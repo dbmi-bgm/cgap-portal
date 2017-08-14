@@ -41,3 +41,27 @@ def test_biosource_convert_cell_line_w_no_ontology_term(
     assert value['schema_version'] == '2'
     assert 'cell_line' not in value
     assert 'cell_line_termid' not in value
+
+
+def test_biosource_convert_cell_line_to_link_to_minor_version(
+        registry, biosource_1, gm12878_oterm):
+    from snovault import UPGRADER
+    upgrader = registry[UPGRADER]
+    biosource_1['schema_version'] = "1.1"
+    value = upgrader.upgrade('biosource', biosource_1, registry=registry,
+                             current_version='1.1', target_version='2')
+    assert value['schema_version'] == "2"
+    assert value['cell_line'] == gm12878_oterm['uuid']
+    assert 'cell_line_termid' not in value
+
+
+def test_biosource_do_not_convert_cell_line_to_link_to_downgrade_version(
+        registry, biosource_1, gm12878_oterm):
+    from snovault import UPGRADER
+    upgrader = registry[UPGRADER]
+    biosource_1['schema_version'] = "1.1"
+    try:
+        upgrader.upgrade('biosource', biosource_1, registry=registry,
+                         current_version='1.1', target_version='1')
+    except Exception as e:
+        assert "'Biosource' from '1.1' to '1'" in e.__str__()
