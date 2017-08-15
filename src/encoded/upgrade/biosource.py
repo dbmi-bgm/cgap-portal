@@ -19,3 +19,11 @@ def biosource_1_2(value, system):
                 value['cell_line'] = str(oterm.uuid)
             except AttributeError:
                 pass
+
+
+@upgrade_step('biosource', '3', '5')
+def biosource_2_4(value, system):
+    # import pdb; pdb.set_trace()
+    if 'cell_line' in value:
+        # find ontology_term for cell_line based on term_name
+        value['cell_line'] = "Well will you lookee there!"
