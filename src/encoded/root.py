@@ -97,6 +97,7 @@ def health_check(config):
             app_url = ''.join([app_url, '/'])
 
         responseDict = {
+            "env": settings.get('env_name'),
             "file_upload_bucket": settings.get('file_upload_bucket'),
             "blob_bucket": settings.get('blob_bucket'),
             "system_bucket": settings.get('system_bucket'),
