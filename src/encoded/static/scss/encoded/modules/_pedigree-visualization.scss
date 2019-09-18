@@ -80,10 +80,10 @@ $pedigree-disease-colors :
         transform: translate3d(0,0,0);
         background: $pedigree-viz-bg-color;
         overflow: auto;
-        –webkit-overflow-scrolling: touch;
         min-height: inherit;
         height: inherit;
         position: relative;
+        –webkit-overflow-scrolling: touch;
 
         // Center viz area
         display: flex;

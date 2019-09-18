@@ -700,18 +700,38 @@ export class PedigreeTabViewBody extends React.PureComponent {
 
     constructor(props){
         super(props);
+        this.onBrowserSizeChange = _.debounce(this.onBrowserSizeChange.bind(this), 300);
         this.state = {
             isBrowserFullscreen : false,
             isPedigreeFullscreen : false
         };
-        //this.pedigreeContainerRef = React.createRef();
+    }
+
+    componentDidMount(){
+        // iOS Safari -specific
+        document.addEventListener("webkitfullscreenchange", this.onBrowserSizeChange);
+        // Chrome, etc
+        document.addEventListener("fullscreenchange", this.onBrowserSizeChange);
+    }
+
+    componentWillUnmount(){
+        document.removeEventListener("webkitfullscreenchange", this.onBrowserSizeChange);
+        document.removeEventListener("fullscreenchange", this.onBrowserSizeChange);
     }
 
     componentDidUpdate(pastProps){
         const { windowHeight } = this.props;
         if (windowHeight !== pastProps.windowHeight){
-            const isBrowserFullscreen = PedigreeTabViewBody.isBrowserFullscreen(windowHeight);
-            console.info("Went full screen?", isBrowserFullscreen);
+            this.onBrowserSizeChange();
+        }
+    }
+
+    onBrowserSizeChange(){
+        console.log("Browser size changed, checking for full screen-ness");
+        setTimeout(()=>{
+            const { windowHeight : wh1 } = this.props;
+            const isBrowserFullscreen = PedigreeTabViewBody.isBrowserFullscreen(wh1);
+            console.info("Went full screen (browser)?", isBrowserFullscreen);
 
             if (!isBrowserFullscreen) {
                 this.setState({
@@ -722,13 +742,17 @@ export class PedigreeTabViewBody extends React.PureComponent {
             }
 
             setTimeout(()=>{
-                const isPedigreeFullscreen = PedigreeTabViewBody.isViewFullscreen(windowHeight);
+                const { windowHeight : wh2 } = this.props;
+                const isPedigreeFullscreen = PedigreeTabViewBody.isViewFullscreen(wh2);
                 this.setState({
                     isBrowserFullscreen,
                     isPedigreeFullscreen
                 });
-            }, 500);
-        }
+
+                console.info("Went full screen (pedigree)?", isPedigreeFullscreen);
+            }, 100);
+
+        }, 100);
     }
 
     render(){
