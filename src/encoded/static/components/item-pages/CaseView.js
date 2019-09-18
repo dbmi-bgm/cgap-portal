@@ -664,7 +664,7 @@ export class PedigreeTabViewBody extends React.PureComponent {
             );
             if (isFullscreenState) return true;
         }
-
+        /*
         let screenH = null;
         if (window && window.screen){
             screenH = window.screen.height;
@@ -677,6 +677,7 @@ export class PedigreeTabViewBody extends React.PureComponent {
         if (windowHeight === screenH){
             return true;
         }
+        */
 
         return false;
     }
@@ -692,15 +693,17 @@ export class PedigreeTabViewBody extends React.PureComponent {
         if (fullscreenElem && pedigreeContainerElem && pedigreeContainerElem === fullscreenElem){
             return true;
         }
+        /*
         if (pedigreeContainerElem && pedigreeContainerElem.offsetHeight === windowHeight){
             return true;
         }
+        */
         return false;
     }
 
     constructor(props){
         super(props);
-        this.onBrowserSizeChange = _.debounce(this.onBrowserSizeChange.bind(this), 300);
+        this.onBrowserSizeChange = _.throttle(this.onBrowserSizeChange.bind(this), 500);
         this.state = {
             isBrowserFullscreen : false,
             isPedigreeFullscreen : false
@@ -728,6 +731,7 @@ export class PedigreeTabViewBody extends React.PureComponent {
 
     onBrowserSizeChange(){
         console.log("Browser size changed, checking for full screen-ness");
+        // Settimeouts might not be needed at all -- could use some testing w. dif browsers.
         setTimeout(()=>{
             const { windowHeight : wh1 } = this.props;
             const isBrowserFullscreen = PedigreeTabViewBody.isBrowserFullscreen(wh1);

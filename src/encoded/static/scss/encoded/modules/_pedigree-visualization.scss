@@ -83,12 +83,15 @@ $pedigree-disease-colors :
         min-height: inherit;
         height: inherit;
         position: relative;
-        –webkit-overflow-scrolling: touch;
 
         // Center viz area
         display: flex;
         justify-content: center;
         align-items: center;
+
+        // For iOS to scroll smoothly horizontally
+        -webkit-overflow-scrolling: touch;
+        -webkit-transform: translate3d(0,0,0);
 
         > .viz-area {
             position: relative;
