@@ -43,29 +43,26 @@ export default class SearchView extends React.PureComponent {
     }
 
     static transformedFacets = memoize(function(href, context, currentAction, session, schemas){
-        var facets,
-            typeFacetIndex,
-            hrefQuery,
-            itemTypesInSearch;
 
         // Clone/filter list of facets.
         // We may filter out type facet completely at this step,
         // in which case we can return out of func early.
-        facets = _.filter(
+        const facets = _.filter(
             context.facets,
             function(facet){ return SearchView.filterFacet(facet, currentAction, session); }
         );
 
         // Find facet for '@type'
-        typeFacetIndex = _.findIndex(facets, { 'field' : 'type' });
+        const typeFacetIndex = _.findIndex(facets, { 'field' : 'type' });
 
         if (typeFacetIndex === -1) {
             return facets; // Facet not present, return.
         }
 
-        hrefQuery = url.parse(href, true).query;
+        const hrefQuery = url.parse(href, true).query;
         if (typeof hrefQuery.type === 'string') hrefQuery.type = [hrefQuery.type];
-        itemTypesInSearch = _.without(hrefQuery.type, 'Item');
+
+        const itemTypesInSearch = _.without(hrefQuery.type, 'Item');
 
         if (itemTypesInSearch.length > 0){
             // Keep all terms/leaf-types - backend should already filter down to only valid sub-types through
@@ -92,14 +89,15 @@ export default class SearchView extends React.PureComponent {
     }
 
     render(){
-        const passProps = _.omit(this.props, 'isFullscreen', 'toggleFullScreen'); // We don't need full screen btn on CGAP as already full width.
+        // We don't need full screen btn on CGAP as already full width.
+        const passProps = _.omit(this.props, 'isFullscreen', 'toggleFullScreen');
         const facets = this.transformedFacets();
         const tableColumnClassName = "col-12" + (facets.length > 0 ? " col-sm-7 col-lg-8 col-xl-9" : "");
         const facetColumnClassName = "col-12" + (facets.length > 0 ? " col-sm-5 col-lg-4 col-xl-3" : "");
         return (
             <div className="container-wide" id="content">
                 <CommonSearchView {...passProps} {...{ columnExtensionMap, tableColumnClassName, facetColumnClassName, facets }}
-                    termTransformFxn={Schemas.Term.toName} />
+                    termTransformFxn={Schemas.Term.toName} separateSingleTermFacets={false} />
             </div>
         );
     }

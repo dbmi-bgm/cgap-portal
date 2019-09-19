@@ -653,6 +653,18 @@ export class PedigreeTabViewBody extends React.PureComponent {
             return false;
         }
 
+        if (document) {
+            const isFullscreenState = (
+                document.fullscreen ||
+                document.fullscreenElement ||
+                document.mozIsFullscreen ||
+                document.mozFullscreenElement ||
+                document.webkitIsFullScreen ||
+                document.webkitFullscreenElement
+            );
+            if (isFullscreenState) return true;
+        }
+        /*
         let screenH = null;
         if (window && window.screen){
             screenH = window.screen.height;
@@ -665,32 +677,65 @@ export class PedigreeTabViewBody extends React.PureComponent {
         if (windowHeight === screenH){
             return true;
         }
+        */
 
         return false;
     }
 
     static isViewFullscreen(windowHeight){
+        if (!document) throw new Error("No document element available");
+        const fullscreenElem = (
+            document.fullscreenElement ||
+            document.mozFullscreenElement ||
+            document.webkitFullscreenElement
+        );
         const pedigreeContainerElem = document.getElementById("pedigree-viz-container-cgap");
+        if (fullscreenElem && pedigreeContainerElem && pedigreeContainerElem === fullscreenElem){
+            return true;
+        }
+        /*
         if (pedigreeContainerElem && pedigreeContainerElem.offsetHeight === windowHeight){
             return true;
         }
+        */
         return false;
     }
 
     constructor(props){
         super(props);
+        this.onBrowserSizeChange = _.throttle(this.onBrowserSizeChange.bind(this), 500);
         this.state = {
             isBrowserFullscreen : false,
             isPedigreeFullscreen : false
         };
-        //this.pedigreeContainerRef = React.createRef();
+    }
+
+    componentDidMount(){
+        // iOS Safari -specific
+        document.addEventListener("webkitfullscreenchange", this.onBrowserSizeChange);
+        // Chrome, etc
+        document.addEventListener("fullscreenchange", this.onBrowserSizeChange);
+    }
+
+    componentWillUnmount(){
+        document.removeEventListener("webkitfullscreenchange", this.onBrowserSizeChange);
+        document.removeEventListener("fullscreenchange", this.onBrowserSizeChange);
     }
 
     componentDidUpdate(pastProps){
         const { windowHeight } = this.props;
         if (windowHeight !== pastProps.windowHeight){
-            const isBrowserFullscreen = PedigreeTabViewBody.isBrowserFullscreen(windowHeight);
-            console.info("Went full screen?", isBrowserFullscreen);
+            this.onBrowserSizeChange();
+        }
+    }
+
+    onBrowserSizeChange(){
+        console.log("Browser size changed, checking for full screen-ness");
+        // Settimeouts might not be needed at all -- could use some testing w. dif browsers.
+        setTimeout(()=>{
+            const { windowHeight : wh1 } = this.props;
+            const isBrowserFullscreen = PedigreeTabViewBody.isBrowserFullscreen(wh1);
+            console.info("Went full screen (browser)?", isBrowserFullscreen);
 
             if (!isBrowserFullscreen) {
                 this.setState({
@@ -700,13 +745,18 @@ export class PedigreeTabViewBody extends React.PureComponent {
                 return;
             }
 
-            const isPedigreeFullscreen = PedigreeTabViewBody.isViewFullscreen(windowHeight);
+            setTimeout(()=>{
+                const { windowHeight : wh2 } = this.props;
+                const isPedigreeFullscreen = PedigreeTabViewBody.isViewFullscreen(wh2);
+                this.setState({
+                    isBrowserFullscreen,
+                    isPedigreeFullscreen
+                });
 
-            this.setState({
-                isBrowserFullscreen,
-                isPedigreeFullscreen
-            });
-        }
+                console.info("Went full screen (pedigree)?", isPedigreeFullscreen);
+            }, 100);
+
+        }, 100);
     }
 
     render(){
@@ -718,7 +768,7 @@ export class PedigreeTabViewBody extends React.PureComponent {
             (isPedigreeFullscreen ? " view-is-full-screen" : "")
         );
         let heightDiff = undefined;
-        if (isBrowserFullscreen || isPedigreeFullscreen){
+        if (isPedigreeFullscreen){
             heightDiff = 0;
         }
 

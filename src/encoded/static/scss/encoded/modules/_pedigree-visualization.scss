@@ -89,6 +89,10 @@ $pedigree-disease-colors :
         justify-content: center;
         align-items: center;
 
+        // For iOS to scroll smoothly horizontally
+        -webkit-overflow-scrolling: touch;
+        -webkit-transform: translate3d(0,0,0);
+
         > .viz-area {
             position: relative;
             transform-origin: 0 0;
@@ -495,7 +499,7 @@ div#pedigree-viz-container-cgap {
 
 /** CGAP-specific full screen view styling **/
 
-div#pedigree-viz-container-cgap.browser-is-full-screen {
+div#pedigree-viz-container-cgap.view-is-full-screen {
     @include media-breakpoint-up(md){
         position: fixed;
         object-fit: contain;
