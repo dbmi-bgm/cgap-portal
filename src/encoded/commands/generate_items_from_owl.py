@@ -377,6 +377,7 @@ def get_existing_items(connection, itype, include_obs_n_del=True):
         search_suffix += '&status=obsolete&status=deleted'
         more_terms = search_metadata(search_suffix, connection, page_limit=200, is_generator=True)
         terms.update({t[iid]: t for t in more_terms})
+    return terms
 
 
 def get_ontology(connection, ont):
