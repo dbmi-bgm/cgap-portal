@@ -186,10 +186,8 @@ def process_pedigree(context, request):
                   'institution': case_props['institution']}
     xml_extra = {'ped_datetime': ped_datetime}
 
-    family = create_family_proband(testapp, xml_data, refs, 'managedObjectID',
+    family_uuids = create_family_proband(testapp, xml_data, refs, 'managedObjectID',
                                    case, post_extra, xml_extra)
-    family_uuids = {'members': [mem['uuid'] for mem in family['members']],
-                    'proband': family['proband']['uuid'] if family.get('proband') else None}
 
     # create Document for input pedigree file
     # pbxml files are not handled by default. Do some mimetype processing
@@ -211,16 +209,14 @@ def process_pedigree(context, request):
 
     # add extra fields to the family object
     attach_uuid = attach_res.json['@graph'][0]['uuid']
-    family['original_pedigree'] = attach_res.json['@graph'][0]
     family_uuids['original_pedigree'] = attach_uuid
-    family['timestamp'] = family_uuids['timestamp'] = ped_timestamp
+    family_uuids['timestamp'] = ped_timestamp
     if xml_data.get('meta', {}).get('notes'):
-        family['clinic_notes'] = family_uuids['clinic_notes'] = xml_data['meta']['notes']
+        family_uuids['clinic_notes'] = xml_data['meta']['notes']
     ped_src = 'Proband app'
     if xml_data.get('meta', {}).get('version'):
         ped_src += (' ' + xml_data['meta']['version'])
-    family['pedigree_source'] = family_uuids['pedigree_source'] = ped_src
-    family['family_phenotypic_features'] = []
+    family_uuids['pedigree_source'] = ped_src
     family_uuids['family_phenotypic_features'] = []
     for hpo_id in family_pheno_feats:
         try:
@@ -233,7 +229,6 @@ def process_pedigree(context, request):
             if config_uri == 'production.ini':
                 raise HTTPUnprocessableEntity(error_msg)
         else:
-            family['family_phenotypic_features'].append(pheno_res)
             family_uuids['family_phenotypic_features'].append(pheno_res['uuid'])
 
     # PATCH the Case with new family
@@ -250,8 +245,8 @@ def process_pedigree(context, request):
                      % (case, family_uuids['members'] + [attach_uuid]))
         raise HTTPUnprocessableEntity(error_msg)
 
-    response['case'] = case_res.json['@graph'][0]
-    response['family'] = family
+    # get the fully embedded case to put in response for front-end
+    response['case'] = testapp.get('/cases/' + case + '?frame=embedded', status=200).json
     response['status'] = 'success'
     return response
 
@@ -731,13 +726,13 @@ def create_family_proband(testapp, xml_data, refs, ref_field, case,
                 else:
                     proband = idv_props['uuid']
 
-    # process into family structure
+    # process into family structure, keeping only uuids of items
     # invert uuids_by_ref to sort family members by managedObjectID (xml ref)
     refs_by_uuid = {v: k for k, v in uuids_by_ref.items()}
-    family = {'members': sorted([m for m in family_members.values()],
-                                 key=lambda v: int(refs_by_uuid[v['uuid']]))}
+    family = {'members': sorted([m['uuid'] for m in family_members.values()],
+                                 key=lambda v: int(refs_by_uuid[v]))}
     if proband and proband in family_members:
-        family['proband'] = family_members[proband]
+        family['proband'] = family_members[proband]['uuid']
     else:
         log.error('Case %s: No proband found for family %s' % family)
     return family
