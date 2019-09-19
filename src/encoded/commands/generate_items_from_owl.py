@@ -366,16 +366,22 @@ def get_slim_terms(connection, itype):
         return None
 
 
-def get_existing_items(connection, itype):
+def get_existing_items(connection, itype, include_obs_n_del=True):
     '''Retrieves all existing items of itype from db '''
+    terms = {}
     search_suffix = 'search/?type={}'.format(itype)
     iid = ITEM2OWL[itype].get('id_field')
     db_terms = search_metadata(search_suffix, connection, page_limit=200, is_generator=True)
-    return {t[iid]: t for t in db_terms}
+    terms = {t[iid]: t for t in db_terms}
+    if include_obs_n_del:
+        search_suffix += '&status=obsolete&status=deleted'
+        more_terms = search_metadata(search_suffix, connection, page_limit=200, is_generator=True)
+        terms.update({t[iid]: t for t in more_terms})
+    return terms
 
 
 def get_ontology(connection, ont):
-    '''return MONDO ontology json retrieved from server
+    '''return ontology json retrieved from server
         ontology jsons are now fully embedded
     '''
     ontology = get_metadata('ontologys/' + ont, connection)
@@ -488,7 +494,7 @@ def compare_terms(t1, t2):
     for k, val in t1.items():
         if k not in t2:
             diff[k] = val
-        elif k == 'parents' or k == 'slim_terms' or k == 'synonyms':
+        elif k in ['parents', 'slim_terms', 'synonyms', 'dbxrefs']:
                 if (len(val) != len(t2[k])) or (Counter(val) != Counter(t2[k])):
                     diff[k] = val
         elif val != t2[k]:
@@ -578,7 +584,7 @@ def id_post_and_patch(terms, dbterms, itype, rm_unchanged=True, set_obsoletes=Tr
         # need a way to exclude our own terms and synonyms and definitions
         id_field = ITEM2OWL[itype].get('id_field')
         for tid, term in dbterms.items():
-            if tid not in terms:
+            if tid not in terms and term.get('status') not in ['obsolete', 'deleted']:
                 if itype == 'OntologyTerm':
                     source_onts = [so.get('uuid') for so in term.get('source_ontologies', [])]
                     if not source_onts or not [o for o in ontids if o in source_onts]:
