@@ -84,7 +84,8 @@ export class IndividualBody extends React.PureComponent {
             onNodeClick,
             onClose,
             diseaseToIndex,
-            session
+            session,
+            href
         } = this.props;
         const {
             isLoadingIndividual,
@@ -93,24 +94,32 @@ export class IndividualBody extends React.PureComponent {
         } = this.state;
         const {
             id, name,
-            data: { individualItem = null } = {},
+            data: { individualItem = {} } = {},
             _parentReferences: parents = [],
             _childReferences: children = []
         } = individual;
 
-        // This should be same as "id" but we grab from here to be safe.
+        // This should be same as "id" but we grab from here to be sure isn't dummy data.
         const {
             '@id' : individualID,
             ethnicity,
             phenotypic_features = [],
             actions = []
-        } = loadedIndividualItem || individualItem || {};
+        } = loadedIndividualItem || individualItem;
 
-        const haveEditPermission = session && _.any(actions, { "name" : "edit" });
+        const haveEditPermission = session && individualID && _.any(actions, { "name" : "edit" });
 
         let showTitle = getIndividualDisplayTitle(individual);
         if (individualID) {
             showTitle = <a href={individualID}>{ showTitle }</a>;
+        }
+
+        let editLink;
+        if (haveEditPermission){
+            editLink = individualID + "?currentAction=edit";
+            if (href){
+                editLink += "&callbackHref=" + encodeURIComponent(href);
+            }
         }
 
         console.log("INDV", loadedIndividualItem, individualItem);
@@ -124,8 +133,8 @@ export class IndividualBody extends React.PureComponent {
                             <label>Individual</label>
                         </div>
                         <div className="col-auto buttons-col">
-                            { haveEditPermission ?
-                                <a href={individualID + "?currentAction=edit"} className="d-block edit-btn">
+                            { editLink ?
+                                <a href={editLink} className="d-block edit-btn">
                                     <i className="icon icon-pencil fas clickable" />
                                 </a>
                                 : isLoadingIndividual ?

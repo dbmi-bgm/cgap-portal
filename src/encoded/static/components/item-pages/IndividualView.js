@@ -21,7 +21,7 @@ export default class IndividualView extends DefaultItemView {
 
 // TODO: Create endpoint to trace family of individual?
 export const PedigreeTabView = React.memo(function PedigreeTabView(props){
-    const { context, innerOverlaysContainer, windowWidth, windowHeight } = props;
+    const { context, windowWidth, windowHeight } = props;
     const family = [ context ];
     if (context.father){
         family.push(context.father);
@@ -37,7 +37,7 @@ export const PedigreeTabView = React.memo(function PedigreeTabView(props){
                 <PedigreeFullScreenBtn />
             </h3>
             <hr className="tab-section-title-horiz-divider"/>
-            <PedigreeTabViewBody {...{ innerOverlaysContainer, windowWidth, windowHeight }} />
+            <PedigreeTabViewBody {...{ windowWidth, windowHeight }} />
         </div>
     );
 });

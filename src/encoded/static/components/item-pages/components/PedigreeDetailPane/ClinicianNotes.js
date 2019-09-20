@@ -30,8 +30,8 @@ export class ClinicianNotes extends React.PureComponent {
             });
         }
 
-        const originalNotes = clinicianNoteSavedCache[id] || propOriginalNotes;
-        const notes = clinicianNoteWorkingDraftCache[id] || originalNotes;
+        const originalNotes = (id && clinicianNoteSavedCache[id]) || propOriginalNotes;
+        const notes = (id && clinicianNoteWorkingDraftCache[id]) || originalNotes;
         return {
             originalNotes,
             notes,
@@ -72,7 +72,10 @@ export class ClinicianNotes extends React.PureComponent {
 
     onChange(e){
         const { individual: { '@id' : id } } = this.props;
-        const notes = clinicianNoteWorkingDraftCache[id] = e.target.value;
+        const notes = e.target.value;
+        if (id){
+            clinicianNoteWorkingDraftCache[id] = notes;
+        }
         this.setState({ notes });
     }
 
@@ -83,6 +86,10 @@ export class ClinicianNotes extends React.PureComponent {
         const { notes, isSaving: alreadyIsSaving } = this.state;
         ReactTooltip.hide();
         if (alreadyIsSaving) return;
+        if (!id) {
+            console.error("No ID available");
+            return;
+        }
         this.setState({ isSaving: true }, ()=>{
             ajax.load(
                 id,
@@ -108,7 +115,9 @@ export class ClinicianNotes extends React.PureComponent {
 
     onReset(e){
         const { individual: { '@id' : id } } = this.props;
-        delete clinicianNoteWorkingDraftCache[id];
+        if (id){
+            delete clinicianNoteWorkingDraftCache[id];
+        }
         this.setState(function({ originalNotes }){
             return { notes: originalNotes };
         });
