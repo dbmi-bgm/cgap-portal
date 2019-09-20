@@ -17,6 +17,7 @@ SomeValuesFrom = OWLNS["someValuesFrom"]
 IntersectionOf = OWLNS["intersectionOf"]
 Deprecated = OWLNS["deprecated"]
 hasDbXref = OBO_OWL["hasDbXref"]
+hasAltId = OBO_OWL["hasAlternativeId"]
 
 DEFAULT_LANGUAGE = "en"
 
