@@ -282,6 +282,21 @@
             }
         }
     },
+    "alternative_ids": {
+        "alternative_ids": {
+            "title": "Alternative identifiers",
+            "comment": "If an item generated from an owl file is deprecated/obsoleted in the ontology then often the id for the item is added to the new rdf that should replace it as an alternative id",
+            "description": "Alternative id - often referring to a deprecated object which this item replaces.",
+            "type": "array",
+            "uniqueItems": true,
+            "lookup": 1000,
+            "items": {
+                "title": "Alternative identifier",
+                "description": "An alternative identifier from this resource - referring to an object that has been deprecated/obsoleted.",
+                "type":  "string"
+            }
+        }
+    },
     "tags": {
         "tags": {
             "title": "Tags",

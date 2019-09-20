@@ -19,7 +19,8 @@ from encoded.commands.owltools import (
     IntersectionOf,
     OnProperty,
     Deprecated,
-    hasDbXref
+    hasDbXref,
+    hasAltId
 )
 from dcicutils.ff_utils import (
     get_authentication_with_server,
@@ -265,9 +266,15 @@ def get_definitions(class_, data, definition_terms):
 
 
 def get_dbxrefs(class_, data):
-    '''Gets synonyms for the class as strings
+    '''Gets dbxrefs for the class as strings
     '''
     return getObjectLiteralsOfType(class_, data, [hasDbXref])
+
+
+def get_alternative_ids(class_, data):
+        '''Gets alternative IDs for the class as strings
+        '''
+        return getObjectLiteralsOfType(class_, data, [hasAltId])
 
 
 def _cleanup_non_fields(terms):
@@ -643,6 +650,9 @@ def add_additional_term_info(terms, data, synonym_terms, definition_terms, itype
         dbxrefs = get_dbxrefs(termuri, data)
         if dbxrefs:
             term.setdefault('dbxrefs', []).extend(dbxrefs)
+        altids = get_alternative_ids(termuri, data)
+        if altids:
+            term.setdefault('alternative_ids', []).extend(altids)
 
     return terms
 
