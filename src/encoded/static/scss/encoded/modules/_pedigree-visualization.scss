@@ -298,9 +298,14 @@ $pedigree-disease-colors :
                         stroke: $pedigree-viz-node-stroke-color;
                         fill: none;
                         stroke-width: 2;
+                        
                         &.is-adjustable {
                             stroke: #7d0000;
                             //stroke: orange;
+                        }
+
+                        &.not-adjustable {
+                            stroke-linecap: square;
                         }
                     }
                 }

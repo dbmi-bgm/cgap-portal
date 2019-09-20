@@ -8,6 +8,12 @@ import { Alerts } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/
 
 export class AttachmentInputController extends React.PureComponent {
 
+    static ErrorObject = {
+        "title" : "Error parsing pedigree file",
+        "message" : "Check your file and try again.",
+        "style" : "danger"
+    };
+
     constructor(props){
         super(props);
         this.handleChange = this.handleChange.bind(this);
@@ -50,7 +56,12 @@ export class AttachmentInputController extends React.PureComponent {
                         }
                         return data;
                     }).then((data)=>{
+                        this.setState({ loading: false }, function(){
+                            onAddedFamily(data);
+                        });
+
                         // todo
+                        /*
                         const {
                             case: caseItem,
                             family : {
@@ -76,22 +87,17 @@ export class AttachmentInputController extends React.PureComponent {
                                 "style" : "success"
                             });
                         });
+                        */
                         return data;
-                    }).then(onAddedFamily).catch((data)=>{
+                    }).catch((data)=>{
                         this.setState({ loading: false }, function(){
-                            Alerts.queue({
-                                "title" : "Error parsing pedigree file",
-                                "message" : "Check your file and try again.",
-                            });
+                            Alerts.queue(AttachmentInputController.ErrorObject);
                         });
                         console.error(data);
                     });
                 } else {
                     this.setState({ loading: false }, function(){
-                        Alerts.queue({
-                            "title" : "Error reading pedigree file",
-                            "message" : "Check your file and try again.",
-                        });
+                        Alerts.queue(AttachmentInputController.ErrorObject);
                     });
                     return;
                 }

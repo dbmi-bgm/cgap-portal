@@ -5,11 +5,15 @@ import PropTypes from 'prop-types';
 import memoize from 'memoize-one';
 import _ from 'underscore';
 import { DropdownButton, DropdownItem } from 'react-bootstrap';
-import DefaultItemView from './../DefaultItemView';
+
 import { console, layout, ajax, object } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { Checkbox } from '@hms-dbmi-bgm/shared-portal-components/es/components/forms/components/Checkbox';
 import { CollapsibleItemViewButtonToolbar } from './../components/CollapsibleItemViewButtonToolbar';
+import { Alerts } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/Alerts';
+
+import DefaultItemView from './../DefaultItemView';
 import { PedigreeDetailPane } from './../components/PedigreeDetailPane';
+import { store } from './../../../store';
 
 import { ProcessingSummaryTable } from './ProcessingSummaryTable';
 import { PedigreeTabViewBody } from './PedigreeTabViewBody';
@@ -21,9 +25,7 @@ export {
     ProcessingSummaryTable,
     PedigreeTabViewBody,
     PedigreeFullScreenBtn,
-    parseFamilyIntoDataset,
-    AttachmentInputController,
-    AttachmentInputMenuOption
+    parseFamilyIntoDataset
 };
 
 
@@ -54,10 +56,11 @@ export default class CaseView extends DefaultItemView {
         this.onAddedFamily = this.onAddedFamily.bind(this);
         this.handleFamilySelect = this.handleFamilySelect.bind(this);
         const pedigreeFamilies = (props.context.families || []).filter(CaseView.haveFullViewPermissionForFamily);
+        const familiesLen = pedigreeFamilies.length;
         this.state = {
             ...this.state,
             pedigreeFamilies,
-            pedigreeFamiliesIdx: 0 // Maybe should be most recent/last index, idk, tbd.
+            pedigreeFamiliesIdx: familiesLen - 1
         };
     }
 
@@ -65,29 +68,48 @@ export default class CaseView extends DefaultItemView {
         const { context } = this.props;
         if (pastProps.context !== context){
             const pedigreeFamilies = (context.families || []).filter(CaseView.haveFullViewPermissionForFamily);
-            this.setState(function({ pedigreeFamiliesIdx: pastIdx }){
-                return {
-                    pedigreeFamilies,
-                    pedigreeFamiliesIdx: (pedigreeFamilies.length > pastIdx ? pastIdx : 0)
-                };
+            const familiesLen = pedigreeFamilies.length;
+            this.setState({
+                pedigreeFamilies,
+                pedigreeFamiliesIdx: familiesLen - 1
             });
         }
     }
 
     onAddedFamily(response){
-        const { family: newFamily } = response;
-        if (!newFamily) return;
-        this.setState(function({ pedigreeFamilies }){
-            const nextFamilies = pedigreeFamilies.slice(0);
-            if (!CaseView.haveFullViewPermissionForFamily(newFamily)){
-                return null; // Shouldn't occur given that User had permission to add in 1st place.
-            }
-            nextFamilies.push(newFamily);
-            return {
-                pedigreeFamilies: nextFamilies,
-                pedigreeFamiliesIdx: nextFamilies.length - 1
-            };
+        const { context, status, title } = response;
+        if (!context || status !== "success") return;
+
+        const { families = [] } = context || {};
+        const familiesLen = families.length;
+        const newestFamily = families[familiesLen - 1];
+
+        if (!newestFamily) return;
+
+        const {
+            original_pedigree : {
+                '@id' : pedigreeID,
+                display_title: pedigreeTitle
+            } = {},
+            pedigree_source
+        } = newestFamily;
+        let message = null;
+
+        if (pedigreeTitle && pedigreeID){
+            message = (
+                <React.Fragment>
+                    <p className="mb-0">Added family from pedigree <a href={pedigreeID}>{ pedigreeTitle }</a>.</p>
+                    { pedigree_source? <p className="mb-0 text-small">Source of pedigree: <em>{ pedigree_source }</em></p> : null }
+                </React.Fragment>
+            );
+        }
+        Alerts.queue({
+            "title" : "Added family " + familiesLen,
+            message,
+            "style" : "success"
         });
+
+        store.dispatch({ type: { context } });
     }
 
     handleFamilySelect(key){
