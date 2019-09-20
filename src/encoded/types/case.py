@@ -246,7 +246,7 @@ def process_pedigree(context, request):
         raise HTTPUnprocessableEntity(error_msg)
 
     # get the fully embedded case to put in response for front-end
-    response['case'] = testapp.get('/cases/' + case + '?frame=embedded', status=200).json
+    response['case'] = testapp.get('/cases/' + case + '?frame=embedded&datastore=database', status=200).json
     response['status'] = 'success'
     return response
 
