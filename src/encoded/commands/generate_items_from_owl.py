@@ -247,9 +247,7 @@ def process_parents(class_, data, terms):
         if isBlankNode(parent):
             continue
         else:
-            if not terms[termid].get('parents'):
-                terms[termid]['parents'] = []
-            terms[termid]['parents'].append(get_termid_from_uri(parent))
+            terms[termid].setdefault('parents', []).append(get_termid_from_uri(parent))
     return terms
 
 
@@ -570,6 +568,8 @@ def id_post_and_patch(terms, dbterms, itype, rm_unchanged=True, set_obsoletes=Tr
 
     # all terms have uuid - now add uuids to linked terms
     for term in terms.values():
+        if term.get('uuid') == '76d151f7-b364-4990-af25-b6c712fb4d0f':
+            import pdb; pdb.set_trace()
         puuids = _get_uuids_for_linked(term, tid2uuid)
         for rt, uuids in puuids.items():
             term[rt] = list(set(uuids))  # to avoid redundant terms
@@ -612,11 +612,12 @@ def id_post_and_patch(terms, dbterms, itype, rm_unchanged=True, set_obsoletes=Tr
 def _get_uuids_for_linked(term, idmap):
     puuids = {}
     for rt in ['parents', 'slim_terms']:
-        if term.get(rt):
-            puuids[rt] = []
-            for p in term[rt]:
+        tlist = term.get(rt)
+        if tlist is not None:
+            del term[rt]
+            for p in tlist:
                 if p in idmap:
-                    puuids[rt].append(idmap[p])
+                    puuids.setdefault(rt, []).append(idmap[p])
                 else:
                     print('WARNING - ', p, ' MISSING FROM IDMAP')
     return puuids
