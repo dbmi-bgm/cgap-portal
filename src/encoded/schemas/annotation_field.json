@@ -31,10 +31,15 @@
           "title": "NCBI Entrez Gene ID",
           "type": "boolean"
         },
-        "enum": {
+        "enum_list": {
             "title": "Enum list",
             "description": "If field is list, you can define set of values",
-            "type": ""
+            "type": "array",
+            "uniqueItems": true,
+            "items": {
+                "title": "Enum list item",
+                "type":  "string"
+            }
         },
         "field_type": {
             "title": "Field type",
@@ -47,135 +52,124 @@
                 "boolean"
             ]
         },
-        "": {
-            "title": "",
-            "description": "",
-            "type": ""
+        "sub_embedding_group": {
+            "title": "Sub-embedding group",
+            "description": "If field belong to a sub embedded object, add field name",
+            "type": "string"
         },
-        "": {
-            "title": "",
-            "description": "",
-            "type": ""
+        "scale": {
+            "title": "Scale",
+            "description": "Scale defined by new annotation structure",
+            "type": "string"
         },
-        "": {
-            "title": "",
-            "description": "",
-            "type": ""
+        "domain": {
+            "title": "Domain",
+            "description": "Domain defined by new annotation structure",
+            "type": "string"
         },
-        "": {
-            "title": "",
-            "description": "",
-            "type": ""
+        "method": {
+            "title": "Method",
+            "description": "Method defined by new annotation structure",
+            "type": "string"
         },
-        "": {
-            "title": "",
-            "description": "",
-            "type": ""
-        },
-        "": {
-            "title": "",
-            "description": "",
-            "type": ""
-        },
-        "": {
-            "title": "",
-            "description": "",
-            "type": ""
-        },
-        "": {
-            "title": "",
-            "description": "",
-            "type": ""
-        },
-        "": {
-            "title": "",
-            "description": "",
-            "type": ""
-        },
-        "": {
-            "title": "",
-            "description": "",
-            "type": ""
-        },
-        "": {
-            "title": "",
-            "description": "",
-            "type": ""
-        },
-        "": {
-            "title": "",
-            "description": "",
-            "type": ""
-        },
-        "": {
-            "title": "",
-            "description": "",
-            "type": ""
-        },
-        "": {
-            "title": "",
-            "description": "",
-            "type": ""
-        },
-        "": {
-            "title": "",
-            "description": "",
-            "type": ""
-        },
-        "": {
-            "title": "",
-            "description": "",
-            "type": ""
-        },
-        "fullname": {
-            "title": "Gene name",
-            "description": "The full gene name preferably approved by the official nomenclature.",
+        "seperator": {
+            "title": "Seperator",
+            "description": "if value is list, use this seperator to split items",
             "type": "string",
-            "permission": "import_items"
+            "enum": [
+                "comma",
+                "pipe",
+                "semicolon",
+                "colon",
+                "tab"
+            ]
         },
-        "synonyms": {
-            "title": "Synonyms",
-            "description": "Alternative symbols and names that have been used to refer to the gene.",
-            "comment": "The list of synonyms is maintained using information from NCBI Entrez. Synonyms not included in NCBI gene_info can be added but are not actively maintained.",
-            "type": "array",
-            "uniqueItems": true,
-            "items": {
-                "title": "Synonym",
-                "description": "An alternative symbol/name referring to the gene.",
-                "type":  "string"
-            }
-        },
-        "organism": {
-            "title": "Organism",
-            "description": "Organism of the gene.",
-            "comment": "See organism.json for available identifiers.",
+        "scope": {
+            "title": "Scope",
+            "description": "Scope that this field belongs to",
             "type": "string",
-            "linkTo": "Organism",
-            "permission": "import_items"
+            "enum": [
+                "variant",
+                "sample",
+                "gene"
+            ]
         },
-        "genomic_location":  {
-            "title": "Genomic Location",
-            "description": "Location of the gene on it's genome",
-            "type": "string",
-            "linkTo": "GenomicRegion"
+        "schema_title": {
+            "title": "Schema Title",
+            "description": "Title to be used in the variant schema for the field",
+            "type": "string"
         },
-        "url": {
-            "title": "Link to Gene",
-            "description": "Link to the gene record in its source database",
+        "schema_description": {
+            "title": "Description to be used in the variant schema for the field",
+            "description": "description inception",
+            "type": "string"
+        },
+        "source_name": {
+            "title": "Source Name",
+            "description": "Source used for collection information in this field",
+            "type": "string"
+        },
+        "source_version": {
+            "title": "Source Version",
+            "description": "Version of source used for collection information in this field",
+            "type": "string"
+        },
+        "field_priority": {
+            "title": "Field priority",
+            "description": "Ranking number of the field (lower is better)",
+            "type": "integer"
+        },
+        "column_priority": {
+            "title": "Column priority",
+            "description": "Ranking number of the field for Column in search view (lower is better)",
+            "type": "integer"
+        },
+        "facet_priority": {
+            "title": "Field priority",
+            "description": "Ranking number of the field for Facet in search view (lower is better)",
+            "type": "integer"
+        },
+        "links_to": {
+            "title": "Linking To",
+            "description": "If this field can be associated with another item type from CGAP database",
             "type": "string",
-            "format": "uri",
-            "permission": "import_items"
+            "enum": [
+                "Gene",
+                "Disorder",
+                "Phenotype"
+            ]
+        },
+        "MVP": {
+            "title": "MVP",
+            "description": "Is this field part of MVP",
+            "type": "boolean"
+        },
+        "value_example": {
+            "title": "Example Value for this field",
+            "description": "Example Value for this field, stored as text",
+            "type": "string"
+        }
+    },
+    "facets": {
+        "field_type": {
+            "title": "Type"
+        },
+        "source_name": {
+            "title": "Source"
+        },
+        "scope": {
+            "title": "Scope"
         }
     },
     "columns": {
-        "fullname": {
-            "title": "Gene name"
+        "field_name": {
+            "title": "Field type"
         },
-        "gene_id": {
-            "title": "NCBI Entrez GeneID"
+        "field_type": {
+            "title": "Field type"
         },
-        "url": {
-            "title": "NCBI link"
+        "source_name": {
+            "title": "Source"
         }
     }
 }
