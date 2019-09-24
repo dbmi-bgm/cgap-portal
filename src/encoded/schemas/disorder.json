@@ -100,7 +100,7 @@
                         "type": "string",
                         "enum": ["P", "I", "C", "M"]
                     },
-                    "curattion_history": {
+                    "curation_history": {
                         "title": "Curation History",
                         "description": "History of curation with format 'HPO:Joseph[2012-07-05];HPO:Suzanna[2015-12-07]'",
                         "type": "string"
@@ -152,7 +152,7 @@
             "title" : "Comment",
             "formInput": "textarea"
         },
-        "curated_dbxref": {
+        "curated_dbxrefs": {
             "title": "Curated DB Xrefs",
             "description": "A reference to an external identifier that has been manually added - not all MONDO IDs map to IDs from HPOA file add as DB:ID eg. OMIM:12345",
             "type": "array",
