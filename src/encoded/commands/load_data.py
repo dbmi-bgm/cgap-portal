@@ -38,8 +38,8 @@ def main():
     log.info("load_data: load_test_data function is %s" % (load_test_data))
     load_test_data = DottedNameResolver().resolve(load_test_data)
 
-    # do not run on webprod/webprod2 unless we set --prod flag
-    if 'webprod' in env and not args.prod:
+    # do not run on cgap/cgapdev unless we set --prod flag
+    if env in ['fourfront-cgap', 'fourfront-cgapdev'] and not args.prod:
         log.info('load_data: skipping, since we are on webprod/webprod2 and --prod not used')
         return
 
