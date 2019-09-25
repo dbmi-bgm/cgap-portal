@@ -32,11 +32,32 @@ export const ProcessingSummaryTable = React.memo(function ProcessingSummaryTable
     ];
 
     const columnTitles = {
-        'individual' : "Individual",
-        'sample' : "Sample",
+        'individual' : (
+            <React.Fragment>
+                <i className="icon icon-fw icon-user fas mr-05 align-middle"/>
+                Individual
+            </React.Fragment>
+        ),
+        'sample' : (
+            <React.Fragment>
+                <i className="icon icon-fw icon-vial fas mr-05 align-middle"/>
+                Sample
+            </React.Fragment>
+        ),
         'processedFileCount' : "Processed Files",
-        'processedFiles' : "Output File",
-        'rawFileCount' : "Raw Files",
+        'processedFiles' : (
+            <React.Fragment>
+                <i className="icon icon-fw icon-file-code fas mr-05 align-middle"/>
+                Output File(s)
+            </React.Fragment>
+        ),
+        'rawFileCount' : (
+            <React.Fragment>
+                <i className="icon icon-fw icon-file-upload fas mr-05 align-middle"
+                    data-tip="Raw Files"/>
+                <span className="d-none d-lg-inline">Raw Files</span>
+            </React.Fragment>
+        ),
         'sampleStatus' : "Sample Status"
     };
 
