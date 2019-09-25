@@ -44,20 +44,6 @@ body[data-current-action="add"] {
                     cursor: pointer;
                 }
 
-                &.active {
-                    background-color: #fff;
-                    > .row > .number-indicator > span {
-                        border: 2px solid transparent;
-                        background-color: #ffe714;
-                    }
-                }
-
-                &.disabled {
-                    > .row {
-                        opacity: 0.5;
-                    }
-                }
-
                 > .row {
                     flex-wrap: nowrap;
                     align-items: center;
@@ -72,11 +58,38 @@ body[data-current-action="add"] {
                             display: block;
                             height: 50px;
                             width: 50px;
-                            border: 2px dashed #ddd;
+                            border: 1px solid transparent;
+                            background-color: #ffe714;
                             border-radius: 50%;
                         }
                     }
                 }
+
+                &.active {
+                    background-color: #fff;
+                    > .row > .number-indicator > span {
+                        border: 1px solid #0004;
+                    }
+                }
+
+                &.completed {
+                    //background-color: #fff;
+                    > .row > .number-indicator > span {
+                        background-color: #98ec64;
+                    }
+                }
+
+                &.disabled {
+                    > .row {
+                        opacity: 0.5;
+                        > .number-indicator > span {
+                            border: 1px dashed #ddd;
+                            background-color: transparent;
+                        }
+                    }
+                }
+
+                
 
                 .panel-title {
                     font-weight: 600;
@@ -87,9 +100,7 @@ body[data-current-action="add"] {
 
         .panel-form-container {
 
-            margin-bottom: 10px;
             padding-bottom: 10px;
-            border-bottom: 1px solid #eee;
 
             &.is-creating {
                 opacity: 0.5;
@@ -123,7 +134,11 @@ body[data-current-action="add"] {
             }
         }
 
+    }
 
+    .buttons-container.finish-row {
+        padding-top: 10px;
+        border-top: 1px solid #eee;
     }
 
 }

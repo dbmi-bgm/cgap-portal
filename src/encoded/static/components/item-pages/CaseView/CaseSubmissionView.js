@@ -34,8 +34,9 @@ export default class CaseSubmissionView extends React.PureComponent {
         this.handleLoadedUser = this.handleLoadedUser.bind(this);
         this.handleLoadedCase = this.handleLoadedCase.bind(this);
         this.handleComplete = this.handleComplete.bind(this);
+        this.markCompleted = this.markCompleted.bind(this);
         this.state = {
-            panelsComplete: [],
+            panelsComplete: [ false, false, false ],
             panelIdx: 0,
             caseItem: null,
             user: null
@@ -73,7 +74,6 @@ export default class CaseSubmissionView extends React.PureComponent {
             } else {
                 panelsComplete = pastPanelsComplete.slice(0);
                 panelsComplete[0] = true;
-                panelsComplete[1] = true;
             }
             return { caseItem, panelsComplete, panelIdx: 1 };
         });
@@ -83,6 +83,19 @@ export default class CaseSubmissionView extends React.PureComponent {
         const { caseItem } = this.state;
         const { '@id' : caseID } = caseItem || {};
         navigate(caseID);
+    }
+
+    markCompleted(panelIdx, setTo = true){
+        this.setState(function({ panelsComplete: pastPanelsComplete }){
+            let panelsComplete;
+            if (pastPanelsComplete[panelIdx] === setTo){
+                panelsComplete = pastPanelsComplete; // Don't change reference.
+            } else {
+                panelsComplete = pastPanelsComplete.slice(0);
+                panelsComplete[panelIdx] = setTo;
+            }
+            return { panelsComplete };
+        });
     }
 
     render(){
@@ -103,13 +116,17 @@ export default class CaseSubmissionView extends React.PureComponent {
                     <i className="icon icon-external-link-alt fas text-smaller ml-05"/>
                 </h5>
             );
-            finishBtn = (
-                <div className="buttons-container text-right">
-                    <button type="button" className="btn btn-outline-success" onClick={this.handleComplete}>
-                        Finish & View Case
-                    </button>
-                </div>
-            );
+            if (panelIdx !== 2){
+                // Hide when on last panel since that has same button, but which also
+                // performs a PATCH
+                finishBtn = (
+                    <div className="buttons-container finish-row text-right">
+                        <button type="button" className="btn btn-outline-success" onClick={this.handleComplete}>
+                            Finish & View Case
+                        </button>
+                    </div>
+                );
+            }
         }
 
         return (
@@ -119,14 +136,15 @@ export default class CaseSubmissionView extends React.PureComponent {
 
                     { caseLink }
 
-                    <PanelSelectionMenu {...{ panelIdx, panelsComplete }} onSelect={this.handleSelectPanel} />
-                    <PanelOne {...this.props} {...this.state} userDetails={userDetails}
+                    <PanelSelectionMenu {...{ panelIdx, panelsComplete, caseItem }} onSelect={this.handleSelectPanel} />
+                    <PanelOne {...this.props} {...this.state} userDetails={userDetails} markCompleted={this.markCompleted}
                         onLoadUser={this.handleLoadedUser} onSubmitCase={this.handleLoadedCase} />
 
-                    <PanelTwo {...this.props} {...this.state} userDetails={userDetails} onLoadedCase={this.handleLoadedCase} />
+                    <PanelTwo {...this.props} {...this.state} userDetails={userDetails} onLoadedCase={this.handleLoadedCase}
+                        markCompleted={this.markCompleted} />
 
                     <PanelThree {...this.props} {...this.state} userDetails={userDetails} onLoadedCase={this.handleLoadedCase}
-                        onComplete={this.handleComplete} />
+                        onComplete={this.handleComplete} markCompleted={this.markCompleted} />
 
                     { finishBtn }
 
@@ -139,7 +157,7 @@ export default class CaseSubmissionView extends React.PureComponent {
 
 
 function PanelSelectionMenu(props){
-    const { onSelect, panelIdx, panelsComplete } = props;
+    const { onSelect, panelIdx, panelsComplete, caseItem } = props;
     const steps = [
         "Basic Information",
         "Import Pedigree(s)",
@@ -149,8 +167,14 @@ function PanelSelectionMenu(props){
     const renderedItems = steps.map(function(stepTitle, stepIdx){
         const stepNum = stepIdx + 1;
         const active = panelIdx === stepIdx;
-        const disabled = stepIdx !== 0 && !panelsComplete[stepIdx - 1];
-        const cls = ("panel-menu-item" + (active? " active" : "") + (disabled? " disabled" : ""));
+        const disabled = stepIdx !== 0 && !caseItem; // Becomes undisabled after first panel completed.
+        const completed = panelsComplete[stepIdx];
+        const cls = (
+            "panel-menu-item" +
+            (active? " active" : "") +
+            (disabled? " disabled" : "") +
+            (completed? " completed" : "")
+        );
         return (
             <div data-for-panel={stepNum} onClick={!disabled && onSelect} key={stepNum} className={cls}>
                 <div className="row">
@@ -199,6 +223,15 @@ class PanelOne extends React.PureComponent {
         return initState;
     }
 
+    static checkIfChanged(caseItem, title, institutionID, projectID){
+        const {
+            institution: { '@id' : caseInstitutionID = null } = {},
+            project: { '@id' : caseProjectID = null } = {},
+            display_title: caseTitle
+        } = caseItem;
+        return (institutionID !== caseInstitutionID) || (projectID !== caseProjectID) || (title !== caseTitle);
+    }
+
     constructor(props){
         super(props);
         this.loadUser = this.loadUser.bind(this);
@@ -217,6 +250,10 @@ class PanelOne extends React.PureComponent {
         this.setSelectingInstitution = () => { this.setState({ selectingField: "institution" }); };
         this.setSelectingProject     = () => { this.setState({ selectingField: "project" }); };
 
+        this.memoized = {
+            checkIfChanged: PanelOne.checkIfChanged
+        };
+
         this.caseTitleInputRef = React.createRef();
     }
 
@@ -225,13 +262,48 @@ class PanelOne extends React.PureComponent {
     }
 
     componentDidUpdate(pastProps){
-        const { user } = this.props;
-        if (user !== pastProps.user){
+        const { caseItem = null, markCompleted, panelIdx, panelsComplete, user } = this.props;
+        const { caseItem: pastCaseItem = null, panelIdx: pastPanelIdx, user: pastUser } = pastProps;
+
+        if (user !== pastUser){
             this.setState(PanelOne.flatFieldsFromUser(user));
             this.caseTitleInputRef.current && this.caseTitleInputRef.current.focus();
             ReactTooltip.rebuild();
+            return;
         }
+
+        if (caseItem && caseItem !== pastCaseItem){
+            const {
+                institution: {
+                    '@id' : institutionID = null,
+                    display_title: institutionTitle = null
+                } = {},
+                project: {
+                    '@id' : projectID = null,
+                    display_title: projectTitle = null
+                } = {}
+            } = caseItem;
+            this.setState({
+                caseTitle: caseItem.title || "",
+                institutionID, institutionTitle,
+                projectID, projectTitle
+            });
+            return;
+        }
+
+        if (caseItem){
+            const { institutionID, projectID, caseTitle: title } = this.state;
+            const valuesDiffer = this.memoized.checkIfChanged(caseItem, title, institutionID, projectID);
+            if (valuesDiffer && panelsComplete[0] === true){
+                markCompleted(0, false);
+            } else if (!valuesDiffer && panelIdx === 0 && panelsComplete[0] === false) {
+                // We already completed POST; once case present, mark this complete also.
+                markCompleted(0, true);
+            }
+        }
+
     }
+
 
     loadUser(){
         const { userDetails, panelIdx, onLoadUser } = this.props;
@@ -286,15 +358,31 @@ class PanelOne extends React.PureComponent {
                 throw res;
             }
             const [ caseItemObject ] = res['@graph'];
-            onSubmitCase(caseItemObject);
+            const { '@id' : caseID } = caseItemObject;
+
+            // Load the @@embedded representation now
+            this.request = ajax.load(caseID + "@@embedded", function(getReqRes){
+                onSubmitCase(getReqRes);
+            });
         };
         const fb = (res) => {
             this.setState({ isCreating: false });
-            const errorList = res.errors || [ res.detail ] || [];
-            errorList.forEach(function(serverErr){
-                let detail = serverErr.description || serverErr[i] || "Unidentified error";
-                if (serverErr.name){
-                    detail += '. ' + serverErr.name;
+
+            if (!res || Object.keys(res).length === 0){
+                Alerts.queue({
+                    'title' : "Submission Error",
+                    'message': "Encountered unknown error, likely related to network connection. Please try again.",
+                    'style': 'danger'
+                });
+                return;
+            }
+
+            const errorList = res.errors || [ res.detail ];
+
+            errorList.forEach(function(err, i){
+                let detail = (err && (err.description || err.detail || err)) || "Unknown Error";
+                if (err && err.name){
+                    detail += '. ' + err.name;
                 }
                 Alerts.queue({
                     'title' : "Validation error " + parseInt(i + 1),
@@ -308,7 +396,7 @@ class PanelOne extends React.PureComponent {
 
         this.setState({ isCreating: true }, ()=>{
             this.request = ajax.load(
-                "/case/",
+                caseItem ? caseItem['@id'] : "/case/",
                 cb,
                 caseItem ? "PATCH" : "POST",
                 fb,
@@ -340,16 +428,13 @@ class PanelOne extends React.PureComponent {
             );
         }
 
-        const createDisabled = (isCreating || !institutionID || !projectID || !caseTitle);
+        const valuesChanged = !caseItem || this.memoized.checkIfChanged(caseItem, caseTitle, institutionID, projectID);
+        const createDisabled = (!valuesChanged || isCreating || !institutionID || !projectID || !caseTitle);
 
         return (
             <form className={"panel-form-container d-block" + (isCreating ? " is-creating" : "")} onSubmit={this.handleCreate}>
                 <h4 className="text-300 mt-2">Required Fields</h4>
-                <label className="field-section mt-2 d-block">
-                    <span className="d-block mb-05">Case Title</span>
-                    <input type="text" value={caseTitle} onChange={this.handleChangeCaseTitle}
-                        className="form-control d-block" ref={this.caseTitleInputRef}/>
-                </label>
+
                 <LinkToFieldSection onCloseChildWindow={this.unsetSelectingField}
                     onStartSelect={this.setSelectingInstitution}
                     onSelect={this.handleSelectInstitution} title="Institution"
@@ -360,15 +445,23 @@ class PanelOne extends React.PureComponent {
                     onSelect={this.handleSelectProject} title="Project"
                     isSelecting={selectingField === "project"}
                     type="Project" selectedId={projectID} selectedTitle={projectTitle} />
+                <label className="field-section mt-2 d-block">
+                    <span className="d-block mb-05">Case Title</span>
+                    <input type="text" value={caseTitle} onChange={this.handleChangeCaseTitle}
+                        className="form-control d-block" ref={this.caseTitleInputRef}/>
+                </label>
 
                 <hr className="mb-1"/>
 
-                <div className="buttons-container text-right">
-                    <button type="submit" className="btn btn-success"
-                        disabled={createDisabled} onClick={this.handleCreate}>
-                        { caseItem ? "Submit Changes" : "Create & Proceed" }
-                    </button>
-                </div>
+                { valuesChanged ?
+                    <div className="buttons-container text-right">
+                        <button type="submit" className="btn btn-success"
+                            disabled={createDisabled} onClick={this.handleCreate}>
+                            { caseItem ? "Submit Changes" : "Create & Proceed" }
+                        </button>
+                    </div>
+                    : null }
+
             </form>
         );
     }
@@ -409,9 +502,17 @@ class PanelTwo extends React.PureComponent {
     }
 
     componentDidUpdate(pastProps){
-        const { caseItem } = this.props;
-        if (caseItem !== pastProps.caseItem){
+        const { caseItem, markCompleted, panelIdx } = this.props;
+        const { families = [] } = caseItem || {};
+        const { caseItem: pastCaseItem, panelIdx: pastPanelIdx } = pastProps;
+        const { pastFamilies = [] } = pastCaseItem || {};
+        if (caseItem !== pastCaseItem){
             ReactTooltip.rebuild();
+        }
+
+        if (panelIdx === 1 && pastFamilies.length !== families.length){
+            // We already completed POST; once case present, mark this complete also.
+            markCompleted(1);
         }
     }
 
@@ -515,27 +616,67 @@ function PedigreeAttachmentBtn(props){
 
 class PanelThree extends React.PureComponent {
 
+    static checkIfChanged(caseItem, status, description, aliases = []){
+        const { description: cDescription, aliases: cAliases = [], status: cStatus } = caseItem;
+        const statusDiffers = cStatus !== status;
+        if (statusDiffers) return true;
+        const descDiffers = !(!description && !cDescription) && (
+            (description && !cDescription) || (description && !cDescription) || description !== cDescription
+        );
+        if (descDiffers) return true;
+        const aliasesDiffers = aliases.length !== cAliases.length || (aliases.length > 0 && !_.every(aliases, function(alias, idx){
+            return alias === cAliases[idx];
+        }));
+        if (aliasesDiffers) return true;
+        return false;
+    }
+
     constructor(props){
         super(props);
+        this.handleStatusChange = this.handleStatusChange.bind(this);
         this.handleAliasChange = this.handleAliasChange.bind(this);
         this.handleDescriptionChange = this.handleDescriptionChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
         this.state = {
             isPatching: false,
             status: props.caseItem && props.caseItem.status,
-            aliases: (props.caseItem && props.caseItem.aliases) || [],
+            aliases: (props.caseItem && props.caseItem.aliases && props.caseItem.aliases.slice(0)) || [],
             description: (props.caseItem && props.caseItem.description) || ""
+        };
+
+        this.memoized = {
+            checkIfChanged: memoize(PanelThree.checkIfChanged)
         };
     }
 
     componentDidUpdate(pastProps){
-        const { caseItem = null } = this.props;
-        const { pastCaseItem = null } = pastProps;
-        if (caseItem !== pastCaseItem){
+        const { caseItem = null, markCompleted, panelIdx, panelsComplete } = this.props;
+        const { caseItem: pastCaseItem = null, panelIdx: pastPanelIdx } = pastProps;
+
+        if (caseItem && caseItem !== pastCaseItem){
             this.setState({
-                status: caseItem.status
+                status: caseItem.status,
+                aliases: (caseItem.aliases || []).slice(0),
+                description: caseItem.description || "",
             });
+            return;
         }
+
+        if (caseItem){
+            const { aliases, description, status } = this.state;
+            const stateDiffersFromCase = this.memoized.checkIfChanged(caseItem, status, description, aliases);
+            if (stateDiffersFromCase && panelsComplete[2] === true){
+                markCompleted(2, false);
+            } else if (!stateDiffersFromCase && panelIdx === 2 && panelsComplete[2] === false) {
+                // We already completed POST; once case present, mark this complete also.
+                markCompleted(2, true);
+            }
+        }
+
+    }
+
+    handleStatusChange(status){
+        this.setState({ status });
     }
 
     handleAliasChange(nextAlias, aliasIdx){
@@ -578,9 +719,9 @@ class PanelThree extends React.PureComponent {
         };
         const fb = (res) => {
             this.setState({ isPatching: false });
-            const errorList = res.errors || [ res.detail ] || [];
-            errorList.forEach(function(serverErr){
-                let detail = serverErr.description || serverErr[i] || "Unidentified error";
+            const errorList = res.errors || [ res.detail ];
+            errorList.forEach(function(serverErr, i){
+                let detail = serverErr.description || serverErr || "Unidentified error";
                 if (serverErr.name){
                     detail += '. ' + serverErr.name;
                 }
@@ -647,12 +788,14 @@ class PanelThree extends React.PureComponent {
         const statusFieldSchema = schemas['Case'].properties.status;
         const statusOpts = statusFieldSchema.enum.map(function(statusOpt){
             return (
-                <DropdownItem key={statusOpt}>
+                <DropdownItem key={statusOpt} eventKey={statusOpt}>
                     <i className="item-status-indicator-dot mr-1" data-status={statusOpt}/>
                     { Schemas.Term.toName("status", statusOpt) }
                 </DropdownItem>
             );
         });
+
+        const stateDiffersFromCase = this.memoized.checkIfChanged(caseItem, status, description, aliases);
 
         return (
             <div className={"panel-form-container" + (isPatching ? " is-creating" : "")}>
@@ -674,14 +817,16 @@ class PanelThree extends React.PureComponent {
                     <label className="d-block mb-05">
                         Case Status
                     </label>
-                    <DropdownButton title={statusTitle} variant="outline-dark">
+                    <DropdownButton title={statusTitle} variant="outline-dark"
+                        onSelect={this.handleStatusChange}>
                         { statusOpts }
                     </DropdownButton>
                 </div>
                 <hr className="mb-1" />
                 <div className="buttons-container text-right">
-                    <button type="button" className="btn btn-success" disabled={isPatching} onClick={this.handleSubmit}>
-                        Submit & View Case
+                    <button type="button" className={"btn btn-" + (stateDiffersFromCase ? "success" : "outline-success")}
+                        disabled={isPatching} onClick={this.handleSubmit}>
+                        Finish & View Case
                     </button>
                 </div>
             </div>
@@ -695,6 +840,23 @@ function LinkToFieldSection(props){
         title, type, isSelecting, onSelect, onCloseChildWindow,
         selectedId, selectedTitle, onStartSelect
     } = props;
+
+    let showTitle;
+    if (selectedTitle && selectedId){
+        showTitle = (
+            <React.Fragment>
+                <a href={selectedId} rel="noopener noreferrer" target="_blank" data-tip="View in new window">
+                    { selectedTitle }
+                </a>
+                &nbsp; - &nbsp;<code className="small">{ selectedId }</code>
+            </React.Fragment>
+        );
+    } else if (selectedId){
+        showTitle = selectedId;
+    } else {
+        showTitle = <em>None Selected</em>;
+    }
+
     return (
         <div className="field-section linkto-section mt-2 d-block">
             <label className="d-block mb-05">{ title }</label>
@@ -705,12 +867,7 @@ function LinkToFieldSection(props){
             <div className="row">
                 <div className="col">
                     <div className={'linkto-value text-400' + (isSelecting ? " active" : "")}>
-                        { selectedTitle || selectedId || <em>None Selected</em> }
-                        { selectedTitle && selectedId ?
-                            <React.Fragment>
-                                &nbsp; - &nbsp;<code className="small">{ selectedId }</code>
-                            </React.Fragment>
-                            : null }
+                        { showTitle }
                     </div>
                 </div>
                 <div className="col-auto">
