@@ -1,0 +1,41 @@
+[
+    {
+        "field_name": "test_field",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "institution": "hms-dbmi",
+        "submitted_by": "koray_kirli@hms.harvard.edu",
+        "uuid": "25e82a90-49e5-4c33-afab-1ec90d65fbbb",
+        "status": "released",
+        "schema_title": "Test Field",
+        "source_name": "Google",
+        "scope": "gene",
+        "field_type": "string",
+        "mvp": false
+    },
+    {
+        "field_name": "test_field_2",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "institution": "hms-dbmi",
+        "submitted_by": "koray_kirli@hms.harvard.edu",
+        "uuid": "25e82a90-49e5-4c33-afab-1ec90d65fabb",
+        "status": "released",
+        "schema_title": "Test Field 2",
+        "source_name": "Google",
+        "scope": "variant",
+        "field_type": "integer",
+        "mvp": true
+    },
+    {
+        "field_name": "test_field_3",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "institution": "hms-dbmi",
+        "submitted_by": "koray_kirli@hms.harvard.edu",
+        "uuid": "25e82a90-49e5-4c33-afab-1ec90d65fcbb",
+        "status": "released",
+        "schema_title": "Test Field 3",
+        "source_name": "Yahoo",
+        "scope": "sample",
+        "field_type": "number",
+        "mvp": true
+    }
+]
