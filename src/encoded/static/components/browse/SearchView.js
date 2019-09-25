@@ -10,6 +10,7 @@ import { SearchView as CommonSearchView } from '@hms-dbmi-bgm/shared-portal-comp
 import { columnExtensionMap } from './columnExtensionMap';
 import { Schemas } from './../util';
 import { TitleAndSubtitleBeside, PageTitleContainer, TitleAndSubtitleUnder, pageTitleViews } from './../PageTitleSection';
+import { getSubmissionItemTypes } from './../forms/CGAPSubmissionView';
 
 
 export default class SearchView extends React.PureComponent {
@@ -105,7 +106,18 @@ export default class SearchView extends React.PureComponent {
 
 
 
-const SearchViewPageTitle = React.memo(function SearchViewPageTitle({ context, schemas, currentAction, alerts }){
+const SearchViewPageTitle = React.memo(function SearchViewPageTitle(props){
+    const { context, href, schemas, currentAction, alerts } = props;
+
+    if (currentAction === "add"){
+        // See if any custom PageTitles registered for ItemType/add
+        const itemTypes = getSubmissionItemTypes(context, href);
+        const FoundTitleComponent = pageTitleViews.lookup({ "@type" : itemTypes }, "add");
+        if (FoundTitleComponent){
+            return <FoundTitleComponent {...props} />;
+        }
+    }
+
     if (currentAction === 'selection') {
         return (
             <PageTitleContainer alerts={alerts}>
@@ -131,3 +143,4 @@ const SearchViewPageTitle = React.memo(function SearchViewPageTitle({ context, s
 
 pageTitleViews.register(SearchViewPageTitle, "Search");
 pageTitleViews.register(SearchViewPageTitle, "Search", "selection");
+pageTitleViews.register(SearchViewPageTitle, "Search", "add");

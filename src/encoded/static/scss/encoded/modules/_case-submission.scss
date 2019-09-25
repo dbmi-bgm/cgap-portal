@@ -1,0 +1,129 @@
+/** Stylesheet for Case Submission View/Wizard **/
+
+body[data-current-action="add"] {
+
+    .case-submission-view {
+
+
+        /** Menu to select step **/
+        .panel-selection {
+            display: flex;
+            margin-top: 30px;
+            
+
+            > .panel-menu-item {
+                flex: 1 1 auto;
+                min-height: 60px;
+                padding: 0 10px;
+                background-color: #f4f4f4;
+
+                &:first-child {
+                    border-radius: 25px 0 0 25px;
+                }
+
+                &:last-child {
+                    border-radius: 0 25px 25px 0;
+                }
+
+                @include media-breakpoint-down(md){
+                    flex-direction: column;
+                    &:first-child {
+                        border-radius: 10px 10px 0 0;
+                    }
+    
+                    &:last-child {
+                        border-radius: 0 0 10px 10px;
+                    }
+                }
+
+                &:not(:last-child){
+                    border-right: 1px solid #ddd;
+                }
+
+                &:not(.disabled):not([disabled]) {
+                    cursor: pointer;
+                }
+
+                &.active {
+                    background-color: #fff;
+                    > .row > .number-indicator > span {
+                        border: 2px solid transparent;
+                        background-color: #ffe714;
+                    }
+                }
+
+                &.disabled {
+                    > .row {
+                        opacity: 0.5;
+                    }
+                }
+
+                > .row {
+                    flex-wrap: nowrap;
+                    align-items: center;
+                    height: 100%;
+                    > .number-indicator {
+                        font-size: 2rem;
+                        font-weight: 600;
+                        text-align: center;
+                        flex: 0 0 70px;
+
+                        > span {
+                            display: block;
+                            height: 50px;
+                            width: 50px;
+                            border: 2px dashed #ddd;
+                            border-radius: 50%;
+                        }
+                    }
+                }
+
+                .panel-title {
+                    font-weight: 600;
+                }
+
+            }
+        }
+
+        .panel-form-container {
+
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+
+            &.is-creating {
+                opacity: 0.5;
+            }
+        }
+
+        .field-section {
+            &.linkto-section {
+                > .row {
+                    > .col {
+                        min-width: 0;
+                        min-height: 100%;
+                        > .linkto-value {
+                            background: #f8f8f8;
+                            border: 1px solid #eee;
+                            border-radius: 5px;
+                            height: 100%;
+                            display: flex;
+                            align-items: center;
+                            padding-left: 10px;
+                            padding-right: 10px;
+                            overflow-x: hidden;
+                            text-overflow: ellipsis;
+                            white-space: nowrap;
+                        }
+                    }
+                    .btn {
+                        min-width: 120px;
+                    }
+                }
+            }
+        }
+
+
+    }
+
+}
