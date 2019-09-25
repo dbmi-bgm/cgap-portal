@@ -4,8 +4,8 @@
     "id": "/profiles/annotation_field.json",
     "$schema": "http://json-schema.org/draft-04/schema#",
     "type": "object",
-    "required": ["field_name", "lab", "award"],
-    "identifyingProperties": ["uuid", "field_name"],
+    "required": ["field_name", "institution", "project", "field_type", "schema_title"],
+    "identifyingProperties": ["uuid", "aliases", "field_name"],
     "additionalProperties": false,
     "mixinProperties": [
       { "$ref": "mixins.json#/schema_version" },
@@ -15,7 +15,8 @@
       { "$ref": "mixins.json#/modified" },
       { "$ref": "mixins.json#/status" },
       { "$ref": "mixins.json#/attribution" },
-      { "$ref": "mixins.json#/notes" }
+      { "$ref": "mixins.json#/notes" },
+      { "$ref": "mixins.json#/static_embeds" }
     ],
     "properties": {
         "schema_version": {
@@ -29,7 +30,8 @@
         },
         "is_list": {
           "title": "NCBI Entrez Gene ID",
-          "type": "boolean"
+          "type": "boolean",
+          "default": false
         },
         "enum_list": {
             "title": "Enum list",
@@ -139,10 +141,11 @@
                 "Phenotype"
             ]
         },
-        "MVP": {
+        "mvp": {
             "title": "MVP",
             "description": "Is this field part of MVP",
-            "type": "boolean"
+            "type": "boolean",
+            "default": false
         },
         "value_example": {
             "title": "Example Value for this field",
@@ -159,11 +162,14 @@
         },
         "scope": {
             "title": "Scope"
+        },
+        "mvp": {
+            "title": "MVP"
         }
     },
     "columns": {
-        "field_name": {
-            "title": "Field type"
+        "schema_title": {
+            "title": "Field name"
         },
         "field_type": {
             "title": "Field type"
