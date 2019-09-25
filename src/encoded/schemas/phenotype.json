@@ -85,11 +85,23 @@
             "type" : "string",
             "title" : "Comment",
             "formInput": "textarea"
+        }
+    },
+    "facets": {
+        "slim_terms.display_title": {
+            "title": "Category"
+        }
+    },
+    "columns": {
+        "hpo_id": {
+            "title": "HPO ID"
         },
-        "ontology_version": {
-            "title": "HPO version",
-            "description": "The version of HPO that the term was last updated from",
-            "type": "string"
+        "slim_terms.display_title": {
+            "title": "Category"
+        },
+        "hpo_url": {
+            "title": "External Link",
+            "default_hidden": true
         }
     }
 }
