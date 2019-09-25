@@ -28,6 +28,11 @@
             "type": "string",
             "uniqueKey": true
         },
+        "vcf_name": {
+            "title": "Field Name on VCF",
+            "description": "Original name of the annotaion field name on vcf file",
+            "type": "string"
+        },
         "is_list": {
           "title": "NCBI Entrez Gene ID",
           "type": "boolean",
@@ -35,7 +40,7 @@
         },
         "enum_list": {
             "title": "Enum list",
-            "description": "If field is list, you can define set of values",
+            "description": "you can restrict to set of values",
             "type": "array",
             "uniqueItems": true,
             "items": {
