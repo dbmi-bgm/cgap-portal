@@ -73,6 +73,7 @@
             "source_version": "VCFv4.2"
         },
         "ad": {
+            "vcf_name": "AD",
             "title": "Allelic depth",
             "type": "array",
             "description": "Allelic depths for the ref and alt alleles in the order listed",
@@ -103,6 +104,7 @@
             "source_version": "VCFv4.2"
         },
         "pl": {
+            "vcf_name": "PL",
             "title": "Phred-scaled likelihoods for genotypes",
             "type": "array",
             "description": "Normalized, Phred-scaled likelihoods for genotypes as defined in the VCF specification",
