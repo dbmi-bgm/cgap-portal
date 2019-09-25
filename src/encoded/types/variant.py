@@ -63,7 +63,6 @@ class Variant(Item):
 
 @collection(
     name='variant-samples',
-    # unique_key='annotation_field:field_name',
     properties={
         'title': 'Variants (sample)',
         'description': 'List of all variants with sample specific information',
@@ -71,6 +70,5 @@ class Variant(Item):
 class VariantSample(Item):
     """Class for variant samples."""
     item_type = 'variant_sample'
-    # name_key = 'field_name'
     schema = load_schema('encoded:schemas/variant_sample.json')
     embedded_list = Item.embedded_list  # + lab_award_attribution_embed_list
