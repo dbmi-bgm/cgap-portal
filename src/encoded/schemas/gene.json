@@ -4,7 +4,7 @@
     "id": "/profiles/gene.json",
     "$schema": "http://json-schema.org/draft-04/schema#",
     "type": "object",
-    "required": ["gene_id", "lab", "award"],
+    "required": ["gene_id"],
     "identifyingProperties": ["uuid", "gene_id", "preferred_symbol", "aliases"],
     "additionalProperties": false,
     "mixinProperties": [
