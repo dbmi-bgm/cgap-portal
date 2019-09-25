@@ -40,7 +40,7 @@ def main():
 
     # do not run on cgap/cgapdev unless we set --prod flag
     if env in ['fourfront-cgap', 'fourfront-cgapdev'] and not args.prod:
-        log.info('load_data: skipping, since we are on webprod/webprod2 and --prod not used')
+        log.info('load_data: skipping, since on %s and --prod not used' % env)
         return
 
     load_test_data(app, args.overwrite)
