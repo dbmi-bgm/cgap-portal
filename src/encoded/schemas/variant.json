@@ -2503,7 +2503,25 @@
         }
     },
     "facets": {
+        "clinsig": {
+            "title": "ClinVar significance"
+        }
     },
     "columns": {
+        "chrom": {
+            "title": "Chromosome"
+        },
+        "pos": {
+            "title": "Position"
+        },
+        "id": {
+            "title": "ID"
+        },
+        "ref": {
+            "title": "Reference allele"
+        },
+        "alt": {
+            "title": "Alternative allele"
+        }
     }
 }
