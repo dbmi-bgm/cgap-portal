@@ -810,7 +810,7 @@ class PanelThree extends React.PureComponent {
 
 
 const LinkToFieldSection = React.memo(function LinkToFieldSection(props){
-    const { title, type, onSelect, selectedID, selectedTitle } = props;
+    const { title, type, onSelect, selectedID, selectedTitle, variant = "primary" } = props;
 
     let showTitle;
     if (selectedTitle && selectedID){
@@ -826,7 +826,7 @@ const LinkToFieldSection = React.memo(function LinkToFieldSection(props){
             <label className="d-block mb-05">{ title }</label>
             <div className="row">
                 <div className="col-auto">
-                    <LinkToDropdown {...{ onSelect, selectedID }} searchURL={"/search/?type=" + type} selectedTitle={showTitle} />
+                    <LinkToDropdown {...{ onSelect, selectedID, variant }} searchURL={"/search/?type=" + type} selectedTitle={showTitle} />
                 </div>
                 <div className="col">
                     <i className="icon icon-fw icon-link fas small mr-05"/>
