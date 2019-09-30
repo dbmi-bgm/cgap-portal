@@ -1125,10 +1125,7 @@ export default class App extends React.PureComponent {
         }
 
         // check error status
-
-        var isPlannedSubmissionsPage = hrefParts.pathname.indexOf('/planned-submissions') > -1; // TEMP EXTRA CHECK WHILE STATIC_PAGES RETURN 404 (vs 403)
-
-        if (context.code && (context.code === 403 || (isPlannedSubmissionsPage && context.code === 404))){
+        if (context.code === 403){
             if (isPlannedSubmissionsPage){
                 status = 'forbidden';
             } else if (context.title && (context.title.toLowerCase() === 'login failure' || context.title === 'No Access')){
@@ -1136,11 +1133,8 @@ export default class App extends React.PureComponent {
             } else if (context.title && context.title === 'Forbidden'){
                 status = 'forbidden';
             }
-        } else if (context.code && context.code === 404){
-            // check to ensure we're not looking at a static page
-            if (routeLeaf != 'help' && routeLeaf != 'about' && routeLeaf !== 'home' && routeLeaf !== 'submissions'){
-                status = 'not_found';
-            }
+        } else if (context.code === 404){
+            status = 'not_found';
         } else if (routeLeaf == 'submissions' && !_.contains(_.pluck(userActions, 'id'), 'submissions')){
             status = 'forbidden'; // attempting to view submissions but it's not in users actions
         }
@@ -1220,8 +1214,8 @@ class HTMLTitle extends React.PureComponent {
     }
 
     render() {
-        var { canonical, currentAction, context, status, contentViews } = this.props,
-            title;
+        const { canonical, currentAction, context, status, contentViews } = this.props;
+        let title;
 
         if (canonical === "about:blank"){   // first case is fallback
             title = PORTAL_TITLE;
@@ -1229,7 +1223,7 @@ class HTMLTitle extends React.PureComponent {
             title = 'Error';
         } else if (context) {               // What should occur (success)
 
-            var ContentView = (contentViews || globals.content_views).lookup(context, currentAction);
+            const ContentView = (contentViews || globals.content_views).lookup(context, currentAction);
 
             // Set browser window title.
             title = object.itemUtil.getTitleStringFromContext(context);
@@ -1281,6 +1275,7 @@ const ContentRenderer = React.memo(function ContentRenderer(props){
         content = <ErrorPage currRoute={routeLeaf} status={status}/>;
     } else if (context) {               // What should occur (success)
         const ContentView = (contentViews || globals.content_views).lookup(context, currentAction);
+
         if (!ContentView){ // Handle the case where context is not loaded correctly
             content = <ErrorPage status={null}/>;
         } else if (currentAction && _.contains(['edit', 'add', 'create'], currentAction)) { // Handle content edit + create action permissions

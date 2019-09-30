@@ -48,8 +48,8 @@ const MyDashboard = React.memo(function MyDashboard(props){
             <div className="mt-4 homepage-dashboard">
                 <h2 className="homepage-section-title">Actions</h2>
                 <p>
-                    We might create a set of mini-dashboards like "Recent Cases" below and then display & order them based on user role,
-                    permissions, & similar.
+                    {"We might create a set of mini-dashboards like \"Recent Cases\" below and then display & order them based on user role,\
+                    permissions, & similar."}
                 </p>
                 <div className="row">
                     <div className="col-xs-12 col-md-6 col-lg-4">
@@ -194,20 +194,20 @@ class RecentCasesSection extends React.PureComponent {
                 return (
                     <div className="case-item-container" key={caseID}>
                         <div className="row">
-                            <h5 className="col text-600 mt-0 mb-0">
+                            <h5 className="col-12 col-md-5 col-xl-7 text-600 mt-0 mb-0">
                                 <a href={caseID}>{ title }</a>
                             </h5>
-                            <div className="col-2 col-xl-1">
+                            <div className="col-3 col-md-2 col-xl-1">
                                 <i className={"icon icon-fw icon-users fas mr-1" + (familiesLen === 0 ? " error" : "")}
                                     data-tip={familiesLen === 0 ? "No families present" : "Number of Families"} />
                                 <span>{ familiesLen }</span>
                             </div>
-                            <div className="col-2 col-xl-1">
+                            <div className="col-3 col-md-2 col-xl-1">
                                 <i className={"icon icon-fw icon-user fas mr-1" + (allMembers.size === 0 ? " error" : "")}
                                     data-tip="Number of Unique Individuals"/>
                                 <span>{ allMembers.size }</span>
                             </div>
-                            <div className="col-3 text-right">
+                            <div className="col-6 col-md-3 text-right">
                                 <i className="icon icon-fw icon-clock far mr-05 align-middle text-small" data-html
                                     data-tip={"<div class='text-right'>Last Modified on " + timeNeat + "<br/>by <span class='text-600'>" + editorName + "</span></div>"}/>
                                 <span className="align-middle">{ timeFromNow }</span>
@@ -223,7 +223,7 @@ class RecentCasesSection extends React.PureComponent {
             <React.Fragment>
                 <h2 className="homepage-section-title mt-5">Recent Cases</h2>
                 <div className="row">
-                    <div className="col-12 col-md-4 col-xl-3 hidden-xs">
+                    <div className="col-12 col-md-4 col-xl-3 mb-1">
                         <a href="/search/?type=Case" className="btn btn-outline-dark btn-block">
                             View All { casesCount ? <span className="text-300">({ casesCount })</span> : null }
                         </a>

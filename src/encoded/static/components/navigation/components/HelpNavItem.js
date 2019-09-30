@@ -115,20 +115,24 @@ export class HelpNavItem extends React.PureComponent {
         const { mounted, href, helpItemHref, id, windowWidth, windowHeight, overlaysContainer, isFullscreen, testWarning } = this.props;
         const { helpMenuTree, isLoadingHelpMenuTree, isDropdownVisible, closingDropdown } = this.state;
         const active = href.indexOf(helpItemHref) > -1; // `helpItemHref` assumed to be /help/something.
-        const commonProps = { id, active, 'key' : id, 'href': helpItemHref };
         const isDesktopView = HelpNavItem.isDesktopView(windowWidth);
+
         let cls = "id-" + id; // `id` is no longer pass as HTML attrib to[NavLink->]Dropdown so we add to className;
 
         if (!helpMenuTree || (helpMenuTree.children || []).length === 0 || !mounted || !isDesktopView || isLoadingHelpMenuTree){
-            return <Nav.Link {...commonProps} className={cls}>Help</Nav.Link>;
+            return (
+                <a href={helpItemHref} className={"nav-link " + cls + (active ? " active" : "")}>
+                    Help
+                </a>
+            );
         }
 
         cls += " dropdown-toggle" + (isDropdownVisible ? " dropdown-open-for" : "");
 
         const navItem = (
-            <Nav.Link {...commonProps} onClick={this.handleToggle} className={cls}>
+            <a href={helpItemHref} className={"nav-link " + cls + (active ? " active" : "")} onClick={this.handleToggle}>
                 Help
-            </Nav.Link>
+            </a>
         );
 
         const inclBigMenu = helpMenuTree && isDropdownVisible && isDesktopView && (helpMenuTree.children || []).length > 0 && isDesktopView;

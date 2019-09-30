@@ -490,8 +490,7 @@
 			margin-bottom: 3px;
 			> .row {
 				align-items: center;
-				> .col,
-				> .col-auto {
+				> div:first-child { // Title
 					overflow-x: hidden;
 					text-overflow: ellipsis;
 					white-space: nowrap;
