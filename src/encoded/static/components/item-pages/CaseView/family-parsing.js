@@ -1,5 +1,7 @@
 'use strict';
 
+import React from 'react';
+
 /**
  * Parses `context.families` instance
  * into list of Individuals (JSON objects) with
@@ -11,7 +13,7 @@ export function parseFamilyIntoDataset(family){
     return members.map(function(individual){
         const {
             "@id": id,
-            display_title: name,
+            display_title: displayTitle,
             sex: gender = "undetermined",
             father = null, // We might get these back as strings from back-end response, instd of embedded obj.
             mother = null,
@@ -62,25 +64,49 @@ export function parseFamilyIntoDataset(family){
             return ageNum;
         }
 
-        let showAgeText = null;
+        function unitsText(age, unit){
+            if (unit === 'year'){
+                return "y.o.";
+            }
+            return unit + (age === 1 ? "" : "s");
+        }
+
+        let showAgeString = null;
         let ageNumerical = age_at_death || age;
         if (typeof age_at_death === 'number' && age_at_death_units){
-            showAgeText = "" + age_at_death + " " + age_at_death_units + (age_at_death > 1 ? "s" : "");
+            showAgeString = "d. " + age_at_death + " " + unitsText(age_at_death, age_at_death_units);
             ageNumerical = calcAgeNum(age_at_death, age_at_death_units);
         } else if (typeof age === 'number' && age_units) {
-            showAgeText = "" + age + " " + age_units + (age > 1 ? "s" : "");
+            showAgeString = "" + age + " " + unitsText(age, age_units);
             ageNumerical = calcAgeNum(age, age_units);
+        }
+
+        let name = displayTitle;
+        if (displayTitle.slice(0,5) === "GAPID"){
+            // <span>s don't work inside SVGs
+            /*
+            name = (
+                <React.Fragment>
+                    <span className="small">CGAPID</span>
+                    <span>{ displayTitle.slice(5) }</span>
+                </React.Fragment>
+            );
+            */
+            //name = "ɢᴀᴘɪᴅ" + displayTitle.slice(5);
+            //name = "ᴳᴬᴾᴵᴰ " + displayTitle.slice(5);
+            //name = "ᴵᴰ " + displayTitle.slice(5);
+            name = "ɪᴅ: " + displayTitle.slice(5);
         }
 
         return {
             id, gender, name,
-            isDeceased : isDeceased || isTerminatedPregnancy || isSpontaneousAbortion || isStillBirth || false,
+            isDeceased : isDeceased || isTerminatedPregnancy || isSpontaneousAbortion || isStillBirth || typeof age_at_death === 'number' || false,
             isPregnancy : isPregnancy || isTerminatedPregnancy || isSpontaneousAbortion || isStillBirth || false,
             isTerminatedPregnancy,
             isSpontaneousAbortion,
             isStillBirth,
             diseases,
-            'ageText' : showAgeText || ageNumerical,
+            'ageString' : showAgeString || ageNumerical,
             'age' : ageNumerical,
             'father' : fatherStr,
             'mother' : motherStr,
@@ -91,4 +117,34 @@ export function parseFamilyIntoDataset(family){
             }
         };
     });
+}
+
+export function gatherPhenotypicFeatureItems(family){
+    const {
+        members = [],
+        proband = null
+    } = family;
+
+    const diseases = [];
+    const seenIDs = {};
+
+    function addToDiseases(individual){
+        const { phenotypic_features = [] } = individual;
+        phenotypic_features.forEach(function(pfObj){
+            const { phenotypic_feature } = pfObj;
+            const { '@id': featureID, display_title: featureTitle } = phenotypic_feature;
+            if (!featureID || seenIDs[featureID]){
+                return;
+            }
+            seenIDs[featureID] = true;
+            diseases.push(phenotypic_feature);
+        });
+    }
+
+    if (proband){
+        addToDiseases(proband);
+    }
+
+    members.forEach(addToDiseases);
+    return [ ...diseases ];
 }

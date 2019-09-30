@@ -106,7 +106,10 @@ export class IndividualNodeShape extends IndividualNodeBase {
     }
 
     render(){
-        const { dims, graphHeight, individual, currHoverNodeId, currSelectedNodeId, diseaseToIndex } = this.props;
+        const {
+            dims, graphHeight, individual, diseaseToIndex,
+            currHoverNodeId, currSelectedNodeId, showOrderBasedName
+        } = this.props;
         const { individualWidth, individualHeight } = dims;
         const { id, diseases = [], _drawing : { xCoord, yCoord } } = individual;
 
@@ -147,7 +150,7 @@ export class IndividualNodeShape extends IndividualNodeBase {
                 <UnderlayMarkers {...{ width, height, individual, shape, diseaseToIndex }} />
                 { fgShape }
                 <OverlayMarkers {...{ width, height, individual, shape, diseaseToIndex }} />
-                <UnderNodeText {...{ width, height, individual, shape, diseaseToIndex, dims }} />
+                <UnderNodeText {...{ width, height, individual, shape, diseaseToIndex, dims, showOrderBasedName }} />
             </g>
         );
     }
@@ -192,7 +195,8 @@ const AffectedBGPieChart = React.memo(function AffectedBGPieChart({ width, heigh
         path.closePath();
         return (
             <path d={path.toString()} clipPath={"url(#" + clipID + ")"} key={idx}
-                data-disease-index={diseaseToIndex[disease]} className="disease-arc" />
+                data-disease-index={diseaseToIndex[disease]} title={disease}
+                className="disease-arc" />
         );
     });
     return <g className="disease-path-arcs">{ arcPaths }</g>;
@@ -371,15 +375,20 @@ function ColumnOfDiseases({ individual, width, height, shape, diseaseToIndex }){
 }
 
 /** @todo Implement things like age, stillBirth, isEctopic, etc. */
-function UnderNodeText({ individual, width, height, shape, dims, diseaseToIndex }){
-    const { id, name, ageText, diseases = [] } = individual;
+function UnderNodeText({ individual, width, height, shape, dims, diseaseToIndex, showOrderBasedName }){
+    const {
+        id, name,
+        ageString,
+        diseases = [],
+        orderBasedName,
+    } = individual;
     const halfWidth = width / 2;
     //const textYStart = 18;
-    const showTitle = name || id;
+    const showTitle = showOrderBasedName ? orderBasedName : (name || id);
 
     const textRows = [[ showTitle, "title" ]];
-    if (ageText){
-        textRows.push([ ageText, "age" ]);
+    if (ageString){
+        textRows.push([ ageString, "age" ]);
     }
 
     diseases.filter(function(disease){
@@ -395,8 +404,12 @@ function UnderNodeText({ individual, width, height, shape, dims, diseaseToIndex 
 
     const renderedTexts = textRows.map(function([ content, desc ], idx){
         const txtProps = {
-            y: 18 + (20 * idx)
+            "y": 18 + (20 * idx),
+            "data-describing" : desc
         };
+        if (desc === "title" && showOrderBasedName){
+            txtProps.className = (txtProps.className || "") + " showing-order-based-name";
+        }
         if (desc === "title" || desc === "age"){
             // Center text
             txtProps.textAnchor = "middle";

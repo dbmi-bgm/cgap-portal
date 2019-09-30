@@ -707,15 +707,16 @@ class PanelThree extends React.PureComponent {
     }
 
     handleSubmit(e){
-        const { onSubmitCase, caseItem, onComplete } = this.props;
+        const { caseItem, onComplete } = this.props;
         const { description, aliases = [], state } = this.state;
+        const { '@id' : caseID } = caseItem;
         const cb = (res) => {
             this.setState({ isPatching: false });
             if (res.status && res.status !== 'success'){
                 throw res;
             }
             const [ caseItemObject ] = res['@graph'];
-            onSubmitCase(caseItemObject);
+            onComplete(caseItemObject);
         };
         const fb = (res) => {
             this.setState({ isPatching: false });
@@ -745,13 +746,7 @@ class PanelThree extends React.PureComponent {
         }
 
         this.setState({ isPatching: true }, ()=>{
-            this.request = ajax.load(
-                "/case/",
-                cb,
-                "PATCH",
-                fb,
-                JSON.stringify(postData)
-            );
+            this.request = ajax.load(caseID, cb, "PATCH", fb, JSON.stringify(postData));
         });
     }
 

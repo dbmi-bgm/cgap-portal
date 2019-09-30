@@ -53,9 +53,9 @@ export const ProcessingSummaryTable = React.memo(function ProcessingSummaryTable
         ),
         'rawFileCount' : (
             <React.Fragment>
-                <i className="icon icon-fw icon-file-upload fas mr-05 align-middle"
+                <i className="icon icon-fw icon-file-upload fas align-middle"
                     data-tip="Raw Files"/>
-                <span className="d-none d-lg-inline">Raw Files</span>
+                <span className="d-none d-lg-inline ml-05">Raw Files</span>
             </React.Fragment>
         ),
         'sampleStatus' : "Sample Status"
@@ -215,16 +215,18 @@ export const ProcessingSummaryTable = React.memo(function ProcessingSummaryTable
     });
 
     const renderedTable = (
-        <table className="processing-summary-table">
-            <thead>
-                <tr>
-                    { columnOrder.map(function(colName){
-                        return <th key={colName}>{ columnTitles[colName] }</th>;
-                    }) }
-                </tr>
-            </thead>
-            <tbody>{ renderedRows }</tbody>
-        </table>
+        <div className="processing-summary-table-container">
+            <table className="processing-summary-table">
+                <thead>
+                    <tr>
+                        { columnOrder.map(function(colName){
+                            return <th key={colName}>{ columnTitles[colName] }</th>;
+                        }) }
+                    </tr>
+                </thead>
+                <tbody>{ renderedRows }</tbody>
+            </table>
+        </div>
     );
 
     return (

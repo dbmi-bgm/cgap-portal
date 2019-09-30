@@ -153,7 +153,7 @@ export function standardizeObjectsInList(jsonList){
         });
 
         indv.age = indv.age || indv.ageNumber;
-        indv.ageText = indv.ageText || (typeof indv.age === 'number' ? (indv.age + " years") : null);
+        indv.ageString = indv.ageString || (typeof indv.age === 'number' ? (indv.age + " years") : null);
 
         indv.isConsultand = indv.isConsultand || false;
         indv.isStillBirth = indv.isStillBirth || false;
@@ -253,6 +253,32 @@ export function isRelationship(node){
         return true;
     }
     return false;
+}
+
+
+/**
+ * Used for generation identifiers/markers.
+ * @see https://stackoverflow.com/questions/9083037/convert-a-number-into-a-roman-numeral-in-javascript#answer-32851198
+ */
+export function numberToRomanNumeral(num){
+    if (isNaN(num) || num % 1 !== 0){
+        throw new Error("Expected integer, received: " + num);
+    }
+    let roman = "";
+
+    const chars = [
+        [1000, "M"], [900, "CM"], [400, "CD"], [100, "C"], [90, "XC"],
+        [50, "L"], [40, "XL"], [10, "X"], [9, "IX"], [5, "V"], [4, "IV"], [1, "I"]
+    ];
+
+    chars.forEach(function([ charNum, char ]){
+        while (num >= charNum){
+            roman += char;
+            num -= charNum;
+        }
+    });
+
+    return roman;
 }
 
 /**

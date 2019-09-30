@@ -1,5 +1,5 @@
 import { getGraphHeight } from './layout-utilities-drawing';
-import { getRelationships, isRelationship } from './data-utilities';
+import { getRelationships, isRelationship, numberToRomanNumeral } from './data-utilities';
 
 
 
@@ -448,7 +448,7 @@ function initOrderingSimple(objectGraph, memoized = {}){
         const orderAssignedInIndex = orderByHeightIndex[heightIndex].length;
         seenOrderInIndex[id] = orderAssignedInIndex;
         orderByHeightIndex[heightIndex].push(node);
-        orderAssignedDebugList.push({ 'id': node.name || node.id, 'h' : heightIndex, 'o' : orderAssignedInIndex });
+        orderAssignedDebugList.push({ 'id': node.id, 'h' : heightIndex, 'o' : orderAssignedInIndex });
         //console.log("DIRECT", direction, stack, id, heightIndex, orderAssignedInIndex, q.map(function(item){ return item.id; }));
     }
 
@@ -1019,13 +1019,25 @@ export function orderObjectGraph(objectGraph, memoized = {}){
     heuristicallyAdjustOrder(bestOrder);
 
     // Save final order to nodes so we don't need order object anymore
-    const { seenOrderInIndex } = bestOrder;
+    const { seenOrderInIndex, orderByHeightIndex } = bestOrder;
     objectGraph.forEach(function(indv){
         indv._drawing.orderInHeightIndex = seenOrderInIndex[indv.id];
     });
     const relationships = (memoized.getRelationships || getRelationships)(objectGraph);
     relationships.forEach(function(r){
         r._drawing.orderInHeightIndex = seenOrderInIndex[r.id];
+    });
+
+    // Assign order-based-name
+    const heightIndicesCount = orderByHeightIndex.length;
+    orderByHeightIndex.forEach(function(nodesInRow, hi){
+        const generationRomanNumeral = numberToRomanNumeral(heightIndicesCount - hi);
+        nodesInRow.reduce(function(currNum, n){
+            if ( isRelationship(n) ) return currNum;
+            n.orderBasedName = "" + generationRomanNumeral + " – " + currNum;
+            currNum++;
+            return currNum;
+        }, 1);
     });
 
     console.log("BEST ORDER2", bestOrder, bestCrossings, objectGraph);

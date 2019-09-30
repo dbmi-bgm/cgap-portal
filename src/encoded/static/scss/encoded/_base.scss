@@ -1,8 +1,4 @@
-// Root HTML doc variables/settings
 
-:root {
-    font-size: 16px;
-}
 
 /* Variables */
 $mainThemeColor: 			#ffffff; /* i.e. the background color ..for now */
@@ -78,10 +74,12 @@ $link-color: #428bca;
 $expset-table-border-color : #eee;
 
 
-$primary:       #3691d2; //#2684ad; //#057eaf;
+//$primary:       #3691d2; //#2684ad; //#057eaf;
+$primary:       #1b75b9;
 $secondary:     #6c757d;
 $success:       #4C994C;
-$info:          #4F689E;
+//$info:          #4F689E;
+$info:          #4ca6ea;
 $warning:       #E59545;
 $danger:        #B24342;
 $light:         #f8f9fa;
