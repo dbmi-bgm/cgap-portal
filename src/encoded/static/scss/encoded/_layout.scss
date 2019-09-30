@@ -259,6 +259,12 @@ body.is-full-screen {
 			&:first-child {
 				// No breadcrumbs present
 				padding-top: 55px;
+
+				body[data-current-action="multiselect"] &,
+				body[data-current-action="selection"] & {
+					// Decrease height by 20px
+					padding-top: 35px;
+				}
 			}
 
 			body[data-pathname="/"] &,
@@ -302,6 +308,25 @@ body.is-full-screen {
 		}
 
 	}
+}
+
+/**********
+> Remove nav headers and similar when on currentAction=selection or multiselection
+***********/
+
+body[data-current-action="selection"],
+body[data-current-action="multiselect"] {
+
+	div#layout > div.navbar-container {
+		display: none;
+	}
+
+	@include media-breakpoint-up(lg){
+		div#post-navbar-container {
+			padding-top: 0;
+		}
+	}
+
 }
 
 
