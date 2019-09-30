@@ -417,7 +417,7 @@ div#top-nav.navbar-fixed-top {
                 > input#navbar-search {
                     font-size: 1em;
                     width: 140px;
-                    color: #000;
+                    color: $navbar-link-color; //#000;
                     border-radius: 3px;
                     //border: 1px solid rgb(125,125,125);
                     border-width: 1px;
@@ -427,11 +427,12 @@ div#top-nav.navbar-fixed-top {
                     -moz-transition: width 0.3s ease-out;
                     -webkit-transition: width 0.3s ease-out;
                     transition: width 0.3s ease-out, background-color .3s ease-out;
-                    background-color: $brand-primary; //desaturate(lighten($color: $navbar-background-color, $amount: 15%), 20%); //$brand-primary-dark;
-                    border-color: $brand-primary;
+                    background-color: transparent; //$brand-primary;
+                    border-color: rgba(255,255,255,0.2); //$brand-primary;
 
                     &::placeholder {
-                        color: rgba(0,0,0,0.33); // For dark bg navbar only
+                        //color: rgba(0,0,0,0.33); // For dark bg navbar only
+                        color: rgba(255,255,255,0.2);
                     }
                     &::-webkit-search-cancel-button {
                         display: none;
@@ -442,8 +443,11 @@ div#top-nav.navbar-fixed-top {
                 #navbar-search:focus {
                     /* dont expand width here */
                     background-color: #fff;
-                    color: rgba(0,0,0,1.0);
+                    color: #000;
                     border-color: unset; //$brand-primary; // rgba(125,125,125,1.0);
+                    &::placeholder {
+                        color: #777;
+                    }
                 }
 
                 .search-item-type-wrapper {
@@ -516,6 +520,17 @@ div#top-nav.navbar-fixed-top {
                     border: none;
                     background: none;
                     padding: 4px 4px 2px;
+                    color: #fff;
+                    transition: color .2s, opacity .2s;
+                }
+
+                &.has-input #navbar-search + .search-icon-button,
+                #navbar-search:focus + .search-icon-button {
+                    color: #000;
+                }
+
+                &.has-input #navbar-search + .search-icon-button {
+                    opacity: 0.75;
                 }
 
             }
