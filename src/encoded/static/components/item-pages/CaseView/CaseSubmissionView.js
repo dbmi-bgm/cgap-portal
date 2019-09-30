@@ -7,19 +7,12 @@ import _ from 'underscore';
 import ReactTooltip from 'react-tooltip';
 import { DropdownButton, DropdownItem } from 'react-bootstrap';
 
-import { console, layout, ajax, object, JWT, navigate } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
+import { console, ajax, JWT, navigate } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { Alerts } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/Alerts';
-import { LinkToSelector } from '@hms-dbmi-bgm/shared-portal-components/es/components/forms/components/LinkToSelector';
+import { LinkToDropdown } from '@hms-dbmi-bgm/shared-portal-components/es/components/forms/components/LinkToDropdown';
 import { AliasInputFieldValidated } from '@hms-dbmi-bgm/shared-portal-components/es/components/forms/components/submission-fields';
 
-
-import { Checkbox } from '@hms-dbmi-bgm/shared-portal-components/es/components/forms/components/Checkbox';
-
-import DefaultItemView from './../DefaultItemView';
-import { PedigreeDetailPane } from './../components/PedigreeDetailPane';
-import { store } from './../../../store';
-
-import { AttachmentInputController, AttachmentInputMenuOption } from './attachment-input';
+import { AttachmentInputController } from './attachment-input';
 
 import { PageTitleContainer, OnlyTitle, TitleAndSubtitleUnder, pageTitleViews } from './../../PageTitleSection';
 import { Schemas } from './../../util';
@@ -320,22 +313,14 @@ class PanelOne extends React.PureComponent {
         this.setState({ caseTitle: e.target.value });
     }
 
-    handleSelectInstitution(items){
-        const [{ id, json }] = items;
-        this.setState({
-            institutionID: id || null,
-            institutionTitle: json.display_title || null,
-            selectingField: null
-        });
+    handleSelectInstitution(institutionID, institutionJSON){
+        const { display_title: institutionTitle = null } = institutionJSON;
+        this.setState({ institutionID, institutionTitle });
     }
 
-    handleSelectProject(items){
-        const [{ id, json }] = items;
-        this.setState({
-            projectID: id || null,
-            projectTitle: json.display_title || null,
-            selectingField: null
-        });
+    handleSelectProject(projectID, projectJSON){
+        const { display_title: projectTitle = null } = projectJSON;
+        this.setState({ projectID, projectTitle });
     }
 
     handleCreate(e){
@@ -435,16 +420,10 @@ class PanelOne extends React.PureComponent {
             <form className={"panel-form-container d-block" + (isCreating ? " is-creating" : "")} onSubmit={this.handleCreate}>
                 <h4 className="text-300 mt-2">Required Fields</h4>
 
-                <LinkToFieldSection onCloseChildWindow={this.unsetSelectingField}
-                    onStartSelect={this.setSelectingInstitution}
-                    onSelect={this.handleSelectInstitution} title="Institution"
-                    isSelecting={selectingField === "institution"}
-                    type="Institution" selectedId={institutionID} selectedTitle={institutionTitle} />
-                <LinkToFieldSection onCloseChildWindow={this.unsetSelectingField}
-                    onStartSelect={this.setSelectingProject}
-                    onSelect={this.handleSelectProject} title="Project"
-                    isSelecting={selectingField === "project"}
-                    type="Project" selectedId={projectID} selectedTitle={projectTitle} />
+                <LinkToFieldSection onSelect={this.handleSelectInstitution} title="Institution"
+                    type="Institution" selectedID={institutionID} selectedTitle={institutionTitle} />
+                <LinkToFieldSection onSelect={this.handleSelectProject} title="Project"
+                    type="Project" selectedID={projectID} selectedTitle={projectTitle} />
                 <label className="field-section mt-2 d-block">
                     <span className="d-block mb-05">Case Title</span>
                     <input type="text" value={caseTitle} onChange={this.handleChangeCaseTitle}
@@ -830,24 +809,14 @@ class PanelThree extends React.PureComponent {
 }
 
 
-function LinkToFieldSection(props){
-    const {
-        title, type, isSelecting, onSelect, onCloseChildWindow,
-        selectedId, selectedTitle, onStartSelect
-    } = props;
+const LinkToFieldSection = React.memo(function LinkToFieldSection(props){
+    const { title, type, onSelect, selectedID, selectedTitle } = props;
 
     let showTitle;
-    if (selectedTitle && selectedId){
-        showTitle = (
-            <React.Fragment>
-                <a href={selectedId} rel="noopener noreferrer" target="_blank" data-tip="View in new window">
-                    { selectedTitle }
-                </a>
-                &nbsp; - &nbsp;<code className="small">{ selectedId }</code>
-            </React.Fragment>
-        );
-    } else if (selectedId){
-        showTitle = selectedId;
+    if (selectedTitle && selectedID){
+        showTitle = <span className="text-600">{ selectedTitle }</span>;
+    } else if (selectedID){
+        showTitle = selectedID;
     } else {
         showTitle = <em>None Selected</em>;
     }
@@ -855,25 +824,22 @@ function LinkToFieldSection(props){
     return (
         <div className="field-section linkto-section mt-2 d-block">
             <label className="d-block mb-05">{ title }</label>
-            <LinkToSelector isSelecting={isSelecting}
-                onSelect={onSelect}
-                searchURL={"/search/?currentAction=selection&type=" + type}
-                onCloseChildWindow={onCloseChildWindow} />
             <div className="row">
-                <div className="col">
-                    <div className={'linkto-value text-400' + (isSelecting ? " active" : "")}>
-                        { showTitle }
-                    </div>
-                </div>
                 <div className="col-auto">
-                    <button type="button" className={"btn btn-" + (!selectedId ? "info" : "outline-dark")} onClick={onStartSelect}>
-                        { !selectedId ? "Select..." : "Change..." }
-                    </button>
+                    <LinkToDropdown {...{ onSelect, selectedID }} searchURL={"/search/?type=" + type} selectedTitle={showTitle} />
+                </div>
+                <div className="col">
+                    <i className="icon icon-fw icon-link fas small mr-05"/>
+                    <span className="text-monospace small">{ selectedID }</span> &bull;
+                    <a href={selectedID} target="_blank" rel="noopener noreferrer" className="ml-05"
+                        data-tip={"Open " + type + " in new window"}>
+                        <i className="icon icon-fw icon-external-link-alt fas small"/>
+                    </a>
                 </div>
             </div>
         </div>
     );
-}
+});
 
 
 

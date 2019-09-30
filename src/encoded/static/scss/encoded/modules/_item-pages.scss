@@ -459,7 +459,10 @@ $tabbar-height: 46px;
 
 }
 
-/*** Submissions ***/
+
+/*************************
+		SUBMISSIONS
+**************************/
 
 // For submissions page headers
 h3.submission-subtitle {
@@ -489,6 +492,8 @@ h3.submission-subtitle {
 	border-color: #f4f4f4;
 }
 
+
+/*** Status Color Styles & Indicators ***/
 
 @mixin statusColorStyles {
 	&[data-status="released"]:before,
@@ -568,183 +573,7 @@ i.item-status-indicator-dot {
 
 
 
-.item-page-container {
 
-	.item-view-header {
-
-		.item-label-extra {
-			font-weight: 300;
-		}
-
-		@include media-breakpoint-down(sm){
-			.item-label-extra.text-right {
-				text-align: left !important;
-			}
-		}
-
-		> .top-row {
-
-			min-height: 40px;
-
-			.item-label-title {
-				/* Is some form of header elem, e.g. h5; shows like "Data File | ACCESSION" at top left of page */
-				font-weight: 300;
-				min-height: 30px;
-				margin: 0;
-				min-height: 40px;
-				display: flex;
-				align-items: center;
-		
-				@include media-breakpoint-down(sm){
-					/* Becomes row (not col) at this size, move closer to title */
-					min-height: 50px;
-					padding-top: 5px;
-					align-items: start;
-				}
-		
-				> div.inner {
-					// padding-top: 10px;
-					> span:not(:last-child){
-						padding-right: 8px;
-						margin-right: 7px;
-						border-right: 1px solid #ccc;
-					}
-				}
-		
-				.accession {
-					font-weight: 500;
-					font-size: 1rem;
-				}
-			}
-
-			.item-header-indicators {
-
-				margin-top: 0;
-				margin-bottom: 0;
-				display: flex;
-				align-items: center;
-				justify-content: flex-end;
-				min-height: 40px;
-
-				@include media-breakpoint-down(sm){
-					/* Becomes row (not col) at this size, move closer to title */
-					justify-content: flex-start;
-				}
-			
-				> .indicator-item {
-					display: inline-block;
-					box-sizing: border-box;
-					position: relative;
-					/* border: 1px solid rgba(0,0,0,0.125); */
-					/* border-radius: 5px; */
-					line-height: 20px;
-					color : #000;
-					font-weight: 400;
-					padding-left: 10px;
-					padding-right: 10px;
-					text-transform: capitalize;
-					color: #444;
-			
-					max-width: 50%;
-					white-space: nowrap;
-					overflow: hidden;
-					text-overflow: ellipsis;
-			
-					padding-right: 21px;
-					padding-left: 0;
-
-					&:after {
-						content : "";
-						display: block;
-						position: absolute;
-						right: 10px;
-						height: 100%;
-						top: 0;
-						border-right: 1px solid rgba(0,0,0,0.125);
-					}
-					&:last-child {
-						padding-right: 0;
-						margin-right: 0;
-					}
-					&:last-child:after {
-						display: none;
-					}
-			
-					&.item-status:before {
-						content: "";
-						width: 9px;
-						height : 9px;
-						display: inline-block;
-						position: relative;
-						margin-right: 7px;
-						border-radius: 50%;
-					}
-			
-					&.item-status {
-						@include statusColorStyles;
-					}
-				}
-			
-			}
-
-		}
-
-		> .item-page-heading {
-			/** Extends .flexible-description-box **/
-			border-top:1px solid #ccc;
-			border-bottom: 1px solid #ccc;
-			//min-height: 42px;
-			padding: 10px 0px 10px;
-			transition: height .4s, border-color .4s;
-			text-align: justify;
-		
-			h1, h2, h3, h4, h5, h6 { margin: 0; line-height: 20px; }
-		
-			h4 {
-				font-weight: 500;
-		
-				small {
-					vertical-align: top;
-					line-height: inherit;
-					letter-spacing: normal;
-				}
-			}
-		
-			&.no-description {
-				padding-top: 0;
-				padding-bottom: 0;
-				border-bottom: none;
-				border-top-color: #eee;
-				@include media-breakpoint-up(md){
-					width: 33%;
-					float: right;
-				}
-				& + div.bottom-row {
-					clear: both;
-				}
-			}
-		
-			&.expanded {
-				border-bottom-color: #ddd;
-			}
-		
-		}
-
-	}
-
-    .info-area {
-	    margin-top: 17px;
-		//border-bottom: 1px solid #ddd;
-		padding-bottom: 7px;
-    }
-
-
-    .item-info-area {
-        margin-bottom: 20px;
-        min-height: 120px;
-    }
-
-}
 
 
 
