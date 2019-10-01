@@ -1126,9 +1126,7 @@ export default class App extends React.PureComponent {
 
         // check error status
         if (context.code === 403){
-            if (isPlannedSubmissionsPage){
-                status = 'forbidden';
-            } else if (context.title && (context.title.toLowerCase() === 'login failure' || context.title === 'No Access')){
+            if (context.title && (context.title.toLowerCase() === 'login failure' || context.title === 'No Access')){
                 status = 'invalid_login';
             } else if (context.title && context.title === 'Forbidden'){
                 status = 'forbidden';
