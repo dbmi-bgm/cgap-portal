@@ -78,6 +78,33 @@ class QualityMetricBamcheck(QualityMetric):
 
 
 @collection(
+    name='quality-metrics-vcfcheck',
+    properties={
+        'title': 'Vcf Check Quality Metrics',
+        'description': 'Listing of Vcf Check Quality Metrics'
+    })
+class QualityMetricVcfcheck(QualityMetric):
+    """Subclass of quality matrics for vcf files."""
+
+    item_type = 'quality_metric_vcfcheck'
+    schema = load_schema('encoded:schemas/quality_metric_vcfcheck.json')
+    embedded_list = QualityMetric.embedded_list
+
+    def _update(self, properties, sheets=None):
+        qc_val = properties.get('quickcheck', '')
+        overall = ''
+        if not properties.get('overall_quality_status'):
+            overall = 'WARN'
+        elif qc_val == 'OK':
+            overall = 'PASS'
+        else:
+            overall = 'FAIL'
+        # set name based on what is entered into title
+        properties['overall_quality_status'] = overall
+        super(QualityMetricVcfcheck, self)._update(properties, sheets)
+
+
+@collection(
     name='quality-metrics-workflowrun',
     properties={
         'title': 'QC Quality metrics for Workflow Run',
