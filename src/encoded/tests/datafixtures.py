@@ -11,7 +11,7 @@ ORDER = [
     'individual_chicken', 'biosource', 'antibody', 'enzyme', 'treatment_rnai',
     'treatment_agent', 'biosample', 'quality_metric_fastqc', 'quality_metric_wgs_bamqc',
     'quality_metric_bamqc', 'quality_metric_pairsqc', 'quality_metric_qclist',
-    'quality_metric_dedupqc_repliseq', 'quality_metric_chipseq',
+    'quality_metric_dedupqc_repliseq', 'quality_metric_chipseq', 'quality_metric_vcfcheck',
     'quality_metric_atacseq', 'microscope_setting_d1', 'microscope_setting_d2',
     'microscope_setting_a1', 'microscope_setting_a2', 'file_fastq',
     'file_processed', 'file_reference', 'file_calibration', 'file_microscopy',
