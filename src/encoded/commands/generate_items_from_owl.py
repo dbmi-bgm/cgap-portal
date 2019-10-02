@@ -499,9 +499,9 @@ def compare_terms(t1, t2):
     for k, val in t1.items():
         if k not in t2:
             diff[k] = val
-        elif k in ['parents', 'slim_terms', 'synonyms', 'dbxrefs']:
-                if (len(val) != len(t2[k])) or (Counter(val) != Counter(t2[k])):
-                    diff[k] = val
+        elif isinstance(val, list):
+            if (len(val) != len(t2[k])) or (Counter(val) != Counter(t2[k])):
+                diff[k] = val
         elif val != t2[k]:
             diff[k] = val
     return diff
@@ -568,8 +568,6 @@ def id_post_and_patch(terms, dbterms, itype, rm_unchanged=True, set_obsoletes=Tr
 
     # all terms have uuid - now add uuids to linked terms
     for term in terms.values():
-        if term.get('uuid') == '76d151f7-b364-4990-af25-b6c712fb4d0f':
-            import pdb; pdb.set_trace()
         puuids = _get_uuids_for_linked(term, tid2uuid)
         for rt, uuids in puuids.items():
             term[rt] = list(set(uuids))  # to avoid redundant terms
