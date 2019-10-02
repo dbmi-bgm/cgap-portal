@@ -1,5 +1,6 @@
 import os
 import json
+import yaml
 import sys
 import argparse
 import datetime
@@ -15,9 +16,6 @@ from encoded.commands.owltools import (
     isBlankNode,
     getObjectLiteralsOfType,
     subClassOf,
-    SomeValuesFrom,
-    IntersectionOf,
-    OnProperty,
     Deprecated,
     hasDbXref,
     hasAltId
@@ -33,21 +31,24 @@ from pyramid.paster import get_app
 
 EPILOG = __doc__
 
-''' global lookups '''
-ITEM2OWL = {
-    'Disorder': {
-        'ontology_prefix': 'MONDO',
-        'id_field': 'disorder_id',
-        'name_field': 'disorder_name',
-        'url_field': 'disorder_url'
-    },
-    'Phenotype': {
-        'ontology_prefix': 'HP',
-        'id_field': 'hpo_id',
-        'name_field': 'phenotype_name',
-        'url_field': 'hpo_url'
-    }}
-# figure out if other fields should be added ezplicitly to this lookup
+''' global config '''
+ITEM2OWL = {}
+with open('generate_items_config.yml') as conf_file:
+    ITEM2OWL = yaml.load(conf_file, Loader=yaml.FullLoader)
+# ITEM2OWL = {
+#     'Disorder': {
+#         'ontology_prefix': 'MONDO',
+#         'id_field': 'disorder_id',
+#         'name_field': 'disorder_name',
+#         'url_field': 'disorder_url'
+#     },
+#     'Phenotype': {
+#         'ontology_prefix': 'HP',
+#         'id_field': 'hpo_id',
+#         'name_field': 'phenotype_name',
+#         'url_field': 'hpo_url'
+#     }}
+# # figure out if other fields should be added ezplicitly to this lookup
 
 
 def iterative_parents(nodes, terms, data):
@@ -85,31 +86,6 @@ def get_all_ancestors(term, terms, field, itype):
         term[closure].extend(words)
     term[closure].append(term[id_field])
     return term  # is this necessary
-
-
-# def _combine_all_parents(term):
-#     '''internal method to combine the directly related terms into 2 uniqued lists
-#         of all_parents or development terms that will be used as starting terms
-#         to generate closures of all ancestors
-#
-#         the development terms have those with has_part_inverse filtered out to
-#         prevent over expansion of the ancestors to incorrect associations
-#     '''
-#     parents = set()
-#     relations = set()
-#     develops = set()
-#     if 'parents' in term:
-#         parents = set(term['parents'])
-#     if 'relationships' in term:
-#         relations = set(term['relationships'])
-#     if 'develops_from' in term:
-#         develops = set(term['develops_from'])
-#     term['all_parents'] = list(parents | relations)
-#     development = list(parents | relations | develops)
-#     if 'has_part_inverse' in term:
-#         development = [dev for dev in development if dev not in term['has_part_inverse']]
-#     term['development'] = development
-#     return term
 
 
 def _has_human(cols):
@@ -154,88 +130,6 @@ def create_term_dict(class_, termid, data, itype):
     if name is not None and name_field:
         term[name_field] = name
     return term
-
-
-# def _add_term_and_info(class_, parent_uri, relationship, data, terms, itype):
-#     '''Internal function to add new terms that are part of an IntersectionOf
-#         along with the appropriate relationships
-#     '''
-#     if not terms:
-#         terms = {}
-#     for subclass in data.rdfGraph.objects(class_, subClassOf):
-#         term_id = get_termid_from_uri(parent_uri)
-#         if terms.get(term_id) is None:
-#             terms[term_id] = create_term_dict(parent_uri, term_id, data, itype)
-#         if terms[term_id].get(relationship) is None:
-#             terms[term_id][relationship] = []
-#         terms[term_id][relationship].append(get_termid_from_uri(subclass))
-#     return terms
-
-
-# def process_intersection_of(class_, intersection, data, terms):
-#     '''Given a class with IntersectionOf predicate determine if the
-#         intersected class is part of human or if our term develops_from
-#         the class and if so make ontology_term json for it if it doesn't
-#         already exist
-#     '''
-#     # the intersectionOf rdf consists of a collection of 2 members
-#     # the first (collection[0]) is the resource uri (term)
-#     # the second (collection[1]) is a restriction
-#     collection = Collection(data.rdfGraph, intersection)
-#     col_list = []
-#     for col in data.rdfGraph.objects(collection[1]):
-#         # get restriction terms and add to col_list as string
-#         col_list.append(col.__str__())
-#     if _has_human(col_list):
-#         if PART_OF in col_list:
-#             terms = _add_term_and_info(class_, collection[0], 'relationships', data, terms)
-#         elif DEVELOPS_FROM in col_list:
-#             terms = _add_term_and_info(class_, collection[0], 'develops_from', data, terms)
-#     return terms
-
-
-# def process_blank_node(class_, data, terms, simple=False):
-#     '''Given a blank node determine if there are any parent resources
-#         of relevant types and if so process them appropriately
-#     '''
-#     for object_ in data.rdfGraph.objects(class_, subClassOf):
-#         # direct parents of blank nodes
-#         if not isBlankNode(object_):
-#             if not simple:
-#                 # we have a resource
-#                 for intersection in data.rdfGraph.objects(class_, IntersectionOf):
-#                     # intersectionOf triples are checked for human part_of
-#                     # or develops_from
-#                     terms = process_intersection_of(class_, intersection, data, terms)
-#     return terms
-
-
-# def _find_and_add_parent_of(parent, child, data, terms, has_part=False, relation=None):
-#     '''Add parent terms with the provided relationship to the 'relationships'
-#         field of the term - treating has_part specially
-#
-#         NOTE: encode had added fields for each relationship type to the dict
-#         our default is a  'relationships' field - but can pass in a specific
-#         relation string eg. develops_from and that will get added as field
-#     '''
-#     child_id = get_termid_from_uri(child)
-#     for obj in data.rdfGraph.objects(parent, SomeValuesFrom):
-#         if not isBlankNode(obj):
-#             objid = get_termid_from_uri(obj)
-#             term2add = objid
-#             if has_part:
-#                 relation = 'has_part_inverse'
-#                 term2add = child_id
-#                 child_id = objid
-#                 child = obj
-#                 if child_id not in terms:
-#                     terms[child_id] = create_term_dict(child, child_id, data)
-#             if relation is None:
-#                 relation = 'relationships'
-#             if not terms[child_id].get(relation):
-#                 terms[child_id][relation] = []
-#             terms[child_id][relation].append(term2add)
-#     return terms
 
 
 def process_parents(class_, data, terms):
@@ -326,6 +220,17 @@ def convert2namespace(uri):
         ns = ns + '/'
     ns = Namespace(ns)
     return ns[name]
+
+
+def get_term_uris_as_ns(itype, conf_name):
+    ''' will get namespace URIs for synonym or definition terms
+        as specified in the config file - will check for general
+        case by conf_name and then specific cases in the specific
+        item type
+    '''
+    uris = [convert2namespace(uri) for uri in ITEM2OWL.get(conf_name, [])]
+    uris.extend([convert2namespace(uri) for uri in ITEM2OWL[itype].get(conf_name, [])])
+    return uris
 
 
 def get_syndef_terms_as_uri(ontology, termtype, as_rdf=True):
@@ -425,34 +330,6 @@ def remove_obsoletes_and_unnamed(terms, itype):
     terms = {termid: term for termid, term in terms.items()
              if name_field in term and (term[name_field] and not term[name_field].lower().startswith('obsolete'))}
     return terms
-
-
-# def verify_and_update_ontology(terms, ontologies):
-#     '''checks to be sure the ontology associated with the term agrees with
-#         the term prefix.  If it doesn't it is likely that the term was
-#         imported into a previously processed ontology and so the ontlogy
-#         of the term should be updated to the one that matches the prefix
-#     '''
-#     ont_lookup = {o['uuid']: o['ontology_prefix'] for o in ontologies}
-#     ont_prefi = {v: k for k, v in ont_lookup.items()}
-#     for termid, term in terms.items():
-#         if ont_lookup.get(term['source_ontology'], None):
-#             prefix = termid.split(':')[0]
-#             if prefix in ont_prefi:
-#                 if prefix != ont_lookup[term['source_ontology']]:
-#                     term['source_ontology'] = ont_prefi[prefix]
-#     return terms
-
-
-# def _get_t_id(val):
-#     # val can be: uuid string, dict with @id, dict with uuid if fully embedded
-#     try:
-#         linkid = val.get('@id')
-#         if linkid is None:
-#             linkid = val.get('term_id')
-#         return linkid
-#     except AttributeError:
-#         return val
 
 
 def _format_as_raw(val):
@@ -568,8 +445,6 @@ def id_post_and_patch(terms, dbterms, itype, rm_unchanged=True, set_obsoletes=Tr
 
     # all terms have uuid - now add uuids to linked terms
     for term in terms.values():
-        if term.get('uuid') == '76d151f7-b364-4990-af25-b6c712fb4d0f':
-            import pdb; pdb.set_trace()
         puuids = _get_uuids_for_linked(term, tid2uuid)
         for rt, uuids in puuids.items():
             term[rt] = list(set(uuids))  # to avoid redundant terms
@@ -667,10 +542,10 @@ def _is_deprecated(class_, data):
     return False
 
 
-def download_and_process_owl(ontology, itype, connection, terms, simple=False):
-    synonym_terms = get_synonym_term_uris(ontology)
-    definition_terms = get_definition_term_uris(ontology)
-    data = Owler(ontology['download_url'])
+def download_and_process_owl(itype, connection, terms, simple=False):
+    synonym_terms = get_term_uris_as_ns(itype, 'synonym_uris')
+    definition_terms = get_term_uris_as_ns(itype, 'definition_uris')
+    data = Owler(ITEM2OWL[itype]['download_url'])
     if not terms:
         terms = {}
     name_field = ITEM2OWL[itype].get('name_field')
@@ -681,7 +556,7 @@ def download_and_process_owl(ontology, itype, connection, terms, simple=False):
                 # terms = process_blank_node(class_, data, terms, simple)
             else:
                 termid = get_termid_from_uri(class_)
-                if simple and not termid.startswith(ontology.get('ontology_prefix')):
+                if simple and not termid.startswith(ITEM2OWL[itype].get('ontology_prefix')):
                     continue
                 if terms.get(termid) is None:
                     terms[termid] = create_term_dict(class_, termid, data, itype)
@@ -759,17 +634,17 @@ def main():
 
     # fourfront connection
     connection = connect2server(args.env, args.key)
-    ontology = get_ontology(connection, ITEM2OWL[itype].get('ontology_prefix'))
+    # ontology = get_ontology(connection, ITEM2OWL[itype].get('ontology_prefix'))
     slim_terms = get_slim_terms(connection, itype)
     db_terms = get_existing_items(connection, itype)
     terms = {}
 
-    print('Processing: ', ontology['ontology_name'])
-    if ontology.get('download_url', None) is not None:
+    print('Processing: ', ITEM2OWL[itype].get('ontology_prefix'))
+    if ITEM2OWL[itype].get('download_url', None) is not None:
         # want only simple processing
         simple = True
         # get all the terms for an ontology
-        terms = download_and_process_owl(ontology, itype, connection, terms, simple)
+        terms = download_and_process_owl(itype, connection, terms, simple)
     else:
         # bail out
         print("Need url to download file from")

@@ -1,0 +1,18 @@
+definition_uris:
+  - purl.obolibrary.org/obo/IAO_0000115
+synonym_uris:
+  - www.geneontology.org/formats/oboInOwl#hasExactSynonym
+  - www.geneontology.org/formats/oboInOwl#hasNarrowSynonym
+  - www.geneontology.org/formats/oboInOwl#RelatedSynonym
+Disorder:
+  download_url: http://purl.obolibrary.org/obo/mondo.owl
+  ontology_prefix: MONDO
+  id_field: disorder_id
+  name_field: disorder_name
+  url_field: disorder_url
+Phenotype:
+  download_url: http://purl.obolibrary.org/obo/hp.owl
+  ontology_prefix: HP
+  id_field: hpo_id
+  name_field: phenotype_name
+  url_field: hpo_url
