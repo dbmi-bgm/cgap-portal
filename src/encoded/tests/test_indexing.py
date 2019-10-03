@@ -142,6 +142,7 @@ def test_fp_uuid(testapp, project, experiment, institution, file_formats):
     return res.json['@graph'][0]['uuid']
 
 
+@pytest.mark.skip # XXX: Needs refactor
 def test_file_processed_detailed(app, testapp, indexer_testapp, test_fp_uuid,
                                  project, institution, file_formats):
     # Todo, input a list of accessions / uuids:

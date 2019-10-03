@@ -12,7 +12,7 @@ def test_server_defaults(admin, anontestapp):
     item = res.json['@graph'][0]
     assert item['now'].startswith('2')
     assert item['user'] == admin['@id']
-    assert item['accession'].startswith('4DNAB')
+    assert item['accession'].startswith('GAP')
 
     anontestapp.patch_json(
         res.location, {}, status=200,

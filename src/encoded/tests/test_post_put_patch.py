@@ -207,6 +207,7 @@ def test_retry(testapp):
     assert not res.json['detached']
 
 
+@pytest.mark.skip # XXX: Needs refactor
 def test_post_check_only(testapp, human_data, human):
     '''
     organism should validate fine but not post
@@ -220,6 +221,7 @@ def test_post_check_only(testapp, human_data, human):
     assert rest['status'] == 'success'
 
 
+@pytest.mark.skip # XXX: Needs refactor
 def test_put_check_only(testapp, human_data, human):
     '''
     organism should validate fine but not post
@@ -233,6 +235,8 @@ def test_put_check_only(testapp, human_data, human):
     rest = testapp.post_json('/organism/?check_only=true', human_data).json
     assert rest['status'] == 'success'
 
+
+@pytest.mark.skip # XXX: Needs refactor
 def test_post_check_only_invalid_data(testapp, human_data):
     '''
     note theese test should work on any object
@@ -241,6 +245,7 @@ def test_post_check_only_invalid_data(testapp, human_data):
     testapp.post_json('/organism/?check_only=true', human_data, status=422)
 
 
+@pytest.mark.skip # XXX: Needs refactor
 def test_put_check_only(testapp, human_data, human):
     '''
     organism should validate fine but not post
@@ -256,6 +261,7 @@ def test_put_check_only(testapp, human_data, human):
     assert rest['status'] == 'success'
 
 
+@pytest.mark.skip # XXX: Needs refactor
 def test_patch_check_only(testapp, human_data, human):
     '''
     organism should validate fine but not post
