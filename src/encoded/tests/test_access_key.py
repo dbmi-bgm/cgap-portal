@@ -13,13 +13,13 @@ def auth_header(access_key):
 
 
 @pytest.fixture
-def no_login_submitter(testapp, lab, award):
+def no_login_submitter(testapp, institution, project):
     item = {
         'first_name': 'ENCODE',
         'last_name': 'Submitter',
         'email': 'no_login_submitter@example.org',
-        'submits_for': [lab['@id']],
-        'status': 'revoked',
+        'submits_for': [institution['@id']],
+        'status': 'deleted',
     }
     # User @@object view has keys omitted.
     res = testapp.post_json('/user', item)
@@ -54,7 +54,7 @@ def test_access_key_get_bad_password(anontestapp, access_key):
     anontestapp.get('/', headers=headers, status=401)
 
 
-def test_access_key_principals(anontestapp, execute_counter, access_key, submitter, lab):
+def test_access_key_principals(anontestapp, execute_counter, access_key, submitter, institution):
     headers = {'Authorization': auth_header(access_key)}
     with execute_counter.expect(2):
         res = anontestapp.get('/@@testing-user', headers=headers)
@@ -64,23 +64,22 @@ def test_access_key_principals(anontestapp, execute_counter, access_key, submitt
     assert sorted(res.json['effective_principals']) == [
         'accesskey.%s' % access_key['access_key_id'],
         'group.submitter',
-        'lab.%s' % lab['uuid'],
-        'submits_for.%s' % lab['uuid'],
+        'institution.%s' % institution['uuid'],
+        'submits_for.%s' % institution['uuid'],
         'system.Authenticated',
         'system.Everyone',
         'userid.%s' % submitter['uuid'],
-        'viewing_group.4DN',
     ]
 
 
 # this user has the 4DN viewing group
 @pytest.fixture
-def viewing_group_member(testapp, award):
+def viewing_group_member(testapp, project):
     item = {
         'first_name': 'Viewing',
         'last_name': 'Group',
         'email': 'viewing_group_member@example.org',
-        'viewing_groups': [award['viewing_group']],
+        'viewing_groups': [project['viewing_group']],
         'status': 'current'
     }
     # User @@object view has keys omitted.

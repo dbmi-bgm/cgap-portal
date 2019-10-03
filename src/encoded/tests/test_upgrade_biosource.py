@@ -3,11 +3,11 @@ pytestmark = [pytest.mark.setone, pytest.mark.working]
 
 
 @pytest.fixture
-def biosource_1(award, lab):
+def biosource_1(project, institution):
     return{
         "schema_version": '1',
-        "award": award['@id'],
-        "lab": lab['@id'],
+        "project": project['@id'],
+        "institution": institution['@id'],
         "biosource_type": "immortalized cell line",
         "cell_line": "GM12878",
         "cell_line_termid": "EFO:0000001"

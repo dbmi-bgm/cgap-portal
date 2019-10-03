@@ -3,44 +3,44 @@ pytestmark = [pytest.mark.setone, pytest.mark.working]
 
 
 @pytest.fixture
-def experiment_repliseq_1(award, lab):
+def experiment_repliseq_1(project, institution):
     return{
         "schema_version": '1',
-        "award": award['@id'],
-        "lab": lab['@id'],
+        "project": project['@id'],
+        "institution": institution['@id'],
         "experiment_type": "repliseq",
         "total_fractions_in_exp": 2
     }
 
 
 @pytest.fixture
-def experiment_chiapet_1(award, lab):
+def experiment_chiapet_1(project, institution):
     return{
         "schema_version": '1',
-        "award": award['@id'],
-        "lab": lab['@id'],
+        "project": project['@id'],
+        "institution": institution['@id'],
         "experiment_type": "CHIA-pet",
         "antibody": "ENCAB1234567"
     }
 
 
 @pytest.fixture
-def experiment_seq_1(award, lab):
+def experiment_seq_1(project, institution):
     return{
         "schema_version": '1',
-        "award": award['@id'],
-        "lab": lab['@id'],
+        "project": project['@id'],
+        "institution": institution['@id'],
         "experiment_type": "CHIP-seq",
         "antibody": "ENCAB1234567"
     }
 
 
 @pytest.fixture
-def experiment_repliseq_2(award, lab):
+def experiment_repliseq_2(project, institution):
     return{
         "schema_version": '2',
-        "award": award['@id'],
-        "lab": lab['@id'],
+        "project": project['@id'],
+        "institution": institution['@id'],
         "experiment_type": "Repli-seq",
         "antibody": "ENCAB1234567",
         "antibody_lot_id": "1234",
@@ -49,11 +49,11 @@ def experiment_repliseq_2(award, lab):
 
 
 @pytest.fixture
-def experiment_damid_1(award, lab):
+def experiment_damid_1(project, institution):
     return{
         "schema_version": '1',
-        "award": award['@id'],
-        "lab": lab['@id'],
+        "project": project['@id'],
+        "institution": institution['@id'],
         "experiment_type": "DAM-ID seq",
         "index_pcr_cycles": 5,
         "fusion": 'LaminB'
@@ -61,11 +61,11 @@ def experiment_damid_1(award, lab):
 
 
 @pytest.fixture
-def experiment_mic_1(award, lab):
+def experiment_mic_1(project, institution):
     return{
         "schema_version": '1',
-        "award": award['@id'],
-        "lab": lab['@id'],
+        "project": project['@id'],
+        "institution": institution['@id'],
         "experiment_type": "DNA-FiSH",
     }
 
@@ -78,11 +78,11 @@ def experiment_n(targ_w_alias):
 
 
 @pytest.fixture
-def experiment_dilution_hic_1(award, lab):
+def experiment_dilution_hic_1(project, institution):
     return {
         "schema_version": '1',
-        "award": award['@id'],
-        "lab": lab['@id'],
+        "project": project['@id'],
+        "institution": institution['@id'],
         "experiment_type": "dilution Hi-C",
     }
 
@@ -141,11 +141,11 @@ def test_experiment_capture_c_target_to_biofeat(
 
 
 @pytest.fixture
-def experiment_hic_new_type_1(award, lab):
+def experiment_hic_new_type_1(project, institution):
     return {
         "schema_version": '1',
-        "award": award['@id'],
-        "lab": lab['@id'],
+        "project": project['@id'],
+        "institution": institution['@id'],
         "experiment_type": "special new Hi-C",
     }
 

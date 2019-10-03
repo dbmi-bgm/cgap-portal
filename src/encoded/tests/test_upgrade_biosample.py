@@ -3,11 +3,11 @@ pytestmark = [pytest.mark.setone, pytest.mark.working]
 
 
 @pytest.fixture
-def biosample_1(biosample_cc_wo_diff, GM12878_biosource, award, lab):
+def biosample_1(biosample_cc_wo_diff, GM12878_biosource, project, institution):
     return{
         "schema_version": '1',
-        "award": award['@id'],
-        "lab": lab['@id'],
+        "project": project['@id'],
+        "institution": institution['@id'],
         "cell_culture_details": biosample_cc_wo_diff['@id'],
         "biosource": [GM12878_biosource['@id']]
     }

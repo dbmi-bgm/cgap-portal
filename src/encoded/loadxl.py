@@ -29,7 +29,7 @@ ORDER = [
     'project',
     'institution',
     'file_format',
-    'disease',
+    'disorder',
     'case',
     'individual',
     'sample',

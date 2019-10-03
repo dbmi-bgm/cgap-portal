@@ -3,11 +3,11 @@ pytestmark = [pytest.mark.setone, pytest.mark.working]
 
 
 @pytest.fixture
-def publication_1(award, lab):
+def publication_1(project, institution):
     return{
         "schema_version": '1',
-        "award": award['@id'],
-        "lab": lab['@id'],
+        "project": project['@id'],
+        "institution": institution['@id'],
         "authors": "Black JC, White AL, Red A"
     }
 

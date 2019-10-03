@@ -127,12 +127,12 @@ def test_create_mapping_on_indexing(app, testapp, registry, elasticsearch):
 
 
 @pytest.fixture
-def test_fp_uuid(testapp, award, experiment, lab, file_formats):
+def test_fp_uuid(testapp, project, experiment, institution, file_formats):
     # this is a processed file
     item = {
         'accession': '4DNFIO67APU2',
-        'award': award['uuid'],
-        'lab': lab['uuid'],
+        'project': project['uuid'],
+        'institution': institution['uuid'],
         'file_format': file_formats.get('pairs').get('@id'),
         'filename': 'test.pairs.gz',
         'md5sum': '0123456789abcdef0123456789abcdef',
@@ -143,15 +143,15 @@ def test_fp_uuid(testapp, award, experiment, lab, file_formats):
 
 
 def test_file_processed_detailed(app, testapp, indexer_testapp, test_fp_uuid,
-                                 award, lab, file_formats):
+                                 project, institution, file_formats):
     # Todo, input a list of accessions / uuids:
     verify_item(test_fp_uuid, indexer_testapp, testapp, app.registry)
     # While we're here, test that _update of the file properly
     # queues the file with given relationship
     indexer_queue = app.registry[INDEXER_QUEUE]
     rel_file = {
-        'award': award['uuid'],
-        'lab': lab['uuid'],
+        'project': project['uuid'],
+        'institution': institution['uuid'],
         'file_format': file_formats.get('pairs').get('@id')
     }
     rel_res = testapp.post_json('/file_processed', rel_file)
@@ -190,7 +190,7 @@ def test_file_processed_detailed(app, testapp, indexer_testapp, test_fp_uuid,
     assert found_rel_sid > found_fp_sid  # sid of related file is greater
 
 
-def test_real_validation_error(app, indexer_testapp, testapp, lab, award, file_formats):
+def test_real_validation_error(app, indexer_testapp, testapp, institution, project, file_formats):
     """
     Create an item (file-processed) with a validation error and index,
     to ensure that validation errors work
@@ -202,8 +202,8 @@ def test_real_validation_error(app, indexer_testapp, testapp, lab, award, file_f
         'schema_version': '3',
         'uuid': str(uuid.uuid4()),
         'file_format': file_formats.get('mcool').get('uuid'),
-        'lab': lab['uuid'],
-        'award': award['uuid'],
+        'institution': institution['uuid'],
+        'project': project['uuid'],
         'higlass_uid': 1  # validation error -- higlass_uid should be string
     }
     res = testapp.post_json('/files-processed/?validate=false&upgrade=False',
@@ -214,7 +214,7 @@ def test_real_validation_error(app, indexer_testapp, testapp, lab, award, file_f
     assert val_err_view['validation_errors'] == []
 
     # call to /index will throw MissingIndexItemException multiple times, since
-    # associated file_format, lab, and award are not indexed. That's okay
+    # associated file_format, institution, and project are not indexed. That's okay
     indexer_testapp.post_json('/index', {'record': True})
     time.sleep(2)
     es_res = es.get(index='file_processed', doc_type='file_processed', id=res['@graph'][0]['uuid'])
@@ -251,7 +251,7 @@ def test_load_and_index_perf_data(testapp, indexer_testapp):
     json_inserts = {}
 
     # pluck a few uuids for testing
-    test_types = ['biosample', 'user', 'lab', 'experiment_set_replicate']
+    test_types = ['biosample', 'user', 'institution', 'experiment_set_replicate']
     test_inserts = []
     for insert in inserts:
         type_name = insert.split('.')[0]

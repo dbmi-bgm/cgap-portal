@@ -61,11 +61,11 @@ def test_replaced_file_not_uniqued(testapp, file):
 
 
 @pytest.fixture
-def fastq_json(award, experiment, lab, file_formats):
+def fastq_json(project, experiment, institution, file_formats):
     return {
         'accession': '4DNFIO67APU2',
-        'award': award['uuid'],
-        'lab': lab['uuid'],
+        'project': project['uuid'],
+        'institution': institution['uuid'],
         'file_format': file_formats.get('fastq').get('uuid'),
         'filename': 'test.fastq.gz',
         'md5sum': '0123456789abcdef0123456789abcdef',
@@ -74,11 +74,11 @@ def fastq_json(award, experiment, lab, file_formats):
 
 
 @pytest.fixture
-def proc_file_json(award, experiment, lab, file_formats):
+def proc_file_json(project, experiment, institution, file_formats):
     return {
         'accession': '4DNFIO67APU2',
-        'award': award['uuid'],
-        'lab': lab['uuid'],
+        'project': project['uuid'],
+        'institution': institution['uuid'],
         'file_format': file_formats.get('pairs').get('uuid'),
         'filename': 'test.pairs.gz',
         'md5sum': '0123456789abcdef0123456789abcdef',
@@ -413,10 +413,10 @@ def test_files_get_s3_with_no_filename_patched(testapp, fastq_uploading,
 
 
 @pytest.fixture
-def mcool_file_json(award, experiment, lab, file_formats):
+def mcool_file_json(project, experiment, institution, file_formats):
     item = {
-        'award': award['@id'],
-        'lab': lab['@id'],
+        'project': project['@id'],
+        'institution': institution['@id'],
         'file_format': file_formats.get('mcool').get('uuid'),
         'md5sum': '00000000000000000000000000000000',
         'filename': 'my.cool.mcool',
@@ -425,10 +425,10 @@ def mcool_file_json(award, experiment, lab, file_formats):
     return item
 
 @pytest.fixture
-def bedGraph_file_json(award, experiment, lab, file_formats):
+def bedGraph_file_json(project, experiment, institution, file_formats):
     item = {
-        'award': award['@id'],
-        'lab': lab['@id'],
+        'project': project['@id'],
+        'institution': institution['@id'],
         'file_format': file_formats.get('bg').get('uuid'),
         'md5sum': '00000000000000000000000000000000',
         'filename': 'my.bedGraph.gz',
@@ -437,10 +437,10 @@ def bedGraph_file_json(award, experiment, lab, file_formats):
     return item
 
 @pytest.fixture
-def bigwig_file_json(award, experiment, lab, file_formats):
+def bigwig_file_json(project, experiment, institution, file_formats):
     item = {
-        'award': award['@id'],
-        'lab': lab['@id'],
+        'project': project['@id'],
+        'institution': institution['@id'],
         'file_format': file_formats.get('bw').get('uuid'),
         'md5sum': '00000000000000000000000000000000',
         'filename': 'my.bw',
@@ -449,10 +449,10 @@ def bigwig_file_json(award, experiment, lab, file_formats):
     return item
 
 @pytest.fixture
-def bigbed_file_json(award, experiment, lab, file_formats):
+def bigbed_file_json(project, experiment, institution, file_formats):
     item = {
-        'award': award['@id'],
-        'lab': lab['@id'],
+        'project': project['@id'],
+        'institution': institution['@id'],
         'file_format': file_formats.get('bigbed').get('uuid'),
         'md5sum': '00000000000000000000000000000000',
         'filename': 'my.bb',
@@ -461,10 +461,10 @@ def bigbed_file_json(award, experiment, lab, file_formats):
     return item
 
 @pytest.fixture
-def bed_beddb_file_json(award, experiment, lab, file_formats):
+def bed_beddb_file_json(project, experiment, institution, file_formats):
     item = {
-        'award': award['@id'],
-        'lab': lab['@id'],
+        'project': project['@id'],
+        'institution': institution['@id'],
         'file_format': file_formats.get('bed').get('uuid'),
         'md5sum': '00000000000000000000000000000000',
         'filename': 'my.bed.gz',
@@ -480,10 +480,10 @@ def bed_beddb_file_json(award, experiment, lab, file_formats):
     return item
 
 @pytest.fixture
-def beddb_file_json(award, experiment, lab, file_formats):
+def beddb_file_json(project, experiment, institution, file_formats):
     item = {
-        'award': award['@id'],
-        'lab': lab['@id'],
+        'project': project['@id'],
+        'institution': institution['@id'],
         'file_format': file_formats.get('beddb').get('uuid'),
         'md5sum': '00000000000000000000000000000000',
         'filename': 'my.beddb',
@@ -492,10 +492,10 @@ def beddb_file_json(award, experiment, lab, file_formats):
     return item
 
 @pytest.fixture
-def chromsizes_file_json(award, experiment, lab, file_formats):
+def chromsizes_file_json(project, experiment, institution, file_formats):
     item = {
-        'award': award['@id'],
-        'lab': lab['@id'],
+        'project': project['@id'],
+        'institution': institution['@id'],
         'file_format': file_formats.get('chromsizes').get('uuid'),
         'md5sum': '00000000000000000000000000000000',
         'filename': 'my.chrom.sizes',
@@ -510,11 +510,11 @@ def mcool_file(testapp, mcool_file_json):
 
 
 @pytest.fixture
-def file(testapp, award, experiment, lab, file_formats):
+def file(testapp, project, experiment, institution, file_formats):
 
     item = {
-        'award': award['@id'],
-        'lab': lab['@id'],
+        'project': project['@id'],
+        'institution': institution['@id'],
         'file_format': file_formats.get('fastq').get('uuid'),
         'md5sum': '00000000000000000000000000000000',
         'filename': 'my.fastq.gz',
@@ -754,10 +754,10 @@ def test_force_beanstalk_env(mocker):
 
 
 @pytest.fixture
-def processed_file_data(award, lab, file_formats):
+def processed_file_data(project, institution, file_formats):
     return {
-        'award': award['@id'],
-        'lab': lab['@id'],
+        'project': project['@id'],
+        'institution': institution['@id'],
         'file_format': file_formats.get('pairs').get('uuid'),
     }
 
@@ -906,15 +906,15 @@ def test_validate_extra_files_bad_extras_format(
     assert "'whosit' not a valid or known file format" in descriptions
 
 
-def test_validate_file_format_validity_for_file_type_allows(testapp, file_formats, award, lab):
+def test_validate_file_format_validity_for_file_type_allows(testapp, file_formats, project, institution):
     my_fastq_file = {
-        'award': award['@id'],
-        'lab': lab['@id'],
+        'project': project['@id'],
+        'institution': institution['@id'],
         'file_format': file_formats.get('fastq').get('uuid'),
     }
     my_proc_file = {
-        'award': award['@id'],
-        'lab': lab['@id'],
+        'project': project['@id'],
+        'institution': institution['@id'],
         'file_format': file_formats.get('pairs').get('uuid'),
     }
     res1 = testapp.post_json('/files-fastq', my_fastq_file, status=201)
@@ -923,15 +923,15 @@ def test_validate_file_format_validity_for_file_type_allows(testapp, file_format
     assert not res2.json.get('errors')
 
 
-def test_validate_file_format_validity_for_file_type_fires(testapp, file_formats, award, lab):
+def test_validate_file_format_validity_for_file_type_fires(testapp, file_formats, project, institution):
     my_fastq_file = {
-        'award': award['@id'],
-        'lab': lab['@id'],
+        'project': project['@id'],
+        'institution': institution['@id'],
         'file_format': file_formats.get('pairs').get('uuid'),
     }
     my_proc_file = {
-        'award': award['@id'],
-        'lab': lab['@id'],
+        'project': project['@id'],
+        'institution': institution['@id'],
         'file_format': file_formats.get('fastq').get('uuid'),
     }
     res1 = testapp.post_json('/files-fastq', my_fastq_file, status=422)
@@ -944,10 +944,10 @@ def test_validate_file_format_validity_for_file_type_fires(testapp, file_formats
     assert "File format fastq is not allowed for FileProcessed" in descriptions
 
 
-def test_file_format_does_not_exist(testapp, file_formats, award, lab):
+def test_file_format_does_not_exist(testapp, file_formats, project, institution):
     my_fastq_file = {
-        'award': award['@id'],
-        'lab': lab['@id'],
+        'project': project['@id'],
+        'institution': institution['@id'],
         'file_format': 'waldo',
     }
     res1 = testapp.post_json('/files-fastq', my_fastq_file, status=422)
@@ -956,10 +956,10 @@ def test_file_format_does_not_exist(testapp, file_formats, award, lab):
     assert "'waldo' not found" in descriptions
 
 
-def test_filename_patch_fails_wrong_format(testapp, file_formats, award, lab):
+def test_filename_patch_fails_wrong_format(testapp, file_formats, project, institution):
     my_fastq_file = {
-        'award': award['@id'],
-        'lab': lab['@id'],
+        'project': project['@id'],
+        'institution': institution['@id'],
         'file_format': file_formats.get('fastq').get('uuid'),
         'filename': 'test.fastq.gz'
     }
@@ -975,10 +975,10 @@ def test_filename_patch_fails_wrong_format(testapp, file_formats, award, lab):
     assert error2 in descriptions
 
 
-def test_filename_patch_works_with_different_format(testapp, file_formats, award, lab):
+def test_filename_patch_works_with_different_format(testapp, file_formats, project, institution):
     my_proc_file = {
-        'award': award['@id'],
-        'lab': lab['@id'],
+        'project': project['@id'],
+        'institution': institution['@id'],
         'file_format': file_formats.get('pairs').get('uuid'),
         'filename': 'test.pairs.gz'
     }
@@ -989,10 +989,10 @@ def test_filename_patch_works_with_different_format(testapp, file_formats, award
     assert not res2.json.get('errors')
 
 
-def test_file_format_patch_works_if_no_filename(testapp, file_formats, award, lab):
+def test_file_format_patch_works_if_no_filename(testapp, file_formats, project, institution):
     my_proc_file = {
-        'award': award['@id'],
-        'lab': lab['@id'],
+        'project': project['@id'],
+        'institution': institution['@id'],
         'file_format': file_formats.get('pairs').get('uuid')
     }
     res1 = testapp.post_json('/files-processed', my_proc_file, status=201)
@@ -1002,13 +1002,13 @@ def test_file_format_patch_works_if_no_filename(testapp, file_formats, award, la
     assert not res2.json.get('errors')
 
 
-def test_file_generate_track_title_fp_all_present(testapp, file_formats, award, lab):
+def test_file_generate_track_title_fp_all_present(testapp, file_formats, project, institution):
     pf_file_meta = {
-        'award': award['@id'],
-        'lab': lab['@id'],
+        'project': project['@id'],
+        'institution': institution['@id'],
         'file_format': file_formats.get('mcool').get('uuid'),
         'override_experiment_type': 'DNase Hi-C',
-        'override_lab_name': 'Test Lab',
+        'override_institution_name': 'Test Lab',
         'file_type': 'normalized counts',
         'override_assay_info': 'PARK1',
         'override_biosource_name': 'GM12878',
@@ -1021,12 +1021,12 @@ def test_file_generate_track_title_fp_all_present(testapp, file_formats, award, 
     assert pf.get('track_and_facet_info', {}).get('track_title') == 'normalized counts for GM12878 DNase Hi-C PARK1'
 
 
-def test_file_generate_track_title_fp_all_missing(testapp, file_formats, award, lab):
+def test_file_generate_track_title_fp_all_missing(testapp, file_formats, project, institution):
     pf_file_meta = {
-        'award': award['@id'],
-        'lab': lab['@id'],
+        'project': project['@id'],
+        'institution': institution['@id'],
         'file_format': file_formats.get('mcool').get('uuid'),
-        'lab': lab['@id'],
+        'institution': institution['@id'],
         'higlass_uid': 'test_hg_uid'
     }
     res1 = testapp.post_json('/files-processed', pf_file_meta, status=201)
@@ -1034,12 +1034,12 @@ def test_file_generate_track_title_fp_all_missing(testapp, file_formats, award, 
     assert pf.get('track_and_facet_info', {}).get('track_title') is None
 
 
-def test_file_generate_track_title_fp_most_missing(testapp, file_formats, award, lab):
+def test_file_generate_track_title_fp_most_missing(testapp, file_formats, project, institution):
     pf_file_meta = {
-        'award': award['@id'],
-        'lab': lab['@id'],
+        'project': project['@id'],
+        'institution': institution['@id'],
         'file_format': file_formats.get('mcool').get('uuid'),
-        'lab': lab['@id'],
+        'institution': institution['@id'],
         'override_experiment_type': 'DNase Hi-C',
         'higlass_uid': 'test_hg_uid'
     }
@@ -1048,15 +1048,15 @@ def test_file_generate_track_title_fp_most_missing(testapp, file_formats, award,
     assert pf.get('track_and_facet_info', {}).get('track_title') == 'unspecified type for unknown sample DNase Hi-C'
 
 
-def test_file_generate_track_title_fvis(testapp, file_formats, award, lab, GM12878_biosource):
+def test_file_generate_track_title_fvis(testapp, file_formats, project, institution, GM12878_biosource):
     vistrack_meta = {
-        'award': award['@id'],
-        'lab': lab['@id'],
+        'project': project['@id'],
+        'institution': institution['@id'],
         'file_format': file_formats.get('mcool').get('uuid'),
         'override_experiment_type': 'DNase Hi-C',
-        'lab': lab['@id'],
+        'institution': institution['@id'],
         'file_type': 'fold change over control',
-        'override_lab_name': 'Some Dude, Somewhere',
+        'override_institution_name': 'Some Dude, Somewhere',
         'override_assay_info': 'PARK1',
         'biosource': GM12878_biosource['@id'],
         'override_replicate_info': 'bio1 tec1',
@@ -1068,10 +1068,10 @@ def test_file_generate_track_title_fvis(testapp, file_formats, award, lab, GM128
 
 
 @pytest.fixture
-def custom_experiment_set_data(lab, award):
+def custom_experiment_set_data(institution, project):
     return {
-        'lab': lab['@id'],
-        'award': award['@id'],
+        'institution': institution['@id'],
+        'project': project['@id'],
         'description': 'test experiment set',
         'experimentset_type': 'custom',
         'status': 'in review'
@@ -1079,10 +1079,10 @@ def custom_experiment_set_data(lab, award):
 
 
 def test_track_and_file_facet_info_no_link_to_exp_or_eset(testapp, proc_file_json):
-    # should only have lab_name
+    # should only have institution_name
     res = testapp.post_json('/file_processed', proc_file_json, status=201).json['@graph'][0]
     tf_info = res.get('track_and_facet_info')
-    assert 'lab_name' in tf_info
+    assert 'institution_name' in tf_info
     assert len(tf_info) == 1
 
 
@@ -1096,7 +1096,7 @@ def test_track_and_file_facet_info_file_link_to_multi_expts(
     assert pfile['@id'] in expt2['processed_files']
     res = testapp.get(pfile['@id']).json
     tf_info = res.get('track_and_facet_info')
-    assert 'lab_name' in tf_info
+    assert 'institution_name' in tf_info
     assert len(tf_info) == 1
 
 
@@ -1219,7 +1219,7 @@ def test_track_and_file_facet_info_file_link_to_multi_repsets(
     assert pfile['@id'] in repset2['processed_files']
     res = testapp.get(pfile['@id']).json
     tf_info = res.get('track_and_facet_info')
-    assert 'lab_name' in tf_info
+    assert 'institution_name' in tf_info
     assert len(tf_info) == 1
 
 
@@ -1260,7 +1260,7 @@ def test_track_and_file_facet_info_file_link_to_repset_w_multi_expt_and_opf(
 def test_track_and_file_facet_info_file_w_all_override_fields(
         testapp, proc_file_json, experiment_data):
     overrides = {
-        'override_lab_name': 'awesome lab',
+        'override_institution_name': 'awesome institution',
         'override_experiment_type': 'TRIP',
         'override_biosource_name': 'some cell',
         'override_assay_info': 'cold',
@@ -1286,7 +1286,7 @@ def test_track_and_file_facet_info_file_w_all_override_fields(
 def test_track_and_file_facet_info_file_vistrack_w_all_override_fields(
         testapp, proc_file_json, experiment_data, file_formats):
     overrides = {
-        'override_lab_name': 'awesome lab',
+        'override_institution_name': 'awesome institution',
         'override_experiment_type': 'TRIP',
         'override_assay_info': 'cold',
         'override_replicate_info': 'replicated lots',
@@ -1313,7 +1313,7 @@ def test_track_and_file_facet_info_file_w_some_override_fields(
     proc_file_json.update(overrides)
     pfile = testapp.post_json('/file_processed', proc_file_json, status=201).json['@graph'][0]
     tf_info = pfile.get('track_and_facet_info')
-    assert len(tf_info) == 5  # lab will get calculated since expt_type exists
+    assert len(tf_info) == 5  # institution will get calculated since expt_type exists
     for k, v in overrides.items():
         tf = k.replace('override_', '', 1)
         assert tf_info[tf] == v
@@ -1326,7 +1326,7 @@ def test_track_and_file_facet_info_file_w_some_override_fields(
         tf = k.replace('override_', '', 1)
         assert tf_info2[tf] == v
     assert tf_info2['experiment_type'] == 'TRIP'
-    assert tf_info2['lab_name'] == 'ENCODE lab'
+    assert tf_info2['institution_name'] == 'ENCODE institution'
     assert tf_info2['experiment_bucket'] == 'processed file'
 
 

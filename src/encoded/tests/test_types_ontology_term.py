@@ -49,17 +49,3 @@ def test_store_ontology_no_required_keys(testapp, oterm):
     oterm.pop('uuid')
     oterm.pop('term_id')
     testapp.post_json('/ontology_term', oterm, status=422)
-
-
-def test_linkto_ontology_term_by_term_id(testapp, lab, award, oterm):
-    item = {
-        "accession": "4DNSROOOAAQ1",
-        "biosource_type": "immortalized cell line",
-        'award': award['@id'],
-        'lab': lab['@id'],
-        'tissue': oterm['term_id']
-    }
-
-    res = testapp.post_json('/ontology_term', oterm).json['@graph'][0]
-    res_biosource = testapp.post_json('/biosource', item).json['@graph'][0]
-    assert res['@id'] == res_biosource['tissue']

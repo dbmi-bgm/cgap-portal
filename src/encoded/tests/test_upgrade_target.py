@@ -3,11 +3,11 @@ pytestmark = [pytest.mark.setone, pytest.mark.working]
 
 
 @pytest.fixture
-def target_1(basic_genomic_region, award, lab):
+def target_1(basic_genomic_region, project, institution):
     return{
         "schema_version": '1',
-        "award": award['@id'],
-        "lab": lab['@id'],
+        "project": project['@id'],
+        "institution": institution['@id'],
         "targeted_region": basic_genomic_region['@id']
     }
 

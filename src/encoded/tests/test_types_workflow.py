@@ -51,7 +51,7 @@ def input_json(workflow):
 
 
 @pytest.fixture()
-def workflow(testapp, software, award, lab):
+def workflow(testapp, software, project, institution):
     # ensure we always use uuid that's on fourfront-webdev
     workflow_uuid = '023bfb3e-9a8b-42b9-a9d4-216079526f68'
     return workflow_uuid

@@ -92,8 +92,8 @@ def test_search_with_embedding(workbook, testapp):
     assert isinstance(test_json['biosource'][0]['biosource_vendor'], dict)
     # this specific field was not embedded and should not be present
     assert 'description' not in test_json['biosource'][0]
-    # since lab.awards was not specifically embedded, the field should not exist
-    assert test_json['lab'].get('awards') is None
+    # since institution.projects was not specifically embedded, the field should not exist
+    assert test_json['institution'].get('projects') is None
 
 
 def test_search_with_simple_query(workbook, testapp):
@@ -512,7 +512,7 @@ def test_barplot_aggregation_endpoint(workbook, testapp):
     # We should get back same count as from search results here.
     res = testapp.post_json('/bar_plot_aggregations', {
         "search_query_params" : { "type" : ['ExperimentSetReplicate'] },
-        "fields_to_aggregate_for" : ["experiments_in_set.experiment_type.display_title", "award.project"]
+        "fields_to_aggregate_for" : ["experiments_in_set.experiment_type.display_title", "project.project"]
     }).json
 
     # Our total count for experiment_sets should match # of exp_set_replicate inserts.abs
@@ -527,9 +527,9 @@ def test_barplot_aggregation_endpoint(workbook, testapp):
 
     #assert isinstance(res['terms']["CHIP-seq"], dict) is True # A common term likely to be found.
 
-    #assert res["terms"]["CHIP-seq"]["field"] == "award.project" # Child-field
+    #assert res["terms"]["CHIP-seq"]["field"] == "project.project" # Child-field
 
-    # We only have 4DN as single award.project in test inserts so should have values in all buckets, though probably less than total.
+    # We only have 4DN as single project.project in test inserts so should have values in all buckets, though probably less than total.
     #assert res["terms"]["CHIP-seq"]["total"]["experiment_sets"] > 0
     #assert res["terms"]["CHIP-seq"]["total"]["experiment_sets"] < count_exp_set_test_inserts
 

@@ -3,11 +3,11 @@ pytestmark = [pytest.mark.setone, pytest.mark.working]
 
 
 @pytest.fixture
-def workflow_2(software, award, lab):
+def workflow_2(software, project, institution):
     return{
         "schema_version": '2',
-        "award": award['@id'],
-        "lab": lab['@id'],
+        "project": project['@id'],
+        "institution": institution['@id'],
         "title": "some workflow",
         "name": "some workflow",
         "workflow_type": "Other",
@@ -23,7 +23,7 @@ def test_workflow_convert_software_used_to_list_2(
     assert value['steps'][0]['meta']['software_used'] == [software['@id']]
 
 @pytest.fixture
-def workflow_3(software, award, lab):
+def workflow_3(software, project, institution):
     return {
         "arguments": [
             {
@@ -88,8 +88,8 @@ def workflow_3(software, award, lab):
             "Hi-C"
         ],
         "description": "Hi-C processing part B revision 15",
-        "award": award['@id'],
-        "lab": lab['@id'],
+        "project": project['@id'],
+        "institution": institution['@id'],
         "name": "hi-c-processing-partb/15",
         "schema_version" : "3",
         "steps": [
@@ -385,7 +385,7 @@ def test_workflow_upgrade_3_4(
 @pytest.fixture
 def workflow_4():
     return {
-        'lab': '/labs/encode-lab/',
+        'institution': '/institutions/encode-institution/',
         'steps': [
             {
                 'meta': {
@@ -531,7 +531,7 @@ def workflow_4():
             {'workflow_argument_name': 'output_hic', 'argument_format': 'hic', 'argument_type': 'Output processed file'},
             {'workflow_argument_name': 'out_mcool', 'argument_format': 'mcool', 'argument_type': 'Output processed file'}
         ],
-        'award': '/awards/encode3-award/',
+        'project': '/projects/encode3-project/',
         'workflow_type': 'Hi-C data analysis',
         'title': 'Hi-C processing part B revision 15'
     }
@@ -564,11 +564,11 @@ def test_workflow_upgrade_4_5(
 
 
 @pytest.fixture
-def workflow_5(software, award, lab):
+def workflow_5(software, project, institution):
     return{
         "schema_version": '5',
-        "award": award['@id'],
-        "lab": lab['@id'],
+        "project": project['@id'],
+        "institution": institution['@id'],
         "title": "some workflow",
         "name": "some workflow",
         "workflow_type": "Other",
@@ -593,11 +593,11 @@ def test_workflow_upgrade_5_6(
 
 
 @pytest.fixture
-def workflow_6(software, award, lab, workflow_bam):
+def workflow_6(software, project, institution, workflow_bam):
     return{
         "schema_version": '6',
-        "award": award['@id'],
-        "lab": lab['@id'],
+        "project": project['@id'],
+        "institution": institution['@id'],
         "title": "some workflow",
         "name": "some workflow",
         "previous_version": workflow_bam['@id']
@@ -616,11 +616,11 @@ def test_workflow_upgrade_6_7(
 
 
 # @pytest.fixture
-# def workflow_7(software, award, lab, workflow_bam):
+# def workflow_7(software, project, institution, workflow_bam):
 #     return{
 #         "schema_version": '6',
-#         "award": award['@id'],
-#         "lab": lab['@id'],
+#         "project": project['@id'],
+#         "institution": institution['@id'],
 #         "title": "some workflow",
 #         "name": "some workflow",
 #         "previous_version": [workflow_bam['@id']]

@@ -3,21 +3,21 @@ pytestmark = [pytest.mark.setone, pytest.mark.working]
 
 
 @pytest.fixture
-def experiment_set_1(award, lab):
+def experiment_set_1(project, institution):
     return{
         "schema_version": '1',
-        "award": award['@id'],
-        "lab": lab['@id'],
+        "project": project['@id'],
+        "institution": institution['@id'],
         "date_released": "2017-01-01"
     }
 
 
 @pytest.fixture
-def experiment_set_replicate_1(award, lab):
+def experiment_set_replicate_1(project, institution):
     return{
         "schema_version": '1',
-        "award": award['@id'],
-        "lab": lab['@id'],
+        "project": project['@id'],
+        "institution": institution['@id'],
         "date_released": "2017-01-01"
     }
 

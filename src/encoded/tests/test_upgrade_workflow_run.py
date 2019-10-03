@@ -6,8 +6,8 @@ pytestmark = [pytest.mark.setone, pytest.mark.working]
 def workflow_run_1():
     return {
         "uuid": "3b7066ef-f9e4-43ce-85b5-a994a15bbcaf",
-        "lab": "4dn-dcic-lab",
-        "award": "1U01CA200059-01",
+        "institution": "4dn-dcic-institution",
+        "project": "1U01CA200059-01",
         "workflow": "c77a117b-9a58-477e-aaa5-291a109a99f6",
         "run_status": "complete",
         "status": "in review",
@@ -65,8 +65,8 @@ def test_workflow_run_upgrade_1_2_missing_file_format(workflow_run_1, registry):
 def workflow_run_2(quality_metric_fastqc, file_fastq):
     return {
         "uuid": "4a43c93c-af77-4bab-adc2-433febc3e76c",
-        "lab": "4dn-dcic-lab",
-        "award": "1U01CA200059-01",
+        "institution": "4dn-dcic-institution",
+        "project": "1U01CA200059-01",
         "workflow": "2324ad76-ff37-4157-8bcc-3ce72b7dace9",
         "run_status": "complete",
         "status": "in review",

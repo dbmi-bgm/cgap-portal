@@ -3,11 +3,11 @@ pytestmark = [pytest.mark.setone, pytest.mark.working]
 
 
 @pytest.fixture
-def data_release_update_1(award, lab):
+def data_release_update_1(project, institution):
     return{
         "schema_version": '1',
-        "award": award['@id'],
-        "lab": lab['@id'],
+        "project": project['@id'],
+        "institution": institution['@id'],
         "summary": "Upgrader test.",
         "update_tag": "UPGRADERTEST",
         "submitted_by": "4dndcic@gmail.com",
@@ -30,11 +30,11 @@ def data_release_update_1(award, lab):
 
 
 @pytest.fixture
-def data_release_update_2(award, lab):
+def data_release_update_2(project, institution):
     return{
         "schema_version": '2',
-        "award": award['@id'],
-        "lab": lab['@id'],
+        "project": project['@id'],
+        "institution": institution['@id'],
         "summary": "Upgrader test.",
         "update_tag": "UPGRADERTEST",
         "submitted_by": "4dndcic@gmail.com",

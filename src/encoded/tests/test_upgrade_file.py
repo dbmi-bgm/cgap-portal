@@ -3,20 +3,20 @@ pytestmark = [pytest.mark.setone, pytest.mark.working]
 
 
 @pytest.fixture
-def file_1(award, lab):
+def file_1(project, institution):
     return{
         "schema_version": '1',
-        "award": award['@id'],
-        "lab": lab['@id'],
+        "project": project['@id'],
+        "institution": institution['@id'],
     }
 
 
 @pytest.fixture
-def file_w_extra_1(award, lab):
+def file_w_extra_1(project, institution):
         return{
             "schema_version": '1',
-            "award": award['@id'],
-            "lab": lab['@id'],
+            "project": project['@id'],
+            "institution": institution['@id'],
             "file_format": "pairs",
             "extra_files": [{"file_format": "pairs_px2"}]
         }
@@ -30,7 +30,7 @@ def file_wo_underscore_fields():
         "replicate_identifiers": ["Biorep 1, Techrep 1"],
         "biosource_name": "H1-hESC",
         "experiment_bucket": "processed files",
-        "project_lab": "Some Lab"
+        "project_institution": "Some Lab"
     }
 
 
@@ -42,7 +42,7 @@ def file_w_underscore_fields(file_wo_underscore_fields):
         "replicate_identifiers": "override_replicate_info",
         "biosource_name": "override_biosource_name",
         "experiment_bucket": "override_experiment_bucket",
-        "project_lab": "override_lab_name"
+        "project_institution": "override_institution_name"
     }
     mod = {v: file_wo_underscore_fields.get(f) for f, v in fieldmap.items()}
     mod['override_replicate_info'] = mod['override_replicate_info'][0]

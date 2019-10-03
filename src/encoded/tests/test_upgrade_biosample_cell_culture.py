@@ -3,11 +3,11 @@ pytestmark = [pytest.mark.setone, pytest.mark.working]
 
 
 @pytest.fixture
-def biosample_cell_culture_1(de_term, award, lab):
+def biosample_cell_culture_1(de_term, project, institution):
     return{
         "schema_version": '1',
-        "award": award['@id'],
-        "lab": lab['@id'],
+        "project": project['@id'],
+        "institution": institution['@id'],
         "differentiation_tissue": de_term['@id']
     }
 

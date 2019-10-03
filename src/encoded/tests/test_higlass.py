@@ -79,8 +79,8 @@ def higlass_mcool_viewconf(testapp):
                                 "tilesetUid":"IUcqX4GzTNWJIzE2-b_sZg",
                                 "type":"horizontal-gene-annotations",
                                 "options":{
-                                    "labelColor":"black",
-                                    "labelPosition":"hidden",
+                                    "institutionelColor":"black",
+                                    "institutionelPosition":"hidden",
                                     "plusStrandColor":"black",
                                     "minusStrandColor":"black",
                                     "trackBorderWidth":0,
@@ -101,7 +101,7 @@ def higlass_mcool_viewconf(testapp):
                                 "name":"Chromosome Axis",
                                 "server":"https://higlass.4dnucleome.org/api/v1",
                                 "tilesetUid":"JXbq7f-GTeq3FJy_ilIomQ",
-                                "type":"horizontal-chromosome-labels",
+                                "type":"horizontal-chromosome-institutionels",
                                 "local":True,
                                 "minHeight":30,
                                 "thumbnail":None,
@@ -124,8 +124,8 @@ def higlass_mcool_viewconf(testapp):
                                 "uid":"left-annotation-track",
                                 "type":"vertical-gene-annotations",
                                 "options":{
-                                    "labelColor":"black",
-                                    "labelPosition":"hidden",
+                                    "institutionelColor":"black",
+                                    "institutionelPosition":"hidden",
                                     "plusStrandColor":"black",
                                     "minusStrandColor":"black",
                                     "trackBorderWidth":0,
@@ -145,7 +145,7 @@ def higlass_mcool_viewconf(testapp):
                                 "server":"https://higlass.4dnucleome.org/api/v1",
                                 "tilesetUid":"JXbq7f-GTeq3FJy_ilIomQ",
                                 "uid":"left-chromosome-track",
-                                "type":"vertical-chromosome-labels",
+                                "type":"vertical-chromosome-institutionels",
                                 "options":{
                                     "showMousePosition":False,
                                     "mousePositionColor":"#999999"
@@ -171,7 +171,7 @@ def higlass_mcool_viewconf(testapp):
                                         "name":"4DNFI1TBYKV3.mcool",
                                         "options":{
                                             "backgroundColor":"#eeeeee",
-                                            "labelPosition":"topLeft",
+                                            "institutionelPosition":"topLeft",
                                             "coordSystem":"GRCm38",
                                             "colorRange":[
                                                 "white",
@@ -552,8 +552,8 @@ def test_add_bedGraph_to_bedGraph(testapp, higlass_blank_viewconf, bedGraph_file
         )
     )
 
-    # Make sure there is a label.
-    assert_true(new_higlass_json["views"][0]["tracks"]["top"][0]["options"]["labelPosition"] != "hidden")
+    # Make sure there is a institutionel.
+    assert_true(new_higlass_json["views"][0]["tracks"]["top"][0]["options"]["institutionelPosition"] != "hidden")
 
     # Add another bedGraph file. Make sure the bedGraphs are stacked atop each other.
     response = testapp.post_json("/add_files_to_higlass_viewconf/", {
@@ -1353,8 +1353,8 @@ def test_add_bigbed_higlass(testapp, higlass_mcool_viewconf, bigbed_file_json):
             assert_true("colorRange" in options)
             assert_true(len(options["colorRange"]) == 256)
 
-            assert_true("labelPosition" in options)
-            assert_true(options["labelPosition"] == "topLeft")
+            assert_true("institutionelPosition" in options)
+            assert_true(options["institutionelPosition"] == "topLeft")
 
     assert_true(found_annotation_track == True)
     assert_true(found_chromosome_track == True)
@@ -1554,12 +1554,12 @@ def test_add_chromsizes(testapp, higlass_blank_viewconf, chromsizes_file_json):
     # There are no other 2D views, so we should not have a center track.
     assert_true(len(tracks["center"][0]["contents"]) == 0)
 
-    # The top track should have chromosome labels
+    # The top track should have chromosome institutionels
     found_top_data_track = False
     for track in tracks["top"]:
         if "tilesetUid" in track and track["tilesetUid"] == chromsizes_file_json['higlass_uid']:
             found_top_data_track = True
-            assert_true(track["type"] == "horizontal-chromosome-labels")
+            assert_true(track["type"] == "horizontal-chromosome-institutionels")
 
     assert_true(found_top_data_track == True)
 
@@ -1620,14 +1620,14 @@ def test_add_2d_chromsizes(testapp, higlass_blank_viewconf, chromsizes_file_json
     assert_true(len(tracks["left"]) == len(old_tracks["left"]) + 1)
     assert_true(len(tracks["top"]) == len(old_tracks["top"]) + 1)
 
-    # The top and left tracks should have chromosome labels as the last track.
+    # The top and left tracks should have chromosome institutionels as the last track.
     for side in ("top", "left"):
         assert_true("tilesetUid" in tracks[side][-1])
         assert_true(tracks[side][-1]["tilesetUid"] == chromsizes_file_json['higlass_uid'])
 
         type_by_side = {
-            "top": "horizontal-chromosome-labels",
-            "left": "vertical-chromosome-labels",
+            "top": "horizontal-chromosome-institutionels",
+            "left": "vertical-chromosome-institutionels",
         }
         assert_true(tracks[side][-1]["type"] == type_by_side[side])
 
@@ -1711,11 +1711,11 @@ def test_remove_1d(testapp, higlass_mcool_viewconf, chromsizes_file_json, bigwig
 
     assert_true(len(higlass_json["viewconfig"]["views"][0]["tracks"]["top"]) + 1 == len(full_higlass_json["views"][0]["tracks"]["top"]), "top side mismatch")
 
-    assert_true(full_higlass_json["views"][0]["tracks"]["top"][0]["type"], "horizontal-chromosome-labels")
+    assert_true(full_higlass_json["views"][0]["tracks"]["top"][0]["type"], "horizontal-chromosome-institutionels")
 
-    # Add a height to the chromosome labels.
+    # Add a height to the chromosome institutionels.
     for t in full_higlass_json["views"][0]["tracks"]["top"]:
-        if t["type"] == "horizontal-chromosome-labels":
+        if t["type"] == "horizontal-chromosome-institutionels":
             t['height'] = 50
             t["orientation"] = "1d-horizontal"
 
@@ -1737,7 +1737,7 @@ def test_remove_1d(testapp, higlass_mcool_viewconf, chromsizes_file_json, bigwig
     # Make sure there are no left tracks.
     assert_true(len(all_1d_higlass_json["views"][0]["tracks"]["left"]) == 0, "Left tracks found")
 
-    top_chromsizes_tracks =[t for t in all_1d_higlass_json["views"][0]["tracks"]["top"] if t["type"] == "horizontal-chromosome-labels"]
+    top_chromsizes_tracks =[t for t in all_1d_higlass_json["views"][0]["tracks"]["top"] if t["type"] == "horizontal-chromosome-institutionels"]
     assert_true(top_chromsizes_tracks[0]["height"] == 50, "Top chromsize track lost its height")
 
     # Add a 2D file. Tell the view to clean up the view.
@@ -1753,15 +1753,15 @@ def test_remove_1d(testapp, higlass_mcool_viewconf, chromsizes_file_json, bigwig
     # Make sure the left chromsize tracks have been added.
     restored_2d_track_higlass_json = response.json["new_viewconfig"]
 
-    found_left_chromsizes = any([t for t in restored_2d_track_higlass_json["views"][0]["tracks"]["left"] if t["type"] == "vertical-chromosome-labels"])
+    found_left_chromsizes = any([t for t in restored_2d_track_higlass_json["views"][0]["tracks"]["left"] if t["type"] == "vertical-chromosome-institutionels"])
     assert_true(found_left_chromsizes, "Could not find left chromsizes track")
 
     # Make sure the top tracks have horizontal types and the left side have vertical types
     types_to_find = {
         "horizontal-gene-annotations": 0,
-        "horizontal-chromosome-labels": 0,
+        "horizontal-chromosome-institutionels": 0,
         "vertical-gene-annotations" : 0,
-        "vertical-chromosome-labels" : 0,
+        "vertical-chromosome-institutionels" : 0,
     }
 
     top_track_uids = []
@@ -1772,7 +1772,7 @@ def test_remove_1d(testapp, higlass_mcool_viewconf, chromsizes_file_json, bigwig
             types_to_find[ track["type"] ] += 1
 
     assert_true(types_to_find["horizontal-gene-annotations"] > 0)
-    assert_true(types_to_find["horizontal-chromosome-labels"] > 0)
+    assert_true(types_to_find["horizontal-chromosome-institutionels"] > 0)
 
     vertical_tracks_found = 0
     for track in restored_2d_track_higlass_json["views"][0]["tracks"]["left"]:
@@ -1787,15 +1787,15 @@ def test_remove_1d(testapp, higlass_mcool_viewconf, chromsizes_file_json, bigwig
             vertical_tracks_found += 1
 
     assert_true(types_to_find["vertical-gene-annotations"] > 0)
-    assert_true(types_to_find["vertical-chromosome-labels"] > 0)
+    assert_true(types_to_find["vertical-chromosome-institutionels"] > 0)
     assert_true(vertical_tracks_found > 0)
 
     # The chromsizes had a height when it was horizontal. Make sure it has a width when vertical.
-    top_chromsizes_tracks =[t for t in restored_2d_track_higlass_json["views"][0]["tracks"]["top"] if t["type"] == "horizontal-chromosome-labels"]
+    top_chromsizes_tracks =[t for t in restored_2d_track_higlass_json["views"][0]["tracks"]["top"] if t["type"] == "horizontal-chromosome-institutionels"]
 
     assert_true(top_chromsizes_tracks[0]["height"] == 50, "Top chromsize track lost its height")
 
-    left_chromsizes_tracks = [t for t in restored_2d_track_higlass_json["views"][0]["tracks"]["left"] if t["type"] == "vertical-chromosome-labels"]
+    left_chromsizes_tracks = [t for t in restored_2d_track_higlass_json["views"][0]["tracks"]["left"] if t["type"] == "vertical-chromosome-institutionels"]
     assert_true(left_chromsizes_tracks[0]["width"] == 50, "Left chromsize track has no width")
     assert_true("height" not in left_chromsizes_tracks[0], "Left chromsize track still has a height")
 

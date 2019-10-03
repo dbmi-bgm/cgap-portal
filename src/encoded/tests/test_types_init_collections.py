@@ -3,52 +3,21 @@ pytestmark = [pytest.mark.setone, pytest.mark.working, pytest.mark.schema]
 
 
 @pytest.fixture
-def genomic_region_w_onlyendloc(testapp, lab, award):
+def genomic_region_w_onlyendloc(testapp, institution, project):
     item = {
         "genome_assembly": "dm6",
         "end_coordinate": 3,
-        'award': award['@id'],
-        'lab': lab['@id']
+        'project': project['@id'],
+        'institution': institution['@id']
     }
     return testapp.post_json('/genomic_region', item).json['@graph'][0]
 
 
 @pytest.fixture
-def dt4genomic_regions(genomic_region_w_onlyendloc, some_genomic_region, basic_genomic_region,
-                       vague_genomic_region, vague_genomic_region_w_desc):
+def protocol_data(institution, project):
     return {
-        'dm6': genomic_region_w_onlyendloc,
-        'GRCh38:1:17-544': some_genomic_region,
-        'GRCh38': basic_genomic_region,
-        'GRCm38:5': vague_genomic_region,
-        'gene X enhancer': vague_genomic_region_w_desc
-    }
-
-
-@pytest.fixture
-def targets(target_w_desc, target_w_region, target_w_genes):
-    return {'target_w_desc': target_w_desc,
-            'target_w_region': target_w_region,
-            'target_w_genes': target_w_genes
-            }
-
-
-def test_calculated_target_summaries(testapp, targets):
-    for name in targets:
-        summary = targets[name]['target_summary']
-        if name == 'target_w_genes':
-            assert summary == 'Gene:eeny,meeny'
-        if name == 'target_w_regions' in targets:
-            assert summary == 'GRCh38:X:1-3'
-        if name == 'target_w_desc':
-            assert summary == 'no target'
-
-
-@pytest.fixture
-def protocol_data(lab, award):
-    return {
-        'lab': lab['@id'],
-        'award': award['@id'],
+        'institution': institution['@id'],
+        'project': project['@id'],
         'protocol_type': 'Experimental protocol',
         'description': 'Test Protocol'
     }
@@ -72,46 +41,6 @@ def test_document_display_title_wo_attachment(testapp, protocol_data):
     del(protocol_data['protocol_type'])
     res = testapp.post_json('/document', protocol_data).json['@graph'][0]
     assert res.get('display_title') == 'Document from ' + str(datetime.now())[:10]
-
-
-def test_organism_display_title_standard_scientific_name(testapp, human_data):
-    res = testapp.post_json('/organism', human_data).json['@graph'][0]
-    assert res.get('display_title') == 'H. sapiens'
-
-
-def test_organism_display_title_three_part_scientific_name(testapp, human_data):
-    human_data['scientific_name'] = 'Drosophila pseudoobscura pseudoobscura'
-    res = testapp.post_json('/organism', human_data).json['@graph'][0]
-    assert res.get('display_title') == 'D. pseudoobscura pseudoobscura'
-
-
-def test_organism_display_title_one_part_scientific_name(testapp, human_data):
-    human_data['scientific_name'] = 'george'
-    res = testapp.post_json('/organism', human_data).json['@graph'][0]
-    assert res.get('display_title') == 'george'
-
-
-def test_organism_display_title_no_scientific_name(testapp, human_data):
-    del(human_data['scientific_name'])
-    res = testapp.post_json('/organism', human_data).json['@graph'][0]
-    assert res.get('display_title') == 'human'
-
-
-def test_protocol_display_title_w_attachment(testapp, protocol_w_attach):
-    assert protocol_w_attach['display_title'] == 'red-dot.png'
-
-
-def test_protocol_display_title_wo_attachment(testapp, protocol_data):
-    from datetime import datetime
-    protocol = testapp.post_json('/protocol', protocol_data).json['@graph'][0]
-    assert protocol['display_title'] == 'Experimental protocol from ' + str(datetime.now())[:10]
-
-
-def test_protocol_other_display_title_wo_attachment(testapp, protocol_data):
-    from datetime import datetime
-    protocol_data['protocol_type'] = 'Other'
-    protocol = testapp.post_json('/protocol', protocol_data).json['@graph'][0]
-    assert protocol['display_title'] == 'Protocol from ' + str(datetime.now())[:10]
 
 
 @pytest.fixture
@@ -218,63 +147,6 @@ def test_tracking_item_display_title_google_analytic(google_analytics):
 def test_tracking_item_display_title_download(download_tracking):
     from datetime import datetime
     assert download_tracking.get('display_title') == 'Download Tracking Item from ' + str(datetime.now())[:10]
-
-
-def test_tracking_item_display_title_other(jupyterhub_session):
-    from datetime import datetime
-    assert jupyterhub_session.get('display_title') == 'Tracking Item from ' + str(datetime.now())[:10]
-
-
-@pytest.fixture
-def vendor_data(lab, award):
-    return {"title": "WorTHington Biochemical", 'lab': lab['@id'], 'award': award['@id']}
-
-
-def test_vendor_update_name_no_caps(testapp, vendor_data):
-    res = testapp.post_json('/vendor', vendor_data, status=201)
-    assert res.json['@graph'][0]['name'] == "worthington-biochemical"
-
-
-def test_vendor_update_name_no_punctuation_or_space(testapp, vendor_data):
-    vendor_data['title'] = "Eeny, = Meeny!  # -miny?"
-    res = testapp.post_json('/vendor', vendor_data, status=201)
-    assert res.json['@graph'][0]['name'] == "eeny-meeny-miny"
-
-
-def test_vendor_name_updates_on_patch(testapp, vendor_data):
-    res = testapp.post_json('/vendor', vendor_data, status=201)
-    assert res.json['@graph'][0]['name'] == "worthington-biochemical"
-    res = testapp.patch_json(res.json['@graph'][0]['@id'], {'title': 'WaHoo'}, status=200)
-    assert res.json['@graph'][0]['name'] == "wahoo"
-
-
-@pytest.fixture
-def vendor_data_alias(lab, award):
-    return {
-        'title': 'Wrong Alias Biochemical',
-        'lab': lab['@id'],
-        'award': award['@id'],
-        'aliases': ['my_lab:this_is_correct_one',
-                    'my_lab:this/is_wrong',
-                    'my_lab:this\is_wrong_too']}
-
-
-def test_vendor_alias_wrong_format(testapp, vendor_data_alias):
-    res = testapp.post_json('/vendor', vendor_data_alias, status=422)
-    response = res.json
-    print(res.json)
-    assert response['status'] == 'error'
-    assert response['code'] == 422
-    problematic_aliases = 0
-    for an_error in response['errors']:
-        if an_error['name'].startswith('Schema: aliases'):
-            problematic_aliases += 1
-    assert problematic_aliases == 2
-
-
-def test_genomic_region_display_title(testapp, dt4genomic_regions):
-    for dt, region in dt4genomic_regions.items():
-        assert region.get('display_title') == dt
 
 
 def test_image_unique_key(registry, image_data):

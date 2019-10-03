@@ -11,7 +11,7 @@ pytestmark = [pytest.mark.setone, pytest.mark.working]
 
 def test_load_data_endpoint(testapp):
     data = {'fdn_dir': 'master-inserts',
-            'itype': ['award', 'lab', 'user']}
+            'itype': ['project', 'institution', 'user']}
     with mock.patch('encoded.loadxl.get_app') as mocked_app:
         mocked_app.return_value = testapp.app
         res = testapp.post_json('/load_data', data, status=200)
@@ -40,7 +40,7 @@ def test_load_data_endpoint_returns_error_if_incorrect_data(testapp):
 
 def test_load_data_user_specified_config(testapp):
     data = {'fdn_dir': 'master-inserts',
-            'itype': ['user', 'lab', 'award']}
+            'itype': ['user', 'institution', 'project']}
     config_uri = 'test.ini'
     data['config_uri'] = config_uri
     with mock.patch('encoded.loadxl.get_app') as mocked_app:
@@ -63,10 +63,10 @@ def test_load_data_local_dir(testapp):
 
 def test_load_data_from_json(testapp):
     user_inserts = list(get_inserts('master-inserts', 'user'))
-    lab_inserts = list(get_inserts('master-inserts', 'lab'))
-    award_inserts = list(get_inserts('master-inserts', 'award'))
-    data = {'store': {'user': user_inserts, 'lab': lab_inserts, 'award': award_inserts},
-            'itype': ['user', 'lab', 'award']}
+    institution_inserts = list(get_inserts('master-inserts', 'institution'))
+    project_inserts = list(get_inserts('master-inserts', 'project'))
+    data = {'store': {'user': user_inserts, 'institution': institution_inserts, 'project': project_inserts},
+            'itype': ['user', 'institution', 'project']}
     with mock.patch('encoded.loadxl.get_app') as mocked_app:
         mocked_app.return_value = testapp.app
         res = testapp.post_json('/load_data', data, status=200)
@@ -75,7 +75,7 @@ def test_load_data_from_json(testapp):
 
 def test_load_data_local_path(testapp):
     local_path = resource_filename('encoded', 'tests/data/master-inserts/')
-    data = {'local_path': local_path, 'itype': ['user', 'lab', 'award']}
+    data = {'local_path': local_path, 'itype': ['user', 'institution', 'project']}
     with mock.patch('encoded.loadxl.get_app') as mocked_app:
         mocked_app.return_value = testapp.app
         res = testapp.post_json('/load_data', data, status=200)
@@ -89,12 +89,12 @@ def test_load_data_iter_response(testapp):
     generator
     """
     user_inserts = list(get_inserts('master-inserts', 'user'))
-    lab_inserts = list(get_inserts('master-inserts', 'lab'))
-    award_inserts = list(get_inserts('master-inserts', 'award'))
+    institution_inserts = list(get_inserts('master-inserts', 'institution'))
+    project_inserts = list(get_inserts('master-inserts', 'project'))
     # the total number of items we expect
-    expected = len(user_inserts) + len(lab_inserts) + len(award_inserts)
-    data = {'store': {'user': user_inserts, 'lab': lab_inserts, 'award': award_inserts},
-            'itype': ['user', 'lab', 'award'], 'iter_response': True}
+    expected = len(user_inserts) + len(institution_inserts) + len(project_inserts)
+    data = {'store': {'user': user_inserts, 'institution': institution_inserts, 'project': project_inserts},
+            'itype': ['user', 'institution', 'project'], 'iter_response': True}
     with mock.patch('encoded.loadxl.get_app') as mocked_app:
         mocked_app.return_value = testapp.app
         res = testapp.post_json('/load_data', data, status=200)
@@ -139,12 +139,12 @@ def test_load_all_gen(testapp):
     tests here, but let's test it a bit more explicitly
     """
     user_inserts = list(get_inserts('master-inserts', 'user'))
-    lab_inserts = list(get_inserts('master-inserts', 'lab'))
-    award_inserts = list(get_inserts('master-inserts', 'award'))
+    institution_inserts = list(get_inserts('master-inserts', 'institution'))
+    project_inserts = list(get_inserts('master-inserts', 'project'))
     # the total number of items we expect
-    expected = len(user_inserts) + len(lab_inserts) + len(award_inserts)
-    data = {'store': {'user': user_inserts, 'lab': lab_inserts, 'award': award_inserts},
-            'itype': ['user', 'lab', 'award']}
+    expected = len(user_inserts) + len(institution_inserts) + len(project_inserts)
+    data = {'store': {'user': user_inserts, 'institution': institution_inserts, 'project': project_inserts},
+            'itype': ['user', 'institution', 'project']}
     with mock.patch('encoded.loadxl.get_app') as mocked_app:
         mocked_app.return_value = testapp.app
         # successful load cases
