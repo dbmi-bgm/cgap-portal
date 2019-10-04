@@ -123,7 +123,7 @@ export const ProcessingSummaryTable = React.memo(function ProcessingSummaryTable
                     processedFileCount: processed_files.length,
                     processedFiles: processed_files,
                     provenance: (
-                        Array.isArray(showFile.workflow_run_outputs) && showFile.workflow_run_outputs.length > 0 ?
+                        showFile && Array.isArray(showFile.workflow_run_outputs) && showFile.workflow_run_outputs.length > 0 ?
                             showFile['@id'] + "#provenance" : null
                     ),
                     rawFileCount: files.length,
