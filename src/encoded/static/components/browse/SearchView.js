@@ -118,7 +118,7 @@ const SearchViewPageTitle = React.memo(function SearchViewPageTitle(props){
         }
     }
 
-    if (currentAction === 'selection') {
+    if (currentAction === "selection" || currentAction === "multiselect") {
         return (
             <PageTitleContainer alerts={alerts}>
                 <TitleAndSubtitleUnder subtitle="Drag and drop Items from this view into other window(s).">
@@ -127,6 +127,7 @@ const SearchViewPageTitle = React.memo(function SearchViewPageTitle(props){
             </PageTitleContainer>
         );
     }
+
     const thisTypeTitle = getSchemaTypeFromSearchContext(context, schemas);
     const subtitle = thisTypeTitle ? (
         <span><small className="text-300">for</small> { thisTypeTitle }</span>

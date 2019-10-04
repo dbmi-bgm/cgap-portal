@@ -8,43 +8,13 @@ import _ from 'underscore';
 
 import { console, ajax } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { LocalizedTime } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/LocalizedTime';
-import { pageTitleViews, PageTitleContainer, TitleAndSubtitleUnder, OnlyTitle } from './../PageTitleSection';
-
-
-/**
- * Homepage View component. Gets rendered at '/' and '/home' paths.
- *
- * @module {Component} static-pages/home
- * @prop {Object} context - Should have properties typically needed for any static page.
- */
-export default class HomePage extends React.PureComponent {
-
-    /**
-     * The render function. Renders homepage contents.
-     * @returns {Element} A React <div> element.
-     */
-    render() {
-        const { session, context } = this.props;
-        return (
-            <div className="homepage-wrapper">
-
-                <div className="container home-content-area" id="content">
-
-                    { session ? <MyDashboard /> : <GuestHomeView /> }
-
-                </div>
-
-            </div>
-        );
-    }
-
-}
+import { Schemas } from './../../util';
 
 
 
-const MyDashboard = React.memo(function MyDashboard(props){
+export const UserDashboard = React.memo(function UserDashboard(props){
     return (
-        <React.Fragment>
+        <div className="container-wide home-content-area" id="content">
             <div className="mt-4 homepage-dashboard">
                 <h2 className="homepage-section-title">Actions</h2>
                 <p>
@@ -76,30 +46,7 @@ const MyDashboard = React.memo(function MyDashboard(props){
 
             <RecentCasesSection />
 
-        </React.Fragment>
-    );
-});
-
-
-
-const GuestHomeView = React.memo(function GuestHomeView(props){
-    return (
-        <React.Fragment>
-            <div className="row mt-5">
-                <div className="col-xs-12 col-md-12">
-                    <h2 className="homepage-section-title">Marketing Stuff Here (maybe)</h2>
-                    <h4 className="text-500">(maybe) Publicly-viewable cases as entrance to crowdsourcing UI/UX</h4>
-                    <p>
-
-                    </p>
-                </div>
-            </div>
-            <div className="row mt-3">
-                <div className="col-xs-12 col-md-5 pull-right">
-                    <LinksColumn {..._.pick(props, 'windowWidth')} />
-                </div>
-            </div>
-        </React.Fragment>
+        </div>
     );
 });
 
@@ -112,7 +59,8 @@ class RecentCasesSection extends React.PureComponent {
         'last_modified.date_modified',
         'last_modified.modified_by',
         '@id',
-        'families.members.@id'
+        'families.members.@id',
+        'status'
     ];
 
     constructor(props){
@@ -141,7 +89,7 @@ class RecentCasesSection extends React.PureComponent {
         };
 
         const requestHref = (
-            "/search/?type=Case&limit=20&sort=-last_modified.date_modified&" +
+            "/search/?type=Case&limit=50&sort=-last_modified.date_modified&" +
             RecentCasesSection.fieldsToRequest.map(function(f){ return "field=" + encodeURIComponent(f); }).join('&')
         );
 
@@ -154,6 +102,8 @@ class RecentCasesSection extends React.PureComponent {
         const { cases = [], loading, casesCount = null } = this.state;
 
         let innerBody;
+        let viewAllCasesBtn;
+        let createCaseBtn;
 
         if (loading){
             innerBody = (
@@ -174,7 +124,8 @@ class RecentCasesSection extends React.PureComponent {
                     display_title: title,
                     date_created: created,
                     last_modified: { date_modified, modified_by } = {},
-                    families = []
+                    families = [],
+                    status = null
                 } = caseItem;
 
                 const { display_title: editorName } = modified_by;
@@ -191,20 +142,28 @@ class RecentCasesSection extends React.PureComponent {
                 const timeFromNow = momentTime.fromNow();
                 const timeNeat = momentTime.format("dddd, MMMM Do YYYY, h:mm:ss a");
 
+                const outerCls = (
+                    "case-item-container" +
+                    (familiesLen === 0 ? " no-families" : "") +
+                    (allMembers.size === 0 ? " no-individuals" : "")
+                );
+
                 return (
-                    <div className="case-item-container" key={caseID}>
+                    <div className={outerCls} key={caseID}>
                         <div className="row">
-                            <h5 className="col-12 col-md-5 col-xl-7 text-600 mt-0 mb-0">
+                            <h5 className="col-12 col-md-5 col-lg-7 text-600 mt-0 mb-0">
+                                <i className="item-status-indicator-dot mr-1" data-status={status} data-html
+                                    data-tip={"Status &mdash; " + Schemas.Term.toName("status", status)}/>
                                 <a href={caseID}>{ title }</a>
                             </h5>
-                            <div className="col-3 col-md-2 col-xl-1">
-                                <i className={"icon icon-fw icon-users fas mr-1" + (familiesLen === 0 ? " error" : "")}
-                                    data-tip={familiesLen === 0 ? "No families present" : "Number of Families"} />
+                            <div className="col-3 col-md-2 col-lg-1 px-0 text-ellipsis-container families-icon-container">
+                                <i className="icon icon-fw icon-users fas mr-1"
+                                    data-tip={familiesLen === 0 ? "No families present" : "" + familiesLen + (familiesLen > 1 ? " Families" : " Family")} />
                                 <span>{ familiesLen }</span>
                             </div>
-                            <div className="col-3 col-md-2 col-xl-1">
-                                <i className={"icon icon-fw icon-user fas mr-1" + (allMembers.size === 0 ? " error" : "")}
-                                    data-tip="Number of Unique Individuals"/>
+                            <div className="col-3 col-md-2 col-lg-1 px-0 text-ellipsis-container individuals-icon-container">
+                                <i className="icon icon-fw icon-user fas mr-1"
+                                    data-tip={"" + allMembers.size + " Unique Individual" + (allMembers.size === 1 ? "" : "s")}/>
                                 <span>{ allMembers.size }</span>
                             </div>
                             <div className="col-6 col-md-3 text-right">
@@ -217,6 +176,11 @@ class RecentCasesSection extends React.PureComponent {
                 );
             });
             innerBody = <div className="case-items">{ renderedCases }</div>;
+            viewAllCasesBtn = (
+                <a href="/search/?type=Case" className="btn btn-outline-dark btn-block">
+                    View All { casesCount ? <span className="text-300">({ casesCount })</span> : null }
+                </a>
+            );
         }
 
         return (
@@ -224,9 +188,7 @@ class RecentCasesSection extends React.PureComponent {
                 <h2 className="homepage-section-title mt-5">Recent Cases</h2>
                 <div className="row">
                     <div className="col-12 col-md-4 col-xl-3 mb-1">
-                        <a href="/search/?type=Case" className="btn btn-outline-dark btn-block">
-                            View All { casesCount ? <span className="text-300">({ casesCount })</span> : null }
-                        </a>
+                        { viewAllCasesBtn }
                         <a href="/search/?type=Case&currentAction=add" className="btn btn-primary btn-block btn-lg">New Case</a>
                     </div>
                     <div className="col-12 col-md-8 col-xl-9">
@@ -251,76 +213,3 @@ class RecentCasesSection extends React.PureComponent {
         );
     }
 }
-
-
-
-const ExternalLinksColumn = React.memo(function ExternalLinksColumn(props){
-    return (
-        <div className="homepage-links-column external-links">
-            {/* <h3 className="text-300 mb-2 mt-3">External Links</h3> */}
-            <h4 className="text-400 mb-15 mt-25">External Links</h4>
-            ( layout & location not final / TBD )
-            <div className="links-wrapper clearfix">
-                <div className="link-block">
-                    <a href="https://dbmi.hms.harvard.edu/" target="_blank" rel="noopener noreferrer" className="external-link">
-                        <span>HMS DBMI</span>
-                    </a>
-                </div>
-                <div className="link-block">
-                    <a href="https://www.brighamandwomens.org/medicine/genetics/genetics-genomic-medicine-service" target="_blank" rel="noopener noreferrer" className="external-link">
-                        <span>Brigham Genomic Medicine</span>
-                    </a>
-                </div>
-                <div className="link-block">
-                    <a href="https://undiagnosed.hms.harvard.edu/" target="_blank" rel="noopener noreferrer" className="external-link">
-                        <span>Undiagnosed Diseased Network (UDN)</span>
-                    </a>
-                </div>
-                <div className="link-block">
-                    <a href="https://forome.org/" target="_blank" rel="noopener noreferrer" className="external-link">
-                        <span>Forome</span>
-                    </a>
-                </div>
-                <div className="link-block">
-                    <a href="http://dcic.4dnucleome.org/" target="_blank" rel="noopener noreferrer" className="external-link">
-                        <span>4DN DCIC</span>
-                    </a>
-                </div>
-            </div>
-            <br/>
-        </div>
-    );
-});
-
-
-const LinksColumn = React.memo(function LinksColumn(props){
-    return (
-        <div className="homepage-links">
-            <ExternalLinksColumn />
-        </div>
-    );
-});
-
-
-const HomePageTitle = React.memo(function HomePageTitle(props){
-    const { session, alerts } = props;
-
-    if (session){
-        return (
-            <PageTitleContainer alerts={alerts}>
-                <OnlyTitle>My Dashboard</OnlyTitle>
-            </PageTitleContainer>
-        );
-    }
-
-    return (
-        <PageTitleContainer alerts={alerts}>
-            <TitleAndSubtitleUnder subtitle="Clinical Genomics Analysis Platform" className="home-page-title">
-                <strong>TODO:</strong> Portal Title Here
-            </TitleAndSubtitleUnder>
-        </PageTitleContainer>
-    );
-});
-
-
-pageTitleViews.register(HomePageTitle, "HomePage");

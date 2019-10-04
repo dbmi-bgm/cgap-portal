@@ -481,7 +481,9 @@
 	.case-items {
 
 		overflow-y: auto;
-		max-height: 200px;
+		min-height: 240px;
+		max-height: 360px;
+		height: 25vh;
 
 		.case-item-container {
 			padding: 8px 12px;
@@ -496,6 +498,19 @@
 					white-space: nowrap;
 				}
 			}
+
+			&.no-families {
+				.families-icon-container {
+					color: #c33939;
+				}
+			}
+
+			&.no-individuals {
+				.individuals-icon-container {
+					color: #c33939;
+				}
+			}
+
 		}
 
 	}
