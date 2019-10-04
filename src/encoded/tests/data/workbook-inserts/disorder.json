@@ -1,0 +1,22 @@
+[
+    {
+        "uuid": "231111bc-8535-4448-903e-854af460b254",
+        "disorder_name": "Dummy Disorder",
+        "disorder_id": "DD1",
+        "comment": "This comment is to test oranges"
+    },
+    {
+        "uuid": "231111bc-8535-4448-903e-854af460b242",
+        "disorder_name": "Dummy Sub Disorder",
+        "disorder_id": "DD2",
+        "parents": ["DD1"],
+        "comment": "This comment is to test apples"
+    },
+    {
+        "uuid": "231111bc-8535-4448-903e-854af460b246",
+        "disorder_name": "Second Dummy Sub Disorder",
+        "disorder_id": "DD3",
+        "parents": ["DD1"],
+        "comment": "This comment is to test bananas"
+    }
+]
