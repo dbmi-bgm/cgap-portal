@@ -65,6 +65,27 @@ def admin(testapp):
 
 
 @pytest.fixture
+def disorder_data():
+    return {
+        "uuid": "231111bc-8535-4448-903e-854af460b254",
+        "disorder_name": "Dummy Disorder",
+        "disorder_id": "DD1",
+        "comment": "This comment is to test oranges"
+    }
+
+
+@pytest.fixture
+def disorder(testapp):
+    item = {
+        "uuid": "231111bc-8535-4448-903e-854af460b254",
+        "disorder_name": "Dummy Disorder",
+        "disorder_id": "DD1",
+        "comment": "This comment is to test oranges"
+    }
+    res = testapp.post_json('/disorder', item)
+    return testapp.get(res.location).json
+
+@pytest.fixture
 def submitter(testapp, institution, project):
     item = {
         'first_name': 'ENCODE',

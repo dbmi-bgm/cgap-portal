@@ -82,7 +82,6 @@ def test_load_data_local_path(testapp):
         assert res.json['status'] == 'success'
 
 
-@pytest.mark.skip # XXX: Not picking up project despite it existing in inserts
 def test_load_data_iter_response(testapp):
     """
     Use iter_response=True in the request json to return a Pyramid Response
@@ -109,7 +108,6 @@ def test_load_data_iter_response(testapp):
         assert res.text.count('ERROR:') == 0
 
 
-@pytest.mark.skip # XXX: Not picking up project despite it existing in inserts
 def test_load_data_iter_response_fail(testapp):
     """
     Use iter_response=True in the request json to return a Pyramid Response
@@ -135,7 +133,6 @@ def test_load_data_iter_response_fail(testapp):
         assert 'Bad response: 422 Unprocessable Entity' in res.text
 
 
-@pytest.mark.skip # XXX: Not picking up project despite it existing in inserts
 def test_load_all_gen(testapp):
     """
     The load_all_gen generator is pretty thoroughly tested by the other

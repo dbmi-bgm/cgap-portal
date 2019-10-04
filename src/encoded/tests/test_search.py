@@ -153,11 +153,11 @@ def test_search_embedded_file_by_accession(workbook, testapp):
 
 
 @pytest.fixture
-def mboI_dts(testapp, workbook):
+def dd_dts(testapp, workbook):
     # returns a dictionary of strings of various date and datetimes
     # relative to the creation date of the mboI one object in test inserts
     from datetime import (datetime, timedelta)
-    enz = testapp.get('/search/?type=Enzyme&name=MboI').json['@graph'][0]
+    enz = testapp.get('/search/?type=Disorder&disorder_name=Dummy+Disorder').json['@graph'][0]
 
     cdate = enz['date_created']
     _date, _time = cdate.split('T')
@@ -177,12 +177,11 @@ def mboI_dts(testapp, workbook):
     }
 
 
-@pytest.mark.skip # XXX: Relies on mboI which is an enzyme
-def test_search_date_range_find_within(mboI_dts, testapp, workbook):
+def test_search_date_range_find_within(dd_dts, testapp, workbook):
     # the MboI enzyme should be returned with all the provided pairs
-    gres = testapp.get('/search/?type=Enzyme&name=MboI').json
+    gres = testapp.get('/search/?type=Disorder&disorder_name=Dummy+Disorder').json
     g_uuids = [item['uuid'] for item in gres['@graph'] if 'uuid' in item]
-    dts = {k: v.replace(':', '%3A') for k, v in mboI_dts.items()}
+    dts = {k: v.replace(':', '%3A') for k, v in dd_dts.items()}
     datepairs = [
         (dts['daybefore'], dts['dayafter']),
         (dts['creationdatetime'], dts['dayafter']),
@@ -192,7 +191,7 @@ def test_search_date_range_find_within(mboI_dts, testapp, workbook):
     ]
 
     for dp in datepairs:
-        search = '/search/?type=Enzyme&date_created.from=%s&date_created.to=%s' % dp
+        search = '/search/?type=Disorder&date_created.from=%s&date_created.to=%s' % dp
         sres = testapp.get(search).json
         s_uuids = [item['uuid'] for item in sres['@graph'] if 'uuid' in item]
         assert set(g_uuids).issubset(set(s_uuids))
@@ -219,17 +218,16 @@ def test_search_with_nested_integer(testapp, workbook):
     assert set(s1_uuids) | set(s2_uuids) == set(s0_uuids)
 
 
-@pytest.mark.skip # XXX: How to best port?
-def test_search_date_range_dontfind_without(mboI_dts, testapp, workbook):
+def test_search_date_range_dontfind_without(dd_dts, testapp, workbook):
     # the MboI enzyme should be returned with all the provided pairs
-    dts = {k: v.replace(':', '%3A') for k, v in mboI_dts.items()}
+    dts = {k: v.replace(':', '%3A') for k, v in dd_dts.items()}
     datepairs = [
         (dts['daybefore'], dts['creationdate']),
         (dts['hourafter'], dts['dayafter']),
         (dts['daybefore'], dts['hourbefore'])
     ]
     for dp in datepairs:
-        search = '/search/?type=Enzyme&date_created.from=%s&date_created.to=%s' % dp
+        search = '/search/?type=Disorder&date_created.from=%s&date_created.to=%s' % dp
         assert testapp.get(search, status=404)
 
 
