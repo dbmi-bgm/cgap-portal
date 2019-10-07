@@ -409,7 +409,7 @@ class PedigreeTabView extends React.PureComponent {
                         <span>Pedigree</span>
                         <CollapsibleItemViewButtonToolbar windowWidth={windowWidth}>
                             {/* <ColorAllDiseasesCheckbox checked={showAllDiseases} onChange={this.handleToggleCheckbox} /> */}
-                            <ShowOrderBasedNameCheckbox checked={showOrderBasedName} onChange={this.handleToggleCheckbox} />
+                            <UniqueIdentifiersCheckbox checked={!showOrderBasedName} onChange={this.handleToggleCheckbox} />
                             <SelectDiseasesDropdown {...{ showAsDiseases, selectedDiseases }} onChange={this.handleToggleSelectedDisease}
                                 availableDiseases={this.memoized.gatherPhenotypicFeatureItems(currentFamily)} />
                             {/* <ShowAsDiseasesDropdown onSelect={this.handleChangeShowAsDiseases} {...{ showAllDiseases, showAsDiseases }}  /> */}
@@ -468,10 +468,10 @@ const SelectDiseasesDropdown = React.memo(function SelectDiseasesDropdown(props)
     );
 });
 
-const ShowOrderBasedNameCheckbox = React.memo(function ShowOrderBasedNameCheckbox({ checked, onChange }){
+const UniqueIdentifiersCheckbox = React.memo(function UniqueIdentifiersCheckbox({ checked, onChange }){
     return (
         <Checkbox {...{ checked, onChange }} className="checkbox-container" name="showOrderBasedName">
-            <span className="align-middle">Generational Identifiers</span>
+            <span className="align-middle">Unique Identifiers</span>
         </Checkbox>
     );
 });
