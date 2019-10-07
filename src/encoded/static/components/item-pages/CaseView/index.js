@@ -501,24 +501,25 @@ const FamilySelectionDropdown = React.memo(function FamilySelectionDropdown(prop
     );
 });
 
+/* DEPRECATED COMPONENTS */
 
-const ShowAsDiseasesDropdown = React.memo(function ShowAsDiseasesDropdown({ showAsDiseases, onSelect, showAllDiseases }){
-    const title = (showAllDiseases ? "All " : "Case ") + showAsDiseases;
-    return (
-        <DropdownButton className="ml-05" onSelect={onSelect} title={title} variant="outline-dark" alignRight>
-            <DropdownItem active={!showAllDiseases && showAsDiseases === "Phenotypic Features"} eventKey="Case Phenotypic Features">Case Phenotypic Features</DropdownItem>
-            <DropdownItem active={showAllDiseases && showAsDiseases === "Phenotypic Features"} eventKey="All Phenotypic Features">All Phenotypic Features</DropdownItem>
-            <DropdownItem active={!showAllDiseases && showAsDiseases === "Disorders"} disabled eventKey="Case Disorders">Case Disorders</DropdownItem>
-            <DropdownItem active={showAllDiseases && showAsDiseases === "Disorders"} disabled eventKey="All Disorders">All Disorders</DropdownItem>
-        </DropdownButton>
-    );
-});
+// const ShowAsDiseasesDropdown = React.memo(function ShowAsDiseasesDropdown({ showAsDiseases, onSelect, showAllDiseases }){
+//     const title = (showAllDiseases ? "All " : "Case ") + showAsDiseases;
+//     return (
+//         <DropdownButton className="ml-05" onSelect={onSelect} title={title} variant="outline-dark" alignRight>
+//             <DropdownItem active={!showAllDiseases && showAsDiseases === "Phenotypic Features"} eventKey="Case Phenotypic Features">Case Phenotypic Features</DropdownItem>
+//             <DropdownItem active={showAllDiseases && showAsDiseases === "Phenotypic Features"} eventKey="All Phenotypic Features">All Phenotypic Features</DropdownItem>
+//             <DropdownItem active={!showAllDiseases && showAsDiseases === "Disorders"} disabled eventKey="Case Disorders">Case Disorders</DropdownItem>
+//             <DropdownItem active={showAllDiseases && showAsDiseases === "Disorders"} disabled eventKey="All Disorders">All Disorders</DropdownItem>
+//         </DropdownButton>
+//     );
+// });
 
 
-const ColorAllDiseasesCheckbox = React.memo(function ShowAllDiseasesCheckbox({ checked, onChange }){
-    return (
-        <Checkbox className="checkbox-container" name="showAllDiseases" checked={checked} onChange={onChange}>
-            Highlight All
-        </Checkbox>
-    );
-});
+// const ColorAllDiseasesCheckbox = React.memo(function ShowAllDiseasesCheckbox({ checked, onChange }){
+//     return (
+//         <Checkbox className="checkbox-container" name="showAllDiseases" checked={checked} onChange={onChange}>
+//             Highlight All
+//         </Checkbox>
+//     );
+// });
