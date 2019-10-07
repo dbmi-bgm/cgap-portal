@@ -154,8 +154,8 @@ To build development bundles and continue updating them as you edit source files
 The development bundles are not minified, to speed up building.
 
 
-Notes on SASS/Compass
-=====================
+Notes on SASS/`node-sass`
+=========================
 
 We use the `SASS <http://sass-lang.com/>`_ and `node-sass <https://github.com/sass/node-sass/>`_ CSS preprocessors.
 The buildout installs the SASS utilities and compiles the CSS.
