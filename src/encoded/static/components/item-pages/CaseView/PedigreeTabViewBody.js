@@ -138,7 +138,14 @@ export class PedigreeTabViewBody extends React.PureComponent {
     }
 
     render(){
-        const { dataset, windowWidth, windowHeight, renderDetailPane, visibleDiseases, scale = 1 } = this.props;
+        const {
+            dataset,
+            windowWidth,
+            windowHeight,
+            visibleDiseases,
+            scale = 1,
+            showOrderBasedName = true
+        } = this.props;
         const { isBrowserFullscreen, isPedigreeFullscreen } = this.state;
         const propName = (isBrowserFullscreen ? "height" : "minimumHeight");
         const cls = (
@@ -153,7 +160,7 @@ export class PedigreeTabViewBody extends React.PureComponent {
         return (
             <div id="pedigree-viz-container-cgap" className={cls}>
                 <FullHeightCalculator {...{ windowWidth, windowHeight, propName, heightDiff }}>
-                    <PedigreeViz {...{ dataset, windowWidth, visibleDiseases, scale }}
+                    <PedigreeViz {...{ dataset, windowWidth, visibleDiseases, scale, showOrderBasedName }}
                         width={windowWidth} filterUnrelatedIndividuals={false}
                         renderDetailPane={this.renderDetailPane}>
                     </PedigreeViz>

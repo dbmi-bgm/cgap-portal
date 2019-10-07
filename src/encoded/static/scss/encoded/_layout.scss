@@ -1,5 +1,16 @@
 @charset "UTF-8";
 
+
+// Root HTML doc variables/settings
+
+:root {
+    // `rem` units will be based on this.
+	font-size: 16px;
+	// Same as Bootstrap's logic for setting default sans-serif and monospace
+	// base fonts.
+	--font-family-serif: #{inspect($font-family-serif)};
+}
+
 /* BASE STYLES */
 /* Note: most base styles handled by Bootstrap, with variable settings in bootstrap/_variables.scss */
 
@@ -248,6 +259,12 @@ body.is-full-screen {
 			&:first-child {
 				// No breadcrumbs present
 				padding-top: 55px;
+
+				body[data-current-action="multiselect"] &,
+				body[data-current-action="selection"] & {
+					// Decrease height by 20px
+					padding-top: 35px;
+				}
 			}
 
 			body[data-pathname="/"] &,
@@ -291,6 +308,25 @@ body.is-full-screen {
 		}
 
 	}
+}
+
+/**********
+> Remove nav headers and similar when on currentAction=selection or multiselection
+***********/
+
+body[data-current-action="selection"],
+body[data-current-action="multiselect"] {
+
+	div#layout > div.navbar-container {
+		display: none;
+	}
+
+	@include media-breakpoint-up(lg){
+		div#post-navbar-container {
+			padding-top: 0;
+		}
+	}
+
 }
 
 
@@ -694,22 +730,7 @@ a.text-600, button.text-600 { font-weight: 600 !important; }
 	white-space: nowrap;
 }
 
-/************** MORE BUTTON STYLES ***********/
 
-/* Light gray BG, more prominent button style than btn-default */
-.btn.btn-secondary {
-  @include button-variant(#000, #e4e4e4, rgba(0,0,0,0.125));
-  &:active, &:focus {
-	  background-color: #e4e4e4;
-  }
-}
-
-/* Moving caret to always right position */
-.dropdown-toggle {
-	&:after {
-		vertical-align: 0.125em;
-	}
-}
 
 /*
 TODO: Re-enable for split buttons w/ specific className maybe.

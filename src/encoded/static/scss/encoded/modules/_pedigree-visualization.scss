@@ -41,6 +41,17 @@ $pedigree-disease-colors :
         $color: nth($pedigree-disease-colors, $i);
         &[data-disease-index="#{$i}"] {
             background-color: $color;
+            @if lightness($color) > 70% {
+                color: #000;
+            } @else {
+                color: #fff;
+            }
+            /*
+            color: change-color(
+                $color: adjust-hue($color: $color, $degrees: 180),
+                $saturation: 0%
+            );
+            */
         }
     }
     @for $i from 1 through $pedigree-colors-length {
@@ -287,6 +298,18 @@ $pedigree-disease-colors :
                             }
                             text {
                                 font-size: 0.9rem;
+                                &[data-describing="title"]{
+
+                                }
+                                &.showing-order-based-name[data-describing="title"]{
+                                    font-family: $font-family-monospace;
+                                    font-family: $font-family-serif;
+                                    /* letter-spacing: -0.125em; */ // <- Enable for monospace
+                                    /* font-size: 0.9125em; */
+                                    /* font-size: 1em; */
+                                    font-size: 1.0725em;
+                                    font-weight: 700;
+                                }
                             }
                         }
                     }
@@ -545,3 +568,40 @@ div#pedigree-viz-container-cgap.browser-is-full-screen {
     }
 
 }
+
+/** Dropdown for selecting diseases/features -- CGAP-specific **/
+
+.tabview-title-controls-container {
+    .disease-option {
+        padding: 1px 10px;
+        display: flex;
+        align-items: center;
+        .checkbox-with-label {
+            flex: 1;
+            > label {
+                cursor: pointer;
+            }
+        }
+        .disease-color-patch {
+            height: 16px;
+            width: 16px;
+            border-radius: 50%;
+            transition: background-color .3s;
+            text-align: center;
+            line-height: 1;
+            > span {
+                font-size: 0.675rem;
+                font-weight: 600;
+                top: -2px;
+                position: relative;
+            }
+            @include pedigree-color-cycle-background;
+        }
+
+        &:hover {
+            background-color: #f4f4f4;
+        }
+    }
+}
+
+

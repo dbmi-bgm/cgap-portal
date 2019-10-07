@@ -25,9 +25,10 @@ export const ProcessingSummaryTable = React.memo(function ProcessingSummaryTable
     const columnOrder = [
         "individual",
         "sample",
+        "rawFileCount",
+        "provenance",
         //"processedFileCount",
         "processedFiles",
-        "rawFileCount",
         "sampleStatus"
     ];
 
@@ -51,11 +52,15 @@ export const ProcessingSummaryTable = React.memo(function ProcessingSummaryTable
                 Output File(s)
             </React.Fragment>
         ),
+        'provenance' : (
+            <i className="icon icon-fw icon-sitemap icon-rotate-90 fas align-middle"
+                data-tip="Link to provenance graph" />
+        ),
         'rawFileCount' : (
             <React.Fragment>
-                <i className="icon icon-fw icon-file-upload fas mr-05 align-middle"
+                <i className="icon icon-fw icon-file-upload fas align-middle"
                     data-tip="Raw Files"/>
-                <span className="d-none d-lg-inline">Raw Files</span>
+                <span className="d-none d-lg-inline ml-05">Raw Files</span>
             </React.Fragment>
         ),
         'sampleStatus' : "Sample Status"
@@ -77,28 +82,11 @@ export const ProcessingSummaryTable = React.memo(function ProcessingSummaryTable
 
         if (!indvDisplayTitle || !indvId){
             membersWithoutViewPermissions.push(individual);
-            /*
-            rows.push({
-                individual : <em>{ error || "No view permissions" }</em>,
-                isProband: false,
-                sample: <em>N/A</em>,
-                processedFileCount: <em>N/A</em>,
-                rawFileCount: <em>N/A</em>,
-                sampleStatus: <em>N/A</em>
-            });
-            */
             return;
         }
 
         if (samples.length === 0){
             membersWithoutSamples.push(individual);
-            /*
-            rows.push({
-                individual : indvLink,
-                isProband: (probandID && probandID === indvId),
-                sample: <em className="small" data-tip="No samples available for this individual">N/A</em>
-            });
-            */
             return;
         }
 
@@ -124,12 +112,20 @@ export const ProcessingSummaryTable = React.memo(function ProcessingSummaryTable
                 });
                 return;
             } else {
+                const procFilesWPermissions = processed_files.filter(function(file){
+                    return file['@id'] && file.display_title;
+                });
+                const [ showFile ] = procFilesWPermissions;
                 rows.push({
                     individual : indvLink,
                     isProband,
                     sample: <a href={sampleID} className="accession">{ sampleTitle }</a>,
                     processedFileCount: processed_files.length,
                     processedFiles: processed_files,
+                    provenance: (
+                        showFile && Array.isArray(showFile.workflow_run_outputs) && showFile.workflow_run_outputs.length > 0 ?
+                            showFile['@id'] + "#provenance" : null
+                    ),
                     rawFileCount: files.length,
                     sampleIdx,
                     sampleStatus: (
@@ -150,7 +146,9 @@ export const ProcessingSummaryTable = React.memo(function ProcessingSummaryTable
     const renderedSummary = (membersWithoutSamplesLen + membersWithoutViewPermissionsLen) > 0 ? (
         <div className="processing-summary">
             { membersWithoutSamplesLen > 0 ?
-                <p className="mb-0">{ (membersWithoutSamplesLen + " members without samples.") }</p>
+                <p className="mb-0">
+                    <span className="text-600">{ membersWithoutSamplesLen }</span> members without samples.
+                </p>
                 /*
                 <React.Fragment>
                     <p className="mb-0">{ (membersWithoutSamplesLen + " members without samples: ") }</p>
@@ -169,7 +167,9 @@ export const ProcessingSummaryTable = React.memo(function ProcessingSummaryTable
                 */
                 : null }
             { membersWithoutViewPermissionsLen > 0 ?
-                <p className="mb-0">{ (membersWithoutViewPermissionsLen + " members without view permissions.") }</p>
+                <p className="mb-0">
+                    <span className="text-600">{ membersWithoutViewPermissionsLen }</span> members without view permissions.
+                </p>
                 : null }
         </div>
     ) : null;
@@ -183,24 +183,54 @@ export const ProcessingSummaryTable = React.memo(function ProcessingSummaryTable
         const rowCls = "sample-row" + (isProband ? " is-proband" : "");
         const rowCols = columnOrder.map(function(colName){
             let colVal = row[colName] || " - ";
-            if (colName === "processedFiles"){
+            if (colName === "provenance"){
+                if (colVal){
+                    colVal = (
+                        <a href={colVal}>
+                            <i className="icon icon-fw icon-sitemap icon-rotate-90 fas"/>
+                        </a>
+                    );
+                } else {
+                    colVal = (
+                        <i className="icon icon-fw icon-ban"/>
+                    );
+                }
+            }
+            else if (colName === "processedFiles"){
                 const filesWPermissions = row[colName].filter(function(file){
                     return file['@id'] && file.display_title;
                 });
                 const filesWPermissionsLen = filesWPermissions.length;
                 if (filesWPermissionsLen === 0){
                     colVal = " - ";
-                } else if (filesWPermissionsLen === 1){
-                    colVal = filesWPermissions[0];
-                    colVal = <a href={colVal['@id']}>{ colVal.display_title }</a>;
                 } else {
-                    colVal = filesWPermissions[0];
-                    colVal = (
-                        <span>
-                            <a href={colVal['@id']}>{ colVal.display_title }</a>
-                            { "+ " + ( filesWPermissions[0].length - 1 ) + " more" }
-                        </span>
-                    );
+                    const [ showFile  ] = filesWPermissions;
+                    const { '@id' : fileID, display_title } = showFile;
+                    /*
+                    let provenanceGraphIcon;
+                    if (Array.isArray(workflow_run_outputs) && workflow_run_outputs.length > 0){
+                        provenanceGraphIcon = (
+                            <div className="col-auto" data-tip="See Provenance Graph">
+                                <a href={fileID + "#provenance"}>
+                                    <i className="icon icon-fw icon-sitemap icon-rotate-90 fas"/>
+                                </a>
+                            </div>
+                        );
+                    }
+                    */
+                    if (filesWPermissionsLen === 1){
+                        colVal = (
+                            <a href={fileID}>{ display_title }</a>
+                        );
+                    } else {
+                        colVal = (
+                            <React.Fragment>
+                                <a href={fileID}>{ display_title }</a>
+                                { "+ " + ( filesWPermissionsLen - 1 ) + " more" }
+                            </React.Fragment>
+                        );
+                    }
+
                 }
             }
             return (
@@ -215,16 +245,18 @@ export const ProcessingSummaryTable = React.memo(function ProcessingSummaryTable
     });
 
     const renderedTable = (
-        <table className="processing-summary-table">
-            <thead>
-                <tr>
-                    { columnOrder.map(function(colName){
-                        return <th key={colName}>{ columnTitles[colName] }</th>;
-                    }) }
-                </tr>
-            </thead>
-            <tbody>{ renderedRows }</tbody>
-        </table>
+        <div className="processing-summary-table-container">
+            <table className="processing-summary-table">
+                <thead>
+                    <tr>
+                        { columnOrder.map(function(colName){
+                            return <th key={colName}>{ columnTitles[colName] }</th>;
+                        }) }
+                    </tr>
+                </thead>
+                <tbody>{ renderedRows }</tbody>
+            </table>
+        </div>
     );
 
     return (

@@ -40,6 +40,7 @@ ITEM_INDEX_ORDER = [
     'QualityMetricQclist',
     'QualityMetricWgsBamqc',
     'QualityMetricWorkflowrun',
+    'QualityMetricVcfcheck',
     'TrackingItem',
     'Software',
     'Sample',

@@ -29,6 +29,14 @@
     padding-right: 7px;
 }
 
+/* Light gray BG, more prominent button style than btn-default */
+.btn.btn-secondary {
+    @include button-variant(#e4e4e4, #e0e0e0);
+    //&:active, &:focus {
+    //    background-color: #e4e4e4;
+    //}
+}
+
 
 /** Overrides for form controls **/
 
@@ -37,3 +45,28 @@
     padding-left: 0.5rem;
     padding-right: 0.5rem;
 }
+
+/** Styling Bootstrap dropdowns to match portal more **/
+
+.dropdown-toggle + div.dropdown-menu {
+    //padding: 10px 0;
+    border-color: #bbb;
+    box-shadow: 0 0 5px -3px #000;
+    border-radius: 3px;
+
+    // For newer browsers, ensure doesn't go beyond window height
+    max-height: 75vh;
+    overflow-y: auto;
+}
+
+
+/************** MORE BUTTON STYLES ***********/
+
+
+  
+  /* Moving caret to always right position */
+  .dropdown-toggle {
+      &:after {
+          vertical-align: 0.125em;
+      }
+  }

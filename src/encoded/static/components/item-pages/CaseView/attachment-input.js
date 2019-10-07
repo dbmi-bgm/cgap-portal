@@ -56,38 +56,8 @@ export class AttachmentInputController extends React.PureComponent {
                         }
                         return data;
                     }).then((data)=>{
-                        this.setState({ loading: false }, function(){
-                            onAddedFamily(data);
-                        });
-
-                        // todo
-                        /*
-                        const {
-                            case: caseItem,
-                            family : {
-                                members,
-                                original_pedigree: {
-                                    display_title: pedigreeTitle,
-                                    '@id' : pedigreeID
-                                } = {}
-                            }
-                        } = data;
-                        this.setState({ loading: false }, function(){
-                            let message = "Added family";
-                            if (pedigreeTitle && pedigreeID){
-                                message = (
-                                    <span>
-                                        Added family from pedigree <a href={pedigreeID}>{ pedigreeTitle }</a>
-                                    </span>
-                                );
-                            }
-                            Alerts.queue({
-                                "title" : "Added family",
-                                message,
-                                "style" : "success"
-                            });
-                        });
-                        */
+                        onAddedFamily(data);
+                        this.setState({ loading: false });
                         return data;
                     }).catch((data)=>{
                         this.setState({ loading: false }, function(){

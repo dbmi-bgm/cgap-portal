@@ -155,7 +155,7 @@ export class ProvenanceGraphTabView extends React.Component {
                 </React.Fragment>
             ),
             'key' : 'provenance',
-            'disabled'  : !stepsExist,
+            'disabled'  : false,
             'content' : (
                 <FullHeightCalculator windowHeight={windowHeight} windowWidth={windowWidth}>
                     <ProvenanceGraphTabView {...props} />
@@ -237,10 +237,33 @@ export class ProvenanceGraphTabView extends React.Component {
     render(){
         const {
             heading,
-            graphSteps,
+            graphSteps = null,
             height: fullVizSpaceHeight, windowWidth,
             toggleAllRuns, includeAllRunsInSteps, isLoadingGraphSteps
         } = this.props;
+
+        if (!Array.isArray(graphSteps) || graphSteps.length === 0){
+            return (
+                <div>
+                    <div className="container-wide">
+                        <h3 className="tab-section-title">
+                            { heading }
+                        </h3>
+                    </div>
+                    <hr className="tab-section-title-horiz-divider mb-5"/>
+                    <div className="container-wide text-center">
+                        { isLoadingGraphSteps?
+                            <i className="icon icon-fw icon-circle-notch icon-spin fas text-larger"/>
+                            :
+                            <h5 className="text-400">
+                                No steps available
+                            </h5>
+                        }
+                    </div>
+                </div>
+            );
+        }
+
         const { parsingOptions: origParseOpts, rowSpacingType } = this.state;
         const { anyReferenceFileNodes, anyIndirectFileNodes, anyGroupNodes } = this.memoized.getNodesInfo(graphSteps);
         const lastStep = graphSteps[graphSteps.length - 1];

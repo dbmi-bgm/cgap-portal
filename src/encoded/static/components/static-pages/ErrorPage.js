@@ -2,14 +2,16 @@
 
 import React from 'react';
 
-/** Render a simple static error page with a link to return to the homepage. */
+/**
+ * Render a simple static error page with a link to return to the homepage.
+ */
 export default class ErrorPage extends React.PureComponent {
 
     render() {
         const { currRoute, status } = this.props;
-        let homelink;
 
-        var errorMessage;
+        let errorMessage;
+
         if (status === 'invalid_login'){
             errorMessage = (
                 <div>
@@ -25,7 +27,7 @@ export default class ErrorPage extends React.PureComponent {
                 </div>
             );
         } else if (status === 'not_found'){
-            errorMessage = <h3>{"The page you've requested does not exist."} <a href="/">Return</a> to the homepage.</h3>;
+            return <HTTPNotFoundView/>;
         } else if (status === 'forbidden'){
             return <HTTPForbiddenView/>;
         }else{
@@ -33,17 +35,41 @@ export default class ErrorPage extends React.PureComponent {
         }
         return <div className="error-page text-center container" id="content">{ errorMessage }</div>;
     }
-
 }
 
-const HTTPForbiddenView =  React.memo(function HTTPForbiddenView(props){
+const HTTPNotFoundView = React.memo(function(props){
     return (
-        <div className="error-page text-left container" id="content">
-            <h2 className="text-400">Access was denied to this resource.</h2>
-            <div className="content fourDN-content">
-                <p>
-                If you have an account, please try logging in or return to the <a href="/">homepage</a>. <br/> For instructions on how to set up an account, please visit the help page for <a href="/help/account-creation">Creating an Account</a>.
-                </p>
+        <div className="error-page container" id="content">
+            <div className="error-msg-container mt-3 mb-3 row">
+                <i className="icon icon-exclamation-circle fas col-auto text-larger"/>
+                <div className="title-wrapper col">
+                    <h4 className="text-400 mb-0 mt-0">
+                        {"The page you've requested does not exist."}
+                    </h4>
+                    <p className="mb-0 mt-0">
+                        <a href="/">Return</a> to the homepage.
+                    </p>
+                </div>
+            </div>
+        </div>
+    );
+});
+
+const HTTPForbiddenView = React.memo(function HTTPForbiddenView(props){
+    return (
+        <div className="error-page container" id="content">
+            <div className="error-msg-container mt-3 mb-3 row">
+                <i className="icon icon-ban fas col-auto text-larger"/>
+                <div className="title-wrapper col">
+                    <h4 className="text-400 mb-0 mt-0">
+                        Access was denied to this resource.
+                    </h4>
+                    <p className="mb-0 mt-0">
+                        If you have an account, please try logging in or return to the <a href="/">homepage</a>.
+                        <br/>
+                        For instructions on how to set up an account, please visit the help page for <a href="/help/account-creation">Creating an Account</a>.
+                    </p>
+                </div>
             </div>
         </div>
     );

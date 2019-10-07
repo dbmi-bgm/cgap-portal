@@ -1,13 +1,14 @@
 import pytest
 import copy
 
-ORDER = [ # add image?
+
+ORDER = [
     'user', 'project', 'institution', 'file_format', 'case', 'individual',
     'sample', 'workflow', 'access_key', 'disorder', 'document', 'file_fastq',
     'file_processed', 'file_reference', 'gene',
     'ontology_term', 'ontology', 'page', 'phenotype', 'quality_metric_fastqc',
     'quality_metric_bamcheck', 'quality_metric_qclist', 'quality_metric_wgs_bamqc',
-    'quality_metric_workflowrun', 'software', 'static_section',
+    'quality_metric_vcfcheck', 'quality_metric_workflowrun', 'software', 'static_section',
     'sysinfo', 'tracking_item', 'workflow_mapping', 'workflow_run_awsem',
     'workflow_run'
 ]

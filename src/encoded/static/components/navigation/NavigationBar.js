@@ -9,7 +9,7 @@ import { console } from '@hms-dbmi-bgm/shared-portal-components/es/components/ut
 import { CGAPLogo } from './../viz/CGAPLogo';
 import { productionHost } from './../globals';
 import { navigate } from './../util';
-import { SearchBar, TestWarning, HelpNavItem, UserActionDropdownMenu } from './components';
+import { SearchBar, TestWarning, HelpNavItem, UserActionDropdownMenu, CollapsedNav } from './components';
 
 
 /**
@@ -89,7 +89,7 @@ export class NavigationBar extends React.PureComponent {
     }
 
     render() {
-        const { testWarning, mobileDropdownOpen, mounted } = this.state;
+        const { mobileDropdownOpen, mounted } = this.state;
         const { href, context, schemas, browseBaseState, isFullscreen, testWarningPresent, hideTestWarning } = this.props;
         const testWarningVisible = testWarningPresent & !isFullscreen; // Hidden on full screen mode.
         //const navClassName = "navbar-container" + (testWarningVisible ? ' test-warning-visible' : '');
@@ -118,31 +118,3 @@ export class NavigationBar extends React.PureComponent {
         );
     }
 }
-
-const CollapsedNav = React.memo(function CollapsedNav(props){
-    const { href, currentAction } = props;
-    const leftNavProps = _.pick(props, 'mobileDropdownOpen', 'windowWidth', 'windowHeight', 'browseBaseState', 'href',
-        'mounted', 'overlaysContainer', 'session', 'testWarning', 'isFullscreen');
-    const userActionNavProps = _.pick(props, 'session', 'href', 'updateUserInfo', 'mounted', 'overlaysContainer', 'schemas', 'windowWidth');
-    return (
-        <Navbar.Collapse>
-            <LeftNav {...leftNavProps} />
-            <SearchBar href={href} currentAction={currentAction} />
-            <UserActionDropdownMenu {...userActionNavProps} />
-        </Navbar.Collapse>
-    );
-});
-
-const LeftNav = React.memo(function LeftNav(props){
-    const { href, ...passProps } = props;
-    const { query = {} } = url.parse(href, true);
-    const isCasesLinkActive = query.type === 'Case';
-    return (
-        <Nav className="mr-auto">
-            <Nav.Link key="browse-menu-item" href="/cases/" active={isCasesLinkActive} className="browse-nav-btn">
-                Cases
-            </Nav.Link>
-            <HelpNavItem {...props} />
-        </Nav>
-    );
-});

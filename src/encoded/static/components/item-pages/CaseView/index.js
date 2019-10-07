@@ -4,7 +4,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import memoize from 'memoize-one';
 import _ from 'underscore';
-import { DropdownButton, DropdownItem } from 'react-bootstrap';
+import { DropdownButton, DropdownItem, Dropdown, Button } from 'react-bootstrap';
 
 import { console, layout, ajax, object } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { Checkbox } from '@hms-dbmi-bgm/shared-portal-components/es/components/forms/components/Checkbox';
@@ -18,7 +18,7 @@ import { store } from './../../../store';
 import { ProcessingSummaryTable } from './ProcessingSummaryTable';
 import { PedigreeTabViewBody } from './PedigreeTabViewBody';
 import { PedigreeFullScreenBtn } from './PedigreeFullScreenBtn';
-import { parseFamilyIntoDataset } from './parseFamilyIntoDataset';
+import { parseFamilyIntoDataset, gatherPhenotypicFeatureItems } from './family-parsing';
 import { AttachmentInputController, AttachmentInputMenuOption } from './attachment-input';
 
 export {
@@ -252,23 +252,47 @@ class PedigreeTabView extends React.PureComponent {
         this.handleWheelMove = this.handleWheelMove.bind(this);
         this.handleToggleCheckbox = this.handleToggleCheckbox.bind(this);
         this.handleChangeShowAsDiseases = this.handleChangeShowAsDiseases.bind(this);
+        this.handleToggleSelectedDisease = this.handleToggleSelectedDisease.bind(this);
         this.renderDetailPane = this.renderDetailPane.bind(this);
+
         this.memoized = {
             parseFamilyIntoDataset : memoize(parseFamilyIntoDataset),
-            getPhenotypicFeatureStrings : memoize(PedigreeTabView.getPhenotypicFeatureStrings)
+            getPhenotypicFeatureStrings : memoize(PedigreeTabView.getPhenotypicFeatureStrings),
+            gatherPhenotypicFeatureItems: memoize(gatherPhenotypicFeatureItems)
         };
 
         if (!(Array.isArray(props.context.families) && props.context.families.length > 0)){
             throw new Error("Expected props.context.families to be a non-empty Array.");
         }
 
+        const { case_phenotypic_features = [] } = props.context;
+
         this.state = {
             showAllDiseases : false,
             showAsDiseases: "Phenotypic Features", // todo - enum
-            scale: 1
+            showOrderBasedName: true,
+            scale: 1,
+            selectedDiseases: this.memoized.getPhenotypicFeatureStrings(case_phenotypic_features)
         };
 
         this.tabViewRef = React.createRef();
+    }
+
+    componentDidUpdate(pastProps){
+        const { context: { case_phenotypic_features: currFeatures = [] } } = this.props;
+        const { context: { case_phenotypic_features: prevFeatures = [] } } = pastProps;
+        if (currFeatures !== prevFeatures){
+            const isEqual = currFeatures.length === prevFeatures.length && (
+                _.every(currFeatures, function(feature, idx){
+                    return feature === prevFeatures[idx];
+                })
+            );
+            if (!isEqual){
+                this.setState({
+                    selectedDiseases: this.memoized.getPhenotypicFeatureStrings(currFeatures)
+                });
+            }
+        }
     }
 
     /*
@@ -322,6 +346,33 @@ class PedigreeTabView extends React.PureComponent {
         });
     }
 
+    handleToggleSelectedDisease(evt, tt){
+        const name = evt.target.getAttribute("name");
+        if (!name) return;
+        this.setState(({ selectedDiseases: prevSelectedDiseases }, { pedigreeFamilies = null, pedigreeFamiliesIdx }) => {
+            const selDiseaseMap = {};
+            prevSelectedDiseases.forEach(function(sd){
+                selDiseaseMap[sd] = true;
+            });
+            if (selDiseaseMap[name]) { // Toggle
+                delete selDiseaseMap[name];
+            } else {
+                selDiseaseMap[name] = true;
+            }
+            // We want order to be maintained
+            const currFamily = pedigreeFamilies[pedigreeFamiliesIdx];
+            const availableDiseases = this.memoized.gatherPhenotypicFeatureItems(currFamily);
+            const selectedDiseases = availableDiseases.filter(function(ad){
+                const { display_title: title } = ad;
+                return selDiseaseMap[title] || false;
+            }).map(function(ad){
+                const { display_title: title } = ad;
+                return title;
+            });
+            return { selectedDiseases };
+        });
+    }
+
     renderDetailPane(pedigreeVizProps){
         const { session, href, context } = this.props;
         return <PedigreeDetailPane {...pedigreeVizProps} {...{ session, href, context }} />;
@@ -330,16 +381,25 @@ class PedigreeTabView extends React.PureComponent {
     render(){
         const {
             context, schemas, windowWidth, windowHeight, href, session,
-            handleFamilySelect, pedigreeFamiliesIdx, pedigreeFamilies
+            handleFamilySelect, pedigreeFamiliesIdx, pedigreeFamilies: families = []
         } = this.props;
-        const { showAllDiseases, showAsDiseases, scale } = this.state;
-        const { families: contextFamilies = [], case_phenotypic_features = [] } = context;
+        const { showAllDiseases, showAsDiseases, showOrderBasedName, scale, selectedDiseases } = this.state;
+        const { case_phenotypic_features = [] } = context;
 
-        const families = pedigreeFamilies || contextFamilies;
         const currentFamily = families[pedigreeFamiliesIdx];
-        const phenotypicFeatureStrings = showAllDiseases ? null : this.memoized.getPhenotypicFeatureStrings(case_phenotypic_features);
+
+        //const phenotypicFeatureStrings = showAllDiseases ? null : this.memoized.getPhenotypicFeatureStrings(case_phenotypic_features);
 
         const dataset = this.memoized.parseFamilyIntoDataset(currentFamily);
+        const visibleDiseases = !showAllDiseases && Array.isArray(selectedDiseases) ? selectedDiseases : undefined;
+
+        const pedigreeTabViewBodyProps = {
+            dataset, visibleDiseases, session, href,
+            context, showOrderBasedName,
+            windowWidth, windowHeight, scale
+        };
+
+        console.log('DDD1', visibleDiseases, selectedDiseases, this.memoized.gatherPhenotypicFeatureItems(currentFamily));
 
         console.log('DDD', scale, dataset);
         return (
@@ -349,21 +409,72 @@ class PedigreeTabView extends React.PureComponent {
                         <span>Pedigree</span>
                         <CollapsibleItemViewButtonToolbar windowWidth={windowWidth}>
                             {/* <ColorAllDiseasesCheckbox checked={showAllDiseases} onChange={this.handleToggleCheckbox} /> */}
-                            <ShowAsDiseasesDropdown onSelect={this.handleChangeShowAsDiseases} {...{ showAllDiseases, showAsDiseases }}  />
+                            <ShowOrderBasedNameCheckbox checked={showOrderBasedName} onChange={this.handleToggleCheckbox} />
+                            <SelectDiseasesDropdown {...{ showAsDiseases, selectedDiseases }} onChange={this.handleToggleSelectedDisease}
+                                availableDiseases={this.memoized.gatherPhenotypicFeatureItems(currentFamily)} />
+                            {/* <ShowAsDiseasesDropdown onSelect={this.handleChangeShowAsDiseases} {...{ showAllDiseases, showAsDiseases }}  /> */}
                             <FamilySelectionDropdown {...{ families, currentFamilyIdx: pedigreeFamiliesIdx }} onSelect={handleFamilySelect} />
                             <PedigreeFullScreenBtn />
                         </CollapsibleItemViewButtonToolbar>
                     </h3>
                 </div>
                 <hr className="tab-section-title-horiz-divider"/>
-                <PedigreeTabViewBody {...{ dataset, windowWidth, windowHeight, scale, session, href, context }}
-                    visibleDiseases={phenotypicFeatureStrings} />
+                <PedigreeTabViewBody {...pedigreeTabViewBodyProps} />
             </div>
         );
     }
 }
 
+const SelectDiseasesDropdown = React.memo(function SelectDiseasesDropdown(props){
+    const { availableDiseases = [], showAsDiseases, selectedDiseases = [], onChange } = props;
+    if (availableDiseases.length === 0) {
+        return null;
+    }
+    const selectedMap = {};
+    selectedDiseases.forEach(function(sD){
+        selectedMap[sD] = true;
+    });
+    let diseaseIndexCounter = 0;
+    const optionItems = availableDiseases.map(function(aD){
+        const { display_title: title, '@id' : id } = aD;
+        const checked = selectedMap[title];
+        let diseaseIndex; // undefined
+        if (checked){
+            diseaseIndexCounter++;
+            diseaseIndex = diseaseIndexCounter;
+        }
+        return (
+            <div className="disease-option" key={id}>
+                <Checkbox checked={checked}
+                    onChange={onChange} name={title}
+                    className="text-400">
+                    <span className="align-middle text-400">{ title }</span>
+                </Checkbox>
+                <div className="disease-color-patch" data-disease-index={diseaseIndex}>
+                    <span>{ diseaseIndex }</span>
+                </div>
+            </div>
+        );
+    });
+    return (
+        <Dropdown alignRight>
+            <Dropdown.Toggle as={Button} variant="outline-dark">
+                Select { showAsDiseases }
+            </Dropdown.Toggle>
+            <Dropdown.Menu>
+                { optionItems }
+            </Dropdown.Menu>
+        </Dropdown>
+    );
+});
 
+const ShowOrderBasedNameCheckbox = React.memo(function ShowOrderBasedNameCheckbox({ checked, onChange }){
+    return (
+        <Checkbox {...{ checked, onChange }} className="checkbox-container" name="showOrderBasedName">
+            <span className="align-middle">Generational Identifiers</span>
+        </Checkbox>
+    );
+});
 
 const FamilySelectionDropdown = React.memo(function FamilySelectionDropdown(props){
     const { families, currentFamilyIdx = 0, onSelect } = props;
@@ -394,7 +505,7 @@ const FamilySelectionDropdown = React.memo(function FamilySelectionDropdown(prop
 const ShowAsDiseasesDropdown = React.memo(function ShowAsDiseasesDropdown({ showAsDiseases, onSelect, showAllDiseases }){
     const title = (showAllDiseases ? "All " : "Case ") + showAsDiseases;
     return (
-        <DropdownButton onSelect={onSelect} title={title} variant="outline-dark" alignRight>
+        <DropdownButton className="ml-05" onSelect={onSelect} title={title} variant="outline-dark" alignRight>
             <DropdownItem active={!showAllDiseases && showAsDiseases === "Phenotypic Features"} eventKey="Case Phenotypic Features">Case Phenotypic Features</DropdownItem>
             <DropdownItem active={showAllDiseases && showAsDiseases === "Phenotypic Features"} eventKey="All Phenotypic Features">All Phenotypic Features</DropdownItem>
             <DropdownItem active={!showAllDiseases && showAsDiseases === "Disorders"} disabled eventKey="Case Disorders">Case Disorders</DropdownItem>

@@ -230,7 +230,20 @@ export class PedigreeViz extends React.PureComponent {
          */
         "visibleDiseases": null,
 
+        /**
+         * If true, will show markers such as "II - 1", "IV - 2", etc. based on generation & order.
+         * Else will use `individual.name` or `individual.id` (if no name).
+         *
+         * @type {boolean}
+         */
+        "showOrderBasedName" : true,
 
+        /**
+         * In progress. Define zoom level.
+         *
+         * @type {number}
+         * @todo - refine zooming & boundaries, controls (not mousewheel, maybe keyboard UI component), etc.
+         */
         "scale" : 1
     };
 
