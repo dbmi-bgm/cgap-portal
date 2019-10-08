@@ -200,16 +200,15 @@ Welcome to CGAP-Portal's documentation!
 
  .. _`Package Control`: https://sublime.wbond.net/
 
-
  Contents:
- .. toctree::
-   :hidden:
-
-   self
 
  .. toctree::
    :maxdepth: 4
 
+   self
+   overview
+   search
+   security
    auth
    beanstalk-deployment
    database
@@ -218,4 +217,6 @@ Welcome to CGAP-Portal's documentation!
    invalidation
    local_deployment_troubleshooting
    object_lifecycle
-   overview
+   static-pages
+   rev-links
+   unittest
