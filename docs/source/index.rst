@@ -200,7 +200,7 @@ CGAP Documentation
 
  .. _`Package Control`: https://sublime.wbond.net/
 
- Contents:
+ *Development Contents:*
 
  .. toctree::
    :maxdepth: 4
@@ -220,3 +220,17 @@ CGAP Documentation
    static-pages
    rev-links
    unittest
+
+
+*User Contents*
+
+  .. toctree::
+    :maxdepth:4
+
+    getting_started
+    account_creation
+    biosample_metadata
+    excel_submission
+    rest_api_submission
+    schema_info
+    web_submission

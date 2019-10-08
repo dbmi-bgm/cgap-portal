@@ -42,6 +42,3 @@ I and Carl tried various things (rebuilds, re-linking brew ...) but it did not h
 * delete the folder /usr/local/etc/elasticsearch/
 * reinstall elasticsearch
 * rebuild
-
-#
--

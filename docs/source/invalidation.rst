@@ -1,4 +1,4 @@
-Dependencies/Invalidation
+Invalidation
 ====================================
 
 Keeping elasticsearch in sync.
