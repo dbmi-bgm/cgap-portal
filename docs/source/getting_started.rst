@@ -57,7 +57,7 @@ For both meta/data submission and retrival, you can also access our database dir
 If you would like to directly interact with the REST API for data submission see the documentation `here </help/user-guide/rest-api>`_.
 
 Notes on Experiments and Replicate Sets
----------------------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 **Biological replicates**
 
@@ -102,7 +102,7 @@ Notes on Experiments and Replicate Sets
   When submitting using the REST API you should format your json according to the specifications in the schema as described in the `REST API page </help/user-guide/rest-api>`_.
 
 Referencing existing objects
-----------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Using aliases
 ^^^^^^^^^^^^^

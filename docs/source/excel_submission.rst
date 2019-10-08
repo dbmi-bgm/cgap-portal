@@ -42,7 +42,7 @@ Excel Headers
 * Your data entry should begin at the first non-commented row.
 
 Preparing Excel Workbooks
--------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^
 
 
 * A field can be one of a few different types;
@@ -202,7 +202,7 @@ Experimental Replicate information
 
 
 Submitting Excel Workbooks
---------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 
 * The 4DN DCIC website has an REST API for fetching and submitting data.
@@ -349,7 +349,7 @@ The DCIC automatically checks file md5sums to confirm successful upload and to e
 * We plan to avoid this issue in future releases by pre-checking md5sums.
 
 Generate a new Template Workbook
---------------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 To create the data submission xls forms, you can use get_field_info, which is part of the Submit4DN package.
 

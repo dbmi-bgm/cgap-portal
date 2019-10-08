@@ -1,6 +1,5 @@
-
-If you are a data submitter for a 4DN lab or are new to the project
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Account Creation
+~~~~~~~~~~~~~~~~
 
 
 * Please email data wranglers at `support@4dnucleome.org <mailto:support@4dnucleome.org>`_ to get set up with an account with the access credentials for your role.
@@ -10,7 +9,7 @@ If you are a data submitter for a 4DN lab or are new to the project
   * For more information on linking your institutional email account to a Google account, see below.
 
 Signing in with your institutional email address
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 
 * The DCIC uses the `OAuth <https://oauth.net/>`_ authentication system which will allow you to login with a Google or `GitHub <https://github.com>`_ account.
@@ -25,4 +24,3 @@ Once your account request is processed, you will then be able to log in with the
 .. image:: /static/img/docs/submitting-metadata/new-google-acct.png
    :target: /static/img/docs/submitting-metadata/new-google-acct.png
    :alt: Embedded fields
-
