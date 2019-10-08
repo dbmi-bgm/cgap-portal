@@ -207,7 +207,7 @@ CGAP Documentation
 
    self
    overview
-   search
+   search_info
    security
    auth
    beanstalk-deployment

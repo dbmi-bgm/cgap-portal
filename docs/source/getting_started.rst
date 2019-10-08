@@ -2,7 +2,7 @@
    :format: html
 
 
-Overview
+Getting Started
 --------
 
 In order to make your data accessible, searchable and assessable you should submit as much metadata as possible to the 4DN system along with the raw files you have generated in your experiments.
@@ -62,9 +62,9 @@ Notes on Experiments and Replicate Sets
 **Biological replicates**
 
 
-* The 4DN Consortium strongly encourages that experiments be performed using at least two different preparations of the same source biomaterial - i.e. bioreplicates.  
+* The 4DN Consortium strongly encourages that experiments be performed using at least two different preparations of the same source biomaterial - i.e. bioreplicates.
 * When submitting metadata you should submit two Experiments that use the same Biosource, but have different Biosamples.
-* In many cases the only difference between Biosamples may be the dates at which the cell culture or tissue was harvested.  
+* In many cases the only difference between Biosamples may be the dates at which the cell culture or tissue was harvested.
 * The experimental techniques and parameters will be shared by all experiments of the same bioreplicate set.
 
 **Technical replicates**
@@ -75,30 +75,30 @@ Notes on Experiments and Replicate Sets
 **Submitting replicate information**
 
 
-* 
+*
   The replicate information is stored and represented as a set of experiments that includes labels indicating the replicate type and replicate number of each experiment in the set.
 
-* 
+*
   The mechanism that you use to submit your metadata will dictate the type of item that you will associate replicate information with
 
 
-  * 
+  *
     In excel workbooks bioreplicate and technical replicate numbers are entered in the Experiment sheet
 
-  * 
+  *
     Using the API you directly associate the replicate information (\ *i.e. replicate number and the experiment identifier*\ ) with the  ExperimentSetReplicate objects.
 
-  * 
+  *
     Using the web submission interface the replicate numbers and linked experiments are added from the ExperimentSetReplicate page
 
 
-* 
-  In the database the information will always end up directly associated with ExperimentSetReplicate objects.  
+*
+  In the database the information will always end up directly associated with ExperimentSetReplicate objects.
 
-* 
-  Specific details on formatting information regarding replicates is given in the `Spreadsheet Submission </help/submitter-guide/spreadsheet#experimental-replicate-information>`_ page.  
+*
+  Specific details on formatting information regarding replicates is given in the `Spreadsheet Submission </help/submitter-guide/spreadsheet#experimental-replicate-information>`_ page.
 
-* 
+*
   When submitting using the REST API you should format your json according to the specifications in the schema as described in the `REST API page </help/user-guide/rest-api>`_.
 
 Referencing existing objects
@@ -114,13 +114,13 @@ Using aliases
 * An alias takes the form of *lab:id_string* eg. ``parklab:myalias``.
 * An alias must be unique within all items.
 * Generally it is good practice to assign an alias to any item that you submit
-* If you use the Online Submission Interface to create new items designating an alias is the first required step.  
+* If you use the Online Submission Interface to create new items designating an alias is the first required step.
 * Once you submit an alias for an Item then that alias can be used as an identifier for that Item in the current submission as well as in any subsequent submission.
 
 Other ways to reference existing items
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-You don't need to use an alias if you are referencing an item that already exists in the database.  
+You don't need to use an alias if you are referencing an item that already exists in the database.
 
 Any of the following can be used to reference an existing item in an excel sheet or when using the REST-API.
 
@@ -182,7 +182,7 @@ Getting Added as a 4DN User or Submitter
 Before you can view protected lab or project data or submit data to the 4DN system you must be a registered user of the site and have the appropriate access credentials.
 
 
-* To view lab data that is still in the review phase you must be registered as a member of the lab that produced the data.  
+* To view lab data that is still in the review phase you must be registered as a member of the lab that produced the data.
 * To submit metadata and files you must be designated as a submitter for a lab
 * Most current 4DN lab members should already be registered in our system.
 
@@ -191,7 +191,7 @@ For instructions on creating an account, please see `this page </help/user-guide
 **Metadata and data accessibility.**
 
 
-* 
+*
   Most metadata items have the following default permissions:
 
 
@@ -199,7 +199,7 @@ For instructions on creating an account, please see `this page </help/user-guide
   * submitters for the lab can edit
   * to help you review and edit a lab's submissions the DCIC data wranglers can view and edit
 
-* 
+*
   Once the data and metadata are complete and quality controlled, they will be released according to the data release policy adopted by the 4DN network.
 
 * After release the data can no longer be edited by data submitters - contact the DCIC to report data issues and we can work together to get them resolved
@@ -211,14 +211,14 @@ If you have been designated as a submitter for the project and plan to use eithe
 
 
 #. Log in to the 4DN `website <https://data.4dnucleome.org>`_ with your username (email) and password. If you have not yet created an account, see `this page </help/user-guide/account-creation>`_ for instructions.
-#. Once logged in, go to your ”Profile” page by clicking **Account** on the upper right side of the page.  
+#. Once logged in, go to your ”Profile” page by clicking **Account** on the upper right side of the page.
 #. In your profile page, click the green “Add Access Key” button, and copy the “access key ID” and “secret access key” values from the pop-up page. *Note that once the pop-up page disappears you will not be able to see the secret access key value.* However, if you forget or lose your secret key you can always delete and add new access keys from your profile page at any time.
-#. Create a file to store this information.  
+#. Create a file to store this information.
 
    * The default parameters used by the submission software is to look for a file named "keypairs.json" in your home directory.
-   * However you can specify your own filename and file location as parameters to the software (see below).  
+   * However you can specify your own filename and file location as parameters to the software (see below).
    * The key information is stored in json format and is used to establish a secure connection.
-   * the json must be formatted as shown below - replace key and secret with your new “Access Key ID” and “Secret Access Key”.  
+   * the json must be formatted as shown below - replace key and secret with your new “Access Key ID” and “Secret Access Key”.
    * You can use the same key and secret to use the 4DN `REST-API </help/user-guide/rest-api>`_.
 
 **Sample content for keypairs.json**
@@ -237,7 +237,7 @@ If you have been designated as a submitter for the project and plan to use eithe
 
 
 * the ``--keyfile`` parameter as an argument to any of the scripts to provide the path to your keypairs file.
-* 
+*
   the ``--key`` parameter to indicate a stored key name.
 
     ``import_data --keyfile Path/name_of_file.json --key NotDefault``
