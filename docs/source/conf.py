@@ -20,7 +20,7 @@
 project = 'CGAP-Portal'
 copyright = '2019, HMS-DBMI-BGM'
 author = 'HMS-DBMI-BGM'
-
+master_doc = 'index'
 
 # -- General configuration ---------------------------------------------------
 
