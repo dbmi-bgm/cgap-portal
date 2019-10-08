@@ -7,7 +7,7 @@ This document explains the end to end behavior of the visualization endpoint.
 API Call
 --------
 
-Make a POST request to ``add_files_to_higlass_viewconf/``. The fourfront server will return the viewconf used to create
+Make a POST request to ``add_files_to_higlass_viewconf/``. The CGAP server will return the viewconf used to create
 Higlass Items.
 
 Payload
@@ -122,8 +122,8 @@ If the files have mismatched genome assemblies, you'll get an error.
      "new_genome_assembly": null
    }
 
-Fourfront display adjustment
-============================
+CGAP display adjustment
+^^^^^^^^^^^^^^^^^^^^^^^
 
 By default, Higlass Items are 600 pixels high. But Experiment Set pages allow 300 pixels for Higlass Items. Front end javascript will dynamically resize a copy of the viewconfig to fit.
 
@@ -134,9 +134,9 @@ By default, Higlass Items are 600 pixels high. But Experiment Set pages allow 30
 * 1D tracks will be scaled so they maintain the relative amount of space in the new container.
 
 Foursight Higlass checks
-========================
+^^^^^^^^^^^^^^^^^^^^^^^^
 
-Foursight uses the Fourfront endpoint to create and update HiglassItems.
+Foursight uses the CGAP endpoint to create and update HiglassItems.
 All of the checks work on a file or experiment set.
 
 Foursight finds reference files
@@ -150,7 +150,7 @@ File Higlass Items
 Foursight looks for files with Higlass uids and genome assemblies.
 There are additional queries used to further filter, based on the Foursight check.
 
-With the file and the reference files Foursight calls the Fourfront API, gets the ``new_viewconf`` and creates a new Higlass Item.
+With the file and the reference files Foursight calls the CGAP API, gets the ``new_viewconf`` and creates a new Higlass Item.
 The File's static_content section is updated so it refers to the uuid of the Higlass item.
 
 Experiment Set (Processed Files) Higlass Items

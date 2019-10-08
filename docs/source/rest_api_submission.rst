@@ -1,5 +1,4 @@
-
-Overview
+REST API
 --------
 
 The 4DN-DCIC metadata database can be accessed using a Hypertext-Transfer-Protocol-(HTTP)-based, Representational-state-transfer (RESTful) application programming interface (API) - aka the REST API.  In fact, this API is used by the ``import_data`` script used to submit metadata entered into excel spreadsheets as described `on this page </help/spreadsheet>`_. This API was developed by the `ENCODE <https://www.encodeproject.org/>`_ project so if you have experience retrieving data from or submitting data to ENCODE use of the 4DN-DCIC API should be familiar to you.   The REST API can be used both for data submission and data retrieval, typically using scripts written in your language of choice.  Data objects exchanged with the server conform to the standard JavaScript Object Notation (JSON) format.  Libraries written for use with your chosen language are typically used for the network connection, data transfer, and parsing of data  (for example, requests and json, respectively for Python).  For a good introduction to scripting data retrieval (using GET requests) you can refer to `this page <https://www.encodeproject.org/help/rest-api/>`_ on the `ENCODE <https://www.encodeproject.org/>`_ web site that also has a good introduction to viewing and understanding JSON formatted data.

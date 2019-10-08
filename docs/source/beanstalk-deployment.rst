@@ -42,7 +42,7 @@ Easiest way to do that is to ssh into the beanstalk instance and do the follow:
 
 ** Note ** to ssh in first ``pip install awsebcli`` then follow the setup instructions.  With that installed you can simply type eb ssh (ensuring that the master branch is checked out). (If this doesn't work, try ``eb init`` before ``eb ssh``\ )
 
-Once conneted do the following:
+Once connected do the following:
 
 .. code-block:: bash
 
@@ -74,7 +74,7 @@ Once conneted do the following:
 The New awesome way to do it:
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. code-block::
+.. code-block:: bash
 
    sudo /opt/python/current/app/bin/dropdb
 

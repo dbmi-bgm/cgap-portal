@@ -177,7 +177,7 @@ Any of the following can be used to reference an existing item in an excel sheet
 * For example, if there is an existing biosource (e.g. accession 4DNSRV3SKQ8M for H1-hESC (Tier 1) ) for the new biosample you are creating, you should reference the existing one instead of creating a new one.
 
 Getting Added as a 4DN User or Submitter
-----------------------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Before you can view protected lab or project data or submit data to the 4DN system you must be a registered user of the site and have the appropriate access credentials.
 
@@ -205,7 +205,7 @@ For instructions on creating an account, please see `this page </help/user-guide
 * After release the data can no longer be edited by data submitters - contact the DCIC to report data issues and we can work together to get them resolved
 
 Getting Connection Keys for the 4DN-DCIC servers
-------------------------------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 If you have been designated as a submitter for the project and plan to use either our spreadsheet-based submission system or the REST-API an access key and a secret key are required to establish a connection to the 4DN database and to fetch, upload (post), or change (patch) data. Please follow these steps to get your keys.
 

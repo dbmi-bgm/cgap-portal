@@ -1,9 +1,11 @@
 Search Info
 =====================
 
+XXX: Not clear what the point of this documentation is, just looks like example queries.
+
 **URIS**
 
-1. http://{SERVER_NAME}/search/?searchTerm={term}
+1. `http://{SERVER_NAME}/search/?searchTerm={term}`
 	Fetches all the documents which contain the text 'term'.
 	The result set includes wild card searches and the 'term' should be atleast 3 characters long.
 
@@ -13,13 +15,13 @@ Search Info
 	*** TERMS ARE NOT INCLUDED until the corresponding boost values are added to the schemas of item_type ***
 	- For example, you must add a boost of "definition" to the biosample schema for this term to be searchable for this object
 
-2. http://{SERVER_NAME}/search/?type={item_type}
+2. `http://{SERVER_NAME}/search/?type={item_type}`
 	Fetches all the documents of that particular 'item_type'
 
 	- SERVER_NAME: ENCODE server
 	- item_type: ENCODE item type (values can be: biosample, experiment, antibody_approval and target)
 
-3. http://{SERVER_NAME}/search/?type={item_type}&{field_name}={text}
+3. `http://{SERVER_NAME}/search/?type={item_type}&{field_name}={text}`
 	Fetches and then filters all the documents of a particular item_type on that field
 
 	- SERVER_NAME: ENCODE server

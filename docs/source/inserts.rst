@@ -1,6 +1,8 @@
 Loading Inserts
 ===============
 
+XXX: Needs updating with CGAP info
+
 Fourfront has a set of json insert files that are used to load data in various environments. These are loaded using ``bin/load-data``\ , which calls the functions defined in src/encoded/loadxl.py.
 
 The behavior of load-data depends on the current Fourfront environment and the ``snovault.load_test_data`` setting in the used .ini file. This documentation goes into some detail on those options; to read about which inserts are used, see `this documentation <../src/encoded/tests/data/README.md>`_.

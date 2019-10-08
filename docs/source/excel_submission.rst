@@ -1,18 +1,14 @@
-.. role:: raw-html-m2r(raw)
-   :format: html
-
-
-Overview
+Excel Submission
 --------
 
 
 * Metadata and data can be submitted to our platform using Microsoft Excel WorkBooks that describe related items in separate sheets.
 * This section provides detailed information on how to use the WorkBooks.
 * You can check out the `example WorkBook <https://github.com/hms-dbmi/Submit4DN/blob/master/Data_Files/Rao_et_al_2014/fieldsRao.xls?raw=true>`_ we prepared for the data from Rao et. al. 2014 to familiarize yourself with the general structure.
-* Based on the type of experiment(s) for which you plan to submit data, the data wranglers can provide you with an Excel WorkBook containing several WorkSheets.  
+* Based on the type of experiment(s) for which you plan to submit data, the data wranglers can provide you with an Excel WorkBook containing several WorkSheets.
 * Each sheet corresponds to an Item type in our metadata database.
 * The workbook provided should contain all the sheets that you may need for your submission.
-* You can refer to `this table <#schema-information>`_ for information on all the Item types available in the database.  
+* You can refer to `this table <#schema-information>`_ for information on all the Item types available in the database.
 * Each sheet should also contain all the data fields that can be submitted for that Item type.
 * Depending on if you have submitted data before or if you are using shared reagents that have been submitted by other labs, you may not need to provide information on every sheet or in every field.
 
@@ -41,8 +37,8 @@ Excel Headers
 
 
 * You may notice that in some sheets there are additional commented rows that contain data values.
-* These are rows corresponding to items that already exist in the database and can provide you with identifiers that you can reuse in your submission (see `Referencing existing items </help/submitter-guide/getting-started#referencing-existing-objects>`_\ ).  
-* Only those items that either are associated with your lab or are already released to the public will appear in these commented data rows.   
+* These are rows corresponding to items that already exist in the database and can provide you with identifiers that you can reuse in your submission (see `Referencing existing items </help/submitter-guide/getting-started#referencing-existing-objects>`_\ ).
+* Only those items that either are associated with your lab or are already released to the public will appear in these commented data rows.
 * Your data entry should begin at the first non-commented row.
 
 Preparing Excel Workbooks
@@ -62,7 +58,7 @@ Preparing Excel Workbooks
 :raw-html-m2r:`<span id="basic-field"></span>`
 
 
-* 
+*
   Most field values are strings:
 
 
@@ -126,12 +122,12 @@ Field(s) with subobjects
 
 
 * Some Items can contain embedded sub-objects that are stored under a single Item field name but that contain multiple sub-fields that remain grouped together.
-* 
+*
   These are indicated in the Item spreadsheet using a ‘.’ (dot) notation.
 
     For example the *"experiment_relations"* field has 2 sub-fields called *"relationship_type"*\ , and *"experiment"*. In the spreadsheet field names you will see *experiment_relations.relationship_type* and *experiment_relations.experiment*.
 
-* 
+*
   If the Item field is designed to store a list of embedded sub-objects, you can enter multiple sub-objects by manually creating new columns and appending incremented integers to the fields names for each new sub-object.
 
     For example, to submit a total of three related experiments to an ExperimentHiC Item you would find the *experiment_relations.relationship_type* and *experiment_relations.experiment* columns, copy them and have total of 6 columns named:
@@ -165,8 +161,8 @@ Referencing existing items
 
 * Ways that you can reference items that already exist in the 4DN database in your spreadsheet submission is described `here </help/submitter-guide/getting-started#referencing-existing-objects>`_.
   :raw-html-m2r:`<span id="supp_files"></span>`
-* In some cases information for existing items will be present in the Excel Work Sheets provided for your submission.  
-* You can also check the existing items from *collection* pages that list all of them.   
+* In some cases information for existing items will be present in the Excel Work Sheets provided for your submission.
+* You can also check the existing items from *collection* pages that list all of them.
 * The links for item lists can be constructed by ``https://data.4dnucleome.org/ + plural-object-name`` (e.g. https://data.4dnucleome.org/biosamples/ ) and the identifiers that can be used for collections are referenced in `this table <schema_info.md>`_.
 
 :raw-html-m2r:`<span id="excel_reps"></span>`
@@ -181,7 +177,7 @@ Experimental Replicate information
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 
-* All experiments must be part of a replicate set - even if it is a set containing only a single experiment.  
+* All experiments must be part of a replicate set - even if it is a set containing only a single experiment.
 * When preparing your submission you should determine how many replicate sets you will be submitting and create an entry - with an alias and preferably an informative description - for each set in the ExperimentSetReplicate sheet.
 
 
@@ -245,7 +241,7 @@ Using import_data script for submission
 
 
 * You can use ``import_data`` either to upload new items or to modify metadata fields of existing items.
-* This script will accept the excel workbook you prepared, and will upload every new item in the sheets.  
+* This script will accept the excel workbook you prepared, and will upload every new item in the sheets.
 * This script is also used to upload data files to the 4DN data store - this is done in a separate step after your File metadata has been successfully uploaded.
 
 Get access keys
@@ -260,7 +256,7 @@ Testing your metadata
 ~~~~~~~~~~~~~~~~~~~~~
 
 
-* Before actually updating the 4DN database you can check your spreadsheet for formatting and missing required data by doing a 'dry run'.  
+* Before actually updating the 4DN database you can check your spreadsheet for formatting and missing required data by doing a 'dry run'.
 * When you run the import_data  script on your metadata excel workbook without the ``--update`` or ``--patchall`` arguments the system will test your data for compatibility with our metadata structure and report back to you any problems.
 * The metadata will not be submitted to the database, so you can take advantage of this feature to test your excel workbook.
 
@@ -309,17 +305,17 @@ Uploading files with import_data
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 
-* 
+*
   The 4DN databased distinguishes two main categories of files:
 
 
   #. files that support the metadata, such as Documents or Images
   #. data files for which metadata is gathered and are specified in specific File items/sheets (eg. FileFastq).
 
-* 
+*
   The first category can be uploaded along with the metadata by using the “attachment” fields in the excel workbook (eg. pdf, png, doc, …) as `described previously <#supp_files>`_.
 
-* 
+*
   The second category includes the data files that are the results of experiments, eg. fastq files from HiC experiments.
 
 

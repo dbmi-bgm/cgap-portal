@@ -12,8 +12,6 @@ Please include software versions, and date
 20190218 Pillow 3.1.1 install error on Mac 10.14.3, Xcode 10.1 (command line tools 10.1 10B61) - Koray
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-error message
-
 ``--enable-zlib requested but zlib not found, aborting``
 
 I switched to Mojave, decided to do a fresh install of ff,  and updated Xcode from appstore, run ``xcode-select --install`` to update (you might need to restart computer after installing xcode, run xcode, and agree to the terms).
@@ -27,8 +25,6 @@ https://github.com/pyenv/pyenv/issues/1219
 
 20190219 Server does not start on Mac 10.14.3, Xcode 10.1 (command line tools 10.1 10B61) - Koray
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-error message
 
 .. code-block::
 
