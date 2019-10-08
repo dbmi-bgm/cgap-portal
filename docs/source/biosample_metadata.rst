@@ -1,6 +1,5 @@
-
-Overview
---------
+Sample Metadata
+---------------
 
 
 * The 4DN consortium will collect metadata on the preparation of a biological sample (biosample) in order to make the data FAIR, Findable, Accessible, Interoperable and Reusable, to the extent that such a service benefits the network and scientific community at large.
@@ -16,7 +15,7 @@ This page outlines and describes the types of metadata that is requested for bio
 *Note that the working group is still discussing some of the metadata and requirements are evolving.  If you have any questions or concerns please feel free to `contact us <mailto:support@4dnucleome.org>`_.*
 
 Basic Biosample Metadata
-------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^
 
 Biosample Fields
 ^^^^^^^^^^^^^^^^
@@ -76,7 +75,7 @@ Biosample Fields
 * The **Protocol** object is of type 'Biosample preparation protocol' and can be further classified as 'Tissue Preparation Methods' if applicable.
 
 Cell Culture Metadata
----------------------
+^^^^^^^^^^^^^^^^^^^^^
 
 
 * The consortium has designated 4 cell lines as `Tier 1 <https://data.4dnucleome.org/search/?type=Biosource&cell_line_tier=Tier+1>`_\ , which will be a primary focus of 4DN research and integrated analysis.

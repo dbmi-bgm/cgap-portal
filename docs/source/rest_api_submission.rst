@@ -4,7 +4,7 @@ REST API
 The 4DN-DCIC metadata database can be accessed using a Hypertext-Transfer-Protocol-(HTTP)-based, Representational-state-transfer (RESTful) application programming interface (API) - aka the REST API.  In fact, this API is used by the ``import_data`` script used to submit metadata entered into excel spreadsheets as described `on this page </help/spreadsheet>`_. This API was developed by the `ENCODE <https://www.encodeproject.org/>`_ project so if you have experience retrieving data from or submitting data to ENCODE use of the 4DN-DCIC API should be familiar to you.   The REST API can be used both for data submission and data retrieval, typically using scripts written in your language of choice.  Data objects exchanged with the server conform to the standard JavaScript Object Notation (JSON) format.  Libraries written for use with your chosen language are typically used for the network connection, data transfer, and parsing of data  (for example, requests and json, respectively for Python).  For a good introduction to scripting data retrieval (using GET requests) you can refer to `this page <https://www.encodeproject.org/help/rest-api/>`_ on the `ENCODE <https://www.encodeproject.org/>`_ web site that also has a good introduction to viewing and understanding JSON formatted data.
 
 Connecting to the server
-------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^
 
 Your script will need to use an access key and secret that you can obtain by following `these instructions </help/getting-started#getting-connection-keys-for-the-4dn-dcic-servers>`_ to connect to the server.  Exactly how you format and pass the connection information to the server depends on your scripting language and the libraries that you use with it.
 
@@ -13,17 +13,17 @@ Your script will need to use an access key and secret that you can obtain by fol
 You can refer to the ``FDN_key`` and ``FDN_connection`` classes in `the ``fdnDCIC.py`` library <https://github.com/4dn-dcic/Submit4DN/blob/master/wranglertools/fdnDCIC.py>`_ in Submit4DN for an example of how to generate the necessary information that will be passed to the server with each request.
 
 Identifying specific items
---------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Your script will need to add a uniquely identifying token to the Base URL in order to GET, POST or PATCH metadata for that item. IDs that can be used include: uuids, accessions, certain type specific identifiers and aliases.  See the sections on `'Using Aliases' and 'Referencing existing items' </help/getting-started#referencing-existing-objects>`_ for the types of identifiers that can be used in your requests.
 
 Ordering of POST requests
--------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Because in many cases fields in one Item may refer to another Item eg. the ``biosample`` field in the ``experiment_hi_c`` schema it is necessary to POST the referenced item prior to POSTing the item that refers to it.  A sensible POSTing order is specified in the ``sheet_order`` array located around line 144 in the `\ ``fdnDCIC.py`` <https://github.com/4dn-dcic/Submit4DN/blob/master/wranglertools/fdnDCIC.py>`_ library.
 
 JSON formatting
----------------
+^^^^^^^^^^^^^^^
 
 The most important component of your submission is the proper formatting of the data into json so it will map correctly onto the 4DN metadata schemas.  The details of the schemas for all object types in the database can be viewed at https://data.4dnucleome.org/profiles/.  Individual schemas can be viewed and/or retrieved via GET by appending the schema file name to the above URL (eg. for the Hi-C experiment schema https://data.4dnucleome.org/profiles/experiment_hi_c.json). For a listing of all schema files and associated resource names see `this table </help/spreadsheet#schema-information>`_\ , which should be up to date with the current schemas in the database.
 
