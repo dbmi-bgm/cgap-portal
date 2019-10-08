@@ -197,7 +197,7 @@ After first setting up `Package Control`_ (follow install and usage instructions
 
 .. _`Package Control`: https://sublime.wbond.net/}}
 
- *Development Contents:*
+*Development Contents:*
 
  .. toctree::
    :maxdepth: 4
