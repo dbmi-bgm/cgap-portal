@@ -227,6 +227,7 @@ CGAP Documentation
   .. toctree::
     :maxdepth:4
 
+    introduction
     getting_started
     account_creation
     biosample_metadata
