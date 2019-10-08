@@ -128,7 +128,7 @@ class RecentCasesSection extends React.PureComponent {
                     status = null
                 } = caseItem;
 
-                const { display_title: editorName } = modified_by;
+                const { display_title: editorName } = modified_by || {};
                 const familiesLen = families.length;
                 const allMembers = families.reduce(function(memo, f){
                     (f.members || []).forEach(function(m){
@@ -168,7 +168,7 @@ class RecentCasesSection extends React.PureComponent {
                             </div>
                             <div className="col-6 col-md-3 text-right">
                                 <i className="icon icon-fw icon-clock far mr-05 align-middle text-small" data-html
-                                    data-tip={"<div class='text-right'>Last Modified on " + timeNeat + "<br/>by <span class='text-600'>" + editorName + "</span></div>"}/>
+                                    data-tip={"<div class='text-right'>Last Modified on " + timeNeat + "<br/>by <span class='text-600'>" + (editorName || "<em>Unknown</em>") + "</span></div>"}/>
                                 <span className="align-middle">{ timeFromNow }</span>
                             </div>
                         </div>
