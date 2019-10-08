@@ -6,25 +6,6 @@
 Welcome to CGAP-Portal's documentation!
 =======================================
 
-Contents:
-.. toctree::
-  :hidden:
-
-  self
-
-.. toctree::
-  :maxdepth: 4
-
-  auth
-  beanstalk-deployment
-  database
-  higlass-visualization
-  inserts
-  invalidation
-  local_deployment_troubleshooting
-  object_lifecycle
-  overview
-
  |Build status|_
 
  .. |Build status| image:: https://travis-ci.org/4dn-dcic/fourfront.png?branch=master
@@ -218,3 +199,23 @@ Contents:
      * sublimelinter-jshint
 
  .. _`Package Control`: https://sublime.wbond.net/
+
+
+ Contents:
+ .. toctree::
+   :hidden:
+
+   self
+
+ .. toctree::
+   :maxdepth: 4
+
+   auth
+   beanstalk-deployment
+   database
+   higlass-visualization
+   inserts
+   invalidation
+   local_deployment_troubleshooting
+   object_lifecycle
+   overview
