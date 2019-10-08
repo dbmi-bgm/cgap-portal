@@ -1,5 +1,4 @@
-
-UNIT Testing
+Testing
 ============
 
 Python : what & where
@@ -22,7 +21,7 @@ Guidelines
 * Look at current tests to get understanding of how they work.
 * Check out the `\ **Jest** API <https://facebook.github.io/jest/docs/api.html>`_.
 * Check out the `React **TestUtils** documentation <https://facebook.github.io/react/docs/test-utils.html>`_.
-* If you need to test AJAX calls, utilize `\ **Sinon** <http://sinonjs.org>`_ to create a `\ **fake server** <http://sinonjs.org/docs/#fakeServer>`_ inside testing scripts, which will also patch XMLHttpRequest to work within tests. For example, in a ``.../__tests__/`` file, can have something resembling the following: 
+* If you need to test AJAX calls, utilize `\ **Sinon** <http://sinonjs.org>`_ to create a `\ **fake server** <http://sinonjs.org/docs/#fakeServer>`_ inside testing scripts, which will also patch XMLHttpRequest to work within tests. For example, in a ``.../__tests__/`` file, can have something resembling the following:
   ```javascript
   sinon = require('sinon');
   var server = sinon.fakeServer.create();

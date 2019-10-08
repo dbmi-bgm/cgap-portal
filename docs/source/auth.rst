@@ -1,5 +1,5 @@
 ================================
-Authentication and authorization
+Authentication/Authorization
 ================================
 
 Background reading: `Pyramid's security system`_.

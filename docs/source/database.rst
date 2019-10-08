@@ -1,5 +1,5 @@
 
-Database Documentation
+Database
 ======================
 
 The (encodeD) system uses a Postgres implementation of a document store of a *JSON-LD* object hierarchy.   Multiple views of each document are indexed in *Elasticsearch* for speed and efficient faceting and filtering.  The JSON-LD object tree can be exported from Elasticsearch with a query, converted to *RDF* and loaded into a *SPARQL* store for arbitrary queries.
@@ -7,9 +7,9 @@ The (encodeD) system uses a Postgres implementation of a document store of a *JS
 PostgreSQL RDB
 --------------
 
-When an object is POSTed to a collection, and has passed schema validation, it is inserted into the Postgres object store, defined in *storage.py*.   
+When an object is POSTed to a collection, and has passed schema validation, it is inserted into the Postgres object store, defined in *storage.py*.
 
-There are 7 tables in the RDB.  Of these, *Resource* represents a single URI.  Most Resources (otherwise known as Items or simply "objects" are represented by a single *PropSheet*\ , but the facility exists for multiple PropSheets per Resource (this is used for attachments and files, in which the actual data is stored as BLOBS instead of JSON).  
+There are 7 tables in the RDB.  Of these, *Resource* represents a single URI.  Most Resources (otherwise known as Items or simply "objects" are represented by a single *PropSheet*\ , but the facility exists for multiple PropSheets per Resource (this is used for attachments and files, in which the actual data is stored as BLOBS instead of JSON).
 
 The *Key* and *Link* tables are indexes used for performance optimziation.  Keys are to find specific unique aliases of Resources (so that all objects have identifiers other than the UUID primary key), while Links are used to track all the JSON-LD relationships between objects (Resources).  Specifically, the Link table is accessed when an Item is updated, to trigger reindexing of all Items that imbed the updated Item.
 
@@ -54,27 +54,27 @@ Back It Up
 Once you have your prerequisites, do the following:
 
 
-#. 
+#.
    In a dedicated Terminal window, create an SSH tunnel via *eb ssh* command to the public RDS database. The command will look like:
    ``eb ssh -n 1 --custom "ssh -i /Users/alex/.ssh/4dn-encode.pem -L 5999:fourfront-webprod.co3gwj7b7tpq.us-east-1.rds.amazonaws.com:5432"``.
    By using the '-L' argument, you create a tunnel from your local port 5999 to a remote host:port on the EC2 instance you're connecting to. Replace path to your 4dn-encode private key and host:port of remote RDS accordingly. *N.B.* We need to use ``eb ssh`` rather than plain ``ssh`` because ``eb ssh`` tells Amazon to temporarily open port 22 (for SSHing) which would otherwise remain closed for security reasons.
 
 
-   #. 
+   #.
       Open *PgAdmin* and, if not yet done, create a new 'Server' connection and call it "SSH to fourfront-webprod" or something relevant. Make sure the hostname is *localhost:5999*\ , as we'll be utilizing the SSH tunnel we created in step 1. Use the database, username, and password that are defined in the AWS EB environment variables configuration.
 
-   #. 
+   #.
       On the left tree-view pane of PgAdmin, should see the live RDS server, hopefully connected. Expand the server until see the database which have connected to. Right click on the database, and select "Backup..." from the drop-down menu.
 
-   #. 
+   #.
       It is important to set the right backup options. Your filename isn't important but should make sense -- suggested format is YYYY-MM-DD-ENVNAME-I.sql, e.g. '2017-07-19-fourfrontwebprod-2.sql'. The following options are important (spread across both tabs)
 
 
       * Select "Plain Text" for format.
-      * 
+      *
         For encoding, select SQL_ASCII or similar. Your luck with UTF-8 may vary.
 
-      * 
+      *
         Under "Dump Options" tab, ensure the following are set to "Yes":
 
 
@@ -99,7 +99,7 @@ Once you have your prerequisites, do the following:
 
 
 
-#. 
+#.
    Click "Backup". PgAdmin should pop up a little box on bottom right of their GUI showing time elapsed and then a success or error message. This should take about 30 seconds (or longer) as of 2017-07-06.
 
    .. image:: https://i.gyazo.com/8947db89fe2739a5729d54cfce10958d.png
@@ -107,7 +107,7 @@ Once you have your prerequisites, do the following:
       :alt: https://i.gyazo.com/8947db89fe2739a5729d54cfce10958d.png
 
 
-#. 
+#.
    Navigate to your newly backed up SQL file. There it is!
    Remember to disconnect the server and SSH tunnel when done.
 
@@ -121,16 +121,16 @@ If you backed up your .SQL file with no issues, you should be able to easily imp
 If want to import into your local, there are a few extra steps needed, and a few things to keep in mind to keep your machine performant.
 
 
-#. 
+#.
    With your local environment shut down, run ``bin/dev-servers development.ini --app-name app --clear --init --load`` as usual, but do not run ``bin/pserve`` yet. This will boot up your local PostgreSQL server and database but not launch the web app yet.
 
-#. 
+#.
    In your favorite text editor **\ *which can handle large files*\ **\ , open the SQL file which you backed up earlier. Do a search & replace for the user (from EB environment variable) and replace all instances with 'postgres', to match the user used to connect to your local server. You can also search & replace all instances of the database name -\ **if**\ - you want to change it from production database name (not suggested). Assuming your database name in SQL file is different than 'postgres' (database name of database created by local environment), you will be creating another database on the same local PostgreSQL server, alongside the database with your test inserts (initially loaded in *bin/dev-servers* and named 'postgres' (not to be confused with user name of same value)).
 
-#. 
+#.
    Run ``psql -h /tmp/snovault/pgdata -U postgres -w postgres -a -f "/Users/alex/db_dumps/2017-06-29-fourfront-webdev-1.sql"`` to run SQL file against your PostgreSQL server instance, replacing the SQL file path and name with your own. This will create and populate another database with your backed up data, alongside the one created and populated with test inserts by *bin/dev-servers* command.
 
-#. 
+#.
    Open up your *development.ini* file. Create a copy of it you'd like, or just adjust locally and don't commit. Make the following changes:
 
 
@@ -138,7 +138,7 @@ If want to import into your local, there are a few extra steps needed, and a few
    * Under both ``[composite:indexer]`` & ``[composite:file_indexer]`` sections, add the following: ``timeout = 64800``. By default, the indexer runs once a minute, and on local machine, it runs for 45 minutes. While running, the indexer uses a lot of energy and is very likely to overheat laptops -- especially if running continuously. It may drain your battery faster than you can charge it. Adjusting the auto-indexing timeout to 48 hours instead of one minute alleviates most of this pain except for initial indexing-upon-bootup.
    * Save (or save copy of) adjusted development.ini file.
 
-#. 
+#.
    Finally, run ``bin/pserve development.ini`` (if created a copy of development.ini, replace development.ini in command with your .ini filename). It should start indexing through tens of thousands of entries. Grab lunch while your laptop fans learn how to fly. Return to a local portal running with production data. Remember to revert your development.ini when want to load in test inserts instead of production data.
 
 Afterthoughts

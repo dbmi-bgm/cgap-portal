@@ -1,5 +1,5 @@
 ===============================
-Overview of encoded Application
+Overview
 ===============================
 
 This document does not contain installation or operating instructures.  See README.rst for that.

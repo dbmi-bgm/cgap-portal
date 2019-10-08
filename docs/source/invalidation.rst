@@ -1,4 +1,4 @@
-Dependency tracking and invalidation
+Dependencies/Invalidation
 ====================================
 
 Keeping elasticsearch in sync.
@@ -21,10 +21,10 @@ Where an object's url depends on other objects – ``Page`` whose url includes i
 Total Reindexing
 ---------------
 
-Cases can arise where a total reindexing needs to be triggered.   
+Cases can arise where a total reindexing needs to be triggered.
 >curl -XDELETE 'localhost:9200/encoded/meta/indexing’  will specifically force it.
 
-localhost:9200/encoded/meta/indexing stores the document that keeps track of incremental indexing. The indexer script checks for that document when deciding between full index and indexing only the recently invalidated documents. It has the benefit of keeping the old-yet-to-be-indexed data online, especially if it’s a production instance. 
+localhost:9200/encoded/meta/indexing stores the document that keeps track of incremental indexing. The indexer script checks for that document when deciding between full index and indexing only the recently invalidated documents. It has the benefit of keeping the old-yet-to-be-indexed data online, especially if it’s a production instance.
 
 Alternatively, >curl -XDELETE 'http://localhost:9200/encoded/' will delete the entire index along with the mapping information for schema objects. Although it does trigger indexing, missing mapping information makes the documets unsearcheable. Mapping in elasticsearch describes how each field of each object should be tokenized/analyzed/indexed for searching.
 

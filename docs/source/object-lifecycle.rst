@@ -1,5 +1,5 @@
 ====================
-The object lifecycle
+Object Lifecycle
 ====================
 
 Retrieval (GET)

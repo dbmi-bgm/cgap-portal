@@ -1,5 +1,5 @@
 
-Higlass Visualization endpoint
+Higlass Visualization
 ==============================
 
 This document explains the end to end behavior of the visualization endpoint.
@@ -7,7 +7,7 @@ This document explains the end to end behavior of the visualization endpoint.
 API Call
 --------
 
-Make a POST request to ``add_files_to_higlass_viewconf/``. The fourfront server will return the viewconf used to create 
+Make a POST request to ``add_files_to_higlass_viewconf/``. The fourfront server will return the viewconf used to create
 Higlass Items.
 
 Payload
@@ -142,7 +142,7 @@ All of the checks work on a file or experiment set.
 Foursight finds reference files
 -------------------------------
 
-Foursight reads the genome assembly from the source files, and gets the relevant chromsizes and beddb files. 
+Foursight reads the genome assembly from the source files, and gets the relevant chromsizes and beddb files.
 
 File Higlass Items
 ------------------
@@ -150,8 +150,8 @@ File Higlass Items
 Foursight looks for files with Higlass uids and genome assemblies.
 There are additional queries used to further filter, based on the Foursight check.
 
-With the file and the reference files Foursight calls the Fourfront API, gets the ``new_viewconf`` and creates a new Higlass Item. 
-The File's static_content section is updated so it refers to the uuid of the Higlass item. 
+With the file and the reference files Foursight calls the Fourfront API, gets the ``new_viewconf`` and creates a new Higlass Item.
+The File's static_content section is updated so it refers to the uuid of the Higlass item.
 
 Experiment Set (Processed Files) Higlass Items
 ----------------------------------------------
@@ -170,7 +170,7 @@ The ExpSet's static_content is updated so the ``tab:processed-files`` section us
 Experiment Set (Other Processed Files aka Supplementary Files) Higlass Items
 ----------------------------------------------------------------------------
 
-The opf section is a bit more complicated because each group has its own Higlass Item. 
+The opf section is a bit more complicated because each group has its own Higlass Item.
 
 Foursight looks for ExpSets with a ``other_processed_files`` section. For each group it sees which groups are worth updating:
 

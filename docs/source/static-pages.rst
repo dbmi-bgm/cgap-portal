@@ -1,5 +1,4 @@
-
-Creating & Editing Static Pages
+Static Pages
 ===============================
 
 Most static pages content - unless hard-coded for the front-end (in case of custom interactivity, etc.) - exists in HTML or Markdown files in the repository, in an S3 bucket, or in-line within an insert. Contents of a page is an array of linkTo StaticSection items loaded in the same way as other Items, and exists in the "content" property on the Page Item. The "name" property of the Page Item becomes the static page's path where it may be viewed.
@@ -115,7 +114,7 @@ Currently may set a ``status`` of "draft", "published", or "deleted" for any Pag
 StaticSections Above Search Results
 ===================================
 
-**Simplification & Future** \< THIS WILL SUPERCEDE SYSINFOS MAPPING &gt;
+**Simplification & Future** 
 ----------------------------------------------------------------------------
 
 If we like this structure of having a static page or block for (almost) each ``@type``\ , we could simplify greatly by getting rid of the Sysinfo Item & just having search.py look-up if any page w/ name ``’/search-info-header/’ + @type`` exists and then including its contents into a ‘search_header_content’ property as part of search results/response JSON.
@@ -163,7 +162,7 @@ Again, the name of the sysinfo object **MUST** be **\ ``search-header-mappings``
 The "value" in the 'mapping' dictionary/object is the @id or link to a StaticSection Item.
 Here these static sections are referenced by their name (rather than UUID).
 In order to allow such a link to your StaticSection, ensure the 'name' of it doesn't have any slashes (\ ``/``\ ) or hashes (\ ``#``\ ).
-For example, in the case above the names are ``search-info-header.WorkflowRun``\ , ``search-info-header.Workflow``\ , & ``search-info-header.FileSetMicroscopeQc``. 
+For example, in the case above the names are ``search-info-header.WorkflowRun``\ , ``search-info-header.Workflow``\ , & ``search-info-header.FileSetMicroscopeQc``.
 
 Auto-Generated Help Dropdown Menu
 =================================
