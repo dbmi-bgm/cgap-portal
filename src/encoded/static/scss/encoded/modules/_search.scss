@@ -81,7 +81,10 @@ $search-results-above-results-row-height: 42px;
 
 /*** FACETS CONTAINER STICKY ***/
 
+$facetlist-omitted-term-color: #901414;
+
 @import "../../../../../../node_modules/@hms-dbmi-bgm/shared-portal-components/scss/facet-list.scss";
+
 
 .search-page-container {
 
