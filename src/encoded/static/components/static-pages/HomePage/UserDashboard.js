@@ -14,7 +14,7 @@ import { Schemas } from './../../util';
 
 export const UserDashboard = React.memo(function UserDashboard(props){
     return (
-        <div className="container-wide home-content-area" id="content">
+        <div className="container-wide home-content-area mb-1" id="content">
             <div className="mt-4 homepage-dashboard">
                 <h2 className="homepage-section-title">Actions</h2>
                 <p>
@@ -156,17 +156,17 @@ class RecentCasesSection extends React.PureComponent {
                                     data-tip={"Status &mdash; " + Schemas.Term.toName("status", status)}/>
                                 <a href={caseID}>{ title }</a>
                             </h5>
-                            <div className="col-3 col-md-2 col-lg-1 px-0 text-ellipsis-container families-icon-container">
+                            <div className="col-3 col-md-2 col-lg-1 text-ellipsis-container families-icon-container">
                                 <i className="icon icon-fw icon-users fas mr-1"
                                     data-tip={familiesLen === 0 ? "No families present" : "" + familiesLen + (familiesLen > 1 ? " Families" : " Family")} />
                                 <span>{ familiesLen }</span>
                             </div>
-                            <div className="col-3 col-md-2 col-lg-1 px-0 text-ellipsis-container individuals-icon-container">
+                            <div className="col-3 col-md-2 col-lg-1 text-ellipsis-container individuals-icon-container">
                                 <i className="icon icon-fw icon-user fas mr-1"
                                     data-tip={"" + allMembers.size + " Unique Individual" + (allMembers.size === 1 ? "" : "s")}/>
                                 <span>{ allMembers.size }</span>
                             </div>
-                            <div className="col-6 col-md-3 text-right">
+                            <div className="col-6 col-md-3 text-right time-from-now-container">
                                 <i className="icon icon-fw icon-clock far mr-05 align-middle text-small" data-html
                                     data-tip={"<div class='text-right'>Last Modified on " + timeNeat + "<br/>by <span class='text-600'>" + (editorName || "<em>Unknown</em>") + "</span></div>"}/>
                                 <span className="align-middle">{ timeFromNow }</span>

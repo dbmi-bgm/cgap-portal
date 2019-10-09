@@ -499,6 +499,21 @@
 				}
 			}
 
+			.time-from-now-container {
+				white-space: nowrap;
+				text-overflow: ellipsis;
+				overflow: hidden;
+			}
+
+			@include media-breakpoint-up(md){
+				.families-icon-container {
+					padding: 0;
+				}
+				.individuals-icon-container {
+					padding: 0;
+				}
+			}
+
 			&.no-families {
 				.families-icon-container {
 					color: #c33939;
