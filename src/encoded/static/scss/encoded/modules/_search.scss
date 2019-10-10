@@ -91,8 +91,13 @@ $facetlist-omitted-term-color: #901414;
     .facets-container {
         position: -webkit-sticky;
         position: sticky;
-        top: 40px;
-        margin-bottom: 20px;
+        top: 0px;
+		
+		@include navbar-fixed-position {
+			top: 40px;
+		}
+
+		margin-bottom: 20px;
         
         .facets-body {
             body.scrolled-past-80 & {
@@ -120,7 +125,15 @@ $facetlist-omitted-term-color: #901414;
             }
 
         }
-    }
+	}
+
+	.search-headers-row {
+		position: sticky;
+		top: 0px;
+		@include navbar-fixed-position {
+			top: 40px;
+		}
+	}
 
 }
 
