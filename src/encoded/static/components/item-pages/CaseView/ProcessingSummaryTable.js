@@ -128,7 +128,6 @@ export const ProcessingSummaryTable = React.memo(function ProcessingSummaryTable
                     const { quality_metric = null } = procFile;
                     const {
                         overall_quality_status = null,
-                        url = null,
                         qc_list = [],
                         "@type" : typesList = []
                     } = quality_metric || {};
@@ -137,36 +136,44 @@ export const ProcessingSummaryTable = React.memo(function ProcessingSummaryTable
                         return; // Skip
                     }
                     qualityMetrics.overall = overall_quality_status;
-                    // determine if qc list or not
-                    if (typesList[0] != "QualityMetricQclist") {
-                        // TODO: update with action for single quality metric
-                        // console.log(`found a non-QualityMetricQclist; 
-                        //     type is ${procFile.quality_metric['@type'][0]}`);
-                    } else {
+
+                    function setQualityMetrics(qm) {
+                        // takes in a qualityMetric object (not container) & updates qualityMetrics with new values
+                        // according to what checks are available
+                        switch(qm.qc_type) {
+                            case "quality_metric_wgs_bamqc":
+                                qualityMetrics.BAMQC = qm.value.overall_quality_status;
+                                qualityMetrics.BAMQC_url = qm.value.url || qm.value["@id"];
+                                break;
+                            case "quality_metric_bamcheck":
+                                qualityMetrics.BAM = qm.value.overall_quality_status;
+                                qualityMetrics.BAM_url = qm.value.url || qm.value["@id"];
+                                break;
+                            case "quality_metric_fastqc":
+                                qualityMetrics.FQC = qm.value.overall_quality_status;
+                                qualityMetrics.FQC_url = qm.value.url || qm.value["@id"];
+                                break;
+                            case "quality_metric_vcfcheck":
+                                qualityMetrics.VCF = qm.value.overall_quality_status;
+                                qualityMetrics.VCF_url = qm.value.url || qm.value["@id"];
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+
+                    // determine if qualitymetric container or not
+                    if (typesList[0] != "QualityMetricQclist" && typesList[1] === "QualityMetric") {
+                        // if not qm container, use top-level quality metric
+                        setQualityMetrics(procFile.quality_metric);
+                    } else if (typesList[0] === "QualityMetricQclist") {
                         // check status for each quality item, and update with the appropriate url and status
                         qc_list.forEach((qcItem) => {
                             console.log("qcItem", qcItem);
-                            switch(qcItem.qc_type) {
-                                case "quality_metric_wgs_bamqc":
-                                    qualityMetrics.BAMQC = qcItem.value.overall_quality_status;
-                                    qualityMetrics.BAMQC_url = qcItem.value.url || qcItem.value["@id"];
-                                    break;
-                                case "quality_metric_bamcheck":
-                                    qualityMetrics.BAM = qcItem.value.overall_quality_status;
-                                    qualityMetrics.BAM_url = qcItem.value.url || qcItem.value["@id"];
-                                    break;
-                                case "quality_metric_fastqc":
-                                    qualityMetrics.FQC = qcItem.value.overall_quality_status;
-                                    qualityMetrics.FQC_url = qcItem.value.url || qcItem.value["@id"];
-                                    break;
-                                case "quality_metric_vcfcheck":
-                                    qualityMetrics.VCF = qcItem.value.overall_quality_status;
-                                    qualityMetrisc.VCF_url = qcItem.value.url || qcItem.value["@id"];
-                                    break;
-                                default:
-                                    break;
-                            }
+                            setQualityMetrics(qcItem);
                         });
+                    } else {
+                        throw Error('Failure while rendering quality row; sample type not QualityMetric or QualityMetric container object [Processingsummarytable.js, 175]');
                     }
                 });
 
