@@ -11,7 +11,7 @@ def help_page_section_json():
     return {
         "title": "",
         "name" : "help.user-guide.rest-api.rest_api_submission",
-        "file": "/docs/public/metadata-submission/rest_api_submission.md",
+        "file": "/docs/source/rest_api_submission.rst",
         "uuid" : "442c8aa0-dc6c-43d7-814a-854af460b020"
     }
 
@@ -103,14 +103,10 @@ def test_get_help_page(testapp, help_page):
     help_page_url = "/" + help_page['name']
     res = testapp.get(help_page_url, status=200)
 
-    #import pdb
-    #pdb.set_trace()
-
     assert res.json['@id'] == help_page_url
     assert res.json['@context'] == help_page_url
     assert 'HelpPage' in res.json['@type']
     assert 'StaticPage' in res.json['@type']
-    #assert res.json['content'] == help_page['content'] # No longer works latter is set to an @id of static_section
     assert 'Accession and uuid are automatically assigned during initial posting' in res.json['content'][0]['content'] # Instead lets check what we have embedded on GET request is inside our doc file (rest_api_submission.md).
     assert res.json['toc'] == help_page['table-of-contents']
 
