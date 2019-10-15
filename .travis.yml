@@ -12,7 +12,6 @@ addons:
   apt:
     update: true
     packages:
-    - oracle-java9-set-default
     - bsdtar
     - build-essential
     - make
