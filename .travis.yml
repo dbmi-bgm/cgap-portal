@@ -10,6 +10,7 @@ cache:
   - /home/travis/.cypress/Cypress
 addons:
   apt:
+    update: true
     packages:
     - oracle-java9-set-default
     - bsdtar
