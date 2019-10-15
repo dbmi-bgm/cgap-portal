@@ -85,6 +85,17 @@
             "type" : "string",
             "title" : "Comment",
             "formInput": "textarea"
+        },
+        "suggested_replacements": {
+            "title": "Suggested Replacement Phenotypes",
+            "description": "Phenotypes that are possible suggestions as replacement for this obsolete Phenotype",
+            "comment": "NOTE: this should only be populated if Phenotype is obsolete",
+            "type": "array",
+            "items": {
+                "title": "Suggestion",
+                "type": "string",
+                "linkTo": "Phenotype"
+            }
         }
     },
     "facets": {
