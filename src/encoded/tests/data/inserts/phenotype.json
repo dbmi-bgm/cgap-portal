@@ -19,7 +19,17 @@
         "phenotype_name": "Blue eyes",
         "hpo_id": "HP:9999997",
         "definition": "Hue of the eyes",
+        "alternative_ids": ["HP:9999996"],
         "hpo_url": "http://purl.obolibrary.org/obo/HP_9999997"
+    },
+    {
+        "uuid": "1526f5d5-2e8d-464e-9236-d82897a13e96",
+        "phenotype_name": "Azure orbs",
+        "hpo_id": "HP:9999996",
+        "definition": "Old Hue of the eyes",
+        "status": "obsolete",
+        "hpo_url": "http://purl.obolibrary.org/obo/HP_9999996",
+        "suggested_replacements": ["4fadb618-4e2b-4a99-b4c6-cf7a59c524cc"]
     }
 
 ]
