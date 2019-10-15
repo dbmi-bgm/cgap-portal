@@ -1,5 +1,5 @@
 language: python
-sudo: true
+sudo: false
 if: tag IS blank
 services:
   - elasticsearch
@@ -66,7 +66,7 @@ install:
 - pip install pytest==2.9.1
 - pip show pytest
 script:
-- if test -n "$NPM"; then npm test; fi
+- if test -n "$NPM"; then npm test --passWithNoTests; fi
 # setone is essentially all tests that are not indexing; change here for clarity
 - if test -n "$NPM"; then bin/test -v -v --aws-auth -m "not performance and not indexing and working" --durations=10
   --cov src/encoded;
