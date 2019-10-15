@@ -1782,6 +1782,16 @@ $badge-item-min-height: 90px;
 								visibility: hidden;
 							}
 						}
+						.qcs-container {
+							> span {
+								display: inline-block;
+								border-right: solid 1px #bbb;
+								padding: 0 5px;
+								&:last-child {
+									border: none;
+								}
+							}
+						}
 					}
 				}
 
