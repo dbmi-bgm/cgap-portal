@@ -125,6 +125,7 @@ export const ProcessingSummaryTable = React.memo(function ProcessingSummaryTable
                 const qualityMetrics = { };
 
                 rawFilesWPermissions.concat(procFilesWPermissions).forEach((procFile) => {
+                    console.log("proc or raw file: ", procFile);
                     const { quality_metric = null } = procFile;
                     const {
                         overall_quality_status = null,
@@ -150,7 +151,7 @@ export const ProcessingSummaryTable = React.memo(function ProcessingSummaryTable
                                 qualityMetrics.BAM_url = qm.value.url || qm.value["@id"];
                                 break;
                             case "quality_metric_fastqc":
-                                qualityMetrics.FQC = qm.value.overall_quality_status;
+                                qualityMetrics.FQC = qm.overall_quality_status;
                                 qualityMetrics.FQC_url = qm.value.url || qm.value["@id"];
                                 break;
                             case "quality_metric_vcfcheck":
@@ -163,16 +164,40 @@ export const ProcessingSummaryTable = React.memo(function ProcessingSummaryTable
                     }
 
                     // determine if qualitymetric container or not
-                    if (typesList[0] != "QualityMetricQclist" && typesList[1] === "QualityMetric") {
-                        // if not qm container, use top-level quality metric
-                        setQualityMetrics(procFile.quality_metric);
-                    } else if (typesList[0] === "QualityMetricQclist") {
+                    if (typesList[0] === "QualityMetricQclist") {
                         // check status for each quality item, and update with the appropriate url and status
                         qc_list.forEach((qcItem) => {
-                            console.log("qcItem", qcItem);
-                            setQualityMetrics(qcItem);
+                            switch(qcItem.value.status) {
+                                case "in review":
+                                case "deleted":
+                                case "obsolete":
+                                case "replaced":
+                                    // todo: handle these cases with more specificity
+                                    break;
+                                default:
+                                    setQualityMetrics(qcItem);
+                                    break;
+                            }
                         });
+                    } else if (typesList[0] === "QualityMetricFastqc") {
+                        switch(procFile.quality_metric.status) {
+                            case "in review":
+                            case "deleted":
+                            case "obsolete":
+                            case "replaced":
+                                // todo: handle these cases with more specificity
+                                break;
+                            default:
+                                setQualityMetrics(procFile.quality_metric);
+                                break;
+                        }
+                    } else if (typesList[1] === "QualityMetric") {
+                        // if not qm container, use top-level quality metric
+                        if (procFile.quality_metric.status !== "deleted") { // todo: update with other types that should be invisible
+                            setQualityMetrics(procFile.quality_metric);
+                        }
                     } else {
+                        // todo: are there any legitimate cases in which this will happen?
                         throw Error('Failure while rendering quality row; sample type not QualityMetric or QualityMetric container object [Processingsummarytable.js, 175]');
                     }
                 });
@@ -314,13 +339,16 @@ export const ProcessingSummaryTable = React.memo(function ProcessingSummaryTable
                 }
                
                 // order the different metrics so that one always shows up
-                const { BAM, BAM_url, BAMQC, BAMQC_url, VCF, FQC } = row.qualityMetrics;
-
+                const { BAM, BAM_url, BAMQC, BAMQC_url, VCF, VCF_url, FQC, FQC_url } = row.qualityMetrics;
+                console.log("row.qms: ", row.qualityMetrics);
 
                 colVal = (
                     <div className="qcs-container">
-                        { VCF ? <span>{ statusToIcon(VCF) } VCF</span> : null }
-                        { BAMQC !== "PASS" || !BAMQC ?
+                        { VCF ?
+                            <span>
+                                <a href={VCF_url} rel="noopener noreferrer" target="_blank"> { statusToIcon(VCF) } VCF</a>
+                            </span> : null }
+                        { (BAMQC !== "PASS" && BAM) || (!BAMQC && BAM) ?
                             <span>
                                 <a href={BAM_url} rel="noopener noreferrer" target="_blank"> { statusToIcon(BAM) } BAM</a>
                             </span> : null }
@@ -328,7 +356,10 @@ export const ProcessingSummaryTable = React.memo(function ProcessingSummaryTable
                             <span>
                                 <a href={BAMQC_url} rel="noopener noreferrer" target="_blank"> { statusToIcon(BAMQC) } BAMQC</a>
                             </span> : null }
-                        { FQC ? <span>{ statusToIcon(FQC) } FQC</span> : null }
+                        { FQC ?
+                            <span>
+                                <a href={FQC_url} rel="noopener noreferrer" target="_blank"> { statusToIcon(FQC) } FQC</a>
+                            </span> : null }
                     </div>
                 );
             }
