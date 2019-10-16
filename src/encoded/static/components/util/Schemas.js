@@ -72,6 +72,7 @@ export const Term = {
                 name = capitalizeSentence(term);
                 break;
             case 'file_size':
+            case 'attachment.size':
                 if (typeof term === 'number'){
                     name = term;
                 } else if (!isNaN(parseInt(term))) {

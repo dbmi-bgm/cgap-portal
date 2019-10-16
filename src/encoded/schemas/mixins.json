@@ -243,8 +243,8 @@
                     "format": "md5sum"
                 },
                 "size": {
-                    "title": "File size",
-                    "description" : "Size of the file on disk",
+                    "title": "Attachment size",
+                    "description" : "Size of the attachment on disk",
                     "type": "integer"
                 },
                 "width": {

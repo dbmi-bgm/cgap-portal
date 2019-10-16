@@ -853,13 +853,18 @@ def initialize_facets(request, doc_types, prepared_terms, schemas):
 
             # If we have a range filter in the URL, strip out the ".to" and ".from"
             if title_field == 'from' or title_field == 'to':
-                if len(split_field) == 3:
-                    f_field = split_field[-2]
+                if len(split_field) >= 3:
+                    f_field = ".".join(split_field[1:-1])
                     field_schema = schema_for_field(f_field, request, doc_types)
+
                     if field_schema:
-                        title_field = f_field
-                        use_field = '.'.join(split_field[1:-1])
-                        aggregation_type = 'stats'
+                        is_date_field = determine_if_is_date_field(field, field_schema)
+                        is_numerical_field = field_schema['type'] in ("integer", "float", "number")
+
+                        if is_date_field or is_numerical_field:
+                            title_field = field_schema.get("title", f_field)
+                            use_field = f_field
+                            aggregation_type = 'stats'
 
             for schema in schemas:
                 if title_field in schema['properties']:
@@ -1067,7 +1072,7 @@ def set_facets(search, facets, search_filters, string_query, request, doc_types,
             if is_date_field:
                 facet["field_type"] = "date"
             elif is_numerical_field:
-                facet["field_type"] = "number"
+                facet["field_type"] = field_schema['type'] or "number"
 
             facet_filters = generate_filters_for_terms_agg_from_search_filters(query_field, search_filters, string_query)
 
