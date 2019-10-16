@@ -21,7 +21,7 @@
 
 For full documentation, see our `docs <https://cgap-portal.readthedocs.io/en/latest/index.html>`_ .
 
-This is a fork from `ENCODE-DCC/encoded <https://github.com/ENCODE-DCC/encoded>`_ .  We are working to modularize the project and adapted to our needs for the 4D Nucleome project.
+This is a fork from `ENCODE-DCC/encoded <https://github.com/ENCODE-DCC/encoded>`_ .  We are working to modularize the project and adapted to our needs for the Clinical Genomic Analysis Platform (CGAP) project.
 
 
 Fourfront is known to work with Python 3.6.x and will not work with Python 3.7 or greater. If part of the 4DN team, it is recommended to use Python 3.4.3, since that's what is running on our servers. It is best practice to create a fresh Python virtualenv using one of these versions before proceeding to the following steps.
