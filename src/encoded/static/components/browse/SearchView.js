@@ -9,7 +9,7 @@ import { getAbstractTypeForType, getSchemaTypeFromSearchContext } from '@hms-dbm
 import { SearchView as CommonSearchView } from '@hms-dbmi-bgm/shared-portal-components/es/components/browse/SearchView';
 import { columnExtensionMap } from './columnExtensionMap';
 import { Schemas } from './../util';
-import { TitleAndSubtitleBeside, PageTitleContainer, TitleAndSubtitleUnder, pageTitleViews } from './../PageTitleSection';
+import { TitleAndSubtitleBeside, PageTitleContainer, TitleAndSubtitleUnder, pageTitleViews, EditingItemPageTitle } from './../PageTitleSection';
 import { getSubmissionItemTypes } from './../forms/CGAPSubmissionView';
 
 
@@ -115,6 +115,8 @@ const SearchViewPageTitle = React.memo(function SearchViewPageTitle(props){
         const FoundTitleComponent = pageTitleViews.lookup({ "@type" : itemTypes }, "add");
         if (FoundTitleComponent){
             return <FoundTitleComponent {...props} />;
+        } else {
+            return <EditingItemPageTitle {...{ context, schemas, currentAction, alerts }} />;
         }
     }
 
