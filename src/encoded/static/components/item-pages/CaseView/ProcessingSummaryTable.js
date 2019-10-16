@@ -125,7 +125,6 @@ export const ProcessingSummaryTable = React.memo(function ProcessingSummaryTable
                 const qualityMetrics = { };
 
                 rawFilesWPermissions.concat(procFilesWPermissions).forEach((procFile) => {
-                    console.log("proc or raw file: ", procFile);
                     const { quality_metric = null } = procFile;
                     const {
                         overall_quality_status = null,
@@ -138,25 +137,26 @@ export const ProcessingSummaryTable = React.memo(function ProcessingSummaryTable
                     }
                     qualityMetrics.overall = overall_quality_status;
 
-                    function setQualityMetrics(qm) {
+                    function setQualityMetrics(qc_type, qm) {
                         // takes in a qualityMetric object (not container) & updates qualityMetrics with new values
                         // according to what checks are available
-                        switch(qm.qc_type) {
-                            case "quality_metric_wgs_bamqc":
-                                qualityMetrics.BAMQC = qm.value.overall_quality_status;
-                                qualityMetrics.BAMQC_url = qm.value.url || qm.value["@id"];
+                        console.log("qc_type", qc_type);
+                        switch(qc_type) {
+                            case "QualityMetricWgsBamqc":
+                                qualityMetrics.BAMQC = qm.overall_quality_status;
+                                qualityMetrics.BAMQC_url = qm.url || qm["@id"];
                                 break;
-                            case "quality_metric_bamcheck":
-                                qualityMetrics.BAM = qm.value.overall_quality_status;
-                                qualityMetrics.BAM_url = qm.value.url || qm.value["@id"];
+                            case "QualityMetricBamcheck":
+                                qualityMetrics.BAM = qm.overall_quality_status;
+                                qualityMetrics.BAM_url = qm.url || qm["@id"];
                                 break;
-                            case "quality_metric_fastqc":
+                            case "QualityMetricFastqc":
                                 qualityMetrics.FQC = qm.overall_quality_status;
-                                qualityMetrics.FQC_url = qm.value.url || qm.value["@id"];
+                                qualityMetrics.FQC_url = qm.url || qm["@id"];
                                 break;
-                            case "quality_metric_vcfcheck":
-                                qualityMetrics.VCF = qm.value.overall_quality_status;
-                                qualityMetrics.VCF_url = qm.value.url || qm.value["@id"];
+                            case "QualityMetricVcfcheck":
+                                qualityMetrics.VCF = qm.overall_quality_status;
+                                qualityMetrics.VCF_url = qm.url || qm["@id"];
                                 break;
                             default:
                                 break;
@@ -167,6 +167,7 @@ export const ProcessingSummaryTable = React.memo(function ProcessingSummaryTable
                     if (typesList[0] === "QualityMetricQclist") {
                         // check status for each quality item, and update with the appropriate url and status
                         qc_list.forEach((qcItem) => {
+                            console.log("qcItem, ", qcItem);
                             switch(qcItem.value.status) {
                                 case "in review":
                                 case "deleted":
@@ -175,26 +176,22 @@ export const ProcessingSummaryTable = React.memo(function ProcessingSummaryTable
                                     // todo: handle these cases with more specificity
                                     break;
                                 default:
-                                    setQualityMetrics(qcItem);
+                                    setQualityMetrics(qcItem.value["@type"][0], qcItem.value);
                                     break;
                             }
                         });
-                    } else if (typesList[0] === "QualityMetricFastqc") {
+                    } else if (typesList[0] === "QualityMetricFastqc" || typesList[1] === "QualityMetric") {
+                        // if single (non-container) qualitymetric item
                         switch(procFile.quality_metric.status) {
-                            case "in review":
+                            // case "in review":
                             case "deleted":
                             case "obsolete":
                             case "replaced":
                                 // todo: handle these cases with more specificity
                                 break;
                             default:
-                                setQualityMetrics(procFile.quality_metric);
+                                setQualityMetrics(procFile.quality_metric["@type"][0], procFile.quality_metric);
                                 break;
-                        }
-                    } else if (typesList[1] === "QualityMetric") {
-                        // if not qm container, use top-level quality metric
-                        if (procFile.quality_metric.status !== "deleted") { // todo: update with other types that should be invisible
-                            setQualityMetrics(procFile.quality_metric);
                         }
                     } else {
                         // todo: are there any legitimate cases in which this will happen?
