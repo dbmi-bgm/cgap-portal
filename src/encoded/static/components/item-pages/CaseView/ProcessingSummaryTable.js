@@ -138,9 +138,6 @@ export const ProcessingSummaryTable = React.memo(function ProcessingSummaryTable
                     qualityMetrics.overall = overall_quality_status;
 
                     function setQualityMetrics(qc_type, qm) {
-                        // takes in a qualityMetric object (not container) & updates qualityMetrics with new values
-                        // according to what checks are available
-                        console.log("qc_type", qc_type);
                         switch(qc_type) {
                             case "QualityMetricWgsBamqc":
                                 qualityMetrics.BAMQC = qm.overall_quality_status;
@@ -163,13 +160,12 @@ export const ProcessingSummaryTable = React.memo(function ProcessingSummaryTable
                         }
                     }
 
-                    // determine if qualitymetric container or not
-                    if (typesList[0] === "QualityMetricQclist") {
-                        // check status for each quality item, and update with the appropriate url and status
+                    // determine if qualitymetric container or not, then
+                    // check status for each quality item, and update with the appropriate url and status
+                    if (typesList[0] === "QualityMetricQclist") { // if qualitymetric container
                         qc_list.forEach((qcItem) => {
-                            console.log("qcItem, ", qcItem);
                             switch(qcItem.value.status) {
-                                case "in review":
+                                case "in review": // for testing
                                 case "deleted":
                                 case "obsolete":
                                 case "replaced":
@@ -180,10 +176,9 @@ export const ProcessingSummaryTable = React.memo(function ProcessingSummaryTable
                                     break;
                             }
                         });
-                    } else if (typesList[0] === "QualityMetricFastqc" || typesList[1] === "QualityMetric") {
-                        // if single (non-container) qualitymetric item
+                    } else if (typesList[1] === "QualityMetric") { // if single (non-container) qualitymetric item
                         switch(procFile.quality_metric.status) {
-                            // case "in review":
+                            case "in review": // for testing
                             case "deleted":
                             case "obsolete":
                             case "replaced":
@@ -195,7 +190,7 @@ export const ProcessingSummaryTable = React.memo(function ProcessingSummaryTable
                         }
                     } else {
                         // todo: are there any legitimate cases in which this will happen?
-                        throw Error('Failure while rendering quality row; sample type not QualityMetric or QualityMetric container object [Processingsummarytable.js, 175]');
+                        console.error('Failure while rendering quality row; type not QualityMetric or QualityMetric container object [ProcessingSummaryTable.js, 193]');
                     }
                 });
 
@@ -335,9 +330,7 @@ export const ProcessingSummaryTable = React.memo(function ProcessingSummaryTable
                     }
                 }
                
-                // order the different metrics so that one always shows up
                 const { BAM, BAM_url, BAMQC, BAMQC_url, VCF, VCF_url, FQC, FQC_url } = row.qualityMetrics;
-                console.log("row.qms: ", row.qualityMetrics);
 
                 colVal = (
                     <div className="qcs-container">
