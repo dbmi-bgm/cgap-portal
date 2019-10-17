@@ -86,7 +86,7 @@ $facetlist-omitted-term-color: #901414;
 
 @import "../../../../../../node_modules/@hms-dbmi-bgm/shared-portal-components/scss/facet-list.scss";
 
-$search-page-padding-resize-transition: padding .0s .3s ease;
+$search-page-padding-resize-transition: padding .2s .3s linear;
 
 /* Make page full(er) width when scroll down */
 @include navbar-fixed-position {
