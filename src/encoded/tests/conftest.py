@@ -44,6 +44,7 @@ _app_settings = {
     'pyramid.debug_authorization': True,
     'postgresql.statement_timeout': 20,
     'retry.attempts': 3,
+    'ontology_path': pkg_resources.resource_filename('encoded', '../../ontology.json'),
     # some file specific stuff for testing
     'file_upload_bucket': 'test-wfout-bucket',
     'file_wfout_bucket': 'test-wfout-bucket',
