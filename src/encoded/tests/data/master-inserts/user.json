@@ -70,16 +70,6 @@
         "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b"
     },
     {
-        "email" : "cgap.platform@gmail.com",
-        "first_name" : "Genomics Platform",
-        "last_name" : "Administration",
-        "groups": ["admin"],
-        "role": "developer",
-        "submits_for": ["hms-dbmi"],
-        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
-        "uuid": "b5f738b6-455a-42e5-bc1c-77fbfd9b15d2"
-    },
-    {
         "email": "koray_kirli@hms.harvard.edu",
         "first_name": "Koray",
         "last_name": "Kirli",
@@ -123,5 +113,15 @@
         "uuid": "b041dba8-e2b2-4e54-a621-97edb508a0c4",
         "submits_for": ["hms-dbmi"],
         "job_title": "Other"
+    },
+    {
+        "email": "bianca_morris@hms.harvard.edu",
+        "first_name": "Bianca",
+        "last_name": "Morris",
+        "role": "developer",
+        "uuid": "70060f34-ec8f-4c34-a6c3-1b7b9ce8d314",
+        "groups": ["admin"],
+        "submits_for": ["hms-dbmi"],
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b"
     }
 ]

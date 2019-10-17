@@ -376,9 +376,9 @@ def compare_terms(t1, t2):
     for k, val in t1.items():
         if k not in t2:
             diff[k] = val
-        elif k in ['parents', 'slim_terms', 'synonyms', 'dbxrefs']:
-                if (len(val) != len(t2[k])) or (Counter(val) != Counter(t2[k])):
-                    diff[k] = val
+        elif isinstance(val, list):
+            if (len(val) != len(t2[k])) or (Counter(val) != Counter(t2[k])):
+                diff[k] = val
         elif val != t2[k]:
             diff[k] = val
     return diff

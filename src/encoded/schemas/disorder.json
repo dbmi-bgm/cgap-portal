@@ -160,6 +160,17 @@
                 "title": "DBXref",
                 "type": "string"
             }
+        },
+        "suggested_replacements": {
+            "title": "Suggested Replacement Disorders",
+            "description": "Disorders that are possible suggestions as replacement for this obsolete Disorder",
+            "comment": "NOTE: this should only be populated if this Disorder is obsolete",
+            "type": "array",
+            "items": {
+                "title": "Suggestion",
+                "type": "string",
+                "linkTo": "Disorder"
+            }
         }
     },
     "columns": {

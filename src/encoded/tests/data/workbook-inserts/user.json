@@ -1,0 +1,28 @@
+[
+    {
+        "email": "wrangler@wrangler.com",
+        "first_name": "Wrangler",
+        "groups": ["submitter"],
+        "job_title": "wrangler",
+        "institution": "hms-dbmi",
+        "last_name": "Wrangler",
+        "status": "current",
+        "submits_for": ["hms-dbmi"],
+        "viewing_groups" : ["4DN"],
+        "timezone": "US/Pacific",
+        "uuid": "986b362f-4eb6-4a9c-8173-3ab267307e3b"
+    },
+    {
+        "email": "test_person@people.com",
+        "first_name": "testing",
+        "last_name": "123",
+        "groups": ["submitter"],
+        "job_title": "wrangler",
+        "institution": "hms-dbmi",
+        "status": "current",
+        "submits_for": ["hms-dbmi"],
+        "viewing_goups": ["4DN"],
+        "timezone": "US/Pacific",
+        "uuid": "986b362f-4eb6-4a9c-8173-3ab267307e4c"
+    }
+]

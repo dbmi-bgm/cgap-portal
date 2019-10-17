@@ -81,15 +81,24 @@ $search-results-above-results-row-height: 42px;
 
 /*** FACETS CONTAINER STICKY ***/
 
+$facetlist-selected-term-color: $brand-primary;
+$facetlist-omitted-term-color: #901414;
+
 @import "../../../../../../node_modules/@hms-dbmi-bgm/shared-portal-components/scss/facet-list.scss";
+
 
 .search-page-container {
 
     .facets-container {
         position: -webkit-sticky;
         position: sticky;
-        top: 40px;
-        margin-bottom: 20px;
+        top: 0px;
+		
+		@include navbar-fixed-position {
+			top: 40px;
+		}
+
+		margin-bottom: 20px;
         
         .facets-body {
             body.scrolled-past-80 & {
@@ -117,7 +126,15 @@ $search-results-above-results-row-height: 42px;
             }
 
         }
-    }
+	}
+
+	.search-headers-row {
+		position: sticky;
+		top: 0px;
+		@include navbar-fixed-position {
+			top: 40px;
+		}
+	}
 
 }
 

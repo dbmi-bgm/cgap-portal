@@ -324,20 +324,18 @@
         "file_size" : {
             "title" : "File Size",
             "description" : "Filter using range of size of the file",
-            "aggregation_type" : "range",
-            "ranges" : [
-                { "to" : 1024 },
-                { "from" : 1024, "to" : 10240 },
-                { "from" : 10240, "to" : 102400 },
-                { "from" : 102400, "to" : 1048576 },
-                { "from" : 1048576, "to" : 10485760 },
-                { "from" : 10485760, "to" : 104857600 },
-                { "from" : 104857600, "to" : 1073741824 },
-                { "from" : 1073741824, "to" : 10737418240 },
-                { "from" : 10737418240, "to" : 107374182400 },
-                { "from" : 107374182400 }
+            "aggregation_type" : "stats",
+            "increments" : [
+                1024,
+                10240,
+                1048576,
+                10485760,
+                104857600,
+                1073741824,
+                10737418240,
+                107374182400
             ],
-            "disabled" : true,
+            "disabled" : false,
             "comment" : "disabled flag may be removed once we (a) can handle ?field=val1-to-val2 (ranges) in filters and (b) send ranges from FacetList to search URI."
         },
         "public_release" : {
@@ -348,43 +346,15 @@
         }
     },
     "columns": {
-        "track_and_facet_info.experiment_type" : {
-            "title" : "Experiment Type",
-            "description" : "Type of experiment to which this file belongs"
-        },
-        "track_and_facet_info.dataset" : {
-            "title" : "Dataset",
-            "description" : "Dataset to which this file belongs"
-        },
-        "track_and_facet_info.condition" : {
-            "title" : "Condition",
-            "description" : "Condition that distinguishes this replicate set from others in the dataset"
-        },
-        "track_and_facet_info.assay_info" : {
-            "title" : "Assay Details",
-            "description" : "Details of the experiment to which this file belongs"
-        },
-        "track_and_facet_info.biosource_name" : {
-            "title" : "Biosource"
-        },
         "file_type" : {
             "title" : "File Type"
         },
         "file_format.file_format": {
             "title" : "File Format"
         },
-        "track_and_facet_info.experiment_bucket": {
-            "title": "In experiment as"
-        },
-        "track_and_facet_info.replicate_info": {
-            "title": "Replicate info"
-        },
-        "track_and_facet_info.lab_name": {
-            "title": "Generating Lab"
-        },
         "file_size" : {
             "title" : "File Size",
-            "default_hiddent": true
+            "default_hidden": false
         },
         "date_created": {
             "default_hidden" : true

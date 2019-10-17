@@ -699,7 +699,7 @@ def set_filters(request, search, result, principals, doc_types):
                     range_filters[query_field]['format'] = 'yyyy-MM-dd HH:mm'
 
             if range_direction in ('gt', 'gte', 'lt', 'lte'):
-                if len(term) == 10:
+                if range_type == 'date' and len(term) == 10:
                     # Correct term to have hours, e.g. 00:00 or 23:59, if not otherwise supplied.
                     if range_direction == 'gt' or range_direction == 'lte':
                         term += ' 23:59'
@@ -757,7 +757,7 @@ def set_filters(request, search, result, principals, doc_types):
     # lastly, add range limits to filters if given
     for range_field, range_def in range_filters.items():
         must_filters.append({
-            'range' : { range_field : range_def }
+            "range" : { range_field : range_def }
         })
 
     # To modify filters of elasticsearch_dsl Search, must call to_dict(),
@@ -800,6 +800,7 @@ def initialize_facets(request, doc_types, prepared_terms, schemas):
     validation_error_facets = [
         ('validation_errors.name', {'title': 'Validation Errors', 'order': 999})
     ]
+
     # hold disabled facets from schema; we also want to remove these from the prepared_terms facets
     disabled_facets = []
 
@@ -817,8 +818,11 @@ def initialize_facets(request, doc_types, prepared_terms, schemas):
 
     ## Add facets for any non-schema ?field=value filters requested in the search (unless already set)
     used_facets = [ facet[0] for facet in facets + append_facets ]
-    used_facet_titles = [facet[1]['title'] for facet in facets + append_facets
-                         if 'title' in facet[1]]
+    used_facet_titles = [
+        facet[1]['title'] for facet in facets + append_facets
+        if 'title' in facet[1]
+    ]
+
     for field in prepared_terms:
         if field.startswith('embedded'):
             split_field = field.strip().split('.') # Will become, e.g. ['embedded', 'experiments_in_set', 'files', 'file_size', 'from']
@@ -829,6 +833,11 @@ def initialize_facets(request, doc_types, prepared_terms, schemas):
 
             # Use the last part of the split field to get the field title
             title_field = split_field[-1]
+
+            # workaround: if query has a '!=' condition, title_field ends with '!'. This prevents to find the proper display title.
+            # TODO: instead of workaround, '!' could be excluded while generating query results
+            if title_field.endswith('!'):
+                title_field = title_field[:-1]
 
             # if searching for a display_title, use the title of parent object
             # use `is_object_title` to keep track of this
@@ -842,15 +851,20 @@ def initialize_facets(request, doc_types, prepared_terms, schemas):
                 # Cancel if already in facets or is disabled
                 continue
 
-            # If we have a range filter in the URL,
+            # If we have a range filter in the URL, strip out the ".to" and ".from"
             if title_field == 'from' or title_field == 'to':
-                if len(split_field) == 3:
-                    f_field = split_field[-2]
+                if len(split_field) >= 3:
+                    f_field = ".".join(split_field[1:-1])
                     field_schema = schema_for_field(f_field, request, doc_types)
+
                     if field_schema:
-                        title_field = f_field
-                        use_field = '.'.join(split_field[1:-1])
-                        aggregation_type = 'stats'
+                        is_date_field = determine_if_is_date_field(field, field_schema)
+                        is_numerical_field = field_schema['type'] in ("integer", "float", "number")
+
+                        if is_date_field or is_numerical_field:
+                            title_field = field_schema.get("title", f_field)
+                            use_field = f_field
+                            aggregation_type = 'stats'
 
             for schema in schemas:
                 if title_field in schema['properties']:
@@ -864,12 +878,14 @@ def initialize_facets(request, doc_types, prepared_terms, schemas):
 
             # At moment is equivalent to `if aggregation_type == 'stats'`` until/unless more agg types are added for _facets_.
             if aggregation_type != 'terms':
-                facet_tuple[1]['hide_from_view'] = True # Temporary until we handle these better on front-end.
-                # Facet would be otherwise added twice if both `.from` and `.to` are requested.
-                if facet_tuple in facets:
+                # Remove completely if duplicate (e.g. .from and .to both present)
+                if use_field in used_facets:
                     continue
+                #facet_tuple[1]['hide_from_view'] = True # Temporary until we handle these better on front-end.
+                # Facet would be otherwise added twice if both `.from` and `.to` are requested.
 
             facets.append(facet_tuple)
+            used_facets.append(use_field)
 
     # Append additional facets (status, validation_errors, ...) at the end of
     # list unless were already added via schemas, etc.
@@ -970,6 +986,7 @@ def generate_filters_for_terms_agg_from_search_filters(query_field, search_filte
         if search_filters['bool'][filter_type] == []:
             continue
         for active_filter in search_filters['bool'][filter_type]:  # active_filter => e.g. { 'terms' : { 'embedded.@type.raw': ['ExperimentSetReplicate'] } }
+
             if 'bool' in active_filter and 'should' in active_filter['bool']:
                 # handle No value case
                 inner_bool = None
@@ -1053,38 +1070,44 @@ def set_facets(search, facets, search_filters, string_query, request, doc_types,
         if facet.get('aggregation_type') == 'stats':
 
             if is_date_field:
-                facet['field_type'] = 'date'
+                facet["field_type"] = "date"
             elif is_numerical_field:
-                facet['field_type'] = 'number'
+                facet["field_type"] = field_schema['type'] or "number"
 
-            aggs[facet['aggregation_type'] + ":" + agg_name] = {
-                'aggs': {
+            facet_filters = generate_filters_for_terms_agg_from_search_filters(query_field, search_filters, string_query)
+
+            aggs[facet["aggregation_type"] + ":" + agg_name] = {
+                "aggs": {
                     "primary_agg" : {
-                        'stats' : {
-                            'field' : query_field
+                        "stats" : {
+                            "field" : query_field,
+                            "missing" : 0
                         }
                     }
                 },
-                'filter': search_filters
+                "filter": {
+                    "bool" : facet_filters
+                }
             }
 
         else: # Default -- facetable terms
 
             facet['aggregation_type'] = 'terms'
             facet_filters = generate_filters_for_terms_agg_from_search_filters(query_field, search_filters, string_query)
-            term_aggregation = {
-                "terms" : {
-                    'size'    : 100,            # Maximum terms returned (default=10); see https://github.com/10up/ElasticPress/wiki/Working-with-Aggregations
-                    'field'   : query_field,
-                    'missing' : facet.get("missing_value_replacement", "No value")
-                }
-            }
 
             aggs[facet['aggregation_type'] + ":" + agg_name] = {
                 'aggs': {
-                    "primary_agg" : term_aggregation
+                    "primary_agg" : {
+                        "terms" : {
+                            "size"    : 100,            # Maximum terms returned (default=10); see https://github.com/10up/ElasticPress/wiki/Working-with-Aggregations
+                            "field"   : query_field,
+                            "missing" : facet.get("missing_value_replacement", "No value")
+                        }
+                    }
                 },
-                'filter': {'bool': facet_filters},
+                "filter": {
+                    "bool": facet_filters
+                },
             }
 
         # Update facet with title, description from field_schema, if missing.

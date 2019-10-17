@@ -174,17 +174,18 @@
         },
         "ethnicity": {
             "title": "Ethnicity",
+            "description": "Ethnicity of the individual. Can use a suggested or custom value",
             "type": "string",
-            "enum": [
-                "asian",
-                "black",
-                "hispanic",
-                "indian",
-                "middle_eastern",
-                "native_american",
-                "pacific_islander",
-                "white",
-                "other"
+            "suggested_enum": [
+                "Asian",
+                "Black",
+                "Hispanic",
+                "Indian",
+                "Middle Eastern",
+                "Native American",
+                "Pacific Islander",
+                "Caucasian",
+                "Other"
             ]
         },
         "images" : {

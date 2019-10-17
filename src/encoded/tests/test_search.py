@@ -28,6 +28,7 @@ def recursively_find_uuids(json, uuids):
 
 
 def test_search_view(workbook, testapp):
+    """ Test basic things about search view """
     res = testapp.get('/search/?type=Item').json
     assert res['@type'] == ['Search']
     assert res['@id'] == '/search/?type=Item'
@@ -41,8 +42,10 @@ def test_search_view(workbook, testapp):
 
 
 def test_search_with_no_query(workbook, testapp):
-    # using /search/ (with no query) should default to /search/?type=Item
-    # thus, should satisfy same assertions as test_search_view
+    """
+    using /search/ (with no query) should default to /search/?type=Item
+    thus, should satisfy same assertions as test_search_view
+    """
     res = testapp.get('/search/').follow(status=200)
     assert res.json['@type'] == ['Search']
     assert res.json['@id'] == '/search/?type=Item'
@@ -60,11 +63,13 @@ def test_search_with_no_query(workbook, testapp):
 
 
 def test_collections_redirect_to_search(workbook, testapp):
-    # we removed the collections page and redirect to search of that type
-    # redirected_from is not used for search
-    res = testapp.get('/biosamples/', status=301).follow(status=200)
+    """
+    we removed the collections page and redirect to search of that type
+    redirected_from is not used for search
+    """
+    res = testapp.get('/user/', status=301).follow(status=200)
     assert res.json['@type'] == ['Search']
-    assert res.json['@id'] == '/search/?type=Biosample'
+    assert res.json['@id'] == '/search/?type=User'
     assert 'redirected_from' not in res.json['@id']
     assert res.json['@context'] == '/terms/'
     assert res.json['notification'] == 'Success'
@@ -76,48 +81,33 @@ def test_collections_redirect_to_search(workbook, testapp):
 
 
 def test_search_with_embedding(workbook, testapp):
-    res = testapp.get('/search/?type=Biosample&limit=all').json
-    # Use a specific biosample, found by accession from test data
-    # Check the embedding /types/biosample.py entry; test ensures
-    # that the actual embedding matches that
-    res_json = [bios for bios in res['@graph'] if bios['accession'] == '4DNBS1234567']
+    """ Searches for a case and checks some embedded items are properly resolved """
+    res = testapp.get('/search/?type=Case&limit=all').json
+    res_json = [dis for dis in res['@graph'] if dis['uuid'] == 'cc7d83a2-6886-4ca0-9402-7c49734cf3c4']
     assert len(res_json) == 1
     test_json = res_json[0]
-    # check default embedding: @id and display_title for submitted_by
-    assert test_json['submitted_by']['display_title'] == 'Wrangler Wrangler'
-    assert test_json['submitted_by']['@id'] == '/users/986b362f-4eb6-4a9c-8173-3ab267307e3b/'
-    # this specific field should be embedded ('biosource.biosource_type')
-    assert test_json['biosource'][0]['biosource_type'] == 'immortalized cell line'
-    # this specific linked should be embedded ('biosource.biosource_vendor')
-    assert isinstance(test_json['biosource'][0]['biosource_vendor'], dict)
-    # this specific field was not embedded and should not be present
-    assert 'description' not in test_json['biosource'][0]
-    # since lab.awards was not specifically embedded, the field should not exist
-    assert test_json['lab'].get('awards') is None
+    assert test_json['display_title'] == 'People with Blue Thumbs'
+    assert test_json['project']['display_title'] == 'Test Project'
+    assert test_json['families'][0]['original_pedigree']['uuid'] == 'dcf15d5e-40aa-43bc-b81c-32c70c9afc50'
 
 
 def test_search_with_simple_query(workbook, testapp):
-    # run a simple query with type=Organism and q=mouse
-    res = testapp.get('/search/?type=Organism&q=mouse').json
+    # run a simple query with type=Disorder and q=Sub
+    res = testapp.get('/search/?type=Disorder&q=Sub').json
     assert len(res['@graph']) > 0
     # get the uuids from the results
     mouse_uuids = [org['uuid'] for org in res['@graph'] if 'uuid' in org]
     # run the same search with type=Item
-    res = testapp.get('/search/?type=Item&q=mouse').json
+    res = testapp.get('/search/?type=Item&q=Sub').json
     assert len(res['@graph']) > 0
     all_uuids = [item['uuid'] for item in res['@graph'] if 'uuid' in item]
     # make sure all uuids found in the first search are present in the second
     assert set(mouse_uuids).issubset(set(all_uuids))
     # run with q=mous returns the same hits...
-    res = testapp.get('/search/?type=Item&q=mous').json
+    res = testapp.get('/search/?type=Item&q=Su').json
     mous_uuids = [item['uuid'] for item in res['@graph'] if 'uuid' in item]
     # make sure all uuids found in the first search are present in the second
     assert set(mouse_uuids).issubset(set(mous_uuids))
-    # run with q=musculus, which should return the same hits as mouse
-    res = testapp.get('/search/?type=Item&q=musculus').json
-    musculus_uuids = [item['uuid'] for item in res['@graph'] if 'uuid' in item]
-    # make sure all uuids found in the first search are present in the second
-    assert set(mouse_uuids).issubset(set(musculus_uuids))
     # run with q=mauze (misspelled) and ensure uuids are not in results
     res = testapp.get('/search/?type=Item&q=mauxz', status=[200, 404]).json
     # make this test robust by either assuming no results are found
@@ -129,6 +119,7 @@ def test_search_with_simple_query(workbook, testapp):
     assert not set(mouse_uuids).issubset(set(mauxz_uuids))
 
 
+@pytest.mark.skip # XXX: What is this really testing?
 def test_search_facets_and_columns_order(workbook, testapp, registry):
     # TODO: Adjust ordering of mixed-in facets, perhaps sort by lookup or something, in order to un-xfail.
     test_type = 'experiment_set_replicate'
@@ -149,8 +140,9 @@ def test_search_facets_and_columns_order(workbook, testapp, registry):
         assert res['columns'][key]['title'] == val['title']
 
 
+@pytest.mark.skip # XXX: Not clear how to best port
 def test_search_embedded_file_by_accession(workbook, testapp):
-    res = testapp.get('/search/?type=ExperimentHiC&files.accession=4DNFIO67APU1').json
+    res = testapp.get('/search/?type=Case&families.original_pedigree.uuid=dcf15d5e-40aa-43bc-b81c-32c70c9afc50').json
     assert len(res['@graph']) > 0
     item_uuids = [item['uuid'] for item in res['@graph'] if 'uuid' in item]
     for item_uuid in item_uuids:
@@ -161,11 +153,11 @@ def test_search_embedded_file_by_accession(workbook, testapp):
 
 
 @pytest.fixture
-def mboI_dts(testapp, workbook):
+def dd_dts(testapp, workbook):
     # returns a dictionary of strings of various date and datetimes
     # relative to the creation date of the mboI one object in test inserts
     from datetime import (datetime, timedelta)
-    enz = testapp.get('/search/?type=Enzyme&name=MboI').json['@graph'][0]
+    enz = testapp.get('/search/?type=Disorder&disorder_name=Dummy+Disorder').json['@graph'][0]
 
     cdate = enz['date_created']
     _date, _time = cdate.split('T')
@@ -185,11 +177,11 @@ def mboI_dts(testapp, workbook):
     }
 
 
-def test_search_date_range_find_within(mboI_dts, testapp, workbook):
+def test_search_date_range_find_within(dd_dts, testapp, workbook):
     # the MboI enzyme should be returned with all the provided pairs
-    gres = testapp.get('/search/?type=Enzyme&name=MboI').json
+    gres = testapp.get('/search/?type=Disorder&disorder_name=Dummy+Disorder').json
     g_uuids = [item['uuid'] for item in gres['@graph'] if 'uuid' in item]
-    dts = {k: v.replace(':', '%3A') for k, v in mboI_dts.items()}
+    dts = {k: v.replace(':', '%3A') for k, v in dd_dts.items()}
     datepairs = [
         (dts['daybefore'], dts['dayafter']),
         (dts['creationdatetime'], dts['dayafter']),
@@ -199,12 +191,13 @@ def test_search_date_range_find_within(mboI_dts, testapp, workbook):
     ]
 
     for dp in datepairs:
-        search = '/search/?type=Enzyme&date_created.from=%s&date_created.to=%s' % dp
+        search = '/search/?type=Disorder&date_created.from=%s&date_created.to=%s' % dp
         sres = testapp.get(search).json
         s_uuids = [item['uuid'] for item in sres['@graph'] if 'uuid' in item]
         assert set(g_uuids).issubset(set(s_uuids))
 
 
+@pytest.mark.skip # XXX: how to best port?
 def test_search_with_nested_integer(testapp, workbook):
     search0 = '/search/?type=ExperimentHiC'
     s0res = testapp.get(search0).json
@@ -225,58 +218,57 @@ def test_search_with_nested_integer(testapp, workbook):
     assert set(s1_uuids) | set(s2_uuids) == set(s0_uuids)
 
 
-
-def test_search_date_range_dontfind_without(mboI_dts, testapp, workbook):
+def test_search_date_range_dontfind_without(dd_dts, testapp, workbook):
     # the MboI enzyme should be returned with all the provided pairs
-    dts = {k: v.replace(':', '%3A') for k, v in mboI_dts.items()}
+    dts = {k: v.replace(':', '%3A') for k, v in dd_dts.items()}
     datepairs = [
         (dts['daybefore'], dts['creationdate']),
         (dts['hourafter'], dts['dayafter']),
         (dts['daybefore'], dts['hourbefore'])
     ]
     for dp in datepairs:
-        search = '/search/?type=Enzyme&date_created.from=%s&date_created.to=%s' % dp
+        search = '/search/?type=Disorder&date_created.from=%s&date_created.to=%s' % dp
         assert testapp.get(search, status=404)
 
 
 def test_search_query_string_AND_NOT_cancel_out(workbook, testapp):
     # if you use + and - with same field you should get no result
-    search = '/search/?q=cell+-cell&type=Biosource'
+    search = '/search/?q=cell+-cell&type=Case'
     assert testapp.get(search, status=404)
 
 
 def test_search_query_string_with_booleans(workbook, testapp):
     """
-    moved references to res_not_induced and not_induced_uuids,
-    which were passing locally but failing on travis for some undetermined
-    reason... will look into this more later
+    Tests some search queries involving booleans on users
     """
-    search = '/search/?type=Biosource&q=GM12878'
+    search = '/search/?type=User&q=hms-dbmi'
     res_stem = testapp.get(search).json
     assert len(res_stem['@graph']) > 1
-    bios_uuids = [r['uuid'] for r in res_stem['@graph'] if 'uuid' in r]
-    swag_bios = '331111bc-8535-4448-903e-854af460b888'
-    assert swag_bios in bios_uuids
+    uuids = [r['uuid'] for r in res_stem['@graph'] if 'uuid' in r]
+    wrangler_uuid = "986b362f-4eb6-4a9c-8173-3ab267307e3b"
+    tester_uuid = "986b362f-4eb6-4a9c-8173-3ab267307e4c"
     # assert induced_stem_uuid not in not_induced_uuids
     # now search for stem +induced (AND is now "+")
-    search_and = '/search/?type=Biosource&q=swag+%2BGM12878'
+    search_and = '/search/?type=User&q=wrangler+%2Bcurrent'
     res_both = testapp.get(search_and).json
     both_uuids = [r['uuid'] for r in res_both['@graph'] if 'uuid' in r]
-    assert len(both_uuids) == 1
-    assert swag_bios in both_uuids
+    assert len(both_uuids) == 2
+    assert wrangler_uuid in both_uuids
+    assert tester_uuid in both_uuids
     # search with OR ("|")
-    search_or = '/search/?type=Biosource&q=swag+%7CGM12878'
+    search_or = '/search/?type=User&q=Wrangler+%7Ctesting'
     res_or = testapp.get(search_or).json
     or_uuids = [r['uuid'] for r in res_or['@graph'] if 'uuid' in r]
-    assert len(or_uuids) > 1
-    assert swag_bios in or_uuids
+    assert wrangler_uuid in or_uuids
+    assert tester_uuid in or_uuids
     # search with NOT ("-")
-    search_not = '/search/?type=Biosource&q=GM12878+-swag'
+    search_not = '/search/?type=User&q=Wrangler+-testing'
     res_not = testapp.get(search_not).json
     not_uuids = [r['uuid'] for r in res_not['@graph'] if 'uuid' in r]
-    assert swag_bios not in not_uuids
+    assert tester_uuid not in not_uuids
 
 
+@pytest.mark.skip # N/A?
 def test_metadata_tsv_view(workbook, htmltestapp):
 
     FILE_ACCESSION_COL_INDEX = 3
@@ -347,13 +339,13 @@ def test_metadata_tsv_view(workbook, htmltestapp):
 def test_default_schema_and_non_schema_facets(workbook, testapp, registry):
     from snovault import TYPES
     from snovault.util import add_default_embeds
-    test_type = 'biosample'
+    test_type = 'user'
     type_info = registry[TYPES].by_item_type[test_type]
     schema = type_info.schema
     embeds = add_default_embeds(test_type, registry[TYPES], type_info.embedded_list, schema)
     # we're looking for this specific facet, which is not in the schema
-    assert 'biosource.biosource_type' in embeds
-    res = testapp.get('/search/?type=Biosample&biosource.biosource_type=immortalized+cell+line').json
+    assert 'institution.display_title' in embeds
+    res = testapp.get('/search/?type=User&institution.display_title=HMS+DBMI').json
     assert 'facets' in res
     facet_fields = [ facet['field'] for facet in res['facets'] ]
     assert 'type' in facet_fields
@@ -362,7 +354,7 @@ def test_default_schema_and_non_schema_facets(workbook, testapp, registry):
         if not schema['facets'][facet].get('hide_from_view'):
             assert facet in facet_fields
     # now ensure that facets can also be created outside of the schema
-    assert 'biosource.biosource_type' in facet_fields
+    assert 'institution.display_title' in facet_fields
 
 
 def test_search_query_string_no_longer_functional(workbook, testapp):
@@ -376,10 +368,11 @@ def test_search_query_string_no_longer_functional(workbook, testapp):
     res_search = testapp.get(search_range, status=404)
     assert len(res_search.json['@graph']) == 0
 
-
+@pytest.mark.skip # XXX: How to best refactor?
 def test_search_with_added_display_title(workbook, testapp, registry):
     # 4DNBS1234567 is display_title for biosample
-    search = '/search/?type=ExperimentHiC&biosample=4DNBS1234567'
+    #import pdb; pdb.set_trace()
+    search = '/search/?type=Disorder&parents=DD1'
     # 301 because search query is changed
     res_json = testapp.get(search, status=301).follow(status=200).json
     assert res_json['@id'] == '/search/?type=ExperimentHiC&biosample.display_title=4DNBS1234567'
@@ -408,20 +401,20 @@ def test_search_with_added_display_title(workbook, testapp, registry):
 
 
 def test_search_with_no_value(workbook, testapp):
-    search = '/search/?description=No+value&description=GM12878+prepared+for+HiC&type=Biosample'
+    search = '/search/?comment=No+value&comment=This+comment+is+to+test+oranges&type=Disorder'
     res_json = testapp.get(search).json
     # grab some random results
     for item in res_json['@graph']:
-        maybe_null = item.get('description')
-        assert( maybe_null is None or maybe_null == 'GM12878 prepared for HiC')
+        maybe_null = item.get('comment')
+        assert( maybe_null is None or maybe_null == 'This comment is to test oranges')
     res_ids = [r['uuid'] for r in res_json['@graph'] if 'uuid' in r]
-    search2 = '/search/?description=GM12878+prepared+for+HiC&type=Biosample'
+    search2 = '/search/?comment=This+comment+is+to+test+apples&type=Disorder'
     res_json2 = testapp.get(search2).json
     # just do 1 res here
     check_item = res_json2['@graph'][0]
-    assert(check_item.get('description') == 'GM12878 prepared for HiC')
+    assert(check_item.get('comment') == 'This comment is to test apples')
     res_ids2 = [r['uuid'] for r in res_json2['@graph'] if 'uuid' in r]
-    assert(set(res_ids2) <= set(res_ids))
+    assert(set(res_ids2) != set(res_ids))
 
 
 #########################################
@@ -431,16 +424,16 @@ def test_search_with_no_value(workbook, testapp):
 from .test_views import TYPE_LENGTH
 
 def test_collection_limit(workbook, testapp):
-    res = testapp.get('/biosamples/?limit=2', status=301)
-    assert len(res.follow().json['@graph']) == 2
+    res = testapp.get('/user/?limit=1', status=301)
+    assert len(res.follow().json['@graph']) == 1
 
 
 def test_collection_actions_filtered_by_permission(workbook, testapp, anontestapp):
-    res = testapp.get('/biosamples/')
+    res = testapp.get('/user/')
     assert any(action for action in res.follow().json.get('actions', []) if action['name'] == 'add')
 
-    # biosamples not visible
-    res = anontestapp.get('/biosamples/', status=404)
+    # users not visible
+    res = anontestapp.get('/user/', status=404)
     assert len(res.json['@graph']) == 0
 
 
@@ -498,21 +491,22 @@ def test_index_data_workbook(app, workbook, testapp, indexer_testapp, htmltestap
 ######################################
 
 
+@pytest.mark.skip # XXX: No bar_plot_aggregations
 def test_barplot_aggregation_endpoint(workbook, testapp):
 
     # Check what we get back -
-    search_result = testapp.get('/browse/?type=ExperimentSetReplicate').json
+    search_result = testapp.get('/search/?type=Case').json
     search_result_count = len(search_result['@graph'])
 
     # We should get back same count as from search results here. But on Travis oftentime we don't, so we compare either against count of inserts --or-- count returned from regular results.
-    exp_set_test_inserts = list(get_inserts('inserts', 'experiment_set_replicate'))
+    exp_set_test_inserts = list(get_inserts('inserts', 'case'))
     count_exp_set_test_inserts = len(exp_set_test_inserts)
 
     # Now, test the endpoint after ensuring we have the data correctly loaded into ES.
     # We should get back same count as from search results here.
     res = testapp.post_json('/bar_plot_aggregations', {
-        "search_query_params" : { "type" : ['ExperimentSetReplicate'] },
-        "fields_to_aggregate_for" : ["experiments_in_set.experiment_type.display_title", "award.project"]
+        "search_query_params" : { "type" : ['User'] },
+        "fields_to_aggregate_for" : ["experiments_in_set.experiment_type.display_title", "project.project"]
     }).json
 
     # Our total count for experiment_sets should match # of exp_set_replicate inserts.abs
@@ -524,14 +518,3 @@ def test_barplot_aggregation_endpoint(workbook, testapp):
     assert isinstance(res['terms'], dict) is True
 
     assert len(res["terms"].keys()) > 0
-
-    #assert isinstance(res['terms']["CHIP-seq"], dict) is True # A common term likely to be found.
-
-    #assert res["terms"]["CHIP-seq"]["field"] == "award.project" # Child-field
-
-    # We only have 4DN as single award.project in test inserts so should have values in all buckets, though probably less than total.
-    #assert res["terms"]["CHIP-seq"]["total"]["experiment_sets"] > 0
-    #assert res["terms"]["CHIP-seq"]["total"]["experiment_sets"] < count_exp_set_test_inserts
-
-    #assert res["terms"]["CHIP-seq"]["terms"]["4DN"]["experiment_sets"] > 0
-    #assert res["terms"]["CHIP-seq"]["terms"]["4DN"]["experiment_sets"] < count_exp_set_test_inserts

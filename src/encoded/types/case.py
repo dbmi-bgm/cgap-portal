@@ -57,6 +57,7 @@ class Case(Item):
         "families.members.phenotypic_features.onset_age_units",
         "families.members.samples.status",
         "families.members.samples.processed_files",
+        "families.members.samples.processed_files.workflow_run_outputs",
         "families.members.samples.files"
     ]
 

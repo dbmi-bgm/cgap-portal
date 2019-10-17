@@ -47,6 +47,8 @@ export const Term = {
                 }
                 return capitalizeSentence(term);
             case 'date_created':
+            case 'last_modified.date_modified':
+            case 'date_modified':
             case 'public_release':
             case 'project_release':
                 if (allowJSXOutput) return <LocalizedTime timestamp={term} />;
@@ -61,22 +63,6 @@ export const Term = {
                     return <span className="mono-text text-small">{ term }</span>;
                 }
                 return term;
-            default:
-                break;
-        }
-
-
-        // Remove 'experiments_in_set' and test as if an experiment field. So can work for both ?type=Experiment, ?type=ExperimentSet.
-        field = field.replace('experiments_in_set.', '');
-
-        switch (field) {
-            case 'biosource_type':
-            case 'organism.name':
-            case 'individual.organism.name':
-            case 'biosource.individual.organism.name':
-            case 'biosample.biosource.individual.organism.name':
-                name = capitalize(term);
-                break;
             case 'file_type':
             case 'file_classification':
             case 'file_type_detailed':
@@ -86,6 +72,7 @@ export const Term = {
                 name = capitalizeSentence(term);
                 break;
             case 'file_size':
+            case 'attachment.size':
                 if (typeof term === 'number'){
                     name = term;
                 } else if (!isNaN(parseInt(term))) {
@@ -101,9 +88,9 @@ export const Term = {
                 name = term;
                 break;
             default:
-                name = null;
                 break;
         }
+
 
         // Custom stuff
         if (field.indexOf('quality_metric.') > -1){

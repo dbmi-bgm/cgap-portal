@@ -63,6 +63,7 @@ content_views.register(CGAPSubmissionView,      'Search', 'add');
 
 content_views.register(SearchView,              'Search');
 content_views.register(SearchView,              'Search', 'selection');
+content_views.register(SearchView,              'Search', 'multiselect');
 
 
 // Fallback for anything we haven't registered

@@ -41,9 +41,9 @@ const { TabObject, Item } = typedefs;
  * Project-specific.
  */
 export const propsForDetailList = {
-    stickyKeys : ['accession', 'status', 'description'],
-    excludedKeys : ['@id', 'principals_allowed', 'actions', '@context', 'display_title', 'title'],
-    alwaysCollapsibleKeys : ['@type', 'schema_version', 'uuid', 'external_references', 'aggregated-items', 'validation-errors'],
+    stickyKeys: ['accession', 'description', 'status', 'institution', 'project'],
+    excludedKeys : ['@id', 'principals_allowed', 'actions', '@context', 'display_title', 'title', 'aggregated-items'],
+    alwaysCollapsibleKeys : ['@type', 'schema_version', 'uuid', 'external_references', 'validation-errors'],
     termTransformFxn : function(field, term, allowJSX){
         // Relatively special cases for when on Item PageViews
         if (field === 'accession'){
@@ -582,10 +582,6 @@ const ViewJSONMenuOption = React.memo(function ViewJSONMenuOption({ href }){
 });
 
 
-function tabViewTermTransformFxn(field, term, allowJSX){
-    return Schemas.Term.toName(field, term, typeof allowJSX === 'boolean' ? allowJSX : true);
-}
-
 const DetailsTabView = React.memo(function DetailsTabView(props){
     return (
         <div className="container-wide">
@@ -593,7 +589,7 @@ const DetailsTabView = React.memo(function DetailsTabView(props){
                 <span>Details</span>
             </h3>
             <hr className="tab-section-title-horiz-divider mb-05"/>
-            <ItemDetailList {..._.pick(props, 'context', 'schemas', 'href')} termTransformFxn={tabViewTermTransformFxn}  />
+            <ItemDetailList {...propsForDetailList} {..._.pick(props, 'context', 'schemas', 'href')} />
         </div>
     );
 });
