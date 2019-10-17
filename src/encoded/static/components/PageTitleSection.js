@@ -41,17 +41,7 @@ export const PageTitleSection = React.memo(function PageTitle(props){
     // Else use fallback(s)
 
     if (isEditingFormView(context, currentAction)){
-        const subtitle = currentAction === 'edit' ? object.itemUtil.getTitleStringFromContext(context) // on item view
-            : currentAction === 'create' ? schemaTransforms.getItemTypeTitle(context, schemas) // on item view
-                : currentAction === 'add' ? schemaTransforms.getSchemaTypeFromSearchContext(context, schemas) // on search view
-                    : schemaTransforms.getItemTypeTitle(context, schemas);
-        return (
-            <PageTitleContainer alerts={alerts}>
-                <TitleAndSubtitleBeside subtitle={subtitle}>
-                    { currentAction === 'edit' ? 'Editing' : 'Creating' }
-                </TitleAndSubtitleBeside>
-            </PageTitleContainer>
-        );
+        return <EditingItemPageTitle {...{ currentAction, context, schemas, alerts }} />;
     }
 
     if (isStaticPage(context)){
@@ -71,6 +61,21 @@ export const PageTitleSection = React.memo(function PageTitle(props){
 
 });
 
+
+export const EditingItemPageTitle = React.memo(function EditingItemPageTitle(props){
+    const { currentAction, context, schemas, alerts } = props;
+    const subtitle = currentAction === 'edit' ? object.itemUtil.getTitleStringFromContext(context) // on item view
+        : currentAction === 'create' ? schemaTransforms.getItemTypeTitle(context, schemas) // on item view
+            : currentAction === 'add' ? schemaTransforms.getSchemaTypeFromSearchContext(context, schemas) // on search view
+                : schemaTransforms.getItemTypeTitle(context, schemas);
+    return (
+        <PageTitleContainer alerts={alerts}>
+            <TitleAndSubtitleBeside subtitle={subtitle}>
+                { currentAction === 'edit' ? 'Editing' : 'Creating' }
+            </TitleAndSubtitleBeside>
+        </PageTitleContainer>
+    );
+});
 
 /** Title Parts/Components **/
 
