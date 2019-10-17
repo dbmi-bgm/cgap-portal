@@ -65,7 +65,12 @@ export const ProcessingSummaryTable = React.memo(function ProcessingSummaryTable
             </React.Fragment>
         ),
         'sampleStatus' : "Sample Status",
-        'qualityMetric' : "Quality"
+        'qualityMetric' : (
+            <React.Fragment>
+                <i className="icon icon-fw icon-award fas mr-05 align-middle"/>
+                Quality
+            </React.Fragment>
+        )
     };
 
 
@@ -137,23 +142,43 @@ export const ProcessingSummaryTable = React.memo(function ProcessingSummaryTable
                     }
                     qualityMetrics.overall = overall_quality_status;
 
+                    function itemVisible(status) {
+                        switch(status) {
+                            case "in review": // for testing
+                            case "deleted":
+                            case "obsolete":
+                            case "replaced":
+                                // todo: handle these cases with more specificity
+                                return false;
+                            default:
+                                return true;
+                        }
+                    }
+
                     function setQualityMetrics(qc_type, qm) {
+                        const {
+                            '@id' : fallbackUrl,
+                            url,
+                            'overall_quality_status': status
+                        } = qm;
+
                         switch(qc_type) {
                             case "QualityMetricWgsBamqc":
-                                qualityMetrics.BAMQC = qm.overall_quality_status;
-                                qualityMetrics.BAMQC_url = qm.url || qm["@id"];
+                                qualityMetrics.BAMQC = status;
+                                qualityMetrics.BAMQC_url = url || fallbackUrl;
                                 break;
                             case "QualityMetricBamcheck":
-                                qualityMetrics.BAM = qm.overall_quality_status;
-                                qualityMetrics.BAM_url = qm.url || qm["@id"];
+                                qualityMetrics.BAM = status;
+                                qualityMetrics.BAM_url = url || fallbackUrl;
                                 break;
                             case "QualityMetricFastqc":
-                                qualityMetrics.FQC = qm.overall_quality_status;
-                                qualityMetrics.FQC_url = qm.url || qm["@id"];
+                                // todo: once set to pass, update only if new status == warn/fail; change URL to point to container/QClist
+                                qualityMetrics.FQC = status;
+                                qualityMetrics.FQC_url = url || fallbackUrl;
                                 break;
                             case "QualityMetricVcfcheck":
-                                qualityMetrics.VCF = qm.overall_quality_status;
-                                qualityMetrics.VCF_url = qm.url || qm["@id"];
+                                qualityMetrics.VCF = status;
+                                qualityMetrics.VCF_url = url || fallbackUrl;
                                 break;
                             default:
                                 break;
@@ -164,29 +189,13 @@ export const ProcessingSummaryTable = React.memo(function ProcessingSummaryTable
                     // check status for each quality item, and update with the appropriate url and status
                     if (typesList[0] === "QualityMetricQclist") { // if qualitymetric container
                         qc_list.forEach((qcItem) => {
-                            switch(qcItem.value.status) {
-                                case "in review": // for testing
-                                case "deleted":
-                                case "obsolete":
-                                case "replaced":
-                                    // todo: handle these cases with more specificity
-                                    break;
-                                default:
-                                    setQualityMetrics(qcItem.value["@type"][0], qcItem.value);
-                                    break;
+                            if (itemVisible(qcItem.value.status)) {
+                                setQualityMetrics(qcItem.value["@type"][0], qcItem.value);
                             }
                         });
                     } else if (typesList[1] === "QualityMetric") { // if single (non-container) qualitymetric item
-                        switch(procFile.quality_metric.status) {
-                            case "in review": // for testing
-                            case "deleted":
-                            case "obsolete":
-                            case "replaced":
-                                // todo: handle these cases with more specificity
-                                break;
-                            default:
-                                setQualityMetrics(procFile.quality_metric["@type"][0], procFile.quality_metric);
-                                break;
+                        if (itemVisible(procFile.quality_metric.status)) {
+                            setQualityMetrics(procFile.quality_metric["@type"][0], procFile.quality_metric);
                         }
                     } else {
                         // todo: are there any legitimate cases in which this will happen?
@@ -348,7 +357,7 @@ export const ProcessingSummaryTable = React.memo(function ProcessingSummaryTable
                             </span> : null }
                         { FQC ?
                             <span>
-                                <a href={FQC_url} rel="noopener noreferrer" target="_blank"> { statusToIcon(FQC) } FQC</a>
+                                <a href={FQC_url} rel="noopener noreferrer" target="_blank"> { statusToIcon(FQC) } FastQC</a>
                             </span> : null }
                     </div>
                 );

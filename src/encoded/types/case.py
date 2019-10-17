@@ -62,6 +62,7 @@ class Case(Item):
         "families.members.samples.processed_files.quality_metric.qc_list.qc_type",
         "families.members.samples.processed_files.quality_metric.qc_list.value.overall_quality_status",
         "families.members.samples.processed_files.quality_metric.qc_list.value.url",
+        "families.members.samples.processed_files.quality_metric.qc_list.value.status",
         "families.members.samples.processed_files.quality_metric.overall_quality_status",
         "families.members.samples.processed_files.quality_metric.url",
         # todo: double check field name(s) "families.members.samples.processed_files.quality_metric",
@@ -70,8 +71,10 @@ class Case(Item):
         "families.members.samples.files.quality_metric.qc_list.qc_type",
         "families.members.samples.files.quality_metric.qc_list.value.overall_quality_status",
         "families.members.samples.files.quality_metric.qc_list.value.url",
+        "families.members.samples.files.quality_metric.qc_list.value.status",
         "families.members.samples.files.quality_metric.overall_quality_status",
         "families.members.samples.files.quality_metric.url",
+        "families.members.samples.files.quality_metric.status"
     ]
 
     @calculated_property(schema={
