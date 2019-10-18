@@ -1193,8 +1193,6 @@ def execute_search(search):
         err_exp = 'The search failed. The DCIC team has been notified.'
     if err_exp:
         raise HTTPBadRequest(explanation=err_exp)
-    import json
-    print('\n\n\n', json.dumps(es_results, indent=4))
     return es_results
 
 
