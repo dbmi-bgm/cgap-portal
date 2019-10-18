@@ -238,49 +238,6 @@ def get_term_uris_as_ns(itype, conf_name):
     return uris
 
 
-# def get_syndef_terms_as_uri(ontology, termtype, as_rdf=True):
-#     '''Checks an ontology item for ontology_terms that are used
-#         to designate synonyms or definitions in that ontology and returns a list
-#         of RDF Namespace:name pairs by default or simple URI strings
-#         if as_rdf=False.
-#     '''
-#     sdterms = ontology.get(termtype)
-#     uris = [term['term_url'] for term in sdterms if term is not None]
-#     if as_rdf:
-#         uris = [convert2namespace(uri) for uri in uris]
-#     return uris
-
-
-# def get_synonym_term_uris(ontology, as_rdf=True):
-#     '''Checks an ontology item for ontology_terms that are used
-#         to designate synonyms in that ontology and returns a list
-#         of RDF Namespace:name pairs by default or simple URI strings
-#         if as_rdf=False.
-#     '''
-#     return get_syndef_terms_as_uri(ontology, 'synonym_terms', as_rdf)
-#
-#
-# def get_definition_term_uris(ontology, as_rdf=True):
-#     '''Checks an ontology item for ontology_terms that are used
-#         to designate definitions in that ontology and returns a list
-#         of RDF Namespace:name pairs by default or simple URI strings
-#         if as_rdf=False.
-#     '''
-#     return get_syndef_terms_as_uri(ontology, 'definition_terms', as_rdf)
-#
-#
-# def get_slim_terms(connection, itype):
-#     '''Retrieves all items from the provided type with 'is_slim_for'
-#         field populated
-#     '''
-#     search_suffix = 'search/?type={}&is_slim_for!=No value'.format(itype)
-#     try:
-#         return search_metadata(search_suffix, connection)
-#     except TypeError as e:
-#         print(e)
-#         return None
-
-
 def get_slim_term_ids_from_db_terms(db_terms, itype):
     '''Retrieves all items from the provided type with 'is_slim_for'
         field populated
@@ -300,16 +257,6 @@ def get_existing_items(connection, itype, include_obs_n_del=True):
         more_terms = search_metadata(search_suffix, connection, page_limit=200, is_generator=True)
         terms.update({t[iid]: t for t in more_terms})
     return terms
-
-
-# def get_ontology(connection, ont):
-#     '''return ontology json retrieved from server
-#         ontology jsons are now fully embedded
-#     '''
-#     ontology = get_metadata('ontologys/' + ont, connection)
-#     if 'Ontology' not in ontology['@type']:
-#         return None
-#     return ontology
 
 
 def connect2server(env=None, key=None):
