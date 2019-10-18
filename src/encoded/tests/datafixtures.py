@@ -6,7 +6,7 @@ ORDER = [
     'user', 'project', 'institution', 'file_format', 'case', 'individual',
     'sample', 'workflow', 'access_key', 'disorder', 'document', 'file_fastq',
     'file_processed', 'file_reference', 'gene',
-    'ontology_term', 'ontology', 'page', 'phenotype', 'quality_metric_fastqc',
+    'page', 'phenotype', 'quality_metric_fastqc',
     'quality_metric_bamcheck', 'quality_metric_qclist', 'quality_metric_wgs_bamqc',
     'quality_metric_vcfcheck', 'quality_metric_workflowrun', 'software', 'static_section',
     'sysinfo', 'tracking_item', 'workflow_mapping', 'workflow_run_awsem',
@@ -32,6 +32,7 @@ def project(testapp):
         'viewing_group': '4DN'
     }
     return testapp.post_json('/project', item).json['@graph'][0]
+
 
 @pytest.fixture
 def institution(testapp):
@@ -85,6 +86,7 @@ def disorder(testapp):
     }
     res = testapp.post_json('/disorder', item)
     return testapp.get(res.location).json
+
 
 @pytest.fixture
 def submitter(testapp, institution, project):
@@ -164,21 +166,10 @@ def mboI(testapp, worthington_biochemical, institution, project):
 def lung_biosource(testapp, institution, project, lung_oterm):
     item = {
         "biosource_type": "tissue",
-        'tissue': lung_oterm['@id'],
         'project': project['@id'],
         'institution': institution['@id'],
     }
     return testapp.post_json('/biosource', item).json['@graph'][0]
-
-
-@pytest.fixture
-def de_term(testapp, institution, project):
-    item = {
-        "term_id": "UBERON:0005439",
-        "term_name": "definitive endoderm",
-        "term_url": "http://purl.obolibrary.org/obo/UBERON_0005439"
-    }
-    return testapp.post_json('/ontology_term', item).json['@graph'][0]
 
 
 @pytest.fixture
@@ -217,100 +208,10 @@ def protocol(testapp, protocol_data):
 
 
 @pytest.fixture
-def so_ont(testapp):
-    return testapp.post_json('/ontology', {'ontology_name': 'SO'}).json['@graph'][0]
-
-
-@pytest.fixture
-def gene_term(testapp, so_ont):
-    gterm = {
-        'uuid': '7bea5bde-d860-49f8-b178-35d0dadbd644',
-        'term_id': 'SO:0000704', 'term_name': 'gene',
-        'source_ontology': so_ont['@id']}
-    return testapp.post_json('/ontology_term', gterm).json['@graph'][0]
-
-
-@pytest.fixture
-def region_term(testapp, so_ont):
-    gterm = {
-        'uuid': '6bea5bde-d860-49f8-b178-35d0dadbd644',
-        'term_id': 'SO:0000001', 'term_name': 'region',
-        'source_ontology': so_ont['@id']}
-    return testapp.post_json('/ontology_term', gterm).json['@graph'][0]
-
-
-@pytest.fixture
-def protein_term(testapp, so_ont):
-    gterm = {
-        'uuid': '8bea5bde-d860-49f8-b178-35d0dadbd644',
-        'term_id': 'SO:0000104', 'term_name': 'polypeptide',
-        'preferred_name': 'protein',
-        'source_ontology': so_ont['@id']}
-    return testapp.post_json('/ontology_term', gterm).json['@graph'][0]
-
-
-@pytest.fixture
-def transcript_term(testapp, so_ont):
-    gterm = {
-        'uuid': '5bea5bde-d860-49f8-b178-35d0dadbd644',
-        'term_id': 'SO:0000673', 'term_name': 'transcript',
-        'source_ontology': so_ont['@id']}
-    return testapp.post_json('/ontology_term', gterm).json['@graph'][0]
-
-
-@pytest.fixture
-def component_term(testapp, so_ont):
-    gterm = {
-        'uuid': '4bea5bde-d860-49f8-b178-35d0dadbd644',
-        'term_id': 'GO:0005575', 'term_name': 'cellular_component',
-        'source_ontology': so_ont['@id']}
-    return testapp.post_json('/ontology_term', gterm).json['@graph'][0]
-
-
-@pytest.fixture
-def cell_line_term(testapp, ontology):
-    item = {
-        "is_slim_for": "cell",
-        "namespace": "http://www.ebi.ac.uk/efo",
-        "term_id": "EFO:0000322",
-        "term_name": "cell line",
-        "uuid": "111189bc-8535-4448-903e-854af460a233",
-        "source_ontology": ontology['@id'],
-        "term_url": "http://www.ebi.ac.uk/efo/EFO_0000322"
-    }
-    return testapp.post_json('/ontology_term', item).json['@graph'][0]
-
-
-@pytest.fixture
-def f123_oterm(testapp, ontology, cell_line_term):
-    item = {
-        "uuid": "530036bc-8535-4448-903e-854af460b254",
-        "term_name": "F123-CASTx129",
-        "term_id": "EFO:0000008",
-        "source_ontology": ontology['@id'],
-        "slim_terms": [cell_line_term['@id']]
-    }
-    return testapp.post_json('/ontology_term', item).json['@graph'][0]
-
-
-@pytest.fixture
-def gm12878_oterm(testapp, ontology, cell_line_term):
-    item = {
-        "uuid": "530056bc-8535-4448-903e-854af460b111",
-        "term_name": "GM12878",
-        "term_id": "EFO:0000009",
-        "source_ontology": ontology['@id'],
-        "slim_terms": [cell_line_term['@id']]
-    }
-    return testapp.post_json('/ontology_term', item).json['@graph'][0]
-
-
-@pytest.fixture
 def F123_biosource(testapp, institution, project, f123_oterm):
     item = {
         "accession": "4DNSROOOAAQ2",
         "biosource_type": "stem cell",
-        "cell_line": f123_oterm['@id'],
         'project': project['@id'],
         'institution': institution['@id'],
     }
@@ -322,7 +223,6 @@ def GM12878_biosource(testapp, institution, project, gm12878_oterm):
     item = {
         "accession": "4DNSROOOAAQ1",
         "biosource_type": "immortalized cell line",
-        "cell_line": gm12878_oterm['@id'],
         'project': project['@id'],
         'institution': institution['@id'],
     }
@@ -334,7 +234,6 @@ def tier1_biosource(testapp, protocol, institution, project, gm12878_oterm):
     item = {
         'description': 'Tier 1 cell line Biosource',
         'biosource_type': 'immortalized cell line',
-        'cell_line': gm12878_oterm['@id'],
         'SOP_cell_line': protocol['@id'],
         'cell_line_tier': 'Tier 1',
         'project': project['@id'],
@@ -349,7 +248,6 @@ def human_biosource(testapp, human_individual, worthington_biochemical, gm12878_
         "description": "GM12878 cells",
         "biosource_type": "immortalized cell line",
         "individual": human_individual['@id'],
-        "cell_line": gm12878_oterm['@id'],
         "biosource_vendor": worthington_biochemical['@id'],
         "status": "current",
         'project': project['@id'],
@@ -1041,45 +939,8 @@ def mod_w_change_and_target(testapp, mod_basic_info, gene_bio_feature):
 
 
 @pytest.fixture
-def uberon_ont(testapp):
-    return testapp.post_json('/ontology', {'ontology_name': 'Uberon'}).json['@graph'][0]
-
-
-@pytest.fixture
-def ontology(testapp):
-    data = {
-        "uuid": "530006bc-8535-4448-903e-854af460b254",
-        "ontology_name": "Experimental Factor Ontology",
-        "ontology_url": "http://www.ebi.ac.uk/efo/",
-        "download_url": "http://sourceforge.net/p/efo/code/HEAD/tree/trunk/src/efoinowl/InferredEFOOWLview/EFO_inferred.owl?format=raw",
-        "namespace_url": "http://www.ebi.ac.uk/efo/",
-        "ontology_prefix": "EFO",
-        "description": "The description",
-        "notes": "The download",
-    }
-    return testapp.post_json('/ontology', data).json['@graph'][0]
-
-
-@pytest.fixture
-def oterm(uberon_ont):
-    return {
-        "uuid": "530036bc-8535-4448-903e-854af460b222",
-        "preferred_name": "preferred lung name",
-        "term_name": "lung",
-        "term_id": "UBERON:0002048",
-        "term_url": "http://purl.obolibrary.org/obo/UBERON_0002048",
-        "source_ontology": uberon_ont['@id']
-    }
-
-
-@pytest.fixture
-def lung_oterm(oterm, testapp):
-    return testapp.post_json('/ontology_term', oterm).json['@graph'][0]
-
-
-@pytest.fixture
 def quality_metric_fastqc(testapp, project, institution):
-    item =  {
+    item = {
         "uuid": "ed80c2a5-ae55-459b-ba1d-7b0971ce2613",
         "project": project['@id'],
         "institution": institution['@id']
