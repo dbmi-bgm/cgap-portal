@@ -48,7 +48,7 @@ class Phenotype(Item):
     #         if termname:
     #             properties['preferred_name'] = termname
     #
-    #     super(OntologyTerm, self)._update(properties, sheets)
+    #     super(Phenotype, self)._update(properties, sheets)
 
     # @calculated_property(schema={
     #     "title": "Associated Disorders",

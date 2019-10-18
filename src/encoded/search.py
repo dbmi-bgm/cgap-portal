@@ -625,11 +625,9 @@ def set_filters(request, search, result, principals, doc_types):
     if 'replaced' not in request.normalized_params.getall('status'):
         field_filters['embedded.status.raw']['must_not_terms'].append('replaced')
 
-    # Exclude type=TrackingItem and type=OntologyTerm from results unless are explictly specified
+    # Exclude type=TrackingItem from results unless are explictly specified
     if 'TrackingItem' not in doc_types:
         field_filters['embedded.@type.raw']['must_not_terms'].append('TrackingItem')
-    if 'OntologyTerm' not in doc_types:
-        field_filters['embedded.@type.raw']['must_not_terms'].append('OntologyTerm')
 
     for field, term in request.normalized_params.items():
         not_field = False # keep track if query is NOT (!)

@@ -19,8 +19,6 @@ ITEM_INDEX_ORDER = [
     'AccessKey',
     'User',
     'Case',
-    'Ontology',
-    'OntologyTerm',
     'Workflow',
     'WorkflowMapping',
     'WorkflowRun',
