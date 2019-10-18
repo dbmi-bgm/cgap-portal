@@ -848,6 +848,7 @@ def initialize_facets(request, doc_types, prepared_terms, schemas):
             if title_field in used_facets or title_field in disabled_facets:
                 # Cancel if already in facets or is disabled
                 continue
+            used_facets.append(title_field)
 
             # If we have a range filter in the URL, strip out the ".to" and ".from"
             if title_field == 'from' or title_field == 'to':
@@ -883,7 +884,7 @@ def initialize_facets(request, doc_types, prepared_terms, schemas):
                 # Facet would be otherwise added twice if both `.from` and `.to` are requested.
 
             facets.append(facet_tuple)
-            used_facets.append(use_field)
+
 
     # Append additional facets (status, validation_errors, ...) at the end of
     # list unless were already added via schemas, etc.
@@ -1099,7 +1100,8 @@ def set_facets(search, facets, search_filters, string_query, request, doc_types,
                         "terms" : {
                             "size"    : 100,            # Maximum terms returned (default=10); see https://github.com/10up/ElasticPress/wiki/Working-with-Aggregations
                             "field"   : query_field,
-                            "missing" : facet.get("missing_value_replacement", "No value")
+                            "missing" : facet.get("missing_value_replacement", "No value"),
+                            "min_doc_count" : 0
                         }
                     }
                 },

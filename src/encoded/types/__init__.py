@@ -15,7 +15,12 @@ from snovault import (
 # from pyramid.traversal import find_root
 from .base import (
     Item,
-    get_item_if_you_can
+    get_item_if_you_can,
+    set_namekey_from_title,
+    ALLOW_OWNER_EDIT,
+    ALLOW_CURRENT,
+    DELETED,
+    ONLY_ADMIN_VIEW
 )
 
 
@@ -235,6 +240,12 @@ class TrackingItem(Item):
     item_type = 'tracking_item'
     schema = load_schema('encoded:schemas/tracking_item.json')
     embedded_list = []
+    STATUS_ACL = Item.STATUS_ACL.copy()
+    STATUS_ACL.update({
+        'released': ALLOW_OWNER_EDIT + ALLOW_CURRENT,
+        'deleted': ALLOW_OWNER_EDIT + DELETED,
+        'draft': ALLOW_OWNER_EDIT + ONLY_ADMIN_VIEW,
+    })
 
     @classmethod
     def create_and_commit(cls, request, properties, clean_headers=False):

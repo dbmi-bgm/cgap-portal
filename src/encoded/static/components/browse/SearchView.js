@@ -48,10 +48,9 @@ export default class SearchView extends React.PureComponent {
         // Clone/filter list of facets.
         // We may filter out type facet completely at this step,
         // in which case we can return out of func early.
-        const facets = _.filter(
-            context.facets,
-            function(facet){ return SearchView.filterFacet(facet, currentAction, session); }
-        );
+        const facets = context.facets.filter(function(facet){
+            return SearchView.filterFacet(facet, currentAction, session);
+        });
 
         // Find facet for '@type'
         const typeFacetIndex = _.findIndex(facets, { 'field' : 'type' });

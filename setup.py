@@ -68,15 +68,15 @@ tests_require = [
 setup(
     name='encoded',
     version='0.1',
-    description='Metadata database for ENCODE',
+    description='CGAP Portal',
     long_description=README + '\n\n' + CHANGES,
     packages=find_packages('src'),
     package_dir={'': 'src'},
     include_package_data=True,
     zip_safe=False,
-    author='Laurence Rowe',
-    author_email='lrowe@stanford.edu',
-    url='http://encode-dcc.org',
+    author='CGAP Team at Harvard Medical School',
+    author_email='carl_vitzthum@hms.harvard.edu',
+    url='https://cgap.hms.harvard.edu',
     license='MIT',
     install_requires=requires,
     tests_require=tests_require,
@@ -87,7 +87,7 @@ setup(
         [console_scripts]
         batchupgrade = snovault.batchupgrade:main
         create-mapping = snovault.elasticsearch.create_mapping:main
-        dev-servers = snovault.dev_servers:main
+        dev-servers = encoded.dev_servers:main
         es-index-listener = snovault.elasticsearch.es_index_listener:main
 
         add-date-created = encoded.commands.add_date_created:main
