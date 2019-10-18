@@ -102,7 +102,8 @@ def get_args():  # pragma: no cover
                         help="An access key dictionary including key, secret and server.\
                         {'key': 'ABCDEF', 'secret': 'supersecret', 'server': 'https://data.4dnucleome.org'}")
     parser.add_argument('infile',
-                        help="the datafile containing object data to import")
+                        help="The datafile containing the disorder to phenotype annotations data to import. \
+                        http://compbio.charite.de/jenkins/job/hpo.annotations.current/lastSuccessfulBuild/artifact/misc_2018/phenotype.hpoa")
     parser.add_argument('--outfile',
                         help="the optional path and file to write output default is disorders.json",
                         default="disorders2phenotypes.json")

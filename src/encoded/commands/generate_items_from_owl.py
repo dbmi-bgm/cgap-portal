@@ -6,7 +6,7 @@ import datetime
 from uuid import uuid4
 from collections import Counter
 from rdflib.collection import Collection
-from owltools import (
+from encoded.commands.owltools import (
     Namespace,
     Owler,
     splitNameFromNamespace,
