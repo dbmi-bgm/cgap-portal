@@ -86,7 +86,8 @@ $facetlist-omitted-term-color: #901414;
 
 @import "../../../../../../node_modules/@hms-dbmi-bgm/shared-portal-components/scss/facet-list.scss";
 
-$search-page-padding-resize-transition: padding .2s .3s linear;
+$search-page-padding-resize-transition-in: padding .25s .5s linear;
+$search-page-padding-resize-transition-out: padding .25s linear;
 
 /* Make page full(er) width when scroll down */
 @include navbar-fixed-position {
@@ -94,11 +95,11 @@ $search-page-padding-resize-transition: padding .2s .3s linear;
 
 		/* Wraps .search-page-container */
 
-		transition: $search-page-padding-resize-transition;
+		transition: $search-page-padding-resize-transition-out;
 
 		.facets-column,
 		.results-column {
-			transition: $search-page-padding-resize-transition;
+			transition: $search-page-padding-resize-transition-out;
 		}
 
 		.facets-column {
@@ -107,18 +108,23 @@ $search-page-padding-resize-transition: padding .2s .3s linear;
 			.facets-container {
 				transition: border-color .3s;
 				background-color: #fff;
+				> .row.facets-header {
+					transition: $search-page-padding-resize-transition-out;
+				}
 			}
 		}
 
-		body.scrolled-past-80 & {
+		body.scrolled-past-160 & {
 			/* Override 36 etc. */
 			padding-left: 10px;
 			padding-right: 10px;
+			transition: $search-page-padding-resize-transition-in;
 
 			.facets-column,
 			.results-column {
 				padding-left: 0;
 				padding-right: 0;
+				transition: $search-page-padding-resize-transition-in;
 			}
 
 			.facets-column {
@@ -127,6 +133,11 @@ $search-page-padding-resize-transition: padding .2s .3s linear;
 				.facets-container {
 					border-right-color: #bbb;
 					border-left-color: transparent;
+
+					> .row.facets-header {
+						padding-left: 15px;
+						transition: $search-page-padding-resize-transition-in;
+					}
 				}
 			}
 
@@ -186,25 +197,18 @@ $search-page-padding-resize-transition: padding .2s .3s linear;
 				position: -webkit-sticky;
 				position: sticky;
 				top: 0px;
+
+				margin-bottom: 20px;
 				
 				@include navbar-fixed-position {
 					top: 40px;
+					margin-bottom: 0px;
 				}
-	
-				> .row.facets-header {
-					transition: $search-page-padding-resize-transition;
-				}
-	
-				margin-bottom: 20px;
 	
 				body.scrolled-past-80 & {
 	
 					margin-bottom: 0px;
 					padding-bottom: 0 !important;
-	
-					> .row.facets-header {
-						padding-left: 15px;
-					}
 				
 					.facets-body {
 						max-height: 90vh;

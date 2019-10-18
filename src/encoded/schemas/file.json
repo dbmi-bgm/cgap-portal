@@ -295,21 +295,6 @@
         }
     },
     "facets": {
-        "lab.display_title": {
-            "title": "Lab",
-            "disabled" : true
-        },
-        "track_and_facet_info.experiment_type" : {
-            "title" : "Experiment Type",
-            "description" : "Type of experiment to which this file belongs"
-        },
-        "track_and_facet_info.assay_info" : {
-            "title" : "Assay Details",
-            "description" : "Details of the experiment to which this file belongs"
-        },
-        "track_and_facet_info.biosource_name" : {
-            "title" : "Biosource"
-        },
         "file_type" : {
             "title" : "File Type",
             "descripton" : "Type or categorization of this file."
@@ -338,8 +323,8 @@
             "disabled" : false,
             "comment" : "disabled flag may be removed once we (a) can handle ?field=val1-to-val2 (ranges) in filters and (b) send ranges from FacetList to search URI."
         },
-        "public_release" : {
-            "title" : "Public Release Date",
+        "date_created" : {
+            "title" : "Date Created",
             "aggregation_type" : "date_histogram",
             "disabled" : true,
             "comment" : "disabled flag may be removed after we can handle ranges in URI filters."

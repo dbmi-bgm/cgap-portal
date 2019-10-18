@@ -1352,27 +1352,29 @@ class BodyElement extends React.PureComponent {
          *
          * @type {Object}
          * @property {boolean} state.scrolledPastTop        Whether window has been scrolled past 0.
-         * @property {boolean} state.scrolledPastEighty     Whether window has been scrolled past 80px.
+         * @property {boolean} state.scrolledPast80     Whether window has been scrolled past 80px.
          * @property {number} state.windowWidth             Window inner width.
          * @property {number} state.windowHeight            Window inner height.
          * @property {string[]} state.classList             List of additional classNames that are added to the body element.
          */
         this.state = {
-            'scrolledPastTop'       : null,
-            'scrolledPastEighty'    : null,
+            scrolledPastTop       : null,
+            scrolledPast80        : null,
+            scrolledPast160       : null,
+            scrolledPast240       : null,
             //'scrollTop'             : null // Not used, too many state updates if were to be.
-            'windowWidth'           : null,
-            'windowHeight'          : null,
-            'classList'             : [],
-            'hasError'              : false,
-            'errorInfo'             : null,
-            'isFullscreen'          : false,
+            windowWidth           : null,
+            windowHeight          : null,
+            classList             : [],
+            hasError              : false,
+            errorInfo             : null,
+            isFullscreen          : false,
             // Because componentWillReceiveProps is deprecated in favor of (static) getDerivedStateFromProps,
             // we ironically must now clone href in state to be able to do comparisons...
             // See: https://stackoverflow.com/questions/49723019/compare-with-previous-props-in-getderivedstatefromprops
-            'lastHref'              : props.href,
+            lastHref              : props.href,
             // Whether Test Data warning banner is visible.
-            'testWarningPresent'    : false, //!globals.productionHost[props.hrefParts.hostname] || false
+            testWarningPresent    : false, //!globals.productionHost[props.hrefParts.hostname] || false
         };
 
         /**
@@ -1632,10 +1634,12 @@ class BodyElement extends React.PureComponent {
                 _.forEach(this.scrollHandlers, (scrollHandlerFxn) => scrollHandlerFxn(currentScrollTop, scrollVector, e) );
             }
 
-            this.setState(function({ windowWidth, scrolledPastTop, scrolledPastEighty }){
+            this.setState(function({ windowWidth }){
                 const rgs = layout.responsiveGridState(windowWidth);
-                let nextScrolledPastTop;
-                let nextScrolledPastEighty;
+                let scrolledPastTop = false;
+                let scrolledPast80 = false;
+                let scrolledPast160 = false;
+                let scrolledPast240 = false;
 
                 if ( // Fixed nav takes effect at medium grid breakpoint or wider.
                     ['xs','sm'].indexOf(rgs) === -1 && (
@@ -1643,23 +1647,19 @@ class BodyElement extends React.PureComponent {
                         (currentScrollTop > 80)
                     )
                 ){
-                    nextScrolledPastTop = true;
+                    scrolledPastTop = true;
                     if (currentScrollTop > 80){
-                        nextScrolledPastEighty = true;
+                        scrolledPast80 = true;
                     }
-                } else {
-                    nextScrolledPastTop = false;
-                    nextScrolledPastEighty = false;
+                    if (currentScrollTop > 160){
+                        scrolledPast160 = true;
+                    }
+                    if (currentScrollTop > 240){
+                        scrolledPast240 = true;
+                    }
                 }
 
-                if (nextScrolledPastTop === scrolledPastTop && nextScrolledPastEighty === scrolledPastEighty){
-                    return null;
-                }
-
-                return {
-                    "scrolledPastTop" : nextScrolledPastTop,
-                    "scrolledPastEighty" : nextScrolledPastEighty
-                };
+                return { scrolledPastTop, scrolledPast80, scrolledPast160, scrolledPast240 };
             });
         };
 
@@ -1709,13 +1709,15 @@ class BodyElement extends React.PureComponent {
 
     bodyClassName(){
         const { isLoading, context } = this.props;
-        const { scrolledPastEighty, scrolledPastTop, classList, isFullscreen, testWarningPresent } = this.state;
+        const { scrolledPast80, scrolledPast160, scrolledPast240, scrolledPastTop, classList, isFullscreen, testWarningPresent } = this.state;
         const bodyClassList = (classList && classList.slice(0)) || [];
 
         // Common UI
         if (isLoading)          bodyClassList.push("loading-request");
         if (scrolledPastTop)    bodyClassList.push("scrolled-past-top");
-        if (scrolledPastEighty) bodyClassList.push("scrolled-past-80");
+        if (scrolledPast80)     bodyClassList.push("scrolled-past-80");
+        if (scrolledPast160)    bodyClassList.push("scrolled-past-160");
+        if (scrolledPast240)    bodyClassList.push("scrolled-past-240");
         if (isFullscreen){
             bodyClassList.push("is-full-screen");
         } else if (testWarningPresent) {
