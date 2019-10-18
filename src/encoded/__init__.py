@@ -137,7 +137,7 @@ def add_schemas_to_html_responses(config):
 
     # Exclude some keys, to make response smaller.
     exclude_schema_keys = [
-        'AccessKey', 'Image', 'ImagingPath', 'OntologyTerm', 'PublicationTracking', 'Modification',
+        'AccessKey', 'Image', 'ImagingPath', 'PublicationTracking', 'Modification',
         'QualityMetricBamqc', 'QualityMetricFastqc', 'QualityMetricFlag', 'QualityMetricPairsqc',
         'TestingDependencies', 'TestingDownload', 'TestingKey', 'TestingLinkSource', 'TestingPostPutPatch',
         'TestingServerDefault'
@@ -248,8 +248,6 @@ def main(global_config, **local_config):
     config.include(static_resources)
     config.include(changelogs)
 
-    # we are loading ontologies now as regular items
-    # config.registry['ontology'] = json_from_path(settings.get('ontology_path'), {})
     aws_ip_ranges = json_from_path(settings.get('aws_ip_ranges_path'), {'prefixes': []})
     config.registry['aws_ipset'] = netaddr.IPSet(
         record['ip_prefix'] for record in aws_ip_ranges['prefixes'] if record['service'] == 'AMAZON')
