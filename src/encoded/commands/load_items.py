@@ -67,21 +67,6 @@ def load_json_to_store(json_file, itype=None):
             return{}
 
 
-# def update_sysinfo(auth):
-#     # update sysinfo. Don't worry about doing this on local
-#     data = {"name": "ffsysinfo", "ontology_updated": datetime.today().isoformat()}
-#     try:
-#         found_info = ff_utils.get_metadata('/sysinfos/' + data['name'], key=auth)
-#     except Exception:
-#         found_info = None
-#
-#     if found_info:
-#         ff_utils.patch_metadata(data, found_info['uuid'], key=auth)
-#     else:
-#         ff_utils.post_metadata(data, 'sysinfos', key=auth)
-#     logger.info("Updated sysinfo with name %s" % data['name'])
-
-
 def load_items(args):
     """
     Load a given JSON file with items inserts to a server using
