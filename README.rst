@@ -2,9 +2,6 @@
  CGAP PORTAL (HMS-BGM)
 ========================
 
-
-|Build status|_
-
 .. image:: https://travis-ci.org/dbmi-bgm/cgap-portal.svg?branch=master
    :target: https://travis-ci.org/dbmi-bgm/cgap-portal
 
@@ -18,11 +15,9 @@
 .. |Quality| image:: https://api.codacy.com/project/badge/Grade/f5fc54006b4740b5800e83eb2aeeeb43
 .. _Quality: https://www.codacy.com/app/4dn/fourfront?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=4dn-dcic/fourfront&amp;utm_campaign=Badge_Grade
 
-|Docs|_
 
 .. image:: https://readthedocs.org/projects/cgap-portal/badge/?version=latest
-:target: https://cgap-portal.readthedocs.io/en/latest/?badge=latest
-:alt: Documentation Status
+
 
 
 For full documentation, see our `docs <https://cgap-portal.readthedocs.io/en/latest/index.html>`_ .
