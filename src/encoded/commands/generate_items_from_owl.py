@@ -19,6 +19,7 @@ from encoded.commands.owltools import (
     hasDbXref,
     hasAltId
 )
+from encoded.commands.load_items import load_items
 from dcicutils.ff_utils import (
     get_authentication_with_server,
     get_metadata,
@@ -505,6 +506,7 @@ def download_and_process_owl(itype, terms, simple=False):
     synonym_terms = get_term_uris_as_ns(itype, 'synonym_uris')
     definition_terms = get_term_uris_as_ns(itype, 'definition_uris')
     data = Owler(ITEM2OWL[itype]['download_url'])
+    ontv = data.versionIRI
     if not terms:
         terms = {}
     name_field = ITEM2OWL[itype].get('name_field')
@@ -526,7 +528,7 @@ def download_and_process_owl(itype, terms, simple=False):
                 terms = process_parents(class_, data, terms)
     # add synonyms and definitions
     terms = add_additional_term_info(terms, data, synonym_terms, definition_terms, itype)
-    return terms
+    return terms, ontv
 
 
 def write_outfile(terms, filename, pretty=False):
@@ -606,13 +608,15 @@ def main():
         # want only simple processing
         simple = True
         # get all the terms for an ontology
-        terms = download_and_process_owl(itype, terms, simple)
+        terms, ontv = download_and_process_owl(itype, terms, simple)
     else:
         # bail out
         print("Need url to download file from")
         sys.exit()
 
     # at this point we've processed the rdf of all the ontologies
+    if ontv:
+        print("Got data from {}".format(ontv))
     if terms:
         terms = add_slim_terms(terms, slim_terms, itype)
         terms = remove_obsoletes_and_unnamed(terms, itype)
