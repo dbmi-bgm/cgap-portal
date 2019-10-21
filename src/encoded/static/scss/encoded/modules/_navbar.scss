@@ -500,7 +500,7 @@ div#top-nav.navbar-fixed-top {
                 i.reset-button {
                     position: absolute;
                     top: 50%;
-                    margin-top: -8px;
+                    margin-top: -7px;
                     right: 10px;
                     opacity: 0.33;
                     cursor: pointer;
@@ -778,6 +778,71 @@ div#top-nav.navbar-fixed-top {
         //height: 27px;
         //line-height: 25px;
         //width: 27px;
+    }
+
+}
+
+
+
+/***********************************
+> Remove nav headers and similar when on currentAction=selection or multiselection
+************************************/
+
+body[data-current-action="selection"],
+body[data-current-action="multiselect"] {
+
+	@include navbar-fixed-position {
+		div#post-navbar-container {
+			padding-top: $navbar-small-height;
+		}
+    }
+    
+    // Regardless of window width size, apply "scrolled-past-top" styling.
+
+    div#top-nav.navbar-fixed-top {
+        border-color: darken($navbar-background-color, 10%);
+        box-shadow: 0 0 3px rgba(0,0,0,0.2);
+
+        > div.navbar-inner-container > nav.navbar-main,
+        > nav.navbar-main {
+            /* React-Bootstrap Navbar itself */
+            height: $navbar-small-height !important;
+            line-height: $navbar-small-height !important;
+
+            // Hide non-select-essential UI things
+
+            > .navbar-brand {
+                display: none;
+            }
+
+            > .navbar-collapse {
+                > .navbar-nav { // Left menu, acct menu
+                    display: none;
+                }
+
+                // Make SearchBar full width
+
+                > .navbar-search-form-container {
+                    width: 100%;
+                    padding: 0 5px;
+
+                    > input {
+                        width: 100% !important;
+                    }
+
+                    > button.search-icon-button {
+                        right: 7px;
+                    }
+
+                    > i.reset-button {
+                        right: 16px !important;
+                    }
+                }
+            }
+
+
+        }
+
     }
 
 }
