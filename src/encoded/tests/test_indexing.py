@@ -8,9 +8,10 @@ import json
 import time
 from encoded.verifier import verify_item
 from snovault.elasticsearch.interfaces import INDEXER_QUEUE
+from snovault.elasticsearch.indexer_utils import get_namespaced_index
 from .features.conftest import app_settings, app as conf_app
 
-pytestmark = [pytest.mark.working, pytest.mark.indexing]
+pytestmark = [pytest.mark.working, pytest.mark.indexing, pytest.mark.flaky]
 
 # subset of collections to run test on
 TEST_COLLECTIONS = ['testing_post_put_patch', 'file_processed']
@@ -52,7 +53,8 @@ def teardown(app, use_collections=TEST_COLLECTIONS):
 @pytest.mark.slow
 def test_indexing_simple(app, testapp, indexer_testapp):
     es = app.registry['elasticsearch']
-    doc_count = es.count(index='testing_post_put_patch', doc_type='testing_post_put_patch').get('count')
+    namespaced_ppp = get_namespaced_index(app, 'testing_post_put_patch')
+    doc_count = es.count(index=namespaced_ppp, doc_type='testing_post_put_patch').get('count')
     assert doc_count == 0
     # First post a single item so that subsequent indexing is incremental
     testapp.post_json('/testing-post-put-patch/', {'required': ''})
@@ -64,7 +66,7 @@ def test_indexing_simple(app, testapp, indexer_testapp):
     assert res.json['indexing_count'] == 1
     time.sleep(3)
     # check es directly
-    doc_count = es.count(index='testing_post_put_patch', doc_type='testing_post_put_patch').get('count')
+    doc_count = es.count(index=namespaced_ppp, doc_type='testing_post_put_patch').get('count')
     assert doc_count == 2
     res = testapp.get('/search/?type=TestingPostPutPatch')
     uuids = [indv_res['uuid'] for indv_res in res.json['@graph']]
@@ -77,16 +79,17 @@ def test_indexing_simple(app, testapp, indexer_testapp):
     assert res.json['total'] >= 2
     assert uuid in uuids
 
-    indexing_doc = es.get(index='indexing', doc_type='indexing', id='latest_indexing')
+    namespaced_indexing = get_namespaced_index(app, 'indexing')
+    indexing_doc = es.get(index=namespaced_indexing, doc_type='indexing', id='latest_indexing')
     indexing_source = indexing_doc['_source']
     assert 'indexing_count' in indexing_source
     assert 'indexing_finished' in indexing_source
     assert 'indexing_content' in indexing_source
     assert indexing_source['indexing_status'] == 'finished'
     assert indexing_source['indexing_count'] > 0
-    testing_ppp_mappings = es.indices.get_mapping(index='testing_post_put_patch')['testing_post_put_patch']
+    testing_ppp_mappings = es.indices.get_mapping(index=namespaced_ppp)['testing_post_put_patch']
     assert 'mappings' in testing_ppp_mappings
-    testing_ppp_settings = es.indices.get_settings(index='testing_post_put_patch')['testing_post_put_patch']
+    testing_ppp_settings = es.indices.get_settings(index=namespaced_ppp)['testing_post_put_patch']
     assert 'settings' in testing_ppp_settings
     # ensure we only have 1 shard for tests
     assert testing_ppp_settings['settings']['index']['number_of_shards'] == '1'
@@ -112,7 +115,8 @@ def test_create_mapping_on_indexing(app, testapp, registry, elasticsearch):
     for item_type in item_types:
         item_mapping = type_mapping(registry[TYPES], item_type)
         try:
-            item_index = es.indices.get(index=item_type)
+            namespaced_index = get_namespaced_index(app, item_type)
+            item_index = es.indices.get(index=namespaced_index)
         except:
             assert False
         found_index_mapping_emb = item_index[item_type]['mappings'][item_type]['properties']['embedded']
@@ -123,7 +127,7 @@ def test_create_mapping_on_indexing(app, testapp, registry, elasticsearch):
         full_mapping = create_mapping_by_type(item_type, registry)
         item_record = build_index_record(full_mapping, item_type)
         # below is True if the found mapping matches manual one
-        assert compare_against_existing_mapping(es, item_type, item_record, True)
+        assert compare_against_existing_mapping(es, namespaced_index, item_type, item_record, True)
 
 
 @pytest.fixture
@@ -218,7 +222,8 @@ def test_real_validation_error(app, indexer_testapp, testapp, institution, proje
     # associated file_format, institution, and project are not indexed. That's okay
     indexer_testapp.post_json('/index', {'record': True})
     time.sleep(2)
-    es_res = es.get(index='file_processed', doc_type='file_processed', id=res['@graph'][0]['uuid'])
+    namespaced_fp = get_namespaced_index(app, 'file_processed')
+    es_res = es.get(index=namespaced_fp, doc_type='file_processed', id=res['@graph'][0]['uuid'])
     assert len(es_res['_source'].get('validation_errors', [])) == 1
     # check that validation-errors view works
     val_err_view = testapp.get(fp_id + '@@validation-errors', status=200).json
