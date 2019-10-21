@@ -190,6 +190,8 @@ export const ProcessingSummaryTable = React.memo(function ProcessingSummaryTable
                             status
                         } = qm;
 
+                        let hyphenatedStatus = status.replace(/\s+/g, "-");
+
                         const shortType = getShortQMType(qc_type);
                         if (shortType && itemVisible(qm.status)) {
                             if (qualityMetrics.hasOwnProperty(shortType)) {
@@ -203,14 +205,18 @@ export const ProcessingSummaryTable = React.memo(function ProcessingSummaryTable
                                 ) {
                                     qualityMetrics[shortType].overall = quality;
                                 }
-                                qualityMetrics[shortType].items.push({ url: (url || fallbackUrl), quality, status });
+                                qualityMetrics[shortType].items.push({
+                                    url: (url || fallbackUrl),
+                                    quality,
+                                    status: hyphenatedStatus
+                                });
                             } else {
                                 qualityMetrics[shortType] = {
                                     overall: quality,
                                     items: [{
                                         url: (url || fallbackUrl),
                                         quality,
-                                        status
+                                        status: hyphenatedStatus
                                     }]
                                 };
                             }
@@ -403,8 +409,13 @@ export const ProcessingSummaryTable = React.memo(function ProcessingSummaryTable
                     if (qms[qmType].items && qms[qmType].items.length <= 1) {
                         renderArr.push(
                             ( qms[qmType].items[0] ?
-                                <span className={`qc-status-${status}`}>
-                                    <a href={qms[qmType].items[0].url} rel="noopener noreferrer" target="_blank">
+                                <span>
+                                    <a
+                                        href={qms[qmType].items[0].url}
+                                        rel="noopener noreferrer"
+                                        target="_blank"
+                                        className={`qc-status-${qms[qmType].items[0].status}`}
+                                    >
                                         { statusToIcon(qms[qmType].overall) } { qmType }
                                     </a>
                                 </span>
@@ -414,7 +425,7 @@ export const ProcessingSummaryTable = React.memo(function ProcessingSummaryTable
                         // otherwise create a list with linked #s
                         renderArr.push(
                             (
-                                <span className={`qc-status-${status}`}>
+                                <span>
                                     { statusToIcon(qms[qmType].overall) } { qmType }
                                         (
                                     {
@@ -424,7 +435,11 @@ export const ProcessingSummaryTable = React.memo(function ProcessingSummaryTable
                                                     href={ qm.url || "" }
                                                     rel="noopener noreferrer"
                                                     target="_blank"
-                                                    className={statusToTextClass(qm.quality)}
+                                                    className={
+                                                        statusToTextClass(qm.quality),
+                                                        `qc-status-${qm.status}`
+                                                    }
+
                                                 >
                                                     {i + 1}
                                                 </a>
