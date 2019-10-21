@@ -156,6 +156,10 @@ export const ProcessingSummaryTable = React.memo(function ProcessingSummaryTable
                         return; // Skip
                     }
 
+                    /**
+                     * Helper f(x) for QM handling; takes in a QM status and returns whether the current item
+                     * should be rendered on the page or not.
+                     */
                     function itemVisible(status) {
                         switch(status) {
                             case "deleted":
@@ -167,6 +171,10 @@ export const ProcessingSummaryTable = React.memo(function ProcessingSummaryTable
                         }
                     }
 
+                    /**
+                     * Helper f(x) for QM handling; takes in a QM type (usually from ['@type'][0]) and returns a
+                     * shortened version for use in interface and as object key.
+                     */
                     function getShortQMType(longType) {
                         switch(longType) {
                             case "QualityMetricWgsBamqc":
@@ -182,6 +190,29 @@ export const ProcessingSummaryTable = React.memo(function ProcessingSummaryTable
                         }
                     }
 
+                    /**
+                     * Helper f(x) for QM handling; takes in a QM type (usually from ['@type'][0]) and a single
+                     * (non-container) QM item. Either adds or updates key-value pairs in qualityMetrics object defined above.
+                     *
+                     * Adds as the key a shortQMType ('BAMQC' instead of 'QualityMetricWgsBamqc') of the passed in QM
+                     * and each value is an object structured as follows:
+                     *
+                     * {
+                     *  overall: String ('PASS'|'FAIL'|'WARN')], // updated when new items are added to qualityMetrics object
+                     *  items: Array [
+                     *          {
+                     *              value: String ('PASS'|'FAIL'|'WARN')
+                     *              status: String ('Current'|'In-Review'... etc.) // Will not be added if status is deleted
+                     *              url: String (URL of a QualityMetric item or a link to its view page)
+                     *          }
+                     *      ]
+                     *  }
+                     *
+                     * If this object already exists, then new items are added to the items Array, and the overall value
+                     * is updated (if new item has a worse status than current overall rating).
+                     *
+                     * Returns undefined.
+                     */
                     function setQualityMetrics(qc_type, qm) {
                         const {
                             '@id' : fallbackUrl,
@@ -241,7 +272,7 @@ export const ProcessingSummaryTable = React.memo(function ProcessingSummaryTable
                         setQualityMetrics(file.quality_metric["@type"][0], file.quality_metric);
                     } else {
                         // todo: are there any legitimate cases in which this will happen?
-                        console.error('Failure while rendering quality row; type not QualityMetric or QualityMetric container object [ProcessingSummaryTable.js, 193]');
+                        console.error('Failure while rendering quality row; type not QualityMetric or QualityMetric container object');
                     }
                 });
 
@@ -314,9 +345,9 @@ export const ProcessingSummaryTable = React.memo(function ProcessingSummaryTable
         const rowCls = "sample-row" + (isProband ? " is-proband" : "");
         const rowCols = columnOrder.map(function(colName){
 
-            /*
-            * Helper f(x) for QM handling; takes in a QM status and returns appropriate icon.
-            */
+            /**
+             * Helper f(x) for QM handling; takes in a QM status and returns appropriate icon.
+             */
             function statusToIcon(status){
                 switch (status) {
                     case "PASS":
@@ -330,9 +361,9 @@ export const ProcessingSummaryTable = React.memo(function ProcessingSummaryTable
                 }
             }
 
-            /*
-            * Helper f(x) for QM handling; takes in a QM status and returns a bootstrap text color class.
-            */
+            /**
+             * Helper f(x) for QM handling; takes in a QM status and returns a bootstrap text color class.
+             */
             function statusToTextClass(status) {
                 switch(status) {
                     case "PASS":
@@ -397,9 +428,10 @@ export const ProcessingSummaryTable = React.memo(function ProcessingSummaryTable
 
                 }
             } else if (colName === "qualityMetric"){
-                const qms = row.qualityMetrics; // { BAM : {} }
-                const renderArr = [];
+                const qms = row.qualityMetrics;
                 const keys = Object.keys(qms); // each key is the qm type, and contains an object as its value
+
+                const renderArr = [];
 
                 const passingBAMQC = qms.BAMQC && (qms.BAMQC.overall === "PASS");
 
@@ -411,7 +443,7 @@ export const ProcessingSummaryTable = React.memo(function ProcessingSummaryTable
                     // if there's a single quality metric, link the item itself
                     if (qms[qmType].items && qms[qmType].items.length <= 1) {
                         renderArr.push(
-                            ( qms[qmType].items[0] ?
+                            qms[qmType].items[0] ?
                                 <span>
                                     <a
                                         href={qms[qmType].items[0].url}
@@ -423,47 +455,35 @@ export const ProcessingSummaryTable = React.memo(function ProcessingSummaryTable
                                         { statusToIcon(qms[qmType].overall) } { qmType }
                                     </a>
                                 </span>
-                                : null )
+                                : null
                         );
                     } else if (qms[qmType].items) {
                         // otherwise create a list with linked #s
                         renderArr.push(
-                            (
-                                <span>
-                                    { statusToIcon(qms[qmType].overall) } { qmType }
-                                        (
-                                    {
-                                        qms[qmType].items.map((qm, i) => (
-                                            <React.Fragment key={`${qms[qmType]}-${i}`}>
-                                                <a
-                                                    href={ qm.url || "" }
-                                                    rel="noopener noreferrer"
-                                                    target="_blank"
-                                                    className={
-                                                        `${statusToTextClass(qm.quality)} qc-status-${qm.status}`
-                                                    }
-                                                    data-tip={`This quality check is ${qm.status}.`}
-                                                >
-                                                    {i + 1}
-                                                </a>
-                                                {
-                                                    // if the last item, don't add a comma
-                                                    (i === qms[qmType].items.length - 1 ?  null : ', ')
-                                                }
-                                            </React.Fragment>
-                                        )
-                                        )
-                                    }
-                            )
-                                </span>
-                            )
+                            <span>
+                                { statusToIcon(qms[qmType].overall) } { qmType }
+                                (   {
+                                    qms[qmType].items.map((qm, i) => (
+                                        <React.Fragment key={`${qms[qmType]}-${i}`}>
+                                            <a href={ qm.url || "" } rel="noopener noreferrer" target="_blank"
+                                                className={`${statusToTextClass(qm.quality)} qc-status-${qm.status}`}
+                                                data-tip={`This quality check is ${qm.status}.`}>
+                                                {i + 1}
+                                            </a>
+                                            { // if the last item, don't add a comma
+                                                (i === qms[qmType].items.length - 1 ?  null : ', ')
+                                            }
+                                        </React.Fragment>
+                                    ))
+                                }   )
+                            </span>
                         );
                     }
                 });
 
                 colVal = (
                     <div className="qcs-container">
-                        { renderArr.map((i) => i) }
+                        { renderArr }
                     </div>
                 );
             }
