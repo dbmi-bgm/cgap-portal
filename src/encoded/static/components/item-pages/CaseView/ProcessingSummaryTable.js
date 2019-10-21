@@ -392,7 +392,13 @@ export const ProcessingSummaryTable = React.memo(function ProcessingSummaryTable
                 const renderArr = [];
                 const keys = Object.keys(qms); // each key is the qm type, and contains an object as its value
 
+                const passingBAMQC = qms.BAMQC && (qms.BAMQC.overall === "PASS");
+
                 keys.forEach((qmType) => {
+                    if (qmType === "BAM" && passingBAMQC) {
+                        return; // skip; don't render BAM
+                    }
+
                     // if there's a single quality metric, link the item itself
                     if (qms[qmType].items && qms[qmType].items.length <= 1) {
                         renderArr.push(
