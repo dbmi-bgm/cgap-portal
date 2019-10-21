@@ -379,8 +379,8 @@ def id_post_and_patch(terms, dbterms, itype, rm_unchanged=True, set_obsoletes=Tr
     '''
     to_update = []
     to_post = []
-    to_patch = 0
-    obsoletes = 0
+    to_patch = {}
+    obsoletes = []
     tid2uuid = {}  # to keep track of existing uuids
     for tid, term in terms.items():
         if tid not in dbterms:
@@ -418,7 +418,7 @@ def id_post_and_patch(terms, dbterms, itype, rm_unchanged=True, set_obsoletes=Tr
         if not term:
             continue
         to_update.append(term)
-        to_patch += 1
+        to_patch[tid] = term
 
     if set_obsoletes:
         # go through db terms and find which aren't in terms and set status
@@ -434,13 +434,12 @@ def id_post_and_patch(terms, dbterms, itype, rm_unchanged=True, set_obsoletes=Tr
                         continue
                 dbuid = term['uuid']
                 # add simple term with only status and uuid to to_patch
-                obsoletes += 1
+                obsoletes.sppend(tid)
                 to_update.append({'status': 'obsolete', 'uuid': dbuid})
                 tid2uuid[term[id_field]] = dbuid
-                to_patch += 1
-    print("Will obsolete {} TERMS".format(obsoletes))
+    print("Will obsolete {} TERMS".format(len(obsoletes)))
     print("{} TERMS ARE NEW".format(len(to_post)))
-    print("{} LIVE TERMS WILL BE PATCHED".format(to_patch - obsoletes))
+    print("{} LIVE TERMS WILL BE PATCHED".format(len(to_patch)))
     return to_update
 
 
