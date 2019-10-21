@@ -444,7 +444,7 @@ export const ProcessingSummaryTable = React.memo(function ProcessingSummaryTable
                     if (qms[qmType].items && qms[qmType].items.length <= 1) {
                         renderArr.push(
                             qms[qmType].items[0] ?
-                                <span className="ellipses">
+                                <span className="ellipses" key={`span-${qms[qmType]}`}>
                                     { statusToIcon(qms[qmType].overall) }
                                     <a
                                         href={qms[qmType].items[0].url}
@@ -461,7 +461,7 @@ export const ProcessingSummaryTable = React.memo(function ProcessingSummaryTable
                     } else if (qms[qmType].items) {
                         // otherwise create a list with linked #s
                         renderArr.push(
-                            <span className="ellipses">
+                            <span className="ellipses" key={`span-multi-${qms[qmType]}`}>
                                 { statusToIcon(qms[qmType].overall) } { qmType }
                                 (   {
                                     qms[qmType].items.map((qm, i) => (
