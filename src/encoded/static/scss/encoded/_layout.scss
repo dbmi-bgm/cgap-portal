@@ -310,25 +310,6 @@ body.is-full-screen {
 	}
 }
 
-/**********
-> Remove nav headers and similar when on currentAction=selection or multiselection
-***********/
-
-body[data-current-action="selection"],
-body[data-current-action="multiselect"] {
-
-	div#layout > div.navbar-container {
-		display: none;
-	}
-
-	@include media-breakpoint-up(lg){
-		div#post-navbar-container {
-			padding-top: 0;
-		}
-	}
-
-}
-
 
 /* *********************************************************
 		FOOTER

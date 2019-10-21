@@ -121,7 +121,7 @@ const SearchViewPageTitle = React.memo(function SearchViewPageTitle(props){
 
     if (currentAction === "selection" || currentAction === "multiselect") {
         return (
-            <PageTitleContainer alerts={alerts}>
+            <PageTitleContainer alerts={alerts} className="container-wide">
                 <TitleAndSubtitleUnder subtitle="Drag and drop Items from this view into other window(s).">
                     Selecting
                 </TitleAndSubtitleUnder>
