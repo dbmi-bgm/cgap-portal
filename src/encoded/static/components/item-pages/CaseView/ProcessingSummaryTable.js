@@ -127,12 +127,27 @@ export const ProcessingSummaryTable = React.memo(function ProcessingSummaryTable
                 });
                 const [ showFile ] = procFilesWPermissions;
 
-                const qualityMetrics = { };
+                const sampleFiles = rawFilesWPermissions.concat(procFilesWPermissions);
 
-                rawFilesWPermissions.concat(procFilesWPermissions).forEach((procFile) => {
-                    const { quality_metric = null } = procFile;
+                const qualityMetrics = { };
+                /*
+                    qualityMetrics = {
+                        <qctype> : {
+                            overall: STRING <PASS|FAIL|WAIL>,
+                            items: ARRAY [
+                                OBJECT {
+                                    url: STRING <url to report, qm item, or qclist item>,
+                                    quality: STRING <PASS|FAIL|WAIL>,
+                                    status: STRING <in review, deleted, current, etc.>
+                                }
+                            ]
+                        }
+                    }
+                */
+
+                sampleFiles.forEach((file) => {
+                    const { quality_metric = null } = file;
                     const {
-                        overall_quality_status = null,
                         qc_list = [],
                         "@type" : typesList = []
                     } = quality_metric || {};
@@ -140,18 +155,31 @@ export const ProcessingSummaryTable = React.memo(function ProcessingSummaryTable
                     if (!quality_metric){
                         return; // Skip
                     }
-                    qualityMetrics.overall = overall_quality_status;
 
                     function itemVisible(status) {
                         switch(status) {
-                            case "in review": // for testing
                             case "deleted":
                             case "obsolete":
                             case "replaced":
-                                // todo: handle these cases with more specificity
                                 return false;
                             default:
                                 return true;
+                        }
+                    }
+
+                    function getShortQMType(longType) {
+                        console.log(longType);
+                        switch(longType) {
+                            case "QualityMetricWgsBamqc":
+                                return "BAMQC";
+                            case "QualityMetricBamcheck":
+                                return "BAM";
+                            case "QualityMetricFastqc":
+                                return "FQC";
+                            case "QualityMetricVcfcheck":
+                                return "VCF";
+                            default:
+                                return "";
                         }
                     }
 
@@ -159,43 +187,54 @@ export const ProcessingSummaryTable = React.memo(function ProcessingSummaryTable
                         const {
                             '@id' : fallbackUrl,
                             url,
-                            'overall_quality_status': status
+                            'overall_quality_status': quality,
+                            status
                         } = qm;
 
-                        switch(qc_type) {
-                            case "QualityMetricWgsBamqc":
-                                qualityMetrics.BAMQC = status;
-                                qualityMetrics.BAMQC_url = url || fallbackUrl;
-                                break;
-                            case "QualityMetricBamcheck":
-                                qualityMetrics.BAM = status;
-                                qualityMetrics.BAM_url = url || fallbackUrl;
-                                break;
-                            case "QualityMetricFastqc":
-                                // todo: once set to pass, update only if new status == warn/fail; change URL to point to container/QClist
-                                qualityMetrics.FQC = status;
-                                qualityMetrics.FQC_url = url || fallbackUrl;
-                                break;
-                            case "QualityMetricVcfcheck":
-                                qualityMetrics.VCF = status;
-                                qualityMetrics.VCF_url = url || fallbackUrl;
-                                break;
-                            default:
-                                break;
+                        const shortType = getShortQMType(qc_type);
+                        if (shortType) {
+                            if (qualityMetrics.hasOwnProperty(shortType)) {
+                                // ensure overall status reflective of current items
+                                const currFailing = quality === "FAIL";
+                                const currWarning = quality === "WARN";
+                                // if current item has a worse status than current overall rating, update to reflect that
+                                if (qualityMetrics[shortType].overall === "PASS" && currFailing ||
+                                    qualityMetrics[shortType].overall === "PASS" && currWarning ||
+                                    qualityMetrics[shortType].overall === "WARN" && currFailing
+                                ) {
+                                    qualityMetrics[shortType].overall = quality;
+                                }
+                                qualityMetrics[shortType].items.push({ url: (url || fallbackUrl), quality, status });
+                            } else {
+                                qualityMetrics[shortType] = {
+                                    overall: quality,
+                                    items: [{
+                                        url: (url || fallbackUrl),
+                                        quality,
+                                        status
+                                    }]
+                                };
+                            }
                         }
                     }
 
                     // determine if qualitymetric container or not, then
                     // check status for each quality item, and update with the appropriate url and status
                     if (typesList[0] === "QualityMetricQclist") { // if qualitymetric container
-                        qc_list.forEach((qcItem) => {
-                            if (itemVisible(qcItem.value.status)) {
-                                setQualityMetrics(qcItem.value["@type"][0], qcItem.value);
-                            }
-                        });
-                    } else if (typesList[1] === "QualityMetric") { // if single (non-container) qualitymetric item
-                        if (itemVisible(procFile.quality_metric.status)) {
-                            setQualityMetrics(procFile.quality_metric["@type"][0], procFile.quality_metric);
+                        console.log("qclist", qc_list);
+                        if (qc_list.length === 1) {
+                            // if there's only one item in the list, just use that data directly, link to the specific item;
+                            setQualityMetrics(qc_list[0].value["@type"][0], qc_list[0].value);
+                        } else {
+                            // if there are multiple items, process each item separately
+                            qc_list.forEach((item) => {
+                                setQualityMetrics(item.value["@type"][0], item.value);
+                            });
+                        }
+                    } else if (typesList[1] === "QualityMetric") {
+                        // if single (non-container) qualitymetric item
+                        if (itemVisible(file.quality_metric.status)) {
+                            setQualityMetrics(file.quality_metric["@type"][0], file.quality_metric);
                         }
                     } else {
                         // todo: are there any legitimate cases in which this will happen?
@@ -329,36 +368,88 @@ export const ProcessingSummaryTable = React.memo(function ProcessingSummaryTable
                             return <i className="icon icon-check fas text-success"/>;
                             break;
                         case "FAIL":
-                            return <i className="icon icon-times fas text-danger"/>;
+                            return <i data-tip="One or more of these files failed quality inspection." className="icon icon-times fas text-danger"/>;
                             break;
                         case "WARN": // todo: what icon makes the most sense here
-                            return <i className="icon icon-exclamation-triangle fas text-warning"/>;
+                            return <i data-tip="One or more of these files has a quality-related warning." className="icon icon-exclamation-triangle fas text-warning"/>;
                             break;
                         default:
                             return null;
                     }
                 }
-               
-                const { BAM, BAM_url, BAMQC, BAMQC_url, VCF, VCF_url, FQC, FQC_url } = row.qualityMetrics;
 
+                function statusToTextClass(status) {
+                    switch(status) {
+                        case "PASS":
+                            return "text-success";
+                        case "FAIL":
+                            return "text-danger";
+                        case "WARN":
+                            return "text-warning";
+                        default:
+                            return null;
+                    }
+                }
+               
+                const qms = row.qualityMetrics; // { BAM : {} }
+                console.log("qms", qms);
+                const renderArr = [];
+                const keys = Object.keys(qms); // each key is the qm type, and contains an object as its value
+                console.log("keys", keys);
+
+                keys.forEach((qmType) => {
+                    // no items marked deleted will show up here
+                    // if (qms[qmType]) {
+                    // if there's a single quality metric, link the item itself
+                    console.log('qmType.items:');
+                    console.log(qms[qmType].items);
+
+                    if (qms[qmType].items && qms[qmType].items.length <= 1) {
+                        renderArr.push(
+                            ( qms[qmType].items[0] ?
+                                <span className={`qc-status-${status}`}>
+                                    <a href={qms[qmType].items[0].url} rel="noopener noreferrer" target="_blank">
+                                        { statusToIcon(qms[qmType].overall) } { qmType }
+                                    </a>
+                                </span>
+                                : null )
+                        );
+                    } else if (qms[qmType].items) {
+                        // otherwise create a list with linked #s
+                        renderArr.push(
+                            (
+                                <span className={`qc-status-${status}`}>
+                                    { statusToIcon(qms[qmType].overall) } { qmType }
+                                        (
+                                    {
+                                        qms[qmType].items.map((qm, i) => (
+                                            <React.Fragment key={`${qms[qmType]}-${i}`}>
+                                                <a
+                                                    href={ qm.url || "" }
+                                                    rel="noopener noreferrer"
+                                                    target="_blank"
+                                                    className={statusToTextClass(qm.quality)}
+                                                >
+                                                    {i + 1}
+                                                </a>
+                                                {
+                                                    // if the last item, don't add a comma
+                                                    (i === qms[qmType].items.length - 1 ?  null : ', ')
+                                                }
+                                            </React.Fragment>
+                                        )
+                                        )}
+                            )
+                                </span>
+                            )
+                        );
+                    }
+                });
+
+                console.log("renderArr", renderArr);
                 colVal = (
                     <div className="qcs-container">
-                        { VCF ?
-                            <span>
-                                <a href={VCF_url} rel="noopener noreferrer" target="_blank"> { statusToIcon(VCF) } VCF</a>
-                            </span> : null }
-                        { (BAMQC !== "PASS" && BAM) || (!BAMQC && BAM) ?
-                            <span>
-                                <a href={BAM_url} rel="noopener noreferrer" target="_blank"> { statusToIcon(BAM) } BAM</a>
-                            </span> : null }
-                        { BAMQC ?
-                            <span>
-                                <a href={BAMQC_url} rel="noopener noreferrer" target="_blank"> { statusToIcon(BAMQC) } BAMQC</a>
-                            </span> : null }
-                        { FQC ?
-                            <span>
-                                <a href={FQC_url} rel="noopener noreferrer" target="_blank"> { statusToIcon(FQC) } FastQC</a>
-                            </span> : null }
+                        { renderArr.map((i) => i ) }
                     </div>
                 );
             }
