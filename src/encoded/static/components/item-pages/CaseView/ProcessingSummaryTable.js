@@ -198,7 +198,7 @@ export const ProcessingSummaryTable = React.memo(function ProcessingSummaryTable
                      * and each value is an object structured as follows:
                      *
                      * {
-                     *  overall: String ('PASS'|'FAIL'|'WARN')], // updated when new items are added to qualityMetrics object
+                     *  overall: String ('PASS'|'FAIL'|'WARN'), // updated when new items are added to qualityMetrics object
                      *  items: Array [
                      *          {
                      *              value: String ('PASS'|'FAIL'|'WARN')
@@ -351,11 +351,11 @@ export const ProcessingSummaryTable = React.memo(function ProcessingSummaryTable
             function statusToIcon(status){
                 switch (status) {
                     case "PASS":
-                        return <i className="icon icon-check fas text-success"/>;
+                        return <i className="icon icon-check fas text-success mr-05"/>;
                     case "FAIL":
-                        return <i data-tip="One or more of these files failed quality inspection." className="icon icon-times fas text-danger"/>;
+                        return <i data-tip="One or more of these files failed quality inspection." className="icon icon-times fas text-danger mr-05"/>;
                     case "WARN": // todo: what icon makes the most sense here
-                        return <i data-tip="One or more of these files has a quality-related warning." className="icon icon-exclamation-triangle fas text-warning"/>;
+                        return <i data-tip="One or more of these files has a quality-related warning." className="icon icon-exclamation-triangle fas text-warning mr-05"/>;
                     default:
                         return null;
                 }
@@ -444,7 +444,8 @@ export const ProcessingSummaryTable = React.memo(function ProcessingSummaryTable
                     if (qms[qmType].items && qms[qmType].items.length <= 1) {
                         renderArr.push(
                             qms[qmType].items[0] ?
-                                <span>
+                                <span className="ellipses">
+                                    { statusToIcon(qms[qmType].overall) }
                                     <a
                                         href={qms[qmType].items[0].url}
                                         rel="noopener noreferrer"
@@ -452,7 +453,7 @@ export const ProcessingSummaryTable = React.memo(function ProcessingSummaryTable
                                         className={`qc-status-${qms[qmType].items[0].status}`}
                                         data-tip={`This quality check is ${qms[qmType].items[0].status}.`}
                                     >
-                                        { statusToIcon(qms[qmType].overall) } { qmType }
+                                        { qmType }
                                     </a>
                                 </span>
                                 : null
@@ -460,7 +461,7 @@ export const ProcessingSummaryTable = React.memo(function ProcessingSummaryTable
                     } else if (qms[qmType].items) {
                         // otherwise create a list with linked #s
                         renderArr.push(
-                            <span>
+                            <span className="ellipses">
                                 { statusToIcon(qms[qmType].overall) } { qmType }
                                 (   {
                                     qms[qmType].items.map((qm, i) => (
@@ -482,7 +483,7 @@ export const ProcessingSummaryTable = React.memo(function ProcessingSummaryTable
                 });
 
                 colVal = (
-                    <div className="qcs-container">
+                    <div className="qcs-container text-ellipsis-container">
                         { renderArr }
                     </div>
                 );

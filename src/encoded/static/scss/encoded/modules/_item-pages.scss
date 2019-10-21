@@ -1783,7 +1783,11 @@ $badge-item-min-height: 90px;
 							}
 						}
 						.qcs-container {
+							&.text-ellipses-container {
+								max-width: 140px;
+							}
 							> span {
+								display: inline-block;
 								border-right: solid 1px #bbb;
 								padding: 0 5px;
 								&:last-child {
