@@ -570,6 +570,10 @@ def parse_args(args):
                         default='s3',
                         help="An access key dictionary including key, secret and server.\
                         {'key'='ABCDEF', 'secret'='supersecret', 'server'='http://fourfront-cgap.9wzadzju3p.us-east-1.elasticbeanstalk.com/'}")
+    parser.add_argument('--load',
+                        action='store_true',
+                        default=False,
+                        help="Default False - use to load data directly from json to the server that the connection refers to")
     return parser.parse_args(args)
 
 
@@ -629,6 +633,10 @@ def main():
         if args.pretty:
             pretty = True
         write_outfile(terms2write, postfile, pretty)
+        if args.load:
+            env = arg.env if args.env else 'local'  # may want to change to use key/secret as option to get env
+            res = load_items(env, items2write, itypes=[itype])
+            print(res)
     stop = datetime.datetime.now()
     print('STARTED: ', str(start))
     print('END: ', str(stop))
