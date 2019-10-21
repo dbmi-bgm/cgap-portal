@@ -190,7 +190,7 @@ export const ProcessingSummaryTable = React.memo(function ProcessingSummaryTable
                             status
                         } = qm;
 
-                        let hyphenatedStatus = status.replace(/\s+/g, "-");
+                        const hyphenatedStatus = status.replace(/\s+/g, "-");
 
                         const shortType = getShortQMType(qc_type);
                         if (shortType && itemVisible(qm.status)) {
@@ -313,6 +313,39 @@ export const ProcessingSummaryTable = React.memo(function ProcessingSummaryTable
         const { isProband = false, sampleIdx } = row;
         const rowCls = "sample-row" + (isProband ? " is-proband" : "");
         const rowCols = columnOrder.map(function(colName){
+
+            /*
+            * Helper f(x) for QM handling; takes in a QM status and returns appropriate icon.
+            */
+            function statusToIcon(status){
+                switch (status) {
+                    case "PASS":
+                        return <i className="icon icon-check fas text-success"/>;
+                    case "FAIL":
+                        return <i data-tip="One or more of these files failed quality inspection." className="icon icon-times fas text-danger"/>;
+                    case "WARN": // todo: what icon makes the most sense here
+                        return <i data-tip="One or more of these files has a quality-related warning." className="icon icon-exclamation-triangle fas text-warning"/>;
+                    default:
+                        return null;
+                }
+            }
+
+            /*
+            * Helper f(x) for QM handling; takes in a QM status and returns a bootstrap text color class.
+            */
+            function statusToTextClass(status) {
+                switch(status) {
+                    case "PASS":
+                        return "";
+                    case "FAIL":
+                        return "text-danger";
+                    case "WARN":
+                        return "text-warning";
+                    default:
+                        return null;
+                }
+            }
+
             let colVal = row[colName] || " - ";
             if (colName === "provenance"){
                 if (colVal){
@@ -364,36 +397,6 @@ export const ProcessingSummaryTable = React.memo(function ProcessingSummaryTable
 
                 }
             } else if (colName === "qualityMetric"){
-
-                function statusToIcon(status){
-                    switch (status) {
-                        case "PASS":
-                            return <i className="icon icon-check fas text-success"/>;
-                            break;
-                        case "FAIL":
-                            return <i data-tip="One or more of these files failed quality inspection." className="icon icon-times fas text-danger"/>;
-                            break;
-                        case "WARN": // todo: what icon makes the most sense here
-                            return <i data-tip="One or more of these files has a quality-related warning." className="icon icon-exclamation-triangle fas text-warning"/>;
-                            break;
-                        default:
-                            return null;
-                    }
-                }
-
-                function statusToTextClass(status) {
-                    switch(status) {
-                        case "PASS":
-                            return "text-success";
-                        case "FAIL":
-                            return "text-danger";
-                        case "WARN":
-                            return "text-warning";
-                        default:
-                            return null;
-                    }
-                }
-               
                 const qms = row.qualityMetrics; // { BAM : {} }
                 const renderArr = [];
                 const keys = Object.keys(qms); // each key is the qm type, and contains an object as its value
@@ -415,6 +418,7 @@ export const ProcessingSummaryTable = React.memo(function ProcessingSummaryTable
                                         rel="noopener noreferrer"
                                         target="_blank"
                                         className={`qc-status-${qms[qmType].items[0].status}`}
+                                        data-tip={`This quality check is ${qms[qmType].items[0].status}.`}
                                     >
                                         { statusToIcon(qms[qmType].overall) } { qmType }
                                     </a>
@@ -436,10 +440,9 @@ export const ProcessingSummaryTable = React.memo(function ProcessingSummaryTable
                                                     rel="noopener noreferrer"
                                                     target="_blank"
                                                     className={
-                                                        statusToTextClass(qm.quality),
-                                                        `qc-status-${qm.status}`
+                                                        `${statusToTextClass(qm.quality)} qc-status-${qm.status}`
                                                     }
-
+                                                    data-tip={`This quality check is ${qm.status}.`}
                                                 >
                                                     {i + 1}
                                                 </a>
@@ -449,7 +452,8 @@ export const ProcessingSummaryTable = React.memo(function ProcessingSummaryTable
                                                 }
                                             </React.Fragment>
                                         )
-                                        )}
+                                        )
+                                    }
                             )
                                 </span>
                             )
