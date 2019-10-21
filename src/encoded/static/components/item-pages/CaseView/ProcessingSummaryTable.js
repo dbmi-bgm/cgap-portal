@@ -168,7 +168,6 @@ export const ProcessingSummaryTable = React.memo(function ProcessingSummaryTable
                     }
 
                     function getShortQMType(longType) {
-                        console.log(longType);
                         switch(longType) {
                             case "QualityMetricWgsBamqc":
                                 return "BAMQC";
@@ -176,8 +175,8 @@ export const ProcessingSummaryTable = React.memo(function ProcessingSummaryTable
                                 return "BAM";
                             case "QualityMetricFastqc":
                                 return "FQC";
-                            case "QualityMetricVcfcheck":
-                                return "VCF";
+                            // case "QualityMetricVcfcheck": // deleted
+                            //     return "VCF";
                             default:
                                 return "";
                         }
@@ -192,7 +191,7 @@ export const ProcessingSummaryTable = React.memo(function ProcessingSummaryTable
                         } = qm;
 
                         const shortType = getShortQMType(qc_type);
-                        if (shortType) {
+                        if (shortType && itemVisible(qm.status)) {
                             if (qualityMetrics.hasOwnProperty(shortType)) {
                                 // ensure overall status reflective of current items
                                 const currFailing = quality === "FAIL";
@@ -220,8 +219,8 @@ export const ProcessingSummaryTable = React.memo(function ProcessingSummaryTable
 
                     // determine if qualitymetric container or not, then
                     // check status for each quality item, and update with the appropriate url and status
-                    if (typesList[0] === "QualityMetricQclist") { // if qualitymetric container
-                        console.log("qclist", qc_list);
+                    if (typesList[0] === "QualityMetricQclist") {
+
                         if (qc_list.length === 1) {
                             // if there's only one item in the list, just use that data directly, link to the specific item;
                             setQualityMetrics(qc_list[0].value["@type"][0], qc_list[0].value);
@@ -233,9 +232,7 @@ export const ProcessingSummaryTable = React.memo(function ProcessingSummaryTable
                         }
                     } else if (typesList[1] === "QualityMetric") {
                         // if single (non-container) qualitymetric item
-                        if (itemVisible(file.quality_metric.status)) {
-                            setQualityMetrics(file.quality_metric["@type"][0], file.quality_metric);
-                        }
+                        setQualityMetrics(file.quality_metric["@type"][0], file.quality_metric);
                     } else {
                         // todo: are there any legitimate cases in which this will happen?
                         console.error('Failure while rendering quality row; type not QualityMetric or QualityMetric container object [ProcessingSummaryTable.js, 193]');
@@ -392,18 +389,11 @@ export const ProcessingSummaryTable = React.memo(function ProcessingSummaryTable
                 }
                
                 const qms = row.qualityMetrics; // { BAM : {} }
-                console.log("qms", qms);
                 const renderArr = [];
                 const keys = Object.keys(qms); // each key is the qm type, and contains an object as its value
-                console.log("keys", keys);
 
                 keys.forEach((qmType) => {
-                    // no items marked deleted will show up here
-                    // if (qms[qmType]) {
                     // if there's a single quality metric, link the item itself
-                    console.log('qmType.items:');
-                    console.log(qms[qmType].items);
-
                     if (qms[qmType].items && qms[qmType].items.length <= 1) {
                         renderArr.push(
                             ( qms[qmType].items[0] ?
@@ -446,10 +436,9 @@ export const ProcessingSummaryTable = React.memo(function ProcessingSummaryTable
                     }
                 });
 
-                console.log("renderArr", renderArr);
                 colVal = (
                     <div className="qcs-container">
-                        { renderArr.map((i) => i ) }
+                        { renderArr.map((i) => i) }
                     </div>
                 );
             }
