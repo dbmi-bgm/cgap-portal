@@ -49,8 +49,8 @@ class Individual(Item):
     ]
 
     # rev = {
-    #     'cases_proband': ('Case', 'proband'),
-    #     'cases_affiliate' : ('Case', 'trio.individual')
+    #     'cohorts_proband': ('Case', 'proband'),
+    #     'cohorts_affiliate' : ('Case', 'trio.individual')
     # }
 
     # @calculated_property(schema={
@@ -63,8 +63,8 @@ class Individual(Item):
     #         "linkTo": "Case"
     #     }
     # })
-    # def cases_proband(self, request):
-    #     return self.rev_link_atids(request, "cases_proband")
+    # def cohorts_proband(self, request):
+    #     return self.rev_link_atids(request, "cohorts_proband")
 
     # @calculated_property(schema={
     #     "title": "Cases (affiliated)",
@@ -76,8 +76,8 @@ class Individual(Item):
     #         "linkTo": "Case"
     #     }
     # })
-    # def cases_affiliate(self, request):
-    #     return self.rev_link_atids(request, "cases_affiliate")
+    # def cohorts_affiliate(self, request):
+    #     return self.rev_link_atids(request, "cohorts_affiliate")
 
     @calculated_property(schema={
         "title": "Display Title",
