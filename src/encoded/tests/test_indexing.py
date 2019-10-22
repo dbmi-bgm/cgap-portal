@@ -87,9 +87,9 @@ def test_indexing_simple(app, testapp, indexer_testapp):
     assert 'indexing_content' in indexing_source
     assert indexing_source['indexing_status'] == 'finished'
     assert indexing_source['indexing_count'] > 0
-    testing_ppp_mappings = es.indices.get_mapping(index=namespaced_ppp)['testing_post_put_patch']
+    testing_ppp_mappings = es.indices.get_mapping(index=namespaced_ppp)[namespaced_ppp]
     assert 'mappings' in testing_ppp_mappings
-    testing_ppp_settings = es.indices.get_settings(index=namespaced_ppp)['testing_post_put_patch']
+    testing_ppp_settings = es.indices.get_settings(index=namespaced_ppp)[namespaced_ppp]
     assert 'settings' in testing_ppp_settings
     # ensure we only have 1 shard for tests
     assert testing_ppp_settings['settings']['index']['number_of_shards'] == '1'
@@ -119,8 +119,8 @@ def test_create_mapping_on_indexing(app, testapp, registry, elasticsearch):
             item_index = es.indices.get(index=namespaced_index)
         except:
             assert False
-        found_index_mapping_emb = item_index[item_type]['mappings'][item_type]['properties']['embedded']
-        found_index_settings = item_index[item_type]['settings']
+        found_index_mapping_emb = item_index[namespaced_index]['mappings'][item_type]['properties']['embedded']
+        found_index_settings = item_index[namespaced_index]['settings']
         assert found_index_mapping_emb
         assert found_index_settings
         # compare the manually created mapping to the one in ES

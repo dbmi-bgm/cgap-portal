@@ -88,7 +88,7 @@ def search(context, request, search_type=None, return_generator=False, forced_ty
     # if doc_type is item, search all indexes by setting es_index to None
     # If multiple, search all specified
     if 'Item' in doc_types:
-        es_index = '_all'
+        es_index = get_namespaced_index(request, '*')
     else:
         es_index = find_index_by_doc_types(request, doc_types, ['Item'])
 
