@@ -34,12 +34,12 @@ export const CollapsedNav = React.memo(function CollapsedNav(props){
 const LeftNavAuthenticated = React.memo(function LeftNavAuthenticated(props){
     const { href, ...passProps } = props;
     const { query = {} } = url.parse(href, true);
-    const isCasesLinkActive = query.type === 'Case';
+    const isCohortsLinkActive = query.type === 'Cohort';
 
     return (
         <Nav className="mr-auto">
-            <Nav.Link key="browse-menu-item" href="/cases/" active={isCasesLinkActive} className="browse-nav-btn">
-                Cases
+            <Nav.Link key="browse-menu-item" href="/cohorts/" active={isCohortsLinkActive} className="browse-nav-btn">
+                Cohorts
             </Nav.Link>
             <HelpNavItem {...props} />
         </Nav>
@@ -52,8 +52,8 @@ const LeftNavGuest = React.memo(function LeftNavGuest(props){
 
     return (
         <Nav className="mr-auto">
-            <a href="/case-studies" className={"nav-link" + (pathname === "/case-studies" ? " active" : "")}>
-                Case Studies
+            <a href="/cohort-studies" className={"nav-link" + (pathname === "/cohort-studies" ? " active" : "")}>
+                Cohort Studies
             </a>
             <HelpNavItem {...props} />
             <a href="/about" className={"nav-link" + (pathname === "/about" ? " active" : "")}>
