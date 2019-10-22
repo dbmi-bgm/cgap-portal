@@ -421,7 +421,7 @@ export const ProcessingSummaryTable = React.memo(function ProcessingSummaryTable
                         colVal = (
                             <React.Fragment>
                                 <a href={fileID}>{ display_title }</a>
-                                { "+ " + ( filesWPermissionsLen - 1 ) + " more" }
+                                { " + " + ( filesWPermissionsLen - 1 ) + " more" }
                             </React.Fragment>
                         );
                     }
