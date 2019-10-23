@@ -3159,8 +3159,15 @@ module.exports = {
                 "type": "string"
             },
             "ethnicity": {
-                "title": "Ethnicity",
-                "type": "array"
+                "title": "Ethnicities",
+                "type": "array",
+                "uniqueItems": true,
+                "default": [],
+                "items": {
+                    "title": "Ethnicity",
+                    "description": "Ancestry",
+                    "type": "string"
+                },
             },
             "age": {
                 "type": "string",
