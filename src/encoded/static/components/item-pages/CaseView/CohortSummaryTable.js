@@ -23,52 +23,55 @@ export const CohortSummaryTable = React.memo(function CohortSummaryTable(props){
     }
 
     const columnOrder = [
-        "individual",
         "sample",
-        "rawFileCount",
-        "provenance",
-        //"processedFileCount",
+        "individual",
+        "visitInfo",
+        "sampleInfo",
+        "workupType",
+        "rawFiles",
+        "processingType",
         "processedFiles",
-        "qualityMetric",
-        "sampleStatus"
+        "variants"
     ];
 
     const columnTitles = {
+        'sample' : (
+            <React.Fragment>
+                <i className="icon icon-fw icon-vial fas mr-05 align-middle"/>
+                Sample ID
+            </React.Fragment>
+        ),
         'individual' : (
             <React.Fragment>
                 <i className="icon icon-fw icon-user fas mr-05 align-middle"/>
                 Individual
             </React.Fragment>
         ),
-        'sample' : (
+        'visitInfo' : (
             <React.Fragment>
-                <i className="icon icon-fw icon-vial fas mr-05 align-middle"/>
-                Sample
+                <i className="icon icon-fw icon-clinic-medical fas mr-05 align-middle"/>
+                Visit Info
             </React.Fragment>
         ),
-        'processedFileCount' : "Processed Files",
-        'processedFiles' : (
+        'sampleInfo' : "Sample Type",
+        'workupType' : "Workup Type",
+        'rawFiles' : (
             <React.Fragment>
                 <i className="icon icon-fw icon-file-code fas mr-05 align-middle"/>
-                Output File(s)
+                Raw Files
             </React.Fragment>
         ),
-        'provenance' : (
-            <i className="icon icon-fw icon-sitemap icon-rotate-90 fas align-middle"
-                data-tip="Link to provenance graph" />
-        ),
-        'rawFileCount' : (
+        'processingType' : "Processing Type",
+        'processedFiles' : (
             <React.Fragment>
-                <i className="icon icon-fw icon-file-upload fas align-middle"
-                    data-tip="Raw Files"/>
-                <span className="d-none d-lg-inline ml-05">Raw Files</span>
+                <i className="icon icon-fw icon-file-medical-alt fas mr-05 align-middle"/>
+                Processed File(s)
             </React.Fragment>
         ),
-        'sampleStatus' : "Sample Status",
-        'qualityMetric' : (
+        'variants' : (
             <React.Fragment>
-                <i className="icon icon-fw icon-award fas mr-05 align-middle"/>
-                Quality
+                <i className="icon icon-fw icon-file-upload fas align-middle" />
+                <span className="d-none d-lg-inline ml-05">Variants (single)</span>
             </React.Fragment>
         )
     };
