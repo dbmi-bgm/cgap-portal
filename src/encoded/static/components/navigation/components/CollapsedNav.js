@@ -52,8 +52,8 @@ const LeftNavGuest = React.memo(function LeftNavGuest(props){
 
     return (
         <Nav className="mr-auto">
-            <a href="/cohort-studies" className={"nav-link" + (pathname === "/cohort-studies" ? " active" : "")}>
-                Cohort Studies
+            <a href="/case-studies" className={"nav-link" + (pathname === "/cohort-studies" ? " active" : "")}>
+                Case Studies
             </a>
             <HelpNavItem {...props} />
             <a href="/about" className={"nav-link" + (pathname === "/about" ? " active" : "")}>
