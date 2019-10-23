@@ -3160,7 +3160,7 @@ module.exports = {
             },
             "ethnicity": {
                 "title": "Ethnicity",
-                "type": "string"
+                "type": "array"
             },
             "age": {
                 "type": "string",

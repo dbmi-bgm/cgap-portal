@@ -173,20 +173,25 @@
             "type" : "string"
         },
         "ethnicity": {
-            "title": "Ethnicity",
+            "title": "Ethnicites",
             "description": "Ethnicity of the individual. Can use a suggested or custom value",
-            "type": "string",
-            "suggested_enum": [
-                "Asian",
-                "Black",
-                "Hispanic",
-                "Indian",
-                "Middle Eastern",
-                "Native American",
-                "Pacific Islander",
-                "Caucasian",
-                "Other"
-            ]
+            "type": "array",
+            "uniqueItems": true,
+            "items": {
+                "title": "Ethnicity",
+                "type" : "string",
+                "suggested_enum": [
+                    "Asian",
+                    "Black",
+                    "Hispanic",
+                    "Indian",
+                    "Middle Eastern",
+                    "Native American",
+                    "Pacific Islander",
+                    "Caucasian",
+                    "Other"
+                ]
+            }
         },
         "images" : {
             "title" : "Images",
