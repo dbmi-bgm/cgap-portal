@@ -15,6 +15,7 @@ import DefaultItemView from './../DefaultItemView';
 import { PedigreeDetailPane } from './../components/PedigreeDetailPane';
 import { store } from './../../../store';
 
+import { CohortSummaryTable } from './CohortSummaryTable';
 import { ProcessingSummaryTable } from './ProcessingSummaryTable';
 import { PedigreeTabViewBody } from './PedigreeTabViewBody';
 import { PedigreeFullScreenBtn } from './PedigreeFullScreenBtn';
@@ -22,6 +23,7 @@ import { parseFamilyIntoDataset, gatherPhenotypicFeatureItems } from './family-p
 import { AttachmentInputController, AttachmentInputMenuOption } from './attachment-input';
 
 export {
+    CohortSummaryTable,
     ProcessingSummaryTable,
     PedigreeTabViewBody,
     PedigreeFullScreenBtn,
@@ -122,6 +124,14 @@ export default class CaseView extends DefaultItemView {
         const familiesLen = pedigreeFamilies.length;
         const initTabs = [];
 
+        if (familiesLen > 0) {
+            initTabs.push(CohortSummaryTabView.getTabObject({
+                ...this.props,
+                ...this.state, // pedigreeFamilies & pedigreeFamiliesIdx
+                handleFamilySelect: this.handleFamilySelect
+            }));
+        }
+
         if (familiesLen > 0){
             // Remove this outer if condition if wanna show disabled '0 Pedigrees' tab instead
 
@@ -162,6 +172,51 @@ export default class CaseView extends DefaultItemView {
     }
 }
 
+const CohortSummaryTabView = React.memo(function CohortSummaryTabView(props){
+    const { pedigreeFamilies: families = [] } = props;
+    const familiesLen = families.length;
+    return (
+        <div className="container-wide">
+            <h3 className="tab-section-title">
+                <span>Cohort Summary</span>
+            </h3>
+            <hr className="tab-section-title-horiz-divider"/>
+            {
+                families.map(function(family, idx){
+                    const { original_pedigree: { display_title: pedFileName } = {} } = family;
+                    const cls = "summary-table-container family-index-" + idx;
+                    const title = familiesLen === 1 ? null : (
+                        <h4>
+                            { "Family " + (idx + 1) }
+                            { pedFileName ? <span className="text-300">{ " (" + pedFileName + ")" }</span> : null }
+                        </h4>
+                    );
+                    return (
+                        <div className={cls} key={idx}>
+                            { title }
+                            <CohortSummaryTable {...family} idx={idx} />
+                        </div>
+                    );
+                })
+            }
+        </div>
+    );
+});
+CohortSummaryTabView.getTabObject = function(props){
+    const { pedigreeFamilies: families = [] } = props;
+    const familiesLen = families.length;
+    return {
+        'tab' : (
+            <React.Fragment>
+                <i className="icon icon-cogs fas icon-fw"/>
+                <span>Cohort Summary</span>
+            </React.Fragment>
+        ),
+        'key' : 'cohort-summary',
+        'disabled' : familiesLen === 0,
+        'content' : <CohortSummaryTabView {...props} />
+    };
+};
 
 
 const ProcessingSummaryTabView = React.memo(function ProcessingSummaryTabView(props){
