@@ -154,7 +154,7 @@ export default class CaseView extends DefaultItemView {
 
         }
 
-        return this.getCommonTabs().concat(initTabs);
+        return initTabs.concat(this.getCommonTabs());
     }
 
     /** Render additional item actions */
