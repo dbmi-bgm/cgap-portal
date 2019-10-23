@@ -20,7 +20,7 @@ import ReleaseUpdates           from './static-pages/ReleaseUpdates';
 
 
 import DefaultItemView          from './item-pages/DefaultItemView';
-import CohortView                 from './item-pages/CohortView';
+import CohortView               from './item-pages/CohortView';
 import IndividualView           from './item-pages/IndividualView';
 import FileProcessedView        from './item-pages/FileProcessedView';
 import SampleView               from './item-pages/SampleView';
