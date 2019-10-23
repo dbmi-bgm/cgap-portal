@@ -49,31 +49,31 @@ class Individual(Item):
     ]
 
     # rev = {
-    #     'cohorts_proband': ('Case', 'proband'),
-    #     'cohorts_affiliate' : ('Case', 'trio.individual')
+    #     'cohorts_proband': ('Cohort', 'proband'),
+    #     'cohorts_affiliate' : ('Cohort', 'trio.individual')
     # }
 
     # @calculated_property(schema={
-    #     "title": "Cases (proband)",
-    #     "description": "Cases that this individual is a proband of",
+    #     "title": "Cohorts (proband)",
+    #     "description": "Cohorts that this individual is a proband of",
     #     "type": "array",
     #     "items": {
-    #         "title": "Case",
+    #         "title": "Cohort",
     #         "type": "string",
-    #         "linkTo": "Case"
+    #         "linkTo": "Cohort"
     #     }
     # })
     # def cohorts_proband(self, request):
     #     return self.rev_link_atids(request, "cohorts_proband")
 
     # @calculated_property(schema={
-    #     "title": "Cases (affiliated)",
-    #     "description": "Cases that this individual is affiliated with",
+    #     "title": "Cohorts (affiliated)",
+    #     "description": "Cohorts that this individual is affiliated with",
     #     "type": "array",
     #     "items": {
-    #         "title": "Case",
+    #         "title": "Cohort",
     #         "type": "string",
-    #         "linkTo": "Case"
+    #         "linkTo": "Cohort"
     #     }
     # })
     # def cohorts_affiliate(self, request):
