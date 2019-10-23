@@ -557,13 +557,20 @@ export class PedigreeVizView extends React.PureComponent {
 
 
 const ShapesLayer = React.memo(function ShapesLayer(props){
-    const { graphHeight, graphWidth } = props;
+    const { graphHeight, graphWidth, objectGraph } = props;
     const svgStyle = { width: graphWidth, height: graphHeight };
+    console.log("objectGraph", objectGraph);
+    const maxHeightIndex = objectGraph.reduce(function(m,v){
+        console.log("m", m);
+        console.log("v", v);
+
+        return Math.max(m, v);
+    }, 0);
     return (
         <svg className="shapes-layer" viewBox={"0 0 " + graphWidth + " " + graphHeight} style={svgStyle}>
             <EdgesLayer {...props} />
             <SelectedNodeIdentifier {...props} />
-            <IndividualNodeShapeLayer {...props} />
+            <IndividualNodeShapeLayer {...props} maxHeightIndex={maxHeightIndex} />
         </svg>
     );
 });
