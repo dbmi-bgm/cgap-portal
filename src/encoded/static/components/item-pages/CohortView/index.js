@@ -1,4 +1,4 @@
-'use strict';
+Cohort'use strict';
 
 import React from 'react';
 import PropTypes from 'prop-types';
@@ -29,7 +29,7 @@ export {
 };
 
 
-export default class CaseView extends DefaultItemView {
+export default class CohortView extends DefaultItemView {
 
     static haveFullViewPermissionForFamily(family){
         const { original_pedigree = null, proband = null, members = [] } = family;
@@ -55,7 +55,7 @@ export default class CaseView extends DefaultItemView {
         super(props);
         this.onAddedFamily = this.onAddedFamily.bind(this);
         this.handleFamilySelect = this.handleFamilySelect.bind(this);
-        const pedigreeFamilies = (props.context.families || []).filter(CaseView.haveFullViewPermissionForFamily);
+        const pedigreeFamilies = (props.context.families || []).filter(CohortView.haveFullViewPermissionForFamily);
         const familiesLen = pedigreeFamilies.length;
         this.state = {
             ...this.state,
@@ -67,7 +67,7 @@ export default class CaseView extends DefaultItemView {
     componentDidUpdate(pastProps, pastState){
         const { context } = this.props;
         if (pastProps.context !== context){
-            const pedigreeFamilies = (context.families || []).filter(CaseView.haveFullViewPermissionForFamily);
+            const pedigreeFamilies = (context.families || []).filter(CohortView.haveFullViewPermissionForFamily);
             const familiesLen = pedigreeFamilies.length;
             this.setState({
                 pedigreeFamilies,
@@ -212,8 +212,8 @@ ProcessingSummaryTabView.getTabObject = function(props){
 
 
 /**
- * TabView that shows Pedigree(s) of Case families.
- * Specific to CaseView.
+ * TabView that shows Pedigree(s) of Cohort families.
+ * Specific to CohortView.
  *
  * @todo Separate zoom logic into a ZoomController component.
  * @todo Create better zoom stuff/ui.
@@ -236,9 +236,9 @@ class PedigreeTabView extends React.PureComponent {
         };
     }
 
-    static getPhenotypicFeatureStrings(case_phenotypic_features = []){
+    static getPhenotypicFeatureStrings(cohort_phenotypic_features = []){
         const strings = [];
-        case_phenotypic_features.forEach(function(feature){
+        cohort_phenotypic_features.forEach(function(feature){
             if (typeof feature === 'string') return feature;
             const { '@id' : featureID, display_title } = feature;
             if (!featureID) return;
@@ -265,22 +265,22 @@ class PedigreeTabView extends React.PureComponent {
             throw new Error("Expected props.context.families to be a non-empty Array.");
         }
 
-        const { case_phenotypic_features = [] } = props.context;
+        const { cohort_phenotypic_features = [] } = props.context;
 
         this.state = {
             showAllDiseases : false,
             showAsDiseases: "Phenotypic Features", // todo - enum
             showOrderBasedName: true,
             scale: 1,
-            selectedDiseases: this.memoized.getPhenotypicFeatureStrings(case_phenotypic_features)
+            selectedDiseases: this.memoized.getPhenotypicFeatureStrings(cohort_phenotypic_features)
         };
 
         this.tabViewRef = React.createRef();
     }
 
     componentDidUpdate(pastProps){
-        const { context: { case_phenotypic_features: currFeatures = [] } } = this.props;
-        const { context: { case_phenotypic_features: prevFeatures = [] } } = pastProps;
+        const { context: { cohort_phenotypic_features: currFeatures = [] } } = this.props;
+        const { context: { cohort_phenotypic_features: prevFeatures = [] } } = pastProps;
         if (currFeatures !== prevFeatures){
             const isEqual = currFeatures.length === prevFeatures.length && (
                 _.every(currFeatures, function(feature, idx){
@@ -337,7 +337,7 @@ class PedigreeTabView extends React.PureComponent {
         let showAsDiseases;
         if (nextShowAllDiseases){ // = "All ..."
             showAsDiseases = key.slice(4);
-        } else { // = "Case ..."
+        } else { // = "Cohort ..."
             showAsDiseases = key.slice(5);
         }
         this.setState({
@@ -384,11 +384,11 @@ class PedigreeTabView extends React.PureComponent {
             handleFamilySelect, pedigreeFamiliesIdx, pedigreeFamilies: families = []
         } = this.props;
         const { showAllDiseases, showAsDiseases, showOrderBasedName, scale, selectedDiseases } = this.state;
-        const { case_phenotypic_features = [] } = context;
+        const { cohort_phenotypic_features = [] } = context;
 
         const currentFamily = families[pedigreeFamiliesIdx];
 
-        //const phenotypicFeatureStrings = showAllDiseases ? null : this.memoized.getPhenotypicFeatureStrings(case_phenotypic_features);
+        //const phenotypicFeatureStrings = showAllDiseases ? null : this.memoized.getPhenotypicFeatureStrings(cohort_phenotypic_features);
 
         const dataset = this.memoized.parseFamilyIntoDataset(currentFamily);
         const visibleDiseases = !showAllDiseases && Array.isArray(selectedDiseases) ? selectedDiseases : undefined;
@@ -504,12 +504,12 @@ const FamilySelectionDropdown = React.memo(function FamilySelectionDropdown(prop
 /* DEPRECATED COMPONENTS */
 
 // const ShowAsDiseasesDropdown = React.memo(function ShowAsDiseasesDropdown({ showAsDiseases, onSelect, showAllDiseases }){
-//     const title = (showAllDiseases ? "All " : "Case ") + showAsDiseases;
+//     const title = (showAllDiseases ? "All " : "Cohort ") + showAsDiseases;
 //     return (
 //         <DropdownButton className="ml-05" onSelect={onSelect} title={title} variant="outline-dark" alignRight>
-//             <DropdownItem active={!showAllDiseases && showAsDiseases === "Phenotypic Features"} eventKey="Case Phenotypic Features">Case Phenotypic Features</DropdownItem>
+//             <DropdownItem active={!showAllDiseases && showAsDiseases === "Phenotypic Features"} eventKey="Cohort Phenotypic Features">Cohort Phenotypic Features</DropdownItem>
 //             <DropdownItem active={showAllDiseases && showAsDiseases === "Phenotypic Features"} eventKey="All Phenotypic Features">All Phenotypic Features</DropdownItem>
-//             <DropdownItem active={!showAllDiseases && showAsDiseases === "Disorders"} disabled eventKey="Case Disorders">Case Disorders</DropdownItem>
+//             <DropdownItem active={!showAllDiseases && showAsDiseases === "Disorders"} disabled eventKey="Cohort Disorders">Cohort Disorders</DropdownItem>
 //             <DropdownItem active={showAllDiseases && showAsDiseases === "Disorders"} disabled eventKey="All Disorders">All Disorders</DropdownItem>
 //         </DropdownButton>
 //     );
