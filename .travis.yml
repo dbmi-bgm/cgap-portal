@@ -1,5 +1,7 @@
 language: python
 sudo: true
+python:
+  - "3.4"
 if: tag IS blank
 cache:
   directories:
