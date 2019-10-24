@@ -4,6 +4,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import memoize from 'memoize-one';
 import { Schemas } from './../../util';
+import { patchedConsoleInstance } from '@hms-dbmi-bgm/shared-portal-components/es/components/util/patched-console';
 
 
 /** @param {Object} props - Contents of a family sub-embedded object. */
@@ -108,8 +109,8 @@ export const CohortSummaryTable = React.memo(function CohortSummaryTable(props){
                 '@id' : sampleID,
                 display_title: sampleTitle,
                 error: sampleErr = null,
-                processed_files = [],
                 files = [],
+                processed_files = [],
                 status: sampleStatus
             } = sample;
 
@@ -131,7 +132,8 @@ export const CohortSummaryTable = React.memo(function CohortSummaryTable(props){
                 const [ showFile ] = procFilesWPermissions;
 
                 const sampleFiles = rawFilesWPermissions.concat(procFilesWPermissions);
-
+                const processedFiles = { };
+                const rawFiles = { };
                 const qualityMetrics = { };
                 /*
                     qualityMetrics = {
@@ -139,17 +141,23 @@ export const CohortSummaryTable = React.memo(function CohortSummaryTable(props){
                             overall: STRING <PASS|FAIL|WAIL>,
                             items: ARRAY [
                                 OBJECT {
-                                    url: STRING <url to report, qm item, or qclist item>,
+                                    fileUrl: String <url to file>
+                                    qcUrl: STRING <url to report, qm item, or qclist item>,
                                     quality: STRING <PASS|FAIL|WAIL>,
-                                    status: STRING <in review, deleted, current, etc.>
+                                    qcStatus: STRING <in review, deleted, current, etc.>
                                 }
                             ]
                         }
                     }
                 */
+                // rawFilesWPermissions.forEach((file) => {
 
-                sampleFiles.forEach((file) => {
-                    const { quality_metric = null } = file;
+                // });
+                procFilesWPermissions.forEach((file) => {
+                    const {
+                        quality_metric = null,
+                        "@id": fileUrl,
+                    } = file;
                     const {
                         qc_list = [],
                         "@type" : typesList = []
@@ -193,6 +201,8 @@ export const CohortSummaryTable = React.memo(function CohortSummaryTable(props){
                         }
                     }
 
+
+
                     /**
                      * Helper f(x) for QM handling; takes in a QM type (usually from ['@type'][0]) and a single
                      * (non-container) QM item. Either adds or updates key-value pairs in qualityMetrics object defined above.
@@ -200,26 +210,30 @@ export const CohortSummaryTable = React.memo(function CohortSummaryTable(props){
                      * Adds as the key a shortQMType ('BAMQC' instead of 'QualityMetricWgsBamqc') of the passed in QM
                      * and each value is an object structured as follows:
                      *
-                     * {
-                     *  overall: String ('PASS'|'FAIL'|'WARN'), // updated when new items are added to qualityMetrics object
-                     *  items: Array [
-                     *          {
-                     *              value: String ('PASS'|'FAIL'|'WARN')
-                     *              status: String ('Current'|'In-Review'... etc.) // Will not be added if status is deleted
-                     *              url: String (URL of a QualityMetric item or a link to its view page)
-                     *          }
-                     *      ]
+                     *
+                     *  {
+                     *  <file extension> : {
+                     *      overallQuality: String,
+                     *           files: Array[
+                     *               quality: String,
+                     *               qmUrl: String,
+                     *               fileStatus: Status,
+                     *               fileUrl: String,
+                     *           ]
+                     *      }
                      *  }
+                     *
                      *
                      * If this object already exists, then new items are added to the items Array, and the overall value
                      * is updated (if new item has a worse status than current overall rating).
                      *
                      * Returns undefined.
                      */
-                    function setQualityMetrics(qc_type, qm) {
+                    function setFileData(fileUrl, qc_type, qm) {
+                        console.log('log: setting file data');
                         const {
-                            '@id' : fallbackUrl,
-                            url,
+                            '@id' : fallbackQMUrl,
+                            url : qmUrl,
                             'overall_quality_status': quality,
                             status
                         } = qm;
@@ -228,51 +242,54 @@ export const CohortSummaryTable = React.memo(function CohortSummaryTable(props){
 
                         const shortType = getShortQMType(qc_type);
                         if (shortType && itemVisible(qm.status)) {
-                            if (qualityMetrics.hasOwnProperty(shortType)) {
+                            if (processedFiles.hasOwnProperty(shortType)) {
                                 // ensure overall status reflective of current items
                                 const currFailing = quality === "FAIL";
                                 const currWarning = quality === "WARN";
                                 // if current item has a worse status than current overall rating, update to reflect that
-                                if (qualityMetrics[shortType].overall === "PASS" && currFailing ||
-                                    qualityMetrics[shortType].overall === "PASS" && currWarning ||
-                                    qualityMetrics[shortType].overall === "WARN" && currFailing
+                                if (processedFiles[shortType].overall === "PASS" && currFailing ||
+                                    processedFiles[shortType].overall === "PASS" && currWarning ||
+                                    processedFiles[shortType].overall === "WARN" && currFailing
                                 ) {
-                                    qualityMetrics[shortType].overall = quality;
+                                    processedFiles[shortType].overall = quality;
                                 }
-                                qualityMetrics[shortType].items.push({
-                                    url: (url || fallbackUrl),
+                                processedFiles[shortType].items.push({
+                                    qmUrl: qmUrl || fallbackQMUrl,
                                     quality,
-                                    status: hyphenatedStatus
+                                    status: hyphenatedStatus,
+                                    fileUrl
                                 });
                             } else {
-                                qualityMetrics[shortType] = {
+                                processedFiles[shortType] = {
                                     overall: quality,
                                     items: [{
-                                        url: (url || fallbackUrl),
+                                        qmUrl: qmUrl || fallbackQMUrl,
                                         quality,
-                                        status: hyphenatedStatus
+                                        status: hyphenatedStatus,
+                                        fileUrl
                                     }]
                                 };
                             }
                         }
+                        console.log("log: finished setting metric", processedFiles);
                     }
 
+                    console.log("log: checking if qmetric");
                     // determine if qualitymetric container or not, then
                     // check status for each quality item, and update with the appropriate url and status
                     if (typesList[0] === "QualityMetricQclist") {
-
                         if (qc_list.length === 1) {
                             // if there's only one item in the list, just use that data directly, link to the specific item;
-                            setQualityMetrics(qc_list[0].value["@type"][0], qc_list[0].value);
+                            setFileData(fileUrl, qc_list[0].value["@type"][0], qc_list[0].value);
                         } else {
                             // if there are multiple items, process each item separately
                             qc_list.forEach((item) => {
-                                setQualityMetrics(item.value["@type"][0], item.value);
+                                setFileData(fileUrl, item.value["@type"][0], item.value);
                             });
                         }
                     } else if (typesList[1] === "QualityMetric") {
                         // if single (non-container) qualitymetric item
-                        setQualityMetrics(file.quality_metric["@type"][0], file.quality_metric);
+                        setFileData(fileUrl, file.quality_metric["@type"][0], file.quality_metric);
                     } else {
                         // todo: are there any legitimate cases in which this will happen?
                         console.error('Failure while rendering quality row; type not QualityMetric or QualityMetric container object');
@@ -281,15 +298,10 @@ export const CohortSummaryTable = React.memo(function CohortSummaryTable(props){
 
 
                 rows.push({
+                    sample: <a href={sampleID} className="accession">{ sampleTitle }</a>,
                     individual : indvLink,
                     isProband,
-                    sample: <a href={sampleID} className="accession">{ sampleTitle }</a>,
-                    processedFileCount: processed_files.length,
-                    processedFiles: processed_files,
-                    provenance: (
-                        showFile && Array.isArray(showFile.workflow_run_outputs) && showFile.workflow_run_outputs.length > 0 ?
-                            showFile['@id'] + "#provenance" : null
-                    ),
+                    processedFiles,
                     rawFileCount: files.length,
                     sampleIdx,
                     qualityMetrics,
@@ -300,6 +312,7 @@ export const CohortSummaryTable = React.memo(function CohortSummaryTable(props){
                         </span>
                     )
                 });
+                console.log("log: done setting processedFiles: ", processedFiles);
             }
         });
 
@@ -381,101 +394,98 @@ export const CohortSummaryTable = React.memo(function CohortSummaryTable(props){
             }
 
             let colVal = row[colName] || " - ";
-            if (colName === "provenance"){
-                if (colVal){
-                    colVal = (
-                        <a href={colVal}>
-                            <i className="icon icon-fw icon-sitemap icon-rotate-90 fas"/>
-                        </a>
-                    );
-                } else {
-                    colVal = (
-                        <i className="icon icon-fw icon-ban"/>
-                    );
-                }
-            }
-            else if (colName === "processedFiles"){
-                const filesWPermissions = row[colName].filter(function(file){
-                    return file['@id'] && file.display_title;
-                });
-                const filesWPermissionsLen = filesWPermissions.length;
-                if (filesWPermissionsLen === 0){
-                    colVal = " - ";
-                } else {
-                    const [ showFile  ] = filesWPermissions;
-                    const { '@id' : fileID, display_title } = showFile;
-                    /*
-                    let provenanceGraphIcon;
-                    if (Array.isArray(workflow_run_outputs) && workflow_run_outputs.length > 0){
-                        provenanceGraphIcon = (
-                            <div className="col-auto" data-tip="See Provenance Graph">
-                                <a href={fileID + "#provenance"}>
-                                    <i className="icon icon-fw icon-sitemap icon-rotate-90 fas"/>
-                                </a>
-                            </div>
-                        );
-                    }
-                    */
-                    if (filesWPermissionsLen === 1){
-                        colVal = (
-                            <a href={fileID}>{ display_title }</a>
-                        );
-                    } else {
-                        colVal = (
-                            <React.Fragment>
-                                <a href={fileID}>{ display_title }</a>
-                                { " + " + ( filesWPermissionsLen - 1 ) + " more" }
-                            </React.Fragment>
-                        );
-                    }
+            // if (colName === "rawFiles"){
+            //     const filesWPermissions = row[colName].filter(function(file){
+            //         return file['@id'] && file.display_title;
+            //     });
+            //     const filesWPermissionsLen = filesWPermissions.length;
+            //     if (filesWPermissionsLen === 0){
+            //         colVal = " - ";
+            //     } else {
+            //         const [ showFile  ] = filesWPermissions;
+            //         const { '@id' : fileID, display_title } = showFile;
+            //         /*
+            //         let provenanceGraphIcon;
+            //         if (Array.isArray(workflow_run_outputs) && workflow_run_outputs.length > 0){
+            //             provenanceGraphIcon = (
+            //                 <div className="col-auto" data-tip="See Provenance Graph">
+            //                     <a href={fileID + "#provenance"}>
+            //                         <i className="icon icon-fw icon-sitemap icon-rotate-90 fas"/>
+            //                     </a>
+            //                 </div>
+            //             );
+            //         }
+            //         */
+            //         if (filesWPermissionsLen === 1){
+            //             colVal = (
+            //                 <a href={fileID}>{ display_title }</a>
+            //             );
+            //         } else {
+            //             colVal = (
+            //                 <React.Fragment>
+            //                     <a href={fileID}>{ display_title }</a>
+            //                     { " + " + ( filesWPermissionsLen - 1 ) + " more" }
+            //                 </React.Fragment>
+            //             );
+            //         }
 
-                }
-            } else if (colName === "qualityMetric"){
-                const qms = row.qualityMetrics;
-                const keys = Object.keys(qms); // each key is the qm type, and contains an object as its value
-
+            //     }
+            if (colName === "processedFiles"){
+                const fileData = row.processedFiles;
+                const extensions = Object.keys(fileData);
                 const renderArr = [];
 
-                const passingBAMQC = qms.BAMQC && (qms.BAMQC.overall === "PASS");
-
-                keys.forEach((qmType) => {
-                    if (qmType === "BAM" && passingBAMQC) {
-                        return; // skip; don't render BAM
-                    }
-
+                console.log("log2: fileData, ", fileData);
+                extensions.forEach((ext) => {
+                    const { items: files, overall: overallQuality } = fileData[ext];
+                    console.log("log2: ext, ", ext);
+                    console.log("log2: , files", files);
+                    console.log("log2: , overallQuality", overallQuality);
                     // if there's a single quality metric, link the item itself
-                    if (qms[qmType].items && qms[qmType].items.length <= 1) {
+                    if (files && files.length <= 1) {
                         renderArr.push(
-                            qms[qmType].items[0] ?
-                                <span className="ellipses" key={`span-${qms[qmType]}`}>
-                                    { statusToIcon(qms[qmType].overall) }
+                            files[0] ?
+                                <span className="ellipses" key={`span-${ext}`}>
+                                    { statusToIcon(overallQuality) }
                                     <a
-                                        href={qms[qmType].items[0].url}
+                                        href={files[0].fileUrl || ""}
                                         rel="noopener noreferrer"
                                         target="_blank"
-                                        className={`qc-status-${qms[qmType].items[0].status}`}
-                                        data-tip={`This quality check is ${qms[qmType].items[0].status}.`}
                                     >
-                                        { qmType }
+                                        { ext.toUpperCase() }
+                                    </a>
+                                    <a
+                                        href={files[0].qmUrl || ""}
+                                        rel="noopener noreferrer"
+                                        target="_blank"
+                                        className={`qc-status-${statusToTextClass(overallQuality)} qc-subscript`}
+                                    >
+                                        QC
                                     </a>
                                 </span>
                                 : null
                         );
-                    } else if (qms[qmType].items) {
-                        // otherwise create a list with linked #s
+                    } else if (files) { // otherwise create a list with linked #s
                         renderArr.push(
-                            <span className="ellipses" key={`span-multi-${qms[qmType]}`}>
-                                { statusToIcon(qms[qmType].overall) } { qmType }
+                            <span className="ellipses" key={`span-multi-${ext}`}>
+                                { statusToIcon(overallQuality) } { ext.toUpperCase() }
                                 (   {
-                                    qms[qmType].items.map((qm, i) => (
-                                        <React.Fragment key={`${qms[qmType]}-${i}`}>
-                                            <a href={ qm.url || "" } rel="noopener noreferrer" target="_blank"
-                                                className={`${statusToTextClass(qm.quality)} qc-status-${qm.status}`}
-                                                data-tip={`This quality check is ${qm.status}.`}>
+                                    files.map((file, i) => (
+                                        <React.Fragment key={`${ext}-${file.fileUrl}`}>
+                                            <a href={ file.fileUrl || "" } rel="noopener noreferrer" target="_blank"
+                                                className={`${statusToTextClass(file.quality)} qc-status-${file.status}`}>
                                                 {i + 1}
                                             </a>
+                                            <a
+                                                href={file.qmUrl || ""}
+                                                rel="noopener noreferrer"
+                                                target="_blank"
+                                                className={`qc-status-${statusToTextClass(overallQuality)} qc-subscript`}
+                                            >
+                                                QC
+                                            </a>
                                             { // if the last item, don't add a comma
-                                                (i === qms[qmType].items.length - 1 ?  null : ', ')
+                                                (i === files.length - 1 ?  null : ', ')
                                             }
                                         </React.Fragment>
                                     ))
@@ -484,7 +494,7 @@ export const CohortSummaryTable = React.memo(function CohortSummaryTable(props){
                         );
                     }
                 });
-
+                console.log(renderArr);
                 colVal = (
                     <div className="qcs-container text-ellipsis-container">
                         { renderArr }
