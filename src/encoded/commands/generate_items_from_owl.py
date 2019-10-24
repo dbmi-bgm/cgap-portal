@@ -260,26 +260,24 @@ def get_existing_items(connection, itype, include_obs_n_del=True):
     return terms
 
 
-def connect2server(env=None, key=None):
+def connect2server(env=None, key=None, keyfile=None):
     '''Sets up credentials for accessing the server.  Generates a key using info
        from the named keyname in the keyfile and checks that the server can be
        reached with that key.
-       Also handles keyfiles stored in s3'''
-    if key == 's3':
-        assert env
-        key = unified_authentication(None, env)
-
-    if all([v in key for v in ['key', 'secret', 'server']]):
-        import ast
-        key = ast.literal_eval(key)
-
+       Also handles keyfiles stored in s3 using the env param'''
+    if key and keyfile:
+        keys = None
+        if os.path.isfile(keyfile):
+            with open(keyfile, 'r') as kf:
+                keys_json_string = kf.read()
+                keys = json.loads(keys_json_string)
+        if keys:
+            key = keys.get(key)
     try:
         auth = get_authentication_with_server(key, env)
     except Exception:
         print("Authentication failed")
         sys.exit(1)
-
-    print("Running on: {server}".format(server=auth.get('server')))
     return auth
 
 
@@ -434,7 +432,7 @@ def id_post_and_patch(terms, dbterms, itype, rm_unchanged=True, set_obsoletes=Tr
                         continue
                 dbuid = term['uuid']
                 # add simple term with only status and uuid to to_patch
-                obsoletes.sppend(tid)
+                obsoletes.append(tid)
                 to_update.append({'status': 'obsolete', 'uuid': dbuid})
                 tid2uuid[term[id_field]] = dbuid
     print("Will obsolete {} TERMS".format(len(obsoletes)))
@@ -501,10 +499,12 @@ def _is_deprecated(class_, data):
     return False
 
 
-def download_and_process_owl(itype, terms, simple=False):
+def download_and_process_owl(itype, terms, simple=False, input=None):
     synonym_terms = get_term_uris_as_ns(itype, 'synonym_uris')
     definition_terms = get_term_uris_as_ns(itype, 'definition_uris')
-    data = Owler(ITEM2OWL[itype]['download_url'])
+    if not input:
+        input = ITEM2OWL[itype]['download_url']
+    data = Owler(input)
     ontv = data.versionIRI
     if not terms:
         terms = {}
@@ -551,8 +551,25 @@ def parse_args(args):
     parser.add_argument('item_type',
                         choices=['Disorder', 'Phenotype'],
                         help="Item Types to generate from owl ontology - currently Phenotype or Disorder")
+    parser.add_argument('--env',
+                        default='local',
+                        help="The environment to use i.e. fourfront-cgap, cgap-test ....\
+                        Default is 'local')")
+    parser.add_argument('--input',
+                        help="optional url or path to owlfile - overrides the download_url present in script ITEM2OWL config info \
+                        Useful for generating items from a specific verion of ontology - otherwise will use current latest")
+    parser.add_argument('--key',
+                        help="The keypair identifier from the keyfile")
+    parser.add_argument('--keyfile',
+                        default=os.path.expanduser("~/keypairs.json"),
+                        help="The keypair file.  Default is --keyfile=%s" %
+                             (os.path.expanduser("~/keypairs.json")))
     parser.add_argument('--outfile',
                         help="the optional path and file to write output default is ./item_type.json ")
+    parser.add_argument('--load',
+                        action='store_true',
+                        default=False,
+                        help="Default False - use to load data directly from json to the server that the connection refers to")
     parser.add_argument('--pretty',
                         default=False,
                         action='store_true',
@@ -561,18 +578,6 @@ def parse_args(args):
                         default=False,
                         action='store_true',
                         help="Default False - set True to generate full file to load - do not filter out existing unchanged terms")
-    parser.add_argument('--env',
-                        default='fourfront-cgap',
-                        help="The environment to use i.e. fourfront-cgap, cgap-test ....\
-                        Default is 'fourfront-cgap')")
-    parser.add_argument('--key',
-                        default='s3',
-                        help="An access key dictionary including key, secret and server.\
-                        {'key'='ABCDEF', 'secret'='supersecret', 'server'='http://fourfront-cgap.9wzadzju3p.us-east-1.elasticbeanstalk.com/'}")
-    parser.add_argument('--load',
-                        action='store_true',
-                        default=False,
-                        help="Default False - use to load data directly from json to the server that the connection refers to")
     return parser.parse_args(args)
 
 
@@ -599,7 +604,7 @@ def main():
     print('Writing to %s' % postfile)
 
     # fourfront connection
-    connection = connect2server(args.env, args.key)
+    connection = connect2server(args.env, args.key, args.keyfile)
     print('Getting existing items from ', args.env)
     db_terms = get_existing_items(connection, itype)
     print('Grabbing slim term ids')
@@ -607,11 +612,11 @@ def main():
     terms = {}
 
     print('Processing: ', ITEM2OWL[itype].get('ontology_prefix'))
-    if ITEM2OWL[itype].get('download_url', None) is not None:
+    if args.input or ITEM2OWL[itype].get('download_url', None) is not None:
         # want only simple processing
         simple = True
         # get all the terms for an ontology
-        terms, ontv = download_and_process_owl(itype, terms, simple)
+        terms, ontv = download_and_process_owl(itype, terms, simple, args.input)
     else:
         # bail out
         print("Need url to download file from")

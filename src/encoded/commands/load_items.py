@@ -17,15 +17,15 @@ def parse_args():
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
     parser.add_argument('json_input', help="File or datastructure containing json of items to load")
+    parser.add_argument('--env', default='local',
+                        help='Environment to update from. Defaults to local')
+    parser.add_argument('--key', help='Access key ID if using local')
+    parser.add_argument('--secret', help='Access key secret if using local')
     parser.add_argument('--item_types',
                         nargs='*',
                         help="Type(s) of Item(s) to load - if not provided then a dictionary of jsons keyed by item_type is required \
                               NOTE if you do provide more than one value to item_types then as long as the item_types are keys of the store only \
                               the values of those keys will be loaded")
-    parser.add_argument('--env', default='local',
-                        help='Environment to update from. Defaults to local')
-    parser.add_argument('--key', help='Access key ID if using local')
-    parser.add_argument('--secret', help='Access key secret if using local')
     return parser.parse_args()
 
 

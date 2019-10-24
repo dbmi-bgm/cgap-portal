@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
 
 import sys
+import os
 import argparse
 import json
 import re
-import ast
+import requests
 from datetime import datetime
 from uuid import uuid4
 from dcicutils.ff_utils import (
@@ -69,7 +70,7 @@ def line2list(line):
 
 def write_outfile(terms, filename, pretty=False):
     '''terms is a list of dicts
-        write to file by default as a json list or if pretty
+        write to file by default as a json list or if prett
         then same with indents and newlines
     '''
     with open(filename, 'w') as outfile:
@@ -79,53 +80,89 @@ def write_outfile(terms, filename, pretty=False):
             json.dump(terms, outfile)
 
 
-def convert_key_arg_to_dict(key):
-    if all([v in key for v in ['key', 'secret', 'server']]):
-        key = ast.literal_eval(key)
-    if not isinstance(key, dict):
-        print("You included a key argument but it appears to be malformed or missing required info - see --help")
+def connect2server(env=None, key=None, keyfile=None):
+    '''Sets up credentials for accessing the server.  Generates a key using info
+       from the named keyname in the keyfile and checks that the server can be
+       reached with that key.
+       Also handles keyfiles stored in s3 using the env param'''
+    if key and keyfile:
+        keys = None
+        if os.path.isfile(keyfile):
+            with open(keyfile, 'r') as kf:
+                keys_json_string = kf.read()
+                keys = json.loads(keys_json_string)
+        if keys:
+            key = keys.get(key)
+    try:
+        auth = get_authentication_with_server(key, env)
+    except Exception:
+        print("Authentication failed")
         sys.exit(1)
-    return key
+    return auth
+
+
+def get_input_gen(input):
+    if input.startswith('http'):
+        try:
+            with requests.get(input, stream=True) as r:
+                if r.encoding is None:
+                    r.encoding = 'utf-8'
+                res = r.iter_lines(decode_unicode=True)
+                for l in res:
+                    yield l
+        except Exception as e:
+            print(e)
+            return []
+    elif os.path.isfile(input):
+        try:
+            with open(input) as r:
+                for line in r:
+                    line = line.strip()
+                    yield line
+        except Exception as e:
+            print(e)
+            return []
+    r.close()
 
 
 def get_args():  # pragma: no cover
     parser = argparse.ArgumentParser(
-        description='Given an HPOA file generate phenotype annotations for that disorder as json',
+        description='Given an HPOA file or url for download generate phenotype annotations for that disorder as json and optionally load',
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
-    parser.add_argument('--env',
-                        default='local',
-                        help="The environment to use i.e. data, webdev, mastertest.\
-                        Default is 'local')")
-    parser.add_argument('--key',
-                        default=None,
-                        help="An access key dictionary including key, secret and server.\
-                        {'key': 'ABCDEF', 'secret': 'supersecret', 'server': 'https://data.4dnucleome.org'}")
-    parser.add_argument('infile',
-                        help="The datafile containing the disorder to phenotype annotations data to import. \
+    parser.add_argument('--input',
+                        default='http://compbio.charite.de/jenkins/job/hpo.annotations.current/lastSuccessfulBuild/artifact/misc_2018/phenotype.hpoa',
+                        help="The url or datafile with the disorder to phenotype annotations data to import. URL must begin with http(s)\
                         http://compbio.charite.de/jenkins/job/hpo.annotations.current/lastSuccessfulBuild/artifact/misc_2018/phenotype.hpoa")
+    parser.add_argument('--env',
+                        help="The environment to use i.e. local, fourfront-cgap")
+    parser.add_argument('--key',
+                        help="The keypair identifier from the keyfile")
+    parser.add_argument('--keyfile',
+                        default=os.path.expanduser("~/keypairs.json"),
+                        help="The keypair file.  Default is --keyfile=%s" %
+                             (os.path.expanduser("~/keypairs.json")))
     parser.add_argument('--outfile',
-                        help="the optional path and file to write output default is disorders.json",
+                        help="the optional path and file to write output",
                         default="disorders2phenotypes.json")
+    parser.add_argument('--load',
+                        action='store_true',
+                        default=False,
+                        help="Default False - use to load data directly from json to the server that the connection refers to")
     parser.add_argument('--pretty',
                         default=False,
                         action='store_true',
                         help="Default False - set True if you want json format easy to read, hard to parse")
-    args = parser.parse_args()
-    if args.key:
-        args.key = convert_key_arg_to_dict(args.key)
-    return args
+    return parser.parse_args()
 
 
 def main():  # pragma: no cover
     start = datetime.now()
     print(str(start))
     args = get_args()
-    try:
-        auth = get_authentication_with_server(args.key, args.env)
-    except Exception:
-        print("Authentication failed")
-        sys.exit(1)
+
+    # get connection
+    auth = connect2server(args.env, args.key, args.keyfile)
 
     # existing_disorders = get_existing_disorders_from_db(auth)
     hpoid2uuid = get_existing_phenotype_uuids(auth)
@@ -134,70 +171,80 @@ def main():  # pragma: no cover
     xref2disorder = get_dbxref2disorder_map(disorders)
     assoc_phenos = {}
     problems = {}
-    with open(args.infile) as annot:
-        fields = []
-        while True:
-            line = annot.readline()
-            if not line.startswith("#"):
-                break
-        fields = line2list(line)
-        bad_fields = check_fields(fields)
-        if bad_fields:
-            print("UNKNOWN FIELDS FOUND: {}".format(', '.join(bad_fields)))
-            sys.exit()
-        for line in annot:
-            if line.startswith("#"):
+    # figure out input and if to save the file
+    lines = get_input_gen(args.input)
+    fields = []
+    dtag = 'date: '
+    fdtag = 'description: '
+    date = None
+    fdesc = None
+    while True:
+        line = lines.next()
+        if not line.startswith("#"):
+            break
+        elif dtag in line:
+            # get the date that the file was generated
+            _, date = line.split(dtag)
+        elif fdtag in line:
+            _, fdesc = line.split(fdesc)
+    fields = line2list(line)
+    bad_fields = check_fields(fields)
+    if bad_fields:
+        print("UNKNOWN FIELDS FOUND: {}".format(', '.join(bad_fields)))
+        sys.exit()
+    for line in lines:
+        if line.startswith("#"):
+            continue
+        data_list = line2list(line)
+        data = dict(zip(fields, data_list))
+        # deal with top level fields for disorder
+        using_id = data.get('DatabaseID')
+        if not using_id:
+            continue
+        if using_id.startswith('ORPHA'):
+            map_id = using_id.replace('ORPHA', 'Orphanet')
+        else:
+            map_id = using_id
+        if map_id not in xref2disorder:
+            problems.setdefault('no_map', []).append(data)
+            continue
+        disorder_id = xref2disorder.get(map_id)
+        pheno_annot = {}
+        for f, v in data.items():
+            if not v or (f == 'DiseaseName'):
                 continue
-            data_list = line2list(line)
-            data = dict(zip(fields, data_list))
-            # deal with top level fields for disorder
-            using_id = data.get('DatabaseID')
-            if not using_id:
-                continue
-            if using_id.startswith('ORPHA'):
-                map_id = using_id.replace('ORPHA', 'Orphanet')
-            else:
-                map_id = using_id
-            if map_id not in xref2disorder:
-                problems.setdefault('no_map', []).append(data)
-                continue
-            disorder_id = xref2disorder.get(map_id)
-            pheno_annot = {}
-            for f, v in data.items():
-                if not v or (f == 'DiseaseName'):
-                    continue
-                if f == 'Frequency':
-                    if v.startswith('HP:'):
-                        cgf = FIELD_MAPPING[f][0]
-                    else:
-                        cgf = FIELD_MAPPING[f][1]
+            if f == 'Frequency':
+                if v.startswith('HP:'):
+                    cgf = FIELD_MAPPING[f][0]
                 else:
-                    cgf = FIELD_MAPPING[f]
+                    cgf = FIELD_MAPPING[f][1]
+            else:
+                cgf = FIELD_MAPPING[f]
 
-                if f == 'Qualifier':
-                    v = True
-                elif f == 'Sex':
-                    v = v[0:1].upper()
+            if f == 'Qualifier':
+                v = True
+            elif f == 'Sex':
+                v = v[0:1].upper()
 
-                if isinstance(v, str) and hp_regex.match(v):
-                    hpuid = hpoid2uuid.get(v)
-                    if not hpuid:
-                        nf_data = data.copy()
-                        nf_data.update({'missing_hpo': v})
-                        problems.setdefault('hpo_not_found', []).append(nf_data)
-                        continue
-                    else:
-                        v = hpuid
-                pheno_annot[cgf] = v
+            if isinstance(v, str) and hp_regex.match(v):
+                hpuid = hpoid2uuid.get(v)
+                if not hpuid:
+                    nf_data = data.copy()
+                    nf_data.update({'missing_hpo': v})
+                    problems.setdefault('hpo_not_found', []).append(nf_data)
+                    continue
+                else:
+                    v = hpuid
+            pheno_annot[cgf] = v
 
-            if pheno_annot:
-                dis2pheno = assoc_phenos.get(disorder_id)
-                if dis2pheno:
-                    if pheno_annot in dis2pheno:
-                        ppos = dis2pheno.index(pheno_annot)
-                        problems.setdefault('redundant_annot', []).append((data, dis2pheno[ppos]))
-                        continue
-                assoc_phenos.setdefault(disorder_id, []).append(pheno_annot)
+        if pheno_annot:
+            dis2pheno = assoc_phenos.get(disorder_id)
+            if dis2pheno:
+                if pheno_annot in dis2pheno:
+                    ppos = dis2pheno.index(pheno_annot)
+                    problems.setdefault('redundant_annot', []).append((data, dis2pheno[ppos]))
+                    continue
+            assoc_phenos.setdefault(disorder_id, []).append(pheno_annot)
     patches = [{'uuid': uid, 'associated_phenotypes': apa} for uid, apa in assoc_phenos.items()]
 
     write_outfile(patches, args.outfile, args.pretty)
