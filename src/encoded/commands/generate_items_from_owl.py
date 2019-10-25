@@ -3,6 +3,8 @@ import json
 import sys
 import argparse
 import datetime
+import logging
+import logging.config
 from uuid import uuid4
 from collections import Counter
 from rdflib.collection import Collection
@@ -26,9 +28,37 @@ from dcicutils.ff_utils import (
     search_metadata,
     unified_authentication
 )
-from dcicutils.s3_utils import s3Utils
 
 EPILOG = __doc__
+
+'''logging setup
+   logging config - to be moved to file at some point
+'''
+logger = logging.getLogger(__name__)
+
+logging.config.dictConfig({
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'standard': {
+            'format': '%(levelname)s - %(message)s - %(name)s'
+        }
+    },
+    'handlers': {
+        'stdout': {
+            'level': 'INFO',
+            'formatter': 'standard',
+            'class': 'logging.StreamHandler'
+        }
+    },
+    'loggers': {
+        '': {
+            'handlers': ['stdout'],
+            'level': 'INFO',
+            'propagate': True
+        }
+    }
+})
 
 ''' global config '''
 ITEM2OWL = {
@@ -276,7 +306,7 @@ def connect2server(env=None, key=None, keyfile=None):
     try:
         auth = get_authentication_with_server(key, env)
     except Exception:
-        print("Authentication failed")
+        logger.error("Authentication failed")
         sys.exit(1)
     return auth
 
@@ -386,8 +416,8 @@ def id_post_and_patch(terms, dbterms, itype, rm_unchanged=True, set_obsoletes=Tr
             uid = str(uuid4())
             term['uuid'] = uid
             if tid in tid2uuid:
-                print("WARNING HAVE SEEN {} BEFORE!".format(tid))
-                print("PREVIOUS={}; NEW={}".format(tid2uuid[tid], uid))
+                logger.warn("HAVE SEEN {} BEFORE!".format(tid))
+                logger.warn("PREVIOUS={}; NEW={}".format(tid2uuid[tid], uid))
             to_update.append(term)
             tid2uuid[tid] = uid
             to_post.append(tid)
@@ -396,8 +426,8 @@ def id_post_and_patch(terms, dbterms, itype, rm_unchanged=True, set_obsoletes=Tr
             dbterm = dbterms[tid]
             uuid = dbterm['uuid']
             if tid in tid2uuid:
-                print("WARNING HAVE SEEN {} BEFORE!".format(tid))
-                print("PREVIOUS={}; NEW={}".format(tid2uuid[tid], uuid))
+                logger.warn("HAVE SEEN {} BEFORE!".format(tid))
+                logger.warn("PREVIOUS={}; NEW={}".format(tid2uuid[tid], uid))
             tid2uuid[tid] = uuid
             term['uuid'] = uuid
 
@@ -435,9 +465,15 @@ def id_post_and_patch(terms, dbterms, itype, rm_unchanged=True, set_obsoletes=Tr
                 obsoletes.append(tid)
                 to_update.append({'status': 'obsolete', 'uuid': dbuid})
                 tid2uuid[term[id_field]] = dbuid
-    print("Will obsolete {} TERMS".format(len(obsoletes)))
-    print("{} TERMS ARE NEW".format(len(to_post)))
-    print("{} LIVE TERMS WILL BE PATCHED".format(len(to_patch)))
+    logger.info("Will obsolete {} TERMS".format(len(obsoletes)))
+    logger.info("{} TERMS ARE NEW".format(len(to_post)))
+    logger.info("{} LIVE TERMS WILL BE PATCHED".format(len(to_patch)))
+    logger.info("OBSOLETE TERMS")
+    for t in obsoletes:
+        logger.info("\t{}".format(t))
+    logger.info("NEW TERMS")
+    for termid in to_post:
+        logger.info("\t{}".format(termid))
     return to_update
 
 
@@ -451,7 +487,7 @@ def _get_uuids_for_linked(term, idmap):
                 if p in idmap:
                     puuids.setdefault(rt, []).append(idmap[p])
                 else:
-                    print('WARNING - ', p, ' MISSING FROM IDMAP')
+                    logger.warn('WARNING - {} - MISSING FROM IDMAP'.format(p))
     return puuids
 
 
@@ -499,15 +535,11 @@ def _is_deprecated(class_, data):
     return False
 
 
-def download_and_process_owl(itype, terms, simple=False, input=None):
+def download_and_process_owl(itype, input, terms={}, simple=False):
     synonym_terms = get_term_uris_as_ns(itype, 'synonym_uris')
     definition_terms = get_term_uris_as_ns(itype, 'definition_uris')
-    if not input:
-        input = ITEM2OWL[itype]['download_url']
     data = Owler(input)
     ontv = data.versionIRI
-    if not terms:
-        terms = {}
     name_field = ITEM2OWL[itype].get('name_field')
     for class_ in data.allclasses:
         if not _is_deprecated(class_, data):
@@ -586,45 +618,63 @@ def owl_runner(value):
     return download_and_process_owl(*value)
 
 
+def prompt_check_for_output_options(load, outfile, itype, server):
+    if load:
+        choice1 = str(input("load is True - are you sure you want to directly load the output to {} (y/n)?: ".format(server)))
+        if choice1.lower() == 'y':
+            logger.info('Will load output directly to {}'.format(server))
+            if not outfile:
+                choice2 = str(input("No outfile provided! - you OK with no saved json (y/n)?: ".format(server)))
+                if choice2.lower() == 'y':
+                    logger.info('No intermediate json file will be generated')
+                    return None, load
+        else:
+            load = None
+    if not outfile:
+        outfile = itype + '.json'
+    logger.info('Will store output to {}'.format(outfile))
+    return outfile, load
+
+
 def main():
-    ''' Downloads latest MONDO OWL file
-        and Updates Terms by generating json inserts
+    ''' Given a item type (Disorder or Phenotype) will process owl file containing ontology terms
+        for the given item from a url or file provided in script config or via --input parameter
+        and comparing to what is currently in system will generate json to post new items or patch
+        existing items and either generate a json file specified with --outfile or load directly
+        into system if --load is used.
+
+        logging/tracking info
     '''
     start = datetime.datetime.now()
-    print(str(start))
     args = parse_args(sys.argv[1:])
     itype = args.item_type
-    postfile = args.outfile
-    if not postfile:
-        postfile = '{}.json'.format(itype)
-    # if '/' not in postfile:  # assume just a filename given
-    #    from pkg_resources import resource_filename
-    #    postfile = resource_filename('encoded', postfile)
-
-    print('Writing to %s' % postfile)
-
-    # fourfront connection
+    logger.info('Processing {} on {}'.format(itype, start))
     connection = connect2server(args.env, args.key, args.keyfile)
-    print('Getting existing items from ', args.env)
+    logger.info('Running on {}'.format(connection.get('server')))
+    postfile, loaddb = prompt_check_for_output_options(args.load, args.outfile, itype, connection.get('server'))
+
+    logger.debug('Getting existing items from ', args.env)
     db_terms = get_existing_items(connection, itype)
-    print('Grabbing slim term ids')
+    logger.debug('Grabbing slim term ids')
     slim_terms = get_slim_term_ids_from_db_terms(db_terms, itype)
     terms = {}
 
-    print('Processing: ', ITEM2OWL[itype].get('ontology_prefix'))
-    if args.input or ITEM2OWL[itype].get('download_url', None) is not None:
-        # want only simple processing
-        simple = True
-        # get all the terms for an ontology
-        terms, ontv = download_and_process_owl(itype, terms, simple, args.input)
+    input = args.input
+    if not input:
+        input = ITEM2OWL[itype].get('download_url', None)
+    if input:
+        # get all the terms for an ontology with simple processing
+        logger.info("Will get ontology data using = {}".format(input))
+        terms, ontv = download_and_process_owl(itype, input, terms, True)
     else:
         # bail out
-        print("Need url to download file from")
+        logger.error("Need url to download file from")
         sys.exit()
 
     # at this point we've processed the rdf of all the ontologies
-    if ontv:
-        print("Got data from {}".format(ontv))
+    if not ontv:
+        ontv = input
+    logger.info("Ontology Version Info: {}".format(ontv))
     if terms:
         terms = add_slim_terms(terms, slim_terms, itype)
         terms = remove_obsoletes_and_unnamed(terms, itype)
@@ -632,15 +682,14 @@ def main():
         if args.full:
             filter_unchanged = False
         terms2write = id_post_and_patch(terms, db_terms, itype, filter_unchanged)
-        # terms2write = add_uuids_and_combine(partitioned_terms)
         pretty = False
         if args.pretty:
             pretty = True
         write_outfile(terms2write, postfile, pretty)
-        if args.load:
+        if loaddb:
             env = arg.env if args.env else 'local'  # may want to change to use key/secret as option to get env
             res = load_items(env, items2write, itypes=[itype])
-            print(res)
+            logger.info(res)
     stop = datetime.datetime.now()
     print('STARTED: ', str(start))
     print('END: ', str(stop))

@@ -6,6 +6,7 @@ import argparse
 import json
 import re
 import requests
+import logging
 from datetime import datetime
 from uuid import uuid4
 from dcicutils.ff_utils import (
