@@ -47,7 +47,7 @@ def main():
     kibana_settings = {'max_result_window': 100000}
     client.indices.put_settings(index='.kibana', body=kibana_settings)
     log.info('configure_kibana_index: successfully changed settings %s'
-             % list(settings.keys()))
+             % list(kibana_settings.keys()))
 
 
 if __name__ == "__main__":
