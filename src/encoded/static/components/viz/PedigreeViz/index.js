@@ -241,12 +241,22 @@ export class PedigreeViz extends React.PureComponent {
         "showOrderBasedName" : true,
 
         /**
-         * In progress. Define zoom level.
+         * Initial zoom/scale.
+         * Will be overriden if `zoomToExtentsOnMount` is true,
+         * after mount.
          *
          * @type {number}
-         * @todo - refine zooming & boundaries, controls (not mousewheel, maybe keyboard UI component), etc.
          */
-        "scale" : 1
+        "initialScale" : 1,
+
+        /**
+         * If true, will zoom out the graph (if needed)
+         * to fit into viewport. Will only fit to dimensions
+         * passed in, e.g. `props.height` & `props.width`.
+         *
+         * @type {boolean}
+         */
+        "zoomToExtentsOnMount" : true
     };
 
     static initState(dataset){
@@ -343,7 +353,11 @@ class GraphTransformer extends React.PureComponent {
     }
 
     render(){
-        const { jsonList, children, dimensionOpts, filterUnrelatedIndividuals, ...passProps } = this.props;
+        const {
+            jsonList, children, dimensionOpts, filterUnrelatedIndividuals,
+            zoomToExtentsOnMount, initialScale,
+            ...passProps
+        } = this.props;
         const { objectGraph, disconnectedIndividuals } = this.memoized.createObjectGraph(jsonList, filterUnrelatedIndividuals);
         const relationships = this.memoized.createRelationships(objectGraph);
         this.memoized.assignTreeHeightIndices(objectGraph);
@@ -368,7 +382,7 @@ class GraphTransformer extends React.PureComponent {
             return React.Children.map(children, (child) => React.cloneElement(child, viewProps));
         } else {
             return (
-                <ScaleController>
+                <ScaleController {...{ zoomToExtentsOnMount, initialScale }}>
                     <PedigreeVizView {...viewProps} memoized={this.memoized} />
                 </ScaleController>
             );
@@ -417,20 +431,22 @@ export class PedigreeVizView extends React.PureComponent {
     }
 
     /** Grab scrollLeft snapshot if scale is changing. We scroll after update to re-center. */
-    /*
+    ///*
     getSnapshotBeforeUpdate(prevProps, prevState){
-        const { scale: currScale, graphWidth } = this.props;
+        const { scale: currScale } = this.props;
         const { scale: prevScale } = prevProps;
+
         if (currScale === prevScale) return null;
 
         const innerElem = this.innerRef.current;
         if (!innerElem) return null;
 
         return {
-            scrollLeft: innerElem.scrollLeft
+            scrollLeft: innerElem.scrollLeft,
+            scrollTop: innerElem.scrollTop
         };
     }
-    */
+    //*/
 
     componentDidUpdate(pastProps, pastState, snapshot){
         const {
@@ -546,7 +562,7 @@ export class PedigreeVizView extends React.PureComponent {
             objectGraph, dims, order, memoized,
             overlaysContainer, renderDetailPane, containerStyle,
             visibleDiseases = null,
-            scale = 100, minScale, maxScale,
+            scale = 1, minScale, maxScale,
             graphHeight, graphWidth,
             setScale,
             ...passProps
@@ -573,12 +589,10 @@ export class PedigreeVizView extends React.PureComponent {
             ...containerStyle
         };
 
-        const transformScale = scale / 100;
-
         const vizAreaStyle = {
-            'width': (graphWidth * transformScale),
-            'height': (graphHeight * transformScale),
-            'transform' : scale !== 1 ? "scale3d(" + transformScale + "," + transformScale + ",1)" : null
+            'width': (graphWidth * scale),
+            'height': (graphHeight * scale),
+            'transform' : "scale3d(" + scale + "," + scale + ",1)"
         };
 
         const commonChildProps = {

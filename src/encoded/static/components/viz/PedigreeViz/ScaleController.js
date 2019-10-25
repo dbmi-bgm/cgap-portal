@@ -7,9 +7,9 @@ import { requestAnimationFrame as raf } from '@hms-dbmi-bgm/shared-portal-compon
 export class ScaleController extends React.PureComponent {
 
     static defaultProps = {
-        minScale: 1,
-        maxScale: 100,
-        initialScale: 100,
+        minScale: 0.01,
+        maxScale: 1,
+        initialScale: 1,
         zoomToExtentsOnMount: true
     };
 
@@ -77,9 +77,8 @@ export class ScaleController extends React.PureComponent {
                 return null;
             }
             const scaleUnbounded = Math.min(
-                // Remove 1%
-                ((containerWidth / graphWidth) * 100) - 1,
-                ((containerHeight / graphHeight) * 100) - 1
+                (containerWidth / graphWidth),
+                (containerHeight / graphHeight)
             );
             const minScale = (Math.min(maxScale, Math.max(propMinScale, scaleUnbounded)));
             const retObj = { containerWidth, containerHeight, minScale };
@@ -99,7 +98,7 @@ export class ScaleController extends React.PureComponent {
         const { scale, minScale } = this.state;
         const childProps = {
             ...passProps,
-            scale: scale || initialScale || 100,
+            scale: scale || initialScale || 1,
             minScale: minScale || propMinScale,
             setScale: this.setScale,
             onDimensionsChanged: this.handleDimensionsChanged
@@ -228,8 +227,8 @@ export class ScaleControls extends React.PureComponent {
         const {
             scale = null,
             setScale = null,
-            minScale = 1,
-            maxScale = 100
+            minScale = 0.1,
+            maxScale = 1
         } = this.props;
 
         if (typeof setScale !== "function" || typeof scale !== "number" || isNaN(scale)) {
