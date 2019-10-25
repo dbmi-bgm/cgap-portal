@@ -21,7 +21,7 @@ log = structlog.getLogger(__name__)
 
 
 @collection(
-    name='',
+    name='cohorts',
     unique_key='accession',
     properties={
         'title': 'Cohorts',
