@@ -124,11 +124,21 @@ export class ScaleControls extends React.PureComponent {
         this.onZoomOutUp = this.onZoomOutUp.bind(this);
         this.onZoomInDown = this.onZoomInDown.bind(this);
         this.onZoomInUp = this.onZoomInUp.bind(this);
+        this.cleanupAfterPress = this.cleanupAfterPress.bind(this);
         this.state = {
             zoomOutPressed: false,
             zoomInPressed: false
         };
 
+        // Not the most reactful thing to store state data outside of state,
+        // but worthwhile here for us for performance
+        // (skip component lifecycle; requestAnimationFrame skipping repaint anyway so would only add lag)
+        this.currentInterval = null;
+        this.currentTempZoom = null;
+    }
+
+    cleanupAfterPress(){
+        clearInterval(this.currentInterval);
         this.currentInterval = null;
         this.currentTempZoom = null;
     }
@@ -138,6 +148,8 @@ export class ScaleControls extends React.PureComponent {
      * than with `setInterval` alone.
      */
     onZoomOutDown(evt){
+        evt.preventDefault();
+        evt.stopPropagation();
         const { setScale, scaleChangeInterval, scaleChangeDownFactor, scale: initScale } = this.props;
         this.setState({ zoomOutPressed: true }, ()=>{
 
@@ -146,12 +158,11 @@ export class ScaleControls extends React.PureComponent {
                 const { scale, minScale } = this.props;
                 const { zoomOutPressed } = this.state;
                 if (!zoomOutPressed){
-                    clearInterval(this.currentInterval);
-                    this.currentInterval = null;
-                    this.currentTempZoom = null;
+                    this.cleanupAfterPress();
                     return;
                 }
                 if (scale <= minScale){
+                    // Button becomes disabled so `onZoomOutUp` is not guaranteed to be called.
                     this.setState({ zoomOutPressed: false });
                     return;
                 }
@@ -169,13 +180,15 @@ export class ScaleControls extends React.PureComponent {
     }
 
     onZoomOutUp(evt){
-        clearInterval(this.currentInterval);
-        this.currentInterval = null;
-        this.currentTempZoom = null;
+        evt.preventDefault();
+        evt.stopPropagation();
+        this.cleanupAfterPress();
         this.setState({ zoomOutPressed: false });
     }
 
     onZoomInDown(evt){
+        evt.preventDefault();
+        evt.stopPropagation();
         const { setScale, scaleChangeInterval, scaleChangeUpFactor, scale: initScale } = this.props;
         this.setState({ zoomInPressed: true }, ()=>{
 
@@ -184,12 +197,11 @@ export class ScaleControls extends React.PureComponent {
                 const { scale, maxScale } = this.props;
                 const { zoomInPressed } = this.state;
                 if (!zoomInPressed){
-                    clearInterval(this.currentInterval);
-                    this.currentInterval = null;
-                    this.currentTempZoom = null;
+                    this.cleanupAfterPress();
                     return;
                 }
                 if (scale >= maxScale){
+                    // Button becomes disabled so `onZoomInUp` is not guaranteed to be called.
                     this.setState({ zoomInPressed: false });
                 }
                 this.currentTempZoom = this.currentTempZoom * scaleChangeUpFactor;
@@ -206,9 +218,9 @@ export class ScaleControls extends React.PureComponent {
     }
 
     onZoomInUp(evt){
-        clearInterval(this.currentInterval);
-        this.currentInterval = null;
-        this.currentTempZoom = null;
+        evt.preventDefault();
+        evt.stopPropagation();
+        this.cleanupAfterPress();
         this.setState({ zoomInPressed: false });
     }
 

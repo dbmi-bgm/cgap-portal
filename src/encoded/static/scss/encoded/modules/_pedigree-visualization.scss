@@ -357,22 +357,36 @@ $pedigree-disease-colors :
         > .zoom-buttons-row {
             display: flex;
             align-items: center;
-            width: 36px;
             > .zoom-btn {
                 border: 1px solid #999;
+                color: #555;
                 background-color: #fff;
                 box-sizing: content-box;
-                flex: 1;
                 text-align: center;
                 padding: 1px 4px;
+                width: 18px;
+
                 &.zoom-out { // Left btn
                     border-radius: 5px 0 0 5px;
-                    border-right-color: #ddd;
+                    border-right: none;
                 }
                 &.zoom-in { // Right btn
                     border-radius: 0 5px 5px 0;
-                    border-left: none;
+                    border-left-color : #ddd;
                 }
+
+                &:disabled {
+                    color: #999;
+                }
+                &:hover:not(:disabled) {
+                    color: #000;
+                    border-color: #555;
+                    &.zoom-out + .zoom-btn,
+                    &.zoom-in {
+                        border-left-color: #aaa;
+                    }
+                }
+                
             }
         }
     }
