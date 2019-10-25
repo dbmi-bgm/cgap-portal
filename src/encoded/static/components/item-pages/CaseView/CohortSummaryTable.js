@@ -391,8 +391,26 @@ export const CohortSummaryTable = React.memo(function CohortSummaryTable(props){
                     console.log("log2: ext, ", ext);
                     console.log("log2: , files", files);
                     console.log("log2: , overallQuality", overallQuality);
+
+                    function getFileQuality(numWarn, numFail) {
+                        if (file.numFail > 0) {
+                            return "FAIL";
+                        }
+                        if (file.numWarn > 0) {
+                            return "WARN";
+                        }
+                        return "PASS";
+                    }
+
                     // if there's a single quality metric, link the item itself
                     if (files && files.length <= 1) {
+                        let dataTip = "";
+                        if (files[0].numWarn > 0) {
+                            dataTip += numWarn + " QMs with Warnings ";
+                        }
+                        if (files[0].numFail > 0) {
+                            dataTip += numFail + " QMs Failing ";
+                        }
                         renderArr.push(
                             files[0] ?
                                 <span className="ellipses" key={`span-${ext}`}>
@@ -409,8 +427,9 @@ export const CohortSummaryTable = React.memo(function CohortSummaryTable(props){
                                         rel="noopener noreferrer"
                                         target="_blank"
                                         className={`qc-status-${statusToTextClass(overallQuality)} qc-subscript`}
+                                        data-tip={dataTip || null}
                                     >
-                                        QC
+                                        <sup>QC</sup>
                                     </a>
                                 </span>
                                 : null
@@ -420,25 +439,36 @@ export const CohortSummaryTable = React.memo(function CohortSummaryTable(props){
                             <span className="ellipses" key={`span-multi-${ext}`}>
                                 { statusToIcon(overallQuality) } { ext.toUpperCase() }
                                 (   {
-                                    files.map((file, i) => (
-                                        <React.Fragment key={`${ext}-${file.fileUrl}`}>
-                                            <a href={ file.fileUrl || "" } rel="noopener noreferrer" target="_blank"
-                                                className={`${statusToTextClass(file.quality)} qc-status-${file.status}`}>
-                                                {i + 1}
-                                            </a>
-                                            <a
-                                                href={file.qmUrl || ""}
-                                                rel="noopener noreferrer"
-                                                target="_blank"
-                                                className={`qc-status-${statusToTextClass(overallQuality)} qc-subscript`}
-                                            >
-                                                QC
-                                            </a>
-                                            { // if the last item, don't add a comma
-                                                (i === files.length - 1 ?  null : ', ')
-                                            }
-                                        </React.Fragment>
-                                    ))
+                                    files.map((file, i) => {
+                                        let dataTip = "";
+                                        if (file.numWarn > 0) {
+                                            dataTip += numWarn + " QMs with Warnings ";
+                                        }
+                                        if (file.numFail > 0) {
+                                            dataTip += numFail + " QMs Failing ";
+                                        }
+                                    
+                                        return (
+                                            <React.Fragment key={`${ext}-${file.fileUrl}`}>
+                                                <a href={ file.fileUrl || "" } rel="noopener noreferrer" target="_blank"
+                                                    className={`${statusToTextClass(file.quality)} qc-status-${file.status}`}>
+                                                    {i + 1}
+                                                </a>
+                                                <a
+                                                    href={file.qmUrl || ""}
+                                                    rel="noopener noreferrer"
+                                                    target="_blank"
+                                                    className={`qc-status-${statusToTextClass(overallQuality)} qc-subscript`}
+                                                    data-tip={dataTip || null}
+                                                >
+                                                    <sup>QC</sup>
+                                                </a>
+                                                { // if the last item, don't add a comma
+                                                    (i === files.length - 1 ?  null : ', ')
+                                                }
+                                            </React.Fragment>
+                                        );
+                                    })
                                 }   )
                             </span>
                         );
