@@ -1,6 +1,6 @@
 'use strict';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import moment from 'moment';
 import _ from 'underscore';
@@ -12,6 +12,83 @@ import { WorkflowNodeElement } from './components/Workflow/WorkflowNodeElement';
 import { WorkflowDetailPane } from './components/Workflow/WorkflowDetailPane';
 import { WorkflowGraphSectionControls } from './components/Workflow/WorkflowGraphSectionControls';
 import { FullHeightCalculator } from './components/FullHeightCalculator';
+
+
+
+
+/**
+ * NOT YET TESTED / EXPERIMENTAL
+ * @todo refactor DefaultItemView into a functional component which uses hook(s)
+ * @todo change all components which extend DefaultItemView into functional components that re-use that hook(s)
+ * @todo figure out how to handle `getTabViewContents`.
+ */
+export function useLoadedProvenanceGraph(itemUUID){
+    const [ includeAllRunsInSteps, setIncludeAllRunsInSteps ] = useState(false);
+    const [ isLoadingGraphSteps, setIsLoadingGraphSteps ] = useState(false);
+    const [ graphSteps, setGraphSteps ] = useState(null);
+    const [ loadingStepsError, setLoadingStepsError ] = useState(null);
+
+    // Load graph steps
+    useEffect(function(){
+        if (!isLoadingGraphSteps && graphSteps === null && loadingStepsError !== null) {
+            if (typeof itemUUID !== 'string') {
+                throw new Error("Expected context.uuid");
+            }
+
+            const callback = (res) => {
+                if (Array.isArray(res) && res.length > 0){
+                    setGraphSteps(res);
+                    setIsLoadingGraphSteps(false);
+                } else {
+                    setGraphSteps(null);
+                    setIsLoadingGraphSteps(false);
+                    setLoadingStepsError(res.message || res.error || "No steps in response.");
+                }
+            };
+
+            const uriOpts = {
+                timestamp: moment.utc().unix()
+            };
+
+            if (includeAllRunsInSteps){
+                uriOpts.all_runs = "True";
+            }
+
+            const tracingHref = (
+                '/trace_workflow_run_steps/' + itemUUID + '/'
+                + '?'
+                + Object.keys(uriOpts).map(function(optKey){
+                    return encodeURIComponent(optKey) + '=' + encodeURIComponent(uriOpts[optKey]);
+                }).join('&')
+            );
+
+            if (isLoadingGraphSteps){
+                console.error("Already loading graph steps");
+                return false;
+            }
+
+            setIsLoadingGraphSteps(true);
+            setLoadingStepsError(null);
+            ajax.load(tracingHref, callback, 'GET', callback);
+        }
+    });
+
+    function toggleIncludeAllRunsInSteps(){
+        if (isLoadingGraphSteps) {
+            return null;
+        }
+        setIncludeAllRunsInSteps(!includeAllRunsInSteps);
+    }
+
+    return {
+        includeAllRunsInSteps,
+        toggleIncludeAllRunsInSteps,
+        isLoadingGraphSteps,
+        graphSteps,
+        loadingStepsError
+    };
+}
+
 
 
 /**
@@ -138,7 +215,17 @@ export default class DefaultItemViewWithProvenance extends DefaultItemView {
  * In future, maybe we can stop extending DefaultItemView for ItemViews
  * and instead use composition & props for getTabViewContents and such.
  */
-export class ProvenanceGraphStepsController extends React.PureComponent {
+
+export function ProvenanceGraphStepsController(props){
+    const { children, ...remainingProps } = props;
+    const { context } = remainingProps;
+    const { uuid } = context;
+    const provenanceProps = useLoadedProvenanceGraph(uuid);
+    const passProps = { ...remainingProps, ...provenanceProps };
+    return React.Children.map(children, (child) => React.cloneElement(child, passProps));
+}
+
+export class ProvenanceGraphStepsControllerDeprecated extends React.PureComponent {
 
     constructor(props){
         super(props);
