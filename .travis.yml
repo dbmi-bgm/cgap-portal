@@ -79,7 +79,8 @@ install:
 before_script:
 - bin/configure-kibana-index --es-endpoint search-fourfront-builds-uhevxdzfcv7mkm5pj5svcri3aq.us-east-1.es.amazonaws.com:80
 script:
-- if test -n "$NPM"; then npm test; fi
+# disable npm for now
+# - if test -n "$NPM"; then npm test; fi
 # setone is essentially all tests that are not indexing; change here for clarity
 - if test -n "$NPM"; then bin/test -v -v --aws-auth -m "not performance and not indexing and working" --durations=10
   --cov src/encoded --es search-fourfront-builds-uhevxdzfcv7mkm5pj5svcri3aq.us-east-1.es.amazonaws.com:80;
