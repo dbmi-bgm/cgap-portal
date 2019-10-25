@@ -21,6 +21,7 @@ import { PedigreeTabViewBody } from './PedigreeTabViewBody';
 import { PedigreeFullScreenBtn } from './PedigreeFullScreenBtn';
 import { parseFamilyIntoDataset, gatherPhenotypicFeatureItems } from './family-parsing';
 import { AttachmentInputController, AttachmentInputMenuOption } from './attachment-input';
+import { CohortStats } from './CohortStats';
 
 export {
     CohortSummaryTable,
@@ -172,9 +173,26 @@ export default class CaseView extends DefaultItemView {
     }
 }
 
+const CohortPedigreeLink = React.memo(function CohortPedigreeLink(props) {
+    return (
+        <div className="card">
+            <a href="#pedigree" rel="noopener noreferrer">
+                <img className="card-img-top pedigree-link-bg" />
+            </a>
+        </div>
+    );
+});
+
 const CohortSummaryTabView = React.memo(function CohortSummaryTabView(props){
     const { pedigreeFamilies: families = [] } = props;
     const familiesLen = families.length;
+
+    function getNumberOfIndividuals(fams) {
+        let count = 0;
+        fams.forEach((fam) => (count += fam.members.length - 1));
+        return count;
+    }
+
     return (
         <div className="container-wide">
             <h3 className="tab-section-title">
@@ -193,6 +211,14 @@ const CohortSummaryTabView = React.memo(function CohortSummaryTabView(props){
                     );
                     return (
                         <div className={cls} key={idx}>
+                            <div className="row">
+                                <div className="col-md-6">
+                                    <CohortStats numFamilies={familiesLen} numIndividuals={getNumberOfIndividuals(families)} />
+                                </div>
+                                <div className="col-md-6">
+                                    <CohortPedigreeLink />
+                                </div>
+                            </div>
                             { title }
                             <CohortSummaryTable {...family} idx={idx} />
                         </div>
