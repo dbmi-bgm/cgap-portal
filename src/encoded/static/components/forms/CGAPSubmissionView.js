@@ -1,4 +1,4 @@
-Cohortimport React from 'react';
+import React from 'react';
 import memoize from 'memoize-one';
 import url from 'url';
 
