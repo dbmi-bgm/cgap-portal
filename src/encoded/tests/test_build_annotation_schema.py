@@ -3,6 +3,7 @@ import csv
 import json
 import pytest
 from encoded.commands.build_annotation_schema import (
+    process_fields,
     read_mapping_table,
     add_annotation_schema_fields,
     add_annotation_schema_facets_and_columns,
@@ -10,39 +11,21 @@ from encoded.commands.build_annotation_schema import (
 )
 
 pytestmark = [pytest.mark.working]
-FNAME = './sample_mp_header.csv' # symlinked from encoded.commands
-
-EXPECTED_FIELDS = 'FIELD NAME,VCF NAME(field name on ann vcf),value_example, \
-                "field_type (string, integer, boolean, number)", \
-                enum_list (limit values to this list),SCALE,DOMAIN,METHOD, \
-                Annotation_grouping,is_list,sub_embedding_group (SUBEMBEDDED \
-                OBJECT GROUPING),"SEPARATOR (comma, pipe, semicolon, colon, \
-                tab) ",SCOPE (sample/variant/gene),schema_title (HUMAN READABLE \
-                HEADER),schema_description (DESCRIPTION),SOURCE_NAME,SOURCE VERSION, \
-                FIELD_PRIORITY (lookup number),COLUMN_PRIORITY,FACET_PRIORITY,links_to, \
-                MVP (Y/N),#excel_order'
+FNAME = './src/encoded/tests/mp.csv' # symlinked from encoded.commands
+EXPECTED_FIELDS = ['field_name', 'vcf_name', 'value_example', 'field_type',
+                    'enum_list', 'scale', 'domain', 'method', 'annotation_grouping',
+                    'is_list', 'sub_embedding_group', 'separator', 'scope',
+                    'schema_title', 'schema_description', 'source_name',
+                    'source_version', 'field_priority', 'column_priority',
+                    'facet_priority', 'links_to', 'mvp']
 
 
-
-@pytest.yield_fixture
-def sample_mp_header():
-    with open(FNAME, 'w+') as out:
-        writer = csv.writer(out, delimiter=',')
-        writer.writerow('#FILEFORMAT= annV1,,,,,,,,,,,,,,,,,,,,,,'.split(','))
-        writer.writerow('#FILEDATE=09.13.19,,,,,,,,,,,,,,,,,,,,,,'.split(','))
-        writer.writerow(EXPECTED_FIELDS.split(','))
-
-    yield # run test
-
-    os.remove(FNAME) # remove file when we're done
-
-
-def test_read_mapping_table(sample_mp_header):
+def test_read_mapping_table():
     """ Tests that we can read mapping table header correctly based on the current format """
     VERSION, DATE, FIELDS = read_mapping_table(FNAME)
     assert VERSION == 'annV1'
     assert DATE == '09.13.19'
-    assert sorted(FIELDS) == sorted(EXPECTED_FIELDS.split(','))
+    assert sorted(FIELDS) == sorted(EXPECTED_FIELDS)
 
 
 def test_add_annotation_schema_fields():
@@ -70,7 +53,7 @@ def test_add_facets_and_columns():
     assert 'source_name' in schema['columns']
 
 
-def test_build_full_schema(sample_mp_header):
+def test_build_full_schema():
     """
     Tests that some fields look correct when we build the whole annotation
     field schema. Tests random things about properties that should be there

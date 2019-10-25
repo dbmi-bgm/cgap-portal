@@ -6,6 +6,22 @@ from collections import OrderedDict
 
 logger = logging.getLogger(__name__)
 
+
+def process_fields(row):
+    """
+    Takes in the row of field names and processes them
+    Based on what Koray did for the current mp.csv
+    """
+    fields = []
+    for name in row:
+        new_name = name.split('(')[0].strip().lower()
+        new_name = new_name.replace(" ", "_")
+        if new_name.startswith('#'):
+            continue
+        fields.append(new_name)
+    return fields
+
+
 def read_mapping_table(fname):
     """
         Reads mapping table from fname
@@ -20,7 +36,7 @@ def read_mapping_table(fname):
             elif row_idx == 1:
                 DATE = row[0].split('=')[1].strip()
             elif row_idx == 2:
-                FIELDS = row
+                FIELDS = process_fields(row)
             else:
                 break # we are done with this step
     logger.info('Mapping table Version: %s, Date: %s\n' % (VERSION, DATE))
@@ -104,15 +120,15 @@ def build_annotation_field_schema(fields):
     schema = {}
     add_annotation_schema_fields(schema)
     for field in fields:
-        if field == 'FIELD NAME':
-            schema['properties']['field_name'] = {
+        if field == 'field_name':
+            schema['properties'][field] = {
                 'title': 'Field Name',
                 'description': 'Name of the annotation field name',
                 'type': 'string',
                 'uniqueKey': True
             }
-        elif 'VCF NAME' in field:
-            schema['properties']['vcf_name'] = {
+        elif field == 'vcf_name':
+            schema['properties'][field] = {
                 "title": "Field Name on VCF",
                 "description": "Original name of the annotaion field name on vcf file",
                 "type": "string"
@@ -123,7 +139,7 @@ def build_annotation_field_schema(fields):
                 "type": "boolean",
                 "default": False
             }
-        elif 'enum_list' in field:
+        elif field == 'enum_list':
             schema['properties']['enum_list'] = {
                 "title": "Enum list",
                 "description": "you can restrict to set of values",
@@ -134,7 +150,7 @@ def build_annotation_field_schema(fields):
                     "type":  "string"
                 }
             }
-        elif 'field_type' in field:
+        elif field == 'field_type':
             schema['properties']['field_type'] = {
                 "title": "Field type",
                 "description": "Field type, number, integer, string",
@@ -146,31 +162,31 @@ def build_annotation_field_schema(fields):
                     "boolean"
                 ]
             }
-        elif 'sub_embedding_group' in field:
+        elif field == 'sub_embedding_group':
             schema['properties']['sub_embedding_group'] = {
                  "title": "Sub-embedding group",
                  "description": "If field belong to a sub embedded object, add field name",
                  "type": "string"
             }
-        elif field == 'SCALE':
+        elif field == 'scale':
             schema['properties']['scale'] = {
                 "title": "Scale",
                 "description": "Scale defined by new annotation structure",
                 "type": "string"
             }
-        elif field == 'DOMAIN':
+        elif field == 'domain':
             schema['properties']['domain'] = {
                 "title": "Domain",
                 "description": "Domain defined by new annotation structure",
                 "type": "string"
             }
-        elif field == 'METHOD':
+        elif field == 'method':
             schema['properties']['method'] = {
                 "title": "Method",
                 "description": "Method defined by new annotation structure",
                 "type": "string"
             }
-        elif 'SEPARATOR' in field:
+        elif field == 'separator': # XXX: typo?
             schema['properties']['seperator'] = {
                 "title": "Seperator",
                 "description": "if value is list, use this seperator to split items",
@@ -183,7 +199,7 @@ def build_annotation_field_schema(fields):
                     "tab"
                 ]
             }
-        elif 'SCOPE' in field:
+        elif field == 'scope':
             schema['properties']['scope'] = {
                 "title": "Scope",
                 "description": "Scope that this field belongs to",
@@ -194,43 +210,43 @@ def build_annotation_field_schema(fields):
                     "gene"
                 ]
             }
-        elif 'schema_title' in field:
+        elif field == 'schema_title':
             schema['properties']['schema_title'] = {
                 "title": "Schema Title",
                 "description": "Title to be used in the variant schema for the field",
                 "type": "string"
             }
-        elif 'schema_description' in field:
+        elif field == 'schema_description':
             schema['properties']['schema_description'] = {
                 "title": "Description to be used in the variant schema for the field",
                 "description": "description inception",
                 "type": "string"
             }
-        elif field == 'SOURCE_NAME':
+        elif field == 'source_name':
             schema['properties']['source_name'] = {
                 "title": "Source Name",
                 "description": "Source used for collection information in this field",
                 "type": "string"
             }
-        elif field == 'SOURCE VERSION':
+        elif field == 'source_version':
             schema['properties']['source_version'] = {
                 "title": "Source Version",
                 "description": "Version of source used for collection information in this field",
                 "type": "string"
             }
-        elif 'FIELD_PRIORITY' in field:
+        elif field == 'field_priority':
             schema['properties']['field_priority'] = {
                 "title": "Field priority",
                 "description": "Ranking number of the field (lower is better)",
                 "type": "integer"
             }
-        elif field == 'COLUMN_PRIORITY':
+        elif field == 'column_priority':
             schema['properties']['column_priority'] = {
                 "title": "Column priority",
                 "description": "Ranking number of the field for Column in search view (lower is better)",
                 "type": "integer"
             }
-        elif field == 'FACET_PRIORITY':
+        elif field == 'facet_priority':
             schema['properties']['facet_priority'] = {
                 "title": "Field priority",
                 "description": "Ranking number of the field for Facet in search view (lower is better)",
@@ -247,7 +263,7 @@ def build_annotation_field_schema(fields):
                     "Phenotype"
                 ]
             }
-        elif 'MVP' in field:
+        elif field == 'mvp':
             schema['properties']['mvp'] = {
                 "title": "MVP",
                 "description": "Is this field part of MVP",
@@ -279,7 +295,9 @@ def main():
         logger.error('Failed to process mapping table. Exiting.\n')
         exit(1)
 
+    print(FIELDS)
     ANNOTATION_SCHEMA = build_annotation_field_schema(FIELDS)
+    print(ANNOTATION_SCHEMA)
     with open('annotation_field.json', 'w+') as out:
         json.dump(ANNOTATION_SCHEMA, out)
     logger.info('Successfully wrote new annotation_schema.json\n')
