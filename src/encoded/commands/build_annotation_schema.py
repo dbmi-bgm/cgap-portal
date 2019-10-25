@@ -91,6 +91,7 @@ def add_annotation_schema_facets_and_columns(schema):
         }
     }
 
+
 def build_annotation_field_schema(fields):
     """
         Takes in fields read from the mapping table and builds the associated
@@ -282,6 +283,7 @@ def main():
     with open('annotation_field.json', 'w+') as out:
         json.dump(ANNOTATION_SCHEMA, out)
     logger.info('Successfully wrote new annotation_schema.json\n')
+
 
 if __name__ == '__main__':
     main()
