@@ -1205,6 +1205,7 @@ class HTMLTitle extends React.PureComponent {
 
     componentDidMount() {
         // See https://github.com/facebook/react/issues/2323
+        // Deprecated as of React v16.
         var node = document.querySelector('title');
         if (node && this._rootNodeID && !node.getAttribute('data-reactid')) {
             node.setAttribute('data-reactid', this._rootNodeID);
