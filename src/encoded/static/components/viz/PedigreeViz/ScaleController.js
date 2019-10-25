@@ -112,9 +112,9 @@ export class ScaleControls extends React.PureComponent {
 
     static defaultProps = {
         /** Align with CSS transition length, if one is set */
-        scaleChangeInterval: 20, // = a bit over 30fps
-        scaleChangeUpFactor: 1.01,
-        scaleChangeDownFactor: 0.99
+        scaleChangeInterval: 18, // = a bit under 60fps
+        scaleChangeUpFactor: 1.03,
+        scaleChangeDownFactor: 0.97
     };
 
     constructor(props){

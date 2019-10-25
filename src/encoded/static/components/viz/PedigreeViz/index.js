@@ -406,6 +406,7 @@ export class PedigreeVizView extends React.PureComponent {
 
     constructor(props){
         super(props);
+        this.handleDimensionOrScaleChanged = this.handleDimensionOrScaleChanged.bind(this);
         this.handleNodeMouseIn = this.handleNodeMouseIn.bind(this);
         this.handleNodeMouseLeave = this.handleNodeMouseLeave.bind(this);
         this.handleNodeClick = this.handleNodeClick.bind(this);
@@ -430,7 +431,13 @@ export class PedigreeVizView extends React.PureComponent {
         this.innerRef = React.createRef();
     }
 
-    /** Grab scrollLeft snapshot if scale is changing. We scroll after update to re-center. */
+    /**
+     * Grab scrollLeft snapshot if scale is changing.
+     * @todo
+     * Try to use in componentDidUpdate to update
+     * `innerElem.scrollLeft` / `scrollTop` if scale
+     * is changing in order to "center" contents
+     */
     ///*
     getSnapshotBeforeUpdate(prevProps, prevState){
         const { scale: currScale } = this.props;
@@ -449,25 +456,8 @@ export class PedigreeVizView extends React.PureComponent {
     //*/
 
     componentDidUpdate(pastProps, pastState, snapshot){
-        const {
-            objectGraph,
-            memoized,
-            onDimensionsChanged,
-            onDataChanged,
-            height: propHeight,
-            graphHeight,
-            graphWidth,
-            minimumHeight,
-            width: containerWidth
-        } = this.props;
-        const {
-            objectGraph: pastObjGraph,
-            height: pastPropHeight,
-            graphHeight: pastGraphHeight,
-            graphWidth: pastGraphWidth,
-            minimumHeight: pastMinHeight,
-            width: pastContainerWidth
-        } = pastProps;
+        const { objectGraph, memoized, onDataChanged } = this.props;
+        const { objectGraph: pastObjGraph } = pastProps;
 
         if (objectGraph !== pastObjGraph){
             onDataChanged(objectGraph);
@@ -481,16 +471,58 @@ export class PedigreeVizView extends React.PureComponent {
             });
         }
 
-        if (typeof onDimensionsChanged === "function"){
-            const containerHeight = propHeight || Math.max(minimumHeight, graphHeight);
-            const pastContainerHeight = pastPropHeight || Math.max(pastMinHeight, pastGraphHeight);
-            if (containerWidth !== pastContainerWidth ||
-                containerHeight !== pastContainerHeight ||
-                graphHeight !== pastGraphHeight ||
-                graphWidth !== pastGraphWidth
-            ){
-                onDimensionsChanged({ containerWidth, containerHeight, graphWidth, graphHeight });
-            }
+        this.handleDimensionOrScaleChanged(pastProps, pastState, snapshot);
+    }
+
+    /**
+     * Called from `componentDidUpdate`.
+     * Pulled into own func in case we want to
+     * try to throttle or debounce it later.
+     */
+    handleDimensionOrScaleChanged(pastProps, pastState, snapshot){
+        const {
+            onDimensionsChanged,
+            width: containerWidth,
+            height: propHeight,
+            graphHeight,
+            graphWidth,
+            minimumHeight,
+            scale
+        } = this.props;
+        const {
+            height: pastPropHeight,
+            graphHeight: pastGraphHeight,
+            graphWidth: pastGraphWidth,
+            minimumHeight: pastMinHeight,
+            width: pastContainerWidth,
+            scale: pastScale
+        } = pastProps;
+
+        const containerHeight = propHeight || Math.max(minimumHeight, graphHeight);
+        const pastContainerHeight = pastPropHeight || Math.max(pastMinHeight, pastGraphHeight);
+        const didDimensionsChange = (
+            containerWidth !== pastContainerWidth || containerHeight !== pastContainerHeight ||
+            graphHeight !== pastGraphHeight || graphWidth !== pastGraphWidth
+        );
+
+        if (didDimensionsChange && typeof onDimensionsChanged === "function"){
+            onDimensionsChanged({ containerWidth, containerHeight, graphWidth, graphHeight });
+        }
+
+        // Figure out center point of previous 'view' and reposition
+        // so as to scroll into/out-of center of viewport
+        const innerElem = this.innerRef.current;
+        if (snapshot && scale !== pastScale && innerElem){
+            const pastCenterV = (pastContainerHeight / 2) + snapshot.scrollTop;
+            const pastCenterVRatio = pastCenterV / (pastGraphHeight * pastScale);
+            const pastCenterH = (pastContainerWidth / 2) + snapshot.scrollLeft;
+            const pastCenterHRatio = pastCenterH / (pastGraphWidth * pastScale);
+            const nextCenterV = (graphHeight * scale) * pastCenterVRatio;
+            const nextCenterH = (graphWidth * scale) * pastCenterHRatio;
+            innerElem.scrollTo(
+                nextCenterH - (containerWidth / 2),
+                nextCenterV - (containerHeight / 2),
+            );
         }
     }
 
