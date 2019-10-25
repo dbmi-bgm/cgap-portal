@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom';
 import PropTypes from 'prop-types';
 import memoize from 'memoize-one';
 import { path as d3Path } from 'd3-path';
+
 import {
     standardizeObjectsInList, findNodeWithId,
     createObjectGraph, createRelationships, getRelationships
@@ -13,6 +14,7 @@ import {
     createEdges, relationshipTopPosition,
     graphToDiseaseIndices, orderNodesBottomRightToTopLeft
 } from './layout-utilities-drawing';
+import { ScaleController, ScaleControls } from './ScaleController';
 import { IndividualsLayer, doesAncestorHaveId } from './IndividualsLayer';
 import { IndividualNodeShapeLayer } from './IndividualNodeShapeLayer';
 import { EdgesLayer } from './EdgesLayer';
@@ -348,13 +350,16 @@ class GraphTransformer extends React.PureComponent {
         const order = this.memoized.orderObjectGraph(objectGraph, relationships, this.memoized);
         const dims = this.memoized.getFullDims(dimensionOpts);
         this.memoized.positionObjectGraph(objectGraph, order, dims);
-        const graphHeight = this.memoized.getGraphHeight(order.orderByHeightIndex, dims);
+        // Add extra to offset text @ bottom of nodes.
+        const graphHeight = this.memoized.getGraphHeight(order.orderByHeightIndex, dims) + 60;
+        const graphWidth = this.memoized.getGraphWidth(objectGraph, dims);
         const edges = this.memoized.createEdges(objectGraph, dims, graphHeight);
         console.log('TTT2', objectGraph, relationships, edges);
 
         const viewProps = {
             ...passProps,
             objectGraph, relationships, dims, order, edges,
+            graphHeight, graphWidth,
             disconnectedIndividuals, filterUnrelatedIndividuals,
             memoized: this.memoized
         };
@@ -362,7 +367,11 @@ class GraphTransformer extends React.PureComponent {
         if (children){
             return React.Children.map(children, (child) => React.cloneElement(child, viewProps));
         } else {
-            return <PedigreeVizView {...viewProps} memoized={this.memoized} />;
+            return (
+                <ScaleController>
+                    <PedigreeVizView {...viewProps} memoized={this.memoized} />
+                </ScaleController>
+            );
         }
     }
 }
@@ -372,7 +381,13 @@ export class PedigreeVizView extends React.PureComponent {
 
     static defaultProps = {
         'width': 600,
-        "scale" : 1
+        "scale" : 1,
+        "onDimensionsChanged" : function(width, height){
+            console.log("DIMENSIONS CHANGED (default handler)", "WIDTH", width, "HEIGHT", height);
+        },
+        "onDataChanged" : function(objectGraph){
+            console.log("DATA CHANGED (default handler)", objectGraph);
+        }
     };
 
     constructor(props){
@@ -386,11 +401,60 @@ export class PedigreeVizView extends React.PureComponent {
             'currHoverNodeId' : null,
             'currSelectedNodeId' :  null
         };
+        if (typeof props.onDataChanged === "function" && props.objectGraph){
+            props.onDataChanged(props.objectGraph);
+        }
+        if (typeof props.onDimensionsChanged === "function"){
+            props.onDimensionsChanged({
+                containerWidth: props.width,
+                containerHeight: props.height || Math.max(props.minimumHeight, props.graphHeight),
+                graphHeight: props.graphHeight,
+                graphWidth: props.graphWidth
+            });
+        }
+
+        this.innerRef = React.createRef();
     }
 
-    componentDidUpdate(pastProps){
-        const { objectGraph, memoized } = this.props;
-        if (objectGraph !== pastProps.objectGraph){
+    /** Grab scrollLeft snapshot if scale is changing. We scroll after update to re-center. */
+    /*
+    getSnapshotBeforeUpdate(prevProps, prevState){
+        const { scale: currScale, graphWidth } = this.props;
+        const { scale: prevScale } = prevProps;
+        if (currScale === prevScale) return null;
+
+        const innerElem = this.innerRef.current;
+        if (!innerElem) return null;
+
+        return {
+            scrollLeft: innerElem.scrollLeft
+        };
+    }
+    */
+
+    componentDidUpdate(pastProps, pastState, snapshot){
+        const {
+            objectGraph,
+            memoized,
+            onDimensionsChanged,
+            onDataChanged,
+            height: propHeight,
+            graphHeight,
+            graphWidth,
+            minimumHeight,
+            width: containerWidth
+        } = this.props;
+        const {
+            objectGraph: pastObjGraph,
+            height: pastPropHeight,
+            graphHeight: pastGraphHeight,
+            graphWidth: pastGraphWidth,
+            minimumHeight: pastMinHeight,
+            width: pastContainerWidth
+        } = pastProps;
+
+        if (objectGraph !== pastObjGraph){
+            onDataChanged(objectGraph);
             this.setState(function({ currSelectedNodeId }){
                 const retState = { currHoverNodeId: null };
                 const selectedNode = currSelectedNodeId && memoized.findNodeWithId(objectGraph, currSelectedNodeId);
@@ -399,6 +463,18 @@ export class PedigreeVizView extends React.PureComponent {
                 }
                 return retState;
             });
+        }
+
+        if (typeof onDimensionsChanged === "function"){
+            const containerHeight = propHeight || Math.max(minimumHeight, graphHeight);
+            const pastContainerHeight = pastPropHeight || Math.max(pastMinHeight, pastGraphHeight);
+            if (containerWidth !== pastContainerWidth ||
+                containerHeight !== pastContainerHeight ||
+                graphHeight !== pastGraphHeight ||
+                graphWidth !== pastGraphWidth
+            ){
+                onDimensionsChanged({ containerWidth, containerHeight, graphWidth, graphHeight });
+            }
         }
     }
 
@@ -470,7 +546,9 @@ export class PedigreeVizView extends React.PureComponent {
             objectGraph, dims, order, memoized,
             overlaysContainer, renderDetailPane, containerStyle,
             visibleDiseases = null,
-            scale = 1,
+            scale = 100, minScale, maxScale,
+            graphHeight, graphWidth,
+            setScale,
             ...passProps
         } = this.props;
         const { currSelectedNodeId } = this.state;
@@ -485,8 +563,6 @@ export class PedigreeVizView extends React.PureComponent {
             diseaseToIndex = memoized.graphToDiseaseIndices(objectGraph);
         }
 
-        const graphHeight = memoized.getGraphHeight(order.orderByHeightIndex, dims);
-        const graphWidth = memoized.getGraphWidth(objectGraph, dims);
         const containerHeight = propHeight || Math.max(minimumHeight, graphHeight);
         const orderedNodes = memoized.orderNodesBottomRightToTopLeft(objectGraph);
 
@@ -497,11 +573,12 @@ export class PedigreeVizView extends React.PureComponent {
             ...containerStyle
         };
 
+        const transformScale = scale / 100;
+
         const vizAreaStyle = {
-            'width': graphWidth * scale,
-            // Add extra to offset text @ bottom of nodes.
-            'height': (graphHeight * scale) + 60,
-            'transform' : scale !== 1 ? "scale(" + scale + ")" : null
+            'width': (graphWidth * transformScale),
+            'height': (graphHeight * transformScale),
+            'transform' : scale !== 1 ? "scale3d(" + transformScale + "," + transformScale + ",1)" : null
         };
 
         const commonChildProps = {
@@ -539,15 +616,18 @@ export class PedigreeVizView extends React.PureComponent {
             (selectedNodePane && currSelectedNodeId ? ' has-selected-node' : '')
         );
 
+        const scaleControlsProps = { scale, minScale, maxScale, setScale };
+
         return (
             <div className={cls} style={useContainerStyle}>
-                <div className="inner-container" onClick={this.handleContainerClick}>
+                <div className="inner-container" onClick={this.handleContainerClick} ref={this.innerRef}>
                     <div className="viz-area" style={vizAreaStyle}>
                         <ShapesLayer {...commonChildProps} />
                         <RelationshipsLayer {...commonChildProps} />
                         <IndividualsLayer {...commonChildProps} />
                     </div>
                 </div>
+                { typeof setScale === "function" ? <ScaleControls {...scaleControlsProps} /> : null }
                 { selectedNodePane ? <div className={detailPanelCls}>{ selectedNodePane }</div> : null }
             </div>
         );

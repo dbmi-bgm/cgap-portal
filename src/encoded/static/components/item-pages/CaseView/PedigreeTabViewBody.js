@@ -147,7 +147,7 @@ export class PedigreeTabViewBody extends React.PureComponent {
             showOrderBasedName = true
         } = this.props;
         const { isBrowserFullscreen, isPedigreeFullscreen } = this.state;
-        const propName = (isBrowserFullscreen ? "height" : "minimumHeight");
+        const propName = "height"; //(isBrowserFullscreen ? "height" : "minimumHeight");
         const cls = (
             (isBrowserFullscreen ? "browser-is-full-screen" : "") +
             (isPedigreeFullscreen ? " view-is-full-screen" : "")
@@ -157,12 +157,14 @@ export class PedigreeTabViewBody extends React.PureComponent {
             heightDiff = 0;
         }
 
+        // PedigreeViz's `height` props gets overriden by FullHeightCalculator @ responsive grid states
+        // larger than 'sm'.
         return (
             <div id="pedigree-viz-container-cgap" className={cls}>
                 <FullHeightCalculator {...{ windowWidth, windowHeight, propName, heightDiff }}>
                     <PedigreeViz {...{ dataset, windowWidth, visibleDiseases, scale, showOrderBasedName }}
                         width={windowWidth} filterUnrelatedIndividuals={false}
-                        renderDetailPane={this.renderDetailPane}>
+                        renderDetailPane={this.renderDetailPane} height={600}>
                     </PedigreeViz>
                 </FullHeightCalculator>
             </div>
