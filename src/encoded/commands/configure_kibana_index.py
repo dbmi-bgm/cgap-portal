@@ -24,9 +24,7 @@ def main():
     parser.add_argument('--env', help='Use the Elasticsearch associated with this EB environment')
     args = parser.parse_args()
 
-    settings = {
-        'max_result_window': 100000
-    }
+    # require either --es-endpoit or --env (not both)
     if not args.es_endpoint or args.env:
         log.error('configure_kibana_index: must provide either --es-endpoint'
                   'or --env to this command! You gave neither.')
