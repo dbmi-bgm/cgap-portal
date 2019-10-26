@@ -95,7 +95,7 @@ $pedigree-disease-colors :
         height: inherit;
         position: relative;
 
-        // Center viz area
+        // Center viz area, also has align-items: center for .pedigree-viz-container.has-extra-height
         display: flex;
         justify-content: center;
         align-items: start;
@@ -350,10 +350,16 @@ $pedigree-disease-colors :
         }
     }
 
+    &.has-extra-height {
+        .inner-container {
+            align-items: center;
+        }
+    }
+
     > .zoom-controls-container {
         position: absolute;
-        top: 10px;
-        left: 10px;
+        top: 5px;
+        left: 5px;
         > .zoom-buttons-row {
             display: flex;
             align-items: center;
@@ -595,14 +601,6 @@ div#pedigree-viz-container-cgap.browser-is-full-screen {
                     top: 0px;
                 }
             }
-        }
-
-        &:not(.has-extra-height) {
-
-            .inner-container {
-                align-items: start;
-            }
-    
         }
 
     }

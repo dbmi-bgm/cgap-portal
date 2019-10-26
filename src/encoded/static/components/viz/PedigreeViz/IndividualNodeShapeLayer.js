@@ -7,11 +7,12 @@ import { IndividualNodeBase } from './IndividualsLayer';
 
 export const IndividualNodeShapeLayer = React.memo(function IndividualNodeShapeLayer(props){
     const { objectGraph: g, ...passProps } = props;
-    const { dims } = passProps;
+    const { dims, scale } = passProps;
+    const textScale = (0.6 / scale) + 0.4;
     return (
         <g className="individuals-bg-shape-layer">
             <ClipPathDefinitions dims={dims} />
-            { g.map((indv) => <IndividualNodeShape key={indv.id} individual={indv} {...passProps} /> )}
+            { g.map((indv) => <IndividualNodeShape key={indv.id} individual={indv} {...passProps} textScale={textScale} /> )}
         </g>
     );
 });
@@ -107,7 +108,7 @@ export class IndividualNodeShape extends IndividualNodeBase {
 
     render(){
         const {
-            dims, graphHeight, individual, diseaseToIndex,
+            dims, graphHeight, individual, diseaseToIndex, textScale,
             currHoverNodeId, currSelectedNodeId, showOrderBasedName
         } = this.props;
         const { individualWidth, individualHeight } = dims;
@@ -149,8 +150,8 @@ export class IndividualNodeShape extends IndividualNodeBase {
                 { bgShape }
                 <UnderlayMarkers {...{ width, height, individual, shape, diseaseToIndex }} />
                 { fgShape }
-                <OverlayMarkers {...{ width, height, individual, shape, diseaseToIndex }} />
-                <UnderNodeText {...{ width, height, individual, shape, diseaseToIndex, dims, showOrderBasedName }} />
+                <OverlayMarkers {...{ width, height, individual, shape, diseaseToIndex, textScale }} />
+                <UnderNodeText {...{ width, height, individual, shape, diseaseToIndex, dims, showOrderBasedName, textScale }} />
             </g>
         );
     }
@@ -203,22 +204,7 @@ const AffectedBGPieChart = React.memo(function AffectedBGPieChart({ width, heigh
 });
 
 const UnderlayMarkers = React.memo(function UnderlayMarkers({ individual, width, height, shape, diseaseToIndex }){
-    const {
-        id,
-        name,
-        gender,
-        isProband = false,
-        isConsultand = false,
-        diseases = [],
-        carrierOfDiseases = [],
-        asymptoticDiseases = [],
-        isDeceased = false,
-        isPregnancy = false,
-        isSpontaneousAbortion = false,
-        isTerminatedPregnancy = false,
-        _drawing : { xCoord, yCoord }
-    } = individual;
-
+    const { diseases = [], carrierOfDiseases = [], asymptoticDiseases = [] } = individual;
     const markers = [];
 
     if (diseases.length > 0) {
@@ -238,7 +224,7 @@ const UnderlayMarkers = React.memo(function UnderlayMarkers({ individual, width,
     return <React.Fragment>{ markers }</React.Fragment>;
 });
 
-const OverlayMarkers = React.memo(function OverlayMarkers({ individual, width, height, shape, diseaseToIndex }){
+const OverlayMarkers = React.memo(function OverlayMarkers({ individual, width, height, shape, diseaseToIndex, textScale }){
     const {
         id,
         name,
@@ -375,7 +361,7 @@ function ColumnOfDiseases({ individual, width, height, shape, diseaseToIndex }){
 }
 
 /** @todo Implement things like age, stillBirth, isEctopic, etc. */
-function UnderNodeText({ individual, width, height, shape, dims, diseaseToIndex, showOrderBasedName }){
+function UnderNodeText({ individual, width, height, shape, dims, diseaseToIndex, showOrderBasedName, textScale }){
     const {
         id, name,
         ageString,
@@ -425,8 +411,9 @@ function UnderNodeText({ individual, width, height, shape, dims, diseaseToIndex,
     // todo maybe make an array of 'rows' to map to <text>s with incremented y coord.
 
     return (
-        <g className="text-box" transform={"translate(0, " + (height + 4) + ")"}>
-            <rect width={width + 4} x={-2} height={dims.individualYSpacing / 3} className="bg-rect" rx={5} />
+        <g className="text-box" style={{ transformOrigin: halfWidth + "px 0" }}
+            transform={"translate(0, " + (height + 4) + "), scale(" + textScale + ")"}>
+            {/* <rect width={width + 4} x={-2} height={dims.individualYSpacing / 3} className="bg-rect" rx={5} /> */}
             { renderedTexts }
         </g>
     );

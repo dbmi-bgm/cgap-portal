@@ -113,8 +113,8 @@ export class ScaleControls extends React.PureComponent {
     static defaultProps = {
         /** Align with CSS transition length, if one is set */
         scaleChangeInterval: 18, // = a bit under 60fps
-        scaleChangeUpFactor: 1.03,
-        scaleChangeDownFactor: 0.97
+        scaleChangeUpFactor: 1.025,
+        scaleChangeDownFactor: 0.975
     };
 
     constructor(props){
@@ -146,6 +146,7 @@ export class ScaleControls extends React.PureComponent {
         const { setScale, scaleChangeInterval, scaleChangeDownFactor, scale: initScale } = this.props;
         this.setState({ zoomOutPressed: true }, ()=>{
             const start = Date.now();
+            //const diff = (scaleChangeDownFactor * initScale) - initScale;
 
             const performZoom = () => { // Maybe could be reusable func w. params.
                 const { scale, minScale } = this.props;
@@ -160,6 +161,7 @@ export class ScaleControls extends React.PureComponent {
                     return;
                 }
                 setScale(
+                    //initScale + (diff * Math.floor((Date.now() - start) / scaleChangeInterval))
                     initScale *
                     (scaleChangeDownFactor ** Math.floor((Date.now() - start) / scaleChangeInterval))
                 );
@@ -183,6 +185,7 @@ export class ScaleControls extends React.PureComponent {
         const { setScale, scaleChangeInterval, scaleChangeUpFactor, scale: initScale } = this.props;
         this.setState({ zoomInPressed: true }, ()=>{
             const start = Date.now();
+            //const diff = (scaleChangeUpFactor * initScale) - initScale;
 
             const performZoom = () => { // Maybe could be reusable func w. params.
                 const { scale, maxScale } = this.props;
@@ -197,6 +200,7 @@ export class ScaleControls extends React.PureComponent {
                     return;
                 }
                 setScale(
+                    //initScale + (diff * Math.floor((Date.now() - start) / scaleChangeInterval))
                     initScale *
                     (scaleChangeUpFactor ** Math.floor((Date.now() - start) / scaleChangeInterval))
                 );

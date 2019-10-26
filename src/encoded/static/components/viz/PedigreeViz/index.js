@@ -614,6 +614,12 @@ export class PedigreeVizView extends React.PureComponent {
         const containerHeight = propHeight || Math.max(minimumHeight, graphHeight);
         const orderedNodes = memoized.orderNodesBottomRightToTopLeft(objectGraph);
 
+        const vizAreaStyle = {
+            'width': (graphWidth * scale),
+            'height': (graphHeight * scale),
+            'transform' : "scale3d(" + scale + "," + scale + ",1)"
+        };
+
         const useContainerStyle = {
             //width: containerWidth,
             height: propHeight || "auto",
@@ -621,16 +627,14 @@ export class PedigreeVizView extends React.PureComponent {
             ...containerStyle
         };
 
-        const vizAreaStyle = {
-            'width': (graphWidth * scale),
-            'height': (graphHeight * scale),
-            'transform' : "scale3d(" + scale + "," + scale + ",1)"
-        };
+        //const innerElemStyle = {
+        //    paddingTop: Math.max(0, (containerHeight - vizAreaStyle.height) / 2)
+        //};
 
         const commonChildProps = {
             objectGraph: orderedNodes,
             graphHeight, graphWidth, dims, memoized, diseaseToIndex,
-            containerHeight, containerWidth,
+            containerHeight, containerWidth, scale,
             'onNodeMouseIn' : this.handleNodeMouseIn,
             'onNodeMouseLeave' : this.handleNodeMouseLeave,
             'onNodeClick' : this.handleNodeClick,
@@ -654,7 +658,7 @@ export class PedigreeVizView extends React.PureComponent {
         const cls = (
             "pedigree-viz-container" +
             (currSelectedNodeId ? ' node-selected' : '') +
-            (containerHeight > graphHeight ? " has-extra-height" : "")
+            (containerHeight >= vizAreaStyle.height ? " has-extra-height" : "")
         );
 
         const detailPanelCls = (
