@@ -151,12 +151,12 @@ export class ScaleControls extends React.PureComponent {
         evt.stopPropagation();
         const { setScale, scaleChangeInterval, scaleChangeDownFactor, scale: initScale } = this.props;
         this.setState({ zoomOutPressed: true }, ()=>{
+            const start = Date.now();
 
-            this.currentTempZoom = initScale * scaleChangeDownFactor;
-            this.currentInterval = setInterval(()=>{
+            const performZoom = () => { // Maybe could be reusable func w. params.
                 const { scale, minScale } = this.props;
                 const { zoomOutPressed } = this.state;
-                if (!zoomOutPressed){
+                if (!zoomOutPressed) {
                     this.cleanupAfterPress();
                     return;
                 }
@@ -165,12 +165,10 @@ export class ScaleControls extends React.PureComponent {
                     this.setState({ zoomOutPressed: false });
                     return;
                 }
-                this.currentTempZoom = this.currentTempZoom * scaleChangeDownFactor;
-            }, scaleChangeInterval);
-
-            const performZoom = () => {
-                if (!this.currentTempZoom) return false; // End
-                setScale(this.currentTempZoom);
+                setScale(
+                    initScale *
+                    (scaleChangeDownFactor ** Math.floor((Date.now() - start) / scaleChangeInterval))
+                );
                 raf(performZoom);
             };
 
@@ -190,25 +188,24 @@ export class ScaleControls extends React.PureComponent {
         evt.stopPropagation();
         const { setScale, scaleChangeInterval, scaleChangeUpFactor, scale: initScale } = this.props;
         this.setState({ zoomInPressed: true }, ()=>{
+            const start = Date.now();
 
-            this.currentTempZoom = initScale * scaleChangeUpFactor;
-            this.currentInterval = setInterval(()=>{
+            const performZoom = () => { // Maybe could be reusable func w. params.
                 const { scale, maxScale } = this.props;
                 const { zoomInPressed } = this.state;
-                if (!zoomInPressed){
+                if (!zoomInPressed) {
                     this.cleanupAfterPress();
                     return;
                 }
                 if (scale >= maxScale){
-                    // Button becomes disabled so `onZoomInUp` is not guaranteed to be called.
+                    // Button becomes disabled so `onZoomOutUp` is not guaranteed to be called.
                     this.setState({ zoomInPressed: false });
+                    return;
                 }
-                this.currentTempZoom = this.currentTempZoom * scaleChangeUpFactor;
-            }, scaleChangeInterval);
-
-            const performZoom = () => {
-                if (!this.currentTempZoom) return false; // End
-                setScale(this.currentTempZoom);
+                setScale(
+                    initScale *
+                    (scaleChangeUpFactor ** Math.floor((Date.now() - start) / scaleChangeInterval))
+                );
                 raf(performZoom);
             };
 
