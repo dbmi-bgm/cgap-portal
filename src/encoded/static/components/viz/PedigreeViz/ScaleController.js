@@ -128,12 +128,6 @@ export class ScaleControls extends React.PureComponent {
             zoomOutPressed: false,
             zoomInPressed: false
         };
-
-        // Not the most reactful thing to store state data outside of state,
-        // but worthwhile here for us for performance
-        // (skip component lifecycle; requestAnimationFrame skipping repaint anyway so would only add lag)
-        this.currentInterval = null;
-        this.currentTempZoom = null;
     }
 
     cleanupAfterPress(){
