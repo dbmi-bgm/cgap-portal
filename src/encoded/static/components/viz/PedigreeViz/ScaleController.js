@@ -8,7 +8,7 @@ export class ScaleController extends React.PureComponent {
 
     static defaultProps = {
         minScale: 0.01,
-        maxScale: 1,
+        maxScale: 1.25,
         initialScale: 1,
         zoomToExtentsOnMount: true
     };
@@ -80,7 +80,7 @@ export class ScaleController extends React.PureComponent {
                 (containerWidth / graphWidth),
                 (containerHeight / graphHeight)
             );
-            const minScale = (Math.min(maxScale, Math.max(propMinScale, scaleUnbounded)));
+            const minScale = Math.floor(Math.min(maxScale, Math.max(propMinScale, scaleUnbounded)) * 100) / 100;
             const retObj = { containerWidth, containerHeight, minScale };
 
             // First time that we've gotten dimensions -- set scale to fit.
@@ -108,11 +108,26 @@ export class ScaleController extends React.PureComponent {
 
 }
 
+/**
+ * Component which provides UI for adjusting scale and
+ * calls `ScaleController`'s `setScale` function.
+ *
+ * Uses `requestAnimationFrame` for smooth and performant
+ * zooming transitions.
+ *
+ * If wondering whether `requestAnimationFrame` makes a meaningful
+ * difference, try to comment out the `raf`-related lines in `onSliderChange`
+ * method (except for `setScale(nextVal)`) and compare performance/smoothness :-D
+ *
+ * React itself does not use requestAnimationFrame under the hood,
+ * which can be asserted by recording/inspecting performance
+ * in Chrome dev tools (no animation frame tasks are called during
+ * normal React-triggered browser repaints).
+ */
 export class ScaleControls extends React.PureComponent {
 
     static defaultProps = {
-        /** Align with CSS transition length, if one is set */
-        scaleChangeInterval: 18, // = a bit under 60fps
+        scaleChangeInterval: 15, // milliseconds
         scaleChangeUpFactor: 1.025,
         scaleChangeDownFactor: 0.975
     };
@@ -123,17 +138,20 @@ export class ScaleControls extends React.PureComponent {
         this.onZoomOutUp = this.onZoomOutUp.bind(this);
         this.onZoomInDown = this.onZoomInDown.bind(this);
         this.onZoomInUp = this.onZoomInUp.bind(this);
-        this.cleanupAfterPress = this.cleanupAfterPress.bind(this);
+        this.cleanupAfterZoom = this.cleanupAfterZoom.bind(this);
+        this.onSliderChange = this.onSliderChange.bind(this);
         this.state = {
             zoomOutPressed: false,
             zoomInPressed: false
         };
+        this.nextAnimationFrame = null;
     }
 
-    cleanupAfterPress(){
-        clearInterval(this.currentInterval);
-        this.currentInterval = null;
-        this.currentTempZoom = null;
+    cleanupAfterZoom(){
+        if (this.nextAnimationFrame) {
+            window && window.cancelAnimationFrame && window.cancelAnimationFrame(this.nextAnimationFrame);
+            this.nextAnimationFrame = null;
+        }
     }
 
     /**
@@ -148,16 +166,10 @@ export class ScaleControls extends React.PureComponent {
             const start = Date.now();
             //const diff = (scaleChangeDownFactor * initScale) - initScale;
 
-            const performZoom = () => { // Maybe could be reusable func w. params.
+            const performZoom = () => {
                 const { scale, minScale } = this.props;
-                const { zoomOutPressed } = this.state;
-                if (!zoomOutPressed) {
-                    this.cleanupAfterPress();
-                    return;
-                }
-                if (scale <= minScale){
-                    // Button becomes disabled so `onZoomOutUp` is not guaranteed to be called.
-                    this.setState({ zoomOutPressed: false });
+                if (scale <= minScale){ // Button becomes disabled so `onZoomOutUp` is not guaranteed to be called.
+                    this.setState({ zoomOutPressed: false }, this.cleanupAfterZoom);
                     return;
                 }
                 setScale(
@@ -165,18 +177,17 @@ export class ScaleControls extends React.PureComponent {
                     initScale *
                     (scaleChangeDownFactor ** Math.floor((Date.now() - start) / scaleChangeInterval))
                 );
-                raf(performZoom);
+                this.nextAnimationFrame = raf(performZoom);
             };
 
-            raf(performZoom);
+            this.nextAnimationFrame = raf(performZoom);
         });
     }
 
     onZoomOutUp(evt){
         evt.preventDefault();
         evt.stopPropagation();
-        this.cleanupAfterPress();
-        this.setState({ zoomOutPressed: false });
+        this.setState({ zoomOutPressed: false }, this.cleanupAfterZoom);
     }
 
     onZoomInDown(evt){
@@ -187,16 +198,10 @@ export class ScaleControls extends React.PureComponent {
             const start = Date.now();
             //const diff = (scaleChangeUpFactor * initScale) - initScale;
 
-            const performZoom = () => { // Maybe could be reusable func w. params.
+            const performZoom = () => {
                 const { scale, maxScale } = this.props;
-                const { zoomInPressed } = this.state;
-                if (!zoomInPressed) {
-                    this.cleanupAfterPress();
-                    return;
-                }
-                if (scale >= maxScale){
-                    // Button becomes disabled so `onZoomOutUp` is not guaranteed to be called.
-                    this.setState({ zoomInPressed: false });
+                if (scale >= maxScale){ // Button becomes disabled so `onZoomOutUp` is not guaranteed to be called.
+                    this.setState({ zoomInPressed: false }, this.cleanupAfterZoom);
                     return;
                 }
                 setScale(
@@ -204,18 +209,28 @@ export class ScaleControls extends React.PureComponent {
                     initScale *
                     (scaleChangeUpFactor ** Math.floor((Date.now() - start) / scaleChangeInterval))
                 );
-                raf(performZoom);
+                this.nextAnimationFrame = raf(performZoom);
             };
 
-            raf(performZoom);
+            this.nextAnimationFrame = raf(performZoom);
         });
     }
 
     onZoomInUp(evt){
         evt.preventDefault();
         evt.stopPropagation();
-        this.cleanupAfterPress();
-        this.setState({ zoomInPressed: false });
+        this.setState({ zoomInPressed: false }, this.cleanupAfterZoom);
+    }
+
+    onSliderChange(evt){
+        evt.preventDefault();
+        evt.stopPropagation();
+        const { setScale } = this.props;
+        const nextVal = parseFloat(evt.target.value);
+        this.cleanupAfterZoom(); // <- Throttling based on browser CPU
+        this.nextAnimationFrame = raf(function(){
+            setScale(nextVal);
+        });
     }
 
     render(){
@@ -235,16 +250,25 @@ export class ScaleControls extends React.PureComponent {
                 <div className="zoom-buttons-row">
                     <button type="button" className="zoom-btn zoom-out"
                         onMouseDown={this.onZoomOutDown} onMouseUp={this.onZoomOutUp}
+                        onTouchStart={this.onZoomOutDown} onTouchEnd={this.onZoomOutUp}
                         disabled={minScale >= scale}>
                         <i className="icon icon-fw icon-search-minus fas"/>
                     </button>
+                    <div className="zoom-value">
+                        { Math.round(scale * 100) }
+                        <i className="icon icon-fw icon-percentage fas small"/>
+                    </div>
                     <button type="button" className="zoom-btn zoom-in"
                         onMouseDown={this.onZoomInDown} onMouseUp={this.onZoomInUp}
+                        onTouchStart={this.onZoomInDown} onTouchEnd={this.onZoomInUp}
                         disabled={maxScale <= scale}>
                         <i className="icon icon-fw icon-search-plus fas"/>
                     </button>
                 </div>
-                {/* @todo: slider */}
+                <div className="zoom-slider">
+                    <input type="range" min={minScale} max={maxScale} value={scale} step={0.01}
+                        onChange={this.onSliderChange} />
+                </div>
             </div>
         );
     }

@@ -3,7 +3,8 @@ import ReactDOM from 'react-dom';
 import PropTypes from 'prop-types';
 import memoize from 'memoize-one';
 import { path as d3Path } from 'd3-path';
-
+/** @todo Pull this out into here if making a lib */
+import { requestAnimationFrame as raf } from '@hms-dbmi-bgm/shared-portal-components/es/components/viz/utilities';
 import {
     standardizeObjectsInList, findNodeWithId,
     createObjectGraph, createRelationships, getRelationships
@@ -411,7 +412,9 @@ export class PedigreeVizView extends React.PureComponent {
         this.handleNodeMouseLeave = this.handleNodeMouseLeave.bind(this);
         this.handleNodeClick = this.handleNodeClick.bind(this);
         this.handleUnselectNode = this.handleUnselectNode.bind(this);
-        this.handleContainerClick = this.handleContainerClick.bind(this);
+        this.handleContainerMouseDown = this.handleContainerMouseDown.bind(this);
+        this.handleContainerMouseMove = this.handleContainerMouseMove.bind(this);
+        this.handleMouseUp = this.handleMouseUp.bind(this);
         this.state = {
             'currHoverNodeId' : null,
             'currSelectedNodeId' :  null
@@ -429,6 +432,27 @@ export class PedigreeVizView extends React.PureComponent {
         }
 
         this.innerRef = React.createRef();
+
+        // We should move at least ~ initMouseX (or 'isDragging')
+        // to state to allow to have "grab" vs "grabbing"
+        // mouse cursor (via className / CSS)
+        this.mouseMove = {
+            initMouseX: null,
+            initMouseY: null,
+            initScrollLeft: null,
+            initScrollTop: null,
+            vectorX: 0,
+            vectorY: 0,
+            nextAnimationFrame: null
+        };
+    }
+
+    componentDidMount(){
+        window.addEventListener("mouseup", this.handleMouseUp);
+    }
+
+    componentWillUnmount(){
+        window.removeEventListener("mouseup", this.handleMouseUp);
     }
 
     /**
@@ -582,8 +606,61 @@ export class PedigreeVizView extends React.PureComponent {
         });
     }
 
-    handleContainerClick(evt){
-        this.handleUnselectNode();
+    handleContainerMouseDown(evt){
+        evt.stopPropagation();
+        evt.preventDefault();
+        this.mouseMove.initMouseX = evt.pageX;
+        this.mouseMove.initMouseY = evt.pageY;
+        const innerElem = this.innerRef.current;
+        if (!innerElem) return;
+
+        this.mouseMove.initScrollLeft = innerElem.scrollLeft;
+        this.mouseMove.initScrollTop = innerElem.scrollTop;
+    }
+
+    handleContainerMouseMove(evt){
+        if (this.mouseMove.initMouseX === null) {
+            return false;
+        }
+
+        const {
+            initMouseX, initMouseY,
+            initScrollLeft, initScrollTop,
+            nextAnimationFrame
+        } = this.mouseMove;
+
+        const vectorX = evt.pageX - initMouseX;
+        const vectorY = evt.pageY - initMouseY;
+
+        this.mouseMove.vectorX = vectorX;
+        this.mouseMove.vectorY = vectorY;
+
+        const innerElem = this.innerRef.current;
+
+        if (nextAnimationFrame){
+            window.cancelAnimationFrame(nextAnimationFrame);
+        }
+        this.mouseMove.nextAnimationFrame = raf(() => {
+            innerElem.scrollTo(
+                Math.max(0, initScrollLeft - vectorX),
+                Math.max(0, initScrollTop - vectorY)
+            );
+        });
+    }
+
+    handleMouseUp(evt){
+        if (typeof this.mouseMove.vectorX === "number" && Math.abs(this.mouseMove.vectorX) < 10 && Math.abs(this.mouseMove.vectorX) < 10) {
+            // Act as click off of node; we will have vectorX if 'click'ed within container.
+            this.handleUnselectNode();
+        }
+        this.mouseMove.nextAnimationFrame && window.cancelAnimationFrame(this.mouseMove.nextAnimationFrame);
+        this.mouseMove.initMouseX = null;
+        this.mouseMove.initMouseY = null;
+        this.mouseMove.initScrollLeft = null;
+        this.mouseMove.initScrollTop = null;
+        this.mouseMove.vectorX = 0;
+        this.mouseMove.vectorY = 0;
+        this.mouseMove.nextAnimationFrame && window.cancelAnimationFrame(this.mouseMove.nextAnimationFrame);
     }
 
     render(){
@@ -594,7 +671,8 @@ export class PedigreeVizView extends React.PureComponent {
             objectGraph, dims, order, memoized,
             overlaysContainer, renderDetailPane, containerStyle,
             visibleDiseases = null,
-            scale = 1, minScale, maxScale,
+            scale = 1,
+            minScale, maxScale,
             graphHeight, graphWidth,
             setScale,
             ...passProps
@@ -622,9 +700,13 @@ export class PedigreeVizView extends React.PureComponent {
 
         const useContainerStyle = {
             //width: containerWidth,
-            height: propHeight || "auto",
             minHeight : containerHeight,
             ...containerStyle
+        };
+
+        const innerContainerStyle = {
+            height: propHeight || "auto",
+            minHeight : containerHeight
         };
 
         //const innerElemStyle = {
@@ -670,8 +752,9 @@ export class PedigreeVizView extends React.PureComponent {
 
         return (
             <div className={cls} style={useContainerStyle}>
-                <div className="inner-container" onClick={this.handleContainerClick} ref={this.innerRef}>
-                    <div className="viz-area" style={vizAreaStyle}>
+                <div className="inner-container" ref={this.innerRef} style={innerContainerStyle}
+                    onMouseDown={this.handleContainerMouseDown} onMouseMove={this.handleContainerMouseMove}>
+                    <div className="viz-area" style={vizAreaStyle} data-scale={scale}>
                         <ShapesLayer {...commonChildProps} />
                         <RelationshipsLayer {...commonChildProps} />
                         <IndividualsLayer {...commonChildProps} />
