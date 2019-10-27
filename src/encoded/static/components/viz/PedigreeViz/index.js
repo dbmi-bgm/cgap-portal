@@ -161,6 +161,9 @@ export class PedigreeViz extends React.PureComponent {
             { id: 18, name: "Silly3", gender: "f", parents: [16, 14] },
         ],
 
+        /** If true, will filter out and not display individuals who are detached from proband. */
+        "filterUnrelatedIndividuals" : false,
+
         /**
          * Dimensions for drawing/layout of nodes.
          * Shouldn't need to change these.
@@ -333,23 +336,39 @@ function getFullDims(dimensionOpts){
 }
 
 
+export function buildGraphData(jsonList, dimensionOpts, filterUnrelatedIndividuals = false){
+    const { objectGraph, disconnectedIndividuals } = createObjectGraph(jsonList, filterUnrelatedIndividuals);
+    const relationships = createRelationships(objectGraph);
+    assignTreeHeightIndices(objectGraph);
+    const order = orderObjectGraph(objectGraph, relationships);
+    const dims = getFullDims(dimensionOpts);
+    positionObjectGraph(objectGraph, order, dims);
+    // Add extra to offset text @ bottom of nodes.
+    const graphHeight = getGraphHeight(order.orderByHeightIndex, dims) + 60;
+    const graphWidth = getGraphWidth(objectGraph, dims);
+    const edges = createEdges(objectGraph, dims, graphHeight);
+
+    return {
+        objectGraph,
+        disconnectedIndividuals,
+        relationships,
+        order,
+        dims,
+        graphHeight,
+        graphWidth,
+        edges
+    };
+}
+
+
 class GraphTransformer extends React.PureComponent {
 
     constructor(props){
         super(props);
+
         // Funcs for which we don't expect result to change unless props.jsonList does.
         this.memoized = {
-            createObjectGraph       : memoize(createObjectGraph),
-            createRelationships     : memoize(createRelationships),
-            assignTreeHeightIndices : memoize(assignTreeHeightIndices),
-            orderObjectGraph        : memoize(orderObjectGraph),
-            positionObjectGraph     : memoize(positionObjectGraph),
-            getGraphHeight          : memoize(getGraphHeight),
-            getGraphWidth           : memoize(getGraphWidth),
-            createEdges             : memoize(createEdges),
-            findNodeWithId          : memoize(findNodeWithId),
-            getFullDims             : memoize(getFullDims),
-            getRelationships        : memoize(getRelationships)
+            buildGraphData: memoize(buildGraphData)
         };
     }
 
@@ -359,32 +378,17 @@ class GraphTransformer extends React.PureComponent {
             zoomToExtentsOnMount, initialScale, enableMouseWheelZoom,
             ...passProps
         } = this.props;
-        const { objectGraph, disconnectedIndividuals } = this.memoized.createObjectGraph(jsonList, filterUnrelatedIndividuals);
-        const relationships = this.memoized.createRelationships(objectGraph);
-        this.memoized.assignTreeHeightIndices(objectGraph);
-        const order = this.memoized.orderObjectGraph(objectGraph, relationships, this.memoized);
-        const dims = this.memoized.getFullDims(dimensionOpts);
-        this.memoized.positionObjectGraph(objectGraph, order, dims);
-        // Add extra to offset text @ bottom of nodes.
-        const graphHeight = this.memoized.getGraphHeight(order.orderByHeightIndex, dims) + 60;
-        const graphWidth = this.memoized.getGraphWidth(objectGraph, dims);
-        const edges = this.memoized.createEdges(objectGraph, dims, graphHeight);
-        console.log('TTT2', objectGraph, relationships, edges);
 
-        const viewProps = {
-            ...passProps,
-            objectGraph, relationships, dims, order, edges,
-            graphHeight, graphWidth,
-            disconnectedIndividuals, filterUnrelatedIndividuals,
-            memoized: this.memoized
-        };
+        const graphData = this.memoized.buildGraphData(jsonList, dimensionOpts, filterUnrelatedIndividuals);
+        const viewProps = { ...passProps, ...graphData, filterUnrelatedIndividuals };
+        console.log('TTT2', graphData);
 
         if (children){
             return React.Children.map(children, (child) => React.cloneElement(child, viewProps));
         } else {
             return (
                 <ScaleController {...{ zoomToExtentsOnMount, initialScale, enableMouseWheelZoom }}>
-                    <PedigreeVizView {...viewProps} memoized={this.memoized} />
+                    <PedigreeVizView {...viewProps} />
                 </ScaleController>
             );
         }
@@ -454,7 +458,8 @@ export class PedigreeVizView extends React.PureComponent {
 
         this.memoized = { // Differs from props.memoized
             diseaseToIndex: memoize(PedigreeVizView.diseaseToIndex),
-            orderNodesBottomRightToTopLeft : memoize(orderNodesBottomRightToTopLeft)
+            orderNodesBottomRightToTopLeft : memoize(orderNodesBottomRightToTopLeft),
+            findNodeWithId: memoize(findNodeWithId)
         };
 
         this.innerRef = React.createRef();
@@ -523,14 +528,14 @@ export class PedigreeVizView extends React.PureComponent {
     //*/
 
     componentDidUpdate(pastProps, pastState, snapshot){
-        const { objectGraph, memoized, onDataChanged } = this.props;
+        const { objectGraph, onDataChanged } = this.props;
         const { objectGraph: pastObjGraph } = pastProps;
 
         if (objectGraph !== pastObjGraph){
             onDataChanged(objectGraph);
-            this.setState(function({ currSelectedNodeId }){
+            this.setState(({ currSelectedNodeId })=>{
                 const retState = { currHoverNodeId: null };
-                const selectedNode = currSelectedNodeId && memoized.findNodeWithId(objectGraph, currSelectedNodeId);
+                const selectedNode = currSelectedNodeId && this.memoized.findNodeWithId(objectGraph, currSelectedNodeId);
                 if (!selectedNode){
                     retState.currSelectedNodeId = null;
                 }
@@ -634,10 +639,10 @@ export class PedigreeVizView extends React.PureComponent {
                 'currHoverNodeId' : id
             };
         }, ()=>{
-            const { onNodeSelect, memoized, objectGraph } = this.props;
+            const { onNodeSelect, objectGraph } = this.props;
             const { currSelectedNodeId } = this.state;
             if (typeof onNodeSelect === 'function'){
-                const currSelectedNode = currSelectedNodeId && memoized.findNodeWithId(objectGraph, currSelectedNodeId);
+                const currSelectedNode = currSelectedNodeId && this.memoized.findNodeWithId(objectGraph, currSelectedNodeId);
                 onNodeSelect(currSelectedNode);
             }
         });
@@ -645,11 +650,11 @@ export class PedigreeVizView extends React.PureComponent {
 
     handleUnselectNode(){
         this.setState({ 'currSelectedNodeId' : null }, ()=>{
-            const { onNodeSelect, memoized, objectGraph } = this.props;
+            const { onNodeSelect, objectGraph } = this.props;
             const { currSelectedNodeId } = this.state;
             if (typeof onNodeSelect === 'function'){
                 // Should always eval to null but keep remainder of logic in case state.currSelectedNodeId changes interim.
-                const currSelectedNode = currSelectedNodeId && memoized.findNodeWithId(objectGraph, currSelectedNodeId);
+                const currSelectedNode = currSelectedNodeId && this.memoized.findNodeWithId(objectGraph, currSelectedNodeId);
                 onNodeSelect(currSelectedNode);
             }
         });
@@ -676,6 +681,11 @@ export class PedigreeVizView extends React.PureComponent {
         this.setState({ isMouseDownOnContainer: true });
     }
 
+    /**
+     * @todo
+     * Maybe add as listener on window instead so viz area remains
+     * moving when mouse goes outside boundary.
+     */
     handleContainerMouseMove(evt){
         if (this.mouseMove.initMouseX === null) {
             return false;
@@ -750,7 +760,7 @@ export class PedigreeVizView extends React.PureComponent {
             width: containerWidth,
             height: propHeight,
             minimumHeight,
-            objectGraph, dims, order, memoized,
+            objectGraph, dims, order,
             renderDetailPane, containerStyle,
             visibleDiseases = null,
             scale = 1,
@@ -779,8 +789,9 @@ export class PedigreeVizView extends React.PureComponent {
 
         const commonChildProps = {
             objectGraph: orderedNodes,
-            graphHeight, graphWidth, dims, memoized, diseaseToIndex,
+            graphHeight, graphWidth, dims, diseaseToIndex,
             containerHeight, containerWidth, scale,
+            'memoized': this.memoized,
             'onNodeMouseIn' : this.handleNodeMouseIn,
             'onNodeMouseLeave' : this.handleNodeMouseLeave,
             //'onNodeClick' : this.handleNodeClick,
@@ -792,8 +803,8 @@ export class PedigreeVizView extends React.PureComponent {
             selectedNodePane = renderDetailPane({
                 objectGraph,
                 currSelectedNodeId,
-                memoized,
                 diseaseToIndex,
+                'memoized': this.memoized, // `findNodeWithId` is reused by child components
                 'unselectNode' : this.handleUnselectNode,
                 'onNodeClick' : this.handleNodeClick,
             });
