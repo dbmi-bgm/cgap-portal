@@ -761,9 +761,9 @@ export class PedigreeVizView extends React.PureComponent {
         } = this.props;
         const { currSelectedNodeId, isMouseDownOnContainer } = this.state;
         const diseaseToIndex = this.memoized.diseaseToIndex(visibleDiseases, objectGraph);
+        const orderedNodes = this.memoized.orderNodesBottomRightToTopLeft(objectGraph);
 
         const containerHeight = propHeight || Math.max(minimumHeight, graphHeight);
-        const orderedNodes = this.memoized.orderNodesBottomRightToTopLeft(objectGraph);
 
         const outerContainerStyle = { minHeight : containerHeight, ...containerStyle };
         const innerContainerStyle = { height: propHeight || "auto", minHeight : containerHeight };
@@ -788,7 +788,6 @@ export class PedigreeVizView extends React.PureComponent {
         };
 
         let selectedNodePane = null;
-
         if (typeof renderDetailPane === 'function'){
             selectedNodePane = renderDetailPane({
                 objectGraph,
@@ -800,18 +799,11 @@ export class PedigreeVizView extends React.PureComponent {
             });
         }
 
-        const detailPanelCls = (
-            "detail-pane-container" +
-            (selectedNodePane && currSelectedNodeId ? " has-selected-node" : "")
-        );
-
+        const detailPaneHasNode = !!(selectedNodePane && currSelectedNodeId);
         const hasExtraHeight = containerHeight >= scaledVizStyle.height;
+        const hasExtraWidth = (typeof containerWidth === "number" && containerWidth >= scaledVizStyle.width);
         const scaleControlsProps = { scale, minScale, maxScale, setScale };
-        const isScrollable = !!(
-            !hasExtraHeight ||
-            (typeof containerWidth === "number" && containerWidth <= scaledVizStyle.width) ||
-            (selectedNodePane && currSelectedNodeId)
-        );
+        const isScrollable = !hasExtraHeight || !hasExtraWidth || detailPaneHasNode;
 
         return (
             <div className="pedigree-viz-container" style={outerContainerStyle} data-selected-node={currSelectedNodeId}>
@@ -827,8 +819,14 @@ export class PedigreeVizView extends React.PureComponent {
                         <IndividualsLayer {...commonChildProps} />
                     </div>
                 </div>
-                { typeof setScale === "function" ? <ScaleControls {...scaleControlsProps} /> : null }
-                { selectedNodePane ? <div className={detailPanelCls}>{ selectedNodePane }</div> : null }
+                { typeof setScale === "function" ?
+                    <ScaleControls {...scaleControlsProps} />
+                    : null }
+                { selectedNodePane ?
+                    <div className={"detail-pane-container" + (detailPaneHasNode ? " has-selected-node" : "")}>
+                        { selectedNodePane }
+                    </div>
+                    : null }
             </div>
         );
     }
