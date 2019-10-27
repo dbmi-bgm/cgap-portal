@@ -802,7 +802,6 @@ export class PedigreeVizView extends React.PureComponent {
         const detailPaneHasNode = !!(selectedNodePane && currSelectedNodeId);
         const hasExtraHeight = containerHeight >= scaledVizStyle.height;
         const hasExtraWidth = (typeof containerWidth === "number" && containerWidth >= scaledVizStyle.width);
-        const scaleControlsProps = { scale, minScale, maxScale, setScale };
         const isScrollable = !hasExtraHeight || !hasExtraWidth || detailPaneHasNode;
 
         return (
@@ -820,7 +819,7 @@ export class PedigreeVizView extends React.PureComponent {
                     </div>
                 </div>
                 { typeof setScale === "function" ?
-                    <ScaleControls {...scaleControlsProps} />
+                    <ScaleControls {...{ scale, minScale, maxScale, setScale }} />
                     : null }
                 { selectedNodePane ?
                     <div className={"detail-pane-container" + (detailPaneHasNode ? " has-selected-node" : "")}>
