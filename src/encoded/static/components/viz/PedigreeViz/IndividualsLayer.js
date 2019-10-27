@@ -74,7 +74,7 @@ export class IndividualDiv extends IndividualNodeBase {
     constructor(props){
         super(props);
         this.onMouseEnter = this.onMouseEnter.bind(this);
-        this.onClick = this.onClick.bind(this);
+        //this.onClick = this.onClick.bind(this);
         this.onAddBtnClick = this.onAddBtnClick.bind(this);
         this.state = {
             'currentOption' : null
@@ -101,11 +101,13 @@ export class IndividualDiv extends IndividualNodeBase {
         onNodeMouseIn(id);
     }
 
+    /* Currently being managed by index.js / PedigreeVizView
     onClick(evt){
         const { onNodeClick, individual: { id } } = this.props;
         evt.stopPropagation();
         onNodeClick(id);
     }
+    */
 
     /** Not used atm */
     onAddBtnClick(evt){
@@ -162,8 +164,8 @@ export class IndividualDiv extends IndividualNodeBase {
         };
         return (
             <div style={elemStyle} id={id} data-height-index={heightIndex} className={indvNodeCls}
-                data-y-coord={yCoord}
-                onMouseEnter={this.onMouseEnter} onMouseLeave={onNodeMouseLeave} onClick={this.onClick}>
+                data-y-coord={yCoord} data-node-type="individual"
+                onMouseEnter={this.onMouseEnter} onMouseLeave={onNodeMouseLeave}>
                 { actionButtons }
                 { currentOption === 'add' ? /** TODO */
                     <NodeOptionsPanel {...this.props} onAddSelect={this.handleAddNewIndividual} /> : null

@@ -157,14 +157,30 @@ export class PedigreeTabViewBody extends React.PureComponent {
             heightDiff = 0;
         }
 
-        // PedigreeViz's `height` props gets overriden by FullHeightCalculator @ responsive grid states
-        // larger than 'sm'.
+        /*
+        const rgs = layout.responsiveGridState(windowWidth);
+        const enableMouseWheelZoom = (
+            rgs !== "xs" && rgs !== "sm" &&
+            // 400px minimumHeight (below) + UI height makes window scrollable at under ~ 620px height.
+            // Which is bad for mousewheel scrolling.
+            windowHeight > 620
+        );
+        */
+
+        // Will lose ability to move top/bottom with touchpad if this is enabled.
+        // Need to consider further.
+        const enableMouseWheelZoom = false;
+
+        /**
+         * PedigreeViz's `height` props gets overriden by FullHeightCalculator @ responsive
+         * grid states larger than 'sm' (@see FullHeightCalculator `defaultProps.skipGridStates`).
+         */
         return (
             <div id="pedigree-viz-container-cgap" className={cls}>
                 <FullHeightCalculator {...{ windowWidth, windowHeight, propName, heightDiff }}>
-                    <PedigreeViz {...{ dataset, windowWidth, visibleDiseases, scale, showOrderBasedName }}
-                        width={windowWidth} filterUnrelatedIndividuals={false}
-                        renderDetailPane={this.renderDetailPane} height={600}>
+                    <PedigreeViz {...{ dataset, windowWidth, visibleDiseases, scale, showOrderBasedName, enableMouseWheelZoom }}
+                        filterUnrelatedIndividuals={false} renderDetailPane={this.renderDetailPane}
+                        height={600} width={windowWidth} minimumHeight={400}>
                     </PedigreeViz>
                 </FullHeightCalculator>
             </div>

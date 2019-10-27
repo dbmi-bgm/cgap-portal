@@ -18,12 +18,28 @@ export class ScaleController extends React.PureComponent {
         this.setScale = this.setScale.bind(this);
         this.handleWheelMove = this.handleWheelMove.bind(this);
         this.handleDimensionsChanged = this.handleDimensionsChanged.bind(this);
+        this.handleInnerContainerMounted = this.handleInnerContainerMounted.bind(this);
+        this.handleInnerContainerWillUnmount = this.handleInnerContainerWillUnmount.bind(this);
         this.state = {
             scale: null,
             minScale: null,
             containerWidth: null,
             containerHeight: null
         };
+        this.innerElemReference = null;
+    }
+
+    componentDidUpdate(pastProps){
+        const { enableMouseWheelZoom } = this.props;
+        const { enableMouseWheelZoom: pastEnabled } = pastProps;
+
+        if (this.innerElemReference){
+            if (enableMouseWheelZoom && !pastEnabled){
+                this.innerElemReference.addEventListener("wheel", this.handleWheelMove);
+            } else if (!enableMouseWheelZoom && pastEnabled){
+                this.innerElemReference.removeEventListener("wheel", this.handleWheelMove);
+            }
+        }
     }
 
     setScale(scaleToSet, cb){
@@ -31,12 +47,19 @@ export class ScaleController extends React.PureComponent {
             { minScale: stateMinScale },
             { minScale: propMinScale, maxScale }
         ){
-            const scale = (Math.max(Math.min(maxScale, scaleToSet), stateMinScale || propMinScale));
+            const scale = Math.max(
+                Math.min(
+                    maxScale,
+                    scaleToSet
+                ),
+                stateMinScale || propMinScale
+            );
             return { scale };
         }, cb);
     }
 
     /**
+     * @todo
      * Not yet used/implemented --
      * don't want this active by default unless are full screen or something
      * due to window itself being vertically scrollable in many cases.
@@ -48,16 +71,38 @@ export class ScaleController extends React.PureComponent {
      */
     handleWheelMove(evt){
         const { deltaY, deltaX } = evt;
-        if (Math.abs(deltaX) > Math.abs(deltaY)){
-            return;
+        if (Math.abs(deltaX) > 0){
+            // Not perfect --
+            // Make sure is mousewheel and not bidirectional touchpad,
+            // for which we still wanna allow left/right movement.
+            return false;
         }
+
         evt.preventDefault();
         evt.stopPropagation();
-        this.setState(function({ scale: prevScale = 1 }, { minScale, maxScale }){
-            const scaleUnbounded = prevScale -= (deltaY * 0.001);
-            const scale = (Math.min(maxScale, Math.max(minScale, scaleUnbounded)));
-            console.log('E2', prevScale, scaleUnbounded, scale);
-            return { scale };
+
+        if (this.nextAnimationFrame !== null){
+            window && window.cancelAnimationFrame(this.nextAnimationFrame);
+        }
+
+        this.nextAnimationFrame = raf(() => {
+            // React uses own state change queuing system, which guessing
+            // gets bypassed w. raf, so below line might work just as well..
+            //this.setScale(this.state.scale - (deltaY * 0.0005));
+            ///*
+            this.setState(function(
+                { scale: prevScale = 1, minScale: stateMinScale },
+                { minScale: propMinScale, maxScale }
+            ){
+                const scaleUnbounded = prevScale - (deltaY * 0.0005);
+                const scale = Math.min(
+                    maxScale,
+                    Math.max(stateMinScale || propMinScale, scaleUnbounded)
+                );
+                return { scale };
+            });
+            //*/
+            this.nextAnimationFrame = null;
         });
     }
 
@@ -93,6 +138,33 @@ export class ScaleController extends React.PureComponent {
         });
     }
 
+    handleInnerContainerMounted(innerElem){
+        const { onMount, enableMouseWheelZoom } = this.props;
+        if (typeof onMount === "function"){
+            onMount(...arguments);
+        }
+        this.innerElemReference = innerElem;
+        if (enableMouseWheelZoom) {
+            innerElem.addEventListener("wheel", this.handleWheelMove);
+        }
+    }
+
+    handleInnerContainerWillUnmount(innerElem){
+        const { onWillUnmount } = this.props;
+        if (typeof onMount === "function"){
+            onWillUnmount(...arguments);
+        }
+        if (this.innerElemReference === null) {
+            console.error("No inner elem, exiting");
+            return;
+        }
+        if (this.innerElemReference !== innerElem) {
+            throw new Error("Inner elem is different, exiting");
+        }
+        this.innerElemReference.removeEventListener("wheel", this.handleWheelMove);
+        this.innerElemReference = null;
+    }
+
     render(){
         const { children, initialScale = null, minScale: propMinScale, ...passProps } = this.props;
         const { scale, minScale } = this.state;
@@ -101,7 +173,9 @@ export class ScaleController extends React.PureComponent {
             scale: scale || initialScale || 1,
             minScale: minScale || propMinScale,
             setScale: this.setScale,
-            onDimensionsChanged: this.handleDimensionsChanged
+            onDimensionsChanged: this.handleDimensionsChanged,
+            onMount: this.handleInnerContainerMounted,
+            onWillUnmount: this.handleInnerContainerWillUnmount
         };
         return React.Children.map(children, (child) => React.cloneElement(child, childProps) );
     }
@@ -138,7 +212,7 @@ export class ScaleControls extends React.PureComponent {
         this.onZoomOutUp = this.onZoomOutUp.bind(this);
         this.onZoomInDown = this.onZoomInDown.bind(this);
         this.onZoomInUp = this.onZoomInUp.bind(this);
-        this.cleanupAfterZoom = this.cleanupAfterZoom.bind(this);
+        this.cancelAnimationFrame = this.cancelAnimationFrame.bind(this);
         this.onSliderChange = this.onSliderChange.bind(this);
         this.state = {
             zoomOutPressed: false,
@@ -147,8 +221,8 @@ export class ScaleControls extends React.PureComponent {
         this.nextAnimationFrame = null;
     }
 
-    cleanupAfterZoom(){
-        if (this.nextAnimationFrame) {
+    cancelAnimationFrame(){
+        if (this.nextAnimationFrame !== null) {
             window && window.cancelAnimationFrame && window.cancelAnimationFrame(this.nextAnimationFrame);
             this.nextAnimationFrame = null;
         }
@@ -169,7 +243,8 @@ export class ScaleControls extends React.PureComponent {
             const performZoom = () => {
                 const { scale, minScale } = this.props;
                 if (scale <= minScale){ // Button becomes disabled so `onZoomOutUp` is not guaranteed to be called.
-                    this.setState({ zoomOutPressed: false }, this.cleanupAfterZoom);
+                    this.setState({ zoomOutPressed: false });
+                    this.nextAnimationFrame = null;
                     return;
                 }
                 setScale(
@@ -187,7 +262,8 @@ export class ScaleControls extends React.PureComponent {
     onZoomOutUp(evt){
         evt.preventDefault();
         evt.stopPropagation();
-        this.setState({ zoomOutPressed: false }, this.cleanupAfterZoom);
+        this.cancelAnimationFrame();
+        this.setState({ zoomOutPressed: false });
     }
 
     onZoomInDown(evt){
@@ -201,7 +277,8 @@ export class ScaleControls extends React.PureComponent {
             const performZoom = () => {
                 const { scale, maxScale } = this.props;
                 if (scale >= maxScale){ // Button becomes disabled so `onZoomOutUp` is not guaranteed to be called.
-                    this.setState({ zoomInPressed: false }, this.cleanupAfterZoom);
+                    this.setState({ zoomInPressed: false });
+                    this.nextAnimationFrame = null;
                     return;
                 }
                 setScale(
@@ -219,7 +296,8 @@ export class ScaleControls extends React.PureComponent {
     onZoomInUp(evt){
         evt.preventDefault();
         evt.stopPropagation();
-        this.setState({ zoomInPressed: false }, this.cleanupAfterZoom);
+        this.cancelAnimationFrame();
+        this.setState({ zoomInPressed: false });
     }
 
     onSliderChange(evt){
@@ -227,9 +305,10 @@ export class ScaleControls extends React.PureComponent {
         evt.stopPropagation();
         const { setScale } = this.props;
         const nextVal = parseFloat(evt.target.value);
-        this.cleanupAfterZoom(); // <- Throttling based on browser CPU
-        this.nextAnimationFrame = raf(function(){
+        this.cancelAnimationFrame(); // <- Somewhat throttling based on browser CPU
+        this.nextAnimationFrame = raf(() => {
             setScale(nextVal);
+            this.nextAnimationFrame = null;
         });
     }
 

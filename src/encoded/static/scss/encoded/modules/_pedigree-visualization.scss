@@ -99,10 +99,20 @@ $pedigree-disease-colors :
         display: flex;
         justify-content: center;
         align-items: start;
+        &[data-has-extra-height="true"]{
+            align-items: center;
+        }
 
         // For iOS to scroll smoothly horizontally
         -webkit-overflow-scrolling: touch;
         -webkit-transform: translate3d(0,0,0);
+
+        &[data-scrollable="true"]{
+            cursor: grab;
+            &[data-mouse-down="true"]{
+                cursor: grabbing;
+            }
+        }
 
         > .viz-area {
             position: relative;
@@ -356,12 +366,6 @@ $pedigree-disease-colors :
         }
     }
 
-    &.has-extra-height {
-        .inner-container {
-            align-items: center;
-        }
-    }
-
     > .zoom-controls-container {
         position: absolute;
         top: 8px;
@@ -393,14 +397,15 @@ $pedigree-disease-colors :
 
                 &:disabled {
                     color: #999;
+                    pointer-events: none;
                 }
                 &:hover:not(:disabled),
-                &:focus, &:active {
+                &:focus:not(:disabled), &:active:not(:disabled) {
                     color: #000;
                     border-color: #555;
                     outline: none;
                 }
-                &:focus, &:active {
+                &:focus:not(:disabled), &:active:not(:disabled) {
                     box-shadow: inset 0px 0px 2px 0px #333;
                 }
             }
