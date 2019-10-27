@@ -62,8 +62,199 @@ const POSITION_DEFAULTS = {
     edgeCornerDiameter: 20
 };
 
+const pedigreeVizPropTypes = {
+    dataset: PropTypes.arrayOf(PropTypes.exact({
+        'id'                : PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+        'name'              : PropTypes.string,
+        'gender'            : PropTypes.oneOf(["m", "M", "male", "f", "F", "female", "u", "U", "undetermined"]).isRequired,
+        'age'               : PropTypes.number,
+        'diseases'          : PropTypes.arrayOf(PropTypes.string),
+        'carrierOfDiseases' : PropTypes.arrayOf(PropTypes.string),
+        'asymptoticDiseases': PropTypes.arrayOf(PropTypes.string),
+        'isProband'         : PropTypes.bool,
+        'isDeceased'        : PropTypes.bool,
+        'isConsultand'      : PropTypes.bool,
+        'isPregnancy'       : PropTypes.bool,
+        'isStillBirth'      : PropTypes.bool,
+        'isSpontaneousAbortion' : PropTypes.bool,
+        'isTerminatedPregnancy' : PropTypes.bool,
+        'isEctopic'         : PropTypes.bool,
+        'data'              : PropTypes.object,
+        'parents'           : PropTypes.arrayOf(PropTypes.oneOfType([ PropTypes.string, PropTypes.number ])),
+        'children'          : PropTypes.arrayOf(PropTypes.oneOfType([ PropTypes.string, PropTypes.number ])),
+        'mother'            : PropTypes.oneOfType([ PropTypes.string, PropTypes.number ]),
+        'father'            : PropTypes.oneOfType([ PropTypes.string, PropTypes.number ]),
+    })),
+    dimensionOpts: PropTypes.objectOf(PropTypes.number),
+    height: PropTypes.number,
+    width: PropTypes.number,
+    editable: PropTypes.bool,
+    onNodeSelect: PropTypes.func,
+    renderDetailPane: PropTypes.func
+};
+
+const pedigreeVizDefaultProps = {
+    /** @type {DatasetEntry[]} dataset - Dataset to be visualized. */
+    "dataset" : [
+        {
+            id: 1,
+            name: "Jack",
+            isProband: true,
+            father: 2,
+            mother: 3,
+            gender: "m",
+            data: {
+                "notes" : "Likes cheeseburger and other sandwiches. Dislikes things that aren't those things.",
+                "description" : "Too many calories in the diet."
+            },
+            age: 42,
+            diseases: ["Badfeelingitis", "Ubercrampus", "Blue Thumb Syndrome"],
+            carrierOfDiseases: ["Green Thumbitis", "BlueClues", "BlueClues2", "BluesClues3"],
+            //asymptoticDiseases: ["Green Thumbitis", "BlueClues", "BlueClues2", "BluesClues3"]
+        },
+        { id: 2, name: "Joe", gender: "m" },
+        { id: 3, name: "Mary", gender: "f", diseases: ["Blue Thumb Syndrome", "Green Thumbitis"] },
+        { id: 4, name: "George", gender: "m", parents: [2,3], age: 45, carrierOfDiseases: ["Blue Thumb Syndrome"], },
+        { id: 19, name: "George II", gender: "m", parents: [2,3], age: 46, carrierOfDiseases: ["Blue Thumb Syndrome"], },
+        { id: 5, name: "Patricia", gender: "f", parents: [3, 6], diseases: ["Badfeelingitis", "Ubercrampus", "Blue Thumb Syndrome"] },
+        {
+            id: 6, name: "Patrick", gender: "m", children: [5],
+            carrierOfDiseases: ["Blue Thumb Syndrome", "Ubercrampus"]
+        },
+        {
+            id: 7, name: "Phillip", gender: "m", children: [6],
+            carrierOfDiseases: ["Blue Thumb Syndrome", "Ubercrampus", "Green Thumbitis", "Badfeelingitis", "BlueClues", "BlueClues2", "BlueClues3"]
+        },
+        { id: 8, name: "Phillipina", gender: "f", children: [6] },
+        { id: 9, name: "Josephina", gender: "f", children: [2] },
+        { id: 10, name: "Joseph", gender: "m", children: [2] },
+        {
+            id: 11, name: "Max", gender: "m", parents: [],
+            asymptoticDiseases: ["Green Thumbitis", "BlueClues", "BlueClues2", "BluesClues3"]
+        },
+        { id: 12, name: "Winnie the Pooh", gender: "u", parents: [11, 5], isDeceased: true, age: 24 },
+        {
+            id: 13, name: "Rutherford", gender: "m", parents: [10, 5], age: 0.3,
+            isPregnancy: true, isDeceased: true, isTerminatedPregnancy: true,
+            diseases: ["Ubercrampus", "Blue Thumb Syndrome", "Green Thumbitis"],
+            carrierOfDiseases: ["BlueClues", "BlueClues2", "BluesClues3"]
+        },
+        { id: 14, name: "Sally", gender: "f", parents: [12, 9] },
+        { id: 15, name: "Sally2", gender: "f" },
+        { id: 16, name: "Silly", gender: "m", parents: [15, 12] },
+        { id: 17, name: "Silly2", gender: "m", parents: [15, 12] },
+        { id: 18, name: "Silly3", gender: "f", parents: [16, 14] },
+    ],
+
+    /** If true, will filter out and not display individuals who are detached from proband. */
+    "filterUnrelatedIndividuals" : false,
+
+    /**
+     * Dimensions for drawing/layout of nodes.
+     * Shouldn't need to change these.
+     * May define some or all or no dimensions (defaults will be applied).
+     *
+     * @required
+     */
+    "dimensionOpts" : Object.assign({}, POSITION_DEFAULTS),
+
+    /**
+     * Height of parent container.
+     * If not defined, visualization will be unbounded and extend as
+     * tall as needed instead of being vertically scrollable.
+     * Depending on UX/context, this is likely desirable.
+     *
+     * @optional
+     */
+    //"height" : null,
+
+    /**
+     * Minimum height of parent container,
+     * if height is not set and want container to
+     * be at least a certain height.
+     *
+     * @optional
+     */
+    "minimumHeight" : 400,
+
+    /**
+     * Width of parent container.
+     * Will be scrollable left/right if greater than this.
+     *
+     * @required
+     */
+    //"width" : 600,
+
+    /**
+     * NOT YET SUPPORTED.
+     * If true (unsupported yet), will be able to modify and add/remove nodes.
+     */
+    "editable" : false,
+
+    /**
+     * Callback function called upon changing of selectedNode.
+     *
+     * @optional
+     */
+    "onNodeSelect" : function(node){
+        console.log('Selected', node);
+    },
+
+    /**
+     * A function which returns a React Component.
+     * Will be instantiated/rendered at side of visualization.
+     *
+     * @type {function}
+     */
+    "renderDetailPane" : function(vizProps){
+        return <DefaultDetailPaneComponent {...vizProps} />;
+    },
+
+
+    /**
+     * Can supply an array of strings to color only those diseases.
+     * If null, then _all_ diseases will be colored.
+     *
+     * @type {!string[]}
+     */
+    "visibleDiseases": null,
+
+    /**
+     * If true, will show markers such as "II - 1", "IV - 2", etc. based on generation & order.
+     * Else will use `individual.name` or `individual.id` (if no name).
+     *
+     * @type {boolean}
+     */
+    "showOrderBasedName" : true,
+
+    /**
+     * Initial zoom/scale.
+     * Will be overriden if `zoomToExtentsOnMount` is true,
+     * after mount.
+     *
+     * @type {number}
+     */
+    "initialScale" : 1,
+
+    /**
+     * If true, will zoom out the graph (if needed)
+     * to fit into viewport. Will only fit to dimensions
+     * passed in, e.g. `props.height` & `props.width`.
+     *
+     * @type {boolean}
+     */
+    "zoomToExtentsOnMount" : true,
+
+
+    /** Whether to allow to zoom w. mousewheel. Experimental. */
+    "enableMouseWheelZoom" : false
+};
+
 /**
  * Primary component to feed data into.
+ * May opt to pull out and separately use `GraphTransformer` or `buildGraphData` and then render out
+ * `PedigreeVizView` with its resulting data. This might be useful when want to use data from resulting
+ * `objectGraph`, such as generation identifiers.
  *
  * @see https://s3-us-west-2.amazonaws.com/utsw-patientcare-web-production/documents/pedigree.pdf
  * @todo Many things, including
@@ -75,242 +266,15 @@ const POSITION_DEFAULTS = {
  *       - Maybe add to side if something already in center (?)
  *  - Twins of different specificites (requires additions to bounding box calculations, edge segments, etc.)
  */
-export class PedigreeViz extends React.PureComponent {
-
-    static propTypes = {
-        dataset: PropTypes.arrayOf(PropTypes.exact({
-            'id'                : PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
-            'name'              : PropTypes.string,
-            'gender'            : PropTypes.oneOf(["m", "M", "male", "f", "F", "female", "u", "U", "undetermined"]).isRequired,
-            'age'               : PropTypes.number,
-            'diseases'          : PropTypes.arrayOf(PropTypes.string),
-            'carrierOfDiseases' : PropTypes.arrayOf(PropTypes.string),
-            'asymptoticDiseases': PropTypes.arrayOf(PropTypes.string),
-            'isProband'         : PropTypes.bool,
-            'isDeceased'        : PropTypes.bool,
-            'isConsultand'      : PropTypes.bool,
-            'isPregnancy'       : PropTypes.bool,
-            'isStillBirth'      : PropTypes.bool,
-            'isSpontaneousAbortion' : PropTypes.bool,
-            'isTerminatedPregnancy' : PropTypes.bool,
-            'isEctopic'         : PropTypes.bool,
-            'data'              : PropTypes.object,
-            'parents'           : PropTypes.arrayOf(PropTypes.oneOfType([ PropTypes.string, PropTypes.number ])),
-            'children'          : PropTypes.arrayOf(PropTypes.oneOfType([ PropTypes.string, PropTypes.number ])),
-            'mother'            : PropTypes.oneOfType([ PropTypes.string, PropTypes.number ]),
-            'father'            : PropTypes.oneOfType([ PropTypes.string, PropTypes.number ]),
-        })),
-        dimensionOpts: PropTypes.objectOf(PropTypes.number),
-        height: PropTypes.number,
-        width: PropTypes.number,
-        editable: PropTypes.bool,
-        onNodeSelect: PropTypes.func,
-        renderDetailPane: PropTypes.func
-    };
-
-    static defaultProps = {
-        /** @type {DatasetEntry[]} dataset - Dataset to be visualized. */
-        "dataset" : [
-            {
-                id: 1,
-                name: "Jack",
-                isProband: true,
-                father: 2,
-                mother: 3,
-                gender: "m",
-                data: {
-                    "notes" : "Likes cheeseburger and other sandwiches. Dislikes things that aren't those things.",
-                    "description" : "Too many calories in the diet."
-                },
-                age: 42,
-                diseases: ["Badfeelingitis", "Ubercrampus", "Blue Thumb Syndrome"],
-                carrierOfDiseases: ["Green Thumbitis", "BlueClues", "BlueClues2", "BluesClues3"],
-                //asymptoticDiseases: ["Green Thumbitis", "BlueClues", "BlueClues2", "BluesClues3"]
-            },
-            { id: 2, name: "Joe", gender: "m" },
-            { id: 3, name: "Mary", gender: "f", diseases: ["Blue Thumb Syndrome", "Green Thumbitis"] },
-            { id: 4, name: "George", gender: "m", parents: [2,3], age: 45, carrierOfDiseases: ["Blue Thumb Syndrome"], },
-            { id: 19, name: "George II", gender: "m", parents: [2,3], age: 46, carrierOfDiseases: ["Blue Thumb Syndrome"], },
-            { id: 5, name: "Patricia", gender: "f", parents: [3, 6], diseases: ["Badfeelingitis", "Ubercrampus", "Blue Thumb Syndrome"] },
-            {
-                id: 6, name: "Patrick", gender: "m", children: [5],
-                carrierOfDiseases: ["Blue Thumb Syndrome", "Ubercrampus"]
-            },
-            {
-                id: 7, name: "Phillip", gender: "m", children: [6],
-                carrierOfDiseases: ["Blue Thumb Syndrome", "Ubercrampus", "Green Thumbitis", "Badfeelingitis", "BlueClues", "BlueClues2", "BlueClues3"]
-            },
-            { id: 8, name: "Phillipina", gender: "f", children: [6] },
-            { id: 9, name: "Josephina", gender: "f", children: [2] },
-            { id: 10, name: "Joseph", gender: "m", children: [2] },
-            {
-                id: 11, name: "Max", gender: "m", parents: [],
-                asymptoticDiseases: ["Green Thumbitis", "BlueClues", "BlueClues2", "BluesClues3"]
-            },
-            { id: 12, name: "Winnie the Pooh", gender: "u", parents: [11, 5], isDeceased: true, age: 24 },
-            {
-                id: 13, name: "Rutherford", gender: "m", parents: [10, 5], age: 0.3,
-                isPregnancy: true, isDeceased: true, isTerminatedPregnancy: true,
-                diseases: ["Ubercrampus", "Blue Thumb Syndrome", "Green Thumbitis"],
-                carrierOfDiseases: ["BlueClues", "BlueClues2", "BluesClues3"]
-            },
-            { id: 14, name: "Sally", gender: "f", parents: [12, 9] },
-            { id: 15, name: "Sally2", gender: "f" },
-            { id: 16, name: "Silly", gender: "m", parents: [15, 12] },
-            { id: 17, name: "Silly2", gender: "m", parents: [15, 12] },
-            { id: 18, name: "Silly3", gender: "f", parents: [16, 14] },
-        ],
-
-        /** If true, will filter out and not display individuals who are detached from proband. */
-        "filterUnrelatedIndividuals" : false,
-
-        /**
-         * Dimensions for drawing/layout of nodes.
-         * Shouldn't need to change these.
-         * May define some or all or no dimensions (defaults will be applied).
-         *
-         * @required
-         */
-        "dimensionOpts" : Object.assign({}, POSITION_DEFAULTS),
-
-        /**
-         * Height of parent container.
-         * If not defined, visualization will be unbounded and extend as
-         * tall as needed instead of being vertically scrollable.
-         * Depending on UX/context, this is likely desirable.
-         *
-         * @optional
-         */
-        //"height" : null,
-
-        /**
-         * Minimum height of parent container,
-         * if height is not set and want container to
-         * be at least a certain height.
-         *
-         * @optional
-         */
-        "minimumHeight" : 400,
-
-        /**
-         * Width of parent container.
-         * Will be scrollable left/right if greater than this.
-         *
-         * @required
-         */
-        //"width" : 600,
-
-        /**
-         * NOT YET SUPPORTED.
-         * If true (unsupported yet), will be able to modify and add/remove nodes.
-         */
-        "editable" : false,
-
-        /**
-         * Callback function called upon changing of selectedNode.
-         *
-         * @optional
-         */
-        "onNodeSelect" : function(node){
-            console.log('Selected', node);
-        },
-
-        /**
-         * A function which returns a React Component.
-         * Will be instantiated/rendered at side of visualization.
-         *
-         * @type {function}
-         */
-        "renderDetailPane" : function(vizProps){
-            return <DefaultDetailPaneComponent {...vizProps} />;
-        },
-
-
-        /**
-         * Can supply an array of strings to color only those diseases.
-         * If null, then _all_ diseases will be colored.
-         *
-         * @type {!string[]}
-         */
-        "visibleDiseases": null,
-
-        /**
-         * If true, will show markers such as "II - 1", "IV - 2", etc. based on generation & order.
-         * Else will use `individual.name` or `individual.id` (if no name).
-         *
-         * @type {boolean}
-         */
-        "showOrderBasedName" : true,
-
-        /**
-         * Initial zoom/scale.
-         * Will be overriden if `zoomToExtentsOnMount` is true,
-         * after mount.
-         *
-         * @type {number}
-         */
-        "initialScale" : 1,
-
-        /**
-         * If true, will zoom out the graph (if needed)
-         * to fit into viewport. Will only fit to dimensions
-         * passed in, e.g. `props.height` & `props.width`.
-         *
-         * @type {boolean}
-         */
-        "zoomToExtentsOnMount" : true,
-
-
-        /** Whether to allow to zoom w. mousewheel. Experimental. */
-        "enableMouseWheelZoom" : false
-    };
-
-    static initState(dataset){
-        const jsonList = dataset ? standardizeObjectsInList(dataset) : null;
-        const history = jsonList? [jsonList] : [];
-        return {
-            // New individuals created in viz will be added to here.
-            // If none, use a default trio set?
-            history,
-            'timesChanged' : 0,
-            'currCounter' : history.length - 1
-        };
-    }
-
-    constructor(props){
-        super(props);
-        this.state = PedigreeViz.initState(props.dataset);
-    }
-
-    componentDidUpdate(pastProps, pastState){
-        const { dataset } = this.props;
-        if (dataset !== pastProps.dataset){
-            this.setState(PedigreeViz.initState(dataset));
-        }
-        /*
-        if (stateDataset !== pastState.dataset){
-            this.setState(function({ timesChanged, history: pastHistory }){
-                const history = pastHistory.slice();
-                return { 'timesChanged' : timesChanged + 1 };
-            });
-        }
-        */
-    }
-
-    componentWillUnmount(){
-        // TODO: if state.jsonList has changed, ask to save before exiting.
-    }
-
-    render(){
-        const { dataset, ...passProps } = this.props;
-        const { history, currCounter } = this.state;
-        const jsonList = history[currCounter];
-        return (
-            <GraphTransformer jsonList={jsonList} {...passProps} />
-        );
-    }
-
+export function PedigreeViz(props){
+    return (
+        <GraphTransformer {...props}>
+            <PedigreeVizView />
+        </GraphTransformer>
+    );
 }
+PedigreeViz.propTypes = pedigreeVizPropTypes;
+PedigreeViz.defaultProps = pedigreeVizDefaultProps;
 
 
 function isMobileSize(windowWidth){
@@ -336,7 +300,8 @@ function getFullDims(dimensionOpts){
 }
 
 
-export function buildGraphData(jsonList, dimensionOpts, filterUnrelatedIndividuals = false){
+export function buildGraphData(dataset, dimensionOpts, filterUnrelatedIndividuals = false){
+    const jsonList = standardizeObjectsInList(dataset);
     const { objectGraph, disconnectedIndividuals } = createObjectGraph(jsonList, filterUnrelatedIndividuals);
     const relationships = createRelationships(objectGraph);
     assignTreeHeightIndices(objectGraph);
@@ -365,38 +330,34 @@ class GraphTransformer extends React.PureComponent {
 
     constructor(props){
         super(props);
-
-        // Funcs for which we don't expect result to change unless props.jsonList does.
-        this.memoized = {
-            buildGraphData: memoize(buildGraphData)
-        };
+        this.buildGraphData = memoize(buildGraphData);
     }
 
     render(){
-        const {
-            jsonList, children, dimensionOpts, filterUnrelatedIndividuals,
-            zoomToExtentsOnMount, initialScale, enableMouseWheelZoom,
-            ...passProps
-        } = this.props;
-
-        const graphData = this.memoized.buildGraphData(jsonList, dimensionOpts, filterUnrelatedIndividuals);
-        const viewProps = { ...passProps, ...graphData, filterUnrelatedIndividuals };
-        console.log('TTT2', graphData);
-
-        if (children){
-            return React.Children.map(children, (child) => React.cloneElement(child, viewProps));
-        } else {
-            return (
-                <ScaleController {...{ zoomToExtentsOnMount, initialScale, enableMouseWheelZoom }}>
-                    <PedigreeVizView {...viewProps} />
-                </ScaleController>
-            );
-        }
+        const { dataset, children, dimensionOpts, filterUnrelatedIndividuals, ...passProps } = this.props;
+        const graphData = this.buildGraphData(dataset, dimensionOpts, filterUnrelatedIndividuals);
+        const viewProps = { ...passProps, ...graphData };
+        return React.Children.map(children, (child) => React.cloneElement(child, viewProps));
     }
 }
 
+/**
+ * @todo
+ * - Possibly move selected node state up into here.
+ * - Eventually create new "EditingController" component
+ *   and wrap 1 of these components.
+ */
+export function PedigreeVizView(props){
+    const { zoomToExtentsOnMount, initialScale, enableMouseWheelZoom, ...pedigreeViewProps } = props;
+    return (
+        <ScaleController {...{ zoomToExtentsOnMount, initialScale, enableMouseWheelZoom }}>
+            <PedigreeVizViewUserInterface {...pedigreeViewProps} />
+        </ScaleController>
+    );
+}
 
-export class PedigreeVizView extends React.PureComponent {
+
+class PedigreeVizViewUserInterface extends React.PureComponent {
 
     static diseaseToIndex(visibleDiseases, objectGraph){
         let diseaseToIndex;
@@ -457,7 +418,7 @@ export class PedigreeVizView extends React.PureComponent {
         };
 
         this.memoized = { // Differs from props.memoized
-            diseaseToIndex: memoize(PedigreeVizView.diseaseToIndex),
+            diseaseToIndex: memoize(PedigreeVizViewUserInterface.diseaseToIndex),
             orderNodesBottomRightToTopLeft : memoize(orderNodesBottomRightToTopLeft),
             findNodeWithId: memoize(findNodeWithId)
         };
@@ -467,7 +428,7 @@ export class PedigreeVizView extends React.PureComponent {
         // We should move at least ~ initMouseX (or 'isDragging')
         // to state to allow to have "grab" vs "grabbing"
         // mouse cursor (via className / CSS)
-        this.mouseMove = { ...PedigreeVizView.initialMouseMoveState };
+        this.mouseMove = { ...PedigreeVizViewUserInterface.initialMouseMoveState };
 
 
         if (typeof props.onDataChanged === "function" && props.objectGraph){
@@ -728,7 +689,7 @@ export class PedigreeVizView extends React.PureComponent {
         this.setState({ isMouseDownOnContainer: false });
 
         const { vectorX = 0, vectorY = 0, nextAnimationFrame = null } = this.mouseMove;
-        this.mouseMove = { ...PedigreeVizView.initialMouseMoveState };
+        this.mouseMove = { ...PedigreeVizViewUserInterface.initialMouseMoveState };
         const { currSelectedNodeId = null } = this.state;
         nextAnimationFrame && window.cancelAnimationFrame(nextAnimationFrame);
 
@@ -757,7 +718,7 @@ export class PedigreeVizView extends React.PureComponent {
 
     render(){
         const {
-            width: containerWidth,
+            width: propWidth,
             height: propHeight,
             minimumHeight,
             objectGraph, dims, order,
@@ -774,6 +735,7 @@ export class PedigreeVizView extends React.PureComponent {
         const orderedNodes = this.memoized.orderNodesBottomRightToTopLeft(objectGraph);
 
         const containerHeight = propHeight || Math.max(minimumHeight, graphHeight);
+        const containerWidth = propWidth || undefined; // TODO: consider measuring innerElem.offsetWidth, also detect/update if changes re: detailpane
 
         const outerContainerStyle = { minHeight : containerHeight, ...containerStyle };
         const innerContainerStyle = { height: propHeight || "auto", minHeight : containerHeight };

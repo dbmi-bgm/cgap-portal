@@ -333,7 +333,7 @@ export class ScaleControls extends React.PureComponent {
                         disabled={minScale >= scale}>
                         <i className="icon icon-fw icon-search-minus fas"/>
                     </button>
-                    <div className="zoom-value">
+                    <div className="zoom-value no-user-select">
                         { Math.round(scale * 100) }
                         <i className="icon icon-fw icon-percentage fas small"/>
                     </div>
