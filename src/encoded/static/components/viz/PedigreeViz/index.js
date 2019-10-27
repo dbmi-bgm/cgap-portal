@@ -105,8 +105,6 @@ export class PedigreeViz extends React.PureComponent {
         width: PropTypes.number,
         editable: PropTypes.bool,
         onNodeSelect: PropTypes.func,
-        overlaysContainer: PropTypes.element,
-        //detailPaneComponent: PropTypes.elementType,
         renderDetailPane: PropTypes.func
     };
 
@@ -351,9 +349,7 @@ class GraphTransformer extends React.PureComponent {
             createEdges             : memoize(createEdges),
             findNodeWithId          : memoize(findNodeWithId),
             getFullDims             : memoize(getFullDims),
-            getRelationships        : memoize(getRelationships),
-            orderNodesBottomRightToTopLeft : memoize(orderNodesBottomRightToTopLeft),
-            graphToDiseaseIndices   : memoize(graphToDiseaseIndices)
+            getRelationships        : memoize(getRelationships)
         };
     }
 
@@ -398,9 +394,23 @@ class GraphTransformer extends React.PureComponent {
 
 export class PedigreeVizView extends React.PureComponent {
 
+    static diseaseToIndex(visibleDiseases, objectGraph){
+        let diseaseToIndex;
+        if (Array.isArray(visibleDiseases)){
+            diseaseToIndex = {};
+            visibleDiseases.forEach(function(disease, index){
+                diseaseToIndex[disease] = index + 1;
+            });
+            return diseaseToIndex;
+        } else {
+            return graphToDiseaseIndices(objectGraph);
+        }
+    }
+
     static defaultProps = {
         'width': 600,
         "scale" : 1,
+        "visibleDiseases": null,
         "onDimensionsChanged" : function(width, height){
             console.log("DIMENSIONS CHANGED (default handler)", "WIDTH", width, "HEIGHT", height);
         },
@@ -435,11 +445,26 @@ export class PedigreeVizView extends React.PureComponent {
         this.handleContainerMouseDown = this.handleContainerMouseDown.bind(this);
         this.handleContainerMouseMove = this.handleContainerMouseMove.bind(this);
         this.handleMouseUp = this.handleMouseUp.bind(this);
+        this.handleMouseLeave = this.handleMouseLeave.bind(this);
         this.state = {
             'currHoverNodeId' : null,
             'currSelectedNodeId' :  null,
             'isMouseDownOnContainer' : true,
         };
+
+        this.memoized = { // Differs from props.memoized
+            diseaseToIndex: memoize(PedigreeVizView.diseaseToIndex),
+            orderNodesBottomRightToTopLeft : memoize(orderNodesBottomRightToTopLeft)
+        };
+
+        this.innerRef = React.createRef();
+
+        // We should move at least ~ initMouseX (or 'isDragging')
+        // to state to allow to have "grab" vs "grabbing"
+        // mouse cursor (via className / CSS)
+        this.mouseMove = { ...PedigreeVizView.initialMouseMoveState };
+
+
         if (typeof props.onDataChanged === "function" && props.objectGraph){
             props.onDataChanged(props.objectGraph);
         }
@@ -451,29 +476,26 @@ export class PedigreeVizView extends React.PureComponent {
                 graphWidth: props.graphWidth
             });
         }
-
-        this.innerRef = React.createRef();
-
-        // We should move at least ~ initMouseX (or 'isDragging')
-        // to state to allow to have "grab" vs "grabbing"
-        // mouse cursor (via className / CSS)
-        this.mouseMove = { ...PedigreeVizView.initialMouseMoveState };
     }
 
     componentDidMount(){
         const { onMount } = this.props;
+        const innerElem = this.innerRef.current;
         if (typeof onMount === "function"){
-            onMount(this.innerRef.current);
+            onMount(innerElem);
         }
         window.addEventListener("mouseup", this.handleMouseUp);
+        document.body.addEventListener("mouseleave", this.handleMouseLeave);
     }
 
     componentWillUnmount(){
         const { onWillUnmount } = this.props;
+        const innerElem = this.innerRef.current;
         if (typeof onMount === "function"){
-            onWillUnmount(this.innerRef.current);
+            onWillUnmount(innerElem);
         }
         window.removeEventListener("mouseup", this.handleMouseUp);
+        document.body.removeEventListener("mouseleave", this.handleMouseLeave);
     }
 
     /**
@@ -683,7 +705,11 @@ export class PedigreeVizView extends React.PureComponent {
         });
     }
 
-    handleMouseUp(evt){
+    handleMouseLeave(evt){
+        this.handleMouseUp();
+    }
+
+    handleMouseUp(evt = null){
         if (this.mouseMove.initMouseX === null) {
             // Mouseup didn't originate from our `.inner-container` element
             return false;
@@ -698,16 +724,18 @@ export class PedigreeVizView extends React.PureComponent {
 
         // Act as click off of or onto node; we will have vectorX if 'click'ed within container.
         if (Math.abs(vectorX) <= 5 && Math.abs(vectorY) <= 5){
-            const nodeID = evt.target.id;
-            const nodeType = evt.target.getAttribute("data-node-type");
+            const nodeID = (evt && evt.target && evt.target.id) || null;
+            const nodeType = (evt && evt.target && evt.target.getAttribute("data-node-type")) || null;
             if (currSelectedNodeId !== null) {
                 if (nodeID === currSelectedNodeId) {
+                    // Keep same node selected if (re)click on it
                     return;
                 }
                 if (nodeID && (nodeType === "individual" || nodeType === "relationship")){
+                    // Change to new node
                     this.handleNodeClick(nodeID);
                     return;
-                }
+                } // Else
                 this.handleUnselectNode();
                 return;
             }
@@ -723,7 +751,7 @@ export class PedigreeVizView extends React.PureComponent {
             height: propHeight,
             minimumHeight,
             objectGraph, dims, order, memoized,
-            overlaysContainer, renderDetailPane, containerStyle,
+            renderDetailPane, containerStyle,
             visibleDiseases = null,
             scale = 1,
             minScale, maxScale,
@@ -732,19 +760,10 @@ export class PedigreeVizView extends React.PureComponent {
             ...passProps
         } = this.props;
         const { currSelectedNodeId, isMouseDownOnContainer } = this.state;
-
-        let diseaseToIndex;
-        if (Array.isArray(visibleDiseases)){
-            diseaseToIndex = {};
-            visibleDiseases.forEach(function(disease, index){
-                diseaseToIndex[disease] = index + 1;
-            });
-        } else {
-            diseaseToIndex = memoized.graphToDiseaseIndices(objectGraph);
-        }
+        const diseaseToIndex = this.memoized.diseaseToIndex(visibleDiseases, objectGraph);
 
         const containerHeight = propHeight || Math.max(minimumHeight, graphHeight);
-        const orderedNodes = memoized.orderNodesBottomRightToTopLeft(objectGraph);
+        const orderedNodes = this.memoized.orderNodesBottomRightToTopLeft(objectGraph);
 
         const outerContainerStyle = { minHeight : containerHeight, ...containerStyle };
         const innerContainerStyle = { height: propHeight || "auto", minHeight : containerHeight };
@@ -776,7 +795,6 @@ export class PedigreeVizView extends React.PureComponent {
                 currSelectedNodeId,
                 memoized,
                 diseaseToIndex,
-                overlaysContainer,
                 'unselectNode' : this.handleUnselectNode,
                 'onNodeClick' : this.handleNodeClick,
             });
