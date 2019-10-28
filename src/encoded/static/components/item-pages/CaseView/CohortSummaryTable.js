@@ -131,6 +131,7 @@ export const CohortSummaryTable = React.memo(function CohortSummaryTable(props){
                 fileObject.qmUrl = qmUrl; // set quality metric URL (either links to the list of QMS or to the QM itself)
 
                 let fileOverallQuality = "PASS";
+                let hasQm = "true";
 
                 if (qc_list.length > 0) {
                     let numFail = 0;
@@ -150,20 +151,28 @@ export const CohortSummaryTable = React.memo(function CohortSummaryTable(props){
                     // once done, add those to fileObject;
                     fileObject.numFail = numFail;
                     fileObject.numWarn = numWarn;
+                    fileObject.hasQm = hasQm;
                 } else {
                     let numFail = 0;
                     let numWarn = 0;
 
-                    // update pass fail number for file
-                    if (overall_quality_status === "FAIL") {
-                        numFail++;
-                    } else if (overall_quality_status === "WARN") {
-                        numWarn++;
+                    // if no quality status, change hasQM to false
+                    if (!overall_quality_status) {
+                        numFail, numWarn = -1;
+                        hasQm = false;
+                    } else {
+                        // update pass fail number for file
+                        if (overall_quality_status === "FAIL") {
+                            numFail++;
+                        } else if (overall_quality_status === "WARN") {
+                            numWarn++;
+                        }
                     }
 
                     // once done, add those to fileObject;
                     fileObject.numFail = numFail;
                     fileObject.numWarn = numWarn;
+                    fileObject.hasQm = hasQm;
 
                     fileOverallQuality = overall_quality_status;
                 }
@@ -369,6 +378,10 @@ export const CohortSummaryTable = React.memo(function CohortSummaryTable(props){
 
                         // if there's a single quality metric, link the item itself
                         let dataTip = "";
+                        let qmExistsTip = null;
+                        if (!files[0].hasQM) {
+                            qmExistsTip = "This file has no quality metrics.";
+                        }
                         if (files[0].numWarn > 0) {
                             dataTip += `${files[0].numWarn} QM(s) with Warnings `;
                         }
@@ -378,23 +391,26 @@ export const CohortSummaryTable = React.memo(function CohortSummaryTable(props){
                         renderArr.push(
                             files[0] ?
                                 <span className="ellipses" key={`span-${ext}`}>
-                                    { statusToIcon(overallQuality) }
+                                    { statusToIcon(overallQuality || "WARN") }
                                     <a
                                         href={files[0].fileUrl || ""}
                                         rel="noopener noreferrer"
                                         target="_blank"
+                                        data-tip={qmExistsTip}
                                     >
                                         { ext.toUpperCase() }
                                     </a>
-                                    <a
-                                        href={files[0].qmUrl || ""}
-                                        rel="noopener noreferrer"
-                                        target="_blank"
-                                        className={`${statusToTextClass(overallQuality)} qc-status-${files[0].status}`}
-                                        data-tip={dataTip || null}
-                                    >
-                                        <sup>QC</sup>
-                                    </a>
+                                    { files[0].hasQm ?
+                                        <a
+                                            href={files[0].qmUrl || ""}
+                                            rel="noopener noreferrer"
+                                            target="_blank"
+                                            className={`${statusToTextClass(overallQuality)} qc-status-${files[0].status}`}
+                                            data-tip={dataTip || null}
+                                        >
+                                            <sup>QC</sup>
+                                        </a>
+                                        : null }
                                 </span>
                                 : null
                         );
@@ -411,23 +427,29 @@ export const CohortSummaryTable = React.memo(function CohortSummaryTable(props){
                                         if (file.numFail > 0) {
                                             dataTip += `${file.numFail} QM(s) with Warnings `;
                                         }
+                                        let qmExistsTip = null;
+                                        if (!file.hasQM) {
+                                            qmExistsTip = "This file has no quality metrics.";
+                                        }
 
                                         return (
                                             <React.Fragment key={`${ext}-${file.fileUrl}`}>
                                                 <a href={ file.fileUrl || "" } rel="noopener noreferrer" target="_blank"
-                                                    className={`${statusToTextClass(file.quality)}`}>
+                                                    className={`${statusToTextClass(file.quality)}`} data-tip={qmExistsTip}>
                                                     {i + 1}
                                                 </a>
-                                                <a
-                                                    href={file.qmUrl || ""}
-                                                    rel="noopener noreferrer"
-                                                    target="_blank"
-                                                    className={`${statusToTextClass(
-                                                        getFileQuality(file.numFail, file.numWarn))} qc-status-${file.status}`}
-                                                    data-tip={dataTip || null}
-                                                >
-                                                    <sup>QC</sup>
-                                                </a>
+                                                { file.hasQm ?
+                                                    <a
+                                                        href={file.qmUrl || ""}
+                                                        rel="noopener noreferrer"
+                                                        target="_blank"
+                                                        className={`${statusToTextClass(
+                                                            getFileQuality(file.numFail, file.numWarn))} qc-status-${file.status}`}
+                                                        data-tip={dataTip || null}
+                                                    >
+                                                        <sup>QC</sup>
+                                                    </a>
+                                                    : null }
                                                 { // if the last item, don't add a comma
                                                     (i === files.length - 1 ?  null : ', ')
                                                 }
