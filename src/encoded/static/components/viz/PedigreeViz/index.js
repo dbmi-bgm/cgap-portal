@@ -5,16 +5,8 @@ import memoize from 'memoize-one';
 import { path as d3Path } from 'd3-path';
 /** @todo Pull this out into here if making a lib */
 import { requestAnimationFrame as raf } from '@hms-dbmi-bgm/shared-portal-components/es/components/viz/utilities';
-import {
-    standardizeObjectsInList,
-    createObjectGraph, createRelationships, getRelationships
-} from './data-utilities';
-import { assignTreeHeightIndices, orderObjectGraph, positionObjectGraph } from './layout-utilities';
-import {
-    getGraphHeight, getGraphWidth,
-    createEdges, relationshipTopPosition,
-    graphToDiseaseIndices, orderNodesBottomRightToTopLeft,
-} from './layout-utilities-drawing';
+import { graphToDiseaseIndices, orderNodesBottomRightToTopLeft } from './layout-utilities-drawing';
+import { GraphTransformer, buildGraphData, POSITION_DEFAULTS } from './GraphTransformer';
 import { ScaleController, ScaleControls } from './ScaleController';
 import { SelectedNodeController } from './SelectedNodeController';
 import { IndividualsLayer, doesAncestorHaveId } from './IndividualsLayer';
@@ -22,8 +14,6 @@ import { IndividualNodeShapeLayer } from './IndividualNodeShapeLayer';
 import { RelationshipNodeShapeLayer } from './RelationshipNodeShapeLayer';
 import { EdgesLayer } from './EdgesLayer';
 import { DefaultDetailPaneComponent } from './DefaultDetailPaneComponent';
-
-
 
 /**
  * @typedef DatasetEntry
@@ -50,19 +40,6 @@ import { DefaultDetailPaneComponent } from './DefaultDetailPaneComponent';
  * @prop {!string} [mother]             Mother of Individual in form of ID. Gets merged into 'parents'.
  */
 
-/**
- * Default values for `props.dimensionOpts`
- */
-const POSITION_DEFAULTS = {
-    individualWidth: 80,
-    individualXSpacing: 80, // THIS MUST BE EQUAL TO OR MULTIPLE OF INDIVIDUAL WIDTH FOR TIME BEING
-    individualHeight: 80,
-    individualYSpacing: 180,
-    graphPadding: 60,
-    relationshipSize: 40,
-    edgeLedge: 40,
-    edgeCornerDiameter: 20
-};
 
 const pedigreeVizPropTypes = {
     dataset: PropTypes.arrayOf(PropTypes.exact({
@@ -268,7 +245,7 @@ const pedigreeVizDefaultProps = {
  *       - Maybe add to side if something already in center (?)
  *  - Twins of different specificites (requires additions to bounding box calculations, edge segments, etc.)
  */
-export function PedigreeViz(props){
+function PedigreeViz(props){
     return (
         <GraphTransformer {...props}>
             <PedigreeVizView />
@@ -279,70 +256,13 @@ PedigreeViz.propTypes = pedigreeVizPropTypes;
 PedigreeViz.defaultProps = pedigreeVizDefaultProps;
 
 
-function getFullDims(dimensionOpts){
-    return Object.assign(
-        {},
-        POSITION_DEFAULTS,
-        dimensionOpts,
-        {
-            graphPadding : Math.max(
-                dimensionOpts.graphPadding || POSITION_DEFAULTS.graphPadding,
-                dimensionOpts.individualXSpacing || POSITION_DEFAULTS.individualXSpacing,
-                dimensionOpts.individualYSpacing || POSITION_DEFAULTS.individualYSpacing
-            )
-        }
-    );
-}
-
-
-export function buildGraphData(dataset, dimensionOpts, filterUnrelatedIndividuals = false){
-    const jsonList = standardizeObjectsInList(dataset);
-    const { objectGraph, disconnectedIndividuals } = createObjectGraph(jsonList, filterUnrelatedIndividuals);
-    const relationships = createRelationships(objectGraph);
-    assignTreeHeightIndices(objectGraph);
-    const order = orderObjectGraph(objectGraph, relationships);
-    const dims = getFullDims(dimensionOpts);
-    positionObjectGraph(objectGraph, order, dims);
-    // Add extra to offset text @ bottom of nodes.
-    const graphHeight = getGraphHeight(order.orderByHeightIndex, dims) + 60;
-    const graphWidth = getGraphWidth(objectGraph, dims);
-    const edges = createEdges(objectGraph, dims, graphHeight);
-
-    return {
-        objectGraph,
-        disconnectedIndividuals,
-        relationships,
-        order,
-        dims,
-        graphHeight,
-        graphWidth,
-        edges
-    };
-}
-
-
-class GraphTransformer extends React.PureComponent {
-
-    constructor(props){
-        super(props);
-        this.buildGraphData = memoize(buildGraphData);
-    }
-
-    render(){
-        const { dataset, children, dimensionOpts, filterUnrelatedIndividuals, ...passProps } = this.props;
-        const graphData = this.buildGraphData(dataset, dimensionOpts, filterUnrelatedIndividuals);
-        const viewProps = { ...passProps, ...graphData };
-        return React.Children.map(children, (child) => React.cloneElement(child, viewProps));
-    }
-}
-
 /**
  * @todo
  * - Possibly move selected node state up into here.
  * - Eventually create new "EditingController" component
  *   and wrap 1 of these components.
  */
-export function PedigreeVizView(props){
+function PedigreeVizView(props){
     const {
         zoomToExtentsOnMount, initialScale, enableMouseWheelZoom,
         objectGraph, onNodeSelected, onDataChanged,
@@ -832,3 +752,8 @@ const SelectedNodeIdentifierShape = React.memo(function SelectedNodeIdentifierSh
 
     return <React.Fragment>{ cornerPathsJSX }</React.Fragment>;
 });
+
+
+/** Exports / entry-points */
+export default PedigreeViz;
+export { GraphTransformer, buildGraphData, PedigreeVizView };

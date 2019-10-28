@@ -4,7 +4,7 @@ import memoize from 'memoize-one';
 import _ from 'underscore';
 import { console, layout, ajax, object } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { PedigreeDetailPane } from './../components/PedigreeDetailPane';
-import { PedigreeViz } from './../../viz/PedigreeViz';
+import PedigreeViz from './../../viz/PedigreeViz';
 import { FullHeightCalculator } from './../components/FullHeightCalculator';
 
 
