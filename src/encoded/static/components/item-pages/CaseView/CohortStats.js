@@ -15,7 +15,7 @@ export const CohortStats = React.memo(function CaseStats(props){
     } = props;
 
     return (
-        <div className="card">
+        <div className="card w-50 mr-1">
             <div className="card-header" role="heading" level="4">Overview</div>
             <div className="card-body">
                 <p className="card-text"><strong>Number of Families:</strong> { numFamilies }</p>

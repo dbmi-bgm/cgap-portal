@@ -173,16 +173,6 @@ export default class CaseView extends DefaultItemView {
     }
 }
 
-const CohortPedigreeLink = React.memo(function CohortPedigreeLink(props) {
-    return (
-        <div className="card">
-            <a href="#pedigree" rel="noopener noreferrer">
-                <img className="card-img-top pedigree-link-bg" />
-            </a>
-        </div>
-    );
-});
-
 const CohortSummaryTabView = React.memo(function CohortSummaryTabView(props){
     const { pedigreeFamilies: families = [] } = props;
     const familiesLen = families.length;
@@ -212,11 +202,16 @@ const CohortSummaryTabView = React.memo(function CohortSummaryTabView(props){
                     return (
                         <div className={cls} key={idx}>
                             <div className="row">
-                                <div className="col-md-6">
-                                    <CohortStats numFamilies={familiesLen} numIndividuals={getNumberOfIndividuals(families)} />
-                                </div>
-                                <div className="col-md-6">
-                                    <CohortPedigreeLink />
+                                <div className="col-md-12">
+                                    <div className="card-group w-100">
+                                        <CohortStats numFamilies={familiesLen} numIndividuals={getNumberOfIndividuals(families)} />
+                                        <div className="w-50">
+                                            <a href="#pedigree" className="card-img-top" rel="noreferrer noopener">
+                                                <img src="https://via.placeholder.com/450x150.png?text=Insert+Pedigree+Graphic+Here" className="card-img-top"/>
+                                            </a>
+                                            <a href="#pedigree" className="btn btn-primary btn-block" rel="noreferrer noopener">View Pedigree(s)</a>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                             { title }
