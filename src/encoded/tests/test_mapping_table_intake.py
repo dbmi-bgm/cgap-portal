@@ -2,7 +2,7 @@ import os
 import csv
 import json
 import pytest
-from encoded.commands.create_annotation_inserts import (
+from encoded.commands.mapping_table_intake import (
     process_fields,
     read_mapping_table,
     process_inserts,
