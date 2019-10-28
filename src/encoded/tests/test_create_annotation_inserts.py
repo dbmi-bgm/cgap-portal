@@ -7,7 +7,10 @@ from encoded.commands.create_annotation_inserts import (
     read_mapping_table,
     process_inserts,
     generate_sample_json,
-    generate_variant_json
+    generate_variant_json,
+    add_default_schema_fields,
+    generate_variant_sample_schema,
+    generate_variant_schema
 )
 
 pytestmark = [pytest.mark.working]
@@ -26,6 +29,8 @@ EXPECTED_INSERT = {'is_list': False, 'field_name': 'chrom', 'mvp': True, 'schema
                '12a92962-8265-4fc0-b2f8-cf14f05db58b', 'submitted_by': 'koray_kirli@hms.harvard.edu',
                'scope': 'variant', 'source_version': 'VCFv4.2', 'source_name': 'VCF',
                'value_example': '1', 'vcf_name': 'CHROM'}
+EXPECTED_VARIANT_SAMPLE_FIELDS = ['sample', 'variant', 'qual', 'filter', 'call_info',
+                           'gt', 'ad', 'dp', 'gq', 'pl', 'pgt', 'pid', 'ps', 'af']
 MVP_EXPECTED = 317
 SAMPLE_FIELDS_EXPECTED = 12
 VARIANT_FIELDS_EXPECTED = 305
@@ -39,6 +44,28 @@ def fields():
 @pytest.fixture
 def inserts(fields):
     return process_inserts(FNAME, fields)
+
+
+@pytest.fixture
+def sample_variant_items(inserts):
+    return generate_sample_json(inserts)
+
+
+@pytest.fixture
+def variant_items(inserts):
+    return generate_variant_json(inserts)
+
+
+def test_add_default_schema_fields():
+    """ Tests that default fields are added """
+    schema = {}
+    add_default_schema_fields(schema)
+    assert '$schema' in schema
+    assert 'type' in schema
+    assert 'required' in schema
+    assert 'identifyingProperties' in schema
+    assert 'additionalProperties' in schema
+    assert 'mixinProperties' in schema
 
 
 def test_read_mapping_table():
@@ -60,7 +87,7 @@ def test_process_inserts(inserts):
     assert len(variant) == VARIANT_FIELDS_EXPECTED
 
 
-def test_generate_sample_json(inserts):
+def test_generate_sample_json_items(inserts):
     """ Tests that sample JSON is being created correctly checking three we expect """
     sample_props = generate_sample_json(inserts)
     assert sample_props['qual']['title'] == 'Quality score'
@@ -74,7 +101,7 @@ def test_generate_sample_json(inserts):
     assert sample_props['af']['source_version'] == 'VCFv4.2'
 
 
-def test_generate_variant_json(inserts):
+def test_generate_variant_json_items(inserts):
     """ Tests that variant JSON along with columns and facets are produced """
     var_props, cols, facs = generate_variant_json(inserts)
     assert cols['chrom']['title'] == 'Chromosome'
@@ -95,3 +122,37 @@ def test_generate_variant_json(inserts):
     assert var_props['exac_sas']['domain'] == 'POPULATION GENETICS'
     assert var_props['exac_sas']['source_name'] == 'ExAC'
     assert var_props['exac_sas']['source_version'] == '3'
+
+
+def test_generate_variant_sample_schema(sample_variant_items):
+    """ Tests some aspects of the variant_sample schema """
+    schema = generate_variant_sample_schema(sample_variant_items)
+    properties = schema['properties']
+    for field in EXPECTED_VARIANT_SAMPLE_FIELDS:
+        assert field in properties
+    assert properties['ad']['items']['vcf_name'] == 'AD'
+    assert properties['ad']['type'] == 'array'
+    assert properties['ad']['items']['type'] == 'integer'
+    assert properties['ps']['vcf_name'] == 'PS'
+    assert 'description' in properties['ps']
+    assert 'columns' in schema
+    assert 'facets' in schema
+
+
+def test_generate_variant_schema(variant_items):
+    items, cols, facs = variant_items
+    schema = generate_variant_schema(items, cols, facs)
+    properties = schema['properties']
+    assert properties['chrom']['vcf_name'] == 'CHROM'
+    assert properties['chrom']['source_name'] == 'VCF'
+    assert properties['chrom']['type'] == 'string'
+    assert 'enum' in properties['chrom']
+    assert properties['alt']['vcf_name'] == 'ALT'
+    assert properties['alt']['type'] == 'array'
+    assert properties['alt']['items']['vcf_name'] == 'ALT'
+    assert properties['alt']['items']['type'] == 'string'
+    assert properties['alt']['items']['separator'] == 'comma'
+    assert properties['alt']['items']['lookup'] == 5
+    assert properties['alt']['lookup'] == 5
+    assert len(properties['transcript_snpeff']['items']['properties']) == 16
+    assert properties['transcript_snpeff']['items']['properties']['gene_name']['separator'] == 'semicolon'

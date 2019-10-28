@@ -177,7 +177,7 @@ def generate_variant_json(inserts):
         if item.get('field_priority'):
             features['lookup'] = item['field_priority']
 
-        for a_field in ['scale', 'domain', 'method', 'seperator', 'source_name', 'source_version']:
+        for a_field in ['scale', 'domain', 'method', 'separator', 'source_name', 'source_version']:
             if item.get(a_field):
                 features[a_field] = item[a_field]
 
@@ -241,27 +241,103 @@ def generate_variant_json(inserts):
     return var_props, cols, facs
 
 
+def add_default_schema_fields(schema):
+    """ Adds default schema fields """
+    schema['$schema'] = 'http://json-schema.org/draft-04/schema#'
+    schema['type'] = 'object'
+    schema['required'] = ['institution', 'project']
+    schema['identifyingProperties'] = ['uuid', 'aliases']
+    schema['additionalProperties'] = False
+    schema['mixinProperties'] = [
+        { "$ref": "mixins.json#/schema_version" },
+        { "$ref": "mixins.json#/uuid" },
+        { "$ref": "mixins.json#/aliases" },
+        { "$ref": "mixins.json#/submitted" },
+        { "$ref": "mixins.json#/modified" },
+        { "$ref": "mixins.json#/status" },
+        { "$ref": "mixins.json#/attribution" },
+        { "$ref": "mixins.json#/notes" },
+        { "$ref": "mixins.json#/static_embeds" }
+    ]
+
+
+def generate_variant_sample_schema(sample_props):
+    """
+        Builds the variant_sample.json schema based on sample_props
+    """
+    schema = {}
+    add_default_schema_fields(schema)
+    schema['title'] = 'Sample Variant'
+    schema['description'] = "Schema for variant info for sample"
+    schema['id'] = '/profiles/variant_sample.json'
+    schema['properties'] = sample_props
+    schema['properties']['schema_version'] = {'default': '1'}
+    schema['properties']['sample'] = {
+        'title': 'Sample',
+        'type': 'string',
+        'linkTo': 'Sample'
+    }
+    schema['properties']['variant'] = {
+        'title': 'Variant',
+        'type': 'string',
+        'linkTo': 'Variant'
+    }
+    schema['columns'] = {}
+    schema['facets'] = {}
+    logger.info('Built variant_sample schema\n')
+    return schema
+
+
+def generate_variant_schema(var_props, cols, facs):
+    """ Creates variant.json schema """
+    schema = {}
+    add_default_schema_fields(schema)
+    schema['title'] = 'Variants'
+    schema['description'] = "Schema for variants"
+    schema['id'] = '/profiles/variant.json'
+    schema['properties'] = var_props
+    schema['properties']['schema_version'] = {'default': '1'}
+    schema['facets'] = facs
+    schema['columns'] = cols
+    logger.info('Build variant schema\n')
+    return schema
+
+
+def write_schema(schema, fname):
+    """ Writes the given schema (JSON) to the given file 'fname' """
+    with open(fname, 'w+') as out:
+        json.dump(schema, out)
+    logger.info('Successfully wrote schema: %s to file: %s\n' % (schema['title'], fname))
+
+
 def main():
     """ Works with mp.csv, downloaded 10-25 """
     logging.basicConfig()
-    if len(sys.argv) < 2:
-        logger.error('Mapping table file not specified, exiting\n')
+    if len(sys.argv) < 4:
+        logger.error('usage: python create_annotation_inserts <mapping_table> <variant_file_path> <variant_sample_file_path>\n')
         exit(1)
-    logger.info('Building annotations from mapping table: %s\n' % sys.argv[1])
-    VERSION, DATE, FIELDS = read_mapping_table(sys.argv[1])
+
+    mapping_table_loc = sys.argv[1]
+    variant_schema_loc = sys.argv[2]
+    variant_sample_schema_loc = sys.argv[3]
+    logger.info('Building annotations from mapping table: %s\n' % mapping_table_loc)
+    VERSION, DATE, FIELDS = read_mapping_table(mapping_table_loc)
     if FIELDS is None:
         logger.error('Failed to process mapping table. Exiting.\n')
         exit(1)
-    inserts = process_inserts(sys.argv[1], FIELDS)
+    inserts = process_inserts(mapping_table_loc, FIELDS)
     # XXX: Post inserts below
     # from ff_utils import post_metadata
     # for entry in inserts:
     #     ff_utils.post_metadata(entry, 'annotation_field', auth_key)
     logger.info('Successfully created/posted annotations\n')
     sample_props = generate_sample_json(inserts)
-    logger.info('Successfully generated sample JSON\n')
+    variant_sample_schema = generate_variant_sample_schema(sample_props)
+    write_schema(variant_sample_schema, variant_sample_schema_loc)
     var_props, cols, facs = generate_variant_json(inserts)
-    logger.info('Successfully generated variant JSON\n')
+    variant_schema = generate_variant_schema(var_props, cols, facs)
+    write_schema(variant_schema, variant_schema_loc)
+    logger.info('Successfully wrote schemas\n')
 
 
 if __name__ == '__main__':
