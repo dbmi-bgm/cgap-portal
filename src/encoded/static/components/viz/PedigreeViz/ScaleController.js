@@ -189,11 +189,11 @@ export class ScaleController extends React.PureComponent {
  * Uses `requestAnimationFrame` for smooth and performant
  * zooming transitions.
  *
- * If wondering whether `requestAnimationFrame` makes a meaningful
+ * To assert whether `requestAnimationFrame` makes a meaningful
  * difference, try to comment out the `raf`-related lines in `onSliderChange`
  * method (except for `setScale(nextVal)`) and compare performance/smoothness :-D
  *
- * React itself does not use requestAnimationFrame under the hood,
+ * React itself does not appear to use requestAnimationFrame under the hood,
  * which can be asserted by recording/inspecting performance
  * in Chrome dev tools (no animation frame tasks are called during
  * normal React-triggered browser repaints).
@@ -228,10 +228,6 @@ export class ScaleControls extends React.PureComponent {
         }
     }
 
-    /**
-     * Transitions when using requestAnimationFrame come out smoother
-     * than with `setInterval` alone.
-     */
     onZoomOutDown(evt){
         evt.preventDefault();
         evt.stopPropagation();

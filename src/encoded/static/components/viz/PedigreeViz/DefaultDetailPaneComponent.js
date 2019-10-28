@@ -12,8 +12,7 @@ function getIndividualDisplayTitle(individual){
 
 
 export const DefaultDetailPaneComponent = React.memo(function DefaultDetailPaneComponent(props){
-    const { unselectNode, memoized, objectGraph, currSelectedNodeId, className } = props;
-    const selectedNode = currSelectedNodeId && memoized.findNodeWithId(objectGraph, currSelectedNodeId);
+    const { unselectNode, selectedNode, currSelectedNodeId, className } = props;
 
     if (!selectedNode){
         return null;

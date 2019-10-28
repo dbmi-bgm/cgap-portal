@@ -16,8 +16,7 @@ export class PedigreeDetailPane extends React.PureComponent {
     }
 
     render(){
-        const { unselectNode, memoized, objectGraph, currSelectedNodeId, className } = this.props;
-        const selectedNode = currSelectedNodeId && memoized.findNodeWithId(objectGraph, currSelectedNodeId);
+        const { selectedNode, unselectNode, currSelectedNodeId, className } = this.props;
 
         if (!selectedNode){
             return null;

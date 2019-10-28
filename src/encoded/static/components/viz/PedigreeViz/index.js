@@ -6,16 +6,17 @@ import { path as d3Path } from 'd3-path';
 /** @todo Pull this out into here if making a lib */
 import { requestAnimationFrame as raf } from '@hms-dbmi-bgm/shared-portal-components/es/components/viz/utilities';
 import {
-    standardizeObjectsInList, findNodeWithId,
+    standardizeObjectsInList,
     createObjectGraph, createRelationships, getRelationships
 } from './data-utilities';
 import { assignTreeHeightIndices, orderObjectGraph, positionObjectGraph } from './layout-utilities';
 import {
     getGraphHeight, getGraphWidth,
     createEdges, relationshipTopPosition,
-    graphToDiseaseIndices, orderNodesBottomRightToTopLeft
+    graphToDiseaseIndices, orderNodesBottomRightToTopLeft,
 } from './layout-utilities-drawing';
 import { ScaleController, ScaleControls } from './ScaleController';
+import { SelectedNodeController } from './SelectedNodeController';
 import { IndividualsLayer, doesAncestorHaveId } from './IndividualsLayer';
 import { IndividualNodeShapeLayer } from './IndividualNodeShapeLayer';
 import { EdgesLayer } from './EdgesLayer';
@@ -89,7 +90,7 @@ const pedigreeVizPropTypes = {
     height: PropTypes.number,
     width: PropTypes.number,
     editable: PropTypes.bool,
-    onNodeSelect: PropTypes.func,
+    onNodeSelected: PropTypes.func,
     renderDetailPane: PropTypes.func
 };
 
@@ -196,7 +197,7 @@ const pedigreeVizDefaultProps = {
      *
      * @optional
      */
-    "onNodeSelect" : function(node){
+    "onNodeSelected" : function(node){
         console.log('Selected', node);
     },
 
@@ -277,13 +278,6 @@ PedigreeViz.propTypes = pedigreeVizPropTypes;
 PedigreeViz.defaultProps = pedigreeVizDefaultProps;
 
 
-function isMobileSize(windowWidth){
-    if ((windowWidth || window.innerWidth) < 800){
-        return true;
-    }
-    return false;
-}
-
 function getFullDims(dimensionOpts){
     return Object.assign(
         {},
@@ -348,14 +342,20 @@ class GraphTransformer extends React.PureComponent {
  *   and wrap 1 of these components.
  */
 export function PedigreeVizView(props){
-    const { zoomToExtentsOnMount, initialScale, enableMouseWheelZoom, ...pedigreeViewProps } = props;
+    const {
+        zoomToExtentsOnMount, initialScale, enableMouseWheelZoom,
+        objectGraph, onNodeSelected, onDataChanged,
+        ...passProps
+    } = props;
+    const pedigreeViewProps = { ...passProps, objectGraph };
     return (
         <ScaleController {...{ zoomToExtentsOnMount, initialScale, enableMouseWheelZoom }}>
-            <PedigreeVizViewUserInterface {...pedigreeViewProps} />
+            <SelectedNodeController {...{ onNodeSelected, onDataChanged, objectGraph }}>
+                <PedigreeVizViewUserInterface {...pedigreeViewProps} />
+            </SelectedNodeController>
         </ScaleController>
     );
 }
-
 
 class PedigreeVizViewUserInterface extends React.PureComponent {
 
@@ -379,9 +379,6 @@ class PedigreeVizViewUserInterface extends React.PureComponent {
         "onDimensionsChanged" : function(width, height){
             console.log("DIMENSIONS CHANGED (default handler)", "WIDTH", width, "HEIGHT", height);
         },
-        "onDataChanged" : function(objectGraph){
-            console.log("DATA CHANGED (default handler)", objectGraph);
-        },
         "onMount": function(innerContainerDOMElement){
             console.log("MOUNTED", innerContainerDOMElement);
         },
@@ -403,24 +400,21 @@ class PedigreeVizViewUserInterface extends React.PureComponent {
     constructor(props){
         super(props);
         this.handleDimensionOrScaleChanged = this.handleDimensionOrScaleChanged.bind(this);
-        this.handleNodeMouseIn = this.handleNodeMouseIn.bind(this);
-        this.handleNodeMouseLeave = this.handleNodeMouseLeave.bind(this);
-        this.handleNodeClick = this.handleNodeClick.bind(this);
-        this.handleUnselectNode = this.handleUnselectNode.bind(this);
+        //this.handleNodeMouseIn = this.handleNodeMouseIn.bind(this);
+        //this.handleNodeMouseLeave = this.handleNodeMouseLeave.bind(this);
+        //this.handleNodeClick = this.handleNodeClick.bind(this);
+        //this.handleUnselectNode = this.handleUnselectNode.bind(this);
         this.handleContainerMouseDown = this.handleContainerMouseDown.bind(this);
         this.handleContainerMouseMove = this.handleContainerMouseMove.bind(this);
         this.handleMouseUp = this.handleMouseUp.bind(this);
         this.handleMouseLeave = this.handleMouseLeave.bind(this);
         this.state = {
-            'currHoverNodeId' : null,
-            'currSelectedNodeId' :  null,
             'isMouseDownOnContainer' : true,
         };
 
         this.memoized = { // Differs from props.memoized
             diseaseToIndex: memoize(PedigreeVizViewUserInterface.diseaseToIndex),
-            orderNodesBottomRightToTopLeft : memoize(orderNodesBottomRightToTopLeft),
-            findNodeWithId: memoize(findNodeWithId)
+            orderNodesBottomRightToTopLeft : memoize(orderNodesBottomRightToTopLeft)
         };
 
         this.innerRef = React.createRef();
@@ -489,21 +483,6 @@ class PedigreeVizViewUserInterface extends React.PureComponent {
     //*/
 
     componentDidUpdate(pastProps, pastState, snapshot){
-        const { objectGraph, onDataChanged } = this.props;
-        const { objectGraph: pastObjGraph } = pastProps;
-
-        if (objectGraph !== pastObjGraph){
-            onDataChanged(objectGraph);
-            this.setState(({ currSelectedNodeId })=>{
-                const retState = { currHoverNodeId: null };
-                const selectedNode = currSelectedNodeId && this.memoized.findNodeWithId(objectGraph, currSelectedNodeId);
-                if (!selectedNode){
-                    retState.currSelectedNodeId = null;
-                }
-                return retState;
-            });
-        }
-
         this.handleDimensionOrScaleChanged(pastProps, pastState, snapshot);
     }
 
@@ -557,68 +536,6 @@ class PedigreeVizViewUserInterface extends React.PureComponent {
                 nextCenterV - (containerHeight / 2),
             );
         }
-    }
-
-    handleNodeMouseIn(id){
-        const { windowWidth = null } = this.props;
-        if (isMobileSize(windowWidth)){
-            // Prevent hover interaction handling on mobile sizes for perf/safety.
-            return false;
-        }
-        if (!id) {
-            return;
-        }
-        this.setState({ 'currHoverNodeId' : id });
-    }
-
-    handleNodeMouseLeave(evt){
-        const { currHoverNodeId = null } = this.state;
-        if (!currHoverNodeId){
-            return false;
-        }
-        //console.log('out', evt.currentTarget, evt.target, evt.relatedTarget);
-        this.setState({ 'currHoverNodeId' : null });
-    }
-
-    handleNodeClick(id){
-        if (!id){
-            return false;
-        }
-        // Is triggered after onmouseup, vectors always === 0.
-        //console.log(this.mouseMove.vectorX, this.mouseMove.vectorY);
-        //if (Math.abs(this.mouseMove.vectorX) > 10 || Math.abs(this.mouseMove.vectorY) > 10){
-        //    // Might have started to drag viewport; cancel.
-        //    return false;
-        //}
-        this.setState(function({ currSelectedNodeId }){
-            if (currSelectedNodeId === id){
-                return null;
-            }
-            return {
-                'currSelectedNodeId' : id,
-                // For mobile
-                'currHoverNodeId' : id
-            };
-        }, ()=>{
-            const { onNodeSelect, objectGraph } = this.props;
-            const { currSelectedNodeId } = this.state;
-            if (typeof onNodeSelect === 'function'){
-                const currSelectedNode = currSelectedNodeId && this.memoized.findNodeWithId(objectGraph, currSelectedNodeId);
-                onNodeSelect(currSelectedNode);
-            }
-        });
-    }
-
-    handleUnselectNode(){
-        this.setState({ 'currSelectedNodeId' : null }, ()=>{
-            const { onNodeSelect, objectGraph } = this.props;
-            const { currSelectedNodeId } = this.state;
-            if (typeof onNodeSelect === 'function'){
-                // Should always eval to null but keep remainder of logic in case state.currSelectedNodeId changes interim.
-                const currSelectedNode = currSelectedNodeId && this.memoized.findNodeWithId(objectGraph, currSelectedNodeId);
-                onNodeSelect(currSelectedNode);
-            }
-        });
     }
 
     handleContainerMouseDown(evt){
@@ -690,7 +607,7 @@ class PedigreeVizViewUserInterface extends React.PureComponent {
 
         const { vectorX = 0, vectorY = 0, nextAnimationFrame = null } = this.mouseMove;
         this.mouseMove = { ...PedigreeVizViewUserInterface.initialMouseMoveState };
-        const { currSelectedNodeId = null } = this.state;
+        const { onSelectNode, onUnselectNode, currSelectedNodeId = null } = this.props;
         nextAnimationFrame && window.cancelAnimationFrame(nextAnimationFrame);
 
         // Act as click off of or onto node; we will have vectorX if 'click'ed within container.
@@ -704,14 +621,14 @@ class PedigreeVizViewUserInterface extends React.PureComponent {
                 }
                 if (nodeID && (nodeType === "individual" || nodeType === "relationship")){
                     // Change to new node
-                    this.handleNodeClick(nodeID);
+                    onSelectNode(nodeID);
                     return;
                 } // Else
-                this.handleUnselectNode();
+                onUnselectNode();
                 return;
             }
             if (currSelectedNodeId === null && nodeID && (nodeType === "individual" || nodeType === "relationship")){
-                this.handleNodeClick(nodeID);
+                onSelectNode(nodeID);
             }
         }
     }
@@ -728,9 +645,14 @@ class PedigreeVizViewUserInterface extends React.PureComponent {
             minScale, maxScale,
             graphHeight, graphWidth,
             setScale,
+            selectedNode,
+            onSelectNode,
+            onUnselectNode,
+            currSelectedNodeId,
+            currHoverNodeId,
             ...passProps
         } = this.props;
-        const { currSelectedNodeId, isMouseDownOnContainer } = this.state;
+        const { isMouseDownOnContainer } = this.state;
         const diseaseToIndex = this.memoized.diseaseToIndex(visibleDiseases, objectGraph);
         const orderedNodes = this.memoized.orderNodesBottomRightToTopLeft(objectGraph);
 
@@ -750,29 +672,35 @@ class PedigreeVizViewUserInterface extends React.PureComponent {
         //};
 
         const commonChildProps = {
-            objectGraph: orderedNodes,
+            ...passProps,
+            ...this.state,
+            "objectGraph": orderedNodes,
             graphHeight, graphWidth, dims, diseaseToIndex,
             containerHeight, containerWidth, scale,
-            'memoized': this.memoized,
-            'onNodeMouseIn' : this.handleNodeMouseIn,
-            'onNodeMouseLeave' : this.handleNodeMouseLeave,
-            //'onNodeClick' : this.handleNodeClick,
-            ...passProps, ...this.state
+            selectedNode,
+            currSelectedNodeId,
+            currHoverNodeId,
+            // In passProps:
+            // onNodeMouseIn,
+            // onNodeMouseLeave,
+            // Handled here for now:
+            // onNodeClick
         };
 
         let selectedNodePane = null;
         if (typeof renderDetailPane === 'function'){
             selectedNodePane = renderDetailPane({
                 objectGraph,
+                selectedNode,
                 currSelectedNodeId,
+                currHoverNodeId,
                 diseaseToIndex,
-                'memoized': this.memoized, // `findNodeWithId` is reused by child components
-                'unselectNode' : this.handleUnselectNode,
-                'onNodeClick' : this.handleNodeClick,
+                'onNodeClick': onSelectNode,
+                'unselectNode' : onUnselectNode
             });
         }
 
-        const detailPaneHasNode = !!(selectedNodePane && currSelectedNodeId);
+        const detailPaneHasNode = !!(selectedNodePane && selectedNode);
         const hasExtraHeight = containerHeight >= scaledVizStyle.height;
         const hasExtraWidth = (typeof containerWidth === "number" && containerWidth >= scaledVizStyle.width);
         const isScrollable = !hasExtraHeight || !hasExtraWidth || detailPaneHasNode;
@@ -805,14 +733,13 @@ class PedigreeVizViewUserInterface extends React.PureComponent {
 }
 
 
-
 const ShapesLayer = React.memo(function ShapesLayer(props){
-    const { graphHeight, graphWidth } = props;
+    const { graphHeight, graphWidth, selectedNode, dims } = props;
     const svgStyle = { width: graphWidth, height: graphHeight };
     return (
         <svg className="shapes-layer" viewBox={"0 0 " + graphWidth + " " + graphHeight} style={svgStyle}>
             <EdgesLayer {...props} />
-            <SelectedNodeIdentifier {...props} />
+            <SelectedNodeIdentifier {...{ selectedNode, dims }} />
             <IndividualNodeShapeLayer {...props} />
         </svg>
     );
@@ -826,9 +753,7 @@ const ShapesLayer = React.memo(function ShapesLayer(props){
  * **BUT** Using CSS transition for SVG transform is part of newer spec so browsers should ideally
  * support it, can likely just wait for (more) browsers to implement?
  */
-const SelectedNodeIdentifier = React.memo(function SelectedNodeIdentifier(props){
-    const { memoized, currSelectedNodeId, objectGraph, dims } = props;
-    const selectedNode = currSelectedNodeId && memoized.findNodeWithId(objectGraph, currSelectedNodeId);
+const SelectedNodeIdentifier = React.memo(function SelectedNodeIdentifier({ selectedNode, dims }){
     if (!selectedNode){
         return null;
     }
