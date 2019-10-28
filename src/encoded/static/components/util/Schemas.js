@@ -65,7 +65,7 @@ export const Term = {
                 return term;
             case 'description':
                 if (allowJSXOutput) {
-                    return <span className="mono-text text-small">{ term }</span>;
+                    return <span className="text-monospace text-small">{ term }</span>;
                 }
                 return term;
             case 'file_type':

@@ -723,7 +723,7 @@ export class OverViewBodyItem extends React.PureComponent {
 
             return (
                 <div className="imaging-path-item-wrapper row">
-                    <div className="index-num col-2 mono-text text-500"><small>{ channel }</small></div>
+                    <div className="index-num col-2 text-monospace text-500"><small>{ channel }</small></div>
                     <div className={"imaging-path col-" + (matchingFile ? '7' : '10')}>{ object.itemUtil.generateLink(path, true) }</div>
                     { matchingFile ? <div className="microscope-setting col-3 text-right" data-tip="Light Source Center Wavelength">{ fileUtil.getLightSourceCenterMicroscopeSettingFromFile(channel, matchingFile) }nm</div> : null }
                 </div>
