@@ -25,8 +25,8 @@ export const CohortSummaryTable = React.memo(function CohortSummaryTable(props){
     }
 
     const columnOrder = [
-        "sample",
         "individual",
+        "sample",
         "visitInfo",
         "sampleInfo",
         "workupType",
@@ -211,7 +211,8 @@ export const CohortSummaryTable = React.memo(function CohortSummaryTable(props){
                 error: sampleErr = null,
                 files = [],
                 processed_files = [],
-                status: sampleStatus
+                status: sampleStatus,
+                specimen_type: sampleInfo = null,
             } = sample;
 
             if (!sampleTitle || !sampleID){
@@ -240,6 +241,7 @@ export const CohortSummaryTable = React.memo(function CohortSummaryTable(props){
                     processedFiles: generateFileRenderObject(procFilesWPermissions),
                     rawFiles: generateFileRenderObject(rawFilesWPermissions),
                     sampleIdx,
+                    sampleInfo,
                     sampleStatus: (
                         <span>
                             <i className="item-status-indicator-dot mr-05" data-status={sampleStatus}/>
@@ -291,9 +293,7 @@ export const CohortSummaryTable = React.memo(function CohortSummaryTable(props){
         return renderedSummary;
     }
 
-    console.log("rows: ", rows);
     const sortedRows = _(rows).chain().sortBy(function(row) {
-        console.log("row: ", row, " is in group ", row.individualGroup);
         return row.sampleGroup;
     }).sortBy(function(row) {
         return row.individualGroup;
