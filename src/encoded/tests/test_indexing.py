@@ -33,8 +33,11 @@ def teardown(app, use_collections=TEST_COLLECTIONS):
     from snovault import DBSESSION
     from snovault.elasticsearch import create_mapping
     from .conftest import indexer_testapp
+    es = app.registry['elasticsearch']
     # index and then run create mapping to clear things out
     indexer_testapp(app).post_json('/index', {'record': True})
+    # remove indexing records
+    es.indices.delete('indexing')
     create_mapping.run(app, collections=use_collections, skip_indexing=True)
     session = app.registry[DBSESSION]
     connection = session.connection().connect()
