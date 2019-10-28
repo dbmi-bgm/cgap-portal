@@ -7,16 +7,11 @@ import { IndividualNodeBase } from './IndividualsLayer';
 
 export const IndividualNodeShapeLayer = React.memo(function IndividualNodeShapeLayer(props){
     const { objectGraph: g, ...passProps } = props;
-    const { dims, scale } = passProps;
-    const textScale = (0.5 / scale) + 0.5;
-    const textScaleTransformStr = "scale3d(" + textScale +"," + textScale +",1)";
+    const { dims } = passProps;
     return (
         <g className="individuals-bg-shape-layer">
             <ClipPathDefinitions dims={dims} />
-            { g.map((indv) =>
-                <IndividualNodeShape {...passProps} key={indv.id} individual={indv}
-                    {...{ textScale, textScaleTransformStr }} />
-            )}
+            { g.map((indv) => <IndividualNodeShape {...passProps} key={indv.id} individual={indv} /> )}
         </g>
     );
 });

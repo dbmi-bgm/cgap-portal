@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import ReactDOM from 'react-dom';
 import PropTypes from 'prop-types';
 import memoize from 'memoize-one';
 import { path as d3Path } from 'd3-path';
 /** @todo Pull this out into here if making a lib */
 import { requestAnimationFrame as raf } from '@hms-dbmi-bgm/shared-portal-components/es/components/viz/utilities';
+import { isRelationship } from './data-utilities';
 import { graphToDiseaseIndices, orderNodesBottomRightToTopLeft } from './layout-utilities-drawing';
 import { GraphTransformer, buildGraphData, POSITION_DEFAULTS } from './GraphTransformer';
 import { ScaleController, ScaleControls } from './ScaleController';
@@ -654,17 +655,17 @@ class PedigreeVizViewUserInterface extends React.PureComponent {
     }
 }
 
-
-
 const ShapesLayer = React.memo(function ShapesLayer(props){
-    const { graphHeight, graphWidth, selectedNode, dims } = props;
+    const { graphHeight, graphWidth, selectedNode, dims, scale } = props;
+    const textScale = (0.5 / scale) + 0.5;
+    const textScaleTransformStr = "scale3d(" + textScale +"," + textScale +",1)";
     const svgStyle = { width: graphWidth, height: graphHeight };
     return (
-        <svg className="shapes-layer" viewBox={"0 0 " + graphWidth + " " + graphHeight} style={svgStyle}>
+        <svg className="pedigree-viz-shapes-layer shapes-layer" viewBox={"0 0 " + graphWidth + " " + graphHeight} style={svgStyle}>
             <EdgesLayer {...props} />
-            <SelectedNodeIdentifier {...{ selectedNode, dims }} />
-            <RelationshipNodeShapeLayer {...props} />
-            <IndividualNodeShapeLayer {...props} />
+            <SelectedNodeIdentifier {...{ selectedNode, dims, textScale }} />
+            <RelationshipNodeShapeLayer {...props} {...{ textScale, textScaleTransformStr }} />
+            <IndividualNodeShapeLayer {...props} {...{ textScale, textScaleTransformStr }} />
         </svg>
     );
 });
@@ -677,7 +678,7 @@ const ShapesLayer = React.memo(function ShapesLayer(props){
  * **BUT** Using CSS transition for SVG transform is part of newer spec so browsers should ideally
  * support it, can likely just wait for (more) browsers to implement?
  */
-const SelectedNodeIdentifier = React.memo(function SelectedNodeIdentifier({ selectedNode, dims }){
+const SelectedNodeIdentifier = React.memo(function SelectedNodeIdentifier({ selectedNode, dims, textScale }){
     if (!selectedNode){
         return null;
     }
@@ -691,13 +692,16 @@ const SelectedNodeIdentifier = React.memo(function SelectedNodeIdentifier({ sele
         useWidth = dims.relationshipSize;
     }
 
-    const topLeftX = dims.graphPadding + xCoord - (useWidth / 2);
-    const topLeftY = dims.graphPadding + yCoord - (useHeight / 2);
-    const transform = "translate(" + topLeftX + ", " + topLeftY + ")";
-
+    const ourScale = ((textScale + 1) / 2);
+    const centerH = useWidth / 2;
+    const centerV = useHeight / 2;
+    const topLeftX = dims.graphPadding + xCoord - centerH;
+    const topLeftY = dims.graphPadding + yCoord - centerV;
+    const transform = "translate(" + topLeftX + ", " + topLeftY + ") scale(" + ourScale + ")";
+    const segmentLength = ourScale * 7;
     return (
-        <g className="selected-node-identifier" transform={transform}>
-            <SelectedNodeIdentifierShape height={useHeight} width={useWidth} />
+        <g className="selected-node-identifier" transform={transform} style={{ transformOrigin: "" + centerH + "px " + centerV + "px" }}>
+            <SelectedNodeIdentifierShape height={useHeight} width={useWidth} segmentLengthX={segmentLength} segmentLengthY={segmentLength} />
         </g>
     );
 });
@@ -764,4 +768,9 @@ const SelectedNodeIdentifierShape = React.memo(function SelectedNodeIdentifierSh
 
 /** Exports / entry-points */
 export default PedigreeViz;
-export { GraphTransformer, buildGraphData, PedigreeVizView };
+export {
+    PedigreeVizView,
+    GraphTransformer,
+    buildGraphData as buildPedigreeGraphData,
+    isRelationship as isRelationshipNode
+};

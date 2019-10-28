@@ -125,7 +125,8 @@ export class ScaleController extends React.PureComponent {
                 (containerWidth / graphWidth),
                 (containerHeight / graphHeight)
             );
-            const minScale = Math.floor(Math.min(maxScale, Math.max(propMinScale, scaleUnbounded)) * 100) / 100;
+            // Decrease by 5% for scrollbars, etc.
+            const minScale = Math.floor(Math.min(maxScale, Math.max(propMinScale, scaleUnbounded)) * 95) / 100;
             const retObj = { containerWidth, containerHeight, minScale };
 
             // First time that we've gotten dimensions -- set scale to fit.

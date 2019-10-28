@@ -4,6 +4,7 @@ import React from 'react';
 import memoize from 'memoize-one';
 import ReactTooltip from 'react-tooltip';
 import { IndividualBody, getIndividualDisplayTitle } from './IndividualBody';
+import { isRelationshipNode } from './../../../viz/PedigreeViz';
 
 
 export class PedigreeDetailPane extends React.PureComponent {
@@ -16,14 +17,16 @@ export class PedigreeDetailPane extends React.PureComponent {
     }
 
     render(){
-        const { selectedNode, unselectNode, className } = this.props;
+        const { hoveredNode, unselectNode: onClose, ...passProps } = this.props;
+        const { selectedNode } = passProps;
+        const isHovered = hoveredNode === selectedNode;
 
         if (!selectedNode){
             return null;
-        } else if (selectedNode.id.slice(0,13) === 'relationship:'){
-            return <RelationshipBody {...this.props} selectedNode={selectedNode} onClose={unselectNode} />;
+        } else if (isRelationshipNode(selectedNode)){
+            return <RelationshipBody {...passProps} {...{ onClose, isHovered }} />;
         } else {
-            return <IndividualBody {...this.props} selectedNode={selectedNode} onClose={unselectNode} />;
+            return <IndividualBody {...passProps} {...{ onClose, isHovered }} />;
         }
     }
 }

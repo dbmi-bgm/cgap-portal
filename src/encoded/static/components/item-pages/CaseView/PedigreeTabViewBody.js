@@ -4,7 +4,7 @@ import memoize from 'memoize-one';
 import _ from 'underscore';
 import { console, layout, ajax, object } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { PedigreeDetailPane } from './../components/PedigreeDetailPane';
-import PedigreeViz from './../../viz/PedigreeViz';
+import PedigreeViz, { PedigreeVizView } from './../../viz/PedigreeViz';
 import { FullHeightCalculator } from './../components/FullHeightCalculator';
 
 
@@ -139,10 +139,11 @@ export class PedigreeTabViewBody extends React.PureComponent {
 
     render(){
         const {
-            dataset,
+            dataset = null,
+            graphData = null,
             windowWidth,
             windowHeight,
-            visibleDiseases,
+            visibleDiseases = null,
             scale = 1,
             showOrderBasedName = true
         } = this.props;
@@ -172,16 +173,32 @@ export class PedigreeTabViewBody extends React.PureComponent {
         const enableMouseWheelZoom = false;
 
         /**
-         * PedigreeViz's `height` props gets overriden by FullHeightCalculator @ responsive
+         * `height` prop gets overriden by FullHeightCalculator @ responsive
          * grid states larger than 'sm' (@see FullHeightCalculator `defaultProps.skipGridStates`).
          */
+        const pedigreeVizProps = {
+            visibleDiseases, showOrderBasedName,
+            scale, enableMouseWheelZoom,
+            filterUnrelatedIndividuals: false,
+            renderDetailPane: this.renderDetailPane,
+            height: 600,
+            width: windowWidth,
+            minimumHeight: 400,
+            windowWidth // <- Todo - maybe remove dependence on this, supply prop instead if needed..
+        };
+
+        if (!dataset && !graphData) {
+            throw new Error("Expected `dataset` or `graphData` to be present");
+        }
+
         return (
             <div id="pedigree-viz-container-cgap" className={cls}>
                 <FullHeightCalculator {...{ windowWidth, windowHeight, propName, heightDiff }}>
-                    <PedigreeViz {...{ dataset, windowWidth, visibleDiseases, scale, showOrderBasedName, enableMouseWheelZoom }}
-                        filterUnrelatedIndividuals={false} renderDetailPane={this.renderDetailPane}
-                        height={600} width={windowWidth} minimumHeight={400}>
-                    </PedigreeViz>
+                    { graphData ? // If already have parsed graph data
+                        <PedigreeVizView {...pedigreeVizProps} {...graphData} />
+                        :
+                        <PedigreeViz {...pedigreeVizProps} dataset={dataset} />
+                    }
                 </FullHeightCalculator>
             </div>
         );
