@@ -45,245 +45,6 @@ def read_mapping_table(fname):
     return VERSION, DATE, FIELDS
 
 
-def add_annotation_schema_fields(schema):
-    """
-        Adds schema fields that are present regardless of the content
-        of the mapping table.
-
-        XXX: May want to specify this stuff somewhere
-    """
-    schema['title'] = 'Annotation Field'
-    schema['description'] = "Schema for submitting an annotation field"
-    schema['id'] = '/profiles/annotation_field.json'
-    schema['$schema'] = 'http://json-schema.org/draft-04/schema#'
-    schema['type'] = 'object'
-    schema['required'] = ['field_name', 'institution', 'project', 'field_type', 'schema_title']
-    schema['identifyingProperties'] = ['uuid', 'aliases', 'field_name']
-    schema['additionalProperties'] = False
-    schema['mixinProperties'] = [
-        { "$ref": "mixins.json#/schema_version" },
-        { "$ref": "mixins.json#/uuid" },
-        { "$ref": "mixins.json#/aliases" },
-        { "$ref": "mixins.json#/submitted" },
-        { "$ref": "mixins.json#/modified" },
-        { "$ref": "mixins.json#/status" },
-        { "$ref": "mixins.json#/attribution" },
-        { "$ref": "mixins.json#/notes" },
-        { "$ref": "mixins.json#/static_embeds" }
-    ]
-    schema['properties'] = {}
-    schema['properties']['schema_version'] = {'default': '1'}
-    logger.info('Added default fields to annotation schema\n')
-
-
-def add_annotation_schema_facets_and_columns(schema):
-    """
-        Adds facets and columns to the annotation field schema
-
-        XXX: May want to specify this stuff somewhere
-    """
-    schema['facets'] = {
-        "field_type": {
-            "title": "Type"
-        },
-        "source_name": {
-            "title": "Source"
-        },
-        "scope": {
-            "title": "Scope"
-        },
-        "mvp": {
-            "title": "MVP"
-        }
-    }
-    schema['columns'] = {
-        "schema_title": {
-            "title": "Field name"
-        },
-        "field_type": {
-            "title": "Field type"
-        },
-        "source_name": {
-            "title": "Source"
-        }
-    }
-
-
-def build_annotation_field_schema(fields):
-    """
-        Takes in fields read from the mapping table and builds the associated
-        annotation_field.json file. First it uses the above helper to add some
-        default fields, then it processes each field, which is essentially hard
-        coded since there is no consistent format.
-
-        XXX: When there is consistent formatting this can be heavily simplified.
-    """
-    schema = {}
-    add_annotation_schema_fields(schema)
-    for field in fields:
-        if field == 'field_name':
-            schema['properties'][field] = {
-                'title': 'Field Name',
-                'description': 'Name of the annotation field name',
-                'type': 'string',
-                'uniqueKey': True
-            }
-        elif field == 'vcf_name':
-            schema['properties'][field] = {
-                "title": "Field Name on VCF",
-                "description": "Original name of the annotaion field name on vcf file",
-                "type": "string"
-            }
-        elif field == 'is_list':
-            schema['properties']['is_list'] = {
-                "title": "NCBI Entrez Gene ID",
-                "type": "boolean",
-                "default": False
-            }
-        elif field == 'enum_list':
-            schema['properties']['enum_list'] = {
-                "title": "Enum list",
-                "description": "you can restrict to set of values",
-                "type": "array",
-                "uniqueItems": True,
-                "items": {
-                    "title": "Enum list item",
-                    "type":  "string"
-                }
-            }
-        elif field == 'field_type':
-            schema['properties']['field_type'] = {
-                "title": "Field type",
-                "description": "Field type, number, integer, string",
-                "type": "string",
-                "enum": [
-                    "string",
-                    "number",
-                    "integer",
-                    "boolean"
-                ]
-            }
-        elif field == 'sub_embedding_group':
-            schema['properties']['sub_embedding_group'] = {
-                 "title": "Sub-embedding group",
-                 "description": "If field belong to a sub embedded object, add field name",
-                 "type": "string"
-            }
-        elif field == 'scale':
-            schema['properties']['scale'] = {
-                "title": "Scale",
-                "description": "Scale defined by new annotation structure",
-                "type": "string"
-            }
-        elif field == 'domain':
-            schema['properties']['domain'] = {
-                "title": "Domain",
-                "description": "Domain defined by new annotation structure",
-                "type": "string"
-            }
-        elif field == 'method':
-            schema['properties']['method'] = {
-                "title": "Method",
-                "description": "Method defined by new annotation structure",
-                "type": "string"
-            }
-        elif field == 'separator': # XXX: typo?
-            schema['properties']['seperator'] = {
-                "title": "Seperator",
-                "description": "if value is list, use this seperator to split items",
-                "type": "string",
-                "enum": [
-                    "comma",
-                    "pipe",
-                    "semicolon",
-                    "colon",
-                    "tab"
-                ]
-            }
-        elif field == 'scope':
-            schema['properties']['scope'] = {
-                "title": "Scope",
-                "description": "Scope that this field belongs to",
-                "type": "string",
-                "enum": [
-                    "variant",
-                    "sample",
-                    "gene"
-                ]
-            }
-        elif field == 'schema_title':
-            schema['properties']['schema_title'] = {
-                "title": "Schema Title",
-                "description": "Title to be used in the variant schema for the field",
-                "type": "string"
-            }
-        elif field == 'schema_description':
-            schema['properties']['schema_description'] = {
-                "title": "Description to be used in the variant schema for the field",
-                "description": "description inception",
-                "type": "string"
-            }
-        elif field == 'source_name':
-            schema['properties']['source_name'] = {
-                "title": "Source Name",
-                "description": "Source used for collection information in this field",
-                "type": "string"
-            }
-        elif field == 'source_version':
-            schema['properties']['source_version'] = {
-                "title": "Source Version",
-                "description": "Version of source used for collection information in this field",
-                "type": "string"
-            }
-        elif field == 'field_priority':
-            schema['properties']['field_priority'] = {
-                "title": "Field priority",
-                "description": "Ranking number of the field (lower is better)",
-                "type": "integer"
-            }
-        elif field == 'column_priority':
-            schema['properties']['column_priority'] = {
-                "title": "Column priority",
-                "description": "Ranking number of the field for Column in search view (lower is better)",
-                "type": "integer"
-            }
-        elif field == 'facet_priority':
-            schema['properties']['facet_priority'] = {
-                "title": "Field priority",
-                "description": "Ranking number of the field for Facet in search view (lower is better)",
-                "type": "integer"
-            }
-        elif field == 'links_to':
-            schema['properties']['links_to'] = {
-                "title": "Linking To",
-                "description": "If this field can be associated with another item type from CGAP database",
-                "type": "string",
-                "enum": [
-                    "Gene",
-                    "Disorder",
-                    "Phenotype"
-                ]
-            }
-        elif field == 'mvp':
-            schema['properties']['mvp'] = {
-                "title": "MVP",
-                "description": "Is this field part of MVP",
-                "type": "boolean",
-                "default": False
-            }
-        elif field == 'value_example':
-            schema['properties']['value_example'] = {
-                "title": "Example Value for this field",
-                "description": "Example Value for this field, stored as text",
-                "type": "string"
-            }
-        else:
-            logger.info('Encountered field with no handler: %s' % field)
-
-    add_annotation_schema_facets_and_columns(schema)
-    return json.dumps(schema)
-
-
 def process_inserts(fname, fields):
     """
         Processes the annotation fields in the mapping table to produce inserts
@@ -486,27 +247,21 @@ def main():
     if len(sys.argv) < 2:
         logger.error('Mapping table file not specified, exiting\n')
         exit(1)
-    logger.info('Processing mapping table at: %s\n' % sys.argv[1])
+    logger.info('Building annotations from mapping table: %s\n' % sys.argv[1])
     VERSION, DATE, FIELDS = read_mapping_table(sys.argv[1])
     if FIELDS is None:
         logger.error('Failed to process mapping table. Exiting.\n')
         exit(1)
-
-    ANNOTATION_SCHEMA = build_annotation_field_schema(FIELDS)
-    with open('annotation_field.json', 'w+') as out:
-        json.dump(ANNOTATION_SCHEMA, out)
-    logger.info('Successfully wrote new annotation_schema.json\n')
-    inserts = process_inserts(fname, FIELDS)
+    inserts = process_inserts(sys.argv[1], FIELDS)
     # XXX: Post inserts below
     # from ff_utils import post_metadata
     # for entry in inserts:
-    #     ff_utils.post_metadata(insert, 'annotation_field')
+    #     ff_utils.post_metadata(entry, 'annotation_field', auth_key)
     logger.info('Successfully created/posted annotations\n')
     sample_props = generate_sample_json(inserts)
     logger.info('Successfully generated sample JSON\n')
     var_props, cols, facs = generate_variant_json(inserts)
     logger.info('Successfully generated variant JSON\n')
-    # Write out stuff here as appropriate
 
 
 if __name__ == '__main__':

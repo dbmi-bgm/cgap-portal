@@ -2,12 +2,9 @@ import os
 import csv
 import json
 import pytest
-from encoded.commands.build_annotation_schema import (
+from encoded.commands.create_annotation_inserts import (
     process_fields,
     read_mapping_table,
-    add_annotation_schema_fields,
-    add_annotation_schema_facets_and_columns,
-    build_annotation_field_schema,
     process_inserts,
     generate_sample_json,
     generate_variant_json
@@ -52,48 +49,8 @@ def test_read_mapping_table():
     assert sorted(FIELDS) == sorted(EXPECTED_FIELDS)
 
 
-def test_add_annotation_schema_fields():
-    """ Tests that schema fields look right when addded """
-    schema = {}
-    add_annotation_schema_fields(schema)
-    assert 'identifyingProperties' in schema
-    assert 'title' in schema
-    assert 'type' in schema
-    assert schema['type'] == 'object'
-    assert 'properties' in schema
-    assert 'schema_version' in schema['properties']
-
-
-def test_add_facets_and_columns():
-    """ Tests that facet and column fields are added correctly """
-    schema = {}
-    add_annotation_schema_facets_and_columns(schema)
-    assert 'facets' in schema
-    assert 'columns' in schema
-    assert 'field_type' in schema['facets']
-    assert 'scope' in schema['facets']
-    assert 'mvp' in schema['facets']
-    assert 'field_type' in schema['columns']
-    assert 'source_name' in schema['columns']
-
-
-def test_build_full_schema(fields):
-    """
-    Tests that some fields look correct when we build the whole annotation
-    field schema. Tests random things about properties that should be there
-    """
-    schema = json.loads(build_annotation_field_schema(fields))
-    assert schema['properties']['field_name']['type'] == 'string'
-    assert schema['properties']['is_list']['type'] == 'boolean'
-    assert schema['properties']['scale']['title'] == 'Scale'
-    assert schema['properties']['domain']['description'] == 'Domain defined by new annotation structure'
-    assert sorted(schema['properties']['scope']['enum']) == sorted(['variant', 'sample', 'gene'])
-    assert sorted(schema['properties']['links_to']['enum']) == sorted(['Gene', 'Disorder', 'Phenotype'])
-    assert schema['properties']['value_example']['type'] == 'string'
-
-
 def test_process_inserts(inserts):
-    """ Tests that we properly process an insert """
+    """ Tests that we properly process an inserts into mvp, sample, variant """
     assert inserts[0] == EXPECTED_INSERT
     mvp_list = [i for i in inserts if i.get('mvp')]
     assert len(mvp_list) == MVP_EXPECTED
