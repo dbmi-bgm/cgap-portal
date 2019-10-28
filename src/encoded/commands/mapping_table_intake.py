@@ -2,10 +2,12 @@ import csv
 import sys
 import six
 import json
+import argparse
 import logging
 from collections import OrderedDict, Mapping
 
 logger = logging.getLogger(__name__)
+EPILOG = __doc__
 
 
 def process_fields(row):
@@ -317,30 +319,40 @@ def main():
     schema and variant schema.
     """
     logging.basicConfig()
-    if len(sys.argv) < 4:
-        logger.error('usage: python create_annotation_inserts <mapping_table> <variant_file_path> <variant_sample_file_path>\n')
-        exit(1)
+    parser = argparse.ArgumentParser(
+        description="Takes in a mapping table and produces inserts/schemas",
+        epilog=EPILOG,
+        formatter_class=argparse.RawDescriptionHelpFormatter
+    )
+    parser.add_argument('mp', help='path to mapping table')
+    parser.add_argument('variant', help='where to write variant schema')
+    parser.add_argument('sample', help='where to write sample_variant schema')
+    parser.add_argument('--post-inserts', action='store_true', default=True,
+                        help='If specified will post inserts, by default False')
+    args = parser.parse_args()
 
-    mapping_table_loc = sys.argv[1]
-    variant_schema_loc = sys.argv[2]
-    variant_sample_schema_loc = sys.argv[3]
-    logger.info('Building annotations from mapping table: %s\n' % mapping_table_loc)
-    VERSION, DATE, FIELDS = read_mapping_table(mapping_table_loc)
+    # read/process mapping table, build inserts
+    logger.info('Building annotations from mapping table: %s\n' % args.mp)
+    VERSION, DATE, FIELDS = read_mapping_table(args.mp)
     if FIELDS is None:
         logger.error('Failed to process mapping table. Exiting.\n')
         exit(1)
-    inserts = process_inserts(mapping_table_loc, FIELDS)
-    # XXX: Post inserts below
-    # from ff_utils import post_metadata
-    # for entry in inserts:
-    #     ff_utils.post_metadata(entry, 'annotation_field', auth_key)
+    inserts = process_inserts(args.mp, FIELDS)
+
+    # if not a dry run try to post inserts
+    if not args.post_inserts:
+        from ff_utils import post_metadata
+        for entry in inserts:
+            ff_utils.post_metadata(entry, 'annotation_field', None)
     logger.info('Successfully created/posted annotations\n')
+
+    # generate schemas from inserts
     sample_props = generate_sample_json(inserts)
     variant_sample_schema = generate_variant_sample_schema(sample_props)
-    write_schema(variant_sample_schema, variant_sample_schema_loc)
+    write_schema(variant_sample_schema, args.sample)
     var_props, cols, facs = generate_variant_json(inserts)
     variant_schema = generate_variant_schema(var_props, cols, facs)
-    write_schema(variant_schema, variant_schema_loc)
+    write_schema(variant_schema, args.variant)
     logger.info('Successfully wrote schemas\n')
 
 
