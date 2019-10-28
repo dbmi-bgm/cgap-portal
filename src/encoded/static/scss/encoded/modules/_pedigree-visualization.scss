@@ -209,37 +209,6 @@ $pedigree-disease-colors :
                     }
                 }
             }
-            > .relationships-layer {
-                .pedigree-relationship {
-                    position: absolute;
-                    border: 2px solid transparent;
-                    border-radius: 50%;
-                    background-color: #521f1fad;
-                    background: transparent;
-                    padding: 9px;
-                    @include transition(padding .2s);
-                    cursor: pointer;
-                    &:after {
-                        content: '';
-                        position: relative;
-                        width: 18px;
-                        height: 18px;
-                        background-color: #521f1fad;
-                        border: 2px solid #521f1f;
-                        border-radius: 50%;
-                        display: block;
-                        @include transition(width .2s, height .2s);
-                    }
-    
-                    &.is-hovered-over:not(.is-selected) {
-                        padding: 6px;
-                        &:after {
-                            width: 24px;
-                            height: 24px;
-                        }
-                    }
-                }
-            }
     
             > .shapes-layer {
                 position: absolute;
@@ -341,6 +310,18 @@ $pedigree-disease-colors :
 
                         &.not-adjustable {
                             stroke-linecap: square;
+                        }
+                    }
+                }
+
+                > .relationships-layer {
+                    .pedigree-relationship {
+                        cursor: pointer;
+                        @include transition(transform .2s, -webkit-transform .2s);
+                        > circle {
+                            stroke: #521f1f;
+                            stroke-width: 2px;
+                            fill: rgba(82, 31, 31, 0.7);
                         }
                     }
                 }

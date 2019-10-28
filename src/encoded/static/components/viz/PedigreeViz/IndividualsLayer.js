@@ -82,9 +82,9 @@ export class IndividualDiv extends IndividualNodeBase {
     }
 
     componentDidUpdate(pastProps, pastState){
-        const { currSelectedNodeId, individual : { id } } = this.props;
-        if (currSelectedNodeId !== pastProps.currSelectedNodeId){
-            if (currSelectedNodeId !== id){
+        const { selectedNode, individual } = this.props;
+        if (selectedNode !== pastProps.selectedNode){
+            if (selectedNode !== individual){
                 this.setState(function({ currentOption }){
                     if (currentOption !== null){
                         return { currentOption: null };
@@ -123,7 +123,7 @@ export class IndividualDiv extends IndividualNodeBase {
     render(){
         const {
             dims, graphHeight, individual, onNodeMouseLeave,
-            currHoverNodeId, currSelectedNodeId, editable
+            hoveredNode, selectedNode, editable
         } = this.props;
         const { currentOption } = this.state;
         const { id, name, _drawing : { heightIndex, xCoord, yCoord } } = individual;
@@ -133,8 +133,8 @@ export class IndividualDiv extends IndividualNodeBase {
             top         : this.memoized.top(yCoord, dims),//this.memoized.top(heightIndex, dims, graphHeight),
             left        : this.memoized.left(xCoord, dims)
         };
-        const isBeingHovered = currHoverNodeId === id;
-        const isSelected = currSelectedNodeId === id;
+        const isSelected = selectedNode === individual;
+        const isBeingHovered = hoveredNode === individual;
         let actionButtons = null;
         if (editable && !currentOption){
             /** TODO */

@@ -9,18 +9,18 @@ import { IndividualBody, getIndividualDisplayTitle } from './IndividualBody';
 export class PedigreeDetailPane extends React.PureComponent {
 
     componentDidUpdate(pastProps){
-        const { currSelectedNodeId } = this.props;
-        if (pastProps.currSelectedNodeId !== currSelectedNodeId) {
+        const { selectedNode } = this.props;
+        if (pastProps.selectedNode !== selectedNode) {
             ReactTooltip.rebuild();
         }
     }
 
     render(){
-        const { selectedNode, unselectNode, currSelectedNodeId, className } = this.props;
+        const { selectedNode, unselectNode, className } = this.props;
 
         if (!selectedNode){
             return null;
-        } else if (currSelectedNodeId.slice(0,13) === 'relationship:'){
+        } else if (selectedNode.id.slice(0,13) === 'relationship:'){
             return <RelationshipBody {...this.props} selectedNode={selectedNode} onClose={unselectNode} />;
         } else {
             return <IndividualBody {...this.props} selectedNode={selectedNode} onClose={unselectNode} />;

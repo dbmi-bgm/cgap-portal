@@ -26,7 +26,6 @@ export class SelectedNodeController extends React.PureComponent {
 
     constructor(props){
         super(props);
-        this.findNodeWithId = memoize(findNodeWithId);
         this.handleSelectNode = this.handleSelectNode.bind(this);
         this.handleUnselectNode = this.handleUnselectNode.bind(this);
         this.handleNodeMouseIn = this.handleNodeMouseIn.bind(this);
@@ -34,6 +33,10 @@ export class SelectedNodeController extends React.PureComponent {
         this.state = {
             'currHoverNodeId' : null,
             'currSelectedNodeId' :  null
+        };
+        this.memoized = {
+            findSelectedNode: memoize(findNodeWithId),
+            findHoveredNode: memoize(findNodeWithId)
         };
     }
 
@@ -45,7 +48,7 @@ export class SelectedNodeController extends React.PureComponent {
             onDataChanged(objectGraph);
             this.setState(({ currSelectedNodeId })=>{
                 const retState = { currHoverNodeId: null };
-                const selectedNode = currSelectedNodeId && this.findNodeWithId(objectGraph, currSelectedNodeId);
+                const selectedNode = currSelectedNodeId && this.memoized.findSelectedNode(objectGraph, currSelectedNodeId);
                 if (!selectedNode){
                     retState.currSelectedNodeId = null;
                 }
@@ -76,7 +79,7 @@ export class SelectedNodeController extends React.PureComponent {
             const { onNodeSelected, objectGraph } = this.props;
             const { currSelectedNodeId } = this.state;
             if (typeof onNodeSelected === 'function'){
-                const currSelectedNode = currSelectedNodeId && this.findNodeWithId(objectGraph, currSelectedNodeId);
+                const currSelectedNode = currSelectedNodeId && this.memoized.findSelectedNode(objectGraph, currSelectedNodeId);
                 onNodeSelected(currSelectedNode);
             }
         });
@@ -88,7 +91,7 @@ export class SelectedNodeController extends React.PureComponent {
             const { currSelectedNodeId } = this.state;
             if (typeof onNodeSelected === 'function'){
                 // Should always eval to null but keep remainder of logic in case state.currSelectedNodeId changes interim.
-                const currSelectedNode = currSelectedNodeId && this.findNodeWithId(objectGraph, currSelectedNodeId);
+                const currSelectedNode = currSelectedNodeId && this.memoized.findSelectedNode(objectGraph, currSelectedNodeId);
                 onNodeSelected(currSelectedNode);
             }
         });
@@ -114,11 +117,12 @@ export class SelectedNodeController extends React.PureComponent {
     render(){
         const { children, objectGraph, ...passProps } = this.props;
         const { currSelectedNodeId, currHoverNodeId } = this.state;
-        const selectedNode = this.findNodeWithId(objectGraph, currSelectedNodeId);
+        const selectedNode = this.memoized.findSelectedNode(objectGraph, currSelectedNodeId);
+        const hoveredNode = this.memoized.findHoveredNode(objectGraph, currHoverNodeId);
         const childProps = {
             ...passProps,
             selectedNode,
-            currSelectedNodeId, currHoverNodeId,
+            hoveredNode,
             onSelectNode: this.handleSelectNode,
             onUnselectNode: this.handleUnselectNode,
             onNodeMouseIn: this.handleNodeMouseIn,

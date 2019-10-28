@@ -113,13 +113,13 @@ export class IndividualNodeShape extends IndividualNodeBase {
     render(){
         const {
             dims, graphHeight, individual, diseaseToIndex, textScale, textScaleTransformStr,
-            currHoverNodeId, currSelectedNodeId, showOrderBasedName
+            hoveredNode, selectedNode, showOrderBasedName
         } = this.props;
         const { individualWidth, individualHeight } = dims;
         const { id, diseases = [], _drawing : { xCoord, yCoord } } = individual;
 
-        const isSelected = currSelectedNodeId === id;
-        const isHoveredOver = currHoverNodeId === id;
+        const isSelected = selectedNode === individual;
+        const isHoveredOver = hoveredNode === individual;
         /*
         const height = isHoveredOver ? individualHeight * 1.2 : individualHeight;
         const width = isHoveredOver ? individualWidth * 1.2 : individualWidth;

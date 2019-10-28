@@ -19,6 +19,7 @@ import { ScaleController, ScaleControls } from './ScaleController';
 import { SelectedNodeController } from './SelectedNodeController';
 import { IndividualsLayer, doesAncestorHaveId } from './IndividualsLayer';
 import { IndividualNodeShapeLayer } from './IndividualNodeShapeLayer';
+import { RelationshipNodeShapeLayer } from './RelationshipNodeShapeLayer';
 import { EdgesLayer } from './EdgesLayer';
 import { DefaultDetailPaneComponent } from './DefaultDetailPaneComponent';
 
@@ -607,15 +608,15 @@ class PedigreeVizViewUserInterface extends React.PureComponent {
 
         const { vectorX = 0, vectorY = 0, nextAnimationFrame = null } = this.mouseMove;
         this.mouseMove = { ...PedigreeVizViewUserInterface.initialMouseMoveState };
-        const { onSelectNode, onUnselectNode, currSelectedNodeId = null } = this.props;
+        const { onSelectNode, onUnselectNode, selectedNode = null } = this.props;
         nextAnimationFrame && window.cancelAnimationFrame(nextAnimationFrame);
 
         // Act as click off of or onto node; we will have vectorX if 'click'ed within container.
         if (Math.abs(vectorX) <= 5 && Math.abs(vectorY) <= 5){
             const nodeID = (evt && evt.target && evt.target.id) || null;
             const nodeType = (evt && evt.target && evt.target.getAttribute("data-node-type")) || null;
-            if (currSelectedNodeId !== null) {
-                if (nodeID === currSelectedNodeId) {
+            if (selectedNode !== null) {
+                if (nodeID === selectedNode.id) {
                     // Keep same node selected if (re)click on it
                     return;
                 }
@@ -627,7 +628,7 @@ class PedigreeVizViewUserInterface extends React.PureComponent {
                 onUnselectNode();
                 return;
             }
-            if (currSelectedNodeId === null && nodeID && (nodeType === "individual" || nodeType === "relationship")){
+            if (selectedNode === null && nodeID && (nodeType === "individual" || nodeType === "relationship")){
                 onSelectNode(nodeID);
             }
         }
@@ -646,10 +647,9 @@ class PedigreeVizViewUserInterface extends React.PureComponent {
             graphHeight, graphWidth,
             setScale,
             selectedNode,
+            hoveredNode,
             onSelectNode,
             onUnselectNode,
-            currSelectedNodeId,
-            currHoverNodeId,
             ...passProps
         } = this.props;
         const { isMouseDownOnContainer } = this.state;
@@ -673,13 +673,10 @@ class PedigreeVizViewUserInterface extends React.PureComponent {
 
         const commonChildProps = {
             ...passProps,
-            ...this.state,
             "objectGraph": orderedNodes,
             graphHeight, graphWidth, dims, diseaseToIndex,
             containerHeight, containerWidth, scale,
-            selectedNode,
-            currSelectedNodeId,
-            currHoverNodeId,
+            selectedNode, hoveredNode,
             // In passProps:
             // onNodeMouseIn,
             // onNodeMouseLeave,
@@ -692,8 +689,7 @@ class PedigreeVizViewUserInterface extends React.PureComponent {
             selectedNodePane = renderDetailPane({
                 objectGraph,
                 selectedNode,
-                currSelectedNodeId,
-                currHoverNodeId,
+                hoveredNode,
                 diseaseToIndex,
                 'onNodeClick': onSelectNode,
                 'unselectNode' : onUnselectNode
@@ -706,7 +702,7 @@ class PedigreeVizViewUserInterface extends React.PureComponent {
         const isScrollable = !hasExtraHeight || !hasExtraWidth || detailPaneHasNode;
 
         return (
-            <div className="pedigree-viz-container" style={outerContainerStyle} data-selected-node={currSelectedNodeId}>
+            <div className="pedigree-viz-container" style={outerContainerStyle} data-selected-node={selectedNode && selectedNode.id}>
                 <div className="inner-container" ref={this.innerRef} style={innerContainerStyle}
                     onMouseDown={this.handleContainerMouseDown}
                     onMouseMove={this.handleContainerMouseMove}
@@ -715,7 +711,6 @@ class PedigreeVizViewUserInterface extends React.PureComponent {
                     data-mouse-down={isMouseDownOnContainer}>
                     <div className="viz-area" style={scaledVizStyle} data-scale={scale}>
                         <ShapesLayer {...commonChildProps} />
-                        <RelationshipsLayer {...commonChildProps} />
                         <IndividualsLayer {...commonChildProps} />
                     </div>
                 </div>
@@ -740,6 +735,7 @@ const ShapesLayer = React.memo(function ShapesLayer(props){
         <svg className="shapes-layer" viewBox={"0 0 " + graphWidth + " " + graphHeight} style={svgStyle}>
             <EdgesLayer {...props} />
             <SelectedNodeIdentifier {...{ selectedNode, dims }} />
+            <RelationshipNodeShapeLayer {...props} />
             <IndividualNodeShapeLayer {...props} />
         </svg>
     );
@@ -836,79 +832,3 @@ const SelectedNodeIdentifierShape = React.memo(function SelectedNodeIdentifierSh
 
     return <React.Fragment>{ cornerPathsJSX }</React.Fragment>;
 });
-
-
-
-const RelationshipsLayer = React.memo(function RelationshipsLayer(props){
-    const { relationships, ...passProps } = props;
-    const visibleRelationshipElements = relationships.map(function(relationship, idx){
-        const partnersStr = relationship.partners.map(function(p){ return p.id; }).join(',');
-        return <RelationshipNode relationship={relationship} key={partnersStr} partnersStr={partnersStr} {...passProps} />;
-    });
-    return (
-        <div className="relationships-layer">{ visibleRelationshipElements }</div>
-    );
-});
-
-
-function relationshipClassName(relationship, isSelected, isBeingHovered){
-    const classes = ["pedigree-relationship"];
-    if (isBeingHovered) {
-        classes.push('is-hovered-over');
-    }
-    if (isSelected) {
-        classes.push('is-selected');
-    }
-    return classes.join(' ');
-}
-
-
-class RelationshipNode extends React.PureComponent {
-
-    constructor(props){
-        super(props);
-        this.onMouseEnter = this.onMouseEnter.bind(this);
-        //this.onClick = this.onClick.bind(this);
-        this.memoized = {
-            top: memoize(relationshipTopPosition)
-        };
-    }
-
-    onMouseEnter(evt){
-        const { onNodeMouseIn, relationship: { id } } = this.props;
-        evt.stopPropagation();
-        onNodeMouseIn(id);
-    }
-
-    /* Handled by PedigreeVizView currently
-    onClick(evt){
-        const { onNodeClick, relationship: { id } } = this.props;
-        evt.stopPropagation();
-        onNodeClick(id);
-    }
-    */
-
-    render(){
-        const {
-            relationship, partnersStr, dims, onNodeMouseLeave,
-            currHoverNodeId, currSelectedNodeId, editable
-        } = this.props;
-        const { id, children = [], partners = [], _drawing : { xCoord, yCoord } } = relationship;
-
-        const isSelected = currSelectedNodeId === id;
-        const isHoveredOver = currHoverNodeId === id;
-
-        const elemStyle = {
-            width : dims.relationshipSize,
-            height: dims.relationshipSize,
-            top: this.memoized.top(yCoord, dims),
-            left: dims.graphPadding + xCoord - (dims.relationshipSize / 2)
-        };
-        return (
-            <div style={elemStyle} className={relationshipClassName(relationship, isSelected, isHoveredOver)}
-                id={id} data-node-type="relationship" data-partners={partnersStr}
-                onMouseEnter={this.onMouseEnter} onMouseLeave={onNodeMouseLeave}>
-            </div>
-        );
-    }
-}
