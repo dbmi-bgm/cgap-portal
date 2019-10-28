@@ -40,7 +40,6 @@ import { DefaultDetailPaneComponent } from './DefaultDetailPaneComponent';
  * @prop {!string} [mother]             Mother of Individual in form of ID. Gets merged into 'parents'.
  */
 
-
 const pedigreeVizPropTypes = {
     dataset: PropTypes.arrayOf(PropTypes.exact({
         'id'                : PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
@@ -69,7 +68,8 @@ const pedigreeVizPropTypes = {
     width: PropTypes.number,
     editable: PropTypes.bool,
     onNodeSelected: PropTypes.func,
-    renderDetailPane: PropTypes.func
+    renderDetailPane: PropTypes.func,
+    filterUnrelatedIndividuals: PropTypes.bool
 };
 
 const pedigreeVizDefaultProps = {
@@ -198,6 +198,7 @@ const pedigreeVizDefaultProps = {
      */
     "visibleDiseases": null,
 
+
     /**
      * If true, will show markers such as "II - 1", "IV - 2", etc. based on generation & order.
      * Else will use `individual.name` or `individual.id` (if no name).
@@ -235,6 +236,7 @@ const pedigreeVizDefaultProps = {
  * `PedigreeVizView` with its resulting data. This might be useful when want to use data from resulting
  * `objectGraph`, such as generation identifiers.
  *
+ * @export
  * @see https://s3-us-west-2.amazonaws.com/utsw-patientcare-web-production/documents/pedigree.pdf
  * @todo Many things, including
  *  - Texts (and containing rect) for markers such as stillBirth, age, ECT, age deceased, pregnancy info, etc.
@@ -246,9 +248,10 @@ const pedigreeVizDefaultProps = {
  *  - Twins of different specificites (requires additions to bounding box calculations, edge segments, etc.)
  */
 function PedigreeViz(props){
+    const { dataset, dimensionOpts, filterUnrelatedIndividuals, ...viewProps } = props;
     return (
-        <GraphTransformer {...props}>
-            <PedigreeVizView />
+        <GraphTransformer {...{ dataset, dimensionOpts, filterUnrelatedIndividuals }}>
+            <PedigreeVizView {...viewProps} />
         </GraphTransformer>
     );
 }
@@ -257,15 +260,17 @@ PedigreeViz.defaultProps = pedigreeVizDefaultProps;
 
 
 /**
+ * @export
  * @todo
  * - Possibly move selected node state up into here.
  * - Eventually create new "EditingController" component
  *   and wrap 1 of these components.
+ * - Define propTypes.
  */
 function PedigreeVizView(props){
     const {
-        zoomToExtentsOnMount, initialScale, enableMouseWheelZoom,
         objectGraph, onNodeSelected, onDataChanged,
+        zoomToExtentsOnMount, initialScale, enableMouseWheelZoom,
         ...passProps
     } = props;
     const pedigreeViewProps = { ...passProps, objectGraph };
@@ -291,6 +296,14 @@ class PedigreeVizViewUserInterface extends React.PureComponent {
         } else {
             return graphToDiseaseIndices(objectGraph);
         }
+    }
+
+    static scaledVizStyle(graphHeight, graphWidth, scale){
+        return {
+            'width': (graphWidth * scale),
+            'height': (graphHeight * scale),
+            'transform' : "scale3d(" + scale + "," + scale + ",1)"
+        };
     }
 
     static defaultProps = {
@@ -321,10 +334,6 @@ class PedigreeVizViewUserInterface extends React.PureComponent {
     constructor(props){
         super(props);
         this.handleDimensionOrScaleChanged = this.handleDimensionOrScaleChanged.bind(this);
-        //this.handleNodeMouseIn = this.handleNodeMouseIn.bind(this);
-        //this.handleNodeMouseLeave = this.handleNodeMouseLeave.bind(this);
-        //this.handleNodeClick = this.handleNodeClick.bind(this);
-        //this.handleUnselectNode = this.handleUnselectNode.bind(this);
         this.handleContainerMouseDown = this.handleContainerMouseDown.bind(this);
         this.handleContainerMouseMove = this.handleContainerMouseMove.bind(this);
         this.handleMouseUp = this.handleMouseUp.bind(this);
@@ -335,7 +344,8 @@ class PedigreeVizViewUserInterface extends React.PureComponent {
 
         this.memoized = { // Differs from props.memoized
             diseaseToIndex: memoize(PedigreeVizViewUserInterface.diseaseToIndex),
-            orderNodesBottomRightToTopLeft : memoize(orderNodesBottomRightToTopLeft)
+            orderNodesBottomRightToTopLeft : memoize(orderNodesBottomRightToTopLeft),
+            scaledVizStyle: memoize(PedigreeVizViewUserInterface.scaledVizStyle)
         };
 
         this.innerRef = React.createRef();
@@ -559,7 +569,8 @@ class PedigreeVizViewUserInterface extends React.PureComponent {
             width: propWidth,
             height: propHeight,
             minimumHeight,
-            objectGraph, dims, order,
+            objectGraph,
+            dims, order,
             renderDetailPane, containerStyle,
             visibleDiseases = null,
             scale = 1,
@@ -575,17 +586,13 @@ class PedigreeVizViewUserInterface extends React.PureComponent {
         const { isMouseDownOnContainer } = this.state;
         const diseaseToIndex = this.memoized.diseaseToIndex(visibleDiseases, objectGraph);
         const orderedNodes = this.memoized.orderNodesBottomRightToTopLeft(objectGraph);
+        const scaledVizStyle = this.memoized.scaledVizStyle(graphHeight, graphWidth, scale);
 
         const containerHeight = propHeight || Math.max(minimumHeight, graphHeight);
         const containerWidth = propWidth || undefined; // TODO: consider measuring innerElem.offsetWidth, also detect/update if changes re: detailpane
 
         const outerContainerStyle = { minHeight : containerHeight, ...containerStyle };
         const innerContainerStyle = { height: propHeight || "auto", minHeight : containerHeight };
-        const scaledVizStyle = {
-            'width': (graphWidth * scale),
-            'height': (graphHeight * scale),
-            'transform' : "scale3d(" + scale + "," + scale + ",1)"
-        };
 
         //const innerElemStyle = {
         //    paddingTop: Math.max(0, (containerHeight - scaledVizStyle.height) / 2)
@@ -646,6 +653,7 @@ class PedigreeVizViewUserInterface extends React.PureComponent {
         );
     }
 }
+
 
 
 const ShapesLayer = React.memo(function ShapesLayer(props){
