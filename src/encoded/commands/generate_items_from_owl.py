@@ -26,7 +26,8 @@ from dcicutils.ff_utils import (
     get_authentication_with_server,
     get_metadata,
     search_metadata,
-    unified_authentication
+    unified_authentication,
+    post_metadata
 )
 
 EPILOG = __doc__
@@ -34,6 +35,7 @@ EPILOG = __doc__
 '''logging setup
    logging config - to be moved to file at some point
 '''
+LOGFILE = 'process_dp_upd.log'
 logger = logging.getLogger(__name__)
 
 logging.config.dictConfig({
@@ -41,19 +43,28 @@ logging.config.dictConfig({
     'disable_existing_loggers': False,
     'formatters': {
         'standard': {
-            'format': '%(levelname)s - %(message)s - %(name)s'
+            'format': '%(levelname)s:\t%(message)s'
+        },
+        'verbose': {
+            'format': '%(levelname)s:\t%(message)s\tFROM: %(name)s'
         }
     },
     'handlers': {
         'stdout': {
+            'level': 'WARN',
+            'formatter': 'verbose',
+            'class': 'logging.StreamHandler'
+        },
+        'logfile': {
             'level': 'INFO',
             'formatter': 'standard',
-            'class': 'logging.StreamHandler'
+            'class': 'logging.FileHandler',
+            'filename': LOGFILE
         }
     },
     'loggers': {
         '': {
-            'handlers': ['stdout'],
+            'handlers': ['stdout', 'logfile'],
             'level': 'INFO',
             'propagate': True
         }
@@ -408,7 +419,7 @@ def id_post_and_patch(terms, dbterms, itype, rm_unchanged=True, set_obsoletes=Tr
     to_update = []
     to_post = []
     to_patch = {}
-    obsoletes = []
+    obsoletes = {}
     tid2uuid = {}  # to keep track of existing uuids
     for tid, term in terms.items():
         if tid not in dbterms:
@@ -433,7 +444,7 @@ def id_post_and_patch(terms, dbterms, itype, rm_unchanged=True, set_obsoletes=Tr
 
     # all terms have uuid - now add uuids to linked terms
     for term in terms.values():
-        puuids = _get_uuids_for_linked(term, tid2uuid)
+        puuids = _get_uuids_for_linked(term, tid2uuid, itype)
         for rt, uuids in puuids.items():
             term[rt] = list(set(uuids))  # to avoid redundant terms
 
@@ -446,7 +457,7 @@ def id_post_and_patch(terms, dbterms, itype, rm_unchanged=True, set_obsoletes=Tr
         if not term:
             continue
         to_update.append(term)
-        to_patch[tid] = term
+        to_patch[tid] = dbterm
 
     if set_obsoletes:
         # go through db terms and find which aren't in terms and set status
@@ -455,29 +466,27 @@ def id_post_and_patch(terms, dbterms, itype, rm_unchanged=True, set_obsoletes=Tr
         id_field = ITEM2OWL[itype].get('id_field')
         for tid, term in dbterms.items():
             if tid not in terms and term.get('status') not in ['obsolete', 'deleted']:
-                if itype == 'OntologyTerm':
-                    source_onts = [so.get('uuid') for so in term.get('source_ontologies', [])]
-                    if not source_onts or not [o for o in ontids if o in source_onts]:
-                        # don't obsolete terms that aren't in one of the ontologies being processed
-                        continue
                 dbuid = term['uuid']
                 # add simple term with only status and uuid to to_patch
-                obsoletes.append(tid)
+                obsoletes[tid] = term
                 to_update.append({'status': 'obsolete', 'uuid': dbuid})
                 tid2uuid[term[id_field]] = dbuid
-    logger.info("Will obsolete {} TERMS".format(len(obsoletes)))
     logger.info("{} TERMS ARE NEW".format(len(to_post)))
+    logger.info("Will obsolete {} TERMS".format(len(obsoletes)))
     logger.info("{} LIVE TERMS WILL BE PATCHED".format(len(to_patch)))
-    logger.info("OBSOLETE TERMS")
-    for t in obsoletes:
-        logger.info("\t{}".format(t))
     logger.info("NEW TERMS")
     for termid in to_post:
         logger.info("\t{}".format(termid))
+    logger.info("OBSOLETE TERMS")
+    for t, tinfo in obsoletes.items():
+        logger.info("\t{}\t{}\t{}".format(t, tinfo.get('uuid'), tinfo.get(ITEM2OWL[itype].get('name_field'))))
+    logger.info("PATCHED TERMS")
+    for t, term in to_patch.items():
+        logger.info("\t{}\t{}\t{}".format(t, term.get('uuid'), term.get(ITEM2OWL[itype].get('name_field'))))
     return to_update
 
 
-def _get_uuids_for_linked(term, idmap):
+def _get_uuids_for_linked(term, idmap, itype):
     puuids = {}
     for rt in ['parents', 'slim_terms']:
         tlist = term.get(rt)
@@ -486,8 +495,8 @@ def _get_uuids_for_linked(term, idmap):
             for p in tlist:
                 if p in idmap:
                     puuids.setdefault(rt, []).append(idmap[p])
-                else:
-                    logger.warn('WARNING - {} - MISSING FROM IDMAP'.format(p))
+                elif p.startswith(ITEM2OWL[itype].get('ontology_prefix')):
+                    logger.warn('{} - MISSING FROM IDMAP'.format(p))
     return puuids
 
 
@@ -602,6 +611,10 @@ def parse_args(args):
                         action='store_true',
                         default=False,
                         help="Default False - use to load data directly from json to the server that the connection refers to")
+    parser.add_argument('--post_report',
+                        action='store_true',
+                        default=False,
+                        help="Default False - use to post a Document item with a report as attachment")
     parser.add_argument('--pretty',
                         default=False,
                         action='store_true',
@@ -616,6 +629,28 @@ def parse_args(args):
 def owl_runner(value):
     print('Processing: ', value[0]['ontology_name'])
     return download_and_process_owl(*value)
+
+
+def post_report_document_to_portal(connection, itype):
+    meta = {}
+    rtype = 'document'
+    date = datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
+    attachment = None
+    if os.path.is_file(LOGFILE):
+        attachment = '{}_update_report_{}'.format(itype, date)
+        try:
+            os.rename(LOGFILE, attachment)
+        except OSError as e:
+            logger.warn("Cannot rename {}".format(LOGFILE))
+    meta['attachment'] = attachment
+    try:
+        res = post_metadata(meta, rtype, connection)
+    except:
+        print("Problem posting report", e)
+    else:
+        if res.get('status') != 'success':
+            print("Not successful - ", res.get('status'))
+    return
 
 
 def prompt_check_for_output_options(load, outfile, itype, server):
@@ -681,18 +716,22 @@ def main():
         filter_unchanged = True
         if args.full:
             filter_unchanged = False
-        terms2write = id_post_and_patch(terms, db_terms, itype, filter_unchanged)
+        items2upd = id_post_and_patch(terms, db_terms, itype, filter_unchanged)
         pretty = False
         if args.pretty:
             pretty = True
-        write_outfile(terms2write, postfile, pretty)
+        write_outfile(items2upd, postfile, pretty)
         if loaddb:
-            env = arg.env if args.env else 'local'  # may want to change to use key/secret as option to get env
-            res = load_items(env, items2write, itypes=[itype])
+            env = args.env if args.env else 'local'  # may want to change to use key/secret as option to get env
+            res = 'TESTING'
+            # res = load_items(env, items2upd, itypes=[itype])
             logger.info(res)
+            logger.info(json.dumps(items2upd, indent=4))
     stop = datetime.datetime.now()
-    print('STARTED: ', str(start))
-    print('END: ', str(stop))
+    logger.info('STARTED: {}'.format(str(start)))
+    logger.info('END: {}'.format(str(stop)))
+    if args.post_report:
+        post_report_document_to_portal(connection, itype)
 
 
 if __name__ == '__main__':
