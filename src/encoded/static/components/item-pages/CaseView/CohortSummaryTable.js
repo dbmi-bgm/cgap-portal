@@ -83,6 +83,9 @@ export const CohortSummaryTable = React.memo(function CohortSummaryTable(props){
     const membersWithoutSamples = [];
     const membersWithoutViewPermissions = [];
 
+    let individualGroup = 0;
+    let sampleGroup = 0;
+
     // Gather rows from family.members - 1 per sample (or individual, if no sample).
     members.forEach(function(individual){
         const {
@@ -111,7 +114,7 @@ export const CohortSummaryTable = React.memo(function CohortSummaryTable(props){
             files.forEach((file) => {
                 const {
                     display_title: filename,
-                    quality_metric = null,
+                    quality_metric = {},
                     "@id": fileUrl
                 } = file;
 
@@ -232,6 +235,8 @@ export const CohortSummaryTable = React.memo(function CohortSummaryTable(props){
                     sample: <a href={sampleID} className="accession">{ sampleTitle }</a>,
                     individual : indvLink,
                     isProband,
+                    individualGroup,
+                    sampleGroup,
                     processedFiles: generateFileRenderObject(procFilesWPermissions),
                     rawFiles: generateFileRenderObject(rawFilesWPermissions),
                     sampleIdx,
@@ -243,8 +248,9 @@ export const CohortSummaryTable = React.memo(function CohortSummaryTable(props){
                     )
                 });
             }
+            sampleGroup++;
         });
-
+        individualGroup++;
     });
 
     const membersWithoutSamplesLen = membersWithoutSamples.length;
@@ -285,7 +291,15 @@ export const CohortSummaryTable = React.memo(function CohortSummaryTable(props){
         return renderedSummary;
     }
 
-    const sortedRows = _.sortBy(rows, "isProband").reverse(); // todo: this is... probably not ideal performance wise
+    console.log("rows: ", rows);
+    const sortedRows = _(rows).chain().sortBy(function(row) {
+        console.log("row: ", row, " is in group ", row.individualGroup);
+        return row.sampleGroup;
+    }).sortBy(function(row) {
+        return row.individualGroup;
+    }).reverse().sortBy(function(row) {
+        return row.isProband;
+    }).value().reverse();
 
     const renderedRows = sortedRows.map(function(row, rowIdx){
         const { isProband = false, sampleIdx } = row;
