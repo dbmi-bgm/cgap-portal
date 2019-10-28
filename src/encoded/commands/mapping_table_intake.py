@@ -311,7 +311,11 @@ def write_schema(schema, fname):
 
 
 def main():
-    """ Works with mp.csv, downloaded 10-25 """
+    """
+    Works with mp.csv, downloaded 10-25
+    Takes in the mapping table and produces annotation field inserts, variant_sample
+    schema and variant schema.
+    """
     logging.basicConfig()
     if len(sys.argv) < 4:
         logger.error('usage: python create_annotation_inserts <mapping_table> <variant_file_path> <variant_sample_file_path>\n')

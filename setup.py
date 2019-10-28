@@ -112,7 +112,7 @@ setup(
         create-mapping-on-deploy = encoded.commands.create_mapping_on_deploy:main
         update-inserts-from-server = encoded.commands.update_inserts_from_server:main
         run-upgrade-on-inserts = encoded.commands.run_upgrader_on_inserts:main
-        create-annotation-inserts = encoded.commands.create_annotation_inserts:main
+        mapping-table-intake = encoded.commands.mapping_table_intake:main
 
         [paste.app_factory]
         main = encoded:main
