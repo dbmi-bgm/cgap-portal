@@ -93,73 +93,32 @@ def process_inserts(fname, fields):
     return inserts
 
 
-def generate_sample_json(inserts):
+def get_sample_inserts(inserts):
     """
-    Generates sample JSON given the inserts, which are first pruned and sorted
-    based on priority.
+        Filters inserts for those that are mvp and sample
+        Meant to be passed to generate_properties
     """
-    sample_props = OrderedDict()
     mvp_list = [i for i in inserts if i.get('mvp')]
     samples = [i for i in mvp_list if i.get('scope') == 'sample']
     samples = sorted(samples, key = lambda i: i.get('field_priority', 1000000))
-
-    def get_prop(item):
-        update = OrderedDict()
-        prop_name = item['field_name']
-        features = OrderedDict()
-        features.update({
-            "title": item['schema_title'],
-            "vcf_name": item['vcf_name'],
-            "type": item['field_type']
-        })
-        if item.get('schema_description'):
-            features['description'] = item['schema_description']
-        if item.get('links_to'):
-            features['linkTo'] = item['links_to']
-        if item.get('enum_list'):
-            features['enum'] = item['enum_list']
-        if item.get('field_priority'):
-            features['lookup'] = item['field_priority']
-        for a_field in ['scale', 'domain', 'method', 'seperator', 'source_name', 'source_version']:
-            if item.get(a_field):
-                features[a_field] = item[a_field]
-
-        # convert array structure
-        if item.get('is_list'):
-            array_item = OrderedDict()
-            array_item.update( {
-                "title": item['schema_title'],
-                "type": "array",
-                "vcf_name": item['vcf_name']
-            })
-            if item.get('schema_description'):
-                array_item['description'] = item['schema_description']
-            if item.get('field_priority'):
-                array_item['lookup'] = item['field_priority']
-            array_item['items'] = features
-            update[prop_name] = array_item
-            return update
-        else:
-            update[prop_name] = features
-            return update
-
-    for sample in samples:
-        if sample.get('sub_embedding_group'):
-            continue
-        sample_props.update(get_prop(sample))
-    return sample_props
+    return samples
 
 
-def generate_variant_json(inserts):
+def get_variant_inserts(inserts):
     """
-    Generates variant JSON, similarly to above
-    Given inserts generates var_props, columns and facets as a 3 tuple
+        Filters inserts for those that are mvp and not sample 
+        Meant to be passed to generate_properties
     """
-    var_props = OrderedDict()
-    cols = OrderedDict()
-    facs = OrderedDict()
     mvp_list = [i for i in inserts if i.get('mvp')]
     variants = [i for i in mvp_list if i.get('scope') != 'sample']
+    return variants
+
+
+def generate_properties(inserts, variant=True):
+    """ Generates sample variant or variant schema properties """
+    props = OrderedDict()
+    cols = OrderedDict()
+    facs = OrderedDict()
 
     def get_prop(item):
         temp = OrderedDict()
@@ -183,25 +142,26 @@ def generate_variant_json(inserts):
             if item.get(a_field):
                 features[a_field] = item[a_field]
 
-        # handle sub_embedded object
-        if item.get('sub_embedding_group'):
-            assert item['is_list'] == True
-            sub_temp = OrderedDict()
-            prop = OrderedDict()
-            prop[prop_name] = features
-            sum_ob_name = item['sub_embedding_group']
-            sub_title = sum_ob_name.replace("_", " ").title()
-            sub_temp.update({
-                "title": sub_title,
-                "type": "array",
-                "items": {
+        # handle sub_embedded object if we are doing variant
+        if variant:
+            if item.get('sub_embedding_group'):
+                assert item['is_list'] == True
+                sub_temp = OrderedDict()
+                prop = OrderedDict()
+                prop[prop_name] = features
+                sum_ob_name = item['sub_embedding_group']
+                sub_title = sum_ob_name.replace("_", " ").title()
+                sub_temp.update({
                     "title": sub_title,
-                    "type": "object",
-                    "properties": prop
-                    }
-                })
-            temp[sum_ob_name] = sub_temp
-            return temp
+                    "type": "array",
+                    "items": {
+                        "title": sub_title,
+                        "type": "object",
+                        "properties": prop
+                        }
+                    })
+                temp[sum_ob_name] = sub_temp
+                return temp
 
         # convert to array sturcutre
         if item.get('is_list'):
@@ -233,14 +193,19 @@ def generate_variant_json(inserts):
                 d[k] = v
         return d
 
-    for variant in variants:
-        update(var_props, get_prop(variant))
-        if variant.get('facet_priority'):
-            facs[variant['field_name']] = {'title': variant['schema_title']}
-        if variant.get('column_priority'):
-            cols[variant['field_name']] = {'title': variant['schema_title']}
+    for obj in inserts:
+        if variant:
+            update(props, get_prop(obj))
+            if obj.get('facet_priority'):
+                facs[obj['field_name']] = {'title': obj['schema_title']}
+            if obj.get('column_priority'):
+                cols[obj['field_name']] = {'title': obj['schema_title']}
+        else:
+            if obj.get('sub_embedding_group'):
+                continue
+            props.update(get_prop(obj))
 
-    return var_props, cols, facs
+    return props, cols, facs
 
 
 def add_default_schema_fields(schema):
@@ -347,10 +312,10 @@ def main():
     logger.info('Successfully created/posted annotations\n')
 
     # generate schemas from inserts
-    sample_props = generate_sample_json(inserts)
+    sample_props, _, _ = generate_properties(get_sample_inserts(inserts), variant=False)
     variant_sample_schema = generate_variant_sample_schema(sample_props)
     write_schema(variant_sample_schema, args.sample)
-    var_props, cols, facs = generate_variant_json(inserts)
+    var_props, cols, facs = generate_properties(get_variant_inserts(inserts))
     variant_schema = generate_variant_schema(var_props, cols, facs)
     write_schema(variant_schema, args.variant)
     logger.info('Successfully wrote schemas\n')

@@ -6,8 +6,9 @@ from encoded.commands.mapping_table_intake import (
     process_fields,
     read_mapping_table,
     process_inserts,
-    generate_sample_json,
-    generate_variant_json,
+    get_sample_inserts,
+    get_variant_inserts,
+    generate_properties,
     add_default_schema_fields,
     generate_variant_sample_schema,
     generate_variant_schema
@@ -48,12 +49,12 @@ def inserts(fields):
 
 @pytest.fixture
 def sample_variant_items(inserts):
-    return generate_sample_json(inserts)
+    return generate_properties(inserts, variant=False)
 
 
 @pytest.fixture
 def variant_items(inserts):
-    return generate_variant_json(inserts)
+    return generate_properties(inserts)
 
 
 def test_add_default_schema_fields():
@@ -85,11 +86,15 @@ def test_process_inserts(inserts):
     assert len(sample) == SAMPLE_FIELDS_EXPECTED
     variant = [i for i in mvp_list if i.get('scope') != 'sample']
     assert len(variant) == VARIANT_FIELDS_EXPECTED
+    variant = get_variant_inserts(inserts)
+    assert len(variant) == VARIANT_FIELDS_EXPECTED
+    sample = get_sample_inserts(inserts)
+    assert len(sample) == SAMPLE_FIELDS_EXPECTED
 
 
 def test_generate_sample_json_items(inserts):
     """ Tests that sample JSON is being created correctly checking three we expect """
-    sample_props = generate_sample_json(inserts)
+    sample_props, _, _ = generate_properties(inserts, variant=False)
     assert sample_props['qual']['title'] == 'Quality score'
     assert sample_props['qual']['vcf_name'] == 'QUAL'
     assert sample_props['qual']['type'] == 'number'
@@ -103,7 +108,7 @@ def test_generate_sample_json_items(inserts):
 
 def test_generate_variant_json_items(inserts):
     """ Tests that variant JSON along with columns and facets are produced """
-    var_props, cols, facs = generate_variant_json(inserts)
+    var_props, cols, facs = generate_properties(inserts)
     assert cols['chrom']['title'] == 'Chromosome'
     assert cols['pos']['title'] == 'Position'
     assert cols['id']['title'] == 'ID'
@@ -126,7 +131,8 @@ def test_generate_variant_json_items(inserts):
 
 def test_generate_variant_sample_schema(sample_variant_items):
     """ Tests some aspects of the variant_sample schema """
-    schema = generate_variant_sample_schema(sample_variant_items)
+    items, _, _ = sample_variant_items
+    schema = generate_variant_sample_schema(items)
     properties = schema['properties']
     for field in EXPECTED_VARIANT_SAMPLE_FIELDS:
         assert field in properties
