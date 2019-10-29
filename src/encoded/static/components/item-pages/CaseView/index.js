@@ -227,7 +227,7 @@ const CohortSummaryTabView = React.memo(function CohortSummaryTabView(props){
                     const cls = "summary-table-container family-index-" + idx;
                     const title = (
                         <h4>
-                            { "Family " + (idx + 1) }
+                            <a href="#pedigree" rel="noreferrer noopener">Family { (idx + 1) }</a>
                             { pedFileName ? <span className="text-300">{ " (" + pedFileName + ")" }</span> : null }
                         </h4>
                     );
