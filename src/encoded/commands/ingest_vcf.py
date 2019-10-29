@@ -12,8 +12,7 @@ EPILOG = __doc__
 
 class VCFParser(object):
     """
-    VCF Parser that wraps some methods and data associated with a single
-    VCF File
+    Wrapper class for 'vcf' that handles some additional things for us
     """
 
     def __init__(self, _vcf, variant, sample):
@@ -71,18 +70,26 @@ class VCFParser(object):
     def parse_vcf_record(self, record):
         """
         Parses an individual vcf record
+        XXX: VCF is malformed, must be fixed by daniel
+        Below 'sort of' works
         """
         result = {}
         for key in self.format.keys():
             annotations = None
             raw = record.INFO.get(key, None)
             if raw:
-                annotations = raw[0].split('|') # which annotation is the right one?
+                if key == 'ANN':
+                    annotations = [r.split('|') for r in raw] # could be many
+                else:
+                    annotations = ','.join(raw).split('|')
             if annotations:
-                for idx, field in enumerate(annotations):
-                    if field:
-                        field_name = self.format[key][idx]
-                        result[field_name] = field
+                for g_idx, group in enumerate(annotations):
+                    for f_idx, field in enumerate(group):
+                        if field:
+                            field_name = self.format[key][f_idx]
+                            if not result.get(field_name):
+                                result[field_name] = {}
+                            result[field_name][g_idx] = field
         return result
 
 
