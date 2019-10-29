@@ -210,7 +210,7 @@ const CohortSummaryTabView = React.memo(function CohortSummaryTabView(props){
                 families.map(function(family, idx){
                     const { original_pedigree: { display_title: pedFileName } = {} } = family;
                     const cls = "summary-table-container family-index-" + idx;
-                    const title = familiesLen === 1 ? null : (
+                    const title = (
                         <h4>
                             { "Family " + (idx + 1) }
                             { pedFileName ? <span className="text-300">{ " (" + pedFileName + ")" }</span> : null }
