@@ -1,8 +1,8 @@
 import React from 'react';
 import memoize from 'memoize-one';
 import { path as d3Path } from 'd3-path';
-import { IndividualNodeBase } from './IndividualsLayer';
-
+import { individualLeftPosition, individualTopPosition } from './layout-utilities-drawing';
+import { individualClassName } from './IndividualsLayer';
 
 
 export const IndividualNodeShapeLayer = React.memo(function IndividualNodeShapeLayer(props){
@@ -98,31 +98,43 @@ function getIndividualShape(individual, width, height){
 }
 
 
-export class IndividualNodeShape extends IndividualNodeBase {
+export class IndividualNodeShape extends React.PureComponent {
 
     constructor(props){
         super(props);
-        this.memoized.getIndividualShape = memoize(getIndividualShape);
+        this.memoized = {
+            className           : memoize(individualClassName),
+            left                : memoize(individualLeftPosition),
+            top                 : memoize(individualTopPosition),
+            getIndividualShape  : memoize(getIndividualShape)
+        };
     }
 
     render(){
         const {
-            dims, graphHeight, individual, diseaseToIndex, textScale, textScaleTransformStr,
-            hoveredNode, selectedNode, showOrderBasedName
+            dims,
+            individual,
+            diseaseToIndex,
+            textScale,
+            textScaleTransformStr,
+            hoveredNode = null,
+            selectedNode = null,
+            showOrderBasedName = true
         } = this.props;
         const { individualWidth, individualHeight } = dims;
         const { id, diseases = [], _drawing : { xCoord, yCoord } } = individual;
 
         const isSelected = selectedNode === individual;
         const isHoveredOver = hoveredNode === individual;
+
         /*
         const height = isHoveredOver ? individualHeight * 1.2 : individualHeight;
         const width = isHoveredOver ? individualWidth * 1.2 : individualWidth;
         */
 
-        const height    = individualHeight;
-        const width     = individualWidth;
-        const shape     = this.memoized.getIndividualShape(individual, height, width);
+        const height = individualHeight;
+        const width = individualWidth;
+        const shape = this.memoized.getIndividualShape(individual, height, width);
         const top       = this.memoized.top(yCoord, dims);
         const left      = this.memoized.left(xCoord, dims);
 
@@ -134,6 +146,7 @@ export class IndividualNodeShape extends IndividualNodeBase {
             );
         }
 
+        // Create 2 copies of the shape, one foreground and one background
         const bgShape = { ...shape, props : {
             ...shape.props,
             className: "bg-shape-copy"
@@ -144,7 +157,7 @@ export class IndividualNodeShape extends IndividualNodeBase {
         } };
 
         return (
-            <g width={individualWidth} height={individualHeight} transform={groupTransform} data-individual-id={id}
+            <g width={width} height={height} transform={groupTransform} data-individual-id={id}
                 className={"pedigree-individual-shape " + this.memoized.className(individual, isHoveredOver, isSelected)}>
                 { bgShape }
                 <UnderlayMarkers {...{ width, height, individual, shape, diseaseToIndex }} />

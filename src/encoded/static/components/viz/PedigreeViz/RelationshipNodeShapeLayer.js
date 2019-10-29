@@ -4,7 +4,7 @@ import { relationshipTopPosition } from './layout-utilities-drawing';
 
 
 
-export const RelationshipNodeShapeLayer = React.memo(function IndividualNodeShapeLayer(props){
+export const RelationshipNodeShapeLayer = React.memo(function RelationshipNodeShapeLayer(props){
     const { relationships, dims, ...passProps } = props;
     const halfRelationshipSize = dims.relationshipSize / 2;
     const relationshipCircleRadius = halfRelationshipSize * 0.6;

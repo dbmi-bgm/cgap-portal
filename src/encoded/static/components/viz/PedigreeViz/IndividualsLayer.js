@@ -4,17 +4,8 @@ import React from 'react';
 import memoize from 'memoize-one';
 import { individualLeftPosition, individualTopPosition } from './layout-utilities-drawing';
 
-
-export function doesAncestorHaveId(id, htmlNode, maxDepth = 10){
-    let currElem = { parentNode: htmlNode };
-    let count = 0;
-    while (currElem.parentNode && count <= maxDepth){
-        count++;
-        currElem = currElem.parentNode;
-        if (currElem.id === id) return true;
-    }
-    return false;
-}
+/** WE MIGHT GET RID OF THIS FILE LATER AND JUST HAVE SVG NODES **/
+/** HOWEVER ARE KEEPING FOR NOW BECAUSE IF WANT TO SHOW "pop-up" ui or similar, is much simpler with HTML than SVG **/
 
 export function individualClassName(individual, isBeingHovered = false, isSelected = false){
     const classes = [];
@@ -46,7 +37,6 @@ export function individualClassName(individual, isBeingHovered = false, isSelect
 
 export const IndividualsLayer = React.memo(function IndividualsLayer(props){
     const { objectGraph: g, ...passProps } = props;
-    const { graphHeight, graphWidth } = passProps;
     return (
         <div className="individuals-layer">
             { g.map((indv) => <IndividualDiv key={indv.id} individual={indv} {...passProps} /> )}
@@ -55,21 +45,7 @@ export const IndividualsLayer = React.memo(function IndividualsLayer(props){
 });
 
 
-/** Contains some memoized per-indv-node funcs/methods to be extended by a view. */
-export class IndividualNodeBase extends React.PureComponent {
-    constructor(props){
-        super(props);
-        // Different from PedigreeViz.memoized
-        this.memoized = {
-            className   : memoize(individualClassName),
-            left        : memoize(individualLeftPosition),
-            top         : memoize(individualTopPosition)
-        };
-    }
-}
-
-
-export class IndividualDiv extends IndividualNodeBase {
+export class IndividualDiv extends React.PureComponent {
 
     constructor(props){
         super(props);
@@ -78,6 +54,11 @@ export class IndividualDiv extends IndividualNodeBase {
         this.onAddBtnClick = this.onAddBtnClick.bind(this);
         this.state = {
             'currentOption' : null
+        };
+        this.memoized = {
+            className   : memoize(individualClassName),
+            left        : memoize(individualLeftPosition),
+            top         : memoize(individualTopPosition)
         };
     }
 
@@ -156,12 +137,6 @@ export class IndividualDiv extends IndividualNodeBase {
             + this.memoized.className(individual, isBeingHovered, isSelected)
         );
 
-        const detailStyle = {
-            maxWidth: dims.individualWidth + dims.individualXSpacing - 10,
-            //left: dims.individualWidth + 8,
-            left: -dims.individualWidth * .05,
-            top: dims.individualHeight + 10
-        };
         return (
             <div style={elemStyle} id={id} data-height-index={heightIndex} className={indvNodeCls}
                 data-y-coord={yCoord} data-node-type="individual"

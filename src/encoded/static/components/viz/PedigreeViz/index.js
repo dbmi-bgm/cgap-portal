@@ -4,13 +4,13 @@ import PropTypes from 'prop-types';
 import memoize from 'memoize-one';
 import { path as d3Path } from 'd3-path';
 /** @todo Pull this out into here if making a lib */
-import { requestAnimationFrame as raf } from '@hms-dbmi-bgm/shared-portal-components/es/components/viz/utilities';
+import { requestAnimationFrame as raf, cancelAnimationFrame } from '@hms-dbmi-bgm/shared-portal-components/es/components/viz/utilities';
 import { isRelationship } from './data-utilities';
 import { graphToDiseaseIndices, orderNodesBottomRightToTopLeft } from './layout-utilities-drawing';
 import { GraphTransformer, buildGraphData, POSITION_DEFAULTS } from './GraphTransformer';
 import { ScaleController, ScaleControls } from './ScaleController';
 import { SelectedNodeController } from './SelectedNodeController';
-import { IndividualsLayer, doesAncestorHaveId } from './IndividualsLayer';
+import { IndividualsLayer } from './IndividualsLayer';
 import { IndividualNodeShapeLayer } from './IndividualNodeShapeLayer';
 import { RelationshipNodeShapeLayer } from './RelationshipNodeShapeLayer';
 import { EdgesLayer } from './EdgesLayer';
@@ -228,7 +228,11 @@ const pedigreeVizDefaultProps = {
 
 
     /** Whether to allow to zoom w. mousewheel. Experimental. */
-    "enableMouseWheelZoom" : false
+    "enableMouseWheelZoom" : false,
+
+
+    /** Whether to allow to zoom w. mousewheel. Experimental. */
+    "enablePinchZoom" : true
 };
 
 /**
@@ -271,12 +275,13 @@ PedigreeViz.defaultProps = pedigreeVizDefaultProps;
 function PedigreeVizView(props){
     const {
         objectGraph, onNodeSelected, onDataChanged,
-        zoomToExtentsOnMount, initialScale, enableMouseWheelZoom,
+        zoomToExtentsOnMount, initialScale,
+        enableMouseWheelZoom, enablePinchZoom,
         ...passProps
     } = props;
     const pedigreeViewProps = { ...passProps, objectGraph };
     return (
-        <ScaleController {...{ zoomToExtentsOnMount, initialScale, enableMouseWheelZoom }}>
+        <ScaleController {...{ zoomToExtentsOnMount, initialScale, enableMouseWheelZoom, enablePinchZoom }}>
             <SelectedNodeController {...{ onNodeSelected, onDataChanged, objectGraph }}>
                 <PedigreeVizViewUserInterface {...pedigreeViewProps} />
             </SelectedNodeController>
@@ -515,7 +520,7 @@ class PedigreeVizViewUserInterface extends React.PureComponent {
         const innerElem = this.innerRef.current;
 
         if (nextAnimationFrame){
-            window.cancelAnimationFrame(nextAnimationFrame);
+            cancelAnimationFrame(nextAnimationFrame);
         }
         this.mouseMove.nextAnimationFrame = raf(() => {
             innerElem.scrollTo(
@@ -540,7 +545,9 @@ class PedigreeVizViewUserInterface extends React.PureComponent {
         const { vectorX = 0, vectorY = 0, nextAnimationFrame = null } = this.mouseMove;
         this.mouseMove = { ...PedigreeVizViewUserInterface.initialMouseMoveState };
         const { onSelectNode, onUnselectNode, selectedNode = null } = this.props;
-        nextAnimationFrame && window.cancelAnimationFrame(nextAnimationFrame);
+        if (nextAnimationFrame){
+            cancelAnimationFrame(nextAnimationFrame);
+        }
 
         // Act as click off of or onto node; we will have vectorX if 'click'ed within container.
         if (Math.abs(vectorX) <= 5 && Math.abs(vectorY) <= 5){
@@ -656,15 +663,21 @@ class PedigreeVizViewUserInterface extends React.PureComponent {
 }
 
 const ShapesLayer = React.memo(function ShapesLayer(props){
-    const { graphHeight, graphWidth, selectedNode, dims, scale } = props;
+    const {
+        graphHeight, graphWidth,
+        edges, relationships,
+        selectedNode, hoveredNode,
+        onNodeMouseIn, onNodeMouseLeave,
+        dims, scale
+    } = props;
     const textScale = (0.5 / scale) + 0.5;
     const textScaleTransformStr = "scale3d(" + textScale +"," + textScale +",1)";
     const svgStyle = { width: graphWidth, height: graphHeight };
     return (
         <svg className="pedigree-viz-shapes-layer shapes-layer" viewBox={"0 0 " + graphWidth + " " + graphHeight} style={svgStyle}>
-            <EdgesLayer {...props} />
+            <EdgesLayer {...{ edges, dims }} />
             <SelectedNodeIdentifier {...{ selectedNode, dims, textScale }} />
-            <RelationshipNodeShapeLayer {...props} {...{ textScale, textScaleTransformStr }} />
+            <RelationshipNodeShapeLayer {...{ relationships, hoveredNode, onNodeMouseIn, onNodeMouseLeave, dims, textScale, textScaleTransformStr }} />
             <IndividualNodeShapeLayer {...props} {...{ textScale, textScaleTransformStr }} />
         </svg>
     );
