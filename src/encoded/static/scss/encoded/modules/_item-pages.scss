@@ -1722,6 +1722,21 @@ $badge-item-min-height: 90px;
 
 .item-page-container {
 
+	label.badge-list-label {
+		padding-right: 3px;
+		margin-bottom: 0;
+	}
+	.badge-list {
+		list-style: none;
+		padding-left: 0;
+		margin-bottom: 0;
+		display: inline;
+
+		> li {
+			display: inline-block;
+		}
+	}
+
 	div.summary-table-container {
 
 		padding-top: 10px;

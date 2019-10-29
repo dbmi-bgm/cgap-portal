@@ -174,7 +174,11 @@ export default class CaseView extends DefaultItemView {
 }
 
 const CohortSummaryTabView = React.memo(function CohortSummaryTabView(props){
-    const { pedigreeFamilies: families = [] } = props;
+    const {
+        pedigreeFamilies: families = [],
+        context: {
+            case_phenotypic_features: caseFeatures = [] } = { case_phenotypic_features: [] }
+    } = props;
     const familiesLen = families.length;
 
     function getNumberOfIndividuals(fams) {
@@ -189,6 +193,19 @@ const CohortSummaryTabView = React.memo(function CohortSummaryTabView(props){
                 <span>Cohort Summary</span>
             </h3>
             <hr className="tab-section-title-horiz-divider"/>
+            <div className="row mt-1">
+                <div className="col-md-12">
+                    <div className="card-group w-100">
+                        <CohortStats caseFeatures={caseFeatures} numFamilies={familiesLen} numIndividuals={getNumberOfIndividuals(families)} />
+                        <div className="w-50">
+                            <a href="#pedigree" className="card-img-top" rel="noreferrer noopener">
+                                <img src="https://via.placeholder.com/450x150.png?text=Insert+Pedigree+Graphic+Here" className="card-img-top"/>
+                            </a>
+                            <a href="#pedigree" className="btn btn-primary btn-block" rel="noreferrer noopener">View Pedigree(s)</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
             {
                 families.map(function(family, idx){
                     const { original_pedigree: { display_title: pedFileName } = {} } = family;
@@ -201,19 +218,6 @@ const CohortSummaryTabView = React.memo(function CohortSummaryTabView(props){
                     );
                     return (
                         <div className={cls} key={idx}>
-                            <div className="row">
-                                <div className="col-md-12">
-                                    <div className="card-group w-100">
-                                        <CohortStats numFamilies={familiesLen} numIndividuals={getNumberOfIndividuals(families)} />
-                                        <div className="w-50">
-                                            <a href="#pedigree" className="card-img-top" rel="noreferrer noopener">
-                                                <img src="https://via.placeholder.com/450x150.png?text=Insert+Pedigree+Graphic+Here" className="card-img-top"/>
-                                            </a>
-                                            <a href="#pedigree" className="btn btn-primary btn-block" rel="noreferrer noopener">View Pedigree(s)</a>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
                             { title }
                             <CohortSummaryTable {...family} idx={idx} />
                         </div>
