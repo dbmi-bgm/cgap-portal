@@ -416,6 +416,7 @@ class PedigreeVizViewUserInterface extends React.PureComponent {
         this.handleMouseLeave = this.handleMouseLeave.bind(this);
         this.state = {
             'isMouseDownOnContainer' : true,
+            'mounted' : false
         };
 
         this.memoized = {
@@ -453,6 +454,11 @@ class PedigreeVizViewUserInterface extends React.PureComponent {
         }
         window.addEventListener("mouseup", this.handleMouseUp);
         document.body.addEventListener("mouseleave", this.handleMouseLeave);
+        setTimeout(()=>{
+            // Delayed so that browser has chance to render non-mounted state
+            // first. Needed for transition in on mount via CSS.
+            this.setState({ mounted: true });
+        }, 100);
     }
 
     componentWillUnmount(){
@@ -661,7 +667,7 @@ class PedigreeVizViewUserInterface extends React.PureComponent {
             onUnselectNode,
             ...passProps
         } = this.props;
-        const { isMouseDownOnContainer } = this.state;
+        const { isMouseDownOnContainer, mounted } = this.state;
         const diseaseToIndex = this.memoized.diseaseToIndex(visibleDiseases, objectGraph);
         const orderedNodes = this.memoized.orderNodesBottomRightToTopLeft(objectGraph);
         const scaledVizStyle = this.memoized.scaledStyle(graphHeight, graphWidth, scale);
@@ -720,6 +726,7 @@ class PedigreeVizViewUserInterface extends React.PureComponent {
                     data-has-extra-height={hasExtraHeight}
                     data-scrollable={isScrollable}
                     data-mouse-down={isMouseDownOnContainer}
+                    data-is-mounted={mounted}
                     data-is-min-scale={scale === minScale}
                     data-is-max-scale={scale === maxScale}>
                     <div className="viz-area" style={visAreaStyle}>

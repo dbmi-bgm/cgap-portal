@@ -26,6 +26,48 @@ export class ScaleController extends React.PureComponent {
         this.innerElemReference = null;
     }
 
+    componentDidMount(){
+        const {
+            containerWidth,
+            containerHeight,
+            minScale: propMinScale,
+            maxScale,
+            graphWidth,
+            graphHeight,
+            zoomToExtentsOnMount = true
+        } = this.props;
+
+        if (typeof containerWidth !== "number" || typeof containerHeight !== "number") {
+            // Maybe will become set in componentDidUpdate later.
+            return false;
+        }
+
+        if (isNaN(containerWidth) || isNaN(containerHeight)) {
+            throw new Error("Width or height is NaN.");
+        }
+
+        const minScaleUnbounded = Math.min(
+            (containerWidth / graphWidth),
+            (containerHeight / graphHeight)
+        );
+
+        // Decrease by 5% for scrollbars, etc.
+        const nextMinScale = Math.floor(
+            Math.min(1, maxScale, Math.max(propMinScale, minScaleUnbounded))
+        * 95) / 100;
+        const retObj = { minScale: nextMinScale };
+
+        // First time that we've gotten dimensions -- set scale to fit.
+        // Also, if nextMinScale > scale or we had scale === minScale before.
+        // TODO: Maybe do this onMount also
+        if (zoomToExtentsOnMount) {
+            retObj.scale = nextMinScale;
+        }
+        raf(() => {
+            this.setState(retObj);
+        });
+    }
+
     componentDidUpdate(pastProps, pastState){
         const {
             enableMouseWheelZoom,
@@ -70,7 +112,9 @@ export class ScaleController extends React.PureComponent {
             );
 
             // Decrease by 5% for scrollbars, etc.
-            const nextMinScale = Math.floor(Math.min(maxScale, Math.max(propMinScale, minScaleUnbounded)) * 95) / 100;
+            const nextMinScale = Math.floor(
+                Math.min(1, maxScale, Math.max(propMinScale, minScaleUnbounded))
+            * 95) / 100;
             const retObj = { minScale: nextMinScale };
 
             // First time that we've gotten dimensions -- set scale to fit.
