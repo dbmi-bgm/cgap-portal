@@ -183,7 +183,19 @@ const CohortSummaryTabView = React.memo(function CohortSummaryTabView(props){
 
     function getNumberOfIndividuals(fams) {
         let count = 0;
-        fams.forEach((fam) => (count += fam.members.length - 1));
+        fams.forEach((fam) => (count += fam.members.length));
+        return count;
+    }
+
+    function getCountIndividualsWSamples(fams) {
+        let count = 0;
+        fams.forEach((fam) => {
+            fam.members.forEach((member) => {
+                if (member.samples && member.samples.length > 0) {
+                    count++;
+                }
+            });
+        }); // todo: fix because ewww also this is done in CohortSummaryTable -- move it up and pass it down
         return count;
     }
 
@@ -196,7 +208,10 @@ const CohortSummaryTabView = React.memo(function CohortSummaryTabView(props){
             <div className="row mt-1">
                 <div className="col-md-12">
                     <div className="card-group w-100">
-                        <CohortStats cohortFeatures={caseFeatures} numFamilies={familiesLen} numIndividuals={getNumberOfIndividuals(families)} />
+                        <CohortStats
+                            numWithSamples={getCountIndividualsWSamples(families)}
+                            cohortFeatures={caseFeatures} numFamilies={familiesLen}
+                            numIndividuals={getNumberOfIndividuals(families)} />
                         <div className="w-50">
                             <a href="#pedigree" className="card-img-top" rel="noreferrer noopener">
                                 <img src="https://via.placeholder.com/450x150.png?text=Insert+Pedigree+Graphic+Here" className="card-img-top"/>

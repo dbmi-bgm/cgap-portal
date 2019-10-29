@@ -12,17 +12,17 @@ export const CohortStats = React.memo(function CaseStats(props){
     const {
         numFamilies,
         numIndividuals,
+        numWithSamples,
         cohortFeatures = []
     } = props;
 
-    console.log("CF: ", cohortFeatures);
 
     return (
         <div className="card w-50 mr-1">
             <div className="card-header" role="heading" level="4">Overview</div>
             <div className="card-body">
                 <p className="card-text"><strong>Number of Families:</strong> { numFamilies }</p>
-                <p className="card-text"><strong>Number of Individuals:</strong> { numIndividuals }</p>
+                <p className="card-text"><strong>Number of Individuals:</strong> { numIndividuals } ({numWithSamples} with samples)</p>
                 <p className="card-text"><strong>Lorem Ipsum:</strong> #</p>
                 <p className="card-text"><strong>Duren vest:</strong> #</p>
             </div>
