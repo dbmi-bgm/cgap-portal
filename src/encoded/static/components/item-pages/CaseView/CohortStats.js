@@ -15,6 +15,8 @@ export const CohortStats = React.memo(function CaseStats(props){
         cohortFeatures = []
     } = props;
 
+    console.log("CF: ", cohortFeatures);
+
     return (
         <div className="card w-50 mr-1">
             <div className="card-header" role="heading" level="4">Overview</div>
@@ -29,10 +31,10 @@ export const CohortStats = React.memo(function CaseStats(props){
                 <ul className="badge-list" name="phenotypic-features">
                     {cohortFeatures.map((feature) => {
                         const { display_title: title,
-                            uuid: url,
+                            uuid: uuid
                         } = feature;
 
-                        return (<li key={url} className="pr-1"><a className="badge badge-info" href={url} rel="noopener noreferrer">{title}</a></li>);
+                        return (<li key={uuid} className="pr-1"><a className="badge badge-info" href={`/${uuid}`} rel="noopener noreferrer">{title}</a></li>);
                     })}
                 </ul>
             </div>
