@@ -12,7 +12,7 @@ export const CohortStats = React.memo(function CaseStats(props){
     const {
         numFamilies,
         numIndividuals,
-        caseFeatures = []
+        cohortFeatures = []
     } = props;
 
     return (
@@ -27,7 +27,7 @@ export const CohortStats = React.memo(function CaseStats(props){
             <div className="card-footer">
                 <label htmlFor="phenotypic-features" className="badge-list-label"><small>Phenotypic Features:</small></label>
                 <ul className="badge-list" name="phenotypic-features">
-                    {caseFeatures.map((feature) => {
+                    {cohortFeatures.map((feature) => {
                         const { display_title: title,
                             uuid: url,
                         } = feature;

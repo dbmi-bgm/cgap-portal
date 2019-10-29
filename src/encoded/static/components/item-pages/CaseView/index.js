@@ -196,7 +196,7 @@ const CohortSummaryTabView = React.memo(function CohortSummaryTabView(props){
             <div className="row mt-1">
                 <div className="col-md-12">
                     <div className="card-group w-100">
-                        <CohortStats caseFeatures={caseFeatures} numFamilies={familiesLen} numIndividuals={getNumberOfIndividuals(families)} />
+                        <CohortStats cohortFeatures={caseFeatures} numFamilies={familiesLen} numIndividuals={getNumberOfIndividuals(families)} />
                         <div className="w-50">
                             <a href="#pedigree" className="card-img-top" rel="noreferrer noopener">
                                 <img src="https://via.placeholder.com/450x150.png?text=Insert+Pedigree+Graphic+Here" className="card-img-top"/>
