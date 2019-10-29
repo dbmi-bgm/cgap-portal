@@ -215,7 +215,7 @@ const CohortSummaryTabView = React.memo(function CohortSummaryTabView(props){
                             numWithSamples={getCountIndividualsWSamples(families)}
                             cohortFeatures={cohortFeatures} numFamilies={familiesLen}
                             numIndividuals={getNumberOfIndividuals(families)} />
-                        <div className="w-50">
+                        <div id="cohort-overview-ped-link">
                             <a href="#pedigree" className="card-img-top" rel="noreferrer noopener">
                                 <img src="https://via.placeholder.com/450x150.png?text=Insert+Pedigree+Graphic+Here" className="card-img-top"/>
                             </a>

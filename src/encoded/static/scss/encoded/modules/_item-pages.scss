@@ -1722,6 +1722,29 @@ $badge-item-min-height: 90px;
 
 .item-page-container {
 
+	#cohort-overview-ped-link {
+		margin-left: 0;
+		@include media-breakpoint-up(lg) {
+			margin-left: 10px;
+		}
+
+		img.card-img-top {
+			display: none;
+			height: calc(100% - 37px);
+			@include media-breakpoint-up(lg) {
+				display: block;
+			}
+		}
+	}
+
+	#cohort-stats,
+	#cohort-overview-ped-link {
+		width: 100%;
+		@include media-breakpoint-up(lg) {
+			width: 50%;
+		}
+	}
+	
 	label.badge-list-label {
 		padding-right: 3px;
 		margin-bottom: 0;
