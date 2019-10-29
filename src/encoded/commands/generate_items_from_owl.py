@@ -632,24 +632,37 @@ def owl_runner(value):
 
 
 def post_report_document_to_portal(connection, itype):
-    meta = {}
+    ''' Read the log file and encode it for upload as an attachment (blob) and
+        post a Document for the log file
+
+        TD: the institution and project are hard coded.  should get this info
+        from the user running script?
+    '''
+    from base64 import b64encode
+    inst = '828cd4fe-ebb0-4b36-a94a-d2e3a36cc989'
+    proj = '12a92962-8265-4fc0-b2f8-cf14f05db58b'
+    meta = {'institution': inst, 'project': proj}
+    mimetype = "text/plain"
     rtype = 'document'
     date = datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
-    attachment = None
-    if os.path.is_file(LOGFILE):
-        attachment = '{}_update_report_{}'.format(itype, date)
+    attach_fn = None
+    if os.path.isfile(LOGFILE):
+        attach_fn = '{}_update_report_{}.txt'.format(itype, date)
         try:
-            os.rename(LOGFILE, attachment)
+            os.rename(LOGFILE, attach_fn)
         except OSError as e:
             logger.warn("Cannot rename {}".format(LOGFILE))
-    meta['attachment'] = attachment
+    with open(attach_fn, 'rb') as at:
+        data = at.read()
+    data_href = 'data:%s;base64,%s' % (mimetype, b64encode(data).decode('ascii'))
+    # data_href = 'data:%s;base64,%s' % (use_type, b64encode(request.json['href'].encode()).decode('ascii'))
+    attach = {'download': attach_fn, 'type': mimetype, 'href': data_href}
+    meta['attachment'] = attach
     try:
         res = post_metadata(meta, rtype, connection)
-    except:
+        assert res.get('status') == 'success'
+    except Exception as e:
         print("Problem posting report", e)
-    else:
-        if res.get('status') != 'success':
-            print("Not successful - ", res.get('status'))
     return
 
 
