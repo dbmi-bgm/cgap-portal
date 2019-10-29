@@ -177,7 +177,9 @@ const CohortSummaryTabView = React.memo(function CohortSummaryTabView(props){
     const {
         pedigreeFamilies: families = [],
         context: {
-            case_phenotypic_features: caseFeatures = [] } = { case_phenotypic_features: [] }
+            case_phenotypic_features: cohortFeatures = { case_phenotypic_features: [] },
+            description: cohortDescription = ""
+        } = {}
     } = props;
     const familiesLen = families.length;
 
@@ -209,8 +211,9 @@ const CohortSummaryTabView = React.memo(function CohortSummaryTabView(props){
                 <div className="col-md-12">
                     <div className="card-group w-100">
                         <CohortStats
+                            description={cohortDescription}
                             numWithSamples={getCountIndividualsWSamples(families)}
-                            cohortFeatures={caseFeatures} numFamilies={familiesLen}
+                            cohortFeatures={cohortFeatures} numFamilies={familiesLen}
                             numIndividuals={getNumberOfIndividuals(families)} />
                         <div className="w-50">
                             <a href="#pedigree" className="card-img-top" rel="noreferrer noopener">
