@@ -115,9 +115,11 @@ $pedigree-disease-colors :
         }
 
         > .viz-area {
-            position: relative;
             transform-origin: 0 0;
             transform: scale3d(1,1,1);
+            position: absolute;
+            left: 0;
+            top: 0;
 
             > .individuals-layer {
                 position: relative;
@@ -214,8 +216,16 @@ $pedigree-disease-colors :
                 position: absolute;
                 top: 0;
                 left: 0;
+                right: 0;
+                bottom: 0;
             }
     
+        }
+
+        &[data-is-min-scale="true"]{
+            > .viz-area {
+                transition: transform .3s ease;
+            }
         }
     }
 
@@ -348,6 +358,7 @@ svg.pedigree-viz-shapes-layer.shapes-layer {
             }
 
             g.text-box {
+                transition: transform .25s linear;
                 rect.bg-rect {
                     stroke: none;
                     fill: transparentize($pedigree-viz-bg-color, 0.25);
@@ -449,7 +460,7 @@ div#pedigree-viz-container-cgap {
             }
             > .detail-pane-container {
                 background-color: $pedigree-viz-bg-color;
-                @include transition(flex .3s, width .3s, background-color .2s);
+                @include transition(flex .3s ease-in-out, width .3s ease-in-out, background-color .2s);
                 &.has-selected-node {
                     background-color: #fff;
                     border-left-color: darken($pedigree-viz-bg-color, 10%) !important;

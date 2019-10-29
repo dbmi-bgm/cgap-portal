@@ -139,8 +139,8 @@ export class PedigreeTabViewBody extends React.PureComponent {
 
     render(){
         const {
-            dataset = null,
-            graphData = null,
+            dataset,
+            graphData,
             windowWidth,
             windowHeight,
             visibleDiseases = null,
@@ -153,9 +153,24 @@ export class PedigreeTabViewBody extends React.PureComponent {
             (isBrowserFullscreen ? "browser-is-full-screen" : "") +
             (isPedigreeFullscreen ? " view-is-full-screen" : "")
         );
+        // `FullHeightCalculator` will use defaultProps.heightDiff if this is
+        // undefined, where default is aligned with fixed page header & footer.
         let heightDiff = undefined;
         if (isPedigreeFullscreen){
             heightDiff = 0;
+        }
+
+        const rgs = layout.responsiveGridState(windowWidth);
+        let detailPaneOpenOffsetWidth = 0;
+
+        if (rgs !== "xs" && rgs !== "sm") {
+            // Should be aligned with CSS stylesheet.
+            // Tablet or higher size; detail pane opens to side
+            if (rgs === "xl") {
+                detailPaneOpenOffsetWidth += 400;
+            } else {
+                detailPaneOpenOffsetWidth += 320;
+            }
         }
 
         /*
@@ -178,7 +193,7 @@ export class PedigreeTabViewBody extends React.PureComponent {
          */
         const pedigreeVizProps = {
             visibleDiseases, showOrderBasedName,
-            scale, enableMouseWheelZoom,
+            scale, enableMouseWheelZoom, detailPaneOpenOffsetWidth,
             filterUnrelatedIndividuals: false,
             renderDetailPane: this.renderDetailPane,
             height: 600,
@@ -188,7 +203,7 @@ export class PedigreeTabViewBody extends React.PureComponent {
         };
 
         if (!dataset && !graphData) {
-            throw new Error("Expected `dataset` or `graphData` to be present");
+            console.error("Expected `dataset` or `graphData` to be present");
         }
 
         return (

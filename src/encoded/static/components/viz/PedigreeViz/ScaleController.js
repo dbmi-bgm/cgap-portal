@@ -17,21 +17,36 @@ export class ScaleController extends React.PureComponent {
         super(props);
         this.setScale = this.setScale.bind(this);
         this.handleWheelMove = this.handleWheelMove.bind(this);
-        this.handleDimensionsChanged = this.handleDimensionsChanged.bind(this);
         this.handleInnerContainerMounted = this.handleInnerContainerMounted.bind(this);
         this.handleInnerContainerWillUnmount = this.handleInnerContainerWillUnmount.bind(this);
         this.state = {
             scale: null,
-            minScale: null,
-            containerWidth: null,
-            containerHeight: null
+            minScale: null
         };
         this.innerElemReference = null;
     }
 
-    componentDidUpdate(pastProps){
-        const { enableMouseWheelZoom, enablePinchZoom } = this.props;
-        const { enableMouseWheelZoom: pastWheelEnabled, enablePinchZoom: pastPinchEnabled } = pastProps;
+    componentDidUpdate(pastProps, pastState){
+        const {
+            enableMouseWheelZoom,
+            enablePinchZoom,
+            zoomToExtentsOnMount,
+            containerWidth,
+            containerHeight,
+            graphWidth,
+            graphHeight,
+            minScale: propMinScale,
+            maxScale
+        } = this.props;
+        const { scale, minScale: stateMinScale } = this.state;
+        const {
+            enableMouseWheelZoom: pastWheelEnabled,
+            enablePinchZoom: pastPinchEnabled,
+            containerWidth: pastWidth,
+            containerHeight: pastHeight
+        } = pastProps;
+
+        // Remove or attach listeners if needed.
         const listenNow = (enableMouseWheelZoom || enablePinchZoom);
         const listenBefore = (pastWheelEnabled || pastPinchEnabled);
 
@@ -41,6 +56,32 @@ export class ScaleController extends React.PureComponent {
             } else if (!listenNow && listenBefore){
                 this.innerElemReference.removeEventListener("wheel", this.handleWheelMove);
             }
+        }
+
+        // Update minScale (& possibly scale itself)
+        // We read `pastState` here before updating set
+        // vs using functional updater because want to avoid
+        // React's state change queuing mechanisms / reading
+        // most accurate prev value not important.
+        if (containerWidth !== pastWidth || containerHeight !== pastHeight){
+            const minScaleUnbounded = Math.min(
+                (containerWidth / graphWidth),
+                (containerHeight / graphHeight)
+            );
+
+            // Decrease by 5% for scrollbars, etc.
+            const nextMinScale = Math.floor(Math.min(maxScale, Math.max(propMinScale, minScaleUnbounded)) * 95) / 100;
+            const retObj = { minScale: nextMinScale };
+
+            // First time that we've gotten dimensions -- set scale to fit.
+            // Also, if nextMinScale > scale or we had scale === minScale before.
+            // TODO: Maybe do this onMount also
+            if (nextMinScale > scale || stateMinScale === scale || (zoomToExtentsOnMount && (!pastHeight || !pastWidth))) {
+                retObj.scale = nextMinScale;
+            }
+            raf(() => {
+                this.setState(retObj);
+            });
         }
     }
 
@@ -122,39 +163,6 @@ export class ScaleController extends React.PureComponent {
         // });
     }
 
-    handleDimensionsChanged({ containerWidth, containerHeight, graphWidth, graphHeight }){
-        const { onDimensionsChanged, minScale: propMinScale, maxScale } = this.props;
-        if (typeof onDimensionsChanged === "function"){
-            onDimensionsChanged(...arguments);
-        }
-
-        this.setState(function({
-            containerWidth: pastWidth,
-            containerHeight: pastHeight,
-            scale: currScale,
-            minScale: pastMinScale
-        }, { zoomToExtentsOnMount }){
-            if (!containerWidth || !containerHeight) {
-                return null;
-            }
-            const scaleUnbounded = Math.min(
-                (containerWidth / graphWidth),
-                (containerHeight / graphHeight)
-            );
-            // Decrease by 5% for scrollbars, etc.
-            const minScale = Math.floor(Math.min(maxScale, Math.max(propMinScale, scaleUnbounded)) * 95) / 100;
-            const retObj = { containerWidth, containerHeight, minScale };
-
-            // First time that we've gotten dimensions -- set scale to fit.
-            // Also, if new minScale > currScale or we had scale === minScale before.
-            if (minScale > currScale || pastMinScale === currScale || (zoomToExtentsOnMount && (!pastHeight || !pastWidth))) {
-                retObj.scale = minScale;
-            }
-
-            return retObj;
-        });
-    }
-
     handleInnerContainerMounted(innerElem){
         const { onMount, enableMouseWheelZoom, enablePinchZoom } = this.props;
         if (typeof onMount === "function"){
@@ -192,7 +200,6 @@ export class ScaleController extends React.PureComponent {
             scale: scale || initialScale || 1,
             minScale: minScale || propMinScale,
             setScale: this.setScale,
-            onDimensionsChanged: this.handleDimensionsChanged,
             onMount: this.handleInnerContainerMounted,
             onWillUnmount: this.handleInnerContainerWillUnmount
         };
@@ -205,16 +212,20 @@ export class ScaleController extends React.PureComponent {
  * Component which provides UI for adjusting scale and
  * calls `ScaleController`'s `setScale` function.
  *
- * Uses `requestAnimationFrame` for smooth and performant
+ * Uses `requestAnimationFrame` (`raf`) for smooth and performant
  * zooming transitions.
  *
- * To assert whether `requestAnimationFrame` makes a meaningful
- * difference, try to comment out the `raf`-related lines in `onSliderChange`
- * method (except for `setScale(nextVal)`) and compare performance/smoothness :-D
+ * To assert whether `raf` makes a meaningful difference, try to comment out
+ * the `raf`-related lines in `onSliderChange` method (except for `setScale(nextVal)`)
+ * and compare performance/smoothness :-D
  *
  * React _does_ seem to use requestAnimationFrame under the hood but maybe only
  * for batched updates, as animation frames aren't always requested (Chrome dev
  * tools > performance > profiling).
+ *
+ * We're getting performance gain from using `raf` in onSliderChange potentially
+ * because we're listening to `SyntheticEvent`s passed in from React element, which
+ * may be throttled or deferred until after state changes (vs native events).
  */
 export class ScaleControls extends React.PureComponent {
 
@@ -319,7 +330,7 @@ export class ScaleControls extends React.PureComponent {
         evt.stopPropagation();
         const { setScale } = this.props;
         const nextVal = parseFloat(evt.target.value);
-        this.cancelAnimationFrame(); // <- Somewhat throttling based on browser CPU
+        this.cancelAnimationFrame();
         this.nextAnimationFrame = raf(() => {
             setScale(nextVal);
             this.nextAnimationFrame = null;
@@ -365,4 +376,12 @@ export class ScaleControls extends React.PureComponent {
             </div>
         );
     }
+}
+
+export function scaledStyle(graphHeight, graphWidth, scale){
+    return {
+        width: (graphWidth * scale),
+        height: (graphHeight * scale),
+        transform : "scale3d(" + scale + "," + scale + ",1)"
+    };
 }

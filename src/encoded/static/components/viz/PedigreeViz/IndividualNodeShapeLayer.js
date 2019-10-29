@@ -122,7 +122,7 @@ export class IndividualNodeShape extends React.PureComponent {
             showOrderBasedName = true
         } = this.props;
         const { individualWidth, individualHeight } = dims;
-        const { id, diseases = [], _drawing : { xCoord, yCoord } } = individual;
+        const { id, _drawing : { xCoord, yCoord } } = individual;
 
         const isSelected = selectedNode === individual;
         const isHoveredOver = hoveredNode === individual;
@@ -135,8 +135,8 @@ export class IndividualNodeShape extends React.PureComponent {
         const height = individualHeight;
         const width = individualWidth;
         const shape = this.memoized.getIndividualShape(individual, height, width);
-        const top       = this.memoized.top(yCoord, dims);
-        const left      = this.memoized.left(xCoord, dims);
+        const top = this.memoized.top(yCoord, dims);
+        const left = this.memoized.left(xCoord, dims);
 
         let groupTransform = "translate(" + left + " " + top + ")";
         if (isHoveredOver && !isSelected){
@@ -162,7 +162,7 @@ export class IndividualNodeShape extends React.PureComponent {
                 { bgShape }
                 <UnderlayMarkers {...{ width, height, individual, shape, diseaseToIndex }} />
                 { fgShape }
-                <OverlayMarkers {...{ width, height, individual, shape, diseaseToIndex, textScaleTransformStr }} />
+                <OverlayMarkers {...{ width, height, individual, shape, textScaleTransformStr }} />
                 <UnderNodeText {...{ width, height, individual, shape, diseaseToIndex, dims, showOrderBasedName, textScale, textScaleTransformStr }} />
             </g>
         );
@@ -236,7 +236,14 @@ const UnderlayMarkers = React.memo(function UnderlayMarkers({ individual, width,
     return <React.Fragment>{ markers }</React.Fragment>;
 });
 
-const OverlayMarkers = React.memo(function OverlayMarkers({ individual, width, height, shape, diseaseToIndex, textScaleTransformStr }){
+const OverlayMarkers = React.memo(function OverlayMarkers(props){
+    const {
+        individual,
+        width = 80,
+        height = 80,
+        shape,
+        textScaleTransformStr = "scale3d(1,1,1)"
+    } = props;
     const {
         id,
         name,
@@ -384,7 +391,16 @@ function ColumnOfDiseases({ individual, width, height, shape, diseaseToIndex }){
 }
 
 /** @todo Implement things like age, stillBirth, isEctopic, etc. */
-function UnderNodeText({ individual, width, height, shape, dims, diseaseToIndex, showOrderBasedName, textScale, textScaleTransformStr }){
+function UnderNodeText(props){
+    const {
+        individual,
+        width = 80,
+        height = 80,
+        diseaseToIndex = {},
+        showOrderBasedName = true,
+        textScale = 1,
+        textScaleTransformStr = "scale3d(1,1,1)"
+    } = props;
     const {
         id, name,
         ageString,
