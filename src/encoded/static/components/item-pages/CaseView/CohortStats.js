@@ -10,10 +10,10 @@ import { patchedConsoleInstance } from '@hms-dbmi-bgm/shared-portal-components/e
 /** @param {Object} props - Contents of a family sub-embedded object. */
 export const CohortStats = React.memo(function CaseStats(props){
     const {
-        numFamilies,
-        numIndividuals,
-        numWithSamples,
-        description,
+        numFamilies = 0,
+        numIndividuals = 0,
+        numWithSamples = 0,
+        description = "N/A",
         cohortFeatures = []
     } = props;
 
