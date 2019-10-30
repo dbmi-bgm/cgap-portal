@@ -16,7 +16,49 @@ from dcicutils.ff_utils import (
     post_metadata,
     search_metadata,
 )
-from dcicwrangling.functions.script_utils import create_ff_arg_parser, convert_key_arg_to_dict
+from encoded.commands.load_items import load_items
+from encoded.commands.generate_items_from_owl import (
+    connect2server,
+)
+
+'''logging setup
+   logging config - to be moved to file at some point
+'''
+LOGFILE = 'upd_dis2pheno_annot.log'
+logger = logging.getLogger(__name__)
+
+logging.config.dictConfig({
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'standard': {
+            'format': '%(levelname)s:\t%(message)s'
+        },
+        'verbose': {
+            'format': '%(levelname)s:\t%(message)s\tFROM: %(name)s'
+        }
+    },
+    'handlers': {
+        'stdout': {
+            'level': 'INFO',
+            'formatter': 'verbose',
+            'class': 'logging.StreamHandler'
+        },
+        'logfile': {
+            'level': 'INFO',
+            'formatter': 'standard',
+            'class': 'logging.FileHandler',
+            'filename': LOGFILE
+        }
+    },
+    'loggers': {
+        '': {
+            'handlers': ['stdout', 'logfile'],
+            'level': 'INFO',
+            'propagate': True
+        }
+    }
+})
 
 ''' Dictionary for field mapping between hpoa file and cgap disorder schema
 '''
@@ -81,27 +123,6 @@ def write_outfile(terms, filename, pretty=False):
             json.dump(terms, outfile)
 
 
-def connect2server(env=None, key=None, keyfile=None):
-    '''Sets up credentials for accessing the server.  Generates a key using info
-       from the named keyname in the keyfile and checks that the server can be
-       reached with that key.
-       Also handles keyfiles stored in s3 using the env param'''
-    if key and keyfile:
-        keys = None
-        if os.path.isfile(keyfile):
-            with open(keyfile, 'r') as kf:
-                keys_json_string = kf.read()
-                keys = json.loads(keys_json_string)
-        if keys:
-            key = keys.get(key)
-    try:
-        auth = get_authentication_with_server(key, env)
-    except Exception:
-        print("Authentication failed")
-        sys.exit(1)
-    return auth
-
-
 def get_input_gen(input):
     if input.startswith('http'):
         try:
@@ -124,6 +145,20 @@ def get_input_gen(input):
             print(e)
             return []
     r.close()
+
+
+def multikeysort(items, columns):
+    from operator import itemgetter
+    comparers = [ ((itemgetter(col[1:].strip()), -1) if col.startswith('-') else (itemgetter(col.strip()), 1)) for col in columns]
+
+    def comparer(left, right):
+        for fn, mult in comparers:
+            result = cmp(fn(left), fn(right))
+            if result:
+                return mult * result
+            else:
+                return 0
+    return sorted(items, cmp=comparer)
 
 
 def get_args():  # pragma: no cover
@@ -159,12 +194,12 @@ def get_args():  # pragma: no cover
 
 def main():  # pragma: no cover
     start = datetime.now()
-    print(str(start))
+    logger.info('Processing disorder to phenotype annotations - START:{}'.format(str(start)))
     args = get_args()
 
     # get connection
     auth = connect2server(args.env, args.key, args.keyfile)
-
+    logger.info('Working with {}'.format(auth.get('server')))
     # existing_disorders = get_existing_disorders_from_db(auth)
     hpoid2uuid = get_existing_phenotype_uuids(auth)
     hp_regex = re.compile('^HP:[0-9]{7}')
@@ -173,12 +208,14 @@ def main():  # pragma: no cover
     assoc_phenos = {}
     problems = {}
     # figure out input and if to save the file
-    lines = get_input_gen(args.input)
+    insrc = args.input
+    logger.info("Getting annotation data using: {}".format(insrc))
+    lines = get_input_gen(insrc)
     fields = []
     dtag = 'date: '
     fdtag = 'description: '
-    date = None
-    fdesc = None
+    date = 'unknown'
+    fdesc = 'unknown'
     while True:
         line = lines.next()
         if not line.startswith("#"):
@@ -188,11 +225,13 @@ def main():  # pragma: no cover
             _, date = line.split(dtag)
         elif fdtag in line:
             _, fdesc = line.split(fdesc)
+    logger.info("Annotation file info:\n\tdate: {}\n\tdescription: {}".format(date, fdesc))
     fields = line2list(line)
     bad_fields = check_fields(fields)
     if bad_fields:
-        print("UNKNOWN FIELDS FOUND: {}".format(', '.join(bad_fields)))
+        logger.error("UNKNOWN FIELDS FOUND: {}".format(', '.join(bad_fields)))
         sys.exit()
+
     for line in lines:
         if line.startswith("#"):
             continue
@@ -246,6 +285,19 @@ def main():  # pragma: no cover
                     problems.setdefault('redundant_annot', []).append((data, dis2pheno[ppos]))
                     continue
             assoc_phenos.setdefault(disorder_id, []).append(pheno_annot)
+    # at this point we've gone through all the lines in the file
+    # here we want to compare with what already exists in db
+    for did, pheno_annots in assoc_phenos.items():
+        pheno_annots = multikeysort(pheno_annots, FIELD_MAPPING.values())
+        db_annots = []
+        db_dis = disorders.get(did)
+        if db_dis:
+            db_annots = multikeysort(db_dis.get('associated_phenotypes', []), FIELD_MAPPING.values())
+        if pheno_annots == db_annots:
+            print("YAY")
+        else:
+            print("BOO")
+
     patches = [{'uuid': uid, 'associated_phenotypes': apa} for uid, apa in assoc_phenos.items()]
 
     write_outfile(patches, args.outfile, args.pretty)
