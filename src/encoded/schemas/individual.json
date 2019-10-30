@@ -172,26 +172,42 @@
             "title" : "Cause of Infertility",
             "type" : "string"
         },
-        "ethnicity": {
-            "title": "Ethnicites",
-            "description": "Ethnicity of the individual. Can use a suggested or custom value",
+        "ancestry": {
+            "title": "Ancestry",
+            "description": "Ancestry of the individual. Can use a suggested or custom value",
             "type": "array",
             "uniqueItems": true,
             "items": {
-                "title": "Ethnicity",
+                "title": "Ancestry",
                 "type" : "string",
-                "suggested_enum": [
-                    "Asian",
-                    "Black",
-                    "Hispanic",
-                    "Indian",
-                    "Middle Eastern",
-                    "Native American",
-                    "Pacific Islander",
-                    "Caucasian",
+                "enum": [
+                    "African/African American",
+                    "Amish",
+                    "Latino",
+                    "Ashkenazi Jewish",
+                    "East Asian",
+                    "Finnish",
+                    "Non-Finnish European",
+                    "South Asian",
                     "Other"
                 ]
             }
+        },
+        "ethnicity": {
+            "title": "Ethnicity",
+            "description": "Ethnicity of the individual. Can use a suggested or custom value",
+            "type": "string",
+            "suggested_enum": [
+                "Asian",
+                "Black",
+                "Hispanic",
+                "Indian",
+                "Middle Eastern",
+                "Native American",
+                "Pacific Islander",
+                "Caucasian",
+                "Other"
+            ]
         },
         "images" : {
             "title" : "Images",

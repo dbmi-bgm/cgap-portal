@@ -371,8 +371,9 @@ svg.pedigree-viz-shapes-layer.shapes-layer {
                 }
                 text {
                     font-size: 0.9rem;
-                    &[data-describing="title"]{
-
+                    &:not(.showing-order-based-name)[data-describing="title"]{
+                        // Showing `name` (unique ID or similar)
+                        
                     }
                     &.showing-order-based-name[data-describing="title"]{
                         font-family: $font-family-monospace;

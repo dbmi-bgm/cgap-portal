@@ -4,6 +4,7 @@ import { path as d3Path } from 'd3-path';
 import { individualLeftPosition, individualTopPosition } from './layout-utilities-drawing';
 import { individualClassName } from './IndividualsLayer';
 
+/** TODO split up into folder `Individual` (and include IndividualsLayer.js stuff in it maybe) */
 
 export const IndividualNodeShapeLayer = React.memo(function IndividualNodeShapeLayer(props){
     const { objectGraph: g, ...passProps } = props;
@@ -119,7 +120,8 @@ export class IndividualNodeShape extends React.PureComponent {
             textScaleTransformStr,
             hoveredNode = null,
             selectedNode = null,
-            showOrderBasedName = true
+            showOrderBasedName = true,
+            maxHeightIndex = Infinity
         } = this.props;
         const { individualWidth, individualHeight } = dims;
         const { id, _drawing : { xCoord, yCoord } } = individual;
@@ -246,19 +248,19 @@ const OverlayMarkers = React.memo(function OverlayMarkers(props){
         textScaleTransformStr = "scale3d(1,1,1)"
     } = props;
     const {
-        id,
-        name,
-        gender,
+        //id,
+        //name,
+        //gender,
         isProband = false,
         isConsultand = false,
-        diseases = [],
-        carrierOfDiseases = [],
-        asymptoticDiseases = [],
+        //diseases = [],
+        //carrierOfDiseases = [],
+        //asymptoticDiseases = [],
         isDeceased = false,
         isPregnancy = false,
         isSpontaneousAbortion = false,
-        isTerminatedPregnancy = false,
-        _drawing : { xCoord, yCoord }
+        //isTerminatedPregnancy = false,
+        //_drawing : { xCoord, yCoord }
     } = individual;
 
     const halfWidth = width / 2;
@@ -394,27 +396,27 @@ function ColumnOfDiseases({ individual, width, height, shape, diseaseToIndex }){
 /** @todo Implement things like age, stillBirth, isEctopic, etc. */
 function AboveNodeText({ individual, width, height, maxHeightIndex }){
     const {
-        id, name,
-        ageString,
+        //id, name,
+        //ageString,
         // diseases = [],
-        orderBasedName,
-        heightIndex,
+        //orderBasedName,
+        _drawing : { heightIndex },
+        ancestry = []
     } = individual;
 
-    const { ethnicity } = individual.data.individualItem;
-
     console.log("===== Above Node Text =====");
-    // console.log("individual: ", individual);
-    // console.log("dims: ", dims);
-    console.log("maxHeightIndex", maxHeightIndex);
 
     if (heightIndex !== maxHeightIndex) return null;
-    if (!ethnicity || ethnicity.length === 0) return null;
+    if (ancestry.length === 0) return null;
+
+    console.log("maxHeightIndex", maxHeightIndex);
 
     const halfWidth = width / 2;
+
+    /*
     //const textYStart = 18;
 
-    const textRows = [[ ethnicity, "title" ]];
+    const textRows = [[ ancestry, "title" ]];
 
     const renderedTexts = textRows.map(function([ content, desc ], idx){
         const txtProps = {
@@ -431,11 +433,13 @@ function AboveNodeText({ individual, width, height, maxHeightIndex }){
         }
         return <text {...txtProps} key={desc + "-" + idx}>{ content }</text>;
     });
+    */
 
     return (
-        <g className="text-box" transform={"translate(0, " + (height + 4) + ")"}>
-            <rect width={width + 4} x={-2} height={3} className="bg-rect" rx={5} />
-            { renderedTexts }
+        <g className="text-box above-node" transform={"translate(0, " + (height + 4) + ")"}>
+            <text y={0} x={halfWidth} textAnchor="middle">
+                { ancestry.join(", ") }
+            </text>
         </g>
     );
 }
@@ -449,7 +453,8 @@ function UnderNodeText(props){
         diseaseToIndex = {},
         showOrderBasedName = true,
         textScale = 1,
-        textScaleTransformStr = "scale3d(1,1,1)"
+        textScaleTransformStr = "scale3d(1,1,1)",
+        dims
     } = props;
     const {
         id, name,

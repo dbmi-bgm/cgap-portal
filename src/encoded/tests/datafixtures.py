@@ -125,7 +125,7 @@ def human_individual(testapp, project, institution, human):
         'project': project['@id'],
         'institution': institution['@id'],
         'organism': human['@id'],
-        "ethnicity": ["Caucasian"],
+        "ethnicity": "Caucasian",
         "health_status": "unknown",
         "life_stage": "adult",
         "sex": "female",

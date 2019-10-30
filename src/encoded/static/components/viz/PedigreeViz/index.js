@@ -382,10 +382,10 @@ class PedigreeVizViewUserInterface extends React.PureComponent {
         return `translate3d(${x}px, ${y}px, 0) ` + scaledVizStyle.transform;
     }
 
-    /* todo */
     static maxHeightIndex(objectGraph){
-        return objectGraph.reduce(function(m,v){
-            return Math.max(m, v);
+        return objectGraph.reduce(function(m, node){
+            const { _drawing: { heightIndex = 0 } } = node;
+            return Math.max(m, heightIndex);
         }, 0);
     }
 
@@ -427,6 +427,7 @@ class PedigreeVizViewUserInterface extends React.PureComponent {
         };
 
         this.memoized = {
+            maxHeightIndex: memoize(PedigreeVizViewUserInterface.maxHeightIndex),
             diseaseToIndex: memoize(PedigreeVizViewUserInterface.diseaseToIndex),
             orderNodesBottomRightToTopLeft : memoize(orderNodesBottomRightToTopLeft),
             scaledStyle: memoize(scaledStyle),
@@ -678,6 +679,7 @@ class PedigreeVizViewUserInterface extends React.PureComponent {
         const diseaseToIndex = this.memoized.diseaseToIndex(visibleDiseases, objectGraph);
         const orderedNodes = this.memoized.orderNodesBottomRightToTopLeft(objectGraph);
         const scaledVizStyle = this.memoized.scaledStyle(graphHeight, graphWidth, scale);
+        const maxHeightIndex = this.memoized.maxHeightIndex(objectGraph);
 
 
         const outerContainerStyle = { minHeight : containerHeight, ...containerStyle };
@@ -708,6 +710,7 @@ class PedigreeVizViewUserInterface extends React.PureComponent {
             diseaseToIndex,
             selectedNode,
             hoveredNode,
+            maxHeightIndex,
             // In passProps:
             // onNodeMouseIn,
             // onNodeMouseLeave,
@@ -760,18 +763,20 @@ const ShapesLayer = React.memo(function ShapesLayer(props){
         edges, relationships,
         selectedNode, hoveredNode,
         onNodeMouseIn, onNodeMouseLeave,
-        dims, scale
+        dims, scale, maxHeightIndex
     } = props;
     const svgStyle = { width: graphWidth, height: graphHeight };
+
     // Update less frequently by rounding for better performance (less changes, caught by Memo/PureComponent)
     const textScale = Math.floor(((0.5 / scale) + 0.5) * 5) / 5;
     const textScaleTransformStr = "scale3d(" + textScale +"," + textScale +",1)";
+
     return (
         <svg className="pedigree-viz-shapes-layer shapes-layer" viewBox={"0 0 " + graphWidth + " " + graphHeight} style={svgStyle}>
             <EdgesLayer {...{ edges, dims }} />
             <SelectedNodeIdentifier {...{ selectedNode, dims, textScale }} />
             <RelationshipNodeShapeLayer {...{ relationships, hoveredNode, onNodeMouseIn, onNodeMouseLeave, dims, textScale, textScaleTransformStr }} />
-            <IndividualNodeShapeLayer {...props} {...{ textScale, textScaleTransformStr }} />
+            <IndividualNodeShapeLayer {...props} {...{ textScale, textScaleTransformStr, maxHeightIndex }} />
         </svg>
     );
 });
