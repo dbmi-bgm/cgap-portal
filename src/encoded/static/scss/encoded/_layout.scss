@@ -662,9 +662,12 @@ div[role="dialog"] {
 }
 
 /************** Common Typography ************/
+/*** BOOTSTRAP HAS SIMILAR UTILITY CLASSES ***/
+/********* THIS SOMEWHAT EXTENDS THEM ********/
 
 .text-capitalize 	{ text-transform: capitalize; } // Same class as Bootstrap (in newer version of it?)
 .text-uppercase 	{ text-transform: uppercase; }
+.text-serif 		{ font-family: $font-family-serif; }
 
 .text-100 { font-weight: 100; }
 a.text-100, button.text-100 { font-weight: 100 !important; }
@@ -686,7 +689,6 @@ a.text-600, button.text-600 { font-weight: 600 !important; }
 .text-large { font-size: 17.5px; }
 .text-larger { font-size: 20px; line-height: 25px; }
 
-.mono-text,
 .accession {
 	font-family: $font-family-monospace;
 }

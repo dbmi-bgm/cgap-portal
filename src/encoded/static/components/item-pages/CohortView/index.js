@@ -249,7 +249,6 @@ class PedigreeTabView extends React.PureComponent {
 
     constructor(props){
         super(props);
-        this.handleWheelMove = this.handleWheelMove.bind(this);
         this.handleToggleCheckbox = this.handleToggleCheckbox.bind(this);
         this.handleChangeShowAsDiseases = this.handleChangeShowAsDiseases.bind(this);
         this.handleToggleSelectedDisease = this.handleToggleSelectedDisease.bind(this);
@@ -271,7 +270,6 @@ class PedigreeTabView extends React.PureComponent {
             showAllDiseases : false,
             showAsDiseases: "Phenotypic Features", // todo - enum
             showOrderBasedName: true,
-            scale: 1,
             selectedDiseases: this.memoized.getPhenotypicFeatureStrings(cohort_phenotypic_features)
         };
 
@@ -293,35 +291,6 @@ class PedigreeTabView extends React.PureComponent {
                 });
             }
         }
-    }
-
-    /*
-    componentDidMount(){
-        if (this.tabViewRef.current){
-            this.tabViewRef.current.addEventListener("wheel", this.handleWheelMove);
-        }
-    }
-
-    componentWillUnmount(){
-        if (this.tabViewRef.current){
-            this.tabViewRef.current.removeEventListener("wheel", this.handleWheelMove);
-        }
-    }
-    */
-
-    handleWheelMove(evt){
-        const { deltaY, deltaX } = evt;
-        if (Math.abs(deltaX) > Math.abs(deltaY)){
-            return;
-        }
-        evt.preventDefault();
-        evt.stopPropagation();
-        this.setState(function({ scale: prevScale = 1 }){
-            const scaleUnbounded = prevScale -= (deltaY * 0.001);
-            const scale = Math.min(1, Math.max(0.1, scaleUnbounded));
-            console.log('E2', prevScale, scaleUnbounded, scale);
-            return { scale };
-        });
     }
 
     handleToggleCheckbox(evt){
@@ -383,7 +352,7 @@ class PedigreeTabView extends React.PureComponent {
             context, schemas, windowWidth, windowHeight, href, session,
             handleFamilySelect, pedigreeFamiliesIdx, pedigreeFamilies: families = []
         } = this.props;
-        const { showAllDiseases, showAsDiseases, showOrderBasedName, scale, selectedDiseases } = this.state;
+        const { showAllDiseases, showAsDiseases, showOrderBasedName, selectedDiseases } = this.state;
         const { cohort_phenotypic_features = [] } = context;
 
         const currentFamily = families[pedigreeFamiliesIdx];
@@ -396,12 +365,11 @@ class PedigreeTabView extends React.PureComponent {
         const pedigreeTabViewBodyProps = {
             dataset, visibleDiseases, session, href,
             context, showOrderBasedName,
-            windowWidth, windowHeight, scale
+            windowWidth, windowHeight
         };
 
-        console.log('DDD1', visibleDiseases, selectedDiseases, this.memoized.gatherPhenotypicFeatureItems(currentFamily));
+        console.log('DDD1', dataset, visibleDiseases, selectedDiseases, this.memoized.gatherPhenotypicFeatureItems(currentFamily));
 
-        console.log('DDD', scale, dataset);
         return (
             <div ref={this.tabViewRef}>
                 <div className="container-wide">

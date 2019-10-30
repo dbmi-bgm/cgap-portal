@@ -4,7 +4,7 @@ import memoize from 'memoize-one';
 import _ from 'underscore';
 import { console, layout, ajax, object } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { PedigreeDetailPane } from './../components/PedigreeDetailPane';
-import { PedigreeViz } from './../../viz/PedigreeViz';
+import PedigreeViz, { PedigreeVizView } from './../../viz/PedigreeViz';
 import { FullHeightCalculator } from './../components/FullHeightCalculator';
 
 
@@ -140,30 +140,80 @@ export class PedigreeTabViewBody extends React.PureComponent {
     render(){
         const {
             dataset,
+            graphData,
             windowWidth,
             windowHeight,
-            visibleDiseases,
+            visibleDiseases = null,
             scale = 1,
             showOrderBasedName = true
         } = this.props;
         const { isBrowserFullscreen, isPedigreeFullscreen } = this.state;
-        const propName = (isBrowserFullscreen ? "height" : "minimumHeight");
+        const propName = "height"; //(isBrowserFullscreen ? "height" : "minimumHeight");
         const cls = (
             (isBrowserFullscreen ? "browser-is-full-screen" : "") +
             (isPedigreeFullscreen ? " view-is-full-screen" : "")
         );
+        // `FullHeightCalculator` will use defaultProps.heightDiff if this is
+        // undefined, where default is aligned with fixed page header & footer.
         let heightDiff = undefined;
         if (isPedigreeFullscreen){
             heightDiff = 0;
         }
 
+        const rgs = layout.responsiveGridState(windowWidth);
+        let detailPaneOpenOffsetWidth = 0;
+
+        if (rgs !== "xs" && rgs !== "sm") {
+            // Should be aligned with CSS stylesheet.
+            // Tablet or higher size; detail pane opens to side
+            if (rgs === "xl") {
+                detailPaneOpenOffsetWidth += 400;
+            } else {
+                detailPaneOpenOffsetWidth += 320;
+            }
+        }
+
+        /*
+        const rgs = layout.responsiveGridState(windowWidth);
+        const enableMouseWheelZoom = (
+            rgs !== "xs" && rgs !== "sm" &&
+            // 400px minimumHeight (below) + UI height makes window scrollable at under ~ 620px height.
+            // Which is bad for mousewheel scrolling.
+            windowHeight > 620
+        );
+        */
+
+        // Will lose ability to move top/bottom with touchpad if this is enabled.
+        // Need to consider further.
+        const enableMouseWheelZoom = false;
+
+        /**
+         * `height` prop gets overriden by FullHeightCalculator @ responsive
+         * grid states larger than 'sm' (@see FullHeightCalculator `defaultProps.skipGridStates`).
+         */
+        const pedigreeVizProps = {
+            visibleDiseases, showOrderBasedName,
+            scale, enableMouseWheelZoom, detailPaneOpenOffsetWidth,
+            filterUnrelatedIndividuals: false,
+            renderDetailPane: this.renderDetailPane,
+            height: 600,
+            width: windowWidth,
+            minimumHeight: 400,
+            windowWidth // <- Todo - maybe remove dependence on this, supply prop instead if needed..
+        };
+
+        if (!dataset && !graphData) {
+            console.error("Expected `dataset` or `graphData` to be present");
+        }
+
         return (
             <div id="pedigree-viz-container-cgap" className={cls}>
                 <FullHeightCalculator {...{ windowWidth, windowHeight, propName, heightDiff }}>
-                    <PedigreeViz {...{ dataset, windowWidth, visibleDiseases, scale, showOrderBasedName }}
-                        width={windowWidth} filterUnrelatedIndividuals={false}
-                        renderDetailPane={this.renderDetailPane}>
-                    </PedigreeViz>
+                    { graphData ? // If already have parsed graph data
+                        <PedigreeVizView {...pedigreeVizProps} {...graphData} />
+                        :
+                        <PedigreeViz {...pedigreeVizProps} dataset={dataset} />
+                    }
                 </FullHeightCalculator>
             </div>
         );

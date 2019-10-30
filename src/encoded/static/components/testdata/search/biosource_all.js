@@ -398,7 +398,7 @@ module.exports = {
           "uuid": "7745b647-ff15-4ff3-9ced-b897d4e2983c",
           "status": "released"
         },
-        "ethnicity": "Caucasian",
+        "ethnicity": ["Caucasian"],
         "date_created": "2017-02-08T21:27:30.975072+00:00",
         "@type": [
           "IndividualHuman",
@@ -563,7 +563,7 @@ module.exports = {
           "uuid": "7745b647-ff15-4ff3-9ced-b897d4e2983c",
           "status": "released"
         },
-        "ethnicity": "Caucasian",
+        "ethnicity": ["Caucasian"],
         "date_created": "2017-02-08T16:54:01.068010+00:00",
         "@type": [
           "IndividualHuman",
@@ -671,7 +671,7 @@ module.exports = {
           "uuid": "7745b647-ff15-4ff3-9ced-b897d4e2983c",
           "status": "released"
         },
-        "ethnicity": "Caucasian",
+        "ethnicity": ["Caucasian"],
         "date_created": "2017-02-08T16:54:01.068010+00:00",
         "@type": [
           "IndividualHuman",
@@ -729,7 +729,7 @@ module.exports = {
           "uuid": "7745b647-ff15-4ff3-9ced-b897d4e2983c",
           "status": "released"
         },
-        "ethnicity": "Caucasian",
+        "ethnicity": ["Caucasian"],
         "date_created": "2017-02-08T21:27:30.872949+00:00",
         "@type": [
           "IndividualHuman",
@@ -832,7 +832,7 @@ module.exports = {
           "uuid": "7745b647-ff15-4ff3-9ced-b897d4e2983c",
           "status": "released"
         },
-        "ethnicity": "Caucasian",
+        "ethnicity": ["Caucasian"],
         "date_created": "2017-02-08T16:54:01.068010+00:00",
         "@type": [
           "IndividualHuman",
@@ -888,7 +888,7 @@ module.exports = {
           "uuid": "7745b647-ff15-4ff3-9ced-b897d4e2983c",
           "status": "released"
         },
-        "ethnicity": "Caucasian",
+        "ethnicity": ["Caucasian"],
         "date_created": "2017-02-08T16:54:01.068010+00:00",
         "@type": [
           "IndividualHuman",
@@ -940,7 +940,7 @@ module.exports = {
           "uuid": "7745b647-ff15-4ff3-9ced-b897d4e2983c",
           "status": "released"
         },
-        "ethnicity": "Caucasian",
+        "ethnicity": ["Caucasian"],
         "date_created": "2017-02-08T16:54:01.068010+00:00",
         "@type": [
           "IndividualHuman",
@@ -997,7 +997,7 @@ module.exports = {
           "uuid": "7745b647-ff15-4ff3-9ced-b897d4e2983c",
           "status": "released"
         },
-        "ethnicity": "Black",
+        "ethnicity": ["Black"],
         "date_created": "2017-02-08T21:27:31.255556+00:00",
         "@type": [
           "IndividualHuman",
@@ -1054,7 +1054,7 @@ module.exports = {
           "uuid": "7745b647-ff15-4ff3-9ced-b897d4e2983c",
           "status": "released"
         },
-        "ethnicity": "Caucasian",
+        "ethnicity": ["Caucasian"],
         "date_created": "2017-02-08T16:54:01.068010+00:00",
         "@type": [
           "IndividualHuman",
@@ -1158,7 +1158,7 @@ module.exports = {
           "uuid": "7745b647-ff15-4ff3-9ced-b897d4e2983c",
           "status": "released"
         },
-        "ethnicity": "Caucasian",
+        "ethnicity": ["Caucasian"],
         "date_created": "2017-02-08T16:54:01.068010+00:00",
         "@type": [
           "IndividualHuman",
@@ -1263,7 +1263,7 @@ module.exports = {
           "uuid": "7745b647-ff15-4ff3-9ced-b897d4e2983c",
           "status": "released"
         },
-        "ethnicity": "Caucasian",
+        "ethnicity": ["Caucasian"],
         "date_created": "2017-02-08T16:54:01.068010+00:00",
         "@type": [
           "IndividualHuman",
@@ -1316,7 +1316,7 @@ module.exports = {
           "uuid": "7745b647-ff15-4ff3-9ced-b897d4e2983c",
           "status": "released"
         },
-        "ethnicity": "Caucasian",
+        "ethnicity": ["Caucasian"],
         "date_created": "2017-02-08T16:54:01.068010+00:00",
         "@type": [
           "IndividualHuman",

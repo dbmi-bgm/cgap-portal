@@ -34,7 +34,8 @@ $search-results-above-results-row-height: 42px;
 			display: inline-block;
 			vertical-align: text-top;
 		}
-		.mono-text {
+		.mono-text,
+		.text-monospace {
 			letter-spacing: 0.5px;
 		}
 		img.in-search-table-title-image {

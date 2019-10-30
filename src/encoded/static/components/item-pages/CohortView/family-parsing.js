@@ -24,7 +24,8 @@ export function parseFamilyIntoDataset(family){
             is_still_birth: isStillBirth = false,
             phenotypic_features = [],
             age = null, age_units = null,
-            age_at_death = null, age_at_death_units = null
+            age_at_death = null, age_at_death_units = null,
+            ancestry = []
         } = individual;
 
         const fatherStr = (father && (typeof father === 'string' ? father : father['@id'])) || null;
@@ -106,6 +107,7 @@ export function parseFamilyIntoDataset(family){
             isSpontaneousAbortion,
             isStillBirth,
             diseases,
+            "ancestry" : ancestry.slice().sort(),
             'ageString' : showAgeString || ageNumerical,
             'age' : ageNumerical,
             'father' : fatherStr,

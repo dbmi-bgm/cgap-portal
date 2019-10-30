@@ -94,19 +94,38 @@ $pedigree-disease-colors :
         min-height: inherit;
         height: inherit;
         position: relative;
+        opacity: 1;
+        &:not([data-is-mounted="true"]) {
+            opacity: 0;
+        }
 
-        // Center viz area
+        transition: opacity .4s ease-out;
+
+        // Center viz area, also has align-items: center for .pedigree-viz-container.has-extra-height
         display: flex;
         justify-content: center;
-        align-items: center;
+        align-items: start;
+        &[data-has-extra-height="true"]{
+            align-items: center;
+        }
 
         // For iOS to scroll smoothly horizontally
         -webkit-overflow-scrolling: touch;
         -webkit-transform: translate3d(0,0,0);
 
+        &[data-scrollable="true"]{
+            cursor: grab;
+            &[data-mouse-down="true"]{
+                cursor: grabbing;
+            }
+        }
+
         > .viz-area {
-            position: relative;
             transform-origin: 0 0;
+            transform: scale3d(1,1,1);
+            position: absolute;
+            left: 0;
+            top: 0;
 
             > .individuals-layer {
                 position: relative;
@@ -198,159 +217,223 @@ $pedigree-disease-colors :
                     }
                 }
             }
-            > .relationships-layer {
-                .pedigree-relationship {
-                    position: absolute;
-                    border: 2px solid transparent;
-                    border-radius: 50%;
-                    background-color: #521f1fad;
-                    background: transparent;
-                    padding: 9px;
-                    @include transition(padding .2s);
-                    cursor: pointer;
-                    &:after {
-                        content: '';
-                        position: relative;
-                        width: 18px;
-                        height: 18px;
-                        background-color: #521f1fad;
-                        border: 2px solid #521f1f;
-                        border-radius: 50%;
-                        display: block;
-                        @include transition(width .2s, height .2s);
-                    }
-    
-                    &.is-hovered-over:not(.is-selected) {
-                        padding: 6px;
-                        &:after {
-                            width: 24px;
-                            height: 24px;
-                        }
-                    }
-                }
-            }
-    
-            > .shapes-layer {
+
+            > svg.pedigree-viz-shapes-layer.shapes-layer {
                 position: absolute;
                 top: 0;
                 left: 0;
-    
-                > .individuals-bg-shape-layer {
-    
-                    > g.pedigree-individual-shape {
-                        // Shapes will inherit group styles unless overriding
-                        stroke-width: 3px;
-                        stroke: $pedigree-viz-node-stroke-color;
-                        @include transition(transform .2s, -webkit-transform .2s);
-    
-                        .bg-shape-copy {
-                            stroke-width: 0px;
-                            fill: $pedigree-viz-bg-color;
-                        }
-    
-                        .fg-shape {
-                            stroke-width: 3px;
-                            fill: transparent;
-                            @include transition(stroke-width .2s);
-                        }
-    
-                        text {
-                            stroke-width: 0px;
-                            fill: $pedigree-viz-node-stroke-color;
-                            &.proband-identifier {
-                                font-weight: 700;
-                            }
-                        }
-    
-                        circle.circle-disease-dot,
-                        rect.rect-disease-partition {
-                            @include pedigree-color-cycle-fill;
-                            stroke-width: 1;
-                            
-                        }
-    
-                        &.is-hovered-over,
-                        &.is-selected {
-                            .fg-shape {
-                                stroke-width: 4px;
-                                stroke: darken($pedigree-viz-node-stroke-color, 20%);
-                            }
-                        }
-    
-                        &.is-affected {
-                            fill: transparent; // Colors of disease-arcs behind it will show through.
-                            g.disease-path-arcs {
-                                path.disease-arc {
-                                    @include pedigree-color-cycle-fill;
-                                    stroke-width: 1;
-                                    &:only-of-type {
-                                        stroke-width: 0;
-                                    }
-                                }
-                            }
-
-                        }
-    
-                        g.text-box {
-                            rect.bg-rect {
-                                stroke: none;
-                                fill: transparentize($pedigree-viz-bg-color, 0.25);
-                            }
-                            text {
-                                font-size: 0.9rem;
-                                &[data-describing="title"]{
-
-                                }
-                                &.showing-order-based-name[data-describing="title"]{
-                                    font-family: $font-family-monospace;
-                                    font-family: $font-family-serif;
-                                    /* letter-spacing: -0.125em; */ // <- Enable for monospace
-                                    /* font-size: 0.9125em; */
-                                    /* font-size: 1em; */
-                                    font-size: 1.0725em;
-                                    font-weight: 700;
-                                }
-                            }
-                        }
-                    }
-    
-                }
-    
-                > .individuals-edge-shape-layer {
-                    path.edge-path {
-                        stroke: $pedigree-viz-node-stroke-color;
-                        fill: none;
-                        stroke-width: 2;
-                        
-                        &.is-adjustable {
-                            stroke: #7d0000;
-                            //stroke: orange;
-                        }
-
-                        &.not-adjustable {
-                            stroke-linecap: square;
-                        }
-                    }
-                }
-    
-                > g.selected-node-identifier {
-                    @include transition(transform .3s);
-                    > g.identifier-corner {
-                        @include transition(transform .3s);
-                    }
-                    path {
-                        stroke: $pedigree-viz-node-stroke-color;
-                        stroke-width: 2px;
-                        fill: none;
-                    }
-                }
+                right: 0;
+                bottom: 0;
             }
     
         }
 
+        &[data-is-min-scale="true"][data-is-mounted="true"]{
+            > .viz-area {
+                transition: transform .3s ease;
+            }
+        }
+    }
+
+    > .zoom-controls-container {
+        position: absolute;
+        top: 8px;
+        left: 8px;
+        > .zoom-buttons-row {
+            display: flex;
+            align-items: center;
+            > .zoom-btn,
+            > .zoom-value {
+                box-sizing: content-box;
+                text-align: center;
+                padding: 1px 4px;
+                height: 25px;
+                color: #555;
+                background-color: #fff;
+            }
+            > .zoom-btn {
+                border: 1px solid #999;
+                width: 24px;
+
+                &.zoom-out { // Left btn
+                    border-radius: 5px 0 0 5px;
+                    border-right-color: #ddd !important;
+                }
+                &.zoom-in { // Right btn
+                    border-radius: 0 5px 5px 0;
+                    border-left-color : #ddd !important;
+                }
+
+                &:disabled {
+                    color: #999;
+                    pointer-events: none;
+                }
+                &:hover:not(:disabled),
+                &:focus:not(:disabled), &:active:not(:disabled) {
+                    color: #000;
+                    border-color: #555;
+                    outline: none;
+                }
+                &:focus:not(:disabled), &:active:not(:disabled) {
+                    box-shadow: inset 0px 0px 2px 0px #333;
+                }
+            }
+            > .zoom-value {
+                border-top: 1px solid #999999;
+                border-bottom: 1px solid #999999;
+                width: 36px;
+                font-size: 0.875em;
+                line-height: 25px;
+                white-space: nowrap;
+                text-align: right;
+            }
+        }
+        > .zoom-slider {
+            width: 112px;
+            padding-top: 3px;
+            > input[type="range"] {
+                width: inherit;
+                // If we want to make it vertical later:
+                //&[orient="vertical"] {
+                //    writing-mode: bt-lr; /* IE */
+                //    -webkit-appearance: slider-vertical; /* WebKit */
+                //    height: 120px;
+                //}
+            }
+        }
+    }
+
+}
+
+svg.pedigree-viz-shapes-layer.shapes-layer {
+
+    > .individuals-bg-shape-layer {
+
+        > g.pedigree-individual-shape {
+            // Shapes will inherit group styles unless overriding
+            stroke-width: 3px;
+            stroke: $pedigree-viz-node-stroke-color;
+            @include transition(transform .2s, -webkit-transform .2s);
+
+            .bg-shape-copy {
+                stroke-width: 0px;
+                fill: $pedigree-viz-bg-color;
+            }
+
+            .fg-shape {
+                stroke-width: 3px;
+                fill: transparent;
+                @include transition(stroke-width .2s);
+            }
+
+            text {
+                stroke-width: 0px;
+                fill: $pedigree-viz-node-stroke-color;
+                &.proband-identifier {
+                    font-weight: 700;
+                }
+            }
+
+            circle.circle-disease-dot,
+            rect.rect-disease-partition {
+                @include pedigree-color-cycle-fill;
+                stroke-width: 1;
+                
+            }
+
+            &.is-hovered-over,
+            &.is-selected {
+                .fg-shape {
+                    stroke-width: 4px;
+                    stroke: darken($pedigree-viz-node-stroke-color, 20%);
+                }
+            }
+
+            &.is-affected {
+                fill: transparent; // Colors of disease-arcs behind it will show through.
+                g.disease-path-arcs {
+                    path.disease-arc {
+                        @include pedigree-color-cycle-fill;
+                        stroke-width: 1;
+                        &:only-of-type {
+                            stroke-width: 0;
+                        }
+                    }
+                }
+
+            }
+
+            g.text-box {
+                // Could be above or below node
+                transition: transform .25s linear;
+                rect.bg-rect {
+                    stroke: none;
+                    fill: transparentize($pedigree-viz-bg-color, 0.25);
+                }
+                text {
+                    font-size: 0.9rem;
+                    &[data-describing="ancestry"]{
+                        font-size: 1em;
+                    }
+                    &:not(.showing-order-based-name)[data-describing="title"]{
+                        // Showing `name` (unique ID or similar)
+                    }
+                    &.showing-order-based-name[data-describing="title"]{
+                        font-family: $font-family-monospace;
+                        font-family: $font-family-serif;
+                        /* letter-spacing: -0.125em; */ // <- Enable for monospace
+                        /* font-size: 0.9125em; */
+                        /* font-size: 1em; */
+                        font-size: 1.0725em;
+                        font-weight: 700;
+                        @extend .no-user-select;
+                    }
+                }
+            }
+        }
 
     }
 
+    > .individuals-edge-shape-layer {
+        path.edge-path {
+            stroke: $pedigree-viz-node-stroke-color;
+            fill: none;
+            stroke-width: 2;
+            
+            &.is-adjustable {
+                stroke: #7d0000;
+                //stroke: orange;
+            }
+
+            &.not-adjustable {
+                stroke-linecap: square;
+            }
+        }
+    }
+
+    > .relationships-layer {
+        .pedigree-relationship {
+            cursor: pointer;
+            @include transition(transform .2s, -webkit-transform .2s);
+            > circle {
+                stroke: #521f1f;
+                stroke-width: 2px;
+                fill: rgba(82, 31, 31, 0.7);
+            }
+        }
+    }
+
+    > g.selected-node-identifier {
+        @include transition(transform .3s);
+        > g.identifier-corner {
+            @include transition(transform .3s);
+        }
+        path {
+            stroke: $pedigree-viz-node-stroke-color;
+            stroke-width: 2px;
+            fill: none;
+        }
+    }
 }
 
 /** Default Detail Pane Styling **/
@@ -387,7 +470,7 @@ div#pedigree-viz-container-cgap {
             }
             > .detail-pane-container {
                 background-color: $pedigree-viz-bg-color;
-                @include transition(flex .3s, width .3s, background-color .2s);
+                @include transition(flex .3s ease-in-out, width .3s ease-in-out, background-color .2s);
                 &.has-selected-node {
                     background-color: #fff;
                     border-left-color: darken($pedigree-viz-bg-color, 10%) !important;
@@ -555,14 +638,6 @@ div#pedigree-viz-container-cgap.browser-is-full-screen {
                     top: 0px;
                 }
             }
-        }
-
-        &:not(.has-extra-height) {
-
-            .inner-container {
-                align-items: start;
-            }
-    
         }
 
     }
