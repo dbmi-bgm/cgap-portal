@@ -147,7 +147,7 @@ def test_load_all_gen(testapp):
             'itype': ['user', 'institution', 'project']}
     with mock.patch('encoded.loadxl.get_app') as mocked_app:
         mocked_app.return_value = testapp.app
-        # successful load cases
+        # successful load items
         gen1 = loadxl.load_all_gen(testapp, data['store'], None,
                                    itype=data['itype'], from_json=True)
         res1 = b''.join([v for v in gen1]).decode()

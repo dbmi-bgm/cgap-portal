@@ -21,16 +21,16 @@ log = structlog.getLogger(__name__)
 
 
 @collection(
-    name='cases',
+    name='cohorts',
     unique_key='accession',
     properties={
-        'title': 'Cases',
-        'description': 'Listing of Cases',
+        'title': 'Cohorts',
+        'description': 'Listing of Cohorts',
     })
-class Case(Item):
-    item_type = 'case'
+class Cohort(Item):
+    item_type = 'cohort'
     name_key = 'accession'
-    schema = load_schema('encoded:schemas/case.json')
+    schema = load_schema('encoded:schemas/cohort.json')
     embedded_list = [
         "families.members.accession",
         "families.members.father",
@@ -86,7 +86,7 @@ class Case(Item):
 
     @calculated_property(schema={
         "title": "Phenotypic features",
-        "description": "Phenotypic features that define the case",
+        "description": "Phenotypic features that define the cohort",
         "type" : "array",
         "items": {
             "title": "Phenotypic feature",
@@ -94,7 +94,7 @@ class Case(Item):
             "linkTo": "Phenotype"
         }
     })
-    def case_phenotypic_features(self, families=None):
+    def cohort_phenotypic_features(self, families=None):
         """
         Calc property that uses `family_phenotypic_features` from each family
         and creates a overall list of phenotypic features shared between
@@ -102,13 +102,13 @@ class Case(Item):
         """
         if not families:
             return []
-        case_feats = set()
+        cohort_feats = set()
         for fam in families:
-            case_feats.update(set(fam.get('family_phenotypic_features', [])))
-        return list(case_feats)
+            cohort_feats.update(set(fam.get('family_phenotypic_features', [])))
+        return list(cohort_feats)
 
 
-@view_config(name='process-pedigree', context=Case, request_method='PATCH',
+@view_config(name='process-pedigree', context=Cohort, request_method='PATCH',
              permission='edit')
 def process_pedigree(context, request):
     """
@@ -121,14 +121,14 @@ def process_pedigree(context, request):
     - config_uri: should be 'development.ini' for dev, else 'production.ini'
 
     Response dict contains the newly created family, as well as the up-to-date
-    Case properties.
+    Cohort properties.
 
     Args:
         request (Request): the current request. Attachment data should be
             given in the request JSON.
 
     Returns:
-        dict: reponse, including 'status', and 'case' and 'family' on success
+        dict: reponse, including 'status', and 'cohort' and 'family' on success
 
     Raises:
         HTTPUnprocessableEntity: on an error. Extra information may be logged
@@ -143,19 +143,19 @@ def process_pedigree(context, request):
     except ImportError:
         from xml.etree.ElementTree import fromstring
 
-    case = str(context.uuid)  # used in logging
+    cohort = str(context.uuid)  # used in logging
 
     # verify that attachment data in request.json has type and href
     if not {'download', 'type', 'href'} <= set(request.json.keys()):
-        raise HTTPUnprocessableEntity('Case %s: Request JSON must include following'
+        raise HTTPUnprocessableEntity('Cohort %s: Request JSON must include following'
                                       ' keys: download, type, href. Found: %s'
-                                      % (case, request.json.keys()))
+                                      % (cohort, request.json.keys()))
     # verification on the attachment. Currently only handle .pbxml
     # pbxml uploads don't get `type` attribute from <input> element
     if request.json['type'] != '' or not request.json['download'].endswith('.pbxml'):
-        raise HTTPUnprocessableEntity('Case %s: Bad pedigree file upload. Use .pbxml'
+        raise HTTPUnprocessableEntity('Cohort %s: Bad pedigree file upload. Use .pbxml'
                                       ' file. Found: %s (file type), %s (file name)'
-                                      % (case, request.json['type'], request.json['download']))
+                                      % (cohort, request.json['type'], request.json['download']))
 
     config_uri = request.params.get('config_uri', 'production.ini')
     # TODO: get pedigree timestamp dynamically, maybe from query_params
@@ -172,7 +172,7 @@ def process_pedigree(context, request):
                 user_uuid = principal[7:]
                 break
         if not user_uuid:
-            raise HTTPUnprocessableEntity('Case %s: Must provide authentication' % case)
+            raise HTTPUnprocessableEntity('Cohort %s: Must provide authentication' % cohort)
         user_props = get_item_if_you_can(request, user_uuid)
         email = user_props['email']
     environ = {'HTTP_ACCEPT': 'application/json', 'REMOTE_USER': email}
@@ -197,13 +197,13 @@ def process_pedigree(context, request):
                 family_pheno_feats.append(meta_val['id'])
 
     # extra values that are used when creating the pedigree
-    case_props = context.upgrade_properties()
-    post_extra = {'project': case_props['project'],
-                  'institution': case_props['institution']}
+    cohort_props = context.upgrade_properties()
+    post_extra = {'project': cohort_props['project'],
+                  'institution': cohort_props['institution']}
     xml_extra = {'ped_datetime': ped_datetime}
 
     family_uuids = create_family_proband(testapp, xml_data, refs, 'managedObjectID',
-                                   case, post_extra, xml_extra)
+                                   cohort, post_extra, xml_extra)
 
     # create Document for input pedigree file
     # pbxml files are not handled by default. Do some mimetype processing
@@ -218,9 +218,9 @@ def process_pedigree(context, request):
         assert attach_res.status_code == 201
     except Exception as exc:
         log.error('Failure to POST Document in process-pedigree! Exception: %s' % exc)
-        error_msg = ('Case %s: Error encountered on POST in process-pedigree.'
+        error_msg = ('Cohort %s: Error encountered on POST in process-pedigree.'
                      ' Check logs. These items were already created: %s'
-                     % (case, family_uuids['members']))
+                     % (cohort, family_uuids['members']))
         raise HTTPUnprocessableEntity(error_msg)
 
     # add extra fields to the family object
@@ -238,8 +238,8 @@ def process_pedigree(context, request):
         try:
             pheno_res = testapp.get('/phenotypes/' + hpo_id, status=200).json
         except Exception as exc:
-            error_msg = ('Case %s: Cannot GET family feature %s. Error: %s'
-                         % (case, hpo_id, str(exc)))
+            error_msg = ('Cohort %s: Cannot GET family feature %s. Error: %s'
+                         % (cohort, hpo_id, str(exc)))
             log.error(error_msg)
             # HACKY. Skip raising this error if local
             if config_uri == 'production.ini':
@@ -247,22 +247,22 @@ def process_pedigree(context, request):
         else:
             family_uuids['family_phenotypic_features'].append(pheno_res['uuid'])
 
-    # PATCH the Case with new family
-    case_families = case_props.get('families', []) + [family_uuids]
-    case_patch = {'families': case_families}
+    # PATCH the Cohort with new family
+    cohort_families = cohort_props.get('families', []) + [family_uuids]
+    cohort_patch = {'families': cohort_families}
     try:
-        case_res = testapp.patch_json('/' + case, case_patch)
-        assert case_res.status_code == 200
+        cohort_res = testapp.patch_json('/' + cohort, cohort_patch)
+        assert cohort_res.status_code == 200
     except Exception as exc:
-        log.error('Failure to PATCH Case %s in process-pedigree with '
-                  'data %s! Exception: %s' % (case, case_patch, exc))
-        error_msg = ('Case %s: Error encountered on PATCH in process-pedigree.'
+        log.error('Failure to PATCH Cohort %s in process-pedigree with '
+                  'data %s! Exception: %s' % (cohort, cohort_patch, exc))
+        error_msg = ('Cohort %s: Error encountered on PATCH in process-pedigree.'
                      ' Check logs. These items were already created: %s'
-                     % (case, family_uuids['members'] + [attach_uuid]))
+                     % (cohort, family_uuids['members'] + [attach_uuid]))
         raise HTTPUnprocessableEntity(error_msg)
 
-    # get the fully embedded case to put in response for front-end
-    response['context'] = testapp.get('/cases/' + case + '?frame=page&datastore=database', status=200).json
+    # get the fully embedded cohort to put in response for front-end
+    response['context'] = testapp.get('/cohorts/' + cohort + '?frame=page&datastore=database', status=200).json
     response['status'] = 'success'
     return response
 
@@ -351,7 +351,7 @@ def convert_to_list(xml_value):
         return [val.get('@ref', val) for val in xml_value]
 
 
-def descendancy_xml_ref_to_parents(testapp, ref_id, refs, data, case, uuids_by_ref):
+def descendancy_xml_ref_to_parents(testapp, ref_id, refs, data, cohort, uuids_by_ref):
     """
     This is a `xml_ref_fxn`, so it must take the correpsonding args in the
     standardized way and return a dictionary that is used to update the
@@ -367,7 +367,7 @@ def descendancy_xml_ref_to_parents(testapp, ref_id, refs, data, case, uuids_by_r
         ref_id (str): value for the reference field of the relevant xml obj
         refs: (dict): reference-based parsed XML data
         data (dict): metadata to POST/PATCH
-        case (str): identifier of the case
+        cohort (str): identifier of the cohort
         uuids_by_ref (dict): mapping of Fourfront uuids by xml ref
 
     Returns:
@@ -378,9 +378,9 @@ def descendancy_xml_ref_to_parents(testapp, ref_id, refs, data, case, uuids_by_r
     relationship = refs[ref_id]
     parents = relationship.get('members', [])
     if len(parents) != 2:
-        error_msg = ('Case %s: Failure to parse two parents from relationship '
+        error_msg = ('Cohort %s: Failure to parse two parents from relationship '
                      'ref %s in process-pedigree. Contents: %s'
-                     % (case, ref_id, relationship))
+                     % (cohort, ref_id, relationship))
     for parent in parents:
         parent_obj = refs[parent['@ref']]
         if parent_obj['sex'].lower() == 'm':
@@ -388,16 +388,16 @@ def descendancy_xml_ref_to_parents(testapp, ref_id, refs, data, case, uuids_by_r
         elif parent_obj['sex'].lower() == 'f':
             result['mother'] = uuids_by_ref[parent['@ref']]
     if error_msg is None and (not result['mother'] or not result['father']):
-        error_msg = ('Case %s: Failure to get valid mother and father from XML'
+        error_msg = ('Cohort %s: Failure to get valid mother and father from XML'
                      'for relationship ref %s in process-pedigree. Parent refs: %s'
-                     % (case, ref_id, parents))
+                     % (cohort, ref_id, parents))
     if error_msg:
         log.error(error_msg)
         raise HTTPUnprocessableEntity(error_msg)
     data.update(result)
 
 
-def annotations_xml_ref_to_clinic_notes(testapp, ref_ids, refs, data, case, uuids_by_ref):
+def annotations_xml_ref_to_clinic_notes(testapp, ref_ids, refs, data, cohort, uuids_by_ref):
     """
     This is a `xml_ref_fxn`, so it must take the corresponding args in the
     standardized way and update the `data` dictionary, which is used to PATCH
@@ -412,7 +412,7 @@ def annotations_xml_ref_to_clinic_notes(testapp, ref_ids, refs, data, case, uuid
         ref_ids (list): value for the reference field of the relevant xml obj
         refs: (dict): reference-based parsed XML data
         data (dict): metadata to POST/PATCH
-        case (str): identifier of the case
+        cohort (str): identifier of the cohort
         uuids_by_ref (dict): mapping of Fourfront uuids by xml ref
 
     Returns:
@@ -429,7 +429,7 @@ def annotations_xml_ref_to_clinic_notes(testapp, ref_ids, refs, data, case, uuid
         data['clinic_notes'] = '\n'.join(clinic_notes)
 
 
-def diagnoses_xml_to_phenotypic_features(testapp, ref_vals, refs, data, case, uuids_by_ref):
+def diagnoses_xml_to_phenotypic_features(testapp, ref_vals, refs, data, cohort, uuids_by_ref):
     """
     This is a `xml_ref_fxn`, so it must take the corresponding args in the
     standardized way and update the `data` dictionary, which is used to PATCH
@@ -444,7 +444,7 @@ def diagnoses_xml_to_phenotypic_features(testapp, ref_vals, refs, data, case, uu
         ref_vals (list): list of dict diagnoses values
         refs: (dict): reference-based parsed XML data
         data (dict): metadata to POST/PATCH
-        case (str): identifier of the case
+        cohort (str): identifier of the cohort
         uuids_by_ref (dict): mapping of Fourfront uuids by xml ref
 
     Returns:
@@ -467,8 +467,8 @@ def diagnoses_xml_to_phenotypic_features(testapp, ref_vals, refs, data, case, uu
                 try:
                     pheno_res = testapp.get('/phenotypes/' + diagnosis['id'], status=200).json
                 except Exception as exc:
-                    log.error('Case %s: Cannot GET term %s. Error: %s'
-                              % (case, diagnosis['id'], str(exc)))
+                    log.error('Cohort %s: Cannot GET term %s. Error: %s'
+                              % (cohort, diagnosis['id'], str(exc)))
                 else:
                     found_term = True
                     pheno_feat_data['phenotypic_feature'] = pheno_res['uuid']
@@ -492,7 +492,7 @@ def diagnoses_xml_to_phenotypic_features(testapp, ref_vals, refs, data, case, uu
         data['clinic_notes'] = '\n'.join(clinic_notes)
 
 
-def affected_xml_to_phenotypic_features(testapp, ref_vals, refs, data, case, uuids_by_ref):
+def affected_xml_to_phenotypic_features(testapp, ref_vals, refs, data, cohort, uuids_by_ref):
     """
     This is a `xml_ref_fxn`, so it must take the corresponding args in the
     standardized way and update the `data` dictionary, which is used to PATCH
@@ -507,7 +507,7 @@ def affected_xml_to_phenotypic_features(testapp, ref_vals, refs, data, case, uui
         ref_vals (list): list of dict affected values (should only have 1 item)
         refs: (dict): reference-based parsed XML data
         data (dict): metadata to POST/PATCH
-        case (str): identifier of the case
+        cohort (str): identifier of the cohort
         uuids_by_ref (dict): mapping of Fourfront uuids by xml ref
 
     Returns:
@@ -519,10 +519,10 @@ def affected_xml_to_phenotypic_features(testapp, ref_vals, refs, data, case, uui
     # make sure these are consistently set from the `person` xml data
     found_aff_val.update(ref_vals[0])
     diagnoses_xml_to_phenotypic_features(testapp, [found_aff_val], refs, data,
-                                         case, uuids_by_ref)
+                                         cohort, uuids_by_ref)
 
 
-def cause_of_death_xml_to_phenotype(testapp, ref_vals, refs, data, case, uuids_by_ref):
+def cause_of_death_xml_to_phenotype(testapp, ref_vals, refs, data, cohort, uuids_by_ref):
     """
     This is a `xml_ref_fxn`, so it must take the corresponding args in the
     standardized way and update the `data` dictionary, which is used to PATCH
@@ -537,7 +537,7 @@ def cause_of_death_xml_to_phenotype(testapp, ref_vals, refs, data, case, uuids_b
         ref_vals (list): list of dict containg cause of death info (should be length 1)
         refs: (dict): reference-based parsed XML data
         data (dict): metadata to POST/PATCH
-        case (str): identifier of the case
+        cohort (str): identifier of the cohort
         uuids_by_ref (dict): mapping of Fourfront uuids by xml ref
 
     Returns:
@@ -552,8 +552,8 @@ def cause_of_death_xml_to_phenotype(testapp, ref_vals, refs, data, case, uuids_b
             try:
                 pheno_res = testapp.get('/phenotypes/' + xml_obj['causeOfDeathOntologyId'], status=200).json
             except Exception as exc:
-                log.error('Case %s: Cannot GET term %s. Error: %s'
-                          % (case, xml_obj['causeOfDeathOntologyId'], str(exc)))
+                log.error('Cohort %s: Cannot GET term %s. Error: %s'
+                          % (cohort, xml_obj['causeOfDeathOntologyId'], str(exc)))
             else:
                 found_term = True
                 data['cause_of_death'] = pheno_res['uuid']
@@ -632,7 +632,7 @@ def etree_to_dict(ele, ref_container=None, ref_field=''):
     return ret
 
 
-def create_family_proband(testapp, xml_data, refs, ref_field, case,
+def create_family_proband(testapp, xml_data, refs, ref_field, cohort,
                           post_extra=None, xml_extra=None):
     """
     Proband-specific object creation protocol. We can expand later on
@@ -648,7 +648,7 @@ def create_family_proband(testapp, xml_data, refs, ref_field, case,
         xml_data (dict): parsed XMl data, probably from `etree_to_dict`
         refs: (dict): reference-based parsed XML data
         ref_field (str): name of reference field from the XML data
-        case (str): identifier of the case
+        cohort (str): identifier of the cohort
         post_extra (dict): keys/values given here are added to POST
         xml_extra (dict): key/values given here are added to each XML object
             processed using the PROBAND_MAPPING
@@ -697,7 +697,7 @@ def create_family_proband(testapp, xml_data, refs, ref_field, case,
                         if ref_val is not None and 'xml_ref_fxn' in converted_dict:
                             # will update data in place
                             converted_dict['xml_ref_fxn'](testapp, ref_val, refs, data,
-                                                     case, uuids_by_ref)
+                                                     cohort, uuids_by_ref)
                         elif ref_val is not None:
                             data[converted_dict['corresponds_to']] = uuids_by_ref[ref_val]
 
@@ -709,9 +709,9 @@ def create_family_proband(testapp, xml_data, refs, ref_field, case,
                 except Exception as exc:
                     log.error('Failure to POST %s in process-pedigree with '
                               'data %s! Exception: %s' % (item_type, data, exc))
-                    error_msg = ('Case %s: Error encountered on POST in process-pedigree.'
+                    error_msg = ('Cohort %s: Error encountered on POST in process-pedigree.'
                                  ' Check logs. These items were already created: %s'
-                                 % (case, list(uuids_by_ref.values())))
+                                 % (cohort, list(uuids_by_ref.values())))
                     raise HTTPUnprocessableEntity(error_msg)
                 else:
                     idv_props = post_res.json['@graph'][0]
@@ -725,9 +725,9 @@ def create_family_proband(testapp, xml_data, refs, ref_field, case,
                 except Exception as exc:
                     log.error('Failure to PATCH %s in process-pedigree with '
                               'data %s! Exception: %s' % (uuids_by_ref[ref], data, exc))
-                    error_msg = ('Case %s: Error encountered on PATCH in process-pedigree.'
+                    error_msg = ('Cohort %s: Error encountered on PATCH in process-pedigree.'
                                  ' Check logs. These items were already created: %s'
-                                 % (case, list(uuids_by_ref.values())))
+                                 % (cohort, list(uuids_by_ref.values())))
                     raise HTTPUnprocessableEntity(error_msg)
                 else:
                     idv_props = patch_res.json['@graph'][0]
@@ -737,7 +737,7 @@ def create_family_proband(testapp, xml_data, refs, ref_field, case,
             # update proband only on first round (not all items hit in second)
             if round == 'first' and xml_obj.get('proband') == '1':
                 if proband and idv_props['uuid'] != proband:
-                    log.error('Case %s: Multiple probands found! %s conflicts with %s'
+                    log.error('Cohort %s: Multiple probands found! %s conflicts with %s'
                               % (idv_props['uuid'], proband))
                 else:
                     proband = idv_props['uuid']
@@ -750,7 +750,7 @@ def create_family_proband(testapp, xml_data, refs, ref_field, case,
     if proband and proband in family_members:
         family['proband'] = family_members[proband]['uuid']
     else:
-        log.error('Case %s: No proband found for family %s' % family)
+        log.error('Cohort %s: No proband found for family %s' % family)
     return family
 
 

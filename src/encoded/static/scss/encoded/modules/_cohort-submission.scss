@@ -1,8 +1,8 @@
-/** Stylesheet for Case Submission View/Wizard **/
+/** Stylesheet for Cohort Submission View/Wizard **/
 
 body[data-current-action="add"] {
 
-    .case-submission-view {
+    .cohort-submission-view {
 
 
         /** Menu to select step **/
@@ -13,7 +13,7 @@ body[data-current-action="add"] {
             @include media-breakpoint-down(md){
                 flex-direction: column;
             }
-            
+
 
             > .panel-menu-item {
                 flex: 1 1 auto;
@@ -28,11 +28,11 @@ body[data-current-action="add"] {
                     &:not(:last-child) {
                         border-right: none;
                     }
-    
+
                     &:first-child {
                         border-radius: 35px 0 0 35px;
                     }
-    
+
                     &:last-child {
                         border-radius: 0 35px 35px 0;
                     }
@@ -43,7 +43,7 @@ body[data-current-action="add"] {
                     &:first-child {
                         border-radius: 10px 10px 0 0;
                     }
-    
+
                     &:last-child {
                         border-radius: 0 0 10px 10px;
                     }
@@ -101,7 +101,7 @@ body[data-current-action="add"] {
                     }
                 }
 
-                
+
 
                 .panel-title {
                     font-weight: 600;

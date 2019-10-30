@@ -30,7 +30,7 @@ ORDER = [
     'institution',
     'file_format',
     'disorder',
-    'case',
+    'cohort',
     'individual',
     'sample',
     'workflow'

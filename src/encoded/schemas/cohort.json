@@ -1,6 +1,6 @@
 {
-    "title": "Case",
-    "id": "/profiles/case.json",
+    "title": "Cohort",
+    "id": "/profiles/cohort.json",
     "$schema": "http://json-schema.org/draft-04/schema#",
     "type": "object",
     "required": ["title", "project", "institution"],
@@ -18,11 +18,11 @@
     ],
     "properties": {
         "accession" : {
-            "accessionType" : "CA"
+            "accessionType" : "CO"
         },
         "title": {
             "title": "Title",
-            "description": "Optional title for this case",
+            "description": "Title for this Cohort",
             "type": "string"
         },
         "families": {
@@ -61,7 +61,7 @@
                         "linkTo": "Document"
                     },
                     "clinic_notes": {
-                        "title": "Case Notes from the Clinic",
+                        "title": "Pedigree Notes from the Clinic",
                         "type": "string"
                     },
                     "timestamp": {
@@ -88,7 +88,7 @@
         },
         "description": {
             "title": "Description",
-            "description": "Description of the case",
+            "description": "Description of the cohort",
             "type": "string"
         }
     }
