@@ -1,5 +1,8 @@
 # contains expected stuff for test_ingest_vcf
 
+SAMPLE_VCF_V41 = './src/encoded/tests/data/sample_vcfs/sample_vcf.vcf'
+SAMPLE_VCF_KEYS = ['BKPTID', 'CIEND', 'CIPOS', 'END', 'HOMLEN', 'HOMSEQ', 'SVLEN', 'SVTYPE']
+SAMPLE_VCF_EXPECTED = ['END', 'HOMLEN', 'HOMSEQ', 'SVLEN', 'SVTYPE']
 VARIANT_SCHEMA = './src/encoded/tests/data/sample_vcfs/variant.json'
 VARIANT_SAMPLE_SCHEMA = './src/encoded/tests/data/sample_vcfs/variant_sample.json'
 ANN_SINGLE_RECORD = './src/encoded/tests/data/sample_vcfs/single_record_ANN.vcf'
@@ -81,6 +84,8 @@ ANNOVAR_SINGLE_RECORD_EXPECTED = {'Func.ensGene': {0: 'exonic'}, 'Gene.ensGene':
  {0: 'criteria_provided,_single_submitter'}, 'CLNSIG': {0: 'Benign'}, 'simpleRepeat':
  {0: 'Name\\x3dGGGGACTCCGTGGGGGGAGGCTGAGGCTAT'}, 'all_repeats.b37': {0: 'Name\\x3dNA'}}
 
-SAMPLE_VCF_V41 = './src/encoded/tests/data/sample_vcfs/sample_vcf.vcf'
-SAMPLE_VCF_KEYS = ['BKPTID', 'CIEND', 'CIPOS', 'END', 'HOMLEN', 'HOMSEQ', 'SVLEN', 'SVTYPE']
-SAMPLE_VCF_EXPECTED = ['END', 'HOMLEN', 'HOMSEQ', 'SVLEN', 'SVTYPE']
+ANNOTADD_SINGLE_RECORD = './src/encoded/tests/data/sample_vcfs/single_record_ANNOTADD.vcf'
+ANNOTADD_EXPECTED_N_FIELDS = 702
+ANNOTADD_EXPECTED_N_RECORD_FIELDS = 656
+
+SINGLE_RECORD_ALL = './src/encoded/tests/data/sample_vcfs/single_record_ALL.vcf'

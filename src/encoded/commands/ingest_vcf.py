@@ -1,4 +1,3 @@
-import csv
 import sys
 import vcf
 import json
@@ -55,6 +54,7 @@ class VCFParser(object):
         """
         Helper function for parse_vcf_fields that handles parsing the 'info'
         object containing a header listing the fields
+        Only needed for annotations - other fields will work as is
         """
         def _strip(s):
             s = s.strip()
@@ -112,6 +112,10 @@ class VCFParser(object):
         a entry would look like:
             { 'Allele' : {0 : 'A', 1 : 'G' }, ... }
         which in this case tell us this annotation has two entries
+
+        If a record has no entry for an expected field, that field will not exist
+        in result. Oftentimes in the VCF there are gaps in annotations so we just
+        drop those fields from the result if we dont see a value
         """
         result = {}
         for key in self.format.keys():
@@ -125,7 +129,7 @@ class VCFParser(object):
             annotations = None
             raw = record.INFO.get(key, None)
             if raw:
-                if key == 'ANNOVAR': # sometimes come out malformed
+                if key in ['ANNOVAR', 'ANNOTADD']: # sometimes come out malformed
                     raw = self.parse_annovar(raw, len(self.format[key]))
                 annotations = [r.split('|') for r in raw] # could be many
             if annotations:
@@ -138,6 +142,12 @@ class VCFParser(object):
                             result[field_name][g_idx] = field
         return result
 
+    def format_vcf_record(self, result):
+        """
+            TODO: process the 'result' generated above into a variant/sample
+            variant item
+        """
+        pass
 
 def main():
     logging.basicConfig()

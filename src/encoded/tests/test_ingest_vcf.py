@@ -10,7 +10,11 @@ from encoded.tests.data.sample_vcfs.expected import (
     ANNOVAR_SINGLE_RECORD_EXPECTED,
     SAMPLE_VCF_V41,
     SAMPLE_VCF_KEYS,
-    SAMPLE_VCF_EXPECTED
+    SAMPLE_VCF_EXPECTED,
+    ANNOTADD_SINGLE_RECORD,
+    ANNOTADD_EXPECTED_N_FIELDS,
+    ANNOTADD_EXPECTED_N_RECORD_FIELDS,
+    SINGLE_RECORD_ALL
 )
 from encoded.commands.ingest_vcf import (
     VCFParser
@@ -47,6 +51,20 @@ def initialized_single_record_parser(single_record_parser):
 @pytest.fixture
 def single_record_annovar():
     parser = VCFParser(ANNOVAR_SINGLE_RECORD, VARIANT_SCHEMA, VARIANT_SAMPLE_SCHEMA)
+    parser.parse_vcf_fields()
+    return parser
+
+
+@pytest.fixture
+def single_record_annotadd():
+    parser = VCFParser(ANNOTADD_SINGLE_RECORD, VARIANT_SCHEMA, VARIANT_SAMPLE_SCHEMA)
+    parser.parse_vcf_fields()
+    return parser
+
+
+@pytest.fixture
+def single_record_all():
+    parser = VCFParser(SINGLE_RECORD_ALL, VARIANT_SCHEMA, VARIANT_SAMPLE_SCHEMA)
     parser.parse_vcf_fields()
     return parser
 
@@ -107,3 +125,24 @@ def test_VCFParser_parse_ANNOVAR(single_record_annovar):
     record = single_record_annovar.get_record()
     result = single_record_annovar.parse_vcf_record(record)
     assert result == ANNOVAR_SINGLE_RECORD_EXPECTED
+
+
+def test_VCFParser_parse_ANNOTADD(single_record_annotadd):
+    """ Tests that we can read/process ANNOTADD annotations """
+    record = single_record_annotadd.get_record()
+    result = single_record_annotadd.parse_vcf_record(record)
+    assert len(single_record_annotadd.format['ANNOTADD']) == ANNOTADD_EXPECTED_N_FIELDS
+    assert len(result) == ANNOTADD_EXPECTED_N_RECORD_FIELDS
+
+
+def test_VCFParser_parse_ALL(single_record_all):
+    """
+        Tests that we can read/process a VCF file containing all three annotation
+        types and produce the same annotation field values for a single record
+    """
+    record = single_record_all.get_record()
+    result = single_record_all.parse_vcf_record(record)
+    for field, values in ANN_SINGLE_RECORD_EXPECTED.items():
+        assert result[field] == values
+    for field, values in ANNOVAR_SINGLE_RECORD_EXPECTED.items():
+        assert result[field] == values
