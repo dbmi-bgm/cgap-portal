@@ -1727,6 +1727,12 @@ $badge-item-min-height: 90px;
 		@include media-breakpoint-up(lg) {
 			margin-left: 10px;
 		}
+		>.btn.btn-primary.btn-block {
+			margin-top: 10px;
+			@include media-breakpoint-up(lg) {
+				margin-top: 0;
+			}
+		}
 
 		img.card-img-top {
 			display: none;
