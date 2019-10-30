@@ -3,7 +3,7 @@ module.exports = {
     "@type": ["HumanDonor", "Donor", "Item"],
     "accession": "ENCDO000HUM",
     "award": "U41HG006992",
-    "ethnicity": "unknown",
+    "ethnicity": ["unknown"],
     "health_status": "unknown",
     "lab": "j-michael-cherry",
     "life_stage": "unknown",

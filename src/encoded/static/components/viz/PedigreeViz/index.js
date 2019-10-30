@@ -382,6 +382,13 @@ class PedigreeVizViewUserInterface extends React.PureComponent {
         return `translate3d(${x}px, ${y}px, 0) ` + scaledVizStyle.transform;
     }
 
+    /* todo */
+    static maxHeightIndex(objectGraph){
+        return objectGraph.reduce(function(m,v){
+            return Math.max(m, v);
+        }, 0);
+    }
+
     static defaultProps = {
         'width': 600,
         "scale" : 1,

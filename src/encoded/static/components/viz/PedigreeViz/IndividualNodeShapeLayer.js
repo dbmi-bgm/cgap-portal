@@ -163,6 +163,7 @@ export class IndividualNodeShape extends React.PureComponent {
                 <UnderlayMarkers {...{ width, height, individual, shape, diseaseToIndex }} />
                 { fgShape }
                 <OverlayMarkers {...{ width, height, individual, shape, textScaleTransformStr }} />
+                <AboveNodeText {...{ width, height, individual, maxHeightIndex }} />
                 <UnderNodeText {...{ width, height, individual, shape, diseaseToIndex, dims, showOrderBasedName, textScale, textScaleTransformStr }} />
             </g>
         );
@@ -391,6 +392,55 @@ function ColumnOfDiseases({ individual, width, height, shape, diseaseToIndex }){
 }
 
 /** @todo Implement things like age, stillBirth, isEctopic, etc. */
+function AboveNodeText({ individual, width, height, maxHeightIndex }){
+    const {
+        id, name,
+        ageString,
+        // diseases = [],
+        orderBasedName,
+        heightIndex,
+    } = individual;
+
+    const { ethnicity } = individual.data.individualItem;
+
+    console.log("===== Above Node Text =====");
+    // console.log("individual: ", individual);
+    // console.log("dims: ", dims);
+    console.log("maxHeightIndex", maxHeightIndex);
+
+    if (heightIndex !== maxHeightIndex) return null;
+    if (!ethnicity || ethnicity.length === 0) return null;
+
+    const halfWidth = width / 2;
+    //const textYStart = 18;
+
+    const textRows = [[ ethnicity, "title" ]];
+
+    const renderedTexts = textRows.map(function([ content, desc ], idx){
+        const txtProps = {
+            "y": 18 + (20 * idx),
+            "data-describing" : desc
+        };
+        if (desc === "title"){
+            txtProps.className = (txtProps.className || "") + " showing-order-based-name";
+        }
+        if (desc === "title"){
+            // Center text
+            txtProps.textAnchor = "middle";
+            txtProps.x = halfWidth;
+        }
+        return <text {...txtProps} key={desc + "-" + idx}>{ content }</text>;
+    });
+
+    return (
+        <g className="text-box" transform={"translate(0, " + (height + 4) + ")"}>
+            <rect width={width + 4} x={-2} height={3} className="bg-rect" rx={5} />
+            { renderedTexts }
+        </g>
+    );
+}
+
+/** @todo Implement things like age, stillBirth, isEctopic, etc. */
 function UnderNodeText(props){
     const {
         individual,
@@ -410,6 +460,9 @@ function UnderNodeText(props){
     const halfWidth = width / 2;
     //const textYStart = 18;
     const showTitle = showOrderBasedName ? orderBasedName : (name || id);
+
+    console.log("===== Below Node Text =====");
+    console.log("dims: ", dims);
 
     const textRows = [[ showTitle, "title" ]];
     if (ageString){
@@ -458,4 +511,3 @@ function UnderNodeText(props){
         </g>
     );
 }
-
