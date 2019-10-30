@@ -121,22 +121,19 @@ export const CohortSummaryTable = React.memo(function CohortSummaryTable(props){
                 const {
                     overall_quality_status = "",
                     qc_list = [],
-                    "@id": qmUrl = ""
+                    "@id": qmId,
+                    url: qmUrl = qmId || "",
                 } = quality_metric;
 
-                const fileObject = {}; // object for storing data for file render
                 const extension = filename.substring(filename.indexOf('.')+1, filename.length) || filename; // assuming the display_title property remains the filename
 
-                fileObject.fileUrl = fileUrl; // set file URL
-                fileObject.qmUrl = qmUrl; // set quality metric URL (either links to the list of QMS or to the QM itself)
-
                 let fileOverallQuality = "PASS";
-                let hasQm = "true";
+                let hasQm = true;
+                let numFail = 0;
+                let numWarn = 0;
 
+                // figure out the file's overall quality status
                 if (qc_list.length > 0) {
-                    let numFail = 0;
-                    let numWarn = 0;
-
                     // loop through all of the quality metrics and count the number of failures and warnings for this file
                     qc_list.forEach((qm) => {
                         if (qm.value.overall_quality_status === "FAIL") {
@@ -147,15 +144,7 @@ export const CohortSummaryTable = React.memo(function CohortSummaryTable(props){
                             fileOverallQuality = (fileOverallQuality === "FAIL" ? "FAIL" : "WARN");
                         }
                     });
-
-                    // once done, add those to fileObject;
-                    fileObject.numFail = numFail;
-                    fileObject.numWarn = numWarn;
-                    fileObject.hasQm = hasQm;
                 } else {
-                    let numFail = 0;
-                    let numWarn = 0;
-
                     // if no quality status, change hasQM to false
                     if (!overall_quality_status) {
                         numFail, numWarn = -1;
@@ -168,14 +157,17 @@ export const CohortSummaryTable = React.memo(function CohortSummaryTable(props){
                             numWarn++;
                         }
                     }
-
-                    // once done, add those to fileObject;
-                    fileObject.numFail = numFail;
-                    fileObject.numWarn = numWarn;
-                    fileObject.hasQm = hasQm;
-
                     fileOverallQuality = overall_quality_status;
                 }
+
+                // once done, add those to fileObject;
+                const fileObject = {
+                    numFail,
+                    numWarn,
+                    hasQm,
+                    fileUrl,
+                    qmUrl
+                };
 
                 function shouldUpdateStatus(currOverall, newStatus) {
                     // s1 is current overall status, s2 is new one
@@ -310,9 +302,10 @@ export const CohortSummaryTable = React.memo(function CohortSummaryTable(props){
         return row.isProband;
     }).value().reverse();
 
+    let isEven = false; // Toggle on individual change
+    let currIndvGroup = null; // Individual Group #
     const renderedRows = sortedRows.map(function(row, rowIdx){
         const { isProband = false, sampleIdx } = row;
-        const rowCls = "sample-row" + (isProband ? " is-proband" : "");
         const rowCols = columnOrder.map(function(colName){
 
             /**
@@ -476,6 +469,18 @@ export const CohortSummaryTable = React.memo(function CohortSummaryTable(props){
                 </td>
             );
         });
+
+        // color code non-proband rows in alternating bands based on individual group
+        if (currIndvGroup !== row.individualGroup) {
+            currIndvGroup = row.individualGroup; // set new individual group
+            isEven = !isEven; // toggle for next row
+        }
+
+        const rowCls = (
+            "sample-row" +
+            (isProband ? " is-proband" :  (isEven ? " is-even" : ""))
+        );
+
         return <tr key={rowIdx} className={rowCls} data-sample-index={sampleIdx}>{ rowCols }</tr>;
     });
 

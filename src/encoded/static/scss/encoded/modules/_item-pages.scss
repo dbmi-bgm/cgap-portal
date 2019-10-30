@@ -1744,7 +1744,7 @@ $badge-item-min-height: 90px;
 			width: 50%;
 		}
 	}
-	
+
 	label.badge-list-label {
 		padding-right: 3px;
 		margin-bottom: 0;
@@ -1801,6 +1801,9 @@ $badge-item-min-height: 90px;
 								font-family: $font-family-monospace;
 							}
 							*/
+						}
+						&.is-even {
+							background-color: rgba(0, 0, 0, 0.03);
 						}
 						&.is-proband {
 							> td {
