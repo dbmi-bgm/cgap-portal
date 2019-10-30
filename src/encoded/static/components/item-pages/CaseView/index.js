@@ -183,7 +183,7 @@ const CohortSummaryTabView = React.memo(function CohortSummaryTabView(props){
                     count++;
                 }
             });
-        }); // todo: fix because ewww also this is done in CohortSummaryTable -- move it up and pass it down
+        }); // todo: this is done in CohortSummaryTable --  maybe move it up and pass it down
         return count;
     }
 
