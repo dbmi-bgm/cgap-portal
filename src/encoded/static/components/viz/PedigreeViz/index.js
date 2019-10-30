@@ -757,7 +757,7 @@ const ShapesLayer = React.memo(function ShapesLayer(props){
     } = props;
     const svgStyle = { width: graphWidth, height: graphHeight };
     // Update less frequently by rounding for better performance (less changes, caught by Memo/PureComponent)
-    const textScale = Math.round(((0.5 / scale) + 0.5) * 5) / 5;
+    const textScale = Math.floor(((0.5 / scale) + 0.5) * 5) / 5;
     const textScaleTransformStr = "scale3d(" + textScale +"," + textScale +",1)";
     return (
         <svg className="pedigree-viz-shapes-layer shapes-layer" viewBox={"0 0 " + graphWidth + " " + graphHeight} style={svgStyle}>

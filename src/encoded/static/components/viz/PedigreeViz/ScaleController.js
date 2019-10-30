@@ -85,7 +85,9 @@ export class ScaleController extends React.PureComponent {
             enableMouseWheelZoom: pastWheelEnabled,
             enablePinchZoom: pastPinchEnabled,
             containerWidth: pastWidth,
-            containerHeight: pastHeight
+            containerHeight: pastHeight,
+            graphWidth: pastGraphWidth,
+            graphHeight: pastGraphHeight
         } = pastProps;
 
         // Remove or attach listeners if needed.
@@ -105,7 +107,11 @@ export class ScaleController extends React.PureComponent {
         // vs using functional updater because want to avoid
         // React's state change queuing mechanisms / reading
         // most accurate prev value not important.
-        if (containerWidth !== pastWidth || containerHeight !== pastHeight){
+        if (containerWidth !== pastWidth ||
+            containerHeight !== pastHeight ||
+            graphWidth !== pastGraphWidth ||
+            graphHeight !== pastGraphHeight
+        ){
             const minScaleUnbounded = Math.min(
                 (containerWidth / graphWidth),
                 (containerHeight / graphHeight)
