@@ -167,7 +167,7 @@ export class IndividualNodeShape extends React.PureComponent {
                 <UnderlayMarkers {...{ width, height, individual, shape, diseaseToIndex }} />
                 { fgShape }
                 <OverlayMarkers {...{ width, height, individual, shape, textScaleTransformStr }} />
-                <AboveNodeText {...{ width, height, individual, maxHeightIndex, dims, halfWidth, aboveNodeTextY }} />
+                <AboveNodeText {...{ width, height, individual, maxHeightIndex, dims, halfWidth, aboveNodeTextY, textScale, textScaleTransformStr }} />
                 <UnderNodeText {...{ width, height, individual, shape, diseaseToIndex, dims, halfWidth, showOrderBasedName, textScale, textScaleTransformStr }} />
             </g>
         );
@@ -395,7 +395,12 @@ function ColumnOfDiseases({ individual, width, height, shape, diseaseToIndex }){
 }
 
 /** @todo Implement things like age, stillBirth, isEctopic, etc. */
-function AboveNodeText({ individual, maxHeightIndex, halfWidth, aboveNodeTextY }){
+function AboveNodeText(props){
+    const {
+        individual, maxHeightIndex, halfWidth, aboveNodeTextY,
+        textScale = 1,
+        textScaleTransformStr = "scale3d(1,1,1)",
+    } = props;
     const {
         //id, name,
         //ageString,
@@ -411,8 +416,14 @@ function AboveNodeText({ individual, maxHeightIndex, halfWidth, aboveNodeTextY }
     const moreAncestryPresent = ancestry.length > 3;
     const showAncestry = moreAncestryPresent ? ancestry.slice(0, 3) : ancestry; // Up to 3 shown.
 
+    const rectTransform = "translate(0, -" + aboveNodeTextY + "), scale(" + textScale + ")";
+    const rectTransform3d = "translate3d(0, -" + aboveNodeTextY + "px, 0) " + textScaleTransformStr;
+
     return (
-        <g className="text-box above-node" transform={"translate(0, -" + aboveNodeTextY + ")"}>
+        <g className="text-box above-node" transform={rectTransform} style={{
+            transformOrigin: "" + halfWidth + "px 0px",
+            transform: rectTransform3d
+        }}>
             <text y={0} x={halfWidth} textAnchor="middle" data-describing="ancestry">
                 { showAncestry.join(" • ") }
             </text>
@@ -441,9 +452,6 @@ function UnderNodeText(props){
     } = individual;
     //const textYStart = 18;
     const showTitle = showOrderBasedName ? orderBasedName : (name || id);
-
-    console.log("===== Below Node Text =====");
-    console.log("dims: ", dims);
 
     const textRows = [[ showTitle, "title" ]];
     if (ageString){
@@ -483,7 +491,7 @@ function UnderNodeText(props){
 
     // todo maybe make an array of 'rows' to map to <text>s with incremented y coord.
     const rectTransform = "translate(0, " + (height + 4) + "), scale(" + textScale + ")";
-    const rectTransform3d = "translate3d(0, " + (height + 4) + ", 0), " + textScaleTransformStr;
+    const rectTransform3d = "translate3d(0, " + (height + 4) + "px, 0) " + textScaleTransformStr;
 
     return (
         <g className="text-box" style={{ transformOrigin: halfWidth + "px 0", transform: rectTransform3d }} transform={rectTransform}>
