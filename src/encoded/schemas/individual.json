@@ -174,7 +174,7 @@
         },
         "ancestry": {
             "title": "Ancestry",
-            "description": "Ancestry of the individual. Can use a suggested or custom value",
+            "description": "Ancestry of the individual.",
             "type": "array",
             "uniqueItems": true,
             "items": {
@@ -195,7 +195,7 @@
         },
         "ethnicity": {
             "title": "Ethnicity",
-            "description": "Ethnicity of the individual. Can use a suggested or custom value",
+            "description": "Ethnicity of the individual.",
             "type": "string",
             "suggested_enum": [
                 "Asian",
