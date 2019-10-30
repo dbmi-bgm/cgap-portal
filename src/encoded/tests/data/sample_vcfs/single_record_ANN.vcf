@@ -1,0 +1,6 @@
+##fileformat=VCFv4.2
+##SnpEffVersion="4.3t (build 2017-11-24 10:18), by Pablo Cingolani"
+##SnpEffCmd="SnpEff  GRCh38.86 /n/data1/hms/dbmi/park/daniel/BiO/Research/mutanno/1907_example/s10_clinvar_pathogenic_variants_b38.vcf.gz.annot/s10_clinvar_pathogenic_variants_b38.vcf.gz_1.vcf "
+##INFO=<ID=ANN,Number=.,Type=String,Description="Functional annotations: 'Allele | Annotation | Annotation_Impact | Gene_Name | Gene_ID | Feature_Type | Feature_ID | Transcript_BioType | Rank | HGVS.c | HGVS.p | cDNA.pos / cDNA.length | CDS.pos / CDS.length | AA.pos / AA.length | Distance | ERRORS / WARNINGS / INFO' ">
+#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT	S1
+1	1014042	.	G	A	.	.	ANN=A|missense_variant|MODERATE|ISG15|ENSG00000187608|transcript|ENST00000379389.4|protein_coding|2/2|c.62G>A|p.Ser21Asn|213/711|62/498|21/165||,A|missense_variant|MODERATE|ISG15|ENSG00000187608|transcript|ENST00000624697.3|protein_coding|3/3|c.38G>A|p.Ser13Asn|289/788|38/474|13/157||,A|missense_variant|MODERATE|ISG15|ENSG00000187608|transcript|ENST00000624652.1|protein_coding|3/3|c.38G>A|p.Ser13Asn|264/657|38/431|13/142||WARNING_TRANSCRIPT_INCOMPLETE,A|upstream_gene_variant|MODIFIER|RP11-54O7.11|ENSG00000224969|transcript|ENST00000458555.1|antisense||n.-849C>T|||||849|;	GT:AD	0/1:20,20

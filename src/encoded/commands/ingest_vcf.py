@@ -8,6 +8,11 @@ from collections import OrderedDict
 
 logger = logging.getLogger(__name__)
 EPILOG = __doc__
+ANNOTATION_TYPES = ['ANN', 'ANNOVAR', 'ANNOTADD']
+
+# might be useful
+class VCFParserException(Exception):
+    pass
 
 
 class VCFParser(object):
@@ -37,6 +42,8 @@ class VCFParser(object):
         Returns fields associated with the given VCF in fname. If a key is specified
         meta data associated with that key will be returned
         examples: ANN, LOF, NMD, ANNOVAR, ANOTADD
+
+        XXX: Mismatch return type, probably bad practice
         """
         if key == 'ALL':
             return self.reader.infos
@@ -65,23 +72,62 @@ class VCFParser(object):
         for key in self.annotation_keys:
             info = self.reader.infos.get(key, None)
             if info:
-                self.format[key] = self.parse_vcf_info(info)
+                if key not in ANNOTATION_TYPES:
+                    self.format[key] = key # handle non annotation INFOs
+                else:
+                    self.format[key] = self.parse_vcf_info(info)
+
+    @staticmethod
+    def parse_annovar(raw, n_expected):
+        """
+        Helper method for parse_vcf_record to handle formatting problems
+        with ANNOVAR annotations
+        """
+        lst = ','.join(raw).split('|')
+        if len(lst) == n_expected:
+            return [','.join(raw)]
+        elif len(lst) % n_expected == 0:
+            return raw # XXX: Handle this later
+        else:
+            raise VCFParserException
+
 
     def parse_vcf_record(self, record):
         """
-        Parses an individual vcf record
-        XXX: VCF is malformed, must be fixed by daniel
-        Below 'sort of' works
+        Produces a dictionary containing all the annotation fields for this record
+
+        Compatible with non-annotation fields like:
+            ##INFO=<ID=SVTYPE,Number=1,Type=String,Description="Type of structural variant">
+        in addition to annoation fields like:
+            ##INFO=<ID=ANN,Number=.,Type=String,Description="Functional annotations:
+            'Allele | Annotation | Annotation_Impact | Gene_Name | Gene_ID |
+            Feature_Type | Feature_ID | Transcript_BioType | Rank | HGVS.c |
+            HGVS.p | cDNA.pos / cDNA.length | CDS.pos / CDS.length | AA.pos / AA.length
+            | Distance | ERRORS / WARNINGS / INFO' ">
+
+        In the former case the 'result' would contain a single dict entry for 'SVTYPE'
+        containing the value in this record. In the latter you would get a dict entry
+        for each field in the annotation fields, such as Allele, Annotation etc.
+        There could be multiple annotations per variant. These are indexed by group, so
+        a entry would look like:
+            { 'Allele' : {0 : 'A', 1 : 'G' }, ... }
+        which in this case tell us this annotation has two entries
         """
         result = {}
         for key in self.format.keys():
+
+            # handle non-annotation fields
+            if key not in ANNOTATION_TYPES:
+                result[key] = record.INFO.get(key, None)
+                continue
+
+            # handle annotation fields
             annotations = None
             raw = record.INFO.get(key, None)
             if raw:
-                if key == 'ANN':
-                    annotations = [r.split('|') for r in raw] # could be many
-                else:
-                    annotations = ','.join(raw).split('|')
+                if key == 'ANNOVAR': # sometimes come out malformed
+                    raw = self.parse_annovar(raw, len(self.format[key]))
+                annotations = [r.split('|') for r in raw] # could be many
             if annotations:
                 for g_idx, group in enumerate(annotations):
                     for f_idx, field in enumerate(group):
