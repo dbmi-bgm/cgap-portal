@@ -19,6 +19,7 @@ from dcicutils.ff_utils import (
 from encoded.commands.load_items import load_items
 from encoded.commands.generate_items_from_owl import (
     connect2server,
+    get_raw_form
 )
 
 '''logging setup
@@ -100,7 +101,7 @@ def get_dbxref2disorder_map(disorders):
         if xrefs:
             for x in xrefs:
                 if x in xref2dis:
-                    print("For disorder uuid {} have already seen {} linked to {}".format(duid, x, xref2dis[x]))
+                    logger.warn("For disorder uuid {} have already seen {} linked to {}".format(duid, x, xref2dis[x]))
                 else:
                     if x.startswith('OMIM:') or x.lower().startswith('orpha') or x.lower().startswith('decip'):
                         xref2dis[x] = duid
@@ -145,20 +146,6 @@ def get_input_gen(input):
             print(e)
             return []
     r.close()
-
-
-def multikeysort(items, columns):
-    from operator import itemgetter
-    comparers = [ ((itemgetter(col[1:].strip()), -1) if col.startswith('-') else (itemgetter(col.strip()), 1)) for col in columns]
-
-    def comparer(left, right):
-        for fn, mult in comparers:
-            result = cmp(fn(left), fn(right))
-            if result:
-                return mult * result
-            else:
-                return 0
-    return sorted(items, cmp=comparer)
 
 
 def get_args():  # pragma: no cover
@@ -217,14 +204,14 @@ def main():  # pragma: no cover
     date = 'unknown'
     fdesc = 'unknown'
     while True:
-        line = lines.next()
+        line = next(lines)
         if not line.startswith("#"):
             break
         elif dtag in line:
             # get the date that the file was generated
             _, date = line.split(dtag)
         elif fdtag in line:
-            _, fdesc = line.split(fdesc)
+            _, fdesc = line.split(fdtag)
     logger.info("Annotation file info:\n\tdate: {}\n\tdescription: {}".format(date, fdesc))
     fields = line2list(line)
     bad_fields = check_fields(fields)
@@ -287,18 +274,25 @@ def main():  # pragma: no cover
             assoc_phenos.setdefault(disorder_id, []).append(pheno_annot)
     # at this point we've gone through all the lines in the file
     # here we want to compare with what already exists in db
+    patches = []
     for did, pheno_annots in assoc_phenos.items():
-        pheno_annots = multikeysort(pheno_annots, FIELD_MAPPING.values())
         db_annots = []
         db_dis = disorders.get(did)
         if db_dis:
-            db_annots = multikeysort(db_dis.get('associated_phenotypes', []), FIELD_MAPPING.values())
-        if pheno_annots == db_annots:
-            print("YAY")
-        else:
-            print("BOO")
-
-    patches = [{'uuid': uid, 'associated_phenotypes': apa} for uid, apa in assoc_phenos.items()]
+            db_annots = db_dis.get('associated_phenotypes', [])
+            db_annots = [get_raw_form(a) for a in db_annots]
+        newannot = [ann for ann in pheno_annots if ann not in db_annots]
+        existingannot = [ann for ann in pheno_annots if ann in db_annots]
+        # we don't need to explicitly get these except for logging purposes
+        obsannot = [ann for ann in db_annots if ann not in pheno_annots]
+        if newannot:
+            print('NEW!!!!', newannot)
+            import pdb; pdb.set_trace()
+        if obsannot:
+            print('OBSOLETE!!!!!', obsannot)
+            import pdb; pdb.set_trace()
+        patch = newannot + existingannot
+        patches.append({'uuid': did, 'associated_phenotypes': patch})
 
     write_outfile(patches, args.outfile, args.pretty)
     if problems:
