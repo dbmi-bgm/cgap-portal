@@ -147,7 +147,8 @@ export const CohortSummaryTable = React.memo(function CohortSummaryTable(props){
                 } else {
                     // if no quality status, change hasQM to false
                     if (!overall_quality_status) {
-                        numFail, numWarn = -1;
+                        numFail = -1;
+                        numWarn = -1;
                         hasQm = false;
                     } else {
                         // update pass fail number for file
@@ -316,9 +317,9 @@ export const CohortSummaryTable = React.memo(function CohortSummaryTable(props){
                     case "PASS":
                         return <i className="icon icon-check fas text-success mr-05"/>;
                     case "FAIL":
-                        return <i data-tip="One or more of these files failed quality inspection." className="icon icon-times fas text-danger mr-05"/>;
+                        return <i className="icon icon-times fas text-danger mr-05"/>;
                     case "WARN": // todo: what icon makes the most sense here
-                        return <i data-tip="One or more of these files has a quality-related warning." className="icon icon-exclamation-triangle fas text-warning mr-05"/>;
+                        return <i className="icon icon-exclamation-triangle fas text-warning mr-05"/>;
                     default:
                         return null;
                 }
@@ -351,7 +352,34 @@ export const CohortSummaryTable = React.memo(function CohortSummaryTable(props){
                 return "PASS";
             }
 
+            function calcTooltips(hasQm, warns, fails) {
+                /**
+                 * Generates a file-level and QC-level tooltip based on a file's QM stats.
+                 *
+                 * @param {boolean} hasQm   Is there at least 1 visible qualitymetric for the given file?
+                 * @param {number}  warns   Number of qualitymetrics with value "WARN"
+                 * @param {number}  fails   Number of qualitymetrics with value "FAIL"
+                 *
+                 * @return {array} Index [0] is the file level tooltip (only relevant if there is no QM), and index [1] is the QC level tooltip.
+                 */
 
+                // console.log(`testing calcTooltips with ${hasQm}, ${warns}, ${fails}`);
+                let qmExistsTip = "";
+                let warnFailTip = "";
+
+                if (!hasQm) {
+                    qmExistsTip += "This file has no quality metrics.";
+                }
+                if (warns > 0) {
+                    warnFailTip += `${warns} QM(s) with Warnings `;
+                }
+                if (fails > 0) {
+                    warnFailTip += `${fails} QM(s) with Failures `;
+                }
+                // console.log(`calcTooltips produced the following tips: \n "${qmExistsTip}" and "${warnFailTip}"`);
+
+                return [qmExistsTip || null, warnFailTip || null];
+            }
 
             let colVal = row[colName] || " - ";
 
@@ -360,7 +388,6 @@ export const CohortSummaryTable = React.memo(function CohortSummaryTable(props){
                 const extensions = Object.keys(fileData);
                 const renderArr = [];
 
-                console.log("log2: fileData, ", fileData);
                 extensions.forEach((ext) => {
                     const { files, overall: overallQuality } = fileData[ext];
 
@@ -369,18 +396,9 @@ export const CohortSummaryTable = React.memo(function CohortSummaryTable(props){
                             return;
                         }
 
+                        const tooltips = calcTooltips(files[0].hasQm, files[0].numWarn, files[0].numFail);
+
                         // if there's a single quality metric, link the item itself
-                        let dataTip = "";
-                        let qmExistsTip = null;
-                        if (!files[0].hasQM) {
-                            qmExistsTip = "This file has no quality metrics.";
-                        }
-                        if (files[0].numWarn > 0) {
-                            dataTip += `${files[0].numWarn} QM(s) with Warnings `;
-                        }
-                        if (files[0].numFail > 0) {
-                            dataTip += `${files[0].numFail} QM(s) with Failures `;
-                        }
                         renderArr.push(
                             files[0] ?
                                 <span className="ellipses" key={`span-${ext}`}>
@@ -389,7 +407,7 @@ export const CohortSummaryTable = React.memo(function CohortSummaryTable(props){
                                         href={files[0].fileUrl || ""}
                                         rel="noopener noreferrer"
                                         target="_blank"
-                                        data-tip={qmExistsTip}
+                                        data-tip={tooltips[0]}
                                     >
                                         { ext.toUpperCase() }
                                     </a>
@@ -399,7 +417,7 @@ export const CohortSummaryTable = React.memo(function CohortSummaryTable(props){
                                             rel="noopener noreferrer"
                                             target="_blank"
                                             className={`${statusToTextClass(overallQuality)} qc-status-${files[0].status}`}
-                                            data-tip={dataTip || null}
+                                            data-tip={tooltips[1]}
                                         >
                                             <sup>QC</sup>
                                         </a>
@@ -413,22 +431,12 @@ export const CohortSummaryTable = React.memo(function CohortSummaryTable(props){
                                 { statusToIcon(overallQuality) } { ext.toUpperCase() }
                                 (   {
                                     files.map((file, i) => {
-                                        let dataTip = "";
-                                        if (file.numWarn > 0) {
-                                            dataTip += `${file.numWarn} QM(s) with Warnings `;
-                                        }
-                                        if (file.numFail > 0) {
-                                            dataTip += `${file.numFail} QM(s) with Warnings `;
-                                        }
-                                        let qmExistsTip = null;
-                                        if (!file.hasQM) {
-                                            qmExistsTip = "This file has no quality metrics.";
-                                        }
+                                        const tooltips = calcTooltips(file.hasQm, file.numWarn, file.numFail);
 
                                         return (
                                             <React.Fragment key={`${ext}-${file.fileUrl}`}>
                                                 <a href={ file.fileUrl || "" } rel="noopener noreferrer" target="_blank"
-                                                    className={`${statusToTextClass(file.quality)}`} data-tip={qmExistsTip}>
+                                                    className={`${statusToTextClass(file.quality)}`} data-tip={tooltips[0]}>
                                                     {i + 1}
                                                 </a>
                                                 { file.hasQm ?
@@ -438,7 +446,7 @@ export const CohortSummaryTable = React.memo(function CohortSummaryTable(props){
                                                         target="_blank"
                                                         className={`${statusToTextClass(
                                                             getFileQuality(file.numFail, file.numWarn))} qc-status-${file.status}`}
-                                                        data-tip={dataTip || null}
+                                                        data-tip={tooltips[1]}
                                                     >
                                                         <sup>QC</sup>
                                                     </a>
