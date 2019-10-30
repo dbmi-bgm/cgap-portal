@@ -4,17 +4,8 @@ import React from 'react';
 import memoize from 'memoize-one';
 import { individualLeftPosition, individualTopPosition } from './layout-utilities-drawing';
 
-
-export function doesAncestorHaveId(id, htmlNode, maxDepth = 10){
-    let currElem = { parentNode: htmlNode };
-    let count = 0;
-    while (currElem.parentNode && count <= maxDepth){
-        count++;
-        currElem = currElem.parentNode;
-        if (currElem.id === id) return true;
-    }
-    return false;
-}
+/** WE MIGHT GET RID OF THIS FILE LATER AND JUST HAVE SVG NODES **/
+/** HOWEVER ARE KEEPING FOR NOW BECAUSE IF WANT TO SHOW "pop-up" ui or similar, is much simpler with HTML than SVG **/
 
 export function individualClassName(individual, isBeingHovered = false, isSelected = false){
     const classes = [];
@@ -46,7 +37,6 @@ export function individualClassName(individual, isBeingHovered = false, isSelect
 
 export const IndividualsLayer = React.memo(function IndividualsLayer(props){
     const { objectGraph: g, ...passProps } = props;
-    const { graphHeight, graphWidth } = passProps;
     return (
         <div className="individuals-layer">
             { g.map((indv) => <IndividualDiv key={indv.id} individual={indv} {...passProps} /> )}
@@ -55,36 +45,27 @@ export const IndividualsLayer = React.memo(function IndividualsLayer(props){
 });
 
 
-/** Contains some memoized per-indv-node funcs/methods to be extended by a view. */
-export class IndividualNodeBase extends React.PureComponent {
+export class IndividualDiv extends React.PureComponent {
+
     constructor(props){
         super(props);
-        // Different from PedigreeViz.memoized
+        this.onMouseEnter = this.onMouseEnter.bind(this);
+        //this.onClick = this.onClick.bind(this);
+        this.onAddBtnClick = this.onAddBtnClick.bind(this);
+        this.state = {
+            'currentOption' : null
+        };
         this.memoized = {
             className   : memoize(individualClassName),
             left        : memoize(individualLeftPosition),
             top         : memoize(individualTopPosition)
         };
     }
-}
-
-
-export class IndividualDiv extends IndividualNodeBase {
-
-    constructor(props){
-        super(props);
-        this.onMouseEnter = this.onMouseEnter.bind(this);
-        this.onClick = this.onClick.bind(this);
-        this.onAddBtnClick = this.onAddBtnClick.bind(this);
-        this.state = {
-            'currentOption' : null
-        };
-    }
 
     componentDidUpdate(pastProps, pastState){
-        const { currSelectedNodeId, individual : { id } } = this.props;
-        if (currSelectedNodeId !== pastProps.currSelectedNodeId){
-            if (currSelectedNodeId !== id){
+        const { selectedNode, individual } = this.props;
+        if (selectedNode !== pastProps.selectedNode){
+            if (selectedNode !== individual){
                 this.setState(function({ currentOption }){
                     if (currentOption !== null){
                         return { currentOption: null };
@@ -101,11 +82,13 @@ export class IndividualDiv extends IndividualNodeBase {
         onNodeMouseIn(id);
     }
 
+    /* Currently being managed by index.js / PedigreeVizView
     onClick(evt){
         const { onNodeClick, individual: { id } } = this.props;
         evt.stopPropagation();
         onNodeClick(id);
     }
+    */
 
     /** Not used atm */
     onAddBtnClick(evt){
@@ -121,7 +104,7 @@ export class IndividualDiv extends IndividualNodeBase {
     render(){
         const {
             dims, graphHeight, individual, onNodeMouseLeave,
-            currHoverNodeId, currSelectedNodeId, editable
+            hoveredNode, selectedNode, editable
         } = this.props;
         const { currentOption } = this.state;
         const { id, name, _drawing : { heightIndex, xCoord, yCoord } } = individual;
@@ -131,8 +114,8 @@ export class IndividualDiv extends IndividualNodeBase {
             top         : this.memoized.top(yCoord, dims),//this.memoized.top(heightIndex, dims, graphHeight),
             left        : this.memoized.left(xCoord, dims)
         };
-        const isBeingHovered = currHoverNodeId === id;
-        const isSelected = currSelectedNodeId === id;
+        const isSelected = selectedNode === individual;
+        const isBeingHovered = hoveredNode === individual;
         let actionButtons = null;
         if (editable && !currentOption){
             /** TODO */
@@ -154,16 +137,10 @@ export class IndividualDiv extends IndividualNodeBase {
             + this.memoized.className(individual, isBeingHovered, isSelected)
         );
 
-        const detailStyle = {
-            maxWidth: dims.individualWidth + dims.individualXSpacing - 10,
-            //left: dims.individualWidth + 8,
-            left: -dims.individualWidth * .05,
-            top: dims.individualHeight + 10
-        };
         return (
             <div style={elemStyle} id={id} data-height-index={heightIndex} className={indvNodeCls}
-                data-y-coord={yCoord}
-                onMouseEnter={this.onMouseEnter} onMouseLeave={onNodeMouseLeave} onClick={this.onClick}>
+                data-y-coord={yCoord} data-node-type="individual"
+                onMouseEnter={this.onMouseEnter} onMouseLeave={onNodeMouseLeave}>
                 { actionButtons }
                 { currentOption === 'add' ? /** TODO */
                     <NodeOptionsPanel {...this.props} onAddSelect={this.handleAddNewIndividual} /> : null

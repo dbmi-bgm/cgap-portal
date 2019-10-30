@@ -12,12 +12,11 @@ function getIndividualDisplayTitle(individual){
 
 
 export const DefaultDetailPaneComponent = React.memo(function DefaultDetailPaneComponent(props){
-    const { unselectNode, memoized, objectGraph, currSelectedNodeId, className } = props;
-    const selectedNode = currSelectedNodeId && memoized.findNodeWithId(objectGraph, currSelectedNodeId);
+    const { unselectNode, selectedNode, className } = props;
 
     if (!selectedNode){
         return null;
-    } else if (currSelectedNodeId.slice(0,13) === 'relationship:'){
+    } else if (selectedNode.id.slice(0,13) === 'relationship:'){
         return <RelationshipBody {...props} selectedNode={selectedNode} onClose={unselectNode} />;
     } else {
         return <IndividualBody {...props} selectedNode={selectedNode} onClose={unselectNode} />;

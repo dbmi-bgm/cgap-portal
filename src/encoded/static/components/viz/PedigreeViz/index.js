@@ -1,24 +1,20 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import ReactDOM from 'react-dom';
 import PropTypes from 'prop-types';
 import memoize from 'memoize-one';
 import { path as d3Path } from 'd3-path';
-import {
-    standardizeObjectsInList, findNodeWithId,
-    createObjectGraph, createRelationships, getRelationships
-} from './data-utilities';
-import { assignTreeHeightIndices, orderObjectGraph, positionObjectGraph } from './layout-utilities';
-import {
-    getGraphHeight, getGraphWidth,
-    createEdges, relationshipTopPosition,
-    graphToDiseaseIndices, orderNodesBottomRightToTopLeft
-} from './layout-utilities-drawing';
-import { IndividualsLayer, doesAncestorHaveId } from './IndividualsLayer';
+/** @todo Pull this out into here if making a lib */
+import { requestAnimationFrame as raf, cancelAnimationFrame } from '@hms-dbmi-bgm/shared-portal-components/es/components/viz/utilities';
+import { isRelationship } from './data-utilities';
+import { graphToDiseaseIndices, orderNodesBottomRightToTopLeft } from './layout-utilities-drawing';
+import { GraphTransformer, buildGraphData, POSITION_DEFAULTS } from './GraphTransformer';
+import { ScaleController, ScaleControls, scaledStyle } from './ScaleController';
+import { SelectedNodeController } from './SelectedNodeController';
+import { IndividualsLayer } from './IndividualsLayer';
 import { IndividualNodeShapeLayer } from './IndividualNodeShapeLayer';
+import { RelationshipNodeShapeLayer } from './RelationshipNodeShapeLayer';
 import { EdgesLayer } from './EdgesLayer';
 import { DefaultDetailPaneComponent } from './DefaultDetailPaneComponent';
-
-
 
 /**
  * @typedef DatasetEntry
@@ -45,23 +41,217 @@ import { DefaultDetailPaneComponent } from './DefaultDetailPaneComponent';
  * @prop {!string} [mother]             Mother of Individual in form of ID. Gets merged into 'parents'.
  */
 
-/**
- * Default values for `props.dimensionOpts`
- */
-const POSITION_DEFAULTS = {
-    individualWidth: 80,
-    individualXSpacing: 80, // THIS MUST BE EQUAL TO OR MULTIPLE OF INDIVIDUAL WIDTH FOR TIME BEING
-    individualHeight: 80,
-    individualYSpacing: 180,
-    graphPadding: 60,
-    relationshipSize: 40,
-    edgeLedge: 40,
-    edgeCornerDiameter: 20
+const pedigreeVizPropTypes = {
+    dataset: PropTypes.arrayOf(PropTypes.exact({
+        'id'                : PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+        'name'              : PropTypes.string,
+        'gender'            : PropTypes.oneOf(["m", "M", "male", "f", "F", "female", "u", "U", "undetermined"]).isRequired,
+        'age'               : PropTypes.number,
+        'diseases'          : PropTypes.arrayOf(PropTypes.string),
+        'carrierOfDiseases' : PropTypes.arrayOf(PropTypes.string),
+        'asymptoticDiseases': PropTypes.arrayOf(PropTypes.string),
+        'isProband'         : PropTypes.bool,
+        'isDeceased'        : PropTypes.bool,
+        'isConsultand'      : PropTypes.bool,
+        'isPregnancy'       : PropTypes.bool,
+        'isStillBirth'      : PropTypes.bool,
+        'isSpontaneousAbortion' : PropTypes.bool,
+        'isTerminatedPregnancy' : PropTypes.bool,
+        'isEctopic'         : PropTypes.bool,
+        'data'              : PropTypes.object,
+        'parents'           : PropTypes.arrayOf(PropTypes.oneOfType([ PropTypes.string, PropTypes.number ])),
+        'children'          : PropTypes.arrayOf(PropTypes.oneOfType([ PropTypes.string, PropTypes.number ])),
+        'mother'            : PropTypes.oneOfType([ PropTypes.string, PropTypes.number ]),
+        'father'            : PropTypes.oneOfType([ PropTypes.string, PropTypes.number ]),
+    })),
+    dimensionOpts: PropTypes.objectOf(PropTypes.number),
+    height: PropTypes.number,
+    width: PropTypes.number,
+    editable: PropTypes.bool,
+    onNodeSelected: PropTypes.func,
+    renderDetailPane: PropTypes.func,
+    filterUnrelatedIndividuals: PropTypes.bool
+};
+
+const pedigreeVizDefaultProps = {
+    /** @type {DatasetEntry[]} dataset - Dataset to be visualized. */
+    "dataset" : [
+        {
+            id: 1,
+            name: "Jack",
+            isProband: true,
+            father: 2,
+            mother: 3,
+            gender: "m",
+            data: {
+                "notes" : "Likes cheeseburger and other sandwiches. Dislikes things that aren't those things.",
+                "description" : "Too many calories in the diet."
+            },
+            age: 42,
+            diseases: ["Badfeelingitis", "Ubercrampus", "Blue Thumb Syndrome"],
+            carrierOfDiseases: ["Green Thumbitis", "BlueClues", "BlueClues2", "BluesClues3"],
+            //asymptoticDiseases: ["Green Thumbitis", "BlueClues", "BlueClues2", "BluesClues3"]
+        },
+        { id: 2, name: "Joe", gender: "m" },
+        { id: 3, name: "Mary", gender: "f", diseases: ["Blue Thumb Syndrome", "Green Thumbitis"] },
+        { id: 4, name: "George", gender: "m", parents: [2,3], age: 45, carrierOfDiseases: ["Blue Thumb Syndrome"], },
+        { id: 19, name: "George II", gender: "m", parents: [2,3], age: 46, carrierOfDiseases: ["Blue Thumb Syndrome"], },
+        { id: 5, name: "Patricia", gender: "f", parents: [3, 6], diseases: ["Badfeelingitis", "Ubercrampus", "Blue Thumb Syndrome"] },
+        {
+            id: 6, name: "Patrick", gender: "m", children: [5],
+            carrierOfDiseases: ["Blue Thumb Syndrome", "Ubercrampus"]
+        },
+        {
+            id: 7, name: "Phillip", gender: "m", children: [6],
+            carrierOfDiseases: ["Blue Thumb Syndrome", "Ubercrampus", "Green Thumbitis", "Badfeelingitis", "BlueClues", "BlueClues2", "BlueClues3"]
+        },
+        { id: 8, name: "Phillipina", gender: "f", children: [6] },
+        { id: 9, name: "Josephina", gender: "f", children: [2] },
+        { id: 10, name: "Joseph", gender: "m", children: [2] },
+        {
+            id: 11, name: "Max", gender: "m", parents: [],
+            asymptoticDiseases: ["Green Thumbitis", "BlueClues", "BlueClues2", "BluesClues3"]
+        },
+        { id: 12, name: "Winnie the Pooh", gender: "u", parents: [11, 5], isDeceased: true, age: 24 },
+        {
+            id: 13, name: "Rutherford", gender: "m", parents: [10, 5], age: 0.3,
+            isPregnancy: true, isDeceased: true, isTerminatedPregnancy: true,
+            diseases: ["Ubercrampus", "Blue Thumb Syndrome", "Green Thumbitis"],
+            carrierOfDiseases: ["BlueClues", "BlueClues2", "BluesClues3"]
+        },
+        { id: 14, name: "Sally", gender: "f", parents: [12, 9] },
+        { id: 15, name: "Sally2", gender: "f" },
+        { id: 16, name: "Silly", gender: "m", parents: [15, 12] },
+        { id: 17, name: "Silly2", gender: "m", parents: [15, 12] },
+        { id: 18, name: "Silly3", gender: "f", parents: [16, 14] },
+    ],
+
+    /** If true, will filter out and not display individuals who are detached from proband. */
+    "filterUnrelatedIndividuals" : false,
+
+    /**
+     * Dimensions for drawing/layout of nodes.
+     * Shouldn't need to change these.
+     * May define some or all or no dimensions (defaults will be applied).
+     *
+     * @required
+     */
+    "dimensionOpts" : Object.assign({}, POSITION_DEFAULTS),
+
+    /**
+     * Height of parent container.
+     * If not defined, visualization will be unbounded and extend as
+     * tall as needed instead of being vertically scrollable.
+     * Depending on UX/context, this is likely desirable.
+     *
+     * @optional
+     */
+    //"height" : null,
+
+    /**
+     * Minimum height of parent container,
+     * if height is not set and want container to
+     * be at least a certain height.
+     *
+     * @optional
+     */
+    "minimumHeight" : 400,
+
+    /**
+     * Width of parent container.
+     * Will be scrollable left/right if greater than this.
+     *
+     * @required
+     */
+    //"width" : 600,
+
+    /**
+     * NOT YET SUPPORTED.
+     * If true (unsupported yet), will be able to modify and add/remove nodes.
+     */
+    "editable" : false,
+
+    /**
+     * Callback function called upon changing of selectedNode.
+     *
+     * @optional
+     */
+    "onNodeSelected" : function(node){
+        console.log('Selected', node);
+    },
+
+    /**
+     * A function which returns a React Component.
+     * Will be instantiated/rendered at side of visualization.
+     *
+     * @type {function}
+     */
+    "renderDetailPane" : function(vizProps){
+        return <DefaultDetailPaneComponent {...vizProps} />;
+    },
+
+
+    /**
+     * Can supply an array of strings to color only those diseases.
+     * If null, then _all_ diseases will be colored.
+     *
+     * @type {!string[]}
+     */
+    "visibleDiseases": null,
+
+
+    /**
+     * If true, will show markers such as "II - 1", "IV - 2", etc. based on generation & order.
+     * Else will use `individual.name` or `individual.id` (if no name).
+     *
+     * @type {boolean}
+     */
+    "showOrderBasedName" : true,
+
+    /**
+     * Initial zoom/scale.
+     * Will be overriden if `zoomToExtentsOnMount` is true,
+     * after mount.
+     *
+     * @type {number}
+     */
+    "initialScale" : 1,
+
+    /**
+     * If true, will zoom out the graph (if needed)
+     * to fit into viewport. Will only fit to dimensions
+     * passed in, e.g. `props.height` & `props.width`.
+     *
+     * @type {boolean}
+     */
+    "zoomToExtentsOnMount" : true,
+
+
+    /**
+     * If when detail pane is open it reduces width or height
+     * of the container/viewport, can add the amount removed
+     * here to be used in re-setting `minScale` when pane is
+     * open.
+     */
+    "detailPaneOpenOffsetWidth" : 0,
+    "detailPaneOpenOffsetHeight" : 0,
+
+
+    /** Whether to allow to zoom w. mousewheel. Experimental. */
+    "enableMouseWheelZoom" : false,
+
+
+    /** Whether to allow to zoom w. mousewheel. Experimental. */
+    "enablePinchZoom" : true
 };
 
 /**
  * Primary component to feed data into.
+ * May opt to pull out and separately use `GraphTransformer` or `buildGraphData` and then render out
+ * `PedigreeVizView` with its resulting data. This might be useful when want to use data from resulting
+ * `objectGraph`, such as generation identifiers.
  *
+ * @export
  * @see https://s3-us-west-2.amazonaws.com/utsw-patientcare-web-production/documents/pedigree.pdf
  * @todo Many things, including
  *  - Texts (and containing rect) for markers such as stillBirth, age, ECT, age deceased, pregnancy info, etc.
@@ -72,498 +262,521 @@ const POSITION_DEFAULTS = {
  *       - Maybe add to side if something already in center (?)
  *  - Twins of different specificites (requires additions to bounding box calculations, edge segments, etc.)
  */
-export class PedigreeViz extends React.PureComponent {
+function PedigreeViz(props){
+    const { dataset, dimensionOpts, filterUnrelatedIndividuals, ...viewProps } = props;
+    return (
+        <GraphTransformer {...{ dataset, dimensionOpts, filterUnrelatedIndividuals }}>
+            <PedigreeVizView {...viewProps} />
+        </GraphTransformer>
+    );
+}
+PedigreeViz.propTypes = pedigreeVizPropTypes;
+PedigreeViz.defaultProps = pedigreeVizDefaultProps;
 
-    static propTypes = {
-        dataset: PropTypes.arrayOf(PropTypes.exact({
-            'id'                : PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
-            'name'              : PropTypes.string,
-            'gender'            : PropTypes.oneOf(["m", "M", "male", "f", "F", "female", "u", "U", "undetermined"]).isRequired,
-            'age'               : PropTypes.number,
-            'diseases'          : PropTypes.arrayOf(PropTypes.string),
-            'carrierOfDiseases' : PropTypes.arrayOf(PropTypes.string),
-            'asymptoticDiseases': PropTypes.arrayOf(PropTypes.string),
-            'isProband'         : PropTypes.bool,
-            'isDeceased'        : PropTypes.bool,
-            'isConsultand'      : PropTypes.bool,
-            'isPregnancy'       : PropTypes.bool,
-            'isStillBirth'      : PropTypes.bool,
-            'isSpontaneousAbortion' : PropTypes.bool,
-            'isTerminatedPregnancy' : PropTypes.bool,
-            'isEctopic'         : PropTypes.bool,
-            'data'              : PropTypes.object,
-            'parents'           : PropTypes.arrayOf(PropTypes.oneOfType([ PropTypes.string, PropTypes.number ])),
-            'children'          : PropTypes.arrayOf(PropTypes.oneOfType([ PropTypes.string, PropTypes.number ])),
-            'mother'            : PropTypes.oneOfType([ PropTypes.string, PropTypes.number ]),
-            'father'            : PropTypes.oneOfType([ PropTypes.string, PropTypes.number ]),
-        })),
-        dimensionOpts: PropTypes.objectOf(PropTypes.number),
-        height: PropTypes.number,
-        width: PropTypes.number,
-        editable: PropTypes.bool,
-        onNodeSelect: PropTypes.func,
-        overlaysContainer: PropTypes.element,
-        //detailPaneComponent: PropTypes.elementType,
-        renderDetailPane: PropTypes.func
+
+/**
+ * @export
+ * @todo
+ * - Possibly move selected node state up into here.
+ * - Eventually create new "EditingController" component
+ *   and wrap 1 of these components.
+ * - Define propTypes.
+ */
+function PedigreeVizView(props){
+    const {
+        objectGraph, onNodeSelected, onDataChanged,
+        zoomToExtentsOnMount, initialScale,
+        enableMouseWheelZoom, enablePinchZoom,
+        graphWidth, graphHeight,
+        height, width, minimumHeight,
+        detailPaneOpenOffsetWidth,
+        detailPaneOpenOffsetHeight,
+        ...passProps
+    } = props;
+
+    // May be overriden in `DetailPaneOffsetContainerSize`
+    const containerHeight = height || Math.max(minimumHeight, graphHeight);
+    const containerWidth = width || undefined;
+
+    const scaleProps = {
+        zoomToExtentsOnMount, initialScale, enableMouseWheelZoom, enablePinchZoom,
+        graphWidth, graphHeight
     };
 
-    static defaultProps = {
-        /** @type {DatasetEntry[]} dataset - Dataset to be visualized. */
-        "dataset" : [
-            {
-                id: 1,
-                name: "Jack",
-                isProband: true,
-                father: 2,
-                mother: 3,
-                gender: "m",
-                data: {
-                    "notes" : "Likes cheeseburger and other sandwiches. Dislikes things that aren't those things.",
-                    "description" : "Too many calories in the diet."
-                },
-                age: 42,
-                diseases: ["Badfeelingitis", "Ubercrampus", "Blue Thumb Syndrome"],
-                carrierOfDiseases: ["Green Thumbitis", "BlueClues", "BlueClues2", "BluesClues3"],
-                //asymptoticDiseases: ["Green Thumbitis", "BlueClues", "BlueClues2", "BluesClues3"]
-            },
-            { id: 2, name: "Joe", gender: "m" },
-            { id: 3, name: "Mary", gender: "f", diseases: ["Blue Thumb Syndrome", "Green Thumbitis"] },
-            { id: 4, name: "George", gender: "m", parents: [2,3], age: 45, carrierOfDiseases: ["Blue Thumb Syndrome"], },
-            { id: 19, name: "George II", gender: "m", parents: [2,3], age: 46, carrierOfDiseases: ["Blue Thumb Syndrome"], },
-            { id: 5, name: "Patricia", gender: "f", parents: [3, 6], diseases: ["Badfeelingitis", "Ubercrampus", "Blue Thumb Syndrome"] },
-            {
-                id: 6, name: "Patrick", gender: "m", children: [5],
-                carrierOfDiseases: ["Blue Thumb Syndrome", "Ubercrampus"]
-            },
-            {
-                id: 7, name: "Phillip", gender: "m", children: [6],
-                carrierOfDiseases: ["Blue Thumb Syndrome", "Ubercrampus", "Green Thumbitis", "Badfeelingitis", "BlueClues", "BlueClues2", "BlueClues3"]
-            },
-            { id: 8, name: "Phillipina", gender: "f", children: [6] },
-            { id: 9, name: "Josephina", gender: "f", children: [2] },
-            { id: 10, name: "Joseph", gender: "m", children: [2] },
-            {
-                id: 11, name: "Max", gender: "m", parents: [],
-                asymptoticDiseases: ["Green Thumbitis", "BlueClues", "BlueClues2", "BluesClues3"]
-            },
-            { id: 12, name: "Winnie the Pooh", gender: "u", parents: [11, 5], isDeceased: true, age: 24 },
-            {
-                id: 13, name: "Rutherford", gender: "m", parents: [10, 5], age: 0.3,
-                isPregnancy: true, isDeceased: true, isTerminatedPregnancy: true,
-                diseases: ["Ubercrampus", "Blue Thumb Syndrome", "Green Thumbitis"],
-                carrierOfDiseases: ["BlueClues", "BlueClues2", "BluesClues3"]
-            },
-            { id: 14, name: "Sally", gender: "f", parents: [12, 9] },
-            { id: 15, name: "Sally2", gender: "f" },
-            { id: 16, name: "Silly", gender: "m", parents: [15, 12] },
-            { id: 17, name: "Silly2", gender: "m", parents: [15, 12] },
-            { id: 18, name: "Silly3", gender: "f", parents: [16, 14] },
-        ],
-
-        /**
-         * Dimensions for drawing/layout of nodes.
-         * Shouldn't need to change these.
-         * May define some or all or no dimensions (defaults will be applied).
-         *
-         * @required
-         */
-        "dimensionOpts" : Object.assign({}, POSITION_DEFAULTS),
-
-        /**
-         * Height of parent container.
-         * If not defined, visualization will be unbounded and extend as
-         * tall as needed instead of being vertically scrollable.
-         * Depending on UX/context, this is likely desirable.
-         *
-         * @optional
-         */
-        //"height" : null,
-
-        /**
-         * Minimum height of parent container,
-         * if height is not set and want container to
-         * be at least a certain height.
-         *
-         * @optional
-         */
-        "minimumHeight" : 400,
-
-        /**
-         * Width of parent container.
-         * Will be scrollable left/right if greater than this.
-         *
-         * @required
-         */
-        //"width" : 600,
-
-        /**
-         * NOT YET SUPPORTED.
-         * If true (unsupported yet), will be able to modify and add/remove nodes.
-         */
-        "editable" : false,
-
-        /**
-         * Callback function called upon changing of selectedNode.
-         *
-         * @optional
-         */
-        "onNodeSelect" : function(node){
-            console.log('Selected', node);
-        },
-
-        /**
-         * A function which returns a React Component.
-         * Will be instantiated/rendered at side of visualization.
-         *
-         * @type {function}
-         */
-        "renderDetailPane" : function(vizProps){
-            return <DefaultDetailPaneComponent {...vizProps} />;
-        },
-
-
-        /**
-         * Can supply an array of strings to color only those diseases.
-         * If null, then _all_ diseases will be colored.
-         *
-         * @type {!string[]}
-         */
-        "visibleDiseases": null,
-
-        /**
-         * If true, will show markers such as "II - 1", "IV - 2", etc. based on generation & order.
-         * Else will use `individual.name` or `individual.id` (if no name).
-         *
-         * @type {boolean}
-         */
-        "showOrderBasedName" : true,
-
-        /**
-         * In progress. Define zoom level.
-         *
-         * @type {number}
-         * @todo - refine zooming & boundaries, controls (not mousewheel, maybe keyboard UI component), etc.
-         */
-        "scale" : 1
+    const pedigreeViewProps = {
+        ...passProps, objectGraph,
+        graphWidth, graphHeight,
+        innerHeight: height
     };
 
-    static initState(dataset){
-        const jsonList = dataset ? standardizeObjectsInList(dataset) : null;
-        const history = jsonList? [jsonList] : [];
-        return {
-            // New individuals created in viz will be added to here.
-            // If none, use a default trio set?
-            history,
-            'timesChanged' : 0,
-            'currCounter' : history.length - 1
-        };
-    }
-
-    constructor(props){
-        super(props);
-        this.state = PedigreeViz.initState(props.dataset);
-    }
-
-    componentDidUpdate(pastProps, pastState){
-        const { dataset } = this.props;
-        if (dataset !== pastProps.dataset){
-            this.setState(PedigreeViz.initState(dataset));
-        }
-        /*
-        if (stateDataset !== pastState.dataset){
-            this.setState(function({ timesChanged, history: pastHistory }){
-                const history = pastHistory.slice();
-                return { 'timesChanged' : timesChanged + 1 };
-            });
-        }
-        */
-    }
-
-    componentWillUnmount(){
-        // TODO: if state.jsonList has changed, ask to save before exiting.
-    }
-
-    render(){
-        const { dataset, ...passProps } = this.props;
-        const { history, currCounter } = this.state;
-        const jsonList = history[currCounter];
-        return (
-            <GraphTransformer jsonList={jsonList} {...passProps} />
-        );
-    }
-
-}
-
-
-function isMobileSize(windowWidth){
-    if ((windowWidth || window.innerWidth) < 800){
-        return true;
-    }
-    return false;
-}
-
-function getFullDims(dimensionOpts){
-    return Object.assign(
-        {},
-        POSITION_DEFAULTS,
-        dimensionOpts,
-        {
-            graphPadding : Math.max(
-                dimensionOpts.graphPadding || POSITION_DEFAULTS.graphPadding,
-                dimensionOpts.individualXSpacing || POSITION_DEFAULTS.individualXSpacing,
-                dimensionOpts.individualYSpacing || POSITION_DEFAULTS.individualYSpacing
-            )
-        }
+    /**
+     * `SelectedNodeController` provides & passes down:
+     *   `selectedNode`, `hoveredNode`, `onNodeSelect`, `onNodeUnselect`, `onNodeMouseIn`, ...
+     *
+     * `DetailPaneOffsetContainerSize` provides & passes down:
+     *   `containerWidth` & `containerHeight` (adjusted)
+     *
+     * `ScaleController` provides & passes down:
+     *   `scale`, `minScale`, `maxScale`, `setScale`, `onMount`, `onUnmount`
+     */
+    return (
+        <SelectedNodeController {...{ onNodeSelected, onDataChanged, objectGraph }}>
+            <DetailPaneOffsetContainerSize {...{ containerWidth, containerHeight, detailPaneOpenOffsetWidth, detailPaneOpenOffsetHeight }}>
+                <ScaleController {...scaleProps}>
+                    <PedigreeVizViewUserInterface {...pedigreeViewProps} />
+                </ScaleController>
+            </DetailPaneOffsetContainerSize>
+        </SelectedNodeController>
     );
 }
 
-
-class GraphTransformer extends React.PureComponent {
-
-    constructor(props){
-        super(props);
-        // Funcs for which we don't expect result to change unless props.jsonList does.
-        this.memoized = {
-            createObjectGraph       : memoize(createObjectGraph),
-            createRelationships     : memoize(createRelationships),
-            assignTreeHeightIndices : memoize(assignTreeHeightIndices),
-            orderObjectGraph        : memoize(orderObjectGraph),
-            positionObjectGraph     : memoize(positionObjectGraph),
-            getGraphHeight          : memoize(getGraphHeight),
-            getGraphWidth           : memoize(getGraphWidth),
-            createEdges             : memoize(createEdges),
-            findNodeWithId          : memoize(findNodeWithId),
-            getFullDims             : memoize(getFullDims),
-            getRelationships        : memoize(getRelationships),
-            orderNodesBottomRightToTopLeft : memoize(orderNodesBottomRightToTopLeft),
-            graphToDiseaseIndices   : memoize(graphToDiseaseIndices)
-        };
-    }
-
-    render(){
-        const { jsonList, children, dimensionOpts, filterUnrelatedIndividuals, ...passProps } = this.props;
-        const { objectGraph, disconnectedIndividuals } = this.memoized.createObjectGraph(jsonList, filterUnrelatedIndividuals);
-        const relationships = this.memoized.createRelationships(objectGraph);
-        this.memoized.assignTreeHeightIndices(objectGraph);
-        const order = this.memoized.orderObjectGraph(objectGraph, relationships, this.memoized);
-        const dims = this.memoized.getFullDims(dimensionOpts);
-        this.memoized.positionObjectGraph(objectGraph, order, dims);
-        const graphHeight = this.memoized.getGraphHeight(order.orderByHeightIndex, dims);
-        const edges = this.memoized.createEdges(objectGraph, dims, graphHeight);
-        console.log('TTT2', objectGraph, relationships, edges);
-
-        const viewProps = {
-            ...passProps,
-            objectGraph, relationships, dims, order, edges,
-            disconnectedIndividuals, filterUnrelatedIndividuals,
-            memoized: this.memoized
-        };
-
-        if (children){
-            return React.Children.map(children, (child) => React.cloneElement(child, viewProps));
-        } else {
-            return <PedigreeVizView {...viewProps} memoized={this.memoized} />;
+const DetailPaneOffsetContainerSize = React.memo(function DetailPaneOffsetContainerSize(props){
+    const {
+        children,
+        selectedNode,
+        containerWidth: propContainerWidth,
+        containerHeight: propContainerHeight,
+        detailPaneOpenOffsetWidth,
+        detailPaneOpenOffsetHeight,
+        ...passProps
+    } = props;
+    let containerHeight = propContainerHeight;
+    let containerWidth = propContainerWidth;
+    if (selectedNode){
+        if (typeof detailPaneOpenOffsetHeight === "number" && typeof containerHeight === "number"){
+            containerHeight -= detailPaneOpenOffsetHeight;
         }
-    }
-}
-
-
-export class PedigreeVizView extends React.PureComponent {
-
-    static defaultProps = {
-        'width': 600,
-        "scale" : 1
-    };
-
-    constructor(props){
-        super(props);
-        this.handleNodeMouseIn = this.handleNodeMouseIn.bind(this);
-        this.handleNodeMouseLeave = this.handleNodeMouseLeave.bind(this);
-        this.handleNodeClick = this.handleNodeClick.bind(this);
-        this.handleUnselectNode = this.handleUnselectNode.bind(this);
-        this.handleContainerClick = this.handleContainerClick.bind(this);
-        this.state = {
-            'currHoverNodeId' : null,
-            'currSelectedNodeId' :  null
-        };
-    }
-
-    componentDidUpdate(pastProps){
-        const { objectGraph, memoized } = this.props;
-        if (objectGraph !== pastProps.objectGraph){
-            this.setState(function({ currSelectedNodeId }){
-                const retState = { currHoverNodeId: null };
-                const selectedNode = currSelectedNodeId && memoized.findNodeWithId(objectGraph, currSelectedNodeId);
-                if (!selectedNode){
-                    retState.currSelectedNodeId = null;
-                }
-                return retState;
-            });
+        if (typeof detailPaneOpenOffsetWidth === "number" && typeof containerWidth === "number"){
+            containerWidth -= detailPaneOpenOffsetWidth;
         }
     }
 
-    handleNodeMouseIn(id){
-        const { windowWidth = null } = this.props;
-        if (isMobileSize(windowWidth)){
-            // Prevent hover interaction handling on mobile sizes for perf/safety.
-            return false;
-        }
-        if (!id) {
-            return;
-        }
-        this.setState({ 'currHoverNodeId' : id });
-    }
+    const childProps = { ...passProps, selectedNode, containerWidth, containerHeight };
 
-    handleNodeMouseLeave(evt){
-        const { currHoverNodeId = null } = this.state;
-        if (!currHoverNodeId){
-            return false;
-        }
-        //console.log('out', evt.currentTarget, evt.target, evt.relatedTarget);
-        this.setState({ 'currHoverNodeId' : null });
-    }
+    return React.Children.map(children, function(child){
+        return React.cloneElement(child, childProps);
+    });
 
-    handleNodeClick(id){
-        if (!id){
-            return false;
-        }
-        this.setState(function({ currSelectedNodeId }){
-            if (currSelectedNodeId === id){
-                return null;
-            }
-            return {
-                'currSelectedNodeId' : id,
-                // For mobile
-                'currHoverNodeId' : id
-            };
-        }, ()=>{
-            const { onNodeSelect, memoized, objectGraph } = this.props;
-            const { currSelectedNodeId } = this.state;
-            if (typeof onNodeSelect === 'function'){
-                const currSelectedNode = currSelectedNodeId && memoized.findNodeWithId(objectGraph, currSelectedNodeId);
-                onNodeSelect(currSelectedNode);
-            }
-        });
-    }
+});
 
-    handleUnselectNode(){
-        this.setState({ 'currSelectedNodeId' : null }, ()=>{
-            const { onNodeSelect, memoized, objectGraph } = this.props;
-            const { currSelectedNodeId } = this.state;
-            if (typeof onNodeSelect === 'function'){
-                // Should always eval to null but keep remainder of logic in case state.currSelectedNodeId changes interim.
-                const currSelectedNode = currSelectedNodeId && memoized.findNodeWithId(objectGraph, currSelectedNodeId);
-                onNodeSelect(currSelectedNode);
-            }
-        });
-    }
+class PedigreeVizViewUserInterface extends React.PureComponent {
 
-    handleContainerClick(evt){
-        this.handleUnselectNode();
-    }
-
-    render(){
-        const {
-            width: containerWidth,
-            height: propHeight,
-            minimumHeight,
-            objectGraph, dims, order, memoized,
-            overlaysContainer, renderDetailPane, containerStyle,
-            visibleDiseases = null,
-            scale = 1,
-            ...passProps
-        } = this.props;
-        const { currSelectedNodeId } = this.state;
-
+    static diseaseToIndex(visibleDiseases, objectGraph){
         let diseaseToIndex;
         if (Array.isArray(visibleDiseases)){
             diseaseToIndex = {};
             visibleDiseases.forEach(function(disease, index){
                 diseaseToIndex[disease] = index + 1;
             });
+            return diseaseToIndex;
         } else {
-            diseaseToIndex = memoized.graphToDiseaseIndices(objectGraph);
+            return graphToDiseaseIndices(objectGraph);
+        }
+    }
+
+    static visAreaTransform(scaledVizStyle, containerHeight, containerWidth){
+        const hasExtraHeight = containerHeight >= scaledVizStyle.height;
+        const hasExtraWidth = (typeof containerWidth === "number" && containerWidth >= scaledVizStyle.width);
+        const x = hasExtraWidth ? (containerWidth - scaledVizStyle.width) / 2 : 0;
+        const y = hasExtraHeight ? (containerHeight - scaledVizStyle.height) / 2 : 0;
+        return `translate3d(${x}px, ${y}px, 0) ` + scaledVizStyle.transform;
+    }
+
+    static maxHeightIndex(objectGraph){
+        return objectGraph.reduce(function(m, node){
+            const { _drawing: { heightIndex = 0 } } = node;
+            return Math.max(m, heightIndex);
+        }, 0);
+    }
+
+    static defaultProps = {
+        'width': 600,
+        "scale" : 1,
+        "visibleDiseases": null,
+        "onDimensionsChanged" : function(width, height){
+            console.log("DIMENSIONS CHANGED (default handler)", "WIDTH", width, "HEIGHT", height);
+        },
+        "onMount": function(innerContainerDOMElement){
+            console.log("MOUNTED", innerContainerDOMElement);
+        },
+        "onWillUnmount": function(innerContainerDOMElement){
+            console.log("WILL UNMOUNT", innerContainerDOMElement);
+        }
+    };
+
+    static initialMouseMoveState = {
+        initMouseX: null,
+        initMouseY: null,
+        initScrollLeft: null,
+        initScrollTop: null,
+        vectorX: null,
+        vectorY: null,
+        nextAnimationFrame: null
+    };
+
+    constructor(props){
+        super(props);
+        this.handleDimensionOrScaleChanged = this.handleDimensionOrScaleChanged.bind(this);
+        this.handleContainerMouseDown = this.handleContainerMouseDown.bind(this);
+        this.handleContainerMouseMove = this.handleContainerMouseMove.bind(this);
+        this.handleMouseUp = this.handleMouseUp.bind(this);
+        this.handleMouseLeave = this.handleMouseLeave.bind(this);
+        this.state = {
+            'isMouseDownOnContainer' : true,
+            'mounted' : false
+        };
+
+        this.memoized = {
+            maxHeightIndex: memoize(PedigreeVizViewUserInterface.maxHeightIndex),
+            diseaseToIndex: memoize(PedigreeVizViewUserInterface.diseaseToIndex),
+            orderNodesBottomRightToTopLeft : memoize(orderNodesBottomRightToTopLeft),
+            scaledStyle: memoize(scaledStyle),
+            visAreaTransform: memoize(PedigreeVizViewUserInterface.visAreaTransform)
+        };
+
+        this.innerRef = React.createRef();
+
+        // We should move at least ~ initMouseX (or 'isDragging')
+        // to state to allow to have "grab" vs "grabbing"
+        // mouse cursor (via className / CSS)
+        this.mouseMove = { ...PedigreeVizViewUserInterface.initialMouseMoveState };
+
+        if (typeof props.onDataChanged === "function" && props.objectGraph){
+            props.onDataChanged(props.objectGraph);
+        }
+        if (typeof props.onDimensionsChanged === "function"){
+            props.onDimensionsChanged({
+                containerWidth: props.containerWidth,
+                containerHeight: props.containerHeight,
+                graphHeight: props.graphHeight,
+                graphWidth: props.graphWidth
+            });
+        }
+    }
+
+    componentDidMount(){
+        const { onMount } = this.props;
+        const innerElem = this.innerRef.current;
+        if (typeof onMount === "function"){
+            onMount(innerElem);
+        }
+        window.addEventListener("mouseup", this.handleMouseUp);
+        document.body.addEventListener("mouseleave", this.handleMouseLeave);
+        setTimeout(()=>{
+            // Delayed so that browser has chance to render non-mounted state
+            // first. Needed for transition in on mount via CSS.
+            this.setState({ mounted: true });
+        }, 100);
+    }
+
+    componentWillUnmount(){
+        const { onWillUnmount } = this.props;
+        const innerElem = this.innerRef.current;
+        if (typeof onMount === "function"){
+            onWillUnmount(innerElem);
+        }
+        window.removeEventListener("mouseup", this.handleMouseUp);
+        document.body.removeEventListener("mouseleave", this.handleMouseLeave);
+    }
+
+    /**
+     * Grab scrollLeft snapshot if scale is changing.
+     * @todo
+     * Try to use in componentDidUpdate to update
+     * `innerElem.scrollLeft` / `scrollTop` if scale
+     * is changing in order to "center" contents
+     */
+    ///*
+    getSnapshotBeforeUpdate(prevProps, prevState){
+        const { scale: currScale } = this.props;
+        const { scale: prevScale } = prevProps;
+
+        if (currScale === prevScale) return null;
+
+        const innerElem = this.innerRef.current;
+        if (!innerElem) return null;
+
+        return {
+            scrollLeft: innerElem.scrollLeft,
+            scrollTop: innerElem.scrollTop
+        };
+    }
+    //*/
+
+    componentDidUpdate(pastProps, pastState, snapshot){
+        this.handleDimensionOrScaleChanged(pastProps, pastState, snapshot);
+    }
+
+    /**
+     * Called from `componentDidUpdate`.
+     * Pulled into own func in case we want to
+     * try to throttle or debounce it later.
+     */
+    handleDimensionOrScaleChanged(pastProps, pastState, snapshot){
+        const {
+            onDimensionsChanged,
+            containerWidth,
+            containerHeight,
+            graphHeight,
+            graphWidth,
+            scale
+        } = this.props;
+        const {
+            containerHeight: pastContainerHeight,
+            containerWidth: pastContainerWidth,
+            graphHeight: pastGraphHeight,
+            graphWidth: pastGraphWidth,
+            scale: pastScale
+        } = pastProps;
+
+        if (typeof onDimensionsChanged === "function"){
+            const didDimensionsChange = (
+                containerWidth !== pastContainerWidth || containerHeight !== pastContainerHeight ||
+                graphHeight !== pastGraphHeight || graphWidth !== pastGraphWidth
+            );
+            if (didDimensionsChange){
+                onDimensionsChanged({ containerWidth, containerHeight, graphWidth, graphHeight });
+            }
         }
 
-        const graphHeight = memoized.getGraphHeight(order.orderByHeightIndex, dims);
-        const graphWidth = memoized.getGraphWidth(objectGraph, dims);
-        const containerHeight = propHeight || Math.max(minimumHeight, graphHeight);
-        const orderedNodes = memoized.orderNodesBottomRightToTopLeft(objectGraph);
+        // Figure out center point of previous 'view' and reposition
+        // so as to scroll into/out-of center of viewport
+        const innerElem = this.innerRef.current;
+        if (snapshot && scale !== pastScale && innerElem){
+            const pastCenterV = (pastContainerHeight / 2) + snapshot.scrollTop;
+            const pastCenterVRatio = pastCenterV / (pastGraphHeight * pastScale);
+            const pastCenterH = (pastContainerWidth / 2) + snapshot.scrollLeft;
+            const pastCenterHRatio = pastCenterH / (pastGraphWidth * pastScale);
+            const nextCenterV = (graphHeight * scale) * pastCenterVRatio;
+            const nextCenterH = (graphWidth * scale) * pastCenterHRatio;
+            innerElem.scrollTo(
+                nextCenterH - (containerWidth / 2),
+                nextCenterV - (containerHeight / 2),
+            );
+        }
+    }
 
-        const useContainerStyle = {
-            //width: containerWidth,
-            height: propHeight || "auto",
-            minHeight : containerHeight,
-            ...containerStyle
-        };
+    handleContainerMouseDown(evt){
+        evt.stopPropagation();
+        evt.preventDefault();
 
-        const vizAreaStyle = {
-            'width': graphWidth * scale,
-            // Add extra to offset text @ bottom of nodes.
-            'height': (graphHeight * scale) + 60,
-            'transform' : scale !== 1 ? "scale(" + scale + ")" : null
-        };
+        // We manage rest of vars outside of React state for performance &
+        // container's `scrollLeft` & `scrollTop` are not DOM attributes &
+        // doesn't benefit much from React's diffing.
+        this.mouseMove.initMouseX = evt.pageX;
+        this.mouseMove.initMouseY = evt.pageY;
+        this.mouseMove.vectorX = 0;
+        this.mouseMove.vectorY = 0;
 
-        const commonChildProps = {
-            objectGraph: orderedNodes,
-            graphHeight, graphWidth, dims, memoized, diseaseToIndex,
-            containerHeight, containerWidth,
-            'onNodeMouseIn' : this.handleNodeMouseIn,
-            'onNodeMouseLeave' : this.handleNodeMouseLeave,
-            'onNodeClick' : this.handleNodeClick,
-            ...passProps, ...this.state
-        };
+        const innerElem = this.innerRef.current;
+        if (!innerElem) return;
+
+        this.mouseMove.initScrollLeft = innerElem.scrollLeft;
+        this.mouseMove.initScrollTop = innerElem.scrollTop;
+
+        this.setState({ isMouseDownOnContainer: true });
+    }
+
+    /**
+     * @todo
+     * Maybe add as listener on window instead so viz area remains
+     * moving when mouse goes outside boundary.
+     */
+    handleContainerMouseMove(evt){
+        if (this.mouseMove.initMouseX === null) {
+            return false;
+        }
+        const {
+            initMouseX, initMouseY,
+            initScrollLeft, initScrollTop,
+            nextAnimationFrame
+        } = this.mouseMove;
+
+        if (nextAnimationFrame){ // Throttle
+            return;
+        }
+
+        const vectorX = evt.pageX - initMouseX;
+        const vectorY = evt.pageY - initMouseY;
+
+        this.mouseMove.vectorX = vectorX;
+        this.mouseMove.vectorY = vectorY;
+
+        const innerElem = this.innerRef.current;
+
+        this.mouseMove.nextAnimationFrame = raf(() => {
+            innerElem.scrollTo(
+                Math.max(0, initScrollLeft - vectorX),
+                Math.max(0, initScrollTop - vectorY)
+            );
+            this.mouseMove.nextAnimationFrame = null;
+        });
+    }
+
+    handleMouseLeave(evt){
+        this.handleMouseUp();
+    }
+
+    handleMouseUp(evt = null){
+        if (this.mouseMove.initMouseX === null) {
+            // Mouseup didn't originate from our `.inner-container` element
+            return false;
+        }
+
+        this.setState({ isMouseDownOnContainer: false });
+
+        // Stop transitioning/panning viewport
+        const { vectorX = 0, vectorY = 0, nextAnimationFrame = null } = this.mouseMove;
+        this.mouseMove = { ...PedigreeVizViewUserInterface.initialMouseMoveState };
+        const { onSelectNode, onUnselectNode, selectedNode = null } = this.props;
+        if (nextAnimationFrame){
+            cancelAnimationFrame(nextAnimationFrame);
+        }
+
+        // Act as click off of or onto node; we will have vectorX if 'click'ed within container.
+        if (Math.abs(vectorX) <= 5 && Math.abs(vectorY) <= 5){
+            const nodeID = (evt && evt.target && evt.target.id) || null;
+            const nodeType = (evt && evt.target && evt.target.getAttribute("data-node-type")) || null;
+            if (selectedNode !== null) {
+                if (nodeID === selectedNode.id) {
+                    // Keep same node selected if (re)click on it
+                    return;
+                }
+                if (nodeID && (nodeType === "individual" || nodeType === "relationship")){
+                    // Change to new node
+                    onSelectNode(nodeID);
+                    return;
+                } // Else
+                onUnselectNode();
+                return;
+            }
+            if (selectedNode === null && nodeID && (nodeType === "individual" || nodeType === "relationship")){
+                onSelectNode(nodeID);
+            }
+        }
+    }
+
+    render(){
+        const {
+            innerHeight = "auto",
+            containerWidth = undefined,
+            containerHeight,
+            objectGraph,
+            dims, order,
+            renderDetailPane, containerStyle,
+            visibleDiseases = null,
+            scale = 1,
+            minScale, maxScale,
+            graphHeight, graphWidth,
+            setScale,
+            selectedNode,
+            hoveredNode,
+            onSelectNode,
+            onUnselectNode,
+            ...passProps
+        } = this.props;
+        const { isMouseDownOnContainer, mounted } = this.state;
+        const diseaseToIndex = this.memoized.diseaseToIndex(visibleDiseases, objectGraph);
+        const orderedNodes = this.memoized.orderNodesBottomRightToTopLeft(objectGraph);
+        const scaledVizStyle = this.memoized.scaledStyle(graphHeight, graphWidth, scale);
+        const maxHeightIndex = this.memoized.maxHeightIndex(objectGraph);
+
+
+        const outerContainerStyle = { minHeight : containerHeight, ...containerStyle };
+        const innerContainerStyle = { height: innerHeight || "auto", minHeight : containerHeight };
+
+        //const innerElemStyle = {
+        //    paddingTop: Math.max(0, (containerHeight - scaledVizStyle.height) / 2)
+        //};
 
         let selectedNodePane = null;
-
         if (typeof renderDetailPane === 'function'){
             selectedNodePane = renderDetailPane({
                 objectGraph,
-                currSelectedNodeId,
-                memoized,
+                selectedNode,
+                hoveredNode,
                 diseaseToIndex,
-                overlaysContainer,
-                'unselectNode' : this.handleUnselectNode,
-                'onNodeClick' : this.handleNodeClick,
+                'onNodeClick': onSelectNode,
+                'unselectNode' : onUnselectNode
             });
         }
+        const detailPaneHasNode = !!(selectedNodePane && selectedNode);
 
-        const cls = (
-            "pedigree-viz-container" +
-            (currSelectedNodeId ? ' node-selected' : '') +
-            (containerHeight > graphHeight ? " has-extra-height" : "")
-        );
+        const commonChildProps = {
+            ...passProps,
+            "objectGraph": orderedNodes,
+            containerWidth, containerHeight,
+            graphHeight, graphWidth, dims, scale,
+            diseaseToIndex,
+            selectedNode,
+            hoveredNode,
+            maxHeightIndex,
+            // In passProps:
+            // onNodeMouseIn,
+            // onNodeMouseLeave,
+            // Handled here for now:
+            // onNodeClick
+        };
 
-        const detailPanelCls = (
-            "detail-pane-container" +
-            (selectedNodePane && currSelectedNodeId ? ' has-selected-node' : '')
-        );
+        const hasExtraHeight = containerHeight >= scaledVizStyle.height;
+        const hasExtraWidth = (typeof containerWidth === "number" && containerWidth >= scaledVizStyle.width);
+        const isScrollable = !hasExtraHeight || !hasExtraWidth;
+
+        const visAreaStyle = {
+            transform: this.memoized.visAreaTransform(scaledVizStyle, containerHeight, containerWidth),
+            width: graphWidth,
+            height: graphHeight
+        };
 
         return (
-            <div className={cls} style={useContainerStyle}>
-                <div className="inner-container" onClick={this.handleContainerClick}>
-                    <div className="viz-area" style={vizAreaStyle}>
+            <div className="pedigree-viz-container" style={outerContainerStyle} data-selected-node={selectedNode && selectedNode.id}>
+                <div className="inner-container" ref={this.innerRef} style={innerContainerStyle}
+                    onMouseDown={this.handleContainerMouseDown}
+                    onMouseMove={this.handleContainerMouseMove}
+                    data-has-extra-height={hasExtraHeight}
+                    data-scrollable={isScrollable}
+                    data-mouse-down={isMouseDownOnContainer}
+                    data-is-mounted={mounted}
+                    data-is-min-scale={scale === minScale}
+                    data-is-max-scale={scale === maxScale}>
+                    <div className="viz-area" style={visAreaStyle}>
                         <ShapesLayer {...commonChildProps} />
-                        <RelationshipsLayer {...commonChildProps} />
                         <IndividualsLayer {...commonChildProps} />
                     </div>
                 </div>
-                { selectedNodePane ? <div className={detailPanelCls}>{ selectedNodePane }</div> : null }
+                { typeof setScale === "function" ?
+                    <ScaleControls {...{ scale, minScale, maxScale, setScale }} />
+                    : null }
+                { selectedNodePane ?
+                    <div className={"detail-pane-container" + (detailPaneHasNode ? " has-selected-node" : "")}>
+                        { selectedNodePane }
+                    </div>
+                    : null }
             </div>
         );
     }
 }
 
-
-
 const ShapesLayer = React.memo(function ShapesLayer(props){
-    const { graphHeight, graphWidth } = props;
+    const {
+        graphHeight, graphWidth,
+        edges, relationships,
+        selectedNode, hoveredNode,
+        onNodeMouseIn, onNodeMouseLeave,
+        dims, scale, maxHeightIndex
+    } = props;
     const svgStyle = { width: graphWidth, height: graphHeight };
+
+    // Update less frequently by rounding for better performance (less changes, caught by Memo/PureComponent)
+    const textScale = Math.floor(((0.5 / scale) + 0.5) * 5) / 5;
+    const textScaleTransformStr = "scale3d(" + textScale +"," + textScale +",1)";
+
     return (
-        <svg className="shapes-layer" viewBox={"0 0 " + graphWidth + " " + graphHeight} style={svgStyle}>
-            <EdgesLayer {...props} />
-            <SelectedNodeIdentifier {...props} />
-            <IndividualNodeShapeLayer {...props} />
+        <svg className="pedigree-viz-shapes-layer shapes-layer" viewBox={"0 0 " + graphWidth + " " + graphHeight} style={svgStyle}>
+            <EdgesLayer {...{ edges, dims }} />
+            <SelectedNodeIdentifier {...{ selectedNode, dims, textScale }} />
+            <RelationshipNodeShapeLayer {...{ relationships, hoveredNode, onNodeMouseIn, onNodeMouseLeave, dims, textScale, textScaleTransformStr }} />
+            <IndividualNodeShapeLayer {...props} {...{ textScale, textScaleTransformStr, maxHeightIndex }} />
         </svg>
     );
 });
@@ -576,29 +789,30 @@ const ShapesLayer = React.memo(function ShapesLayer(props){
  * **BUT** Using CSS transition for SVG transform is part of newer spec so browsers should ideally
  * support it, can likely just wait for (more) browsers to implement?
  */
-const SelectedNodeIdentifier = React.memo(function SelectedNodeIdentifier(props){
-    const { memoized, currSelectedNodeId, objectGraph, dims } = props;
-    const selectedNode = currSelectedNodeId && memoized.findNodeWithId(objectGraph, currSelectedNodeId);
+const SelectedNodeIdentifier = React.memo(function SelectedNodeIdentifier({ selectedNode, dims, textScale }){
     if (!selectedNode){
         return null;
     }
-    const { id, _drawing: { xCoord, yCoord } } = selectedNode;
+    const { _drawing: { xCoord, yCoord } } = selectedNode;
 
     let useHeight = dims.individualHeight;
     let useWidth = dims.individualWidth;
 
-    if (id.slice(0,13) === "relationship:"){ // Is relationship node.
+    if (isRelationship(selectedNode)){
         useHeight = dims.relationshipSize;
         useWidth = dims.relationshipSize;
     }
 
-    const topLeftX = dims.graphPadding + xCoord - (useWidth / 2);
-    const topLeftY = dims.graphPadding + yCoord - (useHeight / 2);
-    const transform = "translate(" + topLeftX + ", " + topLeftY + ")";
-
+    const ourScale = ((textScale + 2) / 3);
+    const centerH = useWidth / 2;
+    const centerV = useHeight / 2;
+    const topLeftX = dims.graphPadding + xCoord - centerH;
+    const topLeftY = dims.graphPadding + yCoord - centerV;
+    const transform = "translate(" + topLeftX + ", " + topLeftY + ") scale(" + ourScale + ")";
+    const segmentLength = Math.round(ourScale * 7);
     return (
-        <g className="selected-node-identifier" transform={transform}>
-            <SelectedNodeIdentifierShape height={useHeight} width={useWidth} />
+        <g className="selected-node-identifier" transform={transform} style={{ transformOrigin: "" + centerH + "px " + centerV + "px" }}>
+            <SelectedNodeIdentifierShape height={useHeight} width={useWidth} segmentLengthX={segmentLength} segmentLengthY={segmentLength} />
         </g>
     );
 });
@@ -663,75 +877,11 @@ const SelectedNodeIdentifierShape = React.memo(function SelectedNodeIdentifierSh
 });
 
 
-
-const RelationshipsLayer = React.memo(function RelationshipsLayer(props){
-    const { relationships, ...passProps } = props;
-    const visibleRelationshipElements = relationships.map(function(relationship, idx){
-        const partnersStr = relationship.partners.map(function(p){ return p.id; }).join(',');
-        return <RelationshipNode relationship={relationship} key={partnersStr} partnersStr={partnersStr} {...passProps} />;
-    });
-    return (
-        <div className="relationships-layer">{ visibleRelationshipElements }</div>
-    );
-});
-
-
-function relationshipClassName(relationship, isSelected, isBeingHovered){
-    const classes = ["pedigree-relationship"];
-    if (isBeingHovered) {
-        classes.push('is-hovered-over');
-    }
-    if (isSelected) {
-        classes.push('is-selected');
-    }
-    return classes.join(' ');
-}
-
-
-class RelationshipNode extends React.PureComponent {
-
-    constructor(props){
-        super(props);
-        this.onMouseEnter = this.onMouseEnter.bind(this);
-        this.onClick = this.onClick.bind(this);
-        this.memoized = {
-            top: memoize(relationshipTopPosition)
-        };
-    }
-
-    onMouseEnter(evt){
-        const { onNodeMouseIn, relationship: { id } } = this.props;
-        evt.stopPropagation();
-        onNodeMouseIn(id);
-    }
-
-    onClick(evt){
-        const { onNodeClick, relationship: { id } } = this.props;
-        evt.stopPropagation();
-        onNodeClick(id);
-    }
-
-    render(){
-        const {
-            relationship, partnersStr, dims, onNodeMouseLeave,
-            currHoverNodeId, currSelectedNodeId, editable
-        } = this.props;
-        const { id, children = [], partners = [], _drawing : { xCoord, yCoord } } = relationship;
-
-        const isSelected = currSelectedNodeId === id;
-        const isHoveredOver = currHoverNodeId === id;
-
-        const elemStyle = {
-            width : dims.relationshipSize,
-            height: dims.relationshipSize,
-            top: this.memoized.top(yCoord, dims),
-            left: dims.graphPadding + xCoord - (dims.relationshipSize / 2)
-        };
-        return (
-            <div style={elemStyle} className={relationshipClassName(relationship, isSelected, isHoveredOver)}
-                data-partners={partnersStr} onMouseEnter={this.onMouseEnter} onMouseLeave={onNodeMouseLeave}
-                onClick={this.onClick}>
-            </div>
-        );
-    }
-}
+/** Exports / entry-points */
+export default PedigreeViz;
+export {
+    PedigreeVizView,
+    GraphTransformer,
+    buildGraphData as buildPedigreeGraphData,
+    isRelationship as isRelationshipNode
+};

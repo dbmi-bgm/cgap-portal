@@ -94,6 +94,8 @@ setup(
         check-rendering = encoded.commands.check_rendering:main
         extract-test-data = encoded.commands.extract_test_data:main
         es-index-data = encoded.commands.es_index_data:main
+        owl-to-items = encoded.commands.generate_items_from_owl:main
+        dis2pheno = encoded.commands.parse_hpoa:main
         load-items = encoded.commands.load_items:main
         import-data = encoded.commands.import_data:main
         export-data = encoded.commands.export_data:main
@@ -110,6 +112,7 @@ setup(
         create-mapping-on-deploy = encoded.commands.create_mapping_on_deploy:main
         update-inserts-from-server = encoded.commands.update_inserts_from_server:main
         run-upgrade-on-inserts = encoded.commands.run_upgrader_on_inserts:main
+        configure-kibana-index = encoded.commands.configure_kibana_index:main
 
         wipe-test-indices = snovault.commands.wipe_test_indices:main
 

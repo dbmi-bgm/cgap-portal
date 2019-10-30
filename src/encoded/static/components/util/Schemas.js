@@ -43,7 +43,12 @@ export const Term = {
                 return getTitleForType(term, get());
             case 'status':
                 if (allowJSXOutput){
-                    return <React.Fragment><i className="item-status-indicator-dot mr-07" data-status="released"/>{ capitalizeSentence(term) }</React.Fragment>;
+                    return (
+                        <React.Fragment>
+                            <i className="item-status-indicator-dot mr-07" data-status={term} />
+                            { capitalizeSentence(term) }
+                        </React.Fragment>
+                    );
                 }
                 return capitalizeSentence(term);
             case 'date_created':
@@ -60,7 +65,7 @@ export const Term = {
                 return term;
             case 'description':
                 if (allowJSXOutput) {
-                    return <span className="mono-text text-small">{ term }</span>;
+                    return <span className="text-monospace text-small">{ term }</span>;
                 }
                 return term;
             case 'file_type':

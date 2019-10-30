@@ -187,7 +187,7 @@
 			color: #888;
 			position: relative;
 			font-weight: 400;
-			
+
 			&[data-depth="0"] {
 				padding-top: 0;
 			}
@@ -218,7 +218,7 @@
 					margin-bottom: 7px;
 					border-bottom: 1px solid #eee;
 				}
-				
+
 				> small {
 					display: none;
 					line-height: 1rem;
@@ -232,7 +232,7 @@
 				.expand-button-container {
 					padding-top: 2px;
 				}
-				
+
 				i.icon-angle-up {
 					display: none;
 					color: #888;
@@ -303,7 +303,7 @@
 					//left: -70px;
 					//margin-left: 14%;
 					left: -36px;
-					
+
 					&:hover {
 						cursor: pointer;
 						//border-color: initial;
@@ -370,7 +370,7 @@
 }
 
 .static-page-breadcrumbs {
-	padding-top: 29px; 
+	padding-top: 29px;
 
 	&.page-has-toc {
 		@include media-breakpoint-up(xl){
@@ -461,7 +461,7 @@
 			border-top: 1px solid #eee;
 			padding-top: 15px;
 		}
-		
+
 		h6 > a {
 			font-size: 1rem;
 		}
@@ -478,14 +478,14 @@
 
 .homepage-wrapper {
 
-	.case-items {
+	.cohort-items {
 
 		overflow-y: auto;
 		min-height: 240px;
 		max-height: 360px;
 		height: 25vh;
 
-		.case-item-container {
+		.cohort-item-container {
 			padding: 8px 12px;
 			background-color: #f4f4f4;
 			border: 1px solid #eee;
@@ -537,7 +537,7 @@
 		margin-top: 15px;
 
 		.link-block {
-					
+
 			> a {
 				font-size: 14px;
 				padding: 7px 10px;
@@ -601,7 +601,7 @@
 				}
 
 			}
-			
+
 			/*
 			&:last-child {
 				border-right: 1px solid #ddd;

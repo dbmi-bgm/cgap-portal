@@ -4,8 +4,7 @@ import * as d3 from 'd3';
 
 
 export const EdgesLayer = React.memo(function EdgesLayer(props){
-    const { graphHeight, graphWidth, edges, ...passProps } = props;
-    const { dims } = passProps;
+    const { edges, dims } = props;
     const { directEdges, adjustableEdges, visibilityGraph } = edges;
     const allEdges = [].concat(directEdges).concat(adjustableEdges);
     return (
@@ -13,8 +12,8 @@ export const EdgesLayer = React.memo(function EdgesLayer(props){
             <DebugVizGraphLayer visibilityGraph={visibilityGraph} dims={dims} />
             <g className="primary-edges">
                 { allEdges.map((edge) => {
-                    const edgeId = edge.fromVertex.toString() + "-to-" + edge.toVertex.toString();
-                    return <Edge key={edgeId} id={edgeId} edge={edge} {...passProps} />;
+                    const id = edge.fromVertex.toString() + "-to-" + edge.toVertex.toString();
+                    return <Edge key={id} {...{ id, edge, dims }} />;
                 } )}
             </g>
         </g>
