@@ -107,7 +107,7 @@ export function parseFamilyIntoDataset(family){
             isSpontaneousAbortion,
             isStillBirth,
             diseases,
-            ancestry,
+            "ancestry" : ancestry.slice().sort(),
             'ageString' : showAgeString || ageNumerical,
             'age' : ageNumerical,
             'father' : fatherStr,

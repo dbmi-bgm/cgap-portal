@@ -136,6 +136,8 @@ export class IndividualNodeShape extends React.PureComponent {
 
         const height = individualHeight;
         const width = individualWidth;
+        const halfWidth = width / 2;
+        const aboveNodeTextY = (dims.individualYSpacing - dims.individualHeight) / 3;
         const shape = this.memoized.getIndividualShape(individual, height, width);
         const top = this.memoized.top(yCoord, dims);
         const left = this.memoized.left(xCoord, dims);
@@ -165,8 +167,8 @@ export class IndividualNodeShape extends React.PureComponent {
                 <UnderlayMarkers {...{ width, height, individual, shape, diseaseToIndex }} />
                 { fgShape }
                 <OverlayMarkers {...{ width, height, individual, shape, textScaleTransformStr }} />
-                <AboveNodeText {...{ width, height, individual, maxHeightIndex }} />
-                <UnderNodeText {...{ width, height, individual, shape, diseaseToIndex, dims, showOrderBasedName, textScale, textScaleTransformStr }} />
+                <AboveNodeText {...{ width, height, individual, maxHeightIndex, dims, halfWidth, aboveNodeTextY }} />
+                <UnderNodeText {...{ width, height, individual, shape, diseaseToIndex, dims, halfWidth, showOrderBasedName, textScale, textScaleTransformStr }} />
             </g>
         );
     }
@@ -263,7 +265,6 @@ const OverlayMarkers = React.memo(function OverlayMarkers(props){
         //_drawing : { xCoord, yCoord }
     } = individual;
 
-    const halfWidth = width / 2;
     const showAsDeceased = isDeceased && !(isSpontaneousAbortion && isPregnancy);
     const showAsProband = isProband;
     const showAsConsultand = !showAsProband && isConsultand;
@@ -394,7 +395,7 @@ function ColumnOfDiseases({ individual, width, height, shape, diseaseToIndex }){
 }
 
 /** @todo Implement things like age, stillBirth, isEctopic, etc. */
-function AboveNodeText({ individual, width, height, maxHeightIndex }){
+function AboveNodeText({ individual, maxHeightIndex, halfWidth, aboveNodeTextY }){
     const {
         //id, name,
         //ageString,
@@ -404,41 +405,16 @@ function AboveNodeText({ individual, width, height, maxHeightIndex }){
         ancestry = []
     } = individual;
 
-    console.log("===== Above Node Text =====");
-
     if (heightIndex !== maxHeightIndex) return null;
     if (ancestry.length === 0) return null;
 
-    console.log("maxHeightIndex", maxHeightIndex);
-
-    const halfWidth = width / 2;
-
-    /*
-    //const textYStart = 18;
-
-    const textRows = [[ ancestry, "title" ]];
-
-    const renderedTexts = textRows.map(function([ content, desc ], idx){
-        const txtProps = {
-            "y": 18 + (20 * idx),
-            "data-describing" : desc
-        };
-        if (desc === "title"){
-            txtProps.className = (txtProps.className || "") + " showing-order-based-name";
-        }
-        if (desc === "title"){
-            // Center text
-            txtProps.textAnchor = "middle";
-            txtProps.x = halfWidth;
-        }
-        return <text {...txtProps} key={desc + "-" + idx}>{ content }</text>;
-    });
-    */
+    const moreAncestryPresent = ancestry.length > 3;
+    const showAncestry = moreAncestryPresent ? ancestry.slice(0, 3) : ancestry; // Up to 3 shown.
 
     return (
-        <g className="text-box above-node" transform={"translate(0, " + (height + 4) + ")"}>
-            <text y={0} x={halfWidth} textAnchor="middle">
-                { ancestry.join(", ") }
+        <g className="text-box above-node" transform={"translate(0, -" + aboveNodeTextY + ")"}>
+            <text y={0} x={halfWidth} textAnchor="middle" data-describing="ancestry">
+                { showAncestry.join(" • ") }
             </text>
         </g>
     );
@@ -450,6 +426,7 @@ function UnderNodeText(props){
         individual,
         width = 80,
         height = 80,
+        halfWidth = 40,
         diseaseToIndex = {},
         showOrderBasedName = true,
         textScale = 1,
@@ -462,7 +439,6 @@ function UnderNodeText(props){
         diseases = [],
         orderBasedName,
     } = individual;
-    const halfWidth = width / 2;
     //const textYStart = 18;
     const showTitle = showOrderBasedName ? orderBasedName : (name || id);
 

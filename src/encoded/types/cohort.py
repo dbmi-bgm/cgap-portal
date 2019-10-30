@@ -51,6 +51,7 @@ class Cohort(Item):
         "families.members.is_infertile",
         "families.members.cause_of_infertility",
         "families.members.ethnicity",
+        "families.members.ancestry",
         "families.members.clinic_notes",
         "families.members.phenotypic_features.phenotypic_feature",
         "families.members.phenotypic_features.onset_age",

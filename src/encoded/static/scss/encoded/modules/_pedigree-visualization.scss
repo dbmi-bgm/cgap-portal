@@ -364,6 +364,7 @@ svg.pedigree-viz-shapes-layer.shapes-layer {
             }
 
             g.text-box {
+                // Could be above or below node
                 transition: transform .25s linear;
                 rect.bg-rect {
                     stroke: none;
@@ -371,9 +372,11 @@ svg.pedigree-viz-shapes-layer.shapes-layer {
                 }
                 text {
                     font-size: 0.9rem;
+                    &[data-describing="ancestry"]{
+                        font-size: 1em;
+                    }
                     &:not(.showing-order-based-name)[data-describing="title"]{
                         // Showing `name` (unique ID or similar)
-                        
                     }
                     &.showing-order-based-name[data-describing="title"]{
                         font-family: $font-family-monospace;
