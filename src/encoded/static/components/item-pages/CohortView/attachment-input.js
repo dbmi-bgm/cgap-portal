@@ -26,7 +26,7 @@ export class AttachmentInputController extends React.PureComponent {
         const file = e.target.files[0];
         this.setState({ loading: true }, ()=>{
             const attachment_props = {};
-            const { context: { uuid: case_uuid }, href, onAddedFamily } = this.props;
+            const { context: { uuid: cohort_uuid }, href, onAddedFamily } = this.props;
             const { host } = url.parse(href);
             let config_uri;
             if (host.indexOf('localhost') > -1){
@@ -45,7 +45,7 @@ export class AttachmentInputController extends React.PureComponent {
                 if (e.target.result) {
                     attachment_props.href = e.target.result;
                     ajax.promise(
-                        '/' + case_uuid + '/process-pedigree?config_uri=' + config_uri,
+                        '/' + cohort_uuid + '/process-pedigree?config_uri=' + config_uri,
                         'PATCH',
                         {},
                         JSON.stringify(attachment_props)

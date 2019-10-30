@@ -19,19 +19,19 @@ import { Schemas } from './../../util';
 
 
 
-export default class CaseSubmissionView extends React.PureComponent {
+export default class CohortSubmissionView extends React.PureComponent {
 
     constructor(props){
         super(props);
         this.handleSelectPanel = this.handleSelectPanel.bind(this);
         this.handleLoadedUser = this.handleLoadedUser.bind(this);
-        this.handleLoadedCase = this.handleLoadedCase.bind(this);
+        this.handleLoadedCohort = this.handleLoadedCohort.bind(this);
         this.handleComplete = this.handleComplete.bind(this);
         this.markCompleted = this.markCompleted.bind(this);
         this.state = {
             panelsComplete: [ false, false, false ],
             panelIdx: 0,
-            caseItem: null,
+            cohortItem: null,
             user: null
         };
     }
@@ -56,9 +56,9 @@ export default class CaseSubmissionView extends React.PureComponent {
         this.setState({ user });
     }
 
-    handleLoadedCase(caseItem){
-        if (!(caseItem && caseItem['@id'])){
-            throw new Error("Expected Case Item");
+    handleLoadedCohort(cohortItem){
+        if (!(cohortItem && cohortItem['@id'])){
+            throw new Error("Expected Cohort Item");
         }
         this.setState(function({ panelsComplete: pastPanelsComplete }){
             let panelsComplete;
@@ -68,14 +68,14 @@ export default class CaseSubmissionView extends React.PureComponent {
                 panelsComplete = pastPanelsComplete.slice(0);
                 panelsComplete[0] = true;
             }
-            return { caseItem, panelsComplete, panelIdx: 1 };
+            return { cohortItem, panelsComplete, panelIdx: 1 };
         });
     }
 
     handleComplete(e){
-        const { caseItem } = this.state;
-        const { '@id' : caseID } = caseItem || {};
-        navigate(caseID);
+        const { cohortItem } = this.state;
+        const { '@id' : cohortID } = cohortItem || {};
+        navigate(cohortID);
     }
 
     markCompleted(panelIdx, setTo = true){
@@ -92,19 +92,19 @@ export default class CaseSubmissionView extends React.PureComponent {
     }
 
     render(){
-        const { panelIdx, panelsComplete, caseItem } = this.state;
+        const { panelIdx, panelsComplete, cohortItem } = this.state;
         const userDetails = JWT.getUserDetails();
-        const { '@id' : caseID, 'display_title': caseTitle } = caseItem || {};
+        const { '@id' : cohortID, 'display_title': cohortTitle } = cohortItem || {};
 
-        let caseLink = null;
+        let cohortLink = null;
         let finishBtn = null;
-        if (caseID && caseTitle){
-            caseLink = (
+        if (cohortID && cohortTitle){
+            cohortLink = (
                 <h5 className="info-area mb-1 text-400 mt-05">
                     <em className="ml-05">Saved as &bull; </em>
-                    <a href={caseID} target="_blank" rel="noopener noreferrer"
+                    <a href={cohortID} target="_blank" rel="noopener noreferrer"
                         data-tip="Item is saved in database; further edits will modify it.">
-                        { caseTitle }
+                        { cohortTitle }
                     </a>
                     <i className="icon icon-external-link-alt fas text-smaller ml-05"/>
                 </h5>
@@ -115,7 +115,7 @@ export default class CaseSubmissionView extends React.PureComponent {
                 finishBtn = (
                     <div className="buttons-container finish-row text-right">
                         <button type="button" className="btn btn-outline-success" onClick={this.handleComplete}>
-                            Finish & View Case
+                            Finish & View Cohort
                         </button>
                     </div>
                 );
@@ -123,20 +123,20 @@ export default class CaseSubmissionView extends React.PureComponent {
         }
 
         return (
-            <div className="case-submission-view">
+            <div className="cohort-submission-view">
 
                 <div className="container">
 
-                    { caseLink }
+                    { cohortLink }
 
-                    <PanelSelectionMenu {...{ panelIdx, panelsComplete, caseItem }} onSelect={this.handleSelectPanel} />
+                    <PanelSelectionMenu {...{ panelIdx, panelsComplete, cohortItem }} onSelect={this.handleSelectPanel} />
                     <PanelOne {...this.props} {...this.state} userDetails={userDetails} markCompleted={this.markCompleted}
-                        onLoadUser={this.handleLoadedUser} onSubmitCase={this.handleLoadedCase} />
+                        onLoadUser={this.handleLoadedUser} onSubmitCohort={this.handleLoadedCohort} />
 
-                    <PanelTwo {...this.props} {...this.state} userDetails={userDetails} onLoadedCase={this.handleLoadedCase}
+                    <PanelTwo {...this.props} {...this.state} userDetails={userDetails} onLoadedCohort={this.handleLoadedCohort}
                         markCompleted={this.markCompleted} />
 
-                    <PanelThree {...this.props} {...this.state} userDetails={userDetails} onLoadedCase={this.handleLoadedCase}
+                    <PanelThree {...this.props} {...this.state} userDetails={userDetails} onLoadedCohort={this.handleLoadedCohort}
                         onComplete={this.handleComplete} markCompleted={this.markCompleted} />
 
                     { finishBtn }
@@ -150,7 +150,7 @@ export default class CaseSubmissionView extends React.PureComponent {
 
 
 function PanelSelectionMenu(props){
-    const { onSelect, panelIdx, panelsComplete, caseItem } = props;
+    const { onSelect, panelIdx, panelsComplete, cohortItem } = props;
     const steps = [
         "Basic Information",
         "Import Pedigree(s)",
@@ -160,7 +160,7 @@ function PanelSelectionMenu(props){
     const renderedItems = steps.map(function(stepTitle, stepIdx){
         const stepNum = stepIdx + 1;
         const active = panelIdx === stepIdx;
-        const disabled = stepIdx !== 0 && !caseItem; // Becomes undisabled after first panel completed.
+        const disabled = stepIdx !== 0 && !cohortItem; // Becomes undisabled after first panel completed.
         const completed = panelsComplete[stepIdx];
         const cls = (
             "panel-menu-item" +
@@ -216,25 +216,25 @@ class PanelOne extends React.PureComponent {
         return initState;
     }
 
-    static checkIfChanged(caseItem, title, institutionID, projectID){
+    static checkIfChanged(cohortItem, title, institutionID, projectID){
         const {
-            institution: { '@id' : caseInstitutionID = null } = {},
-            project: { '@id' : caseProjectID = null } = {},
-            display_title: caseTitle
-        } = caseItem;
-        return (institutionID !== caseInstitutionID) || (projectID !== caseProjectID) || (title !== caseTitle);
+            institution: { '@id' : cohortInstitutionID = null } = {},
+            project: { '@id' : cohortProjectID = null } = {},
+            display_title: cohortTitle
+        } = cohortItem;
+        return (institutionID !== cohortInstitutionID) || (projectID !== cohortProjectID) || (title !== cohortTitle);
     }
 
     constructor(props){
         super(props);
         this.loadUser = this.loadUser.bind(this);
-        this.handleChangeCaseTitle = this.handleChangeCaseTitle.bind(this);
+        this.handleChangeCohortTitle = this.handleChangeCohortTitle.bind(this);
         this.handleSelectInstitution = this.handleSelectInstitution.bind(this);
         this.handleSelectProject = this.handleSelectProject.bind(this);
         this.handleCreate = this.handleCreate.bind(this);
         this.state = {
             selectingField: null,
-            caseTitle: "",
+            cohortTitle: "",
             error: null,
             isCreating: false,
             ...PanelOne.flatFieldsFromUser(props.user)
@@ -247,7 +247,7 @@ class PanelOne extends React.PureComponent {
             checkIfChanged: PanelOne.checkIfChanged
         };
 
-        this.caseTitleInputRef = React.createRef();
+        this.cohortTitleInputRef = React.createRef();
     }
 
     componentDidMount(){
@@ -255,17 +255,17 @@ class PanelOne extends React.PureComponent {
     }
 
     componentDidUpdate(pastProps){
-        const { caseItem = null, markCompleted, panelIdx, panelsComplete, user } = this.props;
-        const { caseItem: pastCaseItem = null, panelIdx: pastPanelIdx, user: pastUser } = pastProps;
+        const { cohortItem = null, markCompleted, panelIdx, panelsComplete, user } = this.props;
+        const { cohortItem: pastCohortItem = null, panelIdx: pastPanelIdx, user: pastUser } = pastProps;
 
         if (user !== pastUser){
             this.setState(PanelOne.flatFieldsFromUser(user));
-            this.caseTitleInputRef.current && this.caseTitleInputRef.current.focus();
+            this.cohortTitleInputRef.current && this.cohortTitleInputRef.current.focus();
             ReactTooltip.rebuild();
             return;
         }
 
-        if (caseItem && caseItem !== pastCaseItem){
+        if (cohortItem && cohortItem !== pastCohortItem){
             const {
                 institution: {
                     '@id' : institutionID = null,
@@ -275,22 +275,22 @@ class PanelOne extends React.PureComponent {
                     '@id' : projectID = null,
                     display_title: projectTitle = null
                 } = {}
-            } = caseItem;
+            } = cohortItem;
             this.setState({
-                caseTitle: caseItem.title || "",
+                cohortTitle: cohortItem.title || "",
                 institutionID, institutionTitle,
                 projectID, projectTitle
             });
             return;
         }
 
-        if (caseItem){
-            const { institutionID, projectID, caseTitle: title } = this.state;
-            const valuesDiffer = this.memoized.checkIfChanged(caseItem, title, institutionID, projectID);
+        if (cohortItem){
+            const { institutionID, projectID, cohortTitle: title } = this.state;
+            const valuesDiffer = this.memoized.checkIfChanged(cohortItem, title, institutionID, projectID);
             if (valuesDiffer && panelsComplete[0] === true){
                 markCompleted(0, false);
             } else if (!valuesDiffer && panelIdx === 0 && panelsComplete[0] === false) {
-                // We already completed POST; once case present, mark this complete also.
+                // We already completed POST; once cohort present, mark this complete also.
                 markCompleted(0, true);
             }
         }
@@ -309,8 +309,8 @@ class PanelOne extends React.PureComponent {
         });
     }
 
-    handleChangeCaseTitle(e){
-        this.setState({ caseTitle: e.target.value });
+    handleChangeCohortTitle(e){
+        this.setState({ cohortTitle: e.target.value });
     }
 
     handleSelectInstitution(institutionID, institutionJSON){
@@ -324,9 +324,9 @@ class PanelOne extends React.PureComponent {
     }
 
     handleCreate(e){
-        const { onSubmitCase, caseItem } = this.props;
+        const { onSubmitCohort, cohortItem } = this.props;
         const {
-            caseTitle: title,
+            cohortTitle: title,
             institutionID: institution,
             projectID: project,
             isCreating = false
@@ -342,12 +342,12 @@ class PanelOne extends React.PureComponent {
             if (res.status && res.status !== 'success'){
                 throw res;
             }
-            const [ caseItemObject ] = res['@graph'];
-            const { '@id' : caseID } = caseItemObject;
+            const [ cohortItemObject ] = res['@graph'];
+            const { '@id' : cohortID } = cohortItemObject;
 
             // Load the @@embedded representation now
-            this.request = ajax.load(caseID + "@@embedded", function(getReqRes){
-                onSubmitCase(getReqRes);
+            this.request = ajax.load(cohortID + "@@embedded", function(getReqRes){
+                onSubmitCohort(getReqRes);
             });
         };
         const fb = (res) => {
@@ -381,9 +381,9 @@ class PanelOne extends React.PureComponent {
 
         this.setState({ isCreating: true }, ()=>{
             this.request = ajax.load(
-                caseItem ? caseItem['@id'] : "/case/",
+                cohortItem ? cohortItem['@id'] : "/cohort/",
                 cb,
-                caseItem ? "PATCH" : "POST",
+                cohortItem ? "PATCH" : "POST",
                 fb,
                 JSON.stringify(postData)
             );
@@ -391,12 +391,12 @@ class PanelOne extends React.PureComponent {
     }
 
     render(){
-        const { userDetails, panelIdx, user, caseItem } = this.props;
+        const { userDetails, panelIdx, user, cohortItem } = this.props;
         const {
             selectingField,
             institutionID, institutionTitle,
             projectID, projectTitle,
-            caseTitle,
+            cohortTitle,
             isCreating = false
         } = this.state;
 
@@ -413,8 +413,8 @@ class PanelOne extends React.PureComponent {
             );
         }
 
-        const valuesChanged = !caseItem || this.memoized.checkIfChanged(caseItem, caseTitle, institutionID, projectID);
-        const createDisabled = (!valuesChanged || isCreating || !institutionID || !projectID || !caseTitle);
+        const valuesChanged = !cohortItem || this.memoized.checkIfChanged(cohortItem, cohortTitle, institutionID, projectID);
+        const createDisabled = (!valuesChanged || isCreating || !institutionID || !projectID || !cohortTitle);
 
         return (
             <form className={"panel-form-container d-block" + (isCreating ? " is-creating" : "")} onSubmit={this.handleCreate}>
@@ -425,9 +425,9 @@ class PanelOne extends React.PureComponent {
                 <LinkToFieldSection onSelect={this.handleSelectProject} title="Project"
                     type="Project" selectedID={projectID} selectedTitle={projectTitle} />
                 <label className="field-section mt-2 d-block">
-                    <span className="d-block mb-05">Case Title</span>
-                    <input type="text" value={caseTitle} onChange={this.handleChangeCaseTitle}
-                        className="form-control d-block" ref={this.caseTitleInputRef}/>
+                    <span className="d-block mb-05">Cohort Title</span>
+                    <input type="text" value={cohortTitle} onChange={this.handleChangeCohortTitle}
+                        className="form-control d-block" ref={this.cohortTitleInputRef}/>
                 </label>
 
                 <hr className="mb-1"/>
@@ -436,7 +436,7 @@ class PanelOne extends React.PureComponent {
                     <div className="buttons-container text-right">
                         <button type="submit" className="btn btn-success"
                             disabled={createDisabled} onClick={this.handleCreate}>
-                            { caseItem ? "Submit Changes" : "Create & Proceed" }
+                            { cohortItem ? "Submit Changes" : "Create & Proceed" }
                         </button>
                     </div>
                     : null }
@@ -481,25 +481,25 @@ class PanelTwo extends React.PureComponent {
     }
 
     componentDidUpdate(pastProps){
-        const { caseItem, markCompleted, panelIdx } = this.props;
-        const { families = [] } = caseItem || {};
-        const { caseItem: pastCaseItem, panelIdx: pastPanelIdx } = pastProps;
-        const { pastFamilies = [] } = pastCaseItem || {};
-        if (caseItem !== pastCaseItem){
+        const { cohortItem, markCompleted, panelIdx } = this.props;
+        const { families = [] } = cohortItem || {};
+        const { cohortItem: pastCohortItem, panelIdx: pastPanelIdx } = pastProps;
+        const { pastFamilies = [] } = pastCohortItem || {};
+        if (cohortItem !== pastCohortItem){
             ReactTooltip.rebuild();
         }
 
         if (panelIdx === 1 && pastFamilies.length !== families.length){
-            // We already completed POST; once case present, mark this complete also.
+            // We already completed POST; once cohort present, mark this complete also.
             markCompleted(1);
         }
     }
 
     onAddedFamily(response){
-        const { onLoadedCase } = this.props;
+        const { onLoadedCohort } = this.props;
         const { context } = response;
 
-        onLoadedCase(context);
+        onLoadedCohort(context);
 
         const { families = [] } = context || {};
         const familiesLen = families.length;
@@ -529,16 +529,16 @@ class PanelTwo extends React.PureComponent {
     }
 
     render(){
-        const { user, caseItem, panelIdx, href } = this.props;
+        const { user, cohortItem, panelIdx, href } = this.props;
 
         if (panelIdx !== 1) {
             return null;
         }
 
         const {
-            '@id' : caseID,
+            '@id' : cohortID,
             families = []
-        } = caseItem || {};
+        } = cohortItem || {};
 
         const familiesLen = families.length;
         const familiesInfo = families.map(function(fam, idx){
@@ -560,7 +560,7 @@ class PanelTwo extends React.PureComponent {
         return (
             <div className="panel-form-container">
                 <h4 className="text-300 mt-2">
-                    { familiesLen } { familiesLen === 1 ? "Family" : "Families" } in Case
+                    { familiesLen } { familiesLen === 1 ? "Family" : "Families" } in Cohort
                 </h4>
                 { familiesInfo }
                 <hr className="mb-1"/>
@@ -570,7 +570,7 @@ class PanelTwo extends React.PureComponent {
                         <i className="icon icon-info-circle fas icon-fw ml-05"
                             data-tip="Select & upload files generated in Proband and other pedigree software" />
                     </label>
-                    <AttachmentInputController href={href} context={caseItem} onAddedFamily={this.onAddedFamily}>
+                    <AttachmentInputController href={href} context={cohortItem} onAddedFamily={this.onAddedFamily}>
                         <PedigreeAttachmentBtn/>
                     </AttachmentInputController>
                 </div>
@@ -595,8 +595,8 @@ function PedigreeAttachmentBtn(props){
 
 class PanelThree extends React.PureComponent {
 
-    static checkIfChanged(caseItem, status, description, aliases = []){
-        const { description: cDescription, aliases: cAliases = [], status: cStatus } = caseItem;
+    static checkIfChanged(cohortItem, status, description, aliases = []){
+        const { description: cDescription, aliases: cAliases = [], status: cStatus } = cohortItem;
         const statusDiffers = cStatus !== status;
         if (statusDiffers) return true;
         const descDiffers = !(!description && !cDescription) && (
@@ -618,9 +618,9 @@ class PanelThree extends React.PureComponent {
         this.handleSubmit = this.handleSubmit.bind(this);
         this.state = {
             isPatching: false,
-            status: props.caseItem && props.caseItem.status,
-            aliases: (props.caseItem && props.caseItem.aliases && props.caseItem.aliases.slice(0)) || [],
-            description: (props.caseItem && props.caseItem.description) || ""
+            status: props.cohortItem && props.cohortItem.status,
+            aliases: (props.cohortItem && props.cohortItem.aliases && props.cohortItem.aliases.slice(0)) || [],
+            description: (props.cohortItem && props.cohortItem.description) || ""
         };
 
         this.memoized = {
@@ -629,25 +629,25 @@ class PanelThree extends React.PureComponent {
     }
 
     componentDidUpdate(pastProps){
-        const { caseItem = null, markCompleted, panelIdx, panelsComplete } = this.props;
-        const { caseItem: pastCaseItem = null, panelIdx: pastPanelIdx } = pastProps;
+        const { cohortItem = null, markCompleted, panelIdx, panelsComplete } = this.props;
+        const { cohortItem: pastCohortItem = null, panelIdx: pastPanelIdx } = pastProps;
 
-        if (caseItem && caseItem !== pastCaseItem){
+        if (cohortItem && cohortItem !== pastCohortItem){
             this.setState({
-                status: caseItem.status,
-                aliases: (caseItem.aliases || []).slice(0),
-                description: caseItem.description || "",
+                status: cohortItem.status,
+                aliases: (cohortItem.aliases || []).slice(0),
+                description: cohortItem.description || "",
             });
             return;
         }
 
-        if (caseItem){
+        if (cohortItem){
             const { aliases, description, status } = this.state;
-            const stateDiffersFromCase = this.memoized.checkIfChanged(caseItem, status, description, aliases);
-            if (stateDiffersFromCase && panelsComplete[2] === true){
+            const stateDiffersFromCohort = this.memoized.checkIfChanged(cohortItem, status, description, aliases);
+            if (stateDiffersFromCohort && panelsComplete[2] === true){
                 markCompleted(2, false);
-            } else if (!stateDiffersFromCase && panelIdx === 2 && panelsComplete[2] === false) {
-                // We already completed POST; once case present, mark this complete also.
+            } else if (!stateDiffersFromCohort && panelIdx === 2 && panelsComplete[2] === false) {
+                // We already completed POST; once cohort present, mark this complete also.
                 markCompleted(2, true);
             }
         }
@@ -686,16 +686,16 @@ class PanelThree extends React.PureComponent {
     }
 
     handleSubmit(e){
-        const { caseItem, onComplete } = this.props;
+        const { cohortItem, onComplete } = this.props;
         const { description, aliases = [], state } = this.state;
-        const { '@id' : caseID } = caseItem;
+        const { '@id' : cohortID } = cohortItem;
         const cb = (res) => {
             this.setState({ isPatching: false });
             if (res.status && res.status !== 'success'){
                 throw res;
             }
-            const [ caseItemObject ] = res['@graph'];
-            onComplete(caseItemObject);
+            const [ cohortItemObject ] = res['@graph'];
+            onComplete(cohortItemObject);
         };
         const fb = (res) => {
             this.setState({ isPatching: false });
@@ -725,12 +725,12 @@ class PanelThree extends React.PureComponent {
         }
 
         this.setState({ isPatching: true }, ()=>{
-            this.request = ajax.load(caseID, cb, "PATCH", fb, JSON.stringify(postData));
+            this.request = ajax.load(cohortID, cb, "PATCH", fb, JSON.stringify(postData));
         });
     }
 
     render(){
-        const { panelIdx, schemas, caseItem, user } = this.props;
+        const { panelIdx, schemas, cohortItem, user } = this.props;
         const { status, description, aliases, isPatching } = this.state;
 
         if (panelIdx !== 2 || !schemas) {
@@ -738,7 +738,7 @@ class PanelThree extends React.PureComponent {
         }
 
         /** Aliases Field */
-        const skipValidateAliases = (caseItem && caseItem.aliases) || [];
+        const skipValidateAliases = (cohortItem && cohortItem.aliases) || [];
         const aliasFields = aliases.map((alias, aliasIdx) => {
             const rejectAliases = _.filter(aliases.slice(0, aliasIdx));
             return (
@@ -759,7 +759,7 @@ class PanelThree extends React.PureComponent {
                 { Schemas.Term.toName("status", status) }
             </React.Fragment>
         );
-        const statusFieldSchema = schemas['Case'].properties.status;
+        const statusFieldSchema = schemas['Cohort'].properties.status;
         const statusOpts = statusFieldSchema.enum.map(function(statusOpt){
             return (
                 <DropdownItem key={statusOpt} eventKey={statusOpt}>
@@ -769,7 +769,7 @@ class PanelThree extends React.PureComponent {
             );
         });
 
-        const stateDiffersFromCase = this.memoized.checkIfChanged(caseItem, status, description, aliases);
+        const stateDiffersFromCohort = this.memoized.checkIfChanged(cohortItem, status, description, aliases);
 
         return (
             <div className={"panel-form-container" + (isPatching ? " is-creating" : "")}>
@@ -783,13 +783,13 @@ class PanelThree extends React.PureComponent {
                     <label className="d-block mb-05">
                         Alias(es)
                         <i className="icon icon-info-circle fas icon-fw ml-05"
-                            data-tip="Alternate identifiers that this Case can be reached by" />
+                            data-tip="Alternate identifiers that this Cohort can be reached by" />
                     </label>
                     { aliasFields }
                 </div>
                 <div className="field-section mt-2">
                     <label className="d-block mb-05">
-                        Case Status
+                        Cohort Status
                     </label>
                     <DropdownButton title={statusTitle} variant="outline-dark"
                         onSelect={this.handleStatusChange}>
@@ -798,9 +798,9 @@ class PanelThree extends React.PureComponent {
                 </div>
                 <hr className="mb-1" />
                 <div className="buttons-container text-right">
-                    <button type="button" className={"btn btn-" + (stateDiffersFromCase ? "success" : "outline-success")}
+                    <button type="button" className={"btn btn-" + (stateDiffersFromCohort ? "success" : "outline-success")}
                         disabled={isPatching} onClick={this.handleSubmit}>
-                        Finish & View Case
+                        Finish & View Cohort
                     </button>
                 </div>
             </div>
@@ -843,16 +843,16 @@ const LinkToFieldSection = React.memo(function LinkToFieldSection(props){
 
 
 
-const CaseSubmissionViewPageTitle = React.memo(function CaseSubmissionViewPageTitle({ context, href, schemas, currentAction, alerts }){
+const CohortSubmissionViewPageTitle = React.memo(function CohortSubmissionViewPageTitle({ context, href, schemas, currentAction, alerts }){
     return (
         <PageTitleContainer alerts={alerts} className="container">
             <OnlyTitle>
-                New Case
+                New Cohort
             </OnlyTitle>
         </PageTitleContainer>
     );
 });
 
-pageTitleViews.register(CaseSubmissionViewPageTitle, "Case", "create");
-pageTitleViews.register(CaseSubmissionViewPageTitle, "Case", "add");
+pageTitleViews.register(CohortSubmissionViewPageTitle, "Cohort", "create");
+pageTitleViews.register(CohortSubmissionViewPageTitle, "Cohort", "add");
 
