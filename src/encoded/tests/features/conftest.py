@@ -12,6 +12,7 @@ def external_tx():
 @pytest.fixture(scope='session')
 def app_settings(wsgi_server_host_port, elasticsearch_server, postgresql_server, aws_auth):
     from ..conftest import _app_settings
+    import os
     settings = _app_settings.copy()
     settings['create_tables'] = True
     settings['persona.audiences'] = 'http://%s:%s' % wsgi_server_host_port
@@ -21,6 +22,7 @@ def app_settings(wsgi_server_host_port, elasticsearch_server, postgresql_server,
     settings['item_datastore'] = 'elasticsearch'
     settings['indexer'] = True
     settings['indexer.processes'] = 2
+    settings['indexer.namespace'] = os.environ.get('TRAVIS_JOB_ID', '')
 
     # use aws auth to access elasticsearch
     if aws_auth:
