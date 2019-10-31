@@ -6,7 +6,7 @@ import memoize from 'memoize-one';
 import _ from 'underscore';
 import { DropdownButton, DropdownItem, Dropdown, Button } from 'react-bootstrap';
 
-import { console, layout, ajax, object } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
+import { console, layout, ajax, object, navigate } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { Checkbox } from '@hms-dbmi-bgm/shared-portal-components/es/components/forms/components/Checkbox';
 import { CollapsibleItemViewButtonToolbar } from './../components/CollapsibleItemViewButtonToolbar';
 import { Alerts } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/Alerts';
@@ -15,14 +15,16 @@ import DefaultItemView from './../DefaultItemView';
 import { PedigreeDetailPane } from './../components/PedigreeDetailPane';
 import { store } from './../../../store';
 
-import { ProcessingSummaryTable } from './ProcessingSummaryTable';
-import { PedigreeTabViewBody } from './PedigreeTabViewBody';
+import { buildPedigreeGraphData } from './../../viz/PedigreeViz';
+import { CohortSummaryTable } from './CohortSummaryTable';
+import { PedigreeTabViewBody, idToGraphIdentifier } from './PedigreeTabViewBody';
 import { PedigreeFullScreenBtn } from './PedigreeFullScreenBtn';
 import { parseFamilyIntoDataset, gatherPhenotypicFeatureItems } from './family-parsing';
 import { AttachmentInputController, AttachmentInputMenuOption } from './attachment-input';
+import { CohortStats } from './CohortStats';
 
 export {
-    ProcessingSummaryTable,
+    CohortSummaryTable,
     PedigreeTabViewBody,
     PedigreeFullScreenBtn,
     parseFamilyIntoDataset
@@ -61,6 +63,11 @@ export default class CohortView extends DefaultItemView {
             ...this.state,
             pedigreeFamilies,
             pedigreeFamiliesIdx: familiesLen - 1
+        };
+        this.memoized = {
+            buildPedigreeGraphData: memoize(buildPedigreeGraphData),
+            parseFamilyIntoDataset: memoize(parseFamilyIntoDataset),
+            idToGraphIdentifier: memoize(idToGraphIdentifier)
         };
     }
 
@@ -117,34 +124,41 @@ export default class CohortView extends DefaultItemView {
     }
 
     getTabViewContents(){
-        const { context : { families = [] } } = this.props;
-        const { pedigreeFamilies = [] } = this.state;
+        //const { context : { families = [] } } = this.props;
+        const { pedigreeFamilies = [], pedigreeFamiliesIdx } = this.state;
         const familiesLen = pedigreeFamilies.length;
+
+        let currFamily, graphData, idToGraphIdentifier;
+        if (familiesLen > 0){
+            currFamily = pedigreeFamilies[pedigreeFamiliesIdx];
+            graphData = this.memoized.buildPedigreeGraphData(this.memoized.parseFamilyIntoDataset(currFamily));
+            idToGraphIdentifier = this.memoized.idToGraphIdentifier(graphData.objectGraph);
+        }
+
         const initTabs = [];
 
-        if (familiesLen > 0){
-            // Remove this outer if condition if wanna show disabled '0 Pedigrees' tab instead
+        initTabs.push(CohortSummaryTabView.getTabObject({
+            ...this.props,
+            ...this.state, // pedigreeFamilies & pedigreeFamiliesIdx
+            currFamily,
+            graphData,
+            idToGraphIdentifier,
+            handleFamilySelect: this.handleFamilySelect
+        }));
 
+        if (familiesLen > 0) {
+            // Remove this outer if condition if wanna show disabled '0 Pedigrees'
             initTabs.push(PedigreeTabView.getTabObject({
                 ...this.props,
                 ...this.state, // pedigreeFamilies & pedigreeFamiliesIdx
+                currFamily,
+                graphData,
+                idToGraphIdentifier,
                 handleFamilySelect: this.handleFamilySelect
             }));
-
         }
 
-        if (familiesLen > 0){
-            // Remove this outer if condition if wanna show disabled 'Pedigree Summary' tab instead
-
-            initTabs.push(ProcessingSummaryTabView.getTabObject({
-                ...this.props,
-                ...this.state, // pedigreeFamilies & pedigreeFamiliesIdx
-                handleFamilySelect: this.handleFamilySelect
-            }));
-
-        }
-
-        return this.getCommonTabs().concat(initTabs);
+        return initTabs.concat(this.getCommonTabs());
     }
 
     /** Render additional item actions */
@@ -162,31 +176,79 @@ export default class CohortView extends DefaultItemView {
     }
 }
 
-
-
-const ProcessingSummaryTabView = React.memo(function ProcessingSummaryTabView(props){
-    const { pedigreeFamilies: families = [] } = props;
+const CohortSummaryTabView = React.memo(function CohortSummaryTabView(props){
+    const {
+        pedigreeFamilies: families = [],
+        context: {
+            cohort_phenotypic_features: cohortFeatures = { cohort_phenotypic_features: [] },
+            description: cohortDescription = ""
+        } = {},
+        idToGraphIdentifier
+    } = props;
     const familiesLen = families.length;
+
+    function getNumberOfIndividuals(fams) {
+        let count = 0;
+        fams.forEach(function(fam){ count += fam.members.length; });
+        return count;
+    }
+
+    function getCountIndividualsWSamples(fams) {
+        let count = 0;
+        fams.forEach(function(fam){
+            fam.members.forEach(function(member){
+                if (member.samples && member.samples.length > 0) {
+                    count++;
+                }
+            });
+        }); // todo: this is done in CohortSummaryTable --  maybe move it up and pass it down
+        return count;
+    }
+
     return (
         <div className="container-wide">
             <h3 className="tab-section-title">
-                <span>Processing Summary</span>
+                <span>Cohort Summary</span>
             </h3>
             <hr className="tab-section-title-horiz-divider"/>
+            <div className="row mt-2">
+                <div className="col-md-12">
+                    <div className="card-group row">
+                        <div className="col-12 col-lg-7 col-xl-8">
+                            <CohortStats
+                                description={cohortDescription}
+                                numWithSamples={getCountIndividualsWSamples(families)}
+                                cohortFeatures={cohortFeatures} numFamilies={familiesLen}
+                                numIndividuals={getNumberOfIndividuals(families)} />
+                        </div>
+                        <div id="cohort-overview-ped-link" className="col-12 col-lg-5 col-xl-4">
+                            <a href="#pedigree" className="card-img-top d-none d-lg-block" rel="noreferrer noopener">
+                                {/*
+                                <img src="https://via.placeholder.com/450x150.png?text=Insert+Pedigree+Graphic+Here" className="card-img-top"/>
+                                */}
+                                <div className="text-center h-100">
+                                    <i className="icon icon-sitemap icon-4x fas" />
+                                </div>
+                            </a>
+                            <a href="#pedigree" className="btn btn-primary btn-block mt-1" rel="noreferrer noopener">View Pedigree(s)</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
             {
                 families.map(function(family, idx){
                     const { original_pedigree: { display_title: pedFileName } = {} } = family;
                     const cls = "summary-table-container family-index-" + idx;
-                    const title = familiesLen === 1 ? null : (
-                        <h4>
-                            { "Family " + (idx + 1) }
+                    const title = (
+                        <h4 data-family-index={idx}>
+                            Family { (idx + 1) }
                             { pedFileName ? <span className="text-300">{ " (" + pedFileName + ")" }</span> : null }
                         </h4>
                     );
                     return (
                         <div className={cls} key={idx}>
                             { title }
-                            <ProcessingSummaryTable {...family} idx={idx} />
+                            <CohortSummaryTable {...family} {...{ idx, idToGraphIdentifier }} />
                         </div>
                     );
                 })
@@ -194,29 +256,38 @@ const ProcessingSummaryTabView = React.memo(function ProcessingSummaryTabView(pr
         </div>
     );
 });
-ProcessingSummaryTabView.getTabObject = function(props){
+CohortSummaryTabView.getTabObject = function(props){
     const { pedigreeFamilies: families = [] } = props;
     const familiesLen = families.length;
     return {
         'tab' : (
             <React.Fragment>
                 <i className="icon icon-cogs fas icon-fw"/>
-                <span>Processing Summary</span>
+                <span>Cohort Summary</span>
             </React.Fragment>
         ),
-        'key' : 'processing-summary',
+        'key' : 'cohort-summary',
         'disabled' : familiesLen === 0,
-        'content' : <ProcessingSummaryTabView {...props} />
+        'content' : <CohortSummaryTabView {...props} />
     };
+};
+/** TODO Implement */
+CohortSummaryTabView.onFamilyTitleClick = function(evt){
+    const nextIndex = parseInt(evt.target.getAttribute("data-damily-index"));
+    if (isNaN(nextIndex)) {
+        return false;
+    }
+    // We also need to get "setFamily" function passed down to here from CohortView
+    // and then call it here.
+    // And then in callback -
+    // Switch tab
+    navigate("#pedigree", { skipRequest: true });
 };
 
 
 /**
  * TabView that shows Pedigree(s) of Cohort families.
  * Specific to CohortView.
- *
- * @todo Separate zoom logic into a ZoomController component.
- * @todo Create better zoom stuff/ui.
  */
 class PedigreeTabView extends React.PureComponent {
 
@@ -255,7 +326,6 @@ class PedigreeTabView extends React.PureComponent {
         this.renderDetailPane = this.renderDetailPane.bind(this);
 
         this.memoized = {
-            parseFamilyIntoDataset : memoize(parseFamilyIntoDataset),
             getPhenotypicFeatureStrings : memoize(PedigreeTabView.getPhenotypicFeatureStrings),
             gatherPhenotypicFeatureItems: memoize(gatherPhenotypicFeatureItems)
         };
@@ -318,7 +388,7 @@ class PedigreeTabView extends React.PureComponent {
     handleToggleSelectedDisease(evt, tt){
         const name = evt.target.getAttribute("name");
         if (!name) return;
-        this.setState(({ selectedDiseases: prevSelectedDiseases }, { pedigreeFamilies = null, pedigreeFamiliesIdx }) => {
+        this.setState(({ selectedDiseases: prevSelectedDiseases }, { currFamily }) => {
             const selDiseaseMap = {};
             prevSelectedDiseases.forEach(function(sd){
                 selDiseaseMap[sd] = true;
@@ -329,7 +399,6 @@ class PedigreeTabView extends React.PureComponent {
                 selDiseaseMap[name] = true;
             }
             // We want order to be maintained
-            const currFamily = pedigreeFamilies[pedigreeFamiliesIdx];
             const availableDiseases = this.memoized.gatherPhenotypicFeatureItems(currFamily);
             const selectedDiseases = availableDiseases.filter(function(ad){
                 const { display_title: title } = ad;
@@ -349,26 +418,21 @@ class PedigreeTabView extends React.PureComponent {
 
     render(){
         const {
-            context, schemas, windowWidth, windowHeight, href, session,
-            handleFamilySelect, pedigreeFamiliesIdx, pedigreeFamilies: families = []
+            context, schemas, windowWidth, windowHeight, href, session, graphData,
+            pedigreeFamilies: families, pedigreeFamiliesIdx, currFamily: currentFamily, handleFamilySelect
         } = this.props;
         const { showAllDiseases, showAsDiseases, showOrderBasedName, selectedDiseases } = this.state;
-        const { cohort_phenotypic_features = [] } = context;
 
-        const currentFamily = families[pedigreeFamiliesIdx];
-
-        //const phenotypicFeatureStrings = showAllDiseases ? null : this.memoized.getPhenotypicFeatureStrings(cohort_phenotypic_features);
-
-        const dataset = this.memoized.parseFamilyIntoDataset(currentFamily);
+        const availableDiseases = this.memoized.gatherPhenotypicFeatureItems(currentFamily);
         const visibleDiseases = !showAllDiseases && Array.isArray(selectedDiseases) ? selectedDiseases : undefined;
 
         const pedigreeTabViewBodyProps = {
-            dataset, visibleDiseases, session, href,
+            graphData, visibleDiseases, session, href,
             context, showOrderBasedName,
             windowWidth, windowHeight
         };
 
-        console.log('DDD1', dataset, visibleDiseases, selectedDiseases, this.memoized.gatherPhenotypicFeatureItems(currentFamily));
+        console.log('DDD1', graphData, visibleDiseases, selectedDiseases, this.memoized.gatherPhenotypicFeatureItems(currentFamily));
 
         return (
             <div ref={this.tabViewRef}>
@@ -378,8 +442,8 @@ class PedigreeTabView extends React.PureComponent {
                         <CollapsibleItemViewButtonToolbar windowWidth={windowWidth}>
                             {/* <ColorAllDiseasesCheckbox checked={showAllDiseases} onChange={this.handleToggleCheckbox} /> */}
                             <UniqueIdentifiersCheckbox checked={!showOrderBasedName} onChange={this.handleToggleCheckbox} />
-                            <SelectDiseasesDropdown {...{ showAsDiseases, selectedDiseases }} onChange={this.handleToggleSelectedDisease}
-                                availableDiseases={this.memoized.gatherPhenotypicFeatureItems(currentFamily)} />
+                            <SelectDiseasesDropdown {...{ showAsDiseases, selectedDiseases, availableDiseases }}
+                                onChange={this.handleToggleSelectedDisease} />
                             {/* <ShowAsDiseasesDropdown onSelect={this.handleChangeShowAsDiseases} {...{ showAllDiseases, showAsDiseases }}  /> */}
                             <FamilySelectionDropdown {...{ families, currentFamilyIdx: pedigreeFamiliesIdx }} onSelect={handleFamilySelect} />
                             <PedigreeFullScreenBtn />

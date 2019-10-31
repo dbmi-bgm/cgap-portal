@@ -1722,6 +1722,39 @@ $badge-item-min-height: 90px;
 
 .item-page-container {
 
+	#cohort-overview-ped-link {
+		margin-left: 0;
+
+		.card-img-top {
+			position: relative;
+			// We usually don't want to use this without having a fallback for older browsers
+			height: 100px; // Nice round number, idk.
+			height: calc(100% - 47px);
+			i.icon.icon-sitemap { // Quick vertical center
+				position: absolute;
+				top: 50%;
+				left: 50%;
+				margin-left: -40px;
+				margin-top: -32px;
+			}
+		}
+	}
+
+	label.badge-list-label {
+		padding-right: 3px;
+		margin-bottom: 0;
+	}
+	.badge-list {
+		list-style: none;
+		padding-left: 0;
+		margin-bottom: 0;
+		display: inline;
+
+		> li {
+			display: inline-block;
+		}
+	}
+
 	div.summary-table-container {
 
 		padding-top: 10px;
@@ -1763,6 +1796,9 @@ $badge-item-min-height: 90px;
 								font-family: $font-family-monospace;
 							}
 							*/
+						}
+						&.is-even {
+							background-color: rgba(0, 0, 0, 0.03);
 						}
 						&.is-proband {
 							> td {

@@ -57,6 +57,7 @@ class Cohort(Item):
         "families.members.phenotypic_features.onset_age",
         "families.members.phenotypic_features.onset_age_units",
         "families.members.samples.status",
+        "families.members.samples.specimen_type",
         "families.members.samples.processed_files",
         "families.members.samples.processed_files.workflow_run_outputs",
         "families.members.samples.processed_files.quality_metric",
