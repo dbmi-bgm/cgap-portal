@@ -5,7 +5,7 @@ import PropTypes from 'prop-types';
 import memoize from 'memoize-one';
 import _ from 'underscore';
 import { Schemas } from './../../util';
-import { patchedConsoleInstance } from '@hms-dbmi-bgm/shared-portal-components/es/components/util/patched-console';
+import { console } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 
 
 /** @param {Object} props - Contents of a family sub-embedded object. */
@@ -13,7 +13,8 @@ export const CohortSummaryTable = React.memo(function CohortSummaryTable(props){
     const {
         members = [],
         proband: { '@id' : probandID } = {},
-        original_pedigree = null
+        original_pedigree = null,
+        idToGraphIdentifier = {}
     } = props;
 
     if (members.length === 0){
@@ -107,7 +108,18 @@ export const CohortSummaryTable = React.memo(function CohortSummaryTable(props){
             return;
         }
 
-        const indvLink = <a href={indvId} className="accession">{ indvDisplayTitle }</a>;
+        const genID = idToGraphIdentifier[indvId];
+        let indvLink = <a href={indvId} className="accession">{ indvDisplayTitle }</a>;
+        if (genID) {
+            indvLink = (
+                <div className="text-ellipsis-container">
+                    <span className="text-serif text-small align-middle text-600 mr-2">
+                        { genID }
+                    </span>
+                    { indvLink }
+                </div>
+            );
+        }
         const isProband = (probandID && probandID === indvId);
 
         function generateFileRenderObject(files) {

@@ -1,41 +1,49 @@
 'use strict';
 
 import React from 'react';
-import PropTypes from 'prop-types';
-import memoize from 'memoize-one';
-import { Schemas } from './../../util';
-import { patchedConsoleInstance } from '@hms-dbmi-bgm/shared-portal-components/es/components/util/patched-console';
 
 
 /** @param {Object} props - Contents of a family sub-embedded object. */
-export const CohortStats = React.memo(function CaseStats(props){
+export const CohortStats = React.memo(function CohortStats(props){
     const {
         numFamilies = 0,
         numIndividuals = 0,
         numWithSamples = 0,
         description = "N/A",
-        cohortFeatures = []
+        cohortFeatures = [],
+        className = null
     } = props;
 
+    const cls = ("card" + (className? " " + className : ""));
+    const renderedPhenotypicFeatures = (
+        cohortFeatures.length > 0 ? cohortFeatures.map(function(feature){
+            const { display_title: title, '@id': featureID } = feature;
+            return (
+                <li key={featureID} className="pr-1">
+                    <a className="badge badge-info" href={featureID} rel="noopener noreferrer">{title}</a>
+                </li>
+            );
+        }) : <em>None</em>
+    );
 
     return (
-        <div className="card" id="cohort-stats">
-            <div className="card-header" role="heading" level="4">Overview</div>
+        <div className={cls} id="cohort-stats">
+            <h4 className="card-header mt-0 text-600">Overview</h4>
             <div className="card-body">
-                <p className="card-text"><strong>Families:</strong> { numFamilies }</p>
-                <p className="card-text"><strong>Individuals:</strong> { numIndividuals } ({numWithSamples} with samples)</p>
-                <p className="card-text"><strong>Description:</strong> { description }</p>
+                <div className="card-text mb-1">
+                    <label className="mb-0">Families:</label> { numFamilies }
+                </div>
+                <div className="card-text mb-1">
+                    <label className="mb-0">Individuals:</label> { numIndividuals } ({numWithSamples} with samples)
+                </div>
+                <div className="card-text mb-1">
+                    <label className="mb-0">Description:</label> { description }
+                </div>
             </div>
             <div className="card-footer">
                 <label htmlFor="phenotypic-features" className="badge-list-label"><small>Phenotypic Features:</small></label>
                 <ul className="badge-list" name="phenotypic-features">
-                    {cohortFeatures.map((feature) => {
-                        const { display_title: title,
-                            uuid: uuid
-                        } = feature;
-
-                        return (<li key={uuid} className="pr-1"><a className="badge badge-info" href={`/${uuid}`} rel="noopener noreferrer">{title}</a></li>);
-                    })}
+                    { renderedPhenotypicFeatures }
                 </ul>
             </div>
         </div>

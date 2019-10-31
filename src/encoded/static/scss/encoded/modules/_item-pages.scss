@@ -1724,30 +1724,19 @@ $badge-item-min-height: 90px;
 
 	#cohort-overview-ped-link {
 		margin-left: 0;
-		@include media-breakpoint-up(lg) {
-			margin-left: 10px;
-		}
-		>.btn.btn-primary.btn-block {
-			margin-top: 10px;
-			@include media-breakpoint-up(lg) {
-				margin-top: 0;
-			}
-		}
 
-		img.card-img-top {
-			display: none;
-			height: calc(100% - 37px);
-			@include media-breakpoint-up(lg) {
-				display: block;
+		.card-img-top {
+			position: relative;
+			// We usually don't want to use this without having a fallback for older browsers
+			height: 100px; // Nice round number, idk.
+			height: calc(100% - 47px);
+			i.icon.icon-sitemap { // Quick vertical center
+				position: absolute;
+				top: 50%;
+				left: 50%;
+				margin-left: -40px;
+				margin-top: -32px;
 			}
-		}
-	}
-
-	#cohort-stats,
-	#cohort-overview-ped-link {
-		width: 100%;
-		@include media-breakpoint-up(lg) {
-			width: 50%;
 		}
 	}
 
