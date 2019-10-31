@@ -1764,6 +1764,18 @@ $badge-item-min-height: 90px;
 			margin-bottom: 0;
 			font-weight: 400;
 			margin-top: 10px;
+			display: inline-block; // To decrease width of the clickable area to just the text width.
+			> i.icon {
+				color: #999;
+			}
+
+			&:hover {
+				color: #000;
+				text-shadow: 0 0 0;
+				> i.icon {
+					color: #000;
+				}
+			}
 		}
 
 		&:not(.family-index-0){
@@ -1839,6 +1851,14 @@ $badge-item-min-height: 90px;
 
 			}
 
+		}
+
+		&[data-is-current-family="true"] {
+			> h4:first-child {
+				> i.icon {
+					color: $brand-primary;
+				}
+			}
 		}
 
 	}

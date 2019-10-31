@@ -119,8 +119,12 @@ export default class CohortView extends DefaultItemView {
         store.dispatch({ type: { context } });
     }
 
-    handleFamilySelect(key){
-        this.setState({ 'pedigreeFamiliesIdx' : parseInt(key) });
+    handleFamilySelect(key, callback){
+        this.setState({ 'pedigreeFamiliesIdx' : parseInt(key) }, function(){
+            if (typeof callback === "function") {
+                callback();
+            }
+        });
     }
 
     getTabViewContents(){
@@ -143,7 +147,7 @@ export default class CohortView extends DefaultItemView {
             currFamily,
             graphData,
             idToGraphIdentifier,
-            handleFamilySelect: this.handleFamilySelect
+            onFamilySelect: this.handleFamilySelect
         }));
 
         if (familiesLen > 0) {
@@ -154,7 +158,7 @@ export default class CohortView extends DefaultItemView {
                 currFamily,
                 graphData,
                 idToGraphIdentifier,
-                handleFamilySelect: this.handleFamilySelect
+                onFamilySelect: this.handleFamilySelect
             }));
         }
 
@@ -179,11 +183,13 @@ export default class CohortView extends DefaultItemView {
 const CohortSummaryTabView = React.memo(function CohortSummaryTabView(props){
     const {
         pedigreeFamilies: families = [],
+        pedigreeFamiliesIdx = 0,
         context: {
             cohort_phenotypic_features: cohortFeatures = { cohort_phenotypic_features: [] },
             description: cohortDescription = ""
         } = {},
-        idToGraphIdentifier
+        idToGraphIdentifier,
+        onFamilySelect
     } = props;
     const familiesLen = families.length;
 
@@ -239,16 +245,26 @@ const CohortSummaryTabView = React.memo(function CohortSummaryTabView(props){
                 families.map(function(family, idx){
                     const { original_pedigree: { display_title: pedFileName } = {} } = family;
                     const cls = "summary-table-container family-index-" + idx;
+                    const onClick = function(evt){
+                        onFamilySelect(idx, function(){
+                            navigate("#pedigree", { skipRequest: true });
+                        });
+                    };
+                    const isCurrentFamily = idx === pedigreeFamiliesIdx;
+                    const tip = isCurrentFamily ?
+                        "Currently-selected family in Pedigree Visualization"
+                        : "Click to view this family in the Pedigree Visualization tab";
                     const title = (
-                        <h4 data-family-index={idx}>
+                        <h4 data-family-index={idx} className="clickable" onClick={onClick} data-tip={tip}>
+                            <i className="icon icon-fw icon-sitemap fas mr-1 small" />
                             Family { (idx + 1) }
                             { pedFileName ? <span className="text-300">{ " (" + pedFileName + ")" }</span> : null }
                         </h4>
                     );
                     return (
-                        <div className={cls} key={idx}>
+                        <div className={cls} key={idx} data-is-current-family={isCurrentFamily}>
                             { title }
-                            <CohortSummaryTable {...family} {...{ idx, idToGraphIdentifier }} />
+                            <CohortSummaryTable {...family} {...{ idx, idToGraphIdentifier, isCurrentFamily }} />
                         </div>
                     );
                 })
@@ -270,18 +286,6 @@ CohortSummaryTabView.getTabObject = function(props){
         'disabled' : familiesLen === 0,
         'content' : <CohortSummaryTabView {...props} />
     };
-};
-/** TODO Implement */
-CohortSummaryTabView.onFamilyTitleClick = function(evt){
-    const nextIndex = parseInt(evt.target.getAttribute("data-damily-index"));
-    if (isNaN(nextIndex)) {
-        return false;
-    }
-    // We also need to get "setFamily" function passed down to here from CohortView
-    // and then call it here.
-    // And then in callback -
-    // Switch tab
-    navigate("#pedigree", { skipRequest: true });
 };
 
 
@@ -419,7 +423,7 @@ class PedigreeTabView extends React.PureComponent {
     render(){
         const {
             context, schemas, windowWidth, windowHeight, href, session, graphData,
-            pedigreeFamilies: families, pedigreeFamiliesIdx, currFamily: currentFamily, handleFamilySelect
+            pedigreeFamilies: families, pedigreeFamiliesIdx, currFamily: currentFamily, onFamilySelect
         } = this.props;
         const { showAllDiseases, showAsDiseases, showOrderBasedName, selectedDiseases } = this.state;
 
@@ -445,7 +449,7 @@ class PedigreeTabView extends React.PureComponent {
                             <SelectDiseasesDropdown {...{ showAsDiseases, selectedDiseases, availableDiseases }}
                                 onChange={this.handleToggleSelectedDisease} />
                             {/* <ShowAsDiseasesDropdown onSelect={this.handleChangeShowAsDiseases} {...{ showAllDiseases, showAsDiseases }}  /> */}
-                            <FamilySelectionDropdown {...{ families, currentFamilyIdx: pedigreeFamiliesIdx }} onSelect={handleFamilySelect} />
+                            <FamilySelectionDropdown {...{ families, currentFamilyIdx: pedigreeFamiliesIdx }} onSelect={onFamilySelect} />
                             <PedigreeFullScreenBtn />
                         </CollapsibleItemViewButtonToolbar>
                     </h3>
