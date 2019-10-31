@@ -15,7 +15,6 @@ import { ViewFileButton } from '@hms-dbmi-bgm/shared-portal-components/es/compon
 import { FlexibleDescriptionBox } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/FlexibleDescriptionBox';
 import { Schemas, fileUtil, typedefs } from './../util';
 
-import { Wrapper as ItemHeaderWrapper, TopRow, MiddleRow, BottomRow } from './components/ItemHeader';
 import { SlideInPane } from './../viz/SlideInPane';
 import { TabView } from './components/TabView';
 import { Publications } from './components/Publications';
@@ -282,24 +281,6 @@ export default class DefaultItemView extends React.PureComponent {
     }
 
     /**
-     * Returns list of elements to be rendered between Item header and the list of properties (or Tabs).
-     * May be extended/customized.
-     *
-     * **NOTE: If adding something here and intend it to apply to _ALL_ Item views:**,
-     * Ensure any Item views which extend/override this method also receive this edit.
-     *
-     * @returns {JSX.Element[]} By default, `Publications.PublicationBelowHeaderRow` and `StaticHeaderArea` component instances.
-     */
-    itemMidSection(){
-        return (
-            <React.Fragment>
-                <Publications.PublicationBelowHeaderRow {...this.props} publication={this.props.context.produced_in_pub} key="publication-info" />
-                <StaticHeadersArea context={this.props.context} key="static-headers-area" />
-            </React.Fragment>
-        );
-    }
-
-    /**
      * Renders footer for the ItemView (if any).
      *
      * @returns {null} Nothing returned by default unless extended.
@@ -312,33 +293,6 @@ export default class DefaultItemView extends React.PureComponent {
     additionalItemActionsContent(){
         return null;
     }
-
-    /**
-     * Somewhat hacky/anti-pattern - calls function of a child component.
-     * Is kept this way to simplify code and avoid putting more logic into
-     * or above this top-level component.
-     */
-    /*
-    onItemActionsTabClick(evt){
-        const childOnClickFxn = (this.itemActionsTabRef.current && this.itemActionsTabRef.current.toggleOpen) || null;
-        if (!childOnClickFxn) {
-            console.error("No function or ref available");
-            return;
-        }
-
-        // React bubbles click events up to outer tab including clicks
-        // within the React.createPortal render tree (unless propagation stopped).
-        // So we check evt.target to ensure we're being called from
-        // menu btn click and nowhere else.
-        // Not super ideal structure but simplifies some other stuff
-        // so keeping this for now.
-        if (!layout.isDOMElementChildOfElementWithClass(evt.target, 'menu-tab')){
-            return;
-        }
-
-        childOnClickFxn(evt);
-    }
-    */
 
     /**
      * The render method which puts the above method outputs together.
@@ -370,8 +324,6 @@ export default class DefaultItemView extends React.PureComponent {
                 <div id="item-page-alerts-container">
                     <Alerts alerts={alerts} className="alerts" />
                 </div>
-                {/* this.itemHeader() */}
-                {/* this.itemMidSection() */}
                 <TabView
                     contents={this.getTabViewContents()} ref={this.tabbedViewRef} key="tabbedView"
                     {..._.pick(this.props, 'windowWidth', 'windowHeight', 'href', 'context')}
@@ -771,7 +723,7 @@ export class OverViewBodyItem extends React.PureComponent {
 
             return (
                 <div className="imaging-path-item-wrapper row">
-                    <div className="index-num col-2 mono-text text-500"><small>{ channel }</small></div>
+                    <div className="index-num col-2 text-monospace text-500"><small>{ channel }</small></div>
                     <div className={"imaging-path col-" + (matchingFile ? '7' : '10')}>{ object.itemUtil.generateLink(path, true) }</div>
                     { matchingFile ? <div className="microscope-setting col-3 text-right" data-tip="Light Source Center Wavelength">{ fileUtil.getLightSourceCenterMicroscopeSettingFromFile(channel, matchingFile) }nm</div> : null }
                 </div>

@@ -3,7 +3,7 @@ import memoize from 'memoize-one';
 import url from 'url';
 
 import SubmissionView from '@hms-dbmi-bgm/shared-portal-components/es/components/forms/SubmissionView';
-import CaseSubmissionView from './../item-pages/CaseView/CaseSubmissionView';
+import CohortSubmissionView from './../item-pages/CohortView/CohortSubmissionView';
 
 
 export function getSubmissionItemTypes(context, href){
@@ -37,8 +37,8 @@ export default class CGAPSubmissionView extends React.PureComponent {
         const principalTypes = this.memoized.getSubmissionItemTypes(context, href);
         const [ leafType ] = principalTypes;
 
-        if (leafType === "Case" && (currentAction === "add" || currentAction === "create")){
-            return <CaseSubmissionView {...this.props} />;
+        if (leafType === "Cohort" && (currentAction === "add" || currentAction === "create")){
+            return <CohortSubmissionView {...this.props} />;
         }
 
         return <SubmissionView {...this.props} />;
