@@ -163,7 +163,7 @@ const CohortSummaryTabView = React.memo(function CohortSummaryTabView(props){
     const {
         pedigreeFamilies: families = [],
         context: {
-            case_phenotypic_features: cohortFeatures = { case_phenotypic_features: [] },
+            cohort_phenotypic_features: cohortFeatures = { cohort_phenotypic_features: [] },
             description: cohortDescription = ""
         } = {}
     } = props;
