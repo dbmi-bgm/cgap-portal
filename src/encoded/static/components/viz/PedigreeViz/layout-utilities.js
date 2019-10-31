@@ -254,6 +254,7 @@ export function indvListToMap(list){
 
 /**
  * Must have `_drawing.heightIndex` already.
+ * @deprecated
  */
 export function getParentlessPartners(objectGraph, memoized = {}){
     const rootlessPartners = {};
@@ -290,10 +291,9 @@ export function getParentlessPartners(objectGraph, memoized = {}){
     return rootlessPartners;
 }
 
-export function getChildlessSiblings(objectGraph, memoized = {}){
+export function getChildlessSiblings(leafIndividuals){
     const leafSiblings = {};
     const seen = {};
-    const leafIndividuals = (memoized.getChildlessIndividuals || getChildlessIndividuals)(objectGraph);
     leafIndividuals.forEach(function(indv){
         const { id, _parentalRelationship = null } = indv;
         if (seen[id]) return;
@@ -347,8 +347,8 @@ export function permutate2DArray1Dimension(arr){
     return permutateArray(arr).map(flattenBuckets);
 }
 
-export function computePossibleParentlessPermutations(objectGraph, memoized = {}, skip={}){
-    const parentlessIndividuals = (memoized.getParentlessIndividuals || getParentlessIndividuals)(objectGraph);
+export function computePossibleParentlessPermutations(objectGraph, skip={}){
+    const parentlessIndividuals = getParentlessIndividuals(objectGraph);
     const seen = {};
     const buckets = [];
     console.log("PARENTLESSINDVDS", parentlessIndividuals);
@@ -387,10 +387,10 @@ export function computePossibleParentlessPermutations(objectGraph, memoized = {}
 
 
 
-export function computePossibleChildlessPermutations(objectGraph, memoized = {}, skip={}){
-    const leafSiblingsObj = (memoized.getChildlessSiblings || getChildlessSiblings)(objectGraph);
-    const leafIndividuals = (memoized.getChildlessIndividuals || getChildlessIndividuals)(objectGraph);
-    const idMap = (memoized.indvListToMap || indvListToMap)(objectGraph);
+export function computePossibleChildlessPermutations(objectGraph, skip={}){
+    const leafIndividuals = getChildlessIndividuals(objectGraph);
+    const leafSiblingsObj = getChildlessSiblings(leafIndividuals);
+    const idMap = indvListToMap(objectGraph);
     const seen = {};
     const buckets = [];
 
@@ -948,13 +948,9 @@ function countEdgeCrossings(order){
 }
 
 
-export function orderObjectGraph(objectGraph, memoized = {}){
-    //const parentlessIndividuals     = (memoized.getParentlessIndividuals || getParentlessIndividuals)(objectGraph);
-    const leafChildren              = (memoized.getChildlessIndividuals || getChildlessIndividuals)(objectGraph);
-    //const parentlessPartners        = (memoized.getParentlessPartners || getParentlessPartners)(objectGraph, memoized);
-    //const leafSiblings              = (memoized.getChildlessSiblings || getChildlessSiblings)(objectGraph, memoized);
-    const rootPermutations          = computePossibleParentlessPermutations(objectGraph, memoized);
-    const leafPermutations          = computePossibleChildlessPermutations(objectGraph, memoized);
+export function orderObjectGraph(objectGraph, relationships = null){
+    const rootPermutations = computePossibleParentlessPermutations(objectGraph);
+    const leafPermutations = computePossibleChildlessPermutations(objectGraph);
 
     let bestOrder = null;
     let bestCrossings = Infinity;
@@ -967,7 +963,7 @@ export function orderObjectGraph(objectGraph, memoized = {}){
 
     console.log(
         'PERMUTATIONS',
-        leafPermutations, leafChildren,
+        leafPermutations,
         rootPermutations,
         //orderingInitial,
         //orderingPermutations
@@ -1023,7 +1019,7 @@ export function orderObjectGraph(objectGraph, memoized = {}){
     objectGraph.forEach(function(indv){
         indv._drawing.orderInHeightIndex = seenOrderInIndex[indv.id];
     });
-    const relationships = (memoized.getRelationships || getRelationships)(objectGraph);
+    relationships = relationships || getRelationships(objectGraph);
     relationships.forEach(function(r){
         r._drawing.orderInHeightIndex = seenOrderInIndex[r.id];
     });

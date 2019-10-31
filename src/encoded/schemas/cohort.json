@@ -1,0 +1,95 @@
+{
+    "title": "Cohort",
+    "id": "/profiles/cohort.json",
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "type": "object",
+    "required": ["title", "project", "institution"],
+    "identifyingProperties": ["uuid", "accession", "aliases"],
+    "additionalProperties": true,
+    "mixinProperties": [
+        { "$ref": "mixins.json#/schema_version" },
+        { "$ref": "mixins.json#/accession" },
+        { "$ref": "mixins.json#/aliases" },
+        { "$ref": "mixins.json#/uuid" },
+        { "$ref": "mixins.json#/submitted" },
+        { "$ref": "mixins.json#/modified" },
+        { "$ref": "mixins.json#/status" },
+        { "$ref": "mixins.json#/attribution" }
+    ],
+    "properties": {
+        "accession" : {
+            "accessionType" : "CO"
+        },
+        "title": {
+            "title": "Title",
+            "description": "Title for this Cohort",
+            "type": "string"
+        },
+        "families": {
+            "title": "Families",
+            "type": "array",
+            "uniqueItems": true,
+            "items" : {
+                "title": "Family",
+                "type": "object",
+                "properties": {
+                    "members": {
+                        "title" : "Members",
+                        "description": "Family members",
+                        "type" : "array",
+                        "items": {
+                            "title": "Member",
+                            "type": "string",
+                            "linkTo": "Individual"
+                        }
+                    },
+                    "proband": {
+                        "title" : "Member",
+                        "description": "Proband member of the family",
+                        "type" : "string",
+                        "linkTo" : "Individual"
+                    },
+                    "pedigree_source": {
+                        "title": "Pedigree Source",
+                        "description": "Source of the input pedigree. Include version information, if applicable",
+                        "type": "string"
+                    },
+                    "original_pedigree": {
+                        "title" : "Original Pedigree File",
+                        "description": "The original pedigree file used for this family",
+                        "type" : "string",
+                        "linkTo": "Document"
+                    },
+                    "clinic_notes": {
+                        "title": "Pedigree Notes from the Clinic",
+                        "type": "string"
+                    },
+                    "timestamp": {
+                        "title": "Pedigree Timestamp",
+                        "description": "Date of original pedigree file generation",
+                        "type": "string",
+                        "anyOf": [
+                            {"format": "date-time"},
+                            {"format": "date"}
+                        ]
+                    },
+                    "family_phenotypic_features": {
+                        "title": "Family phenotypic features",
+                        "description": "Main phenotypic features for the family",
+                        "type" : "array",
+                        "items": {
+                            "title": "Family phenotypic feature",
+                            "type": "string",
+                            "linkTo": "Phenotype"
+                        }
+                    }
+                }
+            }
+        },
+        "description": {
+            "title": "Description",
+            "description": "Description of the cohort",
+            "type": "string"
+        }
+    }
+}

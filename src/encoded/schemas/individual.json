@@ -172,9 +172,30 @@
             "title" : "Cause of Infertility",
             "type" : "string"
         },
+        "ancestry": {
+            "title": "Ancestry",
+            "description": "Ancestry of the individual.",
+            "type": "array",
+            "uniqueItems": true,
+            "items": {
+                "title": "Ancestry",
+                "type" : "string",
+                "enum": [
+                    "African/African American",
+                    "Amish",
+                    "Latino",
+                    "Ashkenazi Jewish",
+                    "East Asian",
+                    "Finnish",
+                    "Non-Finnish European",
+                    "South Asian",
+                    "Other"
+                ]
+            }
+        },
         "ethnicity": {
             "title": "Ethnicity",
-            "description": "Ethnicity of the individual. Can use a suggested or custom value",
+            "description": "Ethnicity of the individual.",
             "type": "string",
             "suggested_enum": [
                 "Asian",

@@ -151,7 +151,8 @@ table.matrix {
 					overflow-x: hidden;
 					font-weight: 500;
 
-					.mono-text {
+					.mono-text,
+					.text-monospace {
 						text-shadow: 0 0 0;
 					}
 				}

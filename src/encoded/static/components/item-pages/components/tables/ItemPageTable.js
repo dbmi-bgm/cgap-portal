@@ -46,7 +46,7 @@ export class ItemPageTable extends React.Component {
                     if (title && (title.length > 20 || width < 100)) tooltip = title;
 
                     if (link){ // Link instead of plaintext
-                        title = <a href={link} className={"text-400" + (isAnAccession ? ' mono-text' : '')}>{ title }</a>;
+                        title = <a href={link} className={"text-400" + (isAnAccession ? ' text-monospace' : '')}>{ title }</a>;
                     }
 
                     var typeTitle = null;
