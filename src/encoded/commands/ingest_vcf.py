@@ -81,13 +81,13 @@ class VCFParser(object):
     def parse_annovar(raw, n_expected):
         """
         Helper method for parse_vcf_record to handle formatting problems
-        with ANNOVAR annotations
+        with ANNOVAR/ANNOTADD annotations
+
+        XXX: This cannot be necessary. Need to agree on annotation format.
         """
         lst = ','.join(raw).split('|')
         if len(lst) == n_expected:
             return [','.join(raw)]
-        elif len(lst) % n_expected == 0:
-            return raw # XXX: Handle this later
         else:
             raise VCFParserException
 

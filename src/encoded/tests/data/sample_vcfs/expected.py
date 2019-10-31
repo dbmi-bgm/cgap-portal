@@ -89,3 +89,4 @@ ANNOTADD_EXPECTED_N_FIELDS = 702
 ANNOTADD_EXPECTED_N_RECORD_FIELDS = 656
 
 SINGLE_RECORD_ALL = './src/encoded/tests/data/sample_vcfs/single_record_ALL.vcf'
+TEST_VCF = './src/encoded/tests/data/sample_vcfs/test.vcf'

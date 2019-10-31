@@ -14,7 +14,8 @@ from encoded.tests.data.sample_vcfs.expected import (
     ANNOTADD_SINGLE_RECORD,
     ANNOTADD_EXPECTED_N_FIELDS,
     ANNOTADD_EXPECTED_N_RECORD_FIELDS,
-    SINGLE_RECORD_ALL
+    SINGLE_RECORD_ALL,
+    TEST_VCF
 )
 from encoded.commands.ingest_vcf import (
     VCFParser
@@ -65,6 +66,13 @@ def single_record_annotadd():
 @pytest.fixture
 def single_record_all():
     parser = VCFParser(SINGLE_RECORD_ALL, VARIANT_SCHEMA, VARIANT_SAMPLE_SCHEMA)
+    parser.parse_vcf_fields()
+    return parser
+
+
+@pytest.fixture
+def full_vcf():
+    parser = VCFParser(TEST_VCF, VARIANT_SCHEMA, VARIANT_SAMPLE_SCHEMA)
     parser.parse_vcf_fields()
     return parser
 
@@ -142,7 +150,20 @@ def test_VCFParser_parse_ALL(single_record_all):
     """
     record = single_record_all.get_record()
     result = single_record_all.parse_vcf_record(record)
+    assert len(single_record_all.format['ANNOTADD']) == ANNOTADD_EXPECTED_N_FIELDS
+    assert len(single_record_all.format['ANN']) == len(ANN_FIELDS)
+    for field in ANNOVAR_SINGLE_RECORD_EXPECTED.keys():
+        assert field in result
     for field, values in ANN_SINGLE_RECORD_EXPECTED.items():
         assert result[field] == values
     for field, values in ANNOVAR_SINGLE_RECORD_EXPECTED.items():
         assert result[field] == values
+
+
+def test_VCFParser_parse_multiple_ALL(full_vcf):
+    """
+        Tests that we can read/process a VCF file containing all three annotation
+        types with many records
+    """
+    for record in full_vcf.reader:
+        result = full_vcf.parse_vcf_record(record)
