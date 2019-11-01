@@ -148,7 +148,7 @@
         "age_at_death": {
             "title": "Death Age",
             "type": "number"
-            },
+        },
         "age_at_death_units": {
             "title": "Death Age Units",
             "type": "string",
@@ -255,6 +255,130 @@
                 "type" : "string",
                 "linkTo" : "Sample"
             }
+        }
+    },
+    "facets" : {
+        "life_status" : {
+            "title" : "Life Status"
+        },
+        "sex" : {
+            "title" : "Gender"
+        },
+        "birth_year" : {
+            "title" : "Birth Year",
+            "notes": "Currently will show up as terms; need to change to date range once able to"
+        },
+        "disorders" : {
+            "title" : "Disorders"
+        },
+        "phenotypic_features" : {
+            "title" : "Phenotypic Features"
+        },
+        "ethnicity" : {
+            "title": "Ethnicity",
+            "grouping": "Origin"
+        },
+        "ancestry" : {
+            "title": "Ancestry",
+            "grouping": "Origin"
+        },
+        "is_infertile" : {
+            "title": "Is Infertile",
+            "grouping" : "Children",
+            "notes" : "We could implement a 'boolean' facet type view"
+        },
+        "is_no_children_by_choice" : {
+            "title": "No Children by Choice",
+            "grouping" : "Children"
+        },
+        "is_still_birth" : {
+            "title": "Is Still-Birth",
+            "grouping" : "Pregnancy"
+        },
+        "is_spontaneous_abortion" : {
+            "title": "Is Spontaneous Abortion",
+            "grouping" : "Pregnancy"
+        },
+        "is_termination_of_pregnancy" : {
+            "title": "Is Termination of Pregnancy",
+            "grouping" : "Pregnancy"
+        },
+        "is_pregnancy" : {
+            "title" : "Is Pregnancy",
+            "grouping" : "Pregnancy"
+        },
+        "is_deceased" : {
+            "title" : "Is Deceased",
+            "grouping" : "Deceased"
+        },
+        "cause_of_death" : {
+            "title": "Cause of Death",
+            "grouping" : "Deceased"
+        },
+        "age_at_death" : {
+            "title": "Age of Death",
+            "grouping": "Deceased",
+            "disabled": true,
+            "notes" : "We should create calculated property that combined age_at_death + age_at_death_units, idk."
+        }
+    },
+    "columns" : {
+        "institutional_id" : {
+            "title" : "Institutional ID"
+        },
+        "age" : {
+            "title" : "Age",
+            "notes" : "Make custom column render fxn that combines this + units",
+            "default_hidden" : true
+        },
+        "sex" : {
+            "title" : "Sex",
+            "default_hidden" : false
+        },
+        "ethnicity" : {
+            "title" : "Ethnicity",
+            "default_hidden" : true
+        },
+        "ancestry" : {
+            "title" : "Ancestry",
+            "default_hidden" : true
+        },
+        "life_status" : {
+            "title" : "Life Status",
+            "default_hidden" : false
+        },
+        "age_at_death" : {
+            "title" : "Age at Death",
+            "default_hidden" : true,
+            "notes" : "Make custom column render fxn that combines this + units"
+        },
+        "cause_of_death" : {
+            "title" : "Death Cause",
+            "default_hidden" : true
+        },
+        "is_pregnancy" : {
+            "title" : "Pregnancy",
+            "default_hidden" : true
+        },
+        "is_termination_of_pregnancy" : {
+            "title" : "Termination of Pregnancy",
+            "default_hidden" : true
+        },
+        "is_spontaneous_abortion" : {
+            "title" : "Spontaneous Abortion",
+            "default_hidden" : true
+        },
+        "is_still_birth" : {
+            "title" : "Still Birth",
+            "default_hidden" : true
+        },
+        "is_no_children_by_choice" : {
+            "title" : "No Children by Choice",
+            "default_hidden" : true
+        },
+        "is_infertile" : {
+            "title" : "Infertile",
+            "default_hidden" : true
         }
     }
 }

@@ -304,9 +304,6 @@
             "title" : "File Format",
             "description" : "Format of the file, i.e. the file extension."
         },
-        "track_and_facet_info.lab_name": {
-            "title": "Generating Lab"
-        },
         "file_size" : {
             "title" : "File Size",
             "description" : "Filter using range of size of the file",
