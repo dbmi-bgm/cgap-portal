@@ -186,12 +186,15 @@ const CohortSummaryTabView = React.memo(function CohortSummaryTabView(props){
         pedigreeFamiliesIdx = 0,
         context: {
             cohort_phenotypic_features: cohortFeatures = { cohort_phenotypic_features: [] },
-            description: cohortDescription = ""
+            description: cohortDescription = "",
+            actions: permissibleActions = []
         } = {},
         idToGraphIdentifier,
         onFamilySelect
     } = props;
+
     const familiesLen = families.length;
+    const editAction = _.findWhere(permissibleActions, { name: "edit" });
 
     function getNumberOfIndividuals(fams) {
         let count = 0;
@@ -209,6 +212,45 @@ const CohortSummaryTabView = React.memo(function CohortSummaryTabView(props){
             });
         }); // todo: this is done in CohortSummaryTable --  maybe move it up and pass it down
         return count;
+    }
+
+    let cohortSummaryTables;
+    if (familiesLen > 0) {
+        cohortSummaryTables = families.map(function(family, idx){
+            const { original_pedigree: { display_title: pedFileName } = {} } = family;
+            const cls = "summary-table-container family-index-" + idx;
+            const onClick = function(evt){
+                onFamilySelect(idx, function(){
+                    navigate("#pedigree", { skipRequest: true });
+                });
+            };
+            const isCurrentFamily = idx === pedigreeFamiliesIdx;
+            const tip = isCurrentFamily ?
+                "Currently-selected family in Pedigree Visualization"
+                : "Click to view this family in the Pedigree Visualization tab";
+            const title = (
+                <h4 data-family-index={idx} className="clickable" onClick={onClick} data-tip={tip}>
+                    <i className="icon icon-fw icon-sitemap fas mr-1 small" />
+                    Family { (idx + 1) }
+                    { pedFileName ? <span className="text-300">{ " (" + pedFileName + ")" }</span> : null }
+                </h4>
+            );
+            return (
+                <div className={cls} key={idx} data-is-current-family={isCurrentFamily}>
+                    { title }
+                    <CohortSummaryTable {...family} {...{ idx, idToGraphIdentifier, isCurrentFamily }} />
+                </div>
+            );
+        });
+    } else {
+        cohortSummaryTables = (
+            <div className="mt-3">
+                <h4 className="text-400 mb-03">No families available</h4>
+                { editAction ?
+                    <div>{ "Add a family by pressing \"Actions\" at top right of page and then \"Add Family\"."}</div>
+                    : null }
+            </div>
+        );
     }
 
     return (
@@ -241,34 +283,9 @@ const CohortSummaryTabView = React.memo(function CohortSummaryTabView(props){
                     </div>
                 </div>
             </div>
-            {
-                families.map(function(family, idx){
-                    const { original_pedigree: { display_title: pedFileName } = {} } = family;
-                    const cls = "summary-table-container family-index-" + idx;
-                    const onClick = function(evt){
-                        onFamilySelect(idx, function(){
-                            navigate("#pedigree", { skipRequest: true });
-                        });
-                    };
-                    const isCurrentFamily = idx === pedigreeFamiliesIdx;
-                    const tip = isCurrentFamily ?
-                        "Currently-selected family in Pedigree Visualization"
-                        : "Click to view this family in the Pedigree Visualization tab";
-                    const title = (
-                        <h4 data-family-index={idx} className="clickable" onClick={onClick} data-tip={tip}>
-                            <i className="icon icon-fw icon-sitemap fas mr-1 small" />
-                            Family { (idx + 1) }
-                            { pedFileName ? <span className="text-300">{ " (" + pedFileName + ")" }</span> : null }
-                        </h4>
-                    );
-                    return (
-                        <div className={cls} key={idx} data-is-current-family={isCurrentFamily}>
-                            { title }
-                            <CohortSummaryTable {...family} {...{ idx, idToGraphIdentifier, isCurrentFamily }} />
-                        </div>
-                    );
-                })
-            }
+            <div className="processing-summary-tables-container mt-15">
+                { cohortSummaryTables }
+            </div>
         </div>
     );
 });
@@ -283,7 +300,7 @@ CohortSummaryTabView.getTabObject = function(props){
             </React.Fragment>
         ),
         'key' : 'cohort-summary',
-        'disabled' : familiesLen === 0,
+        'disabled' : false,
         'content' : <CohortSummaryTabView {...props} />
     };
 };
