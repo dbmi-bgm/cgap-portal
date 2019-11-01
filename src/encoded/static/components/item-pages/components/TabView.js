@@ -56,16 +56,25 @@ export function getTitleForCustomTab(tabName){
 
 export class TabView extends React.PureComponent {
 
-    /** Returns key of first item with `isDefault: true` or first item. */
-    static getDefaultActiveKeyFromContents(contents){
-        var defaultActiveTab = _.findWhere(contents, { 'isDefault' : true });
+    /**
+     * Returns key of first item with `isDefault: true`
+     * or of first non-disabled item.
+     */
+    static getDefaultActiveKeyFromContents(contents = []){
+        if (!Array.isArray(contents)) {
+            throw new Error("Expected array");
+        }
+        const defaultActiveTab = _.findWhere(contents, { 'isDefault' : true });
         if (typeof defaultActiveTab !== 'undefined' && typeof defaultActiveTab.key !== 'undefined'){
             return defaultActiveTab.key;
         }
-        if (contents.length > 0){
-            return contents[0].key;
+        for (let i = 0; i < contents.length; i++) {
+            // First item that isn't disabled
+            if (!contents[i].disabled) {
+                return contents[i].key;
+            }
         }
-        return null;
+        throw new Error("Did not find any non-disabled tab.");
     }
 
     static createTabObject(key, title, icon, tabContent, extraProps = {}){
