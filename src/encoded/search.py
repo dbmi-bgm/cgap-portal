@@ -523,7 +523,14 @@ def set_sort_order(request, search, search_term, types, doc_types, result):
         else:
             name = requested_sort
             order = 'asc'
-        sort_schema = type_schema.get('properties', {}).get(name) if type_schema else None
+        sort_schema = None
+        if type_schema:
+            try:
+                sort_schema = crawl_schema(types, name, type_schema)
+            except Exception as exc:  # cannot find schema. Log and Return None
+                if should_log:
+                    log.warning('Cannot find schema in search.py. Type: %s. Field: %s'
+                            % (doc_types[0], name), field=name, error=str(exc))
         if sort_schema:
             sort_type = sort_schema.get('type')
         else:
@@ -540,6 +547,12 @@ def set_sort_order(request, search, search_term, types, doc_types, result):
             sort['embedded.' + name] = result_sort[name] = {
                 'order': order,
                 'unmapped_type': 'float',
+                'missing': '_last'
+            }
+        elif sort_schema and determine_if_is_date_field(name, sort_schema):
+            sort['embedded.' + name + '.raw'] = result_sort[name] = {
+                'order': order,
+                'unmapped_type': 'date',
                 'missing': '_last'
             }
         else:
