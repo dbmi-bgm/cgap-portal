@@ -29,11 +29,12 @@ ORDER = [
     'project',
     'institution',
     'file_format',
+    'phenotype',
     'disorder',
     'cohort',
     'individual',
     'sample',
-    'workflow'
+    'workflow',
 ]
 
 IS_ATTACHMENT = [
