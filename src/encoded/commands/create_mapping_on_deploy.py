@@ -23,7 +23,6 @@ ITEM_INDEX_ORDER = [
     'WorkflowMapping',
     'WorkflowRun',
     'WorkflowRunAwsem',
-    'Disorder',
     'FileFormat',
     'FileFastq',
     'FileProcessed',
@@ -31,6 +30,7 @@ ITEM_INDEX_ORDER = [
     'Image',
     'Gene',
     'Phenotype',
+    'Disorder',
     'Individual',
     'Document',
     'QualityMetricBamcheck',
@@ -45,6 +45,7 @@ ITEM_INDEX_ORDER = [
     'Sysinfo',
     'StaticSection',
     'Document',
+    'Evidence',
     'Page'
 ]
 
