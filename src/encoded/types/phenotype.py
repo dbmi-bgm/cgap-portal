@@ -9,6 +9,7 @@ from .base import (
 )
 from .evidence import get_evidence_linked_items
 
+
 @collection(
     name='phenotypes',
     unique_key='phenotype:hpo_id',

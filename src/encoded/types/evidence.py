@@ -44,7 +44,7 @@ def get_evidence_linked_items(request, rpaths, direction, filter=None):
         evi_item = get_item_if_you_can(request, evi, 'evidences')
         if evi_item:
             ri_info = evi_item.get(dname)
-            if filter and filter not in obj_info:
+            if filter and filter not in ri_info:
                 continue
             atids.append(ri_info)
     return atids
