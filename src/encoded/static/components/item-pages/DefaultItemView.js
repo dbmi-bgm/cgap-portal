@@ -351,7 +351,9 @@ export default class DefaultItemView extends React.PureComponent {
         if (controllersLen > 0) {
             // Create ~ `<Controller0><Controller1><Controller2><InnerBody/></Controller2></Controller1></Controller0>`
             controllers.slice().reverse().forEach((ctrlr, i) => {
-                innerBody = React.createElement(ctrlr, i === (controllersLen - 1) ? this.props : null, innerBody);
+                // Handle both instantiated & non-instantiated controllers
+                const createFxn = React.isValidElement(ctrlr) ? React.cloneElement : React.createElement;
+                innerBody = createFxn(ctrlr, i === (controllersLen - 1) ? this.props : {}, innerBody);
             });
         }
         return (

@@ -157,6 +157,14 @@ const pedigreeVizDefaultProps = {
      */
     "minimumHeight" : 400,
 
+
+    /**
+     * Disables node selection.
+     * Useful if purposely excluding `renderDetailPane`.
+     * E.g. for a miniature preview view.
+     */
+    "disableSelect" : false,
+
     /**
      * Width of parent container.
      * Will be scrollable left/right if greater than this.
@@ -227,6 +235,9 @@ const pedigreeVizDefaultProps = {
     "zoomToExtentsOnMount" : true,
 
 
+    "showZoomControls" : true,
+
+
     /**
      * If when detail pane is open it reduces width or height
      * of the container/viewport, can add the amount removed
@@ -282,7 +293,7 @@ PedigreeViz.defaultProps = pedigreeVizDefaultProps;
  *   and wrap 1 of these components.
  * - Define propTypes.
  */
-function PedigreeVizView(props){
+const PedigreeVizView = React.memo(function PedigreeVizView(props){
     const {
         objectGraph, onNodeSelected, onDataChanged,
         zoomToExtentsOnMount, initialScale,
@@ -291,6 +302,7 @@ function PedigreeVizView(props){
         height, width, minimumHeight,
         detailPaneOpenOffsetWidth,
         detailPaneOpenOffsetHeight,
+        disableSelect,
         ...passProps
     } = props;
 
@@ -306,6 +318,7 @@ function PedigreeVizView(props){
     const pedigreeViewProps = {
         ...passProps, objectGraph,
         graphWidth, graphHeight,
+        disableSelect,
         innerHeight: height
     };
 
@@ -320,7 +333,7 @@ function PedigreeVizView(props){
      *   `scale`, `minScale`, `maxScale`, `setScale`, `onMount`, `onUnmount`
      */
     return (
-        <SelectedNodeController {...{ onNodeSelected, onDataChanged, objectGraph }}>
+        <SelectedNodeController {...{ onNodeSelected, onDataChanged, objectGraph, disableSelect }}>
             <DetailPaneOffsetContainerSize {...{ containerWidth, containerHeight, detailPaneOpenOffsetWidth, detailPaneOpenOffsetHeight }}>
                 <ScaleController {...scaleProps}>
                     <PedigreeVizViewUserInterface {...pedigreeViewProps} />
@@ -328,7 +341,19 @@ function PedigreeVizView(props){
             </DetailPaneOffsetContainerSize>
         </SelectedNodeController>
     );
-}
+});
+PedigreeVizView.defaultProps = {
+    "minimumHeight": pedigreeVizDefaultProps.minimumHeight,
+    "disableSelect": pedigreeVizDefaultProps.disableSelect,
+    "visibleDiseases": pedigreeVizDefaultProps.visibleDiseases,
+    "showOrderBasedName": pedigreeVizDefaultProps.showOrderBasedName,
+    "showZoomControls": pedigreeVizDefaultProps.showZoomControls,
+    "enableMouseWheelZoom": pedigreeVizDefaultProps.enableMouseWheelZoom,
+    "enablePinchZoom": pedigreeVizDefaultProps.enablePinchZoom,
+    "detailPaneOpenOffsetWidth": pedigreeVizDefaultProps.detailPaneOpenOffsetWidth,
+    "detailPaneOpenOffsetHeight": pedigreeVizDefaultProps.detailPaneOpenOffsetHeight,
+    "renderDetailPane" : null
+};
 
 const DetailPaneOffsetContainerSize = React.memo(function DetailPaneOffsetContainerSize(props){
     const {
@@ -684,6 +709,8 @@ class PedigreeVizViewUserInterface extends React.PureComponent {
             hoveredNode,
             onSelectNode,
             onUnselectNode,
+            showZoomControls = true,
+            disableSelect = false,
             ...passProps
         } = this.props;
         const { isMouseDownOnContainer, mounted } = this.state;
@@ -741,7 +768,7 @@ class PedigreeVizViewUserInterface extends React.PureComponent {
         };
 
         return (
-            <div className="pedigree-viz-container" style={outerContainerStyle}
+            <div className="pedigree-viz-container" style={outerContainerStyle} data-selection-disabled={disableSelect}
                 data-selected-node={selectedNode && selectedNode.id} data-instance-index={this.id}>
                 <div className="inner-container" ref={this.innerRef} style={innerContainerStyle}
                     onMouseDown={this.handleContainerMouseDown}
@@ -757,7 +784,7 @@ class PedigreeVizViewUserInterface extends React.PureComponent {
                         <IndividualsLayer {...commonChildProps} />
                     </div>
                 </div>
-                { typeof setScale === "function" ?
+                { showZoomControls && typeof setScale === "function" ?
                     <ScaleControls {...{ scale, minScale, maxScale, setScale }} />
                     : null }
                 { selectedNodePane ?

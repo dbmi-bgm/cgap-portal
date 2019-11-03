@@ -1732,7 +1732,7 @@ $badge-item-min-height: 90px;
 			padding: 0 10px;
 
 			@include media-breakpoint-up(lg){
-				min-height: 347px;
+				min-height: 358px;
 			}
 		}
 
@@ -1755,6 +1755,10 @@ $badge-item-min-height: 90px;
 			flex-basis: 100%;
 			padding: 0 10px;
 
+			> .pedigree-viz-container > .inner-container {
+				@include border-radius($card-border-radius);
+			}
+
 			@include media-breakpoint-up(lg){
 				flex-grow: 0;
 				flex-shrink: 0;
@@ -1764,6 +1768,10 @@ $badge-item-min-height: 90px;
 
 			@include media-breakpoint-up(xl){
 				flex-basis: 560px;
+			}
+
+			@media (min-width: 1680px) {
+				flex-basis: 800px;
 			}
 		}
 	
@@ -1775,8 +1783,8 @@ $badge-item-min-height: 90px;
 		.pedigree-placeholder {
 			position: relative;
 			// We usually don't want to use this without having a fallback for older browsers
-			height: 100px; // Nice round number, idk.
-			height: calc(100% - 47px);
+			height: 300px; // Nice round number, idk.
+			height: calc(100% - 58px);
 			i.icon.icon-sitemap { // Quick vertical center
 				position: absolute;
 				top: 50%;
@@ -1786,12 +1794,12 @@ $badge-item-min-height: 90px;
 			}
 			border: 1px solid transparent;
 			color: #999;
-			border-radius: 0.25rem; // Same as .card (Bootstrap v4)
-			transition: color .3s, border-color .3s;
+			@include border-radius($card-border-radius); // Same as .card (Bootstrap v4)
+			transition: color .3s;
 			&:not([disabled]):hover {
 				cursor: pointer;
 				color: #777;
-				border-color: #777;
+				border-color: #ddd;
 			}
 		}
 	}

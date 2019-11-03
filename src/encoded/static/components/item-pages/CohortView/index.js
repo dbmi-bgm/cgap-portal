@@ -331,12 +331,16 @@ const CohortSummaryTabView = React.memo(function CohortSummaryTabView(props){
 
         if (rgs === "xl") {
             pedWidth = 560;
+            if (windowWidth >= 1680) {
+                pedWidth = 800;
+            }
         }
 
         if (graphData){
             //const width = layout.gridContainerWidth(windowWidth);
             pedBlock = (
-                <PedigreeVizView {...graphData} width={pedWidth} height={300} visibleDiseases={selectedDiseases} />
+                <PedigreeVizView {...graphData} width={pedWidth} height={300} disableSelect
+                    visibleDiseases={selectedDiseases} showZoomControls={false} enablePinchZoom={false} />
             );
         }
 
@@ -367,7 +371,7 @@ const CohortSummaryTabView = React.memo(function CohortSummaryTabView(props){
                             </a>
                             */}
                             { pedBlock }
-                            <button type="button" className="btn btn-primary btn-block mt-1"
+                            <button type="button" className="btn btn-primary btn-lg btn-block mt-1"
                                 onClick={onViewPedigreeBtnClick} disabled={familiesLen === 0}>
                                 View Pedigree(s)
                             </button>

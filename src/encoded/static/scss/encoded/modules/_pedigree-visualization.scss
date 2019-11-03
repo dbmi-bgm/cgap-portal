@@ -289,6 +289,19 @@ $pedigree-disease-colors :
         }
     }
 
+    &[data-selection-disabled="true"]{
+        .inner-container {
+            > .viz-area {
+                > .individuals-layer {
+                    > .pedigree-individual {
+                        // Unser cursor: pointer
+                        cursor: default !important;
+                    }
+                }
+            }
+        }
+    }
+
 }
 
 svg.pedigree-viz-shapes-layer.shapes-layer {
