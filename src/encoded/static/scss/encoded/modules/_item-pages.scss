@@ -1722,10 +1722,57 @@ $badge-item-min-height: 90px;
 
 .item-page-container {
 
+	.cohort-summary-card-row {
+		display: flex;
+		flex-wrap: wrap;
+		margin: 0 -10px;
+
+		> .col-stats,
+		> .col-pedigree-viz {
+			padding: 0 10px;
+
+			@include media-breakpoint-up(lg){
+				min-height: 347px;
+			}
+		}
+
+		> .col-stats {
+			flex-grow: 1;
+			flex-shrink: 0;
+			flex-basis: 100%;
+			> #cohort-stats {
+				min-height: 100%;
+			}
+
+			@include media-breakpoint-up(lg){
+				flex-basis: 0px;
+			}
+		}
+
+		> .col-pedigree-viz {
+			flex-grow: 0;
+			flex-shrink: 0;
+			flex-basis: 100%;
+			padding: 0 10px;
+
+			@include media-breakpoint-up(lg){
+				flex-grow: 0;
+				flex-shrink: 0;
+				box-sizing: content-box; // Easier to handle width outside of padding.
+				flex-basis: 400px;
+			}
+
+			@include media-breakpoint-up(xl){
+				flex-basis: 560px;
+			}
+		}
+	
+	}
+
 	#cohort-overview-ped-link {
 		margin-left: 0;
 
-		.card-img-top {
+		.pedigree-placeholder {
 			position: relative;
 			// We usually don't want to use this without having a fallback for older browsers
 			height: 100px; // Nice round number, idk.
@@ -1736,6 +1783,15 @@ $badge-item-min-height: 90px;
 				left: 50%;
 				margin-left: -40px;
 				margin-top: -32px;
+			}
+			border: 1px solid transparent;
+			color: #999;
+			border-radius: 0.25rem; // Same as .card (Bootstrap v4)
+			transition: color .3s, border-color .3s;
+			&:not([disabled]):hover {
+				cursor: pointer;
+				color: #777;
+				border-color: #777;
 			}
 		}
 	}
@@ -1867,7 +1923,102 @@ $badge-item-min-height: 90px;
 
 
 
+/**********************************************************
+  PedigreeViz View Tab (CohortView, IndividualView, ...)
+**********************************************************/
 
+.item-page-container {
+
+	.pedigree-tab-view-body-container {
+
+		.pedigree-viz-container {
+			// We make this almost full height.
+			// - IMPORTANT -
+			// Equivalent of this is performed in JS in PedigreeViz, for browsers
+			// which do not yet support calc().
+			// If change size of footer, header, navbar, sub-navbar, etc. then this 216px must
+			// be adjusted here and in JS
+			@include navbar-fixed-position {
+				min-height: calc(100vh - 216px) !important;
+			}
+		}
+
+
+		/** CGAP-specific full screen view styling **/
+
+		&.view-is-full-screen {
+			@include media-breakpoint-up(md){
+				position: fixed;
+				object-fit: contain;
+				width: 100%;
+				width: 100vw;
+				min-width: 100vw;
+				height: 100%;
+				height: 100vh;
+				min-height: 100vh;
+				top: 0;
+				bottom: 0;
+				left: 0;
+				right: 0;
+			}
+		}
+
+		&.view-is-full-screen,
+		&.browser-is-full-screen {
+
+			.pedigree-viz-container {
+
+				@include media-breakpoint-up(md){
+					> .detail-pane-container {
+						.detail-pane-inner {
+							top: 0px;
+						}
+					}
+				}
+
+			}
+
+		}
+
+	}
+
+	/** Dropdown for selecting diseases/features -- CGAP-specific **/
+
+	.tabview-title-controls-container {
+		.disease-option {
+			padding: 1px 10px;
+			display: flex;
+			align-items: center;
+			.checkbox-with-label {
+				flex: 1;
+				> label {
+					cursor: pointer;
+				}
+			}
+			.disease-color-patch {
+				height: 16px;
+				width: 16px;
+				border-radius: 50%;
+				transition: background-color .3s;
+				text-align: center;
+				line-height: 1;
+				> span {
+					font-size: 0.675rem;
+					font-weight: 600;
+					top: -2px;
+					position: relative;
+				}
+				@include pedigree-color-cycle-background;
+			}
+
+			&:hover {
+				background-color: #f4f4f4;
+			}
+		}
+	}
+
+
+}
 
 
 /**********************************************************
