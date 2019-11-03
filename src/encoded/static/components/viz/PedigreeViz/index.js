@@ -359,6 +359,15 @@ const DetailPaneOffsetContainerSize = React.memo(function DetailPaneOffsetContai
 
 });
 
+
+/**
+ * We increment/decrement this in `PedigreeVizViewUserInterface`
+ * constructor so that all have a unique identifier for svg
+ * clipDef ids & similar cases.
+ */
+let createdInstanceCount = 0;
+
+
 class PedigreeVizViewUserInterface extends React.PureComponent {
 
     static diseaseToIndex(visibleDiseases, objectGraph){
@@ -425,6 +434,8 @@ class PedigreeVizViewUserInterface extends React.PureComponent {
             'isMouseDownOnContainer' : true,
             'mounted' : false
         };
+
+        this.id = createdInstanceCount++;
 
         this.memoized = {
             maxHeightIndex: memoize(PedigreeVizViewUserInterface.maxHeightIndex),
@@ -705,6 +716,7 @@ class PedigreeVizViewUserInterface extends React.PureComponent {
         const commonChildProps = {
             ...passProps,
             "objectGraph": orderedNodes,
+            "vizViewID" : this.id,
             containerWidth, containerHeight,
             graphHeight, graphWidth, dims, scale,
             diseaseToIndex,
@@ -729,7 +741,8 @@ class PedigreeVizViewUserInterface extends React.PureComponent {
         };
 
         return (
-            <div className="pedigree-viz-container" style={outerContainerStyle} data-selected-node={selectedNode && selectedNode.id}>
+            <div className="pedigree-viz-container" style={outerContainerStyle}
+                data-selected-node={selectedNode && selectedNode.id} data-instance-index={this.id}>
                 <div className="inner-container" ref={this.innerRef} style={innerContainerStyle}
                     onMouseDown={this.handleContainerMouseDown}
                     onMouseMove={this.handleContainerMouseMove}
@@ -763,7 +776,7 @@ const ShapesLayer = React.memo(function ShapesLayer(props){
         edges, relationships,
         selectedNode, hoveredNode,
         onNodeMouseIn, onNodeMouseLeave,
-        dims, scale, maxHeightIndex
+        dims, scale
     } = props;
     const svgStyle = { width: graphWidth, height: graphHeight };
 
@@ -776,7 +789,7 @@ const ShapesLayer = React.memo(function ShapesLayer(props){
             <EdgesLayer {...{ edges, dims }} />
             <SelectedNodeIdentifier {...{ selectedNode, dims, textScale }} />
             <RelationshipNodeShapeLayer {...{ relationships, hoveredNode, onNodeMouseIn, onNodeMouseLeave, dims, textScale, textScaleTransformStr }} />
-            <IndividualNodeShapeLayer {...props} {...{ textScale, textScaleTransformStr, maxHeightIndex }} />
+            <IndividualNodeShapeLayer {...props} {...{ textScale, textScaleTransformStr }} />
         </svg>
     );
 });
