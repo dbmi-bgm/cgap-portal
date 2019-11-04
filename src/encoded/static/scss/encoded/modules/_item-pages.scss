@@ -1798,6 +1798,12 @@ $badge-item-min-height: 90px;
 				min-width: 640px;
 				width: 100%;
 
+				thead {
+					th.hidden-th {
+						background-color: #ffffff;
+					}
+				}
+				
 				tbody {
 					tr {
 						td {
@@ -1844,7 +1850,7 @@ $badge-item-min-height: 90px;
 							}
 							a.qc-status-in-review {
 								font-style: italic;
-								}
+							}
 						}
 					}
 				}

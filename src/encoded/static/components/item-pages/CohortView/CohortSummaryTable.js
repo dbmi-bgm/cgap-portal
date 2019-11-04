@@ -6,6 +6,7 @@ import memoize from 'memoize-one';
 import _ from 'underscore';
 import { Schemas } from './../../util';
 import { console } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
+import { callbackify } from 'util';
 
 
 /** @param {Object} props - Contents of a family sub-embedded object. */
@@ -25,7 +26,7 @@ export const CohortSummaryTable = React.memo(function CohortSummaryTable(props){
         );
     }
 
-    const columnOrder = [
+    const h2ColumnOrder = [
         "individual",
         "sample",
         "visitInfo",
@@ -61,14 +62,14 @@ export const CohortSummaryTable = React.memo(function CohortSummaryTable(props){
         'rawFiles' : (
             <React.Fragment>
                 <i className="icon icon-fw icon-file-code fas mr-05 align-middle"/>
-                Raw Files
+                <span className="d-none d-lg-inline ml-05">Raw File(s)</span>
             </React.Fragment>
         ),
         'processingType' : "Processing Type",
         'processedFiles' : (
             <React.Fragment>
                 <i className="icon icon-fw icon-file-medical-alt fas mr-05 align-middle"/>
-                Processed File(s)
+                <span className="d-none d-lg-inline ml-05">Processed File(s)</span>
             </React.Fragment>
         ),
         'variants' : (
@@ -79,6 +80,13 @@ export const CohortSummaryTable = React.memo(function CohortSummaryTable(props){
         )
     };
 
+    function pushColumn(title) {
+        // adds a column to the end of the column order and to the column titles map
+        columnTitles[title] = title;
+        h2ColumnOrder.push(title);
+    }
+
+    const hasMSA = h2ColumnOrder.length > 8; //todo: update with appropriate logic, placement
 
     const rows = [];
     const membersWithoutSamples = [];
@@ -217,6 +225,8 @@ export const CohortSummaryTable = React.memo(function CohortSummaryTable(props){
         }
 
         samples.forEach(function(sample, sampleIdx){
+            pushColumn(`Joint Call v${ sampleGroup }`); // todo: update with appropriate sample handling
+
             const {
                 '@id' : sampleID,
                 display_title: sampleTitle,
@@ -316,7 +326,7 @@ export const CohortSummaryTable = React.memo(function CohortSummaryTable(props){
     let currIndvGroup = null; // Individual Group #
     const renderedRows = sortedRows.map(function(row, rowIdx){
         const { isProband = false, sampleIdx } = row;
-        const rowCols = columnOrder.map(function(colName){
+        const rowCols = h2ColumnOrder.map(function(colName){
 
             function statusToIcon(status){
                 switch (status) {
@@ -503,8 +513,16 @@ export const CohortSummaryTable = React.memo(function CohortSummaryTable(props){
         <div className="processing-summary-table-container">
             <table className="processing-summary-table">
                 <thead>
+                    { hasMSA ?
+                        <tr>
+                            {
+                                <React.Fragment>
+                                    <th colSpan="9" className="hidden-th"/>
+                                    <th colSpan={ Object.keys(columnTitles).length - 8 }>Multi Sample Analysis</th>
+                                </React.Fragment>}
+                        </tr> : null}
                     <tr>
-                        { columnOrder.map(function(colName){
+                        { h2ColumnOrder.map(function(colName){
                             return <th key={colName}>{ columnTitles[colName] }</th>;
                         }) }
                     </tr>
