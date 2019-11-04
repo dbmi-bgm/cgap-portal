@@ -268,14 +268,27 @@ def normalize_query(request, types, doc_types):
     def normalize_param(key, val):
         """
         Process each key/val in the original query param. As part of this,
-        obtain the field schema for each parameter.
+        obtain the field schema for each parameter. Changes the query string
+        to redirect the search to the normalized parameters
         Current rules:
         - for 'type', get name from types (from the registry)
         - append '.display_title' to any terminal linkTo query field
+        - append '.display_title' to sorts on linkTo fields
         """
         # type param is a special case. use the name from TypeInfo
         if key == 'type' and val in types:
             return (key, types[val].name)
+
+        # if key is sort, pass val as the key to this function
+        # if it appends display title we know its a linkTo and
+        # should be treated as such
+        if key == 'sort':
+            # do not use '-' if present
+            sort_val = val[1:] if val.startswith('-') else val
+            new_val, _ = normalize_param(sort_val, None)
+            if new_val != sort_val:
+                val = val.replace(sort_val, new_val)
+            return (key, val)
 
         # find schema for field parameter and drill down into arrays/subobjects
         field_schema = schema_for_field(key, request, doc_types)
@@ -525,12 +538,8 @@ def set_sort_order(request, search, search_term, types, doc_types, result):
             order = 'asc'
         sort_schema = None
         if type_schema:
-            try:
-                sort_schema = crawl_schema(types, name, type_schema)
-            except Exception as exc:  # cannot find schema. Log and Return None
-                if should_log:
-                    log.warning('Cannot find schema in search.py. Type: %s. Field: %s'
-                            % (doc_types[0], name), field=name, error=str(exc))
+            sort_schema = schema_for_field(name, request, doc_types)
+
         if sort_schema:
             sort_type = sort_schema.get('type')
         else:
@@ -918,7 +927,8 @@ def schema_for_field(field, request, doc_types, should_log=False):
     '''
     Find the schema for the given field (in embedded '.' format). Uses
     ff_utils.crawl_schema from snovault and logs any cases where there is an
-    error finding the field from the schema
+    error finding the field from the schema. Caches results based off of field
+    and doc types used
 
     Args:
         field (string): embedded field path, separated by '.'
