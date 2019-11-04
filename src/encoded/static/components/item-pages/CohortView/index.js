@@ -290,10 +290,14 @@ const CohortSummaryTabView = React.memo(function CohortSummaryTabView(props){
         cohortSummaryTables = families.map(function(family, idx){
             const { original_pedigree: { display_title: pedFileName } = {} } = family;
             const cls = "summary-table-container family-index-" + idx;
-            const onClick = function(evt){
-                onFamilySelect(idx);
-            };
             const isCurrentFamily = idx === pedigreeFamiliesIdx;
+            const onClick = function(evt){
+                if (isCurrentFamily) {
+                    navigate("#pedigree", { skipRequest: true });
+                } else {
+                    onFamilySelect(idx);
+                }
+            };
             const tip = isCurrentFamily ?
                 "Currently-selected family in Pedigree Visualization"
                 : "Click to view this family in the Pedigree Visualization tab";

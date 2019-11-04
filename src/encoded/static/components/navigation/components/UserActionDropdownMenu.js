@@ -20,13 +20,41 @@ import { LoginNavItem, LogoutDropdownItem } from './LoginNavItem';
  * @property {boolean|function} active - Whether action is currently active.
  */
 
+
+
+const cgapAuth0Options = {
+    auth: {
+        sso: false,
+        redirect: false,
+        responseType: 'token',
+        params: {
+            scope: 'openid email',
+            prompt: 'select_account'
+        }
+    },
+    socialButtonStyle: 'big',
+    theme: {
+        logo: '/static/img/exported-logo-no-stroke.svg',
+        icon: '/static/img/exported-logo-no-stroke.svg',
+        primaryColor: '#1b75b9'
+    },
+    allowedConnections: ['github', 'google-oauth2', 'partners'],
+    defaultEnterpriseConnection: 'partners',
+    languageDictionary: {
+        title: 'Log In',
+        emailInputPlaceholder: 'email@partners.org',
+        databaseEnterpriseAlternativeLoginInstructions: 'or login via Partners'
+    }
+};
+
+
 /**
  * React-Bootstrap Dropdown with User Action menu items.
  *
  * @todo Refactor this into a BigDropdown menu.
  */
 export const UserActionDropdownMenu = React.memo(function UserActionDropdownMenu(props){
-    const { session, href, updateUserInfo } = props;
+    const { session, href, updateUserInfo, overlaysContainer, schemas, windowWidth } = props;
     let acctBtn = null;
 
     if (session){
@@ -61,7 +89,8 @@ export const UserActionDropdownMenu = React.memo(function UserActionDropdownMenu
         );
     } else {
         acctBtn = (
-            <LoginController {..._.pick(props, 'session', 'href', 'updateUserInfo', 'overlaysContainer', 'schemas', 'windowWidth')}>
+            <LoginController {...{ href, session, updateUserInfo, overlaysContainer, schemas, windowWidth }}
+                auth0Options={cgapAuth0Options}>
                 <LoginNavItem key="login-register" className="user-account-item" />
             </LoginController>
         );
