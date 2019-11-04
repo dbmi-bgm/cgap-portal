@@ -213,9 +213,17 @@ class Auth0AuthenticationPolicy(CallbackAuthenticationPolicy):
                 user_url = "https://{domain}/tokeninfo".format(domain='hms-dbmi.auth0.com')
                 resp  = requests.post(user_url, {'id_token':token})
                 payload = resp.json()
-                if 'email' in payload and payload.get('email_verified') is True:
-                    request.set_property(lambda r: False, 'auth0_expired')
-                    return payload
+                if 'email' in payload:
+
+                    # Check Auth0 identities to see if partners is one
+                    # accept if so. Otherwise look for email_verified
+                    is_partners = False
+                    for identity in payload.get('identites', []):
+                        if identity.get('connection', '') == 'partners':
+                            is_partners = True
+                    if payload.get('email_verified') or is_partners:
+                        request.set_property(lambda r: False, 'auth0_expired')
+                        return payload
 
         except (ValueError, jwt.exceptions.InvalidTokenError, jwt.exceptions.InvalidKeyError) as e:
             # Catch errors from decoding JWT
