@@ -20,11 +20,7 @@ from .evidence import get_evidence_linked_items
 class Disorder(Item):
     item_type = 'disorder'
     schema = load_schema('encoded:schemas/disorder.json')
-    embedded_list = [
-        'associated_phenotypes.phenotype.phenotype_name',
-        'associated_phenotypes.phenotype.hpo_id',
-        'associated_phenotypes.phenotype.definition'
-    ]
+    embedded_list = []
     name_key = 'disorder_id'
     rev = {
         'as_subject_evidence': ('Evidence', 'subject_item'),
@@ -49,6 +45,6 @@ class Disorder(Item):
             "linkTo": "Phenotype"
         }
     })
-    def associated_ptypes(self, request):
+    def associated_phenotypes(self, request):
         evi_as_subj = self.rev_link_atids(request, 'as_subject_evidence')
         return get_evidence_linked_items(request, evi_as_subj, 'object', 'phenotype')

@@ -1,12 +1,14 @@
 """Collection for Phenotypes objects."""
 from snovault import (
     calculated_property,
+    abstract_collection,
     collection,
     load_schema,
 )
 from .base import (
     Item,
-    get_item_if_you_can
+    get_item_if_you_can,
+    ALLOW_SUBMITTER_ADD,
 )
 
 
@@ -50,8 +52,9 @@ def get_evidence_linked_items(request, rpaths, direction, filter=None):
     return atids
 
 
-@collection(
+@abstract_collection(
     name='evidences',
+    acl=ALLOW_SUBMITTER_ADD,
     properties={
         'title': 'Evidences',
         'description': 'Listing of Evidence Items',
@@ -61,6 +64,7 @@ class Evidence(Item):
 
     item_type = 'evidence'
     schema = load_schema('encoded:schemas/evidence.json')
+    base_types = ['Evidence'] + Item.base_types
 
     @calculated_property(schema={
         "title": "Display Title",
@@ -75,3 +79,15 @@ class Evidence(Item):
             return st + ' -- ' + ot + ' evidence'
         except Exception as e:
             return Item.display_title(self)
+
+
+@collection(
+    name='evidence_dis_pheno',
+    properties={
+        'title': 'Evidence Linking Disorder to Phenotypes',
+        'description': 'Listing Disorder to Phenotype Items',
+    })
+class EvidenceDisPheno(Evidence):
+    item_type = 'evidence_dis_pheno'
+    schema = load_schema('encoded:schemas/evidence_dis_pheno.json')
+    embedded_list = Evidence.embedded_list
