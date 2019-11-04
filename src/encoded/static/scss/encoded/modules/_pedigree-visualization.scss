@@ -68,20 +68,6 @@ $pedigree-disease-colors :
     }
 }
 
-// PORTAL-SPECIFIC STUFF
-// TODO: Move out if making this viz re-usable
-.pedigree-viz-container {
-    // We make this almost full height.
-    // - IMPORTANT -
-    // Equivalent of this is performed in JS in PedigreeViz, for browsers
-    // which do not yet support calc().
-    // If change size of footer, header, navbar, sub-navbar, etc. then this 216px must
-    // be adjusted here and in JS
-    @include navbar-fixed-position {
-        min-height: calc(100vh - 216px) !important;
-    }
-}
-
 
 .pedigree-viz-container {
     position: relative;
@@ -303,6 +289,19 @@ $pedigree-disease-colors :
         }
     }
 
+    &[data-selection-disabled="true"]{
+        .inner-container {
+            > .viz-area {
+                > .individuals-layer {
+                    > .pedigree-individual {
+                        // Unser cursor: pointer
+                        cursor: default !important;
+                    }
+                }
+            }
+        }
+    }
+
 }
 
 svg.pedigree-viz-shapes-layer.shapes-layer {
@@ -435,248 +434,4 @@ svg.pedigree-viz-shapes-layer.shapes-layer {
         }
     }
 }
-
-/** Default Detail Pane Styling **/
-/** This is specific to CGAP portal and will likely change per use case **/
-/** Should be put into dif stylesheet than above **/
-
-@mixin partner-links {
-    > span.partner-link {
-        &:not(:last-child):after {
-            content: ", ";
-        }
-        > a {
-            color: $body-color;
-        }
-    }
-    &[data-partner-count="2"]{
-        > span.partner-link {
-            &:not(:last-child):after {
-                content: " & ";
-                font-size: 75%;
-            }
-        }
-    }
-}
-
-div#pedigree-viz-container-cgap {
-
-    .pedigree-viz-container {
-
-        @include media-breakpoint-up(md){
-            display: flex;
-            > .inner-container {
-                flex: 1;
-            }
-            > .detail-pane-container {
-                background-color: $pedigree-viz-bg-color;
-                @include transition(flex .3s ease-in-out, width .3s ease-in-out, background-color .2s);
-                &.has-selected-node {
-                    background-color: #fff;
-                    border-left-color: darken($pedigree-viz-bg-color, 10%) !important;
-                }
-            }
-        }
-
-        @include visualization-detail-pane;
-
-        .detail-pane-container {
-
-            .detail-pane-inner {
-
-                > .title-box {
-                    h3 {
-                        @include partner-links;
-                    }
-
-                    /*
-                    i.icon.icon-times {
-                        font-size: 1.25rem;
-                        color: #777;
-                        padding-top: 7px;
-                        &:hover {
-                            color: #000;
-                        }
-                    }
-                    */
-
-                    .label-row {
-                        .buttons-col {
-                            a.edit-btn {
-                                color: #777;
-                                margin-right: 15px;
-                                &:hover {
-                                    color: #111;
-                                }
-                            }
-                        }
-                    }
-
-                }
-
-                > .details {
-                    > .detail-row {
-
-                        &[data-describing="Ethnicity"] {
-                            .value {
-                                text-transform: capitalize;
-                            }
-                        }
-
-                        &[data-describing="phenotypic_features"],
-                        &.phenotypic-features {
-                            > .detail-row-list-item.phenotypic-feature {
-                                display: flex;
-                                align-items: center;
-                                > .legend-patch {
-                                    display: block;
-                                    height: 12px;
-                                    width: 12px;
-                                    flex: 0 0 12px;
-                                    margin-right: 10px;
-                                    border: 1px solid #555;
-                                    @include pedigree-color-cycle-background;
-                                    &[data-disease-index="-1"]{
-                                        border-color: transparent;
-                                        background-color: #f4f4f4;
-                                        height: 8px;
-                                        width: 8px;
-                                        flex: 0 0 8px;
-                                        margin-right: 12px;
-                                        margin-left: 2px;
-                                        border-radius: 2px;
-                                    }
-                                }
-                                > .title {
-                                    text-align: left;
-                                    flex: 1;
-                                    overflow: hidden;
-                                    text-overflow: ellipsis;
-                                }
-                                > .onset {
-                                    font-size: 0.9em;
-                                }
-                            }
-                        }
-
-                        &[data-describing="clinic_notes"] {
-                            textarea {
-                                width: 100%;
-                                width: calc(100% + 8px);
-                                min-height: 100px;
-                                min-height: 15vh;
-                                @include transition(min-height .25s);
-                                font-size: 0.925em;
-                                border: 1px solid #ccc;
-                                padding: 3px;
-                                margin-left: -4px;
-                                margin-right: -4px;
-                                &:focus,
-                                &.has-changed {
-                                    min-height: 180px;
-                                    min-height: 20vh;
-                                    border-color: #333;
-                                }
-                            }
-                            p.read-only-notes {
-                                margin-bottom: 0;
-                                font-size: 0.925em;
-                                white-space: pre-wrap;
-                                text-overflow: ellipsis;
-                                overflow-x: hidden;
-                                padding: 4px 0;
-                            }
-                            .save-btn-container {
-                                text-align: right;
-                            }
-                        }
-
-                        &[data-describing="parents"],
-                        &[data-describing="children"] {
-                            .partners-links {
-                                @include partner-links;
-                            }
-                        }
-
-                    }
-                }
-            }
-
-        }
-
-    }
-
-}
-
-/** CGAP-specific full screen view styling **/
-
-div#pedigree-viz-container-cgap.view-is-full-screen {
-    @include media-breakpoint-up(md){
-        position: fixed;
-        object-fit: contain;
-        width: 100%;
-        width: 100vw;
-        min-width: 100vw;
-        height: 100%;
-        height: 100vh;
-        min-height: 100vh;
-        top: 0;
-        bottom: 0;
-        left: 0;
-        right: 0;
-    }
-}
-
-div#pedigree-viz-container-cgap.view-is-full-screen,
-div#pedigree-viz-container-cgap.browser-is-full-screen {
-
-    .pedigree-viz-container {
-
-        @include media-breakpoint-up(md){
-            > .detail-pane-container {
-                .detail-pane-inner {
-                    top: 0px;
-                }
-            }
-        }
-
-    }
-
-}
-
-/** Dropdown for selecting diseases/features -- CGAP-specific **/
-
-.tabview-title-controls-container {
-    .disease-option {
-        padding: 1px 10px;
-        display: flex;
-        align-items: center;
-        .checkbox-with-label {
-            flex: 1;
-            > label {
-                cursor: pointer;
-            }
-        }
-        .disease-color-patch {
-            height: 16px;
-            width: 16px;
-            border-radius: 50%;
-            transition: background-color .3s;
-            text-align: center;
-            line-height: 1;
-            > span {
-                font-size: 0.675rem;
-                font-weight: 600;
-                top: -2px;
-                position: relative;
-            }
-            @include pedigree-color-cycle-background;
-        }
-
-        &:hover {
-            background-color: #f4f4f4;
-        }
-    }
-}
-
 

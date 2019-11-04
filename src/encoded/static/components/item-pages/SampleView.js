@@ -6,11 +6,18 @@ import _ from 'underscore';
 import memoize from 'memoize-one';
 import { console, object, ajax } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { ItemFileAttachment } from './components/ItemFileAttachment';
-import DefaultItemViewWithProvenance, { ProvenanceGraphTabView } from './DefaultItemViewWithProvenance';
 import { getFile } from './components/Workflow/WorkflowDetailPane';
+import { ProvenanceGraphStepsFetchingController } from './components/Workflow/ProvenanceGraphStepsFetchingController';
+import { ProvenanceGraphTabView } from './components/Workflow/ProvenanceGraphTabView';
+import DefaultItemView from './DefaultItemView';
 
 
-export default class SampleView extends DefaultItemViewWithProvenance {
+export default class SampleView extends DefaultItemView {
+
+    constructor(props){
+        super(props);
+        this.shouldGraphExist = this.shouldGraphExist.bind(this);
+    }
 
     shouldGraphExist(){
         const { context : { processed_files = [] } } = this.props;
@@ -28,7 +35,11 @@ export default class SampleView extends DefaultItemViewWithProvenance {
         return false;
     }
 
-    getTabViewContents(){
+    getControllers(){
+        return [<ProvenanceGraphStepsFetchingController key={0} shouldGraphExist={this.shouldGraphExist} />];
+    }
+
+    getTabViewContents(controllerProps){
         const initTabs = [
             // todo - FileViewOverview.getTabObject(this.props),
             ...this.getCommonTabs()
@@ -37,9 +48,8 @@ export default class SampleView extends DefaultItemViewWithProvenance {
         if (this.shouldGraphExist()){
             initTabs.push(ProvenanceGraphTabView.getTabObject({
                 ...this.props,
-                ...this.state,
-                isNodeCurrentContext,
-                toggleAllRuns: this.toggleAllRuns
+                ...controllerProps,
+                isNodeCurrentContext
             }));
         }
 

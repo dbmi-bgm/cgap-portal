@@ -301,7 +301,7 @@ export class TabView extends React.PureComponent {
     }
 
     render(){
-        const { contents, windowWidth, prefixTabs = [], suffixTabs = [] } = this.props;
+        const { contents, prefixTabs = [], suffixTabs = [] } = this.props;
         const { currentTabKey } = this.state;
 
         const allTabs = TabView.combineSystemAndCustomTabs(this.additionalTabs(), contents);

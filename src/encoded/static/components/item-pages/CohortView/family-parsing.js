@@ -121,7 +121,9 @@ export function parseFamilyIntoDataset(family){
     });
 }
 
+
 export function gatherPhenotypicFeatureItems(family){
+    if (!family) return [];
     const {
         members = [],
         proband = null
@@ -149,4 +151,22 @@ export function gatherPhenotypicFeatureItems(family){
 
     members.forEach(addToDiseases);
     return [ ...diseases ];
+}
+
+/**
+ * Maps `context.cohort_phenotypic_features`
+ * to strings.
+ *
+ * @param {{ @id: string, display_title: string }[]|string[]} [cohort_phenotypic_features=[]] List of phenotypic feature Items from Cohort.
+ * @returns {string[]}
+ */
+export function getPhenotypicFeatureStrings(cohort_phenotypic_features = []){
+    const strings = [];
+    cohort_phenotypic_features.forEach(function(feature){
+        if (typeof feature === 'string') return feature;
+        const { '@id' : featureID, display_title } = feature;
+        if (!featureID) return;
+        strings.push(display_title || featureID);
+    });
+    return strings;
 }
