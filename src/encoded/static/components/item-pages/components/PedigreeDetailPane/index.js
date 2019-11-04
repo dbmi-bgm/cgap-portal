@@ -4,27 +4,29 @@ import React from 'react';
 import memoize from 'memoize-one';
 import ReactTooltip from 'react-tooltip';
 import { IndividualBody, getIndividualDisplayTitle } from './IndividualBody';
+import { isRelationshipNode } from './../../../viz/PedigreeViz';
 
 
 export class PedigreeDetailPane extends React.PureComponent {
 
     componentDidUpdate(pastProps){
-        const { currSelectedNodeId } = this.props;
-        if (pastProps.currSelectedNodeId !== currSelectedNodeId) {
+        const { selectedNode } = this.props;
+        if (pastProps.selectedNode !== selectedNode) {
             ReactTooltip.rebuild();
         }
     }
 
     render(){
-        const { unselectNode, memoized, objectGraph, currSelectedNodeId, className } = this.props;
-        const selectedNode = currSelectedNodeId && memoized.findNodeWithId(objectGraph, currSelectedNodeId);
+        const { hoveredNode, unselectNode: onClose, ...passProps } = this.props;
+        const { selectedNode } = passProps;
+        const isHovered = hoveredNode === selectedNode;
 
         if (!selectedNode){
             return null;
-        } else if (currSelectedNodeId.slice(0,13) === 'relationship:'){
-            return <RelationshipBody {...this.props} selectedNode={selectedNode} onClose={unselectNode} />;
+        } else if (isRelationshipNode(selectedNode)){
+            return <RelationshipBody {...passProps} {...{ onClose, isHovered }} />;
         } else {
-            return <IndividualBody {...this.props} selectedNode={selectedNode} onClose={unselectNode} />;
+            return <IndividualBody {...passProps} {...{ onClose, isHovered }} />;
         }
     }
 }

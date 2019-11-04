@@ -1,4 +1,4 @@
-/***********************************************************
+Cohort/***********************************************************
 Custom Classes & Styling for Item Pages (e.g. Experiment Sets)
 ************************************************************/
 
@@ -124,7 +124,7 @@ $tabbar-bg-color : #ececec !default;
 $tabbar-text-color : #333 !default;
 $tabbar-text-active-color: #000 !default;
 $tabbar-bg-active-color: #fff !default;
-// If override this, check e.g. CaseView Pedigree Tab height dimensioning (JS) since this 46px is accounted for in calculations
+// If override this, check e.g. CohortView Pedigree Tab height dimensioning (JS) since this 46px is accounted for in calculations
 $tabbar-height: 46px;
 
 .item-page-container {
@@ -359,7 +359,7 @@ $tabbar-height: 46px;
                 padding: 12px 18px;
                 border-bottom: 1px solid #ccc;
                 box-shadow: inset 0 -2px 5px -5px #000;
-                
+
                 label {
                     font-weight: 400;
                     margin-bottom: 1px;
@@ -419,7 +419,7 @@ $tabbar-height: 46px;
 					}
 				}
 			}
-			
+
         }
     }
 }
@@ -1717,10 +1717,43 @@ $badge-item-min-height: 90px;
 
 
 /**********************************************************
-			Processing Summary Table (CaseView)
+			Processing Summary Table (CohortView)
 **********************************************************/
 
 .item-page-container {
+
+	#cohort-overview-ped-link {
+		margin-left: 0;
+
+		.card-img-top {
+			position: relative;
+			// We usually don't want to use this without having a fallback for older browsers
+			height: 100px; // Nice round number, idk.
+			height: calc(100% - 47px);
+			i.icon.icon-sitemap { // Quick vertical center
+				position: absolute;
+				top: 50%;
+				left: 50%;
+				margin-left: -40px;
+				margin-top: -32px;
+			}
+		}
+	}
+
+	label.badge-list-label {
+		padding-right: 3px;
+		margin-bottom: 0;
+	}
+	.badge-list {
+		list-style: none;
+		padding-left: 0;
+		margin-bottom: 0;
+		display: inline;
+
+		> li {
+			display: inline-block;
+		}
+	}
 
 	div.summary-table-container {
 
@@ -1731,6 +1764,18 @@ $badge-item-min-height: 90px;
 			margin-bottom: 0;
 			font-weight: 400;
 			margin-top: 10px;
+			display: inline-block; // To decrease width of the clickable area to just the text width.
+			> i.icon {
+				color: #999;
+			}
+
+			&:hover {
+				color: #000;
+				text-shadow: 0 0 0;
+				> i.icon {
+					color: #000;
+				}
+			}
 		}
 
 		&:not(.family-index-0){
@@ -1764,6 +1809,9 @@ $badge-item-min-height: 90px;
 							}
 							*/
 						}
+						&.is-even {
+							background-color: rgba(0, 0, 0, 0.03);
+						}
 						&.is-proband {
 							> td {
 								background-color: #ebf6ff;
@@ -1782,11 +1830,35 @@ $badge-item-min-height: 90px;
 								visibility: hidden;
 							}
 						}
+						.qcs-container {
+							&.text-ellipses-container {
+								max-width: 140px;
+							}
+							> span {
+								display: inline-block;
+								border-right: solid 1px #bbb;
+								padding: 0 5px;
+								&:last-child {
+									border: none;
+								}
+							}
+							a.qc-status-in-review {
+								font-style: italic;
+								}
+						}
 					}
 				}
 
 			}
 
+		}
+
+		&[data-is-current-family="true"] {
+			> h4:first-child {
+				> i.icon {
+					color: $brand-primary;
+				}
+			}
 		}
 
 	}

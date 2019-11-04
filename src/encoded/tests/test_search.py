@@ -2,6 +2,7 @@
 from .features.conftest import app_settings, app, workbook
 import pytest
 from encoded.commands.run_upgrader_on_inserts import get_inserts
+from snovault.elasticsearch.indexer_utils import get_namespaced_index
 import json
 import time
 from snovault import TYPES
@@ -81,8 +82,8 @@ def test_collections_redirect_to_search(workbook, testapp):
 
 
 def test_search_with_embedding(workbook, testapp):
-    """ Searches for a case and checks some embedded items are properly resolved """
-    res = testapp.get('/search/?type=Case&limit=all').json
+    """ Searches for a cohort and checks some embedded items are properly resolved """
+    res = testapp.get('/search/?type=Cohort&limit=all').json
     res_json = [dis for dis in res['@graph'] if dis['uuid'] == 'cc7d83a2-6886-4ca0-9402-7c49734cf3c4']
     assert len(res_json) == 1
     test_json = res_json[0]
@@ -142,7 +143,7 @@ def test_search_facets_and_columns_order(workbook, testapp, registry):
 
 @pytest.mark.skip # XXX: Not clear how to best port
 def test_search_embedded_file_by_accession(workbook, testapp):
-    res = testapp.get('/search/?type=Case&families.original_pedigree.uuid=dcf15d5e-40aa-43bc-b81c-32c70c9afc50').json
+    res = testapp.get('/search/?type=Cohort&families.original_pedigree.uuid=dcf15d5e-40aa-43bc-b81c-32c70c9afc50').json
     assert len(res['@graph']) > 0
     item_uuids = [item['uuid'] for item in res['@graph'] if 'uuid' in item]
     for item_uuid in item_uuids:
@@ -233,7 +234,7 @@ def test_search_date_range_dontfind_without(dd_dts, testapp, workbook):
 
 def test_search_query_string_AND_NOT_cancel_out(workbook, testapp):
     # if you use + and - with same field you should get no result
-    search = '/search/?q=cell+-cell&type=Case'
+    search = '/search/?q=cell+-cell&type=Cohort'
     assert testapp.get(search, status=404)
 
 
@@ -452,11 +453,12 @@ def test_index_data_workbook(app, workbook, testapp, indexer_testapp, htmltestap
     for item_type in TYPE_LENGTH.keys():
         tries = 0
         item_len = None
+        namespaced_index = get_namespaced_index(app, item_type)
         while item_len is None or (item_len != TYPE_LENGTH[item_type] and tries < 3):
             if item_len != None:
                 create_mapping.run(app, collections=[item_type], strict=True, sync_index=True)
-                es.indices.refresh(index=item_type)
-            item_len = es.count(index=item_type, doc_type=item_type).get('count')
+                es.indices.refresh(index=namespaced_index)
+            item_len = es.count(index=namespaced_index, doc_type=item_type).get('count')
             print('... ES COUNT: %s' % item_len)
             print('... TYPE COUNT: %s' % TYPE_LENGTH[item_type])
             tries += 1
@@ -465,7 +467,7 @@ def test_index_data_workbook(app, workbook, testapp, indexer_testapp, htmltestap
             res = testapp.get('/%s?limit=all' % item_type, status=[200, 301, 404])
             res = res.follow()
             for item_res in res.json.get('@graph', []):
-                index_view_res = es.get(index=item_type, doc_type=item_type,
+                index_view_res = es.get(index=namespaced_index, doc_type=item_type,
                                         id=item_res['uuid'])['_source']
                 # make sure that the linked_uuids match the embedded data
                 assert 'linked_uuids_embedded' in index_view_res
@@ -495,11 +497,11 @@ def test_index_data_workbook(app, workbook, testapp, indexer_testapp, htmltestap
 def test_barplot_aggregation_endpoint(workbook, testapp):
 
     # Check what we get back -
-    search_result = testapp.get('/search/?type=Case').json
+    search_result = testapp.get('/search/?type=Cohort').json
     search_result_count = len(search_result['@graph'])
 
     # We should get back same count as from search results here. But on Travis oftentime we don't, so we compare either against count of inserts --or-- count returned from regular results.
-    exp_set_test_inserts = list(get_inserts('inserts', 'case'))
+    exp_set_test_inserts = list(get_inserts('inserts', 'cohort'))
     count_exp_set_test_inserts = len(exp_set_test_inserts)
 
     # Now, test the endpoint after ensuring we have the data correctly loaded into ES.

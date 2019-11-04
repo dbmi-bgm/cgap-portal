@@ -6,13 +6,14 @@ import _ from 'underscore';
 import { console, object } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { LocalizedTime, formatPublicationDate } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/LocalizedTime';
 import { basicColumnExtensionMap } from '@hms-dbmi-bgm/shared-portal-components/es/components/browse/components/table-commons';
-import {  Schemas, typedefs } from './../util';
+import { Schemas, typedefs } from './../util';
 
 // eslint-disable-next-line no-unused-vars
 const { Item, ColumnDefinition } = typedefs;
 
 export const DEFAULT_WIDTH_MAP = { 'lg' : 200, 'md' : 180, 'sm' : 120, 'xs' : 120 };
 
+/** Theoretically we could change all these render functions to just be functional React components, maybe a later todo. */
 
 export const columnExtensionMap = _.extend({}, basicColumnExtensionMap, {
     // TODO: change to organization
@@ -54,6 +55,34 @@ export const columnExtensionMap = _.extend({}, basicColumnExtensionMap, {
         'render' : function googleAnalyticsDate(result, columnDefinition, props, width){
             if (!result.google_analytics || !result.google_analytics.for_date) return null;
             return <LocalizedTime timestamp={result.google_analytics.for_date} formatType="date-sm" localize={false} />;
+        }
+    },
+    'age' : {
+        "title" : "Age",
+        "widthMap" : { 'lg' : 100, 'md' : 90, 'sm' : 80 },
+        "render" : function(result, columnDefinition, props, width){
+            const { age, age_units } = result;
+            if (typeof age !== "number" || isNaN(age)) {
+                return null;
+            }
+            if (age_units) {
+                return age + " " + age_units + (age === 1 ? "" : "s");
+            }
+            return age;
+        }
+    },
+    'age_at_death' : {
+        "title" : "Age at Death",
+        "widthMap" : { 'lg' : 100, 'md' : 90, 'sm' : 80 },
+        "render" : function(result, columnDefinition, props, width){
+            const { age_at_death: age, age_at_death_units: age_units } = result;
+            if (typeof age !== "number" || isNaN(age)) {
+                return null;
+            }
+            if (age_units) {
+                return age + " " + age_units + (age === 1 ? "" : "s");
+            }
+            return age;
         }
     },
     'status' : {

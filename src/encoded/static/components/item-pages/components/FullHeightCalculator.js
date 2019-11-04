@@ -28,7 +28,7 @@ export const FullHeightCalculator = React.memo(function FullHeightCalculator({
 
     if (typeof windowWidth === "number" && !isNaN(windowWidth)){
         const rgs = layout.responsiveGridState(windowWidth);
-        if (skipGridStates.indexOf(rgs) > -1) {
+        if (Array.isArray(skipGridStates) && skipGridStates.indexOf(rgs) > -1) {
             return children; // Doesn't need height
         }
     }

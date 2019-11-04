@@ -72,14 +72,14 @@
             ],
             "lookup": 41
         },
-        "authorized_cases":{
-            "title": "Authorized Cases",
-            "description": "Cases this user is authorized to view or edit, depending on role",
+        "authorized_cohorts":{
+            "title": "Authorized Cohorts",
+            "description": "Cohorts this user is authorized to view or edit, depending on role",
             "type": "array",
             "items": {
-                "title": "Case",
+                "title": "Cohorts",
                 "type": "string",
-                "linkTo": "Case"
+                "linkTo": "Cohort"
             }
         },
         "groups": {

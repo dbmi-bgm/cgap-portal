@@ -6,10 +6,8 @@
 CGAP Documentation
 =======================================
 
-|Build status|_
-
-.. |Build status| image:: https://travis-ci.org/4dn-dcic/fourfront.png?branch=master
-.. _Build status: https://travis-ci.org/4dn-dcic/fourfront
+.. image:: https://travis-ci.org/dbmi-bgm/cgap-portal.svg?branch=master
+   :target: https://travis-ci.org/dbmi-bgm/cgap-portal
 
 |Coverage|_
 
@@ -20,6 +18,9 @@ CGAP Documentation
 
 .. |Quality| image:: https://api.codacy.com/project/badge/Grade/f5fc54006b4740b5800e83eb2aeeeb43
 .. _Quality: https://www.codacy.com/app/4dn/fourfront?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=4dn-dcic/fourfront&amp;utm_campaign=Badge_Grade
+
+
+.. image:: https://readthedocs.org/projects/cgap-portal/badge/?version=latest
 
 Installation
 ^^^^^^^^^^^^

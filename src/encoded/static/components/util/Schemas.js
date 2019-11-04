@@ -43,7 +43,12 @@ export const Term = {
                 return getTitleForType(term, get());
             case 'status':
                 if (allowJSXOutput){
-                    return <React.Fragment><i className="item-status-indicator-dot mr-07" data-status="released"/>{ capitalizeSentence(term) }</React.Fragment>;
+                    return (
+                        <React.Fragment>
+                            <i className="item-status-indicator-dot mr-07" data-status={term} />
+                            { capitalizeSentence(term) }
+                        </React.Fragment>
+                    );
                 }
                 return capitalizeSentence(term);
             case 'date_created':
@@ -53,6 +58,24 @@ export const Term = {
             case 'project_release':
                 if (allowJSXOutput) return <LocalizedTime timestamp={term} />;
                 return dateFormat(term);
+            case 'is_pregnancy':
+            case 'is_spontaneous_abortion':
+            case 'is_infertile':
+            case 'is_termination_of_pregnancy':
+            case 'is_still_birth':
+            case 'is_deceased':
+                if (typeof term === "boolean"){
+                    // Boolean, or undefined to be considered as "false"
+                    return (term && "True") || "False";
+                }
+                if (typeof term === "undefined") {
+                    return "False";
+                }
+                // Common cases, e.g. from search result:
+                if (term === "true") return "True";
+                if (term === "false") return "False";
+                if (term === "No value") return term; // Ideally could have this as "False" but then get 2+ "False" values in list of Facet terms.
+                return term;
             case 'accession':
                 //if (allowJSXOutput) {
                 //    return <span className="accession text-small">{ term }</span>;
@@ -60,7 +83,7 @@ export const Term = {
                 return term;
             case 'description':
                 if (allowJSXOutput) {
-                    return <span className="mono-text text-small">{ term }</span>;
+                    return <span className="text-monospace text-small">{ term }</span>;
                 }
                 return term;
             case 'file_type':
@@ -69,8 +92,11 @@ export const Term = {
             case 'files.file_type':
             case 'files.file_classification':
             case 'files.file_type_detailed':
-                name = capitalizeSentence(term);
-                break;
+            case 'ancestry':
+            case 'ethnicity':
+                return capitalizeSentence(term);
+            case 'life_status':
+                return capitalize(term);
             case 'file_size':
             case 'attachment.size':
                 if (typeof term === 'number'){
@@ -84,9 +110,21 @@ export const Term = {
                     name = null;
                 }
                 break;
+            case 'sex':
+                if (term === "M") name = "Male";
+                if (term === "F") name = "Female";
+                if (term === "U") name = "Undetermined";
+                if (allowJSXOutput) {
+                    return (
+                        <React.Fragment>
+                            <i className={`mr-03 icon icon-fw icon-${Term.genderCharacterToIcon(term)}`}/>
+                            { name }
+                        </React.Fragment>
+                    );
+                }
+                return name;
             case '@id':
-                name = term;
-                break;
+                return term;
             default:
                 break;
         }
@@ -113,6 +151,15 @@ export const Term = {
         if (typeof name !== 'string') name = term;
 
         return name;
+    },
+
+    genderCharacterToIcon(gender){
+        const m = {
+            M: "mars fas",
+            F: "venus fas",
+            U: "question fas"
+        };
+        return m[gender];
     }
 };
 

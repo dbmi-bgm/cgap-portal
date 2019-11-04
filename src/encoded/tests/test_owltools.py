@@ -9,16 +9,6 @@ def owler(mocker):
     return mocker.patch.object(ot, 'Owler')
 
 
-# def emptygen(*args, **kwargs):
-#    return
-#    yield  # necessary to produce generator
-
-
-# def rdfobject_generator(rdfobj_list):
-#    for rdfobj in rdfobj_list:
-#        yield rdfobj
-
-
 @pytest.fixture
 def rdf_objects():
     from rdflib import Literal

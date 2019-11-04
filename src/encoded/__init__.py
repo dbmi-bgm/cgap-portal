@@ -195,6 +195,8 @@ def main(global_config, **local_config):
             logging.getLogger(name).setLevel(logging.WARNING)
     set_logging(in_prod=settings.get('production'))
     # set_logging(settings.get('elasticsearch.server'), settings.get('production'))
+    # in case we want this in CGAP it can be done
+    # settings['indexer.namespace'] = settings['env.name']
 
     # source environment variables on elastic beanstalk
     source_beanstalk_env_vars()

@@ -1,5 +1,4 @@
-
-
+'use strict';
 
 export function getGraphHeight(orderByHeightIndex, dims){
     const heightIndicesLen = orderByHeightIndex.length;
@@ -55,6 +54,13 @@ export function relationshipTopPosition(yCoord, dims){
 
 export function createEdges(objectGraph, dims, graphHeight){
 
+    // Some common dimensions
+    const halfIndvHeight = (dims.individualHeight / 2);
+    const halfIndvWidth = (dims.individualWidth / 2);
+    // Was `(dims.individualYSpacing / 2)` before, experimenting with other nums.
+    // Need to take care to ensure we're using/getting integers back, as float math is very
+    // imprecise in JS; we want to avoid comparing e.g. 28.3333333334 === 28.3333333333333333.
+    const childToMidPointYDifference = halfIndvHeight + (dims.individualYSpacing / 3);
 
     console.log('GRAPH PRE EDGES', objectGraph);
 
@@ -100,9 +106,9 @@ export function createEdges(objectGraph, dims, graphHeight){
             seenParentalRelationships.add(parentRelation);
             if (children.length === 1){
                 midPoint = [ // Center of child top
-                    //children[0]._drawing.xCoord + (dims.individualWidth / 2),
+                    //children[0]._drawing.xCoord + halfIndvWidth,
                     relationXCoord,
-                    children[0]._drawing.yCoord - (dims.individualHeight / 2)
+                    children[0]._drawing.yCoord - halfIndvHeight
                 ];
             } else if (children.length >= 2){
                 //let smallestHeightIndex = Infinity;
@@ -116,7 +122,7 @@ export function createEdges(objectGraph, dims, graphHeight){
                     biggestXCoord = Math.max(biggestXCoord, child._drawing.xCoord);
                     console.log('DDD1', smallestXCoord, biggestXCoord, child._drawing.xCoord, child._drawing.yCoord);
                 });
-                const childEdgeSegmentTopCoord = biggestYCoord - (dims.individualHeight / 2) - (dims.individualYSpacing / 2);
+                const childEdgeSegmentTopCoord = biggestYCoord - childToMidPointYDifference;
                 const childEdgeSegment = {
                     fromVertex : [
                         smallestXCoord,
@@ -143,7 +149,7 @@ export function createEdges(objectGraph, dims, graphHeight){
                         fromNode: child,
                         fromVertex : [ // From child top
                             child._drawing.xCoord,
-                            child._drawing.yCoord - (dims.individualHeight / 2)
+                            child._drawing.yCoord - halfIndvHeight
                         ],
                         toVertex: [ // To horiz line
                             child._drawing.xCoord,
@@ -184,7 +190,7 @@ export function createEdges(objectGraph, dims, graphHeight){
                 const toY = partner._drawing.yCoord;
 
                 const attachToTargetOnLeftSide = toX >= fromX;
-                const toXAttachment = ((dims.individualWidth / 2) * (attachToTargetOnLeftSide ? -1 : 1));
+                const toXAttachment = (halfIndvWidth * (attachToTargetOnLeftSide ? -1 : 1));
                 const toXAttachmentLedge = dims.edgeLedge * (attachToTargetOnLeftSide ? -1 : 1);
                 const parentEdge = {
                     fromNode: parentRelation,

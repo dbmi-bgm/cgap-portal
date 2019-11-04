@@ -205,6 +205,7 @@
             ]
         },
         "quality_metric": {
+            "notes" : "This could be a single Quality Metric or a 'container' Quality Metric item that contains a list of QualityMetrics in its 'qc_list' property.",
             "type": "string",
             "title": "Quality Metric",
             "description": "The associated QC reports",
@@ -302,9 +303,6 @@
         "file_format.file_format": {
             "title" : "File Format",
             "description" : "Format of the file, i.e. the file extension."
-        },
-        "track_and_facet_info.lab_name": {
-            "title": "Generating Lab"
         },
         "file_size" : {
             "title" : "File Size",
