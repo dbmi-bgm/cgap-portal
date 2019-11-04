@@ -55,9 +55,8 @@ class CurrentFamilyController extends React.PureComponent {
     constructor(props) {
         super(props);
         this.onAddedFamily = this.onAddedFamily.bind(this);
-        this.handleFamilySelect = this.handleFamilySelect.bind(this);
+        this.handleFamilySelect = _.throttle(this.handleFamilySelect.bind(this), 1000);
         const pedigreeFamilies = (props.context.families || []).filter(CurrentFamilyController.haveFullViewPermissionForFamily);
-        //const familiesLen = pedigreeFamilies.length;
         this.state = {
             pedigreeFamilies,
             pedigreeFamiliesIdx: 0 //familiesLen - 1
@@ -123,11 +122,24 @@ class CurrentFamilyController extends React.PureComponent {
     }
 
     handleFamilySelect(key, callback){
-        this.setState({ 'pedigreeFamiliesIdx' : parseInt(key) }, function(){
-            if (typeof callback === "function") {
-                callback();
-            }
-        });
+        const callable = () => {
+            this.setState({ 'pedigreeFamiliesIdx' : parseInt(key) }, function(){
+                if (typeof callback === "function") {
+                    callback();
+                }
+            });
+        };
+
+        // Try to defer change to background execution to
+        // avoid 'blocking'/'hanging' UI thread while new
+        // objectGraph is calculated.
+        // @todo Later - maybe attempt to offload PedigreeViz graph-transformer
+        // stuff to a WebWorker instead.
+        if (window && window.requestIdleCallback) {
+            window.requestIdleCallback(callable);
+        } else {
+            setTimeout(callable, 0);
+        }
     }
 
     render(){
@@ -279,9 +291,7 @@ const CohortSummaryTabView = React.memo(function CohortSummaryTabView(props){
             const { original_pedigree: { display_title: pedFileName } = {} } = family;
             const cls = "summary-table-container family-index-" + idx;
             const onClick = function(evt){
-                onFamilySelect(idx, function(){
-                    navigate("#pedigree", { skipRequest: true });
-                });
+                onFamilySelect(idx);
             };
             const isCurrentFamily = idx === pedigreeFamiliesIdx;
             const tip = isCurrentFamily ?
@@ -313,7 +323,7 @@ const CohortSummaryTabView = React.memo(function CohortSummaryTabView(props){
     }
 
     const rgs = layout.responsiveGridState(windowWidth);
-    let pedWidth = 400;
+    let pedWidth;
     let pedBlock = (
         <div className="d-none d-lg-block pedigree-placeholder" onClick={onViewPedigreeBtnClick} disabled={familiesLen === 0}>
             <div className="text-center h-100">

@@ -73,6 +73,7 @@ function toggleSelectedDiseaseCallable(selectedDiseases, availableDiseases, setS
  *         }
  *     }
  *     ```
+ *     Worst case scenario can refactor back to Class component...
  */
 export function usePhenotypicFeatureStrings(context, currFamily){
     const { cohort_phenotypic_features = [] } = context;
