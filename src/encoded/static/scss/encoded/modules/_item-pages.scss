@@ -1862,6 +1862,12 @@ $badge-item-min-height: 90px;
 				min-width: 640px;
 				width: 100%;
 
+				thead {
+					> tr > th {
+						padding: 6px 8px;
+					}
+				}
+
 				tbody {
 					tr {
 						td {
@@ -1872,6 +1878,18 @@ $badge-item-min-height: 90px;
 								font-family: $font-family-monospace;
 							}
 							*/
+							&[data-for-column="individual"]{
+								.gen-identifier {
+									margin-right: 10px;
+									padding-right: 10px;
+									border-right: 1px solid #777;
+									display: inline-block;
+									min-width: 45px;
+									text-align: right;
+									vertical-align: middle;
+									font-weight: 600;
+								}
+							}
 						}
 						&.is-even {
 							background-color: rgba(0, 0, 0, 0.03);

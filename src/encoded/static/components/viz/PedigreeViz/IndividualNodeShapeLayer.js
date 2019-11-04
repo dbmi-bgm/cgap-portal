@@ -168,7 +168,7 @@ export class IndividualNodeShape extends React.PureComponent {
                 { bgShape }
                 <UnderlayMarkers {...{ width, height, individual, shape, diseaseToIndex, vizViewID }} />
                 { fgShape }
-                <OverlayMarkers {...{ width, height, individual, shape, textScaleTransformStr }} />
+                <OverlayMarkers {...{ width, height, individual, shape, textScaleTransformStr, vizViewID }} />
                 <AboveNodeText {...{ width, height, individual, maxHeightIndex, dims, halfWidth, aboveNodeTextY, textScale, textScaleTransformStr }} />
                 <UnderNodeText {...{ width, height, individual, shape, diseaseToIndex, dims, halfWidth, showOrderBasedName, textScale, textScaleTransformStr }} />
             </g>
@@ -229,7 +229,7 @@ const AffectedBGPieChart = React.memo(function AffectedBGPieChart({
     return <g className="disease-path-arcs">{ arcPaths }</g>;
 });
 
-const UnderlayMarkers = React.memo(function UnderlayMarkers({ individual, width, height, shape, diseaseToIndex, vizViewID }){
+const UnderlayMarkers = React.memo(function UnderlayMarkers({ individual, width, height, shape, diseaseToIndex, vizViewID = 0 }){
     const { diseases = [], carrierOfDiseases = [], asymptoticDiseases = [] } = individual;
     const markers = [];
 
@@ -256,7 +256,8 @@ const OverlayMarkers = React.memo(function OverlayMarkers(props){
         width = 80,
         height = 80,
         shape,
-        textScaleTransformStr = "scale3d(1,1,1)"
+        textScaleTransformStr = "scale3d(1,1,1)",
+        vizViewID = 0
     } = props;
     const {
         //id,
@@ -306,7 +307,7 @@ const OverlayMarkers = React.memo(function OverlayMarkers(props){
         path.moveTo(-25, height + 10);
         path.lineTo(-10, height);
         markers.push(
-            <path d={path.toString()} markerEnd="url(#pedigree_lineArrow)" key="consultand-arrow"
+            <path d={path.toString()} markerEnd={`url(#pedigree_lineArrow_viewID${vizViewID})`} key="consultand-arrow"
                 style={bottomLeftScaleStyle} />
         );
         if (showAsProband){ // "P" text identifier
