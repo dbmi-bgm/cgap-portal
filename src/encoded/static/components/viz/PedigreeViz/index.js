@@ -1,249 +1,22 @@
-import React, { useEffect } from 'react';
-import ReactDOM from 'react-dom';
-import PropTypes from 'prop-types';
+'use strict';
+
+import React from 'react';
 import memoize from 'memoize-one';
 import { path as d3Path } from 'd3-path';
 /** @todo Pull this out into here if making a lib */
 import { requestAnimationFrame as raf, cancelAnimationFrame } from '@hms-dbmi-bgm/shared-portal-components/es/components/viz/utilities';
 import { isRelationship } from './data-utilities';
 import { graphToDiseaseIndices, orderNodesBottomRightToTopLeft } from './layout-utilities-drawing';
-import { GraphTransformer, buildGraphData, POSITION_DEFAULTS } from './GraphTransformer';
+import { GraphTransformer, buildGraphData } from './GraphTransformer';
 import { ScaleController, ScaleControls, scaledStyle } from './ScaleController';
 import { SelectedNodeController } from './SelectedNodeController';
 import { IndividualsLayer } from './IndividualsLayer';
 import { IndividualNodeShapeLayer } from './IndividualNodeShapeLayer';
 import { RelationshipNodeShapeLayer } from './RelationshipNodeShapeLayer';
 import { EdgesLayer } from './EdgesLayer';
-import { DefaultDetailPaneComponent } from './DefaultDetailPaneComponent';
+import { pedigreeVizPropTypes, pedigreeVizViewPropTypes } from './prop-types';
+import { pedigreeVizDefaultProps, pedigreeVizViewDefaultProps } from './default-props';
 
-/**
- * @typedef DatasetEntry
- * @type {Object}
- * @prop {!(string|number)} id          Unique Identifier of Individual within dataset.
- * @prop {string} [name]                Publicly visible name of Individual/Node.
- * @prop {string} gender                Should be one of "m", "f", or "u".
- * @prop {?number} [age]                Should be calculated from date of birth to be in context of today.
- * @prop {?string[]} [diseases]         List of diseases affecting the individual.
- * @prop {!boolean} [isProband]         If true, identifies the proband individual.
- * @prop {!boolean} [isDeceased]        If true, then Individual is deceased.
- * @prop {!string} [causeOfDeath]       Describes cause of death.
- * @prop {!boolean} [isConsultand]      If true, Individual is seeking consultation.
- * @prop {?boolean} [isStillBirth]      If present & true, deceased must also be truthy _and_ must have no children.
- * @prop {?boolean} [isPregnancy]       If present & true, this individual is not yet born.
- * @prop {?boolean} [isSpontaneousAbortion] `isPregnancy` must also be `true`.
- * @prop {?boolean} [isTerminatedPregnancy] `isPregnancy` must also be `true`.
- * @prop {?boolean} [isEctopic]         `isPregnancy` must also be `true`.
- * @prop {?Object} [data]               Additional or raw data of the Individual which may not be relevant in pedigree. Would only appear in detailpane.
- *
- * @prop {string[]} [parents]           List of parents of Individual in form of IDs.
- * @prop {?string[]} [children]         List of children of Individual in form of IDs.
- * @prop {!string} [father]             Father of Individual in form of ID. Gets merged into 'parents'.
- * @prop {!string} [mother]             Mother of Individual in form of ID. Gets merged into 'parents'.
- */
-
-const pedigreeVizPropTypes = {
-    dataset: PropTypes.arrayOf(PropTypes.exact({
-        'id'                : PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
-        'name'              : PropTypes.string,
-        'gender'            : PropTypes.oneOf(["m", "M", "male", "f", "F", "female", "u", "U", "undetermined"]).isRequired,
-        'age'               : PropTypes.number,
-        'diseases'          : PropTypes.arrayOf(PropTypes.string),
-        'carrierOfDiseases' : PropTypes.arrayOf(PropTypes.string),
-        'asymptoticDiseases': PropTypes.arrayOf(PropTypes.string),
-        'isProband'         : PropTypes.bool,
-        'isDeceased'        : PropTypes.bool,
-        'isConsultand'      : PropTypes.bool,
-        'isPregnancy'       : PropTypes.bool,
-        'isStillBirth'      : PropTypes.bool,
-        'isSpontaneousAbortion' : PropTypes.bool,
-        'isTerminatedPregnancy' : PropTypes.bool,
-        'isEctopic'         : PropTypes.bool,
-        'data'              : PropTypes.object,
-        'parents'           : PropTypes.arrayOf(PropTypes.oneOfType([ PropTypes.string, PropTypes.number ])),
-        'children'          : PropTypes.arrayOf(PropTypes.oneOfType([ PropTypes.string, PropTypes.number ])),
-        'mother'            : PropTypes.oneOfType([ PropTypes.string, PropTypes.number ]),
-        'father'            : PropTypes.oneOfType([ PropTypes.string, PropTypes.number ]),
-    })),
-    dimensionOpts: PropTypes.objectOf(PropTypes.number),
-    height: PropTypes.number,
-    width: PropTypes.number,
-    editable: PropTypes.bool,
-    onNodeSelected: PropTypes.func,
-    renderDetailPane: PropTypes.func,
-    filterUnrelatedIndividuals: PropTypes.bool
-};
-
-const pedigreeVizDefaultProps = {
-    /** @type {DatasetEntry[]} dataset - Dataset to be visualized. */
-    "dataset" : [
-        {
-            id: 1,
-            name: "Jack",
-            isProband: true,
-            father: 2,
-            mother: 3,
-            gender: "m",
-            data: {
-                "notes" : "Likes cheeseburger and other sandwiches. Dislikes things that aren't those things.",
-                "description" : "Too many calories in the diet."
-            },
-            age: 42,
-            diseases: ["Badfeelingitis", "Ubercrampus", "Blue Thumb Syndrome"],
-            carrierOfDiseases: ["Green Thumbitis", "BlueClues", "BlueClues2", "BluesClues3"],
-            //asymptoticDiseases: ["Green Thumbitis", "BlueClues", "BlueClues2", "BluesClues3"]
-        },
-        { id: 2, name: "Joe", gender: "m" },
-        { id: 3, name: "Mary", gender: "f", diseases: ["Blue Thumb Syndrome", "Green Thumbitis"] },
-        { id: 4, name: "George", gender: "m", parents: [2,3], age: 45, carrierOfDiseases: ["Blue Thumb Syndrome"], },
-        { id: 19, name: "George II", gender: "m", parents: [2,3], age: 46, carrierOfDiseases: ["Blue Thumb Syndrome"], },
-        { id: 5, name: "Patricia", gender: "f", parents: [3, 6], diseases: ["Badfeelingitis", "Ubercrampus", "Blue Thumb Syndrome"] },
-        {
-            id: 6, name: "Patrick", gender: "m", children: [5],
-            carrierOfDiseases: ["Blue Thumb Syndrome", "Ubercrampus"]
-        },
-        {
-            id: 7, name: "Phillip", gender: "m", children: [6],
-            carrierOfDiseases: ["Blue Thumb Syndrome", "Ubercrampus", "Green Thumbitis", "Badfeelingitis", "BlueClues", "BlueClues2", "BlueClues3"]
-        },
-        { id: 8, name: "Phillipina", gender: "f", children: [6] },
-        { id: 9, name: "Josephina", gender: "f", children: [2] },
-        { id: 10, name: "Joseph", gender: "m", children: [2] },
-        {
-            id: 11, name: "Max", gender: "m", parents: [],
-            asymptoticDiseases: ["Green Thumbitis", "BlueClues", "BlueClues2", "BluesClues3"]
-        },
-        { id: 12, name: "Winnie the Pooh", gender: "u", parents: [11, 5], isDeceased: true, age: 24 },
-        {
-            id: 13, name: "Rutherford", gender: "m", parents: [10, 5], age: 0.3,
-            isPregnancy: true, isDeceased: true, isTerminatedPregnancy: true,
-            diseases: ["Ubercrampus", "Blue Thumb Syndrome", "Green Thumbitis"],
-            carrierOfDiseases: ["BlueClues", "BlueClues2", "BluesClues3"]
-        },
-        { id: 14, name: "Sally", gender: "f", parents: [12, 9] },
-        { id: 15, name: "Sally2", gender: "f" },
-        { id: 16, name: "Silly", gender: "m", parents: [15, 12] },
-        { id: 17, name: "Silly2", gender: "m", parents: [15, 12] },
-        { id: 18, name: "Silly3", gender: "f", parents: [16, 14] },
-    ],
-
-    /** If true, will filter out and not display individuals who are detached from proband. */
-    "filterUnrelatedIndividuals" : false,
-
-    /**
-     * Dimensions for drawing/layout of nodes.
-     * Shouldn't need to change these.
-     * May define some or all or no dimensions (defaults will be applied).
-     *
-     * @required
-     */
-    "dimensionOpts" : Object.assign({}, POSITION_DEFAULTS),
-
-    /**
-     * Height of parent container.
-     * If not defined, visualization will be unbounded and extend as
-     * tall as needed instead of being vertically scrollable.
-     * Depending on UX/context, this is likely desirable.
-     *
-     * @optional
-     */
-    //"height" : null,
-
-    /**
-     * Minimum height of parent container,
-     * if height is not set and want container to
-     * be at least a certain height.
-     *
-     * @optional
-     */
-    "minimumHeight" : 400,
-
-    /**
-     * Width of parent container.
-     * Will be scrollable left/right if greater than this.
-     *
-     * @required
-     */
-    //"width" : 600,
-
-    /**
-     * NOT YET SUPPORTED.
-     * If true (unsupported yet), will be able to modify and add/remove nodes.
-     */
-    "editable" : false,
-
-    /**
-     * Callback function called upon changing of selectedNode.
-     *
-     * @optional
-     */
-    "onNodeSelected" : function(node){
-        console.log('Selected', node);
-    },
-
-    /**
-     * A function which returns a React Component.
-     * Will be instantiated/rendered at side of visualization.
-     *
-     * @type {function}
-     */
-    "renderDetailPane" : function(vizProps){
-        return <DefaultDetailPaneComponent {...vizProps} />;
-    },
-
-
-    /**
-     * Can supply an array of strings to color only those diseases.
-     * If null, then _all_ diseases will be colored.
-     *
-     * @type {!string[]}
-     */
-    "visibleDiseases": null,
-
-
-    /**
-     * If true, will show markers such as "II - 1", "IV - 2", etc. based on generation & order.
-     * Else will use `individual.name` or `individual.id` (if no name).
-     *
-     * @type {boolean}
-     */
-    "showOrderBasedName" : true,
-
-    /**
-     * Initial zoom/scale.
-     * Will be overriden if `zoomToExtentsOnMount` is true,
-     * after mount.
-     *
-     * @type {number}
-     */
-    "initialScale" : 1,
-
-    /**
-     * If true, will zoom out the graph (if needed)
-     * to fit into viewport. Will only fit to dimensions
-     * passed in, e.g. `props.height` & `props.width`.
-     *
-     * @type {boolean}
-     */
-    "zoomToExtentsOnMount" : true,
-
-
-    /**
-     * If when detail pane is open it reduces width or height
-     * of the container/viewport, can add the amount removed
-     * here to be used in re-setting `minScale` when pane is
-     * open.
-     */
-    "detailPaneOpenOffsetWidth" : 0,
-    "detailPaneOpenOffsetHeight" : 0,
-
-
-    /** Whether to allow to zoom w. mousewheel. Experimental. */
-    "enableMouseWheelZoom" : false,
-
-
-    /** Whether to allow to zoom w. mousewheel. Experimental. */
-    "enablePinchZoom" : true
-};
 
 /**
  * Primary component to feed data into.
@@ -282,7 +55,7 @@ PedigreeViz.defaultProps = pedigreeVizDefaultProps;
  *   and wrap 1 of these components.
  * - Define propTypes.
  */
-function PedigreeVizView(props){
+const PedigreeVizView = React.memo(function PedigreeVizView(props){
     const {
         objectGraph, onNodeSelected, onDataChanged,
         zoomToExtentsOnMount, initialScale,
@@ -291,6 +64,7 @@ function PedigreeVizView(props){
         height, width, minimumHeight,
         detailPaneOpenOffsetWidth,
         detailPaneOpenOffsetHeight,
+        disableSelect,
         ...passProps
     } = props;
 
@@ -306,6 +80,7 @@ function PedigreeVizView(props){
     const pedigreeViewProps = {
         ...passProps, objectGraph,
         graphWidth, graphHeight,
+        disableSelect,
         innerHeight: height
     };
 
@@ -320,7 +95,7 @@ function PedigreeVizView(props){
      *   `scale`, `minScale`, `maxScale`, `setScale`, `onMount`, `onUnmount`
      */
     return (
-        <SelectedNodeController {...{ onNodeSelected, onDataChanged, objectGraph }}>
+        <SelectedNodeController {...{ onNodeSelected, onDataChanged, objectGraph, disableSelect }}>
             <DetailPaneOffsetContainerSize {...{ containerWidth, containerHeight, detailPaneOpenOffsetWidth, detailPaneOpenOffsetHeight }}>
                 <ScaleController {...scaleProps}>
                     <PedigreeVizViewUserInterface {...pedigreeViewProps} />
@@ -328,7 +103,9 @@ function PedigreeVizView(props){
             </DetailPaneOffsetContainerSize>
         </SelectedNodeController>
     );
-}
+});
+PedigreeVizView.propTypes = pedigreeVizViewPropTypes;
+PedigreeVizView.defaultProps = pedigreeVizViewDefaultProps;
 
 const DetailPaneOffsetContainerSize = React.memo(function DetailPaneOffsetContainerSize(props){
     const {
@@ -358,6 +135,15 @@ const DetailPaneOffsetContainerSize = React.memo(function DetailPaneOffsetContai
     });
 
 });
+
+
+/**
+ * We increment/decrement this in `PedigreeVizViewUserInterface`
+ * constructor so that all have a unique identifier for svg
+ * clipDef ids & similar cases.
+ */
+let createdInstanceCount = 0;
+
 
 class PedigreeVizViewUserInterface extends React.PureComponent {
 
@@ -425,6 +211,8 @@ class PedigreeVizViewUserInterface extends React.PureComponent {
             'isMouseDownOnContainer' : true,
             'mounted' : false
         };
+
+        this.id = createdInstanceCount++;
 
         this.memoized = {
             maxHeightIndex: memoize(PedigreeVizViewUserInterface.maxHeightIndex),
@@ -673,6 +461,8 @@ class PedigreeVizViewUserInterface extends React.PureComponent {
             hoveredNode,
             onSelectNode,
             onUnselectNode,
+            showZoomControls = true,
+            disableSelect = false,
             ...passProps
         } = this.props;
         const { isMouseDownOnContainer, mounted } = this.state;
@@ -705,6 +495,7 @@ class PedigreeVizViewUserInterface extends React.PureComponent {
         const commonChildProps = {
             ...passProps,
             "objectGraph": orderedNodes,
+            "vizViewID" : this.id,
             containerWidth, containerHeight,
             graphHeight, graphWidth, dims, scale,
             diseaseToIndex,
@@ -729,7 +520,8 @@ class PedigreeVizViewUserInterface extends React.PureComponent {
         };
 
         return (
-            <div className="pedigree-viz-container" style={outerContainerStyle} data-selected-node={selectedNode && selectedNode.id}>
+            <div className="pedigree-viz-container" style={outerContainerStyle} data-selection-disabled={disableSelect}
+                data-selected-node={selectedNode && selectedNode.id} data-instance-index={this.id}>
                 <div className="inner-container" ref={this.innerRef} style={innerContainerStyle}
                     onMouseDown={this.handleContainerMouseDown}
                     onMouseMove={this.handleContainerMouseMove}
@@ -744,7 +536,7 @@ class PedigreeVizViewUserInterface extends React.PureComponent {
                         <IndividualsLayer {...commonChildProps} />
                     </div>
                 </div>
-                { typeof setScale === "function" ?
+                { showZoomControls && typeof setScale === "function" ?
                     <ScaleControls {...{ scale, minScale, maxScale, setScale }} />
                     : null }
                 { selectedNodePane ?
@@ -763,7 +555,7 @@ const ShapesLayer = React.memo(function ShapesLayer(props){
         edges, relationships,
         selectedNode, hoveredNode,
         onNodeMouseIn, onNodeMouseLeave,
-        dims, scale, maxHeightIndex
+        dims, scale
     } = props;
     const svgStyle = { width: graphWidth, height: graphHeight };
 
@@ -776,7 +568,7 @@ const ShapesLayer = React.memo(function ShapesLayer(props){
             <EdgesLayer {...{ edges, dims }} />
             <SelectedNodeIdentifier {...{ selectedNode, dims, textScale }} />
             <RelationshipNodeShapeLayer {...{ relationships, hoveredNode, onNodeMouseIn, onNodeMouseLeave, dims, textScale, textScaleTransformStr }} />
-            <IndividualNodeShapeLayer {...props} {...{ textScale, textScaleTransformStr, maxHeightIndex }} />
+            <IndividualNodeShapeLayer {...props} {...{ textScale, textScaleTransformStr }} />
         </svg>
     );
 });

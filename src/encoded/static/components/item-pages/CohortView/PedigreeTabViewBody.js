@@ -164,6 +164,7 @@ export class PedigreeTabViewBody extends React.PureComponent {
             graphData,
             windowWidth,
             windowHeight,
+            containerId = "pedigree-viz-container-cgap",
             visibleDiseases = null,
             scale = 1,
             showOrderBasedName = true
@@ -171,6 +172,7 @@ export class PedigreeTabViewBody extends React.PureComponent {
         const { isBrowserFullscreen, isPedigreeFullscreen } = this.state;
         const propName = "height"; //(isBrowserFullscreen ? "height" : "minimumHeight");
         const cls = (
+            "pedigree-tab-view-body-container" +
             (isBrowserFullscreen ? "browser-is-full-screen" : "") +
             (isPedigreeFullscreen ? " view-is-full-screen" : "")
         );
@@ -228,7 +230,7 @@ export class PedigreeTabViewBody extends React.PureComponent {
         }
 
         return (
-            <div id="pedigree-viz-container-cgap" className={cls}>
+            <div id={containerId} className={cls}>
                 <FullHeightCalculator {...{ windowWidth, windowHeight, propName, heightDiff }}>
                     { graphData ? // If already have parsed graph data
                         <PedigreeVizView {...pedigreeVizProps} {...graphData} />
