@@ -369,24 +369,32 @@ def test_search_query_string_no_longer_functional(workbook, testapp):
     res_search = testapp.get(search_range, status=404)
     assert len(res_search.json['@graph']) == 0
 
-@pytest.mark.skip # XXX: How to best refactor?
 def test_search_with_added_display_title(workbook, testapp, registry):
-    # 4DNBS1234567 is display_title for biosample
-    #import pdb; pdb.set_trace()
-    search = '/search/?type=Disorder&parents=DD1'
+    search = '/search/?type=Individual&father=GAPID3PW26SK'
     # 301 because search query is changed
     res_json = testapp.get(search, status=301).follow(status=200).json
-    assert res_json['@id'] == '/search/?type=ExperimentHiC&biosample.display_title=4DNBS1234567'
-    added_facet = [fct for fct in res_json['facets'] if fct['field'] == 'biosample.display_title']
-    # use the title from biosample in experiment schema
-    bios_title = registry[TYPES]['ExperimentHiC'].schema['properties']['biosample']['title']
-    assert added_facet[0]['title'] == bios_title
-    exps = [exp['uuid'] for exp in res_json['@graph']]
+    assert res_json['@id'] == '/search/?type=Individual&father.display_title=GAPID3PW26SK'
+    added_facet = [fct for fct in res_json['facets'] if fct['field'] == 'father.display_title']
+    # new facet uses the title from schema
+    added_title = registry[TYPES]['Individual'].schema['properties']['father']['title']
+    assert added_facet[0]['title'] == added_title
+    indvs = [indv['uuid'] for indv in res_json['@graph']]
 
     # make sure the search result is the same for the explicit query
     res_json2 = testapp.get(res_json['@id']).json
-    exps2 = [exp['uuid'] for exp in res_json2['@graph']]
-    assert set(exps) == set(exps2)
+    indvs2 = [indv['uuid'] for indv in res_json2['@graph']]
+    assert set(indvs) == set(indvs2)
+
+    # 'sort' also adds display_title for ascending and descending queries
+    for use_sort in ['father', '-father']:
+        search = '/search/?type=Individual&sort=%s' % use_sort
+        res_json = testapp.get(search, status=301).follow(status=200).json
+        assert res_json['@id'] == '/search/?type=Individual&sort=%s.display_title' % use_sort
+
+    # regular sort queries remain unchanged
+    search = '/search/?type=Individual&sort=uuid'
+    res_json = testapp.get(search).json
+    assert res_json['@id'] == '/search/?type=Individual&sort=uuid'
 
     # check to see that added facet doesn't conflict with existing facet title
     # query below will change to file_format.display_title=fastq
