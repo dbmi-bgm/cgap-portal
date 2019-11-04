@@ -536,9 +536,7 @@ def set_sort_order(request, search, search_term, types, doc_types, result):
         else:
             name = requested_sort
             order = 'asc'
-        sort_schema = None
-        if type_schema:
-            sort_schema = schema_for_field(name, request, doc_types)
+        sort_schema = schema_for_field(name, request, doc_types)
 
         if sort_schema:
             sort_type = sort_schema.get('type')
