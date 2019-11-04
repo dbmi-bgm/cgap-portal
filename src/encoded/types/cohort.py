@@ -139,11 +139,7 @@ def process_pedigree(context, request):
     from pyramid.paster import get_app
     from webtest import TestApp
     from base64 import b64encode
-    # temporary: there seem to be buildout installation problems w defusedxml
-    try:
-        from defusedxml.ElementTree import fromstring
-    except ImportError:
-        from xml.etree.ElementTree import fromstring
+    from xml.etree.ElementTree import fromstring
 
     cohort = str(context.uuid)  # used in logging
 
@@ -590,7 +586,7 @@ def etree_to_dict(ele, ref_container=None, ref_field=''):
     `managedObjectID` value
 
     Args:
-        ele (defusedxml.Element): root Element in the ElementTree
+        ele (xml.etree.ElementTree): root Element in the ElementTree
         ref_container (dict): keep referenced items found in tree. Keyed
             by reference value. Must also set `ref_field` to work. Default None
         ref_field (str): if provided, add elements containing this reference
