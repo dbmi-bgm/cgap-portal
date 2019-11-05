@@ -82,7 +82,7 @@ class Evidence(Item):
 
 
 @collection(
-    name='evidence_dis_phenos',
+    name='evidence-dis-phenos',
     properties={
         'title': 'Evidence Linking Disorder to Phenotypes',
         'description': 'Listing Disorder to Phenotype Items',

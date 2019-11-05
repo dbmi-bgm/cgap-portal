@@ -224,7 +224,7 @@ def main():  # pragma: no cover
     hp_regex = re.compile('^HP:[0-9]{7}')
     hpoid2uuid = {hid: pheno.get('uuid') for hid, pheno in phenotypes.items()}
     xref2disorder = get_dbxref2disorder_map(disorders)
-    evidence_items = {}
+    evidence_items = []  # {}
     problems = {}
     # figure out input and if to save the file
     insrc = args.input
@@ -305,19 +305,42 @@ def main():  # pragma: no cover
             pheno_annot[cgf] = v
 
         if pheno_annot:
-            lookup = disorder_id + '_' + phenotype_id
-            dis2pheno = evidence_items.get(lookup)
-            if dis2pheno:
-                if pheno_annot in dis2pheno:
-                    ppos = dis2pheno.index(pheno_annot)
-                    problems.setdefault('redundant_annot', []).append((data, dis2pheno[ppos]))
-                    continue
-            evidence_items.setdefault(lookup, []).append(pheno_annot)
-    import pdb; pdb.set_trace()
+            if pheno_annot in evidence_items:
+                # dis2pheno = evidence_items.get(disorder_id)
+                # if dis2pheno:
+                #    if pheno_annot in dis2pheno:
+                #        ppos = dis2pheno.index(pheno_annot)
+                problems.setdefault('redundant_annot', []).append(pheno_annot)  # (data, dis2pheno[ppos]))
+                continue
+            # evidence_items.setdefault(disorder_id, []).append(pheno_annot)
+            evidence_items.append(pheno_annot)
+    print(len(evidence_items))
+
     # at this point we've gone through all the lines in the file
     # here we want to compare with what already exists in db
     patches = []
-    for did, pheno_annots in evidence_items.items():
+    sq = 'search/?type=EvidenceDisPheno&status!=obsolete'
+    res = search_metadata(sq, auth, is_generator=True)
+    existing = 0
+    uids2obsolete = []
+    logger.info('Comparing to existing evidence')
+    for db_evi in res:
+        rdb_evi = get_raw_form(db_evi)
+        if rdb_evi in evidence_items:
+            existing += 1
+            evidence_items.remove(rdb_evi)
+        else:
+            uids2obsolete.append(rdb_evi.get('uuid'))
+
+    print('EXISTING: ', existing)
+    print('OBSOLETE: ', len(uids2obsolete))
+    print('NEW: ', len(evidence_items))
+    import pdb; pdb.set_trace()
+
+    for luid, evidences in evidence_items.items():
+        # all the evidence items corresponding to a pair of disorder and phenotype uuid
+        # are a list of evidence items - search for all evid
+        did, pid = luid.split('_')
         db_annots = []
         db_dis = disorders.get(did)
         if db_dis:
