@@ -7,6 +7,7 @@ import json
 import re
 import requests
 import logging
+import logging.config
 from datetime import datetime
 from uuid import uuid4
 from dcicutils.ff_utils import (
@@ -18,7 +19,7 @@ from dcicutils.ff_utils import (
 )
 from encoded.commands.load_items import load_items
 from encoded.commands.generate_items_from_owl import (
-    connect2server,
+    #connect2server,
     get_raw_form
 )
 
@@ -206,7 +207,13 @@ def main():  # pragma: no cover
     args = get_args()
 
     # get connection
-    auth = connect2server(args.env, args.key, args.keyfile)
+    # old style for use on this branch
+    try:
+        auth = get_authentication_with_server(args.key, args.env)
+    except Exception:
+        print("Authentication failed")
+        sys.exit(1)
+    # auth = connect2server(args.env, args.key, args.keyfile)
     logger.info('Working with {}'.format(auth.get('server')))
     logger.info('Getting existing Items')
     logger.info('Disorders')
@@ -217,7 +224,7 @@ def main():  # pragma: no cover
     hp_regex = re.compile('^HP:[0-9]{7}')
     hpoid2uuid = {hid: pheno.get('uuid') for hid, pheno in phenotypes.items()}
     xref2disorder = get_dbxref2disorder_map(disorders)
-    assoc_phenos = {}
+    evidence_items = {}
     problems = {}
     # figure out input and if to save the file
     insrc = args.input
@@ -264,7 +271,7 @@ def main():  # pragma: no cover
         data['subject_item'] = disorder_id
         # and the HPO_ID to refer to object_item
         hpo_id = data.get('HPO_ID')
-        phenotype_id = check_hpo_id_and_note_problems('HPO_ID', hpoid, hpoid2uuid, problems)
+        phenotype_id = check_hpo_id_and_note_problems('HPO_ID', hpo_id, hpoid2uuid, problems)
         if not phenotype_id:
             # missing phenotype
             continue
@@ -296,19 +303,19 @@ def main():  # pragma: no cover
             pheno_annot[cgf] = v
 
         if pheno_annot:
-            # HERE IS ONE PLACE WHERE WE MAY NEED TO DO CHECKING FOR EXISING AND DUPES
-            # COME UP WITH A KEY FOR COMPARISON PURPOSES
-            dis2pheno = assoc_phenos.get(disorder_id)
+            lookup = disorder_id + '_' + phenotype_id
+            dis2pheno = evidence_items.get(lookup)
             if dis2pheno:
                 if pheno_annot in dis2pheno:
                     ppos = dis2pheno.index(pheno_annot)
                     problems.setdefault('redundant_annot', []).append((data, dis2pheno[ppos]))
                     continue
-            assoc_phenos.setdefault(disorder_id, []).append(pheno_annot)
+            evidence_items.setdefault(lookup, []).append(pheno_annot)
+    import pdb; pdb.set_trace()
     # at this point we've gone through all the lines in the file
     # here we want to compare with what already exists in db
     patches = []
-    for did, pheno_annots in assoc_phenos.items():
+    for did, pheno_annots in evidence_items.items():
         db_annots = []
         db_dis = disorders.get(did)
         if db_dis:
