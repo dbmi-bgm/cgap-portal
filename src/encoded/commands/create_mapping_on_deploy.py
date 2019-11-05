@@ -45,7 +45,7 @@ ITEM_INDEX_ORDER = [
     'Sysinfo',
     'StaticSection',
     'Document',
-    'Evidence',
+    'EvidenceDisPheno',
     'Page'
 ]
 
