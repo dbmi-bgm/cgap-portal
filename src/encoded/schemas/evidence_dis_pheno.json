@@ -1,7 +1,7 @@
 {
     "title": "Association Evidence for Disorders to Phenotypes",
     "description": "Contains links to Disorders and Phenotypes that have associations from HPOA annotation file",
-    "id": "/profiles/evidence_pheno_dis.json",
+    "id": "/profiles/evidence_dis_pheno.json",
     "$schema": "http://json-schema.org/draft-04/schema#",
     "type": "object",
     "required": ["object_item", "subject_item"],

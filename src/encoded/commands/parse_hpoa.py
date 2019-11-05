@@ -94,6 +94,12 @@ def get_existing_phenotype_uuids(auth):
     return {r.get('hpo_id'): r.get('uuid') for r in result}
 
 
+def get_phenotypes_from_db(auth):
+    q = 'search/?type=Phenotype'
+    result = search_metadata(q, auth, page_limit=200, is_generator=True)
+    return {r.get('hpo_id'): r for r in result}
+
+
 def get_dbxref2disorder_map(disorders):
     xref2dis = {}
     for duid, d in disorders.items():
@@ -106,6 +112,21 @@ def get_dbxref2disorder_map(disorders):
                     if x.startswith('OMIM:') or x.lower().startswith('orpha') or x.lower().startswith('decip'):
                         xref2dis[x] = duid
     return xref2dis
+
+
+def check_hpo_id_and_note_problems(fname, hpoid, hpoid2uuid, problems):
+    hpuid = hpoid2uuid.get(hpoid)
+    if hpuid:
+        return hpuid
+    prob = {fname: hpoid}
+    not_found = problems.get('hpo_not_found', [])
+    if hpo_id in not_found:
+        fields = not_found.get(hpo_id, [])
+        if fname in fields:
+            return None
+        fields.append(fname)
+    problems.setdefault('hpo_not_found', {}).update({hpo_id: fields})
+    return None
 
 
 def line2list(line):
@@ -187,10 +208,14 @@ def main():  # pragma: no cover
     # get connection
     auth = connect2server(args.env, args.key, args.keyfile)
     logger.info('Working with {}'.format(auth.get('server')))
-    # existing_disorders = get_existing_disorders_from_db(auth)
-    hpoid2uuid = get_existing_phenotype_uuids(auth)
-    hp_regex = re.compile('^HP:[0-9]{7}')
+    logger.info('Getting existing Items')
+    logger.info('Disorders')
     disorders = get_disorders_from_db(auth)
+    logger.info('Phenotypes')
+    phenotypes = get_phenotypes_from_db(auth)
+
+    hp_regex = re.compile('^HP:[0-9]{7}')
+    hpoid2uuid = {hid: pheno.get('uuid') for hid, pheno in phenotypes.items()}
     xref2disorder = get_dbxref2disorder_map(disorders)
     assoc_phenos = {}
     problems = {}
@@ -224,7 +249,7 @@ def main():  # pragma: no cover
             continue
         data_list = line2list(line)
         data = dict(zip(fields, data_list))
-        # deal with top level fields for disorder
+        # find the  disorder_uuid to refer to subject_item
         using_id = data.get('DatabaseID')
         if not using_id:
             continue
@@ -236,6 +261,15 @@ def main():  # pragma: no cover
             problems.setdefault('no_map', []).append(data)
             continue
         disorder_id = xref2disorder.get(map_id)
+        data['subject_item'] = disorder_id
+        # and the HPO_ID to refer to object_item
+        hpo_id = data.get('HPO_ID')
+        phenotype_id = check_hpo_id_and_note_problems('HPO_ID', hpoid, hpoid2uuid, problems)
+        if not phenotype_id:
+            # missing phenotype
+            continue
+        data['object_item'] = phenotype_id
+        del data['HPO_ID']
         pheno_annot = {}
         for f, v in data.items():
             if not v or (f == 'DiseaseName'):
@@ -254,17 +288,16 @@ def main():  # pragma: no cover
                 v = v[0:1].upper()
 
             if isinstance(v, str) and hp_regex.match(v):
-                hpuid = hpoid2uuid.get(v)
+                hpuid = check_hpo_id_and_note_problems(f, v, hpoid2uuid, problems)
                 if not hpuid:
-                    nf_data = data.copy()
-                    nf_data.update({'missing_hpo': v})
-                    problems.setdefault('hpo_not_found', []).append(nf_data)
                     continue
                 else:
                     v = hpuid
             pheno_annot[cgf] = v
 
         if pheno_annot:
+            # HERE IS ONE PLACE WHERE WE MAY NEED TO DO CHECKING FOR EXISING AND DUPES
+            # COME UP WITH A KEY FOR COMPARISON PURPOSES
             dis2pheno = assoc_phenos.get(disorder_id)
             if dis2pheno:
                 if pheno_annot in dis2pheno:
