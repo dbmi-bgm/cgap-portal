@@ -218,9 +218,10 @@ class Auth0AuthenticationPolicy(CallbackAuthenticationPolicy):
                     # Check Auth0 identities to see if partners is one
                     # accept if so. Otherwise look for email_verified
                     is_partners = False
-                    for identity in payload.get('identites', []):
+                    for identity in payload.get('identities', []):
                         if identity.get('connection', '') == 'partners':
                             is_partners = True
+                            break
                     if payload.get('email_verified') or is_partners:
                         request.set_property(lambda r: False, 'auth0_expired')
                         return payload
