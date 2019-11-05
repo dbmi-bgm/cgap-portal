@@ -281,7 +281,9 @@ def main():  # pragma: no cover
         for f, v in data.items():
             if not v or (f == 'DiseaseName'):
                 continue
-            if f == 'Frequency':
+            if f in ['subject_item', 'object_item']:
+                cgf = f
+            elif f == 'Frequency':
                 if v.startswith('HP:'):
                     cgf = FIELD_MAPPING[f][0]
                 else:
