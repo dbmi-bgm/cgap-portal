@@ -191,6 +191,18 @@ class Auth0AuthenticationPolicy(CallbackAuthenticationPolicy):
         request.set_property(get_user_info, "user_info", True)
         return email
 
+    @staticmethod
+    def email_is_partners(payload):
+        """
+        Checks that the given JWT payload belongs to a partners email.
+        """
+        for identity in payload.get('identities', []): # if auth0 decoded
+            if identity.get('connection', '') == 'partners':
+                return True
+        if 'partners' in payload.get('sub', '').split('|'): # if we decoded
+            return True
+        return False
+
     def get_token_info(self, token, request):
         '''
         Given a jwt get token info from auth0, handle retrying and whatnot.
@@ -205,24 +217,17 @@ class Auth0AuthenticationPolicy(CallbackAuthenticationPolicy):
                 # leeway accounts for clock drift between us and auth0
                 payload = jwt.decode(token, b64decode(auth0_secret, '-_'),
                                      audience=auth0_client, leeway=30)
-                if 'email' in payload and payload.get('email_verified') is True:
-                    request.set_property(lambda r: False, 'auth0_expired')
-                    return payload
+                if 'email' in payload:
+                    if payload.get('email_verified', False) or self.email_is_partners(payload):
+                        request.set_property(lambda r: False, 'auth0_expired')
+                        return payload
 
             else: # we don't have the key, let auth0 do the work for us
                 user_url = "https://{domain}/tokeninfo".format(domain='hms-dbmi.auth0.com')
                 resp  = requests.post(user_url, {'id_token':token})
                 payload = resp.json()
                 if 'email' in payload:
-
-                    # Check Auth0 identities to see if partners is one
-                    # accept if so. Otherwise look for email_verified
-                    is_partners = False
-                    for identity in payload.get('identities', []):
-                        if identity.get('connection', '') == 'partners':
-                            is_partners = True
-                            break
-                    if payload.get('email_verified') or is_partners:
+                    if payload.get('email_verified', False) or self.email_is_partners(payload):
                         request.set_property(lambda r: False, 'auth0_expired')
                         return payload
 
