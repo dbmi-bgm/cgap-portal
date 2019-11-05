@@ -113,7 +113,7 @@ export const CohortSummaryTable = React.memo(function CohortSummaryTable(props){
         if (genID) {
             indvLink = (
                 <div className="text-ellipsis-container">
-                    <span className="text-serif text-small align-middle text-600 mr-2">
+                    <span className="text-serif text-small gen-identifier">
                         { genID }
                     </span>
                     { indvLink }

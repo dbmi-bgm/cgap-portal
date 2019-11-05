@@ -8,10 +8,10 @@ import { individualClassName } from './IndividualsLayer';
 
 export const IndividualNodeShapeLayer = React.memo(function IndividualNodeShapeLayer(props){
     const { objectGraph: g, ...passProps } = props;
-    const { dims } = passProps;
+    const { dims, vizViewID = 0 } = passProps;
     return (
         <g className="individuals-bg-shape-layer">
-            <ClipPathDefinitions dims={dims} />
+            <ClipPathDefinitions {...{ dims, vizViewID }} />
             { g.map((indv) => <IndividualNodeShape {...passProps} key={indv.id} individual={indv} /> )}
         </g>
     );
@@ -22,34 +22,35 @@ export const IndividualNodeShapeLayer = React.memo(function IndividualNodeShapeL
  * so Individual shapes may performantly reuse them for clipping background color
  * sections instead of defining new clip paths at each node.
  */
-function ClipPathDefinitions({ dims : { individualHeight: height, individualWidth: width } }){
+const ClipPathDefinitions = React.memo(function ClipPathDefinitions({ vizViewID, dims : { individualHeight: height, individualWidth: width } }){
+    const numAppend = "_viewID" + vizViewID;
     return (
         <defs>
-            <marker id="pedigree_lineArrow" viewBox="0 0 10 10" refX="5" refY="5"
+            <marker id={"pedigree_lineArrow" + numAppend} viewBox="0 0 10 10" refX="5" refY="5"
                 markerWidth="4" markerHeight="4"
                 orient="auto-start-reverse">
                 <path d="M 0 0 L 10 5 L 0 10 z" />
             </marker>
-            <marker id="pedigree_circle" viewBox="0 0 10 10" refX="5" refY="5"
+            <marker id={"pedigree_clipPath_for_debug_edge_circle" + numAppend} viewBox="0 0 10 10" refX="5" refY="5"
                 markerWidth="4" markerHeight="4"
                 orient="auto-start-reverse">
                 <circle r={5} cx={5} cy={5} style={{ fill: "#0002" }} />
             </marker>
-            <clipPath id="pedigree_clipPath_for_FemaleShape">
+            <clipPath id={"pedigree_clipPath_for_FemaleShape" + numAppend}>
                 <FemaleShape {...{ height, width }} />
             </clipPath>
-            <clipPath id="pedigree_clipPath_for_MaleShape">
+            <clipPath id={"pedigree_clipPath_for_MaleShape" + numAppend}>
                 <MaleShape {...{ height, width }} />
             </clipPath>
-            <clipPath id="pedigree_clipPath_for_UndeterminedShape">
+            <clipPath id={"pedigree_clipPath_for_UndeterminedShape" + numAppend}>
                 <UndeterminedShape {...{ height, width }} />
             </clipPath>
-            <clipPath id="pedigree_clipPath_for_TerminatedPregnancyShape">
+            <clipPath id={"pedigree_clipPath_for_TerminatedPregnancyShape" + numAppend}>
                 <TerminatedPregnancyShape {...{ height, width }} />
             </clipPath>
         </defs>
     );
-}
+});
 
 
 const FemaleShape = React.memo(function FemaleShape({ height, width, ...passProps }){
@@ -118,6 +119,7 @@ export class IndividualNodeShape extends React.PureComponent {
             diseaseToIndex,
             textScale,
             textScaleTransformStr,
+            vizViewID = 0,
             hoveredNode = null,
             selectedNode = null,
             showOrderBasedName = true,
@@ -164,9 +166,9 @@ export class IndividualNodeShape extends React.PureComponent {
             <g width={width} height={height} transform={groupTransform} data-individual-id={id}
                 className={"pedigree-individual-shape " + this.memoized.className(individual, isHoveredOver, isSelected)}>
                 { bgShape }
-                <UnderlayMarkers {...{ width, height, individual, shape, diseaseToIndex }} />
+                <UnderlayMarkers {...{ width, height, individual, shape, diseaseToIndex, vizViewID }} />
                 { fgShape }
-                <OverlayMarkers {...{ width, height, individual, shape, textScaleTransformStr }} />
+                <OverlayMarkers {...{ width, height, individual, shape, textScaleTransformStr, vizViewID }} />
                 <AboveNodeText {...{ width, height, individual, maxHeightIndex, dims, halfWidth, aboveNodeTextY, textScale, textScaleTransformStr }} />
                 <UnderNodeText {...{ width, height, individual, shape, diseaseToIndex, dims, halfWidth, showOrderBasedName, textScale, textScaleTransformStr }} />
             </g>
@@ -189,7 +191,14 @@ function shapeTypeToString(shapeType){
 }
 
 
-const AffectedBGPieChart = React.memo(function AffectedBGPieChart({ width, height, shape, diseases = [], diseaseToIndex = {} }){
+const AffectedBGPieChart = React.memo(function AffectedBGPieChart({
+    width,
+    height,
+    shape,
+    vizViewID = 0,
+    diseases = [],
+    diseaseToIndex = {}
+}){
     const visibleDiseases = diseases.filter(function(disease){
         return diseaseToIndex[disease];
     });
@@ -197,7 +206,7 @@ const AffectedBGPieChart = React.memo(function AffectedBGPieChart({ width, heigh
     if (diseaseLen === 0) return;
     const centerX = width / 2;
     const centerY = shape.type === TerminatedPregnancyShape ? height / 4 : height / 2;
-    const clipID = "pedigree_clipPath_for_" + (shapeTypeToString(shape.type));
+    const clipID = "pedigree_clipPath_for_" + (shapeTypeToString(shape.type)) + "_viewID" + vizViewID;
     const startAngle = -(Math.PI / 2);
     const endAngle = (2 * Math.PI ) / diseaseLen;
     const arcPaths = visibleDiseases.map(function(disease, idx){
@@ -220,12 +229,12 @@ const AffectedBGPieChart = React.memo(function AffectedBGPieChart({ width, heigh
     return <g className="disease-path-arcs">{ arcPaths }</g>;
 });
 
-const UnderlayMarkers = React.memo(function UnderlayMarkers({ individual, width, height, shape, diseaseToIndex }){
+const UnderlayMarkers = React.memo(function UnderlayMarkers({ individual, width, height, shape, diseaseToIndex, vizViewID = 0 }){
     const { diseases = [], carrierOfDiseases = [], asymptoticDiseases = [] } = individual;
     const markers = [];
 
     if (diseases.length > 0) {
-        markers.push(<AffectedBGPieChart {...{ width, height, diseases, shape, diseaseToIndex }} key="diseases-bg" />);
+        markers.push(<AffectedBGPieChart {...{ width, height, diseases, shape, diseaseToIndex, vizViewID }} key="diseases-bg" />);
     }
 
     if (asymptoticDiseases.length > 0){
@@ -247,7 +256,8 @@ const OverlayMarkers = React.memo(function OverlayMarkers(props){
         width = 80,
         height = 80,
         shape,
-        textScaleTransformStr = "scale3d(1,1,1)"
+        textScaleTransformStr = "scale3d(1,1,1)",
+        vizViewID = 0
     } = props;
     const {
         //id,
@@ -297,7 +307,7 @@ const OverlayMarkers = React.memo(function OverlayMarkers(props){
         path.moveTo(-25, height + 10);
         path.lineTo(-10, height);
         markers.push(
-            <path d={path.toString()} markerEnd="url(#pedigree_lineArrow)" key="consultand-arrow"
+            <path d={path.toString()} markerEnd={`url(#pedigree_lineArrow_viewID${vizViewID})`} key="consultand-arrow"
                 style={bottomLeftScaleStyle} />
         );
         if (showAsProband){ // "P" text identifier

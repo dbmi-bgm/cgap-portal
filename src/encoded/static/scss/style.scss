@@ -33,17 +33,17 @@
 
 @import "encoded/layout";
 
-// @import "encoded/modals"; -- Deleted
-@import "encoded/modules/forms",
+@import "encoded/modules/pedigree-visualization",
+        "encoded/modules/common-visualization-detail-pane",
+        "encoded/modules/forms",
         "encoded/modules/navbar",
         "encoded/modules/tables",
         "encoded/modules/search",
         "encoded/modules/charts",
         "encoded/modules/tooltip",
-        "encoded/modules/item-pages",
+        "encoded/modules/pedigree-visualization-detail-pane",   // Requires: common-visualization-detail-pane, pedigree-visualization
+        "encoded/modules/item-pages",                           // Requires: pedigree-visualization
         "encoded/modules/static-pages",
         "encoded/modules/slide-in-pane",
-        "encoded/modules/common-visualization-detail-pane",
-        "encoded/modules/pedigree-visualization",
         "encoded/modules/workflow-visualization",
         "encoded/modules/cohort-submission";
