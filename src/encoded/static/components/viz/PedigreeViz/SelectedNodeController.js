@@ -24,6 +24,18 @@ export class SelectedNodeController extends React.PureComponent {
         }
     };
 
+    static getDerivedStateFromProps(props, state){
+        if (props.disableSelect) {
+            if (state.currSelectedNodeId || state.currHoverNodeId) {
+                return {
+                    'currHoverNodeId' : null,
+                    'currSelectedNodeId' :  null
+                };
+            }
+        }
+        return null;
+    }
+
     constructor(props){
         super(props);
         this.handleSelectNode = this.handleSelectNode.bind(this);
@@ -58,7 +70,8 @@ export class SelectedNodeController extends React.PureComponent {
     }
 
     handleSelectNode(id){
-        if (!id){
+        const { disableSelect } = this.props;
+        if (disableSelect || !id){
             return false;
         }
         // Is triggered after onmouseup, vectors always === 0.

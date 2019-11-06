@@ -21,9 +21,10 @@ export const EdgesLayer = React.memo(function EdgesLayer(props){
 });
 
 const DebugVizGraphLayer = React.memo(function DebugVizGraphLayer(props){
-    const { visibilityGraph, dims, enabled = false } = props;
+    const { visibilityGraph, dims, enabled = false, vizViewID = 0 } = props;
     if (!visibilityGraph || !enabled) return null;
     const { hSegments, vSegments } = visibilityGraph;
+    const clipStyle = "url(#pedigree_clipPath_for_debug_edge_circle_viewID" + vizViewID + ")";
     console.log('VIZG', visibilityGraph);
     return (
         <g className="visibility-graph" style={{ stroke: "#ccc" }}
@@ -34,7 +35,7 @@ const DebugVizGraphLayer = React.memo(function DebugVizGraphLayer(props){
                     path.moveTo(...start);
                     path.lineTo(...end);
                     const pathStr = path.toString();
-                    return <path d={pathStr} key={pathStr} markerEnd="url(#pedigree_circle)" markerStart="url(#pedigree_circle)" />;
+                    return <path d={pathStr} key={pathStr} markerEnd={clipStyle} markerStart={clipStyle} />;
                 })
             }
         </g>

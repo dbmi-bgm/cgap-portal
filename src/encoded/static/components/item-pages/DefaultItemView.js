@@ -106,7 +106,16 @@ export default class DefaultItemView extends React.PureComponent {
         'windowWidth' : PropTypes.number,
         'schemas' : PropTypes.object,
         'href' : PropTypes.string,
-        'width' : PropTypes.number
+        'width' : PropTypes.number,
+        'context' : PropTypes.shape({
+            '@id' : PropTypes.string.isRequired,
+            'display_title' : PropTypes.string.isRequired
+        }),
+        'alerts' : PropTypes.arrayOf(PropTypes.shape({
+            'title' : PropTypes.string.isRequired,
+            'message' : PropTypes.oneOfType([ PropTypes.string, PropTypes.element ]),
+            'style': PropTypes.oneOf(['warning', 'success', 'danger', 'info', 'primary', 'secondary'])
+        }))
     };
 
     /**
@@ -115,6 +124,7 @@ export default class DefaultItemView extends React.PureComponent {
      */
     constructor(props){
         super(props);
+        this.getControllers = this.getControllers.bind(this);
         this.getCommonTabs = this.getCommonTabs.bind(this);
         this.getTabViewContents = this.getTabViewContents.bind(this);
         this.getTabViewWidth = this.getTabViewWidth.bind(this);
@@ -274,9 +284,10 @@ export default class DefaultItemView extends React.PureComponent {
      * Returns `getDefaultTabs()` by default, until extended in a sub-class.
      * Executed on width change, as well as ItemView's prop changes.
      *
+     * @param {Object<string,*>} [controllerProps] Props passed in from controllers, if any.
      * @returns {TabObject[]} Tab objects for this Item view/type.
      */
-    getTabViewContents(){
+    getTabViewContents(controllerProps){
         return this.getDefaultTabs();
     }
 
@@ -295,6 +306,18 @@ export default class DefaultItemView extends React.PureComponent {
     }
 
     /**
+     * Add 'Controller' components
+     * which clone children and pass down props.
+     * Hacky temporary way to use these to wrap ItemViews
+     * should make it somewhat easier to refactor later though.
+     *
+     * @returns {React.Component[]}
+     */
+    getControllers(){
+        return null;
+    }
+
+    /**
      * The render method which puts the above method outputs together.
      * Should not override except for rare cases; instead, override other
      * methods which are called in this render method.
@@ -304,7 +327,7 @@ export default class DefaultItemView extends React.PureComponent {
      * @returns {JSX.Element}
      */
     render() {
-        const { context, alerts } = this.props;
+        const { context, href, alerts } = this.props;
         const titleTabObj = {
             'className' : "title-tab",
             'tab' : <TitleTab {..._.pick(this.props, 'schemas', 'href', 'context')} />,
@@ -319,21 +342,41 @@ export default class DefaultItemView extends React.PureComponent {
             'key' : 'item-actions-menu',
             //'onClick' : this.onItemActionsTabClick
         };
+        const controllers = this.getControllers();
+        const controllersLen = (Array.isArray(controllers) && controllers.length) || 0;
+        let innerBody = (
+            <InnerBody getTabViewContents={this.getTabViewContents} ref={this.tabbedViewRef}
+                {...{ href, context }} prefixTabs={[ titleTabObj ]} suffixTabs={[ menuTabObj ]} />
+        );
+        if (controllersLen > 0) {
+            // Create ~ `<Controller0><Controller1><Controller2><InnerBody/></Controller2></Controller1></Controller0>`
+            controllers.slice().reverse().forEach((ctrlr, i) => {
+                // Handle both instantiated & non-instantiated controllers
+                const createFxn = React.isValidElement(ctrlr) ? React.cloneElement : React.createElement;
+                innerBody = createFxn(ctrlr, i === (controllersLen - 1) ? this.props : {}, innerBody);
+            });
+        }
         return (
             <div className={DefaultItemView.className(context)} id="content">
                 <div id="item-page-alerts-container">
                     <Alerts alerts={alerts} className="alerts" />
                 </div>
-                <TabView
-                    contents={this.getTabViewContents()} ref={this.tabbedViewRef} key="tabbedView"
-                    {..._.pick(this.props, 'windowWidth', 'windowHeight', 'href', 'context')}
-                    prefixTabs={[ titleTabObj ]} suffixTabs={[ menuTabObj ]} />
+                { innerBody }
                 { this.itemFooter() }
             </div>
         );
     }
-
 }
+
+
+const InnerBody = React.forwardRef(function InnerBody(props, ref){
+    const { getTabViewContents, href, context, prefixTabs, suffixTabs, ...controllerProps } = props;
+    return (
+        <TabView
+            contents={getTabViewContents(controllerProps)} ref={ref}
+            {...{ href, context, prefixTabs, suffixTabs }} />
+    );
+});
 
 
 
@@ -599,278 +642,3 @@ export const StaticHeadersArea = React.memo(function StaticHeaderArea({ context 
     );
 });
 
-function itemAttachmentFileName(item){
-    return (item && item.attachment && item.attachment.download) || object.itemUtil.getTitleStringFromContext(item) || null;
-}
-
-/** Used in OverViewBodyItem.titleRenderPresets */
-const EmbeddedItemWithAttachment = React.memo(function EmbeddedItemWithAttachment({ item, index }){
-    const linkToItem = object.itemUtil.atId(item);
-    const isInArray = typeof index === 'number';
-
-    if (!item || !linkToItem) return null;
-
-    const { attachment = null } = item;
-    const { href: attachmentHref = null, type: attachmentType = null } = attachment || {};
-    const filename = itemAttachmentFileName(item);
-
-    let viewAttachmentButton = null;
-    if (attachmentHref){
-        viewAttachmentButton = (
-            <ViewFileButton title="File" mimeType={attachmentType} filename={filename}
-                href={linkToItem + attachmentHref} disabled={!attachmentHref} className="text-ellipsis-container btn-block btn-sm btn-primary" />
-        );
-    }
-
-    return (
-        <div className={"embedded-item-with-attachment" + (isInArray ? ' in-array' : '')} key={linkToItem}>
-            <div className="row">
-                <div className={"col-12 col-sm-6 col-md-6 link-to-item-col" + (isInArray ? ' in-array' : '')} data-array-index={index}>
-                    <div className="inner">
-                        { isInArray ? <span>{ index + 1 }. </span> : null}{ object.itemUtil.generateLink(item, true) }
-                    </div>
-                </div>
-                <div className="col-12 col-sm-6 col-md-6 pull-right view-attachment-button-col">{ viewAttachmentButton }</div>
-            </div>
-        </div>
-    );
-});
-
-
-
-const isAttachmentImage = memoize(function(filename){
-    return commonFileUtil.isFilenameAnImage(filename);
-});
-
-/** Used in OverViewBodyItem.titleRenderPresets */
-const EmbeddedItemWithImageAttachment = React.memo(function EmbeddedItemWithImageAttachment(props){
-    const { item, index } = props;
-    const linkToItem = object.itemUtil.atId(item);
-    const isInArray = typeof index === 'number';
-
-    if (!item || !linkToItem) return null;
-
-    const { attachment = null } = item;
-    const { href: attachmentHref = null, caption: attachmentCaption = null } = attachment || {};
-    const filename = itemAttachmentFileName(item);
-
-    if (!attachmentHref || !isAttachmentImage(filename)) return <EmbeddedItemWithAttachment {...props} />;
-
-    const imageElem = (
-        <a href={linkToItem} className="image-wrapper">
-            <img className="embedded-item-image" src={linkToItem + attachmentHref} />
-        </a>
-    );
-
-    const captionText = item.caption || item.description || attachmentCaption || filename;
-
-    return (
-        <div className={"embedded-item-with-attachment is-image" + (isInArray ? ' in-array' : '')} key={linkToItem}>
-            <div className="inner">
-                { imageElem }
-                { captionText && <div className="caption">{ captionText }</div> }
-            </div>
-        </div>
-    );
-});
-
-
-
-export class OverViewBodyItem extends React.PureComponent {
-
-    /** Preset Functions to render various Items or property types. Feed in via titleRenderFxn prop. */
-    static titleRenderPresets = {
-        'default' : function(field, value, jsxAllowed = true, addDescriptionTip = true, index = null, wrapperElementType = 'li', fullObject = null){
-            var calcdName = Schemas.Term.toName(field, value, jsxAllowed, addDescriptionTip);
-            if (wrapperElementType === 'div' && typeof index === 'number') {
-                return [((index + 1) + '. '), calcdName];
-            }
-            return calcdName;
-        },
-        'biosample_treatments' : function(field, treatment, allowJX = true, includeDescriptionTips = true, index = null, wrapperElementType = 'li', fullObject = null){
-            if (!treatment || !treatment.display_title || !object.atIdFromObject(treatment)){
-                return null;
-            }
-            return (
-                <div key={object.atIdFromObject(treatment)} >
-                    { wrapperElementType === 'div' && typeof index === 'number' ? (index + 1) + '. ' : null }
-                    { object.itemUtil.generateLink(treatment, true) }
-                    <div>({ treatment.treatment_type })</div>
-                </div>
-            );
-        },
-        'local_date_time' : function(field, timestamp){
-            return timestamp ? <LocalizedTime timestamp={timestamp} formatType="date-time-md" /> : null;
-        },
-        'local_date' : function(field, timestamp){
-            return timestamp ? <LocalizedTime timestamp={timestamp} formatType="date-md" /> : null;
-        },
-        'embedded_item_with_attachment' : function(field, item, allowJX = true, includeDescriptionTips = true, index = null, wrapperElementType = 'li', fullObject = null){
-            return <EmbeddedItemWithAttachment {...{ item, index }} />;
-        },
-        'embedded_item_with_image_attachment' : function(field, item, allowJX = true, includeDescriptionTips = true, index = null, wrapperElementType = 'li', fullObject = null){
-            return <EmbeddedItemWithImageAttachment {...{ item, index }} />;
-        },
-        'url_string' : function(field, value, allowJSX = true, includeDescriptionTips = true, index = null, wrapperElementType = 'li', fullObject = null){
-            if (typeof value !== 'string') return null;
-            return <a href={value} style={{ 'overflowWrap' : 'break-word' }}>{value}</a>;
-        },
-        'imaging_paths_from_exp': function(field, value, allowJSX = true, includeDescriptionTips = true, index = null, wrapperElementType = 'div', fullObject = null){
-            if (!value || typeof value !== 'object') return null;
-            var { channel, path } = value;
-
-            var matchingFile = _.find(fullObject.files || [], fileUtil.getLightSourceCenterMicroscopeSettingFromFile.bind(this, channel));
-
-            return (
-                <div className="imaging-path-item-wrapper row">
-                    <div className="index-num col-2 text-monospace text-500"><small>{ channel }</small></div>
-                    <div className={"imaging-path col-" + (matchingFile ? '7' : '10')}>{ object.itemUtil.generateLink(path, true) }</div>
-                    { matchingFile ? <div className="microscope-setting col-3 text-right" data-tip="Light Source Center Wavelength">{ fileUtil.getLightSourceCenterMicroscopeSettingFromFile(channel, matchingFile) }nm</div> : null }
-                </div>
-            );
-        }
-    }
-
-    /** If we have a list, wrap each in a <li> and calculate value, else return items param as it was passed in. */
-    static createList(items, property, titleRenderFxn = OverViewBodyItem.titleRenderPresets.default, addDescriptionTipForLinkTos = true, listItemElement = 'li', listItemElementProps = null, origResult = null){
-
-        // Preprocess / uniqify:
-        if (Array.isArray(items)) {
-            items = _.filter(_.flatten(items), function(item){ return item !== null && typeof item !== 'undefined'; });
-        }
-        if (Array.isArray(items) && _.every(items, function(item){ return typeof item === 'string' || typeof item === 'number'; } )) {
-            items = _.uniq(items);
-        } else if (Array.isArray(items) && items.length > 1 && items[0] && items[0].display_title && object.atIdFromObject(items[0])) {
-            items = _.uniq(items, false, function(b){ return object.atIdFromObject(b); });
-        }
-
-        // Null value
-        if (items === null || typeof items === 'undefined') {
-            return null;
-        } else if (Array.isArray(items) && items.length === 0){
-            return null;
-        } else if (Array.isArray(items) && _.every(items, function(item){ return item === null || typeof item === 'undefined'; })){
-            return null;
-        }
-
-        // Item List
-        if (Array.isArray(items) && items.length > 1 && items[0].display_title && object.atIdFromObject(items[0])){
-            items = _.map(items, function(b,i){
-                return React.createElement(listItemElement, _.extend({ 'key' : object.atIdFromObject(b) || i }, listItemElementProps || {}), titleRenderFxn(property, b, true, addDescriptionTipForLinkTos, i, listItemElement, origResult) );
-            });
-        } else if (Array.isArray(items) && items.length === 1 && items[0].display_title && object.atIdFromObject(items[0])) {
-            return titleRenderFxn(property, items[0], true, addDescriptionTipForLinkTos, null, 'div', origResult);
-        } else if (Array.isArray(items) && items.length > 1){
-            items = _.map(items, function(b,i){
-                return React.createElement(  listItemElement  ,  _.extend({ 'key' : i }, listItemElementProps || {})  ,  titleRenderFxn(property, b, true, addDescriptionTipForLinkTos, i, listItemElement, origResult)  );
-            });
-        } else if (Array.isArray(items) && items.length === 1){
-            items = titleRenderFxn(property, items[0], true, addDescriptionTipForLinkTos, null, 'div', origResult);
-        } else if (!Array.isArray(items)){
-            return titleRenderFxn(property, items, true, addDescriptionTipForLinkTos, null, 'div', origResult);
-        }
-        return items;
-    }
-
-    static defaultProps = {
-        'titleRenderFxn'                : OverViewBodyItem.titleRenderPresets.default,
-        'hideIfNoValue'                 : false,
-        'wrapInColumn'                  : false,
-        'addDescriptionTipForLinkTos'   : true,
-        'listWrapperElement'            : 'ol',
-        'listWrapperElementProps'       : null,
-        'listItemElement'               : 'li',
-        'listItemElementProps'          : null,
-        'singleItemClassName'           : null,
-        'fallbackTitle'                 : null,
-        'propertyForLabel'              : null,
-        'property'                      : null
-    };
-
-    constructor(props){
-        super(props);
-        this.createList = memoize(OverViewBodyItem.createList);
-    }
-
-    render(){
-        const {
-            result, property, fallbackValue, titleRenderFxn, addDescriptionTipForLinkTos, wrapInColumn,
-            singleItemClassName, overrideTitle, hideIfNoValue
-        } = this.props;
-        let { propertyForLabel, listItemElement, listWrapperElement, listItemElementProps, listWrapperElementProps } = this.props;
-
-        function fallbackify(val){
-            if (!property) return titleRenderFxn(property, result, true, addDescriptionTipForLinkTos, null, 'div', result);
-            return val || fallbackValue || 'None';
-        }
-
-        listItemElementProps = (listItemElementProps && _.clone(listItemElementProps)) || {};
-        listWrapperElementProps = (listWrapperElementProps && _.clone(listWrapperElementProps)) || {};
-        listItemElementProps.className = (listItemElementProps.className || '') + ' overview-list-element';
-        listWrapperElementProps.className = (listWrapperElementProps.className || '') + ' overview-list-elements-container embedded-item-with-attachment-container';
-
-        if (titleRenderFxn === OverViewBodyItem.titleRenderPresets.embedded_item_with_attachment){
-            listItemElement = 'div';
-            listWrapperElement = 'div';
-        }
-        const resultPropertyValue = property && this.createList(
-            object.getNestedProperty(result, property),
-            property,
-            titleRenderFxn,
-            addDescriptionTipForLinkTos,
-            listItemElement,
-            listItemElementProps,
-            result
-        );
-
-        if (property && hideIfNoValue && (!resultPropertyValue || (Array.isArray(resultPropertyValue) && resultPropertyValue.length === 0))){
-            return null;
-        }
-
-        let innerBlockReturned = null;
-        propertyForLabel = propertyForLabel || property;
-
-        if (Array.isArray(resultPropertyValue)){
-            innerBlockReturned = (
-                <div className="inner" key="inner" data-field={property}>
-                    <object.TooltipInfoIconContainerAuto
-                        {..._.pick(this.props, 'result', 'tips', 'schemas', 'fallbackTitle')}
-                        property={propertyForLabel}
-                        title={overrideTitle}
-                        elementType="h5" />
-                    { resultPropertyValue ?
-                        (resultPropertyValue.length > 1 ?
-                            React.createElement(listWrapperElement, listWrapperElementProps || null, fallbackify(resultPropertyValue))
-                            : fallbackify(resultPropertyValue) )
-                        : fallbackify(null)
-                    }
-                </div>
-            );
-        } else {
-            innerBlockReturned = (
-                <div className="inner" key="inner" data-field={property}>
-                    <object.TooltipInfoIconContainerAuto {..._.pick(this.props, 'result', 'tips', 'fallbackTitle', 'schemas')} elementType="h5" property={propertyForLabel} title={this.props.overrideTitle} />
-                    <div key="single-value" className={"overview-single-element" + (singleItemClassName ? ' ' + singleItemClassName : '') + ((!resultPropertyValue && property) ? ' no-value' : '')}>
-                        { fallbackify(resultPropertyValue) }
-                    </div>
-                </div>
-            );
-        }
-
-        return <WrapInColumn wrap={wrapInColumn}>{ innerBlockReturned }</WrapInColumn>;
-    }
-}
-
-export function WrapInColumn(props){
-    const { children, wrap, className, defaultWrapClassName } = props;
-    if (!wrap) return children;
-
-    let wrapClassName;
-    if (wrap === true)                  wrapClassName = defaultWrapClassName;
-    else if (typeof wrap === 'string')  wrapClassName = wrap;
-    return <div className={wrapClassName + (className ? ' ' + className : '')}>{ children }</div>;
-}
-WrapInColumn.defaultProps = {
-    'wrap' : false,
-    'defaultWrapClassName' : "col-6 col-md-4"
-};
