@@ -40,11 +40,11 @@ class Disorder(Item):
         "description": "Phenotypes associated with this Disorder.",
         "type": "array",
         "items": {
-            "title": "Associated Phenotypes",
+            "title": "Phenotypic Features",
             "type": "string",
             "linkTo": "Phenotype"
         }
     })
-    def associated_phenotypes(self, request):
+    def phenotype_features(self, request):
         evi_as_subj = self.rev_link_atids(request, 'as_subject_evidence')
         return get_evidence_linked_items(request, evi_as_subj, 'object', 'phenotype')
