@@ -58,4 +58,12 @@ Associations to other Items such as *Disorders* is implemented through an **Evid
 
 Associations between different items such as *Disorders* and *Phenotypes* can be made that include supporting evidence information.
 
-Generally the associations
+Generally the associations are made using specified inputs and the fields of information about the association may vary depending on which Items are being linked.  Therefore, derivative Evidence Items that have specific fields to capture the information about the associations.  A basic item for an associations has links to the 2 Items being associated - one specified as the subject_item and the other as the object_item.  Many associations may logically fall into the subject-object relationship pattern (although the initial implementations may depend on the datasource), and once a directionality has been established ingestion of new data should follow the same convention, which may require an inversion of the relationship name. and specification of subject_item and object_item different than that used in the source.  The default relationship name is 'associated_with', which does not have a directionality of association.
+
+When items are linked through an Association Item then reverse links are made that allow each of the Items to know about the other.  Then the fields of the association object can be used as filters to only return the relevant associated Items in searches.
+
+**Disorder-Phenotype Associations**
+
+These associations are made by the [HPO project](https://hpo.jax.org/) and provided in a file of [HPOA annotations](http://compbio.charite.de/jenkins/job/hpo.annotations.current/lastSuccessfulBuild/).  Currently the predominant sources of the annotations are OMIM, Orphanet and Decipher but other sources and manually curated annotations are being continuously added to the datasource.
+
+The format of the input file is described [here](https://hpo.jax.org/app/help/annotations)
