@@ -74,12 +74,12 @@ logging.config.dictConfig({
 ''' global config '''
 ITEM2OWL = {
     'definition_uris': [
-        'purl.obolibrary.org/obo/IAO_0000115',
+        'http://purl.obolibrary.org/obo/IAO_0000115',
     ],
     'synonym_uris': [
-        'www.geneontology.org/formats/oboInOwl#hasExactSynonym',
-        'www.geneontology.org/formats/oboInOwl#hasNarrowSynonym',
-        'www.geneontology.org/formats/oboInOwl#RelatedSynonym',
+        'http://www.geneontology.org/formats/oboInOwl#hasExactSynonym',
+        'http://www.geneontology.org/formats/oboInOwl#hasNarrowSynonym',
+        'http://www.geneontology.org/formats/oboInOwl#RelatedSynonym',
     ],
     'Disorder': {
         'download_url': 'http://purl.obolibrary.org/obo/mondo.owl',
@@ -610,7 +610,7 @@ def parse_args(args):
     parser.add_argument('--load',
                         action='store_true',
                         default=False,
-                        help="Default False - use to load data directly from json to the server that the connection refers to")
+                        help="Default False - WARNING: currently only works with --env and not key and secret - use to load data directly from json to the server that the connection refers to")
     parser.add_argument('--post_report',
                         action='store_true',
                         default=False,
@@ -736,8 +736,7 @@ def main():
         write_outfile(items2upd, postfile, pretty)
         if loaddb:
             env = args.env if args.env else 'local'  # may want to change to use key/secret as option to get env
-            res = 'TESTING'
-            # res = load_items(env, items2upd, itypes=[itype])
+            res = load_items(env, items2upd, itypes=[itype])
             logger.info(res)
             logger.info(json.dumps(items2upd, indent=4))
     stop = datetime.datetime.now()

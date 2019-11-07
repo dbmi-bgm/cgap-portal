@@ -31,6 +31,7 @@ def parse_args():
 
 def set_load_params(env, key=None, secret=None):
     # authentication with Fourfront
+    # TODO: add key secret server authentication - how to get server?
     if env == 'local':
         # prompt access key ID and secret from user
         config_uri = 'development.ini'
@@ -39,7 +40,7 @@ def set_load_params(env, key=None, secret=None):
         auth = {'key': local_id, 'secret': local_secret, 'server': 'http://localhost:8000'}
     else:
         config_uri = 'production.ini'
-        auth = ff_utils.get_authentication_with_server(None, args.env)
+        auth = ff_utils.get_authentication_with_server(None, env)
     return auth, config_uri
 
 
