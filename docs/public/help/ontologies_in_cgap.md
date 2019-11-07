@@ -53,3 +53,9 @@ Additional Information that can currently be directly associated with Disorder I
 * comments
 
 Associations to other Items such as *Disorders* is implemented through an **Evidence** item (see below).
+
+### Making links between Items based on supporting evidence
+
+Associations between different items such as *Disorders* and *Phenotypes* can be made that include supporting evidence information.
+
+Generally the associations
