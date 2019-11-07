@@ -218,7 +218,7 @@ After first setting up `Package Control`_ (follow install and usage instructions
    static-pages
    rev-links
    unittest
-   pheno_disorder_updating
+   updating_items_from_ontologies
 
 
 *User Contents*
