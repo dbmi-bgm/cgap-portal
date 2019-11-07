@@ -43,6 +43,7 @@ _app_settings = {
     'production': True,
     'pyramid.debug_authorization': True,
     'postgresql.statement_timeout': 20,
+    'sqlalchemy.url': 'dummy@dummy',
     'retry.attempts': 3,
     # some file specific stuff for testing
     'file_upload_bucket': 'test-wfout-bucket',
