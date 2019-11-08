@@ -119,14 +119,14 @@
                 "linkTo": "FileReference"
             }
         },
-        "sample_analyses": {
-            "title": "Sample Analyses",
+        "sample_processes": {
+            "title": "Sample Processes",
             "description": "Downstream analyses performed on the sample",
             "type": "array",
             "items": {
-                "title": "Sample Analysis",
+                "title": "Sample Processing",
                 "type": "string",
-                "linkTo": "SampleAnalysis"
+                "linkTo": "SampleProcessing"
             }
         }
     }

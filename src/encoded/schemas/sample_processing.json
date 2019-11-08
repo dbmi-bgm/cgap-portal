@@ -1,7 +1,7 @@
 {
-    "title": "Sample Analysis",
+    "title": "Sample Processing",
     "description": "Analysis object used on samples",
-    "id": "/profiles/sample_analysis.json",
+    "id": "/profiles/sample_processing.json",
     "$schema": "http://json-schema.org/draft-04/schema#",
     "type": "object",
     "required": [ "project", "institution"],
