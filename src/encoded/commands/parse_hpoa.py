@@ -19,7 +19,7 @@ from dcicutils.ff_utils import (
 )
 from encoded.commands.load_items import load_items
 from encoded.commands.generate_items_from_owl import (
-    #connect2server,
+    connect2server,
     get_raw_form
 )
 
@@ -206,14 +206,7 @@ def main():  # pragma: no cover
     logger.info('Processing disorder to phenotype annotations - START:{}'.format(str(start)))
     args = get_args()
 
-    # get connection
-    # old style for use on this branch
-    try:
-        auth = get_authentication_with_server(args.key, args.env)
-    except Exception:
-        print("Authentication failed")
-        sys.exit(1)
-    # auth = connect2server(args.env, args.key, args.keyfile)
+    auth = connect2server(args.env, args.key, args.keyfile)
     logger.info('Working with {}'.format(auth.get('server')))
     logger.info('Getting existing Items')
     logger.info('Disorders')

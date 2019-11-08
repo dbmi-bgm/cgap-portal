@@ -42,6 +42,7 @@ ITEM_INDEX_ORDER = [
     'TrackingItem',
     'Software',
     'Sample',
+    'SampleProcessing',
     'StaticSection',
     'Document',
     'EvidenceDisPheno',

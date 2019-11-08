@@ -112,6 +112,18 @@ class Sample(Item):
 
 
 @collection(
+    name='sample-processings',
+    properties={
+        'title': 'SampleProcessings',
+        'description': 'Listing of Sample Processings',
+    })
+class SampleProcessing(Item):
+    item_type = 'sample_processing'
+    schema = load_schema('encoded:schemas/sample_processing.json')
+    embedded_list = []
+
+
+@collection(
     name='genes',
     unique_key='gene:gene_id',
     lookup_key='preferred_symbol',
