@@ -203,6 +203,8 @@ class Auth0AuthenticationPolicy(CallbackAuthenticationPolicy):
             return True
         elif 'hms.harvard' in payload.get('sub', '').split('|'):
             return True
+        elif payload.get('email_verified'):
+            return True
         else:
             return False
 
