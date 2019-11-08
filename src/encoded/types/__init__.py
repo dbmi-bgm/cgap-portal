@@ -117,8 +117,8 @@ class Sample(Item):
         'title': 'SampleProcessings',
         'description': 'Listing of Sample Processings',
     })
-class SampleProcess(Item):
-    item_type = 'sample_process'
+class SampleProcessing(Item):
+    item_type = 'sample_processing'
     schema = load_schema('encoded:schemas/sample_processing.json')
     embedded_list = []
 
