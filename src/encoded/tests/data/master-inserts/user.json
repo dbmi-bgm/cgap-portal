@@ -51,15 +51,6 @@
         "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b"
     },
     {
-        "email": "fake_clinician@not_an_email.com",
-        "first_name": "Fake",
-        "last_name": "Clinician",
-        "role": "clinician",
-        "uuid": "986b362f-4eb6-4a9c-8173-3ab26722aa99",
-        "submits_for": ["hms-dbmi"],
-        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b"
-    },
-    {
         "email": "jkrier@bwh.harvard.edu",
         "first_name": "Joel",
         "last_name": "Krier",

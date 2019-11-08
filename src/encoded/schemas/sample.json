@@ -28,6 +28,15 @@
             "type": "string",
             "linkTo": "Individual"
         },
+        "workup_type": {
+            "title": "Workup Type",
+            "type": "string",
+            "enum": [
+                "WGS",
+                "WES",
+                "Sanger"
+            ]
+        },
         "specimen_type": {
             "title": "Specimen Type",
             "type": "string",
@@ -117,16 +126,6 @@
                 "description": "File metadata.",
                 "type": "string",
                 "linkTo": "FileReference"
-            }
-        },
-        "sample_processes": {
-            "title": "Sample Processes",
-            "description": "Downstream analyses performed on the sample",
-            "type": "array",
-            "items": {
-                "title": "Sample Processing",
-                "type": "string",
-                "linkTo": "SampleProcessing"
             }
         }
     }
