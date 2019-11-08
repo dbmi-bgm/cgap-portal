@@ -38,11 +38,11 @@ const cgapAuth0Options = {
         icon: '/static/img/exported-logo-no-stroke.svg',
         primaryColor: '#1b75b9'
     },
-    allowedConnections: ['github', 'google-oauth2', 'partners'],
+    allowedConnections: ['partners', 'hms-it'],
     defaultEnterpriseConnection: 'partners',
     languageDictionary: {
         title: 'Log In',
-        emailInputPlaceholder: 'email@partners.org',
+        emailInputPlaceholder: 'Partners or Harvard Email',
         databaseEnterpriseAlternativeLoginInstructions: 'or login via Partners'
     }
 };

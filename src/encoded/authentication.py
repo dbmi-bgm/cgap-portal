@@ -192,16 +192,19 @@ class Auth0AuthenticationPolicy(CallbackAuthenticationPolicy):
         return email
 
     @staticmethod
-    def email_is_partners(payload):
+    def email_is_partners_or_hms(payload):
         """
         Checks that the given JWT payload belongs to a partners email.
         """
         for identity in payload.get('identities', []): # if auth0 decoded
-            if identity.get('connection', '') == 'partners':
+            if identity.get('connection', '') in ['partners', 'hms-it']:
                 return True
-        if 'partners' in payload.get('sub', '').split('|'): # if we decoded
+        if 'partners' in payload.get('sub', '').split('|'):
             return True
-        return False
+        elif 'hms.harvard' in payload.get('sub', '').split('|'):
+            return True
+        else:
+            return False
 
     def get_token_info(self, token, request):
         '''
@@ -217,19 +220,17 @@ class Auth0AuthenticationPolicy(CallbackAuthenticationPolicy):
                 # leeway accounts for clock drift between us and auth0
                 payload = jwt.decode(token, b64decode(auth0_secret, '-_'),
                                      audience=auth0_client, leeway=30)
-                if 'email' in payload:
-                    if payload.get('email_verified', False) or self.email_is_partners(payload):
-                        request.set_property(lambda r: False, 'auth0_expired')
-                        return payload
+                if 'email' in payload and self.email_is_partners_or_hms(payload):
+                    request.set_property(lambda r: False, 'auth0_expired')
+                    return payload
 
             else: # we don't have the key, let auth0 do the work for us
                 user_url = "https://{domain}/tokeninfo".format(domain='hms-dbmi.auth0.com')
                 resp  = requests.post(user_url, {'id_token':token})
                 payload = resp.json()
-                if 'email' in payload:
-                    if payload.get('email_verified', False) or self.email_is_partners(payload):
-                        request.set_property(lambda r: False, 'auth0_expired')
-                        return payload
+                if 'email' in payload and self.email_is_partners_or_hms(payload):
+                    request.set_property(lambda r: False, 'auth0_expired')
+                    return payload
 
         except (ValueError, jwt.exceptions.InvalidTokenError, jwt.exceptions.InvalidKeyError) as e:
             # Catch errors from decoding JWT
