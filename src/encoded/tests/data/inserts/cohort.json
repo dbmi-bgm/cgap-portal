@@ -5,6 +5,7 @@
         "institution": "hms-dbmi",
         "status": "released",
         "uuid": "cc7d83a2-6886-4ca0-9402-7c49734cf3c4",
+        "sample_processes": ["4fdb481a-fbdb-4c0f-a68d-aac87f847a67"],
         "families": [
             {
                 "members": ["5ec91041-78a0-4758-abef-21c7f5fd9f12", "5ec91041-78a0-4758-abef-21c7f5fd9f34","5ec91041-78a0-4758-abef-21c7f5fd9f56","5ec91041-78a0-4758-abef-21c7f5fd9f78","5ec91041-78a0-4758-abef-21c7f5fd9f91","5ec91041-78a0-4758-abef-21c7f5fd9f92"],
