@@ -135,6 +135,7 @@ class Owler(object):
                 raise exceptions.Error("Could not parse the file! Is it a valid RDF/OWL ontology?")
         finally:
             self.baseURI = self.__get_OntologyURI() or uri
+            self.versionIRI = self.__get_versionIRI()
             self.allclasses = self.__getAllClasses(includeDomainRange=True, includeImplicit=True, removeBlankNodes=False, excludeRDF_OWL=False)
 
     def __get_OntologyURI(self, return_as_string=True):
@@ -146,6 +147,11 @@ class Owler(object):
                 return test[0]
         else:
             return None
+
+    def __get_versionIRI(self, return_as_string=True):
+        version = self.rdfGraph.value(self.__get_OntologyURI(return_as_string=False), OWLNS["versionIRI"], default=None)
+        version = str(version) if (return_as_string and version is not None) else version
+        return version
 
     def __getAllClasses(self, classPredicate="", includeDomainRange=False, includeImplicit=False, removeBlankNodes=True, addOWLThing=True, excludeRDF_OWL=True):
 

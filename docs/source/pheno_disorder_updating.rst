@@ -1,5 +1,5 @@
 ===================================
-Updating Items from Ontologies
+Updating Disorders and Phenotypes
 ===================================
 
 **Disorder** and **Phenotype** Items correspond to ontology terms from the MONDO or HPO ontologies.
@@ -70,8 +70,3 @@ Possible most likely points of failure:
 - this shouldn’t fail per se but:
 - if the processing fails at any point above you may have a partial log and you should have info as to where the error occurred.
 - you might want to update the Document by for example, concatenating generation and load logs for a decoupled run.  Or appending the successful load logs in case of interrupted loads.
-
-**Getting previous versions of ontology files**
-
-- **HPO** http://purl.obolibrary.org/obo/hp/releases/YYYY-MM-DD/hp.owl
-- **MONDO** currently the versionIRI link is giving a 404 - have submitted an issue to the MONDO github.
