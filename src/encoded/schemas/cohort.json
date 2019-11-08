@@ -5,7 +5,6 @@
     "type": "object",
     "required": ["title", "project", "institution"],
     "identifyingProperties": ["uuid", "accession", "aliases"],
-    "additionalProperties": true,
     "mixinProperties": [
         { "$ref": "mixins.json#/schema_version" },
         { "$ref": "mixins.json#/accession" },

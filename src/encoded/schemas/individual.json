@@ -5,7 +5,6 @@
     "type": "object",
     "required": ["sex"],
     "identifyingProperties": ["uuid", "accession", "aliases"],
-    "additionalProperties": true,
     "mixinProperties": [
         { "$ref": "mixins.json#/attribution" },
         { "$ref": "mixins.json#/aliases" },
