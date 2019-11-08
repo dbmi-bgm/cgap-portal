@@ -61,7 +61,6 @@ class Cohort(Item):
         "families.members.samples.specimen_notes",
         "families.members.samples.specimen_collection_date",
         "families.members.samples.workup_type",
-        "families.members.samples.protocol",
         "families.members.samples.processed_files",
         "families.members.samples.processed_files.workflow_run_outputs",
         "families.members.samples.processed_files.quality_metric",

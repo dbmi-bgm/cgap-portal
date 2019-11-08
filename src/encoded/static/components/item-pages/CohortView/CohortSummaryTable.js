@@ -217,7 +217,7 @@ export const CohortSummaryTable = React.memo(function CohortSummaryTable(props){
                 error: sampleErr = null,
                 files = [],
                 processed_files = [],
-                protocol,
+                completed_processes = [],
                 status: sampleStatus,
                 specimen_type: sampleInfo = null,
                 specimen_collection_date = null,
@@ -264,7 +264,7 @@ export const CohortSummaryTable = React.memo(function CohortSummaryTable(props){
                                 : "" }
                             </span>: null
                     ),
-                    processingType: protocol,
+                    processingType: completed_processes[0] || null,
                     workupType: workup_type
                 });
             }
