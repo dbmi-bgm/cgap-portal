@@ -4,23 +4,8 @@ import memoize from 'memoize-one';
 import { standardizeObjectsInList, createObjectGraph, createRelationships } from './data-utilities';
 import { assignTreeHeightIndices, orderObjectGraph, positionObjectGraph } from './layout-utilities';
 import { getGraphHeight, getGraphWidth, createEdges } from './layout-utilities-drawing';
-
-/**
- * Default values for `props.dimensionOpts`
- * It is not advised to change these, including
- * in passed-in props, unless are up-to-date with
- * visibility graph generation code.
- * Maybe will handle more number options in future.
- */
-export const POSITION_DEFAULTS = {
-    individualWidth: 80,        // Should be divisible by 2 (@see `computeVisibilityGraph`)
-    individualXSpacing: 80,     // THIS MUST BE EQUAL TO OR MULTIPLE OF INDIVIDUAL WIDTH FOR TIME BEING (@see `computeVisibilityGraph`)
-    individualHeight: 80,       // This could vary I think
-    individualYSpacing: 180,    // THIS MUST BE DIVISIBLE BY 60 (or by 2, 3, 4, (& ideally - 5, 6)) (for possible `subdivisionsUsed` in finding visibilitygraph/edges) (@see `computeVisibilityGraph`)
-    graphPadding: 60,
-    relationshipSize: 40,
-    edgeCornerDiameter: 20
-};
+import { graphTransformerPropTypes } from './prop-types';
+import { graphTransformerDefaultProps, POSITION_DEFAULTS } from './default-props';
 
 /**
  * Function to parse dataset into graph (and associated data).
@@ -78,6 +63,10 @@ function getFullDims(dimensionOpts = {}){
 }
 
 export class GraphTransformer extends React.PureComponent {
+
+    static propTypes = graphTransformerPropTypes;
+
+    static defaultProps = graphTransformerDefaultProps;
 
     constructor(props){
         super(props);

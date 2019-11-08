@@ -4,8 +4,29 @@ import memoize from 'memoize-one';
 import _ from 'underscore';
 import { console, layout, ajax, object } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { PedigreeDetailPane } from './../components/PedigreeDetailPane';
-import PedigreeViz, { PedigreeVizView } from './../../viz/PedigreeViz';
+import PedigreeViz, { PedigreeVizView, isRelationshipNode } from './../../viz/PedigreeViz';
 import { FullHeightCalculator } from './../components/FullHeightCalculator';
+
+
+/**
+ * Creates Object mapping Individual `@id` to
+ * the generational identifier (or `orderBasedName`)
+ * that is present for that Individual node in graph
+ * data.
+ *
+ * @param {{ id: string, orderBasedName: string }[]} objectGraph
+ * @returns {Object.<string, string>}
+ */
+export function idToGraphIdentifier(objectGraph){
+    const mapping = {};
+    objectGraph.forEach(function(node){
+        if (isRelationshipNode(node)) return;
+        // We use Individual's `@id` as their dataset entry `id`.
+        // If this changes, can change to get from `node.data.individualItem['@id']` instead.
+        mapping[node.id] = node.orderBasedName;
+    });
+    return mapping;
+}
 
 
 /**
@@ -143,6 +164,7 @@ export class PedigreeTabViewBody extends React.PureComponent {
             graphData,
             windowWidth,
             windowHeight,
+            containerId = "pedigree-viz-container-cgap",
             visibleDiseases = null,
             scale = 1,
             showOrderBasedName = true
@@ -150,6 +172,7 @@ export class PedigreeTabViewBody extends React.PureComponent {
         const { isBrowserFullscreen, isPedigreeFullscreen } = this.state;
         const propName = "height"; //(isBrowserFullscreen ? "height" : "minimumHeight");
         const cls = (
+            "pedigree-tab-view-body-container" +
             (isBrowserFullscreen ? "browser-is-full-screen" : "") +
             (isPedigreeFullscreen ? " view-is-full-screen" : "")
         );
@@ -207,7 +230,7 @@ export class PedigreeTabViewBody extends React.PureComponent {
         }
 
         return (
-            <div id="pedigree-viz-container-cgap" className={cls}>
+            <div id={containerId} className={cls}>
                 <FullHeightCalculator {...{ windowWidth, windowHeight, propName, heightDiff }}>
                     { graphData ? // If already have parsed graph data
                         <PedigreeVizView {...pedigreeVizProps} {...graphData} />

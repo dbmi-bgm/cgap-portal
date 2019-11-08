@@ -54,7 +54,7 @@ const HomePageTitle = React.memo(function HomePageTitle(props){
     return (
         <PageTitleContainer alerts={alerts}>
             <TitleAndSubtitleUnder subtitle="Clinical Genomics Analysis Platform" className="home-page-title">
-                <strong>TODO:</strong> Portal Title Here
+                [Name TBD]
             </TitleAndSubtitleUnder>
         </PageTitleContainer>
     );
