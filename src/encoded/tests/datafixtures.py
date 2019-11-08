@@ -5,11 +5,11 @@ import copy
 ORDER = [
     'user', 'project', 'institution', 'file_format', 'cohort', 'individual',
     'sample', 'workflow', 'access_key', 'disorder', 'document', 'file_fastq',
-    'file_processed', 'file_reference', 'gene',
+    'file_processed', 'file_reference', 'gene', 'sample_processing',
     'page', 'phenotype', 'quality_metric_fastqc',
     'quality_metric_bamcheck', 'quality_metric_qclist', 'quality_metric_wgs_bamqc',
     'quality_metric_vcfcheck', 'quality_metric_workflowrun', 'software', 'static_section',
-    'sysinfo', 'tracking_item', 'workflow_mapping', 'workflow_run_awsem',
+    'tracking_item', 'workflow_mapping', 'workflow_run_awsem',
     'workflow_run'
 ]
 

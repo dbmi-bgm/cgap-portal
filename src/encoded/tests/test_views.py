@@ -62,6 +62,16 @@ def test_vary_json(anontestapp):
     assert 'Accept' in res.vary
 
 
+def test_get_health_page(testapp):
+    """
+    Tests that we can get the health page and various fields we expect are there
+    """
+    res = testapp.get('/health', status=200).json
+    assert 'namespace' in res
+    assert 'blob_bucket' in res
+    assert 'elasticsearch' in res
+
+
 @pytest.mark.parametrize('item_type', [k for k in TYPE_LENGTH if k not in ['user', 'access_key']])
 def test_collections_anon(anontestapp, item_type):
     res = anontestapp.get('/' + item_type).follow(status=200)

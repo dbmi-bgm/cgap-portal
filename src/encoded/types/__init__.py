@@ -112,6 +112,18 @@ class Sample(Item):
 
 
 @collection(
+    name='sample-processings',
+    properties={
+        'title': 'SampleProcessings',
+        'description': 'Listing of Sample Processings',
+    })
+class SampleProcessing(Item):
+    item_type = 'sample_processing'
+    schema = load_schema('encoded:schemas/sample_processing.json')
+    embedded_list = []
+
+
+@collection(
     name='disorders',
     unique_key='disorder:disorder_id',
     properties={
@@ -210,22 +222,6 @@ class FileFormat(Item, ItemWithAttachment):
     })
     def display_title(self, file_format):
         return file_format
-
-
-@collection(
-    name='sysinfos',
-    unique_key='sysinfo:name',
-    properties={
-        'title': 'Sysinfo',
-        'description': 'Just for internal use',
-    })
-class Sysinfo(Item):
-    """sysinfo class."""
-
-    item_type = 'sysinfo'
-    schema = load_schema('encoded:schemas/sysinfo.json')
-    name_key = 'name'
-    embedded_list = []
 
 
 @collection(

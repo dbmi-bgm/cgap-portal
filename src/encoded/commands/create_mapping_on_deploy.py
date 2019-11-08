@@ -42,7 +42,7 @@ ITEM_INDEX_ORDER = [
     'TrackingItem',
     'Software',
     'Sample',
-    'Sysinfo',
+    'SampleProcessing',
     'StaticSection',
     'Document',
     'Page'

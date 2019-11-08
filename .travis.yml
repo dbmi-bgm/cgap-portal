@@ -88,6 +88,11 @@ after_success:
   ]; then\n            echo \"Job succeeded! PUBLISHING to ${tibanna_deploy} environment...\"\n
   \           eb use ${tibanna_deploy} --debug\n            python deploy/deploy_beanstalk.py\n
   \        fi\n      fi\n     fi\n   fi\n  fi\n"
+- |
+  if  [[ $TRAVIS_BRANCH == 'master' ]]; then
+    echo 'Triggering docs build';
+    curl -X POST -d "branches=master" -d "token=$DOCS_TOKEN" https://readthedocs.org/api/v2/webhook/cgap-portal/100087/;
+  fi
 after_failure:
 - python deploy/travis_after_all.py https://api.travis-ci.org
 - export $(cat .to_export_back) >> /dev/null

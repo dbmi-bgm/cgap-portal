@@ -6,7 +6,7 @@
     xmlns:svg="http://www.w3.org/2000/svg"
     xmlns="http://www.w3.org/2000/svg"
     style="vertical-align:middle;display:inline-block;height:100%;padding-bottom: 5px;padding-top: 5px;transition:padding .3s, transform .3s;max-height:80px;"
-    viewBox="0 0 90 90">
+    viewBox="0 0 100 100">
     <g transform="rotate(135,40.692863,29.984096) translate(0, -3)">
         <path d="m 81.314453,24.175781 3.75,7.5 h 10.796875 l -3.71875,-7.5 z" style="fill: rgb(69, 121, 180); fill-opacity: 1; stroke: rgb(63, 111, 165); stroke-width: 1; stroke-linejoin: round; stroke-linecap: butt; stroke-dasharray: none; stroke-dashoffset: 0; stroke-opacity: 1; paint-order: fill markers;" transform="none"></path>
         <path d="M 61.289062,4.3085938 55.621094,11.865234 84.261719,31.1875 80.705078,24.072266 Z" style="fill: rgb(69, 121, 180); fill-opacity: 1; stroke: rgb(63, 111, 165); stroke-width: 1; stroke-linejoin: round; stroke-linecap: butt; stroke-dasharray: none; stroke-dashoffset: 0; stroke-opacity: 1; paint-order: fill markers;" transform="none"></path>
