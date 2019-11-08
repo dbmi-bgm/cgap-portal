@@ -6,7 +6,6 @@ import memoize from 'memoize-one';
 import _ from 'underscore';
 import { Schemas } from './../../util';
 import { console } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
-import { flattenSchemaPropertyToColumnDefinition } from '@hms-dbmi-bgm/shared-portal-components/src/components/util/schema-transforms';
 
 
 /** @param {Object} props - Contents of a family sub-embedded object. */
