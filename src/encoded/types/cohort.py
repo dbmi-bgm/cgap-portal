@@ -58,6 +58,10 @@ class Cohort(Item):
         "families.members.phenotypic_features.onset_age_units",
         "families.members.samples.status",
         "families.members.samples.specimen_type",
+        "families.members.samples.specimen_notes",
+        "families.members.samples.specimen_collection_date",
+        "families.members.samples.workup_type",
+        "families.members.samples.protocol",
         "families.members.samples.processed_files",
         "families.members.samples.processed_files.workflow_run_outputs",
         "families.members.samples.processed_files.quality_metric",
@@ -75,7 +79,8 @@ class Cohort(Item):
         "families.members.samples.files.quality_metric.qc_list.value.status",
         "families.members.samples.files.quality_metric.overall_quality_status",
         "families.members.samples.files.quality_metric.url",
-        "families.members.samples.files.quality_metric.status"
+        "families.members.samples.files.quality_metric.status",
+        "families.members.samples.completed_processes"
     ]
 
     @calculated_property(schema={

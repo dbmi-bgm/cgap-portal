@@ -6,6 +6,7 @@ import memoize from 'memoize-one';
 import _ from 'underscore';
 import { Schemas } from './../../util';
 import { console } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
+import { flattenSchemaPropertyToColumnDefinition } from '@hms-dbmi-bgm/shared-portal-components/src/components/util/schema-transforms';
 
 
 /** @param {Object} props - Contents of a family sub-embedded object. */
@@ -34,7 +35,6 @@ export const CohortSummaryTable = React.memo(function CohortSummaryTable(props){
         "rawFiles",
         "processingType",
         "processedFiles",
-        "variants"
     ];
 
     const columnTitles = {
@@ -52,7 +52,7 @@ export const CohortSummaryTable = React.memo(function CohortSummaryTable(props){
         ),
         'visitInfo' : (
             <React.Fragment>
-                <i className="icon icon-fw icon-clinic-medical fas mr-05 align-middle"/>
+                <i className="icon icon-fw icon-notes-medical fas mr-05 align-middle"/>
                 Visit Info
             </React.Fragment>
         ),
@@ -71,12 +71,6 @@ export const CohortSummaryTable = React.memo(function CohortSummaryTable(props){
                 Processed File(s)
             </React.Fragment>
         ),
-        'variants' : (
-            <React.Fragment>
-                <i className="icon icon-fw icon-file-upload fas align-middle" />
-                <span className="d-none d-lg-inline ml-05">Variants (single)</span>
-            </React.Fragment>
-        )
     };
 
 
@@ -223,8 +217,12 @@ export const CohortSummaryTable = React.memo(function CohortSummaryTable(props){
                 error: sampleErr = null,
                 files = [],
                 processed_files = [],
+                protocol,
                 status: sampleStatus,
                 specimen_type: sampleInfo = null,
+                specimen_collection_date = null,
+                specimen_notes = null,
+                workup_type
             } = sample;
 
             if (!sampleTitle || !sampleID){
@@ -258,7 +256,16 @@ export const CohortSummaryTable = React.memo(function CohortSummaryTable(props){
                             <i className="item-status-indicator-dot mr-05" data-status={sampleStatus}/>
                             { Schemas.Term.toName("status", sampleStatus) }
                         </span>
-                    )
+                    ),
+                    visitInfo: (
+                        specimen_collection_date ?
+                            <span> { specimen_collection_date } { specimen_notes ?
+                                <i className="icon icon-faw far icon-clipboard text-primary" data-tip={ specimen_notes }/>
+                                : "" }
+                            </span>: null
+                    ),
+                    processingType: protocol,
+                    workupType: workup_type
                 });
             }
             sampleGroup++;
