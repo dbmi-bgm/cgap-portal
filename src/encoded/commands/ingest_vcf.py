@@ -7,7 +7,6 @@ from collections import OrderedDict
 
 logger = logging.getLogger(__name__)
 EPILOG = __doc__
-ANNOTATION_TYPES = ['ANN', 'ANNOVAR', 'ANNOTADD']
 
 # might be useful
 class VCFParserException(Exception):
@@ -23,31 +22,23 @@ class VCFParser(object):
         self.reader = vcf.Reader(open(_vcf, 'r'))
         self.variant_schema = json.load(open(variant, 'r'))
         self.variant_sample_schema = json.load(open(sample, 'r'))
-        self.annotation_keys = self.reader.infos.keys()
+        self.annotation_keys = OrderedDict()
+        self.field_keys = OrderedDict()
         self.format = OrderedDict()
-
-    def get_record(self):
-        """ Uses self.reader as an iterator to get the next record """
-        return next(self.reader)
+        self.read_vcf_metadata()
+        self.parse_vcf_fields()
 
     def read_vcf_metadata(self):
         """
-        Parses VCF file meta data (nothing very useful).
+        Parses VCF file meta data to get annotation fields.
+        As per Daniel, annotation fields are found under MUTANNO
+        Called in constructor
         """
-        return self.reader.metadata
-
-    def read_vcf_fields(self, key='ALL'):
-        """
-        Returns fields associated with the given VCF in fname. If a key is specified
-        meta data associated with that key will be returned
-        examples: ANN, LOF, NMD, ANNOVAR, ANOTADD
-
-        XXX: Mismatch return type, probably bad practice
-        """
-        if key == 'ALL':
-            return self.reader.infos
-        else:
-            return self.reader.infos.get(key)
+        for field in self.reader.metadata['MUTANNO']:
+            self.annotation_keys[field['ID']] = True
+        for field in self.reader.infos.keys():
+            if field not in self.annotation_keys:
+                self.field_keys[field] = True
 
     @staticmethod
     def parse_vcf_info(info):
@@ -66,31 +57,48 @@ class VCFParser(object):
 
     def parse_vcf_fields(self):
         """
-        Populates self.format into a dictionary containing annotation keys
-        mapped to a list of fields and returns self.format when done
+        Populates self.format with the annotation format
         """
-        for key in self.annotation_keys:
-            info = self.reader.infos.get(key, None)
-            if info:
-                if key not in ANNOTATION_TYPES:
-                    self.format[key] = key # handle non annotation INFOs
-                else:
-                    self.format[key] = self.parse_vcf_info(info)
+        for key in self.annotation_keys.keys():
+            if key in self.reader.infos.keys():
+                self.format[key] = self.parse_vcf_info(self.reader.infos[key])
+        for key in self.field_keys.keys():
+            if key in self.reader.infos.keys():
+                self.format[key] = self.reader.infos[key].type
+
+    def get_annotation_fields(self, list=False):
+        """ Getter for annotation fields as list or dict """
+        if not list:
+            return self.annotation_keys
+        else:
+            return self.annotation_keys.keys()
+
+    def get_generic_fields(self, list=False):
+        """ Getter for generic fields as list or dict """
+        if not list:
+            return self.field_keys
+        else:
+            return self.field_keys.keys()
+
+    def get_record(self):
+        """ Uses self.reader as an iterator to get the next record """
+        return next(self.reader)
 
     @staticmethod
-    def parse_annovar(raw, n_expected):
+    def parse_annotation_field(s):
         """
-        Helper method for parse_vcf_record to handle formatting problems
-        with ANNOVAR/ANNOTADD annotations
+        Parses an annotation field. Returns a list of the field values for this
+        annotation. They should all be pipe separated
 
-        XXX: This cannot be necessary. Need to agree on annotation format.
+        XXX: This parse info must be discernable either from the schema or the MP
         """
-        lst = ','.join(raw).split('|')
-        if len(lst) == n_expected:
-            return [','.join(raw)]
+        if len(s) > 1:
+            res = []
+            for entry in s:
+                res.append(entry.split('|'))
+            return res
         else:
-            raise VCFParserException
-
+            return [s[0].split('|')]
 
     def parse_vcf_record(self, record):
         """
@@ -121,25 +129,24 @@ class VCFParser(object):
         for key in self.format.keys():
 
             # handle non-annotation fields
-            if key not in ANNOTATION_TYPES:
+            if key not in self.annotation_keys:
                 result[key] = record.INFO.get(key, None)
                 continue
 
             # handle annotation fields
+            result[key] = {}
             annotations = None
             raw = record.INFO.get(key, None)
             if raw:
-                if key in ['ANNOVAR', 'ANNOTADD']: # sometimes come out malformed
-                    raw = self.parse_annovar(raw, len(self.format[key]))
-                annotations = [r.split('|') for r in raw] # could be many
+                annotations = self.parse_annotation_field(raw)
             if annotations:
                 for g_idx, group in enumerate(annotations):
                     for f_idx, field in enumerate(group):
                         if field:
                             field_name = self.format[key][f_idx]
-                            if not result.get(field_name):
-                                result[field_name] = {}
-                            result[field_name][g_idx] = field
+                            if not result[key].get(field_name):
+                                result[key][field_name] = {}
+                            result[key][field_name][g_idx] = field
         return result
 
     def format_vcf_record(self, result):
