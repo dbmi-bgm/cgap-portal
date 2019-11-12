@@ -399,6 +399,33 @@ def descendancy_xml_ref_to_parents(testapp, ref_id, refs, data, cohort, uuids_by
     data.update(result)
 
 
+def add_to_clinic_notes(testapp, notes, refs, data, cohort, uuids_by_ref):
+    """
+    This is a `xml_ref_fxn`, so it must take the corresponding args in the
+    standardized way and update the `data` dictionary, which is used to PATCH
+    the Individual item.
+
+    Helper function to add `notes` from the object in way compatible with the
+    other functions that change `clinic_notes`
+
+    Args:
+        testapp (webtest.TestApp): test application for posting/patching
+        notes (str): notes value for the object
+        refs: (dict): reference-based parsed XML data
+        data (dict): metadata to POST/PATCH
+        cohort (str): identifier of the cohort
+        uuids_by_ref (dict): mapping of Fourfront uuids by xml ref
+
+    Returns:
+        None
+    """
+    if data.get('clinic_notes'):
+        clinic_notes = '\n'.join([data['clinic_notes'], notes])
+    else:
+        clinic_notes = notes
+    data['clinic_notes'] = clinic_notes
+
+
 def annotations_xml_ref_to_clinic_notes(testapp, ref_ids, refs, data, cohort, uuids_by_ref):
     """
     This is a `xml_ref_fxn`, so it must take the corresponding args in the
@@ -836,6 +863,11 @@ PROBAND_MAPPING = {
         'explicitlySetBiologicalMother': {
             'corresponds_to': 'mother',
             'value': lambda v: v['explicitlySetBiologicalMother']['@ref'] if v['explicitlySetBiologicalMother'] else None,
+            'linked': True
+        },
+        'note': {
+            'xml_ref_fxn': add_to_clinic_notes,
+            'value': lambda v: v['note'],
             'linked': True
         },
         'descendancy': {
