@@ -35,7 +35,7 @@ Be warned that features are under active development and may not be stable! Visi
 *Development Contents*
 
   .. toctree::
-    :maxdepth: 1
+    :maxdepth: 2
 
     self
     installation
@@ -45,7 +45,6 @@ Be warned that features are under active development and may not be stable! Visi
 *User Contents*
 
   .. toctree::
-    :maxdepth: 1
 
     introduction
     getting_started
