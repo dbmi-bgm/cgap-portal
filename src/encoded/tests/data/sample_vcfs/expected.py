@@ -1,5 +1,9 @@
 # contains expected stuff for test_ingest_vcf
 
+
+SINGLE_RECORD_FULL = './src/encoded/tests/data/sample_vcfs/single_record_full.vcf'
+
+
 SAMPLE_VCF_V41 = './src/encoded/tests/data/sample_vcfs/sample_vcf.vcf'
 SAMPLE_VCF_KEYS = ['BKPTID', 'CIEND', 'CIPOS', 'END', 'HOMLEN', 'HOMSEQ', 'SVLEN', 'SVTYPE']
 SAMPLE_VCF_EXPECTED = ['END', 'HOMLEN', 'HOMSEQ', 'SVLEN', 'SVTYPE']

@@ -15,7 +15,8 @@ from encoded.tests.data.sample_vcfs.expected import (
     ANNOTADD_EXPECTED_N_FIELDS,
     ANNOTADD_EXPECTED_N_RECORD_FIELDS,
     SINGLE_RECORD_ALL,
-    TEST_VCF
+    TEST_VCF,
+    SINGLE_RECORD_FULL
 )
 from encoded.commands.ingest_vcf import (
     VCFParser
@@ -76,6 +77,17 @@ def full_vcf():
     parser.parse_vcf_fields()
     return parser
 
+
+@pytest.fixture
+def single_record_full():
+    parser = VCFParser(SINGLE_RECORD_FULL, VARIANT_SCHEMA, VARIANT_SAMPLE_SCHEMA)
+    parser.parse_vcf_fields()
+    return parser
+
+
+def test_VCFParser_single_record_full(single_record_full):
+    meta = single_record_full.read_vcf_metadata()
+    import pdb; pdb.set_trace()
 
 def test_VCFParser_generic(sample_vcf):
     """ Tests that we can correctly read a standard v4.1 VCF """
