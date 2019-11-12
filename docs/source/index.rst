@@ -35,7 +35,6 @@ Be warned that features are under active development and may not be stable! Visi
 *Development Contents*
 
   .. toctree::
-    :maxdepth: 2
 
     self
     installation

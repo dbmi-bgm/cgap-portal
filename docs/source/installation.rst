@@ -1,5 +1,5 @@
 Installation
-^^^^^^^^^^^^
+============
 
 CGAP is known to work with Python 3.6.x and will not work with Python 3.7 or greater. If part of the HMS team, it is recommended to use Python 3.4.3, since that's what is running on our servers. It is best practice to create a fresh Python virtualenv using one of these versions before proceeding to the following steps.
 
