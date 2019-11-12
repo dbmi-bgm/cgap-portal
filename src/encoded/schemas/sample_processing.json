@@ -1,0 +1,75 @@
+{
+    "title": "Sample Processing",
+    "description": "Analysis object used on samples",
+    "id": "/profiles/sample_processing.json",
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "type": "object",
+    "required": [ "project", "institution"],
+    "identifyingProperties": ["uuid", "aliases"],
+    "mixinProperties": [
+        { "$ref": "mixins.json#/schema_version" },
+        { "$ref": "mixins.json#/uuid" },
+        { "$ref": "mixins.json#/aliases" },
+        { "$ref": "mixins.json#/submitted" },
+        { "$ref": "mixins.json#/modified" },
+        { "$ref": "mixins.json#/status" },
+        { "$ref": "mixins.json#/attribution" },
+        { "$ref": "mixins.json#/static_embeds" }
+    ],
+    "properties": {
+        "samples": {
+            "title": "Samples",
+            "description": "Samples used in the analysis",
+            "type": "array",
+            "items": {
+                "title": "Sample",
+                "type": "string",
+                "linkTo": "Sample"
+            }
+        },
+        "sample_processed_files": {
+            "title": "Sample Processed Files",
+            "description": "Processed results for each sample",
+            "type": "array",
+            "items": {
+                "title": "Sample Processed File",
+                "type": "object",
+                "properties": {
+                    "sample": {
+                        "title": "Sample",
+                        "type": "string",
+                        "linkTo": "Sample"
+                    },
+                    "processed_files": {
+                        "title": "Processed Files",
+                        "description": "Processed files that are specific for each sample.",
+                        "type": "array",
+                        "items": {
+                            "title": "Processed File",
+                            "type": "string",
+                            "linkTo": "FileProcessed"
+                        }
+                    }
+                }
+            }
+        },
+        "processed_files": {
+            "title": "Processed Files",
+            "description": "Processed files that are combined results for the sample analysis.",
+            "type": "array",
+            "items": {
+                "title": "Processed File",
+                "type": "string",
+                "linkTo": "FileProcessed"
+            }
+        },
+        "completed_processes": {
+            "title": "Completed data processing",
+            "type": "array",
+            "items": {
+                "title": "Completed process",
+                "type": "string"
+            }
+        }
+    }
+}

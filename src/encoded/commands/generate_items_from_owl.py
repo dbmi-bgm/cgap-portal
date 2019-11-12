@@ -3,6 +3,8 @@ import json
 import sys
 import argparse
 import datetime
+import logging
+import logging.config
 from uuid import uuid4
 from collections import Counter
 from rdflib.collection import Collection
@@ -19,25 +21,65 @@ from encoded.commands.owltools import (
     hasDbXref,
     hasAltId
 )
+from encoded.commands.load_items import load_items
 from dcicutils.ff_utils import (
     get_authentication_with_server,
     get_metadata,
     search_metadata,
-    unified_authentication
+    unified_authentication,
+    post_metadata
 )
-from dcicutils.s3_utils import s3Utils
 
 EPILOG = __doc__
+
+'''logging setup
+   logging config - to be moved to file at some point
+'''
+LOGFILE = 'process_dp_upd.log'
+logger = logging.getLogger(__name__)
+
+logging.config.dictConfig({
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'standard': {
+            'format': '%(levelname)s:\t%(message)s'
+        },
+        'verbose': {
+            'format': '%(levelname)s:\t%(message)s\tFROM: %(name)s'
+        }
+    },
+    'handlers': {
+        'stdout': {
+            'level': 'WARN',
+            'formatter': 'verbose',
+            'class': 'logging.StreamHandler'
+        },
+        'logfile': {
+            'level': 'INFO',
+            'formatter': 'standard',
+            'class': 'logging.FileHandler',
+            'filename': LOGFILE
+        }
+    },
+    'loggers': {
+        '': {
+            'handlers': ['stdout', 'logfile'],
+            'level': 'INFO',
+            'propagate': True
+        }
+    }
+})
 
 ''' global config '''
 ITEM2OWL = {
     'definition_uris': [
-        'purl.obolibrary.org/obo/IAO_0000115',
+        'http://purl.obolibrary.org/obo/IAO_0000115',
     ],
     'synonym_uris': [
-        'www.geneontology.org/formats/oboInOwl#hasExactSynonym',
-        'www.geneontology.org/formats/oboInOwl#hasNarrowSynonym',
-        'www.geneontology.org/formats/oboInOwl#RelatedSynonym',
+        'http://www.geneontology.org/formats/oboInOwl#hasExactSynonym',
+        'http://www.geneontology.org/formats/oboInOwl#hasNarrowSynonym',
+        'http://www.geneontology.org/formats/oboInOwl#RelatedSynonym',
     ],
     'Disorder': {
         'download_url': 'http://purl.obolibrary.org/obo/mondo.owl',
@@ -259,26 +301,24 @@ def get_existing_items(connection, itype, include_obs_n_del=True):
     return terms
 
 
-def connect2server(env=None, key=None):
+def connect2server(env=None, key=None, keyfile=None):
     '''Sets up credentials for accessing the server.  Generates a key using info
        from the named keyname in the keyfile and checks that the server can be
        reached with that key.
-       Also handles keyfiles stored in s3'''
-    if key == 's3':
-        assert env
-        key = unified_authentication(None, env)
-
-    if all([v in key for v in ['key', 'secret', 'server']]):
-        import ast
-        key = ast.literal_eval(key)
-
+       Also handles keyfiles stored in s3 using the env param'''
+    if key and keyfile:
+        keys = None
+        if os.path.isfile(keyfile):
+            with open(keyfile, 'r') as kf:
+                keys_json_string = kf.read()
+                keys = json.loads(keys_json_string)
+        if keys:
+            key = keys.get(key)
     try:
         auth = get_authentication_with_server(key, env)
     except Exception:
-        print("Authentication failed")
+        logger.error("Authentication failed")
         sys.exit(1)
-
-    print("Running on: {server}".format(server=auth.get('server')))
     return auth
 
 
@@ -378,8 +418,8 @@ def id_post_and_patch(terms, dbterms, itype, rm_unchanged=True, set_obsoletes=Tr
     '''
     to_update = []
     to_post = []
-    to_patch = 0
-    obsoletes = 0
+    to_patch = {}
+    obsoletes = {}
     tid2uuid = {}  # to keep track of existing uuids
     for tid, term in terms.items():
         if tid not in dbterms:
@@ -387,8 +427,8 @@ def id_post_and_patch(terms, dbterms, itype, rm_unchanged=True, set_obsoletes=Tr
             uid = str(uuid4())
             term['uuid'] = uid
             if tid in tid2uuid:
-                print("WARNING HAVE SEEN {} BEFORE!".format(tid))
-                print("PREVIOUS={}; NEW={}".format(tid2uuid[tid], uid))
+                logger.warn("HAVE SEEN {} BEFORE!".format(tid))
+                logger.warn("PREVIOUS={}; NEW={}".format(tid2uuid[tid], uid))
             to_update.append(term)
             tid2uuid[tid] = uid
             to_post.append(tid)
@@ -397,14 +437,14 @@ def id_post_and_patch(terms, dbterms, itype, rm_unchanged=True, set_obsoletes=Tr
             dbterm = dbterms[tid]
             uuid = dbterm['uuid']
             if tid in tid2uuid:
-                print("WARNING HAVE SEEN {} BEFORE!".format(tid))
-                print("PREVIOUS={}; NEW={}".format(tid2uuid[tid], uuid))
+                logger.warn("HAVE SEEN {} BEFORE!".format(tid))
+                logger.warn("PREVIOUS={}; NEW={}".format(tid2uuid[tid], uid))
             tid2uuid[tid] = uuid
             term['uuid'] = uuid
 
     # all terms have uuid - now add uuids to linked terms
     for term in terms.values():
-        puuids = _get_uuids_for_linked(term, tid2uuid)
+        puuids = _get_uuids_for_linked(term, tid2uuid, itype)
         for rt, uuids in puuids.items():
             term[rt] = list(set(uuids))  # to avoid redundant terms
 
@@ -417,7 +457,7 @@ def id_post_and_patch(terms, dbterms, itype, rm_unchanged=True, set_obsoletes=Tr
         if not term:
             continue
         to_update.append(term)
-        to_patch += 1
+        to_patch[tid] = dbterm
 
     if set_obsoletes:
         # go through db terms and find which aren't in terms and set status
@@ -426,24 +466,27 @@ def id_post_and_patch(terms, dbterms, itype, rm_unchanged=True, set_obsoletes=Tr
         id_field = ITEM2OWL[itype].get('id_field')
         for tid, term in dbterms.items():
             if tid not in terms and term.get('status') not in ['obsolete', 'deleted']:
-                if itype == 'OntologyTerm':
-                    source_onts = [so.get('uuid') for so in term.get('source_ontologies', [])]
-                    if not source_onts or not [o for o in ontids if o in source_onts]:
-                        # don't obsolete terms that aren't in one of the ontologies being processed
-                        continue
                 dbuid = term['uuid']
                 # add simple term with only status and uuid to to_patch
-                obsoletes += 1
+                obsoletes[tid] = term
                 to_update.append({'status': 'obsolete', 'uuid': dbuid})
                 tid2uuid[term[id_field]] = dbuid
-                to_patch += 1
-    print("Will obsolete {} TERMS".format(obsoletes))
-    print("{} TERMS ARE NEW".format(len(to_post)))
-    print("{} LIVE TERMS WILL BE PATCHED".format(to_patch - obsoletes))
+    logger.info("{} TERMS ARE NEW".format(len(to_post)))
+    logger.info("Will obsolete {} TERMS".format(len(obsoletes)))
+    logger.info("{} LIVE TERMS WILL BE PATCHED".format(len(to_patch)))
+    logger.info("NEW TERMS")
+    for termid in to_post:
+        logger.info("\t{}".format(termid))
+    logger.info("OBSOLETE TERMS")
+    for t, tinfo in obsoletes.items():
+        logger.info("\t{}\t{}\t{}".format(t, tinfo.get('uuid'), tinfo.get(ITEM2OWL[itype].get('name_field'))))
+    logger.info("PATCHED TERMS")
+    for t, term in to_patch.items():
+        logger.info("\t{}\t{}\t{}".format(t, term.get('uuid'), term.get(ITEM2OWL[itype].get('name_field'))))
     return to_update
 
 
-def _get_uuids_for_linked(term, idmap):
+def _get_uuids_for_linked(term, idmap, itype):
     puuids = {}
     for rt in ['parents', 'slim_terms']:
         tlist = term.get(rt)
@@ -452,8 +495,8 @@ def _get_uuids_for_linked(term, idmap):
             for p in tlist:
                 if p in idmap:
                     puuids.setdefault(rt, []).append(idmap[p])
-                else:
-                    print('WARNING - ', p, ' MISSING FROM IDMAP')
+                elif p.startswith(ITEM2OWL[itype].get('ontology_prefix')):
+                    logger.warn('{} - MISSING FROM IDMAP'.format(p))
     return puuids
 
 
@@ -501,12 +544,11 @@ def _is_deprecated(class_, data):
     return False
 
 
-def download_and_process_owl(itype, terms, simple=False):
+def download_and_process_owl(itype, input, terms={}, simple=False):
     synonym_terms = get_term_uris_as_ns(itype, 'synonym_uris')
     definition_terms = get_term_uris_as_ns(itype, 'definition_uris')
-    data = Owler(ITEM2OWL[itype]['download_url'])
-    if not terms:
-        terms = {}
+    data = Owler(input)
+    ontv = data.versionIRI
     name_field = ITEM2OWL[itype].get('name_field')
     for class_ in data.allclasses:
         if not _is_deprecated(class_, data):
@@ -526,7 +568,7 @@ def download_and_process_owl(itype, terms, simple=False):
                 terms = process_parents(class_, data, terms)
     # add synonyms and definitions
     terms = add_additional_term_info(terms, data, synonym_terms, definition_terms, itype)
-    return terms
+    return terms, ontv
 
 
 def write_outfile(terms, filename, pretty=False):
@@ -550,8 +592,29 @@ def parse_args(args):
     parser.add_argument('item_type',
                         choices=['Disorder', 'Phenotype'],
                         help="Item Types to generate from owl ontology - currently Phenotype or Disorder")
+    parser.add_argument('--env',
+                        default='local',
+                        help="The environment to use i.e. fourfront-cgap, cgap-test ....\
+                        Default is 'local')")
+    parser.add_argument('--input',
+                        help="optional url or path to owlfile - overrides the download_url present in script ITEM2OWL config info \
+                        Useful for generating items from a specific verion of ontology - otherwise will use current latest")
+    parser.add_argument('--key',
+                        help="The keypair identifier from the keyfile")
+    parser.add_argument('--keyfile',
+                        default=os.path.expanduser("~/keypairs.json"),
+                        help="The keypair file.  Default is --keyfile=%s" %
+                             (os.path.expanduser("~/keypairs.json")))
     parser.add_argument('--outfile',
                         help="the optional path and file to write output default is ./item_type.json ")
+    parser.add_argument('--load',
+                        action='store_true',
+                        default=False,
+                        help="Default False - WARNING: currently only works with --env and not key and secret - use to load data directly from json to the server that the connection refers to")
+    parser.add_argument('--post_report',
+                        action='store_true',
+                        default=False,
+                        help="Default False - use to post a Document item with a report as attachment")
     parser.add_argument('--pretty',
                         default=False,
                         action='store_true',
@@ -560,14 +623,6 @@ def parse_args(args):
                         default=False,
                         action='store_true',
                         help="Default False - set True to generate full file to load - do not filter out existing unchanged terms")
-    parser.add_argument('--env',
-                        default='fourfront-cgap',
-                        help="The environment to use i.e. fourfront-cgap, cgap-test ....\
-                        Default is 'fourfront-cgap')")
-    parser.add_argument('--key',
-                        default='s3',
-                        help="An access key dictionary including key, secret and server.\
-                        {'key'='ABCDEF', 'secret'='supersecret', 'server'='http://fourfront-cgap.9wzadzju3p.us-east-1.elasticbeanstalk.com/'}")
     return parser.parse_args(args)
 
 
@@ -576,58 +631,119 @@ def owl_runner(value):
     return download_and_process_owl(*value)
 
 
+def post_report_document_to_portal(connection, itype):
+    ''' Read the log file and encode it for upload as an attachment (blob) and
+        post a Document for the log file
+
+        TD: the institution and project are hard coded.  should get this info
+        from the user running script?
+    '''
+    from base64 import b64encode
+    inst = '828cd4fe-ebb0-4b36-a94a-d2e3a36cc989'
+    proj = '12a92962-8265-4fc0-b2f8-cf14f05db58b'
+    meta = {'institution': inst, 'project': proj}
+    mimetype = "text/plain"
+    rtype = 'document'
+    date = datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
+    attach_fn = None
+    if os.path.isfile(LOGFILE):
+        attach_fn = '{}_update_report_{}.txt'.format(itype, date)
+        try:
+            os.rename(LOGFILE, attach_fn)
+        except OSError as e:
+            logger.warn("Cannot rename {}".format(LOGFILE))
+    with open(attach_fn, 'rb') as at:
+        data = at.read()
+    data_href = 'data:%s;base64,%s' % (mimetype, b64encode(data).decode('ascii'))
+    # data_href = 'data:%s;base64,%s' % (use_type, b64encode(request.json['href'].encode()).decode('ascii'))
+    attach = {'download': attach_fn, 'type': mimetype, 'href': data_href}
+    meta['attachment'] = attach
+    try:
+        res = post_metadata(meta, rtype, connection)
+        assert res.get('status') == 'success'
+    except Exception as e:
+        print("Problem posting report", e)
+    return
+
+
+def prompt_check_for_output_options(load, outfile, itype, server):
+    if load:
+        choice1 = str(input("load is True - are you sure you want to directly load the output to {} (y/n)?: ".format(server)))
+        if choice1.lower() == 'y':
+            logger.info('Will load output directly to {}'.format(server))
+            if not outfile:
+                choice2 = str(input("No outfile provided! - you OK with no saved json (y/n)?: ".format(server)))
+                if choice2.lower() == 'y':
+                    logger.info('No intermediate json file will be generated')
+                    return None, load
+        else:
+            load = None
+    if not outfile:
+        outfile = itype + '.json'
+    logger.info('Will store output to {}'.format(outfile))
+    return outfile, load
+
+
 def main():
-    ''' Downloads latest MONDO OWL file
-        and Updates Terms by generating json inserts
+    ''' Given a item type (Disorder or Phenotype) will process owl file containing ontology terms
+        for the given item from a url or file provided in script config or via --input parameter
+        and comparing to what is currently in system will generate json to post new items or patch
+        existing items and either generate a json file specified with --outfile or load directly
+        into system if --load is used.
+
+        logging/tracking info
     '''
     start = datetime.datetime.now()
-    print(str(start))
     args = parse_args(sys.argv[1:])
     itype = args.item_type
-    postfile = args.outfile
-    if not postfile:
-        postfile = '{}.json'.format(itype)
-    # if '/' not in postfile:  # assume just a filename given
-    #    from pkg_resources import resource_filename
-    #    postfile = resource_filename('encoded', postfile)
+    logger.info('Processing {} on {}'.format(itype, start))
+    connection = connect2server(args.env, args.key, args.keyfile)
+    logger.info('Running on {}'.format(connection.get('server')))
+    postfile, loaddb = prompt_check_for_output_options(args.load, args.outfile, itype, connection.get('server'))
 
-    print('Writing to %s' % postfile)
-
-    # fourfront connection
-    connection = connect2server(args.env, args.key)
-    print('Getting existing items from ', args.env)
+    logger.debug('Getting existing items from ', args.env)
     db_terms = get_existing_items(connection, itype)
-    print('Grabbing slim term ids')
+    logger.debug('Grabbing slim term ids')
     slim_terms = get_slim_term_ids_from_db_terms(db_terms, itype)
     terms = {}
 
-    print('Processing: ', ITEM2OWL[itype].get('ontology_prefix'))
-    if ITEM2OWL[itype].get('download_url', None) is not None:
-        # want only simple processing
-        simple = True
-        # get all the terms for an ontology
-        terms = download_and_process_owl(itype, terms, simple)
+    input = args.input
+    if not input:
+        input = ITEM2OWL[itype].get('download_url', None)
+    if input:
+        # get all the terms for an ontology with simple processing
+        logger.info("Will get ontology data using = {}".format(input))
+        terms, ontv = download_and_process_owl(itype, input, terms, True)
     else:
         # bail out
-        print("Need url to download file from")
+        logger.error("Need url to download file from")
         sys.exit()
 
     # at this point we've processed the rdf of all the ontologies
+    if not ontv:
+        ontv = input
+    logger.info("Ontology Version Info: {}".format(ontv))
     if terms:
         terms = add_slim_terms(terms, slim_terms, itype)
         terms = remove_obsoletes_and_unnamed(terms, itype)
         filter_unchanged = True
         if args.full:
             filter_unchanged = False
-        terms2write = id_post_and_patch(terms, db_terms, itype, filter_unchanged)
-        # terms2write = add_uuids_and_combine(partitioned_terms)
+        items2upd = id_post_and_patch(terms, db_terms, itype, filter_unchanged)
         pretty = False
         if args.pretty:
             pretty = True
-        write_outfile(terms2write, postfile, pretty)
+        write_outfile(items2upd, postfile, pretty)
+        if loaddb:
+            env = args.env if args.env else 'local'  # may want to change to use key/secret as option to get env
+            res = load_items(env, items2upd, itypes=[itype])
+            logger.info(res)
+            logger.info(json.dumps(items2upd, indent=4))
     stop = datetime.datetime.now()
-    print('STARTED: ', str(start))
-    print('END: ', str(stop))
+    logger.info('STARTED: {}'.format(str(start)))
+    logger.info('END: {}'.format(str(stop)))
+    if args.post_report:
+        post_report_document_to_portal(connection, itype)
 
 
 if __name__ == '__main__':

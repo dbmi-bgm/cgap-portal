@@ -5,7 +5,6 @@
     "type": "object",
     "required": ["title", "project", "institution"],
     "identifyingProperties": ["uuid", "accession", "aliases"],
-    "additionalProperties": true,
     "mixinProperties": [
         { "$ref": "mixins.json#/schema_version" },
         { "$ref": "mixins.json#/accession" },
@@ -90,6 +89,16 @@
             "title": "Description",
             "description": "Description of the cohort",
             "type": "string"
+        },
+        "sample_processes": {
+            "title": "Sample Processes",
+            "description": "Downstream analyses performed on the sample",
+            "type": "array",
+            "items": {
+                "title": "Sample Processing",
+                "type": "string",
+                "linkTo": "SampleProcessing"
+            }
         }
     }
 }
