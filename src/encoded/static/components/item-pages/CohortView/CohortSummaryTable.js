@@ -35,7 +35,6 @@ export const CohortSummaryTable = React.memo(function CohortSummaryTable(props){
         "rawFiles",
         "processingType",
         "processedFiles",
-        "variants"
     ];
 
     const columnTitles = {
@@ -53,7 +52,7 @@ export const CohortSummaryTable = React.memo(function CohortSummaryTable(props){
         ),
         'visitInfo' : (
             <React.Fragment>
-                <i className="icon icon-fw icon-clinic-medical fas mr-05 align-middle"/>
+                <i className="icon icon-fw icon-notes-medical fas mr-05 align-middle"/>
                 Visit Info
             </React.Fragment>
         ),
@@ -72,12 +71,6 @@ export const CohortSummaryTable = React.memo(function CohortSummaryTable(props){
                 <span className="d-none d-lg-inline ml-05">Processed File(s)</span>
             </React.Fragment>
         ),
-        'variants' : (
-            <React.Fragment>
-                <i className="icon icon-fw icon-file-upload fas align-middle" />
-                <span className="d-none d-lg-inline ml-05">Variants (single)</span>
-            </React.Fragment>
-        )
     };
 
     function pushColumn(title) {
@@ -233,8 +226,12 @@ export const CohortSummaryTable = React.memo(function CohortSummaryTable(props){
                 error: sampleErr = null,
                 files = [],
                 processed_files = [],
+                completed_processes = [],
                 status: sampleStatus,
                 specimen_type: sampleInfo = null,
+                specimen_collection_date = null,
+                specimen_notes = null,
+                workup_type
             } = sample;
 
             if (!sampleTitle || !sampleID){
@@ -268,7 +265,16 @@ export const CohortSummaryTable = React.memo(function CohortSummaryTable(props){
                             <i className="item-status-indicator-dot mr-05" data-status={sampleStatus}/>
                             { Schemas.Term.toName("status", sampleStatus) }
                         </span>
-                    )
+                    ),
+                    visitInfo: (
+                        specimen_collection_date ?
+                            <span> { specimen_collection_date } { specimen_notes ?
+                                <i className="icon icon-faw far icon-clipboard text-primary" data-tip={ specimen_notes }/>
+                                : "" }
+                            </span>: null
+                    ),
+                    processingType: completed_processes[0] || null,
+                    workupType: workup_type
                 });
             }
             sampleGroup++;
