@@ -32,16 +32,15 @@ Welcome to CGAP! We are a team of scientists, clinicians, and developers who aim
 
 Be warned that features are under active development and may not be stable! Visit the production deployment for the best experience. To get started, see our developer and user documentation below:
 
-*Development Contents:*
+*Development Contents*
 
- .. toctree::
-   :maxdepth: 1
+  .. toctree::
+    :maxdepth: 1
 
-   self
-   installation
-   infrastructure_overview
-   dataflow_overview
-
+    self
+    installation
+    infrastructure_overview
+    dataflow_overview
 
 *User Contents*
 
