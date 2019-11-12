@@ -1,5 +1,7 @@
-Installation
+Local Installation
 ============
+
+The following instructions are for running a CGAP deployment with macOS and homebrew.
 
 CGAP is known to work with Python 3.6.x and will not work with Python 3.7 or greater. If part of the HMS team, it is recommended to use Python 3.4.3, since that's what is running on our servers. It is best practice to create a fresh Python virtualenv using one of these versions before proceeding to the following steps.
 
@@ -38,8 +40,8 @@ If you need to update dependencies::
    $ bin/buildout
 
    NOTE:
-   If you have issues with postgres or the python interface to it (psycogpg2) you probably need to install postgresql
-   via homebrew (as above)
+   If you have issues with postgres or the python interface to it (psycogpg2) you
+   probably need to install postgresql via homebrew (as above)
    If you have issues with Pillow you may need to install new xcode command line tools:
    - First update Xcode from AppStore (reboot)
    $ xcode-select --install
