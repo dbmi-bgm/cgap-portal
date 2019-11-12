@@ -35,6 +35,7 @@ Be warned that features are under active development and may not be stable! Visi
 *Development Contents*
 
   .. toctree::
+    :titlesonly:
 
     self
     installation
@@ -44,6 +45,7 @@ Be warned that features are under active development and may not be stable! Visi
 *User Contents*
 
   .. toctree::
+    :titlesonly:
 
     introduction
     getting_started
