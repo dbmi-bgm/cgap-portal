@@ -84,11 +84,6 @@ The New awesome way to do it:
 
 Bye bye data. Use at your own risk, all warranties void.
 
-.. image:: https://67.media.tumblr.com/6d863550ff51d672f8c3125344119f20/tumblr_oc5gn5Jvtt1qkjik5o1_540.gif
-   :target: https://67.media.tumblr.com/6d863550ff51d672f8c3125344119f20/tumblr_oc5gn5Jvtt1qkjik5o1_540.gif
-   :alt: genghi
-
-
 ** Note ** this will temporarily bring the site down, for a couple of minutes
 
 Database backup / restore
