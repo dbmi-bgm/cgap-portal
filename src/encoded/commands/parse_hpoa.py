@@ -212,7 +212,6 @@ def main():  # pragma: no cover
     logger.info('Processing disorder to phenotype annotations - START:{}'.format(str(start)))
     args = get_args()
     itype = 'EvidenceDisPheno'
-    import pdb; pdb.set_trace()
 
     connection = connect2server(args.env, args.key, args.keyfile)
     logger.info('Working with {}'.format(connection.get('server')))
@@ -332,7 +331,6 @@ def main():  # pragma: no cover
     print('EXISTING: ', existing)
     print('OBSOLETE: ', len(uids2obsolete))
     print('NEW: ', len(evidence_items))
-    import pdb; pdb.set_trace()
 
     obs_patch = [{'uuid': uid, 'status': 'obsolete'} for uid in uids2obsolete]
     patches = evidence_items + obs_patch
@@ -361,7 +359,7 @@ def main():  # pragma: no cover
             for d in sorted(list(udis.keys())):
                 logger.info('{}\t{}'.format(d, udis[d]))
     end = datetime.now()
-    logger.info("FINISHED - START: ", str(start), "\tEND: ", str(end))
+    logger.info("FINISHED - START: {}\tEND: {}".format(start, str(end)))
     if args.post_report:
         post_report_document_to_portal(connection, itype)
 
