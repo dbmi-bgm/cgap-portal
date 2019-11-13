@@ -1,12 +1,11 @@
 {
     "title": "Sample",
-    "description": "A DNA sample from an individual",
+    "description": "A sample from an individual",
     "id": "/profiles/sample.json",
     "$schema": "http://json-schema.org/draft-04/schema#",
     "type": "object",
     "required": [ "project", "institution"],
     "identifyingProperties": ["uuid", "accession", "aliases"],
-    "additionalProperties": true,
     "mixinProperties": [
         { "$ref": "mixins.json#/schema_version" },
         { "$ref": "mixins.json#/uuid" },
@@ -29,20 +28,32 @@
             "type": "string",
             "linkTo": "Individual"
         },
-        "specimen_accession": {
-            "title": "Specimen Accession",
-            "description": "Accession of specimen from sequencing lab",
+        "workup_type": {
+            "title": "Workup Type",
             "type": "string",
-            "uniqueKey": true
+            "enum": [
+                "WGS",
+                "WES",
+                "Sanger"
+            ]
         },
         "specimen_type": {
             "title": "Specimen Type",
             "type": "string",
-            "enum": [
+            "suggested_enum": [
                 "blood",
-                "saliva",
-                "tissue"
+                "saliva"
             ]
+        },
+        "specimen_notes": {
+            "title": "Specimen Notes",
+            "type": "string"
+        },
+        "specimen_collection_date": {
+            "title": "Specimen Collection Date",
+            "description": "Date of specimen collection",
+            "type": "string",
+            "format": "date"
         },
         "completed_processes": {
             "title": "Completed data processing",
@@ -51,6 +62,12 @@
                 "title": "Completed process",
                 "type": "string"
             }
+        },
+        "specimen_accession": {
+            "title": "Specimen Accession",
+            "description": "Accession of specimen from sequencing lab",
+            "type": "string",
+            "uniqueKey": true
         },
         "specimen_accession_date": {
             "title": "Specimen Accession Date",
@@ -76,14 +93,12 @@
         "protocol": {
             "title": "Reference Protocol",
             "description": "Reference Protocol Document.",
-            "type": "string",
-            "lookup": 50
+            "type": "string"
         },
         "files": {
             "title": "Data Files",
-            "description": "Information about the data files associated with the experiment.",
+            "description": "Information about the data files associated with the sample.",
             "type": "array",
-            "lookup": 13,
             "items": {
                 "title": "File",
                 "description": "File metadata.",
@@ -93,10 +108,8 @@
         },
         "processed_files": {
             "title": "Processed Files",
-            "description": "Processed files that are derived from files in this experiment.",
+            "description": "Processed files that are derived from files in this sample.",
             "type": "array",
-            "lookup": 400,
-            "exclude_from": ["submit4dn", "FFedit-create"],
             "items": {
                 "title": "Processed File",
                 "description": "File metadata.",
@@ -106,9 +119,8 @@
         },
         "reference_files": {
             "title": "Reference Files",
-            "description": "Reference files associated with this experiment (ex. file of sequencing barcodes).",
+            "description": "Reference files associated with this sample (ex. file of sequencing barcodes).",
             "type": "array",
-            "lookup": 415,
             "items": {
                 "title": "Reference File",
                 "description": "File metadata.",

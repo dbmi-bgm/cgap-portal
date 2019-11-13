@@ -1,0 +1,24 @@
+[
+    {
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "institution": "hms-dbmi",
+        "status": "released",
+        "uuid": "4fdb481a-fbdb-4c0f-a68d-aac87f847a67",
+        "samples":
+        [
+            "4fdb481a-fbdb-4c0f-a68d-aac87f847bec",
+            "283f6047-61cd-4ddb-8881-ec1c87082569"
+        ],
+        "sample_processed_files": [
+            {
+                "sample": "4fdb481a-fbdb-4c0f-a68d-aac87f847bec",
+                "processed_files": ["10002377-49e5-4c33-afab-9ec90d65faa2"]
+            },
+            {
+                "sample": "283f6047-61cd-4ddb-8881-ec1c87082569",
+                "processed_files": ["10002377-49e5-4c33-afab-9ec90d65faa3"]
+            }
+         ],
+        "processed_files": ["10002377-49e5-4c33-afab-9ec90d65faa1"]
+    }
+]
