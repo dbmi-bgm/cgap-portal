@@ -36,5 +36,6 @@ RESULT_EXPECTED_FIELDS = ['ANNOVAR', 'SNPEFF', 'SNPEFFLOF', 'SNPEFFNMD', 'VEP',
                           'POSITIVE_TRAIN_SITE', 'QD', 'RAW_MQ', 'ReadPosRankSum',
                           'SOR', 'VQSLOD', 'culprit', 'Chrom', 'Pos', 'ID', 'Ref',
                           'Alt', 'Qual', 'Filter', 'Format', 'samples']
+TEST_VCF_FULL = './src/encoded/tests/data/sample_vcfs/mutanno.vcf'
 VARIANT_SCHEMA = './src/encoded/tests/data/sample_vcfs/variant.json'
 VARIANT_SAMPLE_SCHEMA = './src/encoded/tests/data/sample_vcfs/variant_sample.json'
