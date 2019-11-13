@@ -249,7 +249,13 @@ export const CohortSummaryTable = React.memo(function CohortSummaryTable(props){
                     processedFiles: generateFileRenderObject(procFilesWPermissions),
                     rawFiles: generateFileRenderObject(rawFilesWPermissions),
                     sampleIdx,
-                    sampleInfo,
+                    sampleInfo: (
+                        sampleInfo ?
+                            <React.Fragment>{sampleInfo} { specimen_notes ?
+                                <span className="text-primary" data-tip={ specimen_notes }>* </span>
+                                : "" }
+                            </React.Fragment> : null
+                    ),
                     sampleStatus: (
                         <span>
                             <i className="item-status-indicator-dot mr-05" data-status={sampleStatus}/>
@@ -257,11 +263,7 @@ export const CohortSummaryTable = React.memo(function CohortSummaryTable(props){
                         </span>
                     ),
                     visitInfo: (
-                        specimen_collection_date ?
-                            <span> { specimen_collection_date } { specimen_notes ?
-                                <i className="icon icon-faw far icon-clipboard text-primary" data-tip={ specimen_notes }/>
-                                : "" }
-                            </span>: null
+                        specimen_collection_date ? <span>{ specimen_collection_date }</span>: null
                     ),
                     processingType: completed_processes[0] || null,
                     workupType: workup_type
