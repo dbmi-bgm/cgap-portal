@@ -20,7 +20,9 @@ from dcicutils.ff_utils import (
 from encoded.commands.load_items import load_items
 from encoded.commands.generate_items_from_owl import (
     connect2server,
-    get_raw_form
+    get_raw_form,
+    prompt_check_for_output_options,
+    post_report_document_to_portal,
 )
 
 '''logging setup
@@ -84,20 +86,20 @@ def check_fields(data):
     return [f for f in data if (f != 'DiseaseName' and f not in FIELD_MAPPING)]
 
 
-def get_disorders_from_db(auth):
+def get_disorders_from_db(connection):
     q = 'search/?type=Disorder'
-    return {d.get('uuid'): d for d in search_metadata(q, auth, page_limit=200, is_generator=True)}
+    return {d.get('uuid'): d for d in search_metadata(q, connection, page_limit=200, is_generator=True)}
 
 
-def get_existing_phenotype_uuids(auth):
+def get_existing_phenotype_uuids(connection):
     q = 'search/?type=Phenotype'
-    result = search_metadata(q, auth, page_limit=200, is_generator=True)
+    result = search_metadata(q, connection, page_limit=200, is_generator=True)
     return {r.get('hpo_id'): r.get('uuid') for r in result}
 
 
-def get_phenotypes_from_db(auth):
+def get_phenotypes_from_db(connection):
     q = 'search/?type=Phenotype'
-    result = search_metadata(q, auth, page_limit=200, is_generator=True)
+    result = search_metadata(q, connection, page_limit=200, is_generator=True)
     return {r.get('hpo_id'): r for r in result}
 
 
@@ -194,6 +196,10 @@ def get_args():  # pragma: no cover
                         action='store_true',
                         default=False,
                         help="Default False - use to load data directly from json to the server that the connection refers to")
+    parser.add_argument('--post_report',
+                        action='store_true',
+                        default=False,
+                        help="Default False - use to post a Document item with a report as attachment")
     parser.add_argument('--pretty',
                         default=False,
                         action='store_true',
@@ -205,14 +211,17 @@ def main():  # pragma: no cover
     start = datetime.now()
     logger.info('Processing disorder to phenotype annotations - START:{}'.format(str(start)))
     args = get_args()
+    itype = 'EvidenceDisPheno'
+    import pdb; pdb.set_trace()
 
-    auth = connect2server(args.env, args.key, args.keyfile)
-    logger.info('Working with {}'.format(auth.get('server')))
+    connection = connect2server(args.env, args.key, args.keyfile)
+    logger.info('Working with {}'.format(connection.get('server')))
+    postfile, loaddb = prompt_check_for_output_options(args.load, args.outfile, itype, connection.get('server'))
     logger.info('Getting existing Items')
     logger.info('Disorders')
-    disorders = get_disorders_from_db(auth)
+    disorders = get_disorders_from_db(connection)
     logger.info('Phenotypes')
-    phenotypes = get_phenotypes_from_db(auth)
+    phenotypes = get_phenotypes_from_db(connection)
 
     hp_regex = re.compile('^HP:[0-9]{7}')
     hpoid2uuid = {hid: pheno.get('uuid') for hid, pheno in phenotypes.items()}
@@ -299,21 +308,16 @@ def main():  # pragma: no cover
 
         if pheno_annot:
             if pheno_annot in evidence_items:
-                # dis2pheno = evidence_items.get(disorder_id)
-                # if dis2pheno:
-                #    if pheno_annot in dis2pheno:
-                #        ppos = dis2pheno.index(pheno_annot)
                 problems.setdefault('redundant_annot', []).append(pheno_annot)  # (data, dis2pheno[ppos]))
                 continue
-            # evidence_items.setdefault(disorder_id, []).append(pheno_annot)
             evidence_items.append(pheno_annot)
     print(len(evidence_items))
 
     # at this point we've gone through all the lines in the file
     # here we want to compare with what already exists in db
     patches = []
-    sq = 'search/?type=EvidenceDisPheno&status!=obsolete'
-    res = search_metadata(sq, auth, is_generator=True)
+    sq = 'search/?type={}&status!=obsolete'.format(itype)
+    res = search_metadata(sq, connection, is_generator=True)
     existing = 0
     uids2obsolete = []
     logger.info('Comparing to existing evidence')
@@ -330,56 +334,36 @@ def main():  # pragma: no cover
     print('NEW: ', len(evidence_items))
     import pdb; pdb.set_trace()
 
-    for luid, evidences in evidence_items.items():
-        # all the evidence items corresponding to a pair of disorder and phenotype uuid
-        # are a list of evidence items - search for all evid
-        did, pid = luid.split('_')
-        db_annots = []
-        db_dis = disorders.get(did)
-        if db_dis:
-            db_annots = db_dis.get('associated_phenotypes', [])
-            db_annots = [get_raw_form(a) for a in db_annots]
-        newannot = [ann for ann in pheno_annots if ann not in db_annots]
-        existingannot = [ann for ann in pheno_annots if ann in db_annots]
-        # we don't need to explicitly get these except for logging purposes
-        obsannot = [ann for ann in db_annots if ann not in pheno_annots]
-        if newannot:
-            print('NEW!!!!', newannot)
-            import pdb; pdb.set_trace()
-        if obsannot:
-            print('OBSOLETE!!!!!', obsannot)
-            import pdb; pdb.set_trace()
-        patch = newannot + existingannot
-        patches.append({'uuid': did, 'associated_phenotypes': patch})
+    obs_patch = [{'uuid': uid, 'status': 'obsolete'} for uid in uids2obsolete]
+    patches = evidence_items + obs_patch
 
-    write_outfile(patches, args.outfile, args.pretty)
+    if patches:
+        write_outfile(patches, postfile, args.pretty)
+        if loaddb:
+            env = args.env if args.env else 'local'  # may want to change to use key/secret as option to get env
+            res = load_items(env, patches, itypes=[itype])
+            logger.info(res)
+            # logger.info(json.dumps(res, indent=4))
     if problems:
-        # mini report on problems
+        # log problems
         missing_phenos = problems.get('hpo_not_found')
         if missing_phenos:
-            print("{} missing HPO terms used in hpoa file".format(len(missing_phenos)))
+            logger.info("{} missing HPO terms used in hpoa file".format(len(missing_phenos)))
+            for hpoid, fields in missing_phenos.items():
+                logger.info("{}\t{}".format(hpoid, fields))
         dup_annots = problems.get('redundant_annot')
         if dup_annots:
-            print("{} redundant annotations found".format(len(dup_annots)))
+            logger.info("{} redundant annotations found".format(len(dup_annots)))
         unmapped_dis = problems.get('no_map')
         if unmapped_dis:
             udis = {u.get('DatabaseID'): u.get('DiseaseName') for u in unmapped_dis}
+            logger.info("{} disorders from {} annotation lines not found by xref".format(len(udis), len(unmapped_dis)))
             for d in sorted(list(udis.keys())):
-                print('{}\t{}'.format(d, udis[d]))
-            print("{} disorders from {} annotation lines not found by xref".format(len(udis), len(unmapped_dis)))
-        probfile = args.outfile
-        rfname, rdir = ''.join(probfile[::-1]).split('/', 1)
-        fname = 'problems_' + ''.join(rfname[::-1])
-        dir = ''
-        if rdir:
-            dir = ''.join(rdir[::-1])
-            probfile = dir + '/' + fname
-        else:
-            probfile = fname
-        print('PROBLEMS written to {}'.format(probfile))
-        write_outfile(problems, probfile, True)
+                logger.info('{}\t{}'.format(d, udis[d]))
     end = datetime.now()
-    print("FINISHED - START: ", str(start), "\tEND: ", str(end))
+    logger.info("FINISHED - START: ", str(start), "\tEND: ", str(end))
+    if args.post_report:
+        post_report_document_to_portal(connection, itype)
 
 
 if __name__ == '__main__':  # pragma: no cover
