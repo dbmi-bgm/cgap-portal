@@ -79,7 +79,11 @@ class Cohort(Item):
         "families.members.samples.files.quality_metric.overall_quality_status",
         "families.members.samples.files.quality_metric.url",
         "families.members.samples.files.quality_metric.status",
-        "families.members.samples.completed_processes"
+        "families.members.samples.completed_processes",
+        "sample_processes.samples.accession",
+        "sample_processes.processed_files",
+        "sample_processes.sample_processed_files",
+        "sample_processes.completed_processes",
     ]
 
     @calculated_property(schema={

@@ -59,7 +59,8 @@ class CurrentFamilyController extends React.PureComponent {
         const pedigreeFamilies = (props.context.families || []).filter(CurrentFamilyController.haveFullViewPermissionForFamily);
         this.state = {
             pedigreeFamilies,
-            pedigreeFamiliesIdx: 0 //familiesLen - 1
+            pedigreeFamiliesIdx: 0, // familiesLen - 1
+            sampleProcessing: props.context.sample_processes || []
         };
         this.memoized = {
             buildPedigreeGraphData: memoize(buildPedigreeGraphData),
@@ -71,6 +72,7 @@ class CurrentFamilyController extends React.PureComponent {
     componentDidUpdate(pastProps, pastState){
         const { context } = this.props;
         const { context: pastContext } = pastProps;
+
         if (pastContext !== context){
             const pedigreeFamilies = (context.families || []).filter(CurrentFamilyController.haveFullViewPermissionForFamily);
             const pastPedigreeFamilies = (pastContext.families || []).filter(CurrentFamilyController.haveFullViewPermissionForFamily);
@@ -79,7 +81,8 @@ class CurrentFamilyController extends React.PureComponent {
             if (familiesLen !== pastFamiliesLen){
                 this.setState({
                     pedigreeFamilies,
-                    pedigreeFamiliesIdx: familiesLen - 1
+                    pedigreeFamiliesIdx: familiesLen - 1,
+                    sampleProcessing: context.sample_processes
                 });
             }
         }
@@ -145,7 +148,7 @@ class CurrentFamilyController extends React.PureComponent {
     render(){
         const { children, ...passProps } = this.props;
 
-        const { pedigreeFamilies = [], pedigreeFamiliesIdx } = this.state;
+        const { pedigreeFamilies = [], pedigreeFamiliesIdx, sampleProcessing } = this.state;
         const familiesLen = pedigreeFamilies.length;
 
         let currFamily, graphData, idToGraphIdentifier;
@@ -162,7 +165,8 @@ class CurrentFamilyController extends React.PureComponent {
             currFamily,
             graphData,
             idToGraphIdentifier,
-            onFamilySelect: this.handleFamilySelect
+            onFamilySelect: this.handleFamilySelect,
+            sampleProcessing
         };
         return React.Children.map(children, function(child){
             return React.cloneElement(child, childProps);
@@ -252,7 +256,8 @@ const CohortSummaryTabView = React.memo(function CohortSummaryTabView(props){
         onFamilySelect,
         graphData,
         selectedDiseases,
-        windowWidth
+        windowWidth,
+        sampleProcessing
     } = props;
 
     const familiesLen = families.length;
@@ -311,7 +316,7 @@ const CohortSummaryTabView = React.memo(function CohortSummaryTabView(props){
             return (
                 <div className={cls} key={idx} data-is-current-family={isCurrentFamily}>
                     { title }
-                    <CohortSummaryTable {...family} {...{ idx, idToGraphIdentifier, isCurrentFamily }} />
+                    <CohortSummaryTable {...family} {...{ idx, idToGraphIdentifier, isCurrentFamily, sampleProcessing }} />
                 </div>
             );
         });

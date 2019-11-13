@@ -15,8 +15,11 @@ export const CohortSummaryTable = React.memo(function CohortSummaryTable(props){
         members = [],
         proband: { '@id' : probandID } = {},
         original_pedigree = null,
-        idToGraphIdentifier = {}
+        idToGraphIdentifier = {},
+        sampleProcessing = []
     } = props;
+
+    console.log("log1: Cohort Summary Table, props", sampleProcessing);
 
     if (members.length === 0){
         return (
