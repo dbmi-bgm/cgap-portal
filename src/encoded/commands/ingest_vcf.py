@@ -100,6 +100,19 @@ class VCFParser(object):
         else:
             return [s[0].split('|')]
 
+    @staticmethod
+    def parse_standard_vcf_fields(record, result):
+        """ Pulls common VCF field information into result """
+        result['Chrom'] = record.CHROM
+        result['Pos'] = record.POS
+        result['ID'] = record.ID
+        result['Ref'] = record.REF
+        result['Alt'] = record.ALT
+        result['Qual'] = record.QUAL
+        result['Filter'] = record.FILTER
+        result['Format'] = record.FORMAT
+        result['samples'] = record.samples
+
     def parse_vcf_record(self, record):
         """
         Produces a dictionary containing all the annotation fields for this record
@@ -126,6 +139,7 @@ class VCFParser(object):
         drop those fields from the result if we dont see a value
         """
         result = {}
+        self.parse_standard_vcf_fields(record, result)
         for key in self.format.keys():
 
             # handle non-annotation fields
