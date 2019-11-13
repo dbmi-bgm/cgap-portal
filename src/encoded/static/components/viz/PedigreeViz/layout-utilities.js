@@ -1031,6 +1031,10 @@ export function orderObjectGraph(objectGraph, relationships = null){
         nodesInRow.reduce(function(currNum, n){
             if ( isRelationship(n) ) return currNum;
             n.orderBasedName = "" + generationRomanNumeral + " – " + currNum;
+            if (n.isProband) {
+                // Append "p" if proband
+                n.orderBasedName += "p";
+            }
             currNum++;
             return currNum;
         }, 1);
