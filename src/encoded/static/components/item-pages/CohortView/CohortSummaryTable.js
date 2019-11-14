@@ -7,6 +7,9 @@ import _ from 'underscore';
 import { Schemas } from './../../util';
 import { console } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { callbackify } from 'util';
+import { OverviewHeadingContainer } from '../components/OverviewHeadingContainer';
+import { SSL_OP_NO_TLSv1 } from 'constants';
+import { transformBarPlotAggregationsToD3CompatibleHierarchy } from '@hms-dbmi-bgm/shared-portal-components/src/components/viz/utilities';
 
 
 /** @param {Object} props - Contents of a family sub-embedded object. */
@@ -84,14 +87,35 @@ export const CohortSummaryTable = React.memo(function CohortSummaryTable(props){
     // console.log("log1: Cohort Summary Table, sp", sampleProcessing);
 
     const sampleAnalysisUUIDs = [];
-    sampleProcessing.forEach((sp) => {
+    const sampleProcessingData = {};
+    const sampleProcessingIndices = {}; // map uuid to index in SampleProcessing
+
+    sampleProcessing.forEach((sp, index) => {
         const { uuid, completed_processes = [] } = sp;
+
+        // add column titles
         sampleAnalysisUUIDs.push(uuid); // log the UUIDs for retrieval later
         pushColumn(`~MSA|${ completed_processes[0] }|${ uuid }`); // push with some extra data to indicate MSA status
+
+        sampleProcessingIndices[uuid] = index;
     });
+
+    function sampleInSampleProcessing(sp, sampleID) {
+        let isPresent = false;
+        sp.samples.forEach((sample) => {
+            if (sample.accession === sampleID) {
+                isPresent = true;
+            }
+        });
+        return isPresent;
+    }
 
     function hasMSAFlag(string) {
         return string.substring(0,5) === "~MSA|";
+    }
+
+    function getUUIDFromMSATitle(string) {
+        return string.split("|")[2];
     }
 
     const hasMSA = hasMSAFlag(h2ColumnOrder[h2ColumnOrder.length-1]); // if last column in columnTitles starts with MSA flag
@@ -348,7 +372,7 @@ export const CohortSummaryTable = React.memo(function CohortSummaryTable(props){
     let isEven = false; // Toggle on individual change
     let currIndvGroup = null; // Individual Group #
     const renderedRows = sortedRows.map(function(row, rowIdx){
-        const { isProband = false, sampleIdx } = row;
+        const { isProband = false, sampleIdx, sampleId } = row;
         const rowCols = h2ColumnOrder.map(function(colName){
 
             function statusToIcon(status){
@@ -509,6 +533,28 @@ export const CohortSummaryTable = React.memo(function CohortSummaryTable(props){
                     </div>
                 );
             }
+
+            // ifd a multisample analysis object
+            if (hasMSAFlag(colName)) {
+                const colNameSplit = colName.split("|");
+                const currSPIndex = sampleProcessingIndices[colNameSplit[2]];
+                const currSP = sampleProcessing[currSPIndex];
+
+                console.log("col1: sp,", currSP);
+                console.log("col1: sisp: ", sampleInSampleProcessing(currSP, sampleId));
+                
+                // sampleProcessing[currSPIndex].sample;
+
+                // cosampleAnalysisUUIDs[2]
+                
+                // sampleAnalysisUUIDs.indexOf(getUUIDFromMSATitle(colName));
+                colVal = (
+                    <div className="qcs-container text-ellipsis-container">
+                        { sampleInSampleProcessing(currSP, sampleId).toString() } | {sampleId}
+                    </div>
+                );
+            }
+
             return (
                 <td key={colName} data-for-column={colName}
                     data-tip={isProband && colName === "individual" ? "Proband" : null}
