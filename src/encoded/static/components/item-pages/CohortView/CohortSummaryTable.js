@@ -16,10 +16,8 @@ export const CohortSummaryTable = React.memo(function CohortSummaryTable(props){
         proband: { '@id' : probandID } = {},
         original_pedigree = null,
         idToGraphIdentifier = {},
-        sampleProcessing = []
+        sampleProcessing = [] // todo: make sure only the sample objects for THIS FAMILY are passed in
     } = props;
-
-    console.log("log1: Cohort Summary Table, props", sampleProcessing);
 
     if (members.length === 0){
         return (
@@ -82,7 +80,21 @@ export const CohortSummaryTable = React.memo(function CohortSummaryTable(props){
         h2ColumnOrder.push(title);
     }
 
-    const hasMSA = h2ColumnOrder.length > 8; //todo: update with appropriate logic, placement
+    // console.log("log1: Cohort Summary Table, props", props);
+    // console.log("log1: Cohort Summary Table, sp", sampleProcessing);
+
+    const sampleAnalysisUUIDs = [];
+    sampleProcessing.forEach((sp) => {
+        const { uuid, completed_processes = [] } = sp;
+        sampleAnalysisUUIDs.push(uuid); // log the UUIDs for retrieval later
+        pushColumn(`~MSA|${ completed_processes[0] }|${ uuid }`); // push with some extra data to indicate MSA status
+    });
+
+    function hasMSAFlag(string) {
+        return string.substring(0,5) === "~MSA|";
+    }
+
+    const hasMSA = hasMSAFlag(h2ColumnOrder[h2ColumnOrder.length-1]); // if last column in columnTitles starts with MSA flag
 
     const rows = [];
     const membersWithoutSamples = [];
@@ -99,7 +111,8 @@ export const CohortSummaryTable = React.memo(function CohortSummaryTable(props){
             display_title: indvDisplayTitle = null,
             '@id' : indvId,
             error = null,
-            samples = []
+            samples = [],
+            accession
         } = individual;
 
         if (!indvDisplayTitle || !indvId){
@@ -221,10 +234,8 @@ export const CohortSummaryTable = React.memo(function CohortSummaryTable(props){
         }
 
         samples.forEach(function(sample, sampleIdx){
-            pushColumn(`Joint Call v${ sampleGroup }`); // todo: update with appropriate sample handling
-
             const {
-                '@id' : sampleID,
+                '@id' : samplePath = "",
                 display_title: sampleTitle,
                 error: sampleErr = null,
                 files = [],
@@ -237,7 +248,9 @@ export const CohortSummaryTable = React.memo(function CohortSummaryTable(props){
                 workup_type
             } = sample;
 
-            if (!sampleTitle || !sampleID){
+            const [ , , sampleID ] = samplePath.split("/"); // linter complained about arr destructuring... ¯\_(ツ)_/¯
+
+            if (!sampleTitle || !samplePath){
                 rows.push({
                     individual : indvLink,
                     isProband,
@@ -254,10 +267,11 @@ export const CohortSummaryTable = React.memo(function CohortSummaryTable(props){
                 });
 
                 rows.push({
-                    sample: <a href={sampleID} className="accession">{ sampleTitle }</a>,
+                    sample: <a href={samplePath} className="accession">{ sampleTitle }</a>,
                     individual : indvLink,
                     isProband,
                     individualGroup,
+                    sampleId: sampleID,
                     sampleGroup,
                     processedFiles: generateFileRenderObject(procFilesWPermissions),
                     rawFiles: generateFileRenderObject(rawFilesWPermissions),
@@ -524,15 +538,21 @@ export const CohortSummaryTable = React.memo(function CohortSummaryTable(props){
                 <thead>
                     { hasMSA ?
                         <tr>
-                            {
+                            { // note: currently assumes that any cols after the initial 8 set in ColumnTitles are MSAs
                                 <React.Fragment>
-                                    <th colSpan="9" className="hidden-th"/>
+                                    <th colSpan="8" className="hidden-th"/>
                                     <th colSpan={ Object.keys(columnTitles).length - 8 }>Multi Sample Analysis</th>
                                 </React.Fragment>}
                         </tr> : null}
                     <tr>
                         { h2ColumnOrder.map(function(colName){
-                            return <th key={colName}>{ columnTitles[colName] }</th>;
+                            const title = columnTitles[colName];
+                            // if flagged as a multiSampleAnalysis column, parse it for the appropriate data
+                            if (typeof title === "string" && hasMSAFlag(title)) {
+                                const titleArr = title.split("|");
+                                return <th key={`msa ${titleArr[2]}`}>{ titleArr[1] }</th>;
+                            }
+                            return <th key={colName}>{ title }</th>;
                         }) }
                     </tr>
                 </thead>
