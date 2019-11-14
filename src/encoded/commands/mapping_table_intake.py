@@ -35,9 +35,9 @@ def read_mapping_table(fname):
         reader = csv.reader(f)
         for row_idx, row in enumerate(reader):
             if row_idx == 0:
-                VERSION = row[0].split('=')[1].strip()
+                VERSION = row[1].split('=')[1].strip()
             elif row_idx == 1:
-                DATE = row[0].split('=')[1].strip()
+                DATE = row[1].split('=')[1].strip()
             elif row_idx == 2:
                 FIELDS = process_fields(row)
             else:
@@ -74,7 +74,7 @@ def process_inserts(fname, fields):
                             insert[field_name] = False
                 elif field_name in ['enum_list']:
                     if entry:
-                        field_type = row[3] # hardcoded, must change if field_type is moved on mapping table
+                        field_type = row[5] # hardcoded, must change if field_type is moved on mapping table
                         val_list = []
                         if field_type == 'string':
                             val_list = [en.strip() for en in entry.split(',') if en.strip()]
@@ -86,6 +86,8 @@ def process_inserts(fname, fields):
                 else: # handle all other fields if they exist
                     if entry:
                         insert[field_name] = entry
+            if not insert.get('mvp', False):  # ignore non-mvp items for now
+                continue
             insert['project'] = '12a92962-8265-4fc0-b2f8-cf14f05db58b'
             insert['institution'] = 'hms-dbmi'
             insert['submitted_by'] = 'koray_kirli@hms.harvard.edu'
@@ -106,7 +108,7 @@ def get_sample_inserts(inserts):
 
 def get_variant_inserts(inserts):
     """
-        Filters inserts for those that are mvp and not sample 
+        Filters inserts for those that are mvp and not sample
         Meant to be passed to generate_properties
     """
     mvp_list = [i for i in inserts if i.get('mvp')]
@@ -122,11 +124,11 @@ def generate_properties(inserts, variant=True):
 
     def get_prop(item):
         temp = OrderedDict()
-        prop_name = item['field_name']
+        prop_name = item['vcf_name_v0.2']
         features = OrderedDict()
         features.update({
-            "title": item['schema_title'],
-            "vcf_name": item['vcf_name'],
+            "title": item.get('schema_title', 'None provided'),
+            "vcf_name": prop_name,
             "type": item['field_type']
         })
         if item.get('schema_description'):
@@ -145,7 +147,6 @@ def generate_properties(inserts, variant=True):
         # handle sub_embedded object if we are doing variant
         if variant:
             if item.get('sub_embedding_group'):
-                assert item['is_list'] == True
                 sub_temp = OrderedDict()
                 prop = OrderedDict()
                 prop[prop_name] = features
@@ -167,9 +168,9 @@ def generate_properties(inserts, variant=True):
         if item.get('is_list'):
             array_item = OrderedDict()
             array_item.update( {
-                "title": item['schema_title'],
+                "title": item.get('schema_title', 'None provided'),
                 "type": "array",
-                "vcf_name": item['vcf_name']
+                "vcf_name": item['vcf_name_v0.2']
             })
             if item.get('schema_description'):
                 array_item['description'] = item['schema_description']
