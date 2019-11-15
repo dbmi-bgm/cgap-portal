@@ -36,6 +36,8 @@ export const CohortSummaryTable = React.memo(function CohortSummaryTable(props){
         "processedFiles",
     ];
 
+    const originalNumCols = h2ColumnOrder.length;
+
     const columnTitles = {
         'sample' : (
             <React.Fragment>
@@ -78,9 +80,6 @@ export const CohortSummaryTable = React.memo(function CohortSummaryTable(props){
         h2ColumnOrder.push(title);
     }
 
-    // console.log("log1: Cohort Summary Table, props", props);
-    console.log("log1: Cohort Summary Table, sp", sampleProcessing);
-
     const sampleProcessingData = {};
     const sampleProcessingIndices = {}; // map uuid to index in SampleProcessing
 
@@ -93,29 +92,13 @@ export const CohortSummaryTable = React.memo(function CohortSummaryTable(props){
         sampleProcessingIndices[uuid] = index;
         sampleProcessingData[uuid] = {};
 
-        console.log("log1:, ", sp);
-
         // populate with per sample data
         sample_processed_files.forEach((set) => {
             const { sample = {}, processed_files = [] } = set;
-            console.log("log1: sample accession, ", set);
-            // console.log("log1: sample accession, ", sample.processed_files);
             sampleProcessingData[uuid][sample.accession] = generateFileRenderObject(processed_files);
         });
     });
 
-    console.log("log1: samples ", sampleProcessingData);
-
-    function sampleInSampleProcessing(sp, sampleID) {
-        const { samples = [] } = sp;
-        let isPresent = false;
-        samples.forEach((sample) => {
-            if (sample.accession === sampleID) {
-                isPresent = true;
-            }
-        });
-        return isPresent;
-    }
 
     function hasMSAFlag(string) {
         return string.substring(0,5) === "~MSA|";
@@ -378,9 +361,9 @@ export const CohortSummaryTable = React.memo(function CohortSummaryTable(props){
 
     let isEven = false; // Toggle on individual change
     let currIndvGroup = null; // Individual Group #
-    const renderedRows = sortedRows.map(function(row, rowIdx){
+    const renderedRows = sortedRows.map(function(row, rowIdx) {
         const { isProband = false, sampleIdx, sampleId } = row;
-        const rowCols = h2ColumnOrder.map(function(colName){
+        const rowCols = h2ColumnOrder.map(function(colName) {
 
             function statusToIcon(status){
                 switch (status) {
@@ -434,7 +417,6 @@ export const CohortSummaryTable = React.memo(function CohortSummaryTable(props){
              * @return {array} Index [0] is the file level tooltip (only relevant if there is no QM), and index [1] is the QC level tooltip.
              */
             function calcTooltips(hasQm, warns, fails) {
-                // console.log(`testing calcTooltips with ${hasQm}, ${warns}, ${fails}`);
                 let qmExistsTip = "";
                 let warnFailTip = "";
 
@@ -447,8 +429,6 @@ export const CohortSummaryTable = React.memo(function CohortSummaryTable(props){
                 if (fails > 0) {
                     warnFailTip += `${fails} QM(s) with Failures `;
                 }
-                // console.log(`calcTooltips produced the following tips: \n "${qmExistsTip}" and "${warnFailTip}"`);
-
                 return [qmExistsTip || null, warnFailTip || null];
             }
 
@@ -457,81 +437,11 @@ export const CohortSummaryTable = React.memo(function CohortSummaryTable(props){
             if (colName === "processedFiles" || colName === "rawFiles"){
                 const fileData = row[colName];
                 const extensions = Object.keys(fileData);
-                const renderArr = [];
+                let renderArr = [];
 
                 extensions.forEach((ext) => {
-                    const { files, overall: overallQuality } = fileData[ext];
-
-                    if (files && files.length <= 1) {
-                        if (files.length <= 0) {
-                            return;
-                        }
-
-                        const tooltips = calcTooltips(files[0].hasQm, files[0].numWarn, files[0].numFail);
-
-                        // if there's a single quality metric, link the item itself
-                        renderArr.push(
-                            files[0] ?
-                                <span className="ellipses" key={`span-${ext}`}>
-                                    { statusToIcon(overallQuality || "WARN") }
-                                    <a
-                                        href={files[0].fileUrl || ""}
-                                        rel="noopener noreferrer"
-                                        target="_blank"
-                                        data-tip={tooltips[0]}
-                                    >
-                                        { ext.toUpperCase() }
-                                    </a>
-                                    { files[0].hasQm ?
-                                        <a
-                                            href={files[0].qmUrl || ""}
-                                            rel="noopener noreferrer"
-                                            target="_blank"
-                                            className={`${statusToTextClass(overallQuality)} qc-status-${files[0].status}`}
-                                            data-tip={tooltips[1]}
-                                        >
-                                            <sup>QC</sup>
-                                        </a>
-                                        : null }
-                                </span>
-                                : null
-                        );
-                    } else if (files) { // otherwise create a list with linked #s
-                        renderArr.push(
-                            <span className="ellipses" key={`span-multi-${ext}`}>
-                                { statusToIcon(overallQuality) } { ext.toUpperCase() }
-                                (   {
-                                    files.map((file, i) => {
-                                        const tooltips = calcTooltips(file.hasQm, file.numWarn, file.numFail);
-
-                                        return (
-                                            <React.Fragment key={`${ext}-${file.fileUrl}`}>
-                                                <a href={ file.fileUrl || "" } rel="noopener noreferrer" target="_blank"
-                                                    className={`${statusToTextClass(file.quality)}`} data-tip={tooltips[0]}>
-                                                    {i + 1}
-                                                </a>
-                                                { file.hasQm ?
-                                                    <a
-                                                        href={file.qmUrl || ""}
-                                                        rel="noopener noreferrer"
-                                                        target="_blank"
-                                                        className={`${statusToTextClass(
-                                                            getFileQuality(file.numFail, file.numWarn))} qc-status-${file.status}`}
-                                                        data-tip={tooltips[1]}
-                                                    >
-                                                        <sup>QC</sup>
-                                                    </a>
-                                                    : null }
-                                                { // if the last item, don't add a comma
-                                                    (i === files.length - 1 ?  null : ', ')
-                                                }
-                                            </React.Fragment>
-                                        );
-                                    })
-                                }   )
-                            </span>
-                        );
-                    }
+                    const jsx = convertFileObjectToJSX(fileData[ext], ext);
+                    renderArr = renderArr.concat(jsx); // add to render Arr (matey)
                 });
 
                 colVal = (
@@ -541,97 +451,99 @@ export const CohortSummaryTable = React.memo(function CohortSummaryTable(props){
                 );
             }
 
-            // if a multisample analysis object 
-            if (hasMSAFlag(colName)) {
-                const colNameSplit = colName.split("|");
-                const currSPIndex = sampleProcessingIndices[colNameSplit[2]];
-                const currSP = sampleProcessing[currSPIndex];
-                const lolwut = sampleProcessingData[colNameSplit[2]][sampleId] || {};
-                const extensions = Object.keys(lolwut);
-                console.log("bob1: sp,", currSPIndex);
-                console.log("col1: sisp: ", sampleInSampleProcessing(currSP, sampleId));
-
+            function convertFileObjectToJSX(fileObject, ext) {
                 const renderArr = [];
-                console.log("bob1:", sampleProcessingData[colNameSplit[2]][sampleId]);
-                extensions.forEach((ext) => {
-                    const { files, overall: overallQuality } = sampleProcessingData[colNameSplit[2]][sampleId][ext];
+                const { files, overall: overallQuality } = fileObject;
 
-                    if (files && files.length <= 1) {
-                        if (files.length <= 0) {
-                            return;
-                        }
+                if (files && files.length <= 1) {
+                    if (files.length <= 0) {
+                        return;
+                    }
 
-                        const tooltips = calcTooltips(files[0].hasQm, files[0].numWarn, files[0].numFail);
+                    const tooltips = calcTooltips(files[0].hasQm, files[0].numWarn, files[0].numFail);
 
-                        // if there's a single quality metric, link the item itself
-                        renderArr.push(
-                            files[0] ?
-                                <span className="ellipses" key={`span-${ext}`}>
-                                    { statusToIcon(overallQuality || "WARN") }
+                    // if there's a single quality metric, link the item itself
+                    renderArr.push(
+                        files[0] ?
+                            <span className="ellipses" key={`span-${ext}`}>
+                                { statusToIcon(overallQuality || "WARN") }
+                                <a
+                                    href={files[0].fileUrl || ""}
+                                    rel="noopener noreferrer"
+                                    target="_blank"
+                                    data-tip={tooltips[0]}
+                                >
+                                    { ext.toUpperCase() }
+                                </a>
+                                { files[0].hasQm ?
                                     <a
-                                        href={files[0].fileUrl || ""}
+                                        href={files[0].qmUrl || ""}
                                         rel="noopener noreferrer"
                                         target="_blank"
-                                        data-tip={tooltips[0]}
+                                        className={`${statusToTextClass(overallQuality)} qc-status-${files[0].status}`}
+                                        data-tip={tooltips[1]}
                                     >
-                                        { ext.toUpperCase() }
+                                        <sup>QC</sup>
                                     </a>
-                                    { files[0].hasQm ?
-                                        <a
-                                            href={files[0].qmUrl || ""}
-                                            rel="noopener noreferrer"
-                                            target="_blank"
-                                            className={`${statusToTextClass(overallQuality)} qc-status-${files[0].status}`}
-                                            data-tip={tooltips[1]}
-                                        >
-                                            <sup>QC</sup>
-                                        </a>
-                                        : null }
-                                </span>
-                                : null
-                        );
-                    } else if (files) { // otherwise create a list with linked #s
-                        renderArr.push(
-                            <span className="ellipses" key={`span-multi-${ext}`}>
-                                { statusToIcon(overallQuality) } { ext.toUpperCase() }
-                                (   {
-                                    files.map((file, i) => {
-                                        const tooltips = calcTooltips(file.hasQm, file.numWarn, file.numFail);
-
-                                        return (
-                                            <React.Fragment key={`${ext}-${file.fileUrl}`}>
-                                                <a href={ file.fileUrl || "" } rel="noopener noreferrer" target="_blank"
-                                                    className={`${statusToTextClass(file.quality)}`} data-tip={tooltips[0]}>
-                                                    {i + 1}
-                                                </a>
-                                                { file.hasQm ?
-                                                    <a
-                                                        href={file.qmUrl || ""}
-                                                        rel="noopener noreferrer"
-                                                        target="_blank"
-                                                        className={`${statusToTextClass(
-                                                            getFileQuality(file.numFail, file.numWarn))} qc-status-${file.status}`}
-                                                        data-tip={tooltips[1]}
-                                                    >
-                                                        <sup>QC</sup>
-                                                    </a>
-                                                    : null }
-                                                { // if the last item, don't add a comma
-                                                    (i === files.length - 1 ?  null : ', ')
-                                                }
-                                            </React.Fragment>
-                                        );
-                                    })
-                                }   )
+                                    : null }
                             </span>
-                        );
-                    }
+                            : null
+                    );
+                } else if (files) { // otherwise create a list with linked #s
+                    renderArr.push(
+                        <span className="ellipses" key={`span-multi-${ext}`}>
+                            { statusToIcon(overallQuality) } { ext.toUpperCase() }
+                            (   {
+                                files.map((file, i) => {
+                                    const tooltips = calcTooltips(file.hasQm, file.numWarn, file.numFail);
+
+                                    return (
+                                        <React.Fragment key={`${ext}-${file.fileUrl}`}>
+                                            <a href={ file.fileUrl || "" } rel="noopener noreferrer" target="_blank"
+                                                className={`${statusToTextClass(file.quality)}`} data-tip={tooltips[0]}>
+                                                {i + 1}
+                                            </a>
+                                            { file.hasQm ?
+                                                <a
+                                                    href={file.qmUrl || ""}
+                                                    rel="noopener noreferrer"
+                                                    target="_blank"
+                                                    className={`${statusToTextClass(
+                                                        getFileQuality(file.numFail, file.numWarn))} qc-status-${file.status}`}
+                                                    data-tip={tooltips[1]}
+                                                >
+                                                    <sup>QC</sup>
+                                                </a>
+                                                : null }
+                                            { // if the last item, don't add a comma
+                                                (i === files.length - 1 ?  null : ', ')
+                                            }
+                                        </React.Fragment>
+                                    );
+                                })
+                            }   )
+                        </span>
+                    );
+                }
+                return renderArr; //matey
+            }
+
+            // if a multisample analysis object
+            if (hasMSAFlag(colName)) {
+                const [, pipeline, uuid] = colName.split("|");
+                const allFileObjects = sampleProcessingData[uuid][sampleId] || {};
+                const extensions = Object.keys(allFileObjects);
+
+                let renderArr = [];
+                extensions.forEach((ext) => {
+                    // generate new jsx
+                    const jsx = convertFileObjectToJSX(allFileObjects[ext], ext);
+                    renderArr = renderArr.concat(jsx); // add to render Arr (matey)
                 });
 
                 colVal = (
                     <div className="qcs-container text-ellipsis-container">
-                        {/* { sampleInSampleProcessing(currSP, sampleId).toString() } | {sampleId} */}
-                        {renderArr.length > 0 ? renderArr : '-'}
+                        { renderArr.length > 0 ? renderArr : '-' }
                     </div>
                 );
             }
@@ -667,8 +579,8 @@ export const CohortSummaryTable = React.memo(function CohortSummaryTable(props){
                         <tr>
                             { // note: currently assumes that any cols after the initial 8 set in ColumnTitles are MSAs
                                 <React.Fragment>
-                                    <th colSpan="8" className="hidden-th"/>
-                                    <th colSpan={ Object.keys(columnTitles).length - 8 }>Multi Sample Analysis</th>
+                                    <th colSpan={originalNumCols} className="hidden-th"/>
+                                    <th colSpan={ Object.keys(columnTitles).length - originalNumCols }>Multi Sample Analysis</th>
                                 </React.Fragment>}
                         </tr> : null}
                     <tr>
@@ -681,9 +593,21 @@ export const CohortSummaryTable = React.memo(function CohortSummaryTable(props){
                             }
                             return <th key={colName}>{ title }</th>;
                         }) }
-                    </tr>
+                    </tr>      
                 </thead>
-                <tbody>{ renderedRows }</tbody>
+                <tbody>
+                    { renderedRows }
+                </tbody>
+                <tfoot>
+                    <tr>
+                        {
+                            <React.Fragment>
+                                <td colSpan={originalNumCols} className="hidden-th"/>
+                                <td>test</td><td>test</td>
+                            </React.Fragment>
+                        }
+                    </tr>
+                </tfoot>
             </table>
         </div>
     );
