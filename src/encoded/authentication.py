@@ -199,9 +199,9 @@ class Auth0AuthenticationPolicy(CallbackAuthenticationPolicy):
         for identity in payload.get('identities', []): # if auth0 decoded
             if identity.get('connection', '') in ['partners', 'hms-it']:
                 return True
-        if 'partners' in payload.get('sub', '').split('|'):
+        if 'partners' in payload.get('sub', ''):
             return True
-        elif 'hms.harvard' in payload.get('sub', '').split('|'):
+        elif 'hms.harvard' in payload.get('sub', ''):
             return True
         elif payload.get('email_verified'):
             return True
@@ -214,6 +214,7 @@ class Auth0AuthenticationPolicy(CallbackAuthenticationPolicy):
         This is only called if we receive a Bearer token in Authorization header.
         '''
         try:
+
             # lets see if we have an auth0 token or our own
             registry = request.registry
             auth0_client = registry.settings.get('auth0.client')
