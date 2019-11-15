@@ -98,7 +98,17 @@ export const CohortSummaryTable = React.memo(function CohortSummaryTable(props){
         pushColumn(`~MSA|${ completed_processes[0] }|${ uuid }`); // push with some extra data to indicate MSA status
 
         sampleProcessingIndices[uuid] = index;
+        sampleProcessingData[uuid] = {};
+
+        // populate with per sample data
+        sp.sample_processed_files.forEach((set) => {
+            console.log("log1: sample accession, ", set);
+            console.log("log1: sample accession, ", set.sample.processed_files);
+            sampleProcessingData[uuid][set.sample.accession] = generateFileRenderObject(set.processed_files);
+        });
     });
+
+    console.log("log1: samples ", sampleProcessingData);
 
     function sampleInSampleProcessing(sp, sampleID) {
         let isPresent = false;
@@ -126,6 +136,100 @@ export const CohortSummaryTable = React.memo(function CohortSummaryTable(props){
 
     let individualGroup = 0;
     let sampleGroup = 0;
+
+    function generateFileRenderObject(files) {
+        const allFiles = {};
+
+        files.forEach((file) => {
+            const {
+                display_title: filename,
+                quality_metric = {},
+                "@id": fileUrl
+            } = file;
+
+            const {
+                overall_quality_status = "",
+                qc_list = [],
+                "@id": qmId,
+                url: qmUrl = qmId || "",
+            } = quality_metric;
+
+            const extension = filename.substring(filename.indexOf('.')+1, filename.length) || filename; // assuming the display_title property remains the filename
+
+            let fileOverallQuality = "PASS";
+            let hasQm = true;
+            let numFail = 0;
+            let numWarn = 0;
+
+            // figure out the file's overall quality status
+            if (qc_list.length > 0) {
+                // loop through all of the quality metrics and count the number of failures and warnings for this file
+                qc_list.forEach((qm) => {
+                    if (qm.value.overall_quality_status === "FAIL") {
+                        numFail++;
+                        fileOverallQuality = "FAIL";
+                    } else if (qm.value.overall_quality_status === "WARN") {
+                        numWarn++;
+                        fileOverallQuality = (fileOverallQuality === "FAIL" ? "FAIL" : "WARN");
+                    }
+                });
+            } else {
+                if (!overall_quality_status) {
+                    numFail = -1;
+                    numWarn = -1;
+                    hasQm = false;
+                } else {
+                    if (overall_quality_status === "FAIL") {
+                        numFail++;
+                    } else if (overall_quality_status === "WARN") {
+                        numWarn++;
+                    }
+                }
+                fileOverallQuality = overall_quality_status;
+            }
+
+            const fileObject = {
+                numFail,
+                numWarn,
+                hasQm,
+                fileUrl,
+                qmUrl
+            };
+
+            function shouldUpdateOverallQuality(currOverall, newStatus) {
+                const newFailing = newStatus === "FAIL";
+                const newWarning = newStatus === "WARN";
+                if (currOverall === "PASS" && newFailing ||
+                    currOverall === "PASS" && newWarning ||
+                    currOverall === "WARN" && newFailing
+                ) {
+                    return true;
+                }
+                return false;
+            }
+
+            // check to see if there's currently a property in allFiles with key
+            if (allFiles.hasOwnProperty(extension)) {
+
+                // check if should update overall Quality Status on update
+                if (shouldUpdateOverallQuality(allFiles[extension].overall, fileOverallQuality)) {
+                    // update accordingly
+                    allFiles[extension].overall = fileOverallQuality;
+                }
+
+                // add new file object to files array
+                allFiles[extension].files.push(fileObject);
+            } else {
+                // generate a new object in allFiles object;
+                allFiles[extension] = {
+                    overall: fileOverallQuality,
+                    files: [fileObject]
+                };
+            }
+        });
+
+        return allFiles;
+    }
 
     // Gather rows from family.members - 1 per sample (or individual, if no sample).
     // todo: consider moving this block to Cohort index; we're already doing a pass to figure out
@@ -162,100 +266,6 @@ export const CohortSummaryTable = React.memo(function CohortSummaryTable(props){
             );
         }
         const isProband = (probandID && probandID === indvId);
-
-        function generateFileRenderObject(files) {
-            const allFiles = {};
-
-            files.forEach((file) => {
-                const {
-                    display_title: filename,
-                    quality_metric = {},
-                    "@id": fileUrl
-                } = file;
-
-                const {
-                    overall_quality_status = "",
-                    qc_list = [],
-                    "@id": qmId,
-                    url: qmUrl = qmId || "",
-                } = quality_metric;
-
-                const extension = filename.substring(filename.indexOf('.')+1, filename.length) || filename; // assuming the display_title property remains the filename
-
-                let fileOverallQuality = "PASS";
-                let hasQm = true;
-                let numFail = 0;
-                let numWarn = 0;
-
-                // figure out the file's overall quality status
-                if (qc_list.length > 0) {
-                    // loop through all of the quality metrics and count the number of failures and warnings for this file
-                    qc_list.forEach((qm) => {
-                        if (qm.value.overall_quality_status === "FAIL") {
-                            numFail++;
-                            fileOverallQuality = "FAIL";
-                        } else if (qm.value.overall_quality_status === "WARN") {
-                            numWarn++;
-                            fileOverallQuality = (fileOverallQuality === "FAIL" ? "FAIL" : "WARN");
-                        }
-                    });
-                } else {
-                    if (!overall_quality_status) {
-                        numFail = -1;
-                        numWarn = -1;
-                        hasQm = false;
-                    } else {
-                        if (overall_quality_status === "FAIL") {
-                            numFail++;
-                        } else if (overall_quality_status === "WARN") {
-                            numWarn++;
-                        }
-                    }
-                    fileOverallQuality = overall_quality_status;
-                }
-
-                const fileObject = {
-                    numFail,
-                    numWarn,
-                    hasQm,
-                    fileUrl,
-                    qmUrl
-                };
-
-                function shouldUpdateOverallQuality(currOverall, newStatus) {
-                    const newFailing = newStatus === "FAIL";
-                    const newWarning = newStatus === "WARN";
-                    if (currOverall === "PASS" && newFailing ||
-                        currOverall === "PASS" && newWarning ||
-                        currOverall === "WARN" && newFailing
-                    ) {
-                        return true;
-                    }
-                    return false;
-                }
-
-                // check to see if there's currently a property in allFiles with key
-                if (allFiles.hasOwnProperty(extension)) {
-
-                    // check if should update overall Quality Status on update
-                    if (shouldUpdateOverallQuality(allFiles[extension].overall, fileOverallQuality)) {
-                        // update accordingly
-                        allFiles[extension].overall = fileOverallQuality;
-                    }
-
-                    // add new file object to files array
-                    allFiles[extension].files.push(fileObject);
-                } else {
-                    // generate a new object in allFiles object;
-                    allFiles[extension] = {
-                        overall: fileOverallQuality,
-                        files: [fileObject]
-                    };
-                }
-            });
-
-            return allFiles;
-        }
 
         samples.forEach(function(sample, sampleIdx){
             const {
@@ -534,23 +544,97 @@ export const CohortSummaryTable = React.memo(function CohortSummaryTable(props){
                 );
             }
 
-            // ifd a multisample analysis object
+            // if a multisample analysis object
             if (hasMSAFlag(colName)) {
                 const colNameSplit = colName.split("|");
                 const currSPIndex = sampleProcessingIndices[colNameSplit[2]];
                 const currSP = sampleProcessing[currSPIndex];
-
-                console.log("col1: sp,", currSP);
+                const lolwut = sampleProcessingData[colNameSplit[2]][sampleId] || {};
+                const extensions = Object.keys(lolwut);
+                console.log("bob1: sp,", currSPIndex);
                 console.log("col1: sisp: ", sampleInSampleProcessing(currSP, sampleId));
-                
-                // sampleProcessing[currSPIndex].sample;
 
-                // cosampleAnalysisUUIDs[2]
-                
-                // sampleAnalysisUUIDs.indexOf(getUUIDFromMSATitle(colName));
+                const renderArr = [];
+                console.log("bob1:", sampleProcessingData[colNameSplit[2]][sampleId]);
+                extensions.forEach((ext) => {
+                    const { files, overall: overallQuality } = sampleProcessingData[colNameSplit[2]][sampleId][ext];
+
+                    if (files && files.length <= 1) {
+                        if (files.length <= 0) {
+                            return;
+                        }
+
+                        const tooltips = calcTooltips(files[0].hasQm, files[0].numWarn, files[0].numFail);
+
+                        // if there's a single quality metric, link the item itself
+                        renderArr.push(
+                            files[0] ?
+                                <span className="ellipses" key={`span-${ext}`}>
+                                    { statusToIcon(overallQuality || "WARN") }
+                                    <a
+                                        href={files[0].fileUrl || ""}
+                                        rel="noopener noreferrer"
+                                        target="_blank"
+                                        data-tip={tooltips[0]}
+                                    >
+                                        { ext.toUpperCase() }
+                                    </a>
+                                    { files[0].hasQm ?
+                                        <a
+                                            href={files[0].qmUrl || ""}
+                                            rel="noopener noreferrer"
+                                            target="_blank"
+                                            className={`${statusToTextClass(overallQuality)} qc-status-${files[0].status}`}
+                                            data-tip={tooltips[1]}
+                                        >
+                                            <sup>QC</sup>
+                                        </a>
+                                        : null }
+                                </span>
+                                : null
+                        );
+                    } else if (files) { // otherwise create a list with linked #s
+                        renderArr.push(
+                            <span className="ellipses" key={`span-multi-${ext}`}>
+                                { statusToIcon(overallQuality) } { ext.toUpperCase() }
+                                (   {
+                                    files.map((file, i) => {
+                                        const tooltips = calcTooltips(file.hasQm, file.numWarn, file.numFail);
+
+                                        return (
+                                            <React.Fragment key={`${ext}-${file.fileUrl}`}>
+                                                <a href={ file.fileUrl || "" } rel="noopener noreferrer" target="_blank"
+                                                    className={`${statusToTextClass(file.quality)}`} data-tip={tooltips[0]}>
+                                                    {i + 1}
+                                                </a>
+                                                { file.hasQm ?
+                                                    <a
+                                                        href={file.qmUrl || ""}
+                                                        rel="noopener noreferrer"
+                                                        target="_blank"
+                                                        className={`${statusToTextClass(
+                                                            getFileQuality(file.numFail, file.numWarn))} qc-status-${file.status}`}
+                                                        data-tip={tooltips[1]}
+                                                    >
+                                                        <sup>QC</sup>
+                                                    </a>
+                                                    : null }
+                                                { // if the last item, don't add a comma
+                                                    (i === files.length - 1 ?  null : ', ')
+                                                }
+                                            </React.Fragment>
+                                        );
+                                    })
+                                }   )
+                            </span>
+                        );
+                    }
+                });
+
                 colVal = (
                     <div className="qcs-container text-ellipsis-container">
                         { sampleInSampleProcessing(currSP, sampleId).toString() } | {sampleId}
+                        {renderArr}
                     </div>
                 );
             }

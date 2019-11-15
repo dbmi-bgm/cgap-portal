@@ -83,6 +83,15 @@ class Cohort(Item):
         "sample_processes.samples.accession",
         "sample_processes.processed_files",
         "sample_processes.sample_processed_files",
+        "sample_processes.sample_processed_files.sample.accession",
+        "sample_processes.sample_processed_files.processed_files.quality_metric",
+        "sample_processes.sample_processed_files.processed_files.quality_metric.qc_list.qc_type",
+        "sample_processes.sample_processed_files.processed_files.quality_metric.qc_list.value.overall_quality_status",
+        "sample_processes.sample_processed_files.processed_files.quality_metric.qc_list.value.url",
+        "sample_processes.sample_processed_files.processed_files.quality_metric.qc_list.value.status",
+        "sample_processes.sample_processed_files.processed_files.quality_metric.overall_quality_status",
+        "sample_processes.sample_processed_files.processed_files.quality_metric.url",
+        "sample_processes.sample_processed_files.processed_files.quality_metric.status",
         "sample_processes.completed_processes",
     ]
 
