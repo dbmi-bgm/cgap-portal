@@ -149,18 +149,37 @@ def generate_properties(inserts, variant=True):
             if item.get('sub_embedding_group'):
                 sub_temp = OrderedDict()
                 prop = OrderedDict()
-                prop[prop_name] = features
                 sum_ob_name = item['sub_embedding_group']
                 sub_title = sum_ob_name.replace("_", " ").title()
-                sub_temp.update({
-                    "title": sub_title,
-                    "type": "array",
-                    "items": {
+
+                # handle sub-embedded object that is an array
+                if item.get('is_list'):
+                    prop[prop_name] = {
+                        'title': item.get('schema_title', 'None provided'),
+                        'type': 'array',
+                        'vcf_name': item['vcf_name_v0.2'],
+                        'items': features
+                    }
+                    sub_temp.update({
+                        "title": sum_ob_name,
+                        "type": "array",
+                        "items": {
+                            "title": sub_title,
+                            "type": "array",
+                            "properties": prop
+                            }
+                        })
+                else:
+                    prop[prop_name] = features
+                    sub_temp.update({
                         "title": sub_title,
-                        "type": "object",
-                        "properties": prop
-                        }
-                    })
+                        "type": "array",
+                        "items": {
+                            "title": sub_title,
+                            "type": "object",
+                            "properties": prop
+                            }
+                        })
                 temp[sum_ob_name] = sub_temp
                 return temp
 

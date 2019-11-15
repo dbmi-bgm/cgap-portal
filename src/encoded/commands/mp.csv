@@ -1,6 +1,6 @@
 ,#FILEFORMAT= annV0.2,,,,,,,,,,,,,,,,,,,,,,,,
 ,#FILEDATE=11.08.19,,,,,,,,,,,,,,,,,,,,,,,,
-no,FIELD NAME,VCF NAME v0.2 (field name on ann vcf),SOURCE_NAME v0.2,SOURCE VERSION v0.2,"field_type (string, integer, boolean, number)",value_example,enum_list,is_list,sub_embedding_group (SUBEMBEDDED OBJECT GROUPING),"SEPARATOR (comma, pipe, semicolon, colon, tab) ",SCALE,DOMAIN,METHOD,Annotation_grouping,SCOPE (sample/variant/gene),schema_title (HUMAN READABLE HEADER),schema_description (DESCRIPTION),SOURCE_NAME,SOURCE VERSION,FIELD_PRIORITY (order lookup number),COLUMN_PRIORITY (order/lookup number),FACET_GROUPING,FACET_PRIORITY,links_to,MVP (Y/N)
+no,FIELD NAME,VCF NAME v0.2 (field name on ann vcf),SOURCE_NAME v0.2,SOURCE VERSION v0.2,"field_type (string, integer, boolean, number)",value_example,enum_list (limit values to this list),is_list,sub_embedding_group (SUBEMBEDDED OBJECT GROUPING),"SEPARATOR (comma, pipe, semicolon, colon, tab) ",SCALE,DOMAIN,METHOD,Annotation_grouping,SCOPE (sample/variant/gene),schema_title (HUMAN READABLE HEADER),schema_description (DESCRIPTION),SOURCE_NAME,SOURCE VERSION,FIELD_PRIORITY (order lookup number),COLUMN_PRIORITY (order/lookup number),FACET_GROUPING,FACET_PRIORITY,links_to,MVP (Y/N)
 1,chrom,CHROM,VCF,VCFv4.2,string,1,"1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,X,Y,M",N,,,,,,,variant,Chromosome,,VCF,VCFv4.2,1,1,Chromosome,,,Y
 2,pos,POS,VCF,VCFv4.2,integer,949608,,N,,,,,,,variant,Position,,VCF,VCFv4.2,2,2,,,,Y
 3,id,ID,VCF,VCFv4.2,string,rs1921,,N,,,,,,,variant,ID,,VCF,VCFv4.2,3,3,,,,Y

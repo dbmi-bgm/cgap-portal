@@ -49,7 +49,7 @@ requires = [
     # add it here for some command line tools
     'pytest==2.9.1',
     'aws-requests-auth',
-    'vcf',
+    'PyVCF==0.6.8',
 ]
 
 if sys.version_info.major == 2:

@@ -174,4 +174,6 @@ def test_generate_variant_schema(variant_items):
     assert properties['ALT']['lookup'] == 5
     assert len(properties['transcript']['items']['properties']) == 50
     assert properties['ALT']['items']['separator'] == 'comma'
-    assert properties['transcript']['items']['properties']['vep_domains']['separator'] == 'comma'
+    assert properties['transcript']['items']['properties']['vep_domains']['type'] == 'array'
+    assert properties['transcript']['items']['properties']['vep_domains']['items']['separator'] == 'comma'
+    assert properties['transcript']['items']['properties']['vep_domains']['items']['type'] == 'string'
