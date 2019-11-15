@@ -25,7 +25,9 @@ EXPECTED_FIELDS = ['no', 'field_name', 'vcf_name_v0.2', 'source_name_v0.2',
                    'facet_grouping', 'facet_priority', 'links_to', 'mvp']
 EXPECTED_INSERT = {'no': '1', 'field_name': 'chrom', 'vcf_name_v0.2': 'CHROM',
                    'source_name_v0.2': 'VCF', 'source_version_v0.2': 'VCFv4.2',
-                   'field_type': 'string', 'value_example': '1', 'enum_list': [],
+                   'field_type': 'string', 'value_example': '1', 'enum_list': ['1',
+                    '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12',
+                   '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', 'X', 'Y', 'M'],
                    'is_list': False, 'scope': 'variant', 'schema_title': 'Chromosome',
                    'source_name': 'VCF', 'source_version': 'VCFv4.2',
                    'field_priority': 1, 'column_priority': 1, 'facet_grouping':
