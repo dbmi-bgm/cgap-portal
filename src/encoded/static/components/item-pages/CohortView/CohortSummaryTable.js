@@ -5,11 +5,6 @@ import PropTypes from 'prop-types';
 import memoize from 'memoize-one';
 import _ from 'underscore';
 import { Schemas } from './../../util';
-import { console } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
-import { callbackify } from 'util';
-import { OverviewHeadingContainer } from '../components/OverviewHeadingContainer';
-import { SSL_OP_NO_TLSv1 } from 'constants';
-import { transformBarPlotAggregationsToD3CompatibleHierarchy } from '@hms-dbmi-bgm/shared-portal-components/src/components/viz/utilities';
 
 
 /** @param {Object} props - Contents of a family sub-embedded object. */
@@ -84,35 +79,37 @@ export const CohortSummaryTable = React.memo(function CohortSummaryTable(props){
     }
 
     // console.log("log1: Cohort Summary Table, props", props);
-    // console.log("log1: Cohort Summary Table, sp", sampleProcessing);
+    console.log("log1: Cohort Summary Table, sp", sampleProcessing);
 
-    const sampleAnalysisUUIDs = [];
     const sampleProcessingData = {};
     const sampleProcessingIndices = {}; // map uuid to index in SampleProcessing
 
     sampleProcessing.forEach((sp, index) => {
-        const { uuid, completed_processes = [] } = sp;
+        const { uuid, completed_processes = [] , sample_processed_files = [] } = sp;
 
         // add column titles
-        sampleAnalysisUUIDs.push(uuid); // log the UUIDs for retrieval later
         pushColumn(`~MSA|${ completed_processes[0] }|${ uuid }`); // push with some extra data to indicate MSA status
 
         sampleProcessingIndices[uuid] = index;
         sampleProcessingData[uuid] = {};
 
+        console.log("log1:, ", sp);
+
         // populate with per sample data
-        sp.sample_processed_files.forEach((set) => {
+        sample_processed_files.forEach((set) => {
+            const { sample = {}, processed_files = [] } = set;
             console.log("log1: sample accession, ", set);
-            console.log("log1: sample accession, ", set.sample.processed_files);
-            sampleProcessingData[uuid][set.sample.accession] = generateFileRenderObject(set.processed_files);
+            // console.log("log1: sample accession, ", sample.processed_files);
+            sampleProcessingData[uuid][sample.accession] = generateFileRenderObject(processed_files);
         });
     });
 
     console.log("log1: samples ", sampleProcessingData);
 
     function sampleInSampleProcessing(sp, sampleID) {
+        const { samples = [] } = sp;
         let isPresent = false;
-        sp.samples.forEach((sample) => {
+        samples.forEach((sample) => {
             if (sample.accession === sampleID) {
                 isPresent = true;
             }
@@ -544,7 +541,7 @@ export const CohortSummaryTable = React.memo(function CohortSummaryTable(props){
                 );
             }
 
-            // if a multisample analysis object
+            // if a multisample analysis object 
             if (hasMSAFlag(colName)) {
                 const colNameSplit = colName.split("|");
                 const currSPIndex = sampleProcessingIndices[colNameSplit[2]];
@@ -633,8 +630,8 @@ export const CohortSummaryTable = React.memo(function CohortSummaryTable(props){
 
                 colVal = (
                     <div className="qcs-container text-ellipsis-container">
-                        { sampleInSampleProcessing(currSP, sampleId).toString() } | {sampleId}
-                        {renderArr}
+                        {/* { sampleInSampleProcessing(currSP, sampleId).toString() } | {sampleId} */}
+                        {renderArr.length > 0 ? renderArr : '-'}
                     </div>
                 );
             }
