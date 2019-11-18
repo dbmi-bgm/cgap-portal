@@ -562,7 +562,7 @@ export default class App extends React.PureComponent {
         }
 
         // If we're submitting search form in selection mode, preserve selection mode at next URL.
-        if (currentAction === 'selection'){
+        if (currentAction === 'selection' || currentAction === 'multiselect'){
             if (search && search.indexOf('currentAction=selection') === -1){
                 search += '&currentAction=selection';
             } else if (!search) {

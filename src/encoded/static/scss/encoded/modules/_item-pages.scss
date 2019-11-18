@@ -1880,15 +1880,16 @@ $badge-item-min-height: 90px;
 							*/
 							&[data-for-column="individual"]{
 								.gen-identifier {
-									margin-right: 10px;
-									padding-right: 10px;
+									margin-right: 8px;
+									padding-right: 8px;
 									border-right: 1px solid #777;
 									display: inline-block;
-									min-width: 45px;
+									min-width: 55px;
 									text-align: right;
 									vertical-align: middle;
 									font-weight: 600;
 									line-height: 1;
+									margin-left: -15px;
 								}
 							}
 						}
