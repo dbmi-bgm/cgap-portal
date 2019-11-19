@@ -47,4 +47,4 @@ class Disorder(Item):
     })
     def phenotype_features(self, request):
         evi_as_subj = self.rev_link_atids(request, 'as_subject_evidence')
-        return get_evidence_linked_items(request, evi_as_subj, 'object', 'phenotype')
+        return get_evidence_linked_items(request, evi_as_subj, 'object')
