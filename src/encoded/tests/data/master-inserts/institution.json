@@ -44,14 +44,13 @@
         "name": "bch",
         "phone1": "000-000-0000",
         "phone2": "000-000-0000",
-        "pi": "shira.rockowitz@childrens.harvard.edu",
+        "pi": "dvuzman@research.bwh.harvard.edu",
         "postal_code": "02115",
         "state": "MA",
         "title": "BCH",
         "uuid": "828cd4fe-ebb0-4b36-ccbb-d2e3a36ca765",
         "contact_persons": [
-            "shira.rockowitz@childrens.harvard.edu",
-            "guilherme.yamamoto@childrens.harvard.edu"
+            "dvuzman@research.bwh.harvard.edu"
         ]
     }
 ]
