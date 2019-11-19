@@ -28,7 +28,7 @@ export const CohortSummaryTable = React.memo(function CohortSummaryTable(props){
     const h2ColumnOrder = [
         "individual",
         "sample",
-        "visitInfo",
+        "sampleCollectionDate",
         "sampleInfo",
         "workupType",
         "rawFiles",
@@ -51,10 +51,10 @@ export const CohortSummaryTable = React.memo(function CohortSummaryTable(props){
                 Individual
             </React.Fragment>
         ),
-        'visitInfo' : (
+        'sampleCollectionDate' :  (
             <React.Fragment>
-                <i className="icon icon-fw icon-notes-medical fas mr-05 align-middle"/>
-                Visit Info
+                <i className="icon icon-fw icon-syringe fas mr-05 align-middle"/>
+                <span className="d-none d-lg-inline ml-05">Sample Collection Date</span>
             </React.Fragment>
         ),
         'sampleInfo' : "Sample Type",
@@ -297,7 +297,7 @@ export const CohortSummaryTable = React.memo(function CohortSummaryTable(props){
                             { Schemas.Term.toName("status", sampleStatus) }
                         </span>
                     ),
-                    visitInfo: (
+                    sampleCollectionDate: (
                         specimen_collection_date ?
                             <span> { specimen_collection_date } { specimen_notes ?
                                 <i className="icon icon-faw far icon-clipboard text-primary" data-tip={ specimen_notes }/>
