@@ -310,3 +310,28 @@ class TrackingItem(Item):
             if date_created:
                 title = title + ' from ' + date_created
             return title
+
+
+@collection(
+    name='annotation-fields',
+    unique_key='annotation_field:field_name',
+    properties={
+        'title': 'Annotation Fields',
+        'description': 'List of annotation fields',
+    })
+class AnnotationField(Item):
+    """Class for annotation fields."""
+
+    item_type = 'annotation_field'
+    name_key = 'field_name'
+    schema = load_schema('encoded:schemas/annotation_field.json')
+
+    embedded_list = Item.embedded_list  # + lab_award_attribution_embed_list
+
+    @calculated_property(schema={
+        "title": "Display Title",
+        "description": "A calculated title for every object in 4DN",
+        "type": "string"
+    })
+    def display_title(self, request, field_name):
+        return field_name

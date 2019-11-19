@@ -2,6 +2,7 @@ import os
 import csv
 import json
 import pytest
+import conftest
 from encoded.commands.mapping_table_intake import (
     process_fields,
     read_mapping_table,
@@ -179,3 +180,18 @@ def test_generate_variant_schema(variant_items):
     assert properties['transcript']['items']['properties']['vep_domains']['type'] == 'array'
     assert properties['transcript']['items']['properties']['vep_domains']['items']['separator'] == 'comma'
     assert properties['transcript']['items']['properties']['vep_domains']['items']['type'] == 'string'
+
+
+@pytest.mark.integrated
+@pytest.mark.skip  # this will work once annotation_field.json is correct
+def test_post_inserts(inserts, testapp):
+    """ 
+    Tests that we can post the processed inserts to a test app with 
+    no errors.
+    Use variant_items fixture to use already generated inserts based 
+    on the current mapping table
+    Post them to the testapp
+    """
+    CONNECTION_URL = '/annotation_field'
+    for item in inserts:
+        testapp.post_json(CONNECTION_URL, item, status=201)
