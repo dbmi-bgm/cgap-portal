@@ -1936,6 +1936,19 @@ $badge-item-min-height: 90px;
 					}
 				}
 
+				tfoot {
+					> tr > td {
+						text-align: center;
+						vertical-align: middle !important;
+						padding: 2px 3px;
+						border-top: 1px solid #eeeeee;
+						background-color: #f1f1f1;
+						
+						&:not(.has-value) {
+							background-color: #fff;
+						}
+					}
+				}
 			}
 
 		}
