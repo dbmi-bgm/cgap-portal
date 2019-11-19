@@ -617,12 +617,12 @@ export const CohortSummaryTable = React.memo(function CohortSummaryTable(props){
                                 </React.Fragment>}
                         </tr> : null}
                     <tr>
-                        { h2ColumnOrder.map(function(colName){
+                        { h2ColumnOrder.map(function(colName, colIdx){
                             const title = columnTitles[colName];
                             // if flagged as a multiSampleAnalysis column, parse it for the appropriate data
                             if (typeof title === "string" && hasMSAFlag(title)) {
-                                const titleArr = title.split("|");
-                                return <th key={`msa ${titleArr[2]}`}>{ titleArr[1] }</th>;
+                                const titleArr = title.split("|"); // if there isn't a proper title (undefined) for column, numbers based on index
+                                return <th key={`msa ${titleArr[2]}`}>{ titleArr[1] !== 'undefined' ? titleArr[1] : `Pipeline V${colIdx - 7}`}</th>;
                             }
                             return <th key={colName}>{ title }</th>;
                         }) }
