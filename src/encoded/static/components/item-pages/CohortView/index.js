@@ -59,8 +59,7 @@ class CurrentFamilyController extends React.PureComponent {
         const pedigreeFamilies = (props.context.families || []).filter(CurrentFamilyController.haveFullViewPermissionForFamily);
         this.state = {
             pedigreeFamilies,
-            pedigreeFamiliesIdx: 0, // familiesLen - 1
-            sampleProcessing: props.context.sample_processes || []
+            pedigreeFamiliesIdx: 0 // familiesLen - 1
         };
         this.memoized = {
             buildPedigreeGraphData: memoize(buildPedigreeGraphData),
@@ -81,8 +80,7 @@ class CurrentFamilyController extends React.PureComponent {
             if (familiesLen !== pastFamiliesLen){
                 this.setState({
                     pedigreeFamilies,
-                    pedigreeFamiliesIdx: familiesLen - 1,
-                    sampleProcessing: context.sample_processes
+                    pedigreeFamiliesIdx: familiesLen - 1
                 });
             }
         }
@@ -148,7 +146,7 @@ class CurrentFamilyController extends React.PureComponent {
     render(){
         const { children, ...passProps } = this.props;
 
-        const { pedigreeFamilies = [], pedigreeFamiliesIdx, sampleProcessing } = this.state;
+        const { pedigreeFamilies = [], pedigreeFamiliesIdx } = this.state;
         const familiesLen = pedigreeFamilies.length;
 
         let currFamily, graphData, idToGraphIdentifier;
@@ -166,7 +164,6 @@ class CurrentFamilyController extends React.PureComponent {
             graphData,
             idToGraphIdentifier,
             onFamilySelect: this.handleFamilySelect,
-            sampleProcessing
         };
         return React.Children.map(children, function(child){
             return React.cloneElement(child, childProps);
@@ -250,14 +247,14 @@ const CohortSummaryTabView = React.memo(function CohortSummaryTabView(props){
         context: {
             cohort_phenotypic_features: cohortFeatures = { cohort_phenotypic_features: [] },
             description: cohortDescription = "",
-            actions: permissibleActions = []
+            actions: permissibleActions = [],
+            sample_processes = []
         } = {},
         idToGraphIdentifier,
         onFamilySelect,
         graphData,
         selectedDiseases,
-        windowWidth,
-        sampleProcessing
+        windowWidth
     } = props;
 
     const familiesLen = families.length;
@@ -313,10 +310,45 @@ const CohortSummaryTabView = React.memo(function CohortSummaryTabView(props){
                     { pedFileName ? <span className="text-300">{ " (" + pedFileName + ")" }</span> : null }
                 </h4>
             );
+
+            // go through each member in the family and populate a list with all of their samplesIDs...
+            // will match these up with those in sampleanalysis.samples to determine which to render on per family basis
+            const familySpecificSampleIDs = {};
+            family.members.forEach((member) => {
+
+                if (member.samples && member.samples.length > 0) {
+                    member.samples.forEach((sample) => {
+                        const { "@id" : id } = sample;
+                        if (!familySpecificSampleIDs[id]) {
+                            familySpecificSampleIDs[id] = true;
+                        }
+                    });
+                }
+            });
+
+            const familySpecificSAs = [];
+            // filter out sampleProcessing objects that have 2 or more matching samples, and pass ONLY THOSE through to cohortSummaryTable
+            sample_processes.forEach((sp) => {
+                let numMatchingSamples = 0;
+
+                for (let i = 0; i < sp.samples.length; i++) {
+                    const thisSample = sp.samples[i];
+
+                    if (familySpecificSampleIDs[thisSample["@id"]]) {
+                        numMatchingSamples++;
+                    }
+
+                    if (numMatchingSamples >= 2) {
+                        familySpecificSAs.push(sp);
+                        break;
+                    }
+                }
+            });
+
             return (
                 <div className={cls} key={idx} data-is-current-family={isCurrentFamily}>
                     { title }
-                    <CohortSummaryTable {...family} {...{ idx, idToGraphIdentifier, isCurrentFamily, sampleProcessing }} />
+                    <CohortSummaryTable {...family} sampleProcessing={familySpecificSAs} {...{ idx, idToGraphIdentifier, isCurrentFamily }} />
                 </div>
             );
         });
@@ -362,7 +394,6 @@ const CohortSummaryTabView = React.memo(function CohortSummaryTabView(props){
                     visibleDiseases={selectedDiseases} showZoomControls={false} enablePinchZoom={false} />
             );
         }
-
     }
 
     return (
