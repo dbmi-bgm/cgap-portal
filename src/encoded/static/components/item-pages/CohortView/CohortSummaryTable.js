@@ -14,7 +14,7 @@ export const CohortSummaryTable = React.memo(function CohortSummaryTable(props){
         proband: { '@id' : probandID } = {},
         original_pedigree = null,
         idToGraphIdentifier = {},
-        sampleProcessing = [] // todo: make sure only the sample objects for THIS FAMILY are passed in
+        sampleProcessing = []
     } = props;
 
     if (members.length === 0){
@@ -36,7 +36,7 @@ export const CohortSummaryTable = React.memo(function CohortSummaryTable(props){
         "processedFiles",
     ];
 
-    const originalNumCols = h2ColumnOrder.length;
+    const originalNumCols = h2ColumnOrder.length; // store # of columns before any multisample columns are added
 
     const columnTitles = {
         'sample' : (
@@ -74,33 +74,37 @@ export const CohortSummaryTable = React.memo(function CohortSummaryTable(props){
         ),
     };
 
-    function pushColumn(title) {
-        // adds a column to the end of the column order and to the column titles map
-        columnTitles[title] = title;
-        h2ColumnOrder.push(title);
-    }
+    const sampleProcessingData = {}; // maps sample analysis UUIDs to sample IDs to file data Objects for MSAs and samples
 
-    const sampleProcessingData = {};
-    const multiSampleOutputData = {};
-
-    sampleProcessing.forEach((sp, index) => {
+    let hasMSA = false;
+    // add multisample analysis column data to column order/titles and data object
+    sampleProcessing.forEach((sp) => {
         const { uuid, processed_files = [], completed_processes = [] , sample_processed_files = [] } = sp;
 
-        // add column titles
-        pushColumn(`~MSA|${ completed_processes[0] }|${ uuid }`); // push with some extra data to indicate MSA status
+        function pushColumn(title) {
+            // adds a column to the end of the column order and to the column titles map
+            // placed in a method for potential future use
+            columnTitles[title] = title;
+            h2ColumnOrder.push(title);
+        }
 
-        sampleProcessingData[uuid] = {};
-        multiSampleOutputData[uuid] = generateFileRenderObject(processed_files);
+        if (sample_processed_files.length > 0) {
+            // add column titles with some embedded data for identifying column by UUID & rendering pipeline title
+            pushColumn(`~MSA|${ completed_processes[0] }|${ uuid }`);
 
-        // populate with per sample data
-        sample_processed_files.forEach((set) => {
-            const { sample = {}, processed_files: procFiles = [] } = set;
-            sampleProcessingData[uuid][sample.accession] = generateFileRenderObject(procFiles);
-        });
+            sampleProcessingData[uuid] = {};
+            sampleProcessingData[uuid]["MSA"] = generateFileRenderObject(processed_files); // populate with multisample analysis objects
+
+            // populate with per sample data
+            sample_processed_files.forEach((set) => {
+                const { sample = {}, processed_files: procFiles = [] } = set;
+                sampleProcessingData[uuid][sample.accession] = generateFileRenderObject(procFiles);
+            });
+            hasMSA = true;
+        }
     });
 
-
-    function hasMSAFlag(string) {
+    function hasMSAFlag(string) { // checks if a string starts with an MSA flag
         return string.substring(0,5) === "~MSA|";
     }
 
@@ -108,12 +112,11 @@ export const CohortSummaryTable = React.memo(function CohortSummaryTable(props){
         return string.split("|")[2];
     }
 
-    const hasMSA = hasMSAFlag(h2ColumnOrder[h2ColumnOrder.length-1]); // if last column in columnTitles starts with MSA flag
-
     const rows = [];
     const membersWithoutSamples = [];
     const membersWithoutViewPermissions = [];
 
+    // counters for keeping track of groupings (for rendering samples from the same individual in the same color and ordering rows by individual)
     let individualGroup = 0;
     let sampleGroup = 0;
 
@@ -138,7 +141,7 @@ export const CohortSummaryTable = React.memo(function CohortSummaryTable(props){
 
             let fileOverallQuality = "PASS";
             let hasQm = true;
-            let numFail = 0;
+            let numFail = 0; // using these instead of quality value, since quality value can be extracted from numFail and numWarns (1 source of truth)
             let numWarn = 0;
 
             // figure out the file's overall quality status
@@ -285,7 +288,7 @@ export const CohortSummaryTable = React.memo(function CohortSummaryTable(props){
                 </span>
             );
         }
-        return renderArr; //matey
+        return renderArr;
     }
 
     function statusToIcon(status){
@@ -294,7 +297,7 @@ export const CohortSummaryTable = React.memo(function CohortSummaryTable(props){
                 return <i className="icon icon-check fas text-success mr-05"/>;
             case "FAIL":
                 return <i className="icon icon-times fas text-danger mr-05"/>;
-            case "WARN": // todo: what icon makes the most sense here
+            case "WARN":
                 return <i className="icon icon-exclamation-triangle fas text-warning mr-05"/>;
             default:
                 return null;
@@ -363,8 +366,7 @@ export const CohortSummaryTable = React.memo(function CohortSummaryTable(props){
             display_title: indvDisplayTitle = null,
             '@id' : indvId,
             error = null,
-            samples = [],
-            accession
+            samples = []
         } = individual;
 
         if (!indvDisplayTitle || !indvId){
@@ -576,7 +578,7 @@ export const CohortSummaryTable = React.memo(function CohortSummaryTable(props){
                     let colVal;
                     const hasValue = hasMSAFlag(colName);
                     if (hasMSAFlag(colName)) {
-                        const fileObjects = multiSampleOutputData[getUUIDFromMSATitle(colName)] || {};
+                        const fileObjects = sampleProcessingData[getUUIDFromMSATitle(colName)].MSA || {};
                         const extensions = Object.keys(fileObjects);
 
                         let renderArr = [];
@@ -645,3 +647,41 @@ export const CohortSummaryTable = React.memo(function CohortSummaryTable(props){
         </React.Fragment>
     );
 });
+CohortSummaryTable.propTypes = {
+    clinic_notes : PropTypes.string,
+    family_phenotypic_features : PropTypes.arrayOf(PropTypes.shape({
+        "@id": PropTypes.string,
+        "@type": PropTypes.arrayOf(PropTypes.string),
+        "display_title": PropTypes.string,
+        "principals_allowed": PropTypes.object,
+        "uuid": PropTypes.string
+    })),
+    idToGraphIdentifier : PropTypes.object,
+    idx : PropTypes.number,
+    isCurrentFamily : PropTypes.bool,
+    members : PropTypes.arrayOf(PropTypes.shape({
+        "@id" : PropTypes.string,
+        "@type" : PropTypes.arrayOf(PropTypes.string),
+        "accession" : PropTypes.string,
+        "age_at_death_units" : PropTypes.string,
+        "age_units" : PropTypes.string,
+        "display_title" : PropTypes.string,
+        "father" : PropTypes.object,
+        "is_deceased" : PropTypes.bool,
+        "is_infertile" : PropTypes.bool,
+        "is_no_children_by_choice" : PropTypes.bool,
+        "is_pregnancy" : PropTypes.bool,
+        "is_spontaneous_abortion" : PropTypes.bool,
+        "is_still_birth" : PropTypes.bool,
+        "is_termination_of_pregnancy" : PropTypes.string,
+        "mother" : PropTypes.object,
+        "principals_allowed" : PropTypes.object,
+        "sex" : PropTypes.string,
+        "status" : PropTypes.string,
+        "uuid" : PropTypes.string
+    })),
+    original_pedigree : PropTypes.arrayOf(PropTypes.object),
+    proband : PropTypes.object,
+    sampleProcessing: PropTypes.arrayOf(PropTypes.object),
+    timestamp : PropTypes.string
+};
