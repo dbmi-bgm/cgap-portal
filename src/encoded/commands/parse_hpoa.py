@@ -121,14 +121,14 @@ def check_hpo_id_and_note_problems(fname, hpoid, hpoid2uuid, problems):
     hpuid = hpoid2uuid.get(hpoid)
     if hpuid:
         return hpuid
-    prob = {fname: hpoid}
     not_found = problems.get('hpo_not_found', [])
-    if hpo_id in not_found:
-        fields = not_found.get(hpo_id, [])
+    fields = []
+    if hpoid in not_found:
+        fields = not_found.get(hpoid, [])
         if fname in fields:
             return None
-        fields.append(fname)
-    problems.setdefault('hpo_not_found', {}).update({hpo_id: fields})
+    fields.append(fname)
+    problems.setdefault('hpo_not_found', {}).update({hpoid: fields})
     return None
 
 
@@ -149,13 +149,17 @@ def write_outfile(terms, filename, pretty=False):
 
 
 def get_input_gen(input):
+    ''' depending on what is passed as input will create a generator
+        that returns lines from a webrequest or lines of a file
+    '''
     if input.startswith('http'):
         try:
-            with requests.get(input, stream=True) as r:
+            with requests.get(input, timeout=5) as r:
                 if r.encoding is None:
                     r.encoding = 'utf-8'
-                res = r.iter_lines(decode_unicode=True)
-                for l in res:
+                # res = r.iter_lines(decode_unicode=True)
+                res = r.text
+                for l in res.split('\n'):
                     yield l
         except Exception as e:
             print(e)
@@ -310,16 +314,18 @@ def main():  # pragma: no cover
                 problems.setdefault('redundant_annot', []).append(pheno_annot)  # (data, dis2pheno[ppos]))
                 continue
             evidence_items.append(pheno_annot)
-    print(len(evidence_items))
+    logger.info("after parsing annotation file we have {} evidence items".format(len(evidence_items)))
 
     # at this point we've gone through all the lines in the file
     # here we want to compare with what already exists in db
     patches = []
     sq = 'search/?type={}&status!=obsolete'.format(itype)
+    logger.info("COMPARING FILE ITEMS WITH CURRENT DB CONTENT")
+    logger.info("searching: {}".format(str(datetime.now())))
     res = search_metadata(sq, connection, is_generator=True)
     existing = 0
     uids2obsolete = []
-    logger.info('Comparing to existing evidence')
+    logger.info("comparing: {}".format(str(datetime.now())))
     for db_evi in res:
         rdb_evi = get_raw_form(db_evi)
         if rdb_evi in evidence_items:
@@ -327,10 +333,10 @@ def main():  # pragma: no cover
             evidence_items.remove(rdb_evi)
         else:
             uids2obsolete.append(rdb_evi.get('uuid'))
-
-    print('EXISTING: ', existing)
-    print('OBSOLETE: ', len(uids2obsolete))
-    print('NEW: ', len(evidence_items))
+    logger.info("result: {}".format(str(datetime.now())))
+    logger.info('{} EXISTING DB ITEMS WILL NOT BE CHANGED'.format(existing))
+    logger.info('{} EXISTING DB ITEMS WILL BE SET TO OBSOLETE'.format(len(uids2obsolete)))
+    logger.info('{} NEW ITEMS TO BE LOADED TO DB'.format(len(evidence_items)))
 
     obs_patch = [{'uuid': uid, 'status': 'obsolete'} for uid in uids2obsolete]
     patches = evidence_items + obs_patch
