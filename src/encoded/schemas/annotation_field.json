@@ -4,8 +4,8 @@
     "id": "/profiles/annotation_field.json",
     "$schema": "http://json-schema.org/draft-04/schema#",
     "type": "object",
-    "required": ["field_name", "institution", "project", "field_type", "schema_title"],
-    "identifyingProperties": ["uuid", "aliases", "field_name"],
+    "required": ["vcf_name_v0.2", "institution", "project", "field_type"],
+    "identifyingProperties": ["uuid", "aliases", "vcf_name_v0.2"],
     "additionalProperties": false,
     "mixinProperties": [
       { "$ref": "mixins.json#/schema_version" },
@@ -22,6 +22,11 @@
         "schema_version": {
             "default": "1"
         },
+        "no": {
+            "title": "Number",
+            "description": "Number on mapping table",
+            "type": "integer"
+        },
         "field_name": {
             "title": "Field Name",
             "description": "Name of the annotaion field name",
@@ -33,9 +38,24 @@
             "description": "Original name of the annotaion field name on vcf file",
             "type": "string"
         },
-        "vcf_name v0.2": {
+        "vcf_name_v0.2": {
             "title": "New Field name on VCF",
             "description": "Updated",
+            "type": "string"
+        },
+        "source_name_v0.2": {
+            "title": "Source Name (v0.2)",
+            "description": "Latest source name",
+            "type": "string"
+        },
+        "source_version_v0.2": {
+            "title": "Source Version (v0.2)",
+            "description": "Latest source version",
+            "type": "string"
+        },
+        "annotation_grouping": {
+            "title": "Annotation Grouping",
+            "description": "No idea what this is",
             "type": "string"
         },
         "is_list": {
@@ -140,6 +160,16 @@
             "title": "Field priority",
             "description": "Ranking number of the field for Facet in search view (lower is better)",
             "type": "integer"
+        },
+        "facet_grouping": {
+            "titile": "Facet Grouping",
+            "description": "Which group this facet belongs to",
+            "type": "string"
+        },
+        "separator": {
+            "title": "Separator",
+            "description": "dummy (this should be removed)",
+            "type": "string"
         },
         "links_to": {
             "title": "Linking To",

@@ -326,12 +326,4 @@ class AnnotationField(Item):
     name_key = 'field_name'
     schema = load_schema('encoded:schemas/annotation_field.json')
 
-    embedded_list = Item.embedded_list  # + lab_award_attribution_embed_list
-
-    @calculated_property(schema={
-        "title": "Display Title",
-        "description": "A calculated title for every object in 4DN",
-        "type": "string"
-    })
-    def display_title(self, request, field_name):
-        return field_name
+    embedded_list = Item.embedded_list

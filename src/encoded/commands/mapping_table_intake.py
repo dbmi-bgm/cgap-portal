@@ -62,7 +62,7 @@ def process_inserts(fname, fields):
                 continue
             for field_name, entry in zip(fields, row):
                 # handle int fields
-                if field_name in ['field_priority', 'column_priority', 'facet_priority']:
+                if field_name in ['field_priority', 'column_priority', 'facet_priority', 'no']:
                     if entry:
                         insert[field_name] = int(entry)
                 # handle bool fields
@@ -88,9 +88,9 @@ def process_inserts(fname, fields):
                         insert[field_name] = entry
             if not insert.get('mvp', False):  # ignore non-mvp items for now
                 continue
-            insert['project'] = '12a92962-8265-4fc0-b2f8-cf14f05db58b'
-            insert['institution'] = 'hms-dbmi'
-            insert['submitted_by'] = 'koray_kirli@hms.harvard.edu'
+            insert['project'] = 'encode-project' # XXX: Test
+            insert['institution'] = 'encode-institution' # XXX: Test
+            # insert['submitted_by'] = 'koray_kirli@hms.harvard.edu'
             inserts.append(insert)
     return inserts
 
