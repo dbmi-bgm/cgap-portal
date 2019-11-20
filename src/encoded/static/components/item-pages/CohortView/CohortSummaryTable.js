@@ -67,7 +67,8 @@ export const CohortSummaryTable = React.memo(function CohortSummaryTable(props){
 
     const sampleProcessingData = {}; // maps sample analysis UUIDs to sample IDs to file data Objects for MSAs and samples
 
-    let hasMSA = false;
+    let hasMSA = false; // if there is at least one sample processing object to render (w/2 samples in family)
+    let hasCombinedMSA = false; // if there is also a combined MSA (for rendering last row only when there's a combined VCF)
     // add multisample analysis column data to column order/titles and data object
     sampleProcessing.forEach((sp) => {
         const { uuid, processed_files = [], completed_processes = [] , sample_processed_files = [] } = sp;
@@ -93,6 +94,11 @@ export const CohortSummaryTable = React.memo(function CohortSummaryTable(props){
             });
             hasMSA = true;
         }
+
+        if (processed_files.length > 0) {
+            hasCombinedMSA = true;
+        }
+
     });
 
     function hasMSAFlag(string) { // checks if a string starts with an MSA flag
@@ -613,9 +619,7 @@ export const CohortSummaryTable = React.memo(function CohortSummaryTable(props){
                 <tbody>
                     { renderedRows }
                 </tbody>
-                <tfoot>
-                    { finalRow }
-                </tfoot>
+                { hasCombinedMSA ?  <tfoot>{ finalRow }</tfoot>: null }
             </table>
         </div>
     );
