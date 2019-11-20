@@ -21,6 +21,16 @@
         "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b"
     },
     {
+        "email": "dvuzman@research.bwh.harvard.edu",
+        "first_name": "Dana",
+        "last_name": "Vuzman",
+        "role": "director",
+        "uuid": "986b362f-4eb6-4a9c-8173-3ab267307e4b",
+        "groups": ["admin"],
+        "submits_for": ["hms-dbmi"],
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b"
+    },
+    {
         "email": "alexander_balashov@hms.harvard.edu",
         "first_name": "Alex",
         "last_name": "Balashov",
@@ -143,6 +153,36 @@
         "uuid": "f9524d43-01b5-4b71-94c6-32d2d09c2222",
         "groups": ["admin"],
         "submits_for": ["hms-dbmi"],
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b"
+    },
+    {
+        "email": "aghazani@bwh.harvard.edu",
+        "first_name": "Arezou",
+        "last_name": "Ghazani",
+        "role": "clinician",
+        "uuid": "f9524d43-01b5-4b71-94c6-32d2d09c3343",
+        "groups": ["admin"],
+        "submits_for": ["bwh"],
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b"
+    },
+    {
+        "email": "shira.rockowitz@childrens.harvard.edu",
+        "first_name": "Shira",
+        "last_name": "Rockowitz",
+        "role": "clinician",
+        "uuid": "f9524d43-01b5-4b71-94c6-32d2d09c4433",
+        "groups": ["admin"],
+        "submits_for": ["bch"],
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b"
+    },
+    {
+        "email": "guilherme_yamamoto@hms.harvard.edu",
+        "first_name": "Guilherme",
+        "last_name": "Yamamoto",
+        "role": "clinician",
+        "uuid": "f9524d43-01b5-4b71-94c6-32d2d09c5633",
+        "groups": ["admin"],
+        "submits_for": ["bch"],
         "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b"
     }
 ]
