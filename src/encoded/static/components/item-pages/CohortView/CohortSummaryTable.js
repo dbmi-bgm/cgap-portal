@@ -664,14 +664,14 @@ CohortSummaryTable.propTypes = {
         "is_pregnancy" : PropTypes.bool,
         "is_spontaneous_abortion" : PropTypes.bool,
         "is_still_birth" : PropTypes.bool,
-        "is_termination_of_pregnancy" : PropTypes.string,
+        "is_termination_of_pregnancy" : PropTypes.bool,
         "mother" : PropTypes.object,
         "principals_allowed" : PropTypes.object,
         "sex" : PropTypes.string,
         "status" : PropTypes.string,
         "uuid" : PropTypes.string
     })),
-    original_pedigree : PropTypes.arrayOf(PropTypes.object),
+    original_pedigree : PropTypes.object,
     proband : PropTypes.object,
     sampleProcessing: PropTypes.arrayOf(PropTypes.object),
     timestamp : PropTypes.string
