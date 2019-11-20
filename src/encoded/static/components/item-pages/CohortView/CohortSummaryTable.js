@@ -81,16 +81,16 @@ export const CohortSummaryTable = React.memo(function CohortSummaryTable(props){
         }
 
         if (sample_processed_files.length > 0) {
-            // add column titles with some embedded data for identifying column by UUID & rendering pipeline title
+            // add column titles with a flag & some embedded data for identifying column by UUID & rendering pipeline title
             pushColumn(`~MSA|${ completed_processes[0] }|${ uuid }`);
 
             sampleProcessingData[uuid] = {};
-            sampleProcessingData[uuid]["MSA"] = generateFileRenderObject(processed_files); // populate with multisample analysis objects
+            sampleProcessingData[uuid]["MSA"] = generateFileDataObject(processed_files); // populate with multisample analysis objects
 
             // populate with per sample data
             sample_processed_files.forEach((set) => {
                 const { sample = {}, processed_files: procFiles = [] } = set;
-                sampleProcessingData[uuid][sample.accession] = generateFileRenderObject(procFiles);
+                sampleProcessingData[uuid][sample.accession] = generateFileDataObject(procFiles);
             });
             hasMSA = true;
         }
@@ -101,7 +101,7 @@ export const CohortSummaryTable = React.memo(function CohortSummaryTable(props){
 
     });
 
-    function hasMSAFlag(string) { // checks if a string starts with an MSA flag
+    function hasMSAFlag(string) {
         return string.substring(0,5) === "~MSA|";
     }
 
@@ -117,7 +117,29 @@ export const CohortSummaryTable = React.memo(function CohortSummaryTable(props){
     let individualGroup = 0;
     let sampleGroup = 0;
 
-    function generateFileRenderObject(files) {
+    /**
+     * Takes in an array of processed_files/files and returns an object with file data structured for processing/render.
+     * @param {array} files An array of processed_files or files.
+     * @return {object} {
+     *      file_extension1: {
+     *          overall: <string>, (PASS|FAIL|WARN), // overall quality status for all files with this extension
+     *          files: <array> [
+     *              <objects> {
+     *                  numFail: <number>,
+     *                  numWarn: <number>,
+     *                  hasQm: <boolean>,
+     *                  fileURL: <string>,
+     *                  qmUrl: <string>
+     *              },
+     *              ...
+     *          ]
+     *      },
+     *      file_extensions2: {
+     *          ...
+     *      }
+     * }
+     */
+    function generateFileDataObject(files) {
         const allFiles = {};
 
         files.forEach((file) => {
@@ -211,6 +233,12 @@ export const CohortSummaryTable = React.memo(function CohortSummaryTable(props){
         return allFiles;
     }
 
+    /**
+     * Takes in a FileDataObject as produced by generateFileDataObject and convert into a JSX list of files and QCs.
+     * @param {object} fileObject   An object containing quality metric and file data.
+     * @param {string} ext          The extension of the files being submitted.
+     * @returns {JSX object}        Some renderable HTML component with a list of files and QCs, formatted for tables
+     */
     function convertFileObjectToJSX(fileObject, ext) {
         const renderArr = [];
         const { files, overall: overallQuality } = fileObject;
@@ -288,6 +316,11 @@ export const CohortSummaryTable = React.memo(function CohortSummaryTable(props){
         return renderArr;
     }
 
+    /**
+     * Helper function for QM handling; takes in a QM status and returns an icon.
+     * @param {string} status (PASS|FAIL|WARN)
+     * @return {JSX object} containing a fontawesome icon (or nothing, in the case of invalid input)
+     */
     function statusToIcon(status){
         switch (status) {
             case "PASS":
@@ -303,6 +336,8 @@ export const CohortSummaryTable = React.memo(function CohortSummaryTable(props){
 
     /**
      * Helper f(x) for QM handling; takes in a QM status and returns a bootstrap text color class.
+     * @param {string} status (PASS|FAIL|WARN)
+     * @return {string} Bootstrap text color class
      */
     function statusToTextClass(status) {
         switch(status) {
@@ -319,6 +354,10 @@ export const CohortSummaryTable = React.memo(function CohortSummaryTable(props){
 
     /**
      * Helper f(x) for QM handling; takes in # of QM failues and warnings, returns a QM status string.
+     * @param {number} numFail  Number of failing QM and/or QCs
+     * @param {number} numWarn  Number of failing QM and/or QCs
+     * 
+     * @return {string} (PASS|FAIL|WARN)
      */
     function getFileQuality(numFail, numWarn) {
         if (numFail) {
@@ -400,7 +439,7 @@ export const CohortSummaryTable = React.memo(function CohortSummaryTable(props){
                 workup_type : assayType
             } = sample;
 
-            const [ , , sampleID ] = samplePath.split("/"); // linter complained about arr destructuring... ¯\_(ツ)_/¯
+            const [ , , sampleID ] = samplePath.split("/");
 
             if (!sampleTitle || !samplePath){
                 rows.push({
@@ -434,25 +473,9 @@ export const CohortSummaryTable = React.memo(function CohortSummaryTable(props){
                     individualGroup,
                     sampleId: sampleID,
                     sampleGroup,
-                    processedFiles: generateFileRenderObject(procFilesWPermissions),
-                    rawFiles: generateFileRenderObject(rawFilesWPermissions),
+                    processedFiles: generateFileDataObject(procFilesWPermissions),
+                    rawFiles: generateFileDataObject(rawFilesWPermissions),
                     sampleIdx,
-                    sampleInfo: (
-                        sampleInfo ?
-                            <React.Fragment>{sampleInfo} { specimen_notes ?
-                                <span className="text-primary" data-tip={ specimen_notes }>* </span>
-                                : "" }
-                            </React.Fragment> : null
-                    ),
-                    sampleStatus: (
-                        <span>
-                            <i className="item-status-indicator-dot mr-05" data-status={sampleStatus}/>
-                            { Schemas.Term.toName("status", sampleStatus) }
-                        </span>
-                    ),
-                    visitInfo: (
-                        specimen_collection_date ? <span>{ specimen_collection_date }</span>: null
-                    ),
                     processingType: completed_processes[0] || null,
                     assayType
                 });
@@ -500,6 +523,7 @@ export const CohortSummaryTable = React.memo(function CohortSummaryTable(props){
         return renderedSummary;
     }
 
+    // sort so that proband is on top, then it's ordered by individuals, then by samples of the same individual
     const sortedRows = _(rows).chain().sortBy(function(row) {
         return row.sampleGroup;
     }).sortBy(function(row) {
@@ -524,7 +548,7 @@ export const CohortSummaryTable = React.memo(function CohortSummaryTable(props){
 
                 extensions.forEach((ext) => {
                     const jsx = convertFileObjectToJSX(fileData[ext], ext);
-                    renderArr = renderArr.concat(jsx); // add to render Arr (matey)
+                    renderArr = renderArr.concat(jsx);
                 });
 
                 colVal = (
@@ -539,9 +563,8 @@ export const CohortSummaryTable = React.memo(function CohortSummaryTable(props){
 
                 let renderArr = [];
                 extensions.forEach((ext) => {
-                    // generate new jsx
                     const jsx = convertFileObjectToJSX(allFileObjects[ext], ext);
-                    renderArr = renderArr.concat(jsx); // add to render Arr (matey)
+                    renderArr = renderArr.concat(jsx);
                 });
 
                 colVal = (
@@ -587,7 +610,7 @@ export const CohortSummaryTable = React.memo(function CohortSummaryTable(props){
                         extensions.forEach((ext) => {
                             // generate new jsx
                             const jsx = convertFileObjectToJSX(fileObjects[ext], ext);
-                            renderArr = renderArr.concat(jsx); // add to render Array
+                            renderArr = renderArr.concat(jsx);
                         });
 
                         colVal = (
@@ -614,7 +637,7 @@ export const CohortSummaryTable = React.memo(function CohortSummaryTable(props){
                 <thead>
                     { hasMSA ?
                         <tr>
-                            { // note: currently assumes that any cols after the initial 8 set in ColumnTitles are MSAs
+                            { // note: currently assumes that any cols after those set in ColumnTitles are MSAs
                                 <React.Fragment>
                                     <th colSpan={originalNumCols} className="hidden-th"/>
                                     <th colSpan={ Object.keys(columnTitles).length - originalNumCols }>Multi Sample Analysis</th>
@@ -647,7 +670,7 @@ export const CohortSummaryTable = React.memo(function CohortSummaryTable(props){
         </React.Fragment>
     );
 });
-CohortSummaryTable.propTypes = {
+CohortSummaryTable.propTypes = { // todo: update with required fields
     clinic_notes : PropTypes.string,
     family_phenotypic_features : PropTypes.arrayOf(PropTypes.shape({
         "@id": PropTypes.string,
