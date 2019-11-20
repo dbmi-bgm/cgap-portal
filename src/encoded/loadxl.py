@@ -33,7 +33,7 @@ ORDER = [
     'cohort',
     'individual',
     'sample',
-    'workflow'
+    'workflow',
 ]
 
 IS_ATTACHMENT = [
