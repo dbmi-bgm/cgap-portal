@@ -370,19 +370,15 @@ export const CohortSummaryTable = React.memo(function CohortSummaryTable(props){
             return;
         }
 
-        const genID = idToGraphIdentifier[indvId];
-        let indvLink = <a href={indvId} className="accession">{ indvDisplayTitle }</a>;
-        if (genID) {
-            indvLink = (
-                <div className="text-ellipsis-container">
-                    <span className="text-serif text-small gen-identifier">
-                        { genID }
-                    </span>
-                    { indvLink }
-                </div>
-            );
-        }
         const isProband = (probandID && probandID === indvId);
+        const genID = idToGraphIdentifier[indvId];
+
+        const indvLink = (
+            <div className={`${genID ? "text-ellipsis-container" : ""}`}>
+                { isProband ? <span className="font-weight-bold d-block">Proband</span> : null}
+                { genID ? <span className="text-serif text-small gen-identifier d-block text-center">{ genID }</span>: null}
+                <a href={indvId} className="accession d-block">{ indvDisplayTitle }</a>
+            </div>);
 
         samples.forEach(function(sample, sampleIdx){
             const {
@@ -392,8 +388,7 @@ export const CohortSummaryTable = React.memo(function CohortSummaryTable(props){
                 files = [],
                 processed_files = [],
                 completed_processes = [],
-                status: sampleStatus,
-                specimen_type: sampleInfo = null,
+                specimen_type = null,
                 specimen_collection_date = null,
                 specimen_notes = null,
                 workup_type : assayType
@@ -418,29 +413,24 @@ export const CohortSummaryTable = React.memo(function CohortSummaryTable(props){
                 });
 
                 rows.push({
-                    sample: <a href={samplePath} className="accession">{ sampleTitle }</a>,
                     individual : indvLink,
                     isProband,
+                    sample: (
+                        <React.Fragment>
+                            <span className="d-block">
+                                { specimen_type }
+                                { specimen_notes ? <span className="text-primary" data-tip={ specimen_notes }>*</span>: "" }
+                            </span>
+                            { specimen_collection_date ? <span data-tip="specimen collection date"><i className="mr-03 icon icon-fw icon-syringe fas text-primary"/>{ specimen_collection_date }</span>: null}
+                            <a href={samplePath} className="accession d-block">{ sampleTitle }</a>
+                        </React.Fragment>
+                    ),
                     individualGroup,
                     sampleId: sampleID,
                     sampleGroup,
                     processedFiles: generateFileRenderObject(procFilesWPermissions),
                     rawFiles: generateFileRenderObject(rawFilesWPermissions),
                     sampleIdx,
-                    sampleInfo,
-                    sampleStatus: (
-                        <span>
-                            <i className="item-status-indicator-dot mr-05" data-status={sampleStatus}/>
-                            { Schemas.Term.toName("status", sampleStatus) }
-                        </span>
-                    ),
-                    sampleCollectionDate: (
-                        specimen_collection_date ?
-                            <span> { specimen_collection_date } { specimen_notes ?
-                                <i className="icon icon-faw far icon-clipboard text-primary" data-tip={ specimen_notes }/>
-                                : "" }
-                            </span>: null
-                    ),
                     processingType: completed_processes[0] || null,
                     assayType
                 });
@@ -541,7 +531,6 @@ export const CohortSummaryTable = React.memo(function CohortSummaryTable(props){
 
             return (
                 <td key={colName} data-for-column={colName}
-                    data-tip={isProband && colName === "individual" ? "Proband" : null}
                     className={typeof row[colName] !== 'undefined' ? "has-value" : null}>
                     { colVal }
                 </td>
