@@ -26,4 +26,4 @@ Welcome to CGAP! We are a team of scientists, clinicians, and developers who aim
 * `cgaptest <http://fourfront-cgaptest.9wzadzju3p.us-east-1.elasticbeanstalk.com/>`_ for front-end and UX development
 * `cgapwolf <http://fourfront-cgapwolf.9wzadzju3p.us-east-1.elasticbeanstalk.com/>`_ for workflow development
 
-Be warned that features are under active development and may not be stable! Visit the production deployment for the best experience. For installation and more information on getting started, see our `documentation page <https://cgap-portal.readthedocs.io/en/latest/index.html>`_ .
+Be warned that features are under active development and may not be stable! Visit the production deployment for the best experience. For installation and more information on getting started, see our `documentation page <https://cgap-portal.readthedocs.io/en/latest/index.html>`_.

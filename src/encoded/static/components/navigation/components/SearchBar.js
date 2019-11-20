@@ -150,7 +150,7 @@ export class SearchBar extends React.PureComponent{
             searchBoxHasInput && 'has-input'
         ];
 
-        if (currentAction === 'selection'){
+        if (currentAction === 'selection' || currentAction === 'multiselect'){
             _.extend(query, _.omit(hrefParts.query || {}, 'q')); // Preserve facets (except 'q'), incl type facet.
         } else {
             _.extend(query, { 'type' : 'Item' });                // Don't preserve facets (expsettype=replicates, type=expset, etc.)
