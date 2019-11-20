@@ -28,9 +28,7 @@ export const CohortSummaryTable = React.memo(function CohortSummaryTable(props){
     const h2ColumnOrder = [
         "individual",
         "sample",
-        "sampleCollectionDate",
-        "sampleInfo",
-        "workupType",
+        "assayType",
         "rawFiles",
         "processingType",
         "processedFiles",
@@ -42,7 +40,7 @@ export const CohortSummaryTable = React.memo(function CohortSummaryTable(props){
         'sample' : (
             <React.Fragment>
                 <i className="icon icon-fw icon-vial fas mr-05 align-middle"/>
-                Sample ID
+                Sample
             </React.Fragment>
         ),
         'individual' : (
@@ -51,25 +49,18 @@ export const CohortSummaryTable = React.memo(function CohortSummaryTable(props){
                 Individual
             </React.Fragment>
         ),
-        'sampleCollectionDate' :  (
-            <React.Fragment>
-                <i className="icon icon-fw icon-syringe fas mr-05 align-middle"/>
-                <span className="d-none d-lg-inline ml-05">Sample Collection Date</span>
-            </React.Fragment>
-        ),
-        'sampleInfo' : "Sample Type",
-        'workupType' : "Workup Type",
+        'assayType' : "Assay Type",
         'rawFiles' : (
             <React.Fragment>
                 <i className="icon icon-fw icon-file-code fas mr-05 align-middle"/>
-                <span className="d-none d-lg-inline ml-05">Raw File(s)</span>
+                <span className="d-none d-lg-inline ml-05">Sequencing</span>
             </React.Fragment>
         ),
         'processingType' : "Processing Type",
         'processedFiles' : (
             <React.Fragment>
                 <i className="icon icon-fw icon-file-medical-alt fas mr-05 align-middle"/>
-                <span className="d-none d-lg-inline ml-05">Processed File(s)</span>
+                <span className="d-none d-lg-inline ml-05">Pipeline</span>
             </React.Fragment>
         ),
     };
@@ -405,7 +396,7 @@ export const CohortSummaryTable = React.memo(function CohortSummaryTable(props){
                 specimen_type: sampleInfo = null,
                 specimen_collection_date = null,
                 specimen_notes = null,
-                workup_type
+                workup_type : assayType
             } = sample;
 
             const [ , , sampleID ] = samplePath.split("/"); // linter complained about arr destructuring... ¯\_(ツ)_/¯
@@ -451,7 +442,7 @@ export const CohortSummaryTable = React.memo(function CohortSummaryTable(props){
                             </span>: null
                     ),
                     processingType: completed_processes[0] || null,
-                    workupType: workup_type
+                    assayType
                 });
             }
             sampleGroup++;
@@ -624,7 +615,7 @@ export const CohortSummaryTable = React.memo(function CohortSummaryTable(props){
                             // if flagged as a multiSampleAnalysis column, parse it for the appropriate data
                             if (typeof title === "string" && hasMSAFlag(title)) {
                                 const titleArr = title.split("|"); // if there isn't a proper title (undefined) for column, numbers based on index
-                                return <th key={`msa ${titleArr[2]}`}>{ titleArr[1] !== 'undefined' ? titleArr[1] : `Pipeline V${colIdx - 7}`}</th>;
+                                return <th key={`msa ${titleArr[2]}`}>{ titleArr[1] !== 'undefined' ? titleArr[1] : `Pipeline V${colIdx - originalNumCols}`}</th>;
                             }
                             return <th key={colName}>{ title }</th>;
                         }) }
