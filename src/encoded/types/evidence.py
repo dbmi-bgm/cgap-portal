@@ -12,7 +12,7 @@ from .base import (
 )
 
 
-def get_evidence_linked_items(request, rpaths, direction, filter=None):
+def get_evidence_linked_items(request, rpaths, direction):
     """ This function is generally useful for getting the items that are linked to
         others through an Evidence item so this is where it lives for now.
         To use it in a calculated property the linked Items in subject_item or object_item
@@ -33,23 +33,22 @@ def get_evidence_linked_items(request, rpaths, direction, filter=None):
         request - the request object
         paths - list of resource paths from the rev links
         direction - 'either subject or object'
-        filter - optional string to filter the resource path (usually the lower cased version of the item_type eg. phenotype)
     """
-    atids = []
+    uuids = []
     for evi in rpaths:
         ''' cannot use embedded frame so using the object frame and relying on the collection name to match
             the item type and always be part of the resource_path in the value - a bit hacky and might want
             to prefer to use another get_item_if_you_can for filtering by type but might not be performant
         '''
         dname = direction + '_item'
-        # import pdb; pdb.set_trace()
-        evi_item = get_item_if_you_can(request, evi, 'evidences')
+        # get frame=raw to stop evidence items from linking each other
+        evi_item = get_item_if_you_can(request, evi, 'evidences', frame='raw')
         if evi_item:
+            # this will just be a uuid
             ri_info = evi_item.get(dname)
-            if filter and filter not in ri_info:
-                continue
-            atids.append(ri_info)
-    return atids
+            if ri_info:
+                uuids.append(ri_info)
+    return uuids
 
 
 @abstract_collection(
