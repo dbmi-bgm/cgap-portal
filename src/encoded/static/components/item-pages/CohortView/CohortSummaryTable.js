@@ -89,7 +89,7 @@ export const CohortSummaryTable = React.memo(function CohortSummaryTable(props){
 
             // populate with per sample data
             sample_processed_files.forEach((set) => {
-                const { sample = {}, processed_files: procFiles = [] } = set;
+                const { sample = { accession: '' }, processed_files: procFiles = [] } = set;
                 sampleProcessingData[uuid][sample.accession] = generateFileDataObject(procFiles);
             });
             hasMSA = true;
@@ -167,10 +167,11 @@ export const CohortSummaryTable = React.memo(function CohortSummaryTable(props){
             if (qc_list.length > 0) {
                 // loop through all of the quality metrics and count the number of failures and warnings for this file
                 qc_list.forEach((qm) => {
-                    if (qm.value.overall_quality_status === "FAIL") {
+                    const { value : { overall_quality_status = null } } = qm;
+                    if (overall_quality_status === "FAIL") {
                         numFail++;
                         fileOverallQuality = "FAIL";
-                    } else if (qm.value.overall_quality_status === "WARN") {
+                    } else if (overall_quality_status === "WARN") {
                         numWarn++;
                         fileOverallQuality = (fileOverallQuality === "FAIL" ? "FAIL" : "WARN");
                     }
@@ -244,7 +245,7 @@ export const CohortSummaryTable = React.memo(function CohortSummaryTable(props){
         const { files, overall: overallQuality } = fileObject;
 
         if (files && files.length <= 1) {
-            if (files.length <= 0) {
+            if (files.length === 0) {
                 return;
             }
 
@@ -283,21 +284,22 @@ export const CohortSummaryTable = React.memo(function CohortSummaryTable(props){
                     { statusToIcon(overallQuality) } { ext.toUpperCase() }
                     (   {
                         files.map((file, i) => {
-                            const tooltips = calcTooltips(file.hasQm, file.numWarn, file.numFail);
+                            const { hasQm = false, numWarn = -1, numFail = -1, quality, qmUrl = "", status, fileUrl = "" } = file;
+                            const tooltips = calcTooltips(hasQm, numWarn, numFail);
 
                             return (
-                                <React.Fragment key={`${ext}-${file.fileUrl}`}>
-                                    <a href={ file.fileUrl || "" } rel="noopener noreferrer" target="_blank"
-                                        className={`${statusToTextClass(file.quality)}`} data-tip={tooltips[0]}>
+                                <React.Fragment key={`${ext}-${fileUrl}`}>
+                                    <a href={ fileUrl } rel="noopener noreferrer" target="_blank"
+                                        className={`${statusToTextClass(quality)}`} data-tip={tooltips[0]}>
                                         {i + 1}
                                     </a>
-                                    { file.hasQm ?
+                                    { hasQm ?
                                         <a
-                                            href={file.qmUrl || ""}
+                                            href={qmUrl}
                                             rel="noopener noreferrer"
                                             target="_blank"
                                             className={`${statusToTextClass(
-                                                getFileQuality(file.numFail, file.numWarn))} qc-status-${file.status}`}
+                                                getFileQuality(numFail, numWarn))} qc-status-${status}`}
                                             data-tip={tooltips[1]}
                                         >
                                             <sup>QC</sup>
@@ -356,7 +358,7 @@ export const CohortSummaryTable = React.memo(function CohortSummaryTable(props){
      * Helper f(x) for QM handling; takes in # of QM failues and warnings, returns a QM status string.
      * @param {number} numFail  Number of failing QM and/or QCs
      * @param {number} numWarn  Number of failing QM and/or QCs
-     * 
+     *
      * @return {string} (PASS|FAIL|WARN)
      */
     function getFileQuality(numFail, numWarn) {
@@ -536,7 +538,12 @@ export const CohortSummaryTable = React.memo(function CohortSummaryTable(props){
     let currIndvGroup = null; // Individual Group #
     const renderedRows = sortedRows.map(function(row, rowIdx) {
 
-        const { isProband = false, sampleIdx, sampleId } = row;
+        const {
+            isProband = false,
+            sampleIdx,
+            sampleId,
+            individualGroup
+        } = row;
         const rowCols = h2ColumnOrder.map(function(colName) {
 
             let colVal = row[colName] || " - ";
@@ -583,8 +590,8 @@ export const CohortSummaryTable = React.memo(function CohortSummaryTable(props){
         });
 
         // color code non-proband rows in alternating bands based on individual group
-        if (currIndvGroup !== row.individualGroup) {
-            currIndvGroup = row.individualGroup;
+        if (currIndvGroup !== individualGroup) {
+            currIndvGroup = individualGroup;
             isEven = !isEven;
         }
 

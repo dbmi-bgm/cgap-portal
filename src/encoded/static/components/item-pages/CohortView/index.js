@@ -290,7 +290,10 @@ const CohortSummaryTabView = React.memo(function CohortSummaryTabView(props){
     let cohortSummaryTables;
     if (familiesLen > 0) {
         cohortSummaryTables = families.map(function(family, idx){
-            const { original_pedigree: { display_title: pedFileName } = {} } = family;
+            const {
+                original_pedigree: { display_title: pedFileName } = {},
+                members = []
+            } = family;
             const cls = "summary-table-container family-index-" + idx;
             const isCurrentFamily = idx === pedigreeFamiliesIdx;
             const onClick = function(evt){
@@ -314,10 +317,11 @@ const CohortSummaryTabView = React.memo(function CohortSummaryTabView(props){
             // go through each member in the family and populate a list with all of their samplesIDs...
             // will match these up with those in sampleanalysis.samples to determine which to render on per family basis
             const familySpecificSampleIDs = {};
-            family.members.forEach((member) => {
+            members.forEach((member) => {
+                const { samples = [] } = member;
 
-                if (member.samples && member.samples.length > 0) {
-                    member.samples.forEach((sample) => {
+                if (samples && samples.length > 0) {
+                    samples.forEach((sample) => {
                         const { "@id" : id } = sample;
                         if (!familySpecificSampleIDs[id]) {
                             familySpecificSampleIDs[id] = true;
@@ -329,10 +333,11 @@ const CohortSummaryTabView = React.memo(function CohortSummaryTabView(props){
             const familySpecificSAs = [];
             // filter out sampleProcessing objects that have 2 or more matching samples, and pass ONLY THOSE through to cohortSummaryTable
             sample_processes.forEach((sp) => {
+                const { samples = [] } = sp;
                 let numMatchingSamples = 0;
 
-                for (let i = 0; i < sp.samples.length; i++) {
-                    const thisSample = sp.samples[i];
+                for (let i = 0; i < samples.length; i++) {
+                    const thisSample = samples[i];
 
                     if (familySpecificSampleIDs[thisSample["@id"]]) {
                         numMatchingSamples++;
