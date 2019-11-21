@@ -656,7 +656,7 @@ export const CohortSummaryTable = React.memo(function CohortSummaryTable(props){
                             // if flagged as a multiSampleAnalysis column, parse it for the appropriate data
                             if (typeof title === "string" && hasMSAFlag(title)) {
                                 const titleArr = title.split("|"); // if there isn't a proper title (undefined) for column, numbers based on index
-                                return <th key={`msa ${titleArr[2]}`}>{ titleArr[1] !== 'undefined' ? titleArr[1] : `Pipeline V${colIdx - originalNumCols}`}</th>;
+                                return <th key={`msa ${titleArr[2]}`}>{ titleArr[1] !== 'undefined' ? titleArr[1] : "Joint Call"}</th>;
                             }
                             return <th key={colName}>{ title }</th>;
                         }) }
