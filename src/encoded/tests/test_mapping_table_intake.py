@@ -193,4 +193,4 @@ def test_post_inserts(inserts, project, institution, testapp):
     """
     CONNECTION_URL = '/annotation_field'
     for item in inserts:
-        resp = testapp.post_json(CONNECTION_URL, item)
+        testapp.post_json(CONNECTION_URL, item, status=201)
