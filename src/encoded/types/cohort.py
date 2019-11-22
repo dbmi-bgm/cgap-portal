@@ -22,7 +22,7 @@ log = structlog.getLogger(__name__)
 
 @collection(
     name='cohorts',
-    unique_key='accession',
+    traversal_key='accession',
     properties={
         'title': 'Cohorts',
         'description': 'Listing of Cohorts',

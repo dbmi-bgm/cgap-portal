@@ -142,7 +142,7 @@ def property_closure(request, propname, root_uuid):
 
 @abstract_collection(
     name='files',
-    unique_key='accession',
+    traversal_key='accession',
     acl=ALLOW_SUBMITTER_ADD,
     properties={
         'title': 'Files',
@@ -478,7 +478,7 @@ class File(Item):
 
 @collection(
     name='files-fastq',
-    unique_key='accession',
+    traversal_key='accession',
     properties={
         'title': 'FASTQ Files',
         'description': 'Listing of FASTQ Files',
@@ -528,7 +528,7 @@ class FileFastq(File):
 
 @collection(
     name='files-processed',
-    unique_key='accession',
+    traversal_key='accession',
     properties={
         'title': 'Processed Files',
         'description': 'Listing of Processed Files',
@@ -593,7 +593,7 @@ class FileProcessed(File):
 
 @collection(
     name='files-reference',
-    unique_key='accession',
+    traversal_key='accession',
     properties={
         'title': 'Reference Files',
         'description': 'Listing of Reference Files',

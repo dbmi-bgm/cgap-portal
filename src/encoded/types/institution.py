@@ -41,7 +41,7 @@ ALLOW_EVERYONE_VIEW_AND_SUBMITTER_EDIT = [
 
 @collection(
     name='institutions',
-    unique_key='institution:name',
+    traversal_key='institution:name',
     properties={
         'title': 'Institutions',
         'description': 'Listing of Institutions',

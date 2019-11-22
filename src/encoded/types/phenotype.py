@@ -11,7 +11,7 @@ from .base import (
 
 @collection(
     name='phenotypes',
-    unique_key='phenotype:hpo_id',
+    traversal_key='phenotype:hpo_id',
     lookup_key='phenotype_name',
     properties={
         'title': 'Phenotypes',

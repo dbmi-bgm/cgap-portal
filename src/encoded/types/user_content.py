@@ -21,7 +21,7 @@ import requests
 
 @abstract_collection(
     name='user-contents',
-    unique_key='user_content:name',
+    traversal_key='user_content:name',
     properties={
         'title': "User Content Listing",
         'description': 'Listing of all types of content which may be created by people.',
@@ -92,7 +92,7 @@ class UserContent(Item):
 
 @collection(
     name='static-sections',
-    unique_key='user_content:name',
+    traversal_key='user_content:name',
     properties={
         'title': 'Static Sections',
         'description': 'Static Sections for the Portal',

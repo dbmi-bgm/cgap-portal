@@ -31,7 +31,7 @@ def includeme(config):
 
 @collection(
     name='individuals',
-    unique_key='accession',
+    traversal_key='accession',
     properties={
         'title': 'Individuals',
         'description': 'Listing of Individuals',
@@ -97,7 +97,7 @@ class Individual(Item):
 
 @collection(
     name='samples',
-    unique_key='accession',
+    traversal_key='accession',
     properties={
         'title': 'Samples',
         'description': 'Listing of Samples',
@@ -125,7 +125,7 @@ class SampleProcessing(Item):
 
 @collection(
     name='disorders',
-    unique_key='disorder:disorder_id',
+    traversal_key='disorder:disorder_id',
     properties={
         'title': 'Disorders',
         'description': 'Listing of Disorders',
@@ -151,7 +151,7 @@ class Disorder(Item):
 
 @collection(
     name='genes',
-    unique_key='gene:gene_id',
+    traversal_key='gene:gene_id',
     lookup_key='preferred_symbol',
     properties={
         'title': 'Genes',
@@ -202,7 +202,7 @@ class Document(ItemWithAttachment, Item):
 
 @collection(
     name='file-formats',
-    unique_key='file_format:file_format',
+    traversal_key='file_format:file_format',
     lookup_key='file_format',
     properties={
         'title': 'File Formats',

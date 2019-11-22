@@ -20,7 +20,7 @@ import re
 
 @collection(
     name='projects',
-    unique_key='project:name',
+    traversal_key='project:name',
     properties={
         'title': 'Projects',
         'description': 'Listing of projects',
