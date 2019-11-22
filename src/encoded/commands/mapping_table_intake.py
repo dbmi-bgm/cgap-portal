@@ -91,6 +91,9 @@ def process_inserts(fname, fields):
             insert['project'] = 'encode-project' # XXX: Test
             insert['institution'] = 'encode-institution' # XXX: Test
             # insert['submitted_by'] = 'koray_kirli@hms.harvard.edu'
+            # XXX: Hard coded stripping of prefix, see vep in mapping table
+            # if insert.get('sub_embedding_group', None):
+            #     insert['vcf_name_v0.2'] = ''.join(insert['vcf_name_v0.2'].split('_')[1:])
             inserts.append(insert)
     return inserts
 
@@ -293,7 +296,7 @@ def generate_variant_schema(var_props, cols, facs):
 def write_schema(schema, fname):
     """ Writes the given schema (JSON) to the given file 'fname' """
     with open(fname, 'w+') as out:
-        json.dump(schema, out)
+        json.dump(schema, out, indent=4)
     logger.info('Successfully wrote schema: %s to file: %s\n' % (schema['title'], fname))
 
 

@@ -48,29 +48,22 @@ def test_VCFParser_single_record_full(single_record):
         assert field in EXPECTED_ANNOVAR_FIELDS
     for top_level_field in result:
         assert top_level_field in RESULT_EXPECTED_FIELDS
-    assert result['QD'] == 29.28
+    assert result['QD'] == 33.66
     assert result['MLEAC'] == [2]
-    assert result['MQ'] == 65.65
-    assert result['ANNOVAR']['Func.ensGene'][0] == 'intergenic'
-    assert result['ANNOVAR']['Func.knownGene'][0] == 'intergenic'
+    assert result['MQ'] == 44.51
     assert result['ANNOVAR']['cytoBand'][0] == '1p36.33'
-    assert len(result['VEP']['Location'].keys()) == 7 # varying entry amount
-    assert len(result['VEP']['Allele'].keys()) == 7
+    assert len(result['VEP']['Location'].keys()) == 2 # varying entry amount
+    assert len(result['VEP']['Allele'].keys()) == 2
     assert len(result['VEP']['UNIPARC'].keys()) == 2
-    assert len(result['VEP']['ENSP'].keys()) == 4
-    assert result['VEP']['Codons'][3] == 'Atg/Gtg'
+    assert len(result['VEP']['ENSP'].keys()) == 2
+    assert result['VEP']['Codons'][0] == 'Ggc/Agc'
     assert result['dbNSFP']['codon_degeneracy'][0] == '0'
-    assert result['dbNSFP']['CADD_raw'][0] == '1.955781'
     for key in result['CADD'].keys(): # all entries should have 3
         assert len(result['CADD'][key].keys()) == 3
     for key in result['genomicSuperDups'].keys(): # all entries should have 2
         assert len(result['genomicSuperDups'][key].keys()) == 2
-    assert result['dgvMerged']['name'][0] == '585'
-    assert result['dgvMerged']['name'][5] == '73'
-    assert result['dgvMerged']['varType'][1] == 'loss'
-    assert result['dgvMerged']['pubMedId'][11] == '20981092'
     assert result['Chrom'] == 'chr1'
-    assert result['Ref'] == 'A'
+    assert result['Ref'] == 'G'
     assert result['ID'] is None
 
 

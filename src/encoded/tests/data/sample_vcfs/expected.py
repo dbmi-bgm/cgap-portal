@@ -1,15 +1,14 @@
 # contains expected stuff for test_ingest_vcf
 
 
-SINGLE_RECORD_FULL = './src/encoded/tests/data/sample_vcfs/single_record_full.vcf'
-EXPECTED_ANNOTATION_FIELDS = ['MUTANNO', 'ANNOVAR', 'SNPEFF', 'SNPEFFLOF',
-                              'SNPEFFNMD', 'VEP', '1000GP', 'ESP6500', 'ExAC',
+SINGLE_RECORD_FULL = './src/encoded/tests/data/sample_vcfs/new_vcf.vcf'
+EXPECTED_ANNOTATION_FIELDS = ['MUTANNO', 'ANNOVAR', 'VEP', '1000GP', 'ESP6500', 'ExAC',
                               'ExACnonpsych', 'ExACnonTCGA', 'KAVIAR', 'UK10K',
                               'TOPmed', 'dbSNP', 'gnomAD', 'gnomADexome',
                               'MaxPopAF', 'dbNSFP', 'CADD', 'SpliceAI',
                               'INTERVAR', 'CLINVAR', 'genomicSuperDups',
                               'simpleRepeat', 'rmsk', 'nestedRepeats',
-                              'microsat', 'dgvMerged']
+                              'microsat']
 EXPECTED_GENERIC_FIELDS = ['AC', 'AF', 'AN', 'BaseQRankSum', 'ClippingRankSum',
                            'DB', 'DP', 'DS', 'END', 'ExcessHet', 'FS',
                            'HaplotypeScore', 'InbreedingCoeff', 'MLEAC',
