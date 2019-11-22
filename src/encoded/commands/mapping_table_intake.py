@@ -11,9 +11,14 @@ EPILOG = __doc__
 
 
 def process_fields(row):
-    """
-    Takes in the row of field names and processes them
-    Based on what Koray did for the current mp.csv
+    """ Takes in the row of field names and processes them. This involves replacing
+        spaces, ignoring '#' commented out fields and dropping comments (like this)
+
+    Args:
+        row: row of fields to be processed from the mapping table
+
+    Returns:
+        list of fields
     """
     fields = []
     for name in row:
@@ -26,9 +31,13 @@ def process_fields(row):
 
 
 def read_mapping_table(fname):
-    """
-        Reads mapping table from fname
-        Produces: Version, Date, list of fields
+    """ Reads mapping table from fname
+
+    Args:
+        fname: mapping table location
+
+    Returns:
+        3 tuple - version, date, fields
     """
     VERSION, DATE, FIELDS = None, None, None
     with open(fname, 'r') as f:
@@ -48,10 +57,14 @@ def read_mapping_table(fname):
 
 
 def process_inserts(fname, fields):
-    """
-        Processes the annotation fields in the mapping table to produce inserts
-        Creates a list of inserts
-        Currently should create 887 inserts based on latest MP
+    """ Processes the annotation fields in the mapping table to produce inserts
+
+    Args:
+        fname: mapping table location
+        fields: list of fields on the table
+
+    Returns:
+        list of inserts
     """
     inserts = []
     with open(fname, 'r') as f:
@@ -99,9 +112,13 @@ def process_inserts(fname, fields):
 
 
 def get_sample_inserts(inserts):
-    """
-        Filters inserts for those that are mvp and sample
-        Meant to be passed to generate_properties
+    """ Filters inserts for those that are mvp and sample
+
+    Args:
+        inserts: all inserts produced by the previous function
+
+    Returns:
+        list of inserts that are 'samples'
     """
     mvp_list = [i for i in inserts if i.get('mvp')]
     samples = [i for i in mvp_list if i.get('scope') == 'sample']
@@ -110,9 +127,13 @@ def get_sample_inserts(inserts):
 
 
 def get_variant_inserts(inserts):
-    """
-        Filters inserts for those that are mvp and not sample
-        Meant to be passed to generate_properties
+    """ Filters inserts for those that are mvp and not sample
+
+    Args:
+        inserts: all inserts produced by 'process_inserts'
+
+    Returns:
+        list of inserts that are variants
     """
     mvp_list = [i for i in inserts if i.get('mvp')]
     variants = [i for i in mvp_list if i.get('scope') != 'sample']
@@ -120,7 +141,15 @@ def get_variant_inserts(inserts):
 
 
 def generate_properties(inserts, variant=True):
-    """ Generates sample variant or variant schema properties """
+    """ Generates sample variant or variant schema properties
+
+    Args:
+        inserts: result of one of the above two functions
+        variant: boolean indicating if we are building the variant schema
+
+    Returns:
+        3 tuples of the properties, columns and facets
+    """
     props = OrderedDict()
     cols = OrderedDict()
     facs = OrderedDict()
@@ -232,7 +261,11 @@ def generate_properties(inserts, variant=True):
 
 
 def add_default_schema_fields(schema):
-    """ Adds default schema fields """
+    """ Adds default schema fields
+
+    Args:
+        schema: schema to add fields to
+    """
     schema['$schema'] = 'http://json-schema.org/draft-04/schema#'
     schema['type'] = 'object'
     schema['required'] = ['institution', 'project']
@@ -252,8 +285,13 @@ def add_default_schema_fields(schema):
 
 
 def generate_variant_sample_schema(sample_props):
-    """
-        Builds the variant_sample.json schema based on sample_props
+    """ Builds the variant_sample.json schema based on sample_props
+
+    Args:
+        sample_props: first output of generate_properties
+
+    Returns:
+        Variant sample schema
     """
     schema = {}
     add_default_schema_fields(schema)
@@ -279,7 +317,16 @@ def generate_variant_sample_schema(sample_props):
 
 
 def generate_variant_schema(var_props, cols, facs):
-    """ Creates variant.json schema """
+    """  Builds the variant.json schema based on var_props
+
+    Args:
+        sample_props: first output of generate_properties for variant
+        cols: second output of generate_properties for variant
+        facs: third output of generate_properties for variant
+
+    Returns:
+        Variant schema
+    """
     schema = {}
     add_default_schema_fields(schema)
     schema['title'] = 'Variants'
@@ -294,7 +341,12 @@ def generate_variant_schema(var_props, cols, facs):
 
 
 def write_schema(schema, fname):
-    """ Writes the given schema (JSON) to the given file 'fname' """
+    """ Writes the given schema (JSON) to the given file 'fname'
+
+    Args:
+        schema: dictionary to write as json as the schema
+        fname: file to write out to
+    """
     with open(fname, 'w+') as out:
         json.dump(schema, out, indent=4)
     logger.info('Successfully wrote schema: %s to file: %s\n' % (schema['title'], fname))
