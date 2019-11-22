@@ -7,7 +7,7 @@ from snovault import (
 from .base import (
     Item,
 )
-from .evidence import get_evidence_linked_items
+# from .evidence import get_evidence_linked_items
 
 
 @collection(
@@ -22,10 +22,10 @@ class Disorder(Item):
     schema = load_schema('encoded:schemas/disorder.json')
     embedded_list = []
     name_key = 'disorder_id'
-    rev = {
-        'as_subject_evidence': ('Evidence', 'subject_item'),
-        'as_object_evidence': ('Evidence', 'object_item'),
-    }
+    # rev = {
+    #    'as_subject_evidence': ('Evidence', 'subject_item'),
+    #    'as_object_evidence': ('Evidence', 'object_item'),
+    # }
 
     @calculated_property(schema={
         "title": "Display Title",
@@ -35,16 +35,16 @@ class Disorder(Item):
     def display_title(self, disorder_name):
         return disorder_name
 
-    @calculated_property(schema={
-        "title": "Phenotypes",
-        "description": "Phenotypes associated with this Disorder.",
-        "type": "array",
-        "items": {
-            "title": "Phenotypic Features",
-            "type": "string",
-            "linkTo": "Phenotype"
-        }
-    })
-    def phenotype_features(self, request):
-        evi_as_subj = self.rev_link_atids(request, 'as_subject_evidence')
-        return get_evidence_linked_items(request, evi_as_subj, 'object')
+    # @calculated_property(schema={
+    #     "title": "Phenotypes",
+    #     "description": "Phenotypes associated with this Disorder.",
+    #     "type": "array",
+    #     "items": {
+    #         "title": "Phenotypic Features",
+    #         "type": "string",
+    #         "linkTo": "Phenotype"
+    #     }
+    # })
+    # def phenotype_features(self, request):
+    #     evi_as_subj = self.rev_link_atids(request, 'as_subject_evidence')
+    #     return get_evidence_linked_items(request, evi_as_subj, 'object')

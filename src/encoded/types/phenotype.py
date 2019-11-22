@@ -7,7 +7,7 @@ from snovault import (
 from .base import (
     Item
 )
-from .evidence import get_evidence_linked_items
+# from .evidence import get_evidence_linked_items
 
 
 @collection(
@@ -30,10 +30,10 @@ class Phenotype(Item):
         'parents.hpo_id'
     ]
     name_key = 'hpo_id'
-    rev = {
-        'as_subject_evidence': ('Evidence', 'subject_item'),
-        'as_object_evidence': ('Evidence', 'object_item'),
-    }
+    # rev = {
+    #     'as_subject_evidence': ('Evidence', 'subject_item'),
+    #     'as_object_evidence': ('Evidence', 'object_item'),
+    # }
 
     @calculated_property(schema={
         "title": "Display Title",
@@ -45,16 +45,16 @@ class Phenotype(Item):
             return phenotype_name
         return hpo_id
 
-    @calculated_property(schema={
-        "title": "Linked Disorders",
-        "description": "Disorders linked to this Phenotye.",
-        "type": "array",
-        "items": {
-            "title": "Linked Disorders",
-            "type": "string",
-            "linkTo": "Disorder"
-        }
-    })
-    def associated_disorders(self, request):
-        evi_as_subj = self.rev_link_atids(request, 'as_object_evidence')
-        return get_evidence_linked_items(request, evi_as_subj, 'subject')
+    # @calculated_property(schema={
+    #     "title": "Linked Disorders",
+    #     "description": "Disorders linked to this Phenotye.",
+    #     "type": "array",
+    #     "items": {
+    #         "title": "Linked Disorders",
+    #         "type": "string",
+    #         "linkTo": "Disorder"
+    #     }
+    # })
+    # def associated_disorders(self, request):
+    #     evi_as_subj = self.rev_link_atids(request, 'as_object_evidence')
+    #     return get_evidence_linked_items(request, evi_as_subj, 'subject')
