@@ -249,9 +249,9 @@ def generate_properties(inserts, variant=True):
         if variant:
             update(props, get_prop(obj))
             if obj.get('facet_priority'):
-                facs[obj['field_name']] = {'title': obj['schema_title']}
+                facs[obj['vcf_name_v0.2']] = {'title': obj['schema_title']}
             if obj.get('column_priority'):
-                cols[obj['field_name']] = {'title': obj['schema_title']}
+                cols[obj['vcf_name_v0.2']] = {'title': obj['schema_title']}
         else:
             if obj.get('sub_embedding_group'):
                 continue

@@ -7,15 +7,28 @@ from collections import OrderedDict
 
 logger = logging.getLogger(__name__)
 EPILOG = __doc__
+ENCODING = {
+    '%2C': ',',
+    '%20': ' ',
+    '%7E': '~',
+    '%3D': '=',
+    '%7C': '|',
+    '%3B': ';'
+}
 
-# might be useful
+
 class VCFParserException(Exception):
+    """
+    Specific type of exception we'd like to be able to throw if we find something
+    wrong at this stage of VCF Ingestion
+    """
     pass
 
 
 class VCFParser(object):
     """
-    Wrapper class for 'vcf' that handles some additional things for us
+    Wrapper class for 'vcf' that enforces but the VCF specific format rules and
+    the annotated VCF format rules specified by us
     """
 
     def __init__(self, _vcf, variant, sample):
@@ -35,6 +48,7 @@ class VCFParser(object):
         self.annotation_keys = OrderedDict()
         self.field_keys = OrderedDict()
         self.format = OrderedDict()
+        self.sub_embedded_mapping = OrderedDict()
         self.read_vcf_metadata()
         self.parse_vcf_fields()
 
@@ -47,8 +61,7 @@ class VCFParser(object):
             if field not in self.annotation_keys:
                 self.field_keys[field] = True
 
-    @staticmethod
-    def parse_vcf_info(info):
+    def parse_vcf_info(self, info):
         """ Helper function for parse_vcf_fields that handles parsing the 'info'
             object containing a header listing the fields
             Only needed for annotations - other fields will work as is
@@ -63,9 +76,27 @@ class VCFParser(object):
             s = s.strip()
             s = s.strip('"')
             s = s.strip("'")
-            return s
-        entries = info.desc.split(':')[1:][0].split('|')  # specific to format
-        return list(map(_strip, entries))
+            return s.lower()
+
+        def _verify_in_schema(field, sub_group=None):
+            if sub_group:
+                if field in self.variant_schema['properties'][sub_group]['items']['properties']:
+                    return field
+            if field in self.variant_schema['properties'] or field.lower() in self.variant_schema['properties']:
+                return field
+            return 'DROPPED'
+
+        if 'Subembedded' in info.desc:  # restricted name in INFO description
+            sub_embedded = _strip(info.desc.split(':')[1:2][0])
+            self.sub_embedded_mapping[info.id] = sub_embedded
+            entries = info.desc.split(':')[3:][0].split('|')
+            entries = list(map(lambda f: info.id.lower() + '_' + _strip(f), entries))
+            entries = list(map(lambda f: _verify_in_schema(f, sub_embedded), entries))
+        else:
+            entries = info.desc.split(':')[1:][0].split('|')
+            entries = list(map(lambda f: info.id.lower() + '_' + _strip(f), entries))
+            entries = list(map(_verify_in_schema, entries))
+        return entries
 
     def parse_vcf_fields(self):
         """ Populates self.format with the annotation format
@@ -77,58 +108,6 @@ class VCFParser(object):
         for key in self.field_keys.keys():
             if key in self.reader.infos.keys():
                 self.format[key] = self.reader.infos[key].type
-
-    @staticmethod
-    def process_field_value(type, value, allow_array=True):
-        """ Casts the given value to the type given by 'type'
-
-        Args:
-            type: type to cast value to
-            value: value for the field we processing
-            allow_array: boolean on whether or not we should try to parse an array
-
-        Returns:
-            casted value
-
-        Raises:
-            VCFParserException if there is a type we did not expect
-        """
-        if type == 'string':
-            return str(value)
-        elif type == 'integer':
-            return int(value)
-        elif type == 'number':
-            return float(value)
-        elif type == 'array':
-            if allow_array:
-                sub_type = props['items']['type']
-                items = value.split('~')
-                return list(map(lambda v: process_field_value(sub_type, v, allow_array=False)))
-        else:
-            raise VCFParserException('type was not one of: string, integer, number, array')
-
-    def process_variant_value(self, field, value, key):
-        """ Given a field, check the variant schema for the type of that field and cast
-        the given value to that type
-
-        Args:
-            field: name of the field we are looking to process. This should exist somewhere
-            in the schema properties either at the top level or as a sub-embedded object
-            value: value of the field to be cast
-            key: annotation field that this field is part of (if applicable)
-
-        Returns:
-            casted value
-
-        Raises:
-            VCFParserException if the given field does not exist
-        """
-        props = self.variant_schema['properties']
-        if field not in props:
-            if field not in props[key]['items']['properties']:
-                raise VCFParserException('Tried to check a variant field that does not exist on the schema')
-        type = props[field]['type']
-        return self.process_field_value(type, value)
 
     def get_annotation_fields(self, list=False):
         """ Getter for annotation fields as list or dict
@@ -159,8 +138,32 @@ class VCFParser(object):
             return self.field_keys.keys()
 
     def get_record(self):
-        """ Uses self.reader as an iterator to get the next record """
+        """ Uses self.reader as an iterator to get the next record
+
+        Returns:
+            next record on VCF
+        """
         return next(self.reader)
+
+    def get_sub_embedded_label(self, annotation):
+        """ Gets the sub_embedded_group of the given annotation type
+
+        Args:
+            annotation: name of annotation to check (VEP)
+
+        Returns:
+            sub_embedding_group on the variant schema
+
+        Raises:
+            VCFParserException if the sub_embedding_group on the VCF does not match
+            what we got from the mapping table
+        """
+        if annotation not in self.sub_embedded_mapping:
+            return None
+        grouping = self.sub_embedded_mapping[annotation]
+        if grouping not in self.variant_schema['properties']:
+            raise VCFParserException('Sub_embedding_group for %s from the vcf does not match the schema' % annotation)
+        return grouping
 
     @staticmethod
     def parse_annotation_field(s):
@@ -199,6 +202,70 @@ class VCFParser(object):
         result['Format'] = record.FORMAT
         result['samples'] = record.samples
 
+    def process_field_value(self, type, value, sub_type=None):
+        """ Casts the given value to the type given by 'type'
+
+        Args:
+            type: type to cast value to
+            value: value for the field we processing
+            allow_array: boolean on whether or not we should try to parse an array
+
+        Returns:
+            casted value
+
+        Raises:
+            VCFParserException if there is a type we did not expect
+        """
+        if type == 'string':
+            def fix_encoding(val):  # decode restricted characters
+                for encoded, decoded in ENCODING.items():
+                    val = val.replace(encoded, decoded)
+                return val
+            return fix_encoding(value)
+        elif type == 'integer':
+            try:
+                return int(value)
+            except ValueError: # required if casting string->float->int, such as '0.000'
+                return int(float(value))
+        elif type == 'number':
+            return float(value)
+        elif type == 'array':
+            if sub_type:
+                items = value.split('~')
+                return list(map(lambda v: self.process_field_value(sub_type, v, sub_type=None), items))
+        else:
+            raise VCFParserException('type was not one of: string, integer, number, array')
+
+    def process_variant_value(self, field, value, key=''):
+        """ Given a field, check the variant schema for the type of that field and cast
+        the given value to that type
+
+        Args:
+            field: name of the field we are looking to process. This should exist somewhere
+            in the schema properties either at the top level or as a sub-embedded object
+            value: value of the field to be cast
+            key: annotation field (sub-embedded) that this field is part of
+
+        Returns:
+            casted value
+
+        Raises:
+            VCFParserException if the given field does not exist
+        """
+        props = self.variant_schema['properties']
+        sub_type = None
+        sub_embedded_group = self.sub_embedded_mapping.get(key)
+        if field not in props:  # check if sub-embedded field
+            if sub_embedded_group and field in props[sub_embedded_group]['items']['properties']:
+                type = props[sub_embedded_group]['items']['properties'][field]['type']
+                if type == 'array':
+                    sub_type = props[sub_embedded_group]['items']['properties'][field]['items']['type']
+            else:
+                raise VCFParserException('Tried to check a variant field that does not exist on the schema')
+        else:
+            type = props[field]['type']
+        return self.process_field_value(type, value, sub_type)
+
     def parse_vcf_record(self, record):
         """ Produces a dictionary containing all the annotation fields for this record
 
@@ -225,6 +292,9 @@ class VCFParser(object):
 
         Args:
             record: a single row in the VCF to parse, grabbed from 'vcf'
+
+        Returns:
+            dictionary of parsed VCF entry
         """
         result = {}
         self.parse_standard_vcf_fields(record, result)
@@ -236,30 +306,37 @@ class VCFParser(object):
                 continue
 
             # handle annotation fields
-            result[key] = {}
             annotations = None
             raw = record.INFO.get(key, None)
             if raw:
                 annotations = self.parse_annotation_field(raw)
+
+            # if this annotation field has values, process them
             if annotations:
+
+                # annotation could be multi-valued (VEP), split into groups
                 for g_idx, group in enumerate(annotations):
+
+                    # in nearly all cases there are multiple fields. match them
+                    # up with format
                     for f_idx, field in enumerate(group):
                         if field:
-                            field_name = self.format[key][f_idx]
-                            if not result[key].get(field_name):
-                                result[key][field_name] = {}
-                            if '~' in field:  # XXX: infer list for now
-                                result[key][field_name][g_idx] = field.split('~')
-                            else:
-                                result[key][field_name][g_idx] = field
-        return result
+                            fn = self.format[key][f_idx]
+                            if fn == 'DROPPED':  # special marker for non-MVP fields
+                                continue
 
-    def format_vcf_record(self, result):
-        """
-            TODO: process the 'result' generated above into a variant/sample
-            variant item
-        """
-        pass
+                            # if this annotation is a sub-embedded-grouping, process
+                            # it as such
+                            if key in self.sub_embedded_mapping:
+                                sub_embedded_group = self.sub_embedded_mapping[key]
+                                if sub_embedded_group not in result:  # create sub-embedded group if not there
+                                    result[sub_embedded_group] = {}
+                                if g_idx not in result[sub_embedded_group]:
+                                    result[sub_embedded_group][g_idx] = {}
+                                result[sub_embedded_group][g_idx][fn] = self.process_variant_value(fn, field, key)
+                            else:
+                                result[fn] = self.process_variant_value(fn, field, key)
+        return result
 
 def main():
     logging.basicConfig()
