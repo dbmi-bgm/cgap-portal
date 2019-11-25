@@ -191,12 +191,30 @@ class Auth0AuthenticationPolicy(CallbackAuthenticationPolicy):
         request.set_property(get_user_info, "user_info", True)
         return email
 
+    @staticmethod
+    def email_is_partners_or_hms(payload):
+        """
+        Checks that the given JWT payload belongs to a partners email.
+        """
+        for identity in payload.get('identities', []): # if auth0 decoded
+            if identity.get('connection', '') in ['partners', 'hms-it']:
+                return True
+        if 'partners' in payload.get('sub', ''):
+            return True
+        elif 'hms.harvard' in payload.get('sub', ''):
+            return True
+        elif payload.get('email_verified'):
+            return True
+        else:
+            return False
+
     def get_token_info(self, token, request):
         '''
         Given a jwt get token info from auth0, handle retrying and whatnot.
         This is only called if we receive a Bearer token in Authorization header.
         '''
         try:
+
             # lets see if we have an auth0 token or our own
             registry = request.registry
             auth0_client = registry.settings.get('auth0.client')
@@ -205,7 +223,7 @@ class Auth0AuthenticationPolicy(CallbackAuthenticationPolicy):
                 # leeway accounts for clock drift between us and auth0
                 payload = jwt.decode(token, b64decode(auth0_secret, '-_'),
                                      audience=auth0_client, leeway=30)
-                if 'email' in payload and payload.get('email_verified') is True:
+                if 'email' in payload and self.email_is_partners_or_hms(payload):
                     request.set_property(lambda r: False, 'auth0_expired')
                     return payload
 
@@ -213,7 +231,7 @@ class Auth0AuthenticationPolicy(CallbackAuthenticationPolicy):
                 user_url = "https://{domain}/tokeninfo".format(domain='hms-dbmi.auth0.com')
                 resp  = requests.post(user_url, {'id_token':token})
                 payload = resp.json()
-                if 'email' in payload and payload.get('email_verified') is True:
+                if 'email' in payload and self.email_is_partners_or_hms(payload):
                     request.set_property(lambda r: False, 'auth0_expired')
                     return payload
 
