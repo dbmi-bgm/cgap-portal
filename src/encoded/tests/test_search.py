@@ -440,6 +440,13 @@ def test_search_with_static_header(workbook, testapp):
     assert res_json['search_header']['title'] == 'Workflow Information'
 
 
+def test_search_multiple_types(workbook, testapp):
+    # multiple types work with @type in response
+    search = '/search/?type=Individual&type=Workflow'
+    res = testapp.get(search).json
+    assert res['@type'] == ['IndividualSearchResults', 'WorkflowSearchResults', 'Search']
+
+
 #########################################
 ## Tests for collections (search 301s) ##
 #########################################
