@@ -264,6 +264,8 @@ class VCFParser(object):
                 raise VCFParserException('Tried to check a variant field that does not exist on the schema')
         else:
             type = props[field]['type']
+            if type == 'array':
+                sub_type = props[field]['items']['type']
         return self.process_field_value(type, value, sub_type)
 
     def parse_vcf_record(self, record):
@@ -302,7 +304,8 @@ class VCFParser(object):
 
             # handle non-annotation fields
             if key not in self.annotation_keys:
-                result[key] = record.INFO.get(key, None)
+                if record.INFO.get(key, None):
+                    result[key] = record.INFO.get(key)
                 continue
 
             # handle annotation fields
