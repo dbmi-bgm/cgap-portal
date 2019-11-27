@@ -82,6 +82,13 @@ FIELD_MAPPING = {
 }
 
 
+def convert2raw(item):
+    # need to remove properties not generated from file eg. calc props and others
+    fields2remove = ['uuid', '@id', '@type', 'display_title', 'status', 'principals_allowed', 'date_created']
+    stripped_item = {k: v for k, v in item.items() if k not in fields2remove}
+    return get_raw_form(stripped_item)
+
+
 def check_fields(data):
     return [f for f in data if (f != 'DiseaseName' and f not in FIELD_MAPPING)]
 
@@ -322,22 +329,26 @@ def main():  # pragma: no cover
     sq = 'search/?type={}&status!=obsolete'.format(itype)
     logger.info("COMPARING FILE ITEMS WITH CURRENT DB CONTENT")
     logger.info("searching: {}".format(str(datetime.now())))
-    res = search_metadata(sq, connection, is_generator=True)
+    res = search_metadata(sq, connection, is_generator=True, page_limit=500)
     existing = 0
     uids2obsolete = []
     logger.info("comparing: {}".format(str(datetime.now())))
     for db_evi in res:
-        rdb_evi = get_raw_form(db_evi)
-        if rdb_evi in evidence_items:
+        tochk = convert2raw(db_evi)
+        if tochk in evidence_items:
             existing += 1
-            evidence_items.remove(rdb_evi)
+            evidence_items.remove(db_evi)
         else:
-            uids2obsolete.append(rdb_evi.get('uuid'))
+            uids2obsolete.append(db_evi.get('uuid'))
     logger.info("result: {}".format(str(datetime.now())))
     logger.info('{} EXISTING DB ITEMS WILL NOT BE CHANGED'.format(existing))
     logger.info('{} EXISTING DB ITEMS WILL BE SET TO OBSOLETE'.format(len(uids2obsolete)))
     logger.info('{} NEW ITEMS TO BE LOADED TO DB'.format(len(evidence_items)))
-
+    # let's add uuids to new items so second round will work
+    [evi.update({'uuid': str(uuid4())}) for evi in evidence_items]
+    # for evi in evidence_items:
+    #    uid = str(uuid4())
+    #    evi['uuid'] = uid
     obs_patch = [{'uuid': uid, 'status': 'obsolete'} for uid in uids2obsolete]
     patches = evidence_items + obs_patch
 
