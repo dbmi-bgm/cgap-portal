@@ -443,7 +443,7 @@ export const CohortSummaryTable = React.memo(function CohortSummaryTable(props){
                     } else if (files) { // otherwise create a list with linked #s
                         renderArr.push(
                             <span className="ellipses" key={`span-multi-${ext}`}>
-                                { statusToIcon(overallQuality) } { ext.toUpperCase() }
+                                { statusToIcon(overallQuality || "PASS") } { ext.toUpperCase() }
                                 (   {
                                     files.map((file, i) => {
                                         const tooltips = calcTooltips(file.hasQm, file.numWarn, file.numFail);
