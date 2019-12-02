@@ -102,7 +102,7 @@ export class IndividualBody extends React.PureComponent {
         // This should be same as "id" but we grab from here to be sure isn't dummy data.
         const {
             '@id' : individualID,
-            ethnicity,
+            ancestry,
             phenotypic_features = [],
             actions = []
         } = loadedIndividualItem || individualItem;
@@ -147,7 +147,7 @@ export class IndividualBody extends React.PureComponent {
                 </div>
 
                 <div className="details">
-                    { ethnicity ? <InlineDetailRow label="Ethnicity" value={ethnicity} /> : null }
+                    { ancestry ? <InlineDetailRow label="Ancestry" value={ancestry} /> : null }
                     <PhenotypicFeatures features={phenotypic_features} diseaseToIndex={diseaseToIndex} />
                     <ClinicianNotes individual={loadedIndividualItem || individualItem} haveEditPermission={haveEditPermission} />
                     {/*
