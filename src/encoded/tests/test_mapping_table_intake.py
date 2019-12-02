@@ -17,23 +17,21 @@ from encoded.commands.mapping_table_intake import (
 
 pytestmark = [pytest.mark.working]
 FNAME = './src/encoded/tests/mpv2.csv' # symlinked from encoded.commands
-EXPECTED_FIELDS = ['no', 'field_name', 'vcf_name_v0.2', 'source_name_v0.2',
-                   'source_version_v0.2', 'field_type', 'value_example',
-                   'enum_list', 'is_list', 'sub_embedding_group', 'separator',
-                   'scale', 'domain', 'method', 'annotation_grouping', 'scope',
-                   'schema_title', 'schema_description', 'source_name',
-                   'source_version', 'field_priority', 'column_priority',
-                   'facet_grouping', 'facet_priority', 'links_to', 'mvp']
-EXPECTED_INSERT = {'no': '1', 'field_name': 'chrom', 'vcf_name_v0.2': 'CHROM',
-                   'source_name_v0.2': 'VCF', 'source_version_v0.2': 'VCFv4.2',
-                   'field_type': 'string', 'value_example': '1', 'enum_list': ['1',
-                    '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12',
-                   '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', 'X', 'Y', 'M'],
-                   'is_list': False, 'scope': 'variant', 'schema_title': 'Chromosome',
-                   'source_name': 'VCF', 'source_version': 'VCFv4.2',
+EXPECTED_FIELDS = ['no', 'vcf_name_v0.2', 'source_name_v0.2', 'source_version_v0.2',
+                   'field_type', 'value_example', 'enum_list', 'is_list', 'sub_embedding_group',
+                   'separator', 'scale', 'domain', 'method', 'annotation_grouping', 'scope', 'schema_title', 'schema_description', 'source_name', 'source_version',
+                   'field_priority', 'column_priority', 'facet_grouping',
+                   'facet_priority', 'links_to', 'mvp']
+EXPECTED_INSERT = {'no': 1, 'vcf_name_v0.2': 'CHROM', 'source_name_v0.2': 'VCF',
+                   'source_version_v0.2': 'VCFv4.2', 'field_type': 'string',
+                   'value_example': '1', 'enum_list': ['1', '2', '3', '4', '5',
+                   '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16',
+                   '17', '18', '19', '20', '21', '22', 'X', 'Y', 'M'],
+                   'is_list': False, 'scope': 'variant', 'schema_title':
+                   'Chromosome', 'source_name': 'VCF', 'source_version': 'VCFv4.2',
                    'field_priority': 1, 'column_priority': 1, 'facet_grouping':
-                   'Chromosome', 'mvp': True, 'project': '12a92962-8265-4fc0-b2f8-cf14f05db58b',
-                   'institution': 'hms-dbmi', 'submitted_by': 'koray_kirli@hms.harvard.edu'}
+                   'Chromosome', 'mvp': True, 'project': 'encode-project',
+                   'institution': 'encode-institution'}
 MVP_EXPECTED = 619
 SAMPLE_FIELDS_EXPECTED = 12
 VARIANT_FIELDS_EXPECTED = 607
@@ -113,12 +111,12 @@ def test_generate_sample_json_items(inserts):
 def test_generate_variant_json_items(inserts):
     """ Tests that variant JSON along with columns and facets are produced """
     var_props, cols, facs = generate_properties(inserts)
-    assert cols['chrom']['title'] == 'Chromosome'
-    assert cols['pos']['title'] == 'Position'
-    assert cols['id']['title'] == 'ID'
-    assert cols['ref']['title'] == 'Reference allele'
-    assert cols['alt']['title'] == 'Alternative allele'
-    assert facs['clinsig']['title'] == 'ClinVar significance'
+    assert cols['CHROM']['title'] == 'Chromosome'
+    assert cols['POS']['title'] == 'Position'
+    assert cols['ID']['title'] == 'ID'
+    assert cols['REF']['title'] == 'Reference allele'
+    assert cols['ALT']['title'] == 'Alternative allele'
+    assert facs['clinvar_clnsig']['title'] == 'ClinVar significance'
     assert var_props['annovar_cytoband']['title'] == 'Cytoband'
     assert var_props['annovar_cytoband']['type'] == 'string'
     assert var_props['annovar_cytoband']['scale'] == 'WINDOW'
@@ -179,7 +177,7 @@ def test_generate_variant_schema(variant_items):
     assert len(properties['transcript']['items']['properties']) == 50
     assert properties['ALT']['items']['separator'] == 'comma'
     assert properties['transcript']['items']['properties']['vep_domains']['type'] == 'array'
-    assert properties['transcript']['items']['properties']['vep_domains']['items']['separator'] == 'comma'
+    assert properties['transcript']['items']['properties']['vep_domains']['items']['separator'] == 'tilde'
     assert properties['transcript']['items']['properties']['vep_domains']['items']['type'] == 'string'
 
 

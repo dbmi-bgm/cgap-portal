@@ -87,7 +87,7 @@ def process_inserts(fname, fields):
                             insert[field_name] = False
                 elif field_name in ['enum_list']:
                     if entry:
-                        field_type = row[5] # hardcoded, must change if field_type is moved on mapping table
+                        field_type = row[4] # XXX: hardcoded, must change if field_type is moved on mapping table
                         val_list = []
                         if field_type == 'string':
                             val_list = [en.strip() for en in entry.split(',') if en.strip()]
