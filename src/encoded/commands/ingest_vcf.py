@@ -225,8 +225,8 @@ class VCFParser(object):
         elif type == 'integer':
             try:
                 return int(value)
-            except ValueError: # required if casting string->float->int, such as '0.000'
-                return int(float(value))
+            except ValueError:  # required if casting string->float->int, such as '0.000'
+                return int(float(value))  # throw exception here if need be
         elif type == 'number':
             return float(value)
         elif type == 'array':
@@ -268,29 +268,14 @@ class VCFParser(object):
                 sub_type = props[field]['items']['type']
         return self.process_field_value(type, value, sub_type)
 
-    def parse_vcf_record(self, record):
+    def record_to_variant(self, record):
         """ Produces a dictionary containing all the annotation fields for this record
 
-            Compatible with non-annotation fields like:
-                ##INFO=<ID=SVTYPE,Number=1,Type=String,Description="Type of structural variant">
-            in addition to annoation fields like:
-                ##INFO=<ID=ANN,Number=.,Type=String,Description="Functional annotations:
-                'Allele | Annotation | Annotation_Impact | Gene_Name | Gene_ID |
-                Feature_Type | Feature_ID | Transcript_BioType | Rank | HGVS.c |
-                HGVS.p | cDNA.pos / cDNA.length | CDS.pos / CDS.length | AA.pos / AA.length
-                | Distance | ERRORS / WARNINGS / INFO' ">
-
-            In the former case the 'result' would contain a single dict entry for 'SVTYPE'
-            containing the value in this record. In the latter you would get a dict entry
-            for each field in the annotation fields, such as Allele, Annotation etc.
-            There could be multiple annotations per variant. These are indexed by group, so
-            a entry would look like:
-                { 'Allele' : {0 : 'A', 1 : 'G' }, ... }
-            which in this case tell us this annotation has two entries
-
-            If a record has no entry for an expected field, that field will not exist
-            in result. Oftentimes in the VCF there are gaps in annotations so we just
-            drop those fields from the result if we dont see a value
+        Each MUTANNO tag in the annotated VCF corresponds to an annotation field
+        entry. Each one will be parsed as an annotation field, the rest will be
+        directly cast based on the interpeted type from the INFO field. A MUTANNO
+        tag can also designate a sub-embedded object. Record format is validated
+        against the variant schema.
 
         Args:
             record: a single row in the VCF to parse, grabbed from 'vcf'
@@ -317,7 +302,7 @@ class VCFParser(object):
             # if this annotation field has values, process them
             if annotations:
 
-                # annotation could be multi-valued (VEP), split into groups
+                # annotation could be multi-valued split into groups
                 for g_idx, group in enumerate(annotations):
 
                     # in nearly all cases there are multiple fields. match them
@@ -341,6 +326,31 @@ class VCFParser(object):
                                 result[fn] = self.process_variant_value(fn, field, key)
         return result
 
+    def record_to_sample_variant(self, record):
+        """ Parses the given record to produce the sample variant
+
+        Args:
+            record: a vcf entry to parse
+
+        Returns:
+            a (dict) sample_variant item
+        """
+        result = {}  # add some fields directly (?)
+        result['Qual'] = record.QUAL
+        result['Filter'] = record.FILTER[0]
+        props = self.variant_sample_schema['properties']
+        for field in props.keys():
+            if record.INFO.get(field, None):
+                val = record.INFO.get(field)
+                prop_type = props[field]['type']
+                if prop_type == 'array':
+                    sub_type = props[field]['items']['type']
+                    result[field] = self.process_field_value(prop_type, val, sub_type)
+                else:
+                    result[field] = self.process_field_value(prop_type, val)
+        return result
+
+
 def main():
     logging.basicConfig()
     parser = argparse.ArgumentParser(
@@ -357,7 +367,7 @@ def main():
     vcf_parser = VCFParser(args.vcf, args.variant, args.sample)
     vcf_parser.parse_vcf_fields()
     record = vcf_parser.get_record()
-    print(vcf_parser.parse_vcf_record(record))
+    print(vcf_parser.record_to_variant(record))
 
 
 if __name__ == '__main__':

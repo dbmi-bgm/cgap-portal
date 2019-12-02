@@ -18,7 +18,7 @@ def test_vcf():
     return parser
 
 
-def test_VCFParser_single_record_meta(test_vcf):
+def test_VCFP_meta(test_vcf):
     """ Checks that we can correctly read which fields are annotation """
     annotation_fields = test_vcf.get_annotation_fields()
     for annot_field in EXPECTED_ANNOTATION_FIELDS:
@@ -27,16 +27,17 @@ def test_VCFParser_single_record_meta(test_vcf):
     for generic_field in EXPECTED_GENERIC_FIELDS:
         assert generic_field in generic_fields
     assert test_vcf.get_sub_embedded_label('VEP') == 'transcript'
+    assert test_vcf.get_sub_embedded_label('dbNSFPTranscript') == 'transcript'
     assert test_vcf.get_sub_embedded_label('ANNOVAR') == None
 
 
-def test_VCFParser_single_record_full(test_vcf):
+def test_VCFP_one_variant(test_vcf):
     """
     Tests that we can correctly process a single VCF variant
     Checks many specific things about the record for correctness
     """
     record = test_vcf.get_record()
-    result = test_vcf.parse_vcf_record(record)
+    result = test_vcf.record_to_variant(record)
     assert result['QD'] == 33.66
     assert result['MLEAC'] == [2]
     assert result['MQ'] == 44.51
@@ -45,23 +46,22 @@ def test_VCFParser_single_record_full(test_vcf):
     assert result['transcript'][1]['vep_feature'] == 'ENST00000620552'
     assert result['transcript'][0]['vep_pheno'] == ['1', '1']
     assert result['transcript'][0]['vep_codons'] == 'Ggc/Agc'
-    assert result['dbnsfp_codon_degeneracy'] == 0
+    assert result['transcript'][0]['dbnsfptranscript_sift4g_pred'] == 'D'
+    assert result['transcript'][0]['dbnsfptranscript_mutationassessor_score'] == 2.19
     assert result['dbnsfp_genocanyon_score'] == 0.999999999998938
     assert result['clinvar_alleleid'] == '244110'
     assert result['clinvar_clnvcso'] == 'SO:0001483'
-    assert result['intervar_pm1'] == 1
     assert result['Chrom'] == 'chr1'
     assert result['Ref'] == 'G'
     assert result['ID'] is None
 
 
-@pytest.mark.skip
-def test_VCFParser_full(test_vcf):
+def test_VCFP_multiple_variants(test_vcf):
     """
     Tests that we can correctly process an annotated VCF with multiple records
     """
     record = test_vcf.get_record()
-    result = test_vcf.parse_vcf_record(record)
+    result = test_vcf.record_to_variant(record)
     # check all the same things as the previous test, as they should be the same
     assert result['QD'] == 33.66
     assert result['MLEAC'] == [2]
@@ -71,108 +71,71 @@ def test_VCFParser_full(test_vcf):
     assert result['transcript'][1]['vep_feature'] == 'ENST00000620552'
     assert result['transcript'][0]['vep_pheno'] == ['1', '1']
     assert result['transcript'][0]['vep_codons'] == 'Ggc/Agc'
-    assert result['dbnsfp_codon_degeneracy'] == 0
+    assert result['transcript'][0]['dbnsfptranscript_sift4g_pred'] == 'D'
+    assert result['transcript'][0]['dbnsfptranscript_mutationassessor_score'] == 2.19
     assert result['dbnsfp_genocanyon_score'] == 0.999999999998938
     assert result['clinvar_alleleid'] == '244110'
     assert result['clinvar_clnvcso'] == 'SO:0001483'
-    assert result['intervar_pm1'] == 1
     assert result['Chrom'] == 'chr1'
     assert result['Ref'] == 'G'
     assert result['ID'] is None
 
-    # check next entry for correctness
+    # check record 2
     record = test_vcf.get_record()
-    result = test_vcf.parse_vcf_record(record)
-    # check correctness of fields for the second record
-    assert result['AF'] == [1.0]
-    assert result['DP'] == 12
-    assert result['MQ'] == 44.51
-    assert result['ANNOVAR']['Func.ensGene'][0] == 'exonic'
-    assert result['ANNOVAR']['Func.knownGene'][0] == 'exonic'
-    assert result['ANNOVAR']['Gene.ensGene'][0] == 'OR4F5'
-    assert len(result['VEP']['Location'].keys()) == 4 # varying entry amount
-    assert len(result['VEP']['Allele'].keys()) == 4
-    assert len(result['VEP']['SWISSPROT'].keys()) == 1
-    assert len(result['VEP']['TREMBL'].keys()) == 1
-    assert result['VEP']['CCDS'][1] == 'CCDS30547.1'
-    assert result['VEP']['TREMBL'][2] == 'A0A2U3U0J3'
-    assert result['ESP6500']['EA_AC_ALT'][0] == '5337'
-    assert result['ESP6500']['AA_AC_ALT'][0] == '1937'
-    assert result['ESP6500']['MAF_AA'][0] == '45.5899'
-    assert result['ExAC']['AC_Adj'][0] == '72743'
-    assert result['ExAC']['AC_EAS'][0] == '8379'
-    assert result['ExAC']['AC_NFE'][0] == '37731'
-    assert result['ExACnonpsych']['AN_AMR'][0] == '6466'
-    assert result['ExACnonpsych']['AN_EAS'][0] == '5424'
-    assert result['ExACnonpsych']['DP'][0] == '2408573'
-    assert result['ExACnonTCGA']['AN_FIN'][0] == '3320'
-    assert result['ExACnonTCGA']['AN_OTH'][0] == '452'
-    assert result['gnomAD']['AC_afr'][0] == '15784'
-    assert result['gnomAD']['nhomalt_nfe'][0] == '16125'
-    assert result['gnomAD']['nhomalt_sas_female'][0] == '125'
-    assert result['gnomAD']['AC_oth_male'][0] == '424'
-    assert result['gnomADexome']['AC_amr'][0] == '19014'
-    assert result['gnomADexome']['AN_amr_female'][0] == '11748'
-    assert result['dbNSFP']['Denisova'][0] == './.'
-    assert result['dbNSFP']['phastCons17way_primate_rankscore'][0] == '0.18915'
-    assert result['dbNSFP']['Eigen-PC-phred_coding'][0] == '0.1837653'
-    for key in result['CADD'].keys(): # all entries should have 2
-        assert len(result['CADD'][key].keys()) == 2
-    assert result['SpliceAI']['DS_DG'][0] == '0.02'
-    assert result['SpliceAI']['DP_AG'][0] == '26'
-    assert result['INTERVAR']['InterVar_automated'][0] == 'Benign'
-    assert result['INTERVAR']['BS1'][0] == '1'
-    assert result['INTERVAR']['BS3'][0] == '0'
-    assert result['genomicSuperDups']['otherChrom'][1] == 'chr19'
-    assert result['genomicSuperDups']['otherEnd'][0] == '101981189'
-    for key in result['dgvMerged'].keys(): # all entries should have 13
-        assert len(result['dgvMerged'][key].keys()) == 13
+    result = test_vcf.record_to_variant(record)
+    assert result['AF'] == 0.833
+    assert result['DP'] == 111
+    assert result['MQ'] == 68.07
+    assert len(result['transcript'].keys()) == 9
+    assert result['transcript'][0]['vep_location'] == '1:1044368'
+    assert result['transcript'][0]['dbnsfptranscript_sift_score'] == 0.036
+    assert result['transcript'][4]['vep_distance'] == 1031
+    assert result['transcript'][6]['vep_hgvsc'] == 'ENST00000620552.4:c.1769A>T'
+    assert result['transcript'][6]['dbnsfptranscript_vest4_score'] == 0.283
+    assert result['gnomadexome_ac_sas'] == 675
+    assert result['dbnsfp_gm12878_fitcons_rankscore'] == 0.89359
+    assert result['clinvar_clnhgvs'] == 'NC_000001.11:g.1044368A>T'
+    assert result['kaviar_an'] == 155504.0
+    assert result['1000gp_afr_af'] == 0.0008
 
     # check record 3
     record = test_vcf.get_record()
-    result = test_vcf.parse_vcf_record(record)
-    for field in result['ANNOVAR']:
-        assert field in EXPECTED_ANNOVAR_FIELDS
-    for top_level_field in result:
-        assert top_level_field in RESULT_EXPECTED_FIELDS
-    assert result['BaseQRankSum'] == 1.04
-    assert result['ExcessHet'] == 3.0103
-    assert result['Chrom'] == 'chr1'
-    assert result['ANNOVAR']['Gene.ensGene'][0] == 'AGRN'
-    assert result['ANNOVAR']['Func.refGene'][0] == 'exonic'
-    assert len(result['VEP']['Location'].keys()) == 16
-    assert len(result['VEP']['Allele'].keys()) == 16
-    assert len(result['VEP']['GENE_PHENO'].keys()) == 9
-    assert len(result['VEP']['DISTANCE'].keys()) == 5
-    assert result['VEP']['SYMBOL_SOURCE'][3] == 'HGNC'
-    assert result['VEP']['BIOTYPE'][2] == 'retained_intron'
-    assert result['VEP']['Gene'][3] == 'ENSG00000188157'
-    assert result['VEP']['Feature'][0] == 'CCDS30551.1'
-    assert result['VEP']['TREMBL'][7] == 'A0A087X208'
-    assert result['1000GP']['AN'][0] == '5008'
-    assert result['1000GP']['EUR_AF'][0] == '0.0467'
-    assert result['ESP6500']['TAC_ALT'][0] == '404'
-    assert result['ESP6500']['AA_AC_ALT'][0] == '38'
-    assert result['KAVIAR']['AC'][0] == '4528'
-    assert result['UK10K']['DP'][0] == '21610'
-    assert result['TOPmed']['AF'][0] == '0.0275707'
-    assert result['TOPmed']['Hom'][0] == '60'
-    assert result['dbSNP']['RS'][0] == '113288277'
-    assert result['gnomAD']['AN_amr_male'][0] == '7738'
-    assert result['gnomAD']['AN_asj_female'][0] == '1760'
-    assert result['gnomAD']['nhomalt'][0] == '98'
-    assert result['gnomAD']['nhomalt_amr'][0] == '6'
-    assert result['gnomADexome']['AC_eas_male'][0] == '41'
-    assert result['gnomADexome']['AC_eas'][0] == '77'
-    assert result['gnomADexome']['AC_oth'][0] == '206'
-    assert result['dbNSFP']['CADD_raw_rankscore'][0] == '0.92371'
-    assert result['dbNSFP']['GERP++_NR'][0] == '4.58'
-    assert result['dbNSFP']['phastCons30way_mammalian_rankscore'][0] == '0.39996'
-    assert result['dbNSFP']['clinvar_id'][0] == '128294'
-    assert result['CADD']['Consequence'][0] == 'NON_SYNONYMOUS'
-    assert result['CADD']['AnnoType'][0] == 'CodingTranscript'
-    assert result['CADD']['protPos'][0] == '728'
-    assert result['CADD']['EncodeH3K4me1-sum'][0] == '3.61'
-    assert result['CADD']['Rare1000bp'][0] == '18'
-    for key in result['dgvMerged'].keys(): # all entries should have 13
-        assert len(result['dgvMerged'][key].keys()) == 15
+    result = test_vcf.record_to_variant(record)
+    assert result['AF'] == 0.5
+    assert result['DP'] == 24
+    assert result['MQ'] == 65.65
+    assert len(result['transcript'].keys()) == 7
+    assert result['transcript'][0]['vep_location'] == '1:1804548'
+    assert result['transcript'][0]['dbnsfptranscript_sift_score'] == 0.001
+    assert result['transcript'][1]['vep_trembl'] == 'F6UT28'
+    assert result['transcript'][1]['dbnsfptranscript_sift_pred'] == 'D'
+    assert result['transcript'][2]['dbnsfptranscript_fathmm_score'] == 5.08
+    assert result['transcript'][4]['vep_allele'] == 'C'
+    assert result['transcript'][6]['vep_hgvsc'] == 'ENST00000615252.4:c.1A>G'
+    assert result['transcript'][6]['dbnsfptranscript_vest4_score'] == 0.736
+    assert result['dbnsfp_cadd_raw'] == 3.318765
+    assert result['clinvar_clnsig'] == 'Pathogenic/Likely_pathogenic'
+    assert result['clinvar_clnvc'] == 'single_nucleotide_variant'
+    assert result['dbsnp_rs'] == '869312825'
+
+
+def test_VCFP_multiple_sample_variants(test_vcf):
+    """ Generates 3 sample variant items and checks them for correctness """
+    record = test_vcf.get_record()
+    result = test_vcf.record_to_sample_variant(record)
+    assert result['DP'] == 12
+    assert result['AF'] == 1.0
+    assert result['Qual'] == 403.9
+    assert result['Filter'] == 'VQSRTrancheSNP99.90to100.00'
+    record = test_vcf.get_record()
+    result = test_vcf.record_to_sample_variant(record)
+    assert result['DP'] == 111
+    assert result['AF'] == 0.833
+    assert result['Qual'] == 3202.19
+    assert result['Filter'] == 'VQSRTrancheSNP99.00to99.90'
+    record = test_vcf.get_record()
+    result = test_vcf.record_to_sample_variant(record)
+    assert result['DP'] == 24
+    assert result['AF'] == 0.5
+    assert result['Qual'] == 58.56
+    assert result['Filter'] == 'VQSRTrancheSNP99.00to99.90'

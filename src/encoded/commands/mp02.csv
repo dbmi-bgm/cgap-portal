@@ -462,404 +462,396 @@ no,VCF NAME v0.2 (field name on ann vcf),SOURCE_NAME v0.2,SOURCE VERSION v0.2,"f
 459,maxpopaf_max_pop_af_lat,MaxPopAF,0.2,number,,,N,,,,,,,,,,,,,,,,,Y
 460,maxpopaf_max_pop_af_eas,MaxPopAF,0.2,number,,,N,,,,,,,,,,,,,,,,,Y
 461,maxpopaf_max_pop_af_asj,MaxPopAF,0.2,number,,,N,,,,,,,,,,,,,,,,,Y
-462,dbnsfp_codon_degeneracy,dbNSFP,4.0a,integer,0,,N,,,,,,,,,,,,,,,,,Y
-463,dbnsfp_ancestral_allele,dbNSFP,4.0a,string,,,N,,,,,,,,,,,,,,,,,Y
-464,dbnsfp_altaineandertal,dbNSFP,4.0a,string,A/A,,N,,,,,,,,,,,,,,,,,Y
-465,dbnsfp_denisova,dbNSFP,4.0a,string,A/A,,N,,,,,,,,,,,,,,,,,Y
-466,dbnsfp_vindijianeandertal,dbNSFP,4.0a,string,A/A,,N,,,,,,,,,,,,,,,,,Y
-467,dbnsfp_sift_score,dbNSFP,4.0a,number,0.036,,N,,,,,,pathogenicity,variant,SIFT score,SIFT score,SIFT,,,,,,,Y
-468,dbnsfp_sift_converted_rankscore,dbNSFP,4.0a,number,0.43393,,N,,,,,,pathogenicity,variant,SIFT converted rankscore,SIFT converted rankscore,SIFT,,,,,,,Y
-469,dbnsfp_sift_pred,dbNSFP,4.0a,string,D,,N,,,,,,pathogenicity,variant,SIFT prediction,D: Deleterious (sift<=0.05); T: tolerated (sift>0.05),SIFT,,,,,,,Y
-470,dbnsfp_sift4g_score,dbNSFP,4.0a,string,0.002,,N,,,,,,,,,,,,,,,,,Y
-471,dbnsfp_sift4g_converted_rankscore,dbNSFP,4.0a,number,0.79402,,N,,,,,,,,,,,,,,,,,Y
-472,dbnsfp_sift4g_pred,dbNSFP,4.0a,string,D,,N,,,,,,,,,,,,,,,,,Y
-473,dbnsfp_polyphen2_hdiv_score,dbNSFP,4.0a,number,,,N,,,,,,pathogenicity,variant,Polyphen2 HDIV score,Polyphen2 HDIV score,PolyPhen2,,,,,,,Y
-474,dbnsfp_polyphen2_hdiv_rankscore,dbNSFP,4.0a,number,,,N,,,,,,pathogenicity,variant,Polyphen2 HDIV rankscore,Polyphen2 HDIV rankscore,PolyPhen2,,,,,,,Y
-475,dbnsfp_polyphen2_hdiv_pred,dbNSFP,4.0a,string,,,N,,,,,,pathogenicity,variant,Polyphen2 HDIV prediction,"D: Probably damaging (>=0.957), P: possibly damaging (0.453<=pp2_hdiv<=0.956); B: benign (pp2_hdiv<=0.452)",PolyPhen2,,,,,,,Y
-476,dbnsfp_polyphen2_hvar_score,dbNSFP,4.0a,number,,,N,,,,,,pathogenicity,variant,Polyphen2 HVAR score,Polyphen2 HVAR score,PolyPhen2,,,,,,,Y
-477,dbnsfp_polyphen2_hvar_rankscore,dbNSFP,4.0a,number,,,N,,,,,,pathogenicity,variant,Polyphen2 HVAR rankscore,Polyphen2 HVAR rankscore,PolyPhen2,,,,,,,Y
-478,dbnsfp_polyphen2_hvar_pred,dbNSFP,4.0a,string,,,N,,,,,,pathogenicity,variant,Polyphen2 HVAR prediction,"D: Probably damaging (>=0.909), P: possibly damaging (0.447<=pp2_hdiv<=0.909); B: benign (pp2_hdiv<=0.446)",PolyPhen2,,,,,,,Y
-479,dbnsfp_lrt_score,dbNSFP,4.0a,number,0.000004,,N,,,,,,pathogenicity,variant,LRT score,LRT score,LRT,,,,,,,Y
-480,dbnsfp_lrt_converted_rankscore,dbNSFP,4.0a,number,0.62929,,N,,,,,,pathogenicity,variant,LRT converted rankscore,LRT converted rankscore,LRT,,,,,,,Y
-481,dbnsfp_lrt_pred,dbNSFP,4.0a,string,D,,N,,,,,,pathogenicity,variant,LRT prediction,D: Deleterious; N: Neutral; U: Unknown,LRT,,,,,,,Y
-482,dbnsfp_lrt_omega,dbNSFP,4.0a,integer,0,,N,,,,,,,,,,,,,,,,,Y
-483,dbnsfp_mutationtaster_score,dbNSFP,4.0a,number,1,,N,,,,,,pathogenicity,variant,MutationTater score,MutationTater score,MutationTaster,,,,,,,Y
-484,dbnsfp_mutationtaster_converted_rankscore,dbNSFP,4.0a,number,0.81001,,N,,,,,,pathogenicity,variant,MutationTater converted rankscore,MutationTater converted rankscore,MutationTaster,,,,,,,Y
-485,dbnsfp_mutationtaster_pred,dbNSFP,4.0a,string,D,,N,,,,,,pathogenicity,variant,MutationTater prediction,A: disease_causing_automatic; D:disease_causing; N:polymorphism; P:polymorphism_automatic,MutationTaster,,,,,,,Y
-486,dbnsfp_mutationtaster_model,dbNSFP,4.0a,string,simple_aae,,N,,,,,,,,,,,,,,,,,Y
-487,dbnsfp_mutationtaster_aae,dbNSFP,4.0a,string,E728V,,N,,,,,,,,,,,,,,,,,Y
-488,dbnsfp_mutationassessor_score,dbNSFP,4.0a,number,2.385,,N,,,,,,pathogenicity,variant,MutationAssessor score,MutationAssessor score,MutationAssessor,,,,,,,Y
-489,dbnsfp_mutationassessor_rankscore,dbNSFP,4.0a,number,0.68708,,N,,,,,,pathogenicity,variant,MutationAssessor rankscore,MutationAssessor rankscore,MutationAssessor,,,,,,,Y
-490,dbnsfp_mutationassessor_pred,dbNSFP,4.0a,string,M,,N,,,,,,pathogenicity,variant,MutationAssessor prediction,H: high; M: medium; L: low; N: neutral. H/M means functional and L/N means non-functional,MutationAssessor,,,,,,,Y
-491,dbnsfp_fathmm_score,dbNSFP,4.0a,number,3.56,,N,,,,,,pathogenicity,variant,FATHMM score,FATHMM score,FATHMM,,,,,,,Y
-492,dbnsfp_fathmm_converted_rankscore,dbNSFP,4.0a,number,0.04696,,N,,,,,,pathogenicity,variant,FATHMM converted rankscore,FATHMM converted rankscore,FATHMM,,,,,,,Y
-493,dbnsfp_fathmm_pred,dbNSFP,4.0a,string,T,,N,,,,,,pathogenicity,variant,FATHMM prediction,D: Deleterious; T: Tolerated,FATHMM,,,,,,,Y
-494,dbnsfp_provean_score,dbNSFP,4.0a,number,-3.83,,N,,,,,,pathogenicity,variant,PROVEAN score,PROVEAN score,PROVEAN,,,,,,,Y
-495,dbnsfp_provean_converted_rankscore,dbNSFP,4.0a,number,0.7212,,N,,,,,,pathogenicity,variant,PROVEAN converted rankscore,PROVEAN converted rankscore,PROVEAN,,,,,,,Y
-496,dbnsfp_provean_pred,dbNSFP,4.0a,string,D,,N,,,,,,pathogenicity,variant,PROVEAN prediction,D: Deleterious; N: Neutral,PROVEAN,,,,,,,Y
-497,dbnsfp_vest4_score,dbNSFP,4.0a,number,0.69;0.283,,N,,,,,,pathogenicity,variant,VEST3 score,VEST3 score,VEST3,,,,,,,Y
-498,dbnsfp_vest4_rankscore,dbNSFP,4.0a,number,0.69562,,N,,,,,,pathogenicity,variant,VEST3 rankscore,VEST3 rankscore,VEST3,,,,,,,Y
-499,dbnsfp_metasvm_score,dbNSFP,4.0a,number,-1.2032,,N,,,,,,pathogenicity,variant,MetaSVM score,MetaSVM score,MetaSVM,,,,,,,Y
-500,dbnsfp_metasvm_rankscore,dbNSFP,4.0a,number,0.00127,,N,,,,,,pathogenicity,variant,MetaSVM rankscore,MetaSVM rankscore,MetaSVM,,,,,,,Y
-501,dbnsfp_metasvm_pred,dbNSFP,4.0a,string,T,,N,,,,,,pathogenicity,variant,MetaSVM prediction,D: Deleterious; T: Tolerated,MetaSVM,,,,,,,Y
-502,dbnsfp_metalr_score,dbNSFP,4.0a,number,0.0133,,N,,,,,,pathogenicity,variant,MetaLR score,MetaLR score,MetaLR,,,,,,,Y
-503,dbnsfp_metalr_rankscore,dbNSFP,4.0a,number,0.05225,,N,,,,,,pathogenicity,variant,MetaLR rankscore,MetaLR rankscore,MetaLR,,,,,,,Y
-504,dbnsfp_metalr_pred,dbNSFP,4.0a,string,T,,N,,,,,,pathogenicity,variant,MetaLR prediction,D: Deleterious; T: Tolerated,MetaLR,,,,,,,Y
-505,dbnsfp_reliability_index,dbNSFP,4.0a,integer,10,,N,,,,,,,,,,,,,,,,,Y
-506,dbnsfp_m_cap_score,dbNSFP,4.0a,number,,,N,,,,,,pathogenicity,variant,M-CAP score,M-CAP score,MCAP,,,,,,,Y
-507,dbnsfp_m_cap_rankscore,dbNSFP,4.0a,number,,,N,,,,,,pathogenicity,variant,M-CAP rankscore,M-CAP rankscore,MCAP,,,,,,,Y
-508,dbnsfp_m_cap_pred,dbNSFP,4.0a,string,,,N,,,,,,pathogenicity,variant,M-CAP prediction,D: Deleterious; T: Tolerated,MCAP,,,,,,,Y
-509,dbnsfp_revel_score,dbNSFP,4.0a,number,0.233,,N,,,,,,,,,,,,,,,,,Y
-510,dbnsfp_revel_rankscore,dbNSFP,4.0a,number,0.53914,,N,,,,,,,,,,,,,,,,,Y
-511,dbnsfp_mutpred_score,dbNSFP,4.0a,number,,,N,,,,,,,,,,,,,,,,,Y
-512,dbnsfp_mutpred_rankscore,dbNSFP,4.0a,number,,,N,,,,,,,,,,,,,,,,,Y
-513,dbnsfp_mutpred_protid,dbNSFP,4.0a,string,,,N,,,,,,,,,,,,,,,,,Y
-514,dbnsfp_mutpred_aachange,dbNSFP,4.0a,string,,,N,,,,,,,,,,,,,,,,,Y
-515,dbnsfp_mutpred_top5features,dbNSFP,4.0a,string,,,N,,,,,,,,,,,,,,,,,Y
-516,dbnsfp_mvp_score,dbNSFP,4.0a,number,,,N,,,,,,,,,,,,,,,,,Y
-517,dbnsfp_mvp_rankscore,dbNSFP,4.0a,number,,,N,,,,,,,,,,,,,,,,,Y
-518,dbnsfp_mpc_score,dbNSFP,4.0a,number,0.578932934068,,N,,,,,,,,,,,,,,,,,Y
-519,dbnsfp_mpc_rankscore,dbNSFP,4.0a,number,0.53785,,N,,,,,,,,,,,,,,,,,Y
-520,dbnsfp_primateai_score,dbNSFP,4.0a,number,0.50984478,,N,,,,,,,,,,,,,,,,,Y
-521,dbnsfp_primateai_rankscore,dbNSFP,4.0a,number,0.40201,,N,,,,,,,,,,,,,,,,,Y
-522,dbnsfp_primateai_pred,dbNSFP,4.0a,string,T,,N,,,,,,,,,,,,,,,,,Y
-523,dbnsfp_deogen2_score,dbNSFP,4.0a,number,,,N,,,,,,,,,,,,,,,,,Y
-524,dbnsfp_deogen2_rankscore,dbNSFP,4.0a,number,,,N,,,,,,,,,,,,,,,,,Y
-525,dbnsfp_deogen2_pred,dbNSFP,4.0a,string,,,N,,,,,,,,,,,,,,,,,Y
-526,dbnsfp_aloft_fraction_transcripts_affected,dbNSFP,4.0a,string,,,N,,,,,,,,,,,,,,,,,Y
-527,dbnsfp_aloft_prob_tolerant,dbNSFP,4.0a,number,,,N,,,,,,,,,,,,,,,,,Y
-528,dbnsfp_aloft_prob_recessive,dbNSFP,4.0a,number,,,N,,,,,,,,,,,,,,,,,Y
-529,dbnsfp_aloft_prob_dominant,dbNSFP,4.0a,number,,,N,,,,,,,,,,,,,,,,,Y
-530,dbnsfp_aloft_pred,dbNSFP,4.0a,string,,,N,,,,,,,,,,,,,,,,,Y
-531,dbnsfp_aloft_confidence,dbNSFP,4.0a,string,,,N,,,,,,,,,,,,,,,,,Y
-532,dbnsfp_cadd_raw,dbNSFP,4.0a,number,4.623022,,N,,,,,,pathogenicity,variant,CADD raw score,CADD raw score,CADD,,,,,,,Y
-533,dbnsfp_cadd_raw_rankscore,dbNSFP,4.0a,number,0.92371,,N,,,,,,pathogenicity,variant,CADD raw rankscore,CADD raw rankscore,CADD,,,,,,,Y
-534,dbnsfp_cadd_phred,dbNSFP,4.0a,number,32,,N,,,,,,pathogenicity,variant,CADD PHRED score,CADD PHRED score,CADD,,,,,,,Y
-535,dbnsfp_dann_score,dbNSFP,4.0a,number,0.991547009,,N,,,,,,pathogenicity,variant,DANN score,DANN score,DANN,,,,,,,Y
-536,dbnsfp_dann_rankscore,dbNSFP,4.0a,number,0.53931,,N,,,,,,pathogenicity,variant,DANN rankscore,DANN rankscore,DANN,,,,,,,Y
-537,dbnsfp_fathmm_mkl_coding_score,dbNSFP,4.0a,number,0.99101,,N,,,,,,pathogenicity,variant,fathmm-MKL coding score,fathmm-MKL coding score,fathmm-MKL,,,,,,,Y
-538,dbnsfp_fathmm_mkl_coding_rankscore,dbNSFP,4.0a,number,0.9124,,N,,,,,,pathogenicity,variant,fathmm-MKL coding rankscore,fathmm-MKL coding rankscore,fathmm-MKL,,,,,,,Y
-539,dbnsfp_fathmm_mkl_coding_pred,dbNSFP,4.0a,string,D,,N,,,,,,pathogenicity,variant,fathmm-MKL coding prediction,D: Deleterious; N: Neutral,fathmm-MKL,,,,,,,Y
-540,dbnsfp_fathmm_mkl_coding_group,dbNSFP,4.0a,string,AEFBI,,N,,,,,,,,,,,,,,,,,Y
-541,dbnsfp_fathmm_xf_coding_score,dbNSFP,4.0a,number,0.799036,,N,,,,,,,,,,,,,,,,,Y
-542,dbnsfp_fathmm_xf_coding_rankscore,dbNSFP,4.0a,number,0.72541,,N,,,,,,,,,,,,,,,,,Y
-543,dbnsfp_fathmm_xf_coding_pred,dbNSFP,4.0a,string,D,,N,,,,,,,,,,,,,,,,,Y
-544,dbnsfp_eigen_raw_coding,dbNSFP,4.0a,number,0.531040421,,N,,,,,,,,,,,,,,,,,Y
-545,dbnsfp_eigen_raw_coding_rankscore,dbNSFP,4.0a,number,0.68935,,N,,,,,,,,,,,,,,,,,Y
-546,dbnsfp_eigen_pred_coding,dbNSFP,4.0a,number,5.28621,,N,,,,,,,,,,,,,,,,,Y
-547,dbnsfp_eigen_pc_raw_coding,dbNSFP,4.0a,number,0.422985083,,N,,,,,,,,,,,,,,,,,Y
-548,dbnsfp_eigen_pc_raw_coding_rankscore,dbNSFP,4.0a,number,0.63001,,N,,,,,,,,,,,,,,,,,Y
-549,dbnsfp_eigen_pc_phred_coding,dbNSFP,4.0a,number,4.525378,,N,,,,,,,,,,,,,,,,,Y
-550,dbnsfp_genocanyon_score,dbNSFP,4.0a,number,0.999998244,,N,,,,,,pathogenicity,variant,GenoCanyon score,GenoCanyon score,GenoCanyon,,,,,,,Y
-551,dbnsfp_genocanyon_rankscore,dbNSFP,4.0a,number,0.74766,,N,,,,,,pathogenicity,variant,GenoCanyon rankscore,GenoCanyon rankscore,GenoCanyon,,,,,,,Y
-552,dbnsfp_integrated_fitcons_score,dbNSFP,4.0a,number,0.706548,,N,,,,,,pathogenicity,variant,Integrated fitCons score,Integrated fitCons score,Integrated_FitCons,,,,,,,Y
-553,dbnsfp_integrated_fitcons_rankscore,dbNSFP,4.0a,number,0.73137,,N,,,,,,pathogenicity,variant,Integrated fitCons rankscore,Integrated fitCons rankscore,Integrated_FitCons,,,,,,,Y
-554,dbnsfp_integrated_confidence_value,dbNSFP,4.0a,number,0,,N,,,,,,pathogenicity,variant,integrated confidence value,integrated confidence value,Integrated_FitCons,,,,,,,Y
-555,dbnsfp_gm12878_fitcons_score,dbNSFP,4.0a,number,0.724815,,N,,,,,,,,,,,,,,,,,Y
-556,dbnsfp_gm12878_fitcons_rankscore,dbNSFP,4.0a,number,0.89359,,N,,,,,,,,,,,,,,,,,Y
-557,dbnsfp_gm12878_confidence_value,dbNSFP,4.0a,number,0,,N,,,,,,,,,,,,,,,,,Y
-558,dbnsfp_h1_hesc_fitcons_score,dbNSFP,4.0a,number,0.723109,,N,,,,,,,,,,,,,,,,,Y
-559,dbnsfp_h1_hesc_fitcons_rankscore,dbNSFP,4.0a,number,0.80598,,N,,,,,,,,,,,,,,,,,Y
-560,dbnsfp_h1_hesc_confidence_value,dbNSFP,4.0a,number,0,,N,,,,,,,,,,,,,,,,,Y
-561,dbnsfp_huvec_fitcons_score,dbNSFP,4.0a,number,0.714379,,N,,,,,,,,,,,,,,,,,Y
-562,dbnsfp_huvec_fitcons_rankscore,dbNSFP,4.0a,number,0.83352,,N,,,,,,,,,,,,,,,,,Y
-563,dbnsfp_huvec_confidence_value,dbNSFP,4.0a,number,0,,N,,,,,,,,,,,,,,,,,Y
-564,dbnsfp_linsight,dbNSFP,4.0a,number,,,N,,,,,,,,,,,,,,,,,Y
-565,dbnsfp_linsight_rankscore,dbNSFP,4.0a,number,,,N,,,,,,,,,,,,,,,,,Y
-566,dbnsfp_gerp_nr,dbNSFP,4.0a,number,4.58,,N,,,,,,,,,,,,,,,,,Y
-567,dbnsfp_gerp_rs,dbNSFP,4.0a,number,4.58,,N,,,,,,"pathogenicity, conservation",variant,GERP++ RS,GERP++ RS,GERP,,,,,,,Y
-568,dbnsfp_gerp_rs_rankscore,dbNSFP,4.0a,number,0.56077,,N,,,,,,"pathogenicity, conservation",variant,GERP++ RS rankscore,GERP++ RS rankscore,GERP,,,,,,,Y
-569,dbnsfp_phylop100way_vertebrate,dbNSFP,4.0a,number,5.452,,N,,,,,,"pathogenicity, conservation",variant,phyloP 100way vertebrate score,Conservation score by phyloP 100way vertebrate,phyloP,,,,,,,Y
-570,dbnsfp_phylop100way_vertebrate_rankscore,dbNSFP,4.0a,number,0.6638,,N,,,,,,"pathogenicity, conservation",variant,phyloP 100way vertebrate rankscore,Conservation rankscore by phyloP 100way vertebrate,phyloP,,,,,,,Y
-571,dbnsfp_phylop30way_mammalian,dbNSFP,4.0a,number,1.312,,N,,,,,,,,,,,,,,,,,Y
-572,dbnsfp_phylop30way_mammalian_rankscore,dbNSFP,4.0a,number,0.94714,,N,,,,,,,,,,,,,,,,,Y
-573,dbnsfp_phylop17way_primate,dbNSFP,4.0a,number,0.756,,N,,,,,,,,,,,,,,,,,Y
-574,dbnsfp_phylop17way_primate_rankscore,dbNSFP,4.0a,number,0.94297,,N,,,,,,,,,,,,,,,,,Y
-575,dbnsfp_phastcons100way_vertebrate,dbNSFP,4.0a,number,1,,N,,,,,,"pathogenicity, conservation",variant,phastCons 100way vertebrate score,phastCons 100way vertebrate score,phastCons,,,,,,,Y
-576,dbnsfp_phastcons100way_vertebrate_rankscore,dbNSFP,4.0a,number,0.71638,,N,,,,,,"pathogenicity, conservation",variant,phastCons 100way vertebrate score,phastCons 100way vertebrate score,phastCons,,,,,,,Y
-577,dbnsfp_phastcons30way_mammalian,dbNSFP,4.0a,number,0.932,,N,,,,,,,,,,,,,,,,,Y
-578,dbnsfp_phastcons30way_mammalian_rankscore,dbNSFP,4.0a,number,0.39996,,N,,,,,,,,,,,,,,,,,Y
-579,dbnsfp_phastcons17way_primate,dbNSFP,4.0a,number,0.891,,N,,,,,,,,,,,,,,,,,Y
-580,dbnsfp_phastcons17way_primate_rankscore,dbNSFP,4.0a,number,0.42908,,N,,,,,,,,,,,,,,,,,Y
-581,dbnsfp_siphy_29way_pi,dbNSFP,4.0a,number,1.0:0.0:0.0:0.0,,Y,,tilde,,,,,,,,,,,,,,,Y
-582,dbnsfp_siphy_29way_logodds,dbNSFP,4.0a,number,13.9535,,N,,,,,,pathogenicity,variant,SiPhy 29way logOdds score,SiPhy 29way logOdds score,SiPhy,,,,,,,Y
-583,dbnsfp_siphy_29way_logodds_rankscore,dbNSFP,4.0a,number,0.63643,,N,,,,,,pathogenicity,variant,SiPhy 29way logOdds rankscore,SiPhy 29way logOdds rankscore,SiPhy,,,,,,,Y
-584,dbnsfp_bstatistic,dbNSFP,4.0a,number,940,,N,,,,,,,,,,,,,,,,,Y
-585,dbnsfp_bstatistic_rankscore,dbNSFP,4.0a,number,0.86351,,N,,,,,,,,,,,,,,,,,Y
-586,dbnsfp_clinvar_id,dbNSFP,4.0a,string,128294,,N,,,,,,,,,,,,,,,,,Y
-587,dbnsfp_clinvar_clnsig,dbNSFP,4.0a,string,Benign,,N,,,,,,,,,,,,,,,,,Y
-588,dbnsfp_clinvar_trait,dbNSFP,4.0a,string,"Myasthenic_syndrome,_congenital,_8|not_specified",,Y,,tilde,,,,,,,,,,,,,,,Y
-589,dbnsfp_clinvar_review,dbNSFP,4.0a,string,"criteria_provided,_multiple_submitters,_no_conflicts",,N,,,,,,,,,,,,,,,,,Y
-590,dbnsfp_clinvar_hgvs,dbNSFP,4.0a,string,NC_000001.11:g.1044368A>T,,N,,,,,,,,,,,,,,,,,Y
-591,dbnsfp_clinvar_var_source,dbNSFP,4.0a,string,,,Y,,tilde,,,,,,,,,,,,,,,Y
-592,dbnsfp_clinvar_medgen_id,dbNSFP,4.0a,string,C3808739|CN169374,,Y,,tilde,,,,,,,,,,,,,,,Y
-593,dbnsfp_clinvar_omim_id,dbNSFP,4.0a,string,615120,,Y,,tilde,,,,,,,,,,,,,,,Y
-594,dbnsfp_clinvar_orphanet_id,dbNSFP,4.0a,string,,,Y,,tilde,,,,,,,,,,,,,,,Y
-595,dbnsfp_interpro_domain,dbNSFP,4.0a,string,Kazal domain|Kazal domain|Kazal domain,,Y,,tilde,,,,,gene,INTERPRO domain,INTERPRO domain,INTERPRO,,,,,,,Y
-596,cadd_length,CADD,1.5,integer,0,,N,,,,,,,variant,CADD15.Length,Number of inserted/deleted bases,CADD,1.5,,,,,,N
-597,cadd_annotype,CADD,1.5,string,CodingTranscript,,N,,,,,,,variant,CADD15.AnnoType,"CodingTranscript, Intergenic, MotifFeature, NonCodingTranscript,
+462,dbnsfptranscript_ensembl_transcriptid,dbNSFPTranscript,4.0a,string,ENST00000379370,,N,transcript,,,,,,,,,,,,,,,,
+463,dbnsfptranscript_gencode_basic,dbNSFPTranscript,4.0a,string,,,N,transcript,,,,,,,,,,,,,,,,
+464,dbnsfptranscript_sift_score,dbNSFPTranscript,4.0a,number,0.036,,N,transcript,,,,,pathogenicity,variant,SIFT score,SIFT score,SIFT,,,,,,,Y
+465,dbnsfptranscript_sift_pred,dbNSFPTranscript,4.0a,string,D,,N,transcript,,,,,pathogenicity,variant,SIFT prediction,D: Deleterious (sift<=0.05); T: tolerated (sift>0.05),SIFT,,,,,,,Y
+466,dbnsfptranscript_sift4g_score,dbNSFPTranscript,4.0a,string,0.002,,N,transcript,,,,,,,,,,,,,,,,Y
+467,dbnsfptranscript_sift4g_pred,dbNSFPTranscript,4.0a,string,D,,N,transcript,,,,,,,,,,,,,,,,Y
+468,dbnsfptranscript_sift4g_score,dbNSFPTranscript,4.0a,string,0.002,,N,transcript,,,,,,,,,,,,,,,,Y
+469,dbnsfptranscript_sift4g_pred,dbNSFPTranscript,4.0a,string,D,,N,transcript,,,,,,,,,,,,,,,,Y
+470,dbnsfptranscript_polyphen2_hdiv_score,dbNSFPTranscript,4.0a,number,,,N,transcript,,,,,pathogenicity,variant,Polyphen2 HDIV score,Polyphen2 HDIV score,PolyPhen2,,,,,,,Y
+471,dbnsfptranscript_polyphen2_hdiv_pred,dbNSFPTranscript,4.0a,string,,,N,transcript,,,,,pathogenicity,variant,Polyphen2 HDIV prediction,"D: Probably damaging (>=0.957), P: possibly damaging (0.453<=pp2_hdiv<=0.956); B: benign (pp2_hdiv<=0.452)",PolyPhen2,,,,,,,Y
+472,dbnsfptranscript_polyphen2_hvar_score,dbNSFPTranscript,4.0a,number,,,N,transcript,,,,,pathogenicity,variant,Polyphen2 HVAR score,Polyphen2 HVAR score,PolyPhen2,,,,,,,Y
+473,dbnsfptranscript_polyphen2_hvar_pred,dbNSFPTranscript,4.0a,string,,,N,transcript,,,,,pathogenicity,variant,Polyphen2 HVAR prediction,"D: Probably damaging (>=0.909), P: possibly damaging (0.447<=pp2_hdiv<=0.909); B: benign (pp2_hdiv<=0.446)",PolyPhen2,,,,,,,Y
+474,dbnsfptranscript_mutationassessor_score,dbNSFPTranscript,4.0a,number,2.385,,N,transcript,,,,,pathogenicity,variant,MutationAssessor score,MutationAssessor score,MutationAssessor,,,,,,,Y
+475,dbnsfptranscript_mutationassessor_pred,dbNSFPTranscript,4.0a,string,M,,N,transcript,,,,,pathogenicity,variant,MutationAssessor prediction,H: high; M: medium; L: low; N: neutral. H/M means functional and L/N means non-functional,MutationAssessor,,,,,,,Y
+476,dbnsfptranscript_fathmm_score,dbNSFPTranscript,4.0a,number,3.56,,N,transcript,,,,,pathogenicity,variant,FATHMM score,FATHMM score,FATHMM,,,,,,,Y
+477,dbnsfptranscript_fathmm_pred,dbNSFPTranscript,4.0a,string,T,,N,transcript,,,,,pathogenicity,variant,FATHMM prediction,D: Deleterious; T: Tolerated,FATHMM,,,,,,,Y
+478,dbnsfptranscript_provean_score,dbNSFPTranscript,4.0a,number,-3.83,,N,transcript,,,,,pathogenicity,variant,PROVEAN score,PROVEAN score,PROVEAN,,,,,,,Y
+479,dbnsfptranscript_provean_pred,dbNSFPTranscript,4.0a,string,D,,N,transcript,,,,,pathogenicity,variant,PROVEAN prediction,D: Deleterious; N: Neutral,PROVEAN,,,,,,,Y
+480,dbnsfptranscript_vest4_score,dbNSFPTranscript,4.0a,number,0.69;0.283,,N,transcript,,,,,pathogenicity,variant,VEST3 score,VEST3 score,VEST3,,,,,,,Y
+481,dbnsfptranscript_mvp_score,dbNSFPTranscript,4.0a,number,,,N,transcript,,,,,,,,,,,,,,,,Y
+482,dbnsfptranscript_mpc_score,dbNSFPTranscript,4.0a,number,0.578932934068,,N,transcript,,,,,,,,,,,,,,,,Y
+483,dbnsfptranscript_deogen2_score,dbNSFPTranscript,4.0a,number,,,N,transcript,,,,,,,,,,,,,,,,Y
+484,dbnsfptranscript_deogen2_pred,dbNSFPTranscript,4.0a,string,,,N,transcript,,,,,,,,,,,,,,,,Y
+485,dbnsfptranscript_aloft_fraction_transcripts_affected,dbNSFPTranscript,4.0a,string,,,N,transcript,,,,,,,,,,,,,,,,Y
+486,dbnsfptranscript_aloft_prob_tolerant,dbNSFPTranscript,4.0a,number,,,N,transcript,,,,,,,,,,,,,,,,Y
+487,dbnsfptranscript_aloft_prob_recessive,dbNSFPTranscript,4.0a,number,,,N,transcript,,,,,,,,,,,,,,,,Y
+488,dbnsfptranscript_aloft_prob_dominant,dbNSFPTranscript,4.0a,number,,,N,transcript,,,,,,,,,,,,,,,,Y
+489,dbnsfptranscript_aloft_pred,dbNSFPTranscript,4.0a,string,,,N,transcript,,,,,,,,,,,,,,,,Y
+490,dbnsfptranscript_aloft_confidence,dbNSFPTranscript,4.0a,string,,,N,transcript,,,,,,,,,,,,,,,,Y
+491,dbnsfptranscript_interpro_domain,dbNSFPTranscript,4.0a,string,Kazal domain|Kazal domain|Kazal domain,,Y,transcript,tilde,,,,,gene,INTERPRO domain,INTERPRO domain,INTERPRO,,,,,,,Y
+492,dbnsfp_ancestral_allele,dbNSFP,4.0a,string,,,N,,,,,,,,,,,,,,,,,Y
+493,dbnsfp_altaineandertal,dbNSFP,4.0a,string,A/A,,N,,,,,,,,,,,,,,,,,Y
+494,dbnsfp_denisova,dbNSFP,4.0a,string,A/A,,N,,,,,,,,,,,,,,,,,Y
+495,dbnsfp_vindijianeandertal,dbNSFP,4.0a,string,A/A,,N,,,,,,,,,,,,,,,,,Y
+496,dbnsfp_lrt_score,dbNSFP,4.0a,number,0.000004,,N,,,,,,pathogenicity,variant,LRT score,LRT score,LRT,,,,,,,Y
+497,dbnsfp_lrt_converted_rankscore,dbNSFP,4.0a,number,0.000004,,N,,,,,,pathogenicity,variant,LRT score,LRT score,LRT,,,,,,,Y
+498,dbnsfp_lrt_pred,dbNSFP,4.0a,string,D,,N,,,,,,pathogenicity,variant,LRT prediction,D: Deleterious; N: Neutral; U: Unknown,LRT,,,,,,,Y
+499,dbnsfp_lrt_omega,dbNSFP,4.0a,integer,0,,N,,,,,,,,,,,,,,,,,Y
+500,dbnsfp_mutationtaster_score,dbNSFP,4.0a,number,1,,Y,,tilde,,,,pathogenicity,variant,MutationTater score,MutationTater score,MutationTaster,,,,,,,Y
+501,dbnsfp_mutationtaster_converted_rankscore,dbNSFP,4.0a,number,1,,N,,,,,,pathogenicity,variant,MutationTater score,MutationTater score,MutationTaster,,,,,,,Y
+502,dbnsfp_mutationtaster_pred,dbNSFP,4.0a,string,D,,Y,,tilde,,,,pathogenicity,variant,MutationTater prediction,A: disease_causing_automatic; D:disease_causing; N:polymorphism; P:polymorphism_automatic,MutationTaster,,,,,,,Y
+503,dbnsfp_mutationtaster_model,dbNSFP,4.0a,string,simple_aae,,Y,,tilde,,,,,,,,,,,,,,,Y
+504,dbnsfp_mutationtaster_aae,dbNSFP,4.0a,string,E728V,,Y,,tilde,,,,,,,,,,,,,,,Y
+505,dbnsfp_metasvm_score,dbNSFP,4.0a,number,-1.2032,,N,,,,,,pathogenicity,variant,MetaSVM score,MetaSVM score,MetaSVM,,,,,,,Y
+506,dbnsfp_metasvm_rankscore,dbNSFP,4.0a,number,0.00127,,N,,,,,,pathogenicity,variant,MetaSVM rankscore,MetaSVM rankscore,MetaSVM,,,,,,,Y
+507,dbnsfp_metasvm_pred,dbNSFP,4.0a,string,T,,N,,,,,,pathogenicity,variant,MetaSVM prediction,D: Deleterious; T: Tolerated,MetaSVM,,,,,,,Y
+508,dbnsfp_metalr_score,dbNSFP,4.0a,number,0.0133,,N,,,,,,pathogenicity,variant,MetaLR score,MetaLR score,MetaLR,,,,,,,Y
+509,dbnsfp_metalr_rankscore,dbNSFP,4.0a,number,0.05225,,N,,,,,,pathogenicity,variant,MetaLR rankscore,MetaLR rankscore,MetaLR,,,,,,,Y
+510,dbnsfp_metalr_pred,dbNSFP,4.0a,string,T,,N,,,,,,pathogenicity,variant,MetaLR prediction,D: Deleterious; T: Tolerated,MetaLR,,,,,,,Y
+511,dbnsfp_reliability_index,dbNSFP,4.0a,integer,10,,N,,,,,,,,,,,,,,,,,Y
+512,dbnsfp_m_cap_score,dbNSFP,4.0a,number,,,N,,,,,,pathogenicity,variant,M-CAP score,M-CAP score,MCAP,,,,,,,Y
+513,dbnsfp_m_cap_rankscore,dbNSFP,4.0a,number,,,N,,,,,,pathogenicity,variant,M-CAP rankscore,M-CAP rankscore,MCAP,,,,,,,Y
+514,dbnsfp_m_cap_pred,dbNSFP,4.0a,string,,,N,,,,,,pathogenicity,variant,M-CAP prediction,D: Deleterious; T: Tolerated,MCAP,,,,,,,Y
+515,dbnsfp_revel_score,dbNSFP,4.0a,number,0.233,,N,,,,,,,,,,,,,,,,,Y
+516,dbnsfp_revel_rankscore,dbNSFP,4.0a,number,0.53914,,N,,,,,,,,,,,,,,,,,Y
+517,dbnsfp_mutpred_score,dbNSFP,4.0a,number,,,N,,,,,,,,,,,,,,,,,Y
+518,dbnsfp_mutpred_rankscore,dbNSFP,4.0a,number,,,N,,,,,,,,,,,,,,,,,Y
+519,dbnsfp_mutpred_protid,dbNSFP,4.0a,string,,,N,,,,,,,,,,,,,,,,,Y
+520,dbnsfp_mutpred_aachange,dbNSFP,4.0a,string,,,N,,,,,,,,,,,,,,,,,Y
+521,dbnsfp_mutpred_top5features,dbNSFP,4.0a,string,,,Y,,tilde,,,,,,,,,,,,,,,Y
+522,dbnsfp_primateai_score,dbNSFP,4.0a,number,0.50984478,,N,,,,,,,,,,,,,,,,,Y
+523,dbnsfp_primateai_rankscore,dbNSFP,4.0a,number,0.40201,,N,,,,,,,,,,,,,,,,,Y
+524,dbnsfp_primateai_pred,dbNSFP,4.0a,string,T,,N,,,,,,,,,,,,,,,,,Y
+525,dbnsfp_cadd_raw,dbNSFP,4.0a,number,4.623022,,N,,,,,,pathogenicity,variant,CADD raw score,CADD raw score,CADD,,,,,,,Y
+526,dbnsfp_cadd_raw_rankscore,dbNSFP,4.0a,number,0.92371,,N,,,,,,pathogenicity,variant,CADD raw rankscore,CADD raw rankscore,CADD,,,,,,,Y
+527,dbnsfp_cadd_phred,dbNSFP,4.0a,number,32,,N,,,,,,pathogenicity,variant,CADD PHRED score,CADD PHRED score,CADD,,,,,,,Y
+528,dbnsfp_dann_score,dbNSFP,4.0a,number,0.991547009,,N,,,,,,pathogenicity,variant,DANN score,DANN score,DANN,,,,,,,Y
+529,dbnsfp_dann_rankscore,dbNSFP,4.0a,number,0.53931,,N,,,,,,pathogenicity,variant,DANN rankscore,DANN rankscore,DANN,,,,,,,Y
+530,dbnsfp_fathmm_mkl_coding_score,dbNSFP,4.0a,number,0.99101,,N,,,,,,pathogenicity,variant,fathmm-MKL coding score,fathmm-MKL coding score,fathmm-MKL,,,,,,,Y
+531,dbnsfp_fathmm_mkl_coding_rankscore,dbNSFP,4.0a,number,0.9124,,N,,,,,,pathogenicity,variant,fathmm-MKL coding rankscore,fathmm-MKL coding rankscore,fathmm-MKL,,,,,,,Y
+532,dbnsfp_fathmm_mkl_coding_pred,dbNSFP,4.0a,string,D,,N,,,,,,pathogenicity,variant,fathmm-MKL coding prediction,D: Deleterious; N: Neutral,fathmm-MKL,,,,,,,Y
+533,dbnsfp_fathmm_mkl_coding_group,dbNSFP,4.0a,string,AEFBI,,N,,,,,,,,,,,,,,,,,Y
+534,dbnsfp_fathmm_xf_coding_score,dbNSFP,4.0a,number,0.799036,,N,,,,,,,,,,,,,,,,,Y
+535,dbnsfp_fathmm_xf_coding_rankscore,dbNSFP,4.0a,number,0.72541,,N,,,,,,,,,,,,,,,,,Y
+536,dbnsfp_fathmm_xf_coding_pred,dbNSFP,4.0a,string,D,,N,,,,,,,,,,,,,,,,,Y
+537,dbnsfp_eigen_raw_coding,dbNSFP,4.0a,number,0.531040421,,N,,,,,,,,,,,,,,,,,Y
+538,dbnsfp_eigen_raw_coding_rankscore,dbNSFP,4.0a,number,0.68935,,N,,,,,,,,,,,,,,,,,Y
+539,dbnsfp_eigen_pred_coding,dbNSFP,4.0a,number,5.28621,,N,,,,,,,,,,,,,,,,,Y
+540,dbnsfp_eigen_pc_raw_coding,dbNSFP,4.0a,number,0.422985083,,N,,,,,,,,,,,,,,,,,Y
+541,dbnsfp_eigen_pc_raw_coding_rankscore,dbNSFP,4.0a,number,0.63001,,N,,,,,,,,,,,,,,,,,Y
+542,dbnsfp_eigen_pc_phred_coding,dbNSFP,4.0a,number,4.525378,,N,,,,,,,,,,,,,,,,,Y
+543,dbnsfp_genocanyon_score,dbNSFP,4.0a,number,0.999998244,,N,,,,,,pathogenicity,variant,GenoCanyon score,GenoCanyon score,GenoCanyon,,,,,,,Y
+544,dbnsfp_genocanyon_rankscore,dbNSFP,4.0a,number,0.74766,,N,,,,,,pathogenicity,variant,GenoCanyon rankscore,GenoCanyon rankscore,GenoCanyon,,,,,,,Y
+545,dbnsfp_integrated_fitcons_score,dbNSFP,4.0a,number,0.706548,,N,,,,,,pathogenicity,variant,Integrated fitCons score,Integrated fitCons score,Integrated_FitCons,,,,,,,Y
+546,dbnsfp_integrated_fitcons_rankscore,dbNSFP,4.0a,number,0.73137,,N,,,,,,pathogenicity,variant,Integrated fitCons rankscore,Integrated fitCons rankscore,Integrated_FitCons,,,,,,,Y
+547,dbnsfp_integrated_confidence_value,dbNSFP,4.0a,number,0,,N,,,,,,pathogenicity,variant,integrated confidence value,integrated confidence value,Integrated_FitCons,,,,,,,Y
+548,dbnsfp_gm12878_fitcons_score,dbNSFP,4.0a,number,0.724815,,N,,,,,,,,,,,,,,,,,Y
+549,dbnsfp_gm12878_fitcons_rankscore,dbNSFP,4.0a,number,0.89359,,N,,,,,,,,,,,,,,,,,Y
+550,dbnsfp_gm12878_confidence_value,dbNSFP,4.0a,number,0,,N,,,,,,,,,,,,,,,,,Y
+551,dbnsfp_h1_hesc_fitcons_score,dbNSFP,4.0a,number,0.723109,,N,,,,,,,,,,,,,,,,,Y
+552,dbnsfp_h1_hesc_fitcons_rankscore,dbNSFP,4.0a,number,0.80598,,N,,,,,,,,,,,,,,,,,Y
+553,dbnsfp_h1_hesc_confidence_value,dbNSFP,4.0a,number,0,,N,,,,,,,,,,,,,,,,,Y
+554,dbnsfp_huvec_fitcons_score,dbNSFP,4.0a,number,0.714379,,N,,,,,,,,,,,,,,,,,Y
+555,dbnsfp_huvec_fitcons_rankscore,dbNSFP,4.0a,number,0.83352,,N,,,,,,,,,,,,,,,,,Y
+556,dbnsfp_huvec_confidence_value,dbNSFP,4.0a,number,0,,N,,,,,,,,,,,,,,,,,Y
+557,dbnsfp_linsight,dbNSFP,4.0a,number,,,N,,,,,,,,,,,,,,,,,Y
+558,dbnsfp_linsight_rankscore,dbNSFP,4.0a,number,,,N,,,,,,,,,,,,,,,,,Y
+559,dbnsfp_gerp_nr,dbNSFP,4.0a,number,4.58,,N,,,,,,,,,,,,,,,,,Y
+560,dbnsfp_gerp_rs,dbNSFP,4.0a,number,4.58,,N,,,,,,"pathogenicity, conservation",variant,GERP++ RS,GERP++ RS,GERP,,,,,,,Y
+561,dbnsfp_gerp_rs_rankscore,dbNSFP,4.0a,number,0.56077,,N,,,,,,"pathogenicity, conservation",variant,GERP++ RS rankscore,GERP++ RS rankscore,GERP,,,,,,,Y
+562,dbnsfp_phylop100way_vertebrate,dbNSFP,4.0a,number,5.452,,N,,,,,,"pathogenicity, conservation",variant,phyloP 100way vertebrate score,Conservation score by phyloP 100way vertebrate,phyloP,,,,,,,Y
+563,dbnsfp_phylop100way_vertebrate_rankscore,dbNSFP,4.0a,number,0.6638,,N,,,,,,"pathogenicity, conservation",variant,phyloP 100way vertebrate rankscore,Conservation rankscore by phyloP 100way vertebrate,phyloP,,,,,,,Y
+564,dbnsfp_phylop30way_mammalian,dbNSFP,4.0a,number,1.312,,N,,,,,,,,,,,,,,,,,Y
+565,dbnsfp_phylop30way_mammalian_rankscore,dbNSFP,4.0a,number,0.94714,,N,,,,,,,,,,,,,,,,,Y
+566,dbnsfp_phylop17way_primate,dbNSFP,4.0a,number,0.756,,N,,,,,,,,,,,,,,,,,Y
+567,dbnsfp_phylop17way_primate_rankscore,dbNSFP,4.0a,number,0.94297,,N,,,,,,,,,,,,,,,,,Y
+568,dbnsfp_phastcons100way_vertebrate,dbNSFP,4.0a,number,1,,N,,,,,,"pathogenicity, conservation",variant,phastCons 100way vertebrate score,phastCons 100way vertebrate score,phastCons,,,,,,,Y
+569,dbnsfp_phastcons100way_vertebrate_rankscore,dbNSFP,4.0a,number,0.71638,,N,,,,,,"pathogenicity, conservation",variant,phastCons 100way vertebrate score,phastCons 100way vertebrate score,phastCons,,,,,,,Y
+570,dbnsfp_phastcons30way_mammalian,dbNSFP,4.0a,number,0.932,,N,,,,,,,,,,,,,,,,,Y
+571,dbnsfp_phastcons30way_mammalian_rankscore,dbNSFP,4.0a,number,0.39996,,N,,,,,,,,,,,,,,,,,Y
+572,dbnsfp_phastcons17way_primate,dbNSFP,4.0a,number,0.891,,N,,,,,,,,,,,,,,,,,Y
+573,dbnsfp_phastcons17way_primate_rankscore,dbNSFP,4.0a,number,0.42908,,N,,,,,,,,,,,,,,,,,Y
+574,dbnsfp_siphy_29way_pi,dbNSFP,4.0a,number,1.0:0.0:0.0:0.0,,Y,,tilde,,,,,,,,,,,,,,,Y
+575,dbnsfp_siphy_29way_logodds,dbNSFP,4.0a,number,13.9535,,N,,,,,,pathogenicity,variant,SiPhy 29way logOdds score,SiPhy 29way logOdds score,SiPhy,,,,,,,Y
+576,dbnsfp_siphy_29way_logodds_rankscore,dbNSFP,4.0a,number,0.63643,,N,,,,,,pathogenicity,variant,SiPhy 29way logOdds rankscore,SiPhy 29way logOdds rankscore,SiPhy,,,,,,,Y
+577,dbnsfp_bstatistic,dbNSFP,4.0a,number,940,,N,,,,,,,,,,,,,,,,,Y
+578,dbnsfp_bstatistic_rankscore,dbNSFP,4.0a,number,0.86351,,N,,,,,,,,,,,,,,,,,Y
+579,dbnsfp_clinvar_id,dbNSFP,4.0a,string,128294,,N,,,,,,,,,,,,,,,,,Y
+580,dbnsfp_clinvar_clnsig,dbNSFP,4.0a,string,Benign,,N,,,,,,,,,,,,,,,,,Y
+581,dbnsfp_clinvar_trait,dbNSFP,4.0a,string,"Myasthenic_syndrome,_congenital,_8|not_specified",,Y,,tilde,,,,,,,,,,,,,,,Y
+582,dbnsfp_clinvar_review,dbNSFP,4.0a,string,"criteria_provided,_multiple_submitters,_no_conflicts",,N,,,,,,,,,,,,,,,,,Y
+583,dbnsfp_clinvar_hgvs,dbNSFP,4.0a,string,NC_000001.11:g.1044368A>T,,N,,,,,,,,,,,,,,,,,Y
+584,dbnsfp_clinvar_var_source,dbNSFP,4.0a,string,,,Y,,tilde,,,,,,,,,,,,,,,Y
+585,dbnsfp_clinvar_medgen_id,dbNSFP,4.0a,string,C3808739|CN169374,,Y,,tilde,,,,,,,,,,,,,,,Y
+586,dbnsfp_clinvar_omim_id,dbNSFP,4.0a,string,615120,,Y,,tilde,,,,,,,,,,,,,,,Y
+587,dbnsfp_clinvar_orphanet_id,dbNSFP,4.0a,string,,,Y,,tilde,,,,,,,,,,,,,,,Y
+588,cadd_length,CADD,1.5,integer,0,,N,,,,,,,variant,CADD15.Length,Number of inserted/deleted bases,CADD,1.5,,,,,,N
+589,cadd_annotype,CADD,1.5,string,CodingTranscript,,N,,,,,,,variant,CADD15.AnnoType,"CodingTranscript, Intergenic, MotifFeature, NonCodingTranscript,
 RegulatoryFeature, Transcript",CADD,1.5,,,,,,N
-598,cadd_consequence,CADD,1.5,string,NON_SYNONYMOUS,,N,,,,,,,variant,CADD15.Consequence,"VEP consequence, priority selected by potential impact (default:
+590,cadd_consequence,CADD,1.5,string,NON_SYNONYMOUS,,N,,,,,,,variant,CADD15.Consequence,"VEP consequence, priority selected by potential impact (default:
 UNKNOWN)",CADD,1.5,,,,,,N
-599,cadd_consscore,CADD,1.5,integer,7,,N,,,,,,,variant,CADD15.ConsScore,Custom deleterious score assigned to Consequence,CADD,1.5,,,,,,N
-600,cadd_consdetail,CADD,1.5,string,missense,,N,,,,,,,variant,CADD15.ConsDetail,Trimmed VEP consequence prior to simplification,CADD,1.5,,,,,,N
-601,cadd_gc,CADD,1.5,number,0.662,,N,,,,,,,variant,CADD15.GC,Percent GC in a window of +/- 75bp (default: 0.42),CADD,1.5,,,,,,N
-602,cadd_cpg,CADD,1.5,number,0.12,,N,,,,,,,variant,CADD15.CpG,Percent CpG in a window of +/- 75bp (default: 0.02),CADD,1.5,,,,,,N
-603,cadd_motifecount,CADD,1.5,integer,,,N,,,,,,,variant,CADD15.motifECount,Total number of overlapping motifs (default: 0),CADD,1.5,,,,,,N
-604,cadd_motifename,CADD,1.5,string,,,N,,,,,,,variant,CADD15.motifEName,Name of sequence motif the position overlaps,CADD,1.5,,,,,,N
-605,cadd_motifehipos,CADD,1.5,boolean,,,N,,,,,,,variant,CADD15.motifEHIPos,"Is the position considered highly informative for an overlapping
+591,cadd_consscore,CADD,1.5,integer,7,,N,,,,,,,variant,CADD15.ConsScore,Custom deleterious score assigned to Consequence,CADD,1.5,,,,,,N
+592,cadd_consdetail,CADD,1.5,string,missense,,N,,,,,,,variant,CADD15.ConsDetail,Trimmed VEP consequence prior to simplification,CADD,1.5,,,,,,N
+593,cadd_gc,CADD,1.5,number,0.662,,N,,,,,,,variant,CADD15.GC,Percent GC in a window of +/- 75bp (default: 0.42),CADD,1.5,,,,,,N
+594,cadd_cpg,CADD,1.5,number,0.12,,N,,,,,,,variant,CADD15.CpG,Percent CpG in a window of +/- 75bp (default: 0.02),CADD,1.5,,,,,,N
+595,cadd_motifecount,CADD,1.5,integer,,,N,,,,,,,variant,CADD15.motifECount,Total number of overlapping motifs (default: 0),CADD,1.5,,,,,,N
+596,cadd_motifename,CADD,1.5,string,,,N,,,,,,,variant,CADD15.motifEName,Name of sequence motif the position overlaps,CADD,1.5,,,,,,N
+597,cadd_motifehipos,CADD,1.5,boolean,,,N,,,,,,,variant,CADD15.motifEHIPos,"Is the position considered highly informative for an overlapping
 motif by VEP (default: 0)",CADD,1.5,,,,,,N
-606,cadd_motifescorechng,CADD,1.5,number,,,N,,,,,,,variant,CADD15.motifEScoreChng,VEP score change for the overlapping motif site (default: 0),CADD,1.5,,,,,,N
-607,cadd_oaa,CADD,1.5,string,E,,N,,,,,,,variant,CADD15.oAA,Reference amino acid (default: unknown),CADD,1.5,,,,,,N
-608,cadd_naa,CADD,1.5,string,V,,N,,,,,,,variant,CADD15.nAA,Amino acid of observed variant (default: unknown),CADD,1.5,,,,,,N
-609,cadd_geneid,CADD,1.5,string,ENSG00000188157,,N,,,,,,,variant,CADD15.GeneID,ENSEMBL GeneID,CADD,1.5,,,,,,N
-610,cadd_featureid,CADD,1.5,string,ENST00000379370,,N,,,,,,,variant,a,ENSEMBL feature ID (Transcript ID or regulatory feature ID),CADD,1.5,,,,,,N
-611,cadd_genename,CADD,1.5,string,AGRN,,N,,,,,,,variant,CADD15.GeneName,GeneName provided in ENSEMBL annotation,CADD,1.5,,,,,,N
-612,cadd_ccds,CADD,1.5,string,CCDS30551.1,,N,,,,,,,variant,CADD15.CCDS,Consensus Coding Sequence ID,CADD,1.5,,,,,,N
-613,cadd_intron,CADD,1.5,string,,,N,,,,,,,variant,CADD15.Intron,Intron number/Total number of exons,CADD,1.5,,,,,,N
-614,cadd_exon,CADD,1.5,string,12/36,,N,,,,,,,variant,CADD15.Exon,Exon number/Total number of exons,CADD,1.5,,,,,,N
-615,cadd_cdnapos,CADD,1.5,number,2233,,N,,,,,,,variant,CADD15.cDNApos,Base position from transcription start (default: 0*),CADD,1.5,,,,,,N
-616,cadd_relcdnapos,CADD,1.5,number,0.305,,N,,,,,,,variant,CADD15.relcDNApos,Relative position in transcript (default: 0),CADD,1.5,,,,,,N
-617,cadd_cdspos,CADD,1.5,number,2183,,N,,,,,,,variant,CADD15.CDSpos,Base position from coding start (default: 0*),CADD,1.5,,,,,,N
-618,cadd_relcdspos,CADD,1.5,number,0.356,,N,,,,,,,variant,CADD15.relCDSpos,Relative position in coding sequence (default: 0),CADD,1.5,,,,,,N
-619,cadd_protpos,CADD,1.5,number,728,,N,,,,,,,variant,CADD15.protPos,Amino acid position from coding start (default: 0*),CADD,1.5,,,,,,N
-620,cadd_relprotpos,CADD,1.5,number,0.356,,N,,,,,,,variant,CADD15.relProtPos,Relative position in protein codon (default: 0),CADD,1.5,,,,,,N
-621,cadd_domain,CADD,1.5,string,ndomain,,N,,,,,,,variant,CADD15.Domain,"Domain annotation inferred from VEP annotation (ncoils, sigp,
+598,cadd_motifescorechng,CADD,1.5,number,,,N,,,,,,,variant,CADD15.motifEScoreChng,VEP score change for the overlapping motif site (default: 0),CADD,1.5,,,,,,N
+599,cadd_oaa,CADD,1.5,string,E,,N,,,,,,,variant,CADD15.oAA,Reference amino acid (default: unknown),CADD,1.5,,,,,,N
+600,cadd_naa,CADD,1.5,string,V,,N,,,,,,,variant,CADD15.nAA,Amino acid of observed variant (default: unknown),CADD,1.5,,,,,,N
+601,cadd_geneid,CADD,1.5,string,ENSG00000188157,,N,,,,,,,variant,CADD15.GeneID,ENSEMBL GeneID,CADD,1.5,,,,,,N
+602,cadd_featureid,CADD,1.5,string,ENST00000379370,,N,,,,,,,variant,a,ENSEMBL feature ID (Transcript ID or regulatory feature ID),CADD,1.5,,,,,,N
+603,cadd_genename,CADD,1.5,string,AGRN,,N,,,,,,,variant,CADD15.GeneName,GeneName provided in ENSEMBL annotation,CADD,1.5,,,,,,N
+604,cadd_ccds,CADD,1.5,string,CCDS30551.1,,N,,,,,,,variant,CADD15.CCDS,Consensus Coding Sequence ID,CADD,1.5,,,,,,N
+605,cadd_intron,CADD,1.5,string,,,N,,,,,,,variant,CADD15.Intron,Intron number/Total number of exons,CADD,1.5,,,,,,N
+606,cadd_exon,CADD,1.5,string,12/36,,N,,,,,,,variant,CADD15.Exon,Exon number/Total number of exons,CADD,1.5,,,,,,N
+607,cadd_cdnapos,CADD,1.5,number,2233,,N,,,,,,,variant,CADD15.cDNApos,Base position from transcription start (default: 0*),CADD,1.5,,,,,,N
+608,cadd_relcdnapos,CADD,1.5,number,0.305,,N,,,,,,,variant,CADD15.relcDNApos,Relative position in transcript (default: 0),CADD,1.5,,,,,,N
+609,cadd_cdspos,CADD,1.5,number,2183,,N,,,,,,,variant,CADD15.CDSpos,Base position from coding start (default: 0*),CADD,1.5,,,,,,N
+610,cadd_relcdspos,CADD,1.5,number,0.356,,N,,,,,,,variant,CADD15.relCDSpos,Relative position in coding sequence (default: 0),CADD,1.5,,,,,,N
+611,cadd_protpos,CADD,1.5,number,728,,N,,,,,,,variant,CADD15.protPos,Amino acid position from coding start (default: 0*),CADD,1.5,,,,,,N
+612,cadd_relprotpos,CADD,1.5,number,0.356,,N,,,,,,,variant,CADD15.relProtPos,Relative position in protein codon (default: 0),CADD,1.5,,,,,,N
+613,cadd_domain,CADD,1.5,string,ndomain,,N,,,,,,,variant,CADD15.Domain,"Domain annotation inferred from VEP annotation (ncoils, sigp,
 lcompl, hmmpanther, ndomain = ""other named domain"") (default:
 UD)",CADD,1.5,,,,,,N
-622,cadd_dst2splice,CADD,1.5,number,NA,,N,,,,,,,variant,CADD15.Dst2Splice,"Distance to splice site in 20bp; positive: exonic, negative: intronic
+614,cadd_dst2splice,CADD,1.5,number,NA,,N,,,,,,,variant,CADD15.Dst2Splice,"Distance to splice site in 20bp; positive: exonic, negative: intronic
 (default: 0)",CADD,1.5,,,,,,N
-623,cadd_dst2spltype,CADD,1.5,string,NA,,N,,,,,,,variant,CADD15.Dst2SplType,Closest splice site is ACCEPTOR or DONOR (default: unknown),CADD,1.5,,,,,,N
-624,cadd_mindisttss,CADD,1.5,number,24245,,N,,,,,,,variant,CADD15.minDistTSS,Distance to closest Transcribed Sequence Start (TSS) (default: 5.5),CADD,1.5,,,,,,N
-625,cadd_mindisttse,CADD,1.5,number,11749,,N,,,,,,,variant,CADD15.minDistTSE,Distance to closest Transcribed Sequence End (TSE) (default: 5.5),CADD,1.5,,,,,,N
-626,cadd_siftcat,CADD,1.5,string,deleterious,,N,,,,,,,variant,CADD15.SIFTcat,SIFT category of change (default: UD),CADD,1.5,,,,,,N
-627,cadd_siftval,CADD,1.5,number,0.01,,N,,,,,,,variant,CADD15.SIFTval,SIFT score (default: 0*),CADD,1.5,,,,,,N
-628,cadd_polyphencat,CADD,1.5,number,probably_damaging,,N,,,,,,,variant,CADD15.PolyPhenCat,PolyPhen category of change (default: UD),CADD,1.5,,,,,,N
-629,cadd_polyphenval,CADD,1.5,number,0.986,,N,,,,,,,variant,CADD15.PolyPhenVal,PolyPhen score (default: 0*),CADD,1.5,,,,,,N
-630,cadd_priphcons,CADD,1.5,number,0.928,,N,,,,,,,variant,CADD15.priPhCons,Primate PhastCons conservation score (excl. human) (default: 0.0),CADD,1.5,,,,,,N
-631,cadd_mamphcons,CADD,1.5,number,1,,N,,,,,,,variant,CADD15.mamPhCons,"Mammalian PhastCons conservation score (excl. human) (default:
+615,cadd_dst2spltype,CADD,1.5,string,NA,,N,,,,,,,variant,CADD15.Dst2SplType,Closest splice site is ACCEPTOR or DONOR (default: unknown),CADD,1.5,,,,,,N
+616,cadd_mindisttss,CADD,1.5,number,24245,,N,,,,,,,variant,CADD15.minDistTSS,Distance to closest Transcribed Sequence Start (TSS) (default: 5.5),CADD,1.5,,,,,,N
+617,cadd_mindisttse,CADD,1.5,number,11749,,N,,,,,,,variant,CADD15.minDistTSE,Distance to closest Transcribed Sequence End (TSE) (default: 5.5),CADD,1.5,,,,,,N
+618,cadd_siftcat,CADD,1.5,string,deleterious,,N,,,,,,,variant,CADD15.SIFTcat,SIFT category of change (default: UD),CADD,1.5,,,,,,N
+619,cadd_siftval,CADD,1.5,number,0.01,,N,,,,,,,variant,CADD15.SIFTval,SIFT score (default: 0*),CADD,1.5,,,,,,N
+620,cadd_polyphencat,CADD,1.5,number,probably_damaging,,N,,,,,,,variant,CADD15.PolyPhenCat,PolyPhen category of change (default: UD),CADD,1.5,,,,,,N
+621,cadd_polyphenval,CADD,1.5,number,0.986,,N,,,,,,,variant,CADD15.PolyPhenVal,PolyPhen score (default: 0*),CADD,1.5,,,,,,N
+622,cadd_priphcons,CADD,1.5,number,0.928,,N,,,,,,,variant,CADD15.priPhCons,Primate PhastCons conservation score (excl. human) (default: 0.0),CADD,1.5,,,,,,N
+623,cadd_mamphcons,CADD,1.5,number,1,,N,,,,,,,variant,CADD15.mamPhCons,"Mammalian PhastCons conservation score (excl. human) (default:
 0.0)",CADD,1.5,,,,,,N
-632,cadd_verphcons,CADD,1.5,number,1,,N,,,,,,,variant,CADD15.verPhCons,"Vertebrate PhastCons conservation score (excl. human) (default:
+624,cadd_verphcons,CADD,1.5,number,1,,N,,,,,,,variant,CADD15.verPhCons,"Vertebrate PhastCons conservation score (excl. human) (default:
 0.0)",CADD,1.5,,,,,,N
-633,cadd_priphylop,CADD,1.5,number,0.475,,N,,,,,,,variant,CADD15.priPhyloP,Primate PhyloP score (excl. human) (default: -0.029),CADD,1.5,,,,,,N
-634,cadd_mamphylop,CADD,1.5,number,3.27,,N,,,,,,,variant,CADD15.mamPhyloP,Mammalian PhyloP score (excl. human) (default: -0.005),CADD,1.5,,,,,,N
-635,cadd_verphylop,CADD,1.5,integer,4.955,,N,,,,,,,variant,CADD15.verPhyloP,Vertebrate PhyloP score (excl. human) (default: 0.042),CADD,1.5,,,,,,N
-636,cadd_bstatistic,CADD,1.5,integer,940,,N,,,,,,,variant,CADD15.bStatistic,Background selection score (default: 800),CADD,1.5,,,,,,N
-637,cadd_targetscan,CADD,1.5,number,,,N,,,,,,,variant,CADD15.targetScan,targetscan (default: 0*),CADD,1.5,,,,,,N
-638,cadd_mirsvr-score,CADD,1.5,number,,,N,,,,,,,variant,CADD15.mirSVR-Score,mirSVR-Score (default: 0*),CADD,1.5,,,,,,N
-639,cadd_mirsvr-e,CADD,1.5,number,,,N,,,,,,,variant,CADD15.mirSVR-E,mirSVR-E (default: 0),CADD,1.5,,,,,,N
-640,cadd_mirsvr-aln,CADD,1.5,integer,,,N,,,,,,,variant,CADD15.mirSVR-Aln,mirSVR-Aln (default: 0),CADD,1.5,,,,,,N
-641,cadd_chmm_e1,CADD,1.5,number,0,,N,,,,,,,variant,CADD15.cHmm_E1,"Number of 48 cell types in chromHMM state E1_poised (default:
+625,cadd_priphylop,CADD,1.5,number,0.475,,N,,,,,,,variant,CADD15.priPhyloP,Primate PhyloP score (excl. human) (default: -0.029),CADD,1.5,,,,,,N
+626,cadd_mamphylop,CADD,1.5,number,3.27,,N,,,,,,,variant,CADD15.mamPhyloP,Mammalian PhyloP score (excl. human) (default: -0.005),CADD,1.5,,,,,,N
+627,cadd_verphylop,CADD,1.5,integer,4.955,,N,,,,,,,variant,CADD15.verPhyloP,Vertebrate PhyloP score (excl. human) (default: 0.042),CADD,1.5,,,,,,N
+628,cadd_bstatistic,CADD,1.5,integer,940,,N,,,,,,,variant,CADD15.bStatistic,Background selection score (default: 800),CADD,1.5,,,,,,N
+629,cadd_targetscan,CADD,1.5,number,,,N,,,,,,,variant,CADD15.targetScan,targetscan (default: 0*),CADD,1.5,,,,,,N
+630,cadd_mirsvr-score,CADD,1.5,number,,,N,,,,,,,variant,CADD15.mirSVR-Score,mirSVR-Score (default: 0*),CADD,1.5,,,,,,N
+631,cadd_mirsvr-e,CADD,1.5,number,,,N,,,,,,,variant,CADD15.mirSVR-E,mirSVR-E (default: 0),CADD,1.5,,,,,,N
+632,cadd_mirsvr-aln,CADD,1.5,integer,,,N,,,,,,,variant,CADD15.mirSVR-Aln,mirSVR-Aln (default: 0),CADD,1.5,,,,,,N
+633,cadd_chmm_e1,CADD,1.5,number,0,,N,,,,,,,variant,CADD15.cHmm_E1,"Number of 48 cell types in chromHMM state E1_poised (default:
 1.92*)",CADD,1.5,,,,,,N
-642,cadd_chmm_e2,CADD,1.5,number,1,,N,,,,,,,variant,CADD15.cHmm_E2,"Number of 48 cell types in chromHMM state E2_repressed
+634,cadd_chmm_e2,CADD,1.5,number,1,,N,,,,,,,variant,CADD15.cHmm_E2,"Number of 48 cell types in chromHMM state E2_repressed
 (default: 1.92)",CADD,1.5,,,,,,N
-643,cadd_chmm_e3,CADD,1.5,number,0,,N,,,,,,,variant,CADD15.cHmm_E3,"Number of 48 cell types in chromHMM state E3_dead (default:
+635,cadd_chmm_e3,CADD,1.5,number,0,,N,,,,,,,variant,CADD15.cHmm_E3,"Number of 48 cell types in chromHMM state E3_dead (default:
 1.92)",CADD,1.5,,,,,,N
-644,cadd_chmm_e4,CADD,1.5,number,3,,N,,,,,,,variant,CADD15.cHmm_E4,"Number of 48 cell types in chromHMM state E4_dead (default:
+636,cadd_chmm_e4,CADD,1.5,number,3,,N,,,,,,,variant,CADD15.cHmm_E4,"Number of 48 cell types in chromHMM state E4_dead (default:
 1.92)",CADD,1.5,,,,,,N
-645,cadd_chmm_e5,CADD,1.5,number,0,,N,,,,,,,variant,CADD15.cHmm_E5,"Number of 48 cell types in chromHMM state E5_repressed
+637,cadd_chmm_e5,CADD,1.5,number,0,,N,,,,,,,variant,CADD15.cHmm_E5,"Number of 48 cell types in chromHMM state E5_repressed
 (default: 1.92)",CADD,1.5,,,,,,N
-646,cadd_chmm_e6,CADD,1.5,number,4,,N,,,,,,,variant,CADD15.cHmm_E6,"Number of 48 cell types in chromHMM state E6_repressed
+638,cadd_chmm_e6,CADD,1.5,number,4,,N,,,,,,,variant,CADD15.cHmm_E6,"Number of 48 cell types in chromHMM state E6_repressed
 (default: 1.92)",CADD,1.5,,,,,,N
-647,cadd_chmm_e7,CADD,1.5,number,9,,N,,,,,,,variant,CADD15.cHmm_E7,"Number of 48 cell types in chromHMM state E7_weak (default:
+639,cadd_chmm_e7,CADD,1.5,number,9,,N,,,,,,,variant,CADD15.cHmm_E7,"Number of 48 cell types in chromHMM state E7_weak (default:
 1.92)",CADD,1.5,,,,,,N
-648,cadd_chmm_e8,CADD,1.5,number,13,,N,,,,,,,variant,CADD15.cHmm_E8,"Number of 48 cell types in chromHMM state E8_gene (default:
+640,cadd_chmm_e8,CADD,1.5,number,13,,N,,,,,,,variant,CADD15.cHmm_E8,"Number of 48 cell types in chromHMM state E8_gene (default:
 1.92)",CADD,1.5,,,,,,N
-649,cadd_chmm_e9,CADD,1.5,number,2,,N,,,,,,,variant,CADD15.cHmm_E9,"Number of 48 cell types in chromHMM state E9_gene (default:
+641,cadd_chmm_e9,CADD,1.5,number,2,,N,,,,,,,variant,CADD15.cHmm_E9,"Number of 48 cell types in chromHMM state E9_gene (default:
 1.92)",CADD,1.5,,,,,,N
-650,cadd_chmm_e10,CADD,1.5,number,0,,N,,,,,,,variant,CADD15.cHmm_E10,"Number of 48 cell types in chromHMM state E10_gene (default:
+642,cadd_chmm_e10,CADD,1.5,number,0,,N,,,,,,,variant,CADD15.cHmm_E10,"Number of 48 cell types in chromHMM state E10_gene (default:
 1.92)",CADD,1.5,,,,,,N
-651,cadd_chmm_e11,CADD,1.5,number,0,,N,,,,,,,variant,CADD15.cHmm_E11,"Number of 48 cell types in chromHMM state E11_gene (default:
+643,cadd_chmm_e11,CADD,1.5,number,0,,N,,,,,,,variant,CADD15.cHmm_E11,"Number of 48 cell types in chromHMM state E11_gene (default:
 1.92)",CADD,1.5,,,,,,N
-652,cadd_chmm_e12,CADD,1.5,number,0,,N,,,,,,,variant,CADD15.cHmm_E12,"Number of 48 cell types in chromHMM state E12_distal (default:
+644,cadd_chmm_e12,CADD,1.5,number,0,,N,,,,,,,variant,CADD15.cHmm_E12,"Number of 48 cell types in chromHMM state E12_distal (default:
 1.92)",CADD,1.5,,,,,,N
-653,cadd_chmm_e13,CADD,1.5,number,0,,N,,,,,,,variant,CADD15.cHmm_E13,"Number of 48 cell types in chromHMM state E13_distal (default:
+645,cadd_chmm_e13,CADD,1.5,number,0,,N,,,,,,,variant,CADD15.cHmm_E13,"Number of 48 cell types in chromHMM state E13_distal (default:
 1.92)",CADD,1.5,,,,,,N
-654,cadd_chmm_e14,CADD,1.5,number,0,,N,,,,,,,variant,CADD15.cHmm_E14,"Number of 48 cell types in chromHMM state E14_distal (default:
+646,cadd_chmm_e14,CADD,1.5,number,0,,N,,,,,,,variant,CADD15.cHmm_E14,"Number of 48 cell types in chromHMM state E14_distal (default:
 1.92)",CADD,1.5,,,,,,N
-655,cadd_chmm_e15,CADD,1.5,number,10,,N,,,,,,,variant,CADD15.cHmm_E15,"Number of 48 cell types in chromHMM state E15_weak (default:
+647,cadd_chmm_e15,CADD,1.5,number,10,,N,,,,,,,variant,CADD15.cHmm_E15,"Number of 48 cell types in chromHMM state E15_weak (default:
 1.92)",CADD,1.5,,,,,,N
-656,cadd_chmm_e16,CADD,1.5,number,0,,N,,,,,,,variant,CADD15.cHmm_E16,"Number of 48 cell types in chromHMM state E16_tss (default:
+648,cadd_chmm_e16,CADD,1.5,number,0,,N,,,,,,,variant,CADD15.cHmm_E16,"Number of 48 cell types in chromHMM state E16_tss (default:
 1.92)",CADD,1.5,,,,,,N
-657,cadd_chmm_e17,CADD,1.5,number,0,,N,,,,,,,variant,CADD15.cHmm_E17,"Number of 48 cell types in chromHMM state E17_proximal
+649,cadd_chmm_e17,CADD,1.5,number,0,,N,,,,,,,variant,CADD15.cHmm_E17,"Number of 48 cell types in chromHMM state E17_proximal
 (default: 1.92)",CADD,1.5,,,,,,N
-658,cadd_chmm_e18,CADD,1.5,number,0,,N,,,,,,,variant,CADD15.cHmm_E18,"Number of 48 cell types in chromHMM state E18_proximal
+650,cadd_chmm_e18,CADD,1.5,number,0,,N,,,,,,,variant,CADD15.cHmm_E18,"Number of 48 cell types in chromHMM state E18_proximal
 (default: 1.92)",CADD,1.5,,,,,,N
-659,cadd_chmm_e19,CADD,1.5,number,0,,N,,,,,,,variant,CADD15.cHmm_E19,"Number of 48 cell types in chromHMM state E19_tss (default:
+651,cadd_chmm_e19,CADD,1.5,number,0,,N,,,,,,,variant,CADD15.cHmm_E19,"Number of 48 cell types in chromHMM state E19_tss (default:
 1.92)",CADD,1.5,,,,,,N
-660,cadd_chmm_e20,CADD,1.5,number,0,,N,,,,,,,variant,CADD15.cHmm_E20,"Number of 48 cell types in chromHMM state E20_poised (default:
+652,cadd_chmm_e20,CADD,1.5,number,0,,N,,,,,,,variant,CADD15.cHmm_E20,"Number of 48 cell types in chromHMM state E20_poised (default:
 1.92)",CADD,1.5,,,,,,N
-661,cadd_chmm_e21,CADD,1.5,number,3,,N,,,,,,,variant,CADD15.cHmm_E21,"Number of 48 cell types in chromHMM state E21_dead (default:
+653,cadd_chmm_e21,CADD,1.5,number,3,,N,,,,,,,variant,CADD15.cHmm_E21,"Number of 48 cell types in chromHMM state E21_dead (default:
 1.92)",CADD,1.5,,,,,,N
-662,cadd_chmm_e22,CADD,1.5,number,0,,N,,,,,,,variant,CADD15.cHmm_E22,"Number of 48 cell types in chromHMM state E22_repressed
+654,cadd_chmm_e22,CADD,1.5,number,0,,N,,,,,,,variant,CADD15.cHmm_E22,"Number of 48 cell types in chromHMM state E22_repressed
 (default: 1.92)",CADD,1.5,,,,,,N
-663,cadd_chmm_e23,CADD,1.5,number,3,,N,,,,,,,variant,CADD15.cHmm_E23,"Number of 48 cell types in chromHMM state E23_weak (default:
+655,cadd_chmm_e23,CADD,1.5,number,3,,N,,,,,,,variant,CADD15.cHmm_E23,"Number of 48 cell types in chromHMM state E23_weak (default:
 1.92)",CADD,1.5,,,,,,N
-664,cadd_chmm_e24,CADD,1.5,number,0,,N,,,,,,,variant,CADD15.cHmm_E24,"Number of 48 cell types in chromHMM state E24_distal (default:
+656,cadd_chmm_e24,CADD,1.5,number,0,,N,,,,,,,variant,CADD15.cHmm_E24,"Number of 48 cell types in chromHMM state E24_distal (default:
 1.92)",CADD,1.5,,,,,,N
-665,cadd_chmm_e25,CADD,1.5,number,0,,N,,,,,,,variant,CADD15.cHmm_E25,"Number of 48 cell types in chromHMM state E25_distal (default:
+657,cadd_chmm_e25,CADD,1.5,number,0,,N,,,,,,,variant,CADD15.cHmm_E25,"Number of 48 cell types in chromHMM state E25_distal (default:
 1.92)",CADD,1.5,,,,,,N
-666,cadd_gerprs,CADD,1.5,number,87.4,,N,,,,,,,variant,CADD15.GerpRS,Gerp element score (default: 0),CADD,1.5,,,,,,N
-667,cadd_gerprspval,CADD,1.5,number,2.38E-10,,N,,,,,,,variant,CADD15.GerpRSpval,Gerp element p-Value (default: 0),CADD,1.5,,,,,,N
-668,cadd_gerpn,CADD,1.5,number,17.4,,N,,,,,,,variant,CADD15.GerpN,Neutral evolution score defined by GERP++ (default: 3.0),CADD,1.5,,,,,,N
-669,cadd_gerps,CADD,1.5,number,17.4,,N,,,,,,,variant,CADD15.GerpS,Rejected Substitution score defined by GERP++ (default: -0.2),CADD,1.5,,,,,,N
-670,cadd_toverlapmotifs,CADD,1.5,number,,,N,,,,,,,variant,CADD15.tOverlapMotifs,Number of overlapping predicted TF motifs,CADD,1.5,,,,,,N
-671,cadd_motifdist,CADD,1.5,number,,,N,,,,,,,variant,CADD15.motifDist,"Reference minus alternate allele difference in nucleotide frequency
+658,cadd_gerprs,CADD,1.5,number,87.4,,N,,,,,,,variant,CADD15.GerpRS,Gerp element score (default: 0),CADD,1.5,,,,,,N
+659,cadd_gerprspval,CADD,1.5,number,2.38E-10,,N,,,,,,,variant,CADD15.GerpRSpval,Gerp element p-Value (default: 0),CADD,1.5,,,,,,N
+660,cadd_gerpn,CADD,1.5,number,17.4,,N,,,,,,,variant,CADD15.GerpN,Neutral evolution score defined by GERP++ (default: 3.0),CADD,1.5,,,,,,N
+661,cadd_gerps,CADD,1.5,number,17.4,,N,,,,,,,variant,CADD15.GerpS,Rejected Substitution score defined by GERP++ (default: -0.2),CADD,1.5,,,,,,N
+662,cadd_toverlapmotifs,CADD,1.5,number,,,N,,,,,,,variant,CADD15.tOverlapMotifs,Number of overlapping predicted TF motifs,CADD,1.5,,,,,,N
+663,cadd_motifdist,CADD,1.5,number,,,N,,,,,,,variant,CADD15.motifDist,"Reference minus alternate allele difference in nucleotide frequency
 within an predicted overlapping motif (default: 0)",CADD,1.5,,,,,,N
-672,cadd_encodeh3k4me1-sum,CADD,1.5,number,3.61,,N,,,,,,,variant,CADD15.EncodeH3K4me1-sum,Sum of Encode H3K4me1 levels (from 13 cell lines) (default: 0.76),CADD,1.5,,,,,,N
-673,cadd_encodeh3k4me1-max,CADD,1.5,number,1.51,,N,,,,,,,variant,CADD15.EncodeH3K4me1-max,"Maximum Encode H3K4me1 level (from 13 cell lines) (default:
+664,cadd_encodeh3k4me1-sum,CADD,1.5,number,3.61,,N,,,,,,,variant,CADD15.EncodeH3K4me1-sum,Sum of Encode H3K4me1 levels (from 13 cell lines) (default: 0.76),CADD,1.5,,,,,,N
+665,cadd_encodeh3k4me1-max,CADD,1.5,number,1.51,,N,,,,,,,variant,CADD15.EncodeH3K4me1-max,"Maximum Encode H3K4me1 level (from 13 cell lines) (default:
 0.37)",CADD,1.5,,,,,,N
-674,cadd_encodeh3k4me2-sum,CADD,1.5,number,4.22,,N,,,,,,,variant,CADD15.EncodeH3K4me2-sum,Sum of Encode H3K4me2 levels (from 14 cell lines) (default: 0.73),CADD,1.5,,,,,,N
-675,cadd_encodeh3k4me2-max,CADD,1.5,number,1.53,,N,,,,,,,variant,CADD15.EncodeH3K4me2-max,"Maximum Encode H3K4me2 level (from 14 cell lines) (default:
+666,cadd_encodeh3k4me2-sum,CADD,1.5,number,4.22,,N,,,,,,,variant,CADD15.EncodeH3K4me2-sum,Sum of Encode H3K4me2 levels (from 14 cell lines) (default: 0.73),CADD,1.5,,,,,,N
+667,cadd_encodeh3k4me2-max,CADD,1.5,number,1.53,,N,,,,,,,variant,CADD15.EncodeH3K4me2-max,"Maximum Encode H3K4me2 level (from 14 cell lines) (default:
 0.37)",CADD,1.5,,,,,,N
-676,cadd_encodeh3k4me3-sum,CADD,1.5,number,4.34,,N,,,,,,,variant,CADD15.EncodeH3K4me3-sum,Sum of Encode H3K4me3 levels (from 14 cell lines) (default: 0.81),CADD,1.5,,,,,,N
-677,cadd_encodeh3k4me3-max,CADD,1.5,number,0.97,,N,,,,,,,variant,CADD15.EncodeH3K4me3-max,"Maximum Encode H3K4me3 level (from 14 cell lines) (default:
+668,cadd_encodeh3k4me3-sum,CADD,1.5,number,4.34,,N,,,,,,,variant,CADD15.EncodeH3K4me3-sum,Sum of Encode H3K4me3 levels (from 14 cell lines) (default: 0.81),CADD,1.5,,,,,,N
+669,cadd_encodeh3k4me3-max,CADD,1.5,number,0.97,,N,,,,,,,variant,CADD15.EncodeH3K4me3-max,"Maximum Encode H3K4me3 level (from 14 cell lines) (default:
 0.38)",CADD,1.5,,,,,,N
-678,cadd_encodeh3k9ac-sum,CADD,1.5,number,9.68,,N,,,,,,,variant,CADD15.EncodeH3K9ac-sum,Sum of Encode H3K9ac levels (from 13 cell lines) (default: 0.82),CADD,1.5,,,,,,N
-679,cadd_encodeh3k9ac-max,CADD,1.5,number,2.53,,N,,,,,,,variant,CADD15.EncodeH3K9ac-max,Maximum Encode H3K9ac level (from 13 cell lines) (default: 0.41),CADD,1.5,,,,,,N
-680,cadd_encodeh3k9me3-sum,CADD,1.5,number,5.87,,N,,,,,,,variant,CADD15.EncodeH3K9me3-sum,Sum of Encode H3K9me3 levels (from 14 cell lines) (default: 0.81),CADD,1.5,,,,,,N
-681,cadd_encodeh3k9me3-max,CADD,1.5,number,1.1,,N,,,,,,,variant,CADD15.EncodeH3K9me3-max,"Maximum Encode H3K9me3 level (from 14 cell lines) (default:
+670,cadd_encodeh3k9ac-sum,CADD,1.5,number,9.68,,N,,,,,,,variant,CADD15.EncodeH3K9ac-sum,Sum of Encode H3K9ac levels (from 13 cell lines) (default: 0.82),CADD,1.5,,,,,,N
+671,cadd_encodeh3k9ac-max,CADD,1.5,number,2.53,,N,,,,,,,variant,CADD15.EncodeH3K9ac-max,Maximum Encode H3K9ac level (from 13 cell lines) (default: 0.41),CADD,1.5,,,,,,N
+672,cadd_encodeh3k9me3-sum,CADD,1.5,number,5.87,,N,,,,,,,variant,CADD15.EncodeH3K9me3-sum,Sum of Encode H3K9me3 levels (from 14 cell lines) (default: 0.81),CADD,1.5,,,,,,N
+673,cadd_encodeh3k9me3-max,CADD,1.5,number,1.1,,N,,,,,,,variant,CADD15.EncodeH3K9me3-max,"Maximum Encode H3K9me3 level (from 14 cell lines) (default:
 0.38)",CADD,1.5,,,,,,N
-682,cadd_encodeh3k27ac-sum,CADD,1.5,number,2.88,,N,,,,,,,variant,CADD15.EncodeH3K27ac-sum,Sum of Encode H3K27ac levels (from 14 cell lines) (default: 0.74),CADD,1.5,,,,,,N
-683,cadd_encodeh3k27ac-max,CADD,1.5,number,0.97,,N,,,,,,,variant,CADD15.EncodeH3K27ac-max,"Maximum Encode H3K27ac level (from 14 cell lines) (default:
+674,cadd_encodeh3k27ac-sum,CADD,1.5,number,2.88,,N,,,,,,,variant,CADD15.EncodeH3K27ac-sum,Sum of Encode H3K27ac levels (from 14 cell lines) (default: 0.74),CADD,1.5,,,,,,N
+675,cadd_encodeh3k27ac-max,CADD,1.5,number,0.97,,N,,,,,,,variant,CADD15.EncodeH3K27ac-max,"Maximum Encode H3K27ac level (from 14 cell lines) (default:
 0.36)",CADD,1.5,,,,,,N
-684,cadd_encodeh3k27me3-sum,CADD,1.5,number,4.59,,N,,,,,,,variant,CADD15.EncodeH3K27me3-sum,"Sum of Encode H3K27me3 levels (from 14 cell lines) (default:
+676,cadd_encodeh3k27me3-sum,CADD,1.5,number,4.59,,N,,,,,,,variant,CADD15.EncodeH3K27me3-sum,"Sum of Encode H3K27me3 levels (from 14 cell lines) (default:
 0.93)",CADD,1.5,,,,,,N
-685,cadd_encodeh3k27me3-max,CADD,1.5,number,1.24,,N,,,,,,,variant,CADD15.EncodeH3K27me3-max,"Maximum Encode H3K27me3 level (from 14 cell lines) (default:
+677,cadd_encodeh3k27me3-max,CADD,1.5,number,1.24,,N,,,,,,,variant,CADD15.EncodeH3K27me3-max,"Maximum Encode H3K27me3 level (from 14 cell lines) (default:
 0.47)",CADD,1.5,,,,,,N
-686,cadd_encodeh3k36me3-sum,CADD,1.5,number,23.35,,N,,,,,,,variant,CADD15.EncodeH3K36me3-sum,"Sum of Encode H3K36me3 levels (from 10 cell lines) (default:
+678,cadd_encodeh3k36me3-sum,CADD,1.5,number,23.35,,N,,,,,,,variant,CADD15.EncodeH3K36me3-sum,"Sum of Encode H3K36me3 levels (from 10 cell lines) (default:
 0.71)",CADD,1.5,,,,,,N
-687,cadd_encodeh3k36me3-max,CADD,1.5,number,6.47,,N,,,,,,,variant,CADD15.EncodeH3K36me3-max,"Maximum Encode H3K36me3 level (from 10 cell lines) (default:
+679,cadd_encodeh3k36me3-max,CADD,1.5,number,6.47,,N,,,,,,,variant,CADD15.EncodeH3K36me3-max,"Maximum Encode H3K36me3 level (from 10 cell lines) (default:
 0.39)",CADD,1.5,,,,,,N
-688,cadd_encodeh3k79me2-sum,CADD,1.5,number,15.18,,N,,,,,,,variant,CADD15.EncodeH3K79me2-sum,"Sum of Encode H3K79me2 levels (from 13 cell lines) (default:
+680,cadd_encodeh3k79me2-sum,CADD,1.5,number,15.18,,N,,,,,,,variant,CADD15.EncodeH3K79me2-sum,"Sum of Encode H3K79me2 levels (from 13 cell lines) (default:
 0.64)",CADD,1.5,,,,,,N
-689,cadd_encodeh3k79me2-max,CADD,1.5,number,5.12,,N,,,,,,,variant,CADD15.EncodeH3K79me2-max,"Maximum Encode H3K79me2 level (from 13 cell lines) (default:
+681,cadd_encodeh3k79me2-max,CADD,1.5,number,5.12,,N,,,,,,,variant,CADD15.EncodeH3K79me2-max,"Maximum Encode H3K79me2 level (from 13 cell lines) (default:
 0.34)",CADD,1.5,,,,,,N
-690,cadd_encodeh4k20me1-sum,CADD,1.5,number,20.91,,N,,,,,,,variant,CADD15.EncodeH4K20me1-sum,"Sum of Encode H4K20me1 levels (from 11 cell lines) (default:
+682,cadd_encodeh4k20me1-sum,CADD,1.5,number,20.91,,N,,,,,,,variant,CADD15.EncodeH4K20me1-sum,"Sum of Encode H4K20me1 levels (from 11 cell lines) (default:
 0.88)",CADD,1.5,,,,,,N
-691,cadd_encodeh4k20me1-max,CADD,1.5,number,4.67,,N,,,,,,,variant,CADD15.EncodeH4K20me1-max,"Maximum Encode H4K20me1 level (from 11 cell lines) (default:
+683,cadd_encodeh4k20me1-max,CADD,1.5,number,4.67,,N,,,,,,,variant,CADD15.EncodeH4K20me1-max,"Maximum Encode H4K20me1 level (from 11 cell lines) (default:
 0.47)",CADD,1.5,,,,,,N
-692,cadd_encodeh2afz-sum,CADD,1.5,number,3.12,,N,,,,,,,variant,CADD15.EncodeH2AFZ-sum,Sum of Encode H2AFZ levels (from 13 cell lines) (default: 0.9),CADD,1.5,,,,,,N
-693,cadd_encodeh2afz-max,CADD,1.5,number,2.24,,N,,,,,,,variant,CADD15.EncodeH2AFZ-max,Maximum Encode H2AFZ level (from 13 cell lines) (default: 0.42),CADD,1.5,,,,,,N
-694,cadd_encodednase-sum,CADD,1.5,number,0.71,,N,,,,,,,variant,CADD15.EncodeDNase-sum,Sum of Encode DNase-seq levels (from 12 cell lines) (default: 0.0),CADD,1.5,,,,,,N
-695,cadd_encodednase-max,CADD,1.5,number,0.16,,N,,,,,,,variant,CADD15.EncodeDNase-max,"Maximum Encode DNase-seq level (from 12 cell lines) (default:
+684,cadd_encodeh2afz-sum,CADD,1.5,number,3.12,,N,,,,,,,variant,CADD15.EncodeH2AFZ-sum,Sum of Encode H2AFZ levels (from 13 cell lines) (default: 0.9),CADD,1.5,,,,,,N
+685,cadd_encodeh2afz-max,CADD,1.5,number,2.24,,N,,,,,,,variant,CADD15.EncodeH2AFZ-max,Maximum Encode H2AFZ level (from 13 cell lines) (default: 0.42),CADD,1.5,,,,,,N
+686,cadd_encodednase-sum,CADD,1.5,number,0.71,,N,,,,,,,variant,CADD15.EncodeDNase-sum,Sum of Encode DNase-seq levels (from 12 cell lines) (default: 0.0),CADD,1.5,,,,,,N
+687,cadd_encodednase-max,CADD,1.5,number,0.16,,N,,,,,,,variant,CADD15.EncodeDNase-max,"Maximum Encode DNase-seq level (from 12 cell lines) (default:
 0.0)",CADD,1.5,,,,,,N
-696,cadd_encodetotalrna-sum,CADD,1.5,number,22.66,,N,,,,,,,variant,CADD15.EncodetotalRNA-sum,"Sum of Encode totalRNA-seq levels (from 10 cell lines always
+688,cadd_encodetotalrna-sum,CADD,1.5,number,22.66,,N,,,,,,,variant,CADD15.EncodetotalRNA-sum,"Sum of Encode totalRNA-seq levels (from 10 cell lines always
 minus and plus strand) (default: 0.0)",CADD,1.5,,,,,,N
-697,cadd_encodetotalrna-max,CADD,1.5,number,13.43,,N,,,,,,,variant,CADD15.EncodetotalRNA-max,"Maximum Encode totalRNA-seq level (from 10 cell lines, minus
+689,cadd_encodetotalrna-max,CADD,1.5,number,13.43,,N,,,,,,,variant,CADD15.EncodetotalRNA-max,"Maximum Encode totalRNA-seq level (from 10 cell lines, minus
 and plus strand separately) (default: 0.0)",CADD,1.5,,,,,,N
-698,cadd_grantham,CADD,1.5,number,121,,N,,,,,,,variant,CADD15.Grantham,"Grantham score: oAA,nAA (default: 0*",CADD,1.5,,,,,,N
-699,cadd_dist2mutation,CADD,1.5,number,11,,N,,,,,,,variant,CADD15.Dist2Mutation,"Distance between the closest BRAVO SNV up and downstream
+690,cadd_grantham,CADD,1.5,number,121,,N,,,,,,,variant,CADD15.Grantham,"Grantham score: oAA,nAA (default: 0*",CADD,1.5,,,,,,N
+691,cadd_dist2mutation,CADD,1.5,number,11,,N,,,,,,,variant,CADD15.Dist2Mutation,"Distance between the closest BRAVO SNV up and downstream
 (position itself excluded) (default: 0*)",CADD,1.5,,,,,,N
-700,cadd_freq100bp,CADD,1.5,integer,0,,N,,,,,,,variant,CADD15.Freq100bp,"Number of frequent (MAF > 0.05) BRAVO SNV in 100 bp
+692,cadd_freq100bp,CADD,1.5,integer,0,,N,,,,,,,variant,CADD15.Freq100bp,"Number of frequent (MAF > 0.05) BRAVO SNV in 100 bp
 window nearby (default: 0)",CADD,1.5,,,,,,N
-701,cadd_rare100bp,CADD,1.5,integer,2,,N,,,,,,,variant,CADD15.Rare100bp,"Number of rare (MAF < 0.05) BRAVO SNV in 100 bp window
+693,cadd_rare100bp,CADD,1.5,integer,2,,N,,,,,,,variant,CADD15.Rare100bp,"Number of rare (MAF < 0.05) BRAVO SNV in 100 bp window
 nearby (default: 0)",CADD,1.5,,,,,,N
-702,cadd_sngl100bp,CADD,1.5,integer,15,,N,,,,,,,variant,CADD15.Sngl100bp,"Number of single occurrence BRAVO SNV in 100 bp window
+694,cadd_sngl100bp,CADD,1.5,integer,15,,N,,,,,,,variant,CADD15.Sngl100bp,"Number of single occurrence BRAVO SNV in 100 bp window
 nearby (default: 0)",CADD,1.5,,,,,,N
-703,cadd_freq1000bp,CADD,1.5,integer,0,,N,,,,,,,variant,CADD15.Freq1000bp,"Number of frequent (MAF > 0.05) BRAVO SNV in 1000 bp
+695,cadd_freq1000bp,CADD,1.5,integer,0,,N,,,,,,,variant,CADD15.Freq1000bp,"Number of frequent (MAF > 0.05) BRAVO SNV in 1000 bp
 window nearby (default: 0)",CADD,1.5,,,,,,N
-704,cadd_rare1000bp,CADD,1.5,integer,18,,N,,,,,,,variant,CADD15.Rare1000bp,"Number of rare (MAF < 0.05) BRAVO SNV in 1000 bp window
+696,cadd_rare1000bp,CADD,1.5,integer,18,,N,,,,,,,variant,CADD15.Rare1000bp,"Number of rare (MAF < 0.05) BRAVO SNV in 1000 bp window
 nearby (default: 0)",CADD,1.5,,,,,,N
-705,cadd_sngl1000bp,CADD,1.5,integer,242,,N,,,,,,,variant,CADD15.Sngl1000bp,"Number of single occurrence BRAVO SNV in 1000 bp window
+697,cadd_sngl1000bp,CADD,1.5,integer,242,,N,,,,,,,variant,CADD15.Sngl1000bp,"Number of single occurrence BRAVO SNV in 1000 bp window
 nearby (default: 0)",CADD,1.5,,,,,,N
-706,cadd_freq10000bp,CADD,1.5,integer,20,,N,,,,,,,variant,CADD15.Freq10000bp,"Number of frequent (MAF > 0.05) BRAVO SNV in 10000 bp
+698,cadd_freq10000bp,CADD,1.5,integer,20,,N,,,,,,,variant,CADD15.Freq10000bp,"Number of frequent (MAF > 0.05) BRAVO SNV in 10000 bp
 window nearby (default: 0)",CADD,1.5,,,,,,N
-707,cadd_rare10000bp,CADD,1.5,integer,117,,N,,,,,,,variant,CADD15.Rare10000bp,"Number of rare (MAF < 0.05) BRAVO SNV in 10000 bp window
+699,cadd_rare10000bp,CADD,1.5,integer,117,,N,,,,,,,variant,CADD15.Rare10000bp,"Number of rare (MAF < 0.05) BRAVO SNV in 10000 bp window
 nearby (default: 0)",CADD,1.5,,,,,,N
-708,cadd_sngl10000bp,CADD,1.5,integer,2039,,N,,,,,,,variant,CADD15.Sngl10000bp,"Number of single occurrence BRAVO SNV in 10000 bp window
+700,cadd_sngl10000bp,CADD,1.5,integer,2039,,N,,,,,,,variant,CADD15.Sngl10000bp,"Number of single occurrence BRAVO SNV in 10000 bp window
 nearby (default: 0)",CADD,1.5,,,,,,N
-709,cadd_ensembleregulatoryfeature,CADD,1.5,string,,,N,,,,,,,variant,CADD15.EnsembleRegulatoryFeature,"Matches in the Ensemble Regulatory Built (similar to annotype)
+701,cadd_ensembleregulatoryfeature,CADD,1.5,string,,,N,,,,,,,variant,CADD15.EnsembleRegulatoryFeature,"Matches in the Ensemble Regulatory Built (similar to annotype)
 (default: NA)",CADD,1.5,,,,,,N
-710,cadd_dbscsnv-ada_score,CADD,1.5,number,,,N,,,,,,,variant,CADD15.dbscSNV-ada_score,Adaboost classifier score from dbscSNV (default: 0*),CADD,1.5,,,,,,N
-711,cadd_dbscsnv-rf_score,CADD,1.5,number,,,N,,,,,,,variant,CADD15.dbscSNV-rf_score,Random forest classifier score from dbscSNV (default: 0*),CADD,1.5,,,,,,N
-712,cadd_remapoverlaptf,CADD,1.5,integer,15,,N,,,,,,,variant,CADD15.RemapOverlapTF,"Remap number of different transcription factors binding (default: -
+702,cadd_dbscsnv-ada_score,CADD,1.5,number,,,N,,,,,,,variant,CADD15.dbscSNV-ada_score,Adaboost classifier score from dbscSNV (default: 0*),CADD,1.5,,,,,,N
+703,cadd_dbscsnv-rf_score,CADD,1.5,number,,,N,,,,,,,variant,CADD15.dbscSNV-rf_score,Random forest classifier score from dbscSNV (default: 0*),CADD,1.5,,,,,,N
+704,cadd_remapoverlaptf,CADD,1.5,integer,15,,N,,,,,,,variant,CADD15.RemapOverlapTF,"Remap number of different transcription factors binding (default: -
 0.5)",CADD,1.5,,,,,,N
-713,cadd_remapoverlapcl,CADD,1.5,integer,17,,N,,,,,,,variant,CADD15.RemapOverlapCL,"Remap number of different transcription factor - cell line
+705,cadd_remapoverlapcl,CADD,1.5,integer,17,,N,,,,,,,variant,CADD15.RemapOverlapCL,"Remap number of different transcription factor - cell line
 combinations binding (default: -0.5)",CADD,1.5,,,,,,N
-714,cadd_rawscore,CADD,1.5,number,4.56756,,N,,,,,,pathogenicity,variant,CADD raw score,Raw score from the model ,CADD,1.5,,,,,,Y
-715,cadd_phred,CADD,1.5,number,29.1,,N,,,,,,pathogenicity,variant,CADD PHRED score,CADD PHRED Score,CADD,1.5,,,,,,Y
-716,spliceai_symbol,SpliceAI,20191004,string,AGRN,,N,,,,,,,,,,,,,,,,,Y
-717,spliceai_ds_ag,SpliceAI,20191004,number,0.01,,N,,,,,,,,,,,,,,,,,Y
-718,spliceai_ds_al,SpliceAI,20191004,integer,0,,N,,,,,,,,,,,,,,,,,Y
-719,spliceai_ds_dg,SpliceAI,20191004,number,0.01,,N,,,,,,,,,,,,,,,,,Y
-720,spliceai_ds_dl,SpliceAI,20191004,number,0.01,,N,,,,,,,,,,,,,,,,,Y
-721,spliceai_dp_ag,SpliceAI,20191004,integer,-5,,N,,,,,,,,,,,,,,,,,Y
-722,spliceai_dp_al,SpliceAI,20191004,integer,2,,N,,,,,,,,,,,,,,,,,Y
-723,spliceai_dp_dg,SpliceAI,20191004,integer,21,,N,,,,,,,,,,,,,,,,,Y
-724,spliceai_dp_dl,SpliceAI,20191004,integer,2,,N,,,,,,,,,,,,,,,,,Y
-725,intervar_intervar_automated,INTERVAR,20180118,string,Likelybenign,,N,,,,,,,,,,,,,,,,,Y
-726,intervar_pvs1,INTERVAR,20180118,integer,0,,N,,,,,,,,,,,,,,,,,Y
-727,intervar_ps1,INTERVAR,20180118,integer,0,,N,,,,,,,,,,,,,,,,,Y
-728,intervar_ps2,INTERVAR,20180118,integer,0,,N,,,,,,,,,,,,,,,,,Y
-729,intervar_ps3,INTERVAR,20180118,integer,0,,N,,,,,,,,,,,,,,,,,Y
-730,intervar_ps4,INTERVAR,20180118,integer,0,,N,,,,,,,,,,,,,,,,,Y
-731,intervar_pm1,INTERVAR,20180118,integer,1,,N,,,,,,,,,,,,,,,,,Y
-732,intervar_pm2,INTERVAR,20180118,integer,0,,N,,,,,,,,,,,,,,,,,Y
-733,intervar_pm3,INTERVAR,20180118,integer,0,,N,,,,,,,,,,,,,,,,,Y
-734,intervar_pm4,INTERVAR,20180118,integer,0,,N,,,,,,,,,,,,,,,,,Y
-735,intervar_pm5,INTERVAR,20180118,integer,0,,N,,,,,,,,,,,,,,,,,Y
-736,intervar_pm6,INTERVAR,20180118,integer,0,,N,,,,,,,,,,,,,,,,,Y
-737,intervar_pp1,INTERVAR,20180118,integer,0,,N,,,,,,,,,,,,,,,,,Y
-738,intervar_pp2,INTERVAR,20180118,integer,0,,N,,,,,,,,,,,,,,,,,Y
-739,intervar_pp3,INTERVAR,20180118,integer,0,,N,,,,,,,,,,,,,,,,,Y
-740,intervar_pp4,INTERVAR,20180118,integer,0,,N,,,,,,,,,,,,,,,,,Y
-741,intervar_pp5,INTERVAR,20180118,integer,0,,N,,,,,,,,,,,,,,,,,Y
-742,intervar_ba1,INTERVAR,20180118,integer,0,,N,,,,,,,,,,,,,,,,,Y
-743,intervar_bs1,INTERVAR,20180118,integer,1,,N,,,,,,,,,,,,,,,,,Y
-744,intervar_bs2,INTERVAR,20180118,integer,0,,N,,,,,,,,,,,,,,,,,Y
-745,intervar_bs3,INTERVAR,20180118,integer,0,,N,,,,,,,,,,,,,,,,,Y
-746,intervar_bs4,INTERVAR,20180118,integer,0,,N,,,,,,,,,,,,,,,,,Y
-747,intervar_bp1,INTERVAR,20180118,integer,0,,N,,,,,,,,,,,,,,,,,Y
-748,intervar_bp2,INTERVAR,20180118,integer,0,,N,,,,,,,,,,,,,,,,,Y
-749,intervar_bp3,INTERVAR,20180118,integer,0,,N,,,,,,,,,,,,,,,,,Y
-750,intervar_bp4,INTERVAR,20180118,integer,0,,N,,,,,,,,,,,,,,,,,Y
-751,intervar_bp5,INTERVAR,20180118,integer,0,,N,,,,,,,,,,,,,,,,,Y
-752,intervar_bp6,INTERVAR,20180118,integer,1,,N,,,,,,,,,,,,,,,,,Y
-753,intervar_bp7,INTERVAR,20180118,integer,0,,N,,,,,,,,,,,,,,,,,Y
-754,clinvar_alleleid,CLINVAR,20190914,string,133743,,N,,,,,,,,,,,,,,,,,Y
-755,clinvar_clndn,CLINVAR,20190914,string,"Neurodevelopmental_Disability|hypotonia|Intellectual_disability|Seizures|Muscular_hypotonia|Global_developmental_delay|Generalized_tonic-clonic_seizures|Developmental_regression|Focal_seizures_with_impairment_of_consciousness_or_awareness|Expressive_language_delay|Multifocal_epileptiform_discharges|EEG_with_generalized_epileptiform_discharges|Mental_retardation,_autosomal_dominant_42|not_provided",,Y,,tilde,,,,,variant,ClinVar disease name,ClinVar disease name,CLINVAR,,,,,,,Y
-756,clinvar_clndnincl,CLINVAR,20190914,string,,,Y,,tilde,,,,,,,,,,,,,,,Y
-757,clinvar_clndisdb,CLINVAR,20190914,string,"MedGen:C3808739,OMIM:615120|MedGen:CN169374",,Y,,tilde,,,,,,,,,,,,,,,Y
-758,clinvar_clndisdbincl,CLINVAR,20190914,string,,,Y,,tilde,,,,,,,,,,,,,,,Y
-759,clinvar_clnhgvs,CLINVAR,20190914,string,NC_000001.11:g.1044368A>T,,N,,,,,,,,,,,,,,,,,Y
-760,clinvar_clnrevstat,CLINVAR,20190914,string,"criteria_provided,_multiple_submitters,_no_conflicts",,Y,,tilde,,,,,,,,,,,,,,,Y
-761,clinvar_clnsig,CLINVAR,20190914,string,CLINVAR,,N,,,,,,,variant,ClinVar significance,ClinVar significance,CLINVAR,,6,,,1,,Y
-762,clinvar_clnsigconf,CLINVAR,20190914,string,,,N,,,,,,,,,,,,,,,,,Y
-763,clinvar_clnsigincl,CLINVAR,20190914,string,,,N,,,,,,,,,,,,,,,,,Y
-764,clinvar_clnvc,CLINVAR,20190914,string,single_nucleotide_variant,,N,,,,,,,,,,,,,,,,,Y
-765,clinvar_clnvcso,CLINVAR,20190914,string,SO:0001483,,N,,,,,,,,,,,,,,,,,Y
-766,clinvar_clnvi,CLINVAR,20190914,string,OMIM_Allelic_Variant:139380.0005|UniProtKB_(protein):P62873#VAR_076650,,Y,,tilde,,,,,,,,,,,,,,,Y
-767,clinvar_geneinfo,CLINVAR,20190914,string,AGRN:375790,,N,,,,,,,,,,,,,,,,,Y
-768,clinvar_mc,CLINVAR,20190914,string,SO:0001583|missense_variant,,Y,,comma,,,,,,,,,,,,,,,Y
-769,clinvar_origin,CLINVAR,20190914,string,1,,N,,,,,,,,,,,,,,,,,Y
-770,clinvar_ssr,CLINVAR,20190914,string,,,N,,,,,,,,,,,,,,,,,Y
-771,genomicsuperdups_otherchrom,GenomicSuperDups,19-Oct-2014,string,,,N,,,,,,repeated region,variant,GenomicSuperDups score,GenomicSuperDups score,GenomicSuperDups,,,,,,,Y
-772,genomicsuperdups_otherstart,GenomicSuperDups,19-Oct-2014,integer,,,N,,,,,,,,,,,,,,,,,Y
-773,genomicsuperdups_otherend,GenomicSuperDups,19-Oct-2014,integer,,,N,,,,,,,,,,,,,,,,,Y
-774,genomicsuperdups_fracmatch,GenomicSuperDups,19-Oct-2014,number,,,N,,,,,,,,,,,,,,,,,Y
-775,simplerepeat_name,UCSC,11-Mar-2019,string,,,N,,,,,,,,,,,,,,,,,Y
-776,simplerepeat_sequence,simpleRepeat,11-Mar-2019,string,,,N,,,,,,,,,,,,,,,,,Y
-777,simplerepeat_chrom,simpleRepeat,11-Mar-2019,string,,,N,,,,,,,,,,,,,,,,,Y
-778,simplerepeat_chromstart,simpleRepeat,11-Mar-2019,integer,,,N,,,,,,,,,,,,,,,,,Y
-779,simplerepeat_chromend,simpleRepeat,11-Mar-2019,integer,,,N,,,,,,,,,,,,,,,,,Y
-780,simplerepeat_score,simpleRepeat,11-Mar-2019,number,,,N,,,,,,,,,,,,,,,,,Y
-781,simplerepeat_entropy,simpleRepeat,11-Mar-2019,number,,,N,,,,,,,,,,,,,,,,,Y
-782,rmsk_repname,rmsk,11-Mar-2019,string,,,N,,,,,,,,,,,,,,,,,Y
-783,rmsk_repclass,rmsk,11-Mar-2019,string,,,N,,,,,,,,,,,,,,,,,Y
-784,rmsk_repfamily,rmsk,11-Mar-2019,string,,,N,,,,,,,,,,,,,,,,,Y
-785,rmsk_chromstart,rmsk,11-Mar-2019,integer,,,N,,,,,,,,,,,,,,,,,Y
-786,rmsk_chromend,rmsk,11-Mar-2019,integer,,,N,,,,,,,,,,,,,,,,,Y
-787,rmsk_strand,rmsk,11-Mar-2019,string,,,N,,,,,,,,,,,,,,,,,Y
-788,nestedrepeats_name,nestedRepeats,06-Mar-2014,string,,,N,,,,,,,,,,,,,,,,,Y
-789,nestedrepeats_chrom,nestedRepeats,06-Mar-2014,string,,,N,,,,,,,,,,,,,,,,,Y
-790,nestedrepeats_chromstart,nestedRepeats,06-Mar-2014,integer,,,N,,,,,,,,,,,,,,,,,Y
-791,nestedrepeats_chromend,nestedRepeats,06-Mar-2014,integer,,,N,,,,,,,,,,,,,,,,,Y
-792,nestedrepeats_strand,nestedRepeats,06-Mar-2014,string,,,N,,,,,,,,,,,,,,,,,Y
-793,nestedrepeats_score,nestedRepeats,06-Mar-2014,integer,,,N,,,,,,,,,,,,,,,,,Y
-794,nestedrepeats_repclass,nestedRepeats,06-Mar-2014,string,,,N,,,,,,,,,,,,,,,,,Y
-795,nestedrepeats_repfamily,nestedRepeats,06-Mar-2014,string,,,N,,,,,,,,,,,,,,,,,Y
-796,microsat_name,microsat,23-Aug-2015,string,,,N,,,,,,,,,,,,,,,,,Y
-797,microsat_chrom,microsat,23-Aug-2015,string,,,N,,,,,,,,,,,,,,,,,Y
-798,microsat_chromstart,microsat,23-Aug-2015,integer,,,N,,,,,,,,,,,,,,,,,Y
-799,microsat_chromend,microsat,23-Aug-2015,integer,,,N,,,,,,,,,,,,,,,,,Y
+706,cadd_rawscore,CADD,1.5,number,4.56756,,N,,,,,,pathogenicity,variant,CADD raw score,Raw score from the model ,CADD,1.5,,,,,,Y
+707,cadd_phred,CADD,1.5,number,29.1,,N,,,,,,pathogenicity,variant,CADD PHRED score,CADD PHRED Score,CADD,1.5,,,,,,Y
+708,spliceai_symbol,SpliceAI,20191004,string,AGRN,,N,,,,,,,,,,,,,,,,,Y
+709,spliceai_ds_ag,SpliceAI,20191004,number,0.01,,N,,,,,,,,,,,,,,,,,Y
+710,spliceai_ds_al,SpliceAI,20191004,integer,0,,N,,,,,,,,,,,,,,,,,Y
+711,spliceai_ds_dg,SpliceAI,20191004,number,0.01,,N,,,,,,,,,,,,,,,,,Y
+712,spliceai_ds_dl,SpliceAI,20191004,number,0.01,,N,,,,,,,,,,,,,,,,,Y
+713,spliceai_dp_ag,SpliceAI,20191004,integer,-5,,N,,,,,,,,,,,,,,,,,Y
+714,spliceai_dp_al,SpliceAI,20191004,integer,2,,N,,,,,,,,,,,,,,,,,Y
+715,spliceai_dp_dg,SpliceAI,20191004,integer,21,,N,,,,,,,,,,,,,,,,,Y
+716,spliceai_dp_dl,SpliceAI,20191004,integer,2,,N,,,,,,,,,,,,,,,,,Y
+717,intervar_intervar_automated,INTERVAR,20180118,string,Likelybenign,,N,,,,,,,,,,,,,,,,,Y
+718,intervar_pvs1,INTERVAR,20180118,integer,0,,N,,,,,,,,,,,,,,,,,Y
+719,intervar_ps1,INTERVAR,20180118,integer,0,,N,,,,,,,,,,,,,,,,,Y
+720,intervar_ps2,INTERVAR,20180118,integer,0,,N,,,,,,,,,,,,,,,,,Y
+721,intervar_ps3,INTERVAR,20180118,integer,0,,N,,,,,,,,,,,,,,,,,Y
+722,intervar_ps4,INTERVAR,20180118,integer,0,,N,,,,,,,,,,,,,,,,,Y
+723,intervar_pm1,INTERVAR,20180118,integer,1,,N,,,,,,,,,,,,,,,,,Y
+724,intervar_pm2,INTERVAR,20180118,integer,0,,N,,,,,,,,,,,,,,,,,Y
+725,intervar_pm3,INTERVAR,20180118,integer,0,,N,,,,,,,,,,,,,,,,,Y
+726,intervar_pm4,INTERVAR,20180118,integer,0,,N,,,,,,,,,,,,,,,,,Y
+727,intervar_pm5,INTERVAR,20180118,integer,0,,N,,,,,,,,,,,,,,,,,Y
+728,intervar_pm6,INTERVAR,20180118,integer,0,,N,,,,,,,,,,,,,,,,,Y
+729,intervar_pp1,INTERVAR,20180118,integer,0,,N,,,,,,,,,,,,,,,,,Y
+730,intervar_pp2,INTERVAR,20180118,integer,0,,N,,,,,,,,,,,,,,,,,Y
+731,intervar_pp3,INTERVAR,20180118,integer,0,,N,,,,,,,,,,,,,,,,,Y
+732,intervar_pp4,INTERVAR,20180118,integer,0,,N,,,,,,,,,,,,,,,,,Y
+733,intervar_pp5,INTERVAR,20180118,integer,0,,N,,,,,,,,,,,,,,,,,Y
+734,intervar_ba1,INTERVAR,20180118,integer,0,,N,,,,,,,,,,,,,,,,,Y
+735,intervar_bs1,INTERVAR,20180118,integer,1,,N,,,,,,,,,,,,,,,,,Y
+736,intervar_bs2,INTERVAR,20180118,integer,0,,N,,,,,,,,,,,,,,,,,Y
+737,intervar_bs3,INTERVAR,20180118,integer,0,,N,,,,,,,,,,,,,,,,,Y
+738,intervar_bs4,INTERVAR,20180118,integer,0,,N,,,,,,,,,,,,,,,,,Y
+739,intervar_bp1,INTERVAR,20180118,integer,0,,N,,,,,,,,,,,,,,,,,Y
+740,intervar_bp2,INTERVAR,20180118,integer,0,,N,,,,,,,,,,,,,,,,,Y
+741,intervar_bp3,INTERVAR,20180118,integer,0,,N,,,,,,,,,,,,,,,,,Y
+742,intervar_bp4,INTERVAR,20180118,integer,0,,N,,,,,,,,,,,,,,,,,Y
+743,intervar_bp5,INTERVAR,20180118,integer,0,,N,,,,,,,,,,,,,,,,,Y
+744,intervar_bp6,INTERVAR,20180118,integer,1,,N,,,,,,,,,,,,,,,,,Y
+745,intervar_bp7,INTERVAR,20180118,integer,0,,N,,,,,,,,,,,,,,,,,Y
+746,clinvar_alleleid,CLINVAR,20190914,string,133743,,N,,,,,,,,,,,,,,,,,Y
+747,clinvar_clndn,CLINVAR,20190914,string,"Neurodevelopmental_Disability|hypotonia|Intellectual_disability|Seizures|Muscular_hypotonia|Global_developmental_delay|Generalized_tonic-clonic_seizures|Developmental_regression|Focal_seizures_with_impairment_of_consciousness_or_awareness|Expressive_language_delay|Multifocal_epileptiform_discharges|EEG_with_generalized_epileptiform_discharges|Mental_retardation,_autosomal_dominant_42|not_provided",,Y,,tilde,,,,,variant,ClinVar disease name,ClinVar disease name,CLINVAR,,,,,,,Y
+748,clinvar_clndnincl,CLINVAR,20190914,string,,,Y,,tilde,,,,,,,,,,,,,,,Y
+749,clinvar_clndisdb,CLINVAR,20190914,string,"MedGen:C3808739,OMIM:615120|MedGen:CN169374",,Y,,tilde,,,,,,,,,,,,,,,Y
+750,clinvar_clndisdbincl,CLINVAR,20190914,string,,,Y,,tilde,,,,,,,,,,,,,,,Y
+751,clinvar_clnhgvs,CLINVAR,20190914,string,NC_000001.11:g.1044368A>T,,N,,,,,,,,,,,,,,,,,Y
+752,clinvar_clnrevstat,CLINVAR,20190914,string,"criteria_provided,_multiple_submitters,_no_conflicts",,Y,,tilde,,,,,,,,,,,,,,,Y
+753,clinvar_clnsig,CLINVAR,20190914,string,CLINVAR,,N,,,,,,,variant,ClinVar significance,ClinVar significance,CLINVAR,,6,,,1,,Y
+754,clinvar_clnsigconf,CLINVAR,20190914,string,,,N,,,,,,,,,,,,,,,,,Y
+755,clinvar_clnsigincl,CLINVAR,20190914,string,,,N,,,,,,,,,,,,,,,,,Y
+756,clinvar_clnvc,CLINVAR,20190914,string,single_nucleotide_variant,,N,,,,,,,,,,,,,,,,,Y
+757,clinvar_clnvcso,CLINVAR,20190914,string,SO:0001483,,N,,,,,,,,,,,,,,,,,Y
+758,clinvar_clnvi,CLINVAR,20190914,string,OMIM_Allelic_Variant:139380.0005|UniProtKB_(protein):P62873#VAR_076650,,Y,,tilde,,,,,,,,,,,,,,,Y
+759,clinvar_geneinfo,CLINVAR,20190914,string,AGRN:375790,,N,,,,,,,,,,,,,,,,,Y
+760,clinvar_mc,CLINVAR,20190914,string,SO:0001583|missense_variant,,Y,,comma,,,,,,,,,,,,,,,Y
+761,clinvar_origin,CLINVAR,20190914,string,1,,N,,,,,,,,,,,,,,,,,Y
+762,clinvar_ssr,CLINVAR,20190914,string,,,N,,,,,,,,,,,,,,,,,Y
+763,genomicsuperdups_otherchrom,GenomicSuperDups,19-Oct-2014,string,,,N,,,,,,repeated region,variant,GenomicSuperDups score,GenomicSuperDups score,GenomicSuperDups,,,,,,,Y
+764,genomicsuperdups_otherstart,GenomicSuperDups,19-Oct-2014,integer,,,N,,,,,,,,,,,,,,,,,Y
+765,genomicsuperdups_otherend,GenomicSuperDups,19-Oct-2014,integer,,,N,,,,,,,,,,,,,,,,,Y
+766,genomicsuperdups_fracmatch,GenomicSuperDups,19-Oct-2014,number,,,N,,,,,,,,,,,,,,,,,Y
+767,simplerepeat_name,UCSC,11-Mar-2019,string,,,N,,,,,,,,,,,,,,,,,Y
+768,simplerepeat_sequence,simpleRepeat,11-Mar-2019,string,,,N,,,,,,,,,,,,,,,,,Y
+769,simplerepeat_chrom,simpleRepeat,11-Mar-2019,string,,,N,,,,,,,,,,,,,,,,,Y
+770,simplerepeat_chromstart,simpleRepeat,11-Mar-2019,integer,,,N,,,,,,,,,,,,,,,,,Y
+771,simplerepeat_chromend,simpleRepeat,11-Mar-2019,integer,,,N,,,,,,,,,,,,,,,,,Y
+772,simplerepeat_score,simpleRepeat,11-Mar-2019,number,,,N,,,,,,,,,,,,,,,,,Y
+773,simplerepeat_entropy,simpleRepeat,11-Mar-2019,number,,,N,,,,,,,,,,,,,,,,,Y
+774,rmsk_repname,rmsk,11-Mar-2019,string,,,N,,,,,,,,,,,,,,,,,Y
+775,rmsk_repclass,rmsk,11-Mar-2019,string,,,N,,,,,,,,,,,,,,,,,Y
+776,rmsk_repfamily,rmsk,11-Mar-2019,string,,,N,,,,,,,,,,,,,,,,,Y
+777,rmsk_chromstart,rmsk,11-Mar-2019,integer,,,N,,,,,,,,,,,,,,,,,Y
+778,rmsk_chromend,rmsk,11-Mar-2019,integer,,,N,,,,,,,,,,,,,,,,,Y
+779,rmsk_strand,rmsk,11-Mar-2019,string,,,N,,,,,,,,,,,,,,,,,Y
+780,nestedrepeats_name,nestedRepeats,06-Mar-2014,string,,,N,,,,,,,,,,,,,,,,,Y
+781,nestedrepeats_chrom,nestedRepeats,06-Mar-2014,string,,,N,,,,,,,,,,,,,,,,,Y
+782,nestedrepeats_chromstart,nestedRepeats,06-Mar-2014,integer,,,N,,,,,,,,,,,,,,,,,Y
+783,nestedrepeats_chromend,nestedRepeats,06-Mar-2014,integer,,,N,,,,,,,,,,,,,,,,,Y
+784,nestedrepeats_strand,nestedRepeats,06-Mar-2014,string,,,N,,,,,,,,,,,,,,,,,Y
+785,nestedrepeats_score,nestedRepeats,06-Mar-2014,integer,,,N,,,,,,,,,,,,,,,,,Y
+786,nestedrepeats_repclass,nestedRepeats,06-Mar-2014,string,,,N,,,,,,,,,,,,,,,,,Y
+787,nestedrepeats_repfamily,nestedRepeats,06-Mar-2014,string,,,N,,,,,,,,,,,,,,,,,Y
+788,microsat_name,microsat,23-Aug-2015,string,,,N,,,,,,,,,,,,,,,,,Y
+789,microsat_chrom,microsat,23-Aug-2015,string,,,N,,,,,,,,,,,,,,,,,Y
+790,microsat_chromstart,microsat,23-Aug-2015,integer,,,N,,,,,,,,,,,,,,,,,Y
+791,microsat_chromend,microsat,23-Aug-2015,integer,,,N,,,,,,,,,,,,,,,,,Y

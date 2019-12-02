@@ -102,11 +102,11 @@
             "source_version": "2017-07-17"
         },
         "transcript": {
-            "title": "Transcript",
+            "title": "transcript",
             "type": "array",
             "items": {
                 "title": "Transcript",
-                "type": "object",
+                "type": "array",
                 "properties": {
                     "vep_location": {
                         "title": "None provided",
@@ -393,6 +393,170 @@
                         "title": "None provided",
                         "vcf_name": "vep_motif_score_change",
                         "type": "string"
+                    },
+                    "dbnsfptranscript_sift_score": {
+                        "title": "SIFT score",
+                        "vcf_name": "dbnsfptranscript_sift_score",
+                        "type": "number",
+                        "description": "SIFT score",
+                        "source_name": "SIFT"
+                    },
+                    "dbnsfptranscript_sift_pred": {
+                        "title": "SIFT prediction",
+                        "vcf_name": "dbnsfptranscript_sift_pred",
+                        "type": "string",
+                        "description": "D: Deleterious (sift<=0.05); T: tolerated (sift>0.05)",
+                        "source_name": "SIFT"
+                    },
+                    "dbnsfptranscript_sift4g_score": {
+                        "title": "None provided",
+                        "vcf_name": "dbnsfptranscript_sift4g_score",
+                        "type": "string"
+                    },
+                    "dbnsfptranscript_sift4g_pred": {
+                        "title": "None provided",
+                        "vcf_name": "dbnsfptranscript_sift4g_pred",
+                        "type": "string"
+                    },
+                    "dbnsfptranscript_polyphen2_hdiv_score": {
+                        "title": "Polyphen2 HDIV score",
+                        "vcf_name": "dbnsfptranscript_polyphen2_hdiv_score",
+                        "type": "number",
+                        "description": "Polyphen2 HDIV score",
+                        "source_name": "PolyPhen2"
+                    },
+                    "dbnsfptranscript_polyphen2_hdiv_pred": {
+                        "title": "Polyphen2 HDIV prediction",
+                        "vcf_name": "dbnsfptranscript_polyphen2_hdiv_pred",
+                        "type": "string",
+                        "description": "D: Probably damaging (>=0.957), P: possibly damaging (0.453<=pp2_hdiv<=0.956); B: benign (pp2_hdiv<=0.452)",
+                        "source_name": "PolyPhen2"
+                    },
+                    "dbnsfptranscript_polyphen2_hvar_score": {
+                        "title": "Polyphen2 HVAR score",
+                        "vcf_name": "dbnsfptranscript_polyphen2_hvar_score",
+                        "type": "number",
+                        "description": "Polyphen2 HVAR score",
+                        "source_name": "PolyPhen2"
+                    },
+                    "dbnsfptranscript_polyphen2_hvar_pred": {
+                        "title": "Polyphen2 HVAR prediction",
+                        "vcf_name": "dbnsfptranscript_polyphen2_hvar_pred",
+                        "type": "string",
+                        "description": "D: Probably damaging (>=0.909), P: possibly damaging (0.447<=pp2_hdiv<=0.909); B: benign (pp2_hdiv<=0.446)",
+                        "source_name": "PolyPhen2"
+                    },
+                    "dbnsfptranscript_mutationassessor_score": {
+                        "title": "MutationAssessor score",
+                        "vcf_name": "dbnsfptranscript_mutationassessor_score",
+                        "type": "number",
+                        "description": "MutationAssessor score",
+                        "source_name": "MutationAssessor"
+                    },
+                    "dbnsfptranscript_mutationassessor_pred": {
+                        "title": "MutationAssessor prediction",
+                        "vcf_name": "dbnsfptranscript_mutationassessor_pred",
+                        "type": "string",
+                        "description": "H: high; M: medium; L: low; N: neutral. H/M means functional and L/N means non-functional",
+                        "source_name": "MutationAssessor"
+                    },
+                    "dbnsfptranscript_fathmm_score": {
+                        "title": "FATHMM score",
+                        "vcf_name": "dbnsfptranscript_fathmm_score",
+                        "type": "number",
+                        "description": "FATHMM score",
+                        "source_name": "FATHMM"
+                    },
+                    "dbnsfptranscript_fathmm_pred": {
+                        "title": "FATHMM prediction",
+                        "vcf_name": "dbnsfptranscript_fathmm_pred",
+                        "type": "string",
+                        "description": "D: Deleterious; T: Tolerated",
+                        "source_name": "FATHMM"
+                    },
+                    "dbnsfptranscript_provean_score": {
+                        "title": "PROVEAN score",
+                        "vcf_name": "dbnsfptranscript_provean_score",
+                        "type": "number",
+                        "description": "PROVEAN score",
+                        "source_name": "PROVEAN"
+                    },
+                    "dbnsfptranscript_provean_pred": {
+                        "title": "PROVEAN prediction",
+                        "vcf_name": "dbnsfptranscript_provean_pred",
+                        "type": "string",
+                        "description": "D: Deleterious; N: Neutral",
+                        "source_name": "PROVEAN"
+                    },
+                    "dbnsfptranscript_vest4_score": {
+                        "title": "VEST3 score",
+                        "vcf_name": "dbnsfptranscript_vest4_score",
+                        "type": "number",
+                        "description": "VEST3 score",
+                        "source_name": "VEST3"
+                    },
+                    "dbnsfptranscript_mvp_score": {
+                        "title": "None provided",
+                        "vcf_name": "dbnsfptranscript_mvp_score",
+                        "type": "number"
+                    },
+                    "dbnsfptranscript_mpc_score": {
+                        "title": "None provided",
+                        "vcf_name": "dbnsfptranscript_mpc_score",
+                        "type": "number"
+                    },
+                    "dbnsfptranscript_deogen2_score": {
+                        "title": "None provided",
+                        "vcf_name": "dbnsfptranscript_deogen2_score",
+                        "type": "number"
+                    },
+                    "dbnsfptranscript_deogen2_pred": {
+                        "title": "None provided",
+                        "vcf_name": "dbnsfptranscript_deogen2_pred",
+                        "type": "string"
+                    },
+                    "dbnsfptranscript_aloft_fraction_transcripts_affected": {
+                        "title": "None provided",
+                        "vcf_name": "dbnsfptranscript_aloft_fraction_transcripts_affected",
+                        "type": "string"
+                    },
+                    "dbnsfptranscript_aloft_prob_tolerant": {
+                        "title": "None provided",
+                        "vcf_name": "dbnsfptranscript_aloft_prob_tolerant",
+                        "type": "number"
+                    },
+                    "dbnsfptranscript_aloft_prob_recessive": {
+                        "title": "None provided",
+                        "vcf_name": "dbnsfptranscript_aloft_prob_recessive",
+                        "type": "number"
+                    },
+                    "dbnsfptranscript_aloft_prob_dominant": {
+                        "title": "None provided",
+                        "vcf_name": "dbnsfptranscript_aloft_prob_dominant",
+                        "type": "number"
+                    },
+                    "dbnsfptranscript_aloft_pred": {
+                        "title": "None provided",
+                        "vcf_name": "dbnsfptranscript_aloft_pred",
+                        "type": "string"
+                    },
+                    "dbnsfptranscript_aloft_confidence": {
+                        "title": "None provided",
+                        "vcf_name": "dbnsfptranscript_aloft_confidence",
+                        "type": "string"
+                    },
+                    "dbnsfptranscript_interpro_domain": {
+                        "title": "INTERPRO domain",
+                        "type": "array",
+                        "vcf_name": "dbnsfptranscript_interpro_domain",
+                        "items": {
+                            "title": "INTERPRO domain",
+                            "vcf_name": "dbnsfptranscript_interpro_domain",
+                            "type": "string",
+                            "description": "INTERPRO domain",
+                            "separator": "tilde",
+                            "source_name": "INTERPRO"
+                        }
                     }
                 }
             }
@@ -2514,11 +2678,6 @@
             "vcf_name": "maxpopaf_max_pop_af_asj",
             "type": "number"
         },
-        "dbnsfp_codon_degeneracy": {
-            "title": "None provided",
-            "vcf_name": "dbnsfp_codon_degeneracy",
-            "type": "integer"
-        },
         "dbnsfp_ancestral_allele": {
             "title": "None provided",
             "vcf_name": "dbnsfp_ancestral_allele",
@@ -2539,84 +2698,6 @@
             "vcf_name": "dbnsfp_vindijianeandertal",
             "type": "string"
         },
-        "dbnsfp_sift_score": {
-            "title": "SIFT score",
-            "vcf_name": "dbnsfp_sift_score",
-            "type": "number",
-            "description": "SIFT score",
-            "source_name": "SIFT"
-        },
-        "dbnsfp_sift_converted_rankscore": {
-            "title": "SIFT converted rankscore",
-            "vcf_name": "dbnsfp_sift_converted_rankscore",
-            "type": "number",
-            "description": "SIFT converted rankscore",
-            "source_name": "SIFT"
-        },
-        "dbnsfp_sift_pred": {
-            "title": "SIFT prediction",
-            "vcf_name": "dbnsfp_sift_pred",
-            "type": "string",
-            "description": "D: Deleterious (sift<=0.05); T: tolerated (sift>0.05)",
-            "source_name": "SIFT"
-        },
-        "dbnsfp_sift4g_score": {
-            "title": "None provided",
-            "vcf_name": "dbnsfp_sift4g_score",
-            "type": "string"
-        },
-        "dbnsfp_sift4g_converted_rankscore": {
-            "title": "None provided",
-            "vcf_name": "dbnsfp_sift4g_converted_rankscore",
-            "type": "number"
-        },
-        "dbnsfp_sift4g_pred": {
-            "title": "None provided",
-            "vcf_name": "dbnsfp_sift4g_pred",
-            "type": "string"
-        },
-        "dbnsfp_polyphen2_hdiv_score": {
-            "title": "Polyphen2 HDIV score",
-            "vcf_name": "dbnsfp_polyphen2_hdiv_score",
-            "type": "number",
-            "description": "Polyphen2 HDIV score",
-            "source_name": "PolyPhen2"
-        },
-        "dbnsfp_polyphen2_hdiv_rankscore": {
-            "title": "Polyphen2 HDIV rankscore",
-            "vcf_name": "dbnsfp_polyphen2_hdiv_rankscore",
-            "type": "number",
-            "description": "Polyphen2 HDIV rankscore",
-            "source_name": "PolyPhen2"
-        },
-        "dbnsfp_polyphen2_hdiv_pred": {
-            "title": "Polyphen2 HDIV prediction",
-            "vcf_name": "dbnsfp_polyphen2_hdiv_pred",
-            "type": "string",
-            "description": "D: Probably damaging (>=0.957), P: possibly damaging (0.453<=pp2_hdiv<=0.956); B: benign (pp2_hdiv<=0.452)",
-            "source_name": "PolyPhen2"
-        },
-        "dbnsfp_polyphen2_hvar_score": {
-            "title": "Polyphen2 HVAR score",
-            "vcf_name": "dbnsfp_polyphen2_hvar_score",
-            "type": "number",
-            "description": "Polyphen2 HVAR score",
-            "source_name": "PolyPhen2"
-        },
-        "dbnsfp_polyphen2_hvar_rankscore": {
-            "title": "Polyphen2 HVAR rankscore",
-            "vcf_name": "dbnsfp_polyphen2_hvar_rankscore",
-            "type": "number",
-            "description": "Polyphen2 HVAR rankscore",
-            "source_name": "PolyPhen2"
-        },
-        "dbnsfp_polyphen2_hvar_pred": {
-            "title": "Polyphen2 HVAR prediction",
-            "vcf_name": "dbnsfp_polyphen2_hvar_pred",
-            "type": "string",
-            "description": "D: Probably damaging (>=0.909), P: possibly damaging (0.447<=pp2_hdiv<=0.909); B: benign (pp2_hdiv<=0.446)",
-            "source_name": "PolyPhen2"
-        },
         "dbnsfp_lrt_score": {
             "title": "LRT score",
             "vcf_name": "dbnsfp_lrt_score",
@@ -2625,10 +2706,10 @@
             "source_name": "LRT"
         },
         "dbnsfp_lrt_converted_rankscore": {
-            "title": "LRT converted rankscore",
+            "title": "LRT score",
             "vcf_name": "dbnsfp_lrt_converted_rankscore",
             "type": "number",
-            "description": "LRT converted rankscore",
+            "description": "LRT score",
             "source_name": "LRT"
         },
         "dbnsfp_lrt_pred": {
@@ -2645,111 +2726,60 @@
         },
         "dbnsfp_mutationtaster_score": {
             "title": "MutationTater score",
+            "type": "array",
             "vcf_name": "dbnsfp_mutationtaster_score",
+            "description": "MutationTater score",
+            "items": {
+                "title": "MutationTater score",
+                "vcf_name": "dbnsfp_mutationtaster_score",
+                "type": "number",
+                "description": "MutationTater score",
+                "separator": "tilde",
+                "source_name": "MutationTaster"
+            }
+        },
+        "dbnsfp_mutationtaster_converted_rankscore": {
+            "title": "MutationTater score",
+            "vcf_name": "dbnsfp_mutationtaster_converted_rankscore",
             "type": "number",
             "description": "MutationTater score",
             "source_name": "MutationTaster"
         },
-        "dbnsfp_mutationtaster_converted_rankscore": {
-            "title": "MutationTater converted rankscore",
-            "vcf_name": "dbnsfp_mutationtaster_converted_rankscore",
-            "type": "number",
-            "description": "MutationTater converted rankscore",
-            "source_name": "MutationTaster"
-        },
         "dbnsfp_mutationtaster_pred": {
             "title": "MutationTater prediction",
+            "type": "array",
             "vcf_name": "dbnsfp_mutationtaster_pred",
-            "type": "string",
             "description": "A: disease_causing_automatic; D:disease_causing; N:polymorphism; P:polymorphism_automatic",
-            "source_name": "MutationTaster"
+            "items": {
+                "title": "MutationTater prediction",
+                "vcf_name": "dbnsfp_mutationtaster_pred",
+                "type": "string",
+                "description": "A: disease_causing_automatic; D:disease_causing; N:polymorphism; P:polymorphism_automatic",
+                "separator": "tilde",
+                "source_name": "MutationTaster"
+            }
         },
         "dbnsfp_mutationtaster_model": {
             "title": "None provided",
+            "type": "array",
             "vcf_name": "dbnsfp_mutationtaster_model",
-            "type": "string"
+            "items": {
+                "title": "None provided",
+                "vcf_name": "dbnsfp_mutationtaster_model",
+                "type": "string",
+                "separator": "tilde"
+            }
         },
         "dbnsfp_mutationtaster_aae": {
             "title": "None provided",
+            "type": "array",
             "vcf_name": "dbnsfp_mutationtaster_aae",
-            "type": "string"
-        },
-        "dbnsfp_mutationassessor_score": {
-            "title": "MutationAssessor score",
-            "vcf_name": "dbnsfp_mutationassessor_score",
-            "type": "number",
-            "description": "MutationAssessor score",
-            "source_name": "MutationAssessor"
-        },
-        "dbnsfp_mutationassessor_rankscore": {
-            "title": "MutationAssessor rankscore",
-            "vcf_name": "dbnsfp_mutationassessor_rankscore",
-            "type": "number",
-            "description": "MutationAssessor rankscore",
-            "source_name": "MutationAssessor"
-        },
-        "dbnsfp_mutationassessor_pred": {
-            "title": "MutationAssessor prediction",
-            "vcf_name": "dbnsfp_mutationassessor_pred",
-            "type": "string",
-            "description": "H: high; M: medium; L: low; N: neutral. H/M means functional and L/N means non-functional",
-            "source_name": "MutationAssessor"
-        },
-        "dbnsfp_fathmm_score": {
-            "title": "FATHMM score",
-            "vcf_name": "dbnsfp_fathmm_score",
-            "type": "number",
-            "description": "FATHMM score",
-            "source_name": "FATHMM"
-        },
-        "dbnsfp_fathmm_converted_rankscore": {
-            "title": "FATHMM converted rankscore",
-            "vcf_name": "dbnsfp_fathmm_converted_rankscore",
-            "type": "number",
-            "description": "FATHMM converted rankscore",
-            "source_name": "FATHMM"
-        },
-        "dbnsfp_fathmm_pred": {
-            "title": "FATHMM prediction",
-            "vcf_name": "dbnsfp_fathmm_pred",
-            "type": "string",
-            "description": "D: Deleterious; T: Tolerated",
-            "source_name": "FATHMM"
-        },
-        "dbnsfp_provean_score": {
-            "title": "PROVEAN score",
-            "vcf_name": "dbnsfp_provean_score",
-            "type": "number",
-            "description": "PROVEAN score",
-            "source_name": "PROVEAN"
-        },
-        "dbnsfp_provean_converted_rankscore": {
-            "title": "PROVEAN converted rankscore",
-            "vcf_name": "dbnsfp_provean_converted_rankscore",
-            "type": "number",
-            "description": "PROVEAN converted rankscore",
-            "source_name": "PROVEAN"
-        },
-        "dbnsfp_provean_pred": {
-            "title": "PROVEAN prediction",
-            "vcf_name": "dbnsfp_provean_pred",
-            "type": "string",
-            "description": "D: Deleterious; N: Neutral",
-            "source_name": "PROVEAN"
-        },
-        "dbnsfp_vest4_score": {
-            "title": "VEST3 score",
-            "vcf_name": "dbnsfp_vest4_score",
-            "type": "number",
-            "description": "VEST3 score",
-            "source_name": "VEST3"
-        },
-        "dbnsfp_vest4_rankscore": {
-            "title": "VEST3 rankscore",
-            "vcf_name": "dbnsfp_vest4_rankscore",
-            "type": "number",
-            "description": "VEST3 rankscore",
-            "source_name": "VEST3"
+            "items": {
+                "title": "None provided",
+                "vcf_name": "dbnsfp_mutationtaster_aae",
+                "type": "string",
+                "separator": "tilde"
+            }
         },
         "dbnsfp_metasvm_score": {
             "title": "MetaSVM score",
@@ -2851,28 +2881,14 @@
         },
         "dbnsfp_mutpred_top5features": {
             "title": "None provided",
+            "type": "array",
             "vcf_name": "dbnsfp_mutpred_top5features",
-            "type": "string"
-        },
-        "dbnsfp_mvp_score": {
-            "title": "None provided",
-            "vcf_name": "dbnsfp_mvp_score",
-            "type": "number"
-        },
-        "dbnsfp_mvp_rankscore": {
-            "title": "None provided",
-            "vcf_name": "dbnsfp_mvp_rankscore",
-            "type": "number"
-        },
-        "dbnsfp_mpc_score": {
-            "title": "None provided",
-            "vcf_name": "dbnsfp_mpc_score",
-            "type": "number"
-        },
-        "dbnsfp_mpc_rankscore": {
-            "title": "None provided",
-            "vcf_name": "dbnsfp_mpc_rankscore",
-            "type": "number"
+            "items": {
+                "title": "None provided",
+                "vcf_name": "dbnsfp_mutpred_top5features",
+                "type": "string",
+                "separator": "tilde"
+            }
         },
         "dbnsfp_primateai_score": {
             "title": "None provided",
@@ -2887,51 +2903,6 @@
         "dbnsfp_primateai_pred": {
             "title": "None provided",
             "vcf_name": "dbnsfp_primateai_pred",
-            "type": "string"
-        },
-        "dbnsfp_deogen2_score": {
-            "title": "None provided",
-            "vcf_name": "dbnsfp_deogen2_score",
-            "type": "number"
-        },
-        "dbnsfp_deogen2_rankscore": {
-            "title": "None provided",
-            "vcf_name": "dbnsfp_deogen2_rankscore",
-            "type": "number"
-        },
-        "dbnsfp_deogen2_pred": {
-            "title": "None provided",
-            "vcf_name": "dbnsfp_deogen2_pred",
-            "type": "string"
-        },
-        "dbnsfp_aloft_fraction_transcripts_affected": {
-            "title": "None provided",
-            "vcf_name": "dbnsfp_aloft_fraction_transcripts_affected",
-            "type": "string"
-        },
-        "dbnsfp_aloft_prob_tolerant": {
-            "title": "None provided",
-            "vcf_name": "dbnsfp_aloft_prob_tolerant",
-            "type": "number"
-        },
-        "dbnsfp_aloft_prob_recessive": {
-            "title": "None provided",
-            "vcf_name": "dbnsfp_aloft_prob_recessive",
-            "type": "number"
-        },
-        "dbnsfp_aloft_prob_dominant": {
-            "title": "None provided",
-            "vcf_name": "dbnsfp_aloft_prob_dominant",
-            "type": "number"
-        },
-        "dbnsfp_aloft_pred": {
-            "title": "None provided",
-            "vcf_name": "dbnsfp_aloft_pred",
-            "type": "string"
-        },
-        "dbnsfp_aloft_confidence": {
-            "title": "None provided",
-            "vcf_name": "dbnsfp_aloft_confidence",
             "type": "string"
         },
         "dbnsfp_cadd_raw": {
@@ -3325,20 +3296,6 @@
                 "vcf_name": "dbnsfp_clinvar_orphanet_id",
                 "type": "string",
                 "separator": "tilde"
-            }
-        },
-        "dbnsfp_interpro_domain": {
-            "title": "INTERPRO domain",
-            "type": "array",
-            "vcf_name": "dbnsfp_interpro_domain",
-            "description": "INTERPRO domain",
-            "items": {
-                "title": "INTERPRO domain",
-                "vcf_name": "dbnsfp_interpro_domain",
-                "type": "string",
-                "description": "INTERPRO domain",
-                "separator": "tilde",
-                "source_name": "INTERPRO"
             }
         },
         "cadd_rawscore": {

@@ -1,1 +1,169 @@
-{"$schema": "http://json-schema.org/draft-04/schema#", "type": "object", "required": ["institution", "project"], "identifyingProperties": ["uuid", "aliases"], "additionalProperties": false, "mixinProperties": [{"$ref": "mixins.json#/schema_version"}, {"$ref": "mixins.json#/uuid"}, {"$ref": "mixins.json#/aliases"}, {"$ref": "mixins.json#/submitted"}, {"$ref": "mixins.json#/modified"}, {"$ref": "mixins.json#/status"}, {"$ref": "mixins.json#/attribution"}, {"$ref": "mixins.json#/notes"}, {"$ref": "mixins.json#/static_embeds"}], "title": "Sample Variant", "description": "Schema for variant info for sample", "id": "/profiles/variant_sample.json", "properties": {"qual": {"title": "Quality score", "vcf_name": "QUAL", "type": "number", "source_name": "VCF", "source_version": "VCFv4.2"}, "filter": {"title": "Filter", "vcf_name": "FILTER", "type": "string", "enum": ["PASS", "VQSRTrancheSNP99.00to99.90", "VQSRTrancheSNP99.90to100.00"], "source_name": "VCF", "source_version": "VCFv4.2"}, "call_info": {"title": "Info field", "vcf_name": "CALL_INFO", "type": "string", "source_name": "VCF", "source_version": "VCFv4.2"}, "gt": {"title": "Genotype", "vcf_name": "GT", "type": "string", "description": "Genotype", "source_name": "VCF", "source_version": "VCFv4.2"}, "ad": {"title": "Allelic depth", "type": "array", "vcf_name": "AD", "description": "Allelic depths for the ref and alt alleles in the order listed", "items": {"title": "Allelic depth", "vcf_name": "AD", "type": "integer", "description": "Allelic depths for the ref and alt alleles in the order listed", "separator": "comma", "source_name": "VCF", "source_version": "VCFv4.2"}}, "dp": {"title": "Approximate read depth", "vcf_name": "DP", "type": "integer", "description": "Depth of informative coverage for each sample", "source_name": "VCF", "source_version": "VCFv4.2"}, "gq": {"title": "Genotype quality score", "vcf_name": "GQ", "type": "integer", "description": "Genotype quality score", "source_name": "VCF", "source_version": "VCFv4.2"}, "pl": {"title": "Phred-scaled likelihoods for genotypes", "type": "array", "vcf_name": "PL", "description": "Normalized, Phred-scaled likelihoods for genotypes as defined in the VCF specification", "items": {"title": "Phred-scaled likelihoods for genotypes", "vcf_name": "PL", "type": "integer", "description": "Normalized, Phred-scaled likelihoods for genotypes as defined in the VCF specification", "separator": "comma", "source_name": "VCF", "source_version": "VCFv4.2"}}, "pgt": {"title": "Physical phasing haplotype information", "vcf_name": "PGT", "type": "string", "description": "Physical phasing haplotype information", "source_name": "VCF", "source_version": "VCFv4.2"}, "pid": {"title": "Physical phasing ID information", "vcf_name": "PID", "type": "string", "description": "Physical phasing ID information, where each unique ID within a given sample (but not across samples) connects records within a phasing group", "source_name": "VCF", "source_version": "VCFv4.2"}, "ps": {"title": "Phasing set ID", "vcf_name": "PS", "type": "integer", "description": "Phasing set (typically the position of the first variant in the set)", "source_name": "VCF", "source_version": "VCFv4.2"}, "af": {"title": "Allele fraction", "vcf_name": "AF", "type": "number", "description": "Alternate allele fraction in samples", "source_name": "VCF", "source_version": "VCFv4.2"}, "schema_version": {"default": "1"}, "sample": {"title": "Sample", "type": "string", "linkTo": "Sample"}, "variant": {"title": "Variant", "type": "string", "linkTo": "Variant"}}, "columns": {}, "facets": {}}
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "type": "object",
+    "required": [
+        "institution",
+        "project"
+    ],
+    "identifyingProperties": [
+        "uuid",
+        "aliases"
+    ],
+    "additionalProperties": false,
+    "mixinProperties": [
+        {
+            "$ref": "mixins.json#/schema_version"
+        },
+        {
+            "$ref": "mixins.json#/uuid"
+        },
+        {
+            "$ref": "mixins.json#/aliases"
+        },
+        {
+            "$ref": "mixins.json#/submitted"
+        },
+        {
+            "$ref": "mixins.json#/modified"
+        },
+        {
+            "$ref": "mixins.json#/status"
+        },
+        {
+            "$ref": "mixins.json#/attribution"
+        },
+        {
+            "$ref": "mixins.json#/notes"
+        },
+        {
+            "$ref": "mixins.json#/static_embeds"
+        }
+    ],
+    "title": "Sample Variant",
+    "description": "Schema for variant info for sample",
+    "id": "/profiles/variant_sample.json",
+    "properties": {
+        "QUAL": {
+            "title": "Quality score",
+            "vcf_name": "QUAL",
+            "type": "number",
+            "source_name": "VCF",
+            "source_version": "VCFv4.2"
+        },
+        "FILTER": {
+            "title": "Filter",
+            "vcf_name": "FILTER",
+            "type": "string",
+            "source_name": "VCF",
+            "source_version": "VCFv4.2"
+        },
+        "CALL_INFO (Sample name)": {
+            "title": "Info field",
+            "vcf_name": "CALL_INFO (Sample name)",
+            "type": "string",
+            "source_name": "VCF",
+            "source_version": "VCFv4.2"
+        },
+        "GT": {
+            "title": "Genotype",
+            "vcf_name": "GT",
+            "type": "string",
+            "description": "Genotype",
+            "source_name": "VCF",
+            "source_version": "VCFv4.2"
+        },
+        "AD": {
+            "title": "Allelic depth",
+            "type": "array",
+            "vcf_name": "AD",
+            "description": "Allelic depths for the ref and alt alleles in the order listed",
+            "items": {
+                "title": "Allelic depth",
+                "vcf_name": "AD",
+                "type": "integer",
+                "description": "Allelic depths for the ref and alt alleles in the order listed",
+                "separator": "comma",
+                "source_name": "VCF",
+                "source_version": "VCFv4.2"
+            }
+        },
+        "DP": {
+            "title": "Approximate read depth",
+            "vcf_name": "DP",
+            "type": "integer",
+            "description": "Depth of informative coverage for each sample",
+            "source_name": "VCF",
+            "source_version": "VCFv4.2"
+        },
+        "GQ": {
+            "title": "Genotype quality score",
+            "vcf_name": "GQ",
+            "type": "integer",
+            "description": "Genotype quality score",
+            "source_name": "VCF",
+            "source_version": "VCFv4.2"
+        },
+        "PL": {
+            "title": "Phred-scaled likelihoods for genotypes",
+            "type": "array",
+            "vcf_name": "PL",
+            "description": "Normalized, Phred-scaled likelihoods for genotypes as defined in the VCF specification",
+            "items": {
+                "title": "Phred-scaled likelihoods for genotypes",
+                "vcf_name": "PL",
+                "type": "integer",
+                "description": "Normalized, Phred-scaled likelihoods for genotypes as defined in the VCF specification",
+                "separator": "comma",
+                "source_name": "VCF",
+                "source_version": "VCFv4.2"
+            }
+        },
+        "PGT": {
+            "title": "Physical phasing haplotype information",
+            "vcf_name": "PGT",
+            "type": "string",
+            "description": "Physical phasing haplotype information",
+            "source_name": "VCF",
+            "source_version": "VCFv4.2"
+        },
+        "PID": {
+            "title": "Physical phasing ID information",
+            "vcf_name": "PID",
+            "type": "string",
+            "description": "Physical phasing ID information, where each unique ID within a given sample (but not across samples) connects records within a phasing group",
+            "source_name": "VCF",
+            "source_version": "VCFv4.2"
+        },
+        "PS": {
+            "title": "Phasing set ID",
+            "vcf_name": "PS",
+            "type": "integer",
+            "description": "Phasing set (typically the position of the first variant in the set)",
+            "source_name": "VCF",
+            "source_version": "VCFv4.2"
+        },
+        "AF": {
+            "title": "Sample allele fraction",
+            "vcf_name": "AF",
+            "type": "number",
+            "description": "Alternate allele fraction in samples",
+            "source_name": "VCF",
+            "source_version": "VCFv4.2"
+        },
+        "schema_version": {
+            "default": "1"
+        },
+        "sample": {
+            "title": "Sample",
+            "type": "string",
+            "linkTo": "Sample"
+        },
+        "variant": {
+            "title": "Variant",
+            "type": "string",
+            "linkTo": "Variant"
+        }
+    },
+    "columns": {},
+    "facets": {}
+}
