@@ -38,9 +38,6 @@ def test_VCFP_one_variant(test_vcf):
     """
     record = test_vcf.get_record()
     result = test_vcf.record_to_variant(record)
-    assert result['QD'] == 33.66
-    assert result['MLEAC'] == [2]
-    assert result['MQ'] == 44.51
     assert result['annovar_cytoband'] == '1p36.33'
     assert result['transcript'][0]['vep_feature'] == 'ENST00000379370'
     assert result['transcript'][1]['vep_feature'] == 'ENST00000620552'
@@ -51,9 +48,6 @@ def test_VCFP_one_variant(test_vcf):
     assert result['dbnsfp_genocanyon_score'] == 0.999999999998938
     assert result['clinvar_alleleid'] == '244110'
     assert result['clinvar_clnvcso'] == 'SO:0001483'
-    assert result['Chrom'] == 'chr1'
-    assert result['Ref'] == 'G'
-    assert result['ID'] is None
 
 
 def test_VCFP_multiple_variants(test_vcf):
@@ -63,9 +57,6 @@ def test_VCFP_multiple_variants(test_vcf):
     record = test_vcf.get_record()
     result = test_vcf.record_to_variant(record)
     # check all the same things as the previous test, as they should be the same
-    assert result['QD'] == 33.66
-    assert result['MLEAC'] == [2]
-    assert result['MQ'] == 44.51
     assert result['annovar_cytoband'] == '1p36.33'
     assert result['transcript'][0]['vep_feature'] == 'ENST00000379370'
     assert result['transcript'][1]['vep_feature'] == 'ENST00000620552'
@@ -76,16 +67,10 @@ def test_VCFP_multiple_variants(test_vcf):
     assert result['dbnsfp_genocanyon_score'] == 0.999999999998938
     assert result['clinvar_alleleid'] == '244110'
     assert result['clinvar_clnvcso'] == 'SO:0001483'
-    assert result['Chrom'] == 'chr1'
-    assert result['Ref'] == 'G'
-    assert result['ID'] is None
 
     # check record 2
     record = test_vcf.get_record()
     result = test_vcf.record_to_variant(record)
-    assert result['AF'] == 0.833
-    assert result['DP'] == 111
-    assert result['MQ'] == 68.07
     assert len(result['transcript'].keys()) == 9
     assert result['transcript'][0]['vep_location'] == '1:1044368'
     assert result['transcript'][0]['dbnsfptranscript_sift_score'] == 0.036
@@ -101,9 +86,6 @@ def test_VCFP_multiple_variants(test_vcf):
     # check record 3
     record = test_vcf.get_record()
     result = test_vcf.record_to_variant(record)
-    assert result['AF'] == 0.5
-    assert result['DP'] == 24
-    assert result['MQ'] == 65.65
     assert len(result['transcript'].keys()) == 7
     assert result['transcript'][0]['vep_location'] == '1:1804548'
     assert result['transcript'][0]['dbnsfptranscript_sift_score'] == 0.001
@@ -124,18 +106,45 @@ def test_VCFP_multiple_sample_variants(test_vcf):
     record = test_vcf.get_record()
     result = test_vcf.record_to_sample_variant(record)
     assert result['DP'] == 12
-    assert result['AF'] == 1.0
-    assert result['Qual'] == 403.9
-    assert result['Filter'] == 'VQSRTrancheSNP99.90to100.00'
+    assert result['AF'] == [1.0]
+    assert result['QUAL'] == 403.9
+    assert result['FILTER'] == 'VQSRTrancheSNP99.90to100.00'
+    assert result['GT'] == '1/1'
+    assert result['PL'] == [430, 36, 0]
     record = test_vcf.get_record()
     result = test_vcf.record_to_sample_variant(record)
-    assert result['DP'] == 111
-    assert result['AF'] == 0.833
-    assert result['Qual'] == 3202.19
-    assert result['Filter'] == 'VQSRTrancheSNP99.00to99.90'
+    assert result['DP'] == 42
+    assert result['AF'] == [0.833]
+    assert result['QUAL'] == 3202.19
+    assert result['FILTER'] == 'VQSRTrancheSNP99.00to99.90'
+    assert result['GT'] == '1/1'
+    assert result['GQ'] == 99
+    assert result['PL'] == [1720, 126, 0]
     record = test_vcf.get_record()
     result = test_vcf.record_to_sample_variant(record)
-    assert result['DP'] == 24
-    assert result['AF'] == 0.5
-    assert result['Qual'] == 58.56
-    assert result['Filter'] == 'VQSRTrancheSNP99.00to99.90'
+    assert result['DP'] == 2
+    assert result['AF'] == [0.5]
+    assert result['QUAL'] == 58.56
+    assert result['FILTER'] == 'VQSRTrancheSNP99.00to99.90'
+    assert result['AD'] == [0, 2]
+
+
+def test_VCFP_post_sample_variants(testapp, institution, project, test_vcf):
+    """ Attempts to post all generated sample variants """
+    CONNECTION_URL = '/variant_sample'
+    for record in test_vcf:
+        variant_sample = test_vcf.record_to_sample_variant(record)
+        variant_sample['project'] = 'encode-project'
+        variant_sample['institution'] = 'encode-institution'
+        testapp.post_json(CONNECTION_URL, variant_sample, status=201)
+
+
+def test_VCFP_post_variants(testapp, institution, project, test_vcf):
+    """ Attempts to post all generated variants """
+    CONNECTION_URL = '/variant'
+    for record in test_vcf:
+        variant = test_vcf.record_to_variant(record)
+        variant['project'] = 'encode-project'
+        variant['institution'] = 'encode-institution'
+        test_vcf.format_variant(variant)
+        testapp.post_json(CONNECTION_URL, variant, status=201)

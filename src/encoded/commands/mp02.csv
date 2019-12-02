@@ -8,7 +8,6 @@ no,VCF NAME v0.2 (field name on ann vcf),SOURCE_NAME v0.2,SOURCE VERSION v0.2,"f
 5,ALT,VCF,VCFv4.2,string,A,,Y,,comma,,,,,variant,Alternative allele,,VCF,VCFv4.2,5,5,,,,Y
 6,QUAL,VCF,VCFv4.2,number,302.6,,N,,,,,,,sample,Quality score,,VCF,VCFv4.2,,,,,,Y
 7,FILTER,VCF,VCFv4.2,string,PASS,"PASS,VQSRTrancheSNP99.00to99.90,VQSRTrancheSNP99.90to100.00",N,,,,,,,sample,Filter,,VCF,VCFv4.2,,,,,,Y
-8,CALL_INFO (Sample name),VCF,VCFv4.2,string,"0/1:33,14:47:99:310,0,927",,N,,,,,,,sample,Info field,,VCF,VCFv4.2,,,,,,Y
 9,GT,VCF,VCFv4.2,string,0/1,,N,,,,,,,sample,Genotype,Genotype,VCF,VCFv4.2,,,,,,Y
 10,AD,VCF,VCFv4.2,integer,"33,14",,Y,,comma,,,,,sample,Allelic depth,Allelic depths for the ref and alt alleles in the order listed,VCF,VCFv4.2,,,,,,Y
 11,DP,VCF,VCFv4.2,integer,47,,N,,,,,,,sample,Approximate read depth,Depth of informative coverage for each sample,VCF,VCFv4.2,,,,,,Y
@@ -17,7 +16,7 @@ no,VCF NAME v0.2 (field name on ann vcf),SOURCE_NAME v0.2,SOURCE VERSION v0.2,"f
 14,PGT,VCF,VCFv4.2,string,0|1,,N,,,,,,,sample,Physical phasing haplotype information,Physical phasing haplotype information,VCF,VCFv4.2,,,,,,Y
 15,PID,VCF,VCFv4.2,string,985446_G_T,,N,,,,,,,sample,Physical phasing ID information,"Physical phasing ID information, where each unique ID within a given sample (but not across samples) connects records within a phasing group",VCF,VCFv4.2,,,,,,Y
 16,PS,VCF,VCFv4.2,integer,985446,,N,,,,,,,sample,Phasing set ID,Phasing set (typically the position of the first variant in the set),VCF,VCFv4.2,,,,,,Y
-17,AF,VCF,VCFv4.2,number,0.2979,,N,,,,,,,sample,Sample allele fraction,Alternate allele fraction in samples,VCF,VCFv4.2,,,,,,Y
+17,AF,VCF,VCFv4.2,number,0.2979,,Y,,,,,,,sample,Sample allele fraction,Alternate allele fraction in samples,VCF,VCFv4.2,,,,,,Y
 18,annovar_cytoband,ANNOVAR,2017-07-17,string,1p36.33,,N,,,WINDOW,FUNCTION,EXPERIMENTAL EVIDENCE,,variant,Cytoband,Cytoband,ANNOVAR,2017-07-17,,,,,,Y
 19,vep_location,VEP,v97.4,string,1:1044368,,N,transcript,,,,,,,,,,,,,,,,Y
 20,vep_allele,VEP,v97.4,string,T,,N,transcript,,,,,,,,,,,,,,,,Y

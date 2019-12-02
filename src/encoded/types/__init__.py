@@ -327,3 +327,30 @@ class AnnotationField(Item):
     schema = load_schema('encoded:schemas/annotation_field.json')
 
     embedded_list = Item.embedded_list
+
+
+@collection(
+    name='variants',
+    properties={
+        'title': 'Variants',
+        'description': 'List of all variants'
+    })
+class Variant(Item):
+    """ Variant class """
+
+    item_type = 'variant'
+    schema = load_schema('encoded:schemas/variant.json')
+    embedded_list = Item.embedded_list
+
+@collection(
+    name='variant-samples',
+    properties={
+        'title': 'Variants (sample)',
+        'description': 'List of all variants with sample specific information',
+    })
+class VariantSample(Item):
+    """Class for variant samples."""
+
+    item_type = 'variant_sample'
+    schema = load_schema('encoded:schemas/variant_sample.json')
+    embedded_list = Item.embedded_list

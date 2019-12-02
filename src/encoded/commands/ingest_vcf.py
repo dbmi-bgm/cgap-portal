@@ -52,6 +52,10 @@ class VCFParser(object):
         self.read_vcf_metadata()
         self.parse_vcf_fields()
 
+    def __iter__(self):
+        """ Return generator to VCF rows """
+        return self.reader
+
     def read_vcf_metadata(self):
         """ Parses VCF file meta data to get annotation fields under MUTANNO
         """
@@ -184,24 +188,6 @@ class VCFParser(object):
         else:
             return [s[0].split('|')]
 
-    @staticmethod
-    def parse_standard_vcf_fields(record, result):
-        """ Pulls common VCF field information into result
-
-        Args:
-            record: vcf record to parse
-            result: dict representation of the record
-        """
-        result['Chrom'] = record.CHROM
-        result['Pos'] = record.POS
-        result['ID'] = record.ID
-        result['Ref'] = record.REF
-        result['Alt'] = record.ALT
-        result['Qual'] = record.QUAL
-        result['Filter'] = record.FILTER
-        result['Format'] = record.FORMAT
-        result['samples'] = record.samples
-
     def process_field_value(self, type, value, sub_type=None):
         """ Casts the given value to the type given by 'type'
 
@@ -231,12 +217,17 @@ class VCFParser(object):
             return float(value)
         elif type == 'array':
             if sub_type:
-                items = value.split('~')
+                if not isinstance(value, list):
+                    items = value.split('~')
+                else:
+                    items = value
                 return list(map(lambda v: self.process_field_value(sub_type, v, sub_type=None), items))
+            else:
+                raise VCFParserException('Got array with no sub-type')
         else:
             raise VCFParserException('type was not one of: string, integer, number, array')
 
-    def process_variant_value(self, field, value, key=''):
+    def process_variant_value(self, field, value, key='', fail=True):
         """ Given a field, check the variant schema for the type of that field and cast
         the given value to that type
 
@@ -261,7 +252,11 @@ class VCFParser(object):
                 if type == 'array':
                     sub_type = props[sub_embedded_group]['items']['properties'][field]['items']['type']
             else:
-                raise VCFParserException('Tried to check a variant field that does not exist on the schema')
+                if fail:
+                    raise VCFParserException('Tried to check a variant field that does not exist on the schema: %s' % field)
+                else:
+                    logger.error('Tried to check a variant field that does not exist on the schema: %s' % field)
+                    return None
         else:
             type = props[field]['type']
             if type == 'array':
@@ -284,13 +279,13 @@ class VCFParser(object):
             dictionary of parsed VCF entry
         """
         result = {}
-        self.parse_standard_vcf_fields(record, result)
         for key in self.format.keys():
-
             # handle non-annotation fields
             if key not in self.annotation_keys:
                 if record.INFO.get(key, None):
-                    result[key] = record.INFO.get(key)
+                    val = self.process_variant_value(key, record.INFO.get(key), fail=False)
+                    if val is not None:
+                        result[key] = val
                 continue
 
             # handle annotation fields
@@ -310,11 +305,10 @@ class VCFParser(object):
                     for f_idx, field in enumerate(group):
                         if field:
                             fn = self.format[key][f_idx]
-                            if fn == 'DROPPED':  # special marker for non-MVP fields
+                            if fn == 'DROPPED':
                                 continue
 
-                            # if this annotation is a sub-embedded-grouping, process
-                            # it as such
+                            # handle sub-embedded
                             if key in self.sub_embedded_mapping:
                                 sub_embedded_group = self.sub_embedded_mapping[key]
                                 if sub_embedded_group not in result:  # create sub-embedded group if not there
@@ -326,6 +320,39 @@ class VCFParser(object):
                                 result[fn] = self.process_variant_value(fn, field, key)
         return result
 
+    @staticmethod
+    def format_variant(result):
+        """ Does some extra formatting to the variant so it fits the schema
+            The schema format expect something... odd... maybe needs fixing
+
+        Args:
+            result: the item to reformat
+        """
+        acc = []
+        for _, vals in result['transcript'].items():
+            sub_acc = []
+            for k, v in vals.items():
+                sub_acc.append({k: v})
+            acc.append(sub_acc)
+        result['transcript'] = acc
+
+    @staticmethod
+    def parse_samples(result, record):
+        """ Parses the samples on the record, adding them to result
+
+        Args:
+            result: dict to populate
+            record: record to parse
+        """
+        result['QUAL'] = record.QUAL
+        result['FILTER'] = record.FILTER[0]
+        sample = record.samples[0].data
+        result['GT'] = sample.GT
+        result['AD'] = sample.AD
+        result['DP'] = sample.DP
+        result['GQ'] = sample.GQ
+        result['PL'] = sample.PL
+
     def record_to_sample_variant(self, record):
         """ Parses the given record to produce the sample variant
 
@@ -335,23 +362,22 @@ class VCFParser(object):
         Returns:
             a (dict) sample_variant item
         """
-        result = {}  # add some fields directly (?)
-        result['Qual'] = record.QUAL
-        result['Filter'] = record.FILTER[0]
+        result = {}
         props = self.variant_sample_schema['properties']
-        for field in props.keys():
+        for field in props.keys():  # locate all non-sample included fields
             if record.INFO.get(field, None):
                 val = record.INFO.get(field)
                 prop_type = props[field]['type']
                 if prop_type == 'array':
                     sub_type = props[field]['items']['type']
-                    result[field] = self.process_field_value(prop_type, val, sub_type)
+                    result[field.upper()] = self.process_field_value(prop_type, val, sub_type)
                 else:
-                    result[field] = self.process_field_value(prop_type, val)
+                    result[field.upper()] = self.process_field_value(prop_type, val)
+        self.parse_samples(result, record) # add sample fields, already formatted
         return result
 
-
 def main():
+    """ Main, ingests VCF and posts """
     logging.basicConfig()
     parser = argparse.ArgumentParser(
         description="Ingests a given VCF file",
@@ -361,14 +387,27 @@ def main():
     parser.add_argument('vcf', help='path to vcf file')
     parser.add_argument('variant', help='path to variant schema')
     parser.add_argument('sample', help='path to sample variant schema')
+    parser.add_argument('--post-inserts', action='store_true', default=False,
+                        help='If specified, will post inserts, by default False')
     args = parser.parse_args()
 
     logger.info('Ingesting VCF file: %s' % args.vcf)
     vcf_parser = VCFParser(args.vcf, args.variant, args.sample)
     vcf_parser.parse_vcf_fields()
-    record = vcf_parser.get_record()
-    print(vcf_parser.record_to_variant(record))
 
+    # post variants
+    if args.post_inserts:
+        from ff_utils import post_metadata
+        for record in vcf_parser:
+            variant_sample = vcf_parser.record_to_sample_variant(record)
+            variant_sample['project'] = 'encode-project'
+            variant_sample['institution'] = 'encode-institution'
+            ff_utils.post_metadata(variant_sample, 'variant_sample', None)
+            variant = vcf_parser.record_to_variant(record)
+            variant['project'] = 'encode-project'
+            variant['institution'] = 'encode-institution'
+            test_vcf.format_variant(variant)
+            ff_utils.post_metadata(variant, 'variant', None)
 
 if __name__ == '__main__':
     main()

@@ -367,7 +367,7 @@ def main():
     parser.add_argument('mp', help='path to mapping table')
     parser.add_argument('variant', help='where to write variant schema')
     parser.add_argument('sample', help='where to write sample_variant schema')
-    parser.add_argument('--post-inserts', action='store_true', default=True,
+    parser.add_argument('--post-inserts', action='store_true', default=False,
                         help='If specified will post inserts, by default False')
     args = parser.parse_args()
 
@@ -380,7 +380,7 @@ def main():
     inserts = process_inserts(args.mp, FIELDS)
 
     # if not a dry run try to post inserts
-    if not args.post_inserts:
+    if args.post_inserts:
         from ff_utils import post_metadata
         for entry in inserts:
             ff_utils.post_metadata(entry, 'annotation_field', None)
