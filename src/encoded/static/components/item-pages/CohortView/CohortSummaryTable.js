@@ -256,7 +256,7 @@ export const CohortSummaryTable = React.memo(function CohortSummaryTable(props){
             renderArr.push(
                 files[0] ?
                     <span className="ellipses" key={`span-${ext}`}>
-                        { statusToIcon(overallQuality || "PASS") }
+                        { statusToIcon(overallQuality)}
                         <a
                             href={files[0].fileUrl || ""}
                             rel="noopener noreferrer"
