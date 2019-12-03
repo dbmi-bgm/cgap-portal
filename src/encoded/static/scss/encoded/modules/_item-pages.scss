@@ -1862,9 +1862,13 @@ $badge-item-min-height: 90px;
 				min-width: 640px;
 				width: 100%;
 
-				thead {
+				thead {				
 					> tr > th {
 						padding: 6px 8px;
+						
+						&.hidden-th {
+							background-color: #ffffff;
+						}
 					}
 				}
 
@@ -1880,17 +1884,14 @@ $badge-item-min-height: 90px;
 							*/
 							&[data-for-column="individual"]{
 								.gen-identifier {
-									margin-right: 8px;
-									padding-right: 8px;
-									border-right: 1px solid #777;
 									display: inline-block;
-									min-width: 55px;
-									text-align: right;
+									min-width: 45px;
 									vertical-align: middle;
 									font-weight: 600;
-									line-height: 1;
-									margin-left: -15px;
 								}
+							}
+							i {
+								font-size: 12px;
 							}
 						}
 						&.is-even {
@@ -1928,11 +1929,24 @@ $badge-item-min-height: 90px;
 							}
 							a.qc-status-in-review {
 								font-style: italic;
-								}
+							}
 						}
 					}
 				}
 
+				tfoot {
+					> tr > td {
+						text-align: center;
+						vertical-align: middle !important;
+						padding: 2px 3px;
+						border-top: 1px solid #eeeeee;
+						background-color: #f1f1f1;
+						
+						&:not(.has-value) {
+							background-color: #fff;
+						}
+					}
+				}
 			}
 
 		}
