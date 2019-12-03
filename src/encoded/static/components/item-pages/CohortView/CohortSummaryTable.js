@@ -89,8 +89,8 @@ export const CohortSummaryTable = React.memo(function CohortSummaryTable(props){
 
             // populate with per sample data
             sample_processed_files.forEach((set) => {
-                const { sample = {}, processed_files: procFiles = [] } = set;
-                sampleProcessingData[uuid][sample.accession || ""] = generateFileDataObject(procFiles);
+                const { sample : { accession = "" } = {}, processed_files: procFiles = [] } = set;
+                sampleProcessingData[uuid][accession] = generateFileDataObject(procFiles);
             });
             hasMSA = true;
         }
