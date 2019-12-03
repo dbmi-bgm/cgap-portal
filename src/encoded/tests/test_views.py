@@ -62,14 +62,35 @@ def test_vary_json(anontestapp):
     assert 'Accept' in res.vary
 
 
-def test_get_health_page(testapp):
+def test_get_health_page(app, testapp):
     """
     Tests that we can get the health page and various fields we expect are there
     """
+    from webtest import TestApp
     res = testapp.get('/health', status=200).json
     assert 'namespace' in res
     assert 'blob_bucket' in res
     assert 'elasticsearch' in res
+    assert res['foursight'] is None
+
+    # test some stuff that uses the env.name setting by making a new testapp
+    prev_env = app.registry.settings.get('env.name')
+    app.registry.settings['env.name'] = 'fourfront-test'
+    environ = {
+        'HTTP_ACCEPT': 'application/json',
+        'REMOTE_USER': 'TEST',
+    }
+    new_env_testapp = TestApp(app, environ)
+    env_res = new_env_testapp.get('/health', status=200).json
+    assert env_res['beanstalk_env'] == 'fourfront-test'
+    assert env_res['foursight'].endswith('/view/test')
+
+    # reset settings after test
+    if prev_env is None:
+        del app.registry.settings['env.name']
+    else:
+        app.registry.settings['env.name'] = prev_env
+
 
 
 @pytest.mark.parametrize('item_type', [k for k in TYPE_LENGTH if k not in ['user', 'access_key']])
