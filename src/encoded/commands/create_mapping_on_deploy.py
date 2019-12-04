@@ -46,7 +46,9 @@ ITEM_INDEX_ORDER = [
     'StaticSection',
     'Document',
     'Page',
-    'AnnotationField'
+    'AnnotationField',
+    'Variant',
+    'VariantSample'
 ]
 
 

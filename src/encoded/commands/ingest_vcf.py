@@ -298,17 +298,16 @@ class VCFParser(object):
     @staticmethod
     def format_variant(result):
         """ Does some extra formatting to the variant so it fits the schema
-            The schema format expect something... odd... maybe needs fixing
+            When we build the item above we index the seo's into a dictionary.
+            This function removes that and puts them instead into a list as
+            expected by the schema
 
         Args:
             result: the item to reformat
         """
         acc = []
         for _, vals in result['transcript'].items():
-            sub_acc = []
-            for k, v in vals.items():
-                sub_acc.append({k: v})
-            acc.append(sub_acc)
+            acc.append(vals)
         result['transcript'] = acc
 
     @staticmethod

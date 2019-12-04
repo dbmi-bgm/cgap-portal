@@ -130,10 +130,10 @@
         },
         "transcript": {
             "title": "transcript",
-            "type": "array",
+            "type": "object",
             "items": {
                 "title": "Transcript",
-                "type": "object",
+                "type": "array",
                 "properties": {
                     "vep_location": {
                         "title": "None provided",

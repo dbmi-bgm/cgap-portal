@@ -198,7 +198,7 @@ def generate_properties(inserts, variant=True):
                     }
                     sub_temp.update({
                         "title": sum_ob_name,
-                        "type": "array",
+                        "type": "object",
                         "items": {
                             "title": sub_title,
                             "type": "array",
@@ -209,7 +209,7 @@ def generate_properties(inserts, variant=True):
                     prop[prop_name] = features
                     sub_temp.update({
                         "title": sub_title,
-                        "type": "array",
+                        "type": "object",
                         "items": {
                             "title": sub_title,
                             "type": "object",
@@ -377,7 +377,7 @@ def main():
 
     # read/process mapping table, build inserts
     logger.info('Building annotations from mapping table: %s\n' % args.mp)
-    VERSION, DATE, FIELDS = read_mapping_table(args.mp)
+    VERSION, DATE, FIELDS = read_mp_meta(args.mp)
     inserts = process_mp_inserts(args.mp, FIELDS)
 
     # if not a dry run try to post inserts

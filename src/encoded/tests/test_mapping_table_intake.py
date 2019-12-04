@@ -128,7 +128,7 @@ def test_generate_variant_json_items(inserts):
     assert var_props['exac_af']['source_name'] == 'ExAC'
     assert var_props['exac_af']['source_version'] == '3'
     assert var_props['transcript']['title'] == 'Transcript'
-    assert var_props['transcript']['type'] == 'array'
+    assert var_props['transcript']['type'] == 'object'
     sub_obj_props = var_props['transcript']['items']['properties']
     assert len(sub_obj_props.keys()) == 50 # should see 50 of these
     assert sub_obj_props['vep_allele']['vcf_name'] == 'vep_allele'
