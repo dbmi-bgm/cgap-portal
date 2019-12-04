@@ -204,7 +204,8 @@ export const CohortSummaryTable = React.memo(function CohortSummaryTable(props){
                 const newWarning = newStatus === "WARN";
                 if (currOverall === "PASS" && newFailing ||
                     currOverall === "PASS" && newWarning ||
-                    currOverall === "WARN" && newFailing
+                    currOverall === "WARN" && newFailing ||
+                    newStatus && !currOverall
                 ) {
                     return true;
                 }
@@ -255,7 +256,7 @@ export const CohortSummaryTable = React.memo(function CohortSummaryTable(props){
             renderArr.push(
                 files[0] ?
                     <span className="ellipses" key={`span-${ext}`}>
-                        { statusToIcon(overallQuality || "WARN") }
+                        { statusToIcon(overallQuality)}
                         <a
                             href={files[0].fileUrl || ""}
                             rel="noopener noreferrer"
