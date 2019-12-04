@@ -10,6 +10,13 @@ logger = logging.getLogger(__name__)
 EPILOG = __doc__
 
 
+class MappingTableIntakeException(Exception):
+    """ Specific type of exception we'd like to throw if we fail in this stage
+        due to an error with the table itself
+    """
+    pass
+
+
 def process_fields(row):
     """ Takes in the row of field names and processes them. This involves replacing
         spaces, ignoring '#' commented out fields and dropping comments (like this)
@@ -27,10 +34,12 @@ def process_fields(row):
         if new_name.startswith('#'):
             continue
         fields.append(new_name)
+    if not fields:
+        raise MappingTableIntakeException('Did not find any fields on row %s' % row)
     return fields
 
 
-def read_mapping_table(fname):
+def read_mp_meta(fname):
     """ Reads mapping table from fname
 
     Args:
@@ -56,8 +65,10 @@ def read_mapping_table(fname):
     return VERSION, DATE, FIELDS
 
 
-def process_inserts(fname, fields):
+def process_mp_inserts(fname, fields):
     """ Processes the annotation fields in the mapping table to produce inserts
+        Note that project and institution are required fields on the annotation
+        field schema and are not set here
 
     Args:
         fname: mapping table location
@@ -101,17 +112,11 @@ def process_inserts(fname, fields):
                         insert[field_name] = entry
             if not insert.get('mvp', False):  # ignore non-mvp items for now
                 continue
-            insert['project'] = 'encode-project' # XXX: Test
-            insert['institution'] = 'encode-institution' # XXX: Test
-            # insert['submitted_by'] = 'koray_kirli@hms.harvard.edu'
-            # XXX: Hard coded stripping of prefix, see vep in mapping table
-            # if insert.get('sub_embedding_group', None):
-            #     insert['vcf_name_v0.2'] = ''.join(insert['vcf_name_v0.2'].split('_')[1:])
             inserts.append(insert)
     return inserts
 
 
-def get_sample_inserts(inserts):
+def filter_inserts_sample(inserts):
     """ Filters inserts for those that are mvp and sample
 
     Args:
@@ -120,28 +125,27 @@ def get_sample_inserts(inserts):
     Returns:
         list of inserts that are 'samples'
     """
-    mvp_list = [i for i in inserts if i.get('mvp')]
-    samples = [i for i in mvp_list if i.get('scope') == 'sample']
-    samples = sorted(samples, key = lambda i: i.get('field_priority', 1000000))
+    samples = [i for i in inserts if i.get('scope') == 'sample']
     return samples
 
 
-def get_variant_inserts(inserts):
+def filter_inserts_variant(inserts):
     """ Filters inserts for those that are mvp and not sample
 
     Args:
-        inserts: all inserts produced by 'process_inserts'
+        inserts: all inserts produced by 'process_mp_inserts'
 
     Returns:
         list of inserts that are variants
     """
-    mvp_list = [i for i in inserts if i.get('mvp')]
-    variants = [i for i in mvp_list if i.get('scope') != 'sample']
+    variants = [i for i in inserts if i.get('scope') != 'sample']
     return variants
 
 
 def generate_properties(inserts, variant=True):
     """ Generates sample variant or variant schema properties
+        This function is quite long and complicated... Should probably be
+        refactored
 
     Args:
         inserts: result of one of the above two functions
@@ -257,6 +261,8 @@ def generate_properties(inserts, variant=True):
                 continue
             props.update(get_prop(obj))
 
+    if not props:
+        raise MappingTableIntakeException('Got no properties on schema!')
     return props, cols, facs
 
 
@@ -353,10 +359,8 @@ def write_schema(schema, fname):
 
 
 def main():
-    """
-    Works with mp.csv, downloaded 10-25
-    Takes in the mapping table and produces annotation field inserts, variant_sample
-    schema and variant schema.
+    """ Takes in the mapping table and produces annotation field inserts, variant_sample
+        schema and variant schema.
     """
     logging.basicConfig()
     parser = argparse.ArgumentParser(
@@ -374,10 +378,7 @@ def main():
     # read/process mapping table, build inserts
     logger.info('Building annotations from mapping table: %s\n' % args.mp)
     VERSION, DATE, FIELDS = read_mapping_table(args.mp)
-    if FIELDS is None:
-        logger.error('Failed to process mapping table. Exiting.\n')
-        exit(1)
-    inserts = process_inserts(args.mp, FIELDS)
+    inserts = process_mp_inserts(args.mp, FIELDS)
 
     # if not a dry run try to post inserts
     if args.post_inserts:
@@ -387,10 +388,10 @@ def main():
     logger.info('Successfully created/posted annotations\n')
 
     # generate schemas from inserts
-    sample_props, _, _ = generate_properties(get_sample_inserts(inserts), variant=False)
+    sample_props, _, _ = generate_properties(filter_inserts_sample(inserts), variant=False)
     variant_sample_schema = generate_variant_sample_schema(sample_props)
     write_schema(variant_sample_schema, args.sample)
-    var_props, cols, facs = generate_properties(get_variant_inserts(inserts))
+    var_props, cols, facs = generate_properties(filter_inserts_variant(inserts))
     variant_schema = generate_variant_schema(var_props, cols, facs)
     write_schema(variant_schema, args.variant)
     logger.info('Successfully wrote schemas\n')

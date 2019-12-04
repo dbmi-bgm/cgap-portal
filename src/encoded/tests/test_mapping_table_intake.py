@@ -4,11 +4,10 @@ import json
 import pytest
 from .features.conftest import workbook
 from encoded.commands.mapping_table_intake import (
-    process_fields,
-    read_mapping_table,
-    process_inserts,
-    get_sample_inserts,
-    get_variant_inserts,
+    read_mp_meta,
+    process_mp_inserts,
+    filter_inserts_sample,
+    filter_inserts_variant,
     generate_properties,
     add_default_schema_fields,
     generate_variant_sample_schema,
@@ -30,21 +29,20 @@ EXPECTED_INSERT = {'no': 1, 'vcf_name_v0.2': 'CHROM', 'source_name_v0.2': 'VCF',
                    'is_list': False, 'scope': 'variant', 'schema_title':
                    'Chromosome', 'source_name': 'VCF', 'source_version': 'VCFv4.2',
                    'field_priority': 1, 'column_priority': 1, 'facet_grouping':
-                   'Chromosome', 'mvp': True, 'project': 'encode-project',
-                   'institution': 'encode-institution'}
+                   'Chromosome', 'mvp': True}
 MVP_EXPECTED = 619
 SAMPLE_FIELDS_EXPECTED = 12
 VARIANT_FIELDS_EXPECTED = 607
 
 @pytest.fixture
 def fields():
-    _, _, FIELDS = read_mapping_table(FNAME)
+    _, _, FIELDS = read_mp_meta(FNAME)
     return FIELDS
 
 
 @pytest.fixture
 def inserts(fields):
-    return process_inserts(FNAME, fields)
+    return process_mp_inserts(FNAME, fields)
 
 
 @pytest.fixture
@@ -71,13 +69,13 @@ def test_add_default_schema_fields():
 
 def test_read_mapping_table():
     """ Tests that we can read mapping table header correctly based on the current format """
-    VERSION, DATE, FIELDS = read_mapping_table(FNAME)
+    VERSION, DATE, FIELDS = read_mp_meta(FNAME)
     assert VERSION == 'annV0.2'
     assert DATE == '11.08.19'
     assert sorted(FIELDS) == sorted(EXPECTED_FIELDS)
 
 
-def test_process_inserts(inserts):
+def test_process_mp_inserts(inserts):
     """ Tests that we properly process an inserts into mvp, sample, variant """
     assert inserts[0] == EXPECTED_INSERT
     mvp_list = [i for i in inserts if i.get('mvp')]
@@ -86,9 +84,9 @@ def test_process_inserts(inserts):
     assert len(sample) == SAMPLE_FIELDS_EXPECTED
     variant = [i for i in mvp_list if i.get('scope') != 'sample']
     assert len(variant) == VARIANT_FIELDS_EXPECTED
-    variant = get_variant_inserts(inserts)
+    variant = filter_inserts_variant(inserts)
     assert len(variant) == VARIANT_FIELDS_EXPECTED
-    sample = get_sample_inserts(inserts)
+    sample = filter_inserts_sample(inserts)
     assert len(sample) == SAMPLE_FIELDS_EXPECTED
 
 
@@ -191,4 +189,6 @@ def test_post_inserts(inserts, project, institution, testapp):
     """
     CONNECTION_URL = '/annotation_field'
     for item in inserts:
+        item['project'] = 'encode-project'
+        item['institution'] = 'encode-institution'
         testapp.post_json(CONNECTION_URL, item, status=201)

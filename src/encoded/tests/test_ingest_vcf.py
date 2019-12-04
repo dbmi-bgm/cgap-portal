@@ -20,10 +20,10 @@ def test_vcf():
 
 def test_VCFP_meta(test_vcf):
     """ Checks that we can correctly read which fields are annotation """
-    annotation_fields = test_vcf.get_annotation_fields()
+    annotation_fields = test_vcf.annotation_keys
     for annot_field in EXPECTED_ANNOTATION_FIELDS:
         assert annot_field in annotation_fields
-    generic_fields = test_vcf.get_generic_fields()
+    generic_fields = test_vcf.field_keys
     for generic_field in EXPECTED_GENERIC_FIELDS:
         assert generic_field in generic_fields
     assert test_vcf.get_sub_embedded_label('VEP') == 'transcript'
@@ -148,3 +148,17 @@ def test_VCFP_post_variants(testapp, institution, project, test_vcf):
         variant['institution'] = 'encode-institution'
         test_vcf.format_variant(variant)
         testapp.post_json(CONNECTION_URL, variant, status=201)
+
+
+def test_VCFP_run(testapp, institution, project, test_vcf):
+    """ Tests the 'run' method, which processes all the VCF records
+        Actaul results are already validated in previous 3 tests, just
+        check to see that we get the 3 that we expect and they post correctly
+    """
+    vss, vs = test_vcf.run(project='encode-project', institution='encode-institution')
+    assert len(vss) == 3
+    assert len(vs) == 3
+    for v in vs:
+        testapp.post_json('/variant', v, status=201)
+    for vs in vss:
+        testapp.post_json('/variant_sample', vs, status=201)

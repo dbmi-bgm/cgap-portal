@@ -113,34 +113,6 @@ class VCFParser(object):
             if key in self.reader.infos.keys():
                 self.format[key] = self.reader.infos[key].type
 
-    def get_annotation_fields(self, list=False):
-        """ Getter for annotation fields as list or dict
-
-        Args:
-            list: boolean on whether you just want a list of keys
-
-        Returns:
-            depends on args - dict by default, could be list
-        """
-        if not list:
-            return self.annotation_keys
-        else:
-            return self.annotation_keys.keys()
-
-    def get_generic_fields(self, list=False):
-        """ Getter for generic fields as list or dict
-
-        Args:
-            list: boolean on whether you just want a list of keys
-
-        Returns:
-            depends on args - dict by default, could be list
-        """
-        if not list:
-            return self.field_keys
-        else:
-            return self.field_keys.keys()
-
     def get_record(self):
         """ Uses self.reader as an iterator to get the next record
 
@@ -275,6 +247,9 @@ class VCFParser(object):
         Args:
             record: a single row in the VCF to parse, grabbed from 'vcf'
 
+        Raises:
+            VCFParserException from helpers
+
         Returns:
             dictionary of parsed VCF entry
         """
@@ -359,6 +334,9 @@ class VCFParser(object):
         Args:
             record: a vcf entry to parse
 
+        Raises:
+            VCFParserException from helpers
+
         Returns:
             a (dict) sample_variant item
         """
@@ -376,8 +354,64 @@ class VCFParser(object):
         self.parse_samples(result, record) # add sample fields, already formatted
         return result
 
+    def run(self, project=None, institution=None):
+        """ Runs end-to-end variant ingestion, processing all records and
+            accumulating the variants and sample_variants
+
+        Args:
+            project: project to post these items under
+            institution: institution to post these items under
+
+        Returns:
+            2 tuple of arrays containing the variant sample/variant items
+        """
+        variant_samples, variants = [], []
+        for record in self:
+            vs = self.record_to_sample_variant(record)
+            v = self.record_to_variant(record)
+            if project:
+                vs['project'] = project
+                v['project'] = project
+            if institution:
+                vs['institution'] = institution
+                v['institution'] = institution
+            variant_samples.append(vs)
+            self.format_variant(v)
+            variants.append(v)
+        return variant_samples, variants
+
+
+class MPIngester(object):
+    """ Multiprocessing class for VCF Ingestion. Allows us to multiprocess more
+        than one large VCF file
+
+        Thoughts: 3 modes - MP multiple files, MP a large VCF, do both?
+    """
+
+    def __init__(self, processes=1):
+        """ Creates an MPIngester with 1 process by default """
+        self.processes = processes
+
+    def initialize(self):
+        """ XXX: stub """
+        pass
+
+    def run(self):
+        """ XXX: stub """
+        pass
+
+
 def main():
-    """ Main, ingests VCF and posts """
+    """ Main, ingests VCF and posts if args specified
+
+    Args (via argparse):
+        vcf: path to vcf file to parse
+        variant: path to variant.json schema
+        sample: path to variant_sample.json schema
+        project: project to post inserts under
+        institution: institution to post inserts under
+        --post-inserts: If specified, will post inserts, by default False
+    """
     logging.basicConfig()
     parser = argparse.ArgumentParser(
         description="Ingests a given VCF file",
@@ -387,27 +421,26 @@ def main():
     parser.add_argument('vcf', help='path to vcf file')
     parser.add_argument('variant', help='path to variant schema')
     parser.add_argument('sample', help='path to sample variant schema')
+    parser.add_argument('project', help='project to post inserts under')
+    parser.add_argument('institution', help='institution to post inserts under')
     parser.add_argument('--post-inserts', action='store_true', default=False,
                         help='If specified, will post inserts, by default False')
     args = parser.parse_args()
 
     logger.info('Ingesting VCF file: %s' % args.vcf)
     vcf_parser = VCFParser(args.vcf, args.variant, args.sample)
-    vcf_parser.parse_vcf_fields()
 
-    # post variants
+    # post items
     if args.post_inserts:
         from ff_utils import post_metadata
-        for record in vcf_parser:
-            variant_sample = vcf_parser.record_to_sample_variant(record)
-            variant_sample['project'] = 'encode-project'
-            variant_sample['institution'] = 'encode-institution'
-            ff_utils.post_metadata(variant_sample, 'variant_sample', None)
-            variant = vcf_parser.record_to_variant(record)
-            variant['project'] = 'encode-project'
-            variant['institution'] = 'encode-institution'
-            test_vcf.format_variant(variant)
-            ff_utils.post_metadata(variant, 'variant', None)
+        variant_samples, variants = vcf_parser.run()
+        for vs in variant_samples:
+            ff_utils.post_metadata(vs, 'variant_sample', None)
+        for v in variants:
+            ff_utils.post_metadata(v, 'variant', None)
+
+    logger.info('Succesfully posted VCF entries')
+    exit(0)
 
 if __name__ == '__main__':
     main()
