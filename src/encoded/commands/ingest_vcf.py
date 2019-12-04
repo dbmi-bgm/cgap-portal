@@ -431,7 +431,7 @@ def main():
 
     # post items
     if args.post_inserts:
-        from ff_utils import post_metadata
+        from dcicutils import ff_utils
         variant_samples, variants = vcf_parser.run()
         for vs in variant_samples:
             ff_utils.post_metadata(vs, 'variant_sample', None)

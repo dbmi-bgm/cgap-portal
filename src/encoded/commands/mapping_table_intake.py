@@ -382,7 +382,7 @@ def main():
 
     # if not a dry run try to post inserts
     if args.post_inserts:
-        from ff_utils import post_metadata
+        from dcicutils import ff_utils
         for entry in inserts:
             ff_utils.post_metadata(entry, 'annotation_field', None)
     logger.info('Successfully created/posted annotations\n')
