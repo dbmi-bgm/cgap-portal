@@ -30,29 +30,21 @@ Welcome to CGAP! We are a team of scientists, clinicians, and developers who aim
 * `cgaptest <http://fourfront-cgaptest.9wzadzju3p.us-east-1.elasticbeanstalk.com/>`_ for front-end and UX development
 * `cgapwolf <http://fourfront-cgapwolf.9wzadzju3p.us-east-1.elasticbeanstalk.com/>`_ for workflow development
 
-Be warned that features are under active development and may not be stable! Visit the production deployment for the best experience. To get started, see our developer and user documentation below:
+Be warned that features are under active development and may not be stable! Visit the production deployment for the best experience. To get started, read the following documentation on the infrastructure and how to work with the data model:
 
-*Development Contents*
+*Infrastructure*
 
   .. toctree::
     :titlesonly:
 
-    self
-    installation
+    local_installation
     infrastructure_overview
     dataflow_overview
     variant
 
-*User Contents*
+*Data Model*
 
   .. toctree::
     :titlesonly:
 
-    introduction
-    getting_started
-    account_creation
-    biosample_metadata
-    excel_submission
-    rest_api_submission
-    schema_info
-    web_submission
+    updating_items_from_ontologies

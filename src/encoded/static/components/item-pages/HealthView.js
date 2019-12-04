@@ -70,6 +70,7 @@ export default class HealthView extends React.PureComponent {
 
         return (
             <div className="view-item container" id="content">
+                { context.foursight ? <a href={context.foursight}>View Foursight Dashboard</a> : null }
                 <hr/>
                 <h3 className="text-400 mb-2 mt-3">Configuration</h3>
                 {typeof context.description == "string" ? <p className="description">{context.description}</p> : null}

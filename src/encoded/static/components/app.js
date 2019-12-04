@@ -562,7 +562,7 @@ export default class App extends React.PureComponent {
         }
 
         // If we're submitting search form in selection mode, preserve selection mode at next URL.
-        if (currentAction === 'selection'){
+        if (currentAction === 'selection' || currentAction === 'multiselect'){
             if (search && search.indexOf('currentAction=selection') === -1){
                 search += '&currentAction=selection';
             } else if (!search) {
@@ -1185,8 +1185,8 @@ export default class App extends React.PureComponent {
                     <link rel="stylesheet" href="https://unpkg.com/rc-tabs@9.6.0/dist/rc-tabs.min.css" />
                     <SEO.CurrentContext {...{ context, hrefParts, baseDomain }} />
                     <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:200,300,400,600,700,900,300i,400i,600i|Yrsa|Source+Code+Pro:300,400,500,600" rel="stylesheet"/>
-                    <script async type="application/javascript" src={"/static/build/bundle.js?build=" + (lastCSSBuildTime || 0)} charSet="utf-8" />
-                    <script async type="application/javascript" src="//www.google-analytics.com/analytics.js" />
+                    <script defer type="application/javascript" src={"/static/build/bundle.js?build=" + (lastCSSBuildTime || 0)} charSet="utf-8" />
+                    <script defer type="application/javascript" src="//www.google-analytics.com/analytics.js" />
                     {/* <script data-prop-name="inline" type="application/javascript" charSet="utf-8" dangerouslySetInnerHTML={{__html: this.props.inline}}/> <-- SAVED FOR REFERENCE */}
                 </head>
                 <React.StrictMode>

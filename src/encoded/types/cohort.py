@@ -79,7 +79,28 @@ class Cohort(Item):
         "families.members.samples.files.quality_metric.overall_quality_status",
         "families.members.samples.files.quality_metric.url",
         "families.members.samples.files.quality_metric.status",
-        "families.members.samples.completed_processes"
+        "families.members.samples.completed_processes",
+        "sample_processes.samples.accession",
+        "sample_processes.processed_files",
+        "sample_processes.processed_files.quality_metric",
+        "sample_processes.processed_files.quality_metric.qc_list.qc_type",
+        "sample_processes.processed_files.quality_metric.qc_list.value.overall_quality_status",
+        "sample_processes.processed_files.quality_metric.qc_list.value.url",
+        "sample_processes.processed_files.quality_metric.qc_list.value.status",
+        "sample_processes.processed_files.quality_metric.overall_quality_status",
+        "sample_processes.processed_files.quality_metric.url",
+        "sample_processes.processed_files.quality_metric.status",
+        "sample_processes.sample_processed_files",
+        "sample_processes.sample_processed_files.sample.accession",
+        "sample_processes.sample_processed_files.processed_files.quality_metric",
+        "sample_processes.sample_processed_files.processed_files.quality_metric.qc_list.qc_type",
+        "sample_processes.sample_processed_files.processed_files.quality_metric.qc_list.value.overall_quality_status",
+        "sample_processes.sample_processed_files.processed_files.quality_metric.qc_list.value.url",
+        "sample_processes.sample_processed_files.processed_files.quality_metric.qc_list.value.status",
+        "sample_processes.sample_processed_files.processed_files.quality_metric.overall_quality_status",
+        "sample_processes.sample_processed_files.processed_files.quality_metric.url",
+        "sample_processes.sample_processed_files.processed_files.quality_metric.status",
+        "sample_processes.completed_processes",
     ]
 
     @calculated_property(schema={
@@ -397,6 +418,33 @@ def descendancy_xml_ref_to_parents(testapp, ref_id, refs, data, cohort, uuids_by
         log.error(error_msg)
         raise HTTPUnprocessableEntity(error_msg)
     data.update(result)
+
+
+def add_to_clinic_notes(testapp, notes, refs, data, cohort, uuids_by_ref):
+    """
+    This is a `xml_ref_fxn`, so it must take the corresponding args in the
+    standardized way and update the `data` dictionary, which is used to PATCH
+    the Individual item.
+
+    Helper function to add `notes` from the object in way compatible with the
+    other functions that change `clinic_notes`
+
+    Args:
+        testapp (webtest.TestApp): test application for posting/patching
+        notes (str): notes value for the object
+        refs: (dict): reference-based parsed XML data
+        data (dict): metadata to POST/PATCH
+        cohort (str): identifier of the cohort
+        uuids_by_ref (dict): mapping of Fourfront uuids by xml ref
+
+    Returns:
+        None
+    """
+    if data.get('clinic_notes'):
+        clinic_notes = '\n'.join([data['clinic_notes'], notes])
+    else:
+        clinic_notes = notes
+    data['clinic_notes'] = clinic_notes
 
 
 def annotations_xml_ref_to_clinic_notes(testapp, ref_ids, refs, data, cohort, uuids_by_ref):
@@ -836,6 +884,11 @@ PROBAND_MAPPING = {
         'explicitlySetBiologicalMother': {
             'corresponds_to': 'mother',
             'value': lambda v: v['explicitlySetBiologicalMother']['@ref'] if v['explicitlySetBiologicalMother'] else None,
+            'linked': True
+        },
+        'note': {
+            'xml_ref_fxn': add_to_clinic_notes,
+            'value': lambda v: v['note'],
             'linked': True
         },
         'descendancy': {
