@@ -15,7 +15,7 @@ from encoded.commands.mapping_table_intake import (
 )
 
 pytestmark = [pytest.mark.working]
-FNAME = './src/encoded/tests/mpv2.csv' # symlinked from encoded.commands
+FNAME = './src/encoded/commands/mp02.csv' # symlinked from encoded.commands
 EXPECTED_FIELDS = ['no', 'vcf_name_v0.2', 'source_name_v0.2', 'source_version_v0.2',
                    'field_type', 'value_example', 'enum_list', 'is_list', 'sub_embedding_group',
                    'separator', 'scale', 'domain', 'method', 'annotation_grouping', 'scope', 'schema_title', 'schema_description', 'source_name', 'source_version',
@@ -30,9 +30,9 @@ EXPECTED_INSERT = {'no': 1, 'vcf_name_v0.2': 'CHROM', 'source_name_v0.2': 'VCF',
                    'Chromosome', 'source_name': 'VCF', 'source_version': 'VCFv4.2',
                    'field_priority': 1, 'column_priority': 1, 'facet_grouping':
                    'Chromosome', 'mvp': True}
-MVP_EXPECTED = 619
-SAMPLE_FIELDS_EXPECTED = 12
-VARIANT_FIELDS_EXPECTED = 607
+MVP_EXPECTED = 608
+SAMPLE_FIELDS_EXPECTED = 11
+VARIANT_FIELDS_EXPECTED = 597
 
 @pytest.fixture
 def fields():
@@ -100,10 +100,7 @@ def test_generate_sample_json_items(inserts):
     assert sample_props['PID']['vcf_name'] == 'PID'
     assert sample_props['PID']['type'] == 'string'
     assert sample_props['AF']['title'] == 'Sample allele fraction'
-    assert sample_props['AF']['source_name'] == 'VCF'
-    assert sample_props['AF']['source_version'] == 'VCFv4.2'
     assert sample_props['gnomad_an_afr']['vcf_name'] == 'gnomad_an_afr'
-    assert sample_props['gnomad_an_afr']['source_version'] == '2.1.1'
 
 
 def test_generate_variant_json_items(inserts):
@@ -127,10 +124,10 @@ def test_generate_variant_json_items(inserts):
     assert var_props['exac_af']['domain'] == 'POPULATION GENETICS'
     assert var_props['exac_af']['source_name'] == 'ExAC'
     assert var_props['exac_af']['source_version'] == '3'
-    assert var_props['transcript']['title'] == 'Transcript'
+    assert var_props['transcript']['title'] == 'transcript'
     assert var_props['transcript']['type'] == 'object'
     sub_obj_props = var_props['transcript']['items']['properties']
-    assert len(sub_obj_props.keys()) == 50 # should see 50 of these
+    assert len(sub_obj_props.keys()) == 76 # should see 76 of these
     assert sub_obj_props['vep_allele']['vcf_name'] == 'vep_allele'
     assert sub_obj_props['vep_allele']['type'] == 'string'
     assert sub_obj_props['vep_distance']['type'] == 'integer'
@@ -172,7 +169,7 @@ def test_generate_variant_schema(variant_items):
     assert properties['ALT']['items']['separator'] == 'comma'
     assert properties['ALT']['items']['lookup'] == 5
     assert properties['ALT']['lookup'] == 5
-    assert len(properties['transcript']['items']['properties']) == 50
+    assert len(properties['transcript']['items']['properties']) == 76
     assert properties['ALT']['items']['separator'] == 'comma'
     assert properties['transcript']['items']['properties']['vep_domains']['type'] == 'array'
     assert properties['transcript']['items']['properties']['vep_domains']['items']['separator'] == 'tilde'
