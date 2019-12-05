@@ -20,7 +20,7 @@ ENCODING = {
 class VCFParserException(Exception):
     """
     Specific type of exception we'd like to be able to throw if we find something
-    wrong at this stage of VCF Ingestion
+    wrong at this stage of Variant Ingestion
     """
     pass
 
@@ -69,6 +69,8 @@ class VCFParser(object):
         """ Helper function for parse_vcf_fields that handles parsing the 'info'
             object containing a header listing the fields
             Only needed for annotations - other fields will work as is
+            Lots of VCF specific parsing going on here - refer to VCF spec for 
+            info on the expected format
 
         Args:
             info: INFO header entry to process
@@ -296,19 +298,21 @@ class VCFParser(object):
         return result
 
     @staticmethod
-    def format_variant(result):
-        """ Does some extra formatting to the variant so it fits the schema
-            When we build the item above we index the seo's into a dictionary.
-            This function removes that and puts them instead into a list as
-            expected by the schema
+    def format_variant(result, seo='transcript'):
+        """ Does some extra formatting to the seo's on the variant so they fit the schema.
+            When we build the item above we index the seo's into a dictionary on
+            for processing speed/convenience. This function removes that and puts 
+            them instead into a list as expected by the schema
 
         Args:
             result: the item to reformat
+            seo: sub-embedded-object to re-format, default='transcript' since that
+            is the only seo we currently have on the schema
         """
         acc = []
-        for _, vals in result['transcript'].items():
+        for _, vals in result[seo].items():
             acc.append(vals)
-        result['transcript'] = acc
+        result[seo] = acc
 
     @staticmethod
     def parse_samples(result, record):
@@ -355,7 +359,9 @@ class VCFParser(object):
 
     def run(self, project=None, institution=None):
         """ Runs end-to-end variant ingestion, processing all records and
-            accumulating the variants and sample_variants
+            accumulating the variants and sample_variants. Note that in order
+            to post the items 'project' and 'institution' are required and
+            must exist on the portal for the items to validate on insertion.
 
         Args:
             project: project to post these items under
