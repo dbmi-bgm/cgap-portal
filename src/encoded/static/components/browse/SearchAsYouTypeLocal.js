@@ -12,18 +12,34 @@ export default class SearchAsYouTypeLocal extends React.Component{
 
         this.onFocus = this.onFocus.bind(this);
         this.onType = this.onType.bind(this);
+        this.onUnfocus = this.onUnfocus.bind(this);
         this.filterResults = this.filterResults.bind(this);
         this.onClickResult = this.onClickResult.bind(this);
     }
 
-    onFocus(isFocused) {
-        // show the list of results
-        this.setState({ resultsVisible: isFocused });
+    onFocus() {
+        const { resultsVisible, results } = this.state;
+        const { searchList } = this.props;
+
+        if (!resultsVisible && results.length === 0) {
+            this.setState({ results: searchList, resultsVisible: true });
+        } else if (!resultsVisible && results.length > 0) {
+            this.setState({ resultsVisible: true });
+        }
     }
 
-    filterResults() {
-        const { currQuery } = this.state;
+    onUnfocus() {
+        this.setState({ resultsVisible: false });
+    }
+
+    onType(e) { // relates to onChange prop function how?
+        const { currQuery, resultsVisible } = this.state;
         const { searchList } = this.props;
+        const newQuery = e.target.value;
+        console.log("currQuery:", currQuery);
+        console.log("e.target.value: ", e.target.value);
+        console.log("searchList: ", searchList);
+        console.log("resultsVisible", resultsVisible);
 
         // todo: move to utils or find duplicate util
         function escapeRegExp(string) {
@@ -31,16 +47,20 @@ export default class SearchAsYouTypeLocal extends React.Component{
         }
 
         // as person types, generate a regex filter based on their input
-        const regex = new RegExp('^' + escapeRegExp(currQuery));
+        const regex = new RegExp('^' + escapeRegExp(newQuery));
 
         // narrow down filter results
         const matches = searchList.filter((item) => item.match(regex));
-        this.setState({ results: matches });
+        console.log("matches: , " , matches);
 
-    }
-
-    onType(e) { // relates to onChange prop function how?
-        this.setState({ currQuery: e.target.value });
+        if (newQuery.length > 0) {
+            this.setState({ currQuery: e.target.value, results: matches });
+        } else if (newQuery.length === 0 && currQuery.length > 0) {
+            // if user deletes all characters, hide the results too
+            this.setState({ currQuery: e.target.value, resultsVisible: true });
+        } else if (newQuery.length === 0 && currQuery.length === 0) {
+            this.setState({ currQuery: e.target.value, resultsVisible: false });
+        }
     }
 
     onClickResult(e, result) { // handle hover in CSS
@@ -49,15 +69,14 @@ export default class SearchAsYouTypeLocal extends React.Component{
 
     render() {
         const { results, resultsVisible, currQuery } = this.state;
-        // const { } = this.props;
         return (
             <div className="autocomp-wrap">
-                <input type="text" onFocus={this.onFocus(true)} onBlur={this.onFocus(false)} onChange={this.onChange} value={currQuery}></input>
+                <input type="text" onFocus={this.onFocus} onBlur={this.onUnfocus} onChange={this.onType} value={currQuery}></input>
                 {
-                    resultsVisible && results.length > 0 ?
+                    resultsVisible && results.length > 0 ? (
                         <ul className="autocomp-results">
-                            { results.map((result) => (<li key={result} className="autocomp-result" onClick={ this.onClickResult(e, result) }>{ result }</li>))}
-                        </ul>: null
+                            { results.map((result) => (<li key={result} className="autocomp-result" onClick={ this.onClickResult }>{ result }</li>))}
+                        </ul>): null
                 }
             </div>);
     }
@@ -66,6 +85,4 @@ export default class SearchAsYouTypeLocal extends React.Component{
 SearchAsYouTypeLocal.propTypes = {
     maxResults : PropTypes.number,
     searchList : PropTypes.array.isRequired,
-    // onChange : PropTypes.func.isRequired
-    // searchListJSX : PropTypes.arrayOf(PropTypes.element),
 };
