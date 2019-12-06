@@ -93,7 +93,6 @@ export const Term = {
             case 'files.file_classification':
             case 'files.file_type_detailed':
             case 'ancestry':
-            case 'ethnicity':
                 return capitalizeSentence(term);
             case 'life_status':
                 return capitalize(term);
