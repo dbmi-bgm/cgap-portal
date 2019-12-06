@@ -69,7 +69,7 @@ def test_collections_redirect_to_search(workbook, testapp):
     redirected_from is not used for search
     """
     res = testapp.get('/user/', status=301).follow(status=200)
-    assert res.json['@type'] == ['Search']
+    assert res.json['@type'] == ['UserSearchResults', 'Search']
     assert res.json['@id'] == '/search/?type=User'
     assert 'redirected_from' not in res.json['@id']
     assert res.json['@context'] == '/terms/'
@@ -438,6 +438,13 @@ def test_search_with_static_header(workbook, testapp):
     assert 'search_header' in res_json
     assert 'content' in res_json['search_header']
     assert res_json['search_header']['title'] == 'Workflow Information'
+
+
+def test_search_multiple_types(workbook, testapp):
+    # multiple types work with @type in response
+    search = '/search/?type=Individual&type=Workflow'
+    res = testapp.get(search).json
+    assert res['@type'] == ['IndividualSearchResults', 'WorkflowSearchResults', 'Search']
 
 
 #########################################
