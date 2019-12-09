@@ -179,7 +179,7 @@
             "items": {
                 "title": "Ancestry",
                 "type" : "string",
-                "enum": [
+                "suggested_enum": [
                     "African/African American",
                     "Amish",
                     "Latino",
@@ -191,22 +191,6 @@
                     "Other"
                 ]
             }
-        },
-        "ethnicity": {
-            "title": "Ethnicity",
-            "description": "Ethnicity of the individual.",
-            "type": "string",
-            "suggested_enum": [
-                "Asian",
-                "Black",
-                "Hispanic",
-                "Indian",
-                "Middle Eastern",
-                "Native American",
-                "Pacific Islander",
-                "Caucasian",
-                "Other"
-            ]
         },
         "images" : {
             "title" : "Images",
@@ -273,13 +257,8 @@
         "phenotypic_features" : {
             "title" : "Phenotypic Features"
         },
-        "ethnicity" : {
-            "title": "Ethnicity",
-            "grouping": "Origin"
-        },
         "ancestry" : {
-            "title": "Ancestry",
-            "grouping": "Origin"
+            "title": "Ancestry"
         },
         "is_infertile" : {
             "title": "Is Infertile",
@@ -333,10 +312,6 @@
         "sex" : {
             "title" : "Sex",
             "default_hidden" : false
-        },
-        "ethnicity" : {
-            "title" : "Ethnicity",
-            "default_hidden" : true
         },
         "ancestry" : {
             "title" : "Ancestry",
