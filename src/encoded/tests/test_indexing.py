@@ -142,25 +142,21 @@ def test_create_mapping_on_indexing(app, testapp, registry, elasticsearch):
         assert compare_against_existing_mapping(es, namespaced_index, item_type, item_record, True)
 
 
-@pytest.fixture
-def test_fp_uuid(testapp, project, experiment, institution, file_formats):
-    # this is a processed file
+def test_file_processed_detailed(app, testapp, indexer_testapp, project,
+                                 institution, file_formats):
+    # post file_processed
     item = {
-        'accession': '4DNFIO67APU2',
-        'project': project['uuid'],
         'institution': institution['uuid'],
+        'project': project['uuid'],
         'file_format': file_formats.get('pairs').get('@id'),
         'filename': 'test.pairs.gz',
-        'md5sum': '0123456789abcdef0123456789abcdef',
-        'status': 'uploading',
+        'status': 'uploading'
     }
+    fp_res = testapp.post_json('/file_processed', item)
+    test_fp_uuid = fp_res.json['@graph'][0]['uuid']
     res = testapp.post_json('/file_processed', item)
-    return res.json['@graph'][0]['uuid']
+    indexer_testapp.post_json('/index', {'record': True})
 
-
-@pytest.mark.skip # XXX: Needs refactor
-def test_file_processed_detailed(app, testapp, indexer_testapp, test_fp_uuid,
-                                 project, institution, file_formats):
     # Todo, input a list of accessions / uuids:
     verify_item(test_fp_uuid, indexer_testapp, testapp, app.registry)
     # While we're here, test that _update of the file properly
@@ -207,7 +203,8 @@ def test_file_processed_detailed(app, testapp, indexer_testapp, test_fp_uuid,
     assert found_rel_sid > found_fp_sid  # sid of related file is greater
 
 
-def test_real_validation_error(app, indexer_testapp, testapp, institution, project, file_formats):
+def test_real_validation_error(app, indexer_testapp, testapp, institution,
+                               project, file_formats):
     """
     Create an item (file-processed) with a validation error and index,
     to ensure that validation errors work
