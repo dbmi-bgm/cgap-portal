@@ -7,9 +7,11 @@ import pytest
 import json
 import time
 from encoded.verifier import verify_item
+from snovault import DBSESSION, TYPES
+from snovault.elasticsearch import create_mapping, ELASTIC_SEARCH
 from snovault.elasticsearch.interfaces import INDEXER_QUEUE
 from snovault.elasticsearch.indexer_utils import get_namespaced_index
-from .features.conftest import app_settings, app as conf_app
+from .workbook_fixtures import app_settings
 
 pytestmark = [pytest.mark.working, pytest.mark.indexing, pytest.mark.flaky]
 
@@ -17,26 +19,38 @@ pytestmark = [pytest.mark.working, pytest.mark.indexing, pytest.mark.flaky]
 TEST_COLLECTIONS = ['testing_post_put_patch', 'file_processed']
 
 
-@pytest.yield_fixture(scope='session')
-def app(app_settings, use_collections=TEST_COLLECTIONS):
-    """
-    Use to pass kwargs for create_mapping to conftest app
-    """
-    for app in conf_app(app_settings, collections=use_collections, skip_indexing=True):
-        yield app
+@pytest.yield_fixture(scope='session', params=[False])
+def app(app_settings, request):
+    from encoded import main
+    # for now, don't run with mpindexer. Add `True` to params above to do so
+    if request.param:
+        app_settings['mpindexer'] = True
+    app = main({}, **app_settings)
+
+    yield app
+
+    DBSession = app.registry[DBSESSION]
+    # Dispose connections so postgres can tear down.
+    DBSession.bind.pool.dispose()
 
 
-@pytest.fixture(autouse=True)
-def teardown(app, use_collections=TEST_COLLECTIONS):
+@pytest.yield_fixture(autouse=True)
+def setup_and_teardown(app):
+    """
+    Run create mapping and purge queue before tests and clear out the
+    DB tables after the test
+    """
     import transaction
     from sqlalchemy import MetaData
     from zope.sqlalchemy import mark_changed
-    from snovault import DBSESSION
-    from snovault.elasticsearch import create_mapping
-    from .conftest import indexer_testapp
-    # index and then run create mapping to clear things out
-    indexer_testapp(app).post_json('/index', {'record': True})
-    create_mapping.run(app, collections=use_collections, skip_indexing=True)
+
+    # BEFORE THE TEST - run create mapping for tests types and clear queues
+    create_mapping.run(app, collections=TEST_COLLECTIONS, skip_indexing=True)
+    app.registry[INDEXER_QUEUE].clear_queue()
+
+    yield  # run the test
+
+    # AFTER THE TEST
     session = app.registry[DBSESSION]
     connection = session.connection().connect()
     meta = MetaData(bind=session.connection(), reflect=True)
@@ -107,8 +121,6 @@ def test_create_mapping_on_indexing(app, testapp, registry, elasticsearch):
         build_index_record,
         compare_against_existing_mapping
     )
-    from snovault.elasticsearch import ELASTIC_SEARCH
-    from snovault import TYPES
     es = registry[ELASTIC_SEARCH]
     item_types = TEST_COLLECTIONS
     # check that mappings and settings are in index
@@ -201,7 +213,6 @@ def test_real_validation_error(app, indexer_testapp, testapp, institution, proje
     to ensure that validation errors work
     """
     import uuid
-    from snovault.elasticsearch.interfaces import ELASTIC_SEARCH
     es = app.registry[ELASTIC_SEARCH]
     fp_body = {
         'schema_version': '3',
