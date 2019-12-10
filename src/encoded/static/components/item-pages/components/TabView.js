@@ -3,13 +3,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import _ from 'underscore';
-import url from 'url';
 import memoize from 'memoize-one';
 
-import { navigate, console, analytics } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
+import { navigate, console, analytics, memoizedUrlParse } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { UserContentBodyList } from './../../static-pages/components/UserContentBodyList';
-import { memoizedUrlParse } from './../../globals';
-
 
 
 /**

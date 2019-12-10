@@ -5,9 +5,8 @@ import PropTypes from 'prop-types';
 import memoize from 'memoize-one';
 import url from 'url';
 import _ from 'underscore';
-import { console, searchFilters, isSelectAction } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
+import { console, searchFilters, isSelectAction, memoizedUrlParse } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { navigate } from './../../util';
-import { memoizedUrlParse } from './../../globals';
 
 
 /**

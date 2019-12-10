@@ -8,10 +8,9 @@ import memoize from 'memoize-one';
 
 import { Alerts } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/Alerts';
 import { LocalizedTime } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/LocalizedTime';
-import { console, object, JWT, layout, schemaTransforms } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
+import { console, object, JWT, layout, schemaTransforms, memoizedUrlParse } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import Registry from '@hms-dbmi-bgm/shared-portal-components/es/components/navigation/components/Registry';
 
-import { content_views, memoizedUrlParse } from './globals';
 import jsonScriptEscape from './../libs/jsonScriptEscape';
 import { typedefs } from './util';
 

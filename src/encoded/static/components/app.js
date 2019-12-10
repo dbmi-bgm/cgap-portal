@@ -9,14 +9,14 @@ import ReactTooltip from 'react-tooltip';
 var serialize = require('form-serialize');
 import { detect as detectBrowser } from 'detect-browser';
 import jsonScriptEscape from '../libs/jsonScriptEscape';
-import { content_views as globalContentViews, portalConfig, getGoogleAnalyticsTrackingID, memoizedUrlParse, elementIsChildOfLink } from './globals';
+import { content_views as globalContentViews, portalConfig, getGoogleAnalyticsTrackingID } from './globals';
 import ErrorPage from './static-pages/ErrorPage';
 import { NavigationBar } from './navigation/NavigationBar';
 import { Footer } from './Footer';
 import { store } from './../store';
 
 import { Alerts } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/Alerts';
-import { ajax, JWT, console, isServerSide, object, layout, analytics } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
+import { ajax, JWT, console, isServerSide, object, layout, analytics, memoizedUrlParse } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { Schemas, SEO, typedefs, navigate } from './util';
 import { requestAnimationFrame as raf } from '@hms-dbmi-bgm/shared-portal-components/es/components/viz/utilities';
 
@@ -429,13 +429,11 @@ export default class App extends React.PureComponent {
         // https://github.com/facebook/react/issues/1691
         if (event.isDefaultPrevented()) return;
         const { href } = this.props;
-        const { nativeEvent } = event;
-        let { target } = event;
+        const { nativeEvent, target: evtTarget } = event;
 
-        // SVG anchor elements have tagName == 'a' while HTML anchor elements have tagName == 'A'
-        while (target && (target.tagName.toLowerCase() != 'a' || target.getAttribute('data-href'))) {
-            target = target.parentElement;
-        }
+        // Might click on e.g. the <h4> within a <a href=... className="d-block"><h4>...</h4><span>...</span></a>
+        const target = layout.elementIsChildOfLink(evtTarget);
+
         if (!target) return;
 
         if (target.getAttribute('disabled')) {

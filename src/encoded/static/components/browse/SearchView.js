@@ -5,13 +5,12 @@ import memoize from 'memoize-one';
 import _ from 'underscore';
 import url from 'url';
 
-import { getAbstractTypeForType, getSchemaTypeFromSearchContext } from '@hms-dbmi-bgm/shared-portal-components/es/components/util/schema-transforms';
+import { memoizedUrlParse, schemaTransforms } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { SearchView as CommonSearchView } from '@hms-dbmi-bgm/shared-portal-components/es/components/browse/SearchView';
 import { ActiveFiltersBar } from '@hms-dbmi-bgm/shared-portal-components/es/components/browse/components/ActiveFiltersBar';
 import { columnExtensionMap } from './columnExtensionMap';
 import { Schemas } from './../util';
 import { TitleAndSubtitleBeside, PageTitleContainer, TitleAndSubtitleUnder, pageTitleViews, EditingItemPageTitle } from './../PageTitleSection';
-import { memoizedUrlParse } from './../globals';
 
 
 export default class SearchView extends React.PureComponent {
@@ -72,7 +71,7 @@ export default class SearchView extends React.PureComponent {
 
         // Show only base types for when itemTypesInSearch.length === 0 (aka 'type=Item').
         facets[typeFacetIndex].terms = _.filter(facets[typeFacetIndex].terms, function(itemType){
-            const parentType = getAbstractTypeForType(itemType.key, schemas);
+            const parentType = schemaTransforms.getAbstractTypeForType(itemType.key, schemas);
             return !parentType || parentType === itemType.key;
         });
 
@@ -144,7 +143,7 @@ const SearchViewPageTitle = React.memo(function SearchViewPageTitle(props){
         );
     }
 
-    const thisTypeTitle = getSchemaTypeFromSearchContext(context, schemas);
+    const thisTypeTitle = schemaTransforms.getSchemaTypeFromSearchContext(context, schemas);
     const subtitle = thisTypeTitle ? (
         <span><small className="text-300">for</small> { thisTypeTitle }</span>
     ) : null;

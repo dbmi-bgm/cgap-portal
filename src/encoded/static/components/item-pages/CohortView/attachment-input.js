@@ -2,9 +2,8 @@
 
 import React from 'react';
 import url from 'url';
-import { console, layout, ajax, object } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
+import { console, layout, ajax, object, memoizedUrlParse } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { Alerts } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/Alerts';
-import { memoizedUrlParse } from './../../globals';
 
 
 export class AttachmentInputController extends React.PureComponent {

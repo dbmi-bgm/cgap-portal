@@ -9,7 +9,7 @@ import queryString from 'query-string';
 
 import { ItemDetailList } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/ItemDetailList';
 import { Alerts } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/Alerts';
-import { console, object, layout, ajax, commonFileUtil, schemaTransforms } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
+import { console, object, layout, ajax, commonFileUtil, schemaTransforms, memoizedUrlParse } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 
 import { FlexibleDescriptionBox } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/FlexibleDescriptionBox';
 import { Schemas, fileUtil, typedefs } from './../util';
@@ -17,7 +17,6 @@ import { Schemas, fileUtil, typedefs } from './../util';
 import { SlideInPane } from './../viz/SlideInPane';
 import { TabView } from './components/TabView';
 import { BadgesTabView } from './components/BadgesTabView';
-import { memoizedUrlParse } from './../globals';
 
 import { ExpandableStaticHeader } from './../static-pages/components';
 
