@@ -855,5 +855,4 @@ const CohortSubmissionViewPageTitle = React.memo(function CohortSubmissionViewPa
 });
 
 pageTitleViews.register(CohortSubmissionViewPageTitle, "Cohort", "create");
-pageTitleViews.register(CohortSubmissionViewPageTitle, "Cohort", "add");
-
+pageTitleViews.register(CohortSubmissionViewPageTitle, "CohortSearchResults", "add");

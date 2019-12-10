@@ -127,17 +127,11 @@ export default class SearchView extends React.PureComponent {
 
 
 const SearchViewPageTitle = React.memo(function SearchViewPageTitle(props){
-    const { context, href, schemas, currentAction, alerts } = props;
+    const { context, schemas, currentAction, alerts } = props;
 
     if (currentAction === "add"){
-        // See if any custom PageTitles registered for ItemType/add
-        const itemType = getSubmissionItemType(context, href);
-        const FoundTitleComponent = pageTitleViews.lookup({ "@type" : [ itemType ] }, "add");
-        if (FoundTitleComponent){
-            return <FoundTitleComponent {...props} />;
-        } else {
-            return <EditingItemPageTitle {...{ context, schemas, currentAction, alerts }} />;
-        }
+        // Fallback unless any custom PageTitles registered for @type=<ItemType>SearchResults & currentAction=add
+        return <EditingItemPageTitle {...{ context, schemas, currentAction, alerts }} />;
     }
 
     if (currentAction === "selection" || currentAction === "multiselect") {
