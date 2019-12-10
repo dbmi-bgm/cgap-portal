@@ -130,6 +130,7 @@ export default class CohortSubmissionView extends React.PureComponent {
                     { cohortLink }
 
                     <PanelSelectionMenu {...{ panelIdx, panelsComplete, cohortItem }} onSelect={this.handleSelectPanel} />
+
                     <PanelOne {...this.props} {...this.state} userDetails={userDetails} markCompleted={this.markCompleted}
                         onLoadUser={this.handleLoadedUser} onSubmitCohort={this.handleLoadedCohort} />
 

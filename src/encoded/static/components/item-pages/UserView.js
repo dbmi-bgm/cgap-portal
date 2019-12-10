@@ -113,7 +113,7 @@ class SyncedAccessKeyTable extends React.PureComponent {
         const idToken = JWT.get();
         if (idToken){
             const decoded = JWT.decode(idToken);
-            item.user = decoded.email_verified ? decoded.email.toLowerCase() : "";
+            item.user = decoded.email.toLowerCase();
         } else {
             console.warn("Access key aborted");
             return;
@@ -139,16 +139,17 @@ class SyncedAccessKeyTable extends React.PureComponent {
 
     showNewSecret(response, reset = false) {
         const { secret_access_key, access_key_id } = response;
-        const modalTitle = "Your secret key has been " + (reset ? "reset" : "created" );
         this.setState({ 'modal' : (
             <Modal show onHide={this.hideModal}>
                 <Modal.Header closeButton>
-                    <Modal.Title>{ modalTitle }</Modal.Title>
+                    <Modal.Title>{ "Your secret key has been " + (reset ? "reset" : "created") }</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    Please make a note of the new secret access key.
-                    This is the last time you will be able to view it.
-                    <br/>(It might take a few minutes for the access key to show up in table after page refresh.)
+                    <p className="text-center text-600">
+                        Please make a note of the new secret access key.
+                        <br/>
+                        This is the last time you will be able to view it.
+                    </p>
 
                     <div className="row mt-15">
                         <div className="col-4 text-600 text-right no-user-select">

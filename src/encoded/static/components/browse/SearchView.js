@@ -11,7 +11,7 @@ import { ActiveFiltersBar } from '@hms-dbmi-bgm/shared-portal-components/es/comp
 import { columnExtensionMap } from './columnExtensionMap';
 import { Schemas } from './../util';
 import { TitleAndSubtitleBeside, PageTitleContainer, TitleAndSubtitleUnder, pageTitleViews, EditingItemPageTitle } from './../PageTitleSection';
-import { getSubmissionItemTypes } from './../forms/CGAPSubmissionView';
+import { getSubmissionItemType } from './../forms/CGAPSubmissionView';
 
 
 export default class SearchView extends React.PureComponent {
@@ -131,8 +131,8 @@ const SearchViewPageTitle = React.memo(function SearchViewPageTitle(props){
 
     if (currentAction === "add"){
         // See if any custom PageTitles registered for ItemType/add
-        const itemTypes = getSubmissionItemTypes(context, href);
-        const FoundTitleComponent = pageTitleViews.lookup({ "@type" : itemTypes }, "add");
+        const itemType = getSubmissionItemType(context, href);
+        const FoundTitleComponent = pageTitleViews.lookup({ "@type" : [ itemType ] }, "add");
         if (FoundTitleComponent){
             return <FoundTitleComponent {...props} />;
         } else {
