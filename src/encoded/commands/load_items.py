@@ -1,12 +1,51 @@
 #!/usr/bin/env python3
 import argparse
 import logging
+import logging.config
 import os
 import json
 from datetime import datetime
 from dcicutils import ff_utils
 
+'''logging setup
+   logging config - to be moved to file at some point
+'''
+date = datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
+LOGFILE = '{}_load_items.log'.format(date)
+logger = logging.getLogger(__name__)
 
+logging.config.dictConfig({
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'standard': {
+            'format': '%(levelname)s:\t%(message)s'
+        },
+        'verbose': {
+            'format': '%(levelname)s:\t%(message)s\tFROM: %(name)s'
+        }
+    },
+    'handlers': {
+        'stdout': {
+            'level': 'INFO',
+            'formatter': 'verbose',
+            'class': 'logging.StreamHandler'
+        },
+        'logfile': {
+            'level': 'INFO',
+            'formatter': 'standard',
+            'class': 'logging.FileHandler',
+            'filename': LOGFILE
+        }
+    },
+    'loggers': {
+        '': {
+            'handlers': ['stdout', 'logfile'],
+            'level': 'INFO',
+            'propagate': True
+        }
+    }
+})
 logger = logging.getLogger(__name__)
 EPILOG = __doc__
 
@@ -21,6 +60,10 @@ def parse_args():
                         help='Environment to update from. Defaults to local')
     parser.add_argument('--key', help='Access key ID if using local')
     parser.add_argument('--secret', help='Access key secret if using local')
+    parser.add_argument('--patch-only', default=False,
+                        action='store_true', help='Use if not posting any new items')
+    parser.add_argument('--post-only', default=False,
+                        action='store_true', help='Use if only posting new items')
     parser.add_argument('--item_types',
                         nargs='*',
                         help="Type(s) of Item(s) to load - if not provided then a dictionary of jsons keyed by item_type is required \
@@ -71,7 +114,7 @@ def load_json_to_store(json_input, itype=None):
         return{}
 
 
-def load_items(env, json_input, itypes=None, key=None, secret=None):
+def load_items(env, json_input, itypes=None, key=None, secret=None, patch_only=False, post_only=False):
     """
     Load a given JSON file with items inserts or a python dict keyed by item type
     or a list (as long as a single itype param value is provided) to a server using
@@ -80,7 +123,8 @@ def load_items(env, json_input, itypes=None, key=None, secret=None):
     auth, config_uri = set_load_params(env, key, secret)
     load_endpoint = '/'.join([auth['server'], 'load_data'])
     logger.info('load_items: Starting POST to %s' % load_endpoint)
-    json_data = {'config_uri': config_uri, 'overwrite': True, 'iter_response': True}
+    json_data = {'config_uri': config_uri, 'overwrite': True, 'iter_response': True,
+                 'patch_only': patch_only, 'post_only': post_only}
     if itypes:
         json_data['itype'] = itypes
     json_data.update(load_json_to_store(json_input, itypes))
@@ -131,7 +175,7 @@ def main():
     # Loading app will have configured from config file. Reconfigure here:
     logging.getLogger('encoded').setLevel(logging.INFO)
     args = parse_args()
-    load_items(args.env, args.json_input, args.item_types, args.key, args.secret)
+    load_items(args.env, args.json_input, args.item_types, args.key, args.secret, args.patch_only)
     logger.info("DONE!")
 
 
