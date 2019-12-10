@@ -20,12 +20,14 @@ import { PedigreeFullScreenBtn } from './PedigreeFullScreenBtn';
 import { parseFamilyIntoDataset } from './family-parsing';
 import { AttachmentInputController, AttachmentInputMenuOption } from './attachment-input';
 import { CohortStats } from './CohortStats';
+import CohortSubmissionView from './CohortSubmissionView';
 
 export {
     CohortSummaryTable,
     PedigreeTabViewBody,
     PedigreeFullScreenBtn,
-    parseFamilyIntoDataset
+    parseFamilyIntoDataset,
+    CohortSubmissionView
 };
 
 

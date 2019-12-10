@@ -20,7 +20,7 @@ import ReleaseUpdates           from './static-pages/ReleaseUpdates';
 
 
 import DefaultItemView          from './item-pages/DefaultItemView';
-import CohortView               from './item-pages/CohortView';
+import CohortView, { CohortSubmissionView } from './item-pages/CohortView';
 import IndividualView           from './item-pages/IndividualView';
 import FileProcessedView        from './item-pages/FileProcessedView';
 import SampleView               from './item-pages/SampleView';
@@ -60,6 +60,7 @@ content_views.register(CGAPSubmissionView,      'Item', 'edit');
 content_views.register(CGAPSubmissionView,      'Item', 'create');
 content_views.register(CGAPSubmissionView,      'Item', 'clone');
 content_views.register(CGAPSubmissionView,      'Search', 'add');
+content_views.register(CohortSubmissionView,    'CohortSearchResults', 'add');
 
 content_views.register(SearchView,              'Search');
 content_views.register(SearchView,              'Search', 'selection');
