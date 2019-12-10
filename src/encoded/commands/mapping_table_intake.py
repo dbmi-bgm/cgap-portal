@@ -17,345 +17,381 @@ class MappingTableIntakeException(Exception):
     pass
 
 
-def process_fields(row):
-    """ Takes in the row of field names and processes them. This involves replacing
-        spaces, ignoring '#' commented out fields and dropping comments (like this)
+class MappingTableParser(object):
+    """ Class that encapsulates data/functions related to the mapping table.
 
-    Args:
-        row: row of fields to be processed from the mapping table
-
-    Returns:
-        list of fields
+        XXX: Should Validate the annotation fields against the given schema?
     """
-    fields = []
-    for name in row:
-        new_name = name.split('(')[0].strip().lower()
-        new_name = new_name.replace(" ", "_")
-        if new_name.startswith('#'):
-            continue
-        fields.append(new_name)
-    if not fields:
-        raise MappingTableIntakeException('Did not find any fields on row %s' % row)
-    return fields
 
+    def __init__(self, _mp, schema):
+        self.mapping_table = _mp
+        self.annotation_field_schema = json.load(open(schema, 'r'))
+        self.version, self.date, self.fields = self.read_mp_meta()
 
-def read_mp_meta(fname):
-    """ Reads mapping table from fname
+    @staticmethod
+    def process_fields(row):
+        """ Takes in the row of field names and processes them. This involves replacing
+            spaces, ignoring '#' commented out fields and dropping comments (like this)
 
-    Args:
-        fname: mapping table location
+        Args:
+            row: row of fields to be processed from the mapping table
 
-    Returns:
-        3 tuple - version, date, fields
-    """
-    VERSION, DATE, FIELDS = None, None, None
-    with open(fname, 'r') as f:
-        reader = csv.reader(f)
-        for row_idx, row in enumerate(reader):
-            if row_idx == 0:
-                VERSION = row[1].split('=')[1].strip()
-            elif row_idx == 1:
-                DATE = row[1].split('=')[1].strip()
-            elif row_idx == 2:
-                FIELDS = process_fields(row)
-            else:
-                break # we are done with this step
-    logger.info('Mapping table Version: %s, Date: %s\n' % (VERSION, DATE))
-    logger.info('Mapping table fields: %s\n' % (", ".join(FIELDS)))
-    return VERSION, DATE, FIELDS
-
-
-def process_mp_inserts(fname, fields):
-    """ Processes the annotation fields in the mapping table to produce inserts
-        Note that project and institution are required fields on the annotation
-        field schema and are not set here
-
-    Args:
-        fname: mapping table location
-        fields: list of fields on the table
-
-    Returns:
-        list of inserts
-    """
-    inserts = []
-    with open(fname, 'r') as f:
-        reader = csv.reader(f)
-        for row_idx, row in enumerate(reader):
-            insert = {}
-            if row_idx < 3: # skip header rows
+        Returns:
+            list of fields
+        """
+        fields = []
+        for name in row:
+            new_name = name.split('(')[0].strip().lower()
+            new_name = new_name.replace(" ", "_")
+            if new_name.startswith('#'):
                 continue
-            for field_name, entry in zip(fields, row):
-                # handle int fields
-                if field_name in ['field_priority', 'column_priority', 'facet_priority', 'no']:
-                    if entry:
-                        insert[field_name] = int(entry)
-                # handle bool fields
-                elif field_name in ['is_list', 'mvp']:
-                    if entry:
-                        if entry == 'Y':
-                            insert[field_name] = True
-                        else:
-                            insert[field_name] = False
-                elif field_name in ['enum_list']:
-                    if entry:
-                        field_type = row[4] # XXX: hardcoded, must change if field_type is moved on mapping table
-                        val_list = []
-                        if field_type == 'string':
-                            val_list = [en.strip() for en in entry.split(',') if en.strip()]
-                        elif field_type == 'number':
-                            val_list = [float(en.strip()) for en in entry.split(',') if en.strip()]
-                        elif field_type == 'integer':
-                            val_list = [int(en.strip()) for en in entry.split(',') if en.strip()]
-                        insert[field_name] = val_list
-                else: # handle all other fields if they exist
-                    if entry:
-                        insert[field_name] = entry
-            if not insert.get('mvp', False):  # ignore non-mvp items for now
-                continue
-            inserts.append(insert)
-    return inserts
+            fields.append(new_name)
+        if not fields:
+            raise MappingTableIntakeException('Did not find any fields on row %s' % row)
+        return fields
 
+    def read_mp_meta(self):
+        """ Reads mapping table from file given to class
 
-def filter_inserts_sample(inserts):
-    """ Filters inserts for those that are mvp and sample
-
-    Args:
-        inserts: all inserts produced by the previous function
-
-    Returns:
-        list of inserts that are 'samples'
-    """
-    samples = [i for i in inserts if i.get('scope') == 'sample']
-    return samples
-
-
-def filter_inserts_variant(inserts):
-    """ Filters inserts for those that are mvp and not sample
-
-    Args:
-        inserts: all inserts produced by 'process_mp_inserts'
-
-    Returns:
-        list of inserts that are variants
-    """
-    variants = [i for i in inserts if i.get('scope') != 'sample']
-    return variants
-
-
-def generate_properties(inserts, variant=True):
-    """ Generates sample variant or variant schema properties
-        This function is quite long and complicated... Should probably be
-        refactored
-
-    Args:
-        inserts: result of one of the above two functions
-        variant: boolean indicating if we are building the variant schema
-
-    Returns:
-        3 tuples of the properties, columns and facets
-    """
-    props = OrderedDict()
-    cols = OrderedDict()
-    facs = OrderedDict()
-
-    def get_prop(item):
-        temp = OrderedDict()
-        prop_name = item['vcf_name_v0.2']
-        features = OrderedDict()
-        features.update({
-            "title": item.get('schema_title', 'None provided'),
-            "vcf_name": prop_name,
-            "type": item['field_type']
-        })
-        if item.get('schema_description'):
-            features['description'] = item['schema_description']
-        if item.get('links_to'):
-            features['linkTo'] = item['links_to']
-        if item.get('enum_list'):
-            features['enum'] = item['enum_list']
-        if item.get('field_priority'):
-            features['lookup'] = item['field_priority']
-
-        for a_field in ['scale', 'domain', 'method', 'separator', 'source_name', 'source_version']:
-            if item.get(a_field):
-                features[a_field] = item[a_field]
-
-        # handle sub_embedded object if we are doing variant
-        if variant:
-            if item.get('sub_embedding_group'):
-                sub_temp = OrderedDict()
-                prop = OrderedDict()
-                sum_ob_name = item['sub_embedding_group']
-                sub_title = sum_ob_name.replace("_", " ").title()
-
-                # handle sub-embedded object that is an array
-                if item.get('is_list'):
-                    prop[prop_name] = {
-                        'title': item.get('schema_title', 'None provided'),
-                        'type': 'array',
-                        'vcf_name': item['vcf_name_v0.2'],
-                        'items': features
-                    }
-                    sub_temp.update({
-                        "title": sum_ob_name,
-                        "type": "object",
-                        "items": {
-                            "title": sub_title,
-                            "type": "array",
-                            "properties": prop
-                            }
-                        })
+        Returns:
+            3 tuple - version, date, fields
+        """
+        VERSION, DATE, FIELDS = None, None, None
+        with open(self.mapping_table, 'r') as f:
+            reader = csv.reader(f)
+            for row_idx, row in enumerate(reader):
+                if row_idx == 0:
+                    VERSION = row[1].split('=')[1].strip()
+                elif row_idx == 1:
+                    DATE = row[1].split('=')[1].strip()
+                elif row_idx == 2:
+                    FIELDS = self.process_fields(row)
                 else:
-                    prop[prop_name] = features
-                    sub_temp.update({
-                        "title": sub_title,
-                        "type": "object",
-                        "items": {
-                            "title": sub_title,
-                            "type": "object",
-                            "properties": prop
-                            }
-                        })
-                temp[sum_ob_name] = sub_temp
-                return temp
+                    break # we are done with this step
+        logger.info('Mapping table Version: %s, Date: %s\n' % (VERSION, DATE))
+        logger.info('Mapping table fields: %s\n' % (", ".join(FIELDS)))
+        return VERSION, DATE, FIELDS
 
-        # convert to array sturcutre
-        if item.get('is_list'):
-            array_item = OrderedDict()
-            array_item.update( {
+    def process_mp_inserts(self):
+        """ Processes the annotation fields in the mapping table to produce inserts
+            Note that project and institution are required fields on the annotation
+            field schema and are not set here
+
+        Args:
+            fname: mapping table location
+            fields: list of fields on the table
+
+        Returns:
+            list of inserts
+        """
+        inserts = []
+        with open(self.mapping_table, 'r') as f:
+            reader = csv.reader(f)
+            for row_idx, row in enumerate(reader):
+                insert = {}
+                if row_idx < 3: # skip header rows
+                    continue
+                for field_name, entry in zip(self.fields, row):
+                    # handle int fields
+                    if field_name in ['field_priority', 'column_priority', 'facet_priority', 'no']:
+                        if entry:
+                            insert[field_name] = int(entry)
+                    # handle bool fields
+                    elif field_name in ['is_list', 'mvp']:
+                        if entry:
+                            if entry == 'Y':
+                                insert[field_name] = True
+                            else:
+                                insert[field_name] = False
+                    elif field_name in ['enum_list']:
+                        if entry:
+                            field_type = row[4] # XXX: hardcoded, must change if field_type is moved on mapping table
+                            val_list = []
+                            if field_type == 'string':
+                                val_list = [en.strip() for en in entry.split(',') if en.strip()]
+                            elif field_type == 'number':
+                                val_list = [float(en.strip()) for en in entry.split(',') if en.strip()]
+                            elif field_type == 'integer':
+                                val_list = [int(en.strip()) for en in entry.split(',') if en.strip()]
+                            insert[field_name] = val_list
+                    else: # handle all other fields if they exist
+                        if entry:
+                            insert[field_name] = entry
+                if not insert.get('mvp', False):  # ignore non-mvp items for now
+                    continue
+                inserts.append(insert)
+        return inserts
+
+    @staticmethod
+    def filter_inserts_sample(inserts):
+        """ Filters inserts for those that are mvp and sample
+
+        Args:
+            inserts: all inserts produced by the previous function
+
+        Returns:
+            list of inserts that are 'samples'
+        """
+        samples = [i for i in inserts if i.get('scope') == 'sample']
+        return samples
+
+    @staticmethod
+    def filter_inserts_variant(inserts):
+        """ Filters inserts for those that are mvp and not sample
+
+        Args:
+            inserts: all inserts produced by 'process_mp_inserts'
+
+        Returns:
+            list of inserts that are variants
+        """
+        variants = [i for i in inserts if i.get('scope') != 'sample']
+        return variants
+
+    @staticmethod
+    def generate_properties(inserts, variant=True):
+        """ Generates sample variant or variant schema properties
+            This function is quite long and complicated... Should probably be
+            refactored
+
+        Args:
+            inserts: result of one of the above two functions
+            variant: boolean indicating if we are building the variant schema
+
+        Returns:
+            3 tuples of the properties, columns and facets
+        """
+        props = OrderedDict()
+        cols = OrderedDict()
+        facs = OrderedDict()
+
+        def get_prop(item):
+            temp = OrderedDict()
+            prop_name = item['vcf_name_v0.2']
+            features = OrderedDict()
+            features.update({
                 "title": item.get('schema_title', 'None provided'),
-                "type": "array",
-                "vcf_name": item['vcf_name_v0.2']
+                "vcf_name": prop_name,
+                "type": item['field_type']
             })
             if item.get('schema_description'):
-                array_item['description'] = item['schema_description']
+                features['description'] = item['schema_description']
+            if item.get('links_to'):
+                features['linkTo'] = item['links_to']
+            if item.get('enum_list'):
+                features['enum'] = item['enum_list']
             if item.get('field_priority'):
-                array_item['lookup'] = item['field_priority']
-            array_item['items'] = features
-            temp[prop_name] = array_item
-            return temp
-        else:
-            temp[prop_name] = features
-            return temp
+                features['lookup'] = item['field_priority']
 
-    def update(d, u):
-        for k, v in six.iteritems(u):
-            dv = d.get(k, {})
-            if not isinstance(dv, Mapping):
-                d[k] = v
-            elif isinstance(v, Mapping):
-                d[k] = update(dv, v)
+            for a_field in ['scale', 'domain', 'method', 'separator', 'source_name', 'source_version']:
+                if item.get(a_field):
+                    features[a_field] = item[a_field]
+
+            # handle sub_embedded object if we are doing variant
+            if variant:
+                if item.get('sub_embedding_group'):
+                    sub_temp = OrderedDict()
+                    prop = OrderedDict()
+                    sum_ob_name = item['sub_embedding_group']
+                    sub_title = sum_ob_name.replace("_", " ").title()
+
+                    # handle sub-embedded object that is an array
+                    if item.get('is_list'):
+                        prop[prop_name] = {
+                            'title': item.get('schema_title', 'None provided'),
+                            'type': 'array',
+                            'vcf_name': item['vcf_name_v0.2'],
+                            'items': features
+                        }
+                        sub_temp.update({
+                            "title": sum_ob_name,
+                            "type": "object",
+                            "items": {
+                                "title": sub_title,
+                                "type": "array",
+                                "properties": prop
+                                }
+                            })
+                    else:
+                        prop[prop_name] = features
+                        sub_temp.update({
+                            "title": sub_title,
+                            "type": "object",
+                            "items": {
+                                "title": sub_title,
+                                "type": "object",
+                                "properties": prop
+                                }
+                            })
+                    temp[sum_ob_name] = sub_temp
+                    return temp
+
+            # convert to array sturcutre
+            if item.get('is_list'):
+                array_item = OrderedDict()
+                array_item.update( {
+                    "title": item.get('schema_title', 'None provided'),
+                    "type": "array",
+                    "vcf_name": item['vcf_name_v0.2']
+                })
+                if item.get('schema_description'):
+                    array_item['description'] = item['schema_description']
+                if item.get('field_priority'):
+                    array_item['lookup'] = item['field_priority']
+                array_item['items'] = features
+                temp[prop_name] = array_item
+                return temp
             else:
-                d[k] = v
-        return d
+                temp[prop_name] = features
+                return temp
 
-    for obj in inserts:
-        if variant:
-            update(props, get_prop(obj))
-            if obj.get('facet_priority'):
-                facs[obj['vcf_name_v0.2']] = {'title': obj['schema_title']}
-            if obj.get('column_priority'):
-                cols[obj['vcf_name_v0.2']] = {'title': obj['schema_title']}
-        else:
-            if obj.get('sub_embedding_group'):
-                continue
-            props.update(get_prop(obj))
+        def update(d, u):
+            for k, v in six.iteritems(u):
+                dv = d.get(k, {})
+                if not isinstance(dv, Mapping):
+                    d[k] = v
+                elif isinstance(v, Mapping):
+                    d[k] = update(dv, v)
+                else:
+                    d[k] = v
+            return d
 
-    if not props:
-        raise MappingTableIntakeException('Got no properties on schema!')
-    return props, cols, facs
+        for obj in inserts:
+            if variant:
+                update(props, get_prop(obj))
+                if obj.get('facet_priority'):
+                    facs[obj['vcf_name_v0.2']] = {'title': obj['schema_title']}
+                if obj.get('column_priority'):
+                    cols[obj['vcf_name_v0.2']] = {'title': obj['schema_title']}
+            else:
+                if obj.get('sub_embedding_group'):
+                    continue
+                props.update(get_prop(obj))
 
+        if not props:
+            raise MappingTableIntakeException('Got no properties on schema!')
+        return props, cols, facs
 
-def add_default_schema_fields(schema):
-    """ Adds default schema fields
+    @staticmethod
+    def add_default_schema_fields(schema):
+        """ Adds default schema fields
 
-    Args:
-        schema: schema to add fields to
-    """
-    schema['$schema'] = 'http://json-schema.org/draft-04/schema#'
-    schema['type'] = 'object'
-    schema['required'] = ['institution', 'project']
-    schema['identifyingProperties'] = ['uuid', 'aliases']
-    schema['additionalProperties'] = False
-    schema['mixinProperties'] = [
-        { "$ref": "mixins.json#/schema_version" },
-        { "$ref": "mixins.json#/uuid" },
-        { "$ref": "mixins.json#/aliases" },
-        { "$ref": "mixins.json#/submitted" },
-        { "$ref": "mixins.json#/modified" },
-        { "$ref": "mixins.json#/status" },
-        { "$ref": "mixins.json#/attribution" },
-        { "$ref": "mixins.json#/notes" },
-        { "$ref": "mixins.json#/static_embeds" }
-    ]
+        Args:
+            schema: schema to add fields to
+        """
+        schema['$schema'] = 'http://json-schema.org/draft-04/schema#'
+        schema['type'] = 'object'
+        schema['required'] = ['institution', 'project']
+        schema['identifyingProperties'] = ['uuid', 'aliases']
+        schema['additionalProperties'] = False
+        schema['mixinProperties'] = [
+            { "$ref": "mixins.json#/schema_version" },
+            { "$ref": "mixins.json#/uuid" },
+            { "$ref": "mixins.json#/aliases" },
+            { "$ref": "mixins.json#/submitted" },
+            { "$ref": "mixins.json#/modified" },
+            { "$ref": "mixins.json#/status" },
+            { "$ref": "mixins.json#/attribution" },
+            { "$ref": "mixins.json#/notes" },
+            { "$ref": "mixins.json#/static_embeds" }
+        ]
 
+    def generate_variant_sample_schema(self, sample_props):
+        """ Builds the variant_sample.json schema based on sample_props
 
-def generate_variant_sample_schema(sample_props):
-    """ Builds the variant_sample.json schema based on sample_props
+        Args:
+            sample_props: first output of generate_properties
 
-    Args:
-        sample_props: first output of generate_properties
+        Returns:
+            Variant sample schema
+        """
+        schema = {}
+        self.add_default_schema_fields(schema)
+        schema['title'] = 'Sample Variant'
+        schema['description'] = "Schema for variant info for sample"
+        schema['id'] = '/profiles/variant_sample.json'
+        schema['properties'] = sample_props
+        schema['properties']['schema_version'] = {'default': '1'}
+        schema['properties']['sample'] = {
+            'title': 'Sample',
+            'type': 'string',
+            'linkTo': 'Sample'
+        }
+        schema['properties']['variant'] = {
+            'title': 'Variant',
+            'type': 'string',
+            'linkTo': 'Variant'
+        }
+        schema['columns'] = {}
+        schema['facets'] = {}
+        logger.info('Built variant_sample schema\n')
+        return schema
 
-    Returns:
-        Variant sample schema
-    """
-    schema = {}
-    add_default_schema_fields(schema)
-    schema['title'] = 'Sample Variant'
-    schema['description'] = "Schema for variant info for sample"
-    schema['id'] = '/profiles/variant_sample.json'
-    schema['properties'] = sample_props
-    schema['properties']['schema_version'] = {'default': '1'}
-    schema['properties']['sample'] = {
-        'title': 'Sample',
-        'type': 'string',
-        'linkTo': 'Sample'
-    }
-    schema['properties']['variant'] = {
-        'title': 'Variant',
-        'type': 'string',
-        'linkTo': 'Variant'
-    }
-    schema['columns'] = {}
-    schema['facets'] = {}
-    logger.info('Built variant_sample schema\n')
-    return schema
+    def generate_variant_schema(self, var_props, cols, facs):
+        """  Builds the variant.json schema based on var_props
 
+        Args:
+            sample_props: first output of generate_properties for variant
+            cols: second output of generate_properties for variant
+            facs: third output of generate_properties for variant
 
-def generate_variant_schema(var_props, cols, facs):
-    """  Builds the variant.json schema based on var_props
+        Returns:
+            Variant schema
+        """
+        schema = {}
+        self.add_default_schema_fields(schema)
+        schema['title'] = 'Variants'
+        schema['description'] = "Schema for variants"
+        schema['id'] = '/profiles/variant.json'
+        schema['properties'] = var_props
+        schema['properties']['schema_version'] = {'default': '1'}
+        schema['facets'] = facs
+        schema['columns'] = cols
+        logger.info('Build variant schema\n')
+        return schema
 
-    Args:
-        sample_props: first output of generate_properties for variant
-        cols: second output of generate_properties for variant
-        facs: third output of generate_properties for variant
+    @staticmethod
+    def write_schema(schema, fname):
+        """ Writes the given schema (JSON) to the given file 'fname'
 
-    Returns:
-        Variant schema
-    """
-    schema = {}
-    add_default_schema_fields(schema)
-    schema['title'] = 'Variants'
-    schema['description'] = "Schema for variants"
-    schema['id'] = '/profiles/variant.json'
-    schema['properties'] = var_props
-    schema['properties']['schema_version'] = {'default': '1'}
-    schema['facets'] = facs
-    schema['columns'] = cols
-    logger.info('Build variant schema\n')
-    return schema
+        Args:
+            schema: dictionary to write as json as the schema
+            fname: file to write out to
+        """
+        with open(fname, 'w+') as out:
+            json.dump(schema, out, indent=4)
+        logger.info('Successfully wrote schema: %s to file: %s\n' % (schema['title'], fname))
 
+    def run(self, vs_out, v_out, institution=None, project=None, write=True):
+        """ Runs the mapping table intake program, generates and writes schemas
+            and returns inserts to be posted in main
 
-def write_schema(schema, fname):
-    """ Writes the given schema (JSON) to the given file 'fname'
+        Args:
+            vs_out: where to write variant_sample schema
+            v_out: where to write variant schema
+            institution: what institution to attach to these inserts
+            project: what project to attach to these inserts
+            write: whether to write the schemas - default True
 
-    Args:
-        schema: dictionary to write as json as the schema
-        fname: file to write out to
-    """
-    with open(fname, 'w+') as out:
-        json.dump(schema, out, indent=4)
-    logger.info('Successfully wrote schema: %s to file: %s\n' % (schema['title'], fname))
+        Returns:
+            inserts: annotation field inserts
+        """
+        inserts = self.process_mp_inserts()
+        variant_sample_props, _, _ = self.generate_properties(self.filter_inserts_sample(inserts), variant=False)
+        variant_props, cols, facs = self.generate_properties(self.filter_inserts_variant(inserts))
+        variant_sample_schema = self.generate_variant_sample_schema(variant_sample_props)
+        variant_schema = self.generate_variant_schema(variant_props, cols, facs)
+        if write:
+            self.write_schema(variant_sample_schema, vs_out)
+            self.write_schema(variant_schema, v_out)
+        logger.info('Successfully wrote schemas\n')
+        if project or institution:
+            for insert in inserts:
+                if project:
+                    insert['project'] = project
+                if institution:
+                    insert['institution'] = institution
+        return inserts
 
 
 def main():
@@ -369,32 +405,30 @@ def main():
         formatter_class=argparse.RawDescriptionHelpFormatter
     )
     parser.add_argument('mp', help='path to mapping table')
+    parser.add_argument('annotation_field_schema', help='path to annotation field schema')
     parser.add_argument('variant', help='where to write variant schema')
     parser.add_argument('sample', help='where to write sample_variant schema')
+    parser.add_argument('project', help='project to post inserts under')
+    parser.add_argument('institution', help='institution to post inserts under')
+    parser.add_argument('--write-schemas', action='store_true', default=True,
+                        'help'='If specified will write new schemas to given locations')
     parser.add_argument('--post-inserts', action='store_true', default=False,
                         help='If specified will post inserts, by default False')
     args = parser.parse_args()
 
     # read/process mapping table, build inserts
     logger.info('Building annotations from mapping table: %s\n' % args.mp)
-    VERSION, DATE, FIELDS = read_mp_meta(args.mp)
-    inserts = process_mp_inserts(args.mp, FIELDS)
+    parser = MappingTableParser(args.mp, args.annotation_field_schema)
+    inserts = parser.run(args.sample, args.variant,
+                         institution=args.institution, project=args.project,
+                         write=args.write_schemas)
 
     # if not a dry run try to post inserts
     if args.post_inserts:
         from dcicutils import ff_utils
         for entry in inserts:
             ff_utils.post_metadata(entry, 'annotation_field', None)
-    logger.info('Successfully created/posted annotations\n')
-
-    # generate schemas from inserts
-    sample_props, _, _ = generate_properties(filter_inserts_sample(inserts), variant=False)
-    variant_sample_schema = generate_variant_sample_schema(sample_props)
-    write_schema(variant_sample_schema, args.sample)
-    var_props, cols, facs = generate_properties(filter_inserts_variant(inserts))
-    variant_schema = generate_variant_schema(var_props, cols, facs)
-    write_schema(variant_schema, args.variant)
-    logger.info('Successfully wrote schemas\n')
+    logger.info('Successfully posted annotations\n')
 
 
 if __name__ == '__main__':

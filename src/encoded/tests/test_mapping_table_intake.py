@@ -4,18 +4,12 @@ import json
 import pytest
 from .features.conftest import workbook
 from encoded.commands.mapping_table_intake import (
-    read_mp_meta,
-    process_mp_inserts,
-    filter_inserts_sample,
-    filter_inserts_variant,
-    generate_properties,
-    add_default_schema_fields,
-    generate_variant_sample_schema,
-    generate_variant_schema
+    MappingTableParser
 )
 
 pytestmark = [pytest.mark.working]
-FNAME = './src/encoded/commands/mp02.csv' # symlinked from encoded.commands
+MT_LOC = './src/encoded/commands/mp02.csv' # symlinked from encoded.commands
+ANNOTATION_FIELD_SCHEMA = './src/encoded/schemas/annotation_field.json'
 EXPECTED_FIELDS = ['no', 'vcf_name_v0.2', 'source_name_v0.2', 'source_version_v0.2',
                    'field_type', 'value_example', 'enum_list', 'is_list', 'sub_embedding_group',
                    'separator', 'scale', 'domain', 'method', 'annotation_grouping', 'scope', 'schema_title', 'schema_description', 'source_name', 'source_version',
@@ -35,30 +29,30 @@ SAMPLE_FIELDS_EXPECTED = 11
 VARIANT_FIELDS_EXPECTED = 597
 
 @pytest.fixture
-def fields():
-    _, _, FIELDS = read_mp_meta(FNAME)
-    return FIELDS
+def MTParser():
+    parser = MappingTableParser(MT_LOC, ANNOTATION_FIELD_SCHEMA)
+    return parser
 
 
 @pytest.fixture
-def inserts(fields):
-    return process_mp_inserts(FNAME, fields)
+def inserts(MTParser):
+    return MTParser.process_mp_inserts()
 
 
 @pytest.fixture
-def sample_variant_items(inserts):
-    return generate_properties(inserts, variant=False)
+def sample_variant_items(MTParser, inserts):
+    return MTParser.generate_properties(inserts, variant=False)
 
 
 @pytest.fixture
-def variant_items(inserts):
-    return generate_properties(inserts)
+def variant_items(MTParser, inserts):
+    return MTParser.generate_properties(inserts)
 
 
-def test_add_default_schema_fields():
+def test_add_default_schema_fields(MTParser):
     """ Tests that default fields are added """
     schema = {}
-    add_default_schema_fields(schema)
+    MTParser.add_default_schema_fields(schema)
     assert '$schema' in schema
     assert 'type' in schema
     assert 'required' in schema
@@ -67,15 +61,14 @@ def test_add_default_schema_fields():
     assert 'mixinProperties' in schema
 
 
-def test_read_mapping_table():
+def test_read_mapping_table(MTParser):
     """ Tests that we can read mapping table header correctly based on the current format """
-    VERSION, DATE, FIELDS = read_mp_meta(FNAME)
-    assert VERSION == 'annV0.2'
-    assert DATE == '11.08.19'
-    assert sorted(FIELDS) == sorted(EXPECTED_FIELDS)
+    assert MTParser.version == 'annV0.2'
+    assert MTParser.date == '11.08.19'
+    assert sorted(MTParser.fields) == sorted(EXPECTED_FIELDS)
 
 
-def test_process_mp_inserts(inserts):
+def test_process_mp_inserts(MTParser, inserts):
     """ Tests that we properly process an inserts into mvp, sample, variant """
     assert inserts[0] == EXPECTED_INSERT
     mvp_list = [i for i in inserts if i.get('mvp')]
@@ -84,15 +77,15 @@ def test_process_mp_inserts(inserts):
     assert len(sample) == SAMPLE_FIELDS_EXPECTED
     variant = [i for i in mvp_list if i.get('scope') != 'sample']
     assert len(variant) == VARIANT_FIELDS_EXPECTED
-    variant = filter_inserts_variant(inserts)
+    variant = MTParser.filter_inserts_variant(inserts)
     assert len(variant) == VARIANT_FIELDS_EXPECTED
-    sample = filter_inserts_sample(inserts)
+    sample = MTParser.filter_inserts_sample(inserts)
     assert len(sample) == SAMPLE_FIELDS_EXPECTED
 
 
-def test_generate_sample_json_items(inserts):
+def test_generate_sample_json_items(MTParser, inserts):
     """ Tests that sample JSON is being created correctly checking three we expect """
-    sample_props, _, _ = generate_properties(inserts, variant=False)
+    sample_props, _, _ = MTParser.generate_properties(inserts, variant=False)
     assert sample_props['QUAL']['title'] == 'Quality score'
     assert sample_props['QUAL']['vcf_name'] == 'QUAL'
     assert sample_props['QUAL']['type'] == 'number'
@@ -103,9 +96,9 @@ def test_generate_sample_json_items(inserts):
     assert sample_props['gnomad_an_afr']['vcf_name'] == 'gnomad_an_afr'
 
 
-def test_generate_variant_json_items(inserts):
+def test_generate_variant_json_items(MTParser, inserts):
     """ Tests that variant JSON along with columns and facets are produced """
-    var_props, cols, facs = generate_properties(inserts)
+    var_props, cols, facs = MTParser.generate_properties(inserts)
     assert cols['CHROM']['title'] == 'Chromosome'
     assert cols['POS']['title'] == 'Position'
     assert cols['ID']['title'] == 'ID'
@@ -133,10 +126,10 @@ def test_generate_variant_json_items(inserts):
     assert sub_obj_props['vep_distance']['type'] == 'integer'
 
 
-def test_generate_variant_sample_schema(sample_variant_items):
+def test_generate_variant_sample_schema(MTParser, sample_variant_items):
     """ Tests some aspects of the variant_sample schema """
     items, _, _ = sample_variant_items
-    schema = generate_variant_sample_schema(items)
+    schema = MTParser.generate_variant_sample_schema(items)
     properties = schema['properties']
     assert 'transcript' not in properties
     assert 'CHROM' in properties
@@ -153,10 +146,10 @@ def test_generate_variant_sample_schema(sample_variant_items):
     assert 'facets' in schema
 
 
-def test_generate_variant_schema(variant_items):
+def test_generate_variant_schema(MTParser, variant_items):
     """ Tests some aspects of the variant schema """
     items, cols, facs = variant_items
-    schema = generate_variant_schema(items, cols, facs)
+    schema = MTParser.generate_variant_schema(items, cols, facs)
     properties = schema['properties']
     assert properties['CHROM']['vcf_name'] == 'CHROM'
     assert properties['CHROM']['source_name'] == 'VCF'
@@ -188,4 +181,12 @@ def test_post_inserts(inserts, project, institution, testapp):
     for item in inserts:
         item['project'] = 'encode-project'
         item['institution'] = 'encode-institution'
+        testapp.post_json(CONNECTION_URL, item, status=201)
+
+
+def test_post_inserts_via_run(MTParser, project, institution, testapp):
+    """ Tests that we can run the above test using the 'run' method """
+    inserts = MTParser.run(None, None, institution='encode-institution', project='encode-project', write=False)
+    CONNECTION_URL = '/annotation_field'
+    for item in inserts:
         testapp.post_json(CONNECTION_URL, item, status=201)
