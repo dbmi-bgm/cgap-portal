@@ -411,7 +411,7 @@ def main():
     parser.add_argument('project', help='project to post inserts under')
     parser.add_argument('institution', help='institution to post inserts under')
     parser.add_argument('--write-schemas', action='store_true', default=True,
-                        'help'='If specified will write new schemas to given locations')
+                        help='If specified will write new schemas to given locations')
     parser.add_argument('--post-inserts', action='store_true', default=False,
                         help='If specified will post inserts, by default False')
     args = parser.parse_args()
