@@ -11,7 +11,7 @@ import { LocalizedTime } from '@hms-dbmi-bgm/shared-portal-components/es/compone
 import { console, object, JWT, layout, schemaTransforms } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import Registry from '@hms-dbmi-bgm/shared-portal-components/es/components/navigation/components/Registry';
 
-import { content_views } from './globals';
+import { content_views, memoizedUrlParse } from './globals';
 import jsonScriptEscape from './../libs/jsonScriptEscape';
 import { typedefs } from './util';
 
@@ -350,22 +350,22 @@ export class StaticPageBreadcrumbs extends React.Component {
      */
     seoMetadata(ancestors){
         if (!ancestors || !Array.isArray(ancestors) || ancestors.length < 2) return null;
-        var hrefParts = url.parse(this.props.href),
-            baseDomain = (hrefParts.protocol || '') + '//' + hrefParts.host,
-            structuredJSON = {
-                "@context": "http://schema.org",
-                "@type": "BreadcrumbList",
-                "itemListElement" : _.map(ancestors, function(item, idx){
-                    return {
-                        "@type" : "ListItem",
-                        "position" : idx + 1,
-                        "item" : {
-                            "name" : item.title || item.display_title,
-                            "@id" : baseDomain + object.itemUtil.atId(item)
-                        }
-                    };
-                })
-            };
+        const hrefParts = memoizedUrlParse(this.props.href);
+        const baseDomain = (hrefParts.protocol || '') + '//' + hrefParts.host;
+        const structuredJSON = {
+            "@context": "http://schema.org",
+            "@type": "BreadcrumbList",
+            "itemListElement" : _.map(ancestors, function(item, idx){
+                return {
+                    "@type" : "ListItem",
+                    "position" : idx + 1,
+                    "item" : {
+                        "name" : item.title || item.display_title,
+                        "@id" : baseDomain + object.itemUtil.atId(item)
+                    }
+                };
+            })
+        };
         return <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonScriptEscape(JSON.stringify(structuredJSON)) }} />;
     }
 

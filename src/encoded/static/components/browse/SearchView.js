@@ -11,7 +11,7 @@ import { ActiveFiltersBar } from '@hms-dbmi-bgm/shared-portal-components/es/comp
 import { columnExtensionMap } from './columnExtensionMap';
 import { Schemas } from './../util';
 import { TitleAndSubtitleBeside, PageTitleContainer, TitleAndSubtitleUnder, pageTitleViews, EditingItemPageTitle } from './../PageTitleSection';
-import { getSubmissionItemType } from './../forms/CGAPSubmissionView';
+import { memoizedUrlParse } from './../globals';
 
 
 export default class SearchView extends React.PureComponent {
@@ -56,7 +56,7 @@ export default class SearchView extends React.PureComponent {
             return facets; // Facet not present, return.
         }
 
-        const hrefQuery = url.parse(href, true).query;
+        const hrefQuery = _.clone(memoizedUrlParse(href).query);
         if (typeof hrefQuery.type === 'string') hrefQuery.type = [hrefQuery.type];
 
         const itemTypesInSearch = _.without(hrefQuery.type, 'Item');

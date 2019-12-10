@@ -8,6 +8,7 @@ import memoize from 'memoize-one';
 
 import { navigate, console, analytics } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { UserContentBodyList } from './../../static-pages/components/UserContentBodyList';
+import { memoizedUrlParse } from './../../globals';
 
 
 
@@ -240,7 +241,7 @@ export class TabView extends React.PureComponent {
 
     getTabByHref(){
         const { contents, href } = this.props;
-        const hrefParts = url.parse(href);
+        const hrefParts = memoizedUrlParse(href);
         const hash = typeof hrefParts.hash === 'string' && hrefParts.hash.length > 0 && hrefParts.hash.slice(1);
         const currKey = this.getActiveKey();
 
