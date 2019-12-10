@@ -13,7 +13,7 @@ import { UserActionDropdownMenu } from './UserActionDropdownMenu';
 
 
 export const CollapsedNav = React.memo(function CollapsedNav(props){
-    const { href, currentAction, session } = props;
+    const { href, currentAction, session, context } = props;
     const leftNavProps = _.pick(props, 'mobileDropdownOpen', 'windowWidth', 'windowHeight', 'browseBaseState', 'href',
         'mounted', 'overlaysContainer', 'session', 'testWarning', 'isFullscreen');
     const userActionNavProps = _.pick(props, 'session', 'href', 'updateUserInfo', 'mounted', 'overlaysContainer', 'schemas', 'windowWidth');
@@ -22,7 +22,7 @@ export const CollapsedNav = React.memo(function CollapsedNav(props){
     return (
         <Navbar.Collapse>
             { session ? <LeftNavAuthenticated {...leftNavProps} /> : <LeftNavGuest {...leftNavProps} /> }
-            <SearchBar href={href} currentAction={currentAction} />
+            <SearchBar {...{ href, currentAction, context }} />
             <UserActionDropdownMenu {...userActionNavProps} />
         </Navbar.Collapse>
     );
