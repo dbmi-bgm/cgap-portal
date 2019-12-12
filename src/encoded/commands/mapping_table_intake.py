@@ -47,7 +47,7 @@ class MappingTableParser(object):
         Returns:
             list of fields
         """
-        fields = {}
+        fields = OrderedDict()
         for name in row:
             new_name = name.split('(')[0].strip().lower()
             new_name = new_name.replace(" ", "_")
