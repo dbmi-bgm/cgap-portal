@@ -435,7 +435,7 @@ def main():
     args = parser.parse_args()
 
     # read/process mapping table, build inserts
-    logger.info('Building annotations from mapping table: %s\n' % args.mp)
+    logger.info('Building annotations from mapping table: %s' % args.mp)
     parser = MappingTableParser(args.mp, args.annotation_field_schema)
     inserts = parser.run(args.sample, args.variant,
                          institution=args.institution, project=args.project,
@@ -446,7 +446,7 @@ def main():
         from dcicutils import ff_utils
         for entry in inserts:
             ff_utils.post_metadata(entry, 'annotation_field', None)
-    logger.info('Successfully posted annotations\n')
+    logger.info('Successfully posted annotations')
 
 
 if __name__ == '__main__':

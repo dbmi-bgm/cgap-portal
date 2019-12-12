@@ -7,14 +7,6 @@ from collections import OrderedDict
 
 logger = logging.getLogger(__name__)
 EPILOG = __doc__
-ENCODING = {
-    '%2C': ',',
-    '%20': ' ',
-    '%7E': '~',
-    '%3D': '=',
-    '%7C': '|',
-    '%3B': ';'
-}
 
 
 class VCFParserException(Exception):
@@ -30,6 +22,14 @@ class VCFParser(object):
     Wrapper class for 'vcf' that enforces but the VCF specific format rules and
     the annotated VCF format rules specified by us
     """
+    RESTRICTED_CHARACTER_ENCODING = {
+        '%2C': ',',
+        '%20': ' ',
+        '%7E': '~',
+        '%3D': '=',
+        '%7C': '|',
+        '%3B': ';'
+    }
 
     def __init__(self, _vcf, variant, sample):
         """ Constructor for the parser
@@ -69,7 +69,7 @@ class VCFParser(object):
         """ Helper function for parse_vcf_fields that handles parsing the 'info'
             object containing a header listing the fields
             Only needed for annotations - other fields will work as is
-            Lots of VCF specific parsing going on here - refer to VCF spec for 
+            Lots of VCF specific parsing going on here - refer to VCF spec for
             info on the expected format
 
         Args:
@@ -178,7 +178,7 @@ class VCFParser(object):
         """
         if type == 'string':
             def fix_encoding(val):  # decode restricted characters
-                for encoded, decoded in ENCODING.items():
+                for encoded, decoded in self.RESTRICTED_CHARACTER_ENCODING.items():
                     val = val.replace(encoded, decoded)
                 return val
             return fix_encoding(value)
@@ -301,7 +301,7 @@ class VCFParser(object):
     def format_variant(result, seo='transcript'):
         """ Does some extra formatting to the seo's on the variant so they fit the schema.
             When we build the item above we index the seo's into a dictionary on
-            for processing speed/convenience. This function removes that and puts 
+            for processing speed/convenience. This function removes that and puts
             them instead into a list as expected by the schema
 
         Args:
