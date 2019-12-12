@@ -111,6 +111,8 @@ class MappingTableParser(object):
                     # handle int fields
                     if field_name in self.INTEGER_FIELDS:
                         if entry:
+                            print(field_name)
+                            print(entry)
                             insert[field_name] = int(entry)
                     # handle bool fields
                     elif field_name in self.BOOLEAN_FIELDS:
