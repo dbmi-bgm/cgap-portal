@@ -99,12 +99,16 @@ def test_generate_sample_json_items(MTParser, inserts):
 def test_generate_variant_json_items(MTParser, inserts):
     """ Tests that variant JSON along with columns and facets are produced """
     var_props, cols, facs = MTParser.generate_properties(inserts)
+
+    # check basic things about the columns and facets
     assert cols['CHROM']['title'] == 'Chromosome'
     assert cols['POS']['title'] == 'Position'
     assert cols['ID']['title'] == 'ID'
     assert cols['REF']['title'] == 'Reference allele'
     assert cols['ALT']['title'] == 'Alternative allele'
     assert facs['clinvar_clnsig']['title'] == 'ClinVar significance'
+
+    # check top level fields
     assert var_props['annovar_cytoband']['title'] == 'Cytoband'
     assert var_props['annovar_cytoband']['type'] == 'string'
     assert var_props['annovar_cytoband']['scale'] == 'WINDOW'
@@ -119,6 +123,8 @@ def test_generate_variant_json_items(MTParser, inserts):
     assert var_props['exac_af']['source_version'] == '3'
     assert var_props['transcript']['title'] == 'transcript'
     assert var_props['transcript']['type'] == 'object'
+
+    # check sub-embedded object
     sub_obj_props = var_props['transcript']['items']['properties']
     assert len(sub_obj_props.keys()) == 76 # should see 76 of these
     assert sub_obj_props['vep_allele']['vcf_name'] == 'vep_allele'
@@ -150,6 +156,8 @@ def test_generate_variant_schema(MTParser, variant_items):
     """ Tests some aspects of the variant schema """
     items, cols, facs = variant_items
     schema = MTParser.generate_variant_schema(items, cols, facs)
+
+    # check top level schema fields of various types
     properties = schema['properties']
     assert properties['CHROM']['vcf_name'] == 'CHROM'
     assert properties['CHROM']['source_name'] == 'VCF'
@@ -162,11 +170,14 @@ def test_generate_variant_schema(MTParser, variant_items):
     assert properties['ALT']['items']['separator'] == 'comma'
     assert properties['ALT']['items']['lookup'] == 5
     assert properties['ALT']['lookup'] == 5
-    assert len(properties['transcript']['items']['properties']) == 76
     assert properties['ALT']['items']['separator'] == 'comma'
-    assert properties['transcript']['items']['properties']['vep_domains']['type'] == 'array'
-    assert properties['transcript']['items']['properties']['vep_domains']['items']['separator'] == 'tilde'
-    assert properties['transcript']['items']['properties']['vep_domains']['items']['type'] == 'string'
+
+    # check sub-embedded object fields
+    sub_obj_props = properties['transcript']['items']['properties']
+    assert len(sub_obj_props) == 76
+    assert sub_obj_props['vep_domains']['type'] == 'array'
+    assert sub_obj_props['vep_domains']['items']['separator'] == 'tilde'
+    assert sub_obj_props['vep_domains']['items']['type'] == 'string'
 
 
 def test_post_inserts(inserts, project, institution, testapp):
@@ -186,7 +197,7 @@ def test_post_inserts(inserts, project, institution, testapp):
 
 def test_post_inserts_via_run(MTParser, project, institution, testapp):
     """ Tests that we can run the above test using the 'run' method """
-    inserts = MTParser.run(None, None, institution='encode-institution', project='encode-project', write=False)
+    inserts = MTParser.run(institution='encode-institution', project='encode-project', write=False)
     CONNECTION_URL = '/annotation_field'
     for item in inserts:
         testapp.post_json(CONNECTION_URL, item, status=201)

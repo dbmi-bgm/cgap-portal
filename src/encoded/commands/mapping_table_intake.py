@@ -22,6 +22,10 @@ class MappingTableParser(object):
 
         XXX: Should Validate the annotation fields against the given schema?
     """
+    HEADER_ROW_INDEX = 3
+    FIELD_TYPE_INDEX = 4  # XXX: hardcoded, must change if field_type is moved on mapping table
+    INTEGER_FIELDS = ['field_priority', 'column_priority', 'facet_priority', 'no']
+    BOOLEAN_FIELDS = ['is_list', 'mvp']
 
     def __init__(self, _mp, schema):
         self.mapping_table = _mp
@@ -36,22 +40,34 @@ class MappingTableParser(object):
         Args:
             row: row of fields to be processed from the mapping table
 
+        Raises:
+            MappingTableIntakeException if a duplicate field is detected or no fields
+            are detected
+
         Returns:
             list of fields
         """
-        fields = []
+        fields = {}
         for name in row:
             new_name = name.split('(')[0].strip().lower()
             new_name = new_name.replace(" ", "_")
             if new_name.startswith('#'):
                 continue
-            fields.append(new_name)
+            if new_name not in fields:
+                fields[new_name] = True
+            else:
+                raise MappingTableIntakeException('Found duplicate field in %s' % row)
         if not fields:
             raise MappingTableIntakeException('Did not find any fields on row %s' % row)
-        return fields
+        return fields.keys()
 
     def read_mp_meta(self):
-        """ Reads mapping table from file given to class
+        """ Reads mapping table from file given to class. First 3 rows of the mapping
+            table contain this information. Version and Date are in the second column
+            while fields are across the third row, as below:
+                ,version=v1.5, ...
+                ,date=12/1/2019, ...
+                field1, field2, field3, ...
 
         Returns:
             3 tuple - version, date, fields
@@ -82,22 +98,22 @@ class MappingTableParser(object):
             fields: list of fields on the table
 
         Returns:
-            list of inserts
+            list of annotation field inserts
         """
         inserts = []
         with open(self.mapping_table, 'r') as f:
             reader = csv.reader(f)
             for row_idx, row in enumerate(reader):
                 insert = {}
-                if row_idx < 3: # skip header rows
+                if row_idx < self.HEADER_ROW_INDEX: # skip header rows
                     continue
                 for field_name, entry in zip(self.fields, row):
                     # handle int fields
-                    if field_name in ['field_priority', 'column_priority', 'facet_priority', 'no']:
+                    if field_name in self.INTEGER_FIELDS:
                         if entry:
                             insert[field_name] = int(entry)
                     # handle bool fields
-                    elif field_name in ['is_list', 'mvp']:
+                    elif field_name in self.BOOLEAN_FIELDS:
                         if entry:
                             if entry == 'Y':
                                 insert[field_name] = True
@@ -105,7 +121,7 @@ class MappingTableParser(object):
                                 insert[field_name] = False
                     elif field_name in ['enum_list']:
                         if entry:
-                            field_type = row[4] # XXX: hardcoded, must change if field_type is moved on mapping table
+                            field_type = row[self.FIELD_TYPE_INDEX]
                             val_list = []
                             if field_type == 'string':
                                 val_list = [en.strip() for en in entry.split(',') if en.strip()]
@@ -324,7 +340,7 @@ class MappingTableParser(object):
         }
         schema['columns'] = {}
         schema['facets'] = {}
-        logger.info('Built variant_sample schema\n')
+        logger.info('Built variant_sample schema')
         return schema
 
     def generate_variant_schema(self, var_props, cols, facs):
@@ -347,7 +363,7 @@ class MappingTableParser(object):
         schema['properties']['schema_version'] = {'default': '1'}
         schema['facets'] = facs
         schema['columns'] = cols
-        logger.info('Build variant schema\n')
+        logger.info('Build variant schema')
         return schema
 
     @staticmethod
@@ -362,7 +378,7 @@ class MappingTableParser(object):
             json.dump(schema, out, indent=4)
         logger.info('Successfully wrote schema: %s to file: %s\n' % (schema['title'], fname))
 
-    def run(self, vs_out, v_out, institution=None, project=None, write=True):
+    def run(self, vs_out=None, v_out=None, institution=None, project=None, write=True):
         """ Runs the mapping table intake program, generates and writes schemas
             and returns inserts to be posted in main
 
@@ -382,9 +398,11 @@ class MappingTableParser(object):
         variant_sample_schema = self.generate_variant_sample_schema(variant_sample_props)
         variant_schema = self.generate_variant_schema(variant_props, cols, facs)
         if write:
+            if not vs_out or v_out:
+                raise MappingTableIntakeException('Write specified but no output file given')
             self.write_schema(variant_sample_schema, vs_out)
             self.write_schema(variant_schema, v_out)
-        logger.info('Successfully wrote schemas\n')
+            logger.info('Successfully wrote schemas')
         if project or institution:
             for insert in inserts:
                 if project:
