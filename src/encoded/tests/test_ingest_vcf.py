@@ -23,9 +23,6 @@ def test_VCFP_meta(test_vcf):
     annotation_fields = test_vcf.annotation_keys
     for annot_field in EXPECTED_ANNOTATION_FIELDS:
         assert annot_field in annotation_fields
-    generic_fields = test_vcf.field_keys
-    for generic_field in EXPECTED_GENERIC_FIELDS:
-        assert generic_field in generic_fields
     assert test_vcf.get_sub_embedded_label('VEP') == 'transcript'
     assert test_vcf.get_sub_embedded_label('dbNSFPTranscript') == 'transcript'
     assert test_vcf.get_sub_embedded_label('ANNOVAR') == None
@@ -38,17 +35,20 @@ def test_VCFP_one_variant(test_vcf):
     """
     record = test_vcf.get_record()
     result = test_vcf.record_to_variant(record)
+
+    # check top level fields
     assert result['annovar_cytoband'] == '1p36.33'
+    assert result['dbnsfp_genocanyon_score'] == 0.999999999998938
+    assert result['clinvar_alleleid'] == '244110'
+    assert result['clinvar_clnvcso'] == 'SO:0001483'
+
+    # check sub-embedded object fields
     assert result['transcript'][0]['vep_feature'] == 'ENST00000379370'
     assert result['transcript'][1]['vep_feature'] == 'ENST00000620552'
     assert result['transcript'][0]['vep_pheno'] == ['1', '1']
     assert result['transcript'][0]['vep_codons'] == 'Ggc/Agc'
     assert result['transcript'][0]['dbnsfptranscript_sift4g_pred'] == 'D'
     assert result['transcript'][0]['dbnsfptranscript_mutationassessor_score'] == 2.19
-    assert result['dbnsfp_genocanyon_score'] == 0.999999999998938
-    assert result['clinvar_alleleid'] == '244110'
-    assert result['clinvar_clnvcso'] == 'SO:0001483'
-
 
 def test_VCFP_multiple_variants(test_vcf):
     """
@@ -58,15 +58,15 @@ def test_VCFP_multiple_variants(test_vcf):
     result = test_vcf.record_to_variant(record)
     # check all the same things as the previous test, as they should be the same
     assert result['annovar_cytoband'] == '1p36.33'
+    assert result['dbnsfp_genocanyon_score'] == 0.999999999998938
+    assert result['clinvar_alleleid'] == '244110'
+    assert result['clinvar_clnvcso'] == 'SO:0001483'
     assert result['transcript'][0]['vep_feature'] == 'ENST00000379370'
     assert result['transcript'][1]['vep_feature'] == 'ENST00000620552'
     assert result['transcript'][0]['vep_pheno'] == ['1', '1']
     assert result['transcript'][0]['vep_codons'] == 'Ggc/Agc'
     assert result['transcript'][0]['dbnsfptranscript_sift4g_pred'] == 'D'
     assert result['transcript'][0]['dbnsfptranscript_mutationassessor_score'] == 2.19
-    assert result['dbnsfp_genocanyon_score'] == 0.999999999998938
-    assert result['clinvar_alleleid'] == '244110'
-    assert result['clinvar_clnvcso'] == 'SO:0001483'
 
     # check record 2
     record = test_vcf.get_record()

@@ -1,3 +1,4 @@
+import re
 import sys
 import vcf
 import json
@@ -45,10 +46,9 @@ class VCFParser(object):
         self.reader = vcf.Reader(open(_vcf, 'r'))
         self.variant_schema = json.load(open(variant, 'r'))
         self.variant_sample_schema = json.load(open(sample, 'r'))
-        self.annotation_keys = OrderedDict()
-        self.field_keys = OrderedDict()
-        self.format = OrderedDict()
-        self.sub_embedded_mapping = OrderedDict()
+        self.annotation_keys = OrderedDict()  # list of INFO fields that contain annotation fields
+        self.format = OrderedDict()  # intermediate representation of the item format
+        self.sub_embedded_mapping = OrderedDict()  # denotes which INFO fields belong in a SEO
         self.read_vcf_metadata()
         self.parse_vcf_fields()
 
@@ -61,9 +61,6 @@ class VCFParser(object):
         """
         for field in self.reader.metadata['MUTANNO']:
             self.annotation_keys[field['ID']] = True
-        for field in self.reader.infos.keys():
-            if field not in self.annotation_keys:
-                self.field_keys[field] = True
 
     def parse_vcf_info(self, info):
         """ Helper function for parse_vcf_fields that handles parsing the 'info'
@@ -78,20 +75,20 @@ class VCFParser(object):
         Returns:
             list of fields contained in the INFO tag
         """
-        def _strip(s):
-            s = s.strip()
-            s = s.strip('"')
-            s = s.strip("'")
-            return s.lower()
+        def _strip(s):  # strip whitespace, quotes
+            return re.sub(re.compile(r'\s+$|\"|\''), '', s).lower()
 
+        # helper to verify the given field is in the schema
+        # this is where non-mvp fields are dropped if present in the vcf
         def _verify_in_schema(field, sub_group=None):
             if sub_group:
                 if field in self.variant_schema['properties'][sub_group]['items']['properties']:
                     return field
             if field in self.variant_schema['properties'] or field.lower() in self.variant_schema['properties']:
                 return field
-            return 'DROPPED'
+            return 'DROPPED'  # must maintain field order
 
+        # process INFO tag - reformat as necessary and return the entries
         if 'Subembedded' in info.desc:  # restricted name in INFO description
             sub_embedded = _strip(info.desc.split(':')[1:2][0])
             self.sub_embedded_mapping[info.id] = sub_embedded
@@ -111,9 +108,6 @@ class VCFParser(object):
         for key in self.annotation_keys.keys():
             if key in self.reader.infos.keys():
                 self.format[key] = self.parse_vcf_info(self.reader.infos[key])
-        for key in self.field_keys.keys():
-            if key in self.reader.infos.keys():
-                self.format[key] = self.reader.infos[key].type
 
     def get_record(self):
         """ Uses self.reader as an iterator to get the next record
