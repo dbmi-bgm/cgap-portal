@@ -5,7 +5,8 @@ from encoded.tests.data.sample_vcfs.expected import (
     VARIANT_SAMPLE_SCHEMA,
     EXPECTED_ANNOTATION_FIELDS,
     EXPECTED_GENERIC_FIELDS,
-    TEST_VCF
+    TEST_VCF,
+    RAW_INFOTAG_DESCRIPTION
 )
 from encoded.commands.ingest_vcf import (
     VCFParser
@@ -16,6 +17,16 @@ from encoded.commands.ingest_vcf import (
 def test_vcf():
     parser = VCFParser(TEST_VCF, VARIANT_SCHEMA, VARIANT_SAMPLE_SCHEMA)
     return parser
+
+
+def test_VCFP_parse_infotag_description(test_vcf):
+    """
+    Tests the staticmethod that parses the infotag description and produces
+    a dictionary of all the keyed 'fields'
+    """
+    entries = test_vcf.parse_infotag_description(RAW_INFOTAG_DESCRIPTION)
+    assert 'Subembedded' in entries
+    assert 'Format' in entries
 
 
 def test_VCFP_meta(test_vcf):
@@ -33,8 +44,8 @@ def test_VCFP_one_variant(test_vcf):
     Tests that we can correctly process a single VCF variant
     Checks many specific things about the record for correctness
     """
-    record = test_vcf.get_record()
-    result = test_vcf.record_to_variant(record)
+    record = test_vcf.read_next_record()
+    result = test_vcf.create_variant_from_record(record)
 
     # check top level fields
     assert result['annovar_cytoband'] == '1p36.33'
@@ -54,8 +65,8 @@ def test_VCFP_multiple_variants(test_vcf):
     """
     Tests that we can correctly process an annotated VCF with multiple records
     """
-    record = test_vcf.get_record()
-    result = test_vcf.record_to_variant(record)
+    record = test_vcf.read_next_record()
+    result = test_vcf.create_variant_from_record(record)
     # check all the same things as the previous test, as they should be the same
     assert result['annovar_cytoband'] == '1p36.33'
     assert result['dbnsfp_genocanyon_score'] == 0.999999999998938
@@ -69,8 +80,8 @@ def test_VCFP_multiple_variants(test_vcf):
     assert result['transcript'][0]['dbnsfptranscript_mutationassessor_score'] == 2.19
 
     # check record 2
-    record = test_vcf.get_record()
-    result = test_vcf.record_to_variant(record)
+    record = test_vcf.read_next_record()
+    result = test_vcf.create_variant_from_record(record)
     assert len(result['transcript'].keys()) == 9
     assert result['transcript'][0]['vep_location'] == '1:1044368'
     assert result['transcript'][0]['dbnsfptranscript_sift_score'] == 0.036
@@ -84,8 +95,8 @@ def test_VCFP_multiple_variants(test_vcf):
     assert result['1000gp_afr_af'] == 0.0008
 
     # check record 3
-    record = test_vcf.get_record()
-    result = test_vcf.record_to_variant(record)
+    record = test_vcf.read_next_record()
+    result = test_vcf.create_variant_from_record(record)
     assert len(result['transcript'].keys()) == 7
     assert result['transcript'][0]['vep_location'] == '1:1804548'
     assert result['transcript'][0]['dbnsfptranscript_sift_score'] == 0.001
@@ -103,16 +114,16 @@ def test_VCFP_multiple_variants(test_vcf):
 
 def test_VCFP_multiple_sample_variants(test_vcf):
     """ Generates 3 sample variant items and checks them for correctness """
-    record = test_vcf.get_record()
-    result = test_vcf.record_to_sample_variant(record)
+    record = test_vcf.read_next_record()
+    result = test_vcf.create_sample_variant_from_record(record)
     assert result['DP'] == 12
     assert result['AF'] == [1.0]
     assert result['QUAL'] == 403.9
     assert result['FILTER'] == 'VQSRTrancheSNP99.90to100.00'
     assert result['GT'] == '1/1'
     assert result['PL'] == [430, 36, 0]
-    record = test_vcf.get_record()
-    result = test_vcf.record_to_sample_variant(record)
+    record = test_vcf.read_next_record()
+    result = test_vcf.create_sample_variant_from_record(record)
     assert result['DP'] == 42
     assert result['AF'] == [0.833]
     assert result['QUAL'] == 3202.19
@@ -120,8 +131,8 @@ def test_VCFP_multiple_sample_variants(test_vcf):
     assert result['GT'] == '1/1'
     assert result['GQ'] == 99
     assert result['PL'] == [1720, 126, 0]
-    record = test_vcf.get_record()
-    result = test_vcf.record_to_sample_variant(record)
+    record = test_vcf.read_next_record()
+    result = test_vcf.create_sample_variant_from_record(record)
     assert result['DP'] == 2
     assert result['AF'] == [0.5]
     assert result['QUAL'] == 58.56
@@ -133,7 +144,7 @@ def test_VCFP_post_sample_variants(testapp, institution, project, test_vcf):
     """ Attempts to post all generated sample variants """
     CONNECTION_URL = '/variant_sample'
     for record in test_vcf:
-        variant_sample = test_vcf.record_to_sample_variant(record)
+        variant_sample = test_vcf.create_sample_variant_from_record(record)
         variant_sample['project'] = 'encode-project'
         variant_sample['institution'] = 'encode-institution'
         testapp.post_json(CONNECTION_URL, variant_sample, status=201)
@@ -143,7 +154,7 @@ def test_VCFP_post_variants(testapp, institution, project, test_vcf):
     """ Attempts to post all generated variants """
     CONNECTION_URL = '/variant'
     for record in test_vcf:
-        variant = test_vcf.record_to_variant(record)
+        variant = test_vcf.create_variant_from_record(record)
         variant['project'] = 'encode-project'
         variant['institution'] = 'encode-institution'
         test_vcf.format_variant(variant)

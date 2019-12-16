@@ -31,6 +31,9 @@ class VCFParser(object):
         '%7C': '|',
         '%3B': ';'
     }
+    DROPPED_FIELD = 'DROPPED'
+    SUBEMBEDDED = 'Subembedded'
+    FORMAT = 'Format'
 
     def __init__(self, _vcf, variant, sample):
         """ Constructor for the parser
@@ -62,6 +65,43 @@ class VCFParser(object):
         for field in self.reader.metadata['MUTANNO']:
             self.annotation_keys[field['ID']] = True
 
+    def parse_infotag_description(self, info):
+        """ Build a dictionary of key-value pairs from the info tag description.
+            XXX: This format is not perfect for this, may want to coordinate with
+            Daniel
+            For example, see below.
+
+                Description="Predicted nonsense mediated decay effects for this variant by VEP. Subembedded:'transcript':Format:'Location|Allele ..."
+
+            Would return:
+                {
+                    'description': 'Predicted nonsense mediated decay effects for this variant by VEP.',
+                    'subembedded': 'transcript',
+                    'format': 'Location|Allele ...'
+                }
+
+            Args:
+                info (str): infotag in vcf to parse
+
+            Returns:
+                dictionary of identifiers in the infotag description
+        """
+        result = {}
+        start = 2
+        entries = info.split(':')  # colon is sep
+
+        # handle first two entries
+        if self.SUBEMBEDDED in entries[0]:
+            result[self.SUBEMBEDDED] = entries[1]
+        else:
+            result[self.FORMAT] = entries[1]
+
+        # parse any additional entries
+        while start < len(entries):
+            result[entries[start]] = entries[start+1]
+            start += 2
+        return result
+
     def parse_vcf_info(self, info):
         """ Helper function for parse_vcf_fields that handles parsing the 'info'
             object containing a header listing the fields
@@ -75,8 +115,9 @@ class VCFParser(object):
         Returns:
             list of fields contained in the INFO tag
         """
+        regex = re.compile(r'\s+$|\"|\'')
         def _strip(s):  # strip whitespace, quotes
-            return re.sub(re.compile(r'\s+$|\"|\''), '', s).lower()
+            return re.sub(regex, '', s).lower()
 
         # helper to verify the given field is in the schema
         # this is where non-mvp fields are dropped if present in the vcf
@@ -86,7 +127,7 @@ class VCFParser(object):
                     return field
             if field in self.variant_schema['properties'] or field.lower() in self.variant_schema['properties']:
                 return field
-            return 'DROPPED'  # must maintain field order
+            return self.DROPPED_FIELD  # must maintain field order
 
         # process INFO tag - reformat as necessary and return the entries
         if 'Subembedded' in info.desc:  # restricted name in INFO description
@@ -108,9 +149,14 @@ class VCFParser(object):
         for key in self.annotation_keys.keys():
             if key in self.reader.infos.keys():
                 self.format[key] = self.parse_vcf_info(self.reader.infos[key])
+            else:
+                logger.info('Found key %s that is not in info tag' % key)
 
-    def get_record(self):
-        """ Uses self.reader as an iterator to get the next record
+    def read_next_record(self):
+        """ Uses self.reader as an iterator to get the next record. This function
+            is stateful with respect to the VCF reader. To re-iterate you would
+            need to re-instantiate the class. There shouldn't be any reason to
+            do this
 
         Returns:
             next record on VCF
@@ -138,9 +184,9 @@ class VCFParser(object):
         return grouping
 
     @staticmethod
-    def parse_annotation_field(s):
-        """ Helper - parses an annotation field. Returns a list of the field values for this
-            annotation. They should all be pipe separated as per specs
+    def parse_annotation_field_value(s):
+        """ Helper - parses a raw annotation field value. Returns a list of the
+            field values for this annotation. They should all be pipe separated as per specs
 
         Args:
             s: string annotation field value (ie: raw value in the VCF)
@@ -156,7 +202,7 @@ class VCFParser(object):
         else:
             return [s[0].split('|')]
 
-    def process_field_value(self, type, value, sub_type=None):
+    def cast_field_value(self, type, value, sub_type=None):
         """ Casts the given value to the type given by 'type'
 
         Args:
@@ -189,21 +235,23 @@ class VCFParser(object):
                     items = value.split('~')
                 else:
                     items = value
-                return list(map(lambda v: self.process_field_value(sub_type, v, sub_type=None), items))
+                return list(map(lambda v: self.cast_field_value(sub_type, v, sub_type=None), items))
             else:
                 raise VCFParserException('Got array with no sub-type')
         else:
-            raise VCFParserException('type was not one of: string, integer, number, array')
+            raise VCFParserException('Type was %s and not one of: string, integer, number, array' % type)
 
-    def process_variant_value(self, field, value, key='', fail=True):
+    def validate_variant_value(self, field, value, key='', exit_on_validation=True):
         """ Given a field, check the variant schema for the type of that field and cast
-        the given value to that type
+        the given value to that type. This constitutes our 'validation' step
 
         Args:
             field: name of the field we are looking to process. This should exist somewhere
             in the schema properties either at the top level or as a sub-embedded object
             value: value of the field to be cast
             key: annotation field (sub-embedded) that this field is part of
+            exit_on_validation: boolean flag to determine whether or not we bail if
+            we fail validation in this step. Default to True
 
         Returns:
             casted value
@@ -220,7 +268,7 @@ class VCFParser(object):
                 if type == 'array':
                     sub_type = props[sub_embedded_group]['items']['properties'][field]['items']['type']
             else:
-                if fail:
+                if exit_on_validation:
                     raise VCFParserException('Tried to check a variant field that does not exist on the schema: %s' % field)
                 else:
                     logger.error('Tried to check a variant field that does not exist on the schema: %s' % field)
@@ -229,9 +277,9 @@ class VCFParser(object):
             type = props[field]['type']
             if type == 'array':
                 sub_type = props[field]['items']['type']
-        return self.process_field_value(type, value, sub_type)
+        return self.cast_field_value(type, value, sub_type)
 
-    def record_to_variant(self, record):
+    def create_variant_from_record(self, record):
         """ Produces a dictionary containing all the annotation fields for this record
 
         Each MUTANNO tag in the annotated VCF corresponds to an annotation field
@@ -254,41 +302,38 @@ class VCFParser(object):
             # handle non-annotation fields
             if key not in self.annotation_keys:
                 if record.INFO.get(key, None):
-                    val = self.process_variant_value(key, record.INFO.get(key), fail=False)
+                    val = self.validate_variant_value(key, record.INFO.get(key), fail=False)
                     if val is not None:
                         result[key] = val
                 continue
 
             # handle annotation fields
-            annotations = None
             raw = record.INFO.get(key, None)
             if raw:
-                annotations = self.parse_annotation_field(raw)
+                annotations = self.parse_annotation_field_value(raw)
+            else:
+                continue
+            # annotation could be multi-valued split into groups
+            for g_idx, group in enumerate(annotations):
 
-            # if this annotation field has values, process them
-            if annotations:
+                # in nearly all cases there are multiple fields. match them
+                # up with format
+                for f_idx, field in enumerate(group):
+                    if field:
+                        fn = self.format[key][f_idx]
+                        if fn == self.DROPPED_FIELD:
+                            continue
 
-                # annotation could be multi-valued split into groups
-                for g_idx, group in enumerate(annotations):
-
-                    # in nearly all cases there are multiple fields. match them
-                    # up with format
-                    for f_idx, field in enumerate(group):
-                        if field:
-                            fn = self.format[key][f_idx]
-                            if fn == 'DROPPED':
-                                continue
-
-                            # handle sub-embedded
-                            if key in self.sub_embedded_mapping:
-                                sub_embedded_group = self.sub_embedded_mapping[key]
-                                if sub_embedded_group not in result:  # create sub-embedded group if not there
-                                    result[sub_embedded_group] = {}
-                                if g_idx not in result[sub_embedded_group]:
-                                    result[sub_embedded_group][g_idx] = {}
-                                result[sub_embedded_group][g_idx][fn] = self.process_variant_value(fn, field, key)
-                            else:
-                                result[fn] = self.process_variant_value(fn, field, key)
+                        # handle sub-embedded
+                        if key in self.sub_embedded_mapping:
+                            sub_embedded_group = self.sub_embedded_mapping[key]
+                            if sub_embedded_group not in result:  # create sub-embedded group if not there
+                                result[sub_embedded_group] = {}
+                            if g_idx not in result[sub_embedded_group]:
+                                result[sub_embedded_group][g_idx] = {}
+                            result[sub_embedded_group][g_idx][fn] = self.validate_variant_value(fn, field, key)
+                        else:
+                            result[fn] = self.validate_variant_value(fn, field, key)
         return result
 
     @staticmethod
@@ -325,7 +370,7 @@ class VCFParser(object):
         result['GQ'] = sample.GQ
         result['PL'] = sample.PL
 
-    def record_to_sample_variant(self, record):
+    def create_sample_variant_from_record(self, record):
         """ Parses the given record to produce the sample variant
 
         Args:
@@ -345,9 +390,9 @@ class VCFParser(object):
                 prop_type = props[field]['type']
                 if prop_type == 'array':
                     sub_type = props[field]['items']['type']
-                    result[field.upper()] = self.process_field_value(prop_type, val, sub_type)
+                    result[field.upper()] = self.cast_field_value(prop_type, val, sub_type)
                 else:
-                    result[field.upper()] = self.process_field_value(prop_type, val)
+                    result[field.upper()] = self.cast_field_value(prop_type, val)
         self.parse_samples(result, record) # add sample fields, already formatted
         return result
 
@@ -366,8 +411,8 @@ class VCFParser(object):
         """
         variant_samples, variants = [], []
         for record in self:
-            vs = self.record_to_sample_variant(record)
-            v = self.record_to_variant(record)
+            vs = self.create_sample_variant_from_record(record)
+            v = self.create_variant_from_record(record)
             if project:
                 vs['project'] = project
                 v['project'] = project
