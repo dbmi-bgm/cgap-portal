@@ -302,7 +302,7 @@ class VCFParser(object):
             # handle non-annotation fields
             if key not in self.annotation_keys:
                 if record.INFO.get(key, None):
-                    val = self.validate_variant_value(key, record.INFO.get(key), fail=False)
+                    val = self.validate_variant_value(key, record.INFO.get(key), exit_on_validation=False)
                     if val is not None:
                         result[key] = val
                 continue
