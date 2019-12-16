@@ -326,8 +326,6 @@ class AnnotationField(Item):
     name_key = 'field_name'
     schema = load_schema('encoded:schemas/annotation_field.json')
 
-    embedded_list = Item.embedded_list
-
 
 @collection(
     name='variants',
@@ -340,7 +338,7 @@ class Variant(Item):
 
     item_type = 'variant'
     schema = load_schema('encoded:schemas/variant.json')
-    embedded_list = Item.embedded_list
+
 
 @collection(
     name='variant-samples',
@@ -353,4 +351,3 @@ class VariantSample(Item):
 
     item_type = 'variant_sample'
     schema = load_schema('encoded:schemas/variant_sample.json')
-    embedded_list = Item.embedded_list
