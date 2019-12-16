@@ -43,6 +43,7 @@ def test_VCFP_one_variant(test_vcf):
     """
     Tests that we can correctly process a single VCF variant
     Checks many specific things about the record for correctness
+    For all the following tests we check a 'representative subset' of information
     """
     record = test_vcf.read_next_record()
     result = test_vcf.create_variant_from_record(record)
@@ -65,19 +66,7 @@ def test_VCFP_multiple_variants(test_vcf):
     """
     Tests that we can correctly process an annotated VCF with multiple records
     """
-    record = test_vcf.read_next_record()
-    result = test_vcf.create_variant_from_record(record)
-    # check all the same things as the previous test, as they should be the same
-    assert result['annovar_cytoband'] == '1p36.33'
-    assert result['dbnsfp_genocanyon_score'] == 0.999999999998938
-    assert result['clinvar_alleleid'] == '244110'
-    assert result['clinvar_clnvcso'] == 'SO:0001483'
-    assert result['transcript'][0]['vep_feature'] == 'ENST00000379370'
-    assert result['transcript'][1]['vep_feature'] == 'ENST00000620552'
-    assert result['transcript'][0]['vep_pheno'] == ['1', '1']
-    assert result['transcript'][0]['vep_codons'] == 'Ggc/Agc'
-    assert result['transcript'][0]['dbnsfptranscript_sift4g_pred'] == 'D'
-    assert result['transcript'][0]['dbnsfptranscript_mutationassessor_score'] == 2.19
+    test_VCFP_one_variant(test_vcf)  # run previous test
 
     # check record 2
     record = test_vcf.read_next_record()
@@ -163,7 +152,7 @@ def test_VCFP_post_variants(testapp, institution, project, test_vcf):
 
 def test_VCFP_run(testapp, institution, project, test_vcf):
     """ Tests the 'run' method, which processes all the VCF records
-        Actaul results are already validated in previous 3 tests, just
+        Actual results are already validated in previous 3 tests, just
         check to see that we get the 3 that we expect and they post correctly
     """
     vss, vs = test_vcf.run(project='encode-project', institution='encode-institution')
