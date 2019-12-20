@@ -512,7 +512,7 @@ def build_query(search, prepared_terms, source_fields):
     # prepare the query from prepared_terms
     for field, value in prepared_terms.items():
         if field == 'q':
-            query_info['query'] = value[:MAX_NGRAM]
+            query_info['query'] = value
             query_info['lenient'] = True
             query_info['default_operator'] = 'AND'
             query_info['fields'] = ['_all']
