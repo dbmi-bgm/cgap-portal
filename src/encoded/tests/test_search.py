@@ -123,7 +123,7 @@ def test_search_ngram(workbook, testapp):
     res = testapp.get('/search/?type=Item&q=Second+Dummy+Sub+Disorder').json
     assert len(res['@graph']) == 1
     # run search with q=Du (should get nothing since max_ngram=3)
-    testapp.get('/search/?type=Item&q=Du', status=404)
+    testapp.get('/search/?type=Item&q=D', status=404)
     # run search with q=ummy (should get nothing since we are using edge ngrams)
     testapp.get('/search/?type=Item&q=ummy', status=404)
 
