@@ -93,31 +93,39 @@ def test_search_with_embedding(workbook, testapp):
 
 
 def test_search_with_simple_query(workbook, testapp):
-    # run a simple query with type=Disorder and q=Sub
-    res = testapp.get('/search/?type=Disorder&q=Sub').json
-    assert len(res['@graph']) > 0
+    """
+    Tests simple query string searches on CGAP using type-based
+    q= and generic q=
+    """
+    # run a simple query with type=Disorder and q=Dummy
+    res = testapp.get('/search/?type=Disorder&q=Dummy').json
+    assert len(res['@graph']) == 3
     # get the uuids from the results
-    mouse_uuids = [org['uuid'] for org in res['@graph'] if 'uuid' in org]
+    dummy_uuids = [org['uuid'] for org in res['@graph'] if 'uuid' in org]
     # run the same search with type=Item
-    res = testapp.get('/search/?type=Item&q=Sub').json
-    assert len(res['@graph']) > 0
+    res = testapp.get('/search/?type=Item&q=Dummy').json
+    assert len(res['@graph']) >= 3
     all_uuids = [item['uuid'] for item in res['@graph'] if 'uuid' in item]
     # make sure all uuids found in the first search are present in the second
-    assert set(mouse_uuids).issubset(set(all_uuids))
-    # run with q=mous returns the same hits...
-    res = testapp.get('/search/?type=Item&q=Su').json
-    mous_uuids = [item['uuid'] for item in res['@graph'] if 'uuid' in item]
+    assert set(dummy_uuids).issubset(set(all_uuids))
+    # run with q=Dum returns the same hits...
+    res = testapp.get('/search/?type=Item&q=Dum').json
+    dum_uuids = [item['uuid'] for item in res['@graph'] if 'uuid' in item]
     # make sure all uuids found in the first search are present in the second
-    assert set(mouse_uuids).issubset(set(mous_uuids))
-    # run with q=mauze (misspelled) and ensure uuids are not in results
-    res = testapp.get('/search/?type=Item&q=mauxz', status=[200, 404]).json
-    # make this test robust by either assuming no results are found
-    # (true when this test was written)
-    # OR that results that happen to contain "mauze" do not include what
-    # we're looking for.
-    mauxz_uuids = [item['uuid'] for item in res['@graph'] if 'uuid' in item]
-    # make sure all uuids found in the first search are present in the second
-    assert not set(mouse_uuids).issubset(set(mauxz_uuids))
+    assert set(dummy_uuids).issubset(set(dum_uuids))
+
+
+def test_search_ngram(workbook, testapp):
+    """
+    Tests edge-ngram related behavior with simple query string
+    """
+    # test search beyond max-ngram, should still give one result
+    res = testapp.get('/search/?type=Item&q=Second+Dummy+Sub+Disorder').json
+    assert len(res['@graph']) == 1
+    # run search with q=Du (should get nothing since max_ngram=3)
+    testapp.get('/search/?type=Item&q=Du', status=404)
+    # run search with q=ummy (should get nothing since we are using edge ngrams)
+    testapp.get('/search/?type=Item&q=ummy', status=404)
 
 
 @pytest.mark.skip # XXX: What is this really testing?
