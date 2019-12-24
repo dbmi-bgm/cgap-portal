@@ -113,12 +113,21 @@ def test_search_with_simple_query(workbook, testapp):
     dum_uuids = [item['uuid'] for item in res['@graph'] if 'uuid' in item]
     # make sure all uuids found in the first search are present in the second
     assert set(dummy_uuids).issubset(set(dum_uuids))
+    # should eliminate first and third level disorders
+    res = testapp.get('/search/?type=Disorder&q=Sub+-Second').json
+    assert len(res['@graph']) == 1
+    # include first level
+    res = testapp.get('/search/?type=Disorder&q=(Sub+-Second) | oranges').follow().json
+    assert len(res['@graph']) == 2
+    # exclude all
+    res = testapp.get('/search/?type=Disorder&q=(oranges)+(apples)+(bananas)', status=404
 
 
 def test_search_ngram(workbook, testapp):
     """
     Tests edge-ngram related behavior with simple query string
     """
+    from snovault.elasticsearch.create_mapping import MAX_NGRAM
     # test search beyond max-ngram, should still give one result
     res = testapp.get('/search/?type=Item&q=Second+Dummy+Sub+Disorder').json
     assert len(res['@graph']) == 1
@@ -126,6 +135,18 @@ def test_search_ngram(workbook, testapp):
     testapp.get('/search/?type=Item&q=D', status=404)
     # run search with q=ummy (should get nothing since we are using edge ngrams)
     testapp.get('/search/?type=Item&q=ummy', status=404)
+    # test ngram on upper bound
+    res1 = testapp.get('/search/?type=Item&q=information').json
+    assert len(res) > 0
+    # should get same results
+    res2 = testapp.get('/search/?type=Item&q=informatio').json
+    # should have same results in res1
+    assert len(res1['@graph']) == len(res2['@graph'])
+    # should get nothing
+    testapp.get('/search/?type=Item&q=informatix', status=404)
+    # will get same results as res1 and res2
+    res3 = testapp.get('/search/?type=Item&q=informatioabd').json
+    assert len(res2) == len(res3)
 
 
 @pytest.mark.skip # XXX: What is this really testing?
