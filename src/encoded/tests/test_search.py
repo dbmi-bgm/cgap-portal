@@ -137,7 +137,7 @@ def test_search_ngram(workbook, testapp):
     testapp.get('/search/?type=Item&q=ummy', status=404)
     # test ngram on upper bound
     res1 = testapp.get('/search/?type=Item&q=information').json
-    assert len(res) > 0
+    assert len(res1['@graph']) > 0
     # should get same results
     res2 = testapp.get('/search/?type=Item&q=informatio').json
     # should have same results in res1
@@ -146,7 +146,18 @@ def test_search_ngram(workbook, testapp):
     testapp.get('/search/?type=Item&q=informatix', status=404)
     # will get same results as res1 and res2
     res3 = testapp.get('/search/?type=Item&q=informatioabd').json
-    assert len(res2) == len(res3)
+    assert len(res2['@graph']) == len(res3['@graph'])
+    # search for part of uuid common, should get all 3
+    res4 = testapp.get('/search/?type=Disorder&q=231111bc').json
+    assert len(res4['@graph']) == 3
+    # search for full uuid
+    res5 = testapp.get('/search/?type=Disorder&q=231111bc-8535-4448-903e-854af460b25').json
+    assert len(res4['@graph']) == 3
+    # uuid difference beyond 10
+    res6 = testapp.get('/search/?type=Disorder&q=231111bc-89').json
+    assert len(res4['@graph']) == 3
+    # uuid difference at 10 (should get no results)
+    testapp.get('/search/?type=Disorder&q=231111bc-9', status=404)
 
 
 @pytest.mark.skip # XXX: What is this really testing?
