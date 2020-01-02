@@ -120,7 +120,7 @@ def test_search_with_simple_query(workbook, testapp):
     res = testapp.get('/search/?type=Disorder&q=(Sub+-Second) | oranges').follow().json
     assert len(res['@graph']) == 2
     # exclude all
-    res = testapp.get('/search/?type=Disorder&q=(oranges)+(apples)+(bananas)', status=404
+    res = testapp.get('/search/?type=Disorder&q=(oranges)+(apples)+(bananas)', status=404)
 
 
 def test_search_ngram(workbook, testapp):
