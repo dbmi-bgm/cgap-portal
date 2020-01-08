@@ -2,15 +2,17 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
+import memoize from 'memoize-one';
 import url from 'url';
 import _ from 'underscore';
-import { DropdownItem, DropdownButton } from 'react-bootstrap';
-//import { DropdownItem, DropdownButton } from '@hms-dbmi-bgm/shared-portal-components/es/components/forms/components/DropdownButton';
-import { Fade } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/Fade';
-import { console, searchFilters } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
+import { console, searchFilters, isSelectAction, memoizedUrlParse } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { navigate } from './../../util';
 
 
+/**
+ * @todo if needed later (sync w. 4DN) -
+ * getDropdownTitleText, onChangeSearchItemType, onToggleVisibility, ...
+ */
 export class SearchBar extends React.PureComponent{
 
     static renderHiddenInputsForURIQuery(query){
@@ -32,33 +34,65 @@ export class SearchBar extends React.PureComponent{
         return (typedSearchQuery && typeof typedSearchQuery === 'string' && typedSearchQuery.length > 0) || false;
     }
 
+    // This used to accept searchItemType (current) also; unsure if it was useful..
+    static deriveSearchItemTypeFromContextType(atType = ["Item"]) {
+        if (atType.indexOf("Search") > -1) {
+            return "within";
+        }
+        return "all";
+    }
+
+    static buildURIQuery(searchItemType, currentAction, hrefParts = {}){
+        const query = {};
+        if (searchItemType === 'within' || isSelectAction(currentAction)) {  // Preserve filters, incl type facet.
+            _.extend(query,
+                _.omit(hrefParts.query || {}, 'q')  // Remove 'q' as is provided via the <input name="q" .../> element.
+            );
+        } else if (searchItemType === 'all') {      // Don't preserve _any_ filters (expsettype=replicates, type=expset, etc.) - reinit with type=Item
+            _.extend(query, { 'type': 'Item' });
+        } else {
+            throw new Error("No valid searchItemType provided");
+        }
+        return query;
+    }
+
     constructor(props){
         super(props);
-        //this.toggleSearchAllItems   = this.toggleSearchAllItems.bind(this);
         this.onSearchInputChange    = this.onSearchInputChange.bind(this);
         this.onResetSearch          = this.onResetSearch.bind(this);
         this.onSearchInputBlur      = this.onSearchInputBlur.bind(this);
-        //this.selectItemTypeDropdown = this.selectItemTypeDropdown.bind(this);
 
-        var initialQuery = '';
+        let initialQuery = '';
         if (props.href){
             initialQuery = searchFilters.searchQueryStringFromHref(props.href) || '';
         }
+
+        this.memoized = {
+            buildURIQuery: memoize(SearchBar.buildURIQuery),
+            deriveSearchItemTypeFromContextType: memoize(SearchBar.deriveSearchItemTypeFromContextType)
+        };
+
         this.state = {
-            'searchAllItems'    : props.href && navigate.isSearchHref(props.href),
+            //'isVisible'         : false, // Not used atm
+            'searchItemType'    : this.memoized.deriveSearchItemTypeFromContextType(props.context['@type']), // Not used atm - theoreitcally later could have "cohorts", "all", "individual", ...
             'typedSearchQuery'  : initialQuery
         };
+
     }
 
-    componentDidUpdate(pastProps){
-        const { href } = this.props;
-        if (pastProps.href !== href){
-            const query = searchFilters.searchQueryStringFromHref(href) || '';
-            this.setState(function({ typedSearchQuery }){
-                if (query !== typedSearchQuery){
-                    return { 'typedSearchQuery' : query };
-                }
-                return null;
+    componentDidUpdate(pastProps) {
+        const { href, currentAction, context } = this.props;
+        const { href: pastHref } = pastProps;
+
+        if (pastHref !== href) {
+            this.setState(({ isVisible, searchItemType })=>{
+                const typedSearchQuery = searchFilters.searchQueryStringFromHref(href) || '';
+                return {
+                    // We don't want to hide if was already open.
+                    //isVisible : isSelectAction(currentAction) || isVisible || SearchBar.hasInput(typedSearchQuery) || false,
+                    typedSearchQuery,
+                    searchItemType: this.memoized.deriveSearchItemTypeFromContextType(context['@type'])
+                };
             });
         }
     }
@@ -69,21 +103,6 @@ export class SearchBar extends React.PureComponent{
         }
         return (hrefParts && hrefParts.query && hrefParts.query.q) || null;
     }
-
-    /*
-    toggleSearchAllItems(willSearchAllItems = !this.state.searchAllItems){
-        this.setState(function({ searchAllItems }){
-            if (typeof willSearchAllItems === 'boolean'){
-                if (willSearchAllItems === searchAllItems){
-                    return null;
-                }
-                return { 'searchAllItems' : willSearchAllItems };
-            } else {
-                return { 'searchAllItems' : !searchAllItems };
-            }
-        });
-    }
-    */
 
     onSearchInputChange(e){
         const newValue = e.target.value;
@@ -117,7 +136,7 @@ export class SearchBar extends React.PureComponent{
     selectItemTypeDropdown(visible = false){
         const { currentAction } = this.props;
         const { searchAllItems } = this.state;
-        if (currentAction === 'selection') return null;
+        if (isSelectAction(currentAction)) return null;
         return (
             <Fade in={visible} appear>
                 <DropdownButton id="search-item-type-selector" bsSize="sm" pullRight
@@ -137,24 +156,24 @@ export class SearchBar extends React.PureComponent{
 
     render() {
         const { href, currentAction } = this.props;
-        const { typedSearchQuery } = this.state;
-        const hrefParts           = url.parse(href, true);
+        const { typedSearchQuery, searchItemType, isVisible = true } = this.state;
+
+        const hrefParts = memoizedUrlParse(href);
+
         const searchQueryFromHref = (hrefParts && hrefParts.query && hrefParts.query.q) || '';
-        const showingCurrentQuery = (searchQueryFromHref && searchQueryFromHref === typedSearchQuery);
-        const searchBoxHasInput   = SearchBar.hasInput(typedSearchQuery);
-        const query               = {}; // Don't preserve facets.
+        const searchTypeFromHref = (hrefParts && hrefParts.query && hrefParts.query.type) || '';
+        const showingCurrentQuery = (searchQueryFromHref && searchQueryFromHref === typedSearchQuery) && (
+            (searchTypeFromHref === 'Item' && searchItemType === 'all') || searchItemType === 'within'
+        );
+        const searchBoxHasInput = SearchBar.hasInput(typedSearchQuery);
+        const query = this.memoized.buildURIQuery(searchItemType, currentAction, hrefParts);
         const formClasses = [
             'form-inline',
             'navbar-search-form-container',
             searchQueryFromHref && 'has-query',
-            searchBoxHasInput && 'has-input'
+            searchBoxHasInput && 'has-input',
+            isVisible && "form-is-visible"
         ];
-
-        if (currentAction === 'selection' || currentAction === 'multiselect'){
-            _.extend(query, _.omit(hrefParts.query || {}, 'q')); // Preserve facets (except 'q'), incl type facet.
-        } else {
-            _.extend(query, { 'type' : 'Item' });                // Don't preserve facets (expsettype=replicates, type=expset, etc.)
-        }
 
         return ( // Form submission gets serialized and AJAXed via onSubmit handlers in App.js
             <form className={_.filter(formClasses).join(' ')} action="/search/" method="GET">
@@ -166,6 +185,7 @@ export class SearchBar extends React.PureComponent{
                         <i className="icon icon-fw icon-search fas"/>
                     </button>
                 ) }
+                { SearchBar.renderHiddenInputsForURIQuery(query) }
             </form>
         );
     }

@@ -9,14 +9,14 @@ import ReactTooltip from 'react-tooltip';
 var serialize = require('form-serialize');
 import { detect as detectBrowser } from 'detect-browser';
 import jsonScriptEscape from '../libs/jsonScriptEscape';
-import * as globals from './globals';
+import { content_views as globalContentViews, portalConfig, getGoogleAnalyticsTrackingID } from './globals';
 import ErrorPage from './static-pages/ErrorPage';
 import { NavigationBar } from './navigation/NavigationBar';
 import { Footer } from './Footer';
 import { store } from './../store';
 
 import { Alerts } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/Alerts';
-import { ajax, JWT, console, isServerSide, object, layout, analytics } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
+import { ajax, JWT, console, isServerSide, object, layout, analytics, memoizedUrlParse } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { Schemas, SEO, typedefs, navigate } from './util';
 import { requestAnimationFrame as raf } from '@hms-dbmi-bgm/shared-portal-components/es/components/viz/utilities';
 
@@ -24,22 +24,6 @@ import { PageTitleSection } from './PageTitleSection';
 
 // eslint-disable-next-line no-unused-vars
 const { NavigateOpts } = typedefs;
-
-
-/**
- * Title of app, used as appendix in browser <head> <title> and similar.
- */
-const PORTAL_TITLE = "Clinical Genomic Analysis Platform";
-
-
-const getGoogleAnalyticsTrackingID = memoize(function(href){
-    const { host } = url.parse(href);
-    if (host.indexOf('testportal.4dnucleome') > -1){
-        // TODO
-        return 'UA-86655305-2';
-    }
-    return null;
-});
 
 
 /**
@@ -391,7 +375,7 @@ export default class App extends React.PureComponent {
         if (!href) {
             href = propHref;
         }
-        const query = url.parse(href, true).query || {};
+        const query = memoizedUrlParse(href).query || {};
         let action = query.currentAction || null;
 
         // Handle list of values, e.g. if `currentAction=selection&currentAction=selection&currentAction=edit` or something is in URL.
@@ -445,13 +429,11 @@ export default class App extends React.PureComponent {
         // https://github.com/facebook/react/issues/1691
         if (event.isDefaultPrevented()) return;
         const { href } = this.props;
-        const { nativeEvent } = event;
-        let { target } = event;
+        const { nativeEvent, target: evtTarget } = event;
 
-        // SVG anchor elements have tagName == 'a' while HTML anchor elements have tagName == 'A'
-        while (target && (target.tagName.toLowerCase() != 'a' || target.getAttribute('data-href'))) {
-            target = target.parentElement;
-        }
+        // Might click on e.g. the <h4> within a <a href=... className="d-block"><h4>...</h4><span>...</span></a>
+        const target = layout.elementIsChildOfLink(evtTarget);
+
         if (!target) return;
 
         if (target.getAttribute('disabled')) {
@@ -490,18 +472,18 @@ export default class App extends React.PureComponent {
         if (this.historyEnabled) {
             event.preventDefault();
 
-            var tHrefParts   = url.parse(targetHref),
-                pHrefParts   = url.parse(href),
-                tHrefHash    = tHrefParts.hash,
-                samePath     = pHrefParts.path === tHrefParts.path,
-                navOpts      = {
-                    // Same pathname & search but maybe different hash. Don't add history entry etc.
-                    'replace'           : samePath,
-                    'skipRequest'       : samePath || !!(target.getAttribute('data-skiprequest')),
-                    'dontScrollToTop'   : samePath
-                },
-                targetOffset = target.getAttribute('data-target-offset'),
-                noCache      = target.getAttribute('data-no-cache');
+            const tHrefParts = url.parse(targetHref);
+            const pHrefParts = memoizedUrlParse(href);
+            let tHrefHash = tHrefParts.hash;
+            const samePath = pHrefParts.path === tHrefParts.path;
+            const navOpts = {
+                // Same pathname & search but maybe different hash. Don't add history entry etc.
+                'replace'           : samePath,
+                'skipRequest'       : samePath || !!(target.getAttribute('data-skiprequest')),
+                'dontScrollToTop'   : samePath
+            };
+            let targetOffset = target.getAttribute('data-target-offset');
+            const noCache = target.getAttribute('data-no-cache');
 
             // Don't cache requests to user profile.
             if (noCache) navOpts.cache = false;
@@ -529,7 +511,7 @@ export default class App extends React.PureComponent {
     handleSubmit(event) {
         const { href } = this.props;
         const { target } = event;
-        const hrefParts = url.parse(href);
+        const hrefParts = memoizedUrlParse(href);
 
         // Skip POST forms
         if (target.method !== 'get') return;
@@ -1101,7 +1083,7 @@ export default class App extends React.PureComponent {
      */
     render() {
         const { context, lastCSSBuildTime, href, contextRequest } = this.props;
-        const hrefParts       = url.parse(href);
+        const hrefParts       = memoizedUrlParse(href);
         const routeList       = hrefParts.pathname.split("/");
         const routeLeaf       = routeList[routeList.length - 1];
         const currentAction   = this.currentAction();
@@ -1214,23 +1196,24 @@ class HTMLTitle extends React.PureComponent {
 
     render() {
         const { canonical, currentAction, context, status, contentViews } = this.props;
+        const { title: portalTitle } = portalConfig;
         let title;
 
         if (canonical === "about:blank"){   // first case is fallback
-            title = PORTAL_TITLE;
+            title = portalTitle;
         } else if (status) {                // error catching
             title = 'Error';
         } else if (context) {               // What should occur (success)
 
-            const ContentView = (contentViews || globals.content_views).lookup(context, currentAction);
+            const ContentView = (contentViews || globalContentViews).lookup(context, currentAction);
 
             // Set browser window title.
             title = object.itemUtil.getTitleStringFromContext(context);
 
             if (title && title != 'Home') {
-                title = title + ' – ' + PORTAL_TITLE;
+                title = title + ' – ' + portalTitle;
             } else {
-                title = PORTAL_TITLE;
+                title = portalTitle;
             }
 
             if (!ContentView){ // Handle the case where context is not loaded correctly
@@ -1273,7 +1256,7 @@ const ContentRenderer = React.memo(function ContentRenderer(props){
     } else if (status) {                // error catching
         content = <ErrorPage currRoute={routeLeaf} status={status}/>;
     } else if (context) {               // What should occur (success)
-        const ContentView = (contentViews || globals.content_views).lookup(context, currentAction);
+        const ContentView = (contentViews || globalContentViews).lookup(context, currentAction);
 
         if (!ContentView){ // Handle the case where context is not loaded correctly
             content = <ErrorPage status={null}/>;

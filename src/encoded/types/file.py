@@ -704,7 +704,7 @@ def is_file_to_download(properties, file_format, expected_filename=None):
              permission='view', subpath_segments=[0, 1])
 def download(context, request):
     # first check for restricted status
-    if context.properties.get('status') == 'restricted':
+    if True:  # XXX: restrict all downloads for now
         raise HTTPForbidden('This is a restricted file not available for download')
     try:
         user_props = session_properties(request)
