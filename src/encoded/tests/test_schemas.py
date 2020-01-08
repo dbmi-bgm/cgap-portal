@@ -71,7 +71,8 @@ def test_load_schema(schema, master_mixins, registry):
         'quality_metric.json',
         'treatment.json',
         'workflow_run.json',
-        'user_content.json'
+        'user_content.json',
+        'evidence.json'
     ]
 
     loaded_schema = load_schema('encoded:schemas/%s' % schema)

@@ -7,6 +7,7 @@ from snovault import (
 from .base import (
     Item
 )
+# from .evidence import get_evidence_linked_items
 
 
 @collection(
@@ -29,6 +30,10 @@ class Phenotype(Item):
         'parents.hpo_id'
     ]
     name_key = 'hpo_id'
+    # rev = {
+    #     'as_subject_evidence': ('Evidence', 'subject_item'),
+    #     'as_object_evidence': ('Evidence', 'object_item'),
+    # }
 
     @calculated_property(schema={
         "title": "Display Title",
@@ -40,26 +45,16 @@ class Phenotype(Item):
             return phenotype_name
         return hpo_id
 
-    # def _update(self, properties, sheets=None):
-    #     '''set preferred_name field to term_name if it's not already populated
-    #     '''
-    #     if properties.get('preferred_name', None) is None:
-    #         termname = properties.get('term_name')
-    #         if termname:
-    #             properties['preferred_name'] = termname
-    #
-    #     super(Phenotype, self)._update(properties, sheets)
-
     # @calculated_property(schema={
-    #     "title": "Associated Disorders",
-    #     "description": "Disorders associated with this phenotype",
+    #     "title": "Linked Disorders",
+    #     "description": "Disorders linked to this Phenotye.",
     #     "type": "array",
-    #     "exclude_from": ["submit4dn", "FFedit-create"],
     #     "items": {
-    #         "title": "Disorder",
+    #         "title": "Linked Disorders",
     #         "type": "string",
     #         "linkTo": "Disorder"
     #     }
     # })
     # def associated_disorders(self, request):
-    #     return self.rev_link_atids(request, "associated_disorders")
+    #     evi_as_subj = self.rev_link_atids(request, 'as_object_evidence')
+    #     return get_evidence_linked_items(request, evi_as_subj, 'subject')
