@@ -6,41 +6,23 @@ import SubmissionView from '@hms-dbmi-bgm/shared-portal-components/es/components
 import CohortSubmissionView from './../item-pages/CohortView/CohortSubmissionView';
 
 
-export function getSubmissionItemTypes(context, href){
-    let principalTypes = context['@type'];
-    if (principalTypes[0] === 'Search' || principalTypes[0] === 'Browse'){
-        // If we're creating from search or browse page, use type from href.
-        const parsedHref = url.parse(href, true);
-        let typeFromHref = (parsedHref.query && parsedHref.query.type) || 'Item';
-        if (Array.isArray(typeFromHref)) {
-            [ typeFromHref ] = _.without(typeFromHref, 'Item');
-        }
-        if (typeFromHref && typeFromHref !== 'Item'){
-            principalTypes = [ typeFromHref ]; // e.g. ['ExperimentSetReplicate']
-        }
+export function getSubmissionItemType(context, href){
+    const { '@type': itemTypes = ["Item"] } = context;
+    let [ principalType ] = itemTypes;
+
+    const searchViewTypeMatch = principalType.match(/^(\w+)(SearchResults)$/); // Returns null or [ "ItemTypeSearchResults", "ItemType", "SearchResults" ]
+    if (Array.isArray(searchViewTypeMatch) && searchViewTypeMatch.length === 3){
+        // We're on a search results page. Parse out the proper 'type'.
+        [ , principalType ] = searchViewTypeMatch; // e.g. [ "PublicationSearchResults", >> "Publication" <<, "SearchResults" ]
+        return principalType;
     }
-    return principalTypes;
+
+    return principalType;
 }
 
 
 export default class CGAPSubmissionView extends React.PureComponent {
-
-    constructor(props){
-        super(props);
-        this.memoized = {
-            getSubmissionItemTypes: memoize(getSubmissionItemTypes)
-        };
-    }
-
     render(){
-        const { context, href, currentAction } = this.props;
-        const principalTypes = this.memoized.getSubmissionItemTypes(context, href);
-        const [ leafType ] = principalTypes;
-
-        if (leafType === "Cohort" && (currentAction === "add" || currentAction === "create")){
-            return <CohortSubmissionView {...this.props} />;
-        }
-
         return <SubmissionView {...this.props} />;
     }
 }

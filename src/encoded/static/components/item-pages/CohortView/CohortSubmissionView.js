@@ -130,6 +130,7 @@ export default class CohortSubmissionView extends React.PureComponent {
                     { cohortLink }
 
                     <PanelSelectionMenu {...{ panelIdx, panelsComplete, cohortItem }} onSelect={this.handleSelectPanel} />
+
                     <PanelOne {...this.props} {...this.state} userDetails={userDetails} markCompleted={this.markCompleted}
                         onLoadUser={this.handleLoadedUser} onSubmitCohort={this.handleLoadedCohort} />
 
@@ -854,5 +855,4 @@ const CohortSubmissionViewPageTitle = React.memo(function CohortSubmissionViewPa
 });
 
 pageTitleViews.register(CohortSubmissionViewPageTitle, "Cohort", "create");
-pageTitleViews.register(CohortSubmissionViewPageTitle, "Cohort", "add");
-
+pageTitleViews.register(CohortSubmissionViewPageTitle, "CohortSearchResults", "add");

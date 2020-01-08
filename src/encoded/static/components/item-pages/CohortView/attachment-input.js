@@ -2,7 +2,7 @@
 
 import React from 'react';
 import url from 'url';
-import { console, layout, ajax, object } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
+import { console, layout, ajax, object, memoizedUrlParse } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { Alerts } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/Alerts';
 
 
@@ -27,7 +27,7 @@ export class AttachmentInputController extends React.PureComponent {
         this.setState({ loading: true }, ()=>{
             const attachment_props = {};
             const { context: { uuid: cohort_uuid }, href, onAddedFamily } = this.props;
-            const { host } = url.parse(href);
+            const { host } = memoizedUrlParse(href);
             let config_uri;
             if (host.indexOf('localhost') > -1){
                 config_uri = 'development.ini';
