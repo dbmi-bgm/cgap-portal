@@ -22,7 +22,7 @@ from snovault.crud_views import (
     item_edit,
 )
 from snovault.attachment import ItemWithAttachment
-from snovault import debug_log
+from snovault.util import debug_log
 from .base import (
     Item,
     ALLOW_SUBMITTER_ADD,
