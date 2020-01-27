@@ -51,7 +51,7 @@ const getGoogleAnalyticsTrackingID = memoize(function(href){
         href = window.location.href;
     }
     const { host } = url.parse(href);
-    const hostnames = Object.keys(portalConfig.gaTrackingIDHostMap);
+    const hostnames = Object.keys(analyticsConfigurationOptions.hostnameTrackerIDMapping);
     for (var i = 0; i < hostnames.length; i++){
         if (host.indexOf(hostnames[i]) > -1) {
             return analyticsConfigurationOptions.hostnameTrackerIDMapping[hostnames[i]];
