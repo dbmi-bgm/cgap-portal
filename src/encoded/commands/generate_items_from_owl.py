@@ -733,10 +733,10 @@ def main():
         pretty = False
         if args.pretty:
             pretty = True
-        write_outfile(items2upd, postfile, pretty)
+        if postfile:
+            write_outfile(items2upd, postfile, pretty)
         if loaddb:
-            env = args.env if args.env else 'local'  # may want to change to use key/secret as option to get env
-            res = load_items(env, items2upd, itypes=[itype])
+            res = load_items(items2upd, itypes=[itype], auth=connection)
             logger.info(res)
             logger.info(json.dumps(items2upd, indent=4))
     stop = datetime.datetime.now()

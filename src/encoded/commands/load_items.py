@@ -56,10 +56,14 @@ def parse_args():
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
     parser.add_argument('json_input', help="File or datastructure containing json of items to load")
-    parser.add_argument('--env', default='local',
-                        help='Environment to update from. Defaults to local')
-    parser.add_argument('--key', help='Access key ID if using local')
-    parser.add_argument('--secret', help='Access key secret if using local')
+    parser.add_argument('--env',
+                        help='Environment to update from.')
+    parser.add_argument('--key',
+                        help="The keypair identifier from the keyfile")
+    parser.add_argument('--keyfile',
+                        default=os.path.expanduser("~/keypairs.json"),
+                        help="The keypair file.  Default is --keyfile=%s" %
+                             (os.path.expanduser("~/keypairs.json")))
     parser.add_argument('--patch-only', default=False,
                         action='store_true', help='Use if not posting any new items')
     parser.add_argument('--post-only', default=False,
@@ -72,18 +76,44 @@ def parse_args():
     return parser.parse_args()
 
 
-def set_load_params(env, key=None, secret=None):
+def get_auth(key=None, keyfile=None):
+    '''Sets up credentials for accessing the server.  Generates a key using info
+       from the named keyname in the keyfile and checks that the server can be
+       reached with that key.
+    '''
+    auth = None
+    if key and keyfile:
+        keys = None
+        if os.path.isfile(keyfile):
+            with open(keyfile, 'r') as kf:
+                keys_json_string = kf.read()
+                keys = json.loads(keys_json_string)
+        if keys:
+            auth = keys.get(key)
+    if not isinstance(auth, dict) or not {'key', 'secret', 'server'} <= set(auth.keys()):
+        logger.error("Authentication failed")
+    return auth
+
+
+def set_load_params(auth, env):
     # authentication with Fourfront
-    # TODO: add key secret server authentication - how to get server?
-    if env == 'local':
+    # auth is dict: key, secret, server - set config appropriately
+    if not auth or env:
+        return
+    if auth:
+        if auth.get('server') == 'http://localhost:8000':
+            config_uri = 'development.ini'
+        else:
+            config_uri = 'production.ini'
+    elif env == 'local':
         # prompt access key ID and secret from user
-        config_uri = 'development.ini'
-        local_id = key if key else input('[local access key ID] ')
-        local_secret = secret if secret else input('[local access key secret] ')
+        local_id = input('enter local access key ID: ')
+        local_secret = input('enter local access key secret: ')
         auth = {'key': local_id, 'secret': local_secret, 'server': 'http://localhost:8000'}
+        config_uri = 'development.ini'
     else:
-        config_uri = 'production.ini'
         auth = ff_utils.get_authentication_with_server(None, env)
+        config_uri = 'production.ini'
     return auth, config_uri
 
 
@@ -114,13 +144,13 @@ def load_json_to_store(json_input, itype=None):
         return{}
 
 
-def load_items(env, json_input, itypes=None, key=None, secret=None, patch_only=False, post_only=False):
+def load_items(json_input, itypes=None, env=None, auth=None, patch_only=False, post_only=False):
     """
     Load a given JSON file with items inserts or a python dict keyed by item type
     or a list (as long as a single itype param value is provided) to a server using
     the `load_data` endpoint defined in loadxl.
     """
-    auth, config_uri = set_load_params(env, key, secret)
+    auth, config_uri = set_load_params(auth, env)
     load_endpoint = '/'.join([auth['server'], 'load_data'])
     logger.info('load_items: Starting POST to %s' % load_endpoint)
     json_data = {'config_uri': config_uri, 'overwrite': True, 'iter_response': True,
@@ -175,7 +205,9 @@ def main():
     # Loading app will have configured from config file. Reconfigure here:
     logging.getLogger('encoded').setLevel(logging.INFO)
     args = parse_args()
-    load_items(args.env, args.json_input, args.item_types, args.key, args.secret, args.patch_only)
+    if not args.env and args.key:
+        auth = get_auth(args.key, args.keyfile)
+    load_items(args.json_input, args.item_types, args.env, auth, args.patch_only)
     logger.info("DONE!")
 
 
