@@ -22,6 +22,7 @@ from snovault.crud_views import (
     item_edit,
 )
 from snovault.attachment import ItemWithAttachment
+from snovault import debug_log
 from .base import (
     Item,
     ALLOW_SUBMITTER_ADD,
@@ -608,6 +609,7 @@ class FileReference(File):
 
 @view_config(name='upload', context=File, request_method='GET',
              permission='edit')
+@debug_log
 def get_upload(context, request):
     external = context.propsheets.get('external', {})
     upload_credentials = external.get('upload_credentials')
@@ -628,6 +630,7 @@ def get_upload(context, request):
 
 @view_config(name='upload', context=File, request_method='POST',
              permission='edit', validators=[schema_validator({"type": "object"})])
+@debug_log
 def post_upload(context, request):
     properties = context.upgrade_properties()
     if properties['status'] not in ('uploading', 'to be uploaded by workflow', 'upload failed'):
@@ -1026,6 +1029,7 @@ def validate_extra_file_format(context, request):
 @view_config(context=File.Collection, permission='add_unvalidated', request_method='POST',
              validators=[no_validate_item_content_post],
              request_param=['validate=false'])
+@debug_log
 def file_add(context, request, render=None):
     return collection_add(context, request, render)
 
@@ -1058,5 +1062,6 @@ def file_add(context, request, render=None):
                          validate_processed_file_unique_md5_with_bypass,
                          validate_processed_file_produced_from_field],
             request_param=['check_only=true'])
+@debug_log
 def file_edit(context, request, render=None):
     return item_edit(context, request, render)

@@ -5,6 +5,7 @@ from copy import (
 from pyramid.view import view_config
 from pyramid.httpexceptions import HTTPBadRequest
 from snovault import CONNECTION
+from snovault.util import debug_log
 from .types.base import Item
 from .types.workflow import (
     trace_workflows,
@@ -26,6 +27,7 @@ def includeme(config):
 
 # TODO: figure out how to make one of those cool /file/ACCESSION/@@download/-like URLs for this.
 @view_config(route_name='trace_workflow_runs', request_method='GET', permission='view', context=Item)
+@debug_log
 def trace_workflow_runs(context, request):
     '''
     Traces workflow runs from context (an Item instance), which may be one of the following @types:

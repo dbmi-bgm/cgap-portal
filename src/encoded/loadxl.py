@@ -9,7 +9,7 @@ from past.builtins import basestring
 from pyramid.view import view_config
 from pyramid.paster import get_app
 from pyramid.response import Response
-from datetime import datetime
+from snovault.util import debug_log
 from base64 import b64encode
 from PIL import Image
 
@@ -69,6 +69,7 @@ class LoadGenWrapper(object):
 
 
 @view_config(route_name='load_data', request_method='POST', permission='add')
+@debug_log
 def load_data_view(context, request):
     '''
     expected input data
