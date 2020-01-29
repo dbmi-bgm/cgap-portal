@@ -26,7 +26,11 @@ def includeme(config):
 
 
 @server_default
-def userid(instance, subschema):
+def userid(instance, subschema):  # args required by jsonschema-serialize-fork
+    return _userid()
+
+
+def _userid():
     request = get_current_request()
     for principal in request.effective_principals:
         if principal.startswith('userid.'):
@@ -35,7 +39,11 @@ def userid(instance, subschema):
 
 
 @server_default
-def now(instance, subschema):
+def now(instance, subschema):  # args required by jsonschema-serialize-fork
+    return utc_now_str()
+
+
+def utc_now_str():
     # from jsonschema_serialize_fork date-time format requires a timezone
     return datetime.utcnow().isoformat() + '+00:00'
 
@@ -59,6 +67,40 @@ def accession(instance, subschema):
             continue
         return new_accession
     raise AssertionError("Free accession not found in %d attempts" % ATTEMPTS)
+
+
+def get_userid():
+    """ Wrapper for the server_default 'userid' above so it is not called through SERVER_DEFAULTS in our code """
+    return _userid()
+
+
+def get_now():
+    """ Wrapper for the server_default 'now' above so it is not called through SERVER_DEFAULTS in our code """
+    return utc_now_str()
+
+
+def add_last_modified(properties, userid=None):
+    """
+        Uses the above two functions to add the last_modified information to the item
+        May have no effect
+        Allow someone to override the request userid (none in this case) by passing in a different uuid
+    """
+    try:
+        last_modified = {
+            'modified_by': get_userid(),
+            'date_modified': get_now(),
+        }
+    except AttributeError:  # no request in scope ie: we are outside the core application.
+        if userid:
+            last_modified = {
+                'modified_by': userid,
+                'date_modified': get_now(),
+            }
+            properties['last_modified'] = last_modified
+    else:
+        # get_userid returns NO_DEFAULT if no userid
+        if last_modified['modified_by'] != NO_DEFAULT:
+            properties['last_modified'] = last_modified
 
 
 #FDN_ACCESSION_FORMAT = (digits, digits, digits, ascii_uppercase, ascii_uppercase, ascii_uppercase)
