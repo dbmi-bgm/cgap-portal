@@ -80,6 +80,8 @@ FIELD_MAPPING = {
     'Biocuration': 'curation_history'
 }
 
+RELATION = 'associated with'
+
 
 def convert2raw(item):
     # need to remove properties not generated from file eg. calc props and others
@@ -319,6 +321,7 @@ def main():  # pragma: no cover
             if pheno_annot in evidence_items:
                 problems.setdefault('redundant_annot', []).append(pheno_annot)  # (data, dis2pheno[ppos]))
                 continue
+            pheno_annot['relationship_name'] = RELATION
             evidence_items.append(pheno_annot)
     logger.info("after parsing annotation file we have {} evidence items".format(len(evidence_items)))
 
@@ -336,7 +339,7 @@ def main():  # pragma: no cover
         tochk = convert2raw(db_evi)
         if tochk in evidence_items:
             existing += 1
-            evidence_items.remove(db_evi)
+            evidence_items.remove(tochk)
         else:
             uids2obsolete.append(db_evi.get('uuid'))
     logger.info("result: {}".format(str(datetime.now())))
@@ -345,19 +348,18 @@ def main():  # pragma: no cover
     logger.info('{} NEW ITEMS TO BE LOADED TO DB'.format(len(evidence_items)))
     # let's add uuids to new items so second round will work
     [evi.update({'uuid': str(uuid4())}) for evi in evidence_items]
-    # for evi in evidence_items:
-    #    uid = str(uuid4())
-    #    evi['uuid'] = uid
     obs_patch = [{'uuid': uid, 'status': 'obsolete'} for uid in uids2obsolete]
-    patches = evidence_items + obs_patch
 
-    if patches:
+    if evidence_items or obs_patch:
         if postfile:
-            write_outfile(patches, postfile, args.pretty)
+            write_outfile([evidence_items, obs_patch], postfile, args.pretty)
         if loaddb:
-            env = args.env if args.env else 'local'  # may want to change to use key/secret as option to get env
-            res = load_items(env, patches, itypes=[itype])
-            logger.info(res)
+            if evidence_items:
+                res = load_items(evidence_items, itypes=[itype], auth=connection, post_only=True)
+                logger.info(res)
+            if obs_patch:
+                res2 = load_items(obs_patch, itypes=[itype], auth=connection, patch_only=True)
+                logger.info(res2)
             # logger.info(json.dumps(res, indent=4))
     if problems:
         # log problems

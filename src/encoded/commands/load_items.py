@@ -194,7 +194,7 @@ def load_items(json_input, itypes=None, env=None, auth=None, patch_only=False, p
                     % (num_to_load, len(load_res['POST']), len(load_res['PATCH']), len(load_res['SKIP'])))
         if load_res['ERROR']:
             logger.error("ERROR encountered during load_data! Error: %s" % load_res['ERROR'])
-        if (len(load_res['POST']) + len(load_res['SKIP'])) > len(load_res['PATCH']):
+        if not post_only and (len(load_res['POST']) + len(load_res['SKIP'])) > len(load_res['PATCH']):
             missed = set(load_res['POST'] + load_res['SKIP']) - set(load_res['PATCH'])
             logger.error("The following {} items passed round I (POST/skip) but not round II (PATCH): {}".format(len(missed), missed))
     logger.info("Finished request in %s" % str(datetime.now() - start))
