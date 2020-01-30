@@ -28,9 +28,8 @@ from encoded.commands.generate_items_from_owl import (
 '''logging setup
    logging config - to be moved to file at some point
 '''
-LOGFILE = 'upd_dis2pheno_annot.log'
+logfile = 'upd_dis2pheno_annot.log'
 logger = logging.getLogger(__name__)
-
 logging.config.dictConfig({
     'version': 1,
     'disable_existing_loggers': False,
@@ -52,7 +51,7 @@ logging.config.dictConfig({
             'level': 'INFO',
             'formatter': 'standard',
             'class': 'logging.FileHandler',
-            'filename': LOGFILE
+            'filename': logfile
         }
     },
     'loggers': {
@@ -185,7 +184,7 @@ def get_input_gen(input):
 
 def get_args():  # pragma: no cover
     parser = argparse.ArgumentParser(
-        description='Given an HPOA file or url for download generate phenotype annotations for that disorder as json and optionally load',
+        description='Given an HPOA file or url for download generate EvidenceDisPheno items and optionally load',
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
     parser.add_argument('--input',
@@ -353,7 +352,8 @@ def main():  # pragma: no cover
     patches = evidence_items + obs_patch
 
     if patches:
-        write_outfile(patches, postfile, args.pretty)
+        if postfile:
+            write_outfile(patches, postfile, args.pretty)
         if loaddb:
             env = args.env if args.env else 'local'  # may want to change to use key/secret as option to get env
             res = load_items(env, patches, itypes=[itype])
@@ -379,6 +379,8 @@ def main():  # pragma: no cover
     logger.info("FINISHED - START: {}\tEND: {}".format(start, str(end)))
     if args.post_report:
         post_report_document_to_portal(connection, itype)
+    dt = end.strftime("%y-%m-%d-%H-%M-%S")
+    os.rename(logfile, dt + logfile)
 
 
 if __name__ == '__main__':  # pragma: no cover

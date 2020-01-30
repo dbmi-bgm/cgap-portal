@@ -269,7 +269,7 @@ def load_all(testapp, inserts, docsdir, overwrite=True, itype=None, from_json=Fa
     with the functionality of load_all_gen.
     """
     gen = LoadGenWrapper(
-        load_all_gen(testapp, inserts, docsdir, overwrite, itype, from_json, patch_only)
+        load_all_gen(testapp, inserts, docsdir, overwrite, itype, from_json, patch_only, post_only)
     )
     # run the generator; don't worry about the output
     for _ in gen:
@@ -295,7 +295,8 @@ def load_all_gen(testapp, inserts, docsdir, overwrite=True, itype=None, from_jso
         overwrite (bool)   : if the database contains the item already, skip or patch
         itype (list or str): limit selection to certain type/types
         from_json (bool)   : if set to true, inserts should be dict instead of folder name
-
+        patch_only (bool)  : if set to true will only do second round patch - no posts
+        post_only (bool)   : if set to true posts full item no second round or lookup - use with care - will not work if linkTos to items not in db yet
     Yields:
         Bytes with information on POSTed/PATCHed items
 
