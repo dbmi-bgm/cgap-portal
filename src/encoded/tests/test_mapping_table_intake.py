@@ -8,23 +8,23 @@ from encoded.commands.mapping_table_intake import (
 )
 
 pytestmark = [pytest.mark.working]
-MT_LOC = './src/encoded/commands/mp02.csv' # symlinked from encoded.commands
+MT_LOC = './src/encoded/tests/data/sample_vcfs/mtv03.csv' # symlinked from encoded.commands
 ANNOTATION_FIELD_SCHEMA = './src/encoded/schemas/annotation_field.json'
-EXPECTED_FIELDS = ['no', 'vcf_name_v0.2', 'source_name_v0.2', 'source_version_v0.2',
-                   'field_type', 'value_example', 'enum_list', 'is_list', 'sub_embedding_group',
-                   'separator', 'scale', 'domain', 'method', 'annotation_grouping', 'scope', 'schema_title', 'schema_description', 'source_name', 'source_version',
-                   'field_priority', 'column_priority', 'facet_grouping',
-                   'facet_priority', 'links_to', 'mvp']
-EXPECTED_INSERT = {'no': 1, 'vcf_name_v0.2': 'CHROM', 'source_name_v0.2': 'VCF',
-                   'source_version_v0.2': 'VCFv4.2', 'field_type': 'string',
-                   'value_example': '1', 'enum_list': ['1', '2', '3', '4', '5',
-                   '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16',
-                   '17', '18', '19', '20', '21', '22', 'X', 'Y', 'M'],
-                   'is_list': False, 'scope': 'variant', 'schema_title':
-                   'Chromosome', 'source_name': 'VCF', 'source_version': 'VCFv4.2',
-                   'field_priority': 1, 'column_priority': 1, 'facet_grouping':
-                   'Chromosome', 'mvp': True}
-MVP_EXPECTED = 608
+EXPECTED_FIELDS = ['no', 'vcf_name', 'source_name', 'source_version', 'sub_embedding_group', 
+                   'field_type', 'is_list', 'max_size', 'schema_description', 'value_example']
+EXPECTED_INSERT = {
+    'no': 1,
+    'vcf_name':'vep_consequence',
+    'source_name': 'VEP',
+    'source_version': 'v98.4',
+    'sub_embedding_group': 'transcript',
+    'field_type': 'string',
+    'is_list': True,
+    'max_size': 66,
+    'schema_description': 'Consequence type',
+    'value_example':'intron_variant;intron_variant~NMD_transcript_variant;intron_variant~non_coding_transcript_variant;regulatory_region_variant;splice_region_variant~intron_variant~non_coding_transcript_variant;splice_acceptor_variant~non_coding_transcript_variant;splice_region_variant~non_coding_transcript_exon_variant;non_coding_transcript_exon_variant;downstream_gene_variant;splice_region_variant~intron_variant;splice_donor_variant;splice_region_variant~5_prime_UTR_variant;5_prime_UTR_variant;splice_acceptor_variant;upstream_gene_variant;TF_binding_site_variant;splice_region_variant~intron_variant~NMD_transcript_variant;splice_donor_variant~NMD_transcript_variant;splice_donor_variant~non_coding_transcript_variant;splice_region_variant~5_prime_UTR_variant~NMD_transcript_variant'
+}
+NUMBER_ANNOTATION_FIELDS = 245
 SAMPLE_FIELDS_EXPECTED = 11
 VARIANT_FIELDS_EXPECTED = 597
 
@@ -63,24 +63,18 @@ def test_add_default_schema_fields(MTParser):
 
 def test_read_mapping_table(MTParser):
     """ Tests that we can read mapping table header correctly based on the current format """
-    assert MTParser.version == 'annV0.2'
-    assert MTParser.date == '11.08.19'
+    assert MTParser.version == 'annV0.3'
+    assert MTParser.date == '01.29.20'
     assert sorted(MTParser.fields) == sorted(EXPECTED_FIELDS)
 
 
 def test_process_mp_inserts(MTParser, inserts):
-    """ Tests that we properly process an inserts into mvp, sample, variant """
+    """ 
+        Tests that we properly process annotation field inserts
+        There should be 245 total. A hand crafted example is checked
+    """
     assert inserts[0] == EXPECTED_INSERT
-    mvp_list = [i for i in inserts if i.get('mvp')]
-    assert len(mvp_list) == MVP_EXPECTED
-    sample = [i for i in mvp_list if i.get('scope') == 'sample']
-    assert len(sample) == SAMPLE_FIELDS_EXPECTED
-    variant = [i for i in mvp_list if i.get('scope') != 'sample']
-    assert len(variant) == VARIANT_FIELDS_EXPECTED
-    variant = MTParser.filter_inserts_variant(inserts)
-    assert len(variant) == VARIANT_FIELDS_EXPECTED
-    sample = MTParser.filter_inserts_sample(inserts)
-    assert len(sample) == SAMPLE_FIELDS_EXPECTED
+    assert len(inserts) == NUMBER_ANNOTATION_FIELDS
 
 
 def test_generate_sample_json_items(MTParser, inserts):

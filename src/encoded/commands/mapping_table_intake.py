@@ -22,10 +22,10 @@ class MappingTableParser(object):
 
         XXX: Should Validate the annotation fields against the given schema?
     """
-    HEADER_ROW_INDEX = 3
-    FIELD_TYPE_INDEX = 4  # XXX: hardcoded, must change if field_type is moved on mapping table
-    INTEGER_FIELDS = ['field_priority', 'column_priority', 'facet_priority', 'no']
-    BOOLEAN_FIELDS = ['is_list', 'mvp']
+    HEADER_ROW_INDEX = 2
+    FIELD_TYPE_INDEX = 5  # XXX: hardcoded, must change if field_type is moved on mapping table
+    INTEGER_FIELDS = ['no', 'max_size']
+    BOOLEAN_FIELDS = ['is_list']
 
     def __init__(self, _mp, schema):
         self.mapping_table = _mp
@@ -105,14 +105,12 @@ class MappingTableParser(object):
             reader = csv.reader(f)
             for row_idx, row in enumerate(reader):
                 insert = {}
-                if row_idx < self.HEADER_ROW_INDEX: # skip header rows
+                if row_idx <= self.HEADER_ROW_INDEX: # skip header rows
                     continue
                 for field_name, entry in zip(self.fields, row):
                     # handle int fields
                     if field_name in self.INTEGER_FIELDS:
                         if entry:
-                            print(field_name)
-                            print(entry)
                             insert[field_name] = int(entry)
                     # handle bool fields
                     elif field_name in self.BOOLEAN_FIELDS:
@@ -121,22 +119,9 @@ class MappingTableParser(object):
                                 insert[field_name] = True
                             else:
                                 insert[field_name] = False
-                    elif field_name in ['enum_list']:
-                        if entry:
-                            field_type = row[self.FIELD_TYPE_INDEX]
-                            val_list = []
-                            if field_type == 'string':
-                                val_list = [en.strip() for en in entry.split(',') if en.strip()]
-                            elif field_type == 'number':
-                                val_list = [float(en.strip()) for en in entry.split(',') if en.strip()]
-                            elif field_type == 'integer':
-                                val_list = [int(en.strip()) for en in entry.split(',') if en.strip()]
-                            insert[field_name] = val_list
                     else: # handle all other fields if they exist
                         if entry:
                             insert[field_name] = entry
-                if not insert.get('mvp', False):  # ignore non-mvp items for now
-                    continue
                 inserts.append(insert)
         return inserts
 
