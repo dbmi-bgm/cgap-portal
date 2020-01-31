@@ -318,10 +318,10 @@ def main():  # pragma: no cover
             pheno_annot[cgf] = v
 
         if pheno_annot:
+            pheno_annot['relationship_name'] = RELATION
             if pheno_annot in evidence_items:
                 problems.setdefault('redundant_annot', []).append(pheno_annot)  # (data, dis2pheno[ppos]))
                 continue
-            pheno_annot['relationship_name'] = RELATION
             evidence_items.append(pheno_annot)
     logger.info("after parsing annotation file we have {} evidence items".format(len(evidence_items)))
 
