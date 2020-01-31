@@ -125,44 +125,70 @@ class MappingTableParser(object):
                 inserts.append(insert)
         return inserts
 
+
     @staticmethod
-    def filter_inserts_sample(inserts):
-        """ Filters inserts for those that are mvp and sample
-
-        Args:
-            inserts: all inserts produced by the previous function
-
-        Returns:
-            list of inserts that are 'samples'
+    def filter_fields_by_sample(inserts):
+        """ Returns annotation fields that belong on the sample variant schema
+        :param inserts: annotation field inserts processed from above
+        :return: only annotations fields that are part of the sample variant
         """
-        samples = [i for i in inserts if i.get('scope') == 'sample']
-        return samples
+        return [field for field in inserts if field.get('sub_embedding_group') == 'sample_variant']
+
 
     @staticmethod
-    def filter_inserts_variant(inserts):
-        """ Filters inserts for those that are mvp and not sample
-
-        Args:
-            inserts: all inserts produced by 'process_mp_inserts'
-
-        Returns:
-            list of inserts that are variants
+    def filter_fields_by_variant(inserts):
+        """ Returns annotation fields that belong on the variant schema
+        :param inserts: all raw annotation field inserts
+        :return: only annotation fields that are part of the sample variant
         """
-        variants = [i for i in inserts if i.get('scope') != 'sample']
-        return variants
+        return [field for field in inserts if field.get('sub_embedding_group', '') != 'sample_variant']
+
 
     @staticmethod
-    def generate_properties(inserts, variant=True):
+    def generate_sample_variant_properties(inserts):
+        """ Generates sample variant properties - due to changes in mapping table format this must now
+            be handled separately from variants
+
+        :param inserts: (PRE) annotation fields that belong to the sample variant
+        :return: dictionary of sample_variant properties
+        """
+        props = OrderedDict()
+
+        # get all fields first
+        for prop in inserts:
+            new_prop = OrderedDict()
+            new_prop['field_name'] = prop.get('vcf_name')
+            new_prop['source_name'] = prop.get('source_name')
+            new_prop['source_version'] = prop.get('source_version')
+            new_prop['type'] = prop.get('field_type')
+            new_prop['is_list'] = prop.get('is_list')
+            new_prop['max_size'] = prop.get('max_size')
+            new_prop['description'] = prop.get('schema_description')
+            new_prop['val_example'] = prop.get('value_example')
+            if new_prop['is_list']:
+                del new_prop['is_list']  # inner object is not a list
+                props[new_prop['field_name']] = {
+                    'title': new_prop['field_name'],
+                    'type': 'array',
+                    'items': new_prop
+                }
+            else:
+                props[new_prop['field_name']] = new_prop
+
+        return props
+
+
+    @staticmethod
+    def generate_variant_properties(inserts):
         """ Generates sample variant or variant schema properties
             This function is quite long and complicated... Should probably be
             refactored
 
         Args:
             inserts: result of one of the above two functions
-            variant: boolean indicating if we are building the variant schema
 
         Returns:
-            3 tuples of the properties, columns and facets
+            Returns variant item properties
         """
         props = OrderedDict()
         cols = OrderedDict()
@@ -170,77 +196,71 @@ class MappingTableParser(object):
 
         def get_prop(item):
             temp = OrderedDict()
-            prop_name = item['vcf_name_v0.2']
+            prop_name = item['vcf_name']
             features = OrderedDict()
             features.update({
-                "title": item.get('schema_title', 'None provided'),
+                "title": prop_name,
                 "vcf_name": prop_name,
                 "type": item['field_type']
             })
             if item.get('schema_description'):
                 features['description'] = item['schema_description']
-            if item.get('links_to'):
-                features['linkTo'] = item['links_to']
-            if item.get('enum_list'):
-                features['enum'] = item['enum_list']
-            if item.get('field_priority'):
-                features['lookup'] = item['field_priority']
 
-            for a_field in ['scale', 'domain', 'method', 'separator', 'source_name', 'source_version']:
+            for a_field in ['source_name', 'source_version']:
                 if item.get(a_field):
                     features[a_field] = item[a_field]
 
-            # handle sub_embedded object if we are doing variant
-            if variant:
-                if item.get('sub_embedding_group'):
-                    sub_temp = OrderedDict()
-                    prop = OrderedDict()
-                    sum_ob_name = item['sub_embedding_group']
-                    sub_title = sum_ob_name.replace("_", " ").title()
+            for a_field in ['max_size']:  # cast integer field
+                if item.get(a_field):
+                    features[a_field]= int(item[a_field])
 
-                    # handle sub-embedded object that is an array
-                    if item.get('is_list'):
-                        prop[prop_name] = {
-                            'title': item.get('schema_title', 'None provided'),
+            # handle sub_embedded object
+            if item.get('sub_embedding_group'):
+                sub_temp = OrderedDict()
+                prop = OrderedDict()
+                sum_ob_name = item['sub_embedding_group']
+                sub_title = sum_ob_name.replace("_", " ").title()
+
+                # handle sub-embedded object that is an array
+                if item.get('is_list'):
+                    prop[prop_name] = {
+                        'title': item.get('vcf_name', 'None provided'),
+                        'type': 'array',
+                        'items': features
+                    }
+                    sub_temp.update({
+                        'title': sum_ob_name,
+                        'type': 'object',
+                        'items': {
+                            'title': sub_title,
                             'type': 'array',
-                            'vcf_name': item['vcf_name_v0.2'],
-                            'items': features
-                        }
-                        sub_temp.update({
-                            "title": sum_ob_name,
-                            "type": "object",
-                            "items": {
-                                "title": sub_title,
-                                "type": "array",
-                                "properties": prop
-                                }
-                            })
-                    else:
-                        prop[prop_name] = features
-                        sub_temp.update({
+                            'properties': prop
+                            }
+                    })
+                else:
+                    prop[prop_name] = features
+                    sub_temp.update({
+                        "title": sub_title,
+                        "type": "object",
+                        "items": {
                             "title": sub_title,
                             "type": "object",
-                            "items": {
-                                "title": sub_title,
-                                "type": "object",
-                                "properties": prop
-                                }
-                            })
+                            "properties": prop
+                            }
+                        })
                     temp[sum_ob_name] = sub_temp
                     return temp
 
-            # convert to array sturcutre
+            # convert to array structure
             if item.get('is_list'):
                 array_item = OrderedDict()
                 array_item.update( {
-                    "title": item.get('schema_title', 'None provided'),
+                    "title": item.get('vcf_name'),
                     "type": "array",
-                    "vcf_name": item['vcf_name_v0.2']
+                    "vcf_name": item['vcf_name']
                 })
                 if item.get('schema_description'):
                     array_item['description'] = item['schema_description']
-                if item.get('field_priority'):
-                    array_item['lookup'] = item['field_priority']
                 array_item['items'] = features
                 temp[prop_name] = array_item
                 return temp
@@ -260,20 +280,17 @@ class MappingTableParser(object):
             return d
 
         for obj in inserts:
-            if variant:
-                update(props, get_prop(obj))
-                if obj.get('facet_priority'):
-                    facs[obj['vcf_name_v0.2']] = {'title': obj['schema_title']}
-                if obj.get('column_priority'):
-                    cols[obj['vcf_name_v0.2']] = {'title': obj['schema_title']}
-            else:
-                if obj.get('sub_embedding_group'):
-                    continue
-                props.update(get_prop(obj))
+            update(props, get_prop(obj))
+            if obj.get('facet_priority'):
+                facs[obj['vcf_name_v0.2']] = {'title': obj['schema_title']}
+            if obj.get('column_priority'):
+                cols[obj['vcf_name_v0.2']] = {'title': obj['schema_title']}
+            props.update(get_prop(obj))
 
         if not props:
             raise MappingTableIntakeException('Got no properties on schema!')
         return props, cols, facs
+
 
     @staticmethod
     def add_default_schema_fields(schema):

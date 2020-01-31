@@ -10,10 +10,10 @@ from encoded.commands.mapping_table_intake import (
 pytestmark = [pytest.mark.working]
 MT_LOC = './src/encoded/tests/data/sample_vcfs/mtv03.csv' # symlinked from encoded.commands
 ANNOTATION_FIELD_SCHEMA = './src/encoded/schemas/annotation_field.json'
-EXPECTED_FIELDS = ['no', 'vcf_name', 'source_name', 'source_version', 'sub_embedding_group', 
+EXPECTED_FIELDS = ['no', 'vcf_name', 'source_name', 'source_version', 'sub_embedding_group',
                    'field_type', 'is_list', 'max_size', 'schema_description', 'value_example']
 EXPECTED_INSERT = {
-    'no': 1,
+    'no': 18,
     'vcf_name':'vep_consequence',
     'source_name': 'VEP',
     'source_version': 'v98.4',
@@ -24,9 +24,10 @@ EXPECTED_INSERT = {
     'schema_description': 'Consequence type',
     'value_example':'intron_variant;intron_variant~NMD_transcript_variant;intron_variant~non_coding_transcript_variant;regulatory_region_variant;splice_region_variant~intron_variant~non_coding_transcript_variant;splice_acceptor_variant~non_coding_transcript_variant;splice_region_variant~non_coding_transcript_exon_variant;non_coding_transcript_exon_variant;downstream_gene_variant;splice_region_variant~intron_variant;splice_donor_variant;splice_region_variant~5_prime_UTR_variant;5_prime_UTR_variant;splice_acceptor_variant;upstream_gene_variant;TF_binding_site_variant;splice_region_variant~intron_variant~NMD_transcript_variant;splice_donor_variant~NMD_transcript_variant;splice_donor_variant~non_coding_transcript_variant;splice_region_variant~5_prime_UTR_variant~NMD_transcript_variant'
 }
-NUMBER_ANNOTATION_FIELDS = 245
-SAMPLE_FIELDS_EXPECTED = 11
-VARIANT_FIELDS_EXPECTED = 597
+NUMBER_ANNOTATION_FIELDS = 262
+SAMPLE_FIELDS_EXPECTED = 10
+VARIANT_FIELDS_EXPECTED = 252
+
 
 @pytest.fixture
 def MTParser():
@@ -69,58 +70,44 @@ def test_read_mapping_table(MTParser):
 
 
 def test_process_mp_inserts(MTParser, inserts):
-    """ 
+    """
         Tests that we properly process annotation field inserts
         There should be 245 total. A hand crafted example is checked
     """
-    assert inserts[0] == EXPECTED_INSERT
+    assert inserts[17] == EXPECTED_INSERT
     assert len(inserts) == NUMBER_ANNOTATION_FIELDS
+    sample_fields = MTParser.filter_fields_by_sample(inserts)
+    assert len(sample_fields) == SAMPLE_FIELDS_EXPECTED
+    variant_fields = MTParser.filter_fields_by_variant(inserts)
+    assert len(variant_fields) == VARIANT_FIELDS_EXPECTED
 
 
 def test_generate_sample_json_items(MTParser, inserts):
     """ Tests that sample JSON is being created correctly checking three we expect """
-    sample_props, _, _ = MTParser.generate_properties(inserts, variant=False)
-    assert sample_props['QUAL']['title'] == 'Quality score'
-    assert sample_props['QUAL']['vcf_name'] == 'QUAL'
-    assert sample_props['QUAL']['type'] == 'number'
-    assert sample_props['PID']['title'] == 'Physical phasing ID information'
-    assert sample_props['PID']['vcf_name'] == 'PID'
-    assert sample_props['PID']['type'] == 'string'
-    assert sample_props['AF']['title'] == 'Sample allele fraction'
-    assert sample_props['gnomad_an_afr']['vcf_name'] == 'gnomad_an_afr'
+    sample_fields = MTParser.filter_fields_by_sample(inserts)
+    sample_props = MTParser.generate_sample_variant_properties(sample_fields)
+    assert sample_props['PL']['type'] == 'array'
+    assert sample_props['PL']['items']['type'] == 'integer'
+    assert sample_props['PL']['items']['description'] == 'Phred-scaled likelihoods for genotypes'
+    assert sample_props['PS']['type'] == 'integer'
+    assert sample_props['PS']['is_list'] is False
 
 
 def test_generate_variant_json_items(MTParser, inserts):
     """ Tests that variant JSON along with columns and facets are produced """
-    var_props, cols, facs = MTParser.generate_properties(inserts)
-
-    # check basic things about the columns and facets
-    assert cols['CHROM']['title'] == 'Chromosome'
-    assert cols['POS']['title'] == 'Position'
-    assert cols['ID']['title'] == 'ID'
-    assert cols['REF']['title'] == 'Reference allele'
-    assert cols['ALT']['title'] == 'Alternative allele'
-    assert facs['clinvar_clnsig']['title'] == 'ClinVar significance'
+    var_props = MTParser.generate_variant_properties(inserts)
 
     # check top level fields
-    assert var_props['annovar_cytoband']['title'] == 'Cytoband'
-    assert var_props['annovar_cytoband']['type'] == 'string'
-    assert var_props['annovar_cytoband']['scale'] == 'WINDOW'
-    assert var_props['annovar_cytoband']['domain'] == 'FUNCTION'
-    assert var_props['annovar_cytoband']['source_name'] == 'ANNOVAR'
-    assert var_props['exac_af']['title'] == 'ExAC Allele frequency in All subjects'
-    assert var_props['exac_af']['vcf_name'] == 'exac_af'
-    assert var_props['exac_af']['type'] == 'number'
-    assert var_props['exac_af']['scale'] == 'VARIANT'
-    assert var_props['exac_af']['domain'] == 'POPULATION GENETICS'
-    assert var_props['exac_af']['source_name'] == 'ExAC'
-    assert var_props['exac_af']['source_version'] == '3'
-    assert var_props['transcript']['title'] == 'transcript'
-    assert var_props['transcript']['type'] == 'object'
+    assert var_props['CHROM']['title'] == 'CHROM'
+    assert var_props['CHROM']['type'] == 'string'
+    assert var_props['CHROM']['max_size'] == 2
+    assert var_props['POS']['type'] == 'integer'
+    assert var_props['cadd_phred']['source_name'] == 'CADD'
+    assert var_props['cadd_phred']['type'] == 'float'
 
     # check sub-embedded object
     sub_obj_props = var_props['transcript']['items']['properties']
-    assert len(sub_obj_props.keys()) == 76 # should see 76 of these
+    assert len(sub_obj_props.keys()) == 43 # should see 43 of these
     assert sub_obj_props['vep_allele']['vcf_name'] == 'vep_allele'
     assert sub_obj_props['vep_allele']['type'] == 'string'
     assert sub_obj_props['vep_distance']['type'] == 'integer'
