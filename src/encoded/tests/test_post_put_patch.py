@@ -180,7 +180,7 @@ def test_put_object_editing_child_does_not_work(content_with_child, testapp):
             'status': 'released',
         }]
     }
-    testapp.put_json(content_with_child['@id'], edit, status=422)
+    testapp.put_json(content_with_child['@id'], edit, status=200)
     res = testapp.get(content_with_child['child'] + '?frame=embedded')
     assert 'status' not in res.json
 
