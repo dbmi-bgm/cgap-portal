@@ -106,7 +106,7 @@ def test_generate_variant_json_items(MTParser, inserts):
     assert var_props['CHROM']['max_size'] == 2
     assert var_props['POS']['type'] == 'integer'
     assert var_props['cadd_phred']['source_name'] == 'CADD'
-    assert var_props['cadd_phred']['type'] == 'float'
+    assert var_props['cadd_phred']['type'] == 'number'
 
     # check sub-embedded object
     sub_obj_props = var_props['transcript']['items']['properties']
@@ -126,7 +126,6 @@ def test_generate_variant_sample_schema(MTParser, sample_variant_items):
     items, _, _ = sample_variant_items
     schema = MTParser.generate_variant_sample_schema(items)
     properties = schema['properties']
-    import pdb; pdb.set_trace()
     assert 'CHROM' not in properties
     assert 'vep_consequence' not in properties
     assert 'GT' in properties
