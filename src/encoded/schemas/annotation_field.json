@@ -64,6 +64,19 @@
             "description": "Whether the field is a list or not",
             "default": false
         },
+        "separator": {
+            "title": "Seperator",
+            "description": "if value is list, use this seperator to split items",
+            "type": "string",
+            "enum": [
+                "comma",
+                "pipe",
+                "semicolon",
+                "colon",
+                "tab",
+                "tilde"
+            ]
+        },
         "max_size": {
             "title": "Max Size (bytes)",
             "type": "integer",
@@ -77,6 +90,82 @@
         "value_example": {
             "title": "Example Value for this field",
             "description": "Example Value for this field, stored as text",
+            "type": "string"
+        },
+        "enum_list": {
+            "title": "Enum List",
+            "description": "List of possible values for this field if applicable",
+            "type": "array",
+            "uniqueItems": true,
+            "items": {
+                "Title": "Enum List Item",
+                "type": "string"
+            }
+        },
+        "field_priority": {
+            "title": "Field priority",
+            "description": "Ranking number of the field (lower is better)",
+            "type": "integer"
+        },
+        "column_priority": {
+            "title": "Column priority",
+            "description": "Ranking number of the field for Column in search view (lower is better)",
+            "type": "integer"
+        },
+        "facet_grouping": {
+            "title": "Facet Grouping",
+            "description": "Which group this facet belongs to",
+            "type": "string"
+        },
+        "facet_priority": {
+            "title": "Field priority",
+            "description": "Ranking number of the field for Facet in search view (lower is better)",
+            "type": "integer"
+        },
+        "scale": {
+            "title": "Scale",
+            "description": "Scale defined by new annotation structure",
+            "type": "string"
+        },
+        "domain": {
+            "title": "Domain",
+            "description": "Domain defined by new annotation structure",
+            "type": "string"
+        },
+        "method": {
+            "title": "Method",
+            "description": "Method defined by new annotation structure",
+            "type": "string"
+        },
+         "annotation_grouping": {
+            "title": "Annotation Grouping",
+            "description": "Which group this annotation belongs to",
+            "type": "string"
+        },
+        "scope": {
+            "title": "Scope",
+            "description": "Scope that this field belongs to",
+            "type": "string",
+            "enum": [
+                "variant",
+                "sample",
+                "gene",
+                "sample_variant"
+            ]
+        },
+         "schema_title": {
+            "title": "Schema Title",
+            "description": "Title to be used in the variant schema for the field",
+            "type": "string"
+        },
+        "pre_addon": {
+            "title": "Pre-Addon",
+            "description": "I don't know",
+            "type": "string"
+        },
+        "links_to": {
+            "title": "Link To",
+            "description": "I don't know",
             "type": "string"
         }
     },

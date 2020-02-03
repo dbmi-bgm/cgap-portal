@@ -72,21 +72,21 @@ class MappingTableParser(object):
         Returns:
             3 tuple - version, date, fields
         """
-        VERSION, DATE, FIELDS = None, None, None
+        version, date, fields = None, None, None
         with open(self.mapping_table, 'r') as f:
             reader = csv.reader(f)
             for row_idx, row in enumerate(reader):
                 if row_idx == 0:
-                    VERSION = row[1].split('=')[1].strip()
+                    version = row[1].split('=')[1].strip()
                 elif row_idx == 1:
-                    DATE = row[1].split('=')[1].strip()
+                    date = row[1].split('=')[1].strip()
                 elif row_idx == 2:
-                    FIELDS = self.process_fields(row)
+                    fields = self.process_fields(row)
                 else:
                     break # we are done with this step
-        logger.info('Mapping table Version: %s, Date: %s\n' % (VERSION, DATE))
-        logger.info('Mapping table fields: %s\n' % (", ".join(FIELDS)))
-        return VERSION, DATE, FIELDS
+        logger.info('Mapping table Version: %s, Date: %s\n' % (version, date))
+        logger.info('Mapping table fields: %s\n' % (", ".join(fields)))
+        return version, date, fields
 
     def process_mp_inserts(self):
         """ Processes the annotation fields in the mapping table to produce inserts
@@ -105,21 +105,30 @@ class MappingTableParser(object):
             reader = csv.reader(f)
             for row_idx, row in enumerate(reader):
                 insert = {}
-                if row_idx <= self.HEADER_ROW_INDEX: # skip header rows
+                if row_idx <= self.HEADER_ROW_INDEX:  # skip header rows
                     continue
                 for field_name, entry in zip(self.fields, row):
-                    # handle int fields
-                    if field_name in self.INTEGER_FIELDS:
+                    if field_name in self.INTEGER_FIELDS:  # handle int fields
                         if entry:
                             insert[field_name] = int(entry)
-                    # handle bool fields
-                    elif field_name in self.BOOLEAN_FIELDS:
+                    elif field_name in self.BOOLEAN_FIELDS:  # handle bool fields
                         if entry:
                             if entry == 'Y':
                                 insert[field_name] = True
                             else:
                                 insert[field_name] = False
-                    else: # handle all other fields if they exist
+                    elif field_name in ['enum_list']:  # handle enum fields
+                        if entry:
+                            field_type = row[self.FIELD_TYPE_INDEX]
+                            val_list = []
+                            if field_type == 'string':
+                                val_list = [en.strip() for en in entry.split(',') if en.strip()]
+                            elif field_type == 'number':
+                                val_list = [float(en.strip()) for en in entry.split(',') if en.strip()]
+                            elif field_type == 'integer':
+                                val_list = [int(en.strip()) for en in entry.split(',') if en.strip()]
+                            insert[field_name] = val_list
+                    else:  # handle all other fields with direct copy if they exist
                         if entry:
                             insert[field_name] = entry
                 inserts.append(insert)
@@ -129,66 +138,32 @@ class MappingTableParser(object):
     @staticmethod
     def filter_fields_by_sample(inserts):
         """ Returns annotation fields that belong on the sample variant schema
+
         :param inserts: annotation field inserts processed from above
         :return: only annotations fields that are part of the sample variant
         """
-        return [field for field in inserts if field.get('sub_embedding_group') == 'sample_variant']
+        return [field for field in inserts if field.get('scope', '') == 'sample_variant']
 
 
     @staticmethod
     def filter_fields_by_variant(inserts):
         """ Returns annotation fields that belong on the variant schema
+
         :param inserts: all raw annotation field inserts
         :return: only annotation fields that are part of the sample variant
         """
-        return [field for field in inserts if field.get('sub_embedding_group', '') != 'sample_variant']
+        return [field for field in inserts if field.get('scope', '') == 'variant']
 
 
     @staticmethod
-    def generate_sample_variant_properties(inserts):
-        """ Generates sample variant properties - due to changes in mapping table format this must now
-            be handled separately from variants
-
-        :param inserts: (PRE) annotation fields that belong to the sample variant
-        :return: dictionary of sample_variant properties
-        """
-        props = OrderedDict()
-
-        # get all fields first
-        for prop in inserts:
-            new_prop = OrderedDict()
-            new_prop['field_name'] = prop.get('vcf_name')
-            new_prop['source_name'] = prop.get('source_name')
-            new_prop['source_version'] = prop.get('source_version')
-            new_prop['type'] = prop.get('field_type')
-            new_prop['is_list'] = prop.get('is_list')
-            new_prop['max_size'] = prop.get('max_size')
-            new_prop['description'] = prop.get('schema_description')
-            new_prop['val_example'] = prop.get('value_example')
-            if new_prop['is_list']:
-                del new_prop['is_list']  # inner object is not a list
-                props[new_prop['field_name']] = {
-                    'title': new_prop['field_name'],
-                    'type': 'array',
-                    'items': new_prop
-                }
-            else:
-                props[new_prop['field_name']] = new_prop
-
-        return props
-
-
-    @staticmethod
-    def generate_variant_properties(inserts):
+    def generate_properties(inserts, variant=True):
         """ Generates sample variant or variant schema properties
             This function is quite long and complicated... Should probably be
             refactored
 
-        Args:
-            inserts: result of one of the above two functions
-
-        Returns:
-            Returns variant item properties
+        :param inserts: result of one of the above two functions
+        :param variant: whether or not we are generating variant props or sample_variant props
+        :return: properties
         """
         props = OrderedDict()
         cols = OrderedDict()
@@ -199,55 +174,67 @@ class MappingTableParser(object):
             prop_name = item['vcf_name']
             features = OrderedDict()
             features.update({
-                "title": prop_name,
+                "title": item.get('schema_title', 'None provided'),
                 "vcf_name": prop_name,
                 "type": item['field_type']
             })
+
+            # handle fields where key changes directly
             if item.get('schema_description'):
                 features['description'] = item['schema_description']
+            if item.get('links_to'):
+                features['linkTo'] = item['links_to']
+            if item.get('enum_list'):
+                features['enum'] = item['enum_list']
+            if item.get('field_priority'):
+                features['lookup'] = item['field_priority']
 
-            for a_field in ['source_name', 'source_version']:
+            # handle string fields
+            for a_field in ['source_name', 'source_version', 'scale', 'domain', 'method', 'separator']:
                 if item.get(a_field):
                     features[a_field] = item[a_field]
 
-            for a_field in ['max_size']:  # cast integer field
+            # handle int fields
+            for a_field in ['max_size']:
                 if item.get(a_field):
                     features[a_field]= int(item[a_field])
 
-            # handle sub_embedded object
-            if item.get('sub_embedding_group'):
-                sub_temp = OrderedDict()
-                prop = OrderedDict()
-                sum_ob_name = item['sub_embedding_group']
-                sub_title = sum_ob_name.replace("_", " ").title()
+            if variant:
 
-                # handle sub-embedded object that is an array
-                if item.get('is_list'):
-                    prop[prop_name] = {
-                        'title': item.get('vcf_name', 'None provided'),
-                        'type': 'array',
-                        'items': features
-                    }
-                    sub_temp.update({
-                        'title': sum_ob_name,
-                        'type': 'object',
-                        'items': {
-                            'title': sub_title,
+                # handle sub_embedded object
+                if item.get('sub_embedding_group'):
+                    sub_temp = OrderedDict()
+                    prop = OrderedDict()
+                    sum_ob_name = item['sub_embedding_group']
+                    sub_title = sum_ob_name.replace("_", " ").title()
+
+                    # handle sub-embedded object that is an array
+                    if item.get('is_list'):
+                        prop[prop_name] = {
+                            'title': item.get('vcf_name', 'None provided'),
                             'type': 'array',
-                            'properties': prop
-                            }
-                    })
-                else:
-                    prop[prop_name] = features
-                    sub_temp.update({
-                        "title": sub_title,
-                        "type": "object",
-                        "items": {
+                            'items': features
+                        }
+                        sub_temp.update({
+                            'title': sum_ob_name,
+                            'type': 'object',
+                            'items': {
+                                'title': sub_title,
+                                'type': 'array',
+                                'properties': prop
+                                }
+                        })
+                    else:
+                        prop[prop_name] = features
+                        sub_temp.update({
                             "title": sub_title,
                             "type": "object",
-                            "properties": prop
-                            }
-                        })
+                            "items": {
+                                "title": sub_title,
+                                "type": "object",
+                                "properties": prop
+                                }
+                            })
                     temp[sum_ob_name] = sub_temp
                     return temp
 
@@ -255,7 +242,7 @@ class MappingTableParser(object):
             if item.get('is_list'):
                 array_item = OrderedDict()
                 array_item.update( {
-                    "title": item.get('vcf_name'),
+                    "title": item.get('schema_title', 'None provided'),
                     "type": "array",
                     "vcf_name": item['vcf_name']
                 })
@@ -280,12 +267,16 @@ class MappingTableParser(object):
             return d
 
         for obj in inserts:
-            update(props, get_prop(obj))
-            if obj.get('facet_priority'):
-                facs[obj['vcf_name_v0.2']] = {'title': obj['schema_title']}
-            if obj.get('column_priority'):
-                cols[obj['vcf_name_v0.2']] = {'title': obj['schema_title']}
-            props.update(get_prop(obj))
+            if variant:
+                update(props, get_prop(obj))
+                if obj.get('facet_priority'):
+                    facs[obj['vcf_name']] = {'title': obj['schema_title']}
+                if obj.get('column_priority'):
+                    cols[obj['vcf_name']] = {'title': obj['schema_title']}
+            else:
+                if obj.get('sub_embedding_group'):
+                    continue
+                props.update(get_prop(obj))
 
         if not props:
             raise MappingTableIntakeException('Got no properties on schema!')
@@ -397,8 +388,8 @@ class MappingTableParser(object):
             inserts: annotation field inserts
         """
         inserts = self.process_mp_inserts()
-        variant_sample_props, _, _ = self.generate_properties(self.filter_inserts_sample(inserts), variant=False)
-        variant_props, cols, facs = self.generate_properties(self.filter_inserts_variant(inserts))
+        variant_sample_props, _, _ = self.generate_properties(self.filter_fields_by_sample(inserts), variant=False)
+        variant_props, cols, facs = self.generate_properties(self.filter_fields_by_variant(inserts))
         variant_sample_schema = self.generate_variant_sample_schema(variant_sample_props)
         variant_schema = self.generate_variant_schema(variant_props, cols, facs)
         if write:
