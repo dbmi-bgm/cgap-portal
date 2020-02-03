@@ -130,7 +130,7 @@ def test_generate_variant_sample_schema(MTParser, sample_variant_items):
     assert 'vep_consequence' not in properties
     assert 'GT' in properties
     assert 'GQ' in properties
-    assert properties['AF']['type'] == 'float'
+    assert properties['AF']['type'] == 'number'
     assert properties['RSTR_Rf']['type'] == 'integer'
     assert 'columns' in schema
     assert 'facets' in schema
