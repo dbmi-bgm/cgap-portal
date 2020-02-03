@@ -4,12 +4,12 @@ import memoize from 'memoize-one';
 import url from 'url';
 import Registry from '@hms-dbmi-bgm/shared-portal-components/es/components/navigation/components/Registry';
 import { console, isServerSide } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
-
+import { default as analyticsConfigurationOptions } from "./../ga_config.json";
 
 /**
  * Top bar navigation & link schema definition.
  */
-export const portalConfig = {
+const portalConfig = {
 
     /** Title of app, used as appendix in browser <head> <title> and similar. */
     "title": "Clinical Genomic Analysis Platform",
@@ -25,15 +25,7 @@ export const portalConfig = {
         "www.data.4dnucleome.org",
         "data.4dnucleome.org",
         "fourfront-webdev.us-east-1.elasticbeanstalk.com"
-    ],
-
-    "gaTrackingIDHostMap" : {
-        // TODO
-        // "data.4dnucleome" : "UA-86655305-1",
-        // "testportal.4dnucleome" : "UA-86655305-2",
-        // "localhost" : "UA-86655305-3",
-        // "4dn-web-alex" : "UA-86655305-4",
-    }
+    ]
 };
 
 /**
@@ -43,7 +35,7 @@ export const portalConfig = {
  * @type {Registry}
  * @example content_views.register(SomeReactViewComponent, 'ItemType');
  */
-export const content_views = new Registry();
+const content_views = new Registry();
 
 /**
  * Registry of views for panels. Works similarly to `content_views`.
@@ -51,20 +43,28 @@ export const content_views = new Registry();
  *
  * @type {Registry}
  */
-export const panel_views = new Registry();
+const panel_views = new Registry();
 
 
-export const getGoogleAnalyticsTrackingID = memoize(function(href){
+const getGoogleAnalyticsTrackingID = memoize(function(href){
     if (!href && !isServerSide()){
         href = window.location.href;
     }
     const { host } = url.parse(href);
-    const hostnames = Object.keys(portalConfig.gaTrackingIDHostMap);
+    const hostnames = Object.keys(analyticsConfigurationOptions.hostnameTrackerIDMapping);
     for (var i = 0; i < hostnames.length; i++){
         if (host.indexOf(hostnames[i]) > -1) {
-            return portalConfig.gaTrackingIDHostMap[hostnames[i]];
+            return analyticsConfigurationOptions.hostnameTrackerIDMapping[hostnames[i]];
         }
     }
-    return null;
+    return analyticsConfigurationOptions.hostnameTrackerIDMapping.default || null;
 });
 
+
+export {
+    analyticsConfigurationOptions,
+    portalConfig,
+    getGoogleAnalyticsTrackingID,
+    content_views,
+    panel_views
+};
