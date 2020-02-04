@@ -9,7 +9,7 @@ import ReactTooltip from 'react-tooltip';
 var serialize = require('form-serialize');
 import { detect as detectBrowser } from 'detect-browser';
 import jsonScriptEscape from '../libs/jsonScriptEscape';
-import { content_views as globalContentViews, portalConfig, getGoogleAnalyticsTrackingID } from './globals';
+import { content_views as globalContentViews, portalConfig, getGoogleAnalyticsTrackingID, analyticsConfigurationOptions } from './globals';
 import ErrorPage from './static-pages/ErrorPage';
 import { NavigationBar } from './navigation/NavigationBar';
 import { Footer } from './Footer';
@@ -224,7 +224,15 @@ export default class App extends React.PureComponent {
         // Load up analytics & perform initial pageview track
         const analyticsID = getGoogleAnalyticsTrackingID(href);
         if (analyticsID){
-            analytics.initializeGoogleAnalytics(analyticsID, context);
+            analytics.initializeGoogleAnalytics(
+                analyticsID,
+                {
+                    ...analyticsConfigurationOptions,
+                    reduxStore: store,
+                    initialContext: context,
+                    initialHref: windowHref
+                }
+            );
         }
 
         // Authenticate user if not yet handled server-side w/ cookie and rendering props.
@@ -1158,7 +1166,6 @@ export default class App extends React.PureComponent {
                     <meta name="google-site-verification" content="sia9P1_R16tk3XW93WBFeJZvlTt3h0qL00aAJd3QknU" />
                     <HTMLTitle {...{ context, currentAction, canonical, status }} />
                     {base ? <base href={base}/> : null}
-                    <link rel="canonical" href={canonical} />
                     <script data-prop-name="user_details" type="application/json" dangerouslySetInnerHTML={{
                         __html: jsonScriptEscape(JSON.stringify(JWT.getUserDetails())) /* Kept up-to-date in browser.js */
                     }}/>
@@ -1167,8 +1174,9 @@ export default class App extends React.PureComponent {
                     <link rel="stylesheet" href="https://unpkg.com/rc-tabs@9.6.0/dist/rc-tabs.min.css" />
                     <SEO.CurrentContext {...{ context, hrefParts, baseDomain }} />
                     <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:200,300,400,600,700,900,300i,400i,600i|Yrsa|Source+Code+Pro:300,400,500,600" rel="stylesheet"/>
-                    <script defer type="application/javascript" src={"/static/build/bundle.js?build=" + (lastCSSBuildTime || 0)} charSet="utf-8" />
                     <script defer type="application/javascript" src="//www.google-analytics.com/analytics.js" />
+                    <script defer type="application/javascript" src={"/static/build/bundle.js?build=" + (lastCSSBuildTime || 0)} charSet="utf-8" />
+                    <link rel="canonical" href={canonical} />
                     {/* <script data-prop-name="inline" type="application/javascript" charSet="utf-8" dangerouslySetInnerHTML={{__html: this.props.inline}}/> <-- SAVED FOR REFERENCE */}
                 </head>
                 <React.StrictMode>

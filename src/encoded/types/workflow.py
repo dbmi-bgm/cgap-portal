@@ -18,6 +18,7 @@ from snovault import (
     CONNECTION,
     TYPES
 )
+from snovault.util import debug_log
 from .base import (
     Item,
     # lab_award_attribution_embed_list
@@ -903,6 +904,7 @@ def validate_input_json(context, request):
 
 @view_config(name='pseudo-run', context=WorkflowRun.Collection, request_method='POST',
              permission='add', validators=[validate_input_json])
+@debug_log
 def pseudo_run(context, request):
     input_json = request.json
 
@@ -957,6 +959,7 @@ def pseudo_run(context, request):
 
 @view_config(name='run', context=WorkflowRun.Collection, request_method='POST',
              permission='add')
+@debug_log
 def run_workflow(context, request):
     input_json = request.json
 
