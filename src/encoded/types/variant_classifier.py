@@ -10,9 +10,9 @@ from .base import (
 
 
 @collection(
-    name='variant_classifiers',
+    name='variant-classifiers',
     unique_key='variant_classifier:varclass_id',
-    lookup_key='',
+    lookup_key='variant_class',
     properties={
         'title': 'Variant Classifiers',
         'description': 'Listing of Variant Classifiers',
