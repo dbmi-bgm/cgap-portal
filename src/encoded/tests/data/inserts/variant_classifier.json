@@ -1,0 +1,39 @@
+[
+    {
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "institution": "hms-dbmi",
+        "status": "released",
+        "uuid": "d1adcf9d-ed11-4f43-a7a6-a4149f2ae8f2",
+        "variant_class" : "transcript_ablation",
+        "varclass_id" : "SO:0001893",
+        "definition" : "A feature ablation whereby the deleted region includes a transcript feature",
+        "url": "http://www.sequenceontology.org/miso/current_svn/term/SO:0001893",
+        "severity_order_estimate": 1,
+        "impact": "HIGH"
+    },
+    {
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "institution": "hms-dbmi",
+        "status": "released",
+        "uuid": "fed5c87b-7aaa-4b6a-a6e5-3b821c2078a9",
+        "variant_class" : "inframe_insertion",
+        "varclass_id" : "SO:0001821",
+        "definition" : "An inframe non synonymous variant that inserts bases into in the coding sequence",
+        "url": "http://www.sequenceontology.org/miso/current_svn/term/SO:0001821",
+        "severity_order_estimate": 9,
+        "impact": "MODERATE"
+    },
+    {
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "institution": "hms-dbmi",
+        "status": "released",
+        "uuid": "4222bb1b-557e-4e61-80cc-73f58f7166ae",
+        "variant_class" : "regulatory_region_amplification",
+        "varclass_id" : "SO:0001891",
+        "definition" : "A feature amplification of a region containing a regulatory region",
+        "url": "http://www.sequenceontology.org/miso/current_svn/term/SO:0001891",
+        "severity_order_estimate": 32,
+        "impact": "MODIFIER"
+    }
+
+]

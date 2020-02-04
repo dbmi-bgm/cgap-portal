@@ -30,7 +30,6 @@
             "type" : "string",
             "uniqueKey": true
         },
-
         "definition" : {
             "title" : "Definition",
             "description": "Definition of this variant classification",
