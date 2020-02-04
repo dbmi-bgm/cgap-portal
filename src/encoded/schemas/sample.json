@@ -96,7 +96,7 @@
             "type": "string"
         },
         "files": {
-            "title": "Data Files",
+            "title": "Fastq Files",
             "description": "Information about the data files associated with the sample.",
             "type": "array",
             "items": {
@@ -104,6 +104,17 @@
                 "description": "File metadata.",
                 "type": "string",
                 "linkTo": "File"
+            }
+        },
+        "cram_files": {
+            "title": "CRAM Files",
+            "description": "Input alignment files.",
+            "type": "array",
+            "items": {
+                "title": "CRAM File",
+                "description": "File metadata.",
+                "type": "string",
+                "linkTo": "FileProcessed"
             }
         },
         "processed_files": {
