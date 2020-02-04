@@ -63,6 +63,7 @@ logging.config.dictConfig({
     }
 })
 
+
 ''' Dictionary for field mapping between hpoa file and cgap disorder schema
 '''
 FIELD_MAPPING = {
@@ -380,7 +381,7 @@ def main():  # pragma: no cover
     end = datetime.now()
     logger.info("FINISHED - START: {}\tEND: {}".format(start, str(end)))
     if args.post_report:
-        post_report_document_to_portal(connection, itype)
+        post_report_document_to_portal(connection, itype, logfile)
     dt = end.strftime("%y-%m-%d-%H-%M-%S")
     os.rename(logfile, dt + logfile)
 

@@ -10,10 +10,9 @@ from dcicutils import ff_utils
 '''logging setup
    logging config - to be moved to file at some point
 '''
-date = datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
-LOGFILE = '{}_load_items.log'.format(date)
+date = datetime.now().strftime("%y-%m-%d-%H-%M-%S")
+logfile = 'load_items.log'
 logger = logging.getLogger(__name__)
-
 logging.config.dictConfig({
     'version': 1,
     'disable_existing_loggers': False,
@@ -35,7 +34,7 @@ logging.config.dictConfig({
             'level': 'INFO',
             'formatter': 'standard',
             'class': 'logging.FileHandler',
-            'filename': LOGFILE
+            'filename': logfile
         }
     },
     'loggers': {
@@ -46,7 +45,7 @@ logging.config.dictConfig({
         }
     }
 })
-logger = logging.getLogger(__name__)
+
 EPILOG = __doc__
 
 
@@ -209,6 +208,8 @@ def main():
         auth = get_auth(args.key, args.keyfile)
     load_items(args.json_input, args.item_types, args.env, auth, args.patch_only)
     logger.info("DONE!")
+    dt = end.strftime("%y-%m-%d-%H-%M-%S")
+    os.rename(logfile, dt + logfile)
 
 
 if __name__ == "__main__":
