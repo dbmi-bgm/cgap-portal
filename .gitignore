@@ -52,7 +52,6 @@ beanstalk.cfg
 ~$*
 .~*#
 production.ini
-.python-version
 
 set_aws_env.sh
 
@@ -61,3 +60,14 @@ src/encoded/static/css/fontawesome/font-awesome.css
 # files on build server
 .to_export_back
 elasticsearch-*.deb
+
+# Emacs backup files
+*~
+
+# PyCharm metadata
+.idea/
+
+# Virtual environments
+# Conventions vary, including env, venv, or longer names like cgap_env,
+# but typically they end in "env".
+*env/
