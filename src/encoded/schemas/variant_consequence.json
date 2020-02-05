@@ -1,10 +1,10 @@
 {
-    "title": "Variant Classifier",
-    "description": "Classifier for a Variant - particularly in terms of consequence to transcript",
-    "id": "/profiles/variant_classifier.json",
+    "title": "Variant Consequence",
+    "description": "Consequence of a Variant - particularly in terms of consequence to transcript",
+    "id": "/profiles/variant_consequence.json",
     "$schema": "http://json-schema.org/draft-04/schema#",
     "type": "object",
-    "required": ["variant_class", "varclass_id"],
+    "required": ["var_conseq_name", "var_conseq_id"],
     "identifyingProperties": ["uuid", "aliases", "disorder_id"],
     "additionalProperties": false,
     "mixinProperties": [
@@ -20,24 +20,24 @@
         { "$ref": "mixins.json#/attribution" }
     ],
     "properties": {
-        "variant_class" : {
-            "title" : "Sequence Ontology Style Name of the Variant Classification",
+        "var_conseq_name" : {
+            "title" : "Sequence Ontology Style Name of the Variant Consequence",
             "type" : "string"
         },
-        "varclass_id" : {
-            "title" : "Variant Classificaiton Identifier",
-            "description" : "SO term ID for the variant classification eg. SO:0001893",
+        "var_conseq_id" : {
+            "title" : "Variant Consequence Identifier",
+            "description" : "SO term ID for the variant consequence eg. SO:0001893",
             "type" : "string",
             "uniqueKey": true
         },
         "definition" : {
             "title" : "Definition",
-            "description": "Definition of this variant classification",
+            "description": "Definition of this variant consequence",
             "type" : "string"
         },
         "url": {
             "title": "URL",
-            "description": "A URL to the site with more information about the classification term - MISO.",
+            "description": "A URL to the site with more information about the consequence term - MISO.",
             "type": "string",
             "format": "uri"
         },
