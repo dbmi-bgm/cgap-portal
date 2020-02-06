@@ -40,7 +40,7 @@ def test_document_display_title_wo_attachment(testapp, protocol_data):
     from datetime import datetime
     del(protocol_data['protocol_type'])
     res = testapp.post_json('/document', protocol_data).json['@graph'][0]
-    assert res.get('display_title') == 'Document from ' + str(datetime.now())[:10]
+    assert res.get('display_title') == 'Document from ' + str(datetime.utcnow())[:10]
 
 
 @pytest.fixture
@@ -146,7 +146,7 @@ def test_tracking_item_display_title_google_analytic(google_analytics):
 
 def test_tracking_item_display_title_download(download_tracking):
     from datetime import datetime
-    assert download_tracking.get('display_title') == 'Download Tracking Item from ' + str(datetime.now())[:10]
+    assert download_tracking.get('display_title') == 'Download Tracking Item from ' + str(datetime.utcnow())[:10]
 
 
 def test_image_unique_key(registry, image_data):
