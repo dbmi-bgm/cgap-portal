@@ -1,4 +1,10 @@
 import pytest
+
+from encoded.types.image import Image
+
+from ..utils import utc_today_str
+
+
 pytestmark = [pytest.mark.setone, pytest.mark.working, pytest.mark.schema]
 
 
@@ -37,10 +43,9 @@ def test_document_display_title_w_attachment(testapp, protocol_data, attachment)
 
 
 def test_document_display_title_wo_attachment(testapp, protocol_data):
-    from datetime import datetime
     del(protocol_data['protocol_type'])
     res = testapp.post_json('/document', protocol_data).json['@graph'][0]
-    assert res.get('display_title') == 'Document from ' + str(datetime.utcnow())[:10]
+    assert res.get('display_title') == 'Document from ' + utc_today_str()
 
 
 @pytest.fixture
@@ -145,12 +150,10 @@ def test_tracking_item_display_title_google_analytic(google_analytics):
 
 
 def test_tracking_item_display_title_download(download_tracking):
-    from datetime import datetime
-    assert download_tracking.get('display_title') == 'Download Tracking Item from ' + str(datetime.utcnow())[:10]
+    assert download_tracking.get('display_title') == 'Download Tracking Item from ' + utc_today_str()
 
 
 def test_image_unique_key(registry, image_data):
-    from encoded.types.image import Image
     uuid = "0afb6080-1c08-11e4-8c21-0800200c9a44"
     image = Image.create(registry, uuid, image_data)
     keys = image.unique_keys(image.properties)

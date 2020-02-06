@@ -3,15 +3,33 @@
 The fixtures in this module setup a full system with postgresql and
 elasticsearch running as subprocesses.
 """
-import pytest
 import json
+import os
+import pkg_resources
+import pytest
 import time
+import transaction
+import uuid
+
+from encoded import main
 from encoded.verifier import verify_item
 from snovault import DBSESSION, TYPES
 from snovault.elasticsearch import create_mapping, ELASTIC_SEARCH
-from snovault.elasticsearch.interfaces import INDEXER_QUEUE
+from snovault.elasticsearch.create_mapping import (
+    type_mapping,
+    create_mapping_by_type,
+    build_index_record,
+    compare_against_existing_mapping
+)
 from snovault.elasticsearch.indexer_utils import get_namespaced_index
+from snovault.elasticsearch.interfaces import INDEXER_QUEUE
+from sqlalchemy import MetaData
+from timeit import default_timer as timer
+from unittest import mock
+from zope.sqlalchemy import mark_changed
+
 from .workbook_fixtures import app_settings
+
 
 pytestmark = [pytest.mark.working, pytest.mark.indexing, pytest.mark.flaky]
 
@@ -21,7 +39,6 @@ TEST_COLLECTIONS = ['testing_post_put_patch', 'file_processed']
 
 @pytest.yield_fixture(scope='session', params=[False])
 def app(app_settings, request):
-    from encoded import main
     # for now, don't run with mpindexer. Add `True` to params above to do so
     if request.param:
         app_settings['mpindexer'] = True
@@ -40,9 +57,6 @@ def setup_and_teardown(app):
     Run create mapping and purge queue before tests and clear out the
     DB tables after the test
     """
-    import transaction
-    from sqlalchemy import MetaData
-    from zope.sqlalchemy import mark_changed
 
     # BEFORE THE TEST - run create mapping for tests types and clear queues
     create_mapping.run(app, collections=TEST_COLLECTIONS, skip_indexing=True)
@@ -115,12 +129,6 @@ def test_create_mapping_on_indexing(app, testapp, registry, elasticsearch):
     Do this by checking es directly before and after running mapping.
     Delete an index directly, run again to see if it recovers.
     """
-    from snovault.elasticsearch.create_mapping import (
-        type_mapping,
-        create_mapping_by_type,
-        build_index_record,
-        compare_against_existing_mapping
-    )
     es = registry[ELASTIC_SEARCH]
     item_types = TEST_COLLECTIONS
     # check that mappings and settings are in index
@@ -142,8 +150,7 @@ def test_create_mapping_on_indexing(app, testapp, registry, elasticsearch):
         assert compare_against_existing_mapping(es, namespaced_index, item_type, item_record, True)
 
 
-def test_file_processed_detailed(app, testapp, indexer_testapp, project,
-                                 institution, file_formats):
+def test_file_processed_detailed(app, testapp, indexer_testapp, project, institution, file_formats):
     # post file_processed
     item = {
         'institution': institution['uuid'],
@@ -203,13 +210,11 @@ def test_file_processed_detailed(app, testapp, indexer_testapp, project,
     assert found_rel_sid > found_fp_sid  # sid of related file is greater
 
 
-def test_real_validation_error(app, indexer_testapp, testapp, institution,
-                               project, file_formats):
+def test_real_validation_error(app, indexer_testapp, testapp, institution, project, file_formats):
     """
     Create an item (file-processed) with a validation error and index,
     to ensure that validation errors work
     """
-    import uuid
     es = app.registry[ELASTIC_SEARCH]
     fp_body = {
         'schema_version': '3',
@@ -220,14 +225,15 @@ def test_real_validation_error(app, indexer_testapp, testapp, institution,
         'higlass_uid': 1  # validation error -- higlass_uid should be string
     }
     res = testapp.post_json('/files-processed/?validate=false&upgrade=False',
-                                  fp_body, status=201).json
+                            fp_body, status=201).json
     fp_id = res['@graph'][0]['@id']
     val_err_view = testapp.get(fp_id + '@@validation-errors', status=200).json
     assert val_err_view['@id'] == fp_id
     assert val_err_view['validation_errors'] == []
 
-    # call to /index will throw MissingIndexItemException multiple times, since
-    # associated file_format, institution, and project are not indexed. That's okay
+    # call to /index will throw MissingIndexItemException multiple times,
+    # since associated file_format, institution, and project are not indexed.
+    # That's okay if we don't detect that it succeeded, keep trying until it does
     indexer_testapp.post_json('/index', {'record': True})
     time.sleep(2)
     namespaced_fp = get_namespaced_index(app, 'file_processed')
@@ -255,13 +261,8 @@ def test_load_and_index_perf_data(testapp, indexer_testapp):
     Note: run with bin/test -s -m performance to see the prints from the test
     '''
 
-    from os import listdir
-    from os.path import isfile, join
-    from unittest import mock
-    from timeit import default_timer as timer
-    from pkg_resources import resource_filename
-    insert_dir = resource_filename('encoded', 'tests/data/perf-testing/')
-    inserts = [f for f in listdir(insert_dir) if isfile(join(insert_dir, f))]
+    insert_dir = pkg_resources.resource_filename('encoded', 'tests/data/perf-testing/')
+    inserts = [f for f in os.listdir(insert_dir) if os.path.isfile(os.path.join(insert_dir, f))]
     json_inserts = {}
 
     # pluck a few uuids for testing

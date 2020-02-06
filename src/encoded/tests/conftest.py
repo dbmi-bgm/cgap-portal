@@ -3,7 +3,6 @@
 http://pyramid.readthedocs.org/en/latest/narr/testing.html
 '''
 import logging
-import pkg_resources
 import pytest
 import webtest
 
@@ -14,7 +13,6 @@ from pyramid.testing import DummyRequest, setUp, tearDown
 from pyramid.threadlocal import get_current_registry, manager as threadlocal_manager
 
 from snovault import DBSESSION, ROOT, UPGRADER
-
 from snovault.elasticsearch import ELASTIC_SEARCH
 
 from .conftest_settings import make_app_settings_dictionary
@@ -33,7 +31,6 @@ def autouse_external_tx(external_tx):
 
 @pytest.fixture(scope='session')
 def app_settings(request, wsgi_server_host_port, conn, DBSession):
-
     settings = make_app_settings_dictionary()
     settings['auth0.audiences'] = 'http://%s:%s' % wsgi_server_host_port
     # add some here for file testing
