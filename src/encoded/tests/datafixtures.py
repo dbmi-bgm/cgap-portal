@@ -3,7 +3,7 @@ import copy
 
 
 ORDER = [
-    'user', 'project', 'institution', 'file_format', 'cohort', 'individual',
+    'user', 'project', 'institution', 'file_format', 'variant_consequence', 'cohort', 'individual',
     'sample', 'workflow', 'access_key', 'disorder', 'document', 'file_fastq',
     'file_processed', 'file_reference', 'gene', 'sample_processing',
     'page', 'phenotype', 'quality_metric_fastqc',
@@ -417,8 +417,8 @@ def file_formats(testapp, institution, project):
                         "valid_item_types": ["FileProcessed"]},
         'bai': {'standard_file_extension': 'bam.bai',
                 "valid_item_types": ["FileProcessed"]},
-        'beddb' : {"standard_file_extension": "beddb",
-                "valid_item_types": ["FileProcessed", "FileReference"]},
+        'beddb': {"standard_file_extension": "beddb",
+                  "valid_item_types": ["FileProcessed", "FileReference"]},
     }
     format_info = {
         'fastq': {'standard_file_extension': 'fastq.gz',
@@ -446,8 +446,8 @@ def file_formats(testapp, institution, project):
         'bg': {'standard_file_extension': 'bedGraph.gz',
                "valid_item_types": ["FileProcessed", "FileVistrack"]},
         'bigbed': {'standard_file_extension': 'bb',
-               "valid_item_types": ["FileProcessed", "FileReference"]},
-        'bed' : {"standard_file_extension": "bed.gz",
+                   "valid_item_types": ["FileProcessed", "FileReference"]},
+        'bed': {"standard_file_extension": "bed.gz",
                 "extrafile_formats": ['beddb'],
                 "valid_item_types": ["FileProcessed", "FileReference"]}
     }

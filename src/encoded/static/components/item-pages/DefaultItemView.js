@@ -9,16 +9,13 @@ import queryString from 'query-string';
 
 import { ItemDetailList } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/ItemDetailList';
 import { Alerts } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/Alerts';
-import { LocalizedTime } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/LocalizedTime';
-import { console, object, layout, ajax, commonFileUtil, schemaTransforms } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
-import { ViewFileButton } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/FileDownloadButton';
+import { console, object, layout, ajax, commonFileUtil, schemaTransforms, memoizedUrlParse } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
+
 import { FlexibleDescriptionBox } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/FlexibleDescriptionBox';
 import { Schemas, fileUtil, typedefs } from './../util';
 
 import { SlideInPane } from './../viz/SlideInPane';
 import { TabView } from './components/TabView';
-import { Publications } from './components/Publications';
-import { AttributionTabView } from './components/AttributionTabView';
 import { BadgesTabView } from './components/BadgesTabView';
 
 import { ExpandableStaticHeader } from './../static-pages/components';
@@ -153,7 +150,7 @@ export default class DefaultItemView extends React.PureComponent {
         const { href, context } = this.props;
         if (!href) return;
 
-        let { query : { redirected_from = null } = { redirected_from : null } } = url.parse(href, true);
+        let { query : { redirected_from = null } = { redirected_from : null } } = memoizedUrlParse(href);
 
         if (Array.isArray(redirected_from)){
             redirected_from = redirected_from[0];
@@ -546,8 +543,8 @@ const ItemActionsTabMenu = React.memo(function ItemActionsTabMenu(props){
 });
 
 function ViewJSONAction({ href, children }){
-    const urlParts = url.parse(href, true);
-    urlParts.search = '?' + queryString.stringify(_.extend(urlParts.query, { 'format' : 'json' }));
+    const urlParts = _.clone(memoizedUrlParse(href));
+    urlParts.search = '?' + queryString.stringify(_.extend({}, urlParts.query, { 'format' : 'json' }));
     const viewUrl = url.format(urlParts);
     const onClick = (e) => {
         if (window && window.open){

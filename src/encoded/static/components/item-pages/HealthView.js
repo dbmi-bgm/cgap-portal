@@ -63,10 +63,9 @@ export default class HealthView extends React.PureComponent {
     }
 
     render() {
-        var { context, schemas, session, windowWidth, href } = this.props,
-            { db_es_compare, db_es_total, mounted } = this.state,
-            title = typeof context.title === "string" ? context.title : url.parse(href).path,
-            width = layout.gridContainerWidth(windowWidth);
+        const { context, schemas, session, windowWidth, href } = this.props;
+        const { db_es_compare, db_es_total, mounted } = this.state;
+        const width = layout.gridContainerWidth(windowWidth);
 
         return (
             <div className="view-item container" id="content">

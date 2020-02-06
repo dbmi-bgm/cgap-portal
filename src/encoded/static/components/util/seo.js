@@ -9,8 +9,6 @@ import { getNestedProperty } from '@hms-dbmi-bgm/shared-portal-components/es/com
 import { isServerSide } from '@hms-dbmi-bgm/shared-portal-components/es/components/util/misc';
 import { patchedConsoleInstance as console } from '@hms-dbmi-bgm/shared-portal-components/es/components/util/patched-console';
 
-import { navigate } from './navigate'; // We use own extended version for browse stuff.
-
 // TODO refactor for CGAP
 
 
@@ -116,115 +114,6 @@ export class CurrentContext extends React.PureComponent {
                     "image"                 : FullSite.logo4DN(baseDomain)
                 });
             }
-        },
-        "Browse": function(context, hrefParts, baseDomain){
-            var dcicOrg = FullSite.dcicOrganization(baseDomain),
-                retObj = FullSite.catalog4DN(baseDomain);
-
-            _.extend(retObj, CurrentContext.commonSchemaBase(context, hrefParts, baseDomain, { "@type" : "SearchResultsPage" }), { 'sameAs' : retObj.url });
-
-            return retObj;
-        },
-        "ExperimentSet" : function(context, hrefParts, baseDomain){
-            var dcicOrg = FullSite.dcicOrganization(baseDomain, false),
-                labCreator = CurrentContext.labToSchema(context.lab, baseDomain),
-                labContributors = Array.isArray(context.contributing_labs) && _.map(context.contributing_labs, function(cLab){
-                    return CurrentContext.labToSchema(cLab, baseDomain);
-                }),
-                publication = context.produced_in_pub && context.produced_in_pub.short_attribution && context.produced_in_pub.journal && context.produced_in_pub.title && context.produced_in_pub,
-                experimentTypes = getNestedProperty(context, 'experiments_in_set.experiment_type.display_title');
-
-            if (experimentTypes && Array.isArray(experimentTypes)){
-                experimentTypes = _.uniq(experimentTypes);
-            }
-
-            var retObj = _.extend(CurrentContext.commonSchemaBase(context, hrefParts, baseDomain, { "@type" : "ItemPage" }), {
-                "@type": "Dataset",
-                "includedInDataCatalog" : FullSite.catalog4DN(baseDomain),
-                "name" : "Experiment Set - " + context.accession,
-                "publisher" : dcicOrg,
-                "isAccessibleForFree" : true,
-                // TODO: Add correct 'variableMeasured'
-                // "variableMeasured" : "Biological Sequence"
-            });
-
-            if (labCreator){
-                retObj.creator = labCreator;
-            }
-            if (labContributors){
-                retObj.contributor = labContributors;
-            }
-            if (publication){
-                retObj.citation = publication.short_attribution + " '" + publication.title + "', " + publication.journal;
-            }
-
-            if (experimentTypes && experimentTypes.length === 1){
-                retObj.measurementTechnique = experimentTypes[0];
-            } else if (experimentTypes && experimentTypes.length > 1){
-                retObj.measurementTechnique = experimentTypes;
-            }
-
-            // Add some keywords from various properties.
-            var keywords = Array.isArray(experimentTypes) && experimentTypes.length > 0 ? experimentTypes : [],
-                listOfPropsForKeyWords = [
-                    'experiments_in_set.biosample.biosource_summary',
-                    'experiments_in_set.biosample.biosource.biosource_type',
-                    'experiments_in_set.biosample.biosource.individual.organism.display_title',
-                    'experiments_in_set.biosample.treatments.treatment_type',
-                    'experiments_in_set.experiment_categorizer.value'
-                ];
-
-            _.forEach(listOfPropsForKeyWords, function(field){
-                var value = getNestedProperty(context, field);
-                if (!value) return;
-                if (Array.isArray(value)){
-                    value = _.uniq(_.flatten(value));
-                    _.forEach(value, function(v){
-                        if (typeof v !== 'string'){
-                            return;
-                        }
-                        keywords.push(v);
-                    });
-                } else if (typeof value === 'string') {
-                    keywords.push(value);
-                }
-            });
-
-            if (keywords.length > 0){
-                retObj.keywords = keywords;
-            }
-
-            return retObj;
-        },
-        "Lab" : function(context, hrefParts, baseDomain){
-            var retObj = CurrentContext.labToSchema(context, baseDomain);
-            if (!retObj) return null;
-
-            retObj = _.extend(
-                _.omit(
-                    CurrentContext.commonSchemaBase(context, hrefParts, baseDomain, { "@type" : "ItemPage" }),
-                    'datePublished', 'dateModified'
-                ),
-                retObj
-            );
-
-            // Add address if any defined.
-            if (context.country || context.postal_code || context.address1 || context.address2 || context.city || context.state){
-                retObj.contactPoint = {
-                    '@type' : "PostalAddress"
-                };
-                if (context.country) retObj.contactPoint.addressCountry = context.country;
-                if (context.postal_code) retObj.contactPoint.postalCode = context.postal_code;
-                if (context.address1) retObj.contactPoint.streetAddress = context.address1;
-                if (context.address2) {
-                    retObj.contactPoint.streetAddress = retObj.contactPoint.streetAddress ? retObj.contactPoint.streetAddress + ', ' + context.address2 : context.address2;
-                }
-                if (context.state) retObj.contactPoint.addressRegion = context.state;
-                if (context.city) retObj.contactPoint.addressLocality = context.city;
-            }
-
-            return retObj;
-
         }
     }
 
@@ -261,7 +150,6 @@ export class CurrentContext extends React.PureComponent {
 
 
 const FullSite = {
-
 
     "logo4DN" : function(baseDomain = 'https://data.4dnucleome.org'){
         return {
@@ -333,46 +221,13 @@ const FullSite = {
         });
     },
 
-
-    "catalog4DN" : function(baseDomain = 'https://data.4dnucleome.org'){
-        var dcicOrg = FullSite.dcicOrganization(baseDomain);
-        return {
-            "@type": "DataCatalog",
-            "name" : "4DN Data Browser",
-            "alternateName" : ["Browse", "Data Browser"],
-            "creator" : dcicOrg,
-            "publisher" : dcicOrg,
-            "isAccessibleForFree" : true,
-            "url" : baseDomain + "/browse/?" + queryString.stringify(navigate.getBrowseBaseParams('only_4dn'))
-        };
-    },
-
-
     "generate" : function(baseDomain){
         return shouldDisplayStructuredData(baseDomain) && {
             "@context": "http://schema.org",
             "@type": "WebSite",
             "url": baseDomain + '/',
             "description" : "The 4D Nucleome Data Portal hosts data generated by the 4DN Network and other reference nucleomics data sets, and an expanding tool set for open data processing and visualization.",
-            "potentialAction": {
-                "@type": "SearchAction",
-                "target": baseDomain + "/browse/?" + queryString.stringify(navigate.getBrowseBaseParams('only_4dn')) + '&q={search_term_string}',
-                "query-input": "required name=search_term_string"
-            },
             "creator" : FullSite.dcicOrganization(baseDomain, false),
-            "sponsor" : {
-                "@type" : "GovernmentOrganization",
-                "name" : "National Institutes of Health (NIH)",
-                "alternateName" : [
-                    "National Institutes of Health",
-                    "NIH"
-                ],
-                "url" : "https://www.nih.gov/"
-            },
-            "mainEntity" : {
-                "@type" : "DataCatalog",
-                "url" : baseDomain + "/browse/?" + queryString.stringify(navigate.getBrowseBaseParams('only_4dn'))
-            }
         };
     }
 
