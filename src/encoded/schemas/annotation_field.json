@@ -167,6 +167,11 @@
             "title": "Link To",
             "description": "I don't know",
             "type": "string"
+        },
+        "calculated_property": {
+            "title": "Calculated Property",
+            "description": "Boolean on whether or not this field is a calculated property of a variant",
+            "type": "boolean"
         }
     },
     "facets": {

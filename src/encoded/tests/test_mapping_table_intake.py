@@ -13,7 +13,8 @@ ANNOTATION_FIELD_SCHEMA = './src/encoded/schemas/annotation_field.json'
 EXPECTED_FIELDS = ['no', 'vcf_name', 'source_name', 'source_version', 'sub_embedding_group',
                    'field_type', 'is_list', 'separator', 'max_size', 'schema_description', 'value_example',
                    'enum_list', 'field_priority', 'column_priority', 'facet_grouping', 'facet_priority',
-                   'scale', 'domain', 'method', 'annotation_grouping', 'scope', 'schema_title', 'pre_addon', 'links_to']
+                   'scale', 'domain', 'method', 'annotation_grouping', 'scope', 'schema_title', 'pre_addon', 'links_to',
+                   'calculated_property']
 EXPECTED_INSERT = {'no': 1, 'vcf_name': 'CHROM', 'source_name': 'VCF', 'source_version': 'VCFv4.2',
                    'field_type': 'string', 'is_list': False, 'max_size': 2, 'schema_description': 'Chromosome',
                    'value_example': '1;2;3;4;5;6;22;X;Y;M',
@@ -21,8 +22,8 @@ EXPECTED_INSERT = {'no': 1, 'vcf_name': 'CHROM', 'source_name': 'VCF', 'source_v
                        ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16',
                         '17', '18', '19', '20', '21', '22', 'X', 'Y', 'M'],
                    'scope': 'variant'}
-NUMBER_ANNOTATION_FIELDS = 270
-SAMPLE_FIELDS_EXPECTED = 17
+NUMBER_ANNOTATION_FIELDS = 265
+SAMPLE_FIELDS_EXPECTED = 12
 VARIANT_FIELDS_EXPECTED = 253
 TRANSCRIPT_FIELDS_EXPECTED = 47
 
@@ -90,8 +91,8 @@ def test_generate_sample_json_items(MTParser, inserts):
     assert sample_props['DP']['vcf_name'] == 'DP'
     assert sample_props['PGT']['type'] == 'string'
     assert sample_props['PGT']['source_name'] == 'VCF'
-    assert sample_props['RSTR_Rf']['type'] == 'integer'
-    assert sample_props['RSTR_Rf']['source_name'] == 'novoCaller'
+    assert sample_props['RSTR']['type'] == 'string'
+    assert sample_props['RSTR']['source_name'] == 'novoCaller'
     assert cols == {}
     assert facs == {}  # none on either currently
 
@@ -120,6 +121,10 @@ def test_generate_variant_json_items(MTParser, inserts):
     assert sub_obj_props['vep_consequence']['items']['type'] == 'string'
     assert sub_obj_props['vep_consequence']['items']['separator'] == 'tilde'
 
+    # check cols, facs
+    assert cols == {}
+    assert facs == {}
+
 
 def test_generate_variant_sample_schema(MTParser, sample_variant_items):
     """ Tests some aspects of the variant_sample schema """
@@ -131,7 +136,7 @@ def test_generate_variant_sample_schema(MTParser, sample_variant_items):
     assert 'GT' in properties
     assert 'GQ' in properties
     assert properties['AF']['type'] == 'number'
-    assert properties['RSTR_Rf']['type'] == 'integer'
+    assert properties['RSTR']['type'] == 'string'
     assert 'columns' in schema
     assert 'facets' in schema
 

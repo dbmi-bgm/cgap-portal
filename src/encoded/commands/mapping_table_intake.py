@@ -25,7 +25,7 @@ class MappingTableParser(object):
     HEADER_ROW_INDEX = 2
     FIELD_TYPE_INDEX = 5  # XXX: hardcoded, must change if field_type is moved on mapping table
     INTEGER_FIELDS = ['no', 'max_size']
-    BOOLEAN_FIELDS = ['is_list']
+    BOOLEAN_FIELDS = ['is_list', 'calculated_property']
 
     def __init__(self, _mp, schema):
         self.mapping_table = _mp
