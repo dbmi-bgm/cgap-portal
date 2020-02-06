@@ -1,5 +1,5 @@
 import pytest
-from mock import patch, MagicMock
+from unittest.mock import patch, MagicMock
 from .datafixtures import ORDER
 from snovault import COLLECTIONS
 from encoded.commands.create_mapping_on_deploy import ITEM_INDEX_ORDER, get_deployment_config
