@@ -393,7 +393,7 @@ class MappingTableParser(object):
         variant_sample_schema = self.generate_variant_sample_schema(variant_sample_props)
         variant_schema = self.generate_variant_schema(variant_props, cols, facs)
         if write:
-            if not vs_out or v_out:
+            if not vs_out or not v_out:
                 raise MappingTableIntakeException('Write specified but no output file given')
             self.write_schema(variant_sample_schema, vs_out)
             self.write_schema(variant_schema, v_out)
@@ -421,8 +421,8 @@ def main():
     parser.add_argument('annotation_field_schema', help='path to annotation field schema')
     parser.add_argument('variant', help='where to write variant schema')
     parser.add_argument('sample', help='where to write sample_variant schema')
-    parser.add_argument('project', help='project to post inserts under')
-    parser.add_argument('institution', help='institution to post inserts under')
+    parser.add_argument('--project', help='project to post inserts under')
+    parser.add_argument('--institution', help='institution to post inserts under')
     parser.add_argument('--write-schemas', action='store_true', default=True,
                         help='If specified will write new schemas to given locations')
     parser.add_argument('--post-inserts', action='store_true', default=False,

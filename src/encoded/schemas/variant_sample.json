@@ -43,58 +43,48 @@
     "description": "Schema for variant info for sample",
     "id": "/profiles/variant_sample.json",
     "properties": {
-        "QUAL": {
-            "title": "Quality score",
-            "vcf_name": "QUAL",
-            "type": "number",
-            "source_name": "VCF",
-            "source_version": "VCFv4.2"
-        },
-        "FILTER": {
-            "title": "Filter",
-            "vcf_name": "FILTER",
+        "CALL_INFO (Sample name)": {
+            "title": "None provided",
+            "vcf_name": "CALL_INFO (Sample name)",
             "type": "string",
-            "enum": [
-                "PASS",
-                "VQSRTrancheSNP99.00to99.90",
-                "VQSRTrancheSNP99.90to100.00"
-            ],
+            "description": "Calling info",
             "source_name": "VCF",
             "source_version": "VCFv4.2"
         },
         "GT": {
-            "title": "Genotype",
+            "title": "None provided",
             "vcf_name": "GT",
             "type": "string",
             "description": "Genotype",
             "source_name": "VCF",
             "source_version": "VCFv4.2"
         },
-        "AD": {
-            "title": "Allelic depth",
-            "type": "array",
-            "vcf_name": "AD",
-            "description": "Allelic depths for the ref and alt alleles in the order listed",
-            "items": {
-                "title": "Allelic depth",
-                "vcf_name": "AD",
-                "type": "integer",
-                "description": "Allelic depths for the ref and alt alleles in the order listed",
-                "separator": "comma",
-                "source_name": "VCF",
-                "source_version": "VCFv4.2"
-            }
+        "AD_ref": {
+            "title": "None provided",
+            "vcf_name": "AD_ref",
+            "type": "integer",
+            "description": "Reference allelic depth",
+            "source_name": "VCF",
+            "source_version": "VCFv4.2"
+        },
+        "AD_alt": {
+            "title": "None provided",
+            "vcf_name": "AD_alt",
+            "type": "integer",
+            "description": "Alternate allelic depth",
+            "source_name": "VCF",
+            "source_version": "VCFv4.2"
         },
         "DP": {
-            "title": "Approximate read depth",
+            "title": "None provided",
             "vcf_name": "DP",
             "type": "integer",
-            "description": "Depth of informative coverage for each sample",
+            "description": "Approximate read depth",
             "source_name": "VCF",
             "source_version": "VCFv4.2"
         },
         "GQ": {
-            "title": "Genotype quality score",
+            "title": "None provided",
             "vcf_name": "GQ",
             "type": "integer",
             "description": "Genotype quality score",
@@ -102,22 +92,15 @@
             "source_version": "VCFv4.2"
         },
         "PL": {
-            "title": "Phred-scaled likelihoods for genotypes",
-            "type": "array",
+            "title": "None provided",
             "vcf_name": "PL",
-            "description": "Normalized, Phred-scaled likelihoods for genotypes as defined in the VCF specification",
-            "items": {
-                "title": "Phred-scaled likelihoods for genotypes",
-                "vcf_name": "PL",
-                "type": "integer",
-                "description": "Normalized, Phred-scaled likelihoods for genotypes as defined in the VCF specification",
-                "separator": "comma",
-                "source_name": "VCF",
-                "source_version": "VCFv4.2"
-            }
+            "type": "string",
+            "description": "Phred-scaled likelihoods for genotype (Ref/Ref, Ref/Alt, Alt/Alt)",
+            "source_name": "VCF",
+            "source_version": "VCFv4.2"
         },
         "PGT": {
-            "title": "Physical phasing haplotype information",
+            "title": "None provided",
             "vcf_name": "PGT",
             "type": "string",
             "description": "Physical phasing haplotype information",
@@ -125,34 +108,36 @@
             "source_version": "VCFv4.2"
         },
         "PID": {
-            "title": "Physical phasing ID information",
+            "title": "None provided",
             "vcf_name": "PID",
             "type": "string",
-            "description": "Physical phasing ID information, where each unique ID within a given sample (but not across samples) connects records within a phasing group",
+            "description": "Physical phasing ID information",
             "source_name": "VCF",
             "source_version": "VCFv4.2"
         },
         "PS": {
-            "title": "Phasing set ID",
+            "title": "None provided",
             "vcf_name": "PS",
             "type": "integer",
-            "description": "Phasing set (typically the position of the first variant in the set)",
+            "description": "Phasing set ID",
             "source_name": "VCF",
             "source_version": "VCFv4.2"
         },
         "AF": {
-            "title": "Sample allele fraction",
-            "type": "array",
+            "title": "None provided",
             "vcf_name": "AF",
-            "description": "Alternate allele fraction in samples",
-            "items": {
-                "title": "Sample allele fraction",
-                "vcf_name": "AF",
-                "type": "number",
-                "description": "Alternate allele fraction in samples",
-                "source_name": "VCF",
-                "source_version": "VCFv4.2"
-            }
+            "type": "number",
+            "description": "Sample allele fraction",
+            "source_name": "VCF",
+            "source_version": "VCFv4.2"
+        },
+        "RSTR": {
+            "title": "None provided",
+            "vcf_name": "RSTR",
+            "type": "string",
+            "description": "Reference forward allele read count",
+            "source_name": "novoCaller",
+            "source_version": "2"
         },
         "schema_version": {
             "default": "1"
