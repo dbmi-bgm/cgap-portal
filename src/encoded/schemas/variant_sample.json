@@ -43,7 +43,7 @@
     "description": "Schema for variant info for sample",
     "id": "/profiles/variant_sample.json",
     "properties": {
-        "CALL_INFO (Sample name)": {
+        "CALL_INFO": {
             "title": "None provided",
             "vcf_name": "CALL_INFO (Sample name)",
             "type": "string",

@@ -282,7 +282,8 @@ class VCFParser(object):
                 if exit_on_validation:
                     raise VCFParserException('Tried to check a variant field that does not exist on the schema: %s' % field)
                 else:
-                    logger.error('Tried to check a variant field that does not exist on the schema: %s' % field)
+                    # enable later maybe
+                    #logger.error('Tried to check a variant field that does not exist on the schema: %s' % field)
                     return None
         else:
             type = props[field]['type']
@@ -310,7 +311,12 @@ class VCFParser(object):
         """
         result = {}
         for vcf_key in self.VCF_FIELDS:
-            result[vcf_key] = getattr(record, vcf_key)
+            if vcf_key == 'ALT':  # requires special care
+                result[vcf_key] = getattr(record, vcf_key)[0].sequence
+            elif vcf_key == 'FILTER':
+                result[vcf_key] = getattr(record, vcf_key) or 'PASS'
+            else:
+                result[vcf_key] = getattr(record, vcf_key) or ''
         for key in self.format.keys():
             # handle non-annotation fields
             if key not in self.annotation_keys:
@@ -362,12 +368,14 @@ class VCFParser(object):
             is the only seo we currently have on the schema
         """
         acc = []
+        if not result.get(seo, None):
+            return
         for _, vals in result[seo].items():
             acc.append(vals)
         result[seo] = acc
 
     @staticmethod
-    def parse_samples(result, record):
+    def parse_samples(result, sample):
         """ Parses the samples on the record, adding them to result
             identical samples are duplicated?
 
@@ -375,11 +383,13 @@ class VCFParser(object):
             result: dict to populate
             record: record to parse
         """
-        sample = record.samples[0].data if record.samples else None
-        result['GT'] = sample.GT
-        result['DP'] = sample.DP
-        result['GQ'] = sample.GQ
-        result['PL'] = ','.join(map(str, sample.PL))
+        result['CALL_INFO'] = sample.sample
+        data = sample.data
+        #result['AD'] = data.AD what to do?
+        result['GT'] = data.GT
+        result['DP'] = data.DP
+        result['GQ'] = data.GQ
+        result['PL'] = ','.join(map(str, data.PL))
 
     def create_sample_variant_from_record(self, record):
         """ Parses the given record to produce the sample variant
@@ -393,18 +403,21 @@ class VCFParser(object):
         Returns:
             a (dict) sample_variant item
         """
-        result = {}
+        result = []
         props = self.variant_sample_schema['properties']
-        for field in props.keys():  # locate all non-sample included fields
-            if record.INFO.get(field, None):
-                val = record.INFO.get(field)
-                prop_type = props[field]['type']
-                if prop_type == 'array':
-                    sub_type = props[field]['items']['type']
-                    result[field.upper()] = self.cast_field_value(prop_type, val, sub_type)
-                else:
-                    result[field.upper()] = self.cast_field_value(prop_type, val)
-        self.parse_samples(result, record) # add sample fields, already formatted
+        for sample in record.samples:
+            s = {}
+            for field in props.keys():  # locate all non-sample included fields
+                if record.INFO.get(field, None):
+                    val = record.INFO.get(field)
+                    prop_type = props[field]['type']
+                    if prop_type == 'array':
+                        sub_type = props[field]['items']['type']
+                        s[field.upper()] = self.cast_field_value(prop_type, val, sub_type)
+                    else:
+                        s[field.upper()] = self.cast_field_value(prop_type, val)
+            self.parse_samples(s, sample) # add sample fields, already formatted
+            result.append(s)
         return result
 
     def run(self, project=None, institution=None):
@@ -425,12 +438,14 @@ class VCFParser(object):
             vs = self.create_sample_variant_from_record(record)
             v = self.create_variant_from_record(record)
             if project:
-                vs['project'] = project
+                for entry in vs:
+                    entry['project'] = project
                 v['project'] = project
             if institution:
-                vs['institution'] = institution
+                for entry in vs:
+                    entry['institution'] = institution
                 v['institution'] = institution
-            variant_samples.append(vs)
+            variant_samples += vs
             self.format_variant(v)
             variants.append(v)
         return variant_samples, variants

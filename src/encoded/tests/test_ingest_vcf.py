@@ -34,7 +34,6 @@ def test_VCFP_meta(test_vcf):
     for annot_field in EXPECTED_ANNOTATION_FIELDS:
         assert annot_field in annotation_fields
     assert test_vcf.get_sub_embedded_label('VEP') == 'transcript'
-    assert test_vcf.get_sub_embedded_label('dbNSFPTranscript') == 'transcript'
     assert test_vcf.get_sub_embedded_label('ANNOVAR') == None
 
 
@@ -103,38 +102,34 @@ def test_VCFP_multiple_variants(test_vcf):
 def test_VCFP_multiple_sample_variants(test_vcf):
     """ Generates 3 sample variant items and checks them for correctness """
     record = test_vcf.read_next_record()
-    result = test_vcf.create_sample_variant_from_record(record)
+    result = test_vcf.create_sample_variant_from_record(record)[0]
     assert result['DP'] == 22
     assert result['AF'] == 0.333
-    assert result['QUAL'] == 38.75
-    assert result['FILTER'] == None
     assert result['GT'] == '0/0'
-    assert result['PL'] == [0, 18, 270]
+    assert result['PL'] == '0,18,270'
     record = test_vcf.read_next_record()
-    result = test_vcf.create_sample_variant_from_record(record)
+    result = test_vcf.create_sample_variant_from_record(record)[0]
     assert result['DP'] == 70
     assert result['AF'] == 1.0
-    assert result['QUAL'] == 8844.9
-    assert result['FILTER'] == None
     assert result['GT'] == '1/1'
     assert result['GQ'] == 99
-    assert result['PL'] == [2839, 211, 0]
+    assert result['PL'] == '2839,211,0'
     record = test_vcf.read_next_record()
-    result = test_vcf.create_sample_variant_from_record(record)
+    result = test_vcf.create_sample_variant_from_record(record)[0]
     assert result['DP'] == 66
     assert result['AF'] == 0.833
-    assert result['QUAL'] == 5900.13
-    assert result['FILTER'] == None
-    assert result['AD'] == [0, 66]
+    #assert result['AD'] == [0, 66]
 
 
 def test_VCFP_post_sample_variants(testapp, institution, project, test_vcf):
     """ Attempts to post all generated sample variants """
     CONNECTION_URL = '/variant_sample'
     for record in test_vcf:
-        variant_sample = test_vcf.create_sample_variant_from_record(record)
-        variant_sample['project'] = 'encode-project'
-        variant_sample['institution'] = 'encode-institution'
+        variant_samples = test_vcf.create_sample_variant_from_record(record)
+        for sample in variant_samples:
+            sample['project'] = 'encode-project'
+            sample['institution'] = 'encode-institution'
+            testapp.post_json(CONNECTION_URL, sample, status=201)
 
 
 def test_VCFP_post_variants(testapp, institution, project, test_vcf):
@@ -154,8 +149,8 @@ def test_VCFP_run(testapp, institution, project, test_vcf):
         check to see that we get the 3 that we expect and they post correctly
     """
     vss, vs = test_vcf.run(project='encode-project', institution='encode-institution')
-    assert len(vss) == 3
-    assert len(vs) == 3
+    assert len(vss) == 2895
+    assert len(vs) == 965
     for v in vs:
         testapp.post_json('/variant', v, status=201)
     for vs in vss:
