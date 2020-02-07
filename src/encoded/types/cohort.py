@@ -6,6 +6,7 @@ from snovault import (
     COLLECTIONS,
     display_title_schema
 )
+from snovault.util import debug_log
 from .base import (
     Item,
     get_item_if_you_can
@@ -136,6 +137,7 @@ class Cohort(Item):
 
 @view_config(name='process-pedigree', context=Cohort, request_method='PATCH',
              permission='edit')
+@debug_log
 def process_pedigree(context, request):
     """
     Endpoint to handle creation of a family of individuals provided a pedigree

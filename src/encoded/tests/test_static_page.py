@@ -1,6 +1,6 @@
 import pytest
 import time
-from .features.conftest import app_settings, app, teardown
+from .workbook_fixtures import app_settings, app
 from webtest import AppError
 
 pytestmark = [pytest.mark.indexing, pytest.mark.working]

@@ -1,7 +1,8 @@
 import pytest
+from unittest.mock import patch, MagicMock
 from .datafixtures import ORDER
 from snovault import COLLECTIONS
-from encoded.commands.create_mapping_on_deploy import ITEM_INDEX_ORDER
+from encoded.commands.create_mapping_on_deploy import ITEM_INDEX_ORDER, get_deployment_config
 pytestmark = [pytest.mark.setone, pytest.mark.working]
 
 
@@ -47,3 +48,27 @@ def test_create_mapping_item_order(registry):
         if i_type.startswith('testing_'):
             continue
         assert registry[COLLECTIONS][i_type].type_info.name in ITEM_INDEX_ORDER
+
+
+@patch('encoded.commands.create_mapping_on_deploy.get_my_env', MagicMock(return_value='fourfront-cgap'))
+def test_get_deployment_config_prod():
+    """ Tests we correctly configure prod """
+    cfg = get_deployment_config(None)
+    assert cfg['ENV_NAME'] == 'fourfront-cgap'
+    assert cfg['WIPE_ES'] is False
+
+
+@patch('encoded.commands.create_mapping_on_deploy.get_my_env', MagicMock(return_value='fourfront-cgaptest'))
+def test_get_deployment_config_prod():
+    """ Tests we correctly configure cgaptest """
+    cfg = get_deployment_config(None)
+    assert cfg['ENV_NAME'] == 'fourfront-cgaptest'
+    assert cfg['WIPE_ES'] is True
+
+
+@patch('encoded.commands.create_mapping_on_deploy.get_my_env', MagicMock(return_value='fourfront-cgapother'))
+def test_get_deployment_config_prod():
+    """ Tests we correct configure a different env not listed yet """
+    cfg = get_deployment_config(None)
+    assert cfg['ENV_NAME'] == 'fourfront-cgapother'
+    assert cfg['WIPE_ES'] is False

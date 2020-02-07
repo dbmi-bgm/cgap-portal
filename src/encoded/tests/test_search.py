@@ -1,11 +1,11 @@
 # Use workbook fixture from BDD tests (including elasticsearch)
-from .features.conftest import app_settings, app, workbook
+from .workbook_fixtures import app_settings, app, workbook
 import pytest
 from encoded.commands.run_upgrader_on_inserts import get_inserts
 from snovault.elasticsearch.indexer_utils import get_namespaced_index
 import json
 import time
-from snovault import TYPES
+from snovault import TYPES, COLLECTIONS
 pytestmark = [pytest.mark.working, pytest.mark.schema, pytest.mark.indexing]
 
 
@@ -93,31 +93,71 @@ def test_search_with_embedding(workbook, testapp):
 
 
 def test_search_with_simple_query(workbook, testapp):
-    # run a simple query with type=Disorder and q=Sub
-    res = testapp.get('/search/?type=Disorder&q=Sub').json
-    assert len(res['@graph']) > 0
+    """
+    Tests simple query string searches on CGAP using type-based
+    q= and generic q=
+    """
+    # run a simple query with type=Disorder and q=Dummy
+    res = testapp.get('/search/?type=Disorder&q=Dummy').json
+    assert len(res['@graph']) == 3
     # get the uuids from the results
-    mouse_uuids = [org['uuid'] for org in res['@graph'] if 'uuid' in org]
+    dummy_uuids = [org['uuid'] for org in res['@graph'] if 'uuid' in org]
     # run the same search with type=Item
-    res = testapp.get('/search/?type=Item&q=Sub').json
-    assert len(res['@graph']) > 0
+    res = testapp.get('/search/?type=Item&q=Dummy').json
+    assert len(res['@graph']) >= 3
     all_uuids = [item['uuid'] for item in res['@graph'] if 'uuid' in item]
     # make sure all uuids found in the first search are present in the second
-    assert set(mouse_uuids).issubset(set(all_uuids))
-    # run with q=mous returns the same hits...
-    res = testapp.get('/search/?type=Item&q=Su').json
-    mous_uuids = [item['uuid'] for item in res['@graph'] if 'uuid' in item]
+    assert set(dummy_uuids).issubset(set(all_uuids))
+    # run with q=Dum returns the same hits...
+    res = testapp.get('/search/?type=Item&q=Dum').json
+    dum_uuids = [item['uuid'] for item in res['@graph'] if 'uuid' in item]
     # make sure all uuids found in the first search are present in the second
-    assert set(mouse_uuids).issubset(set(mous_uuids))
-    # run with q=mauze (misspelled) and ensure uuids are not in results
-    res = testapp.get('/search/?type=Item&q=mauxz', status=[200, 404]).json
-    # make this test robust by either assuming no results are found
-    # (true when this test was written)
-    # OR that results that happen to contain "mauze" do not include what
-    # we're looking for.
-    mauxz_uuids = [item['uuid'] for item in res['@graph'] if 'uuid' in item]
-    # make sure all uuids found in the first search are present in the second
-    assert not set(mouse_uuids).issubset(set(mauxz_uuids))
+    assert set(dummy_uuids).issubset(set(dum_uuids))
+    # should eliminate first and third level disorders
+    res = testapp.get('/search/?type=Disorder&q=Sub+-Second').json
+    assert len(res['@graph']) == 1
+    # include first level
+    res = testapp.get('/search/?type=Disorder&q=(Sub+-Second) | oranges').follow().json
+    assert len(res['@graph']) == 2
+    # exclude all
+    res = testapp.get('/search/?type=Disorder&q=(oranges)+(apples)+(bananas)', status=404)
+
+
+def test_search_ngram(workbook, testapp):
+    """
+    Tests edge-ngram related behavior with simple query string
+    """
+    from snovault.elasticsearch.create_mapping import MAX_NGRAM
+    # test search beyond max-ngram, should still give one result
+    res = testapp.get('/search/?type=Item&q=Second+Dummy+Sub+Disorder').json
+    assert len(res['@graph']) == 1
+    # run search with q=Du (should get nothing since max_ngram=3)
+    testapp.get('/search/?type=Item&q=D', status=404)
+    # run search with q=ummy (should get nothing since we are using edge ngrams)
+    testapp.get('/search/?type=Item&q=ummy', status=404)
+    # test ngram on upper bound
+    res1 = testapp.get('/search/?type=Item&q=information').json
+    assert len(res1['@graph']) > 0
+    # should get same results
+    res2 = testapp.get('/search/?type=Item&q=informatio').json
+    # should have same results in res1
+    assert len(res1['@graph']) == len(res2['@graph'])
+    # should get nothing
+    testapp.get('/search/?type=Item&q=informatix', status=404)
+    # will get same results as res1 and res2
+    res3 = testapp.get('/search/?type=Item&q=informatioabd').json
+    assert len(res2['@graph']) == len(res3['@graph'])
+    # search for part of uuid common, should get all 3
+    res4 = testapp.get('/search/?type=Disorder&q=231111bc').json
+    assert len(res4['@graph']) == 3
+    # search for full uuid
+    res5 = testapp.get('/search/?type=Disorder&q=231111bc-8535-4448-903e-854af460b25').json
+    assert len(res4['@graph']) == 3
+    # uuid difference beyond 10
+    res6 = testapp.get('/search/?type=Disorder&q=231111bc-89').json
+    assert len(res4['@graph']) == 3
+    # uuid difference at 10 (should get no results)
+    testapp.get('/search/?type=Disorder&q=231111bc-9', status=404)
 
 
 @pytest.mark.skip # XXX: What is this really testing?
@@ -451,8 +491,6 @@ def test_search_multiple_types(workbook, testapp):
 ## Tests for collections (search 301s) ##
 #########################################
 
-from .test_views import TYPE_LENGTH
-
 def test_collection_limit(workbook, testapp):
     res = testapp.get('/user/?limit=1', status=301)
     assert len(res.follow().json['@graph']) == 1
@@ -471,50 +509,50 @@ def test_index_data_workbook(app, workbook, testapp, indexer_testapp, htmltestap
     from snovault.elasticsearch import create_mapping
     es = app.registry['elasticsearch']
     # we need to reindex the collections to make sure numbers are correct
-    # TODO: NAMESPACE - here, passed in list to create_mapping
-    # turn of logging for a bit
     create_mapping.run(app, sync_index=True)
     # check counts and ensure they're equal
     testapp_counts = testapp.get('/counts')
-    total_counts = testapp_counts.json['db_es_total']
-    split_counts = total_counts.split()  # 2nd item is db counts, 4th is es
-    assert(int(split_counts[1]) == int(split_counts[3]))
-    for item_type in TYPE_LENGTH.keys():
-        tries = 0
-        item_len = None
+    split_counts = testapp_counts.json['db_es_total'].split()
+    assert(int(split_counts[1]) == int(split_counts[3]))  # 2nd is db, 4th is es
+    for item_name, item_counts in testapp_counts.json['db_es_compare'].items():
+        # make sure counts for each item match ES counts
+        split_item_counts = item_counts.split()
+        db_item_count = int(split_item_counts[1])
+        es_item_count = int(split_item_counts[3])
+        assert db_item_count == es_item_count
+
+        # check ES counts directly. Must skip abstract collections
+        # must change counts result ("ItemName") to item_type format
+        item_type = app.registry[COLLECTIONS][item_name].type_info.item_type
         namespaced_index = get_namespaced_index(app, item_type)
-        while item_len is None or (item_len != TYPE_LENGTH[item_type] and tries < 3):
-            if item_len != None:
-                create_mapping.run(app, collections=[item_type], strict=True, sync_index=True)
-                es.indices.refresh(index=namespaced_index)
-            item_len = es.count(index=namespaced_index, doc_type=item_type).get('count')
-            print('... ES COUNT: %s' % item_len)
-            print('... TYPE COUNT: %s' % TYPE_LENGTH[item_type])
-            tries += 1
-        assert item_len == TYPE_LENGTH[item_type]
-        if item_len > 0:
-            res = testapp.get('/%s?limit=all' % item_type, status=[200, 301, 404])
-            res = res.follow()
-            for item_res in res.json.get('@graph', []):
-                index_view_res = es.get(index=namespaced_index, doc_type=item_type,
-                                        id=item_res['uuid'])['_source']
-                # make sure that the linked_uuids match the embedded data
-                assert 'linked_uuids_embedded' in index_view_res
-                assert 'embedded' in index_view_res
-                found_uuids = recursively_find_uuids(index_view_res['embedded'], set())
-                # all found uuids must be within the linked_uuids
-                assert found_uuids <= set([link['uuid'] for link in index_view_res['linked_uuids_embedded']])
-                # if uuids_rev_linking to me, make sure they show up in @@links
-                if len(index_view_res.get('uuids_rev_linked_to_me', [])) > 0:
-                    links_res = testapp.get('/' + item_res['uuid'] + '/@@links', status=200)
-                    link_uuids = [lnk['uuid'] for lnk in links_res.json.get('uuids_linking_to')]
-                    assert set(index_view_res['uuids_rev_linked_to_me']) <= set(link_uuids)
-                # previously test_html_pages
-                try:
-                    html_res = htmltestapp.get(item_res['@id'])
-                    assert html_res.body.startswith(b'<!DOCTYPE html>')
-                except Exception as e:
-                    pass
+
+        es_direct_count = es.count(index=namespaced_index, doc_type=item_type).get('count')
+        assert es_item_count == es_direct_count
+
+        if es_item_count == 0:
+            continue
+        # check items in search result individually
+        res = testapp.get('/%s?limit=all' % item_type, status=[200, 301]).follow()
+        for item_res in res.json.get('@graph', []):
+            index_view_res = es.get(index=namespaced_index, doc_type=item_type,
+                                    id=item_res['uuid'])['_source']
+            # make sure that the linked_uuids match the embedded data
+            assert 'linked_uuids_embedded' in index_view_res
+            assert 'embedded' in index_view_res
+            found_uuids = recursively_find_uuids(index_view_res['embedded'], set())
+            # all found uuids must be within the linked_uuids
+            assert found_uuids <= set([link['uuid'] for link in index_view_res['linked_uuids_embedded']])
+            # if uuids_rev_linking to me, make sure they show up in @@links
+            if len(index_view_res.get('uuids_rev_linked_to_me', [])) > 0:
+                links_res = testapp.get('/' + item_res['uuid'] + '/@@links', status=200)
+                link_uuids = [lnk['uuid'] for lnk in links_res.json.get('uuids_linking_to')]
+                assert set(index_view_res['uuids_rev_linked_to_me']) <= set(link_uuids)
+            # previously test_html_pages
+            try:
+                html_res = htmltestapp.get(item_res['@id'])
+                assert html_res.body.startswith(b'<!DOCTYPE html>')
+            except Exception as e:
+                pass
 
 
 ######################################

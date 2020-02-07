@@ -1,0 +1,61 @@
+{
+    "title": "Variant Consequence",
+    "description": "Consequence of a Variant - particularly in terms of consequence to transcript",
+    "id": "/profiles/variant_consequence.json",
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "type": "object",
+    "required": ["var_conseq_name", "var_conseq_id"],
+    "identifyingProperties": ["uuid", "aliases", "disorder_id"],
+    "additionalProperties": false,
+    "mixinProperties": [
+        { "$ref": "mixins.json#/schema_version" },
+        { "$ref": "mixins.json#/uuid" },
+        { "$ref": "mixins.json#/aliases" },
+        { "$ref": "mixins.json#/submitted" },
+        { "$ref": "mixins.json#/modified" },
+        { "$ref": "mixins.json#/status" },
+        { "$ref": "mixins.json#/dbxrefs" },
+        { "$ref": "mixins.json#/alternative_ids" },
+        { "$ref": "mixins.json#/static_embeds" },
+        { "$ref": "mixins.json#/attribution" }
+    ],
+    "properties": {
+        "var_conseq_name" : {
+            "title" : "Sequence Ontology Style Name of the Variant Consequence",
+            "type" : "string"
+        },
+        "var_conseq_id" : {
+            "title" : "Variant Consequence Identifier",
+            "description" : "SO term ID for the variant consequence eg. SO:0001893",
+            "type" : "string",
+            "uniqueKey": true
+        },
+        "definition" : {
+            "title" : "Definition",
+            "description": "Definition of this variant consequence",
+            "type" : "string"
+        },
+        "url": {
+            "title": "URL",
+            "description": "A URL to the site with more information about the consequence term - MISO.",
+            "type": "string",
+            "format": "uri"
+        },
+        "comment" : {
+            "type" : "string",
+            "title" : "Comment",
+            "formInput": "textarea"
+        },
+        "severity_order_estimate": {
+            "title": "Severity Rank",
+            "description": "Ensembl ranking of estimate of consequence severity with lower numbers being more severe",
+            "type": "integer"
+        },
+        "impact": {
+            "title": "IMPACT",
+            "description": "The IMPACT rating is a rating given for compatibility with other variant annotation tools",
+            "type": "string",
+            "enum": ["HIGH", "MODERATE", "LOW", "MODIFIER"]
+        }
+    }
+}
