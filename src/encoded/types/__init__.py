@@ -326,6 +326,14 @@ class AnnotationField(Item):
     name_key = 'field_name'
     schema = load_schema('encoded:schemas/annotation_field.json')
 
+    @calculated_property(schema={
+        "title": "Display Title",
+        "description": "A calculated title for every object in 4DN",
+        "type": "string"
+    })
+    def display_title(self, vcf_name):
+        return vcf_name
+
 
 @collection(
     name='variants',
@@ -339,6 +347,13 @@ class Variant(Item):
     item_type = 'variant'
     schema = load_schema('encoded:schemas/variant.json')
 
+    @calculated_property(schema={
+        "title": "Display Title",
+        "description": "A calculated title for every object in 4DN",
+        "type": "string"
+    })
+    def display_title(self, CHROM, POS, REF, ALT):
+        return 'C:%sP:%sR:%sA:%s' % (CHROM, POS, REF, ALT)
 
 @collection(
     name='variant-samples',
@@ -351,3 +366,11 @@ class VariantSample(Item):
 
     item_type = 'variant_sample'
     schema = load_schema('encoded:schemas/variant_sample.json')
+
+    @calculated_property(schema={
+        "title": "Display Title",
+        "description": "A calculated title for every object in 4DN",
+        "type": "string"
+    })
+    def display_title(self, CALL_INFO):
+        return 'SAMPLEID: '+ CALL_INFO
