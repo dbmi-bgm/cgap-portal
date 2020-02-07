@@ -31,6 +31,12 @@
                 "Sanger"
             ]
         },
+        "individual": {
+            "title": "Individual",
+            "description": "Individual this sample is derived from",
+            "type": "string",
+            "linkTo": "Individual"
+        },
         "specimen_type": {
             "title": "Specimen Type",
             "type": "string",
