@@ -31,6 +31,7 @@ class VCFParser(object):
         '%7C': '|',
         '%3B': ';'
     }
+    VCF_FIELDS = ['CHROM', 'POS', 'ID', 'REF','ALT', 'QUAL', 'FILTER']
     DROPPED_FIELD = 'DROPPED'
     SUBEMBEDDED = 'Subembedded'
     FORMAT = 'Format'
@@ -151,6 +152,9 @@ class VCFParser(object):
                 self.format[key] = self.parse_vcf_info(self.reader.infos[key])
             else:
                 logger.info('Found key %s that is not in info tag' % key)
+        for key in self.reader.infos.keys():
+            if key not in self.format:
+                self.format[key] = key
 
     def read_next_record(self):
         """ Uses self.reader as an iterator to get the next record. This function
@@ -228,7 +232,14 @@ class VCFParser(object):
             except ValueError:  # required if casting string->float->int, such as '0.000'
                 return int(float(value))  # throw exception here if need be
         elif type == 'number':
-            return float(value)
+            try:
+                return float(value)
+            except:
+                return float(value[0])
+        elif type == 'boolean':
+            if value == '0':
+                return False
+            return True 
         elif type == 'array':
             if sub_type:
                 if not isinstance(value, list):
@@ -298,6 +309,8 @@ class VCFParser(object):
             dictionary of parsed VCF entry
         """
         result = {}
+        for vcf_key in self.VCF_FIELDS:
+            result[vcf_key] = getattr(record, vcf_key)
         for key in self.format.keys():
             # handle non-annotation fields
             if key not in self.annotation_keys:
@@ -335,7 +348,7 @@ class VCFParser(object):
                         else:
                             result[fn] = self.validate_variant_value(fn, field, key)
         return result
-
+    
     @staticmethod
     def format_variant(result, seo='transcript'):
         """ Does some extra formatting to the seo's on the variant so they fit the schema.
@@ -356,19 +369,17 @@ class VCFParser(object):
     @staticmethod
     def parse_samples(result, record):
         """ Parses the samples on the record, adding them to result
+            identical samples are duplicated?
 
         Args:
             result: dict to populate
             record: record to parse
         """
-        result['QUAL'] = record.QUAL
-        result['FILTER'] = record.FILTER[0]
-        sample = record.samples[0].data
+        sample = record.samples[0].data if record.samples else None
         result['GT'] = sample.GT
-        result['AD'] = sample.AD
         result['DP'] = sample.DP
         result['GQ'] = sample.GQ
-        result['PL'] = sample.PL
+        result['PL'] = ','.join(map(str, sample.PL))
 
     def create_sample_variant_from_record(self, record):
         """ Parses the given record to produce the sample variant

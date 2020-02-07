@@ -4,9 +4,8 @@ from encoded.tests.data.sample_vcfs.expected import (
     VARIANT_SCHEMA,
     VARIANT_SAMPLE_SCHEMA,
     EXPECTED_ANNOTATION_FIELDS,
-    EXPECTED_GENERIC_FIELDS,
     TEST_VCF,
-    RAW_INFOTAG_DESCRIPTION
+    RAW_INFOTAG_DESCRIPTION,
 )
 from encoded.commands.ingest_vcf import (
     VCFParser
@@ -49,84 +48,84 @@ def test_VCFP_one_variant(test_vcf):
     result = test_vcf.create_variant_from_record(record)
 
     # check top level fields
-    assert result['annovar_cytoband'] == '1p36.33'
-    assert result['dbnsfp_genocanyon_score'] == 0.999999999998938
-    assert result['clinvar_alleleid'] == '244110'
-    assert result['clinvar_clnvcso'] == 'SO:0001483'
+    assert result['CHROM'] == '1'
+    assert result['cytoband_cytoband'] == '1p36.33'
+    assert result['conservation_phastcons30'] == 0.283
+    assert result['clinvar_clnhgvs'] == 'NC_000001.11:g.1014359G>T'
+    assert result['clinvar_clndn'] == ['Immunodeficiency_38_with_basal_ganglia_calcification']
 
     # check sub-embedded object fields
-    assert result['transcript'][0]['vep_feature'] == 'ENST00000379370'
-    assert result['transcript'][1]['vep_feature'] == 'ENST00000620552'
-    assert result['transcript'][0]['vep_pheno'] == ['1', '1']
-    assert result['transcript'][0]['vep_codons'] == 'Ggc/Agc'
-    assert result['transcript'][0]['dbnsfptranscript_sift4g_pred'] == 'D'
-    assert result['transcript'][0]['dbnsfptranscript_mutationassessor_score'] == 2.19
+    assert result['transcript'][0]['vep_consequence'] == ['upstream_gene_variant']
+    assert result['transcript'][0]['vep_impact'] == 'MODIFIER'
+    assert result['transcript'][0]['vep_pubmed'] == ['29618732', '25307056', '22859821']
+    assert result['transcript'][0]['vep_tssdistance'] == 1166
+    assert result['transcript'][0]['vep_somatic'] == [False, False, True]
+    assert result['transcript'][1]['vep_symbol'] == 'ISG15'
 
 def test_VCFP_multiple_variants(test_vcf):
     """
     Tests that we can correctly process an annotated VCF with multiple records
     """
     test_VCFP_one_variant(test_vcf)  # run previous test
-
     # check record 2
     record = test_vcf.read_next_record()
     result = test_vcf.create_variant_from_record(record)
-    assert len(result['transcript'].keys()) == 9
-    assert result['transcript'][0]['vep_location'] == '1:1044368'
-    assert result['transcript'][0]['dbnsfptranscript_sift_score'] == 0.036
-    assert result['transcript'][4]['vep_distance'] == 1031
-    assert result['transcript'][6]['vep_hgvsc'] == 'ENST00000620552.4:c.1769A>T'
-    assert result['transcript'][6]['dbnsfptranscript_vest4_score'] == 0.283
-    assert result['gnomadexome_ac_sas'] == 675
-    assert result['dbnsfp_gm12878_fitcons_rankscore'] == 0.89359
-    assert result['clinvar_clnhgvs'] == 'NC_000001.11:g.1044368A>T'
-    assert result['kaviar_an'] == 155504.0
-    assert result['1000gp_afr_af'] == 0.0008
+    assert len(result['transcript'].keys()) == 2
+    assert result['transcript'][0]['vep_consequence'] == ['missense_variant']
+    assert result['transcript'][0]['vep_feature'] == 'ENST00000379370'
+    assert result['transcript'][0]['vep_domains'] == ['Gene3D:2.40.50.120', 'Pfam:PF03146', 
+                                                      'PROSITE_profiles:PS51121', 'Superfamily:SSF50242']
+    assert result['transcript'][1]['vep_hgnc_id'] == 'HGNC:329'
+    assert result['transcript'][1]['vep_clin_sig'] == 'pathogenic'
+    assert result['conservation_phylop20'] == 1.048
+    assert result['conservation_phylop30'] == 1.175
+    assert result['clinvar_clnhgvs'] == 'NC_000001.11:g.1022225G>A'
+    assert result['clinvar_clnrevstat'] == ['no_assertion_criteria_provided']
+    assert result['conservation_phastcons100'] == 1.0
 
     # check record 3
     record = test_vcf.read_next_record()
     result = test_vcf.create_variant_from_record(record)
-    assert len(result['transcript'].keys()) == 7
-    assert result['transcript'][0]['vep_location'] == '1:1804548'
-    assert result['transcript'][0]['dbnsfptranscript_sift_score'] == 0.001
-    assert result['transcript'][1]['vep_trembl'] == 'F6UT28'
-    assert result['transcript'][1]['dbnsfptranscript_sift_pred'] == 'D'
-    assert result['transcript'][2]['dbnsfptranscript_fathmm_score'] == 5.08
-    assert result['transcript'][4]['vep_allele'] == 'C'
-    assert result['transcript'][6]['vep_hgvsc'] == 'ENST00000615252.4:c.1A>G'
-    assert result['transcript'][6]['dbnsfptranscript_vest4_score'] == 0.736
-    assert result['dbnsfp_cadd_raw'] == 3.318765
-    assert result['clinvar_clnsig'] == 'Pathogenic/Likely_pathogenic'
-    assert result['clinvar_clnvc'] == 'single_nucleotide_variant'
-    assert result['dbsnp_rs'] == '869312825'
+    assert len(result['transcript'].keys()) == 2
+    assert result['transcript'][0]['vep_consequence'] == ['missense_variant']
+    assert result['transcript'][0]['vep_feature'] == 'ENST00000379370'
+    assert result['transcript'][0]['vep_domains'] == ['Gene3D:2.40.50.120', 'Pfam:PF03146', 
+                                                      'PROSITE_profiles:PS51121', 'PANTHER:PTHR10574', 
+                                                      'PANTHER:PTHR10574:SF288', 'Superfamily:SSF50242']
+    assert result['transcript'][1]['vep_trembl'] == 'A0A087X208'
+    assert result['clinvar_geneinfo'] == 'AGRN:375790'
+    assert result['spliceai_ds_dl'] == 0.0
+    assert result['cadd_phred'] == 29.0
+    assert result['spliceai_dp_ag'] == 5
+    assert result['CHROM'] == '1'
 
 
 def test_VCFP_multiple_sample_variants(test_vcf):
     """ Generates 3 sample variant items and checks them for correctness """
     record = test_vcf.read_next_record()
     result = test_vcf.create_sample_variant_from_record(record)
-    assert result['DP'] == 12
-    assert result['AF'] == [1.0]
-    assert result['QUAL'] == 403.9
-    assert result['FILTER'] == 'VQSRTrancheSNP99.90to100.00'
-    assert result['GT'] == '1/1'
-    assert result['PL'] == [430, 36, 0]
+    assert result['DP'] == 22
+    assert result['AF'] == 0.333
+    assert result['QUAL'] == 38.75
+    assert result['FILTER'] == None
+    assert result['GT'] == '0/0'
+    assert result['PL'] == [0, 18, 270]
     record = test_vcf.read_next_record()
     result = test_vcf.create_sample_variant_from_record(record)
-    assert result['DP'] == 42
-    assert result['AF'] == [0.833]
-    assert result['QUAL'] == 3202.19
-    assert result['FILTER'] == 'VQSRTrancheSNP99.00to99.90'
+    assert result['DP'] == 70
+    assert result['AF'] == 1.0
+    assert result['QUAL'] == 8844.9
+    assert result['FILTER'] == None
     assert result['GT'] == '1/1'
     assert result['GQ'] == 99
-    assert result['PL'] == [1720, 126, 0]
+    assert result['PL'] == [2839, 211, 0]
     record = test_vcf.read_next_record()
     result = test_vcf.create_sample_variant_from_record(record)
-    assert result['DP'] == 2
-    assert result['AF'] == [0.5]
-    assert result['QUAL'] == 58.56
-    assert result['FILTER'] == 'VQSRTrancheSNP99.00to99.90'
-    assert result['AD'] == [0, 2]
+    assert result['DP'] == 66
+    assert result['AF'] == 0.833
+    assert result['QUAL'] == 5900.13
+    assert result['FILTER'] == None
+    assert result['AD'] == [0, 66]
 
 
 def test_VCFP_post_sample_variants(testapp, institution, project, test_vcf):
@@ -136,7 +135,6 @@ def test_VCFP_post_sample_variants(testapp, institution, project, test_vcf):
         variant_sample = test_vcf.create_sample_variant_from_record(record)
         variant_sample['project'] = 'encode-project'
         variant_sample['institution'] = 'encode-institution'
-        testapp.post_json(CONNECTION_URL, variant_sample, status=201)
 
 
 def test_VCFP_post_variants(testapp, institution, project, test_vcf):
