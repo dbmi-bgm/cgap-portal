@@ -346,6 +346,9 @@ class Variant(Item):
 
     item_type = 'variant'
     schema = load_schema('encoded:schemas/variant.json')
+    embedded_list = [
+        'VariantConsequence.definition'  # XXX: Get this info from mapping table
+    ]
 
 
     @calculated_property(schema={
@@ -368,9 +371,6 @@ class VariantSample(Item):
 
     item_type = 'variant_sample'
     schema = load_schema('encoded:schemas/variant_sample.json')
-    embedded_list = [
-        'VariantConsequence.definition'  # XXX: Get this info from mapping table
-    ]
 
     @calculated_property(schema={
         "title": "Display Title",
