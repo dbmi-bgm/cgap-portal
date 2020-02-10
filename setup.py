@@ -115,6 +115,7 @@ setup(
         run-upgrade-on-inserts = encoded.commands.run_upgrader_on_inserts:main
 
         mapping-table-intake = encoded.commands.mapping_table_intake:main
+        ingest-vcf = encoded.commands.ingest_vcf:main
         configure-kibana-index = encoded.commands.configure_kibana_index:main
         wipe-test-indices = snovault.commands.wipe_test_indices:main
 

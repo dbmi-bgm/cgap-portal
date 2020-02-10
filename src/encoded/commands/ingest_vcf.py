@@ -471,6 +471,10 @@ def main():
 
             config_uri: path to app config, usually 'production.ini'
             --app-name: app name, usually 'app'
+
+        To load a vcf on the server:
+            bin/ingest_vcf src/encoded/tests/data/sample_vcfs/test_vcf.vcf src/encoded/schemas/variant.json
+            src/encoded/schemas/variant_sample.json test-project hms-dbmi production.ini --app-name app --post-inserts
     """
     logging.basicConfig()
     parser = argparse.ArgumentParser(
