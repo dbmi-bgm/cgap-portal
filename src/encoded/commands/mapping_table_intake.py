@@ -4,8 +4,8 @@ import six
 import json
 import argparse
 import logging
-from pyramid.paster import get_app
-from webtest import TestApp
+#from pyramid.paster import get_app
+#from webtest import TestApp
 from collections import OrderedDict, Mapping
 
 logger = logging.getLogger(__name__)
@@ -51,6 +51,8 @@ class MappingTableParser(object):
         """
         fields = OrderedDict()
         for name in row:
+            if 'CALL_INFO' in name:
+                import pdb; pdb.set_trace()
             new_name = name.split('(')[0].strip().lower()
             new_name = new_name.replace(" ", "_")
             if new_name.startswith('#'):
@@ -176,11 +178,10 @@ class MappingTableParser(object):
             prop_name = item['vcf_name']
             features = OrderedDict()
             features.update({
-                "title": item.get('schema_title', 'None provided'),
+                "title": item.get('schema_title', prop_name),
                 "vcf_name": prop_name,
                 "type": item['field_type']
             })
-
             # handle fields where key changes directly
             if item.get('schema_description'):
                 features['description'] = item['schema_description']
@@ -243,7 +244,7 @@ class MappingTableParser(object):
             # convert to array structure
             if item.get('is_list'):
                 array_item = OrderedDict()
-                array_item.update( {
+                array_item.update({
                     "title": item.get('schema_title', 'None provided'),
                     "type": "array",
                     "vcf_name": item['vcf_name']
@@ -271,7 +272,7 @@ class MappingTableParser(object):
         for obj in inserts:
             if variant:
                 update(props, get_prop(obj))
-                if obj.get('facet_priority'):
+                if obj.get('facet_priority'):  # XXX: Hard coded around since this is not filled out. Enable later
                     facs[obj['vcf_name']] = {'title': obj['schema_title']}
                 if obj.get('column_priority'):
                     cols[obj['vcf_name']] = {'title': obj['schema_title']}
@@ -358,8 +359,22 @@ class MappingTableParser(object):
         schema['id'] = '/profiles/variant.json'
         schema['properties'] = var_props
         schema['properties']['schema_version'] = {'default': '1'}
-        schema['facets'] = facs
-        schema['columns'] = cols
+        hardcoded_cols_facs = {  # XXX: Hard coded. Set in mapping table and remove when actually specified.
+            'CHROM': {'title': 'CHROM'},
+            'POS': {'title': 'POS'},
+            'REF': {'title': 'REF'},
+            'ALT': {'title': 'ALT'},
+            'AF': {'title': 'AF'},
+            'DP': {'title': 'DP'},
+            'transcript.vep_consequence': {'title': 'vep_consequence'},
+            'transcript.vep_symbol': {'title': 'vep_symbol'},
+            'max_pop_af_af_popmax': {'title': 'max_pop_af_af_popmax'},
+            'transcript.vep_hgvsp': {'title': 'vep_hgvsp'},
+            'cadd_phred': {'title': 'cadd_phred'},
+            'conservation_phastcons100': {'title': 'conservation_phastcons100'},
+        }
+        schema['facets'] = hardcoded_cols_facs
+        schema['columns'] = hardcoded_cols_facs
         logger.info('Build variant schema')
         return schema
 

@@ -1,4 +1,4 @@
-import os
+import json
 import pytest
 from encoded.tests.data.sample_vcfs.expected import (
     VARIANT_SCHEMA,
@@ -10,6 +10,14 @@ from encoded.tests.data.sample_vcfs.expected import (
 from encoded.commands.ingest_vcf import (
     VCFParser
 )
+
+
+@pytest.fixture
+def post_variant_consequence_items(testapp):
+    """ Posts VariantConsequence items so we can post variants that link to these """
+    vcs = json.load(open('./src/encoded/tests/data/sample_vcfs/variant_consequence.json', 'r'))
+    for entry in vcs:
+        testapp.post_json('/variant_consequence', entry, status=201)
 
 
 @pytest.fixture
@@ -132,7 +140,7 @@ def test_VCFP_post_sample_variants(testapp, institution, project, test_vcf):
             testapp.post_json(CONNECTION_URL, sample, status=201)
 
 
-def test_VCFP_post_variants(testapp, institution, project, test_vcf):
+def test_VCFP_post_variants(testapp, institution, project, test_vcf, post_variant_consequence_items):
     """ Attempts to post all generated variants """
     CONNECTION_URL = '/variant'
     for record in test_vcf:
@@ -143,7 +151,21 @@ def test_VCFP_post_variants(testapp, institution, project, test_vcf):
         testapp.post_json(CONNECTION_URL, variant, status=201)
 
 
-def test_VCFP_make_links(testapp, institution, project, test_vcf):
+def test_VCFP_run(testapp, institution, project, test_vcf, post_variant_consequence_items):
+    """ Tests the 'run' method, which processes all the VCF records
+        Actual results are already validated in previous 3 tests, just
+        check to see that we get the 3 that we expect and they post correctly
+    """
+    vss, vs = test_vcf.run(project='encode-project', institution='encode-institution')
+    assert len(vss) == 2895
+    assert len(vs) == 965
+    for v in vs:
+        testapp.post_json('/variant', v, status=201)
+    for vs in vss:
+        testapp.post_json('/variant_sample', vs, status=201)
+
+
+def test_VCFP_make_links(testapp, institution, project, test_vcf, post_variant_consequence_items):
     """ Will post all generated variants and samples, forming linkTo's from variant_sample to variant """
     VARIANT_URL, VARIANT_SAMPLE_URL = '/variant', '/variant_sample'
     for record in test_vcf:
@@ -158,17 +180,3 @@ def test_VCFP_make_links(testapp, institution, project, test_vcf):
             sample['institution'] = 'encode-institution'
             sample['variant'] = res['@id']  # make link
             testapp.post_json(VARIANT_SAMPLE_URL, sample, status=201)
-
-
-def test_VCFP_run(testapp, institution, project, test_vcf):
-    """ Tests the 'run' method, which processes all the VCF records
-        Actual results are already validated in previous 3 tests, just
-        check to see that we get the 3 that we expect and they post correctly
-    """
-    vss, vs = test_vcf.run(project='encode-project', institution='encode-institution')
-    assert len(vss) == 2895
-    assert len(vs) == 965
-    for v in vs:
-        testapp.post_json('/variant', v, status=201)
-    for vs in vss:
-        testapp.post_json('/variant_sample', vs, status=201)

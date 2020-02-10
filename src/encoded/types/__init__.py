@@ -353,7 +353,8 @@ class Variant(Item):
         "type": "string"
     })
     def display_title(self, CHROM, POS, REF, ALT):
-        return 'C:%sP:%sR:%sA:%s' % (CHROM, POS, REF, ALT)
+        return 'chr%s:%s %s/%s' % (CHROM, POS, REF, ALT)
+
 
 @collection(
     name='variant-samples',

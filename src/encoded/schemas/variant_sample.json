@@ -44,15 +44,15 @@
     "id": "/profiles/variant_sample.json",
     "properties": {
         "CALL_INFO": {
-            "title": "None provided",
-            "vcf_name": "CALL_INFO (Sample name)",
+            "title": "CALL_INFO",
+            "vcf_name": "CALL_INFO",
             "type": "string",
             "description": "Calling info",
             "source_name": "VCF",
             "source_version": "VCFv4.2"
         },
         "GT": {
-            "title": "None provided",
+            "title": "GT",
             "vcf_name": "GT",
             "type": "string",
             "description": "Genotype",
@@ -60,7 +60,7 @@
             "source_version": "VCFv4.2"
         },
         "AD_ref": {
-            "title": "None provided",
+            "title": "AD_ref",
             "vcf_name": "AD_ref",
             "type": "integer",
             "description": "Reference allelic depth",
@@ -68,7 +68,7 @@
             "source_version": "VCFv4.2"
         },
         "AD_alt": {
-            "title": "None provided",
+            "title": "AD_alt",
             "vcf_name": "AD_alt",
             "type": "integer",
             "description": "Alternate allelic depth",
@@ -76,7 +76,7 @@
             "source_version": "VCFv4.2"
         },
         "DP": {
-            "title": "None provided",
+            "title": "DP",
             "vcf_name": "DP",
             "type": "integer",
             "description": "Approximate read depth",
@@ -84,7 +84,7 @@
             "source_version": "VCFv4.2"
         },
         "GQ": {
-            "title": "None provided",
+            "title": "GQ",
             "vcf_name": "GQ",
             "type": "integer",
             "description": "Genotype quality score",
@@ -92,7 +92,7 @@
             "source_version": "VCFv4.2"
         },
         "PL": {
-            "title": "None provided",
+            "title": "PL",
             "vcf_name": "PL",
             "type": "string",
             "description": "Phred-scaled likelihoods for genotype (Ref/Ref, Ref/Alt, Alt/Alt)",
@@ -100,7 +100,7 @@
             "source_version": "VCFv4.2"
         },
         "PGT": {
-            "title": "None provided",
+            "title": "PGT",
             "vcf_name": "PGT",
             "type": "string",
             "description": "Physical phasing haplotype information",
@@ -108,7 +108,7 @@
             "source_version": "VCFv4.2"
         },
         "PID": {
-            "title": "None provided",
+            "title": "PID",
             "vcf_name": "PID",
             "type": "string",
             "description": "Physical phasing ID information",
@@ -116,7 +116,7 @@
             "source_version": "VCFv4.2"
         },
         "PS": {
-            "title": "None provided",
+            "title": "PS",
             "vcf_name": "PS",
             "type": "integer",
             "description": "Phasing set ID",
@@ -124,7 +124,7 @@
             "source_version": "VCFv4.2"
         },
         "AF": {
-            "title": "None provided",
+            "title": "AF",
             "vcf_name": "AF",
             "type": "number",
             "description": "Sample allele fraction",
@@ -132,7 +132,7 @@
             "source_version": "VCFv4.2"
         },
         "RSTR": {
-            "title": "None provided",
+            "title": "RSTR",
             "vcf_name": "RSTR",
             "type": "string",
             "description": "Reference forward allele read count",
@@ -144,7 +144,7 @@
         },
         "sample": {
             "title": "Sample",
-            "type": "object",
+            "type": "string",
             "linkTo": "Sample"
         },
         "variant": {

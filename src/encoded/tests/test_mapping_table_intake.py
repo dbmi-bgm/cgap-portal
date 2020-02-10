@@ -101,7 +101,7 @@ def test_generate_variant_json_items(MTParser, inserts):
     var_props, cols, facs = MTParser.generate_properties(inserts)
 
     # check top level fields
-    assert var_props['CHROM']['title'] == 'None provided'
+    assert var_props['CHROM']['title'] == 'CHROM'
     assert var_props['CHROM']['type'] == 'string'
     assert var_props['CHROM']['max_size'] == 2
     assert var_props['POS']['type'] == 'integer'
@@ -162,6 +162,7 @@ def test_generate_variant_schema(MTParser, variant_items):
     assert len(sub_obj_props) == TRANSCRIPT_FIELDS_EXPECTED
     assert sub_obj_props['vep_consequence']['type'] == 'array'
     assert sub_obj_props['vep_consequence']['items']['type'] == 'string'
+    assert sub_obj_props['vep_consequence']['items']['linkTo'] == 'VariantConsequence'
     assert sub_obj_props['vep_domains']['type'] == 'array'
     assert sub_obj_props['vep_domains']['items']['separator'] == 'tilde'
     assert sub_obj_props['vep_domains']['items']['type'] == 'string'
