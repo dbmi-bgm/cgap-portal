@@ -67,3 +67,24 @@ When items are linked through an Association Item then reverse links are made th
 These associations are made by the [HPO project](https://hpo.jax.org/) and provided in a file of [HPOA annotations](http://compbio.charite.de/jenkins/job/hpo.annotations.current/lastSuccessfulBuild/).  Currently the predominant sources of the annotations are OMIM, Orphanet and Decipher but other sources and manually curated annotations are being continuously added to the datasource.
 
 The format of the input file is described [here](https://hpo.jax.org/app/help/annotations)
+
+The fields of the linking item for Disorders to Phenotypes include:
+
+* The database ID for the disorder as used in the HPO annotation file - this can be helpful to identify the source of the information i.e. OMIM, Orphanet ...
+* Attribution for the source of the annotation eg. a PMID or clinician ID
+* Curation history - when and by whom the annotation was created and modified
+* A standardized evidence code for the association
+  * **IEA - inferred from electronic annotation** eg. associations parsed from the clinical features section of OMIM
+  * **PCS - published clinical study** which should have a specific publication identifier referenced in the attribution field or traceable author statement
+  * **ICE - individual clinical experience** is appropriate for disorders with limited amount of published data and should be attributed to the person or center making the annotation.
+  * **TAS - traceable author statement** is used for associations from reviews or only refers to an original publication
+* Aspect that can be one of P (Phenotypic abnormality), I (inheritance), C (onset and clinical course) or M (modifier).
+* Additional optional information that can assist in evaluating the association.
+  * a term or value with information on frequency of the association
+  * information on onset
+  * if the association is sex-specific, which sex is affected
+  * modifier - a term from the clinical modifier sub-ontology
+
+**Gene-Disorder Associations**
+
+The source of the associations between human Genes and Disorders will be obtained from the [Monarch Initiative](https://monarchinitiative.org/).   The associations available from Monarch that were originally imported from the [OMIM](https://www.omim.org/) datasource will be used to populate the portal's Evidence items for this type of association. The source file that includes this information is `gene_disease.9606.tsv` found in this [directory](https://archive.monarchinitiative.org/latest/tsv/gene_associations/)

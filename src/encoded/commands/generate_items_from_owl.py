@@ -35,7 +35,7 @@ EPILOG = __doc__
 '''logging setup
    logging config - to be moved to file at some point
 '''
-LOGFILE = 'process_dp_upd.log'
+logfile = 'process_dp_upd.log'
 logger = logging.getLogger(__name__)
 
 logging.config.dictConfig({
@@ -59,7 +59,7 @@ logging.config.dictConfig({
             'level': 'INFO',
             'formatter': 'standard',
             'class': 'logging.FileHandler',
-            'filename': LOGFILE
+            'filename': logfile
         }
     },
     'loggers': {
@@ -211,9 +211,9 @@ def get_dbxrefs(class_, data):
 
 
 def get_alternative_ids(class_, data):
-        '''Gets alternative IDs for the class as strings
-        '''
-        return getObjectLiteralsOfType(class_, data, [hasAltId])
+    ''' Gets alternative IDs for the class as strings
+    '''
+    return getObjectLiteralsOfType(class_, data, [hasAltId])
 
 
 def _cleanup_non_fields(terms):
@@ -631,7 +631,7 @@ def owl_runner(value):
     return download_and_process_owl(*value)
 
 
-def post_report_document_to_portal(connection, itype):
+def post_report_document_to_portal(connection, itype, logfile):
     ''' Read the log file and encode it for upload as an attachment (blob) and
         post a Document for the log file
 
@@ -646,23 +646,19 @@ def post_report_document_to_portal(connection, itype):
     rtype = 'document'
     date = datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
     attach_fn = None
-    if os.path.isfile(LOGFILE):
+    if os.path.isfile(logfile):
         attach_fn = '{}_update_report_{}.txt'.format(itype, date)
+        with open(logfile, 'rb') as at:
+            data = at.read()
+            data_href = 'data:%s;base64,%s' % (mimetype, b64encode(data).decode('ascii'))
+            attach = {'download': attach_fn, 'type': mimetype, 'href': data_href}
+            meta['attachment'] = attach
+    if 'attachment' in meta:
         try:
-            os.rename(LOGFILE, attach_fn)
-        except OSError as e:
-            logger.warn("Cannot rename {}".format(LOGFILE))
-    with open(attach_fn, 'rb') as at:
-        data = at.read()
-    data_href = 'data:%s;base64,%s' % (mimetype, b64encode(data).decode('ascii'))
-    # data_href = 'data:%s;base64,%s' % (use_type, b64encode(request.json['href'].encode()).decode('ascii'))
-    attach = {'download': attach_fn, 'type': mimetype, 'href': data_href}
-    meta['attachment'] = attach
-    try:
-        res = post_metadata(meta, rtype, connection)
-        assert res.get('status') == 'success'
-    except Exception as e:
-        print("Problem posting report", e)
+            res = post_metadata(meta, rtype, connection)
+            assert res.get('status') == 'success'
+        except Exception as e:
+            print("Problem posting report", e)
     return
 
 
@@ -733,17 +729,19 @@ def main():
         pretty = False
         if args.pretty:
             pretty = True
-        write_outfile(items2upd, postfile, pretty)
+        if postfile:
+            write_outfile(items2upd, postfile, pretty)
         if loaddb:
-            env = args.env if args.env else 'local'  # may want to change to use key/secret as option to get env
-            res = load_items(env, items2upd, itypes=[itype])
+            res = load_items(items2upd, itypes=[itype], auth=connection)
             logger.info(res)
             logger.info(json.dumps(items2upd, indent=4))
     stop = datetime.datetime.now()
     logger.info('STARTED: {}'.format(str(start)))
     logger.info('END: {}'.format(str(stop)))
     if args.post_report:
-        post_report_document_to_portal(connection, itype)
+        post_report_document_to_portal(connection, itype, logfile)
+    dt = end.strftime("%y-%m-%d-%H-%M-%S")
+    os.rename(logfile, dt + logfile)
 
 
 if __name__ == '__main__':
