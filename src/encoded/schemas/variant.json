@@ -2415,12 +2415,6 @@
         }
     },
     "facets": {
-        "CHROM": {
-            "title": "CHROM"
-        },
-        "POS": {
-            "title": "POS"
-        },
         "REF": {
             "title": "REF"
         },
@@ -2453,12 +2447,6 @@
         }
     },
     "columns": {
-        "CHROM": {
-            "title": "CHROM"
-        },
-        "POS": {
-            "title": "POS"
-        },
         "REF": {
             "title": "REF"
         },

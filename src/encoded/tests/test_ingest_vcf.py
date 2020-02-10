@@ -126,7 +126,6 @@ def test_VCFP_multiple_sample_variants(test_vcf):
     result = test_vcf.create_sample_variant_from_record(record)[0]
     assert result['DP'] == 66
     assert result['AF'] == 0.833
-    #assert result['AD'] == [0, 66]
 
 
 def test_VCFP_post_sample_variants(testapp, institution, project, test_vcf):

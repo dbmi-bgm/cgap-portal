@@ -358,8 +358,6 @@ class MappingTableParser(object):
         schema['properties'] = var_props
         schema['properties']['schema_version'] = {'default': '1'}
         hardcoded_cols_facs = {  # XXX: Hard coded. Set in mapping table and remove when actually specified.
-            'CHROM': {'title': 'CHROM'},
-            'POS': {'title': 'POS'},
             'REF': {'title': 'REF'},
             'ALT': {'title': 'ALT'},
             'AF': {'title': 'AF'},

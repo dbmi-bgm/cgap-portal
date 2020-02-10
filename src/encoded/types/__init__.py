@@ -355,6 +355,38 @@ class Variant(Item):
     def display_title(self, CHROM, POS, REF, ALT):
         return 'chr%s:%s %s/%s' % (CHROM, POS, REF, ALT)
 
+    # add when AD is available
+    # @calculated_property(schema={
+    #     "title": "AD_REF",
+    #     "description": "Reference AD",
+    #     "type": "integer"
+    # })
+    # def AD_REF(self, AD):
+    #     if AD:
+    #         return AD.split(',')[0]  # AD = 15,32, first is ref second is alt
+    #     return ''
+    #
+    # @calculated_property(schema={
+    #     "title": "AD_ALT",
+    #     "description": "Reference AD",
+    #     "type": "integer"
+    # })
+    # def AD_ALT(self, AD):
+    #     if AD:
+    #         return AD.split(',')[1]  # AD = 15,32, first is ref second is alt
+    #     return ''
+    #
+    # @calculated_property(schema={
+    #     "title": "AF",
+    #     "description": "Allele Frequency",
+    #     "type": "number"
+    # })
+    # def AF(self, AD):
+    #     if AD:
+    #         ref, alt = AD.split(',')
+    #         return ref / (ref + alt)
+    #     return 0.0
+
 
 @collection(
     name='variant-samples',

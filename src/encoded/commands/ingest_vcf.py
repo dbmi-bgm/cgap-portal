@@ -455,6 +455,20 @@ class VCFParser(object):
             variants.append(v)
         return variant_samples, variants
 
+    @staticmethod
+    def post_variant_consequence_items(testapp, project=None, institution=None):
+        """ Posts variant_consequence items under the given project/institution. Required for poasting variants. """
+        vcs = json.load(open('./src/encoded/tests/data/sample_vcfs/variant_consequence.json', 'r'))
+        for entry in vcs:
+            if project:
+                entry['project'] = project
+            if institution:
+                entry['institution'] = institution
+            try:
+                testapp.post_json('/variant_consequence', entry, status=201)
+            except Exception as e:  # can happen with master-inserts collision
+                logger.info('Failed to post variant consequence %s' % str(e))
+
 
 def main():
     """ Main, ingests VCF and posts if args specified.
@@ -473,8 +487,7 @@ def main():
             --app-name: app name, usually 'app'
 
         To load a vcf on the server:
-            bin/ingest_vcf src/encoded/tests/data/sample_vcfs/test_vcf.vcf src/encoded/schemas/variant.json
-            src/encoded/schemas/variant_sample.json test-project hms-dbmi production.ini --app-name app --post-inserts
+            bin/ingest_vcf src/encoded/tests/data/sample_vcfs/test_vcf.vcf src/encoded/schemas/variant.json src/encoded/schemas/variant_sample.json test-project hms-dbmi production.ini --app-name app --post-inserts
     """
     logging.basicConfig()
     parser = argparse.ArgumentParser(
@@ -490,7 +503,9 @@ def main():
     parser.add_argument('config_uri', help="path to configfile")  # to get app
     parser.add_argument('--app-name', help="Pyramid app name in configfile")  # to get app
     parser.add_argument('--post-inserts', action='store_true', default=False,
-                        help='If specified, will post inserts, by default False')
+                        help='If specified, will post inserts, by default False.')
+    parser.add_argument('--post-variant-consequences', action='store_true', default=False,
+                        help='If specified will post all VariantConsequence items.')
     args = parser.parse_args()
 
     logger.info('Ingesting VCF file: %s' % args.vcf)
@@ -504,6 +519,8 @@ def main():
         }
         app = get_app(args.config_uri, args.app_name)
         testapp = TestApp(app, environ)
+        if args.post_variant_consequences:
+            vcf_parser.post_variant_consequence_items(testapp, project=args.project, institution=args.institution)
         for record in vcf_parser:
             variant = vcf_parser.create_variant_from_record(record)
             variant['project'] = args.project
