@@ -347,7 +347,7 @@ class Variant(Item):
     item_type = 'variant'
     schema = load_schema('encoded:schemas/variant.json')
     embedded_list = [
-        'VariantConsequence.definition'  # XXX: Get this info from mapping table
+        'transcript.vep_consequence.definition'  # XXX: Get this info from mapping table
     ]
 
 
