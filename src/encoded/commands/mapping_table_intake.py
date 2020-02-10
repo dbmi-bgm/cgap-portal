@@ -4,8 +4,8 @@ import six
 import json
 import argparse
 import logging
-#from pyramid.paster import get_app
-#from webtest import TestApp
+from pyramid.paster import get_app
+from webtest import TestApp
 from collections import OrderedDict, Mapping
 
 logger = logging.getLogger(__name__)
@@ -442,8 +442,7 @@ def main():
             --app-name: app name, usually 'app'
 
         From commands dir:
-            python mapping_table_intake.py ../tests/data/sample_vcfs/mtv03.csv ../schemas/annotation_field.json
-            ../schemas/variant.json ../schemas/variant_sample.json ../../../production.ini --app-name app
+            python mapping_table_intake.py ../tests/data/sample_vcfs/mtv03.csv ../schemas/annotation_field.json ../schemas/variant.json ../schemas/variant_sample.json ../../../production.ini --app-name app
 
     """
     logging.basicConfig()
