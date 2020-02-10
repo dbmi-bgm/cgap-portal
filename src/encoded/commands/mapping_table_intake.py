@@ -51,8 +51,6 @@ class MappingTableParser(object):
         """
         fields = OrderedDict()
         for name in row:
-            if 'CALL_INFO' in name:
-                import pdb; pdb.set_trace()
             new_name = name.split('(')[0].strip().lower()
             new_name = new_name.replace(" ", "_")
             if new_name.startswith('#'):
