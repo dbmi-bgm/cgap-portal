@@ -59,6 +59,14 @@
             "source_name": "VCF",
             "source_version": "VCFv4.2"
         },
+        "AD": {
+            "title": "AD",
+            "vcf_name": "AD",
+            "type": "string",
+            "description": "Allelic depth",
+            "source_name": "VCF",
+            "source_version": "VCFv4.2"
+        },
         "AD_ref": {
             "title": "AD_ref",
             "vcf_name": "AD_ref",
@@ -81,7 +89,8 @@
             "type": "integer",
             "description": "Approximate read depth",
             "source_name": "VCF",
-            "source_version": "VCFv4.2"
+            "source_version": "VCFv4.2",
+            "column_priority": 6
         },
         "GQ": {
             "title": "GQ",
@@ -129,7 +138,8 @@
             "type": "number",
             "description": "Sample allele fraction",
             "source_name": "VCF",
-            "source_version": "VCFv4.2"
+            "source_version": "VCFv4.2",
+            "column_priority": 5
         },
         "RSTR": {
             "title": "RSTR",
@@ -153,6 +163,20 @@
             "linkTo": "Variant"
         }
     },
-    "columns": {},
-    "facets": {}
+    "columns": {
+        "DP": {
+            "title": "DP"
+        },
+        "AF": {
+            "title": "AF"
+        }
+    },
+    "facets": {
+        "DP": {
+            "title": "DP"
+        },
+        "AF": {
+            "title": "AF"
+        }
+    }
 }

@@ -26,7 +26,7 @@ class MappingTableParser(object):
     """
     HEADER_ROW_INDEX = 2
     FIELD_TYPE_INDEX = 5  # XXX: hardcoded, must change if field_type is moved on mapping table
-    INTEGER_FIELDS = ['no', 'max_size']
+    INTEGER_FIELDS = ['no', 'max_size', 'column_priority', 'facet_priority']
     BOOLEAN_FIELDS = ['is_list', 'calculated_property']
 
     def __init__(self, _mp, schema):
@@ -191,14 +191,14 @@ class MappingTableParser(object):
                 features['lookup'] = item['field_priority']
 
             # handle string fields
-            for a_field in ['source_name', 'source_version', 'scale', 'domain', 'method', 'separator']:
+            for a_field in ['source_name', 'source_version', 'scale', 'domain', 'method', 'separator', 'embedded_fields']:
                 if item.get(a_field):
                     features[a_field] = item[a_field]
 
             # handle int fields
-            for a_field in ['max_size']:
+            for a_field in ['max_size', 'column_priority', 'facet_priority']:
                 if item.get(a_field):
-                    features[a_field]= int(item[a_field])
+                    features[a_field] = int(item[a_field])
 
             if variant:
 
@@ -270,11 +270,23 @@ class MappingTableParser(object):
         for obj in inserts:
             if variant:
                 update(props, get_prop(obj))
-                if obj.get('facet_priority'):  # XXX: Hard coded around since this is not filled out. Enable later
-                    facs[obj['vcf_name']] = {'title': obj['schema_title']}
-                if obj.get('column_priority'):
-                    cols[obj['vcf_name']] = {'title': obj['schema_title']}
+                if obj.get('facet_priority') and obj.get('scope') == 'variant':
+                    if obj.get('sub_embedding_group'):  # only need for variants now
+                        facs[obj.get('sub_embedding_group') + '.' + obj['vcf_name']] = {
+                            'title': obj.get('schema_title', obj.get('vcf_name'))}
+                    else:
+                        facs[obj['vcf_name']] = {'title': obj.get('schema_title', obj.get('vcf_name'))}
+                if obj.get('column_priority') and obj.get('scope') == 'variant':
+                    if obj.get('sub_embedding_group'):
+                        cols[obj.get('sub_embedding_group') + '.' + obj['vcf_name']] = {
+                            'title': obj.get('schema_title', obj.get('vcf_name'))}
+                    else:
+                        cols[obj['vcf_name']] = {'title': obj.get('schema_title', obj.get('vcf_name'))}
             else:
+                if obj.get('facet_priority') and obj.get('scope') == 'sample_variant':
+                    facs[obj['vcf_name']] = {'title': obj.get('schema_title', obj.get('vcf_name'))}
+                if obj.get('column_priority') and obj.get('scope') == 'sample_variant':
+                    cols[obj['vcf_name']] = {'title': obj.get('schema_title', obj.get('vcf_name'))}
                 if obj.get('sub_embedding_group'):
                     continue
                 props.update(get_prop(obj))
@@ -308,7 +320,7 @@ class MappingTableParser(object):
             { "$ref": "mixins.json#/static_embeds" }
         ]
 
-    def generate_variant_sample_schema(self, sample_props):
+    def generate_variant_sample_schema(self, sample_props, cols, facs):
         """ Builds the variant_sample.json schema based on sample_props
 
         Args:
@@ -334,8 +346,8 @@ class MappingTableParser(object):
             'type': 'string',
             'linkTo': 'Variant'
         }
-        schema['columns'] = {}
-        schema['facets'] = {}
+        schema['columns'] = cols
+        schema['facets'] = cols
         logger.info('Built variant_sample schema')
         return schema
 
@@ -357,20 +369,8 @@ class MappingTableParser(object):
         schema['id'] = '/profiles/variant.json'
         schema['properties'] = var_props
         schema['properties']['schema_version'] = {'default': '1'}
-        hardcoded_cols_facs = {  # XXX: Hard coded. Set in mapping table and remove when actually specified.
-            'REF': {'title': 'REF'},
-            'ALT': {'title': 'ALT'},
-            'AF': {'title': 'AF'},
-            'DP': {'title': 'DP'},
-            'transcript.vep_consequence': {'title': 'vep_consequence'},
-            'transcript.vep_symbol': {'title': 'vep_symbol'},
-            'max_pop_af_af_popmax': {'title': 'max_pop_af_af_popmax'},
-            'transcript.vep_hgvsp': {'title': 'vep_hgvsp'},
-            'cadd_phred': {'title': 'cadd_phred'},
-            'conservation_phastcons100': {'title': 'conservation_phastcons100'},
-        }
-        schema['facets'] = hardcoded_cols_facs
-        schema['columns'] = hardcoded_cols_facs
+        schema['facets'] = facs
+        schema['columns'] = cols
         logger.info('Build variant schema')
         return schema
 
@@ -401,10 +401,10 @@ class MappingTableParser(object):
             inserts: annotation field inserts
         """
         inserts = self.process_mp_inserts()
-        variant_sample_props, _, _ = self.generate_properties(self.filter_fields_by_sample(inserts), variant=False)
-        variant_props, cols, facs = self.generate_properties(self.filter_fields_by_variant(inserts))
-        variant_sample_schema = self.generate_variant_sample_schema(variant_sample_props)
-        variant_schema = self.generate_variant_schema(variant_props, cols, facs)
+        variant_sample_props, vs_cols, vs_facs = self.generate_properties(self.filter_fields_by_sample(inserts), variant=False)
+        variant_props, v_cols, v_facs = self.generate_properties(self.filter_fields_by_variant(inserts))
+        variant_sample_schema = self.generate_variant_sample_schema(variant_sample_props, cols=vs_cols, facs=vs_facs)
+        variant_schema = self.generate_variant_schema(variant_props, cols=v_cols, facs=v_facs)
         if write:
             if not vs_out or not v_out:
                 raise MappingTableIntakeException('Write specified but no output file given')

@@ -168,6 +168,11 @@
             "description": "I don't know",
             "type": "string"
         },
+        "embedded_fields": {
+            "title": "Embedded Fields",
+            "description": "Comma separated fields to be embedded from the item type linkTo",
+            "type": "string"
+        },
         "calculated_property": {
             "title": "Calculated Property",
             "description": "Boolean on whether or not this field is a calculated property of a variant",

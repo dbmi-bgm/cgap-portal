@@ -387,10 +387,10 @@ class VCFParser(object):
         """
         result['CALL_INFO'] = sample.sample
         data = sample.data
-        #result['AD'] = data.AD what to do?
         result['GT'] = data.GT
         result['DP'] = data.DP
         result['GQ'] = data.GQ
+        result['AD'] = ','.join(map(str, data.AD))
         result['PL'] = ','.join(map(str, data.PL))
 
     def create_sample_variant_from_record(self, record):
@@ -418,7 +418,8 @@ class VCFParser(object):
                         s[field.upper()] = self.cast_field_value(prop_type, val, sub_type)
                     else:
                         s[field.upper()] = self.cast_field_value(prop_type, val)
-            self.parse_samples(s, sample) # add sample fields, already formatted
+            self.parse_samples(s, sample)  # add sample fields, already formatted
+            del s['AF']  # XXX: comes from VCF but is not actually what we want. Get rid of it.
             result.append(s)
         return result
 

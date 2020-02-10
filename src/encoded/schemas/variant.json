@@ -77,7 +77,8 @@
             ],
             "source_name": "VCF",
             "source_version": "VCFv4.2",
-            "max_size": 2
+            "max_size": 2,
+            "column_priority": 1
         },
         "POS": {
             "title": "POS",
@@ -85,7 +86,8 @@
             "type": "integer",
             "description": "Position",
             "source_name": "VCF",
-            "source_version": "VCFv4.2"
+            "source_version": "VCFv4.2",
+            "column_priority": 2
         },
         "ID": {
             "title": "ID",
@@ -101,7 +103,8 @@
             "type": "string",
             "description": "Reference allele",
             "source_name": "VCF",
-            "source_version": "VCFv4.2"
+            "source_version": "VCFv4.2",
+            "column_priority": 3
         },
         "ALT": {
             "title": "ALT",
@@ -109,7 +112,8 @@
             "type": "string",
             "description": "Alternative allele",
             "source_name": "VCF",
-            "source_version": "VCFv4.2"
+            "source_version": "VCFv4.2",
+            "column_priority": 4
         },
         "QUAL": {
             "title": "QUAL",
@@ -168,7 +172,9 @@
                             "source_name": "VEP",
                             "source_version": "v98.4",
                             "separator": "tilde",
-                            "max_size": 66
+                            "max_size": 66,
+                            "column_priority": 7,
+                            "facet_priority": 2
                         }
                     },
                     "vep_impact": {
@@ -187,7 +193,9 @@
                         "description": "Gene symbol (e.g. HGNC)",
                         "source_name": "VEP",
                         "source_version": "v98.4",
-                        "max_size": 10
+                        "max_size": 10,
+                        "column_priority": 8,
+                        "facet_priority": 1
                     },
                     "vep_gene": {
                         "title": "vep_gene",
@@ -268,7 +276,8 @@
                         "description": "HGVS coding sequence name",
                         "source_name": "VEP",
                         "source_version": "v98.4",
-                        "max_size": 34
+                        "max_size": 34,
+                        "column_priority": 10
                     },
                     "vep_hgvsp": {
                         "title": "vep_hgvsp",
@@ -349,7 +358,9 @@
                         "description": "SO variant class",
                         "source_name": "VEP",
                         "source_version": "v98.4",
-                        "max_size": 3
+                        "max_size": 3,
+                        "column_priority": 13,
+                        "facet_priority": 6
                     },
                     "vep_hgnc_id": {
                         "title": "vep_hgnc_id",
@@ -657,7 +668,9 @@
             "description": "PhastCons 100 way score",
             "source_name": "CONSERVATION",
             "source_version": "2017-07-17",
-            "max_size": 5
+            "max_size": 5,
+            "column_priority": 12,
+            "facet_priority": 5
         },
         "conservation_phastcons30": {
             "title": "conservation_phastcons30",
@@ -729,7 +742,9 @@
             "description": "CADD Phred score",
             "source_name": "CADD",
             "source_version": "v1.5",
-            "max_size": 5
+            "max_size": 5,
+            "column_priority": 11,
+            "facet_priority": 3
         },
         "spliceai_symbol": {
             "title": "spliceai_symbol",
@@ -819,7 +834,9 @@
             "description": "maximum population allele frequency from gnomAD gnome v3.0",
             "source_name": "MAX_POP_AF",
             "source_version": "0.2",
-            "max_size": 11
+            "max_size": 11,
+            "column_priority": 9,
+            "facet_priority": 4
         },
         "gnomad_ac": {
             "title": "gnomad_ac",
@@ -827,7 +844,7 @@
             "type": "integer",
             "description": "Alternate allele count for samples",
             "source_name": "GNOMAD",
-            "source_version": "3",
+            "source_version": "v3.0",
             "max_size": 6
         },
         "gnomad_ac_afr": {
@@ -836,7 +853,7 @@
             "type": "integer",
             "description": "Alternate allele count for samples of African-American/African ancestry",
             "source_name": "GNOMAD",
-            "source_version": "3",
+            "source_version": "v3.0",
             "max_size": 5
         },
         "gnomad_ac_ami": {
@@ -845,7 +862,7 @@
             "type": "integer",
             "description": "Alternate allele count for samples of Amish ancestry",
             "source_name": "GNOMAD",
-            "source_version": "3",
+            "source_version": "v3.0",
             "max_size": 3
         },
         "gnomad_ac_amr": {
@@ -854,7 +871,7 @@
             "type": "integer",
             "description": "Alternate allele count for samples of Latino ancestry",
             "source_name": "GNOMAD",
-            "source_version": "3",
+            "source_version": "v3.0",
             "max_size": 5
         },
         "gnomad_ac_asj": {
@@ -863,7 +880,7 @@
             "type": "integer",
             "description": "Alternate allele count for samples of Ashkenazi Jewish ancestry",
             "source_name": "GNOMAD",
-            "source_version": "3",
+            "source_version": "v3.0",
             "max_size": 4
         },
         "gnomad_ac_eas": {
@@ -872,7 +889,7 @@
             "type": "integer",
             "description": "Alternate allele count for samples of East Asian ancestry",
             "source_name": "GNOMAD",
-            "source_version": "3",
+            "source_version": "v3.0",
             "max_size": 4
         },
         "gnomad_ac_fin": {
@@ -881,7 +898,7 @@
             "type": "integer",
             "description": "Alternate allele count for samples of Finnish ancestry",
             "source_name": "GNOMAD",
-            "source_version": "3",
+            "source_version": "v3.0",
             "max_size": 5
         },
         "gnomad_ac_nfe": {
@@ -890,7 +907,7 @@
             "type": "integer",
             "description": "Alternate allele count for samples of Non-Finnish European ancestry",
             "source_name": "GNOMAD",
-            "source_version": "3",
+            "source_version": "v3.0",
             "max_size": 5
         },
         "gnomad_ac_sas": {
@@ -899,7 +916,7 @@
             "type": "integer",
             "description": "Alternate allele count for samples of South Asian ancestry",
             "source_name": "GNOMAD",
-            "source_version": "3",
+            "source_version": "v3.0",
             "max_size": 4
         },
         "gnomad_ac_oth": {
@@ -908,7 +925,7 @@
             "type": "integer",
             "description": "Alternate allele count for samples of Other ancestry",
             "source_name": "GNOMAD",
-            "source_version": "3",
+            "source_version": "v3.0",
             "max_size": 4
         },
         "gnomad_ac_male": {
@@ -917,7 +934,7 @@
             "type": "integer",
             "description": "Alternate allele count for male samples",
             "source_name": "GNOMAD",
-            "source_version": "3",
+            "source_version": "v3.0",
             "max_size": 5
         },
         "gnomad_ac_afr_male": {
@@ -926,7 +943,7 @@
             "type": "integer",
             "description": "Alternate allele count for male samples of African-American/African ancestry",
             "source_name": "GNOMAD",
-            "source_version": "3",
+            "source_version": "v3.0",
             "max_size": 5
         },
         "gnomad_ac_ami_male": {
@@ -935,7 +952,7 @@
             "type": "integer",
             "description": "Alternate allele count for male samples of Amish ancestry",
             "source_name": "GNOMAD",
-            "source_version": "3",
+            "source_version": "v3.0",
             "max_size": 3
         },
         "gnomad_ac_amr_male": {
@@ -944,7 +961,7 @@
             "type": "integer",
             "description": "Alternate allele count for male samples of Latino ancestry",
             "source_name": "GNOMAD",
-            "source_version": "3",
+            "source_version": "v3.0",
             "max_size": 4
         },
         "gnomad_ac_asj_male": {
@@ -953,7 +970,7 @@
             "type": "integer",
             "description": "Alternate allele count for male samples of Ashkenazi Jewish ancestry",
             "source_name": "GNOMAD",
-            "source_version": "3",
+            "source_version": "v3.0",
             "max_size": 4
         },
         "gnomad_ac_eas_male": {
@@ -962,7 +979,7 @@
             "type": "integer",
             "description": "Alternate allele count for male samples of East Asian ancestry",
             "source_name": "GNOMAD",
-            "source_version": "3",
+            "source_version": "v3.0",
             "max_size": 4
         },
         "gnomad_ac_fin_male": {
@@ -971,7 +988,7 @@
             "type": "integer",
             "description": "Alternate allele count for male samples of Finnish ancestry",
             "source_name": "GNOMAD",
-            "source_version": "3",
+            "source_version": "v3.0",
             "max_size": 4
         },
         "gnomad_ac_nfe_male": {
@@ -980,7 +997,7 @@
             "type": "integer",
             "description": "Alternate allele count for male samples of Non-Finnish European ancestry",
             "source_name": "GNOMAD",
-            "source_version": "3",
+            "source_version": "v3.0",
             "max_size": 5
         },
         "gnomad_ac_sas_male": {
@@ -989,7 +1006,7 @@
             "type": "integer",
             "description": "Alternate allele count for male samples of South Asian ancestry",
             "source_name": "GNOMAD",
-            "source_version": "3",
+            "source_version": "v3.0",
             "max_size": 4
         },
         "gnomad_ac_oth_male": {
@@ -998,7 +1015,7 @@
             "type": "integer",
             "description": "Alternate allele count for male samples of Other ancestry",
             "source_name": "GNOMAD",
-            "source_version": "3",
+            "source_version": "v3.0",
             "max_size": 4
         },
         "gnomad_ac_female": {
@@ -1007,7 +1024,7 @@
             "type": "integer",
             "description": "Alternate allele count for female samples",
             "source_name": "GNOMAD",
-            "source_version": "3",
+            "source_version": "v3.0",
             "max_size": 5
         },
         "gnomad_ac_afr_female": {
@@ -1016,7 +1033,7 @@
             "type": "integer",
             "description": "Alternate allele count for female samples of African-American/African ancestry",
             "source_name": "GNOMAD",
-            "source_version": "3",
+            "source_version": "v3.0",
             "max_size": 5
         },
         "gnomad_ac_ami_female": {
@@ -1025,7 +1042,7 @@
             "type": "integer",
             "description": "Alternate allele count for female samples of Amish ancestry",
             "source_name": "GNOMAD",
-            "source_version": "3",
+            "source_version": "v3.0",
             "max_size": 3
         },
         "gnomad_ac_amr_female": {
@@ -1034,7 +1051,7 @@
             "type": "integer",
             "description": "Alternate allele count for female samples of Latino ancestry",
             "source_name": "GNOMAD",
-            "source_version": "3",
+            "source_version": "v3.0",
             "max_size": 4
         },
         "gnomad_ac_asj_female": {
@@ -1043,7 +1060,7 @@
             "type": "integer",
             "description": "Alternate allele count for female samples of Ashkenazi Jewish ancestry",
             "source_name": "GNOMAD",
-            "source_version": "3",
+            "source_version": "v3.0",
             "max_size": 4
         },
         "gnomad_ac_eas_female": {
@@ -1052,7 +1069,7 @@
             "type": "integer",
             "description": "Alternate allele count for female samples of East Asian ancestry",
             "source_name": "GNOMAD",
-            "source_version": "3",
+            "source_version": "v3.0",
             "max_size": 4
         },
         "gnomad_ac_fin_female": {
@@ -1061,7 +1078,7 @@
             "type": "integer",
             "description": "Alternate allele count for female samples of Finnish ancestry",
             "source_name": "GNOMAD",
-            "source_version": "3",
+            "source_version": "v3.0",
             "max_size": 4
         },
         "gnomad_ac_nfe_female": {
@@ -1070,7 +1087,7 @@
             "type": "integer",
             "description": "Alternate allele count for female samples of Non-Finnish European ancestry",
             "source_name": "GNOMAD",
-            "source_version": "3",
+            "source_version": "v3.0",
             "max_size": 5
         },
         "gnomad_ac_sas_female": {
@@ -1079,7 +1096,7 @@
             "type": "integer",
             "description": "Alternate allele count for female samples of South Asian ancestry",
             "source_name": "GNOMAD",
-            "source_version": "3",
+            "source_version": "v3.0",
             "max_size": 3
         },
         "gnomad_ac_oth_female": {
@@ -1088,7 +1105,7 @@
             "type": "integer",
             "description": "Alternate allele count for female samples of Other ancestry",
             "source_name": "GNOMAD",
-            "source_version": "3",
+            "source_version": "v3.0",
             "max_size": 4
         },
         "gnomad_ac_raw": {
@@ -1097,7 +1114,7 @@
             "type": "integer",
             "description": "Alternate allele count for samples before removing low-confidence genotypes",
             "source_name": "GNOMAD",
-            "source_version": "3",
+            "source_version": "v3.0",
             "max_size": 6
         },
         "gnomad_an": {
@@ -1106,7 +1123,7 @@
             "type": "integer",
             "description": "Total number of alleles in samples",
             "source_name": "GNOMAD",
-            "source_version": "3",
+            "source_version": "v3.0",
             "max_size": 6
         },
         "gnomad_an_afr": {
@@ -1115,7 +1132,7 @@
             "type": "integer",
             "description": "Total number of alleles in samples of African-American/African ancestry",
             "source_name": "GNOMAD",
-            "source_version": "3",
+            "source_version": "v3.0",
             "max_size": 5
         },
         "gnomad_an_ami": {
@@ -1124,7 +1141,7 @@
             "type": "integer",
             "description": "Total number of alleles in samples of Amish ancestry",
             "source_name": "GNOMAD",
-            "source_version": "3",
+            "source_version": "v3.0",
             "max_size": 3
         },
         "gnomad_an_amr": {
@@ -1133,7 +1150,7 @@
             "type": "integer",
             "description": "Total number of alleles in samples of Latino ancestry",
             "source_name": "GNOMAD",
-            "source_version": "3",
+            "source_version": "v3.0",
             "max_size": 5
         },
         "gnomad_an_asj": {
@@ -1142,7 +1159,7 @@
             "type": "integer",
             "description": "Total number of alleles in samples of Ashkenazi Jewish ancestry",
             "source_name": "GNOMAD",
-            "source_version": "3",
+            "source_version": "v3.0",
             "max_size": 4
         },
         "gnomad_an_eas": {
@@ -1151,7 +1168,7 @@
             "type": "integer",
             "description": "Total number of alleles in samples of East Asian ancestry",
             "source_name": "GNOMAD",
-            "source_version": "3",
+            "source_version": "v3.0",
             "max_size": 4
         },
         "gnomad_an_fin": {
@@ -1160,7 +1177,7 @@
             "type": "integer",
             "description": "Total number of alleles in samples of Finnish ancestry",
             "source_name": "GNOMAD",
-            "source_version": "3",
+            "source_version": "v3.0",
             "max_size": 5
         },
         "gnomad_an_nfe": {
@@ -1169,7 +1186,7 @@
             "type": "integer",
             "description": "Total number of alleles in samples of Non-Finnish European ancestry",
             "source_name": "GNOMAD",
-            "source_version": "3",
+            "source_version": "v3.0",
             "max_size": 5
         },
         "gnomad_an_sas": {
@@ -1178,7 +1195,7 @@
             "type": "integer",
             "description": "Total number of alleles in samples of South Asian ancestry",
             "source_name": "GNOMAD",
-            "source_version": "3",
+            "source_version": "v3.0",
             "max_size": 4
         },
         "gnomad_an_oth": {
@@ -1187,7 +1204,7 @@
             "type": "integer",
             "description": "Total number of alleles in samples of Other ancestry",
             "source_name": "GNOMAD",
-            "source_version": "3",
+            "source_version": "v3.0",
             "max_size": 4
         },
         "gnomad_an_male": {
@@ -1196,7 +1213,7 @@
             "type": "integer",
             "description": "Total number of alleles in male samples",
             "source_name": "GNOMAD",
-            "source_version": "3",
+            "source_version": "v3.0",
             "max_size": 5
         },
         "gnomad_an_afr_male": {
@@ -1205,7 +1222,7 @@
             "type": "integer",
             "description": "Total number of alleles in male samples of African-American/African ancestry",
             "source_name": "GNOMAD",
-            "source_version": "3",
+            "source_version": "v3.0",
             "max_size": 5
         },
         "gnomad_an_ami_male": {
@@ -1214,7 +1231,7 @@
             "type": "integer",
             "description": "Total number of alleles in male samples of Amish ancestry",
             "source_name": "GNOMAD",
-            "source_version": "3",
+            "source_version": "v3.0",
             "max_size": 3
         },
         "gnomad_an_amr_male": {
@@ -1223,7 +1240,7 @@
             "type": "integer",
             "description": "Total number of alleles in male samples of Latino ancestry",
             "source_name": "GNOMAD",
-            "source_version": "3",
+            "source_version": "v3.0",
             "max_size": 4
         },
         "gnomad_an_asj_male": {
@@ -1232,7 +1249,7 @@
             "type": "integer",
             "description": "Total number of alleles in male samples of Ashkenazi Jewish ancestry",
             "source_name": "GNOMAD",
-            "source_version": "3",
+            "source_version": "v3.0",
             "max_size": 4
         },
         "gnomad_an_eas_male": {
@@ -1241,7 +1258,7 @@
             "type": "integer",
             "description": "Total number of alleles in male samples of East Asian ancestry",
             "source_name": "GNOMAD",
-            "source_version": "3",
+            "source_version": "v3.0",
             "max_size": 4
         },
         "gnomad_an_fin_male": {
@@ -1250,7 +1267,7 @@
             "type": "integer",
             "description": "Total number of alleles in male samples of Finnish ancestry",
             "source_name": "GNOMAD",
-            "source_version": "3",
+            "source_version": "v3.0",
             "max_size": 4
         },
         "gnomad_an_nfe_male": {
@@ -1259,7 +1276,7 @@
             "type": "integer",
             "description": "Total number of alleles in male samples of Non-Finnish European ancestry",
             "source_name": "GNOMAD",
-            "source_version": "3",
+            "source_version": "v3.0",
             "max_size": 5
         },
         "gnomad_an_sas_male": {
@@ -1268,7 +1285,7 @@
             "type": "integer",
             "description": "Total number of alleles in male samples of South Asian ancestry",
             "source_name": "GNOMAD",
-            "source_version": "3",
+            "source_version": "v3.0",
             "max_size": 4
         },
         "gnomad_an_oth_male": {
@@ -1277,7 +1294,7 @@
             "type": "integer",
             "description": "Total number of alleles in male samples of Other ancestry",
             "source_name": "GNOMAD",
-            "source_version": "3",
+            "source_version": "v3.0",
             "max_size": 4
         },
         "gnomad_an_female": {
@@ -1286,7 +1303,7 @@
             "type": "integer",
             "description": "Total number of alleles in female samples",
             "source_name": "GNOMAD",
-            "source_version": "3",
+            "source_version": "v3.0",
             "max_size": 5
         },
         "gnomad_an_afr_female": {
@@ -1295,7 +1312,7 @@
             "type": "integer",
             "description": "Total number of alleles in female samples of African-American/African ancestry",
             "source_name": "GNOMAD",
-            "source_version": "3",
+            "source_version": "v3.0",
             "max_size": 5
         },
         "gnomad_an_ami_female": {
@@ -1304,7 +1321,7 @@
             "type": "integer",
             "description": "Total number of alleles in female samples of Amish ancestry",
             "source_name": "GNOMAD",
-            "source_version": "3",
+            "source_version": "v3.0",
             "max_size": 3
         },
         "gnomad_an_amr_female": {
@@ -1313,7 +1330,7 @@
             "type": "integer",
             "description": "Total number of alleles in female samples of Latino ancestry",
             "source_name": "GNOMAD",
-            "source_version": "3",
+            "source_version": "v3.0",
             "max_size": 4
         },
         "gnomad_an_asj_female": {
@@ -1322,7 +1339,7 @@
             "type": "integer",
             "description": "Total number of alleles in female samples of Ashkenazi Jewish ancestry",
             "source_name": "GNOMAD",
-            "source_version": "3",
+            "source_version": "v3.0",
             "max_size": 4
         },
         "gnomad_an_eas_female": {
@@ -1331,7 +1348,7 @@
             "type": "integer",
             "description": "Total number of alleles in female samples of East Asian ancestry",
             "source_name": "GNOMAD",
-            "source_version": "3",
+            "source_version": "v3.0",
             "max_size": 4
         },
         "gnomad_an_fin_female": {
@@ -1340,7 +1357,7 @@
             "type": "integer",
             "description": "Total number of alleles in female samples of Finnish ancestry",
             "source_name": "GNOMAD",
-            "source_version": "3",
+            "source_version": "v3.0",
             "max_size": 4
         },
         "gnomad_an_nfe_female": {
@@ -1349,7 +1366,7 @@
             "type": "integer",
             "description": "Total number of alleles in female samples of Non-Finnish European ancestry",
             "source_name": "GNOMAD",
-            "source_version": "3",
+            "source_version": "v3.0",
             "max_size": 5
         },
         "gnomad_an_sas_female": {
@@ -1358,7 +1375,7 @@
             "type": "integer",
             "description": "Total number of alleles in female samples of South Asian ancestry",
             "source_name": "GNOMAD",
-            "source_version": "3",
+            "source_version": "v3.0",
             "max_size": 3
         },
         "gnomad_an_oth_female": {
@@ -1367,7 +1384,7 @@
             "type": "integer",
             "description": "Total number of alleles in female samples of Other ancestry",
             "source_name": "GNOMAD",
-            "source_version": "3",
+            "source_version": "v3.0",
             "max_size": 4
         },
         "gnomad_an_raw": {
@@ -1376,7 +1393,7 @@
             "type": "integer",
             "description": "Total number of alleles in samples before removing low-confidence genotypes",
             "source_name": "GNOMAD",
-            "source_version": "3",
+            "source_version": "v3.0",
             "max_size": 6
         },
         "gnomad_af": {
@@ -1385,7 +1402,7 @@
             "type": "number",
             "description": "Alternate allele frequency in samples",
             "source_name": "GNOMAD",
-            "source_version": "3",
+            "source_version": "v3.0",
             "max_size": 11
         },
         "gnomad_af_afr": {
@@ -1394,7 +1411,7 @@
             "type": "number",
             "description": "Alternate allele frequency in samples of African-American/African ancestry",
             "source_name": "GNOMAD",
-            "source_version": "3",
+            "source_version": "v3.0",
             "max_size": 11
         },
         "gnomad_af_ami": {
@@ -1403,7 +1420,7 @@
             "type": "number",
             "description": "Alternate allele frequency in samples of Amish ancestry",
             "source_name": "GNOMAD",
-            "source_version": "3",
+            "source_version": "v3.0",
             "max_size": 11
         },
         "gnomad_af_amr": {
@@ -1412,7 +1429,7 @@
             "type": "number",
             "description": "Alternate allele frequency in samples of Latino ancestry",
             "source_name": "GNOMAD",
-            "source_version": "3",
+            "source_version": "v3.0",
             "max_size": 11
         },
         "gnomad_af_asj": {
@@ -1421,7 +1438,7 @@
             "type": "number",
             "description": "Alternate allele frequency in samples of Ashkenazi Jewish ancestry",
             "source_name": "GNOMAD",
-            "source_version": "3",
+            "source_version": "v3.0",
             "max_size": 11
         },
         "gnomad_af_eas": {
@@ -1430,7 +1447,7 @@
             "type": "number",
             "description": "Alternate allele frequency in samples of East Asian ancestry",
             "source_name": "GNOMAD",
-            "source_version": "3",
+            "source_version": "v3.0",
             "max_size": 11
         },
         "gnomad_af_fin": {
@@ -1439,7 +1456,7 @@
             "type": "number",
             "description": "Alternate allele frequency in samples of Finnish ancestry",
             "source_name": "GNOMAD",
-            "source_version": "3",
+            "source_version": "v3.0",
             "max_size": 11
         },
         "gnomad_af_nfe": {
@@ -1448,7 +1465,7 @@
             "type": "number",
             "description": "Alternate allele frequency in samples of Non-Finnish European ancestry",
             "source_name": "GNOMAD",
-            "source_version": "3",
+            "source_version": "v3.0",
             "max_size": 11
         },
         "gnomad_af_sas": {
@@ -1457,7 +1474,7 @@
             "type": "number",
             "description": "Alternate allele frequency in samples of South Asian ancestry",
             "source_name": "GNOMAD",
-            "source_version": "3",
+            "source_version": "v3.0",
             "max_size": 11
         },
         "gnomad_af_oth": {
@@ -1466,7 +1483,7 @@
             "type": "number",
             "description": "Alternate allele frequency in samples of Other ancestry",
             "source_name": "GNOMAD",
-            "source_version": "3",
+            "source_version": "v3.0",
             "max_size": 11
         },
         "gnomad_af_male": {
@@ -1475,7 +1492,7 @@
             "type": "number",
             "description": "Alternate allele frequency in male samples",
             "source_name": "GNOMAD",
-            "source_version": "3",
+            "source_version": "v3.0",
             "max_size": 11
         },
         "gnomad_af_afr_male": {
@@ -1484,7 +1501,7 @@
             "type": "number",
             "description": "Alternate allele frequency in male samples of African-American/African ancestry",
             "source_name": "GNOMAD",
-            "source_version": "3",
+            "source_version": "v3.0",
             "max_size": 11
         },
         "gnomad_af_ami_male": {
@@ -1493,7 +1510,7 @@
             "type": "number",
             "description": "Alternate allele frequency in male samples of Amish ancestry",
             "source_name": "GNOMAD",
-            "source_version": "3",
+            "source_version": "v3.0",
             "max_size": 11
         },
         "gnomad_af_amr_male": {
@@ -1502,7 +1519,7 @@
             "type": "number",
             "description": "Alternate allele frequency in male samples of Latino ancestry",
             "source_name": "GNOMAD",
-            "source_version": "3",
+            "source_version": "v3.0",
             "max_size": 11
         },
         "gnomad_af_asj_male": {
@@ -1511,7 +1528,7 @@
             "type": "number",
             "description": "Alternate allele frequency in male samples of Ashkenazi Jewish ancestry",
             "source_name": "GNOMAD",
-            "source_version": "3",
+            "source_version": "v3.0",
             "max_size": 11
         },
         "gnomad_af_eas_male": {
@@ -1520,7 +1537,7 @@
             "type": "number",
             "description": "Alternate allele frequency in male samples of East Asian ancestry",
             "source_name": "GNOMAD",
-            "source_version": "3",
+            "source_version": "v3.0",
             "max_size": 11
         },
         "gnomad_af_fin_male": {
@@ -1529,7 +1546,7 @@
             "type": "number",
             "description": "Alternate allele frequency in male samples of Finnish ancestry",
             "source_name": "GNOMAD",
-            "source_version": "3",
+            "source_version": "v3.0",
             "max_size": 11
         },
         "gnomad_af_nfe_male": {
@@ -1538,7 +1555,7 @@
             "type": "number",
             "description": "Alternate allele frequency in male samples of Non-Finnish European ancestry",
             "source_name": "GNOMAD",
-            "source_version": "3",
+            "source_version": "v3.0",
             "max_size": 11
         },
         "gnomad_af_sas_male": {
@@ -1547,7 +1564,7 @@
             "type": "number",
             "description": "Alternate allele frequency in male samples of South Asian ancestry",
             "source_name": "GNOMAD",
-            "source_version": "3",
+            "source_version": "v3.0",
             "max_size": 11
         },
         "gnomad_af_oth_male": {
@@ -1556,7 +1573,7 @@
             "type": "number",
             "description": "Alternate allele frequency in male samples of Other ancestry",
             "source_name": "GNOMAD",
-            "source_version": "3",
+            "source_version": "v3.0",
             "max_size": 11
         },
         "gnomad_af_female": {
@@ -1565,7 +1582,7 @@
             "type": "number",
             "description": "Alternate allele frequency in female samples",
             "source_name": "GNOMAD",
-            "source_version": "3",
+            "source_version": "v3.0",
             "max_size": 11
         },
         "gnomad_af_afr_female": {
@@ -1574,7 +1591,7 @@
             "type": "number",
             "description": "Alternate allele frequency in female samples of African-American/African ancestry",
             "source_name": "GNOMAD",
-            "source_version": "3",
+            "source_version": "v3.0",
             "max_size": 11
         },
         "gnomad_af_ami_female": {
@@ -1583,7 +1600,7 @@
             "type": "number",
             "description": "Alternate allele frequency in female samples of Amish ancestry",
             "source_name": "GNOMAD",
-            "source_version": "3",
+            "source_version": "v3.0",
             "max_size": 11
         },
         "gnomad_af_amr_female": {
@@ -1592,7 +1609,7 @@
             "type": "number",
             "description": "Alternate allele frequency in female samples of Latino ancestry",
             "source_name": "GNOMAD",
-            "source_version": "3",
+            "source_version": "v3.0",
             "max_size": 11
         },
         "gnomad_af_asj_female": {
@@ -1601,7 +1618,7 @@
             "type": "number",
             "description": "Alternate allele frequency in female samples of Ashkenazi Jewish ancestry",
             "source_name": "GNOMAD",
-            "source_version": "3",
+            "source_version": "v3.0",
             "max_size": 11
         },
         "gnomad_af_eas_female": {
@@ -1610,7 +1627,7 @@
             "type": "number",
             "description": "Alternate allele frequency in female samples of East Asian ancestry",
             "source_name": "GNOMAD",
-            "source_version": "3",
+            "source_version": "v3.0",
             "max_size": 11
         },
         "gnomad_af_fin_female": {
@@ -1619,7 +1636,7 @@
             "type": "number",
             "description": "Alternate allele frequency in female samples of Finnish ancestry",
             "source_name": "GNOMAD",
-            "source_version": "3",
+            "source_version": "v3.0",
             "max_size": 11
         },
         "gnomad_af_nfe_female": {
@@ -1628,7 +1645,7 @@
             "type": "number",
             "description": "Alternate allele frequency in female samples of Non-Finnish European ancestry",
             "source_name": "GNOMAD",
-            "source_version": "3",
+            "source_version": "v3.0",
             "max_size": 11
         },
         "gnomad_af_sas_female": {
@@ -1637,7 +1654,7 @@
             "type": "number",
             "description": "Alternate allele frequency in female samples of South Asian ancestry",
             "source_name": "GNOMAD",
-            "source_version": "3",
+            "source_version": "v3.0",
             "max_size": 11
         },
         "gnomad_af_oth_female": {
@@ -1646,7 +1663,7 @@
             "type": "number",
             "description": "Alternate allele frequency in female samples of Other ancestry",
             "source_name": "GNOMAD",
-            "source_version": "3",
+            "source_version": "v3.0",
             "max_size": 11
         },
         "gnomad_af_raw": {
@@ -1655,7 +1672,7 @@
             "type": "number",
             "description": "Alternate allele frequency in samples before removing low-confidence genotypes",
             "source_name": "GNOMAD",
-            "source_version": "3",
+            "source_version": "v3.0",
             "max_size": 11
         },
         "gnomad_dp": {
@@ -1664,7 +1681,7 @@
             "type": "integer",
             "description": "depth",
             "source_name": "GNOMAD",
-            "source_version": "3",
+            "source_version": "v3.0",
             "max_size": 8
         },
         "topmed_an": {
@@ -2415,49 +2432,37 @@
         }
     },
     "facets": {
-        "REF": {
-            "title": "REF"
-        },
-        "ALT": {
-            "title": "ALT"
-        },
-        "AF": {
-            "title": "AF"
-        },
-        "DP": {
-            "title": "DP"
-        },
         "transcript.vep_consequence": {
             "title": "vep_consequence"
         },
         "transcript.vep_symbol": {
             "title": "vep_symbol"
         },
-        "max_pop_af_af_popmax": {
-            "title": "max_pop_af_af_popmax"
+        "transcript.vep_variant_class": {
+            "title": "vep_variant_class"
         },
-        "transcript.vep_hgvsp": {
-            "title": "vep_hgvsp"
+        "conservation_phastcons100": {
+            "title": "conservation_phastcons100"
         },
         "cadd_phred": {
             "title": "cadd_phred"
         },
-        "conservation_phastcons100": {
-            "title": "conservation_phastcons100"
+        "max_pop_af_af_popmax": {
+            "title": "max_pop_af_af_popmax"
         }
     },
     "columns": {
+        "CHROM": {
+            "title": "CHROM"
+        },
+        "POS": {
+            "title": "POS"
+        },
         "REF": {
             "title": "REF"
         },
         "ALT": {
             "title": "ALT"
-        },
-        "AF": {
-            "title": "AF"
-        },
-        "DP": {
-            "title": "DP"
         },
         "transcript.vep_consequence": {
             "title": "vep_consequence"
@@ -2465,17 +2470,20 @@
         "transcript.vep_symbol": {
             "title": "vep_symbol"
         },
-        "max_pop_af_af_popmax": {
-            "title": "max_pop_af_af_popmax"
+        "transcript.vep_hgvsc": {
+            "title": "vep_hgvsc"
         },
-        "transcript.vep_hgvsp": {
-            "title": "vep_hgvsp"
+        "transcript.vep_variant_class": {
+            "title": "vep_variant_class"
+        },
+        "conservation_phastcons100": {
+            "title": "conservation_phastcons100"
         },
         "cadd_phred": {
             "title": "cadd_phred"
         },
-        "conservation_phastcons100": {
-            "title": "conservation_phastcons100"
+        "max_pop_af_af_popmax": {
+            "title": "max_pop_af_af_popmax"
         }
     }
 }

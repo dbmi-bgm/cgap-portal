@@ -13,16 +13,16 @@ EXPECTED_FIELDS = ['no', 'vcf_name', 'source_name', 'source_version', 'sub_embed
                    'field_type', 'is_list', 'separator', 'max_size', 'schema_description', 'value_example',
                    'enum_list', 'field_priority', 'column_priority', 'facet_grouping', 'facet_priority',
                    'scale', 'domain', 'method', 'annotation_grouping', 'scope', 'schema_title', 'pre_addon', 'links_to',
-                   'calculated_property']
+                   'embedded_fields', 'calculated_property']
 EXPECTED_INSERT = {'no': 1, 'vcf_name': 'CHROM', 'source_name': 'VCF', 'source_version': 'VCFv4.2',
                    'field_type': 'string', 'is_list': False, 'max_size': 2, 'schema_description': 'Chromosome',
-                   'value_example': '1;2;3;4;5;6;22;X;Y;M',
+                   'value_example': '1;2;3;4;5;6;22;X;Y;M', 'column_priority': 1,
                    'enum_list':
                        ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16',
                         '17', '18', '19', '20', '21', '22', 'X', 'Y', 'M'],
                    'scope': 'variant'}
-NUMBER_ANNOTATION_FIELDS = 265
-SAMPLE_FIELDS_EXPECTED = 12
+NUMBER_ANNOTATION_FIELDS = 266
+SAMPLE_FIELDS_EXPECTED = 13
 VARIANT_FIELDS_EXPECTED = 253
 TRANSCRIPT_FIELDS_EXPECTED = 47
 
@@ -92,7 +92,11 @@ def test_generate_sample_json_items(MTParser, inserts):
     assert sample_props['PGT']['source_name'] == 'VCF'
     assert sample_props['RSTR']['type'] == 'string'
     assert sample_props['RSTR']['source_name'] == 'novoCaller'
-    assert cols == {}
+
+    # check cols/facs
+    assert 'AF' in cols
+    assert 'DP' in cols
+    assert 'ALT' not in cols
     assert facs == {}  # none on either currently
 
 
@@ -120,15 +124,19 @@ def test_generate_variant_json_items(MTParser, inserts):
     assert sub_obj_props['vep_consequence']['items']['type'] == 'string'
     assert sub_obj_props['vep_consequence']['items']['separator'] == 'tilde'
 
-    # check cols, facs
-    assert cols == {}
-    assert facs == {}
+    # check cols/facs
+    assert 'ALT' in cols
+    assert 'CHROM' in cols
+    assert 'cadd_phred' in cols
+    assert 'AF' not in cols
+    assert 'cadd_phred' in facs
+    assert 'transcript.vep_symbol' in facs
 
 
 def test_generate_variant_sample_schema(MTParser, sample_variant_items):
     """ Tests some aspects of the variant_sample schema """
-    items, _, _ = sample_variant_items
-    schema = MTParser.generate_variant_sample_schema(items)
+    items, cols, facs = sample_variant_items
+    schema = MTParser.generate_variant_sample_schema(items, cols, facs)
     properties = schema['properties']
     assert 'CHROM' not in properties
     assert 'vep_consequence' not in properties
@@ -137,6 +145,7 @@ def test_generate_variant_sample_schema(MTParser, sample_variant_items):
     assert properties['AF']['type'] == 'number'
     assert properties['RSTR']['type'] == 'string'
     assert 'columns' in schema
+    assert 'AF' in schema['columns']
     assert 'facets' in schema
     assert 'variant' in properties
     assert 'sample' in properties
@@ -161,8 +170,10 @@ def test_generate_variant_schema(MTParser, variant_items):
     sub_obj_props = properties['transcript']['items']['properties']
     assert len(sub_obj_props) == TRANSCRIPT_FIELDS_EXPECTED
     assert sub_obj_props['vep_consequence']['type'] == 'array'
+    assert sub_obj_props['vep_consequence']['items']['facet_priority'] == 2
     assert sub_obj_props['vep_consequence']['items']['type'] == 'string'
     assert sub_obj_props['vep_consequence']['items']['linkTo'] == 'VariantConsequence'
+    assert sub_obj_props['vep_consequence']['items']['embedded_fields'] == 'definition'  # XXX: allow multiple
     assert sub_obj_props['vep_domains']['type'] == 'array'
     assert sub_obj_props['vep_domains']['items']['separator'] == 'tilde'
     assert sub_obj_props['vep_domains']['items']['type'] == 'string'
@@ -170,6 +181,11 @@ def test_generate_variant_schema(MTParser, variant_items):
     assert sub_obj_props['vep_somatic']['type'] == 'array'
     assert sub_obj_props['vep_somatic']['items']['type'] == 'boolean'
     assert sub_obj_props['vep_somatic']['items']['separator'] == 'tilde'
+
+    # check cols/facs
+    assert 'ALT' in schema['columns']
+    assert 'AF' not in schema['columns']
+    assert 'transcript.vep_consequence' in schema['facets']
 
 
 def test_post_inserts(inserts, project, institution, testapp):

@@ -347,6 +347,7 @@ class Variant(Item):
     item_type = 'variant'
     schema = load_schema('encoded:schemas/variant.json')
 
+
     @calculated_property(schema={
         "title": "Display Title",
         "description": "A calculated title for every object in 4DN",
@@ -354,38 +355,6 @@ class Variant(Item):
     })
     def display_title(self, CHROM, POS, REF, ALT):
         return 'chr%s:%s %s/%s' % (CHROM, POS, REF, ALT)
-
-    # add when AD is available
-    # @calculated_property(schema={
-    #     "title": "AD_REF",
-    #     "description": "Reference AD",
-    #     "type": "integer"
-    # })
-    # def AD_REF(self, AD):
-    #     if AD:
-    #         return AD.split(',')[0]  # AD = 15,32, first is ref second is alt
-    #     return ''
-    #
-    # @calculated_property(schema={
-    #     "title": "AD_ALT",
-    #     "description": "Reference AD",
-    #     "type": "integer"
-    # })
-    # def AD_ALT(self, AD):
-    #     if AD:
-    #         return AD.split(',')[1]  # AD = 15,32, first is ref second is alt
-    #     return ''
-    #
-    # @calculated_property(schema={
-    #     "title": "AF",
-    #     "description": "Allele Frequency",
-    #     "type": "number"
-    # })
-    # def AF(self, AD):
-    #     if AD:
-    #         ref, alt = AD.split(',')
-    #         return ref / (ref + alt)
-    #     return 0.0
 
 
 @collection(
@@ -399,11 +368,47 @@ class VariantSample(Item):
 
     item_type = 'variant_sample'
     schema = load_schema('encoded:schemas/variant_sample.json')
+    embedded_list = [
+        'VariantConsequence.definition'  # XXX: Get this info from mapping table
+    ]
 
     @calculated_property(schema={
         "title": "Display Title",
         "description": "A calculated title for every object in 4DN",
         "type": "string"
     })
-    def display_title(self, CALL_INFO):
-        return 'SAMPLEID: '+ CALL_INFO
+    def display_title(self, CALL_INFO, variant=None):
+        if variant:
+            return CALL_INFO + ' ' + variant
+        return CALL_INFO
+
+    @calculated_property(schema={
+        "title": "AD_REF",
+        "description": "Reference AD",
+        "type": "integer"
+    })
+    def AD_REF(self, AD):
+        if AD:
+            return int(AD.split(',')[0])  # AD = 15,32, first is ref second is alt
+        return -1
+
+    @calculated_property(schema={
+        "title": "AD_ALT",
+        "description": "Reference AD",
+        "type": "integer"
+    })
+    def AD_ALT(self, AD):
+        if AD:
+            return int(AD.split(',')[1])  # AD = 15,32, first is ref second is alt
+        return -1
+
+    @calculated_property(schema={
+        "title": "AF",
+        "description": "Allele Frequency",
+        "type": "number"
+    })
+    def AF(self, AD):
+        if AD:
+            ref, alt = AD.split(',')
+            return int(ref) / (int(ref) + int(alt))
+        return 0.0
