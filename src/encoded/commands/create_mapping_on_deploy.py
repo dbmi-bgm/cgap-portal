@@ -32,6 +32,7 @@ ITEM_INDEX_ORDER = [
     'Image',
     'Gene',
     'Phenotype',
+    'Disorder',
     'Individual',
     'Document',
     'QualityMetricBamcheck',
@@ -50,6 +51,9 @@ ITEM_INDEX_ORDER = [
     'AnnotationField',
     'Variant',
     'VariantSample'
+    'EvidenceDisPheno',
+    'Page'
+
 ]
 
 ENV_PROD = 'fourfront-cgap'

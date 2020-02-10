@@ -124,32 +124,6 @@ class SampleProcessing(Item):
 
 
 @collection(
-    name='disorders',
-    unique_key='disorder:disorder_id',
-    properties={
-        'title': 'Disorders',
-        'description': 'Listing of Disorders',
-    })
-class Disorder(Item):
-    item_type = 'disorder'
-    schema = load_schema('encoded:schemas/disorder.json')
-    embedded_list = [
-        'associated_phenotypes.phenotype.phenotype_name',
-        'associated_phenotypes.phenotype.hpo_id',
-        'associated_phenotypes.phenotype.definition'
-    ]
-    name_key = 'disorder_id'
-
-    @calculated_property(schema={
-        "title": "Display Title",
-        "description": "A calculated title for every object in 4DN",
-        "type": "string"
-    })
-    def display_title(self, disorder_name):
-        return disorder_name
-
-
-@collection(
     name='genes',
     unique_key='gene:gene_id',
     lookup_key='preferred_symbol',
