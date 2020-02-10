@@ -22,12 +22,6 @@
         "accession" : {
             "accessionType" : "SA"
         },
-        "individual": {
-            "title": "Individual",
-            "description": "Individual this sample is derived from",
-            "type": "string",
-            "linkTo": "Individual"
-        },
         "workup_type": {
             "title": "Workup Type",
             "type": "string",
@@ -37,6 +31,12 @@
                 "Sanger"
             ]
         },
+        "individual": {
+            "title": "Individual",
+            "description": "Individual this sample is derived from",
+            "type": "string",
+            "linkTo": "Individual"
+        },
         "specimen_type": {
             "title": "Specimen Type",
             "type": "string",
@@ -44,6 +44,20 @@
                 "blood",
                 "saliva"
             ]
+        },
+        "accepted_or_rejected": {
+            "title": "Accepted/Rejected",
+            "type": "string",
+            "description": "Whether the specimen was accepted or rejected due to quality or other reasons",
+            "enum": [
+                "accepted",
+                "rejected"
+            ]
+        },
+        "rejection_reason": {
+            "title": "Reason for Rejection",
+            "type": "string",
+            "description": "If specimen was rejected, the reason for rejection"
         },
         "specimen_notes": {
             "title": "Specimen Notes",
@@ -78,6 +92,11 @@
                 {"format": "date"}
             ]
         },
+        "requisition_form": {
+            "title": "Requisition Form",
+            "type": "string",
+            "linkTo": "Document"
+        },
         "date_received": {
             "title": "Date Received in Sequencing Lab",
             "type": "string",
@@ -93,7 +112,8 @@
         "protocol": {
             "title": "Reference Protocol",
             "description": "Reference Protocol Document.",
-            "type": "string"
+            "type": "string",
+            "linkTo": "Document"
         },
         "files": {
             "title": "Fastq Files",

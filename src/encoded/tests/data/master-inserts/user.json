@@ -207,6 +207,16 @@
         "groups": ["admin"],
         "submits_for": ["hms-dbmi"],
         "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b"
+    },
+    {
+        "email": "sarah_reiff@hms.harvard.edu",
+        "first_name": "Sarah",
+        "last_name": "Reiff",
+        "role": "scientist",
+        "uuid": "834559db-a3f6-462c-81a4-f5d7e5e65707",
+        "groups": ["admin"],
+        "submits_for": ["hms-dbmi"],
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b"
     }
 
 ]
