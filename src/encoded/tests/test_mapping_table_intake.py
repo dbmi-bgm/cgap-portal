@@ -2,7 +2,6 @@ import os
 import csv
 import json
 import pytest
-from .features.conftest import workbook
 from encoded.commands.mapping_table_intake import (
     MappingTableParser
 )
@@ -139,6 +138,8 @@ def test_generate_variant_sample_schema(MTParser, sample_variant_items):
     assert properties['RSTR']['type'] == 'string'
     assert 'columns' in schema
     assert 'facets' in schema
+    assert 'variant' in properties
+    assert 'sample' in properties
 
 
 def test_generate_variant_schema(MTParser, variant_items):
@@ -156,6 +157,7 @@ def test_generate_variant_schema(MTParser, variant_items):
     assert properties['ALT']['type'] == 'string'
 
     # check sub-embedded object fields
+    assert properties['transcript']['type'] == 'array'
     sub_obj_props = properties['transcript']['items']['properties']
     assert len(sub_obj_props) == TRANSCRIPT_FIELDS_EXPECTED
     assert sub_obj_props['vep_consequence']['type'] == 'array'

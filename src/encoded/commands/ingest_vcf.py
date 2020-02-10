@@ -239,7 +239,7 @@ class VCFParser(object):
         elif type == 'boolean':
             if value == '0':
                 return False
-            return True 
+            return True
         elif type == 'array':
             if sub_type:
                 if not isinstance(value, list):
@@ -354,7 +354,7 @@ class VCFParser(object):
                         else:
                             result[fn] = self.validate_variant_value(fn, field, key)
         return result
-    
+
     @staticmethod
     def format_variant(result, seo='transcript'):
         """ Does some extra formatting to the seo's on the variant so they fit the schema.
@@ -449,26 +449,6 @@ class VCFParser(object):
             self.format_variant(v)
             variants.append(v)
         return variant_samples, variants
-
-
-class MPIngester(object):
-    """ Multiprocessing class for VCF Ingestion. Allows us to multiprocess more
-        than one large VCF file
-
-        Thoughts: 3 modes - MP multiple files, MP a large VCF, do both?
-    """
-
-    def __init__(self, processes=1):
-        """ Creates an MPIngester with 1 process by default """
-        self.processes = processes
-
-    def initialize(self):
-        """ XXX: stub """
-        pass
-
-    def run(self):
-        """ XXX: stub """
-        pass
 
 
 def main():

@@ -72,7 +72,7 @@ def test_VCFP_multiple_variants(test_vcf):
     assert len(result['transcript'].keys()) == 2
     assert result['transcript'][0]['vep_consequence'] == ['missense_variant']
     assert result['transcript'][0]['vep_feature'] == 'ENST00000379370'
-    assert result['transcript'][0]['vep_domains'] == ['Gene3D:2.40.50.120', 'Pfam:PF03146', 
+    assert result['transcript'][0]['vep_domains'] == ['Gene3D:2.40.50.120', 'Pfam:PF03146',
                                                       'PROSITE_profiles:PS51121', 'Superfamily:SSF50242']
     assert result['transcript'][1]['vep_hgnc_id'] == 'HGNC:329'
     assert result['transcript'][1]['vep_clin_sig'] == 'pathogenic'
@@ -88,8 +88,8 @@ def test_VCFP_multiple_variants(test_vcf):
     assert len(result['transcript'].keys()) == 2
     assert result['transcript'][0]['vep_consequence'] == ['missense_variant']
     assert result['transcript'][0]['vep_feature'] == 'ENST00000379370'
-    assert result['transcript'][0]['vep_domains'] == ['Gene3D:2.40.50.120', 'Pfam:PF03146', 
-                                                      'PROSITE_profiles:PS51121', 'PANTHER:PTHR10574', 
+    assert result['transcript'][0]['vep_domains'] == ['Gene3D:2.40.50.120', 'Pfam:PF03146',
+                                                      'PROSITE_profiles:PS51121', 'PANTHER:PTHR10574',
                                                       'PANTHER:PTHR10574:SF288', 'Superfamily:SSF50242']
     assert result['transcript'][1]['vep_trembl'] == 'A0A087X208'
     assert result['clinvar_geneinfo'] == 'AGRN:375790'
@@ -141,6 +141,23 @@ def test_VCFP_post_variants(testapp, institution, project, test_vcf):
         variant['institution'] = 'encode-institution'
         test_vcf.format_variant(variant)
         testapp.post_json(CONNECTION_URL, variant, status=201)
+
+
+def test_VCFP_make_links(testapp, institution, project, test_vcf):
+    """ Will post all generated variants and samples, forming linkTo's from variant_sample to variant """
+    VARIANT_URL, VARIANT_SAMPLE_URL = '/variant', '/variant_sample'
+    for record in test_vcf:
+        variant = test_vcf.create_variant_from_record(record)
+        variant['project'] = 'encode-project'
+        variant['institution'] = 'encode-institution'
+        test_vcf.format_variant(variant)
+        res = testapp.post_json(VARIANT_URL, variant, status=201).json['@graph'][0]  # only one item posted
+        variant_samples = test_vcf.create_sample_variant_from_record(record)
+        for sample in variant_samples:
+            sample['project'] = 'encode-project'
+            sample['institution'] = 'encode-institution'
+            sample['variant'] = res['@id']  # make link
+            testapp.post_json(VARIANT_SAMPLE_URL, sample, status=201)
 
 
 def test_VCFP_run(testapp, institution, project, test_vcf):

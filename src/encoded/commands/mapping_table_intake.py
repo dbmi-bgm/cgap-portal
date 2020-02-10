@@ -228,7 +228,7 @@ class MappingTableParser(object):
                         prop[prop_name] = features
                         sub_temp.update({
                             "title": sub_title,
-                            "type": "object",
+                            "type": "array",
                             "items": {
                                 "title": sub_title,
                                 "type": "object",
@@ -323,12 +323,12 @@ class MappingTableParser(object):
         schema['id'] = '/profiles/variant_sample.json'
         schema['properties'] = sample_props
         schema['properties']['schema_version'] = {'default': '1'}
-        schema['properties']['sample'] = {
+        schema['properties']['sample'] = {  # link to single sample
             'title': 'Sample',
             'type': 'string',
             'linkTo': 'Sample'
         }
-        schema['properties']['variant'] = {
+        schema['properties']['variant'] = {  # link to single variant
             'title': 'Variant',
             'type': 'string',
             'linkTo': 'Variant'
@@ -410,6 +410,9 @@ class MappingTableParser(object):
 def main():
     """ Takes in the mapping table and produces annotation field inserts, variant_sample
         schema and variant schema.
+
+        From commands dri:
+
     """
     logging.basicConfig()
     parser = argparse.ArgumentParser(
