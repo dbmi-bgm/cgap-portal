@@ -4,6 +4,8 @@ import vcf
 import json
 import argparse
 import logging
+from pyramid.paster import get_app
+from webtest import TestApp
 from collections import OrderedDict
 
 logger = logging.getLogger(__name__)
@@ -426,6 +428,9 @@ class VCFParser(object):
             to post the items 'project' and 'institution' are required and
             must exist on the portal for the items to validate on insertion.
 
+            NOTE: does not form links. Use the script directly to form them
+            This function thus is really only used in testing
+
         Args:
             project: project to post these items under
             institution: institution to post these items under
@@ -452,15 +457,20 @@ class VCFParser(object):
 
 
 def main():
-    """ Main, ingests VCF and posts if args specified
+    """ Main, ingests VCF and posts if args specified.
 
-    Args (via argparse):
-        vcf: path to vcf file to parse
-        variant: path to variant.json schema
-        sample: path to variant_sample.json schema
-        project: project to post inserts under
-        institution: institution to post inserts under
-        --post-inserts: If specified, will post inserts, by default False
+        NOTE: is currently a no-op if inserts are not being posted
+
+        Args (via argparse):
+            vcf: path to vcf file to parse
+            variant: path to variant.json schema
+            sample: path to variant_sample.json schema
+            project: project to post inserts under
+            institution: institution to post inserts under
+            --post-inserts: If specified, will post inserts, by default False
+
+            config_uri: path to app config, usually 'production.ini'
+            --app-name: app name, usually 'app'
     """
     logging.basicConfig()
     parser = argparse.ArgumentParser(
@@ -473,6 +483,8 @@ def main():
     parser.add_argument('sample', help='path to sample variant schema')
     parser.add_argument('project', help='project to post inserts under')
     parser.add_argument('institution', help='institution to post inserts under')
+    parser.add_argument('config_uri', help="path to configfile")  # to get app
+    parser.add_argument('--app-name', help="Pyramid app name in configfile")  # to get app
     parser.add_argument('--post-inserts', action='store_true', default=False,
                         help='If specified, will post inserts, by default False')
     args = parser.parse_args()
@@ -480,17 +492,30 @@ def main():
     logger.info('Ingesting VCF file: %s' % args.vcf)
     vcf_parser = VCFParser(args.vcf, args.variant, args.sample)
 
-    # post items
+    # get app, form links then post items
     if args.post_inserts:
-        from dcicutils import ff_utils
-        variant_samples, variants = vcf_parser.run()
-        for vs in variant_samples:
-            ff_utils.post_metadata(vs, 'variant_sample', None)
-        for v in variants:
-            ff_utils.post_metadata(v, 'variant', None)
+        environ = {
+            'HTTP_ACCEPT': 'application/json',
+            'REMOTE_USER': 'TEST',
+        }
+        app = get_app(args.config_uri, args.app_name)
+        testapp = TestApp(app, environ)
+        for record in vcf_parser:
+            variant = vcf_parser.create_variant_from_record(record)
+            variant['project'] = args.project
+            variant['institution'] = args.institution
+            vcf_parser.format_variant(variant)
+            res = testapp.post_json('/variant', variant, status=201).json['@graph'][0]  # only one item posted
+            variant_samples = vcf_parser.create_sample_variant_from_record(record)
+            for sample in variant_samples:
+                sample['project'] = args.project
+                sample['institution'] = args.institution
+                sample['variant'] = res['@id']  # make link
+                testapp.post_json('/variant_sample', sample, status=201)
 
-    logger.info('Succesfully posted VCF entries')
+        logger.info('Succesfully posted VCF entries')
     exit(0)
+
 
 if __name__ == '__main__':
     main()

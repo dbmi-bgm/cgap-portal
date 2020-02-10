@@ -4,6 +4,8 @@ import six
 import json
 import argparse
 import logging
+from pyramid.paster import get_app
+from webtest import TestApp
 from collections import OrderedDict, Mapping
 
 logger = logging.getLogger(__name__)
@@ -411,7 +413,22 @@ def main():
     """ Takes in the mapping table and produces annotation field inserts, variant_sample
         schema and variant schema.
 
-        From commands dri:
+        Args:
+            mp: path to mapping table
+            annotation_field_schema: path to annotation field schema
+            variant: where to write variant schema
+            sample: where to write variant_sample schema
+            --project: project to post under
+            --institution: institution to post under
+            --write-schemas: default True, will write schemas to given output files
+            --post-inserts: default False, will post inserts using testapp if specified
+
+            config_uri: path to app config (usually production.ini)
+            --app-name: app name, usually 'app'
+
+        From commands dir:
+            python mapping_table_intake.py ../tests/data/sample_vcfs/mtv03.csv ../schemas/annotation_field.json
+            ../schemas/variant.json ../schemas/variant_sample.json ../../../production.ini --app-name app
 
     """
     logging.basicConfig()
@@ -424,6 +441,8 @@ def main():
     parser.add_argument('annotation_field_schema', help='path to annotation field schema')
     parser.add_argument('variant', help='where to write variant schema')
     parser.add_argument('sample', help='where to write sample_variant schema')
+    parser.add_argument('config_uri', help="path to configfile")  # to get app
+    parser.add_argument('--app-name', help="Pyramid app name in configfile")  # to get app
     parser.add_argument('--project', help='project to post inserts under')
     parser.add_argument('--institution', help='institution to post inserts under')
     parser.add_argument('--write-schemas', action='store_true', default=True,
@@ -441,9 +460,14 @@ def main():
 
     # if not a dry run try to post inserts
     if args.post_inserts:
-        from dcicutils import ff_utils
+        environ = {
+            'HTTP_ACCEPT': 'application/json',
+            'REMOTE_USER': 'TEST',
+        }
+        app = get_app(args.config_uri, args.app_name)
+        testapp = TestApp(app, environ)
         for entry in inserts:
-            ff_utils.post_metadata(entry, 'annotation_field', None)
+            testapp.post_json('/annotation_field', entry)
     logger.info('Successfully posted annotations')
 
 
