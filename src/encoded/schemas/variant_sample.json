@@ -43,6 +43,28 @@
     "description": "Schema for variant info for sample",
     "id": "/profiles/variant_sample.json",
     "properties": {
+        "QUAL": {
+            "title": "QUAL",
+            "vcf_name": "QUAL",
+            "type": "number",
+            "description": "Quality score",
+            "source_name": "VCF",
+            "source_version": "VCFv4.2"
+        },
+        "FILTER": {
+            "title": "FILTER",
+            "vcf_name": "FILTER",
+            "type": "string",
+            "description": "VQSR filter",
+            "enum": [
+                "PASS",
+                "VQSRTrancheSNP99.00to99.90",
+                "VQSRTrancheSNP99.90to100.00",
+                "LowQual"
+            ],
+            "source_name": "VCF",
+            "source_version": "VCFv4.2"
+        },
         "CALL_INFO": {
             "title": "CALL_INFO",
             "vcf_name": "CALL_INFO",
@@ -146,6 +168,22 @@
             "vcf_name": "RSTR",
             "type": "string",
             "description": "Reference forward allele read count",
+            "source_name": "novoCaller",
+            "source_version": "2"
+        },
+        "novoCaller_Post_prob": {
+            "title": "novoCaller_Post_prob",
+            "vcf_name": "novoCaller_Post_prob",
+            "type": "number",
+            "description": "posterior probability",
+            "source_name": "novoCaller",
+            "source_version": "2"
+        },
+        "novoCaller_AF_unrel": {
+            "title": "novoCaller_AF_unrel",
+            "vcf_name": "novoCaller_AF_unrel",
+            "type": "number",
+            "description": "allele frequency in unrelated samples",
             "source_name": "novoCaller",
             "source_version": "2"
         },

@@ -33,7 +33,7 @@ class VCFParser(object):
         '%7C': '|',
         '%3B': ';'
     }
-    VCF_FIELDS = ['CHROM', 'POS', 'ID', 'REF','ALT', 'QUAL', 'FILTER']
+    VCF_FIELDS = ['CHROM', 'POS', 'ID', 'REF', 'ALT']
     DROPPED_FIELD = 'DROPPED'
     SUBEMBEDDED = 'Subembedded'
     FORMAT = 'Format'

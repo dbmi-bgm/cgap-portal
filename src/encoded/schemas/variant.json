@@ -115,44 +115,6 @@
             "source_version": "VCFv4.2",
             "column_priority": 4
         },
-        "QUAL": {
-            "title": "QUAL",
-            "vcf_name": "QUAL",
-            "type": "number",
-            "description": "Quality score",
-            "source_name": "VCF",
-            "source_version": "VCFv4.2"
-        },
-        "FILTER": {
-            "title": "FILTER",
-            "vcf_name": "FILTER",
-            "type": "string",
-            "description": "VQSR filter",
-            "enum": [
-                "PASS",
-                "VQSRTrancheSNP99.00to99.90",
-                "VQSRTrancheSNP99.90to100.00",
-                "LowQual"
-            ],
-            "source_name": "VCF",
-            "source_version": "VCFv4.2"
-        },
-        "novoCaller_Post_prob": {
-            "title": "novoCaller_Post_prob",
-            "vcf_name": "novoCaller_Post_prob",
-            "type": "number",
-            "description": "posterior probability",
-            "source_name": "novoCaller",
-            "source_version": "2"
-        },
-        "novoCaller_AF_unrel": {
-            "title": "novoCaller_AF_unrel",
-            "vcf_name": "novoCaller_AF_unrel",
-            "type": "number",
-            "description": "allele frequency in unrelated samples",
-            "source_name": "novoCaller",
-            "source_version": "2"
-        },
         "transcript": {
             "title": "Transcript",
             "type": "array",
@@ -172,6 +134,7 @@
                             "source_name": "VEP",
                             "source_version": "v98.4",
                             "separator": "tilde",
+                            "embedded_fields": "definition",
                             "max_size": 66,
                             "column_priority": 7,
                             "facet_priority": 2
@@ -637,7 +600,7 @@
             "max_size": 10
         },
         "uniprot_transmem_annot_desc": {
-            "title": "None provided",
+            "title": "uniprot_transmem_annot_desc",
             "type": "array",
             "vcf_name": "uniprot_transmem_annot_desc",
             "description": "transmembrance description",
@@ -2054,7 +2017,7 @@
             "max_size": 6
         },
         "clinvar_clndn": {
-            "title": "None provided",
+            "title": "clinvar_clndn",
             "type": "array",
             "vcf_name": "clinvar_clndn",
             "description": "ClinVar's preferred disease name for the concept specified by disease identifiers in CLNDISDB",
@@ -2106,7 +2069,7 @@
             "max_size": 51
         },
         "clinvar_clnrevstat": {
-            "title": "None provided",
+            "title": "clinvar_clnrevstat",
             "type": "array",
             "vcf_name": "clinvar_clnrevstat",
             "description": "ClinVar review status for the Variation ID",
@@ -2131,7 +2094,7 @@
             "max_size": 44
         },
         "clinvar_clnsigconf": {
-            "title": "None provided",
+            "title": "clinvar_clnsigconf",
             "type": "array",
             "vcf_name": "clinvar_clnsigconf",
             "description": "Conflicting clinical significance for this single variant",
@@ -2342,7 +2305,7 @@
             "max_size": 36
         },
         "cosmic_mutation_description": {
-            "title": "None provided",
+            "title": "cosmic_mutation_description",
             "type": "array",
             "vcf_name": "cosmic_mutation_description",
             "description": "Type of mutation at the amino acid level (substitution, deletion, insertion, complex, fusion, unknown etc.)",
@@ -2433,7 +2396,7 @@
     },
     "facets": {
         "transcript.vep_consequence": {
-            "title": "vep_consequence"
+            "title": "vep_consequence.display_title"
         },
         "transcript.vep_symbol": {
             "title": "vep_symbol"
@@ -2465,7 +2428,7 @@
             "title": "ALT"
         },
         "transcript.vep_consequence": {
-            "title": "vep_consequence"
+            "title": "vep_consequence.display_title"
         },
         "transcript.vep_symbol": {
             "title": "vep_symbol"

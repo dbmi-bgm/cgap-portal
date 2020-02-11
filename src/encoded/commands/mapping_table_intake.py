@@ -171,6 +171,7 @@ class MappingTableParser(object):
         cols = OrderedDict()
         facs = OrderedDict()
 
+        # inner functions to be used as helpers here
         def get_prop(item):
             temp = OrderedDict()
             prop_name = item['vcf_name']
@@ -243,7 +244,7 @@ class MappingTableParser(object):
             if item.get('is_list'):
                 array_item = OrderedDict()
                 array_item.update({
-                    "title": item.get('schema_title', 'None provided'),
+                    "title": item.get('schema_title', item['vcf_name']),
                     "type": "array",
                     "vcf_name": item['vcf_name']
                 })
@@ -267,29 +268,56 @@ class MappingTableParser(object):
                     d[k] = v
             return d
 
+        def is_variant(o):
+            return o.get('scope') == 'variant'
+
+        def is_sub_embedded_object(o):
+            return o.get('sub_embedding_group')
+
+        def is_facet(o):
+            return o.get('facet_priority')
+
+        def is_column(o):
+            return o.get('column_priority')
+
+        def is_link_to(o):
+            return o.get('links_to')
+
+        def insert_column_or_facet(d, o):
+            if is_sub_embedded_object(o):
+                if is_link_to(o):  # add .display_title if we are a linkTo
+                    d[o.get('sub_embedding_group') + '.' + o['vcf_name']] = {
+                        'title': o.get('schema_title', o.get('vcf_name')) + '.display_title'}
+                else:
+                    d[o.get('sub_embedding_group') + '.' + o['vcf_name']] = {
+                        'title': o.get('schema_title', o.get('vcf_name'))}
+            else:
+                if is_link_to(o):
+                    d[o['vcf_name']] = {
+                        'title': o.get('schema_title', o.get('vcf_name')) + '.display_title'}
+                else:
+                    d[o['vcf_name']] = {
+                        'title': o.get('schema_title', o.get('vcf_name'))}
+
+        # go through all annotation objects generating schema properties and
+        # adding columns/facets as defined by the mapping table
         for obj in inserts:
             if variant:
                 update(props, get_prop(obj))
-                if obj.get('facet_priority') and obj.get('scope') == 'variant':
-                    if obj.get('sub_embedding_group'):  # only need for variants now
-                        facs[obj.get('sub_embedding_group') + '.' + obj['vcf_name']] = {
-                            'title': obj.get('schema_title', obj.get('vcf_name'))}
-                    else:
-                        facs[obj['vcf_name']] = {'title': obj.get('schema_title', obj.get('vcf_name'))}
-                if obj.get('column_priority') and obj.get('scope') == 'variant':
-                    if obj.get('sub_embedding_group'):
-                        cols[obj.get('sub_embedding_group') + '.' + obj['vcf_name']] = {
-                            'title': obj.get('schema_title', obj.get('vcf_name'))}
-                    else:
-                        cols[obj['vcf_name']] = {'title': obj.get('schema_title', obj.get('vcf_name'))}
-            else:
-                if obj.get('facet_priority') and obj.get('scope') == 'sample_variant':
-                    facs[obj['vcf_name']] = {'title': obj.get('schema_title', obj.get('vcf_name'))}
-                if obj.get('column_priority') and obj.get('scope') == 'sample_variant':
-                    cols[obj['vcf_name']] = {'title': obj.get('schema_title', obj.get('vcf_name'))}
-                if obj.get('sub_embedding_group'):
+                if is_variant(obj) and is_facet(obj):
+                    insert_column_or_facet(facs, obj)
+                if is_variant(obj) and is_column(obj):
+                    insert_column_or_facet(cols, obj)
+                else:
                     continue
+            else:
                 props.update(get_prop(obj))
+                if not is_variant(obj) and is_facet(obj):
+                    insert_column_or_facet(facs, obj)
+                if not is_variant(obj) and is_column(obj):
+                    insert_column_or_facet(cols, obj)
+                else:
+                    continue
 
         if not props:
             raise MappingTableIntakeException('Got no properties on schema!')

@@ -22,8 +22,8 @@ EXPECTED_INSERT = {'no': 1, 'vcf_name': 'CHROM', 'source_name': 'VCF', 'source_v
                         '17', '18', '19', '20', '21', '22', 'X', 'Y', 'M'],
                    'scope': 'variant'}
 NUMBER_ANNOTATION_FIELDS = 266
-SAMPLE_FIELDS_EXPECTED = 13
-VARIANT_FIELDS_EXPECTED = 253
+SAMPLE_FIELDS_EXPECTED = 17
+VARIANT_FIELDS_EXPECTED = 249
 TRANSCRIPT_FIELDS_EXPECTED = 47
 
 
@@ -97,7 +97,7 @@ def test_generate_sample_json_items(MTParser, inserts):
     assert 'AF' in cols
     assert 'DP' in cols
     assert 'ALT' not in cols
-    assert facs == {}  # none on either currently
+    assert facs == {}  # none currently
 
 
 def test_generate_variant_json_items(MTParser, inserts):
@@ -129,6 +129,9 @@ def test_generate_variant_json_items(MTParser, inserts):
     assert 'CHROM' in cols
     assert 'cadd_phred' in cols
     assert 'AF' not in cols
+    assert cols['transcript.vep_consequence']['title'] == 'vep_consequence.display_title'  # linkTo has display title
+    assert facs['transcript.vep_consequence']['title'] == 'vep_consequence.display_title'
+    assert facs['transcript.vep_symbol']['title'] == 'vep_symbol'
     assert 'cadd_phred' in facs
     assert 'transcript.vep_symbol' in facs
 

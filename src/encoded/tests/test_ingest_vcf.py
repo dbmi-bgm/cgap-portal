@@ -112,24 +112,21 @@ def test_VCFP_multiple_sample_variants(test_vcf):
     record = test_vcf.read_next_record()
     result = test_vcf.create_sample_variant_from_record(record)[0]
     assert result['DP'] == 22
-    assert result['AF'] == 0.333
     assert result['GT'] == '0/0'
     assert result['PL'] == '0,18,270'
     record = test_vcf.read_next_record()
     result = test_vcf.create_sample_variant_from_record(record)[0]
     assert result['DP'] == 70
-    assert result['AF'] == 1.0
     assert result['GT'] == '1/1'
     assert result['GQ'] == 99
     assert result['PL'] == '2839,211,0'
     record = test_vcf.read_next_record()
     result = test_vcf.create_sample_variant_from_record(record)[0]
     assert result['DP'] == 66
-    assert result['AF'] == 0.833
 
 
 def test_VCFP_post_sample_variants(testapp, institution, project, test_vcf):
-    """ Attempts to post all generated sample variants """
+    """ Attempts to post all generated sample variants without links"""
     CONNECTION_URL = '/variant_sample'
     for record in test_vcf:
         variant_samples = test_vcf.create_sample_variant_from_record(record)
@@ -140,7 +137,7 @@ def test_VCFP_post_sample_variants(testapp, institution, project, test_vcf):
 
 
 def test_VCFP_post_variants(testapp, institution, project, test_vcf, post_variant_consequence_items):
-    """ Attempts to post all generated variants """
+    """ Attempts to post all generated variants without links """
     CONNECTION_URL = '/variant'
     for record in test_vcf:
         variant = test_vcf.create_variant_from_record(record)

@@ -50,10 +50,9 @@ ITEM_INDEX_ORDER = [
     'Page',
     'AnnotationField',
     'Variant',
-    'VariantSample'
+    'VariantSample',
     'EvidenceDisPheno',
-    'Page'
-
+    'Page',
 ]
 
 ENV_PROD = 'fourfront-cgap'
