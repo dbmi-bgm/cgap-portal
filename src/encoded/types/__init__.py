@@ -351,9 +351,10 @@ class VariantSample(Item):
         "description": "A calculated title for every object in 4DN",
         "type": "string"
     })
-    def display_title(self, CALL_INFO, variant=None):
+    def display_title(self, request, CALL_INFO, variant=None):
+        variant = get_item_if_you_can(request, variant, 'Variant')
         if variant:
-            return CALL_INFO + ' ' + variant
+            return CALL_INFO + ' ' + variant['display_title']
         return CALL_INFO
 
     @calculated_property(schema={
