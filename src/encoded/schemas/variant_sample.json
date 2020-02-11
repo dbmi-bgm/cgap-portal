@@ -203,18 +203,22 @@
     },
     "columns": {
         "DP": {
-            "title": "DP"
+            "title": "DP",
+            "aggregation_type": "stats"
         },
         "AF": {
-            "title": "AF"
+            "title": "AF",
+            "aggregation_type": "stats"
         }
     },
     "facets": {
         "DP": {
-            "title": "DP"
+            "title": "DP",
+            "aggregation_type": "stats"
         },
         "AF": {
-            "title": "AF"
+            "title": "AF",
+            "aggregation_type": "stats"
         }
     }
 }

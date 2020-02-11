@@ -114,6 +114,8 @@ def test_VCFP_multiple_sample_variants(test_vcf):
     assert result['DP'] == 22
     assert result['GT'] == '0/0'
     assert result['PL'] == '0,18,270'
+    assert result['QUAL'] == 38.75
+    assert result['FILTER'] == 'PASS'
     record = test_vcf.read_next_record()
     result = test_vcf.create_sample_variant_from_record(record)[0]
     assert result['DP'] == 70

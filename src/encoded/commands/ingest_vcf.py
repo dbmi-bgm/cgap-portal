@@ -34,6 +34,7 @@ class VCFParser(object):
         '%3B': ';'
     }
     VCF_FIELDS = ['CHROM', 'POS', 'ID', 'REF', 'ALT']
+    VCF_SAMPLE_FIELDS = ['FILTER', 'QUAL']
     DROPPED_FIELD = 'DROPPED'
     SUBEMBEDDED = 'Subembedded'
     FORMAT = 'Format'
@@ -119,6 +120,7 @@ class VCFParser(object):
             list of fields contained in the INFO tag
         """
         regex = re.compile(r'\s+$|\"|\'')
+
         def _strip(s):  # strip whitespace, quotes
             return re.sub(regex, '', s).lower()
 
@@ -315,8 +317,6 @@ class VCFParser(object):
         for vcf_key in self.VCF_FIELDS:
             if vcf_key == 'ALT':  # requires special care
                 result[vcf_key] = getattr(record, vcf_key)[0].sequence
-            elif vcf_key == 'FILTER':
-                result[vcf_key] = getattr(record, vcf_key) or 'PASS'
             else:
                 result[vcf_key] = getattr(record, vcf_key) or ''
         for key in self.format.keys():
@@ -379,7 +379,6 @@ class VCFParser(object):
     @staticmethod
     def parse_samples(result, sample):
         """ Parses the samples on the record, adding them to result
-            identical samples are duplicated?
 
         Args:
             result: dict to populate
@@ -409,8 +408,8 @@ class VCFParser(object):
         props = self.variant_sample_schema['properties']
         for sample in record.samples:
             s = {}
-            for field in props.keys():  # locate all non-sample included fields
-                if record.INFO.get(field, None):
+            for field in props.keys():
+                if record.INFO.get(field, None):  # first check INFO tag, then check record attributes
                     val = record.INFO.get(field)
                     prop_type = props[field]['type']
                     if prop_type == 'array':
@@ -418,6 +417,11 @@ class VCFParser(object):
                         s[field.upper()] = self.cast_field_value(prop_type, val, sub_type)
                     else:
                         s[field.upper()] = self.cast_field_value(prop_type, val)
+                if field in self.VCF_SAMPLE_FIELDS:
+                    if field == 'FILTER':  # XXX: default to PASS, should handle on all fields generally
+                        s[field] = getattr(record, field) or 'PASS'
+                    else:
+                        s[field] = getattr(record, field) or ''
             self.parse_samples(s, sample)  # add sample fields, already formatted
             del s['AF']  # XXX: comes from VCF but is not actually what we want. Get rid of it.
             result.append(s)
@@ -488,7 +492,7 @@ def main():
             --app-name: app name, usually 'app'
 
         To load a vcf on the server:
-            bin/ingest_vcf src/encoded/tests/data/sample_vcfs/test_vcf.vcf src/encoded/schemas/variant.json src/encoded/schemas/variant_sample.json test-project hms-dbmi production.ini --app-name app --post-inserts
+            bin/ingest-vcf src/encoded/tests/data/sample_vcfs/test_vcf.vcf src/encoded/schemas/variant.json src/encoded/schemas/variant_sample.json hms-dbmi hms-dbmi production.ini --app-name app --post-inserts
     """
     logging.basicConfig()
     parser = argparse.ArgumentParser(

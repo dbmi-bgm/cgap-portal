@@ -129,10 +129,10 @@ def test_generate_variant_json_items(MTParser, inserts):
     assert 'CHROM' in cols
     assert 'cadd_phred' in cols
     assert 'AF' not in cols
-    assert cols['transcript.vep_consequence']['title'] == 'vep_consequence.display_title'  # linkTo has display title
-    assert facs['transcript.vep_consequence']['title'] == 'vep_consequence.display_title'
+    assert cols['transcript.vep_consequence.display_title']['title'] == 'vep_consequence'  # linkTo has display title
+    assert facs['transcript.vep_consequence.display_title']['title'] == 'vep_consequence'
     assert facs['transcript.vep_symbol']['title'] == 'vep_symbol'
-    assert 'cadd_phred' in facs
+    assert facs['cadd_phred']['aggregation_type'] == 'stats'
     assert 'transcript.vep_symbol' in facs
 
 
@@ -188,7 +188,8 @@ def test_generate_variant_schema(MTParser, variant_items):
     # check cols/facs
     assert 'ALT' in schema['columns']
     assert 'AF' not in schema['columns']
-    assert 'transcript.vep_consequence' in schema['facets']
+    assert 'transcript.vep_consequence.display_title' in schema['facets']
+    assert 'transcript.vep_symbol' in schema['facets']
 
 
 def test_post_inserts(inserts, project, institution, testapp):

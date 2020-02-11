@@ -283,21 +283,23 @@ class MappingTableParser(object):
         def is_link_to(o):
             return o.get('links_to')
 
+        def is_numbered_field(o):
+            return o.get('field_type') in ['integer', 'number']
+
         def insert_column_or_facet(d, o):
+            val = {'title': o.get('schema_title', o.get('vcf_name'))}
+            if is_numbered_field(o):
+                val['aggregation_type'] = 'stats'
             if is_sub_embedded_object(o):
                 if is_link_to(o):  # add .display_title if we are a linkTo
-                    d[o.get('sub_embedding_group') + '.' + o['vcf_name']] = {
-                        'title': o.get('schema_title', o.get('vcf_name')) + '.display_title'}
+                    d[o.get('sub_embedding_group') + '.' + o['vcf_name'] + '.display_title'] = val
                 else:
-                    d[o.get('sub_embedding_group') + '.' + o['vcf_name']] = {
-                        'title': o.get('schema_title', o.get('vcf_name'))}
+                    d[o.get('sub_embedding_group') + '.' + o['vcf_name']] = val
             else:
                 if is_link_to(o):
-                    d[o['vcf_name']] = {
-                        'title': o.get('schema_title', o.get('vcf_name')) + '.display_title'}
+                    d[o['vcf_name'] + '.display_title'] = val
                 else:
-                    d[o['vcf_name']] = {
-                        'title': o.get('schema_title', o.get('vcf_name'))}
+                    d[o['vcf_name']] = val
 
         # go through all annotation objects generating schema properties and
         # adding columns/facets as defined by the mapping table
@@ -467,6 +469,8 @@ def main():
 
         From commands dir:
             python mapping_table_intake.py ../tests/data/sample_vcfs/mtv03.csv ../schemas/annotation_field.json ../schemas/variant.json ../schemas/variant_sample.json ../../../production.ini --app-name app
+        From top level on server/local (will post inserts):
+            bin/mapping-table-intake src/encoded/tests/data/sample_vcfs/mtv03.csv src/encoded/schemas/annotation_field.json src/encoded/schemas/variant.json src/encoded/schemas/variant_sample.json development.ini --app-name app --post-inserts
 
     """
     logging.basicConfig()
