@@ -209,15 +209,65 @@
         "AF": {
             "title": "AF",
             "aggregation_type": "stats"
+        },
+        "variant.CHROM": {
+            "title": "CHROM"
+        },
+        "variant.POS": {
+            "title": "POS",
+            "aggregation_type": "stats"
+        },
+        "variant.REF": {
+            "title": "REF"
+        },
+        "variant.ALT": {
+            "title": "ALT"
+        },
+        "variant.transcript.vep_consequence.display_title": {
+            "title": "vep_consequence"
+        },
+        "variant.transcript.vep_symbol": {
+            "title": "vep_symbol"
+        },
+        "variant.transcript.vep_hgvsc": {
+            "title": "vep_hgvsc"
+        },
+        "variant.transcript.vep_variant_class": {
+            "title": "vep_variant_class"
+        },
+        "variant.conservation_phastcons100": {
+            "title": "conservation_phastcons100",
+            "aggregation_type": "stats"
+        },
+        "variant.cadd_phred": {
+            "title": "cadd_phred",
+            "aggregation_type": "stats"
+        },
+        "variant.max_pop_af_af_popmax": {
+            "title": "max_pop_af_af_popmax",
+            "aggregation_type": "stats"
         }
     },
     "facets": {
-        "DP": {
-            "title": "DP",
+        "variant.transcript.vep_consequence.display_title": {
+            "title": "vep_consequence"
+        },
+        "variant.transcript.vep_symbol": {
+            "title": "vep_symbol"
+        },
+        "variant.transcript.vep_variant_class": {
+            "title": "vep_variant_class"
+        },
+        "variant.conservation_phastcons100": {
+            "title": "conservation_phastcons100",
             "aggregation_type": "stats"
         },
-        "AF": {
-            "title": "AF",
+        "variant.cadd_phred": {
+            "title": "cadd_phred",
+            "aggregation_type": "stats"
+        },
+        "variant.max_pop_af_af_popmax": {
+            "title": "max_pop_af_af_popmax",
             "aggregation_type": "stats"
         }
     }

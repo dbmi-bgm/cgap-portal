@@ -367,7 +367,7 @@ class VariantSample(Item):
     })
     def AD_REF(self, AD):
         if AD:
-            return int(AD.split(',')[0])  # AD = 15,32, first is ref second is alt
+            return int(AD.split(',')[0])
         return -1
 
     @calculated_property(schema={
@@ -377,7 +377,7 @@ class VariantSample(Item):
     })
     def AD_ALT(self, AD):
         if AD:
-            return int(AD.split(',')[1])  # AD = 15,32, first is ref second is alt
+            return int(AD.split(',')[1])
         return -1
 
     @calculated_property(schema={
@@ -388,5 +388,5 @@ class VariantSample(Item):
     def AF(self, AD):
         if AD:
             ref, alt = AD.split(',')
-            return int(alt) / (int(ref) + int(alt))
+            return round(int(alt) / (int(ref) + int(alt)), 3)  # round to 3 digits
         return 0.0

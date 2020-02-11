@@ -350,8 +350,9 @@ class MappingTableParser(object):
             { "$ref": "mixins.json#/static_embeds" }
         ]
 
-    def generate_variant_sample_schema(self, sample_props, cols, facs):
-        """ Builds the variant_sample.json schema based on sample_props
+    def generate_variant_sample_schema(self, sample_props, cols, facs, variant_cols, variant_facs):
+        """ Builds the variant_sample.json schema based on sample_props. Will also add variant columns and
+            facets since this information is embedded
 
         Args:
             sample_props: first output of generate_properties
@@ -376,8 +377,21 @@ class MappingTableParser(object):
             'type': 'string',
             'linkTo': 'Variant'
         }
+
+        # helper so variant facets work on variant sample
+        # XXX: Behavior needs testing
+        def format_variant_cols_or_facs(d):
+            cp = {}
+            for k, v in d.items():
+                cp['variant.' + k] = v
+            return cp
+
+        variant_cols = format_variant_cols_or_facs(variant_cols)
+        variant_facs = format_variant_cols_or_facs(variant_facs)
+        cols.update(variant_cols)  # add variant stuff since we are embedding this info
+        facs.update(variant_facs)
         schema['columns'] = cols
-        schema['facets'] = cols
+        schema['facets'] = facs
         logger.info('Built variant_sample schema')
         return schema
 
@@ -433,7 +447,8 @@ class MappingTableParser(object):
         inserts = self.process_mp_inserts()
         variant_sample_props, vs_cols, vs_facs = self.generate_properties(self.filter_fields_by_sample(inserts), variant=False)
         variant_props, v_cols, v_facs = self.generate_properties(self.filter_fields_by_variant(inserts))
-        variant_sample_schema = self.generate_variant_sample_schema(variant_sample_props, cols=vs_cols, facs=vs_facs)
+        variant_sample_schema = self.generate_variant_sample_schema(variant_sample_props, cols=vs_cols, facs=vs_facs,
+                                                                    variant_cols=v_cols, variant_facs=v_facs)
         variant_schema = self.generate_variant_schema(variant_props, cols=v_cols, facs=v_facs)
         if write:
             if not vs_out or not v_out:

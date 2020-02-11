@@ -96,8 +96,8 @@ def test_generate_sample_json_items(MTParser, inserts):
     # check cols/facs
     assert 'AF' in cols
     assert 'DP' in cols
-    assert 'ALT' not in cols
-    assert facs == {}  # none currently
+    assert 'AF' not in facs
+    assert 'DP' not in facs
 
 
 def test_generate_variant_json_items(MTParser, inserts):
@@ -139,7 +139,7 @@ def test_generate_variant_json_items(MTParser, inserts):
 def test_generate_variant_sample_schema(MTParser, sample_variant_items):
     """ Tests some aspects of the variant_sample schema """
     items, cols, facs = sample_variant_items
-    schema = MTParser.generate_variant_sample_schema(items, cols, facs)
+    schema = MTParser.generate_variant_sample_schema(items, cols, facs, {}, {})
     properties = schema['properties']
     assert 'CHROM' not in properties
     assert 'vep_consequence' not in properties
@@ -149,6 +149,7 @@ def test_generate_variant_sample_schema(MTParser, sample_variant_items):
     assert properties['RSTR']['type'] == 'string'
     assert 'columns' in schema
     assert 'AF' in schema['columns']
+    assert 'AF' not in schema['facets']
     assert 'facets' in schema
     assert 'variant' in properties
     assert 'sample' in properties
