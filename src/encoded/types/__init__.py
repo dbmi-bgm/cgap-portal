@@ -345,6 +345,9 @@ class VariantSample(Item):
 
     item_type = 'variant_sample'
     schema = load_schema('encoded:schemas/variant_sample.json')
+    embedded_list = [
+        'variant.*'  # embed all variant fields
+    ]
 
     @calculated_property(schema={
         "title": "Display Title",
@@ -369,7 +372,7 @@ class VariantSample(Item):
 
     @calculated_property(schema={
         "title": "AD_ALT",
-        "description": "Reference AD",
+        "description": "Alternate AD",
         "type": "integer"
     })
     def AD_ALT(self, AD):
@@ -385,5 +388,5 @@ class VariantSample(Item):
     def AF(self, AD):
         if AD:
             ref, alt = AD.split(',')
-            return int(ref) / (int(ref) + int(alt))
+            return int(alt) / (int(ref) + int(alt))
         return 0.0
