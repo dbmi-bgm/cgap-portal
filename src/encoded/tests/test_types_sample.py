@@ -27,7 +27,6 @@ def sample_one(project, institution, MIndividual):
     return {
         'project': project['@id'],
         'institution': institution['@id'],
-        'individual': MIndividual['@id'],
         'specimen_type': 'blood',
         'date_received': '2018-12-1'
     }
@@ -38,7 +37,6 @@ def sample_two(project, institution, WIndividual):
     return {
         'project': project['@id'],
         'institution': institution['@id'],
-        'individual': WIndividual['@id'],
         'specimen_type': 'saliva',
         'date_received': '2015-12-7'
     }
@@ -49,7 +47,6 @@ def sample_invalid_specimen_type(project, institution, MIndividual):
     return {
         'project': project['@id'],
         'institution': institution['@id'],
-        'individual': MIndividual['@id'],
         'specimen_type': 'skin',
         'date_received': '2015-12-7'
     }
@@ -60,7 +57,6 @@ def sample_no_project(institution, MIndividual):
     return {
         'project': 'does not exist',
         'institution': institution['@id'],
-        'individual': MIndividual['@id'],
         'specimen_type': 'tissue',
         'date_received': '2015-12-7'
     }
