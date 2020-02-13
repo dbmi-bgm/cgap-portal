@@ -45,4 +45,6 @@ def test_individual_children(testapp, project, institution, MIndividual, WIndivi
     res_m = testapp.post_json('/individual', MIndividual, status=201).json['@graph'][0]
     WIndividual['father'] = res_m['@id']
     res_f = testapp.post_json('/individual', WIndividual, status=201).json['@graph'][0]
-    assert testapp.get(res_m['@id']).json.get('children') == [res_f['@id']]
+    children = testapp.get(res_m['@id']).json.get('children')
+    assert len(children) == 1
+    assert children[0]['@id'] == res_f['@id']

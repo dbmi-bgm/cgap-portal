@@ -47,7 +47,12 @@ class Individual(Item):
     @calculated_property(schema={
         "title": "Children",
         "description": "Children of the individual",
-        "type": "array"
+        "type": "array",
+        "items": {
+            "title": "Child",
+            "type": "string",
+            "linkTo": "Individual"
+        }
     })
     def children(self, request):
         return (self.rev_link_atids(request, "children_f") +
