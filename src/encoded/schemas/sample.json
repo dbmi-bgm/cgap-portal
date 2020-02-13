@@ -92,10 +92,54 @@
                 {"format": "date"}
             ]
         },
-        "requisition_form": {
-            "title": "Requisition Form",
+        "requisition": {
+            "title": "Requisition",
+            "type": "array",
+            "uniqueItems": true,
+            "items" : {
+                "title": "Requisition",
+                "type": "object",
+                "required": ["requisition_form"],
+                "properties": {
+                    "requisition_id": {
+                        "title": "Requisition ID",
+                        "type": "string"
+                    },
+                    "requisition_form": {
+                        "title": "Requisition Form",
+                        "type": "string",
+                        "linkTo": "Document"
+                    }
+                }
+            }
+        },
+        "ordering_physician": {
+            "title": "Ordering Physician",
+            "description": "Physician who ordered the test",
+            "type": "string"
+        },
+        "date_test_ordered": {
+            "title": "Test Ordered Date",
+            "description": "Date test was ordered",
             "type": "string",
-            "linkTo": "Document"
+            "anyOf": [
+                {"format": "date-time"},
+                {"format": "date"}
+            ]
+        },
+        "priority": {
+            "title": "Priority",
+            "description": "Indicate if test is a rush order",
+            "type": "string",
+            "enum": [
+                "High",
+                "Normal"
+            ]
+        },
+        "transported_by": {
+            "title": "Specimen Transported By",
+            "description": "Transport service that transported this specimen",
+            "type": "string"
         },
         "date_received": {
             "title": "Date Received in Sequencing Lab",
@@ -114,6 +158,20 @@
             "description": "Reference Protocol Document.",
             "type": "string",
             "linkTo": "Document"
+        },
+        "note_from_sequencing_lab": {
+            "title": "Note from sequencing lab",
+            "type": "string"
+        },
+        "dna_extraction_lab": {
+            "title": "DNA Extraction Performed By",
+            "description": "Institute or Lab that performed DNA extraction from specimen",
+            "type": "string"
+        },
+        "dna_storage_lab": {
+            "title": "DNA Stored By",
+            "description": "Institute or Lab that stored the DNA",
+            "type": "string"
         },
         "files": {
             "title": "Fastq Files",
