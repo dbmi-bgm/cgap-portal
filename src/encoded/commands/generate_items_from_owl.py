@@ -1,14 +1,23 @@
-import os
-import json
-import sys
 import argparse
 import datetime
 import logging
 import logging.config
-from uuid import uuid4
+import json
+import os
+import sys
+
 from collections import Counter
+from dcicutils.ff_utils import (
+    get_authentication_with_server,
+    get_metadata,
+    search_metadata,
+    unified_authentication,
+    post_metadata
+)
 from rdflib.collection import Collection
-from encoded.commands.owltools import (
+from uuid import uuid4
+from ..commands.load_items import load_items
+from ..commands.owltools import (
     Namespace,
     Owler,
     splitNameFromNamespace,
@@ -21,14 +30,7 @@ from encoded.commands.owltools import (
     hasDbXref,
     hasAltId
 )
-from encoded.commands.load_items import load_items
-from dcicutils.ff_utils import (
-    get_authentication_with_server,
-    get_metadata,
-    search_metadata,
-    unified_authentication,
-    post_metadata
-)
+
 
 EPILOG = __doc__
 

@@ -1,15 +1,15 @@
 #!/usr/bin/env python3
 
-import sys
-import os
 import argparse
 import json
-import re
-import requests
 import logging
 import logging.config
+import os
+import re
+import requests
+import sys
+
 from datetime import datetime
-from uuid import uuid4
 from dcicutils.ff_utils import (
     get_authentication_with_server,
     get_metadata,
@@ -17,13 +17,15 @@ from dcicutils.ff_utils import (
     post_metadata,
     search_metadata,
 )
-from encoded.commands.load_items import load_items
-from encoded.commands.generate_items_from_owl import (
+from uuid import uuid4
+from ..commands.generate_items_from_owl import (
     connect2server,
     get_raw_form,
     prompt_check_for_output_options,
     post_report_document_to_portal,
 )
+from ..commands.load_items import load_items
+
 
 '''logging setup
    logging config - to be moved to file at some point
