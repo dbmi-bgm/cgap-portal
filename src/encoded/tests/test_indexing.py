@@ -219,10 +219,11 @@ def test_real_validation_error(app, indexer_testapp, testapp, institution,
     fp_body = {
         'schema_version': '3',
         'uuid': str(uuid.uuid4()),
-        'file_format': file_formats.get('mcool').get('uuid'),
+        'file_format': file_formats.get('zip').get('uuid'),
         'institution': institution['uuid'],
         'project': project['uuid'],
-        'higlass_uid': 1  # validation error -- higlass_uid should be string
+        'file_classification': 'unprocessed file'
+        # 'higlass_uid': 1  # validation error -- higlass_uid should be string
     }
     res = testapp.post_json('/files-processed/?validate=false&upgrade=False',
                                   fp_body, status=201).json
