@@ -23,7 +23,7 @@
             "accessionType" : "SA"
         },
         "schema_version": {
-            "default": "2"
+            "default": "1"
         },
         "workup_type": {
             "title": "Workup Type",
