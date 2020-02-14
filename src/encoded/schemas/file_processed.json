@@ -37,37 +37,12 @@
             "title": "File Type",
             "description": "The type of file based on the information in the file.",
             "suggested_enum": [
-                "read pairs",
                 "alignments",
-                "unfiltered alignments",
-                "contact list",
-                "contact list-replicate",
-                "contact list-combined",
-                "contact matrix",
-                "normalized contact matrix",
-                "long range chromatin interactions",
-                "intensity values",
-                "peaks",
                 "image",
-                "locus distances, submitter format",
-                "dot calls",
-                "compartments",
-                "insulation score - diamond",
-                "insulation score - potential",
                 "other",
-                "domains",
-                "boundaries",
-                "loci distances",
-                "counts",
-                "normalized counts",
-                "lads",
-                "coordinates",
-                "juicebox norm vector",
-                "read positions",
-                "spt results",
-                "conservative peaks",
-                "signal fold change",
-                "segregation table"
+                "intermediate file",
+                "raw VCF",
+                "gVCF"
             ]
         },
         "file_classification": {
@@ -104,12 +79,7 @@
             "description": "The genome assembly associated with the file - for processing or reference",
             "type": "string",
             "lookup": 30,
-            "enum": [
-                "GRCh38",
-                "GRCm38",
-                "dm6",
-                "galGal5"
-            ]
+            "enum": ["GRCh38"]
         },
         "produced_from": {
             "title": "Produced From",
