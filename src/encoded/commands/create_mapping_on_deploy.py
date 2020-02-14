@@ -32,6 +32,7 @@ ITEM_INDEX_ORDER = [
     'Image',
     'Gene',
     'Phenotype',
+    'Disorder',
     'Individual',
     'Document',
     'QualityMetricBamcheck',
@@ -46,6 +47,7 @@ ITEM_INDEX_ORDER = [
     'SampleProcessing',
     'StaticSection',
     'Document',
+    'EvidenceDisPheno',
     'Page'
 ]
 

@@ -1,8 +1,13 @@
 import pytest
+
+from snovault import COLLECTIONS, TYPES
+from snovault.elasticsearch.create_mapping import type_mapping
+from snovault.util import add_default_embeds
 from unittest.mock import patch, MagicMock
 from .datafixtures import ORDER
-from snovault import COLLECTIONS
-from encoded.commands.create_mapping_on_deploy import ITEM_INDEX_ORDER, get_deployment_config
+from ..commands.create_mapping_on_deploy import ITEM_INDEX_ORDER, get_deployment_config
+
+
 pytestmark = [pytest.mark.setone, pytest.mark.working]
 
 
@@ -13,9 +18,6 @@ def test_create_mapping(registry, item_type):
     This test does not actually use elasticsearch
     Only tests the mappings generated from schemas
     """
-    from snovault.elasticsearch.create_mapping import type_mapping
-    from snovault.util import add_default_embeds
-    from snovault import TYPES
     mapping = type_mapping(registry[TYPES], item_type)
     assert mapping
     type_info = registry[TYPES].by_item_type[item_type]

@@ -1,5 +1,9 @@
 import pytest
-from encoded.types import TrackingItem
+
+# Supports commented-out code below.
+# from ..types import TrackingItem
+
+
 pytestmark = [pytest.mark.setone, pytest.mark.working, pytest.mark.schema]
 
 

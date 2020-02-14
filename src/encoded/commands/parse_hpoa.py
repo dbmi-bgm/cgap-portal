@@ -1,14 +1,15 @@
 #!/usr/bin/env python3
 
-import sys
-import os
 import argparse
 import json
+import logging
+import logging.config
+import os
 import re
 import requests
-import logging
+import sys
+
 from datetime import datetime
-from uuid import uuid4
 from dcicutils.ff_utils import (
     get_authentication_with_server,
     get_metadata,
@@ -16,18 +17,21 @@ from dcicutils.ff_utils import (
     post_metadata,
     search_metadata,
 )
-from encoded.commands.load_items import load_items
-from encoded.commands.generate_items_from_owl import (
+from uuid import uuid4
+from ..commands.generate_items_from_owl import (
     connect2server,
-    get_raw_form
+    get_raw_form,
+    prompt_check_for_output_options,
+    post_report_document_to_portal,
 )
+from ..commands.load_items import load_items
+
 
 '''logging setup
    logging config - to be moved to file at some point
 '''
-LOGFILE = 'upd_dis2pheno_annot.log'
+logfile = 'upd_dis2pheno_annot.log'
 logger = logging.getLogger(__name__)
-
 logging.config.dictConfig({
     'version': 1,
     'disable_existing_loggers': False,
@@ -49,7 +53,7 @@ logging.config.dictConfig({
             'level': 'INFO',
             'formatter': 'standard',
             'class': 'logging.FileHandler',
-            'filename': LOGFILE
+            'filename': logfile
         }
     },
     'loggers': {
@@ -60,6 +64,7 @@ logging.config.dictConfig({
         }
     }
 })
+
 
 ''' Dictionary for field mapping between hpoa file and cgap disorder schema
 '''
@@ -78,20 +83,35 @@ FIELD_MAPPING = {
     'Biocuration': 'curation_history'
 }
 
+RELATION = 'associated with'
+
+
+def convert2raw(item):
+    # need to remove properties not generated from file eg. calc props and others
+    fields2remove = ['uuid', '@id', '@type', 'display_title', 'status', 'principals_allowed', 'date_created']
+    stripped_item = {k: v for k, v in item.items() if k not in fields2remove}
+    return get_raw_form(stripped_item)
+
 
 def check_fields(data):
     return [f for f in data if (f != 'DiseaseName' and f not in FIELD_MAPPING)]
 
 
-def get_disorders_from_db(auth):
+def get_disorders_from_db(connection):
     q = 'search/?type=Disorder'
-    return {d.get('uuid'): d for d in search_metadata(q, auth, page_limit=200, is_generator=True)}
+    return {d.get('uuid'): d for d in search_metadata(q, connection, page_limit=200, is_generator=True)}
 
 
-def get_existing_phenotype_uuids(auth):
+def get_existing_phenotype_uuids(connection):
     q = 'search/?type=Phenotype'
-    result = search_metadata(q, auth, page_limit=200, is_generator=True)
+    result = search_metadata(q, connection, page_limit=200, is_generator=True)
     return {r.get('hpo_id'): r.get('uuid') for r in result}
+
+
+def get_phenotypes_from_db(connection):
+    q = 'search/?type=Phenotype'
+    result = search_metadata(q, connection, page_limit=200, is_generator=True)
+    return {r.get('hpo_id'): r for r in result}
 
 
 def get_dbxref2disorder_map(disorders):
@@ -106,6 +126,21 @@ def get_dbxref2disorder_map(disorders):
                     if x.startswith('OMIM:') or x.lower().startswith('orpha') or x.lower().startswith('decip'):
                         xref2dis[x] = duid
     return xref2dis
+
+
+def check_hpo_id_and_note_problems(fname, hpoid, hpoid2uuid, problems):
+    hpuid = hpoid2uuid.get(hpoid)
+    if hpuid:
+        return hpuid
+    not_found = problems.get('hpo_not_found', [])
+    fields = []
+    if hpoid in not_found:
+        fields = not_found.get(hpoid, [])
+        if fname in fields:
+            return None
+    fields.append(fname)
+    problems.setdefault('hpo_not_found', {}).update({hpoid: fields})
+    return None
 
 
 def line2list(line):
@@ -125,13 +160,17 @@ def write_outfile(terms, filename, pretty=False):
 
 
 def get_input_gen(input):
+    ''' depending on what is passed as input will create a generator
+        that returns lines from a webrequest or lines of a file
+    '''
     if input.startswith('http'):
         try:
-            with requests.get(input, stream=True) as r:
+            with requests.get(input, timeout=5) as r:
                 if r.encoding is None:
                     r.encoding = 'utf-8'
-                res = r.iter_lines(decode_unicode=True)
-                for l in res:
+                # res = r.iter_lines(decode_unicode=True)
+                res = r.text
+                for l in res.split('\n'):
                     yield l
         except Exception as e:
             print(e)
@@ -150,7 +189,7 @@ def get_input_gen(input):
 
 def get_args():  # pragma: no cover
     parser = argparse.ArgumentParser(
-        description='Given an HPOA file or url for download generate phenotype annotations for that disorder as json and optionally load',
+        description='Given an HPOA file or url for download generate EvidenceDisPheno items and optionally load',
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
     parser.add_argument('--input',
@@ -172,6 +211,10 @@ def get_args():  # pragma: no cover
                         action='store_true',
                         default=False,
                         help="Default False - use to load data directly from json to the server that the connection refers to")
+    parser.add_argument('--post_report',
+                        action='store_true',
+                        default=False,
+                        help="Default False - use to post a Document item with a report as attachment")
     parser.add_argument('--pretty',
                         default=False,
                         action='store_true',
@@ -183,16 +226,21 @@ def main():  # pragma: no cover
     start = datetime.now()
     logger.info('Processing disorder to phenotype annotations - START:{}'.format(str(start)))
     args = get_args()
+    itype = 'EvidenceDisPheno'
 
-    # get connection
-    auth = connect2server(args.env, args.key, args.keyfile)
-    logger.info('Working with {}'.format(auth.get('server')))
-    # existing_disorders = get_existing_disorders_from_db(auth)
-    hpoid2uuid = get_existing_phenotype_uuids(auth)
+    connection = connect2server(args.env, args.key, args.keyfile)
+    logger.info('Working with {}'.format(connection.get('server')))
+    postfile, loaddb = prompt_check_for_output_options(args.load, args.outfile, itype, connection.get('server'))
+    logger.info('Getting existing Items')
+    logger.info('Disorders')
+    disorders = get_disorders_from_db(connection)
+    logger.info('Phenotypes')
+    phenotypes = get_phenotypes_from_db(connection)
+
     hp_regex = re.compile('^HP:[0-9]{7}')
-    disorders = get_disorders_from_db(auth)
+    hpoid2uuid = {hid: pheno.get('uuid') for hid, pheno in phenotypes.items()}
     xref2disorder = get_dbxref2disorder_map(disorders)
-    assoc_phenos = {}
+    evidence_items = []  # {}
     problems = {}
     # figure out input and if to save the file
     insrc = args.input
@@ -224,7 +272,7 @@ def main():  # pragma: no cover
             continue
         data_list = line2list(line)
         data = dict(zip(fields, data_list))
-        # deal with top level fields for disorder
+        # find the  disorder_uuid to refer to subject_item
         using_id = data.get('DatabaseID')
         if not using_id:
             continue
@@ -236,11 +284,22 @@ def main():  # pragma: no cover
             problems.setdefault('no_map', []).append(data)
             continue
         disorder_id = xref2disorder.get(map_id)
+        data['subject_item'] = disorder_id
+        # and the HPO_ID to refer to object_item
+        hpo_id = data.get('HPO_ID')
+        phenotype_id = check_hpo_id_and_note_problems('HPO_ID', hpo_id, hpoid2uuid, problems)
+        if not phenotype_id:
+            # missing phenotype
+            continue
+        data['object_item'] = phenotype_id
+        del data['HPO_ID']
         pheno_annot = {}
         for f, v in data.items():
             if not v or (f == 'DiseaseName'):
                 continue
-            if f == 'Frequency':
+            if f in ['subject_item', 'object_item']:
+                cgf = f
+            elif f == 'Frequency':
                 if v.startswith('HP:'):
                     cgf = FIELD_MAPPING[f][0]
                 else:
@@ -254,74 +313,79 @@ def main():  # pragma: no cover
                 v = v[0:1].upper()
 
             if isinstance(v, str) and hp_regex.match(v):
-                hpuid = hpoid2uuid.get(v)
+                hpuid = check_hpo_id_and_note_problems(f, v, hpoid2uuid, problems)
                 if not hpuid:
-                    nf_data = data.copy()
-                    nf_data.update({'missing_hpo': v})
-                    problems.setdefault('hpo_not_found', []).append(nf_data)
                     continue
                 else:
                     v = hpuid
             pheno_annot[cgf] = v
 
         if pheno_annot:
-            dis2pheno = assoc_phenos.get(disorder_id)
-            if dis2pheno:
-                if pheno_annot in dis2pheno:
-                    ppos = dis2pheno.index(pheno_annot)
-                    problems.setdefault('redundant_annot', []).append((data, dis2pheno[ppos]))
-                    continue
-            assoc_phenos.setdefault(disorder_id, []).append(pheno_annot)
+            pheno_annot['relationship_name'] = RELATION
+            if pheno_annot in evidence_items:
+                problems.setdefault('redundant_annot', []).append(pheno_annot)  # (data, dis2pheno[ppos]))
+                continue
+            evidence_items.append(pheno_annot)
+    logger.info("after parsing annotation file we have {} evidence items".format(len(evidence_items)))
+
     # at this point we've gone through all the lines in the file
     # here we want to compare with what already exists in db
     patches = []
-    for did, pheno_annots in assoc_phenos.items():
-        db_annots = []
-        db_dis = disorders.get(did)
-        if db_dis:
-            db_annots = db_dis.get('associated_phenotypes', [])
-            db_annots = [get_raw_form(a) for a in db_annots]
-        newannot = [ann for ann in pheno_annots if ann not in db_annots]
-        existingannot = [ann for ann in pheno_annots if ann in db_annots]
-        # we don't need to explicitly get these except for logging purposes
-        obsannot = [ann for ann in db_annots if ann not in pheno_annots]
-        if newannot:
-            print('NEW!!!!', newannot)
-            import pdb; pdb.set_trace()
-        if obsannot:
-            print('OBSOLETE!!!!!', obsannot)
-            import pdb; pdb.set_trace()
-        patch = newannot + existingannot
-        patches.append({'uuid': did, 'associated_phenotypes': patch})
+    sq = 'search/?type={}&status!=obsolete'.format(itype)
+    logger.info("COMPARING FILE ITEMS WITH CURRENT DB CONTENT")
+    logger.info("searching: {}".format(str(datetime.now())))
+    res = search_metadata(sq, connection, is_generator=True, page_limit=500)
+    existing = 0
+    uids2obsolete = []
+    logger.info("comparing: {}".format(str(datetime.now())))
+    for db_evi in res:
+        tochk = convert2raw(db_evi)
+        if tochk in evidence_items:
+            existing += 1
+            evidence_items.remove(tochk)
+        else:
+            uids2obsolete.append(db_evi.get('uuid'))
+    logger.info("result: {}".format(str(datetime.now())))
+    logger.info('{} EXISTING DB ITEMS WILL NOT BE CHANGED'.format(existing))
+    logger.info('{} EXISTING DB ITEMS WILL BE SET TO OBSOLETE'.format(len(uids2obsolete)))
+    logger.info('{} NEW ITEMS TO BE LOADED TO DB'.format(len(evidence_items)))
+    # let's add uuids to new items so second round will work
+    [evi.update({'uuid': str(uuid4())}) for evi in evidence_items]
+    obs_patch = [{'uuid': uid, 'status': 'obsolete'} for uid in uids2obsolete]
 
-    write_outfile(patches, args.outfile, args.pretty)
+    if evidence_items or obs_patch:
+        if postfile:
+            write_outfile([evidence_items, obs_patch], postfile, args.pretty)
+        if loaddb:
+            if evidence_items:
+                res = load_items(evidence_items, itypes=[itype], auth=connection, post_only=True)
+                logger.info(res)
+            if obs_patch:
+                res2 = load_items(obs_patch, itypes=[itype], auth=connection, patch_only=True)
+                logger.info(res2)
+            # logger.info(json.dumps(res, indent=4))
     if problems:
-        # mini report on problems
+        # log problems
         missing_phenos = problems.get('hpo_not_found')
         if missing_phenos:
-            print("{} missing HPO terms used in hpoa file".format(len(missing_phenos)))
+            logger.info("{} missing HPO terms used in hpoa file".format(len(missing_phenos)))
+            for hpoid, fields in missing_phenos.items():
+                logger.info("{}\t{}".format(hpoid, fields))
         dup_annots = problems.get('redundant_annot')
         if dup_annots:
-            print("{} redundant annotations found".format(len(dup_annots)))
+            logger.info("{} redundant annotations found".format(len(dup_annots)))
         unmapped_dis = problems.get('no_map')
         if unmapped_dis:
             udis = {u.get('DatabaseID'): u.get('DiseaseName') for u in unmapped_dis}
+            logger.info("{} disorders from {} annotation lines not found by xref".format(len(udis), len(unmapped_dis)))
             for d in sorted(list(udis.keys())):
-                print('{}\t{}'.format(d, udis[d]))
-            print("{} disorders from {} annotation lines not found by xref".format(len(udis), len(unmapped_dis)))
-        probfile = args.outfile
-        rfname, rdir = ''.join(probfile[::-1]).split('/', 1)
-        fname = 'problems_' + ''.join(rfname[::-1])
-        dir = ''
-        if rdir:
-            dir = ''.join(rdir[::-1])
-            probfile = dir + '/' + fname
-        else:
-            probfile = fname
-        print('PROBLEMS written to {}'.format(probfile))
-        write_outfile(problems, probfile, True)
+                logger.info('{}\t{}'.format(d, udis[d]))
     end = datetime.now()
-    print("FINISHED - START: ", str(start), "\tEND: ", str(end))
+    logger.info("FINISHED - START: {}\tEND: {}".format(start, str(end)))
+    if args.post_report:
+        post_report_document_to_portal(connection, itype, logfile)
+    dt = end.strftime("%y-%m-%d-%H-%M-%S")
+    os.rename(logfile, dt + logfile)
 
 
 if __name__ == '__main__':  # pragma: no cover

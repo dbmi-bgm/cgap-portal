@@ -5,14 +5,18 @@ import structlog
 import magic
 import json
 import os
+
+from base64 import b64encode
 from past.builtins import basestring
-from pyramid.view import view_config
+from PIL import Image
+from pkg_resources import resource_filename
 from pyramid.paster import get_app
 from pyramid.response import Response
+from pyramid.view import view_config
 from snovault.util import debug_log
-from encoded.server_defaults import add_last_modified
-from base64 import b64encode
-from PIL import Image
+from webtest import TestApp
+from .server_defaults import add_last_modified
+
 
 text = type(u'')
 logger = structlog.getLogger(__name__)
@@ -30,11 +34,12 @@ ORDER = [
     'project',
     'institution',
     'file_format',
+    'phenotype',
     'disorder',
     'cohort',
     'individual',
     'sample',
-    'workflow'
+    'workflow',
 ]
 
 IS_ATTACHMENT = [
@@ -95,8 +100,8 @@ def load_data_view(context, request):
     # this is a bit wierd but want to reuse load_data functionality so I'm rolling with it
     config_uri = request.json.get('config_uri', 'production.ini')
     patch_only = request.json.get('patch_only', False)
+    post_only = request.json.get('post_only', False)
     app = get_app(config_uri, 'app')
-    from webtest import TestApp
     environ = {'HTTP_ACCEPT': 'application/json', 'REMOTE_USER': 'TEST'}
     testapp = TestApp(app, environ)
     # expected response
@@ -105,7 +110,6 @@ def load_data_view(context, request):
         'status': 'success',
         '@type': ['result'],
     }
-    from pkg_resources import resource_filename
     store = request.json.get('store', {})
     local_path = request.json.get('local_path')
     fdn_dir = request.json.get('fdn_dir')
@@ -127,8 +131,8 @@ def load_data_view(context, request):
         return Response(
             content_type='text/plain',
             app_iter=LoadGenWrapper(
-                load_all_gen(testapp, inserts, None, overwrite=overwrite,
-                             itype=itype, from_json=from_json, patch_only=patch_only)
+                load_all_gen(testapp, inserts, None, overwrite=overwrite, itype=itype,
+                             from_json=from_json, patch_only=patch_only, post_only=post_only)
             )
         )
     # otherwise, it is a regular view and we can call load_all as usual
@@ -260,7 +264,7 @@ LOAD_ERROR_MESSAGE = """#   ██▓     ▒█████   ▄▄▄      �
 #                                       ░                    """
 
 
-def load_all(testapp, inserts, docsdir, overwrite=True, itype=None, from_json=False, patch_only=False):
+def load_all(testapp, inserts, docsdir, overwrite=True, itype=None, from_json=False, patch_only=False, post_only=False):
     """
     Wrapper function for load_all_gen, which invokes the generator returned
     from that function. Takes all of the same args as load_all_gen, so
@@ -272,7 +276,7 @@ def load_all(testapp, inserts, docsdir, overwrite=True, itype=None, from_json=Fa
     with the functionality of load_all_gen.
     """
     gen = LoadGenWrapper(
-        load_all_gen(testapp, inserts, docsdir, overwrite, itype, from_json, patch_only)
+        load_all_gen(testapp, inserts, docsdir, overwrite, itype, from_json, patch_only, post_only)
     )
     # run the generator; don't worry about the output
     for _ in gen:
@@ -283,7 +287,7 @@ def load_all(testapp, inserts, docsdir, overwrite=True, itype=None, from_json=Fa
     return gen.caught
 
 
-def load_all_gen(testapp, inserts, docsdir, overwrite=True, itype=None, from_json=False, patch_only=False):
+def load_all_gen(testapp, inserts, docsdir, overwrite=True, itype=None, from_json=False, patch_only=False, post_only=False):
     """
     Generator function that yields bytes information about each item POSTed/PATCHed.
     Is the base functionality of load_all function.
@@ -298,7 +302,8 @@ def load_all_gen(testapp, inserts, docsdir, overwrite=True, itype=None, from_jso
         overwrite (bool)   : if the database contains the item already, skip or patch
         itype (list or str): limit selection to certain type/types
         from_json (bool)   : if set to true, inserts should be dict instead of folder name
-
+        patch_only (bool)  : if set to true will only do second round patch - no posts
+        post_only (bool)   : if set to true posts full item no second round or lookup - use with care - will not work if linkTos to items not in db yet
     Yields:
         Bytes with information on POSTed/PATCHed items
 
@@ -367,30 +372,34 @@ def load_all_gen(testapp, inserts, docsdir, overwrite=True, itype=None, from_jso
     second_round_items = {}
     if not patch_only:
         for a_type in all_types:
-            # this conversion of schema name to object type works for all existing schemas at the moment
-            obj_type = "".join([i.title() for i in a_type.split('_')])
-            # minimal schema
-            schema_info = profiles[obj_type]
-            req_fields = schema_info.get('required', [])
-            ids = schema_info.get('identifyingProperties', [])
-            # some schemas did not include aliases
-            if 'aliases' not in ids:
-                ids.append('aliases')
-            # file format is required for files, but its usability depends this field
-            if a_type in ['file_format', 'experiment_type']:
-                req_fields.append('valid_item_types')
-            first_fields = list(set(req_fields+ids))
+            first_fields = []
+            if not post_only:
+                # this conversion of schema name to object type works for all existing schemas at the moment
+                obj_type = "".join([i.title() for i in a_type.split('_')])
+                # minimal schema
+                schema_info = profiles[obj_type]
+                req_fields = schema_info.get('required', [])
+                ids = schema_info.get('identifyingProperties', [])
+                # some schemas did not include aliases
+                if 'aliases' not in ids:
+                    ids.append('aliases')
+                # file format is required for files, but its usability depends this field
+                if a_type in ['file_format', 'experiment_type']:
+                    req_fields.append('valid_item_types')
+                first_fields = list(set(req_fields+ids))
             skip_existing_items = set()
             posted = 0
             patched = 0
             skip_exist = 0
             for an_item in store[a_type]:
-                try:
-                    # 301 because @id is the existing item path, not uuid
-                    testapp.get('/'+an_item['uuid'], status=[200, 301])
-                    exists = True
-                except:
-                    exists = False
+                exists = False
+                if not post_only:
+                    try:
+                        # 301 because @id is the existing item path, not uuid
+                        testapp.get('/'+an_item['uuid'], status=[200, 301])
+                        exists = True
+                    except:
+                        pass
                 # skip the items that exists
                 # if overwrite=True, still include them in PATCH round
                 if exists:
@@ -399,10 +408,13 @@ def load_all_gen(testapp, inserts, docsdir, overwrite=True, itype=None, from_jso
                         skip_existing_items.add(an_item['uuid'])
                     yield str.encode('SKIP: %s\n' % an_item['uuid'])
                 else:
-                    post_first = {key: value for (key, value) in an_item.items() if key in first_fields}
-                    post_first = format_for_attachment(post_first, docsdir)
+                    if post_only:
+                        to_post = an_item
+                    else:
+                        to_post = {key: value for (key, value) in an_item.items() if key in first_fields}
+                    to_post = format_for_attachment(to_post, docsdir)
                     try:
-                        res = testapp.post_json('/'+a_type, post_first)
+                        res = testapp.post_json('/'+a_type, to_post)
                         assert res.status_code == 201
                         posted += 1
                         # yield bytes to work with Response.app_iter
@@ -414,10 +426,11 @@ def load_all_gen(testapp, inserts, docsdir, overwrite=True, itype=None, from_jso
                         e_str = str(e).replace('\n', '')
                         yield str.encode('ERROR: %s\n' % e_str)
                         raise StopIteration
-            second_round_items[a_type] = [i for i in store[a_type] if i['uuid'] not in skip_existing_items]
+            if not post_only:
+                second_round_items[a_type] = [i for i in store[a_type] if i['uuid'] not in skip_existing_items]
             logger.info('{} 1st: {} items posted, {} items exists.'.format(a_type, posted, skip_exist))
             logger.info('{} 1st: {} items will be patched in second round'.format(a_type, str(len(second_round_items.get(a_type, [])))))
-    elif overwrite:
+    elif overwrite and not post_only:
         logger.info('Posting round skipped')
         for a_type in all_types:
             second_round_items[a_type] = [i for i in store[a_type]]
@@ -427,7 +440,6 @@ def load_all_gen(testapp, inserts, docsdir, overwrite=True, itype=None, from_jso
     rnd = ' 2nd' if not patch_only else ''
     for a_type in all_types:
         patched = 0
-        obj_type = "".join([i.title() for i in a_type.split('_')])
         if not second_round_items[a_type]:
             logger.info('{}{}: no items to patch'.format(a_type, rnd))
             continue
@@ -461,13 +473,11 @@ def load_data(app, indir='inserts', docsdir=None, overwrite=False,
         indir (inserts): inserts folder, should be relative to tests/data/
         docsdir (None): folder with attachment documents, relative to tests/data
     '''
-    from webtest import TestApp
     environ = {
         'HTTP_ACCEPT': 'application/json',
         'REMOTE_USER': 'TEST',
     }
     testapp = TestApp(app, environ)
-    from pkg_resources import resource_filename
     # load master-inserts by default
     if indir != 'master-inserts' and use_master_inserts:
         master_inserts = resource_filename('encoded', 'tests/data/master-inserts/')
@@ -512,7 +522,6 @@ def load_local_data(app, overwrite=False):
     Returns:
         None if successful, otherwise Exception encountered
     """
-    from pkg_resources import resource_filename
     # if we have any json files in temp-local-inserts, use those
     chk_dir = resource_filename('encoded', 'tests/data/temp-local-inserts')
     use_temp_local = False
