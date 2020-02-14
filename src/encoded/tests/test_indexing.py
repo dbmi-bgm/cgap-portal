@@ -154,8 +154,8 @@ def test_file_processed_detailed(app, testapp, indexer_testapp, project,
     item = {
         'institution': institution['uuid'],
         'project': project['uuid'],
-        'file_format': file_formats.get('pairs').get('@id'),
-        'filename': 'test.pairs.gz',
+        'file_format': file_formats.get('bam').get('@id'),
+        'filename': 'test.bam',
         'status': 'uploading'
     }
     fp_res = testapp.post_json('/file_processed', item)
@@ -171,7 +171,7 @@ def test_file_processed_detailed(app, testapp, indexer_testapp, project,
     rel_file = {
         'project': project['uuid'],
         'institution': institution['uuid'],
-        'file_format': file_formats.get('pairs').get('@id')
+        'file_format': file_formats.get('bam').get('@id')
     }
     rel_res = testapp.post_json('/file_processed', rel_file)
     rel_uuid = rel_res.json['@graph'][0]['uuid']

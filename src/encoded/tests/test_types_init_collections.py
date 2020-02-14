@@ -109,13 +109,12 @@ def download_tracking_item_data():
         "download_tracking": {
             "geo_country": "NL",
             "geo_city": "Utrecht, Provincie Utrecht",
-            "request_path": "/files-processed/4DNFI6BTR1IC/@@download/4DNFI6BTR1IC.pairs.gz.px2",
+            "request_path": "/files-processed/GAPFI6BTR1IC/@@download/4DNFI6BTR1IC.bam.bai",
             "user_uuid": "anonymous",
             "user_agent": "Wget/1.17.1 (linux-gnu)",
             "remote_ip": "192.87.138.11",
-            "file_format": "pairs_px2",
-            "filename": "4DNFI6BTR1IC.pairs.gz.px2",
-            "experiment_type": "in situ Hi-C"
+            "file_format": "bai",
+            "filename": "4DNFI6BTR1IC.bam.bai"
         }
     }
 
