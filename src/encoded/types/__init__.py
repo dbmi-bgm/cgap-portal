@@ -29,22 +29,6 @@ def includeme(config):
     config.scan()
 
 
-# @collection(
-#     name='samples',
-#     unique_key='accession',
-#     properties={
-#         'title': 'Samples',
-#         'description': 'Listing of Samples',
-#     })
-# class Sample(Item):
-#     item_type = 'sample'
-#     name_key = 'accession'
-#     schema = load_schema('encoded:schemas/sample.json')
-#     embedded_list = [
-#         "processed_files.workflow_run_outputs"
-#     ]
-
-
 @collection(
     name='sample-processings',
     properties={
