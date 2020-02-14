@@ -1,12 +1,19 @@
 import argparse
 import logging
 import structlog
+import transaction
+
 from pyramid.paster import get_app
-from encoded import configure_dbsession
-from snovault.elasticsearch.create_mapping import run as run_create_mapping
 from snovault import DBSESSION
+from snovault.elasticsearch.create_mapping import run as run_create_mapping
+from sqlalchemy import MetaData
+from zope.sqlalchemy import mark_changed
+from .. import configure_dbsession
+
 
 log = structlog.getLogger(__name__)
+
+
 EPILOG = __doc__
 
 
@@ -21,9 +28,6 @@ def clear_db_tables(app):
     Returns:
         bool: True if successful, False if error encountered
     """
-    import transaction
-    from sqlalchemy import MetaData
-    from zope.sqlalchemy import mark_changed
     success = False
     session = app.registry[DBSESSION]
     meta = MetaData(bind=session.connection(), reflect=True)

@@ -1,8 +1,10 @@
 import pytest
 from unittest import mock
-from encoded.commands.load_access_keys import generate_access_key
+from ..commands.load_access_keys import generate_access_key
+
 
 pytestmark = [pytest.mark.setone, pytest.mark.working]
+
 
 # TODO: test load_access_keys.get_existing_key_ids, which would use ES
 

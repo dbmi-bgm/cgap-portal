@@ -1,10 +1,7 @@
 """
 The type file for the collection Pages.  Which is used for static pages on the portal
 """
-from urllib.parse import (
-    urlparse,
-    urlencode
-)
+
 from pyramid.httpexceptions import ( # 301-307 redirect code response
     HTTPMovedPermanently,
     HTTPFound,
@@ -20,10 +17,9 @@ from snovault import (
     COLLECTIONS,
     CONNECTION
 )
-from encoded.search import get_iterable_search_results
-from .base import Item
-from .user_content import (
-    StaticSection
+from snovault.crud_views import (
+    collection_add,
+    item_edit,
 )
 from snovault.resource_views import item_view_page
 from snovault.validators import (
@@ -35,11 +31,16 @@ from snovault.validators import (
     no_validate_item_content_put,
     no_validate_item_content_patch
 )
-from snovault.crud_views import (
-    collection_add,
-    item_edit,
-)
 from snovault.util import debug_log
+from urllib.parse import (
+    urlparse,
+    urlencode
+)
+from ..search import get_iterable_search_results
+from .base import Item
+from .user_content import (
+    StaticSection
+)
 
 
 def get_pyramid_http_exception_for_redirect_code(code):
