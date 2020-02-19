@@ -1,11 +1,18 @@
+import json
+import pytest
+import time
+
+from datetime import (datetime, timedelta)
+from snovault import TYPES, COLLECTIONS
+from snovault.elasticsearch import create_mapping
+from snovault.elasticsearch.create_mapping import MAX_NGRAM
+from snovault.elasticsearch.indexer_utils import get_namespaced_index
+from snovault.util import add_default_embeds
+from ..commands.run_upgrader_on_inserts import get_inserts
 # Use workbook fixture from BDD tests (including elasticsearch)
 from .workbook_fixtures import app_settings, app, workbook
-import pytest
-from encoded.commands.run_upgrader_on_inserts import get_inserts
-from snovault.elasticsearch.indexer_utils import get_namespaced_index
-import json
-import time
-from snovault import TYPES, COLLECTIONS
+
+
 pytestmark = [pytest.mark.working, pytest.mark.schema, pytest.mark.indexing]
 
 
@@ -127,7 +134,6 @@ def test_search_ngram(workbook, testapp):
     """
     Tests edge-ngram related behavior with simple query string
     """
-    from snovault.elasticsearch.create_mapping import MAX_NGRAM
     # test search beyond max-ngram, should still give one result
     res = testapp.get('/search/?type=Item&q=Second+Dummy+Sub+Disorder').json
     assert len(res['@graph']) == 1
@@ -197,7 +203,6 @@ def test_search_embedded_file_by_accession(workbook, testapp):
 def dd_dts(testapp, workbook):
     # returns a dictionary of strings of various date and datetimes
     # relative to the creation date of the mboI one object in test inserts
-    from datetime import (datetime, timedelta)
     enz = testapp.get('/search/?type=Disorder&disorder_name=Dummy+Disorder').json['@graph'][0]
 
     cdate = enz['date_created']
@@ -378,8 +383,6 @@ def test_metadata_tsv_view(workbook, htmltestapp):
 
 
 def test_default_schema_and_non_schema_facets(workbook, testapp, registry):
-    from snovault import TYPES
-    from snovault.util import add_default_embeds
     test_type = 'user'
     type_info = registry[TYPES].by_item_type[test_type]
     schema = type_info.schema
@@ -506,7 +509,6 @@ def test_collection_actions_filtered_by_permission(workbook, testapp, anontestap
 
 
 def test_index_data_workbook(app, workbook, testapp, indexer_testapp, htmltestapp):
-    from snovault.elasticsearch import create_mapping
     es = app.registry['elasticsearch']
     # we need to reindex the collections to make sure numbers are correct
     create_mapping.run(app, sync_index=True)

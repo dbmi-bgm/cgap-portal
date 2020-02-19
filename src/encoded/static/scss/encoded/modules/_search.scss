@@ -174,7 +174,8 @@ $search-page-padding-resize-transition-out: padding .25s linear;
 
 .search-page-container {
 
-	> div > .row {
+	> div.search-view-controls-and-results.row {
+
 		@include navbar-fixed-position {
 			flex-wrap: nowrap;
 		}

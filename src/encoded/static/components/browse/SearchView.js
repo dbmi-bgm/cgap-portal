@@ -5,12 +5,14 @@ import memoize from 'memoize-one';
 import _ from 'underscore';
 import url from 'url';
 
-import { memoizedUrlParse, schemaTransforms } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
+import { memoizedUrlParse, schemaTransforms, analytics } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { SearchView as CommonSearchView } from '@hms-dbmi-bgm/shared-portal-components/es/components/browse/SearchView';
 import { ActiveFiltersBar } from '@hms-dbmi-bgm/shared-portal-components/es/components/browse/components/ActiveFiltersBar';
 import { columnExtensionMap } from './columnExtensionMap';
 import { Schemas } from './../util';
 import { TitleAndSubtitleBeside, PageTitleContainer, TitleAndSubtitleUnder, pageTitleViews, EditingItemPageTitle } from './../PageTitleSection';
+
+
 
 
 export default class SearchView extends React.PureComponent {
@@ -28,7 +30,7 @@ export default class SearchView extends React.PureComponent {
      * @param {{ field: string }} facet - Object representing a facet.
      * @returns {boolean} Whether to keep or discard facet.
      */
-    static filterFacet(facet, currentAction, session){
+    static filterFacet(facet, currentAction){
         // Set in backend or schema for facets which are under development or similar.
         if (facet.hide_from_view) return false;
 
@@ -38,32 +40,37 @@ export default class SearchView extends React.PureComponent {
         return true;
     }
 
-    /** Static method is memoized (instd of instance) because assumed only 1 SearchView per page max */
-    static transformedFacets = memoize(function(href, context, currentAction, session, schemas){
+    /** Filter the `@type` facet options down to abstract types only (if none selected) for Search. */
+    static transformedFacets(context, currentAction, schemas){
 
         // Clone/filter list of facets.
         // We may filter out type facet completely at this step,
         // in which case we can return out of func early.
         const facets = context.facets.filter(function(facet){
-            return SearchView.filterFacet(facet, currentAction, session);
+            return SearchView.filterFacet(facet, currentAction);
         });
 
         // Find facet for '@type'
-        const typeFacetIndex = _.findIndex(facets, { 'field' : 'type' });
+        const searchItemTypes = schemaTransforms.getAllSchemaTypesFromSearchContext(context); // "Item" is excluded
 
-        if (typeFacetIndex === -1) {
-            return facets; // Facet not present, return.
-        }
-
-        const hrefQuery = _.clone(memoizedUrlParse(href).query);
-        if (typeof hrefQuery.type === 'string') hrefQuery.type = [hrefQuery.type];
-
-        const itemTypesInSearch = _.without(hrefQuery.type, 'Item');
-
-        if (itemTypesInSearch.length > 0){
+        if (searchItemTypes.length > 0) {
+            console.info("A (non-'Item') type filter is present. Will skip filtering Item types in Facet.");
             // Keep all terms/leaf-types - backend should already filter down to only valid sub-types through
             // nature of search itself.
+
+            if (searchItemTypes.length > 1) {
+                const errMsg = "More than one \"type\" filter is selected. This is intended to not occur, at least as a consequence of interacting with the UI. Perhaps have entered multiple types into URL.";
+                analytics.exception("CGAP SearchView - " + errMsg);
+                console.warn(errMsg);
+            }
+
             return facets;
+        }
+
+        const typeFacetIndex = _.findIndex(facets, { 'field' : 'type' });
+        if (typeFacetIndex === -1) {
+            console.error("Could not get type facet, though some filter for it is present.");
+            return facets; // Facet not present, return.
         }
 
         // Avoid modifying in place.
@@ -72,13 +79,14 @@ export default class SearchView extends React.PureComponent {
         // Show only base types for when itemTypesInSearch.length === 0 (aka 'type=Item').
         facets[typeFacetIndex].terms = _.filter(facets[typeFacetIndex].terms, function(itemType){
             const parentType = schemaTransforms.getAbstractTypeForType(itemType.key, schemas);
-            return !parentType || parentType === itemType.key;
+            return !parentType || (parentType === itemType.key);
         });
 
         return facets;
-    });
+    }
 
-    static filteredFilters = memoize(function(filters){
+    /** Not currently used. */
+    static filteredFilters(filters){
         const typeFilterCount = filters.reduce(function(m, { field }){
             if (field === "type") return m + 1;
             return m;
@@ -94,20 +102,22 @@ export default class SearchView extends React.PureComponent {
             }
             return true;
         });
-    });
+    }
 
-    /** Filter the `@type` facet options down to abstract types only (if none selected) for Search. */
-    transformedFacets(){
-        const { href, context, currentAction, session, schemas } = this.props;
-        return SearchView.transformedFacets(href, context, currentAction, session, schemas);
+    constructor(props){
+        super(props);
+        this.memoized = {
+            transformedFacets : memoize(SearchView.transformedFacets),
+            filteredFilters: memoize(SearchView.filteredFilters)
+        };
     }
 
     render(){
         // We don't need full screen btn on CGAP as already full width.
         const passProps = _.omit(this.props, 'isFullscreen', 'toggleFullScreen');
-        const { context, schemas } = passProps;
-        const filters = SearchView.filteredFilters(context.filters || []);
-        const facets = this.transformedFacets();
+        const { context, currentAction, schemas } = passProps;
+        //const filters = SearchView.filteredFilters(context.filters || []);
+        const facets = this.memoized.transformedFacets(context, currentAction, schemas);
         const tableColumnClassName = "results-column col";
         const facetColumnClassName = "facets-column col-auto";
         return (

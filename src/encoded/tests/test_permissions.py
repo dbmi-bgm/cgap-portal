@@ -1,8 +1,13 @@
 import pytest
-pytestmark = [pytest.mark.setone, pytest.mark.working, pytest.mark.schema]
+import webtest
 
 from datetime import date
 from urllib.parse import urlencode
+from ..types.institution import Institution
+
+
+pytestmark = [pytest.mark.setone, pytest.mark.working, pytest.mark.schema]
+
 
 # XXX: There are a lot of testing holes here. New datafixtures will need to be
 # developed to adequately test the permissions.
@@ -152,12 +157,11 @@ def remc_submitter(testapp, remc_institution, remc_project):
 
 
 def remote_user_testapp(app, remote_user):
-    from webtest import TestApp
     environ = {
         'HTTP_ACCEPT': 'application/json',
         'REMOTE_USER': str(remote_user),
     }
-    return TestApp(app, environ)
+    return webtest.TestApp(app, environ)
 
 
 @pytest.fixture
@@ -477,7 +481,6 @@ def test_wrangler_can_edit_institution_name_or_title(institution, submitter_test
 
 
 def test_ac_local_roles_for_institution(registry):
-    from encoded.types.institution import Institution
     institution_data = {
         'status': 'in review',
         'project': 'b0b9c607-bbbb-4f02-93f4-9895baa1334b',
