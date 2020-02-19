@@ -46,6 +46,8 @@ install:
 # need to manually change the version of six used by Travis for some reason
 - pip uninstall -y six
 - pip install six==1.11.0
+- pip install --upgrade pip==19.0.3
+- pip install poetry
 - pip install coveralls
 - pip install codacy-coverage
 - poetry install
