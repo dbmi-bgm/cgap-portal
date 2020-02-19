@@ -547,7 +547,7 @@ description = "Integrated process monitor for developing and reloading daemons."
 name = "hupper"
 optional = false
 python-versions = ">=2.7,!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*"
-version = "1.9.1"
+version = "1.10.1"
 
 [package.extras]
 docs = ["watchdog", "sphinx", "pylons-sphinx-themes"]
@@ -2754,8 +2754,8 @@ humanfriendly = [
     {file = "humanfriendly-1.44.5.tar.gz", hash = "sha256:4465e94cdfac4659c485a680057eae8beadd94f480db8cfa71de8fc85ddc429c"},
 ]
 hupper = [
-    {file = "hupper-1.9.1-py2.py3-none-any.whl", hash = "sha256:5ab839f9428dd2d993092193ad0032f968eae007873916794c3856131b2df112"},
-    {file = "hupper-1.9.1.tar.gz", hash = "sha256:3b1c2222ec7b8159e7ad059e4493c6cc634c86184af0bf2ce5aba6edd241cf5f"},
+    {file = "hupper-1.10.1-py2.py3-none-any.whl", hash = "sha256:25e19eab7ba5d25c40c5fa083c845c5919ad2652b4bff002d1e9016b238489ae"},
+    {file = "hupper-1.10.1.tar.gz", hash = "sha256:109928477eeac69a55cdba65d20f09d06eff596a861f96c7736028988f090096"},
 ]
 idna = [
     {file = "idna-2.7-py2.py3-none-any.whl", hash = "sha256:156a6814fb5ac1fc6850fb002e0852d56c0c8d2531923a51032d1b70760e186e"},

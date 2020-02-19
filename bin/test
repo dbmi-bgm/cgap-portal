@@ -1,2 +1,11 @@
+if [ "$1" = "--setup-npm" ]; then
+    make npm-setup
+    shift 1
+else
+    echo "---------------------------------------------------------------"
+    echo "NOTE: For efficiency, we're skipping the 'make npm-setup' step."
+    echo "      You may need '--setup-npm' if you get a lot of 500's."
+    echo "---------------------------------------------------------------"
+fi
 python $(dirname $0)/test.py $@
 
