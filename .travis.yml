@@ -59,14 +59,14 @@ install:
 #- pip install pytest==2.9.1
 #- pip show pytest
 before_script:
-- bin/configure-kibana-index --es-endpoint search-fourfront-builds-uhevxdzfcv7mkm5pj5svcri3aq.us-east-1.es.amazonaws.com:80
+- configure-kibana-index --es-endpoint search-fourfront-builds-uhevxdzfcv7mkm5pj5svcri3aq.us-east-1.es.amazonaws.com:80
 script:
 # setone is essentially all tests that are not indexing; change here for clarity
 - travis_wait 30 bin/test -v -v --aws-auth -m "working" --durations=10
   --cov src/encoded --es search-fourfront-builds-uhevxdzfcv7mkm5pj5svcri3aq.us-east-1.es.amazonaws.com:80;
 after_script:
 - echo leader=$BUILD_LEADER status=$BUILD_AGGREGATE_STATUS
-- bin/wipe-test-indices $TRAVIS_JOB_ID search-fourfront-builds-uhevxdzfcv7mkm5pj5svcri3aq.us-east-1.es.amazonaws.com:80
+- wipe-test-indices $TRAVIS_JOB_ID search-fourfront-builds-uhevxdzfcv7mkm5pj5svcri3aq.us-east-1.es.amazonaws.com:80
 after_success:
 - coveralls
 - ! "if test -n \"$NPM\"; then \n   cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js\n
@@ -83,7 +83,7 @@ after_success:
 - ! "if [ \"$BUILD_LEADER\" = \"YES\" ]; then\n  if [ \"$BUILD_AGGREGATE_STATUS\"
   = \"others_succeeded\" ]; then\n    if [ \"$TRAVIS_PULL_REQUEST\" = \"false\" ];
   then\n      echo \"cleanup build artifacts\"\n      rm elasticsearch-5.4.1.deb\n
-  \     rm .to_export_back\n      rm versions.cfg\n      pip install awsebcli\n      bin/aws
+  \     rm .to_export_back\n      rm versions.cfg\n      pip install awsebcli\n      aws
   s3 cp --recursive s3://encoded-4dn-conf-prod/.aws /home/travis/.aws\n      git remote
   add origin-travis https://${GH_TOKEN}@github.com/4dn-dcic/fourfront.git\n      git
   config --global user.email \"travis@builder.com\"\n      git config --global user.name
