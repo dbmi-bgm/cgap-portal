@@ -52,17 +52,6 @@
             "exclude_from": ["submit4dn", "FFedit-create"],
             "enum": ["processed file"]
         },
-         "source_experiments": {
-             "title": "Source Experiments",
-             "description": "Experiments that this file is associated with",
-             "type": "array",
-             "lookup": 40,
-             "exclude_from": ["submit4dn"],
-             "items": {
-                 "title": "Source Experiment",
-                 "type": "string"
-             }
-        },
         "source_samples": {
             "title": "Source Samples",
             "description": "Samples that this file is associated with",
@@ -78,6 +67,7 @@
             "title": "Genome Assembly",
             "description": "The genome assembly associated with the file - for processing or reference",
             "type": "string",
+            "default": "GRCh38",
             "lookup": 30,
             "enum": ["GRCh38"]
         },

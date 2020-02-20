@@ -60,6 +60,7 @@
             "title": "Genome Assembly",
             "description": "The genome assembly associated with the file - for processing or reference",
             "type": "string",
+            "default": "GRCh38",
             "lookup": 30,
             "enum": ["GRCh38"]
         }
