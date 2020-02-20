@@ -154,8 +154,8 @@ def test_file_processed_detailed(app, testapp, indexer_testapp, project,
     item = {
         'institution': institution['uuid'],
         'project': project['uuid'],
-        'file_format': file_formats.get('pairs').get('@id'),
-        'filename': 'test.pairs.gz',
+        'file_format': file_formats.get('bam').get('@id'),
+        'filename': 'test.bam',
         'status': 'uploading'
     }
     fp_res = testapp.post_json('/file_processed', item)
@@ -171,7 +171,7 @@ def test_file_processed_detailed(app, testapp, indexer_testapp, project,
     rel_file = {
         'project': project['uuid'],
         'institution': institution['uuid'],
-        'file_format': file_formats.get('pairs').get('@id')
+        'file_format': file_formats.get('bam').get('@id')
     }
     rel_res = testapp.post_json('/file_processed', rel_file)
     rel_uuid = rel_res.json['@graph'][0]['uuid']
@@ -219,10 +219,11 @@ def test_real_validation_error(app, indexer_testapp, testapp, institution,
     fp_body = {
         'schema_version': '3',
         'uuid': str(uuid.uuid4()),
-        'file_format': file_formats.get('mcool').get('uuid'),
+        'file_format': file_formats.get('zip').get('uuid'),
         'institution': institution['uuid'],
         'project': project['uuid'],
-        'higlass_uid': 1  # validation error -- higlass_uid should be string
+        'file_classification': 'unprocessed file'
+        # 'higlass_uid': 1  # validation error -- higlass_uid should be string
     }
     res = testapp.post_json('/files-processed/?validate=false&upgrade=False',
                                   fp_body, status=201).json
