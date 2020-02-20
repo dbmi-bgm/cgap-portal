@@ -1112,7 +1112,13 @@ def set_facets(search, facets, search_filters, string_query, request, doc_types,
                 facet["field_type"] = "date"
             elif is_numerical_field:
                 facet["field_type"] = field_schema['type'] or "number"
-
+                if "number_step" not in facet:
+                    if "number_step" in field_schema:
+                        facet["number_step"] = field_schema['number_step']
+                    elif facet["field_type"] == "integer":
+                        facet["number_step"] = 1
+                    else: # Default
+                        facet["number_step"] = "any"
             facet_filters = generate_filters_for_terms_agg_from_search_filters(query_field, search_filters, string_query)
 
             aggs[facet["aggregation_type"] + ":" + agg_name] = {

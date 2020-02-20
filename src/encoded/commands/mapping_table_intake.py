@@ -287,9 +287,17 @@ class MappingTableParser(object):
             return o.get('field_type') in ['integer', 'number']
 
         def insert_column_or_facet(d, o):
-            val = {'title': o.get('schema_title', o.get('vcf_name'))}
-            if is_numbered_field(o):
+            val = { 'title': o.get('schema_title', o.get('vcf_name')) }
+            if is_numbered_field(o) and is_facet(o):
                 val['aggregation_type'] = 'stats'
+                if "number_step" in o:
+                    val['number_step'] = o["number_step"]
+                elif o['field_type'] == "integer":
+                    val['number_step'] = 1
+                else:
+                    # Default. Is assumed to be "any" on frontend if absent,
+                    # but adding 'documentation through redundancy', if such thing is a thing.
+                    val['number_step'] = "any"
             if is_sub_embedded_object(o):
                 if is_link_to(o):  # add .display_title if we are a linkTo
                     d[o.get('sub_embedding_group') + '.' + o['vcf_name'] + '.display_title'] = val
