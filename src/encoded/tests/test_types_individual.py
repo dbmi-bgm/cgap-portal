@@ -39,3 +39,12 @@ def test_patch_invalid_project_inst(testapp, project, institution, MIndividual):
     res = testapp.post_json('/individual', MIndividual, status=201).json['@graph'][0]
     testapp.patch_json(res['@id'], {'project': 'does not exist'}, status=422)
     testapp.patch_json(res['@id'], {'institution': 'does not exist'}, status=422)
+
+
+def test_individual_children(testapp, project, institution, MIndividual, WIndividual):
+    res_m = testapp.post_json('/individual', MIndividual, status=201).json['@graph'][0]
+    WIndividual['father'] = res_m['@id']
+    res_f = testapp.post_json('/individual', WIndividual, status=201).json['@graph'][0]
+    children = testapp.get(res_m['@id']).json.get('children')
+    assert len(children) == 1
+    assert children[0]['@id'] == res_f['@id']
