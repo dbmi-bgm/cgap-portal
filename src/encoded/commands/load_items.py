@@ -7,46 +7,85 @@ import json
 from datetime import datetime
 from dcicutils import ff_utils
 
-'''logging setup
-   logging config - to be moved to file at some point
-'''
-date = datetime.now().strftime("%y-%m-%d-%H-%M-%S")
-logfile = 'load_items.log'
-logger = logging.getLogger(__name__)
-logging.config.dictConfig({
-    'version': 1,
-    'disable_existing_loggers': False,
-    'formatters': {
-        'standard': {
-            'format': '%(levelname)s:\t%(message)s'
-        },
-        'verbose': {
-            'format': '%(levelname)s:\t%(message)s\tFROM: %(name)s'
-        }
-    },
-    'handlers': {
-        'stdout': {
-            'level': 'INFO',
-            'formatter': 'verbose',
-            'class': 'logging.StreamHandler'
-        },
-        'logfile': {
-            'level': 'INFO',
-            'formatter': 'standard',
-            'class': 'logging.FileHandler',
-            'filename': logfile
-        }
-    },
-    'loggers': {
-        '': {
-            'handlers': ['stdout', 'logfile'],
-            'level': 'INFO',
-            'propagate': True
-        }
-    }
-})
+# '''logging setup
+#    logging config - to be moved to file at some point
+# '''
+# date = datetime.now().strftime("%y-%m-%d-%H-%M-%S")
+# logfile = 'load_items.log'
+# logger = logging.getLogger(__name__)
+# logging.config.dictConfig({
+#     'version': 1,
+#     'disable_existing_loggers': False,
+#     'formatters': {
+#         'standard': {
+#             'format': '%(levelname)s:\t%(message)s'
+#         },
+#         'verbose': {
+#             'format': '%(levelname)s:\t%(message)s\tFROM: %(name)s'
+#         }
+#     },
+#     'handlers': {
+#         'stdout': {
+#             'level': 'INFO',
+#             'formatter': 'verbose',
+#             'class': 'logging.StreamHandler'
+#         },
+#         'logfile': {
+#             'level': 'INFO',
+#             'formatter': 'standard',
+#             'class': 'logging.FileHandler',
+#             'filename': logfile
+#         }
+#     },
+#     'loggers': {
+#         '': {
+#             'handlers': ['stdout', 'logfile'],
+#             'level': 'INFO',
+#             'propagate': True
+#         }
+#     }
+# })
 
 EPILOG = __doc__
+
+
+def get_logger(lname, logfile):
+    """logging setup"""
+    logger = logging.getLogger(lname)
+
+    logging.config.dictConfig({
+        'version': 1,
+        'disable_existing_loggers': False,
+        'formatters': {
+            'standard': {
+                'format': '%(levelname)s:\t%(message)s'
+            },
+            'verbose': {
+                'format': '%(levelname)s:\t%(message)s\tFROM: %(name)s'
+            }
+        },
+        'handlers': {
+            'stdout': {
+                'level': 'WARN',
+                'formatter': 'verbose',
+                'class': 'logging.StreamHandler'
+            },
+            'logfile': {
+                'level': 'INFO',
+                'formatter': 'standard',
+                'class': 'logging.FileHandler',
+                'filename': logfile
+            }
+        },
+        'loggers': {
+            '': {
+                'handlers': ['stdout', 'logfile'],
+                'level': 'INFO',
+                'propagate': True
+            }
+        }
+    })
+    return logger
 
 
 def parse_args():
@@ -76,10 +115,10 @@ def parse_args():
 
 
 def get_auth(key=None, keyfile=None):
-    '''Sets up credentials for accessing the server.  Generates a key using info
+    """Sets up credentials for accessing the server.  Generates a key using info
        from the named keyname in the keyfile and checks that the server can be
        reached with that key.
-    '''
+    """
     auth = None
     if key and keyfile:
         keys = None
@@ -97,7 +136,7 @@ def get_auth(key=None, keyfile=None):
 def set_load_params(auth, env):
     # authentication with Fourfront
     # auth is dict: key, secret, server - set config appropriately
-    if not auth or env:
+    if not (auth or env):
         return
     if auth:
         if auth.get('server') == 'http://localhost:8000':
@@ -143,7 +182,7 @@ def load_json_to_store(json_input, itype=None):
         return{}
 
 
-def load_items(json_input, itypes=None, env=None, auth=None, patch_only=False, post_only=False):
+def load_items(json_input, itypes=None, env=None, auth=None, patch_only=False, post_only=False, logger=None):
     """
     Load a given JSON file with items inserts or a python dict keyed by item type
     or a list (as long as a single itype param value is provided) to a server using
@@ -204,12 +243,18 @@ def main():
     # Loading app will have configured from config file. Reconfigure here:
     logging.getLogger('encoded').setLevel(logging.INFO)
     args = parse_args()
+    start = datetime.now()
+    dt = start.strftime("%y-%m-%d-%H-%M-%S")
+    logfile = '{}_load_items.log'.format(dt)
+    logger = get_logger(__name__, logfile)
+    auth = None
     if not args.env and args.key:
         auth = get_auth(args.key, args.keyfile)
-    load_items(args.json_input, args.item_types, args.env, auth, args.patch_only)
-    logger.info("DONE!")
-    dt = end.strftime("%y-%m-%d-%H-%M-%S")
-    os.rename(logfile, dt + logfile)
+    load_items(args.json_input, args.item_types, args.env, auth, args.patch_only, args.post_only, logger)
+    end = datetime.now()
+    et = end.strftime("%y-%m-%d-%H-%M-%S")
+    logger.info("DONE! {}".format(et))
+
 
 
 if __name__ == "__main__":

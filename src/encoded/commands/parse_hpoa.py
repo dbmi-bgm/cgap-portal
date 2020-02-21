@@ -5,7 +5,6 @@ import json
 import logging
 import logging.config
 import os
-import pdb
 import re
 import requests
 import sys
@@ -338,10 +337,10 @@ def main():  # pragma: no cover
 
     args = get_args()
 
-    connection = connect2server(args.env, args.key, args.keyfile)
+    connection = connect2server(args.env, args.key, args.keyfile, logger)
     logger.info('Working with {}'.format(connection.get('server')))
 
-    postfile, loaddb = prompt_check_for_output_options(args.load, args.outfile, ITEMTYPE, connection.get('server'))
+    postfile, loaddb = prompt_check_for_output_options(args.load, args.outfile, ITEMTYPE, connection.get('server'), logger)
 
     logger.info('Getting existing Items from Database')
     logger.info('Disorders')
@@ -413,15 +412,15 @@ def main():  # pragma: no cover
             write_outfile([evidence_items, obs_patch], postfile, args.pretty)
         if loaddb:
             if evidence_items:
-                res = load_items(evidence_items, itypes=[ITEMTYPE], auth=connection, post_only=True)
+                res = load_items(evidence_items, itypes=[ITEMTYPE], auth=connection, post_only=True, logger=logger)
                 logger.info(res)
             if obs_patch:
-                res2 = load_items(obs_patch, itypes=[ITEMTYPE], auth=connection, patch_only=True)
+                res2 = load_items(obs_patch, itypes=[ITEMTYPE], auth=connection, patch_only=True, logger=logger)
                 logger.info(res2)
             # logger.info(json.dumps(res, indent=4))
     if problems:
         log_problems(logger, problems)
-           
+
     end = datetime.now()
     logger.info("FINISHED - START: {}\tEND: {}".format(start, str(end)))
     if args.post_report:

@@ -1,5 +1,5 @@
 import argparse
-import datetime
+from datetime import datetime
 import logging
 import logging.config
 import json
@@ -14,7 +14,6 @@ from dcicutils.ff_utils import (
     unified_authentication,
     post_metadata
 )
-from rdflib.collection import Collection
 from uuid import uuid4
 from ..commands.load_items import load_items
 from ..commands.owltools import (
@@ -25,7 +24,6 @@ from ..commands.owltools import (
     isURIRef,
     isBlankNode,
     getObjectLiteralsOfType,
-    subClassOf,
     Deprecated,
     hasDbXref,
     hasAltId
@@ -34,44 +32,44 @@ from ..commands.owltools import (
 
 EPILOG = __doc__
 
-'''logging setup
-   logging config - to be moved to file at some point
-'''
-logfile = 'process_dp_upd.log'
-logger = logging.getLogger(__name__)
-
-logging.config.dictConfig({
-    'version': 1,
-    'disable_existing_loggers': False,
-    'formatters': {
-        'standard': {
-            'format': '%(levelname)s:\t%(message)s'
-        },
-        'verbose': {
-            'format': '%(levelname)s:\t%(message)s\tFROM: %(name)s'
-        }
-    },
-    'handlers': {
-        'stdout': {
-            'level': 'WARN',
-            'formatter': 'verbose',
-            'class': 'logging.StreamHandler'
-        },
-        'logfile': {
-            'level': 'INFO',
-            'formatter': 'standard',
-            'class': 'logging.FileHandler',
-            'filename': logfile
-        }
-    },
-    'loggers': {
-        '': {
-            'handlers': ['stdout', 'logfile'],
-            'level': 'INFO',
-            'propagate': True
-        }
-    }
-})
+# '''logging setup
+#    logging config - to be moved to file at some point
+# '''
+# logfile = 'process_dp_upd.log'
+# logger = logging.getLogger(__name__)
+#
+# logging.config.dictConfig({
+#     'version': 1,
+#     'disable_existing_loggers': False,
+#     'formatters': {
+#         'standard': {
+#             'format': '%(levelname)s:\t%(message)s'
+#         },
+#         'verbose': {
+#             'format': '%(levelname)s:\t%(message)s\tFROM: %(name)s'
+#         }
+#     },
+#     'handlers': {
+#         'stdout': {
+#             'level': 'WARN',
+#             'formatter': 'verbose',
+#             'class': 'logging.StreamHandler'
+#         },
+#         'logfile': {
+#             'level': 'INFO',
+#             'formatter': 'standard',
+#             'class': 'logging.FileHandler',
+#             'filename': logfile
+#         }
+#     },
+#     'loggers': {
+#         '': {
+#             'handlers': ['stdout', 'logfile'],
+#             'level': 'INFO',
+#             'propagate': True
+#         }
+#     }
+# })
 
 ''' global config '''
 ITEM2OWL = {
@@ -98,6 +96,45 @@ ITEM2OWL = {
         'url_field': 'hpo_url'
     },
 }
+
+
+def get_logger(lname, logfile):
+    """logging setup"""
+    logger = logging.getLogger(lname)
+
+    logging.config.dictConfig({
+        'version': 1,
+        'disable_existing_loggers': False,
+        'formatters': {
+            'standard': {
+                'format': '%(levelname)s:\t%(message)s'
+            },
+            'verbose': {
+                'format': '%(levelname)s:\t%(message)s\tFROM: %(name)s'
+            }
+        },
+        'handlers': {
+            'stdout': {
+                'level': 'WARN',
+                'formatter': 'verbose',
+                'class': 'logging.StreamHandler'
+            },
+            'logfile': {
+                'level': 'INFO',
+                'formatter': 'standard',
+                'class': 'logging.FileHandler',
+                'filename': logfile
+            }
+        },
+        'loggers': {
+            '': {
+                'handlers': ['stdout', 'logfile'],
+                'level': 'INFO',
+                'propagate': True
+            }
+        }
+    })
+    return logger
 
 
 def iterative_parents(nodes, terms, data):
@@ -303,7 +340,7 @@ def get_existing_items(connection, itype, include_obs_n_del=True):
     return terms
 
 
-def connect2server(env=None, key=None, keyfile=None):
+def connect2server(env=None, key=None, keyfile=None, logger=None):
     '''Sets up credentials for accessing the server.  Generates a key using info
        from the named keyname in the keyfile and checks that the server can be
        reached with that key.
@@ -413,7 +450,7 @@ def id_fields2patch(term, dbterm, rm_unch):
         return term
 
 
-def id_post_and_patch(terms, dbterms, itype, rm_unchanged=True, set_obsoletes=True):
+def id_post_and_patch(terms, dbterms, itype, rm_unchanged=True, set_obsoletes=True, logger=None):
     '''compares terms to terms that are already in db - if no change
         removes them from the list of updates, if new adds to post dict,
         if changed adds uuid and add to patch dict
@@ -446,7 +483,7 @@ def id_post_and_patch(terms, dbterms, itype, rm_unchanged=True, set_obsoletes=Tr
 
     # all terms have uuid - now add uuids to linked terms
     for term in terms.values():
-        puuids = _get_uuids_for_linked(term, tid2uuid, itype)
+        puuids = _get_uuids_for_linked(term, tid2uuid, itype, logger)
         for rt, uuids in puuids.items():
             term[rt] = list(set(uuids))  # to avoid redundant terms
 
@@ -488,7 +525,7 @@ def id_post_and_patch(terms, dbterms, itype, rm_unchanged=True, set_obsoletes=Tr
     return to_update
 
 
-def _get_uuids_for_linked(term, idmap, itype):
+def _get_uuids_for_linked(term, idmap, itype, logger=None):
     puuids = {}
     for rt in ['parents', 'slim_terms']:
         tlist = term.get(rt)
@@ -646,7 +683,7 @@ def post_report_document_to_portal(connection, itype, logfile):
     meta = {'institution': inst, 'project': proj}
     mimetype = "text/plain"
     rtype = 'document'
-    date = datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
+    date = datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
     attach_fn = None
     if os.path.isfile(logfile):
         attach_fn = '{}_update_report_{}.txt'.format(itype, date)
@@ -664,7 +701,7 @@ def post_report_document_to_portal(connection, itype, logfile):
     return
 
 
-def prompt_check_for_output_options(load, outfile, itype, server):
+def prompt_check_for_output_options(load, outfile, itype, server, logger=None):
     if load:
         choice1 = str(input("load is True - are you sure you want to directly load the output to {} (y/n)?: ".format(server)))
         if choice1.lower() == 'y':
@@ -691,13 +728,16 @@ def main():
 
         logging/tracking info
     '''
-    start = datetime.datetime.now()
+    start = datetime.now()
+    dt = start.strftime("%y-%m-%d-%H-%M-%S")
     args = parse_args(sys.argv[1:])
     itype = args.item_type
+    logfile = '{}_{}_item_upd.log'.format(dt, itype)
+    logger = get_logger(__name__, logfile)
     logger.info('Processing {} on {}'.format(itype, start))
     connection = connect2server(args.env, args.key, args.keyfile)
     logger.info('Running on {}'.format(connection.get('server')))
-    postfile, loaddb = prompt_check_for_output_options(args.load, args.outfile, itype, connection.get('server'))
+    postfile, loaddb = prompt_check_for_output_options(args.load, args.outfile, itype, connection.get('server'), logger)
 
     logger.debug('Getting existing items from ', args.env)
     db_terms = get_existing_items(connection, itype)
@@ -727,23 +767,21 @@ def main():
         filter_unchanged = True
         if args.full:
             filter_unchanged = False
-        items2upd = id_post_and_patch(terms, db_terms, itype, filter_unchanged)
+        items2upd = id_post_and_patch(terms, db_terms, itype, filter_unchanged, logger=logger)
         pretty = False
         if args.pretty:
             pretty = True
         if postfile:
             write_outfile(items2upd, postfile, pretty)
         if loaddb:
-            res = load_items(items2upd, itypes=[itype], auth=connection)
+            res = load_items(items2upd, itypes=[itype], auth=connection, logger=logger)
             logger.info(res)
             logger.info(json.dumps(items2upd, indent=4))
-    stop = datetime.datetime.now()
+    stop = datetime.now()
     logger.info('STARTED: {}'.format(str(start)))
     logger.info('END: {}'.format(str(stop)))
     if args.post_report:
         post_report_document_to_portal(connection, itype, logfile)
-    dt = end.strftime("%y-%m-%d-%H-%M-%S")
-    os.rename(logfile, dt + logfile)
 
 
 if __name__ == '__main__':
