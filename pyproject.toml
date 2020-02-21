@@ -35,7 +35,7 @@ classifiers = [
 ]
 
 [tool.poetry.dependencies]
-python = ">=3.5,<3.7"
+python = ">=3.4,<3.7"
 apipkg = "1.4"
 attr = "0.1.0"
 attrs = "16.3.0"
@@ -61,7 +61,7 @@ colorama = "0.3.3"
 coverage = "4.0.3"
 cryptacular = "1.4.1"
 dcicutils = "0.9.3b0"
-dcicsnovault = "2.0.0b7"
+dcicsnovault = "2.0.0b13"
 docutils = "0.12"
 elasticsearch = "5.5.3"
 elasticsearch-dsl = "5.4.0"
