@@ -37,16 +37,19 @@
         },
         "is_pregnancy": {
             "title": "Pregnancy",
-            "type": "boolean"
+            "type": "boolean",
+            "lookup": 4
         },
         "gestational_age": {
             "title": "Gestational Age (weeks)",
             "description": "Age of fetus, expressed as weeks",
-            "type": "number"
+            "type": "number",
+            "lookup": 5
         },
         "sex": {
             "title": "Sex",
             "type": "string",
+            "lookup": 1,
             "enum": [
                 "M",
                 "F",
@@ -56,13 +59,15 @@
         "quantity": {
             "title": "Quantity",
             "description": "Number of individuals represented by this item in pedigree",
-            "type": "number"
+            "type": "number",
+            "lookup": 150
         },
         "phenotypic_features": {
             "title": "Phenotypic Features",
             "description": "Phenotypic Features as listed in HPO",
             "type": "array",
             "uniqueItems": true,
+            "lookup": 10,
             "items":{
                 "title": "Phenotypic Feature Info",
                 "type": "object",
@@ -97,6 +102,7 @@
             "title" : "Disorders",
             "type" : "array",
             "uniqueItems": true,
+            "lookup": 20,
             "items" : {
                 "title" : "Disorder",
                 "type" : "string",
@@ -105,21 +111,25 @@
         },
         "clinic_notes": {
             "title": "Notes from the Clinic",
-            "type": "string"
+            "type": "string",
+            "lookup": 125
         },
         "birth_year" : {
             "title" : "Year of Birth",
-            "type" : "integer"
+            "type" : "integer",
+            "lookup": 25
         },
         "is_deceased": {
             "title": "Deceased",
             "description": "Whether the individual is deceased",
-            "type": "boolean"
+            "type": "boolean",
+            "lookup": 31
         },
         "life_status": {
             "title": "Life Status",
             "description": "Status of individual",
             "type": "string",
+            "lookup": 30,
             "enum": [
                 "alive and well",
                 "alive",
@@ -129,29 +139,34 @@
         },
         "is_termination_of_pregnancy": {
             "title": "Termination of Pregnancy",
-            "type": "boolean"
+            "type": "boolean",
+            "lookup": 32
         },
         "is_spontaneous_abortion": {
             "title": "Spontaneous Abortion",
-            "type": "boolean"
+            "type": "boolean",
+            "lookup": 33
         },
         "is_still_birth": {
             "title": "Still Birth",
-            "type": "boolean"
+            "type": "boolean",
+            "lookup": 34
         },
         "cause_of_death": {
             "title" : "Cause of Death",
             "type" : "string",
+            "lookup": 35,
             "linkTo" : "Phenotype"
         },
         "age_at_death": {
             "title": "Death Age",
-            "type": "number"
+            "type": "number",
+            "lookup": 36
         },
         "age_at_death_units": {
             "title": "Death Age Units",
             "type": "string",
-            "lookup": 13,
+            "lookup": 37,
             "enum": [
                 "day",
                 "week",
@@ -176,6 +191,7 @@
             "description": "Ancestry of the individual. List taken from https://gist.github.com/incredimike/1469814.",
             "type": "array",
             "uniqueItems": true,
+            "lookup": 100,
             "items": {
                 "title": "Ancestry",
                 "type" : "string",
@@ -446,6 +462,7 @@
             "description": "Custom identifier provided by the institution",
             "type": "object",
             "required": ["id", "id_source"],
+            "lookup": 9,
             "properties": {
                 "id": {
                     "title": "Identifier",
@@ -462,17 +479,20 @@
         "mother": {
             "title": "Mother",
             "type": "string",
+            "lookup": 50,
             "linkTo": "Individual"
         },
         "father": {
             "title": "Father",
             "type": "string",
+            "lookup": 40,
             "linkTo": "Individual"
         },
         "samples" : {
             "title" : "Samples",
             "type" : "array",
             "uniqueItems": true,
+            "lookup": 110,
             "items" : {
                 "title" : "Sample",
                 "type" : "string",

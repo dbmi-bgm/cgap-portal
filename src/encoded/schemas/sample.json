@@ -28,6 +28,7 @@
         "workup_type": {
             "title": "Workup Type",
             "type": "string",
+            "lookup": 50,
             "enum": [
                 "WGS",
                 "WES",
@@ -37,6 +38,7 @@
         "specimen_type": {
             "title": "Specimen Type",
             "type": "string",
+            "lookup": 40,
             "suggested_enum": [
                 "blood",
                 "saliva"
@@ -45,6 +47,7 @@
         "accepted_or_rejected": {
             "title": "Accepted/Rejected",
             "type": "string",
+            "lookup": 120,
             "description": "Whether the specimen was accepted or rejected due to quality or other reasons",
             "enum": [
                 "accepted",
@@ -54,21 +57,25 @@
         "rejection_reason": {
             "title": "Reason for Rejection",
             "type": "string",
+            "lookup": 130,
             "description": "If specimen was rejected, the reason for rejection"
         },
         "specimen_notes": {
             "title": "Specimen Notes",
-            "type": "string"
+            "type": "string",
+            "lookup": 140
         },
         "specimen_collection_date": {
             "title": "Specimen Collection Date",
             "description": "Date of specimen collection",
             "type": "string",
+            "lookup": 60,
             "format": "date"
         },
         "completed_processes": {
             "title": "Completed data processing",
             "type": "array",
+            "lookup": 310,
             "items": {
                 "title": "Completed process",
                 "type": "string"
@@ -78,12 +85,14 @@
             "title": "Specimen Accession",
             "description": "Accession of specimen from sequencing lab",
             "type": "string",
+            "lookup": 100,
             "uniqueKey": true
         },
         "specimen_accession_date": {
             "title": "Specimen Accession Date",
             "description": "Date of specimen accessioning by sequencing lab",
             "type": "string",
+            "lookup": 110,
             "anyOf": [
                 {"format": "date-time"},
                 {"format": "date"}
@@ -92,6 +101,7 @@
         "requisition": {
             "title": "Requisition",
             "type": "array",
+            "lookup": 150,
             "uniqueItems": true,
             "items" : {
                 "title": "Requisition",
@@ -113,12 +123,14 @@
         "ordering_physician": {
             "title": "Ordering Physician",
             "description": "Physician who ordered the test",
-            "type": "string"
+            "type": "string",
+            "lookup": 70
         },
         "date_test_ordered": {
             "title": "Test Ordered Date",
             "description": "Date test was ordered",
             "type": "string",
+            "lookup": 90,
             "anyOf": [
                 {"format": "date-time"},
                 {"format": "date"}
@@ -128,6 +140,7 @@
             "title": "Priority",
             "description": "Indicate if test is a rush order",
             "type": "string",
+            "lookup": 170,
             "enum": [
                 "High",
                 "Normal"
@@ -136,11 +149,13 @@
         "transported_by": {
             "title": "Specimen Transported By",
             "description": "Transport service that transported this specimen",
-            "type": "string"
+            "type": "string",
+            "lookup": 190
         },
         "date_received": {
             "title": "Date Received in Sequencing Lab",
             "type": "string",
+            "lookup": 200,
             "anyOf": [
                 {"format": "date-time"},
                 {"format": "date"}
@@ -148,32 +163,38 @@
         },
         "sequence_id": {
             "title": "Sequence Identifier",
-            "type": "string"
+            "type": "string",
+            "lookup": 250
         },
         "protocol": {
             "title": "Reference Protocol",
             "description": "Reference Protocol Document.",
             "type": "string",
+            "lookup": 255,
             "linkTo": "Document"
         },
         "note_from_sequencing_lab": {
             "title": "Note from sequencing lab",
-            "type": "string"
+            "type": "string",
+            "lookup": 220
         },
         "dna_extraction_lab": {
             "title": "DNA Extraction Performed By",
             "description": "Institute or Lab that performed DNA extraction from specimen",
-            "type": "string"
+            "type": "string",
+            "lookup": 230
         },
         "dna_storage_lab": {
             "title": "DNA Stored By",
             "description": "Institute or Lab that stored the DNA",
-            "type": "string"
+            "type": "string",
+            "lookup": 240
         },
         "files": {
             "title": "Fastq Files",
             "description": "Information about the data files associated with the sample.",
             "type": "array",
+            "lookup": 260,
             "items": {
                 "title": "File",
                 "description": "File metadata.",
@@ -185,6 +206,7 @@
             "title": "CRAM Files",
             "description": "Input alignment files.",
             "type": "array",
+            "lookup": 270,
             "items": {
                 "title": "CRAM File",
                 "description": "File metadata.",
@@ -196,6 +218,7 @@
             "title": "Processed Files",
             "description": "Processed files that are derived from files in this sample.",
             "type": "array",
+            "lookup": 290,
             "items": {
                 "title": "Processed File",
                 "description": "File metadata.",
@@ -207,6 +230,7 @@
             "title": "Reference Files",
             "description": "Reference files associated with this sample (ex. file of sequencing barcodes).",
             "type": "array",
+            "lookup": 280,
             "items": {
                 "title": "Reference File",
                 "description": "File metadata.",
