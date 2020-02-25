@@ -17,6 +17,9 @@
         { "$ref": "mixins.json#/static_embeds" }
     ],
     "properties": {
+        "schema_version": {
+            "default": "1"
+        },
         "samples": {
             "title": "Samples",
             "description": "Samples used in the analysis",

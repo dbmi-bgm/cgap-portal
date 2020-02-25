@@ -19,6 +19,9 @@
         { "$ref": "mixins.json#/static_embeds" }
     ],
     "properties": {
+        "schema_version": {
+           "default": "1"
+        },
         "disorder_name" : {
             "title" : "Standard Name of the Disorder",
             "type" : "string"

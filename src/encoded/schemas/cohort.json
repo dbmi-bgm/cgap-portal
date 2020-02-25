@@ -16,6 +16,9 @@
         { "$ref": "mixins.json#/attribution" }
     ],
     "properties": {
+        "schema_version": {
+            "default": "1"
+        },
         "accession" : {
             "accessionType" : "CO"
         },

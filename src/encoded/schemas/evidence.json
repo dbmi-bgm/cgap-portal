@@ -8,6 +8,9 @@
     "identifyingProperties": ["uuid", "aliases"],
     "additionalProperties": false,
     "properties": {
+        "schema_version": {
+            "default": "1"
+        },
         "subject_item" : {
             "title" : "Subject Item",
             "description": "Association through evidence can be directional and if so subject-object roles can be assigned - if the association is non-directional the assignment to subject-object may be arbitrary",
