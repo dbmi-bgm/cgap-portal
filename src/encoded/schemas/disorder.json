@@ -36,6 +36,7 @@
             "title": "Associated Genes",
             "type": "array",
             "uniqueItems": true,
+            "lookup": 20,
             "items": {
                 "title" : "Gene",
                 "type" : "string",
@@ -45,12 +46,14 @@
         "definition" : {
             "title" : "Definition",
             "description": "Definition of this disorder",
-            "type" : "string"
+            "type" : "string",
+            "lookup": 10
         },
         "synonyms": {
             "title": "Disorder Synonyms",
             "description": "Synonyms for the disease or disorder",
             "type": "array",
+            "lookup": 30,
             "items": {
                 "title": "Synonym",
                 "type": "string"
@@ -59,6 +62,7 @@
         "parents" : {
             "title": "Parent Disorders",
             "type" : "array",
+            "lookup": 40,
             "items": {
                 "title": "Parent",
                 "type": "string",
@@ -69,17 +73,20 @@
             "title": "URL",
             "description": "The url that uniquely identifies term - often purl.",
             "type": "string",
-            "format": "uri"
+            "format": "uri",
+            "lookup": 50
         },
         "comment" : {
             "type" : "string",
             "title" : "Comment",
-            "formInput": "textarea"
+            "formInput": "textarea",
+            "lookup": 60
         },
         "curated_dbxrefs": {
             "title": "Curated DB Xrefs",
             "description": "A reference to an external identifier that has been manually added - not all MONDO IDs map to IDs from HPOA file add as DB:ID eg. OMIM:12345",
             "type": "array",
+            "lookup": 70,
             "items": {
                 "title": "DBXref",
                 "type": "string"
@@ -90,6 +97,7 @@
             "description": "Disorders that are possible suggestions as replacement for this obsolete Disorder",
             "comment": "NOTE: this should only be populated if this Disorder is obsolete",
             "type": "array",
+            "lookup": 80,
             "items": {
                 "title": "Suggestion",
                 "type": "string",

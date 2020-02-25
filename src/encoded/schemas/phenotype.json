@@ -40,11 +40,13 @@
             "title": "URL",
             "description": "The url that uniquely identifies term - often purl.",
             "type": "string",
-            "format": "uri"
+            "format": "uri",
+            "lookup": 20
         },
         "parents" : {
             "title": "Parent Phenotypes",
             "type" : "array",
+            "lookup": 50,
             "items": {
                 "title": "Parent",
                 "type": "string",
@@ -55,6 +57,7 @@
             "title": "Categories",
             "description": "Categories for grouping phenotypes",
             "type": "array",
+            "lookup": 60,
             "items": {
                 "title": "Category",
                 "type": "string",
@@ -65,17 +68,20 @@
             "title": "Slim Branch",
             "description": "If the phenotype is a category the value is the slot that the slim is for",
             "type": "string",
+            "lookup": 70,
             "enum": ["Phenotypic abnormality"]
         },
         "definition" : {
             "title" : "Definition",
             "description": "Definition of this phenotype",
             "type" : "string",
-            "formInput": "textarea"
+            "formInput": "textarea",
+            "lookup": 30
         },
         "synonyms" : {
             "type" : "array",
             "title" : "Synonyms",
+            "lookup": 40,
             "items" : {
                 "type" : "string",
                 "title": "Synonym"
@@ -84,13 +90,15 @@
         "comment" : {
             "type" : "string",
             "title" : "Comment",
-            "formInput": "textarea"
+            "formInput": "textarea",
+            "lookup": 80
         },
         "suggested_replacements": {
             "title": "Suggested Replacement Phenotypes",
             "description": "Phenotypes that are possible suggestions as replacement for this obsolete Phenotype",
             "comment": "NOTE: this should only be populated if Phenotype is obsolete",
             "type": "array",
+            "lookup": 90,
             "items": {
                 "title": "Suggestion",
                 "type": "string",
