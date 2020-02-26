@@ -69,7 +69,7 @@
             "title": "Specimen Collection Date",
             "description": "Date of specimen collection",
             "type": "string",
-            "lookup": 60,
+            "lookup": 80,
             "format": "date"
         },
         "completed_processes": {
@@ -85,14 +85,14 @@
             "title": "Specimen Accession",
             "description": "Accession of specimen from sequencing lab",
             "type": "string",
-            "lookup": 100,
+            "lookup": 60,
             "uniqueKey": true
         },
         "specimen_accession_date": {
             "title": "Specimen Accession Date",
             "description": "Date of specimen accessioning by sequencing lab",
             "type": "string",
-            "lookup": 110,
+            "lookup": 70,
             "anyOf": [
                 {"format": "date-time"},
                 {"format": "date"}
@@ -124,7 +124,7 @@
             "title": "Ordering Physician",
             "description": "Physician who ordered the test",
             "type": "array",
-            "lookup": 70,
+            "lookup": 90,
             "uniqueItems": true,
             "items" : {
                 "title": "Ordering Physician",
@@ -148,7 +148,7 @@
             "title": "Test Ordered Date",
             "description": "Date test was ordered",
             "type": "string",
-            "lookup": 90,
+            "lookup": 110,
             "anyOf": [
                 {"format": "date-time"},
                 {"format": "date"}
