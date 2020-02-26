@@ -42,6 +42,16 @@
             "type": "string",
             "lookup": 22
         },
+        "file_version": {
+            "title": "File Version",
+            "description": "The version of file based on how it was originally generated.",
+            "type": "string"
+        },
+        "file_version_date": {
+            "title": "File Version",
+            "description": "The date of the version of file based on when it was originally generated.",
+            "type": "string"
+        },
         "file_classification": {
             "title": "General Classification",
             "description": "General classification group for the File (raw, processed, ancillary (eg. index files))",
