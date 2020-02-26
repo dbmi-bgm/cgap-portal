@@ -123,8 +123,26 @@
         "ordering_physician": {
             "title": "Ordering Physician",
             "description": "Physician who ordered the test",
-            "type": "string",
-            "lookup": 70
+            "type": "array",
+            "lookup": 70,
+            "uniqueItems": true,
+            "items" : {
+                "title": "Ordering Physician",
+                "type": "object",
+                "required": ["physician_name"],
+                "properties": {
+                    "physician_name": {
+                        "title": "Physician Name",
+                        "type": "string"
+                    },
+                    "physician_contact": {
+                        "title": "Physician Contact",
+                        "description": "Contact information for the physician that ordered the test",
+                        "type": "string",
+                        "formInput": "textarea"
+                    }
+                }
+            }
         },
         "date_test_ordered": {
             "title": "Test Ordered Date",
