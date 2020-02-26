@@ -25,12 +25,12 @@
         "age": {
             "title": "Age of the Individual",
             "type": "number",
-            "lookup": 2
+            "lookup": 6
         },
         "age_units": {
             "title": "Age units",
             "type": "string",
-            "lookup": 3,
+            "lookup": 7,
             "enum": [
                 "day",
                 "week",
@@ -41,13 +41,13 @@
         "is_pregnancy": {
             "title": "Pregnancy",
             "type": "boolean",
-            "lookup": 4
+            "lookup": 9
         },
         "gestational_age": {
             "title": "Gestational Age (weeks)",
             "description": "Age of fetus, expressed as weeks",
             "type": "number",
-            "lookup": 5
+            "lookup": 10
         },
         "sex": {
             "title": "Sex",
@@ -63,14 +63,14 @@
             "title": "Quantity",
             "description": "Number of individuals represented by this item in pedigree",
             "type": "number",
-            "lookup": 150
+            "lookup": 100
         },
         "phenotypic_features": {
             "title": "Phenotypic Features",
             "description": "Phenotypic Features as listed in HPO",
             "type": "array",
             "uniqueItems": true,
-            "lookup": 10,
+            "lookup": 20,
             "items":{
                 "title": "Phenotypic Feature Info",
                 "type": "object",
@@ -80,17 +80,17 @@
                         "title": "Phenotypic Feature",
                         "type": "string",
                         "linkTo": "Phenotype",
-                        "lookup": 11
+                        "lookup": 21
                     },
                     "onset_age": {
                         "title": "Onset Age",
                         "type": "number",
-                        "lookup": 12
+                        "lookup": 22
                     },
                     "onset_age_units": {
                         "title": "Onset Age Units",
                         "type": "string",
-                        "lookup": 13,
+                        "lookup": 23,
                         "enum": [
                             "day",
                             "week",
@@ -105,7 +105,7 @@
             "title" : "Disorders",
             "type" : "array",
             "uniqueItems": true,
-            "lookup": 20,
+            "lookup": 30,
             "items" : {
                 "title" : "Disorder",
                 "type" : "string",
@@ -115,24 +115,24 @@
         "clinic_notes": {
             "title": "Notes from the Clinic",
             "type": "string",
-            "lookup": 125
+            "lookup": 90
         },
         "birth_year" : {
             "title" : "Year of Birth",
             "type" : "integer",
-            "lookup": 25
+            "lookup": 8
         },
         "is_deceased": {
             "title": "Deceased",
             "description": "Whether the individual is deceased",
             "type": "boolean",
-            "lookup": 31
+            "lookup": 61
         },
         "life_status": {
             "title": "Life Status",
             "description": "Status of individual",
             "type": "string",
-            "lookup": 30,
+            "lookup": 60,
             "enum": [
                 "alive and well",
                 "alive",
@@ -143,33 +143,33 @@
         "is_termination_of_pregnancy": {
             "title": "Termination of Pregnancy",
             "type": "boolean",
-            "lookup": 32
+            "lookup": 62
         },
         "is_spontaneous_abortion": {
             "title": "Spontaneous Abortion",
             "type": "boolean",
-            "lookup": 33
+            "lookup": 63
         },
         "is_still_birth": {
             "title": "Still Birth",
             "type": "boolean",
-            "lookup": 34
+            "lookup": 64
         },
         "cause_of_death": {
             "title" : "Cause of Death",
             "type" : "string",
-            "lookup": 35,
+            "lookup": 65,
             "linkTo" : "Phenotype"
         },
         "age_at_death": {
             "title": "Death Age",
             "type": "number",
-            "lookup": 36
+            "lookup": 66
         },
         "age_at_death_units": {
             "title": "Death Age Units",
             "type": "string",
-            "lookup": 37,
+            "lookup": 67,
             "enum": [
                 "day",
                 "week",
@@ -179,22 +179,25 @@
         },
         "is_no_children_by_choice": {
             "title": "No Children by Choice",
-            "type": "boolean"
+            "type": "boolean",
+            "lookup": 70
         },
         "is_infertile": {
             "title": "Infertile",
-            "type": "boolean"
+            "type": "boolean",
+            "lookup": 71
         },
         "cause_of_infertility": {
             "title" : "Cause of Infertility",
-            "type" : "string"
+            "type" : "string",
+            "lookup": 72
         },
         "ancestry": {
             "title": "Ancestry",
             "description": "Ancestry of the individual. List taken from https://gist.github.com/incredimike/1469814.",
             "type": "array",
             "uniqueItems": true,
-            "lookup": 100,
+            "lookup": 40,
             "items": {
                 "title": "Ancestry",
                 "type" : "string",
@@ -454,6 +457,7 @@
         "images" : {
             "title" : "Images",
             "type" : "array",
+            "lookup": 50,
             "uniqueItems": true,
             "items" : {
                 "title" : "Image",
@@ -482,20 +486,20 @@
         "mother": {
             "title": "Mother",
             "type": "string",
-            "lookup": 50,
+            "lookup": 3,
             "linkTo": "Individual"
         },
         "father": {
             "title": "Father",
             "type": "string",
-            "lookup": 40,
+            "lookup": 4,
             "linkTo": "Individual"
         },
         "samples" : {
             "title" : "Samples",
             "type" : "array",
             "uniqueItems": true,
-            "lookup": 110,
+            "lookup": 80,
             "items" : {
                 "title" : "Sample",
                 "type" : "string",
