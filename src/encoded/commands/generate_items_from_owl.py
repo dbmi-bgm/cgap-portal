@@ -32,44 +32,6 @@ from ..commands.owltools import (
 
 EPILOG = __doc__
 
-# '''logging setup
-#    logging config - to be moved to file at some point
-# '''
-# logfile = 'process_dp_upd.log'
-# logger = logging.getLogger(__name__)
-#
-# logging.config.dictConfig({
-#     'version': 1,
-#     'disable_existing_loggers': False,
-#     'formatters': {
-#         'standard': {
-#             'format': '%(levelname)s:\t%(message)s'
-#         },
-#         'verbose': {
-#             'format': '%(levelname)s:\t%(message)s\tFROM: %(name)s'
-#         }
-#     },
-#     'handlers': {
-#         'stdout': {
-#             'level': 'WARN',
-#             'formatter': 'verbose',
-#             'class': 'logging.StreamHandler'
-#         },
-#         'logfile': {
-#             'level': 'INFO',
-#             'formatter': 'standard',
-#             'class': 'logging.FileHandler',
-#             'filename': logfile
-#         }
-#     },
-#     'loggers': {
-#         '': {
-#             'handlers': ['stdout', 'logfile'],
-#             'level': 'INFO',
-#             'propagate': True
-#         }
-#     }
-# })
 
 ''' global config '''
 ITEM2OWL = {
@@ -174,18 +136,6 @@ def get_all_ancestors(term, terms, field, itype):
     return term  # is this necessary
 
 
-def _has_human(cols):
-    '''True if human taxon is part of the collection'''
-    ans = False
-    human = HUMAN_TAXON
-    if cols:
-        if isURIRef(cols[0]):
-            human = convert2URIRef(human)
-        if human in cols:
-            ans = True
-    return ans
-
-
 def get_termid_from_uri(uri):
     '''Given a uri - takes the last part (name) and converts _ to :
         eg. http://www.ebi.ac.uk/efo/EFO_0002784 => EFO:0002784
@@ -219,15 +169,11 @@ def create_term_dict(class_, termid, data, itype):
 
 
 def process_parents(class_, data, terms):
-    '''Gets the parents of the class - direct and those linked via
-        specified relationship types
+    '''Gets the direct parents of the class
     '''
     termid = get_termid_from_uri(class_)
-    for parent in data.get_classDirectSupers(class_, excludeBnodes=False):
-        if isBlankNode(parent):
-            continue
-        else:
-            terms[termid].setdefault('parents', []).append(get_termid_from_uri(parent))
+    for parent in data.get_classDirectSupers(class_):
+        terms[termid].setdefault('parents', []).append(get_termid_from_uri(parent))
     return terms
 
 
@@ -273,9 +219,6 @@ def _cleanup_non_fields(terms):
 def add_slim_to_term(term, slim_terms, itype):
     '''Checks the list of ancestor terms to see if any are slim_terms
         and if so adds the slim_term to the term in slim_term slot
-
-        for now checking both closure and closure_with_develops_from
-        but consider having only single 'ancestor' list
     '''
     id_field = ITEM2OWL[itype].get('id_field')
     if not id_field:
