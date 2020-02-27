@@ -110,12 +110,9 @@ def test_VCFP_multiple_variants(test_vcf):
 def test_VCFP_multiple_sample_variants(test_vcf):
     """ Generates 3 sample variant items and checks them for correctness """
     record = test_vcf.read_next_record()
-    result = test_vcf.create_sample_variant_from_record(record)[0]
-    assert result['DP'] == 22
-    assert result['GT'] == '0/0'
-    assert result['PL'] == '0,18,270'
-    assert result['QUAL'] == 38.75
-    assert result['FILTER'] == 'PASS'
+    result = test_vcf.create_sample_variant_from_record(record)
+    for sample in result:
+        assert sample['GT'] != '0/0'  # this VCF has one of these that should be dropped
     record = test_vcf.read_next_record()
     result = test_vcf.create_sample_variant_from_record(record)[0]
     assert result['DP'] == 70
@@ -155,7 +152,7 @@ def test_VCFP_run(testapp, institution, project, test_vcf, post_variant_conseque
         check to see that we get the 3 that we expect and they post correctly
     """
     vss, vs = test_vcf.run(project='encode-project', institution='encode-institution')
-    assert len(vss) == 2895
+    assert len(vss) == 2219
     assert len(vs) == 965
     for v in vs:
         testapp.post_json('/variant', v, status=201)

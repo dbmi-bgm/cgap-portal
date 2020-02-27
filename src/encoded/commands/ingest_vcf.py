@@ -38,6 +38,8 @@ class VCFParser(object):
     DROPPED_FIELD = 'DROPPED'
     SUBEMBEDDED = 'Subembedded'
     FORMAT = 'Format'
+    GT_REF = '0/0'
+    GT_MISSING = './.'
 
     def __init__(self, _vcf, variant, sample):
         """ Constructor for the parser
@@ -424,6 +426,10 @@ class VCFParser(object):
                         s[field] = getattr(record, field) or ''
             self.parse_samples(s, sample)  # add sample fields, already formatted
             del s['AF']  # XXX: comes from VCF but is not actually what we want. Get rid of it.
+
+            # DROP SV's that are REF/REF
+            if s.get('GT', None) in [self.GT_REF, self.GT_MISSING]:
+                continue
             result.append(s)
         return result
 
