@@ -334,12 +334,14 @@ def _format_as_raw(val):
 
 
 def get_raw_form(term):
-    ''' takes a term dict that could be in embedded or object format
+    ''' takes a term dict that is in embedded frame format
         and transforms to raw (so uuids) are used for linked items
+        WARNING: DOES NOT work for object frame - won't convert @ids
+        and should not change an already raw frame json
     '''
     raw_term = {}
     for field, val in term.items():
-        if isinstance(val, str):
+        if isinstance(val, (str, int, float, bool)):
             raw_term[field] = val
         else:
             rawval = _format_as_raw(val)
@@ -350,15 +352,19 @@ def get_raw_form(term):
 
 
 def compare_terms(t1, t2):
-    '''check that all the fields in the first term t1 are in t2 and
-        have the same values
+    ''' compare t1 to t2 and if a key is not in t2 or
+        the key is there but the value is different
+        returns a dict of the new key:val of t1
+
+        NOTE: could be false positives if the order of fields in a subembedded object differ
+        consider revisting (though we don't have that use case at this time)
     '''
     diff = {}
     for k, val in t1.items():
         if k not in t2:
             diff[k] = val
         elif isinstance(val, list):
-            if (len(val) != len(t2[k])) or (Counter(val) != Counter(t2[k])):
+            if (len(val) != len(t2[k])) or (Counter(str(val)) != Counter(str(t2[k]))):
                 diff[k] = val
         elif val != t2[k]:
             diff[k] = val

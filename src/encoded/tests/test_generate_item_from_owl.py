@@ -14,13 +14,13 @@ pytestmark = [pytest.mark.setone, pytest.mark.working]
 
 class MockedLogger(object):
     def info(self, msg):
-        return 'INFO: ' + msg
+        print('INFO: ' + msg)
 
-    def warning(self, msg):
-        return 'WARNING: ' + msg
+    def warn(self, msg):
+        print('WARNING: ' + msg)
 
     def error(self, msg):
-        return 'ERROR: ' + msg
+        print('ERROR: ' + msg)
 
 
 @pytest.fixture
@@ -422,7 +422,8 @@ def terms():
         'hp:1': {
             'hpo_id': 'hp:1',
             'phenotype_name': 'name1',
-            'parents': []
+            'parents': [],
+            'is_slim_for': 'Abnormal Phenotype'
         },
         'hp:2': {
             'hpo_id': 'hp:2',
@@ -431,22 +432,24 @@ def terms():
         },
         'hp:3': {
             'hpo_id': 'hp:3',
-            'phenotype_name': 'obsolete name',
-            'parents': ['hp:2'],
+            'phenotype_name': 'name3',
+            'parents': ['hp:1'],
         },
         'hp:4': {
             'hpo_id': 'hp:4',
-            'phenotype_name': 'Obsolete name',
-            'parents': ['name1', 'hp:2']
+            'phenotype_name': 'name4',
+            'parents': ['hp:1', 'hp:2']
         },
         'hp:5': {
             'hpo_id': 'hp:5',
-            'phenotype_name': '',
+            'phenotype_name': 'name5',
             'parents': ['hp:4']
         },
         'hp:6': {
             'hpo_id': 'hp:6',
-            'parents': ['hp:2'],
+            'phenotype_name': 'name6',
+            'parents': ['hp:5'],
+            'is_slim_for': 'Abnormal Phenotype'
         },
         'hp:7': {
             'hpo_id': 'hp:7',
@@ -463,98 +466,343 @@ def terms():
     }
 
 
-def test_iterative_parents(terms):
+@pytest.fixture
+def tid_w_iparents():
+    return {
+        'hp:1': [],
+        'hp:2': [],
+        'hp:3': ['hp:1'],
+        'hp:4': ['hp:1', 'hp:2'],
+        'hp:5': ['hp:1', 'hp:2', 'hp:4'],
+        'hp:6': ['hp:1', 'hp:2', 'hp:4', 'hp:5'],
+        'hp:7': ['hp:1', 'hp:2', 'hp:4', 'hp:5', 'hp:6'],
+        'hp:8': ['hp:1', 'hp:2', 'hp:3', 'hp:4', 'hp:5', 'hp:6', 'hp:7'],
+        'hp:9': []
+    }
+
+
+def test_iterative_parents(terms, tid_w_iparents):
     for tid, term in terms.items():
-        iparents = []
-        oks = []
-        if 'parents' in term:
-            iparents = gifo.iterative_parents(term['parents'], terms, 'parents')
-        if tid in ['hp:1', 'hp:2', 'hp:9']:
-            assert not iparents
-        if tid in ['hp:3', 'hp:4', 'hp:6']:
-            oks = ['hp:2']
-            assert len(iparents) == 1
-        if tid in ['hp:5', 'hp:7']:
-            oks = ['hp:2', 'hp:4', 'hp:6']
-            assert len(iparents) == 2
-        if tid == 'hp:8':
-            oks = ['hp:7', 'hp:6', 'hp:3', 'hp:2']
-            assert len(iparents) == 4
-        if oks:
-            assert [_id in oks for _id in iparents]
+        iparents = gifo.iterative_parents(term['parents'], terms, 'parents')
+        assert tid_w_iparents.get(tid) == sorted(iparents)
 
 
-def test_get_all_ancestors(terms):
+def test_get_all_ancestors(terms, tid_w_iparents):
     for tid, term in terms.items():
         term = gifo.get_all_ancestors(term, terms, 'parents', 'Phenotype')
         closure = term['closure']
-        okids = []
         assert tid in closure  # checks that the term id is included
-        if tid in ['hp:1', 'hp:2', 'hp:9']:
-            assert len(closure) == 1
-        if tid in ['hp:3', 'hp:4', 'hp:6']:
-            assert len(closure) == 2
-            okids.append('hp:2')
-        if tid in ['hp:5', 'hp:7']:
-            assert len(closure) == 3
-            okids = ['hp:4', 'hp:2', 'hp:6']
-        if tid == 'hp:8':
-            assert len(closure) == 5
-            oks = ['hp:7', 'hp:6', 'hp:3', 'hp:2']
-        if okids:
-            assert [_id in okids for _id in closure if _id != tid]
+        closure.remove(tid)
+        assert tid_w_iparents.get(tid) == sorted(closure)
 
 
 @pytest.fixture
-def term_w_closure():
-    return {'hpo_id': 'hp:1', 'uuid': 'uuid1',
-            'closure': ['hp:1', 'hp:2', 'a_term1']}
+def terms_w_closures(terms, tid_w_iparents):
+    for tid, term in terms.items():
+        closure = tid_w_iparents[tid]
+        closure.append(tid)
+        term.update({'closure': closure})
+    return terms
 
 
-@pytest.fixture
-def terms_w_closures(term_w_closure):
-    # term with 2 slims
-    term_w_two = term_w_closure.copy()
-    term_w_two['hpo_id'] = 'hp:4'
-    term_w_two['uuid'] = 'uuid2'
-    term_w_two['closure'] = term_w_closure['closure'].copy()
-    term_w_two['closure'].append('a_term2')
-    # term w closure but no slim terms
-    term_wo_slim = term_w_closure.copy()
-    term_wo_slim['hpo_id'] = 'hp:5'
-    term_wo_slim['uuid'] = 'uuid5'
-    term_wo_slim['closure'] = term_w_closure['closure'].copy()
-    term_wo_slim['closure'].pop()
-    # term with no closures
-    term_w_none = term_w_closure.copy()
-    term_w_none['hpo_id'] = 'hp:6'
-    term_w_none['uuid'] = 'uuid6'
-    del term_w_none['closure']
-    return [term_w_closure, term_w_two, term_wo_slim, term_w_none]
-
-
-@pytest.fixture
-def slim_term_list():
-    # see ontology_term schema for full schema
-    return [{'hpo_id': 'a_term1', 'uuid': 'uuida1', 'is_slim_for': 'assay'},
-            {'hpo_id': 'a_term2', 'uuid': 'uuida2', 'is_slim_for': 'assay'},
-            {'hpo_id': 'd_term1', 'uuid': 'uuidd1', 'is_slim_for': 'developmental'}]
-
-
-def test_add_slim_to_term(terms_w_closures, slim_term_list):
-    slim_ids = ['a_term1', 'd_term1', 'a_term2']
-    for i, term in enumerate(terms_w_closures):
-        test_term = gifo.add_slim_to_term(term, slim_term_list, 'Phenotype')
-        assert test_term['hpo_id'] == str(i + 1)
-        if i < 2:
-            assert len(test_term['slim_terms']) == 1
-            assert test_term['slim_terms'][0] == slim_ids[i]
-        elif i <= 3:
-            assert len(test_term['slim_terms']) == 2
-            for t in test_term['slim_terms']:
-                assert t in slim_ids
-        elif i > 3:
+def test_add_slim_to_term(terms_w_closures):
+    slim_ids = ['hp:1', 'hp:6']
+    for term in terms_w_closures.values():
+        test_term = gifo.add_slim_to_term(term, slim_ids, 'Phenotype')
+        if test_term.get('hpo_id') in ['hp:2', 'hp:9']:
             assert 'slim_terms' not in test_term
+        elif test_term.get('hpo_id') in ['hp:6', 'hp:7', 'hp:8']:
+            assert sorted(test_term['slim_terms']) == ['hp:1', 'hp:6']
+        else:
+            assert test_term['slim_terms'][0] == 'hp:1'
+
+
+@pytest.fixture
+def terms_w_stuff():
+    return {
+        'hp:1': {
+            'hpo_id': 'id1',
+            'phenotype_name': 'term1',
+            'parents': ['hp:0'],
+            'closure': ['hp:1', 'hp:0'],
+        },
+        'hp:2': {
+            'hpo_id': 'id1',
+            'phenotype_name': 'term1',
+            'parents': ['hp:0']
+        },
+        'hp:3': {},
+        'hp:4': None
+    }
+
+
+def test_cleanup_non_fields(terms_w_stuff):
+    assert len(terms_w_stuff) == 4
+    terms = gifo._cleanup_non_fields(terms_w_stuff)
+    assert len(terms) == 2
+    tvals = list(terms.values())
+    assert len(tvals[0]) == 3
+    assert tvals[0] == tvals[1]
+
+
+@pytest.fixture
+def raw_item_dict():
+    return {
+        'string_field': 'a_string',
+        'list_string_field': ['a_string', 'b_string', 'c_string'],
+        'int_field': 1,
+        'num_field': 1.1,
+        'boolean_field': True,
+        'list_int_field': [1, 2, 3],
+        'list_num_field': [1.1, 2.2, 3.3],
+        'linked_item_field': 'uuid1',
+        'list_linked_item_field': ['uuid1', 'uuid2'],
+        'sub_embed_obj_field': {'sef1': 'string', 'sef2': 'uuid1'},
+        'list_sub_embed_obj_field': [
+            {'sef1': 'string', 'sef2': 'uuid1'},
+            {'sef1': 'string2', 'sef2': 'uuid2'}
+        ]
+    }
+
+
+@pytest.fixture
+def object_item_dict():
+    return {
+        'uuid': 'uuid1',
+        'string_field': 'a_string',
+        'list_string_field': ['a_string', 'b_string', 'c_string'],
+        'int_field': 1,
+        'num_field': 1.1,
+        'boolean_field': True,
+        'list_int_field': [1, 2, 3],
+        'list_num_field': [1.1, 2.2, 3.3],
+        'linked_item_field': '/item/name1',
+        'list_linked_item_field': ['/item/name1', '/item/name2'],
+        'sub_embed_obj_field': {'sef1': 'string', 'sef2': '/item/name1'},
+        'list_sub_embed_obj_field': [
+            {'sef1': 'string', 'sef2': '/item/name1'},
+            {'sef1': 'string2', 'sef2': '/item/name2'}
+        ]
+    }
+
+
+@pytest.fixture
+def embedded_item_dict():
+    return {
+        'uuid': 'uuid1',
+        'string_field': 'a_string',
+        'list_string_field': ['a_string', 'b_string', 'c_string'],
+        'int_field': 1,
+        'num_field': 1.1,
+        'boolean_field': True,
+        'list_int_field': [1, 2, 3],
+        'list_num_field': [1.1, 2.2, 3.3],
+        'linked_item_field': {
+            'uuid': 'uuid1',
+            'display_title': 'dt1',
+            '@type': ['Item'],
+            'embedded_field1': 'val1',
+            'embedded_item_field': {'uuid': 'uuid1', 'display_title': 'dt1', '@type': ['Item']}
+        },
+        'list_linked_item_field': [
+            {
+                'uuid': 'uuid1',
+                'display_title': 'dt1',
+                '@type': ['Item'],
+                'embedded_field1': 'val1',
+                'embedded_item_field': {'uuid': 'uuid1', 'display_title': 'dt1', '@type': ['Item']}
+            },
+            {
+                'uuid': 'uuid2',
+                'display_title': 'dt1',
+                '@type': ['Item'],
+                'embedded_field1': 'val1',
+                'embedded_item_field': {'uuid': 'uuid1', 'display_title': 'dt1', '@type': ['Item']}
+            }
+        ],
+        'sub_embed_obj_field': {
+            'sef1': 'string',
+            'sef2': {
+                'uuid': 'uuid1',
+                'display_title': 'dt1',
+                '@type': ['Item'],
+                'embedded_field1': 'val1',
+                'embedded_item_field': {'uuid': 'uuid1', 'display_title': 'dt1', '@type': ['Item']}
+            }
+        },
+        'list_sub_embed_obj_field': [
+            {
+                'sef1': 'string',
+                'sef2': {
+                    'uuid': 'uuid1',
+                    'display_title': 'dt1',
+                    '@type': ['Item'],
+                    'embedded_field1': 'val1',
+                    'embedded_item_field': {'uuid': 'uuid1', 'display_title': 'dt1', '@type': ['Item']}
+                }
+            },
+            {
+                'sef1': 'string2',
+                'sef2': {
+                    'uuid': 'uuid2',
+                    'display_title': 'dt2',
+                    '@type': ['Item'],
+                    'embedded_field1': 'val1',
+                    'embedded_item_field': {'uuid': 'uuid1', 'display_title': 'dt1', '@type': ['Item']}
+                }
+            }
+        ]
+    }
+
+
+def test_get_raw_form_raw_and_embedded(raw_item_dict, embedded_item_dict):
+    # all term dicts have uuid as it's been added though not included in raw frame view
+    raw_item_dict['uuid'] = 'uuid1'
+    result1 = gifo.get_raw_form(raw_item_dict)
+    result2 = gifo.get_raw_form(embedded_item_dict)
+    assert result1 == raw_item_dict
+    assert result1 == result2
+
+
+def test_get_raw_form_does_not_convert_object(raw_item_dict, object_item_dict):
+    ''' This may not be necessary but shows object frame of item is not
+        converted - and is in fact unchanged
+    '''
+    rawresult = gifo.get_raw_form(raw_item_dict)
+    objresult = gifo.get_raw_form(object_item_dict)
+    assert rawresult != objresult
+    assert objresult == object_item_dict
+
+
+def test_compare_terms_no_diff(raw_item_dict):
+    t1 = raw_item_dict
+    t2 = raw_item_dict.copy()
+    assert not gifo.compare_terms(t1, t2)
+
+
+def test_compare_terms_extra_field_in_t2(raw_item_dict):
+    ''' should ignore any extra fields in t2
+    '''
+    t1 = raw_item_dict
+    t2 = raw_item_dict.copy()
+    t2['extra_field'] = 'extra_val'
+    assert not gifo.compare_terms(t1, t2)
+
+
+def test_compare_terms_extra_fields_in_t1(raw_item_dict):
+    ''' should ignore any extra fields in t2
+    '''
+    extra_fields = {
+        'extra_field1': 'extra_val1',
+        'extra_list_field': ['v1', 'v2', 'v3'],
+        'extra_obj_field': {'ef1': 'ev1', 'ef2': 'ev2'}
+    }
+    t1 = raw_item_dict
+    t2 = raw_item_dict.copy()
+    t1.update(extra_fields)
+    result = gifo.compare_terms(t1, t2)
+    assert result == extra_fields
+
+
+def test_check_for_fields_to_keep(raw_item_dict):
+    raw_item_dict['uuid'] = 'uuid1'
+    fields_to_keep = {
+        'is_slim_for': 'Abnormal phenotype',
+        'comment': 'some comment'
+    }
+    added_fields = {'unwanted_field': 'blah'}
+    added_fields.update(fields_to_keep)
+    dbterm = raw_item_dict.copy()
+    dbterm.update(added_fields)
+    result = gifo.check_for_fields_to_keep(raw_item_dict, dbterm)
+    fields_to_keep['uuid'] = 'uuid1'
+    assert result == fields_to_keep
+
+
+def test_id_fields2patch_unchanged(mocker, raw_item_dict):
+    mocker.patch('encoded.commands.generate_items_from_owl.get_raw_form', return_value=raw_item_dict)
+    mocker.patch('encoded.commands.generate_items_from_owl.compare_terms', return_value=None)
+    assert not gifo.id_fields2patch(raw_item_dict, raw_item_dict, True)
+
+
+def test_id_fields2patch_keep_term(mocker, raw_item_dict):
+    ''' case when remove unchanged (rm_unch) param is False just returns term
+    '''
+    mocker.patch('encoded.commands.generate_items_from_owl.get_raw_form', return_value=raw_item_dict)
+    mocker.patch('encoded.commands.generate_items_from_owl.compare_terms', return_value=None)
+    assert gifo.id_fields2patch(raw_item_dict, raw_item_dict, False) == raw_item_dict
+
+
+def test_id_fields2patch_find_some_fields(mocker, raw_item_dict):
+    ''' case when remove unchanged (rm_unch) param is False just returns term
+    '''
+    patch = {'uuid': 'uuid1', 'field1': 'val1', 'field2': ['a', 'b']}
+    mocker.patch('encoded.commands.generate_items_from_owl.get_raw_form', return_value=raw_item_dict)
+    mocker.patch('encoded.commands.generate_items_from_owl.compare_terms', return_value=patch)
+    assert gifo.id_fields2patch(raw_item_dict, raw_item_dict, True) == patch
+
+
+@pytest.fixture
+def term_w_slims_and_parents():
+    return {
+        'uuid': 'uuid1',
+        'slim_terms': ['HP:0000001', 'HP0000002'],
+        'parents': ['HP:0000003']
+    }
+
+
+def test_get_uuids_for_linked_no_linked(term_w_slims_and_parents, mock_logger):
+    idmap = {'HP:0000001': 'uuid10', 'HP0000002': 'uuid11', 'HP:0000003': 'uuid12'}
+    del term_w_slims_and_parents['parents']
+    del term_w_slims_and_parents['slim_terms']
+    assert not gifo._get_uuids_for_linked(term_w_slims_and_parents, idmap, 'Phenotype', mock_logger)
+
+
+def test_get_uuids_for_linked_all_present(term_w_slims_and_parents, mock_logger):
+    idmap = {'HP:0000001': 'uuid10', 'HP0000002': 'uuid11', 'HP:0000003': 'uuid12'}
+    uuids = sorted(idmap.values())
+    field2uuid = gifo._get_uuids_for_linked(term_w_slims_and_parents, idmap, 'Phenotype', mock_logger)
+    sts = field2uuid.get('slim_terms')
+    assert sts == uuids[:2]
+    pts = field2uuid.get('parents')
+    assert pts == uuids[-1:]
+
+
+def test_get_uuids_for_linked_one_missing(term_w_slims_and_parents, mock_logger, capsys):
+    idmap = {'HP:0000001': 'uuid10'}
+    del term_w_slims_and_parents['parents']
+    uuids = sorted(idmap.values())
+    field2uuid = gifo._get_uuids_for_linked(term_w_slims_and_parents, idmap, 'Phenotype', mock_logger)
+    sts = field2uuid.get('slim_terms')
+    assert sts == uuids
+    out = capsys.readouterr()[0]
+    assert out == 'WARNING: HP0000002 - MISSING FROM IDMAP\n'
+
+
+def test_id_post_and_patch_no_changes(mocker, terms, mock_logger):
+    dbterms = terms.copy()
+    for i, tid in enumerate(dbterms.keys()):
+        dbterms[tid].update({'uuid': 'uuid' + str(i + 1)})
+    mocker.patch('encoded.commands.generate_items_from_owl._get_uuids_for_linked', return_value={})
+    mocker.patch('encoded.commands.generate_items_from_owl.id_fields2patch', return_value=None)
+    assert not gifo.id_post_and_patch(terms, dbterms, 'Phenotype', logger=mock_logger)
+
+
+def test_id_post_and_patch_w_new_term(mocker, terms, mock_logger):
+    dbterms = terms.copy()
+    for i, tid in enumerate(dbterms.keys()):
+        dbterms[tid].update({'uuid': 'uuid' + str(i + 1)})
+    new_term = {'hpo_id': 'hp:11', 'phenotype_name': 'name11'}
+    terms['hp:11'] = new_term
+    side_effect = [None] * 9
+    side_effect.append(new_term)
+    mocker.patch('encoded.commands.generate_items_from_owl.uuid4', return_value='uuid11')
+    mocker.patch('encoded.commands.generate_items_from_owl._get_uuids_for_linked', return_value={})
+    mocker.patch('encoded.commands.generate_items_from_owl.id_fields2patch', side_effect=side_effect)
+    to_update = gifo.id_post_and_patch(terms, dbterms, 'Phenotype', logger=mock_logger)
+    new_term.update({'uuid': 'uuid11'})
+    assert to_update[0] == new_term
+
 
 '''
     Old stuff below
@@ -579,47 +827,6 @@ def slim_terms_by_ont(slim_term_list):
         None,
         None
     ]
-
-
-@pytest.fixture
-def term_w_closure():
-    return {'term_id': '1', 'uuid': 'uuid1',
-            'closure': ['id1', 'id2', 'a_term1']}
-
-
-@pytest.fixture
-def terms_w_closures(term_w_closure):
-    # term with 2 slims
-    term_w_two = term_w_closure.copy()
-    term_w_two['term_id'] = '4'
-    term_w_two['uuid'] = 'uuid2'
-    term_w_two['closure'] = term_w_closure['closure'].copy()
-    term_w_two['closure'].append('a_term2')
-    # term w closure but no slim terms
-    term_wo_slim = term_w_closure.copy()
-    term_wo_slim['term_id'] = '5'
-    term_wo_slim['uuid'] = 'uuid5'
-    term_wo_slim['closure'] = term_w_closure['closure'].copy()
-    term_wo_slim['closure'].pop()
-    # term with both 'closure' and 'closure_with_develops_from' both with the same slim
-    term_with_both = term_w_closure.copy()
-    term_with_both['term_id'] = '3'
-    term_with_both['uuid'] = 'uuid3'
-    term_with_both['closure_with_develops_from'] = ['d_term1']
-    print(term_with_both)
-    # term with 'closure_with_develops_from' slim term'
-    term_cwdf = term_with_both.copy()
-    term_cwdf['term_id'] = '2'
-    term_cwdf['uuid'] = 'uuid2'
-    del term_cwdf['closure']
-    # term with no closures
-    term_w_none = term_cwdf.copy()
-    term_w_none['term_id'] = '6'
-    term_w_none['uuid'] = 'uuid6'
-    del term_w_none['closure_with_develops_from']
-    return [term_w_closure, term_cwdf, term_with_both,
-            term_w_two, term_wo_slim, term_w_none]
-
 
 
 
@@ -923,44 +1130,6 @@ def test_find_and_add_parent_of(uberon_owler4):
 
 
 
-@pytest.fixture
-def terms_w_stuff():
-    return {
-        'term1': {
-            'term_id': 't1',
-            'term_name': 'term1',
-            'relationships': ['rel1', 'rel2'],
-            'all_parents': ['p'],
-            'development': 'd',
-            'has_part_inverse': [],
-            'develops_from': '',
-            'part_of': ['p1'],
-            'closure': [],
-            'closure_with_develops_from': None
-        },
-        'term2': {
-            'term_id': 't1',
-            'term_name': 'term1'
-        },
-        'term3': {},
-        'term4': None
-    }
-
-
-def test_cleanup_non_fields(terms_w_stuff):
-    to_delete = ['relationships', 'all_parents', 'development',
-                 'has_part_inverse', 'develops_from', 'part_of',
-                 'closure', 'closure_with_develops_from']
-    to_keep = ['term_id', 'term_name']
-    for d in to_delete + to_keep:
-        assert d in terms_w_stuff['term1']
-    terms = gifo._cleanup_non_fields(terms_w_stuff)
-    assert len(terms) == 2
-    assert terms['term1'] == terms['term2']
-    for d in to_delete:
-        assert d not in terms['term1']
-    for k in to_keep:
-        assert k in terms['term1']
 
 
 @pytest.fixture
