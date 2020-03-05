@@ -789,7 +789,8 @@ def test_id_post_and_patch_no_changes(mocker, terms, mock_logger):
 
 
 def test_id_post_and_patch_w_new_term(mocker, terms, mock_logger):
-    dbterms = terms.copy()
+    import copy
+    dbterms = copy.deepcopy(terms)
     for i, tid in enumerate(dbterms.keys()):
         dbterms[tid].update({'uuid': 'uuid' + str(i + 1)})
     new_term = {'hpo_id': 'hp:11', 'phenotype_name': 'name11'}
@@ -804,347 +805,77 @@ def test_id_post_and_patch_w_new_term(mocker, terms, mock_logger):
     assert to_update[0] == new_term
 
 
-'''
-    Old stuff below
-'''
-
-
-@pytest.fixture
-def slim_term_list():
-    # see ontology_term schema for full schema
-    return [{'term_id': 'a_term1', 'uuid': 'uuida1', 'is_slim_for': 'assay'},
-            {'term_id': 'a_term2', 'uuid': 'uuida2', 'is_slim_for': 'assay'},
-            {'term_id': 'd_term1', 'uuid': 'uuidd1', 'is_slim_for': 'developmental'}]
-
-
-@pytest.fixture
-def slim_terms_by_ont(slim_term_list):
-    return [
-        [slim_term_list[0],
-         slim_term_list[1]],
-        [slim_term_list[2]],
-        None,
-        None,
-        None
-    ]
-
-
-
-@pytest.fixture
-def syn_uris():
-    return ['http://www.ebi.ac.uk/efo/alternative_term',
-            'http://www.geneontology.org/formats/oboInOwl#hasExactSynonym',
-            'http://purl.obolibrary.org/obo/IAO_0000118']
-
-
-@pytest.fixture
-def syn_uris_as_URIRef(syn_uris):
-    return [gifo.convert2namespace(uri) for uri in syn_uris]
-
-
-def test_get_slim_terms(mocker, connection, slim_terms_by_ont):
-    present = ['developmental', 'assay']
-    absent = ['organ', 'system', 'cell']
-    test_slim_terms = slim_terms_by_ont
-    with mocker.patch('encoded.commands.generate_ontology.search_metadata',
-                      side_effect=test_slim_terms):
-        terms = gifo.get_slim_terms(connection)
-        assert len(terms) == 3
-        for term in terms:
-            assert term['is_slim_for'] in present
-            assert term['is_slim_for'] not in absent
-
-
-
-def test_add_slim_terms(terms, slim_term_list):
-    terms = gifo.add_slim_terms(terms, slim_term_list, 'Phenotype')
-    print(terms)
-    for tid, term in terms.items():
-        if tid == 'id6':
-            assert len(term['slim_terms']) == 2
-            assert 'd_term1' in term['slim_terms']
-            assert 'a_term1' in term['slim_terms']
-        elif tid == 'id9':
-            assert 'slim_terms' not in term
-        else:
-            assert len(term['slim_terms']) == 1
-            if tid in ['a_term1', 'id2', 'id3', 'id4']:
-                assert term['slim_terms'][0] == 'a_term1'
-            elif tid in ['d_term1', 'id7', 'id8']:
-                assert term['slim_terms'][0] == 'd_term1'
-
-
-
-def check_if_URIRef(uri):
-    return isinstance(uri, URIRef)
-
-
-def test_convert2namespace(syn_uris):
-    for uri in syn_uris:
-        ns = gifo.convert2namespace(uri)
-        assert check_if_URIRef(ns)
-        assert str(ns) == uri
-
-
-def test_get_syndef_terms_as_uri(mocker, syn_uris):
-    asrdf = [True, False]
-    for rdf in asrdf:
-        uris = gifo.get_syndef_terms_as_uri(all_ontology[2], 'synonym_terms', rdf)
-        if rdf:
-            for uri in uris:
-                assert check_if_URIRef(uri)
-                assert str(uri) in syn_uris
-        else:
-            assert str(uri) in syn_uris
-
-
-def test_get_synonym_term_uris_no_ontology(mocker):
-    with mocker.patch('encoded.commands.generate_ontology.get_syndef_terms_as_uri',
-                      return_value=[]):
-        synterms = gifo.get_synonym_term_uris('ontologys/FAKE')
-        assert not synterms
-
-
-def test_get_definition_term_uris_no_ontology(mocker):
-    with mocker.patch('encoded.commands.generate_ontology.get_syndef_terms_as_uri',
-                      return_value=[]):
-        synterms = gifo.get_definition_term_uris('ontologys/FAKE')
-        assert not synterms
-
-
-def test_get_synonym_term_uris(mocker, syn_uris, syn_uris_as_URIRef):
-    asrdf = [True, False]
-    with mocker.patch('encoded.commands.generate_ontology.get_syndef_terms_as_uri',
-                      return_value=syn_uris_as_URIRef):
-        for rdf in asrdf:
-            uris = gifo.get_synonym_term_uris('ontid', rdf)
-            if rdf:
-                for uri in uris:
-                    assert check_if_URIRef(uri)
-                    assert str(uri) in syn_uris
-            else:
-                assert str(uri) in syn_uris
-
-
-def test_get_definition_term_uris(mocker, syn_uris, syn_uris_as_URIRef):
-    asrdf = [True, False]
-    with mocker.patch('encoded.commands.generate_ontology.get_syndef_terms_as_uri',
-                      return_value=syn_uris_as_URIRef):
-        for rdf in asrdf:
-            uris = gifo.get_synonym_term_uris('ontid', rdf)
-            if rdf:
-                for uri in uris:
-                    assert check_if_URIRef(uri)
-                    assert str(uri) in syn_uris
-            else:
-                assert str(uri) in syn_uris
-
-
-def test_combine_all_parents_w_no_parents():
-    term = {'term_id': 'id1'}
-    term = gifo._combine_all_parents(term)
-    assert not term['all_parents']  # both should be empty lists
-    assert not term['development']
-
-
-def test_combine_all_parents_w_empty_parents():
-    term = {'term_id': 'id1', 'parents': [], 'relationships': [],
-            'develops_from': [], 'has_part_inverse': []}
-    term = gifo._combine_all_parents(term)
-    assert not term['all_parents']  # both should be empty lists
-    assert not term['development']
-
-
-def test_combine_all_parents_w_one_parent():
-    term = {'term_id': 'id1', 'parents': ['id2'], 'relationships': [],
-            'develops_from': [], 'has_part_inverse': []}
-    term = gifo._combine_all_parents(term)
-    assert len(term['all_parents']) == 1
-    assert term['all_parents'][0] == 'id2'
-    assert term['development'] == term['all_parents']
-
-
-def test_combine_all_parents_w_two_parents():
-    term = {'term_id': 'id1', 'parents': ['id2', 'id3'], 'relationships': [],
-            'develops_from': [], 'has_part_inverse': []}
-    term = gifo._combine_all_parents(term)
-    assert len(term['all_parents']) == 2
-    assert 'id2' in term['all_parents']
-    assert 'id3' in term['all_parents']
-    assert sorted(term['development']) == sorted(term['all_parents'])
-
-
-def test_combine_all_parents_w_two_same_parents():
-    term = {'term_id': 'id1', 'parents': ['id2', 'id2'], 'relationships': [],
-            'develops_from': [], 'has_part_inverse': []}
-    term = gifo._combine_all_parents(term)
-    assert len(term['all_parents']) == 1
-    assert term['all_parents'][0] == 'id2'
-    assert term['development'] == term['all_parents']
-
-
-def test_combine_all_parents_w_parent_and_relationship_diff():
-    term = {'term_id': 'id1', 'parents': ['id2'], 'relationships': ['id3'],
-            'develops_from': [], 'has_part_inverse': []}
-    term = gifo._combine_all_parents(term)
-    assert len(term['all_parents']) == 2
-    assert 'id2' in term['all_parents']
-    assert 'id3' in term['all_parents']
-    assert sorted(term['development']) == sorted(term['all_parents'])
-
-
-def test_combine_all_parents_w_parent_and_relationship_same():
-    term = {'term_id': 'id1', 'parents': ['id2'], 'relationships': ['id2'],
-            'develops_from': [], 'has_part_inverse': []}
-    term = gifo._combine_all_parents(term)
-    assert len(term['all_parents']) == 1
-    assert term['all_parents'][0] == 'id2'
-    assert term['development'] == term['all_parents']
-
-
-def test_combine_all_parents_w_parent_and_develops_from_diff():
-    term = {'term_id': 'id1', 'parents': ['id2'], 'relationships': [],
-            'develops_from': ['id3'], 'has_part_inverse': []}
-    term = gifo._combine_all_parents(term)
-    assert len(term['all_parents']) == 1
-    assert len(term['development']) == 2
-    assert term['all_parents'][0] == 'id2'
-    assert 'id2' in term['development']
-    assert 'id3' in term['development']
-
-
-def test_combine_all_parents_w_parent_and_develops_from_same():
-    term = {'term_id': 'id1', 'parents': ['id2'], 'relationships': [],
-            'develops_from': ['id2'], 'has_part_inverse': []}
-    term = gifo._combine_all_parents(term)
-    assert len(term['all_parents']) == 1
-    assert term['all_parents'][0] == 'id2'
-    assert term['development'] == term['all_parents']
-
-
-def test_combine_all_parents_w_only_develops_from():
-    term = {'term_id': 'id1', 'parents': [], 'relationships': [],
-            'develops_from': ['id2'], 'has_part_inverse': []}
-    term = gifo._combine_all_parents(term)
-    assert not term['all_parents']
-    assert len(term['development']) == 1
-    assert term['development'][0] == 'id2'
-
-
-def test_combine_all_parents_w_has_part_inverse_only():
-    term = {'term_id': 'id1', 'parents': [], 'relationships': [],
-            'develops_from': [], 'has_part_inverse': ['id2']}
-    term = gifo._combine_all_parents(term)
-    assert not term['all_parents']  # both should be empty lists
-    assert not term['development']
-
-
-def test_combine_all_parents_w_has_part_inverse_to_exclude():
-    term = {'term_id': 'id1', 'parents': [], 'relationships': [],
-            'develops_from': ['id2'], 'has_part_inverse': ['id2']}
-    term = gifo._combine_all_parents(term)
-    assert not term['all_parents']  # both should be empty lists
-    assert not term['development']
-
-
-def test_combine_all_parents_w_has_part_inverse_to_exclude_plus_others():
-    term = {'term_id': 'id1', 'parents': ['id2'], 'relationships': [],
-            'develops_from': ['id3', 'id4', 'id5'], 'has_part_inverse': ['id4', 'id5', 'id6']}
-    term = gifo._combine_all_parents(term)
-    assert len(term['all_parents']) == 1
-    assert len(term['development']) == 2
-    assert term['all_parents'][0] == 'id2'
-    assert 'id2' in term['development']
-    assert 'id3' in term['development']
-
-
-
-
-
-
-
-
-
-def test_add_term_and_info(uberon_owler2):
-    testid = 'UBERON:0001772'
-    relid = 'UBERON:0010304'
-    for c in uberon_owler2.allclasses:
-        if gifo.isBlankNode(c):
-            test_class = c
-    parent = gifo.convert2URIRef('http://purl.obolibrary.org/obo/UBERON_0001772')
-    terms = gifo._add_term_and_info(test_class, parent, 'test_rel', uberon_owler2, {})
-    assert testid in terms
-    term = terms[testid]
-    assert term['term_id'] == testid
-    assert relid in term['test_rel']
-
-
-def test_process_intersection_of(uberon_owler3):
-    terms = {}
-    for c in uberon_owler3.allclasses:
-        for i in uberon_owler3.rdfGraph.objects(c, gifo.IntersectionOf):
-            terms = gifo.process_intersection_of(c, i, uberon_owler3, terms)
-    assert len(terms) == 1
-    term = list(terms.values())[0]
-    assert len(term['relationships']) == 1
-    assert term['relationships'][0] == 'UBERON:1'
-    assert len(term['develops_from']) == 1
-    assert term['develops_from'][0] == 'UBERON:2'
-
-
-def test_process_blank_node(uberon_owler3):
-    terms = {}
-    for c in uberon_owler3.allclasses:
-        terms = gifo.process_blank_node(c, uberon_owler3, terms)
-    assert len(terms) == 1
-    assert 'UBERON:0001772' in terms
-
-
-def test_find_and_add_parent_of(uberon_owler4):
-    tid = 'CL:0002553'
-    terms = {tid: {'term_id': tid}}
-    relids = ['UBERON:0002048', 'OBI:0000456', 'CL:0000058', 'CL:0000133']
-    relation = None
-    seen = False
-    for c in uberon_owler4.allclasses:
-        for _, p in enumerate(uberon_owler4.get_classDirectSupers(c, excludeBnodes=False)):
-            if gifo.isBlankNode(p):
-                has_part = False
-                if not seen:
-                    has_part = True
-                    seen = True
-                terms = gifo._find_and_add_parent_of(p, c, uberon_owler4, terms, has_part, relation)
-    assert len(terms) == 2
-    print(terms)
-    for termid, term in terms.items():
-        if termid == tid:
-            assert len(term['relationships']) == 3
-            for t in term['relationships']:
-                assert t in relids
-        else:
-            assert termid in relids
-            assert len(term['has_part_inverse']) == 1
-            assert term['has_part_inverse'][0] == tid
-
-
-
-
-
-
-
-@pytest.fixture
-def mock_get_synonyms(mocker):
-    syn_lists = [[], ['syn1'], ['syn1', 'syn2']]
-    return mocker.patch('encoded.commands.generate_ontology.get_synonyms', side_effect=syn_lists)
-
-
-@pytest.fixture
-def mock_get_definitions(mocker):
-    def_lists = [[], ['def1'], ['def1', 'def2']]
-    return mocker.patch('encoded.commands.generate_ontology.get_synonyms', side_effect=def_lists)
-
-
-
+def test_id_post_and_patch_w_patch_term(mocker, terms, mock_logger):
+    import copy
+    dbterms = copy.deepcopy(terms)
+    added_field = {'definition': 'this is what it means'}
+    for i, tid in enumerate(dbterms.keys()):
+        dbterms[tid].update({'uuid': 'uuid' + str(i + 1)})
+        if i >= 7:
+            terms[tid].update(added_field)
+    side_effect = [None] * 7
+    for n in ['8', '9']:
+        se = copy.deepcopy(added_field)
+        se.update({'uuid': 'uuid{}'.format(n)})
+        side_effect.append(se)
+    mocker.patch('encoded.commands.generate_items_from_owl._get_uuids_for_linked', return_value={})
+    mocker.patch('encoded.commands.generate_items_from_owl.id_fields2patch', side_effect=side_effect)
+    to_update = gifo.id_post_and_patch(terms, dbterms, 'Phenotype', logger=mock_logger)
+    assert len(to_update) == 2
+    for upd in to_update:
+        assert 'uuid' in upd
+        assert upd['definition'] == 'this is what it means'
+
+
+def test_id_post_and_patch_set_obsolete_true_obsolete(mocker, terms, mock_logger):
+    """ if set_obsolete is true (the default) then the extra dbterm should be added
+        to patches as a term to set to obsolete
+    """
+    import copy
+    dbterms = copy.deepcopy(terms)
+    added_obs = {'hpo_id': 'hp:10', 'definition': 'soon to be obsolete'}
+    dbterms.update({added_obs['hpo_id']: added_obs})
+    for i, tid in enumerate(dbterms.keys()):
+        dbterms[tid].update({'uuid': 'uuid' + str(i + 1)})
+    mocker.patch('encoded.commands.generate_items_from_owl._get_uuids_for_linked', return_value={})
+    mocker.patch('encoded.commands.generate_items_from_owl.id_fields2patch', return_value=None)
+    to_update = gifo.id_post_and_patch(terms, dbterms, 'Phenotype', logger=mock_logger)
+    assert len(to_update) == 1
+    obsterm = to_update[0]
+    assert obsterm['uuid'] == 'uuid10'
+    assert obsterm['status'] == 'obsolete'
+
+
+def test_id_post_and_patch_set_obsolete_false_do_not_obsolete_live_term(mocker, terms, mock_logger):
+    """ if set_obsolete is false then the extra dbterm should not be added to patches
+        as a term to set to obsolete as long as it's status is not obsolete or deleted
+    """
+    import copy
+    dbterms = copy.deepcopy(terms)
+    added_obs = {'hpo_id': 'hp:10', 'definition': 'soon to be obsolete'}
+    dbterms.update({added_obs['hpo_id']: added_obs})
+    for i, tid in enumerate(dbterms.keys()):
+        dbterms[tid].update({'uuid': 'uuid' + str(i + 1)})
+    mocker.patch('encoded.commands.generate_items_from_owl._get_uuids_for_linked', return_value={})
+    mocker.patch('encoded.commands.generate_items_from_owl.id_fields2patch', return_value=None)
+    to_update = gifo.id_post_and_patch(terms, dbterms, 'Phenotype', set_obsoletes=False, logger=mock_logger)
+    assert not to_update
+
+
+def test_id_post_and_patch_set_obsolete_true_do_not_patch_obsolete_term(mocker, terms, mock_logger):
+    """ if set_obsolete is True then the extra dbterm should not be added to patches
+        if it's already status = obsolete
+    """
+    import copy
+    dbterms = copy.deepcopy(terms)
+    added_obs = {'hpo_id': 'hp:10', 'definition': 'already obsolete', 'status': 'obsolete'}
+    dbterms.update({added_obs['hpo_id']: added_obs})
+    for i, tid in enumerate(dbterms.keys()):
+        dbterms[tid].update({'uuid': 'uuid' + str(i + 1)})
+    mocker.patch('encoded.commands.generate_items_from_owl._get_uuids_for_linked', return_value={})
+    mocker.patch('encoded.commands.generate_items_from_owl.id_fields2patch', return_value=None)
+    to_update = gifo.id_post_and_patch(terms, dbterms, 'Phenotype', logger=mock_logger)
+    assert not to_update
 
 
 def test_write_outfile_pretty(simple_terms):
@@ -1169,422 +900,3 @@ def test_write_outfile_notpretty(simple_terms):
             for v in simple_terms.values():
                 assert v in result
     os.remove(filename)
-
-
-@pytest.fixture
-def matches():
-    return [{'term_id': 't1', 'a': 1, 'b': 2, 'c': 3}, {'term_id': 't1', 'a': 1, 'b': 2, 'c': 3}]
-
-
-def test_terms_match_identical(matches):
-    assert gifo._terms_match(matches[0], matches[1])
-
-
-def test_terms_match_w_parents(matches):
-    t1 = matches[0]
-    t2 = matches[1]
-    p1 = ['OBI:01', 'EFO:01']
-    p2 = [{'@id': '/ontology-terms/OBI:01/', 'display_title': 'blah'},
-          {'@id': '/ontology-terms/EFO:01/', 'display_title': 'hah'}]
-    t1['parents'] = p1
-    t2['parents'] = p2
-    assert gifo._terms_match(t1, t2)
-
-
-def test_terms_match_unmatched_parents_1(matches):
-    t1 = matches[0]
-    t2 = matches[1]
-    p1 = ['OBI:01', 'EFO:01']
-    p2 = [{'@id': '/ontology-terms/OBI:01/', 'display_title': 'blah'}]
-    t1['parents'] = p1
-    t2['parents'] = p2
-    assert not gifo._terms_match(t1, t2)
-
-
-def test_terms_match_unmatched_parents_2(matches):
-    t1 = matches[0]
-    t2 = matches[1]
-    p1 = ['OBI:01', 'EFO:01']
-    p2 = [{'@id': '/ontology-terms/OBI:01/', 'display_title': 'blah'},
-          {'@id': '/ontology-terms/EFO:02/', 'display_title': 'hah'}]
-    t1['parents'] = p1
-    t2['parents'] = p2
-    assert not gifo._terms_match(t1, t2)
-
-
-def test_terms_match_w_ontology(matches):
-    t1 = matches[0]
-    t2 = matches[1]
-    o1 = '530016bc-8535-4448-903e-854af460b254'
-    o2 = {'@id': '/ontologys/530016bc-8535-4448-903e-854af460b254/', 'display_title': 'blah'}
-    t1['source_ontologies'] = [o1]
-    t2['source_ontologies'] = [o2]
-    assert gifo._terms_match(t1, t2)
-
-
-@pytest.fixture
-def ont_terms(matches):
-    t2 = matches[1]
-    t2['term_id'] = 't2'
-    t2['parents'] = ['OBI:01', 'EFO:01']
-    return {
-        't1': matches[0],
-        't2': t2,
-        't3': {'term_id': 't3', 'x': 7, 'y': 8, 'z': 9}
-    }
-
-
-@pytest.fixture
-def ontology_list():
-    return [
-        {'uuid': '1', 'ontology_name': 'ont1'},
-        {'uuid': '2', 'ontology_name': 'ont2'}
-    ]
-
-
-@pytest.fixture
-def db_terms(ont_terms):
-    db_terms = ont_terms.copy()
-    db_terms['t1']['uuid'] = '1234'
-    db_terms['t2']['uuid'] = '5678'
-    del db_terms['t2']['parents']
-    del db_terms['t3']
-    return db_terms
-
-
-def test_id_post_and_patch_filter(ont_terms, db_terms, ontology_list):
-    result = gifo.id_post_and_patch(ont_terms, db_terms, ontology_list)
-    assert len(result) == 1
-    assert 't3' == result[0].get('term_id')
-    # assert len(idmap) == 3
-    # for k, v in idmap.items():
-    #     assert k in ['t1', 't2', 't3']
-    #     if k != 't3':  # t1 and t2 already had uuids
-    #         assert v in ['1234', '5678']
-
-
-def test_id_post_and_patch_no_filter(ont_terms, db_terms, ontology_list):
-    tids = ['t1', 't2', 't3']
-    result = gifo.id_post_and_patch(ont_terms, db_terms, ontology_list, False)
-    assert len(result) == 3
-    for t in result:
-        # assert t.get('term_id') in idmap
-        assert t.get('term_id') in tids
-
-
-# def test_id_post_and_patch_id_obs(ont_terms, db_terms, ontology_list):
-#     db_terms['t4'] = {'term_id': 't4', 'source_ontologies': {'uuid': '1', 'ontology_name': 'ont1'}, 'uuid': '7890'}
-#     result = gifo.id_post_and_patch(ont_terms, db_terms, ontology_list)
-#     assert len(result) == 2
-#     assert '7890' in [t.get('uuid') for t in result]
-#     # assert 't4' in idmap
-
-
-def test_id_post_and_patch_donot_obs(ont_terms, db_terms, ontology_list):
-    db_terms['t4'] = {'term_id': 't4', 'source_ontologies': {'uuid': '1', 'ontology_name': 'ont1'}, 'uuid': '7890'}
-    result = gifo.id_post_and_patch(ont_terms, db_terms, ontology_list, True, False)
-    assert 't4' not in [t.get('term_id') for t in result]
-    # assert 't4' not in idmap
-
-
-# def test_id_post_and_patch_ignore_4dn(ont_terms, db_terms, ontology_list):
-#     db_terms['t4'] = {'term_id': 't4', 'source_ontologies': {'uuid': '4', 'ontology_name': '4DN ont'}, 'uuid': '7890'}
-#     result = gifo.id_post_and_patch(ont_terms, db_terms, ontology_list)
-#     print(result)
-#     assert 't4' not in [t.get('term_id') for t in result]
-#     # assert 't4' not in idmap
-
-
-def valid_uuid(uid):
-    validchars = '0123456789abcdef'
-    uid = uid.replace('-', '')
-    if len(uid) != 32:
-        return False
-    for c in uid:
-        if c not in validchars:
-            return False
-    return True
-
-
-@pytest.fixture
-def embedded_dbterm():
-    return {
-         "synonyms": [
-            "renal pelvis uroepithelium",
-            "renal pelvis transitional epithelium",
-            "pelvis of ureter uroepithelium",
-            "renal pelvis urothelium",
-            "kidney pelvis uroepithelium",
-            "uroepithelium of pelvis of ureter",
-            "urothelium of pelvis of ureter",
-            "uroepithelium of kidney pelvis",
-            "transitional epithelium of kidney pelvis",
-            "transitional epithelium of renal pelvis",
-            "urothelium of kidney pelvis",
-            "uroepithelium of renal pelvis",
-            "urothelium of renal pelvis",
-            "kidney pelvis transitional epithelium",
-            "pelvis of ureter urothelium"
-          ],
-          "preferred_name": "kidney pelvis urothelium",
-          "references": [
-
-          ],
-          "external_references": [
-
-          ],
-          "status": "released",
-          "term_name": "kidney pelvis urothelium",
-          "submitted_by": {
-            "principals_allowed": {
-              "edit": [
-                "group.admin",
-                "userid.986b362f-4eb6-4a9c-8173-3ab267307e3a"
-              ],
-              "view": [
-                "group.admin",
-                "group.read-only-admin",
-                "remoteuser.EMBED",
-                "remoteuser.INDEXER",
-                "userid.986b362f-4eb6-4a9c-8173-3ab267307e3a"
-              ]
-            },
-            "@id": "/users/986b362f-4eb6-4a9c-8173-3ab267307e3a/",
-            "@type": [
-              "User",
-              "Item"
-            ],
-            "uuid": "986b362f-4eb6-4a9c-8173-3ab267307e3a",
-            "display_title": "4dn DCIC"
-          },
-          "display_title": "kidney pelvis urothelium",
-          "schema_version": "1",
-          "@type": [
-            "OntologyTerm",
-            "Item"
-          ],
-          "parents": [
-            {
-              "principals_allowed": {
-                "edit": [
-                  "group.admin"
-                ],
-                "view": [
-                  "system.Everyone"
-                ]
-              },
-              "@id": "/ontology-terms/UBERON:0001254/",
-              "@type": [
-                "OntologyTerm",
-                "Item"
-              ],
-              "uuid": "38dbff69-aac7-46a4-837e-7340c2c5bcd5",
-              "display_title": "urothelium of ureter"
-            },
-            {
-              "principals_allowed": {
-                "edit": [
-                  "group.admin"
-                ],
-                "view": [
-                  "system.Everyone"
-                ]
-              },
-              "@id": "/ontology-terms/UBERON:0004819/",
-              "@type": [
-                "OntologyTerm",
-                "Item"
-              ],
-              "uuid": "57ac2905-0533-43c9-988b-9add8c225a78",
-              "display_title": "kidney epithelium"
-            }
-          ],
-          "date_created": "2017-05-11T16:00:51.747446+00:00",
-          "term_id": "UBERON:0004788",
-          "source_ontology": {
-            "uuid": "530016bc-8535-4448-903e-854af460b254",
-            "display_title": "Uberon",
-            "principals_allowed": {
-              "edit": [
-                "group.admin"
-              ],
-              "view": [
-                "system.Everyone"
-              ]
-            },
-            "@id": "/ontologys/530016bc-8535-4448-903e-854af460b254/",
-            "@type": [
-              "Ontology",
-              "Item"
-            ],
-            "ontology_name": "Uberon"
-          },
-          "uuid": "e5e1690a-1a80-4e50-a3cf-58f2f269abd8",
-          "term_url": "http://purl.obolibrary.org/obo/UBERON_0004788",
-          "last_modified": {
-            "date_modified": "2018-07-11T05:05:30.826642+00:00",
-            "modified_by": {
-              "principals_allowed": {
-                "edit": [
-                  "group.admin",
-                  "userid.986b362f-4eb6-4a9c-8173-3ab267307e3a"
-                ],
-                "view": [
-                  "group.admin",
-                  "group.read-only-admin",
-                  "remoteuser.EMBED",
-                  "remoteuser.INDEXER",
-                  "userid.986b362f-4eb6-4a9c-8173-3ab267307e3a"
-                ]
-              },
-              "@id": "/users/986b362f-4eb6-4a9c-8173-3ab267307e3a/",
-              "@type": [
-                "User",
-                "Item"
-              ],
-              "uuid": "986b362f-4eb6-4a9c-8173-3ab267307e3a",
-              "display_title": "4dn DCIC"
-            }
-          },
-          "principals_allowed": {
-            "edit": [
-              "group.admin"
-            ],
-            "view": [
-              "system.Everyone"
-            ]
-          },
-          "@id": "/ontology-terms/UBERON:0004788/",
-          "slim_terms": [
-            {
-              "principals_allowed": {
-                "edit": [
-                  "group.admin"
-                ],
-                "view": [
-                  "system.Everyone"
-                ]
-              },
-              "term_name": "endoderm",
-              "display_title": "endoderm",
-              "is_slim_for": "developmental",
-              "@id": "/ontology-terms/UBERON:0000925/",
-              "@type": [
-                "OntologyTerm",
-                "Item"
-              ],
-              "uuid": "111121bc-8535-4448-903e-854af460a233"
-            },
-            {
-              "principals_allowed": {
-                "edit": [
-                  "group.admin"
-                ],
-                "view": [
-                  "system.Everyone"
-                ]
-              },
-              "term_name": "kidney",
-              "display_title": "kidney",
-              "is_slim_for": "organ",
-              "@id": "/ontology-terms/UBERON:0002113/",
-              "@type": [
-                "OntologyTerm",
-                "Item"
-              ],
-              "uuid": "111167bc-8535-4448-903e-854af460a233"
-            },
-            {
-              "principals_allowed": {
-                "edit": [
-                  "group.admin"
-                ],
-                "view": [
-                  "system.Everyone"
-                ]
-              },
-              "term_name": "ureter",
-              "display_title": "ureter",
-              "is_slim_for": "organ",
-              "@id": "/ontology-terms/UBERON:0000056/",
-              "@type": [
-                "OntologyTerm",
-                "Item"
-              ],
-              "uuid": "111148bc-8535-4448-903e-854af460a233"
-            },
-            {
-              "principals_allowed": {
-                "edit": [
-                  "group.admin"
-                ],
-                "view": [
-                  "system.Everyone"
-                ]
-              },
-              "term_name": "renal system",
-              "display_title": "renal system",
-              "is_slim_for": "system",
-              "@id": "/ontology-terms/UBERON:0001008/",
-              "@type": [
-                "OntologyTerm",
-                "Item"
-              ],
-              "uuid": "111130bc-8535-4448-903e-854af460a233"
-            },
-            {
-              "principals_allowed": {
-                "edit": [
-                  "group.admin"
-                ],
-                "view": [
-                  "system.Everyone"
-                ]
-              },
-              "term_name": "mesoderm",
-              "display_title": "mesoderm",
-              "is_slim_for": "developmental",
-              "@id": "/ontology-terms/UBERON:0000926/",
-              "@type": [
-                "OntologyTerm",
-                "Item"
-              ],
-              "uuid": "111120bc-8535-4448-903e-854af460a233"
-            }
-          ],
-          "namespace": "http://purl.obolibrary.org/obo",
-          "definition": "the epithelial lining of the luminal space of the kidney pelvis"
-        }
-
-
-def test_get_raw_form(embedded_dbterm):
-    raw_term = gifo.get_raw_form(embedded_dbterm)
-    print(raw_term)
-
-
-def test_update_definition():
-    prefix = 'EFO'
-    tdef = 'here is EFO definition (EFO)'
-    dbdef = 'here is outdated definition (EFO, OBI) and another def (SO)'
-    newdef = gifo.update_definition(tdef, dbdef, prefix)
-    assert tdef in newdef
-    assert 'here is outdated definition (EFO, OBI)' not in newdef
-
-
-@pytest.fixture
-def slim_terms():
-    return [
-        {
-            "uuid": "111119bc-8535-4448-903e-854af460a233",
-            "term_name": "ectoderm",
-            "term_id": "UBERON:0000924",
-            "is_slim_for": "developmental",
-        },
-        {
-            "uuid": "111122bc-8535-4448-903e-854af460a233",
-            "preferred_name": "3D chromatin structure",
-            "term_name": "chromosome conformation identification objective",
-            "term_id": "OBI:0001917",
-            "is_slim_for": "assay"
-        }
-    ]

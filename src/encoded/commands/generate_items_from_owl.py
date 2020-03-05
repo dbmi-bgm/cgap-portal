@@ -414,9 +414,6 @@ def id_post_and_patch(terms, dbterms, itype, rm_unchanged=True, set_obsoletes=Tr
             # new term
             uid = str(uuid4())
             term['uuid'] = uid
-            if tid in tid2uuid:
-                logger.warn("HAVE SEEN {} BEFORE!".format(tid))
-                logger.warn("PREVIOUS={}; NEW={}".format(tid2uuid[tid], uid))
             to_update.append(term)
             tid2uuid[tid] = uid
             to_post.append(tid)
@@ -424,9 +421,6 @@ def id_post_and_patch(terms, dbterms, itype, rm_unchanged=True, set_obsoletes=Tr
             # add uuid to mapping and existing term
             dbterm = dbterms[tid]
             uuid = dbterm['uuid']
-            if tid in tid2uuid:
-                logger.warn("HAVE SEEN {} BEFORE!".format(tid))
-                logger.warn("PREVIOUS={}; NEW={}".format(tid2uuid[tid], uid))
             tid2uuid[tid] = uuid
             term['uuid'] = uuid
 
