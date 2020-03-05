@@ -89,9 +89,6 @@ class Document(ItemWithAttachment, Item):
             return True
         if m1 in self.mimetype_map and m2 in self.mimetype_map[m1]:
             return True
-        #     m1 = self.mimetype_map[m1][0]
-        # if m2 in self.mimetype_map:
-        #     m2 = self.mimetype_map[m2][0]
         return m1 == m2
 
     @calculated_property(schema={
