@@ -49,7 +49,7 @@
         },
         "file_version_date": {
             "title": "File Version",
-            "description": "The date of the version of file based on when it was originally generated. Accepted formats: YYYYMMDD, YYYY-MM-DD, YYYY-MM-DD-HH:MM:SS",
+            "description": "The date of the version of file based on when it was originally generated. Accepted formats: YYYY-MM-DD, YYYY-MM-DD-HH:MM:SS",
             "type": "string",
             "anyOf": [
                 {"format": "date-time"},
