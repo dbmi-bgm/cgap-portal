@@ -835,8 +835,9 @@ def test_id_post_and_patch_set_obsolete_true_obsolete(mocker, terms, mock_logger
     dbterms = copy.deepcopy(terms)
     added_obs = {'hpo_id': 'hp:10', 'definition': 'soon to be obsolete'}
     dbterms.update({added_obs['hpo_id']: added_obs})
-    for i, tid in enumerate(dbterms.keys()):
-        dbterms[tid].update({'uuid': 'uuid' + str(i + 1)})
+    for tid in dbterms.keys():
+        uid = tid.replace('hp:', 'uuid')
+        dbterms[tid].update({'uuid': uid})
     mocker.patch('encoded.commands.generate_items_from_owl._get_uuids_for_linked', return_value={})
     mocker.patch('encoded.commands.generate_items_from_owl.id_fields2patch', return_value=None)
     to_update = gifo.id_post_and_patch(terms, dbterms, 'Phenotype', logger=mock_logger)
