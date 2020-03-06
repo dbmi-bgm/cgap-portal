@@ -780,16 +780,16 @@ def test_get_uuids_for_linked_one_missing(term_w_slims_and_parents, mock_logger,
     assert out == 'WARNING: HP0000002 - MISSING FROM IDMAP\n'
 
 
-def test_id_post_and_patch_no_changes(mocker, terms, mock_logger):
+def test_identify_item_updates_no_changes(mocker, terms, mock_logger):
     dbterms = terms.copy()
     for i, tid in enumerate(dbterms.keys()):
         dbterms[tid].update({'uuid': 'uuid' + str(i + 1)})
     mocker.patch('encoded.commands.generate_items_from_owl._get_uuids_for_linked', return_value={})
     mocker.patch('encoded.commands.generate_items_from_owl.id_fields2patch', return_value=None)
-    assert not gifo.id_post_and_patch(terms, dbterms, 'Phenotype', logger=mock_logger)
+    assert not gifo.identify_item_updates(terms, dbterms, 'Phenotype', logger=mock_logger)
 
 
-def test_id_post_and_patch_w_new_term(mocker, terms, mock_logger):
+def test_identify_item_updates_w_new_term(mocker, terms, mock_logger):
     dbterms = copy.deepcopy(terms)
     for i, tid in enumerate(dbterms.keys()):
         dbterms[tid].update({'uuid': 'uuid' + str(i + 1)})
@@ -800,12 +800,12 @@ def test_id_post_and_patch_w_new_term(mocker, terms, mock_logger):
     mocker.patch('encoded.commands.generate_items_from_owl.uuid4', return_value='uuid11')
     mocker.patch('encoded.commands.generate_items_from_owl._get_uuids_for_linked', return_value={})
     mocker.patch('encoded.commands.generate_items_from_owl.id_fields2patch', side_effect=side_effect)
-    to_update = gifo.id_post_and_patch(terms, dbterms, 'Phenotype', logger=mock_logger)
+    to_update = gifo.identify_item_updates(terms, dbterms, 'Phenotype', logger=mock_logger)
     new_term.update({'uuid': 'uuid11'})
     assert to_update[0] == new_term
 
 
-def test_id_post_and_patch_w_patch_term(mocker, terms, mock_logger):
+def test_identify_item_updates_w_patch_term(mocker, terms, mock_logger):
     dbterms = copy.deepcopy(terms)
     added_field = {'definition': 'this is what it means'}
     for i, tid in enumerate(dbterms.keys()):
@@ -819,14 +819,14 @@ def test_id_post_and_patch_w_patch_term(mocker, terms, mock_logger):
         side_effect.append(se)
     mocker.patch('encoded.commands.generate_items_from_owl._get_uuids_for_linked', return_value={})
     mocker.patch('encoded.commands.generate_items_from_owl.id_fields2patch', side_effect=side_effect)
-    to_update = gifo.id_post_and_patch(terms, dbterms, 'Phenotype', logger=mock_logger)
+    to_update = gifo.identify_item_updates(terms, dbterms, 'Phenotype', logger=mock_logger)
     assert len(to_update) == 2
     for upd in to_update:
         assert 'uuid' in upd
         assert upd['definition'] == 'this is what it means'
 
 
-def test_id_post_and_patch_set_obsolete_true_obsolete(mocker, terms, mock_logger):
+def test_identify_item_updates_set_obsolete_true_obsolete(mocker, terms, mock_logger):
     """ if set_obsolete is true (the default) then the extra dbterm should be added
         to patches as a term to set to obsolete
     """
@@ -838,14 +838,14 @@ def test_id_post_and_patch_set_obsolete_true_obsolete(mocker, terms, mock_logger
         dbterms[tid].update({'uuid': uid})
     mocker.patch('encoded.commands.generate_items_from_owl._get_uuids_for_linked', return_value={})
     mocker.patch('encoded.commands.generate_items_from_owl.id_fields2patch', return_value=None)
-    to_update = gifo.id_post_and_patch(terms, dbterms, 'Phenotype', logger=mock_logger)
+    to_update = gifo.identify_item_updates(terms, dbterms, 'Phenotype', logger=mock_logger)
     assert len(to_update) == 1
     obsterm = to_update[0]
     assert obsterm['uuid'] == 'uuid10'
     assert obsterm['status'] == 'obsolete'
 
 
-def test_id_post_and_patch_set_obsolete_false_do_not_obsolete_live_term(mocker, terms, mock_logger):
+def test_identify_item_updates_set_obsolete_false_do_not_obsolete_live_term(mocker, terms, mock_logger):
     """ if set_obsolete is false then the extra dbterm should not be added to patches
         as a term to set to obsolete as long as it's status is not obsolete or deleted
     """
@@ -856,11 +856,11 @@ def test_id_post_and_patch_set_obsolete_false_do_not_obsolete_live_term(mocker, 
         dbterms[tid].update({'uuid': 'uuid' + str(i + 1)})
     mocker.patch('encoded.commands.generate_items_from_owl._get_uuids_for_linked', return_value={})
     mocker.patch('encoded.commands.generate_items_from_owl.id_fields2patch', return_value=None)
-    to_update = gifo.id_post_and_patch(terms, dbterms, 'Phenotype', set_obsoletes=False, logger=mock_logger)
+    to_update = gifo.identify_item_updates(terms, dbterms, 'Phenotype', set_obsoletes=False, logger=mock_logger)
     assert not to_update
 
 
-def test_id_post_and_patch_set_obsolete_true_do_not_patch_obsolete_term(mocker, terms, mock_logger):
+def test_identify_item_updates_set_obsolete_true_do_not_patch_obsolete_term(mocker, terms, mock_logger):
     """ if set_obsolete is True then the extra dbterm should not be added to patches
         if it's already status = obsolete
     """
@@ -871,7 +871,7 @@ def test_id_post_and_patch_set_obsolete_true_do_not_patch_obsolete_term(mocker, 
         dbterms[tid].update({'uuid': 'uuid' + str(i + 1)})
     mocker.patch('encoded.commands.generate_items_from_owl._get_uuids_for_linked', return_value={})
     mocker.patch('encoded.commands.generate_items_from_owl.id_fields2patch', return_value=None)
-    to_update = gifo.id_post_and_patch(terms, dbterms, 'Phenotype', logger=mock_logger)
+    to_update = gifo.identify_item_updates(terms, dbterms, 'Phenotype', logger=mock_logger)
     assert not to_update
 
 
