@@ -239,11 +239,11 @@ def compare_existing_to_newly_generated(logger, connection, evidence_items, ityp
     """
     sq = 'search/?type={}&status!=obsolete'.format(itype)
     logger.info("COMPARING FILE ITEMS WITH CURRENT DB CONTENT")
-    logger.info("searching: {}".format(str(datetime.now())))
+    logger.info("searching: {}".format(datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")))
     dbitems = search_metadata(sq, connection, is_generator=True, page_limit=500)
     existing = 0
     uids2obsolete = []
-    logger.info("comparing: {}".format(str(datetime.now())))
+    logger.info("comparing: {}".format(datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")))
     for db_evi in dbitems:
         tochk = convert2raw(db_evi)
         if tochk in evidence_items:
@@ -251,7 +251,7 @@ def compare_existing_to_newly_generated(logger, connection, evidence_items, ityp
             evidence_items.remove(tochk)
         else:
             uids2obsolete.append(db_evi.get('uuid'))
-    logger.info("result: {}".format(str(datetime.now())))
+    logger.info("result: {}".format(datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")))
     return evidence_items, existing, uids2obsolete
 
 
@@ -329,11 +329,10 @@ def get_args():  # pragma: no cover
 def main():  # pragma: no cover
     ITEMTYPE = 'EvidenceDisPheno'
 
-    start = datetime.now()
-    dt = start.strftime("%y-%m-%d-%H-%M-%S")
-    logfile = '{}_upd_dis2pheno_annot.log'.format(dt)
+    start = datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
+    logfile = '{}_upd_dis2pheno_annot.log'.format(start.replace(':', '-'))
     logger = get_logger(__name__, logfile)
-    logger.info('Processing disorder to phenotype annotations - START:{}'.format(str(start)))
+    logger.info('Processing disorder to phenotype annotations - START:{}'.format(start))
 
     args = get_args()
 
@@ -347,7 +346,6 @@ def main():  # pragma: no cover
     disorders = get_items_from_db_keyed_by_field(connection, 'Disorder', 'uuid')
     logger.info('Phenotypes')
     phenotypes = get_items_from_db_keyed_by_field(connection, 'Phenotype', 'hpo_id')
-
 
     hpoid2uuid = {hid: pheno.get('uuid') for hid, pheno in phenotypes.items()}
     xref2disorder = get_dbxref2disorder_map(disorders)
@@ -421,8 +419,8 @@ def main():  # pragma: no cover
     if problems:
         log_problems(logger, problems)
 
-    end = datetime.now()
-    logger.info("FINISHED - START: {}\tEND: {}".format(start, str(end)))
+    end = datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
+    logger.info("FINISHED - START: {}\tEND: {}".format(start, end))
     if args.post_report:
         post_report_document_to_portal(connection, itype, logfile)
 

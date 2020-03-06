@@ -7,44 +7,6 @@ import json
 from datetime import datetime
 from dcicutils import ff_utils
 
-# '''logging setup
-#    logging config - to be moved to file at some point
-# '''
-# date = datetime.now().strftime("%y-%m-%d-%H-%M-%S")
-# logfile = 'load_items.log'
-# logger = logging.getLogger(__name__)
-# logging.config.dictConfig({
-#     'version': 1,
-#     'disable_existing_loggers': False,
-#     'formatters': {
-#         'standard': {
-#             'format': '%(levelname)s:\t%(message)s'
-#         },
-#         'verbose': {
-#             'format': '%(levelname)s:\t%(message)s\tFROM: %(name)s'
-#         }
-#     },
-#     'handlers': {
-#         'stdout': {
-#             'level': 'INFO',
-#             'formatter': 'verbose',
-#             'class': 'logging.StreamHandler'
-#         },
-#         'logfile': {
-#             'level': 'INFO',
-#             'formatter': 'standard',
-#             'class': 'logging.FileHandler',
-#             'filename': logfile
-#         }
-#     },
-#     'loggers': {
-#         '': {
-#             'handlers': ['stdout', 'logfile'],
-#             'level': 'INFO',
-#             'propagate': True
-#         }
-#     }
-# })
 
 EPILOG = __doc__
 
@@ -202,7 +164,7 @@ def load_items(json_input, itypes=None, env=None, auth=None, patch_only=False, p
         num_items = len(idata)
         logger.info('{} {}'.format(num_items, iname))
         num_to_load += num_items
-    start = datetime.now()
+    start = datetime.utcnow()
     if not json_data.get('store'):
         logger.error("No DATA to LOAD!")
         return
@@ -235,7 +197,8 @@ def load_items(json_input, itypes=None, env=None, auth=None, patch_only=False, p
         if not post_only and (len(load_res['POST']) + len(load_res['SKIP'])) > len(load_res['PATCH']):
             missed = set(load_res['POST'] + load_res['SKIP']) - set(load_res['PATCH'])
             logger.error("The following {} items passed round I (POST/skip) but not round II (PATCH): {}".format(len(missed), missed))
-    logger.info("Finished request in %s" % str(datetime.now() - start))
+    request_time = datetime.utcnow() - start
+    logger.info("Finished request in {}".format(str(request_time)))
 
 
 def main():
@@ -243,18 +206,16 @@ def main():
     # Loading app will have configured from config file. Reconfigure here:
     logging.getLogger('encoded').setLevel(logging.INFO)
     args = parse_args()
-    start = datetime.now()
-    dt = start.strftime("%y-%m-%d-%H-%M-%S")
-    logfile = '{}_load_items.log'.format(dt)
+    start = datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
+    logfile = '{}_load_items.log'.format(start.replace(':', '-'))
     logger = get_logger(__name__, logfile)
     auth = None
     if not args.env and args.key:
         auth = get_auth(args.key, args.keyfile)
     load_items(args.json_input, args.item_types, args.env, auth, args.patch_only, args.post_only, logger)
     end = datetime.now()
-    et = end.strftime("%y-%m-%d-%H-%M-%S")
+    et = utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
     logger.info("DONE! {}".format(et))
-
 
 
 if __name__ == "__main__":

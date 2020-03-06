@@ -626,7 +626,7 @@ def post_report_document_to_portal(connection, itype, logfile):
     meta = {'institution': inst, 'project': proj}
     mimetype = "text/plain"
     rtype = 'document'
-    date = datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
+    date = datetime.utcnow().strftime("%Y-%m-%dT%H-%M-%SZ")
     attach_fn = None
     if os.path.isfile(logfile):
         attach_fn = '{}_update_report_{}.txt'.format(itype, date)
@@ -671,11 +671,10 @@ def main():
 
         logging/tracking info
     '''
-    start = datetime.now()
-    dt = start.strftime("%y-%m-%d-%H-%M-%S")
+    start = datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
     args = parse_args(sys.argv[1:])
     itype = args.item_type
-    logfile = '{}_{}_item_upd.log'.format(dt, itype)
+    logfile = '{}_{}_item_upd.log'.format(start.replace(':', '-'), itype)  # avoids colons in filename
     logger = get_logger(__name__, logfile)
     logger.info('Processing {} on {}'.format(itype, start))
     connection = connect2server(args.env, args.key, args.keyfile)
@@ -720,9 +719,8 @@ def main():
             res = load_items(items2upd, itypes=[itype], auth=connection, logger=logger)
             logger.info(res)
             logger.info(json.dumps(items2upd, indent=4))
-    stop = datetime.now()
-    logger.info('STARTED: {}'.format(str(start)))
-    logger.info('END: {}'.format(str(stop)))
+    logger.info('STARTED: {}'.format(start))
+    logger.info('END: {}'.format(datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")))
     if args.post_report:
         post_report_document_to_portal(connection, itype, logfile)
 
