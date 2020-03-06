@@ -1,41 +1,65 @@
 <?xml version="1.0"?>
-  <rdf:RDF xmlns="http://purl.obolibrary.org/obo/uberon/ext.owl#"
-       xml:base="http://purl.obolibrary.org/obo/uberon/ext.owl"
-       xmlns:owl="http://www.w3.org/2002/07/owl#"
-       xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
-       xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
-      <owl:Ontology rdf:about="http://purl.obolibrary.org/obo/uberon/ext.owl">
-      </owl:Ontology>
-  <owl:AnnotationProperty rdf:about="http://www.w3.org/2000/01/rdf-schema#label"/>
-  <!-- http://purl.obolibrary.org/obo/CL_0002553 -->
+<rdf:RDF xmlns="http://purl.obolibrary.org/obo/hp.owl#"
+     xml:base="http://purl.obolibrary.org/obo/hp.owl"
+     xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+     xmlns:owl="http://www.w3.org/2002/07/owl#"
+     xmlns:oboInOwl="http://www.geneontology.org/formats/oboInOwl#"
+     xmlns:hsapdv="http://purl.obolibrary.org/obo/hsapdv#"
+     xmlns:hp="http://purl.obolibrary.org/obo/hp#"
+     xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+     xmlns:nbo="http://purl.obolibrary.org/obo/nbo.owl#"
+     xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+     xmlns:hp2="http://purl.obolibrary.org/obo/hp.owl#"
+     xmlns:obo="http://purl.obolibrary.org/obo/"
+     xmlns:dc="http://purl.org/dc/elements/1.1/">
+    <owl:Ontology rdf:about="http://purl.obolibrary.org/obo/hp.owl">
+    </owl:Ontology>
 
-     <owl:Class rdf:about="http://purl.obolibrary.org/obo/CL_0002553">
-         <rdfs:subClassOf>
-             <owl:Restriction>
-                 <owl:onProperty rdf:resource="http://purl.obolibrary.org/obo/BFO_0000050"/>
-                 <owl:someValuesFrom rdf:resource="http://purl.obolibrary.org/obo/UBERON_0002048"/>
-             </owl:Restriction>
-         </rdfs:subClassOf>
-         <rdfs:subClassOf>
-             <owl:Restriction>
-                 <owl:onProperty rdf:resource="http://purl.obolibrary.org/obo/RO_0002202"/>
-                 <owl:someValuesFrom rdf:resource="http://purl.obolibrary.org/obo/CL_0000133"/>
-             </owl:Restriction>
-         </rdfs:subClassOf>
-         <rdfs:subClassOf>
-             <owl:Restriction>
-                 <owl:onProperty rdf:resource="http://purl.obolibrary.org/obo/BFO_0000051"/>
-                 <owl:someValuesFrom rdf:resource="http://purl.obolibrary.org/obo/CL_0000058"/>
-             </owl:Restriction>
-         </rdfs:subClassOf>
-         <rdfs:subClassOf>
-             <owl:Restriction>
-                 <owl:onProperty rdf:resource="http://purl.obolibrary.org/obo/OBI_0000417"/><!-- achieves_planned_objective -->
-                 <owl:someValuesFrom rdf:resource="http://purl.obolibrary.org/obo/OBI_0000456"/><!-- material transformation objective -->
-             </owl:Restriction>
-         </rdfs:subClassOf>
-         <rdfs:subClassOf rdf:resource="http://purl.obolibrary.org/obo/UBERON_0010313"/>
-         <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">fibroblast of lung</rdfs:label>
+
+    <!-- http://purl.obolibrary.org/obo/HP_0000811 -->
+
+     <owl:Class rdf:about="http://purl.obolibrary.org/obo/HP_0000811">
+         <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Abnormal external genitalia</rdfs:label>
+         <oboInOwl:hasExactSynonym rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Abnormal external genitalia</oboInOwl:hasExactSynonym>
+         <oboInOwl:id rdf:datatype="http://www.w3.org/2001/XMLSchema#string">HP:0000811</oboInOwl:id>
+         <oboInOwl:hasDbXref rdf:datatype="http://www.w3.org/2001/XMLSchema#string">UMLS:C4025825</oboInOwl:hasDbXref>
+         <oboInOwl:hasOBONamespace rdf:datatype="http://www.w3.org/2001/XMLSchema#string">human_phenotype</oboInOwl:hasOBONamespace>
      </owl:Class>
+
+     <!-- http://purl.obolibrary.org/obo/HP_0010460 -->
+
+     <owl:Class rdf:about="http://purl.obolibrary.org/obo/HP_0010460">
+        <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Abnormality of the female genitalia</rdfs:label>
+        <oboInOwl:creation_date rdf:datatype="http://www.w3.org/2001/XMLSchema#string">2009-09-15T08:32:09Z</oboInOwl:creation_date>
+        <obo:IAO_0000115 rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Abnormality of the female genital system.</obo:IAO_0000115>
+        <rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Abnormality of the female internal or external genitalia.</rdfs:comment>
+        <oboInOwl:id rdf:datatype="http://www.w3.org/2001/XMLSchema#string">HP:0010460</oboInOwl:id>
+        <oboInOwl:hasDbXref rdf:datatype="http://www.w3.org/2001/XMLSchema#string">UMLS:C4023820</oboInOwl:hasDbXref>
+        <oboInOwl:hasOBONamespace rdf:datatype="http://www.w3.org/2001/XMLSchema#string">human_phenotype</oboInOwl:hasOBONamespace>
+    </owl:Class>
+
+    <!-- http://purl.obolibrary.org/obo/HP_0000055 -->
+
+    <owl:Class rdf:about="http://purl.obolibrary.org/obo/HP_0000055">
+        <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Abnormality of female external genitalia</rdfs:label>
+        <rdfs:subClassOf rdf:resource="http://purl.obolibrary.org/obo/HP_0000811"/>
+        <rdfs:subClassOf rdf:resource="http://purl.obolibrary.org/obo/HP_0010460"/>
+        <obo:IAO_0000115 rdf:datatype="http://www.w3.org/2001/XMLSchema#string">An abnormality of the female external genitalia.</obo:IAO_0000115>
+        <oboInOwl:id rdf:datatype="http://www.w3.org/2001/XMLSchema#string">HP:0000055</oboInOwl:id>
+        <oboInOwl:hasDbXref rdf:datatype="http://www.w3.org/2001/XMLSchema#string">UMLS:C4021822</oboInOwl:hasDbXref>
+        <oboInOwl:hasOBONamespace rdf:datatype="http://www.w3.org/2001/XMLSchema#string">human_phenotype</oboInOwl:hasOBONamespace>
+        <oboInOwl:hasExactSynonym>Abnormal female external genitalia</oboInOwl:hasExactSynonym>
+    </owl:Class>
+
+    <!-- http://purl.obolibrary.org/obo/HP_0000058 -->
+
+    <owl:Class rdf:about="http://purl.obolibrary.org/obo/HP_0000058">
+      <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Abnormality of the labia</rdfs:label>
+      <rdfs:subClassOf rdf:resource="http://purl.obolibrary.org/obo/HP_0000055"/>
+      <obo:IAO_0000115 rdf:datatype="http://www.w3.org/2001/XMLSchema#string">An anomaly of the labia, the externally visible portions of the vulva.</obo:IAO_0000115>
+      <oboInOwl:id rdf:datatype="http://www.w3.org/2001/XMLSchema#string">HP:0000058</oboInOwl:id>
+      <oboInOwl:hasDbXref rdf:datatype="http://www.w3.org/2001/XMLSchema#string">UMLS:C4025892</oboInOwl:hasDbXref>
+      <oboInOwl:hasOBONamespace rdf:datatype="http://www.w3.org/2001/XMLSchema#string">human_phenotype</oboInOwl:hasOBONamespace>
+    </owl:Class>
 
 </rdf:RDF>
