@@ -1,6 +1,7 @@
 import json
 import os
 import pytest
+import copy
 from io import StringIO
 
 from collections import OrderedDict
@@ -789,7 +790,6 @@ def test_id_post_and_patch_no_changes(mocker, terms, mock_logger):
 
 
 def test_id_post_and_patch_w_new_term(mocker, terms, mock_logger):
-    import copy
     dbterms = copy.deepcopy(terms)
     for i, tid in enumerate(dbterms.keys()):
         dbterms[tid].update({'uuid': 'uuid' + str(i + 1)})
@@ -806,7 +806,6 @@ def test_id_post_and_patch_w_new_term(mocker, terms, mock_logger):
 
 
 def test_id_post_and_patch_w_patch_term(mocker, terms, mock_logger):
-    import copy
     dbterms = copy.deepcopy(terms)
     added_field = {'definition': 'this is what it means'}
     for i, tid in enumerate(dbterms.keys()):
@@ -831,7 +830,6 @@ def test_id_post_and_patch_set_obsolete_true_obsolete(mocker, terms, mock_logger
     """ if set_obsolete is true (the default) then the extra dbterm should be added
         to patches as a term to set to obsolete
     """
-    import copy
     dbterms = copy.deepcopy(terms)
     added_obs = {'hpo_id': 'hp:10', 'definition': 'soon to be obsolete'}
     dbterms.update({added_obs['hpo_id']: added_obs})
@@ -851,7 +849,6 @@ def test_id_post_and_patch_set_obsolete_false_do_not_obsolete_live_term(mocker, 
     """ if set_obsolete is false then the extra dbterm should not be added to patches
         as a term to set to obsolete as long as it's status is not obsolete or deleted
     """
-    import copy
     dbterms = copy.deepcopy(terms)
     added_obs = {'hpo_id': 'hp:10', 'definition': 'soon to be obsolete'}
     dbterms.update({added_obs['hpo_id']: added_obs})
@@ -867,7 +864,6 @@ def test_id_post_and_patch_set_obsolete_true_do_not_patch_obsolete_term(mocker, 
     """ if set_obsolete is True then the extra dbterm should not be added to patches
         if it's already status = obsolete
     """
-    import copy
     dbterms = copy.deepcopy(terms)
     added_obs = {'hpo_id': 'hp:10', 'definition': 'already obsolete', 'status': 'obsolete'}
     dbterms.update({added_obs['hpo_id']: added_obs})
@@ -891,7 +887,6 @@ def test_write_outfile_pretty(simple_terms):
 
 
 def test_write_outfile_notpretty(simple_terms):
-    # import pdb; pdb.set_trace()
     print(simple_terms)
     filename = 'tmp_test_file'
     gifo.write_outfile(list(simple_terms.values()), filename)

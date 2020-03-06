@@ -47,6 +47,12 @@ FIELD_MAPPING = {
     'Biocuration': 'curation_history'
 }
 
+''' Field that needs to be skipped or only used for logging missing info
+'''
+DIS_NAME_FIELD_FROM_INPUT = 'DiseaseName'
+
+''' Relationship to use in the Evidence Item for making evidence links between ITEMS
+'''
 RELATION = 'associated with'
 
 
@@ -91,8 +97,8 @@ def get_logger(lname, logfile):
 
 
 def get_items_from_db_keyed_by_field(connection, itype, keyfield):
-    """ Returns all the items of the given type in the db as a dictionary
-        keyed by the given field
+    """ Returns returns a dictionary keyed by the given field
+        for each item in the database of the specified itype
     """
     q = 'search/?type={}'.format(itype)
     return {i.get(keyfield): i for i in search_metadata(q, connection, page_limit=200, is_generator=True)}
@@ -143,8 +149,12 @@ def line2list(line):
     return [d.strip() for d in line.split('\t')]
 
 
-def check_fields(data):
-    return [f for f in data if (f != 'DiseaseName' and f not in FIELD_MAPPING)]
+def has_unexpected_fields(data):
+    ''' Checks keys of dict to make sure that the keys correspond to a field from the
+        expected field mapping
+        return True if unexpected fields found
+    '''
+    return [f for f in data if (f != DIS_NAME_FIELD_FROM_INPUT and f not in FIELD_MAPPING)]
 
 
 def get_header_info_and_field_names(lines, logger):
@@ -164,7 +174,7 @@ def get_header_info_and_field_names(lines, logger):
             _, fdesc = line.split(fdtag)
     logger.info("Annotation file info:\n\tdate: {}\n\tdescription: {}".format(date, fdesc))
     fields = line2list(line)
-    bad_fields = check_fields(fields)
+    bad_fields = has_unexpected_fields(fields)
     if bad_fields:
         logger.error("UNKNOWN FIELDS FOUND: {}".format(', '.join(bad_fields)))
         sys.exit()
@@ -206,7 +216,7 @@ def create_evi_annotation(data, hpoid2uuid, problems):
     HP_REGEX = re.compile('^HP:[0-9]{7}')
     pheno_annot = {}
     for f, v in data.items():
-        if not v or (f == 'DiseaseName'):
+        if not v or (f == DIS_NAME_FIELD_FROM_INPUT):
             continue
         if f in ['subject_item', 'object_item']:
             cgf = f
@@ -285,7 +295,7 @@ def log_problems(logger, problems):
         logger.info("{} redundant annotations found".format(len(dup_annots)))
     unmapped_dis = problems.get('no_map')
     if unmapped_dis:
-        udis = {u.get('DatabaseID'): u.get('DiseaseName') for u in unmapped_dis}
+        udis = {u.get('DatabaseID'): u.get(DIS_NAME_FIELD_FROM_INPUT) for u in unmapped_dis}
         logger.info("{} disorders from {} annotation lines not found by xref".format(len(udis), len(unmapped_dis)))
         for d in sorted(list(udis.keys())):
             logger.info('{}\t{}'.format(d, udis[d]))

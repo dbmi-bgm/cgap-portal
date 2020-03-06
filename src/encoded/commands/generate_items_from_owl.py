@@ -399,10 +399,16 @@ def id_fields2patch(term, dbterm, rm_unch):
         return term
 
 
-def id_post_and_patch(terms, dbterms, itype, rm_unchanged=True, set_obsoletes=True, logger=None):
-    '''compares terms to terms that are already in db - if no change
-        removes them from the list of updates, if new adds to post dict,
-        if changed adds uuid and add to patch dict
+def identify_item_updates(terms, dbterms, itype, rm_unchanged=True, set_obsoletes=True, logger=None):
+    ''' compares items generated from the owl file to items of that type that are already in db
+        - if item is in the db and has not changed and rm_unchanged is True items are removed
+          from the items to be updated
+        - if rm_unchanged is False all items are added to the updates
+        - if an item is not in the db it is added to the updates
+        - if there are values of fields that are obtained from the owl file that are different from the values
+          in the same fields in the item from the db those fields are added as a patch to the updates
+        - if set_obsoletes is True (the default) then an item that exists in the db that is not present
+          in the items created from the owl is added as a patch to obsolete status to the updates
     '''
     to_update = []
     to_post = []
@@ -709,7 +715,7 @@ def main():
         filter_unchanged = True
         if args.full:
             filter_unchanged = False
-        items2upd = id_post_and_patch(terms, db_terms, itype, filter_unchanged, logger=logger)
+        items2upd = identify_item_updates(terms, db_terms, itype, filter_unchanged, logger=logger)
         pretty = False
         if args.pretty:
             pretty = True
