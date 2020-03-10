@@ -46,6 +46,8 @@
                 "blacklisted regions",
                 "repeats",
                 "spike-in",
+                "annotation source",
+                "micro-annotation source",
                 "other"
             ]
         },
