@@ -4,8 +4,8 @@ import six
 import json
 import argparse
 import logging
-from pyramid.paster import get_app
-from webtest import TestApp
+#from pyramid.paster import get_app
+#from webtest import TestApp
 from collections import OrderedDict, Mapping
 
 logger = logging.getLogger(__name__)
@@ -26,7 +26,7 @@ class MappingTableParser(object):
     """
     HEADER_ROW_INDEX = 2
     FIELD_TYPE_INDEX = 5  # XXX: hardcoded, must change if field_type is moved on mapping table
-    INTEGER_FIELDS = ['no', 'max_size', 'column_priority', 'facet_priority']
+    INTEGER_FIELDS = ['no', 'maximum_length_of_value', 'column_priority', 'facet_priority']
     BOOLEAN_FIELDS = ['is_list', 'calculated_property']
 
     def __init__(self, _mp, schema):
@@ -197,12 +197,11 @@ class MappingTableParser(object):
                     features[a_field] = item[a_field]
 
             # handle int fields
-            for a_field in ['max_size', 'column_priority', 'facet_priority']:
+            for a_field in ['maximum_length_of_value', 'column_priority', 'facet_priority']:
                 if item.get(a_field):
                     features[a_field] = int(item[a_field])
 
-            if variant:
-
+            if True:
                 # handle sub_embedded object
                 if item.get('sub_embedding_group'):
                     sub_temp = OrderedDict()
@@ -321,7 +320,7 @@ class MappingTableParser(object):
                 else:
                     continue
             else:
-                props.update(get_prop(obj))
+                update(props, get_prop(obj))
                 if not is_variant(obj) and is_facet(obj):
                     insert_column_or_facet(facs, obj)
                 if not is_variant(obj) and is_column(obj):

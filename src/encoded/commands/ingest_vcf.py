@@ -319,6 +319,8 @@ class VCFParser(object):
         for vcf_key in self.VCF_FIELDS:
             if vcf_key == 'ALT':  # requires special care
                 result[vcf_key] = getattr(record, vcf_key)[0].sequence
+            elif vcf_key == 'CHROM':
+                result[vcf_key] = getattr(record, vcf_key)[3:]  # XXX: splice chr off for now
             else:
                 result[vcf_key] = getattr(record, vcf_key) or ''
         for key in self.format.keys():
@@ -421,9 +423,23 @@ class VCFParser(object):
                         s[field.upper()] = self.cast_field_value(prop_type, val)
                 if field in self.VCF_SAMPLE_FIELDS:
                     if field == 'FILTER':  # XXX: default to PASS, should handle on all fields generally
-                        s[field] = getattr(record, field) or 'PASS'
+                        if getattr(record, field):
+                            s[field] = getattr(record, field)[0]
+                        else:
+                            s[field] = 'PASS'
                     else:
                         s[field] = getattr(record, field) or ''
+                if field == 'samplegeno':  # XXX: should be refactored
+                    genotypes = record.INFO.get('SAMPLEGENO')
+                    s['samplegeno'] = []
+                    for gt in genotypes:
+                        numgt, gt, ad = gt.split('|')
+                        tmp = dict()
+                        tmp['NUMGT'] = numgt
+                        tmp['GT'] = gt
+                        tmp['AD'] = ad
+                        s['samplegeno'].append(tmp)
+
             self.parse_samples(s, sample)  # add sample fields, already formatted
             del s['AF']  # XXX: comes from VCF but is not actually what we want. Get rid of it.
 

@@ -57,16 +57,15 @@ def test_VCFP_one_variant(test_vcf):
     # check top level fields
     assert result['CHROM'] == '1'
     assert result['cytoband_cytoband'] == '1p36.33'
-    assert result['conservation_phastcons30'] == 0.283
-    assert result['clinvar_clnhgvs'] == 'NC_000001.11:g.1014359G>T'
+    assert result['conservation_phastcons30'] == 0.133
+    assert result['clinvar_clnhgvs'] == 'NC_000001.11:g.1014143C>T'
     assert result['clinvar_clndn'] == ['Immunodeficiency_38_with_basal_ganglia_calcification']
 
     # check sub-embedded object fields
     assert result['transcript'][0]['vep_consequence'] == ['upstream_gene_variant']
     assert result['transcript'][0]['vep_impact'] == 'MODIFIER'
-    assert result['transcript'][0]['vep_pubmed'] == ['29618732', '25307056', '22859821']
-    assert result['transcript'][0]['vep_tssdistance'] == 1166
-    assert result['transcript'][0]['vep_somatic'] == [False, False, True]
+    assert result['transcript'][0]['vep_pubmed'] == ['25307056']
+    assert result['transcript'][0]['vep_tssdistance'] == 950
     assert result['transcript'][1]['vep_symbol'] == 'ISG15'
 
 def test_VCFP_multiple_variants(test_vcf):
@@ -77,18 +76,20 @@ def test_VCFP_multiple_variants(test_vcf):
     # check record 2
     record = test_vcf.read_next_record()
     result = test_vcf.create_variant_from_record(record)
-    assert len(result['transcript'].keys()) == 2
-    assert result['transcript'][0]['vep_consequence'] == ['missense_variant']
-    assert result['transcript'][0]['vep_feature'] == 'ENST00000379370'
-    assert result['transcript'][0]['vep_domains'] == ['Gene3D:2.40.50.120', 'Pfam:PF03146',
-                                                      'PROSITE_profiles:PS51121', 'Superfamily:SSF50242']
-    assert result['transcript'][1]['vep_hgnc_id'] == 'HGNC:329'
+    assert len(result['transcript'].keys()) == 5
+    assert result['transcript'][0]['vep_consequence'] == ['upstream_gene_variant']
+    assert result['transcript'][0]['vep_feature'] == 'ENST00000458555'
+    assert result['transcript'][1]['vep_domains'] == ['Gene3D:3.10.20.90', 'Pfam:PF00240',
+                                                      'PROSITE_profiles:PS50053', 'PANTHER:PTHR10666',
+                                                      'PANTHER:PTHR10666:SF267', 'SMART:SM00213',
+                                                      'Superfamily:SSF54236', 'CDD:cd01810']
+    assert result['transcript'][1]['vep_hgnc_id'] == 'HGNC:4053'
     assert result['transcript'][1]['vep_clin_sig'] == 'pathogenic'
-    assert result['conservation_phylop20'] == 1.048
-    assert result['conservation_phylop30'] == 1.175
-    assert result['clinvar_clnhgvs'] == 'NC_000001.11:g.1022225G>A'
+    assert result['conservation_phylop20'] == -0.903
+    assert result['conservation_phylop30'] == -0.772
+    assert result['clinvar_clnhgvs'] == 'NC_000001.11:g.1014359G>T'
     assert result['clinvar_clnrevstat'] == ['no_assertion_criteria_provided']
-    assert result['conservation_phastcons100'] == 1.0
+    assert result['conservation_phastcons100'] == 0.0
 
     # check record 3
     record = test_vcf.read_next_record()
@@ -97,13 +98,12 @@ def test_VCFP_multiple_variants(test_vcf):
     assert result['transcript'][0]['vep_consequence'] == ['missense_variant']
     assert result['transcript'][0]['vep_feature'] == 'ENST00000379370'
     assert result['transcript'][0]['vep_domains'] == ['Gene3D:2.40.50.120', 'Pfam:PF03146',
-                                                      'PROSITE_profiles:PS51121', 'PANTHER:PTHR10574',
-                                                      'PANTHER:PTHR10574:SF288', 'Superfamily:SSF50242']
+                                                      'PROSITE_profiles:PS51121', 'Superfamily:SSF50242']
     assert result['transcript'][1]['vep_trembl'] == 'A0A087X208'
     assert result['clinvar_geneinfo'] == 'AGRN:375790'
     assert result['spliceai_ds_dl'] == 0.0
-    assert result['cadd_phred'] == 29.0
-    assert result['spliceai_dp_ag'] == 5
+    assert result['cadd_phred'] == 32.0
+    assert result['spliceai_dp_ag'] == -24
     assert result['CHROM'] == '1'
 
 
@@ -115,13 +115,17 @@ def test_VCFP_multiple_sample_variants(test_vcf):
         assert sample['GT'] != '0/0'  # this VCF has one of these that should be dropped
     record = test_vcf.read_next_record()
     result = test_vcf.create_sample_variant_from_record(record)[0]
-    assert result['DP'] == 70
+    assert result['DP'] == 1
     assert result['GT'] == '1/1'
-    assert result['GQ'] == 99
-    assert result['PL'] == '2839,211,0'
+    assert result['GQ'] == 6
+    assert result['PL'] == '73,6,0'
     record = test_vcf.read_next_record()
     result = test_vcf.create_sample_variant_from_record(record)[0]
-    assert result['DP'] == 66
+    assert result['DP'] == 70
+    assert len(result['samplegeno']) == 3
+    assert 'NUMGT' in result['samplegeno'][0]
+    assert 'AD' in result['samplegeno'][0]
+    assert 'GT' in result['samplegeno'][0]
 
 
 def test_VCFP_post_sample_variants(testapp, institution, project, test_vcf):
@@ -143,7 +147,10 @@ def test_VCFP_post_variants(testapp, institution, project, test_vcf, post_varian
         variant['project'] = 'encode-project'
         variant['institution'] = 'encode-institution'
         test_vcf.format_variant(variant)
-        testapp.post_json(CONNECTION_URL, variant, status=201)
+        try:
+            testapp.post_json(CONNECTION_URL, variant, status=201)
+        except:
+            import pdb; pdb.set_trace()
 
 
 def test_VCFP_run(testapp, institution, project, test_vcf, post_variant_consequence_items):
@@ -152,8 +159,8 @@ def test_VCFP_run(testapp, institution, project, test_vcf, post_variant_conseque
         check to see that we get the 3 that we expect and they post correctly
     """
     vss, vs = test_vcf.run(project='encode-project', institution='encode-institution')
-    assert len(vss) == 2219
-    assert len(vs) == 965
+    assert len(vss) == 20
+    assert len(vs) == 11
     for v in vs:
         testapp.post_json('/variant', v, status=201)
     for vs in vss:

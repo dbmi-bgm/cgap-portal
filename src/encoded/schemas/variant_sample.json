@@ -163,6 +163,40 @@
             "source_version": "VCFv4.2",
             "column_priority": 5
         },
+        "samplegeno": {
+            "title": "Samplegeno",
+            "type": "array",
+            "items": {
+                "title": "Samplegeno",
+                "type": "object",
+                "properties": {
+                    "NUMGT": {
+                        "title": "NUMGT",
+                        "vcf_name": "NUMGT",
+                        "type": "string",
+                        "description": "Sample genotype (number format)",
+                        "source_name": "SAMPLEGENO",
+                        "source_version": "v0.2"
+                    },
+                    "GT": {
+                        "title": "GT",
+                        "vcf_name": "GT",
+                        "type": "string",
+                        "description": "Sample genotype (nucletide format)",
+                        "source_name": "SAMPLEGENO",
+                        "source_version": "v0.2"
+                    },
+                    "AD": {
+                        "title": "AD",
+                        "vcf_name": "AD",
+                        "type": "string",
+                        "description": "Allelic depth",
+                        "source_name": "SAMPLEGENO",
+                        "source_version": "v0.2"
+                    }
+                }
+            }
+        },
         "RSTR": {
             "title": "RSTR",
             "vcf_name": "RSTR",
@@ -203,19 +237,16 @@
     },
     "columns": {
         "DP": {
-            "title": "DP",
-            "aggregation_type": "stats"
+            "title": "DP"
         },
         "AF": {
-            "title": "AF",
-            "aggregation_type": "stats"
+            "title": "AF"
         },
         "variant.CHROM": {
             "title": "CHROM"
         },
         "variant.POS": {
-            "title": "POS",
-            "aggregation_type": "stats"
+            "title": "POS"
         },
         "variant.REF": {
             "title": "REF"
@@ -237,15 +268,18 @@
         },
         "variant.conservation_phastcons100": {
             "title": "conservation_phastcons100",
-            "aggregation_type": "stats"
+            "aggregation_type": "stats",
+            "number_step": "any"
         },
         "variant.cadd_phred": {
             "title": "cadd_phred",
-            "aggregation_type": "stats"
+            "aggregation_type": "stats",
+            "number_step": "any"
         },
         "variant.max_pop_af_af_popmax": {
             "title": "max_pop_af_af_popmax",
-            "aggregation_type": "stats"
+            "aggregation_type": "stats",
+            "number_step": "any"
         }
     },
     "facets": {
@@ -260,15 +294,18 @@
         },
         "variant.conservation_phastcons100": {
             "title": "conservation_phastcons100",
-            "aggregation_type": "stats"
+            "aggregation_type": "stats",
+            "number_step": "any"
         },
         "variant.cadd_phred": {
             "title": "cadd_phred",
-            "aggregation_type": "stats"
+            "aggregation_type": "stats",
+            "number_step": "any"
         },
         "variant.max_pop_af_af_popmax": {
             "title": "max_pop_af_af_popmax",
-            "aggregation_type": "stats"
+            "aggregation_type": "stats",
+            "number_step": "any"
         }
     }
 }

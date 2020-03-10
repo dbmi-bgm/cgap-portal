@@ -77,7 +77,7 @@
             ],
             "source_name": "VCF",
             "source_version": "VCFv4.2",
-            "max_size": 2,
+            "maximum_length_of_value": 2,
             "column_priority": 1
         },
         "POS": {
@@ -135,7 +135,7 @@
                             "source_version": "v98.4",
                             "separator": "tilde",
                             "embedded_fields": "definition",
-                            "max_size": 66,
+                            "maximum_length_of_value": 66,
                             "column_priority": 7,
                             "facet_priority": 2
                         }
@@ -147,7 +147,7 @@
                         "description": "Subjective impact classification of consequence type",
                         "source_name": "VEP",
                         "source_version": "v98.4",
-                        "max_size": 8
+                        "maximum_length_of_value": 8
                     },
                     "vep_symbol": {
                         "title": "vep_symbol",
@@ -156,7 +156,7 @@
                         "description": "Gene symbol (e.g. HGNC)",
                         "source_name": "VEP",
                         "source_version": "v98.4",
-                        "max_size": 10,
+                        "maximum_length_of_value": 10,
                         "column_priority": 8,
                         "facet_priority": 1
                     },
@@ -167,7 +167,7 @@
                         "description": "Stable ID of affected gene",
                         "source_name": "VEP",
                         "source_version": "v98.4",
-                        "max_size": 15
+                        "maximum_length_of_value": 15
                     },
                     "vep_gene_ncbi": {
                         "title": "vep_gene_ncbi",
@@ -176,7 +176,7 @@
                         "description": "Stable ID of feature",
                         "source_name": "VEP",
                         "source_version": "v98.4",
-                        "max_size": 9
+                        "maximum_length_of_value": 9
                     },
                     "vep_feature_type": {
                         "title": "vep_feature_type",
@@ -185,7 +185,7 @@
                         "description": "Type of feature - Transcript, RegulatoryFeature or MotifFeature",
                         "source_name": "VEP",
                         "source_version": "v98.4",
-                        "max_size": 17
+                        "maximum_length_of_value": 17
                     },
                     "vep_feature": {
                         "title": "vep_feature",
@@ -194,7 +194,7 @@
                         "description": "Stable ID of feature",
                         "source_name": "VEP",
                         "source_version": "v98.4",
-                        "max_size": 15
+                        "maximum_length_of_value": 15
                     },
                     "vep_feature_ncbi": {
                         "title": "vep_feature_ncbi",
@@ -203,7 +203,7 @@
                         "description": "Stable ID of feature",
                         "source_name": "VEP",
                         "source_version": "v98.4",
-                        "max_size": 12
+                        "maximum_length_of_value": 12
                     },
                     "vep_biotype": {
                         "title": "vep_biotype",
@@ -212,7 +212,7 @@
                         "description": "Biotype of transcript or regulatory feature",
                         "source_name": "VEP",
                         "source_version": "v98.4",
-                        "max_size": 34
+                        "maximum_length_of_value": 34
                     },
                     "vep_exon": {
                         "title": "vep_exon",
@@ -221,7 +221,7 @@
                         "description": "Exon number(s) / total",
                         "source_name": "VEP",
                         "source_version": "v98.4",
-                        "max_size": 6
+                        "maximum_length_of_value": 6
                     },
                     "vep_intron": {
                         "title": "vep_intron",
@@ -230,7 +230,7 @@
                         "description": "Intron number(s) / total",
                         "source_name": "VEP",
                         "source_version": "v98.4",
-                        "max_size": 6
+                        "maximum_length_of_value": 6
                     },
                     "vep_hgvsc": {
                         "title": "vep_hgvsc",
@@ -239,7 +239,7 @@
                         "description": "HGVS coding sequence name",
                         "source_name": "VEP",
                         "source_version": "v98.4",
-                        "max_size": 34,
+                        "maximum_length_of_value": 34,
                         "column_priority": 10
                     },
                     "vep_hgvsp": {
@@ -249,7 +249,7 @@
                         "description": "HGVS protein sequence name",
                         "source_name": "VEP",
                         "source_version": "v98.4",
-                        "max_size": 38
+                        "maximum_length_of_value": 38
                     },
                     "vep_cdna_position": {
                         "title": "vep_cdna_position",
@@ -258,7 +258,7 @@
                         "description": "Relative position of base pair in cDNA sequence",
                         "source_name": "VEP",
                         "source_version": "v98.4",
-                        "max_size": 5
+                        "maximum_length_of_value": 5
                     },
                     "vep_cds_position": {
                         "title": "vep_cds_position",
@@ -267,7 +267,7 @@
                         "description": "Relative position of base pair in coding sequence",
                         "source_name": "VEP",
                         "source_version": "v98.4",
-                        "max_size": 5
+                        "maximum_length_of_value": 5
                     },
                     "vep_protein_position": {
                         "title": "vep_protein_position",
@@ -276,7 +276,7 @@
                         "description": "Relative position of amino acid in protein",
                         "source_name": "VEP",
                         "source_version": "v98.4",
-                        "max_size": 4
+                        "maximum_length_of_value": 4
                     },
                     "vep_amino_acids": {
                         "title": "vep_amino_acids",
@@ -285,7 +285,7 @@
                         "description": "Reference and variant amino acids",
                         "source_name": "VEP",
                         "source_version": "v98.4",
-                        "max_size": 3
+                        "maximum_length_of_value": 3
                     },
                     "vep_codons": {
                         "title": "vep_codons",
@@ -294,7 +294,7 @@
                         "description": "Reference and variant codon sequence",
                         "source_name": "VEP",
                         "source_version": "v98.4",
-                        "max_size": 7
+                        "maximum_length_of_value": 7
                     },
                     "vep_distance": {
                         "title": "vep_distance",
@@ -303,7 +303,7 @@
                         "description": "Shortest distance from variant to transcript",
                         "source_name": "VEP",
                         "source_version": "v98.4",
-                        "max_size": 4
+                        "maximum_length_of_value": 4
                     },
                     "vep_strand": {
                         "title": "vep_strand",
@@ -312,7 +312,7 @@
                         "description": "Strand of the feature",
                         "source_name": "VEP",
                         "source_version": "v98.4",
-                        "max_size": 1
+                        "maximum_length_of_value": 1
                     },
                     "vep_variant_class": {
                         "title": "vep_variant_class",
@@ -321,7 +321,7 @@
                         "description": "SO variant class",
                         "source_name": "VEP",
                         "source_version": "v98.4",
-                        "max_size": 3,
+                        "maximum_length_of_value": 3,
                         "column_priority": 13,
                         "facet_priority": 6
                     },
@@ -332,7 +332,7 @@
                         "description": "Stable identifer of HGNC gene symbol",
                         "source_name": "VEP",
                         "source_version": "v98.4",
-                        "max_size": 10
+                        "maximum_length_of_value": 10
                     },
                     "vep_canonical": {
                         "title": "vep_canonical",
@@ -341,7 +341,7 @@
                         "description": "Indicates if transcript is canonical for this gene",
                         "source_name": "VEP",
                         "source_version": "v98.4",
-                        "max_size": 1
+                        "maximum_length_of_value": 1
                     },
                     "vep_tsl": {
                         "title": "vep_tsl",
@@ -350,7 +350,7 @@
                         "description": "Transcript support level",
                         "source_name": "VEP",
                         "source_version": "v98.4",
-                        "max_size": 1
+                        "maximum_length_of_value": 1
                     },
                     "vep_ccds": {
                         "title": "vep_ccds",
@@ -359,7 +359,7 @@
                         "description": "Indicates if transcript is a CCDS transcript",
                         "source_name": "VEP",
                         "source_version": "v98.4",
-                        "max_size": 11
+                        "maximum_length_of_value": 11
                     },
                     "vep_ensp": {
                         "title": "vep_ensp",
@@ -368,7 +368,7 @@
                         "description": "Protein identifer",
                         "source_name": "VEP",
                         "source_version": "v98.4",
-                        "max_size": 15
+                        "maximum_length_of_value": 15
                     },
                     "vep_swissprot": {
                         "title": "vep_swissprot",
@@ -377,7 +377,7 @@
                         "description": "UniProtKB/Swiss-Prot accession",
                         "source_name": "VEP",
                         "source_version": "v98.4",
-                        "max_size": 13
+                        "maximum_length_of_value": 13
                     },
                     "vep_trembl": {
                         "title": "vep_trembl",
@@ -386,7 +386,7 @@
                         "description": "UniProtKB/TrEMBL accession",
                         "source_name": "VEP",
                         "source_version": "v98.4",
-                        "max_size": 10
+                        "maximum_length_of_value": 10
                     },
                     "vep_uniparc": {
                         "title": "vep_uniparc",
@@ -395,7 +395,7 @@
                         "description": "UniParc accession",
                         "source_name": "VEP",
                         "source_version": "v98.4",
-                        "max_size": 13
+                        "maximum_length_of_value": 13
                     },
                     "vep_sift": {
                         "title": "vep_sift",
@@ -404,7 +404,7 @@
                         "description": "SIFT prediction and/or score",
                         "source_name": "VEP",
                         "source_version": "v98.4",
-                        "max_size": 32
+                        "maximum_length_of_value": 32
                     },
                     "vep_polyphen": {
                         "title": "vep_polyphen",
@@ -413,7 +413,7 @@
                         "description": "PolyPhen prediction and/or score",
                         "source_name": "VEP",
                         "source_version": "v98.4",
-                        "max_size": 24
+                        "maximum_length_of_value": 24
                     },
                     "vep_domains": {
                         "title": "vep_domains",
@@ -426,7 +426,7 @@
                             "source_name": "VEP",
                             "source_version": "v98.4",
                             "separator": "tilde",
-                            "max_size": 629
+                            "maximum_length_of_value": 629
                         }
                     },
                     "vep_mirna": {
@@ -436,7 +436,7 @@
                         "description": "SO terms of overlapped miRNA secondary structure feature(s)",
                         "source_name": "VEP",
                         "source_version": "v98.4",
-                        "max_size": 10
+                        "maximum_length_of_value": 10
                     },
                     "vep_hgvs_offset": {
                         "title": "vep_hgvs_offset",
@@ -453,7 +453,7 @@
                         "description": "ClinVar clinical significance of the dbSNP variant",
                         "source_name": "VEP",
                         "source_version": "v98.4",
-                        "max_size": 81
+                        "maximum_length_of_value": 81
                     },
                     "vep_somatic": {
                         "title": "vep_somatic",
@@ -466,7 +466,7 @@
                             "source_name": "VEP",
                             "source_version": "v98.4",
                             "separator": "tilde",
-                            "max_size": 9
+                            "maximum_length_of_value": 9
                         }
                     },
                     "vep_pheno": {
@@ -480,7 +480,7 @@
                             "source_name": "VEP",
                             "source_version": "v98.4",
                             "separator": "tilde",
-                            "max_size": 9
+                            "maximum_length_of_value": 9
                         }
                     },
                     "vep_pubmed": {
@@ -494,7 +494,7 @@
                             "source_name": "VEP",
                             "source_version": "v98.4",
                             "separator": "tilde",
-                            "max_size": 233
+                            "maximum_length_of_value": 233
                         }
                     },
                     "vep_motif_name": {
@@ -504,7 +504,7 @@
                         "description": "The source and identifier of a transcription factor binding profile (TFBP) aligned at this position",
                         "source_name": "VEP",
                         "source_version": "v98.4",
-                        "max_size": 15
+                        "maximum_length_of_value": 15
                     },
                     "vep_motif_pos": {
                         "title": "vep_motif_pos",
@@ -513,7 +513,7 @@
                         "description": "The relative position of the variation in the aligned TFBP",
                         "source_name": "VEP",
                         "source_version": "v98.4",
-                        "max_size": 2
+                        "maximum_length_of_value": 2
                     },
                     "vep_high_inf_pos": {
                         "title": "vep_high_inf_pos",
@@ -522,7 +522,7 @@
                         "description": "A flag indicating if the variant falls in a high information position of the TFBP",
                         "source_name": "VEP",
                         "source_version": "v98.4",
-                        "max_size": 1
+                        "maximum_length_of_value": 1
                     },
                     "vep_motif_score_change": {
                         "title": "vep_motif_score_change",
@@ -531,7 +531,7 @@
                         "description": "The difference in motif score of the reference and variant sequences for the TFBP",
                         "source_name": "VEP",
                         "source_version": "v98.4",
-                        "max_size": 6
+                        "maximum_length_of_value": 6
                     },
                     "vep_maxentscan_alt": {
                         "title": "vep_maxentscan_alt",
@@ -540,7 +540,7 @@
                         "description": "MaxEntScan alternate sequence score",
                         "source_name": "VEP",
                         "source_version": "v98.4",
-                        "max_size": 7
+                        "maximum_length_of_value": 7
                     },
                     "vep_maxentscan_diff": {
                         "title": "vep_maxentscan_diff",
@@ -549,7 +549,7 @@
                         "description": "MaxEntScan score difference",
                         "source_name": "VEP",
                         "source_version": "v98.4",
-                        "max_size": 7
+                        "maximum_length_of_value": 7
                     },
                     "vep_maxentscan_ref": {
                         "title": "vep_maxentscan_ref",
@@ -558,7 +558,7 @@
                         "description": "MaxEntScan reference sequence score",
                         "source_name": "VEP",
                         "source_version": "v98.4",
-                        "max_size": 7
+                        "maximum_length_of_value": 7
                     },
                     "vep_tssdistance": {
                         "title": "vep_tssdistance",
@@ -567,7 +567,7 @@
                         "description": "Distance from the transcription start site",
                         "source_name": "VEP",
                         "source_version": "v98.4",
-                        "max_size": 4
+                        "maximum_length_of_value": 4
                     },
                     "vep_spliceregion": {
                         "title": "vep_spliceregion",
@@ -576,7 +576,7 @@
                         "description": "SpliceRegion predictions",
                         "source_name": "VEP",
                         "source_version": "v98.4",
-                        "max_size": 39
+                        "maximum_length_of_value": 39
                     }
                 }
             }
@@ -588,7 +588,7 @@
             "description": "cytoband",
             "source_name": "CYTOBAND",
             "source_version": "2017-07-17",
-            "max_size": 7
+            "maximum_length_of_value": 7
         },
         "uniprot_transmem_uniprotkb_ac": {
             "title": "uniprot_transmem_uniprotkb_ac",
@@ -597,7 +597,7 @@
             "description": "UniprotKB accession number",
             "source_name": "UNIPROT_TRANSMEM",
             "source_version": "2019-12-18",
-            "max_size": 10
+            "maximum_length_of_value": 10
         },
         "uniprot_transmem_annot_desc": {
             "title": "uniprot_transmem_annot_desc",
@@ -612,7 +612,7 @@
                 "source_name": "UNIPROT_TRANSMEM",
                 "source_version": "2019-12-18",
                 "separator": "tilde",
-                "max_size": 71
+                "maximum_length_of_value": 71
             }
         },
         "dbsnp_rs_number": {
@@ -622,7 +622,7 @@
             "description": "dbSNP RS number",
             "source_name": "DBSNP",
             "source_version": "20190722",
-            "max_size": 12
+            "maximum_length_of_value": 12
         },
         "conservation_phastcons100": {
             "title": "conservation_phastcons100",
@@ -631,7 +631,7 @@
             "description": "PhastCons 100 way score",
             "source_name": "CONSERVATION",
             "source_version": "2017-07-17",
-            "max_size": 5,
+            "maximum_length_of_value": 5,
             "column_priority": 12,
             "facet_priority": 5
         },
@@ -642,7 +642,7 @@
             "description": "PhastCons 30 way score",
             "source_name": "CONSERVATION",
             "source_version": "2017-07-17",
-            "max_size": 5
+            "maximum_length_of_value": 5
         },
         "conservation_phastcons20": {
             "title": "conservation_phastcons20",
@@ -651,7 +651,7 @@
             "description": "PhastCons 20 way score",
             "source_name": "CONSERVATION",
             "source_version": "2017-07-17",
-            "max_size": 5
+            "maximum_length_of_value": 5
         },
         "conservation_phylop100": {
             "title": "conservation_phylop100",
@@ -660,7 +660,7 @@
             "description": "PhyloP 100 way score",
             "source_name": "CONSERVATION",
             "source_version": "2017-07-17",
-            "max_size": 7
+            "maximum_length_of_value": 7
         },
         "conservation_phylop30": {
             "title": "conservation_phylop30",
@@ -669,7 +669,7 @@
             "description": "PhyloP 30 way score",
             "source_name": "CONSERVATION",
             "source_version": "2017-07-17",
-            "max_size": 7
+            "maximum_length_of_value": 7
         },
         "conservation_phylop20": {
             "title": "conservation_phylop20",
@@ -678,7 +678,7 @@
             "description": "PhyloP 20 way score",
             "source_name": "CONSERVATION",
             "source_version": "2017-07-17",
-            "max_size": 7
+            "maximum_length_of_value": 7
         },
         "conservation_gerp": {
             "title": "conservation_gerp",
@@ -687,7 +687,7 @@
             "description": "GERP score",
             "source_name": "CONSERVATION",
             "source_version": "2017-07-17",
-            "max_size": 9
+            "maximum_length_of_value": 9
         },
         "primateai_primatedl_score": {
             "title": "primateai_primatedl_score",
@@ -696,7 +696,7 @@
             "description": "PrimateAI score",
             "source_name": "PRIMATEAI",
             "source_version": "v0.2_hg38",
-            "max_size": 14
+            "maximum_length_of_value": 14
         },
         "cadd_phred": {
             "title": "cadd_phred",
@@ -705,7 +705,7 @@
             "description": "CADD Phred score",
             "source_name": "CADD",
             "source_version": "v1.5",
-            "max_size": 5,
+            "maximum_length_of_value": 5,
             "column_priority": 11,
             "facet_priority": 3
         },
@@ -716,7 +716,7 @@
             "description": "affected gene symbol",
             "source_name": "SPLICEAI",
             "source_version": "20191004",
-            "max_size": 10
+            "maximum_length_of_value": 10
         },
         "spliceai_ds_ag": {
             "title": "spliceai_ds_ag",
@@ -725,7 +725,7 @@
             "description": "delta scores (DS) for acceptor gain (AG)",
             "source_name": "SPLICEAI",
             "source_version": "20191004",
-            "max_size": 4
+            "maximum_length_of_value": 4
         },
         "spliceai_ds_al": {
             "title": "spliceai_ds_al",
@@ -734,7 +734,7 @@
             "description": "delta scores (DS) for acceptor loss (AL)",
             "source_name": "SPLICEAI",
             "source_version": "20191004",
-            "max_size": 4
+            "maximum_length_of_value": 4
         },
         "spliceai_ds_dg": {
             "title": "spliceai_ds_dg",
@@ -743,7 +743,7 @@
             "description": "delta scores (DS) for donor gain (DG)",
             "source_name": "SPLICEAI",
             "source_version": "20191004",
-            "max_size": 4
+            "maximum_length_of_value": 4
         },
         "spliceai_ds_dl": {
             "title": "spliceai_ds_dl",
@@ -752,7 +752,7 @@
             "description": "delta scores (DS) for donor loss (DL)",
             "source_name": "SPLICEAI",
             "source_version": "20191004",
-            "max_size": 4
+            "maximum_length_of_value": 4
         },
         "spliceai_dp_ag": {
             "title": "spliceai_dp_ag",
@@ -761,7 +761,7 @@
             "description": "delta positions (DP) for acceptor gain (AG)",
             "source_name": "SPLICEAI",
             "source_version": "20191004",
-            "max_size": 3
+            "maximum_length_of_value": 3
         },
         "spliceai_dp_al": {
             "title": "spliceai_dp_al",
@@ -770,7 +770,7 @@
             "description": "delta positions (DP) for acceptor loss (AL)",
             "source_name": "SPLICEAI",
             "source_version": "20191004",
-            "max_size": 3
+            "maximum_length_of_value": 3
         },
         "spliceai_dp_dg": {
             "title": "spliceai_dp_dg",
@@ -779,7 +779,7 @@
             "description": "delta positions (DP) for donor gain (DG)",
             "source_name": "SPLICEAI",
             "source_version": "20191004",
-            "max_size": 3
+            "maximum_length_of_value": 3
         },
         "spliceai_dp_dl": {
             "title": "spliceai_dp_dl",
@@ -788,7 +788,7 @@
             "description": "delta positions (DP) for donor loss (DL)",
             "source_name": "SPLICEAI",
             "source_version": "20191004",
-            "max_size": 3
+            "maximum_length_of_value": 3
         },
         "max_pop_af_af_popmax": {
             "title": "max_pop_af_af_popmax",
@@ -797,7 +797,7 @@
             "description": "maximum population allele frequency from gnomAD gnome v3.0",
             "source_name": "MAX_POP_AF",
             "source_version": "0.2",
-            "max_size": 11,
+            "maximum_length_of_value": 11,
             "column_priority": 9,
             "facet_priority": 4
         },
@@ -808,7 +808,7 @@
             "description": "Alternate allele count for samples",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
-            "max_size": 6
+            "maximum_length_of_value": 6
         },
         "gnomad_ac_afr": {
             "title": "gnomad_ac_afr",
@@ -817,7 +817,7 @@
             "description": "Alternate allele count for samples of African-American/African ancestry",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
-            "max_size": 5
+            "maximum_length_of_value": 5
         },
         "gnomad_ac_ami": {
             "title": "gnomad_ac_ami",
@@ -826,7 +826,7 @@
             "description": "Alternate allele count for samples of Amish ancestry",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
-            "max_size": 3
+            "maximum_length_of_value": 3
         },
         "gnomad_ac_amr": {
             "title": "gnomad_ac_amr",
@@ -835,7 +835,7 @@
             "description": "Alternate allele count for samples of Latino ancestry",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
-            "max_size": 5
+            "maximum_length_of_value": 5
         },
         "gnomad_ac_asj": {
             "title": "gnomad_ac_asj",
@@ -844,7 +844,7 @@
             "description": "Alternate allele count for samples of Ashkenazi Jewish ancestry",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
-            "max_size": 4
+            "maximum_length_of_value": 4
         },
         "gnomad_ac_eas": {
             "title": "gnomad_ac_eas",
@@ -853,7 +853,7 @@
             "description": "Alternate allele count for samples of East Asian ancestry",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
-            "max_size": 4
+            "maximum_length_of_value": 4
         },
         "gnomad_ac_fin": {
             "title": "gnomad_ac_fin",
@@ -862,7 +862,7 @@
             "description": "Alternate allele count for samples of Finnish ancestry",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
-            "max_size": 5
+            "maximum_length_of_value": 5
         },
         "gnomad_ac_nfe": {
             "title": "gnomad_ac_nfe",
@@ -871,7 +871,7 @@
             "description": "Alternate allele count for samples of Non-Finnish European ancestry",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
-            "max_size": 5
+            "maximum_length_of_value": 5
         },
         "gnomad_ac_sas": {
             "title": "gnomad_ac_sas",
@@ -880,7 +880,7 @@
             "description": "Alternate allele count for samples of South Asian ancestry",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
-            "max_size": 4
+            "maximum_length_of_value": 4
         },
         "gnomad_ac_oth": {
             "title": "gnomad_ac_oth",
@@ -889,7 +889,7 @@
             "description": "Alternate allele count for samples of Other ancestry",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
-            "max_size": 4
+            "maximum_length_of_value": 4
         },
         "gnomad_ac_male": {
             "title": "gnomad_ac_male",
@@ -898,7 +898,7 @@
             "description": "Alternate allele count for male samples",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
-            "max_size": 5
+            "maximum_length_of_value": 5
         },
         "gnomad_ac_afr_male": {
             "title": "gnomad_ac_afr_male",
@@ -907,7 +907,7 @@
             "description": "Alternate allele count for male samples of African-American/African ancestry",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
-            "max_size": 5
+            "maximum_length_of_value": 5
         },
         "gnomad_ac_ami_male": {
             "title": "gnomad_ac_ami_male",
@@ -916,7 +916,7 @@
             "description": "Alternate allele count for male samples of Amish ancestry",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
-            "max_size": 3
+            "maximum_length_of_value": 3
         },
         "gnomad_ac_amr_male": {
             "title": "gnomad_ac_amr_male",
@@ -925,7 +925,7 @@
             "description": "Alternate allele count for male samples of Latino ancestry",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
-            "max_size": 4
+            "maximum_length_of_value": 4
         },
         "gnomad_ac_asj_male": {
             "title": "gnomad_ac_asj_male",
@@ -934,7 +934,7 @@
             "description": "Alternate allele count for male samples of Ashkenazi Jewish ancestry",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
-            "max_size": 4
+            "maximum_length_of_value": 4
         },
         "gnomad_ac_eas_male": {
             "title": "gnomad_ac_eas_male",
@@ -943,7 +943,7 @@
             "description": "Alternate allele count for male samples of East Asian ancestry",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
-            "max_size": 4
+            "maximum_length_of_value": 4
         },
         "gnomad_ac_fin_male": {
             "title": "gnomad_ac_fin_male",
@@ -952,7 +952,7 @@
             "description": "Alternate allele count for male samples of Finnish ancestry",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
-            "max_size": 4
+            "maximum_length_of_value": 4
         },
         "gnomad_ac_nfe_male": {
             "title": "gnomad_ac_nfe_male",
@@ -961,7 +961,7 @@
             "description": "Alternate allele count for male samples of Non-Finnish European ancestry",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
-            "max_size": 5
+            "maximum_length_of_value": 5
         },
         "gnomad_ac_sas_male": {
             "title": "gnomad_ac_sas_male",
@@ -970,7 +970,7 @@
             "description": "Alternate allele count for male samples of South Asian ancestry",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
-            "max_size": 4
+            "maximum_length_of_value": 4
         },
         "gnomad_ac_oth_male": {
             "title": "gnomad_ac_oth_male",
@@ -979,7 +979,7 @@
             "description": "Alternate allele count for male samples of Other ancestry",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
-            "max_size": 4
+            "maximum_length_of_value": 4
         },
         "gnomad_ac_female": {
             "title": "gnomad_ac_female",
@@ -988,7 +988,7 @@
             "description": "Alternate allele count for female samples",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
-            "max_size": 5
+            "maximum_length_of_value": 5
         },
         "gnomad_ac_afr_female": {
             "title": "gnomad_ac_afr_female",
@@ -997,7 +997,7 @@
             "description": "Alternate allele count for female samples of African-American/African ancestry",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
-            "max_size": 5
+            "maximum_length_of_value": 5
         },
         "gnomad_ac_ami_female": {
             "title": "gnomad_ac_ami_female",
@@ -1006,7 +1006,7 @@
             "description": "Alternate allele count for female samples of Amish ancestry",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
-            "max_size": 3
+            "maximum_length_of_value": 3
         },
         "gnomad_ac_amr_female": {
             "title": "gnomad_ac_amr_female",
@@ -1015,7 +1015,7 @@
             "description": "Alternate allele count for female samples of Latino ancestry",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
-            "max_size": 4
+            "maximum_length_of_value": 4
         },
         "gnomad_ac_asj_female": {
             "title": "gnomad_ac_asj_female",
@@ -1024,7 +1024,7 @@
             "description": "Alternate allele count for female samples of Ashkenazi Jewish ancestry",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
-            "max_size": 4
+            "maximum_length_of_value": 4
         },
         "gnomad_ac_eas_female": {
             "title": "gnomad_ac_eas_female",
@@ -1033,7 +1033,7 @@
             "description": "Alternate allele count for female samples of East Asian ancestry",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
-            "max_size": 4
+            "maximum_length_of_value": 4
         },
         "gnomad_ac_fin_female": {
             "title": "gnomad_ac_fin_female",
@@ -1042,7 +1042,7 @@
             "description": "Alternate allele count for female samples of Finnish ancestry",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
-            "max_size": 4
+            "maximum_length_of_value": 4
         },
         "gnomad_ac_nfe_female": {
             "title": "gnomad_ac_nfe_female",
@@ -1051,7 +1051,7 @@
             "description": "Alternate allele count for female samples of Non-Finnish European ancestry",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
-            "max_size": 5
+            "maximum_length_of_value": 5
         },
         "gnomad_ac_sas_female": {
             "title": "gnomad_ac_sas_female",
@@ -1060,7 +1060,7 @@
             "description": "Alternate allele count for female samples of South Asian ancestry",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
-            "max_size": 3
+            "maximum_length_of_value": 3
         },
         "gnomad_ac_oth_female": {
             "title": "gnomad_ac_oth_female",
@@ -1069,7 +1069,7 @@
             "description": "Alternate allele count for female samples of Other ancestry",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
-            "max_size": 4
+            "maximum_length_of_value": 4
         },
         "gnomad_ac_raw": {
             "title": "gnomad_ac_raw",
@@ -1078,7 +1078,7 @@
             "description": "Alternate allele count for samples before removing low-confidence genotypes",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
-            "max_size": 6
+            "maximum_length_of_value": 6
         },
         "gnomad_an": {
             "title": "gnomad_an",
@@ -1087,7 +1087,7 @@
             "description": "Total number of alleles in samples",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
-            "max_size": 6
+            "maximum_length_of_value": 6
         },
         "gnomad_an_afr": {
             "title": "gnomad_an_afr",
@@ -1096,7 +1096,7 @@
             "description": "Total number of alleles in samples of African-American/African ancestry",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
-            "max_size": 5
+            "maximum_length_of_value": 5
         },
         "gnomad_an_ami": {
             "title": "gnomad_an_ami",
@@ -1105,7 +1105,7 @@
             "description": "Total number of alleles in samples of Amish ancestry",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
-            "max_size": 3
+            "maximum_length_of_value": 3
         },
         "gnomad_an_amr": {
             "title": "gnomad_an_amr",
@@ -1114,7 +1114,7 @@
             "description": "Total number of alleles in samples of Latino ancestry",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
-            "max_size": 5
+            "maximum_length_of_value": 5
         },
         "gnomad_an_asj": {
             "title": "gnomad_an_asj",
@@ -1123,7 +1123,7 @@
             "description": "Total number of alleles in samples of Ashkenazi Jewish ancestry",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
-            "max_size": 4
+            "maximum_length_of_value": 4
         },
         "gnomad_an_eas": {
             "title": "gnomad_an_eas",
@@ -1132,7 +1132,7 @@
             "description": "Total number of alleles in samples of East Asian ancestry",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
-            "max_size": 4
+            "maximum_length_of_value": 4
         },
         "gnomad_an_fin": {
             "title": "gnomad_an_fin",
@@ -1141,7 +1141,7 @@
             "description": "Total number of alleles in samples of Finnish ancestry",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
-            "max_size": 5
+            "maximum_length_of_value": 5
         },
         "gnomad_an_nfe": {
             "title": "gnomad_an_nfe",
@@ -1150,7 +1150,7 @@
             "description": "Total number of alleles in samples of Non-Finnish European ancestry",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
-            "max_size": 5
+            "maximum_length_of_value": 5
         },
         "gnomad_an_sas": {
             "title": "gnomad_an_sas",
@@ -1159,7 +1159,7 @@
             "description": "Total number of alleles in samples of South Asian ancestry",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
-            "max_size": 4
+            "maximum_length_of_value": 4
         },
         "gnomad_an_oth": {
             "title": "gnomad_an_oth",
@@ -1168,7 +1168,7 @@
             "description": "Total number of alleles in samples of Other ancestry",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
-            "max_size": 4
+            "maximum_length_of_value": 4
         },
         "gnomad_an_male": {
             "title": "gnomad_an_male",
@@ -1177,7 +1177,7 @@
             "description": "Total number of alleles in male samples",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
-            "max_size": 5
+            "maximum_length_of_value": 5
         },
         "gnomad_an_afr_male": {
             "title": "gnomad_an_afr_male",
@@ -1186,7 +1186,7 @@
             "description": "Total number of alleles in male samples of African-American/African ancestry",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
-            "max_size": 5
+            "maximum_length_of_value": 5
         },
         "gnomad_an_ami_male": {
             "title": "gnomad_an_ami_male",
@@ -1195,7 +1195,7 @@
             "description": "Total number of alleles in male samples of Amish ancestry",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
-            "max_size": 3
+            "maximum_length_of_value": 3
         },
         "gnomad_an_amr_male": {
             "title": "gnomad_an_amr_male",
@@ -1204,7 +1204,7 @@
             "description": "Total number of alleles in male samples of Latino ancestry",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
-            "max_size": 4
+            "maximum_length_of_value": 4
         },
         "gnomad_an_asj_male": {
             "title": "gnomad_an_asj_male",
@@ -1213,7 +1213,7 @@
             "description": "Total number of alleles in male samples of Ashkenazi Jewish ancestry",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
-            "max_size": 4
+            "maximum_length_of_value": 4
         },
         "gnomad_an_eas_male": {
             "title": "gnomad_an_eas_male",
@@ -1222,7 +1222,7 @@
             "description": "Total number of alleles in male samples of East Asian ancestry",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
-            "max_size": 4
+            "maximum_length_of_value": 4
         },
         "gnomad_an_fin_male": {
             "title": "gnomad_an_fin_male",
@@ -1231,7 +1231,7 @@
             "description": "Total number of alleles in male samples of Finnish ancestry",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
-            "max_size": 4
+            "maximum_length_of_value": 4
         },
         "gnomad_an_nfe_male": {
             "title": "gnomad_an_nfe_male",
@@ -1240,7 +1240,7 @@
             "description": "Total number of alleles in male samples of Non-Finnish European ancestry",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
-            "max_size": 5
+            "maximum_length_of_value": 5
         },
         "gnomad_an_sas_male": {
             "title": "gnomad_an_sas_male",
@@ -1249,7 +1249,7 @@
             "description": "Total number of alleles in male samples of South Asian ancestry",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
-            "max_size": 4
+            "maximum_length_of_value": 4
         },
         "gnomad_an_oth_male": {
             "title": "gnomad_an_oth_male",
@@ -1258,7 +1258,7 @@
             "description": "Total number of alleles in male samples of Other ancestry",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
-            "max_size": 4
+            "maximum_length_of_value": 4
         },
         "gnomad_an_female": {
             "title": "gnomad_an_female",
@@ -1267,7 +1267,7 @@
             "description": "Total number of alleles in female samples",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
-            "max_size": 5
+            "maximum_length_of_value": 5
         },
         "gnomad_an_afr_female": {
             "title": "gnomad_an_afr_female",
@@ -1276,7 +1276,7 @@
             "description": "Total number of alleles in female samples of African-American/African ancestry",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
-            "max_size": 5
+            "maximum_length_of_value": 5
         },
         "gnomad_an_ami_female": {
             "title": "gnomad_an_ami_female",
@@ -1285,7 +1285,7 @@
             "description": "Total number of alleles in female samples of Amish ancestry",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
-            "max_size": 3
+            "maximum_length_of_value": 3
         },
         "gnomad_an_amr_female": {
             "title": "gnomad_an_amr_female",
@@ -1294,7 +1294,7 @@
             "description": "Total number of alleles in female samples of Latino ancestry",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
-            "max_size": 4
+            "maximum_length_of_value": 4
         },
         "gnomad_an_asj_female": {
             "title": "gnomad_an_asj_female",
@@ -1303,7 +1303,7 @@
             "description": "Total number of alleles in female samples of Ashkenazi Jewish ancestry",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
-            "max_size": 4
+            "maximum_length_of_value": 4
         },
         "gnomad_an_eas_female": {
             "title": "gnomad_an_eas_female",
@@ -1312,7 +1312,7 @@
             "description": "Total number of alleles in female samples of East Asian ancestry",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
-            "max_size": 4
+            "maximum_length_of_value": 4
         },
         "gnomad_an_fin_female": {
             "title": "gnomad_an_fin_female",
@@ -1321,7 +1321,7 @@
             "description": "Total number of alleles in female samples of Finnish ancestry",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
-            "max_size": 4
+            "maximum_length_of_value": 4
         },
         "gnomad_an_nfe_female": {
             "title": "gnomad_an_nfe_female",
@@ -1330,7 +1330,7 @@
             "description": "Total number of alleles in female samples of Non-Finnish European ancestry",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
-            "max_size": 5
+            "maximum_length_of_value": 5
         },
         "gnomad_an_sas_female": {
             "title": "gnomad_an_sas_female",
@@ -1339,7 +1339,7 @@
             "description": "Total number of alleles in female samples of South Asian ancestry",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
-            "max_size": 3
+            "maximum_length_of_value": 3
         },
         "gnomad_an_oth_female": {
             "title": "gnomad_an_oth_female",
@@ -1348,7 +1348,7 @@
             "description": "Total number of alleles in female samples of Other ancestry",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
-            "max_size": 4
+            "maximum_length_of_value": 4
         },
         "gnomad_an_raw": {
             "title": "gnomad_an_raw",
@@ -1357,7 +1357,7 @@
             "description": "Total number of alleles in samples before removing low-confidence genotypes",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
-            "max_size": 6
+            "maximum_length_of_value": 6
         },
         "gnomad_af": {
             "title": "gnomad_af",
@@ -1366,7 +1366,7 @@
             "description": "Alternate allele frequency in samples",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
-            "max_size": 11
+            "maximum_length_of_value": 11
         },
         "gnomad_af_afr": {
             "title": "gnomad_af_afr",
@@ -1375,7 +1375,7 @@
             "description": "Alternate allele frequency in samples of African-American/African ancestry",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
-            "max_size": 11
+            "maximum_length_of_value": 11
         },
         "gnomad_af_ami": {
             "title": "gnomad_af_ami",
@@ -1384,7 +1384,7 @@
             "description": "Alternate allele frequency in samples of Amish ancestry",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
-            "max_size": 11
+            "maximum_length_of_value": 11
         },
         "gnomad_af_amr": {
             "title": "gnomad_af_amr",
@@ -1393,7 +1393,7 @@
             "description": "Alternate allele frequency in samples of Latino ancestry",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
-            "max_size": 11
+            "maximum_length_of_value": 11
         },
         "gnomad_af_asj": {
             "title": "gnomad_af_asj",
@@ -1402,7 +1402,7 @@
             "description": "Alternate allele frequency in samples of Ashkenazi Jewish ancestry",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
-            "max_size": 11
+            "maximum_length_of_value": 11
         },
         "gnomad_af_eas": {
             "title": "gnomad_af_eas",
@@ -1411,7 +1411,7 @@
             "description": "Alternate allele frequency in samples of East Asian ancestry",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
-            "max_size": 11
+            "maximum_length_of_value": 11
         },
         "gnomad_af_fin": {
             "title": "gnomad_af_fin",
@@ -1420,7 +1420,7 @@
             "description": "Alternate allele frequency in samples of Finnish ancestry",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
-            "max_size": 11
+            "maximum_length_of_value": 11
         },
         "gnomad_af_nfe": {
             "title": "gnomad_af_nfe",
@@ -1429,7 +1429,7 @@
             "description": "Alternate allele frequency in samples of Non-Finnish European ancestry",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
-            "max_size": 11
+            "maximum_length_of_value": 11
         },
         "gnomad_af_sas": {
             "title": "gnomad_af_sas",
@@ -1438,7 +1438,7 @@
             "description": "Alternate allele frequency in samples of South Asian ancestry",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
-            "max_size": 11
+            "maximum_length_of_value": 11
         },
         "gnomad_af_oth": {
             "title": "gnomad_af_oth",
@@ -1447,7 +1447,7 @@
             "description": "Alternate allele frequency in samples of Other ancestry",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
-            "max_size": 11
+            "maximum_length_of_value": 11
         },
         "gnomad_af_male": {
             "title": "gnomad_af_male",
@@ -1456,7 +1456,7 @@
             "description": "Alternate allele frequency in male samples",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
-            "max_size": 11
+            "maximum_length_of_value": 11
         },
         "gnomad_af_afr_male": {
             "title": "gnomad_af_afr_male",
@@ -1465,7 +1465,7 @@
             "description": "Alternate allele frequency in male samples of African-American/African ancestry",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
-            "max_size": 11
+            "maximum_length_of_value": 11
         },
         "gnomad_af_ami_male": {
             "title": "gnomad_af_ami_male",
@@ -1474,7 +1474,7 @@
             "description": "Alternate allele frequency in male samples of Amish ancestry",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
-            "max_size": 11
+            "maximum_length_of_value": 11
         },
         "gnomad_af_amr_male": {
             "title": "gnomad_af_amr_male",
@@ -1483,7 +1483,7 @@
             "description": "Alternate allele frequency in male samples of Latino ancestry",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
-            "max_size": 11
+            "maximum_length_of_value": 11
         },
         "gnomad_af_asj_male": {
             "title": "gnomad_af_asj_male",
@@ -1492,7 +1492,7 @@
             "description": "Alternate allele frequency in male samples of Ashkenazi Jewish ancestry",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
-            "max_size": 11
+            "maximum_length_of_value": 11
         },
         "gnomad_af_eas_male": {
             "title": "gnomad_af_eas_male",
@@ -1501,7 +1501,7 @@
             "description": "Alternate allele frequency in male samples of East Asian ancestry",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
-            "max_size": 11
+            "maximum_length_of_value": 11
         },
         "gnomad_af_fin_male": {
             "title": "gnomad_af_fin_male",
@@ -1510,7 +1510,7 @@
             "description": "Alternate allele frequency in male samples of Finnish ancestry",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
-            "max_size": 11
+            "maximum_length_of_value": 11
         },
         "gnomad_af_nfe_male": {
             "title": "gnomad_af_nfe_male",
@@ -1519,7 +1519,7 @@
             "description": "Alternate allele frequency in male samples of Non-Finnish European ancestry",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
-            "max_size": 11
+            "maximum_length_of_value": 11
         },
         "gnomad_af_sas_male": {
             "title": "gnomad_af_sas_male",
@@ -1528,7 +1528,7 @@
             "description": "Alternate allele frequency in male samples of South Asian ancestry",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
-            "max_size": 11
+            "maximum_length_of_value": 11
         },
         "gnomad_af_oth_male": {
             "title": "gnomad_af_oth_male",
@@ -1537,7 +1537,7 @@
             "description": "Alternate allele frequency in male samples of Other ancestry",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
-            "max_size": 11
+            "maximum_length_of_value": 11
         },
         "gnomad_af_female": {
             "title": "gnomad_af_female",
@@ -1546,7 +1546,7 @@
             "description": "Alternate allele frequency in female samples",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
-            "max_size": 11
+            "maximum_length_of_value": 11
         },
         "gnomad_af_afr_female": {
             "title": "gnomad_af_afr_female",
@@ -1555,7 +1555,7 @@
             "description": "Alternate allele frequency in female samples of African-American/African ancestry",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
-            "max_size": 11
+            "maximum_length_of_value": 11
         },
         "gnomad_af_ami_female": {
             "title": "gnomad_af_ami_female",
@@ -1564,7 +1564,7 @@
             "description": "Alternate allele frequency in female samples of Amish ancestry",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
-            "max_size": 11
+            "maximum_length_of_value": 11
         },
         "gnomad_af_amr_female": {
             "title": "gnomad_af_amr_female",
@@ -1573,7 +1573,7 @@
             "description": "Alternate allele frequency in female samples of Latino ancestry",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
-            "max_size": 11
+            "maximum_length_of_value": 11
         },
         "gnomad_af_asj_female": {
             "title": "gnomad_af_asj_female",
@@ -1582,7 +1582,7 @@
             "description": "Alternate allele frequency in female samples of Ashkenazi Jewish ancestry",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
-            "max_size": 11
+            "maximum_length_of_value": 11
         },
         "gnomad_af_eas_female": {
             "title": "gnomad_af_eas_female",
@@ -1591,7 +1591,7 @@
             "description": "Alternate allele frequency in female samples of East Asian ancestry",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
-            "max_size": 11
+            "maximum_length_of_value": 11
         },
         "gnomad_af_fin_female": {
             "title": "gnomad_af_fin_female",
@@ -1600,7 +1600,7 @@
             "description": "Alternate allele frequency in female samples of Finnish ancestry",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
-            "max_size": 11
+            "maximum_length_of_value": 11
         },
         "gnomad_af_nfe_female": {
             "title": "gnomad_af_nfe_female",
@@ -1609,7 +1609,7 @@
             "description": "Alternate allele frequency in female samples of Non-Finnish European ancestry",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
-            "max_size": 11
+            "maximum_length_of_value": 11
         },
         "gnomad_af_sas_female": {
             "title": "gnomad_af_sas_female",
@@ -1618,7 +1618,7 @@
             "description": "Alternate allele frequency in female samples of South Asian ancestry",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
-            "max_size": 11
+            "maximum_length_of_value": 11
         },
         "gnomad_af_oth_female": {
             "title": "gnomad_af_oth_female",
@@ -1627,7 +1627,7 @@
             "description": "Alternate allele frequency in female samples of Other ancestry",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
-            "max_size": 11
+            "maximum_length_of_value": 11
         },
         "gnomad_af_raw": {
             "title": "gnomad_af_raw",
@@ -1636,7 +1636,7 @@
             "description": "Alternate allele frequency in samples before removing low-confidence genotypes",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
-            "max_size": 11
+            "maximum_length_of_value": 11
         },
         "gnomad_dp": {
             "title": "gnomad_dp",
@@ -1645,7 +1645,7 @@
             "description": "depth",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
-            "max_size": 8
+            "maximum_length_of_value": 8
         },
         "topmed_an": {
             "title": "topmed_an",
@@ -1654,7 +1654,7 @@
             "description": "Total allele number",
             "source_name": "TOPMED",
             "source_version": "freeze 5",
-            "max_size": 6
+            "maximum_length_of_value": 6
         },
         "topmed_ac": {
             "title": "topmed_ac",
@@ -1663,7 +1663,7 @@
             "description": "Allele count",
             "source_name": "TOPMED",
             "source_version": "freeze 5",
-            "max_size": 6
+            "maximum_length_of_value": 6
         },
         "topmed_af": {
             "title": "topmed_af",
@@ -1672,7 +1672,7 @@
             "description": "Allele frequency",
             "source_name": "TOPMED",
             "source_version": "freeze 5",
-            "max_size": 11
+            "maximum_length_of_value": 11
         },
         "topmed_het": {
             "title": "topmed_het",
@@ -1681,7 +1681,7 @@
             "description": "number of heterozygous genotype",
             "source_name": "TOPMED",
             "source_version": "freeze 5",
-            "max_size": 5
+            "maximum_length_of_value": 5
         },
         "topmed_hom": {
             "title": "topmed_hom",
@@ -1690,7 +1690,7 @@
             "description": "number of homozygous genotype",
             "source_name": "TOPMED",
             "source_version": "freeze 5",
-            "max_size": 5
+            "maximum_length_of_value": 5
         },
         "uk10k_ac": {
             "title": "uk10k_ac",
@@ -1699,7 +1699,7 @@
             "description": "Allele count in called genotypes",
             "source_name": "UK10K",
             "source_version": "20160215",
-            "max_size": 4
+            "maximum_length_of_value": 4
         },
         "uk10k_an": {
             "title": "uk10k_an",
@@ -1708,7 +1708,7 @@
             "description": "Total number of alleles in called genotypes",
             "source_name": "UK10K",
             "source_version": "20160215",
-            "max_size": 4
+            "maximum_length_of_value": 4
         },
         "uk10k_af": {
             "title": "uk10k_af",
@@ -1717,7 +1717,7 @@
             "description": "Allele frequency in called genotypes",
             "source_name": "UK10K",
             "source_version": "20160215",
-            "max_size": 8
+            "maximum_length_of_value": 8
         },
         "uk10k_af_afr": {
             "title": "uk10k_af_afr",
@@ -1726,7 +1726,7 @@
             "description": "1000 Genomes Phase 1 Allele Frequency in African population (YRI,LWK,ASW)",
             "source_name": "UK10K",
             "source_version": "20160215",
-            "max_size": 8
+            "maximum_length_of_value": 8
         },
         "uk10k_af_amr": {
             "title": "uk10k_af_amr",
@@ -1735,7 +1735,7 @@
             "description": "1000 Genomes Phase 1 Allele Frequency in American population (MXL,CLM,PUR)",
             "source_name": "UK10K",
             "source_version": "20160215",
-            "max_size": 8
+            "maximum_length_of_value": 8
         },
         "uk10k_af_asn": {
             "title": "uk10k_af_asn",
@@ -1744,7 +1744,7 @@
             "description": "1000 Genomes Phase 1 Allele Frequency in Asian population (CHB,CHS,JPT)",
             "source_name": "UK10K",
             "source_version": "20160215",
-            "max_size": 8
+            "maximum_length_of_value": 8
         },
         "uk10k_af_eur": {
             "title": "uk10k_af_eur",
@@ -1753,7 +1753,7 @@
             "description": "1000 Genomes Phase 1 Allele Frequency in European population (CEU,TSI,FIN,GBR,IBS)",
             "source_name": "UK10K",
             "source_version": "20160215",
-            "max_size": 8
+            "maximum_length_of_value": 8
         },
         "uk10k_af_max": {
             "title": "uk10k_af_max",
@@ -1762,7 +1762,7 @@
             "description": "1000 Genomes Phase 1 Maximum Allele Frequency",
             "source_name": "UK10K",
             "source_version": "20160215",
-            "max_size": 8
+            "maximum_length_of_value": 8
         },
         "uk10k_esp_maf": {
             "title": "uk10k_esp_maf",
@@ -1771,7 +1771,7 @@
             "description": "Minor allele frequecy in percent for European American, African American and All populations in the NHLBI Exome Sequencing Project (ESP)",
             "source_name": "UK10K",
             "source_version": "20160215",
-            "max_size": 27
+            "maximum_length_of_value": 27
         },
         "genomic_super_duplicates_otherchrom": {
             "title": "genomic_super_duplicates_otherchrom",
@@ -1780,7 +1780,7 @@
             "description": "chromosome",
             "source_name": "GENOMIC_SUPER_DUPLICATES",
             "source_version": "19-Oct-2014",
-            "max_size": 22
+            "maximum_length_of_value": 22
         },
         "genomic_super_duplicates_otherstart": {
             "title": "genomic_super_duplicates_otherstart",
@@ -1789,7 +1789,7 @@
             "description": "start position",
             "source_name": "GENOMIC_SUPER_DUPLICATES",
             "source_version": "19-Oct-2014",
-            "max_size": 9
+            "maximum_length_of_value": 9
         },
         "genomic_super_duplicates_otherend": {
             "title": "genomic_super_duplicates_otherend",
@@ -1798,7 +1798,7 @@
             "description": "end position",
             "source_name": "GENOMIC_SUPER_DUPLICATES",
             "source_version": "19-Oct-2014",
-            "max_size": 9
+            "maximum_length_of_value": 9
         },
         "genomic_super_duplicates_fracmatch": {
             "title": "genomic_super_duplicates_fracmatch",
@@ -1807,7 +1807,7 @@
             "description": "fraction of matching bases",
             "source_name": "GENOMIC_SUPER_DUPLICATES",
             "source_version": "19-Oct-2014",
-            "max_size": 8
+            "maximum_length_of_value": 8
         },
         "simple_repeat_name": {
             "title": "simple_repeat_name",
@@ -1816,7 +1816,7 @@
             "description": "Simple Repeats tag name",
             "source_name": "SIMPLE_REPEAT",
             "source_version": "11-Mar-2019",
-            "max_size": 3
+            "maximum_length_of_value": 3
         },
         "simple_repeat_sequence": {
             "title": "simple_repeat_sequence",
@@ -1825,7 +1825,7 @@
             "description": "Sequence of repeat unit element",
             "source_name": "SIMPLE_REPEAT",
             "source_version": "11-Mar-2019",
-            "max_size": 365
+            "maximum_length_of_value": 365
         },
         "simple_repeat_chromstart": {
             "title": "simple_repeat_chromstart",
@@ -1834,7 +1834,7 @@
             "description": "start position",
             "source_name": "SIMPLE_REPEAT",
             "source_version": "11-Mar-2019",
-            "max_size": 8
+            "maximum_length_of_value": 8
         },
         "simple_repeat_chromend": {
             "title": "simple_repeat_chromend",
@@ -1843,7 +1843,7 @@
             "description": "end position",
             "source_name": "SIMPLE_REPEAT",
             "source_version": "11-Mar-2019",
-            "max_size": 8
+            "maximum_length_of_value": 8
         },
         "simple_repeat_score": {
             "title": "simple_repeat_score",
@@ -1852,7 +1852,7 @@
             "description": "Alignment Score = 2*match-7*mismatch-7*indel; minscore=50",
             "source_name": "SIMPLE_REPEAT",
             "source_version": "11-Mar-2019",
-            "max_size": 4
+            "maximum_length_of_value": 4
         },
         "simple_repeat_entropy": {
             "title": "simple_repeat_entropy",
@@ -1861,7 +1861,7 @@
             "description": "Entropy",
             "source_name": "SIMPLE_REPEAT",
             "source_version": "11-Mar-2019",
-            "max_size": 4
+            "maximum_length_of_value": 4
         },
         "rmsk_repname": {
             "title": "rmsk_repname",
@@ -1870,7 +1870,7 @@
             "description": "Name of repeat",
             "source_name": "RMSK",
             "source_version": "11-Mar-2019",
-            "max_size": 15
+            "maximum_length_of_value": 15
         },
         "rmsk_repclass": {
             "title": "rmsk_repclass",
@@ -1879,7 +1879,7 @@
             "description": "Class of repeat",
             "source_name": "RMSK",
             "source_version": "11-Mar-2019",
-            "max_size": 14
+            "maximum_length_of_value": 14
         },
         "rmsk_repfamily": {
             "title": "rmsk_repfamily",
@@ -1888,7 +1888,7 @@
             "description": "Family of repeat",
             "source_name": "RMSK",
             "source_version": "11-Mar-2019",
-            "max_size": 14
+            "maximum_length_of_value": 14
         },
         "rmsk_chromstart": {
             "title": "rmsk_chromstart",
@@ -1897,7 +1897,7 @@
             "description": "Start in genomic sequence",
             "source_name": "RMSK",
             "source_version": "11-Mar-2019",
-            "max_size": 8
+            "maximum_length_of_value": 8
         },
         "rmsk_chromend": {
             "title": "rmsk_chromend",
@@ -1906,7 +1906,7 @@
             "description": "End in genomic sequence",
             "source_name": "RMSK",
             "source_version": "11-Mar-2019",
-            "max_size": 8
+            "maximum_length_of_value": 8
         },
         "rmsk_strand": {
             "title": "rmsk_strand",
@@ -1915,7 +1915,7 @@
             "description": "Relative orientation + or -",
             "source_name": "RMSK",
             "source_version": "11-Mar-2019",
-            "max_size": 1
+            "maximum_length_of_value": 1
         },
         "nested_repeats_name": {
             "title": "nested_repeats_name",
@@ -1924,7 +1924,7 @@
             "description": "Name of item",
             "source_name": "NESTED_REPEATS",
             "source_version": "06-Mar-2014",
-            "max_size": 3
+            "maximum_length_of_value": 3
         },
         "nested_repeats_chromstart": {
             "title": "nested_repeats_chromstart",
@@ -1933,7 +1933,7 @@
             "description": "Start position in chromosome",
             "source_name": "NESTED_REPEATS",
             "source_version": "06-Mar-2014",
-            "max_size": 8
+            "maximum_length_of_value": 8
         },
         "nested_repeats_chromend": {
             "title": "nested_repeats_chromend",
@@ -1942,7 +1942,7 @@
             "description": "End position in chromosome",
             "source_name": "NESTED_REPEATS",
             "source_version": "06-Mar-2014",
-            "max_size": 8
+            "maximum_length_of_value": 8
         },
         "nested_repeats_strand": {
             "title": "nested_repeats_strand",
@@ -1951,7 +1951,7 @@
             "description": "=+, -, or . for mixed (some fragments +, some -)",
             "source_name": "NESTED_REPEATS",
             "source_version": "06-Mar-2014",
-            "max_size": 1
+            "maximum_length_of_value": 1
         },
         "nested_repeats_score": {
             "title": "nested_repeats_score",
@@ -1960,7 +1960,7 @@
             "description": "Average of fragment identity scores, transformed into 0..1000 range for shading",
             "source_name": "NESTED_REPEATS",
             "source_version": "06-Mar-2014",
-            "max_size": 3
+            "maximum_length_of_value": 3
         },
         "nested_repeats_repclass": {
             "title": "nested_repeats_repclass",
@@ -1969,7 +1969,7 @@
             "description": "Class of repeat",
             "source_name": "NESTED_REPEATS",
             "source_version": "06-Mar-2014",
-            "max_size": 14
+            "maximum_length_of_value": 14
         },
         "nested_repeats_repfamily": {
             "title": "nested_repeats_repfamily",
@@ -1978,7 +1978,7 @@
             "description": "Family of repeat",
             "source_name": "NESTED_REPEATS",
             "source_version": "06-Mar-2014",
-            "max_size": 14
+            "maximum_length_of_value": 14
         },
         "microsatellite_name": {
             "title": "microsatellite_name",
@@ -1987,7 +1987,7 @@
             "description": "Name of item",
             "source_name": "MICROSATELLITE",
             "source_version": "23-Aug-2015",
-            "max_size": 3
+            "maximum_length_of_value": 3
         },
         "microsatellite_chromstart": {
             "title": "microsatellite_chromstart",
@@ -1996,7 +1996,7 @@
             "description": "Start position in chromosome",
             "source_name": "MICROSATELLITE",
             "source_version": "23-Aug-2015",
-            "max_size": 8
+            "maximum_length_of_value": 8
         },
         "microsatellite_chromend": {
             "title": "microsatellite_chromend",
@@ -2005,7 +2005,7 @@
             "description": "End position in chromosome",
             "source_name": "MICROSATELLITE",
             "source_version": "23-Aug-2015",
-            "max_size": 8
+            "maximum_length_of_value": 8
         },
         "clinvar_alleleid": {
             "title": "clinvar_alleleid",
@@ -2014,7 +2014,7 @@
             "description": "the ClinVar Allele ID",
             "source_name": "CLINVAR",
             "source_version": "20191021",
-            "max_size": 6
+            "maximum_length_of_value": 6
         },
         "clinvar_clndn": {
             "title": "clinvar_clndn",
@@ -2029,7 +2029,7 @@
                 "source_name": "CLINVAR",
                 "source_version": "20191021",
                 "separator": "tilde",
-                "max_size": 445
+                "maximum_length_of_value": 445
             }
         },
         "clinvar_clndnincl": {
@@ -2039,7 +2039,7 @@
             "description": "For included Variant : ClinVar's preferred disease name for the concept specified by disease identifiers in CLNDISDB",
             "source_name": "CLINVAR",
             "source_version": "20191021",
-            "max_size": 49
+            "maximum_length_of_value": 49
         },
         "clinvar_clndisdb": {
             "title": "clinvar_clndisdb",
@@ -2048,7 +2048,7 @@
             "description": "Tag-value pairs of disease database name and identifier, e.g. OMIM:NNNNNN",
             "source_name": "CLINVAR",
             "source_version": "20191021",
-            "max_size": 1130
+            "maximum_length_of_value": 1130
         },
         "clinvar_clndisdbincl": {
             "title": "clinvar_clndisdbincl",
@@ -2057,7 +2057,7 @@
             "description": "For included Variant: Tag-value pairs of disease database name and identifier, e.g. OMIM:NNNNNN",
             "source_name": "CLINVAR",
             "source_version": "20191021",
-            "max_size": 71
+            "maximum_length_of_value": 71
         },
         "clinvar_clnhgvs": {
             "title": "clinvar_clnhgvs",
@@ -2066,7 +2066,7 @@
             "description": "Top-level (primary assembly, alt, or patch) HGVS expression.",
             "source_name": "CLINVAR",
             "source_version": "20191021",
-            "max_size": 51
+            "maximum_length_of_value": 51
         },
         "clinvar_clnrevstat": {
             "title": "clinvar_clnrevstat",
@@ -2081,7 +2081,7 @@
                 "source_name": "CLINVAR",
                 "source_version": "20191021",
                 "separator": "tilde",
-                "max_size": 52
+                "maximum_length_of_value": 52
             }
         },
         "clinvar_clnsig": {
@@ -2091,7 +2091,7 @@
             "description": "Clinical significance for this single variant",
             "source_name": "CLINVAR",
             "source_version": "20191021",
-            "max_size": 44
+            "maximum_length_of_value": 44
         },
         "clinvar_clnsigconf": {
             "title": "clinvar_clnsigconf",
@@ -2106,7 +2106,7 @@
                 "source_name": "CLINVAR",
                 "source_version": "20191021",
                 "separator": "tilde",
-                "max_size": 60
+                "maximum_length_of_value": 60
             }
         },
         "clinvar_clnsigincl": {
@@ -2116,7 +2116,7 @@
             "description": "Clinical significance for a haplotype or genotype that includes this variant. Reported as pairs of VariationID:clinical significance.",
             "source_name": "CLINVAR",
             "source_version": "20191021",
-            "max_size": 24
+            "maximum_length_of_value": 24
         },
         "clinvar_clnvc": {
             "title": "clinvar_clnvc",
@@ -2125,7 +2125,7 @@
             "description": "Variant type",
             "source_name": "CLINVAR",
             "source_version": "20191021",
-            "max_size": 25
+            "maximum_length_of_value": 25
         },
         "clinvar_clnvcso": {
             "title": "clinvar_clnvcso",
@@ -2134,7 +2134,7 @@
             "description": "Sequence Ontology id for variant type",
             "source_name": "CLINVAR",
             "source_version": "20191021",
-            "max_size": 10
+            "maximum_length_of_value": 10
         },
         "clinvar_clnvi": {
             "title": "clinvar_clnvi",
@@ -2143,7 +2143,7 @@
             "description": "the variant's clinical sources reported as tag-value pairs of database and variant identifier",
             "source_name": "CLINVAR",
             "source_version": "20191021",
-            "max_size": 218
+            "maximum_length_of_value": 218
         },
         "clinvar_geneinfo": {
             "title": "clinvar_geneinfo",
@@ -2152,7 +2152,7 @@
             "description": "Gene(s) for the variant reported as gene symbol:gene id. The gene symbol and id are delimited by a colon (:) and each pair is delimited by a vertical bar (|)",
             "source_name": "CLINVAR",
             "source_version": "20191021",
-            "max_size": 22
+            "maximum_length_of_value": 22
         },
         "clinvar_mc": {
             "title": "clinvar_mc",
@@ -2161,7 +2161,7 @@
             "description": "comma separated list of molecular consequence in the form of Sequence Ontology ID|molecular_consequence",
             "source_name": "CLINVAR",
             "source_version": "20191021",
-            "max_size": 141
+            "maximum_length_of_value": 141
         },
         "clinvar_origin": {
             "title": "clinvar_origin",
@@ -2170,7 +2170,7 @@
             "description": "Allele origin. One or more of the following values may be added: 0 - unknown; 1 - germline; 2 - somatic; 4 - inherited; 8 - paternal; 16 - maternal; 32 - de-novo; 64 - biparental; 128 - uniparental; 256 - not-tested; 512 - tested-inconclusive; 1073741824 - other",
             "source_name": "CLINVAR",
             "source_version": "20191021",
-            "max_size": 2
+            "maximum_length_of_value": 2
         },
         "clinvar_ssr": {
             "title": "clinvar_ssr",
@@ -2187,7 +2187,7 @@
             "description": "Genomic mutation identifier (COSV) to indicate the definitive position of the variant on the genome. This identifier is trackable and stable between different versions of the release.",
             "source_name": "COSMIC",
             "source_version": "v90",
-            "max_size": 12
+            "maximum_length_of_value": 12
         },
         "cosmic_legacy_mutation_id": {
             "title": "cosmic_legacy_mutation_id",
@@ -2196,7 +2196,7 @@
             "description": "Legacy mutation identifier (COSM) that will represent existing COSM mutation identifiers.",
             "source_name": "COSMIC",
             "source_version": "v90",
-            "max_size": 12
+            "maximum_length_of_value": 12
         },
         "cosmic_mutation_id": {
             "title": "cosmic_mutation_id",
@@ -2205,7 +2205,7 @@
             "description": "An internal mutation identifier to uniquely represent each mutation on a specific transcript on a given assembly build.",
             "source_name": "COSMIC",
             "source_version": "v90",
-            "max_size": 9
+            "maximum_length_of_value": 9
         },
         "cosmic_transcript_id": {
             "title": "cosmic_transcript_id",
@@ -2214,7 +2214,7 @@
             "description": "The transcript identifier of the gene.",
             "source_name": "COSMIC",
             "source_version": "v90",
-            "max_size": 18
+            "maximum_length_of_value": 18
         },
         "cosmic_primary_site": {
             "title": "cosmic_primary_site",
@@ -2223,7 +2223,7 @@
             "description": "The primary tissue/cancer from which the sample originated. More details on the tissue classification are avaliable from here. In COSMIC we have standard classification system for tissue types and sub types because they vary a lot between different papers.",
             "source_name": "COSMIC",
             "source_version": "v90",
-            "max_size": 34
+            "maximum_length_of_value": 34
         },
         "cosmic_site_subtype_1": {
             "title": "cosmic_site_subtype_1",
@@ -2232,7 +2232,7 @@
             "description": "Further sub classification (level 1) of the samples tissue of origin.",
             "source_name": "COSMIC",
             "source_version": "v90",
-            "max_size": 35
+            "maximum_length_of_value": 35
         },
         "cosmic_site_subtype_2": {
             "title": "cosmic_site_subtype_2",
@@ -2241,7 +2241,7 @@
             "description": "Further sub classification (level 2) of the samples tissue of origin.",
             "source_name": "COSMIC",
             "source_version": "v90",
-            "max_size": 15
+            "maximum_length_of_value": 15
         },
         "cosmic_site_subtype_3": {
             "title": "cosmic_site_subtype_3",
@@ -2258,7 +2258,7 @@
             "description": "The histological classification of the sample.",
             "source_name": "COSMIC",
             "source_version": "v90",
-            "max_size": 58
+            "maximum_length_of_value": 58
         },
         "cosmic_histology_subtype_1": {
             "title": "cosmic_histology_subtype_1",
@@ -2267,7 +2267,7 @@
             "description": "Further histological classification (level 1) of the sample.",
             "source_name": "COSMIC",
             "source_version": "v90",
-            "max_size": 58
+            "maximum_length_of_value": 58
         },
         "cosmic_histology_subtype_2": {
             "title": "cosmic_histology_subtype_2",
@@ -2276,7 +2276,7 @@
             "description": "Further histological classification (level 2) of the sample.",
             "source_name": "COSMIC",
             "source_version": "v90",
-            "max_size": 50
+            "maximum_length_of_value": 50
         },
         "cosmic_histology_subtype_3": {
             "title": "cosmic_histology_subtype_3",
@@ -2293,7 +2293,7 @@
             "description": "The change that has occurred in the nucleotide sequence. Formatting is identical to the method used for the peptide sequence.",
             "source_name": "COSMIC",
             "source_version": "v90",
-            "max_size": 89
+            "maximum_length_of_value": 89
         },
         "cosmic_mutation_aa": {
             "title": "cosmic_mutation_aa",
@@ -2302,7 +2302,7 @@
             "description": "The change that has occurred in the peptide sequence. Formatting is based on the recommendations made by the Human Genome Variation Society. The description of each type can be found by following the link to Mutation Overview page.",
             "source_name": "COSMIC",
             "source_version": "v90",
-            "max_size": 36
+            "maximum_length_of_value": 36
         },
         "cosmic_mutation_description": {
             "title": "cosmic_mutation_description",
@@ -2317,7 +2317,7 @@
                 "source_name": "COSMIC",
                 "source_version": "v90",
                 "separator": "tilde",
-                "max_size": 28
+                "maximum_length_of_value": 28
             }
         },
         "cosmic_mutation_zygosity": {
@@ -2327,7 +2327,7 @@
             "description": "Information on whether the mutation was reported to be homozygous , heterozygous or unknown within the sample.",
             "source_name": "COSMIC",
             "source_version": "v90",
-            "max_size": 3
+            "maximum_length_of_value": 3
         },
         "cosmic_loh": {
             "title": "cosmic_loh",
@@ -2344,7 +2344,7 @@
             "description": "The genomic coordinates of the mutation.",
             "source_name": "COSMIC",
             "source_version": "v90",
-            "max_size": 19
+            "maximum_length_of_value": 19
         },
         "cosmic_resistance_mutation": {
             "title": "cosmic_resistance_mutation",
@@ -2361,7 +2361,7 @@
             "description": "Information on whether the sample was reported to be Confirmed Somatic, Previously Reported or Variant of unknown origin",
             "source_name": "COSMIC",
             "source_version": "v90",
-            "max_size": 56
+            "maximum_length_of_value": 56
         },
         "cosmic_pubmed_pmid": {
             "title": "cosmic_pubmed_pmid",
@@ -2370,7 +2370,7 @@
             "description": "The PUBMED ID for the paper that the sample was noted in, linking to pubmed to provide more details of the publication.",
             "source_name": "COSMIC",
             "source_version": "v90",
-            "max_size": 8
+            "maximum_length_of_value": 8
         },
         "cosmic_id_study": {
             "title": "cosmic_id_study",
@@ -2379,7 +2379,7 @@
             "description": "Lists the unique Ids of studies that have involved this sample.",
             "source_name": "COSMIC",
             "source_version": "v90",
-            "max_size": 3
+            "maximum_length_of_value": 3
         },
         "cosmic_tumour_origin": {
             "title": "cosmic_tumour_origin",
@@ -2388,7 +2388,7 @@
             "description": "Describes where the sample has originated from including the tumour type.",
             "source_name": "COSMIC",
             "source_version": "v90",
-            "max_size": 46
+            "maximum_length_of_value": 46
         },
         "schema_version": {
             "default": "1"
@@ -2406,15 +2406,18 @@
         },
         "conservation_phastcons100": {
             "title": "conservation_phastcons100",
-            "aggregation_type": "stats"
+            "aggregation_type": "stats",
+            "number_step": "any"
         },
         "cadd_phred": {
             "title": "cadd_phred",
-            "aggregation_type": "stats"
+            "aggregation_type": "stats",
+            "number_step": "any"
         },
         "max_pop_af_af_popmax": {
             "title": "max_pop_af_af_popmax",
-            "aggregation_type": "stats"
+            "aggregation_type": "stats",
+            "number_step": "any"
         }
     },
     "columns": {
@@ -2422,8 +2425,7 @@
             "title": "CHROM"
         },
         "POS": {
-            "title": "POS",
-            "aggregation_type": "stats"
+            "title": "POS"
         },
         "REF": {
             "title": "REF"
@@ -2445,15 +2447,18 @@
         },
         "conservation_phastcons100": {
             "title": "conservation_phastcons100",
-            "aggregation_type": "stats"
+            "aggregation_type": "stats",
+            "number_step": "any"
         },
         "cadd_phred": {
             "title": "cadd_phred",
-            "aggregation_type": "stats"
+            "aggregation_type": "stats",
+            "number_step": "any"
         },
         "max_pop_af_af_popmax": {
             "title": "max_pop_af_af_popmax",
-            "aggregation_type": "stats"
+            "aggregation_type": "stats",
+            "number_step": "any"
         }
     }
 }

@@ -77,8 +77,8 @@
                 "tilde"
             ]
         },
-        "max_size": {
-            "title": "Max Size (bytes)",
+        "maximum_length_of_value": {
+            "title": "Maximum length of value (bytes)",
             "type": "integer",
             "description": "Maximum number of bytes this field can hold"
         },

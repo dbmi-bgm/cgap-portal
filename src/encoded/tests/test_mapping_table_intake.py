@@ -10,19 +10,19 @@ pytestmark = [pytest.mark.working]
 MT_LOC = './src/encoded/tests/data/sample_vcfs/mtv03.csv' # symlinked from encoded.commands
 ANNOTATION_FIELD_SCHEMA = './src/encoded/schemas/annotation_field.json'
 EXPECTED_FIELDS = ['no', 'vcf_name', 'source_name', 'source_version', 'sub_embedding_group',
-                   'field_type', 'is_list', 'separator', 'max_size', 'schema_description', 'value_example',
+                   'field_type', 'is_list', 'separator', 'maximum_length_of_value', 'schema_description', 'value_example',
                    'enum_list', 'field_priority', 'column_priority', 'facet_grouping', 'facet_priority',
                    'scale', 'domain', 'method', 'annotation_grouping', 'scope', 'schema_title', 'pre_addon', 'links_to',
                    'embedded_fields', 'calculated_property']
 EXPECTED_INSERT = {'no': 1, 'vcf_name': 'CHROM', 'source_name': 'VCF', 'source_version': 'VCFv4.2',
-                   'field_type': 'string', 'is_list': False, 'max_size': 2, 'schema_description': 'Chromosome',
+                   'field_type': 'string', 'is_list': False, 'maximum_length_of_value': 2, 'schema_description': 'Chromosome',
                    'value_example': '1;2;3;4;5;6;22;X;Y;M', 'column_priority': 1,
                    'enum_list':
                        ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16',
                         '17', '18', '19', '20', '21', '22', 'X', 'Y', 'M'],
                    'scope': 'variant'}
-NUMBER_ANNOTATION_FIELDS = 266
-SAMPLE_FIELDS_EXPECTED = 17
+NUMBER_ANNOTATION_FIELDS = 269
+SAMPLE_FIELDS_EXPECTED = 20
 VARIANT_FIELDS_EXPECTED = 249
 TRANSCRIPT_FIELDS_EXPECTED = 47
 
@@ -107,7 +107,7 @@ def test_generate_variant_json_items(MTParser, inserts):
     # check top level fields
     assert var_props['CHROM']['title'] == 'CHROM'
     assert var_props['CHROM']['type'] == 'string'
-    assert var_props['CHROM']['max_size'] == 2
+    assert var_props['CHROM']['maximum_length_of_value'] == 2
     assert var_props['POS']['type'] == 'integer'
     assert var_props['cadd_phred']['source_name'] == 'CADD'
     assert var_props['cadd_phred']['type'] == 'number'
@@ -153,6 +153,12 @@ def test_generate_variant_sample_schema(MTParser, sample_variant_items):
     assert 'facets' in schema
     assert 'variant' in properties
     assert 'sample' in properties
+
+    # check sample sub-embedded obj
+    assert 'samplegeno' in properties
+    assert 'AD' in properties['samplegeno']['items']['properties']
+    assert 'GT' in properties['samplegeno']['items']['properties']
+    assert 'NUMGT' in properties['samplegeno']['items']['properties']
 
 
 def test_generate_variant_schema(MTParser, variant_items):
@@ -206,6 +212,7 @@ def test_post_inserts(inserts, project, institution, testapp):
         item['project'] = 'encode-project'
         item['institution'] = 'encode-institution'
         testapp.post_json(CONNECTION_URL, item, status=201)
+
 
 
 def test_post_inserts_via_run(MTParser, project, institution, testapp):
