@@ -147,10 +147,8 @@ def test_VCFP_post_variants(testapp, institution, project, test_vcf, post_varian
         variant['project'] = 'encode-project'
         variant['institution'] = 'encode-institution'
         test_vcf.format_variant(variant)
-        try:
-            testapp.post_json(CONNECTION_URL, variant, status=201)
-        except:
-            import pdb; pdb.set_trace()
+        testapp.post_json(CONNECTION_URL, variant, status=201)
+
 
 
 def test_VCFP_run(testapp, institution, project, test_vcf, post_variant_consequence_items):
