@@ -48,7 +48,7 @@
             "type": "string"
         },
         "file_version_date": {
-            "title": "File Version",
+            "title": "File Version Date",
             "description": "The date of the version of file based on when it was originally generated. Accepted formats: YYYYMMDD, YYYY-MM-DD, YYYY-MM-DD-HH:MM:SS",
             "type": "string",
             "anyOf": [
