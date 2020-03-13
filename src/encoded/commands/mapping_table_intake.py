@@ -4,8 +4,6 @@ import six
 import json
 import argparse
 import logging
-#from pyramid.paster import get_app
-#from webtest import TestApp
 from collections import OrderedDict, Mapping
 
 logger = logging.getLogger(__name__)
@@ -523,7 +521,9 @@ def main():
                          write=args.write_schemas)
 
     # if not a dry run try to post inserts
-    if args.post_inserts:
+    if args.post_inserts:  # do imports here as they will fail in certain scenarios
+        from pyramid.paster import get_app
+        from webtest import TestApp
         environ = {
             'HTTP_ACCEPT': 'application/json',
             'REMOTE_USER': 'TEST',
