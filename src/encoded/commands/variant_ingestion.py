@@ -1,7 +1,7 @@
 import argparse
 import logging
-from mapping_table_intake import MappingTableParser
-from ingest_vcf import VCFParser
+from encoded.commands.mapping_table_intake import MappingTableParser
+from encoded.commands.ingest_vcf import VCFParser
 
 logger = logging.getLogger(__name__)
 EPILOG = __doc__
@@ -57,7 +57,43 @@ def run_ingest_vcf(args):
 
 
 def main():
-    """ Document me pls """
+    """
+    Variant Ingestion Program
+
+    positional arguments:
+        mp              path to mapping table
+        annotation_field_schema
+                        path to annotation field schema
+        variant         where to write variant schema
+        sample          where to write sample_variant schema
+        vcf             path to vcf file
+        project         project to post inserts under
+        institution     institution to post inserts under
+        config_uri      path to configfile
+
+    optional arguments:
+        -h, --help      show this help message and exit
+        --skip-mp       Skip the mapping table intake step. Do this if no
+                        changes have been made to the mapping table
+        --write-schemas If specified will write new schemas to given locations
+        --app-name APP_NAME   Pyramid app name in configfile
+        --post-variants If specified, will post variant/variant sample
+                        inserts, by default False.
+        --post-variant-consequences
+                        If specified will post all VariantConsequence items.
+                        Required only once.
+
+    NOTE: This usage will run the entire end to end process
+        - bin/variant-ingestion
+            src/encoded/tests/data/sample_vcfs/mtv03.csv
+            src/encoded/schemas/annotation_field.json
+            src/encoded/schemas/variant.json
+            src/encoded/schemas/variant_sample.json
+            src/encoded/tests/data/sample_vcfs/test_vcf.vcf
+            hms-dbmi hms-dbmi development.ini
+            --post-variants --post-variant-consequences
+
+    """
     logging.basicConfig()
     parser = argparse.ArgumentParser(
         description="Variant Ingestion Program",
@@ -85,10 +121,15 @@ def main():
                         help='If specified will post all VariantConsequence items. Required only once.')
     args = parser.parse_args()
 
-    if not args.skip_mp:
-        run_mapping_table_intake(args)
-    run_ingest_vcf(args)
-
+    try:
+        if not args.skip_mp:
+            run_mapping_table_intake(args)
+        run_ingest_vcf(args)
+        exit(0)
+    except Exception as e:
+        logger.info('Got exception in variant ingestion: %s' % str(e))
+    # XXX: Catch more exceptions
+    exit(1)
 
 if __name__ == "__main__":
     main()
