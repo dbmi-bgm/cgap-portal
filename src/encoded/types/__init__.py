@@ -14,6 +14,7 @@ from snovault import (
 )
 # from pyramid.traversal import find_root
 from pyramid.view import view_config
+from snovault.util import debug_log
 from .base import (
     Item,
     get_item_if_you_can,
