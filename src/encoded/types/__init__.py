@@ -13,6 +13,7 @@ from snovault import (
     display_title_schema
 )
 # from pyramid.traversal import find_root
+from pyramid.view import view_config
 from .base import (
     Item,
     get_item_if_you_can,
