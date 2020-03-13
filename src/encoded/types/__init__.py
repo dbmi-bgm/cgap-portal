@@ -318,3 +318,20 @@ class VariantSample(Item):
             ref, alt = AD.split(',')
             return round(int(alt) / (int(ref) + int(alt)), 3)  # round to 3 digits
         return 0.0
+
+
+@view_config(name='variant_ingestion', context=Variant.Collection,
+             request_method='POST', permission='add')
+@debug_log
+def variant_ingestion(context, request):
+    """
+        Variant Ingestion API
+
+        Processes all, or none, of a vcf file based on the loaded annotation
+        fields and on the variant and variant sample schemas
+    """
+    # get vcf file
+    # build the variants, post a dry run
+    # if dry run is successful, run for real
+    # catch potential errors
+    pass
