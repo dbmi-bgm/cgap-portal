@@ -522,8 +522,9 @@ def diagnoses_xml_to_phenotypic_features(testapp, ref_vals, refs, data, cohort, 
                               % (cohort, diagnosis['id'], str(exc)))
                 else:
                     found_term = True
-                    pheno_feat_data['phenotypic_feature'] = pheno_res['uuid']
-                    pheno_feats.append(pheno_feat_data)
+                    if pheno_res['uuid'] not in [item['phenotypic_feature'] for item in pheno_feats]:
+                        pheno_feat_data['phenotypic_feature'] = pheno_res['uuid']
+                        pheno_feats.append(pheno_feat_data)
 
         # if we cannot find the term, update the clinical notes
         if diagnosis.get('name') and not found_term:
