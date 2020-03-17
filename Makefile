@@ -48,3 +48,6 @@ deploy1:  # starts postgres/ES locally and loads inserts
 
 deploy2:  # spins up waittress to serve the application
 	pserve development.ini
+
+test:
+	bin/test -vv --timeout=400
