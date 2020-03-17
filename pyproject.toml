@@ -159,6 +159,8 @@ strict-rfc3339 = ">=0.7,<1"
 structlog = ">=18.1.0,<20"
 subprocess-middleware = "0.3"
 # subprocess32 = "3.2.7"
+# Useful for picking apart pyproject.toml
+toml = ">=0.10.0,<1"
 transaction = "2.4.0"
 translationstring = "1.3"
 # urllib3 = "1.23"
@@ -226,6 +228,15 @@ run-upgrade-on-inserts = "encoded.commands.run_upgrader_on_inserts:main"
 configure-kibana-index = "encoded.commands.configure_kibana_index:main"
 wipe-test-indices = "snovault.commands.wipe_test_indices:main"
 
+[paste.app_factory]
+main = "encoded:main"
+
+[paste.composite_factory]
+indexer = "snovault.elasticsearch.es_index_listener:composite"
+
+[paste.filter_app_factory]
+memlimit = "encoded.memlimit:filter_app"
+
 [build-system]
 requires = ["poetry>=0.12"]
-build-backend = "^poetry.masonry.api"
+build-backend = "poetry.masonry.api"
