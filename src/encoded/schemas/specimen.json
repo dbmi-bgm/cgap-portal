@@ -1,0 +1,217 @@
+{
+    "title": "Specimen",
+    "description": "A specimen from an individual",
+    "id": "/profiles/specimen.json",
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "type": "object",
+    "required": [ "project", "institution"],
+    "identifyingProperties": ["uuid", "accession", "aliases"],
+    "mixinProperties": [
+        { "$ref": "mixins.json#/schema_version" },
+        { "$ref": "mixins.json#/uuid" },
+        { "$ref": "mixins.json#/aliases" },
+        { "$ref": "mixins.json#/submitted" },
+        { "$ref": "mixins.json#/modified" },
+        { "$ref": "mixins.json#/status" },
+        { "$ref": "mixins.json#/attribution" },
+        { "$ref": "mixins.json#/static_embeds" },
+        { "$ref": "mixins.json#/accession"}
+    ],
+    "properties": {
+        "accession" : {
+            "accessionType" : "SP"
+        },
+        "schema_version": {
+            "default": "1"
+        },
+        "specimen_type": {
+            "title": "Specimen Type",
+            "type": "string",
+            "suggested_enum": [
+                "blood",
+                "saliva"
+            ]
+        },
+        "specimen_ids": {
+            "title": "Specimen IDs",
+            "type": "array",
+            "description": "Identifier(s) for the specimen",
+            "items": {
+                "title": "Specimen ID",
+                "type": "string"
+            }
+        },
+        "requisition_type": {
+            "title": "Requisition Type",
+            "type": "string",
+            "description": "Clinical or research consent/protocol"
+        },
+        "date_requisition_received": {
+            "title": "Date Requisition Received",
+            "type": "string",
+            "description": "YYYY-MM-DD",
+            "format": "date"
+        },
+        "ordering_physician": {
+            "title": "Ordering Physician",
+            "description": "Name of physician who ordered the test",
+            "type": "string"
+        },
+        "physician_id": {
+            "title": "Physician ID",
+            "description": "ID of physician who ordered the test",
+            "type": "string"
+        },
+        "indication": {
+            "title": "Indication",
+            "type": "string",
+            "description": "Indication per requisition form"
+        },
+        "accessioned_by": {
+            "title": "Accessioned By",
+            "type": "string",
+            "description": "User who accessioned this specimen",
+            "linkTo": "User"
+        },
+        "specimen_accession_date": {
+            "title": "Specimen Accession Date",
+            "description": "Date of specimen accessioning by sequencing lab",
+            "type": "string",
+            "anyOf": [
+                {"format": "date-time"},
+                {"format": "date"}
+            ]
+        },
+        "requisition_acceptance": {
+            "title": "Requisition Acceptance",
+            "type": "array",
+            "items": {
+                "title": "Requisition Acceptance",
+                "type": "object",
+                "required": ["accepted_rejected"],
+                "properties": {
+                    "accepted_rejected": {
+                        "title": "Accepted/Rejected?",
+                        "type": "string",
+                        "description": "Whether the requisition was accepted or rejected",
+                        "enum": ["Accepted", "Rejected"]
+                    },
+                    "rejection_reason": {
+                        "title": "Reason for Rejection",
+                        "type": "string",
+                        "description": "If requisition was rejected, the reason for rejection"
+                    },
+                    "corrective_action": {
+                        "title": "Corrective Action",
+                        "type": "string",
+                        "description": "If requisition was rejected, the corrective action noted/taken"
+                    },
+                    "date_sent": {
+                        "title": "Date Correction Sent",
+                        "type": "string",
+                        "description": "YYYY-MM-DD",
+                        "anyOf": [
+                            {"format": "date-time"},
+                            {"format": "date"}
+                        ]
+                    },
+                    "date_completed": {
+                        "title": "Date Requisition Completed",
+                        "type": "string",
+                        "description": "If corrective action was needed, date amended requisition was completed (YYYY-MM-DD)",
+                        "anyOf": [
+                            {"format": "date-time"},
+                            {"format": "date"}
+                        ]
+                    },
+                    "notes": {
+                        "title": "Notes",
+                        "type": "string",
+                        "description": "Additional notes regarding requisition",
+                        "formInput": "textarea"
+                    }
+                }
+            }
+        },
+        "specimen_collection_date": {
+            "title": "Specimen Collection Date",
+            "description": "Date of specimen collection",
+            "type": "string",
+            "anyOf": [
+                {"format": "date-time"},
+                {"format": "date"}
+            ]
+        },
+        "specimen_collection_location": {
+            "title": "Specimen Collection Location",
+            "description": "Location of specimen collection",
+            "type": "string"
+        },
+        "specimen_accession": {
+            "title": "Specimen Accession",
+            "description": "Accession of specimen from sequencing lab",
+            "type": "string",
+            "uniqueKey": true
+        },
+        "priority": {
+            "title": "Priority",
+            "description": "Indicate if test is a rush order",
+            "type": "string",
+            "enum": [
+                "High",
+                "Normal"
+            ]
+        },
+        "date_transported": {
+            "title": "Transport Date",
+            "type": "string",
+            "description": "Date specimen was transported (YYYY-MM-DD)",
+            "anyOf": [
+                {"format": "date-time"},
+                {"format": "date"}
+            ]
+        },
+        "transported_by": {
+            "title": "Specimen Transported By",
+            "description": "Transport service that transported this specimen",
+            "type": "string"
+        },
+        "sent_by": {
+            "title": "Sent By",
+            "type": "string",
+            "description": "ID of person who sent the specimen"
+        },
+        "date_received": {
+            "title": "Date Received in Sequencing Lab",
+            "type": "string",
+            "anyOf": [
+                {"format": "date-time"},
+                {"format": "date"}
+            ]
+        },
+        "specimen_accepted": {
+            "title": "Specimen Accepted by Sequencing Lab?",
+            "type": "string",
+            "enum": ["Y", "N"]
+        },
+        "dna_extraction_lab": {
+            "title": "DNA Extraction Performed By",
+            "description": "Institute or Lab that performed DNA extraction from specimen",
+            "type": "string"
+        },
+        "dna_storage_lab": {
+            "title": "DNA Stored By",
+            "description": "Institute or Lab that stored the DNA",
+            "type": "string"
+        },
+        "dna_concentration": {
+            "title": "DNA Concentration after Extraction",
+            "type": "string"
+        },
+        "specimen_notes": {
+            "title": "Specimen Notes",
+            "type": "string",
+            "formInput": "textarea"
+        }
+    }
+}
