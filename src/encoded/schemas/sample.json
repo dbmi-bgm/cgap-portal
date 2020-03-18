@@ -1,6 +1,6 @@
 {
     "title": "Sample",
-    "description": "A sample from an individual",
+    "description": "A sample (library) from an individual",
     "id": "/profiles/sample.json",
     "$schema": "http://json-schema.org/draft-04/schema#",
     "type": "object",
@@ -34,37 +34,20 @@
                 "Sanger"
             ]
         },
-        "specimen_type": {
-            "title": "Specimen Type",
-            "type": "string",
-            "suggested_enum": [
-                "blood",
-                "saliva"
-            ]
+        "library_ids": {
+            "title": "Library IDs",
+            "type": "array",
+            "description": "The identifiers for this sample/library",
+            "items": {
+                "title": "Library ID",
+                "type": "string"
+            }
         },
-        "accepted_or_rejected": {
-            "title": "Accepted/Rejected",
+        "specimen": {
+            "title": "Specimen",
             "type": "string",
-            "description": "Whether the specimen was accepted or rejected due to quality or other reasons",
-            "enum": [
-                "accepted",
-                "rejected"
-            ]
-        },
-        "rejection_reason": {
-            "title": "Reason for Rejection",
-            "type": "string",
-            "description": "If specimen was rejected, the reason for rejection"
-        },
-        "specimen_notes": {
-            "title": "Specimen Notes",
-            "type": "string"
-        },
-        "specimen_collection_date": {
-            "title": "Specimen Collection Date",
-            "description": "Date of specimen collection",
-            "type": "string",
-            "format": "date"
+            "description": "The specimen this sample/library is derived from",
+            "linkTo": "Specimen"
         },
         "completed_processes": {
             "title": "Completed data processing",
@@ -73,78 +56,6 @@
                 "title": "Completed process",
                 "type": "string"
             }
-        },
-        "specimen_accession": {
-            "title": "Specimen Accession",
-            "description": "Accession of specimen from sequencing lab",
-            "type": "string",
-            "uniqueKey": true
-        },
-        "specimen_accession_date": {
-            "title": "Specimen Accession Date",
-            "description": "Date of specimen accessioning by sequencing lab",
-            "type": "string",
-            "anyOf": [
-                {"format": "date-time"},
-                {"format": "date"}
-            ]
-        },
-        "requisition": {
-            "title": "Requisition",
-            "type": "array",
-            "uniqueItems": true,
-            "items" : {
-                "title": "Requisition",
-                "type": "object",
-                "required": ["requisition_form"],
-                "properties": {
-                    "requisition_id": {
-                        "title": "Requisition ID",
-                        "type": "string"
-                    },
-                    "requisition_form": {
-                        "title": "Requisition Form",
-                        "type": "string",
-                        "linkTo": "Document"
-                    }
-                }
-            }
-        },
-        "ordering_physician": {
-            "title": "Ordering Physician",
-            "description": "Physician who ordered the test",
-            "type": "string"
-        },
-        "date_test_ordered": {
-            "title": "Test Ordered Date",
-            "description": "Date test was ordered",
-            "type": "string",
-            "anyOf": [
-                {"format": "date-time"},
-                {"format": "date"}
-            ]
-        },
-        "priority": {
-            "title": "Priority",
-            "description": "Indicate if test is a rush order",
-            "type": "string",
-            "enum": [
-                "High",
-                "Normal"
-            ]
-        },
-        "transported_by": {
-            "title": "Specimen Transported By",
-            "description": "Transport service that transported this specimen",
-            "type": "string"
-        },
-        "date_received": {
-            "title": "Date Received in Sequencing Lab",
-            "type": "string",
-            "anyOf": [
-                {"format": "date-time"},
-                {"format": "date"}
-            ]
         },
         "sequence_id": {
             "title": "Sequence Identifier",
@@ -158,16 +69,6 @@
         },
         "note_from_sequencing_lab": {
             "title": "Note from sequencing lab",
-            "type": "string"
-        },
-        "dna_extraction_lab": {
-            "title": "DNA Extraction Performed By",
-            "description": "Institute or Lab that performed DNA extraction from specimen",
-            "type": "string"
-        },
-        "dna_storage_lab": {
-            "title": "DNA Stored By",
-            "description": "Institute or Lab that stored the DNA",
             "type": "string"
         },
         "files": {
