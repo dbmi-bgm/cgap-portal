@@ -21,7 +21,10 @@ class Sample(Item):
     schema = load_schema('encoded:schemas/sample.json')
     rev = {'indiv': ('Individual', 'samples')}
     embedded_list = [
-        "processed_files.workflow_run_outputs"
+        "processed_files.workflow_run_outputs",
+        "specimen.specimen_type",
+        "specimen.specimen_notes",
+        "specimen.specimen_collection_date"
     ]
 
     @calculated_property(schema={
