@@ -1,5 +1,8 @@
 [tool.poetry]
-name = "cgap-portal"
+# cgap-portal has to be called encoded here because that's what makes script lookup work
+# after having done 'python setup_eb.py develop', at least on the beanstalk. It doesn't
+# sem to be needed locally. -kmp 17-Mar-2020
+name = "encoded"
 version = "1.0b0"
 description = "Clinical Genomics Analysis Platform"
 authors = ["4DN-DCIC Team <support@4dnucleome.org>"]
