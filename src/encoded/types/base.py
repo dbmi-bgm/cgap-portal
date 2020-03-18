@@ -271,7 +271,7 @@ class Item(snovault.Item):
     # Items of these statuses are filtered out from rev links
     filtered_rev_statuses = ('deleted', 'replaced')
 
-    # Default embed list for all 4DN Items
+    # Default embed list for all CGAP Items
     embedded_list = static_content_embed_list
 
     def __init__(self, registry, models):
