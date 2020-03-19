@@ -27,8 +27,7 @@ def sample_one(project, institution):
     return {
         'project': project['@id'],
         'institution': institution['@id'],
-        'specimen_type': 'blood',
-        'date_received': '2018-12-1'
+        'workup_type': 'WGS'
     }
 
 
@@ -37,18 +36,16 @@ def sample_two(project, institution):
     return {
         'project': project['@id'],
         'institution': institution['@id'],
-        'specimen_type': 'saliva',
-        'date_received': '2015-12-7'
+        'workup_type': 'WES'
     }
 
 
 @pytest.fixture
-def sample_invalid_specimen_type(project, institution, MIndividual):
+def sample_invalid_workup_type(project, institution, MIndividual):
     return {
         'project': project['@id'],
         'institution': institution['@id'],
-        'specimen_type': 'skin',
-        'date_received': '2015-12-7'
+        'workup_type': 'WBC'
     }
 
 
@@ -57,8 +54,7 @@ def sample_no_project(institution, MIndividual):
     return {
         'project': 'does not exist',
         'institution': institution['@id'],
-        'specimen_type': 'tissue',
-        'date_received': '2015-12-7'
+        'workup_type': 'WGS'
     }
 
 
@@ -67,9 +63,9 @@ def test_post_valid_samples(testapp, sample_one, sample_two):
     testapp.post_json('/sample', sample_two, status=201)
 
 
-def test_post_invalid_samples(testapp, sample_invalid_specimen_type, sample_no_project):
+def test_post_invalid_samples(testapp, sample_no_project, sample_invalid_workup_type):
     testapp.post_json('/sample', sample_no_project, status=422)
-    # testapp.post_json('/sample', sample_invalid_specimen_type, status=422)
+    testapp.post_json('/sample', sample_invalid_workup_type, status=422)
 
 
 def test_post_valid_patch_error(testapp, sample_one):
