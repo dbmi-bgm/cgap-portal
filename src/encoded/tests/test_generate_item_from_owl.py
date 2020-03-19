@@ -60,13 +60,6 @@ def rel_disorders():
 
 
 @pytest.fixture
-def disorder_gen(rel_disorders):
-    def disgen():
-        for dis in rel_disorders:
-            yield dis
-
-
-@pytest.fixture
 def delobs_disorders():
     return [
         {
@@ -82,13 +75,6 @@ def delobs_disorders():
             'disorder_url': 'http://purl.obolibrary.org/obo/MONDO_9999999'
         }
     ]
-
-
-@pytest.fixture
-def delobs_disorder_gen(delobs_disorders):
-    def disgen():
-        for dis in delobs_disorders:
-            yield dis
 
 
 @pytest.fixture
@@ -203,6 +189,24 @@ def test_prompt_check_for_output_options_wo_load_w_file(mock_logger):
     ofile, loadit = gifo.prompt_check_for_output_options(None, 'test.out', 'Disorder', 'test_server', mock_logger)
     assert ofile == 'test.out'
     assert not loadit
+
+
+@pytest.yield_fixture
+def disorder_gen(rel_disorders):
+    def disgen():
+        for dis in rel_disorders:
+            yield dis
+    yield disgen
+
+
+@pytest.yield_fixture
+def delobs_disorder_gen(delobs_disorders):
+    def disgen():
+        for dis in delobs_disorders:
+            yield dis
+    yield disgen
+
+
 
 
 def test_get_existing_items(mocker, connection, rel_disorders, delobs_disorders):
