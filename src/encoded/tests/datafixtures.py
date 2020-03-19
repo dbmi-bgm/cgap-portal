@@ -13,6 +13,31 @@ ORDER = [
 ]
 
 
+class MockedLogger(object):
+    def info(self, msg):
+        print('INFO: ' + msg)
+
+    def warn(self, msg):
+        print('WARNING: ' + msg)
+
+    def error(self, msg):
+        print('ERROR: ' + msg)
+
+
+@pytest.fixture
+def mock_logger():
+    return MockedLogger()
+
+
+@pytest.fixture
+def connection():
+    return {
+        "server": "https://cgap.hms.harvard.edu/",
+        "key": "testkey",
+        "secret": "testsecret"
+    }
+
+
 @pytest.fixture
 def wrangler_testapp(wrangler, app, external_tx, zsa_savepoints):
     return remote_user_testapp(app, wrangler['uuid'])

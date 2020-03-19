@@ -5,28 +5,25 @@ import copy
 from io import StringIO
 
 from collections import OrderedDict
-from rdflib import URIRef
-from ..commands import generate_items_from_owl as gifo
-from ..commands.owltools import Owler
+from ..commands import parse_hpoa as ph
 
 
 pytestmark = [pytest.mark.setone, pytest.mark.working]
 
 
-def test_gifo_get_args_defaults():
-    args = ['Disorder']
-    args = gifo.get_args(args)
-    assert args.env == 'local'
+def test_ph_get_args_defaults():
+    args = []
+    args = ph.get_args(args)
+    assert args.input == 'http://compbio.charite.de/jenkins/job/hpo.annotations.current/lastSuccessfulBuild/artifact/misc_2018/phenotype.hpoa'
     assert args.keyfile == os.path.expanduser("~/keypairs.json")
+    assert args.outfile == 'disorders2phenotypes.json'
     assert args.load is False
     assert args.post_report is False
     assert args.pretty is False
-    assert args.full is False
 
 
-@pytest.fixture
-def owler(mocker):
-    return mocker.patch.object(gifo, 'Owler')
+def test_get_items_from_db_keyed_by_field_ok_field(mocker):
+    mocker.patch('encoded.commands.parse_hpoa.search_metadata', side_effect=[rel_disorders, delobs_disorders])
 
 
 @pytest.fixture
@@ -60,13 +57,6 @@ def rel_disorders():
 
 
 @pytest.fixture
-def disorder_gen(rel_disorders):
-    def disgen():
-        for dis in rel_disorders:
-            yield dis
-
-
-@pytest.fixture
 def delobs_disorders():
     return [
         {
@@ -82,13 +72,6 @@ def delobs_disorders():
             'disorder_url': 'http://purl.obolibrary.org/obo/MONDO_9999999'
         }
     ]
-
-
-@pytest.fixture
-def delobs_disorder_gen(delobs_disorders):
-    def disgen():
-        for dis in delobs_disorders:
-            yield dis
 
 
 @pytest.fixture
@@ -205,23 +188,14 @@ def test_prompt_check_for_output_options_wo_load_w_file(mock_logger):
     assert not loadit
 
 
-def test_get_existing_items(mocker, connection, rel_disorders, delobs_disorders):
-    disorder_ids = [d.get('disorder_id') for d in rel_disorders + delobs_disorders]
-    mocker.patch('encoded.commands.generate_items_from_owl.search_metadata', side_effect=[rel_disorders, delobs_disorders])
-    dbdiseases = gifo.get_existing_items(connection, 'Disorder')
-    assert len(dbdiseases) == len(rel_disorders) + len(delobs_disorders)
-    assert all([d in dbdiseases for d in disorder_ids])
-
-
-def test_get_existing_items_from_db(mocker, connection, disorder_gen, delobs_disorder_gen, rel_disorders, delobs_disorders):
-    disorder_ids = [d.get('disorder_id') for d in rel_disorders + delobs_disorders]
-    mocker.patch('encoded.commands.generate_items_from_owl.search_metadata', side_effect=[disorder_gen, delobs_disorder_gen])
-    dbdiseases = list(gifo.get_existing_items_from_db(connection, 'Disorder'))
-    import pdb; pdb.set_trace()
-    assert len(dbdiseases) == len(rel_disorders) + len(delobs_disorders)
-    assert all([d in dbdiseases for d in disorder_ids])
-
-
+# def test_get_existing_items(mocker, connection, rel_disorders, delobs_disorders):
+#     disorder_ids = [d.get('disorder_id') for d in rel_disorders + delobs_disorders]
+#     mocker.patch('encoded.commands.generate_items_from_owl.search_metadata', side_effect=[rel_disorders, delobs_disorders])
+#     dbdiseases = gifo.get_existing_items(connection, 'Disorder')
+#     assert len(dbdiseases) == len(rel_disorders) + len(delobs_disorders)
+#     assert all([d in dbdiseases for d in disorder_ids])
+#
+#
 # def test_get_existing_items_wo_obsdel(mocker, connection, rel_disorders):
 #     disorder_ids = [d.get('disorder_id') for d in rel_disorders]
 #     mocker.patch('encoded.commands.generate_items_from_owl.search_metadata', return_value=rel_disorders)

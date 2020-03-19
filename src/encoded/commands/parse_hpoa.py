@@ -26,6 +26,7 @@ from ..commands.generate_items_from_owl import (
     get_raw_form,
     prompt_check_for_output_options,
     post_report_document_to_portal,
+    write_outfile
 )
 from ..commands.load_items import load_items
 
@@ -97,7 +98,7 @@ def get_logger(lname, logfile):
 
 
 def get_items_from_db_keyed_by_field(connection, itype, keyfield):
-    """ Returns returns a dictionary keyed by the given field
+    """ Returns a dictionary keyed by the given field
         for each item in the database of the specified itype
     """
     q = 'search/?type={}'.format(itype)
@@ -272,18 +273,6 @@ def convert2raw(item):
     return get_raw_form(stripped_item)
 
 
-def write_outfile(terms, filename, pretty=False):
-    '''terms is a list of dicts
-        write to file by default as a json list or if prett
-        then same with indents and newlines
-    '''
-    with open(filename, 'w') as outfile:
-        if pretty:
-            json.dump(terms, outfile, indent=4)
-        else:
-            json.dump(terms, outfile)
-
-
 def log_problems(logger, problems):
     missing_phenos = problems.get('hpo_not_found')
     if missing_phenos:
@@ -301,7 +290,7 @@ def log_problems(logger, problems):
             logger.info('{}\t{}'.format(d, udis[d]))
 
 
-def get_args():  # pragma: no cover
+def get_args(args):  # pragma: no cover
     parser = argparse.ArgumentParser(
         description='Given an HPOA file or url for download generate EvidenceDisPheno items and optionally load',
         formatter_class=argparse.RawDescriptionHelpFormatter,
@@ -333,7 +322,7 @@ def get_args():  # pragma: no cover
                         default=False,
                         action='store_true',
                         help="Default False - set True if you want json format easy to read, hard to parse")
-    return parser.parse_args()
+    return parser.parse_args(args)
 
 
 def main():  # pragma: no cover
@@ -344,7 +333,7 @@ def main():  # pragma: no cover
     logger = get_logger(__name__, logfile)
     logger.info('Processing disorder to phenotype annotations - START:{}'.format(start))
 
-    args = get_args()
+    args = get_args(sys.argv[1:])
 
     connection = connect2server(args.env, args.key, args.keyfile, logger)
     logger.info('Working with {}'.format(connection.get('server')))
