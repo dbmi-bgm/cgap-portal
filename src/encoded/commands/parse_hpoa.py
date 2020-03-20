@@ -103,21 +103,16 @@ def get_items_from_db_keyed_by_field(connection, itype, keyfield):
     """ Returns a dictionary keyed by the given field
         for each item in the database of the specified itype
     """
-    items = get_existing_items(connection, itype)
+    items = get_existing_items_from_db(connection, itype)
     return create_dict_keyed_by_field_from_items(items, keyfield)
 
 
 def get_dbxref2disorder_map(disorders):
+    xref_pre = ['omim:', 'orpha', 'decip']
     xref2dis = {}
     for duid, d in disorders.items():
-        xrefs = d.get('dbxrefs')
-        if xrefs:
-            for x in xrefs:
-                if x in xref2dis:
-                    logger.warn("For disorder uuid {} have already seen {} linked to {}".format(duid, x, xref2dis[x]))
-                else:
-                    if x.startswith('OMIM:') or x.lower().startswith('orpha') or x.lower().startswith('decip'):
-                        xref2dis[x] = duid
+        xref2dis.update({x: duid for x in d.get('dbxrefs', []) if (any([x.lower().startswith(p) for p in xref_pre]) and x not in xref2dis)})
+    import pdb; pdb.set_trace()
     return xref2dis
 
 
