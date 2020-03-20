@@ -207,8 +207,6 @@ def delobs_disorder_gen(delobs_disorders):
     yield disgen
 
 
-
-
 def test_get_existing_items(mocker, connection, rel_disorders, delobs_disorders):
     disorder_ids = [d.get('disorder_id') for d in rel_disorders + delobs_disorders]
     mocker.patch('encoded.commands.generate_items_from_owl.search_metadata', side_effect=[rel_disorders, delobs_disorders])
@@ -221,7 +219,6 @@ def test_get_existing_items_from_db(mocker, connection, disorder_gen, delobs_dis
     disorder_ids = [d.get('disorder_id') for d in rel_disorders + delobs_disorders]
     mocker.patch('encoded.commands.generate_items_from_owl.search_metadata', side_effect=[disorder_gen, delobs_disorder_gen])
     dbdiseases = list(gifo.get_existing_items_from_db(connection, 'Disorder'))
-    import pdb; pdb.set_trace()
     assert len(dbdiseases) == len(rel_disorders) + len(delobs_disorders)
     assert all([d in dbdiseases for d in disorder_ids])
 
@@ -232,6 +229,34 @@ def test_get_existing_items_from_db(mocker, connection, disorder_gen, delobs_dis
 #     dbdiseases = gifo.get_existing_items(connection, 'Disorder', False)
 #     assert len(dbdiseases) == len(rel_disorders)
 #     assert all([d in dbdiseases for d in disorder_ids])
+def test_create_dict_keyed_by_field_from_items_valid_field_for_all(rel_disorders):
+    keyfield = 'disorder_id'
+    disorder_ids = [d.get(keyfield) for d in rel_disorders]
+    disorder_dict = gifo.create_dict_keyed_by_field_from_items(rel_disorders, keyfield)
+    assert len(disorder_dict) == len(disorder_ids)
+    assert all([d in disorder_dict for d in disorder_ids])
+
+
+def test_create_dict_keyed_by_field_from_items_valid_field_with_2_empty_1_missing_field(rel_disorders):
+    keyfield = 'disorder_id'
+    disorder_ids = [d.get(keyfield) for d in rel_disorders]
+    rel_disorders.append(None)
+    rel_disorders.append({})
+    rel_disorders.append({
+        'status': 'deleted',
+        'disorder_name': 'colored thumbs',
+        'disorder_url': 'http://purl.obolibrary.org/obo/MONDO_9999998'
+    })
+    assert len(rel_disorders) == len(disorder_ids) + 3
+    disorder_dict = gifo.create_dict_keyed_by_field_from_items(rel_disorders, keyfield)
+    assert len(disorder_dict) == len(disorder_ids)
+    assert all([d in disorder_dict for d in disorder_ids])
+
+
+def test_create_dict_keyed_by_field_from_items_bad_field(rel_disorders):
+    keyfield = 'hpo_id'
+    disorder_dict = gifo.create_dict_keyed_by_field_from_items(rel_disorders, keyfield)
+    assert not disorder_dict
 
 
 def test_remove_obsoletes_and_unnamed_obsoletes(rel_disorders):

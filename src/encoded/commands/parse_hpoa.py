@@ -26,7 +26,9 @@ from ..commands.generate_items_from_owl import (
     get_raw_form,
     prompt_check_for_output_options,
     post_report_document_to_portal,
-    write_outfile
+    write_outfile,
+    create_dict_keyed_by_field_from_items,
+    get_existing_items_from_db
 )
 from ..commands.load_items import load_items
 
@@ -101,8 +103,8 @@ def get_items_from_db_keyed_by_field(connection, itype, keyfield):
     """ Returns a dictionary keyed by the given field
         for each item in the database of the specified itype
     """
-    q = 'search/?type={}'.format(itype)
-    return {i.get(keyfield): i for i in search_metadata(q, connection, page_limit=200, is_generator=True)}
+    items = get_existing_items(connection, itype)
+    return create_dict_keyed_by_field_from_items(items, keyfield)
 
 
 def get_dbxref2disorder_map(disorders):
