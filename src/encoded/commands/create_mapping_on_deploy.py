@@ -51,8 +51,8 @@ ITEM_INDEX_ORDER = [
     'Page'
 ]
 
-ENV_PROD = 'fourfront-cgap'
 ENV_DEV = 'fourfront-cgapdev'
+ENV_PROD = 'fourfront-cgap'
 ENV_TEST = 'fourfront-cgaptest'
 ENV_WOLF = 'fourfront-cgapwolf'
 
@@ -79,8 +79,8 @@ def get_my_env(app):
 
 def get_deployment_config(app):
     """
-    Gets deployment configuration based on what env we are on. Right now we wipe ES on all except
-    CGAP prod
+    Gets deployment configuration based on what env we are on.
+    Right now we wipe ES on all except CGAP prod
 
     :param app: handle to Pyramid app
     :return: dict of config options
