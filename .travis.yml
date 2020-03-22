@@ -2,7 +2,7 @@ dist: trusty
 language: python
 sudo: true
 python:
-  - "3.4"
+  - "3.6"
 if: tag IS blank
 cache:
   directories:
