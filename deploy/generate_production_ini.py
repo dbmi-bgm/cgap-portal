@@ -32,8 +32,14 @@ def build_ini_stream_from_template(template_file_name, init_file_stream):
 
 
 def environment_template_filename(env_name):
-    prefix = "fourfront-"
-    short_env_name = env_name[len(prefix):] if env_name.startswith(prefix) else env_name
+    prefixes = ["fourfront-", "cgap-"]
+    short_env_name = None
+    for prefix in prefixes:
+        if env_name.startswith(prefix):
+            short_env_name = env_name[len(prefix):]
+            break
+    if short_env_name is None:
+        short_env_name = env_name
     file = os.path.join(TEMPLATE_DIR, short_env_name + ".ini")
     if not os.path.exists(file):
         raise ValueError("No such environment: %s" % env_name)
