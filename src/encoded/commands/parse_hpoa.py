@@ -108,11 +108,15 @@ def get_items_from_db_keyed_by_field(connection, itype, keyfield):
 
 
 def get_dbxref2disorder_map(disorders):
+    ''' for existing db disorders gets their dbxrefs and maps them to uuid of the
+        disorder so you can use dbxrefs provided in the hpoa file to figure out the
+        database disorder that should be used for links
+        NOTE: for repeated dbxrefs - first encounter is saved, others silently discarded
+    '''
     xref_pre = ['omim:', 'orpha', 'decip']
     xref2dis = {}
     for duid, d in disorders.items():
         xref2dis.update({x: duid for x in d.get('dbxrefs', []) if (any([x.lower().startswith(p) for p in xref_pre]) and x not in xref2dis)})
-    import pdb; pdb.set_trace()
     return xref2dis
 
 
@@ -156,6 +160,11 @@ def has_unexpected_fields(data):
 
 
 def get_header_info_and_field_names(lines, logger):
+    ''' expects hash commented lines at beginning of file and the first uncommented lines
+        to contain the field names - if no preceeding comments will still work but report
+        info about file as 'unknown' but if any uncommented lines before field line then
+        program exit
+    '''
     fields = []
     dtag = 'date: '
     fdtag = 'description: '

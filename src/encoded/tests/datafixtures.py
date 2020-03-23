@@ -431,3 +431,83 @@ def quality_metric_fastqc(testapp, project, institution):
         "institution": institution['@id']
     }
     return testapp.post_json('/quality_metric_fastqc', item).json['@graph'][0]
+
+
+@pytest.fixture
+def rel_disorders():
+    return [
+        {
+            'disorder_id': 'MONDO:0400005',
+            'status': 'released',
+            'disorder_name': 'refeeding syndrome',
+            'disorder_url': 'http://purl.obolibrary.org/obo/MONDO_0400005',
+        },
+        {
+            'disorder_id': 'MONDO:0400004',
+            'status': 'released',
+            'disorder_name': 'phrynoderma',
+            'disorder_url': 'http://purl.obolibrary.org/obo/MONDO_0400004',
+        },
+        {
+            'disorder_id': 'MONDO:0300000',
+            'status': 'released',
+            'disorder_name': 'SSR3-CDG',
+            'disorder_url': 'http://purl.obolibrary.org/obo/MONDO_0300000',
+        },
+        {
+            'disorder_id': 'MONDO:0200000',
+            'status': 'released',
+            'disorder_name': 'uterine ligament adenosarcoma',
+            'disorder_url': 'http://purl.obolibrary.org/obo/MONDO_0200000'
+        }
+    ]
+
+
+@pytest.fixture
+def delobs_disorders():
+    return [
+        {
+            'disorder_id': 'MONDO:9999998',
+            'status': 'deleted',
+            'disorder_name': 'colored thumbs',
+            'disorder_url': 'http://purl.obolibrary.org/obo/MONDO_9999998'
+        },
+        {
+            'disorder_id': 'MONDO:9999999',
+            'status': 'obsolete',
+            'disorder_name': 'green thumbs',
+            'disorder_url': 'http://purl.obolibrary.org/obo/MONDO_9999999'
+        }
+    ]
+
+
+@pytest.fixture
+def phenotypes():
+    return [
+        {
+            'hpo_id': 'HP:0001507',
+            'status': 'released',
+            'phenotype_name': 'growth abnormality',
+            'hpo_url': 'http://purl.obolibrary.org/obo/HP_00001507',
+            'is_slim_for': 'Phenotype abnormality'
+        },
+        {
+            'hpo_id': 'HP:0040064',
+            'status': 'released',
+            'phenotype_name': 'Abnormality of limbs',
+            'hpo_url': 'http://purl.obolibrary.org/obo/HP_0040064',
+            'is_slim_for': 'Phenotype abnormality'
+        },
+        {
+            'hpo_id': 'HP:3000008',
+            'status': 'released',
+            'phenotype_name': 'Abnormality of mylohyoid muscle',
+            'hpo_url': 'http://purl.obolibrary.org/obo/HP_3000008'
+        },
+        {
+            'hpo_id': 'HP:0010708',
+            'status': 'released',
+            'phenotype_name': '1-5 finger syndactyly',
+            'hpo_url': 'http://purl.obolibrary.org/obo/HP_0010708'
+        }
+    ]
