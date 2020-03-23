@@ -19,6 +19,9 @@
         { "$ref": "evidence.json#/properties"}
     ],
     "properties" : {
+        "schema_version": {
+            "default": "1"
+        },
         "subject_item": {
             "title": "Disorder",
             "type": "string",
