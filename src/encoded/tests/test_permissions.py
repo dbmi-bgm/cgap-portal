@@ -75,8 +75,7 @@ def institution_viewer(testapp, institution, project):
         'last_name': 'institution viewer',
         'email': 'encode_viewer@example.org',
         'institution': institution['name'],
-        'status': 'current',
-        'viewing_groups': [project['viewing_group']]
+        'status': 'current'
     }
     # User @@object view has keys omitted.
     res = testapp.post_json('/user', item)
@@ -104,36 +103,6 @@ def viewing_group_member(testapp, project):
         'first_name': 'Viewing',
         'last_name': 'Group',
         'email': 'viewing_group_member@example.org',
-        'viewing_groups': [project['viewing_group']],
-        'status': 'current'
-    }
-    # User @@object view has keys omitted.
-    res = testapp.post_json('/user', item)
-    return testapp.get(res.location).json
-
-
-# this user has the NOFIC viewing group
-@pytest.fixture
-def nofic_group_member(testapp, nofic_project):
-    item = {
-        'first_name': 'NOFIC',
-        'last_name': 'Group',
-        'email': 'viewing_group_member@example.org',
-        'viewing_groups': [nofic_project['viewing_group']],
-        'status': 'current'
-    }
-    # User @@object view has keys omitted.
-    res = testapp.post_json('/user', item)
-    return testapp.get(res.location).json
-
-
-@pytest.fixture
-def multi_viewing_group_member(testapp, project, nofic_project):
-    item = {
-        'first_name': 'Viewing',
-        'last_name': 'Group',
-        'email': 'viewing_group_member@example.org',
-        'viewing_groups': [project['viewing_group'], nofic_project['viewing_group']],
         'status': 'current'
     }
     # User @@object view has keys omitted.
@@ -148,7 +117,6 @@ def remc_submitter(testapp, remc_institution, remc_project):
         'last_name': 'Submitter',
         'email': 'remc_submitter@example.org',
         'submits_for': [remc_institution['@id']],
-        'viewing_groups': [remc_project['viewing_group']],
         'status': 'current'
     }
     # User @@object view has keys omitted.
@@ -264,18 +232,6 @@ def viewing_group_member_testapp(viewing_group_member, app, external_tx, zsa_sav
 
 
 @pytest.fixture
-def multi_viewing_group_member_testapp(multi_viewing_group_member, app, external_tx, zsa_savepoints):
-    # app with both 4DN and NOFIC viewing group
-    return remote_user_testapp(app, multi_viewing_group_member['uuid'])
-
-
-@pytest.fixture
-def nofic_group_member_testapp(nofic_group_member, app, external_tx, zsa_savepoints):
-    # app for 4DN viewing group member
-    return remote_user_testapp(app, nofic_group_member['uuid'])
-
-
-@pytest.fixture
 def indexer_testapp(app, external_tx, zsa_savepoints):
     return remote_user_testapp(app, 'INDEXER')
 
@@ -383,12 +339,6 @@ def test_submitter_patch_viewing_groups_disallowed(submitter, other_institution,
     res = submitter_testapp.get(submitter['@id'])
     vgroups = {'viewing_groups': res.json['viewing_groups'] + ['GGR']}
     submitter_testapp.patch_json(res.json['@id'], vgroups, status=422)
-
-
-def test_wrangler_patch_viewing_groups_allowed(submitter, wrangler_testapp):
-    res = wrangler_testapp.get(submitter['@id'])
-    vgroups = {'viewing_groups': res.json['viewing_groups'] + ['Not 4DN']}
-    wrangler_testapp.patch_json(res.json['@id'], vgroups, status=200)
 
 
 def test_institutions_view_wrangler(wrangler_testapp, other_institution):
