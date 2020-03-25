@@ -98,3 +98,41 @@ def test_get_header_info_and_field_names_misformatted(mocker, capsys, mock_logge
         fields, lines = ph.get_header_info_and_field_names(iter(mini_hpoa_lines[4:]), mock_logger)
     out = capsys.readouterr()[0]
     assert out == 'INFO: Annotation file info:\n\tdate: unknown\n\tdescription: unknown\nERROR: UNKNOWN FIELDS FOUND: bad\n'
+
+
+@pytest.fixture
+def dis_data():
+    return {
+        'DatabaseID': 'OMIM:163600',
+        'DiseaseName': 'NIPPLES INVERTED',
+        'HPO_ID': 'HP:0000006',
+        'Reference': 'OMIM:163600',
+        'Evidence': 'IEA',
+        'Aspect': 'P'
+    }
+
+
+@pytest.fixture
+def xref2dis_map():
+    return {'OMIM:163600': 'uuid1', 'Orphanet:1': 'uuid2'}
+
+
+def test_find_disorder_uid_using_file_id_no_using_id(dis_data, xref2dis_map):
+    del dis_data['DatabaseID']
+    assert ph.find_disorder_uid_using_file_id(dis_data, xref2dis_map) is None
+
+
+def test_find_disorder_uid_using_file_id_OMIM(dis_data, xref2dis_map):
+    uid = ph.find_disorder_uid_using_file_id(dis_data, xref2dis_map)
+    assert uid == 'uuid1'
+
+
+def test_find_disorder_uid_using_file_id_ORPHA(dis_data, xref2dis_map):
+    dis_data['DatabaseID'] = 'ORPHA:1'
+    uid = ph.find_disorder_uid_using_file_id(dis_data, xref2dis_map)
+    assert uid == 'uuid2'
+
+
+def test_find_disorder_uid_using_file_id_using_id_not_found(dis_data, xref2dis_map):
+    dis_data['DatabaseID'] = 'ORPHA:2'
+    assert ph.find_disorder_uid_using_file_id(dis_data, xref2dis_map) is None
