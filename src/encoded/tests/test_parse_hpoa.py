@@ -136,3 +136,43 @@ def test_find_disorder_uid_using_file_id_ORPHA(dis_data, xref2dis_map):
 def test_find_disorder_uid_using_file_id_using_id_not_found(dis_data, xref2dis_map):
     dis_data['DatabaseID'] = 'ORPHA:2'
     assert ph.find_disorder_uid_using_file_id(dis_data, xref2dis_map) is None
+
+
+@pytest.fixture
+def hpo2uid_map():
+    return {
+        'HP:3000079': '7158aaec-9e34-4a80-b7d5-6066351a41bf',
+        'HP:0500252': '05648474-44de-4cdb-b35b-18f5362b8281',
+        'HP:0500249': 'fe6ec882-8af6-402d-ab55-69322519b5ef'
+    }
+
+
+def test_check_hpo_id_and_note_problems_ok(hpo2uid_map):
+    hpoid = 'HP:3000079'
+    ans = ph.check_hpo_id_and_note_problems('blah', hpoid, hpo2uid_map, {})
+    assert ans == hpo2uid_map.get(hpoid)
+
+
+def test_check_hpo_id_and_note_problems_new_not_ok(hpo2uid_map):
+    hpoid = 'HP:1111111'
+    problems = {}
+    assert ph.check_hpo_id_and_note_problems('blah', hpoid, hpo2uid_map, problems) is None
+    assert problems.get('hpo_not_found').get(hpoid)[0] == 'blah'
+
+
+def test_check_hpo_id_and_note_problems_new_field_w_existing_prob(hpo2uid_map):
+    hpoid = 'HP:1111111'
+    problems = {'hpo_not_found': {'HP:1111111': ['blah']}}
+    assert ph.check_hpo_id_and_note_problems('ooh', hpoid, hpo2uid_map, problems) is None
+    probs = problems.get('hpo_not_found').get(hpoid)
+    assert len(probs) == 2
+    assert probs[1] == 'ooh'
+
+
+def test_check_hpo_id_and_note_problems_existing_not_ok(hpo2uid_map):
+    hpoid = 'HP:1111111'
+    problems = {'hpo_not_found': {'HP:1111111': ['ooh', 'blah']}}
+    assert ph.check_hpo_id_and_note_problems('blah', hpoid, hpo2uid_map, problems) is None
+    probs = problems.get('hpo_not_found').get(hpoid)
+    assert len(probs) == 2
+    assert probs[1] == 'blah'

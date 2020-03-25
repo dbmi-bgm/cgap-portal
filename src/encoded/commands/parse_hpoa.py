@@ -202,10 +202,13 @@ def find_disorder_uid_using_file_id(data, xref2disorder):
 
 
 def check_hpo_id_and_note_problems(fname, hpoid, hpoid2uuid, problems):
+    ''' Is the hpo_id in the mapping dict?  If so return uuid.
+        If not add info to the problems dict for later reporting
+    '''
     hpuid = hpoid2uuid.get(hpoid)
     if hpuid:
         return hpuid
-    not_found = problems.get('hpo_not_found', [])
+    not_found = problems.get('hpo_not_found', {})
     fields = []
     if hpoid in not_found:
         fields = not_found.get(hpoid, [])
