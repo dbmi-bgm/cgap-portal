@@ -77,21 +77,6 @@
                 "tilde"
             ]
         },
-        "maximum_length_of_value": {
-            "title": "Maximum length of value (bytes)",
-            "type": "integer",
-            "description": "Maximum number of bytes this field can hold"
-        },
-        "schema_description": {
-            "title": "Description to be used in the variant schema for the field",
-            "description": "description inception",
-            "type": "string"
-        },
-        "value_example": {
-            "title": "Example Value for this field",
-            "description": "Example Value for this field, stored as text",
-            "type": "string"
-        },
         "enum_list": {
             "title": "Enum List",
             "description": "List of possible values for this field if applicable",
@@ -102,16 +87,31 @@
                 "type": "string"
             }
         },
-        "schema_title": {
-           "title": "Schema Title",
-           "description": "Title to be used in the variant schema for the field",
-           "type": "string"
-       },
        "links_to": {
            "title": "Link To",
            "description": "Item Type that should be linked to from this field",
            "type": "string"
        },
+       "schema_title": {
+           "title": "Schema Title",
+           "description": "Title to be used in the gene schema for the field",
+           "type": "string"
+       },
+       "schema_description": {
+            "title": "Description",
+            "description": "description to be used in the gene schema for the field",
+            "type": "string"
+        },
+        "value_example": {
+            "title": "Example Value for this field",
+            "description": "Example Value for this field, stored as text",
+            "type": "string"
+        },
+        "pre_addon": {
+            "title": "Pre-Addon",
+            "description": "base of url to substitute in an ID to make a external link - use in namespaces.json?",
+            "type": "string"
+        },
         "field_priority": {
             "title": "Field priority",
             "description": "Ranking number of the field (lower is better)",
@@ -147,7 +147,7 @@
             "description": "Method defined by new annotation structure",
             "type": "string"
         },
-         "annotation_grouping": {
+        "annotation_grouping": {
             "title": "Annotation Grouping",
             "description": "Which group this annotation belongs to",
             "type": "string"
@@ -162,11 +162,6 @@
                 "gene",
                 "sample_variant"
             ]
-        },
-        "pre_addon": {
-            "title": "Pre-Addon",
-            "description": "I don't know",
-            "type": "string"
         },
         "calculated_property": {
             "title": "Calculated Property",

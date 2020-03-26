@@ -58,16 +58,6 @@ class Gene(Item):
     schema = load_schema('encoded:schemas/gene.json')
     embedded_list = []
 
-    @calculated_property(schema={
-        "title": "Display Title",
-        "description": "A calculated title for every object in 4DN",
-        "type": "string"
-    })
-    def display_title(self, request, gene_id, preferred_symbol=None):
-        if preferred_symbol:
-            return preferred_symbol
-        return 'GENE ID:{}'.format(gene_id)
-
 
 @collection(
     name='documents',
