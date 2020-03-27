@@ -30,6 +30,7 @@
             "title": "Workup Type",
             "type": "string",
             "label": "test",
+            "lookup": 10,
             "enum": [
                 "WGS",
                 "WES",
@@ -40,6 +41,7 @@
             "title": "Specimen Type",
             "type": "string",
             "label": "specimen",
+            "lookup": 20,
             "suggested_enum": [
                 "blood",
                 "saliva"
@@ -116,27 +118,27 @@
                     "accepted_rejected": {
                         "title": "Accepted/Rejected?",
                         "type": "string",
-                        "lookup": 101,
+                        "lookup": 111,
                         "description": "Whether the requisition was accepted or rejected",
                         "enum": ["Accepted", "Rejected"]
                     },
                     "rejection_reason": {
                         "title": "Reason for Rejection",
                         "type": "string",
-                        "lookup": 102,
+                        "lookup": 112,
                         "description": "If requisition was rejected, the reason for rejection"
                     },
                     "corrective_action": {
                         "title": "Corrective Action",
                         "type": "string",
-                        "lookup": 103,
+                        "lookup": 113,
                         "description": "If requisition was rejected, the corrective action noted/taken"
                     },
                     "date_sent": {
                         "title": "Date Correction Sent",
                         "type": "string",
                         "description": "YYYY-MM-DD",
-                        "lookup": 104,
+                        "lookup": 114,
                         "anyOf": [
                             {"format": "date-time"},
                             {"format": "date"}
@@ -145,7 +147,7 @@
                     "date_completed": {
                         "title": "Date Requisition Completed",
                         "type": "string",
-                        "lookup": 105,
+                        "lookup": 115,
                         "description": "If corrective action was needed, date amended requisition was completed (YYYY-MM-DD)",
                         "anyOf": [
                             {"format": "date-time"},
@@ -155,7 +157,7 @@
                     "notes": {
                         "title": "Notes",
                         "type": "string",
-                        "lookup": 106,
+                        "lookup": 116,
                         "description": "Additional notes regarding requisition",
                         "formInput": "textarea"
                     }
@@ -166,7 +168,7 @@
             "title": "Other Specimen IDs",
             "type": "array",
             "label": "specimen",
-            "lookup": 110,
+            "lookup": 120,
             "items": {
                 "title": "Other Specimen ID",
                 "type": "object",
@@ -175,12 +177,14 @@
                     "id_type": {
                         "title": "ID Type",
                         "description": "Label for where this ID is used, e.g. BCGG-ID",
-                        "type": "string"
+                        "type": "string",
+                        "lookup": 121
                     },
                     "id": {
                         "title": "ID",
                         "description": "Identifier that corresponds to the ID type, e.g. 333",
-                        "type": "string"
+                        "type": "string",
+                        "lookup": 122
                     }
                 }
             }
@@ -190,7 +194,7 @@
             "description": "Date of specimen collection",
             "type": "string",
             "label": "specimen",
-            "lookup": 120,
+            "lookup": 130,
             "anyOf": [
                 {"format": "date-time"},
                 {"format": "date"}
@@ -201,7 +205,7 @@
             "description": "Location of specimen collection",
             "label": "specimen",
             "type": "string",
-            "lookup": 130
+            "lookup": 140
         },
         "specimen_accession": {
             "title": "Specimen Accession",
@@ -216,7 +220,7 @@
             "description": "Indicate if test is a rush order",
             "type": "string",
             "label": "requisition",
-            "lookup": 140,
+            "lookup": 150,
             "enum": [
                 "High",
                 "Normal"
@@ -226,7 +230,7 @@
             "title": "Transport Date",
             "type": "string",
             "label": "specimen",
-            "lookup": 160,
+            "lookup": 170,
             "description": "Date specimen was transported (YYYY-MM-DD)",
             "anyOf": [
                 {"format": "date-time"},
@@ -238,20 +242,20 @@
             "description": "Transport service that transported this specimen",
             "label": "specimen",
             "type": "string",
-            "lookup": 170
+            "lookup": 180
         },
         "sent_by": {
             "title": "Sent By",
             "type": "string",
             "label": "specimen",
-            "lookup": 150,
+            "lookup": 160,
             "description": "ID of person who sent the specimen"
         },
         "date_received": {
             "title": "Date Received in Sequencing Lab",
             "type": "string",
             "label": "specimen",
-            "lookup": 180,
+            "lookup": 190,
             "anyOf": [
                 {"format": "date-time"},
                 {"format": "date"}
@@ -261,7 +265,7 @@
             "title": "Specimen Accepted by Sequencing Lab?",
             "type": "string",
             "label": "specimen",
-            "lookup": 190,
+            "lookup": 200,
             "enum": ["Yes", "No"]
         },
         "dna_extraction_lab": {
@@ -269,25 +273,25 @@
             "description": "Institute or Lab that performed DNA extraction from specimen",
             "type": "string",
             "label": "specimen",
-            "lookup": 200
+            "lookup": 210
         },
         "dna_storage_lab": {
             "title": "DNA Stored By",
             "description": "Institute or Lab that stored the DNA",
             "type": "string",
             "label": "specimen",
-            "lookup": 210
+            "lookup": 220
         },
         "dna_concentration": {
             "title": "DNA Concentration after Extraction",
             "type": "string",
             "label": "specimen",
-            "lookup": 220
+            "lookup": 230
         },
         "specimen_notes": {
             "title": "Specimen Notes",
             "type": "string",
-            "lookup": 230,
+            "lookup": 240,
             "label": "specimen",
             "formInput": "textarea"
         },
@@ -295,7 +299,7 @@
             "title": "Library Information",
             "type": "array",
             "label": "library",
-            "lookup": 110,
+            "lookup": 250,
             "items": {
                 "title": "Library Information",
                 "type": "object",
@@ -304,12 +308,14 @@
                     "field": {
                         "title": "Field",
                         "description": "Label for what this info corresponds to, e.g. Preparation Date or Plate ID",
-                        "type": "string"
+                        "type": "string",
+                        "lookup": 251
                     },
                     "value": {
                         "title": "Value",
                         "description": "Information about the library",
-                        "type": "string"
+                        "type": "string",
+                        "lookup": 252
                     }
                 }
             }
@@ -317,13 +323,14 @@
         "sequence_id": {
             "title": "Sequence Identifier",
             "type": "string",
-            "label": "test"
+            "label": "test",
+            "lookup": 260
         },
         "other_sequence_ids": {
             "title": "Other Sequence IDs",
             "type": "array",
             "label": "test",
-            "lookup": 110,
+            "lookup": 270,
             "items": {
                 "title": "Other Sequence ID",
                 "type": "object",
@@ -332,12 +339,14 @@
                     "id_type": {
                         "title": "ID Type",
                         "description": "Label for where this ID is used, e.g. BCGG-ID",
-                        "type": "string"
+                        "type": "string",
+                        "lookup": 271
                     },
                     "id": {
                         "title": "ID",
                         "description": "Identifier that corresponds to the ID type, e.g. 333",
-                        "type": "string"
+                        "type": "string",
+                        "lookup": 272
                     }
                 }
             }
@@ -345,12 +354,14 @@
         "note_from_sequencing_lab": {
             "title": "Note from sequencing lab",
             "type": "string",
+            "lookup": 280,
             "formInput": "textarea"
         },
         "sequencing_date": {
             "title": "Date of Sequencing",
             "type": "string",
             "label": "test",
+            "lookup": 290,
             "anyOf": [
                 {"format": "date-time"},
                 {"format": "date"}
@@ -361,6 +372,7 @@
             "description": "Information about the data files associated with the sample.",
             "type": "array",
             "label": "test",
+            "lookup": 300,
             "items": {
                 "title": "File",
                 "description": "File metadata.",
@@ -373,6 +385,7 @@
             "description": "Input alignment files.",
             "type": "array",
             "label": "test",
+            "lookup": 310,
             "items": {
                 "title": "CRAM File",
                 "description": "File metadata.",
@@ -385,6 +398,7 @@
             "description": "Processed files that are derived from files in this sample.",
             "type": "array",
             "label": "test",
+            "lookup": 330,
             "items": {
                 "title": "Processed File",
                 "description": "File metadata.",
@@ -397,6 +411,7 @@
             "description": "Reference files associated with this sample (ex. file of sequencing barcodes).",
             "type": "array",
             "label": "test",
+            "lookup": 320,
             "items": {
                 "title": "Reference File",
                 "description": "File metadata.",
@@ -408,6 +423,7 @@
             "title": "Completed data processing",
             "type": "array",
             "label": "test",
+            "lookup": 340,
             "items": {
                 "title": "Completed process",
                 "type": "string"
