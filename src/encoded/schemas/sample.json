@@ -107,60 +107,56 @@
         },
         "requisition_acceptance": {
             "title": "Requisition Acceptance",
-            "type": "array",
+            "type": "object",
             "label": "requisition",
             "lookup": 110,
-            "items": {
-                "title": "Requisition Acceptance",
-                "type": "object",
-                "required": ["accepted_rejected"],
-                "properties": {
-                    "accepted_rejected": {
-                        "title": "Accepted/Rejected?",
-                        "type": "string",
-                        "lookup": 111,
-                        "description": "Whether the requisition was accepted or rejected",
-                        "enum": ["Accepted", "Rejected"]
-                    },
-                    "rejection_reason": {
-                        "title": "Reason for Rejection",
-                        "type": "string",
-                        "lookup": 112,
-                        "description": "If requisition was rejected, the reason for rejection"
-                    },
-                    "corrective_action": {
-                        "title": "Corrective Action",
-                        "type": "string",
-                        "lookup": 113,
-                        "description": "If requisition was rejected, the corrective action noted/taken"
-                    },
-                    "date_sent": {
-                        "title": "Date Correction Sent",
-                        "type": "string",
-                        "description": "YYYY-MM-DD",
-                        "lookup": 114,
-                        "anyOf": [
-                            {"format": "date-time"},
-                            {"format": "date"}
-                        ]
-                    },
-                    "date_completed": {
-                        "title": "Date Requisition Completed",
-                        "type": "string",
-                        "lookup": 115,
-                        "description": "If corrective action was needed, date amended requisition was completed (YYYY-MM-DD)",
-                        "anyOf": [
-                            {"format": "date-time"},
-                            {"format": "date"}
-                        ]
-                    },
-                    "notes": {
-                        "title": "Notes",
-                        "type": "string",
-                        "lookup": 116,
-                        "description": "Additional notes regarding requisition",
-                        "formInput": "textarea"
-                    }
+            "required": ["accepted_rejected"],
+            "properties": {
+                "accepted_rejected": {
+                    "title": "Accepted/Rejected?",
+                    "type": "string",
+                    "lookup": 111,
+                    "description": "Whether the requisition was accepted or rejected",
+                    "enum": ["Accepted", "Rejected"]
+                },
+                "rejection_reason": {
+                    "title": "Reason for Rejection",
+                    "type": "string",
+                    "lookup": 112,
+                    "description": "If requisition was rejected, the reason for rejection"
+                },
+                "corrective_action": {
+                    "title": "Corrective Action",
+                    "type": "string",
+                    "lookup": 113,
+                    "description": "If requisition was rejected, the corrective action noted/taken"
+                },
+                "date_sent": {
+                    "title": "Date Correction Sent",
+                    "type": "string",
+                    "description": "YYYY-MM-DD",
+                    "lookup": 114,
+                    "anyOf": [
+                        {"format": "date-time"},
+                        {"format": "date"}
+                    ]
+                },
+                "date_completed": {
+                    "title": "Date Requisition Completed",
+                    "type": "string",
+                    "lookup": 115,
+                    "description": "If corrective action was needed, date amended requisition was completed (YYYY-MM-DD)",
+                    "anyOf": [
+                        {"format": "date-time"},
+                        {"format": "date"}
+                    ]
+                },
+                "notes": {
+                    "title": "Notes",
+                    "type": "string",
+                    "lookup": 116,
+                    "description": "Additional notes regarding requisition",
+                    "formInput": "textarea"
                 }
             }
         },
