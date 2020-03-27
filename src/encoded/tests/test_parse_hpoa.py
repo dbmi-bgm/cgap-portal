@@ -143,7 +143,9 @@ def hpo2uid_map():
     return {
         'HP:3000079': '7158aaec-9e34-4a80-b7d5-6066351a41bf',
         'HP:0500252': '05648474-44de-4cdb-b35b-18f5362b8281',
-        'HP:0500249': 'fe6ec882-8af6-402d-ab55-69322519b5ef'
+        'HP:0500249': 'fe6ec882-8af6-402d-ab55-69322519b5ef',
+        'HP:0000006': 'phe_uuid1',
+        'HP:0040283': 'phe_uuid2'
     }
 
 
@@ -176,3 +178,77 @@ def test_check_hpo_id_and_note_problems_existing_not_ok(hpo2uid_map):
     probs = problems.get('hpo_not_found').get(hpoid)
     assert len(probs) == 2
     assert probs[1] == 'blah'
+
+
+@pytest.fixture
+def hpoa_data():
+    return {
+        'DatabaseID': 'OMIM:163600',
+        'DiseaseName': 'NIPPLES INVERTED',
+        'Qualifier': None,
+        'Reference': 'OMIM:163600',
+        'Evidence': 'IEA',
+        'Frequency': 'HP:0040283',
+        'Sex': 'male',
+        'Aspect': 'I',
+        'Biocuration': 'HPO:iea[2009-02-17]',
+        'subject_item': 'dis_uuid1',
+        'object_item': 'phe_uuid1'
+    }
+
+
+def test_create_evi_annotation_no_data(hpo2uid_map):
+    assert not ph.create_evi_annotation({}, hpo2uid_map, {})
+
+
+def test_create_evi_annotation_with_data(hpoa_data, hpo2uid_map):
+    evi = ph.create_evi_annotation(hpoa_data, hpo2uid_map, {})
+    map = ph.FIELD_MAPPING
+    revmap = {v: k for k, v in map.items() if k != 'Frequency'}
+    for f, v in evi.items():
+        if f.endswith('_item'):
+            assert v == hpoa_data[f]
+        elif f == 'frequency_term':
+            assert v == 'phe_uuid2'
+        elif f == 'affected_sex':
+            assert v == 'M'
+        elif f in revmap:
+            assert v == hpoa_data.get(revmap[f])
+
+
+# the following test specific field cases
+
+def test_create_evi_annotation_with_qual(hpoa_data, hpo2uid_map):
+    hpoa_data['Qualifier'] = 'NOT'
+    evi = ph.create_evi_annotation(hpoa_data, hpo2uid_map, {})
+    assert evi.get('is_not')
+
+
+def test_create_evi_annotation_with_female(hpoa_data, hpo2uid_map):
+    hpoa_data['Sex'] = 'Female'
+    evi = ph.create_evi_annotation(hpoa_data, hpo2uid_map, {})
+    assert evi.get('affected_sex') == 'F'
+
+
+def test_create_evi_annotation_with_freq_str(hpoa_data, hpo2uid_map):
+    freq = '1 in 10'
+    hpoa_data['Frequency'] = freq
+    evi = ph.create_evi_annotation(hpoa_data, hpo2uid_map, {})
+    assert evi.get('frequency_value') == freq
+
+
+def test_create_evi_annotation_with_hp_modifier(mocker, hpoa_data, hpo2uid_map):
+    mod_phe = 'HP:0500252'
+    phe_uuid = '05648474-44de-4cdb-b35b-18f5362b8281'
+    hpoa_data['Modifier'] = mod_phe
+    mocker.patch('encoded.commands.parse_hpoa.check_hpo_id_and_note_problems', return_value=phe_uuid)
+    evi = ph.create_evi_annotation(hpoa_data, hpo2uid_map, {})
+    assert evi.get('modifier') == phe_uuid
+
+
+def test_create_evi_annotation_with_unknown_hp_modifier(mocker, hpoa_data, hpo2uid_map):
+    mod_phe = 'HP:0000002'
+    hpoa_data['Modifier'] = mod_phe
+    mocker.patch('encoded.commands.parse_hpoa.check_hpo_id_and_note_problems', return_value=None)
+    evi = ph.create_evi_annotation(hpoa_data, hpo2uid_map, {})
+    assert 'modifier' not in evi
