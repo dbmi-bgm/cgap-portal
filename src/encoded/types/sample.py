@@ -34,3 +34,24 @@ class Sample(Item):
         indivs = self.rev_link_atids(request, "indiv")
         if indivs:
             return indivs[0]
+
+    @calculated_property(schema={
+        "title": "Requisition Completed",
+        "description": "True when Requisition Acceptance fields are completed",
+        "type": "boolean"
+    })
+    def requisition_completed(self, request):
+        props = self.properties
+        req = props.get('requisition_acceptance', {})
+        if req:
+            if req.get('accepted_rejected') == 'Accepted':
+                return True
+            elif req.get('accepted_rejected') == 'Rejected' and req.get('date_completed'):
+                return True
+            else:
+                return False
+        elif any(props.get(item) for item in [
+            'specimen_accession_date', 'specimen_accession',
+            'date_requisition_received', 'accessioned_by'
+        ]):
+            return False

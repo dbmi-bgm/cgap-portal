@@ -60,12 +60,14 @@
         "quantity": {
             "title": "Quantity",
             "description": "Number of individuals represented by this item in pedigree",
-            "type": "number"
+            "type": "number",
+            "lookup": 60
         },
         "phenotypic_features": {
             "title": "Phenotypic Features",
             "description": "Phenotypic Features as listed in HPO",
             "type": "array",
+            "lookup": 40,
             "uniqueItems": true,
             "items":{
                 "title": "Phenotypic Feature Info",
@@ -101,6 +103,7 @@
             "title" : "Disorders",
             "type" : "array",
             "uniqueItems": true,
+            "lookup": 50,
             "items" : {
                 "title" : "Disorder",
                 "type" : "string",
@@ -113,17 +116,20 @@
         },
         "birth_year" : {
             "title" : "Year of Birth",
-            "type" : "integer"
+            "type" : "integer",
+            "lookup": 70
         },
         "is_deceased": {
             "title": "Deceased",
             "description": "Whether the individual is deceased",
-            "type": "boolean"
+            "type": "boolean",
+            "lookup": 72
         },
         "life_status": {
             "title": "Life Status",
             "description": "Status of individual",
             "type": "string",
+            "lookup": 71,
             "enum": [
                 "alive and well",
                 "alive",
@@ -133,29 +139,34 @@
         },
         "is_termination_of_pregnancy": {
             "title": "Termination of Pregnancy",
-            "type": "boolean"
+            "type": "boolean",
+            "lookup": 73
         },
         "is_spontaneous_abortion": {
             "title": "Spontaneous Abortion",
-            "type": "boolean"
+            "type": "boolean",
+            "lookup": 74
         },
         "is_still_birth": {
             "title": "Still Birth",
-            "type": "boolean"
+            "type": "boolean",
+            "lookup": 75
         },
         "cause_of_death": {
             "title" : "Cause of Death",
             "type" : "string",
-            "linkTo" : "Phenotype"
+            "linkTo" : "Phenotype",
+            "lookup": 76
         },
         "age_at_death": {
             "title": "Death Age",
-            "type": "number"
+            "type": "number",
+            "lookup": 77
         },
         "age_at_death_units": {
             "title": "Death Age Units",
             "type": "string",
-            "lookup": 13,
+            "lookup": 78,
             "enum": [
                 "day",
                 "week",
@@ -165,20 +176,24 @@
         },
         "is_no_children_by_choice": {
             "title": "No Children by Choice",
-            "type": "boolean"
+            "type": "boolean",
+            "lookup": 80
         },
         "is_infertile": {
             "title": "Infertile",
-            "type": "boolean"
+            "type": "boolean",
+            "lookup": 81
         },
         "cause_of_infertility": {
             "title" : "Cause of Infertility",
-            "type" : "string"
+            "type" : "string",
+            "lookup": 82
         },
         "ancestry": {
             "title": "Ancestry",
             "description": "Ancestry of the individual. List taken from https://gist.github.com/incredimike/1469814.",
             "type": "array",
+            "lookup": 30,
             "uniqueItems": true,
             "items": {
                 "title": "Ancestry",
@@ -466,16 +481,19 @@
         "mother": {
             "title": "Mother",
             "type": "string",
+            "lookup": 10,
             "linkTo": "Individual"
         },
         "father": {
             "title": "Father",
             "type": "string",
+            "lookup": 15,
             "linkTo": "Individual"
         },
         "samples" : {
             "title" : "Samples",
             "type" : "array",
+            "lookup": 20,
             "uniqueItems": true,
             "items" : {
                 "title" : "Sample",
