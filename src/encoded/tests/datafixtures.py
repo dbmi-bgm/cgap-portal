@@ -3,7 +3,7 @@ import copy
 
 
 ORDER = [
-    'user', 'project', 'institution', 'file_format', 'variant_consequence', 'cohort', 'individual',
+    'user', 'project', 'institution', 'file_format', 'variant_consequence', 'cohort', 'family', 'individual',
     'sample', 'workflow', 'access_key', 'disorder', 'document', 'file_fastq',
     'file_processed', 'file_reference', 'gene', 'sample_processing',
     'page', 'phenotype', 'quality_metric_fastqc', 'evidence_dis_pheno',
