@@ -295,20 +295,20 @@ def test_search_query_string_with_booleans(workbook, testapp):
     tester_uuid = "986b362f-4eb6-4a9c-8173-3ab267307e4c"
     # assert induced_stem_uuid not in not_induced_uuids
     # now search for stem +induced (AND is now "+")
-    search_and = '/search/?type=User&q=wrangler+%2Bcurrent'
+    search_and = '/search/?type=User&q=scientist+%2Bcurrent'
     res_both = testapp.get(search_and).json
     both_uuids = [r['uuid'] for r in res_both['@graph'] if 'uuid' in r]
     assert len(both_uuids) == 2
     assert wrangler_uuid in both_uuids
     assert tester_uuid in both_uuids
     # search with OR ("|")
-    search_or = '/search/?type=User&q=Wrangler+%7Ctesting'
+    search_or = '/search/?type=User&q=Scientist+%7Ctesting'
     res_or = testapp.get(search_or).json
     or_uuids = [r['uuid'] for r in res_or['@graph'] if 'uuid' in r]
     assert wrangler_uuid in or_uuids
     assert tester_uuid in or_uuids
     # search with NOT ("-")
-    search_not = '/search/?type=User&q=Wrangler+-testing'
+    search_not = '/search/?type=User&q=Scientist+-testing'
     res_not = testapp.get(search_not).json
     not_uuids = [r['uuid'] for r in res_not['@graph'] if 'uuid' in r]
     assert tester_uuid not in not_uuids
