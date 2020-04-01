@@ -111,6 +111,87 @@ class Family(Item):
     def display_title(self, title):
         return title
 
+    def _update(self, properties, sheets=None):
+        # Note:
+        # Most of this is concerned with creating member relations in family item
+        # super(Family, self)._update(properties, sheets)
+
+        if 'proband' in properties.keys():
+            proband = self.collection.get(properties['proband'])
+
+        relations = {}
+        if 'proband' in properties.keys() and 'members' in properties.keys():
+            for member in properties['members']:
+                indiv = self.collection.get(member['individual'])
+                relations[member['individual']] = {}
+                if indiv.properties.get('father'):
+                    relations[member['individual']]['father'] = indiv.properties.get('father')
+                if indiv.properties.get('mother'):
+                    relations[member['individual']]['mother'] = indiv.properties.get('mother')
+                if indiv.properties.get('children'):
+                    relations[member['individual']]['children'] = indiv.properties.get('children')
+                if indiv.properties.get('sex'):
+                    relations[member['individual']]['sex'] = indiv.properties.get('sex')
+        parents = [
+            relations[properties['proband']].get('father'),
+            relations[properties['proband']].get('mother')
+        ]
+        grandparents = []
+        if parents[0]:
+            grandparents.append(relations[relations[properties['proband']]['father']].get('mother'))
+            grandparents.append(relations[relations[properties['proband']]['father']].get('father'))
+        if parents[1]:
+            grandparents.append(relations[relations[properties['proband']]['mother']].get('mother'))
+            grandparents.append(relations[relations[properties['proband']]['mother']].get('father'))
+        aunts_and_uncles = []
+        for key in relations.keys():
+            if (key not in parents and
+                    relations[key].get('mother', '') in grandparents and
+                    relations[key].get('father', '') in grandparents):
+                aunts_and_uncles.append(key)
+        cousins = []
+        for key in relations.keys():
+            if relations[key].get('mother') in aunts_and_uncles and relations[key].get('father') in aunts_and_uncles:
+                cousins.append(key)
+        for member in properties.get('members', []):
+            if member['individual'] == properties['proband']:
+                member['relation'] = 'self'
+            elif parents[0] and member['individual'] == parents[0]:
+                member['relation'] = 'father'
+            elif parents[1] and member['individual'] == parents[1]:
+                member['relation'] = 'mother'
+            # siblings: parents children who aren't proband
+            elif member['individual'] in [child for parent in parents for child in relations[parent].get('children', [])]:
+                member['relation'] = 'sibling'
+            # grandparents
+            elif member['individual'] in grandparents:
+                if relations[member['individual']].get('sex') == 'M':
+                    member['relation'] = 'grandfather'
+                elif relations[member['individual']].get('sex') == 'F':
+                    member['relation'] = 'grandmother'
+            # children
+            elif member['individual'] in relations[properties['proband']].get('children', []):
+                member['relation'] = 'child'
+            # grandchildren
+            elif member['individual'] in [
+                gc for child in relations[properties['proband']].get('children', []) for gc in relations[child].get('children', [])
+            ]:
+                member['relation'] = 'grandchild'
+            # aunts and uncles: grandparents children who aren't parents
+            elif member['individual'] in aunts_and_uncles:
+                if relations[member['individual']].get('sex') == 'F':
+                    member['relation'] = 'aunt'
+                elif relations[member['individual']].get('sex') == 'M':
+                    member['relation'] = 'uncle'
+            # cousins: aunts and uncles children
+            elif member['individual'] in cousins:
+                member['relation'] = 'cousin'
+            # elif member['individual'] in [child for aau in aunts_and_uncles for child in aau.get('children', [])]:
+            #     member['relation'] = 'cousin'
+            else:
+                member['relation'] = 'other'
+        super(Family, self)._update(properties, sheets)
+
 
 @view_config(name='process-pedigree', context=Family, request_method='PATCH',
              permission='edit')
@@ -773,10 +854,37 @@ def create_family_proband(testapp, xml_data, refs, ref_field, family_item,
     # process into family structure, keeping only uuids of items
     # invert uuids_by_ref to sort family members by managedObjectID (xml ref)
     refs_by_uuid = {v: k for k, v in uuids_by_ref.items()}
+    print(refs_by_uuid)
+    print(family_members.values())
     family = {'members': sorted([{'individual': m['uuid']} for m in family_members.values()],
                                  key=lambda v: int(refs_by_uuid[v['individual']]))}
     if proband and proband in family_members:
         family['proband'] = family_members[proband]['uuid']
+
+        # relations = {}
+        # for k, v in family_members.items():
+        #     relations[k] = {}
+        #     if v.get('father'):
+        #         relations[k]['father'] = v['father']
+        #     if v.get('mother'):
+
+        # father = family_members[proband].get('father')
+        # mother = family_members[proband].get('mother')
+        # print(father)
+        # if father:
+            # for item in family['members']:
+            #     if item['individual'] == father:
+            #         item['relation'] = 'father'
+            # for k, v in family_members.items():
+            #     if v.get('@id') == father:
+            #         f_uuid = v['uuid']
+            #         for item in family['members']:
+            #             if item['individual'] == f_uuid:
+            #                 item['relation'] = 'father'
+        # if mother:
+        #     for item in family['members']:
+        #         if item['individual'] == mother:
+        #             item['relation'] == 'mother'
     else:
         log.error('Family %s: No proband found' % family_item)
     return family
