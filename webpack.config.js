@@ -84,7 +84,10 @@ const optimization = {
             sourceMap: true,
             terserOptions:{
                 compress: true,
-                mangle: true
+                mangle: true,
+                output: {
+                    comments: false
+                }
             }
         })
     ]

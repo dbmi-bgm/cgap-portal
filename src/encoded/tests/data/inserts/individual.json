@@ -34,7 +34,8 @@
         "sex": "F",
         "is_deceased": false,
         "mother": "5ec91041-78a0-4758-abef-21c7f5fd9f92",
-        "father": "5ec91041-78a0-4758-abef-21c7f5fd9f91"
+        "father": "5ec91041-78a0-4758-abef-21c7f5fd9f91",
+        "samples": ["a4b98709-25fe-48a4-afde-8f886b57abc9"]
     },
     {
         "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",

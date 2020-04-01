@@ -28,8 +28,7 @@ def submitter_testapp(submitter, app, external_tx, zsa_savepoints):
 def project(testapp):
     item = {
         'name': 'encode-project',
-        'title': 'ENCODE Project',
-        'viewing_group': '4DN'
+        'title': 'ENCODE Project'
     }
     return testapp.post_json('/project', item).json['@graph'][0]
 
@@ -95,7 +94,6 @@ def submitter(testapp, institution, project):
         'last_name': 'Submitter',
         'email': 'encode_submitter@example.org',
         'submits_for': [institution['@id']],
-        'viewing_groups': [project['viewing_group']],
         'status': "current"
     }
     # User @@object view has keys omitted.
