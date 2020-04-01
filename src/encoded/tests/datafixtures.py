@@ -511,3 +511,92 @@ def phenotypes():
             'hpo_url': 'http://purl.obolibrary.org/obo/HP_0010708'
         }
     ]
+
+
+@pytest.fixture
+def raw_item_dict():
+    return {
+        'string_field': 'a_string',
+        'list_string_field': ['a_string', 'b_string', 'c_string'],
+        'int_field': 1,
+        'num_field': 1.1,
+        'boolean_field': True,
+        'list_int_field': [1, 2, 3],
+        'list_num_field': [1.1, 2.2, 3.3],
+        'linked_item_field': 'uuid1',
+        'list_linked_item_field': ['uuid1', 'uuid2'],
+        'sub_embed_obj_field': {'sef1': 'string', 'sef2': 'uuid1'},
+        'list_sub_embed_obj_field': [
+            {'sef1': 'string', 'sef2': 'uuid1'},
+            {'sef1': 'string2', 'sef2': 'uuid2'}
+        ]
+    }
+
+
+@pytest.fixture
+def embedded_item_dict():
+    return {
+        'uuid': 'uuid1',
+        'string_field': 'a_string',
+        'list_string_field': ['a_string', 'b_string', 'c_string'],
+        'int_field': 1,
+        'num_field': 1.1,
+        'boolean_field': True,
+        'list_int_field': [1, 2, 3],
+        'list_num_field': [1.1, 2.2, 3.3],
+        'linked_item_field': {
+            'uuid': 'uuid1',
+            'display_title': 'dt1',
+            '@type': ['Item'],
+            'embedded_field1': 'val1',
+            'embedded_item_field': {'uuid': 'uuid1', 'display_title': 'dt1', '@type': ['Item']}
+        },
+        'list_linked_item_field': [
+            {
+                'uuid': 'uuid1',
+                'display_title': 'dt1',
+                '@type': ['Item'],
+                'embedded_field1': 'val1',
+                'embedded_item_field': {'uuid': 'uuid1', 'display_title': 'dt1', '@type': ['Item']}
+            },
+            {
+                'uuid': 'uuid2',
+                'display_title': 'dt1',
+                '@type': ['Item'],
+                'embedded_field1': 'val1',
+                'embedded_item_field': {'uuid': 'uuid1', 'display_title': 'dt1', '@type': ['Item']}
+            }
+        ],
+        'sub_embed_obj_field': {
+            'sef1': 'string',
+            'sef2': {
+                'uuid': 'uuid1',
+                'display_title': 'dt1',
+                '@type': ['Item'],
+                'embedded_field1': 'val1',
+                'embedded_item_field': {'uuid': 'uuid1', 'display_title': 'dt1', '@type': ['Item']}
+            }
+        },
+        'list_sub_embed_obj_field': [
+            {
+                'sef1': 'string',
+                'sef2': {
+                    'uuid': 'uuid1',
+                    'display_title': 'dt1',
+                    '@type': ['Item'],
+                    'embedded_field1': 'val1',
+                    'embedded_item_field': {'uuid': 'uuid1', 'display_title': 'dt1', '@type': ['Item']}
+                }
+            },
+            {
+                'sef1': 'string2',
+                'sef2': {
+                    'uuid': 'uuid2',
+                    'display_title': 'dt2',
+                    '@type': ['Item'],
+                    'embedded_field1': 'val1',
+                    'embedded_item_field': {'uuid': 'uuid1', 'display_title': 'dt1', '@type': ['Item']}
+                }
+            }
+        ]
+    }

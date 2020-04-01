@@ -22,6 +22,15 @@ def test_ph_get_args_defaults():
     assert args.pretty is False
 
 
+def test_get_fields_for_item_added_by_file():
+    list2chk = ['subject_item', 'object_item', 'relationship_name']
+    to_add = [v for k, v in ph.FIELD_MAPPING.items() if k not in ['Frequency', 'DiseaseName', 'HPO_ID']]
+    list2chk.extend(to_add)
+    list2chk.extend(ph.FIELD_MAPPING.get('Frequency'))
+    field_list = ph.get_fields_for_item_added_by_file()
+    assert field_list == list2chk
+
+
 def test_get_dbxref2disorder_map(rel_disorders):
     dbxrefs = [
         ['OMIM:1'],  # first instance of this
@@ -252,3 +261,16 @@ def test_create_evi_annotation_with_unknown_hp_modifier(mocker, hpoa_data, hpo2u
     mocker.patch('encoded.commands.parse_hpoa.check_hpo_id_and_note_problems', return_value=None)
     evi = ph.create_evi_annotation(hpoa_data, hpo2uid_map, {})
     assert 'modifier' not in evi
+
+
+def test_convert2raw(mocker, embedded_item_dict, raw_item_dict):
+    # this is not really testing much as the mocked return value is what is being
+    # checked so no way to know if fields are really being stripped as expected
+    # first add some fields that should be ignored when getting raw form
+    embedded_item_dict['status'] = 'released'
+    embedded_item_dict['date_created'] = "2020-03-03T20:08:10.690526+00:00"
+    embedded_item_dict['institution'] = '/institution/bwh'
+    embedded_item_dict["principals_allowed"] = {"view": ["system.Everyone"], "edit": ["group.admin"]}
+    mocker.patch('encoded.commands.parse_hpoa.get_raw_form', return_value=raw_item_dict)
+    raw_item = ph.convert2raw(embedded_item_dict)
+    assert raw_item == raw_item_dict

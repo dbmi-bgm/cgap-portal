@@ -59,6 +59,21 @@ DIS_NAME_FIELD_FROM_INPUT = 'DiseaseName'
 RELATION = 'associated with'
 
 
+def get_fields_for_item_added_by_file():
+    ''' returns a list of all the property names of the item that are generated
+        from the file - omits calc prop and other user editable fields like clinic_notes
+        fields will be used to compare dbterms to terms from file
+    '''
+    item_fields = ['subject_item', 'object_item', 'relationship_name']
+    to_add = [v for k, v in FIELD_MAPPING.items() if k not in ['Frequency', 'DiseaseName', 'HPO_ID']]
+    item_fields.extend(to_add)
+    item_fields.extend(FIELD_MAPPING.get('Frequency'))
+    return item_fields
+
+
+ITEM_FIELDS = get_fields_for_item_added_by_file()
+
+
 def get_logger(lname, logfile):
     """logging setup
        logging config - to be moved to file at some point
@@ -277,8 +292,7 @@ def compare_existing_to_newly_generated(logger, connection, evidence_items, ityp
 
 def convert2raw(item):
     # need to remove properties not generated from file eg. calc props and others
-    fields2remove = ['uuid', '@id', '@type', 'display_title', 'status', 'principals_allowed', 'date_created']
-    stripped_item = {k: v for k, v in item.items() if k not in fields2remove}
+    stripped_item = {k: v for k, v in item.items() if k in ITEM_FIELDS}
     return get_raw_form(stripped_item)
 
 
