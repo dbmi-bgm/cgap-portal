@@ -280,6 +280,7 @@ def compare_existing_to_newly_generated(logger, connection, evidence_items, ityp
     uids2obsolete = []
     logger.info("comparing: {}".format(datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")))
     for db_evi in dbitems:
+        # import pdb; pdb.set_trace()
         tochk = convert2raw(db_evi)
         if tochk in evidence_items:
             existing += 1

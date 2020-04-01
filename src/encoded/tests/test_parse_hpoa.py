@@ -274,3 +274,77 @@ def test_convert2raw(mocker, embedded_item_dict, raw_item_dict):
     mocker.patch('encoded.commands.parse_hpoa.get_raw_form', return_value=raw_item_dict)
     raw_item = ph.convert2raw(embedded_item_dict)
     assert raw_item == raw_item_dict
+
+
+@pytest.fixture
+def evi_items():
+    return [
+        {
+            'uuid': 'uuid1',
+            'subject_item': 'duuid1',
+            'object_item': 'puuid1',
+            'relationship_name': 'associated with',
+        },
+        {
+            'uuid': 'uuid2',
+            'subject_item': 'duuid2',
+            'object_item': 'puuid2',
+            'relationship_name': 'associated with'
+        },
+        {
+            'uuid': 'uuid3',
+            'subject_item': 'duuid3',
+            'object_item': 'puuid3',
+            'relationship_name': 'associated with'
+        }
+    ]
+
+
+def test_compare_existing_to_newly_generated_all_new(mocker, mock_logger, connection, evi_items):
+    itemcnt = len(evi_items)
+    mocker.patch('encoded.commands.parse_hpoa.search_metadata', return_value=[])
+    evi, exist, to_obs = ph.compare_existing_to_newly_generated(mock_logger, connection, evi_items, 'EvidenceDisPheno')
+    assert evi == evi_items
+    assert not to_obs
+    assert exist == 0
+
+
+def test_compare_existing_to_newly_generated_all_same(mocker, mock_logger, connection, evi_items):
+    itemcnt = len(evi_items)
+    mocker.patch('encoded.commands.parse_hpoa.search_metadata', return_value=evi_items[:])
+    mocker.patch('encoded.commands.parse_hpoa.get_raw_form', side_effect=evi_items[:])
+    evi, exist, to_obs = ph.compare_existing_to_newly_generated(mock_logger, connection, evi_items, 'EvidenceDisPheno')
+    assert not evi
+    assert not to_obs
+    assert itemcnt == exist
+
+
+def test_compare_existing_to_newly_generated_none_same(mocker, mock_logger, connection, evi_items):
+    dbitems = []
+    for e in evi_items:
+        dbitems.append({k: v + '9' for k, v in e.items()})
+    dbuuids = [d.get('uuid') for d in dbitems]
+    mocker.patch('encoded.commands.parse_hpoa.search_metadata', return_value=dbitems)
+    mocker.patch('encoded.commands.parse_hpoa.get_raw_form', side_effect=dbitems)
+    evi, exist, to_obs = ph.compare_existing_to_newly_generated(mock_logger, connection, evi_items, 'EvidenceDisPheno')
+    assert evi == evi_items
+    assert to_obs == dbuuids
+    assert exist == 0
+
+
+@pytest.fixture
+def problems(evi_items, hpoa_data):
+    return {
+        'hpo_not_found': {
+            'HP:0000001': 'HPO_ID',
+            'HP:0202021': 'Frequency',
+        },
+        'redundant_annot': [evi_items],
+        'no_map': [hpoa_data]
+    }
+
+
+def test_log_problems(mock_logger, problems, capsys):
+    ph.log_problems(mock_logger, problems)
+    out = capsys.readouterr()[0]
+    assert out == "INFO: 2 missing HPO terms used in hpoa file\nINFO: HP:0000001	HPO_ID\nINFO: HP:0202021	Frequency\nINFO: 1 redundant annotations found\nINFO: 1 disorders from 1 annotation lines not found by xref\nINFO: OMIM:163600	NIPPLES INVERTED\n"
