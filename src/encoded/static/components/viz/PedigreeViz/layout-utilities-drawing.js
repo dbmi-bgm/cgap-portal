@@ -51,7 +51,13 @@ export function relationshipTopPosition(yCoord, dims){
     return dims.graphPadding + yCoord - (dims.relationshipSize / 2);
 }
 
-
+/**
+ * @todo
+ * We could just pass in relationships and do foreach loop.
+ * However want to make sure is ordered from proband out, which
+ * object graph currently does slightly better job of, but gathers
+ * them below probably not ideally/orderedly. To look at later.
+ */
 export function createEdges(objectGraph, dims, graphHeight){
 
     // Some common dimensions
@@ -72,18 +78,18 @@ export function createEdges(objectGraph, dims, graphHeight){
 
     const q = [objectGraph[0]];
 
-    while(q.length){
+    while (typeof q[0] !== "undefined") {
         const indv = q.shift();
         if (seen[indv.id]) continue;
         seen[indv.id] = true;
         const { _maritalRelationships = [], _parentalRelationship : parentRelation } = indv;
 
         _maritalRelationships.forEach(function(mr){
-            mr.children.forEach(function(ch){
-                q.push(ch);
-            });
             mr.partners.forEach(function(p){
                 q.push(p);
+            });
+            mr.children.forEach(function(ch){
+                q.push(ch);
             });
         });
 
@@ -99,11 +105,16 @@ export function createEdges(objectGraph, dims, graphHeight){
                 }
             } = parentRelation;
 
-            let midPoint = null;
-            if (children.length === 0 || seenParentalRelationships.has(parentRelation)){
+            if (seenParentalRelationships.has(parentRelation)){
                 continue;
             }
             seenParentalRelationships.add(parentRelation);
+
+            children.forEach(function(ch){
+                q.push(ch);
+            });
+
+            let midPoint = null;
             if (children.length === 1){
                 midPoint = [ // Center of child top
                     //children[0]._drawing.xCoord + halfIndvWidth,
@@ -217,10 +228,6 @@ export function createEdges(objectGraph, dims, graphHeight){
                 adjustableEdges.push(parentEdge);
 
                 q.push(partner);
-            });
-
-            children.forEach(function(ch){
-                q.push(ch);
             });
 
 
@@ -374,9 +381,9 @@ function tracePaths(adjustableEdges, visibilityGraph){
                 //*/
 
 
-                if (!isVertical && v[1] === targetV[1]) {
+                if (prevEdge1[0][1] === targetV[1] && prevEdge1[1][1] === targetV[1]) {
                     // Slight advantage to paths which sticky to Y axis coord of target (or todo?: source) (heuristic optimization)
-                    costToTargetEstimate = costToTargetEstimate * 0.9;
+                    costToTargetEstimate = costToTargetEstimate * 0.99;
                 }
 
                 if (costToTargetEstimate < bestCostEstimate){
@@ -457,7 +464,16 @@ function tracePaths(adjustableEdges, visibilityGraph){
 
     }
 
-    adjustableEdges.forEach(function(edge, edgeIndex){
+    adjustableEdges.sort(function(a, b){
+        // TODO: Reconsider, maybe order by positionedRelationships order
+        const fromAV = a.vertices[1];
+        const toAV = a.vertices[a.vertices.length - 2];
+        const fromBV = b.vertices[1];
+        const toBV = b.vertices[b.vertices.length - 2];
+
+        // Rounded - preserve existing order unless distances vastly different.
+        return Math.floor(manhattanDistance(fromAV, toAV) / 200) - Math.floor(manhattanDistance(fromBV, toBV) / 200);
+    }).forEach(function(edge, edgeIndex){
         // We have 4 pts min in each due to edgeLedge
         const edgeVLen = edge.vertices.length;
         const fromV = edge.vertices[1];

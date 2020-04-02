@@ -219,206 +219,11 @@ export function assignTreeHeightIndices(objectGraph, filterUnrelatedIndividuals 
             rel._drawing.heightIndex += diff;
         });
 
-        console.log("SMALHEIGHTDIF", smallestHeightIndex, diff, maxHeightIndexAssigned);
     }
 
     return maxHeightIndexAssigned;
 }
 
-
-/** Individuals with no parents defined */
-export function getParentlessIndividuals(objectGraph){
-    return objectGraph.filter(function(individual){
-        if (!individual.parents || individual.parents.length === 0){
-            return true;
-        }
-        return false;
-    }).sort(function(a,b){
-        if (a.gender === 'male' && b.gender !== 'male') return -1;
-        if (a.gender !== 'male' && b.gender === 'male') return 1;
-        return 0;
-    });
-}
-
-/** Individuals with no children defined */
-export function getChildlessIndividuals(objectGraph){
-    return objectGraph.filter(function(individual){
-        if (!individual.children || individual.children.length === 0){
-            return true;
-        }
-        return false;
-    });
-}
-
-export function indvListToMap(list){
-    const idMap = {};
-    list.forEach(function(indv){
-        idMap[indv.id] = indv;
-    });
-    return idMap;
-}
-
-/**
- * Must have `_drawing.heightIndex` already.
- * @deprecated
- */
-export function getParentlessPartners(objectGraph, memoized = {}){
-    const rootlessPartners = {};
-    const idMap = (memoized.indvListToMap || indvListToMap)(objectGraph);
-    const parentlessIndividuals = (memoized.getParentlessIndividuals || getParentlessIndividuals)(objectGraph);
-    parentlessIndividuals.forEach(function(parentlessIndv){
-        const { _childReferences, _drawing } = parentlessIndv;
-        const otherParentIDSet = _childReferences.reduce(function(allParentIDs, child){
-            child._parentReferences.forEach(function(parent){
-                if (parent.id !== parentlessIndv.id){
-                    allParentIDs.add(parent.id);
-                }
-            });
-            return allParentIDs;
-        }, new Set());
-        const otherParents = [...otherParentIDSet].map(function(pID){ return idMap[pID]; });
-        const otherParentsHeightIndices = otherParents.map(function(oP){ return oP._drawing.heightIndex; });
-        for (let i = 0; i < otherParentsHeightIndices.length; i++){
-            if (otherParents[i]._drawing.heightIndex !== _drawing.heightIndex){
-                return; // continue/skip for ordering purposes
-            }
-        }
-
-        otherParents.forEach(function(oP){
-            const { _parentReferences } = oP;
-            if (_parentReferences.length > 0){
-                rootlessPartners[oP.id] = rootlessPartners[oP.id] || [];
-                rootlessPartners[oP.id].push(parentlessIndv);
-            }
-        });
-
-    });
-    // TODO: ensure it works
-    return rootlessPartners;
-}
-
-export function getChildlessSiblings(leafIndividuals){
-    const leafSiblings = {};
-    const seen = {};
-    leafIndividuals.forEach(function(indv){
-        const { id, _parentalRelationship = null } = indv;
-        if (seen[id]) return;
-        if (_parentalRelationship && _parentalRelationship.children.length >= 2){
-            leafSiblings[id] = [];
-            _parentalRelationship.children.forEach(function(sibling){
-                if (sibling.id === id || sibling._maritalRelationships.length > 0) return;
-                leafSiblings[id].push(sibling);
-                seen[sibling.id] = true;
-            });
-        }
-    });
-    return leafSiblings;
-}
-
-
-export function permutateArray(arr, from = 0, permutations = []){
-    const len = arr.length;
-    if (from === len - 1) {
-        permutations.push(arr.slice(0));
-        return permutations;
-    }
-
-    for (let i = from; i < len; i++) {
-        // Swap
-        let temp = arr[i];
-        arr[i] = arr[from];
-        arr[from] = temp;
-        // Recurse
-        permutateArray(arr, from + 1, permutations);
-        // Reverse
-        temp = arr[i];
-        arr[i] = arr[from];
-        arr[from] = temp;
-    }
-
-    return permutations;
-}
-
-export function flattenBuckets(arr){
-    return arr.reduce(function(retList, itemOrList, idx){
-        if (Array.isArray(itemOrList)){
-            return retList.concat(itemOrList);
-        }
-        retList.push(itemOrList);
-        return retList;
-    }, []);
-}
-
-export function permutate2DArray1Dimension(arr){
-    return permutateArray(arr).map(flattenBuckets);
-}
-
-export function computePossibleParentlessPermutations(objectGraph, skip={}){
-    const parentlessIndividuals = getParentlessIndividuals(objectGraph);
-    const seen = {};
-    const buckets = [];
-    console.log("PARENTLESSINDVDS", parentlessIndividuals);
-    parentlessIndividuals.forEach(function(indv){
-        if (seen[indv.id] || skip[indv.id]) return;
-        const nextBucket = [];
-        nextBucket.push(indv);
-        seen[indv.id] = true;
-
-        // grouping: place parents which are only connected to the same relationship in the same bucket
-        if (indv._maritalRelationships.length === 1 && !seen[indv._maritalRelationships[0].id] && !skip[indv._maritalRelationships[0].id]){
-            const otherPartners = indv._maritalRelationships[0].partners.filter(function(partner){
-                return partner.id !== indv.id && partner._parentReferences.length === 0 && partner._maritalRelationships.length === 1;
-            });
-            if (otherPartners.length + 1 === indv._maritalRelationships[0].partners.length){
-                nextBucket.push(indv._maritalRelationships[0]);
-                seen[indv._maritalRelationships.id] = true;
-                otherPartners.forEach(function(oP){
-                    if (!seen[oP.id]){
-                        if (oP._parentReferences.length === 0 && oP._maritalRelationships.length === 1){
-                            nextBucket.push(oP);
-                            seen[oP.id] = true;
-                        }
-                    }
-                });
-            }
-        }
-
-        buckets.push(nextBucket);
-    });
-
-    console.log("ROOTBUCKETS", buckets);
-
-    return permutate2DArray1Dimension(buckets);
-}
-
-
-
-export function computePossibleChildlessPermutations(objectGraph, skip={}){
-    const leafIndividuals = getChildlessIndividuals(objectGraph);
-    const leafSiblingsObj = getChildlessSiblings(leafIndividuals);
-    const idMap = indvListToMap(objectGraph);
-    const seen = {};
-    const buckets = [];
-
-
-    Object.keys(leafSiblingsObj).forEach(function(leafIndvID){
-        const siblings = leafSiblingsObj[leafIndvID];
-        const bucket = [ idMap[leafIndvID], ...siblings ];
-        buckets.push(bucket);
-        bucket.forEach(function(indv){
-            seen[indv.id] = true;
-        });
-    });
-
-    leafIndividuals.forEach(function(indv){
-        if (seen[indv.id] || skip[indv.id]) return;
-        buckets.push([indv]);
-    });
-
-    console.log("LEAF BUCKETS", buckets);
-
-    return permutate2DArray1Dimension(buckets);
-}
 
 
 export function getMaxHeightIndex(objectGraph){
@@ -432,361 +237,6 @@ export function getMaxHeightIndex(objectGraph){
 
 
 
-/** NOT USED **/
-function initOrderingSimple(objectGraph, memoized = {}){
-
-    const q = [objectGraph[0]];
-
-    const orderByHeightIndex = []; // 2D arr
-    const maxHeightIndex = (memoized.getMaxHeightIndex || getMaxHeightIndex)(objectGraph);
-    for (let i = 0; i <= maxHeightIndex; i++){
-        orderByHeightIndex[i] = [];
-    }
-
-    function addToQ(indv){
-        q.unshift(indv);
-    }
-
-    const orderAssignedDebugList = [];
-
-    function assignOrder(node){
-        const { id, _drawing : { heightIndex } } = node;
-        const orderAssignedInIndex = orderByHeightIndex[heightIndex].length;
-        seenOrderInIndex[id] = orderAssignedInIndex;
-        orderByHeightIndex[heightIndex].push(node);
-        orderAssignedDebugList.push({ 'id': node.id, 'h' : heightIndex, 'o' : orderAssignedInIndex });
-        //console.log("DIRECT", direction, stack, id, heightIndex, orderAssignedInIndex, q.map(function(item){ return item.id; }));
-    }
-
-    const seenOrderInIndex = {};
-    const seenIndvs = [];
-    // eslint-disable-next-line no-constant-condition
-    while (true){
-        while (q.length){
-            const node = q.pop();
-            const {
-                id,
-                _drawing : { heightIndex },
-                _maritalRelationships = [],
-                _parentalRelationship = null,
-                children = [],
-                partners = []
-            } = node;
-
-            if (typeof seenOrderInIndex[id] !== "undefined") continue;
-
-            assignOrder(node);
-
-            if (isRelationship(node)){
-                //(partners || []).forEach(addToQ);
-                //(children || []).forEach(addToQ);
-            } else {
-                seenIndvs.push(node);
-
-                (_maritalRelationships || []).forEach(function(mr){
-                    const { children: mrChildren } = mr;
-                    addToQ(mr);
-                    mrChildren.forEach(addToQ);
-                });
-
-                const { id: parentID, partners: parentPartners = [] } = _parentalRelationship || {};
-                if (parentPartners.length > 0){
-                    addToQ(parentPartners[0]);
-                }
-                if (parentID){
-                    addToQ(_parentalRelationship);
-                }
-                if (parentPartners.length > 1){
-                    parentPartners.slice(1).forEach(addToQ);
-                }
-            }
-        }
-        if (seenIndvs.length === objectGraph.length){
-            break;
-        } else {
-            // Have Individuals not connected to proband
-            console.error("Unconnected individuals found", seenOrderInIndex, objectGraph);
-            for (let i = 0; i < objectGraph.length; i++){
-                if (typeof seenOrderInIndex[objectGraph[i].id] === 'undefined'){
-                    q.push(objectGraph[i]);
-                    break;
-                }
-            }
-        }
-    }
-
-    console.log("ORDER ASSIGNMENTS", orderAssignedDebugList);
-
-    return { orderByHeightIndex, seenOrderInIndex };
-}
-
-/** NOT USED **/
-function divideIntoBuckets(rowOfNodes = []){
-    const buckets = [];
-    const seenIDs = {};
-    let heightIndex = null;
-
-    function isParentlessWithOneRelationship(partner){
-        const sameIndex = partner._drawing.heightIndex === heightIndex;
-        const noParents = (partner._parentReferences || []).length === 0;
-        const singleRelationship = partner._maritalRelationships.length === 1;
-        return sameIndex && noParents && singleRelationship;
-    }
-
-    rowOfNodes.forEach(function(node){
-        const {
-            id,
-            _drawing : { heightIndex: hi },
-            partners,
-            children,
-            _maritalRelationships = [],
-            _parentalRelationship = null,
-            _parentReferences = []
-        } = node;
-        if (seenIDs[id]) return;
-        seenIDs[id] = true;
-        if (heightIndex === null){
-            heightIndex = hi;
-        }
-        const currBucket = [node];
-        if (isRelationship(node)){
-            // Group partner with relationship node if same heightIndex and no other relationships on partner
-            const parentlessSinglePartners = (partners || []).filter(isParentlessWithOneRelationship);
-            parentlessSinglePartners.forEach(function(partner, i){
-                if (i === 0){
-                    currBucket.unshift(partner);
-                } else {
-                    currBucket.push(partner);
-                }
-                seenIDs[partner.id] = true;
-            });
-        } else {
-            // Group partner with relationship node if same heightIndex and no other relationships on partner
-            if (_maritalRelationships.length === 1 && _parentReferences.length === 0 && _maritalRelationships[0]._drawing.heightIndex === heightIndex){
-                currBucket.push(_maritalRelationships[0]);
-                seenIDs[_maritalRelationships[0].id] = true;
-                const parentlessSinglePartners = (_maritalRelationships[0].partners || []).filter(isParentlessWithOneRelationship);
-                parentlessSinglePartners.forEach(function(partner, i){
-                    if (partner.id === id) return; // Is self, skip
-                    currBucket.push(partner);
-                    seenIDs[partner.id] = true;
-                });
-            }
-            // Group siblings w.o. relationships
-            if (_parentalRelationship && _maritalRelationships.length === 0){
-                const relationlessSiblings = (_parentalRelationship.children || []).filter(function(child){
-                    if (child.id === id) return false; // Is self, skip
-                    if (child._drawing.heightIndex === heightIndex && (child._maritalRelationships || []).length === 0){
-                        return true;
-                    }
-                    return false;
-                });
-                relationlessSiblings.forEach(function(child){
-                    currBucket.push(child);
-                    seenIDs[child.id] = true;
-                });
-            }
-        }
-        buckets.push(currBucket);
-    });
-    console.log('BUCKETS', buckets);
-    return buckets;
-}
-
-/** NOT USED - TOO UNPERFORMANT - O(n!) **/
-function createOrderingPermutations(order, memoized = {}){
-    const { orderByHeightIndex } = order;
-    const orderByHeightIndexPermutations = orderByHeightIndex.map(function(nodesInrow, heightIndex){
-        return permutate2DArray1Dimension(divideIntoBuckets(nodesInrow));
-    });
-    const orderingPermutations = [];
-    const totalCountPermutations = orderByHeightIndexPermutations.reduce(function(m, permutationsOfRow){
-        return m * permutationsOfRow.length;
-    }, 1);
-
-    const counters = orderByHeightIndexPermutations.map(function(){
-        return 0;
-    });
-
-    function incrementCounters(){
-        let currHeightIndex = counters.length - 1;
-        while (currHeightIndex >= 0){
-            counters[currHeightIndex]++;
-            if (counters[currHeightIndex] >= orderByHeightIndexPermutations[currHeightIndex].length){
-                counters[currHeightIndex] = 0;
-                currHeightIndex--;
-            } else {
-                break;
-            }
-        }
-    }
-
-    var i, hi;
-    for (i = 0; i < totalCountPermutations; i++){
-        const orderingPermutation = orderByHeightIndexPermutations.map(function(){ return []; });
-        for (hi = 0; hi < orderByHeightIndexPermutations.length; hi++){
-            orderingPermutation[hi] = orderByHeightIndexPermutations[hi][counters[hi]];
-        }
-        orderingPermutations.push(orderingPermutation);
-        incrementCounters();
-    }
-
-    return orderingPermutations.map(function(orderByHeightIndex2){
-        const seenOrderInIndex = {};
-        orderByHeightIndex2.forEach(function(rowOfNodes){
-            rowOfNodes.forEach(function(node, orderPos){
-                seenOrderInIndex[node.id] = orderPos;
-            });
-        });
-        return {
-            orderByHeightIndex: orderByHeightIndex2,
-            seenOrderInIndex
-        };
-    });
-}
-
-
-
-function initOrdering(objectGraph, startIndividuals = null, direction = "children", stack = false, memoized = {}){
-    const q = startIndividuals.slice(0);
-    if (!stack){
-        q.reverse();
-    }
-
-    const orderByHeightIndex = []; // 2D
-    const maxHeightIndex = (memoized.getMaxHeightIndex || getMaxHeightIndex)(objectGraph);
-    for (let i = 0; i <= maxHeightIndex; i++){
-        orderByHeightIndex[i] = [];
-    }
-
-    function addToQ(indv){
-        if (stack){
-            q.push(indv);
-        } else {
-            q.unshift(indv);
-        }
-    }
-
-    function countAncestors(indvNode){
-        const seenA = {};
-        const aQ = [indvNode];
-        let count = 0;
-        while (aQ.length){
-            const currA = aQ.pop();
-            if (seenA[currA.id]) continue;
-            if (currA._parentalRelationship){
-                currA._parentalRelationship.partners.forEach(function(p){
-                    aQ.unshift(p);
-                });
-            }
-            count++;
-        }
-        return count;
-    }
-
-    function sortByAncestorCount(a,b){
-        const count = countAncestors(b) - countAncestors(a);
-        if (count !== 0) return count;
-        if (a.gender === 'male') return -1;
-        if (b.gender === 'male') return 1;
-        return 0;
-    }
-
-    function countDescendants(indvNode){
-        const seenD = {};
-        const dQ = [indvNode];
-        let count = 0;
-        while (dQ.length){
-            const currD = dQ.pop();
-            if (seenD[currD.id]) continue;
-            (currD._maritalRelationships || []).forEach(function(mr){
-                (mr.children || []).forEach(function(child){
-                    dQ.unshift(child);
-                });
-            });
-            count++;
-        }
-        return count;
-    }
-
-    function sortByDescendantCount(a,b){
-        return countDescendants(b) - countDescendants(a);
-    }
-
-    const orderAssignedDebugList = [];
-
-    function assignOrder(node){
-        const { id, _drawing : { heightIndex } } = node;
-        const orderAssignedInIndex = orderByHeightIndex[heightIndex].length;
-        seenOrderInIndex[id] = orderAssignedInIndex;
-        orderByHeightIndex[heightIndex].push(node);
-        orderAssignedDebugList.push({ 'id': node.name || node.id, 'h' : heightIndex, 'o' : orderAssignedInIndex });
-        //console.log("DIRECT", direction, stack, id, heightIndex, orderAssignedInIndex, q.map(function(item){ return item.id; }));
-    }
-
-    const seenOrderInIndex = {};
-    const seenIndvs = [];
-    // eslint-disable-next-line no-constant-condition
-    while (true){
-        while (q.length){
-            const node = q.pop();
-            const {
-                id,
-                _drawing : { heightIndex },
-                _maritalRelationships = [],
-                _parentalRelationship = null,
-                children = [],
-                partners = []
-            } = node;
-
-            if (typeof seenOrderInIndex[id] !== "undefined") continue;
-
-            assignOrder(node);
-
-            if (isRelationship(node)){
-                if (direction === "parents" && partners){
-                    partners.sort(sortByAncestorCount).sort(sortPartnersByGender).forEach(addToQ);
-                } else if (direction === "children" && children){
-                    children.sort(sortByDescendantCount).forEach(addToQ);
-                }
-            } else {
-                seenIndvs.push(node);
-                if (direction === "parents" && _parentalRelationship){
-                    const [ firstParentPartner, ...otherParentPartners ] = (_parentalRelationship.partners || [])
-                        .sort(sortByAncestorCount)
-                        .sort(sortPartnersByGender);
-                    if (firstParentPartner){
-                        addToQ(firstParentPartner);
-                    }
-                    addToQ(_parentalRelationship);
-                    otherParentPartners.forEach(addToQ);
-
-                } else if (direction === "children" && _maritalRelationships){
-                    _maritalRelationships.forEach(addToQ);
-                }
-            }
-
-        }
-        if (seenIndvs.length === objectGraph.length){
-            break;
-        } else {
-            // Have Individuals not connected to proband
-            console.error("Unconnected individuals found", seenOrderInIndex, objectGraph);
-            for (let i = 0; i < objectGraph.length; i++){
-                if (typeof seenOrderInIndex[objectGraph[i].id] === 'undefined'){
-                    q.push(objectGraph[i]);
-                    break;
-                }
-            }
-        }
-    }
-
-    //console.log("ORDER ASSIGNMENTS", direction, stack, orderAssignedDebugList, startIndividuals);
-
-    return { orderByHeightIndex, seenOrderInIndex };
-}
-
-
 function countNodesInBetween(order, fromNode, toNode){
     const { orderByHeightIndex, seenOrderInIndex } = order;
     const { _drawing : { heightIndex } } = fromNode;
@@ -795,7 +245,7 @@ function countNodesInBetween(order, fromNode, toNode){
     let num = 0;
     const begin = Math.min(orderFrom, orderTo) + 1;
     const end = Math.max(orderFrom, orderTo) - 1;
-    console.log("XXX", begin, end, orderTo, orderFrom);
+    //console.log("XXX", begin, end, orderTo, orderFrom);
     for (let ord = begin; ord <= end; ord++){
         const node = orderByHeightIndex[heightIndex][ord];
         //console.log('IN BETWEEN', node);
@@ -906,6 +356,11 @@ function countEdgeCrossingInstance(order, fromNode, toNode){
     return crossings;
 }
 
+/**
+ * Maybe can be repurposed and be made more accurate in future using posByHeightIndex.
+ * Will return to later.
+ * @deprecated
+ */
 function countEdgeCrossings(order){
     const { orderByHeightIndex, seenOrderInIndex } = order;
     let crossings = 0;
@@ -959,7 +414,6 @@ function countEdgeCrossings(order){
 
     return crossings;
 }
-
 
 
 
@@ -1149,7 +603,8 @@ export function orderObjectGraph(objectGraph, relationships = null, maxHeightInd
 
     // = 128 as last elem in arr (maxHeightIndex)
     // then quadruple to front until first elem/index (0)
-    const spansByHeightIndex = [ 128 ];
+    const MIN_SPAN = 128; // maxHeightIndex[0] would be equivalent to a `MAX_SPAN`
+    const spansByHeightIndex = [ MIN_SPAN ];
     for (let i = maxHeightIndex - 1; i >= 0; i--){
         spansByHeightIndex.unshift(spansByHeightIndex[0] * 4);
     }
@@ -1167,6 +622,30 @@ export function orderObjectGraph(objectGraph, relationships = null, maxHeightInd
             });
         });
         return maxV;
+    }
+
+    function posByHIToOrderByHI(allNodes, posByHI){
+        const orderByHeightIndex = [];
+        const seenOrderInIndex = {};
+        const seenPosInIndex = {};
+        allNodes.forEach(function(node){
+            const { _drawing: { heightIndex: hi }, id } = node;
+            const pos = posByHI[hi][id];
+            orderByHeightIndex[hi] = orderByHeightIndex[hi] || [];
+            orderByHeightIndex[hi].push([ node, pos ]);
+        });
+        orderByHeightIndex.forEach(function(orderingForHI, hi){
+            orderingForHI.sort(function([ nodeA, posA ], [ nodeB, posB ]){
+                return posA - posB;
+            });
+            orderByHeightIndex[hi] = orderingForHI.map(function([ node, pos ], idxInRow){
+                // Save final order to nodes so we don't need order object anymore (todo)
+                seenOrderInIndex[node.id] = idxInRow;
+                seenPosInIndex[node.id] = pos; // for debugging only rn past this
+                return node;
+            });
+        });
+        return { orderByHeightIndex, seenOrderInIndex, seenPosInIndex };
     }
 
     const {
@@ -1274,7 +753,9 @@ export function orderObjectGraph(objectGraph, relationships = null, maxHeightInd
 
     const subtreeStack = [ ...subtrees ];
     const nodePositionScaleDiviser = spansByHeightIndex[0] * 2; // TODO: reconsider this diviser
-    const partnerNodeRelations = {}; // Sometimes same node has multiple aux relations, keep track to offset them; maybe need to group siblings later idk.
+    // Sometimes same node has multiple aux relations, keep track to offset them; maybe need to group siblings later idk.
+    const partnerNodeRelations = {};
+    const auxRelationshipsWithoutSubtrees = []; // Most likely intra-family relationships; to be positioned in subsequent step.
 
     [{  // Simulate primary tree as subtree to allow final iteration/merge into primary `posByHeightIndex`.
         posByHeightIndex,
@@ -1291,7 +772,10 @@ export function orderObjectGraph(objectGraph, relationships = null, maxHeightInd
             });
 
             if (subtreeAtRelationIdx < 0 || typeof subtreeAtRelationIdx !== "number" || isNaN(subtreeAtRelationIdx)) {
-                throw new Error("Could not find subtree for auxiliary relation");
+                auxRelationshipsWithoutSubtrees.push(relQItem);
+                console.warn("Could not find subtree for auxiliary relation, likely an intra-family relationship");
+                return;
+                //throw new Error("Could not find subtree for auxiliary relation");
             }
             const { _drawing : { heightIndex: relationshipHeightIndex } } = relationshipNode;
             const { id: ppID, _drawing: { heightIndex: ppHeightIndex } } = positionedPartnerNode;
@@ -1363,8 +847,9 @@ export function orderObjectGraph(objectGraph, relationships = null, maxHeightInd
 
 
     // Handle remaining (disconnected) tree fragments/individuals
-    let maxHorizPos = getMaxPos(posByHeightIndex) + 128;
-    console.log("TREES", subtreeStack);
+    // Simply position them to the right of existing tree.
+    let maxHorizPos = getMaxPos(posByHeightIndex) + MIN_SPAN;
+
     while (typeof subtreeStack[0] !== "undefined"){
         const subtree = subtreeStack.shift(); // We'll be a queue now.
         let minOffset = -getMaxPos(subtree.posByHeightIndex, -1);
@@ -1380,7 +865,7 @@ export function orderObjectGraph(objectGraph, relationships = null, maxHeightInd
                 nextMaxHorizPos = Math.max(nextMaxHorizPos, Math.ceil(posByHeightIndex[hi][nodeID]));
             });
         });
-        maxHorizPos = nextMaxHorizPos + 128;
+        maxHorizPos = nextMaxHorizPos + MIN_SPAN;
         subtree.positionedIndividuals.forEach(function(pi){
             positionedIndividuals.push(pi);
         });
@@ -1390,49 +875,88 @@ export function orderObjectGraph(objectGraph, relationships = null, maxHeightInd
         });
     }
 
-    // TODO: Handle remaining auxiliary relationships, if any.
-    // Add'l aux relationships are most likely intra-family marriage (no subtrees)
-    // and just need to figure out where to put aux relation node.
-    // Perhaps, since should be small #, could do this after converting to orderByHeightIndex & count intersections per option..
-
-    if (subtreeStack.length > 0 || positionedIndividuals.length !== graphSize) {
+    if (positionedIndividuals.length !== graphSize) {
+        // Shouldn't occur now..
         console.log(subtreeStack, graphSize, positionedIndividuals.length);
         throw new Error("Disconnected family tree or individuals found, check data.");
     }
 
 
+    // TODO: Handle remaining auxiliary relationships, if any.
+    // Add'l aux relationships are most likely intra-family marriage (no subtrees)
+    // and just need to figure out where to put aux relation node.
+    // Perhaps, since should be small #, could do this after converting to orderByHeightIndex & count intersections per option..
+
+    // maybe: if (positionedRelationships.length !== relationships.length) {...}
+    if (auxRelationshipsWithoutSubtrees.length > 0) {
+        console.warn(
+            `${auxRelationshipsWithoutSubtrees.length} auxiliary relationship nodes with ${relationships.length - positionedRelationships.length} not positioned.`,
+            auxRelationshipsWithoutSubtrees
+        );
+        // TODO: (Re-)arrange relationship node to be in better place.
+        // Idea 1: Try placing each relationship in different spots in order and testing crossings.
+        // (1 by 1 or likely permutations? pro/con = speed/accuracy; need to try both and assess)
+        auxRelationshipsWithoutSubtrees.forEach(function(relQItem){
+            const [ relationshipNode, positionedPartnerNode, partnerNodeHorizPos, prevRelationshipHorizPos ] = relQItem;
+            const { id: relID,_drawing: { heightIndex: relHeightIndex } } = relationshipNode;
+            const { id: ppID, _drawing: { heightIndex: ppHeightIndex } } = positionedPartnerNode;
+            const spanAtHeightIdx = spansByHeightIndex[ppHeightIndex];
+            const toRight = prevRelationshipHorizPos < partnerNodeHorizPos ? 1 : -1;
+            partnerNodeRelations[ppID] = partnerNodeRelations[ppID] || {
+                parentless: 0,
+                parentful: 0
+            };
+            partnerNodeRelations[ppID].parentful++;
+
+            // TODO: Change intersection counting code to use position instead of order.
+            // To avoid overhead of converting (and inaccuracy) _if_ we don't use some better idea.
+            const origCrossings = countEdgeCrossings(posByHIToOrderByHI(
+                positionedIndividuals.concat(positionedRelationships),
+                posByHeightIndex
+            ));
+
+            const origPos = posByHeightIndex[relHeightIndex][relID];
+            const newPos = (
+                partnerNodeHorizPos +
+                ((spanAtHeightIdx / 2) * partnerNodeRelations[ppID].parentful) * toRight
+            );
+            posByHeightIndex[relHeightIndex][relID] = newPos;
+
+            const nextCrossings = countEdgeCrossings(posByHIToOrderByHI(
+                positionedIndividuals.concat(positionedRelationships),
+                posByHeightIndex
+            ));
+
+            if (nextCrossings >= origCrossings) { // Undo
+                posByHeightIndex[relHeightIndex][relID] = origPos;
+                partnerNodeRelations[ppID].parentful--;
+            } else {
+                console.info(`Changed ${relID} from ${origPos} to ${newPos}.`);
+            }
+
+        });
+    }
+
     // Generate initial `orderByHeightIndex` from `posByHeightIndex`
-    const orderByHeightIndex = [];
-    const seenOrderInIndex = {};
-    const seenPosInIndex = {};
-    positionedIndividuals.concat(positionedRelationships).forEach(function(node){
-        const { _drawing: { heightIndex: hi }, id } = node;
-        const pos = posByHeightIndex[hi][id];
-        orderByHeightIndex[hi] = orderByHeightIndex[hi] || [];
-        orderByHeightIndex[hi].push([ node, pos ]);
-    });
-    orderByHeightIndex.forEach(function(orderingForHI, hi){
-        orderingForHI.sort(function([ nodeA, posA ], [ nodeB, posB ]){
-            return posA - posB;
-        });
-        orderByHeightIndex[hi] = orderingForHI.map(function([ node, pos ], idxInRow){
-            // Save final order to nodes so we don't need order object anymore (todo)
-            node._drawing.orderInHeightIndex = seenOrderInIndex[node.id] = idxInRow;
-            node._drawing.origPosInHeightIndex = seenPosInIndex[node.id] = pos; // for debugging only rn past this
-            return node;
-        });
-    });
+    const { orderByHeightIndex, seenOrderInIndex, seenPosInIndex } = posByHIToOrderByHI(
+        positionedIndividuals.concat(positionedRelationships),
+        posByHeightIndex
+    );
 
-    console.log("SPANS", maxHeightIndex, spansByHeightIndex, posByHeightIndex, orderByHeightIndex);
 
-    // const initialCrossings = countEdgeCrossings({ orderByHeightIndex, seenOrderInIndex });
-
-    // Assign generation+order -based-name
+    // Assign generation+order -based-name & save final order to nodes so we don't need order object anymore (todo)
     const heightIndicesCount = orderByHeightIndex.length;
     orderByHeightIndex.forEach(function(nodesInRow, hi){
         const generationRomanNumeral = numberToRomanNumeral(heightIndicesCount - hi);
         nodesInRow.reduce(function(currNum, n){
-            if ( isRelationship(n) ) return currNum;
+
+            n._drawing.orderInHeightIndex = seenOrderInIndex[n.id];
+            n._drawing.origPosInHeightIndex = seenPosInIndex[n.id]; // for debugging only rn past this
+
+            if ( isRelationship(n) ) {
+                // Don't increment or add to node.
+                return currNum;
+            }
             n.orderBasedName = "" + generationRomanNumeral + " – " + currNum;
             if (n.isProband) {
                 // Append "p" if proband
@@ -1449,154 +973,6 @@ export function orderObjectGraph(objectGraph, relationships = null, maxHeightInd
         objectGraph: positionedIndividuals,
         relationships: positionedRelationships
     };
-}
-
-/** @deprecated */
-export function orderObjectGraph2(objectGraph, relationships = null){
-    const rootPermutations = computePossibleParentlessPermutations(objectGraph);
-    const leafPermutations = computePossibleChildlessPermutations(objectGraph);
-
-    let bestOrder = null;
-    let bestCrossings = Infinity;
-    let i;
-
-    //const orderingInitial = initOrderingSimple(objectGraph, memoized);
-    //const orderingPermutations = createOrderingPermutations(orderingInitial);
-    //const orderingPermutationsLen = orderingPermutations.length;
-
-
-    console.log(
-        'PERMUTATIONS',
-        leafPermutations,
-        rootPermutations,
-        //orderingInitial,
-        //orderingPermutations
-    );
-
-    function checkCrossings(order){
-        const edgeCrossings = countEdgeCrossings(order);
-        //console.log("ORDER", order, edgeCrossings);
-        if (edgeCrossings < bestCrossings){
-            bestOrder = order;//copyOrder(order, objectGraph, memoized);
-            bestCrossings = edgeCrossings;
-            //console.log("ISBEST");
-        }
-    }
-
-    //for (i = 0; i < orderingPermutationsLen; i++){
-    //    checkCrossings(orderingPermutations[i]);
-    //    if (bestCrossings === 0) break;
-    //}
-
-    //const probandBasedOrdering = initOrderingSimple(objectGraph, memoized);
-    //checkCrossings(probandBasedOrdering);
-
-    if (bestCrossings !== 0){
-        for (i = 0; i < rootPermutations.length; i++){
-            const orderBFS = initOrdering(objectGraph, rootPermutations[i], "children", false);
-            checkCrossings(orderBFS);
-            if (bestCrossings === 0) break;
-            const orderDFS = initOrdering(objectGraph, rootPermutations[i], "children", true);
-            checkCrossings(orderDFS);
-            if (bestCrossings === 0) break;
-        }
-    }
-
-    if (bestCrossings !== 0){
-        for (i = 0; i < leafPermutations.length; i++){
-            const orderBFS = initOrdering(objectGraph, leafPermutations[i], "parents", false);
-            checkCrossings(orderBFS);
-            if (bestCrossings === 0) break;
-            const orderDFS = initOrdering(objectGraph, leafPermutations[i], "parents", true);
-            checkCrossings(orderDFS);
-            if (bestCrossings === 0) break;
-        }
-    }
-
-    console.log("BEST ORDER1", Object.assign({}, bestOrder), bestCrossings, objectGraph);
-
-    improveOrder(bestOrder, bestCrossings);
-    heuristicallyAdjustOrder(bestOrder);
-
-    // Save final order to nodes so we don't need order object anymore
-    const { seenOrderInIndex, orderByHeightIndex } = bestOrder;
-    objectGraph.forEach(function(indv){
-        indv._drawing.orderInHeightIndex = seenOrderInIndex[indv.id];
-    });
-    relationships = relationships || getRelationships(objectGraph);
-    relationships.forEach(function(r){
-        r._drawing.orderInHeightIndex = seenOrderInIndex[r.id];
-    });
-
-    // Assign order-based-name
-    const heightIndicesCount = orderByHeightIndex.length;
-    orderByHeightIndex.forEach(function(nodesInRow, hi){
-        const generationRomanNumeral = numberToRomanNumeral(heightIndicesCount - hi);
-        nodesInRow.reduce(function(currNum, n){
-            if ( isRelationship(n) ) return currNum;
-            n.orderBasedName = "" + generationRomanNumeral + " – " + currNum;
-            if (n.isProband) {
-                // Append "p" if proband
-                n.orderBasedName += "p";
-            }
-            currNum++;
-            return currNum;
-        }, 1);
-    });
-
-    console.log("BEST ORDER2", bestOrder, bestCrossings, objectGraph);
-
-    return { objectGraph, relationships, ...bestOrder };
-}
-
-function swapOrder(row, seenOrderInIndex, i1, i2){
-    const temp = row[i1];
-    row[i1] = row[i2];
-    row[i2] = temp;
-    seenOrderInIndex[row[i1].id] = i1;
-    seenOrderInIndex[row[i2].id] = i2;
-}
-
-function improveOrder(order, initCrossings){
-    const { orderByHeightIndex, seenOrderInIndex } = order;
-
-    let bestCrossings = initCrossings;
-    let iterations = 0;
-    let improved = true;
-
-    while (improved){
-        iterations++;
-        if (iterations > 5) break;
-        improved = false;
-        orderByHeightIndex.forEach(function(nodesInRow, hi){
-            const rowLen = nodesInRow.length;
-            let i, nextCrossings;
-            for (i = 1; i < rowLen; i++){
-                swapOrder(nodesInRow, seenOrderInIndex, i, i - 1);
-                nextCrossings = countEdgeCrossings(order);
-                //console.log(nextCrossings, bestCrossings);
-                if (nextCrossings < bestCrossings){
-                    bestCrossings = nextCrossings;
-                    //console.log("swapped", hi, i, i-1, seenOrderInIndex, orderByHeightIndex);
-                    improved = true;
-                } else {
-                    swapOrder(nodesInRow, seenOrderInIndex, i, i - 1);
-                    if (i - 2 >= 0){
-                        swapOrder(nodesInRow, seenOrderInIndex, i, i - 2);
-                        nextCrossings = countEdgeCrossings(order);
-                        if (nextCrossings < bestCrossings){
-                            bestCrossings = nextCrossings;
-                            //console.log("swapped", hi, i, i-2, seenOrderInIndex, orderByHeightIndex);
-                            improved = true;
-                        } else {
-                            swapOrder(nodesInRow, seenOrderInIndex, i, i - 2);
-                        }
-                    }
-                }
-            }
-        });
-
-    }
 }
 
 function sortChildrenByAge(a,b){
@@ -1616,74 +992,6 @@ function sortPartnersByGender(a,b) {
     return 0;
 }
 
-function heuristicallyAdjustOrder(order){
-    const { orderByHeightIndex, seenOrderInIndex } = order;
-
-    orderByHeightIndex.forEach(function(nodesInRow, hi){
-        const rowLen = nodesInRow.length;
-        // Swap parents so male is first, if next to each other and no parents on at least 1.
-        for (let i = 0; i < rowLen; i++){
-            const nodeSet = nodesInRow.slice(i, i+3);
-            if (nodeSet.length < 3) continue;
-            const [ leftNode, centerNode, rightNode ] = nodeSet;
-            if (leftNode.gender === "male" || isRelationship(leftNode)){
-                continue;
-            }
-            if (rightNode.gender !== "male" || isRelationship(rightNode)){
-                continue;
-            }
-            if (leftNode._maritalRelationships.length > 1 || rightNode._maritalRelationships.length > 1){
-                continue;
-            }
-            if (leftNode._parentalRelationship && rightNode._parentalRelationship){
-                continue;
-            }
-            if (!isRelationship(centerNode) || centerNode.partners.indexOf(leftNode) === -1 || centerNode.partners.indexOf(rightNode) === -1){
-                continue;
-            }
-            swapOrder(nodesInRow, seenOrderInIndex, i, i+2);
-        }
-
-        // Sort adjacent childless children
-        const groups = [];
-        let currGroup = [];
-        let currGroupStartIdx = null;
-        for (let i = 0; i < rowLen; i++){
-            const node = nodesInRow[i];
-            if (currGroup.length === 0){
-                if (isRelationship(node)) continue;
-                if (!node._parentalRelationship) continue;
-                if (node._maritalRelationships.length > 0) continue;
-                currGroup.push(node);
-                currGroupStartIdx = i;
-                continue;
-            }
-            if (isRelationship(node) ||
-                !node._parentalRelationship ||
-                node._parentalRelationship !== currGroup[0]._parentalRelationship ||
-                node._maritalRelationships.length > 0
-            ){
-                if (currGroup.length > 1){
-                    groups.push([currGroup, currGroupStartIdx ]);
-                }
-                currGroup = [];
-                currGroupStartIdx = null;
-                i--;
-                continue;
-            }
-            currGroup.push(node);
-        }
-        if (currGroup.length > 1){
-            groups.push([currGroup, currGroupStartIdx ]);
-        }
-        //console.log("GROUPS", groups);
-        groups.forEach(function([ nodeSet, startIdx ]){
-            const nodesLen = nodeSet.length;
-            const nextSet = nodeSet.sort(sortChildrenByAge);
-            nodesInRow.splice(startIdx, nodesLen, ...nextSet);
-        });
-    });
-}
 
 
 export function positionObjectGraph(objectGraph, order, dims, memoized = {}){
