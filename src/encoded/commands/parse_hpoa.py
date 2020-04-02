@@ -320,9 +320,9 @@ def get_args(args):  # pragma: no cover
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
     parser.add_argument('--input',
-                        default='http://compbio.charite.de/jenkins/job/hpo.annotations.current/lastSuccessfulBuild/artifact/misc_2018/phenotype.hpoa',
+                        default='http://compbio.charite.de/jenkins/job/hpo.annotations.current/lastSuccessfulBuild/artifact/current/phenotype.hpoa',
                         help="The url or datafile with the disorder to phenotype annotations data to import. URL must begin with http(s)\
-                        http://compbio.charite.de/jenkins/job/hpo.annotations.current/lastSuccessfulBuild/artifact/misc_2018/phenotype.hpoa")
+                        http://compbio.charite.de/jenkins/job/hpo.annotations.current/lastSuccessfulBuild/artifact/current/phenotype.hpoa")
     parser.add_argument('--env',
                         help="The environment to use i.e. local, fourfront-cgap")
     parser.add_argument('--key',
