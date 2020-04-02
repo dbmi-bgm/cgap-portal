@@ -38,7 +38,7 @@ def test_get_dbxref2disorder_map(rel_disorders):
         ['ORPHA:3', 'orphanet:3', 'OMIM:1'],  # both orphas OK, OMIM is repeat
         []
     ]
-    print("To start)
+    print("To start")
     for i, d in enumerate(rel_disorders):
         print(d)
         d.update({'dbxrefs': dbxrefs[i]})
