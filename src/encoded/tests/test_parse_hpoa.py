@@ -38,13 +38,20 @@ def test_get_dbxref2disorder_map(rel_disorders):
         ['ORPHA:3', 'orphanet:3', 'OMIM:1'],  # both orphas OK, OMIM is repeat
         []
     ]
+    print("To start)
     for i, d in enumerate(rel_disorders):
+        print(d)
         d.update({'dbxrefs': dbxrefs[i]})
-    print("Added dbxrefs ", rel_disorders)
+    print("\nAdded dbxrefs:")
+    for rd in rel_disorders:
+        print(rd)
     disorders = {'uuid' + str(i + 1): d for i, d in enumerate(rel_disorders)}
-    print("Added uuids ", disorders)
+    print("\nAdded uuids:")
+    for ud in disorders:
+        print(ud)
     map = ph.get_dbxref2disorder_map(disorders)
-    print("Map ", map)
+    print("Map:\n", map)
+    print("\nindexes:")
     for dx, uid in map.items():
         print(dx, uid, dx[dx.index(':') + 1:], uid[4:])
         assert dx[dx.index(':') + 1:] == uid[4:]
