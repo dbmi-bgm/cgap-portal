@@ -14,7 +14,7 @@ pytestmark = [pytest.mark.setone, pytest.mark.working]
 def test_ph_get_args_defaults():
     args = []
     args = ph.get_args(args)
-    assert args.input == 'http://compbio.charite.de/jenkins/job/hpo.annotations.current/lastSuccessfulBuild/artifact/misc_2018/phenotype.hpoa'
+    assert args.input == 'http://compbio.charite.de/jenkins/job/hpo.annotations.current/lastSuccessfulBuild/artifact/current/phenotype.hpoa'
     assert args.keyfile == os.path.expanduser("~/keypairs.json")
     assert args.outfile == 'disorders2phenotypes.json'
     assert args.load is False
@@ -42,6 +42,7 @@ def test_get_dbxref2disorder_map(rel_disorders):
         d.update({'dbxrefs': dbxrefs[i]})
     disorders = {'uuid' + str(i + 1): d for i, d in enumerate(rel_disorders)}
     map = ph.get_dbxref2disorder_map(disorders)
+    import pdb; pdb.set_trace()
     for dx, uid in map.items():
         assert dx[dx.index(':') + 1:] == uid[4:]
 
