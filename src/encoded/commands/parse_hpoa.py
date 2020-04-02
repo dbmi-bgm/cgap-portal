@@ -19,8 +19,6 @@ from dcicutils.ff_utils import (
 )
 from uuid import uuid4
 
-from typing import List, Any
-
 from ..commands.generate_items_from_owl import (
     connect2server,
     get_raw_form,
