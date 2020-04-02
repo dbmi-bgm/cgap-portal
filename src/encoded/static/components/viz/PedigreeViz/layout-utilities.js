@@ -10,6 +10,7 @@ export function assignTreeHeightIndices(objectGraph, filterUnrelatedIndividuals 
         return og.id;
     }));
     const visitedRelationships = new Set();
+    let maxHeightIndexAssigned = 0;
 
     function performAssignments(q){
         while (q.length) {
@@ -27,6 +28,8 @@ export function assignTreeHeightIndices(objectGraph, filterUnrelatedIndividuals 
             unassignedIDs.delete(id);
             //individual._drawing = individual._drawing || {};
             //individual._drawing.heightIndex = heightIndex;
+
+            maxHeightIndexAssigned = Math.max(maxHeightIndexAssigned, heightIndex);
 
             if (_parentalRelationship && !visitedRelationships.has(_parentalRelationship)){
                 visitedRelationships.add(_parentalRelationship);
@@ -208,15 +211,18 @@ export function assignTreeHeightIndices(objectGraph, filterUnrelatedIndividuals 
 
     if (smallestHeightIndex !== 0){ // adjust so starts w 0
         const diff = 0 - smallestHeightIndex;
+        maxHeightIndexAssigned += diff;
         objectGraph.forEach(function(indv){
             indv._drawing.heightIndex += diff;
         });
         relationships.forEach(function(rel){
             rel._drawing.heightIndex += diff;
         });
+
+        console.log("SMALHEIGHTDIF", smallestHeightIndex, diff, maxHeightIndexAssigned);
     }
 
-    return objectGraph;
+    return maxHeightIndexAssigned;
 }
 
 
@@ -359,7 +365,7 @@ export function computePossibleParentlessPermutations(objectGraph, skip={}){
         seen[indv.id] = true;
 
         // grouping: place parents which are only connected to the same relationship in the same bucket
-        if (indv._maritalRelationships.length === 1 && !seen[indv._maritalRelationships.id]){
+        if (indv._maritalRelationships.length === 1 && !seen[indv._maritalRelationships[0].id] && !skip[indv._maritalRelationships[0].id]){
             const otherPartners = indv._maritalRelationships[0].partners.filter(function(partner){
                 return partner.id !== indv.id && partner._parentReferences.length === 0 && partner._maritalRelationships.length === 1;
             });
@@ -739,14 +745,16 @@ function initOrdering(objectGraph, startIndividuals = null, direction = "childre
 
             if (isRelationship(node)){
                 if (direction === "parents" && partners){
-                    partners.sort(sortByAncestorCount).forEach(addToQ);
+                    partners.sort(sortByAncestorCount).sort(sortPartnersByGender).forEach(addToQ);
                 } else if (direction === "children" && children){
                     children.sort(sortByDescendantCount).forEach(addToQ);
                 }
             } else {
                 seenIndvs.push(node);
                 if (direction === "parents" && _parentalRelationship){
-                    const [ firstParentPartner, ...otherParentPartners ] = (_parentalRelationship.partners || []).sort(sortByAncestorCount);
+                    const [ firstParentPartner, ...otherParentPartners ] = (_parentalRelationship.partners || [])
+                        .sort(sortByAncestorCount)
+                        .sort(sortPartnersByGender);
                     if (firstParentPartner){
                         addToQ(firstParentPartner);
                     }
@@ -787,6 +795,7 @@ function countNodesInBetween(order, fromNode, toNode){
     let num = 0;
     const begin = Math.min(orderFrom, orderTo) + 1;
     const end = Math.max(orderFrom, orderTo) - 1;
+    console.log("XXX", begin, end, orderTo, orderFrom);
     for (let ord = begin; ord <= end; ord++){
         const node = orderByHeightIndex[heightIndex][ord];
         //console.log('IN BETWEEN', node);
@@ -839,6 +848,10 @@ function countEdgeCrossingInstance(order, fromNode, toNode){
     const { orderByHeightIndex, seenOrderInIndex } = order;
     const orderFrom = seenOrderInIndex[fromNode.id];
     const orderTo = seenOrderInIndex[toNode.id];
+    if (typeof orderFrom !== "number" || typeof orderTo !== "number") {
+        console.warn(`No order set for either ${fromNode.id} or ${toNode.id}, counting as 0 crossings.`);
+        return 0;
+    }
     const orderLow = Math.min(orderFrom, orderTo);
     const orderHigh = Math.max(orderFrom, orderTo);
     const hiFrom = fromNode._drawing.heightIndex;
@@ -948,7 +961,498 @@ function countEdgeCrossings(order){
 }
 
 
-export function orderObjectGraph(objectGraph, relationships = null){
+
+
+function buildAncestralPositions(spansByHeightIndex, q, seenDirectInRelation = {}, auxRelationsToConnect = {}){
+    const posByHeightIndex = [];
+    const positionedIndividuals = [];
+    const positionedRelationships = [];
+    const qAuxRelationships = [];
+
+    // Create initial family tree heuristically off of proband without taking into account indirect relationships
+    // eslint-disable-next-line no-constant-condition
+    while (true) {
+        const [ currNode, horizPos, prevHorizPos ] = q.shift() || [];
+        if (typeof currNode === "undefined") {
+            break;
+        }
+        const {
+            id,
+            _drawing : { heightIndex },
+            // Present on individual nodes:
+            _maritalRelationships = [],
+            _parentalRelationship = null,
+            // Present on relationship nodes:
+            children = [],
+            partners = null
+        } = currNode;
+        if (seenDirectInRelation[id]) {
+            continue;
+        }
+        if (typeof posByHeightIndex[heightIndex] === "undefined") {
+            posByHeightIndex[heightIndex] = {};
+        }
+        // If individual, add parent relationship to q & continue.
+        // Skip queuing external marital relationships for now.
+        if (!Array.isArray(partners)) {
+
+            if (_parentalRelationship && !seenDirectInRelation[_parentalRelationship.id]) {
+                q.push([ _parentalRelationship, horizPos, prevHorizPos ]);
+                // const { id: prID, _drawing : { heightIndex: prHI } } = _parentalRelationship;
+                // posByHeightIndex[prHI] = { [prID]: horizPos };
+            } else {
+                // Skip unless parent relationship has been assigned and we are adding its children _or_ has no parent -
+                seenDirectInRelation[id] = true;
+                positionedIndividuals.push(currNode);
+                posByHeightIndex[heightIndex][id] = horizPos;
+
+                if (Array.isArray(_maritalRelationships)) {
+                    // Added to secondary 'qAuxRelationships' queue - where horizPos will be treated differently.
+                    _maritalRelationships.forEach(function(relationship){
+                        if (!seenDirectInRelation[relationship.id]) {
+                            qAuxRelationships.push([
+                                relationship,
+                                currNode,
+                                horizPos,
+                                prevHorizPos
+                            ]);
+                        }
+                    });
+                }
+
+            }
+            continue;
+        }
+
+        // Else if relationship:
+        seenDirectInRelation[id] = true;
+        positionedRelationships.push(currNode);
+        posByHeightIndex[heightIndex][id] = horizPos;
+
+        // Add M + F heuristically. We use sort fxn in case 3+ ppl in relationship for some reason.
+        const orderedPartners = partners.slice().sort(sortPartnersByGender);
+
+        // If we are connecting at this relationship to a parent subtree,
+        // we don't care as much about ordering the relationship partners,
+        // so sort them by how close they are to target/previous partner in
+        // parent subtree instead.
+        if (typeof auxRelationsToConnect[id] !== "undefined") {
+            console.log("CONNECT!", auxRelationsToConnect[id], auxRelationsToConnect[id][0] === currNode, currNode);
+            const [ , positionedPartnerNode, partnerNodeHorizPos, prevRelationshipHorizPos ] = auxRelationsToConnect[id];
+            const toRight = prevRelationshipHorizPos < partnerNodeHorizPos ? 1 : -1;
+            orderedPartners.sort(function(a,b){
+                if (positionedPartnerNode === a) {
+                    return -toRight;
+                }
+                if (positionedPartnerNode === b) {
+                    return toRight;
+                }
+                return 0;
+            });
+            delete auxRelationsToConnect[id]; // not really necessary
+        }
+
+        orderedPartners.forEach(function(p, i){
+            q.push([
+                p,
+                i === 0 ? (horizPos - spansByHeightIndex[heightIndex]) : (horizPos + (spansByHeightIndex[heightIndex] * i)),
+                horizPos
+            ]);
+        });
+
+        const orderedChildrenByAge = children.slice()
+            .sort(function(a,b){
+
+                if (typeof a.age === "number" && typeof b.age === "number" && a.age !== b.age) {
+                    return sortChildrenByAge(a,b);
+                }
+
+                // Sort by distance to already-drawn marital partners first.
+                // This is used as fallback in case ages aren't present or something to reduce line distances.
+                let aDist = Infinity;
+                let bDist = Infinity;
+                let aMarPos = null;
+                let bMarPos = null;
+                var i;
+                for (i = 0; i < (a._maritalRelationships || []).length; i++) {
+                    if (typeof posByHeightIndex[a._maritalRelationships[i]._drawing.heightIndex][a._maritalRelationships[i].id] === "number") {
+                        aMarPos = posByHeightIndex[a._maritalRelationships[i]._drawing.heightIndex][a._maritalRelationships[i].id];
+                        aDist = aMarPos - horizPos;
+                        break;
+                    }
+                }
+                for (i = 0; i < (b._maritalRelationships || []).length; i++) {
+                    if (typeof posByHeightIndex[b._maritalRelationships[i]._drawing.heightIndex][b._maritalRelationships[i].id] === "number") {
+                        bMarPos = posByHeightIndex[b._maritalRelationships[i]._drawing.heightIndex][b._maritalRelationships[i].id];
+                        bDist = bMarPos - horizPos;
+                        break;
+                    }
+                }
+                console.log('sorty', a.id, b.id, aMarPos, bMarPos, aDist, bDist);
+                if (aDist === bDist){
+                    // Most likely Infinity for both, default to age in case one does not have it defined (else is 0).
+                    return sortChildrenByAge(a,b);
+                    //return 0;
+                }
+                if (aDist < bDist) {
+                    if (aMarPos > horizPos) {
+                        return 1;
+                    } else {
+                        return -1;
+                    }
+                } else {
+                    if (bMarPos > horizPos) {
+                        return -1;
+                    } else {
+                        return 1;
+                    }
+                }
+            });
+
+        let incr = 0;
+        const incrIncr = Math.floor((spansByHeightIndex[heightIndex] / 2) / orderedChildrenByAge.length) - 1;
+        orderedChildrenByAge.forEach(function(c){
+            q.push([ c, horizPos + incr, prevHorizPos ]);
+            incr += incrIncr; // previously 4
+        });
+
+    }
+
+    return {
+        posByHeightIndex,
+        positionedIndividuals,
+        positionedRelationships,
+        qAuxRelationships,
+        seenDirectInRelation
+    };
+}
+
+function collectTerminalChildrenFromRelationship(relationshipNode){
+    let allChildren = [];
+    const { children: rChildren = [] } = relationshipNode || {};
+    rChildren.forEach(function(childNode){
+        if (childNode._maritalRelationships.length === 0) {
+            allChildren.push(childNode);
+            return;
+        }
+        childNode._maritalRelationships.map(collectTerminalChildrenFromRelationship).forEach(function(childCollection){
+            allChildren = allChildren.concat(childCollection);
+        });
+    });
+    return allChildren;
+}
+
+
+export function orderObjectGraph(objectGraph, relationships = null, maxHeightIndex = null) {
+
+    //return orderObjectGraph2(...arguments);
+
+    // = 128 as last elem in arr (maxHeightIndex)
+    // then quadruple to front until first elem/index (0)
+    const spansByHeightIndex = [ 128 ];
+    for (let i = maxHeightIndex - 1; i >= 0; i--){
+        spansByHeightIndex.unshift(spansByHeightIndex[0] * 4);
+    }
+
+    /* Get boundary in defined direction of tree positions */
+    function getMaxPos(posByHI, dir = 1) {
+        let maxV = 0;
+        posByHI.forEach(function(posMap){
+            Object.keys(posMap).forEach(function(k){
+                if (dir === 1) {
+                    maxV = Math.max(maxV, posMap[k]);
+                } else {
+                    maxV = Math.min(maxV, posMap[k]);
+                }
+            });
+        });
+        return maxV;
+    }
+
+    const {
+        posByHeightIndex,
+        positionedIndividuals,
+        positionedRelationships,
+        seenDirectInRelation,
+        qAuxRelationships,
+    } = buildAncestralPositions(
+        spansByHeightIndex,
+        [  [ objectGraph[0], 0, 0 ]  ] // Assume first node/indv in objectGraph is the proband.
+    );
+
+    const graphSize = objectGraph.length;
+    const allSeen = { ...seenDirectInRelation };
+    const subtrees = [];
+    const auxRelationsToMakeSubtreesFor = {}; // We delete from this once connected-to, as a sort of unordered queue.
+    qAuxRelationships.forEach(function(qARItem){
+        auxRelationsToMakeSubtreesFor[qARItem[0].id] = qARItem;
+    });
+
+    const skippedAuxRelationships = new Set();
+
+    // eslint-disable-next-line no-constant-condition
+    while (true){
+
+        // Order creation of subtrees by auxiliary relations to facilitate connecting (~BFS)
+        // back subtrees to parent subtree in order in case multiple layers of auxiliary relations/subtrees
+        let nextAuxRelationship = qAuxRelationships.find(function([ rNode ]){
+            return !!(auxRelationsToMakeSubtreesFor[rNode.id]);
+        }) || null;
+
+        if (nextAuxRelationship === null) {
+            for (let i = 0; i < subtrees.length; i++) {
+                nextAuxRelationship = subtrees[i].qAuxRelationships.find(function([ rNode ]){
+                    return !!(auxRelationsToMakeSubtreesFor[rNode.id] && !skippedAuxRelationships.has(rNode));
+                }) || null;
+                if (nextAuxRelationship !== null) {
+                    break;
+                }
+            }
+        }
+
+        let nextChildrenSet;
+        let nextChildrenSetCount;
+        if (nextAuxRelationship === null) {
+            const positionedIndvCount = positionedIndividuals.length + subtrees.reduce(function(m,s){ return m + s.positionedIndividuals.length; }, 0);
+            const positionedRelCount = positionedRelationships.length + subtrees.reduce(function(m,s){ return m + s.positionedRelationships.length; }, 0);
+            console.info("No more auxiliary relationships remaining.");
+            console.log("Total individual count vs positioned individual count:", graphSize, positionedIndvCount);
+            console.log("Total relationship count vs positioned relationship count:", relationships.length, positionedRelCount);
+
+            if (positionedIndvCount === graphSize) {
+                break; // Exit while loop,  handle remaining aux (intra-family) relationships later
+            }
+
+            console.info("Positioning remaining individuals...");
+            nextChildrenSet = objectGraph;
+            nextChildrenSetCount = graphSize;
+        } else {
+            nextChildrenSet = collectTerminalChildrenFromRelationship(nextAuxRelationship[0]);
+            nextChildrenSetCount = nextChildrenSet.length;
+            if (nextChildrenSetCount === 0) {
+                // Will be excluded for now at least.
+                console.error("Could not find any children for relationship, check source data", nextAuxRelationship);
+                skippedAuxRelationships.add(nextAuxRelationship[0]);
+                continue;
+            }
+        }
+
+        console.log('AAA', nextAuxRelationship, nextChildrenSet);
+
+        let nodeAtLowestHI = null;
+        for (let i = 0; i < nextChildrenSetCount; i++) {
+            if (allSeen[nextChildrenSet[i].id]) {
+                continue;
+            }
+            if (nodeAtLowestHI === null) {
+                nodeAtLowestHI = nextChildrenSet[i];
+            } else if (nextChildrenSet[i]._drawing.heightIndex < nodeAtLowestHI._drawing.heightIndex) {
+                nodeAtLowestHI = nextChildrenSet[i];
+            }
+        }
+
+        if (nodeAtLowestHI === null) {
+            console.warn("Could not find any more unpositioned children for relationship, likely tree has been created and this is secondary relation", nextAuxRelationship);
+            skippedAuxRelationships.add(nextAuxRelationship[0]);
+            continue;
+        }
+
+        const subtree = buildAncestralPositions(
+            spansByHeightIndex,
+            [   [  nodeAtLowestHI, 0, 0  ]   ],
+            allSeen,
+            auxRelationsToMakeSubtreesFor
+        );
+        subtree.qAuxRelationships.forEach(function(qARItem){
+            // Append subtree object to this.
+            // If present, we will add to its subtree.posByHeightIndex rather than primary one.
+            qARItem = [ ...qARItem, subtree ];
+            auxRelationsToMakeSubtreesFor[qARItem[0].id] = qARItem;
+        });
+        subtrees.push(subtree);
+    }
+
+    const subtreeStack = [ ...subtrees ];
+    const nodePositionScaleDiviser = spansByHeightIndex[0] * 2; // TODO: reconsider this diviser
+    const partnerNodeRelations = {}; // Sometimes same node has multiple aux relations, keep track to offset them; maybe need to group siblings later idk.
+
+    [{  // Simulate primary tree as subtree to allow final iteration/merge into primary `posByHeightIndex`.
+        posByHeightIndex,
+        positionedIndividuals,
+        positionedRelationships,
+        qAuxRelationships
+    }].concat(subtrees).reverse().forEach(function(treeWithAuxRelations, i, allSubTreesReversed){
+        treeWithAuxRelations.qAuxRelationships.forEach(function(relQItem){
+            const [ relationshipNode, positionedPartnerNode, partnerNodeHorizPos, prevRelationshipHorizPos ] = relQItem;
+            const currIdxInStack = subtrees.length - i;
+            const subtreesCreatedAfterThisRelationship = subtreeStack.slice(currIdxInStack);
+            const subtreeAtRelationIdx = currIdxInStack + subtreesCreatedAfterThisRelationship.findIndex(function(subtree){
+                return subtree.positionedRelationships.indexOf(relationshipNode) > -1;
+            });
+
+            if (subtreeAtRelationIdx < 0 || typeof subtreeAtRelationIdx !== "number" || isNaN(subtreeAtRelationIdx)) {
+                throw new Error("Could not find subtree for auxiliary relation");
+            }
+            const { _drawing : { heightIndex: relationshipHeightIndex } } = relationshipNode;
+            const { id: ppID, _drawing: { heightIndex: ppHeightIndex } } = positionedPartnerNode;
+
+            const subtreeAtRelation = subtreeStack[subtreeAtRelationIdx];
+            subtreeStack.splice(subtreeAtRelationIdx, 1);
+
+
+            partnerNodeRelations[ppID] = partnerNodeRelations[ppID] || {
+                parentless: 0,
+                parentful: 0
+            };
+
+            // Hmm maybe should use partner node height index instd of relationshipHeightIndex.. to be considered
+
+            const subtreeHasParents = !!(subtreeAtRelation.posByHeightIndex[ppHeightIndex + 1]);
+            if (subtreeHasParents) {
+                partnerNodeRelations[ppID].parentful++;
+            } else {
+                partnerNodeRelations[ppID].parentless++;
+            }
+
+            const spanAtHeightIdx = spansByHeightIndex[ppHeightIndex];
+            const toRight = prevRelationshipHorizPos < partnerNodeHorizPos ? 1 : -1;
+            const connectionPos = (
+                partnerNodeHorizPos +
+                (
+                    (   // heuristic optimization - if subtree has no parents greater than curr generation, compactify a bit
+                        subtreeHasParents ?
+                            ((spanAtHeightIdx / 2) * partnerNodeRelations[ppID].parentful)
+                            :
+                            partnerNodeRelations[ppID].parentless
+                    ) *
+                    //(spanAtHeightIdx / (subtreeHasParents ? 2 : 8)) *
+                    // to left or
+                    toRight
+                )
+            );
+
+            console.log('SUBTREE', connectionPos, nodePositionScaleDiviser, spanAtHeightIdx, relationshipNode, subtreeAtRelation);
+
+            let boundaryOffset = -getMaxPos(subtreeAtRelation.posByHeightIndex, -toRight); // Opp. end of parent
+            boundaryOffset = boundaryOffset > 0 ? Math.ceil(boundaryOffset) : Math.floor(boundaryOffset);
+            console.log("BND", boundaryOffset, ppID);
+            // Position subtree nodes relative to connectionPos
+            subtreeAtRelation.posByHeightIndex.forEach(function(nodePosForHeightIndex, hi){
+                Object.keys(nodePosForHeightIndex).forEach(function(nodeID){
+                    treeWithAuxRelations.posByHeightIndex[hi] = treeWithAuxRelations.posByHeightIndex[hi] || {};
+                    treeWithAuxRelations.posByHeightIndex[hi][nodeID] = (
+                        connectionPos + (
+                            (boundaryOffset + nodePosForHeightIndex[nodeID]) /
+                            (nodePositionScaleDiviser * (subtreeHasParents ? 1 : 32)) // heuristic opt cont'd
+                        )
+                    );
+                });
+            });
+
+            subtreeAtRelation.positionedIndividuals.forEach(function(pi){
+                // Don't concat, since .positionedIndividuals here might refer to outer-scope `positionedIndividuals`
+                treeWithAuxRelations.positionedIndividuals.push(pi);
+            });
+
+            subtreeAtRelation.positionedRelationships.forEach(function(pr){
+                treeWithAuxRelations.positionedRelationships.push(pr);
+            });
+
+        });
+    });
+
+
+    // Handle remaining (disconnected) tree fragments/individuals
+    let maxHorizPos = getMaxPos(posByHeightIndex) + 128;
+    console.log("TREES", subtreeStack);
+    while (typeof subtreeStack[0] !== "undefined"){
+        const subtree = subtreeStack.shift(); // We'll be a queue now.
+        let minOffset = -getMaxPos(subtree.posByHeightIndex, -1);
+        minOffset = minOffset < 0 ? Math.floor(minOffset) : Math.ceil(minOffset);
+        let nextMaxHorizPos = maxHorizPos;
+        // Position subtree nodes relative to maxHorizPos
+        subtree.posByHeightIndex.forEach(function(nodePosForHeightIndex, hi){
+            Object.keys(nodePosForHeightIndex).forEach(function(nodeID){
+                posByHeightIndex[hi] = posByHeightIndex[hi] || {};
+                posByHeightIndex[hi][nodeID] = (
+                    maxHorizPos + ((minOffset + nodePosForHeightIndex[nodeID]) / nodePositionScaleDiviser)
+                );
+                nextMaxHorizPos = Math.max(nextMaxHorizPos, Math.ceil(posByHeightIndex[hi][nodeID]));
+            });
+        });
+        maxHorizPos = nextMaxHorizPos + 128;
+        subtree.positionedIndividuals.forEach(function(pi){
+            positionedIndividuals.push(pi);
+        });
+
+        subtree.positionedRelationships.forEach(function(pr){
+            positionedRelationships.push(pr);
+        });
+    }
+
+    // TODO: Handle remaining auxiliary relationships, if any.
+    // Add'l aux relationships are most likely intra-family marriage (no subtrees)
+    // and just need to figure out where to put aux relation node.
+    // Perhaps, since should be small #, could do this after converting to orderByHeightIndex & count intersections per option..
+
+    if (subtreeStack.length > 0 || positionedIndividuals.length !== graphSize) {
+        console.log(subtreeStack, graphSize, positionedIndividuals.length);
+        throw new Error("Disconnected family tree or individuals found, check data.");
+    }
+
+
+    // Generate initial `orderByHeightIndex` from `posByHeightIndex`
+    const orderByHeightIndex = [];
+    const seenOrderInIndex = {};
+    const seenPosInIndex = {};
+    positionedIndividuals.concat(positionedRelationships).forEach(function(node){
+        const { _drawing: { heightIndex: hi }, id } = node;
+        const pos = posByHeightIndex[hi][id];
+        orderByHeightIndex[hi] = orderByHeightIndex[hi] || [];
+        orderByHeightIndex[hi].push([ node, pos ]);
+    });
+    orderByHeightIndex.forEach(function(orderingForHI, hi){
+        orderingForHI.sort(function([ nodeA, posA ], [ nodeB, posB ]){
+            return posA - posB;
+        });
+        orderByHeightIndex[hi] = orderingForHI.map(function([ node, pos ], idxInRow){
+            // Save final order to nodes so we don't need order object anymore (todo)
+            node._drawing.orderInHeightIndex = seenOrderInIndex[node.id] = idxInRow;
+            node._drawing.origPosInHeightIndex = seenPosInIndex[node.id] = pos; // for debugging only rn past this
+            return node;
+        });
+    });
+
+    console.log("SPANS", maxHeightIndex, spansByHeightIndex, posByHeightIndex, orderByHeightIndex);
+
+    // const initialCrossings = countEdgeCrossings({ orderByHeightIndex, seenOrderInIndex });
+
+    // Assign generation+order -based-name
+    const heightIndicesCount = orderByHeightIndex.length;
+    orderByHeightIndex.forEach(function(nodesInRow, hi){
+        const generationRomanNumeral = numberToRomanNumeral(heightIndicesCount - hi);
+        nodesInRow.reduce(function(currNum, n){
+            if ( isRelationship(n) ) return currNum;
+            n.orderBasedName = "" + generationRomanNumeral + " – " + currNum;
+            if (n.isProband) {
+                // Append "p" if proband
+                n.orderBasedName += "p";
+            }
+            currNum++;
+            return currNum;
+        }, 1);
+    });
+
+    return {
+        orderByHeightIndex,
+        seenOrderInIndex,
+        objectGraph: positionedIndividuals,
+        relationships: positionedRelationships
+    };
+}
+
+/** @deprecated */
+export function orderObjectGraph2(objectGraph, relationships = null){
     const rootPermutations = computePossibleParentlessPermutations(objectGraph);
     const leafPermutations = computePossibleChildlessPermutations(objectGraph);
 
@@ -1009,7 +1513,7 @@ export function orderObjectGraph(objectGraph, relationships = null){
         }
     }
 
-    console.log("BEST ORDER1", bestOrder, bestCrossings, objectGraph);
+    console.log("BEST ORDER1", Object.assign({}, bestOrder), bestCrossings, objectGraph);
 
     improveOrder(bestOrder, bestCrossings);
     heuristicallyAdjustOrder(bestOrder);
@@ -1042,7 +1546,7 @@ export function orderObjectGraph(objectGraph, relationships = null){
 
     console.log("BEST ORDER2", bestOrder, bestCrossings, objectGraph);
 
-    return bestOrder;
+    return { objectGraph, relationships, ...bestOrder };
 }
 
 function swapOrder(row, seenOrderInIndex, i1, i2){
@@ -1095,15 +1599,25 @@ function improveOrder(order, initCrossings){
     }
 }
 
+function sortChildrenByAge(a,b){
+    if (a.isProband) return -1;
+    if (b.isProband) return 1;
+    return (b.age || 0) - (a.age || 0);
+}
+
+function sortPartnersByGender(a,b) {
+    const { gender: gA } = a, { gender: gB } = b;
+    if (gA === "male" && gB !== "male") {
+        return -1;
+    }
+    if (gB === "male" && gA !== "male") {
+        return 1;
+    }
+    return 0;
+}
 
 function heuristicallyAdjustOrder(order){
     const { orderByHeightIndex, seenOrderInIndex } = order;
-
-    function sortAdjacentChildren(a,b){
-        if (a.isProband) return -1;
-        if (b.isProband) return 1;
-        return (b.age || 0) - (a.age || 0);
-    }
 
     orderByHeightIndex.forEach(function(nodesInRow, hi){
         const rowLen = nodesInRow.length;
@@ -1165,7 +1679,7 @@ function heuristicallyAdjustOrder(order){
         //console.log("GROUPS", groups);
         groups.forEach(function([ nodeSet, startIdx ]){
             const nodesLen = nodeSet.length;
-            const nextSet = nodeSet.sort(sortAdjacentChildren);
+            const nextSet = nodeSet.sort(sortChildrenByAge);
             nodesInRow.splice(startIdx, nodesLen, ...nextSet);
         });
     });

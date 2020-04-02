@@ -18,12 +18,13 @@ import { graphTransformerDefaultProps, POSITION_DEFAULTS } from './default-props
 export function buildGraphData(dataset, dimensionOpts = {}, filterUnrelatedIndividuals = false){
     const jsonList = standardizeObjectsInList(dataset);
     const {
-        objectGraph,
+        objectGraph: initialObjectGraph,
         disconnectedIndividuals: detachedIndividuals
     } = createObjectGraph(jsonList, filterUnrelatedIndividuals);
-    const relationships = createRelationships(objectGraph);
-    assignTreeHeightIndices(objectGraph);
-    const order = orderObjectGraph(objectGraph, relationships);
+    const initialRelationships = createRelationships(initialObjectGraph);
+    const maxHeightIdx = assignTreeHeightIndices(initialObjectGraph);
+    //const { objectGraph, relationships, ...order } = orderObjectGraph(initialObjectGraph, initialRelationships, maxHeightIdx);
+    const { objectGraph, relationships, ...order } = orderObjectGraph(initialObjectGraph, initialRelationships, maxHeightIdx);
     const dims = getFullDims(dimensionOpts);
     positionObjectGraph(objectGraph, order, dims);
     // Add extra to offset text @ bottom of nodes.

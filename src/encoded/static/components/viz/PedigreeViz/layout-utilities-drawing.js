@@ -76,7 +76,7 @@ export function createEdges(objectGraph, dims, graphHeight){
         const indv = q.shift();
         if (seen[indv.id]) continue;
         seen[indv.id] = true;
-        const { _maritalRelationships, _parentalRelationship : parentRelation } = indv;
+        const { _maritalRelationships = [], _parentalRelationship : parentRelation } = indv;
 
         _maritalRelationships.forEach(function(mr){
             mr.children.forEach(function(ch){
@@ -225,6 +225,7 @@ export function createEdges(objectGraph, dims, graphHeight){
 
 
         } // End if parentRelation
+
     }
 
     directEdges.forEach(function(edge){
@@ -371,6 +372,12 @@ function tracePaths(adjustableEdges, visibilityGraph){
                     costToTargetEstimate = costToTargetEstimate * ((intersected / 4) + 1);
                 }
                 //*/
+
+
+                if (!isVertical && v[1] === targetV[1]) {
+                    // Slight advantage to paths which sticky to Y axis coord of target (or todo?: source) (heuristic optimization)
+                    costToTargetEstimate = costToTargetEstimate * 0.9;
+                }
 
                 if (costToTargetEstimate < bestCostEstimate){
                     bestCostEstimate = costToTargetEstimate;
