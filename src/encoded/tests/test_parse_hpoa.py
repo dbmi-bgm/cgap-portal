@@ -334,11 +334,11 @@ def test_compare_existing_to_newly_generated_none_same(mocker, mock_logger, conn
 
 @pytest.fixture
 def problems(evi_items, hpoa_data):
+    not_found = OrderedDict()
+    not_found['HP:0000001'] = 'HPO_ID'
+    not_found['HP:0202021'] = 'Frequency'
     return {
-        'hpo_not_found': {
-            'HP:0000001': 'HPO_ID',
-            'HP:0202021': 'Frequency',
-        },
+        'hpo_not_found': not_found,
         'redundant_annot': [evi_items],
         'no_map': [hpoa_data]
     }
