@@ -40,9 +40,13 @@ def test_get_dbxref2disorder_map(rel_disorders):
     ]
     for i, d in enumerate(rel_disorders):
         d.update({'dbxrefs': dbxrefs[i]})
+    print("Added dbxrefs ", rel_disorders)
     disorders = {'uuid' + str(i + 1): d for i, d in enumerate(rel_disorders)}
+    print("Added uuids ", disorders)
     map = ph.get_dbxref2disorder_map(disorders)
+    print("Map ", map)
     for dx, uid in map.items():
+        print(dx, uid, dx[dx.index(':') + 1:], uid[4:])
         assert dx[dx.index(':') + 1:] == uid[4:]
 
 
