@@ -180,6 +180,7 @@ export function sortByAge(a, b){
     return b.age - a.age;
 }
 
+/** Left to right in row: Father -> Mother -> Undetermined-Gender Parent */
 export function sortByGender(indvA, indvB){
     const { gender: gA } = indvA;
     const { gender: gB } = indvB;
