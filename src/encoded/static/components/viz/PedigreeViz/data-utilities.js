@@ -170,8 +170,14 @@ export function standardizeObjectsInList(jsonList){
     return nextList;
 }
 
-export function sortByAge(indvA, indvB){
-    return 0 - ((indvA.age || 0) - (indvB.age || 0));
+/** Oldest first */
+export function sortByAge(a, b){
+    if (a.isProband) return -1;
+    if (b.isProband) return 1;
+    if (isNaN(b) && !isNaN(a)) return -1;
+    if (isNaN(a) && !isNaN(b)) return 1;
+    if (isNaN(a) && isNaN(b)) return 0;
+    return b.age - a.age;
 }
 
 export function sortByGender(indvA, indvB){

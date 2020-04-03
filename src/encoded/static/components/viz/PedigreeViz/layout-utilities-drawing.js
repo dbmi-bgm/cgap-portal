@@ -239,7 +239,10 @@ export function createEdges(objectGraph, dims, graphHeight){
         edge.vertices = [edge.fromVertex, edge.toVertex];
     });
 
-    let visibilityGraph = computeVisibilityGraph(objectGraph, directEdges, dims, graphHeight, true);
+    // set depending on # relations maybe.. eh idk it helps on complexy graphs, not sure how to calculate
+    // 'complexiness' any better for now (relationships / objectGraph ratio maybe?)
+    const countDirectEdges = (seenParentalRelationships.size / objectGraph) < 3;
+    let visibilityGraph = computeVisibilityGraph(objectGraph, directEdges, dims, graphHeight, countDirectEdges);
     let subdivisions = 3;
     function trySubdivisions(){
         if (subdivisions >= 5){

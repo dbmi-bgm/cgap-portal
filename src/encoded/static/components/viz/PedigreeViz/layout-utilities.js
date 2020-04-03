@@ -1,5 +1,5 @@
 import { getGraphHeight } from './layout-utilities-drawing';
-import { getRelationships, isRelationship, numberToRomanNumeral } from './data-utilities';
+import { getRelationships, isRelationship, numberToRomanNumeral, sortByAge, sortByGender } from './data-utilities';
 
 
 
@@ -484,7 +484,7 @@ function buildAncestralPositions(spansByHeightIndex, q, seenDirectInRelation = {
         posByHeightIndex[heightIndex][id] = horizPos;
 
         // Add M + F heuristically. We use sort fxn in case 3+ ppl in relationship for some reason.
-        const orderedPartners = partners.slice().sort(sortPartnersByGender);
+        const orderedPartners = partners.slice().sort(sortByGender);
 
         // If we are connecting at this relationship to a parent subtree,
         // we don't care as much about ordering the relationship partners,
@@ -518,7 +518,7 @@ function buildAncestralPositions(spansByHeightIndex, q, seenDirectInRelation = {
             .sort(function(a,b){
 
                 if (typeof a.age === "number" && typeof b.age === "number" && a.age !== b.age) {
-                    return sortChildrenByAge(a,b);
+                    return sortByAge(a,b);
                 }
 
                 // Sort by distance to already-drawn marital partners first.
@@ -545,7 +545,7 @@ function buildAncestralPositions(spansByHeightIndex, q, seenDirectInRelation = {
                 console.log('sorty', a.id, b.id, aMarPos, bMarPos, aDist, bDist);
                 if (aDist === bDist){
                     // Most likely Infinity for both, default to age in case one does not have it defined (else is 0).
-                    return sortChildrenByAge(a,b);
+                    return sortByAge(a,b);
                     //return 0;
                 }
                 if (aDist < bDist) {
@@ -908,6 +908,9 @@ export function orderObjectGraph(objectGraph, relationships = null, maxHeightInd
             };
             partnerNodeRelations[ppID].parentful++;
 
+            // TODO instead of trying to move relationship closer to other aux node,
+            // try moving to other side of current node is on if it brings it closer to other partner(s).
+
             // TODO: Change intersection counting code to use position instead of order.
             // To avoid overhead of converting (and inaccuracy) _if_ we don't use some better idea.
             const origCrossings = countEdgeCrossings(posByHIToOrderByHI(
@@ -974,25 +977,6 @@ export function orderObjectGraph(objectGraph, relationships = null, maxHeightInd
         relationships: positionedRelationships
     };
 }
-
-function sortChildrenByAge(a,b){
-    if (a.isProband) return -1;
-    if (b.isProband) return 1;
-    return (b.age || 0) - (a.age || 0);
-}
-
-function sortPartnersByGender(a,b) {
-    const { gender: gA } = a, { gender: gB } = b;
-    if (gA === "male" && gB !== "male") {
-        return -1;
-    }
-    if (gB === "male" && gA !== "male") {
-        return 1;
-    }
-    return 0;
-}
-
-
 
 export function positionObjectGraph(objectGraph, order, dims, memoized = {}){
     const { orderByHeightIndex, seenOrderInIndex } = order;
