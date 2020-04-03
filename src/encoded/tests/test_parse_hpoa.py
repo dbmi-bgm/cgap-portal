@@ -14,7 +14,7 @@ pytestmark = [pytest.mark.setone, pytest.mark.working]
 def test_ph_get_args_defaults():
     args = []
     args = ph.get_args(args)
-    assert args.input == 'http://compbio.charite.de/jenkins/job/hpo.annotations.current/lastSuccessfulBuild/artifact/current/phenotype.hpoa'
+    assert args.input == ph.HPOA_URL
     assert args.keyfile == os.path.expanduser("~/keypairs.json")
     assert args.outfile == 'disorders2phenotypes.json'
     assert args.load is False

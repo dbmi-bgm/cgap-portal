@@ -179,7 +179,6 @@ def test_create_dict_keyed_by_field_from_items_valid_field_with_2_empty_1_missin
         'disorder_name': 'colored thumbs',
         'disorder_url': 'http://purl.obolibrary.org/obo/MONDO_9999998'
     })
-    assert len(rel_disorders) == len(disorder_ids) + 3
     disorder_dict = gifo.create_dict_keyed_by_field_from_items(rel_disorders, keyfield)
     assert len(disorder_dict) == len(disorder_ids)
     assert all([d in disorder_dict for d in disorder_ids])
@@ -194,7 +193,6 @@ def test_create_dict_keyed_by_field_from_items_duplicates_present_last_returned(
     alt_disorder = rel_disorders[1].copy()
     alt_disorder['disorder_name'] = alt_name
     rel_disorders.append(alt_disorder)
-    assert len(rel_disorders) == len(disorder_ids) + 2
     disorder_dict = gifo.create_dict_keyed_by_field_from_items(rel_disorders, keyfield)
     assert len(disorder_dict) == len(disorder_ids)
     to_chk = disorder_dict.get(chk_id)
