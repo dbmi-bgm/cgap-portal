@@ -35,7 +35,7 @@ def test_get_dbxref2disorder_map(rel_disorders):
     dbxrefs = [
         ['OMIM:1'],  # first instance of this
         ['Decipher:2', 'omim_1234', 'ICD9:123'],  # only good one is Decipher
-        ['ORPHA:3', 'orphanet:3', 'OMIM:1'],  # both orphas OK, OMIM is repeat
+        ['ORPHA:3', 'orphanet:3'],  # both orphas OK
         []
     ]
     print("To start")
@@ -55,6 +55,7 @@ def test_get_dbxref2disorder_map(rel_disorders):
     for dx, uid in map.items():
         print(dx, uid, dx[dx.index(':') + 1:], uid[4:])
         assert dx[dx.index(':') + 1:] == uid[4:]
+    assert False
 
 
 def test_line2list():
