@@ -269,18 +269,36 @@ def get_slim_term_ids_from_db_terms(db_terms, itype):
     return [t.get(ITEM2OWL[itype].get('id_field')) for t in db_terms.values() if t.get('is_slim_for')]
 
 
-def get_existing_items(connection, itype, include_obs_n_del=True):
+def get_existing_items(connection, itype):
     '''Retrieves all existing items of itype from db '''
-    terms = {}
+    terms = get_existing_items_from_db(connection, itype)
+    return create_dict_keyed_by_field_from_items(terms, ITEM2OWL[itype].get('id_field'))
+
+
+def get_existing_items_from_db(connection, itype, include_invisible=True):
+    ''' Retrieves all existing items of itype from db and returns a generator
+        by default includes deleted and restricted terms which are usually
+        filtered from search results
+        include_invisible=False excludes deleted and restricted
+        return Generator of item dicts
+    '''
+    invisible_stati = ['deleted', 'replaced']
+    gens = []
     search_suffix = 'search/?type={}'.format(itype)
-    iid = ITEM2OWL[itype].get('id_field')
-    db_terms = search_metadata(search_suffix, connection, page_limit=200, is_generator=True)
-    terms = {t[iid]: t for t in db_terms}
-    if include_obs_n_del:
-        search_suffix += '&status=obsolete&status=deleted'
-        more_terms = search_metadata(search_suffix, connection, page_limit=200, is_generator=True)
-        terms.update({t[iid]: t for t in more_terms})
-    return terms
+    gens.append(search_metadata(search_suffix, connection, page_limit=200, is_generator=True))
+    if include_invisible:
+        for istatus in invisible_stati:
+            search_suffix += '&status={}'.format(istatus)
+        gens.append(search_metadata(search_suffix, connection, page_limit=200, is_generator=True))
+    for gen in gens:
+        yield from gen
+
+
+def create_dict_keyed_by_field_from_items(items, keyfield):
+    ''' given a field and iterable of items with that field
+        return a dict keyed by that field with item as values
+    '''
+    return {i.get(keyfield): i for i in items if i and keyfield in i}
 
 
 def connect2server(env=None, key=None, keyfile=None, logger=None):
@@ -571,7 +589,7 @@ def write_outfile(terms, filename, pretty=False):
             json.dump(terms, outfile)
 
 
-def parse_args(args):
+def get_args(args):
     parser = argparse.ArgumentParser(
         description="Process specified Ontologies and create OntologyTerm inserts for updates",
         epilog=EPILOG,
@@ -678,7 +696,7 @@ def main():
         logging/tracking info
     '''
     start = datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
-    args = parse_args(sys.argv[1:])
+    args = get_args(sys.argv[1:])
     itype = args.item_type
     logfile = '{}_{}_item_upd.log'.format(start.replace(':', '-'), itype)  # avoids colons in filename
     logger = get_logger(__name__, logfile)
