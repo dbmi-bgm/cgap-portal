@@ -126,6 +126,7 @@ function watchSharedPortalComponents(done){
 // TODO: Just use command-line `node-sass` ?
 
 const cssOutputLocation = './src/encoded/static/css/style.css';
+const sourceMapLocation = "./src/encoded/static/css/style.css.map";
 
 function doSassBuild(done, options = {}) {
     sass.render({
@@ -144,13 +145,30 @@ function doSassBuild(done, options = {}) {
             console.log("Finished compiling SCSS in", result.stats.duration, "ms");
             console.log("Writing to", cssOutputLocation);
 
+            let countCompleted = 0;
+
             fs.writeFile(cssOutputLocation, result.css.toString(), null, function(err){
                 if (err){
                     return console.error(err);
                 }
                 console.log("Wrote " + cssOutputLocation);
-                done();
+                countCompleted++;
+                if (countCompleted === 2){
+                    done();
+                }
             });
+
+            fs.writeFile(sourceMapLocation, result.map.toString(), null, function(err){
+                if (err){
+                    return console.error(err);
+                }
+                console.log("Wrote " + sourceMapLocation);
+                countCompleted++;
+                if (countCompleted === 2){
+                    done();
+                }
+            });
+
         }
     });
 }
