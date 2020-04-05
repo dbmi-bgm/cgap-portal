@@ -289,10 +289,6 @@ function tracePaths(adjustableEdges, visibilityGraph){
         vSegments: vSegmentQ
     } = visibilityGraph;
 
-    //const hSegmentQ = hSegments.slice(0);
-    //const vSegmentQ = vSegments.slice(0);
-
-
     function getEdgeTargetV(otherV, edge){
         let connectsAt = null;
         if (otherV[0] === edge[0][0] && otherV[1] === edge[0][1]){
@@ -311,8 +307,8 @@ function tracePaths(adjustableEdges, visibilityGraph){
         const vLen = vSegmentQ.length;
         const resultList = [];
         // Go from last to first, selecting segments 'to bottom'
-        // first in cases when allow partner-relationship edges to cross
-        // child-relationship line segments
+        // first as these look better for cases when partner-relationship
+        // edges cross child-relationship line segments
         for (let i = (vLen + hLen) - 1; i >= 0; i--){
             let checkIdx = i;
             let checkQ = vSegmentQ;
@@ -415,8 +411,13 @@ function tracePaths(adjustableEdges, visibilityGraph){
             const {
                 v: currV,
                 searchPath: currSearchPath,
+                // Actual distance
                 pathLengthCost: currPathLengthCost,
                 skip,
+                // This may be different from actual distance in response to 'path prettiness'
+                // heuristics. We theoretically could migrate to just using heuristicCostTotal entirely
+                // but would argue is nice to differentiate & have for simpler debugging if needed.
+                // Especially while heuristicCostTotal calculation is uh.. more experimental than polished.
                 heuristicCostTotal
             } = currArgs;
 
@@ -443,7 +444,7 @@ function tracePaths(adjustableEdges, visibilityGraph){
                 if (currPathLengthCost < bestPathTotalCost){
                     bestPathTotalCost = currPathLengthCost;
                     bestPathTotal = currSearchPath;
-                    console.info("FOUND after", iterations);
+                    console.info(`Found best path between ${initCurrV} and ${targetV} after ${iterations} iterations (0,0 is top left).`);
                     break;
                 }
             }
