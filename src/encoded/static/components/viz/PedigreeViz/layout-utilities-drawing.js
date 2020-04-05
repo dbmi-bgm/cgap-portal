@@ -205,7 +205,7 @@ export function createEdges(objectGraph, dims, graphHeight){
                 const toIndividualXAttachmentLedge = dims.edgeLedge * (attachToIndividualOnLeftSide ? -1 : 1);
 
                 // TODO: Add concept of 'ledges' to relationships. In such way that it chooses
-                // the "empty" side (if any) for last partner.
+                // the "empty" side (if any) for last partner (which should be further-away partner).
                 // Addition of 'ledge' will require minor upstream changes, probably just to the React
                 // component that visualizes it to extend real or faux line/something from node
                 // center to start of edge/path.
