@@ -174,9 +174,9 @@ export function standardizeObjectsInList(jsonList){
 export function sortByAge(a, b){
     if (a.isProband) return -1;
     if (b.isProband) return 1;
-    if (isNaN(b) && !isNaN(a)) return -1;
-    if (isNaN(a) && !isNaN(b)) return 1;
-    if (isNaN(a) && isNaN(b)) return 0;
+    if (isNaN(b.age) && !isNaN(a.age)) return -1;
+    if (isNaN(a.age) && !isNaN(b.age)) return 1;
+    if (isNaN(a.age) && isNaN(b.age)) return 0;
     return b.age - a.age;
 }
 

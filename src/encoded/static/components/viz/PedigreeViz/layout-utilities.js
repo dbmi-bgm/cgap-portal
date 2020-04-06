@@ -491,7 +491,7 @@ function buildAncestralPositions(spansByHeightIndex, q, seenDirectInRelation = {
         // so sort them by how close they are to target/previous partner in
         // parent subtree instead.
         if (typeof auxRelationsToConnect[id] !== "undefined") {
-            console.log("CONNECT!", auxRelationsToConnect[id], auxRelationsToConnect[id][0] === currNode, currNode);
+            console.log("CONNECT PARENT", auxRelationsToConnect[id], auxRelationsToConnect[id][0] === currNode, currNode);
             const [ , positionedPartnerNode, partnerNodeHorizPos, prevRelationshipHorizPos ] = auxRelationsToConnect[id];
             const toRight = prevRelationshipHorizPos < partnerNodeHorizPos ? 1 : -1;
             orderedPartners.sort(function(a,b){
@@ -503,7 +503,7 @@ function buildAncestralPositions(spansByHeightIndex, q, seenDirectInRelation = {
                 }
                 return 0;
             });
-            delete auxRelationsToConnect[id]; // not really necessary
+            delete auxRelationsToConnect[id];
         }
 
         orderedPartners.forEach(function(p, i){
@@ -517,6 +517,10 @@ function buildAncestralPositions(spansByHeightIndex, q, seenDirectInRelation = {
         const orderedChildrenByAge = children.slice()
             .sort(function(a,b){
 
+                // TODO consider skipping this `if` check if auxRelationsToConnect is not empty
+                // (= is a subtree being made) or at least if is applicable.
+                // Would cost a distortion in heuristic order of subtree children/siblings but
+                // benefit by resulting in shorter/cleaner edges.
                 if (typeof a.age === "number" && typeof b.age === "number" && a.age !== b.age) {
                     return sortByAge(a,b);
                 }
@@ -542,7 +546,7 @@ function buildAncestralPositions(spansByHeightIndex, q, seenDirectInRelation = {
                         break;
                     }
                 }
-                console.log('sorty', a.id, b.id, aMarPos, bMarPos, aDist, bDist);
+                console.log('sorty-b', a.id, b.id, aMarPos, bMarPos, aDist, bDist);
                 if (aDist === bDist){
                     // Most likely Infinity for both, default to age in case one does not have it defined (else is 0).
                     return sortByAge(a,b);
