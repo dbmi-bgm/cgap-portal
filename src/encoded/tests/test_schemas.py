@@ -45,15 +45,15 @@ def camel_case(name):
 def pluralize(name):
     name = name.replace('_', '-')
     # deal with a few special cases explicitly
-    specials = ['experiment', 'file', 'individual', 'treatment',
-                'quality-metric', 'summary-statistic', 'workflow-run',
-                'microscope-setting']
+    specials = ['file', 'quality-metric', 'summary-statistic', 'workflow-run']
     for sp in specials:
         if name.startswith(sp) and re.search('-(set|flag|format|type)', name) is None:
             return name.replace(sp, sp + 's')
         elif name.startswith(sp) and re.search('setting', name):
             return name.replace(sp, sp + 's')
     # otherwise just add 's'
+    if name.endswith('ly'):
+        return name[:-1] + 'ies'
     return name + 's'
 
 
