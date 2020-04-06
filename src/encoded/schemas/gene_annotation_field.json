@@ -28,13 +28,13 @@
             "type": "integer"
         },
         "field_name": {
-            "title": "Field Name in BED file",
-            "description": "Original name of the field name in the gene annotation bed file",
+            "title": "Field Name from Mutanno",
+            "description": "Original name of the field name in the mutanno database",
             "type": "string"
         },
         "source_name": {
             "title": "Source Name",
-            "description": "Latest source name",
+            "description": "Latest source name for the data",
             "type": "string"
         },
         "source_version": {
@@ -90,14 +90,15 @@
        "links_to": {
            "title": "Link To",
            "description": "Item Type that should be linked to from this field",
-           "type": "string"
+           "type": "string",
+           "comment": "MAY NOT NEED THIS FOR GENES"
        },
        "schema_title": {
            "title": "Schema Title",
            "description": "Title to be used in the gene schema for the field",
            "type": "string"
        },
-       "schema_description": {
+       "description": {
             "title": "Description",
             "description": "description to be used in the gene schema for the field",
             "type": "string"
@@ -107,9 +108,9 @@
             "description": "Example Value for this field, stored as text",
             "type": "string"
         },
-        "pre_addon": {
-            "title": "Pre-Addon",
-            "description": "base of url to substitute in an ID to make a external link - use in namespaces.json?",
+        "link_substitution": {
+            "title": "Link Substitution",
+            "description": "url with placehold to substitute in an ID to make a external link - use in namespaces.json?",
             "type": "string"
         },
         "field_priority": {
@@ -132,36 +133,10 @@
             "description": "Ranking number of the field for Facet in search view (lower is better)",
             "type": "integer"
         },
-        "scale": {
-            "title": "Scale",
-            "description": "Scale defined by new annotation structure",
-            "type": "string"
-        },
-        "domain": {
-            "title": "Domain",
-            "description": "Domain defined by new annotation structure",
-            "type": "string"
-        },
-        "method": {
-            "title": "Method",
-            "description": "Method defined by new annotation structure",
-            "type": "string"
-        },
         "annotation_grouping": {
             "title": "Annotation Grouping",
             "description": "Which group this annotation belongs to",
             "type": "string"
-        },
-        "scope": {
-            "title": "Scope",
-            "description": "Scope that this field belongs to",
-            "type": "string",
-            "enum": [
-                "variant",
-                "sample",
-                "gene",
-                "sample_variant"
-            ]
         },
         "calculated_property": {
             "title": "Calculated Property",
