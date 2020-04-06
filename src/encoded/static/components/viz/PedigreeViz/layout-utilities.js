@@ -546,7 +546,7 @@ function buildAncestralPositions(spansByHeightIndex, q, seenDirectInRelation = {
                         break;
                     }
                 }
-                console.log('sorty-b', a.id, b.id, aMarPos, bMarPos, aDist, bDist);
+                console.log('children sorty-b', a.id, b.id, aMarPos, bMarPos, aDist, bDist);
                 if (aDist === bDist){
                     // Most likely Infinity for both, default to age in case one does not have it defined (else is 0).
                     return sortByAge(a,b);
@@ -900,48 +900,48 @@ export function orderObjectGraph(objectGraph, relationships = null, maxHeightInd
         // TODO: (Re-)arrange relationship node to be in better place.
         // Idea 1: Try placing each relationship in different spots in order and testing crossings.
         // (1 by 1 or likely permutations? pro/con = speed/accuracy; need to try both and assess)
-        auxRelationshipsWithoutSubtrees.forEach(function(relQItem){
-            const [ relationshipNode, positionedPartnerNode, partnerNodeHorizPos, prevRelationshipHorizPos ] = relQItem;
-            const { id: relID,_drawing: { heightIndex: relHeightIndex } } = relationshipNode;
-            const { id: ppID, _drawing: { heightIndex: ppHeightIndex } } = positionedPartnerNode;
-            const spanAtHeightIdx = spansByHeightIndex[ppHeightIndex];
-            const toRight = prevRelationshipHorizPos < partnerNodeHorizPos ? 1 : -1;
-            partnerNodeRelations[ppID] = partnerNodeRelations[ppID] || {
-                parentless: 0,
-                parentful: 0
-            };
-            partnerNodeRelations[ppID].parentful++;
+        // auxRelationshipsWithoutSubtrees.forEach(function(relQItem){
+        //     const [ relationshipNode, positionedPartnerNode, partnerNodeHorizPos, prevRelationshipHorizPos ] = relQItem;
+        //     const { id: relID,_drawing: { heightIndex: relHeightIndex } } = relationshipNode;
+        //     const { id: ppID, _drawing: { heightIndex: ppHeightIndex } } = positionedPartnerNode;
+        //     const spanAtHeightIdx = spansByHeightIndex[ppHeightIndex];
+        //     const toRight = prevRelationshipHorizPos < partnerNodeHorizPos ? 1 : -1;
+        //     partnerNodeRelations[ppID] = partnerNodeRelations[ppID] || {
+        //         parentless: 0,
+        //         parentful: 0
+        //     };
+        //     partnerNodeRelations[ppID].parentful++;
 
-            // TODO instead of trying to move relationship closer to other aux node,
-            // try moving to other side of current node is on if it brings it closer to other partner(s).
+        //     // TODO instead of trying to move relationship closer to other aux node,
+        //     // try moving to other side of current node is on if it brings it closer to other partner(s).
 
-            // TODO: Change intersection counting code to use position instead of order.
-            // To avoid overhead of converting (and inaccuracy) _if_ we don't use some better idea.
-            const origCrossings = countEdgeCrossings(posByHIToOrderByHI(
-                positionedIndividuals.concat(positionedRelationships),
-                posByHeightIndex
-            ));
+        //     // TODO: Change intersection counting code to use position instead of order.
+        //     // To avoid overhead of converting (and inaccuracy) _if_ we don't use some better idea.
+        //     const origCrossings = countEdgeCrossings(posByHIToOrderByHI(
+        //         positionedIndividuals.concat(positionedRelationships),
+        //         posByHeightIndex
+        //     ));
 
-            const origPos = posByHeightIndex[relHeightIndex][relID];
-            const newPos = (
-                partnerNodeHorizPos +
-                ((spanAtHeightIdx / 2) * partnerNodeRelations[ppID].parentful) * toRight
-            );
-            posByHeightIndex[relHeightIndex][relID] = newPos;
+        //     const origPos = posByHeightIndex[relHeightIndex][relID];
+        //     const newPos = (
+        //         partnerNodeHorizPos +
+        //         ((spanAtHeightIdx / 2) * partnerNodeRelations[ppID].parentful) * toRight
+        //     );
+        //     posByHeightIndex[relHeightIndex][relID] = newPos;
 
-            const nextCrossings = countEdgeCrossings(posByHIToOrderByHI(
-                positionedIndividuals.concat(positionedRelationships),
-                posByHeightIndex
-            ));
+        //     const nextCrossings = countEdgeCrossings(posByHIToOrderByHI(
+        //         positionedIndividuals.concat(positionedRelationships),
+        //         posByHeightIndex
+        //     ));
 
-            if (nextCrossings >= origCrossings) { // Undo
-                posByHeightIndex[relHeightIndex][relID] = origPos;
-                partnerNodeRelations[ppID].parentful--;
-            } else {
-                console.info(`Changed ${relID} from ${origPos} to ${newPos}.`);
-            }
+        //     if (nextCrossings >= origCrossings) { // Undo
+        //         posByHeightIndex[relHeightIndex][relID] = origPos;
+        //         partnerNodeRelations[ppID].parentful--;
+        //     } else {
+        //         console.info(`Changed ${relID} from ${origPos} to ${newPos}.`);
+        //     }
 
-        });
+        // });
     }
 
     // Generate initial `orderByHeightIndex` from `posByHeightIndex`
