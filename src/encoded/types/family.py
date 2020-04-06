@@ -32,6 +32,7 @@ class Family(Item):
     item_type = 'family'
     name_key = 'accession'
     schema = load_schema('encoded:schemas/family.json')
+    rev = {'sample_procs': ('SampleProcessing', 'families')}
     embedded_list = [
         "members.accession",
         "members.father",
@@ -80,27 +81,27 @@ class Family(Item):
         "members.samples.files.quality_metric.url",
         "members.samples.files.quality_metric.status",
         "members.samples.completed_processes",
-        "sample_processes.samples.accession",
-        "sample_processes.processed_files",
-        "sample_processes.processed_files.quality_metric",
-        "sample_processes.processed_files.quality_metric.qc_list.qc_type",
-        "sample_processes.processed_files.quality_metric.qc_list.value.overall_quality_status",
-        "sample_processes.processed_files.quality_metric.qc_list.value.url",
-        "sample_processes.processed_files.quality_metric.qc_list.value.status",
-        "sample_processes.processed_files.quality_metric.overall_quality_status",
-        "sample_processes.processed_files.quality_metric.url",
-        "sample_processes.processed_files.quality_metric.status",
-        "sample_processes.sample_processed_files",
-        "sample_processes.sample_processed_files.sample.accession",
-        "sample_processes.sample_processed_files.processed_files.quality_metric",
-        "sample_processes.sample_processed_files.processed_files.quality_metric.qc_list.qc_type",
-        "sample_processes.sample_processed_files.processed_files.quality_metric.qc_list.value.overall_quality_status",
-        "sample_processes.sample_processed_files.processed_files.quality_metric.qc_list.value.url",
-        "sample_processes.sample_processed_files.processed_files.quality_metric.qc_list.value.status",
-        "sample_processes.sample_processed_files.processed_files.quality_metric.overall_quality_status",
-        "sample_processes.sample_processed_files.processed_files.quality_metric.url",
-        "sample_processes.sample_processed_files.processed_files.quality_metric.status",
-        "sample_processes.completed_processes",
+        "analysis_groups.samples.accession",
+        "analysis_groups.processed_files",
+        "analysis_groups.processed_files.quality_metric",
+        "analysis_groups.processed_files.quality_metric.qc_list.qc_type",
+        "analysis_groups.processed_files.quality_metric.qc_list.value.overall_quality_status",
+        "analysis_groups.processed_files.quality_metric.qc_list.value.url",
+        "analysis_groups.processed_files.quality_metric.qc_list.value.status",
+        "analysis_groups.processed_files.quality_metric.overall_quality_status",
+        "analysis_groups.processed_files.quality_metric.url",
+        "analysis_groups.processed_files.quality_metric.status",
+        "analysis_groups.sample_processed_files",
+        "analysis_groups.sample_processed_files.sample.accession",
+        "analysis_groups.sample_processed_files.processed_files.quality_metric",
+        "analysis_groups.sample_processed_files.processed_files.quality_metric.qc_list.qc_type",
+        "analysis_groups.sample_processed_files.processed_files.quality_metric.qc_list.value.overall_quality_status",
+        "analysis_groups.sample_processed_files.processed_files.quality_metric.qc_list.value.url",
+        "analysis_groups.sample_processed_files.processed_files.quality_metric.qc_list.value.status",
+        "analysis_groups.sample_processed_files.processed_files.quality_metric.overall_quality_status",
+        "analysis_groups.sample_processed_files.processed_files.quality_metric.url",
+        "analysis_groups.sample_processed_files.processed_files.quality_metric.status",
+        "analysis_groups.completed_processes",
     ]
 
     def get_parents(self, request, proband=None, members=None):
@@ -131,6 +132,19 @@ class Family(Item):
     })
     def display_title(self, title):
         return title
+
+    @calculated_property(schema={
+        "title": "Analysis Groups",
+        "description": "Analysis groups (sample_processing items) this family is in",
+        "type": "array",
+        "items": {
+            "title": "Analysis Group",
+            "type": "string",
+            "linkTo": "SampleProcessing"
+        }
+    })
+    def analysis_groups(self, request):
+        return self.rev_link_atids(request, "sample_procs")
 
     @calculated_property(schema={
         "title": "Mother",
