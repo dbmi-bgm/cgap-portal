@@ -33,53 +33,53 @@ class Family(Item):
     name_key = 'accession'
     schema = load_schema('encoded:schemas/family.json')
     embedded_list = [
-        "members.individual.accession",
-        "members.individual.father",
-        "members.individual.mother",
-        "members.individual.status",
-        "members.individual.sex",
-        "members.individual.is_deceased",
-        "members.individual.is_pregnancy",
-        "members.individual.is_termination_of_pregnancy",
-        "members.individual.is_spontaneous_abortion",
-        "members.individual.is_still_birth",
-        "members.individual.cause_of_death",
-        "members.individual.age",
-        "members.individual.age_units",
-        "members.individual.age_at_death",
-        "members.individual.age_at_death_units",
-        "members.individual.is_no_children_by_choice",
-        "members.individual.is_infertile",
-        "members.individual.cause_of_infertility",
-        "members.individual.ancestry",
-        "members.individual.clinic_notes",
-        "members.individual.phenotypic_features.phenotypic_feature",
-        "members.individual.phenotypic_features.onset_age",
-        "members.individual.phenotypic_features.onset_age_units",
-        "members.individual.samples.status",
-        "members.individual.samples.specimen_type",
-        "members.individual.samples.specimen_notes",
-        "members.individual.samples.specimen_collection_date",
-        "members.individual.samples.workup_type",
-        "members.individual.samples.processed_files",
-        "members.individual.samples.processed_files.workflow_run_outputs",
-        "members.individual.samples.processed_files.quality_metric",
-        "members.individual.samples.processed_files.quality_metric.qc_list.qc_type",
-        "members.individual.samples.processed_files.quality_metric.qc_list.value.overall_quality_status",
-        "members.individual.samples.processed_files.quality_metric.qc_list.value.url",
-        "members.individual.samples.processed_files.quality_metric.qc_list.value.status",
-        "members.individual.samples.processed_files.quality_metric.overall_quality_status",
-        "members.individual.samples.processed_files.quality_metric.url",
-        "members.individual.samples.processed_files.quality_metric.status",
-        "members.individual.samples.files.quality_metric",
-        "members.individual.samples.files.quality_metric.qc_list.qc_type",
-        "members.individual.samples.files.quality_metric.qc_list.value.overall_quality_status",
-        "members.individual.samples.files.quality_metric.qc_list.value.url",
-        "members.individual.samples.files.quality_metric.qc_list.value.status",
-        "members.individual.samples.files.quality_metric.overall_quality_status",
-        "members.individual.samples.files.quality_metric.url",
-        "members.individual.samples.files.quality_metric.status",
-        "members.individual.samples.completed_processes",
+        "members.accession",
+        "members.father",
+        "members.mother",
+        "members.status",
+        "members.sex",
+        "members.is_deceased",
+        "members.is_pregnancy",
+        "members.is_termination_of_pregnancy",
+        "members.is_spontaneous_abortion",
+        "members.is_still_birth",
+        "members.cause_of_death",
+        "members.age",
+        "members.age_units",
+        "members.age_at_death",
+        "members.age_at_death_units",
+        "members.is_no_children_by_choice",
+        "members.is_infertile",
+        "members.cause_of_infertility",
+        "members.ancestry",
+        "members.clinic_notes",
+        "members.phenotypic_features.phenotypic_feature",
+        "members.phenotypic_features.onset_age",
+        "members.phenotypic_features.onset_age_units",
+        "members.samples.status",
+        "members.samples.specimen_type",
+        "members.samples.specimen_notes",
+        "members.samples.specimen_collection_date",
+        "members.samples.workup_type",
+        "members.samples.processed_files",
+        "members.samples.processed_files.workflow_run_outputs",
+        "members.samples.processed_files.quality_metric",
+        "members.samples.processed_files.quality_metric.qc_list.qc_type",
+        "members.samples.processed_files.quality_metric.qc_list.value.overall_quality_status",
+        "members.samples.processed_files.quality_metric.qc_list.value.url",
+        "members.samples.processed_files.quality_metric.qc_list.value.status",
+        "members.samples.processed_files.quality_metric.overall_quality_status",
+        "members.samples.processed_files.quality_metric.url",
+        "members.samples.processed_files.quality_metric.status",
+        "members.samples.files.quality_metric",
+        "members.samples.files.quality_metric.qc_list.qc_type",
+        "members.samples.files.quality_metric.qc_list.value.overall_quality_status",
+        "members.samples.files.quality_metric.qc_list.value.url",
+        "members.samples.files.quality_metric.qc_list.value.status",
+        "members.samples.files.quality_metric.overall_quality_status",
+        "members.samples.files.quality_metric.url",
+        "members.samples.files.quality_metric.status",
+        "members.samples.completed_processes",
         "sample_processes.samples.accession",
         "sample_processes.processed_files",
         "sample_processes.processed_files.quality_metric",
@@ -103,6 +103,27 @@ class Family(Item):
         "sample_processes.completed_processes",
     ]
 
+    def get_parents(self, request, proband=None, members=None):
+        parents = []
+        if proband and members:
+            props = get_item_if_you_can(request, proband, 'individuals')
+            if props:
+                for p in ['mother', 'father']:
+                    if props.get(p):
+                        parents.append(props[p])
+        return parents
+
+    def get_grandparents(self, request, proband=None, members=None, parents=[]):
+        gp = []
+        if proband and members and parents:
+            for item in parents:
+                p_props = get_item_if_you_can(request, item, 'individuals')
+                if p_props:
+                    for p in ['mother', 'father']:
+                        if p_props.get(p) and p_props[p] in members:
+                            gp.append(p_props[p])
+        return gp
+
     @calculated_property(schema={
         "title": "Display Title",
         "description": "A calculated title for every object in 4DN",
@@ -111,86 +132,176 @@ class Family(Item):
     def display_title(self, title):
         return title
 
-    def _update(self, properties, sheets=None):
-        # Note:
-        # Most of this is concerned with creating member relations in family item
-        # super(Family, self)._update(properties, sheets)
+    @calculated_property(schema={
+        "title": "Mother",
+        "description": "Mother of proband",
+        "type": "string",
+        "linkTo": "Individual"
+    })
+    def mother(self, request, proband=None, members=[]):
+        if proband and members:
+            props = get_item_if_you_can(request, proband, 'individuals')
+            if props and props.get('mother'):
+                return props['mother']
 
-        if 'proband' in properties.keys():
-            proband = self.collection.get(properties['proband'])
+    @calculated_property(schema={
+        "title": "Father",
+        "description": "Father of proband",
+        "type": "string",
+        "linkTo": "Individual"
+    })
+    def father(self, request, proband=None, members=[]):
+        if proband and members:
+            props = get_item_if_you_can(request, proband, 'individuals')
+            if props and props.get('father') and props['father'] in members:
+                return props['father']
 
-        relations = {}
-        if 'proband' in properties.keys() and 'members' in properties.keys():
-            for member in properties['members']:
-                indiv = self.collection.get(member['individual'])
-                relations[member['individual']] = {}
-                if indiv.properties.get('father'):
-                    relations[member['individual']]['father'] = indiv.properties.get('father')
-                if indiv.properties.get('mother'):
-                    relations[member['individual']]['mother'] = indiv.properties.get('mother')
-                if indiv.properties.get('children'):
-                    relations[member['individual']]['children'] = indiv.properties.get('children')
-                if indiv.properties.get('sex'):
-                    relations[member['individual']]['sex'] = indiv.properties.get('sex')
-        parents = [
-            relations[properties['proband']].get('father'),
-            relations[properties['proband']].get('mother')
-        ]
-        grandparents = []
-        if parents[0]:
-            grandparents.append(relations[relations[properties['proband']]['father']].get('mother'))
-            grandparents.append(relations[relations[properties['proband']]['father']].get('father'))
-        if parents[1]:
-            grandparents.append(relations[relations[properties['proband']]['mother']].get('mother'))
-            grandparents.append(relations[relations[properties['proband']]['mother']].get('father'))
-        aunts_and_uncles = []
-        for key in relations.keys():
-            if (key not in parents and
-                    relations[key].get('mother', '') in grandparents and
-                    relations[key].get('father', '') in grandparents):
-                aunts_and_uncles.append(key)
-        cousins = []
-        for key in relations.keys():
-            if relations[key].get('mother') in aunts_and_uncles and relations[key].get('father') in aunts_and_uncles:
-                cousins.append(key)
-        for member in properties.get('members', []):
-            if member['individual'] == properties['proband']:
-                member['relation'] = 'self'
-            elif parents[0] and member['individual'] == parents[0]:
-                member['relation'] = 'father'
-            elif parents[1] and member['individual'] == parents[1]:
-                member['relation'] = 'mother'
-            # siblings: parents children who aren't proband
-            elif member['individual'] in [child for parent in parents for child in relations[parent].get('children', [])]:
-                member['relation'] = 'sibling'
-            # grandparents
-            elif member['individual'] in grandparents:
-                if relations[member['individual']].get('sex') == 'M':
-                    member['relation'] = 'grandfather'
-                elif relations[member['individual']].get('sex') == 'F':
-                    member['relation'] = 'grandmother'
-            # children
-            elif member['individual'] in relations[properties['proband']].get('children', []):
-                member['relation'] = 'child'
-            # grandchildren
-            elif member['individual'] in [
-                gc for child in relations[properties['proband']].get('children', []) for gc in relations[child].get('children', [])
-            ]:
-                member['relation'] = 'grandchild'
-            # aunts and uncles: grandparents children who aren't parents
-            elif member['individual'] in aunts_and_uncles:
-                if relations[member['individual']].get('sex') == 'F':
-                    member['relation'] = 'aunt'
-                elif relations[member['individual']].get('sex') == 'M':
-                    member['relation'] = 'uncle'
-            # cousins: aunts and uncles children
-            elif member['individual'] in cousins:
-                member['relation'] = 'cousin'
-            # elif member['individual'] in [child for aau in aunts_and_uncles for child in aau.get('children', [])]:
-            #     member['relation'] = 'cousin'
-            else:
-                member['relation'] = 'other'
-        super(Family, self)._update(properties, sheets)
+    @calculated_property(schema={
+        "title": "Siblings",
+        "description": "Full siblings of proband",
+        "type": "string",
+        "items": {
+            "title": "Sibling",
+            "description": "Full sibling of proband",
+            "type": "string",
+            "linkTo": "Individual"
+        }
+    })
+    def siblings(self, request, proband=None, members=None):
+        if proband and members:
+            sibs = []
+            parents = self.get_parents(request, proband, members)
+            for member in members:
+                member_props = get_item_if_you_can(request, member, 'individuals')
+                if member_props and member != proband:
+                    if member_props.get('mother') in parents and member_props.get('father') in parents:
+                        sibs.append(member)
+            if sibs:
+                return sibs
+
+    @calculated_property(schema={
+        "title": "Half-siblings",
+        "description": "Half-siblings of proband",
+        "type": "string",
+        "items": {
+            "title": "Sibling",
+            "description": "Half sibling of proband",
+            "type": "string",
+            "linkTo": "Individual"
+        }
+    })
+    def half_siblings(self, request, proband=None, members=None):
+        if proband and members:
+            sibs = []
+            parents = self.get_parents(request, proband, members)
+            for member in members:
+                member_props = get_item_if_you_can(request, member, 'individuals')
+                if member_props and member != proband:
+                    if member_props.get('mother') in parents and member_props.get('father') not in parents:
+                        sibs.append(member)
+                    elif member_props.get('mother') not in parents and member_props.get('father') in parents:
+                        sibs.append(member)
+            if sibs:
+                return sibs
+
+    @calculated_property(schema={
+        "title": "Children",
+        "description": "Children of proband",
+        "type": "array",
+        "items": {
+            "title": "Child",
+            "description": "Child of proband",
+            "type": "string",
+            "linkTo": "Individual"
+        }
+    })
+    def children(self, request, proband=None, members=[]):
+        if proband and members:
+            ch = []
+            for member in members:
+                props = get_item_if_you_can(request, member, 'individuals')
+                if props and any(props.get(p) == proband for p in ['mother', 'father']):
+                    ch.append(member)
+            if ch:
+                return ch
+
+    @calculated_property(schema={
+        "title": "Grandparents",
+        "description": "Grandparents of proband",
+        "type": "array",
+        "items": {
+            "title": "Grandparent",
+            "description": "Grandparent of proband",
+            "type": "string",
+            "linkTo": "Individual"
+        }
+    })
+    def grandparents(self, request, proband=None, members=None):
+        if proband and members:
+            parents = self.get_parents(request, proband, members)
+            gp = self.get_grandparents(request, proband, members, parents=parents)
+            if gp:
+                return gp
+
+    @calculated_property(schema={
+        "title": "Aunts and Uncles",
+        "description": "Aunts and Uncles of proband",
+        "type": "array",
+        "items": {
+            "title": "Aunt or Uncle",
+            "description": "Aunt or Uncle of Proband",
+            "type": "string",
+            "linkTo": "Individual"
+        }
+    })
+    def aunts_and_uncles(self, request, proband=None, members=None):
+        if proband and members:
+            parents = self.get_parents(request, proband, members)
+            gp = self.get_grandparents(request, proband, members, parents)
+            aunts_uncles = []
+            for member in members:
+                member_props = get_item_if_you_can(request, member, 'individuals')
+                if member_props and member not in parents:
+                    for p in ['mother', 'father']:
+                        if member_props.get(p) and member_props[p] in gp:
+                            aunts_uncles.append(member)
+                            break
+            if aunts_uncles:
+                return aunts_uncles
+
+    @calculated_property(schema={
+        "title": "Cousins",
+        "description": "Cousins of proband",
+        "type": "string",
+        "items": {
+            "title": "Cousin",
+            "description": "Cousin of proband",
+            "type": "string",
+            "linkTo": "Individual"
+        }
+    })
+    def cousins(self, request, proband=None, members=None):
+        if proband and members:
+            csns = []
+            member_props = {}
+            parents = self.get_parents(request, proband, members)
+            gp = self.get_grandparents(request, proband, members, parents)
+            aunts_uncles = []
+            for member in members:
+                member_props[member] = get_item_if_you_can(request, member, 'individuals')
+                if member_props[member] and member not in parents:
+                    for p in ['mother', 'father']:
+                        if member_props[member].get(p) and member_props[member][p] in gp:
+                            aunts_uncles.append(member)
+                            break
+            for member in members:
+                if member_props[member]:
+                    for p in ['mother', 'father']:
+                        if member_props[member].get(p) and member_props[member][p] in aunts_uncles:
+                            csns.append(member)
+                            break
+            if csns:
+                return csns
 
 
 @view_config(name='process-pedigree', context=Family, request_method='PATCH',
@@ -856,35 +967,10 @@ def create_family_proband(testapp, xml_data, refs, ref_field, family_item,
     refs_by_uuid = {v: k for k, v in uuids_by_ref.items()}
     print(refs_by_uuid)
     print(family_members.values())
-    family = {'members': sorted([{'individual': m['uuid']} for m in family_members.values()],
-                                 key=lambda v: int(refs_by_uuid[v['individual']]))}
+    family = {'members': sorted([m['uuid'] for m in family_members.values()],
+                                 key=lambda v: int(refs_by_uuid[v]))}
     if proband and proband in family_members:
         family['proband'] = family_members[proband]['uuid']
-
-        # relations = {}
-        # for k, v in family_members.items():
-        #     relations[k] = {}
-        #     if v.get('father'):
-        #         relations[k]['father'] = v['father']
-        #     if v.get('mother'):
-
-        # father = family_members[proband].get('father')
-        # mother = family_members[proband].get('mother')
-        # print(father)
-        # if father:
-            # for item in family['members']:
-            #     if item['individual'] == father:
-            #         item['relation'] = 'father'
-            # for k, v in family_members.items():
-            #     if v.get('@id') == father:
-            #         f_uuid = v['uuid']
-            #         for item in family['members']:
-            #             if item['individual'] == f_uuid:
-            #                 item['relation'] = 'father'
-        # if mother:
-        #     for item in family['members']:
-        #         if item['individual'] == mother:
-        #             item['relation'] == 'mother'
     else:
         log.error('Family %s: No proband found' % family_item)
     return family
