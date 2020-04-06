@@ -34,34 +34,9 @@
             "type" : "array",
             "items": {
                 "title": "Member",
-                "type": "object",
-                "required": ["individual"],
-                "properties": {
-                    "individual": {
-                        "title": "Individual",
-                        "description": "The individual who is the member of the family",
-                        "type": "string",
-                        "linkTo": "Individual"
-                    },
-                    "relation": {
-                        "title": "Relation to Proband",
-                        "type": "string",
-                        "suggested_enum": [
-                            "proband",
-                            "mother",
-                            "father",
-                            "sibling",
-                            "child",
-                            "aunt",
-                            "uncle",
-                            "niece",
-                            "nephew",
-                            "grandmother",
-                            "grandfather",
-                            "grandchild"
-                        ]
-                    }
-                }
+                "type": "string",
+                "description": "The individual who is the member of the family",
+                "linkTo": "Individual"
             }
         },
         "proband": {
