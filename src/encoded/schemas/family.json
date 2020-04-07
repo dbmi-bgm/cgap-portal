@@ -3,7 +3,7 @@
     "id": "/profiles/family.json",
     "$schema": "http://json-schema.org/draft-04/schema#",
     "type": "object",
-    "required": ["title", "project", "institution"],
+    "required": ["project", "institution"],
     "identifyingProperties": ["uuid", "accession", "aliases"],
     "additionalProperties": false,
     "mixinProperties": [
@@ -81,7 +81,7 @@
         },
         "description": {
             "title": "Description",
-            "description": "Description of the cohort",
+            "description": "Description of the family",
             "type": "string"
         }
     }
