@@ -130,8 +130,13 @@ class Family(Item):
         "description": "A calculated title for every object in 4DN",
         "type": "string"
     })
-    def display_title(self, title):
-        return title
+    def display_title(self, accession, title=None, family_id=None):
+        if title:
+            return '{} ({})'.format(title, accession)
+        elif family_id:
+            return '{} ({})'.format(family_id, accession)
+        else:
+            return accession
 
     @calculated_property(schema={
         "title": "Analysis Groups",

@@ -28,6 +28,11 @@
             "description": "Title for this Family",
             "type": "string"
         },
+        "family_id": {
+            "title": "Family ID",
+            "description": "Project or Institution-specific ID for the family",
+            "type": "string"
+        },
         "members": {
             "title" : "Members",
             "description": "Family members",
