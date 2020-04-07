@@ -121,10 +121,8 @@ def female_individual(testapp, project, institution):
         "age_units": "year",
         'project': project['@id'],
         'institution': institution['@id'],
-        "ethnicity": "Caucasian",
         "sex": "F",
-        "status": "released",
-        "url": "http://ccr.coriell.org/Sections/BrowseCatalog/FamilyTypeSubDetail.aspx?PgId=402&fam=1463&coll=GM"
+        "status": "released"
         # "uuid": "44d24e3f-bc5b-469a-8500-7ebd728f8ed5"
     }
     return testapp.post_json('/individual', item).json['@graph'][0]

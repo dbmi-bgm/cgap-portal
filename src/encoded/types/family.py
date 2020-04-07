@@ -144,7 +144,9 @@ class Family(Item):
         }
     })
     def analysis_groups(self, request):
-        return self.rev_link_atids(request, "sample_procs")
+        result = self.rev_link_atids(request, "sample_procs")
+        if result:
+            return result
 
     @calculated_property(schema={
         "title": "Mother",
