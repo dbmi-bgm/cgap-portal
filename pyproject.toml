@@ -61,8 +61,9 @@ coverage = "4.0.3"
 # This cryptacular support might need to stay pinned because of dropped support for 3.4 in later versions,
 # but we don't think we need it any more, so maybe we can do without? -kmp 28-Feb-2020
 # cryptacular = "1.4.1"
-dcicutils = "0.9.3b0"
-dcicsnovault = "2.0.2b1"
+dcicutils = ">=0.13.2,<1"
+# dcicsnovault = "2.0.2b1"
+dcicsnovault = "^2.1.2"
 docutils = "0.12"
 elasticsearch = "5.5.3"
 elasticsearch-dsl = "5.4.0"
