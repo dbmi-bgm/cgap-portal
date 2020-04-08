@@ -1,39 +1,34 @@
-from future.standard_library import install_aliases
-install_aliases()  # NOQA
-import base64
-import codecs
+# Are these still needed? -kmp 28-Mar-2020
+# from future.standard_library import install_aliases
+# install_aliases()  # NOQA
+
+# import base64  # unused?
+# import codecs  # unused?
 import json
+import logging  # not used in Fourfront, but used in CGAP? -kmp 8-Apr-2020
 import netaddr
 import os
-try:
-    import subprocess32 as subprocess  # Closes pipes on failure
-except ImportError:
-    import subprocess
-from pyramid.config import Configurator
-from pyramid.path import (
-    AssetResolver,
-    caller_package,
-)
-from pyramid.authorization import ACLAuthorizationPolicy
-from pyramid.session import SignedCookieSessionFactory
-from pyramid.settings import (
-    aslist,
-    asbool,
-)
-from sqlalchemy import engine_from_config
-from webob.cookies import JSONSerializer
-from snovault.json_renderer import json_renderer
-from snovault.app import (
-    STATIC_MAX_AGE,
-    session,
-    json_from_path,
-    configure_dbsession,
-    changelogs,
-    json_asset
-)
+# import structlog
+import subprocess
+import sys  # used in FourFront, but not here (yet)
+
+from dcicutils.beanstalk_utils import source_beanstalk_env_vars
 from dcicutils.log_utils import set_logging
-import structlog
-import logging
+from dcicutils.env_utils import get_mirror_env_from_context
+# from pyramid.authorization import ACLAuthorizationPolicy
+from pyramid.config import Configurator
+# from pyramid.path import AssetResolver, caller_package
+# from pyramid.session import SignedCookieSessionFactory
+from pyramid.settings import asbool  # , aslist
+from snovault.app import STATIC_MAX_AGE, session, json_from_path, configure_dbsession, changelogs, json_asset
+# from snovault.json_renderer import json_renderer
+# from sqlalchemy import engine_from_config
+# from webob.cookies import JSONSerializer
+
+
+if sys.version_info.major < 3:
+    raise EnvironmentError("The CGAP encoded library no longer supports Python 2.")
+
 
 # location of environment variables on elasticbeanstalk
 BEANSTALK_ENV_PATH = "/opt/python/current/env"
@@ -123,11 +118,15 @@ def app_version(config):
                     ['git', '-C', os.path.dirname(__file__), 'diff', '--no-ext-diff'])
                 if diff:
                     version += '-patch' + hashlib.sha1(diff).hexdigest()[:7]
-            except:
+            except Exception:
                 version = "test"
 
         config.registry.settings['snovault.app_version'] = version
 
+    # There is GA Config stuff in Fourfront at this point that is missing here. Intentional? -kmp 8-Apr-2020
+
+
+# This function no longer exists in Fourfront either. Remove it here? -kmp 8-Apr-2008
 '''
 def add_schemas_to_html_responses(config):
 
@@ -188,11 +187,13 @@ def main(global_config, **local_config):
     settings = global_config
     settings.update(local_config)
 
+    # BEGIN PART THAT'S NOT IN FOURFRONT
     # adjust log levels for some annoying loggers
     lnames = ['boto', 'urllib', 'elasticsearch', 'dcicutils']
     for name in logging.Logger.manager.loggerDict:
         if any(logname in name for logname in lnames):
             logging.getLogger(name).setLevel(logging.WARNING)
+    # END PART THAT'S NOT IN FOURFRONT
     set_logging(in_prod=settings.get('production'))
     # set_logging(settings.get('elasticsearch.server'), settings.get('production'))
 
@@ -208,8 +209,8 @@ def main(global_config, **local_config):
     # set google reCAPTCHA keys
     settings['g.recaptcha.key'] = os.environ.get('reCaptchaKey')
     settings['g.recaptcha.secret'] = os.environ.get('reCaptchaSecret')
-    # set mirrored Elasticsearch location (for webprod/webprod2)
-    settings['mirror.env.name'] = os.environ.get('MIRROR_ENV_NAME')
+    # set mirrored Elasticsearch location (for staging and production servers)
+    settings['mirror.env.name'] = get_mirror_env_from_context(settings)
     config = Configurator(settings=settings)
 
     from snovault.elasticsearch import APP_FACTORY
@@ -230,12 +231,14 @@ def main(global_config, **local_config):
     config.commit()  # commit so search can override listing
 
     # Render an HTML page to browsers and a JSON document for API clients
-    #config.include(add_schemas_to_html_responses)
+    # config.include(add_schemas_to_html_responses)
     config.include('.renderers')
     config.include('.authentication')
     config.include('.server_defaults')
     config.include('.root')
     config.include('.types')
+    # Fourfront does this. Do we need that here? -kmp 8-Apr-2020
+    # config.include('.batch_download')
     config.include('.loadxl')
     config.include('.visualization')
 
@@ -268,6 +271,5 @@ def main(global_config, **local_config):
         docsdir = [path.strip() for path in docsdir.strip().split('\n')]
     if workbook_filename:
         load_workbook(app, workbook_filename, docsdir)
-
 
     return app
