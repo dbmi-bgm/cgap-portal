@@ -74,6 +74,17 @@
         "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b"
     },
     {
+        "email": "kent_pitman@hms.harvard.edu",
+        "first_name": "Kent",
+        "last_name": "Pitman",
+        "job_title": "Software Developer",
+        "role": "developer",
+        "uuid": "2b91852e-fc9b-483f-99ff-31295a5e04b6",
+        "groups": ["admin"],
+        "submits_for": ["hms-dbmi"],
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b"
+    },
+    {
         "email": "jkrier@bwh.harvard.edu",
         "first_name": "Joel",
         "last_name": "Krier",
