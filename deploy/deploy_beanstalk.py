@@ -137,30 +137,35 @@ if __name__ == "__main__":
     merge_to = os.environ.get("tibanna_merge", "").strip()
     deploy_to = os.environ.get("tibanna_deploy", "").strip()
 
-    try:
-        if deploy_to in ['fourfront-staging', 'fourfront-webprod', 'fourfront-webprod2']:
-            print("deploy to staging")
-            ver = get_git_version()
-            # checkout correct branch
-            print("checkout master")
-            subprocess.check_output(
-                ['git', 'checkout', branch])
-
-            print("update version")
-            update_version(ver, branch)
-            if merge_to:
-                print("merge from %s to %s" % (branch, merge_to))
-                merge(branch, merge_to)
-                print("tag it")
-                tag(ver)
-    except Exception as e:
-        # this can all go wrong if somebody pushes during the build
-        # or what not, in which case we just won't update the tag / merge
-        print("got the following expection but we will ignore it")
-        print(e)
-        print("switching back to source branch")
-        subprocess.check_output(
-            ['git', 'checkout', branch])
+    # Ref: https://hms-dbmi.atlassian.net/browse/C4-114
+    # Will and I believe this code to be stale and no longer needed.
+    # It's retained temporarily because it illustrates some interesting tool use
+    # I might want to borrow later for other purposes. -kmp 8-Apr-2020
+    #
+    # try:
+    #     if deploy_to in ['fourfront-staging', 'fourfront-webprod', 'fourfront-webprod2']:
+    #         print("deploy to staging")
+    #         ver = get_git_version()
+    #         # checkout correct branch
+    #         print("checkout master")
+    #         subprocess.check_output(
+    #             ['git', 'checkout', branch])
+    #
+    #         print("update version")
+    #         update_version(ver, branch)
+    #         if merge_to:
+    #             print("merge from %s to %s" % (branch, merge_to))
+    #             merge(branch, merge_to)
+    #             print("tag it")
+    #             tag(ver)
+    # except Exception as e:
+    #     # this can all go wrong if somebody pushes during the build
+    #     # or what not, in which case we just won't update the tag / merge
+    #     print("got the following expection but we will ignore it")
+    #     print(e)
+    #     print("switching back to source branch")
+    #     subprocess.check_output(
+    #         ['git', 'checkout', branch])
 
     print("now let's deploy")
     deploy(deploy_to)
