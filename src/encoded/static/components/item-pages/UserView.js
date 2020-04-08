@@ -51,7 +51,7 @@ class SyncedAccessKeyTable extends React.PureComponent {
             'groups' : PropTypes.array,
             'status' : PropTypes.string,
             'timezone' : PropTypes.string,
-            'job_title' : PropTypes.string,
+            'role' : PropTypes.string,
             'submits_for' : PropTypes.array
         })
     };
@@ -356,7 +356,7 @@ export default class UserView extends React.Component {
             'lab' : PropTypes.object,
             'status' : PropTypes.string,
             'timezone' : PropTypes.string,
-            'job_title' : PropTypes.string
+            'role' : PropTypes.string
         }),
         'href' : PropTypes.string.isRequired,
         'schemas' : PropTypes.shape({
@@ -582,7 +582,7 @@ class ProfileWorkFields extends React.PureComponent {
 
     render(){
         const { user, containerClassName } = this.props;
-        const { submits_for = [], lab, pending_lab, job_title } = user;
+        const { submits_for = [], lab, pending_lab, role } = user;
         const { awards_list: awards } = this.state;
 
         let labTitle = <span className="not-set">No Labs</span>;
@@ -612,12 +612,12 @@ class ProfileWorkFields extends React.PureComponent {
                         { labTitle }
                     </div>
                 </div>
-                <div className="row field-entry job_title">
+                <div className="row field-entry role">
                     <div className="col-md-3 text-right text-left-xs">
-                        <label htmlFor="job_title">Role</label>
+                        <label htmlFor="role">Role</label>
                     </div>
-                    <div id="job_title" className="col-md-9 value">
-                        { job_title || <span className="not-set">No Job Title</span> }
+                    <div id="role" className="col-md-9 value">
+                        { role || <span className="not-set">No Job Title</span> }
                     </div>
                 </div>
                 <div className="row field-entry submits_for">

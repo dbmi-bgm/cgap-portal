@@ -314,12 +314,12 @@ class PanelOne extends React.PureComponent {
         this.setState({ cohortTitle: e.target.value });
     }
 
-    handleSelectInstitution(institutionID, institutionJSON){
+    handleSelectInstitution(institutionJSON, institutionID){
         const { display_title: institutionTitle = null } = institutionJSON;
         this.setState({ institutionID, institutionTitle });
     }
 
-    handleSelectProject(projectID, projectJSON){
+    handleSelectProject(projectJSON, projectID){
         const { display_title: projectTitle = null } = projectJSON;
         this.setState({ projectID, projectTitle });
     }
@@ -422,9 +422,9 @@ class PanelOne extends React.PureComponent {
                 <h4 className="text-300 mt-2">Required Fields</h4>
 
                 <LinkToFieldSection onSelect={this.handleSelectInstitution} title="Institution"
-                    type="Institution" selectedID={institutionID} selectedTitle={institutionTitle} />
+                    type="Institution" selectedID={institutionID} selectedTitle={institutionTitle} searchAsYouType/>
                 <LinkToFieldSection onSelect={this.handleSelectProject} title="Project"
-                    type="Project" selectedID={projectID} selectedTitle={projectTitle} />
+                    type="Project" selectedID={projectID} selectedTitle={projectTitle} searchAsYouType />
                 <label className="field-section mt-2 d-block">
                     <span className="d-block mb-05">Cohort Title</span>
                     <input type="text" value={cohortTitle} onChange={this.handleChangeCohortTitle}
@@ -811,7 +811,7 @@ class PanelThree extends React.PureComponent {
 
 
 const LinkToFieldSection = React.memo(function LinkToFieldSection(props){
-    const { title, type, onSelect, selectedID, selectedTitle, variant = "primary" } = props;
+    const { title, type, onSelect, selectedID, selectedTitle, variant = "primary", searchAsYouType } = props;
 
     let showTitle;
     if (selectedTitle && selectedID){
@@ -827,7 +827,7 @@ const LinkToFieldSection = React.memo(function LinkToFieldSection(props){
             <label className="d-block mb-05">{ title }</label>
             <div className="row">
                 <div className="col-auto">
-                    <LinkToDropdown {...{ onSelect, selectedID, variant }} searchURL={"/search/?type=" + type} selectedTitle={showTitle} />
+                    <LinkToDropdown {...{ onSelect, selectedID, variant, searchAsYouType }} searchURL={"/search/?type=" + type} selectedTitle={showTitle} />
                 </div>
                 <div className="col">
                     <i className="icon icon-fw icon-link fas small mr-05"/>

@@ -3,7 +3,7 @@
         "email": "loadxl@loadxl.us",
         "first_name": "loadxl",
         "groups": ["admin"],
-        "job_title": "Administrator",
+        "role": "other",
         "institution": "hms-dbmi",
         "last_name": "loadxl",
         "status": "current",
@@ -134,7 +134,7 @@
         "email": "foursight.app@gmail.com",
         "uuid": "7677f8a8-79d2-4cff-ab0a-a967a2a68e39",
         "submits_for": ["hms-dbmi"],
-        "job_title": "Other"
+        "role": "other"
     },
     {
         "last_name": "App",
@@ -147,7 +147,7 @@
         "email": "tibanna.app@gmail.com",
         "uuid": "b041dba8-e2b2-4e54-a621-97edb508a0c4",
         "submits_for": ["hms-dbmi"],
-        "job_title": "Other"
+        "role": "other"
     },
     {
         "email": "bianca_morris@hms.harvard.edu",

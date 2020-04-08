@@ -77,14 +77,13 @@ def test_access_key_principals(anontestapp, execute_counter, access_key, submitt
     ]
 
 
-# this user has the 4DN viewing group
 @pytest.fixture
-def viewing_group_member(testapp, project):
+def proj_member(testapp, project):
     item = {
-        'first_name': 'Viewing',
-        'last_name': 'Group',
-        'email': 'viewing_group_member@example.org',
-        'viewing_groups': [project['viewing_group']],
+        'first_name': 'Project',
+        'last_name': 'Member',
+        'email': 'project_member@example.org',
+        'project': project['@id'],
         'status': 'current'
     }
     # User @@object view has keys omitted.
@@ -92,8 +91,8 @@ def viewing_group_member(testapp, project):
     return testapp.get(res.location).json
 
 
-def test_access_key_self_create_no_submits_for(anontestapp, access_key, viewing_group_member):
-    submitter = viewing_group_member
+def test_access_key_self_create_no_submits_for(anontestapp, access_key, proj_member):
+    submitter = proj_member
     extra_environ = {'REMOTE_USER': str(submitter['email'])}
     res = anontestapp.post_json(
         '/access_key/', {}, extra_environ=extra_environ

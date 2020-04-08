@@ -6,7 +6,7 @@
     "type": "object",
     "required": ["object_item", "subject_item"],
     "identifyingProperties": ["uuid", "aliases"],
-    "additionalProperties": true,
+    "additionalProperties": false,
     "mixinProperties": [
         { "$ref": "mixins.json#/schema_version" },
         { "$ref": "mixins.json#/uuid" },
@@ -19,6 +19,9 @@
         { "$ref": "evidence.json#/properties"}
     ],
     "properties" : {
+        "schema_version": {
+            "default": "1"
+        },
         "subject_item": {
             "title": "Disorder",
             "type": "string",
