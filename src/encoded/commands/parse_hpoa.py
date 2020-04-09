@@ -19,16 +19,20 @@ from dcicutils.ff_utils import (
 )
 from uuid import uuid4
 
-from typing import List, Any
-
 from ..commands.generate_items_from_owl import (
     connect2server,
     get_raw_form,
     prompt_check_for_output_options,
     post_report_document_to_portal,
+    write_outfile,
+    create_dict_keyed_by_field_from_items,
+    get_existing_items_from_db
 )
 from ..commands.load_items import load_items
 
+''' URL for fetching the disorder to phenotype annoation file phenotype.hpoa
+'''
+HPOA_URL = 'http://compbio.charite.de/jenkins/job/hpo.annotations.current/lastSuccessfulBuild/artifact/current/phenotype.hpoa'
 
 ''' Dictionary for field mapping between hpoa file and cgap disorder schema
 '''
@@ -54,6 +58,21 @@ DIS_NAME_FIELD_FROM_INPUT = 'DiseaseName'
 ''' Relationship to use in the Evidence Item for making evidence links between ITEMS
 '''
 RELATION = 'associated with'
+
+
+def get_fields_for_item_added_by_file():
+    ''' returns a list of all the property names of the item that are generated
+        from the file - omits calc prop and other user editable fields like clinic_notes
+        fields will be used to compare dbterms to terms from file
+    '''
+    item_fields = ['subject_item', 'object_item', 'relationship_name']
+    to_add = [v for k, v in FIELD_MAPPING.items() if k not in ['Frequency', 'DiseaseName', 'HPO_ID']]
+    item_fields.extend(to_add)
+    item_fields.extend(FIELD_MAPPING.get('Frequency'))
+    return item_fields
+
+
+ITEM_FIELDS = get_fields_for_item_added_by_file()
 
 
 def get_logger(lname, logfile):
@@ -97,24 +116,23 @@ def get_logger(lname, logfile):
 
 
 def get_items_from_db_keyed_by_field(connection, itype, keyfield):
-    """ Returns returns a dictionary keyed by the given field
+    """ Returns a dictionary keyed by the given field
         for each item in the database of the specified itype
     """
-    q = 'search/?type={}'.format(itype)
-    return {i.get(keyfield): i for i in search_metadata(q, connection, page_limit=200, is_generator=True)}
+    items = get_existing_items_from_db(connection, itype)
+    return create_dict_keyed_by_field_from_items(items, keyfield)
 
 
 def get_dbxref2disorder_map(disorders):
+    ''' for existing db disorders gets their dbxrefs and maps them to uuid of the
+        disorder so you can use dbxrefs provided in the hpoa file to figure out the
+        database disorder that should be used for links
+        NOTE: for repeated dbxrefs - first encounter is saved, others silently discarded
+    '''
+    xref_pre = ['omim:', 'orpha', 'decip']
     xref2dis = {}
     for duid, d in disorders.items():
-        xrefs = d.get('dbxrefs')
-        if xrefs:
-            for x in xrefs:
-                if x in xref2dis:
-                    logger.warn("For disorder uuid {} have already seen {} linked to {}".format(duid, x, xref2dis[x]))
-                else:
-                    if x.startswith('OMIM:') or x.lower().startswith('orpha') or x.lower().startswith('decip'):
-                        xref2dis[x] = duid
+        xref2dis.update({x: duid for x in d.get('dbxrefs', []) if (any([x.lower().startswith(p) for p in xref_pre]) and x not in xref2dis)})
     return xref2dis
 
 
@@ -158,6 +176,11 @@ def has_unexpected_fields(data):
 
 
 def get_header_info_and_field_names(lines, logger):
+    ''' expects hash commented lines at beginning of file and the first uncommented lines
+        to contain the field names - if no preceeding comments will still work but report
+        info about file as 'unknown' but if any uncommented lines before field line then
+        program exit
+    '''
     fields = []
     dtag = 'date: '
     fdtag = 'description: '
@@ -195,10 +218,13 @@ def find_disorder_uid_using_file_id(data, xref2disorder):
 
 
 def check_hpo_id_and_note_problems(fname, hpoid, hpoid2uuid, problems):
+    ''' Is the hpo_id in the mapping dict?  If so return uuid.
+        If not add info to the problems dict for later reporting
+    '''
     hpuid = hpoid2uuid.get(hpoid)
     if hpuid:
         return hpuid
-    not_found = problems.get('hpo_not_found', [])
+    not_found = problems.get('hpo_not_found', {})
     fields = []
     if hpoid in not_found:
         fields = not_found.get(hpoid, [])
@@ -255,6 +281,7 @@ def compare_existing_to_newly_generated(logger, connection, evidence_items, ityp
     uids2obsolete = []
     logger.info("comparing: {}".format(datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")))
     for db_evi in dbitems:
+        # import pdb; pdb.set_trace()
         tochk = convert2raw(db_evi)
         if tochk in evidence_items:
             existing += 1
@@ -267,21 +294,8 @@ def compare_existing_to_newly_generated(logger, connection, evidence_items, ityp
 
 def convert2raw(item):
     # need to remove properties not generated from file eg. calc props and others
-    fields2remove = ['uuid', '@id', '@type', 'display_title', 'status', 'principals_allowed', 'date_created']
-    stripped_item = {k: v for k, v in item.items() if k not in fields2remove}
+    stripped_item = {k: v for k, v in item.items() if k in ITEM_FIELDS}
     return get_raw_form(stripped_item)
-
-
-def write_outfile(terms, filename, pretty=False):
-    '''terms is a list of dicts
-        write to file by default as a json list or if prett
-        then same with indents and newlines
-    '''
-    with open(filename, 'w') as outfile:
-        if pretty:
-            json.dump(terms, outfile, indent=4)
-        else:
-            json.dump(terms, outfile)
 
 
 def log_problems(logger, problems):
@@ -301,15 +315,14 @@ def log_problems(logger, problems):
             logger.info('{}\t{}'.format(d, udis[d]))
 
 
-def get_args():  # pragma: no cover
+def get_args(args):  # pragma: no cover
     parser = argparse.ArgumentParser(
         description='Given an HPOA file or url for download generate EvidenceDisPheno items and optionally load',
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
     parser.add_argument('--input',
-                        default='http://compbio.charite.de/jenkins/job/hpo.annotations.current/lastSuccessfulBuild/artifact/misc_2018/phenotype.hpoa',
-                        help="The url or datafile with the disorder to phenotype annotations data to import. URL must begin with http(s)\
-                        http://compbio.charite.de/jenkins/job/hpo.annotations.current/lastSuccessfulBuild/artifact/misc_2018/phenotype.hpoa")
+                        default=HPOA_URL,
+                        help="The url or datafile with the disorder to phenotype annotations data to import. URL must begin with http(s): {}".format(HPOA_URL))
     parser.add_argument('--env',
                         help="The environment to use i.e. local, fourfront-cgap")
     parser.add_argument('--key',
@@ -333,7 +346,7 @@ def get_args():  # pragma: no cover
                         default=False,
                         action='store_true',
                         help="Default False - set True if you want json format easy to read, hard to parse")
-    return parser.parse_args()
+    return parser.parse_args(args)
 
 
 def main():  # pragma: no cover
@@ -344,7 +357,7 @@ def main():  # pragma: no cover
     logger = get_logger(__name__, logfile)
     logger.info('Processing disorder to phenotype annotations - START:{}'.format(start))
 
-    args = get_args()
+    args = get_args(sys.argv[1:])
 
     connection = connect2server(args.env, args.key, args.keyfile, logger)
     logger.info('Working with {}'.format(connection.get('server')))
