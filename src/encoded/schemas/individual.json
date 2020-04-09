@@ -563,16 +563,32 @@
         }
     },
     "columns" : {
+        "display_title" : {
+            "notes" : "display_title is hardcoded to always be present and first column.",
+            "title" : "Individual",
+            "sort_fields" : [
+                { "field" : "accession", "title" : "Accession (CGAP ID)" },
+                { "field" : "aliases", "title" : "User-Defined Alias" },
+                { "field" : "uuid", "title" : "UUID" }
+            ]
+        },
         "institutional_id" : {
             "title" : "Institutional ID"
         },
         "age" : {
             "title" : "Age",
-            "notes" : "Make custom column render fxn that combines this + units",
-            "default_hidden" : true
+            "notes" : "Make custom column render fxn that combines this + age units. Have it show age_at_death if present..",
+            "sort_fields" : [
+                { "field" : "accession", "title" : "Accession (CGAP ID)" },
+                { "field" : "aliases", "title" : "User-Defined Alias" },
+                { "field" : "uuid", "title" : "UUID" }
+            ],
+            "default_hidden" : false
         },
         "sex" : {
             "title" : "Sex",
+            "description" : "Gender of Individual",
+            "widthMap" : { "lg" : 120, "md" : 100, "sm" : 100 },
             "default_hidden" : false
         },
         "ancestry" : {

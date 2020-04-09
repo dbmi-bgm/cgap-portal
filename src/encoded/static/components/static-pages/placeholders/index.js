@@ -6,6 +6,7 @@ import memoize from 'memoize-one';
 import _ from 'underscore';
 
 import { SlideCarousel } from './SlideCarousel';
+import { EmbeddedItemSearchTable } from './../../item-pages/components/EmbeddedItemSearchTable';
 
 export { SlideCarousel };
 
@@ -14,12 +15,13 @@ export { SlideCarousel };
  * Any placeholder(s) used in a StaticSection _must_ get imported here
  * and be available here.
  */
-const placeholders = { SlideCarousel };
+const placeholders = { SlideCarousel, EmbeddedItemSearchTable };
 
 export const replaceString = memoize(function(placeholderString, props){
 
     var parsedJSXContent = (
-        <JsxParser bindings={props} jsx={placeholderString} components={placeholders} key="placeholder-replacement" renderInWrapper={false} />
+        <JsxParser bindings={props} jsx={placeholderString} components={placeholders} key="placeholder-replacement"
+            renderInWrapper={false} showWarnings onError={onError} disableKeyGeneration />
     );
 
     if (parsedJSXContent){
@@ -36,3 +38,7 @@ export const replaceString = memoize(function(placeholderString, props){
     }
     return true;
 });
+
+function onError(err){
+    console.error("Error in JSX Parser --", err);
+}

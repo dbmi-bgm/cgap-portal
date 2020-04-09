@@ -15,7 +15,8 @@ export const DEFAULT_WIDTH_MAP = { 'lg' : 200, 'md' : 180, 'sm' : 120, 'xs' : 12
 
 /** Theoretically we could change all these render functions to just be functional React components, maybe a later todo. */
 
-export const columnExtensionMap = _.extend({}, basicColumnExtensionMap, {
+export const columnExtensionMap = {
+    ...basicColumnExtensionMap,
     // TODO: change to organization
     'lab.display_title' : {
         'title' : "Lab",
@@ -112,4 +113,5 @@ export const columnExtensionMap = _.extend({}, basicColumnExtensionMap, {
             }
         }
     }
-});
+};
+
