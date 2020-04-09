@@ -146,7 +146,6 @@ def test_diagnoses_xml_to_phenotypic_features_term_not_found(testapp, family_emp
     data = {}
     diagnosis = death_info[0]['diagnoses']
     diagnoses_xml_to_phenotypic_features(testapp, diagnosis, {}, data, family_empty['@id'], {})
-    print(data.get('clinic_notes'))
     assert data.get('clinic_notes')
     assert 'HPO term {} not found'.format(diagnosis[0]['id']) in data.get('clinic_notes')
     assert not data.get('phenotypic_features')
