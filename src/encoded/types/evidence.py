@@ -51,3 +51,15 @@ class EvidenceDisPheno(Evidence):
     item_type = 'evidence_dis_pheno'
     schema = load_schema('encoded:schemas/evidence_dis_pheno.json')
     embedded_list = Evidence.embedded_list
+
+
+@collection(
+    name='evidence-gene-disorders',
+    properties={
+        'title': 'Evidence Linking Genes to Disorders',
+        'description': 'Listing Gene to Disorder Evidence Items',
+    })
+class EvidenceGeneDisorder(Evidence):
+    item_type = 'evidence_gene_disorder'
+    schema = load_schema('encoded:schemas/evidence_gene_disorder.json')
+    embedded_list = Evidence.embedded_list

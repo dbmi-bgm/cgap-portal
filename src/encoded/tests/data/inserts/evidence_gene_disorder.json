@@ -1,0 +1,26 @@
+[
+    {
+        "uuid": "385de496-90a4-4aba-8676-7c778eaf9223",
+        "subject_item": "cf2e7ca1-8538-41f8-b945-2c1591bc4d3a",
+        "object_item": "71bae2e1-4532-45cf-8fd7-958b47d7e446",
+        "relationship_name": "has curated association",
+        "datasource": "ClinGen",
+        "datasource_version": "20200309",
+        "evidence_class": ["definitive"],
+        "moi": "Autosomal Dominant"
+    },
+    {
+        "uuid": "53ea2b15-2ecd-458f-8688-c174e028f718",
+        "subject_item": "8c809b76-0ed3-407f-98a6-9cd1831231ed",
+        "object_item": "5197d1eb-e995-404d-99e1-52b5abde3242",
+        "using_gene_id": "HGNC:21197",
+        "relationship_name": "causes condition",
+        "datasource": "Monarch",
+        "datasource_version": "20200309",
+        "evidence_class": [
+            "imported manually asserted information used in automatic assertion",
+            "sequencing assay evidence"
+        ],
+        "attribution_info": "omim|orphanet"
+    }
+]
