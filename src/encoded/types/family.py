@@ -705,7 +705,7 @@ def diagnoses_xml_to_phenotypic_features(testapp, ref_vals, refs, data, family_i
             if diagnosis:
                 # look up HPO term. If not found, use a clinical note
                 try:
-                    pheno_res = testapp.get('/phenotypes/' + diagnosis['id'], status=200).json
+                    pheno_res = testapp.get('/phenotypes/' + diagnosis['id'] + '/', status=200).json
                 except Exception as exc:
                     log.error('Family %s: Cannot GET term %s. Error: %s'
                               % (family_item, diagnosis['id'], str(exc)))
@@ -791,7 +791,7 @@ def cause_of_death_xml_to_phenotype(testapp, ref_vals, refs, data, family_item, 
         if xml_obj.get('causeOfDeathOntologyId') and xml_obj.get('causeOfDeathOntology') == 'HPO':
             # look up HPO term. If not found, use a clinical note
             try:
-                pheno_res = testapp.get('/phenotypes/' + xml_obj['causeOfDeathOntologyId'], status=200).json
+                pheno_res = testapp.get('/phenotypes/' + xml_obj['causeOfDeathOntologyId'] + '/', status=200).json
             except Exception as exc:
                 log.error('Family %s: Cannot GET term %s. Error: %s'
                           % (family_item, xml_obj['causeOfDeathOntologyId'], str(exc)))
@@ -986,8 +986,6 @@ def create_family_proband(testapp, xml_data, refs, ref_field, family_item,
     # process into family structure, keeping only uuids of items
     # invert uuids_by_ref to sort family members by managedObjectID (xml ref)
     refs_by_uuid = {v: k for k, v in uuids_by_ref.items()}
-    print(refs_by_uuid)
-    print(family_members.values())
     family = {'members': sorted([m['uuid'] for m in family_members.values()],
                                  key=lambda v: int(refs_by_uuid[v]))}
     if proband and proband in family_members:
