@@ -2,9 +2,12 @@
 based on environment variables make a config file for build out
 """
 
+import datetime
 import glob
 import io
+import json
 import os
+import subprocess
 import sys
 import argparse
 
@@ -19,16 +22,70 @@ def build_ini_file_from_template(template_file_name, init_file_name):
                                        init_file_stream=init_file_fp)
 
 
+EB_MANIFEST_FILENAME = "/opt/elasticbeanstalk/deploy/manifest"
+
+
+def get_eb_bundled_version():
+    """
+    Returns the
+    This will return None when there is no eb source bundle.
+    """
+    if os.path.exists(EB_MANIFEST_FILENAME):
+        try:
+            with io.open(EB_MANIFEST_FILENAME, 'r') as fp:
+                data = json.load(fp)
+            return data.get('VersionLabel')
+        except Exception as e:
+            print("get_eb_bundled_version got error: %s" % e)
+            return None
+    else:
+        print("Doesn't exist")
+        return None
+
+
+def get_local_git_version():
+    return subprocess.check_output(['git', 'describe', '--dirty']).decode('utf-8').strip('\n')
+
+
+def get_version():  # This logic (perhaps most or all of this file) should move to dcicutils
+    try:
+        return get_eb_bundled_version() or get_local_git_version()
+    except Exception:
+        return 'unknown-version-at-' + datetime.datetime.now().strftime("%Y%m%d%H%M%S%f")
+
+
 def build_ini_stream_from_template(template_file_name, init_file_stream):
-    with io.open(template_file_name, 'r') as template_fp:
-        for line in template_fp:
-            expanded_line = os.path.expandvars(line)
-            # Uncomment for debugging, but this must not be disabled for production code so that passwords
-            # are not echoed into logs. -kmp 26-Feb-2020
-            # if '$' in line:
-            #     print("line=", line)
-            #     print("expanded_line=", expanded_line)
-            init_file_stream.write(expanded_line)
+    extra_vars = {
+        'EB_APP_VERSION': get_version()
+    }
+
+    # We assume these variables are not set, but best to check first. Confusion might result otherwise.
+    for extra_var in extra_vars:
+        if extra_var in os.environ:
+            raise RuntimeError("The environment variable %s is already set to %s." % (extra_var, os.environ[extra_var]))
+
+    try:
+
+        # When we've checked everything, go ahead and do the bindings.
+        for var, val in extra_vars.items():
+            os.environ[var] = val
+
+        with io.open(template_file_name, 'r') as template_fp:
+            for line in template_fp:
+                expanded_line = os.path.expandvars(line)
+                # Uncomment for debugging, but this must not be disabled for production code so that passwords
+                # are not echoed into logs. -kmp 26-Feb-2020
+                # if '$' in line:
+                #     print("line=", line)
+                #     print("expanded_line=", expanded_line)
+                init_file_stream.write(expanded_line)
+
+    finally:
+
+        for key in extra_vars.keys():
+            # Let's be tidy and put things back the way they were before.
+            # Most things probably don't care, but testing might.
+            del os.environ[key]
 
 
 def environment_template_filename(env_name):
