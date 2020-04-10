@@ -36,6 +36,7 @@ ORDER = [
     'file_format',
     'phenotype',
     'disorder',
+    'gene',
     'cohort',
     'individual',
     'sample',
