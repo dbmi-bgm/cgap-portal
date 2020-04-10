@@ -1,29 +1,16 @@
-# Are these still needed? -kmp 28-Mar-2020
-# from future.standard_library import install_aliases
-# install_aliases()  # NOQA
-
-# import base64  # unused?
-# import codecs  # unused?
 import json
 import logging  # not used in Fourfront, but used in CGAP? -kmp 8-Apr-2020
 import netaddr
 import os
-# import structlog
 import subprocess
-import sys  # used in FourFront, but not here (yet)
+import sys
 
 from dcicutils.beanstalk_utils import source_beanstalk_env_vars
 from dcicutils.log_utils import set_logging
 from dcicutils.env_utils import get_mirror_env_from_context
-# from pyramid.authorization import ACLAuthorizationPolicy
 from pyramid.config import Configurator
-# from pyramid.path import AssetResolver, caller_package
-# from pyramid.session import SignedCookieSessionFactory
-from pyramid.settings import asbool  # , aslist
+from pyramid.settings import asbool
 from snovault.app import STATIC_MAX_AGE, session, json_from_path, configure_dbsession, changelogs, json_asset
-# from snovault.json_renderer import json_renderer
-# from sqlalchemy import engine_from_config
-# from webob.cookies import JSONSerializer
 
 
 if sys.version_info.major < 3:
@@ -123,7 +110,7 @@ def app_version(config):
 
         config.registry.settings['snovault.app_version'] = version
 
-    # There is GA Config stuff in Fourfront at this point that is missing here. Intentional? -kmp 8-Apr-2020
+    # Fourfront does GA stuff here that makes no sense in CGAP (yet).
 
 
 # This function no longer exists in Fourfront either. Remove it here? -kmp 8-Apr-2008

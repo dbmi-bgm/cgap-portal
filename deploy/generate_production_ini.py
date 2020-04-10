@@ -22,6 +22,7 @@ def build_ini_file_from_template(template_file_name, init_file_name):
                                        init_file_stream=init_file_fp)
 
 
+# Ref: https://stackoverflow.com/questions/19911123/how-can-you-get-the-elastic-beanstalk-application-version-in-your-application
 EB_MANIFEST_FILENAME = "/opt/elasticbeanstalk/deploy/manifest"
 
 

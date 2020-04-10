@@ -45,9 +45,8 @@ def main():
 
     # do not run on elasticbeanstalk environments unless using --prod flag
     if env and not args.prod:
-        # NOTE: In fourfront, we only care about stopping this in production. Is CGAP intentionally more paranoid? -kmp 8-Apr-2020
-        #       Comment would be: # do not run on a production environment unless we set --prod flag
-        #       Test would be: if is_stg_or_prd_env(env) and not args.prod:
+        # NOTE: The cgap logic is different from Fourfront, but Will thinks rightly so.
+        #       Use care if these two files ever get folded. -kmp 9-Apr-2020
         log.info('load_data: skipping, since on %s and --prod not used' % env)
         return
 
