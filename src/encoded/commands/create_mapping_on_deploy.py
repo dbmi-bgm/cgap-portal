@@ -48,6 +48,7 @@ ITEM_INDEX_ORDER = [
     'StaticSection',
     'Document',
     'EvidenceDisPheno',
+    'EvidenceGeneDisorder',
     'Page'
 ]
 
