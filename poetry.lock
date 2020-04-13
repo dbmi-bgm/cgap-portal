@@ -53,7 +53,7 @@ description = "The AWS X-Ray SDK for Python (the SDK) enables Python developers 
 name = "aws-xray-sdk"
 optional = false
 python-versions = "*"
-version = "2.4.3"
+version = "2.5.0"
 
 [package.dependencies]
 botocore = ">=1.11.3"
@@ -172,7 +172,7 @@ description = "Checks CloudFormation templates for practices and behaviour that 
 name = "cfn-lint"
 optional = false
 python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
-version = "0.29.4"
+version = "0.29.5"
 
 [package.dependencies]
 aws-sam-translator = ">=1.21.0"
@@ -210,49 +210,6 @@ name = "click"
 optional = false
 python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*"
 version = "7.1.1"
-
-[[package]]
-category = "main"
-description = "A Buildout recipe to execute commands in the console user interface"
-name = "collective.recipe.cmd"
-optional = false
-python-versions = "*"
-version = "0.11"
-
-[package.dependencies]
-setuptools = "*"
-"zc.buildout" = "*"
-
-[package.extras]
-tests = ["zope.testing", "zc.buildout", "manuel"]
-
-[[package]]
-category = "main"
-description = "WSGI from buildout"
-name = "collective.recipe.modwsgi"
-optional = false
-python-versions = "*"
-version = "2.1"
-
-[package.dependencies]
-setuptools = "*"
-"zc.recipe.egg" = "*"
-
-[[package]]
-category = "main"
-description = "Buildout recipe to generate a text file from a template"
-name = "collective.recipe.template"
-optional = false
-python-versions = "*"
-version = "1.13"
-
-[package.dependencies]
-setuptools = "*"
-"zc.buildout" = "*"
-
-[package.extras]
-genshi = ["genshi"]
-test = ["zope.testing"]
 
 [[package]]
 category = "main"
@@ -295,7 +252,7 @@ description = "Storage support for 4DN Data Portals."
 name = "dcicsnovault"
 optional = false
 python-versions = ">=3.4,<3.7"
-version = "2.1.2"
+version = "2.1.2b0"
 
 [package.dependencies]
 MarkupSafe = ">=0.23,<1"
@@ -547,7 +504,6 @@ version = "2.7"
 [[package]]
 category = "dev"
 description = "Read metadata from Python packages"
-marker = "python_version < \"3.8\""
 name = "importlib-metadata"
 optional = false
 python-versions = "!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*,>=2.7"
@@ -591,7 +547,7 @@ description = "A very fast and expressive template engine."
 name = "jinja2"
 optional = false
 python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*"
-version = "2.11.1"
+version = "2.11.2"
 
 [package.dependencies]
 MarkupSafe = ">=0.23"
@@ -632,8 +588,16 @@ category = "dev"
 description = "Python library for serializing any arbitrary object graph into JSON"
 name = "jsonpickle"
 optional = false
-python-versions = "*"
-version = "1.3"
+python-versions = ">=2.7"
+version = "1.4"
+
+[package.dependencies]
+importlib-metadata = "*"
+
+[package.extras]
+docs = ["sphinx", "jaraco.packaging (>=3.2)", "rst.linker (>=1.9)"]
+testing = ["coverage (<5)", "pytest (>=3.5,<3.7.3 || >3.7.3)", "pytest-checkdocs (>=1.2.3)", "pytest-flake8", "pytest-black-multipy", "pytest-cov", "ecdsa", "feedparser", "numpy", "pandas", "pymongo", "sqlalchemy", "enum34", "jsonlib"]
+"testing.libs" = ["demjson", "simplejson", "ujson", "yajl"]
 
 [[package]]
 category = "dev"
@@ -1630,35 +1594,8 @@ python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
 version = "0.12.0"
 
 [[package]]
-category = "main"
-description = "System for managing development buildouts"
-name = "zc.buildout"
-optional = false
-python-versions = "*"
-version = "2.13.3"
-
-[package.dependencies]
-setuptools = ">=8.0"
-
-[package.extras]
-test = ["zope.testing", "manuel", "bobo (2.3.0)", "zdaemon", "zc.zdaemonrecipe", "zc.recipe.deployment"]
-
-[[package]]
-category = "main"
-description = "Recipe for installing Python package distributions as eggs"
-name = "zc.recipe.egg"
-optional = false
-python-versions = "*"
-version = "2.0.7"
-
-[package.dependencies]
-setuptools = "*"
-"zc.buildout" = ">=2.12.0"
-
-[[package]]
 category = "dev"
 description = "Backport of pathlib-compatible object wrapper for zip files"
-marker = "python_version < \"3.8\""
 name = "zipp"
 optional = false
 python-versions = ">=2.7"
@@ -1671,7 +1608,6 @@ testing = ["pathlib2", "unittest2", "jaraco.itertools", "func-timeout"]
 [[package]]
 category = "dev"
 description = "Backport of pathlib-compatible object wrapper for zip files"
-marker = "python_version < \"3.8\""
 name = "zipp"
 optional = false
 python-versions = ">=3.6"
@@ -1730,7 +1666,7 @@ transaction = ">=1.6.0"
 test = ["zope.testing"]
 
 [metadata]
-content-hash = "5a3f7c3c1174027523562c403d51dbe768e458290fbbca48732dfced43f53ba5"
+content-hash = "fefa2ad0d866422c7ee02992cfb122b4e77c8a251af1e1f72cf782850d6d6034"
 python-versions = ">=3.5,<3.7"
 
 [metadata.files]
@@ -1749,8 +1685,8 @@ aws-sam-translator = [
     {file = "aws-sam-translator-1.22.0.tar.gz", hash = "sha256:3ba6a821eda29ca8ea1306e27a8135256d6136f1b0b29c6cbf9a107dfd1c2dd9"},
 ]
 aws-xray-sdk = [
-    {file = "aws-xray-sdk-2.4.3.tar.gz", hash = "sha256:263a38f3920d9dc625e3acb92e6f6d300f4250b70f538bd009ce6e485676ab74"},
-    {file = "aws_xray_sdk-2.4.3-py2.py3-none-any.whl", hash = "sha256:612dba6efc3704ef224ac0747b05488b8aad94e71be3ece4edbc051189d50482"},
+    {file = "aws-xray-sdk-2.5.0.tar.gz", hash = "sha256:8dfa785305fc8dc720d8d4c2ec6a58e85e467ddc3a53b1506a2ed8b5801c8fc7"},
+    {file = "aws_xray_sdk-2.5.0-py2.py3-none-any.whl", hash = "sha256:ae57baeb175993bdbf31f83843e2c0958dd5aa8cb691ab5628aafb6ccc78a0fc"},
 ]
 awscli = [
     {file = "awscli-1.16.314-py2.py3-none-any.whl", hash = "sha256:8ea6dd9a3538c35e5d1596a4409c7501e12457e93889487351fe52f55b54cac3"},
@@ -1812,8 +1748,8 @@ cffi = [
     {file = "cffi-1.14.0.tar.gz", hash = "sha256:2d384f4a127a15ba701207f7639d94106693b6cd64173d6c8988e2c25f3ac2b6"},
 ]
 cfn-lint = [
-    {file = "cfn-lint-0.29.4.tar.gz", hash = "sha256:58652622b28732223a9a4c2b5625c5f4f4d9509bbf8d06b1b891a1ef9782f1fd"},
-    {file = "cfn_lint-0.29.4-py3-none-any.whl", hash = "sha256:3ff2a77214777360516945d06cbbbeecddc9c7969832b6e1b699f94144b89317"},
+    {file = "cfn-lint-0.29.5.tar.gz", hash = "sha256:9873c82b710c60eacdbed68faebd835e2f0108a037babc1c7ccd3ed7d7e921e5"},
+    {file = "cfn_lint-0.29.5-py3-none-any.whl", hash = "sha256:c101073c5af8eb23fbccb44f5482604384d3593c6298543d072403eb7469b4ef"},
 ]
 chardet = [
     {file = "chardet-3.0.4-py2.py3-none-any.whl", hash = "sha256:fc323ffcaeaed0e0a02bf4d117757b98aed530d9ed4531e3e15460124c106691"},
@@ -1822,16 +1758,6 @@ chardet = [
 click = [
     {file = "click-7.1.1-py2.py3-none-any.whl", hash = "sha256:e345d143d80bf5ee7534056164e5e112ea5e22716bbb1ce727941f4c8b471b9a"},
     {file = "click-7.1.1.tar.gz", hash = "sha256:8a18b4ea89d8820c5d0c7da8a64b2c324b4dabb695804dbfea19b9be9d88c0cc"},
-]
-"collective.recipe.cmd" = [
-    {file = "collective.recipe.cmd-0.11.tar.gz", hash = "sha256:5c251ed2100de54a435594e297aa2173cfa55e9f335373523718c83aa470e173"},
-]
-"collective.recipe.modwsgi" = [
-    {file = "collective.recipe.modwsgi-2.1.tar.gz", hash = "sha256:7c56032e3f949a34a276a91d281672d7f3311b0e225a95abb8592d7ffd5fad9e"},
-]
-"collective.recipe.template" = [
-    {file = "collective.recipe.template-1.13-py2-none-any.whl", hash = "sha256:df3de0ad2f0e9b60ed10912e936eaeaadaadf72c9dc6898c2a09fb6455273eed"},
-    {file = "collective.recipe.template-1.13.tar.gz", hash = "sha256:737f4c75542bb39d91979dbc1d39104c2344e323b3aeba05d331867a2e649d01"},
 ]
 colorama = [
     {file = "colorama-0.3.3.tar.gz", hash = "sha256:eb21f2ba718fbf357afdfdf6f641ab393901c7ca8d9f37edd0bee4806ffa269c"},
@@ -1887,8 +1813,8 @@ cryptography = [
     {file = "cryptography-2.9.tar.gz", hash = "sha256:0cacd3ef5c604b8e5f59bf2582c076c98a37fe206b31430d0cd08138aff0986e"},
 ]
 dcicsnovault = [
-    {file = "dcicsnovault-2.1.2-py3-none-any.whl", hash = "sha256:52441f66f213c6eafbe64aea3cc4222b8d432591d3a3d9087607bdf65904d76b"},
-    {file = "dcicsnovault-2.1.2.tar.gz", hash = "sha256:f23be673648f61fec8b08c138bc8639187085079687e50ce9049534e01232f9d"},
+    {file = "dcicsnovault-2.1.2b0-py3-none-any.whl", hash = "sha256:80838e9e45abf22d3bfd15d1071975cce9d37710491ed0ca428bc0dd3b33c6d4"},
+    {file = "dcicsnovault-2.1.2b0.tar.gz", hash = "sha256:c0d734c2f8c25d469f040c8926e7de2aea232a93638b0edbe9fedcf2969cdd01"},
 ]
 dcicutils = [
     {file = "dcicutils-0.13.2-py3-none-any.whl", hash = "sha256:ad2f760e4630937b9b180b482d0a64c4e9c2a3e893d18dd0ac26fea6403b5dec"},
@@ -1968,8 +1894,8 @@ itsdangerous = [
     {file = "itsdangerous-1.1.0.tar.gz", hash = "sha256:321b033d07f2a4136d3ec762eac9f16a10ccd60f53c0c91af90217ace7ba1f19"},
 ]
 jinja2 = [
-    {file = "Jinja2-2.11.1-py2.py3-none-any.whl", hash = "sha256:b0eaf100007721b5c16c1fc1eecb87409464edc10469ddc9a22a27a99123be49"},
-    {file = "Jinja2-2.11.1.tar.gz", hash = "sha256:93187ffbc7808079673ef52771baa950426fd664d3aad1d0fa3e95644360e250"},
+    {file = "Jinja2-2.11.2-py2.py3-none-any.whl", hash = "sha256:f0a4641d3cf955324a89c04f3d94663aa4d638abe8f733ecd3582848e1c37035"},
+    {file = "Jinja2-2.11.2.tar.gz", hash = "sha256:89aab215427ef59c34ad58735269eb58b1a5808103067f7bb9d5836c651b3bb0"},
 ]
 jmespath = [
     {file = "jmespath-0.9.0-py2.py3-none-any.whl", hash = "sha256:ade5261b0d7d34b6f53accc91e6881b579b40161ed575e6ac465de5edad32815"},
@@ -1983,8 +1909,8 @@ jsonpatch = [
     {file = "jsonpatch-1.25.tar.gz", hash = "sha256:ddc0f7628b8bfdd62e3cbfbc24ca6671b0b6265b50d186c2cf3659dc0f78fd6a"},
 ]
 jsonpickle = [
-    {file = "jsonpickle-1.3-py2.py3-none-any.whl", hash = "sha256:efc6839cb341985f0c24f98650a4c1063a2877c236ffd3d7e1662f0c482bac93"},
-    {file = "jsonpickle-1.3.tar.gz", hash = "sha256:71bca2b80ae28af4e3f86629ef247100af7f97032b5ca8d791c1f8725b411d95"},
+    {file = "jsonpickle-1.4-py2.py3-none-any.whl", hash = "sha256:3d71018794242f6b1640f779a94a192500f73ceed9ef579b4f01799171ec3fb3"},
+    {file = "jsonpickle-1.4.tar.gz", hash = "sha256:e8ca6ec3f379f5eee6e11380d48db220aacc282b480dea46b11cc6f6009d1cdb"},
 ]
 jsonpointer = [
     {file = "jsonpointer-2.0-py2.py3-none-any.whl", hash = "sha256:ff379fa021d1b81ab539f5ec467c7745beb1a5671463f9dcc2b2d458bd361c1e"},
@@ -2471,13 +2397,6 @@ xlwt = [
 xmltodict = [
     {file = "xmltodict-0.12.0-py2.py3-none-any.whl", hash = "sha256:8bbcb45cc982f48b2ca8fe7e7827c5d792f217ecf1792626f808bf41c3b86051"},
     {file = "xmltodict-0.12.0.tar.gz", hash = "sha256:50d8c638ed7ecb88d90561beedbf720c9b4e851a9fa6c47ebd64e99d166d8a21"},
-]
-"zc.buildout" = [
-    {file = "zc.buildout-2.13.3-py2.py3-none-any.whl", hash = "sha256:0880f131cd5f3c5f6a5e1d17add9d6bead079a4236056c3f896609ebd680c8c1"},
-    {file = "zc.buildout-2.13.3.tar.gz", hash = "sha256:d6691a864a7f14b3302ed9a9ab5790f2efc883375033371c1c959fedc72bccb7"},
-]
-"zc.recipe.egg" = [
-    {file = "zc.recipe.egg-2.0.7.tar.gz", hash = "sha256:b89eb00979614e3584bb4e8431172b2345d00b983a04ebf00a401fb695f4e6d3"},
 ]
 zipp = [
     {file = "zipp-1.2.0-py2.py3-none-any.whl", hash = "sha256:e0d9e63797e483a30d27e09fffd308c59a700d365ec34e93cc100844168bf921"},

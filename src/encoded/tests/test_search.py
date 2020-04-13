@@ -557,35 +557,25 @@ def test_index_data_workbook(app, workbook, testapp, indexer_testapp, htmltestap
                 pass
 
 
-######################################
-## Search-based visualization tests ##
-######################################
+def test_search_nested(workbook, testapp):
+    """ Tests multiple search conditions that are handled differently under mapping type=nested """
+    # TODO: standard search on a nested field
+    #       the display_titles are not coded anywhere, so this is tricky...
+    # res = testapp.get('/search/?type=Cohort'
+    #                   '&families.proband.display_title=GAPID8J9B9CR').json
+    # assert len(res['@graph']) == 1
+
+    # TODO: check multiple params not in same nested object
+    # TODO: check two properties that occur in the same sub-embedded object in one cohort
+    # TODO: check two properties that occur in the same sub-embedded object in different cohorts
+    # TODO: exclude results based on nested range query
+    # TODO: Combine the above - multiple cohorts with valid + invalid range selection
+    # TODO: check with not (!) and combine with range query
+    # TODO: check all works with 'no value'
+    pass
 
 
-@pytest.mark.skip # XXX: No bar_plot_aggregations
-def test_barplot_aggregation_endpoint(workbook, testapp):
-
-    # Check what we get back -
-    search_result = testapp.get('/search/?type=Cohort').json
-    search_result_count = len(search_result['@graph'])
-
-    # We should get back same count as from search results here. But on Travis oftentime we don't, so we compare either against count of inserts --or-- count returned from regular results.
-    exp_set_test_inserts = list(get_inserts('inserts', 'cohort'))
-    count_exp_set_test_inserts = len(exp_set_test_inserts)
-
-    # Now, test the endpoint after ensuring we have the data correctly loaded into ES.
-    # We should get back same count as from search results here.
-    res = testapp.post_json('/bar_plot_aggregations', {
-        "search_query_params" : { "type" : ['User'] },
-        "fields_to_aggregate_for" : ["experiments_in_set.experiment_type.display_title", "project.project"]
-    }).json
-
-    # Our total count for experiment_sets should match # of exp_set_replicate inserts.abs
-
-    assert (res['total']['experiment_sets'] == count_exp_set_test_inserts) or (res['total']['experiment_sets'] == search_result_count)
-
-    assert res['field'] == 'experiments_in_set.experiment_type.display_title' # top level field
-
-    assert isinstance(res['terms'], dict) is True
-
-    assert len(res["terms"].keys()) > 0
+# TODO: write test that examines facets for correctness
+def test_search_nested_facets_are_correct(workbook, testapp):
+    """ Tests that nested facets are properly rendered """
+    pass
