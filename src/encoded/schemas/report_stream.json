@@ -1,0 +1,49 @@
+{
+    "title": "Report Stream",
+    "id": "/profiles/report_stream.json",
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "type": "object",
+    "required": ["project", "institution"],
+    "identifyingProperties": ["uuid", "accession", "aliases"],
+    "additionalProperties": false,
+    "mixinProperties": [
+        { "$ref": "mixins.json#/schema_version" },
+        { "$ref": "mixins.json#/accession" },
+        { "$ref": "mixins.json#/aliases" },
+        { "$ref": "mixins.json#/uuid" },
+        { "$ref": "mixins.json#/submitted" },
+        { "$ref": "mixins.json#/modified" },
+        { "$ref": "mixins.json#/status" },
+        { "$ref": "mixins.json#/attribution" }
+    ],
+    "properties": {
+        "schema_version": {
+            "default": "1"
+        },
+        "accession" : {
+            "accessionType" : "CA"
+        },
+        "title": {
+            "title": "Title",
+            "description": "Title for this Case",
+            "type": "string"
+        },
+        "description": {
+            "title": "Description",
+            "description": "Description of the cohort",
+            "type": "string"
+        },
+        "individual": {
+            "title": "Individual",
+            "description": "The individual who comprises the case",
+            "type": "string",
+            "linkTo": "Individual"
+        },
+        "sample_processing": {
+            "title": "Sample Processing",
+            "description": "Downstream analysis performed on sample",
+            "type": "string",
+            "linkTo": "SampleProcessing"
+        }
+    }
+}
