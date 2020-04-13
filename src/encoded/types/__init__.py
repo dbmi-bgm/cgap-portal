@@ -332,6 +332,7 @@ def variant_ingestion(context, request):
         Processes all, or none, of a vcf file based on the loaded annotation
         fields and on the variant and variant sample schemas
     """
+    # TODO: Implement this when we need it, though practically speaking it probably takes too long to do this way
     # get vcf file
     # build the variants, post a dry run
     # if dry run is successful, run for real
