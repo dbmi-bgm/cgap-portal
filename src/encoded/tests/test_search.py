@@ -559,13 +559,29 @@ def test_index_data_workbook(app, workbook, testapp, indexer_testapp, htmltestap
 
 def test_search_nested(workbook, testapp):
     """ Tests multiple search conditions that are handled differently under mapping type=nested """
-    # TODO: standard search on a nested field
-    #       the display_titles are not coded anywhere, so this is tricky...
-    # res = testapp.get('/search/?type=Cohort'
-    #                   '&families.proband.display_title=GAPID8J9B9CR').json
-    # assert len(res['@graph']) == 1
 
-    # TODO: check multiple params not in same nested object
+    # Should match only once since one has a family with a proband with display_title GAPID8J9B9CR
+    res = testapp.get('/search/?type=Cohort'
+                      '&families.proband.display_title=GAPID8J9B9CR').json
+    assert len(res['@graph']) == 1
+
+    # Should match both because both cohorts since this is interpreted as an OR search on this field
+    res = testapp.get('/search/?type=Cohort'
+                      '&families.proband.display_title=GAPID8J9B9CR'
+                      '&families.proband.display_title=GAPID5HBSLG6').json
+    assert len(res['@graph']) == 2
+
+    # This has clinic notes that do not match with the proband object, so will give no results
+    testapp.get('/search/?type=Cohort'
+                      '&families.proband.display_title=GAPID8J9B9CR'
+                      '&families.clinic_notes=gnitset', status=404)
+
+    # This has the correct 'clinic_notes', so should match
+    res = testapp.get('/search/?type=Cohort'
+                      '&families.proband.display_title=GAPID5HBSLG6'
+                      '&families.clinic_notes=testing').json
+    assert len(res['@graph']) == 1
+
     # TODO: check two properties that occur in the same sub-embedded object in one cohort
     # TODO: check two properties that occur in the same sub-embedded object in different cohorts
     # TODO: exclude results based on nested range query

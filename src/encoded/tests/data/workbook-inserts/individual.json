@@ -31,6 +31,7 @@
         "status": "released",
         "uuid": "5ec91041-78a0-4758-abef-21c7f5fd9f12",
         "sex": "F",
+        "accession": "GAPID8J9B9CR",
         "is_deceased": false,
         "mother": "5ec91041-78a0-4758-abef-21c7f5fd9f92",
         "father": "5ec91041-78a0-4758-abef-21c7f5fd9f91"
@@ -85,6 +86,7 @@
         "status": "released",
         "uuid": "5ec91041-78a0-4758-abef-21c7f5fd9f21",
         "sex": "M",
+        "accession": "GAPID5HBSLG6",
         "is_deceased": false,
         "mother": "5ec91041-78a0-4758-abef-21c7f5fd9f25",
         "father": "5ec91041-78a0-4758-abef-21c7f5fd9f24"
