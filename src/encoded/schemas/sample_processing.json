@@ -31,6 +31,17 @@
                 "linkTo": "Sample"
             }
         },
+        "families": {
+            "title": "Families",
+            "description": "Families the analysis is on",
+            "type": "array",
+            "items": {
+                "title": "Family",
+                "description": "A family in the analysis",
+                "type": "string",
+                "linkTo": "Family"
+            }
+        },
         "sample_processed_files": {
             "title": "Sample Processed Files",
             "description": "Processed results for each sample",
