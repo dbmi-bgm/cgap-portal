@@ -880,7 +880,7 @@ def construct_nested_sub_queries(query_field, filters, key='must_terms'):
     if key == 'must_terms':
         es_key = MUST
     elif key == 'must_not_terms':
-        es_key = MUST_NOT
+        es_key = MUST  # this is already wrapped one level up in must_not, so must is needed here
     else:
         raise RuntimeError('Tried to handle nested filter with key other than must/must_not: %s' % key)
 
