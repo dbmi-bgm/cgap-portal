@@ -3,7 +3,7 @@ import copy
 
 
 ORDER = [
-    'user', 'project', 'institution', 'file_format', 'variant_consequence', 'cohort', 'individual',
+    'user', 'project', 'institution', 'file_format', 'variant_consequence', 'cohort', 'family', 'individual',
     'sample', 'workflow', 'access_key', 'disorder', 'document', 'file_fastq',
     'file_processed', 'file_reference', 'gene', 'sample_processing',
     'page', 'phenotype', 'quality_metric_fastqc', 'evidence_dis_pheno',
@@ -146,13 +146,124 @@ def female_individual(testapp, project, institution):
         "age_units": "year",
         'project': project['@id'],
         'institution': institution['@id'],
-        "ethnicity": "Caucasian",
         "sex": "F",
-        "status": "released",
-        "url": "http://ccr.coriell.org/Sections/BrowseCatalog/FamilyTypeSubDetail.aspx?PgId=402&fam=1463&coll=GM"
+        "status": "released"
         # "uuid": "44d24e3f-bc5b-469a-8500-7ebd728f8ed5"
     }
     return testapp.post_json('/individual', item).json['@graph'][0]
+
+
+@pytest.fixture
+def grandpa(testapp, project, institution):
+    item = {
+        "age": 53,
+        "age_units": "year",
+        'project': project['@id'],
+        'institution': institution['@id'],
+        "sex": "M",
+        "status": "released"
+    }
+    return testapp.post_json('/individual', item).json['@graph'][0]
+
+
+@pytest.fixture
+def mother(testapp, project, institution, grandpa, female_individual):
+    item = {
+        "age": 33,
+        "age_units": "year",
+        'project': project['@id'],
+        'institution': institution['@id'],
+        "sex": "F",
+        "father": grandpa['@id'],
+        "mother": female_individual['@id']
+    }
+    return testapp.post_json('/individual', item).json['@graph'][0]
+
+
+@pytest.fixture
+def father(testapp, project, institution):
+    item = {
+        "age": 33,
+        "age_units": "year",
+        'project': project['@id'],
+        'institution': institution['@id'],
+        "sex": "M",
+    }
+    return testapp.post_json('/individual', item).json['@graph'][0]
+
+
+@pytest.fixture
+def uncle(testapp, project, institution, grandpa):
+    item = {
+        "age": 35,
+        "age_units": "year",
+        'project': project['@id'],
+        'institution': institution['@id'],
+        "sex": "M",
+        "father": grandpa['@id']
+    }
+    return testapp.post_json('/individual', item).json['@graph'][0]
+
+
+@pytest.fixture
+def child(testapp, project, institution, mother, father):
+    item = {
+        "age": 7,
+        "age_units": "year",
+        'project': project['@id'],
+        'institution': institution['@id'],
+        "sex": "M",
+        "mother": mother['@id'],
+        "father": father['@id']
+    }
+    return testapp.post_json('/individual', item).json['@graph'][0]
+
+
+@pytest.fixture
+def cousin(testapp, project, institution, uncle):
+    item = {
+        "age": 11,
+        "age_units": "year",
+        'project': project['@id'],
+        'institution': institution['@id'],
+        "sex": "F",
+        "father": uncle['@id']
+    }
+    return testapp.post_json('/individual', item).json['@graph'][0]
+
+
+@pytest.fixture
+def sister(testapp, project, institution, mother):
+    item = {
+        "age": 11,
+        "age_units": "year",
+        'project': project['@id'],
+        'institution': institution['@id'],
+        "sex": "F",
+        "mother": mother['@id']
+    }
+    return testapp.post_json('/individual', item).json['@graph'][0]
+
+
+@pytest.fixture
+def fam(testapp, project, female_individual, institution, grandpa, mother, father, uncle, child, cousin, sister):
+    item = {
+        "project": project['@id'],
+        "institution": institution['@id'],
+        "title": "Smith family",
+        "proband": child['@id'],
+        "members": [
+            child['@id'],
+            sister['@id'],
+            mother['@id'],
+            father['@id'],
+            uncle['@id'],
+            cousin['@id'],
+            grandpa['@id'],
+            female_individual['@id']
+        ]
+    }
+    return testapp.post_json('/family', item).json['@graph'][0]
 
 
 @pytest.fixture

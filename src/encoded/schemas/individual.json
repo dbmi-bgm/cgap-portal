@@ -23,6 +23,11 @@
         "accession" : {
             "accessionType" : "ID"
         },
+        "individual_id": {
+            "title": "Individual ID",
+            "description": "Project or institution-specific ID for the individual",
+            "type": "string"
+        },
         "age": {
             "title": "Age of the Individual",
             "type": "number",
