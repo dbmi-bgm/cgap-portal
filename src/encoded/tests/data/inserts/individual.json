@@ -126,5 +126,32 @@
         "uuid": "5ec91041-78a0-4758-abef-21c7f5fd9f25",
         "sex": "F",
         "is_deceased": false
+    },
+    {
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "institution": "hms-dbmi",
+        "status": "released",
+        "uuid": "5ec91041-78a0-4758-abef-21c7f5fd9f35",
+        "sex": "F",
+        "father": "5ec91041-78a0-4758-abef-21c7f5fd9f21",
+        "is_deceased": false
+    },
+    {
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "institution": "hms-dbmi",
+        "status": "released",
+        "uuid": "5ec91041-78a0-4758-abef-21c7f5fd9f36",
+        "sex": "F",
+        "father": "5ec91041-78a0-4758-abef-21c7f5fd9f21",
+        "is_deceased": false
+    },
+    {
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "institution": "hms-dbmi",
+        "status": "released",
+        "uuid": "5ec91041-78a0-4758-abef-21c7f5fd9f39",
+        "sex": "F",
+        "mother": "5ec91041-78a0-4758-abef-21c7f5fd9f23",
+        "is_deceased": false
     }
 ]

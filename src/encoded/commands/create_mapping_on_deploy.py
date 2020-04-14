@@ -18,6 +18,7 @@ ITEM_INDEX_ORDER = [
     'Institution',
     'AccessKey',
     'Cohort',
+    'Family',
     'User',
     'Workflow',
     'WorkflowMapping',
