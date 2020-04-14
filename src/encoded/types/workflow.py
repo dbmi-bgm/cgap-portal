@@ -1,35 +1,33 @@
 """The type file for the workflow related items.
 """
-from collections import (
-    OrderedDict,
-    deque
-)
-from inspect import signature
+
 import copy
-from pyramid.view import view_config
+import boto3
+import cProfile
+import io
+import json
+import pstats
+
+from collections import OrderedDict, deque
+from dcicutils.env_utils import CGAP_ENV_WEBDEV, is_stg_or_prd_env, prod_bucket_env
+from inspect import signature
+from pyramid.httpexceptions import HTTPUnprocessableEntity
 from pyramid.response import Response
-from pyramid.httpexceptions import (
-    HTTPUnprocessableEntity,
-)
-from snovault import (
-    calculated_property,
-    collection,
-    load_schema,
-    CONNECTION,
-    TYPES
-)
+from pyramid.view import view_config
+from snovault import calculated_property, collection, load_schema, CONNECTION, TYPES
 from snovault.util import debug_log
+from time import sleep
 from .base import (
     Item,
     # lab_award_attribution_embed_list
 )
-import cProfile
-import pstats
-import io
-import boto3
-import json
-from time import sleep
 
+
+TIBANNA_CODE_NAME = 'zebra'
+TIBANNA_WORKFLOW_RUNNER_LAMBDA_FUNCTION = 'run_workflow_zebra'
+TIBANNA_WORKFLOW_STATUS_LAMBDA_FUNCTION = 'status_wfr_zebra'
+
+ENV_WEBDEV = CGAP_ENV_WEBDEV
 
 steps_run_data_schema = {
     "type": "object",
@@ -189,7 +187,6 @@ def common_props_from_file(file_obj):
     #         })
 
     return ret_obj
-
 
 
 def trace_workflows(original_file_set_to_trace, request, options=None):
@@ -663,18 +660,22 @@ class Workflow(Item):
 
     item_type = 'workflow'
     schema = workflow_schema
-    embedded_list = Item.embedded_list + [
-        'steps.name',
-        'steps.inputs',
-        'steps.outputs',
-        'steps.meta.software_used.name',
-        'steps.meta.software_used.title',
-        'steps.meta.software_used.version',
-        'steps.meta.software_used.source_url',
-        'arguments.argument_type',
-        'arguments.argument_format',
-        'arguments.workflow_argument_name'
-    ]  # + lab_award_attribution_embed_list
+    embedded_list = (
+        Item.embedded_list +
+        # lab_award_attribution_embed_list +
+        [
+            'steps.name',
+            'steps.inputs',
+            'steps.outputs',
+            'steps.meta.software_used.name',
+            'steps.meta.software_used.title',
+            'steps.meta.software_used.version',
+            'steps.meta.software_used.source_url',
+            'arguments.argument_type',
+            'arguments.argument_format',
+            'arguments.workflow_argument_name'
+        ]
+    )
     rev = {
         'newer_versions': ('Workflow', 'previous_version')
     }
@@ -705,44 +706,47 @@ class WorkflowRun(Item):
 
     item_type = 'workflow_run'
     schema = load_schema('encoded:schemas/workflow_run.json')
-    embedded_list = Item.embedded_list + [
-        'workflow.category',
-        # 'workflow.experiment_types',
-        'workflow.app_name',
-        'workflow.title',
-        'workflow.steps.name',
-        'workflow.steps.meta.software_used.name',
-        'workflow.steps.meta.software_used.title',
-        'workflow.steps.meta.software_used.version',
-        'workflow.steps.meta.software_used.source_url',
-        'input_files.workflow_argument_name',
-        'input_files.value.filename',
-        'input_files.value.display_title',
-        'input_files.value.href',
-        'input_files.value.file_format',
-        'input_files.value.accession',
-        'input_files.value.@type',
-        'input_files.value.@id',
-        'input_files.value.file_size',
-        'input_files.value.quality_metric.url',
-        'input_files.value.quality_metric.overall_quality_status',
-        'input_files.value.status',
-        'output_files.workflow_argument_name',
-        'output_files.value.filename',
-        'output_files.value.display_title',
-        'output_files.value.href',
-        'output_files.value.file_format',
-        'output_files.value.accession',
-        'output_files.value.@type',
-        'output_files.value.@id',
-        'output_files.value.file_size',
-        'output_files.value.quality_metric.url',
-        'output_files.value.quality_metric.overall_quality_status',
-        'output_files.value.status',
-        'output_files.value_qc.url',
-        'output_files.value_qc.overall_quality_status'
-    ]  # + lab_award_attribution_embed_list
-
+    embedded_list = (
+        Item.embedded_list +
+        # lab_award_attribution_embed_list +
+        [
+            'workflow.category',
+            # 'workflow.experiment_types',
+            'workflow.app_name',
+            'workflow.title',
+            'workflow.steps.name',
+            'workflow.steps.meta.software_used.name',
+            'workflow.steps.meta.software_used.title',
+            'workflow.steps.meta.software_used.version',
+            'workflow.steps.meta.software_used.source_url',
+            'input_files.workflow_argument_name',
+            'input_files.value.filename',
+            'input_files.value.display_title',
+            'input_files.value.href',
+            'input_files.value.file_format',
+            'input_files.value.accession',
+            'input_files.value.@type',
+            'input_files.value.@id',
+            'input_files.value.file_size',
+            'input_files.value.quality_metric.url',
+            'input_files.value.quality_metric.overall_quality_status',
+            'input_files.value.status',
+            'output_files.workflow_argument_name',
+            'output_files.value.filename',
+            'output_files.value.display_title',
+            'output_files.value.href',
+            'output_files.value.file_format',
+            'output_files.value.accession',
+            'output_files.value.@type',
+            'output_files.value.@id',
+            'output_files.value.file_size',
+            'output_files.value.quality_metric.url',
+            'output_files.value.quality_metric.overall_quality_status',
+            'output_files.value.status',
+            'output_files.value_qc.url',
+            'output_files.value_qc.overall_quality_status'
+        ]
+    )
     @calculated_property(schema=workflow_run_steps_property_schema, category='page')
     def steps(self, request):
         '''
@@ -765,7 +769,14 @@ class WorkflowRun(Item):
         # fileCache = {} # Unnecessary unless we'll convert file @id into plain embedded dictionary, in which case we use this to avoid re-requests for same file UUID.
 
         def get_global_source_or_target(all_io_source_targets):
-            global_pointing_source_target = [ source_target for source_target in all_io_source_targets if source_target.get('step') == None ] # Find source or target w/o a 'step'.
+            # Find source or target w/o a 'step'.
+            # Step outputs or inputs with a source or target without a "step" defined
+            # are considered global inputs/outputs. Matching WorkflowRun.[output|input]_files
+            # is done against step step.[inputs | output].[target | source].name.
+            global_pointing_source_target = [
+                source_target for source_target in all_io_source_targets
+                if source_target.get('step') == None
+            ]
             if len(global_pointing_source_target) > 1:
                 raise Exception('Found more than one source or target without a step.')
             if len(global_pointing_source_target) == 0:
@@ -912,12 +923,8 @@ def pseudo_run(context, request):
     env = request.registry.settings.get('env.name')
     # for testing
     if not env:
-        env = 'fourfront-webdev'
-    if env == 'fourfront-webprod2':
-        input_json['output_bucket'] = 'elasticbeanstalk-fourfront-webprod-wfoutput'
-    else:
-        input_json['output_bucket'] = 'elasticbeanstalk-%s-wfoutput' % env
-
+        env = ENV_WEBDEV
+    input_json['output_bucket'] = _wfoutput_bucket_for_env(env)
     input_json['env_name'] = env
     if input_json.get('app_name', None) is None:
         input_json['app_name'] = 'pseudo-workflow-run'
@@ -929,14 +936,14 @@ def pseudo_run(context, request):
 
     # hand-off to tibanna for further processing
     aws_lambda = boto3.client('lambda', region_name='us-east-1')
-    res = aws_lambda.invoke(FunctionName='run_workflow_zebra',
+    res = aws_lambda.invoke(FunctionName=TIBANNA_WORKFLOW_RUNNER_LAMBDA_FUNCTION,
                             Payload=json.dumps(input_json))
     res_decode = res['Payload'].read().decode()
     res_dict = json.loads(res_decode)
     arn = res_dict['_tibanna']['response']['executionArn']
     # just loop until we get proper status
     for i in range(100):
-        res = aws_lambda.invoke(FunctionName='status_wfr_zebra',
+        res = aws_lambda.invoke(FunctionName=TIBANNA_WORKFLOW_STATUS_LAMBDA_FUNCTION,
                                 Payload=json.dumps({'executionArn': arn}))
         res_decode = res['Payload'].read().decode()
         res_dict = json.loads(res_decode)
@@ -957,6 +964,10 @@ def pseudo_run(context, request):
     return res_dict
 
 
+def _wfoutput_bucket_for_env(env):
+    return 'elasticbeanstalk-%s-wfoutput' % (prod_bucket_env(env) if is_stg_or_prd_env(env) else env)
+
+
 @view_config(name='run', context=WorkflowRun.Collection, request_method='POST',
              permission='add')
 @debug_log
@@ -967,24 +978,20 @@ def run_workflow(context, request):
     env = request.registry.settings.get('env.name')
     # for testing
     if not env:
-        env = 'fourfront-webdev'
-    if env == 'fourfront-webprod2':
-        input_json['output_bucket'] = 'elasticbeanstalk-fourfront-webprod-wfoutput'
-    else:
-        input_json['output_bucket'] = 'elasticbeanstalk-%s-wfoutput' % env
-
+        env = ENV_WEBDEV
+    input_json['output_bucket'] = _wfoutput_bucket_for_env(env)
     input_json['env_name'] = env
 
     # hand-off to tibanna for further processing
     aws_lambda = boto3.client('lambda', region_name='us-east-1')
-    res = aws_lambda.invoke(FunctionName='run_workflow_zebra',
+    res = aws_lambda.invoke(FunctionName=TIBANNA_WORKFLOW_RUNNER_LAMBDA_FUNCTION,
                             Payload=json.dumps(input_json))
     res_decode = res['Payload'].read().decode()
     res_dict = json.loads(res_decode)
     arn = res_dict['_tibanna']['response']['executionArn']
     # just loop until we get proper status
     for _ in range(2):
-        res = aws_lambda.invoke(FunctionName='status_wfr_zebra',
+        res = aws_lambda.invoke(FunctionName=TIBANNA_WORKFLOW_STATUS_LAMBDA_FUNCTION,
                                 Payload=json.dumps({'executionArn': arn}))
         res_decode = res['Payload'].read().decode()
         res_dict = json.loads(res_decode)
