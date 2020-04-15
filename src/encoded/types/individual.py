@@ -80,12 +80,16 @@ class Individual(Item):
             return fams
 
     @calculated_property(schema={
-        "title": "Case",
-        "description": "Case for this individual",
-        "type": "string",
-        "linkTo": "ReportStream"
+        "title": "Cases",
+        "description": "Cases for this individual",
+        "type": "array",
+        "items": {
+            "title": "Case",
+            "type": "string",
+            "linkTo": "ReportStream"
+        }
     })
     def case(self, request):
         rs = self.rev_link_atids(request, "case")
         if rs:
-            return rs 
+            return rs

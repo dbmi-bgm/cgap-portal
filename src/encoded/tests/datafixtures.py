@@ -267,12 +267,33 @@ def fam(testapp, project, female_individual, institution, grandpa, mother, fathe
 
 
 @pytest.fixture
-def sample_f(project, institution, female_individual):
-    return {
+def sample_f(testapp, project, institution, female_individual):
+    data = {
         'project': project['@id'],
         'institution': institution['@id'],
         'specimen_type': 'saliva',
         'date_received': '2015-12-7'
+    }
+    return testapp.post_json('/sample', data).json['@graph'][0]
+
+@pytest.fixture
+def sample_proc(testapp, project, institution, sample_f, fam):
+    data = {
+        'project': project['@id'],
+        'institution': institution['@id'],
+        'samples': [sample_f['@id']],
+        'families': [fam['@id']]
+    }
+    return testapp.post_json('/sample_processing', data).json['@graph'][0]
+
+
+@pytest.fixture
+def a_case(project, institution, child, sample_proc):
+    return {
+        'project': project['@id'],
+        'institution': institution['@id'],
+        'individual': child['@id'],
+        'sample_processing': sample_proc['@id']
     }
 
 

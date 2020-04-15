@@ -156,3 +156,9 @@ def test_image_unique_key(registry, image_data):
     image = Image.create(registry, uuid, image_data)
     keys = image.unique_keys(image.properties)
     assert 'red-dot.png' in keys['image:filename']
+
+
+def test_sample_processing_case(testapp, sample_proc, a_case):
+    case = testapp.post_json('/report_stream', a_case, status=201).json['@graph'][0]
+    result = testapp.get(sample_proc['@id']).json
+    assert result.get('case', {}).get('@id') == case['@id']

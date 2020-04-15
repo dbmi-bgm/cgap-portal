@@ -52,7 +52,7 @@ class SampleProcessing(Item):
     def case(self, request):
         rs = self.rev_link_atids(request, "case")
         if rs:
-            return rs
+            return rs[0]
 
 
 @collection(
