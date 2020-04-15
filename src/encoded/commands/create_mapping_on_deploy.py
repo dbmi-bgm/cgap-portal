@@ -35,6 +35,7 @@ ITEM_INDEX_ORDER = [
     'Phenotype',
     'Disorder',
     'Individual',
+    'Case',
     'Document',
     'QualityMetricBamcheck',
     'QualityMetricFastqc',

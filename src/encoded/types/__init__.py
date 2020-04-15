@@ -41,13 +41,13 @@ class SampleProcessing(Item):
     item_type = 'sample_processing'
     schema = load_schema('encoded:schemas/sample_processing.json')
     embedded_list = []
-    rev = {'case': ('ReportStream', 'sample_processing')}
+    rev = {'case': ('Case', 'sample_processing')}
 
     @calculated_property(schema={
         "title": "Case",
         "description": "The case this sample processing is for",
         "type": "string",
-        "linkTo": "ReportStream"
+        "linkTo": "Case"
     })
     def case(self, request):
         rs = self.rev_link_atids(request, "case")

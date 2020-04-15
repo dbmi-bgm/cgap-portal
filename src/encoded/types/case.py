@@ -22,16 +22,16 @@ log = structlog.getLogger(__name__)
 
 
 @collection(
-    name='report-streams',
+    name='cases',
     unique_key='accession',
     properties={
-        'title': 'Report Streams',
+        'title': 'Cases',
         'description': 'Listing of Cases',
     })
-class ReportStream(Item):
+class Case(Item):
     item_type = 'report_stream'
     name_key = 'accession'
-    schema = load_schema('encoded:schemas/report_stream.json')
+    schema = load_schema('encoded:schemas/case.json')
     embedded_list = [
         "individual.accession",
         "individual.father",

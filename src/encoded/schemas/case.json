@@ -1,6 +1,6 @@
 {
-    "title": "Report Stream",
-    "id": "/profiles/report_stream.json",
+    "title": "Case",
+    "id": "/profiles/case.json",
     "$schema": "http://json-schema.org/draft-04/schema#",
     "type": "object",
     "required": ["project", "institution"],
@@ -30,7 +30,7 @@
         },
         "description": {
             "title": "Description",
-            "description": "Description of the cohort",
+            "description": "Description of the case",
             "type": "string"
         },
         "individual": {
@@ -41,7 +41,7 @@
         },
         "sample_processing": {
             "title": "Sample Processing",
-            "description": "Downstream analysis performed on sample",
+            "description": "Downstream analysis performed on relevant sample",
             "type": "string",
             "linkTo": "SampleProcessing"
         }

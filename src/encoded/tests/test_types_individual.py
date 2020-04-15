@@ -59,7 +59,7 @@ def test_individual_families(testapp, fam, mother):
 
 def test_individual_case(testapp, child, a_case):
     assert child.get('case') == None
-    case = testapp.post_json('/report_stream', a_case, status=201).json['@graph'][0]
+    case = testapp.post_json('/case', a_case, status=201).json['@graph'][0]
     child_res = testapp.get(child['@id']).json
     assert len(child_res.get('case', [])) == 1
     assert child_res['case'][0]['@id'] == case['@id']

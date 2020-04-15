@@ -23,7 +23,7 @@ class Individual(Item):
         'children_f': ('Individual', 'father'),
         'children_m': ('Individual', 'mother'),
         'families': ('Family', 'members'),
-        'case': ('ReportStream', 'individual')
+        'case': ('Case', 'individual')
     }
 
     embedded_list = [
@@ -86,7 +86,7 @@ class Individual(Item):
         "items": {
             "title": "Case",
             "type": "string",
-            "linkTo": "ReportStream"
+            "linkTo": "Case"
         }
     })
     def case(self, request):
