@@ -38,7 +38,7 @@ def recursively_find_uuids(json, uuids):
 def test_search_view(workbook, testapp):
     """ Test basic things about search view """
     res = testapp.get('/search/?type=Item').json
-    assert res['@type'] == ['Search']
+    assert res['@type'] == ['ItemSearchResults', 'Search']
     assert res['@id'] == '/search/?type=Item'
     assert res['@context'] == '/terms/'
     assert res['notification'] == 'Success'
@@ -55,7 +55,7 @@ def test_search_with_no_query(workbook, testapp):
     thus, should satisfy same assertions as test_search_view
     """
     res = testapp.get('/search/').follow(status=200)
-    assert res.json['@type'] == ['Search']
+    assert res.json['@type'] == ['ItemSearchResults', 'Search']
     assert res.json['@id'] == '/search/?type=Item'
     assert res.json['@context'] == '/terms/'
     assert res.json['notification'] == 'Success'
@@ -76,7 +76,7 @@ def test_collections_redirect_to_search(workbook, testapp):
     redirected_from is not used for search
     """
     res = testapp.get('/user/', status=301).follow(status=200)
-    assert res.json['@type'] == ['UserSearchResults', 'Search']
+    assert res.json['@type'] == ['UserSearchResults', 'ItemSearchResults', 'Search']
     assert res.json['@id'] == '/search/?type=User'
     assert 'redirected_from' not in res.json['@id']
     assert res.json['@context'] == '/terms/'
@@ -484,10 +484,10 @@ def test_search_with_static_header(workbook, testapp):
 
 
 def test_search_multiple_types(workbook, testapp):
-    # multiple types work with @type in response
+    """ Note that the behavior now is in '@type' will be the highest common ancestor if searched on multiple types """
     search = '/search/?type=Individual&type=Workflow'
     res = testapp.get(search).json
-    assert res['@type'] == ['IndividualSearchResults', 'WorkflowSearchResults', 'Search']
+    assert res['@type'] == ['ItemSearchResults', 'Search']
 
 
 #########################################
