@@ -2,23 +2,9 @@ from snovault import (
     calculated_property,
     collection,
     load_schema,
-    CONNECTION,
-    COLLECTIONS,
     display_title_schema
 )
-from snovault.util import debug_log
-from .base import (
-    Item,
-    get_item_if_you_can
-)
-from pyramid.httpexceptions import HTTPUnprocessableEntity
-from pyramid.view import view_config
-from datetime import datetime
-from dateutil.relativedelta import relativedelta
-import structlog
-
-
-log = structlog.getLogger(__name__)
+from .base import Item
 
 
 @collection(
