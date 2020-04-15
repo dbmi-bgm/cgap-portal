@@ -56,9 +56,21 @@
         },
         "impact": {
             "title": "IMPACT",
-            "description": "The IMPACT rating is a rating given for compatibility with other variant annotation tools",
+            "description": "The IMPACT rating expresses a subjective call on the likely impact of the variant (see snpEff). MODIFIER - usually non-coding variants or variants affecting non-coding genes, where predictions are difficult or there is no evidence of impact. LOW - a variant that is assumed to be mostly harmless or unlikely to change protein behaviour. MODERATE - a non-disruptive variant that might change protein effectiveness. HIGH - the variant is assumed to have high (disruptive) impact in the protein, probably causing protein truncation, loss of function or triggering nonsense mediated decay.",
             "type": "string",
             "enum": ["HIGH", "MODERATE", "LOW", "MODIFIER"]
+        },
+        "location": {
+            "title": "Location",
+            "description": "The location within the gene upon which the variant has its consequence",
+            "type": "string",
+            "enum": ["splice region", "CDS", "miRNA", "UTR"]
+        },
+        "conseq_summary": {
+            "title": "Consequence",
+            "description": "Summarized consequence of variant",
+            "type": "string",
+            "enum": ["Nonsense", "Frameshift", "Stop lost", "Start lost", "inframe indel", "Missense", "Synonymous"]
         }
     }
 }
