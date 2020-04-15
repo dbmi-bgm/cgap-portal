@@ -1,0 +1,40 @@
+[
+    {
+        "title": "Bluethumb Family",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "institution": "hms-dbmi",
+        "status": "released",
+        "uuid": "aa7d83a2-6886-4ca0-9402-7c49734ce3d4",
+        "members": [
+          "5ec91041-78a0-4758-abef-21c7f5fd9f12",
+          "5ec91041-78a0-4758-abef-21c7f5fd9f34",
+          "5ec91041-78a0-4758-abef-21c7f5fd9f56",
+          "5ec91041-78a0-4758-abef-21c7f5fd9f78",
+          "5ec91041-78a0-4758-abef-21c7f5fd9f91",
+          "5ec91041-78a0-4758-abef-21c7f5fd9f92"
+        ],
+        "proband": "5ec91041-78a0-4758-abef-21c7f5fd9f12",
+        "original_pedigree": "dcf15d5e-40aa-43bc-b81c-32c70c9afc50",
+        "description": "This family has been affected by a novel disease which can emerge at any age. The initial symptoms include gastrointestinal pains followed a few days later by bluing of some extremities."
+    },
+    {
+        "title": "Greenthumb Family",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "institution": "hms-dbmi",
+        "status": "released",
+        "uuid": "cb7d83a2-6886-4ca0-9402-7c49734ce1d9",
+        "members": [
+            "5ec91041-78a0-4758-abef-21c7f5fd9f21",
+            "5ec91041-78a0-4758-abef-21c7f5fd9f22",
+            "5ec91041-78a0-4758-abef-21c7f5fd9f23",
+            "5ec91041-78a0-4758-abef-21c7f5fd9f24",
+            "5ec91041-78a0-4758-abef-21c7f5fd9f25",
+            "5ec91041-78a0-4758-abef-21c7f5fd9f35",
+            "5ec91041-78a0-4758-abef-21c7f5fd9f36",
+            "5ec91041-78a0-4758-abef-21c7f5fd9f39"
+        ],
+        "proband": "5ec91041-78a0-4758-abef-21c7f5fd9f35",
+        "original_pedigree": "dcf15d5e-40aa-43bc-b81c-32c70c9afc52",
+        "description": "This family been affected by a novel disease which can emerge at any age. The initial symptoms include gastrointestinal pains followed a few days later by appearance of a green tint in some extremities."
+    }
+]

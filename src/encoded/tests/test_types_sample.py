@@ -85,3 +85,23 @@ def test_sample_individual_revlink(testapp, sample_one, MIndividual):
     indiv_res = testapp.patch_json(MIndividual['@id'], {'samples': [sample_res['@id']]}, status=200).json['@graph'][0]
     sample_indiv = testapp.get(sample_res['@id']).json.get('individual')
     assert sample_indiv['@id'] == indiv_res['@id']
+
+
+def test_sample_requisition_completed_accepted(testapp, sample_one):
+    res = testapp.post_json('/sample', sample_one, status=201).json['@graph'][0]
+    assert not res.get('requisition_completed')
+    res2 = testapp.patch_json(res['@id'], {'specimen_accession_date': '2020-01-01'}, status=200).json['@graph'][0]
+    assert res2.get('requisition_completed') == False
+    res3 = testapp.patch_json(res['@id'], {'requisition_acceptance': {'accepted_rejected': 'Accepted'}},
+                              status=200).json['@graph'][0]
+    assert res3.get('requisition_completed') == True
+
+
+def test_sample_requisition_completed_rejected(testapp, sample_one):
+    sample_one['requisition_acceptance'] = {'accepted_rejected': 'Rejected'}
+    res = testapp.post_json('/sample', sample_one, status=201).json['@graph'][0]
+    assert res.get('requisition_completed') == False
+    patch_info = res.get('requisition_acceptance')
+    patch_info['date_completed'] = '2020-03-01'
+    res2 = testapp.patch_json(res['@id'], {'requisition_acceptance': patch_info}, status=200).json['@graph'][0]
+    assert res2.get('requisition_completed') == True

@@ -13,25 +13,9 @@ from ..commands.owltools import Owler
 pytestmark = [pytest.mark.setone, pytest.mark.working]
 
 
-class MockedLogger(object):
-    def info(self, msg):
-        print('INFO: ' + msg)
-
-    def warn(self, msg):
-        print('WARNING: ' + msg)
-
-    def error(self, msg):
-        print('ERROR: ' + msg)
-
-
-@pytest.fixture
-def mock_logger():
-    return MockedLogger()
-
-
-def test_parse_args_defaults():
+def test_gifo_get_args_defaults():
     args = ['Disorder']
-    args = gifo.parse_args(args)
+    args = gifo.get_args(args)
     assert args.env == 'local'
     assert args.keyfile == os.path.expanduser("~/keypairs.json")
     assert args.load is False
@@ -41,97 +25,8 @@ def test_parse_args_defaults():
 
 
 @pytest.fixture
-def connection():
-    return {
-        "server": "https://cgap.hms.harvard.edu/",
-        "key": "testkey",
-        "secret": "testsecret"
-    }
-
-
-@pytest.fixture
 def owler(mocker):
     return mocker.patch.object(gifo, 'Owler')
-
-
-@pytest.fixture
-def rel_disorders():
-    return [
-        {
-            'disorder_id': 'MONDO:0400005',
-            'status': 'released',
-            'disorder_name': 'refeeding syndrome',
-            'disorder_url': 'http://purl.obolibrary.org/obo/MONDO_0400005'
-        },
-        {
-            'disorder_id': 'MONDO:0400004',
-            'status': 'released',
-            'disorder_name': 'phrynoderma',
-            'disorder_url': 'http://purl.obolibrary.org/obo/MONDO_0400004'
-        },
-        {
-            'disorder_id': 'MONDO:0300000',
-            'status': 'released',
-            'disorder_name': 'SSR3-CDG',
-            'disorder_url': 'http://purl.obolibrary.org/obo/MONDO_0300000'
-        },
-        {
-            'disorder_id': 'MONDO:0200000',
-            'status': 'released',
-            'disorder_name': 'uterine ligament adenosarcoma',
-            'disorder_url': 'http://purl.obolibrary.org/obo/MONDO_0200000'
-        }
-    ]
-
-
-@pytest.fixture
-def delobs_disorders():
-    return [
-        {
-            'disorder_id': 'MONDO:9999998',
-            'status': 'deleted',
-            'disorder_name': 'colored thumbs',
-            'disorder_url': 'http://purl.obolibrary.org/obo/MONDO_9999998'
-        },
-        {
-            'disorder_id': 'MONDO:9999999',
-            'status': 'obsolete',
-            'disorder_name': 'green thumbs',
-            'disorder_url': 'http://purl.obolibrary.org/obo/MONDO_9999999'
-        }
-    ]
-
-
-@pytest.fixture
-def phenotypes():
-    return [
-        {
-            'hpo_id': 'HP:0001507',
-            'status': 'released',
-            'phenotype_name': 'growth abnormality',
-            'hpo_url': 'http://purl.obolibrary.org/obo/HP_00001507',
-            'is_slim_for': 'Phenotype abnormality'
-        },
-        {
-            'hpo_id': 'HP:0040064',
-            'status': 'released',
-            'phenotype_name': 'Abnormality of limbs',
-            'hpo_url': 'http://purl.obolibrary.org/obo/HP_0040064',
-            'is_slim_for': 'Phenotype abnormality'
-        },
-        {
-            'hpo_id': 'HP:3000008',
-            'status': 'released',
-            'phenotype_name': 'Abnormality of mylohyoid muscle',
-            'hpo_url': 'http://purl.obolibrary.org/obo/HP_3000008'
-        },
-        {
-            'hpo_id': 'HP:0010708',
-            'status': 'released',
-            'phenotype_name': '1-5 finger syndactyly',
-            'hpo_url': 'http://purl.obolibrary.org/obo/HP_0010708'
-        }
-    ]
 
 
 @pytest.fixture
@@ -216,7 +111,20 @@ def test_prompt_check_for_output_options_wo_load_w_file(mock_logger):
     assert not loadit
 
 
+@pytest.fixture
+def disorder_gen(rel_disorders):
+    return iter(rel_disorders)
+
+
+@pytest.fixture
+def delobs_disorder_gen(delobs_disorders):
+    return iter(delobs_disorders)
+
+
 def test_get_existing_items(mocker, connection, rel_disorders, delobs_disorders):
+    ''' Currently this test passes but is not really a unit test and also does not
+        quite mock the correct things so should be refactored
+    '''
     disorder_ids = [d.get('disorder_id') for d in rel_disorders + delobs_disorders]
     mocker.patch('encoded.commands.generate_items_from_owl.search_metadata', side_effect=[rel_disorders, delobs_disorders])
     dbdiseases = gifo.get_existing_items(connection, 'Disorder')
@@ -224,12 +132,77 @@ def test_get_existing_items(mocker, connection, rel_disorders, delobs_disorders)
     assert all([d in dbdiseases for d in disorder_ids])
 
 
-def test_get_existing_items_wo_obsdel(mocker, connection, rel_disorders):
+def test_get_existing_items_from_db_w_deleted(mocker, connection, disorder_gen, delobs_disorder_gen, rel_disorders, delobs_disorders):
+    disorder_ids = [d.get('disorder_id') for d in rel_disorders + delobs_disorders]
+    mocker.patch('encoded.commands.generate_items_from_owl.search_metadata', side_effect=[disorder_gen, delobs_disorder_gen])
+    dbdiseases = list(gifo.get_existing_items_from_db(connection, 'Disorder'))
+    assert len(dbdiseases) == len(rel_disorders) + len(delobs_disorders)
+    assert all([dis.get('disorder_id') in disorder_ids for dis in dbdiseases])
+
+
+def test_get_existing_items_from_db_wo_deleted(mocker, connection, disorder_gen, rel_disorders):
     disorder_ids = [d.get('disorder_id') for d in rel_disorders]
-    mocker.patch('encoded.commands.generate_items_from_owl.search_metadata', return_value=rel_disorders)
-    dbdiseases = gifo.get_existing_items(connection, 'Disorder', False)
+    mocker.patch('encoded.commands.generate_items_from_owl.search_metadata', side_effect=[disorder_gen])
+    dbdiseases = list(gifo.get_existing_items_from_db(connection, 'Disorder', include_invisible=False))
     assert len(dbdiseases) == len(rel_disorders)
-    assert all([d in dbdiseases for d in disorder_ids])
+    assert all([dis.get('disorder_id') in disorder_ids for dis in dbdiseases])
+
+
+def test_get_existing_items_from_db_w_duplicates(mocker, connection, rel_disorders):
+    ''' The tested function is agnostic to duplicates so testing to make sure
+        if duplicates are present they are returned
+    '''
+    rel_disorders.append(rel_disorders[0])  # add the duplicate item
+    dgen = iter(rel_disorders)
+    disorder_ids = [d.get('disorder_id') for d in rel_disorders]
+    mocker.patch('encoded.commands.generate_items_from_owl.search_metadata', side_effect=[dgen])
+    dbdiseases = list(gifo.get_existing_items_from_db(connection, 'Disorder', include_invisible=False))
+    assert len(dbdiseases) == len(rel_disorders)
+    assert all([dis.get('disorder_id') in disorder_ids for dis in dbdiseases])
+
+
+def test_create_dict_keyed_by_field_from_items_valid_field_for_all(rel_disorders):
+    keyfield = 'disorder_id'
+    disorder_ids = [d.get(keyfield) for d in rel_disorders]
+    disorder_dict = gifo.create_dict_keyed_by_field_from_items(rel_disorders, keyfield)
+    assert len(disorder_dict) == len(disorder_ids)
+    assert all([d in disorder_dict for d in disorder_ids])
+
+
+def test_create_dict_keyed_by_field_from_items_valid_field_with_2_empty_1_missing_field(rel_disorders):
+    keyfield = 'disorder_id'
+    disorder_ids = [d.get(keyfield) for d in rel_disorders]
+    rel_disorders.append(None)
+    rel_disorders.append({})
+    rel_disorders.append({
+        'status': 'deleted',
+        'disorder_name': 'colored thumbs',
+        'disorder_url': 'http://purl.obolibrary.org/obo/MONDO_9999998'
+    })
+    disorder_dict = gifo.create_dict_keyed_by_field_from_items(rel_disorders, keyfield)
+    assert len(disorder_dict) == len(disorder_ids)
+    assert all([d in disorder_dict for d in disorder_ids])
+
+
+def test_create_dict_keyed_by_field_from_items_duplicates_present_last_returned(rel_disorders):
+    keyfield = 'disorder_id'
+    chk_id = 'MONDO:0400004'
+    alt_name = 'changed'
+    disorder_ids = [d.get(keyfield) for d in rel_disorders]
+    rel_disorders.append(rel_disorders[0])  # straight duplicate
+    alt_disorder = rel_disorders[1].copy()
+    alt_disorder['disorder_name'] = alt_name
+    rel_disorders.append(alt_disorder)
+    disorder_dict = gifo.create_dict_keyed_by_field_from_items(rel_disorders, keyfield)
+    assert len(disorder_dict) == len(disorder_ids)
+    to_chk = disorder_dict.get(chk_id)
+    assert to_chk.get('disorder_name') == alt_name
+
+
+def test_create_dict_keyed_by_field_from_items_bad_field(rel_disorders):
+    keyfield = 'hpo_id'
+    disorder_dict = gifo.create_dict_keyed_by_field_from_items(rel_disorders, keyfield)
+    assert not disorder_dict
 
 
 def test_remove_obsoletes_and_unnamed_obsoletes(rel_disorders):
@@ -547,26 +520,6 @@ def test_cleanup_non_fields(terms_w_stuff):
 
 
 @pytest.fixture
-def raw_item_dict():
-    return {
-        'string_field': 'a_string',
-        'list_string_field': ['a_string', 'b_string', 'c_string'],
-        'int_field': 1,
-        'num_field': 1.1,
-        'boolean_field': True,
-        'list_int_field': [1, 2, 3],
-        'list_num_field': [1.1, 2.2, 3.3],
-        'linked_item_field': 'uuid1',
-        'list_linked_item_field': ['uuid1', 'uuid2'],
-        'sub_embed_obj_field': {'sef1': 'string', 'sef2': 'uuid1'},
-        'list_sub_embed_obj_field': [
-            {'sef1': 'string', 'sef2': 'uuid1'},
-            {'sef1': 'string2', 'sef2': 'uuid2'}
-        ]
-    }
-
-
-@pytest.fixture
 def object_item_dict():
     return {
         'uuid': 'uuid1',
@@ -583,75 +536,6 @@ def object_item_dict():
         'list_sub_embed_obj_field': [
             {'sef1': 'string', 'sef2': '/item/name1'},
             {'sef1': 'string2', 'sef2': '/item/name2'}
-        ]
-    }
-
-
-@pytest.fixture
-def embedded_item_dict():
-    return {
-        'uuid': 'uuid1',
-        'string_field': 'a_string',
-        'list_string_field': ['a_string', 'b_string', 'c_string'],
-        'int_field': 1,
-        'num_field': 1.1,
-        'boolean_field': True,
-        'list_int_field': [1, 2, 3],
-        'list_num_field': [1.1, 2.2, 3.3],
-        'linked_item_field': {
-            'uuid': 'uuid1',
-            'display_title': 'dt1',
-            '@type': ['Item'],
-            'embedded_field1': 'val1',
-            'embedded_item_field': {'uuid': 'uuid1', 'display_title': 'dt1', '@type': ['Item']}
-        },
-        'list_linked_item_field': [
-            {
-                'uuid': 'uuid1',
-                'display_title': 'dt1',
-                '@type': ['Item'],
-                'embedded_field1': 'val1',
-                'embedded_item_field': {'uuid': 'uuid1', 'display_title': 'dt1', '@type': ['Item']}
-            },
-            {
-                'uuid': 'uuid2',
-                'display_title': 'dt1',
-                '@type': ['Item'],
-                'embedded_field1': 'val1',
-                'embedded_item_field': {'uuid': 'uuid1', 'display_title': 'dt1', '@type': ['Item']}
-            }
-        ],
-        'sub_embed_obj_field': {
-            'sef1': 'string',
-            'sef2': {
-                'uuid': 'uuid1',
-                'display_title': 'dt1',
-                '@type': ['Item'],
-                'embedded_field1': 'val1',
-                'embedded_item_field': {'uuid': 'uuid1', 'display_title': 'dt1', '@type': ['Item']}
-            }
-        },
-        'list_sub_embed_obj_field': [
-            {
-                'sef1': 'string',
-                'sef2': {
-                    'uuid': 'uuid1',
-                    'display_title': 'dt1',
-                    '@type': ['Item'],
-                    'embedded_field1': 'val1',
-                    'embedded_item_field': {'uuid': 'uuid1', 'display_title': 'dt1', '@type': ['Item']}
-                }
-            },
-            {
-                'sef1': 'string2',
-                'sef2': {
-                    'uuid': 'uuid2',
-                    'display_title': 'dt2',
-                    '@type': ['Item'],
-                    'embedded_field1': 'val1',
-                    'embedded_item_field': {'uuid': 'uuid1', 'display_title': 'dt1', '@type': ['Item']}
-                }
-            }
         ]
     }
 

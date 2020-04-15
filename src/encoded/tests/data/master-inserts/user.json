@@ -3,7 +3,7 @@
         "email": "loadxl@loadxl.us",
         "first_name": "loadxl",
         "groups": ["admin"],
-        "job_title": "Administrator",
+        "role": "other",
         "institution": "hms-dbmi",
         "last_name": "loadxl",
         "status": "current",
@@ -74,6 +74,16 @@
         "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b"
     },
     {
+        "email": "kent_pitman@hms.harvard.edu",
+        "first_name": "Kent",
+        "last_name": "Pitman",
+        "role": "developer",
+        "uuid": "27d2ac03-7d12-442b-9375-211d3c5c5f97",
+        "groups": ["admin"],
+        "submits_for": ["hms-dbmi"],
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b"
+    },
+    {
         "email": "jkrier@bwh.harvard.edu",
         "first_name": "Joel",
         "last_name": "Krier",
@@ -123,7 +133,7 @@
         "email": "foursight.app@gmail.com",
         "uuid": "7677f8a8-79d2-4cff-ab0a-a967a2a68e39",
         "submits_for": ["hms-dbmi"],
-        "job_title": "Other"
+        "role": "other"
     },
     {
         "last_name": "App",
@@ -136,7 +146,7 @@
         "email": "tibanna.app@gmail.com",
         "uuid": "b041dba8-e2b2-4e54-a621-97edb508a0c4",
         "submits_for": ["hms-dbmi"],
-        "job_title": "Other"
+        "role": "other"
     },
     {
         "email": "bianca_morris@hms.harvard.edu",

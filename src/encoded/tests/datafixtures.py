@@ -3,7 +3,7 @@ import copy
 
 
 ORDER = [
-    'user', 'project', 'institution', 'file_format', 'variant_consequence', 'cohort', 'individual',
+    'user', 'project', 'institution', 'file_format', 'variant_consequence', 'cohort', 'family', 'individual',
     'sample', 'workflow', 'access_key', 'disorder', 'document', 'file_fastq',
     'file_processed', 'file_reference', 'gene', 'sample_processing',
     'page', 'phenotype', 'quality_metric_fastqc', 'evidence_dis_pheno',
@@ -12,6 +12,31 @@ ORDER = [
     'tracking_item', 'workflow_mapping', 'workflow_run_awsem',
     'workflow_run', 'annotation_field', 'variant_sample', 'variant'
 ]
+
+
+class MockedLogger(object):
+    def info(self, msg):
+        print('INFO: ' + msg)
+
+    def warn(self, msg):
+        print('WARNING: ' + msg)
+
+    def error(self, msg):
+        print('ERROR: ' + msg)
+
+
+@pytest.fixture
+def mock_logger():
+    return MockedLogger()
+
+
+@pytest.fixture
+def connection():
+    return {
+        "server": "https://cgap.hms.harvard.edu/",
+        "key": "testkey",
+        "secret": "testsecret"
+    }
 
 
 @pytest.fixture
@@ -28,8 +53,7 @@ def submitter_testapp(submitter, app, external_tx, zsa_savepoints):
 def project(testapp):
     item = {
         'name': 'encode-project',
-        'title': 'ENCODE Project',
-        'viewing_group': '4DN'
+        'title': 'ENCODE Project'
     }
     return testapp.post_json('/project', item).json['@graph'][0]
 
@@ -95,7 +119,6 @@ def submitter(testapp, institution, project):
         'last_name': 'Submitter',
         'email': 'encode_submitter@example.org',
         'submits_for': [institution['@id']],
-        'viewing_groups': [project['viewing_group']],
         'status': "current"
     }
     # User @@object view has keys omitted.
@@ -124,13 +147,124 @@ def female_individual(testapp, project, institution):
         "age_units": "year",
         'project': project['@id'],
         'institution': institution['@id'],
-        "ethnicity": "Caucasian",
         "sex": "F",
-        "status": "released",
-        "url": "http://ccr.coriell.org/Sections/BrowseCatalog/FamilyTypeSubDetail.aspx?PgId=402&fam=1463&coll=GM"
+        "status": "released"
         # "uuid": "44d24e3f-bc5b-469a-8500-7ebd728f8ed5"
     }
     return testapp.post_json('/individual', item).json['@graph'][0]
+
+
+@pytest.fixture
+def grandpa(testapp, project, institution):
+    item = {
+        "age": 53,
+        "age_units": "year",
+        'project': project['@id'],
+        'institution': institution['@id'],
+        "sex": "M",
+        "status": "released"
+    }
+    return testapp.post_json('/individual', item).json['@graph'][0]
+
+
+@pytest.fixture
+def mother(testapp, project, institution, grandpa, female_individual):
+    item = {
+        "age": 33,
+        "age_units": "year",
+        'project': project['@id'],
+        'institution': institution['@id'],
+        "sex": "F",
+        "father": grandpa['@id'],
+        "mother": female_individual['@id']
+    }
+    return testapp.post_json('/individual', item).json['@graph'][0]
+
+
+@pytest.fixture
+def father(testapp, project, institution):
+    item = {
+        "age": 33,
+        "age_units": "year",
+        'project': project['@id'],
+        'institution': institution['@id'],
+        "sex": "M",
+    }
+    return testapp.post_json('/individual', item).json['@graph'][0]
+
+
+@pytest.fixture
+def uncle(testapp, project, institution, grandpa):
+    item = {
+        "age": 35,
+        "age_units": "year",
+        'project': project['@id'],
+        'institution': institution['@id'],
+        "sex": "M",
+        "father": grandpa['@id']
+    }
+    return testapp.post_json('/individual', item).json['@graph'][0]
+
+
+@pytest.fixture
+def child(testapp, project, institution, mother, father):
+    item = {
+        "age": 7,
+        "age_units": "year",
+        'project': project['@id'],
+        'institution': institution['@id'],
+        "sex": "M",
+        "mother": mother['@id'],
+        "father": father['@id']
+    }
+    return testapp.post_json('/individual', item).json['@graph'][0]
+
+
+@pytest.fixture
+def cousin(testapp, project, institution, uncle):
+    item = {
+        "age": 11,
+        "age_units": "year",
+        'project': project['@id'],
+        'institution': institution['@id'],
+        "sex": "F",
+        "father": uncle['@id']
+    }
+    return testapp.post_json('/individual', item).json['@graph'][0]
+
+
+@pytest.fixture
+def sister(testapp, project, institution, mother):
+    item = {
+        "age": 11,
+        "age_units": "year",
+        'project': project['@id'],
+        'institution': institution['@id'],
+        "sex": "F",
+        "mother": mother['@id']
+    }
+    return testapp.post_json('/individual', item).json['@graph'][0]
+
+
+@pytest.fixture
+def fam(testapp, project, female_individual, institution, grandpa, mother, father, uncle, child, cousin, sister):
+    item = {
+        "project": project['@id'],
+        "institution": institution['@id'],
+        "title": "Smith family",
+        "proband": child['@id'],
+        "members": [
+            child['@id'],
+            sister['@id'],
+            mother['@id'],
+            father['@id'],
+            uncle['@id'],
+            cousin['@id'],
+            grandpa['@id'],
+            female_individual['@id']
+        ]
+    }
+    return testapp.post_json('/family', item).json['@graph'][0]
 
 
 @pytest.fixture
@@ -407,3 +541,172 @@ def quality_metric_fastqc(testapp, project, institution):
         "institution": institution['@id']
     }
     return testapp.post_json('/quality_metric_fastqc', item).json['@graph'][0]
+
+
+@pytest.fixture
+def rel_disorders():
+    return [
+        {
+            'disorder_id': 'MONDO:0400005',
+            'status': 'released',
+            'disorder_name': 'refeeding syndrome',
+            'disorder_url': 'http://purl.obolibrary.org/obo/MONDO_0400005',
+        },
+        {
+            'disorder_id': 'MONDO:0400004',
+            'status': 'released',
+            'disorder_name': 'phrynoderma',
+            'disorder_url': 'http://purl.obolibrary.org/obo/MONDO_0400004',
+        },
+        {
+            'disorder_id': 'MONDO:0300000',
+            'status': 'released',
+            'disorder_name': 'SSR3-CDG',
+            'disorder_url': 'http://purl.obolibrary.org/obo/MONDO_0300000',
+        },
+        {
+            'disorder_id': 'MONDO:0200000',
+            'status': 'released',
+            'disorder_name': 'uterine ligament adenosarcoma',
+            'disorder_url': 'http://purl.obolibrary.org/obo/MONDO_0200000'
+        }
+    ]
+
+
+@pytest.fixture
+def delobs_disorders():
+    return [
+        {
+            'disorder_id': 'MONDO:9999998',
+            'status': 'deleted',
+            'disorder_name': 'colored thumbs',
+            'disorder_url': 'http://purl.obolibrary.org/obo/MONDO_9999998'
+        },
+        {
+            'disorder_id': 'MONDO:9999999',
+            'status': 'obsolete',
+            'disorder_name': 'green thumbs',
+            'disorder_url': 'http://purl.obolibrary.org/obo/MONDO_9999999'
+        }
+    ]
+
+
+@pytest.fixture
+def phenotypes():
+    return [
+        {
+            'hpo_id': 'HP:0001507',
+            'status': 'released',
+            'phenotype_name': 'growth abnormality',
+            'hpo_url': 'http://purl.obolibrary.org/obo/HP_00001507',
+            'is_slim_for': 'Phenotype abnormality'
+        },
+        {
+            'hpo_id': 'HP:0040064',
+            'status': 'released',
+            'phenotype_name': 'Abnormality of limbs',
+            'hpo_url': 'http://purl.obolibrary.org/obo/HP_0040064',
+            'is_slim_for': 'Phenotype abnormality'
+        },
+        {
+            'hpo_id': 'HP:3000008',
+            'status': 'released',
+            'phenotype_name': 'Abnormality of mylohyoid muscle',
+            'hpo_url': 'http://purl.obolibrary.org/obo/HP_3000008'
+        },
+        {
+            'hpo_id': 'HP:0010708',
+            'status': 'released',
+            'phenotype_name': '1-5 finger syndactyly',
+            'hpo_url': 'http://purl.obolibrary.org/obo/HP_0010708'
+        }
+    ]
+
+
+@pytest.fixture
+def raw_item_dict():
+    return {
+        'string_field': 'a_string',
+        'list_string_field': ['a_string', 'b_string', 'c_string'],
+        'int_field': 1,
+        'num_field': 1.1,
+        'boolean_field': True,
+        'list_int_field': [1, 2, 3],
+        'list_num_field': [1.1, 2.2, 3.3],
+        'linked_item_field': 'uuid1',
+        'list_linked_item_field': ['uuid1', 'uuid2'],
+        'sub_embed_obj_field': {'sef1': 'string', 'sef2': 'uuid1'},
+        'list_sub_embed_obj_field': [
+            {'sef1': 'string', 'sef2': 'uuid1'},
+            {'sef1': 'string2', 'sef2': 'uuid2'}
+        ]
+    }
+
+
+@pytest.fixture
+def embedded_item_dict():
+    return {
+        'uuid': 'uuid1',
+        'string_field': 'a_string',
+        'list_string_field': ['a_string', 'b_string', 'c_string'],
+        'int_field': 1,
+        'num_field': 1.1,
+        'boolean_field': True,
+        'list_int_field': [1, 2, 3],
+        'list_num_field': [1.1, 2.2, 3.3],
+        'linked_item_field': {
+            'uuid': 'uuid1',
+            'display_title': 'dt1',
+            '@type': ['Item'],
+            'embedded_field1': 'val1',
+            'embedded_item_field': {'uuid': 'uuid1', 'display_title': 'dt1', '@type': ['Item']}
+        },
+        'list_linked_item_field': [
+            {
+                'uuid': 'uuid1',
+                'display_title': 'dt1',
+                '@type': ['Item'],
+                'embedded_field1': 'val1',
+                'embedded_item_field': {'uuid': 'uuid1', 'display_title': 'dt1', '@type': ['Item']}
+            },
+            {
+                'uuid': 'uuid2',
+                'display_title': 'dt1',
+                '@type': ['Item'],
+                'embedded_field1': 'val1',
+                'embedded_item_field': {'uuid': 'uuid1', 'display_title': 'dt1', '@type': ['Item']}
+            }
+        ],
+        'sub_embed_obj_field': {
+            'sef1': 'string',
+            'sef2': {
+                'uuid': 'uuid1',
+                'display_title': 'dt1',
+                '@type': ['Item'],
+                'embedded_field1': 'val1',
+                'embedded_item_field': {'uuid': 'uuid1', 'display_title': 'dt1', '@type': ['Item']}
+            }
+        },
+        'list_sub_embed_obj_field': [
+            {
+                'sef1': 'string',
+                'sef2': {
+                    'uuid': 'uuid1',
+                    'display_title': 'dt1',
+                    '@type': ['Item'],
+                    'embedded_field1': 'val1',
+                    'embedded_item_field': {'uuid': 'uuid1', 'display_title': 'dt1', '@type': ['Item']}
+                }
+            },
+            {
+                'sef1': 'string2',
+                'sef2': {
+                    'uuid': 'uuid2',
+                    'display_title': 'dt2',
+                    '@type': ['Item'],
+                    'embedded_field1': 'val1',
+                    'embedded_item_field': {'uuid': 'uuid1', 'display_title': 'dt1', '@type': ['Item']}
+                }
+            }
+        ]
+    }

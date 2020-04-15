@@ -40,6 +40,7 @@ ORDER = [
     # 'variant', # links to ^ variant_consequence
     # 'variant_sample', # links to ^ variant
     'cohort',
+    'family',
     'individual',
     'sample',
     'workflow',
