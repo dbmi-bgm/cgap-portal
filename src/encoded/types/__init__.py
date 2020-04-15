@@ -13,6 +13,8 @@ from snovault import (
     display_title_schema
 )
 # from pyramid.traversal import find_root
+from pyramid.view import view_config
+from snovault.util import debug_log
 from .base import (
     Item,
     get_item_if_you_can,
@@ -39,6 +41,18 @@ class SampleProcessing(Item):
     item_type = 'sample_processing'
     schema = load_schema('encoded:schemas/sample_processing.json')
     embedded_list = []
+    rev = {'case': ('ReportStream', 'sample_processing')}
+
+    @calculated_property(schema={
+        "title": "Case",
+        "description": "The case this sample processing is for",
+        "type": "string",
+        "linkTo": "ReportStream"
+    })
+    def case(self, request):
+        rs = self.rev_link_atids(request, "case")
+        if rs:
+            return rs
 
 
 @collection(
