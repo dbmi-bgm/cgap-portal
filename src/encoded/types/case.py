@@ -29,7 +29,7 @@ log = structlog.getLogger(__name__)
         'description': 'Listing of Cases',
     })
 class Case(Item):
-    item_type = 'report_stream'
+    item_type = 'case'
     name_key = 'accession'
     schema = load_schema('encoded:schemas/case.json')
     embedded_list = [
