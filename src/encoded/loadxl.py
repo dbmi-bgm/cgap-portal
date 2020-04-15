@@ -39,6 +39,7 @@ ORDER = [
     'cohort',
     'family',
     'individual',
+    'case',
     'sample',
     'workflow',
 ]
