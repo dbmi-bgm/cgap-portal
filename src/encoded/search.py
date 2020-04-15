@@ -74,6 +74,27 @@ ELASTIC_SEARCH_QUERY_KEYWORDS = [
 ]
 
 
+class SearchException(Exception):
+    """ Base Search Exception - not meant to be used directly """
+    def __init__(self, func, msg=None):
+        if msg is None:
+            msg = 'Exception occurred in search code at stage %s' % func
+        super(SearchException, self).__init__(msg)
+        self.func = func
+
+
+class QueryConstructionException(SearchException):
+    """
+    Query construction exception - throw this if we should throw an exception in query building
+    due to invalid query params
+    """
+    def __init__(self, query_type, func, msg=None):
+        if msg is None:
+            msg = 'Exception occurred during query building at query type %s in func %s' % (query_type, func)
+        super(QueryConstructionException, self).__init__(func, msg)
+        self.query_type = query_type
+
+
 @view_config(route_name='search', request_method='GET', permission='search')
 @debug_log
 def search(context, request, search_type=None, return_generator=False, forced_type='Search', custom_aggregations=None):
@@ -948,9 +969,14 @@ def construct_nested_sub_queries(query_field, filters, key='must_terms'):
     :param filters: all filters
     :param key: one of 'must' or 'must_not'
     :return: a lucene sub-query filtering the query field based on the given filters
+    :raises: QueryConstructionException if bad params make it here
     """
     if key not in ['must_terms', 'must_not_terms']:
-        raise RuntimeError('Tried to handle nested filter with key other than must/must_not: %s' % key)
+        raise QueryConstructionException(
+            query_type='nested',
+            func='construct_nested_sub_queries',
+            msg='Tried to handle nested filter with key other than must/must_not: %s' % key
+        )
 
     # handle length 0, 1 and n cases
     try:
@@ -1098,7 +1124,11 @@ def handle_nested_filters(nested_filters, final_filters, key='must'):
     """
     key_map = {MUST: MUST_NOT, MUST_NOT: MUST}
     if key not in key_map:
-        raise RuntimeError('Tried to handle nested filter with key other than must/must_not: %s' % key)
+        raise QueryConstructionException(
+            query_type='nested',
+            func='handle_nested_filters',
+            msg='Tried to handle nested filter with key other than must/must_not: %s' % key
+        )
 
     # iterate through all nested filters
     for field, query in nested_filters:
@@ -1139,7 +1169,11 @@ def handle_nested_filters(nested_filters, final_filters, key='must'):
                 if len(query) == 1:
                     query = query[0]
                 else:
-                    raise Exception  # malformed
+                    raise QueryConstructionException(
+                        query_type='nested',
+                        func='handle_nested_filters',
+                        msg='Malformed entry on query field: %s' % query
+                    )
 
             # Check that key is in the sub-query first, it's possible that it in fact uses it's opposite
             # This can happen when adding no value, the opposite 'key' can occur in the sub-query
@@ -1155,7 +1189,11 @@ def handle_nested_filters(nested_filters, final_filters, key='must'):
                 if SHOULD in outer_query[BOOL]:
                     sub_query = query
                 else:
-                    raise Exception  # malformed
+                    raise QueryConstructionException(
+                        query_type='bool',
+                        func='handle_nested_filters',
+                        msg='BOOL container in parent query requires SHOULD component in sub-query, got: %s' % query
+                    )
 
             # Otherwise, we have a standard 'match' and must repeat 'options' work here since its
             # possible we are the first nested field on the given path
@@ -1674,13 +1712,19 @@ def set_additional_aggregations(search_as_dict, request, doc_types, extra_aggreg
     if schema.get('aggregations'):
         for schema_agg_name in schema['aggregations'].keys():
             if schema_agg_name == 'all_items':
-                raise Exception('all_items is a reserved agg name and not allowed as an extra aggregation name.')
+                raise QueryConstructionException(
+                    query_type='aggregations',
+                    func='set_additional_aggregations',
+                    msg='all_items is a reserved agg name and not allowed as an extra aggregation name.')
             search_as_dict['aggs'][schema_agg_name] = schema['aggregations'][schema_agg_name]
 
     if extra_aggregations:
         for extra_agg_name in extra_aggregations.keys():
             if extra_agg_name == 'all_items':
-                raise Exception('all_items is a reserved agg name and not allowed as an extra aggregation name.')
+                raise QueryConstructionException(
+                    query_type='extra_aggregations',
+                    func='set_additional_aggregations',
+                    msg='all_items is a reserved agg name and not allowed as an extra aggregation name.')
             search_as_dict['aggs'][extra_agg_name] = extra_aggregations[extra_agg_name]
 
     return search_as_dict
@@ -1714,7 +1758,7 @@ def execute_search(search):
         else:
             err_exp = 'The search failed due to a transport error: ' + str(exc)
     except Exception as exc:
-        err_exp = 'The search failed. The DCIC team has been notified.'
+        err_exp = str(exc)
     if err_exp:
         raise HTTPBadRequest(explanation=err_exp)
     return es_results
