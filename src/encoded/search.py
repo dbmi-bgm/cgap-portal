@@ -3,6 +3,7 @@ import math
 import itertools
 from pyramid.view import view_config
 from webob.multidict import MultiDict
+from functools import reduce
 from snovault import (
     AbstractCollection,
     TYPES,
@@ -83,7 +84,7 @@ def search(context, request, search_type=None, return_generator=False, forced_ty
     # list of item types used from the query
     doc_types = set_doc_types(request, types, search_type)
     # calculate @type
-    search_types = [dt + 'SearchResults' for dt in doc_types if dt != 'Item']
+    search_types = build_search_types(types, doc_types)
     search_types.append(forced_type)  # the old base search type
     # sets request.normalized_params
     search_base = normalize_query(request, types, doc_types)
@@ -226,6 +227,38 @@ def collection_view(context, request):
     This is a redirect directly to the search page
     """
     return search(context, request, context.type_info.name, False, forced_type='Search')
+
+
+def build_search_types(types, doc_types):
+    """ Builds search_types based on the given doc_types
+    :param types: TypesTool from the registry
+    :param doc_types: Type names we would like to search on
+    :return: search_types, or a list of 'SearchResults' type candidates
+    """
+    search_types = []
+    if len(doc_types) == 1:  # if we have one, add it and its base_type
+        ti = types[doc_types[0]]
+        search_types.append(ti.name + "SearchResults")
+        if hasattr(ti, 'base_types'):
+            for base_type in ti.base_types:
+                search_types.append(base_type + "SearchResults")
+
+    # If we have more than one, compute and add common ancestors to search_types
+    # TODO: handle more than 2 common ancestors
+    else:
+        base_types = []
+        for ti in doc_types:
+            if hasattr(types[ti], 'base_types'):
+                base_types.append(set(types[ti].base_types))
+        common_ancestors = reduce(lambda x, y: x & y, base_types)
+        if not common_ancestors:
+            raise HTTPBadRequest("Tried to search on types with no common ancestor. This should never happen.")
+
+        for ancestor in common_ancestors:
+            if ancestor != "Item":
+                search_types.append(ancestor + "SearchResults")
+        search_types.append("ItemSearchResults")
+    return search_types
 
 
 def get_es_index(request, doc_types):
