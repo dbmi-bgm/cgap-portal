@@ -2,7 +2,7 @@ dist: trusty
 language: python
 sudo: true
 python:
-  - "3.4"
+  - "3.6"
 if: tag IS blank
 cache:
   directories:
@@ -29,13 +29,6 @@ env:
   - SNO_REPO="snovault"
 before_install:
 - python -c "import fcntl; fcntl.fcntl(1, fcntl.F_SETFL, 0)"
-- SNO_PATH="snovault = git https://github.com/$USER/$SNO_REPO.git rev="
-- SNO_BRANCH=$(grep "${SNO_PATH}" buildout.cfg | sed "s@$SNO_PATH@@")
-- SNO_STATUS=$(curl -s "https://api.travis-ci.org/$USER/$SNO_REPO.svg?branch=$SNO_BRANCH"
-  | grep pass)
-- ! "if [ -z \"$SNO_STATUS\" ]; then\n    echo \"Snovault branch build for $SNO_BRANCH
-  is failing; exiting build\"\n    travis_terminate\nelse\n    echo \"Snovault branch
-  $SNO_BRANCH is okay with build status: $SNO_STATUS\"\nfi\n"
 - echo $tibanna_deploy
 - postgres --version
 - initdb --version
@@ -46,23 +39,21 @@ install:
 # need to manually change the version of six used by Travis for some reason
 - pip uninstall -y six
 - pip install six==1.11.0
+- pip install --upgrade pip==19.0.3
+- pip install poetry
 - pip install coveralls
 - pip install codacy-coverage
-- pip install -U zc.buildout setuptools
-- buildout bootstrap
-- bin/buildout || (echo "Retrying buildout" && bin/buildout )
-- pip show pytest
-- pip install pytest==2.9.1
-- pip show pytest
+- poetry install
+- make npm-setup
 before_script:
-- bin/configure-kibana-index --es-endpoint search-fourfront-builds-uhevxdzfcv7mkm5pj5svcri3aq.us-east-1.es.amazonaws.com:80
+- configure-kibana-index --es-endpoint search-fourfront-builds-uhevxdzfcv7mkm5pj5svcri3aq.us-east-1.es.amazonaws.com:80
 script:
 # setone is essentially all tests that are not indexing; change here for clarity
 - travis_wait 30 bin/test -v -v --aws-auth -m "working" --durations=10
   --cov src/encoded --es search-fourfront-builds-uhevxdzfcv7mkm5pj5svcri3aq.us-east-1.es.amazonaws.com:80;
 after_script:
 - echo leader=$BUILD_LEADER status=$BUILD_AGGREGATE_STATUS
-- bin/wipe-test-indices $TRAVIS_JOB_ID search-fourfront-builds-uhevxdzfcv7mkm5pj5svcri3aq.us-east-1.es.amazonaws.com:80
+- wipe-test-indices $TRAVIS_JOB_ID search-fourfront-builds-uhevxdzfcv7mkm5pj5svcri3aq.us-east-1.es.amazonaws.com:80
 after_success:
 - coveralls
 - ! "if test -n \"$NPM\"; then \n   cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js\n
@@ -79,7 +70,7 @@ after_success:
 - ! "if [ \"$BUILD_LEADER\" = \"YES\" ]; then\n  if [ \"$BUILD_AGGREGATE_STATUS\"
   = \"others_succeeded\" ]; then\n    if [ \"$TRAVIS_PULL_REQUEST\" = \"false\" ];
   then\n      echo \"cleanup build artifacts\"\n      rm elasticsearch-5.4.1.deb\n
-  \     rm .to_export_back\n      rm versions.cfg\n      pip install awsebcli\n      bin/aws
+  \     rm .to_export_back\n      rm versions.cfg\n      pip install awsebcli\n      aws
   s3 cp --recursive s3://encoded-4dn-conf-prod/.aws /home/travis/.aws\n      git remote
   add origin-travis https://${GH_TOKEN}@github.com/4dn-dcic/fourfront.git\n      git
   config --global user.email \"travis@builder.com\"\n      git config --global user.name

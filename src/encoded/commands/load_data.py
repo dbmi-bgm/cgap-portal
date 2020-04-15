@@ -2,12 +2,15 @@ import argparse
 import logging
 import structlog
 
-from pyramid.path import DottedNameResolver
+from dcicutils.env_utils import is_stg_or_prd_env
 from pyramid.paster import get_app
+from pyramid.path import DottedNameResolver
 from .. import configure_dbsession
 
 
 log = structlog.getLogger(__name__)
+
+
 EPILOG = __doc__
 
 
@@ -23,7 +26,7 @@ def main():
     parser.add_argument('--app-name', help="Pyramid app name in configfile")
     parser.add_argument('config_uri', help="path to configfile")
     parser.add_argument('--prod', action='store_true',
-                        help="must be set to run on webprod/webprod2")
+                        help="must be set to confirm this action is intended to happen on a production server")
     parser.add_argument('--overwrite', action='store_true',
                         help="must be set to update existing uuids with patch")
     args = parser.parse_args()
@@ -42,6 +45,8 @@ def main():
 
     # do not run on elasticbeanstalk environments unless using --prod flag
     if env and not args.prod:
+        # NOTE: The cgap logic is different from Fourfront, but Will thinks rightly so.
+        #       Use care if these two files ever get folded. -kmp 9-Apr-2020
         log.info('load_data: skipping, since on %s and --prod not used' % env)
         return
 
