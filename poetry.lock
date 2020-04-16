@@ -252,7 +252,7 @@ description = "Storage support for 4DN Data Portals."
 name = "dcicsnovault"
 optional = false
 python-versions = ">=3.4,<3.7"
-version = "2.1.2b0"
+version = "2.2.0"
 
 [package.dependencies]
 MarkupSafe = ">=0.23,<1"
@@ -268,7 +268,7 @@ aws_requests_auth = ">=0.4.1,<0.5.0"
 awscli = ">=1.15.42,<2.0.0"
 "backports.statistics" = "0.1.0"
 boto3 = ">=1.7.42,<2.0.0"
-dcicutils = ">=0.12.0,<1"
+dcicutils = ">=0.15.0,<1"
 elasticsearch_dsl = ">=5.3.0,<6.0.0"
 future = ">=0.15.2,<0.16.0"
 futures = ">=3.1.1,<4.0.0"
@@ -311,7 +311,7 @@ description = "Utility package for interacting with the 4DN Data Portal and othe
 name = "dcicutils"
 optional = false
 python-versions = ">=3.4,<3.7"
-version = "0.14.0"
+version = "0.15.0"
 
 [package.dependencies]
 aws-requests-auth = ">=0.4.2,<1"
@@ -1453,11 +1453,11 @@ description = "HTTP library with thread-safe connection pooling, file post, and 
 name = "urllib3"
 optional = false
 python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*, <4"
-version = "1.25.8"
+version = "1.25.9"
 
 [package.extras]
 brotli = ["brotlipy (>=0.6.0)"]
-secure = ["pyOpenSSL (>=0.14)", "cryptography (>=1.3.4)", "idna (>=2.0.0)", "certifi", "ipaddress"]
+secure = ["certifi", "cryptography (>=1.3.4)", "idna (>=2.0.0)", "pyOpenSSL (>=0.14)", "ipaddress"]
 socks = ["PySocks (>=1.5.6,<1.5.7 || >1.5.7,<2.0)"]
 
 [[package]]
@@ -1666,7 +1666,7 @@ transaction = ">=1.6.0"
 test = ["zope.testing"]
 
 [metadata]
-content-hash = "58aa35185ccd273ebdd4e51cbd304ab46b9d2adfab9026231b2a2d96b409ea63"
+content-hash = "70dd715555235d89eed4f480541b055c386780ae25376191cd4a2f7d8e37b5cb"
 python-versions = ">=3.5,<3.7"
 
 [metadata.files]
@@ -1813,12 +1813,12 @@ cryptography = [
     {file = "cryptography-2.9.tar.gz", hash = "sha256:0cacd3ef5c604b8e5f59bf2582c076c98a37fe206b31430d0cd08138aff0986e"},
 ]
 dcicsnovault = [
-    {file = "dcicsnovault-2.1.2b0-py3-none-any.whl", hash = "sha256:80838e9e45abf22d3bfd15d1071975cce9d37710491ed0ca428bc0dd3b33c6d4"},
-    {file = "dcicsnovault-2.1.2b0.tar.gz", hash = "sha256:c0d734c2f8c25d469f040c8926e7de2aea232a93638b0edbe9fedcf2969cdd01"},
+    {file = "dcicsnovault-2.2.0-py3-none-any.whl", hash = "sha256:32ed80ff18bbc693437d00658b1a48fff2c1ffee5a562d3728e6d3fb47af3fa6"},
+    {file = "dcicsnovault-2.2.0.tar.gz", hash = "sha256:83bf879d05a6a20183bb8695559c7daa591b86e664dfebb288d6c864a4d83ed7"},
 ]
 dcicutils = [
-    {file = "dcicutils-0.14.0-py3-none-any.whl", hash = "sha256:d0717460419194cf0a59986be5432d9765829c95bb0537dde036a613be2dea7d"},
-    {file = "dcicutils-0.14.0.tar.gz", hash = "sha256:f2225c85fc6c01f7ff3c900acc00e9670d86e2db61bb8911af3eed2de2b0a697"},
+    {file = "dcicutils-0.15.0-py3-none-any.whl", hash = "sha256:fd3d3c6e0342803bb8a2669dd51ed825a6ca4fde70a8824eb9904ad42745d37d"},
+    {file = "dcicutils-0.15.0.tar.gz", hash = "sha256:78730bbee5e2310ae405a0b4490e78453ee82423b8e53532da9d6d32b9367f90"},
 ]
 decorator = [
     {file = "decorator-4.4.2-py2.py3-none-any.whl", hash = "sha256:41fa54c2a0cc4ba648be4fd43cff00aedf5b9465c9bf18d64325bc225f08f760"},
@@ -2349,8 +2349,8 @@ translationstring = [
     {file = "translationstring-1.3.tar.gz", hash = "sha256:4ee44cfa58c52ade8910ea0ebc3d2d84bdcad9fa0422405b1801ec9b9a65b72d"},
 ]
 urllib3 = [
-    {file = "urllib3-1.25.8-py2.py3-none-any.whl", hash = "sha256:2f3db8b19923a873b3e5256dc9c2dedfa883e33d87c690d9c7913e1f40673cdc"},
-    {file = "urllib3-1.25.8.tar.gz", hash = "sha256:87716c2d2a7121198ebcb7ce7cccf6ce5e9ba539041cfbaeecfb641dc0bf6acc"},
+    {file = "urllib3-1.25.9-py2.py3-none-any.whl", hash = "sha256:88206b0eb87e6d677d424843ac5209e3fb9d0190d0ee169599165ec25e9d9115"},
+    {file = "urllib3-1.25.9.tar.gz", hash = "sha256:3018294ebefce6572a474f0604c2021e33b3fd8006ecd11d62107a5d2a963527"},
 ]
 venusian = [
     {file = "venusian-1.2.0-py2.py3-none-any.whl", hash = "sha256:2f2d077a1eedc3fda40425f65687c8c494da7e83d7c23bc2c4d1a40eb3ca5b6d"},
