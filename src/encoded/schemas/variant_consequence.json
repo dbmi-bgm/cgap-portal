@@ -62,13 +62,13 @@
         },
         "location": {
             "title": "Location",
-            "description": "The location within the gene upon which the variant has its consequence",
+            "description": "The location within the gene/transcript upon which the variant has its consequence",
             "type": "string",
             "enum": ["splice region", "CDS", "miRNA", "UTR"]
         },
-        "conseq_summary": {
-            "title": "Consequence",
-            "description": "Summarized consequence of variant",
+        "coding_effect": {
+            "title": "Coding Effect",
+            "description": "Effect of variant that resides within the coding sequence",
             "type": "string",
             "enum": ["Nonsense", "Frameshift", "Stop lost", "Start lost", "inframe indel", "Missense", "Synonymous"]
         }
