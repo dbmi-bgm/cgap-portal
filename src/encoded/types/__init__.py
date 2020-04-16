@@ -83,9 +83,10 @@ class Report(Item):
         "description": "A calculated title for every object in 4DN",
         "type": "string"
     })
-    def display_title(self, request, accession, case=None):
+    def display_title(self, request, accession):
+        case = self.rev_link_atids(request, "case")
         if case:
-            case_props = get_item_if_you_can(request, case, 'cases')
+            case_props = get_item_if_you_can(request, case[0], 'cases')
             if case_props and case_props.get('case_id'):
                 return case_props['case_id'] + ' Case Report'
         return accession
