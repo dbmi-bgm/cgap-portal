@@ -56,6 +56,42 @@ class SampleProcessing(Item):
 
 
 @collection(
+    name='reports',
+    properties={
+        'title': 'Reports',
+        'description': 'Listing of Reports',
+    })
+class Report(Item):
+    item_type = 'report'
+    schema = load_schema('encoded:schemas/report.json')
+    embedded_list = []
+    rev = {'case': ('Case', 'report')}
+
+    @calculated_property(schema={
+        "title": "Case",
+        "description": "The case this sample processing is for",
+        "type": "string",
+        "linkTo": "Case"
+    })
+    def case(self, request):
+        rs = self.rev_link_atids(request, "case")
+        if rs:
+            return rs[0]
+
+    @calculated_property(schema={
+        "title": "Display Title",
+        "description": "A calculated title for every object in 4DN",
+        "type": "string"
+    })
+    def display_title(self, request, accession, case=None):
+        if case:
+            case_props = get_item_if_you_can(request, case, 'cases')
+            if case_props and case_props.get('case_id'):
+                return case_props['case_id'] + ' Case Report'
+        return accession
+
+
+@collection(
     name='genes',
     unique_key='gene:gene_id',
     lookup_key='preferred_symbol',

@@ -40,6 +40,7 @@ ORDER = [
     'family',
     'individual',
     'case',
+    'report',
     'sample',
     'workflow',
 ]

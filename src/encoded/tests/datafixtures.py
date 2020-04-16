@@ -6,7 +6,7 @@ ORDER = [
     'user', 'project', 'institution', 'file_format', 'variant_consequence', 'cohort', 'family', 'individual',
     'sample', 'workflow', 'access_key', 'disorder', 'document', 'file_fastq',
     'file_processed', 'file_reference', 'gene', 'sample_processing', 'case',
-    'page', 'phenotype', 'quality_metric_fastqc', 'evidence_dis_pheno',
+    'report', 'page', 'phenotype', 'quality_metric_fastqc', 'evidence_dis_pheno',
     'quality_metric_bamcheck', 'quality_metric_qclist', 'quality_metric_wgs_bamqc',
     'quality_metric_vcfcheck', 'quality_metric_workflowrun', 'software', 'static_section',
     'tracking_item', 'workflow_mapping', 'workflow_run_awsem', 'workflow_run'

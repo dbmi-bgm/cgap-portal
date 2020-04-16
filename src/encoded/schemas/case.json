@@ -23,9 +23,9 @@
         "accession" : {
             "accessionType" : "CA"
         },
-        "title": {
-            "title": "Title",
-            "description": "Title for this Case",
+        "case_id": {
+            "title": "Case ID",
+            "description": "An identifier for this case",
             "type": "string"
         },
         "description": {
@@ -44,6 +44,12 @@
             "description": "Downstream analysis performed on relevant sample",
             "type": "string",
             "linkTo": "SampleProcessing"
+        },
+        "report": {
+            "title": "Report",
+            "description": "The report generated from this case",
+            "type": "string",
+            "linkTo": "Report"
         }
     }
 }

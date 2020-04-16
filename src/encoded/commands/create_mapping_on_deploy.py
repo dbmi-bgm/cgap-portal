@@ -36,6 +36,7 @@ ITEM_INDEX_ORDER = [
     'Disorder',
     'Individual',
     'Case',
+    'Report',
     'Document',
     'QualityMetricBamcheck',
     'QualityMetricFastqc',
