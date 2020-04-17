@@ -52,7 +52,7 @@ def get_local_git_version():
     return subprocess.check_output(['git', 'describe', '--dirty']).decode('utf-8').strip('\n')
 
 
-def get_version():  # This logic (perhaps most or all of this file) should move to dcicutils
+def get_app_version():  # This logic (perhaps most or all of this file) should move to dcicutils
     try:
         return get_eb_bundled_version() or get_local_git_version()
     except Exception:
@@ -61,7 +61,7 @@ def get_version():  # This logic (perhaps most or all of this file) should move 
 
 def build_ini_stream_from_template(template_file_name, init_file_stream):
     extra_vars = {
-        'EB_APP_VERSION': get_version(),
+        'APP_VERSION': get_app_version(),
         'PROJECT_VERSION': toml.load(PYPROJECT_FILE_NAME)['tool']['poetry']['version']
     }
 

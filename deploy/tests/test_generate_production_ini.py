@@ -17,7 +17,7 @@ from ..generate_production_ini import (
     template_environment_names,
     get_local_git_version,
     get_eb_bundled_version,
-    get_version,
+    get_app_version,
     EB_MANIFEST_FILENAME,
     PYPROJECT_FILE_NAME,
 )
@@ -130,7 +130,7 @@ def test_build_ini_file_from_template():
                         'OOPS = "$NOT_AN_ENV_VAR"\n'
                         'HMMM = "${NOT_AN_ENV_VAR_EITHER}"\n'
                         'SHHH = "$RDS_PASSWORD"\n'
-                        'VERSION = "${EB_APP_VERSION}"\n'
+                        'VERSION = "${APP_VERSION}"\n'
                         'PROJECT_VERSION = "${PROJECT_VERSION}"\n'
                     )
                 elif filename == PYPROJECT_FILE_NAME:
@@ -232,7 +232,7 @@ def test_build_ini_file_from_template():
         # assert False, "PASSED"
 
 
-def test_get_version():
+def test_get_app_version():
 
     with mock.patch('subprocess.check_output') as mock_check_output:
 
@@ -241,20 +241,20 @@ def test_get_version():
             with mock.patch("io.open") as mock_open:
                 mock_open.return_value = StringIO('{"VersionLabel": "%s"}' % MOCKED_BUNDLE_VERSION)
                 mock_check_output.side_effect = make_mocked_check_output_for_get_version()
-                assert get_version() == MOCKED_BUNDLE_VERSION
+                assert get_app_version() == MOCKED_BUNDLE_VERSION
 
         mock_check_output.side_effect = make_mocked_check_output_for_get_version()
-        assert get_version() == MOCKED_LOCAL_GIT_VERSION
+        assert get_app_version() == MOCKED_LOCAL_GIT_VERSION
 
         # Simulate 'git' command not found.
         mock_check_output.side_effect = make_mocked_check_output_for_get_version(simulate_git_command=False)
-        v = get_version()
+        v = get_app_version()
         assert re.match("^unknown-version-at-[0-9]+$", v)
 
         assert not os.environ.get('EB_CONFIG_SOURCE_BUNDLE')
         # Simulate 'git' repo not found.
         mock_check_output.side_effect = make_mocked_check_output_for_get_version(simulate_git_repo=False)
-        v = get_version()
+        v = get_app_version()
         assert re.match("^unknown-version-at-[0-9]+$", v)
 
 
