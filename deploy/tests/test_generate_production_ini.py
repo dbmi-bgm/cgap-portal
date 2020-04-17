@@ -17,8 +17,9 @@ from ..generate_production_ini import (
     template_environment_names,
     get_local_git_version,
     get_eb_bundled_version,
-    get_version,
+    get_app_version,
     EB_MANIFEST_FILENAME,
+    PYPROJECT_FILE_NAME,
 )
 
 
@@ -67,7 +68,7 @@ def test_template_environment_names():
 MOCKED_SOURCE_BUNDLE = "/some/source/bundle"
 MOCKED_BUNDLE_VERSION = 'v-12345-bundle-version'
 MOCKED_LOCAL_GIT_VERSION = 'v-67890-git-version'
-
+MOCKED_PROJECT_VERSION = '11.22.33'
 
 def make_mocked_check_output_for_get_version(simulate_git_command=True, simulate_git_repo=True):
     def mocked_check_output(command):
@@ -111,7 +112,8 @@ def test_build_ini_file_from_template():
             def __exit__(self, type, value, traceback):
                 self.FILE_SYSTEM[self.filename] = self.output_string_stream.getvalue().strip().split('\n')
 
-        def mocked_open(filename, mode):
+        def mocked_open(filename, mode='r', encoding=None):
+            assert encoding in (None, 'utf-8')
             # In this test there are two opens, one for read and one for write, so we discriminate on that basis.
             print("Enter mock_open", filename, mode)
             if mode == 'r':
@@ -128,7 +130,17 @@ def test_build_ini_file_from_template():
                         'OOPS = "$NOT_AN_ENV_VAR"\n'
                         'HMMM = "${NOT_AN_ENV_VAR_EITHER}"\n'
                         'SHHH = "$RDS_PASSWORD"\n'
-                        'VERSION = "${EB_APP_VERSION}"'
+                        'VERSION = "${APP_VERSION}"\n'
+                        'PROJECT_VERSION = "${PROJECT_VERSION}"\n'
+                    )
+                elif filename == PYPROJECT_FILE_NAME:
+                    print("reading mocked TOML FILE", PYPROJECT_FILE_NAME)
+                    return StringIO(
+                        '[something]\n'
+                        'version = "5.6.7"\n'
+                        '[tool.poetry]\n'
+                        'author = "somebody"\n'
+                        'version = "%s"\n' % MOCKED_PROJECT_VERSION
                     )
                 else:
                     raise AssertionError("mocked_open(%r, %r) unsupported." % (filename, mode))
@@ -154,6 +166,7 @@ def test_build_ini_file_from_template():
             'HMMM = "${NOT_AN_ENV_VAR_EITHER}"',
             'SHHH = "my-secret"',
             'VERSION = "%s"' % MOCKED_BUNDLE_VERSION,
+            'PROJECT_VERSION = "%s"' % MOCKED_PROJECT_VERSION,
         ]
 
         MockFileStream.reset()
@@ -178,6 +191,7 @@ def test_build_ini_file_from_template():
             'HMMM = "${NOT_AN_ENV_VAR_EITHER}"',
             'SHHH = "my-secret"',
             'VERSION = "%s"' % MOCKED_LOCAL_GIT_VERSION,
+            'PROJECT_VERSION = "%s"' % MOCKED_PROJECT_VERSION,
         ]
 
         MockFileStream.reset()
@@ -209,6 +223,7 @@ def test_build_ini_file_from_template():
             'HMMM = "${NOT_AN_ENV_VAR_EITHER}"',
             'SHHH = "my-secret"',
             'VERSION = "unknown-version-at-20010203045506000000"',  # We mocked datetime.datetime.now() to get this
+            'PROJECT_VERSION = "%s"' % MOCKED_PROJECT_VERSION,
         ]
 
         MockFileStream.reset()
@@ -217,7 +232,7 @@ def test_build_ini_file_from_template():
         # assert False, "PASSED"
 
 
-def test_get_version():
+def test_get_app_version():
 
     with mock.patch('subprocess.check_output') as mock_check_output:
 
@@ -226,20 +241,20 @@ def test_get_version():
             with mock.patch("io.open") as mock_open:
                 mock_open.return_value = StringIO('{"VersionLabel": "%s"}' % MOCKED_BUNDLE_VERSION)
                 mock_check_output.side_effect = make_mocked_check_output_for_get_version()
-                assert get_version() == MOCKED_BUNDLE_VERSION
+                assert get_app_version() == MOCKED_BUNDLE_VERSION
 
         mock_check_output.side_effect = make_mocked_check_output_for_get_version()
-        assert get_version() == MOCKED_LOCAL_GIT_VERSION
+        assert get_app_version() == MOCKED_LOCAL_GIT_VERSION
 
         # Simulate 'git' command not found.
         mock_check_output.side_effect = make_mocked_check_output_for_get_version(simulate_git_command=False)
-        v = get_version()
+        v = get_app_version()
         assert re.match("^unknown-version-at-[0-9]+$", v)
 
         assert not os.environ.get('EB_CONFIG_SOURCE_BUNDLE')
         # Simulate 'git' repo not found.
         mock_check_output.side_effect = make_mocked_check_output_for_get_version(simulate_git_repo=False)
-        v = get_version()
+        v = get_app_version()
         assert re.match("^unknown-version-at-[0-9]+$", v)
 
 
