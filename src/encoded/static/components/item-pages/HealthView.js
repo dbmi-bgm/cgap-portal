@@ -115,7 +115,7 @@ export default class HealthView extends React.PureComponent {
                     },
                     'namespace': {
                         title : "Namespace",
-                        description : "Similar to the Beanstalk Environment, but if there is a cloned environment with a fourfront-foo-1 and fourfront-foo-2, this is just the shared part (fourfront-foo)."
+                        description : "The ElasticSearch namespace to use. This is often the same as the Beanstalk Environment, but don't rely on that."
                     },
                     'ontology_updated' : {
                         title : 'Last Ontology Update',
