@@ -69,3 +69,7 @@ elasticsearch-*.deb
 # Conventions vary, including env, venv, or longer names like cgap_env,
 # but typically they end in "env".
 *env/
+
+# Saved configurations from Elastic beanstalk that have been downloaded.
+.elasticbeanstalk/saved_configs/
+
