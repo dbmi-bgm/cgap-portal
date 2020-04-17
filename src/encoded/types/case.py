@@ -48,6 +48,7 @@ class Case(Item):
         "individual.samples.specimen_notes",
         "individual.samples.specimen_collection_date",
         "individual.samples.specimen_accession_date",
+        "individual.samples.sequencing_date",
         "individual.samples.workup_type",
         "individual.samples.processed_files",
         "individual.samples.processed_files.workflow_run_outputs",
@@ -68,8 +69,12 @@ class Case(Item):
         "individual.samples.files.quality_metric.url",
         "individual.samples.files.quality_metric.status",
         "individual.samples.completed_processes",
+        "sample_processing.analysis_type",
         "sample_processing.last_modified.*",
         "sample_processing.families.family_id",
+        "sample_processing.families.proband.individual_id",
+        "sample_processing.families.mother.individual_id",
+        "sample_processing.families.father.individual_id",
         "sample_processing.families.accession",
         "sample_processing.samples.accession",
         "sample_processing.samples.specimen_collection_date",
@@ -77,6 +82,7 @@ class Case(Item):
         "sample_processing.samples.other_specimen_ids.*",
         "sample_processing.samples.individual.individual_id",
         "sample_processing.samples.last_modified.*",
+        "sample_processing.samples.workup_type",
         "sample_processing.processed_files",
         "sample_processing.processed_files.last_modified.*",
         "sample_processing.processed_files.quality_metric",
@@ -99,6 +105,8 @@ class Case(Item):
         "sample_processing.sample_processed_files.processed_files.quality_metric.url",
         "sample_processing.sample_processed_files.processed_files.quality_metric.status",
         "sample_processing.completed_processes",
+        "report.last_modified.*",
+        "report.status"
     ]
 
     @calculated_property(schema={
