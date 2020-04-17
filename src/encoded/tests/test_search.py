@@ -38,7 +38,7 @@ def recursively_find_uuids(json, uuids):
 def test_search_view(workbook, testapp):
     """ Test basic things about search view """
     res = testapp.get('/search/?type=Item').json
-    assert res['@type'] == ['Search']
+    assert res['@type'] == ['ItemSearchResults', 'Search']
     assert res['@id'] == '/search/?type=Item'
     assert res['@context'] == '/terms/'
     assert res['notification'] == 'Success'
@@ -55,7 +55,7 @@ def test_search_with_no_query(workbook, testapp):
     thus, should satisfy same assertions as test_search_view
     """
     res = testapp.get('/search/').follow(status=200)
-    assert res.json['@type'] == ['Search']
+    assert res.json['@type'] == ['ItemSearchResults', 'Search']
     assert res.json['@id'] == '/search/?type=Item'
     assert res.json['@context'] == '/terms/'
     assert res.json['notification'] == 'Success'
@@ -76,7 +76,7 @@ def test_collections_redirect_to_search(workbook, testapp):
     redirected_from is not used for search
     """
     res = testapp.get('/user/', status=301).follow(status=200)
-    assert res.json['@type'] == ['UserSearchResults', 'Search']
+    assert res.json['@type'] == ['UserSearchResults', 'ItemSearchResults', 'Search']
     assert res.json['@id'] == '/search/?type=User'
     assert 'redirected_from' not in res.json['@id']
     assert res.json['@context'] == '/terms/'
@@ -484,10 +484,10 @@ def test_search_with_static_header(workbook, testapp):
 
 
 def test_search_multiple_types(workbook, testapp):
-    # multiple types work with @type in response
+    """ Note that the behavior now is in '@type' will be the highest common ancestor if searched on multiple types """
     search = '/search/?type=Individual&type=Workflow'
     res = testapp.get(search).json
-    assert res['@type'] == ['IndividualSearchResults', 'WorkflowSearchResults', 'Search']
+    assert res['@type'] == ['ItemSearchResults', 'Search']
 
 
 #########################################
@@ -557,35 +557,134 @@ def test_index_data_workbook(app, workbook, testapp, indexer_testapp, htmltestap
                 pass
 
 
-######################################
-## Search-based visualization tests ##
-######################################
+def test_search_nested(workbook, testapp):
+    """
+    Tests multiple search conditions that are handled differently under mapping type=nested
+    TODO: Test with 'No value'
+    TODO: Test with range values (does any data exist that can test this?)
+    """
+
+    # helpers for checking which cohort was returned
+    # first two take in the object itself
+    def is_blue_thumbs(result):
+        return 'Blue' in result['title']
+
+    def is_red_feet(result):
+        return 'Red' in result['title']
+
+    # this one takes in '@graph'
+    def result_contains_both(result):
+        compound = True
+        for res in result:
+            compound = compound and (is_blue_thumbs(res) or is_red_feet(res))
+        return compound
+
+    # Should match only once since one has a family with a proband with display_title GAPID8J9B9CR
+    res = testapp.get('/search/?type=Cohort'
+                      '&families.proband.display_title=GAPID8J9B9CR').json
+    assert len(res['@graph']) == 1
+    assert is_blue_thumbs(res['@graph'][0])
+
+    # Should match both because both cohorts since this is interpreted as an OR search on this field
+    res = testapp.get('/search/?type=Cohort'
+                      '&families.proband.display_title=GAPID8J9B9CR'
+                      '&families.proband.display_title=GAPID5HBSLG6').json
+    assert len(res['@graph']) == 2
+    assert result_contains_both(res['@graph'])
+
+    # This has clinic notes that do not match with the proband object, so will give no results
+    testapp.get('/search/?type=Cohort'
+                      '&families.proband.display_title=GAPID8J9B9CR'
+                      '&families.clinic_notes=gnitset', status=404)
+
+    # This has the correct 'clinic_notes', so should match
+    res = testapp.get('/search/?type=Cohort'
+                      '&families.proband.display_title=GAPID5HBSLG6'
+                      '&families.clinic_notes=testing').json
+    assert len(res['@graph']) == 1
+    assert is_blue_thumbs(res['@graph'][0])
+
+    # Do the same search but OR on clinic_notes, should get both cohorts now
+    res = testapp.get('/search/?type=Cohort'
+                      '&families.proband.display_title=GAPID5HBSLG6'
+                      '&families.clinic_notes=xyz'
+                      '&families.clinic_notes=testing').json
+    assert len(res['@graph']) == 2
+    assert result_contains_both(res['@graph'])
+
+    # Do the same search but OR on clinic_notes with a negative, should again match only 1
+    res = testapp.get('/search/?type=Cohort'
+                      '&families.proband.display_title=GAPID5HBSLG6'
+                      '&families.clinic_notes!=xyz').follow().json
+    assert len(res['@graph']) == 1
+    assert is_blue_thumbs(res['@graph'][0])
+
+    # Search not on the other clinic notes
+    res = testapp.get('/search/?type=Cohort'
+                      '&families.proband.display_title=GAPID5HBSLG6'
+                      '&families.clinic_notes!=testing').follow().json
+    assert len(res['@graph']) == 1
+    assert is_red_feet(res['@graph'][0])
+
+    # Check two properties that occur in the same sub-embedded object in 1 cohort
+    res = testapp.get('/search/?type=Cohort'
+                      '&families.members.mother.display_title=GAPID6ZUDPO2'
+                      '&families.members.father.display_title=GAPIDRU2NWFO').json
+    assert len(res['@graph']) == 1
+    assert is_blue_thumbs(res['@graph'][0])
+
+    # Check two properties that occur in the same sub-embedded object in 2 cohorts
+    res = testapp.get('/search/?type=Cohort'
+                      '&families.members.mother.display_title=GAPIDISC7R73'
+                      '&families.members.father.display_title=GAPID3PW26SK').json
+    assert len(res['@graph']) == 2
+    assert result_contains_both(res['@graph'])
+
+    # Check three properties - two of which occur in the same sub-embedded object in
+    # 2 cohorts with an additional property that removes both
+    testapp.get('/search/?type=Cohort'
+                '&families.members.mother.display_title=GAPIDISC7R73'
+                '&families.members.father.display_title=GAPID3PW26SK'
+                '&families.proband.display_title=GAPID8J9B9CR', status=404)
+
+    # Do same as above except with expected proband
+    res = testapp.get('/search/?type=Cohort'
+                      '&families.members.mother.display_title=GAPIDISC7R73'
+                      '&families.members.father.display_title=GAPID3PW26SK'
+                      '&families.proband.display_title=GAPID5HBSLG6').json
+    assert len(res['@graph']) == 2
+    assert result_contains_both(res['@graph'])
+
+    # Change parents - this time only one should have it
+    res = testapp.get('/search/?type=Cohort'
+                      '&families.members.mother.display_title=GAPID6ZUDPO2'
+                      '&families.members.father.display_title=GAPIDRU2NWFO'
+                      '&families.proband.display_title=GAPID8J9B9CR').json
+    assert len(res['@graph']) == 1
+    assert is_blue_thumbs(res['@graph'][0])
+
+    # Swap the parents
+    testapp.get('/search/?type=Cohort'
+                '&families.members.mother.display_title=GAPID3PW26SK'
+                '&families.members.father.display_title=GAPIDISC7R73', status=404)
+
+    # Swap the father
+    testapp.get('/search/?type=Cohort'
+                '&families.members.mother.display_title=GAPIDISC7R73'
+                '&families.members.father.display_title=GAPIDRU2NWFO', status=404)
+
+    # Swap the mother
+    testapp.get('/search/?type=Cohort'
+                '&families.members.mother.display_title=GAPID6ZUDPO2'
+                '&families.members.father.display_title=GAPIDISC7R73', status=404)
 
 
-@pytest.mark.skip # XXX: No bar_plot_aggregations
-def test_barplot_aggregation_endpoint(workbook, testapp):
-
-    # Check what we get back -
-    search_result = testapp.get('/search/?type=Cohort').json
-    search_result_count = len(search_result['@graph'])
-
-    # We should get back same count as from search results here. But on Travis oftentime we don't, so we compare either against count of inserts --or-- count returned from regular results.
-    exp_set_test_inserts = list(get_inserts('inserts', 'cohort'))
-    count_exp_set_test_inserts = len(exp_set_test_inserts)
-
-    # Now, test the endpoint after ensuring we have the data correctly loaded into ES.
-    # We should get back same count as from search results here.
-    res = testapp.post_json('/bar_plot_aggregations', {
-        "search_query_params" : { "type" : ['User'] },
-        "fields_to_aggregate_for" : ["experiments_in_set.experiment_type.display_title", "project.project"]
-    }).json
-
-    # Our total count for experiment_sets should match # of exp_set_replicate inserts.abs
-
-    assert (res['total']['experiment_sets'] == count_exp_set_test_inserts) or (res['total']['experiment_sets'] == search_result_count)
-
-    assert res['field'] == 'experiments_in_set.experiment_type.display_title' # top level field
-
-    assert isinstance(res['terms'], dict) is True
-
-    assert len(res["terms"].keys()) > 0
+# TODO: write test that examines facets for correctness
+def test_search_nested_facets_are_correct(workbook, testapp):
+    """ Tests that nested facets are properly rendered """
+    facets = testapp.get('/search/?type=Cohort'
+                         '&families.proband.display_title=GAPID8J9B9CR').json['facets']
+    for facet in facets:
+        if facet['field'] == 'families.proband.display_title':
+            assert len(facet['terms']) > 1  # there should be multiple if nested agg is working here
+            break

@@ -8,15 +8,33 @@
         "families": [
             {
                 "members": ["5ec91041-78a0-4758-abef-21c7f5fd9f12", "5ec91041-78a0-4758-abef-21c7f5fd9f34","5ec91041-78a0-4758-abef-21c7f5fd9f56","5ec91041-78a0-4758-abef-21c7f5fd9f78","5ec91041-78a0-4758-abef-21c7f5fd9f91","5ec91041-78a0-4758-abef-21c7f5fd9f92"],
-                "proband": "5ec91041-78a0-4758-abef-21c7f5fd9f12",
-                "original_pedigree": "dcf15d5e-40aa-43bc-b81c-32c70c9afc50"
+                "proband": "GAPID8J9B9CR",
+                "original_pedigree": "dcf15d5e-40aa-43bc-b81c-32c70c9afc50",
+                "clinic_notes": "abcd"
             },
             {
                 "members": ["5ec91041-78a0-4758-abef-21c7f5fd9f21", "5ec91041-78a0-4758-abef-21c7f5fd9f22","5ec91041-78a0-4758-abef-21c7f5fd9f23","5ec91041-78a0-4758-abef-21c7f5fd9f24","5ec91041-78a0-4758-abef-21c7f5fd9f25"],
-                "proband": "5ec91041-78a0-4758-abef-21c7f5fd9f21",
-                "original_pedigree": "dcf15d5e-40aa-43bc-b81c-32c70c9afc52"
+                "proband": "GAPID5HBSLG6",
+                "original_pedigree": "dcf15d5e-40aa-43bc-b81c-32c70c9afc52",
+                "clinic_notes": "testing"
             }
         ],
         "description": "These people have been affected by a novel disease which can emerge at any age. The initial symptoms include gastrointestinal pains followed a few days later by bluing of some extremities. Death occurs usually within 2 years of onset."
+    },
+    {
+        "title": "People with Red Feet",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "institution": "hms-dbmi",
+        "status": "released",
+        "uuid": "cc7d83a2-6886-4ca0-9402-7c49734cf3c5",
+        "families": [
+            {
+                "members": ["5ec91041-78a0-4758-abef-21c7f5fd9f21", "5ec91041-78a0-4758-abef-21c7f5fd9f22","5ec91041-78a0-4758-abef-21c7f5fd9f23","5ec91041-78a0-4758-abef-21c7f5fd9f24","5ec91041-78a0-4758-abef-21c7f5fd9f25"],
+                "proband": "GAPID5HBSLG6",
+                "original_pedigree": "dcf15d5e-40aa-43bc-b81c-32c70c9afc52",
+                "clinic_notes": "xyz"
+            }
+        ],
+        "description": "These people have been affected by a novel disease which can emerge at any age. The initial symptoms include gastrointestinal pains followed a few days later by redding of some extremities. Death occurs usually within 2 years of onset."
     }
 ]
