@@ -12,6 +12,8 @@ import sys
 import toml
 import argparse
 
+from dcicutils.env_utils import is_stg_or_prd_env
+
 
 _MY_DIR = os.path.dirname(__file__)
 TEMPLATE_DIR = os.path.join(_MY_DIR, "ini_files")
@@ -20,10 +22,15 @@ PYPROJECT_DIR = os.path.dirname(_MY_DIR)
 PYPROJECT_FILE_NAME = os.path.join(PYPROJECT_DIR, "pyproject.toml")
 
 
-def build_ini_file_from_template(template_file_name, init_file_name):
+def build_ini_file_from_template(template_file_name, init_file_name,
+                                 bs_env=None, data_set=None, es_server=None, es_namespace=None):
     with io.open(init_file_name, 'w') as init_file_fp:
         build_ini_stream_from_template(template_file_name=template_file_name,
-                                       init_file_stream=init_file_fp)
+                                       init_file_stream=init_file_fp,
+                                       bs_env=bs_env,
+                                       data_set=data_set,
+                                       es_server=es_server,
+                                       es_namespace=es_namespace)
 
 
 # Ref: https://stackoverflow.com/questions/19911123/how-can-you-get-the-elastic-beanstalk-application-version-in-your-application
@@ -59,10 +66,36 @@ def get_app_version():  # This logic (perhaps most or all of this file) should m
         return 'unknown-version-at-' + datetime.datetime.now().strftime("%Y%m%d%H%M%S%f")
 
 
-def build_ini_stream_from_template(template_file_name, init_file_stream):
+def build_ini_stream_from_template(template_file_name, init_file_stream,
+                                   bs_env=None, data_set=None, es_server=None, es_namespace=None):
+    """
+    Sends output to init_file_stream corresponding to the data noe would want in an ini file
+    for the given template_file_name and available environment variables.
+
+    Args:
+        template_file_name: The template file to guide the output.
+        init_file_stream: A stream to send output to.
+        bs_env: A beanstalk environment.
+        data_set: 'test' or 'prod'. Default is 'test' unless bs_env is a staging or production environment.
+        es_server: The name of an es server to use.
+        es_namespace: The namespace to use on the es server. If None, this uses the bs_env.
+
+    Returns: None
+
+    """
+
+    es_server = es_server or os.environ.get('ENCODED_ES_SERVER', "MISSING_ENCODED_ES_SERVER")
+    bs_env = bs_env or os.environ.get("ENCODED_BS_ENV", "MISSING_ENCODED_BS_ENV")
+    data_set = data_set or os.environ.get("ENCODED_DATA_SET", "prod" if is_stg_or_prd_env(bs_env) else "test")
+    es_namespace = es_namespace or os.environ.get("ENCODED_ES_NAMESPACE", bs_env)
+
     extra_vars = {
         'APP_VERSION': get_app_version(),
-        'PROJECT_VERSION': toml.load(PYPROJECT_FILE_NAME)['tool']['poetry']['version']
+        'PROJECT_VERSION': toml.load(PYPROJECT_FILE_NAME)['tool']['poetry']['version'],
+        'ES_SERVER': es_server,
+        'BS_ENV': bs_env,
+        'DATA_SET': data_set,
+        'ES_NAMESPACE': es_namespace,
     }
 
     # We assume these variables are not set, but best to check first. Confusion might result otherwise.
@@ -135,12 +168,27 @@ def main():
         parser.add_argument("--target",
                             help="the name of a .ini file to generate",
                             default=INI_FILE_NAME)
+        parser.add_argument("--bs_env",
+                            help="an ElasticBeanstalk environment name",
+                            default=None)
+        parser.add_argument("--data_set",
+                            help="a data set name",
+                            choices=['test', 'prod'],
+                            default=None)
+        parser.add_argument("--es_server",
+                            help="an ElasticSearch servername or servername:port",
+                            default=None)
+        parser.add_argument("--es_namespace",
+                            help="an ElasticSearch namespace",
+                            default=None)
         args = parser.parse_args()
         template_file_name = environment_template_filename(args.env)
         ini_file_name = args.target
         # print("template_file_name=", template_file_name)
         # print("ini_file_name=", ini_file_name)
-        build_ini_file_from_template(template_file_name, ini_file_name)
+        build_ini_file_from_template(template_file_name, ini_file_name,
+                                     bs_env=args.bs_env, data_set=args.data_set,
+                                     es_server=args.es_server, es_namespace=args.es_namespace)
     except Exception as e:
         print(e)
         sys.exit(1)
