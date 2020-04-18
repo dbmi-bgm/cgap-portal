@@ -74,6 +74,14 @@ export default class HealthView extends React.PureComponent {
                 <h3 className="text-400 mb-2 mt-3">Configuration</h3>
                 {typeof context.description == "string" ? <p className="description">{context.description}</p> : null}
                 <ItemDetailList excludedKeys={ItemDetailList.Detail.defaultProps.excludedKeys.concat(['content'])} hideButtons context={context} schemas={schemas} keyTitleDescriptionMap={{
+                    'aggregations' : {
+                        title : 'Aggregations',
+                        description : "Aggregations of ES-indexed data."
+                    },
+                    'beanstalk_app_version': {
+                        title : "Beanstalk App Version",
+                        description : "Unique descriptive identifier for this app's ElasticBeanstalk source bundle."
+                    },
                     'blob_bucket' : {
                         title : "Blob Bucket",
                         description : "Name of S3 bucket used for blob data."
@@ -97,21 +105,33 @@ export default class HealthView extends React.PureComponent {
                         title : "File Upload Bucket",
                         description : "Where uploaded files are stored."
                     },
+                    'foursight' : {
+                        title : "Foursight",
+                        description : "URI of corresponding Foursight page."
+                    },
                     'load_data' : {
-                        title : "Data Loaded",
+                        title : "Loaded Data",
                         description : "Data which was loaded into database on initialization or boot."
+                    },
+                    'namespace': {
+                        title : "Namespace",
+                        description : "The ElasticSearch namespace to use. This is often the same as the Beanstalk Environment, but don't rely on that."
                     },
                     'ontology_updated' : {
                         title : 'Last Ontology Update',
                         description : "Last time ontologies were updated."
                     },
+                    'processed_file_bucket' : {
+                        title : 'Processed File Bucket',
+                        description : "Name of S3 bucket used for workflow output files from processing steps."
+                    },
+                    'project_version': {
+                        title : "Project Version",
+                        description : "Software version for this portal's software."
+                    },
                     'system_bucket' : {
                         title : 'System Bucket',
                         description : "Name of S3 Bucket used for system data."
-                    },
-                    'aggregations' : {
-                        title : 'Aggregations',
-                        description : "Aggregations of ES-indexed data."
                     }
                 }} />
 
