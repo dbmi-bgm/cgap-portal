@@ -705,14 +705,46 @@ class TestNestedSearch(object):
 
     def test_nested_search_with_no_value_combined(self, workbook, testapp):
         """ Tests searching on 'No value' combined with another nested field, in this case
-            should give no results """
+            should give no results (no matter the ordering) """
         testapp.get('/search/?type=Cohort'
                     '&families.clinic_notes=No+value'
                     '&families.proband.display_title=GAPID8J9B9CR', status=404)
         testapp.get('/search/?type=Cohort'
+                    '&families.proband.display_title=GAPID8J9B9CR'
+                    '&families.clinic_notes=No+value', status=404)
+        testapp.get('/search/?type=Cohort'
                     '&families.clinic_notes=No+value'
                     '&families.proband.display_title=GAPIDISC7R74', status=404)
+        testapp.get('/search/?type=Cohort'
+                    '&families.proband.display_title=GAPIDISC7R74'
+                    '&families.clinic_notes=No+value', status=404)
 
+    def test_search_nested_with_non_nested_fields(self, workbook, testapp):
+        """ Tests that combining a nested search with a non-nested one works in any order """
+        res = testapp.get('/search/?type=Cohort'
+                          '&families.clinic_notes=No+value'
+                          '&title=People+with+Swollen+Ears').json
+        self.assert_length_is_expected(res, 1)
+        assert self.is_swollen_ears(res['@graph'][0])
+        res = testapp.get('/search/?type=Cohort'
+                          '&title=People+with+Swollen+Ears'
+                          '&families.clinic_notes=No+value').json
+        self.assert_length_is_expected(res, 1)
+        assert self.is_swollen_ears(res['@graph'][0])
+
+    def test_search_nested_no_value_with_multiple_other_fields(self, workbook, testapp):
+        """ Tests that combining a 'No value' search with another nested search and a different non-nested
+            field works correctly """
+        res = testapp.get('/search/?type=Cohort'
+                          '&title=People+with+Swollen+Ears'
+                          '&families.clinic_notes=No+value'
+                          '&families.proband=GAPID5HBSLG6').follow().json
+        self.assert_length_is_expected(res, 1)
+        assert self.is_swollen_ears(res['@graph'][0])
+        testapp.get('/search/?type=Cohort'
+                    '&title=People+with+Swollen+Ears'
+                    '&families.clinic_notes=No+value'
+                    '&families.proband=GAPIDISC7R74', status=404)  # proband should disqualify
 
     def test_search_nested_facets_are_correct(self, workbook, testapp):
         """ Tests that nested facets are properly rendered """
