@@ -1154,7 +1154,11 @@ def handle_nested_filters(nested_filters, final_filters, key='must'):
 
                         # if we don't have options, our original 'query' is what we need
                         else:
-                            _q[NESTED][QUERY][BOOL][key].append(query[BOOL][key][0])
+                            insertion_point = _q[NESTED][QUERY][BOOL]
+                            if key not in insertion_point:  # this can happen if we are combining with 'No value'
+                                _q[NESTED][QUERY][BOOL][key] = query[BOOL][key][0]
+                            else:
+                                _q[NESTED][QUERY][BOOL][key].append(query[BOOL][key][0])
 
                         found = True  # break is not sufficient, see below
                         break

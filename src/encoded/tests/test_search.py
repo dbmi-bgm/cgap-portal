@@ -709,10 +709,9 @@ class TestNestedSearch(object):
         testapp.get('/search/?type=Cohort'
                     '&families.clinic_notes=No+value'
                     '&families.proband.display_title=GAPID8J9B9CR', status=404)
-        # BUG: this returns results when it should not
-        # testapp.get('/search/?type=Cohort'
-        #             '&families.clinic_notes=No+value'
-        #             '&families.proband.display_title=GAPIDISC7R74', status=404)
+        testapp.get('/search/?type=Cohort'
+                    '&families.clinic_notes=No+value'
+                    '&families.proband.display_title=GAPIDISC7R74', status=404)
 
 
     def test_search_nested_facets_are_correct(self, workbook, testapp):
