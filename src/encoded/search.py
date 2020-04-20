@@ -1144,24 +1144,35 @@ def handle_nested_filters(nested_filters, final_filters, key='must'):
             if _q.get(NESTED, None):
                 if _q[NESTED][PATH] == nested_path:
                     try:
-                        # check if this field has multiple options
-                        options = query[BOOL][key][0][MATCH][field].split(',')
-                        if len(options) > 1:
+                        if isinstance(query, list):  # reject list structure, if present
+                            query = query[0]
 
-                            # construct SHOULD sub-query for all options
-                            sub_query = handle_should_query(field, options)
-                            _q[NESTED][QUERY][BOOL][key].append(sub_query)
-
-                        # if we don't have options, our original 'query' is what we need
+                        if key not in query[BOOL]:  # we are combining a different type of query on this nested path
+                            opposite_key = key_map[key]
+                            if opposite_key in query[BOOL]:
+                                _q[NESTED][QUERY][BOOL][opposite_key] = query[BOOL][opposite_key]
+                                found = True
+                                break
                         else:
-                            insertion_point = _q[NESTED][QUERY][BOOL]
-                            if key not in insertion_point:  # this can happen if we are combining with 'No value'
-                                _q[NESTED][QUERY][BOOL][key] = query[BOOL][key][0]
-                            else:
-                                _q[NESTED][QUERY][BOOL][key].append(query[BOOL][key][0])
 
-                        found = True  # break is not sufficient, see below
-                        break
+                            # check if this field has multiple options
+                            options = query[BOOL][key][0][MATCH][field].split(',')
+                            if len(options) > 1:
+
+                                # construct SHOULD sub-query for all options
+                                sub_query = handle_should_query(field, options)
+                                _q[NESTED][QUERY][BOOL][key].append(sub_query)
+
+                            # if we don't have options, our original 'query' is what we need
+                            else:
+                                insertion_point = _q[NESTED][QUERY][BOOL]
+                                if key not in insertion_point:  # this can happen if we are combining with 'No value'
+                                    _q[NESTED][QUERY][BOOL][key] = query[BOOL][key][0]
+                                else:
+                                    _q[NESTED][QUERY][BOOL][key].append(query[BOOL][key][0])
+
+                            found = True  # break is not sufficient, see below
+                            break
                     except:       # Why? We found a 'range' nested query and must add this one separately
                         continue  # This behavior is absurd. Somehow it knows to combine separate nested range
                                   # queries with AND, but of course not regular queries and of course you cannot
@@ -1633,7 +1644,15 @@ def set_facets(search, facets, search_filters, string_query, request, doc_types,
             if is_date_field:
                 facet['field_type'] = 'date'
             elif is_numerical_field:
-                facet['field_type'] = field_schema['type'] or "number"
+                facet["field_type"] = field_schema['type'] or "number"
+                if "number_step" not in facet:
+                    if "number_step" in field_schema:
+                        facet["number_step"] = field_schema['number_step']
+                    elif facet["field_type"] == "integer":
+                        facet["number_step"] = 1
+                    else: # Default
+                        facet["number_step"] = "any"
+            facet_filters = generate_filters_for_terms_agg_from_search_filters(query_field, search_filters, string_query)
 
             aggs[facet['aggregation_type'] + ":" + agg_name] = {
                 AGGS: {
