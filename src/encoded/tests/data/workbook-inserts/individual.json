@@ -137,5 +137,14 @@
         "uuid": "5ec91041-78a0-4758-abef-21c7f5fd9f25",
         "sex": "F",
         "is_deceased": false
+    },
+    {
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "institution": "hms-dbmi",
+        "status": "released",
+        "accession": "GAPIDISC7R74",
+        "uuid": "5ec91041-78a0-4758-abef-21c7f5fd9f26",
+        "sex": "M",
+        "is_deceased": false
     }
 ]

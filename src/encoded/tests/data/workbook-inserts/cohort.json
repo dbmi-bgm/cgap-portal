@@ -36,5 +36,23 @@
             }
         ],
         "description": "These people have been affected by a novel disease which can emerge at any age. The initial symptoms include gastrointestinal pains followed a few days later by redding of some extremities. Death occurs usually within 2 years of onset."
+    },
+    {
+        "title": "People with Swollen Ears",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "institution": "hms-dbmi",
+        "status": "released",
+        "uuid": "cc7d83a2-6886-4ca0-9402-7c49734cf3c6",
+        "families": [
+            {
+                "members": ["GAPIDISC7R74", "GAPID5HBSLG6"],
+                "proband": "GAPID5HBSLG6"
+            },
+            {
+                "proband": "GAPIDISC7R74",
+                "clinic_notes": "here are some"
+            }
+        ],
+        "description": "These two people have swollen ears."
     }
 ]

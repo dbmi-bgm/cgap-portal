@@ -557,134 +557,169 @@ def test_index_data_workbook(app, workbook, testapp, indexer_testapp, htmltestap
                 pass
 
 
-def test_search_nested(workbook, testapp):
-    """
-    Tests multiple search conditions that are handled differently under mapping type=nested
-    TODO: Test with 'No value'
-    TODO: Test with range values (does any data exist that can test this?)
-    """
+class TestNestedSearch(object):
+    """ This class encapsulates all helper methods and tests needed to test out nested searches """
 
-    # helpers for checking which cohort was returned
-    # first two take in the object itself
+    FACET_TO_CHECK = 'families.proband.display_title'
+
+    @staticmethod
+    def assert_length_is_expected(result, expected):
+        assert len(result['@graph']) == expected
+
+    @staticmethod
     def is_blue_thumbs(result):
+        """ Checks that this result is the 'People with Blue Thumbs' cohort """
         return 'Blue' in result['title']
 
+    @staticmethod
     def is_red_feet(result):
+        """ Checks that this result is the 'People with Red Feet' cohort """
         return 'Red' in result['title']
 
-    # this one takes in '@graph'
-    def result_contains_both(result):
+    @staticmethod
+    def is_swollen_ears(result):
+        """ Checks that this result is the 'People with Swollen Ears' cohort """
+        return 'Swollen' in result['title']
+
+    @staticmethod
+    def result_contains_two(result, f1, f2):
         compound = True
         for res in result:
-            compound = compound and (is_blue_thumbs(res) or is_red_feet(res))
+            compound = compound and (f1(res) or f2(res))
         return compound
 
-    # Should match only once since one has a family with a proband with display_title GAPID8J9B9CR
-    res = testapp.get('/search/?type=Cohort'
-                      '&families.proband.display_title=GAPID8J9B9CR').json
-    assert len(res['@graph']) == 1
-    assert is_blue_thumbs(res['@graph'][0])
+    @staticmethod
+    def result_contains_all(result, f1, f2, f3):
+        compound = True
+        for res in result:
+            compound = compound and (f1(res) or f2(res) or f3(res))
+        return compound
 
-    # Should match both because both cohorts since this is interpreted as an OR search on this field
-    res = testapp.get('/search/?type=Cohort'
-                      '&families.proband.display_title=GAPID8J9B9CR'
-                      '&families.proband.display_title=GAPID5HBSLG6').json
-    assert len(res['@graph']) == 2
-    assert result_contains_both(res['@graph'])
+    def test_search_on_single_nested_field(self, workbook, testapp):
+        """ Should match only once since one has a family with a proband with display_title GAPID8J9B9CR """
+        res = testapp.get('/search/?type=Cohort'
+                          '&families.proband.display_title=GAPID8J9B9CR').json
+        self.assert_length_is_expected(res, 1)
+        assert self.is_blue_thumbs(res['@graph'][0])
 
-    # This has clinic notes that do not match with the proband object, so will give no results
-    testapp.get('/search/?type=Cohort'
-                      '&families.proband.display_title=GAPID8J9B9CR'
-                      '&families.clinic_notes=gnitset', status=404)
+    def test_or_search_on_same_nested_field(self, workbook, testapp):
+        """ Should match all 3 since this is interpreted as an OR search on this field """
+        res = testapp.get('/search/?type=Cohort'
+                          '&families.proband.display_title=GAPID8J9B9CR'
+                          '&families.proband.display_title=GAPID5HBSLG6').json
+        self.assert_length_is_expected(res, 3)
+        assert self.result_contains_all(res['@graph'], self.is_blue_thumbs, self.is_red_feet, self.is_swollen_ears)
 
-    # This has the correct 'clinic_notes', so should match
-    res = testapp.get('/search/?type=Cohort'
-                      '&families.proband.display_title=GAPID5HBSLG6'
-                      '&families.clinic_notes=testing').json
-    assert len(res['@graph']) == 1
-    assert is_blue_thumbs(res['@graph'][0])
+    def test_and_search_on_nested_field_that_does_not_match(self, workbook, testapp):
+        """ This has clinic notes that do not match with any proband object, so will give no results """
+        testapp.get('/search/?type=Cohort'
+                    '&families.proband.display_title=GAPID8J9B9CR'
+                    '&families.clinic_notes=gnitset', status=404)
 
-    # Do the same search but OR on clinic_notes, should get both cohorts now
-    res = testapp.get('/search/?type=Cohort'
-                      '&families.proband.display_title=GAPID5HBSLG6'
-                      '&families.clinic_notes=xyz'
-                      '&families.clinic_notes=testing').json
-    assert len(res['@graph']) == 2
-    assert result_contains_both(res['@graph'])
+    def test_and_search_on_nested_field_that_matches_one(self, workbook, testapp):
+        """ This has the correct 'clinic_notes', so should match """
+        res = testapp.get('/search/?type=Cohort'
+                          '&families.proband.display_title=GAPID5HBSLG6'
+                          '&families.clinic_notes=testing').json
+        self.assert_length_is_expected(res, 1)
+        assert self.is_blue_thumbs(res['@graph'][0])
 
-    # Do the same search but OR on clinic_notes with a negative, should again match only 1
-    res = testapp.get('/search/?type=Cohort'
-                      '&families.proband.display_title=GAPID5HBSLG6'
-                      '&families.clinic_notes!=xyz').follow().json
-    assert len(res['@graph']) == 1
-    assert is_blue_thumbs(res['@graph'][0])
+    def test_or_search_on_nested_clinic_notes_that_matches_two(self, workbook, testapp):
+        """ Do an OR search on clinic_notes, matching two cohorts """
+        res = testapp.get('/search/?type=Cohort'
+                          '&families.proband.display_title=GAPID5HBSLG6'
+                          '&families.clinic_notes=xyz'
+                          '&families.clinic_notes=testing').json
+        self.assert_length_is_expected(res, 2)
+        assert self.result_contains_two(res['@graph'], self.is_blue_thumbs, self.is_red_feet)
 
-    # Search not on the other clinic notes
-    res = testapp.get('/search/?type=Cohort'
-                      '&families.proband.display_title=GAPID5HBSLG6'
-                      '&families.clinic_notes!=testing').follow().json
-    assert len(res['@graph']) == 1
-    assert is_red_feet(res['@graph'][0])
+    def test_negative_search_on_clinic_notes(self, workbook, testapp):
+        """ Do an OR search with clinic_notes with a negative, should eliminate red_feet and match swollen_ears """
+        res = testapp.get('/search/?type=Cohort'
+                          '&families.proband.display_title=GAPID5HBSLG6'
+                          '&families.clinic_notes!=xyz').follow().json
+        self.assert_length_is_expected(res, 2)
+        assert self.result_contains_two(res['@graph'], self.is_blue_thumbs, self.is_swollen_ears)
 
-    # Check two properties that occur in the same sub-embedded object in 1 cohort
-    res = testapp.get('/search/?type=Cohort'
-                      '&families.members.mother.display_title=GAPID6ZUDPO2'
-                      '&families.members.father.display_title=GAPIDRU2NWFO').json
-    assert len(res['@graph']) == 1
-    assert is_blue_thumbs(res['@graph'][0])
+    def test_and_search_that_matches_one(self, workbook, testapp):
+        """ Check two properties that occur in the same sub-embedded object in 1 cohort """
+        res = testapp.get('/search/?type=Cohort'
+                          '&families.members.mother.display_title=GAPID6ZUDPO2'
+                          '&families.members.father.display_title=GAPIDRU2NWFO').json
+        self.assert_length_is_expected(res, 1)
+        assert self.is_blue_thumbs(res['@graph'][0])
 
-    # Check two properties that occur in the same sub-embedded object in 2 cohorts
-    res = testapp.get('/search/?type=Cohort'
-                      '&families.members.mother.display_title=GAPIDISC7R73'
-                      '&families.members.father.display_title=GAPID3PW26SK').json
-    assert len(res['@graph']) == 2
-    assert result_contains_both(res['@graph'])
+    def test_and_search_that_matches_multiple(self, workbook, testapp):
+        """ Check two properties that occur in the same sub-embedded object in 3 cohorts """
+        res = testapp.get('/search/?type=Cohort'
+                          '&families.members.mother.display_title=GAPIDISC7R73'
+                          '&families.members.father.display_title=GAPID3PW26SK').json
+        self.assert_length_is_expected(res, 3)
+        assert self.result_contains_all(res['@graph'], self.is_blue_thumbs, self.is_red_feet, self.is_swollen_ears)
 
-    # Check three properties - two of which occur in the same sub-embedded object in
-    # 2 cohorts with an additional property that removes both
-    testapp.get('/search/?type=Cohort'
-                '&families.members.mother.display_title=GAPIDISC7R73'
-                '&families.members.father.display_title=GAPID3PW26SK'
-                '&families.proband.display_title=GAPID8J9B9CR', status=404)
+    def test_and_search_with_disqualifier(self, workbook, testapp):
+        """ Check three properties - two of which occur in the same sub-embedded object in
+           2 cohorts with an additional property that removes both """
+        testapp.get('/search/?type=Cohort'
+                    '&families.members.mother.display_title=GAPIDISC7R73'
+                    '&families.members.father.display_title=GAPID3PW26SK'
+                    '&families.proband.display_title=GAPID8J9B9CR', status=404)
 
-    # Do same as above except with expected proband
-    res = testapp.get('/search/?type=Cohort'
-                      '&families.members.mother.display_title=GAPIDISC7R73'
-                      '&families.members.father.display_title=GAPID3PW26SK'
-                      '&families.proband.display_title=GAPID5HBSLG6').json
-    assert len(res['@graph']) == 2
-    assert result_contains_both(res['@graph'])
+    def test_and_search_on_three_fields(self, workbook, testapp):
+        """ Search for 3 properties that all occur in the cohorts """
+        res = testapp.get('/search/?type=Cohort'
+                          '&families.members.mother.display_title=GAPIDISC7R73'
+                          '&families.members.father.display_title=GAPID3PW26SK'
+                          '&families.proband.display_title=GAPID5HBSLG6').json
+        self.assert_length_is_expected(res, 3)
+        assert self.result_contains_all(res['@graph'], self.is_blue_thumbs, self.is_red_feet, self.is_swollen_ears)
 
-    # Change parents - this time only one should have it
-    res = testapp.get('/search/?type=Cohort'
-                      '&families.members.mother.display_title=GAPID6ZUDPO2'
-                      '&families.members.father.display_title=GAPIDRU2NWFO'
-                      '&families.proband.display_title=GAPID8J9B9CR').json
-    assert len(res['@graph']) == 1
-    assert is_blue_thumbs(res['@graph'][0])
+    def test_and_search_on_three_fields_that_matches_one(self, workbook, testapp):
+        """ Change the parents such that only one cohort matches now """
+        res = testapp.get('/search/?type=Cohort'
+                          '&families.members.mother.display_title=GAPID6ZUDPO2'
+                          '&families.members.father.display_title=GAPIDRU2NWFO'
+                          '&families.proband.display_title=GAPID8J9B9CR').json
+        self.assert_length_is_expected(res, 1)
+        assert self.is_blue_thumbs(res['@graph'][0])
 
-    # Swap the parents
-    testapp.get('/search/?type=Cohort'
-                '&families.members.mother.display_title=GAPID3PW26SK'
-                '&families.members.father.display_title=GAPIDISC7R73', status=404)
+    def test_search_with_non_existant_combinations(self, workbook, testapp):
+        """ Test that swapping around fields that would match across different sub-embedded objects
+            does not actually do so (ie: returns no results). """
+        testapp.get('/search/?type=Cohort'  # Swap the parents
+                    '&families.members.mother.display_title=GAPID3PW26SK'
+                    '&families.members.father.display_title=GAPIDISC7R73', status=404)
+        testapp.get('/search/?type=Cohort'  # Swap just the father
+                    '&families.members.mother.display_title=GAPIDISC7R73'
+                    '&families.members.father.display_title=GAPIDRU2NWFO', status=404)
+        testapp.get('/search/?type=Cohort'  # Swap just the mother
+                    '&families.members.mother.display_title=GAPID6ZUDPO2'
+                    '&families.members.father.display_title=GAPIDISC7R73', status=404)
 
-    # Swap the father
-    testapp.get('/search/?type=Cohort'
-                '&families.members.mother.display_title=GAPIDISC7R73'
-                '&families.members.father.display_title=GAPIDRU2NWFO', status=404)
+    def test_nested_search_with_no_value(self, workbook, testapp):
+        """ Tests searching on 'No value' alone on a nested field  """
+        res = testapp.get('/search/?type=Cohort'
+                          '&families.clinic_notes=No+value').json
+        self.assert_length_is_expected(res, 1)
+        assert self.is_swollen_ears(res['@graph'][0])
 
-    # Swap the mother
-    testapp.get('/search/?type=Cohort'
-                '&families.members.mother.display_title=GAPID6ZUDPO2'
-                '&families.members.father.display_title=GAPIDISC7R73', status=404)
+    def test_nested_search_with_no_value_combined(self, workbook, testapp):
+        """ Tests searching on 'No value' combined with another nested field, in this case
+            should give no results """
+        testapp.get('/search/?type=Cohort'
+                    '&families.clinic_notes=No+value'
+                    '&families.proband.display_title=GAPID8J9B9CR', status=404)
+        # BUG: this returns results when it should not
+        # testapp.get('/search/?type=Cohort'
+        #             '&families.clinic_notes=No+value'
+        #             '&families.proband.display_title=GAPIDISC7R74', status=404)
 
 
-# TODO: write test that examines facets for correctness
-def test_search_nested_facets_are_correct(workbook, testapp):
-    """ Tests that nested facets are properly rendered """
-    facets = testapp.get('/search/?type=Cohort'
-                         '&families.proband.display_title=GAPID8J9B9CR').json['facets']
-    for facet in facets:
-        if facet['field'] == 'families.proband.display_title':
-            assert len(facet['terms']) > 1  # there should be multiple if nested agg is working here
-            break
+    def test_search_nested_facets_are_correct(self, workbook, testapp):
+        """ Tests that nested facets are properly rendered """
+        facets = testapp.get('/search/?type=Cohort'
+                             '&families.proband.display_title=GAPID8J9B9CR').json['facets']
+        for facet in facets:
+            if facet['field'] == self.FACET_TO_CHECK:
+                assert len(facet['terms']) > 1  # there should be multiple if nested agg is working here
+                break
