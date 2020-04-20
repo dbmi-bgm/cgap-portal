@@ -161,7 +161,8 @@ def test_image_unique_key(registry, image_data):
 def test_sample_processing_case(testapp, sample_proc, a_case):
     case = testapp.post_json('/case', a_case, status=201).json['@graph'][0]
     result = testapp.get(sample_proc['@id']).json
-    assert result.get('case', {}).get('@id') == case['@id']
+    assert len(result.get('cases', [])) == 1
+    assert result['cases'][0]['@id'] == case['@id']
 
 
 @pytest.fixture

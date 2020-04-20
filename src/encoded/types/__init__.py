@@ -44,15 +44,19 @@ class SampleProcessing(Item):
     rev = {'case': ('Case', 'sample_processing')}
 
     @calculated_property(schema={
-        "title": "Case",
-        "description": "The case this sample processing is for",
-        "type": "string",
-        "linkTo": "Case"
+        "title": "Cases",
+        "description": "The case(s) this sample processing is for",
+        "type": "array",
+        "items": {
+            "title": "Case",
+            "type": "string",
+            "linkTo": "Case"
+        }
     })
-    def case(self, request):
+    def cases(self, request):
         rs = self.rev_link_atids(request, "case")
         if rs:
-            return rs[0]
+            return rs
 
 
 @collection(
