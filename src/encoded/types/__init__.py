@@ -13,6 +13,8 @@ from snovault import (
     display_title_schema
 )
 # from pyramid.traversal import find_root
+from pyramid.view import view_config
+from snovault.util import debug_log
 from .base import (
     Item,
     get_item_if_you_can,
@@ -39,6 +41,59 @@ class SampleProcessing(Item):
     item_type = 'sample_processing'
     schema = load_schema('encoded:schemas/sample_processing.json')
     embedded_list = []
+    rev = {'case': ('Case', 'sample_processing')}
+
+    @calculated_property(schema={
+        "title": "Cases",
+        "description": "The case(s) this sample processing is for",
+        "type": "array",
+        "items": {
+            "title": "Case",
+            "type": "string",
+            "linkTo": "Case"
+        }
+    })
+    def cases(self, request):
+        rs = self.rev_link_atids(request, "case")
+        if rs:
+            return rs
+
+
+@collection(
+    name='reports',
+    properties={
+        'title': 'Reports',
+        'description': 'Listing of Reports',
+    })
+class Report(Item):
+    item_type = 'report'
+    schema = load_schema('encoded:schemas/report.json')
+    embedded_list = []
+    rev = {'case': ('Case', 'report')}
+
+    @calculated_property(schema={
+        "title": "Case",
+        "description": "The case this sample processing is for",
+        "type": "string",
+        "linkTo": "Case"
+    })
+    def case(self, request):
+        rs = self.rev_link_atids(request, "case")
+        if rs:
+            return rs[0]
+
+    @calculated_property(schema={
+        "title": "Display Title",
+        "description": "A calculated title for every object in 4DN",
+        "type": "string"
+    })
+    def display_title(self, request, accession):
+        case = self.rev_link_atids(request, "case")
+        if case:
+            case_props = get_item_if_you_can(request, case[0], 'cases')
+            if case_props and case_props.get('case_id'):
+                return case_props['case_id'] + ' Case Report'
+        return accession
 
 
 @collection(
