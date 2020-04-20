@@ -104,6 +104,8 @@ def health_check(config):
             "load_data": settings.get('load_test_data'),
             "beanstalk_env": env_name,
             "namespace": settings.get('indexer.namespace'),
+            'project_version': settings.get('encoded_version'),
+            'beanstalk_app_version': settings.get('eb_app_version'),
             "foursight": foursight_url,
             "@type": ["Health", "Portal"],
             "@context": "/health",
