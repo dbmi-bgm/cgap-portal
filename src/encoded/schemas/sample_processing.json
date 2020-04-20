@@ -25,11 +25,13 @@
             "title": "Analysis Type",
             "description": "The type of analysis performed, e.g. trio",
             "type": "string",
-            "enum": [
+            "suggested_enum": [
                 "WGS",
                 "WGS-Trio",
+                "WGS-Group",
                 "WES",
                 "WES-Trio",
+                "WES-Group",
                 "Custom"
             ]
         },
