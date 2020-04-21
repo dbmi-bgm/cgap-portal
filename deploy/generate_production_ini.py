@@ -127,6 +127,13 @@ def build_ini_stream_from_template(template_file_name, init_file_stream,
             del os.environ[key]
 
 
+def any_environment_template_filename():
+    file = os.path.join(TEMPLATE_DIR, "any.ini")
+    if not os.path.exists(file):
+        raise ValueError("Special template any.ini was not found.")
+    return file
+
+
 def environment_template_filename(env_name):
     prefixes = ["fourfront-", "cgap-"]
     short_env_name = None
@@ -182,7 +189,8 @@ def main():
                             help="an ElasticSearch namespace",
                             default=None)
         args = parser.parse_args()
-        template_file_name = environment_template_filename(args.env)
+        # template_file_name = environment_template_filename(args.env)
+        template_file_name = any_environment_template_filename()
         ini_file_name = args.target
         # print("template_file_name=", template_file_name)
         # print("ini_file_name=", ini_file_name)
