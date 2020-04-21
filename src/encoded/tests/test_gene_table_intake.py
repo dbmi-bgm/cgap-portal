@@ -51,10 +51,7 @@ def test_process_gene_table_inserts(GTParser, inserts):
 def test_post_gene_annotation_field_inserts(inserts, testapp):
     """
     Tests that we can post the processed inserts to a test app with
-    no errors.
-    Use variant_items fixture to use already generated inserts based
-    on the current mapping table
-    Post them to the testapp
+    no errors. This posts all gene annotation fields in the gene_table.
     """
     CONNECTION_URL = '/gene_annotation_field'
     for item in inserts:
