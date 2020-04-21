@@ -4,7 +4,7 @@
     "id": "/profiles/gene_annotation_field.json",
     "$schema": "http://json-schema.org/draft-04/schema#",
     "type": "object",
-    "required": ["field_name", "field_type"],
+    "required": ["field_name"],
     "identifyingProperties": ["field_name", "uuid", "aliases"],
     "additionalProperties": false,
     "mixinProperties": [
@@ -30,7 +30,8 @@
         "field_name": {
             "title": "Field Name from Mutanno",
             "description": "Original name of the field name in the mutanno database",
-            "type": "string"
+            "type": "string",
+            "uniqueKey": true
         },
         "source_name": {
             "title": "Source Name",
@@ -56,7 +57,8 @@
                 "number",
                 "integer",
                 "boolean"
-            ]
+            ],
+            "default": "string"
         },
         "is_list": {
             "title": "Is List",
@@ -93,6 +95,11 @@
                 "type": "string"
             }
         },
+       "link": {
+            "title": "Link",
+            "description": "link to external site",
+            "type": "string"
+       },
        "links_to": {
            "title": "Link To",
            "description": "Item Type that should be linked to from this field",
@@ -112,6 +119,11 @@
         "value_example": {
             "title": "Example Value for this field",
             "description": "Example Value for this field, stored as text",
+            "type": "string"
+        },
+        "comments": {
+            "title": "Comments",
+            "description": "Comments associated with this gene annotation field",
             "type": "string"
         },
         "link_substitution": {

@@ -29,7 +29,7 @@
         },
         "vcf_name": {
             "title": "Field Name on VCF",
-            "description": "Original name of the annotaion field name on vcf file",
+            "description": "Original name of the annotation field name on vcf file",
             "type": "string"
         },
         "source_name": {
