@@ -1,6 +1,6 @@
 import argparse
 import logging
-from encoded.commands.mapping_table_intake import MappingTableParser
+from encoded.commands.variant_table_intake import MappingTableParser
 from encoded.commands.ingest_vcf import VCFParser
 
 logger = logging.getLogger(__name__)
@@ -85,11 +85,11 @@ def main():
 
     NOTE: This usage will run the entire end to end process
         - bin/variant-ingestion
-            src/encoded/tests/data/sample_vcfs/mtv03.csv
+            src/encoded/tests/data/variant_workbook/variant_table.csv
             src/encoded/schemas/annotation_field.json
             src/encoded/schemas/variant.json
             src/encoded/schemas/variant_sample.json
-            src/encoded/tests/data/sample_vcfs/test_vcf.vcf
+            src/encoded/tests/data/variant_workbook/test_vcf.vcf
             hms-dbmi hms-dbmi development.ini
             --post-variants --post-variant-consequences
 

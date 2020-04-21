@@ -488,9 +488,9 @@ def main():
             --app-name: app name, usually 'app'
 
         From commands dir:
-            python mapping_table_intake.py ../tests/data/sample_vcfs/mtv03.csv ../schemas/annotation_field.json ../schemas/variant.json ../schemas/variant_sample.json ../../../production.ini --app-name app
+            python variant_table_intake.py ../tests/data/variant_workbook/variant_table.csv ../schemas/annotation_field.json ../schemas/variant.json ../schemas/variant_sample.json ../../../production.ini --app-name app
         From top level on server/local (will post inserts):
-            bin/mapping-table-intake src/encoded/tests/data/sample_vcfs/mtv03.csv src/encoded/schemas/annotation_field.json src/encoded/schemas/variant.json src/encoded/schemas/variant_sample.json development.ini --app-name app --post-inserts
+            bin/mapping-table-intake src/encoded/tests/data/variant_workbook/variant_table.csv src/encoded/schemas/annotation_field.json src/encoded/schemas/variant.json src/encoded/schemas/variant_sample.json development.ini --app-name app --post-inserts
 
     """
     logging.basicConfig()

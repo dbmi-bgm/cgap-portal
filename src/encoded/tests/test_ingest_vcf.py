@@ -1,6 +1,6 @@
 import json
 import pytest
-from encoded.tests.data.sample_vcfs.expected import (
+from encoded.tests.data.variant_workbook.expected import (
     VARIANT_SCHEMA,
     VARIANT_SAMPLE_SCHEMA,
     EXPECTED_ANNOTATION_FIELDS,
@@ -15,7 +15,7 @@ from encoded.commands.ingest_vcf import (
 @pytest.fixture
 def post_variant_consequence_items(testapp):
     """ Posts VariantConsequence items so we can post variants that link to these """
-    vcs = json.load(open('./src/encoded/tests/data/sample_vcfs/variant_consequence.json', 'r'))
+    vcs = json.load(open('./src/encoded/tests/data/variant_workbook/variant_consequence.json', 'r'))
     for entry in vcs:
         testapp.post_json('/variant_consequence', entry, status=201)
 

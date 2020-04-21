@@ -2,12 +2,12 @@ import os
 import csv
 import json
 import pytest
-from encoded.commands.mapping_table_intake import (
+from encoded.commands.variant_table_intake import (
     MappingTableParser
 )
 
 pytestmark = [pytest.mark.working]
-MT_LOC = './src/encoded/tests/data/sample_vcfs/mtv03.csv' # symlinked from encoded.commands
+MT_LOC = './src/encoded/tests/data/variant_workbook/variant_table.csv' # symlinked from encoded.commands
 ANNOTATION_FIELD_SCHEMA = './src/encoded/schemas/annotation_field.json'
 EXPECTED_FIELDS = ['no', 'vcf_name', 'source_name', 'source_version', 'sub_embedding_group',
                    'field_type', 'is_list', 'separator', 'maximum_length_of_value', 'schema_description', 'value_example',

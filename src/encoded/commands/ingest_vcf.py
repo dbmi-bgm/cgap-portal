@@ -485,7 +485,7 @@ class VCFParser(object):
     @staticmethod
     def post_variant_consequence_items(testapp, project=None, institution=None):
         """ Posts variant_consequence items under the given project/institution. Required for poasting variants. """
-        vcs = json.load(open('./src/encoded/tests/data/sample_vcfs/variant_consequence.json', 'r'))
+        vcs = json.load(open('./src/encoded/tests/data/variant_workbook/variant_consequence.json', 'r'))
         for entry in vcs:
             if project:
                 entry['project'] = project
@@ -514,7 +514,7 @@ def main():
             --app-name: app name, usually 'app'
 
         To load a vcf on the server:
-            bin/ingest-vcf src/encoded/tests/data/sample_vcfs/test_vcf.vcf src/encoded/schemas/variant.json src/encoded/schemas/variant_sample.json hms-dbmi hms-dbmi production.ini --app-name app --post-inserts
+            bin/ingest-vcf src/encoded/tests/data/variant_workbook/test_vcf.vcf src/encoded/schemas/variant.json src/encoded/schemas/variant_sample.json hms-dbmi hms-dbmi production.ini --app-name app --post-inserts
     """
     logging.basicConfig()
     parser = argparse.ArgumentParser(

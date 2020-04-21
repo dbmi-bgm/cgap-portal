@@ -43,43 +43,27 @@ class SampleProcessing(Item):
     embedded_list = []
 
 
-@collection(
-    name='genes',
-    unique_key='gene:gene_id',
-    lookup_key='preferred_symbol',
-    properties={
-        'title': 'Genes',
-        'description': 'Gene items',
-    })
-class Gene(Item):
-    """Gene class."""
-    item_type = 'gene'
-    name_key = 'gene_id'
-    schema = load_schema('encoded:schemas/gene.json')
-    embedded_list = []
-
-
-@collection(
-    name='gene-annotation-fields',
-    unique_key='gene_annotation_field:field_name',
-    properties={
-        'title': 'Gene Annotation Fields',
-        'description': 'List of gene annotation fields',
-    })
-class GeneAnnotationField(Item):
-    """Class for gene annotation fields."""
-
-    item_type = 'gene_annotation_field'
-    name_key = 'field_name'
-    schema = load_schema('encoded:schemas/gene_annotation_field.json')
-
-    @calculated_property(schema={
-        "title": "Display Title",
-        "description": "A calculated title for every object in 4DN",
-        "type": "string"
-    })
-    def display_title(self, field_name):
-        return field_name
+# @collection(
+#     name='gene-annotation-fields',
+#     unique_key='gene_annotation_field:field_name',
+#     properties={
+#         'title': 'Gene Annotation Fields',
+#         'description': 'List of gene annotation fields',
+#     })
+# class GeneAnnotationField(Item):
+#     """Class for gene annotation fields."""
+#
+#     item_type = 'gene_annotation_field'
+#     name_key = 'field_name'
+#     schema = load_schema('encoded:schemas/gene_annotation_field.json')
+#
+#     @calculated_property(schema={
+#         "title": "Display Title",
+#         "description": "A calculated title for every object in 4DN",
+#         "type": "string"
+#     })
+#     def display_title(self, field_name):
+#         return field_name
 
 
 @collection(
