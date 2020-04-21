@@ -5,7 +5,7 @@
     "$schema": "http://json-schema.org/draft-04/schema#",
     "type": "object",
     "required": ["field_name", "field_type"],
-    "identifyingProperties": ["uuid", "aliases", "vcf_name"],
+    "identifyingProperties": ["field_name", "uuid", "aliases"],
     "additionalProperties": false,
     "mixinProperties": [
       { "$ref": "mixins.json#/schema_version" },
@@ -62,6 +62,12 @@
             "title": "Is List",
             "type": "boolean",
             "description": "Whether the field is a list or not",
+            "default": false
+        },
+        "do_import": {
+            "title": "Do Import",
+            "type": "boolean",
+            "description": "Whether to do import or not (?)",
             "default": false
         },
         "separator": {

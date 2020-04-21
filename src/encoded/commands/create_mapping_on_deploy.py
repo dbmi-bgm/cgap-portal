@@ -54,6 +54,7 @@ ITEM_INDEX_ORDER = [
     'VariantSample',
     'EvidenceDisPheno',
     'Page',
+    'GeneAnnotationField',
 ]
 
 ENV_HOTSEAT = 'fourfront-cgaphot'

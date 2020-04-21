@@ -1,5 +1,4 @@
 import csv
-import sys
 import six
 import json
 import argparse
@@ -18,10 +17,7 @@ class MappingTableIntakeException(Exception):
 
 
 class MappingTableParser(object):
-    """ Class that encapsulates data/functions related to the mapping table.
-
-        XXX: Should Validate the annotation fields against the given schema?
-    """
+    """ Class that encapsulates data/functions related to the annotation field mapping table. """
     HEADER_ROW_INDEX = 2
     FIELD_TYPE_INDEX = 5  # XXX: hardcoded, must change if field_type is moved on mapping table
     INTEGER_FIELDS = ['no', 'maximum_length_of_value', 'column_priority', 'facet_priority']

@@ -1,11 +1,10 @@
-import os
-import csv
-import json
 import pytest
 from encoded.commands.variant_table_intake import (
     MappingTableParser
 )
 
+
+# XXX: These constants should probably be handled in a more intelligent way -will
 pytestmark = [pytest.mark.working]
 MT_LOC = './src/encoded/tests/data/variant_workbook/variant_table.csv' # symlinked from encoded.commands
 ANNOTATION_FIELD_SCHEMA = './src/encoded/schemas/annotation_field.json'
@@ -62,14 +61,14 @@ def test_add_default_schema_fields(MTParser):
     assert 'mixinProperties' in schema
 
 
-def test_read_mapping_table(MTParser):
+def test_read_variant_table_header(MTParser):
     """ Tests that we can read mapping table header correctly based on the current format """
     assert MTParser.version == 'annV0.3'
     assert MTParser.date == '01.29.2020'
     assert sorted(MTParser.fields) == sorted(EXPECTED_FIELDS)
 
 
-def test_process_mp_inserts(MTParser, inserts):
+def test_process_variant_table_inserts(MTParser, inserts):
     """
         Tests that we properly process annotation field inserts
         There should be 270 total. A hand crafted example is checked
@@ -199,7 +198,7 @@ def test_generate_variant_schema(MTParser, variant_items):
     assert 'transcript.vep_symbol' in schema['facets']
 
 
-def test_post_inserts(inserts, project, institution, testapp):
+def test_post_variant_annotation_field_inserts(inserts, project, institution, testapp):
     """
     Tests that we can post the processed inserts to a test app with
     no errors.
