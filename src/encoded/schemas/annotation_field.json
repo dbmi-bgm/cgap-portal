@@ -65,8 +65,8 @@
             "default": false
         },
         "separator": {
-            "title": "Seperator",
-            "description": "if value is list, use this seperator to split items",
+            "title": "Separator",
+            "description": "if value is list, use this separator to split items",
             "type": "string",
             "enum": [
                 "comma",
