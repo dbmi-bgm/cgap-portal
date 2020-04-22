@@ -12,7 +12,6 @@ beanstalk.cfg
 /docs/javascript-reference/
 /annotations.json
 /aws-ip-ranges.json
-/bin/
 /develop/
 /develop-eggs/
 /downloads/
@@ -28,7 +27,6 @@ beanstalk.cfg
 /deploy/post_deploy_testing/cypress/screenshots/
 /documentation/
 /ontology.json
-/parts/
 /session-secret.b64
 /src/encoded/static/coverage
 /src/encoded/static/components/lib/react-infinite
@@ -39,6 +37,11 @@ beanstalk.cfg
 
 /src/encoded/tests/data/temp-local-inserts/*
 !/src/encoded/tests/data/temp-local-inserts/.gitkeep
+
+/bin
+!/bin/test
+!/bin/test.py
+!/bin/macpoetry-install
 
 *.swp
 *.hprof
@@ -71,3 +74,7 @@ elasticsearch-*.deb
 # Conventions vary, including env, venv, or longer names like cgap_env,
 # but typically they end in "env".
 *env/
+
+# Saved configurations from Elastic beanstalk that have been downloaded.
+.elasticbeanstalk/saved_configs/
+

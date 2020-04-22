@@ -37,7 +37,10 @@ ORDER = [
     'phenotype',
     'disorder',
     'cohort',
+    'family',
     'individual',
+    'case',
+    'report',
     'sample',
     'workflow',
 ]

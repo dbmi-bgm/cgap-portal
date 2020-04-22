@@ -156,3 +156,38 @@ def test_image_unique_key(registry, image_data):
     image = Image.create(registry, uuid, image_data)
     keys = image.unique_keys(image.properties)
     assert 'red-dot.png' in keys['image:filename']
+
+
+def test_sample_processing_case(testapp, sample_proc, a_case):
+    case = testapp.post_json('/case', a_case, status=201).json['@graph'][0]
+    result = testapp.get(sample_proc['@id']).json
+    assert len(result.get('cases', [])) == 1
+    assert result['cases'][0]['@id'] == case['@id']
+
+
+@pytest.fixture
+def a_report(testapp, project, institution):
+    data = {
+        "project": project['@id'],
+        "institution": institution['@id'],
+        "description": "This is a report for a case."
+    }
+    return testapp.post_json('/report', data, status=201).json['@graph'][0]
+
+
+def test_report_case(testapp, a_report, a_case):
+    assert not a_report.get('case')
+    a_case['report'] = a_report['@id']
+    case = testapp.post_json('/case', a_case, status=201).json['@graph'][0]
+    report = testapp.get(a_report['@id']).json
+    assert report.get('case', {}).get('@id') == case['@id']
+
+
+def test_report_display_title(testapp, a_report, a_case):
+    a_case['report'] = a_report['@id']
+    case = testapp.post_json('/case', a_case, status=201).json['@graph'][0]
+    report = testapp.get(a_report['@id']).json
+    assert report.get('display_title') == report.get('accession')
+    patch = testapp.patch_json(case['@id'], {'case_id': '12345'}, status=200).json['@graph'][0]
+    report = testapp.get(a_report['@id']).json
+    assert report.get('display_title') == patch.get('case_id') + ' Case Report'

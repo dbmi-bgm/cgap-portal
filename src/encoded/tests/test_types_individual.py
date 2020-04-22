@@ -20,6 +20,7 @@ def WIndividual():
     }
 
 
+
 def test_post_valid_individuals(testapp, project, institution, MIndividual, WIndividual):
     """ Posts valid individuals """
     testapp.post_json('/individual', MIndividual, status=201)
@@ -48,3 +49,17 @@ def test_individual_children(testapp, project, institution, MIndividual, WIndivi
     children = testapp.get(res_m['@id']).json.get('children')
     assert len(children) == 1
     assert children[0]['@id'] == res_f['@id']
+
+
+def test_individual_families(testapp, fam, mother):
+    assert mother.get('families') == None
+    mom = testapp.get(mother['@id']).json
+    assert [f['@id'] for f in mom.get('families')] == [fam['@id']]
+
+
+def test_individual_case(testapp, child, a_case):
+    assert child.get('case') == None
+    case = testapp.post_json('/case', a_case, status=201).json['@graph'][0]
+    child_res = testapp.get(child['@id']).json
+    assert len(child_res.get('case', [])) == 1
+    assert child_res['case'][0]['@id'] == case['@id']
