@@ -1,10 +1,7 @@
-import csv
-import six
-import json
 import argparse
 import logging
 from .variant_table_intake import MappingTableParser
-from collections import OrderedDict, Mapping
+
 
 logger = logging.getLogger(__name__)
 EPILOG = __doc__
@@ -12,8 +9,8 @@ EPILOG = __doc__
 
 class GeneTableIntakeException(Exception):
     """ Specific type of exception we'd like to throw if we fail in this stage
-            due to an error with the table itself
-        """
+        due to an error with the table itself
+    """
     pass
 
 
@@ -25,6 +22,7 @@ class GeneTableParser(MappingTableParser):
         self.FIELD_TYPE_INDEX = 11
         self.INTEGER_FIELDS = ['no', 'column_priority', 'facet_priority']
         self.BOOLEAN_FIELDS = ['is_list', 'do_import']
+        self.STRING_FIELDS.extend(['schema_title', 'description', 'comments', 'link'])
         self.NAME_FIELD = 'field_name'
 
     def generate_gene_schema(self, gene_props, columns, facets):
@@ -47,3 +45,66 @@ class GeneTableParser(MappingTableParser):
         schema['columns'] = columns
         logger.info('Build gene schema')
         return schema
+
+    def run(self, gs_out=None, write=True):
+        """
+        Ingests the gene table, producing the gene schema
+
+        :param gs_out: path where to write the gene schema
+        :param write: whether or not to actually write the schema (can do dry-run)
+        :return: gene_annotation_field inserts
+        """
+        inserts = self.process_annotation_field_inserts()
+        gene_props, columns, facets = self.generate_properties(inserts)
+        gene_schema = self.generate_gene_schema(gene_props, columns, facets)
+        if write:
+            if not gs_out:
+                raise GeneTableIntakeException('Write specified but no output file given')
+            self.write_schema(gene_schema, gs_out)
+            logger.info('Successfully wrote gene schema')
+        return inserts
+
+
+def main():
+    """ Takes in the gene mapping table, produces + posts gene annotation fields and
+        writes the gene schema.
+    """
+    logging.basicConfig()
+    parser = argparse.ArgumentParser(
+        description="Takes in a mapping table and produces inserts/schemas",
+        epilog=EPILOG,
+        formatter_class=argparse.RawDescriptionHelpFormatter
+    )
+    parser.add_argument('gene_table', help='path to gene table')
+    parser.add_argument('gene_annotation_field_schema', help='path to gene annotation field schema')
+    parser.add_argument('gene', help='where to write gene schema')
+    parser.agg_argument('config_uri', help='path to app configfile')
+    parser.add_argument('--app-name', help='Pyramid app name in configfile')
+    parser.add_argument('--write-schema', action='store_true', default=False,
+                        help='If specified will write schema to location')
+    parser.add_argument('--post-inserts', action='store_true', default=False,
+                        help='If specified will post inserts to portal')
+    args = parser.parse_args()
+
+    # read/process gene table, build inserts
+    logger.info('Building gene annotation fields from mapping table %s' % args.gene_table)
+    parser = GeneTableParser(args.gene_table, args.gene_annotation_field_schema)
+    inserts = parser.run(gs_out=args.gene, write=args.write_schema)
+
+    # if not a dry run try to post inserts
+    if args.post_inserts:
+        from pyramid.paster import get_app
+        from webtest import TestApp
+        environ = {
+            'HTTP_ACCEPT': 'application/json',
+            'REMOTE_USER': 'TEST',
+        }
+        app = get_app(args.config_uri, args.app_name)
+        testapp = TestApp(app, environ)
+        for entry in inserts:
+            testapp.post_json('/gene_annotation_field', entry)  # XXX: what if something goes wrong?
+        logger.info('Successfully posted gene annotations')
+
+
+if __name__ == '__main__':
+    main()

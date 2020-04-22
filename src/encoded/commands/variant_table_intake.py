@@ -22,6 +22,7 @@ class MappingTableParser(object):
     FIELD_TYPE_INDEX = 5  # XXX: hardcoded, must change if field_type is moved on mapping table
     INTEGER_FIELDS = ['no', 'maximum_length_of_value', 'column_priority', 'facet_priority']
     BOOLEAN_FIELDS = ['is_list', 'calculated_property']
+    STRING_FIELDS = ['source_name', 'source_version', 'scale', 'domain', 'method', 'separator', 'embedded_fields']
     NAME_FIELD = 'vcf_name'
 
     def __init__(self, _mp, schema):
@@ -131,7 +132,6 @@ class MappingTableParser(object):
                 inserts.append(insert)
         return inserts
 
-
     @staticmethod
     def filter_fields_by_sample(inserts):
         """ Returns annotation fields that belong on the sample variant schema
@@ -140,7 +140,6 @@ class MappingTableParser(object):
         :return: only annotations fields that are part of the sample variant
         """
         return [field for field in inserts if field.get('scope', '') == 'sample_variant']
-
 
     @staticmethod
     def filter_fields_by_variant(inserts):
@@ -184,14 +183,19 @@ class MappingTableParser(object):
             if item.get('field_priority'):
                 features['lookup'] = item['field_priority']
 
+            # handle boolean fields
+            for a_field in self.BOOLEAN_FIELDS:
+                if item.get(a_field) and a_field != 'is_list':
+                    features[a_field] = item[a_field]
+
             # handle string fields
-            for a_field in ['source_name', 'source_version', 'scale', 'domain', 'method', 'separator', 'embedded_fields']:
+            for a_field in self.STRING_FIELDS:
                 if item.get(a_field):
                     features[a_field] = item[a_field]
 
             # handle int fields
-            for a_field in ['maximum_length_of_value', 'column_priority', 'facet_priority']:
-                if item.get(a_field):
+            for a_field in self.INTEGER_FIELDS:
+                if item.get(a_field) and a_field != 'no':
                     features[a_field] = int(item[a_field])
 
             if True:
@@ -238,7 +242,7 @@ class MappingTableParser(object):
                 array_item.update({
                     "title": item.get('schema_title', item[self.NAME_FIELD]),
                     "type": "array",
-                    "vcf_name": item[self.NAME_FIELD]
+                    self.NAME_FIELD: item[self.NAME_FIELD]
                 })
                 if item.get('schema_description'):
                     array_item['description'] = item['schema_description']
@@ -525,8 +529,8 @@ def main():
         app = get_app(args.config_uri, args.app_name)
         testapp = TestApp(app, environ)
         for entry in inserts:
-            testapp.post_json('/annotation_field', entry)
-    logger.info('Successfully posted annotations')
+            testapp.post_json('/annotation_field', entry)  # XXX: what if something goes wrong?
+        logger.info('Successfully posted annotations')
 
 
 if __name__ == '__main__':

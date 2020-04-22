@@ -1,0 +1,3161 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "type": "object",
+    "required": [
+        "institution",
+        "project"
+    ],
+    "identifyingProperties": [
+        "uuid",
+        "aliases"
+    ],
+    "additionalProperties": false,
+    "mixinProperties": [
+        {
+            "$ref": "mixins.json#/schema_version"
+        },
+        {
+            "$ref": "mixins.json#/uuid"
+        },
+        {
+            "$ref": "mixins.json#/aliases"
+        },
+        {
+            "$ref": "mixins.json#/submitted"
+        },
+        {
+            "$ref": "mixins.json#/modified"
+        },
+        {
+            "$ref": "mixins.json#/status"
+        },
+        {
+            "$ref": "mixins.json#/attribution"
+        },
+        {
+            "$ref": "mixins.json#/notes"
+        },
+        {
+            "$ref": "mixins.json#/static_embeds"
+        }
+    ],
+    "title": "Genes",
+    "description": "Schema for Genes",
+    "id": "/profiles/gene.json",
+    "properties": {
+        "chrom": {
+            "title": "Chromosome",
+            "field_name": "chrom",
+            "type": "string",
+            "enum": [
+                "1",
+                "2",
+                "3",
+                "4",
+                "5",
+                "6",
+                "7",
+                "8",
+                "9",
+                "10",
+                "11",
+                "12",
+                "13",
+                "14",
+                "15",
+                "16",
+                "17",
+                "18",
+                "19",
+                "20",
+                "21",
+                "22",
+                "X",
+                "Y",
+                "M"
+            ],
+            "do_import": true,
+            "source_name": "ENSEMBLgene",
+            "source_version": "v99",
+            "schema_title": "Chromosome",
+            "description": "name of the chromosome or scaffold; chromosome names without a 'chr'"
+        },
+        "spos": {
+            "title": "Start position",
+            "field_name": "spos",
+            "type": "integer",
+            "do_import": true,
+            "source_name": "ENSEMBLgene",
+            "source_version": "v99",
+            "schema_title": "Start position",
+            "description": "start position"
+        },
+        "epos": {
+            "title": "End position",
+            "field_name": "epos",
+            "type": "integer",
+            "do_import": true,
+            "source_name": "ENSEMBLgene",
+            "source_version": "v99",
+            "schema_title": "End position",
+            "description": "end position"
+        },
+        "strand": {
+            "title": "Strand",
+            "field_name": "strand",
+            "type": "string",
+            "enum": [
+                "\"+",
+                "-",
+                ".\""
+            ],
+            "source_name": "ENSEMBLgene",
+            "source_version": "v99",
+            "schema_title": "Strand"
+        },
+        "ensgid": {
+            "title": "ENSEMBL gene ID",
+            "field_name": "ensgid",
+            "type": "string",
+            "do_import": true,
+            "source_name": "ENSEMBLgene",
+            "source_version": "v99",
+            "schema_title": "ENSEMBL gene ID",
+            "description": "The stable identifier for the gene",
+            "link": "https://useast.ensembl.org/Homo_sapiens/Gene/Summary?g=<ID>"
+        },
+        "gene_version": {
+            "title": "ENSEMBL gene version",
+            "field_name": "gene_version",
+            "type": "string",
+            "do_import": true,
+            "source_name": "ENSEMBLgene",
+            "source_version": "v99",
+            "schema_title": "ENSEMBL gene version",
+            "description": "The stable identifier version for the gene"
+        },
+        "gene_symbol": {
+            "title": "Gene symbol",
+            "field_name": "gene_symbol",
+            "type": "string",
+            "do_import": true,
+            "source_name": "ENSEMBLgene",
+            "source_version": "v99",
+            "schema_title": "Gene symbol",
+            "description": "The official symbol of this gene",
+            "comments": "Present NCBI or HUGO Name as the default"
+        },
+        "gene_biotype": {
+            "title": "Gene biotype",
+            "field_name": "gene_biotype",
+            "type": "string",
+            "enum": [
+                "enum values?"
+            ],
+            "do_import": true,
+            "source_name": "ENSEMBLgene",
+            "source_version": "v99",
+            "schema_title": "Gene biotype",
+            "description": "The biotype of this gene"
+        },
+        "cytoband": {
+            "title": "Cytoband",
+            "type": "array",
+            "field_name": "cytoband",
+            "items": {
+                "title": "Cytoband",
+                "field_name": "cytoband",
+                "type": "string",
+                "do_import": true,
+                "source_name": "CYTOBAND",
+                "source_version": "2017-07-17",
+                "schema_title": "Cytoband",
+                "description": "cytoband"
+            }
+        },
+        "gene_summary": {
+            "title": "Gene summary",
+            "field_name": "gene_summary",
+            "type": "string",
+            "do_import": true,
+            "source_name": "RefSeq",
+            "source_version": "2020-03-20",
+            "schema_title": "Gene summary",
+            "description": "Gene summary from RefSeq",
+            "comments": "Default=CGAP KB; RefSeq if not available"
+        },
+        "hgnc_id": {
+            "title": "HGNC ID",
+            "field_name": "hgnc_id",
+            "type": "string",
+            "do_import": true,
+            "source_name": "HGNC",
+            "source_version": "2020-02-24",
+            "schema_title": "HGNC ID",
+            "description": "A unique ID provided by the HGNC for each gene with an approved symbol.",
+            "link": "https://www.genenames.org/data/gene-symbol-report/#!/hgnc_id/HGNC:<ID>"
+        },
+        "name": {
+            "title": "Gene full name",
+            "field_name": "name",
+            "type": "string",
+            "do_import": true,
+            "source_name": "HGNC",
+            "source_version": "2020-02-24",
+            "schema_title": "Gene full name",
+            "description": "The full gene name approved by the HGNC.",
+            "comments": "Default "
+        },
+        "entrez_id": {
+            "title": "NCBI Gene",
+            "field_name": "entrez_id",
+            "type": "string",
+            "do_import": true,
+            "source_name": "HGNC",
+            "source_version": "2020-02-24",
+            "schema_title": "NCBI Gene",
+            "description": "NCBI Gene ID",
+            "link": "https://www.ncbi.nlm.nih.gov/gene/<ID>"
+        },
+        "ucsc_id": {
+            "title": "UCSC",
+            "field_name": "ucsc_id",
+            "type": "string",
+            "do_import": true,
+            "source_name": "HGNC",
+            "source_version": "2020-02-24",
+            "schema_title": "UCSC",
+            "description": "UCSC genome browser gene ID"
+        },
+        "refseq_accession": {
+            "title": "RefSeq",
+            "type": "array",
+            "field_name": "refseq_accession",
+            "items": {
+                "title": "RefSeq",
+                "field_name": "refseq_accession",
+                "type": "string",
+                "do_import": true,
+                "source_name": "HGNC",
+                "source_version": "2020-02-24",
+                "schema_title": "RefSeq",
+                "description": "The Reference Sequence (RefSeq) collection",
+                "link": "https://www.ncbi.nlm.nih.gov/gene/?term=<ID>"
+            }
+        },
+        "ccds_id": {
+            "title": "CCDS",
+            "type": "array",
+            "field_name": "ccds_id",
+            "items": {
+                "title": "CCDS",
+                "field_name": "ccds_id",
+                "type": "string",
+                "do_import": true,
+                "source_name": "HGNC",
+                "source_version": "2020-02-24",
+                "schema_title": "CCDS",
+                "description": "The Consensus CDS (CCDS) project: a collaborative effort to identify a core set of human and mouse protein coding regions that are consistently annotated and of high quality",
+                "link": "https://www.ncbi.nlm.nih.gov/CCDS/CcdsBrowse.cgi?REQUEST=CCDS&DATA=<ID>"
+            }
+        },
+        "uniprot_ids": {
+            "title": "UniProt",
+            "type": "array",
+            "field_name": "uniprot_ids",
+            "items": {
+                "title": "UniProt",
+                "field_name": "uniprot_ids",
+                "type": "string",
+                "do_import": true,
+                "source_name": "HGNC",
+                "source_version": "2020-02-24",
+                "schema_title": "UniProt",
+                "description": "UniProt accession number",
+                "link": "https://www.uniprot.org/uniprot/<ID>"
+            }
+        },
+        "mgd_id": {
+            "title": "MGI",
+            "type": "array",
+            "field_name": "mgd_id",
+            "items": {
+                "title": "MGI",
+                "field_name": "mgd_id",
+                "type": "string",
+                "do_import": true,
+                "source_name": "HGNC",
+                "source_version": "2020-02-24",
+                "schema_title": "MGI",
+                "description": "Mouse Genome Informatics Database",
+                "comments": "We need to look at one mouse db at least",
+                "link": "http://www.informatics.jax.org/marker/<ID>"
+            }
+        },
+        "omim_id": {
+            "title": "OMIM",
+            "type": "array",
+            "field_name": "omim_id",
+            "items": {
+                "title": "OMIM",
+                "field_name": "omim_id",
+                "type": "string",
+                "do_import": true,
+                "source_name": "HGNC",
+                "source_version": "2020-02-24",
+                "schema_title": "OMIM",
+                "description": "Online Mendelian Inheritance in Man (OMIM)",
+                "link": "https://omim.org/entry/<ID>"
+            }
+        },
+        "orphanet": {
+            "title": "OrphaNet",
+            "field_name": "orphanet",
+            "type": "string",
+            "do_import": true,
+            "source_name": "HGNC",
+            "source_version": "2020-02-24",
+            "schema_title": "OrphaNet",
+            "description": "portal for rare diseases and orphan drugs",
+            "link": "https://www.orpha.net/consor/cgi-bin/OC_Exp.php?Lng=GB&Expert=<ID>"
+        },
+        "ClinGen": {
+            "title": "ClinGen",
+            "field_name": "ClinGen",
+            "type": "string",
+            "do_import": true,
+            "source_name": "ClinGen",
+            "source_version": "20200309",
+            "schema_title": "ClinGen",
+            "description": "ClinGen",
+            "comments": "Keep as a link",
+            "link": "https://search.clinicalgenome.org/kb/genes/HGNC:<ID>"
+        },
+        "clingendis": {
+            "title": "clingendis",
+            "type": "object",
+            "items": {
+                "title": "Clingendis",
+                "type": "array",
+                "properties": {
+                    "disease_label": {
+                        "title": "disease_label",
+                        "type": "array",
+                        "items": {
+                            "title": "Disease Label",
+                            "field_name": "disease_label",
+                            "type": "string",
+                            "do_import": true,
+                            "source_name": "ClinGenDisease",
+                            "source_version": "20200309",
+                            "schema_title": "Disease Label",
+                            "description": "Disease label list"
+                        }
+                    },
+                    "disease_id": {
+                        "title": "disease_id",
+                        "type": "array",
+                        "items": {
+                            "title": "Disease ID (MONDO)",
+                            "field_name": "disease_id",
+                            "type": "string",
+                            "do_import": true,
+                            "source_name": "ClinGenDisease",
+                            "source_version": "20200309",
+                            "schema_title": "Disease ID (MONDO)",
+                            "link": "https://search.clinicalgenome.org/kb/conditions/<ID>"
+                        }
+                    },
+                    "Inheritance": {
+                        "title": "Inheritance",
+                        "type": "array",
+                        "items": {
+                            "title": "Inheritance",
+                            "field_name": "Inheritance",
+                            "type": "string",
+                            "enum": [
+                                "Autosomal Dominant",
+                                "Autosomal Recessive",
+                                "Mitochondrial",
+                                "Semidominant",
+                                "X-linked",
+                                "Undetermined MOI",
+                                "Other"
+                            ],
+                            "do_import": true,
+                            "source_name": "ClinGenDisease",
+                            "source_version": "20200309",
+                            "schema_title": "Inheritance"
+                        }
+                    },
+                    "classification": {
+                        "title": "classification",
+                        "type": "array",
+                        "items": {
+                            "title": "Classification",
+                            "field_name": "classification",
+                            "type": "string",
+                            "enum": [
+                                "Definitive",
+                                "Strong",
+                                "Moderate",
+                                "Limited",
+                                "No Reported Evidence",
+                                "Disputed"
+                            ],
+                            "do_import": true,
+                            "source_name": "ClinGenDisease",
+                            "source_version": "20200309",
+                            "schema_title": "Classification"
+                        }
+                    },
+                    "online_report": {
+                        "title": "online_report",
+                        "type": "array",
+                        "items": {
+                            "title": "Online report",
+                            "field_name": "online_report",
+                            "type": "string",
+                            "source_name": "ClinGenDisease",
+                            "source_version": "20200309",
+                            "schema_title": "Online report"
+                        }
+                    },
+                    "classification_date": {
+                        "title": "classification_date",
+                        "type": "array",
+                        "items": {
+                            "title": "Classification date",
+                            "field_name": "classification_date",
+                            "type": "string",
+                            "source_name": "ClinGenDisease",
+                            "source_version": "20200309",
+                            "schema_title": "Classification date"
+                        }
+                    }
+                }
+            }
+        },
+        "transcriptid": {
+            "title": "Transcriptid",
+            "type": "array",
+            "items": {
+                "title": "Transcriptid",
+                "type": "object",
+                "properties": {
+                    "Ensembl_TRS": {
+                        "title": "ENSEMBL transcript",
+                        "field_name": "Ensembl_TRS",
+                        "type": "string",
+                        "do_import": true,
+                        "source_name": "ENSEMBLIDxref",
+                        "source_version": "v2.1.1",
+                        "schema_title": "ENSEMBL transcript",
+                        "description": "ENSEMBL transcript ID list",
+                        "link": "https://useast.ensembl.org/Homo_sapiens/Transcript/Summary?t=<ID>"
+                    },
+                    "Ensembl_PRO": {
+                        "title": "ENSEMBL protein",
+                        "field_name": "Ensembl_PRO",
+                        "type": "string",
+                        "do_import": true,
+                        "source_name": "ENSEMBLIDxref",
+                        "source_version": "v2.1.1",
+                        "schema_title": "ENSEMBL protein",
+                        "description": "ENSEMBL protein ID list",
+                        "link": "http://www.ensembl.org/Homo_sapiens/protview?peptide=<ID>"
+                    }
+                }
+            }
+        },
+        "PDB": {
+            "title": "PDB",
+            "type": "array",
+            "field_name": "PDB",
+            "items": {
+                "title": "PDB",
+                "field_name": "PDB",
+                "type": "string",
+                "do_import": true,
+                "source_name": "ENSEMBLIDxref",
+                "source_version": "v2.1.1",
+                "schema_title": "PDB",
+                "description": "The Protein Data Bank (PDB) [1] is a database for the three-dimensional structural data of large biological molecules, such as proteins and nucleic acids.",
+                "link": "https://www.rcsb.org/structure/<ID>"
+            }
+        },
+        "BioGrid": {
+            "title": "BioGrid",
+            "type": "array",
+            "field_name": "BioGrid",
+            "items": {
+                "title": "BioGrid",
+                "field_name": "BioGrid",
+                "type": "string",
+                "do_import": true,
+                "source_name": "ENSEMBLIDxref",
+                "source_version": "v2.1.1",
+                "schema_title": "BioGrid",
+                "description": "BioGRID is an interaction repository with data compiled through comprehensive curation efforts.",
+                "link": "https://thebiogrid.org/<ID>"
+            }
+        },
+        "STRING": {
+            "title": "STRING",
+            "type": "array",
+            "field_name": "STRING",
+            "items": {
+                "title": "STRING",
+                "field_name": "STRING",
+                "type": "string",
+                "do_import": true,
+                "source_name": "ENSEMBLIDxref",
+                "source_version": "v2.1.1",
+                "schema_title": "STRING",
+                "description": "STRING (Search Tool for the Retrieval of Interacting Genes/Proteins) is a biological database and web resource of known and predicted protein\u2013protein interactions.",
+                "link": "https://string-db.org/network/<ID>"
+            }
+        },
+        "GeneCards": {
+            "title": "GeneCards",
+            "type": "array",
+            "field_name": "GeneCards",
+            "items": {
+                "title": "GeneCards",
+                "field_name": "GeneCards",
+                "type": "string",
+                "do_import": true,
+                "source_name": "ENSEMBLIDxref",
+                "source_version": "v2.1.1",
+                "schema_title": "GeneCards",
+                "description": "a database of human genes that provides genomic, proteomic, transcriptomic, genetic and functional information on all known and predicted human genes.",
+                "comments": "link",
+                "link": "https://www.genecards.org/cgi-bin/carddisp.pl?gene=<ID>"
+            }
+        },
+        "PharmGKB": {
+            "title": "PharmGKB",
+            "type": "array",
+            "field_name": "PharmGKB",
+            "items": {
+                "title": "PharmGKB",
+                "field_name": "PharmGKB",
+                "type": "string",
+                "do_import": true,
+                "source_name": "ENSEMBLIDxref",
+                "source_version": "v2.1.1",
+                "schema_title": "PharmGKB",
+                "description": "a publicly available, online knowledgebase responsible for the aggregation, curation, integration and dissemination of knowledge regarding the impact of human genetic variation on drug response.",
+                "comments": "PGx- manul MVP",
+                "link": "https://www.pharmgkb.org/gene/<ID>"
+            }
+        },
+        "GeneReviews": {
+            "title": "GeneReviews",
+            "type": "array",
+            "field_name": "GeneReviews",
+            "items": {
+                "title": "GeneReviews",
+                "field_name": "GeneReviews",
+                "type": "string",
+                "do_import": true,
+                "source_name": "ENSEMBLIDxref",
+                "source_version": "v2.1.1",
+                "schema_title": "GeneReviews",
+                "description": "GeneReviews",
+                "link": "https://www.ncbi.nlm.nih.gov/books/NBK1116/?term=<ID>%5BGeneSymbol%5D"
+            }
+        },
+        "Pathway_KEGG_id": {
+            "title": "KEGG",
+            "field_name": "Pathway_KEGG_id",
+            "type": "string",
+            "do_import": true,
+            "source_name": "dbNSFP",
+            "source_version": "4.0c",
+            "schema_title": "KEGG",
+            "description": "ID(s) of the Pathway(s) the gene belongs to (from KEGG)",
+            "link": "https://www.genome.jp/dbget-bin/www_bget?<ID>"
+        },
+        "Pathway_KEGG_full": {
+            "title": "KEGG pathway",
+            "field_name": "Pathway_KEGG_full",
+            "type": "string",
+            "do_import": true,
+            "source_name": "dbNSFP",
+            "source_version": "4.0c",
+            "schema_title": "KEGG pathway",
+            "description": "Full name(s) of the Pathway(s) the gene belongs to (from KEGG)"
+        },
+        "Trait_association_GWAS": {
+            "title": "GWAS catalog trait",
+            "type": "array",
+            "field_name": "Trait_association_GWAS",
+            "items": {
+                "title": "GWAS catalog trait",
+                "field_name": "Trait_association_GWAS",
+                "type": "string",
+                "do_import": true,
+                "source_name": "dbNSFP",
+                "source_version": "4.0c",
+                "schema_title": "GWAS catalog trait",
+                "description": "Trait(s) the gene associated with (from GWAS catalog)",
+                "comments": "Discuss UI/UX"
+            }
+        },
+        "Trait_association_GWAS_PMID": {
+            "title": "GWAS catalog trait PMID",
+            "type": "array",
+            "field_name": "Trait_association_GWAS_PMID",
+            "items": {
+                "title": "GWAS catalog trait PMID",
+                "field_name": "Trait_association_GWAS_PMID",
+                "type": "string",
+                "do_import": true,
+                "source_name": "dbNSFP",
+                "source_version": "4.0c",
+                "schema_title": "GWAS catalog trait PMID",
+                "description": "Trait(s) the gene associated with (from GWAS catalog)",
+                "link": "https://www.ebi.ac.uk/gwas/publications/<ID>"
+            }
+        },
+        "RVIS_ExAC": {
+            "title": "RVIS(ExAC)",
+            "field_name": "RVIS_ExAC",
+            "type": "number",
+            "do_import": true,
+            "source_name": "dbNSFP",
+            "source_version": "4.0c",
+            "schema_title": "RVIS(ExAC)",
+            "description": "ExAC-based RVIS; setting 'common' MAF filter at 0.05% in at least one of the six individual ethnic strata from ExAC."
+        },
+        "RVIS_percentile_ExAC": {
+            "title": "RVIS(ExAC) percentile",
+            "field_name": "RVIS_percentile_ExAC",
+            "type": "number",
+            "do_import": true,
+            "source_name": "dbNSFP",
+            "source_version": "4.0c",
+            "schema_title": "RVIS(ExAC) percentile",
+            "description": "Genome-Wide percentile for the new ExAC-based RVIS; setting 'common' MAF filter at 0.05% in at least one of the six individual ethnic strata from ExAC."
+        },
+        "GDI-Phred": {
+            "title": "GDI phred score",
+            "field_name": "GDI-Phred",
+            "type": "number",
+            "do_import": true,
+            "source_name": "dbNSFP",
+            "source_version": "4.0c",
+            "schema_title": "GDI phred score",
+            "description": "Phred-scaled GDI scores",
+            "comments": "??also change to no??"
+        },
+        "GDP": {
+            "title": "Gene damage prediction (all disease-causing genes)",
+            "field_name": "GDP",
+            "type": "string",
+            "enum": [
+                "Medium",
+                "High",
+                "Low"
+            ],
+            "do_import": true,
+            "source_name": "dbNSFP",
+            "source_version": "4.0c",
+            "schema_title": "Gene damage prediction (all disease-causing genes)",
+            "description": "gene damage prediction (low/medium/high) by GDI for all diseases"
+        },
+        "MGI_mouse_gene": {
+            "title": "Mouse gene (MGI)",
+            "field_name": "MGI_mouse_gene",
+            "type": "string",
+            "do_import": true,
+            "source_name": "dbNSFP",
+            "source_version": "4.0c",
+            "schema_title": "Mouse gene (MGI)",
+            "description": "Homolog mouse gene name from MGI"
+        },
+        "MGI_mouse_phenotype": {
+            "title": "Mouse phenotype (MGI)",
+            "field_name": "MGI_mouse_phenotype",
+            "type": "string",
+            "do_import": true,
+            "source_name": "dbNSFP",
+            "source_version": "4.0c",
+            "schema_title": "Mouse phenotype (MGI)",
+            "description": "Phenotype description for the homolog mouse gene from MGI"
+        },
+        "gnomAD": {
+            "title": "gnomAD",
+            "field_name": "gnomAD",
+            "type": "string",
+            "do_import": true,
+            "source_name": "gnomADmetrics",
+            "source_version": "v2.1.1",
+            "schema_title": "gnomAD",
+            "description": "gnomAD gene",
+            "link": "https://gnomad.broadinstitute.org/gene/<ID>"
+        },
+        "obs_mis": {
+            "title": "Observed missense",
+            "field_name": "obs_mis",
+            "type": "integer",
+            "do_import": true,
+            "source_name": "gnomADmetrics",
+            "source_version": "v2.1.1",
+            "schema_title": "Observed missense"
+        },
+        "exp_mis": {
+            "title": "Expected missense",
+            "field_name": "exp_mis",
+            "type": "number",
+            "do_import": true,
+            "source_name": "gnomADmetrics",
+            "source_version": "v2.1.1",
+            "schema_title": "Expected missense"
+        },
+        "oe_mis": {
+            "title": "o/e (missense)",
+            "field_name": "oe_mis",
+            "type": "number",
+            "do_import": true,
+            "source_name": "gnomADmetrics",
+            "source_version": "v2.1.1",
+            "schema_title": "o/e (missense)"
+        },
+        "obs_syn": {
+            "title": "Observed synonymous",
+            "field_name": "obs_syn",
+            "type": "integer",
+            "do_import": true,
+            "source_name": "gnomADmetrics",
+            "source_version": "v2.1.1",
+            "schema_title": "Observed synonymous"
+        },
+        "exp_syn": {
+            "title": "Expected synonymous",
+            "field_name": "exp_syn",
+            "type": "number",
+            "do_import": true,
+            "source_name": "gnomADmetrics",
+            "source_version": "v2.1.1",
+            "schema_title": "Expected synonymous"
+        },
+        "oe_syn": {
+            "title": "o/e (synonymous)",
+            "field_name": "oe_syn",
+            "type": "number",
+            "do_import": true,
+            "source_name": "gnomADmetrics",
+            "source_version": "v2.1.1",
+            "schema_title": "o/e (synonymous)"
+        },
+        "obs_lof": {
+            "title": "Observed LoF",
+            "field_name": "obs_lof",
+            "type": "integer",
+            "do_import": true,
+            "source_name": "gnomADmetrics",
+            "source_version": "v2.1.1",
+            "schema_title": "Observed LoF"
+        },
+        "exp_lof": {
+            "title": "Expected LoF",
+            "field_name": "exp_lof",
+            "type": "number",
+            "do_import": true,
+            "source_name": "gnomADmetrics",
+            "source_version": "v2.1.1",
+            "schema_title": "Expected LoF"
+        },
+        "oe_lof": {
+            "title": "o/e (LoF)",
+            "field_name": "oe_lof",
+            "type": "number",
+            "do_import": true,
+            "source_name": "gnomADmetrics",
+            "source_version": "v2.1.1",
+            "schema_title": "o/e (LoF)"
+        },
+        "cds_length": {
+            "title": "CDS length",
+            "field_name": "cds_length",
+            "type": "integer",
+            "do_import": true,
+            "source_name": "gnomADmetrics",
+            "source_version": "v2.1.1",
+            "schema_title": "CDS length"
+        },
+        "num_coding_exons": {
+            "title": "Number of coding exons",
+            "field_name": "num_coding_exons",
+            "type": "integer",
+            "do_import": true,
+            "source_name": "gnomADmetrics",
+            "source_version": "v2.1.1",
+            "schema_title": "Number of coding exons"
+        },
+        "Marrvel": {
+            "title": "Marrvel",
+            "field_name": "Marrvel",
+            "type": "string",
+            "do_import": true,
+            "source_name": "Marrvel",
+            "source_version": "v1.2",
+            "schema_title": "Marrvel",
+            "description": "Integrated information from six human genetic databases and seven model organism databases",
+            "link": "http://www.marrvel.org/search/gene/<ID>"
+        },
+        "s_het": {
+            "title": "s_het",
+            "field_name": "s_het",
+            "type": "number",
+            "do_import": true,
+            "source_name": "CassaNatGenet2017",
+            "source_version": "04/03/2017",
+            "schema_title": "s_het",
+            "description": "s_het estimates based on ExAC should be here http://genetics.bwh.harvard.edu/genescores/"
+        },
+        "gtex_expression": {
+            "title": "GTEx",
+            "field_name": "gtex_expression",
+            "type": "string",
+            "do_import": true,
+            "source_name": "GTEx",
+            "source_version": "v8",
+            "schema_title": "GTEx",
+            "link": "https://gtexportal.org/home/gene/<ID>"
+        },
+        "brainspan_rnaseq": {
+            "title": "BrainSpan RNAseq",
+            "field_name": "brainspan_rnaseq",
+            "type": "string",
+            "do_import": true,
+            "source_name": "BrainSpan",
+            "source_version": "March.2013",
+            "schema_title": "BrainSpan RNAseq",
+            "link": "https://www.brainspan.org/rnaseq/searches?exact_match=false&search_term=<ID>"
+        },
+        "brainspan_microarray": {
+            "title": "BrainSpan Microarray",
+            "field_name": "brainspan_microarray",
+            "type": "string",
+            "do_import": true,
+            "source_name": "BrainSpan",
+            "source_version": "March.2013",
+            "schema_title": "BrainSpan Microarray",
+            "link": "https://www.brainspan.org/lcm/search?exact_match=false&search_term=%<ID>%22&search_type=gene"
+        },
+        "brainatlas_microarray": {
+            "title": "BrainAtlas Microarray",
+            "field_name": "brainatlas_microarray",
+            "type": "string",
+            "do_import": true,
+            "source_name": "BrainAtlas",
+            "source_version": "March.2013",
+            "schema_title": "BrainAtlas Microarray",
+            "link": "https://human.brain-map.org/microarray/search/show?exact_match=false&search_term=%22<ID>%22&search_type=gene"
+        },
+        "transcript": {
+            "title": "Transcript",
+            "type": "array",
+            "items": {
+                "title": "Transcript",
+                "type": "object",
+                "properties": {
+                    "enstid": {
+                        "title": "ENSEMBL transcript ID",
+                        "field_name": "enstid",
+                        "type": "string",
+                        "do_import": true,
+                        "source_name": "GenCode",
+                        "source_version": "v33",
+                        "schema_title": "ENSEMBL transcript ID"
+                    },
+                    "enspid": {
+                        "title": "ENSEMBL protein ID",
+                        "field_name": "enspid",
+                        "type": "string",
+                        "do_import": true,
+                        "source_name": "GenCode",
+                        "source_version": "v33",
+                        "schema_title": "ENSEMBL protein ID"
+                    },
+                    "refseq": {
+                        "title": "RefSeq ID",
+                        "field_name": "refseq",
+                        "type": "string",
+                        "do_import": true,
+                        "source_name": "GenCode",
+                        "source_version": "v33",
+                        "schema_title": "RefSeq ID"
+                    },
+                    "refseq_protein": {
+                        "title": "RefSeq Protein ID",
+                        "field_name": "refseq_protein",
+                        "type": "string",
+                        "do_import": true,
+                        "source_name": "GenCode",
+                        "source_version": "v33",
+                        "schema_title": "RefSeq Protein ID"
+                    },
+                    "pos": {
+                        "title": "position",
+                        "field_name": "pos",
+                        "type": "string",
+                        "do_import": true,
+                        "source_name": "GenCode",
+                        "source_version": "v33",
+                        "schema_title": "position"
+                    },
+                    "exon": {
+                        "title": "Exon region position",
+                        "field_name": "exon",
+                        "type": "string",
+                        "do_import": true,
+                        "source_name": "GenCode",
+                        "source_version": "v33",
+                        "schema_title": "Exon region position"
+                    },
+                    "CDS": {
+                        "title": "CDS region postion",
+                        "field_name": "CDS",
+                        "type": "string",
+                        "do_import": true,
+                        "source_name": "GenCode",
+                        "source_version": "v33",
+                        "schema_title": "CDS region postion"
+                    },
+                    "start_codon": {
+                        "title": "Start codon position",
+                        "field_name": "start_codon",
+                        "type": "string",
+                        "do_import": true,
+                        "source_name": "GenCode",
+                        "source_version": "v33",
+                        "schema_title": "Start codon position"
+                    },
+                    "stop_codon": {
+                        "title": "Stop codon position",
+                        "field_name": "stop_codon",
+                        "type": "string",
+                        "do_import": true,
+                        "source_name": "GenCode",
+                        "source_version": "v33",
+                        "schema_title": "Stop codon position"
+                    },
+                    "five_prime_UTR": {
+                        "title": "5' UTR position",
+                        "field_name": "five_prime_UTR",
+                        "type": "string",
+                        "do_import": true,
+                        "source_name": "GenCode",
+                        "source_version": "v33",
+                        "schema_title": "5' UTR position"
+                    },
+                    "three_prime_UTR": {
+                        "title": "3' UTR position",
+                        "field_name": "three_prime_UTR",
+                        "type": "string",
+                        "do_import": true,
+                        "source_name": "GenCode",
+                        "source_version": "v33",
+                        "schema_title": "3' UTR position"
+                    },
+                    "transcript_length": {
+                        "title": "Transcript sequence length",
+                        "field_name": "transcript_length",
+                        "type": "string",
+                        "do_import": true,
+                        "source_name": "GenCode",
+                        "source_version": "v33",
+                        "schema_title": "Transcript sequence length"
+                    },
+                    "transcript_sequence": {
+                        "title": "Transcript sequence",
+                        "field_name": "transcript_sequence",
+                        "type": "string",
+                        "do_import": true,
+                        "source_name": "GenCode",
+                        "source_version": "v33",
+                        "schema_title": "Transcript sequence"
+                    },
+                    "protein_length": {
+                        "title": "Protein sequence length",
+                        "field_name": "protein_length",
+                        "type": "string",
+                        "do_import": true,
+                        "source_name": "GenCode",
+                        "source_version": "v33",
+                        "schema_title": "Protein sequence length"
+                    },
+                    "protein_sequence": {
+                        "title": "Protein sequence",
+                        "field_name": "protein_sequence",
+                        "type": "string",
+                        "do_import": true,
+                        "source_name": "GenCode",
+                        "source_version": "v33",
+                        "schema_title": "Protein sequence"
+                    }
+                }
+            }
+        },
+        "gene_source": {
+            "title": "Gene source",
+            "field_name": "gene_source",
+            "type": "string",
+            "source_name": "ENSEMBLgene",
+            "source_version": "v99",
+            "schema_title": "Gene source",
+            "description": "The annotation source for this gene"
+        },
+        "locus_group": {
+            "title": "Locus group",
+            "field_name": "locus_group",
+            "type": "string",
+            "source_name": "HGNC",
+            "source_version": "2020-02-24",
+            "schema_title": "Locus group"
+        },
+        "locus_type": {
+            "title": "Locus type",
+            "field_name": "locus_type",
+            "type": "string",
+            "source_name": "HGNC",
+            "source_version": "2020-02-24",
+            "schema_title": "Locus type",
+            "description": "Specifies the genetic class of each gene entry."
+        },
+        "alias_symbol": {
+            "title": "Alias gene symbol",
+            "type": "array",
+            "field_name": "alias_symbol",
+            "items": {
+                "title": "Alias gene symbol",
+                "field_name": "alias_symbol",
+                "type": "string",
+                "source_name": "HGNC",
+                "source_version": "2020-02-24",
+                "schema_title": "Alias gene symbol",
+                "description": "Alias gene symbol"
+            }
+        },
+        "alias_name": {
+            "title": "Alias gene name",
+            "type": "array",
+            "field_name": "alias_name",
+            "items": {
+                "title": "Alias gene name",
+                "field_name": "alias_name",
+                "type": "string",
+                "source_name": "HGNC",
+                "source_version": "2020-02-24",
+                "schema_title": "Alias gene name",
+                "description": "Alias gene name"
+            }
+        },
+        "prev_symbol": {
+            "title": "Previous gene symbol",
+            "type": "array",
+            "field_name": "prev_symbol",
+            "items": {
+                "title": "Previous gene symbol",
+                "field_name": "prev_symbol",
+                "type": "string",
+                "source_name": "HGNC",
+                "source_version": "2020-02-24",
+                "schema_title": "Previous gene symbol",
+                "description": "This field displays any symbols that were previously HGNC-approved nomenclature."
+            }
+        },
+        "prev_name": {
+            "title": "Previous gene name",
+            "type": "array",
+            "field_name": "prev_name",
+            "items": {
+                "title": "Previous gene name",
+                "field_name": "prev_name",
+                "type": "string",
+                "source_name": "HGNC",
+                "source_version": "2020-02-24",
+                "schema_title": "Previous gene name",
+                "description": "This field displays any names that were previously HGNC-approved nomenclature."
+            }
+        },
+        "vega_id": {
+            "title": "VEGA",
+            "field_name": "vega_id",
+            "type": "string",
+            "source_name": "HGNC",
+            "source_version": "2020-02-24",
+            "schema_title": "VEGA",
+            "link": "http://vega.archive.ensembl.org/Homo_sapiens/Gene/Summary?db=core;g=<ID>"
+        },
+        "pubmed_id": {
+            "title": "PubMed",
+            "type": "array",
+            "field_name": "pubmed_id",
+            "items": {
+                "title": "PubMed",
+                "field_name": "pubmed_id",
+                "type": "string",
+                "source_name": "HGNC",
+                "source_version": "2020-02-24",
+                "schema_title": "PubMed",
+                "description": "PubMed",
+                "link": "https://pubmed.ncbi.nlm.nih.gov/<ID>"
+            }
+        },
+        "rgd_id": {
+            "title": "MouseMine",
+            "type": "array",
+            "field_name": "rgd_id",
+            "items": {
+                "title": "MouseMine",
+                "field_name": "rgd_id",
+                "type": "string",
+                "source_name": "HGNC",
+                "source_version": "2020-02-24",
+                "schema_title": "MouseMine",
+                "link": "http://ratmine.mcw.edu/ratmine/portal.do?externalids=<ID>&class=Gene&origin=MouseMine"
+            }
+        },
+        "lsdb": {
+            "title": "LRG",
+            "type": "array",
+            "field_name": "lsdb",
+            "items": {
+                "title": "LRG",
+                "field_name": "lsdb",
+                "type": "string",
+                "source_name": "HGNC",
+                "source_version": "2020-02-24",
+                "schema_title": "LRG",
+                "description": "A Locus Reference Genomic (LRG) record contains stable reference sequences that are used for reporting sequence variants with clinical implications"
+            }
+        },
+        "cosmic": {
+            "title": "Cosmic",
+            "field_name": "cosmic",
+            "type": "string",
+            "source_name": "HGNC",
+            "source_version": "2020-02-24",
+            "schema_title": "Cosmic",
+            "description": "Catalog of somatic mutations in cancer",
+            "link": "https://cancer.sanger.ac.uk/cosmic/gene/analysis?ln=<ID>"
+        },
+        "mirbase": {
+            "title": "miRBase",
+            "field_name": "mirbase",
+            "type": "string",
+            "source_name": "HGNC",
+            "source_version": "2020-02-24",
+            "schema_title": "miRBase",
+            "description": "the microRNA database",
+            "link": "http://www.mirbase.org/cgi-bin/mirna_entry.pl?acc=<ID>"
+        },
+        "homeodb": {
+            "title": "HomeoDB",
+            "field_name": "homeodb",
+            "type": "string",
+            "source_name": "HGNC",
+            "source_version": "2020-02-24",
+            "schema_title": "HomeoDB",
+            "description": "a database of homeobox gene diversity",
+            "link": "http://homeodb.zoo.ox.ac.uk/gene_info.get?id=<ID>&og=Human"
+        },
+        "snornabase": {
+            "title": "snoRNABase",
+            "field_name": "snornabase",
+            "type": "string",
+            "source_name": "HGNC",
+            "source_version": "2020-02-24",
+            "schema_title": "snoRNABase",
+            "description": "database of human H/ACA and C/D box snoRNAs",
+            "link": "https://www-snorna.biotoul.fr/plus.php?id=<ID>"
+        },
+        "enzyme_id": {
+            "title": "ENZYME",
+            "type": "array",
+            "field_name": "enzyme_id",
+            "items": {
+                "title": "ENZYME",
+                "field_name": "enzyme_id",
+                "type": "string",
+                "source_name": "HGNC",
+                "source_version": "2020-02-24",
+                "schema_title": "ENZYME",
+                "description": "ENZYME database",
+                "link": "http://enzyme.expasy.org/EC/<ID>"
+            }
+        },
+        "clinical_validity": {
+            "title": "Clinical Validity",
+            "field_name": "clinical_validity",
+            "type": "string",
+            "enum": [
+                "Curated"
+            ],
+            "source_name": "ClinGen",
+            "source_version": "20200309",
+            "schema_title": "Clinical Validity",
+            "comments": "V1"
+        },
+        "evidence": {
+            "title": "Evidence-Based Summary",
+            "field_name": "evidence",
+            "type": "string",
+            "enum": [
+                "Curated"
+            ],
+            "source_name": "ClinGen",
+            "source_version": "20200309",
+            "schema_title": "Evidence-Based Summary",
+            "comments": "V1"
+        },
+        "haploinsufficiency_score": {
+            "title": "Haploinsufficiency Score",
+            "field_name": "haploinsufficiency_score",
+            "type": "string",
+            "source_name": "ClinGen",
+            "source_version": "20200309",
+            "schema_title": "Haploinsufficiency Score",
+            "comments": "V1"
+        },
+        "triplosensitivity_score": {
+            "title": "Triplosensitivity Score",
+            "field_name": "triplosensitivity_score",
+            "type": "string",
+            "source_name": "ClinGen",
+            "source_version": "20200309",
+            "schema_title": "Triplosensitivity Score",
+            "comments": "V1"
+        },
+        "UniRef100": {
+            "title": "UinRef 100% sequence identity genes",
+            "type": "array",
+            "field_name": "UniRef100",
+            "items": {
+                "title": "UinRef 100% sequence identity genes",
+                "field_name": "UniRef100",
+                "type": "string",
+                "source_name": "ENSEMBLIDxref",
+                "source_version": "v2.1.1",
+                "schema_title": "UinRef 100% sequence identity genes",
+                "description": "UniRef100 combines identical sequences and sub-fragments with 11 or more residues from any organism into a single UniRef entry.",
+                "link": "https://www.uniprot.org/uniref/<ID>"
+            }
+        },
+        "UniRef90": {
+            "title": "UinRef 90% sequence identity genes",
+            "type": "array",
+            "field_name": "UniRef90",
+            "items": {
+                "title": "UinRef 90% sequence identity genes",
+                "field_name": "UniRef90",
+                "type": "string",
+                "source_name": "ENSEMBLIDxref",
+                "source_version": "v2.1.1",
+                "schema_title": "UinRef 90% sequence identity genes",
+                "description": "UniRef90 is built by clustering UniRef100 sequences such that each cluster is composed of sequences that have at least 90% sequence identity to, and 80% overlap with, the longest sequence (a.k.a. seed sequence).",
+                "link": "https://www.uniprot.org/uniref/<ID>"
+            }
+        },
+        "UniRef50": {
+            "title": "UinRef 50% sequence identity genes",
+            "type": "array",
+            "field_name": "UniRef50",
+            "items": {
+                "title": "UinRef 50% sequence identity genes",
+                "field_name": "UniRef50",
+                "type": "string",
+                "source_name": "ENSEMBLIDxref",
+                "source_version": "v2.1.1",
+                "schema_title": "UinRef 50% sequence identity genes",
+                "description": "UniRef50 is built by clustering UniRef90 seed sequences that have at least 50% sequence identity to, and 80% overlap with, the longest sequence in the cluster.",
+                "link": "https://www.uniprot.org/uniref/<ID>"
+            }
+        },
+        "UniParc": {
+            "title": "UniParc",
+            "type": "array",
+            "field_name": "UniParc",
+            "items": {
+                "title": "UniParc",
+                "field_name": "UniParc",
+                "type": "string",
+                "source_name": "ENSEMBLIDxref",
+                "source_version": "v2.1.1",
+                "schema_title": "UniParc",
+                "description": "The UniProt Archive (UniParc) is a comprehensive and non-redundant database that contains most of the publicly available protein sequences in the world.",
+                "link": "https://www.uniprot.org/uniparc/<ID>"
+            }
+        },
+        "NCBInucleotide": {
+            "title": "NCBI Nucleotide",
+            "type": "array",
+            "field_name": "NCBInucleotide",
+            "items": {
+                "title": "NCBI Nucleotide",
+                "field_name": "NCBInucleotide",
+                "type": "string",
+                "source_name": "ENSEMBLIDxref",
+                "source_version": "v2.1.1",
+                "schema_title": "NCBI Nucleotide",
+                "link": "https://www.ncbi.nlm.nih.gov/nuccore/<ID>"
+            }
+        },
+        "NCBIprotein": {
+            "title": "NCBI Protein",
+            "type": "array",
+            "field_name": "NCBIprotein",
+            "items": {
+                "title": "NCBI Protein",
+                "field_name": "NCBIprotein",
+                "type": "string",
+                "source_name": "ENSEMBLIDxref",
+                "source_version": "v2.1.1",
+                "schema_title": "NCBI Protein",
+                "link": "https://www.ncbi.nlm.nih.gov/protein/<ID>"
+            }
+        },
+        "DIP": {
+            "title": "DIP",
+            "field_name": "DIP",
+            "type": "string",
+            "source_name": "ENSEMBLIDxref",
+            "source_version": "v2.1.1",
+            "schema_title": "DIP",
+            "description": "Database of Interacting Proteins",
+            "link": "https://dip.doe-mbi.ucla.edu/dip/DIPview.cgi?PK=<ID>"
+        },
+        "MINT": {
+            "title": "MINT",
+            "type": "array",
+            "field_name": "MINT",
+            "items": {
+                "title": "MINT",
+                "field_name": "MINT",
+                "type": "string",
+                "source_name": "ENSEMBLIDxref",
+                "source_version": "v2.1.1",
+                "schema_title": "MINT",
+                "description": "The Molecular INTeraction Database",
+                "link": "https://mint.bio.uniroma2.it/index.php/results-interactions/?id=<ID>"
+            }
+        },
+        "ChEMBL": {
+            "title": "ChEMBL",
+            "type": "array",
+            "field_name": "ChEMBL",
+            "items": {
+                "title": "ChEMBL",
+                "field_name": "ChEMBL",
+                "type": "string",
+                "source_name": "ENSEMBLIDxref",
+                "source_version": "v2.1.1",
+                "schema_title": "ChEMBL",
+                "description": "Manually curated database of bioactive molecules with drug-like properties.",
+                "link": "https://www.ebi.ac.uk/chembl/target_report_card/<ID>/"
+            }
+        },
+        "DrugBank": {
+            "title": "DrugBank",
+            "type": "array",
+            "field_name": "DrugBank",
+            "items": {
+                "title": "DrugBank",
+                "field_name": "DrugBank",
+                "type": "string",
+                "source_name": "ENSEMBLIDxref",
+                "source_version": "v2.1.1",
+                "schema_title": "DrugBank",
+                "description": "The DrugBank database is a bioinformatics and cheminformatics resource that combines detailed drug data with comprehensive drug target information.",
+                "link": "https://www.drugbank.ca/drugs/<ID>"
+            }
+        },
+        "BioMuta": {
+            "title": "BioMuta",
+            "type": "array",
+            "field_name": "BioMuta",
+            "items": {
+                "title": "BioMuta",
+                "field_name": "BioMuta",
+                "type": "string",
+                "source_name": "ENSEMBLIDxref",
+                "source_version": "v2.1.1",
+                "schema_title": "BioMuta",
+                "description": "A single-nucleotide variation (SNV) and disease association database where variations are mapped to genomes and RefSeq nucleotide entries, and unified through UniProtKB/Swiss-Prot positional coordinates."
+            }
+        },
+        "DMDM": {
+            "title": "DMDM",
+            "type": "array",
+            "field_name": "DMDM",
+            "items": {
+                "title": "DMDM",
+                "field_name": "DMDM",
+                "type": "string",
+                "source_name": "ENSEMBLIDxref",
+                "source_version": "v2.1.1",
+                "schema_title": "DMDM"
+            }
+        },
+        "CPTAC": {
+            "title": "CPTAC",
+            "type": "array",
+            "field_name": "CPTAC",
+            "items": {
+                "title": "CPTAC",
+                "field_name": "CPTAC",
+                "type": "string",
+                "source_name": "ENSEMBLIDxref",
+                "source_version": "v2.1.1",
+                "schema_title": "CPTAC"
+            }
+        },
+        "ProteomicsDB": {
+            "title": "ProteomicsDB",
+            "type": "array",
+            "field_name": "ProteomicsDB",
+            "items": {
+                "title": "ProteomicsDB",
+                "field_name": "ProteomicsDB",
+                "type": "string",
+                "source_name": "ENSEMBLIDxref",
+                "source_version": "v2.1.1",
+                "schema_title": "ProteomicsDB"
+            }
+        },
+        "DNASU": {
+            "title": "DNASU",
+            "type": "array",
+            "field_name": "DNASU",
+            "items": {
+                "title": "DNASU",
+                "field_name": "DNASU",
+                "type": "string",
+                "source_name": "ENSEMBLIDxref",
+                "source_version": "v2.1.1",
+                "schema_title": "DNASU"
+            }
+        },
+        "GeneID": {
+            "title": "NCBI gene",
+            "type": "array",
+            "field_name": "GeneID",
+            "items": {
+                "title": "NCBI gene",
+                "field_name": "GeneID",
+                "type": "string",
+                "source_name": "ENSEMBLIDxref",
+                "source_version": "v2.1.1",
+                "schema_title": "NCBI gene"
+            }
+        },
+        "KEGG": {
+            "title": "KEGG",
+            "type": "array",
+            "field_name": "KEGG",
+            "items": {
+                "title": "KEGG",
+                "field_name": "KEGG",
+                "type": "string",
+                "source_name": "ENSEMBLIDxref",
+                "source_version": "v2.1.1",
+                "schema_title": "KEGG",
+                "link": "https://www.genome.jp/dbget-bin/www_bget?<ID>"
+            }
+        },
+        "EuPathDB": {
+            "title": "EuPathDB",
+            "type": "array",
+            "field_name": "EuPathDB",
+            "items": {
+                "title": "EuPathDB",
+                "field_name": "EuPathDB",
+                "type": "string",
+                "source_name": "ENSEMBLIDxref",
+                "source_version": "v2.1.1",
+                "schema_title": "EuPathDB",
+                "link": "https://www.eupathdb.org/gene/<ID>"
+            }
+        },
+        "HPA": {
+            "title": "Human Protein Atlas",
+            "type": "array",
+            "field_name": "HPA",
+            "items": {
+                "title": "Human Protein Atlas",
+                "field_name": "HPA",
+                "type": "string",
+                "source_name": "ENSEMBLIDxref",
+                "source_version": "v2.1.1",
+                "schema_title": "Human Protein Atlas",
+                "description": "Human Protein Atlas",
+                "link": "https://www.proteinatlas.org/search/<ID>"
+            }
+        },
+        "neXtProt": {
+            "title": "neXtProt",
+            "type": "array",
+            "field_name": "neXtProt",
+            "items": {
+                "title": "neXtProt",
+                "field_name": "neXtProt",
+                "type": "string",
+                "source_name": "ENSEMBLIDxref",
+                "source_version": "v2.1.1",
+                "schema_title": "neXtProt",
+                "link": "https://www.nextprot.org/entry/<ID>/"
+            }
+        },
+        "eggNOG": {
+            "title": "eggNOG",
+            "type": "array",
+            "field_name": "eggNOG",
+            "items": {
+                "title": "eggNOG",
+                "field_name": "eggNOG",
+                "type": "string",
+                "source_name": "ENSEMBLIDxref",
+                "source_version": "v2.1.1",
+                "schema_title": "eggNOG",
+                "description": "It is based on the original idea of COGs and expands that idea to non-supervised orthologous groups constructed from numerous organisms.",
+                "link": "http://eggnogdb.embl.de/#/app/results#<ID>"
+            }
+        },
+        "GeneTree": {
+            "title": "GeneTree",
+            "type": "array",
+            "field_name": "GeneTree",
+            "items": {
+                "title": "GeneTree",
+                "field_name": "GeneTree",
+                "type": "string",
+                "source_name": "ENSEMBLIDxref",
+                "source_version": "v2.1.1",
+                "schema_title": "GeneTree"
+            }
+        },
+        "HOGENOM": {
+            "title": "HOGENOM",
+            "type": "array",
+            "field_name": "HOGENOM",
+            "items": {
+                "title": "HOGENOM",
+                "field_name": "HOGENOM",
+                "type": "string",
+                "source_name": "ENSEMBLIDxref",
+                "source_version": "v2.1.1",
+                "schema_title": "HOGENOM",
+                "description": "Database of Complete Genome Homologous Genes Families"
+            }
+        },
+        "KO": {
+            "title": "KEGG Ontology",
+            "type": "array",
+            "field_name": "KO",
+            "items": {
+                "title": "KEGG Ontology",
+                "field_name": "KO",
+                "type": "string",
+                "source_name": "ENSEMBLIDxref",
+                "source_version": "v2.1.1",
+                "schema_title": "KEGG Ontology",
+                "description": "KEGG Ontology",
+                "link": "https://www.genome.jp/dbget-bin/www_bget?ko:<ID>"
+            }
+        },
+        "OMA": {
+            "title": "OMA",
+            "type": "array",
+            "field_name": "OMA",
+            "items": {
+                "title": "OMA",
+                "field_name": "OMA",
+                "type": "string",
+                "source_name": "ENSEMBLIDxref",
+                "source_version": "v2.1.1",
+                "schema_title": "OMA"
+            }
+        },
+        "OrthoDB": {
+            "title": "OrthoDB",
+            "type": "array",
+            "field_name": "OrthoDB",
+            "items": {
+                "title": "OrthoDB",
+                "field_name": "OrthoDB",
+                "type": "string",
+                "source_name": "ENSEMBLIDxref",
+                "source_version": "v2.1.1",
+                "schema_title": "OrthoDB",
+                "description": "OrthoDB presents a catalog of orthologous protein-coding genes across vertebrates, arthropods, fungi, plants, and bacteria.",
+                "link": "https://www.orthodb.org/?query=<ID>"
+            }
+        },
+        "TreeFam": {
+            "title": "TreeFam",
+            "type": "array",
+            "field_name": "TreeFam",
+            "items": {
+                "title": "TreeFam",
+                "field_name": "TreeFam",
+                "type": "string",
+                "source_name": "ENSEMBLIDxref",
+                "source_version": "v2.1.1",
+                "schema_title": "TreeFam",
+                "description": "Database of animal gene trees",
+                "link": "http://www.treefam.org/family/<ID>"
+            }
+        },
+        "Reactome": {
+            "title": "Reactome",
+            "type": "array",
+            "field_name": "Reactome",
+            "items": {
+                "title": "Reactome",
+                "field_name": "Reactome",
+                "type": "string",
+                "source_name": "ENSEMBLIDxref",
+                "source_version": "v2.1.1",
+                "schema_title": "Reactome",
+                "link": "https://reactome.org/content/detail/<ID>"
+            }
+        },
+        "ChiTaRS": {
+            "title": "ChiTaRS",
+            "type": "array",
+            "field_name": "ChiTaRS",
+            "items": {
+                "title": "ChiTaRS",
+                "field_name": "ChiTaRS",
+                "type": "string",
+                "source_name": "ENSEMBLIDxref",
+                "source_version": "v2.1.1",
+                "schema_title": "ChiTaRS",
+                "description": "Database of chimeric transcripts and RNA-seq data"
+            }
+        },
+        "GeneWiki": {
+            "title": "GeneWiki",
+            "type": "array",
+            "field_name": "GeneWiki",
+            "items": {
+                "title": "GeneWiki",
+                "field_name": "GeneWiki",
+                "type": "string",
+                "source_name": "ENSEMBLIDxref",
+                "source_version": "v2.1.1",
+                "schema_title": "GeneWiki"
+            }
+        },
+        "GenomeRNAi": {
+            "title": "GenomeRNAi",
+            "type": "array",
+            "field_name": "GenomeRNAi",
+            "items": {
+                "title": "GenomeRNAi",
+                "field_name": "GenomeRNAi",
+                "type": "string",
+                "source_name": "ENSEMBLIDxref",
+                "source_version": "v2.1.1",
+                "schema_title": "GenomeRNAi"
+            }
+        },
+        "CRC64": {
+            "title": "CRC64",
+            "type": "array",
+            "field_name": "CRC64",
+            "items": {
+                "title": "CRC64",
+                "field_name": "CRC64",
+                "type": "string",
+                "source_name": "ENSEMBLIDxref",
+                "source_version": "v2.1.1",
+                "schema_title": "CRC64"
+            }
+        },
+        "UniProt": {
+            "title": "UniProt",
+            "type": "array",
+            "field_name": "UniProt",
+            "items": {
+                "title": "UniProt",
+                "field_name": "UniProt",
+                "type": "string",
+                "source_name": "ENSEMBLIDxref",
+                "source_version": "v2.1.1",
+                "schema_title": "UniProt",
+                "description": "UniProt is a freely accessible database of protein sequence and functional information, many entries being derived from genome sequencing projects.",
+                "link": "https://www.uniprot.org/uniprot/<ID>"
+            }
+        },
+        "GO": {
+            "title": "Gene Ontology",
+            "type": "array",
+            "field_name": "GO",
+            "items": {
+                "title": "Gene Ontology",
+                "field_name": "GO",
+                "type": "string",
+                "source_name": "ENSEMBLIDxref",
+                "source_version": "v2.1.1",
+                "schema_title": "Gene Ontology",
+                "description": "Gene Ontology",
+                "link": "https://www.ebi.ac.uk/QuickGO/term/<ID>"
+            }
+        },
+        "PIR": {
+            "title": "PIR",
+            "type": "array",
+            "field_name": "PIR",
+            "items": {
+                "title": "PIR",
+                "field_name": "PIR",
+                "type": "string",
+                "source_name": "ENSEMBLIDxref",
+                "source_version": "v2.1.1",
+                "schema_title": "PIR"
+            }
+        },
+        "Gene_Synonym": {
+            "title": "Gene_Synonym",
+            "type": "array",
+            "field_name": "Gene_Synonym",
+            "items": {
+                "title": "Gene_Synonym",
+                "field_name": "Gene_Synonym",
+                "type": "string",
+                "source_name": "ENSEMBLIDxref",
+                "source_version": "v2.1.1",
+                "schema_title": "Gene_Synonym"
+            }
+        },
+        "ComplexPortal": {
+            "title": "ComplexPortal",
+            "type": "array",
+            "field_name": "ComplexPortal",
+            "items": {
+                "title": "ComplexPortal",
+                "field_name": "ComplexPortal",
+                "type": "string",
+                "source_name": "ENSEMBLIDxref",
+                "source_version": "v2.1.1",
+                "schema_title": "ComplexPortal",
+                "description": "The Complex Portal is a manually curated, encyclopaedic resource of macromolecular complexes from a number of key model organisms.",
+                "link": "https://www.ebi.ac.uk/complexportal/complex/<ID>"
+            }
+        },
+        "TCDB": {
+            "title": "TCDB",
+            "type": "array",
+            "field_name": "TCDB",
+            "items": {
+                "title": "TCDB",
+                "field_name": "TCDB",
+                "type": "string",
+                "source_name": "ENSEMBLIDxref",
+                "source_version": "v2.1.1",
+                "schema_title": "TCDB",
+                "description": "Functional and Phylogenetic Classification of Membrane Transport Proteins",
+                "link": "http://www.tcdb.org/search/result.php?tc=<ID>"
+            }
+        },
+        "BioCyc": {
+            "title": "BioCyc",
+            "field_name": "BioCyc",
+            "type": "string",
+            "source_name": "ENSEMBLIDxref",
+            "source_version": "v2.1.1",
+            "schema_title": "BioCyc",
+            "description": "BioCyc is a collection of 17043 Pathway/Genome Databases (PGDBs), plus software tools for exploring them.",
+            "link": "https://biocyc.org/getid?id=<ID>"
+        },
+        "SwissLipids": {
+            "title": "SwissLipids",
+            "type": "array",
+            "field_name": "SwissLipids",
+            "items": {
+                "title": "SwissLipids",
+                "field_name": "SwissLipids",
+                "type": "string",
+                "source_name": "ENSEMBLIDxref",
+                "source_version": "v2.1.1",
+                "schema_title": "SwissLipids"
+            }
+        },
+        "UniPathway": {
+            "title": "UniPathway",
+            "type": "array",
+            "field_name": "UniPathway",
+            "items": {
+                "title": "UniPathway",
+                "field_name": "UniPathway",
+                "type": "string",
+                "source_name": "ENSEMBLIDxref",
+                "source_version": "v2.1.1",
+                "schema_title": "UniPathway",
+                "description": "UniPathway",
+                "link": "https://www.nextprot.org/term/<ID>/"
+            }
+        },
+        "Gene_ORFName": {
+            "title": "Gene_ORFName",
+            "type": "array",
+            "field_name": "Gene_ORFName",
+            "items": {
+                "title": "Gene_ORFName",
+                "field_name": "Gene_ORFName",
+                "type": "string",
+                "source_name": "ENSEMBLIDxref",
+                "source_version": "v2.1.1",
+                "schema_title": "Gene_ORFName"
+            }
+        },
+        "GlyConnect": {
+            "title": "GlyConnect",
+            "type": "array",
+            "field_name": "GlyConnect",
+            "items": {
+                "title": "GlyConnect",
+                "field_name": "GlyConnect",
+                "type": "string",
+                "source_name": "ENSEMBLIDxref",
+                "source_version": "v2.1.1",
+                "schema_title": "GlyConnect"
+            }
+        },
+        "DisProt": {
+            "title": "DisProt",
+            "type": "array",
+            "field_name": "DisProt",
+            "items": {
+                "title": "DisProt",
+                "field_name": "DisProt",
+                "type": "string",
+                "source_name": "ENSEMBLIDxref",
+                "source_version": "v2.1.1",
+                "schema_title": "DisProt"
+            }
+        },
+        "GuidetoPHARMACOLOGY": {
+            "title": "GuidetoPHARMACOLOGY",
+            "field_name": "GuidetoPHARMACOLOGY",
+            "type": "string",
+            "source_name": "ENSEMBLIDxref",
+            "source_version": "v2.1.1",
+            "schema_title": "GuidetoPHARMACOLOGY"
+        },
+        "MEROPS": {
+            "title": "MEROPS",
+            "type": "array",
+            "field_name": "MEROPS",
+            "items": {
+                "title": "MEROPS",
+                "field_name": "MEROPS",
+                "type": "string",
+                "source_name": "ENSEMBLIDxref",
+                "source_version": "v2.1.1",
+                "schema_title": "MEROPS"
+            }
+        },
+        "ESTHER": {
+            "title": "ESTHER",
+            "type": "array",
+            "field_name": "ESTHER",
+            "items": {
+                "title": "ESTHER",
+                "field_name": "ESTHER",
+                "type": "string",
+                "source_name": "ENSEMBLIDxref",
+                "source_version": "v2.1.1",
+                "schema_title": "ESTHER"
+            }
+        },
+        "Allergome": {
+            "title": "Allergome",
+            "type": "array",
+            "field_name": "Allergome",
+            "items": {
+                "title": "Allergome",
+                "field_name": "Allergome",
+                "type": "string",
+                "source_name": "ENSEMBLIDxref",
+                "source_version": "v2.1.1",
+                "schema_title": "Allergome"
+            }
+        },
+        "PeroxiBase": {
+            "title": "PeroxiBase",
+            "type": "array",
+            "field_name": "PeroxiBase",
+            "items": {
+                "title": "PeroxiBase",
+                "field_name": "PeroxiBase",
+                "type": "string",
+                "source_name": "ENSEMBLIDxref",
+                "source_version": "v2.1.1",
+                "schema_title": "PeroxiBase"
+            }
+        },
+        "REBASE": {
+            "title": "REBASE",
+            "type": "array",
+            "field_name": "REBASE",
+            "items": {
+                "title": "REBASE",
+                "field_name": "REBASE",
+                "type": "string",
+                "source_name": "ENSEMBLIDxref",
+                "source_version": "v2.1.1",
+                "schema_title": "REBASE"
+            }
+        },
+        "PATRIC": {
+            "title": "PATRIC",
+            "type": "array",
+            "field_name": "PATRIC",
+            "items": {
+                "title": "PATRIC",
+                "field_name": "PATRIC",
+                "type": "string",
+                "source_name": "ENSEMBLIDxref",
+                "source_version": "v2.1.1",
+                "schema_title": "PATRIC",
+                "description": "PATRIC, the Pathosystems Resource Integration Center, provides integrated data and analysis tools to support biomedical research on bacterial infectious diseases.",
+                "link": "https://www.patricbrc.org/search/?keyword(\"<ID>\")"
+            }
+        },
+        "Pathway_BioCarta_short": {
+            "title": "BioCarta",
+            "field_name": "Pathway_BioCarta_short",
+            "type": "string",
+            "source_name": "dbNSFP",
+            "source_version": "4.0c",
+            "schema_title": "BioCarta",
+            "description": "Short name of the Pathway(s) the gene belongs to (from BioCarta)",
+            "link": "http://amp.pharm.mssm.edu/Harmonizome/search?t=geneSet&q=<ID>"
+        },
+        "Pathway_BioCarta_full": {
+            "title": "BioCarta pathway",
+            "field_name": "Pathway_BioCarta_full",
+            "type": "string",
+            "source_name": "dbNSFP",
+            "source_version": "4.0c",
+            "schema_title": "BioCarta pathway",
+            "description": "Full name(s) of the Pathway(s) the gene belongs to (from BioCarta)"
+        },
+        "Pathway_ConsensusPathDB": {
+            "title": "Pathway(ConsensusPathDB)",
+            "field_name": "Pathway_ConsensusPathDB",
+            "type": "string",
+            "source_name": "dbNSFP",
+            "source_version": "4.0c",
+            "schema_title": "Pathway(ConsensusPathDB)",
+            "description": "Pathway(s) the gene belongs to (from ConsensusPathDB)"
+        },
+        "Function_description": {
+            "title": "Function description",
+            "type": "array",
+            "field_name": "Function_description",
+            "items": {
+                "title": "Function description",
+                "field_name": "Function_description",
+                "type": "string",
+                "source_name": "dbNSFP",
+                "source_version": "4.0c",
+                "schema_title": "Function description",
+                "description": "Function description of the gene (from Uniprot)"
+            }
+        },
+        "Disease_description": {
+            "title": "Disease description",
+            "type": "array",
+            "field_name": "Disease_description",
+            "items": {
+                "title": "Disease description",
+                "field_name": "Disease_description",
+                "type": "string",
+                "source_name": "dbNSFP",
+                "source_version": "4.0c",
+                "schema_title": "Disease description",
+                "description": "Disease(s) the gene caused or associated with (from Uniprot)"
+            }
+        },
+        "MIM_phenotype_id": {
+            "title": "MIM Phenotype ID",
+            "type": "array",
+            "field_name": "MIM_phenotype_id",
+            "items": {
+                "title": "MIM Phenotype ID",
+                "field_name": "MIM_phenotype_id",
+                "type": "string",
+                "source_name": "dbNSFP",
+                "source_version": "4.0c",
+                "schema_title": "MIM Phenotype ID",
+                "description": "MIM id(s) of the phenotype the gene caused or associated with (from Uniprot)",
+                "link": "https://www.omim.org/entry/<ID>"
+            }
+        },
+        "MIM_disease": {
+            "title": "MIM Disease",
+            "field_name": "MIM_disease",
+            "type": "string",
+            "source_name": "dbNSFP",
+            "source_version": "4.0c",
+            "schema_title": "MIM Disease",
+            "description": "MIM disease name(s) with MIM id(s) in '[]' (from Uniprot)"
+        },
+        "Orphanet_disorder_id": {
+            "title": "Orphanet Disorder ID",
+            "type": "array",
+            "field_name": "Orphanet_disorder_id",
+            "items": {
+                "title": "Orphanet Disorder ID",
+                "field_name": "Orphanet_disorder_id",
+                "type": "string",
+                "source_name": "dbNSFP",
+                "source_version": "4.0c",
+                "schema_title": "Orphanet Disorder ID",
+                "description": "Orphanet Number of the disorder the gene caused or associated with",
+                "link": "https://www.orpha.net/consor/cgi-bin/OC_Exp.php?lng=EN&Expert=<ID>"
+            }
+        },
+        "Orphanet_disorder": {
+            "title": "Orphanet Disorder",
+            "type": "array",
+            "field_name": "Orphanet_disorder",
+            "items": {
+                "title": "Orphanet Disorder",
+                "field_name": "Orphanet_disorder",
+                "type": "string",
+                "source_name": "dbNSFP",
+                "source_version": "4.0c",
+                "schema_title": "Orphanet Disorder",
+                "description": "Disorder name from Orphanet"
+            }
+        },
+        "Orphanet_association_type": {
+            "title": "Orphanet association type",
+            "type": "array",
+            "field_name": "Orphanet_association_type",
+            "items": {
+                "title": "Orphanet association type",
+                "field_name": "Orphanet_association_type",
+                "type": "string",
+                "source_name": "dbNSFP",
+                "source_version": "4.0c",
+                "schema_title": "Orphanet association type",
+                "description": "the type of association beteen the gene and the disorder"
+            }
+        },
+        "GO_biological_process": {
+            "title": "GO biological process",
+            "type": "array",
+            "field_name": "GO_biological_process",
+            "items": {
+                "title": "GO biological process",
+                "field_name": "GO_biological_process",
+                "type": "string",
+                "source_name": "dbNSFP",
+                "source_version": "4.0c",
+                "schema_title": "GO biological process",
+                "description": "GO terms for biological process"
+            }
+        },
+        "GO_cellular_component": {
+            "title": "GO cellular component",
+            "type": "array",
+            "field_name": "GO_cellular_component",
+            "items": {
+                "title": "GO cellular component",
+                "field_name": "GO_cellular_component",
+                "type": "string",
+                "source_name": "dbNSFP",
+                "source_version": "4.0c",
+                "schema_title": "GO cellular component",
+                "description": "GO terms for cellular component"
+            }
+        },
+        "GO_molecular_function": {
+            "title": "GO molecular function",
+            "type": "array",
+            "field_name": "GO_molecular_function",
+            "items": {
+                "title": "GO molecular function",
+                "field_name": "GO_molecular_function",
+                "type": "string",
+                "source_name": "dbNSFP",
+                "source_version": "4.0c",
+                "schema_title": "GO molecular function",
+                "description": "GO terms for molecular function"
+            }
+        },
+        "Tissue_specificity_Uniprot": {
+            "title": "Tissue specificity",
+            "type": "array",
+            "field_name": "Tissue_specificity_Uniprot",
+            "items": {
+                "title": "Tissue specificity",
+                "field_name": "Tissue_specificity_Uniprot",
+                "type": "string",
+                "source_name": "dbNSFP",
+                "source_version": "4.0c",
+                "schema_title": "Tissue specificity",
+                "description": "Tissue specificity description from Uniprot"
+            }
+        },
+        "Expression_egenetics": {
+            "title": "Expression from egenetics data",
+            "type": "array",
+            "field_name": "Expression_egenetics",
+            "items": {
+                "title": "Expression from egenetics data",
+                "field_name": "Expression_egenetics",
+                "type": "string",
+                "source_name": "dbNSFP",
+                "source_version": "4.0c",
+                "schema_title": "Expression from egenetics data",
+                "description": "Tissues/organs the gene expressed in (egenetics data from BioMart)"
+            }
+        },
+        "Expression_GNF_Atlas": {
+            "title": "Expression from GNF/Atlas data",
+            "type": "array",
+            "field_name": "Expression_GNF_Atlas",
+            "items": {
+                "title": "Expression from GNF/Atlas data",
+                "field_name": "Expression_GNF_Atlas",
+                "type": "string",
+                "source_name": "dbNSFP",
+                "source_version": "4.0c",
+                "schema_title": "Expression from GNF/Atlas data",
+                "description": "Tissues/organs the gene expressed in (GNF/Atlas data from BioMart)"
+            }
+        },
+        "Interactions_IntAct": {
+            "title": "IntAct interaction",
+            "type": "array",
+            "field_name": "Interactions_IntAct",
+            "items": {
+                "title": "IntAct interaction",
+                "field_name": "Interactions_IntAct",
+                "type": "string",
+                "source_name": "dbNSFP",
+                "source_version": "4.0c",
+                "schema_title": "IntAct interaction",
+                "description": "The number of other genes this gene interacting with (from IntAct)."
+            }
+        },
+        "Interactions_BioGRID": {
+            "title": "BioGRID interaction",
+            "type": "array",
+            "field_name": "Interactions_BioGRID",
+            "items": {
+                "title": "BioGRID interaction",
+                "field_name": "Interactions_BioGRID",
+                "type": "string",
+                "source_name": "dbNSFP",
+                "source_version": "4.0c",
+                "schema_title": "BioGRID interaction",
+                "description": "The number of other genes this gene interacting with (from BioGRID)"
+            }
+        },
+        "Interactions_ConsensusPathDB": {
+            "title": "ConsensusPathDB interaction",
+            "type": "array",
+            "field_name": "Interactions_ConsensusPathDB",
+            "items": {
+                "title": "ConsensusPathDB interaction",
+                "field_name": "Interactions_ConsensusPathDB",
+                "type": "string",
+                "source_name": "dbNSFP",
+                "source_version": "4.0c",
+                "schema_title": "ConsensusPathDB interaction",
+                "description": "The number of other genes this gene interacting with (from ConsensusPathDB)."
+            }
+        },
+        "P_HI": {
+            "title": "P_HI",
+            "field_name": "P_HI",
+            "type": "number",
+            "source_name": "dbNSFP",
+            "source_version": "4.0c",
+            "description": "Estimated probability of haploinsufficiency of the gene(from doi:10.1371/journal.pgen.1001154)"
+        },
+        "HIPred_score": {
+            "title": "HIPred_score",
+            "field_name": "HIPred_score",
+            "type": "number",
+            "source_name": "dbNSFP",
+            "source_version": "4.0c",
+            "description": "Estimated probability of haploinsufficiency of the gene(from doi:10.1093/bioinformatics/btx028)"
+        },
+        "HIPred": {
+            "title": "HIPred",
+            "field_name": "HIPred",
+            "type": "string",
+            "enum": [
+                "N",
+                "Y"
+            ],
+            "source_name": "dbNSFP",
+            "source_version": "4.0c",
+            "description": "HIPred prediction of haploinsufficiency of the gene. Y(es) or N(o).(from doi:10.1093/bioinformatics/btx028)"
+        },
+        "GHIS": {
+            "title": "GHIS",
+            "field_name": "GHIS",
+            "type": "number",
+            "source_name": "dbNSFP",
+            "source_version": "4.0c",
+            "description": "A score predicting the gene haploinsufficiency. The higher the score the more likely the gene is haploinsufficient. (from doi: 10.1093/nar/gkv474)"
+        },
+        "P_rec": {
+            "title": "P_rec",
+            "field_name": "P_rec",
+            "type": "number",
+            "source_name": "dbNSFP",
+            "source_version": "4.0c",
+            "description": "Estimated probability that gene is a recessive disease gene (from DOI:10.1126/science.1215040)"
+        },
+        "Known_rec_info": {
+            "title": "Known recessive status",
+            "field_name": "Known_rec_info",
+            "type": "string",
+            "source_name": "dbNSFP",
+            "source_version": "4.0c",
+            "schema_title": "Known recessive status",
+            "description": "Known recessive status of the gene (f2rom DOI:10.1126/science.1215040);lof-tolerant = seen in homozygous state in at least one 1000G individual;recessive = known OMIM recessive disease"
+        },
+        "RVIS_EVS": {
+            "title": "RVIS(ESP6500)",
+            "field_name": "RVIS_EVS",
+            "type": "number",
+            "source_name": "dbNSFP",
+            "source_version": "4.0c",
+            "schema_title": "RVIS(ESP6500)",
+            "description": "Residual Variation Intolerance Score, a measure of intolerance of mutational burden, the higher the score the more tolerant to mutational burden the gene is. Based on EVS (ESP6500) data. from doi:10.1371/journal.pgen.1003709"
+        },
+        "RVIS_percentile_EVS": {
+            "title": "RVIS(ESP6500) percentile",
+            "field_name": "RVIS_percentile_EVS",
+            "type": "number",
+            "source_name": "dbNSFP",
+            "source_version": "4.0c",
+            "schema_title": "RVIS(ESP6500) percentile",
+            "description": "The percentile rank of the gene based on RVIS, the higher the percentile the more tolerant to mutational burden the gene is. Based on EVS (ESP6500) data."
+        },
+        "LoF-FDR_ExAC": {
+            "title": "LoF-FDR (ExAC)",
+            "field_name": "LoF-FDR_ExAC",
+            "type": "number",
+            "source_name": "dbNSFP",
+            "source_version": "4.0c",
+            "schema_title": "LoF-FDR (ExAC)",
+            "description": "A gene's corresponding FDR p-value for preferential LoF depletion among the ExAC population. Lower FDR corresponds with genes that are increasingly depleted of LoF variants."
+        },
+        "ExAC_pLI": {
+            "title": "pLI (ExAC)",
+            "field_name": "ExAC_pLI",
+            "type": "number",
+            "source_name": "dbNSFP",
+            "source_version": "4.0c",
+            "schema_title": "pLI (ExAC)",
+            "description": "the probability of being loss-of-function intolerant (intolerant of both heterozygous and homozygous lof variants) based on ExAC r0.3 data",
+            "comments": "available from ExAC"
+        },
+        "ExAC_pRec": {
+            "title": "pRec (ExAC)",
+            "field_name": "ExAC_pRec",
+            "type": "number",
+            "source_name": "dbNSFP",
+            "source_version": "4.0c",
+            "schema_title": "pRec (ExAC)",
+            "description": "the probability of being intolerant of homozygous, but not heterozygous lof variants based on ExAC r0.3 data"
+        },
+        "ExAC_pNull": {
+            "title": "pNull (ExAC)",
+            "field_name": "ExAC_pNull",
+            "type": "number",
+            "source_name": "dbNSFP",
+            "source_version": "4.0c",
+            "schema_title": "pNull (ExAC)",
+            "description": "the probability of being tolerant of both heterozygous and homozygous lof variants based on ExAC r0.3 data"
+        },
+        "ExAC_nonTCGA_pLI": {
+            "title": "pLI (ExAC nonTCGA)",
+            "field_name": "ExAC_nonTCGA_pLI",
+            "type": "number",
+            "source_name": "dbNSFP",
+            "source_version": "4.0c",
+            "schema_title": "pLI (ExAC nonTCGA)",
+            "description": "the probability of being loss-of-function intolerant (intolerant of both heterozygous and homozygous lof variants) based on ExAC r0.3 nonTCGA subset"
+        },
+        "ExAC_nonTCGA_pRec": {
+            "title": "pRec (ExAC nonTCGA)",
+            "field_name": "ExAC_nonTCGA_pRec",
+            "type": "number",
+            "source_name": "dbNSFP",
+            "source_version": "4.0c",
+            "schema_title": "pRec (ExAC nonTCGA)",
+            "description": "the probability of being intolerant of homozygous, but not heterozygous lof variants based on ExAC r0.3 nonTCGA subset"
+        },
+        "ExAC_nonTCGA_pNull": {
+            "title": "pNull (ExAC nonTCGA)",
+            "field_name": "ExAC_nonTCGA_pNull",
+            "type": "number",
+            "source_name": "dbNSFP",
+            "source_version": "4.0c",
+            "schema_title": "pNull (ExAC nonTCGA)",
+            "description": "the probability of being tolerant of both heterozygous and homozygous lof variants based on ExAC r0.3 nonTCGA subset"
+        },
+        "ExAC_nonpsych_pLI": {
+            "title": "pLI (ExAC nonpsych)",
+            "field_name": "ExAC_nonpsych_pLI",
+            "type": "number",
+            "source_name": "dbNSFP",
+            "source_version": "4.0c",
+            "schema_title": "pLI (ExAC nonpsych)",
+            "description": "the probability of being loss-of-function intolerant (intolerant of both heterozygous and homozygous lof variants) based on ExAC r0.3 nonpsych subset"
+        },
+        "ExAC_nonpsych_pRec": {
+            "title": "pRec (ExAC nonpsych)",
+            "field_name": "ExAC_nonpsych_pRec",
+            "type": "number",
+            "source_name": "dbNSFP",
+            "source_version": "4.0c",
+            "schema_title": "pRec (ExAC nonpsych)",
+            "description": "the probability of being intolerant of homozygous, but not heterozygous lof variants based on ExAC r0.3 nonpsych subset"
+        },
+        "ExAC_nonpsych_pNull": {
+            "title": "pNull (ExAC nonpsych)",
+            "field_name": "ExAC_nonpsych_pNull",
+            "type": "number",
+            "source_name": "dbNSFP",
+            "source_version": "4.0c",
+            "schema_title": "pNull (ExAC nonpsych)",
+            "description": "the probability of being tolerant of both heterozygous and homozygous lof variants based on ExAC r0.3 nonpsych subset"
+        },
+        "gnomAD_pLI": {
+            "title": "pLI (gnomAD)",
+            "field_name": "gnomAD_pLI",
+            "type": "number",
+            "source_name": "dbNSFP",
+            "source_version": "4.0c",
+            "schema_title": "pLI (gnomAD)",
+            "description": "the probability of being loss-of-function intolerant (intolerant of both heterozygous and homozygous lof variants) based on gnomAD 2.1 data",
+            "comments": "available from gnomAD"
+        },
+        "gnomAD_pRec": {
+            "title": "pRec (gnomAD)",
+            "field_name": "gnomAD_pRec",
+            "type": "number",
+            "source_name": "dbNSFP",
+            "source_version": "4.0c",
+            "schema_title": "pRec (gnomAD)",
+            "description": "the probability of being intolerant of homozygous, but not heterozygous lof variants based on gnomAD 2.1 data"
+        },
+        "gnomAD_pNull": {
+            "title": "pNull (gnomAD)",
+            "field_name": "gnomAD_pNull",
+            "type": "number",
+            "source_name": "dbNSFP",
+            "source_version": "4.0c",
+            "schema_title": "pNull (gnomAD)",
+            "description": "the probability of being tolerant of both heterozygous and homozygous lof variants based on gnomAD 2.1 data"
+        },
+        "ExAC_del.score": {
+            "title": "Deletion intolerance z-core",
+            "field_name": "ExAC_del.score",
+            "type": "number",
+            "source_name": "dbNSFP",
+            "source_version": "4.0c",
+            "schema_title": "Deletion intolerance z-core",
+            "description": "Winsorised deletion intolerance z-score based on ExAC r0.3.1 CNV data"
+        },
+        "ExAC_dup.score": {
+            "title": "Duplication intolerance z-score",
+            "field_name": "ExAC_dup.score",
+            "type": "number",
+            "source_name": "dbNSFP",
+            "source_version": "4.0c",
+            "schema_title": "Duplication intolerance z-score",
+            "description": "Winsorised duplication intolerance z-score based on ExAC r0.3.1 CNV data"
+        },
+        "ExAC_cnv.score": {
+            "title": "CNV intolerance z-score",
+            "field_name": "ExAC_cnv.score",
+            "type": "number",
+            "source_name": "dbNSFP",
+            "source_version": "4.0c",
+            "schema_title": "CNV intolerance z-score",
+            "description": "Winsorised cnv intolerance z-score based on ExAC r0.3.1 CNV data",
+            "comments": "V1"
+        },
+        "ExAC_cnv_flag": {
+            "title": "CNV flag",
+            "field_name": "ExAC_cnv_flag",
+            "type": "string",
+            "enum": [
+                "N",
+                "Y"
+            ],
+            "source_name": "dbNSFP",
+            "source_version": "4.0c",
+            "schema_title": "CNV flag",
+            "description": "Gene is in a known region of recurrent CNVs mediated by tandem segmental duplications and intolerance scores are more likely to be biased or noisy from ExAC r0.3.1 CNV release",
+            "comments": "V1"
+        },
+        "GDI": {
+            "title": "Gene damage index (GDI)",
+            "field_name": "GDI",
+            "type": "number",
+            "source_name": "dbNSFP",
+            "source_version": "4.0c",
+            "schema_title": "Gene damage index (GDI)",
+            "description": "gene damage index score, a genome-wide, gene-level metric of the mutational damage that has accumulated in the general population from doi: 10.1073/pnas.1518646112. The higher the score the less likely the gene is to be responsible for monogenic diseases."
+        },
+        "GDP_mendelian": {
+            "title": "Gene damage prediction (all Mendelian disease-causing genes)",
+            "field_name": "GDP_mendelian",
+            "type": "string",
+            "enum": [
+                "Medium",
+                "High",
+                "Low"
+            ],
+            "source_name": "dbNSFP",
+            "source_version": "4.0c",
+            "schema_title": "Gene damage prediction (all Mendelian disease-causing genes)",
+            "description": "gene damage prediction (low/medium/high) by GDI for all Mendelian diseases"
+        },
+        "GDP_mendelian_AD": {
+            "title": "Gene damage prediction (Mendelian AD disease-causing genes)",
+            "field_name": "GDP_mendelian_AD",
+            "type": "string",
+            "enum": [
+                "Medium",
+                "High",
+                "Low"
+            ],
+            "source_name": "dbNSFP",
+            "source_version": "4.0c",
+            "schema_title": "Gene damage prediction (Mendelian AD disease-causing genes)",
+            "description": "gene damage prediction (low/medium/high) by GDI for Mendelian autosomal dominant diseases"
+        },
+        "GDP_mendelian_AR": {
+            "title": "Gene damage prediction (Mendelian AR disease-causing genes)",
+            "field_name": "GDP_mendelian_AR",
+            "type": "string",
+            "enum": [
+                "Medium",
+                "High",
+                "Low"
+            ],
+            "source_name": "dbNSFP",
+            "source_version": "4.0c",
+            "schema_title": "Gene damage prediction (Mendelian AR disease-causing genes)",
+            "description": "gene damage prediction (low/medium/high) by GDI for Mendelian autosomal recessive diseases"
+        },
+        "GDP_PID": {
+            "title": "Gene damage prediction (all PID disease-causing genes)",
+            "field_name": "GDP_PID",
+            "type": "string",
+            "enum": [
+                "Medium",
+                "High",
+                "Low"
+            ],
+            "source_name": "dbNSFP",
+            "source_version": "4.0c",
+            "schema_title": "Gene damage prediction (all PID disease-causing genes)",
+            "description": "gene damage prediction (low/medium/high) by GDI for all primary immunodeficiency diseases"
+        },
+        "GDP_PID_AD": {
+            "title": "Gene damage prediction (PID AD disease-causing genes)",
+            "field_name": "GDP_PID_AD",
+            "type": "string",
+            "enum": [
+                "Medium",
+                "High",
+                "Low"
+            ],
+            "source_name": "dbNSFP",
+            "source_version": "4.0c",
+            "schema_title": "Gene damage prediction (PID AD disease-causing genes)",
+            "description": "gene damage prediction (low/medium/high) by GDI for primary immunodeficiency autosomal dominant diseases"
+        },
+        "GDP_PID_AR": {
+            "title": "Gene damage prediction (PID AR disease-causing genes)",
+            "field_name": "GDP_PID_AR",
+            "type": "string",
+            "enum": [
+                "Medium",
+                "High",
+                "Low"
+            ],
+            "source_name": "dbNSFP",
+            "source_version": "4.0c",
+            "schema_title": "Gene damage prediction (PID AR disease-causing genes)",
+            "description": "gene damage prediction (low/medium/high) by GDI for primary immunodeficiency autosomal recessive diseases"
+        },
+        "GDP_cancer": {
+            "title": "Gene damage prediction (all cancer disease-causing genes)",
+            "field_name": "GDP_cancer",
+            "type": "string",
+            "enum": [
+                "Medium",
+                "High",
+                "Low"
+            ],
+            "source_name": "dbNSFP",
+            "source_version": "4.0c",
+            "schema_title": "Gene damage prediction (all cancer disease-causing genes)",
+            "description": "gene damage prediction (low/medium/high) by GDI for all cancer disease"
+        },
+        "GDP_cancer_rec": {
+            "title": "Gene damage prediction (cancer recessive disease-causing genes)",
+            "field_name": "GDP_cancer_rec",
+            "type": "string",
+            "enum": [
+                "Medium",
+                "High",
+                "Low"
+            ],
+            "source_name": "dbNSFP",
+            "source_version": "4.0c",
+            "schema_title": "Gene damage prediction (cancer recessive disease-causing genes)",
+            "description": "gene damage prediction (low/medium/high) by GDI for cancer recessive disease"
+        },
+        "GDP_cancer_dom": {
+            "title": "Gene damage prediction (cancer dominant disease-causing genes)",
+            "field_name": "GDP_cancer_dom",
+            "type": "string",
+            "enum": [
+                "Medium",
+                "High",
+                "Low"
+            ],
+            "source_name": "dbNSFP",
+            "source_version": "4.0c",
+            "schema_title": "Gene damage prediction (cancer dominant disease-causing genes)",
+            "description": "gene damage prediction (low/medium/high) by GDI for cancer dominant disease"
+        },
+        "LoFtool_score": {
+            "title": "LoF",
+            "field_name": "LoFtool_score",
+            "type": "number",
+            "source_name": "dbNSFP",
+            "source_version": "4.0c",
+            "schema_title": "LoF",
+            "description": "a percentile score for gene intolerance to functional change. The lower the score the higher gene intolerance to functional change. For details see doi: 10.1093/bioinformatics/btv602."
+        },
+        "SORVA_LOF_MAF0.005_HetOrHom": {
+            "title": "SORVA_LOF_MAF0.005_HetOrHom",
+            "field_name": "SORVA_LOF_MAF0.005_HetOrHom",
+            "type": "number",
+            "source_name": "dbNSFP",
+            "source_version": "4.0c",
+            "description": "the fraction of individuals in the 1000 Genomes Project data (N=2504) who are either Heterozygote or Homozygote of LOF SNVs whose MAF<0.005. This fraction is from a method for ranking genes based on mutational burden called SORVA (Significance Of Rare VAriants). Please see doi: 10.1101/103218 for details."
+        },
+        "SORVA_LOF_MAF0.005_HomOrCompoundHet": {
+            "title": "SORVA_LOF_MAF0.005_HomOrCompoundHet",
+            "field_name": "SORVA_LOF_MAF0.005_HomOrCompoundHet",
+            "type": "number",
+            "source_name": "dbNSFP",
+            "source_version": "4.0c",
+            "description": "the fraction of individuals in the 1000 Genomes Project data (N=2504) who are either Compound Heterozygote or Homozygote of LOF SNVs whose MAF<0.005. This fraction is from a method for ranking genes based on mutational burden called SORVA (Significance Of Rare VAriants). Please see doi: 10.1101/103218 for details."
+        },
+        "SORVA_LOF_MAF0.001_HetOrHom": {
+            "title": "SORVA_LOF_MAF0.001_HetOrHom",
+            "field_name": "SORVA_LOF_MAF0.001_HetOrHom",
+            "type": "number",
+            "source_name": "dbNSFP",
+            "source_version": "4.0c",
+            "description": "the fraction of individuals in the 1000 Genomes Project data (N=2504) who are either Heterozygote or Homozygote of LOF SNVs whose MAF<0.001. This fraction is from a method for ranking genes based on mutational burden called SORVA (Significance Of Rare VAriants). Please see doi: 10.1101/103218 for details."
+        },
+        "SORVA_LOF_MAF0.001_HomOrCompoundHet": {
+            "title": "SORVA_LOF_MAF0.001_HomOrCompoundHet",
+            "field_name": "SORVA_LOF_MAF0.001_HomOrCompoundHet",
+            "type": "number",
+            "source_name": "dbNSFP",
+            "source_version": "4.0c",
+            "description": "the fraction of individuals in the 1000 Genomes Project data (N=2504) who are either Compound Heterozygote or Homozygote of LOF SNVs whose MAF<0.001. This fraction is from a method for ranking genes based on mutational burden called SORVA (Significance Of Rare VAriants). Please see doi: 10.1101/103218 for details."
+        },
+        "SORVA_LOForMissense_MAF0.005_HetOrHom": {
+            "title": "SORVA_LOForMissense_MAF0.005_HetOrHom",
+            "field_name": "SORVA_LOForMissense_MAF0.005_HetOrHom",
+            "type": "number",
+            "source_name": "dbNSFP",
+            "source_version": "4.0c",
+            "description": "the fraction of individuals in the 1000 Genomes Project data (N=2504) who are either Heterozygote or Homozygote of LOF or missense SNVs whose MAF<0.005. This fraction is from a method for ranking genes based on mutational burden called SORVA (Significance Of Rare VAriants). Please see doi: 10.1101/103218 for details."
+        },
+        "SORVA_LOForMissense_MAF0.005_HomOrCompoundHet": {
+            "title": "SORVA_LOForMissense_MAF0.005_HomOrCompoundHet",
+            "field_name": "SORVA_LOForMissense_MAF0.005_HomOrCompoundHet",
+            "type": "number",
+            "source_name": "dbNSFP",
+            "source_version": "4.0c",
+            "description": "the fraction of individuals in the 1000 Genomes Project data (N=2504) who are either Compound Heterozygote or Homozygote of LOF or missense SNVs whose MAF<0.005. This fraction is from a method for ranking genes based on mutational burden called SORVA (Significance Of Rare VAriants). Please see doi: 10.1101/103218 for details."
+        },
+        "SORVA_LOForMissense_MAF0.001_HetOrHom": {
+            "title": "SORVA_LOForMissense_MAF0.001_HetOrHom",
+            "field_name": "SORVA_LOForMissense_MAF0.001_HetOrHom",
+            "type": "number",
+            "source_name": "dbNSFP",
+            "source_version": "4.0c",
+            "description": "the fraction of individuals in the 1000 Genomes Project data (N=2504) who are either Heterozygote or Homozygote of LOF or missense SNVs whose MAF<0.001. This fraction is from a method for ranking genes based on mutational burden called SORVA (Significance Of Rare VAriants). Please see doi: 10.1101/103218 for details."
+        },
+        "SORVA_LOForMissense_MAF0.001_HomOrCompoundHet": {
+            "title": "SORVA_LOForMissense_MAF0.001_HomOrCompoundHet",
+            "field_name": "SORVA_LOForMissense_MAF0.001_HomOrCompoundHet",
+            "type": "number",
+            "source_name": "dbNSFP",
+            "source_version": "4.0c",
+            "description": "the fraction of individuals in the 1000 Genomes Project data (N=2504) who are either Compound Heterozygote or Homozygote of LOF or missense SNVs whose MAF<0.001. This fraction is from a method for ranking genes based on mutational burden called SORVA (Significance Of Rare VAriants). Please see doi: 10.1101/103218 for details."
+        },
+        "Essential_gene": {
+            "title": "Essential gene (MGI)",
+            "field_name": "Essential_gene",
+            "type": "string",
+            "enum": [
+                "N",
+                "E"
+            ],
+            "source_name": "dbNSFP",
+            "source_version": "4.0c",
+            "schema_title": "Essential gene (MGI)",
+            "description": "Essential ('E') or Non-essential phenotype-changing ('N') based on Mouse Genome Informatics database. from doi:10.1371/journal.pgen.1003484"
+        },
+        "Essential_gene_CRISPR": {
+            "title": "Essential gene (CRISPR)",
+            "field_name": "Essential_gene_CRISPR",
+            "type": "string",
+            "enum": [
+                "N",
+                "E"
+            ],
+            "source_name": "dbNSFP",
+            "source_version": "4.0c",
+            "schema_title": "Essential gene (CRISPR)",
+            "description": "Essential ('E') or Non-essential phenotype-changing ('N') based on large scale CRISPR experiments. from doi: 10.1126/science.aac7041"
+        },
+        "Essential_gene_CRISPR2": {
+            "title": "Essential gene (CRISPR2)",
+            "field_name": "Essential_gene_CRISPR2",
+            "type": "string",
+            "enum": [
+                "N",
+                "E",
+                "S"
+            ],
+            "source_name": "dbNSFP",
+            "source_version": "4.0c",
+            "schema_title": "Essential gene (CRISPR2)",
+            "description": "Essential ('E'), context-Specific essential ('S'), or Non-essential phenotype-changing ('N') based on large scale CRISPR experiments. from http://dx.doi.org/10.1016/j.cell.2015.11.015"
+        },
+        "Essential_gene_gene-trap": {
+            "title": "Essential gene (gene-trap)",
+            "field_name": "Essential_gene_gene-trap",
+            "type": "string",
+            "enum": [
+                "N",
+                "H",
+                "E",
+                "K"
+            ],
+            "source_name": "dbNSFP",
+            "source_version": "4.0c",
+            "schema_title": "Essential gene (gene-trap)",
+            "description": "Essential ('E'), HAP1-Specific essential ('H'), KBM7-Specific essential ('K'), or Non-essential phenotype-changing ('N'), based on large scale mutagenesis experiments. from doi: 10.1126/science.aac7557"
+        },
+        "Gene_indispensability_score": {
+            "title": "Gene_indispensability_score",
+            "field_name": "Gene_indispensability_score",
+            "type": "number",
+            "source_name": "dbNSFP",
+            "source_version": "4.0c",
+            "description": "A probability prediction of the gene being essential. From doi:10.1371/journal.pcbi.1002886"
+        },
+        "Gene_indispensability_pred": {
+            "title": "Gene_indispensability_pred",
+            "field_name": "Gene_indispensability_pred",
+            "type": "string",
+            "enum": [
+                "N",
+                "E"
+            ],
+            "source_name": "dbNSFP",
+            "source_version": "4.0c",
+            "description": "Essential ('E') or loss-of-function tolerant ('N') based on Gene_indispensability_score."
+        },
+        "ZFIN_zebrafish_gene": {
+            "title": "Zebrafish gene (ZFIN)",
+            "field_name": "ZFIN_zebrafish_gene",
+            "type": "string",
+            "source_name": "dbNSFP",
+            "source_version": "4.0c",
+            "schema_title": "Zebrafish gene (ZFIN)",
+            "description": "Homolog zebrafish gene name from ZFIN",
+            "comments": "V1"
+        },
+        "ZFIN_zebrafish_structure": {
+            "title": "Zebrafish structure (ZFIN)",
+            "field_name": "ZFIN_zebrafish_structure",
+            "type": "string",
+            "source_name": "dbNSFP",
+            "source_version": "4.0c",
+            "schema_title": "Zebrafish structure (ZFIN)",
+            "description": "Affected structure of the homolog zebrafish gene from ZFIN",
+            "comments": "V1"
+        },
+        "ZFIN_zebrafish_phenotype_quality": {
+            "title": "Zebrafish phenotype quality (ZFIN)",
+            "field_name": "ZFIN_zebrafish_phenotype_quality",
+            "type": "string",
+            "source_name": "dbNSFP",
+            "source_version": "4.0c",
+            "schema_title": "Zebrafish phenotype quality (ZFIN)",
+            "description": "Phenotype description for the homolog zebrafish gene from ZFIN",
+            "comments": "V1"
+        },
+        "ZFIN_zebrafish_phenotype_tag": {
+            "title": "Zebrafish phenotype tag (ZFIN)",
+            "field_name": "ZFIN_zebrafish_phenotype_tag",
+            "type": "string",
+            "source_name": "dbNSFP",
+            "source_version": "4.0c",
+            "schema_title": "Zebrafish phenotype tag (ZFIN)",
+            "description": "Phenotype tag for the homolog zebrafish gene from ZFIN",
+            "comments": "V1"
+        },
+        "mu_mis": {
+            "title": "mu_mis",
+            "field_name": "mu_mis",
+            "type": "number",
+            "source_name": "gnomADmetrics",
+            "source_version": "v2.1.1"
+        },
+        "possible_mis": {
+            "title": "possible_mis",
+            "field_name": "possible_mis",
+            "type": "integer",
+            "source_name": "gnomADmetrics",
+            "source_version": "v2.1.1"
+        },
+        "obs_mis_pphen": {
+            "title": "obs_mis_pphen",
+            "field_name": "obs_mis_pphen",
+            "type": "integer",
+            "source_name": "gnomADmetrics",
+            "source_version": "v2.1.1"
+        },
+        "exp_mis_pphen": {
+            "title": "exp_mis_pphen",
+            "field_name": "exp_mis_pphen",
+            "type": "number",
+            "source_name": "gnomADmetrics",
+            "source_version": "v2.1.1"
+        },
+        "oe_mis_pphen": {
+            "title": "oe_mis_pphen",
+            "field_name": "oe_mis_pphen",
+            "type": "number",
+            "source_name": "gnomADmetrics",
+            "source_version": "v2.1.1"
+        },
+        "possible_mis_pphen": {
+            "title": "possible_mis_pphen",
+            "field_name": "possible_mis_pphen",
+            "type": "integer",
+            "source_name": "gnomADmetrics",
+            "source_version": "v2.1.1"
+        },
+        "mu_syn": {
+            "title": "mu_syn",
+            "field_name": "mu_syn",
+            "type": "number",
+            "source_name": "gnomADmetrics",
+            "source_version": "v2.1.1"
+        },
+        "possible_syn": {
+            "title": "possible_syn",
+            "field_name": "possible_syn",
+            "type": "integer",
+            "source_name": "gnomADmetrics",
+            "source_version": "v2.1.1"
+        },
+        "mu_lof": {
+            "title": "mu_lof",
+            "field_name": "mu_lof",
+            "type": "number",
+            "source_name": "gnomADmetrics",
+            "source_version": "v2.1.1"
+        },
+        "possible_lof": {
+            "title": "possible_lof",
+            "field_name": "possible_lof",
+            "type": "integer",
+            "source_name": "gnomADmetrics",
+            "source_version": "v2.1.1"
+        },
+        "pLI": {
+            "title": "pLI",
+            "field_name": "pLI",
+            "type": "number",
+            "source_name": "gnomADmetrics",
+            "source_version": "v2.1.1",
+            "schema_title": "pLI",
+            "description": "the probability of being loss-of-function intolerant (intolerant of both heterozygous and homozygous lof variants) based on gnomAD v2"
+        },
+        "pNull": {
+            "title": "pNull",
+            "field_name": "pNull",
+            "type": "number",
+            "source_name": "gnomADmetrics",
+            "source_version": "v2.1.1",
+            "schema_title": "pNull"
+        },
+        "pRec": {
+            "title": "pRec",
+            "field_name": "pRec",
+            "type": "number",
+            "source_name": "gnomADmetrics",
+            "source_version": "v2.1.1",
+            "schema_title": "pRec"
+        },
+        "oe_syn_lower": {
+            "title": "oe_syn_lower",
+            "field_name": "oe_syn_lower",
+            "type": "number",
+            "source_name": "gnomADmetrics",
+            "source_version": "v2.1.1"
+        },
+        "oe_syn_upper": {
+            "title": "oe_syn_upper",
+            "field_name": "oe_syn_upper",
+            "type": "number",
+            "source_name": "gnomADmetrics",
+            "source_version": "v2.1.1"
+        },
+        "oe_mis_lower": {
+            "title": "oe_mis_lower",
+            "field_name": "oe_mis_lower",
+            "type": "number",
+            "source_name": "gnomADmetrics",
+            "source_version": "v2.1.1"
+        },
+        "oe_mis_upper": {
+            "title": "oe_mis_upper",
+            "field_name": "oe_mis_upper",
+            "type": "number",
+            "source_name": "gnomADmetrics",
+            "source_version": "v2.1.1"
+        },
+        "oe_lof_lower": {
+            "title": "oe_lof_lower",
+            "field_name": "oe_lof_lower",
+            "type": "number",
+            "source_name": "gnomADmetrics",
+            "source_version": "v2.1.1"
+        },
+        "oe_lof_upper": {
+            "title": "oe_lof_upper",
+            "field_name": "oe_lof_upper",
+            "type": "number",
+            "source_name": "gnomADmetrics",
+            "source_version": "v2.1.1"
+        },
+        "constraint_flag": {
+            "title": "Constraint flag (gnomAD)",
+            "type": "array",
+            "field_name": "constraint_flag",
+            "items": {
+                "title": "Constraint flag (gnomAD)",
+                "field_name": "constraint_flag",
+                "type": "string",
+                "source_name": "gnomADmetrics",
+                "source_version": "v2.1.1",
+                "schema_title": "Constraint flag (gnomAD)"
+            }
+        },
+        "syn_z": {
+            "title": "Z score (synonymous)",
+            "field_name": "syn_z",
+            "type": "number",
+            "source_name": "gnomADmetrics",
+            "source_version": "v2.1.1",
+            "schema_title": "Z score (synonymous)"
+        },
+        "mis_z": {
+            "title": "Z score (missense)",
+            "field_name": "mis_z",
+            "type": "number",
+            "source_name": "gnomADmetrics",
+            "source_version": "v2.1.1",
+            "schema_title": "Z score (missense)"
+        },
+        "lof_z": {
+            "title": "Z score (LoF)",
+            "field_name": "lof_z",
+            "type": "number",
+            "source_name": "gnomADmetrics",
+            "source_version": "v2.1.1",
+            "schema_title": "Z score (LoF)"
+        },
+        "oe_lof_upper_rank": {
+            "title": "oe_lof_upper_rank",
+            "field_name": "oe_lof_upper_rank",
+            "type": "integer",
+            "source_name": "gnomADmetrics",
+            "source_version": "v2.1.1"
+        },
+        "oe_lof_upper_bin": {
+            "title": "oe_lof_upper_bin",
+            "field_name": "oe_lof_upper_bin",
+            "type": "integer",
+            "source_name": "gnomADmetrics",
+            "source_version": "v2.1.1"
+        },
+        "oe_lof_upper_bin_6": {
+            "title": "oe_lof_upper_bin_6",
+            "field_name": "oe_lof_upper_bin_6",
+            "type": "integer",
+            "source_name": "gnomADmetrics",
+            "source_version": "v2.1.1"
+        },
+        "n_sites": {
+            "title": "n_sites",
+            "field_name": "n_sites",
+            "type": "string",
+            "source_name": "gnomADmetrics",
+            "source_version": "v2.1.1"
+        },
+        "classic_caf": {
+            "title": "classic_caf",
+            "field_name": "classic_caf",
+            "type": "number",
+            "source_name": "gnomADmetrics",
+            "source_version": "v2.1.1"
+        },
+        "max_af": {
+            "title": "max_af",
+            "field_name": "max_af",
+            "type": "number",
+            "source_name": "gnomADmetrics",
+            "source_version": "v2.1.1"
+        },
+        "no_lofs": {
+            "title": "no_lofs",
+            "field_name": "no_lofs",
+            "type": "integer",
+            "source_name": "gnomADmetrics",
+            "source_version": "v2.1.1"
+        },
+        "obs_het_lof": {
+            "title": "obs_het_lof",
+            "field_name": "obs_het_lof",
+            "type": "integer",
+            "source_name": "gnomADmetrics",
+            "source_version": "v2.1.1"
+        },
+        "obs_hom_lof": {
+            "title": "obs_hom_lof",
+            "field_name": "obs_hom_lof",
+            "type": "integer",
+            "source_name": "gnomADmetrics",
+            "source_version": "v2.1.1"
+        },
+        "defined": {
+            "title": "defined",
+            "field_name": "defined",
+            "type": "integer",
+            "source_name": "gnomADmetrics",
+            "source_version": "v2.1.1"
+        },
+        "p": {
+            "title": "p",
+            "field_name": "p",
+            "type": "number",
+            "source_name": "gnomADmetrics",
+            "source_version": "v2.1.1"
+        },
+        "exp_hom_lof": {
+            "title": "exp_hom_lof",
+            "field_name": "exp_hom_lof",
+            "type": "number",
+            "source_name": "gnomADmetrics",
+            "source_version": "v2.1.1"
+        },
+        "classic_caf_afr": {
+            "title": "classic_caf_afr",
+            "field_name": "classic_caf_afr",
+            "type": "number",
+            "source_name": "gnomADmetrics",
+            "source_version": "v2.1.1"
+        },
+        "classic_caf_amr": {
+            "title": "classic_caf_amr",
+            "field_name": "classic_caf_amr",
+            "type": "number",
+            "source_name": "gnomADmetrics",
+            "source_version": "v2.1.1"
+        },
+        "classic_caf_asj": {
+            "title": "classic_caf_asj",
+            "field_name": "classic_caf_asj",
+            "type": "number",
+            "source_name": "gnomADmetrics",
+            "source_version": "v2.1.1"
+        },
+        "classic_caf_eas": {
+            "title": "classic_caf_eas",
+            "field_name": "classic_caf_eas",
+            "type": "number",
+            "source_name": "gnomADmetrics",
+            "source_version": "v2.1.1"
+        },
+        "classic_caf_fin": {
+            "title": "classic_caf_fin",
+            "field_name": "classic_caf_fin",
+            "type": "number",
+            "source_name": "gnomADmetrics",
+            "source_version": "v2.1.1"
+        },
+        "classic_caf_nfe": {
+            "title": "classic_caf_nfe",
+            "field_name": "classic_caf_nfe",
+            "type": "number",
+            "source_name": "gnomADmetrics",
+            "source_version": "v2.1.1"
+        },
+        "classic_caf_oth": {
+            "title": "classic_caf_oth",
+            "field_name": "classic_caf_oth",
+            "type": "number",
+            "source_name": "gnomADmetrics",
+            "source_version": "v2.1.1"
+        },
+        "classic_caf_sas": {
+            "title": "classic_caf_sas",
+            "field_name": "classic_caf_sas",
+            "type": "number",
+            "source_name": "gnomADmetrics",
+            "source_version": "v2.1.1"
+        },
+        "p_afr": {
+            "title": "p_afr",
+            "field_name": "p_afr",
+            "type": "number",
+            "source_name": "gnomADmetrics",
+            "source_version": "v2.1.1"
+        },
+        "p_amr": {
+            "title": "p_amr",
+            "field_name": "p_amr",
+            "type": "number",
+            "source_name": "gnomADmetrics",
+            "source_version": "v2.1.1"
+        },
+        "p_asj": {
+            "title": "p_asj",
+            "field_name": "p_asj",
+            "type": "number",
+            "source_name": "gnomADmetrics",
+            "source_version": "v2.1.1"
+        },
+        "p_eas": {
+            "title": "p_eas",
+            "field_name": "p_eas",
+            "type": "number",
+            "source_name": "gnomADmetrics",
+            "source_version": "v2.1.1"
+        },
+        "p_fin": {
+            "title": "p_fin",
+            "field_name": "p_fin",
+            "type": "number",
+            "source_name": "gnomADmetrics",
+            "source_version": "v2.1.1"
+        },
+        "p_nfe": {
+            "title": "p_nfe",
+            "field_name": "p_nfe",
+            "type": "number",
+            "source_name": "gnomADmetrics",
+            "source_version": "v2.1.1"
+        },
+        "p_oth": {
+            "title": "p_oth",
+            "field_name": "p_oth",
+            "type": "number",
+            "source_name": "gnomADmetrics",
+            "source_version": "v2.1.1"
+        },
+        "p_sas": {
+            "title": "p_sas",
+            "field_name": "p_sas",
+            "type": "number",
+            "source_name": "gnomADmetrics",
+            "source_version": "v2.1.1"
+        },
+        "transcript_level": {
+            "title": "transcript_level",
+            "field_name": "transcript_level",
+            "type": "integer",
+            "source_name": "gnomADmetrics",
+            "source_version": "v2.1.1"
+        },
+        "gene_type": {
+            "title": "gene_type",
+            "field_name": "gene_type",
+            "type": "string",
+            "source_name": "gnomADmetrics",
+            "source_version": "v2.1.1"
+        },
+        "gene_length": {
+            "title": "gene_length",
+            "field_name": "gene_length",
+            "type": "integer",
+            "source_name": "gnomADmetrics",
+            "source_version": "v2.1.1"
+        },
+        "exac_pLI": {
+            "title": "exac_pLI",
+            "field_name": "exac_pLI",
+            "type": "number",
+            "source_name": "gnomADmetrics",
+            "source_version": "v2.1.1"
+        },
+        "exac_obs_lof": {
+            "title": "exac_obs_lof",
+            "field_name": "exac_obs_lof",
+            "type": "integer",
+            "source_name": "gnomADmetrics",
+            "source_version": "v2.1.1"
+        },
+        "exac_exp_lof": {
+            "title": "exac_exp_lof",
+            "field_name": "exac_exp_lof",
+            "type": "number",
+            "source_name": "gnomADmetrics",
+            "source_version": "v2.1.1"
+        },
+        "exac_oe_lof": {
+            "title": "exac_oe_lof",
+            "field_name": "exac_oe_lof",
+            "type": "number",
+            "source_name": "gnomADmetrics",
+            "source_version": "v2.1.1"
+        },
+        "schema_version": {
+            "default": "1"
+        }
+    },
+    "facets": {},
+    "columns": {}
+}

@@ -5,6 +5,7 @@ from encoded.commands.gene_table_intake import (
 
 pytestmark = [pytest.mark.working]
 MT_LOC = './src/encoded/tests/data/variant_workbook/gene_table.csv'
+GENE_SCHEMA_TEST_LOC = './src/encoded/tests/data/variant_workbook/gene.json'
 GENE_ANNOTATION_FIELD_SCHEMA = './src/encoded/schemas/gene_annotation_field.json'
 EXPECTED_FIELDS = ['column_priority', 'comments', 'description', 'do_import',
                    'enum_list', 'facet_grouping', 'facet_priority', 'field_name',
@@ -20,6 +21,8 @@ EXPECTED_INSERT = {'no': 1, 'field_name': 'chrom', 'source_name': 'ENSEMBLgene',
                        ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13',
                         '14', '15', '16', '17', '18', '19', '20', '21', '22', 'X', 'Y', 'M'],
                    'do_import': True}
+CLINGENDIS_FIELDS_EXPECTED = 6
+TRANSCRIPT_FIELDS_EXPECTED = 15
 
 
 @pytest.fixture
@@ -66,4 +69,40 @@ def test_post_gene_annotation_field_inserts(inserts, testapp):
 
 def test_generate_gene_schema(gene_schema):
     """ Inspects parts of the generated gene schema for correctness """
-    pass
+    properties = gene_schema['properties']
+
+    # check top level properties
+    assert 'chrom' in properties
+    assert 'enum' in properties['chrom']
+    assert properties['chrom']['type'] == 'string'
+    assert properties['chrom']['do_import'] is True
+    assert properties['chrom']['schema_title'] == 'Chromosome'
+
+    # check sub-embedded object fields
+    clingendis_props = properties['clingendis']['items']['properties']
+    assert len(clingendis_props.keys()) == CLINGENDIS_FIELDS_EXPECTED
+    assert 'disease_id' in clingendis_props
+    assert 'classification_date' in clingendis_props
+    clingendis_disease_label = properties['clingendis']['items']['properties']['disease_label']['items']
+    assert clingendis_disease_label['type'] == 'string'
+
+    transcript_props = properties['transcript']['items']['properties']
+    assert len(transcript_props.keys()) == TRANSCRIPT_FIELDS_EXPECTED
+    assert 'refseq' in transcript_props
+    assert 'protein_length' in transcript_props
+    assert transcript_props['five_prime_UTR']['source_name'] == 'GenCode'
+
+    # XXX: Columns/Facets are empty
+    assert gene_schema['columns'] == {}
+    assert gene_schema['facets'] == {}
+
+
+def test_gene_table_run(GTParser, testapp):
+    """ Runs the gene table ingestion process, building the schema into the test location
+        and posting the resulting inserts """
+    CONNECTION_URL = '/gene_annotation_field'
+    inserts = GTParser.run(gs_out=GENE_SCHEMA_TEST_LOC, write=False)
+    for item in inserts:
+        testapp.post_json(CONNECTION_URL, item, status=201)
+
+

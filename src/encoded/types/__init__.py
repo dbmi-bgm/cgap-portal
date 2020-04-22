@@ -44,6 +44,21 @@ class SampleProcessing(Item):
 
 
 @collection(
+    name='genes',
+    unique_key='gene:ensgid',
+    properties={
+        'title': 'Genes',
+        'description': 'Gene items',
+    })
+class Gene(Item):
+    """Gene class."""
+    item_type = 'gene'
+    name_key = 'ensgid'
+    schema = load_schema('encoded:schemas/gene.json')
+    embedded_list = []
+
+
+@collection(
     name='gene-annotation-fields',
     unique_key='gene_annotation_field:field_name',
     properties={
