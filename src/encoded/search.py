@@ -1399,7 +1399,7 @@ def build_table_columns(request, schemas, doc_types):
     # Add title column, at beginning always
     columns['display_title'] = {
         "title" : "Title",
-        "order" : -100
+        "order" : -1000
     }
 
     # Add type column if any abstract types in search
@@ -1407,7 +1407,7 @@ def build_table_columns(request, schemas, doc_types):
         columns['@type'] = {
             "title" : "Item Type",
             "colTitle" : "Type",
-            "order" : -80,
+            "order" : -980,
             "description" : "Type or category of Item",
             # Alternative below, if we want type column to be available but hidden by default in selection mode:
             # "default_hidden": request.normalized_params.get('currentAction') == 'selection'
@@ -1436,7 +1436,7 @@ def build_table_columns(request, schemas, doc_types):
         columns['status'] = {
             "title"             : "Status",
             "default_hidden"    : True,
-            "order"             : 501
+            "order"             : 980
         }
     # Add date column, if not present, at end.
     if 'date_created' not in columns:
@@ -1444,7 +1444,7 @@ def build_table_columns(request, schemas, doc_types):
             "title"             : "Date Created",
             "colTitle"          : "Created",
             "default_hidden"    : True,
-            "order"             : 510
+            "order"             : 1000
         }
     return columns
 

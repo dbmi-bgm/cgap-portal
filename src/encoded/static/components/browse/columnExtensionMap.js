@@ -46,7 +46,7 @@ export const columnExtensionMap = {
         'widthMap' : { 'lg' : 140, 'md' : 120, 'sm' : 120 },
         'render' : function(result, columnDefinition, props, width){
             if (!result.date_published) return null;
-            return formatPublicationDate(result.date_published);
+            return <span className="value">{ formatPublicationDate(result.date_published) }</span>;
         },
         'order' : 504
     },
@@ -66,10 +66,11 @@ export const columnExtensionMap = {
             if (typeof age !== "number" || isNaN(age)) {
                 return null;
             }
+            let showAge = age;
             if (age_units) {
-                return age + " " + age_units + (age === 1 ? "" : "s");
+                showAge = age + " " + age_units + (age === 1 ? "" : "s");
             }
-            return age;
+            return <span className="value">{ showAge }</span>;
         }
     },
     'age_at_death' : {
@@ -80,10 +81,11 @@ export const columnExtensionMap = {
             if (typeof age !== "number" || isNaN(age)) {
                 return null;
             }
+            let showAge = age;
             if (age_units) {
-                return age + " " + age_units + (age === 1 ? "" : "s");
+                showAge = age + " " + age_units + (age === 1 ? "" : "s");
             }
-            return age;
+            return <span className="value">{ showAge }</span>;
         }
     },
     'status' : {
@@ -105,12 +107,14 @@ export const columnExtensionMap = {
         'render' : function(result, columnDefinition, props, width){
             if (!result.workflow || !result.workflow.title) return null;
             const { title }  = result.workflow;
-            const link = object.itemUtil.atId(result.workflow);
-            if (link){
-                return <a href={link}>{ title }</a>;
+            const workflowHref = object.itemUtil.atId(result.workflow);
+            let retLink;
+            if (workflowHref){
+                retLink = <a href={link}>{ title }</a>;
             } else {
-                return title;
+                retLink = title;
             }
+            return <span className="value">{ retLink }</span>;
         }
     }
 };

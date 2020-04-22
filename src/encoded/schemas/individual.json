@@ -24,7 +24,8 @@
             "accessionType" : "ID"
         },
         "age": {
-            "title": "Age of the Individual",
+            "title": "Age",
+            "description": "Age of the Individual",
             "type": "number",
             "lookup": 2
         },
@@ -191,7 +192,8 @@
         },
         "ancestry": {
             "title": "Ancestry",
-            "description": "Ancestry of the individual. List taken from https://gist.github.com/incredimike/1469814.",
+            "description": "Ancestry of the individual by nation.",
+            "notes" : "Initial list for `items.suggested_enum` taken from https://gist.github.com/incredimike/1469814.",
             "type": "array",
             "lookup": 30,
             "uniqueItems": true,
@@ -579,9 +581,10 @@
             "title" : "Age",
             "notes" : "Make custom column render fxn that combines this + age units. Have it show age_at_death if present..",
             "sort_fields" : [
-                { "field" : "accession", "title" : "Accession (CGAP ID)" },
-                { "field" : "aliases", "title" : "User-Defined Alias" },
-                { "field" : "uuid", "title" : "UUID" }
+                { "field" : "age", "title" : "Age (any unit)" },
+                { "field" : "age_at_death", "title" : "Age at Death" },
+                { "field" : "gestational_age", "title" : "Gestational Age" },
+                { "field" : "birth_year", "title" : "Birth Year" }
             ],
             "default_hidden" : false
         },
