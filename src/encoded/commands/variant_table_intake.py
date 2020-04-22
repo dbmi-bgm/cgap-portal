@@ -22,6 +22,7 @@ class MappingTableParser(object):
     FIELD_TYPE_INDEX = 5  # XXX: hardcoded, must change if field_type is moved on mapping table
     INTEGER_FIELDS = ['no', 'maximum_length_of_value', 'column_priority', 'facet_priority']
     BOOLEAN_FIELDS = ['is_list', 'calculated_property']
+    NAME_FIELD = 'vcf_name'
 
     def __init__(self, _mp, schema):
         self.mapping_table = _mp
@@ -84,7 +85,7 @@ class MappingTableParser(object):
         logger.info('Mapping table fields: %s\n' % (", ".join(fields)))
         return version, date, fields
 
-    def process_mp_inserts(self):
+    def process_annotation_field_inserts(self):
         """ Processes the annotation fields in the mapping table to produce inserts
             Note that project and institution are required fields on the annotation
             field schema and are not set here
@@ -150,9 +151,7 @@ class MappingTableParser(object):
         """
         return [field for field in inserts if field.get('scope', '') == 'variant']
 
-
-    @staticmethod
-    def generate_properties(inserts, variant=True):
+    def generate_properties(self, inserts, variant=True):
         """ Generates sample variant or variant schema properties
             This function is quite long and complicated... Should probably be
             refactored
@@ -168,11 +167,11 @@ class MappingTableParser(object):
         # inner functions to be used as helpers here
         def get_prop(item):
             temp = OrderedDict()
-            prop_name = item['vcf_name']
+            prop_name = item[self.NAME_FIELD]
             features = OrderedDict()
             features.update({
                 "title": item.get('schema_title', prop_name),
-                "vcf_name": prop_name,
+                self.NAME_FIELD: prop_name,
                 "type": item['field_type']
             })
             # handle fields where key changes directly
@@ -206,7 +205,7 @@ class MappingTableParser(object):
                     # handle sub-embedded object that is an array
                     if item.get('is_list'):
                         prop[prop_name] = {
-                            'title': item.get('vcf_name', 'None provided'),
+                            'title': item.get(self.NAME_FIELD, 'None provided'),
                             'type': 'array',
                             'items': features
                         }
@@ -237,9 +236,9 @@ class MappingTableParser(object):
             if item.get('is_list'):
                 array_item = OrderedDict()
                 array_item.update({
-                    "title": item.get('schema_title', item['vcf_name']),
+                    "title": item.get('schema_title', item[self.NAME_FIELD]),
                     "type": "array",
-                    "vcf_name": item['vcf_name']
+                    "vcf_name": item[self.NAME_FIELD]
                 })
                 if item.get('schema_description'):
                     array_item['description'] = item['schema_description']
@@ -280,7 +279,7 @@ class MappingTableParser(object):
             return o.get('field_type') in ['integer', 'number']
 
         def insert_column_or_facet(d, o):
-            val = { 'title': o.get('schema_title', o.get('vcf_name')) }
+            val = {'title': o.get('schema_title', o.get(self.NAME_FIELD))}
             if is_numbered_field(o) and is_facet(o):
                 val['aggregation_type'] = 'stats'
                 if "number_step" in o:
@@ -293,14 +292,14 @@ class MappingTableParser(object):
                     val['number_step'] = "any"
             if is_sub_embedded_object(o):
                 if is_link_to(o):  # add .display_title if we are a linkTo
-                    d[o.get('sub_embedding_group') + '.' + o['vcf_name'] + '.display_title'] = val
+                    d[o.get('sub_embedding_group') + '.' + o[self.NAME_FIELD] + '.display_title'] = val
                 else:
-                    d[o.get('sub_embedding_group') + '.' + o['vcf_name']] = val
+                    d[o.get('sub_embedding_group') + '.' + o[self.NAME_FIELD]] = val
             else:
                 if is_link_to(o):
-                    d[o['vcf_name'] + '.display_title'] = val
+                    d[o[self.NAME_FIELD] + '.display_title'] = val
                 else:
-                    d[o['vcf_name']] = val
+                    d[o[self.NAME_FIELD]] = val
 
         # go through all annotation objects generating schema properties and
         # adding columns/facets as defined by the mapping table
@@ -325,7 +324,6 @@ class MappingTableParser(object):
         if not props:
             raise MappingTableIntakeException('Got no properties on schema!')
         return props, cols, facs
-
 
     @staticmethod
     def add_default_schema_fields(schema):
@@ -445,7 +443,7 @@ class MappingTableParser(object):
         Returns:
             inserts: annotation field inserts
         """
-        inserts = self.process_mp_inserts()
+        inserts = self.process_annotation_field_inserts()
         variant_sample_props, vs_cols, vs_facs = self.generate_properties(self.filter_fields_by_sample(inserts), variant=False)
         variant_props, v_cols, v_facs = self.generate_properties(self.filter_fields_by_variant(inserts))
         variant_sample_schema = self.generate_variant_sample_schema(variant_sample_props, cols=vs_cols, facs=vs_facs,

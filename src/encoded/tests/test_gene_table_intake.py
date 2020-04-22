@@ -29,7 +29,13 @@ def GTParser():
 
 @pytest.fixture
 def inserts(GTParser):
-    return GTParser.process_mp_inserts()
+    return GTParser.process_annotation_field_inserts()
+
+
+@pytest.fixture
+def gene_schema(GTParser, inserts):
+    props, columns, facets = GTParser.generate_properties(inserts)
+    return GTParser.generate_gene_schema(props, columns, facets)
 
 
 def test_read_gene_table_header(GTParser):
@@ -39,7 +45,7 @@ def test_read_gene_table_header(GTParser):
     assert sorted(GTParser.fields) == sorted(EXPECTED_FIELDS)
 
 
-def test_process_gene_table_inserts(GTParser, inserts):
+def test_process_gene_table_inserts(inserts):
     """
         Tests that we properly process gene annotation field inserts
         There should be 254 total. A hand crafted example is checked
@@ -56,3 +62,8 @@ def test_post_gene_annotation_field_inserts(inserts, testapp):
     CONNECTION_URL = '/gene_annotation_field'
     for item in inserts:
         testapp.post_json(CONNECTION_URL, item, status=201)
+
+
+def test_generate_gene_schema(gene_schema):
+    """ Inspects parts of the generated gene schema for correctness """
+    pass

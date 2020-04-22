@@ -34,7 +34,7 @@ def MTParser():
 
 @pytest.fixture
 def inserts(MTParser):
-    return MTParser.process_mp_inserts()
+    return MTParser.process_annotation_field_inserts()
 
 
 @pytest.fixture
