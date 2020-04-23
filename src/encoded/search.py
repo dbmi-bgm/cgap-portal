@@ -1281,8 +1281,8 @@ def set_filters(request, search, result, principals, doc_types, es_mapping):
     range_filters = handle_range_filters(request, result, field_filters, doc_types)
 
     # construct queries
-    must_filters, must_not_filters, \
-    must_filters_nested, must_not_filters_nested = build_sub_queries(field_filters, es_mapping)
+    (must_filters, must_not_filters,
+     must_filters_nested, must_not_filters_nested = build_sub_queries(field_filters, es_mapping))
 
     # add range limits to filters if given
     apply_range_filters(range_filters, must_filters, es_mapping)
@@ -1589,16 +1589,16 @@ def fix_nested_aggregations(search, es_mapping):
     aggs_ptr = search.aggs['all_items']
     for agg in aggs_ptr:
         if NESTED in agg:
-            search.aggs['all_items'] \
-                  .bucket(agg, 'nested', path=find_nested_path(aggs_ptr.aggs[agg]['primary_agg'].field, es_mapping)) \
+            (search.aggs['all_items']
+                  .bucket(agg, 'nested', path=find_nested_path(aggs_ptr.aggs[agg]['primary_agg'].field, es_mapping))
                   .bucket('primary_agg',
-                          Terms(field=aggs_ptr.aggs[agg]['primary_agg'].field, size=100, missing='No value')) \
-                  .bucket('primary_agg_reverse_nested', REVERSE_NESTED)
+                          Terms(field=aggs_ptr.aggs[agg]['primary_agg'].field, size=100, missing='No value'))
+                  .bucket('primary_agg_reverse_nested', REVERSE_NESTED))
 
 
 def get_query_field(field, facet):
     """
-    Converts a field from its generic field name to a more specific field name referencing it's embedded nature
+    Converts a field from its generic field name to a more specific field name referencing its embedded nature
 
     :param field: generic field name, such as 'files.accession'
     :param facet: facet on this field
@@ -1650,7 +1650,7 @@ def set_facets(search, facets, search_filters, string_query, request, doc_types,
                         facet["number_step"] = field_schema['number_step']
                     elif facet["field_type"] == "integer":
                         facet["number_step"] = 1
-                    else: # Default
+                    else:  # Default
                         facet["number_step"] = "any"
             facet_filters = generate_filters_for_terms_agg_from_search_filters(query_field, search_filters, string_query)
 
@@ -1816,7 +1816,7 @@ def execute_search(request, search):
         else:
             err_exp = 'The search failed due to a transport error: ' + str(exc)
     except Exception as exc:
-        err_exp = str(exc)
+        err_exp = str(exc)  # XXX: We should revisit if we think this is always safe... -Will 4-23-2020
     if err_exp:
         raise HTTPBadRequest(explanation=err_exp)
     return es_results
@@ -1828,8 +1828,8 @@ def fix_and_replace_nested_doc_count(result_facet, aggregations, full_agg_name):
         1. front-end does not care about 'nested', only what the inner thing is, so lets pretend (so it doesn't break)
         2. We must overwrite the "second level" doc_count with the "third level" because the "third level"
            is the 'root' level doc_count, which is what we care about, NOT the nested doc count
-         3. We must then re-sort the aggregations so they show up in from greatest to least doc_count wrt the root
-            level count instead of the "old" nested doc count.
+        3. We must then re-sort the aggregations so they show up in from greatest to least doc_count wrt the root
+           level count instead of the "old" nested doc count.
 
     :param result_facet: facet to be created - 'aggregation_type' is overwritten as 'terms'
     :param aggregations: handle to all aggregations that we can access based on name
@@ -1895,11 +1895,11 @@ def format_facets(es_results, facets, total, search_frame='embedded'):
                 # XXX: The above comment is misleading - this drops all facets with no buckets
                 # we apparently want this for non-nested fields based on the tests, but should be
                 # investigated as having to do this doesn't really make sense.
-                if len(result_facet.get('terms', [])) < 1 and not facet['aggregation_type'] == 'nested':
+                if len(result_facet.get('terms', [])) < 1 and not facet['aggregation_type'] == NESTED:
                     continue
 
                 # if we are nested, apply fix + replace
-                if facet['aggregation_type'] == 'nested':
+                if facet['aggregation_type'] == NESTED:
                     fix_and_replace_nested_doc_count(result_facet, aggregations, full_agg_name)
 
                 # Re-add buckets under 'terms' AFTER we have fixed the doc_counts
