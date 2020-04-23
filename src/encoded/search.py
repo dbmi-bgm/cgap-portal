@@ -1281,8 +1281,8 @@ def set_filters(request, search, result, principals, doc_types, es_mapping):
     range_filters = handle_range_filters(request, result, field_filters, doc_types)
 
     # construct queries
-    (must_filters, must_not_filters,
-     must_filters_nested, must_not_filters_nested = build_sub_queries(field_filters, es_mapping))
+    must_filters, must_not_filters, \
+    must_filters_nested, must_not_filters_nested = build_sub_queries(field_filters, es_mapping)
 
     # add range limits to filters if given
     apply_range_filters(range_filters, must_filters, es_mapping)
