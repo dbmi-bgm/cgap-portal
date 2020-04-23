@@ -557,6 +557,22 @@ def test_index_data_workbook(app, workbook, testapp, indexer_testapp, htmltestap
                 pass
 
 
+def test_search_with_principals_allowed_fails(workbook, anontestapp):
+    """ Tests query with a query string parameter for principals_allowed.view, which should not be possible. """
+    from webtest import AppError
+    with pytest.raises(AppError):
+        anontestapp.get('/search/?type=Item&principals_allowed.view=group.PERMISSION_YOU_DONT_HAVE')
+    with pytest.raises(AppError):
+        anontestapp.get('/search/?type=Cohort'
+                        '&families.proband.display_title=GAPID8J9B9CR'
+                        '&principals_allowed.view=group.PERMISSION_YOU_DONT_HAVE')
+    with pytest.raises(AppError):
+        anontestapp.get('/search/?type=Cohort'
+                        '&families.proband.display_title=GAPID5HBSLG6'
+                        '&families.clinic_notes=testing'
+                        '&principals_allowed.view=group.PERMISSION_YOU_DONT_HAVE')
+
+
 class TestNestedSearch(object):
     """ This class encapsulates all helper methods and tests needed to test out nested searches """
 

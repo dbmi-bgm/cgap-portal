@@ -186,10 +186,10 @@ def search(context, request, search_type=None, return_generator=False, forced_ty
 
     ### Execute the query
     if size == 'all':
-        es_results = execute_search_for_all_results(search)
+        es_results = execute_search_for_all_results(request, search)
     else:
         size_search = search[from_:from_ + size]
-        es_results = execute_search(size_search)
+        es_results = execute_search(request, size_search)
 
     ### Record total number of hits
     result['total'] = total = es_results['hits']['total']
@@ -405,19 +405,19 @@ def get_pagination(request):
     return from_, size
 
 
-def get_all_subsequent_results(initial_search_result, search, extra_requests_needed_count, size_increment):
+def get_all_subsequent_results(request, initial_search_result, search, extra_requests_needed_count, size_increment):
     """ Generator method used to paginate. """
     from_ = 0
     while extra_requests_needed_count > 0:
         #print(str(extra_requests_needed_count) + " requests left to get all results.")
         from_ = from_ + size_increment
         subsequent_search = search[from_:from_ + size_increment]
-        subsequent_search_result = execute_search(subsequent_search)
+        subsequent_search_result = execute_search(request, subsequent_search)
         extra_requests_needed_count -= 1
         for hit in subsequent_search_result['hits'].get('hits', []):
             yield hit
 
-def execute_search_for_all_results(search):
+def execute_search_for_all_results(request, search):
     """
     Uses the above function to automatically paginate all results.
     Note: in the future, we should the approach here
@@ -428,13 +428,13 @@ def execute_search_for_all_results(search):
     size_increment = 100  # Decrease this to like 5 or 10 to test.
 
     first_search = search[0:size_increment]  # get aggregations from here
-    es_result = execute_search(first_search)
+    es_result = execute_search(request, first_search)
 
     total_results_expected = es_result['hits'].get('total', 0)
     extra_requests_needed_count = int(math.ceil(total_results_expected / size_increment)) - 1  # Decrease by 1 (first es_result already happened)
 
     if extra_requests_needed_count > 0:
-        es_result['hits']['hits'] = itertools.chain(es_result['hits']['hits'], get_all_subsequent_results(es_result, search, extra_requests_needed_count, size_increment))
+        es_result['hits']['hits'] = itertools.chain(es_result['hits']['hits'], get_all_subsequent_results(request, es_result, search, extra_requests_needed_count, size_increment))
     return es_result
 
 
@@ -1753,7 +1753,41 @@ def set_additional_aggregations(search_as_dict, request, doc_types, extra_aggreg
     return search_as_dict
 
 
-def execute_search(search):
+def verify_search_has_permissions(request, search):
+    """
+    Inspects the search object to ensure permissions are still present on the query
+    This method depends on the query structure defined in 'set_filters'.
+
+    :param search: search object to inspect
+    :raises: HTTPBadRequest if permissions not present
+    """
+    search_dict = search.to_dict()
+    try:
+        for boolean_clause in search_dict['query']['bool']['filter']:  # should always be present
+            if 'bool' in boolean_clause and 'must' in boolean_clause['bool']:  # could be must_not,
+                possible_permission_block = boolean_clause['bool']['must']
+                for entry in possible_permission_block:
+                    if 'terms' in entry:
+                        if 'principals_allowed.view' in entry['terms']:
+                            effective_principals_on_query = sorted(entry['terms']['principals_allowed.view'])
+                            if effective_principals_on_query != sorted(request.effective_principals):
+                                log.error('SEARCH: Detected URL query param manipulation, principals_allowed.view was'
+                                          'modified from %s to %s' % (request.effective_principals,
+                                                                      effective_principals_on_query))
+                                raise QueryConstructionException(
+                                    query_type='principals',
+                                    func='verify_search_has_permissions',
+                                    msg='principals_allowed was modified - see application logs')
+                            else:
+                                break
+    except QueryConstructionException:
+        raise HTTPBadRequest('The search failed - the DCIC team has been notified.')
+    except KeyError:
+        log.error('SEARCH: Malformed query detected while checking for principals_allowed')
+        raise HTTPBadRequest('The search failed - the DCIC team has been notified.')
+
+
+def execute_search(request, search):
     """
     Execute the given Elasticsearch-dsl search. Raise HTTPBadRequest for any
     exceptions that arise.
@@ -1762,6 +1796,7 @@ def execute_search(search):
     :returns: Dictionary search results
     """
     err_exp = None
+    verify_search_has_permissions(request, search)  # query integrity check
     try:
         es_results = search.execute().to_dict()
     except ConnectionTimeout as exc:
