@@ -468,6 +468,17 @@
                 "linkTo" : "Image"
             }
         },
+        "related_documents" : {
+            "title" : "Related Documents",
+            "description": "Documents related to the individual, e.g. clinical notes or test results",
+            "type" : "array",
+            "uniqueItems": true,
+            "items" : {
+                "title" : "Document",
+                "type" : "string",
+                "linkTo" : "Document"
+            }
+        },
         "institutional_id": {
             "description": "Custom identifier provided by the institution",
             "type": "object",
