@@ -3,6 +3,7 @@ import pytest
 import mock
 
 from datetime import (datetime, timedelta)
+from pyramid.httpexceptions import HTTPBadRequest
 from snovault import TYPES, COLLECTIONS
 from snovault.elasticsearch import create_mapping
 from snovault.elasticsearch.create_mapping import MAX_NGRAM
@@ -585,7 +586,7 @@ def test_search_with_hacked_query(anontestapp, hacked_query):
     """
     with mock.patch('encoded.search.convert_search_to_dictionary', return_value=hacked_query):
         mocked_request_with_least_permissive_permissions = MockedRequest()
-        with pytest.raises(Exception):
+        with pytest.raises(HTTPBadRequest):
             verify_search_has_permissions(mocked_request_with_least_permissive_permissions, None)
         mocked_request_with_same_permissions = MockedRequest(principals_allowed=['system.Everyone',
                                                                                  'group.PERMISSION_YOU_DONT_HAVE'])
