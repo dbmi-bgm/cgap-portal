@@ -1,11 +1,13 @@
 import json
 import pytest
-import time
+import mock
 
 from datetime import (datetime, timedelta)
+from pyramid.httpexceptions import HTTPBadRequest
 from snovault import TYPES, COLLECTIONS
 from snovault.elasticsearch import create_mapping
 from snovault.elasticsearch.create_mapping import MAX_NGRAM
+from encoded.search import verify_search_has_permissions
 from snovault.elasticsearch.indexer_utils import get_namespaced_index
 from snovault.util import add_default_embeds
 from ..commands.run_upgrader_on_inserts import get_inserts
@@ -38,7 +40,7 @@ def recursively_find_uuids(json, uuids):
 def test_search_view(workbook, testapp):
     """ Test basic things about search view """
     res = testapp.get('/search/?type=Item').json
-    assert res['@type'] == ['Search']
+    assert res['@type'] == ['ItemSearchResults', 'Search']
     assert res['@id'] == '/search/?type=Item'
     assert res['@context'] == '/terms/'
     assert res['notification'] == 'Success'
@@ -55,7 +57,7 @@ def test_search_with_no_query(workbook, testapp):
     thus, should satisfy same assertions as test_search_view
     """
     res = testapp.get('/search/').follow(status=200)
-    assert res.json['@type'] == ['Search']
+    assert res.json['@type'] == ['ItemSearchResults', 'Search']
     assert res.json['@id'] == '/search/?type=Item'
     assert res.json['@context'] == '/terms/'
     assert res.json['notification'] == 'Success'
@@ -76,7 +78,7 @@ def test_collections_redirect_to_search(workbook, testapp):
     redirected_from is not used for search
     """
     res = testapp.get('/user/', status=301).follow(status=200)
-    assert res.json['@type'] == ['UserSearchResults', 'Search']
+    assert res.json['@type'] == ['UserSearchResults', 'ItemSearchResults', 'Search']
     assert res.json['@id'] == '/search/?type=User'
     assert 'redirected_from' not in res.json['@id']
     assert res.json['@context'] == '/terms/'
@@ -484,10 +486,10 @@ def test_search_with_static_header(workbook, testapp):
 
 
 def test_search_multiple_types(workbook, testapp):
-    # multiple types work with @type in response
+    """ Note that the behavior now is in '@type' will be the highest common ancestor if searched on multiple types """
     search = '/search/?type=Individual&type=Workflow'
     res = testapp.get(search).json
-    assert res['@type'] == ['IndividualSearchResults', 'WorkflowSearchResults', 'Search']
+    assert res['@type'] == ['ItemSearchResults', 'Search']
 
 
 #########################################
@@ -557,35 +559,255 @@ def test_index_data_workbook(app, workbook, testapp, indexer_testapp, htmltestap
                 pass
 
 
-######################################
-## Search-based visualization tests ##
-######################################
+class MockedRequest(object):
+    """ Test object intended to be used to mock certain aspects of requests. Takes kwargs which
+        will be passed as named fields to MockedRequest. More arguments could be added if other
+        use is seen.
+    """
+    def __init__(self, **kwargs):
+        if 'principals_allowed' not in kwargs:
+            self.effective_principals = ['system.Everyone']
+        else:
+            self.effective_principals = kwargs['principals_allowed']  # note this is not exactly what the field is
 
 
-@pytest.mark.skip # XXX: No bar_plot_aggregations
-def test_barplot_aggregation_endpoint(workbook, testapp):
+@pytest.fixture
+def hacked_query():
+    """ This is valid lucene that will have 'principals_allowed.view' that differs from what is on the request.
+        Our helper method should detect such change and throw an error. """
+    return {'query': {'bool': {'filter': [{'bool': {'must': [{'terms':
+                     {'principals_allowed.view': ['system.Everyone', 'group.PERMISSION_YOU_DONT_HAVE']}}]}}]}}}
 
-    # Check what we get back -
-    search_result = testapp.get('/search/?type=Cohort').json
-    search_result_count = len(search_result['@graph'])
 
-    # We should get back same count as from search results here. But on Travis oftentime we don't, so we compare either against count of inserts --or-- count returned from regular results.
-    exp_set_test_inserts = list(get_inserts('inserts', 'cohort'))
-    count_exp_set_test_inserts = len(exp_set_test_inserts)
+def test_search_with_hacked_query(anontestapp, hacked_query):
+    """ Attempts to execute what is considered a 'bad query' in a MockedRequest context. Our
+        verification function should throw an exception if there is any delta in the permissions object
+        we explicitly attach to every search query.
+    """
+    with mock.patch('encoded.search.convert_search_to_dictionary', return_value=hacked_query):
+        mocked_request_with_least_permissive_permissions = MockedRequest()
+        with pytest.raises(HTTPBadRequest):
+            verify_search_has_permissions(mocked_request_with_least_permissive_permissions, None)
+        mocked_request_with_same_permissions = MockedRequest(principals_allowed=['system.Everyone',
+                                                                                 'group.PERMISSION_YOU_DONT_HAVE'])
+        verify_search_has_permissions(mocked_request_with_same_permissions, None)
 
-    # Now, test the endpoint after ensuring we have the data correctly loaded into ES.
-    # We should get back same count as from search results here.
-    res = testapp.post_json('/bar_plot_aggregations', {
-        "search_query_params" : { "type" : ['User'] },
-        "fields_to_aggregate_for" : ["experiments_in_set.experiment_type.display_title", "project.project"]
-    }).json
 
-    # Our total count for experiment_sets should match # of exp_set_replicate inserts.abs
+def test_search_with_principals_allowed_fails(workbook, anontestapp):
+    """ Tests query with a query string parameter for principals_allowed.view, which will be AND'd with what's
+        on the request.
 
-    assert (res['total']['experiment_sets'] == count_exp_set_test_inserts) or (res['total']['experiment_sets'] == search_result_count)
+        XXX IMPORTANT: Since we do permissions in a restrictive way, this works - if our permissions structure is
+        modified, it is possible this behavior will need to be revisited -Will 4-24-2020
+    """
+    from webtest import AppError
+    with pytest.raises(AppError):
+        anontestapp.get('/search/?type=Item&principals_allowed.view=group.PERMISSION_YOU_DONT_HAVE')
+    with pytest.raises(AppError):
+        anontestapp.get('/search/?type=Cohort'
+                        '&families.proband.display_title=GAPID8J9B9CR'
+                        '&principals_allowed.view=group.PERMISSION_YOU_DONT_HAVE')
+    with pytest.raises(AppError):
+        anontestapp.get('/search/?type=Cohort'
+                        '&families.proband.display_title=GAPID5HBSLG6'
+                        '&families.clinic_notes=testing'
+                        '&principals_allowed.view=group.PERMISSION_YOU_DONT_HAVE')
 
-    assert res['field'] == 'experiments_in_set.experiment_type.display_title' # top level field
 
-    assert isinstance(res['terms'], dict) is True
+class TestNestedSearch(object):
+    """ This class encapsulates all helper methods and tests needed to test out nested searches """
 
-    assert len(res["terms"].keys()) > 0
+    FACET_TO_CHECK = 'families.proband.display_title'
+
+    @staticmethod
+    def assert_length_is_expected(result, expected):
+        assert len(result['@graph']) == expected
+
+    @staticmethod
+    def is_blue_thumbs(result):
+        """ Checks that this result is the 'People with Blue Thumbs' cohort """
+        return 'Blue' in result['title']
+
+    @staticmethod
+    def is_red_feet(result):
+        """ Checks that this result is the 'People with Red Feet' cohort """
+        return 'Red' in result['title']
+
+    @staticmethod
+    def is_swollen_ears(result):
+        """ Checks that this result is the 'People with Swollen Ears' cohort """
+        return 'Swollen' in result['title']
+
+    @staticmethod
+    def result_contains_two(result, f1, f2):
+        compound = True
+        for res in result:
+            compound = compound and (f1(res) or f2(res))
+        return compound
+
+    @staticmethod
+    def result_contains_all(result, f1, f2, f3):
+        compound = True
+        for res in result:
+            compound = compound and (f1(res) or f2(res) or f3(res))
+        return compound
+
+    def test_search_on_single_nested_field(self, workbook, testapp):
+        """ Should match only once since one has a family with a proband with display_title GAPID8J9B9CR """
+        res = testapp.get('/search/?type=Cohort'
+                          '&families.proband.display_title=GAPID8J9B9CR').json
+        self.assert_length_is_expected(res, 1)
+        assert self.is_blue_thumbs(res['@graph'][0])
+
+    def test_or_search_on_same_nested_field(self, workbook, testapp):
+        """ Should match all 3 since this is interpreted as an OR search on this field """
+        res = testapp.get('/search/?type=Cohort'
+                          '&families.proband.display_title=GAPID8J9B9CR'
+                          '&families.proband.display_title=GAPID5HBSLG6').json
+        self.assert_length_is_expected(res, 3)
+        assert self.result_contains_all(res['@graph'], self.is_blue_thumbs, self.is_red_feet, self.is_swollen_ears)
+
+    def test_and_search_on_nested_field_that_does_not_match(self, workbook, testapp):
+        """ This has clinic notes that do not match with any proband object, so will give no results """
+        testapp.get('/search/?type=Cohort'
+                    '&families.proband.display_title=GAPID8J9B9CR'
+                    '&families.clinic_notes=gnitset', status=404)
+
+    def test_and_search_on_nested_field_that_matches_one(self, workbook, testapp):
+        """ This has the correct 'clinic_notes', so should match """
+        res = testapp.get('/search/?type=Cohort'
+                          '&families.proband.display_title=GAPID5HBSLG6'
+                          '&families.clinic_notes=testing').json
+        self.assert_length_is_expected(res, 1)
+        assert self.is_blue_thumbs(res['@graph'][0])
+
+    def test_or_search_on_nested_clinic_notes_that_matches_two(self, workbook, testapp):
+        """ Do an OR search on clinic_notes, matching two cohorts """
+        res = testapp.get('/search/?type=Cohort'
+                          '&families.proband.display_title=GAPID5HBSLG6'
+                          '&families.clinic_notes=xyz'
+                          '&families.clinic_notes=testing').json
+        self.assert_length_is_expected(res, 2)
+        assert self.result_contains_two(res['@graph'], self.is_blue_thumbs, self.is_red_feet)
+
+    def test_negative_search_on_clinic_notes(self, workbook, testapp):
+        """ Do an OR search with clinic_notes with a negative, should eliminate red_feet and match swollen_ears """
+        res = testapp.get('/search/?type=Cohort'
+                          '&families.proband.display_title=GAPID5HBSLG6'
+                          '&families.clinic_notes!=xyz').follow().json
+        self.assert_length_is_expected(res, 2)
+        assert self.result_contains_two(res['@graph'], self.is_blue_thumbs, self.is_swollen_ears)
+
+    def test_and_search_that_matches_one(self, workbook, testapp):
+        """ Check two properties that occur in the same sub-embedded object in 1 cohort """
+        res = testapp.get('/search/?type=Cohort'
+                          '&families.members.mother.display_title=GAPID6ZUDPO2'
+                          '&families.members.father.display_title=GAPIDRU2NWFO').json
+        self.assert_length_is_expected(res, 1)
+        assert self.is_blue_thumbs(res['@graph'][0])
+
+    def test_and_search_that_matches_multiple(self, workbook, testapp):
+        """ Check two properties that occur in the same sub-embedded object in 3 cohorts """
+        res = testapp.get('/search/?type=Cohort'
+                          '&families.members.mother.display_title=GAPIDISC7R73'
+                          '&families.members.father.display_title=GAPID3PW26SK').json
+        self.assert_length_is_expected(res, 3)
+        assert self.result_contains_all(res['@graph'], self.is_blue_thumbs, self.is_red_feet, self.is_swollen_ears)
+
+    def test_and_search_with_disqualifier(self, workbook, testapp):
+        """ Check three properties - two of which occur in the same sub-embedded object in
+           2 cohorts with an additional property that removes both """
+        testapp.get('/search/?type=Cohort'
+                    '&families.members.mother.display_title=GAPIDISC7R73'
+                    '&families.members.father.display_title=GAPID3PW26SK'
+                    '&families.proband.display_title=GAPID8J9B9CR', status=404)
+
+    def test_and_search_on_three_fields(self, workbook, testapp):
+        """ Search for 3 properties that all occur in the cohorts """
+        res = testapp.get('/search/?type=Cohort'
+                          '&families.members.mother.display_title=GAPIDISC7R73'
+                          '&families.members.father.display_title=GAPID3PW26SK'
+                          '&families.proband.display_title=GAPID5HBSLG6').json
+        self.assert_length_is_expected(res, 3)
+        assert self.result_contains_all(res['@graph'], self.is_blue_thumbs, self.is_red_feet, self.is_swollen_ears)
+
+    def test_and_search_on_three_fields_that_matches_one(self, workbook, testapp):
+        """ Change the parents such that only one cohort matches now """
+        res = testapp.get('/search/?type=Cohort'
+                          '&families.members.mother.display_title=GAPID6ZUDPO2'
+                          '&families.members.father.display_title=GAPIDRU2NWFO'
+                          '&families.proband.display_title=GAPID8J9B9CR').json
+        self.assert_length_is_expected(res, 1)
+        assert self.is_blue_thumbs(res['@graph'][0])
+
+    def test_search_with_non_existant_combinations(self, workbook, testapp):
+        """ Test that swapping around fields that would match across different sub-embedded objects
+            does not actually do so (ie: returns no results). """
+        testapp.get('/search/?type=Cohort'  # Swap the parents
+                    '&families.members.mother.display_title=GAPID3PW26SK'
+                    '&families.members.father.display_title=GAPIDISC7R73', status=404)
+        testapp.get('/search/?type=Cohort'  # Swap just the father
+                    '&families.members.mother.display_title=GAPIDISC7R73'
+                    '&families.members.father.display_title=GAPIDRU2NWFO', status=404)
+        testapp.get('/search/?type=Cohort'  # Swap just the mother
+                    '&families.members.mother.display_title=GAPID6ZUDPO2'
+                    '&families.members.father.display_title=GAPIDISC7R73', status=404)
+
+    def test_nested_search_with_no_value(self, workbook, testapp):
+        """ Tests searching on 'No value' alone on a nested field  """
+        res = testapp.get('/search/?type=Cohort'
+                          '&families.clinic_notes=No+value').json
+        self.assert_length_is_expected(res, 1)
+        assert self.is_swollen_ears(res['@graph'][0])
+
+    def test_nested_search_with_no_value_combined(self, workbook, testapp):
+        """ Tests searching on 'No value' combined with another nested field, in this case
+            should give no results (no matter the ordering) """
+        testapp.get('/search/?type=Cohort'
+                    '&families.clinic_notes=No+value'
+                    '&families.proband.display_title=GAPID8J9B9CR', status=404)
+        testapp.get('/search/?type=Cohort'
+                    '&families.proband.display_title=GAPID8J9B9CR'
+                    '&families.clinic_notes=No+value', status=404)
+        testapp.get('/search/?type=Cohort'
+                    '&families.clinic_notes=No+value'
+                    '&families.proband.display_title=GAPIDISC7R74', status=404)
+        testapp.get('/search/?type=Cohort'
+                    '&families.proband.display_title=GAPIDISC7R74'
+                    '&families.clinic_notes=No+value', status=404)
+
+    def test_search_nested_with_non_nested_fields(self, workbook, testapp):
+        """ Tests that combining a nested search with a non-nested one works in any order """
+        res = testapp.get('/search/?type=Cohort'
+                          '&families.clinic_notes=No+value'
+                          '&title=People+with+Swollen+Ears').json
+        self.assert_length_is_expected(res, 1)
+        assert self.is_swollen_ears(res['@graph'][0])
+        res = testapp.get('/search/?type=Cohort'
+                          '&title=People+with+Swollen+Ears'
+                          '&families.clinic_notes=No+value').json
+        self.assert_length_is_expected(res, 1)
+        assert self.is_swollen_ears(res['@graph'][0])
+
+    def test_search_nested_no_value_with_multiple_other_fields(self, workbook, testapp):
+        """ Tests that combining a 'No value' search with another nested search and a different non-nested
+            field works correctly """
+        res = testapp.get('/search/?type=Cohort'
+                          '&title=People+with+Swollen+Ears'
+                          '&families.clinic_notes=No+value'
+                          '&families.proband=GAPID5HBSLG6').follow().json
+        self.assert_length_is_expected(res, 1)
+        assert self.is_swollen_ears(res['@graph'][0])
+        testapp.get('/search/?type=Cohort'
+                    '&title=People+with+Swollen+Ears'
+                    '&families.clinic_notes=No+value'
+                    '&families.proband=GAPIDISC7R74', status=404)  # proband should disqualify
+
+    def test_search_nested_facets_are_correct(self, workbook, testapp):
+        """ Tests that nested facets are properly rendered """
+        facets = testapp.get('/search/?type=Cohort'
+                             '&families.proband.display_title=GAPID8J9B9CR').json['facets']
+        for facet in facets:
+            if facet['field'] == self.FACET_TO_CHECK:
+                assert len(facet['terms']) > 1  # there should be multiple if nested agg is working here
+                break
