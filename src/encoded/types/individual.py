@@ -19,9 +19,12 @@ class Individual(Item):
     item_type = 'individual'
     name_key = 'accession'
     schema = load_schema('encoded:schemas/individual.json')
-    rev = {'children_f': ('Individual', 'father'),
-           'children_m': ('Individual', 'mother'),
-           'families': ('Family', 'members')}
+    rev = {
+        'children_f': ('Individual', 'father'),
+        'children_m': ('Individual', 'mother'),
+        'families': ('Family', 'members'),
+        'case': ('Case', 'individual')
+    }
 
     embedded_list = [
         'father.is_deceased',
@@ -75,3 +78,18 @@ class Individual(Item):
         fams = self.rev_link_atids(request, "families")
         if fams:
             return fams
+
+    @calculated_property(schema={
+        "title": "Cases",
+        "description": "Cases for this individual",
+        "type": "array",
+        "items": {
+            "title": "Case",
+            "type": "string",
+            "linkTo": "Case"
+        }
+    })
+    def case(self, request):
+        rs = self.rev_link_atids(request, "case")
+        if rs:
+            return rs

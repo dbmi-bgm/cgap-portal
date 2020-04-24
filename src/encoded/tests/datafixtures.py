@@ -3,10 +3,10 @@ import copy
 
 
 ORDER = [
-    'user', 'project', 'institution', 'file_format', 'variant_consequence', 'cohort', 'family', 'individual',
-    'sample', 'workflow', 'access_key', 'disorder', 'document', 'file_fastq',
-    'file_processed', 'file_reference', 'gene', 'sample_processing',
-    'page', 'phenotype', 'quality_metric_fastqc', 'evidence_dis_pheno',
+    'user', 'project', 'institution', 'file_format', 'variant_consequence', 'phenotype',
+    'cohort', 'family', 'individual', 'sample', 'workflow', 'access_key', 'disorder',
+    'document', 'file_fastq', 'file_processed', 'file_reference', 'gene', 'sample_processing',
+    'case', 'report', 'page', 'quality_metric_fastqc', 'evidence_dis_pheno',
     'quality_metric_bamcheck', 'quality_metric_qclist', 'quality_metric_wgs_bamqc',
     'quality_metric_vcfcheck', 'quality_metric_workflowrun', 'software', 'static_section',
     'tracking_item', 'workflow_mapping', 'workflow_run_awsem', 'workflow_run'
@@ -267,12 +267,33 @@ def fam(testapp, project, female_individual, institution, grandpa, mother, fathe
 
 
 @pytest.fixture
-def sample_f(project, institution, female_individual):
-    return {
+def sample_f(testapp, project, institution, female_individual):
+    data = {
         'project': project['@id'],
         'institution': institution['@id'],
         'specimen_type': 'saliva',
         'date_received': '2015-12-7'
+    }
+    return testapp.post_json('/sample', data).json['@graph'][0]
+
+@pytest.fixture
+def sample_proc(testapp, project, institution, sample_f, fam):
+    data = {
+        'project': project['@id'],
+        'institution': institution['@id'],
+        'samples': [sample_f['@id']],
+        'families': [fam['@id']]
+    }
+    return testapp.post_json('/sample_processing', data).json['@graph'][0]
+
+
+@pytest.fixture
+def a_case(project, institution, child, sample_proc):
+    return {
+        'project': project['@id'],
+        'institution': institution['@id'],
+        'individual': child['@id'],
+        'sample_processing': sample_proc['@id']
     }
 
 

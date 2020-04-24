@@ -21,6 +21,20 @@
         "schema_version": {
             "default": "1"
         },
+        "analysis_type": {
+            "title": "Analysis Type",
+            "description": "The type of analysis performed, e.g. trio",
+            "type": "string",
+            "suggested_enum": [
+                "WGS",
+                "WGS-Trio",
+                "WGS-Group",
+                "WES",
+                "WES-Trio",
+                "WES-Group",
+                "Custom"
+            ]
+        },
         "samples": {
             "title": "Samples",
             "description": "Samples used in the analysis",
