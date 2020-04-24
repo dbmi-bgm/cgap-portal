@@ -170,10 +170,17 @@ export function standardizeObjectsInList(jsonList){
     return nextList;
 }
 
-export function sortByAge(indvA, indvB){
-    return 0 - ((indvA.age || 0) - (indvB.age || 0));
+/** Oldest first */
+export function sortByAge(a, b){
+    if (a.isProband) return -1;
+    if (b.isProband) return 1;
+    if (isNaN(b.age) && !isNaN(a.age)) return -1;
+    if (isNaN(a.age) && !isNaN(b.age)) return 1;
+    if (isNaN(a.age) && isNaN(b.age)) return 0;
+    return b.age - a.age;
 }
 
+/** Left to right in row: Father -> Mother -> Undetermined-Gender Parent */
 export function sortByGender(indvA, indvB){
     const { gender: gA } = indvA;
     const { gender: gB } = indvB;
