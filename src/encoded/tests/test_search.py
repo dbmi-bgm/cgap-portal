@@ -579,7 +579,10 @@ def hacked_query():
 
 
 def test_search_with_hacked_query(anontestapp, hacked_query):
-    """ Attempts to execute """
+    """ Attempts to execute what is considered a 'bad query' in a MockedRequest context. Our
+        verification function should throw an exception if there is any delta in the permissions object
+        we explicitly attach to every search query.
+    """
     with mock.patch('encoded.search.convert_search_to_dictionary', return_value=hacked_query):
         mocked_request_with_least_permissive_permissions = MockedRequest()
         with pytest.raises(Exception):
