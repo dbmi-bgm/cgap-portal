@@ -118,6 +118,7 @@
             "title": "ENSEMBL gene ID",
             "field_name": "ensgid",
             "type": "string",
+            "uniqueKey": true,
             "do_import": true,
             "source_name": "ENSEMBLgene",
             "source_version": "v99",
@@ -339,7 +340,7 @@
             "source_version": "2020-02-24",
             "schema_title": "UCSC",
             "description": "UCSC genome browser gene ID",
-            "pattern": "^uc[0-9]{3}[a-z]{3}\\\\.[0-9]$"
+            "pattern": "^uc[0-9]{3}[a-z]{3}\\.[0-9]$"
         },
         "refseq_accession": {
             "title": "RefSeq",

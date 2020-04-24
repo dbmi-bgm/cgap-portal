@@ -5,7 +5,7 @@ from encoded.commands.variant_table_intake import (
 
 
 # XXX: These constants should probably be handled in a more intelligent way -will
-pytestmark = [pytest.mark.working]
+pytestmark = [pytest.mark.working, pytest.mark.ingestion]
 MT_LOC = './src/encoded/tests/data/variant_workbook/variant_table.csv' # symlinked from encoded.commands
 ANNOTATION_FIELD_SCHEMA = './src/encoded/schemas/annotation_field.json'
 EXPECTED_FIELDS = ['no', 'vcf_name', 'source_name', 'source_version', 'sub_embedding_group',

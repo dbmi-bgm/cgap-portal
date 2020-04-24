@@ -12,6 +12,9 @@ from encoded.commands.ingest_vcf import (
 )
 
 
+pytestmark = [pytest.mark.working, pytest.mark.ingestion]
+
+
 @pytest.fixture
 def post_variant_consequence_items(testapp):
     """ Posts VariantConsequence items so we can post variants that link to these """

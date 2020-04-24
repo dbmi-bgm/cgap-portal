@@ -71,7 +71,7 @@ class MappingTableParser(object):
             3 tuple - version, date, fields
         """
         version, date, fields = None, None, None
-        with open(self.mapping_table, 'r') as f:
+        with open(self.mapping_table, 'r', encoding='utf-8-sig') as f:
             reader = csv.reader(f)
             for row_idx, row in enumerate(reader):
                 if row_idx == 0:
@@ -99,8 +99,8 @@ class MappingTableParser(object):
             list of annotation field inserts
         """
         inserts = []
-        with open(self.mapping_table, 'r') as f:
-            reader = csv.reader(f)
+        with open(self.mapping_table, 'r', encoding='utf-8-sig') as f:
+            reader = csv.reader(f, )
             for row_idx, row in enumerate(reader):
                 insert = {}
                 if row_idx <= self.HEADER_ROW_INDEX:  # skip header rows
@@ -128,7 +128,10 @@ class MappingTableParser(object):
                             insert[field_name] = val_list
                     else:  # handle all other fields with direct copy if they exist
                         if entry:
-                            insert[field_name] = entry
+                            if field_name == 'pattern':  # must decode escape characters
+                                insert[field_name] = entry.encode().decode('unicode-escape')
+                            else:
+                                insert[field_name] = entry
                 inserts.append(insert)
         return inserts
 
@@ -215,7 +218,7 @@ class MappingTableParser(object):
                         }
                         sub_temp.update({
                             'title': sum_ob_name,
-                            'type': 'object',
+                            'type': 'array',
                             'items': {
                                 'title': sub_title,
                                 'type': 'array',

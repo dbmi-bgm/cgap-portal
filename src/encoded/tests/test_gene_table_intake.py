@@ -3,7 +3,7 @@ from encoded.commands.gene_table_intake import (
     GeneTableParser
 )
 
-pytestmark = [pytest.mark.working]
+pytestmark = [pytest.mark.working, pytest.mark.ingestion]
 MT_LOC = './src/encoded/tests/data/variant_workbook/gene_table.csv'
 GENE_SCHEMA_TEST_LOC = './src/encoded/tests/data/variant_workbook/gene.json'
 GENE_ANNOTATION_FIELD_SCHEMA = './src/encoded/schemas/gene_annotation_field.json'
@@ -79,6 +79,7 @@ def test_generate_gene_schema(gene_schema):
     assert properties['chrom']['schema_title'] == 'Chromosome'
 
     # check sub-embedded object fields
+    assert properties['clingendis']['type'] == 'array'
     clingendis_props = properties['clingendis']['items']['properties']
     assert len(clingendis_props.keys()) == CLINGENDIS_FIELDS_EXPECTED
     assert 'disease_id' in clingendis_props
@@ -94,6 +95,7 @@ def test_generate_gene_schema(gene_schema):
 
     # check regex
     assert properties['ensgid']['pattern'] == '^ENSG[0-9]{11}$'
+    assert properties['ucsc_id']['pattern'] == '^uc[0-9]{3}[a-z]{3}\\.[0-9]$'
 
     # XXX: Columns/Facets are empty
     assert gene_schema['columns'] == {}
@@ -104,7 +106,7 @@ def test_gene_table_run(GTParser, testapp):
     """ Runs the gene table ingestion process, building the schema into the test location
         and posting the resulting inserts """
     CONNECTION_URL = '/gene_annotation_field'
-    inserts = GTParser.run(gs_out=GENE_SCHEMA_TEST_LOC, write=False)
+    inserts = GTParser.run(gs_out=GENE_SCHEMA_TEST_LOC, write=True)
     for item in inserts:
         testapp.post_json(CONNECTION_URL, item, status=201)
 
