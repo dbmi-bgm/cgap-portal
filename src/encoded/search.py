@@ -1298,7 +1298,12 @@ def set_filters(request, search, result, principals, doc_types, es_mapping):
 
     # at this point, final_filters is valid lucene and can be dropped into the query directly
     prev_search[QUERY][BOOL][FILTER] = final_filters
-    search.update_from_dict(prev_search)
+    try:
+        search.update_from_dict(prev_search)
+    except Exception as e:  # not ideal, but important to catch at this stage no matter what it is
+        log.error('SEARCH: exception encountered when converting raw lucene params to elasticsearch_dsl,'
+                  'search: %s\n error: %s' % (prev_search, str(e)))
+        raise HTTPBadRequest('The search failed - the DCIC team has been notified.')
     return search, final_filters
 
 
