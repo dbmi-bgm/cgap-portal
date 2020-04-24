@@ -565,7 +565,7 @@ class MockedRequest(object):
         use is seen.
     """
     def __init__(self, **kwargs):
-        if 'principals_allowed.view' not in kwargs:
+        if 'principals_allowed' not in kwargs:
             self.effective_principals = ['system.Everyone']
         else:
             self.effective_principals = kwargs['principals_allowed']  # note this is not exactly what the field is
