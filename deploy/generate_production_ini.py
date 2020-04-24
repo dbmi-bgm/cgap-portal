@@ -9,11 +9,15 @@ import json
 import os
 import subprocess
 import sys
+import toml
 import argparse
 
 
-TEMPLATE_DIR = os.path.join(os.path.dirname(__file__), "ini_files")
+_MY_DIR = os.path.dirname(__file__)
+TEMPLATE_DIR = os.path.join(_MY_DIR, "ini_files")
 INI_FILE_NAME = "production.ini"
+PYPROJECT_DIR = os.path.dirname(_MY_DIR)
+PYPROJECT_FILE_NAME = os.path.join(PYPROJECT_DIR, "pyproject.toml")
 
 
 def build_ini_file_from_template(template_file_name, init_file_name):
@@ -48,7 +52,7 @@ def get_local_git_version():
     return subprocess.check_output(['git', 'describe', '--dirty']).decode('utf-8').strip('\n')
 
 
-def get_version():  # This logic (perhaps most or all of this file) should move to dcicutils
+def get_app_version():  # This logic (perhaps most or all of this file) should move to dcicutils
     try:
         return get_eb_bundled_version() or get_local_git_version()
     except Exception:
@@ -57,7 +61,8 @@ def get_version():  # This logic (perhaps most or all of this file) should move 
 
 def build_ini_stream_from_template(template_file_name, init_file_stream):
     extra_vars = {
-        'EB_APP_VERSION': get_version()
+        'APP_VERSION': get_app_version(),
+        'PROJECT_VERSION': toml.load(PYPROJECT_FILE_NAME)['tool']['poetry']['version']
     }
 
     # We assume these variables are not set, but best to check first. Confusion might result otherwise.

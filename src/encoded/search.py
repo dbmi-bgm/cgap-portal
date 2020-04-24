@@ -186,10 +186,10 @@ def search(context, request, search_type=None, return_generator=False, forced_ty
 
     ### Execute the query
     if size == 'all':
-        es_results = execute_search_for_all_results(search)
+        es_results = execute_search_for_all_results(request, search)
     else:
         size_search = search[from_:from_ + size]
-        es_results = execute_search(size_search)
+        es_results = execute_search(request, size_search)
 
     ### Record total number of hits
     result['total'] = total = es_results['hits']['total']
@@ -405,19 +405,20 @@ def get_pagination(request):
     return from_, size
 
 
-def get_all_subsequent_results(initial_search_result, search, extra_requests_needed_count, size_increment):
+def get_all_subsequent_results(request, initial_search_result, search, extra_requests_needed_count, size_increment):
     """ Generator method used to paginate. """
     from_ = 0
     while extra_requests_needed_count > 0:
         #print(str(extra_requests_needed_count) + " requests left to get all results.")
         from_ = from_ + size_increment
         subsequent_search = search[from_:from_ + size_increment]
-        subsequent_search_result = execute_search(subsequent_search)
+        subsequent_search_result = execute_search(request, subsequent_search)
         extra_requests_needed_count -= 1
         for hit in subsequent_search_result['hits'].get('hits', []):
             yield hit
 
-def execute_search_for_all_results(search):
+
+def execute_search_for_all_results(request, search):
     """
     Uses the above function to automatically paginate all results.
     Note: in the future, we should the approach here
@@ -428,13 +429,13 @@ def execute_search_for_all_results(search):
     size_increment = 100  # Decrease this to like 5 or 10 to test.
 
     first_search = search[0:size_increment]  # get aggregations from here
-    es_result = execute_search(first_search)
+    es_result = execute_search(request, first_search)
 
     total_results_expected = es_result['hits'].get('total', 0)
     extra_requests_needed_count = int(math.ceil(total_results_expected / size_increment)) - 1  # Decrease by 1 (first es_result already happened)
 
     if extra_requests_needed_count > 0:
-        es_result['hits']['hits'] = itertools.chain(es_result['hits']['hits'], get_all_subsequent_results(es_result, search, extra_requests_needed_count, size_increment))
+        es_result['hits']['hits'] = itertools.chain(es_result['hits']['hits'], get_all_subsequent_results(request, es_result, search, extra_requests_needed_count, size_increment))
     return es_result
 
 
@@ -1298,7 +1299,12 @@ def set_filters(request, search, result, principals, doc_types, es_mapping):
 
     # at this point, final_filters is valid lucene and can be dropped into the query directly
     prev_search[QUERY][BOOL][FILTER] = final_filters
-    search.update_from_dict(prev_search)
+    try:
+        search.update_from_dict(prev_search)
+    except Exception as e:  # not ideal, but important to catch at this stage no matter what it is
+        log.error('SEARCH: exception encountered when converting raw lucene params to elasticsearch_dsl,'
+                  'search: %s\n error: %s' % (prev_search, str(e)))
+        raise HTTPBadRequest('The search failed - the DCIC team has been notified.')
     return search, final_filters
 
 
@@ -1589,16 +1595,16 @@ def fix_nested_aggregations(search, es_mapping):
     aggs_ptr = search.aggs['all_items']
     for agg in aggs_ptr:
         if NESTED in agg:
-            search.aggs['all_items'] \
-                  .bucket(agg, 'nested', path=find_nested_path(aggs_ptr.aggs[agg]['primary_agg'].field, es_mapping)) \
+            (search.aggs['all_items']
+                  .bucket(agg, 'nested', path=find_nested_path(aggs_ptr.aggs[agg]['primary_agg'].field, es_mapping))
                   .bucket('primary_agg',
-                          Terms(field=aggs_ptr.aggs[agg]['primary_agg'].field, size=100, missing='No value')) \
-                  .bucket('primary_agg_reverse_nested', REVERSE_NESTED)
+                          Terms(field=aggs_ptr.aggs[agg]['primary_agg'].field, size=100, missing='No value'))
+                  .bucket('primary_agg_reverse_nested', REVERSE_NESTED))
 
 
 def get_query_field(field, facet):
     """
-    Converts a field from its generic field name to a more specific field name referencing it's embedded nature
+    Converts a field from its generic field name to a more specific field name referencing its embedded nature
 
     :param field: generic field name, such as 'files.accession'
     :param facet: facet on this field
@@ -1650,7 +1656,7 @@ def set_facets(search, facets, search_filters, string_query, request, doc_types,
                         facet["number_step"] = field_schema['number_step']
                     elif facet["field_type"] == "integer":
                         facet["number_step"] = 1
-                    else: # Default
+                    else:  # Default
                         facet["number_step"] = "any"
             facet_filters = generate_filters_for_terms_agg_from_search_filters(query_field, search_filters, string_query)
 
@@ -1753,7 +1759,56 @@ def set_additional_aggregations(search_as_dict, request, doc_types, extra_aggreg
     return search_as_dict
 
 
-def execute_search(search):
+def convert_search_to_dictionary(search):
+    """ Converts the given search to a dictionary. Useful in mocking queries from dictionaries in testing.
+
+    :param search: elasticsearch_dsl object to convert
+    :return: query in dictionary form
+    """
+    return search.to_dict()
+
+
+def verify_search_has_permissions(request, search):
+    """
+    Inspects the search object to ensure permissions are still present on the query
+    This method depends on the query structure defined in 'set_filters'.
+
+    :param request: the current request
+    :param search: search object to inspect
+    :raises: HTTPBadRequest if permissions not present
+    """
+    search_dict = convert_search_to_dictionary(search)
+    found = False  # set to True if we found valid 'principals_allowed.view'
+    try:
+        for boolean_clause in search_dict['query']['bool']['filter']:  # should always be present
+            if 'bool' in boolean_clause and 'must' in boolean_clause['bool']:  # principals_allowed.view is on 'must'
+                possible_permission_block = boolean_clause['bool']['must']
+                for entry in possible_permission_block:
+                    if 'terms' in entry:
+                        if 'principals_allowed.view' in entry['terms']:
+                            effective_principals_on_query = entry['terms']['principals_allowed.view']
+                            if effective_principals_on_query != request.effective_principals:
+                                raise QueryConstructionException(
+                                    query_type='principals',
+                                    func='verify_search_has_permissions',
+                                    msg='principals_allowed was modified - see application logs')
+                            else:
+                                found = True
+                                break
+    except QueryConstructionException:
+        log.error('SEARCH: Detected URL query param manipulation, principals_allowed.view was'
+                  'modified from %s to %s' % (request.effective_principals,
+                                              effective_principals_on_query))
+        raise HTTPBadRequest('The search failed - the DCIC team has been notified.')
+    except KeyError:
+        log.error('SEARCH: Malformed query detected while checking for principals_allowed')
+        raise HTTPBadRequest('The search failed - the DCIC team has been notified.')
+    if not found:
+        log.error('SEARCH: Did not locate principals_allowed.view on search query body: %s' % search_dict)
+        raise HTTPBadRequest('The search failed - the DCIC team has been notified.')
+
+
+def execute_search(request, search):
     """
     Execute the given Elasticsearch-dsl search. Raise HTTPBadRequest for any
     exceptions that arise.
@@ -1762,6 +1817,7 @@ def execute_search(search):
     :returns: Dictionary search results
     """
     err_exp = None
+    verify_search_has_permissions(request, search)  # query integrity check
     try:
         es_results = search.execute().to_dict()
     except ConnectionTimeout as exc:
@@ -1781,7 +1837,7 @@ def execute_search(search):
         else:
             err_exp = 'The search failed due to a transport error: ' + str(exc)
     except Exception as exc:
-        err_exp = str(exc)
+        err_exp = str(exc)  # XXX: We should revisit if we think this is always safe... -Will 4-23-2020
     if err_exp:
         raise HTTPBadRequest(explanation=err_exp)
     return es_results
@@ -1793,8 +1849,8 @@ def fix_and_replace_nested_doc_count(result_facet, aggregations, full_agg_name):
         1. front-end does not care about 'nested', only what the inner thing is, so lets pretend (so it doesn't break)
         2. We must overwrite the "second level" doc_count with the "third level" because the "third level"
            is the 'root' level doc_count, which is what we care about, NOT the nested doc count
-         3. We must then re-sort the aggregations so they show up in from greatest to least doc_count wrt the root
-            level count instead of the "old" nested doc count.
+        3. We must then re-sort the aggregations so they show up in from greatest to least doc_count wrt the root
+           level count instead of the "old" nested doc count.
 
     :param result_facet: facet to be created - 'aggregation_type' is overwritten as 'terms'
     :param aggregations: handle to all aggregations that we can access based on name
@@ -1860,11 +1916,11 @@ def format_facets(es_results, facets, total, search_frame='embedded'):
                 # XXX: The above comment is misleading - this drops all facets with no buckets
                 # we apparently want this for non-nested fields based on the tests, but should be
                 # investigated as having to do this doesn't really make sense.
-                if len(result_facet.get('terms', [])) < 1 and not facet['aggregation_type'] == 'nested':
+                if len(result_facet.get('terms', [])) < 1 and not facet['aggregation_type'] == NESTED:
                     continue
 
                 # if we are nested, apply fix + replace
-                if facet['aggregation_type'] == 'nested':
+                if facet['aggregation_type'] == NESTED:
                     fix_and_replace_nested_doc_count(result_facet, aggregations, full_agg_name)
 
                 # Re-add buckets under 'terms' AFTER we have fixed the doc_counts

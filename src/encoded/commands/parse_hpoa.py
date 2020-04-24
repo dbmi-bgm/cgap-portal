@@ -445,7 +445,7 @@ def main():  # pragma: no cover
     end = datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
     logger.info("FINISHED - START: {}\tEND: {}".format(start, end))
     if args.post_report:
-        post_report_document_to_portal(connection, itype, logfile)
+        post_report_document_to_portal(connection, ITEMTYPE, logfile)
 
 
 if __name__ == '__main__':  # pragma: no cover
