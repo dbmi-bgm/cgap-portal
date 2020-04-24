@@ -3,6 +3,7 @@ import math
 import itertools
 from pyramid.view import view_config
 from webob.multidict import MultiDict
+from functools import reduce
 from snovault import (
     AbstractCollection,
     TYPES,
@@ -12,15 +13,14 @@ from snovault.embed import make_subrequest
 from snovault.elasticsearch import ELASTIC_SEARCH
 from snovault.elasticsearch.create_mapping import determine_if_is_date_field
 from snovault.elasticsearch.indexer_utils import get_namespaced_index
-from snovault.resource_views import collection_view_listing_db
 from snovault.util import (
     find_collection_subtypes,
     crawl_schema,
     debug_log
 )
 from snovault.typeinfo import AbstractTypeInfo
-from elasticsearch.helpers import scan
-from elasticsearch_dsl import Search
+from elasticsearch_dsl import Search, Nested
+from elasticsearch_dsl.aggs import Terms
 from elasticsearch import (
     TransportError,
     RequestError,
@@ -50,6 +50,51 @@ COMMON_EXCLUDED_URI_PARAMS = [
 ]
 
 
+# from now on, use these constants when referring to elastic search
+# query keywords when writing elastic search queries - Will 3-20-2020
+QUERY = 'query'
+FILTER = 'filter'
+MUST = 'must'
+MUST_NOT = 'must_not'
+BOOL = 'bool'
+MATCH = 'match'
+SHOULD = 'should'
+EXISTS = 'exists'
+FIELD = 'field'
+NESTED = 'nested'
+PATH = 'path'
+TERMS = 'terms'
+RANGE = 'range'
+AGGS = 'aggs'
+REVERSE_NESTED = 'reverse_nested'
+# just for book-keeping/readability but is 'unused' for now
+# ie: it should be obvious when you are 'effectively' writing lucene
+ELASTIC_SEARCH_QUERY_KEYWORDS = [
+    QUERY, FILTER, MUST, MUST_NOT, BOOL, MATCH, SHOULD, EXISTS, FIELD, NESTED, PATH, TERMS, RANGE, AGGS, REVERSE_NESTED,
+]
+
+
+class SearchException(Exception):
+    """ Base Search Exception - not meant to be used directly """
+    def __init__(self, func, msg=None):
+        if msg is None:
+            msg = 'Exception occurred in search code at stage %s' % func
+        super(SearchException, self).__init__(msg)
+        self.func = func
+
+
+class QueryConstructionException(SearchException):
+    """
+    Query construction exception - throw this if we should throw an exception in query building
+    due to invalid query params
+    """
+    def __init__(self, query_type, func, msg=None):
+        if msg is None:
+            msg = 'Exception occurred during query building at query type %s in func %s' % (query_type, func)
+        super(QueryConstructionException, self).__init__(func, msg)
+        self.query_type = query_type
+
+
 @view_config(route_name='search', request_method='GET', permission='search')
 @debug_log
 def search(context, request, search_type=None, return_generator=False, forced_type='Search', custom_aggregations=None):
@@ -60,7 +105,7 @@ def search(context, request, search_type=None, return_generator=False, forced_ty
     # list of item types used from the query
     doc_types = set_doc_types(request, types, search_type)
     # calculate @type
-    search_types = [dt + 'SearchResults' for dt in doc_types if dt != 'Item']
+    search_types = build_search_types(types, doc_types)
     search_types.append(forced_type)  # the old base search type
     # sets request.normalized_params
     search_base = normalize_query(request, types, doc_types)
@@ -82,14 +127,7 @@ def search(context, request, search_type=None, return_generator=False, forced_ty
     # Get static section (if applicable) when searching a single item type
     # Note: Because we rely on 'source', if the static_section hasn't been indexed
     # into Elasticsearch it will not be loaded
-    if (len(doc_types) == 1) and 'Item' not in doc_types:
-        search_term = 'search-info-header.' + doc_types[0]
-        static_section = request.registry['collections']['StaticSection'].get(search_term)
-        if static_section and hasattr(static_section.model, 'source'):
-            item = static_section.model.source['object']
-            result['search_header'] = {}
-            result['search_header']['content'] = item['content']
-            result['search_header']['title'] = item.get('title', item['display_title'])
+    add_search_header_if_needed(request, doc_types, result)
 
     from_, size = get_pagination(request)
 
@@ -104,10 +142,8 @@ def search(context, request, search_type=None, return_generator=False, forced_ty
     # set ES index based on doc_type (one type per index)
     # if doc_type is item, search all indexes by setting es_index to None
     # If multiple, search all specified
-    if 'Item' in doc_types:
-        es_index = get_namespaced_index(request, '*')
-    else:
-        es_index = find_index_by_doc_types(request, doc_types, ['Item'])
+    es_index = get_es_index(request, doc_types)
+    item_type_es_mapping = get_es_mapping(es, es_index)
 
     # establish elasticsearch_dsl class that will perform the search
     search = Search(using=es, index=es_index)
@@ -132,14 +168,15 @@ def search(context, request, search_type=None, return_generator=False, forced_ty
     # TODO: implement BOOST here?
 
     ### Set filters
-    search, query_filters = set_filters(request, search, result, principals, doc_types)
+    search, query_filters = set_filters(request, search, result, principals, doc_types, item_type_es_mapping)
 
     ### Set starting facets
-    facets = initialize_facets(request, doc_types, prepared_terms, schemas)
+    facets = initialize_facets(request, doc_types, prepared_terms, schemas, item_type_es_mapping)
 
     ### Adding facets, plus any optional custom aggregations.
     ### Uses 'size' and 'from_' to conditionally skip (no facets if from > 0; no aggs if size > 0).
-    search = set_facets(search, facets, query_filters, string_query, request, doc_types, custom_aggregations, size, from_)
+    search = set_facets(search, facets, query_filters, string_query, request, doc_types, custom_aggregations,
+                        size, from_, item_type_es_mapping)
 
     ### Add preference from session, if available
     search_session_id = None
@@ -149,10 +186,10 @@ def search(context, request, search_type=None, return_generator=False, forced_ty
 
     ### Execute the query
     if size == 'all':
-        es_results = execute_search_for_all_results(search)
+        es_results = execute_search_for_all_results(request, search)
     else:
         size_search = search[from_:from_ + size]
-        es_results = execute_search(size_search)
+        es_results = execute_search(request, size_search)
 
     ### Record total number of hits
     result['total'] = total = es_results['hits']['total']
@@ -213,7 +250,134 @@ def collection_view(context, request):
     return search(context, request, context.type_info.name, False, forced_type='Search')
 
 
+def build_search_types(types, doc_types):
+    """ Builds search_types based on the given doc_types
+    :param types: TypesTool from the registry
+    :param doc_types: Type names we would like to search on
+    :return: search_types, or a list of 'SearchResults' type candidates
+    """
+    search_types = []
+    if len(doc_types) == 1:  # if we have one, add it and its base_type
+        ti = types[doc_types[0]]
+        search_types.append(ti.name + "SearchResults")
+        if hasattr(ti, 'base_types'):
+            for base_type in ti.base_types:
+                search_types.append(base_type + "SearchResults")
+
+    # If we have more than one, compute and add common ancestors to search_types
+    # TODO: handle more than 2 common ancestors
+    else:
+        base_types = []
+        for ti in doc_types:
+            if hasattr(types[ti], 'base_types'):
+                base_types.append(set(types[ti].base_types))
+        common_ancestors = reduce(lambda x, y: x & y, base_types)
+        if not common_ancestors:
+            raise HTTPBadRequest("Tried to search on types with no common ancestor. This should never happen.")
+
+        for ancestor in common_ancestors:
+            if ancestor != "Item":
+                search_types.append(ancestor + "SearchResults")
+        search_types.append("ItemSearchResults")
+    return search_types
+
+
+def get_es_index(request, doc_types):
+    """
+    Gets ES index based on doc_type (one type per index)
+    if doc_type is item, search all indexes by setting es_index to None
+    If multiple, search all specified
+
+    :param request: current request, to be passed
+    :param doc_types: item types we are searching on
+    :return: index name
+    """
+    if 'Item' in doc_types:
+        return get_namespaced_index(request, '*')
+    else:
+        return find_index_by_doc_types(request, doc_types, ['Item'])
+
+
+def get_es_mapping(es, es_index):
+    """
+    Get es mapping for given doc type (so we can handle type=nested)
+    Note this is the mechanism by which we "enable" the ability to do nested searches
+    ie: only enabled on single index searches. You could feasibly add more criteria.
+
+    :param es: elasticsearch client
+    :param es_index: index to get mapping from
+    :return: the mapping for this item type or {} if we are not doing a single index search
+    """
+    if '*' in es_index or ',' in es_index:  # no type=nested searches can be done on * or multi-index
+        return {}
+    else:
+        item_type = list(es.indices.get(es_index)[es_index]['mappings'].keys())[0]  # no other way to get it
+        return es.indices.get(es_index)[es_index]['mappings'][item_type]['properties']
+
+
+def find_nested_path(field, es_mapping):
+    """
+    Returns path to 'highest' level nested field, in other words the first field mapped with type=nested
+    found by traversing the given field from the *top* level.
+
+    This function relies on information about the structure of the es_mapping to extract
+    the *path to the object who's mapping is nested*. The comments within this function try to explain
+    that structure. This information is needed to construct nested queries (it is the path).
+    It returns None if the given (sub)field is not a member of a type=nested mapped field.
+
+    :param field: the *full path* to the field we are filtering/aggregating on.
+                        For example: "experiments_in_set.biosample.biosource.individual.organism.name"
+    :param es_mapping: dictionary representation of the es_mapping of the type we are searching on
+    :return: path for nested query or None
+    """
+    location = es_mapping
+    path = []
+    for level in field.split('.'):
+        if level == 'raw':  # if we get to this point we're definitely at a leaf and should stop
+            break
+        if level not in location:  # its possible we are at a sub-embedded object boundary. Check if it has properties.
+            if 'properties' not in location:  # if it doesn't have properties, there's nowhere to go, so return None.
+                return None
+            location = location['properties']  # else move location forward, but do not add it to the PATH
+        if level not in location:  # if we still don't see our 'level', we are not a nested field
+            break
+        location = location[level]
+        path.append(level)
+        if location.get('type', None) == 'nested':
+            return '.'.join(path)
+    return None
+
+
+def add_search_header_if_needed(request, doc_types, result):
+    """
+    Get static section (if applicable) when searching a single item type
+    Note: Because we rely on 'source', if the static_section hasn't been indexed
+    into Elasticsearch it will not be loaded
+
+    :param request: current request
+    :param doc_types: item type(s) we are searching on
+    :param result: the final result to populate search header info with
+    :return: Nothing, modifies result in place
+    """
+    if (len(doc_types) == 1) and 'Item' not in doc_types:
+        search_term = 'search-info-header.' + doc_types[0]
+        static_section = request.registry['collections']['StaticSection'].get(search_term)
+        if static_section and hasattr(static_section.model, 'source'):
+            item = static_section.model.source['object']
+            result['search_header'] = {}
+            result['search_header']['content'] = item['content']
+            result['search_header']['title'] = item.get('title', item['display_title'])
+            result['search_header']['filetype'] = item['filetype']
+
+
 def get_collection_actions(request, type_info):
+    """
+    Use this method to see actions available on an item type (collection) in the request context
+
+    :param request: current request
+    :param type_info: snovault type_info object for the requested type
+    :return: actions available for this collection at this time
+    """
     collection = request.registry[COLLECTIONS].get(type_info.name)
     if hasattr(collection, 'actions'):
         return collection.actions(request)
@@ -241,28 +405,36 @@ def get_pagination(request):
     return from_, size
 
 
-def get_all_subsequent_results(initial_search_result, search, extra_requests_needed_count, size_increment):
+def get_all_subsequent_results(request, initial_search_result, search, extra_requests_needed_count, size_increment):
+    """ Generator method used to paginate. """
     from_ = 0
     while extra_requests_needed_count > 0:
         #print(str(extra_requests_needed_count) + " requests left to get all results.")
         from_ = from_ + size_increment
         subsequent_search = search[from_:from_ + size_increment]
-        subsequent_search_result = execute_search(subsequent_search)
+        subsequent_search_result = execute_search(request, subsequent_search)
         extra_requests_needed_count -= 1
         for hit in subsequent_search_result['hits'].get('hits', []):
             yield hit
 
-def execute_search_for_all_results(search):
-    size_increment = 100 # Decrease this to like 5 or 10 to test.
+def execute_search_for_all_results(request, search):
+    """
+    Uses the above function to automatically paginate all results.
+    Note: in the future, we should the approach here
 
-    first_search = search[0:size_increment] # get aggregations from here
-    es_result = execute_search(first_search)
+    :param search: elasticsearch_dsl search object to execute (no more configuration is done at this point)
+    :return: all es_results that matched the given query
+    """
+    size_increment = 100  # Decrease this to like 5 or 10 to test.
 
-    total_results_expected = es_result['hits'].get('total',0)
-    extra_requests_needed_count = int(math.ceil(total_results_expected / size_increment)) - 1 # Decrease by 1 (first es_result already happened)
+    first_search = search[0:size_increment]  # get aggregations from here
+    es_result = execute_search(request, first_search)
+
+    total_results_expected = es_result['hits'].get('total', 0)
+    extra_requests_needed_count = int(math.ceil(total_results_expected / size_increment)) - 1  # Decrease by 1 (first es_result already happened)
 
     if extra_requests_needed_count > 0:
-        es_result['hits']['hits'] = itertools.chain(es_result['hits']['hits'], get_all_subsequent_results(es_result, search, extra_requests_needed_count, size_increment))
+        es_result['hits']['hits'] = itertools.chain(es_result['hits']['hits'], get_all_subsequent_results(request, es_result, search, extra_requests_needed_count, size_increment))
     return es_result
 
 
@@ -275,13 +447,11 @@ def normalize_query(request, types, doc_types):
     a set of rules (see below). If the query item types differ from doc_types,
     override with doc_types
 
-    Args:
-        request: the current Request
-        types: registry[TYPES]
-        doc_types (list): item_types to use for the search
+    :param request: the current Request
+    :param types: registry[TYPES]
+    :param doc_types: item_types to use for the search
 
-    Returns:
-        string: query string built from normalized params
+    :returns: query string built from normalized params
     """
     def normalize_param(key, val):
         """
@@ -351,16 +521,15 @@ def normalize_query(request, types, doc_types):
 
 
 def clear_filters_setup(request, doc_types, forced_type):
-    '''
+    """
     Clear Filters URI path
 
     Make a URI path that clears all non-datatype filters
     and leaves in `q` (search query) params, if present.
     Also preserves currentAction=selection, if is set.
 
-    Returns:
-        A URL path
-    '''
+    :returns: A URL path
+    """
     seach_query_specs = request.normalized_params.getall('q')
     seach_query_url = urlencode([("q", seach_query) for seach_query in seach_query_specs])
     # types_url will always be present (always >=1 doc_type)
@@ -382,6 +551,11 @@ def clear_filters_setup(request, doc_types, forced_type):
 def build_type_filters(result, request, doc_types, types):
     """
     Set the type filters for the search. If no doc_types, default to Item
+
+    :param result: result to add filter intermediary format to
+    :param request: current request
+    :param doc_types: item types we are searching on, or None, in which case all params are discarded
+    :param types: registry types
     """
     if not doc_types:
         doc_types = ['Item']
@@ -401,16 +575,20 @@ def build_type_filters(result, request, doc_types, types):
 
 def prepare_search_term(request):
     """
-    Prepares search terms by making a dictionary where the keys are fields
-    and the values are arrays of query strings
+    Prepares search terms by making a dictionary where the keys are fields and the values are arrays
+    of query strings. This is an intermediary format  which will be modified when constructing the
+    actual search query.
+
     Ignore certain keywords, such as type, format, and field
+
+    :param request: current request
+    :return: dictionary mapping field --> query strings
     """
     prepared_terms = {}
-    prepared_vals = []
     for field, val in request.normalized_params.iteritems():
         if field.startswith('validation_errors') or field.startswith('aggregated_items'):
             continue
-        elif field == 'q': # searched string has field 'q'
+        elif field == 'q':  # searched string has field 'q'
             # people shouldn't provide multiple queries, but if they do,
             # combine them with AND logic
             if 'q' in prepared_terms:
@@ -431,16 +609,12 @@ def set_doc_types(request, types, search_type):
     invalid types as well. If a forced search_type is enforced, use that;
     otherwise, set types from the query params. Default to Item if none set.
 
-    Args:
-        request: the current Request
-        types: registry[TYPES]
-        search_type (str): forced search item type
+    :param request: the current Request
+    :param types: registry[TYPES]
+    :param search_type: forced search item type
 
-    Returns:
-        list: the string item types to use for the search
-
-    Raises:
-        HTTPBadRequest: if an invalid item type is supplied
+    :returns: list: the string item types to use for the search
+    :raises: HTTPBadRequest: if an invalid item type is supplied
     """
     doc_types = []
     if search_type is None:
@@ -536,7 +710,6 @@ def set_sort_order(request, search, search_term, types, doc_types, result):
     will sort by display_title in ascending order. To set descending order,
     use the "-" flag: sort_by=-date_created.
     Sorting is done alphatbetically, case sensitive by default.
-    TODO: add a schema flag for case sensitivity/insensitivity?
 
     ES5: simply pass in the sort OrderedDict into search.sort
     """
@@ -631,32 +804,27 @@ def set_sort_order(request, search, search_term, types, doc_types, result):
     return search
 
 
-def set_filters(request, search, result, principals, doc_types):
+def initialize_field_filters(request, principals, doc_types):
+    """ Helper function for set_filters
+        Initializes field filters with filters that exist on all searches, does some basic updates
     """
-    Sets filters in the query
-    """
-
-    # these next two dictionaries should each have keys equal to query_field
-    # and values: must_terms: [<list of terms>], must_not_terms: [<list of terms>], add_no_value: True/False/None
     field_filters = {
-        'principals_allowed.view' : {
+        'principals_allowed.view': {
             'must_terms': principals,
             'must_not_terms': [],
             'add_no_value': None
         },
-        'embedded.@type.raw' : {
+        'embedded.@type.raw': {
             'must_terms': doc_types,
             'must_not_terms': [],
             'add_no_value': None
         },
-        'embedded.status.raw' : {
+        'embedded.status.raw': {
             'must_terms': [],
             'must_not_terms': [],
             'add_no_value': None
         }
     }
-
-    range_filters = {}
 
     # Exclude status=deleted Items unless explicitly requested/filtered-in.
     if 'deleted' not in request.normalized_params.getall('status'):
@@ -664,14 +832,31 @@ def set_filters(request, search, result, principals, doc_types):
     if 'replaced' not in request.normalized_params.getall('status'):
         field_filters['embedded.status.raw']['must_not_terms'].append('replaced')
 
-    # Exclude type=TrackingItem from results unless are explictly specified
+    # Exclude type=TrackingItem and type=OntologyTerm from results unless are explictly specified
     if 'TrackingItem' not in doc_types:
         field_filters['embedded.@type.raw']['must_not_terms'].append('TrackingItem')
+    if 'OntologyTerm' not in doc_types:
+        field_filters['embedded.@type.raw']['must_not_terms'].append('OntologyTerm')
+
+    return field_filters
+
+
+def handle_range_filters(request, result, field_filters, doc_types):
+    """
+    Constructs range_filters based on the given filters as part of the MUST sub-query
+
+    :param request: current request
+    :param result: result to modify in place
+    :param field_filters: filters to look at
+    :param doc_types: types we are searching on
+    :return: constructed range_filters
+    """
+    range_filters = {}
 
     for field, term in request.normalized_params.items():
-        not_field = False # keep track if query is NOT (!)
-        exists_field = False # keep track of null values
-        range_type = False # If we determine is a range request (field.to, field.from), will be populated with string 'date' or 'numerical'
+        not_field = False  # keep track if query is NOT (!)
+        exists_field = False  # keep track of null values
+        range_type = False  # If we determine is a range request (field.to, field.from), will be populated with string 'date' or 'numerical'
         range_direction = None
         if field in COMMON_EXCLUDED_URI_PARAMS + ['q']:
             continue
@@ -708,8 +893,8 @@ def set_filters(request, search, result, principals, doc_types):
             remove_path += 'type=Item'
 
         result['filters'].append({
-            'field' : field,
-            'term'  : term,
+            'field': field,
+            'term': term,
             'remove': remove_path
         })
 
@@ -728,7 +913,6 @@ def set_filters(request, search, result, principals, doc_types):
         else:
             query_field = 'embedded.' + field + '.raw'
 
-
         if range_type:
             if query_field not in range_filters:
                 range_filters[query_field] = {}
@@ -736,7 +920,7 @@ def set_filters(request, search, result, principals, doc_types):
                     range_filters[query_field]['format'] = 'yyyy-MM-dd HH:mm'
 
             if range_direction in ('gt', 'gte', 'lt', 'lte'):
-                if range_type == 'date' and len(term) == 10:
+                if range_type == "date" and len(term) == 10:
                     # Correct term to have hours, e.g. 00:00 or 23:59, if not otherwise supplied.
                     if range_direction == 'gt' or range_direction == 'lte':
                         term += ' 23:59'
@@ -772,55 +956,370 @@ def set_filters(request, search, result, principals, doc_types):
             else:
                 field_filters[query_field]['must_terms'].append(term)
 
+    return range_filters
+
+
+def construct_nested_sub_queries(query_field, filters, key='must_terms'):
+    """
+     Helper for build_sub_queries that constructs the base layer of sub-queries
+     Note that due to the query structure, 'must' is always needed in the base level query,
+     since at this point we have already split into 'must' or 'must_not'.
+
+    :param query_field: field that we are querying
+    :param filters: all filters
+    :param key: one of 'must' or 'must_not'
+    :return: a lucene sub-query filtering the query field based on the given filters
+    :raises: QueryConstructionException if bad params make it here
+    """
+    if key not in ['must_terms', 'must_not_terms']:
+        raise QueryConstructionException(
+            query_type='nested',
+            func='construct_nested_sub_queries',
+            msg='Tried to handle nested filter with key other than must/must_not: %s' % key
+        )
+
+    # handle length 0, 1 and n cases
+    try:
+        my_filters = filters[key]
+    except KeyError:
+        return {}  # just in case, we want this to be recoverable if for some reason it happens
+    if len(my_filters) == 0:
+        return {}
+    elif len(my_filters) == 1:  # see standard bool/match query
+        return {BOOL: {MUST: [{MATCH: {query_field: my_filters[0]}}]}}
+    else:
+        sub_queries = {BOOL: {MUST: {BOOL: {SHOULD: []}}}}
+        for option in my_filters:  # see how to combine queries on the same field
+            sub_queries[BOOL][MUST][BOOL][SHOULD].append({MATCH: {query_field: option}})
+        return sub_queries
+
+
+def build_sub_queries(field_filters, es_mapping):
+    """
+    Builds queries based on several things:
+        - What the query field is
+        - If that field is nested
+        - If we would like to see items who do not have a value for this field. These items will have 'No value'
+          for the relevant field.
+        - If it is a positive (must) or negative (must_not) query. This is the level by which these are separated.
+
+    :param field_filters: Intermediary format to be converted to valid lucene based on the es_mapping
+    :param es_mapping: mapping of the item we are searching on
+    :return: 4 tuple consisting of (must_filters, must_not_filters, must_filters_nested, must_not_filters_nested)
+    """
     must_filters = []
     must_not_filters = []
-    for query_field, filters in field_filters.items():
-        must_terms = {'terms': {query_field: filters['must_terms']}} if filters['must_terms'] else {}
-        must_not_terms = {'terms': {query_field: filters['must_not_terms']}} if filters['must_not_terms'] else {}
-        if filters['add_no_value'] is True:
-            # add to must_not in an OR case, which is equivalent to filtering on 'No value'
-            should_arr = [must_terms] if must_terms else []
-            should_arr.append({'bool': {'must_not': {'exists': {'field': query_field}}}})
-            must_filters.append({'bool': {'should': should_arr}})
-        elif filters['add_no_value'] is False:
-            # add to must_not in an OR case, which is equivalent to filtering on '! No value'
-            should_arr = [must_terms] if must_terms else []
-            should_arr.append({'exists': {'field': query_field}})
-            must_filters.append({'bool': {'should': should_arr}})
-        else: # no filtering on 'No value'
-            if must_terms: must_filters.append(must_terms)
-        if must_not_terms: must_not_filters.append(must_not_terms)
+    must_filters_nested = []
+    must_not_filters_nested = []
 
-    # lastly, add range limits to filters if given
+    for query_field, filters in field_filters.items():
+        # if we are nested, we must construct the query differently than normal
+        if find_nested_path(query_field, es_mapping):
+            query_field = query_field.replace('.properties', '')
+
+            # Build must/must_not sub-queries
+            must_terms = construct_nested_sub_queries(query_field, filters, key='must_terms')
+            must_not_terms = construct_nested_sub_queries(query_field, filters, key='must_not_terms')
+
+            if filters['add_no_value'] is True:  # when searching on 'No Value'
+                should_arr = [must_terms] if must_terms else []
+                should_arr.append({BOOL: {MUST_NOT: {EXISTS: {FIELD: query_field}}}})
+                must_filters_nested.append((query_field, should_arr))
+            elif filters['add_no_value'] is False:  # when not searching on 'No Value'
+                should_arr = [must_terms] if must_terms else []
+                should_arr.append({EXISTS: {FIELD: query_field}})
+                must_filters_nested.append((query_field, should_arr))
+            else:
+                if must_terms: must_filters_nested.append((query_field, must_terms))
+            if must_not_terms: must_not_filters_nested.append((query_field, must_not_terms))
+
+        # if we are not nested, handle this with 'terms' query like usual
+        else:
+            must_terms = {TERMS: {query_field: filters['must_terms']}} if filters['must_terms'] else {}
+            must_not_terms = {TERMS: {query_field: filters['must_not_terms']}} if filters['must_not_terms'] else {}
+            if filters['add_no_value'] is True:
+                # add to must_not in an OR case, which is equivalent to filtering on 'No value'
+                should_arr = [must_terms] if must_terms else []
+                should_arr.append({BOOL: {MUST_NOT: {EXISTS: {FIELD: query_field}}}})
+                must_filters.append((query_field, {BOOL: {SHOULD: should_arr}}))
+            elif filters['add_no_value'] is False:
+                # add to must_not in an OR case, which is equivalent to filtering on '! No value'
+                should_arr = [must_terms] if must_terms else []
+                should_arr.append({EXISTS: {FIELD: query_field}})
+                must_filters.append((query_field, {BOOL: {SHOULD: should_arr}}))
+            else:  # no filtering on 'No value'
+                if must_terms: must_filters.append((query_field, must_terms))
+            if must_not_terms: must_not_filters.append((query_field, must_not_terms))
+
+    return must_filters, must_not_filters, must_filters_nested, must_not_filters_nested
+
+
+def apply_range_filters(range_filters, must_filters, es_mapping):
+    """
+    Applies the range filters to the 'must' subquery
+    Tuple format is required to handle nested fields that are non-range (it is discarded in this case)
+    Nested range fields must also be separated from other nested sub queries - see comment in handle_nested_filters
+
+    :param range_filters: intermediary range_filter format to be converted to valid lucene
+    :param must_filters: must_filters from build_sub_queries, this is where range filters are applied
+    :param es_mapping: mapping of the item we searching on, as the range filter could be on a nested field
+    """
+
+    # tuple format is required to handle nested fields that are non-range (it is discarded in this case)
+    # nested range fields must also be separated from other nested sub queries - see comment in 'handle_nested_filters'
     for range_field, range_def in range_filters.items():
-        must_filters.append({
-            "range" : { range_field : range_def }
-        })
+        nested_path = find_nested_path(range_field, es_mapping)
+        if nested_path:
+            must_filters.append(('range', {
+                NESTED: {
+                    PATH: nested_path,
+                    QUERY: {
+                        RANGE: {range_field: range_def}
+                    }
+                }
+            }))
+        else:
+            must_filters.append(('range', {
+                RANGE: {range_field: range_def}
+            }))
+
+
+def extract_nested_path_from_field(field):
+    """
+    Extracts the nested path from the field by splicing the field from start:second_idx_of_('.').
+    This seems to work in general but feels fragile... It is specific to how we map things.
+    It's likely this can be factored out. - Will
+        ex: 'embedded.files.accession.raw' --> 'embedded.files' is the nested path
+
+    :param field: full field path at the most, nested path at the least
+    :return: nested
+    """
+    return field[:field.index('.', field.index('.') + 1)]
+
+
+def handle_should_query(field_name, options):
+    """
+    Builds a lucene 'should' subquery for every option for the given field
+
+    :param field_name: full path to field
+    :param options: list of options for that field
+        ex: field_name='embedded.files.file_size.raw', options=[20, 30, 40]
+
+    :return: dsl-subquery that is effectively an OR of all options on the field. See SHOULD.
+    """
+    should_query = {BOOL: {SHOULD: {TERMS: {field_name: []}}}}
+    for option in options:
+        should_query[BOOL][SHOULD][TERMS][field_name].append(option)
+    return should_query
+
+
+def handle_nested_filters(nested_filters, final_filters, key='must'):
+    """
+    Helper function for set_filters that collapses nested filters together into a single lucene sub-query
+    and attaching it to final_filters (modifying in place).
+
+    :param nested_filters: All nested fields that we would like to search on
+    :param final_filters: Collection of filters formatted in lucene, to be extended with nested filters
+    :param key: 'must' or 'must_not'
+    """
+    key_map = {MUST: MUST_NOT, MUST_NOT: MUST}
+    if key not in key_map:
+        raise QueryConstructionException(
+            query_type='nested',
+            func='handle_nested_filters',
+            msg='Tried to handle nested filter with key other than must/must_not: %s' % key
+        )
+
+    # iterate through all nested filters
+    for field, query in nested_filters:
+
+        # iterate through all sub_query parts - note that this is modified in place hence the need
+        # to re-iterate after every nested filer is applied
+        nested_path = extract_nested_path_from_field(field)
+        sub_queries = final_filters['bool'][key]
+        found = False
+        for _q in sub_queries:
+
+            # Try to add to an existing 'nested' sub-query if possible
+            if _q.get(NESTED, None):
+                if _q[NESTED][PATH] == nested_path:
+                    try:
+                        if isinstance(query, list):  # reject list structure, if present
+                            query = query[0]
+
+                        if key not in query[BOOL]:  # we are combining a different type of query on this nested path
+                            opposite_key = key_map[key]
+                            if opposite_key in query[BOOL]:
+                                _q[NESTED][QUERY][BOOL][opposite_key] = query[BOOL][opposite_key]
+                                found = True
+                                break
+                        else:
+
+                            # check if this field has multiple options
+                            options = query[BOOL][key][0][MATCH][field].split(',')
+                            if len(options) > 1:
+
+                                # construct SHOULD sub-query for all options
+                                sub_query = handle_should_query(field, options)
+                                _q[NESTED][QUERY][BOOL][key].append(sub_query)
+
+                            # if we don't have options, our original 'query' is what we need
+                            else:
+                                insertion_point = _q[NESTED][QUERY][BOOL]
+                                if key not in insertion_point:  # this can happen if we are combining with 'No value'
+                                    _q[NESTED][QUERY][BOOL][key] = query[BOOL][key][0]
+                                else:
+                                    _q[NESTED][QUERY][BOOL][key].append(query[BOOL][key][0])
+
+                            found = True  # break is not sufficient, see below
+                            break
+                    except:       # Why? We found a 'range' nested query and must add this one separately
+                        continue  # This behavior is absurd. Somehow it knows to combine separate nested range
+                                  # queries with AND, but of course not regular queries and of course you cannot
+                                  # combine the range query here due to syntax  - Will
+        if not found:
+
+            # It's possible we're looking at a sub-query that's wrapped in a (length 1) list
+            if type(query) == list:
+                if len(query) == 1:
+                    query = query[0]
+                else:
+                    raise QueryConstructionException(
+                        query_type='nested',
+                        func='handle_nested_filters',
+                        msg='Malformed entry on query field: %s' % query
+                    )
+
+            # Check that key is in the sub-query first, it's possible that it in fact uses it's opposite
+            # This can happen when adding no value, the opposite 'key' can occur in the sub-query
+            opposite_key = None
+            if key not in query[BOOL]:
+                opposite_key = key_map[key]
+                outer_query = query[BOOL][opposite_key]
+            else:
+                outer_query = query[BOOL][key]
+
+            # It's possible we have multiple options for the same field (OR). Take those in place.
+            if BOOL in outer_query:
+                if SHOULD in outer_query[BOOL]:
+                    sub_query = query
+                else:
+                    raise QueryConstructionException(
+                        query_type='bool',
+                        func='handle_nested_filters',
+                        msg='BOOL container in parent query requires SHOULD component in sub-query, got: %s' % query
+                    )
+
+            # Otherwise, we have a standard 'match' and must repeat 'options' work here since its
+            # possible we are the first nested field on the given path
+            else:
+                if opposite_key:  # in case we are in an 'opposite scenario', pass query directly
+                    options = []
+                else:
+                    options = query[BOOL][key][0][MATCH][field].split(',')
+
+                if len(options) > 1:
+                    sub_query = handle_should_query(field, options)
+                else:
+                    sub_query = query
+
+            # add the 'nested' sub query to the main query for this path
+            # all remaining nested filters on this path will be part of this object unless they are of type 'range'
+            # in which case they will get their own NESTED sub-query
+            final_filters[BOOL][key].append({
+                    NESTED: {PATH: nested_path,
+                             QUERY: sub_query}
+            })
+
+
+def set_filters(request, search, result, principals, doc_types, es_mapping):
+    """
+    This function builds the Elasticsearch query based on the request. The structure of the query
+    is approximately represented below. 'Approximate' because you could not copy-paste directly into
+    Lucene, but should illustrate enough so it is comprehensible. Note the 'nested' nature of the query.
+
+    QUERY HEIRARCHY ('approximate' lucene syntax):
+        {
+            'query': {
+                'bool': {
+                    'filter': {
+                        'bool': {
+                            'must': {
+                                <positive+range sub-queries>
+                                +
+                                'bool': {
+                                    'should': { option1, option2 ... }
+                                }
+                            },
+                            'must_not': {
+                                <negative sub-queries>
+                                +
+                                'bool': {
+                                    'should': { option1, option2 ...
+                            }}}}}
+        }
+    There are several different sub-queries, but most of them are built using 'bool' -> 'must'.
+    A brief overview follows.
+        * nested data type sub-queries have a special format. See 'handle_nested_filters'.
+        * range filter sub-queries also have their own special format. See 'apply_range_filters'. Note that
+            the format is extra special when you're applying a range filter to a nested data type.
+        * 'terms' filters are what we 'normally' use.
+
+    :param request: Current request
+    :param search: Current search
+    :param result: Response to be returned from the view ('/search')
+    :param principals: Active user roles
+    :param doc_types: Document type we are searching on
+    :param es_mapping: Elasticsearch mapping of the document type we're searching on
+    :returns: 2-tuple containing the updated search based on the request parameters and
+              information on the filters used in the query.
+    """
+
+    # these next two dictionaries should each have keys equal to query_field
+    # and values: must_terms: [<list of terms>], must_not_terms: [<list of terms>], add_no_value: True/False/None
+    field_filters = initialize_field_filters(request, principals, doc_types)
+    range_filters = handle_range_filters(request, result, field_filters, doc_types)
+
+    # construct queries
+    must_filters, must_not_filters, \
+    must_filters_nested, must_not_filters_nested = build_sub_queries(field_filters, es_mapping)
+
+    # add range limits to filters if given
+    apply_range_filters(range_filters, must_filters, es_mapping)
 
     # To modify filters of elasticsearch_dsl Search, must call to_dict(),
     # modify that, then update from the new dict
     prev_search = search.to_dict()
-    # initialize filter hierarchy
-    final_filters = {'bool': {'must': must_filters, 'must_not': must_not_filters}}
-    prev_search['query']['bool']['filter'] = final_filters
-    search.update_from_dict(prev_search)
 
+    # initialize filter hierarchy
+    final_filters = {BOOL: {MUST: [f for _, f in must_filters], MUST_NOT: [f for _, f in must_not_filters]}}
+    handle_nested_filters(must_filters_nested, final_filters, key=MUST)
+    handle_nested_filters(must_not_filters_nested, final_filters, key=MUST_NOT)
+
+    # at this point, final_filters is valid lucene and can be dropped into the query directly
+    prev_search[QUERY][BOOL][FILTER] = final_filters
+    try:
+        search.update_from_dict(prev_search)
+    except Exception as e:  # not ideal, but important to catch at this stage no matter what it is
+        log.error('SEARCH: exception encountered when converting raw lucene params to elasticsearch_dsl,'
+                  'search: %s\n error: %s' % (prev_search, str(e)))
+        raise HTTPBadRequest('The search failed - the DCIC team has been notified.')
     return search, final_filters
 
 
-def initialize_facets(request, doc_types, prepared_terms, schemas):
+def initialize_facets(request, doc_types, prepared_terms, schemas, es_mapping):
     """
     Initialize the facets used for the search. If searching across multiple
     doc_types, only use the default 'Data Type' and 'Status' facets.
-    Add facets for custom url filters whether or not they're in the schema
+    Add facets for custom url filters whether or not they're in the schema.
+    TODO: clean up this method
 
-    Args:
-        doc_types (list): Item types (@type) for which we are performing a search for.
-        prepared_terms (dict): terms to match in ES, keyed by ES field name.
-        schemas (list): List of OrderedDicts of schemas for doc_types.
+    :param doc_types: Item types (@type) for which we are performing a search for.
+    :param prepared_terms: terms to match in ES, keyed by ES field name.
+    :param schemas: List of OrderedDicts of schemas for doc_types.
 
-    Returns:
-        list: tuples containing (0) ElasticSearch-formatted field name (e.g. `embedded.status`) and (1) list of terms for it.
+    :returns: list: tuples containing (0) ElasticSearch-formatted field name (e.g. `embedded.status`)
+                    and (1) list of terms for it.
     """
 
     facets = [
@@ -866,7 +1365,10 @@ def initialize_facets(request, doc_types, prepared_terms, schemas):
             use_field = '.'.join(split_field[1:])
 
             # 'terms' is the default per-term bucket aggregation for all non-schema facets
-            aggregation_type = 'terms'
+            if es_mapping and find_nested_path(field, es_mapping):
+                aggregation_type = 'nested'
+            else:
+                aggregation_type = 'terms'
 
             # Use the last part of the split field to get the field title
             title_field = split_field[-1]
@@ -940,23 +1442,21 @@ def initialize_facets(request, doc_types, prepared_terms, schemas):
 
 
 def schema_for_field(field, request, doc_types, should_log=False):
-    '''
+    """
     Find the schema for the given field (in embedded '.' format). Uses
     ff_utils.crawl_schema from snovault and logs any cases where there is an
     error finding the field from the schema. Caches results based off of field
     and doc types used
 
-    Args:
-        field (string): embedded field path, separated by '.'
-        request: current Request object
-        doc_types (list): @types for the search
-        should_log (bool): logging will only occur if set to True
+    :param field: embedded field path, separated by '.'
+    :param request: current Request object
+    :param doc_types (list): @types for the search
+    :param should_log (bool): logging will only occur if set to True
 
-    Returns:
-        Dictionary schema for the field, or None if not found
-    '''
+    :returns: Dictionary schema for the field, or None if not found
+    """
     types = request.registry[TYPES]
-    schemas = [ types[dt].schema for dt in doc_types ]
+    schemas = [types[dt].schema for dt in doc_types]
 
     # We cannot hash dict by list (of doc_types) so we convert to unique ordered string
     doc_type_string = ','.join(doc_types)
@@ -995,7 +1495,14 @@ def schema_for_field(field, request, doc_types, should_log=False):
 
 
 def is_linkto_or_object_array_root_field(field, types, doc_types):
-    '''Not used currently. May be useful for if we want to enabled "type" : "nested" mappings on lists of dictionaries'''
+    """
+    Not used currently.
+
+    :param field: field to check
+    :param types: registry types
+    :param doc_types: types we are searching on
+    :return: infer whether or not this field is mapped with type=nested based on the schema alone
+    """
     schema = types[doc_types[0]].schema
     field_root = field.split('.')[0]
     fr_schema = (schema and schema.get('properties', {}).get(field_root, None)) or None
@@ -1005,20 +1512,24 @@ def is_linkto_or_object_array_root_field(field, types, doc_types):
 
 
 def generate_filters_for_terms_agg_from_search_filters(query_field, search_filters, string_query):
-    '''
+    """
     We add a copy of our filters to each facet, minus that of
     facet's field itself so that we can get term counts for other terms filters.
     And be able to filter w/ it.
-
     Remove filters from fields they apply to.
     For example, the 'biosource_type' aggs should not have any
     biosource_type filter in place.
     Handle 'must' and 'must_not' filters separately
 
-    Returns
-        Copy of search_filters, minus filter for current query_field (if one set).
-    '''
+    Note: At this point no nested work has been done, so formatting into this intermediary state is okay
+          and is in fact necessary for later work to handle nested to function correctly.
 
+    :param query_field: field terms agg is on
+    :param search_filters: intermediary format prior to any valid lucene representing the search_filters
+                           from the front-end
+    :param string_query: query string if provided
+    :return: Copy of search_filters, minus filter for current query_field (if one set).
+    """
     facet_filters = deepcopy(search_filters['bool'])
 
     for filter_type in ['must', 'must_not']:
@@ -1069,85 +1580,115 @@ def generate_filters_for_terms_agg_from_search_filters(query_field, search_filte
     return facet_filters
 
 
-def set_facets(search, facets, search_filters, string_query, request, doc_types, custom_aggregations=None, size=25, from_=0):
+def fix_nested_aggregations(search, es_mapping):
+    """
+    Unfortunately, elasticsearch_dsl will not update_from_dict with a nested aggregation (bug?), so we must
+    update the search manually after processing all the "terms". This method handles that update in place.
+    It does this in 3 steps: first by overwriting the current 'agg bucket' with a empty new one, recreating the
+    'primary_agg' and adding a REVERSE_NESTED bucket called 'primary_agg_reverse_nested', which will contain the
+    doc count wrt the item we are searching on.
+
+    :param search: search object
+    :param es_mapping: mapping of this item
+    """
+    aggs_ptr = search.aggs['all_items']
+    for agg in aggs_ptr:
+        if NESTED in agg:
+            (search.aggs['all_items']
+                  .bucket(agg, 'nested', path=find_nested_path(aggs_ptr.aggs[agg]['primary_agg'].field, es_mapping))
+                  .bucket('primary_agg',
+                          Terms(field=aggs_ptr.aggs[agg]['primary_agg'].field, size=100, missing='No value'))
+                  .bucket('primary_agg_reverse_nested', REVERSE_NESTED))
+
+
+def get_query_field(field, facet):
+    """
+    Converts a field from its generic field name to a more specific field name referencing its embedded nature
+
+    :param field: generic field name, such as 'files.accession'
+    :param facet: facet on this field
+    :return: full path to field on ES mapping
+    """
+    if field == 'type':
+        return 'embedded.@type.raw'
+    elif field.startswith('validation_errors') or field.startswith('aggregated_items'):
+        return field + '.raw'
+    elif facet.get('aggregation_type') in ('stats', 'date_histogram', 'histogram', 'range'):
+        return 'embedded.' + field
+    else:
+        return 'embedded.' + field + '.raw'
+
+
+def set_facets(search, facets, search_filters, string_query, request, doc_types,
+               custom_aggregations=None, size=25, from_=0, es_mapping=None):
     """
     Sets facets in the query as ElasticSearch aggregations, with each aggregation to be
     filtered by search_filters minus filter affecting facet field in order to get counts
     for other facet term options.
     ES5 - simply sets aggs by calling update_from_dict after adding them in
-
         :param facets:         Facet field (0) in object dot notation, and a dict or OrderedDict with title property (1).
         :type  facets:         List of tuples.
         :param search_filters: Dict of filters which are set for the ES query in set_filters
         :param string_query:   Dict holding the query_string used in the search
     """
-
     if from_ != 0:
         return search
 
     aggs = OrderedDict()
-
     for field, facet in facets: # E.g. 'type','experimentset_type','experiments_in_set.award.project', ...
-
         field_schema = schema_for_field(field, request, doc_types, should_log=True)
         is_date_field = field_schema and determine_if_is_date_field(field, field_schema)
         is_numerical_field = field_schema and field_schema['type'] in ("integer", "float", "number")
-
-        if field == 'type':
-            query_field = 'embedded.@type.raw'
-        elif field.startswith('validation_errors') or field.startswith('aggregated_items'):
-            query_field = field + '.raw'
-        elif facet.get('aggregation_type') in ('stats', 'date_histogram', 'histogram', 'range'):
-            query_field = 'embedded.' + field
-        else:
-            query_field = 'embedded.' + field + '.raw'
-
+        query_field = get_query_field(field, facet)
+        nested_path = find_nested_path(query_field, es_mapping)
 
         ## Create the aggregation itself, extend facet with info to pass down to front-end
         agg_name = field.replace('.', '-')
-
         if facet.get('aggregation_type') == 'stats':
 
             if is_date_field:
-                facet["field_type"] = "date"
+                facet['field_type'] = 'date'
             elif is_numerical_field:
                 facet["field_type"] = field_schema['type'] or "number"
-
-            facet_filters = generate_filters_for_terms_agg_from_search_filters(query_field, search_filters, string_query)
-
-            aggs[facet["aggregation_type"] + ":" + agg_name] = {
-                "aggs": {
-                    "primary_agg" : {
-                        "stats" : {
-                            "field" : query_field,
-                            "missing" : 0
-                        }
-                    }
-                },
-                "filter": {
-                    "bool" : facet_filters
-                }
-            }
-
-        else: # Default -- facetable terms
-
-            facet['aggregation_type'] = 'terms'
+                if "number_step" not in facet:
+                    if "number_step" in field_schema:
+                        facet["number_step"] = field_schema['number_step']
+                    elif facet["field_type"] == "integer":
+                        facet["number_step"] = 1
+                    else:  # Default
+                        facet["number_step"] = "any"
             facet_filters = generate_filters_for_terms_agg_from_search_filters(query_field, search_filters, string_query)
 
             aggs[facet['aggregation_type'] + ":" + agg_name] = {
-                'aggs': {
-                    "primary_agg" : {
-                        "terms" : {
-                            "size"    : 100,            # Maximum terms returned (default=10); see https://github.com/10up/ElasticPress/wiki/Working-with-Aggregations
-                            "field"   : query_field,
-                            "missing" : facet.get("missing_value_replacement", "No value"),
-                            "min_doc_count" : 0
+                AGGS: {
+                    'primary_agg': {
+                        'stats': {
+                            'field': query_field
                         }
                     }
                 },
-                "filter": {
-                    "bool": facet_filters
+                FILTER: {BOOL: facet_filters}
+            }
+
+        else:
+            if nested_path:
+                facet['aggregation_type'] = NESTED
+            else:
+                facet['aggregation_type'] = TERMS
+
+            facet_filters = generate_filters_for_terms_agg_from_search_filters(query_field, search_filters, string_query)
+            term_aggregation = {
+                TERMS: {
+                    'size': 100,  # Maximum terms returned (default=10); see https://github.com/10up/ElasticPress/wiki/Working-with-Aggregations
+                    'field': query_field,
+                    'missing': facet.get("missing_value_replacement", "No value")
+                }
+            }
+            aggs[facet['aggregation_type'] + ":" + agg_name] = {
+                AGGS: {
+                    'primary_agg': term_aggregation
                 },
+                FILTER: {BOOL: facet_filters},
             }
 
         # Update facet with title, description from field_schema, if missing.
@@ -1173,15 +1714,25 @@ def set_facets(search, facets, search_filters, string_query, request, doc_types,
         # We do currently have (hidden) monthly date histogram facets which may yet to be utilized for common size!=0 agg use cases.
         set_additional_aggregations(search_as_dict, request, doc_types, custom_aggregations)
 
+    # update with all terms aggregations
     search.update_from_dict(search_as_dict)
+
+    # update with correct nested aggregations, see docstring
+    fix_nested_aggregations(search, es_mapping)
     return search
 
 
 def set_additional_aggregations(search_as_dict, request, doc_types, extra_aggregations=None):
-    '''
-    Per-type aggregations may be defined in schemas. Apply them OUTSIDE of globals so they act on our current search filters.
-    Warning: `search_as_dict` is modified IN PLACE.
-    '''
+    """
+    Per-type aggregations may be defined in schemas. Apply them OUTSIDE of globals so they act on our
+    current search filters. Warning: `search_as_dict` is modified IN PLACE.
+
+    :param search_as_dict: elasticsearch_dsl object converted to_dict()
+    :param request: current request
+    :param doc_types: types we are searching on
+    :param extra_aggregations: aggregations to add
+    :return: search_as_dict, same as originally passed in, but modified in this function
+    """
 
     types = request.registry[TYPES]
     schema = types[doc_types[0]].schema
@@ -1189,28 +1740,83 @@ def set_additional_aggregations(search_as_dict, request, doc_types, extra_aggreg
     if schema.get('aggregations'):
         for schema_agg_name in schema['aggregations'].keys():
             if schema_agg_name == 'all_items':
-                raise Exception('all_items is a reserved agg name and not allowed as an extra aggregation name.')
+                raise QueryConstructionException(
+                    query_type='aggregations',
+                    func='set_additional_aggregations',
+                    msg='all_items is a reserved agg name and not allowed as an extra aggregation name.')
             search_as_dict['aggs'][schema_agg_name] = schema['aggregations'][schema_agg_name]
 
     if extra_aggregations:
         for extra_agg_name in extra_aggregations.keys():
             if extra_agg_name == 'all_items':
-                raise Exception('all_items is a reserved agg name and not allowed as an extra aggregation name.')
+                raise QueryConstructionException(
+                    query_type='extra_aggregations',
+                    func='set_additional_aggregations',
+                    msg='all_items is a reserved agg name and not allowed as an extra aggregation name.')
             search_as_dict['aggs'][extra_agg_name] = extra_aggregations[extra_agg_name]
 
     return search_as_dict
 
 
-def execute_search(search):
+def convert_search_to_dictionary(search):
+    """ Converts the given search to a dictionary. Useful in mocking queries from dictionaries in testing.
+
+    :param search: elasticsearch_dsl object to convert
+    :return: query in dictionary form
+    """
+    return search.to_dict()
+
+
+def verify_search_has_permissions(request, search):
+    """
+    Inspects the search object to ensure permissions are still present on the query
+    This method depends on the query structure defined in 'set_filters'.
+
+    :param request: the current request
+    :param search: search object to inspect
+    :raises: HTTPBadRequest if permissions not present
+    """
+    search_dict = convert_search_to_dictionary(search)
+    found = False  # set to True if we found valid 'principals_allowed.view'
+    try:
+        for boolean_clause in search_dict['query']['bool']['filter']:  # should always be present
+            if 'bool' in boolean_clause and 'must' in boolean_clause['bool']:  # principals_allowed.view is on 'must'
+                possible_permission_block = boolean_clause['bool']['must']
+                for entry in possible_permission_block:
+                    if 'terms' in entry:
+                        if 'principals_allowed.view' in entry['terms']:
+                            effective_principals_on_query = entry['terms']['principals_allowed.view']
+                            if effective_principals_on_query != request.effective_principals:
+                                raise QueryConstructionException(
+                                    query_type='principals',
+                                    func='verify_search_has_permissions',
+                                    msg='principals_allowed was modified - see application logs')
+                            else:
+                                found = True
+                                break
+    except QueryConstructionException:
+        log.error('SEARCH: Detected URL query param manipulation, principals_allowed.view was'
+                  'modified from %s to %s' % (request.effective_principals,
+                                              effective_principals_on_query))
+        raise HTTPBadRequest('The search failed - the DCIC team has been notified.')
+    except KeyError:
+        log.error('SEARCH: Malformed query detected while checking for principals_allowed')
+        raise HTTPBadRequest('The search failed - the DCIC team has been notified.')
+    if not found:
+        log.error('SEARCH: Did not locate principals_allowed.view on search query body: %s' % search_dict)
+        raise HTTPBadRequest('The search failed - the DCIC team has been notified.')
+
+
+def execute_search(request, search):
     """
     Execute the given Elasticsearch-dsl search. Raise HTTPBadRequest for any
     exceptions that arise.
-    Args:
-        search: the Elasticsearch-dsl prepared in the search() function
-    Returns:
-        Dictionary search results
+
+    :param search: the Elasticsearch-dsl prepared in the search() function
+    :returns: Dictionary search results
     """
     err_exp = None
+    verify_search_has_permissions(request, search)  # query integrity check
     try:
         es_results = search.execute().to_dict()
     except ConnectionTimeout as exc:
@@ -1230,10 +1836,32 @@ def execute_search(search):
         else:
             err_exp = 'The search failed due to a transport error: ' + str(exc)
     except Exception as exc:
-        err_exp = 'The search failed. The DCIC team has been notified.'
+        err_exp = str(exc)  # XXX: We should revisit if we think this is always safe... -Will 4-23-2020
     if err_exp:
         raise HTTPBadRequest(explanation=err_exp)
     return es_results
+
+
+def fix_and_replace_nested_doc_count(result_facet, aggregations, full_agg_name):
+    """
+    3 things must happen here (all occur in place):
+        1. front-end does not care about 'nested', only what the inner thing is, so lets pretend (so it doesn't break)
+        2. We must overwrite the "second level" doc_count with the "third level" because the "third level"
+           is the 'root' level doc_count, which is what we care about, NOT the nested doc count
+        3. We must then re-sort the aggregations so they show up in from greatest to least doc_count wrt the root
+           level count instead of the "old" nested doc count.
+
+    :param result_facet: facet to be created - 'aggregation_type' is overwritten as 'terms'
+    :param aggregations: handle to all aggregations that we can access based on name
+    :param full_agg_name: full name of the aggregation
+    """
+    result_facet['aggregation_type'] = 'terms'
+    buckets = aggregations[full_agg_name]['primary_agg']['buckets']
+    for bucket in buckets:
+        if 'primary_agg_reverse_nested' in bucket:
+            bucket['doc_count'] = bucket['primary_agg_reverse_nested']['doc_count']
+    aggregations[full_agg_name]['primary_agg']['buckets'] = \
+        sorted(buckets, key=lambda d: d['primary_agg_reverse_nested']['doc_count'], reverse=True)
 
 
 def format_facets(es_results, facets, total, search_frame='embedded'):
@@ -1278,6 +1906,26 @@ def format_facets(es_results, facets, total, search_frame='embedded'):
                 for k in aggregations[full_agg_name]["primary_agg"].keys():
                     result_facet[k] = aggregations[full_agg_name]["primary_agg"][k]
             else: # 'terms' assumed.
+
+                # XXX: This needs to be done in case we 'continue' below, unclear why needed in that case
+                # but tests will fail if its not there when expected.
+                result_facet['terms'] = aggregations[full_agg_name]["primary_agg"]["buckets"]
+
+                # Choosing to show facets with one term for summary info on search it provides
+                # XXX: The above comment is misleading - this drops all facets with no buckets
+                # we apparently want this for non-nested fields based on the tests, but should be
+                # investigated as having to do this doesn't really make sense.
+                if len(result_facet.get('terms', [])) < 1 and not facet['aggregation_type'] == NESTED:
+                    continue
+
+                # if we are nested, apply fix + replace
+                if facet['aggregation_type'] == NESTED:
+                    fix_and_replace_nested_doc_count(result_facet, aggregations, full_agg_name)
+
+                # Re-add buckets under 'terms' AFTER we have fixed the doc_counts
+                result_facet['terms'] = aggregations[full_agg_name]["primary_agg"]["buckets"]
+
+
                 # Default - terms, range, or histogram buckets. Buckets may not be present
                 result_facet['terms'] = aggregations[full_agg_name]["primary_agg"]["buckets"]
                 # Choosing to show facets with one term for summary info on search it provides
@@ -1292,9 +1940,15 @@ def format_facets(es_results, facets, total, search_frame='embedded'):
     return result
 
 def format_extra_aggregations(es_results):
+    """
+    Extracts any extra aggregations results returned from elasticsearch
+
+    :param es_results: dictionary response from es
+    :return: dictionary mapping field -> agg_value, varies based on type of aggregation
+    """
     if 'aggregations' not in es_results:
         return {}
-    return { k:v for k,v in es_results['aggregations'].items() if k != 'all_items' }
+    return {k: v for k, v in es_results['aggregations'].items() if k != 'all_items'}
 
 
 def format_results(request, hits, search_frame):
