@@ -1,0 +1,555 @@
+[{
+  "chrom": "1",
+  "spos": 65419,
+  "epos": 71585,
+  "ensgid": "ENSG00000186092",
+  "strand": "+",
+  "gene_version": "6",
+  "gene_symbol": "OR4F5",
+  "gene_biotype": "protein_coding",
+  "chrom_hg19": "1",
+  "spos_hg19": 69091,
+  "epos_hg19": 70008,
+  "strand_hg19": "+",
+  "cytoband": [
+    "1p36.33"
+  ],
+  "hgnc_id": "14825",
+  "name": "olfactory receptor family 4 subfamily F member 5",
+  "entrez_id": "79501",
+  "ucsc_id": "uc001aal.1",
+  "refseq_accession": [
+    "NM_001005484"
+  ],
+  "ccds_id": [
+    "CCDS30547"
+  ],
+  "uniprot_ids": [
+    "Q8NH21"
+  ],
+  "transcriptid": [
+    {
+      "Ensembl_TRS": "ENST00000641515",
+      "Ensembl_PRO": "ENSP00000493376"
+    },
+    {
+      "Ensembl_TRS": "ENST00000335137",
+      "Ensembl_PRO": "ENSP00000334393"
+    }
+  ],
+  "STRING": [
+    "9606.ENSP00000334393"
+  ],
+  "GeneCards": "ENSG00000186092",
+  "PharmGKB": [
+    "PA32291"
+  ],
+  "Pathway_KEGG_id": "hsa04740",
+  "Pathway_KEGG_full": "Olfactory transduction",
+  "GDI-Phred": 2.31572,
+  "GDP": "Medium",
+  "obs_mis": 67,
+  "exp_mis": 82.715,
+  "oe_mis": 0.81001,
+  "obs_syn": 28,
+  "exp_syn": 30.512,
+  "oe_syn": 0.91766,
+  "obs_lof": 2,
+  "exp_lof": 2.3369,
+  "oe_lof": 0.85584,
+  "cds_length": 915,
+  "num_coding_exons": 1,
+  "Marrvel": "OR4F5",
+  "gtex_expression": "ENSG00000186092.4",
+  "brainspan_rnaseq": "ENSG00000186092"
+},{
+  "chrom": "1",
+  "spos": 450703,
+  "epos": 451697,
+  "ensgid": "ENSG00000284733",
+  "strand": "-",
+  "gene_version": "1",
+  "gene_symbol": "OR4F29",
+  "gene_biotype": "protein_coding",
+  "cytoband": [
+    "1p36.33"
+  ],
+  "hgnc_id": "31275",
+  "name": "olfactory receptor family 4 subfamily F member 29",
+  "entrez_id": "729759",
+  "ucsc_id": "uc010nxu.2",
+  "refseq_accession": [
+    "NM_001005221"
+  ],
+  "ccds_id": [
+    "CCDS72675"
+  ],
+  "uniprot_ids": [
+    "Q6IEY1"
+  ],
+  "mgd_id": [
+    "MGI:3031137"
+  ],
+  "transcriptid": [
+    {
+      "Ensembl_TRS": "ENST00000332831",
+      "Ensembl_PRO": "ENSP00000329982"
+    },
+    {
+      "Ensembl_TRS": "ENST00000426406",
+      "Ensembl_PRO": "ENSP00000409316"
+    },
+    {
+      "Ensembl_TRS": "ENST00000456475",
+      "Ensembl_PRO": "ENSP00000394282"
+    }
+  ],
+  "STRING": [
+    "9606.ENSP00000409316"
+  ],
+  "GeneCards": "ENSG00000284733",
+  "PharmGKB": [
+    "PA32284"
+  ],
+  "Trait_association_GWAS": [
+    "Subjective response to lithium treatment"
+  ],
+  "Trait_association_GWAS_PMID": [
+    "26503763"
+  ],
+  "MGI_mouse_gene": "Olfr1303",
+  "Marrvel": "OR4F29"
+},{
+  "chrom": "1",
+  "spos": 685679,
+  "epos": 686673,
+  "ensgid": "ENSG00000284662",
+  "strand": "-",
+  "gene_version": "1",
+  "gene_symbol": "OR4F16",
+  "gene_biotype": "protein_coding",
+  "cytoband": [
+    "1p36.33"
+  ],
+  "hgnc_id": "15079",
+  "name": "olfactory receptor family 4 subfamily F member 16",
+  "entrez_id": "81399",
+  "ucsc_id": "uc010nxv.2",
+  "refseq_accession": [
+    "NM_001005277"
+  ],
+  "ccds_id": [
+    "CCDS41221"
+  ],
+  "uniprot_ids": [
+    "Q6IEY1"
+  ],
+  "mgd_id": [
+    "MGI:3031137"
+  ],
+  "transcriptid": [
+    {
+      "Ensembl_TRS": "ENST00000332831",
+      "Ensembl_PRO": "ENSP00000329982"
+    },
+    {
+      "Ensembl_TRS": "ENST00000426406",
+      "Ensembl_PRO": "ENSP00000409316"
+    },
+    {
+      "Ensembl_TRS": "ENST00000456475",
+      "Ensembl_PRO": "ENSP00000394282"
+    }
+  ],
+  "STRING": [
+    "9606.ENSP00000409316"
+  ],
+  "GeneCards": "ENSG00000284662",
+  "PharmGKB": [
+    "PA32284"
+  ],
+  "Pathway_KEGG_id": "hsa04740",
+  "Pathway_KEGG_full": "Olfactory transduction",
+  "Trait_association_GWAS": [
+    "Subjective response to lithium treatment"
+  ],
+  "Trait_association_GWAS_PMID": [
+    "26503763"
+  ],
+  "MGI_mouse_gene": "Olfr1303",
+  "Marrvel": "OR4F16"
+},{
+  "chrom": "1",
+  "spos": 923928,
+  "epos": 944581,
+  "ensgid": "ENSG00000187634",
+  "strand": "+",
+  "gene_version": "12",
+  "gene_symbol": "SAMD11",
+  "gene_biotype": "protein_coding",
+  "chrom_hg19": "1",
+  "spos_hg19": 860260,
+  "epos_hg19": 879955,
+  "strand_hg19": "+",
+  "cytoband": [
+    "1p36.33"
+  ],
+  "hgnc_id": "28706",
+  "name": "sterile alpha motif domain containing 11",
+  "entrez_id": "148398",
+  "ucsc_id": "uc001abw.2",
+  "refseq_accession": [
+    "NM_152486"
+  ],
+  "ccds_id": [
+    "CCDS2"
+  ],
+  "uniprot_ids": [
+    "Q96NU1"
+  ],
+  "mgd_id": [
+    "MGI:2446220"
+  ],
+  "omim_id": [
+    "616765"
+  ],
+  "transcriptid": [
+    {
+      "Ensembl_TRS": "ENST00000420190",
+      "Ensembl_PRO": "ENSP00000411579"
+    },
+    {
+      "Ensembl_TRS": "ENST00000437963",
+      "Ensembl_PRO": "ENSP00000393181"
+    },
+    {
+      "Ensembl_TRS": "ENST00000342066",
+      "Ensembl_PRO": "ENSP00000342313"
+    },
+    {
+      "Ensembl_TRS": "ENST00000341065",
+      "Ensembl_PRO": "ENSP00000349216"
+    },
+    {
+      "Ensembl_TRS": "ENST00000455979",
+      "Ensembl_PRO": "ENSP00000412228"
+    },
+    {
+      "Ensembl_TRS": "ENST00000618181",
+      "Ensembl_PRO": "ENSP00000480870"
+    },
+    {
+      "Ensembl_TRS": "ENST00000622503",
+      "Ensembl_PRO": "ENSP00000482138"
+    },
+    {
+      "Ensembl_TRS": "ENST00000618323",
+      "Ensembl_PRO": "ENSP00000480678"
+    },
+    {
+      "Ensembl_TRS": "ENST00000616016",
+      "Ensembl_PRO": "ENSP00000478421"
+    },
+    {
+      "Ensembl_TRS": "ENST00000618779",
+      "Ensembl_PRO": "ENSP00000484256"
+    },
+    {
+      "Ensembl_TRS": "ENST00000616125",
+      "Ensembl_PRO": "ENSP00000484643"
+    },
+    {
+      "Ensembl_TRS": "ENST00000620200",
+      "Ensembl_PRO": "ENSP00000484820"
+    },
+    {
+      "Ensembl_TRS": "ENST00000617307",
+      "Ensembl_PRO": "ENSP00000482090"
+    }
+  ],
+  "BioGrid": [
+    "127146"
+  ],
+  "STRING": [
+    "9606.ENSP00000342313"
+  ],
+  "GeneCards": "ENSG00000187634",
+  "PharmGKB": [
+    "PA134968665"
+  ],
+  "RVIS_ExAC": 2.274410941,
+  "RVIS_percentile_ExAC": 98.9036805,
+  "GDI-Phred": 5.65821,
+  "GDP": "Medium",
+  "MGI_mouse_gene": "Samd11",
+  "obs_mis": 546,
+  "exp_mis": 362.02,
+  "oe_mis": 1.5082,
+  "obs_syn": 270,
+  "exp_syn": 158.98,
+  "oe_syn": 1.6983,
+  "obs_lof": 22,
+  "exp_lof": 24.538,
+  "oe_lof": 0.89656,
+  "cds_length": 2043,
+  "num_coding_exons": 13,
+  "Marrvel": "SAMD11",
+  "s_het": 0.007702292,
+  "gtex_expression": "ENSG00000187634.11",
+  "brainspan_microarray": "SAMD11",
+  "brainspan_rnaseq": "ENSG00000187634",
+  "brainatlas_microarray": "SAMD11"
+},{
+  "chrom": "1",
+  "spos": 944203,
+  "epos": 959309,
+  "ensgid": "ENSG00000188976",
+  "strand": "-",
+  "gene_version": "11",
+  "gene_symbol": "NOC2L",
+  "gene_biotype": "protein_coding",
+  "chrom_hg19": "1",
+  "spos_hg19": 879584,
+  "epos_hg19": 894689,
+  "strand_hg19": "-",
+  "cytoband": [
+    "1p36.33"
+  ],
+  "gene_summary": "The protein encoded by this gene is expressed in neurons of most regions of the brain. It contains an N-terminal BTB domain, which mediates dimerization of the protein, and a C-terminal Kelch domain, which mediates binding to F-actin. This protein may play a key role in the regulation of actin-based neuronal function. [provided by RefSeq, Aug 2010].",
+  "hgnc_id": "24517",
+  "name": "NOC2 like nucleolar associated transcriptional repressor",
+  "entrez_id": "26155",
+  "ucsc_id": "uc001abz.5",
+  "refseq_accession": [
+    "NM_015658"
+  ],
+  "ccds_id": [
+    "CCDS3"
+  ],
+  "uniprot_ids": [
+    "Q9Y3T9"
+  ],
+  "mgd_id": [
+    "MGI:1931051"
+  ],
+  "omim_id": [
+    "610770"
+  ],
+  "transcriptid": [
+    {
+      "Ensembl_TRS": "ENST00000327044",
+      "Ensembl_PRO": "ENSP00000317992"
+    }
+  ],
+  "BioGrid": [
+    "117586"
+  ],
+  "STRING": [
+    "9606.ENSP00000317992"
+  ],
+  "GeneCards": "ENSG00000188976",
+  "PharmGKB": [
+    "PA142671261"
+  ],
+  "Trait_association_GWAS": [
+    "Pancreatic cancer"
+  ],
+  "Trait_association_GWAS_PMID": [
+    "29422604"
+  ],
+  "RVIS_ExAC": 0.231569638,
+  "RVIS_percentile_ExAC": 65.47195952,
+  "GDI-Phred": 5.53337,
+  "GDP": "Medium",
+  "MGI_mouse_gene": "Noc2l",
+  "MGI_mouse_phenotype": "endocrine/exocrine gland phenotype; cellular phenotype; mortality/aging (the observable characteristics related to the ability of a mammalian organism to live and age that are manifested throughout development and life span); hematopoietic system phenotype; immune system phenotype",
+  "obs_mis": 577,
+  "exp_mis": 462.01,
+  "oe_mis": 1.2489,
+  "obs_syn": 320,
+  "exp_syn": 199.38,
+  "oe_syn": 1.6049,
+  "obs_lof": 43,
+  "exp_lof": 41.785,
+  "oe_lof": 1.0291,
+  "cds_length": 2247,
+  "num_coding_exons": 19,
+  "Marrvel": "NOC2L",
+  "s_het": 0.005405258,
+  "gtex_expression": "ENSG00000188976.10",
+  "brainspan_microarray": "NOC2L",
+  "brainspan_rnaseq": "ENSG00000188976",
+  "brainatlas_microarray": "NOC2L"
+},{
+  "chrom": "1",
+  "spos": 960584,
+  "epos": 965719,
+  "ensgid": "ENSG00000187961",
+  "strand": "+",
+  "gene_version": "14",
+  "gene_symbol": "KLHL17",
+  "gene_biotype": "protein_coding",
+  "chrom_hg19": "1",
+  "spos_hg19": 895967,
+  "epos_hg19": 901095,
+  "strand_hg19": "+",
+  "cytoband": [
+    "1p36.33"
+  ],
+  "gene_summary": "The protein encoded by this gene is expressed in neurons of most regions of the brain. It contains an N-terminal BTB domain, which mediates dimerization of the protein, and a C-terminal Kelch domain, which mediates binding to F-actin. This protein may play a key role in the regulation of actin-based neuronal function. [provided by RefSeq, Aug 2010].",
+  "hgnc_id": "24023",
+  "name": "kelch like family member 17",
+  "entrez_id": "339451",
+  "ucsc_id": "uc001aca.3",
+  "refseq_accession": [
+    "NM_198317"
+  ],
+  "ccds_id": [
+    "CCDS30550"
+  ],
+  "uniprot_ids": [
+    "Q6TDP4"
+  ],
+  "mgd_id": [
+    "MGI:2678948"
+  ],
+  "transcriptid": [
+    {
+      "Ensembl_TRS": "ENST00000338591",
+      "Ensembl_PRO": "ENSP00000343930"
+    },
+    {
+      "Ensembl_TRS": "ENST00000466300",
+      "Ensembl_PRO": "ENSP00000463694"
+    },
+    {
+      "Ensembl_TRS": "ENST00000622660",
+      "Ensembl_PRO": "ENSP00000479477"
+    }
+  ],
+  "PDB": [
+    "6HRL"
+  ],
+  "BioGrid": [
+    "130885"
+  ],
+  "STRING": [
+    "9606.ENSP00000343930"
+  ],
+  "GeneCards": "ENSG00000187961",
+  "PharmGKB": [
+    "PA134887396"
+  ],
+  "RVIS_ExAC": -1.365209057,
+  "RVIS_percentile_ExAC": 4.843081742,
+  "GDI-Phred": 1.58809,
+  "GDP": "Medium",
+  "MGI_mouse_gene": "Klhl17",
+  "obs_mis": 467,
+  "exp_mis": 433.55,
+  "oe_mis": 1.0772,
+  "obs_syn": 360,
+  "exp_syn": 201.09,
+  "oe_syn": 1.7903,
+  "obs_lof": 26,
+  "exp_lof": 28.65,
+  "oe_lof": 0.90749,
+  "cds_length": 1926,
+  "num_coding_exons": 12,
+  "Marrvel": "KLHL17",
+  "s_het": 0.013762146,
+  "gtex_expression": "ENSG00000187961.13",
+  "brainspan_microarray": "KLHL17",
+  "brainspan_rnaseq": "ENSG00000187961",
+  "brainatlas_microarray": "KLHL17"
+},{
+  "chrom": "1",
+  "spos": 966482,
+  "epos": 975865,
+  "ensgid": "ENSG00000187583",
+  "strand": "+",
+  "gene_version": "11",
+  "gene_symbol": "PLEKHN1",
+  "gene_biotype": "protein_coding",
+  "chrom_hg19": "1",
+  "spos_hg19": 901877,
+  "epos_hg19": 911245,
+  "strand_hg19": "+",
+  "cytoband": [
+    "1p36.33"
+  ],
+  "gene_summary": "The protein encoded by this gene is expressed in neurons of most regions of the brain. It contains an N-terminal BTB domain, which mediates dimerization of the protein, and a C-terminal Kelch domain, which mediates binding to F-actin. This protein may play a key role in the regulation of actin-based neuronal function. [provided by RefSeq, Aug 2010].",
+  "hgnc_id": "25284",
+  "name": "pleckstrin homology domain containing N1",
+  "entrez_id": "84069",
+  "ucsc_id": "uc001acd.4",
+  "refseq_accession": [
+    "NM_032129"
+  ],
+  "ccds_id": [
+    "CCDS4",
+    "CCDS53256"
+  ],
+  "uniprot_ids": [
+    "Q494U1"
+  ],
+  "mgd_id": [
+    "MGI:2387630"
+  ],
+  "transcriptid": [
+    {
+      "Ensembl_TRS": "ENST00000379407",
+      "Ensembl_PRO": "ENSP00000368717"
+    },
+    {
+      "Ensembl_TRS": "ENST00000379409",
+      "Ensembl_PRO": "ENSP00000368719"
+    },
+    {
+      "Ensembl_TRS": "ENST00000379410",
+      "Ensembl_PRO": "ENSP00000368720"
+    },
+    {
+      "Ensembl_TRS": "ENST00000491024",
+      "Ensembl_PRO": "ENSP00000462558"
+    }
+  ],
+  "BioGrid": [
+    "123864"
+  ],
+  "STRING": [
+    "9606.ENSP00000368720"
+  ],
+  "GeneCards": "ENSG00000187583",
+  "PharmGKB": [
+    "PA142671166"
+  ],
+  "Trait_association_GWAS": [
+    "Parkinson's disease"
+  ],
+  "Trait_association_GWAS_PMID": [
+    "26227905"
+  ],
+  "RVIS_ExAC": 1.879999506,
+  "RVIS_percentile_ExAC": 97.96397807,
+  "GDI-Phred": 5.29021,
+  "GDP": "Medium",
+  "MGI_mouse_gene": "Plekhn1",
+  "obs_mis": 480,
+  "exp_mis": 381.17,
+  "oe_mis": 1.2593,
+  "obs_syn": 216,
+  "exp_syn": 174.52,
+  "oe_syn": 1.2377,
+  "obs_lof": 25,
+  "exp_lof": 31.069,
+  "oe_lof": 0.80467,
+  "cds_length": 1833,
+  "num_coding_exons": 16,
+  "Marrvel": "PLEKHN1",
+  "s_het": 0.006848947,
+  "gtex_expression": "ENSG00000187583.10",
+  "brainspan_microarray": "PLEKHN1",
+  "brainspan_rnaseq": "ENSG00000187583",
+  "brainatlas_microarray": "PLEKHN1"
+}]

@@ -5,7 +5,7 @@ from encoded.commands.ingest_genes import (
 
 
 pytestmark = [pytest.mark.working, pytest.mark.ingestion]
-GENES_LOC = './src/encoded/tests/data/variant_workbook/gene_inserts.json'
+GENES_LOC = './src/encoded/tests/data/variant_workbook/gene_inserts_partial.json'
 
 
 @pytest.fixture
@@ -19,7 +19,7 @@ def test_post_gene_inserts(testapp, project, institution, test_genes):
         XXX: fix test when new inserts come in """
     CONNECTION_URL = '/gene'
     success, fail = 0, 0
-    for gene in test_genes[0:100]:
+    for gene in test_genes:
         gene['project'] = 'encode-project'
         gene['institution'] = 'encode-institution'
         try:
