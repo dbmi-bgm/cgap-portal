@@ -19,10 +19,10 @@ class GeneTableParser(MappingTableParser):
 
     def __init__(self, *args, **kwargs):
         super(GeneTableParser, self).__init__(*args, **kwargs)
-        self.FIELD_TYPE_INDEX = 11
+        self.FIELD_TYPE_INDEX = 12
         self.INTEGER_FIELDS = ['no', 'column_priority', 'facet_priority']
         self.BOOLEAN_FIELDS = ['is_list', 'do_import']
-        self.STRING_FIELDS.extend(['schema_title', 'description', 'comments', 'link'])
+        self.STRING_FIELDS.extend(['schema_title', 'description', 'comments', 'link', 'pattern'])
         self.NAME_FIELD = 'field_name'
 
     def generate_gene_schema(self, gene_props, columns, facets):

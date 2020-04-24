@@ -88,7 +88,7 @@
             "source_name": "ENSEMBLgene",
             "source_version": "v99",
             "schema_title": "Start position",
-            "description": "start position"
+            "description": "start position (hg38)"
         },
         "epos": {
             "title": "End position",
@@ -98,20 +98,21 @@
             "source_name": "ENSEMBLgene",
             "source_version": "v99",
             "schema_title": "End position",
-            "description": "end position"
+            "description": "end position (hg38)"
         },
         "strand": {
             "title": "Strand",
             "field_name": "strand",
             "type": "string",
             "enum": [
-                "\"+",
+                ".",
                 "-",
-                ".\""
+                "+"
             ],
             "source_name": "ENSEMBLgene",
             "source_version": "v99",
-            "schema_title": "Strand"
+            "schema_title": "Strand",
+            "description": "strand (hg38)"
         },
         "ensgid": {
             "title": "ENSEMBL gene ID",
@@ -122,7 +123,8 @@
             "source_version": "v99",
             "schema_title": "ENSEMBL gene ID",
             "description": "The stable identifier for the gene",
-            "link": "https://useast.ensembl.org/Homo_sapiens/Gene/Summary?g=<ID>"
+            "link": "https://useast.ensembl.org/Homo_sapiens/Gene/Summary?g=<ID>",
+            "pattern": "^ENSG[0-9]{11}$"
         },
         "gene_version": {
             "title": "ENSEMBL gene version",
@@ -150,13 +152,124 @@
             "field_name": "gene_biotype",
             "type": "string",
             "enum": [
-                "enum values?"
+                "protein_coding",
+                "IG_C_gene",
+                "IG_C_pseudogene",
+                "IG_D_gene",
+                "IG_J_gene",
+                "IG_J_pseudogene",
+                "IG_pseudogene",
+                "IG_V_gene",
+                "IG_V_pseudogene",
+                "lncRNA",
+                "miRNA",
+                "misc_RNA",
+                "Mt_rRNA",
+                "Mt_tRNA",
+                "polymorphic_pseudogene",
+                "processed_pseudogene",
+                "pseudogene",
+                "ribozyme",
+                "rRNA",
+                "rRNA_pseudogene",
+                "scaRNA",
+                "scRNA",
+                "snoRNA",
+                "snRNA",
+                "sRNA",
+                "TEC",
+                "transcribed_processed_pseudogene",
+                "transcribed_unitary_pseudogene",
+                "transcribed_unprocessed_pseudogene",
+                "translated_processed_pseudogene",
+                "translated_unprocessed_pseudogene",
+                "TR_C_gene",
+                "TR_D_gene",
+                "TR_J_gene",
+                "TR_J_pseudogene",
+                "TR_V_gene",
+                "TR_V_pseudogene",
+                "unitary_pseudogene",
+                "unprocessed_pseudogene",
+                "vaultRNA"
             ],
             "do_import": true,
             "source_name": "ENSEMBLgene",
             "source_version": "v99",
             "schema_title": "Gene biotype",
             "description": "The biotype of this gene"
+        },
+        "chrom_hg19": {
+            "title": "Chromosome (hg19)",
+            "field_name": "chrom_hg19",
+            "type": "string",
+            "enum": [
+                "1",
+                "2",
+                "3",
+                "4",
+                "5",
+                "6",
+                "7",
+                "8",
+                "9",
+                "10",
+                "11",
+                "12",
+                "13",
+                "14",
+                "15",
+                "16",
+                "17",
+                "18",
+                "19",
+                "20",
+                "21",
+                "22",
+                "X",
+                "Y",
+                "M"
+            ],
+            "do_import": true,
+            "source_name": "ENSEMBLgeneGRCh37",
+            "source_version": "v75(GRCh37.p13)",
+            "schema_title": "Chromosome (hg19)",
+            "description": "name of the chromosome or scaffold in hg19; chromosome names without a 'chr'"
+        },
+        "spos_hg19": {
+            "title": "Start position (hg19)",
+            "field_name": "spos_hg19",
+            "type": "integer",
+            "do_import": true,
+            "source_name": "ENSEMBLgeneGRCh37",
+            "source_version": "v75(GRCh37.p13)",
+            "schema_title": "Start position (hg19)",
+            "description": "Start position (hg19)"
+        },
+        "epos_hg19": {
+            "title": "End position (hg19)",
+            "field_name": "epos_hg19",
+            "type": "integer",
+            "do_import": true,
+            "source_name": "ENSEMBLgeneGRCh37",
+            "source_version": "v75(GRCh37.p13)",
+            "schema_title": "End position (hg19)",
+            "description": "End position (hg19)"
+        },
+        "strand_hg19": {
+            "title": "Strand (hg19)",
+            "field_name": "strand_hg19",
+            "type": "string",
+            "enum": [
+                ".",
+                "-",
+                "+"
+            ],
+            "do_import": true,
+            "source_name": "ENSEMBLgeneGRCh37",
+            "source_version": "v75(GRCh37.p13)",
+            "schema_title": "Strand (hg19)",
+            "description": "Strand (hg19)"
         },
         "cytoband": {
             "title": "Cytoband",
@@ -225,7 +338,8 @@
             "source_name": "HGNC",
             "source_version": "2020-02-24",
             "schema_title": "UCSC",
-            "description": "UCSC genome browser gene ID"
+            "description": "UCSC genome browser gene ID",
+            "pattern": "^uc[0-9]{3}[a-z]{3}\\\\.[0-9]$"
         },
         "refseq_accession": {
             "title": "RefSeq",
@@ -240,7 +354,8 @@
                 "source_version": "2020-02-24",
                 "schema_title": "RefSeq",
                 "description": "The Reference Sequence (RefSeq) collection",
-                "link": "https://www.ncbi.nlm.nih.gov/gene/?term=<ID>"
+                "link": "https://www.ncbi.nlm.nih.gov/gene/?term=<ID>",
+                "pattern": "^(A|N|W|X|Y)(C|G|M|P|R|T|W)_[0-9]+"
             }
         },
         "ccds_id": {
@@ -256,7 +371,8 @@
                 "source_version": "2020-02-24",
                 "schema_title": "CCDS",
                 "description": "The Consensus CDS (CCDS) project: a collaborative effort to identify a core set of human and mouse protein coding regions that are consistently annotated and of high quality",
-                "link": "https://www.ncbi.nlm.nih.gov/CCDS/CcdsBrowse.cgi?REQUEST=CCDS&DATA=<ID>"
+                "link": "https://www.ncbi.nlm.nih.gov/CCDS/CcdsBrowse.cgi?REQUEST=CCDS&DATA=<ID>",
+                "pattern": "^CCDS[0-9]+"
             }
         },
         "uniprot_ids": {
@@ -289,7 +405,8 @@
                 "schema_title": "MGI",
                 "description": "Mouse Genome Informatics Database",
                 "comments": "We need to look at one mouse db at least",
-                "link": "http://www.informatics.jax.org/marker/<ID>"
+                "link": "http://www.informatics.jax.org/marker/<ID>",
+                "pattern": "^MGI:[0-9]+"
             }
         },
         "omim_id": {
@@ -305,7 +422,8 @@
                 "source_version": "2020-02-24",
                 "schema_title": "OMIM",
                 "description": "Online Mendelian Inheritance in Man (OMIM)",
-                "link": "https://omim.org/entry/<ID>"
+                "link": "https://omim.org/entry/<ID>",
+                "pattern": "^[0-9]+$"
             }
         },
         "orphanet": {
@@ -317,7 +435,8 @@
             "source_version": "2020-02-24",
             "schema_title": "OrphaNet",
             "description": "portal for rare diseases and orphan drugs",
-            "link": "https://www.orpha.net/consor/cgi-bin/OC_Exp.php?Lng=GB&Expert=<ID>"
+            "link": "https://www.orpha.net/consor/cgi-bin/OC_Exp.php?Lng=GB&Expert=<ID>",
+            "pattern": "^[0-9]+$"
         },
         "ClinGen": {
             "title": "ClinGen",
@@ -329,7 +448,8 @@
             "schema_title": "ClinGen",
             "description": "ClinGen",
             "comments": "Keep as a link",
-            "link": "https://search.clinicalgenome.org/kb/genes/HGNC:<ID>"
+            "link": "https://search.clinicalgenome.org/kb/genes/HGNC:<ID>",
+            "pattern": "^[0-9]+$"
         },
         "clingendis": {
             "title": "clingendis",
@@ -339,75 +459,60 @@
                 "type": "array",
                 "properties": {
                     "disease_label": {
-                        "title": "disease_label",
-                        "type": "array",
-                        "items": {
-                            "title": "Disease Label",
-                            "field_name": "disease_label",
-                            "type": "string",
-                            "do_import": true,
-                            "source_name": "ClinGenDisease",
-                            "source_version": "20200309",
-                            "schema_title": "Disease Label",
-                            "description": "Disease label list"
-                        }
+                        "title": "Disease Label",
+                        "field_name": "disease_label",
+                        "type": "string",
+                        "do_import": true,
+                        "source_name": "ClinGenDisease",
+                        "source_version": "20200309",
+                        "schema_title": "Disease Label",
+                        "description": "Disease label list"
                     },
                     "disease_id": {
-                        "title": "disease_id",
-                        "type": "array",
-                        "items": {
-                            "title": "Disease ID (MONDO)",
-                            "field_name": "disease_id",
-                            "type": "string",
-                            "do_import": true,
-                            "source_name": "ClinGenDisease",
-                            "source_version": "20200309",
-                            "schema_title": "Disease ID (MONDO)",
-                            "link": "https://search.clinicalgenome.org/kb/conditions/<ID>"
-                        }
+                        "title": "Disease ID (MONDO)",
+                        "field_name": "disease_id",
+                        "type": "string",
+                        "do_import": true,
+                        "source_name": "ClinGenDisease",
+                        "source_version": "20200309",
+                        "schema_title": "Disease ID (MONDO)",
+                        "link": "https://search.clinicalgenome.org/kb/conditions/<ID>",
+                        "pattern": "^MONDO_[0-9]+$"
                     },
                     "Inheritance": {
                         "title": "Inheritance",
-                        "type": "array",
-                        "items": {
-                            "title": "Inheritance",
-                            "field_name": "Inheritance",
-                            "type": "string",
-                            "enum": [
-                                "Autosomal Dominant",
-                                "Autosomal Recessive",
-                                "Mitochondrial",
-                                "Semidominant",
-                                "X-linked",
-                                "Undetermined MOI",
-                                "Other"
-                            ],
-                            "do_import": true,
-                            "source_name": "ClinGenDisease",
-                            "source_version": "20200309",
-                            "schema_title": "Inheritance"
-                        }
+                        "field_name": "Inheritance",
+                        "type": "string",
+                        "enum": [
+                            "Autosomal Dominant",
+                            "Autosomal Recessive",
+                            "Mitochondrial",
+                            "Semidominant",
+                            "X-linked",
+                            "Undetermined MOI",
+                            "Other"
+                        ],
+                        "do_import": true,
+                        "source_name": "ClinGenDisease",
+                        "source_version": "20200309",
+                        "schema_title": "Inheritance"
                     },
                     "classification": {
-                        "title": "classification",
-                        "type": "array",
-                        "items": {
-                            "title": "Classification",
-                            "field_name": "classification",
-                            "type": "string",
-                            "enum": [
-                                "Definitive",
-                                "Strong",
-                                "Moderate",
-                                "Limited",
-                                "No Reported Evidence",
-                                "Disputed"
-                            ],
-                            "do_import": true,
-                            "source_name": "ClinGenDisease",
-                            "source_version": "20200309",
-                            "schema_title": "Classification"
-                        }
+                        "title": "Classification",
+                        "field_name": "classification",
+                        "type": "string",
+                        "enum": [
+                            "Definitive",
+                            "Strong",
+                            "Moderate",
+                            "Limited",
+                            "No Reported Evidence",
+                            "Disputed"
+                        ],
+                        "do_import": true,
+                        "source_name": "ClinGenDisease",
+                        "source_version": "20200309",
+                        "schema_title": "Classification"
                     },
                     "online_report": {
                         "title": "online_report",
@@ -452,7 +557,8 @@
                         "source_version": "v2.1.1",
                         "schema_title": "ENSEMBL transcript",
                         "description": "ENSEMBL transcript ID list",
-                        "link": "https://useast.ensembl.org/Homo_sapiens/Transcript/Summary?t=<ID>"
+                        "link": "https://useast.ensembl.org/Homo_sapiens/Transcript/Summary?t=<ID>",
+                        "pattern": "^ENST[0-9]{11}$"
                     },
                     "Ensembl_PRO": {
                         "title": "ENSEMBL protein",
@@ -463,7 +569,8 @@
                         "source_version": "v2.1.1",
                         "schema_title": "ENSEMBL protein",
                         "description": "ENSEMBL protein ID list",
-                        "link": "http://www.ensembl.org/Homo_sapiens/protview?peptide=<ID>"
+                        "link": "http://www.ensembl.org/Homo_sapiens/protview?peptide=<ID>",
+                        "pattern": "^ENSP[0-9]{11}$"
                     }
                 }
             }
@@ -518,20 +625,15 @@
         },
         "GeneCards": {
             "title": "GeneCards",
-            "type": "array",
             "field_name": "GeneCards",
-            "items": {
-                "title": "GeneCards",
-                "field_name": "GeneCards",
-                "type": "string",
-                "do_import": true,
-                "source_name": "ENSEMBLIDxref",
-                "source_version": "v2.1.1",
-                "schema_title": "GeneCards",
-                "description": "a database of human genes that provides genomic, proteomic, transcriptomic, genetic and functional information on all known and predicted human genes.",
-                "comments": "link",
-                "link": "https://www.genecards.org/cgi-bin/carddisp.pl?gene=<ID>"
-            }
+            "type": "string",
+            "do_import": true,
+            "source_name": "ENSEMBLIDxref",
+            "source_version": "v2.1.1",
+            "schema_title": "GeneCards",
+            "description": "a database of human genes that provides genomic, proteomic, transcriptomic, genetic and functional information on all known and predicted human genes.",
+            "comments": "link",
+            "link": "https://www.genecards.org/cgi-bin/carddisp.pl?gene=<ID>"
         },
         "PharmGKB": {
             "title": "PharmGKB",
@@ -867,7 +969,6 @@
                         "title": "ENSEMBL transcript ID",
                         "field_name": "enstid",
                         "type": "string",
-                        "do_import": true,
                         "source_name": "GenCode",
                         "source_version": "v33",
                         "schema_title": "ENSEMBL transcript ID"
@@ -876,7 +977,6 @@
                         "title": "ENSEMBL protein ID",
                         "field_name": "enspid",
                         "type": "string",
-                        "do_import": true,
                         "source_name": "GenCode",
                         "source_version": "v33",
                         "schema_title": "ENSEMBL protein ID"
@@ -885,7 +985,6 @@
                         "title": "RefSeq ID",
                         "field_name": "refseq",
                         "type": "string",
-                        "do_import": true,
                         "source_name": "GenCode",
                         "source_version": "v33",
                         "schema_title": "RefSeq ID"
@@ -894,7 +993,6 @@
                         "title": "RefSeq Protein ID",
                         "field_name": "refseq_protein",
                         "type": "string",
-                        "do_import": true,
                         "source_name": "GenCode",
                         "source_version": "v33",
                         "schema_title": "RefSeq Protein ID"
@@ -903,7 +1001,6 @@
                         "title": "position",
                         "field_name": "pos",
                         "type": "string",
-                        "do_import": true,
                         "source_name": "GenCode",
                         "source_version": "v33",
                         "schema_title": "position"
@@ -912,7 +1009,6 @@
                         "title": "Exon region position",
                         "field_name": "exon",
                         "type": "string",
-                        "do_import": true,
                         "source_name": "GenCode",
                         "source_version": "v33",
                         "schema_title": "Exon region position"
@@ -921,7 +1017,6 @@
                         "title": "CDS region postion",
                         "field_name": "CDS",
                         "type": "string",
-                        "do_import": true,
                         "source_name": "GenCode",
                         "source_version": "v33",
                         "schema_title": "CDS region postion"
@@ -930,7 +1025,6 @@
                         "title": "Start codon position",
                         "field_name": "start_codon",
                         "type": "string",
-                        "do_import": true,
                         "source_name": "GenCode",
                         "source_version": "v33",
                         "schema_title": "Start codon position"
@@ -939,7 +1033,6 @@
                         "title": "Stop codon position",
                         "field_name": "stop_codon",
                         "type": "string",
-                        "do_import": true,
                         "source_name": "GenCode",
                         "source_version": "v33",
                         "schema_title": "Stop codon position"
@@ -948,7 +1041,6 @@
                         "title": "5' UTR position",
                         "field_name": "five_prime_UTR",
                         "type": "string",
-                        "do_import": true,
                         "source_name": "GenCode",
                         "source_version": "v33",
                         "schema_title": "5' UTR position"
@@ -957,7 +1049,6 @@
                         "title": "3' UTR position",
                         "field_name": "three_prime_UTR",
                         "type": "string",
-                        "do_import": true,
                         "source_name": "GenCode",
                         "source_version": "v33",
                         "schema_title": "3' UTR position"
@@ -966,7 +1057,6 @@
                         "title": "Transcript sequence length",
                         "field_name": "transcript_length",
                         "type": "string",
-                        "do_import": true,
                         "source_name": "GenCode",
                         "source_version": "v33",
                         "schema_title": "Transcript sequence length"
@@ -975,7 +1065,6 @@
                         "title": "Transcript sequence",
                         "field_name": "transcript_sequence",
                         "type": "string",
-                        "do_import": true,
                         "source_name": "GenCode",
                         "source_version": "v33",
                         "schema_title": "Transcript sequence"
@@ -984,7 +1073,6 @@
                         "title": "Protein sequence length",
                         "field_name": "protein_length",
                         "type": "string",
-                        "do_import": true,
                         "source_name": "GenCode",
                         "source_version": "v33",
                         "schema_title": "Protein sequence length"
@@ -993,7 +1081,6 @@
                         "title": "Protein sequence",
                         "field_name": "protein_sequence",
                         "type": "string",
-                        "do_import": true,
                         "source_name": "GenCode",
                         "source_version": "v33",
                         "schema_title": "Protein sequence"

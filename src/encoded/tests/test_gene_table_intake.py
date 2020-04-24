@@ -8,10 +8,10 @@ MT_LOC = './src/encoded/tests/data/variant_workbook/gene_table.csv'
 GENE_SCHEMA_TEST_LOC = './src/encoded/tests/data/variant_workbook/gene.json'
 GENE_ANNOTATION_FIELD_SCHEMA = './src/encoded/schemas/gene_annotation_field.json'
 EXPECTED_FIELDS = ['column_priority', 'comments', 'description', 'do_import',
-                   'enum_list', 'facet_grouping', 'facet_priority', 'field_name',
+                   'enum_list', 'pattern', 'facet_grouping', 'facet_priority', 'field_name',
                    'field_priority', 'field_type', 'is_list', 'link', 'no', 'schema_title',
                    'separator', 'source_name', 'source_version', 'sub_embedding_group', 'value_example']
-NUMBER_ANNOTATION_FIELDS = 280
+NUMBER_ANNOTATION_FIELDS = 284
 EXPECTED_INSERT = {'no': 1, 'field_name': 'chrom', 'source_name': 'ENSEMBLgene',
                    'source_version': 'v99', 'schema_title': 'Chromosome',
                    'description': "name of the chromosome or scaffold; chromosome names without a 'chr'",
@@ -43,8 +43,8 @@ def gene_schema(GTParser, inserts):
 
 def test_read_gene_table_header(GTParser):
     """ Tests that we can read mapping table header correctly based on the current format """
-    assert GTParser.version == 'gene_annV0.4.1'
-    assert GTParser.date == '2020.04.20'
+    assert GTParser.version == 'gene_annV0.4.2'
+    assert GTParser.date == '2020.04.24'
     assert sorted(GTParser.fields) == sorted(EXPECTED_FIELDS)
 
 
@@ -83,7 +83,7 @@ def test_generate_gene_schema(gene_schema):
     assert len(clingendis_props.keys()) == CLINGENDIS_FIELDS_EXPECTED
     assert 'disease_id' in clingendis_props
     assert 'classification_date' in clingendis_props
-    clingendis_disease_label = properties['clingendis']['items']['properties']['disease_label']['items']
+    clingendis_disease_label = properties['clingendis']['items']['properties']['disease_label']
     assert clingendis_disease_label['type'] == 'string'
 
     transcript_props = properties['transcript']['items']['properties']
@@ -91,6 +91,9 @@ def test_generate_gene_schema(gene_schema):
     assert 'refseq' in transcript_props
     assert 'protein_length' in transcript_props
     assert transcript_props['five_prime_UTR']['source_name'] == 'GenCode'
+
+    # check regex
+    assert properties['ensgid']['pattern'] == '^ENSG[0-9]{11}$'
 
     # XXX: Columns/Facets are empty
     assert gene_schema['columns'] == {}
@@ -104,5 +107,4 @@ def test_gene_table_run(GTParser, testapp):
     inserts = GTParser.run(gs_out=GENE_SCHEMA_TEST_LOC, write=False)
     for item in inserts:
         testapp.post_json(CONNECTION_URL, item, status=201)
-
 

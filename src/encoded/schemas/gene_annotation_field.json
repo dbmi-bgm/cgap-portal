@@ -100,6 +100,11 @@
             "description": "link to external site",
             "type": "string"
        },
+      "pattern":  {
+            "title": "Pattern",
+            "description": "Regex used to validate field entries",
+            "type": "string"
+      },
        "links_to": {
            "title": "Link To",
            "description": "Item Type that should be linked to from this field",
