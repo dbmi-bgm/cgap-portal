@@ -1,11 +1,12 @@
 import json
 import pytest
-import time
+import mock
 
 from datetime import (datetime, timedelta)
 from snovault import TYPES, COLLECTIONS
 from snovault.elasticsearch import create_mapping
 from snovault.elasticsearch.create_mapping import MAX_NGRAM
+from encoded.search import verify_search_has_permissions
 from snovault.elasticsearch.indexer_utils import get_namespaced_index
 from snovault.util import add_default_embeds
 from ..commands.run_upgrader_on_inserts import get_inserts
@@ -557,8 +558,44 @@ def test_index_data_workbook(app, workbook, testapp, indexer_testapp, htmltestap
                 pass
 
 
+class MockedRequest(object):
+    """ Test object intended to be used to mock certain aspects of requests. Takes kwargs which
+        will be passed as named fields to MockedRequest. More arguments could be added if other
+        use is seen.
+    """
+    def __init__(self, **kwargs):
+        if 'principals_allowed.view' not in kwargs:
+            self.effective_principals = ['system.Everyone']
+        else:
+            self.effective_principals = kwargs['principals_allowed']  # note this is not exactly what the field is
+
+
+@pytest.fixture
+def hacked_query():
+    """ This is valid lucene that will have 'principals_allowed.view' that differs from what is on the request.
+        Our helper method should detect such change and throw an error. """
+    return {'query': {'bool': {'filter': [{'bool': {'must': [{'terms':
+                     {'principals_allowed.view': ['system.Everyone', 'group.PERMISSION_YOU_DONT_HAVE']}}]}}]}}}
+
+
+def test_search_with_hacked_query(anontestapp, hacked_query):
+    """ Attempts to execute """
+    with mock.patch('encoded.search.convert_search_to_dictionary', return_value=hacked_query):
+        mocked_request_with_least_permissive_permissions = MockedRequest()
+        with pytest.raises(Exception):
+            verify_search_has_permissions(mocked_request_with_least_permissive_permissions, None)
+        mocked_request_with_same_permissions = MockedRequest(principals_allowed=['system.Everyone',
+                                                                                 'group.PERMISSION_YOU_DONT_HAVE'])
+        verify_search_has_permissions(mocked_request_with_same_permissions, None)
+
+
 def test_search_with_principals_allowed_fails(workbook, anontestapp):
-    """ Tests query with a query string parameter for principals_allowed.view, which should not be possible. """
+    """ Tests query with a query string parameter for principals_allowed.view, which will be AND'd with what's
+        on the request.
+
+        XXX IMPORTANT: Since we do permissions in a restrictive way, this works - if our permissions structure is
+        modified, it is possible this behavior will need to be revisited -Will 4-24-2020
+    """
     from webtest import AppError
     with pytest.raises(AppError):
         anontestapp.get('/search/?type=Item&principals_allowed.view=group.PERMISSION_YOU_DONT_HAVE')

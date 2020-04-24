@@ -1753,37 +1753,52 @@ def set_additional_aggregations(search_as_dict, request, doc_types, extra_aggreg
     return search_as_dict
 
 
+def convert_search_to_dictionary(search):
+    """ Converts the given search to a dictionary. Useful in mocking queries from dictionaries in testing.
+
+    :param search: elasticsearch_dsl object to convert
+    :return: query in dictionary form
+    """
+    return search.to_dict()
+
+
 def verify_search_has_permissions(request, search):
     """
     Inspects the search object to ensure permissions are still present on the query
     This method depends on the query structure defined in 'set_filters'.
 
+    :param request: the current request
     :param search: search object to inspect
     :raises: HTTPBadRequest if permissions not present
     """
-    search_dict = search.to_dict()
+    search_dict = convert_search_to_dictionary(search)
+    found = False  # set to True if we found valid 'principals_allowed.view'
     try:
         for boolean_clause in search_dict['query']['bool']['filter']:  # should always be present
-            if 'bool' in boolean_clause and 'must' in boolean_clause['bool']:  # could be must_not,
+            if 'bool' in boolean_clause and 'must' in boolean_clause['bool']:  # principals_allowed.view is on 'must'
                 possible_permission_block = boolean_clause['bool']['must']
                 for entry in possible_permission_block:
                     if 'terms' in entry:
                         if 'principals_allowed.view' in entry['terms']:
-                            effective_principals_on_query = sorted(entry['terms']['principals_allowed.view'])
-                            if effective_principals_on_query != sorted(request.effective_principals):
-                                log.error('SEARCH: Detected URL query param manipulation, principals_allowed.view was'
-                                          'modified from %s to %s' % (request.effective_principals,
-                                                                      effective_principals_on_query))
+                            effective_principals_on_query = entry['terms']['principals_allowed.view']
+                            if effective_principals_on_query != request.effective_principals:
                                 raise QueryConstructionException(
                                     query_type='principals',
                                     func='verify_search_has_permissions',
                                     msg='principals_allowed was modified - see application logs')
                             else:
+                                found = True
                                 break
     except QueryConstructionException:
+        log.error('SEARCH: Detected URL query param manipulation, principals_allowed.view was'
+                  'modified from %s to %s' % (request.effective_principals,
+                                              effective_principals_on_query))
         raise HTTPBadRequest('The search failed - the DCIC team has been notified.')
     except KeyError:
         log.error('SEARCH: Malformed query detected while checking for principals_allowed')
+        raise HTTPBadRequest('The search failed - the DCIC team has been notified.')
+    if not found:
+        log.error('SEARCH: Did not locate principals_allowed.view on search query body: %s' % search_dict)
         raise HTTPBadRequest('The search failed - the DCIC team has been notified.')
 
 
