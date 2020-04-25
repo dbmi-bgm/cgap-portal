@@ -5,19 +5,24 @@ import { DragAndDropUploadStandaloneController } from '@hms-dbmi-bgm/shared-port
 
 export class FileWrapper extends React.Component {
     static propTypes = {
-        individual: PropTypes.object
+        individual: PropTypes.object,
+        haveEditPermission: PropTypes.bool
+        // TODO: need to eventually pass down current user's associated lab/awards 
+        // for submission of Document objects
     }
 
     render() {
-        const { individual } = this.props;
-        const { related_documents = [], images = [] } = individual;
-        console.log(related_documents, images);
+        const { individual, haveEditPermission } = this.props;
+        const { related_documents = [], images = [], "@id": individualId } = individual;
+
         return (
             <React.Fragment>
                 { related_documents.length === 0 ? null :
-                    <FileArrayField fieldName="Related Documents" files={ related_documents }/> }
+                    <FileArrayField fieldName="Related Documents" files={related_documents}
+                        {...{ haveEditPermission, individualId }} /> }
                 { images.length === 0 ? null :
-                    <FileArrayField fieldName="Images" files={ images } /> }
+                    <FileArrayField fieldName="Images" files={images} 
+                        {...{ haveEditPermission, individualId }} /> }
             </ React.Fragment>
         );
     }
@@ -25,11 +30,14 @@ export class FileWrapper extends React.Component {
 
 class FileArrayField extends React.Component {
     static propTypes = {
-        fieldName: PropTypes.string
+        fieldName: PropTypes.string.isRequired,
+        files: PropTypes.array.isRequired,
+        individualId: PropTypes.string.isRequired,
+        haveEditPermission: PropTypes.bool
     }
 
     render () {
-        const { fieldName, files } = this.props;
+        const { fieldName, files, haveEditPermission = false } = this.props;
         return (
             <div className="detail-row" data-describing={fieldName}>
                 <label className="d-block">{fieldName}</label>
@@ -38,46 +46,10 @@ class FileArrayField extends React.Component {
                         files.map((file) => <li key={file['@id']}><a href={file['@id']}>{file.display_title}</a></li>)
                     }
                 </ul>
-                <DragAndDropUploadStandaloneController />
+                { haveEditPermission ?
+                    <DragAndDropUploadStandaloneController 
+                        fieldName={fieldName} cls="btn btn-sm btn-outline-dark" /> : null }
             </div>
         );
     }
 }
-
-// export class Files extends React.Component {
-
-
-
-//     render() {
-
-        
-//         return (
-//             // <DragAndDropUploadStandaloneController />
-
-//             <div className="detail-row" data-describing="files">
-//                 <label className="d-block">Files</label>
-//                 {/* { haveEditPermission ?
-//                     <textarea value={notes} onChange={this.onChange} className={notesChanged ? "has-changed" : null}/>
-//                     :
-//                     <p className="read-only-notes">{ notes }</p>
-//                 }
-//                 { haveEditPermission && notesChanged ?
-//                     <div className="save-btn-container">
-//                         <button type="button" disabled={isSaving} className="btn btn-sm btn-success mt-02 mr-05" onClick={this.onSave}
-//                             data-tip="It may take a couple of minutes for changes to take effect">
-//                             { isSaving ?
-//                                 <React.Fragment>
-//                                     <i className="icon icon-circle-notch fas icon-spin mr-08"/>
-//                                     Saving
-//                                 </React.Fragment>
-//                                 : "Save" }
-//                         </button>
-//                         <button type="button" disabled={isSaving} className="btn btn-sm btn-outline-dark mt-02" onClick={this.onReset}>
-//                             Reset
-//                         </button>
-//                     </div>
-//                     : null } */}
-//             </div>
-//         );
-//     }
-// }
