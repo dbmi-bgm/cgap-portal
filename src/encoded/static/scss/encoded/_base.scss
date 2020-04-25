@@ -6,6 +6,7 @@ $mainThemeColor: 			#ffffff; /* i.e. the background color ..for now */
 $appVersionHeight:          0px;
 $footer-height:             50px + $appVersionHeight;
 $appBackgroundColor:        #fff; /* Not sure where $mainThemeColor is used... definitely not #application background-color, so creating new one */
+$appSecondaryBackgroundColor: #f5f5f5;
 
 $tableHeadFootBackgroundColor: #000000;
 
@@ -31,7 +32,9 @@ $line-height-base: 1.475; // Default: 1.5. Customized for source sans pro fit
 $dropdown-link-hover-bg: #ddd;
 
 
-// Override Bootstrap default variables:
+/*****************************/
+/**** Bootstrap Variables ****/
+/*****************************/
 
 $border-radius-base:                        3px;
 $border-radius-large:                       4px;
@@ -101,7 +104,15 @@ $brand-secondary: $secondary;
 $btn-line-height: 1.45rem;
 
 
+/* Cards */
+$card-cap-bg: #fff;
+$card-bg: #fff;
+$card-inner-border-radius: 3px;
+$card-border-color: rgba(0,0,0,0.08); // Lighter
+
+/****************************/
 /** FontAwesome Icon Stuff **/
+/****************************/
 $fa-font-path: "/static/font/fontawesome5.9" !default;
 $fa-font-size-base: $font-size-base;
 $fa-css-prefix: icon;

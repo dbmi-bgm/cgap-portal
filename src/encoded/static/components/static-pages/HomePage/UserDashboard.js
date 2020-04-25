@@ -14,37 +14,40 @@ import { Schemas } from './../../util';
 
 export const UserDashboard = React.memo(function UserDashboard(props){
     return (
-        <div className="container-wide home-content-area mb-1" id="content">
-            <div className="mt-4 homepage-dashboard">
-                <h2 className="homepage-section-title">Actions</h2>
-                <p>
-                    {"We might create a set of mini-dashboards like \"Recent Cohorts\" below and then display & order them based on user role,\
-                    permissions, & similar."}
-                </p>
-                <div className="row">
-                    <div className="col-xs-12 col-md-6 col-lg-4">
-                        <a className="btn btn-primary btn-block btn-lg mb-2" href="/search/?type=Cohort&currentAction=add">New Cohort</a>
-                    </div>
-                    <div className="col-xs-12 col-md-6 col-lg-4">
-                        <a className="btn btn-primary btn-block btn-lg mb-2 disabled" href="#" >Pipeline Admin</a>
-                    </div>
-                    <div className="col-xs-12 col-md-6 col-lg-4">
-                        <a className="btn btn-primary btn-block btn-lg mb-2 disabled" href="#">Quality Controls</a>
-                    </div>
-                    <div className="col-xs-12 col-md-6 col-lg-4">
-                        <a className="btn btn-primary btn-block btn-lg mb-2 disabled" href="#">Curation</a>
-                    </div>
-                    <div className="col-xs-12 col-md-6 col-lg-4">
-                        <a className="btn btn-primary btn-block btn-lg mb-2 disabled" href="#">Crowdsourcing</a>
-                    </div>
-                    <div className="col-xs-12 col-md-6 col-lg-4">
-                        <a className="btn btn-primary btn-block btn-lg mb-2" href="/search/?type=Item">Clinical Reports</a>
-                    </div>
+        <div className="home-dashboard-area" id="content">
+            <div className="container-wide home-content-area mb-1" id="content">
+                <div className="mt-4 homepage-dashboard">
+                    <h2 className="homepage-section-title">Actions</h2>
+                    <p>
+                        {"We might create a set of mini-dashboards like \"Recent Cohorts\" below and then display & order them based on user role,\
+                        permissions, & similar."}
+                    </p>
+                    <div className="row">
+                        <div className="col-xs-12 col-md-6 col-lg-4">
+                            <a className="btn btn-primary btn-block btn-lg mb-2" href="/search/?type=Cohort&currentAction=add">New Cohort</a>
+                        </div>
+                        <div className="col-xs-12 col-md-6 col-lg-4">
+                            <a className="btn btn-primary btn-block btn-lg mb-2 disabled" href="#" >Pipeline Admin</a>
+                        </div>
+                        <div className="col-xs-12 col-md-6 col-lg-4">
+                            <a className="btn btn-primary btn-block btn-lg mb-2 disabled" href="#">Quality Controls</a>
+                        </div>
+                        <div className="col-xs-12 col-md-6 col-lg-4">
+                            <a className="btn btn-primary btn-block btn-lg mb-2 disabled" href="#">Curation</a>
+                        </div>
+                        <div className="col-xs-12 col-md-6 col-lg-4">
+                            <a className="btn btn-primary btn-block btn-lg mb-2 disabled" href="#">Crowdsourcing</a>
+                        </div>
+                        <div className="col-xs-12 col-md-6 col-lg-4">
+                            <a className="btn btn-primary btn-block btn-lg mb-2" href="/search/?type=Item">Clinical Reports</a>
+                        </div>
 
+                    </div>
                 </div>
-            </div>
 
-            <RecentCohortsSection />
+                <RecentCohortsSection />
+
+            </div>
 
         </div>
     );

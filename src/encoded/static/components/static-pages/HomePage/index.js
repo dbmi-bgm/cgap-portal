@@ -27,9 +27,7 @@ export default class HomePage extends React.PureComponent {
      */
     render() {
         const { session, context } = this.props;
-        const commonProps = {
-            session, context
-        };
+        const commonProps = { context };
         return (
             <div className="homepage-wrapper">
                 { session ? <UserDashboard {...commonProps} /> : <GuestHomeView {...commonProps} /> }

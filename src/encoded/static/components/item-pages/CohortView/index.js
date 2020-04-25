@@ -248,7 +248,7 @@ const CohortSummaryTabView = React.memo(function CohortSummaryTabView(props){
         pedigreeFamiliesIdx = 0,
         context: {
             cohort_phenotypic_features: cohortFeatures = { cohort_phenotypic_features: [] },
-            description: cohortDescription = "",
+            description = null,
             actions: permissibleActions = [],
             sample_processes = []
         } = {},
@@ -262,32 +262,33 @@ const CohortSummaryTabView = React.memo(function CohortSummaryTabView(props){
     const familiesLen = families.length;
     const editAction = _.findWhere(permissibleActions, { name: "edit" });
 
-    function getNumberOfIndividuals(fams) {
-        let count = 0;
-        fams.forEach(function(fam){ count += fam.members.length; });
-        return count;
-    }
-
-    function getCountIndividualsWSamples(fams) {
-        let count = 0;
-        fams.forEach(function(fam){
-            fam.members.forEach(function(member){
-                if (member.samples && member.samples.length > 0) {
-                    count++;
+    const {
+        countIndividuals: numIndividuals,
+        countIndividualsWSamples: numWithSamples
+    } = useMemo(function(){
+        let countIndividuals = 0;
+        let countIndividualsWSamples = 0;
+        families.forEach(function({ members = [] }){
+            members.forEach(function({ samples }){
+                if (Array.isArray(samples) && samples.length > 0) {
+                    countIndividualsWSamples++;
                 }
+                countIndividuals++;
             });
-        }); // todo: this is done in CohortSummaryTable --  maybe move it up and pass it down
-        return count;
-    }
+        });
+        return { countIndividuals, countIndividualsWSamples };
+    }, [ families ]);
 
-    function onViewPedigreeBtnClick(evt){
-        evt.preventDefault();
-        evt.stopPropagation();
-        if (familiesLen === 0) return false;
-        // By default, click on link elements would trigger ajax request to get new context.
-        // (unless are external links)
-        navigate("#pedigree", { skipRequest: true });
-    }
+    const onViewPedigreeBtnClick = useMemo(function(){
+        return function(evt){
+            evt.preventDefault();
+            evt.stopPropagation();
+            if (familiesLen === 0) return false;
+            // By default, click on link elements would trigger ajax request to get new context.
+            // (unless are external links)
+            navigate("#pedigree", { skipRequest: true });
+        }
+    }, [ /* empty == executed only once ever */ ]);
 
     let cohortSummaryTables;
     if (familiesLen > 0) {
@@ -318,38 +319,29 @@ const CohortSummaryTabView = React.memo(function CohortSummaryTabView(props){
 
             // go through each member in the family and populate a list with all of their samplesIDs...
             // will match these up with those in sampleanalysis.samples to determine which to render on per family basis
-            const familySpecificSampleIDs = {};
-            members.forEach((member) => {
-                const { samples = [] } = member;
+            const familySpecificSampleIDs = members.reduce(function(m, { samples = [] }){
+                samples.forEach(function({ "@id" : id }){
+                    m[id] = true;
+                });
+                return m;
+            }, {});
 
-                if (samples && samples.length > 0) {
-                    samples.forEach((sample) => {
-                        const { "@id" : id } = sample;
-                        if (!familySpecificSampleIDs[id]) {
-                            familySpecificSampleIDs[id] = true;
-                        }
-                    });
-                }
-            });
-
-            const familySpecificSAs = [];
-            // filter out sampleProcessing objects that have 2 or more matching samples, and pass ONLY THOSE through to cohortSummaryTable
-            sample_processes.forEach((sp) => {
+            // sampleProcessing objects that have 2 or more matching samples to pass ONLY THOSE through to cohortSummaryTable
+            const familySpecificSAs = sample_processes.filter(function(sp){
                 const { samples = [] } = sp;
                 let numMatchingSamples = 0;
-
                 for (let i = 0; i < samples.length; i++) {
-                    const thisSample = samples[i];
+                    const { "@id": currSampleID } = samples[i];
 
-                    if (familySpecificSampleIDs[thisSample["@id"]]) {
+                    if (familySpecificSampleIDs[currSampleID]) {
                         numMatchingSamples++;
                     }
 
                     if (numMatchingSamples >= 2) {
-                        familySpecificSAs.push(sp);
-                        break;
+                        return true;
                     }
                 }
+                return false;
             });
 
             return (
@@ -404,46 +396,48 @@ const CohortSummaryTabView = React.memo(function CohortSummaryTabView(props){
     }
 
     return (
-        <div className="container-wide">
-            <h3 className="tab-section-title">
-                <span>Cohort Summary</span>
-            </h3>
+        <React.Fragment>
+            <div className="container-wide">
+                <h3 className="tab-section-title">
+                    <span>Cohort Summary</span>
+                </h3>
+            </div>
             <hr className="tab-section-title-horiz-divider"/>
-            <div className="row mt-2">
-                <div className="col-md-12">
-                    <div className="card-group cohort-summary-card-row">
-                        <div className="col-stats">
-                            <CohortStats
-                                description={cohortDescription}
-                                numWithSamples={getCountIndividualsWSamples(families)}
-                                cohortFeatures={cohortFeatures} numFamilies={familiesLen}
-                                numIndividuals={getNumberOfIndividuals(families)} />
-                        </div>
-                        <div id="cohort-overview-ped-link" className="col-pedigree-viz">
-                            {/*
-                            <a href="#pedigree" className="card-img-top d-none d-lg-block" rel="noreferrer noopener">
-                                <div className="text-center h-100">
-                                    <i className="icon icon-sitemap icon-4x fas" />
-                                </div>
-                            </a>
-                            */}
-                            { pedBlock }
-                            <button type="button" className="btn btn-primary btn-lg btn-block mt-1"
-                                onClick={onViewPedigreeBtnClick} disabled={familiesLen === 0}>
-                                View Pedigree(s)
-                            </button>
+            <div className="container-wide bg-light py-4">
+                <div className="row">
+                    <div className="col-md-12">
+                        <div className="card-group cohort-summary-card-row">
+                            <div className="col-stats">
+                                <CohortStats {...{ description, numIndividuals, numWithSamples, cohortFeatures }} numFamilies={familiesLen} />
+                            </div>
+                            <div id="cohort-overview-ped-link" className="col-pedigree-viz">
+                                {/*
+                                <a href="#pedigree" className="card-img-top d-none d-lg-block" rel="noreferrer noopener">
+                                    <div className="text-center h-100">
+                                        <i className="icon icon-sitemap icon-4x fas" />
+                                    </div>
+                                </a>
+                                */}
+                                { pedBlock }
+                                <button type="button" className="btn btn-primary btn-lg btn-block mt-1"
+                                    onClick={onViewPedigreeBtnClick} disabled={familiesLen === 0}>
+                                    View Pedigree(s)
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-            <div className="processing-summary-tables-container mt-15">
-                { cohortSummaryTables }
+            <hr className="tab-section-title-horiz-divider"/>
+            <div className="container-wide">
+                <div className="processing-summary-tables-container mt-15">
+                    { cohortSummaryTables }
+                </div>
             </div>
-        </div>
+        </React.Fragment>
     );
 });
 CohortSummaryTabView.getTabObject = function(props){
-    const { pedigreeFamilies: families = [] } = props;
     return {
         'tab' : (
             <React.Fragment>
