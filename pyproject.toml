@@ -3,7 +3,7 @@
 # after having done 'python setup_eb.py develop', at least on the beanstalk. It doesn't
 # sem to be needed locally. -kmp 17-Mar-2020
 name = "encoded"
-version = "1.4.1"
+version = "1.5.1"
 description = "Clinical Genomics Analysis Platform"
 authors = ["4DN-DCIC Team <support@4dnucleome.org>"]
 license = "MIT"
@@ -46,7 +46,7 @@ chardet = "3.0.4"
 colorama = "0.3.3"
 coverage = "4.0.3"
 dcicsnovault = "2.2.0"
-dcicutils = ">=0.14.0,<1"
+dcicutils = ">=0.15.0,<1"
 docutils = "0.12"
 elasticsearch = "5.5.3"
 elasticsearch-dsl = "5.4.0"

@@ -39,8 +39,13 @@ build-after-poetry:  # continuation of build after poetry install
 	make npm-setup
 	python setup_eb.py develop
 
-build-dev:  # same as build but gives moto setup as well
+build-dev:  # same as build but gives moto & locust setup as well
 	make build
+	make moto-setup
+	pip install locust
+
+macbuild-dev:  # same as macbuild but gives moto & locust setup as well
+	make macbuild
 	make moto-setup
 	pip install locust
 
@@ -73,6 +78,7 @@ info:
 	   $(info - Use 'make deploy1' to spin up postgres/elasticsearch and load inserts)
 	   $(info - Use 'make deploy2' to spin up the application server)
 	   $(info - Use 'make macpoetry-install' to install fourfront on OSX catalina)
+	   $(info - Use 'make macbuild-dev' to build all dependencies on OSX catalina)
 	   $(info - Use 'make moto-setup' to install moto, for less flaky tests)
 	   $(info - Use 'make npm-setup' to build the front-end)
 	   $(info - Use 'make test' to run tests with the normal options we use on travis)
