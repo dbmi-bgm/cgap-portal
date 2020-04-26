@@ -38,6 +38,9 @@ class FileArrayField extends React.Component {
 
     render () {
         const { fieldName, files, haveEditPermission = false } = this.props;
+
+        const fieldType = files[0]["@type"][0];
+
         return (
             <div className="detail-row" data-describing={fieldName}>
                 <label className="d-block">{fieldName}</label>
@@ -47,8 +50,8 @@ class FileArrayField extends React.Component {
                     }
                 </ul>
                 { haveEditPermission ?
-                    <DragAndDropUploadStandaloneController 
-                        fieldName={fieldName} cls="btn btn-sm btn-outline-dark" /> : null }
+                    <DragAndDropUploadStandaloneController
+                        {...{ fieldName, fieldType }} cls="btn btn-sm btn-outline-dark" /> : null }
             </div>
         );
     }
