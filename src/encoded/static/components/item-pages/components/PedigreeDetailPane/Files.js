@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { DragAndDropUploadStandaloneController } from '@hms-dbmi-bgm/shared-portal-components/es/components/forms/components/DragAndDropUpload';
+import { DragAndDropUploadFileUploadController } from '@hms-dbmi-bgm/shared-portal-components/es/components/forms/components/DragAndDropUpload';
 
 
 export class FileWrapper extends React.Component {
@@ -13,16 +13,16 @@ export class FileWrapper extends React.Component {
 
     render() {
         const { individual, haveEditPermission } = this.props;
-        const { related_documents = [], images = [], "@id": individualId } = individual;
+        const { related_documents = [], images = [], "@id": individualId, institution, project } = individual;
 
         return (
             <React.Fragment>
                 { related_documents.length === 0 ? null :
                     <FileArrayField fieldName="Related Documents" files={related_documents}
-                        {...{ haveEditPermission, individualId }} /> }
+                        {...{ haveEditPermission, individualId, institution, project }} /> }
                 { images.length === 0 ? null :
                     <FileArrayField fieldName="Images" files={images} 
-                        {...{ haveEditPermission, individualId }} /> }
+                        {...{ haveEditPermission, individualId, institution, project }} /> }
             </ React.Fragment>
         );
     }
@@ -33,11 +33,13 @@ class FileArrayField extends React.Component {
         fieldName: PropTypes.string.isRequired,
         files: PropTypes.array.isRequired,
         individualId: PropTypes.string.isRequired,
+        institution: PropTypes.object.isRequired,
+        project: PropTypes.object.isRequired,
         haveEditPermission: PropTypes.bool
     }
 
     render () {
-        const { fieldName, files, haveEditPermission = false } = this.props;
+        const { fieldName, files, individualId, haveEditPermission = false, institution, project } = this.props;
 
         const fieldType = files[0]["@type"][0];
 
@@ -50,8 +52,8 @@ class FileArrayField extends React.Component {
                     }
                 </ul>
                 { haveEditPermission ?
-                    <DragAndDropUploadStandaloneController
-                        {...{ fieldName, fieldType }} cls="btn btn-sm btn-outline-dark" /> : null }
+                    <DragAndDropUploadFileUploadController award={null} lab={null}
+                        {...{ fieldName, fieldType, individualId, project, institution }} cls="btn btn-sm btn-outline-dark" /> : null }
             </div>
         );
     }
