@@ -37,33 +37,30 @@ export class FileWrapper extends React.Component {
         });
 
         // Calculate JSX for these fields
-
-        
         console.log("relevantFields", relevantFields);
+        const elements = [];
 
-        relevantFields.forEach((property) => console.log(properties[property]));
+        const { individual, haveEditPermission } = this.props;
+        const { "@id": individualId, institution, project } = individual;
 
-        // const properties = _.keys(schemas[properties]);
-        // console.log("properties", properties);
-        // schemas[properties].forEach()
-        return null;
+        relevantFields.forEach((property) => {
+            const files = individual[property];
+
+            // Check if the current individual has any items in the specified field
+            if (files && files.length !== 0) {
+                elements.push(
+                    <FileArrayField fieldName={properties[property]["title"]} {...{ files, haveEditPermission,
+                        individualId, institution, project }} />
+                );
+            }
+        });
+        return elements;
     }
 
     render() {
-        const { individual, haveEditPermission, schemas } = this.props;
-        const { related_documents = [], images = [], "@id": individualId, institution, project } = individual;
-
         return (
             <React.Fragment>
-
-
                 { this.renderFieldsWithDocumentsOrImages() }
-                { related_documents.length === 0 ? null :
-                    <FileArrayField fieldName="Related Documents" files={related_documents}
-                        {...{ haveEditPermission, individualId, institution, project }} /> }
-                { images.length === 0 ? null :
-                    <FileArrayField fieldName="Images" files={images} 
-                        {...{ haveEditPermission, individualId, institution, project }} /> }
             </ React.Fragment>
         );
     }
