@@ -204,33 +204,6 @@
             "title": "Chromosome (hg19)",
             "field_name": "chrom_hg19",
             "type": "string",
-            "enum": [
-                "1",
-                "2",
-                "3",
-                "4",
-                "5",
-                "6",
-                "7",
-                "8",
-                "9",
-                "10",
-                "11",
-                "12",
-                "13",
-                "14",
-                "15",
-                "16",
-                "17",
-                "18",
-                "19",
-                "20",
-                "21",
-                "22",
-                "X",
-                "Y",
-                "M"
-            ],
             "do_import": true,
             "source_name": "ENSEMBLgeneGRCh37",
             "source_version": "v75(GRCh37.p13)",
@@ -454,10 +427,10 @@
         },
         "clingendis": {
             "title": "clingendis",
-            "type": "object",
+            "type": "array",
             "items": {
                 "title": "Clingendis",
-                "type": "array",
+                "type": "object",
                 "properties": {
                     "disease_label": {
                         "title": "Disease Label",
@@ -508,7 +481,8 @@
                             "Moderate",
                             "Limited",
                             "No Reported Evidence",
-                            "Disputed"
+                            "Disputed",
+                            "Refuted"
                         ],
                         "do_import": true,
                         "source_name": "ClinGenDisease",

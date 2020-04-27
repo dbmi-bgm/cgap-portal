@@ -221,7 +221,7 @@ class MappingTableParser(object):
                             'type': 'array',
                             'items': {
                                 'title': sub_title,
-                                'type': 'array',
+                                'type': 'object',
                                 'properties': prop
                                 }
                         })

@@ -39,6 +39,7 @@ class GeneTableParser(MappingTableParser):
         schema['title'] = 'Genes'
         schema['description'] = "Schema for Genes"
         schema['id'] = '/profiles/gene.json'
+        gene_props['ensgid']['uniqueKey'] = True  # XXX: This is required for genes
         schema['properties'] = gene_props
         schema['properties']['schema_version'] = {'default': '1'}
         schema['facets'] = facets
