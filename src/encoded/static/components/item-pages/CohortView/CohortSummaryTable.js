@@ -5,6 +5,7 @@ import PropTypes from 'prop-types';
 import memoize from 'memoize-one';
 import _ from 'underscore';
 import { Schemas } from './../../util';
+import { LocalizedTime } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/LocalizedTime';
 
 
 /** @param {Object} props - Contents of a family sub-embedded object. */
@@ -469,7 +470,12 @@ export const CohortSummaryTable = React.memo(function CohortSummaryTable(props){
                                 { specimen_type }
                                 { specimen_notes ? <span className="text-primary" data-tip={ specimen_notes }>*</span>: "" }
                             </span>
-                            { specimen_collection_date ? <span data-tip="specimen collection date"><i className="mr-03 icon icon-fw icon-syringe fas text-primary"/>{ specimen_collection_date }</span>: null}
+                            { specimen_collection_date ?
+                                <span data-tip="Specimen Collection Date">
+                                    <i className="mr-03 icon icon-fw icon-syringe fas text-secondary"/>
+                                    <LocalizedTime timestamp={specimen_collection_date} />
+                                </span>
+                                : null }
                             <a href={samplePath} className="accession d-block">{ sampleTitle }</a>
                         </React.Fragment>
                     ),
