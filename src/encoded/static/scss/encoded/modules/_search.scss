@@ -13,6 +13,13 @@ $search-results-header-row-height: 52px; // 46px is existing default for both re
 
 // Extensions to shared-portal-components searchview table(s):
 .search-result-row .result-table-row .search-result-column-block {
+	&[data-field="display_title"] {
+		> .inner {
+			> .title-block {
+				white-space: normal; // Allow to wrap by default (overrides SPC's default white-space: nowrap;) since we have tall-ish rows.
+			}
+		}
+	}
 	&[data-field="status"] {
 		> .inner {
 			i.item-status-indicator-dot {
@@ -178,7 +185,7 @@ $search-page-padding-resize-transition-out: padding .25s linear;
 
 /** CGAP-Related SearchView Theming **/
 
-body[data-pathname="/search/"] {
+body[data-pathname="/search/"]:not([data-current-action="add"]) {
 	#slot-application,
 	#application,
 	#layout {

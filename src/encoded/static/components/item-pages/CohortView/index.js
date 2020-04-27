@@ -404,27 +404,23 @@ const CohortSummaryTabView = React.memo(function CohortSummaryTabView(props){
             </div>
             <hr className="tab-section-title-horiz-divider"/>
             <div className="container-wide bg-light py-4">
-                <div className="row">
-                    <div className="col-md-12">
-                        <div className="card-group cohort-summary-card-row">
-                            <div className="col-stats">
-                                <CohortStats {...{ description, numIndividuals, numWithSamples, cohortFeatures }} numFamilies={familiesLen} />
+                <div className="card-group cohort-summary-card-row">
+                    <div className="col-stats">
+                        <CohortStats {...{ description, numIndividuals, numWithSamples, cohortFeatures }} numFamilies={familiesLen} />
+                    </div>
+                    <div id="cohort-overview-ped-link" className="col-pedigree-viz">
+                        {/*
+                        <a href="#pedigree" className="card-img-top d-none d-lg-block" rel="noreferrer noopener">
+                            <div className="text-center h-100">
+                                <i className="icon icon-sitemap icon-4x fas" />
                             </div>
-                            <div id="cohort-overview-ped-link" className="col-pedigree-viz">
-                                {/*
-                                <a href="#pedigree" className="card-img-top d-none d-lg-block" rel="noreferrer noopener">
-                                    <div className="text-center h-100">
-                                        <i className="icon icon-sitemap icon-4x fas" />
-                                    </div>
-                                </a>
-                                */}
-                                { pedBlock }
-                                <button type="button" className="btn btn-primary btn-lg btn-block mt-1"
-                                    onClick={onViewPedigreeBtnClick} disabled={familiesLen === 0}>
-                                    View Pedigree(s)
-                                </button>
-                            </div>
-                        </div>
+                        </a>
+                        */}
+                        { pedBlock }
+                        <button type="button" className="btn btn-primary btn-lg btn-block mt-1"
+                            onClick={onViewPedigreeBtnClick} disabled={familiesLen === 0}>
+                            View Pedigree(s)
+                        </button>
                     </div>
                 </div>
             </div>
