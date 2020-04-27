@@ -17,7 +17,7 @@ export class PedigreeDetailPane extends React.PureComponent {
     }
 
     render(){
-        const { hoveredNode, unselectNode: onClose, ...passProps } = this.props;
+        const { hoveredNode, unselectNode: onClose, schemas, ...passProps } = this.props;
         const { selectedNode } = passProps;
         const isHovered = hoveredNode === selectedNode;
 
@@ -26,7 +26,7 @@ export class PedigreeDetailPane extends React.PureComponent {
         } else if (isRelationshipNode(selectedNode)){
             return <RelationshipBody {...passProps} {...{ onClose, isHovered }} />;
         } else {
-            return <IndividualBody {...passProps} {...{ onClose, isHovered }} />;
+            return <IndividualBody {...passProps} {...{ onClose, isHovered, schemas }} />;
         }
     }
 }

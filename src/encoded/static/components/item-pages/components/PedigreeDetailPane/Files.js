@@ -1,22 +1,63 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { DragAndDropUploadFileUploadController } from '@hms-dbmi-bgm/shared-portal-components/es/components/forms/components/DragAndDropUpload';
-
+import { _ } from 'underscore';
 
 export class FileWrapper extends React.Component {
     static propTypes = {
         individual: PropTypes.object,
-        haveEditPermission: PropTypes.bool
-        // TODO: need to eventually pass down current user's associated lab/awards 
-        // for submission of Document objects
+        haveEditPermission: PropTypes.bool,
+        schemas: PropTypes.object
+    }
+
+    renderFieldsWithDocumentsOrImages() {
+        const { schemas } = this.props;
+        const { properties = {} } = schemas;
+
+        // Isolate the field/property names of linkTos with type Document or Image
+        const allProperties = _.keys(properties);
+        const relevantFields = [];
+
+        allProperties.forEach((property) => {
+            const propertyFields = properties[property];
+            const { type = null, linkTo = null, items = {} } = propertyFields;
+
+            // If not an array, check linkTo directly from property data root
+            if (type !== "array" &&
+                (linkTo === "Document" || linkTo === "Image")
+            ) {
+                relevantFields.push(property);
+            }
+            // If an array, check the items field for linkTo data
+            else if ( type === "array" &&
+                (items["linkTo"] === "Document" || items["linkTo"] === "Image")
+            ) {
+                relevantFields.push(property);
+            }
+        });
+
+        // Calculate JSX for these fields
+
+        
+        console.log("relevantFields", relevantFields);
+
+        relevantFields.forEach((property) => console.log(properties[property]));
+
+        // const properties = _.keys(schemas[properties]);
+        // console.log("properties", properties);
+        // schemas[properties].forEach()
+        return null;
     }
 
     render() {
-        const { individual, haveEditPermission } = this.props;
+        const { individual, haveEditPermission, schemas } = this.props;
         const { related_documents = [], images = [], "@id": individualId, institution, project } = individual;
 
         return (
             <React.Fragment>
+
+
+                { this.renderFieldsWithDocumentsOrImages() }
                 { related_documents.length === 0 ? null :
                     <FileArrayField fieldName="Related Documents" files={related_documents}
                         {...{ haveEditPermission, individualId, institution, project }} /> }
@@ -35,7 +76,8 @@ class FileArrayField extends React.Component {
         individualId: PropTypes.string.isRequired,
         institution: PropTypes.object.isRequired,
         project: PropTypes.object.isRequired,
-        haveEditPermission: PropTypes.bool
+        haveEditPermission: PropTypes.bool,
+        schemas: PropTypes.object.isRequired
     }
 
     render () {
