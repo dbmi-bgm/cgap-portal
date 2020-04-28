@@ -46,7 +46,7 @@ chardet = "3.0.4"
 colorama = "0.3.3"
 coverage = "4.0.3"
 dcicsnovault = "2.2.0"
-dcicutils = ">=0.14.0,<1"
+dcicutils = "^0.18.0"
 docutils = "0.12"
 elasticsearch = "5.5.3"
 elasticsearch-dsl = "5.4.0"
@@ -180,9 +180,11 @@ update-inserts-from-server = "encoded.commands.update_inserts_from_server:main"
 verify-item = "encoded.commands.verify_item:main"
 
 # cgap commands
-mapping-table-intake = "encoded.commands.mapping_table_intake:main"
+variant-table-intake = "encoded.commands.variant_table_intake:main"
 ingest-vcf = "encoded.commands.ingest_vcf:main"
 variant-ingestion = "encoded.commands.variant_ingestion:main"
+gene-table-intake = "encoded.commands.gene_table_intake:main"
+ingest-genes = "encoded.commands.ingest_genes:main"
 
 [paste.app_factory]
 main = "encoded:main"

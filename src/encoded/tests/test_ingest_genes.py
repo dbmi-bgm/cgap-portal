@@ -21,3 +21,8 @@ def test_post_gene_inserts(testapp, project, institution, test_genes):
         gene['project'] = 'encode-project'
         gene['institution'] = 'encode-institution'
         testapp.post_json(CONNECTION_URL, gene, status=201)
+
+
+def test_post_gene_inserts_via_upload(testapp, project, institution, test_genes):
+    """ Attempts to post using the upload method """
+    test_genes.upload(testapp, project='encode-project', institution='encode-institution')
