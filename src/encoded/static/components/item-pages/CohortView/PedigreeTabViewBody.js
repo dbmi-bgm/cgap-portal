@@ -160,12 +160,16 @@ export class PedigreeTabViewBody extends React.PureComponent {
         // Pass schemas down for use in File Upload Drag and Drop
         const schemas = Schemas.get();
         let indvSchema;
+        let docSchema;
+        let imageSchema;
         if (schemas) {
             indvSchema = schemas.Individual;
+            docSchema = schemas.Document;
+            imageSchema = schemas.Image;
         }
 
         // console.log("schemas[individual]", schemas["Individual"]);
-        return <PedigreeDetailPane {...pedigreeVizProps} {...{ session, href, context }} schemas={indvSchema} />;
+        return <PedigreeDetailPane {...pedigreeVizProps} {...{ session, href, context, indvSchema, docSchema, imageSchema }} />;
     }
 
     render(){

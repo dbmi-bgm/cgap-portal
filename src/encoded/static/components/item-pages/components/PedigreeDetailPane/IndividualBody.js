@@ -87,7 +87,9 @@ export class IndividualBody extends React.PureComponent {
             diseaseToIndex,
             session,
             href,
-            schemas
+            indvSchema,
+            docSchema,
+            imageSchema
         } = this.props;
         const {
             isLoadingIndividual,
@@ -152,7 +154,7 @@ export class IndividualBody extends React.PureComponent {
                     { ancestry ? <InlineDetailRow label="Ancestry" value={ancestry} /> : null }
                     <PhenotypicFeatures features={phenotypic_features} diseaseToIndex={diseaseToIndex} />
                     <ClinicianNotes individual={loadedIndividualItem || individualItem} haveEditPermission={haveEditPermission} />
-                    <FileWrapper individual={loadedIndividualItem || individualItem } {...{ haveEditPermission, schemas }} />
+                    <FileWrapper individual={loadedIndividualItem || individualItem } {...{ haveEditPermission, indvSchema, docSchema, imageSchema }} />
                     {/*
                     <div className="detail-row row" data-describing="parents">
                         <div className="col-12">

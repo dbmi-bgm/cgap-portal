@@ -7,12 +7,15 @@ export class FileWrapper extends React.Component {
     static propTypes = {
         individual: PropTypes.object,
         haveEditPermission: PropTypes.bool,
-        schemas: PropTypes.object
+        indvSchema: PropTypes.object,
+        docSchema: PropTypes.object,
+        imageSchema: PropTypes.object
     }
 
     renderFieldsWithDocumentsOrImages() {
-        const { schemas } = this.props;
-        const { properties = {} } = schemas;
+        // TODO: maybe memoize this?
+        const { indvSchema } = this.props;
+        const { properties = {} } = indvSchema;
 
         // Isolate the field/property names of linkTos with type Document or Image
         const allProperties = _.keys(properties);
@@ -37,7 +40,6 @@ export class FileWrapper extends React.Component {
         });
 
         // Calculate JSX for these fields
-        console.log("relevantFields", relevantFields);
         const elements = [];
 
         const { individual, haveEditPermission } = this.props;
@@ -74,7 +76,7 @@ class FileArrayField extends React.Component {
         institution: PropTypes.object.isRequired,
         project: PropTypes.object.isRequired,
         haveEditPermission: PropTypes.bool,
-        schemas: PropTypes.object.isRequired
+        indvSchema: PropTypes.object.isRequired
     }
 
     render () {
