@@ -43,8 +43,8 @@ def gene_schema(GTParser, inserts):
 
 def test_read_gene_table_header(GTParser):
     """ Tests that we can read mapping table header correctly based on the current format """
-    assert GTParser.version == 'gene_annV0.4.2'
-    assert GTParser.date == '2020.04.24'
+    assert GTParser.version == 'gene_annV0.4.4'
+    assert GTParser.date == '2020.04.27'
     assert sorted(GTParser.fields) == sorted(EXPECTED_FIELDS)
 
 
@@ -91,7 +91,7 @@ def test_generate_gene_schema(gene_schema):
     assert len(transcript_props.keys()) == TRANSCRIPT_FIELDS_EXPECTED
     assert 'refseq' in transcript_props
     assert 'protein_length' in transcript_props
-    assert transcript_props['five_prime_UTR']['source_name'] == 'GenCode'
+    assert transcript_props['five_prime_utr']['source_name'] == 'GenCode'
 
     # check regex
     assert properties['ensgid']['pattern'] == '^ENSG[0-9]{11}$'
