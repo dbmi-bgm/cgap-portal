@@ -1,5 +1,5 @@
 """
-based on environment variables make a config file for build out
+Based on environment variables make a config file (production.ini) for our encoded application.
 """
 
 import datetime
@@ -7,6 +7,7 @@ import glob
 import io
 import json
 import os
+import pkg_resources
 import re
 import subprocess
 import sys
@@ -14,7 +15,7 @@ import toml
 import argparse
 
 from dcicutils.env_utils import (
-    is_stg_or_prd_env, prod_bucket_env, get_standard_mirror_env,
+    is_stg_or_prd_env, prod_bucket_env, get_standard_mirror_env, data_set_for_env, get_bucket_env, INDEXER_ENVS,
 )
 from dcicutils.misc_utils import PRINT
 
@@ -28,7 +29,7 @@ PYPROJECT_FILE_NAME = os.path.join(PYPROJECT_DIR, "pyproject.toml")
 
 def build_ini_file_from_template(template_file_name, init_file_name,
                                      bs_env=None, bs_mirror_env=None, s3_bucket_env=None,
-                                     data_set=None, es_server=None, es_namespace=None):
+                                     data_set=None, es_server=None, es_namespace=None, indexer=False):
     """
     Builds a .ini file from a given template file.
 
@@ -41,6 +42,7 @@ def build_ini_file_from_template(template_file_name, init_file_name,
         data_set (str): An identifier for data to load (either 'prod' for prd/stg envs, or 'test' for others)
         es_server (str): The server name (or server:port) for the ElasticSearch server.
         es_namespace (str): The ElasticSearch namespace to use (probably but not necessarily same as bs_env).
+        indexer (bool): Whether or not we are building an ini file for an indexer.
     """
     with io.open(init_file_name, 'w') as init_file_fp:
         build_ini_stream_from_template(template_file_name=template_file_name,
@@ -50,7 +52,8 @@ def build_ini_file_from_template(template_file_name, init_file_name,
                                        s3_bucket_env=s3_bucket_env,
                                        data_set=data_set,
                                        es_server=es_server,
-                                       es_namespace=es_namespace)
+                                       es_namespace=es_namespace,
+                                       indexer=indexer)
 
 
 # Ref: https://stackoverflow.com/questions/19911123/how-can-you-get-the-elastic-beanstalk-application-version-in-your-application
@@ -90,7 +93,7 @@ EMPTY_ASSIGNMENT = re.compile(r'^[ \t]*[A-Za-z][A-Za-z0-9.-_]*[ \t]*=[ \t\r\n]*$
 
 def build_ini_stream_from_template(template_file_name, init_file_stream,
                                    bs_env=None, bs_mirror_env=None, s3_bucket_env=None, data_set=None,
-                                   es_server=None, es_namespace=None):
+                                   es_server=None, es_namespace=None, indexer=False):
     """
     Sends output to init_file_stream corresponding to the data noe would want in an ini file
     for the given template_file_name and available environment variables.
@@ -99,10 +102,12 @@ def build_ini_stream_from_template(template_file_name, init_file_stream,
         template_file_name: The template file to guide the output.
         init_file_stream: A stream to send output to.
         bs_env: A beanstalk environment.
+        bs_mirror_env: A beanstalk environment.
         s3_bucket_env: Environment name that is part of the s3 bucket name. (Usually defaults properly.)
         data_set: 'test' or 'prod'. Default is 'test' unless bs_env is a staging or production environment.
         es_server: The name of an es server to use.
         es_namespace: The namespace to use on the es server. If None, this uses the bs_env.
+        indexer: Whether or not we are building an ini file for an indexer.
 
     Returns: None
 
@@ -111,22 +116,35 @@ def build_ini_stream_from_template(template_file_name, init_file_stream,
     es_server = es_server or os.environ.get('ENCODED_ES_SERVER', "MISSING_ENCODED_ES_SERVER")
     bs_env = bs_env or os.environ.get("ENCODED_BS_ENV", "MISSING_ENCODED_BS_ENV")
     bs_mirror_env = bs_mirror_env or os.environ.get("ENCODED_BS_MIRROR_ENV", get_standard_mirror_env(bs_env)) or ""
-    s3_bucket_env = s3_bucket_env or os.environ.get("ENCODED_S3_BUCKET_ENV",
-                                                    prod_bucket_env(bs_env) if is_stg_or_prd_env(bs_env) else bs_env)
+    s3_bucket_env = s3_bucket_env or os.environ.get("ENCODED_S3_BUCKET_ENV", get_bucket_env(bs_env))
     data_set = data_set or os.environ.get("ENCODED_DATA_SET",
-                                          "prod" if is_stg_or_prd_env(bs_env) else "test")
+                                          data_set_for_env(bs_env) or "MISSING_ENCODED_DATA_SET")
     es_namespace = es_namespace or os.environ.get("ENCODED_ES_NAMESPACE", bs_env)
+    # Set ENCODED_INDEXER to 'true' to deploy an indexer.
+    # If the value is missing, the empty string, or any other thing besides 'true' (in any case),
+    # this value will default to the empty string, causing the line not to appear in the output file
+    # because there is a special case that suppresses output of empty values. -kmp 27-Apr-2020
+    indexer = "true" if indexer or os.environ.get('ENCODED_INDEXER', "false").upper() == "TRUE" else ""
 
     extra_vars = {
         'APP_VERSION': get_app_version(),
         'PROJECT_VERSION': toml.load(PYPROJECT_FILE_NAME)['tool']['poetry']['version'],
+        'SNOVAULT_VERSION': pkg_resources.get_distribution("dcicsnovault").version,
+        'UTILS_VERSION': pkg_resources.get_distribution("dcicutils").version,
         'ES_SERVER': es_server,
         'BS_ENV': bs_env,
         'BS_MIRROR_ENV': bs_mirror_env,
         'S3_BUCKET_ENV': s3_bucket_env,
         'DATA_SET': data_set,
         'ES_NAMESPACE': es_namespace,
+        'INDEXER': indexer,
     }
+
+    # if we specify an indexer name for bs_env, we did the deployment wrong and should bail
+    if bs_env in INDEXER_ENVS:
+        raise RuntimeError("Deployed with bs_env %s, which is an indexer env."
+                           "Re-deploy with the env you want to index and set the 'ENCODED.INDEXER'"
+                           "environment variable." % bs_env)
 
     # We assume these variables are not set, but best to check first. Confusion might result otherwise.
     for extra_var in extra_vars:
@@ -226,16 +244,21 @@ def main():
         parser.add_argument("--es_namespace",
                             help="an ElasticSearch namespace",
                             default=None)
+        parser.add_argument("--indexer",
+                            help="whether or not to deploy an indexer",
+                            action='store_true',
+                            default=False)
         args = parser.parse_args()
-        # template_file_name = environment_template_filename(args.env)
-        template_file_name = any_environment_template_filename()
+        template_file_name = environment_template_filename(args.env)
+        # template_file_name = any_environment_template_filename()
         ini_file_name = args.target
         # print("template_file_name=", template_file_name)
         # print("ini_file_name=", ini_file_name)
         build_ini_file_from_template(template_file_name, ini_file_name,
                                      bs_env=args.bs_env, bs_mirror_env=args.bs_mirror_env,
                                      s3_bucket_env=args.s3_bucket_env, data_set=args.data_set,
-                                     es_server=args.es_server, es_namespace=args.es_namespace)
+                                     es_server=args.es_server, es_namespace=args.es_namespace,
+                                     indexer=args.indexer)
     except Exception as e:
         PRINT("Error (%s): %s" % (e.__class__.__name__, e))
         sys.exit(1)

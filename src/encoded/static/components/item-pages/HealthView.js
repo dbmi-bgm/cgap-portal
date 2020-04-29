@@ -82,13 +82,13 @@ export default class HealthView extends React.PureComponent {
                         title : "Beanstalk App Version",
                         description : "Unique descriptive identifier for this app's ElasticBeanstalk source bundle."
                     },
-                    'blob_bucket' : {
-                        title : "Blob Bucket",
-                        description : "Name of S3 bucket used for blob data."
-                    },
                     'beanstalk_env' : {
                         title : "Beanstalk Environment",
                         description : "Which Elastic Beanstalk environment this instance running on."
+                    },
+                    'blob_bucket' : {
+                        title : "Blob Bucket",
+                        description : "Name of S3 bucket used for blob data."
                     },
                     'content' : {
                         title : "Extra Information"
@@ -118,7 +118,7 @@ export default class HealthView extends React.PureComponent {
                         description : "The ElasticSearch namespace to use. This is often the same as the Beanstalk Environment, but don't rely on that."
                     },
                     'ontology_updated' : {
-                        title : 'Last Ontology Update',
+                        title : 'Ontology Last Updated',
                         description : "Last time ontologies were updated."
                     },
                     'processed_file_bucket' : {
@@ -132,7 +132,7 @@ export default class HealthView extends React.PureComponent {
                     'system_bucket' : {
                         title : 'System Bucket',
                         description : "Name of S3 Bucket used for system data."
-                    }
+                    },
                 }} />
 
                 <button type="button" className="btn btn-outline-dark refresh-counts-button pull-right mt-2"

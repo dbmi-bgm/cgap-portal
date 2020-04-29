@@ -24,6 +24,12 @@ from ..generate_production_ini import (
 )
 
 
+# TODO: Maybe this should move to env_utils? If not, at least to a non-test file.
+#       Then again, if we used the "single parameterized ini file" we could side-step that. -kmp 3-Apr-2020
+
+CGAP_DEPLOY_NAMES = ['cgap', 'cgapdev', 'cgaptest', 'cgapwolf']
+
+
 @contextmanager
 def override_environ(**overrides):
     to_delete = []
@@ -42,6 +48,7 @@ def override_environ(**overrides):
             del os.environ[k]
         for k, v in to_restore.items():
             os.environ[k] = v
+
 
 def test_environment_template_filename():
 
@@ -66,7 +73,7 @@ def test_template_environment_names():
 
     names = template_environment_names()
 
-    required_names = ['cgap', 'cgapdev', 'cgaptest', 'cgapwolf']
+    required_names = CGAP_DEPLOY_NAMES
 
     for required_name in required_names:
         assert required_name in names
