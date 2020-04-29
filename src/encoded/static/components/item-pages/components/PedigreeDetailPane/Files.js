@@ -1,7 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { DragAndDropUploadFileUploadController } from '@hms-dbmi-bgm/shared-portal-components/es/components/forms/components/DragAndDropUpload';
+import memoize from 'memoize-one';
 import { _ } from 'underscore';
+import { DragAndDropUploadFileUploadController } from '@hms-dbmi-bgm/shared-portal-components/es/components/forms/components/DragAndDropUpload';
 
 export class FileWrapper extends React.Component {
     static propTypes = {
@@ -12,7 +13,16 @@ export class FileWrapper extends React.Component {
         imageSchema: PropTypes.object
     }
 
-    renderFieldsWithDocumentsOrImages() {
+    constructor() {
+        super();
+
+        this.findFieldsWithDocumentsOrImages = this.findFieldsWithDocumentsOrImages.bind(this);
+        this.memoized = {
+            fileFields : memoize(this.findFieldsWithDocumentsOrImages)
+        };
+    }
+
+    findFieldsWithDocumentsOrImages() {
         // TODO: maybe memoize this?
         const { indvSchema } = this.props;
         const { properties = {} } = indvSchema;
@@ -29,40 +39,41 @@ export class FileWrapper extends React.Component {
             if (type !== "array" &&
                 (linkTo === "Document" || linkTo === "Image")
             ) {
-                relevantFields.push(property);
+                relevantFields.push({ [property] : linkTo });
             }
             // If an array, check the items field for linkTo data
             else if ( type === "array" &&
                 (items["linkTo"] === "Document" || items["linkTo"] === "Image")
             ) {
-                relevantFields.push(property);
+                relevantFields.push({ [property]: items["linkTo"] });
             }
         });
-
-        // Calculate JSX for these fields
-        const elements = [];
-
-        const { individual, haveEditPermission } = this.props;
-        const { "@id": individualId, institution, project } = individual;
-
-        relevantFields.forEach((property) => {
-            const files = individual[property];
-
-            // Check if the current individual has any items in the specified field
-            if (files && files.length !== 0) {
-                elements.push(
-                    <FileArrayField fieldName={properties[property]["title"]} {...{ files, haveEditPermission,
-                        individualId, institution, project }} />
-                );
-            }
-        });
-        return elements;
+        console.log("relevantFields", relevantFields);
+        return relevantFields;
     }
 
     render() {
+        const { individual, haveEditPermission, docSchema, imageSchema, indvSchema } = this.props; 
+        const { properties = {} } = indvSchema;
+        const { "@id": individualId, institution, project } = individual;
+
+        const fieldsToRender = this.memoized.fileFields();
+
         return (
             <React.Fragment>
-                { this.renderFieldsWithDocumentsOrImages() }
+                { fieldsToRender.map((obj) => {
+                    const property = _.keys(obj)[0];
+                    const files = individual[property];
+
+                    // Pass the correct schema for this particular type of file (Image OR Document)
+                    let fileSchema;
+                    const fieldType = obj[property];
+                    if (fieldType === "Document") { fileSchema = docSchema; }
+                    else { fileSchema = imageSchema; }
+
+                    return <FileArrayField key={property} fieldName={properties[property]["title"]} {...{ files, haveEditPermission,
+                        individualId, institution, project, fileSchema, fieldType }} />;
+                }) }
             </ React.Fragment>
         );
     }
@@ -71,18 +82,21 @@ export class FileWrapper extends React.Component {
 class FileArrayField extends React.Component {
     static propTypes = {
         fieldName: PropTypes.string.isRequired,
-        files: PropTypes.array.isRequired,
+        fieldType: PropTypes.string.isRequired,
         individualId: PropTypes.string.isRequired,
         institution: PropTypes.object.isRequired,
         project: PropTypes.object.isRequired,
+        files: PropTypes.array,
         haveEditPermission: PropTypes.bool,
-        indvSchema: PropTypes.object.isRequired
+        fileSchema: PropTypes.object.isRequired
     }
 
-    render () {
-        const { fieldName, files, individualId, haveEditPermission = false, institution, project } = this.props;
+    static defaultProps = {
+        files: []
+    }
 
-        const fieldType = files[0]["@type"][0];
+    render() {
+        const { fieldName, fieldType, files, individualId, haveEditPermission = false, institution, project, fileSchema } = this.props;
 
         return (
             <div className="detail-row" data-describing={fieldName}>
@@ -94,7 +108,7 @@ class FileArrayField extends React.Component {
                 </ul>
                 { haveEditPermission ?
                     <DragAndDropUploadFileUploadController award={null} lab={null}
-                        {...{ fieldName, fieldType, individualId, project, institution }} cls="btn btn-sm btn-outline-dark" /> : null }
+                        {...{ fieldName, fieldType, individualId, project, institution, fileSchema }} cls="btn btn-sm btn-outline-dark" /> : null }
             </div>
         );
     }
