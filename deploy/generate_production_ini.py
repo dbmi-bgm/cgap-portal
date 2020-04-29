@@ -218,6 +218,13 @@ def main():
             description="Generates a product.ini file from a template appropriate for the given environment,"
                         " which defaults from the value of the ENV_NAME environment variable "
                         " and may be given with or without a 'fourfront-' prefix. ")
+        parser.add_argument("--use_any",
+                            help="whether or not to prefer the new any.ini template over a named template",
+                            action='store_true',
+                            # In order for us to change the default to True, we'd need to re-issue beanstalks
+                            # with the new environment variables. The any.ini template relies on different
+                            # variables. -kmp 29-Apr-2020
+                            default=False)
         parser.add_argument("--env",
                             help="environment name",
                             default=os.environ['ENV_NAME'],
@@ -249,8 +256,9 @@ def main():
                             action='store_true',
                             default=False)
         args = parser.parse_args()
-        template_file_name = environment_template_filename(args.env)
-        # template_file_name = any_environment_template_filename()
+        template_file_name = (any_environment_template_filename()
+                              if args.use_any
+                              else environment_template_filename(args.env))
         ini_file_name = args.target
         # print("template_file_name=", template_file_name)
         # print("ini_file_name=", ini_file_name)
