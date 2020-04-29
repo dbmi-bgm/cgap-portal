@@ -9,7 +9,7 @@ import _ from 'underscore';
 
 import { ajax, layout, navigate } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { ItemDetailList } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/ItemDetailList';
-
+import { Term } from './../util/Schemas';
 
 /**
  * Fallback content_view for pages which are not specifically 'Items.
@@ -23,6 +23,13 @@ export default class HealthView extends React.PureComponent {
 
     static notFinishedIndexing(db_es_total){
         return db_es_total && (db_es_total.indexOf('< DB has') > -1 || db_es_total.indexOf('loading') > -1) ? true : false;
+    }
+
+    static termTransformFxn(field, term){
+        if (field === "foursight" && term.slice(0,4) === "http") {
+            return <a href={term} target="_blank" rel="noopener noreferrer">{ term }</a>;
+        }
+        return Term.toName(field, term, true);
     }
 
     static propTypes = {
@@ -129,11 +136,19 @@ export default class HealthView extends React.PureComponent {
                         title : "Project Version",
                         description : "Software version for this portal's software."
                     },
+                    'snovault_version': {
+                        title : "Snovault Version",
+                        description : "Software version of dcicsnovault being used."
+                    },
                     'system_bucket' : {
                         title : 'System Bucket',
                         description : "Name of S3 Bucket used for system data."
                     },
-                }} />
+                    'utils_version': {
+                        title : "Utils Version",
+                        description : "Software version of dcicutils being used."
+                    },
+                }} termTransformFxn={HealthView.termTransformFxn} />
 
                 <button type="button" className="btn btn-outline-dark refresh-counts-button pull-right mt-2"
                     onClick={this.getCounts} disabled={db_es_total === 'loading...'}>
