@@ -108,7 +108,7 @@ class FileArrayField extends React.Component {
                 </ul>
                 { haveEditPermission ?
                     <DragAndDropUploadFileUploadController award={null} lab={null}
-                        {...{ fieldName, fieldType, individualId, project, institution, fileSchema }} cls="btn btn-sm btn-outline-dark" /> : null }
+                        {...{ fieldName, fieldType, individualId, project, institution, fileSchema, files }} cls="btn btn-sm btn-outline-dark" /> : null }
             </div>
         );
     }
