@@ -279,37 +279,37 @@ body[data-pathname="/search/"]:not([data-current-action="add"]) {
 			}
 		}
 
-		.search-results-container .react-infinite-container .search-result-row {
+	}
 
-			border-bottom: 1px solid #00000015;
-			box-shadow: 0 1px 5px -2px #0002;
-			margin-bottom: 9px;
+}
 
-			// Re-style result row re: CGAP styling/theming/branding.
-			> .columns.result-table-row > .search-result-column-block > .inner {
-				// Along with margin-bottom & border, aligned to `rowHeight` in SearchView.js.
-				height: $search-results-result-row-height; // = 80px (+9px margin bottom +1px border bottom = 90px rowHeight);
-			}
-	
-			> .columns.result-table-row > .search-result-column-block[data-field="display_title"] {
-				padding-left: 45px !important;
+.search-results-container .react-infinite-container .search-result-row {
 
-				.toggle-detail-button-container {
-					top: 0;
-					bottom: 0;
-					> button {
-						width: 45px !important;
-						border-radius: 0;
-					}
-				}
+	border-bottom: 1px solid #00000015;
+	box-shadow: 0 1px 5px -2px #0002;
+	margin-bottom: 9px;
+
+	// Re-style result row re: CGAP styling/theming/branding.
+	> .columns.result-table-row > .search-result-column-block > .inner {
+		// Along with margin-bottom & border, aligned to `rowHeight` in SearchView.js.
+		height: $search-results-result-row-height; // = 80px (+9px margin bottom +1px border bottom = 90px rowHeight);
+	}
+
+	> .columns.result-table-row > .search-result-column-block[data-field="display_title"] {
+		padding-left: 45px !important;
+
+		.toggle-detail-button-container {
+			top: 0;
+			bottom: 0;
+			> button {
+				width: 45px !important;
+				border-radius: 0;
 			}
-	
-			.result-table-detail-container .result-table-detail {
-				padding-left: 57px;
-			}
-	
 		}
+	}
 
+	.result-table-detail-container .result-table-detail {
+		padding-left: 57px;
 	}
 
 }

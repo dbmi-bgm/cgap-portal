@@ -21,17 +21,11 @@ export const columnExtensionMap = {
     'lab.display_title' : {
         'title' : "Lab",
         'widthMap' : { 'lg' : 200, 'md' : 180, 'sm' : 160 },
-        'render' : function labTitle(result, columnDefinition, props, width, popLink = false){
-            var labItem = result.lab;
-            if (!labItem) return null;
-            var labLink;
-            if (popLink){
-                labLink = <a href={object.atIdFromObject(labItem)} target="_blank" rel="noopener noreferrer">{ labItem.display_title }</a>;
-            }else{
-                labLink = <a href={object.atIdFromObject(labItem)}>{ labItem.display_title }</a>;
-            }
-
-            if (!result.submitted_by || !result.submitted_by.display_title){
+        'render' : function labTitle(result, props){
+            const { lab, submitted_by : { display_title : submitterTitle } = {} } = result;
+            if (!lab) return null;
+            const labLink = <a href={object.atIdFromObject(lab)}>{ lab.display_title }</a>;
+            if (!submitterTitle){
                 return labLink;
             }
             return (
@@ -44,7 +38,7 @@ export const columnExtensionMap = {
     },
     'date_published' : {
         'widthMap' : { 'lg' : 140, 'md' : 120, 'sm' : 120 },
-        'render' : function(result, columnDefinition, props, width){
+        'render' : function(result, props){
             if (!result.date_published) return null;
             return <span className="value">{ formatPublicationDate(result.date_published) }</span>;
         },
@@ -53,7 +47,7 @@ export const columnExtensionMap = {
     'google_analytics.for_date' : {
         'title' : 'Analytics Date',
         'widthMap' : { 'lg' : 140, 'md' : 120, 'sm' : 120 },
-        'render' : function googleAnalyticsDate(result, columnDefinition, props, width){
+        'render' : function googleAnalyticsDate(result, props){
             if (!result.google_analytics || !result.google_analytics.for_date) return null;
             return <LocalizedTime timestamp={result.google_analytics.for_date} formatType="date-sm" localize={false} />;
         }
@@ -61,7 +55,7 @@ export const columnExtensionMap = {
     'age' : {
         "title" : "Age",
         "widthMap" : { 'lg' : 100, 'md' : 90, 'sm' : 80 },
-        "render" : function(result, columnDefinition, props, width){
+        "render" : function(result, props){
             const { age, age_units } = result;
             if (typeof age !== "number" || isNaN(age)) {
                 return null;
@@ -76,7 +70,7 @@ export const columnExtensionMap = {
     'age_at_death' : {
         "title" : "Age at Death",
         "widthMap" : { 'lg' : 100, 'md' : 90, 'sm' : 80 },
-        "render" : function(result, columnDefinition, props, width){
+        "render" : function(result, props){
             const { age_at_death: age, age_at_death_units: age_units } = result;
             if (typeof age !== "number" || isNaN(age)) {
                 return null;
@@ -92,7 +86,7 @@ export const columnExtensionMap = {
         'title' : 'Status',
         'widthMap' : { 'lg' : 120, 'md' : 120, 'sm' : 100 },
         'order' : 501,
-        'render' : function statusIndicator(result, columnDefinition, props, width){
+        'render' : function statusIndicator(result, props){
             const statusFormatted = Schemas.Term.toName('status', result.status);
             return (
                 <React.Fragment>
@@ -104,7 +98,7 @@ export const columnExtensionMap = {
     },
     'workflow.title' : {
         'title' : "Workflow",
-        'render' : function(result, columnDefinition, props, width){
+        'render' : function(result, props){
             if (!result.workflow || !result.workflow.title) return null;
             const { title }  = result.workflow;
             const workflowHref = object.itemUtil.atId(result.workflow);
