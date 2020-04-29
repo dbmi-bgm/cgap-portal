@@ -71,7 +71,7 @@ export class FileWrapper extends React.Component {
                     if (fieldType === "Document") { fileSchema = docSchema; }
                     else { fileSchema = imageSchema; }
 
-                    return <FileArrayField key={property} fieldName={properties[property]["title"]} {...{ files, haveEditPermission,
+                    return <FileArrayField key={property} fieldName={property} fieldDisplayTitle={properties[property]["title"]} {...{ files, haveEditPermission,
                         individualId, institution, project, fileSchema, fieldType }} />;
                 }) }
             </ React.Fragment>
@@ -81,6 +81,7 @@ export class FileWrapper extends React.Component {
 
 class FileArrayField extends React.Component {
     static propTypes = {
+        fieldDisplayTitle: PropTypes.string.isRequired,
         fieldName: PropTypes.string.isRequired,
         fieldType: PropTypes.string.isRequired,
         individualId: PropTypes.string.isRequired,
@@ -96,11 +97,11 @@ class FileArrayField extends React.Component {
     }
 
     render() {
-        const { fieldName, fieldType, files, individualId, haveEditPermission = false, institution, project, fileSchema } = this.props;
+        const { fieldDisplayTitle, fieldName, fieldType, files, individualId, haveEditPermission = false, institution, project, fileSchema } = this.props;
 
         return (
-            <div className="detail-row" data-describing={fieldName}>
-                <label className="d-block">{fieldName}</label>
+            <div className="detail-row" data-describing={fieldDisplayTitle}>
+                <label className="d-block">{fieldDisplayTitle}</label>
                 <ul>
                     {
                         files.map((file) => <li key={file['@id']}><a href={file['@id']}>{file.display_title}</a></li>)
@@ -108,7 +109,7 @@ class FileArrayField extends React.Component {
                 </ul>
                 { haveEditPermission ?
                     <DragAndDropUploadFileUploadController award={null} lab={null}
-                        {...{ fieldName, fieldType, individualId, project, institution, fileSchema, files }} cls="btn btn-sm btn-outline-dark" /> : null }
+                        {...{ fieldDisplayTitle, fieldType, fieldName, individualId, project, institution, fileSchema, files }} cls="btn btn-sm btn-outline-dark" /> : null }
             </div>
         );
     }
