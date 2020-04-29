@@ -148,7 +148,7 @@ def build_ini_stream_from_template(template_file_name, init_file_stream,
     # if we specify an indexer name for bs_env, we did the deployment wrong and should bail
     if bs_env in INDEXER_ENVS:
         raise RuntimeError("Deployed with bs_env %s, which is an indexer env."
-                           "Re-deploy with the env you want to index and set the 'ENCODED.INDEXER'"
+                           "Re-deploy with the env you want to index and set the 'ENCODED_INDEXER'"
                            "environment variable." % bs_env)
 
     # We assume these variables are not set, but best to check first. Confusion might result otherwise.
