@@ -110,6 +110,14 @@ class Gene(Item):
     schema = load_schema('encoded:schemas/gene.json')
     embedded_list = []
 
+    @calculated_property(schema={
+        "title": "Display Title",
+        "description": "A calculated title for every object in 4DN",
+        "type": "string"
+    })
+    def display_title(self, gene_symbol):
+        return gene_symbol
+
 
 @collection(
     name='gene-annotation-fields',
