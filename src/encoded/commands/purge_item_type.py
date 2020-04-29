@@ -2,11 +2,13 @@ import sys
 import argparse
 import logging
 import structlog
+import transaction
 from pyramid.paster import get_app
 
 from dcicutils.env_utils import is_stg_or_prd_env
 from snovault import STORAGE
 from snovault.elasticsearch.indexer_utils import get_uuids_for_types
+from .. import configure_dbsession
 
 
 logger = structlog.getLogger(__name__)
@@ -19,8 +21,8 @@ def purge_item_type_from_storage(app, item_types, prod=False):
     an item type if an error is encountered. Note that this will work no matter what resources are backing
     'PickStorage'.
 
-    IMPORTANT: This does not sever links. If you try to run this on an item type that is linkedTo,
-    it will fail and potentially corrupt data. Use with care!
+    IMPORTANT: If an error occurs the DB transaction is rolled back, but the ES deletions will persist.
+               Re-running 'create_mapping' on this item type will reindex the items.
 
     :param app: app to access settings from, either a testapp (testapp.app.registry) or regular app(.registry)
     :param item_types: list of types to purge from DB
@@ -47,8 +49,10 @@ def purge_item_type_from_storage(app, item_types, prod=False):
             pstorage.purge_uuid(uuid)
         except Exception as e:  # XXX: handle recoverable exceptions?
             logger.error('Encountered exception purging an item type from the DB: %s' % str(e))
+            transaction.abort()
             return False
 
+    transaction.commit()
     return True
 
 
@@ -69,4 +73,5 @@ def main():
     args = parser.parse_args()
 
     app = get_app(args.config_uri, args.app_name)
+    configure_dbsession(app)
     sys.exit(purge_item_type_from_storage(app, [args.item_type], prod=args.prod))
