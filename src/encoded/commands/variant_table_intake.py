@@ -206,8 +206,22 @@ class MappingTableParser(object):
                 if item.get('sub_embedding_group'):
                     sub_temp = OrderedDict()
                     prop = OrderedDict()
-                    sum_ob_name = item['sub_embedding_group']
-                    sub_title = sum_ob_name.replace("_", " ").title()
+
+                    # helper method that will extract the appropriate value from sub_embedding_group
+                    def format_sub_embedding_group_name(seg, type='key'):
+                        if type not in ['key', 'title']:
+                            raise MappingTableIntakeException('Tried to parse sub_embedded_group with'
+                                                              'key other than "key" or "title": %s ' %
+                                                              type)
+                        try:
+                            fmt = json.loads(seg)
+                        except:  # just a string is given, use for both name and title
+                            return seg
+                        else:
+                            return fmt[type]
+
+                    sum_ob_name = format_sub_embedding_group_name(item['sub_embedding_group'], type='key')
+                    sub_title = format_sub_embedding_group_name(item['sub_embedding_group'], type='title')
 
                     # handle sub-embedded object that is an array
                     if item.get('is_list'):

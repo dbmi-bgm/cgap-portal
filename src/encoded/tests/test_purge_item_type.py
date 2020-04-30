@@ -37,10 +37,10 @@ def many_dummy_static_sections(testapp):
     return paths
 
 
-@pytest.mark.parametrize('item_type', ['static_section'])  # maybe should test some other types...
-def test_purge_item_type_from_db(testapp, dummy_static_section, item_type):
+# XXX: Maybe parametrize on a few types?
+def test_purge_item_type_from_db(testapp, dummy_static_section):
     """ Tests purging all items of a certain item type from the DB """
-    assert purge_item_type_from_storage(testapp, [item_type]) is True
+    assert purge_item_type_from_storage(testapp, ['static_section']) is True
     testapp.post_json('/index', {'record': True})
     testapp.get('/search/?type=StaticSection', status=404)
     testapp.get('/static-sections/442c8aa0-dc6c-43d7-814a-854af460b015?datastore=database', status=404)
