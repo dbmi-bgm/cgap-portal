@@ -19,8 +19,8 @@ from snovault.util import (
     debug_log
 )
 from snovault.typeinfo import AbstractTypeInfo
-from elasticsearch_dsl import Search, Nested
-from elasticsearch_dsl.aggs import Terms, ReverseNested
+from elasticsearch_dsl import Search
+from elasticsearch_dsl.aggs import Terms
 from elasticsearch import (
     TransportError,
     RequestError,
