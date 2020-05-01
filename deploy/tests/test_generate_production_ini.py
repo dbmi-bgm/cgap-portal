@@ -1,4 +1,5 @@
 import datetime
+import io
 import os
 import pytest
 import re
@@ -313,7 +314,7 @@ def test_transitional_equivalence():
     # TODO: Once this mechanism is in place, the files cgap.ini, cgapdev.ini, cgaptest.ini, and cgapwolf.ini
     #       can either be removed (and these transitional tests removed) or transitioned to be test data.
 
-    def tester(ref_ini, bs_env, data_set, es_server, es_namespace=None):
+    def tester(ref_ini, bs_env, data_set, es_server, es_namespace=None, line_checker=None):
 
         assert ref_ini[:-4] == bs_env[10:]  # "xxx.ini" needs to match "fourfront-xxx"
 
@@ -349,17 +350,84 @@ def test_transitional_equivalence():
         new_content = new_output.getvalue()
         assert old_content == new_content
 
+        problems = []
+
+        if line_checker:
+
+            for raw_line in io.StringIO(new_content):
+                line = raw_line.rstrip()
+                problem = line_checker.check(line)
+                if problem:
+                    problems.append(problem)
+
+            line_checker.check_finally()
+
+            assert problems == [], "Problems found:\n%s" % "\n".join(problems)
+
     with mock.patch.object(CGAPDeployer, "get_app_version", return_value=MOCKED_PROJECT_VERSION):
         with mock.patch("toml.load", return_value={"tool": {"poetry": {"version": MOCKED_LOCAL_GIT_VERSION}}}):
 
-            tester(ref_ini="cgap.ini", bs_env="fourfront-cgap", data_set="prod",
-                   es_server="search-fourfront-cgap-ewf7r7u2nq3xkgyozdhns4bkni.us-east-1.es.amazonaws.com:80")
+            class Checker:
 
-            tester(ref_ini="cgapdev.ini", bs_env="fourfront-cgapdev", data_set="test",
-                   es_server="search-fourfront-cgapdev-gnv2sgdngkjbcemdadmaoxcsae.us-east-1.es.amazonaws.com:80")
+                def __init__(self, expect_indexer="true"):
+                    self.indexer = None
+                    self.expect_indexer = expect_indexer
 
-            tester(ref_ini="cgaptest.ini", bs_env="fourfront-cgaptest", data_set="test",
-                   es_server="search-fourfront-cgaptest-dxiczz2zv7f3nshshvevcvmpmy.us-east-1.es.amazonaws.com:80")
+                def check_any(self, line):
+                    if line.startswith('indexer ='):
+                        print("saw indexer line:", repr(line))
+                        self.indexer = line.split('=')[1].strip()
 
-            tester(ref_ini="cgapwolf.ini", bs_env="fourfront-cgapwolf", data_set="test",
-                   es_server="search-fourfront-cgapwolf-r5kkbokabymtguuwjzspt2kiqa.us-east-1.es.amazonaws.com:80")
+                def check(self, line):
+                    self.check_any(line)
+
+                def check_finally(self):
+                    assert self.indexer == self.expect_indexer, (
+                            "Expected 'indexer = %s' but value seen was %r." % (self.expect_indexer, self.indexer)
+                    )
+
+            class ProdChecker(Checker):
+
+                def check(self, line):
+                    if 'bucket =' in line:
+                        fragment = 'fourfront-cgap'
+                        if fragment not in line:
+                            return "'%s' missing in '%s'" % (fragment, line)
+                    self.check_any(line)
+
+            with override_environ(ENCODED_INDEXER=None):  # Make sure any global settings are masked.
+
+                tester(ref_ini="cgap.ini", bs_env="fourfront-cgap", data_set="prod",
+                       es_server="search-fourfront-cgap-ewf7r7u2nq3xkgyozdhns4bkni.us-east-1.es.amazonaws.com:80",
+                       line_checker=ProdChecker())
+
+                tester(ref_ini="cgapdev.ini", bs_env="fourfront-cgapdev", data_set="test",
+                       es_server="search-fourfront-cgapdev-gnv2sgdngkjbcemdadmaoxcsae.us-east-1.es.amazonaws.com:80",
+                       line_checker=Checker())
+
+                tester(ref_ini="cgaptest.ini", bs_env="fourfront-cgaptest", data_set="test",
+                       es_server="search-fourfront-cgaptest-dxiczz2zv7f3nshshvevcvmpmy.us-east-1.es.amazonaws.com:80",
+                       line_checker=Checker())
+
+                tester(ref_ini="cgapwolf.ini", bs_env="fourfront-cgapwolf", data_set="test",
+                       es_server="search-fourfront-cgapwolf-r5kkbokabymtguuwjzspt2kiqa.us-east-1.es.amazonaws.com:80",
+                       line_checker=Checker())
+
+                with override_environ(ENCODED_INDEXER=""):
+
+                    tester(ref_ini="cgap.ini", bs_env="fourfront-cgap", data_set="prod",
+                           es_server="search-fourfront-cgap-ewf7r7u2nq3xkgyozdhns4bkni.us-east-1.es.amazonaws.com:80",
+                           line_checker=ProdChecker())
+
+                with override_environ(ENCODED_INDEXER="TRUE"):
+
+                    tester(ref_ini="cgap.ini", bs_env="fourfront-cgap", data_set="prod",
+                           es_server="search-fourfront-cgap-ewf7r7u2nq3xkgyozdhns4bkni.us-east-1.es.amazonaws.com:80",
+                           line_checker=ProdChecker())
+
+                with override_environ(ENCODED_INDEXER="FALSE"):
+
+                    tester(ref_ini="cgap.ini", bs_env="fourfront-cgap", data_set="prod",
+                           es_server="search-fourfront-cgap-ewf7r7u2nq3xkgyozdhns4bkni.us-east-1.es.amazonaws.com:80",
+                           line_checker=ProdChecker(expect_indexer=None))
+
