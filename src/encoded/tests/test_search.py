@@ -810,9 +810,7 @@ class TestNestedSearch(object):
                     '&families.proband=GAPIDISC7R74', status=404)  # proband should disqualify
 
     def test_search_nested_facets_are_correct(self, workbook, testapp):
-        """ Tests that nested facets are properly rendered
-            TODO: this test should be expanded
-        """
+        """ Tests that nested facets are properly rendered """
         facets = testapp.get('/search/?type=Cohort').json['facets']
         self.verify_facet(facets, 'families.proband.display_title', 3)
         facets = testapp.get('/search/?type=Cohort'
