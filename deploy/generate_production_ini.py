@@ -29,7 +29,7 @@ PYPROJECT_FILE_NAME = os.path.join(PYPROJECT_DIR, "pyproject.toml")
 
 def build_ini_file_from_template(template_file_name, init_file_name,
                                      bs_env=None, bs_mirror_env=None, s3_bucket_env=None,
-                                     data_set=None, es_server=None, es_namespace=None, indexer=False):
+                                     data_set=None, es_server=None, es_namespace=None, indexer=None):
     """
     Builds a .ini file from a given template file.
 
@@ -98,7 +98,7 @@ def omittable(line, expanded_line):
 
 def build_ini_stream_from_template(template_file_name, init_file_stream,
                                    bs_env=None, bs_mirror_env=None, s3_bucket_env=None, data_set=None,
-                                   es_server=None, es_namespace=None, indexer=False):
+                                   es_server=None, es_namespace=None, indexer=None):
     """
     Sends output to init_file_stream corresponding to the data noe would want in an ini file
     for the given template_file_name and available environment variables.
@@ -129,7 +129,19 @@ def build_ini_stream_from_template(template_file_name, init_file_stream,
     # If the value is missing, the empty string, or any other thing besides 'true' (in any case),
     # this value will default to the empty string, causing the line not to appear in the output file
     # because there is a special case that suppresses output of empty values. -kmp 27-Apr-2020
-    indexer = "true" if indexer or os.environ.get('ENCODED_INDEXER', "false").upper() == "TRUE" else ""
+    # Set ENCODED_INDEXER to 'false' to suppress deployment of an indexer.
+    # If the value is missing, the empty string, or any other thing besides 'false' (in any case),
+    # it will be assumed true.
+    # In the True, we'll use "true" as the value so the init file will contain "indexer = true".
+    # In the False case, we'll use "" as the value, so the init file will not contain an indexer line.
+    if indexer is None:  # If argument is not None, then it's True or False. Use that.
+        env_var_val = os.environ.get('ENCODED_INDEXER', "true").upper()
+        if env_var_val == "FALSE":
+            indexer = False
+        else:
+            indexer = True
+    # preferred indexer format is "true" if it's on or omitted if off
+    indexer = "true" if indexer else ""
 
     extra_vars = {
         'APP_VERSION': get_app_version(),
@@ -258,8 +270,7 @@ def main():
                             default=None)
         parser.add_argument("--indexer",
                             help="whether or not to deploy an indexer",
-                            action='store_true',
-                            default=False)
+                            default=None)
         args = parser.parse_args()
         template_file_name = (any_environment_template_filename()
                               if args.use_any
