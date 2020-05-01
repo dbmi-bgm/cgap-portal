@@ -617,8 +617,6 @@ def test_search_with_principals_allowed_fails(workbook, anontestapp):
 class TestNestedSearch(object):
     """ This class encapsulates all helper methods and tests needed to test out nested searches """
 
-    FACET_TO_CHECK = 'families.proband.display_title'
-
     @staticmethod
     def assert_length_is_expected(result, expected):
         assert len(result['@graph']) == expected
@@ -651,6 +649,14 @@ class TestNestedSearch(object):
         for res in result:
             compound = compound and (f1(res) or f2(res) or f3(res))
         return compound
+
+    @staticmethod
+    def verify_facet(facets, name, count):
+        """ Checks that a given facet name has the correct number of terms """
+        for facet in facets:
+            if facet['field'] == name:
+                assert len(facet['terms']) == count
+                return
 
     def test_search_on_single_nested_field(self, workbook, testapp):
         """ Should match only once since one has a family with a proband with display_title GAPID8J9B9CR """
@@ -804,10 +810,11 @@ class TestNestedSearch(object):
                     '&families.proband=GAPIDISC7R74', status=404)  # proband should disqualify
 
     def test_search_nested_facets_are_correct(self, workbook, testapp):
-        """ Tests that nested facets are properly rendered """
+        """ Tests that nested facets are properly rendered
+            TODO: this test should be expanded
+        """
+        facets = testapp.get('/search/?type=Cohort').json['facets']
+        self.verify_facet(facets, 'families.proband.display_title', 3)
         facets = testapp.get('/search/?type=Cohort'
                              '&families.proband.display_title=GAPID8J9B9CR').json['facets']
-        for facet in facets:
-            if facet['field'] == self.FACET_TO_CHECK:
-                assert len(facet['terms']) > 1  # there should be multiple if nested agg is working here
-                break
+        self.verify_facet(facets, 'families.proband.display_title', 2)
