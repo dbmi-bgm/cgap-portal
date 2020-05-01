@@ -20,7 +20,7 @@ from snovault.util import (
 )
 from snovault.typeinfo import AbstractTypeInfo
 from elasticsearch_dsl import Search, Nested
-from elasticsearch_dsl.aggs import Terms, ReverseNested
+from elasticsearch_dsl.aggs import Terms
 from elasticsearch import (
     TransportError,
     RequestError,
@@ -1594,15 +1594,6 @@ def fix_nested_aggregations(search, es_mapping):
     aggs_ptr = search.aggs['all_items']
     for agg in aggs_ptr:
         if NESTED in agg:
-            # New:
-            # (search.aggs['all_items'][agg]
-            #        .bucket('primary_agg',
-            #                'nested', path=find_nested_path(aggs_ptr.aggs[agg]['primary_agg'].field, es_mapping))
-            #        .bucket('primary_agg',
-            #                Terms(field=aggs_ptr.aggs[agg]['primary_agg'].field, size=100, missing='No value'))
-            #        .bucket('primary_agg_reverse_nested', REVERSE_NESTED))
-
-            # OLD: (enabled for now)
             (search.aggs['all_items']
                   .bucket(agg, 'nested', path=find_nested_path(aggs_ptr.aggs[agg]['primary_agg'].field, es_mapping))
                   .bucket('primary_agg',
@@ -1864,7 +1855,6 @@ def fix_and_replace_nested_doc_count(result_facet, aggregations, full_agg_name):
     :param aggregations: handle to all aggregations that we can access based on name
     :param full_agg_name: full name of the aggregation
     """
-    # TODO: This needs to be modified to handle new query structure
     result_facet['aggregation_type'] = 'terms'
     buckets = aggregations[full_agg_name]['primary_agg']['buckets']
     for bucket in buckets:
