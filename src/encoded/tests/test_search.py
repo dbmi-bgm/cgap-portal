@@ -804,12 +804,10 @@ class TestNestedSearch(object):
                     '&families.proband=GAPIDISC7R74', status=404)  # proband should disqualify
 
     def test_search_nested_facets_are_correct(self, workbook, testapp):
-        """ Tests that nested facets are properly rendered
-            TODO: this test should be expanded
-        """
+        """ Tests that nested facets are properly rendered """
         facets = testapp.get('/search/?type=Cohort'
                              '&families.proband.display_title=GAPID8J9B9CR').json['facets']
         for facet in facets:
             if facet['field'] == self.FACET_TO_CHECK:
                 assert len(facet['terms']) > 1  # there should be multiple if nested agg is working here
-                break  # TODO: we should check this value precisely
+                break
