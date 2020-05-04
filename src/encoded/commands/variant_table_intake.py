@@ -3,6 +3,8 @@ import six
 import json
 import argparse
 import logging
+from pyramid.paster import get_app
+from dcicutils.misc_utils import VirtualApp
 from collections import OrderedDict, Mapping
 
 logger = logging.getLogger(__name__)
@@ -537,16 +539,14 @@ def main():
 
     # if not a dry run try to post inserts
     if args.post_inserts:  # do imports here as they will fail in certain scenarios
-        from pyramid.paster import get_app
-        from webtest import TestApp
         environ = {
             'HTTP_ACCEPT': 'application/json',
             'REMOTE_USER': 'TEST',
         }
         app = get_app(args.config_uri, args.app_name)
-        testapp = TestApp(app, environ)
+        app_handle = VirtualApp(app, environ)
         for entry in inserts:
-            testapp.post_json('/annotation_field', entry)  # XXX: what if something goes wrong?
+            app_handle.post_json('/annotation_field', entry)  # XXX: what if something goes wrong?
         logger.info('Successfully posted annotations')
 
 

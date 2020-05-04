@@ -5,7 +5,7 @@ import json
 import argparse
 import logging
 from pyramid.paster import get_app
-from webtest import TestApp
+from dcicutils.misc_utils import VirtualApp
 from collections import OrderedDict
 
 logger = logging.getLogger(__name__)
@@ -545,21 +545,21 @@ def main():
             'REMOTE_USER': 'TEST',
         }
         app = get_app(args.config_uri, args.app_name)
-        testapp = TestApp(app, environ)
+        app_handle = VirtualApp(app, environ)
         if args.post_variant_consequences:
-            vcf_parser.post_variant_consequence_items(testapp, project=args.project, institution=args.institution)
+            vcf_parser.post_variant_consequence_items(app_handle, project=args.project, institution=args.institution)
         for record in vcf_parser:
             variant = vcf_parser.create_variant_from_record(record)
             variant['project'] = args.project
             variant['institution'] = args.institution
             vcf_parser.format_variant(variant)
-            res = testapp.post_json('/variant', variant, status=201).json['@graph'][0]  # only one item posted
+            res = app_handle.post_json('/variant', variant, status=201).json['@graph'][0]  # only one item posted
             variant_samples = vcf_parser.create_sample_variant_from_record(record)
             for sample in variant_samples:
                 sample['project'] = args.project
                 sample['institution'] = args.institution
                 sample['variant'] = res['@id']  # make link
-                testapp.post_json('/variant_sample', sample, status=201)
+                app_handle.post_json('/variant_sample', sample, status=201)
 
         logger.info('Succesfully posted VCF entries')
     exit(0)

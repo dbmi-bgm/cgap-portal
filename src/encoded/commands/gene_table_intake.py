@@ -1,6 +1,8 @@
 import argparse
 import logging
-from .variant_table_intake import MappingTableParser
+from pyramid.paster import get_app
+from dcicutils.misc_utils import VirtualApp
+from encoded.commands.variant_table_intake import MappingTableParser
 
 
 logger = logging.getLogger(__name__)
@@ -94,16 +96,14 @@ def main():
 
     # if not a dry run try to post inserts
     if args.post_inserts:
-        from pyramid.paster import get_app
-        from webtest import TestApp
         environ = {
             'HTTP_ACCEPT': 'application/json',
             'REMOTE_USER': 'TEST',
         }
         app = get_app(args.config_uri, args.app_name)
-        testapp = TestApp(app, environ)
+        app_handle = VirtualApp(app, environ)
         for entry in inserts:
-            testapp.post_json('/gene_annotation_field', entry)
+            app_handle.post_json('/gene_annotation_field', entry)
         logger.info('Successfully posted gene annotations')
 
 

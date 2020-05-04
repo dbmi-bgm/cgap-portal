@@ -13,9 +13,25 @@ EPILOG = __doc__
 
 def main():
     """ Main entry point for interacting with ingested items from the annotation server.
-    Invokes the variant, then gene ingestion process subject to appropriate options.
-    The options allow for significant customization of the process.
+        Invokes the variant, then gene ingestion process subject to appropriate options.
+        The options allow for significant customization of the process.
 
+        Code Structure in terms of usage
+                                    ingestion.py (end-to-end)
+                ________________________|___________________________
+               |                                                    |
+               |                                                    |
+          variant_ingestion                                  gene_ingestion.py
+               |                                                        |
+               |                                                        |
+        _______|______________________                         _________|______________
+       |                              |                       |                        |
+       |                              |                       |                        |
+    variant_table_intake.py       ingest_vcf.py      gene_table_intake.py          ingest_genes.py
+
+    The only inheritance occurs in gene_table_intake, who inherits from variant_table_intake.
+    Each Python file has a entry point that allows you to run its 'sub-part' of the 'whole'.
+    The idea is to provide as many 'knobs' as possible.
     """
     logging.basicConfig()
     parser = argparse.ArgumentParser(
