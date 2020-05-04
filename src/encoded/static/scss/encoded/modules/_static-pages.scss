@@ -478,59 +478,76 @@
 
 .homepage-wrapper {
 
-	.cohort-items {
+	.dashboard-header {
+		height: $tabbar-height;
+		position: relative;
+		background-color: #fff;
+		border-bottom: 1px solid #ddd;
+		> .container-wide {
+			height: 100%;
+		}
+	}
 
-		overflow-y: auto;
-		min-height: 240px;
-		max-height: 360px;
-		height: 25vh;
+	.home-dashboard-area {
 
-		.cohort-item-container {
-			padding: 8px 12px;
-			background-color: #f4f4f4;
-			border: 1px solid #eee;
-			margin-bottom: 3px;
-			> .row {
-				align-items: center;
-				> div:first-child { // Title
-					overflow-x: hidden;
-					text-overflow: ellipsis;
+		/* 100% window height - 50px footer - 81px header+border - $tabbar-height dashboard header */
+		min-height: calc(100vh - 50px - 81px - #{$tabbar-height});
+
+		.cohort-items {
+
+			overflow-y: auto;
+			min-height: 240px;
+			max-height: 360px;
+			height: 25vh;
+
+			.cohort-item-container {
+				padding: 8px 12px;
+				background-color: #f4f4f4;
+				border: 1px solid #eee;
+				margin-bottom: 3px;
+				> .row {
+					align-items: center;
+					> div:first-child { // Title
+						overflow-x: hidden;
+						text-overflow: ellipsis;
+						white-space: nowrap;
+					}
+				}
+
+				.time-from-now-container {
 					white-space: nowrap;
+					text-overflow: ellipsis;
+					overflow: hidden;
 				}
-			}
 
-			.time-from-now-container {
-				white-space: nowrap;
-				text-overflow: ellipsis;
-				overflow: hidden;
-			}
+				@include media-breakpoint-up(md){
+					.families-icon-container {
+						padding: 0;
+					}
+					.individuals-icon-container {
+						padding: 0;
+					}
+				}
 
-			@include media-breakpoint-up(md){
-				.families-icon-container {
-					padding: 0;
+				&.no-families {
+					.families-icon-container {
+						color: #c33939;
+					}
 				}
-				.individuals-icon-container {
-					padding: 0;
-				}
-			}
 
-			&.no-families {
-				.families-icon-container {
-					color: #c33939;
+				&.no-individuals {
+					.individuals-icon-container {
+						color: #c33939;
+					}
 				}
-			}
 
-			&.no-individuals {
-				.individuals-icon-container {
-					color: #c33939;
-				}
 			}
 
 		}
 
-	}
+		/*** Other homepage things ***/
 
-	/*** Other homepage things ***/
+	}
 
 	.home-content-area {
 
