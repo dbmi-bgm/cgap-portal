@@ -116,10 +116,10 @@
             "column_priority": 4
         },
         "transcript": {
-            "title": "Transcript",
+            "title": "transcript",
             "type": "array",
             "items": {
-                "title": "Transcript",
+                "title": "transcript",
                 "type": "object",
                 "properties": {
                     "vep_consequence": {

@@ -94,6 +94,7 @@
             "vcf_name": "AD_ref",
             "type": "integer",
             "description": "Reference allelic depth",
+            "calculated_property": true,
             "source_name": "VCF",
             "source_version": "VCFv4.2"
         },
@@ -102,6 +103,7 @@
             "vcf_name": "AD_alt",
             "type": "integer",
             "description": "Alternate allelic depth",
+            "calculated_property": true,
             "source_name": "VCF",
             "source_version": "VCFv4.2"
         },
@@ -159,15 +161,16 @@
             "vcf_name": "AF",
             "type": "number",
             "description": "Sample allele fraction",
+            "calculated_property": true,
             "source_name": "VCF",
             "source_version": "VCFv4.2",
             "column_priority": 5
         },
         "samplegeno": {
-            "title": "Samplegeno",
+            "title": "samplegeno",
             "type": "array",
             "items": {
-                "title": "Samplegeno",
+                "title": "samplegeno",
                 "type": "object",
                 "properties": {
                     "NUMGT": {

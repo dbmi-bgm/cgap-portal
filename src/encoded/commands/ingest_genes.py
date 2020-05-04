@@ -1,9 +1,9 @@
-import os
 import json
 import argparse
 import logging
 from pyramid.paster import get_app
 from dcicutils.misc_utils import VirtualApp
+from tqdm import tqdm
 
 
 EPILOG = __doc__
@@ -33,15 +33,20 @@ class GeneIngestion(object):
     def __getitem__(self, item):
         return self.genes_to_ingest[item]
 
-    def upload(self, vapp, project=None, institution=None):
+    def upload(self, vapp, project=None, institution=None, use_tqdm=False):
         """ Uploads all (or some if a failure occurs) of the genes
 
         :param vapp: VirtualApp from dcicutils to post to
         :param project: project to attach to these genes
         :param institution: institution to attach to these genes
+        :param use_tqdm: boolean on whether or not to show a progress bar
         :raises: VirtualAppError if a post is unsuccessful
         """
-        for gene in self.genes_to_ingest:
+        if use_tqdm:
+            _iter = tqdm(self.genes_to_ingest, unit='genes')
+        else:
+            _iter = self.genes_to_ingest
+        for gene in _iter:
             if project:
                 gene['project'] = project
             if institution:

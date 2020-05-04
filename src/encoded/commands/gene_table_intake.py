@@ -72,7 +72,7 @@ def main():
     """
     logging.basicConfig()
     parser = argparse.ArgumentParser(
-        description="Takes in a mapping table and produces inserts/schemas",
+        description="Takes in a variant mapping table and produces variant related inserts/schemas",
         epilog=EPILOG,
         formatter_class=argparse.RawDescriptionHelpFormatter
     )
@@ -103,7 +103,7 @@ def main():
         app = get_app(args.config_uri, args.app_name)
         testapp = TestApp(app, environ)
         for entry in inserts:
-            testapp.post_json('/gene_annotation_field', entry)  # XXX: what if something goes wrong?
+            testapp.post_json('/gene_annotation_field', entry)
         logger.info('Successfully posted gene annotations')
 
 
