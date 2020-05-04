@@ -40,6 +40,7 @@ def many_dummy_static_sections(testapp):
 # XXX: Maybe parametrize on a few types?
 def test_purge_item_type_from_db(testapp, dummy_static_section):
     """ Tests purging all items of a certain item type from the DB """
+    testapp.post_json('/index', {'record': True})
     assert purge_item_type_from_storage(testapp, ['static_section']) is True
     testapp.post_json('/index', {'record': True})
     testapp.get('/search/?type=StaticSection', status=404)
