@@ -26,7 +26,7 @@ export default class HealthView extends React.PureComponent {
     }
 
     static termTransformFxn(field, term){
-        if (field === "foursight" && term.slice(0,4) === "http") {
+        if (field === "foursight" && term && term.slice(0,4) === "http") {
             return <a href={term} target="_blank" rel="noopener noreferrer">{ term }</a>;
         }
         return Term.toName(field, term, true);
@@ -116,6 +116,14 @@ export default class HealthView extends React.PureComponent {
                         title : "Foursight",
                         description : "URI of corresponding Foursight page."
                     },
+                    'indexer' : {
+                        title : "Indexer",
+                        description : "Whether this server processes indexing requests at all."
+                    },
+                    'index_server' : {
+                        title : "Index Server",
+                        description : "Whether this server is only for indexing."
+                    },
                     'load_data' : {
                         title : "Loaded Data",
                         description : "Data which was loaded into database on initialization or boot."
@@ -143,6 +151,10 @@ export default class HealthView extends React.PureComponent {
                     'system_bucket' : {
                         title : 'System Bucket',
                         description : "Name of S3 Bucket used for system data."
+                    },
+                    'uptime': {
+                        title : 'Uptime',
+                        description : "How long this server has been running."
                     },
                     'utils_version': {
                         title : "Utils Version",

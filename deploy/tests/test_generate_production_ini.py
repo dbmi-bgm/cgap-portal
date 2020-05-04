@@ -11,21 +11,20 @@ from unittest import mock
 
 from dcicutils.qa_utils import override_environ
 from .. import generate_production_ini
-from ..generate_production_ini import (
-    TEMPLATE_DIR,
-    build_ini_file_from_template,
-    build_ini_stream_from_template,
-    any_environment_template_filename,
-    environment_template_filename,
-    template_environment_names,
-    get_local_git_version,
-    get_eb_bundled_version,
-    get_app_version,
-    EB_MANIFEST_FILENAME,
-    PYPROJECT_FILE_NAME,
-    omittable,
-)
+from ..generate_production_ini import CGAPDeployer
 
+TEMPLATE_DIR = CGAPDeployer.TEMPLATE_DIR
+build_ini_file_from_template = CGAPDeployer.build_ini_file_from_template
+build_ini_stream_from_template = CGAPDeployer.build_ini_stream_from_template
+any_environment_template_filename = CGAPDeployer.any_environment_template_filename
+environment_template_filename = CGAPDeployer.environment_template_filename
+template_environment_names = CGAPDeployer.template_environment_names
+get_local_git_version = CGAPDeployer.get_local_git_version
+get_eb_bundled_version = CGAPDeployer.get_eb_bundled_version
+get_app_version = CGAPDeployer.get_app_version
+EB_MANIFEST_FILENAME = CGAPDeployer.EB_MANIFEST_FILENAME
+PYPROJECT_FILE_NAME = CGAPDeployer.PYPROJECT_FILE_NAME
+omittable = CGAPDeployer.omittable
 
 # TODO: Maybe this should move to env_utils? If not, at least to a non-test file.
 #       Then again, if we used the "single parameterized ini file" we could side-step that. -kmp 3-Apr-2020
@@ -365,7 +364,7 @@ def test_transitional_equivalence():
 
             assert problems == [], "Problems found:\n%s" % "\n".join(problems)
 
-    with mock.patch.object(generate_production_ini, "get_app_version", return_value=MOCKED_PROJECT_VERSION):
+    with mock.patch.object(CGAPDeployer, "get_app_version", return_value=MOCKED_PROJECT_VERSION):
         with mock.patch("toml.load", return_value={"tool": {"poetry": {"version": MOCKED_LOCAL_GIT_VERSION}}}):
 
             class Checker:
@@ -431,3 +430,4 @@ def test_transitional_equivalence():
                     tester(ref_ini="cgap.ini", bs_env="fourfront-cgap", data_set="prod",
                            es_server="search-fourfront-cgap-ewf7r7u2nq3xkgyozdhns4bkni.us-east-1.es.amazonaws.com:80",
                            line_checker=ProdChecker(expect_indexer=None))
+
