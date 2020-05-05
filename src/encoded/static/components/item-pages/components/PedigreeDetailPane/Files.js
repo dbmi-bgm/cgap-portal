@@ -22,8 +22,7 @@ export class FileWrapper extends React.Component {
         };
     }
 
-    findFieldsWithDocumentsOrImages() {
-        // TODO: maybe memoize this?
+    findFieldsWithDocumentsOrImages() {  // Q: Does it make sense to memoize this?
         const { indvSchema } = this.props;
         const { properties = {} } = indvSchema;
 
@@ -67,12 +66,12 @@ export class FileWrapper extends React.Component {
 
                     // Pass the correct schema for this particular type of file (Image OR Document)
                     let fileSchema;
-                    const fieldType = obj[property];
-                    if (fieldType === "Document") { fileSchema = docSchema; }
+                    const fieldName = obj[property];
+                    if (fieldName === "Document") { fileSchema = docSchema; }
                     else { fileSchema = imageSchema; }
 
-                    return <FileArrayField key={property} fieldName={property} fieldDisplayTitle={properties[property]["title"]} {...{ files, haveEditPermission,
-                        individualId, institution, project, fileSchema, fieldType }} />;
+                    return <FileArrayField key={property} fieldType={property} fieldDisplayTitle={properties[property]["title"]} {...{ files, haveEditPermission,
+                        individualId, institution, project, fileSchema, fieldName }} />;
                 }) }
             </ React.Fragment>
         );
