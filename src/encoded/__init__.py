@@ -92,9 +92,15 @@ def source_beanstalk_env_vars(config_file=BEANSTALK_ENV_PATH):
         proc.communicate()
 
 
+# This key is best interpreted not as the 'snovault version' but rather the 'version of the app built on snovault'.
+# As such, it should be left this way, even though it may appear redundant with the 'eb_app_version' registry key
+# that we also have, which tries to be the value eb uses. -kmp 28-Apr-2020
+APP_VERSION_REGISTRY_KEY = 'snovault.app_version'
+
+
 def app_version(config):
     import hashlib
-    if not config.registry.settings.get('snovault.app_version'):
+    if not config.registry.settings.get(APP_VERSION_REGISTRY_KEY):
         # we update version as part of deployment process `deploy_beanstalk.py`
         # but if we didn't check env then git
         version = os.environ.get("ENCODED_VERSION")
@@ -109,7 +115,7 @@ def app_version(config):
             except Exception:
                 version = "test"
 
-        config.registry.settings['snovault.app_version'] = version
+        config.registry.settings[APP_VERSION_REGISTRY_KEY] = version
 
     # Fourfront does GA stuff here that makes no sense in CGAP (yet).
 

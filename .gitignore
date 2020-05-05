@@ -77,4 +77,4 @@ elasticsearch-*.deb
 
 # Saved configurations from Elastic beanstalk that have been downloaded.
 .elasticbeanstalk/saved_configs/
-
+.elasticbeanstalk/app_versions/
