@@ -385,7 +385,7 @@ svg.pedigree-viz-shapes-layer.shapes-layer {
                         /* font-size: 1em; */
                         font-size: 1.0725em;
                         font-weight: 700;
-                        @extend .no-user-select;
+                        @include no-user-select;
                     }
                 }
             }

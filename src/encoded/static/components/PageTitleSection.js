@@ -33,7 +33,7 @@ export const PageTitleSection = React.memo(function PageTitle(props){
 
     // See if any views register their own custom-er title view.
     const FoundTitleView = pageTitleViews.lookup(context, currentAction);
-    if (FoundTitleView){
+    if (typeof FoundTitleView !== "undefined"){ // `null` considered as conscious lack of title
         return <FoundTitleView {...props} />;
     }
 

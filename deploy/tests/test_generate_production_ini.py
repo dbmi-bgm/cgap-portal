@@ -13,6 +13,7 @@ from ..generate_production_ini import (
     TEMPLATE_DIR,
     build_ini_file_from_template,
     build_ini_stream_from_template,
+    any_environment_template_filename,
     environment_template_filename,
     template_environment_names,
     get_local_git_version,
@@ -53,6 +54,12 @@ def test_environment_template_filename():
     assert os.path.exists(actual)
 
     assert environment_template_filename('cgapdev') == environment_template_filename('fourfront-cgapdev')
+
+
+def test_any_environment_template_filename():
+
+    actual = os.path.abspath(any_environment_template_filename())
+    assert actual.endswith("/ini_files/any.ini")
 
 
 def test_template_environment_names():

@@ -18,5 +18,14 @@
         "title" : "Acknowledgements",
         "status" : "released",
         "file" : "/src/encoded/static/data/about/acknowledgements.html"
+    },
+    {
+        "title" : "Embedded Search Table Examples",
+        "description" : "Check out these examples",
+        "name" : "demos.embedded-search-table",
+        "uuid" : "4570c6b5-dad9-4f34-b366-9895b461334d",
+        "file" : "/src/encoded/static/data/embedded-search-table-demo.jsx",
+        "section_type" : "Page Section",
+        "status" : "released"
     }
 ]

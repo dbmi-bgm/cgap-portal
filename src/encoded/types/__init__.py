@@ -112,7 +112,7 @@ class Gene(Item):
 
     @calculated_property(schema={
         "title": "Display Title",
-        "description": "A calculated title for every object in 4DN",
+        "description": "Gene ID",
         "type": "string"
     })
     def display_title(self, gene_symbol):
@@ -168,7 +168,7 @@ class Document(ItemWithAttachment, Item):
 
     @calculated_property(schema={
         "title": "Display Title",
-        "description": "A calculated title for every object in 4DN",
+        "description": "Document filename, if available.",
         "type": "string"
     })
     def display_title(self, attachment=None):
@@ -194,7 +194,7 @@ class FileFormat(Item, ItemWithAttachment):
 
     @calculated_property(schema={
         "title": "Display Title",
-        "description": "A calculated title",
+        "description": "File Format name or extension.",
         "type": "string"
     })
     def display_title(self, file_format):
@@ -264,7 +264,7 @@ class TrackingItem(Item):
 
     @calculated_property(schema={
         "title": "Display Title",
-        "description": "A calculated title for every object in 4DN",
+        "description": "Descriptor of TrackingItem",
         "type": "string"
     })
     def display_title(self, tracking_type, date_created=None, google_analytics=None):

@@ -127,7 +127,7 @@ export default class SearchView extends React.PureComponent {
                     termTransformFxn={Schemas.Term.toName} fieldTransformFxn={Schemas.Field.toName}/>
                 */}
                 <CommonSearchView {...passProps} {...{ columnExtensionMap, tableColumnClassName, facetColumnClassName, facets }}
-                    termTransformFxn={Schemas.Term.toName} separateSingleTermFacets={false} />
+                    termTransformFxn={Schemas.Term.toName} separateSingleTermFacets={false} rowHeight={90} openRowHeight={90} />
             </div>
         );
     }

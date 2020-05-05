@@ -1,11 +1,14 @@
 
 
-/* Variables */
+/* CGAP-Theme-Specific Variables */
+/* (some might be deprecated or carried over from ENCODE/4DN) */
+
 $mainThemeColor: 			#ffffff; /* i.e. the background color ..for now */
 
 $appVersionHeight:          0px;
 $footer-height:             50px + $appVersionHeight;
 $appBackgroundColor:        #fff; /* Not sure where $mainThemeColor is used... definitely not #application background-color, so creating new one */
+$appSecondaryBackgroundColor: #f5f5f5;
 
 $tableHeadFootBackgroundColor: #000000;
 
@@ -31,7 +34,18 @@ $line-height-base: 1.475; // Default: 1.5. Customized for source sans pro fit
 $dropdown-link-hover-bg: #ddd;
 
 
-// Override Bootstrap default variables:
+/* TabBar stuff for Item Pages, and maybe some similar places */
+$tabbar-bg-color : #ececec !default;
+$tabbar-text-color : #333 !default;
+$tabbar-text-active-color: #000 !default;
+$tabbar-bg-active-color: #fff !default;
+// If override this, check e.g. CohortView Pedigree Tab height dimensioning (JS) since this 46px is accounted for in calculations
+$tabbar-height: 46px;
+
+
+/*****************************/
+/**** Bootstrap Variables ****/
+/*****************************/
 
 $border-radius-base:                        3px;
 $border-radius-large:                       4px;
@@ -43,8 +57,9 @@ $navbar-height:                             80px;
 
 $navbar-default-bg: #f8f8f8; // Bootstrap default is #F8F8F8
 
+// THese are probably deprecated -- todo: bring up vars from navbar.scss and put em here in place of these...
 //$navbar-fixed-breakpoint: $screen-md-min; // Use instead of Bootstrap's $grid-float-breakpoint as we want nav to become fixed later.
-$navbar-background-color: #20445f; //#144567; //#083c52;  // ALT: #19314d;
+$navbar-background-color: #20445f;
 $navbar-link-color : rgba(255,255,255,0.8);
 $navbar-link-hover-color : #fff;
 $navbar-link-active-color : #fff;
@@ -101,7 +116,15 @@ $brand-secondary: $secondary;
 $btn-line-height: 1.45rem;
 
 
+/* Cards */
+$card-cap-bg: #fff;
+$card-bg: #fff;
+$card-inner-border-radius: 3px;
+$card-border-color: rgba(0,0,0,0.08); // Lighter
+
+/****************************/
 /** FontAwesome Icon Stuff **/
+/****************************/
 $fa-font-path: "/static/font/fontawesome5.9" !default;
 $fa-font-size-base: $font-size-base;
 $fa-css-prefix: icon;

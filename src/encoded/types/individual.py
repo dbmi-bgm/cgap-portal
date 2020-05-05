@@ -35,7 +35,7 @@ class Individual(Item):
 
     @calculated_property(schema={
         "title": "Display Title",
-        "description": "A calculated title for every object in 4DN",
+        "description": "Individual's Identifier",
         "type": "string"
     })
     def display_title(self, request, accession, bgm_id=None, other_id=None):
