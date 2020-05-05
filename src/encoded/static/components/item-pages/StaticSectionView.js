@@ -5,6 +5,7 @@ import PropTypes from 'prop-types';
 import _ from 'underscore';
 import DefaultItemView from './DefaultItemView';
 import { BasicStaticSectionBody } from '@hms-dbmi-bgm/shared-portal-components/es/components/static-pages/BasicStaticSectionBody';
+import { replaceString as placeholderReplacementFxn } from './../static-pages/placeholders';
 
 
 export default class StaticSectionView extends DefaultItemView {
@@ -17,20 +18,21 @@ export default class StaticSectionView extends DefaultItemView {
 
 }
 
-const StaticSectionViewPreview = React.memo(function StaticSectionViewPreview({ context }){
+const StaticSectionViewPreview = React.memo(function StaticSectionViewPreview({ context, windowWidth }){
+    const { content, filetype, section_type } = context;
     return (
-        <div className="mt-18 static-section-entry">
-            <BasicStaticSectionBody {..._.pick(context, 'content', 'filetype')} />
+        <div className="mt-18 static-section-entry px-2">
+            <BasicStaticSectionBody {...{ content, filetype, placeholderReplacementFxn, windowWidth }} />
         </div>
     );
 });
 StaticSectionViewPreview.getTabObject = function({ context, windowWidth }){
     return {
-        'tab' : <span><i className="icon icon-image fas icon-fw"/> Preview</span>,
+        'tab' : <span><i className="icon icon-image far icon-fw"/> Preview</span>,
         'key' : 'preview',
         //'disabled' : !Array.isArray(context.experiments),
         'content' : (
-            <div className="overflow-hidden container">
+            <div className="container-wide">
                 <h3 className="tab-section-title">
                     { context.title || 'Preview' }
                 </h3>

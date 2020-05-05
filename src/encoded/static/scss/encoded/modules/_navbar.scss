@@ -1,5 +1,6 @@
 /* NavBar */
 
+// These defaults are overriden/set in base.scss
 $navbar-link-color: #333 !default;
 $navbar-full-height : 80px;
 $navbar-small-height : 40px; /* Bootstrap navbar default */
@@ -100,7 +101,6 @@ div#top-nav.navbar-fixed-top {
     position: relative;
     top: 0;
     border: none;
-    border-bottom: 1px solid darken($navbar-background-color, 5%);
     background: #ffffff;
     margin-bottom: 0;
     box-shadow: 0 0 3px rgba(0,0,0,0);
@@ -115,7 +115,6 @@ div#top-nav.navbar-fixed-top {
         body.scrolled-past-top &,
         body.is-full-screen .navbar-container &,
         body.is-item-view .navbar-container & {
-            border-color: darken($navbar-background-color, 10%);
             box-shadow: 0 0 3px rgba(0,0,0,0.2);
         }
     }

@@ -5,10 +5,21 @@
 /**********************/
 
 $search-results-above-results-row-height: 42px;
+$search-results-edge-background-color: #e2e2e2;
+$search-results-edge-shadow-color : rgba(0,0,0,0.5);
+$search-results-result-row-height: 80px; // +9px margin bottom +1px border bottom = 90px rowHeight.
+$search-results-header-row-height: 52px; // 46px is existing default for both result and header height.
 @import "./../../../../../../node_modules/@hms-dbmi-bgm/shared-portal-components/scss/search-view-table.scss";
 
 // Extensions to shared-portal-components searchview table(s):
 .search-result-row .result-table-row .search-result-column-block {
+	&[data-field="display_title"] {
+		> .inner {
+			> .title-block {
+				white-space: normal; // Allow to wrap by default (overrides SPC's default white-space: nowrap;) since we have tall-ish rows.
+			}
+		}
+	}
 	&[data-field="status"] {
 		> .inner {
 			i.item-status-indicator-dot {
@@ -172,6 +183,17 @@ $search-page-padding-resize-transition-out: padding .25s linear;
 	}
 }
 
+/** CGAP-Related SearchView Theming **/
+
+body[data-pathname="/search/"]:not([data-current-action="add"]) {
+	#slot-application,
+	#application,
+	#layout {
+		// Possible todo: switch this to appBackgroundColor param (base.scss) or parameterize according to final design.
+		background-color: #f5f5f5;
+	}
+}
+
 .search-page-container {
 
 	> div.search-view-controls-and-results.row {
@@ -205,6 +227,11 @@ $search-page-padding-resize-transition-out: padding .25s linear;
 				@include navbar-fixed-position {
 					top: 40px;
 					margin-bottom: 0px;
+				}
+
+				// Align header height with $search-results-header-row-height.
+				&.with-header-bg .facets-header {
+					height: $search-results-header-row-height;
 				}
 	
 				body.scrolled-past-160 & {
@@ -242,29 +269,47 @@ $search-page-padding-resize-transition-out: padding .25s linear;
 		}
 	}
 
+	.search-results-outer-container {
 
-	.search-headers-row {
-		position: sticky;
-		top: 0px;
-		@include navbar-fixed-position {
-			top: 40px;
-		}
-	}
-
-	.search-results-outer-container .search-results-container .inner-container .scrollable-container .search-result-row {
-	
-		> .columns.result-table-row > .search-result-column-block[data-field="display_title"] {
-			padding-left: 50px !important;
-
-			.toggle-detail-button-container > button {
-				width: 45px !important;
+		.search-headers-row {
+			position: sticky;
+			top: 0px;
+			@include navbar-fixed-position {
+				top: 40px;
 			}
 		}
 
-		.result-table-detail-container .result-table-detail {
-			padding-left: 57px;
-		}
+	}
 
+}
+
+.search-results-container .react-infinite-container .search-result-row {
+
+	border-bottom: 1px solid #00000015;
+	box-shadow: 0 1px 5px -2px #0002;
+	margin-bottom: 9px;
+
+	// Re-style result row re: CGAP styling/theming/branding.
+	> .columns.result-table-row > .search-result-column-block > .inner {
+		// Along with margin-bottom & border, aligned to `rowHeight` in SearchView.js.
+		height: $search-results-result-row-height; // = 80px (+9px margin bottom +1px border bottom = 90px rowHeight);
+	}
+
+	> .columns.result-table-row > .search-result-column-block[data-field="display_title"] {
+		padding-left: 45px !important;
+
+		.toggle-detail-button-container {
+			top: 0;
+			bottom: 0;
+			> button {
+				width: 45px !important;
+				border-radius: 0;
+			}
+		}
+	}
+
+	.result-table-detail-container .result-table-detail {
+		padding-left: 57px;
 	}
 
 }
