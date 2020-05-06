@@ -48,6 +48,7 @@ def many_dummy_static_sections(testapp):
 def test_purge_item_type_from_db(testapp, dummy_static_section):
     """ Tests purging all items of a certain item type from the DB """
     testapp.post_json('/index', {'record': True})
+    # this will need to work slightly differently when snovault is updated.
     time.sleep(10 + min(60, (datetime.datetime.now() - PurgeQueueData.PURGE_QUEUE_LAST_TIME).total_seconds()))
     assert purge_item_type_from_storage(testapp, ['static_section']) is True
     testapp.post_json('/index', {'record': True})
