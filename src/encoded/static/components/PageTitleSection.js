@@ -33,7 +33,7 @@ export const PageTitleSection = React.memo(function PageTitle(props){
 
     // See if any views register their own custom-er title view.
     const FoundTitleView = pageTitleViews.lookup(context, currentAction);
-    if (FoundTitleView){
+    if (typeof FoundTitleView !== "undefined"){ // `null` considered as conscious lack of title
         return <FoundTitleView {...props} />;
     }
 
@@ -328,7 +328,7 @@ export class StaticPageBreadcrumbs extends React.Component {
                 if (editAction && editAction.href){
                     return (
                         <div className="static-edit-button pull-right" style={style}>
-                            <i className="icon icon-fw icon-pencil fas"/> <a href={editAction.href} data-tip="Edit this Static Page">Edit</a>
+                            <i className="icon icon-fw icon-pencil-alt fas"/> <a href={editAction.href} data-tip="Edit this Static Page">Edit</a>
                         </div>
                     );
                 }

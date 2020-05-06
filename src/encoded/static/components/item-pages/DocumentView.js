@@ -32,7 +32,7 @@ DocumentViewOverview.getTabObject = function({ context, schemas }){
     return {
         'tab' : (
             <React.Fragment>
-                <i className="icon icon-file-text fas icon-fw"/>
+                <i className="icon icon-file-alt far icon-fw"/>
                 <span>Overview</span>
             </React.Fragment>
         ),

@@ -27,9 +27,7 @@ export default class HomePage extends React.PureComponent {
      */
     render() {
         const { session, context } = this.props;
-        const commonProps = {
-            session, context
-        };
+        const commonProps = { context };
         return (
             <div className="homepage-wrapper">
                 { session ? <UserDashboard {...commonProps} /> : <GuestHomeView {...commonProps} /> }
@@ -45,9 +43,14 @@ const HomePageTitle = React.memo(function HomePageTitle(props){
 
     if (session){
         return (
-            <PageTitleContainer alerts={alerts} className="container-wide">
-                <OnlyTitle>My Dashboard</OnlyTitle>
-            </PageTitleContainer>
+            // We can also make into .container-wide..
+            // <React.Fragment>
+            //     <PageTitleContainer alerts={alerts} className="container pb-55">
+            //         <OnlyTitle>My Dashboard</OnlyTitle>
+            //     </PageTitleContainer>
+            //     <hr className="tab-section-title-horiz-divider"/>
+            // </React.Fragment>
+            null
         );
     }
 

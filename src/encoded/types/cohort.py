@@ -105,7 +105,6 @@ class Cohort(Item):
 
     @calculated_property(schema={
         "title": "Display Title",
-        "description": "A calculated title for every object in 4DN",
         "type": "string"
     })
     def display_title(self, title):

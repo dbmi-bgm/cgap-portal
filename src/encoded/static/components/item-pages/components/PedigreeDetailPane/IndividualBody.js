@@ -139,7 +139,7 @@ export class IndividualBody extends React.PureComponent {
                         <div className="col-auto buttons-col">
                             { editLink ?
                                 <a href={editLink} className="d-block edit-btn">
-                                    <i className="icon icon-pencil fas clickable" />
+                                    <i className="icon icon-pencil-alt fas clickable" />
                                 </a>
                                 : isLoadingIndividual ?
                                     <i className="icon icon-circle-notch icon-spin fas d-block mr-15" />

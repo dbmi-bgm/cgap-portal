@@ -51,7 +51,13 @@ export function relationshipTopPosition(yCoord, dims){
     return dims.graphPadding + yCoord - (dims.relationshipSize / 2);
 }
 
-
+/**
+ * @todo
+ * We could just pass in relationships and do foreach loop.
+ * However want to make sure is ordered from proband out, which
+ * object graph currently does slightly better job of, but gathers
+ * them below probably not ideally/orderedly. To look at later.
+ */
 export function createEdges(objectGraph, dims, graphHeight){
 
     // Some common dimensions
@@ -72,18 +78,18 @@ export function createEdges(objectGraph, dims, graphHeight){
 
     const q = [objectGraph[0]];
 
-    while(q.length){
+    while (typeof q[0] !== "undefined") {
         const indv = q.shift();
         if (seen[indv.id]) continue;
         seen[indv.id] = true;
-        const { _maritalRelationships, _parentalRelationship : parentRelation } = indv;
+        const { _maritalRelationships = [], _parentalRelationship : parentRelation } = indv;
 
         _maritalRelationships.forEach(function(mr){
-            mr.children.forEach(function(ch){
-                q.push(ch);
-            });
             mr.partners.forEach(function(p){
                 q.push(p);
+            });
+            mr.children.forEach(function(ch){
+                q.push(ch);
             });
         });
 
@@ -99,11 +105,16 @@ export function createEdges(objectGraph, dims, graphHeight){
                 }
             } = parentRelation;
 
-            let midPoint = null;
-            if (children.length === 0 || seenParentalRelationships.has(parentRelation)){
+            if (seenParentalRelationships.has(parentRelation)){
                 continue;
             }
             seenParentalRelationships.add(parentRelation);
+
+            children.forEach(function(ch){
+                q.push(ch);
+            });
+
+            let midPoint = null;
             if (children.length === 1){
                 midPoint = [ // Center of child top
                     //children[0]._drawing.xCoord + halfIndvWidth,
@@ -180,7 +191,7 @@ export function createEdges(objectGraph, dims, graphHeight){
 
             // Add edges to parent(s) - Relationship Edges
             // Then add to q
-            partners.forEach(function(partner){
+            partners.forEach(function(partner, partnerIdx){
                 // Vertical center of relationship
                 const fromX = relationXCoord;
                 const fromY = relationYCoord;
@@ -189,14 +200,21 @@ export function createEdges(objectGraph, dims, graphHeight){
                 const toX = partner._drawing.xCoord;
                 const toY = partner._drawing.yCoord;
 
-                const attachToTargetOnLeftSide = toX >= fromX;
-                const toXAttachment = (halfIndvWidth * (attachToTargetOnLeftSide ? -1 : 1));
-                const toXAttachmentLedge = dims.edgeLedge * (attachToTargetOnLeftSide ? -1 : 1);
+                const attachToIndividualOnLeftSide = toX >= fromX;
+                const toIndividualXAttachment = (halfIndvWidth * (attachToIndividualOnLeftSide ? -1 : 1));
+                const toIndividualXAttachmentLedge = dims.edgeLedge * (attachToIndividualOnLeftSide ? -1 : 1);
+
+                // TODO: Add concept of 'ledges' to relationships. In such way that it chooses
+                // the "empty" side (if any) for last partner (which should be further-away partner).
+                // Addition of 'ledge' will require minor upstream changes, probably just to the React
+                // component that visualizes it to extend real or faux line/something from node
+                // center to start of edge/path.
+
                 const parentEdge = {
                     fromNode: parentRelation,
                     fromVertex : [ fromX, fromY ], // Relationship
                     toNode: partner,
-                    toVertex: [ toX + toXAttachment, toY ], // Partner
+                    toVertex: [ toX + toIndividualXAttachment, toY ], // Partner
                     adjustable: true,
                     direct: false,
                     descriptor : "relationship midpoint to partner"
@@ -204,14 +222,14 @@ export function createEdges(objectGraph, dims, graphHeight){
                 parentEdge.vertices = [
                     // Relationship
                     parentEdge.fromVertex,
-                    [ parentEdge.fromVertex[0] - toXAttachmentLedge, parentEdge.fromVertex[1] ],
+                    [ parentEdge.fromVertex[0] - toIndividualXAttachmentLedge, parentEdge.fromVertex[1] ],
                     // Parent
-                    [ parentEdge.toVertex[0] + toXAttachmentLedge, parentEdge.toVertex[1] ],
+                    [ parentEdge.toVertex[0] + toIndividualXAttachmentLedge, parentEdge.toVertex[1] ],
                     parentEdge.toVertex
                 ];
 
                 //if (fromY !== toY){ // Make orthaganol
-                //    parentEdge.vertices.splice(2, 0, [fromX - toXAttachmentLedge, toY]);
+                //    parentEdge.vertices.splice(2, 0, [fromX - toIndividualXAttachmentLedge, toY]);
                 //}
 
                 adjustableEdges.push(parentEdge);
@@ -219,19 +237,20 @@ export function createEdges(objectGraph, dims, graphHeight){
                 q.push(partner);
             });
 
-            children.forEach(function(ch){
-                q.push(ch);
-            });
-
 
         } // End if parentRelation
+
     }
 
     directEdges.forEach(function(edge){
         edge.vertices = [edge.fromVertex, edge.toVertex];
     });
 
-    let visibilityGraph = computeVisibilityGraph(objectGraph, directEdges, dims, graphHeight, true);
+    // set depending on # relations maybe.. eh idk it visually helps on complexy graphs (less curves around relationship+child),
+    // not sure how to calculate 'complexiness' any better for now, maybe something like `relationships.length / countIndvsInRelationships`
+    // and/or countRelationshipsWhichCrossGenerations > 0 ... countSubtreesFromOrderingStep might be useful too.
+    const countDirectEdges = (seenParentalRelationships.size / objectGraph.length) < 0.4;
+    let visibilityGraph = computeVisibilityGraph(objectGraph, directEdges, dims, graphHeight, countDirectEdges);
     let subdivisions = 3;
     function trySubdivisions(){
         if (subdivisions >= 5){
@@ -270,10 +289,6 @@ function tracePaths(adjustableEdges, visibilityGraph){
         vSegments: vSegmentQ
     } = visibilityGraph;
 
-    //const hSegmentQ = hSegments.slice(0);
-    //const vSegmentQ = vSegments.slice(0);
-
-
     function getEdgeTargetV(otherV, edge){
         let connectsAt = null;
         if (otherV[0] === edge[0][0] && otherV[1] === edge[0][1]){
@@ -291,11 +306,12 @@ function tracePaths(adjustableEdges, visibilityGraph){
         const hLen = hSegmentQ.length;
         const vLen = vSegmentQ.length;
         const resultList = [];
-        let i = 0;
-        let checkQ;
-        for (i = 0; i < (vLen + hLen); i++){
+        // Go from last to first, selecting segments 'to bottom'
+        // first as these look better for cases when partner-relationship
+        // edges cross child-relationship line segments
+        for (let i = (vLen + hLen) - 1; i >= 0; i--){
             let checkIdx = i;
-            checkQ = vSegmentQ;
+            let checkQ = vSegmentQ;
             if (checkIdx >= vLen){
                 checkIdx -= vLen;
                 checkQ = hSegmentQ;
@@ -372,6 +388,12 @@ function tracePaths(adjustableEdges, visibilityGraph){
                 }
                 //*/
 
+
+                if (prevEdge1[0][1] === targetV[1] && prevEdge1[1][1] === targetV[1]) {
+                    // Slight advantage to paths which sticky to Y axis coord of target (or todo?: source) (heuristic optimization)
+                    costToTargetEstimate = costToTargetEstimate * 0.99;
+                }
+
                 if (costToTargetEstimate < bestCostEstimate){
                     bestCostEstimate = costToTargetEstimate;
                     bestIdx = i;
@@ -389,8 +411,13 @@ function tracePaths(adjustableEdges, visibilityGraph){
             const {
                 v: currV,
                 searchPath: currSearchPath,
+                // Actual distance
                 pathLengthCost: currPathLengthCost,
                 skip,
+                // This may be different from actual distance in response to 'path prettiness'
+                // heuristics. We theoretically could migrate to just using heuristicCostTotal entirely
+                // but would argue is nice to differentiate & have for simpler debugging if needed.
+                // Especially while heuristicCostTotal calculation is uh.. more experimental than polished.
                 heuristicCostTotal
             } = currArgs;
 
@@ -417,7 +444,7 @@ function tracePaths(adjustableEdges, visibilityGraph){
                 if (currPathLengthCost < bestPathTotalCost){
                     bestPathTotalCost = currPathLengthCost;
                     bestPathTotal = currSearchPath;
-                    console.info("FOUND after", iterations);
+                    console.info(`Found best path between ${initCurrV} and ${targetV} after ${iterations} iterations (0,0 is top left).`);
                     break;
                 }
             }
@@ -450,7 +477,16 @@ function tracePaths(adjustableEdges, visibilityGraph){
 
     }
 
-    adjustableEdges.forEach(function(edge, edgeIndex){
+    adjustableEdges.sort(function(a, b){
+        // TODO: Reconsider, maybe order by positionedRelationships order
+        const fromAV = a.vertices[1];
+        const toAV = a.vertices[a.vertices.length - 2];
+        const fromBV = b.vertices[1];
+        const toBV = b.vertices[b.vertices.length - 2];
+
+        // Rounded - preserve existing order unless distances vastly different.
+        return Math.floor(manhattanDistance(fromAV, toAV) / 200) - Math.floor(manhattanDistance(fromBV, toBV) / 200);
+    }).forEach(function(edge, edgeIndex){
         // We have 4 pts min in each due to edgeLedge
         const edgeVLen = edge.vertices.length;
         const fromV = edge.vertices[1];
@@ -610,14 +646,12 @@ export function computeVisibilityGraph(objectGraph, directEdges, dims, graphHeig
     // We make these into faux boxes to prevent edge crossings
     // These all contain 2 vertices at most
     directEdges.forEach(function(edge){
-        if (!countDirectEdges){
-            boundingBoxes.push(edge.vertices);
-            return;
-        }
         let bb = null;
         if (edge.vertices[0][0] === edge.vertices[1][0]){
             // Vertical line segment
-            if (edge.vertices[0][1] > edge.vertices[1][1]){
+            if (!countDirectEdges){
+                bb = edge.vertices;
+            } else if (edge.vertices[0][1] > edge.vertices[1][1]){
                 bb = [
                     [ edge.vertices[0][0] - halfRelationSize, edge.vertices[1][1] ],
                     [ edge.vertices[0][0] - halfRelationSize, edge.vertices[0][1] ],
@@ -737,7 +771,8 @@ export function computeVisibilityGraph(objectGraph, directEdges, dims, graphHeig
     // In the future, we could return to this to make sure float values are handled and rounded.
     while (yCoord < graphHeight){
         // Make horiz lines, split them into pieces
-        if (counter % (2 + divCount) < 2){ // Within row of individuals
+        const withinIndvRow = (yCoord % (dims.individualHeight + dims.individualYSpacing)) < dims.individualHeight;
+        if (withinIndvRow) {
             yCoord += partIndHeight;
         } else {
             yCoord += partIndYSpacing;  // Within row of spacing area
