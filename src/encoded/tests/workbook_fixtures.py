@@ -46,12 +46,12 @@ PURGE_QUEUE_CALL_STACKS = []
 def show_purge_queue_calls():
     for i, stack in enumerate(PURGE_QUEUE_CALL_STACKS, start=1):
         print("#"*10, "Stack for QueueManager.purge_queue call #%s" % i, "#"*10)
-        map(lambda x: print(x, end=''), traceback.format_list(stack))
+        print(stack)
         print("#"*40)
 
 
 def alt_purge_queue(self):  # Patterned after QueueManager.purge_queue
-    PURGE_QUEUE_CALL_STACKS.append(traceback.extract_stack())
+    PURGE_QUEUE_CALL_STACKS.append("".join(traceback.format_list(traceback.extract_stack())))
     for queue_url in [self.queue_url, self.second_queue_url, self.dlq_url]:
         try:
             self.client.purge_queue(
