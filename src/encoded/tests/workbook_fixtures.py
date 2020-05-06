@@ -1,10 +1,13 @@
 import os
 import pkg_resources
 import pytest
+import traceback
 import webtest
 
 from snovault import DBSESSION
 from snovault.elasticsearch import create_mapping
+from snovault.elasticsearch.indexer_queue import QueueManager, log
+from unittest import mock
 from .. import main
 from ..loadxl import load_all
 from .conftest_settings import make_app_settings_dictionary
@@ -37,6 +40,30 @@ def app_settings(wsgi_server_host_port, elasticsearch_server, postgresql_server,
     return settings
 
 
+PURGE_QUEUE_CALL_STACKS = []
+
+
+def show_purge_queue_calls():
+    for i, stack in enumerate(PURGE_QUEUE_CALL_STACKS, start=1):
+        print("#"*10, "Stack for QueueManager.purge_queue call #%s" % i, "#"*10)
+        map(lambda x: print(x, end=''), traceback.format_list(stack))
+        print("#"*40)
+
+
+def alt_purge_queue(self):  # Patterned after QueueManager.purge_queue
+    PURGE_QUEUE_CALL_STACKS.append(traceback.extract_stack())
+    for queue_url in [self.queue_url, self.second_queue_url, self.dlq_url]:
+        try:
+            self.client.purge_queue(
+                QueueUrl=queue_url
+            )
+        except self.client.exceptions.PurgeQueueInProgress as e:
+            print("QUEUE ALREADY BEING PURGED:", e)
+            show_purge_queue_calls()  # For debugging
+            log.warning('\n___QUEUE IS ALREADY BEING PURGED: %s___\n' % queue_url,
+                        queue_url=queue_url)
+
+
 @pytest.yield_fixture(scope='session')
 def app(app_settings, **kwargs):
     """
@@ -46,7 +73,13 @@ def app(app_settings, **kwargs):
     app = main({}, **app_settings)
     create_mapping.run(app, **kwargs)
 
-    yield app
+    # old_purge_queue = QueueManager.purge_queue
+    # def instrumented_purge_queue(self):
+    #     PURGE_QUEUE_CALL_STACKS.append(traceback.extract_stack())
+    #     return old_purge_queue(self)
+
+    with mock.patch.object(QueueManager, "purge_queue", alt_purge_queue):
+        yield app
 
     DBSession = app.registry[DBSESSION]
     # Dispose connections so postgres can tear down.

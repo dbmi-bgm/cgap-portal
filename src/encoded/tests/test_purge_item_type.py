@@ -1,7 +1,13 @@
 import pytest
 import time
-from .workbook_fixtures import app_settings, app, workbook
+from .workbook_fixtures import app_settings, app, workbook, show_purge_queue_calls
 from encoded.commands.purge_item_type import purge_item_type_from_storage
+from dcicutils.misc_utils import ignored
+
+accept_fixtures = ignored
+
+
+accept_fixtures(app_settings, app, workbook)  # Makes sure the imports in this file don't seem unused
 
 
 pytestmark = [pytest.mark.working]
@@ -63,6 +69,7 @@ def test_purge_item_type_with_links_fails(testapp, workbook):
     """ Tries to remove Individuals, which when the workbook is indexed will have links so
         deletion will fail
     """
+    accept_fixtures(workbook)
     testapp.post_json('/index', {'record': True})  # must index everything so individual links show up
     time.sleep(5)  # wait for indexing to catch up
     assert not purge_item_type_from_storage(testapp, ['individual'])
