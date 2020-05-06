@@ -1,3 +1,4 @@
+import json
 import pytest
 from encoded.commands.variant_table_intake import (
     MappingTableParser
@@ -6,23 +7,29 @@ from encoded.commands.variant_table_intake import (
 
 # XXX: These constants should probably be handled in a more intelligent way -will
 pytestmark = [pytest.mark.working, pytest.mark.ingestion]
-MT_LOC = './src/encoded/tests/data/variant_workbook/variant_table.csv' # symlinked from encoded.commands
+MT_LOC = './src/encoded/tests/data/variant_workbook/variant_table_v0.4.csv'
 ANNOTATION_FIELD_SCHEMA = './src/encoded/schemas/annotation_field.json'
 EXPECTED_FIELDS = ['no', 'vcf_name', 'source_name', 'source_version', 'sub_embedding_group',
-                   'field_type', 'is_list', 'separator', 'maximum_length_of_value', 'schema_description', 'value_example',
-                   'enum_list', 'field_priority', 'column_priority', 'facet_grouping', 'facet_priority',
-                   'scale', 'domain', 'method', 'annotation_grouping', 'scope', 'schema_title', 'pre_addon', 'links_to',
-                   'embedded_fields', 'calculated_property']
-EXPECTED_INSERT = {'no': 1, 'vcf_name': 'CHROM', 'source_name': 'VCF', 'source_version': 'VCFv4.2',
-                   'field_type': 'string', 'is_list': False, 'maximum_length_of_value': 2, 'schema_description': 'Chromosome',
-                   'value_example': '1;2;3;4;5;6;22;X;Y;M', 'column_priority': 1,
-                   'enum_list':
-                       ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16',
-                        '17', '18', '19', '20', '21', '22', 'X', 'Y', 'M'],
-                   'scope': 'variant'}
-NUMBER_ANNOTATION_FIELDS = 269
-SAMPLE_FIELDS_EXPECTED = 20
-VARIANT_FIELDS_EXPECTED = 249
+                   'field_type', 'is_list', 'separator', 'maximum_length_of_value',
+                   'schema_description', 'value_example', 'enum_list',
+                   'facet_order', 'column_order', 'annotation_category',
+                   'scope', 'schema_title', 'pre_addon', 'links_to', 'embedded_fields',
+                   'calculated_property']
+EXPECTED_INSERT = {'no': 1, 'vcf_name': 'CHROM', 'source_name': 'VCF',
+                   'source_version': 'VCFv4.2', 'field_type': 'string',
+                   'is_list': False, 'maximum_length_of_value': 2,
+                   'schema_description': 'Chromosome',
+                   'value_example': '1;2;3;4;5;6;22;X;Y;M',
+                   'enum_list': ['1', '2', '3', '4', '5', '6', '7', '8', '9',
+                                 '10', '11', '12', '13', '14', '15', '16', '17',
+                                 '18', '19', '20', '21', '22', 'X', 'Y', 'M'],
+                   'annotation_category': 'position', 'scope': 'variant'}
+VEP_CONSEQUENCE_EMBEDS = ['transcript.vep_consequence.var_conseq_id', 'transcript.vep_consequence.definition',
+                          'transcript.vep_consequence.impact', 'transcript.vep_consequence.location',
+                          'transcript.vep_consequence.coding_effect']
+NUMBER_ANNOTATION_FIELDS = 295
+SAMPLE_FIELDS_EXPECTED = 21
+VARIANT_FIELDS_EXPECTED = 263
 TRANSCRIPT_FIELDS_EXPECTED = 47
 
 
@@ -63,9 +70,11 @@ def test_add_default_schema_fields(MTParser):
 
 def test_read_variant_table_header(MTParser):
     """ Tests that we can read mapping table header correctly based on the current format """
-    assert MTParser.version == 'annV0.3'
-    assert MTParser.date == '01.29.2020'
+    assert MTParser.version == 'annV0.4'
+    assert MTParser.date == '05.04.2020'
     assert sorted(MTParser.fields) == sorted(EXPECTED_FIELDS)
+    for field in EXPECTED_FIELDS:  # all fields are categorized by the Parser
+        assert field in MTParser.ALL_FIELDS
 
 
 def test_process_variant_table_inserts(MTParser, inserts):
@@ -92,11 +101,9 @@ def test_generate_sample_json_items(MTParser, inserts):
     assert sample_props['RSTR']['type'] == 'string'
     assert sample_props['RSTR']['source_name'] == 'novoCaller'
 
-    # check cols/facs
-    assert 'AF' in cols
-    assert 'DP' in cols
-    assert 'AF' not in facs
-    assert 'DP' not in facs
+    # check cols/facs (there are none now)
+    assert cols == {}
+    assert facs == {}
 
 
 def test_generate_variant_json_items(MTParser, inserts):
@@ -114,9 +121,10 @@ def test_generate_variant_json_items(MTParser, inserts):
     # check sub-embedded object
     sub_obj_props = var_props['transcript']['items']['properties']
     assert len(sub_obj_props.keys()) == TRANSCRIPT_FIELDS_EXPECTED
-    assert sub_obj_props['vep_impact']['vcf_name'] == 'vep_impact'
-    assert sub_obj_props['vep_impact']['type'] == 'string'
+    assert sub_obj_props['vep_symbol']['vcf_name'] == 'vep_symbol'
+    assert sub_obj_props['vep_symbol']['type'] == 'string'
     assert sub_obj_props['vep_distance']['type'] == 'string'
+    assert sub_obj_props['vep_canonical']['type'] == 'boolean'
 
     # check sub-embedded object array
     assert sub_obj_props['vep_consequence']['type'] == 'array'
@@ -124,8 +132,8 @@ def test_generate_variant_json_items(MTParser, inserts):
     assert sub_obj_props['vep_consequence']['items']['separator'] == 'tilde'
 
     # check cols/facs
-    assert 'ALT' in cols
-    assert 'CHROM' in cols
+    assert 'transcript.vep_consequence.display_title' in cols
+    assert 'transcript.vep_symbol' in cols
     assert 'cadd_phred' in cols
     assert 'AF' not in cols
     assert cols['transcript.vep_consequence.display_title']['title'] == 'vep_consequence'  # linkTo has display title
@@ -147,7 +155,6 @@ def test_generate_variant_sample_schema(MTParser, sample_variant_items):
     assert properties['AF']['type'] == 'number'
     assert properties['RSTR']['type'] == 'string'
     assert 'columns' in schema
-    assert 'AF' in schema['columns']
     assert 'AF' not in schema['facets']
     assert 'facets' in schema
     assert 'variant' in properties
@@ -176,13 +183,13 @@ def test_generate_variant_schema(MTParser, variant_items):
 
     # check sub-embedded object fields
     assert properties['transcript']['type'] == 'array'
+    assert properties['transcript']['title'] == 'Transcript'
     sub_obj_props = properties['transcript']['items']['properties']
     assert len(sub_obj_props) == TRANSCRIPT_FIELDS_EXPECTED
     assert sub_obj_props['vep_consequence']['type'] == 'array'
-    assert sub_obj_props['vep_consequence']['items']['facet_priority'] == 2
+    assert sub_obj_props['vep_consequence']['items']['facet_order'] == 7
     assert sub_obj_props['vep_consequence']['items']['type'] == 'string'
     assert sub_obj_props['vep_consequence']['items']['linkTo'] == 'VariantConsequence'
-    assert sub_obj_props['vep_consequence']['items']['embedded_fields'] == 'definition'  # XXX: allow multiple
     assert sub_obj_props['vep_domains']['type'] == 'array'
     assert sub_obj_props['vep_domains']['items']['separator'] == 'tilde'
     assert sub_obj_props['vep_domains']['items']['type'] == 'string'
@@ -192,10 +199,18 @@ def test_generate_variant_schema(MTParser, variant_items):
     assert sub_obj_props['vep_somatic']['items']['separator'] == 'tilde'
 
     # check cols/facs
-    assert 'ALT' in schema['columns']
+    assert 'ID' in schema['columns']
     assert 'AF' not in schema['columns']
     assert 'transcript.vep_consequence.display_title' in schema['facets']
     assert 'transcript.vep_symbol' in schema['facets']
+
+    # check embedded fields are there
+    with open(MTParser.EMBEDDED_VARIANT_FIELDS, 'r') as fd:
+        embeds_to_check = json.load(fd)
+        for embed in embeds_to_check['variant']['VariantConsequence']:
+            assert embed.strip() in VEP_CONSEQUENCE_EMBEDS
+
+    import pdb; pdb.set_trace()
 
 
 def test_post_variant_annotation_field_inserts(inserts, project, institution, testapp):
@@ -213,10 +228,11 @@ def test_post_variant_annotation_field_inserts(inserts, project, institution, te
         testapp.post_json(CONNECTION_URL, item, status=201)
 
 
-
 def test_post_inserts_via_run(MTParser, project, institution, testapp):
     """ Tests that we can run the above test using the 'run' method """
-    inserts = MTParser.run(institution='encode-institution', project='encode-project', write=False)
+    inserts = MTParser.run(institution='encode-institution', project='encode-project',
+                           vs_out='./src/encoded/schemas/variant_sample.json',
+                           v_out='./src/encoded/schemas/variant.json', write=True)
     CONNECTION_URL = '/annotation_field'
     for item in inserts:
         testapp.post_json(CONNECTION_URL, item, status=201)

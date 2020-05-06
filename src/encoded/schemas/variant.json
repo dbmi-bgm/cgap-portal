@@ -77,8 +77,11 @@
             ],
             "source_name": "VCF",
             "source_version": "VCFv4.2",
-            "maximum_length_of_value": 2,
-            "column_priority": 1
+            "annotation_category": "position",
+            "schema_description": "Chromosome",
+            "value_example": "1;2;3;4;5;6;22;X;Y;M",
+            "scope": "variant",
+            "maximum_length_of_value": 2
         },
         "POS": {
             "title": "POS",
@@ -87,7 +90,10 @@
             "description": "Position",
             "source_name": "VCF",
             "source_version": "VCFv4.2",
-            "column_priority": 2
+            "annotation_category": "position",
+            "schema_description": "Position",
+            "value_example": "949608",
+            "scope": "variant"
         },
         "ID": {
             "title": "ID",
@@ -95,7 +101,12 @@
             "type": "string",
             "description": "ID",
             "source_name": "VCF",
-            "source_version": "VCFv4.2"
+            "source_version": "VCFv4.2",
+            "annotation_category": "position",
+            "schema_description": "ID",
+            "value_example": "rs1921",
+            "scope": "variant",
+            "column_order": 1
         },
         "REF": {
             "title": "REF",
@@ -104,7 +115,10 @@
             "description": "Reference allele",
             "source_name": "VCF",
             "source_version": "VCFv4.2",
-            "column_priority": 3
+            "annotation_category": "position",
+            "schema_description": "Reference allele",
+            "value_example": "G",
+            "scope": "variant"
         },
         "ALT": {
             "title": "ALT",
@@ -113,13 +127,71 @@
             "description": "Alternative allele",
             "source_name": "VCF",
             "source_version": "VCFv4.2",
-            "column_priority": 4
+            "annotation_category": "position",
+            "schema_description": "Alternative allele",
+            "value_example": "A;T;C;G;GAAATCA",
+            "scope": "variant"
         },
-        "transcript": {
-            "title": "transcript",
+        "hgvsg": {
+            "title": "hgvsg",
+            "vcf_name": "hgvsg",
+            "type": "string",
+            "description": "HGVS genome sequence name",
+            "source_name": "HGVS",
+            "source_version": "v0.4",
+            "schema_description": "HGVS genome sequence name",
+            "scope": "variant"
+        },
+        "hg19": {
+            "title": "hg19 Coordinates",
             "type": "array",
             "items": {
-                "title": "transcript",
+                "title": "hg19 Coordinates",
+                "type": "object",
+                "properties": {
+                    "hg19_hgvsg": {
+                        "title": "hg19_hgvsg",
+                        "vcf_name": "hg19_hgvsg",
+                        "type": "string",
+                        "description": "HGVS genome sequence name (hg19)",
+                        "source_name": "HG19",
+                        "source_version": "v0.4",
+                        "sub_embedding_group": "{\"key\": \"hg19\", \"title\": \"hg19 Coordinates\"}",
+                        "schema_description": "HGVS genome sequence name (hg19)",
+                        "scope": "variant"
+                    },
+                    "hg19_chrom": {
+                        "title": "hg19_chrom",
+                        "vcf_name": "hg19_chrom",
+                        "type": "string",
+                        "description": "hg19 coordinate chromosome",
+                        "source_name": "HG19",
+                        "source_version": "v0.4",
+                        "sub_embedding_group": "{\"key\": \"hg19\", \"title\": \"hg19 Coordinates\"}",
+                        "annotation_category": "position",
+                        "schema_description": "hg19 coordinate chromosome",
+                        "scope": "variant"
+                    },
+                    "hg19_pos": {
+                        "title": "hg19_pos",
+                        "vcf_name": "hg19_pos",
+                        "type": "integer",
+                        "description": "hg19 coordinate position",
+                        "source_name": "HG19",
+                        "source_version": "v0.4",
+                        "sub_embedding_group": "{\"key\": \"hg19\", \"title\": \"hg19 Coordinates\"}",
+                        "annotation_category": "position",
+                        "schema_description": "hg19 coordinate position",
+                        "scope": "variant"
+                    }
+                }
+            }
+        },
+        "transcript": {
+            "title": "Transcript",
+            "type": "array",
+            "items": {
+                "title": "Transcript",
                 "type": "object",
                 "properties": {
                     "vep_consequence": {
@@ -133,21 +205,16 @@
                             "linkTo": "VariantConsequence",
                             "source_name": "VEP",
                             "source_version": "v98.4",
+                            "sub_embedding_group": "{\"key\": \"transcript\", \"title\": \"Transcript\"}",
                             "separator": "tilde",
-                            "embedded_fields": "definition",
+                            "schema_description": "Consequence type",
+                            "value_example": "intron_variant;intron_variant~NMD_transcript_variant;intron_variant~non_coding_transcript_variant;regulatory_region_variant;splice_region_variant~intron_variant~non_coding_transcript_variant;splice_acceptor_variant~non_coding_transcript_variant;splice_region_variant~non_coding_transcript_exon_variant;non_coding_transcript_exon_variant;downstream_gene_variant;splice_region_variant~intron_variant;splice_donor_variant;splice_region_variant~5_prime_UTR_variant;5_prime_UTR_variant;splice_acceptor_variant;upstream_gene_variant;TF_binding_site_variant;splice_region_variant~intron_variant~NMD_transcript_variant;splice_donor_variant~NMD_transcript_variant;splice_donor_variant~non_coding_transcript_variant;splice_region_variant~5_prime_UTR_variant~NMD_transcript_variant",
+                            "scope": "variant",
+                            "embedded_fields": "var_conseq_id, definition, impact, location, coding_effect",
                             "maximum_length_of_value": 66,
-                            "column_priority": 7,
-                            "facet_priority": 2
+                            "column_order": 3,
+                            "facet_order": 7
                         }
-                    },
-                    "vep_impact": {
-                        "title": "vep_impact",
-                        "vcf_name": "vep_impact",
-                        "type": "string",
-                        "description": "Subjective impact classification of consequence type",
-                        "source_name": "VEP",
-                        "source_version": "v98.4",
-                        "maximum_length_of_value": 8
                     },
                     "vep_symbol": {
                         "title": "vep_symbol",
@@ -156,9 +223,13 @@
                         "description": "Gene symbol (e.g. HGNC)",
                         "source_name": "VEP",
                         "source_version": "v98.4",
+                        "sub_embedding_group": "{\"key\": \"transcript\", \"title\": \"Transcript\"}",
+                        "schema_description": "Gene symbol (e.g. HGNC)",
+                        "value_example": "C1orf159;AL390719.3;LINC01342;MIR200B;MIR200A;MIR429;AL390719.2;TTLL10-AS1;TTLL10;TNFRSF18;SKI;AL590822.3;MORN1;AL589739.1;AL513477.1;AL513477.2;RER1;PEX10;MEGF6",
+                        "scope": "variant",
                         "maximum_length_of_value": 10,
-                        "column_priority": 8,
-                        "facet_priority": 1
+                        "column_order": 2,
+                        "facet_order": 8
                     },
                     "vep_gene": {
                         "title": "vep_gene",
@@ -167,6 +238,10 @@
                         "description": "Stable ID of affected gene",
                         "source_name": "VEP",
                         "source_version": "v98.4",
+                        "sub_embedding_group": "{\"key\": \"transcript\", \"title\": \"Transcript\"}",
+                        "schema_description": "Stable ID of affected gene",
+                        "value_example": "ENSG00000131591;ENSG00000285812;ENSG00000223823;ENSG00000207730;ENSG00000207607;ENSG00000198976;ENSG00000272141;ENSG00000205231;ENSG00000162571;ENSG00000186891;ENSG00000157933;ENSG00000287356;ENSG00000116151;ENSG00000272161;ENSG00000269896;ENSG00000272420;ENSG00000157916;ENSG00000157911;ENSG00000162591",
+                        "scope": "variant",
                         "maximum_length_of_value": 15
                     },
                     "vep_gene_ncbi": {
@@ -176,6 +251,10 @@
                         "description": "Stable ID of feature",
                         "source_name": "VEP",
                         "source_version": "v98.4",
+                        "sub_embedding_group": "{\"key\": \"transcript\", \"title\": \"Transcript\"}",
+                        "schema_description": "Stable ID of feature",
+                        "value_example": "54991;406984;554210;254173;8784;6497;79906;11079;5192;1953;55966;261734;8514;23261;50651;473;84275;199953;54897",
+                        "scope": "variant",
                         "maximum_length_of_value": 9
                     },
                     "vep_feature_type": {
@@ -185,6 +264,10 @@
                         "description": "Type of feature - Transcript, RegulatoryFeature or MotifFeature",
                         "source_name": "VEP",
                         "source_version": "v98.4",
+                        "sub_embedding_group": "{\"key\": \"transcript\", \"title\": \"Transcript\"}",
+                        "schema_description": "Type of feature - Transcript, RegulatoryFeature or MotifFeature",
+                        "value_example": "Transcript;RegulatoryFeature;MotifFeature",
+                        "scope": "variant",
                         "maximum_length_of_value": 17
                     },
                     "vep_feature": {
@@ -194,6 +277,10 @@
                         "description": "Stable ID of feature",
                         "source_name": "VEP",
                         "source_version": "v98.4",
+                        "sub_embedding_group": "{\"key\": \"transcript\", \"title\": \"Transcript\"}",
+                        "schema_description": "Stable ID of feature",
+                        "value_example": "ENST00000379319;ENST00000379325;ENST00000379339;ENST00000421241;ENST00000434641;ENST00000462097;ENST00000467751;ENST00000472741;ENST00000475119;ENST00000477196;ENST00000480643;ENST00000482816;ENST00000648183;ENSR00000344492;ENSR00000344493;ENSR00000918401;ENSM00137401367;ENSM00524098499;ENSM00522508013;ENSM00094709716",
+                        "scope": "variant",
                         "maximum_length_of_value": 15
                     },
                     "vep_feature_ncbi": {
@@ -203,6 +290,10 @@
                         "description": "Stable ID of feature",
                         "source_name": "VEP",
                         "source_version": "v98.4",
+                        "sub_embedding_group": "{\"key\": \"transcript\", \"title\": \"Transcript\"}",
+                        "schema_description": "Stable ID of feature",
+                        "value_example": "XP_011539961;NM_017891;NR_038869;NR_029639;NR_029834;NR_029957;XR_132470;XR_001737088;XP_016856395;NM_153254;XM_017002722;NM_004195;NM_148902;XP_016857617;NM_024848;NR_024489;NM_001301060;NR_125361;XP_016855621",
+                        "scope": "variant",
                         "maximum_length_of_value": 12
                     },
                     "vep_biotype": {
@@ -212,6 +303,10 @@
                         "description": "Biotype of transcript or regulatory feature",
                         "source_name": "VEP",
                         "source_version": "v98.4",
+                        "sub_embedding_group": "{\"key\": \"transcript\", \"title\": \"Transcript\"}",
+                        "schema_description": "Biotype of transcript or regulatory feature",
+                        "value_example": "protein_coding;nonsense_mediated_decay;retained_intron;processed_transcript;lncRNA;promoter_flanking_region;TF_binding_site;enhancer;promoter;CTCF_binding_site;open_chromatin_region;miRNA;transcribed_processed_pseudogene;misc_RNA;non_stop_decay;processed_pseudogene;snRNA;unprocessed_pseudogene;transcribed_unprocessed_pseudogene",
+                        "scope": "variant",
                         "maximum_length_of_value": 34
                     },
                     "vep_exon": {
@@ -221,6 +316,10 @@
                         "description": "Exon number(s) / total",
                         "source_name": "VEP",
                         "source_version": "v98.4",
+                        "sub_embedding_group": "{\"key\": \"transcript\", \"title\": \"Transcript\"}",
+                        "schema_description": "Exon number(s) / total",
+                        "value_example": "2/2;1/10;2/7;4/6;3/6;2/12;2/6;1/11;1/12;1/7;1/3;1/6;2/3;3/3;1/1;1/16;1/2;2/16;3/16",
+                        "scope": "variant",
                         "maximum_length_of_value": 6
                     },
                     "vep_intron": {
@@ -230,6 +329,10 @@
                         "description": "Intron number(s) / total",
                         "source_name": "VEP",
                         "source_version": "v98.4",
+                        "sub_embedding_group": "{\"key\": \"transcript\", \"title\": \"Transcript\"}",
+                        "schema_description": "Intron number(s) / total",
+                        "value_example": "1/9;1/10;2/11;2/6;1/11;1/2;1/5;4/5;1/1;1/6;3/5;2/5;2/2;1/15;2/15;3/15;4/15;5/15;5/5",
+                        "scope": "variant",
                         "maximum_length_of_value": 6
                     },
                     "vep_hgvsc": {
@@ -239,8 +342,12 @@
                         "description": "HGVS coding sequence name",
                         "source_name": "VEP",
                         "source_version": "v98.4",
+                        "sub_embedding_group": "{\"key\": \"transcript\", \"title\": \"Transcript\"}",
+                        "schema_description": "HGVS coding sequence name",
+                        "value_example": "ENST00000379319.5:c.-136+5977A>T;ENST00000379325.7:c.-135-7876A>T;ENST00000379339.5:c.-135-7876A>T;ENST00000421241.6:c.-135-7876A>T;ENST00000434641.5:c.-135-7876A>T;ENST00000462097.5:c.-136+5977A>T;ENST00000467751.5:c.-135-7876A>T;ENST00000472741.5:n.29-7876A>T;ENST00000475119.5:c.-179-7876A>T;ENST00000477196.5:c.-135-7876A>T;ENST00000480643.1:c.-136+5977A>T;ENST00000482816.5:n.185-7876A>T;ENST00000648183.1:n.529+1866T>A;ENST00000379319.5:c.-136+5977A>C;ENST00000379325.7:c.-135-7876A>C;ENST00000379339.5:c.-135-7876A>C;ENST00000421241.6:c.-135-7876A>C;ENST00000434641.5:c.-135-7876A>C;ENST00000462097.5:c.-136+5977A>C;ENST00000467751.5:c.-135-7876A>C",
+                        "scope": "variant",
                         "maximum_length_of_value": 34,
-                        "column_priority": 10
+                        "facet_order": 10
                     },
                     "vep_hgvsp": {
                         "title": "vep_hgvsp",
@@ -249,6 +356,10 @@
                         "description": "HGVS protein sequence name",
                         "source_name": "VEP",
                         "source_version": "v98.4",
+                        "sub_embedding_group": "{\"key\": \"transcript\", \"title\": \"Transcript\"}",
+                        "schema_description": "HGVS protein sequence name",
+                        "value_example": "ENSP00000368591.1:p.Met1?;ENSP00000368592.1:p.Met1?;ENSP00000500959.1:p.Met1?;ENSP00000368591.1:p.Asp2Asn;ENSP00000368592.1:p.Asp2Asn;ENSP00000500959.1:p.Asp2Asn;ENSP00000368591.1:p.Asp2Tyr;ENSP00000368592.1:p.Asp2Tyr;ENSP00000500959.1:p.Asp2Tyr;ENSP00000368591.1:p.Asp2His;ENSP00000368592.1:p.Asp2His;ENSP00000500959.1:p.Asp2His;ENSP00000368591.1:p.Asp2Val;ENSP00000368592.1:p.Asp2Val;ENSP00000500959.1:p.Asp2Val;ENSP00000368591.1:p.Asp2Gly;ENSP00000368592.1:p.Asp2Gly;ENSP00000500959.1:p.Asp2Gly;ENSP00000368591.1:p.Asp2Ala",
+                        "scope": "variant",
                         "maximum_length_of_value": 38
                     },
                     "vep_cdna_position": {
@@ -258,6 +369,10 @@
                         "description": "Relative position of base pair in cDNA sequence",
                         "source_name": "VEP",
                         "source_version": "v98.4",
+                        "sub_embedding_group": "{\"key\": \"transcript\", \"title\": \"Transcript\"}",
+                        "schema_description": "Relative position of base pair in cDNA sequence",
+                        "value_example": "530;531;532;533;534;535;536;537;538;539;540;541;542;543;544;545;546;547;548",
+                        "scope": "variant",
                         "maximum_length_of_value": 5
                     },
                     "vep_cds_position": {
@@ -267,6 +382,10 @@
                         "description": "Relative position of base pair in coding sequence",
                         "source_name": "VEP",
                         "source_version": "v98.4",
+                        "sub_embedding_group": "{\"key\": \"transcript\", \"title\": \"Transcript\"}",
+                        "schema_description": "Relative position of base pair in coding sequence",
+                        "value_example": "1;2;3;4;5;6;7;8;9;10;11;12;13;14;15;16;17;18;19",
+                        "scope": "variant",
                         "maximum_length_of_value": 5
                     },
                     "vep_protein_position": {
@@ -276,6 +395,10 @@
                         "description": "Relative position of amino acid in protein",
                         "source_name": "VEP",
                         "source_version": "v98.4",
+                        "sub_embedding_group": "{\"key\": \"transcript\", \"title\": \"Transcript\"}",
+                        "schema_description": "Relative position of amino acid in protein",
+                        "value_example": "1;2;3;4;5;6;7;8;9;10;11;12;13;14;15;16;17;18;19",
+                        "scope": "variant",
                         "maximum_length_of_value": 4
                     },
                     "vep_amino_acids": {
@@ -285,6 +408,10 @@
                         "description": "Reference and variant amino acids",
                         "source_name": "VEP",
                         "source_version": "v98.4",
+                        "sub_embedding_group": "{\"key\": \"transcript\", \"title\": \"Transcript\"}",
+                        "schema_description": "Reference and variant amino acids",
+                        "value_example": "M/L;M/V;M/K;M/R;M/T;M/I;D/N;D/Y;D/H;D/V;D/G;D/A;D/E;D;H/N;H/Y;H/D;H/L;H/R",
+                        "scope": "variant",
                         "maximum_length_of_value": 3
                     },
                     "vep_codons": {
@@ -294,6 +421,10 @@
                         "description": "Reference and variant codon sequence",
                         "source_name": "VEP",
                         "source_version": "v98.4",
+                        "sub_embedding_group": "{\"key\": \"transcript\", \"title\": \"Transcript\"}",
+                        "schema_description": "Reference and variant codon sequence",
+                        "value_example": "Atg/Ttg;Atg/Gtg;Atg/Ctg;aTg/aAg;aTg/aGg;aTg/aCg;atG/atA;atG/atT;atG/atC;Gac/Aac;Gac/Tac;Gac/Cac;gAc/gTc;gAc/gGc;gAc/gCc;gaC/gaA;gaC/gaT;gaC/gaG;Cac/Aac",
+                        "scope": "variant",
                         "maximum_length_of_value": 7
                     },
                     "vep_distance": {
@@ -303,6 +434,10 @@
                         "description": "Shortest distance from variant to transcript",
                         "source_name": "VEP",
                         "source_version": "v98.4",
+                        "sub_embedding_group": "{\"key\": \"transcript\", \"title\": \"Transcript\"}",
+                        "schema_description": "Shortest distance from variant to transcript",
+                        "value_example": "1;2;3;4;5;6;7;8;9;10;11;12;13;14;15;16;17;18;19",
+                        "scope": "variant",
                         "maximum_length_of_value": 4
                     },
                     "vep_strand": {
@@ -312,6 +447,10 @@
                         "description": "Strand of the feature",
                         "source_name": "VEP",
                         "source_version": "v98.4",
+                        "sub_embedding_group": "{\"key\": \"transcript\", \"title\": \"Transcript\"}",
+                        "schema_description": "Strand of the feature",
+                        "value_example": "0;1",
+                        "scope": "variant",
                         "maximum_length_of_value": 1
                     },
                     "vep_variant_class": {
@@ -321,9 +460,13 @@
                         "description": "SO variant class",
                         "source_name": "VEP",
                         "source_version": "v98.4",
+                        "sub_embedding_group": "{\"key\": \"transcript\", \"title\": \"Transcript\"}",
+                        "schema_description": "SO variant class",
+                        "value_example": "SNV",
+                        "scope": "variant",
                         "maximum_length_of_value": 3,
-                        "column_priority": 13,
-                        "facet_priority": 6
+                        "column_order": 7,
+                        "facet_order": 13
                     },
                     "vep_hgnc_id": {
                         "title": "vep_hgnc_id",
@@ -332,6 +475,10 @@
                         "description": "Stable identifer of HGNC gene symbol",
                         "source_name": "VEP",
                         "source_version": "v98.4",
+                        "sub_embedding_group": "{\"key\": \"transcript\", \"title\": \"Transcript\"}",
+                        "schema_description": "Stable identifer of HGNC gene symbol",
+                        "value_example": "HGNC:26062;HGNC:50551;HGNC:31579;HGNC:31578;HGNC:13784;HGNC:41159;HGNC:26693;HGNC:11914;HGNC:10896;HGNC:25852;HGNC:30309;HGNC:8851;HGNC:3232;HGNC:32806;HGNC:30801;HGNC:19104;HGNC:6229;HGNC:18806;HGNC:17939",
+                        "scope": "variant",
                         "maximum_length_of_value": 10
                     },
                     "vep_canonical": {
@@ -341,6 +488,23 @@
                         "description": "Indicates if transcript is canonical for this gene",
                         "source_name": "VEP",
                         "source_version": "v98.4",
+                        "sub_embedding_group": "{\"key\": \"transcript\", \"title\": \"Transcript\"}",
+                        "schema_description": "Indicates if transcript is canonical for this gene",
+                        "value_example": "0;1",
+                        "scope": "variant",
+                        "maximum_length_of_value": 1
+                    },
+                    "vep_most_severe": {
+                        "title": "vep_most_severe",
+                        "vcf_name": "vep_most_severe",
+                        "type": "boolean",
+                        "description": "Indicates if transcript is most severe for this gene",
+                        "source_name": "VEP",
+                        "source_version": "v98.4",
+                        "sub_embedding_group": "{\"key\": \"transcript\", \"title\": \"Transcript\"}",
+                        "schema_description": "Indicates if transcript is most severe for this gene",
+                        "value_example": "0;1",
+                        "scope": "variant",
                         "maximum_length_of_value": 1
                     },
                     "vep_tsl": {
@@ -350,6 +514,10 @@
                         "description": "Transcript support level",
                         "source_name": "VEP",
                         "source_version": "v98.4",
+                        "sub_embedding_group": "{\"key\": \"transcript\", \"title\": \"Transcript\"}",
+                        "schema_description": "Transcript support level",
+                        "value_example": "5;2;3;4;1",
+                        "scope": "variant",
                         "maximum_length_of_value": 1
                     },
                     "vep_ccds": {
@@ -359,6 +527,10 @@
                         "description": "Indicates if transcript is a CCDS transcript",
                         "source_name": "VEP",
                         "source_version": "v98.4",
+                        "sub_embedding_group": "{\"key\": \"transcript\", \"title\": \"Transcript\"}",
+                        "schema_description": "Indicates if transcript is a CCDS transcript",
+                        "value_example": "CCDS7.2;CCDS81250.1;CCDS44036.1;CCDS8.1;CCDS9.1;CCDS10.1;CCDS30552.1;CCDS39.1;CCDS40.1;CCDS72688.1;CCDS41232.1;CCDS41.1;CCDS44045.1;CCDS41237.1;CCDS54.1;CCDS44052.1;CCDS55.1;CCDS56.1;CCDS30576.1",
+                        "scope": "variant",
                         "maximum_length_of_value": 11
                     },
                     "vep_ensp": {
@@ -368,6 +540,10 @@
                         "description": "Protein identifer",
                         "source_name": "VEP",
                         "source_version": "v98.4",
+                        "sub_embedding_group": "{\"key\": \"transcript\", \"title\": \"Transcript\"}",
+                        "schema_description": "Protein identifer",
+                        "value_example": "ENSP00000368623;ENSP00000368629;ENSP00000368644;ENSP00000400736;ENSP00000390635;ENSP00000464273;ENSP00000463144;ENSP00000462517;ENSP00000462798;ENSP00000464657;ENSP00000368591;ENSP00000368592;ENSP00000500959;ENSP00000368590;ENSP00000464269;ENSP00000328207;ENSP00000368570;ENSP00000368567;ENSP00000462735",
+                        "scope": "variant",
                         "maximum_length_of_value": 15
                     },
                     "vep_swissprot": {
@@ -377,6 +553,10 @@
                         "description": "UniProtKB/Swiss-Prot accession",
                         "source_name": "VEP",
                         "source_version": "v98.4",
+                        "sub_embedding_group": "{\"key\": \"transcript\", \"title\": \"Transcript\"}",
+                        "schema_description": "UniProtKB/Swiss-Prot accession",
+                        "value_example": "Q96HA4;Q6ZVT0;Q9Y5U5;P12755;Q5T089;O15258;O60683;O75095;Q9UKB5;O75161;Q13303;Q9Y6Y1;Q9Y2W3;Q9P2R6;Q9BSK2;Q5SNT2;Q86V15;Q8IYS2;Q02809",
+                        "scope": "variant",
                         "maximum_length_of_value": 13
                     },
                     "vep_trembl": {
@@ -386,6 +566,10 @@
                         "description": "UniProtKB/TrEMBL accession",
                         "source_name": "VEP",
                         "source_version": "v98.4",
+                        "sub_embedding_group": "{\"key\": \"transcript\", \"title\": \"Transcript\"}",
+                        "schema_description": "UniProtKB/TrEMBL accession",
+                        "value_example": "A0A024R082;Q5T2W7;J3QRL0;J3QKM1;J3KSJ6;J3KT48;J3QSF0;J3QRK8;J3KT02;Q5T088;B4DRE3;U3KQS9;Q5T093;Q5T094;A0A0A0MR06;Q5T091;Q5T092;A0A024R0A4;A0A3B3ITN6",
+                        "scope": "variant",
                         "maximum_length_of_value": 10
                     },
                     "vep_uniparc": {
@@ -395,6 +579,10 @@
                         "description": "UniParc accession",
                         "source_name": "VEP",
                         "source_version": "v98.4",
+                        "sub_embedding_group": "{\"key\": \"transcript\", \"title\": \"Transcript\"}",
+                        "schema_description": "UniParc accession",
+                        "value_example": "UPI0000049DAC;UPI0000048F44;UPI000013EF85;UPI0003F47F17;UPI000268AE20;UPI0000205ACB;UPI000268AE21;UPI000048B028;UPI0003F48015;UPI0000205ADB;UPI000013EF63;UPI000268AE23;UPI000002B5CE;UPI0000035975;UPI000015B651;UPI000268AE24;UPI00001359DE;UPI000007293C;UPI00002039D7",
+                        "scope": "variant",
                         "maximum_length_of_value": 13
                     },
                     "vep_sift": {
@@ -404,6 +592,11 @@
                         "description": "SIFT prediction and/or score",
                         "source_name": "VEP",
                         "source_version": "v98.4",
+                        "sub_embedding_group": "{\"key\": \"transcript\", \"title\": \"Transcript\"}",
+                        "annotation_category": "pathogenicity",
+                        "schema_description": "SIFT prediction and/or score",
+                        "value_example": "tolerated_low_confidence(0.23);deleterious_low_confidence(0);tolerated_low_confidence(0.11);deleterious_low_confidence(0.01);tolerated_low_confidence(0.26);tolerated_low_confidence(0.08);tolerated_low_confidence(0.18);deleterious_low_confidence(0.03);deleterious_low_confidence(0.02);deleterious_low_confidence(0.04);tolerated_low_confidence(0.27);tolerated_low_confidence(0.48);tolerated_low_confidence(1);tolerated_low_confidence(0.07);tolerated_low_confidence(0.15);tolerated_low_confidence(0.25);tolerated_low_confidence(0.52);tolerated_low_confidence(0.5);tolerated_low_confidence(0.41)",
+                        "scope": "variant",
                         "maximum_length_of_value": 32
                     },
                     "vep_polyphen": {
@@ -413,6 +606,11 @@
                         "description": "PolyPhen prediction and/or score",
                         "source_name": "VEP",
                         "source_version": "v98.4",
+                        "sub_embedding_group": "{\"key\": \"transcript\", \"title\": \"Transcript\"}",
+                        "annotation_category": "pathogenicity",
+                        "schema_description": "PolyPhen prediction and/or score",
+                        "value_example": "benign(0);benign(0.013);benign(0.029);benign(0.001);benign(0.033);benign(0.13);benign(0.068);benign(0.037);possibly_damaging(0.57);benign(0.243);benign(0.003);benign(0.396);benign(0.084);benign(0.007);benign(0.336);benign(0.006);benign(0.129);benign(0.163);benign(0.41)",
+                        "scope": "variant",
                         "maximum_length_of_value": 24
                     },
                     "vep_domains": {
@@ -425,7 +623,11 @@
                             "description": "The source and identifer of any overlapping protein domains",
                             "source_name": "VEP",
                             "source_version": "v98.4",
+                            "sub_embedding_group": "{\"key\": \"transcript\", \"title\": \"Transcript\"}",
                             "separator": "tilde",
+                            "schema_description": "The source and identifer of any overlapping protein domains",
+                            "value_example": "MobiDB_lite:mobidb-lite;PANTHER:PTHR46810~MobiDB_lite:mobidb-lite;PANTHER:PTHR46810~MobiDB_lite:mobidb-lite~MobiDB_lite:mobidb-lite;MobiDB_lite:mobidb-lite~MobiDB_lite:mobidb-lite;Low_complexity_(Seg):seg~PANTHER:PTHR46810~MobiDB_lite:mobidb-lite;PANTHER:PTHR46810~MobiDB_lite:mobidb-lite~Low_complexity_(Seg):seg;Low_complexity_(Seg):seg~PANTHER:PTHR46810;PANTHER:PTHR46810~Low_complexity_(Seg):seg;PANTHER:PTHR46810;PROSITE_profiles:PS51221~PANTHER:PTHR46810;PROSITE_profiles:PS51221~PANTHER:PTHR46810~Pfam:PF03133;Pfam:PF03133~PROSITE_profiles:PS51221~PANTHER:PTHR46810;PROSITE_profiles:PS51221~PANTHER:PTHR46810~Pfam:PF03133~Superfamily:SSF56059;Pfam:PF03133~PROSITE_profiles:PS51221~PANTHER:PTHR46810~Superfamily:SSF56059;PROSITE_profiles:PS51221~PANTHER:PTHR46810~Gene3D:3.30.470.20~Pfam:PF03133~Superfamily:SSF56059;Gene3D:3.30.470.20~Pfam:PF03133~PROSITE_profiles:PS51221~PANTHER:PTHR46810~Superfamily:SSF56059;PROSITE_profiles:PS51221~PANTHER:PTHR46810~Gene3D:3.30.470.20~Pfam:PF03133;PROSITE_profiles:PS51221~PANTHER:PTHR46810~Gene3D:3.30.470.20;PROSITE_profiles:PS51221",
+                            "scope": "variant",
                             "maximum_length_of_value": 629
                         }
                     },
@@ -436,6 +638,10 @@
                         "description": "SO terms of overlapped miRNA secondary structure feature(s)",
                         "source_name": "VEP",
                         "source_version": "v98.4",
+                        "sub_embedding_group": "{\"key\": \"transcript\", \"title\": \"Transcript\"}",
+                        "schema_description": "SO terms of overlapped miRNA secondary structure feature(s)",
+                        "value_example": "miRNA_loop;miRNA_stem",
+                        "scope": "variant",
                         "maximum_length_of_value": 10
                     },
                     "vep_hgvs_offset": {
@@ -444,7 +650,10 @@
                         "type": "string",
                         "description": "Indicates by how many bases the HGVS notations for this variant have been shifted",
                         "source_name": "VEP",
-                        "source_version": "v98.4"
+                        "source_version": "v98.4",
+                        "sub_embedding_group": "{\"key\": \"transcript\", \"title\": \"Transcript\"}",
+                        "schema_description": "Indicates by how many bases the HGVS notations for this variant have been shifted",
+                        "scope": "variant"
                     },
                     "vep_clin_sig": {
                         "title": "vep_clin_sig",
@@ -453,6 +662,10 @@
                         "description": "ClinVar clinical significance of the dbSNP variant",
                         "source_name": "VEP",
                         "source_version": "v98.4",
+                        "sub_embedding_group": "{\"key\": \"transcript\", \"title\": \"Transcript\"}",
+                        "schema_description": "ClinVar clinical significance of the dbSNP variant",
+                        "value_example": "likely_benign;uncertain_significance&likely_benign;uncertain_significance;benign&benign/likely_benign;uncertain_significance&conflicting_interpretations_of_pathogenicity&likely_benign;benign&likely_benign;benign;benign/likely_benign;uncertain_significance&likely_benign&benign/likely_benign;benign/likely_benign&likely_benign;pathogenic&likely_pathogenic;benign&benign/likely_benign&likely_benign;pathogenic;uncertain_significance&benign;benign&uncertain_significance&conflicting_interpretations_of_pathogenicity;uncertain_significance&benign/likely_benign;likely_pathogenic;pathogenic/likely_pathogenic;likely_pathogenic&pathogenic",
+                        "scope": "variant",
                         "maximum_length_of_value": 81
                     },
                     "vep_somatic": {
@@ -465,7 +678,11 @@
                             "description": "Somatic status of existing variant",
                             "source_name": "VEP",
                             "source_version": "v98.4",
+                            "sub_embedding_group": "{\"key\": \"transcript\", \"title\": \"Transcript\"}",
                             "separator": "tilde",
+                            "schema_description": "Somatic status of existing variant",
+                            "value_example": "0~1;1;1~1;0~1~1;0~0~1;1~1~1;0~1~1~1;0~0~1~1;0~0~0~1;0~0~0~1~1;0~0~0~0~1;0~1~1~1~1;1~1~1~1",
+                            "scope": "variant",
                             "maximum_length_of_value": 9
                         }
                     },
@@ -479,7 +696,11 @@
                             "description": "Indicates if existing variant(s) is associated with a phenotype, disease or trait; multiple values correspond to multiple variants",
                             "source_name": "VEP",
                             "source_version": "v98.4",
+                            "sub_embedding_group": "{\"key\": \"transcript\", \"title\": \"Transcript\"}",
                             "separator": "tilde",
+                            "schema_description": "Indicates if existing variant(s) is associated with a phenotype, disease or trait; multiple values correspond to multiple variants",
+                            "value_example": "0~1;1;1~1;0~1~1;1~1~1;0~1~1~1;1~1~1~1;1~1~1~1~1;0~1~1~1~1",
+                            "scope": "variant",
                             "maximum_length_of_value": 9
                         }
                     },
@@ -493,7 +714,11 @@
                             "description": "Pubmed ID(s) of publications that cite existing variant",
                             "source_name": "VEP",
                             "source_version": "v98.4",
+                            "sub_embedding_group": "{\"key\": \"transcript\", \"title\": \"Transcript\"}",
                             "separator": "tilde",
+                            "schema_description": "Pubmed ID(s) of publications that cite existing variant",
+                            "value_example": "20964851;24074042;21492446;20964851~19176549;21686129;21686129~27374108;20964851~21686129~27374108;27603512~31117970;27004216~21686129~28364128;30999277;31231424~29956763~30373632;31231424~30373632;18564129;25741868;25741868~24033266;24033266;22984993~16327884;16054854;25380769",
+                            "scope": "variant",
                             "maximum_length_of_value": 233
                         }
                     },
@@ -504,6 +729,10 @@
                         "description": "The source and identifier of a transcription factor binding profile (TFBP) aligned at this position",
                         "source_name": "VEP",
                         "source_version": "v98.4",
+                        "sub_embedding_group": "{\"key\": \"transcript\", \"title\": \"Transcript\"}",
+                        "schema_description": "The source and identifier of a transcription factor binding profile (TFBP) aligned at this position",
+                        "value_example": "ENSM00137401367;ENSM00524098499;ENSM00522508013;ENSM00094709716;ENSM00136127118;ENSM00526042377;ENSM00524632119;ENSM00526151560;ENSM00526134086;ENSM00144227272;ENSM00135365932;ENSM00523799938;ENSM00525648169;ENSM00145001366;ENSM00136127157;ENSM00389937456;ENSM00526203647;ENSM00138429017;ENSM00023429794",
+                        "scope": "variant",
                         "maximum_length_of_value": 15
                     },
                     "vep_motif_pos": {
@@ -513,6 +742,10 @@
                         "description": "The relative position of the variation in the aligned TFBP",
                         "source_name": "VEP",
                         "source_version": "v98.4",
+                        "sub_embedding_group": "{\"key\": \"transcript\", \"title\": \"Transcript\"}",
+                        "schema_description": "The relative position of the variation in the aligned TFBP",
+                        "value_example": "1;2;3;4;5;6;7;8;9;10;11;12;13;14;15;16;17;18;19",
+                        "scope": "variant",
                         "maximum_length_of_value": 2
                     },
                     "vep_high_inf_pos": {
@@ -522,6 +755,10 @@
                         "description": "A flag indicating if the variant falls in a high information position of the TFBP",
                         "source_name": "VEP",
                         "source_version": "v98.4",
+                        "sub_embedding_group": "{\"key\": \"transcript\", \"title\": \"Transcript\"}",
+                        "schema_description": "A flag indicating if the variant falls in a high information position of the TFBP",
+                        "value_example": "0;1",
+                        "scope": "variant",
                         "maximum_length_of_value": 1
                     },
                     "vep_motif_score_change": {
@@ -531,6 +768,10 @@
                         "description": "The difference in motif score of the reference and variant sequences for the TFBP",
                         "source_name": "VEP",
                         "source_version": "v98.4",
+                        "sub_embedding_group": "{\"key\": \"transcript\", \"title\": \"Transcript\"}",
+                        "schema_description": "The difference in motif score of the reference and variant sequences for the TFBP",
+                        "value_example": "0.021;-0.048;-0.054;-0.028;-0.072;-0.073;-0.018;0.005;0.057;-0.047;0.000;0.073;-0.032;0.028;0.039;0.003;0.044;0.031;-0.042",
+                        "scope": "variant",
                         "maximum_length_of_value": 6
                     },
                     "vep_maxentscan_alt": {
@@ -540,6 +781,11 @@
                         "description": "MaxEntScan alternate sequence score",
                         "source_name": "VEP",
                         "source_version": "v98.4",
+                        "sub_embedding_group": "{\"key\": \"transcript\", \"title\": \"Transcript\"}",
+                        "annotation_category": "splicing",
+                        "schema_description": "MaxEntScan alternate sequence score",
+                        "value_example": "6.692;4.641;6.121;5.009;5.858;6.202;4.006;3.483;4.484;4.060;4.891;5.160;3.541;4.902;4.860;1.281;4.708;3.739;3.673",
+                        "scope": "variant",
                         "maximum_length_of_value": 7
                     },
                     "vep_maxentscan_diff": {
@@ -549,6 +795,11 @@
                         "description": "MaxEntScan score difference",
                         "source_name": "VEP",
                         "source_version": "v98.4",
+                        "sub_embedding_group": "{\"key\": \"transcript\", \"title\": \"Transcript\"}",
+                        "annotation_category": "splicing",
+                        "schema_description": "MaxEntScan score difference",
+                        "value_example": "-2.272;-0.220;-1.701;-0.589;-1.438;-1.782;0.414;0.937;-0.064;0.360;-0.471;-0.740;0.879;-0.482;-0.440;3.139;-0.288;0.681;0.747",
+                        "scope": "variant",
                         "maximum_length_of_value": 7
                     },
                     "vep_maxentscan_ref": {
@@ -558,6 +809,11 @@
                         "description": "MaxEntScan reference sequence score",
                         "source_name": "VEP",
                         "source_version": "v98.4",
+                        "sub_embedding_group": "{\"key\": \"transcript\", \"title\": \"Transcript\"}",
+                        "annotation_category": "splicing",
+                        "schema_description": "MaxEntScan reference sequence score",
+                        "value_example": "4.420;7.531;7.049;7.358;2.476;10.267;6.277;7.933;9.100;6.139;8.066;6.746;10.766;3.423;3.259;5.341;1.927;5.778;8.594",
+                        "scope": "variant",
                         "maximum_length_of_value": 7
                     },
                     "vep_tssdistance": {
@@ -567,6 +823,10 @@
                         "description": "Distance from the transcription start site",
                         "source_name": "VEP",
                         "source_version": "v98.4",
+                        "sub_embedding_group": "{\"key\": \"transcript\", \"title\": \"Transcript\"}",
+                        "schema_description": "Distance from the transcription start site",
+                        "value_example": "1;2;3;4;5;6;7;8;9;10;11;12;13;14;15;16;17;18;19",
+                        "scope": "variant",
                         "maximum_length_of_value": 4
                     },
                     "vep_spliceregion": {
@@ -576,7 +836,51 @@
                         "description": "SpliceRegion predictions",
                         "source_name": "VEP",
                         "source_version": "v98.4",
+                        "sub_embedding_group": "{\"key\": \"transcript\", \"title\": \"Transcript\"}",
+                        "annotation_category": "splicing",
+                        "schema_description": "SpliceRegion predictions",
+                        "value_example": "extended_intronic_splice_region_variant",
+                        "scope": "variant",
                         "maximum_length_of_value": 39
+                    }
+                }
+            }
+        },
+        "genes": {
+            "title": "Gene",
+            "type": "array",
+            "items": {
+                "title": "Gene",
+                "type": "object",
+                "properties": {
+                    "genes_ensg": {
+                        "title": "genes_ensg",
+                        "vcf_name": "genes_ensg",
+                        "type": "string",
+                        "linkTo": "Gene",
+                        "source_name": "GENES",
+                        "source_version": "v98.4",
+                        "sub_embedding_group": "{\"key\": \"genes\", \"title\": \"Gene\"}",
+                        "scope": "variant"
+                    },
+                    "genes_most_severe_transcript": {
+                        "title": "genes_most_severe_transcript",
+                        "vcf_name": "genes_most_severe_transcript",
+                        "type": "string",
+                        "source_name": "GENES",
+                        "source_version": "v98.4",
+                        "sub_embedding_group": "{\"key\": \"genes\", \"title\": \"Gene\"}",
+                        "scope": "variant"
+                    },
+                    "genes_most_severe_consequence": {
+                        "title": "genes_most_severe_consequence",
+                        "vcf_name": "genes_most_severe_consequence",
+                        "type": "string",
+                        "linkTo": "VariantConsequence",
+                        "source_name": "GENES",
+                        "source_version": "v98.4",
+                        "sub_embedding_group": "{\"key\": \"genes\", \"title\": \"Gene\"}",
+                        "scope": "variant"
                     }
                 }
             }
@@ -588,6 +892,9 @@
             "description": "cytoband",
             "source_name": "CYTOBAND",
             "source_version": "2017-07-17",
+            "schema_description": "cytoband",
+            "value_example": "1p36.33;1p36.32;1p36.31;1p36.23;1p36.22;1p36.21;1p36.13;1p36.12;1p36.11;1p35.3;1p35.2;1p35.1;1p34.3",
+            "scope": "variant",
             "maximum_length_of_value": 7
         },
         "uniprot_transmem_uniprotkb_ac": {
@@ -597,6 +904,9 @@
             "description": "UniprotKB accession number",
             "source_name": "UNIPROT_TRANSMEM",
             "source_version": "2019-12-18",
+            "schema_description": "UniprotKB accession number",
+            "value_example": "A0A0A0MR06;Q5T091;Q5T092;Q5T093;Q5T094;O15258;Q9UKB5;A0A2H2EQP0;Q9Y2W3;Q9BSK2;Q8IYS2;Q9Y2G8;Q5TDG9;Q5TDH4;H0YCM8;Q5T4S7;V9HWN9;H0YDA0;Q4KMZ8;R4GNE2",
+            "scope": "variant",
             "maximum_length_of_value": 10
         },
         "uniprot_transmem_annot_desc": {
@@ -612,6 +922,9 @@
                 "source_name": "UNIPROT_TRANSMEM",
                 "source_version": "2019-12-18",
                 "separator": "tilde",
+                "schema_description": "transmembrance description",
+                "value_example": "A41-L60~Helical;A41-L61~Helical;G63-L83~Helical;I66-L83~Helical;I283-L303~Helical~Signal-anchor%20for%20type%20III%20membrane%20protein;L87-M103~Helical;I127-L147~Helical;S157-W177~Helical;S123-S144~Helical;R189-G209~Helical;P156-L173~Helical;W225-D245~Helical;L193-A210~Helical;L231-V248~Helical;I267-W287~Helical;V268-I288~Helical;V302-I322~Helical;F531-F553~Helical;G567-F587~Helical;V573-I593~Helical",
+                "scope": "variant",
                 "maximum_length_of_value": 71
             }
         },
@@ -622,6 +935,9 @@
             "description": "dbSNP RS number",
             "source_name": "DBSNP",
             "source_version": "20190722",
+            "schema_description": "dbSNP RS number",
+            "value_example": "rs900106464;rs996778209;rs1043209779;rs905587020;rs1189475219;rs1249477666;rs1427170431;rs1417276159;rs955405035;rs1169259779;rs999338640;rs1184193019;rs556755331;rs115660024;rs1412590796;rs1330927510;rs1423684909;rs1434757437;rs756473995;rs1277176852",
+            "scope": "variant",
             "maximum_length_of_value": 12
         },
         "conservation_phastcons100": {
@@ -631,9 +947,13 @@
             "description": "PhastCons 100 way score",
             "source_name": "CONSERVATION",
             "source_version": "2017-07-17",
+            "annotation_category": "conservation",
+            "schema_description": "PhastCons 100 way score",
+            "value_example": "0.095;0.111;0.124;0.135;0.145;0.153;0.159;0.164;0.168;0.170;0.171;0.186;0.199;0.211;0.222;0.231;0.238;0.244;0.249;0.252",
+            "scope": "variant",
             "maximum_length_of_value": 5,
-            "column_priority": 12,
-            "facet_priority": 5
+            "column_order": 6,
+            "facet_order": 12
         },
         "conservation_phastcons30": {
             "title": "conservation_phastcons30",
@@ -642,6 +962,10 @@
             "description": "PhastCons 30 way score",
             "source_name": "CONSERVATION",
             "source_version": "2017-07-17",
+            "annotation_category": "conservation",
+            "schema_description": "PhastCons 30 way score",
+            "value_example": "0.126;0.147;0.164;0.179;0.192;0.203;0.211;0.219;0.224;0.228;0.231;0.250;0.266;0.281;0.294;0.305;0.314;0.321;0.326;0.330",
+            "scope": "variant",
             "maximum_length_of_value": 5
         },
         "conservation_phastcons20": {
@@ -651,6 +975,10 @@
             "description": "PhastCons 20 way score",
             "source_name": "CONSERVATION",
             "source_version": "2017-07-17",
+            "annotation_category": "conservation",
+            "schema_description": "PhastCons 20 way score",
+            "value_example": "0.003;0.002;0.004;0.001;0.007;0.010;0.013;0.014;0.015;0.012;0.009;0.006;0.005;0.008;0.011;0.000;0.021;0.030;0.038;0.045",
+            "scope": "variant",
             "maximum_length_of_value": 5
         },
         "conservation_phylop100": {
@@ -660,6 +988,10 @@
             "description": "PhyloP 100 way score",
             "source_name": "CONSERVATION",
             "source_version": "2017-07-17",
+            "annotation_category": "conservation",
+            "schema_description": "PhyloP 100 way score",
+            "value_example": "0.214;0.252;0.240;0.213;-1.036;-0.984;-0.852;-1.095;-1.103;-2.621;-0.838;-1.387;0.121;0.221;0.198;-1.216;0.196;-0.931;0.232;-0.987",
+            "scope": "variant",
             "maximum_length_of_value": 7
         },
         "conservation_phylop30": {
@@ -669,6 +1001,10 @@
             "description": "PhyloP 30 way score",
             "source_name": "CONSERVATION",
             "source_version": "2017-07-17",
+            "annotation_category": "conservation",
+            "schema_description": "PhyloP 30 way score",
+            "value_example": "0.244;0.252;0.274;0.225;-1.049;-0.863;-0.762;-0.948;-1.092;-1.100;-2.462;-0.789;0.145;-0.812;0.255;0.227;-1.202;0.210;-0.855;0.234",
+            "scope": "variant",
             "maximum_length_of_value": 7
         },
         "conservation_phylop20": {
@@ -678,6 +1014,10 @@
             "description": "PhyloP 20 way score",
             "source_name": "CONSERVATION",
             "source_version": "2017-07-17",
+            "annotation_category": "conservation",
+            "schema_description": "PhyloP 20 way score",
+            "value_example": "0.247;-1.222;-0.848;0.246;0.223;-0.800;0.273;-0.907;-1.081;-1.217;-1.016;-2.221;-0.859;-0.872;0.270;-0.771;-0.957;0.221;0.243;-0.870",
+            "scope": "variant",
             "maximum_length_of_value": 7
         },
         "conservation_gerp": {
@@ -687,7 +1027,33 @@
             "description": "GERP score",
             "source_name": "CONSERVATION",
             "source_version": "2017-07-17",
+            "annotation_category": "conservation",
+            "schema_description": "GERP score",
+            "value_example": "-0.579;-1.14;-1.09;-0.655;-1.04;-0.676;-0.572;-0.4;0.546;-0.71;-0.563;0.572;-0.24;-1.4;-1.38;0.7;-0.529;-1.32;-0.647",
+            "scope": "variant",
             "maximum_length_of_value": 9
+        },
+        "conservation_siphy_omega": {
+            "title": "conservation_siphy_omega",
+            "vcf_name": "conservation_siphy_omega",
+            "type": "number",
+            "description": "Siphy omega score",
+            "source_name": "CONSERVATION",
+            "source_version": "2017-07-17",
+            "annotation_category": "conservation",
+            "schema_description": "Siphy omega score",
+            "scope": "variant"
+        },
+        "conservation_siphy_p": {
+            "title": "conservation_siphy_p",
+            "vcf_name": "conservation_siphy_p",
+            "type": "number",
+            "description": "Siphy p score",
+            "source_name": "CONSERVATION",
+            "source_version": "2017-07-17",
+            "annotation_category": "conservation",
+            "schema_description": "Siphy p score",
+            "scope": "variant"
         },
         "primateai_primatedl_score": {
             "title": "primateai_primatedl_score",
@@ -696,6 +1062,10 @@
             "description": "PrimateAI score",
             "source_name": "PRIMATEAI",
             "source_version": "v0.2_hg38",
+            "annotation_category": "pathogenicity",
+            "schema_description": "PrimateAI score",
+            "value_example": "0.255579769611;0.315366983414;0.262992084026;0.307070791721;0.234844043851;0.310526788235;0.280283987522;0.249432697892;0.556455075741;0.440282404423;0.442956477404;0.460922122002;0.443065643311;0.329660713673;0.334714531898;0.323188245296;0.323923885822;0.308033645153;0.31327611208;0.32739585638",
+            "scope": "variant",
             "maximum_length_of_value": 14
         },
         "cadd_phred": {
@@ -705,9 +1075,13 @@
             "description": "CADD Phred score",
             "source_name": "CADD",
             "source_version": "v1.5",
+            "annotation_category": "pathogenicity",
+            "schema_description": "CADD Phred score",
+            "value_example": "3.550;3.815;4.132;2.642;2.221;2.366;4.235;4.711;4.425;4.484;4.738;5.035;2.836;2.396;2.548;3.269;2.794;2.959;2.948;3.627",
+            "scope": "variant",
             "maximum_length_of_value": 5,
-            "column_priority": 11,
-            "facet_priority": 3
+            "column_order": 4,
+            "facet_order": 11
         },
         "spliceai_symbol": {
             "title": "spliceai_symbol",
@@ -716,6 +1090,10 @@
             "description": "affected gene symbol",
             "source_name": "SPLICEAI",
             "source_version": "20191004",
+            "annotation_category": "splicing",
+            "schema_description": "affected gene symbol",
+            "value_example": "C1orf159;TTLL10;SKI;MORN1;AL589739.1;RER1;MEGF6;AJAP1;NPHP4;KCNAB2;CAMTA1;SLC45A1;RERE;SLC25A33;TMEM201;CASZ1;KIAA2013;PLOD1;MFN2;HNRNPCL2",
+            "scope": "variant",
             "maximum_length_of_value": 10
         },
         "spliceai_ds_ag": {
@@ -725,6 +1103,10 @@
             "description": "delta scores (DS) for acceptor gain (AG)",
             "source_name": "SPLICEAI",
             "source_version": "20191004",
+            "annotation_category": "splicing",
+            "schema_description": "delta scores (DS) for acceptor gain (AG)",
+            "value_example": "0.00;0.02;0.01;0.04;0.12;0.07;0.03;0.05;0.06;0.21;0.15;0.08;0.11;0.09;0.10;0.13;0.23;0.14;0.20;0.25",
+            "scope": "variant",
             "maximum_length_of_value": 4
         },
         "spliceai_ds_al": {
@@ -734,6 +1116,10 @@
             "description": "delta scores (DS) for acceptor loss (AL)",
             "source_name": "SPLICEAI",
             "source_version": "20191004",
+            "annotation_category": "splicing",
+            "schema_description": "delta scores (DS) for acceptor loss (AL)",
+            "value_example": "0.00;0.01;0.05;0.03;0.02;0.07;0.06;0.04;0.08;0.10;0.09;0.16;0.15;0.14;0.13;0.11;0.12;0.17;0.18;0.24",
+            "scope": "variant",
             "maximum_length_of_value": 4
         },
         "spliceai_ds_dg": {
@@ -743,6 +1129,10 @@
             "description": "delta scores (DS) for donor gain (DG)",
             "source_name": "SPLICEAI",
             "source_version": "20191004",
+            "annotation_category": "splicing",
+            "schema_description": "delta scores (DS) for donor gain (DG)",
+            "value_example": "0.00;0.01;0.02;0.06;0.09;0.03;0.05;0.04;0.08;0.17;0.10;0.21;0.07;0.25;0.20;0.16;0.12;0.11;0.70;0.37",
+            "scope": "variant",
             "maximum_length_of_value": 4
         },
         "spliceai_ds_dl": {
@@ -752,6 +1142,10 @@
             "description": "delta scores (DS) for donor loss (DL)",
             "source_name": "SPLICEAI",
             "source_version": "20191004",
+            "annotation_category": "splicing",
+            "schema_description": "delta scores (DS) for donor loss (DL)",
+            "value_example": "0.00;0.01;0.02;0.05;0.03;0.04;0.10;0.09;0.07;0.06;0.08;0.23;0.21;0.27;0.26;0.28;0.22;0.17;0.11;0.14",
+            "scope": "variant",
             "maximum_length_of_value": 4
         },
         "spliceai_dp_ag": {
@@ -761,6 +1155,10 @@
             "description": "delta positions (DP) for acceptor gain (AG)",
             "source_name": "SPLICEAI",
             "source_version": "20191004",
+            "annotation_category": "splicing",
+            "schema_description": "delta positions (DP) for acceptor gain (AG)",
+            "value_example": "-40;1;-50;-28;-47;-42;18;14;-43;17;-31;-45;-33;30;-10;-35;-48;-49;-13;2",
+            "scope": "variant",
             "maximum_length_of_value": 3
         },
         "spliceai_dp_al": {
@@ -770,6 +1168,10 @@
             "description": "delta positions (DP) for acceptor loss (AL)",
             "source_name": "SPLICEAI",
             "source_version": "20191004",
+            "annotation_category": "splicing",
+            "schema_description": "delta positions (DP) for acceptor loss (AL)",
+            "value_example": "-49;-40;-15;-41;-42;-17;-6;-43;-7;-44;-45;-39;-46;6;-47;-48;5;-8;-2;-38",
+            "scope": "variant",
             "maximum_length_of_value": 3
         },
         "spliceai_dp_dg": {
@@ -779,6 +1181,10 @@
             "description": "delta positions (DP) for donor gain (DG)",
             "source_name": "SPLICEAI",
             "source_version": "20191004",
+            "annotation_category": "splicing",
+            "schema_description": "delta positions (DP) for donor gain (DG)",
+            "value_example": "-40;12;-28;-27;-42;-43;10;9;-44;8;-45;14;3;15;-47;31;-3;-48;4;-49",
+            "scope": "variant",
             "maximum_length_of_value": 3
         },
         "spliceai_dp_dl": {
@@ -788,6 +1194,10 @@
             "description": "delta positions (DP) for donor loss (DL)",
             "source_name": "SPLICEAI",
             "source_version": "20191004",
+            "annotation_category": "splicing",
+            "schema_description": "delta positions (DP) for donor loss (DL)",
+            "value_example": "20;-25;-41;-42;-16;18;-23;-43;17;-44;9;-45;-32;-19;-46;6;-47;-48;5;11",
+            "scope": "variant",
             "maximum_length_of_value": 3
         },
         "max_pop_af_af_popmax": {
@@ -797,9 +1207,13 @@
             "description": "maximum population allele frequency from gnomAD gnome v3.0",
             "source_name": "MAX_POP_AF",
             "source_version": "0.2",
+            "annotation_category": "population frequency",
+            "schema_description": "maximum population allele frequency from gnomAD gnome v3.0",
+            "value_example": "1.65366e-05;9.1985e-05;5.35045e-05;1.54828e-05;1.54851e-05;0.000146456;1.54823e-05;0.000957854;0.0106084;1.54871e-05;2.37937e-05;0.000319285;1.54861e-05;1.54832e-05;0.000319081;1.54847e-05;1.54914e-05;7.32601e-05;4.761e-05;0.00135785",
+            "scope": "variant",
             "maximum_length_of_value": 11,
-            "column_priority": 9,
-            "facet_priority": 4
+            "column_order": 5,
+            "facet_order": 14
         },
         "gnomad_ac": {
             "title": "gnomad_ac",
@@ -808,6 +1222,10 @@
             "description": "Alternate allele count for samples",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
+            "annotation_category": "population frequency",
+            "schema_description": "Alternate allele count for samples",
+            "value_example": "1;3;2;4;460;58;12;1149;5;1227;65;20;7;441;23;10;11;991;215;6",
+            "scope": "variant",
             "maximum_length_of_value": 6
         },
         "gnomad_ac_afr": {
@@ -817,6 +1235,10 @@
             "description": "Alternate allele count for samples of African-American/African ancestry",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
+            "annotation_category": "population frequency",
+            "schema_description": "Alternate allele count for samples of African-American/African ancestry",
+            "value_example": "0;3;2;446;1;57;4;7;1099;1158;58;428;908;8;6;40;5;6951;21;10",
+            "scope": "variant",
             "maximum_length_of_value": 5
         },
         "gnomad_ac_ami": {
@@ -826,6 +1248,10 @@
             "description": "Alternate allele count for samples of Amish ancestry",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
+            "annotation_category": "population frequency",
+            "schema_description": "Alternate allele count for samples of Amish ancestry",
+            "value_example": "0;11;326;16;291;106;293;5;104;14;30;6;2;1;8;3;73;7;43;13",
+            "scope": "variant",
             "maximum_length_of_value": 3
         },
         "gnomad_ac_amr": {
@@ -835,6 +1261,10 @@
             "description": "Alternate allele count for samples of Latino ancestry",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
+            "annotation_category": "population frequency",
+            "schema_description": "Alternate allele count for samples of Latino ancestry",
+            "value_example": "0;2;10;1;36;41;5;13;8;19;23;2428;3;9;16;82;21;17;15;80",
+            "scope": "variant",
             "maximum_length_of_value": 5
         },
         "gnomad_ac_asj": {
@@ -844,6 +1274,10 @@
             "description": "Alternate allele count for samples of Ashkenazi Jewish ancestry",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
+            "annotation_category": "population frequency",
+            "schema_description": "Alternate allele count for samples of Ashkenazi Jewish ancestry",
+            "value_example": "0;1;6;8;914;3;9;85;12;641;677;589;588;582;619;674;670;672;47;61",
+            "scope": "variant",
             "maximum_length_of_value": 4
         },
         "gnomad_ac_eas": {
@@ -853,6 +1287,10 @@
             "description": "Alternate allele count for samples of East Asian ancestry",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
+            "annotation_category": "population frequency",
+            "schema_description": "Alternate allele count for samples of East Asian ancestry",
+            "value_example": "0;3;1;14;7;2;70;6;5;68;658;657;10;654;67;655;660;9;37;29",
+            "scope": "variant",
             "maximum_length_of_value": 4
         },
         "gnomad_ac_fin": {
@@ -862,6 +1300,10 @@
             "description": "Alternate allele count for samples of Finnish ancestry",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
+            "annotation_category": "population frequency",
+            "schema_description": "Alternate allele count for samples of Finnish ancestry",
+            "value_example": "0;12;1;57;7;3225;189;24;5;217;493;13;2612;2;1128;491;3;9;637;492",
+            "scope": "variant",
             "maximum_length_of_value": 5
         },
         "gnomad_ac_nfe": {
@@ -871,6 +1313,10 @@
             "description": "Alternate allele count for samples of Non-Finnish European ancestry",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
+            "annotation_category": "population frequency",
+            "schema_description": "Alternate allele count for samples of Non-Finnish European ancestry",
+            "value_example": "1;0;5;3;13;2;11;7;29;112;19;4;299;8;6;21844;10;21;9;273",
+            "scope": "variant",
             "maximum_length_of_value": 5
         },
         "gnomad_ac_sas": {
@@ -880,6 +1326,10 @@
             "description": "Alternate allele count for samples of South Asian ancestry",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
+            "annotation_category": "population frequency",
+            "schema_description": "Alternate allele count for samples of South Asian ancestry",
+            "value_example": "0;4;1;3;474;2;5;44;412;689;46;640;47;627;415;10;685;686;665;26",
+            "scope": "variant",
             "maximum_length_of_value": 4
         },
         "gnomad_ac_oth": {
@@ -889,6 +1339,10 @@
             "description": "Alternate allele count for samples of Other ancestry",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
+            "annotation_category": "population frequency",
+            "schema_description": "Alternate allele count for samples of Other ancestry",
+            "value_example": "0;4;10;15;1;5;3;496;33;77;2;361;536;111;425;438;13;302;360;7",
+            "scope": "variant",
             "maximum_length_of_value": 4
         },
         "gnomad_ac_male": {
@@ -898,6 +1352,10 @@
             "description": "Alternate allele count for male samples",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
+            "annotation_category": "population frequency",
+            "schema_description": "Alternate allele count for male samples",
+            "value_example": "1;2;0;219;22;4;542;572;26;201;14;447;107;3;15;169;11;17501;6;10",
+            "scope": "variant",
             "maximum_length_of_value": 5
         },
         "gnomad_ac_afr_male": {
@@ -907,6 +1365,10 @@
             "description": "Alternate allele count for male samples of African-American/African ancestry",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
+            "annotation_category": "population frequency",
+            "schema_description": "Alternate allele count for male samples of African-American/African ancestry",
+            "value_example": "0;1;2;213;21;3;519;538;23;192;400;4;18;3194;6;12;9;17;337;55",
+            "scope": "variant",
             "maximum_length_of_value": 5
         },
         "gnomad_ac_ami_male": {
@@ -916,6 +1378,10 @@
             "description": "Alternate allele count for male samples of Amish ancestry",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
+            "annotation_category": "population frequency",
+            "schema_description": "Alternate allele count for male samples of Amish ancestry",
+            "value_example": "0;6;159;4;136;56;3;54;15;1;5;38;2;24;17;37;40;55;18;53",
+            "scope": "variant",
             "maximum_length_of_value": 3
         },
         "gnomad_ac_amr_male": {
@@ -925,6 +1391,10 @@
             "description": "Alternate allele count for male samples of Latino ancestry",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
+            "annotation_category": "population frequency",
+            "schema_description": "Alternate allele count for male samples of Latino ancestry",
+            "value_example": "0;1;3;17;24;9;2;26;11;10;1364;6;7;52;20;4;14;8;45;146",
+            "scope": "variant",
             "maximum_length_of_value": 4
         },
         "gnomad_ac_asj_male": {
@@ -934,6 +1404,10 @@
             "description": "Alternate allele count for male samples of Ashkenazi Jewish ancestry",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
+            "annotation_category": "population frequency",
+            "schema_description": "Alternate allele count for male samples of Ashkenazi Jewish ancestry",
+            "value_example": "0;3;5;424;1;2;42;6;297;313;269;268;266;288;309;310;19;34;14;12",
+            "scope": "variant",
             "maximum_length_of_value": 4
         },
         "gnomad_ac_eas_male": {
@@ -943,6 +1417,10 @@
             "description": "Alternate allele count for male samples of East Asian ancestry",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
+            "annotation_category": "population frequency",
+            "schema_description": "Alternate allele count for male samples of East Asian ancestry",
+            "value_example": "0;1;4;45;2;40;341;339;335;337;342;5;20;9;34;29;187;16;27;6",
+            "scope": "variant",
             "maximum_length_of_value": 4
         },
         "gnomad_ac_fin_male": {
@@ -952,6 +1430,10 @@
             "description": "Alternate allele count for male samples of Finnish ancestry",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
+            "annotation_category": "population frequency",
+            "schema_description": "Alternate allele count for male samples of Finnish ancestry",
+            "value_example": "0;9;40;1;3;2421;148;18;5;169;373;10;1959;835;371;2;7;464;372;467",
+            "scope": "variant",
             "maximum_length_of_value": 4
         },
         "gnomad_ac_nfe_male": {
@@ -961,6 +1443,10 @@
             "description": "Alternate allele count for male samples of Non-Finnish European ancestry",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
+            "annotation_category": "population frequency",
+            "schema_description": "Alternate allele count for male samples of Non-Finnish European ancestry",
+            "value_example": "1;0;2;5;13;44;8;3;133;4;9261;7;10;118;9;11;72;687;70;28",
+            "scope": "variant",
             "maximum_length_of_value": 5
         },
         "gnomad_ac_sas_male": {
@@ -970,6 +1456,10 @@
             "description": "Alternate allele count for male samples of South Asian ancestry",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
+            "annotation_category": "population frequency",
+            "schema_description": "Alternate allele count for male samples of South Asian ancestry",
+            "value_example": "0;2;1;393;4;40;5;328;558;41;517;42;506;331;9;555;3;556;538;20",
+            "scope": "variant",
             "maximum_length_of_value": 4
         },
         "gnomad_ac_oth_male": {
@@ -979,6 +1469,10 @@
             "description": "Alternate allele count for male samples of Other ancestry",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
+            "annotation_category": "population frequency",
+            "schema_description": "Alternate allele count for male samples of Other ancestry",
+            "value_example": "0;3;5;7;2;240;1;4;15;35;169;258;53;204;208;9;146;168;256;268",
+            "scope": "variant",
             "maximum_length_of_value": 4
         },
         "gnomad_ac_female": {
@@ -988,6 +1482,10 @@
             "description": "Alternate allele count for female samples",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
+            "annotation_category": "population frequency",
+            "schema_description": "Alternate allele count for female samples",
+            "value_example": "0;2;1;241;36;3;8;607;655;39;16;240;9;10;544;108;20;209;4;6",
+            "scope": "variant",
             "maximum_length_of_value": 5
         },
         "gnomad_ac_afr_female": {
@@ -997,6 +1495,10 @@
             "description": "Alternate allele count for female samples of African-American/African ancestry",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
+            "annotation_category": "population frequency",
+            "schema_description": "Alternate allele count for female samples of African-American/African ancestry",
+            "value_example": "0;2;233;1;36;3;4;580;620;35;236;508;6;22;3757;17;16;7;32;415",
+            "scope": "variant",
             "maximum_length_of_value": 5
         },
         "gnomad_ac_ami_female": {
@@ -1006,6 +1508,10 @@
             "description": "Alternate allele count for female samples of Amish ancestry",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
+            "annotation_category": "population frequency",
+            "schema_description": "Alternate allele count for female samples of Amish ancestry",
+            "value_example": "0;5;167;12;155;50;157;2;8;15;3;1;35;19;7;20;38;21;48;49",
+            "scope": "variant",
             "maximum_length_of_value": 3
         },
         "gnomad_ac_amr_female": {
@@ -1015,6 +1521,10 @@
             "description": "Alternate allele count for female samples of Latino ancestry",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
+            "annotation_category": "population frequency",
+            "schema_description": "Alternate allele count for female samples of Latino ancestry",
+            "value_example": "0;1;7;19;17;2;4;6;15;8;5;13;1064;3;30;9;35;104;917;1157",
+            "scope": "variant",
             "maximum_length_of_value": 4
         },
         "gnomad_ac_asj_female": {
@@ -1024,6 +1534,10 @@
             "description": "Alternate allele count for female samples of Ashkenazi Jewish ancestry",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
+            "annotation_category": "population frequency",
+            "schema_description": "Alternate allele count for female samples of Ashkenazi Jewish ancestry",
+            "value_example": "0;1;3;490;6;43;344;364;320;316;331;361;9;362;28;27;2;14;22;196",
+            "scope": "variant",
             "maximum_length_of_value": 4
         },
         "gnomad_ac_eas_female": {
@@ -1033,6 +1547,10 @@
             "description": "Alternate allele count for female samples of East Asian ancestry",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
+            "annotation_category": "population frequency",
+            "schema_description": "Alternate allele count for female samples of East Asian ancestry",
+            "value_example": "0;2;1;10;3;25;4;28;317;318;319;6;315;27;320;17;20;36;21;171",
+            "scope": "variant",
             "maximum_length_of_value": 4
         },
         "gnomad_ac_fin_female": {
@@ -1042,6 +1560,10 @@
             "description": "Alternate allele count for female samples of Finnish ancestry",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
+            "annotation_category": "population frequency",
+            "schema_description": "Alternate allele count for female samples of Finnish ancestry",
+            "value_example": "0;3;1;17;4;804;41;6;48;120;2;653;293;173;33;292;291;66;286;9",
+            "scope": "variant",
             "maximum_length_of_value": 4
         },
         "gnomad_ac_nfe_female": {
@@ -1051,6 +1573,10 @@
             "description": "Alternate allele count for female samples of Non-Finnish European ancestry",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
+            "annotation_category": "population frequency",
+            "schema_description": "Alternate allele count for female samples of Non-Finnish European ancestry",
+            "value_example": "0;1;4;8;6;16;68;2;11;166;12583;3;7;155;10;22;9;12;79;941",
+            "scope": "variant",
             "maximum_length_of_value": 5
         },
         "gnomad_ac_sas_female": {
@@ -1060,6 +1586,10 @@
             "description": "Alternate allele count for female samples of South Asian ancestry",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
+            "annotation_category": "population frequency",
+            "schema_description": "Alternate allele count for female samples of South Asian ancestry",
+            "value_example": "0;2;1;81;4;84;131;5;123;121;130;127;6;7;20;42;3;40;9;46",
+            "scope": "variant",
             "maximum_length_of_value": 3
         },
         "gnomad_ac_oth_female": {
@@ -1069,6 +1599,10 @@
             "description": "Alternate allele count for female samples of Other ancestry",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
+            "annotation_category": "population frequency",
+            "schema_description": "Alternate allele count for female samples of Other ancestry",
+            "value_example": "0;1;7;10;5;3;256;2;18;42;192;278;58;221;230;4;156;290;272;6",
+            "scope": "variant",
             "maximum_length_of_value": 4
         },
         "gnomad_ac_raw": {
@@ -1078,6 +1612,10 @@
             "description": "Alternate allele count for samples before removing low-confidence genotypes",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
+            "annotation_category": "population frequency",
+            "schema_description": "Alternate allele count for samples before removing low-confidence genotypes",
+            "value_example": "1;3;2;4;460;58;12;1155;5;1230;65;20;7;441;23;10;11;1006;234;6",
+            "scope": "variant",
             "maximum_length_of_value": 6
         },
         "gnomad_an": {
@@ -1087,6 +1625,10 @@
             "description": "Total number of alleles in samples",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
+            "annotation_category": "population frequency",
+            "schema_description": "Total number of alleles in samples",
+            "value_example": "123474;127784;135984;143312;143316;143326;143340;143286;143324;143236;143302;143260;143282;143094;143224;143234;143218;143256;143194;143046",
+            "scope": "variant",
             "maximum_length_of_value": 6
         },
         "gnomad_an_afr": {
@@ -1096,6 +1638,10 @@
             "description": "Total number of alleles in samples of African-American/African ancestry",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
+            "annotation_category": "population frequency",
+            "schema_description": "Total number of alleles in samples of African-American/African ancestry",
+            "value_example": "30198;32614;37380;42030;42040;42052;42046;42056;42042;42006;42028;42008;42036;42012;41946;42002;41978;41992;41906;41804",
+            "scope": "variant",
             "maximum_length_of_value": 5
         },
         "gnomad_an_ami": {
@@ -1105,6 +1651,10 @@
             "description": "Total number of alleles in samples of Amish ancestry",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
+            "annotation_category": "population frequency",
+            "schema_description": "Total number of alleles in samples of Amish ancestry",
+            "value_example": "848;856;874;900;898;896;888;882;884;876;878;880;886;890;892;894;870;872;846;820",
+            "scope": "variant",
             "maximum_length_of_value": 3
         },
         "gnomad_an_amr": {
@@ -1114,6 +1664,10 @@
             "description": "Total number of alleles in samples of Latino ancestry",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
+            "annotation_category": "population frequency",
+            "schema_description": "Total number of alleles in samples of Latino ancestry",
+            "value_example": "12176;12454;13138;13660;13654;13656;13662;13658;13652;13650;13648;13640;13644;13646;13572;13568;13634;13664;13642;13618",
+            "scope": "variant",
             "maximum_length_of_value": 5
         },
         "gnomad_an_asj": {
@@ -1123,6 +1677,10 @@
             "description": "Total number of alleles in samples of Ashkenazi Jewish ancestry",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
+            "annotation_category": "population frequency",
+            "schema_description": "Total number of alleles in samples of Ashkenazi Jewish ancestry",
+            "value_example": "3024;3088;3220;3324;3322;3320;3318;3316;3314;3154;3158;3182;3312;3310;3298;3300;3292;3302;3290;3288",
+            "scope": "variant",
             "maximum_length_of_value": 4
         },
         "gnomad_an_eas": {
@@ -1132,6 +1690,10 @@
             "description": "Total number of alleles in samples of East Asian ancestry",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
+            "annotation_category": "population frequency",
+            "schema_description": "Total number of alleles in samples of East Asian ancestry",
+            "value_example": "2936;2984;3080;3134;3132;3130;3128;3126;3122;3124;3118;3104;3120;3110;3098;3116;3090;3082;3094;3050",
+            "scope": "variant",
             "maximum_length_of_value": 4
         },
         "gnomad_an_fin": {
@@ -1141,6 +1703,10 @@
             "description": "Total number of alleles in samples of Finnish ancestry",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
+            "annotation_category": "population frequency",
+            "schema_description": "Total number of alleles in samples of Finnish ancestry",
+            "value_example": "9288;9522;10016;10476;10480;10462;10468;10482;10478;10458;10466;10452;10406;10446;10448;10486;10484;10444;10472;10470",
+            "scope": "variant",
             "maximum_length_of_value": 5
         },
         "gnomad_an_nfe": {
@@ -1150,6 +1716,10 @@
             "description": "Total number of alleles in samples of Non-Finnish European ancestry",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
+            "annotation_category": "population frequency",
+            "schema_description": "Total number of alleles in samples of Non-Finnish European ancestry",
+            "value_example": "60472;61584;63356;64588;64578;64584;64590;64566;64570;64592;64574;64586;64580;64552;64572;64582;64568;64576;64562;64556",
+            "scope": "variant",
             "maximum_length_of_value": 5
         },
         "gnomad_an_sas": {
@@ -1159,6 +1729,10 @@
             "description": "Total number of alleles in samples of South Asian ancestry",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
+            "annotation_category": "population frequency",
+            "schema_description": "Total number of alleles in samples of South Asian ancestry",
+            "value_example": "2668;2764;2864;3048;3050;3046;3038;3052;3044;3042;3040;3030;3036;3034;3024;3032;3028;3026;3020;3014",
+            "scope": "variant",
             "maximum_length_of_value": 4
         },
         "gnomad_an_oth": {
@@ -1168,6 +1742,10 @@
             "description": "Total number of alleles in samples of Other ancestry",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
+            "annotation_category": "population frequency",
+            "schema_description": "Total number of alleles in samples of Other ancestry",
+            "value_example": "1864;1918;2056;2152;2154;2150;2128;2132;2144;2146;2148;2142;2124;2126;2130;2138;2118;1930;1932;1978",
+            "scope": "variant",
             "maximum_length_of_value": 4
         },
         "gnomad_an_male": {
@@ -1177,6 +1755,10 @@
             "description": "Total number of alleles in male samples",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
+            "annotation_category": "population frequency",
+            "schema_description": "Total number of alleles in male samples",
+            "value_example": "59752;61784;65762;69456;69464;69448;69474;69438;69470;69404;69452;69426;69424;69326;69394;69408;69396;69416;69390;69310",
+            "scope": "variant",
             "maximum_length_of_value": 5
         },
         "gnomad_an_afr_male": {
@@ -1186,6 +1768,10 @@
             "description": "Total number of alleles in male samples of African-American/African ancestry",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
+            "annotation_category": "population frequency",
+            "schema_description": "Total number of alleles in male samples of African-American/African ancestry",
+            "value_example": "13862;14930;17116;19342;19348;19350;19338;19324;19336;19316;19328;19306;19326;19310;19260;19210;19224;19220;19304;18248",
+            "scope": "variant",
             "maximum_length_of_value": 5
         },
         "gnomad_an_ami_male": {
@@ -1195,6 +1781,10 @@
             "description": "Total number of alleles in male samples of Amish ancestry",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
+            "annotation_category": "population frequency",
+            "schema_description": "Total number of alleles in male samples of Amish ancestry",
+            "value_example": "394;400;416;430;428;424;420;422;418;426;412;396;320;336;330;226;376;354;348;392",
+            "scope": "variant",
             "maximum_length_of_value": 3
         },
         "gnomad_an_amr_male": {
@@ -1204,6 +1794,10 @@
             "description": "Total number of alleles in male samples of Latino ancestry",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
+            "annotation_category": "population frequency",
+            "schema_description": "Total number of alleles in male samples of Latino ancestry",
+            "value_example": "6844;7012;7428;7746;7742;7750;7748;7752;7740;7734;7738;7702;7698;7724;7736;7744;7732;7728;7710;7712",
+            "scope": "variant",
             "maximum_length_of_value": 4
         },
         "gnomad_an_asj_male": {
@@ -1213,6 +1807,10 @@
             "description": "Total number of alleles in male samples of Ashkenazi Jewish ancestry",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
+            "annotation_category": "population frequency",
+            "schema_description": "Total number of alleles in male samples of Ashkenazi Jewish ancestry",
+            "value_example": "1426;1458;1520;1562;1560;1558;1556;1478;1480;1494;1554;1550;1542;1546;1552;1538;1524;1540;1548;1518",
+            "scope": "variant",
             "maximum_length_of_value": 4
         },
         "gnomad_an_eas_male": {
@@ -1222,6 +1820,10 @@
             "description": "Total number of alleles in male samples of East Asian ancestry",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
+            "annotation_category": "population frequency",
+            "schema_description": "Total number of alleles in male samples of East Asian ancestry",
+            "value_example": "1582;1614;1658;1686;1684;1682;1680;1678;1664;1674;1672;1668;1662;1670;1650;1640;1636;1656;1666;1660",
+            "scope": "variant",
             "maximum_length_of_value": 4
         },
         "gnomad_an_fin_male": {
@@ -1231,6 +1833,10 @@
             "description": "Total number of alleles in male samples of Finnish ancestry",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
+            "annotation_category": "population frequency",
+            "schema_description": "Total number of alleles in male samples of Finnish ancestry",
+            "value_example": "7048;7238;7612;7970;7976;7958;7964;7978;7972;7974;7954;7962;7948;7956;7910;7944;7980;7982;7946;7968",
+            "scope": "variant",
             "maximum_length_of_value": 4
         },
         "gnomad_an_nfe_male": {
@@ -1240,6 +1846,10 @@
             "description": "Total number of alleles in male samples of Non-Finnish European ancestry",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
+            "annotation_category": "population frequency",
+            "schema_description": "Total number of alleles in male samples of Non-Finnish European ancestry",
+            "value_example": "25500;25946;26672;27186;27184;27190;27172;27188;27182;27180;27166;27176;27192;27170;27174;27118;27098;27104;27080;27072",
+            "scope": "variant",
             "maximum_length_of_value": 5
         },
         "gnomad_an_sas_male": {
@@ -1249,6 +1859,10 @@
             "description": "Total number of alleles in male samples of South Asian ancestry",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
+            "annotation_category": "population frequency",
+            "schema_description": "Total number of alleles in male samples of South Asian ancestry",
+            "value_example": "2182;2256;2336;2482;2484;2480;2474;2486;2478;2476;2472;2464;2470;2466;2462;2468;2460;2456;2370;2364",
+            "scope": "variant",
             "maximum_length_of_value": 4
         },
         "gnomad_an_oth_male": {
@@ -1258,6 +1872,10 @@
             "description": "Total number of alleles in male samples of Other ancestry",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
+            "annotation_category": "population frequency",
+            "schema_description": "Total number of alleles in male samples of Other ancestry",
+            "value_example": "914;930;1004;1052;1054;1050;1046;1048;1038;1034;1036;1044;944;972;1042;1040;996;988;1008;1014",
+            "scope": "variant",
             "maximum_length_of_value": 4
         },
         "gnomad_an_female": {
@@ -1267,6 +1885,10 @@
             "description": "Total number of alleles in female samples",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
+            "annotation_category": "population frequency",
+            "schema_description": "Total number of alleles in female samples",
+            "value_example": "63722;66000;70222;73856;73848;73868;73870;73866;73854;73832;73850;73834;73844;73836;73768;73830;73826;73822;73840;73804",
+            "scope": "variant",
             "maximum_length_of_value": 5
         },
         "gnomad_an_afr_female": {
@@ -1276,6 +1898,10 @@
             "description": "Total number of alleles in female samples of African-American/African ancestry",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
+            "annotation_category": "population frequency",
+            "schema_description": "Total number of alleles in female samples of African-American/African ancestry",
+            "value_example": "16336;17684;20264;22688;22692;22704;22706;22700;22682;22694;22684;22680;22640;22678;22672;22646;22594;22582;22650;22648",
+            "scope": "variant",
             "maximum_length_of_value": 5
         },
         "gnomad_an_ami_female": {
@@ -1285,6 +1911,10 @@
             "description": "Total number of alleles in female samples of Amish ancestry",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
+            "annotation_category": "population frequency",
+            "schema_description": "Total number of alleles in female samples of Amish ancestry",
+            "value_example": "454;456;458;470;468;464;462;460;466;448;452;434;424;322;376;360;244;450;418;398",
+            "scope": "variant",
             "maximum_length_of_value": 3
         },
         "gnomad_an_amr_female": {
@@ -1294,6 +1924,10 @@
             "description": "Total number of alleles in female samples of Latino ancestry",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
+            "annotation_category": "population frequency",
+            "schema_description": "Total number of alleles in female samples of Latino ancestry",
+            "value_example": "5332;5442;5710;5914;5912;5916;5906;5902;5904;5908;5870;5910;5894;5886;5890;5896;5866;5862;5888;5864",
+            "scope": "variant",
             "maximum_length_of_value": 4
         },
         "gnomad_an_asj_female": {
@@ -1303,6 +1937,10 @@
             "description": "Total number of alleles in female samples of Ashkenazi Jewish ancestry",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
+            "annotation_category": "population frequency",
+            "schema_description": "Total number of alleles in female samples of Ashkenazi Jewish ancestry",
+            "value_example": "1598;1630;1700;1762;1760;1758;1756;1754;1676;1678;1688;1744;1746;1742;1748;1738;1752;1750;1736;1728",
+            "scope": "variant",
             "maximum_length_of_value": 4
         },
         "gnomad_an_eas_female": {
@@ -1312,6 +1950,10 @@
             "description": "Total number of alleles in female samples of East Asian ancestry",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
+            "annotation_category": "population frequency",
+            "schema_description": "Total number of alleles in female samples of East Asian ancestry",
+            "value_example": "1354;1370;1422;1448;1446;1444;1442;1440;1438;1436;1432;1430;1428;1424;1426;1410;1398;1412;1414;1400",
+            "scope": "variant",
             "maximum_length_of_value": 4
         },
         "gnomad_an_fin_female": {
@@ -1321,6 +1963,10 @@
             "description": "Total number of alleles in female samples of Finnish ancestry",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
+            "annotation_category": "population frequency",
+            "schema_description": "Total number of alleles in female samples of Finnish ancestry",
+            "value_example": "2240;2284;2404;2506;2504;2502;2496;2500;2498;2488;2468;2466;2458;2492;2456;2472;2480;2476;2494;2482",
+            "scope": "variant",
             "maximum_length_of_value": 4
         },
         "gnomad_an_nfe_female": {
@@ -1330,6 +1976,10 @@
             "description": "Total number of alleles in female samples of Non-Finnish European ancestry",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
+            "annotation_category": "population frequency",
+            "schema_description": "Total number of alleles in female samples of Non-Finnish European ancestry",
+            "value_example": "34972;35638;36684;37402;37394;37400;37398;37404;37392;37386;37396;37388;37382;37390;37384;37374;37362;37296;37264;37286",
+            "scope": "variant",
             "maximum_length_of_value": 5
         },
         "gnomad_an_sas_female": {
@@ -1339,6 +1989,10 @@
             "description": "Total number of alleles in female samples of South Asian ancestry",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
+            "annotation_category": "population frequency",
+            "schema_description": "Total number of alleles in female samples of South Asian ancestry",
+            "value_example": "486;508;528;566;564;562;558;560;556;554;550;552;540;544;498;538;546;514;534;494",
+            "scope": "variant",
             "maximum_length_of_value": 3
         },
         "gnomad_an_oth_female": {
@@ -1348,6 +2002,10 @@
             "description": "Total number of alleles in female samples of Other ancestry",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
+            "annotation_category": "population frequency",
+            "schema_description": "Total number of alleles in female samples of Other ancestry",
+            "value_example": "950;988;1052;1100;1098;1082;1084;1096;1094;1090;1092;1088;986;1006;1086;1050;1074;1038;1036;1022",
+            "scope": "variant",
             "maximum_length_of_value": 4
         },
         "gnomad_an_raw": {
@@ -1357,6 +2015,10 @@
             "description": "Total number of alleles in samples before removing low-confidence genotypes",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
+            "annotation_category": "population frequency",
+            "schema_description": "Total number of alleles in samples before removing low-confidence genotypes",
+            "value_example": "128854;132628;138990;143380;143378;143382;143388;143392;143384;143354;143376;143370;143348;143364;143344;143318;143346;143362;143316;143292",
+            "scope": "variant",
             "maximum_length_of_value": 6
         },
         "gnomad_af": {
@@ -1366,6 +2028,10 @@
             "description": "Alternate allele frequency in samples",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
+            "annotation_category": "population frequency",
+            "schema_description": "Alternate allele frequency in samples",
+            "value_example": "8.09887e-06;2.34771e-05;1.47076e-05;6.97778e-06;2.79111e-05;1.39552e-05;6.97710e-06;6.97642e-06;2.79162e-05;3.20951e-03;6.98149e-06;6.97827e-06;6.98032e-06;6.97924e-06;6.98841e-06;6.98207e-06;1.39632e-05;4.04977e-04;1.39610e-05;2.79341e-05",
+            "scope": "variant",
             "maximum_length_of_value": 11
         },
         "gnomad_af_afr": {
@@ -1375,6 +2041,10 @@
             "description": "Alternate allele frequency in samples of African-American/African ancestry",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
+            "annotation_category": "population frequency",
+            "schema_description": "Alternate allele frequency in samples of African-American/African ancestry",
+            "value_example": "0.00000e+00;9.19850e-05;5.35045e-05;1.06084e-02;2.37937e-05;4.76100e-05;1.35785e-03;2.38141e-05;9.54517e-05;2.39212e-05;1.67456e-04;2.38345e-05;2.61966e-02;1.00771e-04;2.50689e-05;2.90342e-02;1.37977e-03;2.37914e-05;4.75670e-05;7.13504e-05",
+            "scope": "variant",
             "maximum_length_of_value": 11
         },
         "gnomad_af_ami": {
@@ -1384,6 +2054,10 @@
             "description": "Alternate allele frequency in samples of Amish ancestry",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
+            "annotation_category": "population frequency",
+            "schema_description": "Alternate allele frequency in samples of Amish ancestry",
+            "value_example": "0.00000e+00;1.22494e-02;3.63839e-01;1.78174e-02;3.24777e-01;1.18040e-01;1.17778e-01;3.25556e-01;5.55556e-03;1.16071e-01;1.19369e-01;4.43038e-02;9.86842e-02;2.02703e-02;6.21118e-03;7.09220e-03;3.12500e-03;8.88889e-03;3.34076e-03;8.37156e-02",
+            "scope": "variant",
             "maximum_length_of_value": 11
         },
         "gnomad_af_amr": {
@@ -1393,6 +2067,10 @@
             "description": "Alternate allele frequency in samples of Latino ancestry",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
+            "annotation_category": "population frequency",
+            "schema_description": "Alternate allele frequency in samples of Latino ancestry",
+            "value_example": "0.00000e+00;1.46456e-04;7.32279e-04;7.32601e-05;7.32386e-05;7.32172e-05;2.63659e-03;3.02182e-03;3.66247e-04;7.32708e-05;9.51684e-04;7.34322e-05;5.87458e-04;7.32493e-05;3.00895e-03;1.39439e-03;7.38116e-05;5.86682e-04;7.36052e-05;7.35294e-05",
+            "scope": "variant",
             "maximum_length_of_value": 11
         },
         "gnomad_af_asj": {
@@ -1402,6 +2080,10 @@
             "description": "Alternate allele frequency in samples of Ashkenazi Jewish ancestry",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
+            "annotation_category": "population frequency",
+            "schema_description": "Alternate allele frequency in samples of Ashkenazi Jewish ancestry",
+            "value_example": "0.00000e+00;3.01205e-04;1.80723e-03;2.40674e-03;2.74970e-01;3.01023e-04;9.04159e-04;2.71084e-03;2.56024e-02;3.61228e-03;9.03614e-04;3.00842e-04;1.93072e-01;2.03916e-01;2.55716e-02;1.85104e-01;1.77429e-01;1.75407e-01;1.86446e-01;1.80614e-03",
+            "scope": "variant",
             "maximum_length_of_value": 11
         },
         "gnomad_af_eas": {
@@ -1411,6 +2093,10 @@
             "description": "Alternate allele frequency in samples of East Asian ancestry",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
+            "annotation_category": "population frequency",
+            "schema_description": "Alternate allele frequency in samples of East Asian ancestry",
+            "value_example": "0.00000e+00;9.57854e-04;3.19285e-04;3.19081e-04;3.19489e-04;4.47570e-03;2.23642e-03;3.19898e-04;9.59079e-04;6.38978e-04;2.23928e-02;2.23499e-03;6.39795e-04;3.20102e-04;6.38162e-04;1.91449e-03;6.39386e-04;6.38570e-04;1.59847e-03;2.23785e-03",
+            "scope": "variant",
             "maximum_length_of_value": 11
         },
         "gnomad_af_fin": {
@@ -1420,6 +2106,10 @@
             "description": "Alternate allele frequency in samples of Finnish ancestry",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
+            "annotation_category": "population frequency",
+            "schema_description": "Alternate allele frequency in samples of Finnish ancestry",
+            "value_example": "0.00000e+00;1.14745e-03;9.54016e-05;5.47656e-03;9.71251e-05;9.68992e-05;9.54563e-05;9.65997e-05;6.76721e-04;3.11173e-01;9.55657e-05;9.53652e-05;1.81034e-02;2.29226e-03;4.77190e-04;9.54198e-05;2.07934e-02;4.71409e-02;1.24402e-03;4.77920e-04",
+            "scope": "variant",
             "maximum_length_of_value": 11
         },
         "gnomad_af_nfe": {
@@ -1429,6 +2119,10 @@
             "description": "Alternate allele frequency in samples of Non-Finnish European ancestry",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
+            "annotation_category": "population frequency",
+            "schema_description": "Alternate allele frequency in samples of Non-Finnish European ancestry",
+            "value_example": "1.65366e-05;0.00000e+00;1.54828e-05;1.54851e-05;1.54823e-05;1.54880e-05;1.54871e-05;1.54861e-05;1.54832e-05;1.54847e-05;1.54914e-05;1.54837e-05;7.74401e-05;4.64569e-05;1.54890e-05;1.54904e-05;2.01376e-04;1.54842e-05;3.09693e-05;1.54875e-05",
+            "scope": "variant",
             "maximum_length_of_value": 11
         },
         "gnomad_af_sas": {
@@ -1438,6 +2132,10 @@
             "description": "Alternate allele frequency in samples of South Asian ancestry",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
+            "annotation_category": "population frequency",
+            "schema_description": "Alternate allele frequency in samples of South Asian ancestry",
+            "value_example": "0.00000e+00;1.31148e-03;3.27654e-04;3.28299e-04;9.84898e-04;3.28515e-04;1.56539e-01;3.28947e-04;6.60502e-04;9.86842e-04;3.30251e-04;3.29164e-04;3.29815e-04;3.30033e-04;1.64908e-03;1.64799e-03;1.31234e-03;1.44737e-02;1.63934e-03;6.57895e-04",
+            "scope": "variant",
             "maximum_length_of_value": 11
         },
         "gnomad_af_oth": {
@@ -1447,6 +2145,10 @@
             "description": "Alternate allele frequency in samples of Other ancestry",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
+            "annotation_category": "population frequency",
+            "schema_description": "Alternate allele frequency in samples of Other ancestry",
+            "value_example": "0.00000e+00;1.86047e-03;4.64253e-03;7.03565e-03;4.65116e-04;2.32126e-03;4.65549e-04;4.64684e-04;4.65116e-03;1.85874e-03;4.66418e-04;1.39535e-03;2.31993e-01;6.96379e-03;4.64253e-04;2.32558e-03;1.39276e-03;1.39405e-03;2.33427e-03;1.53488e-02",
+            "scope": "variant",
             "maximum_length_of_value": 11
         },
         "gnomad_af_male": {
@@ -1456,6 +2158,10 @@
             "description": "Alternate allele frequency in male samples",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
+            "annotation_category": "population frequency",
+            "schema_description": "Alternate allele frequency in male samples",
+            "value_example": "1.67358e-05;1.61854e-05;3.04127e-05;0.00000e+00;2.87919e-05;1.43993e-05;2.88027e-05;3.15244e-03;1.44084e-05;1.44013e-05;1.44246e-05;1.44105e-05;1.44076e-05;3.17021e-04;1.44059e-05;1.44113e-05;5.76934e-05;7.80642e-03;2.92834e-05;1.46310e-05",
+            "scope": "variant",
             "maximum_length_of_value": 11
         },
         "gnomad_af_afr_male": {
@@ -1465,6 +2171,10 @@
             "description": "Alternate allele frequency in male samples of African-American/African ancestry",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
+            "annotation_category": "population frequency",
+            "schema_description": "Alternate allele frequency in male samples of African-American/African ancestry",
+            "value_example": "0.00000e+00;6.69792e-05;1.16850e-04;1.10123e-02;5.17438e-05;1.08774e-03;5.19211e-05;1.56087e-04;2.68856e-02;5.48005e-05;2.93540e-02;1.18974e-03;5.17331e-05;1.03455e-04;5.17117e-05;9.92556e-03;5.17224e-05;5.17974e-05;5.22357e-05;2.07275e-02",
+            "scope": "variant",
             "maximum_length_of_value": 11
         },
         "gnomad_af_ami_male": {
@@ -1474,6 +2184,10 @@
             "description": "Alternate allele frequency in male samples of Amish ancestry",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
+            "annotation_category": "population frequency",
+            "schema_description": "Alternate allele frequency in male samples of Amish ancestry",
+            "value_example": "0.00000e+00;1.40187e-02;3.71495e-01;9.30233e-03;3.17757e-01;1.30233e-01;3.16279e-01;6.97674e-03;1.26168e-01;1.26761e-01;3.48837e-02;9.14634e-02;1.82927e-02;5.74713e-03;6.66667e-03;5.68182e-03;1.16279e-02;9.04762e-02;2.33645e-03;1.13636e-02",
+            "scope": "variant",
             "maximum_length_of_value": 11
         },
         "gnomad_af_amr_male": {
@@ -1483,6 +2197,10 @@
             "description": "Alternate allele frequency in male samples of Latino ancestry",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
+            "annotation_category": "population frequency",
+            "schema_description": "Alternate allele frequency in male samples of Latino ancestry",
+            "value_example": "0.00000e+00;1.29166e-04;3.87097e-04;1.29232e-04;1.29199e-04;2.19468e-03;3.11769e-03;3.87497e-04;1.16129e-03;2.58799e-04;3.36004e-03;1.42156e-03;3.87797e-04;1.29601e-04;1.29534e-04;2.59471e-04;1.29433e-03;1.29500e-04;1.29132e-04;1.76592e-01",
+            "scope": "variant",
             "maximum_length_of_value": 11
         },
         "gnomad_af_asj_male": {
@@ -1492,6 +2210,10 @@
             "description": "Alternate allele frequency in male samples of Ashkenazi Jewish ancestry",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
+            "annotation_category": "population frequency",
+            "schema_description": "Alternate allele frequency in male samples of Ashkenazi Jewish ancestry",
+            "value_example": "0.00000e+00;1.92061e-03;3.20102e-03;2.71447e-01;6.41026e-04;1.28205e-03;2.68886e-02;3.84123e-03;1.28041e-03;6.40205e-04;1.90141e-01;2.00641e-01;1.80054e-01;1.72458e-01;2.69576e-02;1.70732e-01;1.84615e-01;2.00384e-01;1.98842e-01;1.92308e-03",
+            "scope": "variant",
             "maximum_length_of_value": 11
         },
         "gnomad_af_eas_male": {
@@ -1501,6 +2223,10 @@
             "description": "Alternate allele frequency in male samples of East Asian ancestry",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
+            "annotation_category": "population frequency",
+            "schema_description": "Alternate allele frequency in male samples of East Asian ancestry",
+            "value_example": "0.00000e+00;5.93824e-04;2.37812e-03;2.37530e-03;5.93120e-04;5.94530e-04;2.68176e-02;2.37248e-03;1.18765e-03;5.95238e-04;1.18624e-03;2.38095e-03;2.37530e-02;2.02735e-01;2.01786e-01;2.02026e-01;2.38095e-02;2.01322e-01;5.98086e-04;2.01555e-01",
+            "scope": "variant",
             "maximum_length_of_value": 11
         },
         "gnomad_af_fin_male": {
@@ -1510,6 +2236,10 @@
             "description": "Alternate allele frequency in male samples of Finnish ancestry",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
+            "annotation_category": "population frequency",
+            "schema_description": "Alternate allele frequency in male samples of Finnish ancestry",
+            "value_example": "0.00000e+00;1.13151e-03;5.05306e-03;1.27551e-04;1.27356e-04;1.25439e-04;1.26839e-04;3.80904e-04;3.07780e-01;1.25628e-04;1.86492e-02;2.25790e-03;6.27195e-04;2.12954e-02;4.68946e-02;1.25755e-03;3.76979e-04;1.25502e-04;2.46912e-01;1.25471e-04",
+            "scope": "variant",
             "maximum_length_of_value": 11
         },
         "gnomad_af_nfe_male": {
@@ -1519,6 +2249,10 @@
             "description": "Alternate allele frequency in male samples of Non-Finnish European ancestry",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
+            "annotation_category": "population frequency",
+            "schema_description": "Alternate allele frequency in male samples of Non-Finnish European ancestry",
+            "value_example": "3.92157e-05;0.00000e+00;3.68026e-05;3.67809e-05;3.68107e-05;3.67863e-05;7.35673e-05;3.67918e-05;1.84013e-04;3.67891e-05;3.68053e-05;1.83999e-04;3.67782e-05;3.69276e-05;3.69385e-05;4.78539e-04;1.61967e-03;3.68134e-05;3.68161e-05;2.94377e-04",
+            "scope": "variant",
             "maximum_length_of_value": 11
         },
         "gnomad_af_sas_male": {
@@ -1528,6 +2262,10 @@
             "description": "Alternate allele frequency in male samples of South Asian ancestry",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
+            "annotation_category": "population frequency",
+            "schema_description": "Alternate allele frequency in male samples of South Asian ancestry",
+            "value_example": "0.00000e+00;8.05153e-04;4.02253e-04;4.03226e-04;4.02901e-04;4.03551e-04;1.59626e-01;8.11030e-04;8.07754e-04;4.04204e-04;4.04858e-04;4.04531e-04;1.62075e-03;1.61812e-03;1.61160e-03;4.03877e-04;1.61421e-02;2.01288e-03;1.32472e-01;2.26461e-01",
+            "scope": "variant",
             "maximum_length_of_value": 11
         },
         "gnomad_af_oth_male": {
@@ -1537,6 +2275,10 @@
             "description": "Alternate allele frequency in male samples of Other ancestry",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
+            "annotation_category": "population frequency",
+            "schema_description": "Alternate allele frequency in male samples of Other ancestry",
+            "value_example": "0.00000e+00;2.85171e-03;2.84630e-03;4.77099e-03;6.65399e-03;1.90476e-03;2.29885e-01;9.52381e-04;4.74383e-03;9.50570e-04;9.48767e-04;1.90114e-03;3.83142e-03;1.42857e-02;3.32700e-02;9.54198e-04;1.60646e-01;2.46183e-01;5.03802e-02;1.05932e-03",
+            "scope": "variant",
             "maximum_length_of_value": 11
         },
         "gnomad_af_female": {
@@ -1546,6 +2288,10 @@
             "description": "Alternate allele frequency in female samples",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
+            "annotation_category": "population frequency",
+            "schema_description": "Alternate allele frequency in female samples",
+            "value_example": "0.00000e+00;3.03030e-05;1.35399e-05;2.70827e-05;1.35413e-05;1.35377e-05;1.35373e-05;1.35380e-05;3.26319e-03;1.35410e-05;1.35439e-05;1.35435e-05;1.35443e-05;1.35454e-05;4.87660e-04;1.35428e-05;4.06482e-05;1.35619e-05;1.35586e-05;1.08522e-04",
+            "scope": "variant",
             "maximum_length_of_value": 11
         },
         "gnomad_af_afr_female": {
@@ -1555,6 +2301,10 @@
             "description": "Alternate allele frequency in female samples of African-American/African ancestry",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
+            "annotation_category": "population frequency",
+            "schema_description": "Alternate allele frequency in female samples of African-American/African ancestry",
+            "value_example": "0.00000e+00;1.13097e-04;1.02643e-02;4.40684e-05;4.40878e-05;1.58786e-03;1.32474e-04;4.42595e-05;1.77132e-04;4.41501e-05;2.56093e-02;1.39886e-04;4.63822e-05;2.87623e-02;1.54158e-03;8.80747e-05;1.03937e-02;4.40529e-05;4.40412e-05;1.32755e-04",
+            "scope": "variant",
             "maximum_length_of_value": 11
         },
         "gnomad_af_ami_female": {
@@ -1564,6 +2314,10 @@
             "description": "Alternate allele frequency in female samples of Amish ancestry",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
+            "annotation_category": "population frequency",
+            "schema_description": "Alternate allele frequency in female samples of Amish ancestry",
+            "value_example": "0.00000e+00;1.06383e-02;3.56838e-01;2.56410e-02;3.31197e-01;1.06838e-01;1.06383e-01;3.34043e-01;4.25532e-03;1.09170e-01;5.55556e-02;1.07143e-01;2.27273e-02;6.75676e-03;7.57576e-03;6.38298e-03;7.74336e-02;8.15217e-03;2.46305e-03;1.48438e-01",
+            "scope": "variant",
             "maximum_length_of_value": 11
         },
         "gnomad_af_amr_female": {
@@ -1573,6 +2327,10 @@
             "description": "Alternate allele frequency in female samples of Latino ancestry",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
+            "annotation_category": "population frequency",
+            "schema_description": "Alternate allele frequency in female samples of Latino ancestry",
+            "value_example": "0.00000e+00;1.69090e-04;1.18524e-03;3.21598e-03;2.89608e-03;3.38409e-04;1.69319e-04;6.76819e-04;1.69664e-04;1.01868e-03;1.69434e-04;2.54755e-03;1.35870e-03;1.70532e-04;8.47458e-04;2.20938e-03;1.69377e-04;1.80891e-01;3.38524e-04;3.38753e-04",
+            "scope": "variant",
             "maximum_length_of_value": 11
         },
         "gnomad_af_asj_female": {
@@ -1582,6 +2340,10 @@
             "description": "Alternate allele frequency in female samples of Ashkenazi Jewish ancestry",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
+            "annotation_category": "population frequency",
+            "schema_description": "Alternate allele frequency in female samples of Ashkenazi Jewish ancestry",
+            "value_example": "0.00000e+00;5.68828e-04;1.70648e-03;1.70261e-03;2.78093e-01;3.41297e-03;2.44596e-02;3.40909e-03;1.95677e-01;2.06818e-01;2.44041e-02;1.89573e-01;1.81818e-01;1.79545e-01;1.88068e-01;1.70455e-03;2.05815e-01;2.05347e-01;5.11945e-03;2.06621e-01",
+            "scope": "variant",
             "maximum_length_of_value": 11
         },
         "gnomad_af_eas_female": {
@@ -1591,6 +2353,10 @@
             "description": "Alternate allele frequency in female samples of East Asian ancestry",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
+            "annotation_category": "population frequency",
+            "schema_description": "Alternate allele frequency in female samples of East Asian ancestry",
+            "value_example": "0.00000e+00;1.38122e-03;6.90608e-04;6.91563e-04;6.91563e-03;2.07469e-03;6.93481e-04;1.38313e-03;6.92521e-04;1.72652e-02;2.76243e-03;2.76625e-03;2.07182e-03;1.93906e-02;2.19834e-01;2.20222e-01;2.20609e-01;4.14365e-03;2.18144e-01;1.86722e-02",
+            "scope": "variant",
             "maximum_length_of_value": 11
         },
         "gnomad_af_fin_female": {
@@ -1600,6 +2366,10 @@
             "description": "Alternate allele frequency in female samples of Finnish ancestry",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
+            "annotation_category": "population frequency",
+            "schema_description": "Alternate allele frequency in female samples of Finnish ancestry",
+            "value_example": "0.00000e+00;1.19808e-03;3.99680e-04;6.82183e-03;1.62075e-03;3.21857e-01;3.99042e-04;1.63738e-02;2.40192e-03;1.92000e-02;4.79233e-02;1.20096e-03;7.98722e-04;3.99361e-04;2.61200e-01;1.17200e-01;4.79616e-02;4.43262e-04;8.88889e-04;7.60105e-02",
+            "scope": "variant",
             "maximum_length_of_value": 11
         },
         "gnomad_af_nfe_female": {
@@ -1609,6 +2379,10 @@
             "description": "Alternate allele frequency in female samples of Non-Finnish European ancestry",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
+            "annotation_category": "population frequency",
+            "schema_description": "Alternate allele frequency in female samples of Non-Finnish European ancestry",
+            "value_example": "0.00000e+00;2.67365e-05;2.67423e-05;2.67380e-05;2.67437e-05;2.67394e-05;1.07003e-04;2.67451e-05;2.13995e-04;2.67465e-05;2.67408e-05;2.67566e-05;2.67652e-05;1.60479e-04;1.60436e-04;2.68442e-05;2.68586e-05;2.67580e-05;4.28128e-04;1.81954e-03",
+            "scope": "variant",
             "maximum_length_of_value": 11
         },
         "gnomad_af_sas_female": {
@@ -1618,6 +2392,10 @@
             "description": "Alternate allele frequency in female samples of South Asian ancestry",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
+            "annotation_category": "population frequency",
+            "schema_description": "Alternate allele frequency in female samples of South Asian ancestry",
+            "value_example": "0.00000e+00;3.53357e-03;3.54610e-03;1.76678e-03;1.43110e-01;1.77305e-03;1.77936e-03;7.11744e-03;1.48410e-01;2.32270e-01;8.86525e-03;2.22826e-01;2.21223e-01;8.96057e-03;2.14539e-01;1.48936e-01;2.32143e-01;2.30496e-01;2.30072e-01;5.26316e-02",
+            "scope": "variant",
             "maximum_length_of_value": 11
         },
         "gnomad_af_oth_female": {
@@ -1627,6 +2405,10 @@
             "description": "Alternate allele frequency in female samples of Other ancestry",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
+            "annotation_category": "population frequency",
+            "schema_description": "Alternate allele frequency in female samples of Other ancestry",
+            "value_example": "0.00000e+00;9.10747e-04;6.36364e-03;9.22509e-03;9.09091e-04;4.54545e-03;2.73224e-03;9.12409e-04;2.34004e-01;9.09091e-03;1.82149e-03;2.72727e-03;1.63636e-02;3.81818e-02;1.81818e-03;1.74863e-01;2.53650e-01;5.27273e-02;1.01420e-03;2.19682e-01",
+            "scope": "variant",
             "maximum_length_of_value": 11
         },
         "gnomad_af_raw": {
@@ -1636,6 +2418,10 @@
             "description": "Alternate allele frequency in samples before removing low-confidence genotypes",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
+            "annotation_category": "population frequency",
+            "schema_description": "Alternate allele frequency in samples before removing low-confidence genotypes",
+            "value_example": "7.76072e-06;2.26197e-05;1.43895e-05;6.97447e-06;2.78983e-05;6.97457e-06;1.39488e-05;6.97408e-06;6.97389e-06;2.78979e-05;3.20817e-03;6.97574e-06;6.97467e-06;6.97496e-06;6.97603e-06;6.97525e-06;6.97623e-06;6.97749e-06;1.39523e-05;4.04570e-04",
+            "scope": "variant",
             "maximum_length_of_value": 11
         },
         "gnomad_dp": {
@@ -1645,6 +2431,10 @@
             "description": "depth",
             "source_name": "GNOMAD",
             "source_version": "v3.0",
+            "annotation_category": "population frequency",
+            "schema_description": "depth",
+            "value_example": "297;129;172;37;315;30;60;143;175;200;25770;154;34;38;158;50;27;40;83;66",
+            "scope": "variant",
             "maximum_length_of_value": 8
         },
         "topmed_an": {
@@ -1654,6 +2444,10 @@
             "description": "Total allele number",
             "source_name": "TOPMED",
             "source_version": "freeze 5",
+            "annotation_category": "population frequency",
+            "schema_description": "Total allele number",
+            "value_example": "125568",
+            "scope": "variant",
             "maximum_length_of_value": 6
         },
         "topmed_ac": {
@@ -1663,6 +2457,10 @@
             "description": "Allele count",
             "source_name": "TOPMED",
             "source_version": "freeze 5",
+            "annotation_category": "population frequency",
+            "schema_description": "Allele count",
+            "value_example": "4;2;3;1;9;369;62;1041;1169;24;13;408;8;5;6;94;101;95;427;451",
+            "scope": "variant",
             "maximum_length_of_value": 6
         },
         "topmed_af": {
@@ -1672,6 +2470,10 @@
             "description": "Allele frequency",
             "source_name": "TOPMED",
             "source_version": "freeze 5",
+            "annotation_category": "population frequency",
+            "schema_description": "Allele frequency",
+            "value_example": "3.18552e-05;1.59276e-05;2.38914e-05;7.96381e-06;7.16743e-05;0.00293865;0.000493756;0.00829033;0.0093097;0.000191131;0.00010353;0.00324924;6.37105e-05;3.98191e-05;4.77829e-05;0.000748598;0.000804345;0.000756562;0.00340055;0.00359168",
+            "scope": "variant",
             "maximum_length_of_value": 11
         },
         "topmed_het": {
@@ -1681,6 +2483,10 @@
             "description": "number of heterozygous genotype",
             "source_name": "TOPMED",
             "source_version": "freeze 5",
+            "annotation_category": "population frequency",
+            "schema_description": "number of heterozygous genotype",
+            "value_example": "4;2;3;1;9;369;62;1021;1123;24;13;402;8;5;6;94;101;95;419;451",
+            "scope": "variant",
             "maximum_length_of_value": 5
         },
         "topmed_hom": {
@@ -1690,6 +2496,10 @@
             "description": "number of homozygous genotype",
             "source_name": "TOPMED",
             "source_version": "freeze 5",
+            "annotation_category": "population frequency",
+            "schema_description": "number of homozygous genotype",
+            "value_example": "0;10;23;3;4;1;4471;5;2;80;140;2530;5274;245;4838;5621;1120;2518;5272;5921",
+            "scope": "variant",
             "maximum_length_of_value": 5
         },
         "uk10k_ac": {
@@ -1699,6 +2509,10 @@
             "description": "Allele count in called genotypes",
             "source_name": "UK10K",
             "source_version": "20160215",
+            "annotation_category": "population frequency",
+            "schema_description": "Allele count in called genotypes",
+            "value_example": "1;2;31;3;2626;4;16;160;11;12;2036;867;862;25;828;2035;55;987;990;56",
+            "scope": "variant",
             "maximum_length_of_value": 4
         },
         "uk10k_an": {
@@ -1708,6 +2522,10 @@
             "description": "Total number of alleles in called genotypes",
             "source_name": "UK10K",
             "source_version": "20160215",
+            "annotation_category": "population frequency",
+            "schema_description": "Total number of alleles in called genotypes",
+            "value_example": "7562",
+            "scope": "variant",
             "maximum_length_of_value": 4
         },
         "uk10k_af": {
@@ -1717,6 +2535,10 @@
             "description": "Allele frequency in called genotypes",
             "source_name": "UK10K",
             "source_version": "20160215",
+            "annotation_category": "population frequency",
+            "schema_description": "Allele frequency in called genotypes",
+            "value_example": "0.000132;0.000264;0.004099;0.000397;0.347263;0.000529;0.002116;0.021158;0.001455;0.001587;0.269241;0.114652;0.113991;0.003306;0.109495;0.269109;0.007273;0.130521;0.130918;0.007405",
+            "scope": "variant",
             "maximum_length_of_value": 8
         },
         "uk10k_af_afr": {
@@ -1726,6 +2548,10 @@
             "description": "1000 Genomes Phase 1 Allele Frequency in African population (YRI,LWK,ASW)",
             "source_name": "UK10K",
             "source_version": "20160215",
+            "annotation_category": "population frequency",
+            "schema_description": "1000 Genomes Phase 1 Allele Frequency in African population (YRI,LWK,ASW)",
+            "value_example": "0;0.176829;0.020325;0.054878;0.075203;0.03252;0.504065;0.518293;0.152439;0.49187;0.53252;0.495935;0.002033;0.018293;0.097561;0.073171;0.00813;0.512195;0.485772",
+            "scope": "variant",
             "maximum_length_of_value": 8
         },
         "uk10k_af_amr": {
@@ -1735,6 +2561,10 @@
             "description": "1000 Genomes Phase 1 Allele Frequency in American population (MXL,CLM,PUR)",
             "source_name": "UK10K",
             "source_version": "20160215",
+            "annotation_category": "population frequency",
+            "schema_description": "1000 Genomes Phase 1 Allele Frequency in American population (MXL,CLM,PUR)",
+            "value_example": "0.005525;0.240331;0;0.002762;0.013812;0.146409;0.174033;0.024862;0.127072;0.151934;0.176796;0.171271;0.008287;0.027624;0.121547;0.187845;0.01105;0.179558;0.030387",
+            "scope": "variant",
             "maximum_length_of_value": 8
         },
         "uk10k_af_asn": {
@@ -1744,6 +2574,10 @@
             "description": "1000 Genomes Phase 1 Allele Frequency in Asian population (CHB,CHS,JPT)",
             "source_name": "UK10K",
             "source_version": "20160215",
+            "annotation_category": "population frequency",
+            "schema_description": "1000 Genomes Phase 1 Allele Frequency in Asian population (CHB,CHS,JPT)",
+            "value_example": "0;0.013986;0.001748;0.003497;0.244755;0.23951;0.255245;0.012238;0.227273;0.333916;0.258741;0.25;0.04021;0.262238;0.02972;0.236014;0.243007;0.199301;0.008741",
+            "scope": "variant",
             "maximum_length_of_value": 8
         },
         "uk10k_af_eur": {
@@ -1753,6 +2587,10 @@
             "description": "1000 Genomes Phase 1 Allele Frequency in European population (CEU,TSI,FIN,GBR,IBS)",
             "source_name": "UK10K",
             "source_version": "20160215",
+            "annotation_category": "population frequency",
+            "schema_description": "1000 Genomes Phase 1 Allele Frequency in European population (CEU,TSI,FIN,GBR,IBS)",
+            "value_example": "0.006596;0.349604;0;0.003958;0.001319;0.027704;0.273087;0.112137;0.110818;0.08971;0.005277;0.117414;0.011873;0.01847;0.002639;0.007916;0.109499;0.062005;0.120053",
+            "scope": "variant",
             "maximum_length_of_value": 8
         },
         "uk10k_af_max": {
@@ -1762,6 +2600,10 @@
             "description": "1000 Genomes Phase 1 Maximum Allele Frequency",
             "source_name": "UK10K",
             "source_version": "20160215",
+            "annotation_category": "population frequency",
+            "schema_description": "1000 Genomes Phase 1 Maximum Allele Frequency",
+            "value_example": "0.006596;0.349604;0.020325;0.003958;0.001748;0.005525;0.054878;0.075203;0.273087;0.504065;0.518293;0.013812;0.024862;0.255245;0.005277;0.49187;0.53252;0.011873;0.495935",
+            "scope": "variant",
             "maximum_length_of_value": 8
         },
         "uk10k_esp_maf": {
@@ -1771,6 +2613,10 @@
             "description": "Minor allele frequecy in percent for European American, African American and All populations in the NHLBI Exome Sequencing Project (ESP)",
             "source_name": "UK10K",
             "source_version": "20160215",
+            "annotation_category": "population frequency",
+            "schema_description": "Minor allele frequecy in percent for European American, African American and All populations in the NHLBI Exome Sequencing Project (ESP)",
+            "value_example": "1.9687%2C0.3523%2C1.478;0.0421%2C0%2C0.0293;0.0978%2C0.064%2C0.0875;0.0977%2C0.0319%2C0.0777;0.0279%2C0%2C0.0194;0%2C0.0723%2C0.0219;6.4111%2C13.8728%2C8.6728;0.0314%2C1.6618%2C0.5256;0%2C0.023%2C0.0078;0.1405%2C6.8744%2C2.4182;2.5256%2C0.4091%2C1.8088;0.0815%2C1.2483%2C0.477;2.7713%2C0.5469%2C2.0191;0.1281%2C0.0685%2C0.108;0.0358%2C0%2C0.0237;0.062%2C0%2C0.0409;0.204%2C5.1559%2C1.87;13.8231%2C38.7166%2C22.1928;0.0816%2C0%2C0.054",
+            "scope": "variant",
             "maximum_length_of_value": 27
         },
         "genomic_super_duplicates_otherchrom": {
@@ -1780,6 +2626,10 @@
             "description": "chromosome",
             "source_name": "GENOMIC_SUPER_DUPLICATES",
             "source_version": "19-Oct-2014",
+            "annotation_category": "repeat region",
+            "schema_description": "chromosome",
+            "value_example": "chr16;chr1;chr15;chr2;chr1_KI270714v1_random;chr1_KI270713v1_random;chr3;chr14;chr13;chr20;chr9;chr5;chr6",
+            "scope": "variant",
             "maximum_length_of_value": 22
         },
         "genomic_super_duplicates_otherstart": {
@@ -1789,6 +2639,10 @@
             "description": "start position",
             "source_name": "GENOMIC_SUPER_DUPLICATES",
             "source_version": "19-Oct-2014",
+            "annotation_category": "repeat region",
+            "schema_description": "start position",
+            "value_example": "14988008;13122521;13389331;13245536;12894433;12839949;13060096;79236169;189923169;13004384;13251844;12933876;12811748;13315263;13168349;12874443;13156268;13154150;12847096;13250207",
+            "scope": "variant",
             "maximum_length_of_value": 9
         },
         "genomic_super_duplicates_otherend": {
@@ -1798,6 +2652,10 @@
             "description": "end position",
             "source_name": "GENOMIC_SUPER_DUPLICATES",
             "source_version": "19-Oct-2014",
+            "annotation_category": "repeat region",
+            "schema_description": "end position",
+            "value_example": "14990326;13224571;13391071;13247273;12902157;12846275;13070539;79237828;189924844;13104252;13267912;12949947;12833786;13327388;13184242;12888569;13158422;13156268;189924878;12849522",
+            "scope": "variant",
             "maximum_length_of_value": 9
         },
         "genomic_super_duplicates_fracmatch": {
@@ -1807,6 +2665,10 @@
             "description": "fraction of matching bases",
             "source_name": "GENOMIC_SUPER_DUPLICATES",
             "source_version": "19-Oct-2014",
+            "annotation_category": "repeat region",
+            "schema_description": "fraction of matching bases",
+            "value_example": "0.983131;0.997615;0.924409;0.921387;0.900091;0.980848;0.903792;0.901629;0.926303;0.942137;0.94213;0.953277;0.959738;0.956217;0.956796;0.931656;0.923664;0.929875;0.961892;0.959353",
+            "scope": "variant",
             "maximum_length_of_value": 8
         },
         "simple_repeat_name": {
@@ -1816,6 +2678,10 @@
             "description": "Simple Repeats tag name",
             "source_name": "SIMPLE_REPEAT",
             "source_version": "11-Mar-2019",
+            "annotation_category": "repeat region",
+            "schema_description": "Simple Repeats tag name",
+            "value_example": "trf",
+            "scope": "variant",
             "maximum_length_of_value": 3
         },
         "simple_repeat_sequence": {
@@ -1825,6 +2691,10 @@
             "description": "Sequence of repeat unit element",
             "source_name": "SIMPLE_REPEAT",
             "source_version": "11-Mar-2019",
+            "annotation_category": "repeat region",
+            "schema_description": "Sequence of repeat unit element",
+            "value_example": "TTAATATTTAATATAATTACTATTATGGGTAGATGTAGGTATG;GTCTATCAGCTCATGGTCTATCAGCTCAGG;GTCTATCAGCTCAGG;TCAGCTCACAGTCTATCGGCTCAGGGTCCATTGGCTCATGGTCTATCAA;A;GATATCACCTAAGGTCCCAGAGGCTTA;AAAT;GGTGAGGACTTGGAGAACCTTTATGTCTAGCTACAGGATTGTAAATACACCAATCAGCACTCCGTGTCTAGCTCAAGGTTTGTAAACGCACCAATCAGCACCTTGTATCTAGCTAATCC;TGTCTAGCTCAAGGTTTGTAAATGCACCAATCAGCACTCTG;GACCAATCAGCTCTCTATAAAATG;AGCAGCACCGTCCACCACAGCCACCATGTCTGCAGCACCGTTCACCACAGCCACCATGTCTCGCAGCACCGTTCACCACAGCCACCATGTCTC;GCAGCACCGTTCACCACAGCCACCATGTCTC;CAGCACCGTTCACCACAGCCACCATGTCTCAGCAGCACCGTCCACCACAGCCACCATGTCT;CAGCACCATTCACCA;CAGCCACCATGTCTCGG;TTTCCTTTCCTCT;CTCCAGTGAACACACGGCGCATGCTCCCTCC;TCCCCTCCCCAGGGACCCCC;TCCCCTCCCCAGGGACCCCCTCCCTGCCCCGAGAACCCCC;TCCCCTCCCCAGGGACCCCCTTCCCTGCCCCGGGAACCCTTCCCCTCCCCAGGGACCCCCCTCCCCCCCAGGGACCCCC",
+            "scope": "variant",
             "maximum_length_of_value": 365
         },
         "simple_repeat_chromstart": {
@@ -1834,6 +2704,10 @@
             "description": "start position",
             "source_name": "SIMPLE_REPEAT",
             "source_version": "11-Mar-2019",
+            "annotation_category": "repeat region",
+            "schema_description": "start position",
+            "value_example": "1100228;1101513;1101548;1102071;1102283;1102614;1105884;1107230;1107374;1107615;1108047;1108048;1108049;1108737;1109017;1109411;1112368;1115480;1117068;1117069",
+            "scope": "variant",
             "maximum_length_of_value": 8
         },
         "simple_repeat_chromend": {
@@ -1843,6 +2717,10 @@
             "description": "end position",
             "source_name": "SIMPLE_REPEAT",
             "source_version": "11-Mar-2019",
+            "annotation_category": "repeat region",
+            "schema_description": "end position",
+            "value_example": "1100319;1101576;1101691;1102096;1102336;1102649;1105919;1107465;1107504;1107672;1109117;1108291;1108788;1109068;1109440;1112675;1115750;1115744;1115741;1117207",
+            "scope": "variant",
             "maximum_length_of_value": 8
         },
         "simple_repeat_score": {
@@ -1852,6 +2730,10 @@
             "description": "Alignment Score = 2*match-7*mismatch-7*indel; minscore=50",
             "source_name": "SIMPLE_REPEAT",
             "source_version": "11-Mar-2019",
+            "annotation_category": "repeat region",
+            "schema_description": "Alignment Score = 2*match-7*mismatch-7*indel; minscore=50",
+            "value_example": "157;108;90;166;50;88;70;52;353;176;87;1430;1458;1439;81;51;422;261;292;368",
+            "scope": "variant",
             "maximum_length_of_value": 4
         },
         "simple_repeat_entropy": {
@@ -1861,6 +2743,10 @@
             "description": "Entropy",
             "source_name": "SIMPLE_REPEAT",
             "source_version": "11-Mar-2019",
+            "annotation_category": "repeat region",
+            "schema_description": "Entropy",
+            "value_example": "1.62;1.96;1.97;0;1.99;1.07;1.95;1.85;1.84;1.88;0.93;1.86;1.57;1.58;1.59;1.44;1.45;1.66;1.79;1.78",
+            "scope": "variant",
             "maximum_length_of_value": 4
         },
         "rmsk_repname": {
@@ -1870,6 +2756,10 @@
             "description": "Name of repeat",
             "source_name": "RMSK",
             "source_version": "11-Mar-2019",
+            "annotation_category": "repeat region",
+            "schema_description": "Name of repeat",
+            "value_example": "FLAM_C;(AGAC)n;L1ME2;L1MC1;AluSz6;AluSx;AluSx1;AluSq2;AluJr;AluSx3;AluJo;MIR;AluY;(AAAT)n;LTR12C;L1MB3;(TTTCC)n;MER49;L1M5;AluJb",
+            "scope": "variant",
             "maximum_length_of_value": 15
         },
         "rmsk_repclass": {
@@ -1879,6 +2769,10 @@
             "description": "Class of repeat",
             "source_name": "RMSK",
             "source_version": "11-Mar-2019",
+            "annotation_category": "repeat region",
+            "schema_description": "Class of repeat",
+            "value_example": "SINE;Simple_repeat;LINE;LTR;Low_complexity;DNA;snRNA;scRNA;Retroposon;Satellite;RNA;LTR?;Unknown;tRNA;RC;RC?;rRNA;DNA?;srpRNA",
+            "scope": "variant",
             "maximum_length_of_value": 14
         },
         "rmsk_repfamily": {
@@ -1888,6 +2782,10 @@
             "description": "Family of repeat",
             "source_name": "RMSK",
             "source_version": "11-Mar-2019",
+            "annotation_category": "repeat region",
+            "schema_description": "Family of repeat",
+            "value_example": "Alu;Simple_repeat;L1;MIR;ERV1;Low_complexity;ERVL-MaLR;hAT-Charlie;L2;hAT-Tip100;ERVK;Gypsy;TcMar-Tigger;ERVL;hAT-Ac;CR1;tRNA-RTE;hAT;PiggyBac;snRNA",
+            "scope": "variant",
             "maximum_length_of_value": 14
         },
         "rmsk_chromstart": {
@@ -1897,6 +2795,10 @@
             "description": "Start in genomic sequence",
             "source_name": "RMSK",
             "source_version": "11-Mar-2019",
+            "annotation_category": "repeat region",
+            "schema_description": "Start in genomic sequence",
+            "value_example": "1099946;1100113;1100140;1100355;1100577;1101201;1101488;1101789;1102100;1102497;1102825;1103142;1103722;1103986;1104338;1104649;1104935;1105237;1105605;1105884",
+            "scope": "variant",
             "maximum_length_of_value": 8
         },
         "rmsk_chromend": {
@@ -1906,6 +2808,10 @@
             "description": "End in genomic sequence",
             "source_name": "RMSK",
             "source_version": "11-Mar-2019",
+            "annotation_category": "repeat region",
+            "schema_description": "End in genomic sequence",
+            "value_example": "1100108;1100137;1100295;1100587;1101201;1101488;1101789;1102100;1102497;1102818;1103142;1103719;1103975;1104286;1104517;1104829;1105165;1105529;1105883;1105919",
+            "scope": "variant",
             "maximum_length_of_value": 8
         },
         "rmsk_strand": {
@@ -1915,6 +2821,10 @@
             "description": "Relative orientation + or -",
             "source_name": "RMSK",
             "source_version": "11-Mar-2019",
+            "annotation_category": "repeat region",
+            "schema_description": "Relative orientation + or -",
+            "value_example": "1;0",
+            "scope": "variant",
             "maximum_length_of_value": 1
         },
         "nested_repeats_name": {
@@ -1924,6 +2834,10 @@
             "description": "Name of item",
             "source_name": "NESTED_REPEATS",
             "source_version": "06-Mar-2014",
+            "annotation_category": "repeat region",
+            "schema_description": "Name of item",
+            "value_example": "593;594;602;603;611;612;620;621;630;639;648;1;649;657;658;666;667;675;84;676",
+            "scope": "variant",
             "maximum_length_of_value": 3
         },
         "nested_repeats_chromstart": {
@@ -1933,6 +2847,10 @@
             "description": "Start position in chromosome",
             "source_name": "NESTED_REPEATS",
             "source_version": "06-Mar-2014",
+            "annotation_category": "repeat region",
+            "schema_description": "Start position in chromosome",
+            "value_example": "1093360;1106021;1112043;1113434;1113584;1130547;1147726;1151955;1154132;1172614;1185820;1195559;2342809;2360302;2361707;2364326;2369472;2370661;2370923;2383091",
+            "scope": "variant",
             "maximum_length_of_value": 8
         },
         "nested_repeats_chromend": {
@@ -1942,6 +2860,10 @@
             "description": "End position in chromosome",
             "source_name": "NESTED_REPEATS",
             "source_version": "06-Mar-2014",
+            "annotation_category": "repeat region",
+            "schema_description": "End position in chromosome",
+            "value_example": "1104517;1111082;1113335;1114402;1114311;1131376;1148199;1153637;1155526;1173025;1196298;1196074;2343031;2369452;2362438;2366486;2372164;2371331;2371254;2383438",
+            "scope": "variant",
             "maximum_length_of_value": 8
         },
         "nested_repeats_strand": {
@@ -1951,6 +2873,10 @@
             "description": "=+, -, or . for mixed (some fragments +, some -)",
             "source_name": "NESTED_REPEATS",
             "source_version": "06-Mar-2014",
+            "annotation_category": "repeat region",
+            "schema_description": "=+, -, or . for mixed (some fragments +, some -)",
+            "value_example": "=+",
+            "scope": "variant",
             "maximum_length_of_value": 1
         },
         "nested_repeats_score": {
@@ -1960,6 +2886,10 @@
             "description": "Average of fragment identity scores, transformed into 0..1000 range for shading",
             "source_name": "NESTED_REPEATS",
             "source_version": "06-Mar-2014",
+            "annotation_category": "repeat region",
+            "schema_description": "Average of fragment identity scores, transformed into 0..1000 range for shading",
+            "value_example": "279;381;475;665;552;139;416;286;154;805;354;590;622;395;538;936;446;613;808;338",
+            "scope": "variant",
             "maximum_length_of_value": 3
         },
         "nested_repeats_repclass": {
@@ -1969,6 +2899,10 @@
             "description": "Class of repeat",
             "source_name": "NESTED_REPEATS",
             "source_version": "06-Mar-2014",
+            "annotation_category": "repeat region",
+            "schema_description": "Class of repeat",
+            "value_example": "LINE;LTR;SINE;DNA;Low_complexity;RC;Simple_repeat;Retroposon",
+            "scope": "variant",
             "maximum_length_of_value": 14
         },
         "nested_repeats_repfamily": {
@@ -1978,6 +2912,10 @@
             "description": "Family of repeat",
             "source_name": "NESTED_REPEATS",
             "source_version": "06-Mar-2014",
+            "annotation_category": "repeat region",
+            "schema_description": "Family of repeat",
+            "value_example": "L1;ERV1;Alu;hAT-Tip100;TcMar-Tigger;ERVL;ERVL-MaLR;Low_complexity;MIR;L2;TcMar-Tc2;hAT-Charlie;hAT;ERVK;Helitron;Gypsy?;CR1;Gypsy;PiggyBac;hAT-Blackjack",
+            "scope": "variant",
             "maximum_length_of_value": 14
         },
         "microsatellite_name": {
@@ -1987,6 +2925,10 @@
             "description": "Name of item",
             "source_name": "MICROSATELLITE",
             "source_version": "23-Aug-2015",
+            "annotation_category": "repeat region",
+            "schema_description": "Name of item",
+            "value_example": "611;639;648;657;666;676;694;703;731;739;767;776;785;786;804;813;822;831;841;850",
+            "scope": "variant",
             "maximum_length_of_value": 3
         },
         "microsatellite_chromstart": {
@@ -1996,6 +2938,10 @@
             "description": "Start position in chromosome",
             "source_name": "MICROSATELLITE",
             "source_version": "23-Aug-2015",
+            "annotation_category": "repeat region",
+            "schema_description": "Start position in chromosome",
+            "value_example": "3538696;7129919;7197628;8320692;8372507;8385993;9523515;9531830;10700080;11944422;14354645;15544151;19145508;19195969;20309907;23932097;25147817;26324504;26359849;28760271",
+            "scope": "variant",
             "maximum_length_of_value": 8
         },
         "microsatellite_chromend": {
@@ -2005,16 +2951,22 @@
             "description": "End position in chromosome",
             "source_name": "MICROSATELLITE",
             "source_version": "23-Aug-2015",
+            "annotation_category": "repeat region",
+            "schema_description": "End position in chromosome",
+            "value_example": "3538745;7129955;7197678;8320734;8372543;8386023;9523560;9531886;10700117;11944454;14354688;15544186;19145543;19196018;20309956;23932132;25147864;26324536;26359886;28760315",
+            "scope": "variant",
             "maximum_length_of_value": 8
         },
-        "clinvar_alleleid": {
-            "title": "clinvar_alleleid",
-            "vcf_name": "clinvar_alleleid",
+        "clinvar_variationid": {
+            "title": "clinvar_variationid",
+            "vcf_name": "clinvar_variationid",
             "type": "string",
-            "description": "the ClinVar Allele ID",
+            "description": "ClinVar variantion ID",
             "source_name": "CLINVAR",
             "source_version": "20191021",
-            "maximum_length_of_value": 6
+            "annotation_category": "variant database",
+            "schema_description": "ClinVar variantion ID",
+            "scope": "variant"
         },
         "clinvar_clndn": {
             "title": "clinvar_clndn",
@@ -2028,7 +2980,11 @@
                 "description": "ClinVar's preferred disease name for the concept specified by disease identifiers in CLNDISDB",
                 "source_name": "CLINVAR",
                 "source_version": "20191021",
+                "annotation_category": "variant database",
                 "separator": "tilde",
+                "schema_description": "ClinVar's preferred disease name for the concept specified by disease identifiers in CLNDISDB",
+                "value_example": "not_provided;not_specified;not_specified~not_provided;Cardiovascular_phenotype~not_provided;Shprintzen-Goldberg_syndrome;Shprintzen-Goldberg_syndrome~not_provided;Shprintzen-Goldberg_syndrome~not_specified~Cardiovascular_phenotype;Shprintzen-Goldberg_syndrome~not_specified;Cardiovascular_phenotype;not_specified~Cardiovascular_phenotype~not_provided;Shprintzen-Goldberg_syndrome~not_specified~Cardiovascular_phenotype~not_provided;Marfanoid_habitus;Shprintzen-Goldberg_syndrome~Cardiovascular_phenotype~not_provided;Inborn_genetic_diseases~Shprintzen-Goldberg_syndrome;Shprintzen-Goldberg_syndrome~Cardiovascular_phenotype;Arterial_dissection~Cardiovascular_phenotype~not_provided;not_specified~Cardiovascular_phenotype;Nephronophthisis~not_provided;Nephronophthisis~Renal_dysplasia_and_retinal_aplasia~not_provided;Senior-Loken_syndrome_4~Nephronophthisis_4~not_provided",
+                "scope": "variant",
                 "maximum_length_of_value": 445
             }
         },
@@ -2039,6 +2995,10 @@
             "description": "For included Variant : ClinVar's preferred disease name for the concept specified by disease identifiers in CLNDISDB",
             "source_name": "CLINVAR",
             "source_version": "20191021",
+            "annotation_category": "variant database",
+            "schema_description": "For included Variant : ClinVar's preferred disease name for the concept specified by disease identifiers in CLNDISDB",
+            "value_example": "Ehlers-Danlos_syndrome%2C_hydroxylysine-deficient",
+            "scope": "variant",
             "maximum_length_of_value": 49
         },
         "clinvar_clndisdb": {
@@ -2048,6 +3008,10 @@
             "description": "Tag-value pairs of disease database name and identifier, e.g. OMIM:NNNNNN",
             "source_name": "CLINVAR",
             "source_version": "20191021",
+            "annotation_category": "variant database",
+            "schema_description": "Tag-value pairs of disease database name and identifier, e.g. OMIM:NNNNNN",
+            "value_example": "MedGen:CN517202;MedGen:CN169374;MedGen:CN169374%7CMedGen:CN517202;MedGen:CN230736%7CMedGen:CN517202;MedGen:C1321551%2COMIM:182212%2COrphanet:ORPHA2462%2CSNOMED_CT:83092002;MedGen:C1321551%2COMIM:182212%2COrphanet:ORPHA2462%2CSNOMED_CT:83092002%7CMedGen:CN517202;MedGen:C1321551%2COMIM:182212%2COrphanet:ORPHA2462%2CSNOMED_CT:83092002%7CMedGen:CN169374%7CMedGen:CN230736;MedGen:C1321551%2COMIM:182212%2COrphanet:ORPHA2462%2CSNOMED_CT:83092002%7CMedGen:CN169374;MedGen:CN230736;MedGen:CN169374%7CMedGen:CN230736%7CMedGen:CN517202;MedGen:C1321551%2COMIM:182212%2COrphanet:ORPHA2462%2CSNOMED_CT:83092002%7CMedGen:CN169374%7CMedGen:CN230736%7CMedGen:CN517202;MedGen:C1839796;MedGen:C1321551%2COMIM:182212%2COrphanet:ORPHA2462%2CSNOMED_CT:83092002%7CMedGen:CN230736%7CMedGen:CN517202;MeSH:D030342%2CMedGen:C0950123%7CMedGen:C1321551%2COMIM:182212%2COrphanet:ORPHA2462%2CSNOMED_CT:83092002;MedGen:C1321551%2COMIM:182212%2COrphanet:ORPHA2462%2CSNOMED_CT:83092002%7CMedGen:CN230736;Human_Phenotype_Ontology:HP:0005294%2CMedGen:C0002949%7CMedGen:CN230736%7CMedGen:CN517202;MedGen:CN169374%7CMedGen:CN230736;Human_Phenotype_Ontology:HP:0000090%2CMedGen:C0687120%2COrphanet:ORPHA655%2CSNOMED_CT:204958008%7CMedGen:CN517202;Human_Phenotype_Ontology:HP:0000090%2CMedGen:C0687120%2COrphanet:ORPHA655%2CSNOMED_CT:204958008%7CMedGen:C0403553%2COrphanet:ORPHA3156%2CSNOMED_CT:236531005%7CMedGen:CN517202;MedGen:C1846979%2COMIM:606996%7CMedGen:C1847013%2COMIM:606966%7CMedGen:CN517202",
+            "scope": "variant",
             "maximum_length_of_value": 1130
         },
         "clinvar_clndisdbincl": {
@@ -2057,6 +3021,10 @@
             "description": "For included Variant: Tag-value pairs of disease database name and identifier, e.g. OMIM:NNNNNN",
             "source_name": "CLINVAR",
             "source_version": "20191021",
+            "annotation_category": "variant database",
+            "schema_description": "For included Variant: Tag-value pairs of disease database name and identifier, e.g. OMIM:NNNNNN",
+            "value_example": "MedGen:C0268342%2COMIM:225400%2COrphanet:ORPHA1900%2CSNOMED_CT:25606004",
+            "scope": "variant",
             "maximum_length_of_value": 71
         },
         "clinvar_clnhgvs": {
@@ -2066,6 +3034,10 @@
             "description": "Top-level (primary assembly, alt, or patch) HGVS expression.",
             "source_name": "CLINVAR",
             "source_version": "20191021",
+            "annotation_category": "variant database",
+            "schema_description": "Top-level (primary assembly, alt, or patch) HGVS expression.",
+            "value_example": "NC_000001.11:g.2302812A>G;NC_000001.11:g.2302968T>C;NC_000001.11:g.2302971A>G;NC_000001.11:g.2302973C>T;NC_000001.11:g.2302983C>T;NC_000001.11:g.2302994C>T;NC_000001.11:g.2303002A>G;NC_000001.11:g.2303008C>T;NC_000001.11:g.2303013A>G;NC_000001.11:g.2303033A>T;NC_000001.11:g.2303033A>G;NC_000001.11:g.2303040C>T;NC_000001.11:g.2303041G>A;NC_000001.11:g.2303042C>T;NC_000001.11:g.2303047del;NC_000001.11:g.2303049C>T;NC_000001.11:g.2303067C>T;NC_000001.11:g.2303076G>A;NC_000001.11:g.2303077C>T;NC_000001.11:g.2303078G>A",
+            "scope": "variant",
             "maximum_length_of_value": 51
         },
         "clinvar_clnrevstat": {
@@ -2080,7 +3052,11 @@
                 "description": "ClinVar review status for the Variation ID",
                 "source_name": "CLINVAR",
                 "source_version": "20191021",
+                "annotation_category": "variant database",
                 "separator": "tilde",
+                "schema_description": "ClinVar review status for the Variation ID",
+                "value_example": "criteria_provided~_single_submitter;criteria_provided~_conflicting_interpretations;criteria_provided~_multiple_submitters~_no_conflicts;no_assertion_criteria_provided;no_interpretation_for_the_single_variant;no_assertion_provided",
+                "scope": "variant",
                 "maximum_length_of_value": 52
             }
         },
@@ -2091,6 +3067,10 @@
             "description": "Clinical significance for this single variant",
             "source_name": "CLINVAR",
             "source_version": "20191021",
+            "annotation_category": "variant database",
+            "schema_description": "Clinical significance for this single variant",
+            "value_example": "Benign;Likely_benign;Conflicting_interpretations_of_pathogenicity;Uncertain_significance;Benign/Likely_benign;Pathogenic/Likely_pathogenic;Pathogenic;Likely_pathogenic;not_provided",
+            "scope": "variant",
             "maximum_length_of_value": 44
         },
         "clinvar_clnsigconf": {
@@ -2105,7 +3085,11 @@
                 "description": "Conflicting clinical significance for this single variant",
                 "source_name": "CLINVAR",
                 "source_version": "20191021",
+                "annotation_category": "variant database",
                 "separator": "tilde",
+                "schema_description": "Conflicting clinical significance for this single variant",
+                "value_example": "Likely_benign(1)~Uncertain_significance(1);Likely_benign(2)~Uncertain_significance(1);Likely_benign(4)~Uncertain_significance(2);Benign(1)~Likely_benign(2)~Uncertain_significance(1);Likely_benign(1)~Uncertain_significance(2);Likely_benign(3)~Uncertain_significance(1);Benign(2)~Uncertain_significance(2);Likely_benign(1)~Uncertain_significance(3);Benign(1)~Uncertain_significance(3);Benign(1)~Uncertain_significance(2);Benign(1)~Uncertain_significance(1);Benign(2)~Likely_benign(1)~Uncertain_significance(2);Benign(1)~Likely_benign(1)~Uncertain_significance(3);Likely_benign(1)~Uncertain_significance(4);Benign(1)~Likely_benign(5)~Uncertain_significance(2);Likely_benign(2)~Uncertain_significance(3);Likely_pathogenic(1)~Uncertain_significance(1);Pathogenic(1)~Uncertain_significance(1);Pathogenic(1)~Uncertain_significance(2)",
+                "scope": "variant",
                 "maximum_length_of_value": 60
             }
         },
@@ -2116,6 +3100,10 @@
             "description": "Clinical significance for a haplotype or genotype that includes this variant. Reported as pairs of VariationID:clinical significance.",
             "source_name": "CLINVAR",
             "source_version": "20191021",
+            "annotation_category": "variant database",
+            "schema_description": "Clinical significance for a haplotype or genotype that includes this variant. Reported as pairs of VariationID:clinical significance.",
+            "value_example": "427816:Likely_pathogenic",
+            "scope": "variant",
             "maximum_length_of_value": 24
         },
         "clinvar_clnvc": {
@@ -2125,6 +3113,10 @@
             "description": "Variant type",
             "source_name": "CLINVAR",
             "source_version": "20191021",
+            "annotation_category": "variant database",
+            "schema_description": "Variant type",
+            "value_example": "single_nucleotide_variant;Deletion;Microsatellite;Duplication;Indel;Insertion;Variation",
+            "scope": "variant",
             "maximum_length_of_value": 25
         },
         "clinvar_clnvcso": {
@@ -2134,6 +3126,10 @@
             "description": "Sequence Ontology id for variant type",
             "source_name": "CLINVAR",
             "source_version": "20191021",
+            "annotation_category": "variant database",
+            "schema_description": "Sequence Ontology id for variant type",
+            "value_example": "SO:0001483;SO:0000159;SO:0000289;SO:1000035;SO:1000032;SO:0000667;SO:0001059",
+            "scope": "variant",
             "maximum_length_of_value": 10
         },
         "clinvar_clnvi": {
@@ -2143,6 +3139,10 @@
             "description": "the variant's clinical sources reported as tag-value pairs of database and variant identifier",
             "source_name": "CLINVAR",
             "source_version": "20191021",
+            "annotation_category": "variant database",
+            "schema_description": "the variant's clinical sources reported as tag-value pairs of database and variant identifier",
+            "value_example": "ARUP_Laboratories%2C_Molecular_Genetics_and_Genomics%2C_ARUP_Laboratories:38902;ARUP_Laboratories%2C_Molecular_Genetics_and_Genomics%2C_ARUP_Laboratories:112839;ARUP_Laboratories%2C_Molecular_Genetics_and_Genomics%2C_ARUP_Laboratories:32545;ARUP_Laboratories%2C_Molecular_Genetics_and_Genomics%2C_ARUP_Laboratories:13034;ARUP_Laboratories%2C_Molecular_Genetics_and_Genomics%2C_ARUP_Laboratories:27176;ARUP_Laboratories%2C_Molecular_Genetics_and_Genomics%2C_ARUP_Laboratories:126925;Laboratory_of_Molecular_Genetics_(Pr._Bezieau's_lab)%2C_CHU_de_Nantes:CLIN0149;ARUP_Laboratories%2C_Molecular_Genetics_and_Genomics%2C_ARUP_Laboratories:175594;Illumina_Clinical_Services_Laboratory%2CIllumina:77;OMIM_Allelic_Variant:607215.0003;Illumina_Clinical_Services_Laboratory%2CIllumina:752284;Illumina_Clinical_Services_Laboratory%2CIllumina:796818;OMIM_Allelic_Variant:607215.0007;Illumina_Clinical_Services_Laboratory%2CIllumina:216915;Illumina_Clinical_Services_Laboratory%2CIllumina:718565;Illumina_Clinical_Services_Laboratory%2CIllumina:809077;Illumina_Clinical_Services_Laboratory%2CIllumina:88;Illumina_Clinical_Services_Laboratory%2CIllumina:454154;Illumina_Clinical_Services_Laboratory%2CIllumina:454174",
+            "scope": "variant",
             "maximum_length_of_value": 218
         },
         "clinvar_geneinfo": {
@@ -2152,6 +3152,10 @@
             "description": "Gene(s) for the variant reported as gene symbol:gene id. The gene symbol and id are delimited by a colon (:) and each pair is delimited by a vertical bar (|)",
             "source_name": "CLINVAR",
             "source_version": "20191021",
+            "annotation_category": "variant database",
+            "schema_description": "Gene(s) for the variant reported as gene symbol:gene id. The gene symbol and id are delimited by a colon (:) and each pair is delimited by a vertical bar (|)",
+            "value_example": "SKI:6497;MORN1:79906;MEGF6:1953;AJAP1:55966;NPHP4:261734;SLC45A1:50651;RERE:473;TMEM201:199953;PLOD1:5351;MFN2:9927%7CPLOD1:5351;MFN2:9927;CASP9:842;AGMAT:79814;UBR4:23352;ALPL:249;EPHB2:2048;AHDC1:27245;HDAC1:3065;MARCKSL1:65108;CSMD2:114784",
+            "scope": "variant",
             "maximum_length_of_value": 22
         },
         "clinvar_mc": {
@@ -2161,6 +3165,10 @@
             "description": "comma separated list of molecular consequence in the form of Sequence Ontology ID|molecular_consequence",
             "source_name": "CLINVAR",
             "source_version": "20191021",
+            "annotation_category": "variant database",
+            "schema_description": "comma separated list of molecular consequence in the form of Sequence Ontology ID|molecular_consequence",
+            "value_example": "SO:0001627%7Cintron_variant;SO:0001819%7Csynonymous_variant;SO:0001583%7Cmissense_variant;SO:0001589%7Cframeshift_variant;SO:0001822%7Cinframe_deletion;SO:0001575%7Csplice_donor_variant;SO:0001587%7Cnonsense;SO:0001624%7C3_prime_UTR_variant;SO:0001619%7Cnon-coding_transcript_variant%2CSO:0001819%7Csynonymous_variant;SO:0001583%7Cmissense_variant%2CSO:0001619%7Cnon-coding_transcript_variant;SO:0001619%7Cnon-coding_transcript_variant%2CSO:0001821%7Cinframe_insertion;SO:0001587%7Cnonsense%2CSO:0001619%7Cnon-coding_transcript_variant;SO:0001589%7Cframeshift_variant%2CSO:0001619%7Cnon-coding_transcript_variant;SO:0001619%7Cnon-coding_transcript_variant%2CSO:0001822%7Cinframe_deletion;SO:0001583%7Cmissense_variant%2CSO:0001619%7Cnon-coding_transcript_variant%2CSO:0001627%7Cintron_variant;SO:0001619%7Cnon-coding_transcript_variant%2CSO:0001819%7Csynonymous_variant%2CSO:0001627%7Cintron_variant;SO:0001587%7Cnonsense%2CSO:0001619%7Cnon-coding_transcript_variant%2CSO:0001627%7Cintron_variant;SO:0001583%7Cmissense_variant%2CSO:0001619%7Cnon-coding_transcript_variant%2CSO:0001819%7Csynonymous_variant;SO:0001583%7Cmissense_variant%2CSO:0001587%7Cnonsense%2CSO:0001619%7Cnon-coding_transcript_variant;SO:0001587%7Cnonsense%2CSO:0001619%7Cnon-coding_transcript_variant%2CSO:0001623%7C5_prime_UTR_variant",
+            "scope": "variant",
             "maximum_length_of_value": 141
         },
         "clinvar_origin": {
@@ -2170,6 +3178,10 @@
             "description": "Allele origin. One or more of the following values may be added: 0 - unknown; 1 - germline; 2 - somatic; 4 - inherited; 8 - paternal; 16 - maternal; 32 - de-novo; 64 - biparental; 128 - uniparental; 256 - not-tested; 512 - tested-inconclusive; 1073741824 - other",
             "source_name": "CLINVAR",
             "source_version": "20191021",
+            "annotation_category": "variant database",
+            "schema_description": "Allele origin. One or more of the following values may be added: 0 - unknown; 1 - germline; 2 - somatic; 4 - inherited; 8 - paternal; 16 - maternal; 32 - de-novo; 64 - biparental; 128 - uniparental; 256 - not-tested; 512 - tested-inconclusive; 1073741824 - other",
+            "value_example": "1;5;32;33;4;0;16;8;17;9;3;2",
+            "scope": "variant",
             "maximum_length_of_value": 2
         },
         "clinvar_ssr": {
@@ -2178,7 +3190,10 @@
             "type": "integer",
             "description": "Variant Suspect Reason Codes. One or more of the following values may be added: 0 - unspecified, 1 - Paralog, 2 - byEST, 4 - oldAlign, 8 - Para_EST, 16 - 1kg_failed, 1024 - other",
             "source_name": "CLINVAR",
-            "source_version": "20191021"
+            "source_version": "20191021",
+            "annotation_category": "variant database",
+            "schema_description": "Variant Suspect Reason Codes. One or more of the following values may be added: 0 - unspecified, 1 - Paralog, 2 - byEST, 4 - oldAlign, 8 - Para_EST, 16 - 1kg_failed, 1024 - other",
+            "scope": "variant"
         },
         "cosmic_genomic_mutation_id": {
             "title": "cosmic_genomic_mutation_id",
@@ -2187,6 +3202,10 @@
             "description": "Genomic mutation identifier (COSV) to indicate the definitive position of the variant on the genome. This identifier is trackable and stable between different versions of the release.",
             "source_name": "COSMIC",
             "source_version": "v90",
+            "annotation_category": "variant database",
+            "schema_description": "Genomic mutation identifier (COSV) to indicate the definitive position of the variant on the genome. This identifier is trackable and stable between different versions of the release.",
+            "value_example": "COSV53881138;COSV53885194;COSV53884007;COSV53879537;COSV53880046;COSV53881818;COSV53883407;COSV53882676;COSV53881265;COSV53881767;COSV53882336;COSV53884283;COSV53883885;COSV53882738;COSV53880526;COSV53884094;COSV53883269;COSV53880222;COSV53882052;COSV53883806",
+            "scope": "variant",
             "maximum_length_of_value": 12
         },
         "cosmic_legacy_mutation_id": {
@@ -2196,6 +3215,10 @@
             "description": "Legacy mutation identifier (COSM) that will represent existing COSM mutation identifiers.",
             "source_name": "COSMIC",
             "source_version": "v90",
+            "annotation_category": "variant database",
+            "schema_description": "Legacy mutation identifier (COSM) that will represent existing COSM mutation identifiers.",
+            "value_example": "COSN5729674;COSN27162012;COSN27111955;COSN29591499;COSN16732927;COSN26288609;COSN4900466;COSN18750770;COSN5995376;COSN8316799;COSN7168593;COSN22030714;COSN5729710;COSN7168604;COSN7168605;COSN7168640;COSN15140098;COSN25983901;COSN24779931;COSN26891585",
+            "scope": "variant",
             "maximum_length_of_value": 12
         },
         "cosmic_mutation_id": {
@@ -2205,6 +3228,10 @@
             "description": "An internal mutation identifier to uniquely represent each mutation on a specific transcript on a given assembly build.",
             "source_name": "COSMIC",
             "source_version": "v90",
+            "annotation_category": "variant database",
+            "schema_description": "An internal mutation identifier to uniquely represent each mutation on a specific transcript on a given assembly build.",
+            "value_example": "101353880;101392672;108660952;101355882;101394630;108663494;101355498;101394266;108663059;101355822;101394600;108663451;101353086;101391608;108660041;101354296;101393060;108661320;101393891;108662628",
+            "scope": "variant",
             "maximum_length_of_value": 9
         },
         "cosmic_transcript_id": {
@@ -2214,6 +3241,10 @@
             "description": "The transcript identifier of the gene.",
             "source_name": "COSMIC",
             "source_version": "v90",
+            "annotation_category": "variant database",
+            "schema_description": "The transcript identifier of the gene.",
+            "value_example": "ENST00000379319.5;ENST00000379339.5;ENST00000421241.6;ENST00000379289.5;ENST00000379290.5;ENST00000379288.3;ENST00000378536.4;ENST00000378531.7;ENST00000378529.7;ENST00000378513.7;ENST00000378518.5;ENST00000605895.5;ENST00000378512.5;ENST00000488353.2;ENST00000294599.8;ENST00000356575.8;ENST00000378190.7;ENST00000378191.4;ENST00000378156.8;ENST00000622020.4",
+            "scope": "variant",
             "maximum_length_of_value": 18
         },
         "cosmic_primary_site": {
@@ -2223,6 +3254,10 @@
             "description": "The primary tissue/cancer from which the sample originated. More details on the tissue classification are avaliable from here. In COSMIC we have standard classification system for tissue types and sub types because they vary a lot between different papers.",
             "source_name": "COSMIC",
             "source_version": "v90",
+            "annotation_category": "variant database",
+            "schema_description": "The primary tissue/cancer from which the sample originated. More details on the tissue classification are avaliable from here. In COSMIC we have standard classification system for tissue types and sub types because they vary a lot between different papers.",
+            "value_example": "liver;oesophagus;prostate;pancreas;haematopoietic_and_lymphoid_tissue;breast;stomach;endometrium;kidney;lung;upper_aerodigestive_tract;biliary_tract;large_intestine;central_nervous_system;cervix;skin;ovary;thyroid;peritoneum;urinary_tract",
+            "scope": "variant",
             "maximum_length_of_value": 34
         },
         "cosmic_site_subtype_1": {
@@ -2232,6 +3267,10 @@
             "description": "Further sub classification (level 1) of the samples tissue of origin.",
             "source_name": "COSMIC",
             "source_version": "v90",
+            "annotation_category": "variant database",
+            "schema_description": "Further sub classification (level 1) of the samples tissue of origin.",
+            "value_example": "skin;head_neck;bile_duct;brain;mouth;colon;rectum;forearm;mucosal;upper_arm;caecum;hand;pharynx;bladder;right_upper_lobe;scalp;adrenal_gland;blood_vessel;face",
+            "scope": "variant",
             "maximum_length_of_value": 35
         },
         "cosmic_site_subtype_2": {
@@ -2241,6 +3280,10 @@
             "description": "Further sub classification (level 2) of the samples tissue of origin.",
             "source_name": "COSMIC",
             "source_version": "v90",
+            "annotation_category": "variant database",
+            "schema_description": "Further sub classification (level 2) of the samples tissue of origin.",
+            "value_example": "descending;ascending;right;transverse;nasopharynx;sigmoid;breast;paratestis;gingiva;face;cheek;left;brain;buccal_mucosa;tongue;tibia;prostate;pelvis;lip",
+            "scope": "variant",
             "maximum_length_of_value": 15
         },
         "cosmic_site_subtype_3": {
@@ -2249,7 +3292,10 @@
             "type": "string",
             "description": "Further sub classification (level 3) of the samples tissue of origin.",
             "source_name": "COSMIC",
-            "source_version": "v90"
+            "source_version": "v90",
+            "annotation_category": "variant database",
+            "schema_description": "Further sub classification (level 3) of the samples tissue of origin.",
+            "scope": "variant"
         },
         "cosmic_primary_histology": {
             "title": "cosmic_primary_histology",
@@ -2258,6 +3304,10 @@
             "description": "The histological classification of the sample.",
             "source_name": "COSMIC",
             "source_version": "v90",
+            "annotation_category": "variant database",
+            "schema_description": "The histological classification of the sample.",
+            "value_example": "carcinoma;carcinoid-endocrine_tumour;lymphoid_neoplasm;NS;haematopoietic_neoplasm;other;primitive_neuroectodermal_tumour-medulloblastoma;malignant_melanoma;glioma;adrenal_cortical_carcinoma;angiosarcoma;rhabdomyosarcoma;craniopharyngioma;Ewings_sarcoma-peripheral_primitive_neuroectodermal_tumour;osteosarcoma;mesothelioma;haemangioblastoma;adenoma;thymoma;Wilms_tumour",
+            "scope": "variant",
             "maximum_length_of_value": 58
         },
         "cosmic_histology_subtype_1": {
@@ -2267,6 +3317,10 @@
             "description": "Further histological classification (level 1) of the sample.",
             "source_name": "COSMIC",
             "source_version": "v90",
+            "annotation_category": "variant database",
+            "schema_description": "Further histological classification (level 1) of the sample.",
+            "value_example": "adenocarcinoma;mycosis_fungoides-Sezary_syndrome;ductal_carcinoma;carcinosarcoma-malignant_mesodermal_mixed_tumour;acute_myeloid_leukaemia;squamous_cell_carcinoma;neoplasm;chronic_lymphocytic_leukaemia-small_lymphocytic_lymphoma;HER-positive_carcinoma;basal_cell_carcinoma;chronic_myelomonocytic_leukaemia;hepatocellular_carcinoma;mixed_adenosquamous_carcinoma;desmoplastic;non_small_cell_carcinoma;mucoepidermoid_carcinoma;small_cell_carcinoma;acinar_adenocarcinoma;Merkel_cell_carcinoma",
+            "scope": "variant",
             "maximum_length_of_value": 58
         },
         "cosmic_histology_subtype_2": {
@@ -2276,6 +3330,10 @@
             "description": "Further histological classification (level 2) of the sample.",
             "source_name": "COSMIC",
             "source_version": "v90",
+            "annotation_category": "variant database",
+            "schema_description": "Further histological classification (level 2) of the sample.",
+            "value_example": "glioblastoma_multiforme;papillary;primary_mediastinal_B_cell_lymphoma;Ph-like;pigmented;micropapillary;mucinous;sporadic_type;pleomorphic;anaplastic;apocrine;fibrillary;M3;benign;M1;papillary_transitional_cell_carcinoma_non_invasive;tubular;refractory_anaemia_with_excess_blasts;Richter_transformation",
+            "scope": "variant",
             "maximum_length_of_value": 50
         },
         "cosmic_histology_subtype_3": {
@@ -2284,7 +3342,10 @@
             "type": "string",
             "description": "Further histological classification (level 3) of the sample.",
             "source_name": "COSMIC",
-            "source_version": "v90"
+            "source_version": "v90",
+            "annotation_category": "variant database",
+            "schema_description": "Further histological classification (level 3) of the sample.",
+            "scope": "variant"
         },
         "cosmic_mutation_cds": {
             "title": "cosmic_mutation_cds",
@@ -2293,6 +3354,10 @@
             "description": "The change that has occurred in the nucleotide sequence. Formatting is identical to the method used for the peptide sequence.",
             "source_name": "COSMIC",
             "source_version": "v90",
+            "annotation_category": "variant database",
+            "schema_description": "The change that has occurred in the nucleotide sequence. Formatting is identical to the method used for the peptide sequence.",
+            "value_example": "c.-136+5906C>G;c.-135-7947C>G;c.-136+4471T>G;c.-135-9382T>G;c.-136+4467A>T;c.-135-9386A>T;c.-136+4428_-136+4442del;c.-135-9425_-135-9411del;c.-136+4382C>T;c.-135-9471C>T;c.-136+4330G>A;c.-135-9523G>A;c.-135-9772A>G;c.-135-9994del;c.-136+3297C>T;c.-135-10556C>T;c.-136+2852T>C;c.-135-11001T>C;c.-135-11109G>A;c.-136+2313C>T",
+            "scope": "variant",
             "maximum_length_of_value": 89
         },
         "cosmic_mutation_aa": {
@@ -2302,6 +3367,10 @@
             "description": "The change that has occurred in the peptide sequence. Formatting is based on the recommendations made by the Human Genome Variation Society. The description of each type can be found by following the link to Mutation Overview page.",
             "source_name": "COSMIC",
             "source_version": "v90",
+            "annotation_category": "variant database",
+            "schema_description": "The change that has occurred in the peptide sequence. Formatting is based on the recommendations made by the Human Genome Variation Society. The description of each type can be found by following the link to Mutation Overview page.",
+            "value_example": "p.?;p.D2Y;p.R12W;p.R12Q;p.A20%3D;p.G21%3D;p.F22%3D;p.R35W;p.R35Q;p.A36T;p.R46S;p.P65L;p.G67D;p.A69%3D;p.S4I;p.S77I;p.G8R;p.G81R;p.R10W;p.R83W",
+            "scope": "variant",
             "maximum_length_of_value": 36
         },
         "cosmic_mutation_description": {
@@ -2316,7 +3385,11 @@
                 "description": "Type of mutation at the amino acid level (substitution, deletion, insertion, complex, fusion, unknown etc.)",
                 "source_name": "COSMIC",
                 "source_version": "v90",
+                "annotation_category": "variant database",
                 "separator": "tilde",
+                "schema_description": "Type of mutation at the amino acid level (substitution, deletion, insertion, complex, fusion, unknown etc.)",
+                "value_example": "Unknown;Substitution~Missense;Substitution~coding%20silent;Substitution~Nonsense;Deletion~Frameshift;Insertion~Frameshift;Complex~frameshift;Deletion~In%20frame;Insertion~In%20frame;Nonstop%20extension",
+                "scope": "variant",
                 "maximum_length_of_value": 28
             }
         },
@@ -2327,6 +3400,10 @@
             "description": "Information on whether the mutation was reported to be homozygous , heterozygous or unknown within the sample.",
             "source_name": "COSMIC",
             "source_version": "v90",
+            "annotation_category": "variant database",
+            "schema_description": "Information on whether the mutation was reported to be homozygous , heterozygous or unknown within the sample.",
+            "value_example": "hom;het",
+            "scope": "variant",
             "maximum_length_of_value": 3
         },
         "cosmic_loh": {
@@ -2335,7 +3412,10 @@
             "type": "string",
             "description": "LOH Information on whether the gene was reported to have loss of heterozygosity in the sample: yes, no or unknown.",
             "source_name": "COSMIC",
-            "source_version": "v90"
+            "source_version": "v90",
+            "annotation_category": "variant database",
+            "schema_description": "LOH Information on whether the gene was reported to have loss of heterozygosity in the sample: yes, no or unknown.",
+            "scope": "variant"
         },
         "cosmic_mutation_genome_position": {
             "title": "cosmic_mutation_genome_position",
@@ -2344,6 +3424,10 @@
             "description": "The genomic coordinates of the mutation.",
             "source_name": "COSMIC",
             "source_version": "v90",
+            "annotation_category": "variant database",
+            "schema_description": "The genomic coordinates of the mutation.",
+            "value_example": "1:1100050-1100050;1:1101485-1101485;1:1101489-1101489;1:1101527-1101541;1:1101574-1101574;1:1101626-1101626;1:1101875-1101875;1:1102097-1102097;1:1102659-1102659;1:1103104-1103104;1:1103212-1103212;1:1103643-1103643;1:1103813-1103813;1:1104483-1104483;1:1104570-1104570;1:1105314-1105314;1:1105902-1105902;1:1105987-1105987;1:1106681-1106681;1:1106756-1106756",
+            "scope": "variant",
             "maximum_length_of_value": 19
         },
         "cosmic_resistance_mutation": {
@@ -2352,7 +3436,10 @@
             "type": "string",
             "description": "mutation confers drug resistance (see CosmicResistanceMutations.tsv.gz for gene/drug details).",
             "source_name": "COSMIC",
-            "source_version": "v90"
+            "source_version": "v90",
+            "annotation_category": "variant database",
+            "schema_description": "mutation confers drug resistance (see CosmicResistanceMutations.tsv.gz for gene/drug details).",
+            "scope": "variant"
         },
         "cosmic_mutation_somatic_status": {
             "title": "cosmic_mutation_somatic_status",
@@ -2361,6 +3448,10 @@
             "description": "Information on whether the sample was reported to be Confirmed Somatic, Previously Reported or Variant of unknown origin",
             "source_name": "COSMIC",
             "source_version": "v90",
+            "annotation_category": "variant database",
+            "schema_description": "Information on whether the sample was reported to be Confirmed Somatic, Previously Reported or Variant of unknown origin",
+            "value_example": "Confirmed%20somatic%20variant;Variant%20of%20unknown%20origin;Reported%20in%20another%20cancer%20sample%20as%20somatic",
+            "scope": "variant",
             "maximum_length_of_value": 56
         },
         "cosmic_pubmed_pmid": {
@@ -2370,6 +3461,10 @@
             "description": "The PUBMED ID for the paper that the sample was noted in, linking to pubmed to provide more details of the publication.",
             "source_name": "COSMIC",
             "source_version": "v90",
+            "annotation_category": "variant database",
+            "schema_description": "The PUBMED ID for the paper that the sample was noted in, linking to pubmed to provide more details of the publication.",
+            "value_example": "26082451;25056374;21642962;25759019;26648538;26928463;26000489;25275298;20016485;25112956;27149842;26343386;25839328;26759717;29681454;25303977;22842228;25344691;26168399",
+            "scope": "variant",
             "maximum_length_of_value": 8
         },
         "cosmic_id_study": {
@@ -2379,6 +3474,10 @@
             "description": "Lists the unique Ids of studies that have involved this sample.",
             "source_name": "COSMIC",
             "source_version": "v90",
+            "annotation_category": "variant database",
+            "schema_description": "Lists the unique Ids of studies that have involved this sample.",
+            "value_example": "323;535;537;650;661;538;322;382;328;652;371;677;440;588;544;583;660;340;653",
+            "scope": "variant",
             "maximum_length_of_value": 3
         },
         "cosmic_tumour_origin": {
@@ -2388,6 +3487,10 @@
             "description": "Describes where the sample has originated from including the tumour type.",
             "source_name": "COSMIC",
             "source_version": "v90",
+            "annotation_category": "variant database",
+            "schema_description": "Describes where the sample has originated from including the tumour type.",
+            "value_example": "primary;metastasis;secondary;recurrent;hyperplasia%20adjacent%20to%20primary%20tumour",
+            "scope": "variant",
             "maximum_length_of_value": 46
         },
         "schema_version": {
@@ -2400,6 +3503,9 @@
         },
         "transcript.vep_symbol": {
             "title": "vep_symbol"
+        },
+        "transcript.vep_hgvsc": {
+            "title": "vep_hgvsc"
         },
         "transcript.vep_variant_class": {
             "title": "vep_variant_class"
@@ -2421,26 +3527,14 @@
         }
     },
     "columns": {
-        "CHROM": {
-            "title": "CHROM"
-        },
-        "POS": {
-            "title": "POS"
-        },
-        "REF": {
-            "title": "REF"
-        },
-        "ALT": {
-            "title": "ALT"
+        "ID": {
+            "title": "ID"
         },
         "transcript.vep_consequence.display_title": {
             "title": "vep_consequence"
         },
         "transcript.vep_symbol": {
             "title": "vep_symbol"
-        },
-        "transcript.vep_hgvsc": {
-            "title": "vep_hgvsc"
         },
         "transcript.vep_variant_class": {
             "title": "vep_variant_class"

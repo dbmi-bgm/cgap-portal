@@ -49,7 +49,11 @@
             "type": "number",
             "description": "Quality score",
             "source_name": "VCF",
-            "source_version": "VCFv4.2"
+            "source_version": "VCFv4.2",
+            "annotation_category": "Variant Quality",
+            "schema_description": "Quality score",
+            "value_example": "302.6",
+            "scope": "sample_variant"
         },
         "FILTER": {
             "title": "FILTER",
@@ -63,7 +67,11 @@
                 "LowQual"
             ],
             "source_name": "VCF",
-            "source_version": "VCFv4.2"
+            "source_version": "VCFv4.2",
+            "annotation_category": "Variant Quality",
+            "schema_description": "VQSR filter",
+            "value_example": "PASS;VQSRTrancheSNP99.00to99.90;VQSRTrancheSNP99.90to100.00",
+            "scope": "sample_variant"
         },
         "CALL_INFO": {
             "title": "CALL_INFO",
@@ -71,7 +79,11 @@
             "type": "string",
             "description": "Calling info",
             "source_name": "VCF",
-            "source_version": "VCFv4.2"
+            "source_version": "VCFv4.2",
+            "annotation_category": "Variant Quality",
+            "schema_description": "Calling info",
+            "value_example": "0/1:33,14:47:99:310,0,927",
+            "scope": "sample_variant"
         },
         "GT": {
             "title": "GT",
@@ -79,7 +91,11 @@
             "type": "string",
             "description": "Genotype",
             "source_name": "VCF",
-            "source_version": "VCFv4.2"
+            "source_version": "VCFv4.2",
+            "annotation_category": "Genotype",
+            "schema_description": "Genotype",
+            "value_example": "0/1,0/2,1/2",
+            "scope": "sample_variant"
         },
         "AD": {
             "title": "AD",
@@ -87,7 +103,11 @@
             "type": "string",
             "description": "Allelic depth",
             "source_name": "VCF",
-            "source_version": "VCFv4.2"
+            "source_version": "VCFv4.2",
+            "annotation_category": "Variant Quality",
+            "schema_description": "Allelic depth",
+            "value_example": "33,14",
+            "scope": "sample_variant"
         },
         "AD_ref": {
             "title": "AD_ref",
@@ -96,7 +116,11 @@
             "description": "Reference allelic depth",
             "calculated_property": true,
             "source_name": "VCF",
-            "source_version": "VCFv4.2"
+            "source_version": "VCFv4.2",
+            "annotation_category": "Variant Quality",
+            "schema_description": "Reference allelic depth",
+            "value_example": "33",
+            "scope": "sample_variant"
         },
         "AD_alt": {
             "title": "AD_alt",
@@ -105,7 +129,11 @@
             "description": "Alternate allelic depth",
             "calculated_property": true,
             "source_name": "VCF",
-            "source_version": "VCFv4.2"
+            "source_version": "VCFv4.2",
+            "annotation_category": "Variant Quality",
+            "schema_description": "Alternate allelic depth",
+            "value_example": "14",
+            "scope": "sample_variant"
         },
         "DP": {
             "title": "DP",
@@ -114,7 +142,10 @@
             "description": "Approximate read depth",
             "source_name": "VCF",
             "source_version": "VCFv4.2",
-            "column_priority": 6
+            "annotation_category": "Variant Quality",
+            "schema_description": "Approximate read depth",
+            "value_example": "47",
+            "scope": "sample_variant"
         },
         "GQ": {
             "title": "GQ",
@@ -122,7 +153,11 @@
             "type": "integer",
             "description": "Genotype quality score",
             "source_name": "VCF",
-            "source_version": "VCFv4.2"
+            "source_version": "VCFv4.2",
+            "annotation_category": "Variant Quality",
+            "schema_description": "Genotype quality score",
+            "value_example": "99",
+            "scope": "sample_variant"
         },
         "PL": {
             "title": "PL",
@@ -130,7 +165,11 @@
             "type": "string",
             "description": "Phred-scaled likelihoods for genotype (Ref/Ref, Ref/Alt, Alt/Alt)",
             "source_name": "VCF",
-            "source_version": "VCFv4.2"
+            "source_version": "VCFv4.2",
+            "annotation_category": "Variant Quality",
+            "schema_description": "Phred-scaled likelihoods for genotype (Ref/Ref, Ref/Alt, Alt/Alt)",
+            "value_example": "310,200,100",
+            "scope": "sample_variant"
         },
         "PGT": {
             "title": "PGT",
@@ -138,7 +177,11 @@
             "type": "string",
             "description": "Physical phasing haplotype information",
             "source_name": "VCF",
-            "source_version": "VCFv4.2"
+            "source_version": "VCFv4.2",
+            "annotation_category": "Genotype",
+            "schema_description": "Physical phasing haplotype information",
+            "value_example": "0|1",
+            "scope": "sample_variant"
         },
         "PID": {
             "title": "PID",
@@ -146,7 +189,11 @@
             "type": "string",
             "description": "Physical phasing ID information",
             "source_name": "VCF",
-            "source_version": "VCFv4.2"
+            "source_version": "VCFv4.2",
+            "annotation_category": "Genotype",
+            "schema_description": "Physical phasing ID information",
+            "value_example": "985446_G_T",
+            "scope": "sample_variant"
         },
         "PS": {
             "title": "PS",
@@ -154,7 +201,11 @@
             "type": "integer",
             "description": "Phasing set ID",
             "source_name": "VCF",
-            "source_version": "VCFv4.2"
+            "source_version": "VCFv4.2",
+            "annotation_category": "Genotype",
+            "schema_description": "Phasing set ID",
+            "value_example": "985446",
+            "scope": "sample_variant"
         },
         "AF": {
             "title": "AF",
@@ -164,13 +215,16 @@
             "calculated_property": true,
             "source_name": "VCF",
             "source_version": "VCFv4.2",
-            "column_priority": 5
+            "annotation_category": "Variant Quality",
+            "schema_description": "Sample allele fraction",
+            "value_example": "0.2979",
+            "scope": "sample_variant"
         },
         "samplegeno": {
-            "title": "samplegeno",
+            "title": "Sample Genotype",
             "type": "array",
             "items": {
-                "title": "samplegeno",
+                "title": "Sample Genotype",
                 "type": "object",
                 "properties": {
                     "NUMGT": {
@@ -179,7 +233,11 @@
                         "type": "string",
                         "description": "Sample genotype (number format)",
                         "source_name": "SAMPLEGENO",
-                        "source_version": "v0.2"
+                        "source_version": "v0.2",
+                        "sub_embedding_group": "{\"key\": \"samplegeno\", \"title\": \"Sample Genotype\"}",
+                        "schema_description": "Sample genotype (number format)",
+                        "value_example": "0/1",
+                        "scope": "sample_variant"
                     },
                     "GT": {
                         "title": "GT",
@@ -187,7 +245,11 @@
                         "type": "string",
                         "description": "Sample genotype (nucletide format)",
                         "source_name": "SAMPLEGENO",
-                        "source_version": "v0.2"
+                        "source_version": "v0.2",
+                        "sub_embedding_group": "{\"key\": \"samplegeno\", \"title\": \"Sample Genotype\"}",
+                        "schema_description": "Sample genotype (nucletide format)",
+                        "value_example": "G/T",
+                        "scope": "sample_variant"
                     },
                     "AD": {
                         "title": "AD",
@@ -195,7 +257,23 @@
                         "type": "string",
                         "description": "Allelic depth",
                         "source_name": "SAMPLEGENO",
-                        "source_version": "v0.2"
+                        "source_version": "v0.2",
+                        "sub_embedding_group": "{\"key\": \"samplegeno\", \"title\": \"Sample Genotype\"}",
+                        "annotation_category": "Variant Quality",
+                        "schema_description": "Allelic depth",
+                        "value_example": "21/10",
+                        "scope": "sample_variant"
+                    },
+                    "SAMPLEID": {
+                        "title": "SAMPLEID",
+                        "vcf_name": "SAMPLEID",
+                        "type": "string",
+                        "description": "Sample ID",
+                        "source_name": "SAMPLEGENO",
+                        "source_version": "v0.2",
+                        "sub_embedding_group": "{\"key\": \"samplegeno\", \"title\": \"Sample Genotype\"}",
+                        "schema_description": "Sample ID",
+                        "scope": "sample_variant"
                     }
                 }
             }
@@ -206,7 +284,11 @@
             "type": "string",
             "description": "Reference forward allele read count",
             "source_name": "novoCaller",
-            "source_version": "2"
+            "source_version": "2",
+            "annotation_category": "Variant Quality",
+            "schema_description": "Reference forward allele read count",
+            "value_example": "24,14,21,12",
+            "scope": "sample_variant"
         },
         "novoCaller_Post_prob": {
             "title": "novoCaller_Post_prob",
@@ -214,7 +296,11 @@
             "type": "number",
             "description": "posterior probability",
             "source_name": "novoCaller",
-            "source_version": "2"
+            "source_version": "2",
+            "annotation_category": "Genotype",
+            "schema_description": "posterior probability",
+            "value_example": "1.0;0.9999999999999998",
+            "scope": "sample_variant"
         },
         "novoCaller_AF_unrel": {
             "title": "novoCaller_AF_unrel",
@@ -222,7 +308,11 @@
             "type": "number",
             "description": "allele frequency in unrelated samples",
             "source_name": "novoCaller",
-            "source_version": "2"
+            "source_version": "2",
+            "annotation_category": "Variant Quality",
+            "schema_description": "allele frequency in unrelated samples",
+            "value_example": "6.07737694233669E-12;6.761231331315275e-12",
+            "scope": "sample_variant"
         },
         "schema_version": {
             "default": "1"
@@ -239,32 +329,14 @@
         }
     },
     "columns": {
-        "DP": {
-            "title": "DP"
-        },
-        "AF": {
-            "title": "AF"
-        },
-        "variant.CHROM": {
-            "title": "CHROM"
-        },
-        "variant.POS": {
-            "title": "POS"
-        },
-        "variant.REF": {
-            "title": "REF"
-        },
-        "variant.ALT": {
-            "title": "ALT"
+        "variant.ID": {
+            "title": "ID"
         },
         "variant.transcript.vep_consequence.display_title": {
             "title": "vep_consequence"
         },
         "variant.transcript.vep_symbol": {
             "title": "vep_symbol"
-        },
-        "variant.transcript.vep_hgvsc": {
-            "title": "vep_hgvsc"
         },
         "variant.transcript.vep_variant_class": {
             "title": "vep_variant_class"
@@ -291,6 +363,9 @@
         },
         "variant.transcript.vep_symbol": {
             "title": "vep_symbol"
+        },
+        "variant.transcript.vep_hgvsc": {
+            "title": "vep_hgvsc"
         },
         "variant.transcript.vep_variant_class": {
             "title": "vep_variant_class"

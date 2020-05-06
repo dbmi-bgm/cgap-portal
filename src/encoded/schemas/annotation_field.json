@@ -55,7 +55,8 @@
                 "string",
                 "number",
                 "integer",
-                "boolean"
+                "boolean",
+                "embedded"
             ]
         },
         "is_list": {
@@ -102,45 +103,20 @@
                 "type": "string"
             }
         },
-        "field_priority": {
-            "title": "Field priority",
-            "description": "Ranking number of the field (lower is better)",
+        "annotation_category": {
+            "title": "Annotation Category",
+            "description": "Category used for this annotation, could be used for grouping",
+            "type": "string"
+        },
+        "facet_order": {
+            "title": "Facet Order",
+            "description": "Ranking number of the field wrt to Facets, lower is better",
             "type": "integer"
         },
-        "column_priority": {
-            "title": "Column priority",
+        "column_order": {
+            "title": "Column order",
             "description": "Ranking number of the field for Column in search view (lower is better)",
             "type": "integer"
-        },
-        "facet_grouping": {
-            "title": "Facet Grouping",
-            "description": "Which group this facet belongs to",
-            "type": "string"
-        },
-        "facet_priority": {
-            "title": "Field priority",
-            "description": "Ranking number of the field for Facet in search view (lower is better)",
-            "type": "integer"
-        },
-        "scale": {
-            "title": "Scale",
-            "description": "Scale defined by new annotation structure",
-            "type": "string"
-        },
-        "domain": {
-            "title": "Domain",
-            "description": "Domain defined by new annotation structure",
-            "type": "string"
-        },
-        "method": {
-            "title": "Method",
-            "description": "Method defined by new annotation structure",
-            "type": "string"
-        },
-         "annotation_grouping": {
-            "title": "Annotation Grouping",
-            "description": "Which group this annotation belongs to",
-            "type": "string"
         },
         "scope": {
             "title": "Scope",

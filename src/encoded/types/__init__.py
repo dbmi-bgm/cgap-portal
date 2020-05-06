@@ -13,8 +13,6 @@ from snovault import (
     display_title_schema
 )
 # from pyramid.traversal import find_root
-from pyramid.view import view_config
-from snovault.util import debug_log
 from .base import (
     Item,
     get_item_if_you_can,
@@ -313,31 +311,6 @@ class AnnotationField(Item):
 
 
 @collection(
-    name='variants',
-    properties={
-        'title': 'Variants',
-        'description': 'List of all variants'
-    })
-class Variant(Item):
-    """ Variant class """
-
-    item_type = 'variant'
-    schema = load_schema('encoded:schemas/variant.json')
-    embedded_list = [
-        'transcript.vep_consequence.definition'  # XXX: Get this info from mapping table
-    ]
-
-
-    @calculated_property(schema={
-        "title": "Display Title",
-        "description": "A calculated title for every object in 4DN",
-        "type": "string"
-    })
-    def display_title(self, CHROM, POS, REF, ALT):
-        return 'chr%s:%s %s/%s' % (CHROM, POS, REF, ALT)
-
-
-@collection(
     name='variant-samples',
     properties={
         'title': 'Variants (sample)',
@@ -394,20 +367,3 @@ class VariantSample(Item):
             return round(int(alt) / (int(ref) + int(alt)), 3)  # round to 3 digits
         return 0.0
 
-
-@view_config(name='variant_ingestion', context=Variant.Collection,
-             request_method='POST', permission='add')
-@debug_log
-def variant_ingestion(context, request):
-    """
-        Variant Ingestion API
-
-        Processes all, or none, of a vcf file based on the loaded annotation
-        fields and on the variant and variant sample schemas
-    """
-    # TODO: Implement this when we need it, though practically speaking it probably takes too long to do this way
-    # get vcf file
-    # build the variants, post a dry run
-    # if dry run is successful, run for real
-    # catch potential errors
-    pass

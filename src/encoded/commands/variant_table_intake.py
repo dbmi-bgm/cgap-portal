@@ -22,15 +22,24 @@ class MappingTableParser(object):
     """ Class that encapsulates data/functions related to the annotation field mapping table. """
     HEADER_ROW_INDEX = 2
     FIELD_TYPE_INDEX = 5  # XXX: hardcoded, must change if field_type is moved on mapping table
-    INTEGER_FIELDS = ['no', 'maximum_length_of_value', 'column_priority', 'facet_priority']
+    INTEGER_FIELDS = ['no', 'maximum_length_of_value', 'column_order', 'facet_order']
     BOOLEAN_FIELDS = ['is_list', 'calculated_property']
-    STRING_FIELDS = ['source_name', 'source_version', 'scale', 'domain', 'method', 'separator', 'embedded_fields']
+    STRING_FIELDS = ['vcf_name', 'source_name', 'source_version', 'sub_embedding_group',
+                     'annotation_category', 'separator', 'schema_description', 'value_example',
+                     'scope', 'schema_title', 'pre_addon', 'embedded_fields']
+    SPECIAL_FIELDS = ['field_type', 'enum_list', 'links_to']
+    ALL_FIELDS = INTEGER_FIELDS + BOOLEAN_FIELDS + STRING_FIELDS + SPECIAL_FIELDS
+    EMBEDDED_VARIANT_FIELDS = './src/encoded/schemas/variant_embeds.json'
+    EMBEDDED_VARIANT_SAMPLE_FIELDS = './src/encoded/schemas/variant_sample_embeds.json'
+    EMBEDS_TO_GENERATE = [('variant', EMBEDDED_VARIANT_FIELDS),
+                          ('variant_sample', EMBEDDED_VARIANT_SAMPLE_FIELDS)]
     NAME_FIELD = 'vcf_name'
 
     def __init__(self, _mp, schema):
         self.mapping_table = _mp
         self.annotation_field_schema = json.load(open(schema, 'r'))
         self.version, self.date, self.fields = self.read_mp_meta()
+        self.provision_embeds()
 
     @staticmethod
     def process_fields(row):
@@ -60,6 +69,15 @@ class MappingTableParser(object):
         if not fields:
             raise MappingTableIntakeException('Did not find any fields on row %s' % row)
         return fields.keys()
+
+    def provision_embeds(self):
+        """ Does setup necessary for writing embeds to JSON files in the schemas directory
+            Called by initializer based on EMBEDS_TO_GENERATE, overwrite this to control
+            this functionality (for genes).
+        """
+        for field, f in self.EMBEDS_TO_GENERATE:
+            with open(f, 'w+') as fd:
+                json.dump({field: {}}, fd)
 
     def read_mp_meta(self):
         """ Reads mapping table from file given to class. First 3 rows of the mapping
@@ -93,21 +111,18 @@ class MappingTableParser(object):
             Note that project and institution are required fields on the annotation
             field schema and are not set here
 
-        Args:
-            fname: mapping table location
-            fields: list of fields on the table
-
-        Returns:
-            list of annotation field inserts
+        :returns: list of annotation field inserts
         """
         inserts = []
         with open(self.mapping_table, 'r', encoding='utf-8-sig') as f:
-            reader = csv.reader(f, )
+            reader = csv.reader(f)
             for row_idx, row in enumerate(reader):
                 insert = {}
                 if row_idx <= self.HEADER_ROW_INDEX:  # skip header rows
                     continue
                 for field_name, entry in zip(self.fields, row):
+                    if not entry:
+                        continue
                     if field_name in self.INTEGER_FIELDS:  # handle int fields
                         if entry:
                             insert[field_name] = int(entry)
@@ -129,11 +144,10 @@ class MappingTableParser(object):
                                 val_list = [int(en.strip()) for en in entry.split(',') if en.strip()]
                             insert[field_name] = val_list
                     else:  # handle all other fields with direct copy if they exist
-                        if entry:
-                            if field_name == 'pattern':  # must decode escape characters
-                                insert[field_name] = entry.encode().decode('unicode-escape')
-                            else:
-                                insert[field_name] = entry
+                        if field_name == 'pattern':  # must decode escape characters
+                            insert[field_name] = entry.encode().decode('unicode-escape')
+                        else:
+                            insert[field_name] = entry
                 inserts.append(insert)
         return inserts
 
@@ -155,6 +169,45 @@ class MappingTableParser(object):
         """
         return [field for field in inserts if field.get('scope', '') == 'variant']
 
+    def update_embeds(self, item, typ):
+        """ Updates the EMBEDDED_FIELDS location JSON containing the embeds for Variant.
+            NOTE: the files are overwritten everytime you run the process!
+
+        :param item: embedded field to be written
+        """
+        for t, f in self.EMBEDS_TO_GENERATE:
+            if typ == t:
+                with open(f, 'rb') as fd:
+                    embeds = json.load(fd)
+                    link_type = item['links_to']
+                    prefix = ''
+                    if item.get('sub_embedding_group', None):
+                        prefix = self.format_sub_embedding_group_name(item.get('sub_embedding_group'), type='key') + '.'
+                    if link_type not in embeds[t]:
+                        embeds[t][link_type] = [prefix + item[self.NAME_FIELD]]
+                    else:
+                        embeds[t][link_type].append(prefix + item[self.NAME_FIELD])
+                with open(f, 'w+') as wfd:
+                    json.dump(embeds, wfd)
+
+    @staticmethod
+    def format_sub_embedding_group_name(json_or_str, type='key'):
+        """ Helper method that will extract the appropriate value from sub_embedding_group
+
+        :param json_or_str: entry in mapping table, could be string or json, so we try both
+        :param type: one of key or title
+        :return: title that you wanted based on inputs
+        """
+        if type not in ['key', 'title']:
+            raise MappingTableIntakeException('Tried to parse sub_embedded_group with'
+                                              'key other than "key" or "title": %s ' % type)
+        try:
+            fmt = json.loads(json_or_str)
+        except:  # just a string is given, use for both name and title
+            return json_or_str
+        else:
+            return fmt[type]
+
     def generate_properties(self, inserts, variant=True):
         """ Generates sample variant or variant schema properties
             This function is quite long and complicated... Should probably be
@@ -170,6 +223,10 @@ class MappingTableParser(object):
 
         # inner functions to be used as helpers here
         def get_prop(item):
+            if item.get('field_type') == 'embedded':
+                self.update_embeds(item, item.get('scope', 'gene'))  # XXX: HACK - how to get around? -Will
+                return OrderedDict()
+
             temp = OrderedDict()
             prop_name = item[self.NAME_FIELD]
             features = OrderedDict()
@@ -208,22 +265,8 @@ class MappingTableParser(object):
                 if item.get('sub_embedding_group'):
                     sub_temp = OrderedDict()
                     prop = OrderedDict()
-
-                    # helper method that will extract the appropriate value from sub_embedding_group
-                    def format_sub_embedding_group_name(seg, type='key'):
-                        if type not in ['key', 'title']:
-                            raise MappingTableIntakeException('Tried to parse sub_embedded_group with'
-                                                              'key other than "key" or "title": %s ' %
-                                                              type)
-                        try:
-                            fmt = json.loads(seg)
-                        except:  # just a string is given, use for both name and title
-                            return seg
-                        else:
-                            return fmt[type]
-
-                    sum_ob_name = format_sub_embedding_group_name(item['sub_embedding_group'], type='key')
-                    sub_title = format_sub_embedding_group_name(item['sub_embedding_group'], type='title')
+                    sum_ob_name = self.format_sub_embedding_group_name(item['sub_embedding_group'], type='key')
+                    sub_title = self.format_sub_embedding_group_name(item['sub_embedding_group'], type='title')
 
                     # handle sub-embedded object that is an array
                     if item.get('is_list'):
@@ -290,10 +333,10 @@ class MappingTableParser(object):
             return o.get('sub_embedding_group')
 
         def is_facet(o):
-            return o.get('facet_priority')
+            return o.get('facet_order')
 
         def is_column(o):
-            return o.get('column_priority')
+            return o.get('column_order')
 
         def is_link_to(o):
             return o.get('links_to')
@@ -315,9 +358,11 @@ class MappingTableParser(object):
                     val['number_step'] = "any"
             if is_sub_embedded_object(o):
                 if is_link_to(o):  # add .display_title if we are a linkTo
-                    d[o.get('sub_embedding_group') + '.' + o[self.NAME_FIELD] + '.display_title'] = val
+                    d[self.format_sub_embedding_group_name(o.get('sub_embedding_group')) + '.'
+                      + o[self.NAME_FIELD] + '.display_title'] = val
                 else:
-                    d[o.get('sub_embedding_group') + '.' + o[self.NAME_FIELD]] = val
+                    d[self.format_sub_embedding_group_name(o.get('sub_embedding_group')) + '.'
+                      + o[self.NAME_FIELD]] = val
             else:
                 if is_link_to(o):
                     d[o[self.NAME_FIELD] + '.display_title'] = val
