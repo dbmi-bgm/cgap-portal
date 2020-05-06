@@ -1,6 +1,7 @@
 import os
 import pkg_resources
 import pytest
+import time
 import traceback
 import webtest
 
@@ -62,6 +63,7 @@ def alt_purge_queue(self):  # Patterned after QueueManager.purge_queue
             show_purge_queue_calls()  # For debugging
             log.warning('\n___QUEUE IS ALREADY BEING PURGED: %s___\n' % queue_url,
                         queue_url=queue_url)
+            time.sleep(2)  # allow a bit of time for the log to be updated before this process is blown away
 
 QueueManager.purge_queue = alt_purge_queue
 
