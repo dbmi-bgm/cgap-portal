@@ -63,6 +63,7 @@ def alt_purge_queue(self):  # Patterned after QueueManager.purge_queue
             log.warning('\n___QUEUE IS ALREADY BEING PURGED: %s___\n' % queue_url,
                         queue_url=queue_url)
 
+QueueManager.purge_queue = alt_purge_queue
 
 @pytest.yield_fixture(scope='session')
 def app(app_settings, **kwargs):
@@ -78,8 +79,7 @@ def app(app_settings, **kwargs):
     #     PURGE_QUEUE_CALL_STACKS.append(traceback.extract_stack())
     #     return old_purge_queue(self)
 
-    with mock.patch.object(QueueManager, "purge_queue", alt_purge_queue):
-        yield app
+    yield app
 
     DBSession = app.registry[DBSESSION]
     # Dispose connections so postgres can tear down.
