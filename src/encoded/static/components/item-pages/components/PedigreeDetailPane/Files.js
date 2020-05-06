@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import memoize from 'memoize-one';
 import { _ } from 'underscore';
-import { DragAndDropUploadFileUploadController } from '@hms-dbmi-bgm/shared-portal-components/es/components/forms/components/DragAndDropUpload';
+import { DragAndDropFileUploadController } from '@hms-dbmi-bgm/shared-portal-components/es/components/forms/components/DragAndDropUpload';
 
 export class FileWrapper extends React.Component {
     static propTypes = {
@@ -107,7 +107,7 @@ class FileArrayField extends React.Component {
                     }
                 </ul>
                 { haveEditPermission ?
-                    <DragAndDropUploadFileUploadController award={null} lab={null}
+                    <DragAndDropFileUploadController award={null} lab={null}
                         {...{ fieldDisplayTitle, fieldType, fieldName, individualId, project, institution, fileSchema, files }} cls="btn btn-sm btn-outline-dark" /> : null }
             </div>
         );
