@@ -1,3 +1,4 @@
+import datetime
 import os
 import pkg_resources
 import pytest
@@ -12,6 +13,7 @@ from unittest import mock
 from .. import main
 from ..loadxl import load_all
 from .conftest_settings import make_app_settings_dictionary
+from dcicutils.lang_utils import EnglishUtils
 
 
 # this file was previously used to setup the test fixtures for the BDD tests.
@@ -50,14 +52,32 @@ def show_purge_queue_calls():
         print(stack)
         print("#"*40)
 
+class PurgeQueueData:
+    PURGE_QUEUE_LAST_TIME = datetime.datetime(datetime.MINYEAR,1,1)
+    PURGE_QUEUE_SAFETY_MARGIN = 1
 
 def alt_purge_queue(self):  # Patterned after QueueManager.purge_queue
     PURGE_QUEUE_CALL_STACKS.append("".join(traceback.format_list(traceback.extract_stack())))
     for queue_url in [self.queue_url, self.second_queue_url, self.dlq_url]:
         try:
-            self.client.purge_queue(
-                QueueUrl=queue_url
-            )
+            NOW = datetime.datetime.now()
+            seconds_since_last_purge = (NOW - PurgeQueueData.PURGE_QUEUE_LAST_TIME).total_seconds()
+            if seconds_since_last_purge < 60:
+                wait_time = 60 - seconds_since_last_purge + PurgeQueueData.PURGE_QUEUE_SAFETY_MARGIN
+                log.warning("It has been %s seconds since we last purged."
+                            " We can only do so every 60 seconds, so will wait %s seconds more"
+                            " (allowing a %s second safety margin)."
+                            % (seconds_since_last_purge, wait_time, PurgeQueueData.PURGE_QUEUE_SAFETY_MARGIN))
+                time.sleep(wait_time)
+            # Tentatively set this value so that no one tries anew while we're operating.
+            PurgeQueueData.PURGE_QUEUE_LAST_TIME = datetime.datetime.now()  # time marches on since we last checked
+            try:
+                self.client.purge_queue(
+                    QueueUrl=queue_url
+                )
+            finally:
+                # Doing the call to purge_queue could have taken enough time that we should really update our estimate
+                PurgeQueueData.PURGE_QUEUE_LAST_TIME = datetime.datetime.now()
         except self.client.exceptions.PurgeQueueInProgress as e:
             print("QUEUE ALREADY BEING PURGED:", e)
             show_purge_queue_calls()  # For debugging
