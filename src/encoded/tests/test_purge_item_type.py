@@ -1,6 +1,7 @@
+import datetime
 import pytest
 import time
-from .workbook_fixtures import app_settings, app, workbook, show_purge_queue_calls
+from .workbook_fixtures import app_settings, app, workbook, show_purge_queue_calls, PurgeQueueData
 from encoded.commands.purge_item_type import purge_item_type_from_storage
 from dcicutils.misc_utils import ignored
 
@@ -47,7 +48,7 @@ def many_dummy_static_sections(testapp):
 def test_purge_item_type_from_db(testapp, dummy_static_section):
     """ Tests purging all items of a certain item type from the DB """
     testapp.post_json('/index', {'record': True})
-    time.sleep(10)
+    time.sleep(10 + min(60, (datetime.datetime.now() - PurgeQueueData.PURGE_QUEUE_LAST_TIME).total_seconds()))
     assert purge_item_type_from_storage(testapp, ['static_section']) is True
     testapp.post_json('/index', {'record': True})
     testapp.get('/search/?type=StaticSection', status=404)
