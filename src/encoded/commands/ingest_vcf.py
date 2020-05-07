@@ -128,12 +128,14 @@ class VCFParser(object):
 
         # helper to verify the given field is in the schema
         # this is where non-mvp fields are dropped if present in the vcf
+        # and not present on either the variant or sample_variant schemas
         def _verify_in_schema(field, sub_group=None):
-            if sub_group:
-                if field in self.variant_schema['properties'][sub_group]['items']['properties']:
+            for schema in [self.variant_sample_schema, self.variant_schema]:
+                if sub_group and sub_group in schema['properties']:
+                    if field in schema['properties'][sub_group]['items']['properties']:
+                        return field
+                if field in schema['properties'] or field.lower() in schema['properties']:
                     return field
-            if field in self.variant_schema['properties'] or field.lower() in self.variant_schema['properties']:
-                return field
             return self.DROPPED_FIELD  # must maintain field order
 
         # process INFO tag - reformat as necessary and return the entries
@@ -380,6 +382,11 @@ class VCFParser(object):
             acc.append(vals)
         result[seo] = acc
 
+    def format_variant_sub_embedded_objects(self, result):
+        """ Applies 'format_variant' for all sub_embedded_object fields (detected) """
+        for key in self.sub_embedded_mapping.values():
+            self.format_variant(result, seo=key)
+
     @staticmethod
     def parse_samples(result, sample):
         """ Parses the samples on the record, adding them to result
@@ -393,8 +400,8 @@ class VCFParser(object):
         result['GT'] = data.GT
         result['DP'] = data.DP
         result['GQ'] = data.GQ
-        result['AD'] = ','.join(map(str, data.AD))
-        result['PL'] = ','.join(map(str, data.PL))
+        result['AD'] = ','.join(map(str, data.AD)) if data.AD else 'Not provided'
+        result['PL'] = ','.join(map(str, data.PL)) if data.PL else 'Not provided'
 
     def create_sample_variant_from_record(self, record):
         """ Parses the given record to produce the sample variant
@@ -433,11 +440,12 @@ class VCFParser(object):
                     genotypes = record.INFO.get('SAMPLEGENO')
                     s['samplegeno'] = []
                     for gt in genotypes:
-                        numgt, gt, ad = gt.split('|')
+                        numgt, gt, ad, sample_id = gt.split('|')
                         tmp = dict()
                         tmp['NUMGT'] = numgt
                         tmp['GT'] = gt
                         tmp['AD'] = ad
+                        tmp['SAMPLEID'] = sample_id
                         s['samplegeno'].append(tmp)
 
             self.parse_samples(s, sample)  # add sample fields, already formatted
@@ -478,7 +486,7 @@ class VCFParser(object):
                     entry['institution'] = institution
                 v['institution'] = institution
             variant_samples += vs
-            self.format_variant(v)
+            self.format_variant_sub_embedded_objects(v)
             variants.append(v)
         return variant_samples, variants
 
@@ -512,6 +520,9 @@ def main():
 
             config_uri: path to app config, usually 'production.ini'
             --app-name: app name, usually 'app'
+
+        local update:
+            python src/encoded/commands/ingest_vcf.py src/encoded/tests/data/variant_workbook/vcf_v0.4.6_subset.vcf src/encoded/schemas/variant.json src/encoded/schemas/variant_sample.json hms-dbmi hms-dbmi development.ini --app-name app --post-inserts
 
         To load a vcf on the server:
             bin/ingest-vcf src/encoded/tests/data/variant_workbook/test_vcf.vcf src/encoded/schemas/variant.json src/encoded/schemas/variant_sample.json hms-dbmi hms-dbmi production.ini --app-name app --post-inserts
@@ -552,8 +563,12 @@ def main():
             variant = vcf_parser.create_variant_from_record(record)
             variant['project'] = args.project
             variant['institution'] = args.institution
-            vcf_parser.format_variant(variant)
-            res = app_handle.post_json('/variant', variant, status=201).json['@graph'][0]  # only one item posted
+            vcf_parser.format_variant_sub_embedded_objects(variant)
+            try:
+                res = app_handle.post_json('/variant', variant, status=201).json['@graph'][0]  # only one item posted
+            except:
+                print('Failed validation')  # some variant gene linkTos do not exist
+                continue
             variant_samples = vcf_parser.create_sample_variant_from_record(record)
             for sample in variant_samples:
                 sample['project'] = args.project

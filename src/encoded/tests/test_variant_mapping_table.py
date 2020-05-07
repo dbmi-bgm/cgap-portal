@@ -7,7 +7,7 @@ from encoded.commands.variant_table_intake import (
 
 # XXX: These constants should probably be handled in a more intelligent way -will
 pytestmark = [pytest.mark.working, pytest.mark.ingestion]
-MT_LOC = './src/encoded/tests/data/variant_workbook/variant_table_v0.4.csv'
+MT_LOC = './src/encoded/tests/data/variant_workbook/variant_table_v0.4.6.csv'
 ANNOTATION_FIELD_SCHEMA = './src/encoded/schemas/annotation_field.json'
 EXPECTED_FIELDS = ['no', 'vcf_name', 'source_name', 'source_version', 'sub_embedding_group',
                    'field_type', 'is_list', 'separator', 'maximum_length_of_value',
@@ -23,13 +23,13 @@ EXPECTED_INSERT = {'no': 1, 'vcf_name': 'CHROM', 'source_name': 'VCF',
                    'enum_list': ['1', '2', '3', '4', '5', '6', '7', '8', '9',
                                  '10', '11', '12', '13', '14', '15', '16', '17',
                                  '18', '19', '20', '21', '22', 'X', 'Y', 'M'],
-                   'annotation_category': 'position', 'scope': 'variant'}
+                   'annotation_category': 'position', 'scope': 'variant', 'column_order': 1}
 VEP_CONSEQUENCE_EMBEDS = ['transcript.vep_consequence.var_conseq_id', 'transcript.vep_consequence.definition',
                           'transcript.vep_consequence.impact', 'transcript.vep_consequence.location',
                           'transcript.vep_consequence.coding_effect']
-NUMBER_ANNOTATION_FIELDS = 295
-SAMPLE_FIELDS_EXPECTED = 21
-VARIANT_FIELDS_EXPECTED = 263
+NUMBER_ANNOTATION_FIELDS = 294
+SAMPLE_FIELDS_EXPECTED = 18
+VARIANT_FIELDS_EXPECTED = 276
 TRANSCRIPT_FIELDS_EXPECTED = 47
 
 
@@ -71,7 +71,7 @@ def test_add_default_schema_fields(MTParser):
 def test_read_variant_table_header(MTParser):
     """ Tests that we can read mapping table header correctly based on the current format """
     assert MTParser.version == 'annV0.4'
-    assert MTParser.date == '05.04.2020'
+    assert MTParser.date == '05.06.2020'
     assert sorted(MTParser.fields) == sorted(EXPECTED_FIELDS)
     for field in EXPECTED_FIELDS:  # all fields are categorized by the Parser
         assert field in MTParser.ALL_FIELDS
@@ -98,8 +98,7 @@ def test_generate_sample_json_items(MTParser, inserts):
     assert sample_props['DP']['vcf_name'] == 'DP'
     assert sample_props['PGT']['type'] == 'string'
     assert sample_props['PGT']['source_name'] == 'VCF'
-    assert sample_props['RSTR']['type'] == 'string'
-    assert sample_props['RSTR']['source_name'] == 'novoCaller'
+    assert 'samplegeno' in sample_props
 
     # check cols/facs (there are none now)
     assert cols == {}
@@ -118,7 +117,13 @@ def test_generate_variant_json_items(MTParser, inserts):
     assert var_props['cadd_phred']['source_name'] == 'CADD'
     assert var_props['cadd_phred']['type'] == 'number'
 
-    # check sub-embedded object
+    # check samplegeno sub-embedded obj
+    assert 'samplegeno' in var_props
+    assert 'AD' in var_props['samplegeno']['items']['properties']
+    assert 'GT' in var_props['samplegeno']['items']['properties']
+    assert 'NUMGT' in var_props['samplegeno']['items']['properties']
+
+    # check vep (transcript) sub-embedded object
     sub_obj_props = var_props['transcript']['items']['properties']
     assert len(sub_obj_props.keys()) == TRANSCRIPT_FIELDS_EXPECTED
     assert sub_obj_props['vep_symbol']['vcf_name'] == 'vep_symbol'
@@ -153,18 +158,11 @@ def test_generate_variant_sample_schema(MTParser, sample_variant_items):
     assert 'GT' in properties
     assert 'GQ' in properties
     assert properties['AF']['type'] == 'number'
-    assert properties['RSTR']['type'] == 'string'
     assert 'columns' in schema
     assert 'AF' not in schema['facets']
     assert 'facets' in schema
     assert 'variant' in properties
     assert 'sample' in properties
-
-    # check sample sub-embedded obj
-    assert 'samplegeno' in properties
-    assert 'AD' in properties['samplegeno']['items']['properties']
-    assert 'GT' in properties['samplegeno']['items']['properties']
-    assert 'NUMGT' in properties['samplegeno']['items']['properties']
 
 
 def test_generate_variant_schema(MTParser, variant_items):
@@ -198,6 +196,11 @@ def test_generate_variant_schema(MTParser, variant_items):
     assert sub_obj_props['vep_somatic']['items']['type'] == 'boolean'
     assert sub_obj_props['vep_somatic']['items']['separator'] == 'tilde'
 
+    # check (existence of) different sub-embedded object fields
+    assert properties['genes']['type'] == 'array'
+    assert properties['hg19']['type'] == 'array'
+    assert properties['clinvar_submission']['type'] == 'array'
+
     # check cols/facs
     assert 'ID' in schema['columns']
     assert 'AF' not in schema['columns']
@@ -209,8 +212,6 @@ def test_generate_variant_schema(MTParser, variant_items):
         embeds_to_check = json.load(fd)
         for embed in embeds_to_check['variant']['VariantConsequence']:
             assert embed.strip() in VEP_CONSEQUENCE_EMBEDS
-
-    import pdb; pdb.set_trace()
 
 
 def test_post_variant_annotation_field_inserts(inserts, project, institution, testapp):

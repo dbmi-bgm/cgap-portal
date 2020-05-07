@@ -233,7 +233,7 @@
                         "type": "string",
                         "description": "Sample genotype (number format)",
                         "source_name": "SAMPLEGENO",
-                        "source_version": "v0.2",
+                        "source_version": "v0.4",
                         "sub_embedding_group": "{\"key\": \"samplegeno\", \"title\": \"Sample Genotype\"}",
                         "schema_description": "Sample genotype (number format)",
                         "value_example": "0/1",
@@ -245,7 +245,7 @@
                         "type": "string",
                         "description": "Sample genotype (nucletide format)",
                         "source_name": "SAMPLEGENO",
-                        "source_version": "v0.2",
+                        "source_version": "v0.4",
                         "sub_embedding_group": "{\"key\": \"samplegeno\", \"title\": \"Sample Genotype\"}",
                         "schema_description": "Sample genotype (nucletide format)",
                         "value_example": "G/T",
@@ -257,7 +257,7 @@
                         "type": "string",
                         "description": "Allelic depth",
                         "source_name": "SAMPLEGENO",
-                        "source_version": "v0.2",
+                        "source_version": "v0.4",
                         "sub_embedding_group": "{\"key\": \"samplegeno\", \"title\": \"Sample Genotype\"}",
                         "annotation_category": "Variant Quality",
                         "schema_description": "Allelic depth",
@@ -270,49 +270,13 @@
                         "type": "string",
                         "description": "Sample ID",
                         "source_name": "SAMPLEGENO",
-                        "source_version": "v0.2",
+                        "source_version": "v0.4",
                         "sub_embedding_group": "{\"key\": \"samplegeno\", \"title\": \"Sample Genotype\"}",
                         "schema_description": "Sample ID",
                         "scope": "sample_variant"
                     }
                 }
             }
-        },
-        "RSTR": {
-            "title": "RSTR",
-            "vcf_name": "RSTR",
-            "type": "string",
-            "description": "Reference forward allele read count",
-            "source_name": "novoCaller",
-            "source_version": "2",
-            "annotation_category": "Variant Quality",
-            "schema_description": "Reference forward allele read count",
-            "value_example": "24,14,21,12",
-            "scope": "sample_variant"
-        },
-        "novoCaller_Post_prob": {
-            "title": "novoCaller_Post_prob",
-            "vcf_name": "novoCaller_Post_prob",
-            "type": "number",
-            "description": "posterior probability",
-            "source_name": "novoCaller",
-            "source_version": "2",
-            "annotation_category": "Genotype",
-            "schema_description": "posterior probability",
-            "value_example": "1.0;0.9999999999999998",
-            "scope": "sample_variant"
-        },
-        "novoCaller_AF_unrel": {
-            "title": "novoCaller_AF_unrel",
-            "vcf_name": "novoCaller_AF_unrel",
-            "type": "number",
-            "description": "allele frequency in unrelated samples",
-            "source_name": "novoCaller",
-            "source_version": "2",
-            "annotation_category": "Variant Quality",
-            "schema_description": "allele frequency in unrelated samples",
-            "value_example": "6.07737694233669E-12;6.761231331315275e-12",
-            "scope": "sample_variant"
         },
         "schema_version": {
             "default": "1"
@@ -329,8 +293,17 @@
         }
     },
     "columns": {
+        "variant.CHROM": {
+            "title": "CHROM"
+        },
+        "variant.POS": {
+            "title": "POS"
+        },
         "variant.ID": {
             "title": "ID"
+        },
+        "variant.hgvs_hgvsg": {
+            "title": "hgvs_hgvsg"
         },
         "variant.transcript.vep_consequence.display_title": {
             "title": "vep_consequence"
@@ -344,17 +317,20 @@
         "variant.conservation_phastcons100": {
             "title": "conservation_phastcons100",
             "aggregation_type": "stats",
-            "number_step": "any"
+            "number_step": "any",
+            "grouping": "conservation"
         },
         "variant.cadd_phred": {
             "title": "cadd_phred",
             "aggregation_type": "stats",
-            "number_step": "any"
+            "number_step": "any",
+            "grouping": "pathogenicity"
         },
         "variant.max_pop_af_af_popmax": {
             "title": "max_pop_af_af_popmax",
             "aggregation_type": "stats",
-            "number_step": "any"
+            "number_step": "any",
+            "grouping": "population frequency"
         }
     },
     "facets": {
@@ -373,17 +349,20 @@
         "variant.conservation_phastcons100": {
             "title": "conservation_phastcons100",
             "aggregation_type": "stats",
-            "number_step": "any"
+            "number_step": "any",
+            "grouping": "conservation"
         },
         "variant.cadd_phred": {
             "title": "cadd_phred",
             "aggregation_type": "stats",
-            "number_step": "any"
+            "number_step": "any",
+            "grouping": "pathogenicity"
         },
         "variant.max_pop_af_af_popmax": {
             "title": "max_pop_af_af_popmax",
             "aggregation_type": "stats",
-            "number_step": "any"
+            "number_step": "any",
+            "grouping": "population frequency"
         }
     }
 }

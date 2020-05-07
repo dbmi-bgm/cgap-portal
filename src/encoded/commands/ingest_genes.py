@@ -80,7 +80,7 @@ def main():
     }
     vapp = VirtualApp(get_app(args.config_uri, args.app_name), environ)
     try:
-        gene_parser.upload(vapp)
+        gene_parser.upload(vapp, project='hms-dbmi', institution='hms-dbmi', use_tqdm=True)
         logger.info('Successfully posted genes')
     except Exception as e:
         logger.error('Exception encountered during gene ingestion: %s' % str(e))

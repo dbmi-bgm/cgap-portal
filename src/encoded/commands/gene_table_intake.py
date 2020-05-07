@@ -71,6 +71,9 @@ class GeneTableParser(MappingTableParser):
 def main():
     """ Takes in the gene mapping table, produces + posts gene annotation fields and
         writes the gene schema.
+
+        Below will post on local machine
+        python src/encoded/commands/gene_table_intake.py src/encoded/tests/data/variant_workbook/gene_table.csv src/encoded/schemas/gene_annotation_field.json src/encoded/schemas/gene.json development.ini --app-name app --post-inserts
     """
     logging.basicConfig()
     parser = argparse.ArgumentParser(
@@ -81,7 +84,7 @@ def main():
     parser.add_argument('gene_table', help='path to gene table')
     parser.add_argument('gene_annotation_field_schema', help='path to gene annotation field schema')
     parser.add_argument('gene', help='where to write gene schema')
-    parser.agg_argument('config_uri', help='path to app configfile')
+    parser.add_argument('config_uri', help='path to app configfile')
     parser.add_argument('--app-name', help='Pyramid app name in configfile')
     parser.add_argument('--write-schema', action='store_true', default=False,
                         help='If specified will write schema to location')

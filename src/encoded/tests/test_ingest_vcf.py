@@ -45,7 +45,10 @@ def test_VCFP_meta(test_vcf):
     for annot_field in EXPECTED_ANNOTATION_FIELDS:
         assert annot_field in annotation_fields
     assert test_vcf.get_sub_embedded_label('VEP') == 'transcript'
-    assert test_vcf.get_sub_embedded_label('ANNOVAR') == None
+    assert test_vcf.get_sub_embedded_label('GENES') == 'genes'
+    assert test_vcf.get_sub_embedded_label('HG19') == 'hg19'
+    assert test_vcf.get_sub_embedded_label('CLINVAR_SUBMISSION') == 'clinvar_submission'
+    assert test_vcf.get_sub_embedded_label('ANNOVAR') is None
 
 
 def test_VCFP_one_variant(test_vcf):
@@ -60,54 +63,58 @@ def test_VCFP_one_variant(test_vcf):
     # check top level fields
     assert result['CHROM'] == '1'
     assert result['cytoband_cytoband'] == '1p36.33'
-    assert result['conservation_phastcons30'] == 0.133
-    assert result['clinvar_clnhgvs'] == 'NC_000001.11:g.1014143C>T'
-    assert result['clinvar_clndn'] == ['Immunodeficiency_38_with_basal_ganglia_calcification']
+    assert result['conservation_phastcons30'] == 0.545
+    assert result['dbsnp_rs_number'] == 'rs72631890'
+    assert result['gnomad_an_raw'] == 143376
 
     # check sub-embedded object fields
-    assert result['transcript'][0]['vep_consequence'] == ['upstream_gene_variant']
-    assert result['transcript'][0]['vep_impact'] == 'MODIFIER'
-    assert result['transcript'][0]['vep_pubmed'] == ['25307056']
-    assert result['transcript'][0]['vep_tssdistance'] == 950
-    assert result['transcript'][1]['vep_symbol'] == 'ISG15'
+    assert result['transcript'][0]['vep_consequence'] == ['missense_variant']
+    assert result['transcript'][0]['vep_symbol'] == 'NOC2L'
+    assert result['transcript'][0]['vep_canonical'] is True
+    assert result['transcript'][10]['vep_tsl'] == 5
+
 
 def test_VCFP_multiple_variants(test_vcf):
     """
     Tests that we can correctly process an annotated VCF with multiple records
     """
     test_VCFP_one_variant(test_vcf)  # run previous test
+
     # check record 2
     record = test_vcf.read_next_record()
     result = test_vcf.create_variant_from_record(record)
-    assert len(result['transcript'].keys()) == 5
-    assert result['transcript'][0]['vep_consequence'] == ['upstream_gene_variant']
-    assert result['transcript'][0]['vep_feature'] == 'ENST00000458555'
-    assert result['transcript'][1]['vep_domains'] == ['Gene3D:3.10.20.90', 'Pfam:PF00240',
-                                                      'PROSITE_profiles:PS50053', 'PANTHER:PTHR10666',
-                                                      'PANTHER:PTHR10666:SF267', 'SMART:SM00213',
-                                                      'Superfamily:SSF54236', 'CDD:cd01810']
-    assert result['transcript'][1]['vep_hgnc_id'] == 'HGNC:4053'
-    assert result['transcript'][1]['vep_clin_sig'] == 'pathogenic'
-    assert result['conservation_phylop20'] == -0.903
-    assert result['conservation_phylop30'] == -0.772
-    assert result['clinvar_clnhgvs'] == 'NC_000001.11:g.1014359G>T'
-    assert result['clinvar_clnrevstat'] == ['no_assertion_criteria_provided']
+
+    # check top level fields
+    assert result['conservation_phylop20'] == -0.91
+    assert result['conservation_phylop30'] == -1.239
+    assert result['topmed_het'] == 67
+    assert result['cosmic_mutation_somatic_status'] == 'Confirmed somatic variant'
     assert result['conservation_phastcons100'] == 0.0
 
-    # check record 3
+    # check transcript
+    assert len(result['transcript'].keys()) == 6
+    assert result['transcript'][0]['vep_consequence'] == ['inframe_deletion']
+    assert result['transcript'][3]['vep_consequence'] == ['downstream_gene_variant']
+    assert result['transcript'][0]['vep_feature'] == 'ENST00000341290'
+    assert result['transcript'][5]['vep_feature'] == 'ENST00000491024'
+    assert result['transcript'][0]['vep_domains'] == ['PANTHER:PTHR47282']
+
+    # check genes
+    assert result['genes'][0]['genes_ensg'] == 'ENSG00000187642'
+    assert result['genes'][1]['genes_ensg'] == 'ENSG00000187583'
+
+    # check hg19
+    assert result['hg19'][0]['hg19_pos'] == 914414
+
+    # check record 3 (only a few things)
     record = test_vcf.read_next_record()
     result = test_vcf.create_variant_from_record(record)
-    assert len(result['transcript'].keys()) == 2
-    assert result['transcript'][0]['vep_consequence'] == ['missense_variant']
-    assert result['transcript'][0]['vep_feature'] == 'ENST00000379370'
-    assert result['transcript'][0]['vep_domains'] == ['Gene3D:2.40.50.120', 'Pfam:PF03146',
-                                                      'PROSITE_profiles:PS51121', 'Superfamily:SSF50242']
-    assert result['transcript'][1]['vep_trembl'] == 'A0A087X208'
-    assert result['clinvar_geneinfo'] == 'AGRN:375790'
-    assert result['spliceai_ds_dl'] == 0.0
-    assert result['cadd_phred'] == 32.0
-    assert result['spliceai_dp_ag'] == -24
-    assert result['CHROM'] == '1'
+    assert len(result['transcript'].keys()) == 3
+    assert result['transcript'][0]['vep_consequence'] == ['intron_variant']
+    assert result['transcript'][0]['vep_feature'] == 'ENST00000624652'
+    assert result['transcript'][1]['vep_trembl'] == 'A0A096LPJ4'
+    assert result['gnomad_ac_afr_male'] == 158
+    assert result['topmed_het'] == 403
 
 
 def test_VCFP_multiple_sample_variants(test_vcf):
@@ -118,13 +125,13 @@ def test_VCFP_multiple_sample_variants(test_vcf):
         assert sample['GT'] != '0/0'  # this VCF has one of these that should be dropped
     record = test_vcf.read_next_record()
     result = test_vcf.create_sample_variant_from_record(record)[0]
-    assert result['DP'] == 1
-    assert result['GT'] == '1/1'
-    assert result['GQ'] == 6
-    assert result['PL'] == '73,6,0'
+    assert result['DP'] == 38
+    assert result['GT'] == '0/1'
+    assert result['GQ'] == 99
+    assert result['PL'] == '876,0,605'
     record = test_vcf.read_next_record()
     result = test_vcf.create_sample_variant_from_record(record)[0]
-    assert result['DP'] == 70
+    assert result['DP'] == 52
     assert len(result['samplegeno']) == 3
     assert 'NUMGT' in result['samplegeno'][0]
     assert 'AD' in result['samplegeno'][0]
@@ -149,7 +156,7 @@ def test_VCFP_post_variants(testapp, institution, project, test_vcf, post_varian
         variant = test_vcf.create_variant_from_record(record)
         variant['project'] = 'encode-project'
         variant['institution'] = 'encode-institution'
-        test_vcf.format_variant(variant)
+        test_vcf.format_variant_sub_embedded_objects(variant)
         testapp.post_json(CONNECTION_URL, variant, status=201)
 
 

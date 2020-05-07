@@ -344,6 +344,9 @@ class MappingTableParser(object):
         def is_numbered_field(o):
             return o.get('field_type') in ['integer', 'number']
 
+        def has_grouping(o):
+            return o.get('annotation_category', False)
+
         def insert_column_or_facet(d, o):
             val = {'title': o.get('schema_title', o.get(self.NAME_FIELD))}
             if is_numbered_field(o) and is_facet(o):
@@ -356,6 +359,11 @@ class MappingTableParser(object):
                     # Default. Is assumed to be "any" on frontend if absent,
                     # but adding 'documentation through redundancy', if such thing is a thing.
                     val['number_step'] = "any"
+
+            # add facet grouping
+            if is_facet(o) and has_grouping(o):
+                val['grouping'] = o.get('annotation_category')
+
             if is_sub_embedded_object(o):
                 if is_link_to(o):  # add .display_title if we are a linkTo
                     d[self.format_sub_embedding_group_name(o.get('sub_embedding_group')) + '.'

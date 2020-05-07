@@ -81,7 +81,8 @@
             "schema_description": "Chromosome",
             "value_example": "1;2;3;4;5;6;22;X;Y;M",
             "scope": "variant",
-            "maximum_length_of_value": 2
+            "maximum_length_of_value": 2,
+            "column_order": 1
         },
         "POS": {
             "title": "POS",
@@ -93,7 +94,8 @@
             "annotation_category": "position",
             "schema_description": "Position",
             "value_example": "949608",
-            "scope": "variant"
+            "scope": "variant",
+            "column_order": 1
         },
         "ID": {
             "title": "ID",
@@ -132,15 +134,39 @@
             "value_example": "A;T;C;G;GAAATCA",
             "scope": "variant"
         },
-        "hgvsg": {
-            "title": "hgvsg",
-            "vcf_name": "hgvsg",
+        "multiallele_samplevariantkey": {
+            "title": "multiallele_samplevariantkey",
+            "vcf_name": "multiallele_samplevariantkey",
+            "type": "string",
+            "description": "key for multi-allelic variant ",
+            "source_name": "MUTIALLELE",
+            "source_version": "v0.4",
+            "schema_description": "key for multi-allelic variant ",
+            "scope": "variant"
+        },
+        "NovoPP": {
+            "title": "NovoPP",
+            "vcf_name": "NovoPP",
+            "type": "number",
+            "description": "posterior probability from novoCaller",
+            "source_name": "VCF",
+            "source_version": "VCFv4.2",
+            "annotation_category": "Genotype",
+            "schema_description": "posterior probability from novoCaller",
+            "value_example": "1.0;0.9999999999999998",
+            "scope": "variant"
+        },
+        "hgvs_hgvsg": {
+            "title": "hgvs_hgvsg",
+            "vcf_name": "hgvs_hgvsg",
             "type": "string",
             "description": "HGVS genome sequence name",
             "source_name": "HGVS",
             "source_version": "v0.4",
+            "annotation_category": "position",
             "schema_description": "HGVS genome sequence name",
-            "scope": "variant"
+            "scope": "variant",
+            "column_order": 1
         },
         "hg19": {
             "title": "hg19 Coordinates",
@@ -157,6 +183,7 @@
                         "source_name": "HG19",
                         "source_version": "v0.4",
                         "sub_embedding_group": "{\"key\": \"hg19\", \"title\": \"hg19 Coordinates\"}",
+                        "annotation_category": "position",
                         "schema_description": "HGVS genome sequence name (hg19)",
                         "scope": "variant"
                     },
@@ -365,7 +392,7 @@
                     "vep_cdna_position": {
                         "title": "vep_cdna_position",
                         "vcf_name": "vep_cdna_position",
-                        "type": "integer",
+                        "type": "string",
                         "description": "Relative position of base pair in cDNA sequence",
                         "source_name": "VEP",
                         "source_version": "v98.4",
@@ -378,7 +405,7 @@
                     "vep_cds_position": {
                         "title": "vep_cds_position",
                         "vcf_name": "vep_cds_position",
-                        "type": "integer",
+                        "type": "string",
                         "description": "Relative position of base pair in coding sequence",
                         "source_name": "VEP",
                         "source_version": "v98.4",
@@ -3195,6 +3222,106 @@
             "schema_description": "Variant Suspect Reason Codes. One or more of the following values may be added: 0 - unspecified, 1 - Paralog, 2 - byEST, 4 - oldAlign, 8 - Para_EST, 16 - 1kg_failed, 1024 - other",
             "scope": "variant"
         },
+        "clinvar_submission": {
+            "title": "Submitted Interpretations",
+            "type": "array",
+            "items": {
+                "title": "Submitted Interpretations",
+                "type": "object",
+                "properties": {
+                    "clinvar_submission_interpretation": {
+                        "title": "clinvar_submission_interpretation",
+                        "vcf_name": "clinvar_submission_interpretation",
+                        "type": "string",
+                        "source_name": "CLINVAR_SUBMISSION",
+                        "source_version": "20191021",
+                        "sub_embedding_group": "{\"key\": \"clinvar_submission\", \"title\": \"Submitted Interpretations\"}",
+                        "scope": "variant"
+                    },
+                    "clinvar_submission_datelastevaluated": {
+                        "title": "clinvar_submission_datelastevaluated",
+                        "vcf_name": "clinvar_submission_datelastevaluated",
+                        "type": "string",
+                        "source_name": "CLINVAR_SUBMISSION",
+                        "source_version": "20191021",
+                        "sub_embedding_group": "{\"key\": \"clinvar_submission\", \"title\": \"Submitted Interpretations\"}",
+                        "scope": "variant"
+                    },
+                    "clinvar_submission_reviewstatus": {
+                        "title": "clinvar_submission_reviewstatus",
+                        "vcf_name": "clinvar_submission_reviewstatus",
+                        "type": "string",
+                        "source_name": "CLINVAR_SUBMISSION",
+                        "source_version": "20191021",
+                        "sub_embedding_group": "{\"key\": \"clinvar_submission\", \"title\": \"Submitted Interpretations\"}",
+                        "scope": "variant"
+                    },
+                    "clinvar_submission_method": {
+                        "title": "clinvar_submission_method",
+                        "vcf_name": "clinvar_submission_method",
+                        "type": "string",
+                        "source_name": "CLINVAR_SUBMISSION",
+                        "source_version": "20191021",
+                        "sub_embedding_group": "{\"key\": \"clinvar_submission\", \"title\": \"Submitted Interpretations\"}",
+                        "scope": "variant"
+                    },
+                    "clinvar_submission_condition": {
+                        "title": "clinvar_submission_condition",
+                        "vcf_name": "clinvar_submission_condition",
+                        "type": "string",
+                        "source_name": "CLINVAR_SUBMISSION",
+                        "source_version": "20191021",
+                        "sub_embedding_group": "{\"key\": \"clinvar_submission\", \"title\": \"Submitted Interpretations\"}",
+                        "scope": "variant"
+                    },
+                    "clinvar_submission_alleleorigin": {
+                        "title": "clinvar_submission_alleleorigin",
+                        "vcf_name": "clinvar_submission_alleleorigin",
+                        "type": "string",
+                        "source_name": "CLINVAR_SUBMISSION",
+                        "source_version": "20191021",
+                        "sub_embedding_group": "{\"key\": \"clinvar_submission\", \"title\": \"Submitted Interpretations\"}",
+                        "scope": "variant"
+                    },
+                    "clinvar_submission_submitter": {
+                        "title": "clinvar_submission_submitter",
+                        "vcf_name": "clinvar_submission_submitter",
+                        "type": "string",
+                        "source_name": "CLINVAR_SUBMISSION",
+                        "source_version": "20191021",
+                        "sub_embedding_group": "{\"key\": \"clinvar_submission\", \"title\": \"Submitted Interpretations\"}",
+                        "scope": "variant"
+                    },
+                    "clinvar_submission_submitterid": {
+                        "title": "clinvar_submission_submitterid",
+                        "vcf_name": "clinvar_submission_submitterid",
+                        "type": "string",
+                        "source_name": "CLINVAR_SUBMISSION",
+                        "source_version": "20191021",
+                        "sub_embedding_group": "{\"key\": \"clinvar_submission\", \"title\": \"Submitted Interpretations\"}",
+                        "scope": "variant"
+                    },
+                    "clinvar_submission_citation": {
+                        "title": "clinvar_submission_citation",
+                        "vcf_name": "clinvar_submission_citation",
+                        "type": "string",
+                        "source_name": "CLINVAR_SUBMISSION",
+                        "source_version": "20191021",
+                        "sub_embedding_group": "{\"key\": \"clinvar_submission\", \"title\": \"Submitted Interpretations\"}",
+                        "scope": "variant"
+                    },
+                    "clinvar_submission_accession": {
+                        "title": "clinvar_submission_accession",
+                        "vcf_name": "clinvar_submission_accession",
+                        "type": "string",
+                        "source_name": "CLINVAR_SUBMISSION",
+                        "source_version": "20191021",
+                        "sub_embedding_group": "{\"key\": \"clinvar_submission\", \"title\": \"Submitted Interpretations\"}",
+                        "scope": "variant"
+                    }
+                }
+            }
+        },
         "cosmic_genomic_mutation_id": {
             "title": "cosmic_genomic_mutation_id",
             "vcf_name": "cosmic_genomic_mutation_id",
@@ -3513,22 +3640,34 @@
         "conservation_phastcons100": {
             "title": "conservation_phastcons100",
             "aggregation_type": "stats",
-            "number_step": "any"
+            "number_step": "any",
+            "grouping": "conservation"
         },
         "cadd_phred": {
             "title": "cadd_phred",
             "aggregation_type": "stats",
-            "number_step": "any"
+            "number_step": "any",
+            "grouping": "pathogenicity"
         },
         "max_pop_af_af_popmax": {
             "title": "max_pop_af_af_popmax",
             "aggregation_type": "stats",
-            "number_step": "any"
+            "number_step": "any",
+            "grouping": "population frequency"
         }
     },
     "columns": {
+        "CHROM": {
+            "title": "CHROM"
+        },
+        "POS": {
+            "title": "POS"
+        },
         "ID": {
             "title": "ID"
+        },
+        "hgvs_hgvsg": {
+            "title": "hgvs_hgvsg"
         },
         "transcript.vep_consequence.display_title": {
             "title": "vep_consequence"
@@ -3542,17 +3681,20 @@
         "conservation_phastcons100": {
             "title": "conservation_phastcons100",
             "aggregation_type": "stats",
-            "number_step": "any"
+            "number_step": "any",
+            "grouping": "conservation"
         },
         "cadd_phred": {
             "title": "cadd_phred",
             "aggregation_type": "stats",
-            "number_step": "any"
+            "number_step": "any",
+            "grouping": "pathogenicity"
         },
         "max_pop_af_af_popmax": {
             "title": "max_pop_af_af_popmax",
             "aggregation_type": "stats",
-            "number_step": "any"
+            "number_step": "any",
+            "grouping": "population frequency"
         }
     }
 }
