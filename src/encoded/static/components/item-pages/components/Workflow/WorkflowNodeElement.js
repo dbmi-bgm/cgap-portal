@@ -116,18 +116,18 @@ export class WorkflowNodeElement extends React.PureComponent {
         } else if (nodeType === 'input' || nodeType === 'output'){
             // By file_format
             if (fileFormatAsString === 'zip' || fileFormatAsString === 'tar' || fileFormatAsString === 'gz') {
-                iconClass = 'file-zip-o';
+                iconClass = 'file-archive far';
             }
             // By meta.type & ioType
             else if (typeof ioType === 'undefined'){
-                iconClass = 'question';
+                iconClass = 'question fas';
             } else if (typeof ioType === 'string') {
                 if (isNodeQCMetric(node)) {
-                    iconClass = 'check-square-o';
+                    iconClass = 'check-square far';
                 } else if (isNodeParameter(node) || ioType.indexOf('int') > -1 || ioType.indexOf('string') > -1){
                     iconClass = 'wrench';
                 } else if (isNodeFile(node)){
-                    iconClass = 'file-text-o fas';
+                    iconClass = 'file-alt fas';
                 } else {
                     iconClass = 'question fas';
                 }
@@ -136,12 +136,12 @@ export class WorkflowNodeElement extends React.PureComponent {
                     ioType[0] === 'File' ||
                     (ioType[0] === 'null' && ioType[1] === 'File')
                 ){
-                    iconClass = 'file-text-o';
+                    iconClass = 'file-alt fas';
                 } else if (
                     (ioType[0] === 'int' || ioType[0] === 'string') ||
                     (ioType[0] === 'null' && (ioType[1] === 'int' || ioType[1] === 'string'))
                 ){
-                    iconClass = 'wrench';
+                    iconClass = 'wrench fas';
                 }
             }
 
@@ -149,7 +149,7 @@ export class WorkflowNodeElement extends React.PureComponent {
             iconClass = 'cogs fas';
         }
         if (!iconClass) {
-            iconClass = 'question';
+            iconClass = 'question fas';
         }
         return <i className={"icon icon-fw icon-" + iconClass}/>;
     }

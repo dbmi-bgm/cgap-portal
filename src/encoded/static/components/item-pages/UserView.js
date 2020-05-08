@@ -409,7 +409,7 @@ export default class UserView extends React.Component {
                                         <div className="col-md-3 gravatar-container">
                                             { object.itemUtil.User.gravatar(email, 70) }
                                             <a className="edit-button-remote text-center" target="_blank" rel="noopener noreferrer" href="https://gravatar.com">
-                                                <i className="icon icon-pencil fas"/>
+                                                <i className="icon icon-pencil-alt fas"/>
                                             </a>
                                         </div>
                                         <div className="col-md-9 user-title-col">

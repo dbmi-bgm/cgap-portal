@@ -19,7 +19,7 @@ from snovault.util import (
     debug_log
 )
 from snovault.typeinfo import AbstractTypeInfo
-from elasticsearch_dsl import Search, Nested
+from elasticsearch_dsl import Search
 from elasticsearch_dsl.aggs import Terms
 from elasticsearch import (
     TransportError,
@@ -1582,11 +1582,12 @@ def fix_nested_aggregations(search, es_mapping):
     aggs_ptr = search.aggs['all_items']
     for agg in aggs_ptr:
         if NESTED in agg:
-            (search.aggs['all_items']
-                  .bucket(agg, 'nested', path=find_nested_path(aggs_ptr.aggs[agg]['primary_agg'].field, es_mapping))
-                  .bucket('primary_agg',
-                          Terms(field=aggs_ptr.aggs[agg]['primary_agg'].field, size=100, missing='No value'))
-                  .bucket('primary_agg_reverse_nested', REVERSE_NESTED))
+            (search.aggs['all_items'][agg]  # create a sub-bucket, preserving the boolean qualifiers
+                   .bucket('primary_agg',
+                           'nested', path=find_nested_path(aggs_ptr.aggs[agg]['primary_agg'].field, es_mapping))
+                   .bucket('primary_agg',
+                           Terms(field=aggs_ptr.aggs[agg]['primary_agg'].field, size=100, missing='No value'))
+                   .bucket('primary_agg_reverse_nested', REVERSE_NESTED))
 
 
 def get_query_field(field, facet, es_mapping):
@@ -1844,7 +1845,7 @@ def fix_and_replace_nested_doc_count(result_facet, aggregations, full_agg_name):
     :param full_agg_name: full name of the aggregation
     """
     result_facet['aggregation_type'] = 'terms'
-    buckets = aggregations[full_agg_name]['primary_agg']['buckets']
+    buckets = aggregations[full_agg_name]['primary_agg']['primary_agg']['buckets']
     for bucket in buckets:
         if 'primary_agg_reverse_nested' in bucket:
             bucket['doc_count'] = bucket['primary_agg_reverse_nested']['doc_count']
@@ -1859,6 +1860,7 @@ def format_facets(es_results, facets, total, search_frame='embedded'):
     These are stored within 'aggregations' of the result.
 
     If the frame for the search != embedded, return no facets
+    TODO: refactor this method. -will 05/01/2020
     """
     result = []
     if search_frame != 'embedded':
@@ -1891,13 +1893,15 @@ def format_facets(es_results, facets, total, search_frame='embedded'):
             if facet['aggregation_type'] == 'stats':
                 result_facet['total'] = aggregations[full_agg_name]['doc_count']
                 # Used for fields on which can do range filter on, to provide min + max bounds
-                for k in aggregations[full_agg_name]["primary_agg"].keys():
-                    result_facet[k] = aggregations[full_agg_name]["primary_agg"][k]
+                for k in aggregations[full_agg_name]['primary_agg'].keys():
+                    result_facet[k] = aggregations[full_agg_name]['primary_agg'][k]
             else: # 'terms' assumed.
 
-                # XXX: This needs to be done in case we 'continue' below, unclear why needed in that case
-                # but tests will fail if its not there when expected.
-                result_facet['terms'] = aggregations[full_agg_name]["primary_agg"]["buckets"]
+                # Shift the bucket location
+                bucket_location = aggregations[full_agg_name]['primary_agg']
+                if 'buckets' not in bucket_location:  # account for nested structure
+                    bucket_location = bucket_location['primary_agg']
+                result_facet['terms'] = bucket_location['buckets']
 
                 # Choosing to show facets with one term for summary info on search it provides
                 # XXX: The above comment is misleading - this drops all facets with no buckets
@@ -1912,7 +1916,6 @@ def format_facets(es_results, facets, total, search_frame='embedded'):
 
                 # Re-add buckets under 'terms' AFTER we have fixed the doc_counts
                 result_facet['terms'] = aggregations[full_agg_name]["primary_agg"]["buckets"]
-
 
                 # Default - terms, range, or histogram buckets. Buckets may not be present
                 result_facet['terms'] = aggregations[full_agg_name]["primary_agg"]["buckets"]
