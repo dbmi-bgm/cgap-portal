@@ -58,6 +58,12 @@ deploy1:  # starts postgres/ES locally and loads inserts
 deploy2:  # spins up waittress to serve the application
 	pserve development.ini
 
+deploy3:  # uploads: GeneAnnotationFields, then Genes, then AnnotationFields, then Variant + VariantSamples
+    python src/encoded/commands/gene_table_intake.py src/encoded/tests/data/variant_workbook/gene_table.csv src/encoded/schemas/gene_annotation_field.json src/encoded/schemas/gene.json development.ini --app-name app --post-inserts
+	python src/encoded/commands/ingest_genes.py src/encoded/tests/data/variant_workbook/gene_inserts_v0.4.4.json development.ini --app-name app
+	python src/encoded/commands/variant_table_intake.py src/encoded/tests/data/variant_workbook/variant_table_v0.4.6.csv src/encoded/schemas/annotation_field.json src/encoded/schemas/variant.json src/encoded/schemas/variant_sample.json development.ini --app-name app --post-inserts
+	python src/encoded/commands/ingest_vcf.py src/encoded/tests/data/variant_workbook/vcf_v0.4.6_subset.vcf src/encoded/schemas/variant.json src/encoded/schemas/variant_sample.json hms-dbmi hms-dbmi development.ini --app-name app --post-inserts --post-variant-consequences
+
 clean-python:
 	@echo -n "Are you sure? This will wipe all libraries installed on this virtualenv [y/N] " && read ans && [ $${ans:-N} = y ]
 	pip uninstall encoded
