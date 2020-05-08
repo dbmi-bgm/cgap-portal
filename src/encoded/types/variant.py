@@ -32,9 +32,6 @@ class Variant(Item):
 
     item_type = 'variant'
     schema = load_schema('encoded:schemas/variant.json')
-    # embedded_list = [
-    #     'transcript.vep_consequence.definition'  # XXX: Get this info from mapping table
-    # ]
     embedded_list = build_variant_embedded_list()
 
     @calculated_property(schema={

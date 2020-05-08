@@ -1589,7 +1589,7 @@ def fix_nested_aggregations(search, es_mapping):
                   .bucket('primary_agg_reverse_nested', REVERSE_NESTED))
 
 
-def get_query_field(field, facet):
+def get_query_field(field, facet, es_mapping):
     """
     Converts a field from its generic field name to a more specific field name referencing its embedded nature
 
@@ -1627,7 +1627,7 @@ def set_facets(search, facets, search_filters, string_query, request, doc_types,
         field_schema = schema_for_field(field, request, doc_types, should_log=True)
         is_date_field = field_schema and determine_if_is_date_field(field, field_schema)
         is_numerical_field = field_schema and field_schema['type'] in ("integer", "float", "number")
-        query_field = get_query_field(field, facet)
+        query_field = get_query_field(field, facet, es_mapping)
         nested_path = find_nested_path(query_field, es_mapping)
 
         ## Create the aggregation itself, extend facet with info to pass down to front-end

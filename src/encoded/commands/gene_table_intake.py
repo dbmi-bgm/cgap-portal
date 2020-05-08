@@ -25,6 +25,7 @@ class GeneTableParser(MappingTableParser):
         self.INTEGER_FIELDS = ['no', 'column_priority', 'facet_priority']
         self.BOOLEAN_FIELDS = ['is_list', 'do_import']
         self.STRING_FIELDS.extend(['schema_title', 'description', 'comments', 'link', 'pattern'])
+        self.EMBEDS_TO_GENERATE = []
         self.NAME_FIELD = 'field_name'
 
     def generate_gene_schema(self, gene_props, columns, facets):

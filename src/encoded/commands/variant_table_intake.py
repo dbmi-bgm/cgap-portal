@@ -173,6 +173,8 @@ class MappingTableParser(object):
         """ Updates the EMBEDDED_FIELDS location JSON containing the embeds for Variant.
             NOTE: the files are overwritten everytime you run the process!
 
+            XXX: This does NOT work properly if for linkTos, embeds required .keyword!
+
         :param item: embedded field to be written
         """
         for t, f in self.EMBEDS_TO_GENERATE:
@@ -225,6 +227,8 @@ class MappingTableParser(object):
         def get_prop(item):
             if item.get('field_type') == 'embedded':
                 self.update_embeds(item, item.get('scope', 'gene'))  # XXX: HACK - how to get around? -Will
+                return OrderedDict()
+            if not item.get('do_import', True):  # DROP fields that explicitly have do_import = False
                 return OrderedDict()
 
             temp = OrderedDict()

@@ -136,7 +136,7 @@
             "scope": "sample_variant"
         },
         "DP": {
-            "title": "DP",
+            "title": "Coverage",
             "vcf_name": "DP",
             "type": "integer",
             "description": "Approximate read depth",
@@ -145,10 +145,13 @@
             "annotation_category": "Variant Quality",
             "schema_description": "Approximate read depth",
             "value_example": "47",
-            "scope": "sample_variant"
+            "scope": "sample_variant",
+            "schema_title": "Coverage",
+            "column_order": 40,
+            "facet_order": 8
         },
         "GQ": {
-            "title": "GQ",
+            "title": "Genotype Quality",
             "vcf_name": "GQ",
             "type": "integer",
             "description": "Genotype quality score",
@@ -157,7 +160,10 @@
             "annotation_category": "Variant Quality",
             "schema_description": "Genotype quality score",
             "value_example": "99",
-            "scope": "sample_variant"
+            "scope": "sample_variant",
+            "schema_title": "Genotype Quality",
+            "column_order": 60,
+            "facet_order": 11
         },
         "PL": {
             "title": "PL",
@@ -208,16 +214,29 @@
             "scope": "sample_variant"
         },
         "AF": {
-            "title": "AF",
+            "title": "VAF",
             "vcf_name": "AF",
             "type": "number",
-            "description": "Sample allele fraction",
+            "description": "Variant allele fraction",
             "calculated_property": true,
             "source_name": "VCF",
             "source_version": "VCFv4.2",
             "annotation_category": "Variant Quality",
-            "schema_description": "Sample allele fraction",
+            "schema_description": "Variant allele fraction",
             "value_example": "0.2979",
+            "scope": "sample_variant",
+            "schema_title": "VAF",
+            "column_order": 41,
+            "facet_order": 9
+        },
+        "multiallele_samplevariantkey": {
+            "title": "multiallele_samplevariantkey",
+            "vcf_name": "multiallele_samplevariantkey",
+            "type": "string",
+            "description": "key for multi-allelic variant ",
+            "source_name": "MUTIALLELE",
+            "source_version": "v0.4",
+            "schema_description": "key for multi-allelic variant ",
             "scope": "sample_variant"
         },
         "samplegeno": {
@@ -278,6 +297,19 @@
                 }
             }
         },
+        "NovoPP": {
+            "title": "NovoPP",
+            "vcf_name": "NovoPP",
+            "type": "number",
+            "description": "posterior probability from novoCaller",
+            "source_name": "VCF",
+            "source_version": "VCFv4.2",
+            "annotation_category": "Genotype",
+            "schema_description": "posterior probability from novoCaller",
+            "value_example": "1.0;0.9999999999999998",
+            "scope": "sample_variant",
+            "facet_order": 16
+        },
         "schema_version": {
             "default": "1"
         },
@@ -293,76 +325,182 @@
         }
     },
     "columns": {
-        "variant.CHROM": {
-            "title": "CHROM"
+        "DP": {
+            "title": "Coverage",
+            "aggregation_type": "stats",
+            "number_step": 1,
+            "grouping": "Variant Quality"
         },
-        "variant.POS": {
-            "title": "POS"
+        "GQ": {
+            "title": "Genotype Quality",
+            "aggregation_type": "stats",
+            "number_step": 1,
+            "grouping": "Variant Quality"
+        },
+        "AF": {
+            "title": "VAF",
+            "aggregation_type": "stats",
+            "number_step": "any",
+            "grouping": "Variant Quality"
         },
         "variant.ID": {
-            "title": "ID"
+            "title": "dbSNP ID"
         },
         "variant.hgvs_hgvsg": {
-            "title": "hgvs_hgvsg"
+            "title": "Variant"
         },
-        "variant.transcript.vep_consequence.display_title": {
-            "title": "vep_consequence"
-        },
-        "variant.transcript.vep_symbol": {
-            "title": "vep_symbol"
-        },
-        "variant.transcript.vep_variant_class": {
-            "title": "vep_variant_class"
-        },
-        "variant.conservation_phastcons100": {
-            "title": "conservation_phastcons100",
-            "aggregation_type": "stats",
-            "number_step": "any",
-            "grouping": "conservation"
-        },
-        "variant.cadd_phred": {
-            "title": "cadd_phred",
-            "aggregation_type": "stats",
-            "number_step": "any",
-            "grouping": "pathogenicity"
+        "variant.genes.genes_ensg.display_title": {
+            "title": "Gene"
         },
         "variant.max_pop_af_af_popmax": {
-            "title": "max_pop_af_af_popmax",
+            "title": "Gnomad PopMax AF",
             "aggregation_type": "stats",
             "number_step": "any",
-            "grouping": "population frequency"
+            "grouping": "Population Frequency"
+        },
+        "variant.gnomad_af": {
+            "title": "Gnomad Total AF",
+            "aggregation_type": "stats",
+            "number_step": "any",
+            "grouping": "Population Frequency"
         }
     },
     "facets": {
-        "variant.transcript.vep_consequence.display_title": {
-            "title": "vep_consequence"
+        "DP": {
+            "title": "Coverage",
+            "aggregation_type": "stats",
+            "number_step": 1,
+            "grouping": "Variant Quality"
         },
-        "variant.transcript.vep_symbol": {
-            "title": "vep_symbol"
+        "GQ": {
+            "title": "Genotype Quality",
+            "aggregation_type": "stats",
+            "number_step": 1,
+            "grouping": "Variant Quality"
         },
-        "variant.transcript.vep_hgvsc": {
-            "title": "vep_hgvsc"
+        "AF": {
+            "title": "VAF",
+            "aggregation_type": "stats",
+            "number_step": "any",
+            "grouping": "Variant Quality"
+        },
+        "NovoPP": {
+            "title": "NovoPP",
+            "aggregation_type": "stats",
+            "number_step": "any",
+            "grouping": "Genotype"
+        },
+        "variant.CHROM": {
+            "title": "Chromosome",
+            "grouping": "Position"
+        },
+        "variant.POS": {
+            "title": "Position",
+            "aggregation_type": "stats",
+            "number_step": 1,
+            "grouping": "Position"
+        },
+        "variant.transcript.vep_consequence.impact.display_title": {
+            "title": "Impact",
+            "grouping": "Consequence"
+        },
+        "variant.transcript.vep_consequence.location.display_title": {
+            "title": "Location",
+            "grouping": "Consequence"
+        },
+        "variant.transcript.vep_consequence.coding_effect.display_title": {
+            "title": "Coding Effect",
+            "grouping": "Consequence"
         },
         "variant.transcript.vep_variant_class": {
-            "title": "vep_variant_class"
+            "title": "Variant Type"
         },
-        "variant.conservation_phastcons100": {
-            "title": "conservation_phastcons100",
+        "variant.transcript.vep_sift": {
+            "title": "SIFT",
+            "grouping": "Missense Predictors"
+        },
+        "variant.transcript.vep_polyphen": {
+            "title": "PolyPhen",
+            "grouping": "Missense Predictors"
+        },
+        "variant.transcript.vep_clin_sig": {
+            "title": "Clinvar"
+        },
+        "variant.transcript.vep_maxentscan_diff": {
+            "title": "MaxEntScan",
             "aggregation_type": "stats",
             "number_step": "any",
-            "grouping": "conservation"
+            "grouping": "Splice Predictors"
+        },
+        "variant.genes.genes_ensg.s_het.display_title": {
+            "title": "S_het",
+            "grouping": "Constraint Metrics"
+        },
+        "variant.genes.genes.oe_mis.display_title": {
+            "title": "o/e (missense)",
+            "grouping": "Constraint Metrics"
+        },
+        "variant.genes.genes.oe_lof.display_title": {
+            "title": "o/e (LoF)",
+            "grouping": "Constraint Metrics"
+        },
+        "variant.cytoband_cytoband": {
+            "title": "Cytoband",
+            "grouping": "Position"
+        },
+        "variant.conservation_phylop100": {
+            "title": "PhyloP-100",
+            "aggregation_type": "stats",
+            "number_step": "any",
+            "grouping": "Conservation"
         },
         "variant.cadd_phred": {
-            "title": "cadd_phred",
+            "title": "CADD",
             "aggregation_type": "stats",
             "number_step": "any",
-            "grouping": "pathogenicity"
+            "grouping": "Missense Predictors"
+        },
+        "variant.spliceai_ds_ag": {
+            "title": "SpliceAI-AG",
+            "aggregation_type": "stats",
+            "number_step": "any",
+            "grouping": "Splice Predictors"
+        },
+        "variant.spliceai_ds_al": {
+            "title": "SpliceAI-AL",
+            "aggregation_type": "stats",
+            "number_step": "any",
+            "grouping": "Splice Predictors"
+        },
+        "variant.spliceai_ds_dg": {
+            "title": "SpliceAI-DG",
+            "aggregation_type": "stats",
+            "number_step": "any",
+            "grouping": "Splice Predictors"
+        },
+        "variant.spliceai_ds_dl": {
+            "title": "SpliceAI-DL",
+            "aggregation_type": "stats",
+            "number_step": "any",
+            "grouping": "Splice Predictors"
         },
         "variant.max_pop_af_af_popmax": {
-            "title": "max_pop_af_af_popmax",
+            "title": "Gnomad PopMax AF",
             "aggregation_type": "stats",
             "number_step": "any",
-            "grouping": "population frequency"
+            "grouping": "Population Frequency"
+        },
+        "variant.gnomad_an": {
+            "title": "Gnomad Allele Depth",
+            "aggregation_type": "stats",
+            "number_step": 1,
+            "grouping": "Population Frequency"
+        },
+        "variant.gnomad_af": {
+            "title": "Gnomad Total AF",
+            "aggregation_type": "stats",
+            "number_step": "any",
+            "grouping": "Population Frequency"
         }
     }
 }

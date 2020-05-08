@@ -425,9 +425,9 @@ class VCFParser(object):
                     prop_type = props[field]['type']
                     if prop_type == 'array':
                         sub_type = props[field]['items']['type']
-                        s[field.upper()] = self.cast_field_value(prop_type, val, sub_type)
+                        s[field] = self.cast_field_value(prop_type, val, sub_type)
                     else:
-                        s[field.upper()] = self.cast_field_value(prop_type, val)
+                        s[field] = self.cast_field_value(prop_type, val)
                 if field in self.VCF_SAMPLE_FIELDS:
                     if field == 'FILTER':  # XXX: default to PASS, should handle on all fields generally
                         if getattr(record, field):

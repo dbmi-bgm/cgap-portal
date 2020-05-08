@@ -23,13 +23,14 @@ EXPECTED_INSERT = {'no': 1, 'vcf_name': 'CHROM', 'source_name': 'VCF',
                    'enum_list': ['1', '2', '3', '4', '5', '6', '7', '8', '9',
                                  '10', '11', '12', '13', '14', '15', '16', '17',
                                  '18', '19', '20', '21', '22', 'X', 'Y', 'M'],
-                   'annotation_category': 'position', 'scope': 'variant', 'column_order': 1}
+                   'annotation_category': 'Position', 'scope': 'variant', 'facet_order': 1,
+                   'schema_title': 'Chromosome'}
 VEP_CONSEQUENCE_EMBEDS = ['transcript.vep_consequence.var_conseq_id', 'transcript.vep_consequence.definition',
                           'transcript.vep_consequence.impact', 'transcript.vep_consequence.location',
                           'transcript.vep_consequence.coding_effect']
-NUMBER_ANNOTATION_FIELDS = 294
-SAMPLE_FIELDS_EXPECTED = 18
-VARIANT_FIELDS_EXPECTED = 276
+NUMBER_ANNOTATION_FIELDS = 297
+SAMPLE_FIELDS_EXPECTED = 20
+VARIANT_FIELDS_EXPECTED = 277
 TRANSCRIPT_FIELDS_EXPECTED = 47
 
 
@@ -98,11 +99,14 @@ def test_generate_sample_json_items(MTParser, inserts):
     assert sample_props['DP']['vcf_name'] == 'DP'
     assert sample_props['PGT']['type'] == 'string'
     assert sample_props['PGT']['source_name'] == 'VCF'
+    assert sample_props['NovoPP']['type'] == 'number'
     assert 'samplegeno' in sample_props
 
     # check cols/facs (there are none now)
-    assert cols == {}
-    assert facs == {}
+    assert 'AF' in cols
+    assert 'DP' in cols
+    assert 'GQ' in cols
+    assert 'NovoPP' in facs
 
 
 def test_generate_variant_json_items(MTParser, inserts):
@@ -110,7 +114,7 @@ def test_generate_variant_json_items(MTParser, inserts):
     var_props, cols, facs = MTParser.generate_properties(inserts)
 
     # check top level fields
-    assert var_props['CHROM']['title'] == 'CHROM'
+    assert var_props['CHROM']['title'] == 'Chromosome'
     assert var_props['CHROM']['type'] == 'string'
     assert var_props['CHROM']['maximum_length_of_value'] == 2
     assert var_props['POS']['type'] == 'integer'
@@ -137,15 +141,13 @@ def test_generate_variant_json_items(MTParser, inserts):
     assert sub_obj_props['vep_consequence']['items']['separator'] == 'tilde'
 
     # check cols/facs
-    assert 'transcript.vep_consequence.display_title' in cols
-    assert 'transcript.vep_symbol' in cols
-    assert 'cadd_phred' in cols
-    assert 'AF' not in cols
-    assert cols['transcript.vep_consequence.display_title']['title'] == 'vep_consequence'  # linkTo has display title
-    assert facs['transcript.vep_consequence.display_title']['title'] == 'vep_consequence'
-    assert facs['transcript.vep_symbol']['title'] == 'vep_symbol'
-    assert facs['cadd_phred']['aggregation_type'] == 'stats'
-    assert 'transcript.vep_symbol' in facs
+    assert 'hgvs_hgvsg' in cols
+    assert 'max_pop_af_af_popmax' in cols
+    assert 'gnomad_af' in cols
+    assert cols['hgvs_hgvsg']['title'] == 'Variant'
+    assert facs['CHROM']['title'] == 'Chromosome'
+    assert facs['CHROM']['grouping'] == 'Position'
+    assert facs['spliceai_ds_dg']['aggregation_type'] == 'stats'
 
 
 def test_generate_variant_sample_schema(MTParser, sample_variant_items):
@@ -159,7 +161,7 @@ def test_generate_variant_sample_schema(MTParser, sample_variant_items):
     assert 'GQ' in properties
     assert properties['AF']['type'] == 'number'
     assert 'columns' in schema
-    assert 'AF' not in schema['facets']
+    assert 'AF' in schema['facets']
     assert 'facets' in schema
     assert 'variant' in properties
     assert 'sample' in properties

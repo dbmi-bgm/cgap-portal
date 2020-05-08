@@ -66,6 +66,11 @@
             "description": "Whether the field is a list or not",
             "default": false
         },
+        "annotation_category": {
+            "title": "Annotation Category",
+            "description": "Category used for this annotation, could be used for grouping",
+            "type": "string"
+        },
         "do_import": {
             "title": "Do Import",
             "type": "boolean",
