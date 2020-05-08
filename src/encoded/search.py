@@ -1085,19 +1085,6 @@ def apply_range_filters(range_filters, must_filters, es_mapping):
             }))
 
 
-def extract_nested_path_from_field(field):
-    """
-    Extracts the nested path from the field by splicing the field from start:second_idx_of_('.').
-    This seems to work in general but feels fragile... It is specific to how we map things.
-    It's likely this can be factored out. - Will
-        ex: 'embedded.files.accession.raw' --> 'embedded.files' is the nested path
-
-    :param field: full field path at the most, nested path at the least
-    :return: nested
-    """
-    return field[:field.index('.', field.index('.') + 1)]
-
-
 def handle_should_query(field_name, options):
     """
     Builds a lucene 'should' subquery for every option for the given field
@@ -1114,7 +1101,7 @@ def handle_should_query(field_name, options):
     return should_query
 
 
-def handle_nested_filters(nested_filters, final_filters, key='must'):
+def handle_nested_filters(nested_filters, final_filters, es_mapping, key='must'):
     """
     Helper function for set_filters that collapses nested filters together into a single lucene sub-query
     and attaching it to final_filters (modifying in place).
@@ -1136,7 +1123,7 @@ def handle_nested_filters(nested_filters, final_filters, key='must'):
 
         # iterate through all sub_query parts - note that this is modified in place hence the need
         # to re-iterate after every nested filer is applied
-        nested_path = extract_nested_path_from_field(field)
+        nested_path = find_nested_path(field, es_mapping)
         sub_queries = final_filters['bool'][key]
         found = False
         for _q in sub_queries:
@@ -1294,8 +1281,8 @@ def set_filters(request, search, result, principals, doc_types, es_mapping):
 
     # initialize filter hierarchy
     final_filters = {BOOL: {MUST: [f for _, f in must_filters], MUST_NOT: [f for _, f in must_not_filters]}}
-    handle_nested_filters(must_filters_nested, final_filters, key=MUST)
-    handle_nested_filters(must_not_filters_nested, final_filters, key=MUST_NOT)
+    handle_nested_filters(must_filters_nested, final_filters, es_mapping, key=MUST)
+    handle_nested_filters(must_not_filters_nested, final_filters, es_mapping, key=MUST_NOT)
 
     # at this point, final_filters is valid lucene and can be dropped into the query directly
     prev_search[QUERY][BOOL][FILTER] = final_filters

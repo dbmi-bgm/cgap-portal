@@ -418,7 +418,7 @@
                     "vep_protein_position": {
                         "title": "vep_protein_position",
                         "vcf_name": "vep_protein_position",
-                        "type": "integer",
+                        "type": "string",
                         "description": "Relative position of amino acid in protein",
                         "source_name": "VEP",
                         "source_version": "v98.4",
