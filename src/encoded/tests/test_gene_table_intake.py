@@ -7,9 +7,9 @@ pytestmark = [pytest.mark.working, pytest.mark.ingestion]
 MT_LOC = './src/encoded/tests/data/variant_workbook/gene_table.csv'
 GENE_SCHEMA_TEST_LOC = './src/encoded/tests/data/variant_workbook/gene.json'
 GENE_ANNOTATION_FIELD_SCHEMA = './src/encoded/schemas/gene_annotation_field.json'
-EXPECTED_FIELDS = ['column_priority', 'comments', 'description', 'do_import',
-                   'enum_list', 'pattern', 'facet_grouping', 'facet_priority', 'field_name',
-                   'field_priority', 'field_type', 'is_list', 'link', 'no', 'schema_title',
+EXPECTED_FIELDS = ['annotation_category', 'column_order', 'comments', 'description', 'do_import',
+                   'enum_list', 'pattern', 'facet_order', 'field_name',
+                   'field_type', 'is_list', 'link', 'no', 'schema_title',
                    'separator', 'source_name', 'source_version', 'sub_embedding_group', 'value_example']
 NUMBER_ANNOTATION_FIELDS = 284
 EXPECTED_INSERT = {'no': 1, 'field_name': 'chrom', 'source_name': 'ENSEMBLgene',
@@ -21,7 +21,7 @@ EXPECTED_INSERT = {'no': 1, 'field_name': 'chrom', 'source_name': 'ENSEMBLgene',
                        ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13',
                         '14', '15', '16', '17', '18', '19', '20', '21', '22', 'X', 'Y', 'M'],
                    'do_import': True}
-CLINGENDIS_FIELDS_EXPECTED = 6
+CLINGENDIS_FIELDS_EXPECTED = 4
 TRANSCRIPT_FIELDS_EXPECTED = 15
 
 
@@ -83,15 +83,15 @@ def test_generate_gene_schema(gene_schema):
     clingendis_props = properties['clingendis']['items']['properties']
     assert len(clingendis_props.keys()) == CLINGENDIS_FIELDS_EXPECTED
     assert 'disease_id' in clingendis_props
-    assert 'classification_date' in clingendis_props
     clingendis_disease_label = properties['clingendis']['items']['properties']['disease_label']
     assert clingendis_disease_label['type'] == 'string'
 
-    transcript_props = properties['transcript']['items']['properties']
-    assert len(transcript_props.keys()) == TRANSCRIPT_FIELDS_EXPECTED
-    assert 'refseq' in transcript_props
-    assert 'protein_length' in transcript_props
-    assert transcript_props['five_prime_utr']['source_name'] == 'GenCode'
+    # Re-enable once these fields are added to gene schema via do_import
+    # transcript_props = properties['transcript']['items']['properties']
+    # assert len(transcript_props.keys()) == TRANSCRIPT_FIELDS_EXPECTED
+    # assert 'refseq' in transcript_props
+    # assert 'protein_length' in transcript_props
+    # assert transcript_props['five_prime_utr']['source_name'] == 'GenCode'
 
     # check regex
     assert properties['ensgid']['pattern'] == '^ENSG[0-9]{11}$'

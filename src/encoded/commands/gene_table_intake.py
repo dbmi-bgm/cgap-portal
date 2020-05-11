@@ -20,13 +20,13 @@ class GeneTableParser(MappingTableParser):
     """ Subclass of MappingTableParser that overrides methods required for any differences across tables. """
 
     def __init__(self, *args, **kwargs):
-        super(GeneTableParser, self).__init__(*args, **kwargs)
         self.FIELD_TYPE_INDEX = 12
         self.INTEGER_FIELDS = ['no', 'column_priority', 'facet_priority']
         self.BOOLEAN_FIELDS = ['is_list', 'do_import']
         self.STRING_FIELDS.extend(['schema_title', 'description', 'comments', 'link', 'pattern'])
         self.EMBEDS_TO_GENERATE = []
         self.NAME_FIELD = 'field_name'
+        super(GeneTableParser, self).__init__(*args, **kwargs)
 
     def generate_gene_schema(self, gene_props, columns, facets):
         """

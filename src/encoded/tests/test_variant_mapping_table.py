@@ -187,7 +187,6 @@ def test_generate_variant_schema(MTParser, variant_items):
     sub_obj_props = properties['transcript']['items']['properties']
     assert len(sub_obj_props) == TRANSCRIPT_FIELDS_EXPECTED
     assert sub_obj_props['vep_consequence']['type'] == 'array'
-    assert sub_obj_props['vep_consequence']['items']['facet_order'] == 7
     assert sub_obj_props['vep_consequence']['items']['type'] == 'string'
     assert sub_obj_props['vep_consequence']['items']['linkTo'] == 'VariantConsequence'
     assert sub_obj_props['vep_domains']['type'] == 'array'
@@ -206,8 +205,8 @@ def test_generate_variant_schema(MTParser, variant_items):
     # check cols/facs
     assert 'ID' in schema['columns']
     assert 'AF' not in schema['columns']
-    assert 'transcript.vep_consequence.display_title' in schema['facets']
-    assert 'transcript.vep_symbol' in schema['facets']
+    assert 'CHROM' in schema['facets']
+    assert 'POS' in schema['facets']
 
     # check embedded fields are there
     with open(MTParser.EMBEDDED_VARIANT_FIELDS, 'r') as fd:

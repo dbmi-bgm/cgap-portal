@@ -436,11 +436,11 @@
             "title": "S_het",
             "grouping": "Constraint Metrics"
         },
-        "variant.genes.genes.oe_mis.display_title": {
+        "variant.genes.genes_ensg.oe_mis.display_title": {
             "title": "o/e (missense)",
             "grouping": "Constraint Metrics"
         },
-        "variant.genes.genes.oe_lof.display_title": {
+        "variant.genes.genes_ensg.oe_lof.display_title": {
             "title": "o/e (LoF)",
             "grouping": "Constraint Metrics"
         },
