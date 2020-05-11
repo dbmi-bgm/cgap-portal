@@ -29,13 +29,19 @@ def run_ingest_vcf(app_handle, args):
     if args.post_variant_consequences:
         vcf_parser.post_variant_consequence_items(app_handle, project=args.variant_project,
                                                   institution=args.variant_institution)
+    success, error = 0, 0
     if args.post_variants:
         for record in tqdm(vcf_parser, unit='variants'):
             variant = vcf_parser.create_variant_from_record(record)
             variant['project'] = args.variant_project
             variant['institution'] = args.variant_institution
-            vcf_parser.format_variant(variant)
-            res = app_handle.post_json('/variant', variant, status=201).json['@graph'][0]  # only one item posted
+            vcf_parser.format_variant_sub_embedded_objects(variant)
+            try:
+                res = app_handle.post_json('/variant', variant, status=201).json['@graph'][0]  # only one item posted
+                success += 1
+            except:
+                error += 1
+                continue
             variant_samples = vcf_parser.create_sample_variant_from_record(record)
             for sample in variant_samples:
                 sample['project'] = args.variant_project
@@ -43,7 +49,7 @@ def run_ingest_vcf(app_handle, args):
                 sample['variant'] = res['@id']  # make link
                 app_handle.post_json('/variant_sample', sample, status=201)
 
-        logger.warning('Succesfully posted VCF entries')
+        logger.warning('Succesfully posted %s VCF entries, errors: %s' % (success, error))
     return True
 
 

@@ -52,6 +52,12 @@ macbuild-dev:  # same as macbuild but gives moto & locust setup as well
 build-locust:  # just pip installs locust - may cause instability
 	pip install locust
 
+download-genes: # grabs latest gene list from the below link, unzips and drops in correct place 
+	wget https://www.dropbox.com/s/s2xa978nwktd3ib/mvp_gene_datasource_v0.4.5.coding_gene_main_chrom.json.gz?dl=1
+	mv mvp_gene_datasource_v0.4.5.coding_gene_main_chrom.json.gz\?dl\=1 gene_list_v0.4.5.json.gz
+	gunzip gene_list_v0.4.5.json.gz
+	mv gene_list.json src/encoded/tests/data/variant_workbook/gene_list.json
+
 deploy1:  # starts postgres/ES locally and loads inserts
 	dev-servers development.ini --app-name app --clear --init --load
 
@@ -59,10 +65,7 @@ deploy2:  # spins up waittress to serve the application
 	pserve development.ini
 
 deploy3:  # uploads: GeneAnnotationFields, then Genes, then AnnotationFields, then Variant + VariantSamples
-    python src/encoded/commands/gene_table_intake.py src/encoded/tests/data/variant_workbook/gene_table.csv src/encoded/schemas/gene_annotation_field.json src/encoded/schemas/gene.json development.ini --app-name app --post-inserts
-	python src/encoded/commands/ingest_genes.py src/encoded/tests/data/variant_workbook/gene_inserts_v0.4.4.json development.ini --app-name app
-	python src/encoded/commands/variant_table_intake.py src/encoded/tests/data/variant_workbook/variant_table_v0.4.6.csv src/encoded/schemas/annotation_field.json src/encoded/schemas/variant.json src/encoded/schemas/variant_sample.json development.ini --app-name app --post-inserts
-	python src/encoded/commands/ingest_vcf.py src/encoded/tests/data/variant_workbook/vcf_v0.4.6_subset.vcf src/encoded/schemas/variant.json src/encoded/schemas/variant_sample.json hms-dbmi hms-dbmi development.ini --app-name app --post-inserts --post-variant-consequences
+	python src/encoded/commands/ingestion.py src/encoded/tests/data/variant_workbook/variant_table_v0.4.6.csv src/encoded/schemas/annotation_field.json src/encoded/schemas/variant.json src/encoded/schemas/variant_sample.json src/encoded/tests/data/variant_workbook/vcf_v0.4.6_subset.vcf hms-dbmi hms-dbmi src/encoded/tests/data/variant_workbook/gene_table.csv src/encoded/schemas/gene_annotation_field.json src/encoded/schemas/gene.json src/encoded/tests/data/variant_workbook/gene_inserts_v0.4.5.json hms-dbmi hms-dbmi development.ini --post-variant-consequences --post-variants --post-gene-annotation-field-inserts --post-gene-inserts --app-name app
 
 clean-python:
 	@echo -n "Are you sure? This will wipe all libraries installed on this virtualenv [y/N] " && read ans && [ $${ans:-N} = y ]

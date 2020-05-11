@@ -1,3 +1,4 @@
+import os
 import argparse
 import logging
 from encoded.commands.variant_ingestion import run_variant_table_intake, run_ingest_vcf
@@ -9,6 +10,18 @@ from pyramid.paster import get_app
 
 logger = logging.getLogger(__name__)
 EPILOG = __doc__
+
+
+def validate_files_exist(args):
+    """ Validates that the files we care about (passed through args) are actually present, that way we don't
+        run through a (potentially long) step only to File Not Found
+    """
+    assert os.path.exists(args.variant_table)
+    assert os.path.exists(args.variant_annotation_field_schema)
+    assert os.path.exists(args.vcf)
+    assert os.path.exists(args.gene_table)
+    assert os.path.exists(args.gene_annotation_field_schema)
+    assert os.path.exists(args.gene_list)
 
 
 def main():
@@ -97,6 +110,7 @@ def main():
     parser.add_argument('--app-name', help="Pyramid app name in configfile")  # to get app
 
     args = parser.parse_args()
+    validate_files_exist(args)  # throw assertion error here if we gave a bad file anywhere
 
     # initialize VirtualApp
     environ = {
@@ -110,12 +124,12 @@ def main():
         print('Tried to run ingestion not on cgapdev, which is temporarily disabled.')
         exit(1)
     app_handle = VirtualApp(app, environ)
+    # gene_ingestion_result = run_gene_table_intake(app_handle, args) and run_ingest_genes(app_handle, args)
+    # if gene_ingestion_result is True:
     variant_ingestion_result = run_variant_table_intake(app_handle, args) and run_ingest_vcf(app_handle, args)
     if variant_ingestion_result is True:
-        gene_ingestion_result = run_gene_table_intake(app_handle, args) and run_ingest_genes(app_handle, args)
-        if gene_ingestion_result is True:
-            logger.warning('Successfully finished end-to-end ingestion!')
-            exit(0)
+        logger.warning('Successfully finished end-to-end ingestion!')
+        exit(0)
 
     exit(1)  # if we got to this point, something went wrong
 

@@ -223,7 +223,7 @@ class MappingTableParser(object):
         cols = OrderedDict()
         facs = OrderedDict()
 
-        # inner functions to be used as helpers here
+        # inner functions to be used as helper
         def get_prop(item):
             if item.get('field_type') == 'embedded':
                 self.update_embeds(item, item.get('scope', 'gene'))  # XXX: HACK - how to get around? -Will
