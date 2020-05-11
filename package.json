@@ -101,7 +101,7 @@
   "dependencies": {
     "@fortawesome/fontawesome-free": "^5.13.0",
     "@hms-dbmi-bgm/react-workflow-viz": "0.1.4",
-    "@hms-dbmi-bgm/shared-portal-components": "github:4dn-dcic/shared-portal-components#0.0.2.64.1b",
+    "@hms-dbmi-bgm/shared-portal-components": "github:4dn-dcic/shared-portal-components#0.0.2.64.2b",
     "babel-polyfill": "^6.26.0",
     "d3": "^5.16.0",
     "detect-browser": "^3.0.1",
