@@ -3,7 +3,7 @@
 # after having done 'python setup_eb.py develop', at least on the beanstalk. It doesn't
 # sem to be needed locally. -kmp 17-Mar-2020
 name = "encoded"
-version = "1.10.0"
+version = "1.11.0"
 description = "Clinical Genomics Analysis Platform"
 authors = ["4DN-DCIC Team <support@4dnucleome.org>"]
 license = "MIT"
@@ -95,7 +95,7 @@ pytest-xdist = "1.14"
 python-dateutil = "2.5.3"
 python-magic = "0.4.12"
 pytz = ">=2016.3"
-dcic_pyVCF = "1.0.0"
+dcicpyvcf = "1.0.0"
 rdflib = "4.2.2"
 rdflib-jsonld = "0.3"
 "repoze.debug" = "1.0.2"

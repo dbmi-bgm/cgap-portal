@@ -1,5 +1,4 @@
 import re
-import sys
 import vcf
 import json
 import argparse
