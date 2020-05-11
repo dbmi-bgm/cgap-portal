@@ -124,9 +124,9 @@ def main():
         print('Tried to run ingestion not on cgapdev, which is temporarily disabled.')
         exit(1)
     app_handle = VirtualApp(app, environ)
-    # gene_ingestion_result = run_gene_table_intake(app_handle, args) and run_ingest_genes(app_handle, args)
-    # if gene_ingestion_result is True:
-    variant_ingestion_result = run_variant_table_intake(app_handle, args) and run_ingest_vcf(app_handle, args)
+    gene_ingestion_result = run_gene_table_intake(app_handle, args) and run_ingest_genes(app_handle, args)
+    if gene_ingestion_result is True:
+        variant_ingestion_result = run_variant_table_intake(app_handle, args) and run_ingest_vcf(app_handle, args)
     if variant_ingestion_result is True:
         logger.warning('Successfully finished end-to-end ingestion!')
         exit(0)
