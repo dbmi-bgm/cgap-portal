@@ -3645,15 +3645,15 @@
             "number_step": 1,
             "grouping": "Position"
         },
-        "transcript.vep_consequence.impact.display_title": {
+        "transcript.vep_consequence.impact": {
             "title": "Impact",
             "grouping": "Consequence"
         },
-        "transcript.vep_consequence.location.display_title": {
+        "transcript.vep_consequence.location": {
             "title": "Location",
             "grouping": "Consequence"
         },
-        "transcript.vep_consequence.coding_effect.display_title": {
+        "transcript.vep_consequence.coding_effect": {
             "title": "Coding Effect",
             "grouping": "Consequence"
         },
@@ -3677,16 +3677,22 @@
             "number_step": "any",
             "grouping": "Splice Predictors"
         },
-        "genes.genes_ensg.s_het.display_title": {
+        "genes.genes_ensg.s_het": {
             "title": "S_het",
+            "aggregation_type": "stats",
+            "number_step": "any",
             "grouping": "Constraint Metrics"
         },
-        "genes.genes_ensg.oe_mis.display_title": {
+        "genes.genes_ensg.oe_mis": {
             "title": "o/e (missense)",
+            "aggregation_type": "stats",
+            "number_step": "any",
             "grouping": "Constraint Metrics"
         },
-        "genes.genes_ensg.oe_lof.display_title": {
+        "genes.genes_ensg.oe_lof": {
             "title": "o/e (LoF)",
+            "aggregation_type": "stats",
+            "number_step": "any",
             "grouping": "Constraint Metrics"
         },
         "cytoband_cytoband": {
