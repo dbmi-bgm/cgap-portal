@@ -3637,114 +3637,143 @@
     "facets": {
         "CHROM": {
             "title": "Chromosome",
+            "order": 1,
             "grouping": "Position"
         },
         "POS": {
             "title": "Position",
             "aggregation_type": "stats",
             "number_step": 1,
+            "order": 2,
             "grouping": "Position"
         },
-        "transcript.vep_consequence.impact.display_title": {
+        "transcript.vep_consequence.impact": {
             "title": "Impact",
+            "order": 5,
             "grouping": "Consequence"
         },
-        "transcript.vep_consequence.location.display_title": {
+        "transcript.vep_consequence.location": {
             "title": "Location",
+            "order": 6,
             "grouping": "Consequence"
         },
-        "transcript.vep_consequence.coding_effect.display_title": {
+        "transcript.vep_consequence.coding_effect": {
             "title": "Coding Effect",
+            "order": 7,
             "grouping": "Consequence"
         },
         "transcript.vep_variant_class": {
-            "title": "Variant Type"
+            "title": "Variant Type",
+            "order": 4
         },
         "transcript.vep_sift": {
             "title": "SIFT",
+            "order": 22,
             "grouping": "Missense Predictors"
         },
         "transcript.vep_polyphen": {
             "title": "PolyPhen",
+            "order": 23,
             "grouping": "Missense Predictors"
         },
         "transcript.vep_clin_sig": {
-            "title": "Clinvar"
+            "title": "Clinvar",
+            "order": 30
         },
         "transcript.vep_maxentscan_diff": {
             "title": "MaxEntScan",
             "aggregation_type": "stats",
             "number_step": "any",
+            "order": 29,
             "grouping": "Splice Predictors"
         },
-        "genes.genes_ensg.s_het.display_title": {
+        "genes.genes_ensg.s_het": {
             "title": "S_het",
+            "aggregation_type": "stats",
+            "number_step": "any",
+            "order": 32,
             "grouping": "Constraint Metrics"
         },
-        "genes.genes_ensg.oe_mis.display_title": {
+        "genes.genes_ensg.oe_mis": {
             "title": "o/e (missense)",
+            "aggregation_type": "stats",
+            "number_step": "any",
+            "order": 33,
             "grouping": "Constraint Metrics"
         },
-        "genes.genes_ensg.oe_lof.display_title": {
+        "genes.genes_ensg.oe_lof": {
             "title": "o/e (LoF)",
+            "aggregation_type": "stats",
+            "number_step": "any",
+            "order": 34,
             "grouping": "Constraint Metrics"
         },
         "cytoband_cytoband": {
             "title": "Cytoband",
+            "order": 3,
             "grouping": "Position"
         },
         "conservation_phylop100": {
             "title": "PhyloP-100",
             "aggregation_type": "stats",
             "number_step": "any",
+            "order": 20,
             "grouping": "Conservation"
         },
         "cadd_phred": {
             "title": "CADD",
             "aggregation_type": "stats",
             "number_step": "any",
+            "order": 21,
             "grouping": "Missense Predictors"
         },
         "spliceai_ds_ag": {
             "title": "SpliceAI-AG",
             "aggregation_type": "stats",
             "number_step": "any",
+            "order": 25,
             "grouping": "Splice Predictors"
         },
         "spliceai_ds_al": {
             "title": "SpliceAI-AL",
             "aggregation_type": "stats",
             "number_step": "any",
+            "order": 26,
             "grouping": "Splice Predictors"
         },
         "spliceai_ds_dg": {
             "title": "SpliceAI-DG",
             "aggregation_type": "stats",
             "number_step": "any",
+            "order": 27,
             "grouping": "Splice Predictors"
         },
         "spliceai_ds_dl": {
             "title": "SpliceAI-DL",
             "aggregation_type": "stats",
             "number_step": "any",
+            "order": 28,
             "grouping": "Splice Predictors"
         },
         "max_pop_af_af_popmax": {
             "title": "Gnomad PopMax AF",
             "aggregation_type": "stats",
             "number_step": "any",
+            "order": 18,
             "grouping": "Population Frequency"
         },
         "gnomad_an": {
             "title": "Gnomad Allele Depth",
             "aggregation_type": "stats",
             "number_step": 1,
+            "order": 19,
             "grouping": "Population Frequency"
         },
         "gnomad_af": {
             "title": "Gnomad Total AF",
             "aggregation_type": "stats",
             "number_step": "any",
+            "order": 17,
             "grouping": "Population Frequency"
         }
     },
@@ -3762,12 +3791,14 @@
             "title": "Gnomad PopMax AF",
             "aggregation_type": "stats",
             "number_step": "any",
+            "order": 18,
             "grouping": "Population Frequency"
         },
         "gnomad_af": {
             "title": "Gnomad Total AF",
             "aggregation_type": "stats",
             "number_step": "any",
+            "order": 17,
             "grouping": "Population Frequency"
         }
     }

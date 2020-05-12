@@ -338,7 +338,7 @@ class MappingTableParser(object):
             return o.get('sub_embedding_group')
 
         def is_facet(o):
-            return o.get('facet_order')
+            return o.get('facet_order', None)
 
         def is_column(o):
             return o.get('column_order')
@@ -366,13 +366,15 @@ class MappingTableParser(object):
                     val['number_step'] = "any"
 
             # add facet grouping
-            if is_facet(o) and has_grouping(o):
-                val['grouping'] = o.get('annotation_category')
+            if is_facet(o) is not None:
+                val['order'] = is_facet(o)
+                if has_grouping(o) is not False:
+                    val['grouping'] = o.get('annotation_category')
 
             if is_sub_embedded_object(o):
                 if is_link_to(o):  # add .display_title if we are a linkTo
                     d[self.format_sub_embedding_group_name(o.get('sub_embedding_group')) + '.'
-                      + o[self.NAME_FIELD] + '.display_title'] = val
+                      + o[self.NAME_FIELD] + '.display_title'] = val  # XXX: when new mapping table comes in check embedded field
                 else:
                     d[self.format_sub_embedding_group_name(o.get('sub_embedding_group')) + '.'
                       + o[self.NAME_FIELD]] = val

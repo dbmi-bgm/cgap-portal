@@ -207,6 +207,7 @@ def test_generate_variant_schema(MTParser, variant_items):
     assert 'AF' not in schema['columns']
     assert 'CHROM' in schema['facets']
     assert 'POS' in schema['facets']
+    assert 'order' in schema['facets']['POS']
 
     # check embedded fields are there
     with open(MTParser.EMBEDDED_VARIANT_FIELDS, 'r') as fd:
