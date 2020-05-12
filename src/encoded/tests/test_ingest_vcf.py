@@ -138,6 +138,7 @@ def test_VCFP_multiple_sample_variants(test_vcf):
     assert 'GT' in result['samplegeno'][0]
 
 
+@pytest.mark.skip  # will not run until valid VCF is given
 def test_VCFP_post_sample_variants(testapp, institution, project, test_vcf):
     """ Attempts to post all generated sample variants without links"""
     CONNECTION_URL = '/variant_sample'

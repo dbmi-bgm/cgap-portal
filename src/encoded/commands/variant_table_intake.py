@@ -30,8 +30,8 @@ class MappingTableParser(object):
                      'scope', 'schema_title', 'pre_addon', 'embedded_fields']
     SPECIAL_FIELDS = ['field_type', 'enum_list', 'links_to']
     ALL_FIELDS = INTEGER_FIELDS + BOOLEAN_FIELDS + STRING_FIELDS + SPECIAL_FIELDS
-    EMBEDDED_VARIANT_FIELDS = resolve_file_path('../schemas/variant_embeds.json')
-    EMBEDDED_VARIANT_SAMPLE_FIELDS = resolve_file_path('../schemas/variant_sample_embeds.json')  # XXX: unused currently
+    EMBEDDED_VARIANT_FIELDS = resolve_file_path('../schemas/variant_embeds.json', file_loc=__file__)
+    EMBEDDED_VARIANT_SAMPLE_FIELDS = resolve_file_path('../schemas/variant_sample_embeds.json', file_loc=__file__)  # XXX: unused currently
     EMBEDS_TO_GENERATE = [('variant', EMBEDDED_VARIANT_FIELDS),
                           ('variant_sample', EMBEDDED_VARIANT_SAMPLE_FIELDS)]
     NAME_FIELD = 'vcf_name'
