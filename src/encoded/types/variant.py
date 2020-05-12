@@ -22,7 +22,7 @@ def build_variant_embedded_list():
     embedded_list = []
     with open(resolve_file_path('../schemas/variant_embeds.json', file_loc=__file__), 'r') as fd:
         embeds = json.load(fd)['variant']
-        for embedded_type, _embeds in embeds.items():
+        for _, _embeds in embeds.items():
             embedded_list.extend(_embeds)
     return embedded_list + Item.embedded_list
 
@@ -38,7 +38,7 @@ def build_variant_sample_embedded_list():
     embedded_list = []
     with open(resolve_file_path('../schemas/variant_embeds.json', file_loc=__file__), 'r') as fd:
         embeds = json.load(fd)['variant']
-        for embedded_type, _embeds in embeds.items():
+        for _, _embeds in embeds.items():
             embedded_list.extend('variant.' + e for e in _embeds)
     return ['variant.*'] + embedded_list + Item.embedded_list
 

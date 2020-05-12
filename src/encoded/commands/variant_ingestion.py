@@ -40,6 +40,7 @@ def run_ingest_vcf(app_handle, args):
                 res = app_handle.post_json('/variant', variant, status=201).json['@graph'][0]  # only one item posted
                 success += 1
             except:  # validation error
+                import pdb; pdb.set_trace()
                 error += 1
                 continue
             variant_samples = vcf_parser.create_sample_variant_from_record(record)

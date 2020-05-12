@@ -1879,7 +1879,7 @@ def format_facets(es_results, facets, total, search_frame='embedded'):
     # Sort facets by order (ascending).
     # If no order is provided, assume 0 to
     # retain order of non-explicitly ordered facets
-    for field, facet in sorted(facets, key=lambda fct: fct[1].get('order', 0)):
+    for field, facet in sorted(facets, key=lambda fct: fct[1].get('order', 10000)):
         result_facet = {
             'field' : field,
             'title' : facet.get('title', field),

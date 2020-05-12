@@ -13,7 +13,7 @@ EXPECTED_FIELDS = ['no', 'vcf_name', 'source_name', 'source_version', 'sub_embed
                    'field_type', 'is_list', 'separator', 'maximum_length_of_value',
                    'schema_description', 'value_example', 'enum_list',
                    'facet_order', 'column_order', 'annotation_category',
-                   'scope', 'schema_title', 'pre_addon', 'links_to', 'embedded_fields',
+                   'scope', 'schema_title', 'pre_addon', 'links_to', 'embedded_field',
                    'calculated_property']
 EXPECTED_INSERT = {'no': 1, 'vcf_name': 'CHROM', 'source_name': 'VCF',
                    'source_version': 'VCFv4.2', 'field_type': 'string',
@@ -28,9 +28,9 @@ EXPECTED_INSERT = {'no': 1, 'vcf_name': 'CHROM', 'source_name': 'VCF',
 VEP_CONSEQUENCE_EMBEDS = ['transcript.vep_consequence.var_conseq_id', 'transcript.vep_consequence.definition',
                           'transcript.vep_consequence.impact', 'transcript.vep_consequence.location',
                           'transcript.vep_consequence.coding_effect']
-NUMBER_ANNOTATION_FIELDS = 297
+NUMBER_ANNOTATION_FIELDS = 302
 SAMPLE_FIELDS_EXPECTED = 20
-VARIANT_FIELDS_EXPECTED = 277
+VARIANT_FIELDS_EXPECTED = 282
 TRANSCRIPT_FIELDS_EXPECTED = 47
 
 
@@ -212,8 +212,9 @@ def test_generate_variant_schema(MTParser, variant_items):
     # check embedded fields are there
     with open(MTParser.EMBEDDED_VARIANT_FIELDS, 'r') as fd:
         embeds_to_check = json.load(fd)
-        for embed in embeds_to_check['variant']['VariantConsequence']:
-            assert embed.strip() in VEP_CONSEQUENCE_EMBEDS
+        for embed in embeds_to_check['variant']['embedded_field']:
+            if 'vep' in embed:
+                assert embed.strip() in VEP_CONSEQUENCE_EMBEDS
 
 
 def test_post_variant_annotation_field_inserts(inserts, project, institution, testapp):

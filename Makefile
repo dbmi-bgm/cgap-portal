@@ -65,7 +65,7 @@ deploy2:  # spins up waittress to serve the application
 	pserve development.ini
 
 deploy3:  # uploads: GeneAnnotationFields, then Genes, then AnnotationFields, then Variant + VariantSamples
-	python src/encoded/commands/ingestion.py src/encoded/tests/data/variant_workbook/variant_table_v0.4.6.csv src/encoded/schemas/annotation_field.json src/encoded/schemas/variant.json src/encoded/schemas/variant_sample.json src/encoded/tests/data/variant_workbook/vcf_v0.4.6_subset.vcf hms-dbmi hms-dbmi src/encoded/tests/data/variant_workbook/gene_table.csv src/encoded/schemas/gene_annotation_field.json src/encoded/schemas/gene.json src/encoded/tests/data/variant_workbook/gene_inserts_v0.4.5.json hms-dbmi hms-dbmi development.ini --post-variant-consequences --post-variants --post-gene-annotation-field-inserts --post-gene-inserts --app-name app
+	python src/encoded/commands/ingestion.py src/encoded/tests/data/variant_workbook/variant_table_v0.4.6.csv src/encoded/schemas/annotation_field.json src/encoded/schemas/variant.json src/encoded/schemas/variant_sample.json src/encoded/tests/data/variant_workbook/vcf_v0.4.6.vcf hms-dbmi hms-dbmi src/encoded/tests/data/variant_workbook/gene_table.csv src/encoded/schemas/gene_annotation_field.json src/encoded/schemas/gene.json src/encoded/tests/data/variant_workbook/gene_inserts_v0.4.5.json hms-dbmi hms-dbmi development.ini --post-variant-consequences --post-variants --post-gene-annotation-field-inserts --post-gene-inserts --app-name app
 
 clean-python:
 	@echo -n "Are you sure? This will wipe all libraries installed on this virtualenv [y/N] " && read ans && [ $${ans:-N} = y ]

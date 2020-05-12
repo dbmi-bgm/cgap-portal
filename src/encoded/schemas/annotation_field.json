@@ -144,10 +144,10 @@
             "description": "I don't know",
             "type": "string"
         },
-        "embedded_fields": {
-            "title": "Embedded Fields",
-            "description": "Comma separated fields to be embedded from the item type linkTo",
-            "type": "string"
+        "embedded_field": {
+            "title": "Embedded Field",
+            "description": "Whether or not this field is embedded from another object",
+            "type": "boolean"
         },
         "calculated_property": {
             "title": "Calculated Property",

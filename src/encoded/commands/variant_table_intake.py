@@ -24,10 +24,10 @@ class MappingTableParser(object):
     HEADER_ROW_INDEX = 2
     FIELD_TYPE_INDEX = 5  # XXX: hardcoded, must change if field_type is moved on mapping table
     INTEGER_FIELDS = ['no', 'maximum_length_of_value', 'column_order', 'facet_order']
-    BOOLEAN_FIELDS = ['is_list', 'calculated_property']
+    BOOLEAN_FIELDS = ['is_list', 'calculated_property', 'embedded_field']
     STRING_FIELDS = ['vcf_name', 'source_name', 'source_version', 'sub_embedding_group',
                      'annotation_category', 'separator', 'schema_description', 'value_example',
-                     'scope', 'schema_title', 'pre_addon', 'embedded_fields']
+                     'scope', 'schema_title', 'pre_addon']
     SPECIAL_FIELDS = ['field_type', 'enum_list', 'links_to']
     ALL_FIELDS = INTEGER_FIELDS + BOOLEAN_FIELDS + STRING_FIELDS + SPECIAL_FIELDS
     EMBEDDED_VARIANT_FIELDS = resolve_file_path('../schemas/variant_embeds.json', file_loc=__file__)
@@ -182,7 +182,7 @@ class MappingTableParser(object):
             if typ == t:
                 with open(f, 'rb') as fd:
                     embeds = json.load(fd)
-                    link_type = item['links_to']
+                    link_type = 'embedded_field'
                     prefix = ''
                     if item.get('sub_embedding_group', None):
                         prefix = self.format_sub_embedding_group_name(item.get('sub_embedding_group'), type='key') + '.'
@@ -226,7 +226,7 @@ class MappingTableParser(object):
 
         # inner functions to be used as helper
         def get_prop(item):
-            if item.get('field_type') == 'embedded':
+            if item.get('embedded_field', False):
                 self.update_embeds(item, item.get('scope', 'gene'))  # XXX: HACK - how to get around? -Will
                 return OrderedDict()
             if not item.get('do_import', True):  # DROP fields that explicitly have do_import = False

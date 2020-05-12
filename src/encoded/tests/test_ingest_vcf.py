@@ -117,6 +117,21 @@ def test_VCFP_multiple_variants(test_vcf):
     assert result['topmed_het'] == 403
 
 
+@pytest.mark.skip
+def test_VCFP_post_sample_variants(testapp, institution, project, test_vcf):
+    """ Attempts to post all generated sample variants without links"""
+    CONNECTION_URL = '/variant_sample'
+    for record in test_vcf:
+        try:
+            variant_samples = test_vcf.create_sample_variant_from_record(record)
+        except:  # validation error
+            continue
+        for sample in variant_samples:
+            sample['project'] = 'encode-project'
+            sample['institution'] = 'encode-institution'
+            testapp.post_json(CONNECTION_URL, sample, status=201)
+
+
 def test_VCFP_multiple_sample_variants(test_vcf):
     """ Generates 3 sample variant items and checks them for correctness """
     record = test_vcf.read_next_record()
@@ -136,21 +151,6 @@ def test_VCFP_multiple_sample_variants(test_vcf):
     assert 'NUMGT' in result['samplegeno'][0]
     assert 'AD' in result['samplegeno'][0]
     assert 'GT' in result['samplegeno'][0]
-
-
-#@pytest.mark.skip  # causes other tests to fail
-def test_VCFP_post_sample_variants(testapp, institution, project, test_vcf):
-    """ Attempts to post all generated sample variants without links"""
-    CONNECTION_URL = '/variant_sample'
-    for record in test_vcf:
-        try:
-            variant_samples = test_vcf.create_sample_variant_from_record(record)
-        except:  # validation error
-            continue
-        for sample in variant_samples:
-            sample['project'] = 'encode-project'
-            sample['institution'] = 'encode-institution'
-            testapp.post_json(CONNECTION_URL, sample, status=201)
 
 
 @pytest.mark.skip  # will not run currently as genes are not posted
