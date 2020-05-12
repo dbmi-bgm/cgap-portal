@@ -1,6 +1,7 @@
 import json
 from pyramid.view import view_config
 from snovault.util import debug_log
+from encoded.util import resolve_file_path
 from snovault import (
     calculated_property,
     collection,
@@ -19,7 +20,7 @@ def build_variant_embedded_list():
         :returns: list of variant embeds
     """
     embedded_list = []
-    with open('./src/encoded/schemas/variant_embeds.json', 'r') as fd:  # XXX: get this some other way
+    with open(resolve_file_path('../schemas/variant_embeds.json'), 'r') as fd:
         embeds = json.load(fd)['variant']
         for embedded_type, _embeds in embeds.items():
             embedded_list.extend(_embeds)
@@ -35,7 +36,7 @@ def build_variant_sample_embedded_list():
         :returns: list of embeds from 'variant' linkTo
     """
     embedded_list = []
-    with open('./src/encoded/schemas/variant_embeds.json', 'r') as fd:
+    with open(resolve_file_path('../schemas/variant_embeds.json'), 'r') as fd:
         embeds = json.load(fd)['variant']
         for embedded_type, _embeds in embeds.items():
             embedded_list.extend('variant.' + e for e in _embeds)
@@ -118,7 +119,6 @@ class VariantSample(Item):
             ref, alt = AD.split(',')
             return round(int(alt) / (int(ref) + int(alt)), 3)  # round to 3 digits
         return 0.0
-
 
 
 @view_config(name='variant_ingestion', context=Variant.Collection,
