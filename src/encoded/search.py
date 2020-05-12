@@ -1309,14 +1309,17 @@ def initialize_facets(request, doc_types, prepared_terms, schemas, es_mapping):
     :returns: list: tuples containing (0) ElasticSearch-formatted field name (e.g. `embedded.status`)
                     and (1) list of terms for it.
     """
+    if len(doc_types) > 1:  # only provide this if we are searching on more than one type
+        facets = [
+            # More facets will be appended to this list from item schema plus from any currently-active filters (as requested in URI params).
+            ('type', {'title': 'Data Type'})
+        ]
+    else:
+        facets = []
 
-    facets = [
-        # More facets will be appended to this list from item schema plus from any currently-active filters (as requested in URI params).
-        ('type', {'title': 'Data Type'})
-    ]
     append_facets = [
         # Facets which will be appended after those which are in & added to `facets`
-        ('status', {'title': 'Status'}),
+        # ('status', {'title': 'Status'}), XXX: uncomment this if you want status facet
 
         # TODO: Re-enable below line if/when 'range' URI param queries for date & numerical fields are implemented.
         # ('date_created', {'title': 'Date Created', 'hide_from_view' : True, 'aggregation_type' : 'date_histogram' })

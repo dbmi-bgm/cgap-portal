@@ -32,14 +32,14 @@ def run_ingest_vcf(app_handle, args):
     success, error = 0, 0
     if args.post_variants:
         for record in tqdm(vcf_parser, unit='variants'):
-            variant = vcf_parser.create_variant_from_record(record)
-            variant['project'] = args.variant_project
-            variant['institution'] = args.variant_institution
-            vcf_parser.format_variant_sub_embedded_objects(variant)
             try:
+                variant = vcf_parser.create_variant_from_record(record)
+                variant['project'] = args.variant_project
+                variant['institution'] = args.variant_institution
+                vcf_parser.format_variant_sub_embedded_objects(variant)
                 res = app_handle.post_json('/variant', variant, status=201).json['@graph'][0]  # only one item posted
                 success += 1
-            except:
+            except:  # validation error
                 error += 1
                 continue
             variant_samples = vcf_parser.create_sample_variant_from_record(record)
