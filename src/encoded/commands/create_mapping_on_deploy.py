@@ -125,11 +125,11 @@ def get_deployment_config(app):
         log.info('This looks like a new production environment -- do nothing for now')
         exit(0)
     elif my_env in BEANSTALK_TEST_ENVS:
-        if my_env == ENV_HOTSEAT:
-            log.info('Looks like we are on hotseat -- do not wipe ES')
+        if my_env == ENV_HOTSEAT or my_env == ENV_WEBDEV:
+            log.info('Looks like we are on hotseat/cgapdev -- do not wipe ES')
             deploy_cfg['WIPE_ES'] = False
         else:
-            log.info('Looks like we are on webdev or mastertest -- wipe ES')
+            log.info('Looks like we are on cgaptest -- wipe ES')
             deploy_cfg['WIPE_ES'] = True
     else:
         log.warning('This environment is not recognized: %s' % my_env)
