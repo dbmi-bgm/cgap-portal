@@ -386,8 +386,7 @@ class VCFParser(object):
         for key in self.sub_embedded_mapping.values():
             self.format_variant(result, seo=key)
 
-    @staticmethod
-    def parse_samples(result, sample):
+    def parse_samples(self, result, sample):
         """ Parses the samples on the record, adding them to result
 
         Args:
@@ -397,7 +396,7 @@ class VCFParser(object):
         result['CALL_INFO'] = sample.sample
         data = sample.data
         for field in sample.data._fields:  # must peek at structure to know which fields to pass
-            if hasattr(data, field):
+            if hasattr(data, field) and field in self.variant_sample_schema['properties']:
                 field_value = data.__getattribute__(field)
                 if isinstance(field_value, list):  # could be a list - in this case, force cast to string
                     field_value = ','.join(map(str, field_value))
