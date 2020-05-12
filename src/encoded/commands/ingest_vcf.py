@@ -396,11 +396,12 @@ class VCFParser(object):
         """
         result['CALL_INFO'] = sample.sample
         data = sample.data
-        result['GT'] = data.GT
-        result['DP'] = data.DP
-        result['GQ'] = data.GQ
-        result['AD'] = ','.join(map(str, data.AD)) if data.AD else 'Not provided'
-        result['PL'] = ','.join(map(str, data.PL)) if data.PL else 'Not provided'
+        for field in sample.data._fields:  # must peek at structure to know which fields to pass
+            if hasattr(data, field):
+                field_value = data.__getattribute__(field)
+                if isinstance(field_value, list):  # could be a list - in this case, force cast to string
+                    field_value = ','.join(map(str, field_value))
+                result[field] = field_value
 
     def create_sample_variant_from_record(self, record):
         """ Parses the given record to produce the sample variant

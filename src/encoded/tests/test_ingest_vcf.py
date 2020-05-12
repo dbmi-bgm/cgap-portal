@@ -117,21 +117,6 @@ def test_VCFP_multiple_variants(test_vcf):
     assert result['topmed_het'] == 403
 
 
-@pytest.mark.skip
-def test_VCFP_post_sample_variants(testapp, institution, project, test_vcf):
-    """ Attempts to post all generated sample variants without links"""
-    CONNECTION_URL = '/variant_sample'
-    for record in test_vcf:
-        try:
-            variant_samples = test_vcf.create_sample_variant_from_record(record)
-        except:  # validation error
-            continue
-        for sample in variant_samples:
-            sample['project'] = 'encode-project'
-            sample['institution'] = 'encode-institution'
-            testapp.post_json(CONNECTION_URL, sample, status=201)
-
-
 def test_VCFP_multiple_sample_variants(test_vcf):
     """ Generates 3 sample variant items and checks them for correctness """
     record = test_vcf.read_next_record()
@@ -153,46 +138,61 @@ def test_VCFP_multiple_sample_variants(test_vcf):
     assert 'GT' in result['samplegeno'][0]
 
 
-@pytest.mark.skip  # will not run currently as genes are not posted
-def test_VCFP_post_variants(testapp, institution, project, test_vcf, post_variant_consequence_items):
-    """ Attempts to post all generated variants without links """
-    CONNECTION_URL = '/variant'
-    for record in test_vcf:
-        variant = test_vcf.create_variant_from_record(record)
-        variant['project'] = 'encode-project'
-        variant['institution'] = 'encode-institution'
-        test_vcf.format_variant_sub_embedded_objects(variant)
-        testapp.post_json(CONNECTION_URL, variant, status=201)
+# @pytest.mark.skip if enabled will cause build to fail
+# def test_VCFP_post_sample_variants(testapp, institution, project, test_vcf):
+#     """ Attempts to post all generated sample variants without links"""
+#     CONNECTION_URL = '/variant_sample'
+#     for record in test_vcf:
+#         try:
+#             variant_samples = test_vcf.create_sample_variant_from_record(record)
+#         except:  # validation error
+#             continue
+#         for sample in variant_samples:
+#             sample['project'] = 'encode-project'
+#             sample['institution'] = 'encode-institution'
+#             testapp.post_json(CONNECTION_URL, sample, status=201)
 
 
-@pytest.mark.skip  # will not run currently as genes are not posted
-def test_VCFP_run(testapp, institution, project, test_vcf, post_variant_consequence_items):
-    """ Tests the 'run' method, which processes all the VCF records
-        Actual results are already validated in previous 3 tests, just
-        check to see that we get the 3 that we expect and they post correctly
-    """
-    vss, vs = test_vcf.run(project='encode-project', institution='encode-institution')
-    assert len(vss) == 20
-    assert len(vs) == 11
-    for v in vs:
-        testapp.post_json('/variant', v, status=201)
-    for vs in vss:
-        testapp.post_json('/variant_sample', vs, status=201)
-
-
-@pytest.mark.skip  # will not work currently as genes are not posted
-def test_VCFP_make_links(testapp, institution, project, test_vcf, post_variant_consequence_items):
-    """ Will post all generated variants and samples, forming linkTo's from variant_sample to variant """
-    VARIANT_URL, VARIANT_SAMPLE_URL = '/variant', '/variant_sample'
-    for record in test_vcf:
-        variant = test_vcf.create_variant_from_record(record)
-        variant['project'] = 'encode-project'
-        variant['institution'] = 'encode-institution'
-        test_vcf.format_variant(variant)
-        res = testapp.post_json(VARIANT_URL, variant, status=201).json['@graph'][0]  # only one item posted
-        variant_samples = test_vcf.create_sample_variant_from_record(record)
-        for sample in variant_samples:
-            sample['project'] = 'encode-project'
-            sample['institution'] = 'encode-institution'
-            sample['variant'] = res['@id']  # make link
-            testapp.post_json(VARIANT_SAMPLE_URL, sample, status=201)
+# @pytest.mark.skip  # will not run currently as genes are not posted
+# def test_VCFP_post_variants(testapp, institution, project, test_vcf, post_variant_consequence_items):
+#     """ Attempts to post all generated variants without links """
+#     CONNECTION_URL = '/variant'
+#     for record in test_vcf:
+#         variant = test_vcf.create_variant_from_record(record)
+#         variant['project'] = 'encode-project'
+#         variant['institution'] = 'encode-institution'
+#         test_vcf.format_variant_sub_embedded_objects(variant)
+#         testapp.post_json(CONNECTION_URL, variant, status=201)
+#
+#
+# @pytest.mark.skip  # will not run currently as genes are not posted
+# def test_VCFP_run(testapp, institution, project, test_vcf, post_variant_consequence_items):
+#     """ Tests the 'run' method, which processes all the VCF records
+#         Actual results are already validated in previous 3 tests, just
+#         check to see that we get the 3 that we expect and they post correctly
+#     """
+#     vss, vs = test_vcf.run(project='encode-project', institution='encode-institution')
+#     assert len(vss) == 20
+#     assert len(vs) == 11
+#     for v in vs:
+#         testapp.post_json('/variant', v, status=201)
+#     for vs in vss:
+#         testapp.post_json('/variant_sample', vs, status=201)
+#
+#
+# @pytest.mark.skip  # will not work currently as genes are not posted
+# def test_VCFP_make_links(testapp, institution, project, test_vcf, post_variant_consequence_items):
+#     """ Will post all generated variants and samples, forming linkTo's from variant_sample to variant """
+#     VARIANT_URL, VARIANT_SAMPLE_URL = '/variant', '/variant_sample'
+#     for record in test_vcf:
+#         variant = test_vcf.create_variant_from_record(record)
+#         variant['project'] = 'encode-project'
+#         variant['institution'] = 'encode-institution'
+#         test_vcf.format_variant(variant)
+#         res = testapp.post_json(VARIANT_URL, variant, status=201).json['@graph'][0]  # only one item posted
+#         variant_samples = test_vcf.create_sample_variant_from_record(record)
+#         for sample in variant_samples:
+#             sample['project'] = 'encode-project'
+#             sample['institution'] = 'encode-institution'
+#             sample['variant'] = res['@id']  # make link
+#             testapp.post_json(VARIANT_SAMPLE_URL, sample, status=201)
