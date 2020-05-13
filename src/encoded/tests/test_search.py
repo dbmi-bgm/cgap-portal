@@ -64,10 +64,10 @@ def test_search_with_no_query(workbook, testapp):
     assert res.json['title'] == 'Search'
     assert res.json['total'] > 0
     assert 'facets' in res
-    # test default facets (data type and status)
+    # test default facets (data type)
     default_facets = [facet['field'] for facet in res.json['facets']]
     assert 'type' in default_facets
-    assert 'status' in default_facets
+    # assert 'status' in default_facets uncomment this if status is added back -Will 5/13/2020
     assert 'filters' in res
     assert '@graph' in res
 
@@ -394,8 +394,8 @@ def test_default_schema_and_non_schema_facets(workbook, testapp, registry):
     res = testapp.get('/search/?type=User&institution.display_title=HMS+DBMI').json
     assert 'facets' in res
     facet_fields = [ facet['field'] for facet in res['facets'] ]
-    assert 'type' in facet_fields
-    assert 'status' in facet_fields
+    # assert 'type' in facet_fields uncomment this if we decide type should exist when searching on a single type
+    # assert 'status' in facet_fields uncomment this if status is added back -Will 5/13/2020
     for facet in schema['facets'].keys():
         if not schema['facets'][facet].get('hide_from_view'):
             assert facet in facet_fields
