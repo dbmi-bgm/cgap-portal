@@ -12,7 +12,7 @@ def help_page_section_json():
         "title": "",
         "name" : "help.user-guide.rest-api.rest_api_submission",
         "file": "/docs/source/rest_api_submission.rst",
-        "uuid" : "442c8aa0-dc6c-43d7-814a-854af460b020"
+        "uuid" : "442c8aa0-dc6c-43d7-814a-854af460c020"
     }
 
 @pytest.fixture(scope='module')
