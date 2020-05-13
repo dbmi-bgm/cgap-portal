@@ -31,23 +31,27 @@ def run_ingest_vcf(app_handle, args):
                                                   institution=args.variant_institution)
     success, error = 0, 0
     if args.post_variants:
-        for record in tqdm(vcf_parser, unit='variants'):
-            try:
-                variant = vcf_parser.create_variant_from_record(record)
-                variant['project'] = args.variant_project
-                variant['institution'] = args.variant_institution
-                vcf_parser.format_variant_sub_embedded_objects(variant)
-                res = app_handle.post_json('/variant', variant, status=201).json['@graph'][0]  # only one item posted
-                success += 1
-            except:  # validation error
-                error += 1
-                continue
-            variant_samples = vcf_parser.create_sample_variant_from_record(record)
-            for sample in variant_samples:
-                sample['project'] = args.variant_project
-                sample['institution'] = args.variant_institution
-                sample['variant'] = res['@id']  # make link
-                app_handle.post_json('/variant_sample', sample, status=201)
+        try:
+            for record in tqdm(vcf_parser, unit='variants'):
+                try:
+                    variant = vcf_parser.create_variant_from_record(record)
+                    variant['project'] = args.variant_project
+                    variant['institution'] = args.variant_institution
+                    vcf_parser.format_variant_sub_embedded_objects(variant)
+                    res = app_handle.post_json('/variant', variant, status=201).json['@graph'][0]  # only one item posted
+                    success += 1
+                except:  # ANNOTATION spec validation error, recoverable
+                    error += 1
+                    continue
+                variant_samples = vcf_parser.create_sample_variant_from_record(record)
+                for sample in variant_samples:
+                    sample['project'] = args.variant_project
+                    sample['institution'] = args.variant_institution
+                    sample['variant'] = res['@id']  # make link
+                    app_handle.post_json('/variant_sample', sample, status=201)
+        except Exception as e:  # VCF spec validation error, not recoverable
+            logger.error('Encountered VCF format error: %s' % str(e))
+            exit(1)
 
         logger.warning('Succesfully posted %s VCF entries, errors: %s' % (success, error))
     return True

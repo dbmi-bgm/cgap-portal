@@ -67,6 +67,10 @@ deploy2:  # spins up waittress to serve the application
 deploy3:  # uploads: GeneAnnotationFields, then Genes, then AnnotationFields, then Variant + VariantSamples
 	python src/encoded/commands/ingestion.py src/encoded/tests/data/variant_workbook/variant_table_v0.4.6.csv src/encoded/schemas/annotation_field.json src/encoded/schemas/variant.json src/encoded/schemas/variant_sample.json src/encoded/tests/data/variant_workbook/vcf_v0.4.6.vcf hms-dbmi hms-dbmi src/encoded/tests/data/variant_workbook/gene_table.csv src/encoded/schemas/gene_annotation_field.json src/encoded/schemas/gene.json src/encoded/tests/data/variant_workbook/gene_inserts_v0.4.5.json hms-dbmi hms-dbmi development.ini --post-variant-consequences --post-variants --post-gene-annotation-field-inserts --post-gene-inserts --app-name app
 
+kill:  # kills back-end processes associated with the application. Use with care.
+	pkill -f postgres &
+	pkill -f elasticsearch &
+
 clean-python:
 	@echo -n "Are you sure? This will wipe all libraries installed on this virtualenv [y/N] " && read ans && [ $${ans:-N} = y ]
 	pip uninstall encoded
@@ -92,6 +96,8 @@ info:
 	   $(info - Use 'make configure' to install poetry. You should not have to do this directly)
 	   $(info - Use 'make deploy1' to spin up postgres/elasticsearch and load inserts)
 	   $(info - Use 'make deploy2' to spin up the application server)
+	   $(info - Use 'make deploy3' to load variants and genes)
+	   $(info - Use 'make kill' to kill back-end resources)
 	   $(info - Use 'make macpoetry-install' to install fourfront on OSX catalina)
 	   $(info - Use 'make macbuild-dev' to build all dependencies on OSX catalina)
 	   $(info - Use 'make moto-setup' to install moto, for less flaky tests)
