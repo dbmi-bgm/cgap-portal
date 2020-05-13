@@ -391,7 +391,7 @@ class VCFParser(object):
 
         Args:
             result: dict to populate
-            record: record to parse
+            sample: sample to parse
         """
         result['CALL_INFO'] = sample.sample
         data = sample.data

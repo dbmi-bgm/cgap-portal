@@ -1,27 +1,10 @@
 import pytest
-from encoded.commands.ingest_genes import (
-    GeneIngestion
+from encoded.tests.variant_fixtures import (  # noqa
+    test_genes,
 )
 
 
 pytestmark = [pytest.mark.working, pytest.mark.ingestion]
-GENES_LOC = './src/encoded/tests/data/variant_workbook/gene_inserts_partial.json'
-
-
-@pytest.fixture
-def test_genes():
-    genes = GeneIngestion(GENES_LOC)
-    return genes
-
-
-@pytest.fixture
-def genes(testapp, project, institution, test_genes):
-    """ Just like the test below, but a fixture that posts them """
-    CONNECTION_URL = '/gene'
-    for gene in test_genes:
-        gene['project'] = 'encode-project'
-        gene['institution'] = 'encode-institution'
-        testapp.post_json(CONNECTION_URL, gene, status=201)
 
 
 def test_post_gene_inserts(testapp, project, institution, test_genes):
