@@ -35,7 +35,7 @@ def main():
     app = get_app(args.config_uri, args.app_name)
     for item_type in ORDER:
         try:
-            purge_item_type_from_storage(app, item_type, prod=args.prod)
+            purge_item_type_from_storage(app, [item_type], prod=args.prod)
         except Exception as e:
             logger.error('Encountered exception purging item_type: %s from storage with error: %s'
                          % (item_type, str(e)))
