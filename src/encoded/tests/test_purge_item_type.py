@@ -4,7 +4,7 @@ from .workbook_fixtures import app_settings, app, workbook
 from encoded.commands.purge_item_type import purge_item_type_from_storage
 
 
-pytestmark = [pytest.mark.working]
+pytestmark = [pytest.mark.broken]
 
 
 @pytest.fixture
