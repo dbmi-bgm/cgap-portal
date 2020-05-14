@@ -6,15 +6,13 @@ import moment from 'moment';
 import ReactTooltip from 'react-tooltip';
 import _ from 'underscore';
 
-import { console, ajax } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
-import { LocalizedTime } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/LocalizedTime';
-
 
 export const GuestHomeView = React.memo(function GuestHomeView(props){
-    return (
-        <div className="container home-content-area" id="content">
-            <div className="jumbotron mb-0" style={{ backgroundImage: "url('/static/img/homepage-banner3.jpeg')", backgroundSize: "cover" }}>
-                <h2 style={{ color: "#ffffff" }} className="homepage-section-title">Streamline Your Bioinformatics Pipeline</h2>
+    return (<React.Fragment>
+        <div className="jumbotron mb-0" style={{ borderRadius: 0, backgroundImage: "url('/static/img/homepage-banner3.jpeg')", backgroundSize: "cover" }}>
+            <div className="container">
+            <h2 style={{ color: "#ffffff" }} className="homepage-section-title">Streamline Your Bioinformatics Pipeline</h2>
+                <hr style={{ borderColor: "#ffffff"}} />
                 <h4 style={{ color: "#ffffff" }} className="text-500">Get Actionable Data, Fast.</h4>
                 <p style={{ color: "#ffffff", maxWidth: "70%" }}>
                     CGAP (the Clinical Genome Analysis Project) lorem ipsum dolor sit amet, consectetur adipiscing elit, 
@@ -22,8 +20,10 @@ export const GuestHomeView = React.memo(function GuestHomeView(props){
                     Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris 
                     nisi ut aliquip ex ea commodo consequat.
                 </p>
-                <button className="btn btn-outline-light btn-large">Get Started Today</button>
-            </div>
+                {/* <button className="btn btn-outline-light btn-large">Request More Info</button> */}
+            </div> 
+        </div>
+        <div className="container home-content-area" id="content">
             <div className="row">
                 <div className="col-xs-12 col-md-4">
                     <h4 className="text-400 mb-15 mt-25">Discover Novel Pathogenic Variants</h4>
@@ -38,7 +38,6 @@ export const GuestHomeView = React.memo(function GuestHomeView(props){
                     Excepteur sint occaecat cupidatat non in reprehenderit in
                     proident, sunt in culpa qui officia deserunt mollit anim id est laborum. 
                     </p>
-                    <button className="btn btn-large btn-primary">Learn More</button>
                 </div>
                 <div className="col-xs-12 col-md-4">
                     <h4 className="text-400 mb-15 mt-25">Collaborate in the Clinic or the Lab</h4>
@@ -53,13 +52,13 @@ export const GuestHomeView = React.memo(function GuestHomeView(props){
                     Duis aute irure dolor in reprehenderit in voluptate velit esse cillum 
                     dolore <strong>CLIA-compatible workflow</strong> eu fugiat nulla pariatur. 
                     </p>
-                    <button className="btn btn-large btn-primary">Learn More</button>
                 </div>
                 <div className="col-xs-12 col-md-4 pull-right">
                     <LinksColumn {..._.pick(props, 'windowWidth')} />
                 </div>
             </div>
         </div>
+    </React.Fragment>
     );
 });
 
@@ -69,7 +68,7 @@ const ExternalLinksColumn = React.memo(function ExternalLinksColumn(props){
     return (
         <div className="homepage-links-column external-links">
             {/* <h3 className="text-300 mb-2 mt-3">External Links</h3> */}
-            <h4 className="text-400 mb-15 mt-25">External Links</h4>
+            <h4 className="text-400 mb-15 mt-25">Our Partners</h4>
             <div className="links-wrapper clearfix">
                 <div className="link-block">
                     <a href="https://dbmi.hms.harvard.edu/" target="_blank" rel="noopener noreferrer" className="external-link">
@@ -84,11 +83,6 @@ const ExternalLinksColumn = React.memo(function ExternalLinksColumn(props){
                 <div className="link-block">
                     <a href="https://undiagnosed.hms.harvard.edu/" target="_blank" rel="noopener noreferrer" className="external-link">
                         <span>Undiagnosed Diseased Network (UDN)</span>
-                    </a>
-                </div>
-                <div className="link-block">
-                    <a href="https://forome.org/" target="_blank" rel="noopener noreferrer" className="external-link">
-                        <span>Forome</span>
                     </a>
                 </div>
                 <div className="link-block">
