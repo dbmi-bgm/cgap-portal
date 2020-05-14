@@ -206,7 +206,7 @@ description = "Storage support for 4DN Data Portals."
 name = "dcicsnovault"
 optional = false
 python-versions = ">=3.6,<3.7"
-version = "3.0.0b0"
+version = "3.0.0b4"
 
 [package.dependencies]
 MarkupSafe = ">=0.23,<1"
@@ -1253,7 +1253,7 @@ description = "Python Library for Tom's Obvious, Minimal Language"
 name = "toml"
 optional = false
 python-versions = "*"
-version = "0.10.0"
+version = "0.10.1"
 
 [[package]]
 category = "main"
@@ -1494,7 +1494,7 @@ transaction = ">=1.6.0"
 test = ["zope.testing"]
 
 [metadata]
-content-hash = "fc8c811a755b6303877428a8e5fef53783c3593af74689601eefa8aad34a1e3e"
+content-hash = "57ea5f3dd7e2d741b6bb137173b57ed493a1ecab65dfd9f50fa7109c6af132d1"
 python-versions = ">=3.6,<3.7"
 
 [metadata.files]
@@ -1634,8 +1634,8 @@ cryptography = [
     {file = "cryptography-2.9.2.tar.gz", hash = "sha256:a0c30272fb4ddda5f5ffc1089d7405b7a71b0b0f51993cb4e5dbb4590b2fc229"},
 ]
 dcicsnovault = [
-    {file = "dcicsnovault-3.0.0b0-py3-none-any.whl", hash = "sha256:8f75a7b294884e5313dc7c1dd2f6c5066203d123562e2ba719fa33b08f16b46c"},
-    {file = "dcicsnovault-3.0.0b0.tar.gz", hash = "sha256:b897cae31d2c8a383aca299603494c3c9c9b9f96355817a1f273ad32ce309442"},
+    {file = "dcicsnovault-3.0.0b4-py3-none-any.whl", hash = "sha256:ac3af3377813b9c16eb6f6c6da289f69874f9f3c58a6b40f0f793df445714013"},
+    {file = "dcicsnovault-3.0.0b4.tar.gz", hash = "sha256:d7a44c6e2a208bbe1e1ee1928d5e1a56bcc697ac2abf70052e2c128041f86070"},
 ]
 dcicutils = [
     {file = "dcicutils-0.25.0-py3-none-any.whl", hash = "sha256:0a1cf22e42b56fd97e602a4defee680ac50474235f3061c66fe4201729e4dc81"},
@@ -2146,9 +2146,8 @@ subprocess-middleware = [
     {file = "subprocess_middleware-0.3.zip", hash = "sha256:182c3ecd1d5657dbfb2e1d22629835305b26851d8baaf759f10cd1b2e4b4697e"},
 ]
 toml = [
-    {file = "toml-0.10.0-py2.7.egg", hash = "sha256:f1db651f9657708513243e61e6cc67d101a39bad662eaa9b5546f789338e07a3"},
-    {file = "toml-0.10.0-py2.py3-none-any.whl", hash = "sha256:235682dd292d5899d361a811df37e04a8828a5b1da3115886b73cf81ebc9100e"},
-    {file = "toml-0.10.0.tar.gz", hash = "sha256:229f81c57791a41d65e399fc06bf0848bab550a9dfd5ed66df18ce5f05e73d5c"},
+    {file = "toml-0.10.1-py2.py3-none-any.whl", hash = "sha256:bda89d5935c2eac546d648028b9901107a595863cb36bae0c73ac804a9b4ce88"},
+    {file = "toml-0.10.1.tar.gz", hash = "sha256:926b612be1e5ce0634a2ca03470f95169cf16f939018233a670519cb4ac58b0f"},
 ]
 transaction = [
     {file = "transaction-2.4.0-py2.py3-none-any.whl", hash = "sha256:b96a5e9aaa73f905759bc9ccf0021bf4864c01ac36666e0d28395e871f6d584a"},
