@@ -174,7 +174,7 @@ python-versions = "*"
 version = "0.3.3"
 
 [[package]]
-category = "main"
+category = "dev"
 description = "Code coverage measurement for Python"
 name = "coverage"
 optional = false
@@ -365,7 +365,7 @@ version = "1.4.1"
 apipkg = ">=1.4"
 
 [[package]]
-category = "main"
+category = "dev"
 description = "Plugin for nose or pytest that automatically reruns flaky tests."
 name = "flaky"
 optional = false
@@ -872,7 +872,7 @@ version = "0.1"
 setuptools = "*"
 
 [[package]]
-category = "main"
+category = "dev"
 description = "pytest: simple powerful testing with Python"
 name = "pytest"
 optional = false
@@ -884,7 +884,7 @@ colorama = "*"
 py = ">=1.4.29"
 
 [[package]]
-category = "main"
+category = "dev"
 description = "Pytest plugin for measuring coverage."
 name = "pytest-cov"
 optional = false
@@ -896,7 +896,7 @@ coverage = ">=3.7.1"
 pytest = ">=2.6.0"
 
 [[package]]
-category = "main"
+category = "dev"
 description = "Parse queries in Lucene and Elasticsearch syntaxes"
 name = "pytest-exact-fixtures"
 optional = false
@@ -904,7 +904,7 @@ python-versions = "*"
 version = "0.1"
 
 [[package]]
-category = "main"
+category = "dev"
 description = "py.test plugin to show failures instantly"
 name = "pytest-instafail"
 optional = false
@@ -915,7 +915,7 @@ version = "0.3.0"
 pytest = ">=2.3"
 
 [[package]]
-category = "main"
+category = "dev"
 description = "Thin-wrapper around the mock package for easier use with py.test"
 name = "pytest-mock"
 optional = false
@@ -926,7 +926,7 @@ version = "0.11.0"
 pytest = ">=2.7"
 
 [[package]]
-category = "main"
+category = "dev"
 description = "py.test plugin to abort hanging tests"
 name = "pytest-timeout"
 optional = false
@@ -937,7 +937,7 @@ version = "1.0.0"
 pytest = ">=2.8.0"
 
 [[package]]
-category = "main"
+category = "dev"
 description = "py.test xdist plugin for distributed testing and loop-on-failing modes"
 name = "pytest-xdist"
 optional = false
@@ -1039,7 +1039,7 @@ version = "0.3"
 rdflib = ">=4.2"
 
 [[package]]
-category = "main"
+category = "dev"
 description = "Forensic debugging WSGI middleware"
 name = "repoze.debug"
 optional = false
@@ -1494,7 +1494,7 @@ transaction = ">=1.6.0"
 test = ["zope.testing"]
 
 [metadata]
-content-hash = "c34a8abbd323944512835cb243f6b0c25c6c4045c627e75e9f3b1acf1db7ac3e"
+content-hash = "7aa3798636a039323c3917fdb283f73dcbad9883fd496b16484116abed8946f8"
 python-versions = ">=3.6,<3.7"
 
 [metadata.files]
