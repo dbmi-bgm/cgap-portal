@@ -650,7 +650,7 @@ description = "A network address manipulation library for Python"
 name = "netaddr"
 optional = false
 python-versions = "*"
-version = "0.7.18"
+version = "0.7.19"
 
 [[package]]
 category = "main"
@@ -1617,7 +1617,7 @@ transaction = ">=1.6.0"
 test = ["zope.testing"]
 
 [metadata]
-content-hash = "fdd1eb25a8d4deaccfe514b4493e9a2217a293885aed438f4b32f5285e41ec51"
+content-hash = "93e7a9b103d31beaf7991c87d857f1e18539f597ab357ff4e09d02649d5023a4"
 python-versions = ">=3.6,<3.7"
 
 [metadata.files]
@@ -1890,10 +1890,8 @@ moto = [
     {file = "moto-1.3.7.tar.gz", hash = "sha256:129de2e04cb250d9f8b2c722ec152ed1b5426ef179b4ebb03e9ec36e6eb3fcc5"},
 ]
 netaddr = [
-    {file = "netaddr-0.7.18-py2.py3-none-any.whl", hash = "sha256:cb305179658334eb035860e515f054504e232b832abb4efc51c04bf8a72d3574"},
-    {file = "netaddr-0.7.18-py3.4.egg", hash = "sha256:98c3d6fe831d119785c37af25f032169dd653a0dad86e54b387f4a5b83da4383"},
-    {file = "netaddr-0.7.18.tar.gz", hash = "sha256:a1f5c9fcf75ac2579b9995c843dade33009543c04f218ff7c007b3c81695bd19"},
-    {file = "netaddr-0.7.18.zip", hash = "sha256:c64c570ac612e20e8b8a6eee72034c924fff9d76c7a46f50a9f919085f1bfbed"},
+    {file = "netaddr-0.7.19-py2.py3-none-any.whl", hash = "sha256:56b3558bd71f3f6999e4c52e349f38660e54a7a8a9943335f73dfc96883e08ca"},
+    {file = "netaddr-0.7.19.tar.gz", hash = "sha256:38aeec7cdd035081d3a4c306394b19d677623bf76fa0913f6695127c7753aefd"},
 ]
 passlib = [
     {file = "passlib-1.6.5-py2.py3-none-any.whl", hash = "sha256:ad631a58dc8abeb0f48016c13f4b3b0f3a7b1045a8cb3c61dd15e2d95b45c472"},
