@@ -78,7 +78,7 @@ info:
 	   $(info - Use 'make aws-ip-ranges' to download latest ip range information. You should never have to do this yourself.)
 	   $(info - Use 'make build' to build only application dependencies (or 'make macbuild' on OSX Catalina))
 	   $(info - Use 'make build-dev' to build all dependencies (or 'make macbuild-dev' on OSX Catalina))
-	   $(info - Use 'make build-locust' to intall locust. Do not do this unless you know what you are doing)
+	   $(info - Use 'make build-locust' to install locust. Do not do this unless you know what you are doing)
 	   $(info - Use 'make clean' to clear out (non-python) dependencies)
 	   $(info - Use 'make clean-python' to clear python virtualenv for fresh poetry install)
 	   $(info - Use 'make configure' to install poetry. You should not have to do this directly)
