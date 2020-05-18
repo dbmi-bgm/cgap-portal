@@ -1617,7 +1617,7 @@ transaction = ">=1.6.0"
 test = ["zope.testing"]
 
 [metadata]
-content-hash = "536ab93f6a3e1d9205a5d53e28cb5c452cadacbe9feb139124175c345f694dcf"
+content-hash = "fdd1eb25a8d4deaccfe514b4493e9a2217a293885aed438f4b32f5285e41ec51"
 python-versions = ">=3.6,<3.7"
 
 [metadata.files]

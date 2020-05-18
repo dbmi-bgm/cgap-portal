@@ -1,4 +1,4 @@
-clean:  # clear node modules, eggs, npm build stuff 
+clean:  # clear node modules, eggs, npm build stuff
 	rm -rf src/*.egg-info/
 	rm -rf node_modules eggs
 	rm -rf .sass-cache
@@ -16,26 +16,27 @@ npm-setup:  # runs all front-end setup
 	npm run build-scss
 	curl -o aws-ip-ranges.json https://ip-ranges.amazonaws.com/ip-ranges.json
 
-moto-setup:  # optional moto setup that must be done separately 
-	pip install "moto[server]"
+moto-setup:  # optional moto setup that must be done separately
+	pip install "moto[server]==1.3.7"
 
 macpoetry-install:  # install for OSX Catalina
 	bin/macpoetry-install
 
 configure:  # does any pre-requisite installs
-	pip install poetry 
+	pip install poetry
 
-macbuild: # builds for Catalina
+macbuild:  # builds for Catalina
 	make configure
 	make macpoetry-install
 	make build-after-poetry
 
-build:  # builds 
+build:  # builds
 	make configure
-	poetry install 
+	poetry install
 	make build-after-poetry
 
 build-after-poetry:  # continuation of build after poetry install
+	make moto-setup
 	make npm-setup
 	python setup_eb.py develop
 
@@ -73,18 +74,16 @@ help:
 	@make info
 
 info:
-	@: $(info Printing some info on how to use make)
+	@: $(info Here are some 'make' options:)
 	   $(info - Use 'make aws-ip-ranges' to download latest ip range information. You should never have to do this yourself.)
-	   $(info - Use 'make build' to build only application dependencies)
-	   $(info - Use 'make build-dev' to build all dependencies)
+	   $(info - Use 'make build' to build only application dependencies (or 'make macbuild' on OSX Catalina))
+	   $(info - Use 'make build-dev' to build all dependencies (or 'make macbuild-dev' on OSX Catalina))
 	   $(info - Use 'make build-locust' to intall locust. Do not do this unless you know what you are doing)
 	   $(info - Use 'make clean' to clear out (non-python) dependencies)
 	   $(info - Use 'make clean-python' to clear python virtualenv for fresh poetry install)
 	   $(info - Use 'make configure' to install poetry. You should not have to do this directly)
 	   $(info - Use 'make deploy1' to spin up postgres/elasticsearch and load inserts)
 	   $(info - Use 'make deploy2' to spin up the application server)
-	   $(info - Use 'make macpoetry-install' to install fourfront on OSX catalina)
-	   $(info - Use 'make macbuild-dev' to build all dependencies on OSX catalina)
 	   $(info - Use 'make moto-setup' to install moto, for less flaky tests)
 	   $(info - Use 'make npm-setup' to build the front-end)
 	   $(info - Use 'make test' to run tests with the normal options we use on travis)
