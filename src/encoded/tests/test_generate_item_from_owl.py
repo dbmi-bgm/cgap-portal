@@ -63,13 +63,20 @@ def ll_class():
 def mkd_class():
     return gifo.convert2URIRef('http://purl.obolibrary.org/obo/HP_0000003')
 
+import six
+RERAISE = six.reraise
+from unittest import mock
 
 def test_connect2server_w_env(mocker, connection):
-    # parameters we pass in don't really matter
-    key = "{'server': 'https://cgap.hms.harvard.edu/', 'key': 'testkey', 'secret': 'testsecret'}"
-    mocker.patch('encoded.commands.generate_items_from_owl.get_authentication_with_server', return_value=connection)
-    retval = gifo.connect2server('fourfront-cgap')
-    assert retval == connection
+    def mock_raise(tp, value, tb=None):
+        import pdb; pdb.set_trace()
+        return RERAISE(tp, value, tb)
+    with mock.patch("six.reraise", side_effect=mock_raise):
+        # parameters we pass in don't really matter
+        key = "{'server': 'https://cgap.hms.harvard.edu/', 'key': 'testkey', 'secret': 'testsecret'}"
+        mocker.patch('encoded.commands.generate_items_from_owl.get_authentication_with_server', return_value=connection)
+        retval = gifo.connect2server('fourfront-cgap')
+        assert retval == connection
 
 
 def test_connect2server_w_key(mocker, connection):

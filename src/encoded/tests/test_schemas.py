@@ -14,6 +14,10 @@ SCHEMA_FILES = [
 
 @pytest.fixture(scope='module')
 def master_mixins():
+    return compute_master_mixins()
+
+
+def compute_master_mixins():
     mixins = load_schema('encoded:schemas/mixins.json')
     mixin_keys = [
         'schema_version',
