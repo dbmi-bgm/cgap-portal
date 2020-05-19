@@ -13,6 +13,29 @@ from .base import (
 )
 
 
+def extend_embedded_list(embedded_list, fd, typ, prefix=None):
+    """ Extends the given embedded list with embeds from fd. Helper method for
+        building embedded lists from files, used for Variant and Variant Sample
+        (and gene in the future).
+
+        :param embedded_list: embedded_list to extend
+        :param fd: (open) file descriptor to read JSON from
+        :param typ: lowercase snake_case item type
+        :param prefix: prefix to add to every embed (if you are embedding another item's embeds)
+        :raises RuntimeError: if bad type is detected for the given fd ie: you try to get variant embeds from
+                              variant_sample_embeds.json
+    """
+    embeds = json.load(fd).get(typ, None)
+    if embeds is None:
+        raise RuntimeError('Bad type %s passed to create_embedded_list from file %s' % (typ, fd))
+    if prefix is None:
+        for _, _embeds in embeds.items():
+            embedded_list.extend(_embeds)
+    else:
+        for _, _embeds in embeds.items():
+            embedded_list.extend(prefix + e for e in _embeds)
+
+
 def build_variant_embedded_list():
     """ Determines the embedded_list based on the information
         present in ./src/encoded/schemas/variant_embeds.json
@@ -20,10 +43,8 @@ def build_variant_embedded_list():
         :returns: list of variant embeds
     """
     embedded_list = []
-    with open(resolve_file_path('../schemas/variant_embeds.json', file_loc=__file__), 'r') as fd:
-        embeds = json.load(fd)['variant']
-        for _, _embeds in embeds.items():
-            embedded_list.extend(_embeds)
+    with open(resolve_file_path('schemas/variant_embeds.json'), 'r') as fd:
+        extend_embedded_list(embedded_list, fd, 'variant')
     return embedded_list + Item.embedded_list
 
 
@@ -36,10 +57,10 @@ def build_variant_sample_embedded_list():
         :returns: list of embeds from 'variant' linkTo
     """
     embedded_list = []
-    with open(resolve_file_path('../schemas/variant_embeds.json', file_loc=__file__), 'r') as fd:
-        embeds = json.load(fd)['variant']
-        for _, _embeds in embeds.items():
-            embedded_list.extend('variant.' + e for e in _embeds)
+    with open(resolve_file_path('schemas/variant_embeds.json'), 'r') as fd:
+        extend_embedded_list(embedded_list, fd, 'variant', prefix='variant.')
+    with open(resolve_file_path('schemas/variant_sample_embeds.json'), 'r') as fd:
+        extend_embedded_list(embedded_list, fd, 'variant_sample')
     return ['variant.*'] + embedded_list + Item.embedded_list
 
 

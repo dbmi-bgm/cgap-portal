@@ -104,7 +104,7 @@ class Report(Item):
 class Gene(Item):
     """Gene class."""
     item_type = 'gene'
-    name_key = 'ensgid'
+    name_key = 'ensgid'  # use the ENSEMBL Gene ID as the identifier
     schema = load_schema('encoded:schemas/gene.json')
     embedded_list = []
 

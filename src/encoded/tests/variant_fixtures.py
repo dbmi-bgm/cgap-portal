@@ -1,12 +1,16 @@
 import pytest
 import json
-from encoded.commands.ingest_genes import (
-    GeneIngestion
-)
+from encoded.util import resolve_file_path
+from encoded.commands.ingest_genes import GeneIngestion
 
 
-GENES_LOC = './src/encoded/tests/data/variant_workbook/gene_inserts_partial.json'
-NUMBER_TO_POST = 5
+GENES_LOC = resolve_file_path('tests/data/variant_workbook/gene_inserts_partial.json')
+GENE_WORKBOOK = resolve_file_path('tests/data/variant_workbook/gene_workbook.json')
+VARIANT_CONSEQUENCE_LOC = resolve_file_path('tests/data/variant_workbook/variant_consequence.json')
+MAX_POSTS_FOR_TESTING = 5
+VARIANT_URL = '/variant'
+VARIANT_SAMPLE_URL = '/variant_sample'
+GENE_URL = '/gene'
 
 
 @pytest.fixture
@@ -18,27 +22,26 @@ def test_genes():
 @pytest.fixture
 def genes(testapp, project, institution, test_genes):
     """ Fixture that posts a subset of genes """
-    CONNECTION_URL = '/gene'
     for gene in test_genes:
         gene['project'] = 'encode-project'
         gene['institution'] = 'encode-institution'
-        testapp.post_json(CONNECTION_URL, gene, status=201)
+        testapp.post_json(GENE_URL, gene, status=201)
 
 
 @pytest.fixture
 def gene_workbook(testapp):
     """ Posts Genes required for the first few variants in the test VCF up to NUMBER_TO_POST """
-    genes = json.load(open('./src/encoded/tests/data/variant_workbook/gene_workbook.json', 'r'))
+    genes = json.load(open(GENE_WORKBOOK, 'r'))
     for entry in genes:
         entry['project'] = 'encode-project'
         entry['institution'] = 'encode-institution'
-        testapp.post_json('/gene', entry, status=201)
+        testapp.post_json(GENE_URL, entry, status=201)
 
 
 @pytest.fixture
 def post_variant_consequence_items(testapp):
     """ Posts VariantConsequence items so we can post variants that link to these """
-    vcs = json.load(open('./src/encoded/tests/data/variant_workbook/variant_consequence.json', 'r'))
+    vcs = json.load(open(VARIANT_CONSEQUENCE_LOC, 'r'))
     for entry in vcs:
         testapp.post_json('/variant_consequence', entry, status=201)
 
@@ -46,9 +49,8 @@ def post_variant_consequence_items(testapp):
 @pytest.fixture
 def variants_and_variant_samples(testapp, institution, project, test_vcf, gene_workbook, post_variant_consequence_items):
     """ Will post a small subset of variants + variant samples with links """
-    VARIANT_URL, VARIANT_SAMPLE_URL = '/variant', '/variant_sample'
     for idx, record in enumerate(test_vcf):
-        if idx == NUMBER_TO_POST:
+        if idx == MAX_POSTS_FOR_TESTING:
             break
         variant = test_vcf.create_variant_from_record(record)
         variant['project'] = 'encode-project'

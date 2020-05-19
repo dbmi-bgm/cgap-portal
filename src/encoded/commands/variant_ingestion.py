@@ -59,7 +59,8 @@ def run_ingest_vcf(app_handle, args):
 
 def main():
     """
-    Variant Ingestion Program
+    Variant Ingestion Program. This is a one time operation per VCF. If mapping table changes are made (that are
+    incompatible) an upgrader must be written for items on the portal or all VCFs must be re-annotated and re-ingested.
 
     positional arguments:
         mp              path to variant mapping table

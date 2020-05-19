@@ -12,7 +12,7 @@ from encoded.commands.ingest_vcf import (
 from encoded.tests.variant_fixtures import (  # noqa
     gene_workbook,
     post_variant_consequence_items,
-    NUMBER_TO_POST,
+    MAX_POSTS_FOR_TESTING,
 )
 
 
@@ -138,7 +138,7 @@ def test_VCFP_post_sample_variants(testapp, institution, project, test_vcf):
     """ Attempts to post all generated sample variants without links"""
     CONNECTION_URL = '/variant_sample'
     for idx, record in enumerate(test_vcf):
-        if idx == NUMBER_TO_POST:
+        if idx == MAX_POSTS_FOR_TESTING:
             break
         variant_samples = test_vcf.create_sample_variant_from_record(record)
         for sample in variant_samples:
@@ -151,7 +151,7 @@ def test_VCFP_post_variants(testapp, institution, project, test_vcf, gene_workbo
     """ Attempts to post all generated variants without links """
     CONNECTION_URL = '/variant'
     for idx, record in enumerate(test_vcf):
-        if idx == NUMBER_TO_POST:
+        if idx == MAX_POSTS_FOR_TESTING:
             break
         variant = test_vcf.create_variant_from_record(record)
         variant['project'] = 'encode-project'
@@ -179,7 +179,7 @@ def test_VCFP_make_links(testapp, institution, project, test_vcf, gene_workbook,
     """ Will post all generated variants and samples, forming linkTo's from variant_sample to variant """
     VARIANT_URL, VARIANT_SAMPLE_URL = '/variant', '/variant_sample'
     for idx, record in enumerate(test_vcf):
-        if idx == NUMBER_TO_POST:
+        if idx == MAX_POSTS_FOR_TESTING:
             break
         variant = test_vcf.create_variant_from_record(record)
         variant['project'] = 'encode-project'
