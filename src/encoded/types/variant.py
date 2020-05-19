@@ -9,7 +9,7 @@ from snovault import (
 )
 from .base import (
     Item,
-    get_item_if_you_can,
+    get_item_or_none,
 )
 
 
@@ -105,7 +105,7 @@ class VariantSample(Item):
         "type": "string"
     })
     def display_title(self, request, CALL_INFO, variant=None):
-        variant = get_item_if_you_can(request, variant, 'Variant')
+        variant = get_item_or_none(request, variant, 'Variant')
         if variant:
             return CALL_INFO + ':' + variant['display_title']  # HG002:chr1:504A>T
         return CALL_INFO

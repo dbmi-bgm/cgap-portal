@@ -15,7 +15,7 @@ from snovault import (
 # from pyramid.traversal import find_root
 from .base import (
     Item,
-    get_item_if_you_can,
+    get_item_or_none,
     set_namekey_from_title,
     ALLOW_OWNER_EDIT,
     ALLOW_CURRENT,
@@ -88,7 +88,7 @@ class Report(Item):
     def display_title(self, request, accession):
         case = self.rev_link_atids(request, "case")
         if case:
-            case_props = get_item_if_you_can(request, case[0], 'cases')
+            case_props = get_item_or_none(request, case[0], 'cases')
             if case_props and case_props.get('case_id'):
                 return case_props['case_id'] + ' Case Report'
         return accession

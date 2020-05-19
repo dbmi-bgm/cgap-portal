@@ -1,14 +1,13 @@
 import json
 import pytest
-from encoded.commands.variant_table_intake import (
-    MappingTableParser
-)
+from encoded.util import resolve_file_path
+from encoded.commands.variant_table_intake import MappingTableParser
 
 
 # XXX: These constants should probably be handled in a more intelligent way -will
 pytestmark = [pytest.mark.working, pytest.mark.ingestion]
-MT_LOC = './src/encoded/tests/data/variant_workbook/variant_table_v0.4.6.csv'
-ANNOTATION_FIELD_SCHEMA = './src/encoded/schemas/annotation_field.json'
+MT_LOC = resolve_file_path('tests/data/variant_workbook/variant_table_v0.4.6.csv')
+ANNOTATION_FIELD_SCHEMA = resolve_file_path('schemas/annotation_field.json')
 EXPECTED_FIELDS = ['no', 'vcf_name', 'source_name', 'source_version', 'sub_embedding_group',
                    'field_type', 'is_list', 'separator', 'maximum_length_of_value',
                    'schema_description', 'value_example', 'enum_list',
@@ -235,8 +234,8 @@ def test_post_variant_annotation_field_inserts(inserts, project, institution, te
 def test_post_inserts_via_run(MTParser, project, institution, testapp):
     """ Tests that we can run the above test using the 'run' method """
     inserts = MTParser.run(institution='encode-institution', project='encode-project',
-                           vs_out='./src/encoded/schemas/variant_sample.json',
-                           v_out='./src/encoded/schemas/variant.json', write=False)
+                           vs_out=resolve_file_path('schemas/variant_sample.json'),
+                           v_out=resolve_file_path('schemas/variant.json'), write=False)
     CONNECTION_URL = '/annotation_field'
     for item in inserts:
         testapp.post_json(CONNECTION_URL, item, status=201)
