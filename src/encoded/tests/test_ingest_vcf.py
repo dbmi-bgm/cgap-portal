@@ -25,16 +25,6 @@ def test_vcf():
     return parser
 
 
-def test_VCFP_parse_infotag_description(test_vcf):
-    """
-    Tests the staticmethod that parses the infotag description and produces
-    a dictionary of all the keyed 'fields'
-    """
-    entries = test_vcf.parse_infotag_description(RAW_INFOTAG_DESCRIPTION)
-    assert 'Subembedded' in entries
-    assert 'Format' in entries
-
-
 def test_VCFP_meta(test_vcf):
     """ Checks that we can correctly read which fields are annotation """
     annotation_fields = test_vcf.annotation_keys

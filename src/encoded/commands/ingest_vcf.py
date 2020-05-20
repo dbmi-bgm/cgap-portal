@@ -6,6 +6,7 @@ import logging
 from pyramid.paster import get_app
 from dcicutils.misc_utils import VirtualApp
 from collections import OrderedDict
+from encoded.util import resolve_file_path
 
 logger = logging.getLogger(__name__)
 EPILOG = __doc__
@@ -70,44 +71,60 @@ class VCFParser(object):
         for field in self.reader.metadata['MUTANNO']:
             self.annotation_keys[field['ID']] = True
 
-    def parse_infotag_description(self, info):
-        """ Build a dictionary of key-value pairs from the info tag description.
-            XXX: This format is not perfect for this, may want to coordinate with
-            Daniel
-            For example, see below.
+    @staticmethod
+    def _strip(s):
+        """ Strips whitespace and quotation characters and also lowercases the given string s
 
-                Description="Predicted nonsense mediated decay effects for this variant by VEP. Subembedded:'transcript':Format:'Location|Allele ..."
-
-            Would return:
-                {
-                    'description': 'Predicted nonsense mediated decay effects for this variant by VEP.',
-                    'subembedded': 'transcript',
-                    'format': 'Location|Allele ...'
-                }
-
-            Args:
-                info (str): infotag in vcf to parse
-
-            Returns:
-                dictionary of identifiers in the infotag description
+        :param s: String to strip
+        :return: processed string
         """
-        result = {}
-        start = 2
-        entries = info.split(':')  # colon is sep
+        regex = re.compile(r"""(\s+$|["]|['])""")
+        return re.sub(regex, '', s).lower()
 
-        # handle first two entries
-        if self.SUBEMBEDDED in entries[0]:
-            result[self.SUBEMBEDDED] = entries[1]
-        else:
-            result[self.FORMAT] = entries[1]
+    def verify_in_schema(self, field, sub_group=None):
+        """ Helper to verify the given field is in the schema.
+            Note: This is where non-mvp fields are dropped if present in the vcf
+            and not present on either the variant or variant_sample schemas
 
-        # parse any additional entries
-        while start < len(entries):
-            result[entries[start]] = entries[start+1]
-            start += 2
-        return result
+        :param field: field to check
+        :param sub_group: sub_embedding_group this field is a part of, if any, default None
+        :return: field or self.DROPPED_FIELD if this is not a schema field
+        """
+        field_lower = field.lower()
+        for schema in [self.variant_sample_schema, self.variant_schema]:
+            if sub_group and sub_group in schema['properties']:
+                if field in schema['properties'][sub_group]['items']['properties']:
+                    return field
+            if field in schema['properties'] or field_lower in schema['properties']:
+                return field
+        return self.DROPPED_FIELD  # must maintain field order
 
-    def parse_vcf_info(self, info):
+    def parse_subembedded_info_header(self, hdr):
+        """ Parses an individual (sub-embedded) INFO header
+
+        :param hdr: hdr to process, MUST contain 'Subembedded' (see parse_vcf_info below).
+                    Format:
+        :return: a list of fields on this sub-embedded object
+        """
+        sub_embedded = self._strip(hdr.desc.split(':')[1:2][0])  # extracts string that comes after 'Subembedded'
+        self.sub_embedded_mapping[hdr.id] = sub_embedded
+        entries = hdr.desc.split(':')[3:][0].split('|')  # get everything after 'Format', split on field sep
+        entries = list(map(lambda f: hdr.id.lower() + '_' + self._strip(f), entries))  # ID + stripped field name
+        entries = list(map(lambda f: self.verify_in_schema(f, sub_embedded), entries))
+        return entries
+
+    def parse_info_header(self, hdr):
+        """ Parses an individual INFO header
+
+        :param hdr: hdr to process, must NOT contain 'Submembedded'
+        :return: list of fields in this annotation grouping (but not part of a sub-embedded object)
+        """
+        entries = hdr.desc.split(':')[1:][0].split('|')  # extract 'Format' string
+        entries = list(map(lambda f: hdr.id.lower() + '_' + self._strip(f), entries))  # ID + stripped field name
+        entries = list(map(self.verify_in_schema, entries))
+        return entries
+
+    def parse_vcf_info_header(self, info):
         """ Helper function for parse_vcf_fields that handles parsing the 'info'
             object containing a header listing the fields
             Only needed for annotations - other fields will work as is
@@ -120,35 +137,10 @@ class VCFParser(object):
         Returns:
             list of fields contained in the INFO tag
         """
-        regex = re.compile(r'\s+$|\"|\'')
-
-        def _strip(s):  # strip whitespace, quotes
-            return re.sub(regex, '', s).lower()
-
-        # helper to verify the given field is in the schema
-        # this is where non-mvp fields are dropped if present in the vcf
-        # and not present on either the variant or sample_variant schemas
-        def _verify_in_schema(field, sub_group=None):
-            for schema in [self.variant_sample_schema, self.variant_schema]:
-                if sub_group and sub_group in schema['properties']:
-                    if field in schema['properties'][sub_group]['items']['properties']:
-                        return field
-                if field in schema['properties'] or field.lower() in schema['properties']:
-                    return field
-            return self.DROPPED_FIELD  # must maintain field order
-
-        # process INFO tag - reformat as necessary and return the entries
         if 'Subembedded' in info.desc:  # restricted name in INFO description
-            sub_embedded = _strip(info.desc.split(':')[1:2][0])
-            self.sub_embedded_mapping[info.id] = sub_embedded
-            entries = info.desc.split(':')[3:][0].split('|')
-            entries = list(map(lambda f: info.id.lower() + '_' + _strip(f), entries))
-            entries = list(map(lambda f: _verify_in_schema(f, sub_embedded), entries))
+            return self.parse_subembedded_info_header(info)
         else:
-            entries = info.desc.split(':')[1:][0].split('|')
-            entries = list(map(lambda f: info.id.lower() + '_' + _strip(f), entries))
-            entries = list(map(_verify_in_schema, entries))
-        return entries
+            return self.parse_info_header(info)
 
     def parse_vcf_fields(self):
         """ Populates self.format with the annotation format
@@ -156,7 +148,7 @@ class VCFParser(object):
         """
         for key in self.annotation_keys.keys():
             if key in self.reader.infos.keys():
-                self.format[key] = self.parse_vcf_info(self.reader.infos[key])
+                self.format[key] = self.parse_vcf_info_header(self.reader.infos[key])
             else:
                 logger.info('Found key %s that is not in info tag' % key)
         for key in self.reader.infos.keys():
@@ -167,7 +159,11 @@ class VCFParser(object):
         """ Uses self.reader as an iterator to get the next record. This function
             is stateful with respect to the VCF reader. To re-iterate you would
             need to re-instantiate the class. There shouldn't be any reason to
-            do this
+            do this unless you require multiple VCF passes.
+
+            NOTE: this also validates the "next" VCF row against the VCF specification since in
+                  "reading" it, it is "parsing" it. It does NOT parse or validate the extended
+                  specification.
 
         Returns:
             next record on VCF
@@ -257,7 +253,7 @@ class VCFParser(object):
             else:
                 raise VCFParserException('Got array with no sub-type')
         else:
-            raise VCFParserException('Type was %s and not one of: string, integer, number, array' % type)
+            raise VCFParserException('Type was %s and not one of: string, integer, number, boolean, array' % type)
 
     def validate_variant_value(self, field, value, key='', exit_on_validation=True):
         """ Given a field, check the variant schema for the type of that field and cast
@@ -281,16 +277,20 @@ class VCFParser(object):
         sub_type = None
         sub_embedded_group = self.sub_embedded_mapping.get(key)
         if field not in props:  # check if sub-embedded field
-            if sub_embedded_group and field in props[sub_embedded_group]['items']['properties']:
-                type = props[sub_embedded_group]['items']['properties'][field]['type']
-                if type == 'array':
-                    sub_type = props[sub_embedded_group]['items']['properties'][field]['items']['type']
+            if sub_embedded_group:
+                item_props = props[sub_embedded_group]['items']['properties']
+                if field in item_props:
+                    type = item_props[field]['type']
+                    if type == 'array':
+                        sub_type = item_props[field]['items']['type']
+                else:
+                    return None  # maybe log as well? Special case where key has sub-embedding group but is not in props
             else:
                 if exit_on_validation:
                     raise VCFParserException('Tried to check a variant field that does not exist on the schema: %s' % field)
                 else:
                     # enable later maybe
-                    #logger.error('Tried to check a variant field that does not exist on the schema: %s' % field)
+                    # logger.error('Tried to check a variant field that does not exist on the schema: %s' % field)
                     return None
         else:
             type = props[field]['type']
@@ -448,7 +448,7 @@ class VCFParser(object):
                         s['samplegeno'].append(tmp)
 
             self.parse_samples(s, sample)  # add sample fields, already formatted
-            del s['AF']  # XXX: comes from VCF but is not actually what we want. Get rid of it.
+            s.pop('AF', None)  # XXX: comes from VCF but is not actually what we want. Get rid of it.
 
             # DROP SV's that are REF/REF
             if s.get('GT', None) in [self.GT_REF, self.GT_MISSING]:
@@ -470,7 +470,7 @@ class VCFParser(object):
             institution: institution to post these items under
 
         Returns:
-            2 tuple of arrays containing the variant sample/variant items
+            2-tuple of arrays containing the variant sample/variant items
         """
         variant_samples, variants = [], []
         for record in self:
@@ -490,16 +490,21 @@ class VCFParser(object):
         return variant_samples, variants
 
     @staticmethod
-    def post_variant_consequence_items(testapp, project=None, institution=None):
-        """ Posts variant_consequence items under the given project/institution. Required for poasting variants. """
-        vcs = json.load(open('./src/encoded/tests/data/variant_workbook/variant_consequence.json', 'r'))
+    def post_variant_consequence_items(virtualapp, project=None, institution=None):
+        """ Posts variant_consequence items under the given project/institution. Required for poasting variants.
+
+        :param virtualapp: application_handle to post under
+        :param project: project to post under
+        :param institution: institution to post under
+=        """
+        vcs = json.load(open(resolve_file_path('tests/data/variant_workbook/variant_consequence.json'), 'r'))
         for entry in vcs:
             if project:
                 entry['project'] = project
             if institution:
                 entry['institution'] = institution
             try:
-                testapp.post_json('/variant_consequence', entry, status=201)
+                virtualapp.post_json('/variant_consequence', entry, status=201)
             except Exception as e:  # can happen with master-inserts collision
                 logger.info('Failed to post variant consequence %s' % str(e))
 
@@ -521,10 +526,17 @@ def main():
             --app-name: app name, usually 'app'
 
         local update:
-            python src/encoded/commands/ingest_vcf.py src/encoded/tests/data/variant_workbook/vcf_v0.4.6_subset.vcf src/encoded/schemas/variant.json src/encoded/schemas/variant_sample.json hms-dbmi hms-dbmi development.ini --app-name app --post-inserts
+            python src/encoded/commands/ingest_vcf.py \
+                src/encoded/tests/data/variant_workbook/vcf_v0.4.6_subset.vcf \
+                src/encoded/schemas/variant.json \
+                src/encoded/schemas/variant_sample.json \
+                hms-dbmi hms-dbmi development.ini --app-name app --post-inserts
 
         To load a vcf on the server:
-            bin/ingest-vcf src/encoded/tests/data/variant_workbook/test_vcf.vcf src/encoded/schemas/variant.json src/encoded/schemas/variant_sample.json hms-dbmi hms-dbmi production.ini --app-name app --post-inserts
+            ingest-vcf src/encoded/tests/data/variant_workbook/test_vcf.vcf \
+            src/encoded/schemas/variant.json \
+            src/encoded/schemas/variant_sample.json \
+            hms-dbmi hms-dbmi production.ini --app-name app --post-inserts
     """
     logging.basicConfig()
     parser = argparse.ArgumentParser(
