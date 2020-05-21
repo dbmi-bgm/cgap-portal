@@ -1,0 +1,57 @@
+{
+    "title": "Filter Set",
+    "description": "Filter Set for combining multiple queries",
+    "id": "/profiles/filter_set.json",
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "type": "object",
+    "required": ["institution", "project"],
+    "identifyingProperties": ["uuid", "aliases"],
+    "additionalProperties": false,
+    "mixinProperties": [
+        { "$ref": "mixins.json#/schema_version" },
+        { "$ref": "mixins.json#/uuid" },
+        { "$ref": "mixins.json#/status" },
+        { "$ref": "mixins.json#/aliases" },
+        { "$ref": "mixins.json#/attribution" },
+        { "$ref": "mixins.json#/submitted" },
+        { "$ref": "mixins.json#/modified" },
+        { "$ref": "mixins.json#/tags" },
+        { "$ref": "mixins.json#/notes" }
+    ],
+    "properties": {
+        "schema_version": {
+            "default": "1"
+        },
+        "type": {
+            "title": "Item Type",
+            "description": "Item type that the filter set will work on.",
+            "type": "string",
+            "enum": ["VariantSample"]
+        },
+        "filter_blocks": {
+            "title": "Filter Blocks",
+            "description": "Filter queryies that will be joined.",
+            "type": "array",
+            "uniqueItems": true,
+            "items": {
+                "title": "Filter Block",
+                "type": "object",
+                "properties": {
+                    "query": {
+                        "title": "Single query",
+                        "type": "string"
+                    },
+                    "flag_applied": {
+                        "title": "Flag applies",
+                        "type": "boolean"
+                    }
+                }
+            }
+        },
+        "flags": {
+            "title": "Flags",
+            "description": "A single query containing all filters.",
+            "type": "string"
+        }
+    }
+}
