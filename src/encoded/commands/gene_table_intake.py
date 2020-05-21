@@ -73,8 +73,11 @@ def main():
     """ Takes in the gene mapping table, produces + posts gene annotation fields and
         writes the gene schema.
 
-        Below will post on local machine
-        python src/encoded/commands/gene_table_intake.py src/encoded/tests/data/variant_workbook/gene_table.csv src/encoded/schemas/gene_annotation_field.json src/encoded/schemas/gene.json development.ini --app-name app --post-inserts
+        Below command will post on local machine
+        python src/encoded/commands/gene_table_intake.py \
+               src/encoded/tests/data/variant_workbook/gene_table.csv \
+               src/encoded/schemas/gene_annotation_field.json \
+               src/encoded/schemas/gene.json development.ini --app-name app --post-inserts
     """
     logging.basicConfig()
     parser = argparse.ArgumentParser(

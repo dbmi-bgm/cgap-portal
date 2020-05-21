@@ -55,6 +55,7 @@ class VCFParser(object):
         self.reader = vcf.Reader(open(_vcf, 'r'))
         self.variant_schema = json.load(open(variant, 'r'))
         self.variant_sample_schema = json.load(open(sample, 'r'))
+        self.regex = re.compile(r"""(\s+$|["]|['])""")  # for stripping
         self.annotation_keys = OrderedDict()  # list of INFO fields that contain annotation fields
         self.format = OrderedDict()  # intermediate representation of the item format
         self.sub_embedded_mapping = OrderedDict()  # denotes which INFO fields belong in a SEO
@@ -71,15 +72,13 @@ class VCFParser(object):
         for field in self.reader.metadata['MUTANNO']:
             self.annotation_keys[field['ID']] = True
 
-    @staticmethod
-    def _strip(s):
+    def _strip(self, s):
         """ Strips whitespace and quotation characters and also lowercases the given string s
 
         :param s: String to strip
         :return: processed string
         """
-        regex = re.compile(r"""(\s+$|["]|['])""")
-        return re.sub(regex, '', s).lower()
+        return re.sub(self.regex, '', s).lower()
 
     def verify_in_schema(self, field, sub_group=None):
         """ Helper to verify the given field is in the schema.
@@ -109,18 +108,18 @@ class VCFParser(object):
         sub_embedded = self._strip(hdr.desc.split(':')[1:2][0])  # extracts string that comes after 'Subembedded'
         self.sub_embedded_mapping[hdr.id] = sub_embedded
         entries = hdr.desc.split(':')[3:][0].split('|')  # get everything after 'Format', split on field sep
-        entries = list(map(lambda f: hdr.id.lower() + '_' + self._strip(f), entries))  # ID + stripped field name
+        entries = map(lambda f: hdr.id.lower() + '_' + self._strip(f), entries)  # ID + stripped field name
         entries = list(map(lambda f: self.verify_in_schema(f, sub_embedded), entries))
         return entries
 
     def parse_info_header(self, hdr):
         """ Parses an individual INFO header
 
-        :param hdr: hdr to process, must NOT contain 'Submembedded'
+        :param hdr: hdr to process, must NOT contain 'Subembedded'
         :return: list of fields in this annotation grouping (but not part of a sub-embedded object)
         """
         entries = hdr.desc.split(':')[1:][0].split('|')  # extract 'Format' string
-        entries = list(map(lambda f: hdr.id.lower() + '_' + self._strip(f), entries))  # ID + stripped field name
+        entries = map(lambda f: hdr.id.lower() + '_' + self._strip(f), entries)  # ID + stripped field name
         entries = list(map(self.verify_in_schema, entries))
         return entries
 

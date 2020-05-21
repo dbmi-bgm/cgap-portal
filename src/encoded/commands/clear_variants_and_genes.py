@@ -7,6 +7,7 @@ from pyramid.paster import get_app
 
 logger = structlog.getLogger(__name__)
 EPILOG = __doc__
+# TODO: Infer this order somehow
 ORDER = [  # this must be modified if object relationships change! -Will 05/04/2020
     'variant_sample',
     'variant',

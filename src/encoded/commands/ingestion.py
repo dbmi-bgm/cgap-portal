@@ -42,7 +42,7 @@ def main():
        |                              |                       |                        |
     variant_table_intake.py       ingest_vcf.py      gene_table_intake.py          ingest_genes.py
 
-    The only inheritance occurs in gene_table_intake, who inherits from variant_table_intake.
+    The only (class) inheritance occurs in gene_table_intake, who inherits from variant_table_intake.
     Each Python file has a entry point that allows you to run its 'sub-part' of the 'whole'.
     The idea is to provide as many 'knobs' as possible.
     """

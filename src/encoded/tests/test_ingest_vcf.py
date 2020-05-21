@@ -159,9 +159,9 @@ def test_VCFP_post_variants(testapp, institution, project, test_vcf, gene_workbo
 #     vss, vs = test_vcf.run(project='encode-project', institution='encode-institution')
 #     assert len(vss) == 20
 #     assert len(vs) == 11
-#     for v in vs[:NUMBER_TO_POST]:
+#     for v in vs[:MAX_POSTS_FOR_TESTING]:
 #         testapp.post_json('/variant', v, status=201)
-#     for vs in vss[:NUMBER_TO_POST]:
+#     for vs in vss[:MAX_POSTS_FOR_TESTING]:
 #         testapp.post_json('/variant_sample', vs, status=201)
 
 

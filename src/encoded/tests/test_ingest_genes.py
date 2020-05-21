@@ -1,7 +1,5 @@
 import pytest
-from encoded.tests.variant_fixtures import (  # noqa
-    test_genes,
-)
+from encoded.tests.variant_fixtures import test_genes  # noqa (is a fixture)
 
 
 pytestmark = [pytest.mark.working, pytest.mark.ingestion]

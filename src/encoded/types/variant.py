@@ -38,7 +38,7 @@ def extend_embedded_list(embedded_list, fd, typ, prefix=None):
 
 def build_variant_embedded_list():
     """ Determines the embedded_list based on the information
-        present in ./src/encoded/schemas/variant_embeds.json
+        present in schemas/variant_embeds.json
 
         :returns: list of variant embeds
     """

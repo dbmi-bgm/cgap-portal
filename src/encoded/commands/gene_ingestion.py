@@ -52,7 +52,8 @@ def run_ingest_genes(app_handle, args):
 def main():
     """
     Gene Ingestion Program. Posts the given gene list to the running portal. This is a one time process. If more fields
-    are added or there are mapping table changes this process must be re-run.
+    are added or there are mapping table changes this process must be re-run. Running this multiple times without
+    clearing the appropriate items will create DB conflicts.
 
     positional arguments:
         mp              path to gene mapping table
