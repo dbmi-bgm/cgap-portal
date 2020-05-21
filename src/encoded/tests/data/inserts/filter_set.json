@@ -5,6 +5,18 @@
         "institution": "hms-dbmi",
         "submitted_by": "koray_kirli@hms.harvard.edu",
         "status": "released",
-        "uuid": "dcf15d5e-40aa-43bc-b81c-32c70c9afa99"
+        "uuid": "dcf15d5e-40aa-43bc-b81c-32c70c9afa99",
+        "type": "VariantSample",
+        "filter_blocks": [
+            {
+                "query": "&variant.CHROM=1&variant.genes.genes_most_severe_consequence.impact=MODERATE",
+                "flag_applied": true
+            },
+            {
+                "query": "&variant.conservation_phylop100.from=0.2&variant.conservation_phylop100.to=1&variant.cytoband_cytoband=1p36.33",
+                "flag_applied": false
+            }
+        ],
+        "flags": "&variant.transcript.vep_clin_sig=benign%26uncertain_significance"
     }
 ]
