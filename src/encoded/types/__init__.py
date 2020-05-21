@@ -267,3 +267,17 @@ class TrackingItem(Item):
             if date_created:
                 title = title + ' from ' + date_created
             return title
+
+
+@collection(
+    name='filter-sets',
+    properties={
+        'title': 'Filter Sets',
+        'description': 'Filter Set for combining multiple queries'
+    }
+)
+class FilterSet(Item):
+    """The class to store information about 4DN file formats"""
+    item_type = 'filter_set'
+    schema = load_schema('encoded:schemas/filter_set.json')
+    name_key = 'filter_set'
