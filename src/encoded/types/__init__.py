@@ -281,3 +281,4 @@ class FilterSet(Item):
     item_type = 'filter_set'
     schema = load_schema('encoded:schemas/filter_set.json')
     name_key = 'filter_set'
+    embedded_list = []
