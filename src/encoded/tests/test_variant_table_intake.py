@@ -7,7 +7,7 @@ from encoded.tests.variant_fixtures import ANNOTATION_FIELD_URL
 
 # XXX: These constants should probably be handled in a more intelligent way -will
 pytestmark = [pytest.mark.working, pytest.mark.ingestion]
-MT_LOC = resolve_file_path('tests/data/variant_workbook/variant_table_v0.4.6.csv')
+MT_LOC = resolve_file_path('annotations/variant_table_v0.4.6.csv')
 ANNOTATION_FIELD_SCHEMA = resolve_file_path('schemas/annotation_field.json')
 EXPECTED_FIELDS = ['no', 'field_name', 'source_name', 'source_version', 'sub_embedding_group',
                    'field_type', 'is_list',

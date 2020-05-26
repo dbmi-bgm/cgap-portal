@@ -56,7 +56,7 @@ download-genes: # grabs latest gene list from the below link, unzips and drops i
 	wget https://www.dropbox.com/s/s2xa978nwktd3ib/mvp_gene_datasource_v0.4.5.coding_gene_main_chrom.json.gz?dl=1
 	mv mvp_gene_datasource_v0.4.5.coding_gene_main_chrom.json.gz\?dl\=1 gene_inserts_v0.4.5.json.gz
 	gunzip gene_inserts_v0.4.5.json.gz
-	mv gene_inserts_v0.4.5.json src/encoded/tests/data/variant_workbook/gene_inserts_v0.4.5.json
+	mv gene_inserts_v0.4.5.json src/annotations/gene_inserts_v0.4.5.json
 
 deploy1:  # starts postgres/ES locally and loads inserts
 	dev-servers development.ini --app-name app --clear --init --load
@@ -65,7 +65,7 @@ deploy2:  # spins up waittress to serve the application
 	pserve development.ini
 
 deploy3:  # uploads: GeneAnnotationFields, then Genes, then AnnotationFields, then Variant + VariantSamples
-	python src/encoded/commands/ingestion.py src/encoded/tests/data/variant_workbook/variant_table_v0.4.6.csv src/encoded/schemas/annotation_field.json src/encoded/schemas/variant.json src/encoded/schemas/variant_sample.json src/encoded/tests/data/variant_workbook/vcf_v0.4.6.vcf hms-dbmi hms-dbmi src/encoded/tests/data/variant_workbook/gene_table.csv src/encoded/schemas/gene_annotation_field.json src/encoded/schemas/gene.json src/encoded/tests/data/variant_workbook/gene_inserts_v0.4.5.json hms-dbmi hms-dbmi development.ini --post-variant-consequences --post-variants --post-gene-annotation-field-inserts --post-gene-inserts --app-name app
+	python src/encoded/commands/ingestion.py src/encoded/annotations/variant_table_v0.4.6.csv src/encoded/schemas/annotation_field.json src/encoded/schemas/variant.json src/encoded/schemas/variant_sample.json src/encoded/annotations/vcf_v0.4.6.vcf hms-dbmi hms-dbmi src/encoded/annotations/gene_table_v0.4.5.csv src/encoded/schemas/gene_annotation_field.json src/encoded/schemas/gene.json src/encoded/annotations/gene_inserts_v0.4.5.json hms-dbmi hms-dbmi development.ini --post-variant-consequences --post-variants --post-gene-annotation-field-inserts --post-gene-inserts --app-name app
 
 kill:  # kills back-end processes associated with the application. Use with care.
 	pkill -f postgres &

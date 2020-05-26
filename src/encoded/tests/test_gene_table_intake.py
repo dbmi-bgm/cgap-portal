@@ -3,12 +3,13 @@ from encoded.tests.test_variant_table_intake import (
     ANNOTATION_FIELD_SCHEMA,
     EXPECTED_FIELDS
 )
+from encoded.util import resolve_file_path
 from encoded.tests.variant_fixtures import GENE_ANNOTATION_FIELD_URL
 from encoded.commands.gene_table_intake import GeneTableParser
 
 pytestmark = [pytest.mark.working, pytest.mark.ingestion]
-MT_LOC = './src/encoded/tests/data/variant_workbook/gene_table_v0.4.5.csv'
-GENE_SCHEMA_TEST_LOC = './src/encoded/tests/data/variant_workbook/gene.json'
+MT_LOC = resolve_file_path('annotations/gene_table_v0.4.5.csv')
+GENE_SCHEMA_TEST_LOC = resolve_file_path('schemas/gene.json')
 NUMBER_ANNOTATION_FIELDS = 284
 EXPECTED_INSERT = {'no': 1, 'field_name': 'chrom',
                    'schema_title': 'Chromosome', 'do_import': True,

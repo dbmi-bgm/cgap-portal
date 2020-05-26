@@ -6,7 +6,7 @@ from encoded.commands.ingest_genes import GeneIngestion
 
 GENES_LOC = resolve_file_path('tests/data/variant_workbook/gene_inserts_partial.json')
 GENE_WORKBOOK = resolve_file_path('tests/data/variant_workbook/gene_workbook.json')
-VARIANT_CONSEQUENCE_LOC = resolve_file_path('tests/data/variant_workbook/variant_consequence.json')
+VARIANT_CONSEQUENCE_LOC = resolve_file_path('annotations/variant_consequence.json')
 MAX_POSTS_FOR_TESTING = 5
 ANNOTATION_FIELD_URL = '/annotation_field'
 GENE_ANNOTATION_FIELD_URL = '/gene_annotation_field'
