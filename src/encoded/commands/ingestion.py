@@ -127,9 +127,9 @@ def main():
     gene_ingestion_result = run_gene_table_intake(app_handle, args) and run_ingest_genes(app_handle, args)
     if gene_ingestion_result is True:
         variant_ingestion_result = run_variant_table_intake(app_handle, args) and run_ingest_vcf(app_handle, args)
-    if variant_ingestion_result is True:
-        logger.warning('Successfully finished end-to-end ingestion!')
-        exit(0)
+        if variant_ingestion_result is True:
+            logger.warning('Successfully finished end-to-end ingestion!')
+            exit(0)
 
     exit(1)  # if we got to this point, something went wrong
 
