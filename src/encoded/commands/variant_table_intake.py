@@ -22,19 +22,19 @@ class MappingTableIntakeException(Exception):
 class MappingTableParser(object):
     """ Class that encapsulates data/functions related to the annotation field mapping table. """
     HEADER_ROW_INDEX = 2
-    FIELD_TYPE_INDEX = 5  # XXX: hardcoded, must change if field_type is moved on mapping table
-    INTEGER_FIELDS = ['no', 'maximum_length_of_value', 'column_order', 'facet_order']
-    BOOLEAN_FIELDS = ['is_list', 'calculated_property', 'embedded_field']
-    STRING_FIELDS = ['vcf_name', 'source_name', 'source_version', 'sub_embedding_group',
-                     'annotation_category', 'separator', 'schema_description', 'value_example',
-                     'scope', 'schema_title', 'pre_addon']
+    FIELD_TYPE_INDEX = 9  # XXX: hardcoded, must change if field_type is moved on mapping table
+    INTEGER_FIELDS = ['no', 'maximum_length_of_value', 'column_order', 'facet_order', 'default', 'min', 'max']
+    BOOLEAN_FIELDS = ['is_list', 'calculated_property', 'embedded_field', 'do_import']
+    STRING_FIELDS = ['field_name', 'source_name', 'source_version', 'sub_embedding_group',
+                     'annotation_category', 'separator', 'description', 'value_example',
+                     'scope', 'schema_title', 'pattern', 'link', 'comments']
     SPECIAL_FIELDS = ['field_type', 'enum_list', 'links_to']
     ALL_FIELDS = INTEGER_FIELDS + BOOLEAN_FIELDS + STRING_FIELDS + SPECIAL_FIELDS
     EMBEDDED_VARIANT_FIELDS = resolve_file_path('schemas/variant_embeds.json')
     EMBEDDED_VARIANT_SAMPLE_FIELDS = resolve_file_path('schemas/variant_sample_embeds.json')  # XXX: unused currently
     EMBEDS_TO_GENERATE = [('variant', EMBEDDED_VARIANT_FIELDS),
                           ('variant_sample', EMBEDDED_VARIANT_SAMPLE_FIELDS)]
-    NAME_FIELD = 'vcf_name'
+    NAME_FIELD = 'field_name'
 
     def __init__(self, _mp, schema):
         self.mapping_table = _mp
@@ -44,8 +44,8 @@ class MappingTableParser(object):
 
     @staticmethod
     def process_fields(row):
-        """ Takes in the row of field names and processes them. This involves replacing
-            spaces, ignoring '#' commented out fields and dropping comments (like this)
+        """ Takes in the row of field names and processes them. At this point fields are all
+            lowercased and use underscores, such as 'field_name'
 
         Args:
             row: row of fields to be processed from the mapping table
@@ -59,12 +59,8 @@ class MappingTableParser(object):
         """
         fields = OrderedDict()
         for name in row:
-            new_name = name.split('(')[0].strip().lower()
-            new_name = new_name.replace(" ", "_")
-            if new_name.startswith('#'):
-                continue
-            if new_name not in fields:
-                fields[new_name] = True
+            if name not in fields:
+                fields[name] = True
             else:
                 raise MappingTableIntakeException('Found duplicate field in %s' % row)
         if not fields:

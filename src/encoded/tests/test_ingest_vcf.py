@@ -13,6 +13,8 @@ from encoded.tests.variant_fixtures import (  # noqa
     gene_workbook,
     post_variant_consequence_items,
     MAX_POSTS_FOR_TESTING,
+    VARIANT_SAMPLE_URL,
+    VARIANT_URL
 )
 
 
@@ -55,7 +57,7 @@ def test_VCFP_one_variant(test_vcf):
 
     # check sub-embedded object fields
     assert result['transcript'][0]['vep_consequence'] == ['missense_variant']
-    assert result['transcript'][0]['vep_symbol'] == 'NOC2L'
+    assert result['transcript'][0]['vep_gene'] == 'ENSG00000188976'
     assert result['transcript'][0]['vep_canonical'] is True
     assert result['transcript'][10]['vep_tsl'] == 5
 
@@ -119,14 +121,13 @@ def test_VCFP_multiple_sample_variants(test_vcf):
     result = test_vcf.create_sample_variant_from_record(record)[0]
     assert result['DP'] == 52
     assert len(result['samplegeno']) == 3
-    assert 'NUMGT' in result['samplegeno'][0]
-    assert 'AD' in result['samplegeno'][0]
-    assert 'GT' in result['samplegeno'][0]
+    assert 'samplegeno_numgt' in result['samplegeno'][0]
+    assert 'samplegeno_ad' in result['samplegeno'][0]
+    assert 'samplegeno_gt' in result['samplegeno'][0]
 
 
 def test_VCFP_post_sample_variants(testapp, institution, project, test_vcf):
     """ Attempts to post all generated sample variants without links"""
-    CONNECTION_URL = '/variant_sample'
     for idx, record in enumerate(test_vcf):
         if idx == MAX_POSTS_FOR_TESTING:
             break
@@ -134,12 +135,11 @@ def test_VCFP_post_sample_variants(testapp, institution, project, test_vcf):
         for sample in variant_samples:
             sample['project'] = 'encode-project'
             sample['institution'] = 'encode-institution'
-            testapp.post_json(CONNECTION_URL, sample, status=201)
+            testapp.post_json(VARIANT_SAMPLE_URL, sample, status=201)
 
 
 def test_VCFP_post_variants(testapp, institution, project, test_vcf, gene_workbook, post_variant_consequence_items):
     """ Attempts to post all generated variants without links """
-    CONNECTION_URL = '/variant'
     for idx, record in enumerate(test_vcf):
         if idx == MAX_POSTS_FOR_TESTING:
             break
@@ -147,7 +147,7 @@ def test_VCFP_post_variants(testapp, institution, project, test_vcf, gene_workbo
         variant['project'] = 'encode-project'
         variant['institution'] = 'encode-institution'
         test_vcf.format_variant_sub_embedded_objects(variant)
-        testapp.post_json(CONNECTION_URL, variant, status=201)
+        testapp.post_json(VARIANT_URL, variant, status=201)
 
 
 # @pytest.mark.skip  # will not run currently without valid VCF

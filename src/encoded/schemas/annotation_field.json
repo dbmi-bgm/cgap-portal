@@ -4,8 +4,8 @@
     "id": "/profiles/annotation_field.json",
     "$schema": "http://json-schema.org/draft-04/schema#",
     "type": "object",
-    "required": ["vcf_name", "field_type"],
-    "identifyingProperties": ["uuid", "aliases", "vcf_name"],
+    "required": ["field_name", "field_type"],
+    "identifyingProperties": ["uuid", "aliases", "field_name"],
     "additionalProperties": false,
     "mixinProperties": [
       { "$ref": "mixins.json#/schema_version" },
@@ -27,10 +27,11 @@
             "description": "Number on mapping table",
             "type": "integer"
         },
-        "vcf_name": {
-            "title": "Field Name on VCF",
+        "field_name": {
+            "title": "Field Name",
             "description": "Original name of the annotation field name on vcf file",
-            "type": "string"
+            "type": "string",
+            "uniqueKey": true
         },
         "source_name": {
             "title": "Source Name",
@@ -83,10 +84,39 @@
             "type": "integer",
             "description": "Maximum number of bytes this field can hold"
         },
-        "schema_description": {
-            "title": "Description to be used in the variant schema for the field",
-            "description": "description inception",
+        "description": {
+            "title": "Description",
+            "description": "Description to be used in the variant schema for the field",
             "type": "string"
+        },
+        "pattern": {
+            "title": "Pattern",
+            "description": "Regex used to validate field entries",
+            "type": "string"
+        },
+        "do_import": {
+            "title": "Do Import",
+            "type": "boolean",
+            "description": "Whether this annotation field is currently available on the portal",
+            "default": false
+        },
+        "link": {
+            "title": "Link",
+            "description": "Base link used to lookup this field",
+            "type": "string"
+        },
+        "default": {
+            "title": "Default value for this field",
+            "description": "For defaults/min/max only type=integer is available",
+            "type": "integer"
+        },
+        "min": {
+            "title": "Minimum Value for this field",
+            "type": "integer"
+        },
+        "max": {
+            "title": "Maximum Value for this field",
+            "type": "integer"
         },
         "value_example": {
             "title": "Example Value for this field",
@@ -134,11 +164,6 @@
             "description": "Title to be used in the variant schema for the field",
             "type": "string"
         },
-        "pre_addon": {
-            "title": "Pre-Addon",
-            "description": "I don't know",
-            "type": "string"
-        },
         "links_to": {
             "title": "Link To",
             "description": "I don't know",
@@ -153,6 +178,11 @@
             "title": "Calculated Property",
             "description": "Boolean on whether or not this field is a calculated property of a variant",
             "type": "boolean"
+        },
+        "comments": {
+            "title": "Comments",
+            "description": "Comments on this field",
+            "type": "string"
         }
     },
     "facets": {
@@ -172,6 +202,9 @@
         },
         "source_name": {
             "title": "Source"
+        },
+        "scope": {
+            "title": "Scope"
         }
     }
 }

@@ -1,33 +1,30 @@
 import pytest
-from encoded.commands.gene_table_intake import (
-    GeneTableParser
+from encoded.tests.test_variant_table_intake import (
+    ANNOTATION_FIELD_SCHEMA,
+    EXPECTED_FIELDS
 )
+from encoded.tests.variant_fixtures import GENE_ANNOTATION_FIELD_URL
+from encoded.commands.gene_table_intake import GeneTableParser
 
 pytestmark = [pytest.mark.working, pytest.mark.ingestion]
-MT_LOC = './src/encoded/tests/data/variant_workbook/gene_table.csv'
+MT_LOC = './src/encoded/tests/data/variant_workbook/gene_table_v0.4.5.csv'
 GENE_SCHEMA_TEST_LOC = './src/encoded/tests/data/variant_workbook/gene.json'
-GENE_ANNOTATION_FIELD_SCHEMA = './src/encoded/schemas/gene_annotation_field.json'
-EXPECTED_FIELDS = ['annotation_category', 'column_order', 'comments', 'description', 'do_import',
-                   'enum_list', 'pattern', 'facet_order', 'field_name',
-                   'field_type', 'is_list', 'link', 'no', 'schema_title',
-                   'separator', 'source_name', 'source_version', 'sub_embedding_group', 'value_example']
 NUMBER_ANNOTATION_FIELDS = 284
-EXPECTED_INSERT = {'no': 1, 'field_name': 'chrom', 'source_name': 'ENSEMBLgene',
-                   'source_version': 'v99', 'schema_title': 'Chromosome',
+EXPECTED_INSERT = {'no': 1, 'field_name': 'chrom',
+                   'schema_title': 'Chromosome', 'do_import': True,
+                   'source_name': 'ENSEMBLgene', 'source_version': 'v99',
                    'description': "name of the chromosome or scaffold; chromosome names without a 'chr'",
-                   'value_example': '1; 2; 3; 4; 5; 6; 7; X; 8; 9', 'is_list': False,
-                   'field_type': 'string',
-                   'enum_list':
-                       ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13',
-                        '14', '15', '16', '17', '18', '19', '20', '21', '22', 'X', 'Y', 'M'],
-                   'do_import': True}
+                   'field_type': 'string', 'is_list': False,
+                   'enum_list': ['1', '2', '3', '4', '5', '6','7', '8', '9', '10', '11', '12', '13', '14', '15', '16',
+                                 '17', '18', '19', '20', '21', '22', 'X', 'Y', 'M'],
+                   'value_example': '1; 2; 3; 4; 5; 6; 7; X; 8; 9'}
 CLINGENDIS_FIELDS_EXPECTED = 4
 TRANSCRIPT_FIELDS_EXPECTED = 15
 
 
 @pytest.fixture
 def GTParser():
-    parser = GeneTableParser(MT_LOC, GENE_ANNOTATION_FIELD_SCHEMA)
+    parser = GeneTableParser(MT_LOC, ANNOTATION_FIELD_SCHEMA)
     return parser
 
 @pytest.fixture
@@ -43,8 +40,8 @@ def gene_schema(GTParser, inserts):
 
 def test_read_gene_table_header(GTParser):
     """ Tests that we can read mapping table header correctly based on the current format """
-    assert GTParser.version == 'gene_annV0.4.4'
-    assert GTParser.date == '2020.04.27'
+    assert GTParser.version == 'gene_annV0.4.5'
+    assert GTParser.date == '2020.05.20'
     assert sorted(GTParser.fields) == sorted(EXPECTED_FIELDS)
 
 
@@ -62,9 +59,8 @@ def test_post_gene_annotation_field_inserts(inserts, testapp):
     Tests that we can post the processed inserts to a test app with
     no errors. This posts all gene annotation fields in the gene_table.
     """
-    CONNECTION_URL = '/gene_annotation_field'
     for item in inserts:
-        testapp.post_json(CONNECTION_URL, item, status=201)
+        testapp.post_json(GENE_ANNOTATION_FIELD_URL, item, status=201)
 
 
 def test_generate_gene_schema(gene_schema):
@@ -105,8 +101,7 @@ def test_generate_gene_schema(gene_schema):
 def test_gene_table_run(GTParser, testapp):
     """ Runs the gene table ingestion process, building the schema into the test location
         and posting the resulting inserts """
-    CONNECTION_URL = '/gene_annotation_field'
     inserts = GTParser.run(gs_out=GENE_SCHEMA_TEST_LOC, write=True)
     for item in inserts:
-        testapp.post_json(CONNECTION_URL, item, status=201)
+        testapp.post_json(GENE_ANNOTATION_FIELD_URL, item, status=201)
 

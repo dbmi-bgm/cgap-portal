@@ -4,8 +4,8 @@
     "id": "/profiles/gene_annotation_field.json",
     "$schema": "http://json-schema.org/draft-04/schema#",
     "type": "object",
-    "required": ["field_name"],
-    "identifyingProperties": ["field_name", "uuid", "aliases"],
+    "required": ["field_name", "field_type"],
+    "identifyingProperties": ["uuid", "aliases", "field_name"],
     "additionalProperties": false,
     "mixinProperties": [
       { "$ref": "mixins.json#/schema_version" },
@@ -28,18 +28,18 @@
             "type": "integer"
         },
         "field_name": {
-            "title": "Field Name from Mutanno",
-            "description": "Original name of the field name in the mutanno database",
+            "title": "Field Name",
+            "description": "Original name of the annotation field name on vcf file",
             "type": "string",
             "uniqueKey": true
         },
         "source_name": {
             "title": "Source Name",
-            "description": "Latest source name for the data",
+            "description": "Latest source name",
             "type": "string"
         },
         "source_version": {
-            "title": "Source Version",
+            "title": "Source Version (v0.2)",
             "description": "Latest source version",
             "type": "string"
         },
@@ -56,9 +56,9 @@
                 "string",
                 "number",
                 "integer",
-                "boolean"
-            ],
-            "default": "string"
+                "boolean",
+                "embedded"
+            ]
         },
         "is_list": {
             "title": "Is List",
@@ -66,20 +66,9 @@
             "description": "Whether the field is a list or not",
             "default": false
         },
-        "annotation_category": {
-            "title": "Annotation Category",
-            "description": "Category used for this annotation, could be used for grouping",
-            "type": "string"
-        },
-        "do_import": {
-            "title": "Do Import",
-            "type": "boolean",
-            "description": "Whether to do import or not (?)",
-            "default": false
-        },
         "separator": {
             "title": "Separator",
-            "description": "if value is list, use this seperator to split items",
+            "description": "if value is list, use this separator to split items",
             "type": "string",
             "enum": [
                 "comma",
@@ -89,6 +78,50 @@
                 "tab",
                 "tilde"
             ]
+        },
+        "maximum_length_of_value": {
+            "title": "Maximum length of value (bytes)",
+            "type": "integer",
+            "description": "Maximum number of bytes this field can hold"
+        },
+        "description": {
+            "title": "Description",
+            "description": "Description to be used in the variant schema for the field",
+            "type": "string"
+        },
+        "pattern": {
+            "title": "Pattern",
+            "description": "Regex used to validate field entries",
+            "type": "string"
+        },
+        "do_import": {
+            "title": "Do Import",
+            "type": "boolean",
+            "description": "Whether this annotation field is currently available on the portal",
+            "default": false
+        },
+        "link": {
+            "title": "Link",
+            "description": "Base link used to lookup this field",
+            "type": "string"
+        },
+        "default": {
+            "title": "Default value for this field",
+            "description": "For defaults/min/max only type=integer is available",
+            "type": "integer"
+        },
+        "min": {
+            "title": "Minimum Value for this field",
+            "type": "integer"
+        },
+        "max": {
+            "title": "Maximum Value for this field",
+            "type": "integer"
+        },
+        "value_example": {
+            "title": "Example Value for this field",
+            "description": "Example Value for this field, stored as text",
+            "type": "string"
         },
         "enum_list": {
             "title": "Enum List",
@@ -100,76 +133,56 @@
                 "type": "string"
             }
         },
-       "link": {
-            "title": "Link",
-            "description": "link to external site",
-            "type": "string"
-       },
-      "pattern":  {
-            "title": "Pattern",
-            "description": "Regex used to validate field entries",
-            "type": "string"
-      },
-       "links_to": {
-           "title": "Link To",
-           "description": "Item Type that should be linked to from this field",
-           "type": "string",
-           "comment": "MAY NOT NEED THIS FOR GENES"
-       },
-       "schema_title": {
-           "title": "Schema Title",
-           "description": "Title to be used in the gene schema for the field",
-           "type": "string"
-       },
-       "description": {
-            "title": "Description",
-            "description": "description to be used in the gene schema for the field",
+        "annotation_category": {
+            "title": "Annotation Category",
+            "description": "Category used for this annotation, could be used for grouping",
             "type": "string"
         },
-        "value_example": {
-            "title": "Example Value for this field",
-            "description": "Example Value for this field, stored as text",
-            "type": "string"
-        },
-        "comments": {
-            "title": "Comments",
-            "description": "Comments associated with this gene annotation field",
-            "type": "string"
-        },
-        "link_substitution": {
-            "title": "Link Substitution",
-            "description": "url with placehold to substitute in an ID to make a external link - use in namespaces.json?",
-            "type": "string"
-        },
-        "field_priority": {
-            "title": "Field priority",
-            "description": "Ranking number of the field (lower is better)",
+        "facet_order": {
+            "title": "Facet Order",
+            "description": "Ranking number of the field wrt to Facets, lower is better",
             "type": "integer"
         },
-        "column_priority": {
-            "title": "Column priority",
+        "column_order": {
+            "title": "Column order",
             "description": "Ranking number of the field for Column in search view (lower is better)",
             "type": "integer"
         },
-        "facet_grouping": {
-            "title": "Facet Grouping",
-            "description": "Which group this facet belongs to",
+        "scope": {
+            "title": "Scope",
+            "description": "Scope that this field belongs to",
+            "type": "string",
+            "enum": [
+                "variant",
+                "sample",
+                "gene",
+                "sample_variant"
+            ]
+        },
+         "schema_title": {
+            "title": "Schema Title",
+            "description": "Title to be used in the variant schema for the field",
             "type": "string"
         },
-        "facet_priority": {
-            "title": "Field priority",
-            "description": "Ranking number of the field for Facet in search view (lower is better)",
-            "type": "integer"
-        },
-        "annotation_grouping": {
-            "title": "Annotation Grouping",
-            "description": "Which group this annotation belongs to",
+        "links_to": {
+            "title": "Link To",
+            "description": "I don't know",
             "type": "string"
+        },
+        "embedded_field": {
+            "title": "Embedded Field",
+            "description": "Whether or not this field is embedded from another object",
+            "type": "boolean"
         },
         "calculated_property": {
             "title": "Calculated Property",
             "description": "Boolean on whether or not this field is a calculated property of a variant",
             "type": "boolean"
+        },
+        "comments": {
+            "title": "Comments",
+            "description": "Comments on this field",
+            "type": "string"
         }
     },
     "facets": {
@@ -189,6 +202,9 @@
         },
         "source_name": {
             "title": "Source"
+        },
+        "scope": {
+            "title": "Scope"
         }
     }
 }

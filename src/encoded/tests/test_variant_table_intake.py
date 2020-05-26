@@ -2,35 +2,35 @@ import json
 import pytest
 from encoded.util import resolve_file_path
 from encoded.commands.variant_table_intake import MappingTableParser
+from encoded.tests.variant_fixtures import ANNOTATION_FIELD_URL
 
 
 # XXX: These constants should probably be handled in a more intelligent way -will
 pytestmark = [pytest.mark.working, pytest.mark.ingestion]
 MT_LOC = resolve_file_path('tests/data/variant_workbook/variant_table_v0.4.6.csv')
 ANNOTATION_FIELD_SCHEMA = resolve_file_path('schemas/annotation_field.json')
-EXPECTED_FIELDS = ['no', 'vcf_name', 'source_name', 'source_version', 'sub_embedding_group',
-                   'field_type', 'is_list', 'separator', 'maximum_length_of_value',
-                   'schema_description', 'value_example', 'enum_list',
+EXPECTED_FIELDS = ['no', 'field_name', 'source_name', 'source_version', 'sub_embedding_group',
+                   'field_type', 'is_list',
+                   'description', 'value_example', 'enum_list', 'do_import',
                    'facet_order', 'column_order', 'annotation_category',
-                   'scope', 'schema_title', 'pre_addon', 'links_to', 'embedded_field',
-                   'calculated_property']
-EXPECTED_INSERT = {'no': 1, 'vcf_name': 'CHROM', 'source_name': 'VCF',
-                   'source_version': 'VCFv4.2', 'field_type': 'string',
-                   'is_list': False, 'maximum_length_of_value': 2,
-                   'schema_description': 'Chromosome',
-                   'value_example': '1;2;3;4;5;6;22;X;Y;M',
-                   'enum_list': ['1', '2', '3', '4', '5', '6', '7', '8', '9',
-                                 '10', '11', '12', '13', '14', '15', '16', '17',
-                                 '18', '19', '20', '21', '22', 'X', 'Y', 'M'],
-                   'annotation_category': 'Position', 'scope': 'variant', 'facet_order': 1,
-                   'schema_title': 'Chromosome'}
+                   'scope', 'schema_title', 'links_to', 'embedded_field',
+                   'calculated_property', 'pattern', 'default', 'min', 'max', 'link', 'comments']
+EXPECTED_INSERT = {'no': 1, 'field_name': 'CHROM', 'schema_title': 'Chromosome',
+                   'do_import': True, 'scope': 'variant', 'source_name': 'VCF',
+                   'source_version': 'VCFv4.2', 'description': 'Chromosome',
+                   'field_type': 'string', 'is_list': False, 'annotation_category': 'Position',
+                   'facet_order': 1,
+                   'enum_list': ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10',
+                                 '11', '12', '13', '14', '15', '16', '17', '18', '19',
+                                 '20', '21', '22', 'X', 'Y', 'M'],
+                   'value_example': '1;2;3;4;5;6;22;X;Y;M'}
 VEP_CONSEQUENCE_EMBEDS = ['transcript.vep_consequence.var_conseq_id', 'transcript.vep_consequence.definition',
                           'transcript.vep_consequence.impact', 'transcript.vep_consequence.location',
                           'transcript.vep_consequence.coding_effect']
-NUMBER_ANNOTATION_FIELDS = 302
-SAMPLE_FIELDS_EXPECTED = 20
-VARIANT_FIELDS_EXPECTED = 282
-TRANSCRIPT_FIELDS_EXPECTED = 47
+NUMBER_ANNOTATION_FIELDS = 340
+SAMPLE_FIELDS_EXPECTED = 25
+VARIANT_FIELDS_EXPECTED = 315
+TRANSCRIPT_FIELDS_EXPECTED = 39
 
 
 @pytest.fixture
@@ -70,8 +70,8 @@ def test_add_default_schema_fields(MTParser):
 
 def test_read_variant_table_header(MTParser):
     """ Tests that we can read mapping table header correctly based on the current format """
-    assert MTParser.version == 'annV0.4'
-    assert MTParser.date == '05.06.2020'
+    assert MTParser.version == 'annV0.4.6'
+    assert MTParser.date == '05.25.2020'
     assert sorted(MTParser.fields) == sorted(EXPECTED_FIELDS)
     for field in EXPECTED_FIELDS:  # all fields are categorized by the Parser
         assert field in MTParser.ALL_FIELDS
@@ -80,7 +80,7 @@ def test_read_variant_table_header(MTParser):
 def test_process_variant_table_inserts(MTParser, inserts):
     """
         Tests that we properly process annotation field inserts
-        There should be 270 total. A hand crafted example is checked
+        There should be 306 total. A hand crafted example is checked
     """
     assert inserts[0] == EXPECTED_INSERT
     assert len(inserts) == NUMBER_ANNOTATION_FIELDS
@@ -95,17 +95,18 @@ def test_generate_sample_json_items(MTParser, inserts):
     sample_fields = MTParser.filter_fields_by_sample(inserts)
     sample_props, cols, facs = MTParser.generate_properties(sample_fields, variant=False)
     assert sample_props['DP']['type'] == 'integer'
-    assert sample_props['DP']['vcf_name'] == 'DP'
+    assert sample_props['DP']['field_name'] == 'DP'
     assert sample_props['PGT']['type'] == 'string'
     assert sample_props['PGT']['source_name'] == 'VCF'
-    assert sample_props['NovoPP']['type'] == 'number'
+    assert sample_props['novoPP']['type'] == 'number'
     assert 'samplegeno' in sample_props
+    assert 'cmphet' in sample_props
 
     # check cols/facs (there are none now)
     assert 'AF' in cols
     assert 'DP' in cols
     assert 'GQ' in cols
-    assert 'NovoPP' in facs
+    assert 'novoPP' in facs
 
 
 def test_generate_variant_json_items(MTParser, inserts):
@@ -115,29 +116,21 @@ def test_generate_variant_json_items(MTParser, inserts):
     # check top level fields
     assert var_props['CHROM']['title'] == 'Chromosome'
     assert var_props['CHROM']['type'] == 'string'
-    assert var_props['CHROM']['maximum_length_of_value'] == 2
     assert var_props['POS']['type'] == 'integer'
     assert var_props['cadd_phred']['source_name'] == 'CADD'
     assert var_props['cadd_phred']['type'] == 'number'
 
-    # check samplegeno sub-embedded obj
-    assert 'samplegeno' in var_props
-    assert 'AD' in var_props['samplegeno']['items']['properties']
-    assert 'GT' in var_props['samplegeno']['items']['properties']
-    assert 'NUMGT' in var_props['samplegeno']['items']['properties']
-
     # check vep (transcript) sub-embedded object
     sub_obj_props = var_props['transcript']['items']['properties']
     assert len(sub_obj_props.keys()) == TRANSCRIPT_FIELDS_EXPECTED
-    assert sub_obj_props['vep_symbol']['vcf_name'] == 'vep_symbol'
-    assert sub_obj_props['vep_symbol']['type'] == 'string'
+    assert sub_obj_props['vep_gene']['field_name'] == 'vep_gene'
+    assert sub_obj_props['vep_gene']['type'] == 'string'
     assert sub_obj_props['vep_distance']['type'] == 'string'
     assert sub_obj_props['vep_canonical']['type'] == 'boolean'
 
     # check sub-embedded object array
     assert sub_obj_props['vep_consequence']['type'] == 'array'
     assert sub_obj_props['vep_consequence']['items']['type'] == 'string'
-    assert sub_obj_props['vep_consequence']['items']['separator'] == 'tilde'
 
     # check cols/facs
     assert 'hgvs_hgvsg' in cols
@@ -156,6 +149,13 @@ def test_generate_variant_sample_schema(MTParser, sample_variant_items):
     properties = schema['properties']
     assert 'CHROM' not in properties
     assert 'vep_consequence' not in properties
+
+    # check samplegeno sub-embedded obj
+    assert 'samplegeno' in properties
+    assert 'samplegeno_ad' in properties['samplegeno']['items']['properties']
+    assert 'samplegeno_gt' in properties['samplegeno']['items']['properties']
+    assert 'samplegeno_numgt' in properties['samplegeno']['items']['properties']
+
     assert 'GT' in properties
     assert 'GQ' in properties
     assert properties['AF']['type'] == 'number'
@@ -173,11 +173,11 @@ def test_generate_variant_schema(MTParser, variant_items):
 
     # check top level schema fields of various types
     properties = schema['properties']
-    assert properties['CHROM']['vcf_name'] == 'CHROM'
+    assert properties['CHROM']['field_name'] == 'CHROM'
     assert properties['CHROM']['source_name'] == 'VCF'
     assert properties['CHROM']['type'] == 'string'
     assert 'enum' in properties['CHROM']
-    assert properties['ALT']['vcf_name'] == 'ALT'
+    assert properties['ALT']['field_name'] == 'ALT'
     assert properties['ALT']['type'] == 'string'
 
     # check sub-embedded object fields
@@ -189,12 +189,10 @@ def test_generate_variant_schema(MTParser, variant_items):
     assert sub_obj_props['vep_consequence']['items']['type'] == 'string'
     assert sub_obj_props['vep_consequence']['items']['linkTo'] == 'VariantConsequence'
     assert sub_obj_props['vep_domains']['type'] == 'array'
-    assert sub_obj_props['vep_domains']['items']['separator'] == 'tilde'
     assert sub_obj_props['vep_domains']['items']['type'] == 'string'
     assert sub_obj_props['vep_clin_sig']['type'] == 'string'
     assert sub_obj_props['vep_somatic']['type'] == 'array'
     assert sub_obj_props['vep_somatic']['items']['type'] == 'boolean'
-    assert sub_obj_props['vep_somatic']['items']['separator'] == 'tilde'
 
     # check (existence of) different sub-embedded object fields
     assert properties['genes']['type'] == 'array'
@@ -224,18 +222,16 @@ def test_post_variant_annotation_field_inserts(inserts, project, institution, te
     on the current mapping table
     Post them to the testapp
     """
-    CONNECTION_URL = '/annotation_field'
     for item in inserts:
         item['project'] = 'encode-project'
         item['institution'] = 'encode-institution'
-        testapp.post_json(CONNECTION_URL, item, status=201)
+        testapp.post_json(ANNOTATION_FIELD_URL, item, status=201)
 
 
 def test_post_inserts_via_run(MTParser, project, institution, testapp):
     """ Tests that we can run the above test using the 'run' method """
     inserts = MTParser.run(institution='encode-institution', project='encode-project',
                            vs_out=resolve_file_path('schemas/variant_sample.json'),
-                           v_out=resolve_file_path('schemas/variant.json'), write=False)
-    CONNECTION_URL = '/annotation_field'
+                           v_out=resolve_file_path('schemas/variant.json'), write=True)
     for item in inserts:
-        testapp.post_json(CONNECTION_URL, item, status=201)
+        testapp.post_json(ANNOTATION_FIELD_URL, item, status=201)

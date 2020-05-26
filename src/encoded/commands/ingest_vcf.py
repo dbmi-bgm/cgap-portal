@@ -33,6 +33,7 @@ class VCFParser(object):
         '%7C': '|',
         '%3B': ';'
     }
+    VARIANT_SAMPLE_SUBEMBEDDED = ['SAMPLEGENO']
     VCF_FIELDS = ['CHROM', 'POS', 'ID', 'REF', 'ALT']
     VCF_SAMPLE_FIELDS = ['FILTER', 'QUAL']
     DROPPED_FIELD = 'DROPPED'
@@ -254,7 +255,7 @@ class VCFParser(object):
         else:
             raise VCFParserException('Type was %s and not one of: string, integer, number, boolean, array' % type)
 
-    def validate_variant_value(self, field, value, key='', exit_on_validation=True):
+    def validate_variant_value(self, field, value, key='', exit_on_validation=False):
         """ Given a field, check the variant schema for the type of that field and cast
         the given value to that type. This constitutes our 'validation' step
 
@@ -264,7 +265,7 @@ class VCFParser(object):
             value: value of the field to be cast
             key: annotation field (sub-embedded) that this field is part of
             exit_on_validation: boolean flag to determine whether or not we bail if
-            we fail validation in this step. Default to True
+            we fail validation in this step. Default to False
 
         Returns:
             casted value
@@ -276,7 +277,7 @@ class VCFParser(object):
         sub_type = None
         sub_embedded_group = self.sub_embedded_mapping.get(key)
         if field not in props:  # check if sub-embedded field
-            if sub_embedded_group:
+            if sub_embedded_group and sub_embedded_group in props:
                 item_props = props[sub_embedded_group]['items']['properties']
                 if field in item_props:
                     type = item_props[field]['type']
@@ -324,6 +325,10 @@ class VCFParser(object):
             else:
                 result[vcf_key] = getattr(record, vcf_key) or ''
         for key in self.format.keys():
+            # Skip Sample fields
+            if key in self.VARIANT_SAMPLE_SUBEMBEDDED:
+                continue
+
             # handle non-annotation fields
             if key not in self.annotation_keys:
                 if record.INFO.get(key, None):
@@ -383,7 +388,8 @@ class VCFParser(object):
     def format_variant_sub_embedded_objects(self, result):
         """ Applies 'format_variant' for all sub_embedded_object fields (detected) """
         for key in self.sub_embedded_mapping.values():
-            self.format_variant(result, seo=key)
+            if key not in self.VARIANT_SAMPLE_SUBEMBEDDED:
+                self.format_variant(result, seo=key)
 
     def parse_samples(self, result, sample):
         """ Parses the samples on the record, adding them to result
@@ -440,10 +446,10 @@ class VCFParser(object):
                     for gt in genotypes:
                         numgt, gt, ad, sample_id = gt.split('|')
                         tmp = dict()
-                        tmp['NUMGT'] = numgt
-                        tmp['GT'] = gt
-                        tmp['AD'] = ad
-                        tmp['SAMPLEID'] = sample_id
+                        tmp['samplegeno_numgt'] = numgt
+                        tmp['samplegeno_gt'] = gt
+                        tmp['samplegeno_ad'] = ad
+                        tmp['samplegeno_sampleid'] = sample_id
                         s['samplegeno'].append(tmp)
 
             self.parse_samples(s, sample)  # add sample fields, already formatted

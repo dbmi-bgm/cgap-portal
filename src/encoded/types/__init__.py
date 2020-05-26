@@ -306,5 +306,5 @@ class AnnotationField(Item):
         "description": "A calculated title for every object in 4DN",
         "type": "string"
     })
-    def display_title(self, vcf_name):
-        return vcf_name
+    def display_title(self, field_name):
+        return field_name
