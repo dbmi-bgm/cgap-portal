@@ -1298,7 +1298,6 @@ def set_filters(request, search, result, principals, doc_types, es_mapping):
     try:
         search.update_from_dict(prev_search)
     except Exception as e:  # not ideal, but important to catch at this stage no matter what it is
-        import pdb; pdb.set_trace()
         log.error('SEARCH: exception encountered when converting raw lucene params to elasticsearch_dsl,'
                   'search: %s\n error: %s' % (prev_search, str(e)))
         raise HTTPBadRequest('The search failed - the DCIC team has been notified.')
