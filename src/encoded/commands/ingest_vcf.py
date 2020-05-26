@@ -502,7 +502,7 @@ class VCFParser(object):
         :param project: project to post under
         :param institution: institution to post under
 =        """
-        vcs = json.load(open(resolve_file_path('tests/data/variant_workbook/variant_consequence.json'), 'r'))
+        vcs = json.load(open(resolve_file_path('annotations/variant_consequence.json'), 'r'))
         for entry in vcs:
             if project:
                 entry['project'] = project
