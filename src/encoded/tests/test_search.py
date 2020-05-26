@@ -816,3 +816,7 @@ class TestNestedSearch(object):
         facets = testapp.get('/search/?type=Cohort'
                              '&families.proband.display_title=GAPID8J9B9CR').json['facets']
         self.verify_facet(facets, 'families.proband.display_title', 2)
+
+    def test_search_nested_exists_query(self, testapp):
+        """ Tests doing a !=No+value search on a nested sub-field. """
+        testapp.get('/search/?type=SampleProcessing&samples.uuid!=No+value', status=404)

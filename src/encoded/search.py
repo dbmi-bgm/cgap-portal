@@ -1178,6 +1178,15 @@ def handle_nested_filters(nested_filters, final_filters, es_mapping, key='must')
                         msg='Malformed entry on query field: %s' % query
                     )
 
+            # if there is no boolean clause in this sub-query, add it directly to final_filters
+            # otherwise continue logic below
+            if BOOL not in query:
+                final_filters[BOOL][MUST].append({
+                    NESTED: {PATH: nested_path,
+                             QUERY: query}
+                })
+                continue
+
             # Check that key is in the sub-query first, it's possible that it in fact uses it's opposite
             # This can happen when adding no value, the opposite 'key' can occur in the sub-query
             opposite_key = None
@@ -1289,6 +1298,7 @@ def set_filters(request, search, result, principals, doc_types, es_mapping):
     try:
         search.update_from_dict(prev_search)
     except Exception as e:  # not ideal, but important to catch at this stage no matter what it is
+        import pdb; pdb.set_trace()
         log.error('SEARCH: exception encountered when converting raw lucene params to elasticsearch_dsl,'
                   'search: %s\n error: %s' % (prev_search, str(e)))
         raise HTTPBadRequest('The search failed - the DCIC team has been notified.')
