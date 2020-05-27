@@ -56,7 +56,7 @@ download-genes: # grabs latest gene list from the below link, unzips and drops i
 	wget https://www.dropbox.com/s/s2xa978nwktd3ib/mvp_gene_datasource_v0.4.5.coding_gene_main_chrom.json.gz?dl=1
 	mv mvp_gene_datasource_v0.4.5.coding_gene_main_chrom.json.gz\?dl\=1 gene_inserts_v0.4.5.json.gz
 	gunzip gene_inserts_v0.4.5.json.gz
-	mv gene_inserts_v0.4.5.json src/annotations/gene_inserts_v0.4.5.json
+	mv gene_inserts_v0.4.5.json src/encoded/annotations/gene_inserts_v0.4.5.json
 
 deploy1:  # starts postgres/ES locally and loads inserts
 	dev-servers development.ini --app-name app --clear --init --load
