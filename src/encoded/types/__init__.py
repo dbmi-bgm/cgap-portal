@@ -13,11 +13,9 @@ from snovault import (
     display_title_schema
 )
 # from pyramid.traversal import find_root
-from pyramid.view import view_config
-from snovault.util import debug_log
 from .base import (
     Item,
-    get_item_if_you_can,
+    get_item_or_none,
     set_namekey_from_title,
     ALLOW_OWNER_EDIT,
     ALLOW_CURRENT,
@@ -90,7 +88,7 @@ class Report(Item):
     def display_title(self, request, accession):
         case = self.rev_link_atids(request, "case")
         if case:
-            case_props = get_item_if_you_can(request, case[0], 'cases')
+            case_props = get_item_or_none(request, case[0], 'cases')
             if case_props and case_props.get('case_id'):
                 return case_props['case_id'] + ' Case Report'
         return accession
@@ -98,8 +96,7 @@ class Report(Item):
 
 @collection(
     name='genes',
-    unique_key='gene:gene_id',
-    lookup_key='preferred_symbol',
+    unique_key='gene:ensgid',
     properties={
         'title': 'Genes',
         'description': 'Gene items',
@@ -107,7 +104,7 @@ class Report(Item):
 class Gene(Item):
     """Gene class."""
     item_type = 'gene'
-    name_key = 'gene_id'
+    name_key = 'ensgid'  # use the ENSEMBL Gene ID as the identifier
     schema = load_schema('encoded:schemas/gene.json')
     embedded_list = []
 
@@ -116,10 +113,31 @@ class Gene(Item):
         "description": "Gene ID",
         "type": "string"
     })
-    def display_title(self, request, gene_id, preferred_symbol=None):
-        if preferred_symbol:
-            return preferred_symbol
-        return 'GENE ID:{}'.format(gene_id)
+    def display_title(self, gene_symbol):
+        return gene_symbol
+
+
+@collection(
+    name='gene-annotation-fields',
+    unique_key='gene_annotation_field:field_name',
+    properties={
+        'title': 'Gene Annotation Fields',
+        'description': 'List of gene annotation fields',
+    })
+class GeneAnnotationField(Item):
+    """Class for gene annotation fields."""
+
+    item_type = 'gene_annotation_field'
+    name_key = 'field_name'
+    schema = load_schema('encoded:schemas/gene_annotation_field.json')
+
+    @calculated_property(schema={
+        "title": "Display Title",
+        "description": "A calculated title for every object in 4DN",
+        "type": "string"
+    })
+    def display_title(self, source_name, field_name):
+        return ':'.join([source_name, field_name])
 
 
 @collection(
@@ -270,15 +288,23 @@ class TrackingItem(Item):
 
 
 @collection(
-    name='filter-sets',
+    name='annotation-fields',
+    unique_key='annotation_field:field_name',
     properties={
-        'title': 'Filter Sets',
-        'description': 'Filter Set for combining multiple queries'
-    }
-)
-class FilterSet(Item):
-    """The class to store information about 4DN file formats"""
-    item_type = 'filter_set'
-    schema = load_schema('encoded:schemas/filter_set.json')
-    name_key = 'filter_set'
-    embedded_list = []
+        'title': 'Annotation Fields',
+        'description': 'List of annotation fields',
+    })
+class AnnotationField(Item):
+    """Class for annotation fields."""
+
+    item_type = 'annotation_field'
+    name_key = 'field_name'
+    schema = load_schema('encoded:schemas/annotation_field.json')
+
+    @calculated_property(schema={
+        "title": "Display Title",
+        "description": "A calculated title for every object in 4DN",
+        "type": "string"
+    })
+    def display_title(self, field_name):
+        return field_name

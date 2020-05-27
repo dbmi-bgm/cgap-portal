@@ -36,6 +36,9 @@ ORDER = [
     'file_format',
     'phenotype',
     'disorder',
+    # 'variant_consequence',
+    # 'variant', # links to ^ variant_consequence
+    # 'variant_sample', # links to ^ variant
     'cohort',
     'family',
     'individual',

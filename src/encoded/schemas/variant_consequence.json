@@ -70,7 +70,7 @@
             "title": "Coding Effect",
             "description": "Effect of variant that resides within the coding sequence",
             "type": "string",
-            "enum": ["Nonsense", "Frameshift", "Stop lost", "Start lost", "inframe indel", "Missense", "Synonymous"]
+            "enum": ["Nonsense", "Frameshift", "Stop lost", "Start lost", "Inframe indel", "Missense", "Synonymous"]
         }
     }
 }

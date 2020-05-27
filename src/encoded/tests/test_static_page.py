@@ -12,7 +12,7 @@ def help_page_section_json():
         "title": "",
         "name" : "help.user-guide.rest-api.rest_api_submission",
         "file": "/docs/source/rest_api_submission.rst",
-        "uuid" : "442c8aa0-dc6c-43d7-814a-854af460b020"
+        "uuid" : "442c8aa0-dc6c-43d7-814a-854af460c020"
     }
 
 @pytest.fixture(scope='module')
@@ -20,7 +20,7 @@ def help_page_json():
     return {
         "name": "help/user-guide/rest-api",
         "title": "The REST-API",
-        "content": ["442c8aa0-dc6c-43d7-814a-854af460b020"],
+        "content": ["442c8aa0-dc6c-43d7-814a-854af460c020"],
         "uuid": "a2aa8bb9-9dd9-4c80-bdb6-2349b7a3540d",
         "table-of-contents": {
             "enabled": True,
@@ -34,7 +34,7 @@ def help_page_json_draft():
     return {
         "name": "help/user-guide/rest-api-draft",
         "title": "The REST-API",
-        "content": ["442c8aa0-dc6c-43d7-814a-854af460b020"],
+        "content": ["442c8aa0-dc6c-43d7-814a-854af460c020"],
         "uuid": "a2aa8bb9-9dd9-4c80-bdb6-2349b7a3540c",
         "table-of-contents": {
             "enabled": True,
@@ -49,7 +49,7 @@ def help_page_json_deleted():
     return {
         "name": "help/user-guide/rest-api-deleted",
         "title": "The REST-API",
-        "content": ["442c8aa0-dc6c-43d7-814a-854af460b020"],
+        "content": ["442c8aa0-dc6c-43d7-814a-854af460c020"],
         "uuid": "a2aa8bb9-9dd9-4c80-bdb6-2349b7a3540a",
         "table-of-contents": {
             "enabled": True,

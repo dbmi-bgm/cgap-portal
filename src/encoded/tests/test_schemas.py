@@ -8,7 +8,7 @@ pytestmark = [pytest.mark.setone, pytest.mark.working, pytest.mark.schema]
 
 SCHEMA_FILES = [
     f for f in resource_listdir('encoded', 'schemas')
-    if f.endswith('.json')
+    if f.endswith('.json') and 'embeds' not in f
 ]
 
 

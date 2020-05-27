@@ -80,7 +80,7 @@ description = "Screen-scraping library"
 name = "beautifulsoup4"
 optional = false
 python-versions = "*"
-version = "4.9.0"
+version = "4.9.1"
 
 [package.dependencies]
 soupsieve = [">1.2", "<2.0"]
@@ -202,6 +202,17 @@ test = ["pytest (>=3.6.0,<3.9.0 || >3.9.0,<3.9.1 || >3.9.1,<3.9.2 || >3.9.2)", "
 
 [[package]]
 category = "main"
+description = "Variant Call Format (VCF) parser for Python"
+name = "dcicpyvcf"
+optional = false
+python-versions = "*"
+version = "1.0.0"
+
+[package.dependencies]
+setuptools = "*"
+
+[[package]]
+category = "main"
 description = "Storage support for 4DN Data Portals."
 name = "dcicsnovault"
 optional = false
@@ -264,14 +275,15 @@ category = "main"
 description = "Utility package for interacting with the 4DN Data Portal and other 4DN resources"
 name = "dcicutils"
 optional = false
-python-versions = ">=3.4,<3.7"
-version = "0.25.0"
+python-versions = ">=3.4,<3.8"
+version = "0.28.1"
 
 [package.dependencies]
 aws-requests-auth = ">=0.4.2,<1"
 boto3 = ">=1.10.46,<2.0.0"
 botocore = ">=1.13.46,<2.0.0"
 elasticsearch = ">=5.5.3,<6.0.0"
+gitpython = ">=3.1.2,<4.0.0"
 pytz = ">=2016.4"
 requests = ">=2.21.0,<3.0.0"
 structlog = ">=19.2.0,<20.0.0"
@@ -406,6 +418,28 @@ name = "futures"
 optional = false
 python-versions = "*"
 version = "3.1.1"
+
+[[package]]
+category = "main"
+description = "Git Object Database"
+name = "gitdb"
+optional = false
+python-versions = ">=3.4"
+version = "4.0.5"
+
+[package.dependencies]
+smmap = ">=3.0.1,<4"
+
+[[package]]
+category = "main"
+description = "Python Git Library"
+name = "gitpython"
+optional = false
+python-versions = ">=3.4"
+version = "3.1.2"
+
+[package.dependencies]
+gitdb = ">=4.0.1,<5"
 
 [[package]]
 category = "main"
@@ -1148,11 +1182,19 @@ version = "1.14.0"
 
 [[package]]
 category = "main"
+description = "A pure Python implementation of a sliding window memory map manager"
+name = "smmap"
+optional = false
+python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
+version = "3.0.4"
+
+[[package]]
+category = "main"
 description = "A modern CSS selector implementation for Beautiful Soup."
 name = "soupsieve"
 optional = false
 python-versions = "*"
-version = "1.9.5"
+version = "1.9.6"
 
 [[package]]
 category = "main"
@@ -1254,6 +1296,17 @@ name = "toml"
 optional = false
 python-versions = "*"
 version = "0.10.1"
+
+[[package]]
+category = "main"
+description = "Fast, Extensible Progress Meter"
+name = "tqdm"
+optional = false
+python-versions = ">=2.6, !=3.0.*, !=3.1.*"
+version = "4.46.0"
+
+[package.extras]
+dev = ["py-make (>=0.1.0)", "twine", "argopt", "pydoc-markdown"]
 
 [[package]]
 category = "main"
@@ -1494,7 +1547,7 @@ transaction = ">=1.6.0"
 test = ["zope.testing"]
 
 [metadata]
-content-hash = "c34a8abbd323944512835cb243f6b0c25c6c4045c627e75e9f3b1acf1db7ac3e"
+content-hash = "4a84e464ae3912d85d1b7789d49278f15a9c38004a959d08807813628bfbde83"
 python-versions = ">=3.6,<3.7"
 
 [metadata.files]
@@ -1522,9 +1575,9 @@ awscli = [
     {file = "backports.statistics-0.1.0.tar.gz", hash = "sha256:714ab29b9b9937c6ec65d8c6a3dcc39ee4972f929d55977b018bb9f204ba1f98"},
 ]
 beautifulsoup4 = [
-    {file = "beautifulsoup4-4.9.0-py2-none-any.whl", hash = "sha256:a4bbe77fd30670455c5296242967a123ec28c37e9702a8a81bd2f20a4baf0368"},
-    {file = "beautifulsoup4-4.9.0-py3-none-any.whl", hash = "sha256:d4e96ac9b0c3a6d3f0caae2e4124e6055c5dcafde8e2f831ff194c104f0775a0"},
-    {file = "beautifulsoup4-4.9.0.tar.gz", hash = "sha256:594ca51a10d2b3443cbac41214e12dbb2a1cd57e1a7344659849e2e20ba6a8d8"},
+    {file = "beautifulsoup4-4.9.1-py2-none-any.whl", hash = "sha256:e718f2342e2e099b640a34ab782407b7b676f47ee272d6739e60b8ea23829f2c"},
+    {file = "beautifulsoup4-4.9.1-py3-none-any.whl", hash = "sha256:a6237df3c32ccfaee4fd201c8f5f9d9df619b93121d01353a64a73ce8c6ef9a8"},
+    {file = "beautifulsoup4-4.9.1.tar.gz", hash = "sha256:73cc4d115b96f79c7d77c1c7f7a0a8d4c57860d1041df407dd1aae7f07a77fd7"},
 ]
 boto = [
     {file = "boto-2.49.0-py2.py3-none-any.whl", hash = "sha256:147758d41ae7240dc989f0039f27da8ca0d53734be0eb869ef16e3adcfa462e8"},
@@ -1633,13 +1686,16 @@ cryptography = [
     {file = "cryptography-2.9.2-cp38-cp38-win_amd64.whl", hash = "sha256:1dfa985f62b137909496e7fc182dac687206d8d089dd03eaeb28ae16eec8e7d5"},
     {file = "cryptography-2.9.2.tar.gz", hash = "sha256:a0c30272fb4ddda5f5ffc1089d7405b7a71b0b0f51993cb4e5dbb4590b2fc229"},
 ]
+dcicpyvcf = [
+    {file = "dcicpyvcf-1.0.0.tar.gz", hash = "sha256:c5bf8d585002ab3b95d13a47803376b456b931865e4189c38a18cca47b108449"},
+]
 dcicsnovault = [
     {file = "dcicsnovault-3.0.0-py3-none-any.whl", hash = "sha256:5309fad97a2b3ab48ce4efa42ba7f30eac6b1a602bb9469cc7857fc397c190a0"},
     {file = "dcicsnovault-3.0.0.tar.gz", hash = "sha256:e61712c12ab4c58904fc1edb4fe540c45915d58dfcc3a11d6b83d783badcd7a6"},
 ]
 dcicutils = [
-    {file = "dcicutils-0.25.0-py3-none-any.whl", hash = "sha256:0a1cf22e42b56fd97e602a4defee680ac50474235f3061c66fe4201729e4dc81"},
-    {file = "dcicutils-0.25.0.tar.gz", hash = "sha256:b5549c473acd2c0f8247dc5465c52f52737e43cdff969fde9be95185607bc34c"},
+    {file = "dcicutils-0.28.1-py3-none-any.whl", hash = "sha256:b3c3433ebc417e68b5cdb4f456d10e1f21d015a325acceb8b60c182ec2bbeb37"},
+    {file = "dcicutils-0.28.1.tar.gz", hash = "sha256:cb4de6831e327accc383245a5e5db62c8a4f2f10e34ed12ffb2c5f0507bdbb7b"},
 ]
 docker = [
     {file = "docker-4.2.0-py2.py3-none-any.whl", hash = "sha256:1c2ddb7a047b2599d1faec00889561316c674f7099427b9c51e8cb804114b553"},
@@ -1680,6 +1736,14 @@ futures = [
     {file = "futures-3.1.1-py2-none-any.whl", hash = "sha256:c4884a65654a7c45435063e14ae85280eb1f111d94e542396717ba9828c4337f"},
     {file = "futures-3.1.1-py3-none-any.whl", hash = "sha256:3a44f286998ae64f0cc083682fcfec16c406134a81a589a5de445d7bb7c2751b"},
     {file = "futures-3.1.1.tar.gz", hash = "sha256:51ecb45f0add83c806c68e4b06106f90db260585b25ef2abfcda0bd95c0132fd"},
+]
+gitdb = [
+    {file = "gitdb-4.0.5-py3-none-any.whl", hash = "sha256:91f36bfb1ab7949b3b40e23736db18231bf7593edada2ba5c3a174a7b23657ac"},
+    {file = "gitdb-4.0.5.tar.gz", hash = "sha256:c9e1f2d0db7ddb9a704c2a0217be31214e91a4fe1dea1efad19ae42ba0c285c9"},
+]
+gitpython = [
+    {file = "GitPython-3.1.2-py3-none-any.whl", hash = "sha256:da3b2cf819974789da34f95ac218ef99f515a928685db141327c09b73dd69c09"},
+    {file = "GitPython-3.1.2.tar.gz", hash = "sha256:864a47472548f3ba716ca202e034c1900f197c0fb3a08f641c20c3cafd15ed94"},
 ]
 html5lib = [
     {file = "html5lib-0.9999999.tar.gz", hash = "sha256:2612a191a8d5842bfa057e41ba50bbb9dcb722419d2408c78cff4758d0754868"},
@@ -2117,9 +2181,13 @@ six = [
     {file = "six-1.14.0-py2.py3-none-any.whl", hash = "sha256:8f3cd2e254d8f793e7f3d6d9df77b92252b52637291d0f0da013c76ea2724b6c"},
     {file = "six-1.14.0.tar.gz", hash = "sha256:236bdbdce46e6e6a3d61a337c0f8b763ca1e8717c03b369e87a7ec7ce1319c0a"},
 ]
+smmap = [
+    {file = "smmap-3.0.4-py2.py3-none-any.whl", hash = "sha256:54c44c197c819d5ef1991799a7e30b662d1e520f2ac75c9efbeb54a742214cf4"},
+    {file = "smmap-3.0.4.tar.gz", hash = "sha256:9c98bbd1f9786d22f14b3d4126894d56befb835ec90cef151af566c7e19b5d24"},
+]
 soupsieve = [
-    {file = "soupsieve-1.9.5-py2.py3-none-any.whl", hash = "sha256:bdb0d917b03a1369ce964056fc195cfdff8819c40de04695a80bc813c3cfa1f5"},
-    {file = "soupsieve-1.9.5.tar.gz", hash = "sha256:e2c1c5dee4a1c36bcb790e0fabd5492d874b8ebd4617622c4f6a731701060dda"},
+    {file = "soupsieve-1.9.6-py2.py3-none-any.whl", hash = "sha256:feb1e937fa26a69e08436aad4a9037cd7e1d4c7212909502ba30701247ff8abd"},
+    {file = "soupsieve-1.9.6.tar.gz", hash = "sha256:7985bacc98c34923a439967c1a602dc4f1e15f923b6fcf02344184f86cc7efaa"},
 ]
 sparqlwrapper = [
     {file = "SPARQLWrapper-1.7.6-py2.7.egg", hash = "sha256:0b9ee3070ca418585b752b48e5ef1d33aa2bf9d5431186ee30b6bcf212c52e78"},
@@ -2148,6 +2216,10 @@ subprocess-middleware = [
 toml = [
     {file = "toml-0.10.1-py2.py3-none-any.whl", hash = "sha256:bda89d5935c2eac546d648028b9901107a595863cb36bae0c73ac804a9b4ce88"},
     {file = "toml-0.10.1.tar.gz", hash = "sha256:926b612be1e5ce0634a2ca03470f95169cf16f939018233a670519cb4ac58b0f"},
+]
+tqdm = [
+    {file = "tqdm-4.46.0-py2.py3-none-any.whl", hash = "sha256:acdafb20f51637ca3954150d0405ff1a7edde0ff19e38fb99a80a66210d2a28f"},
+    {file = "tqdm-4.46.0.tar.gz", hash = "sha256:4733c4a10d0f2a4d098d801464bdaf5240c7dadd2a7fde4ee93b0a0efd9fb25e"},
 ]
 transaction = [
     {file = "transaction-2.4.0-py2.py3-none-any.whl", hash = "sha256:b96a5e9aaa73f905759bc9ccf0021bf4864c01ac36666e0d28395e871f6d584a"},
