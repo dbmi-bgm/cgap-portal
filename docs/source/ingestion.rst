@@ -135,3 +135,61 @@ These annotations are all single valued and are thus processed directly as strin
   1%3A65565|G|ENSG00000240361|ENST00000492842|Transcript|downstream_gene_variant|||||||MODIFIER|1678|1||SNV|OR4G11P|HGNC|HGNC%3A31276|transcribed_unprocessed_pseudogene|||||||||||||||||||||||||||;
 
 Above is a VEP annotation entry that is both multi-valued and has multiple entries. To parse this we first split on the comma to get the groups. Newlines are inserted to visualize the groups. We then split on pipe since the fields are pipe separated. Even if a field is blank a pipe must be present for that field otherwise we will not be able to determine which fields go with which values. Once we have all the fields, we then go through each one and post-process. If it is an array field (not shown in this example but consistent with point 4 above) then we split again on tilde to determine the array elements, otherwise the field value is cast to the appropriate type.
+
+How to Provision Annotations
+============================
+
+This section will describe how to "provision annotations", which roughly means the process of ingesting annotation related items to the portal. Note that the paths in the commands that follow may change.
+
+Local Machine
+^^^^^^^^^^^^^
+
+Follow the below steps. It takes 30-45 minutes to run.
+
+1. Startup back-end resources: ``make deploy1``
+2. Startup waitress: ``make deploy2``
+3. (If first time) Download genes: ``make download-genes``
+4. Load annotations: ``make deploy3``
+
+Beanstalk
+^^^^^^^^^
+
+To run on Beanstalk, follow these steps. The first three are common to running all commands on Beanstalk.
+
+0. Get SSH access. Ask Will for this.
+1. SSH to the appropriate environment: ``eb ssh <env_name>``
+2. Enter the current application home directory: ``pushd /opt/python/current/app``
+3. Activate the application virtual environment: ``source /opt/python/run/venv/bin/activate``
+4. If annotations are already present and you want to start from scratch (using schemas on the current application version), clear the existing annotation items: ``clear-variants-and-genes production.ini --app-name app``. If you want to just ingest a VCF, see later sections.
+5. Run the following ingestion command:
+
+``ingestion src/encoded/annotations/variant_table_v0.4.6.csv src/encoded/schemas/annotation_field.json src/encoded/schemas/variant.json src/encoded/schemas/variant_sample.json src/encoded/annotations/vcf_v0.4.6.vcf hms-dbmi hms-dbmi src/encoded/annotations/gene_table_v0.4.5.csv src/encoded/schemas/gene_annotation_field.json src/encoded/schemas/gene.json src/encoded/annotations/gene_inserts_v0.4.5.json hms-dbmi hms-dbmi production.ini --post-variant-consequences --post-variants --post-gene-annotation-field-inserts --post-gene-inserts --app-name app``
+
+
+Output
+^^^^^^
+
+The ``ingestion`` command uses ``tqdm`` to show progress bars, so you can tell what stage of the process is currently ongoing. At the end the output will look something like the below.
+
+``100%|███████████████| 284/284 [00:09<00:00, 30.90gene_annotation_fields/s]``
+
+``100%|███████████████| 21873/21873 [20:12<00:00, 18.04genes/s]``
+
+``100%|███████████████| 340/340 [00:18<00:00, 18.79variant_annotation_fields/s]``
+
+``46variants [00:18,  2.44variants/s]``
+
+``ERROR:encoded.commands.variant_ingestion:Encountered VCF format error: could not convert string to float: '18,0,19,0'``
+
+
+The error at the end is expected with the latest VCF - if a different error occurs there should be some reasonable description. As an example, the one below looks like this:
+
+``ERROR:encoded.commands.variant_ingestion:Encountered VCF format error: could not convert string to float: '18,0,19,0'``
+
+It tells you exactly which file threw the error (src/encoded/commands/variant_ingestion.py), what type of error it was (VCF format error) and what caused it (TypeError). Errors like these should be reported, along with the VCF row which threw the error (the 47th variant in the VCF since we posted 46). In this case that line has an actual VCF spec validation error.
+
+
+Ingesting Additional VCFs
+^^^^^^^^^^^^^^^^^^^^^^^^^
+
+To ingest more VCFs with the current setup, use the ``variant-ingestion`` command. See ``src/encoded/commands/variant_ingestion.py``.

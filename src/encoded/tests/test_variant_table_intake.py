@@ -232,6 +232,6 @@ def test_post_inserts_via_run(MTParser, project, institution, testapp):
     """ Tests that we can run the above test using the 'run' method """
     inserts = MTParser.run(institution='encode-institution', project='encode-project',
                            vs_out=resolve_file_path('schemas/variant_sample.json'),
-                           v_out=resolve_file_path('schemas/variant.json'), write=True)
+                           v_out=resolve_file_path('schemas/variant.json'), write=False)  # enable to generate schemas
     for item in inserts:
         testapp.post_json(ANNOTATION_FIELD_URL, item, status=201)
