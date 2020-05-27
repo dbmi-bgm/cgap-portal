@@ -95,6 +95,107 @@ class QueryConstructionException(SearchException):
         self.query_type = query_type
 
 
+class SearchBuilder:
+    """ A monolithic object that encapsulates information needed to perform searches.
+        Ideally, you have time to fully refactor this code, but adding this alone I think
+        will help things. It still passes around a lot of state to functions not defined
+        as part of this class. Ideally these functions are absorbed into this class and
+        refactored. If this doesn't take too long that should be thought about.
+
+        You can think of this class like a wrapper around a less user-friendly
+        API. Using this class will allow you to get a basic grasp of what's going on. The details
+        are in the external methods. Hopefully at some point all functions can be refactored, but
+        for now there are just "entry points" needed for filter_sets. - Will 5/27/2020
+    """
+
+    def __init__(self, context, request, search_type=None, return_generator=False, forced_type='Search',
+                 custom_aggregations=None):
+
+        # Initialized directly
+        self.request = request  # request who requested a search
+        self.return_generator = return_generator  # whether or not this search should return a generator
+        self.custom_aggregations = custom_aggregations  # any custom aggregations on this search
+        self.types = request.registry[TYPES]  # all types in the system
+        self.forced_type = forced_type  # (mostly deprecated) search type
+        self.principals = request.effective_principals  # permissions to apply to this search
+        self.es = request.registry[ELASTIC_SEARCH]  # handle to remote ES
+        self.search_frame = request.normalized_params.get('frame', 'embedded')  # which frame to return, always embedded
+
+        # Initialized via outside function call
+        self.doc_types = set_doc_types(request, self.types, search_type)  # doc_types for this search
+        self.schemas = [self.types[item_type].schema for item_type in self.doc_types]  # schemas for doc_types
+        self.search_types = build_search_types(self.types, self.doc_types)  # item_type hierarchy we are searching on
+        self.prepared_terms = prepare_search_term(request)  # handles resolving search term path on mapping (naively)
+        self.search_base = normalize_query(request, self.types, self.doc_types)  # passes
+
+        # API Calls
+        self.es_index = get_es_index(request, self.doc_types)  # what index we are searching on
+        self.item_type_es_mapping = get_es_mapping(self.es, self.es_index)  # mapping for the item type we are searching
+
+        # To be computed later, initialized to None here
+        self.result = None
+        self.from_ = None
+        self.size = None
+        self.response = None
+        self.search = None
+
+    def initialize_search_response(self):
+        """ Initializes the search response """
+        response = {
+            '@context': self.request.route_path('jsonld_context'),
+            '@id': '/' + self.forced_type.lower() + '/' + self.search_base,
+            '@type': self.search_types,
+            'title': self.forced_type,
+            'filters': [],
+            'facets': [],
+            '@graph': [],
+            'notification': '',
+            'sort': {},
+            'clear_filters': clear_filters_setup(self.request, self.doc_types, self.forced_type)
+        }
+        add_search_header_if_needed(self.request, self.doc_types, response)
+        self.from_, self.size = get_pagination(self.request)
+        build_type_filters(response, self.request, self.doc_types, self.types)
+        self.response = response
+
+    def build_search_query(self):
+        """ Builds the search query """
+        search = Search(using=self.es, index=self.es_index)
+        source_fields = sorted(list_source_fields(self.request, self.doc_types, self.search_frame))
+        search, string_query = build_query(search, self.prepared_terms, source_fields)
+        search = set_sort_order(self.request, search, self.prepared_terms, self.types, self.doc_types, self.response)
+        search, query_filters = set_filters(self.request, search, self.response, self.principals, self.doc_types,
+                                            self.item_type_es_mapping)
+        facets = initialize_facets(self.request, self.doc_types, self.prepared_terms, self.schemas,
+                                   self.item_type_es_mapping)
+
+        search = set_facets(search, facets, query_filters, string_query, self.request, self.doc_types,
+                            self.custom_aggregations, self.size, self.from_, self.item_type_es_mapping)
+
+        # Add preference from session, if available
+        search_session_id = None
+        if (self.request.__parent__ is None and
+                  not self.return_generator and
+                  self.size != 'all'):  # Probably unnecessary, but skip for non-paged, sub-reqs, etc.
+            search_session_id = self.request.cookies.get('searchSessionID', 'SESSION-' + str(uuid.uuid1()))
+            search = search.params(preference=search_session_id)
+
+        self.search = search
+
+    def execute_search(self):
+        """ Does the search execution """
+        if self.size == 'all':
+            es_results = execute_search_for_all_results(self.request, self.search)
+        else:
+            size_search = search[self.from_:self.from_ + self.size]
+            es_results = execute_search(self.request, size_search)
+        return es_results
+
+    def format_results(self):
+        """ Does result formatting """
+        pass  # TODO: continue this refactor
+
+
 @view_config(route_name='search', request_method='GET', permission='search')
 @debug_log
 def search(context, request, search_type=None, return_generator=False, forced_type='Search', custom_aggregations=None):
@@ -180,7 +281,7 @@ def search(context, request, search_type=None, return_generator=False, forced_ty
 
     ### Add preference from session, if available
     search_session_id = None
-    if request.__parent__ is None and not return_generator and size != 'all': # Probably unnecessary, but skip for non-paged, sub-reqs, etc.
+    if request.__parent__ is None and not return_generator and size != 'all':  # Probably unnecessary, but skip for non-paged, sub-reqs, etc.
         search_session_id = request.cookies.get('searchSessionID', 'SESSION-' + str(uuid.uuid1()))
         search = search.params(preference=search_session_id)
 
