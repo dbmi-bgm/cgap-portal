@@ -108,7 +108,7 @@ def main():
     # clear queues and initialize indices before loading data. No indexing yet.
     # this is needed for items with properties stored in ES
     if args.init:
-        create_mapping.run(app, skip_indexing=True, purge_queue=True)
+        create_mapping.run(app, skip_indexing=True, purge_queue=False)
 
     if args.init and args.load:
         from pyramid.path import DottedNameResolver
@@ -119,7 +119,7 @@ def main():
             raise(load_res)
 
         # now clear the queues and queue items for indexing
-        create_mapping.run(app, check_first=True, strict=True, purge_queue=True)
+        create_mapping.run(app, check_first=True, strict=True, purge_queue=False)
 
     print('Started. ^C to exit.')
 

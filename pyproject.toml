@@ -3,7 +3,7 @@
 # after having done 'python setup_eb.py develop', at least on the beanstalk. It doesn't
 # sem to be needed locally. -kmp 17-Mar-2020
 name = "encoded"
-version = "1.9.2"
+version = "2.0.0"
 description = "Clinical Genomics Analysis Platform"
 authors = ["4DN-DCIC Team <support@4dnucleome.org>"]
 license = "MIT"
@@ -92,9 +92,10 @@ pytest-mock = "0.11.0"
 pytest-timeout = "1.0.0"
 pytest-xdist = "1.14"
 python-dateutil = "2.5.3"
-# python-magic is presently pinned to 0.4.15 in lockstep with dcicsnovault's requirements. See explanation there.
 python-magic = "0.4.15"
 pytz = ">=2020.1"
+dcicpyvcf = "1.0.0"
+# python-magic is presently pinned to 0.4.15 in lockstep with dcicsnovault's requirements. See explanation there.
 rdflib = "4.2.2"
 rdflib-jsonld = "0.3"
 "repoze.debug" = "1.0.2"
@@ -112,6 +113,7 @@ submit4dn = "0.9.7"
 subprocess-middleware = "0.3"
 # Useful for picking apart pyproject.toml
 toml = ">=0.10.0,<1"
+tqdm = "^4.46.0"
 transaction = "2.4.0"
 translationstring = "1.3"
 uptime = ">=3.0.1,<4"
@@ -185,12 +187,22 @@ migrate-attachments-aws = "encoded.commands.migrate_attachments_aws:main"
 migrate-dataset-type = "encoded.commands.migrate_dataset_type:main"
 migrate-files-aws = "encoded.commands.migrate_files_aws:main"
 owl-to-items = "encoded.commands.generate_items_from_owl:main"
-profile = "encoded.commands.profile:main"
+profiler = "encoded.commands.profiler:main"
+purge-item-type = "encoded.commands.purge_item_type:main"
 run-upgrade-on-inserts = "encoded.commands.run_upgrader_on_inserts:main"
 spreadsheet-to-json = "encoded.commands.spreadsheet_to_json:main"
 update-inserts-from-server = "encoded.commands.update_inserts_from_server:main"
 verify-item = "encoded.commands.verify_item:main"
 
+# cgap commands
+variant-table-intake = "encoded.commands.variant_table_intake:main"
+ingest-vcf = "encoded.commands.ingest_vcf:main"
+variant-ingestion = "encoded.commands.variant_ingestion:main"
+gene-table-intake = "encoded.commands.gene_table_intake:main"
+ingest-genes = "encoded.commands.ingest_genes:main"
+gene-ingestion = "encoded.commands.gene_ingestion:main"
+ingestion = "encoded.commands.ingestion:main"
+clear-variants-and-genes = "encoded.commands.clear_variants_and_genes:main"
 
 [paste.app_factory]
 main = "encoded:main"

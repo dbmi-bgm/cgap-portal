@@ -9,7 +9,7 @@ from snovault import (
 from snovault.util import debug_log
 from .base import (
     Item,
-    get_item_if_you_can
+    get_item_or_none
 )
 from pyramid.httpexceptions import HTTPUnprocessableEntity
 from pyramid.view import view_config
@@ -107,7 +107,7 @@ class Family(Item):
     def get_parents(self, request, proband=None, members=None):
         parents = []
         if proband and members:
-            props = get_item_if_you_can(request, proband, 'individuals')
+            props = get_item_or_none(request, proband, 'individuals')
             if props:
                 for p in ['mother', 'father']:
                     if props.get(p):
@@ -118,7 +118,7 @@ class Family(Item):
         gp = []
         if proband and members and parents:
             for item in parents:
-                p_props = get_item_if_you_can(request, item, 'individuals')
+                p_props = get_item_or_none(request, item, 'individuals')
                 if p_props:
                     for p in ['mother', 'father']:
                         if p_props.get(p) and p_props[p] in members:
@@ -161,7 +161,7 @@ class Family(Item):
     })
     def mother(self, request, proband=None, members=[]):
         if proband and members:
-            props = get_item_if_you_can(request, proband, 'individuals')
+            props = get_item_or_none(request, proband, 'individuals')
             if props and props.get('mother'):
                 return props['mother']
 
@@ -173,7 +173,7 @@ class Family(Item):
     })
     def father(self, request, proband=None, members=[]):
         if proband and members:
-            props = get_item_if_you_can(request, proband, 'individuals')
+            props = get_item_or_none(request, proband, 'individuals')
             if props and props.get('father') and props['father'] in members:
                 return props['father']
 
@@ -193,7 +193,7 @@ class Family(Item):
             sibs = []
             parents = self.get_parents(request, proband, members)
             for member in members:
-                member_props = get_item_if_you_can(request, member, 'individuals')
+                member_props = get_item_or_none(request, member, 'individuals')
                 if member_props and member != proband:
                     if member_props.get('mother') in parents and member_props.get('father') in parents:
                         sibs.append(member)
@@ -216,7 +216,7 @@ class Family(Item):
             sibs = []
             parents = self.get_parents(request, proband, members)
             for member in members:
-                member_props = get_item_if_you_can(request, member, 'individuals')
+                member_props = get_item_or_none(request, member, 'individuals')
                 if member_props and member != proband:
                     if member_props.get('mother') in parents and member_props.get('father') not in parents:
                         sibs.append(member)
@@ -240,7 +240,7 @@ class Family(Item):
         if proband and members:
             ch = []
             for member in members:
-                props = get_item_if_you_can(request, member, 'individuals')
+                props = get_item_or_none(request, member, 'individuals')
                 if props and any(props.get(p) == proband for p in ['mother', 'father']):
                     ch.append(member)
             if ch:
@@ -281,7 +281,7 @@ class Family(Item):
             gp = self.get_grandparents(request, proband, members, parents)
             aunts_uncles = []
             for member in members:
-                member_props = get_item_if_you_can(request, member, 'individuals')
+                member_props = get_item_or_none(request, member, 'individuals')
                 if member_props and member not in parents:
                     for p in ['mother', 'father']:
                         if member_props.get(p) and member_props[p] in gp:
@@ -309,7 +309,7 @@ class Family(Item):
             gp = self.get_grandparents(request, proband, members, parents)
             aunts_uncles = []
             for member in members:
-                member_props[member] = get_item_if_you_can(request, member, 'individuals')
+                member_props[member] = get_item_or_none(request, member, 'individuals')
                 if member_props[member] and member not in parents:
                     for p in ['mother', 'father']:
                         if member_props[member].get(p) and member_props[member][p] in gp:
@@ -386,7 +386,7 @@ def process_pedigree(context, request):
                 break
         if not user_uuid:
             raise HTTPUnprocessableEntity('Family %s: Must provide authentication' % family_item)
-        user_props = get_item_if_you_can(request, user_uuid)
+        user_props = get_item_or_none(request, user_uuid)
         email = user_props['email']
     environ = {'HTTP_ACCEPT': 'application/json', 'REMOTE_USER': email}
     testapp = TestApp(app, environ)
