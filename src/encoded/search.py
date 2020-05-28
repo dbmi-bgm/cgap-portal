@@ -112,6 +112,7 @@ class SearchBuilder:
                  custom_aggregations=None):
 
         # Initialized directly
+        self.context = context  # request context
         self.request = request  # request who requested a search
         self.return_generator = return_generator  # whether or not this search should return a generator
         self.custom_aggregations = custom_aggregations  # any custom aggregations on this search
@@ -119,17 +120,17 @@ class SearchBuilder:
         self.forced_type = forced_type  # (mostly deprecated) search type
         self.principals = request.effective_principals  # permissions to apply to this search
         self.es = request.registry[ELASTIC_SEARCH]  # handle to remote ES
-        self.search_frame = request.normalized_params.get('frame', 'embedded')  # which frame to return, always embedded
 
         # Initialized via outside function call
-        self.doc_types = set_doc_types(request, self.types, search_type)  # doc_types for this search
+        self.doc_types = set_doc_types(self.request, self.types, search_type)  # doc_types for this search
         self.schemas = [self.types[item_type].schema for item_type in self.doc_types]  # schemas for doc_types
-        self.search_types = build_search_types(self.types, self.doc_types)  # item_type hierarchy we are searching on
-        self.prepared_terms = prepare_search_term(request)  # handles resolving search term path on mapping (naively)
-        self.search_base = normalize_query(request, self.types, self.doc_types)  # passes
+        self.search_types = build_search_types(self.types, self.doc_types) + [self.forced_type]  # item_type hierarchy we are searching on
+        self.search_base = normalize_query(self.request, self.types, self.doc_types)  # passes
+        self.search_frame = self.request.normalized_params.get('frame', 'embedded')  # which frame to return, always embedded
+        self.prepared_terms = prepare_search_term(self.request)  # handles resolving search term path on mapping (naively)
 
         # API Calls
-        self.es_index = get_es_index(request, self.doc_types)  # what index we are searching on
+        self.es_index = get_es_index(self.request, self.doc_types)  # what index we are searching on
         self.item_type_es_mapping = get_es_mapping(self.es, self.es_index)  # mapping for the item type we are searching
 
         # To be computed later, initialized to None here
@@ -137,7 +138,9 @@ class SearchBuilder:
         self.from_ = None
         self.size = None
         self.response = None
+        self.facets = None
         self.search = None
+        self.search_session_id = None
 
     def initialize_search_response(self):
         """ Initializes the search response """
@@ -166,19 +169,18 @@ class SearchBuilder:
         search = set_sort_order(self.request, search, self.prepared_terms, self.types, self.doc_types, self.response)
         search, query_filters = set_filters(self.request, search, self.response, self.principals, self.doc_types,
                                             self.item_type_es_mapping)
-        facets = initialize_facets(self.request, self.doc_types, self.prepared_terms, self.schemas,
-                                   self.item_type_es_mapping)
+        self.facets = initialize_facets(self.request, self.doc_types, self.prepared_terms, self.schemas,
+                                        self.item_type_es_mapping)
 
-        search = set_facets(search, facets, query_filters, string_query, self.request, self.doc_types,
+        search = set_facets(search, self.facets, query_filters, string_query, self.request, self.doc_types,
                             self.custom_aggregations, self.size, self.from_, self.item_type_es_mapping)
 
         # Add preference from session, if available
-        search_session_id = None
         if (self.request.__parent__ is None and
                   not self.return_generator and
                   self.size != 'all'):  # Probably unnecessary, but skip for non-paged, sub-reqs, etc.
-            search_session_id = self.request.cookies.get('searchSessionID', 'SESSION-' + str(uuid.uuid1()))
-            search = search.params(preference=search_session_id)
+            self.search_session_id = self.request.cookies.get('searchSessionID', 'SESSION-' + str(uuid.uuid1()))
+            search = search.params(preference=self.search_session_id)
 
         self.search = search
 
@@ -187,14 +189,55 @@ class SearchBuilder:
         if self.size == 'all':
             es_results = execute_search_for_all_results(self.request, self.search)
         else:
-            size_search = search[self.from_:self.from_ + self.size]
+            size_search = self.search[self.from_:self.from_ + self.size]
             es_results = execute_search(self.request, size_search)
         return es_results
 
-    def format_results(self):
+    def format_results(self, es_results):
         """ Does result formatting """
-        pass  # TODO: continue this refactor
+        self.response['total'] = total = es_results['hits']['total']
+        self.response['facets'] = format_facets(es_results, self.facets, total, self.search_frame)
+        self.response['aggregations'] = format_extra_aggregations(es_results)
 
+        if self.size not in (None, 'all') and self.size < self.response['total']:
+            params = [(k, v) for k, v in self.request.normalized_params.items() if k != 'limit']
+            params.append(('limit', 'all'))
+            if self.context:
+                self.response['all'] = '%s?%s' % (self.request.resource_path(self.context), urlencode(params))
+
+        self.response['actions'] = get_collection_actions(self.request, self.types[self.doc_types[0]])
+
+        if not self.response['total']:
+            # http://googlewebmastercentral.blogspot.com/2014/02/faceted-navigation-best-and-5-of-worst.html
+            self.request.response.status_code = 404
+            self.response['notification'] = 'No results found'
+            self.response['@graph'] = []
+            return self.response if not self.return_generator else []
+
+        columns = build_table_columns(self.request, self.schemas, self.doc_types)
+        if columns:
+            self.response['columns'] = columns
+
+        self.response['notification'] = 'Success'
+
+        ### Format results for JSON-LD
+        graph = format_results(self.request, es_results['hits']['hits'], self.search_frame)
+
+        if self.request.__parent__ is not None or self.return_generator:
+            if self.return_generator:
+                return graph
+            else:
+                self.response['@graph'] = list(graph)
+                return self.response
+
+        self.response['@graph'] = list(graph)
+        if self.search_session_id:  # Is 'None' if e.g. limit=all
+            self.request.response.set_cookie('searchSessionID',
+                                             self.search_session_id)  # Save session ID for re-requests / subsequent pages.
+        return self.response
+
+    def get_response(self):
+        return self.response
 
 @view_config(route_name='search', request_method='GET', permission='search')
 @debug_log
@@ -202,143 +245,12 @@ def search(context, request, search_type=None, return_generator=False, forced_ty
     """
     Search view connects to ElasticSearch and returns the results
     """
-    types = request.registry[TYPES]
-    # list of item types used from the query
-    doc_types = set_doc_types(request, types, search_type)
-    # calculate @type
-    search_types = build_search_types(types, doc_types)
-    search_types.append(forced_type)  # the old base search type
-    # sets request.normalized_params
-    search_base = normalize_query(request, types, doc_types)
-    ### INITIALIZE RESULT.
-    result = {
-        '@context': request.route_path('jsonld_context'),
-        '@id': '/' + forced_type.lower() + '/' + search_base,
-        '@type': search_types,
-        'title': forced_type,
-        'filters': [],
-        'facets': [],
-        '@graph': [],
-        'notification': '',
-        'sort': {}
-    }
-    principals = request.effective_principals
-    es = request.registry[ELASTIC_SEARCH]
-
-    # Get static section (if applicable) when searching a single item type
-    # Note: Because we rely on 'source', if the static_section hasn't been indexed
-    # into Elasticsearch it will not be loaded
-    add_search_header_if_needed(request, doc_types, result)
-
-    from_, size = get_pagination(request)
-
-    # get desired frame for this search
-    search_frame = request.normalized_params.get('frame', 'embedded')
-
-    ### PREPARE SEARCH TERM
-    prepared_terms = prepare_search_term(request)
-
-    schemas = [types[item_type].schema for item_type in doc_types]
-
-    # set ES index based on doc_type (one type per index)
-    # if doc_type is item, search all indexes by setting es_index to None
-    # If multiple, search all specified
-    es_index = get_es_index(request, doc_types)
-    item_type_es_mapping = get_es_mapping(es, es_index)
-
-    # establish elasticsearch_dsl class that will perform the search
-    search = Search(using=es, index=es_index)
-
-    # set up clear_filters path
-    result['clear_filters'] = clear_filters_setup(request, doc_types, forced_type)
-
-    ### SET TYPE FILTERS
-    build_type_filters(result, request, doc_types, types)
-
-    # get the fields that will be used as source for the search
-    # currently, supports frame=raw/object but live faceting does not work
-    # this is okay because the only non-embedded access will be programmatic
-    source_fields = sorted(list_source_fields(request, doc_types, search_frame))
-
-    ### GET FILTERED QUERY
-    # Builds filtered query which supports multiple facet selection
-    search, string_query = build_query(search, prepared_terms, source_fields)
-
-    ### Set sort order
-    search = set_sort_order(request, search, prepared_terms, types, doc_types, result)
-    # TODO: implement BOOST here?
-
-    ### Set filters
-    search, query_filters = set_filters(request, search, result, principals, doc_types, item_type_es_mapping)
-
-    ### Set starting facets
-    facets = initialize_facets(request, doc_types, prepared_terms, schemas, item_type_es_mapping)
-
-    ### Adding facets, plus any optional custom aggregations.
-    ### Uses 'size' and 'from_' to conditionally skip (no facets if from > 0; no aggs if size > 0).
-    search = set_facets(search, facets, query_filters, string_query, request, doc_types, custom_aggregations,
-                        size, from_, item_type_es_mapping)
-
-    ### Add preference from session, if available
-    search_session_id = None
-    if request.__parent__ is None and not return_generator and size != 'all':  # Probably unnecessary, but skip for non-paged, sub-reqs, etc.
-        search_session_id = request.cookies.get('searchSessionID', 'SESSION-' + str(uuid.uuid1()))
-        search = search.params(preference=search_session_id)
-
-    ### Execute the query
-    if size == 'all':
-        es_results = execute_search_for_all_results(request, search)
-    else:
-        size_search = search[from_:from_ + size]
-        es_results = execute_search(request, size_search)
-
-    ### Record total number of hits
-    result['total'] = total = es_results['hits']['total']
-    result['facets'] = format_facets(es_results, facets, total, search_frame)
-    result['aggregations'] = format_extra_aggregations(es_results)
-
-    # Add batch actions
-    # TODO: figure out exactly what this does. Provide download URLs?
-    # Implement later
-    # result.update(search_result_actions(request, doc_types, es_results))
-
-    ### Add all link for collections
-    if size not in (None, 'all') and size < result['total']:
-        params = [(k, v) for k, v in request.normalized_params.items() if k != 'limit']
-        params.append(('limit', 'all'))
-        if context:
-            result['all'] = '%s?%s' % (request.resource_path(context), urlencode(params))
-
-    # add actions (namely 'add')
-    result['actions'] = get_collection_actions(request, types[doc_types[0]])
-
-    if not result['total']:
-        # http://googlewebmastercentral.blogspot.com/2014/02/faceted-navigation-best-and-5-of-worst.html
-        request.response.status_code = 404
-        result['notification'] = 'No results found'
-        result['@graph'] = []
-        return result if not return_generator else []
-
-    columns = build_table_columns(request, schemas, doc_types)
-    if columns:
-        result['columns'] = columns
-
-    result['notification'] = 'Success'
-
-    ### Format results for JSON-LD
-    graph = format_results(request, es_results['hits']['hits'], search_frame)
-
-    if request.__parent__ is not None or return_generator:
-        if return_generator:
-            return graph
-        else:
-            result['@graph'] = list(graph)
-            return result
-
-    result['@graph'] = list(graph)
-    if search_session_id: # Is 'None' if e.g. limit=all
-        request.response.set_cookie('searchSessionID', search_session_id) # Save session ID for re-requests / subsequent pages.
-    return result
+    search_builder = SearchBuilder(context, request, search_type, return_generator, forced_type, custom_aggregations)
+    search_builder.initialize_search_response()
+    search_builder.build_search_query()
+    es_results = search_builder.execute_search()
+    search_builder.format_results(es_results)
+    return search_builder.get_response()
 
 
 @view_config(context=AbstractCollection, permission='list', request_method='GET')
