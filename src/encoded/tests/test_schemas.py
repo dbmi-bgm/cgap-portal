@@ -12,8 +12,15 @@ SCHEMA_FILES = [
 ]
 
 
-@pytest.fixture(scope='module')
+@pytest.fixture
 def pattern_fields():
+    ''' This fixture returns a dictionary keyed by schema fields that use the 'pattern' attribute.
+        The value is a dict of 2 lists:
+            'good' is list of values that should pass the pattern regex
+            'bad'  is list of values that should fail the pattern regex
+        This fixture is used in test_load_schema
+        More fields can be added if more pattern attributes are added to fields
+    '''
     return {
         'schema_version': {  # "^\\d+(\\.\\d+)*$"
             'good': ['1', '20', '3.2', '30.11'],
