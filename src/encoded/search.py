@@ -116,10 +116,10 @@ class SearchBuilder:
         self.request = request  # request who requested a search
         self.return_generator = return_generator  # whether or not this search should return a generator
         self.custom_aggregations = custom_aggregations  # any custom aggregations on this search
-        self.types = request.registry[TYPES]  # all types in the system
+        self.types = self.request.registry[TYPES]  # all types in the system
         self.forced_type = forced_type  # (mostly deprecated) search type
-        self.principals = request.effective_principals  # permissions to apply to this search
-        self.es = request.registry[ELASTIC_SEARCH]  # handle to remote ES
+        self.principals = self.request.effective_principals  # permissions to apply to this search
+        self.es = self.request.registry[ELASTIC_SEARCH]  # handle to remote ES
 
         # Initialized via outside function call
         self.doc_types = set_doc_types(self.request, self.types, search_type)  # doc_types for this search
@@ -185,7 +185,7 @@ class SearchBuilder:
         self.search = search
 
     def execute_search(self):
-        """ Does the search execution """
+        """ Executes the search, accounting for size if necessary """
         if self.size == 'all':
             es_results = execute_search_for_all_results(self.request, self.search)
         else:
@@ -194,7 +194,13 @@ class SearchBuilder:
         return es_results
 
     def format_results(self, es_results):
-        """ Does result formatting """
+        """ Takes es_results from Elasticsearch and populates a response object based on
+            on the given results.
+
+        :param es_results: search results (from elasticsearch-dsl)
+        """
+
+        # response formatting
         self.response['total'] = total = es_results['hits']['total']
         self.response['facets'] = format_facets(es_results, self.facets, total, self.search_frame)
         self.response['aggregations'] = format_extra_aggregations(es_results)
@@ -206,13 +212,6 @@ class SearchBuilder:
                 self.response['all'] = '%s?%s' % (self.request.resource_path(self.context), urlencode(params))
 
         self.response['actions'] = get_collection_actions(self.request, self.types[self.doc_types[0]])
-
-        if not self.response['total']:
-            # http://googlewebmastercentral.blogspot.com/2014/02/faceted-navigation-best-and-5-of-worst.html
-            self.request.response.status_code = 404
-            self.response['notification'] = 'No results found'
-            self.response['@graph'] = []
-            return self.response if not self.return_generator else []
 
         columns = build_table_columns(self.request, self.schemas, self.doc_types)
         if columns:
@@ -234,10 +233,30 @@ class SearchBuilder:
         if self.search_session_id:  # Is 'None' if e.g. limit=all
             self.request.response.set_cookie('searchSessionID',
                                              self.search_session_id)  # Save session ID for re-requests / subsequent pages.
-        return self.response
 
     def get_response(self):
+        """ Gets the response for this search.  """
+        if not self.response:
+            return {}  # XXX: rather than raise exception? -Will
+        if not self.response['total']:
+            # http://googlewebmastercentral.blogspot.com/2014/02/faceted-navigation-best-and-5-of-worst.html
+            self.request.response.status_code = 404
+            self.response['notification'] = 'No results found'
+            self.response['@graph'] = []
+            return self.response if not self.return_generator else []
         return self.response
+
+    def search(self):
+        """ Executes the end-to-end search.
+
+        :returns: a search response (based on the __init__ parameters)
+        """
+        self.initialize_search_response()
+        self.build_search_query()
+        es_results = self.execute_search()
+        self.format_results(es_results)
+        return self.get_response()
+
 
 @view_config(route_name='search', request_method='GET', permission='search')
 @debug_log
@@ -246,11 +265,7 @@ def search(context, request, search_type=None, return_generator=False, forced_ty
     Search view connects to ElasticSearch and returns the results
     """
     search_builder = SearchBuilder(context, request, search_type, return_generator, forced_type, custom_aggregations)
-    search_builder.initialize_search_response()
-    search_builder.build_search_query()
-    es_results = search_builder.execute_search()
-    search_builder.format_results(es_results)
-    return search_builder.get_response()
+    return search_builder.search()
 
 
 @view_config(context=AbstractCollection, permission='list', request_method='GET')
