@@ -26,7 +26,6 @@ from snovault import (
     load_schema,
     abstract_collection,
 )
-from snovault.attachment import ItemWithAttachment
 from snovault.crud_views import (
     collection_add,
     item_edit,
@@ -48,8 +47,7 @@ from urllib.parse import (
     urlparse,
 )
 from ..authentication import session_properties
-from ..search import make_search_subreq
-from . import TrackingItem
+from encoded.search.search import make_search_subreq
 from .base import (
     Item,
     ALLOW_SUBMITTER_ADD,
