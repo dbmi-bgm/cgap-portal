@@ -245,7 +245,7 @@ class LuceneBuilder:
     @classmethod
     def handle_nested_filters(cls, nested_filters, final_filters, es_mapping, key='must'):
         """
-        Helper function for set_filters that collapses nested filters together into a single lucene sub-query
+        Helper function for build_filters that collapses nested filters together into a single lucene sub-query
         and attaching it to final_filters (modifying in place).
 
         :param nested_filters: All nested fields that we would like to search on
@@ -490,7 +490,7 @@ class LuceneBuilder:
 
     @staticmethod
     def initialize_field_filters(request, principals, doc_types):
-        """ Helper function for set_filters
+        """ Helper function for build_filters
             Initializes field filters with filters that exist on all searches, does some basic updates
         """
         field_filters = {
@@ -526,7 +526,7 @@ class LuceneBuilder:
         return field_filters
 
     @classmethod
-    def set_filters(cls, request, search, result, principals, doc_types, es_mapping):
+    def build_filters(cls, request, search, result, principals, doc_types, es_mapping):
         """
         This function builds the Elasticsearch query based on the request. The structure of the query
         is approximately represented below. 'Approximate' because you could not copy-paste directly into
@@ -600,9 +600,245 @@ class LuceneBuilder:
             raise HTTPBadRequest('The search failed - the DCIC team has been notified.')
         return search, final_filters
 
+    @staticmethod
+    def generate_filters_for_terms_agg_from_search_filters(query_field, search_filters, string_query):
+        """
+        We add a copy of our filters to each facet, minus that of
+        facet's field itself so that we can get term counts for other terms filters.
+        And be able to filter w/ it.
+        Remove filters from fields they apply to.
+        For example, the 'biosource_type' aggs should not have any
+        biosource_type filter in place.
+        Handle 'must' and 'must_not' filters separately
+
+        Note: At this point no nested work has been done, so formatting into this intermediary state is okay
+              and is in fact necessary for later work to handle nested to function correctly.
+
+        :param query_field: field terms agg is on
+        :param search_filters: intermediary format prior to any valid lucene representing the search_filters
+                               from the front-end
+        :param string_query: query string if provided
+        :return: Copy of search_filters, minus filter for current query_field (if one set).
+        """
+        facet_filters = deepcopy(search_filters['bool'])
+
+        for filter_type in ['must', 'must_not']:
+            if search_filters['bool'][filter_type] == []:
+                continue
+            for active_filter in search_filters['bool'][
+                filter_type]:  # active_filter => e.g. { 'terms' : { 'embedded.@type.raw': ['ExperimentSetReplicate'] } }
+
+                if 'bool' in active_filter and 'should' in active_filter['bool']:
+                    # handle No value case
+                    inner_bool = None
+                    inner_should = active_filter.get('bool').get('should', [])
+                    for or_term in inner_should:
+                        # this may be naive, but assume first non-terms
+                        # filter is the No value quqery
+                        if 'terms' in or_term:
+                            continue
+                        else:
+                            inner_bool = or_term
+                            break
+                    if 'exists' in inner_bool:
+                        compare_field = inner_bool['exists'].get('field')
+                    else:
+                        # attempt to get the field from the alternative No value syntax
+                        compare_field = inner_bool.get('bool', {}).get('must_not', {}).get('exists', {}).get('field')
+                    if compare_field == query_field and query_field != 'embedded.@type.raw':
+                        facet_filters[filter_type].remove(active_filter)
+
+                if 'terms' in active_filter:
+                    # there should only be one key here
+                    for compare_field in active_filter['terms'].keys():
+                        # remove filter for a given field for that facet
+                        # skip this for type facet (field = 'type')
+                        # since we always want to include that filter.
+                        if compare_field == query_field and query_field != 'embedded.@type.raw':
+                            facet_filters[filter_type].remove(active_filter)
+
+                elif 'range' in active_filter:
+                    for compare_field in active_filter['range'].keys():
+                        # Do same as for terms
+                        if compare_field == query_field:
+                            facet_filters[filter_type].remove(active_filter)
+
+        # add the string_query, if present, to the bool term with facet_filters
+        if string_query and string_query['must']:
+            # combine statements within 'must' for each
+            facet_filters['must'].append(string_query['must'])
+
+        return facet_filters
+
+    @staticmethod
+    def set_additional_aggregations(search_as_dict, request, doc_types, extra_aggregations=None):
+        """
+        Per-type aggregations may be defined in schemas. Apply them OUTSIDE of globals so they act on our
+        current search filters. Warning: `search_as_dict` is modified IN PLACE.
+
+        :param search_as_dict: elasticsearch_dsl object converted to_dict()
+        :param request: current request
+        :param doc_types: types we are searching on
+        :param extra_aggregations: aggregations to add
+        :return: search_as_dict, same as originally passed in, but modified in this function
+        """
+
+        types = request.registry[TYPES]
+        schema = types[doc_types[0]].schema
+
+        if schema.get('aggregations'):
+            for schema_agg_name in schema['aggregations'].keys():
+                if schema_agg_name == 'all_items':
+                    raise QueryConstructionException(
+                        query_type='aggregations',
+                        func='set_additional_aggregations',
+                        msg='all_items is a reserved agg name and not allowed as an extra aggregation name.')
+                search_as_dict['aggs'][schema_agg_name] = schema['aggregations'][schema_agg_name]
+
+        if extra_aggregations:
+            for extra_agg_name in extra_aggregations.keys():
+                if extra_agg_name == 'all_items':
+                    raise QueryConstructionException(
+                        query_type='extra_aggregations',
+                        func='set_additional_aggregations',
+                        msg='all_items is a reserved agg name and not allowed as an extra aggregation name.')
+                search_as_dict['aggs'][extra_agg_name] = extra_aggregations[extra_agg_name]
+
+        return search_as_dict
+
+    @staticmethod
+    def fix_nested_aggregations(search, es_mapping):
+        """
+        Unfortunately, elasticsearch_dsl will not update_from_dict with a nested aggregation (bug?), so we must
+        update the search manually after processing all the "terms". This method handles that update in place.
+        It does this in 3 steps: first by overwriting the current 'agg bucket' with a empty new one, recreating the
+        'primary_agg' and adding a REVERSE_NESTED bucket called 'primary_agg_reverse_nested', which will contain the
+        doc count wrt the item we are searching on.
+
+        :param search: search object
+        :param es_mapping: mapping of this item
+        """
+        aggs_ptr = search.aggs['all_items']
+        for agg in aggs_ptr:
+            if NESTED in agg:
+                (search.aggs['all_items'][agg]  # create a sub-bucket, preserving the boolean qualifiers
+                 .bucket('primary_agg',
+                         'nested', path=find_nested_path(aggs_ptr.aggs[agg]['primary_agg'].field, es_mapping))
+                 .bucket('primary_agg',
+                         Terms(field=aggs_ptr.aggs[agg]['primary_agg'].field, size=100, missing='No value'))
+                 .bucket('primary_agg_reverse_nested', REVERSE_NESTED))
+
+    @classmethod
+    def build_facets(cls, search, facets, search_filters, string_query, request, doc_types,
+                     custom_aggregations=None, size=25, from_=0, es_mapping=None):
+        """
+        Sets facets in the query as ElasticSearch aggregations, with each aggregation to be
+        filtered by search_filters minus filter affecting facet field in order to get counts
+        for other facet term options.
+        ES5 - simply sets aggs by calling update_from_dict after adding them in
+            :param facets:         Facet field (0) in object dot notation, and a dict or OrderedDict with title property (1).
+            :type  facets:         List of tuples.
+            :param search_filters: Dict of filters which are set for the ES query in build_filters
+            :param string_query:   Dict holding the query_string used in the search
+        """
+        if from_ != 0:
+            return search
+
+        aggs = OrderedDict()
+        for field, facet in facets:  # E.g. 'type','experimentset_type','experiments_in_set.award.project', ...
+            field_schema = schema_for_field(field, request, doc_types, should_log=True)
+            is_date_field = field_schema and determine_if_is_date_field(field, field_schema)
+            is_numerical_field = field_schema and field_schema['type'] in ("integer", "float", "number")
+            query_field = get_query_field(field, facet, es_mapping)
+            nested_path = find_nested_path(query_field, es_mapping)
+
+            ## Create the aggregation itself, extend facet with info to pass down to front-end
+            agg_name = field.replace('.', '-')
+            if facet.get('aggregation_type') == 'stats':
+
+                if is_date_field:
+                    facet['field_type'] = 'date'
+                elif is_numerical_field:
+                    facet["field_type"] = field_schema['type'] or "number"
+                    if "number_step" not in facet:
+                        if "number_step" in field_schema:
+                            facet["number_step"] = field_schema['number_step']
+                        elif facet["field_type"] == "integer":
+                            facet["number_step"] = 1
+                        else:  # Default
+                            facet["number_step"] = "any"
+                facet_filters = cls.generate_filters_for_terms_agg_from_search_filters(query_field, search_filters,
+                                                                                       string_query)
+
+                aggs[facet['aggregation_type'] + ":" + agg_name] = {
+                    AGGS: {
+                        'primary_agg': {
+                            'stats': {
+                                'field': query_field
+                            }
+                        }
+                    },
+                    FILTER: {BOOL: facet_filters}
+                }
+
+            else:
+                if nested_path:
+                    facet['aggregation_type'] = NESTED
+                else:
+                    facet['aggregation_type'] = TERMS
+
+                facet_filters = cls.generate_filters_for_terms_agg_from_search_filters(query_field, search_filters,
+                                                                                       string_query)
+                term_aggregation = {
+                    TERMS: {
+                        'size': 100,
+                        # Maximum terms returned (default=10); see https://github.com/10up/ElasticPress/wiki/Working-with-Aggregations
+                        'field': query_field,
+                        'missing': facet.get("missing_value_replacement", "No value")
+                    }
+                }
+                aggs[facet['aggregation_type'] + ":" + agg_name] = {
+                    AGGS: {
+                        'primary_agg': term_aggregation
+                    },
+                    FILTER: {BOOL: facet_filters},
+                }
+
+            # Update facet with title, description from field_schema, if missing.
+            if facet.get('title') is None and field_schema and 'title' in field_schema:
+                facet['title'] = field_schema['title']
+            if facet.get('description') is None and field_schema and 'description' in field_schema:
+                facet['description'] = field_schema['description']
+
+        # to achieve OR behavior within facets, search among GLOBAL results,
+        # not just returned ones. to do this, wrap aggs in ['all_items']
+        # and add "global": {} to top level aggs query
+        # see elasticsearch global aggs for documentation (should be ES5 compliant)
+        search_as_dict = search.to_dict()
+        search_as_dict['aggs'] = {
+            'all_items': {
+                'global': {},
+                'aggs': aggs
+            }
+        }
+
+        if size == 0:
+            # Only perform aggs if size==0 requested, to improve performance for search page queries.
+            # We do currently have (hidden) monthly date histogram facets which may yet to be utilized for common size!=0 agg use cases.
+            cls.set_additional_aggregations(search_as_dict, request, doc_types, custom_aggregations)
+
+        # update with all terms aggregations
+        search.update_from_dict(search_as_dict)
+
+        # update with correct nested aggregations, see docstring
+        cls.fix_nested_aggregations(search, es_mapping)
+        return search
+
 
 class SearchBuilder:
     """ A monolithic object that encapsulates information needed to perform searches.
+        The purpose of this class is to organize state + methods used for bootstrapping
+        the search.
 
         You can think of this class like a wrapper around a less user-friendly
         API. Using this class will allow you to get a basic grasp of what's going on. The details
@@ -871,18 +1107,162 @@ class SearchBuilder:
             self.response['sort'] = result_sort
             self.search = self.search.sort(sort)
 
+    def initialize_facets(self):
+        """
+        Initialize the facets used for the search. If searching across multiple
+        doc_types, only use the default 'Data Type' and 'Status' facets.
+        Add facets for custom url filters whether or not they're in the schema.
+        TODO: clean up this method
+
+        :param doc_types: Item types (@type) for which we are performing a search for.
+        :param prepared_terms: terms to match in ES, keyed by ES field name.
+        :param schemas: List of OrderedDicts of schemas for doc_types.
+
+        :returns: list: tuples containing (0) ElasticSearch-formatted field name (e.g. `embedded.status`)
+                        and (1) list of terms for it.
+        """
+        if len(self.doc_types) > 1:  # only provide this if we are searching on more than one type
+            facets = [
+                # More facets will be appended to this list from item schema plus from any currently-active filters (as requested in URI params).
+                ('type', {'title': 'Data Type'})
+            ]
+        else:
+            facets = []
+
+        append_facets = [
+            # Facets which will be appended after those which are in & added to `facets`
+            # ('status', {'title': 'Status'}), XXX: uncomment this if you want status facet
+
+            # TODO: Re-enable below line if/when 'range' URI param queries for date & numerical fields are implemented.
+            # ('date_created', {'title': 'Date Created', 'hide_from_view' : True, 'aggregation_type' : 'date_histogram' })
+        ]
+        validation_error_facets = [
+            ('validation_errors.name', {'title': 'Validation Errors', 'order': 999})
+        ]
+
+        # hold disabled facets from schema; we also want to remove these from the prepared_terms facets
+        disabled_facets = []
+
+        # Add facets from schema if one Item type is defined.
+        # Also, conditionally add extra appendable facets if relevant for type from schema.
+        if len(self.doc_types) == 1 and self.doc_types[0] != 'Item':
+            current_type_schema = self.request.registry[TYPES][self.doc_types[0]].schema
+            if 'facets' in current_type_schema:
+                schema_facets = OrderedDict(current_type_schema['facets'])
+                for schema_facet in schema_facets.items():
+                    if schema_facet[1].get('disabled', False):
+                        disabled_facets.append(schema_facet[0])
+                        continue  # Skip disabled facets.
+                    facets.append(schema_facet)
+
+        ## Add facets for any non-schema ?field=value filters requested in the search (unless already set)
+        used_facets = [facet[0] for facet in facets + append_facets]
+        used_facet_titles = [
+            facet[1]['title'] for facet in facets + append_facets
+            if 'title' in facet[1]
+        ]
+
+        for field in self.prepared_terms:
+            if field.startswith('embedded'):
+                split_field = field.strip().split(
+                    '.')  # Will become, e.g. ['embedded', 'experiments_in_set', 'files', 'file_size', 'from']
+                use_field = '.'.join(split_field[1:])
+
+                # 'terms' is the default per-term bucket aggregation for all non-schema facets
+                if self.item_type_es_mapping and find_nested_path(field, self.item_type_es_mapping):
+                    aggregation_type = 'nested'
+                else:
+                    aggregation_type = 'terms'
+
+                # Use the last part of the split field to get the field title
+                title_field = split_field[-1]
+
+                # workaround: if query has a '!=' condition, title_field ends with '!'. This prevents to find the proper display title.
+                # TODO: instead of workaround, '!' could be excluded while generating query results
+                if title_field.endswith('!'):
+                    title_field = title_field[:-1]
+
+                # if searching for a display_title, use the title of parent object
+                # use `is_object_title` to keep track of this
+                if title_field == 'display_title' and len(split_field) > 1:
+                    title_field = split_field[-2]
+                    is_object_title = True
+                else:
+                    is_object_title = False
+
+                if title_field in used_facets or title_field in disabled_facets:
+                    # Cancel if already in facets or is disabled
+                    continue
+                used_facets.append(title_field)
+
+                # If we have a range filter in the URL, strip out the ".to" and ".from"
+                if title_field == 'from' or title_field == 'to':
+                    if len(split_field) >= 3:
+                        f_field = ".".join(split_field[1:-1])
+                        field_schema = schema_for_field(f_field, self.request, self.doc_types)
+
+                        if field_schema:
+                            is_date_field = determine_if_is_date_field(field, field_schema)
+                            is_numerical_field = field_schema['type'] in ("integer", "float", "number")
+
+                            if is_date_field or is_numerical_field:
+                                title_field = field_schema.get("title", f_field)
+                                use_field = f_field
+                                aggregation_type = 'stats'
+
+                for schema in self.schemas:
+                    if title_field in schema['properties']:
+                        title_field = schema['properties'][title_field].get('title', title_field)
+                        # see if the title field conflicts for is_object_title facets
+                        if is_object_title and title_field in used_facet_titles:
+                            title_field += ' (Title)'
+                        break
+
+                facet_tuple = (use_field, {'title': title_field, 'aggregation_type': aggregation_type})
+
+                # At moment is equivalent to `if aggregation_type == 'stats'`` until/unless more agg types are added for _facets_.
+                if aggregation_type != 'terms':
+                    # Remove completely if duplicate (e.g. .from and .to both present)
+                    if use_field in used_facets:
+                        continue
+                    # facet_tuple[1]['hide_from_view'] = True # Temporary until we handle these better on front-end.
+                    # Facet would be otherwise added twice if both `.from` and `.to` are requested.
+
+                facets.append(facet_tuple)
+
+        # Append additional facets (status, validation_errors, ...) at the end of
+        # list unless were already added via schemas, etc.
+        used_facets = [facet[0] for facet in facets]  # Reset this var
+        for ap_facet in append_facets + validation_error_facets:
+            if ap_facet[0] not in used_facets:
+                facets.append(ap_facet)
+            else:  # Update with better title if not already defined from e.g. requested filters.
+                existing_facet_index = used_facets.index(ap_facet[0])
+                if facets[existing_facet_index][1].get('title') in (None, facets[existing_facet_index][0]):
+                    facets[existing_facet_index][1]['title'] = ap_facet[1]['title']
+
+        return facets
+
     def build_search_query(self):
-        """ Builds the search query """
+        """ Builds the search query utilizing a combination of helper methods within this class
+            to build intermediary structures and LuceneBuilder function calls to handle building
+            the actual Elasticsearch query.
+        """
         self.search = Search(using=self.es, index=self.es_index)
         self.build_query(sorted(self.list_source_fields()))
         self.set_sort_order()
-        self.search, query_filters = LuceneBuilder.set_filters(self.request, self.search, self.response,
-                                                               self.principals, self.doc_types, self.item_type_es_mapping)
-        self.facets = initialize_facets(self.request, self.doc_types, self.prepared_terms, self.schemas,
-                                        self.item_type_es_mapping)
 
-        self.search = set_facets(self.search, self.facets, query_filters, self.string_query, self.request, self.doc_types,
-                            self.custom_aggregations, self.size, self.from_, self.item_type_es_mapping)
+        # Transform into filtered search
+        self.search, query_filters = LuceneBuilder.build_filters(self.request, self.search, self.response,
+                                                                 self.principals, self.doc_types,
+                                                                 self.item_type_es_mapping)
+        # Prepare facets in intermediary structure
+        self.facets = self.initialize_facets()
+
+        # Transform filter search into filter + faceted search
+        self.search = LuceneBuilder.build_facets(self.search, self.facets, query_filters, self.string_query,
+                                                 self.request, self.doc_types, self.custom_aggregations, self.size,
+                                                 self.from_, self.item_type_es_mapping)
 
         # Add preference from session, if available
         if (self.request.__parent__ is None and
@@ -1320,143 +1700,6 @@ def get_search_fields(request, doc_types):
     return fields, highlights
 
 
-def initialize_facets(request, doc_types, prepared_terms, schemas, es_mapping):
-    """
-    Initialize the facets used for the search. If searching across multiple
-    doc_types, only use the default 'Data Type' and 'Status' facets.
-    Add facets for custom url filters whether or not they're in the schema.
-    TODO: clean up this method
-
-    :param doc_types: Item types (@type) for which we are performing a search for.
-    :param prepared_terms: terms to match in ES, keyed by ES field name.
-    :param schemas: List of OrderedDicts of schemas for doc_types.
-
-    :returns: list: tuples containing (0) ElasticSearch-formatted field name (e.g. `embedded.status`)
-                    and (1) list of terms for it.
-    """
-    if len(doc_types) > 1:  # only provide this if we are searching on more than one type
-        facets = [
-            # More facets will be appended to this list from item schema plus from any currently-active filters (as requested in URI params).
-            ('type', {'title': 'Data Type'})
-        ]
-    else:
-        facets = []
-
-    append_facets = [
-        # Facets which will be appended after those which are in & added to `facets`
-        # ('status', {'title': 'Status'}), XXX: uncomment this if you want status facet
-
-        # TODO: Re-enable below line if/when 'range' URI param queries for date & numerical fields are implemented.
-        # ('date_created', {'title': 'Date Created', 'hide_from_view' : True, 'aggregation_type' : 'date_histogram' })
-    ]
-    validation_error_facets = [
-        ('validation_errors.name', {'title': 'Validation Errors', 'order': 999})
-    ]
-
-    # hold disabled facets from schema; we also want to remove these from the prepared_terms facets
-    disabled_facets = []
-
-    # Add facets from schema if one Item type is defined.
-    # Also, conditionally add extra appendable facets if relevant for type from schema.
-    if len(doc_types) == 1 and doc_types[0] != 'Item':
-        current_type_schema = request.registry[TYPES][doc_types[0]].schema
-        if 'facets' in current_type_schema:
-            schema_facets = OrderedDict(current_type_schema['facets'])
-            for schema_facet in schema_facets.items():
-                if schema_facet[1].get('disabled', False):
-                    disabled_facets.append(schema_facet[0])
-                    continue # Skip disabled facets.
-                facets.append(schema_facet)
-
-    ## Add facets for any non-schema ?field=value filters requested in the search (unless already set)
-    used_facets = [ facet[0] for facet in facets + append_facets ]
-    used_facet_titles = [
-        facet[1]['title'] for facet in facets + append_facets
-        if 'title' in facet[1]
-    ]
-
-    for field in prepared_terms:
-        if field.startswith('embedded'):
-            split_field = field.strip().split('.') # Will become, e.g. ['embedded', 'experiments_in_set', 'files', 'file_size', 'from']
-            use_field = '.'.join(split_field[1:])
-
-            # 'terms' is the default per-term bucket aggregation for all non-schema facets
-            if es_mapping and find_nested_path(field, es_mapping):
-                aggregation_type = 'nested'
-            else:
-                aggregation_type = 'terms'
-
-            # Use the last part of the split field to get the field title
-            title_field = split_field[-1]
-
-            # workaround: if query has a '!=' condition, title_field ends with '!'. This prevents to find the proper display title.
-            # TODO: instead of workaround, '!' could be excluded while generating query results
-            if title_field.endswith('!'):
-                title_field = title_field[:-1]
-
-            # if searching for a display_title, use the title of parent object
-            # use `is_object_title` to keep track of this
-            if title_field == 'display_title' and len(split_field) > 1:
-                title_field = split_field[-2]
-                is_object_title = True
-            else:
-                is_object_title = False
-
-            if title_field in used_facets or title_field in disabled_facets:
-                # Cancel if already in facets or is disabled
-                continue
-            used_facets.append(title_field)
-
-            # If we have a range filter in the URL, strip out the ".to" and ".from"
-            if title_field == 'from' or title_field == 'to':
-                if len(split_field) >= 3:
-                    f_field = ".".join(split_field[1:-1])
-                    field_schema = schema_for_field(f_field, request, doc_types)
-
-                    if field_schema:
-                        is_date_field = determine_if_is_date_field(field, field_schema)
-                        is_numerical_field = field_schema['type'] in ("integer", "float", "number")
-
-                        if is_date_field or is_numerical_field:
-                            title_field = field_schema.get("title", f_field)
-                            use_field = f_field
-                            aggregation_type = 'stats'
-
-            for schema in schemas:
-                if title_field in schema['properties']:
-                    title_field = schema['properties'][title_field].get('title', title_field)
-                    # see if the title field conflicts for is_object_title facets
-                    if is_object_title and title_field in used_facet_titles:
-                        title_field += ' (Title)'
-                    break
-
-            facet_tuple = (use_field, {'title': title_field, 'aggregation_type' : aggregation_type})
-
-            # At moment is equivalent to `if aggregation_type == 'stats'`` until/unless more agg types are added for _facets_.
-            if aggregation_type != 'terms':
-                # Remove completely if duplicate (e.g. .from and .to both present)
-                if use_field in used_facets:
-                    continue
-                #facet_tuple[1]['hide_from_view'] = True # Temporary until we handle these better on front-end.
-                # Facet would be otherwise added twice if both `.from` and `.to` are requested.
-
-            facets.append(facet_tuple)
-
-
-    # Append additional facets (status, validation_errors, ...) at the end of
-    # list unless were already added via schemas, etc.
-    used_facets = [ facet[0] for facet in facets ] # Reset this var
-    for ap_facet in append_facets + validation_error_facets:
-        if ap_facet[0] not in used_facets:
-            facets.append(ap_facet)
-        else: # Update with better title if not already defined from e.g. requested filters.
-            existing_facet_index = used_facets.index(ap_facet[0])
-            if facets[existing_facet_index][1].get('title') in (None, facets[existing_facet_index][0]):
-                facets[existing_facet_index][1]['title'] = ap_facet[1]['title']
-
-    return facets
-
-
 def schema_for_field(field, request, doc_types, should_log=False):
     """
     Find the schema for the given field (in embedded '.' format). Uses
@@ -1527,97 +1770,6 @@ def is_linkto_or_object_array_root_field(field, types, doc_types):
     return False
 
 
-def generate_filters_for_terms_agg_from_search_filters(query_field, search_filters, string_query):
-    """
-    We add a copy of our filters to each facet, minus that of
-    facet's field itself so that we can get term counts for other terms filters.
-    And be able to filter w/ it.
-    Remove filters from fields they apply to.
-    For example, the 'biosource_type' aggs should not have any
-    biosource_type filter in place.
-    Handle 'must' and 'must_not' filters separately
-
-    Note: At this point no nested work has been done, so formatting into this intermediary state is okay
-          and is in fact necessary for later work to handle nested to function correctly.
-
-    :param query_field: field terms agg is on
-    :param search_filters: intermediary format prior to any valid lucene representing the search_filters
-                           from the front-end
-    :param string_query: query string if provided
-    :return: Copy of search_filters, minus filter for current query_field (if one set).
-    """
-    facet_filters = deepcopy(search_filters['bool'])
-
-    for filter_type in ['must', 'must_not']:
-        if search_filters['bool'][filter_type] == []:
-            continue
-        for active_filter in search_filters['bool'][filter_type]:  # active_filter => e.g. { 'terms' : { 'embedded.@type.raw': ['ExperimentSetReplicate'] } }
-
-            if 'bool' in active_filter and 'should' in active_filter['bool']:
-                # handle No value case
-                inner_bool = None
-                inner_should = active_filter.get('bool').get('should', [])
-                for or_term in inner_should:
-                    # this may be naive, but assume first non-terms
-                    # filter is the No value quqery
-                    if 'terms' in or_term:
-                        continue
-                    else:
-                        inner_bool = or_term
-                        break
-                if 'exists' in inner_bool:
-                    compare_field = inner_bool['exists'].get('field')
-                else:
-                    # attempt to get the field from the alternative No value syntax
-                    compare_field = inner_bool.get('bool', {}).get('must_not', {}).get('exists', {}).get('field')
-                if compare_field == query_field and query_field != 'embedded.@type.raw':
-                    facet_filters[filter_type].remove(active_filter)
-
-            if 'terms' in active_filter:
-                # there should only be one key here
-                for compare_field in active_filter['terms'].keys():
-                    # remove filter for a given field for that facet
-                    # skip this for type facet (field = 'type')
-                    # since we always want to include that filter.
-                    if compare_field == query_field and query_field != 'embedded.@type.raw':
-                        facet_filters[filter_type].remove(active_filter)
-
-            elif 'range' in active_filter:
-                for compare_field in active_filter['range'].keys():
-                    # Do same as for terms
-                    if compare_field == query_field:
-                        facet_filters[filter_type].remove(active_filter)
-
-    # add the string_query, if present, to the bool term with facet_filters
-    if string_query and string_query['must']:
-        # combine statements within 'must' for each
-        facet_filters['must'].append(string_query['must'])
-
-    return facet_filters
-
-
-def fix_nested_aggregations(search, es_mapping):
-    """
-    Unfortunately, elasticsearch_dsl will not update_from_dict with a nested aggregation (bug?), so we must
-    update the search manually after processing all the "terms". This method handles that update in place.
-    It does this in 3 steps: first by overwriting the current 'agg bucket' with a empty new one, recreating the
-    'primary_agg' and adding a REVERSE_NESTED bucket called 'primary_agg_reverse_nested', which will contain the
-    doc count wrt the item we are searching on.
-
-    :param search: search object
-    :param es_mapping: mapping of this item
-    """
-    aggs_ptr = search.aggs['all_items']
-    for agg in aggs_ptr:
-        if NESTED in agg:
-            (search.aggs['all_items'][agg]  # create a sub-bucket, preserving the boolean qualifiers
-                   .bucket('primary_agg',
-                           'nested', path=find_nested_path(aggs_ptr.aggs[agg]['primary_agg'].field, es_mapping))
-                   .bucket('primary_agg',
-                           Terms(field=aggs_ptr.aggs[agg]['primary_agg'].field, size=100, missing='No value'))
-                   .bucket('primary_agg_reverse_nested', REVERSE_NESTED))
-
-
 def get_query_field(field, facet, es_mapping):
     """
     Converts a field from its generic field name to a more specific field name referencing its embedded nature
@@ -1636,145 +1788,6 @@ def get_query_field(field, facet, es_mapping):
         return 'embedded.' + field + '.raw'
 
 
-def set_facets(search, facets, search_filters, string_query, request, doc_types,
-               custom_aggregations=None, size=25, from_=0, es_mapping=None):
-    """
-    Sets facets in the query as ElasticSearch aggregations, with each aggregation to be
-    filtered by search_filters minus filter affecting facet field in order to get counts
-    for other facet term options.
-    ES5 - simply sets aggs by calling update_from_dict after adding them in
-        :param facets:         Facet field (0) in object dot notation, and a dict or OrderedDict with title property (1).
-        :type  facets:         List of tuples.
-        :param search_filters: Dict of filters which are set for the ES query in set_filters
-        :param string_query:   Dict holding the query_string used in the search
-    """
-    if from_ != 0:
-        return search
-
-    aggs = OrderedDict()
-    for field, facet in facets: # E.g. 'type','experimentset_type','experiments_in_set.award.project', ...
-        field_schema = schema_for_field(field, request, doc_types, should_log=True)
-        is_date_field = field_schema and determine_if_is_date_field(field, field_schema)
-        is_numerical_field = field_schema and field_schema['type'] in ("integer", "float", "number")
-        query_field = get_query_field(field, facet, es_mapping)
-        nested_path = find_nested_path(query_field, es_mapping)
-
-        ## Create the aggregation itself, extend facet with info to pass down to front-end
-        agg_name = field.replace('.', '-')
-        if facet.get('aggregation_type') == 'stats':
-
-            if is_date_field:
-                facet['field_type'] = 'date'
-            elif is_numerical_field:
-                facet["field_type"] = field_schema['type'] or "number"
-                if "number_step" not in facet:
-                    if "number_step" in field_schema:
-                        facet["number_step"] = field_schema['number_step']
-                    elif facet["field_type"] == "integer":
-                        facet["number_step"] = 1
-                    else:  # Default
-                        facet["number_step"] = "any"
-            facet_filters = generate_filters_for_terms_agg_from_search_filters(query_field, search_filters, string_query)
-
-            aggs[facet['aggregation_type'] + ":" + agg_name] = {
-                AGGS: {
-                    'primary_agg': {
-                        'stats': {
-                            'field': query_field
-                        }
-                    }
-                },
-                FILTER: {BOOL: facet_filters}
-            }
-
-        else:
-            if nested_path:
-                facet['aggregation_type'] = NESTED
-            else:
-                facet['aggregation_type'] = TERMS
-
-            facet_filters = generate_filters_for_terms_agg_from_search_filters(query_field, search_filters, string_query)
-            term_aggregation = {
-                TERMS: {
-                    'size': 100,  # Maximum terms returned (default=10); see https://github.com/10up/ElasticPress/wiki/Working-with-Aggregations
-                    'field': query_field,
-                    'missing': facet.get("missing_value_replacement", "No value")
-                }
-            }
-            aggs[facet['aggregation_type'] + ":" + agg_name] = {
-                AGGS: {
-                    'primary_agg': term_aggregation
-                },
-                FILTER: {BOOL: facet_filters},
-            }
-
-        # Update facet with title, description from field_schema, if missing.
-        if facet.get('title') is None and field_schema and 'title' in field_schema:
-            facet['title'] = field_schema['title']
-        if facet.get('description') is None and field_schema and 'description' in field_schema:
-            facet['description'] = field_schema['description']
-
-    # to achieve OR behavior within facets, search among GLOBAL results,
-    # not just returned ones. to do this, wrap aggs in ['all_items']
-    # and add "global": {} to top level aggs query
-    # see elasticsearch global aggs for documentation (should be ES5 compliant)
-    search_as_dict = search.to_dict()
-    search_as_dict['aggs'] = {
-        'all_items': {
-            'global': {},
-            'aggs': aggs
-        }
-    }
-
-    if size == 0:
-        # Only perform aggs if size==0 requested, to improve performance for search page queries.
-        # We do currently have (hidden) monthly date histogram facets which may yet to be utilized for common size!=0 agg use cases.
-        set_additional_aggregations(search_as_dict, request, doc_types, custom_aggregations)
-
-    # update with all terms aggregations
-    search.update_from_dict(search_as_dict)
-
-    # update with correct nested aggregations, see docstring
-    fix_nested_aggregations(search, es_mapping)
-    return search
-
-
-def set_additional_aggregations(search_as_dict, request, doc_types, extra_aggregations=None):
-    """
-    Per-type aggregations may be defined in schemas. Apply them OUTSIDE of globals so they act on our
-    current search filters. Warning: `search_as_dict` is modified IN PLACE.
-
-    :param search_as_dict: elasticsearch_dsl object converted to_dict()
-    :param request: current request
-    :param doc_types: types we are searching on
-    :param extra_aggregations: aggregations to add
-    :return: search_as_dict, same as originally passed in, but modified in this function
-    """
-
-    types = request.registry[TYPES]
-    schema = types[doc_types[0]].schema
-
-    if schema.get('aggregations'):
-        for schema_agg_name in schema['aggregations'].keys():
-            if schema_agg_name == 'all_items':
-                raise QueryConstructionException(
-                    query_type='aggregations',
-                    func='set_additional_aggregations',
-                    msg='all_items is a reserved agg name and not allowed as an extra aggregation name.')
-            search_as_dict['aggs'][schema_agg_name] = schema['aggregations'][schema_agg_name]
-
-    if extra_aggregations:
-        for extra_agg_name in extra_aggregations.keys():
-            if extra_agg_name == 'all_items':
-                raise QueryConstructionException(
-                    query_type='extra_aggregations',
-                    func='set_additional_aggregations',
-                    msg='all_items is a reserved agg name and not allowed as an extra aggregation name.')
-            search_as_dict['aggs'][extra_agg_name] = extra_aggregations[extra_agg_name]
-
-    return search_as_dict
-
-
 def convert_search_to_dictionary(search):
     """ Converts the given search to a dictionary. Useful in mocking queries from dictionaries in testing.
 
@@ -1787,7 +1800,7 @@ def convert_search_to_dictionary(search):
 def verify_search_has_permissions(request, search):
     """
     Inspects the search object to ensure permissions are still present on the query
-    This method depends on the query structure defined in 'set_filters'.
+    This method depends on the query structure defined in 'build_filters'.
 
     :param request: the current request
     :param search: search object to inspect
