@@ -582,7 +582,7 @@ def test_search_with_hacked_query(anontestapp, hacked_query):
         verification function should throw an exception if there is any delta in the permissions object
         we explicitly attach to every search query.
     """
-    with mock.patch('encoded.search.search_utils.convert_search_to_dictionary', return_value=hacked_query):
+    with mock.patch('encoded.search.lucene_builder.convert_search_to_dictionary', return_value=hacked_query):
         mocked_request_with_least_permissive_permissions = MockedRequest()
         with pytest.raises(HTTPBadRequest):
             LuceneBuilder.verify_search_has_permissions(mocked_request_with_least_permissive_permissions, None)
