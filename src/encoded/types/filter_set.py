@@ -21,6 +21,8 @@ class FilterSet(Item):
             For each filter_block:
                 AND with all other filter blocks (if applied)
             AND 'flags'
+
+            The idea is to provide a button the filter set view to 'execute' a filter set.
         """
         pass  # XXX: invoke search.py
 

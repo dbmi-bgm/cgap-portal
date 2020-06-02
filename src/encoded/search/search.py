@@ -19,9 +19,10 @@ from snovault import (
 from snovault.elasticsearch import ELASTIC_SEARCH
 from snovault.elasticsearch.create_mapping import determine_if_is_date_field
 from snovault.util import (
-    debug_log
+    debug_log,
 )
 from snovault.typeinfo import AbstractTypeInfo
+from encoded.types.base import get_item_or_none
 from encoded.search.lucene_builder import LuceneBuilder
 from encoded.search.search_utils import (find_nested_path, schema_for_field, get_es_index, get_es_mapping,
                                          execute_search, make_search_subreq,
@@ -33,6 +34,7 @@ log = structlog.getLogger(__name__)
 
 def includeme(config):
     config.add_route('search', '/search{slash:/?}')
+    config.add_route('compound_search', '/compound_search')
     config.scan(__name__)
 
 
@@ -999,26 +1001,76 @@ class SearchBuilder:
             return self.response if not self.return_generator else []
         return self.response
 
+    def _build_query(self):
+        """ Builds the query, setting self.search """
+        self.initialize_search_response()
+        self.build_search_query()
+
     def _search(self):
         """ Executes the end-to-end search.
 
         :returns: a search response (based on the __init__ parameters)
         """
-        self.initialize_search_response()
-        self.build_search_query()
+        self._build_query()
         es_results = self.execute_search()
         self.format_results(es_results)
         return self.get_response()
 
 
+class CompoundSearchBuilder:
+    """ Encapsulates multiple search queries represented as SearchBuilder objects.
+        The idea is this object is boot-strapped/executed in the "execute" filter_set action.
+    """
+
+    def __init__(self, context, request, search_type=None, return_generator=False, forced_type='Search',
+                 custom_aggregations=None):
+        self.context = context
+        self.request = request
+        self.search_type = search_type
+        self.return_generator = return_generator
+        self.forced_type = forced_type
+        self.custom_aggregations = custom_aggregations
+        self.filter_blocks = []
+        self.flags = None
+        self._search = None
+
+    def extract_query_from_filter_set(self):
+        """ The page viewing the filter_set passes the filter_set object on the request, so
+            grab and break apart here.
+
+            XXX: This will look different based on what we decide for the front-end, revisit if needed
+        """
+        _uuid = self.request.params.get('filter_set')
+        filter_set = get_item_or_none(self.request, _uuid)
+        filter_blocks = filter_set.get('filter_blocks', [])
+        for filter_block in filter_blocks:
+            self.filter_blocks.append(filter_block)  # add the filter block
+        if 'flags' in filter_set:
+            self.flags = filter_set['flags']
+
+    def construct_query(self):
+        """ Calls out to LuceneBuilder to construct an elasticsearch-dsl search object that will
+            execute the given filter_set params.
+        """
+        pass  # XXX: call to LuceneBuilder
+
+
 @view_config(route_name='search', request_method='GET', permission='search')
 @debug_log
 def search(context, request, search_type=None, return_generator=False, forced_type='Search', custom_aggregations=None):
-    """
-    Search view connects to ElasticSearch and returns the results
-    """
+    """ Search view connects to ElasticSearch and returns the results """
     search_builder = SearchBuilder(context, request, search_type, return_generator, forced_type, custom_aggregations)
     return search_builder._search()
+
+
+@view_config(route_name='compound_search', request_method='POST', permission='search')
+@debug_log
+def compound_search(context, request,
+                   search_type=None, return_generator=False,
+                   forced_type='Search', custom_aggregations=None):
+    """ Executes a compound_search given a uuid of a filter_set (or filter_set props, tbd) """
+    pass  # XXX: construct a compound search, execute and return response
+
 
 
 @view_config(context=AbstractCollection, permission='list', request_method='GET')
