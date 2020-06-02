@@ -1,9 +1,16 @@
 import re
 import math
 import itertools
+import uuid
+import structlog
 from pyramid.view import view_config
 from webob.multidict import MultiDict
 from functools import reduce
+from elasticsearch_dsl import Search
+from pyramid.httpexceptions import HTTPBadRequest
+from urllib.parse import urlencode
+from collections import OrderedDict
+from copy import deepcopy
 from snovault import (
     AbstractCollection,
     TYPES,
@@ -16,22 +23,10 @@ from snovault.util import (
 )
 from snovault.typeinfo import AbstractTypeInfo
 from encoded.search.lucene_builder import LuceneBuilder
-from encoded.search.search_utils import (find_nested_path,
-                                         NESTED,
-                                         schema_for_field,
-                                         COMMON_EXCLUDED_URI_PARAMS,
-                                         get_es_index,
-                                         get_es_mapping,
-                                         execute_search,
-                                         make_search_subreq)
-from elasticsearch_dsl import Search
+from encoded.search.search_utils import (find_nested_path, schema_for_field, get_es_index, get_es_mapping,
+                                         execute_search, make_search_subreq,
+                                         NESTED, COMMON_EXCLUDED_URI_PARAMS,)
 
-from pyramid.httpexceptions import HTTPBadRequest
-from urllib.parse import urlencode
-from collections import OrderedDict
-from copy import deepcopy
-import uuid
-import structlog
 
 log = structlog.getLogger(__name__)
 
@@ -39,6 +34,7 @@ log = structlog.getLogger(__name__)
 def includeme(config):
     config.add_route('search', '/search{slash:/?}')
     config.scan(__name__)
+
 
 sanitize_search_string_re = re.compile(r'[\\\+\-\&\|\!\(\)\{\}\[\]\^\~\:\/\\\*\?]')
 
@@ -224,7 +220,7 @@ class SearchBuilder:
         :return: dictionary mapping field --> query strings
         """
         prepared_terms = {}
-        for field, val in request.normalized_params.iteritems():
+        for field, val in request.normalized_params.items():
             if field.startswith('validation_errors') or field.startswith('aggregated_items'):
                 continue
             elif field == 'q':  # searched string has field 'q'
@@ -356,7 +352,6 @@ class SearchBuilder:
             clear_qs += '&' + current_search_sort_url
         return self.request.route_path(self.forced_type.lower(), slash='/') + (('?' + clear_qs) if clear_qs else '')
 
-
     def initialize_search_response(self):
         """ Initializes the search response """
         self.response = {
@@ -409,8 +404,6 @@ class SearchBuilder:
         """
         query_info = {}
         string_query = None
-        # set _source fields for the search
-        search = self.search.source(list(source_fields))
         # prepare the query from prepared_terms
         for field, value in self.prepared_terms.items():
             if field == 'q':
@@ -821,7 +814,7 @@ class SearchBuilder:
 
         any_abstract_types = 'Item' in self.doc_types
         if not any_abstract_types:  # Check explictly-defined types to see if any are abstract.
-            type_infos = [self.request.registry[TYPES][type] for type in self.doc_types if type != 'Item']
+            type_infos = [self.request.registry[TYPES][t] for t in self.doc_types if t != 'Item']
             for ti in type_infos:
                 # We use `type` instead of `isinstance` since we don't want to catch subclasses.
                 if type(ti) == AbstractTypeInfo:

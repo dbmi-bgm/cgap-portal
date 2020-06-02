@@ -22,12 +22,20 @@ log = structlog.getLogger(__name__)
 
 class LuceneBuilder:
     """ Collection of methods for working with Lucene queries. These operations can be used
-        independently of the SearchBuilder state.
-        XXX: move to separate file?
+        independently of the SearchBuilder state. See SearchBuilder for how these are used.
+
+        Main points of entry:
+            1. build_filters (construct the search query itself)
+            2. build_facets (construct aggregations on search)
+            3. verify_search_has_permissions (to be sure we did not strip permissions while building search)
+
+        All other methods in this class are helper methods. Static methods are "leaf" operations that do
+        not require additional function calls. Class methods call other methods within the class but could
+        be "entry-point" methods as well.
     """
 
-    @classmethod
-    def apply_range_filters(cls, range_filters, must_filters, es_mapping):
+    @staticmethod
+    def apply_range_filters(range_filters, must_filters, es_mapping):
         """
         Applies the range filters to the 'must' subquery
         Tuple format is required to handle nested fields that are non-range (it is discarded in this case)
@@ -313,6 +321,7 @@ class LuceneBuilder:
             exists_field = False  # keep track of null values
             range_type = False  # If we determine is a range request (field.to, field.from), will be populated with string 'date' or 'numerical'
             range_direction = None
+            f_field = None
             if field in COMMON_EXCLUDED_URI_PARAMS + ['q']:
                 continue
             elif field == 'type' and term != 'Item':
@@ -770,6 +779,7 @@ class LuceneBuilder:
         :raises: HTTPBadRequest if permissions not present
         """
         search_dict = convert_search_to_dictionary(search)
+        effective_principals_on_query = None
         found = False  # set to True if we found valid 'principals_allowed.view'
         try:
             for boolean_clause in search_dict['query']['bool']['filter']:  # should always be present

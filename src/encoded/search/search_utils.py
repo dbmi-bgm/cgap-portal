@@ -1,21 +1,15 @@
-from copy import deepcopy
-
-from snovault import (
-    TYPES,
-)
-from snovault.util import (
-    crawl_schema,
-    find_collection_subtypes,
-)
-from snovault.embed import make_subrequest
+import structlog
 from elasticsearch import (
     TransportError,
     RequestError,
     ConnectionTimeout
 )
 from pyramid.httpexceptions import HTTPBadRequest
+from snovault import TYPES
+from snovault.util import crawl_schema, find_collection_subtypes
+from snovault.embed import make_subrequest
 from snovault.elasticsearch.indexer_utils import get_namespaced_index
-import structlog
+
 
 log = structlog.getLogger(__name__)
 
@@ -290,6 +284,7 @@ def execute_search(request, search):
     :returns: Dictionary search results
     """
     err_exp = None
+    es_results = None
     try:
         es_results = search.execute().to_dict()
     except ConnectionTimeout as exc:
