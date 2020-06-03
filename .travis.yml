@@ -19,7 +19,7 @@ addons:
     - make
     - graphviz
     - nginx
-  postgresql: '9.4'
+  postgresql: '11.1'
 env:
   global:
   - BOTO_CONFIG=/bogus

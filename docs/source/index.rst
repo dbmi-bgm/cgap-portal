@@ -40,6 +40,7 @@ Be warned that features are under active development and may not be stable! Visi
     local_installation
     infrastructure_overview
     dataflow_overview
+    ingestion
 
 *Data Model*
 

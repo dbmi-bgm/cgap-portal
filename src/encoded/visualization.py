@@ -14,7 +14,7 @@ from .types.workflow import (
     item_model_to_object
 )
 
-from .types.base import get_item_if_you_can
+from .types.base import get_item_or_none
 
 def includeme(config):
     config.add_route(

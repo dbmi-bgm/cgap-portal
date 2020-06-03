@@ -3,7 +3,7 @@ import pytest
 from .datafixtures import ORDER
 from snovault import TYPES
 from snovault.util import add_default_embeds, crawl_schemas_by_embeds
-from ..types.base import get_item_if_you_can
+from ..types.base import get_item_or_none
 
 
 pytestmark = [pytest.mark.setone, pytest.mark.working]
@@ -150,10 +150,10 @@ def test_get_item_if_you_can(content, dummy_request, threadlocals):
     """
     used_item = sources[0]
     # all of these should get the full item
-    res1 = get_item_if_you_can(dummy_request, used_item)
-    res2 = get_item_if_you_can(dummy_request, {'uuid': used_item['uuid']})
-    res3 = get_item_if_you_can(dummy_request, used_item['uuid'])
-    res4 = get_item_if_you_can(dummy_request, used_item['uuid'], '/testing-link-sources/')
+    res1 = get_item_or_none(dummy_request, used_item)
+    res2 = get_item_or_none(dummy_request, {'uuid': used_item['uuid']})
+    res3 = get_item_or_none(dummy_request, used_item['uuid'])
+    res4 = get_item_or_none(dummy_request, used_item['uuid'], '/testing-link-sources/')
     for res in [res1, res2, res3, res4]:
         assert res['uuid'] == used_item['uuid']
         assert res['name'] == used_item['name']
