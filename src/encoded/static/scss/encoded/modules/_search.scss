@@ -4,6 +4,10 @@
 /**** Search Table ****/
 /**********************/
 
+// 40px is height of navbar, we subtract 1 to help cover up 1px gap glitch
+// which appears at times..
+$cgap-search-sticky-header-top-offset: 39px;
+
 $search-results-above-results-row-height: 42px;
 $search-results-edge-background-color: #e2e2e2;
 $search-results-edge-shadow-color : rgba(0,0,0,0.5);
@@ -126,60 +130,29 @@ $search-page-padding-resize-transition-out: padding .25s linear;
 			}
 		}
 
-		body.scrolled-past-160 & {
-			/* Override 36 etc. */
-			padding-left: 10px;
-			padding-right: 10px;
-			transition: $search-page-padding-resize-transition-in;
+		// Stylistic adjustment (experimental / in-progress)
 
-			.facets-column,
-			.results-column {
-				padding-left: 0;
-				padding-right: 0;
-				transition: $search-page-padding-resize-transition-in;
-			}
+		// &:before {
+		// 	content: "";
+		// 	display: block;
+		// 	position: fixed;
+		// 	left: 0;
+		// 	right: 0;
+		// 	top: 30px;
+		// 	height: 61px;
+		// 	opacity: 0;
+		// 	background-color: darken($color: $brand-primary-dark, $amount: 5%);
+		// 	transition: height .5s ease-out, opacity .5s ease-out;
+		// }
 
-			.facets-column {
-				//transition: $search-page-padding-resize-transition, background-color .4s .5s;
-				//background-color: #f8f8f8;
-				.facets-container {
-					border-right-color: #bbb;
-					border-left-color: transparent;
+		// body.scrolled-past-240 & {
 
-					> .row.facets-header {
-						padding-left: 15px;
-						transition: $search-page-padding-resize-transition-in;
-					}
-				}
-			}
+		// 	&:before {
+		// 		opacity: 1;
+		// 	}
 
-			.shadow-border-layer {
-				.edge-scroll-button {
-					z-index: 25;
-				}
-				.edge-scroll-button.left-edge {
-					left: 0;
-				}
-				.edge-scroll-button.right-edge {
-					right: 0;
-				}
-			}
+		// }
 
-			.search-results-container {
-
-				.search-result-column-block[data-field="display_title"] {
-					.toggle-detail-button-container {
-						top: 0 !important;
-						bottom: 0 !important;
-						button.toggle-detail-button {
-							border-radius: 0 !important;
-						}
-					}
-				}
-
-			}
-
-		}
 	}
 }
 
@@ -225,7 +198,7 @@ body[data-pathname="/search/"]:not([data-current-action="add"]) {
 				margin-bottom: 20px;
 				
 				@include navbar-fixed-position {
-					top: 40px;
+					top: $cgap-search-sticky-header-top-offset;
 					margin-bottom: 0px;
 				}
 
@@ -275,7 +248,7 @@ body[data-pathname="/search/"]:not([data-current-action="add"]) {
 			position: sticky;
 			top: 0px;
 			@include navbar-fixed-position {
-				top: 40px;
+				top: $cgap-search-sticky-header-top-offset;
 			}
 		}
 

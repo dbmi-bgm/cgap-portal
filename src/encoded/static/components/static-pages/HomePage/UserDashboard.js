@@ -21,6 +21,7 @@ export const UserDashboard = React.memo(function UserDashboard(props){
         <React.Fragment>
             <div className="dashboard-header">
                 <div className="container-wide d-flex align-items-center">
+                    <i className="icon icon-fw icon-home fas mr-1" />
                     <h5 className="mt-0 mb-0 text-400">Home Dashboard</h5>
                 </div>
             </div>

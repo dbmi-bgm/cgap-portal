@@ -1,0 +1,564 @@
+[
+  {
+  "chrom": "1",
+  "spos": 944203,
+  "epos": 959309,
+  "ensgid": "ENSG00000188976",
+  "strand": "-",
+  "gene_version": "11",
+  "gene_symbol": "NOC2L",
+  "gene_biotype": "protein_coding",
+  "chrom_hg19": "1",
+  "spos_hg19": 879584,
+  "epos_hg19": 894689,
+  "strand_hg19": "-",
+  "cytoband": [
+    "1p36.33"
+  ],
+  "gene_summary": "The protein encoded by this gene is expressed in neurons of most regions of the brain. It contains an N-terminal BTB domain, which mediates dimerization of the protein, and a C-terminal Kelch domain, which mediates binding to F-actin. This protein may play a key role in the regulation of actin-based neuronal function. [provided by RefSeq, Aug 2010].",
+  "hgnc_id": "24517",
+  "name": "NOC2 like nucleolar associated transcriptional repressor",
+  "entrez_id": "26155",
+  "ucsc_id": "uc001abz.5",
+  "refseq_accession": [
+    "NM_015658"
+  ],
+  "ccds_id": [
+    "CCDS3"
+  ],
+  "uniprot_ids": [
+    "Q9Y3T9"
+  ],
+  "mgd_id": [
+    "MGI:1931051"
+  ],
+  "omim_id": [
+    "610770"
+  ],
+  "transcriptid": [
+    {
+      "ensembl_trs": "ENST00000327044",
+      "ensembl_pro": "ENSP00000317992"
+    }
+  ],
+  "biogrid": [
+    "117586"
+  ],
+  "string": [
+    "9606.ENSP00000317992"
+  ],
+  "genecards": "ENSG00000188976",
+  "pharmgkb": [
+    "PA142671261"
+  ],
+  "trait_association_gwas": [
+    "Pancreatic cancer"
+  ],
+  "trait_association_gwas_pmid": [
+    "29422604"
+  ],
+  "rvis_exac": 0.231569638,
+  "rvis_percentile_exac": 65.47195952,
+  "gdi_phred": 5.53337,
+  "gdp": "Medium",
+  "mgi_mouse_gene": "Noc2l",
+  "mgi_mouse_phenotype": "endocrine/exocrine gland phenotype; cellular phenotype; mortality/aging (the observable characteristics related to the ability of a mammalian organism to live and age that are manifested throughout development and life span); hematopoietic system phenotype; immune system phenotype",
+  "obs_mis": 577,
+  "exp_mis": 462.01,
+  "oe_mis": 1.2489,
+  "obs_syn": 320,
+  "exp_syn": 199.38,
+  "oe_syn": 1.6049,
+  "obs_lof": 43,
+  "exp_lof": 41.785,
+  "oe_lof": 1.0291,
+  "cds_length": 2247,
+  "num_coding_exons": 19,
+  "marrvel": "NOC2L",
+  "s_het": 0.005405258,
+  "gtex_expression": "ENSG00000188976.10",
+  "brainspan_microarray": "NOC2L",
+  "brainspan_rnaseq": "ENSG00000188976",
+  "brainatlas_microarray": "NOC2L"
+},
+  {
+  "chrom": "1",
+  "spos": 923928,
+  "epos": 944581,
+  "ensgid": "ENSG00000187634",
+  "strand": "+",
+  "gene_version": "12",
+  "gene_symbol": "SAMD11",
+  "gene_biotype": "protein_coding",
+  "chrom_hg19": "1",
+  "spos_hg19": 860260,
+  "epos_hg19": 879955,
+  "strand_hg19": "+",
+  "cytoband": [
+    "1p36.33"
+  ],
+  "hgnc_id": "28706",
+  "name": "sterile alpha motif domain containing 11",
+  "entrez_id": "148398",
+  "ucsc_id": "uc001abw.2",
+  "refseq_accession": [
+    "NM_152486"
+  ],
+  "ccds_id": [
+    "CCDS2"
+  ],
+  "uniprot_ids": [
+    "Q96NU1"
+  ],
+  "mgd_id": [
+    "MGI:2446220"
+  ],
+  "omim_id": [
+    "616765"
+  ],
+  "transcriptid": [
+    {
+      "ensembl_trs": "ENST00000420190",
+      "ensembl_pro": "ENSP00000411579"
+    },
+    {
+      "ensembl_trs": "ENST00000437963",
+      "ensembl_pro": "ENSP00000393181"
+    },
+    {
+      "ensembl_trs": "ENST00000342066",
+      "ensembl_pro": "ENSP00000342313"
+    },
+    {
+      "ensembl_trs": "ENST00000341065",
+      "ensembl_pro": "ENSP00000349216"
+    },
+    {
+      "ensembl_trs": "ENST00000455979",
+      "ensembl_pro": "ENSP00000412228"
+    },
+    {
+      "ensembl_trs": "ENST00000618181",
+      "ensembl_pro": "ENSP00000480870"
+    },
+    {
+      "ensembl_trs": "ENST00000622503",
+      "ensembl_pro": "ENSP00000482138"
+    },
+    {
+      "ensembl_trs": "ENST00000618323",
+      "ensembl_pro": "ENSP00000480678"
+    },
+    {
+      "ensembl_trs": "ENST00000616016",
+      "ensembl_pro": "ENSP00000478421"
+    },
+    {
+      "ensembl_trs": "ENST00000618779",
+      "ensembl_pro": "ENSP00000484256"
+    },
+    {
+      "ensembl_trs": "ENST00000616125",
+      "ensembl_pro": "ENSP00000484643"
+    },
+    {
+      "ensembl_trs": "ENST00000620200",
+      "ensembl_pro": "ENSP00000484820"
+    },
+    {
+      "ensembl_trs": "ENST00000617307",
+      "ensembl_pro": "ENSP00000482090"
+    }
+  ],
+  "biogrid": [
+    "127146"
+  ],
+  "string": [
+    "9606.ENSP00000342313"
+  ],
+  "genecards": "ENSG00000187634",
+  "pharmgkb": [
+    "PA134968665"
+  ],
+  "rvis_exac": 2.274410941,
+  "rvis_percentile_exac": 98.9036805,
+  "gdi_phred": 5.65821,
+  "gdp": "Medium",
+  "mgi_mouse_gene": "Samd11",
+  "obs_mis": 546,
+  "exp_mis": 362.02,
+  "oe_mis": 1.5082,
+  "obs_syn": 270,
+  "exp_syn": 158.98,
+  "oe_syn": 1.6983,
+  "obs_lof": 22,
+  "exp_lof": 24.538,
+  "oe_lof": 0.89656,
+  "cds_length": 2043,
+  "num_coding_exons": 13,
+  "marrvel": "SAMD11",
+  "s_het": 0.007702292,
+  "gtex_expression": "ENSG00000187634.11",
+  "brainspan_microarray": "SAMD11",
+  "brainspan_rnaseq": "ENSG00000187634",
+  "brainatlas_microarray": "SAMD11"
+},
+  {
+  "chrom": "1",
+  "spos": 975204,
+  "epos": 982093,
+  "ensgid": "ENSG00000187642",
+  "strand": "-",
+  "gene_version": "9",
+  "gene_symbol": "PERM1",
+  "gene_biotype": "protein_coding",
+  "chrom_hg19": "1",
+  "spos_hg19": 910579,
+  "epos_hg19": 917497,
+  "strand_hg19": "-",
+  "cytoband": [
+    "1p36.33"
+  ],
+  "hgnc_id": "28208",
+  "name": "PPARGC1 and ESRR induced regulator, muscle 1",
+  "entrez_id": "84808",
+  "refseq_accession": [
+    "NR_027693"
+  ],
+  "ccds_id": [
+    "CCDS76083"
+  ],
+  "uniprot_ids": [
+    "Q5SV97"
+  ],
+  "mgd_id": [
+    "MGI:1921433"
+  ],
+  "omim_id": [
+    "615921"
+  ],
+  "transcriptid": [
+    {
+      "ensembl_trs": "ENST00000341290",
+      "ensembl_pro": "ENSP00000343864"
+    },
+    {
+      "ensembl_trs": "ENST00000433179",
+      "ensembl_pro": "ENSP00000414022"
+    }
+  ],
+  "biogrid": [
+    "124270"
+  ],
+  "string": [
+    "9606.ENSP00000414022"
+  ],
+  "genecards": "ENSG00000187642",
+  "mgi_mouse_gene": "Perm1",
+  "obs_mis": 422,
+  "exp_mis": 391.1,
+  "oe_mis": 1.079,
+  "obs_syn": 215,
+  "exp_syn": 174.81,
+  "oe_syn": 1.2299,
+  "obs_lof": 21,
+  "exp_lof": 17.757,
+  "oe_lof": 1.1826,
+  "cds_length": 2088,
+  "num_coding_exons": 5,
+  "marrvel": "PERM1",
+  "gtex_expression": "ENSG00000187642.9",
+  "brainspan_microarray": "C1orf170",
+  "brainspan_rnaseq": "ENSG00000187642"
+},
+  {
+  "chrom": "1",
+  "spos": 966482,
+  "epos": 975865,
+  "ensgid": "ENSG00000187583",
+  "strand": "+",
+  "gene_version": "11",
+  "gene_symbol": "PLEKHN1",
+  "gene_biotype": "protein_coding",
+  "chrom_hg19": "1",
+  "spos_hg19": 901877,
+  "epos_hg19": 911245,
+  "strand_hg19": "+",
+  "cytoband": [
+    "1p36.33"
+  ],
+  "gene_summary": "The protein encoded by this gene is expressed in neurons of most regions of the brain. It contains an N-terminal BTB domain, which mediates dimerization of the protein, and a C-terminal Kelch domain, which mediates binding to F-actin. This protein may play a key role in the regulation of actin-based neuronal function. [provided by RefSeq, Aug 2010].",
+  "hgnc_id": "25284",
+  "name": "pleckstrin homology domain containing N1",
+  "entrez_id": "84069",
+  "ucsc_id": "uc001acd.4",
+  "refseq_accession": [
+    "NM_032129"
+  ],
+  "ccds_id": [
+    "CCDS4",
+    "CCDS53256"
+  ],
+  "uniprot_ids": [
+    "Q494U1"
+  ],
+  "mgd_id": [
+    "MGI:2387630"
+  ],
+  "transcriptid": [
+    {
+      "ensembl_trs": "ENST00000379407",
+      "ensembl_pro": "ENSP00000368717"
+    },
+    {
+      "ensembl_trs": "ENST00000379409",
+      "ensembl_pro": "ENSP00000368719"
+    },
+    {
+      "ensembl_trs": "ENST00000379410",
+      "ensembl_pro": "ENSP00000368720"
+    },
+    {
+      "ensembl_trs": "ENST00000491024",
+      "ensembl_pro": "ENSP00000462558"
+    }
+  ],
+  "biogrid": [
+    "123864"
+  ],
+  "string": [
+    "9606.ENSP00000368720"
+  ],
+  "genecards": "ENSG00000187583",
+  "pharmgkb": [
+    "PA142671166"
+  ],
+  "trait_association_gwas": [
+    "Parkinson's disease"
+  ],
+  "trait_association_gwas_pmid": [
+    "26227905"
+  ],
+  "rvis_exac": 1.879999506,
+  "rvis_percentile_exac": 97.96397807,
+  "gdi_phred": 5.29021,
+  "gdp": "Medium",
+  "mgi_mouse_gene": "Plekhn1",
+  "obs_mis": 480,
+  "exp_mis": 381.17,
+  "oe_mis": 1.2593,
+  "obs_syn": 216,
+  "exp_syn": 174.52,
+  "oe_syn": 1.2377,
+  "obs_lof": 25,
+  "exp_lof": 31.069,
+  "oe_lof": 0.80467,
+  "cds_length": 1833,
+  "num_coding_exons": 16,
+  "marrvel": "PLEKHN1",
+  "s_het": 0.006848947,
+  "gtex_expression": "ENSG00000187583.10",
+  "brainspan_microarray": "PLEKHN1",
+  "brainspan_rnaseq": "ENSG00000187583",
+  "brainatlas_microarray": "PLEKHN1"
+},
+  {
+  "chrom": "1",
+  "spos": 1001138,
+  "epos": 1014540,
+  "ensgid": "ENSG00000187608",
+  "strand": "+",
+  "gene_version": "10",
+  "gene_symbol": "ISG15",
+  "gene_biotype": "protein_coding",
+  "chrom_hg19": "1",
+  "spos_hg19": 948803,
+  "epos_hg19": 949920,
+  "strand_hg19": "+",
+  "cytoband": [
+    "1p36.33"
+  ],
+  "gene_summary": "The protein encoded by this gene is a ubiquitin-like protein that is conjugated to intracellular target proteins upon activation by interferon-alpha and interferon-beta. Several functions have been ascribed to the encoded protein, including chemotactic activity towards neutrophils, direction of ligated target proteins to intermediate filaments, cell-to-cell signaling, and antiviral activity during viral infections. While conjugates of this protein have been found to be noncovalently attached to intermediate filaments, this protein is sometimes secreted. [provided by RefSeq, Dec 2012].",
+  "hgnc_id": "4053",
+  "name": "ISG15 ubiquitin like modifier",
+  "entrez_id": "9636",
+  "ucsc_id": "uc001acj.5",
+  "refseq_accession": [
+    "NM_005101"
+  ],
+  "ccds_id": [
+    "CCDS6"
+  ],
+  "uniprot_ids": [
+    "P05161"
+  ],
+  "mgd_id": [
+    "MGI:1855694"
+  ],
+  "omim_id": [
+    "147571"
+  ],
+  "orphanet": "315470",
+  "transcriptid": [
+    {
+      "ensembl_trs": "ENST00000624697",
+      "ensembl_pro": "ENSP00000485643"
+    },
+    {
+      "ensembl_trs": "ENST00000624652",
+      "ensembl_pro": "ENSP00000485313"
+    },
+    {
+      "ensembl_trs": "ENST00000649529",
+      "ensembl_pro": "ENSP00000496832"
+    }
+  ],
+  "pdb": [
+    "1Z2M",
+    "2HJ8",
+    "3PHX",
+    "3PSE",
+    "3R66",
+    "3RT3",
+    "3SDL",
+    "5TL6",
+    "5W8T",
+    "5W8U",
+    "6BI8",
+    "6FFA"
+  ],
+  "biogrid": [
+    "114995"
+  ],
+  "string": [
+    "9606.ENSP00000368699"
+  ],
+  "genecards": "ENSG00000187608",
+  "pharmgkb": [
+    "PA28465"
+  ],
+  "trait_association_gwas": [
+    "Blood protein levels"
+  ],
+  "trait_association_gwas_pmid": [
+    "29875488~30072576"
+  ],
+  "rvis_exac": 0.410434686,
+  "rvis_percentile_exac": 74.54370219,
+  "gdi_phred": 6.95277,
+  "gdp": "Medium",
+  "mgi_mouse_gene": "Isg15",
+  "mgi_mouse_phenotype": "skeleton phenotype",
+  "obs_mis": 117,
+  "exp_mis": 115.66,
+  "oe_mis": 1.0115,
+  "obs_syn": 63,
+  "exp_syn": 58.149,
+  "oe_syn": 1.0834,
+  "obs_lof": 0,
+  "exp_lof": 1.1056,
+  "oe_lof": 0.0,
+  "cds_length": 495,
+  "num_coding_exons": 2,
+  "marrvel": "ISG15",
+  "s_het": 0.008602742,
+  "gtex_expression": "ENSG00000187608.8",
+  "brainspan_microarray": "ISG15",
+  "brainspan_rnaseq": "ENSG00000187608",
+  "brainatlas_microarray": "ISG15"
+},
+  {
+  "chrom": "1",
+  "spos": 1020120,
+  "epos": 1056118,
+  "ensgid": "ENSG00000188157",
+  "strand": "+",
+  "gene_version": "15",
+  "gene_symbol": "AGRN",
+  "gene_biotype": "protein_coding",
+  "chrom_hg19": "1",
+  "spos_hg19": 955503,
+  "epos_hg19": 991496,
+  "strand_hg19": "+",
+  "cytoband": [
+    "1p36.33"
+  ],
+  "gene_summary": "This gene encodes one of several proteins that are critical in the development of the neuromuscular junction (NMJ), as identified in mouse knock-out studies. The encoded protein contains several laminin G, Kazal type serine protease inhibitor, and epidermal growth factor domains. Additional post-translational modifications occur to add glycosaminoglycans and disulfide bonds. In one family with congenital myasthenic syndrome affecting limb-girdle muscles, a mutation in this gene was found. Alternative splicing results in multiple transcript variants encoding different isoforms. [provided by RefSeq, Mar 2015].",
+  "hgnc_id": "329",
+  "name": "agrin",
+  "entrez_id": "375790",
+  "ucsc_id": "uc001ack.3",
+  "refseq_accession": [
+    "NM_198576"
+  ],
+  "ccds_id": [
+    "CCDS30551"
+  ],
+  "uniprot_ids": [
+    "O00468"
+  ],
+  "mgd_id": [
+    "MGI:87961"
+  ],
+  "omim_id": [
+    "103320"
+  ],
+  "orphanet": "233062",
+  "clingen": "329",
+  "transcriptid": [
+    {
+      "ensembl_trs": "ENST00000379370",
+      "ensembl_pro": "ENSP00000368678"
+    },
+    {
+      "ensembl_trs": "ENST00000652369",
+      "ensembl_pro": "ENSP00000498543"
+    },
+    {
+      "ensembl_trs": "ENST00000651234",
+      "ensembl_pro": "ENSP00000499046"
+    },
+    {
+      "ensembl_trs": "ENST00000620552",
+      "ensembl_pro": "ENSP00000484607"
+    }
+  ],
+  "biogrid": [
+    "132000"
+  ],
+  "string": [
+    "9606.ENSP00000368678"
+  ],
+  "genecards": "ENSG00000188157",
+  "pharmgkb": [
+    "PA24626"
+  ],
+  "genereviews": [
+    "AGRN"
+  ],
+  "pathway_kegg_id": "hsa04512",
+  "pathway_kegg_full": "ECM-receptor interaction",
+  "rvis_exac": 0.70374788,
+  "rvis_percentile_exac": 85.01897476,
+  "gdi_phred": 6.8699,
+  "gdp": "Medium",
+  "mgi_mouse_gene": "Agrn",
+  "mgi_mouse_phenotype": "growth/size/body region phenotype; homeostasis/metabolism phenotype; muscle phenotype; cardiovascular system phenotype (the observable morphological and physiological characteristics of the mammalian heart, blood vessels, or circulatory system that are manifested through development and lifespan); normal phenotype; mortality/aging (the observable characteristics related to the ability of a mammalian organism to live and age that are manifested throughout development and life span); behavior/neurological phenotype (the observable actions or reactions of mammalian organisms that are manifested through development and lifespan); respiratory system phenotype; renal/urinary system phenotype; limbs/digits/tail phenotype; nervous system phenotype (the observable morphological and physiological characteristics of the extensive, intricate network of electochemical structures in the body that is comprised of the brain, spinal cord, nerves, ganglia and parts of the receptor organs that are manifested through development and lifespan)",
+  "obs_mis": 1303,
+  "exp_mis": 1326.1,
+  "oe_mis": 0.98257,
+  "obs_syn": 727,
+  "exp_syn": 603.35,
+  "oe_syn": 1.2049,
+  "obs_lof": 29,
+  "exp_lof": 90.87,
+  "oe_lof": 0.31914,
+  "cds_length": 6135,
+  "num_coding_exons": 36,
+  "marrvel": "AGRN",
+  "s_het": 0.02313541,
+  "gtex_expression": "ENSG00000188157.14",
+  "brainspan_rnaseq": "ENSG00000188157",
+  "brainatlas_microarray": "AGRN"
+}
+]

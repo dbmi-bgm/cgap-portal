@@ -1,0 +1,210 @@
+{
+    "title": "Annotation Field",
+    "description": "Schema for submitting an annotation field",
+    "id": "/profiles/annotation_field.json",
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "type": "object",
+    "required": ["field_name", "field_type"],
+    "identifyingProperties": ["uuid", "aliases", "field_name"],
+    "additionalProperties": false,
+    "mixinProperties": [
+      { "$ref": "mixins.json#/schema_version" },
+      { "$ref": "mixins.json#/uuid" },
+      { "$ref": "mixins.json#/aliases" },
+      { "$ref": "mixins.json#/submitted" },
+      { "$ref": "mixins.json#/modified" },
+      { "$ref": "mixins.json#/status" },
+      { "$ref": "mixins.json#/attribution" },
+      { "$ref": "mixins.json#/notes" },
+      { "$ref": "mixins.json#/static_embeds" }
+    ],
+    "properties": {
+        "schema_version": {
+            "default": "1"
+        },
+        "no": {
+            "title": "Number",
+            "description": "Number on mapping table",
+            "type": "integer"
+        },
+        "field_name": {
+            "title": "Field Name",
+            "description": "Original name of the annotation field name on vcf file",
+            "type": "string",
+            "uniqueKey": true
+        },
+        "source_name": {
+            "title": "Source Name",
+            "description": "Latest source name",
+            "type": "string"
+        },
+        "source_version": {
+            "title": "Source Version (v0.2)",
+            "description": "Latest source version",
+            "type": "string"
+        },
+        "sub_embedding_group": {
+            "title": "Sub-embedding group",
+            "description": "If field belongs to a sub embedded object, add field name to that object",
+            "type": "string"
+        },
+        "field_type": {
+            "title": "Field type",
+            "description": "Field type, number, integer, string",
+            "type": "string",
+            "enum": [
+                "string",
+                "number",
+                "integer",
+                "boolean",
+                "embedded"
+            ]
+        },
+        "is_list": {
+            "title": "Is List",
+            "type": "boolean",
+            "description": "Whether the field is a list or not",
+            "default": false
+        },
+        "separator": {
+            "title": "Separator",
+            "description": "if value is list, use this separator to split items",
+            "type": "string",
+            "enum": [
+                "comma",
+                "pipe",
+                "semicolon",
+                "colon",
+                "tab",
+                "tilde"
+            ]
+        },
+        "maximum_length_of_value": {
+            "title": "Maximum length of value (bytes)",
+            "type": "integer",
+            "description": "Maximum number of bytes this field can hold"
+        },
+        "description": {
+            "title": "Description",
+            "description": "Description to be used in the variant schema for the field",
+            "type": "string"
+        },
+        "pattern": {
+            "title": "Pattern",
+            "description": "Regex used to validate field entries",
+            "type": "string"
+        },
+        "do_import": {
+            "title": "Do Import",
+            "type": "boolean",
+            "description": "Whether this annotation field is currently available on the portal",
+            "default": false
+        },
+        "link": {
+            "title": "Link",
+            "description": "Base link used to lookup this field",
+            "type": "string"
+        },
+        "default": {
+            "title": "Default value for this field",
+            "description": "For defaults/min/max only type=integer is available",
+            "type": "integer"
+        },
+        "min": {
+            "title": "Minimum Value for this field",
+            "type": "integer"
+        },
+        "max": {
+            "title": "Maximum Value for this field",
+            "type": "integer"
+        },
+        "value_example": {
+            "title": "Example Value for this field",
+            "description": "Example Value for this field, stored as text",
+            "type": "string"
+        },
+        "enum_list": {
+            "title": "Enum List",
+            "description": "List of possible values for this field if applicable",
+            "type": "array",
+            "uniqueItems": true,
+            "items": {
+                "Title": "Enum List Item",
+                "type": "string"
+            }
+        },
+        "annotation_category": {
+            "title": "Annotation Category",
+            "description": "Category used for this annotation, could be used for grouping",
+            "type": "string"
+        },
+        "facet_order": {
+            "title": "Facet Order",
+            "description": "Ranking number of the field wrt to Facets, lower is better",
+            "type": "integer"
+        },
+        "column_order": {
+            "title": "Column order",
+            "description": "Ranking number of the field for Column in search view (lower is better)",
+            "type": "integer"
+        },
+        "scope": {
+            "title": "Scope",
+            "description": "Scope that this field belongs to",
+            "type": "string",
+            "enum": [
+                "variant",
+                "sample",
+                "gene",
+                "sample_variant"
+            ]
+        },
+         "schema_title": {
+            "title": "Schema Title",
+            "description": "Title to be used in the variant schema for the field",
+            "type": "string"
+        },
+        "links_to": {
+            "title": "Link To",
+            "description": "I don't know",
+            "type": "string"
+        },
+        "embedded_field": {
+            "title": "Embedded Field",
+            "description": "Whether or not this field is embedded from another object",
+            "type": "boolean"
+        },
+        "calculated_property": {
+            "title": "Calculated Property",
+            "description": "Boolean on whether or not this field is a calculated property of a variant",
+            "type": "boolean"
+        },
+        "comments": {
+            "title": "Comments",
+            "description": "Comments on this field",
+            "type": "string"
+        }
+    },
+    "facets": {
+        "field_type": {
+            "title": "Type"
+        },
+        "source_name": {
+            "title": "Source"
+        }
+    },
+    "columns": {
+        "schema_title": {
+            "title": "Field name"
+        },
+        "field_type": {
+            "title": "Field type"
+        },
+        "source_name": {
+            "title": "Source"
+        },
+        "scope": {
+            "title": "Scope"
+        }
+    }
+}

@@ -64,10 +64,10 @@ def test_search_with_no_query(workbook, testapp):
     assert res.json['title'] == 'Search'
     assert res.json['total'] > 0
     assert 'facets' in res
-    # test default facets (data type and status)
+    # test default facets (data type)
     default_facets = [facet['field'] for facet in res.json['facets']]
     assert 'type' in default_facets
-    assert 'status' in default_facets
+    # assert 'status' in default_facets uncomment this if status is added back -Will 5/13/2020
     assert 'filters' in res
     assert '@graph' in res
 
@@ -394,8 +394,8 @@ def test_default_schema_and_non_schema_facets(workbook, testapp, registry):
     res = testapp.get('/search/?type=User&institution.display_title=HMS+DBMI').json
     assert 'facets' in res
     facet_fields = [ facet['field'] for facet in res['facets'] ]
-    assert 'type' in facet_fields
-    assert 'status' in facet_fields
+    # assert 'type' in facet_fields uncomment this if we decide type should exist when searching on a single type
+    # assert 'status' in facet_fields uncomment this if status is added back -Will 5/13/2020
     for facet in schema['facets'].keys():
         if not schema['facets'][facet].get('hide_from_view'):
             assert facet in facet_fields
@@ -617,8 +617,6 @@ def test_search_with_principals_allowed_fails(workbook, anontestapp):
 class TestNestedSearch(object):
     """ This class encapsulates all helper methods and tests needed to test out nested searches """
 
-    FACET_TO_CHECK = 'families.proband.display_title'
-
     @staticmethod
     def assert_length_is_expected(result, expected):
         assert len(result['@graph']) == expected
@@ -651,6 +649,14 @@ class TestNestedSearch(object):
         for res in result:
             compound = compound and (f1(res) or f2(res) or f3(res))
         return compound
+
+    @staticmethod
+    def verify_facet(facets, name, count):
+        """ Checks that a given facet name has the correct number of terms """
+        for facet in facets:
+            if facet['field'] == name:
+                assert len(facet['terms']) == count
+                return
 
     def test_search_on_single_nested_field(self, workbook, testapp):
         """ Should match only once since one has a family with a proband with display_title GAPID8J9B9CR """
@@ -805,9 +811,12 @@ class TestNestedSearch(object):
 
     def test_search_nested_facets_are_correct(self, workbook, testapp):
         """ Tests that nested facets are properly rendered """
+        facets = testapp.get('/search/?type=Cohort').json['facets']
+        self.verify_facet(facets, 'families.proband.display_title', 3)
         facets = testapp.get('/search/?type=Cohort'
                              '&families.proband.display_title=GAPID8J9B9CR').json['facets']
-        for facet in facets:
-            if facet['field'] == self.FACET_TO_CHECK:
-                assert len(facet['terms']) > 1  # there should be multiple if nested agg is working here
-                break
+        self.verify_facet(facets, 'families.proband.display_title', 2)
+
+    def test_search_nested_exists_query(self, testapp):
+        """ Tests doing a !=No+value search on a nested sub-field. """
+        testapp.get('/search/?type=SampleProcessing&samples.uuid!=No+value', status=404)
