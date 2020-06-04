@@ -40,6 +40,7 @@ class LuceneBuilder:
         Applies the range filters to the 'must' subquery
         Tuple format is required to handle nested fields that are non-range (it is discarded in this case)
         Nested range fields must also be separated from other nested sub queries - see comment in handle_nested_filters
+        Modifies must_filters in place
 
         :param range_filters: intermediary range_filter format to be converted to valid lucene
         :param must_filters: must_filters from build_sub_queries, this is where range filters are applied
@@ -466,7 +467,7 @@ class LuceneBuilder:
         is approximately represented below. 'Approximate' because you could not copy-paste directly into
         Lucene, but should illustrate enough so it is comprehensible. Note the 'nested' nature of the query.
 
-        QUERY HEIRARCHY ('approximate' lucene syntax):
+        QUERY HIERARCHY ('approximate' lucene syntax):
             {
                 'query': {
                     'bool': {

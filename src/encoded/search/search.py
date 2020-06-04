@@ -60,29 +60,11 @@ class SearchBuilder:
     """
 
     def __init__(self, context, request, search_type=None, return_generator=False, forced_type='Search',
-                 custom_aggregations=None):
-
-        # Initialized directly
+                 custom_aggregations=None, skip_bootstrap=False):
         self.context = context  # request context
         self.request = request  # request who requested a search
-        self.return_generator = return_generator  # whether or not this search should return a generator
-        self.custom_aggregations = custom_aggregations  # any custom aggregations on this search
-        self.types = self.request.registry[TYPES]  # all types in the system
-        self.forced_type = forced_type  # (mostly deprecated) search type
-        self.principals = self.request.effective_principals  # permissions to apply to this search
-        self.es = self.request.registry[ELASTIC_SEARCH]  # handle to remote ES
-
-        # Initialized via outside function call
-        self.doc_types = self.set_doc_types(self.request, self.types, search_type)  # doc_types for this search
-        self.schemas = [self.types[item_type].schema for item_type in self.doc_types]  # schemas for doc_types
-        self.search_types = self.build_search_types(self.types, self.doc_types) + [self.forced_type]  # item_type hierarchy we are searching on
-        self.search_base = self.normalize_query(self.request, self.types, self.doc_types)
-        self.search_frame = self.request.normalized_params.get('frame', 'embedded')  # which frame to return, always embedded
-        self.prepared_terms = self.prepare_search_term(self.request)  # handles resolving search term path on mapping (naively)
-
-        # API Calls
-        self.es_index = get_es_index(self.request, self.doc_types)  # what index we are searching on
-        self.item_type_es_mapping = get_es_mapping(self.es, self.es_index)  # mapping for the item type we are searching
+        if not skip_bootstrap:
+            self._bootstrap_query(search_type, return_generator, forced_type, custom_aggregations)
 
         # To be computed later, initialized to None here
         self.result = None
@@ -93,6 +75,47 @@ class SearchBuilder:
         self.search = None
         self.search_session_id = None
         self.string_query = None
+
+    def _bootstrap_query(self, search_type=None, return_generator=False, forced_type='Search',
+                         custom_aggregations=None):
+        """ Helper method that will bootstrap metadata necessary for building a search query. """
+        self.return_generator = return_generator  # whether or not this search should return a generator
+        self.custom_aggregations = custom_aggregations  # any custom aggregations on this search
+        self.types = self.request.registry[TYPES]  # all types in the system
+        self.forced_type = forced_type  # (mostly deprecated) search type
+        self.principals = self.request.effective_principals  # permissions to apply to this search
+        self.es = self.request.registry[ELASTIC_SEARCH]  # handle to remote ES
+
+        # Initialized via outside function call
+        self.doc_types = self.set_doc_types(self.request, self.types, search_type)  # doc_types for this search
+        self.schemas = [self.types[item_type].schema for item_type in self.doc_types]  # schemas for doc_types
+        self.search_types = self.build_search_types(self.types, self.doc_types) + [
+            self.forced_type]  # item_type hierarchy we are searching on
+        self.search_base = self.normalize_query(self.request, self.types, self.doc_types)
+        self.search_frame = self.request.normalized_params.get('frame',
+                                                               'embedded')  # which frame to return, always embedded
+        self.prepared_terms = self.prepare_search_term(
+            self.request)  # handles resolving search term path on mapping (naively)
+
+        # API Calls
+        self.es_index = get_es_index(self.request, self.doc_types)  # what index we are searching on
+        self.item_type_es_mapping = get_es_mapping(self.es, self.es_index)  # mapping for the item type we are searching
+
+    @classmethod
+    def from_search(cls, context, request, search, from_=0, size=10):
+        """ Builds a SearchBuilder object with a pre-built search by skipping the bootstrap
+            initialization and setting self.search directly.
+
+        :param search: search object to update
+        :param from_: start index of search
+        :param size: number of documents to return
+        :return:
+        """
+        result = cls(context, request, skip_bootstrap=True)  # bypass bootstrap
+        result.from_ = from_
+        result.size = size
+        result.search = search
+        return result
 
     @staticmethod
     def build_search_types(types, doc_types):
@@ -253,7 +276,6 @@ class SearchBuilder:
         :returns: list: the string item types to use for the search
         :raises: HTTPBadRequest: if an invalid item type is supplied
         """
-        doc_types = []
         if search_type is None:
             doc_types = request.params.getall('type')
             if '*' in doc_types:
@@ -813,7 +835,10 @@ class SearchBuilder:
             return None
 
     def build_table_columns(self):
-
+        """ Constructs an ordered dictionary of column information to be rendered by
+            the front-end. If this functionality is needed outside of general search, this
+            method should be moved to search_utils.py.
+        """
         any_abstract_types = 'Item' in self.doc_types
         if not any_abstract_types:  # Check explictly-defined types to see if any are abstract.
             type_infos = [self.request.registry[TYPES][t] for t in self.doc_types if t != 'Item']
@@ -920,9 +945,7 @@ class SearchBuilder:
     def execute_search_for_all_results(self):
         """
         Uses the above function to automatically paginate all results.
-        Note: in the future, we should the approach here
 
-        :param search: elasticsearch_dsl search object to execute (no more configuration is done at this point)
         :return: all es_results that matched the given query
         """
         size_increment = 100  # Decrease this to like 5 or 10 to test.
@@ -990,7 +1013,7 @@ class SearchBuilder:
                                              self.search_session_id)
 
     def get_response(self):
-        """ Gets the response for this search.  """
+        """ Gets the response for this search, setting 404 status if necessary. """
         if not self.response:
             return {}  # XXX: rather than raise exception? -Will
         if not self.response['total']:
@@ -1005,6 +1028,10 @@ class SearchBuilder:
         """ Builds the query, setting self.search """
         self.initialize_search_response()
         self.build_search_query()
+
+    def get_query(self):
+        """ Grabs the search object """
+        return self.search
 
     def _search(self):
         """ Executes the end-to-end search.
