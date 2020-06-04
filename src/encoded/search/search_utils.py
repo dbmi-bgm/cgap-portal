@@ -13,7 +13,7 @@ from snovault.elasticsearch.indexer_utils import get_namespaced_index
 
 log = structlog.getLogger(__name__)
 
-# CONSTANTS #
+# Constants
 
 # from now on, use these constants when referring to elastic search
 # query keywords when writing elastic search queries - Will 3-20-2020
@@ -46,12 +46,12 @@ COMMON_EXCLUDED_URI_PARAMS = [
 ]
 
 
-# Exception Classes #
+# Exception Classes
 
 
 class SearchException(Exception):
     """ Base Search Exception - not meant to be used directly """
-    def __init__(self, func, msg=None):
+    def __init__(self, *, func, msg=None):
         if msg is None:
             msg = 'Exception occurred in search code at stage %s' % func
         super(SearchException, self).__init__(msg)
@@ -66,11 +66,11 @@ class QueryConstructionException(SearchException):
     def __init__(self, query_type, func, msg=None):
         if msg is None:
             msg = 'Exception occurred during query building at query type %s in func %s' % (query_type, func)
-        super(QueryConstructionException, self).__init__(func, msg)
+        super(QueryConstructionException, self).__init__(func=func, msg=msg)
         self.query_type = query_type
 
 
-# Functions #
+# Functions
 
 
 def convert_search_to_dictionary(search):
@@ -99,17 +99,17 @@ def find_nested_path(field, es_mapping):
     """
     location = es_mapping
     path = []
-    for level in field.split('.'):
-        if level == 'raw':  # if we get to this point we're definitely at a leaf and should stop
+    for cursor in field.split('.'):
+        if cursor == 'raw':  # if we get to this point we're definitely at a leaf and should stop
             break
-        if level not in location:  # its possible we are at a sub-embedded object boundary. Check if it has properties.
+        if cursor not in location:  # its possible we are at a sub-embedded object boundary. Check if it has properties.
             if 'properties' not in location:  # if it doesn't have properties, there's nowhere to go, so return None.
                 return None
             location = location['properties']  # else move location forward, but do not add it to the PATH
-        if level not in location:  # if we still don't see our 'level', we are not a nested field
+        if cursor not in location:  # if we still don't see our 'level', we are not a nested field
             break
-        location = location[level]
-        path.append(level)
+        location = location[cursor]
+        path.append(cursor)
         if location.get('type', None) == 'nested':
             return '.'.join(path)
     return None
@@ -131,15 +131,17 @@ def schema_for_field(field, request, doc_types, should_log=False):
     """
     types = request.registry[TYPES]
     schemas = [types[dt].schema for dt in doc_types]
+    field_schema = None
 
     # We cannot hash dict by list (of doc_types) so we convert to unique ordered string
-    doc_type_string = ','.join(doc_types)
+    doc_type_string = ','.join(sorted(doc_types))  # use default sort
 
+    # Check cache, initializing if necessary
     cache = getattr(request, '_field_schema_cache', {})
+    if cache is None:
+        request._field_schema_cache = cache = {}
     if (field, doc_type_string) in cache:
         return cache[(field, doc_type_string)]
-
-    field_schema = None
 
     # for 'validation_errors.*' and 'aggregated_items.*',
     # schema will never be found and logging isn't helpful
@@ -162,8 +164,6 @@ def schema_for_field(field, request, doc_types, should_log=False):
 
     # Cache result, even if not found, for this request.
     cache[(field, doc_type_string)] = field_schema
-    if not hasattr(request, '_field_schema_cache'):
-        setattr(request, '_field_schema_cache', cache)
 
     return field_schema
 

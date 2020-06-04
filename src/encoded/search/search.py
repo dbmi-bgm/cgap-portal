@@ -1093,8 +1093,8 @@ def search(context, request, search_type=None, return_generator=False, forced_ty
 @view_config(route_name='compound_search', request_method='POST', permission='search')
 @debug_log
 def compound_search(context, request,
-                   search_type=None, return_generator=False,
-                   forced_type='Search', custom_aggregations=None):
+                    search_type=None, return_generator=False,
+                    forced_type='Search', custom_aggregations=None):
     """ Executes a compound_search given a uuid of a filter_set (or filter_set props, tbd) """
     pass  # XXX: construct a compound search, execute and return response
 

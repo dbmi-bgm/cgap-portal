@@ -1,6 +1,6 @@
 {
     "title": "Filter Set",
-    "description": "Filter Set for combining multiple queries",
+    "description": "Filter Set for encapsulating multiple queries",
     "id": "/profiles/filter_set.json",
     "$schema": "http://json-schema.org/draft-04/schema#",
     "type": "object",
@@ -30,7 +30,7 @@
         },
         "filter_blocks": {
             "title": "Filter Blocks",
-            "description": "Filter queryies that will be joined.",
+            "description": "Filter queries that will be joined.",
             "type": "array",
             "uniqueItems": true,
             "items": {
@@ -42,7 +42,8 @@
                         "type": "string"
                     },
                     "flag_applied": {
-                        "title": "Flag applies",
+                        "title": "Flag applied",
+                        "description": "Whether or not this filter_block is toggled",
                         "type": "boolean"
                     }
                 }
