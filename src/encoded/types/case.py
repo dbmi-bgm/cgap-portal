@@ -83,6 +83,8 @@ class Case(Item):
         "sample_processing.samples.individual.individual_id",
         "sample_processing.samples.last_modified.*",
         "sample_processing.samples.workup_type",
+        "sample_processing.samples.specimen_type",
+        "sample_processing.samples.status",
         "sample_processing.processed_files",
         "sample_processing.processed_files.last_modified.*",
         "sample_processing.processed_files.quality_metric",
