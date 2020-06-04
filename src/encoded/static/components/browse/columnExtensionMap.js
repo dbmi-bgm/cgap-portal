@@ -35,7 +35,7 @@ function renderAdvancedColumn(topLeft, status, main, dateTitle, date) {
                 {main}
             </div>
             <div className="col-date text-ellipsis-container" style={{ textAlign: "center", fontSize: "12px" }}>
-                <strong>{dateTitle}</strong> 
+                <strong>{dateTitle} </strong> 
                 <LocalizedTime timestamp={date} formatType="date-sm" />
             </div>
         </div>
@@ -61,6 +61,7 @@ export const DisplayTitleColumnIndividual = React.memo(function DisplayTitleIndi
     </div>;
 });
 
+// export const CaseIndividualColumnWrapper
 
 
 
@@ -124,9 +125,24 @@ export const columnExtensionMap = {
             return <DisplayTitleColumnIndividual {...{ result }}/>;
         }
     },
-    'sample_processing': {
-        'title': "This won't work right",
-        'render' : function renderIndividualColumn(result, parentProps){
+    'sample_processing.completed_processes': {
+        'render' : function renderBioinformaticsColumn(result, parentProps){
+            const { href, context, rowNumber, detailOpen, toggleDetailOpen } = parentProps;
+            const { '@type' : itemTypeList = ["Item"], individual, sample_processing: { completed_processes = [], last_modified = {}, samples = []} } = result;
+            console.log("detailopen", detailOpen);
+            let selected = {};
+            console.log("individual @id", individual['@id']);
+            samples.forEach(sample => {
+                console.log("sample @id", sample['@id']);
+                if (sample.individual['@id'] === individual['@id']){
+                    selected = sample;
+                }
+            });
+            return renderAdvancedColumn(null, null, completed_processes, "Last Updated:", last_modified.date_modified || null);
+        }
+    },
+    'sample_processing.sample': {
+        'render' : function renderSequencingColumn(result, parentProps){
             const { href, context, rowNumber, detailOpen, toggleDetailOpen } = parentProps;
             const { '@type' : itemTypeList = ["Item"], individual, sample_processing: { samples = []} } = result;
 
@@ -138,7 +154,24 @@ export const columnExtensionMap = {
                     selected = sample;
                 }
             });
-            return renderAdvancedColumn(selected.accession, selected.status, selected.specimen_type, "Collected Date:", selected.specimen_collection_date);
+            return renderAdvancedColumn(null, null, selected.workup_type, "Accessioned:", selected.specimen_accession_date);
+        }
+    },
+    'sample_processing': {
+        'title': "This won't work right",
+        'render' : function renderSampleColumn(result, parentProps){
+            const { href, context, rowNumber, detailOpen, toggleDetailOpen } = parentProps;
+            const { '@type' : itemTypeList = ["Item"], individual, sample_processing: { samples = []} } = result;
+
+            let selected = {};
+            console.log("individual @id", individual['@id']);
+            samples.forEach(sample => {
+                console.log("sample @id", sample['@id']);
+                if (sample.individual['@id'] === individual['@id']){
+                    selected = sample;
+                }
+            });
+            return renderAdvancedColumn(selected.accession, selected.status, selected.specimen_type, "Collected:", selected.specimen_collection_date);
         }
     },
     'date_published' : {
