@@ -18,7 +18,7 @@ def load_data_should_proceed(env, allow_prod):
     """ Returns True on whether or not load_data should proceed.
 
     :param env: env we are on
-    :param allow_prod: parsed arguments from argparse
+    :param allow_prod: prod argument from argparse, defaults to False
     :return: True if load_data should continue, False otherwise
     """
     # run on cgaptest -- XXX: this logic should probably be refactored into dcicutils
