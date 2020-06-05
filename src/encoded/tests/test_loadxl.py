@@ -203,5 +203,3 @@ def test_load_data_should_proceed():
     assert load_data_should_proceed(CGAP_ENV_DEV, False) is False
     assert load_data_should_proceed(CGAP_ENV_WEBPROD, True) is True  # XXX: Do we really want this?
     assert load_data_should_proceed(CGAP_ENV_WEBPROD, False) is False
-
-

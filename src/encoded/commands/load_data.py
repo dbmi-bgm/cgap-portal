@@ -23,7 +23,7 @@ def load_data_should_proceed(env, allow_prod):
     """
     # run on cgaptest -- XXX: this logic should probably be refactored into dcicutils
     if env == CGAP_ENV_MASTERTEST:
-        log.info('load_data: proceeding since we are on cgaptest')
+        log.info('load_data: proceeding since we are on %s' % env)
         return True
     elif env and not allow_prod:  # old logic, allow run on servers if prod is specified
         log.info('load_data: skipping, since on %s' % env)
