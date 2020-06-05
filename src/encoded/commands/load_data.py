@@ -2,7 +2,7 @@ import argparse
 import logging
 import structlog
 
-from dcicutils.env_utils import is_stg_or_prd_env
+from dcicutils.env_utils import CGAP_ENV_MASTERTEST
 from pyramid.paster import get_app
 from pyramid.path import DottedNameResolver
 from .. import configure_dbsession
@@ -43,14 +43,16 @@ def main():
     log.info("load_data: load_test_data function is %s" % (load_test_data))
     load_test_data = DottedNameResolver().resolve(load_test_data)
 
-    # do not run on elasticbeanstalk environments unless using --prod flag
-    if env and not args.prod:
-        # NOTE: The cgap logic is different from Fourfront, but Will thinks rightly so.
-        #       Use care if these two files ever get folded. -kmp 9-Apr-2020
-        log.info('load_data: skipping, since on %s and --prod not used' % env)
-        return
-
-    load_test_data(app, args.overwrite)
+    # run on cgaptest -- this logic should probably be refactored into dcicutils
+    if env == CGAP_ENV_MASTERTEST:
+        log.info('load_data: proceeding since we are on cgaptest')
+        load_test_data(app, args.overwrite)
+    elif env and not args.prod:  # old logic, allow run on servers if prod is specified
+        log.info('load_data: skipping, since on %s' % env)
+    else:  # allow run on local, which will not have env set
+        log.info('load_data: proceeding since we are either on local or specified the prod option')
+        load_test_data(app, args.overwrite)
+    exit(0)
 
 if __name__ == "__main__":
     main()
