@@ -9,6 +9,7 @@ from snovault import TYPES
 from snovault.util import crawl_schema, find_collection_subtypes
 from snovault.embed import make_subrequest
 from snovault.elasticsearch.indexer_utils import get_namespaced_index
+from ..util import deduplicate_list
 
 
 log = structlog.getLogger(__name__)
@@ -115,6 +116,30 @@ def find_nested_path(field, es_mapping):
     return None
 
 
+def is_schema_field(field):
+    """ Returns whether or not we should expect a schema to be found for the given field.
+        Currently this only applies to validation_errors and aggregated_items.
+        XXX: Consider regex?
+
+    :param field: field name to check
+    :return: False if this field doesn't a schema, True otherwise
+    """
+    if field.startswith('validation_errors') or field.startswith('aggregated_items'):  # note that trailing '.' is gone
+        return False
+    return True
+
+
+def extract_field(field):
+    """ Pre-processes 'field' from URL query params. Solely handles converting 'type' to '@type' and
+        discarding the not (!) qualifier.
+
+    :param field: field name to process
+    :return: correct field_name to search on
+    """
+    use_field = '@type' if field == 'type' else field  # 'type' field is really '@type' in the schema
+    return use_field[:-1] if use_field.endswith('!') else use_field
+
+
 def schema_for_field(field, request, doc_types, should_log=False):
     """
     Find the schema for the given field (in embedded '.' format). Uses
@@ -138,19 +163,16 @@ def schema_for_field(field, request, doc_types, should_log=False):
 
     # Check cache, initializing if necessary
     cache = getattr(request, '_field_schema_cache', {})
+    cache_key = (field, doc_type_string)
     if cache is None:
         request._field_schema_cache = cache = {}
-    if (field, doc_type_string) in cache:
-        return cache[(field, doc_type_string)]
+    if cache_key in cache:
+        return cache[cache_key]
 
     # for 'validation_errors.*' and 'aggregated_items.*',
     # schema will never be found and logging isn't helpful
-    if (schemas and not field.startswith('validation_errors.') and
-        not field.startswith('aggregated_items.')):
-        # 'type' field is really '@type' in the schema
-        use_field = '@type' if field == 'type' else field
-        # eliminate '!' from not fields
-        use_field = use_field[:-1] if use_field.endswith('!') else use_field
+    if schemas and is_schema_field(field):
+        use_field = extract_field(field)
         for schema in schemas:
             try:
                 field_schema = crawl_schema(types, use_field, schema)
@@ -163,7 +185,7 @@ def schema_for_field(field, request, doc_types, should_log=False):
                     break
 
     # Cache result, even if not found, for this request.
-    cache[(field, doc_type_string)] = field_schema
+    cache[cache_key] = field_schema
 
     return field_schema
 
@@ -178,7 +200,7 @@ def get_query_field(field, facet, es_mapping):
     """
     if field == 'type':
         return 'embedded.@type.raw'
-    elif field.startswith('validation_errors') or field.startswith('aggregated_items'):
+    elif not is_schema_field(field):
         return field + '.raw'
     elif facet.get('aggregation_type') in ('stats', 'date_histogram', 'histogram', 'range'):
         return 'embedded.' + field
@@ -203,8 +225,7 @@ def find_index_by_doc_types(request, doc_types, ignore):
             result = find_collection_subtypes(request.registry, doc_type)
             namespaced_results = map(lambda t: get_namespaced_index(request, t), result)
             indexes.extend(namespaced_results)
-    # remove any duplicates
-    indexes = list(set(indexes))
+    indexes = deduplicate_list(indexes)
     index_string = ','.join(indexes)
     return index_string
 
@@ -287,13 +308,13 @@ def execute_search(request, search):
     es_results = None
     try:
         es_results = search.execute().to_dict()
-    except ConnectionTimeout as exc:
+    except ConnectionTimeout:
         err_exp = 'The search failed due to a timeout. Please try a different query.'
     except RequestError as exc:
         # try to get a specific error message. May fail in some cases
         try:
             err_detail = str(exc.info['error']['root_cause'][0]['reason'])
-        except:
+        except Exception:
             err_detail = str(exc)
         err_exp = 'The search failed due to a request error: ' + err_detail
     except TransportError as exc:
