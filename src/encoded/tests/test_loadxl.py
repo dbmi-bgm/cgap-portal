@@ -4,8 +4,10 @@ import pytest
 from past.builtins import basestring
 from pkg_resources import resource_filename
 from unittest import mock
+from dcicutils.env_utils import CGAP_ENV_MASTERTEST, CGAP_ENV_WEBPROD, CGAP_ENV_DEV, CGAP_ENV_WOLF
 from .. import loadxl
 from ..commands.run_upgrader_on_inserts import get_inserts
+from ..commands.load_data import load_data_should_proceed
 
 
 pytestmark = [pytest.mark.setone, pytest.mark.working]
@@ -189,3 +191,15 @@ def test_load_all_gen(testapp):
         assert 'Failure loading inserts' in res4
         assert isinstance(catch4.caught, basestring)
         assert 'Failure loading inserts' in catch4.caught
+
+
+def test_load_data_should_proceed():
+    """ Tests that load_data_should_proceed does the right thing in various environment scenarios """
+    assert load_data_should_proceed(CGAP_ENV_MASTERTEST, True) is True
+    assert load_data_should_proceed(CGAP_ENV_MASTERTEST, False) is True
+    assert load_data_should_proceed(CGAP_ENV_WOLF, True) is True
+    assert load_data_should_proceed(CGAP_ENV_WOLF, False) is False
+    assert load_data_should_proceed(CGAP_ENV_DEV, True) is True
+    assert load_data_should_proceed(CGAP_ENV_DEV, False) is False
+    assert load_data_should_proceed(CGAP_ENV_WEBPROD, True) is True  # XXX: Do we really want this?
+    assert load_data_should_proceed(CGAP_ENV_WEBPROD, False) is False

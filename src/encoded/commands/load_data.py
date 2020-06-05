@@ -2,7 +2,7 @@ import argparse
 import logging
 import structlog
 
-from dcicutils.env_utils import is_stg_or_prd_env
+from dcicutils.env_utils import CGAP_ENV_MASTERTEST
 from pyramid.paster import get_app
 from pyramid.path import DottedNameResolver
 from .. import configure_dbsession
@@ -12,6 +12,25 @@ log = structlog.getLogger(__name__)
 
 
 EPILOG = __doc__
+
+
+def load_data_should_proceed(env, allow_prod):
+    """ Returns True on whether or not load_data should proceed.
+
+    :param env: env we are on
+    :param allow_prod: prod argument from argparse, defaults to False
+    :return: True if load_data should continue, False otherwise
+    """
+    # run on cgaptest -- XXX: this logic should probably be refactored into dcicutils
+    if env == CGAP_ENV_MASTERTEST:
+        log.info('load_data: proceeding since we are on %s' % env)
+        return True
+    elif env and not allow_prod:  # old logic, allow run on servers if prod is specified
+        log.info('load_data: skipping, since on %s' % env)
+        return False
+    else:  # allow run on local, which will not have env set
+        log.info('load_data: proceeding since we are either on local or specified the prod option')
+        return True
 
 
 def main():
@@ -25,7 +44,7 @@ def main():
     )
     parser.add_argument('--app-name', help="Pyramid app name in configfile")
     parser.add_argument('config_uri', help="path to configfile")
-    parser.add_argument('--prod', action='store_true',
+    parser.add_argument('--prod', action='store_true', default=False,
                         help="must be set to confirm this action is intended to happen on a production server")
     parser.add_argument('--overwrite', action='store_true',
                         help="must be set to update existing uuids with patch")
@@ -38,19 +57,15 @@ def main():
     configure_dbsession(app)
 
     env = app.registry.settings.get('env.name', '')
-
+    allow_prod = args.prod
     load_test_data = app.registry.settings.get('load_test_data')
     log.info("load_data: load_test_data function is %s" % (load_test_data))
     load_test_data = DottedNameResolver().resolve(load_test_data)
 
-    # do not run on elasticbeanstalk environments unless using --prod flag
-    if env and not args.prod:
-        # NOTE: The cgap logic is different from Fourfront, but Will thinks rightly so.
-        #       Use care if these two files ever get folded. -kmp 9-Apr-2020
-        log.info('load_data: skipping, since on %s and --prod not used' % env)
-        return
+    if load_data_should_proceed(env, allow_prod):
+        load_test_data(app, args.overwrite)
+    exit(0)
 
-    load_test_data(app, args.overwrite)
 
 if __name__ == "__main__":
     main()
