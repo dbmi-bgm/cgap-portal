@@ -1000,11 +1000,8 @@ class SearchBuilder:
         # Format results, handle "child" requests special
         graph = self._format_results(es_results['hits']['hits'])
         if self.request.__parent__ is not None or self.return_generator:
-            if self.return_generator:
-                return graph
-            else:
+            if not self.return_generator:
                 self.response['@graph'] = list(graph)
-                return self.response
 
         # Set @graph, save session ID for re-requests / subsequent pages.
         self.response['@graph'] = list(graph)
@@ -1016,12 +1013,21 @@ class SearchBuilder:
         """ Gets the response for this search, setting 404 status if necessary. """
         if not self.response:
             return {}  # XXX: rather than raise exception? -Will
+
+        # If we got no results, return 404 or []
         if not self.response['total']:
             # http://googlewebmastercentral.blogspot.com/2014/02/faceted-navigation-best-and-5-of-worst.html
             self.request.response.status_code = 404
             self.response['notification'] = 'No results found'
             self.response['@graph'] = []
             return self.response if not self.return_generator else []
+
+        # if this is a subrequest/gen request, return '@graph' directly
+        if self.request.__parent__ is not None or self.return_generator:
+            if self.return_generator:
+                return self.response['@graph']
+
+        # otherwise just hand off response
         return self.response
 
     def _build_query(self):
