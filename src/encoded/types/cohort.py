@@ -9,7 +9,7 @@ from snovault import (
 from snovault.util import debug_log
 from .base import (
     Item,
-    get_item_if_you_can
+    get_item_or_none
 )
 from pyramid.httpexceptions import HTTPUnprocessableEntity
 from pyramid.view import view_config
@@ -129,7 +129,7 @@ def process_pedigree(context, request):
                 break
         if not user_uuid:
             raise HTTPUnprocessableEntity('Cohort %s: Must provide authentication' % cohort)
-        user_props = get_item_if_you_can(request, user_uuid)
+        user_props = get_item_or_none(request, user_uuid)
         email = user_props['email']
     environ = {'HTTP_ACCEPT': 'application/json', 'REMOTE_USER': email}
     testapp = TestApp(app, environ)

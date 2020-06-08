@@ -1,6 +1,6 @@
 [
     {
-        "email": "loadxl@loadxl.us",
+        "email": "loadxl@hms.harvard.edu",
         "first_name": "loadxl",
         "groups": ["admin"],
         "role": "other",
@@ -79,6 +79,16 @@
         "last_name": "Pitman",
         "role": "developer",
         "uuid": "27d2ac03-7d12-442b-9375-211d3c5c5f97",
+        "groups": ["admin"],
+        "submits_for": ["hms-dbmi"],
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b"
+    },
+    {
+        "email": "eric_berg@hms.harvard.edu",
+        "first_name": "Eric",
+        "last_name": "Berg",
+        "role": "developer",
+        "uuid": "3f0052c9-218d-42e1-94bd-4319d0615681",
         "groups": ["admin"],
         "submits_for": ["hms-dbmi"],
         "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b"

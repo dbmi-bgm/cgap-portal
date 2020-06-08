@@ -1,4 +1,5 @@
 .coverage
+*.srctr*
 coverage.xml
 beanstalk.cfg
 /coverage
