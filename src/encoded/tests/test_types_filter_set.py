@@ -57,9 +57,21 @@ def simple_filter_set():
     }
 
 
-def test_filter_set_barebones(setup_for_filter_sets, barebones_filter_set, simple_filter_set):
+def test_filter_set_barebones(setup_for_filter_sets, barebones_filter_set):
     """ Tests posting a filter set """
     testapp = setup_for_filter_sets
-    res1 = testapp.post_json(FILTER_SET_URL, barebones_filter_set, status=201).json
-    res2 = testapp.post_json(FILTER_SET_URL, simple_filter_set, status=201).json
-    # XXX: implement execute, then test
+    res = testapp.post_json(FILTER_SET_URL, barebones_filter_set, status=201).json
+    uuid = res['@graph'][0]['@id']
+    testapp.post_json('/index', {})
+    compound_search_res = testapp.post_json('/compound_search', {'@id': uuid})
+    # XXX: Implement route
+
+
+def test_filter_set_simple(setup_for_filter_sets, simple_filter_set):
+    """ Test posting a non-trivial (but simple) filter set """
+    testapp = setup_for_filter_sets
+    res = testapp.post_json(FILTER_SET_URL, simple_filter_set, status=201).json
+    uuid = res['@graph'][0]['@id']
+    testapp.post_json('/index', {})
+    compound_search_res = testapp.post_json('/compound_search', {'@id': uuid})
+    # XXX: Implement route

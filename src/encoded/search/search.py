@@ -1,5 +1,6 @@
 import re
 import math
+import json
 import itertools
 import uuid
 import structlog
@@ -14,7 +15,7 @@ from copy import deepcopy
 from snovault import (
     AbstractCollection,
     TYPES,
-    COLLECTIONS
+    COLLECTIONS,
 )
 from snovault.elasticsearch import ELASTIC_SEARCH
 from snovault.elasticsearch.create_mapping import determine_if_is_date_field
@@ -23,10 +24,10 @@ from snovault.util import (
 )
 from snovault.typeinfo import AbstractTypeInfo
 from encoded.types.base import get_item_or_none
-from encoded.search.lucene_builder import LuceneBuilder
-from encoded.search.search_utils import (find_nested_path, schema_for_field, get_es_index, get_es_mapping,
-                                         execute_search, make_search_subreq,
-                                         NESTED, COMMON_EXCLUDED_URI_PARAMS,)
+from .lucene_builder import LuceneBuilder
+from .search_utils import (find_nested_path, schema_for_field, get_es_index, get_es_mapping,
+                           execute_search, make_search_subreq, NESTED, COMMON_EXCLUDED_URI_PARAMS,
+)
 
 
 log = structlog.getLogger(__name__)
@@ -1096,14 +1097,50 @@ def search(context, request, search_type=None, return_generator=False, forced_ty
     return search_builder._search()
 
 
+def execute_filter_set(context, request, filter_set, search_type=None, return_generator=False,
+                       forced_type='Search', custom_aggregations=None):
+    """ Executes the given filter set, which effectively is:
+        For each filter_block:
+            AND with all other filter blocks (if applied)
+        AND 'flags'
+
+        The idea is to provide a button the filter set view to 'execute' a filter set.
+    """
+    filter_blocks = filter_set.get('filter_blocks', [])
+    flags = filter_set.get('flags', None)
+
+    import pdb; pdb.set_trace()
+
+    # if we have no filter blocks, pass flags alone to search
+    if not filter_blocks and flags:
+        return search(context, request)  # XXX: build request
+
+    # if we have only a single filter block with no flags, pass single filter_block to search
+    elif not flags and len(filter_blocks) == 1:
+        if filter_blocks['flag_applied']:
+            return search(context, request)  # XXX: build request
+        else:
+            return search(context, request)  # this one should be fine
+
+    # do query construction, merging
+    else:
+        pass  # XXX: implement this
+
+    return {}
+
+
 @view_config(route_name='compound_search', request_method='POST', permission='search')
 @debug_log
-def compound_search(context, request,
-                    search_type=None, return_generator=False,
+def compound_search(context, request, search_type=None, return_generator=False,
                     forced_type='Search', custom_aggregations=None):
     """ Executes a compound_search given a uuid of a filter_set (or filter_set props, tbd) """
-    import pdb; pdb.set_trace()  # XXX: construct a compound search, execute and return response
-    return {}
+    # XXX: construct a compound search, execute and return response
+    body = json.loads(request.body)
+    if '@id' not in body:
+        raise HTTPBadRequest('Request body does not contain a filter_set uuid!')
+    filter_set = get_item_or_none(request, body['@id'])
+    return execute_filter_set(context, request, filter_set, search_type=None, return_generator=False,
+                              forced_type='Search', custom_aggregations=None)
 
 
 @view_config(context=AbstractCollection, permission='list', request_method='GET')
