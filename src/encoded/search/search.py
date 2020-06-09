@@ -38,6 +38,7 @@ log = structlog.getLogger(__name__)
 def includeme(config):
     config.add_route('search', '/search{slash:/?}')
     config.add_route('compound_search', '/compound_search')
+    config.add_route('build_query', '/build_query{slash:/?}')
     config.scan(__name__)
 
 
@@ -66,6 +67,7 @@ class SearchBuilder:
                  custom_aggregations=None, skip_bootstrap=False):
         self.context = context  # request context
         self.request = request  # request who requested a search
+        self.response = {}
         if not skip_bootstrap:
             self._bootstrap_query(search_type, return_generator, forced_type, custom_aggregations)
 
@@ -73,7 +75,6 @@ class SearchBuilder:
         self.result = None
         self.from_ = None
         self.size = None
-        self.response = None
         self.facets = None
         self.search = None
         self.search_session_id = None
@@ -1072,19 +1073,31 @@ def transfer_request_permissions(parent_request, sub_request):
     sub_request.environ['REMOTE_USER'] = parent_request.environ['REMOTE_USER']
 
 
-def build_subreq_from_single_query(request, query):
+def build_subreq_from_single_query(request, query, route='/search/'):
     """ Builds a Request object that is a proper sub-request of the given request.
         Passes flags directly as query string params. Intended for use with search.
 
     :param request: request to build off of
     :param query: search query
+    :param route: route of sub-request to build
     :return: new Request
     """
     if '?' not in query:  # do some sanitization
         query = '?' + query
-    subreq = Request.blank('/search/' + query)
+    subreq = Request.blank(route + query)
     transfer_request_permissions(request, subreq)  # VERY IMPORTANT - Will
     return subreq
+
+
+def combine_flags_and_block(flags, block):
+    """ Builds a single URL query from the given flags and blocks
+
+    :param flags: flags, usually ? prefixed
+    :param block: blocks to add to it
+    :return: combined query
+    """
+    # XXX: Something smarter probably needs to happen here, hence why this is a function -Will
+    return '&'.join([flags, block])
 
 
 def execute_filter_set(context, request, filter_set, search_type=None, return_generator=False,
@@ -1113,11 +1126,40 @@ def execute_filter_set(context, request, filter_set, search_type=None, return_ge
         else:
             return search(context, request)  # Re-direct to ?type=Item (all) search
 
-    # do query construction
-    else:
-        pass  # XXX: implement this
+    # if given flags and single filter block, combine and pass
+    elif flags and len(filter_blocks) == 1:
+        block = filter_blocks[0]
+        if block['flag_applied']:
+            combined_query = combine_flags_and_block(flags, block['query'])
+            subreq = build_subreq_from_single_query(request, combined_query)
+        else:
+            subreq = build_subreq_from_single_query(request, flags)
+        return request.invoke_subrequest(subreq)
 
-    return {}
+    # Build the compound_query
+    else:
+        sub_queries = []
+        for block in filter_blocks:
+            if block['flag_applied']:  # only build sub_query if this block is applied
+                if flags:
+                    combined_query = combine_flags_and_block(flags, block['query'])
+                    subreq = build_subreq_from_single_query(request, combined_query, route='/build_query/')
+                else:
+                    subreq = build_subreq_from_single_query(request, block['query'], route='/build_query/')
+                sub_query = request.invoke_subrequest(subreq).json['query']
+                sub_queries.append(sub_query)
+            else:
+                continue
+
+        if len(sub_queries) == 0:  # if all blocks are disabled, just execute the flags
+            subreq = build_subreq_from_single_query(request, flags)
+            return request.invoke_subrequest(subreq)
+
+        else:
+            compound_query = LuceneBuilder.compound_search(sub_queries)  # XXX: could pass AND or OR here
+            # execute the query
+            # subreq = build_subreq_from_single_query(request, flags)
+            # search = SearchBuilder.from_search(context, request, compound_query)
 
 
 def extract_filter_set_from_search_body(request, body):
@@ -1141,6 +1183,15 @@ def extract_filter_set_from_search_body(request, body):
                 raise HTTPBadRequest('Passed a bad value for flags: %s -- Expected a list.' % body[FILTER_BLOCKS])
             filter_set[FILTER_BLOCKS] = body[FILTER_BLOCKS]
         return filter_set
+
+
+@view_config(route_name='build_query', request_method='GET', permission='search')
+@debug_log
+def build_query(context, request):
+    """ Runs the query construction step of the search, returning the query as the response. """
+    search = SearchBuilder(context, request)
+    search._build_query()
+    return search.search.to_dict()
 
 
 @view_config(route_name='compound_search', request_method='POST', permission='search')

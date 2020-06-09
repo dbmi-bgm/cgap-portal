@@ -75,6 +75,27 @@ def simple_filter_set():
     }
 
 
+@pytest.fixture
+def standard_filter_set():
+    """ A filter set with two filter blocks and a flag """
+    return {
+        'type': 'Cohort',
+        'filter_blocks': [
+            {
+                'query': 'families.proband=GAPID8J9B9CR',
+                'flag_applied': True
+            },
+            {
+                'query': 'families.clinic_notes=xyz',
+                'flag_applied': True
+            }
+        ],
+        'flags': '?type=Cohort',
+        'project': 'hms-dbmi',
+        'institution': 'hms-dbmi'
+    }
+
+
 def test_filter_set_barebones(setup_for_filter_sets, post_dummy_variant, barebones_filter_set):
     """ Tests posting a filter set and executing it through the /compound_search route """
     testapp = setup_for_filter_sets
@@ -100,7 +121,6 @@ def test_filter_set_simple(workbook, testapp, post_dummy_variant, simple_filter_
     uuid = res['@graph'][0]['@id']
     testapp.post_json('/index', {})
 
-
     # execute given filter_blocks only
     compound_search_res = testapp.post_json('/compound_search', {
                                                 'filter_blocks': [{
@@ -114,5 +134,27 @@ def test_filter_set_simple(workbook, testapp, post_dummy_variant, simple_filter_
     compound_search_res = testapp.post_json('/compound_search', {'flags': '?type=project'}).json['@graph']
     assert len(compound_search_res) == 2
 
-    # XXX: This logic is TODO
-    #compound_search_res = testapp.post_json('/compound_search', {'@id': uuid})
+    # execute the same search using filter_blocks and flags
+    compound_search_res = testapp.post_json('/compound_search', {
+        'filter_blocks': [{
+            'query': 'CHROM=1',
+            'flag_applied': True
+        }],
+        'flags': 'type=variant'
+    }).json['@graph']
+    assert len(compound_search_res) == 1
+
+    # do similar search with @id
+    compound_search_res = testapp.post_json('/compound_search', {'@id': uuid}).json['@graph']
+    assert len(compound_search_res) == 3
+
+
+def test_filter_set_complete(workbook, testapp, standard_filter_set):
+    """ Executes a filter set with multiple filter blocks """
+    res = testapp.post_json(FILTER_SET_URL, standard_filter_set, status=201).json
+    uuid = res['@graph'][0]['@id']
+
+    # execute the more complicated filter_set by @id
+    compound_search_res = testapp.post_json('/compound_search', {'@id': uuid}).json['@graph']
+    #assert len(compound_search_res) == 2  # will be the correct answer
+

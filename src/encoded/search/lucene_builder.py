@@ -809,3 +809,27 @@ class LuceneBuilder:
         if not found:
             log.error('SEARCH: Did not locate principals_allowed.view on search query body: %s' % search_dict)
             raise HTTPBadRequest('The search failed - the DCIC team has been notified.')
+
+    @classmethod
+    def compound_search(cls, sub_queries, intersect=False):
+        """  Takes an array of sub-queries and merges them into one query
+
+        :param sub_queries: list of query to be combined, typically starting with "bool"
+        :param intersect: whether or not to intersect the sub-queries
+        :return: lucene query combining the sub_queries with OR
+        """
+        if not intersect:
+            key = SHOULD
+        else:
+            key = MUST
+
+        query = {
+            'query': {
+                'bool': {
+                    key: []
+                }
+            }
+        }
+        for q in sub_queries:
+            query['query']['bool'][key].append(q)
+        return query
