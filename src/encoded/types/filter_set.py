@@ -2,6 +2,10 @@ from snovault import collection, load_schema, calculated_property
 from .base import Item
 
 
+FLAGS = 'flags'
+FILTER_BLOCKS = 'filter_blocks'
+
+
 @collection(
     name='filter-sets',
     properties={

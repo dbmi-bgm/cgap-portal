@@ -5,6 +5,7 @@ import itertools
 import uuid
 import structlog
 from pyramid.view import view_config
+from pyramid.request import Request
 from webob.multidict import MultiDict
 from functools import reduce
 from elasticsearch_dsl import Search
@@ -28,6 +29,7 @@ from .lucene_builder import LuceneBuilder
 from .search_utils import (find_nested_path, schema_for_field, get_es_index, get_es_mapping,
                            execute_search, make_search_subreq, NESTED, COMMON_EXCLUDED_URI_PARAMS,
 )
+from ..types.filter_set import FLAGS, FILTER_BLOCKS
 
 
 log = structlog.getLogger(__name__)
@@ -1051,50 +1053,38 @@ class SearchBuilder:
         return self.get_response()
 
 
-class CompoundSearchBuilder:
-    """ Encapsulates multiple search queries represented as SearchBuilder objects.
-        The idea is this object is boot-strapped/executed in the "execute" filter_set action.
-    """
-
-    def __init__(self, context, request, search_type=None, return_generator=False, forced_type='Search',
-                 custom_aggregations=None):
-        self.context = context
-        self.request = request
-        self.search_type = search_type
-        self.return_generator = return_generator
-        self.forced_type = forced_type
-        self.custom_aggregations = custom_aggregations
-        self.filter_blocks = []
-        self.flags = None
-        self._search = None
-
-    def extract_query_from_filter_set(self):
-        """ The page viewing the filter_set passes the filter_set object on the request, so
-            grab and break apart here.
-
-            XXX: This will look different based on what we decide for the front-end, revisit if needed
-        """
-        _uuid = self.request.params.get('filter_set')
-        filter_set = get_item_or_none(self.request, _uuid)
-        filter_blocks = filter_set.get('filter_blocks', [])
-        for filter_block in filter_blocks:
-            self.filter_blocks.append(filter_block)  # add the filter block
-        if 'flags' in filter_set:
-            self.flags = filter_set['flags']
-
-    def construct_query(self):
-        """ Calls out to LuceneBuilder to construct an elasticsearch-dsl search object that will
-            execute the given filter_set params.
-        """
-        pass  # XXX: call to LuceneBuilder
-
-
 @view_config(route_name='search', request_method='GET', permission='search')
 @debug_log
 def search(context, request, search_type=None, return_generator=False, forced_type='Search', custom_aggregations=None):
     """ Search view connects to ElasticSearch and returns the results """
     search_builder = SearchBuilder(context, request, search_type, return_generator, forced_type, custom_aggregations)
     return search_builder._search()
+
+
+def transfer_request_permissions(parent_request, sub_request):
+    """ Copies over the REMOTE_USER field from the parent request to the sub_request. This is a critical
+        action that must be done to properly execute the sub_request with permissions. It is possible more
+        things need to be done.
+
+    :param parent_request: parent_request who possesses permissions
+    :param sub_request: request who requires the permissions of the parent request
+    """
+    sub_request.environ['REMOTE_USER'] = parent_request.environ['REMOTE_USER']
+
+
+def build_subreq_from_single_query(request, query):
+    """ Builds a Request object that is a proper sub-request of the given request.
+        Passes flags directly as query string params. Intended for use with search.
+
+    :param request: request to build off of
+    :param query: search query
+    :return: new Request
+    """
+    if '?' not in query:  # do some sanitization
+        query = '?' + query
+    subreq = Request.blank('/search/' + query)
+    transfer_request_permissions(request, subreq)  # VERY IMPORTANT - Will
+    return subreq
 
 
 def execute_filter_set(context, request, filter_set, search_type=None, return_generator=False,
@@ -1109,24 +1099,48 @@ def execute_filter_set(context, request, filter_set, search_type=None, return_ge
     filter_blocks = filter_set.get('filter_blocks', [])
     flags = filter_set.get('flags', None)
 
-    import pdb; pdb.set_trace()
-
     # if we have no filter blocks, pass flags alone to search
     if not filter_blocks and flags:
-        return search(context, request)  # XXX: build request
+        subreq = build_subreq_from_single_query(request, flags)
+        return request.invoke_subrequest(subreq)
 
     # if we have only a single filter block with no flags, pass single filter_block to search
     elif not flags and len(filter_blocks) == 1:
-        if filter_blocks['flag_applied']:
-            return search(context, request)  # XXX: build request
+        block = filter_blocks[0]
+        if block['flag_applied']:
+            subreq = build_subreq_from_single_query(request, block['query'])
+            return request.invoke_subrequest(subreq)
         else:
-            return search(context, request)  # this one should be fine
+            return search(context, request)  # Re-direct to ?type=Item (all) search
 
-    # do query construction, merging
+    # do query construction
     else:
         pass  # XXX: implement this
 
     return {}
+
+
+def extract_filter_set_from_search_body(request, body):
+    """ Validates the compound_search POST request body, returning a dictionary filter_set item.
+        XXX: Test (and should HTTPBadRequest be thrown here?)
+
+    :param request: current request
+    :param body: body of POST request (in JSON)
+    :return: a filter_set, to be executed
+    """
+    if '@id' in body:  # prioritize @id
+        return get_item_or_none(request, body['@id'])
+    else:
+        filter_set = {}
+        if FLAGS in body:
+            if not isinstance(body[FLAGS], str):
+                raise HTTPBadRequest('Passed a bad value for flags: %s -- Expected a string.' % body[FLAGS])
+            filter_set[FLAGS] = body[FLAGS]
+        if FILTER_BLOCKS in body:
+            if not isinstance(body[FILTER_BLOCKS], list):
+                raise HTTPBadRequest('Passed a bad value for flags: %s -- Expected a list.' % body[FILTER_BLOCKS])
+            filter_set[FILTER_BLOCKS] = body[FILTER_BLOCKS]
+        return filter_set
 
 
 @view_config(route_name='compound_search', request_method='POST', permission='search')
@@ -1136,9 +1150,7 @@ def compound_search(context, request, search_type=None, return_generator=False,
     """ Executes a compound_search given a uuid of a filter_set (or filter_set props, tbd) """
     # XXX: construct a compound search, execute and return response
     body = json.loads(request.body)
-    if '@id' not in body:
-        raise HTTPBadRequest('Request body does not contain a filter_set uuid!')
-    filter_set = get_item_or_none(request, body['@id'])
+    filter_set = extract_filter_set_from_search_body(request, body)
     return execute_filter_set(context, request, filter_set, search_type=None, return_generator=False,
                               forced_type='Search', custom_aggregations=None)
 

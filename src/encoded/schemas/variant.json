@@ -3,7 +3,11 @@
     "type": "object",
     "required": [
         "institution",
-        "project"
+        "project",
+        "CHROM",
+        "POS",
+        "REF",
+        "ALT"
     ],
     "identifyingProperties": [
         "uuid",

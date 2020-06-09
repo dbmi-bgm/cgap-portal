@@ -26,7 +26,7 @@
             "title": "Item Type",
             "description": "Item type that the filter set will work on.",
             "type": "string",
-            "enum": ["VariantSample", "Cohort"]
+            "enum": ["Variant", "VariantSample", "Cohort"]
         },
         "filter_blocks": {
             "title": "Filter Blocks",
