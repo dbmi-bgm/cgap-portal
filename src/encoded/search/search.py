@@ -1102,8 +1102,8 @@ def compound_search(context, request,
                     search_type=None, return_generator=False,
                     forced_type='Search', custom_aggregations=None):
     """ Executes a compound_search given a uuid of a filter_set (or filter_set props, tbd) """
-    pass  # XXX: construct a compound search, execute and return response
-
+    import pdb; pdb.set_trace()  # XXX: construct a compound search, execute and return response
+    return {}
 
 
 @view_config(context=AbstractCollection, permission='list', request_method='GET')

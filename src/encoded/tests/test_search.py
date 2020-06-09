@@ -11,7 +11,7 @@ from snovault.elasticsearch.indexer_utils import get_namespaced_index
 from snovault.util import add_default_embeds
 
 # Use workbook fixture from BDD tests (including elasticsearch)
-from .workbook_fixtures import app_settings, app, workbook
+from .workbook_fixtures import app, workbook
 
 pytestmark = [pytest.mark.working, pytest.mark.schema, pytest.mark.indexing]
 

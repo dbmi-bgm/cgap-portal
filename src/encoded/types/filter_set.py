@@ -1,5 +1,6 @@
 from snovault import collection, load_schema, calculated_property
 from .base import Item
+from ..search.search import SearchBuilder
 
 
 @collection(
@@ -16,7 +17,7 @@ class FilterSet(Item):
     name_key = 'filter_set'
     embedded_list = []
 
-    def execute(self):
+    def execute(self, context, request, filter_blocks, flags):
         """ Invokes the execute action on this filter set, which effectively is:
             For each filter_block:
                 AND with all other filter blocks (if applied)
@@ -24,7 +25,10 @@ class FilterSet(Item):
 
             The idea is to provide a button the filter set view to 'execute' a filter set.
         """
-        pass  # XXX: invoke search.py
+        for filter in filter_blocks:
+            import pdb; pdb.set_trace()
+        search_builder = SearchBuilder(context, request, skip_bootstrap=True)
+        return {}
 
 
 @calculated_property(context=FilterSet, category='action')

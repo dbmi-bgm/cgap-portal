@@ -32,5 +32,6 @@ _app_settings = {
     'file_upload_profile_name': 'test-profile',
 }
 
+
 def make_app_settings_dictionary():
     return _app_settings.copy()
