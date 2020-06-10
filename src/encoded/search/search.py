@@ -18,6 +18,7 @@ from snovault import (
     TYPES,
     COLLECTIONS,
 )
+from snovault.embed import make_subrequest  # XXX: Should I be using this method? -Will
 from snovault.elasticsearch import ELASTIC_SEARCH
 from snovault.elasticsearch.create_mapping import determine_if_is_date_field
 from snovault.util import (
@@ -54,13 +55,8 @@ class SearchBuilder:
             1. Take state and use it to generate new state in the initializer.
             2. Functions that operate at the "leaf" and do not require state.
 
-        All other classes interact with and modify the state of this class, rather than passing that
-        state around.
-
-        You can think of this class like a wrapper around a less user-friendly
-        API. Using this class will allow you to get a basic grasp of what's going on. The details
-        are in the external methods. Hopefully at some point all functions can be refactored, but
-        for now there are just "entry points" needed for filter_sets. - Will 5/27/2020
+        The point is to split apart logic needed for query construction with logic needed for the
+        API itself. Search is by far our most complicated API, thus there is a lot of state.
     """
 
     def __init__(self, context, request, search_type=None, return_generator=False, forced_type='Search',
@@ -68,6 +64,16 @@ class SearchBuilder:
         self.context = context  # request context
         self.request = request  # request who requested a search
         self.response = {}
+
+        # setup needed regardless of whether we are building from a base query or building a new one
+        # from params
+        self.types = self.request.registry[TYPES]  # all types in the system
+        self.doc_types = self.set_doc_types(self.request, self.types, search_type)  # doc_types for this search
+        self.es = self.request.registry[ELASTIC_SEARCH]  # handle to remote ES
+        self.es_index = get_es_index(self.request, self.doc_types)  # what index we are searching on
+        self.search = Search(using=self.es, index=self.es_index)
+
+        # skip setup needed for building the query, if desired
         if not skip_bootstrap:
             self._bootstrap_query(search_type, return_generator, forced_type, custom_aggregations)
 
@@ -76,7 +82,6 @@ class SearchBuilder:
         self.from_ = None
         self.size = None
         self.facets = None
-        self.search = None
         self.search_session_id = None
         self.string_query = None
 
@@ -85,13 +90,10 @@ class SearchBuilder:
         """ Helper method that will bootstrap metadata necessary for building a search query. """
         self.return_generator = return_generator  # whether or not this search should return a generator
         self.custom_aggregations = custom_aggregations  # any custom aggregations on this search
-        self.types = self.request.registry[TYPES]  # all types in the system
         self.forced_type = forced_type  # (mostly deprecated) search type
         self.principals = self.request.effective_principals  # permissions to apply to this search
-        self.es = self.request.registry[ELASTIC_SEARCH]  # handle to remote ES
 
         # Initialized via outside function call
-        self.doc_types = self.set_doc_types(self.request, self.types, search_type)  # doc_types for this search
         self.schemas = [self.types[item_type].schema for item_type in self.doc_types]  # schemas for doc_types
         self.search_types = self.build_search_types(self.types, self.doc_types) + [
             self.forced_type]  # item_type hierarchy we are searching on
@@ -102,7 +104,6 @@ class SearchBuilder:
             self.request)  # handles resolving search term path on mapping (naively)
 
         # API Calls
-        self.es_index = get_es_index(self.request, self.doc_types)  # what index we are searching on
         self.item_type_es_mapping = get_es_mapping(self.es, self.es_index)  # mapping for the item type we are searching
 
     @classmethod
@@ -118,7 +119,7 @@ class SearchBuilder:
         result = cls(context, request, skip_bootstrap=True)  # bypass bootstrap
         result.from_ = from_
         result.size = size
-        result.search = search
+        result.search.update_from_dict(search)
         return result
 
     @staticmethod
@@ -690,7 +691,6 @@ class SearchBuilder:
             to build intermediary structures and LuceneBuilder function calls to handle building
             the actual Elasticsearch query.
         """
-        self.search = Search(using=self.es, index=self.es_index)
         self.build_query(sorted(self.list_source_fields()))
         self.set_sort_order()
 
@@ -1071,6 +1071,7 @@ def transfer_request_permissions(parent_request, sub_request):
     :param sub_request: request who requires the permissions of the parent request
     """
     sub_request.environ['REMOTE_USER'] = parent_request.environ['REMOTE_USER']
+    sub_request.registry = parent_request.registry  # transfer registry as well
 
 
 def build_subreq_from_single_query(request, query, route='/search/'):
@@ -1100,6 +1101,20 @@ def combine_flags_and_block(flags, block):
     return '&'.join([flags, block])
 
 
+def format_filter_set_results(es_results):
+    """ Formats es_results from filter_set into a dictionary containing total and @graph """
+    if es_results['hits']['total'] == 0:
+        return {
+            'total': 0,
+            '@graph': []
+        }
+    else:
+        return {
+            'total': es_results['hits']['total'],
+            '@graph': es_results['hits']['hits']
+        }
+
+
 def execute_filter_set(context, request, filter_set, search_type=None, return_generator=False,
                        forced_type='Search', custom_aggregations=None):
     """ Executes the given filter set, which effectively is:
@@ -1111,6 +1126,10 @@ def execute_filter_set(context, request, filter_set, search_type=None, return_ge
     """
     filter_blocks = filter_set.get('filter_blocks', [])
     flags = filter_set.get('flags', None)
+    t = filter_set.get('type', None)
+
+    if not t:
+        raise HTTPBadRequest('Tried to execute a filter_set without a type!')
 
     # if we have no filter blocks, pass flags alone to search
     if not filter_blocks and flags:
@@ -1124,7 +1143,7 @@ def execute_filter_set(context, request, filter_set, search_type=None, return_ge
             subreq = build_subreq_from_single_query(request, block['query'])
             return request.invoke_subrequest(subreq)
         else:
-            return search(context, request)  # Re-direct to ?type=Item (all) search
+            return search(context, request)  # noqa Re-direct to ?type=Item (all) search
 
     # if given flags and single filter block, combine and pass
     elif flags and len(filter_blocks) == 1:
@@ -1155,11 +1174,12 @@ def execute_filter_set(context, request, filter_set, search_type=None, return_ge
             subreq = build_subreq_from_single_query(request, flags)
             return request.invoke_subrequest(subreq)
 
-        else:
+        else:  # build, execute compound query and return a response with @graph containing results
             compound_query = LuceneBuilder.compound_search(sub_queries)  # XXX: could pass AND or OR here
-            # execute the query
-            # subreq = build_subreq_from_single_query(request, flags)
-            # search = SearchBuilder.from_search(context, request, compound_query)
+            subreq = build_subreq_from_single_query(request, ('?type=' + t))
+            search = SearchBuilder.from_search(context, subreq, compound_query)  # from, to passed here
+            es_results = execute_search(subreq, search.search)
+            return format_filter_set_results(es_results)
 
 
 def extract_filter_set_from_search_body(request, body):
@@ -1174,6 +1194,10 @@ def extract_filter_set_from_search_body(request, body):
         return get_item_or_none(request, body['@id'])
     else:
         filter_set = {}
+        if 'type' in body:
+            filter_set['type'] = body['type']
+        else:
+            raise HTTPBadRequest('Tried to execute a filter_set without specifying a type!')
         if FLAGS in body:
             if not isinstance(body[FLAGS], str):
                 raise HTTPBadRequest('Passed a bad value for flags: %s -- Expected a string.' % body[FLAGS])

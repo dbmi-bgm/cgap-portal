@@ -7,6 +7,7 @@ from .workbook_fixtures import app, workbook
 pytestmark = [pytest.mark.working, pytest.mark.schema]
 FILTER_SET_URL = '/filter_set'
 COHORT_URL = '/cohort'
+VARIANT_URL = '/variant'
 
 
 @pytest.yield_fixture(scope='module')
@@ -34,9 +35,8 @@ def setup_for_filter_sets(elasticsearch_testapp, project, institution):
 
 
 @pytest.fixture
-def post_dummy_variant(setup_for_filter_sets):
-    elasticsearch_testapp = setup_for_filter_sets
-    elasticsearch_testapp.post_json('/variant', {
+def dummy_variant():
+    return {
         'project': 'encode-project',
         'institution': 'encode-institution',
         'CHROM': "1",
@@ -44,7 +44,13 @@ def post_dummy_variant(setup_for_filter_sets):
         'REF': 'A',
         'ALT': 'G',
         'uuid': 'cedff838-99af-4936-a0ae-4dfc63ba8bf4'
-    }, status=201)
+    }
+
+
+@pytest.fixture
+def post_dummy_variant(setup_for_filter_sets, dummy_variant):
+    elasticsearch_testapp = setup_for_filter_sets
+    elasticsearch_testapp.post_json('/variant', dummy_variant, status=201)
 
 
 @pytest.fixture
@@ -108,15 +114,22 @@ def test_filter_set_barebones(setup_for_filter_sets, post_dummy_variant, barebon
     assert len(compound_search_res) == 1
 
     # execute given flags only
-    compound_search_res = testapp.post_json('/compound_search', {'flags': '?type=project'}).json['@graph']
+    compound_search_res = testapp.post_json('/compound_search', {
+        'flags': '?type=project',
+        'type': 'Project'  # NOTE: will work since we are not actually validating this
+    }).json['@graph']
     assert len(compound_search_res) == 1
 
     # do it again, this time with a type that will return 404
-    testapp.post_json('/compound_search', {'flags': '?type=gene'}, status=404)
+    testapp.post_json('/compound_search', {
+        'flags': '?type=gene',
+        'type': 'Gene'
+    }, status=404)
 
 
-def test_filter_set_simple(workbook, testapp, post_dummy_variant, simple_filter_set):
+def test_filter_set_simple(workbook, testapp, simple_filter_set, dummy_variant):
     """ Test posting a non-trivial (but simple) filter set """
+    #testapp.post_json(VARIANT_URL, dummy_variant, status=201)
     res = testapp.post_json(FILTER_SET_URL, simple_filter_set, status=201).json
     uuid = res['@graph'][0]['@id']
     testapp.post_json('/index', {})
@@ -126,12 +139,16 @@ def test_filter_set_simple(workbook, testapp, post_dummy_variant, simple_filter_
                                                 'filter_blocks': [{
                                                     'query': 'type=variant&CHROM=1',
                                                     'flag_applied': True
-                                                }]
+                                                }],
+                                                'type': 'Variant'
                                             }).json['@graph']
     assert len(compound_search_res) == 1
 
     # execute given flags only
-    compound_search_res = testapp.post_json('/compound_search', {'flags': '?type=project'}).json['@graph']
+    compound_search_res = testapp.post_json('/compound_search', {
+        'flags': '?type=project',
+        'type': 'Project'
+    }).json['@graph']
     assert len(compound_search_res) == 2
 
     # execute the same search using filter_blocks and flags
@@ -140,7 +157,8 @@ def test_filter_set_simple(workbook, testapp, post_dummy_variant, simple_filter_
             'query': 'CHROM=1',
             'flag_applied': True
         }],
-        'flags': 'type=variant'
+        'flags': 'type=variant',
+        'type': 'Variant'
     }).json['@graph']
     assert len(compound_search_res) == 1
 
@@ -156,5 +174,4 @@ def test_filter_set_complete(workbook, testapp, standard_filter_set):
 
     # execute the more complicated filter_set by @id
     compound_search_res = testapp.post_json('/compound_search', {'@id': uuid}).json['@graph']
-    #assert len(compound_search_res) == 2  # will be the correct answer
-
+    assert len(compound_search_res) == 2  # will be the correct answer
