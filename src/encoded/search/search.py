@@ -1063,6 +1063,9 @@ def search(context, request, search_type=None, return_generator=False, forced_ty
 
 
 class CompoundSearchBuilder:
+    """ Encapsulates methods needed to run a compound search, in other words an
+        AND or an OR query combining a set of queries.
+    """
 
     @staticmethod
     def transfer_request_permissions(parent_request, sub_request):
@@ -1094,7 +1097,7 @@ class CompoundSearchBuilder:
 
     @staticmethod
     def combine_flags_and_block(flags, block):
-        """ Builds a single URL query from the given flags and blocks
+        """ Builds a single URL query from the given flags and blocks.
 
         :param flags: flags, usually ? prefixed
         :param block: blocks to add to it
@@ -1105,7 +1108,13 @@ class CompoundSearchBuilder:
 
     @staticmethod
     def format_filter_set_results(request, es_results):
-        """ Formats es_results from filter_set into a dictionary containing total and @graph """
+        """ Formats es_results from filter_set into a dictionary containing total and @graph,
+            setting status on the request if needed.
+
+        :param request: current request
+        :param es_results: response from ES
+        :return: dictionary response
+        """
         if es_results['hits']['total'] == 0:
             request.response.status_code = 404
             return {
