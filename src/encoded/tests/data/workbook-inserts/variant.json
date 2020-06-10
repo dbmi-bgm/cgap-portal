@@ -52,5 +52,14 @@
     ],
     "CHROM": "1",
     "rmsk_repname": "AluSq2"
+  },
+  {
+    "project": "hms-dbmi",
+    "institution": "hms-dbmi",
+    "uuid": "cedff838-99af-4936-a0ae-4dfc63ba8bf4",
+    "CHROM": "1",
+    "POS": 88832,
+    "REF": "A",
+    "ALT": "G"
   }
 ]
