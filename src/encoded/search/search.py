@@ -1117,12 +1117,14 @@ def format_filter_set_results(es_results):
 
 def execute_filter_set(context, request, filter_set, search_type=None, return_generator=False,
                        forced_type='Search', custom_aggregations=None):
-    """ Executes the given filter set, which effectively is:
-        For each filter_block:
-            AND with all other filter blocks (if applied)
-        AND 'flags'
+    """ Executes the given filter_set. A filter_set with respect to this function is just a dictionary
+        containing the following things:
+            1. 'type' is the item type we are executing on. Required.
+            2. 'filter_blocks' contains the filter blocks we would like to apply
+            3. 'flags' contains the query to be combined with all filter_blocks
 
-        The idea is to provide a button the filter set view to 'execute' a filter set.
+            NOTE: if neither 'flags' nor 'filter_blocks' is specified then a generic type=Item
+            search will be executed.
     """
     filter_blocks = filter_set.get('filter_blocks', [])
     flags = filter_set.get('flags', None)

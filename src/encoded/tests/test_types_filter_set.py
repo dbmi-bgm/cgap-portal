@@ -127,9 +127,8 @@ def test_filter_set_barebones(setup_for_filter_sets, post_dummy_variant, barebon
     }, status=404)
 
 
-def test_filter_set_simple(workbook, testapp, simple_filter_set, dummy_variant):
+def test_filter_set_simple(workbook, testapp, simple_filter_set):
     """ Test posting a non-trivial (but simple) filter set """
-    #testapp.post_json(VARIANT_URL, dummy_variant, status=201)
     res = testapp.post_json(FILTER_SET_URL, simple_filter_set, status=201).json
     uuid = res['@graph'][0]['@id']
     testapp.post_json('/index', {})
@@ -142,7 +141,7 @@ def test_filter_set_simple(workbook, testapp, simple_filter_set, dummy_variant):
                                                 }],
                                                 'type': 'Variant'
                                             }).json['@graph']
-    assert len(compound_search_res) == 1
+    assert len(compound_search_res) == 4
 
     # execute given flags only
     compound_search_res = testapp.post_json('/compound_search', {
@@ -160,7 +159,7 @@ def test_filter_set_simple(workbook, testapp, simple_filter_set, dummy_variant):
         'flags': 'type=variant',
         'type': 'Variant'
     }).json['@graph']
-    assert len(compound_search_res) == 1
+    assert len(compound_search_res) == 4
 
     # do similar search with @id
     compound_search_res = testapp.post_json('/compound_search', {'@id': uuid}).json['@graph']
