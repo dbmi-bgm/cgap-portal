@@ -78,7 +78,8 @@ def complex_filter_set():
         ],
         'flags': '?type=Variant&CHROM=1',
         'project': 'hms-dbmi',
-        'institution': 'hms-dbmi'
+        'institution': 'hms-dbmi',
+        'uuid': '5145195f-c203-41be-9642-7ba6fb4bfb16'
     }
 
 
@@ -207,3 +208,35 @@ def test_filter_set_complex(workbook, testapp, complex_filter_set):
             break
     compound_search_res = testapp.post_json('/compound_search', filter_set).json['@graph']
     assert len(compound_search_res) == 2
+
+
+def test_filter_set_intersection(workbook, testapp, complex_filter_set):
+    """ Uses the complex filter set with an AND filter_set execution, which should be
+        functionally identical but will show slightly different results.
+    """
+    t = complex_filter_set['type']
+    filter_blocks = complex_filter_set['filter_blocks']
+    flags = complex_filter_set['flags']
+    filter_set = {
+        'type': t,
+        'filter_blocks': filter_blocks,
+        'flags': flags,
+        'intersect': True
+    }
+    testapp.post_json('/compound_search', filter_set, status=404)  # AND will eliminate all here
+
+    # toggle off the REF/ALT requirement, now 2 will match
+    for block in filter_blocks:
+        if 'REF' in block['query']:
+            block['flag_applied'] = False
+            break
+    compound_search_res = testapp.post_json('/compound_search', filter_set).json['@graph']
+    assert len(compound_search_res) == 2
+
+    # toggle off hg19 so all match
+    for block in filter_blocks:
+        if 'hg19' in block['query']:
+            block['flag_applied'] = False
+            break
+    compound_search_res = testapp.post_json('/compound_search', filter_set).json['@graph']
+    assert len(compound_search_res) == 4

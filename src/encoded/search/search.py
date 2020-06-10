@@ -1062,153 +1062,157 @@ def search(context, request, search_type=None, return_generator=False, forced_ty
     return search_builder._search()
 
 
-def transfer_request_permissions(parent_request, sub_request):
-    """ Copies over the REMOTE_USER field from the parent request to the sub_request. This is a critical
-        action that must be done to properly execute the sub_request with permissions. It is possible more
-        things need to be done.
+class CompoundSearchBuilder:
 
-    :param parent_request: parent_request who possesses permissions
-    :param sub_request: request who requires the permissions of the parent request
-    """
-    sub_request.environ['REMOTE_USER'] = parent_request.environ['REMOTE_USER']
-    sub_request.registry = parent_request.registry  # transfer registry as well
+    @staticmethod
+    def transfer_request_permissions(parent_request, sub_request):
+        """ Copies over the REMOTE_USER field from the parent request to the sub_request. This is a critical
+            action that must be done to properly execute the sub_request with permissions. It is possible more
+            things need to be done.
 
+        :param parent_request: parent_request who possesses permissions
+        :param sub_request: request who requires the permissions of the parent request
+        """
+        sub_request.environ['REMOTE_USER'] = parent_request.environ['REMOTE_USER']
+        sub_request.registry = parent_request.registry  # transfer registry as well
 
-def build_subreq_from_single_query(request, query, route='/search/'):
-    """ Builds a Request object that is a proper sub-request of the given request.
-        Passes flags directly as query string params. Intended for use with search.
+    @classmethod
+    def build_subreq_from_single_query(cls, request, query, route='/search/'):
+        """ Builds a Request object that is a proper sub-request of the given request.
+            Passes flags directly as query string params. Intended for use with search.
 
-    :param request: request to build off of
-    :param query: search query
-    :param route: route of sub-request to build
-    :return: new Request
-    """
-    if '?' not in query:  # do some sanitization
-        query = '?' + query
-    subreq = Request.blank(route + query)
-    transfer_request_permissions(request, subreq)  # VERY IMPORTANT - Will
-    return subreq
+        :param request: request to build off of
+        :param query: search query
+        :param route: route of sub-request to build
+        :return: new Request
+        """
+        if '?' not in query:  # do some sanitization
+            query = '?' + query
+        subreq = Request.blank(route + query)
+        cls.transfer_request_permissions(request, subreq)  # VERY IMPORTANT - Will
+        return subreq
 
+    @staticmethod
+    def combine_flags_and_block(flags, block):
+        """ Builds a single URL query from the given flags and blocks
 
-def combine_flags_and_block(flags, block):
-    """ Builds a single URL query from the given flags and blocks
+        :param flags: flags, usually ? prefixed
+        :param block: blocks to add to it
+        :return: combined query
+        """
+        # XXX: Something smarter probably needs to happen here, hence why this is a function -Will
+        return '&'.join([flags, block])
 
-    :param flags: flags, usually ? prefixed
-    :param block: blocks to add to it
-    :return: combined query
-    """
-    # XXX: Something smarter probably needs to happen here, hence why this is a function -Will
-    return '&'.join([flags, block])
+    @staticmethod
+    def format_filter_set_results(request, es_results):
+        """ Formats es_results from filter_set into a dictionary containing total and @graph """
+        if es_results['hits']['total'] == 0:
+            request.response.status_code = 404
+            return {
+                'total': 0,
+                '@graph': []
+            }
+        else:
+            return {
+                'total': es_results['hits']['total'],
+                '@graph': es_results['hits']['hits']
+            }
 
+    @classmethod
+    def execute_filter_set(cls, context, request, filter_set, search_type=None, return_generator=False,
+                           forced_type='Search', custom_aggregations=None, intersect=False):
+        """ Executes the given filter_set. This function contains the core functionality of the class.
+            A filter_set with respect to this function is just a dictionary containing the following things:
+                1. 'type' is the item type we are executing on. Required.
+                2. 'filter_blocks' contains the filter blocks we would like to apply
+                3. 'flags' contains the query to be combined with all filter_blocks
 
-def format_filter_set_results(es_results):
-    """ Formats es_results from filter_set into a dictionary containing total and @graph """
-    if es_results['hits']['total'] == 0:
-        return {
-            'total': 0,
-            '@graph': []
-        }
-    else:
-        return {
-            'total': es_results['hits']['total'],
-            '@graph': es_results['hits']['hits']
-        }
+                NOTE: if neither 'flags' nor 'filter_blocks' is specified then a generic type=Item
+                search will be executed.
+        """
+        filter_blocks = filter_set.get('filter_blocks', [])
+        flags = filter_set.get('flags', None)
+        t = filter_set.get('type', None)
 
+        if not t:
+            raise HTTPBadRequest('Tried to execute a filter_set without a type!')
 
-def execute_filter_set(context, request, filter_set, search_type=None, return_generator=False,
-                       forced_type='Search', custom_aggregations=None):
-    """ Executes the given filter_set. A filter_set with respect to this function is just a dictionary
-        containing the following things:
-            1. 'type' is the item type we are executing on. Required.
-            2. 'filter_blocks' contains the filter blocks we would like to apply
-            3. 'flags' contains the query to be combined with all filter_blocks
-
-            NOTE: if neither 'flags' nor 'filter_blocks' is specified then a generic type=Item
-            search will be executed.
-    """
-    filter_blocks = filter_set.get('filter_blocks', [])
-    flags = filter_set.get('flags', None)
-    t = filter_set.get('type', None)
-
-    if not t:
-        raise HTTPBadRequest('Tried to execute a filter_set without a type!')
-
-    # if we have no filter blocks, pass flags alone to search
-    if not filter_blocks and flags:
-        subreq = build_subreq_from_single_query(request, flags)
-        return request.invoke_subrequest(subreq)
-
-    # if we have only a single filter block with no flags, pass single filter_block to search
-    elif not flags and len(filter_blocks) == 1:
-        block = filter_blocks[0]
-        if block['flag_applied']:
-            subreq = build_subreq_from_single_query(request, block['query'])
+        # if we have no filter blocks, pass flags alone to search
+        if not filter_blocks and flags:
+            subreq = cls.build_subreq_from_single_query(request, flags)
             return request.invoke_subrequest(subreq)
-        else:
-            return search(context, request)  # noqa Re-direct to ?type=Item (all) search
 
-    # if given flags and single filter block, combine and pass
-    elif flags and len(filter_blocks) == 1:
-        block = filter_blocks[0]
-        if block['flag_applied']:
-            combined_query = combine_flags_and_block(flags, block['query'])
-            subreq = build_subreq_from_single_query(request, combined_query)
-        else:
-            subreq = build_subreq_from_single_query(request, flags)
-        return request.invoke_subrequest(subreq)
-
-    # Build the compound_query
-    else:
-        sub_queries = []
-        for block in filter_blocks:
-            if block['flag_applied']:  # only build sub_query if this block is applied
-                if flags:
-                    combined_query = combine_flags_and_block(flags, block['query'])
-                    subreq = build_subreq_from_single_query(request, combined_query, route='/build_query/')
-                else:
-                    subreq = build_subreq_from_single_query(request, block['query'], route='/build_query/')
-                sub_query = request.invoke_subrequest(subreq).json['query']
-                sub_queries.append(sub_query)
+        # if we have only a single filter block with no flags, pass single filter_block to search
+        elif not flags and len(filter_blocks) == 1:
+            block = filter_blocks[0]
+            if block['flag_applied']:
+                subreq = cls.build_subreq_from_single_query(request, block['query'])
+                return request.invoke_subrequest(subreq)
             else:
-                continue
+                return search(context, request)  # noqa Re-direct to ?type=Item (all) search
 
-        if len(sub_queries) == 0:  # if all blocks are disabled, just execute the flags
-            subreq = build_subreq_from_single_query(request, flags)
+        # if given flags and single filter block, combine and pass
+        elif flags and len(filter_blocks) == 1:
+            block = filter_blocks[0]
+            if block['flag_applied']:
+                combined_query = cls.combine_flags_and_block(flags, block['query'])
+                subreq = cls.build_subreq_from_single_query(request, combined_query)
+            else:
+                subreq = cls.build_subreq_from_single_query(request, flags)
             return request.invoke_subrequest(subreq)
 
-        else:  # build, execute compound query and return a response with @graph containing results
-            compound_query = LuceneBuilder.compound_search(sub_queries)  # XXX: could pass AND or OR here
-            subreq = build_subreq_from_single_query(request, ('?type=' + t))
-            search = SearchBuilder.from_search(context, subreq, compound_query)  # from, to passed here
-            es_results = execute_search(subreq, search.search)
-            return format_filter_set_results(es_results)
-
-
-def extract_filter_set_from_search_body(request, body):
-    """ Validates the compound_search POST request body, returning a dictionary filter_set item.
-        XXX: Test (and should HTTPBadRequest be thrown here?)
-
-    :param request: current request
-    :param body: body of POST request (in JSON)
-    :return: a filter_set, to be executed
-    """
-    if '@id' in body:  # prioritize @id
-        return get_item_or_none(request, body['@id'])
-    else:
-        filter_set = {}
-        if 'type' in body:
-            filter_set['type'] = body['type']
+        # Build the compound_query
         else:
-            raise HTTPBadRequest('Tried to execute a filter_set without specifying a type!')
-        if FLAGS in body:
-            if not isinstance(body[FLAGS], str):
-                raise HTTPBadRequest('Passed a bad value for flags: %s -- Expected a string.' % body[FLAGS])
-            filter_set[FLAGS] = body[FLAGS]
-        if FILTER_BLOCKS in body:
-            if not isinstance(body[FILTER_BLOCKS], list):
-                raise HTTPBadRequest('Passed a bad value for flags: %s -- Expected a list.' % body[FILTER_BLOCKS])
-            filter_set[FILTER_BLOCKS] = body[FILTER_BLOCKS]
-        return filter_set
+            sub_queries = []
+            for block in filter_blocks:
+                if block['flag_applied']:  # only build sub_query if this block is applied
+                    if flags:
+                        combined_query = cls.combine_flags_and_block(flags, block['query'])
+                        subreq = cls.build_subreq_from_single_query(request, combined_query, route='/build_query/')
+                    else:
+                        subreq = cls.build_subreq_from_single_query(request, block['query'], route='/build_query/')
+                    sub_query = request.invoke_subrequest(subreq).json['query']
+                    sub_queries.append(sub_query)
+                else:
+                    continue
+
+            if len(sub_queries) == 0:  # if all blocks are disabled, just execute the flags
+                subreq = cls.build_subreq_from_single_query(request, flags)
+                return request.invoke_subrequest(subreq)
+
+            else:  # build, execute compound query and return a response with @graph containing results
+                compound_query = LuceneBuilder.compound_search(sub_queries, intersect=intersect)
+                subreq = cls.build_subreq_from_single_query(request, ('?type=' + t))
+                search = SearchBuilder.from_search(context, subreq, compound_query)  # from, to passed here
+                es_results = execute_search(subreq, search.search)
+                return cls.format_filter_set_results(request, es_results)
+
+    @staticmethod
+    def extract_filter_set_from_search_body(request, body):
+        """ Validates the compound_search POST request body, returning a dictionary filter_set item.
+            XXX: Test (and should HTTPBadRequest be thrown here?)
+
+        :param request: current request
+        :param body: body of POST request (in JSON)
+        :return: a filter_set, to be executed
+        """
+        if '@id' in body:  # prioritize @id
+            return get_item_or_none(request, body['@id'])
+        else:
+            filter_set = {}
+            if 'type' in body:
+                filter_set['type'] = body['type']
+            else:
+                raise HTTPBadRequest('Tried to execute a filter_set without specifying a type!')
+            if FLAGS in body:
+                if not isinstance(body[FLAGS], str):
+                    raise HTTPBadRequest('Passed a bad value for flags: %s -- Expected a string.' % body[FLAGS])
+                filter_set[FLAGS] = body[FLAGS]
+            if FILTER_BLOCKS in body:
+                if not isinstance(body[FILTER_BLOCKS], list):
+                    raise HTTPBadRequest('Passed a bad value for flags: %s -- Expected a list.' % body[FILTER_BLOCKS])
+                filter_set[FILTER_BLOCKS] = body[FILTER_BLOCKS]
+            return filter_set
 
 
 @view_config(route_name='build_query', request_method='GET', permission='search')
@@ -1225,11 +1229,12 @@ def build_query(context, request):
 def compound_search(context, request, search_type=None, return_generator=False,
                     forced_type='Search', custom_aggregations=None):
     """ Executes a compound_search given a uuid of a filter_set (or filter_set props, tbd) """
-    # XXX: construct a compound search, execute and return response
     body = json.loads(request.body)
-    filter_set = extract_filter_set_from_search_body(request, body)
-    return execute_filter_set(context, request, filter_set, search_type=None, return_generator=False,
-                              forced_type='Search', custom_aggregations=None)
+    filter_set = CompoundSearchBuilder.extract_filter_set_from_search_body(request, body)
+    intersect = True if body.get('intersect', False) else False
+    return CompoundSearchBuilder.execute_filter_set(context, request, filter_set, search_type=search_type,
+                                                    return_generator=return_generator, forced_type=forced_type,
+                                                    custom_aggregations=custom_aggregations, intersect=intersect)
 
 
 @view_config(context=AbstractCollection, permission='list', request_method='GET')
