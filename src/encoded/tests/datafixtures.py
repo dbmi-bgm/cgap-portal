@@ -171,6 +171,7 @@ def grandpa(testapp, project, institution):
 @pytest.fixture
 def mother(testapp, project, institution, grandpa, female_individual):
     item = {
+        "aliases": ["test-project:indiv-003389"],
         "age": 33,
         "age_units": "year",
         'project': project['@id'],
