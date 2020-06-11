@@ -3,7 +3,7 @@ from pyramid.response import Response
 from pyramid.view import view_config
 from snovault.util import debug_log
 # from webtest import TestApp
-from dcicutils.misc_utils import VirtualApp
+from dcicutils.misc_utils import VirtualApp, VirtualAppError
 from dcicutils import ff_utils
 from webtest.app import AppError
 import ast
@@ -108,9 +108,11 @@ def fetch_individual_metadata(row, items, indiv_alias):
         'aliases': [indiv_alias],
         'individual_id': row['patient id'],
         'sex': row.get('sex'),
-        'age': row.get('age'),
-        'birth_year': row.get('birth year')
+        # 'age': int(row.get('age')),
+        # 'birth_year': int(row.get('birth year'))
     }
+    info['age'] = int(row['age']) if row.get('age') else None
+    info['birth_year'] = int(row['birth year']) if row.get('birth year') else None
     if indiv_alias not in new_items['individual']:
         new_items['individual'][indiv_alias] = {k: v for k, v in info.items() if v}
     else:
@@ -127,15 +129,15 @@ def fetch_family_metadata(row, items, indiv_alias, fam_alias):
         'family_id': row['family id'],
         'members': [indiv_alias]
     }
-    if row.get('relation to proband', '').lower() in ['proband', 'mother', 'father']:
-        info[row['relation to proband'].lower()] = indiv_alias
+    if row.get('relation to proband', '').lower() == 'proband':
+        info['proband'] = indiv_alias
     if fam_alias not in new_items['family']:
         new_items['family'][fam_alias] = info
     else:
         if indiv_alias not in new_items['family'][fam_alias]['members']:
             new_items['family'][fam_alias]['members'].append(indiv_alias)
-        if row.get('relation to proband', '').lower() not in new_items['family'][fam_alias]:
-            new_items['family'][fam_alias][row['relation to proband'].lower()] = indiv_alias
+        if row.get('relation to proband', '').lower() == 'proband' and 'proband' not in new_items['family'][fam_alias]:
+            new_items['family'][fam_alias]['proband'] = indiv_alias
     return new_items
 
 
@@ -191,35 +193,33 @@ def create_sample_processing_groups(items, sp_alias):
                 new_items['sample_processing'][sp_alias] = sp
     return new_items
 
+
 # NOT YET TESTED
 def compare_with_db(alias, virtualapp):
     try:  # check if already in db
-        # result = virtualapp.get(alias + '/?frame=object')
-        # result = virtualapp.get('/search/?type=Item&aliases={}'.format(alias))
-        result = virtualapp.get('/search/?type=Item&age=33')
-        print(result)
+        result = virtualapp.get(alias + '/?frame=object')
     except Exception as e:  # if not in db
-        print(e)
+        # print(e)
         if 'HTTPNotFound' in str(e):
             return None
     else:
         return result.json
 
 
+# TODO : Handle validation of not-yet-submitted-aliases in fields
 def validate_item(virtualapp, item, method, itemtype, atid=None):
     if method == 'post':
         #import pdb; pdb.set_trace()
         try:
-            validation = virtualapp.post_json('/{}/?checkonly=True'.format(itemtype), item)
-        except AppError as e:
-            print('exception')
+            validation = virtualapp.post_json('/{}/?check_only=true'.format(itemtype), item)
+        except (AppError, VirtualAppError) as e:
             return parse_exception(e)
         else:
             return
     elif method == 'patch':
         try:
-            validation = virtualapp.patch_json(atid + '?checkonly=True', item, status=200)
-        except Exception as e:
+            validation = virtualapp.patch_json(atid + '?check_only=true', item, status=200)
+        except (AppError, VirtualAppError) as e:
             return parse_exception(e)
         else:
             return
@@ -267,71 +267,77 @@ def validate_and_post(virtualapp, json_data, dryrun=False):
     json_data_final = {'post': {}, 'patch': {}}
     for itemtype in POST_ORDER:
         profile = virtualapp.get('/profiles/{}.json'.format(itemtype))
-        for alias in results[itemtype]:
-            result = compare_with_db(alias)
+        for alias in json_data[itemtype]:
+            # TODO : format fields (e.g. int, list, etc.)
+            result = compare_with_db(virtualapp, alias)
             if not result:
-                error = validate_item(results[itemtype][alias], 'post', itemtype)
+                error = validate_item(virtualapp, json_data[itemtype][alias], 'post', itemtype)
                 if error:  # modify to check for presence of validation errors
                     # do something to report validation errors
-                    errors.append(error)
+                    for e in error:
+                        errors.append('{} {} - Error found: {}'.format(itemtype, alias, e))
                 else:
-                    json_data_final['post'].setdefault(itemtype, default=[]).append(results[itemtype][alias])
+                    json_data_final['post'].setdefault(itemtype, [])
+                    json_data_final['post'][itemtype].append(json_data[itemtype][alias])
             else:
                 # patch if item exists in db
                 alias_dict[alias] = result['@id']
                 to_patch = {}
-                for field in results[itemtype][alias]:
+                for field in json_data[itemtype][alias]:
                     if field in links:
                         # look up atids of links
                         if profile['properties'][field]['type'] != 'array':
-                            for i, item in enumerate(results[itemtype][alias][field]):
+                            for i, item in enumerate(json_data[itemtype][alias][field]):
                                 if item in alias_dict:
-                                    results[itemtype][alias][field][i] = alias_dict[item]
+                                    json_data[itemtype][alias][field][i] = alias_dict[item]
                         elif profile['properties'][field]['type'] == 'string':
                             if item in alias_dict:
-                                results[itemtype][alias][field] = alias_dict[item]
+                                json_data[itemtype][alias][field] = alias_dict[item]
                     # if not an array, patch field gets overwritten (if different from db)
                     if profile['properties'][field]['type'] != 'array':
-                        if results[itemtype][alias][field] != result.get(field):
-                            to_patch[field] = results[itemtype][alias][field]
+                        if json_data[itemtype][alias][field] != result.get(field):
+                            to_patch[field] = json_data[itemtype][alias][field]
                     else:
                         # if array, patch field vals get added to what's in db
-                        if sorted(results[itemtype][alias][field]) != sorted(result.get(field, [])):
+                        if sorted(json_data[itemtype][alias][field]) != sorted(result.get(field, [])):
                             val = result.get(field, [])
-                            val.extend(results[itemtype][alias][field])
+                            val.extend(json_data[itemtype][alias][field])
                             to_patch[field] = list(set(val))
-                error = validate_item(to_patch, 'post', itemtype, atid=result['@id'])
+                error = validate_item(virtualapp, to_patch, 'post', itemtype, atid=result['@id'])
                 if error:  # modify to check for presence of validation errors
                     # do something to report validation errors
-                    errors.append(error)
+                    for e in error:
+                        errors.append('{} {} - Error found: {}'.format(itemtype, alias, e))
                 else:  # patch
                     json_data_final['patch'][result['@id']] = to_patch
                     # do something to record response
     if errors:
         return errors
-    output = []
-    item_names = {'individual': 'individual_id', 'family': 'family_id', 'sample': 'specimen_id'}
-    if json_data_final['post']:
-        for k, v in json_data_final['post'].items():
-            # also create Case and Report items for each SampleProcessing item created
-            for item in v:
-                for field in links:
-                    if field in item:
-                        json_data_final['patch'][item['aliases'][0]] = item[field]
-                        del item[field]
-                try:
-                    response = virtualapp.post_json('/' + k, item, status=201)
-                    aliasdict[item['aliases'][0]] = response.json['@graph'][0]['@id']
-                    if response.json['status'] == 'success' and k in item_names:
-                        output.append('Success - {} {} posted'.format(k, item[item_names[k]]))
-                except Exception:
-                    pass
-    for k, v in json_data_final['patch'].items():
-        atid = k if k.startswith('/') else aliasdict[k]
-        try:
-            response = testapp.patch_json(atid, v, status=200)
-        except Exception:
-            pass
+    else:
+        return 'All items validated'
+    # output = []
+    # item_names = {'individual': 'individual_id', 'family': 'family_id', 'sample': 'specimen_id'}
+    # if json_data_final['post']:
+    #     for k, v in json_data_final['post'].items():
+    #         # also create Case and Report items for each SampleProcessing item created
+    #         for item in v:
+    #             for field in links:
+    #                 if field in item:
+    #                     json_data_final['patch'][item['aliases'][0]] = item[field]
+    #                     del item[field]
+    #             try:
+    #                 response = virtualapp.post_json('/' + k, item, status=201)
+    #                 aliasdict[item['aliases'][0]] = response.json['@graph'][0]['@id']
+    #                 if response.json['status'] == 'success' and k in item_names:
+    #                     output.append('Success - {} {} posted'.format(k, item[item_names[k]]))
+    #             except Exception:
+    #                 pass
+    # for k, v in json_data_final['patch'].items():
+    #     atid = k if k.startswith('/') else aliasdict[k]
+    #     try:
+    #         response = testapp.patch_json(atid, v, status=200)
+    #     except Exception:
+    #         pass
 
 
 # This was just to see if i could post something using testapp in the python command line, currently works.
