@@ -42,7 +42,7 @@ def app_settings(request, wsgi_server_host_port, conn, DBSession):
 def es_app_settings(wsgi_server_host_port, elasticsearch_server, postgresql_server, aws_auth):
     settings = make_app_settings_dictionary()
     settings['create_tables'] = True
-    settings['persona.audiences'] = 'http://%s:%s' % wsgi_server_host_port
+    settings['persona.audiences'] = 'http://%s:%s' % wsgi_server_host_port  # 2-tuple such as: ('localhost', '5000')
     settings['elasticsearch.server'] = elasticsearch_server
     settings['sqlalchemy.url'] = postgresql_server
     settings['collection_datastore'] = 'elasticsearch'

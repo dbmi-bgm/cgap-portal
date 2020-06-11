@@ -684,7 +684,7 @@ class LuceneBuilder:
             field_schema = schema_for_field(field, request, doc_types, should_log=True)
             is_date_field = field_schema and determine_if_is_date_field(field, field_schema)
             is_numerical_field = field_schema and field_schema['type'] in ("integer", "float", "number")
-            query_field = get_query_field(field, facet, es_mapping)
+            query_field = get_query_field(field, facet)
             nested_path = find_nested_path(query_field, es_mapping)
 
             ## Create the aggregation itself, extend facet with info to pass down to front-end

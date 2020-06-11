@@ -64,7 +64,7 @@ class QueryConstructionException(SearchException):
     Query construction exception - throw this if we should throw an exception in query building
     due to invalid query params
     """
-    def __init__(self, query_type, func, msg=None):
+    def __init__(self, *, query_type, func, msg=None):
         if msg is None:
             msg = 'Exception occurred during query building at query type %s in func %s' % (query_type, func)
         super(QueryConstructionException, self).__init__(func=func, msg=msg)
@@ -119,17 +119,17 @@ def find_nested_path(field, es_mapping):
 def is_schema_field(field):
     """ Returns whether or not we should expect a schema to be found for the given field.
         Currently this only applies to validation_errors and aggregated_items.
-        XXX: Consider regex?
 
     :param field: field name to check
     :return: False if this field doesn't a schema, True otherwise
     """
+    # XXX: Consider doing this with regex? - Will 6/11/2020
     if field.startswith('validation_errors') or field.startswith('aggregated_items'):  # note that trailing '.' is gone
         return False
     return True
 
 
-def extract_field(field):
+def extract_field_name(field):
     """ Pre-processes 'field' from URL query params. Solely handles converting 'type' to '@type' and
         discarding the not (!) qualifier.
 
@@ -172,7 +172,7 @@ def schema_for_field(field, request, doc_types, should_log=False):
     # for 'validation_errors.*' and 'aggregated_items.*',
     # schema will never be found and logging isn't helpful
     if schemas and is_schema_field(field):
-        use_field = extract_field(field)
+        use_field = extract_field_name(field)
         for schema in schemas:
             try:
                 field_schema = crawl_schema(types, use_field, schema)
@@ -190,7 +190,7 @@ def schema_for_field(field, request, doc_types, should_log=False):
     return field_schema
 
 
-def get_query_field(field, facet, es_mapping):
+def get_query_field(field, facet):
     """
     Converts a field from its generic field name to a more specific field name referencing its embedded nature
 
