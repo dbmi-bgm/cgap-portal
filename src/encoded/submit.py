@@ -207,27 +207,27 @@ def compare_with_db(alias, virtualapp):
 
 
 # TODO : Handle validation of not-yet-submitted-aliases in fields
-def validate_item(virtualapp, item, method, itemtype, atid=None):
+def validate_item(virtualapp, item, method, itemtype, aliases, atid=None):
     if method == 'post':
         #import pdb; pdb.set_trace()
         try:
             validation = virtualapp.post_json('/{}/?check_only=true'.format(itemtype), item)
         except (AppError, VirtualAppError) as e:
-            return parse_exception(e)
+            return parse_exception(e, aliases)
         else:
             return
     elif method == 'patch':
         try:
             validation = virtualapp.patch_json(atid + '?check_only=true', item, status=200)
         except (AppError, VirtualAppError) as e:
-            return parse_exception(e)
+            return parse_exception(e, aliases)
         else:
             return
     else:
         raise ValueError("Unrecognized method -- must be 'post' or 'patch'")
 
 
-def parse_exception(e):
+def parse_exception(e, aliases):
     """ff_utils functions raise an exception when the expected code is not returned.
     This response is a pre-formatted text, and this function will get the resonse json
     out of it. [Adapted from Submit4DN]"""
@@ -235,8 +235,14 @@ def parse_exception(e):
         # try parsing the exception
         text = e.args[0]
         resp_text = text[text.index('{'):-1]
-        resp_text = json.loads(resp_text.replace('\\', ''))
-        resp_list = [error['description'] for error in resp_text['errors']]
+        resp_dict = json.loads(resp_text.replace('\\', ''))
+        if resp_dict.get('description') == 'Failed validation':
+            resp_list = [error['description'] for error in resp_dict['errors']]
+            for error in resp_list:
+            # if error is caused by linkTo to item not submitted yet but in aliases list,
+            # remove that error
+                if 'not found' in error and error.split("'")[1] in aliases:
+                    resp_list.remove(error)
         return resp_list
     # if not re-raise
     except:  # pragma: no cover
@@ -260,10 +266,23 @@ def validate_and_post(virtualapp, json_data, dryrun=False):
     1. looks up each item in json
     2. if item in db, will validate and patch any different metadata
     3. if item not in db, will post item
+
+    Current status:
+    Still testing validation/data organization parts - patch/post part hasn't been fully
+    written or tested and need to add code to create Case/Report items.
+    
+    More notes:
+    Case and Report items to be created at end. We don't want them in the validation report, since
+    they are not part of the user's spreadsheet and validation error messages would be too confusing.
+    We only want to create these when we are sure no validation issues in other items exist.
+    Spreadsheet has no Case ID, but if there is an "analysis ID" then we can create a Case ID from this
+    (perhaps analysis ID + indiv ID + label indicating group/trio vs solo)
+    Report ID can be same as case ID but with "report" appended (?)
     '''
     alias_dict = {}
     links = ['samples', 'members', 'mother', 'father', 'proband']
     errors = []
+    all_aliases = [k for itype in json_data for k in itype]
     json_data_final = {'post': {}, 'patch': {}}
     for itemtype in POST_ORDER:
         profile = virtualapp.get('/profiles/{}.json'.format(itemtype))
@@ -271,7 +290,7 @@ def validate_and_post(virtualapp, json_data, dryrun=False):
             # TODO : format fields (e.g. int, list, etc.)
             result = compare_with_db(virtualapp, alias)
             if not result:
-                error = validate_item(virtualapp, json_data[itemtype][alias], 'post', itemtype)
+                error = validate_item(virtualapp, json_data[itemtype][alias], 'post', itemtype, all_aliases)
                 if error:  # modify to check for presence of validation errors
                     # do something to report validation errors
                     for e in error:
@@ -303,7 +322,7 @@ def validate_and_post(virtualapp, json_data, dryrun=False):
                             val = result.get(field, [])
                             val.extend(json_data[itemtype][alias][field])
                             to_patch[field] = list(set(val))
-                error = validate_item(virtualapp, to_patch, 'post', itemtype, atid=result['@id'])
+                error = validate_item(virtualapp, to_patch, 'post', itemtype, all_aliases, atid=result['@id'])
                 if error:  # modify to check for presence of validation errors
                     # do something to report validation errors
                     for e in error:
@@ -315,6 +334,7 @@ def validate_and_post(virtualapp, json_data, dryrun=False):
         return errors
     else:
         return 'All items validated'
+    # TODO : create case and report items here - skip validation part because they are not part of user's spreadsheet
     # output = []
     # item_names = {'individual': 'individual_id', 'family': 'family_id', 'sample': 'specimen_id'}
     # if json_data_final['post']:
