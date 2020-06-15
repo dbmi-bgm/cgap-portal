@@ -140,23 +140,49 @@ def test_xls_to_json(project, institution):
 
 
 def test_validate_item_post_valid(testapp, a_case):
-    result = validate_item(testapp, a_case, 'post', 'case')
+    result = validate_item(testapp, a_case, 'post', 'case', [])
     assert not result
 
 
 def test_validate_item_post_invalid(testapp, a_case):
     a_case['project'] = '/projects/invalid-project/'
-    result = validate_item(testapp, a_case, 'post', 'case')
+    result = validate_item(testapp, a_case, 'post', 'case', [])
     assert 'not found' in result[0]
 
 
 def test_validate_item_patch_valid(testapp, mother, grandpa):
     patch_dict = {'mother': mother['aliases'][0]}
-    result = validate_item(testapp, patch_dict, 'patch', 'individual', atid=grandpa['@id'])
+    result = validate_item(testapp, patch_dict, 'patch', 'individual', [], atid=grandpa['@id'])
     assert not result
 
 
 def test_validate_item_patch_invalid(testapp, grandpa):
     patch_dict = {'mother': 'non-existant-alias'}
-    result = validate_item(testapp, patch_dict, 'patch', 'individual', atid=grandpa['@id'])
+    result = validate_item(testapp, patch_dict, 'patch', 'individual', [], atid=grandpa['@id'])
     assert 'not found' in result[0]
+
+
+def test_validate_item_patch_alias(testapp, grandpa):
+    patch_dict = {'mother': 'existing-alias'}
+    result = validate_item(testapp, patch_dict, 'patch', 'individual', ['existing-alias'], atid=grandpa['@id'])
+    assert not result
+
+
+def test_validate_all_items_errors(testapp, mother, empty_items):
+    new_individual = {
+        'aliases': ['test-proj:new-individual-alias'],
+        'individual_id': '1234',
+        'sex': 'F',
+        'mother': mother['aliases'][0],
+        'project': 'test-proj:invalid-project-alias',
+        'institution': 'test-proj:invalid-institution-alias'
+    }
+    items = empty_items
+    items['individual']['new-individual-alias'] = new_individual
+    data_out, result = validate_all_items(testapp, items)
+    assert not data_out
+    assert len(result) > 1
+    errors = ' '.join(result)
+    assert "'test-proj:invalid-project-alias' not found" in errors
+    assert "'test-proj:invalid-institution-alias' not found" in errors
+    assert mother['aliases'][0] not in errors
