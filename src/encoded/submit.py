@@ -19,7 +19,7 @@ BGM_FIELD_MAPPING = {
 }
 
 
-POST_ORDER = ['sample', 'sample_processing', 'individual', 'family']
+POST_ORDER = ['sample', 'sample_processing', 'individual', 'family', 'report', 'case']
 
 
 SECOND_ROUND = {}
@@ -66,7 +66,10 @@ def xls_to_json(xls_data, project, institution):
         row_dict = {keys[i].lower(): item for i, item in enumerate(r)}
         rows.append(row_dict)
 
-    items = {'individual': {}, 'family': {}, 'sample': {}, 'sample_processing': {}}
+    items = {
+        'individual': {}, 'family': {}, 'sample': {}, 'sample_processing': {},
+        'case': {}, 'report': {}
+    }
     specimen_ids = {}
     for row in rows:
         indiv_alias = '{}:individual-{}'.format(project['name'], row['patient id'])
@@ -84,12 +87,14 @@ def xls_to_json(xls_data, project, institution):
                 specimen_ids[row['specimen id']] += 1
             else:
                 specimen_ids[row['specimen id']] = 1
-            items = fetch_sample_metadata(row, items, indiv_alias, samp_alias, sp_alias)
+            analysis_alias = '{}:analysis-{}'.format(project['name'], row['analysis id'])
+            items = fetch_sample_metadata(row, items, indiv_alias, samp_alias, sp_alias, analysis_alias, fam_alias)
         else:
             print('WARNING: No specimen id present for patient {},'
                   ' sample will not be created.'.format(row['patient id']))
     # create SampleProcessing item for trio/group if needed
-    items = create_sample_processing_groups(items, sp_alias)
+    # items = create_sample_processing_groups(items, sp_alias)
+    items = create_case_items(items, project['name'])
     # removed unused fields, add project and institution
     for val1 in items.values():
         for val2 in val1.values():
@@ -108,8 +113,6 @@ def fetch_individual_metadata(row, items, indiv_alias):
         'aliases': [indiv_alias],
         'individual_id': row['patient id'],
         'sex': row.get('sex'),
-        # 'age': int(row.get('age')),
-        # 'birth_year': int(row.get('birth year'))
     }
     info['age'] = int(row['age']) if row.get('age') else None
     info['birth_year'] = int(row['birth year']) if row.get('birth year') else None
@@ -141,7 +144,7 @@ def fetch_family_metadata(row, items, indiv_alias, fam_alias):
     return new_items
 
 
-def fetch_sample_metadata(row, items, indiv_alias, samp_alias, sp_alias):
+def fetch_sample_metadata(row, items, indiv_alias, samp_alias, sp_alias, analysis_alias, fam_alias):
     new_items = items.copy()
     info = {
         'aliases': [samp_alias],
@@ -162,12 +165,50 @@ def fetch_sample_metadata(row, items, indiv_alias, samp_alias, sp_alias):
     if indiv_alias in new_items['individual']:
         new_items['individual'][indiv_alias]['samples'] = [samp_alias]
     # create SampleProcessing item for that one sample if needed
-    if row['report required'].lower() in ['yes', 'y']:
-        new_items['sample_processing'][sp_alias] = {
-            'aliases': [sp_alias],
-            'analysis_type': row['workup type'],
-            'samples': [samp_alias]
-        }
+    # if row['report required'].lower() in ['yes', 'y']:
+    #     new_items['sample_processing'][sp_alias] = {
+    #         'aliases': [sp_alias],
+    #         'analysis_type': row['workup type'],
+    #         'samples': [samp_alias]
+    #     }
+    new_sp_item = {
+        # not trivial to add analysis_type here, turn into calculated property
+        'aliases': [analysis_alias],
+        'samples': [],
+        'families': []
+    }
+    new_items['sample_processing'].setdefault(analysis_alias, new_sp_item)
+    new_items['sample_processing'][analysis_alias]['samples'].append(samp_alias)
+    if fam_alias not in new_items['sample_processing'][analysis_alias]['families']:
+        new_items['sample_processing'][analysis_alias]['families'].append(fam_alias)
+    return new_items
+
+
+def create_case_items(items, proj_name):
+    new_items = items.copy()
+    for k, v in items['sample_processing'].items():
+        analysis_id = k[k.index('analysis-')+9:]
+        for sample in v['samples']:
+            case_id = '{}-{}'.format(analysis_id, items['sample'][sample]['specimen_accession'])
+            if len(v['samples']) == 1:
+                case_id += '-single'
+            elif len(v['samples']) > 1:
+                case_id += '-group'
+            case_alias = '{}:case-{}'.format(proj_name, case_id)
+            indiv = [ikey for ikey, ival in items['individual'].items() if sample in ival.get('samples', [])][0]
+            report_alias = case_alias.replace('case', 'report')
+            new_items['report'][report_alias] = {
+                'aliases': [report_alias],
+                'description': 'Analysis Report for Individual ID {}'.format(items['individual'][indiv]['individual_id'])
+            }
+            case_info = {
+                'aliases': [case_alias],
+                'case_id': case_id,
+                'sample_processing': k,
+                'individual': indiv,
+                'report': report_alias
+            }
+            new_items['case'][case_alias] = case_info
     return new_items
 
 
@@ -233,19 +274,26 @@ def parse_exception(e, aliases):
     out of it. [Adapted from Submit4DN]"""
     try:
         # try parsing the exception
-        text = e.args[0]
+        if isinstance(e, VirtualAppError):
+            text = e.raw_exception
+        else:
+            text = e.args[0]
         resp_text = text[text.index('{'):-1]
         resp_dict = json.loads(resp_text.replace('\\', ''))
-        if resp_dict.get('description') == 'Failed validation':
-            resp_list = [error['description'] for error in resp_dict['errors']]
-            for error in resp_list:
+    except Exception:  # pragma: no cover
+        raise e
+    if resp_dict.get('description') == 'Failed validation':
+        keep = []
+        resp_list = [error['description'] for error in resp_dict['errors']]
+        for error in resp_list:
             # if error is caused by linkTo to item not submitted yet but in aliases list,
             # remove that error
-                if 'not found' in error and error.split("'")[1] in aliases:
-                    resp_list.remove(error)
-        return resp_list
-    # if not re-raise
-    except:  # pragma: no cover
+            if 'not found' in error and error.split("'")[1] in aliases:
+                continue
+            else:
+                keep.append(error)
+        return keep
+    else:
         raise e
 
 
@@ -269,22 +317,14 @@ def validate_and_post(virtualapp, json_data, dryrun=False):
 
     Current status:
     Still testing validation/data organization parts - patch/post part hasn't been fully
-    written or tested and need to add code to create Case/Report items.
-    
-    More notes:
-    Case and Report items to be created at end. We don't want them in the validation report, since
-    they are not part of the user's spreadsheet and validation error messages would be too confusing.
-    We only want to create these when we are sure no validation issues in other items exist.
-    Spreadsheet has no Case ID, but if there is an "analysis ID" then we can create a Case ID from this
-    (perhaps analysis ID + indiv ID + label indicating group/trio vs solo)
-    Report ID can be same as case ID but with "report" appended (?)
+    written or tested.
     '''
     alias_dict = {}
     links = ['samples', 'members', 'mother', 'father', 'proband']
     errors = []
-    all_aliases = [k for itype in json_data for k in itype]
+    all_aliases = [k for itype in json_data for k in json_data[itype]]
     json_data_final = {'post': {}, 'patch': {}}
-    for itemtype in POST_ORDER:
+    for itemtype in POST_ORDER[:4]:  # don't pre-validate case and report
         profile = virtualapp.get('/profiles/{}.json'.format(itemtype))
         for alias in json_data[itemtype]:
             # TODO : format fields (e.g. int, list, etc.)
@@ -334,7 +374,6 @@ def validate_and_post(virtualapp, json_data, dryrun=False):
         return errors
     else:
         return 'All items validated'
-    # TODO : create case and report items here - skip validation part because they are not part of user's spreadsheet
     # output = []
     # item_names = {'individual': 'individual_id', 'family': 'family_id', 'sample': 'specimen_id'}
     # if json_data_final['post']:
