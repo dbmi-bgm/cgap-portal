@@ -53,7 +53,7 @@ from . import TrackingItem
 from .base import (
     Item,
     ALLOW_SUBMITTER_ADD,
-    get_item_if_you_can,
+    get_item_or_none,
     # lab_award_attribution_embed_list
 )
 
@@ -175,7 +175,7 @@ class File(Item):
     })
     def display_title(self, request, file_format, accession=None, external_accession=None):
         accession = accession or external_accession
-        file_format_item = get_item_if_you_can(request, file_format, 'file-formats')
+        file_format_item = get_item_or_none(request, file_format, 'file-formats')
         try:
             file_extension = '.' + file_format_item.get('standard_file_extension')
         except AttributeError:
@@ -189,7 +189,7 @@ class File(Item):
     })
     def file_type_detailed(self, request, file_format, file_type=None):
         outString = (file_type or 'other')
-        file_format_item = get_item_if_you_can(request, file_format, 'file-formats')
+        file_format_item = get_item_or_none(request, file_format, 'file-formats')
         try:
             fformat = file_format_item.get('file_format')
             outString = outString + ' (' + fformat + ')'
@@ -390,7 +390,7 @@ class File(Item):
         "description": "Use this link to download this file."
     })
     def href(self, request, file_format, accession=None, external_accession=None):
-        fformat = get_item_if_you_can(request, file_format, 'file-formats')
+        fformat = get_item_or_none(request, file_format, 'file-formats')
         try:
             file_extension = '.' + fformat.get('standard_file_extension')
         except AttributeError:
@@ -648,7 +648,7 @@ def post_upload(context, request):
         bucket = request.registry.settings['file_upload_bucket']
         # maybe this should be properties.uuid
         uuid = context.uuid
-        file_format = get_item_if_you_can(request, properties.get('file_format'), 'file-formats')
+        file_format = get_item_or_none(request, properties.get('file_format'), 'file-formats')
         try:
             file_extension = '.' + file_format.get('standard_file_extension')
         except AttributeError:
@@ -733,7 +733,7 @@ def download(context, request):
     # or one of the files in extra files, the following logic will
     # search to find the "right" file and redirect to a download link for that one
     properties = context.upgrade_properties()
-    file_format = get_item_if_you_can(request, properties.get('file_format'), 'file-formats')
+    file_format = get_item_or_none(request, properties.get('file_format'), 'file-formats')
     _filename = None
     if request.subpath:
         _filename, = request.subpath
@@ -741,7 +741,7 @@ def download(context, request):
     if not filename:
         found = False
         for extra in properties.get('extra_files', []):
-            eformat = get_item_if_you_can(request, extra.get('file_format'), 'file-formats')
+            eformat = get_item_or_none(request, extra.get('file_format'), 'file-formats')
             filename = is_file_to_download(extra, eformat, _filename)
             if filename:
                 found = True
@@ -826,7 +826,7 @@ def validate_file_format_validity_for_file_type(context, request):
     """
     data = request.json
     if 'file_format' in data:
-        file_format_item = get_item_if_you_can(request, data['file_format'], 'file-formats')
+        file_format_item = get_item_or_none(request, data['file_format'], 'file-formats')
         if not file_format_item:
             # item level validation will take care of generating the error
             return
@@ -854,7 +854,7 @@ def validate_file_filename(context, request):
     ff = data.get('file_format')
     if not ff:
         ff = context.properties.get('file_format')
-    file_format_item = get_item_if_you_can(request, ff, 'file-formats')
+    file_format_item = get_item_or_none(request, ff, 'file-formats')
     if not file_format_item:
         msg = 'Problem getting file_format for %s' % filename
         request.errors.add('body', 'File: no format', msg)
@@ -933,7 +933,7 @@ def validate_processed_file_produced_from_field(context, request):
     files2chk = data['produced_from']
     for i, f in enumerate(files2chk):
         try:
-            fid = get_item_if_you_can(request, f, 'files').get('uuid')
+            fid = get_item_or_none(request, f, 'files').get('uuid')
         except AttributeError:
             files_ok = False
             request.errors.add('body', 'File: invalid produced_from id', "'%s' not found" % f)
@@ -960,7 +960,7 @@ def validate_extra_file_format(context, request):
     ff = data.get('file_format')
     if not ff:
         ff = context.properties.get('file_format')
-    file_format_item = get_item_if_you_can(request, ff, 'file-formats')
+    file_format_item = get_item_or_none(request, ff, 'file-formats')
     if not file_format_item or 'standard_file_extension' not in file_format_item:
         request.errors.add('body', 'File: no extra_file format', "Can't find parent file format for extra_files")
         return
@@ -975,7 +975,7 @@ def validate_extra_file_format(context, request):
     else:
         valid_ext_formats = []
         for ok_format in schema_eformats:
-            ok_format_item = get_item_if_you_can(request, ok_format, 'file-formats')
+            ok_format_item = get_item_or_none(request, ok_format, 'file-formats')
             try:
                 off_uuid = ok_format_item.get('uuid')
             except AttributeError:
@@ -988,7 +988,7 @@ def validate_extra_file_format(context, request):
         eformat = ef.get('file_format')
         if eformat is None:
             return  # will fail the required extra_file.file_format
-        eformat_item = get_item_if_you_can(request, eformat, 'file-formats')
+        eformat_item = get_item_or_none(request, eformat, 'file-formats')
         try:
             ef_uuid = eformat_item.get('uuid')
         except AttributeError:

@@ -417,6 +417,7 @@ def get_all_subsequent_results(request, initial_search_result, search, extra_req
         for hit in subsequent_search_result['hits'].get('hits', []):
             yield hit
 
+
 def execute_search_for_all_results(request, search):
     """
     Uses the above function to automatically paginate all results.
@@ -1084,19 +1085,6 @@ def apply_range_filters(range_filters, must_filters, es_mapping):
             }))
 
 
-def extract_nested_path_from_field(field):
-    """
-    Extracts the nested path from the field by splicing the field from start:second_idx_of_('.').
-    This seems to work in general but feels fragile... It is specific to how we map things.
-    It's likely this can be factored out. - Will
-        ex: 'embedded.files.accession.raw' --> 'embedded.files' is the nested path
-
-    :param field: full field path at the most, nested path at the least
-    :return: nested
-    """
-    return field[:field.index('.', field.index('.') + 1)]
-
-
 def handle_should_query(field_name, options):
     """
     Builds a lucene 'should' subquery for every option for the given field
@@ -1113,7 +1101,7 @@ def handle_should_query(field_name, options):
     return should_query
 
 
-def handle_nested_filters(nested_filters, final_filters, key='must'):
+def handle_nested_filters(nested_filters, final_filters, es_mapping, key='must'):
     """
     Helper function for set_filters that collapses nested filters together into a single lucene sub-query
     and attaching it to final_filters (modifying in place).
@@ -1135,7 +1123,7 @@ def handle_nested_filters(nested_filters, final_filters, key='must'):
 
         # iterate through all sub_query parts - note that this is modified in place hence the need
         # to re-iterate after every nested filer is applied
-        nested_path = extract_nested_path_from_field(field)
+        nested_path = find_nested_path(field, es_mapping)
         sub_queries = final_filters['bool'][key]
         found = False
         for _q in sub_queries:
@@ -1189,6 +1177,15 @@ def handle_nested_filters(nested_filters, final_filters, key='must'):
                         func='handle_nested_filters',
                         msg='Malformed entry on query field: %s' % query
                     )
+
+            # if there is no boolean clause in this sub-query, add it directly to final_filters
+            # otherwise continue logic below
+            if BOOL not in query:
+                final_filters[BOOL][MUST].append({
+                    NESTED: {PATH: nested_path,
+                             QUERY: query}
+                })
+                continue
 
             # Check that key is in the sub-query first, it's possible that it in fact uses it's opposite
             # This can happen when adding no value, the opposite 'key' can occur in the sub-query
@@ -1293,8 +1290,8 @@ def set_filters(request, search, result, principals, doc_types, es_mapping):
 
     # initialize filter hierarchy
     final_filters = {BOOL: {MUST: [f for _, f in must_filters], MUST_NOT: [f for _, f in must_not_filters]}}
-    handle_nested_filters(must_filters_nested, final_filters, key=MUST)
-    handle_nested_filters(must_not_filters_nested, final_filters, key=MUST_NOT)
+    handle_nested_filters(must_filters_nested, final_filters, es_mapping, key=MUST)
+    handle_nested_filters(must_not_filters_nested, final_filters, es_mapping, key=MUST_NOT)
 
     # at this point, final_filters is valid lucene and can be dropped into the query directly
     prev_search[QUERY][BOOL][FILTER] = final_filters
@@ -1321,14 +1318,17 @@ def initialize_facets(request, doc_types, prepared_terms, schemas, es_mapping):
     :returns: list: tuples containing (0) ElasticSearch-formatted field name (e.g. `embedded.status`)
                     and (1) list of terms for it.
     """
+    if len(doc_types) > 1:  # only provide this if we are searching on more than one type
+        facets = [
+            # More facets will be appended to this list from item schema plus from any currently-active filters (as requested in URI params).
+            ('type', {'title': 'Data Type'})
+        ]
+    else:
+        facets = []
 
-    facets = [
-        # More facets will be appended to this list from item schema plus from any currently-active filters (as requested in URI params).
-        ('type', {'title': 'Data Type'})
-    ]
     append_facets = [
         # Facets which will be appended after those which are in & added to `facets`
-        ('status', {'title': 'Status'}),
+        # ('status', {'title': 'Status'}), XXX: uncomment this if you want status facet
 
         # TODO: Re-enable below line if/when 'range' URI param queries for date & numerical fields are implemented.
         # ('date_created', {'title': 'Date Created', 'hide_from_view' : True, 'aggregation_type' : 'date_histogram' })
@@ -1602,7 +1602,7 @@ def fix_nested_aggregations(search, es_mapping):
                    .bucket('primary_agg_reverse_nested', REVERSE_NESTED))
 
 
-def get_query_field(field, facet):
+def get_query_field(field, facet, es_mapping):
     """
     Converts a field from its generic field name to a more specific field name referencing its embedded nature
 
@@ -1640,7 +1640,7 @@ def set_facets(search, facets, search_filters, string_query, request, doc_types,
         field_schema = schema_for_field(field, request, doc_types, should_log=True)
         is_date_field = field_schema and determine_if_is_date_field(field, field_schema)
         is_numerical_field = field_schema and field_schema['type'] in ("integer", "float", "number")
-        query_field = get_query_field(field, facet)
+        query_field = get_query_field(field, facet, es_mapping)
         nested_path = find_nested_path(query_field, es_mapping)
 
         ## Create the aggregation itself, extend facet with info to pass down to front-end
@@ -1888,7 +1888,7 @@ def format_facets(es_results, facets, total, search_frame='embedded'):
     # Sort facets by order (ascending).
     # If no order is provided, assume 0 to
     # retain order of non-explicitly ordered facets
-    for field, facet in sorted(facets, key=lambda fct: fct[1].get('order', 0)):
+    for field, facet in sorted(facets, key=lambda fct: fct[1].get('order', 10000)):
         result_facet = {
             'field' : field,
             'title' : facet.get('title', field),
