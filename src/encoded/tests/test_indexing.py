@@ -65,7 +65,8 @@ def setup_and_teardown(app):
     # AFTER THE TEST
     session = app.registry[DBSESSION]
     connection = session.connection().connect()
-    meta = MetaData(bind=session.connection(), reflect=True)
+    meta = MetaData(bind=session.connection())
+    meta.reflect()
     for table in meta.sorted_tables:
         print('Clear table %s' % table)
         print('Count before -->', str(connection.scalar("SELECT COUNT(*) FROM %s" % table)))
@@ -132,11 +133,8 @@ def test_create_mapping_on_indexing(app, testapp, registry, elasticsearch):
     # check that mappings and settings are in index
     for item_type in item_types:
         item_mapping = type_mapping(registry[TYPES], item_type)
-        try:
-            namespaced_index = get_namespaced_index(app, item_type)
-            item_index = es.indices.get(index=namespaced_index)
-        except:
-            assert False
+        namespaced_index = get_namespaced_index(app, item_type)
+        item_index = es.indices.get(index=namespaced_index)
         found_index_mapping_emb = item_index[namespaced_index]['mappings'][item_type]['properties']['embedded']
         found_index_settings = item_index[namespaced_index]['settings']
         assert found_index_mapping_emb
@@ -245,7 +243,7 @@ def test_real_validation_error(app, indexer_testapp, testapp, institution,
     assert val_err_view['validation_errors'] == es_res['_source']['validation_errors']
 
 
-# @pytest.mark.performance
+@pytest.mark.performance
 @pytest.mark.skip(reason="need to update perf-testing inserts")
 def test_load_and_index_perf_data(testapp, indexer_testapp):
     '''

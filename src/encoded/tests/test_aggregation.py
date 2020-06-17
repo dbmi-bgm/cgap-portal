@@ -1,9 +1,14 @@
-import pytest
-from .workbook_fixtures import app_settings, workbook
-
+# import pytest
+# from dcicutils.qa_utils import notice_pytest_fixtures
+# from .workbook_fixtures import app_settings, workbook
+#
 # XXX: All need refactor
-pytestmark = [pytest.mark.working, pytest.mark.indexing]
-
+# pytestmark = [pytest.mark.working, pytest.mark.indexing]
+#
+#
+# notice_pytest_fixtures(app_settings, workbook)
+#
+#
 # def test_aggregation_facet(workbook, testapp):
 #     res = testapp.get('/search/?type=ExperimentSetReplicate').json
 #     badge_facets = [facet for facet in res['facets'] if facet['title'] in

@@ -314,6 +314,46 @@ def canonical_redirect(event):
     raise HTTPMovedPermanently(location=location, detail="Redirected from " + str(request.path_info))
 
 
+# Web browsers send an Accept request header for initial (e.g. non-AJAX) page requests
+# which should contain 'text/html'
+MIME_TYPES_SUPPORTED = ['text/html', 'application/json', 'application/ld+json']
+MIME_TYPE_DEFAULT = 'application/json'
+MIME_TYPE_TRIAGE_MODE = 'modern'  # if this doesn't work, fall back to 'legacy'
+
+
+def best_mime_type(request, mode=MIME_TYPE_TRIAGE_MODE):
+    """
+    Given a request, tries to figure out the best kind of MIME type to use in response
+    based on what kinds of responses we support and what was requested.
+
+    In the case we can't comply, we just use application/json whether or not that's what was asked for.
+    """
+    if mode == 'legacy':
+        # See: https://tedboy.github.io/flask/generated/generated/werkzeug.Accept.best_match.html#werkzeug-accept-best-match
+        # Note that this is now deprecated, or will be. The message is oddly worded ("will be deprecated")
+        # that presumably means "will be removed". Deprecation IS the warning of actual action, not the action itself.
+        # "This is currently maintained for backward compatibility, and will be deprecated in the future.
+        #  AcceptValidHeader.best_match() uses its own algorithm (one not specified in RFC 7231) to determine
+        #  what is a best match. The algorithm has many issues, and does not conform to RFC 7231."
+        # Anyway, we were getting this warning during testing:
+        #   DeprecationWarning: The behavior of AcceptValidHeader.best_match is currently
+        #      being maintained for backward compatibility, but it will be deprecated in the future,
+        #      as it does not conform to the RFC.
+        # TODO: Once the modern replacement is shown to work, we should remove this conditional branch.
+        return request.accept.best_match(MIME_TYPES_SUPPORTED, MIME_TYPE_DEFAULT)
+    else:
+        options = request.accept.acceptable_offers(MIME_TYPES_SUPPORTED)
+        if not options:
+            # TODO: Probably we should return a 406 response by raising HTTPNotAcceptable if
+            #       no acceptable types are available. (Certainly returning JSON in this case is
+            #       not some kind of friendly help toa naive user with an old browser.)
+            #       Ref: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status
+            return MIME_TYPE_DEFAULT
+        else:
+            mime_type, score = options[0]
+            return mime_type
+
+
 @lru_cache(maxsize=16)
 def should_transform(request, response):
     '''
@@ -342,10 +382,7 @@ def should_transform(request, response):
         else:
             raise HTTPNotAcceptable("Improper format URI parameter", comment="The format URI parameter should be set to either html or json.")
 
-    # Web browsers send an Accept request header for initial (e.g. non-AJAX) page requests
-    # which should contain 'text/html'
-    # See: https://tedboy.github.io/flask/generated/generated/werkzeug.Accept.best_match.html#werkzeug-accept-best-match
-    mime_type = request.accept.best_match(['text/html',  'application/json', 'application/ld+json'], 'application/json')
+    mime_type = best_mime_type(request)
     format = mime_type.split('/', 1)[1] # Will be 1 of 'html', 'json', 'json-ld'
 
     # N.B. ld+json (JSON-LD) is likely more unique case and might be sent by search engines (?) which can parse JSON-LDs.

@@ -4,6 +4,7 @@ import pytest
 import tempfile
 
 from pyramid.httpexceptions import HTTPForbidden
+from unittest import mock
 from .. import source_beanstalk_env_vars
 from ..types.file import FileFastq, post_upload, external_creds
 
@@ -30,17 +31,18 @@ def file(testapp, project, experiment, institution, file_formats):
     return res.json['@graph'][0]
 
 
-def test_external_creds(mocker):
-    mocker.patch('encoded.types.file.boto3', autospec=True)
+def test_external_creds():
 
-    ret = external_creds('test-wfout-bucket', 'test-key', 'name')
-    assert ret['key'] == 'test-key'
-    assert ret['bucket'] == 'test-wfout-bucket'
-    assert ret['service'] == 's3'
-    assert 'upload_credentials' in ret.keys()
+    with mock.patch('encoded.types.file.boto3', autospec=True):
+
+        ret = external_creds('test-wfout-bucket', 'test-key', 'name')
+        assert ret['key'] == 'test-key'
+        assert ret['bucket'] == 'test-wfout-bucket'
+        assert ret['service'] == 's3'
+        assert 'upload_credentials' in ret.keys()
 
 
-def test_force_beanstalk_env(mocker):
+def test_force_beanstalk_env():
     """
     This test is a bit outdated, since env variable loading has moved to
     application __init__ from file.py. But let's keep the test...
@@ -57,19 +59,20 @@ def test_force_beanstalk_env(mocker):
     test_cfg.close()
 
     # mock_boto
-    mock_boto = mocker.patch('encoded.tests.test_types_file.boto3', autospec=True)
+    with mock.patch('encoded.tests.test_types_file.boto3', autospec=True) as mock_boto:
 
-    source_beanstalk_env_vars(test_cfg_name)
-    boto3.client('sts', aws_access_key_id=os.environ.get("AWS_ACCESS_KEY_ID"),
-                 aws_secret_access_key=os.environ.get("AWS_SECRET_ACCESS_KEY"))
-    # reset
-    os.environ["AWS_SECRET_ACCESS_KEY"] = secret
-    os.environ["AWS_ACCESS_KEY_ID"] = key
-    # os.remove(test_cfg.delete)
+        source_beanstalk_env_vars(test_cfg_name)
+        boto3.client('sts', aws_access_key_id=os.environ.get("AWS_ACCESS_KEY_ID"),
+                     aws_secret_access_key=os.environ.get("AWS_SECRET_ACCESS_KEY"))
+        # reset
+        os.environ["AWS_SECRET_ACCESS_KEY"] = secret
+        os.environ["AWS_ACCESS_KEY_ID"] = key
+        # os.remove(test_cfg.delete)
 
-    # ensure boto called with correct arguments
-    mock_boto.client.assert_called_once_with('sts', aws_access_key_id='its a secret id',
-                                             aws_secret_access_key='its a secret')
+        # ensure boto called with correct arguments
+        mock_boto.client.assert_called_once_with('sts',
+                                                 aws_access_key_id='its a secret id',
+                                                 aws_secret_access_key='its a secret')
 
 
 @pytest.fixture
