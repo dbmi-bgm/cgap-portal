@@ -40,16 +40,12 @@ build-after-poetry:  # continuation of build after poetry install
 	make npm-setup
 	python setup_eb.py develop
 
-build-dev:  # same as build but gives moto & locust setup as well
+build-dev:  # same as build, but sets up locust as well
 	make build
-	# 'make build' will aleady have done 'make moto-setup' (via 'make build-after-poetry')
-	# make moto-setup
 	pip install locust
 
-macbuild-dev:  # same as macbuild but gives moto & locust setup as well
+macbuild-dev:  # same as macbuild, but sets up locust as well
 	make macbuild
-	# 'make macbuild' will aleady have done 'make moto-setup' (via 'make build-after-poetry')
-	# make moto-setup
 	pip install locust
 
 build-locust:  # just pip installs locust - may cause instability
@@ -90,19 +86,18 @@ help:
 
 info:
 	@: $(info Here are some 'make' options:)
-	   $(info - Use 'make aws-ip-ranges' to download latest ip range information. You should never have to do this yourself.)
-	   $(info - Use 'make build' to build only application dependencies (or 'make macbuild' on OSX Catalina))
-	   $(info - Use 'make build-dev' to build all dependencies (or 'make macbuild-dev' on OSX Catalina))
-	   $(info - Use 'make build-locust' to install locust. Do not do this unless you know what you are doing)
-	   $(info - Use 'make clean' to clear out (non-python) dependencies)
-	   $(info - Use 'make clean-python' to clear python virtualenv for fresh poetry install)
-	   $(info - Use 'make configure' to install poetry. You should not have to do this directly)
-	   $(info - Use 'make deploy1' to spin up postgres/elasticsearch and load inserts)
-	   $(info - Use 'make deploy2' to spin up the application server)
-	   $(info - Use 'make deploy3' to load variants and genes)
-	   $(info - Use 'make kill' to kill back-end resources)
-	   $(info - Use 'make macbuild-dev' to build all dependencies on OSX catalina)
-	   $(info - Use 'make moto-setup' to install moto, for less flaky tests)
-	   $(info - Use 'make npm-setup' to build the front-end)
-	   $(info - Use 'make test' to run tests with the normal options we use on travis)
-	   $(info - Use 'make update' to update dependencies (and the lock file))
+	   $(info - Use 'make aws-ip-ranges' to download latest ip range information. Invoked automatically when needed.)
+	   $(info - Use 'make build' (or 'make macbuild' on OSX Catalina) to build only application dependencies.)
+	   $(info - Use 'make build-dev' (or 'make macbuild-dev' on OSX Catalina) to build all dependencies, including locust.)
+	   $(info - Use 'make build-locust' to install locust. Do not do this unless you know what you are doing.)
+	   $(info - Use 'make clean' to clear out (non-python) dependencies.)
+	   $(info - Use 'make clean-python' to clear python virtualenv for fresh poetry install.)
+	   $(info - Use 'make configure' to install poetry. You should not have to do this directly.)
+	   $(info - Use 'make deploy1' to spin up postgres/elasticsearch and load inserts.)
+	   $(info - Use 'make deploy2' to spin up the application server.)
+	   $(info - Use 'make deploy3' to load variants and genes.)
+	   $(info - Use 'make kill' to kill back-end resources.)
+	   $(info - Use 'make moto-setup' to install moto, for less flaky tests. Implied by 'make build'.)
+	   $(info - Use 'make npm-setup' to build the front-end. Implied by 'make build'.)
+	   $(info - Use 'make test' to run tests with the normal options we use on travis.)
+	   $(info - Use 'make update' to update dependencies (and the lock file).)
