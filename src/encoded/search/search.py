@@ -1107,7 +1107,7 @@ class CompoundSearchBuilder:
         return '&'.join([flags, block])
 
     @staticmethod
-    def format_filter_set_results(request, es_results):
+    def format_filter_set_results(request, es_results, return_generator=False):
         """ Formats es_results from filter_set into a dictionary containing total and @graph,
             setting status on the request if needed.
 
@@ -1115,7 +1115,12 @@ class CompoundSearchBuilder:
         :param es_results: response from ES
         :return: dictionary response
         """
-        if es_results['hits']['total'] == 0:
+        # if this is a subrequest/gen request, return '@graph' directly
+        if request.__parent__ is not None or return_generator:
+            if return_generator:
+                return es_results['hits']['hits']
+
+        elif es_results['hits']['total'] == 0:
             request.response.status_code = 404
             return {
                 'total': 0,
@@ -1128,8 +1133,7 @@ class CompoundSearchBuilder:
             }
 
     @classmethod
-    def execute_filter_set(cls, context, request, filter_set, search_type=None, return_generator=False,
-                           forced_type='Search', custom_aggregations=None, intersect=False):
+    def execute_filter_set(cls, context, request, filter_set, return_generator=False, intersect=False):
         """ Executes the given filter_set. This function contains the core functionality of the class.
             A filter_set with respect to this function is just a dictionary containing the following things:
                 1. 'type' is the item type we are executing on. Required.
@@ -1194,7 +1198,7 @@ class CompoundSearchBuilder:
                 subreq = cls.build_subreq_from_single_query(request, ('?type=' + t))
                 search = SearchBuilder.from_search(context, subreq, compound_query)  # from, to passed here
                 es_results = execute_search(subreq, search.search)
-                return cls.format_filter_set_results(request, es_results)
+                return cls.format_filter_set_results(request, es_results, return_generator)
 
     @staticmethod
     def extract_filter_set_from_search_body(request, body):
@@ -1241,9 +1245,8 @@ def compound_search(context, request, search_type=None, return_generator=False,
     body = json.loads(request.body)
     filter_set = CompoundSearchBuilder.extract_filter_set_from_search_body(request, body)
     intersect = True if body.get('intersect', False) else False
-    return CompoundSearchBuilder.execute_filter_set(context, request, filter_set, search_type=search_type,
-                                                    return_generator=return_generator, forced_type=forced_type,
-                                                    custom_aggregations=custom_aggregations, intersect=intersect)
+    return CompoundSearchBuilder.execute_filter_set(context, request, filter_set,
+                                                    return_generator=return_generator, intersect=intersect)
 
 
 @view_config(context=AbstractCollection, permission='list', request_method='GET')
