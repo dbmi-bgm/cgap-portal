@@ -1,4 +1,5 @@
 import pytest
+from webtest import AppError
 from .workbook_fixtures import app, workbook
 
 
@@ -323,3 +324,64 @@ def test_compound_search_filter_and_flags(workbook, testapp, filter_set_with_sin
     resp = testapp.post_json(COMPOUND_SEARCH_URL, filter_set_with_single_filter_block_and_flags).json
     assert len(resp['@graph']) == 4
     assert 'facets' in resp
+
+
+@pytest.fixture
+def filter_set_with_multiple_disabled_flags():
+    return {
+        'type': 'Variant',
+        'filter_blocks': [{
+            'query': '?type=Variant&POS.from=0&POS.to=10000000',
+            'flag_applied': False
+        },
+        {
+            'query': '?type=Variant&REF=A',
+            'flag_applied': False
+        }],
+        'flags': 'CHROM=1'
+    }
+
+
+def test_compound_search_disabled_filter_blocks(workbook, testapp, filter_set_with_multiple_disabled_flags):
+    """ Tests a compound search with all filter_blocks disabled (so will only execute flags). """
+    resp = testapp.post_json(COMPOUND_SEARCH_URL, filter_set_with_multiple_disabled_flags).json
+    assert len(resp['@graph']) == 4
+
+    # Test same facet behavior as previously, since we are only executing flags
+    assert 'facets' in resp
+    facets = resp['facets']
+    for facet in facets:
+        count = 0
+        if 'terms' in facet:
+            for term in facet['terms']:
+                count += term['doc_count']
+        else:
+            count += facet['total']
+        assert count == 4
+
+
+@pytest.fixture
+def paginated_request():
+    return {
+        'type': 'Item',
+    }
+
+
+def test_compound_search_from_to(workbook, testapp, paginated_request):
+    """ Tests pagination with compound searches """
+
+    # first, test failures
+    def test_failure(from_, limit):
+        paginated_request['from'] = from_
+        paginated_request['limit'] = limit
+        with pytest.raises(AppError):
+            testapp.post_json(COMPOUND_SEARCH_URL, paginated_request)
+    test_failure(0, -5)
+    test_failure(-5, 0)
+    test_failure(-3, 1)
+
+    # attempt to paginate
+    paginated_request['from'] = 5
+    paginated_request['limit'] = 10
+    resp = testapp.post_json(COMPOUND_SEARCH_URL, paginated_request).json
+    assert len(resp['@graph']) == 10

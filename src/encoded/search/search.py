@@ -118,8 +118,8 @@ class SearchBuilder:
         """
         result = cls(context, request, skip_bootstrap=True)  # bypass bootstrap
         result.from_ = from_
-        result.size = size
-        result.search.update_from_dict(search)
+        result.to = size  # execute_search will apply pagination
+        result.search.update_from_dict(search)  # parse compound query
         return result
 
     @staticmethod
@@ -1080,18 +1080,20 @@ class CompoundSearchBuilder:
         sub_request.registry = parent_request.registry  # transfer registry as well
 
     @classmethod
-    def build_subreq_from_single_query(cls, request, query, route='/search/'):
+    def build_subreq_from_single_query(cls, request, query, route='/search/', from_=0, to=10):
         """ Builds a Request object that is a proper sub-request of the given request.
             Passes flags directly as query string params. Intended for use with search.
 
         :param request: request to build off of
         :param query: search query
         :param route: route of sub-request to build
+        :param from_: starting ES hit index
+        :param to: how many results to returning, index starting at from_
         :return: new Request
         """
         if '?' not in query:  # do some sanitization
             query = '?' + query
-        subreq = Request.blank(route + query)
+        subreq = Request.blank(route + '%s&from=%s&limit=%s' % (query, from_, to))
         cls.transfer_request_permissions(request, subreq)  # VERY IMPORTANT - Will
         return subreq
 
@@ -1122,8 +1124,7 @@ class CompoundSearchBuilder:
         """
         # if this is a subrequest/gen request, return '@graph' directly
         if request.__parent__ is not None or return_generator:
-            if return_generator:
-                return es_results['hits']['hits']
+            return es_results['hits']['hits']
 
         elif es_results['hits']['total'] == 0:
             request.response.status_code = 404
@@ -1138,7 +1139,7 @@ class CompoundSearchBuilder:
             }
 
     @classmethod
-    def execute_filter_set(cls, context, request, filter_set, return_generator=False, intersect=False):
+    def execute_filter_set(cls, context, request, filter_set, from_=0, to=10, return_generator=False, intersect=False):
         """ Executes the given filter_set. This function contains the core functionality of the class.
             A filter_set with respect to this function is just a dictionary containing the following things:
                 1. 'type' is the item type we are executing on. Required.
@@ -1159,14 +1160,14 @@ class CompoundSearchBuilder:
         if not filter_blocks and flags:
             if t not in flags:
                 flags += '&type=%s' % t
-            subreq = cls.build_subreq_from_single_query(request, flags)
+            subreq = cls.build_subreq_from_single_query(request, flags, from_=from_, to=to)
             return request.invoke_subrequest(subreq)
 
         # if we have only a single filter block with no flags, pass single filter_block to search
         elif not flags and len(filter_blocks) == 1:
             block = filter_blocks[0]
             if block['flag_applied']:
-                subreq = cls.build_subreq_from_single_query(request, block['query'])
+                subreq = cls.build_subreq_from_single_query(request, block['query'], from_=from_, to=to)
                 return request.invoke_subrequest(subreq)
             else:
                 return search(context, request)  # noqa Re-direct to ?type=Item (all) search
@@ -1176,9 +1177,9 @@ class CompoundSearchBuilder:
             block = filter_blocks[0]
             if block['flag_applied']:
                 combined_query = cls.combine_flags_and_block(flags, block['query'])
-                subreq = cls.build_subreq_from_single_query(request, combined_query)
+                subreq = cls.build_subreq_from_single_query(request, combined_query, from_=from_, to=to)
             else:
-                subreq = cls.build_subreq_from_single_query(request, flags)
+                subreq = cls.build_subreq_from_single_query(request, flags, from_=from_, to=to)
             return request.invoke_subrequest(subreq)
 
         # Build the compound_query
@@ -1188,22 +1189,28 @@ class CompoundSearchBuilder:
                 if block['flag_applied']:  # only build sub_query if this block is applied
                     if flags:
                         combined_query = cls.combine_flags_and_block(flags, block['query'])
-                        subreq = cls.build_subreq_from_single_query(request, combined_query, route='/build_query/')
+                        subreq = cls.build_subreq_from_single_query(request, combined_query, route='/build_query/',
+                                                                    from_=from_, to=to)
                     else:
-                        subreq = cls.build_subreq_from_single_query(request, block['query'], route='/build_query/')
+                        subreq = cls.build_subreq_from_single_query(request, block['query'], route='/build_query/',
+                                                                    from_=from_, to=to)
                     sub_query = request.invoke_subrequest(subreq).json['query']
                     sub_queries.append(sub_query)
                 else:
                     continue
 
             if len(sub_queries) == 0:  # if all blocks are disabled, just execute the flags
-                subreq = cls.build_subreq_from_single_query(request, flags)
+                if not flags:
+                    flags = '?type=Item'
+                elif t not in flags:
+                    flags += '&type=%s' % t
+                subreq = cls.build_subreq_from_single_query(request, flags, from_=from_, to=to)
                 return request.invoke_subrequest(subreq)
 
             else:  # build, execute compound query and return a response with @graph containing results
                 compound_query = LuceneBuilder.compound_search(sub_queries, intersect=intersect)
                 subreq = cls.build_subreq_from_single_query(request, ('?type=' + t))
-                search = SearchBuilder.from_search(context, subreq, compound_query)  # from, to passed here
+                search = SearchBuilder.from_search(context, subreq, compound_query, from_=from_, size=to)
                 es_results = execute_search(subreq, search.search)
                 return cls.format_filter_set_results(request, es_results, return_generator)
 
@@ -1252,7 +1259,11 @@ def compound_search(context, request, search_type=None, return_generator=False,
     body = json.loads(request.body)
     filter_set = CompoundSearchBuilder.extract_filter_set_from_search_body(request, body)
     intersect = True if body.get('intersect', False) else False
-    return CompoundSearchBuilder.execute_filter_set(context, request, filter_set,
+    _from = body.get('from', 0)
+    limit = body.get('limit', 10)
+    if _from < 0 or limit < 0 or limit < _from:
+        raise HTTPBadRequest('Passed bad from, to request body params: %s, %s' % (_from, limit))
+    return CompoundSearchBuilder.execute_filter_set(context, request, filter_set, from_=_from, to=limit,
                                                     return_generator=return_generator, intersect=intersect)
 
 
