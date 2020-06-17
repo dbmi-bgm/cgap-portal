@@ -3,6 +3,7 @@ import os
 import pytest
 import copy
 from io import StringIO
+from unittest import mock
 
 from collections import OrderedDict
 from ..commands import parse_hpoa as ph
@@ -80,33 +81,33 @@ def mini_hpoa_lines():
     ]
 
 
-def test_get_header_info_and_field_names(mocker, capsys, mock_logger, mini_hpoa_lines):
-    mocker.patch('encoded.commands.parse_hpoa.has_unexpected_fields', return_value=False)
-    lfields = ph.line2list(mini_hpoa_lines[4])
-    fields, lines = ph.get_header_info_and_field_names(iter(mini_hpoa_lines), mock_logger)
-    assert fields == lfields
-    assert next(lines).startswith('OMIM:210100')
-    out = capsys.readouterr()[0]
-    assert out == 'INFO: Annotation file info:\n\tdate: 2019-11-08\n\tdescription: HPO annotations for rare diseases [7623: OMIM; 47: DECIPHER; 3771 ORPHANET]\n'
+def test_get_header_info_and_field_names(capsys, mock_logger, mini_hpoa_lines):
+    with mock.patch('encoded.commands.parse_hpoa.has_unexpected_fields', return_value=False):
+        lfields = ph.line2list(mini_hpoa_lines[4])
+        fields, lines = ph.get_header_info_and_field_names(iter(mini_hpoa_lines), mock_logger)
+        assert fields == lfields
+        assert next(lines).startswith('OMIM:210100')
+        out = capsys.readouterr()[0]
+        assert out == 'INFO: Annotation file info:\n\tdate: 2019-11-08\n\tdescription: HPO annotations for rare diseases [7623: OMIM; 47: DECIPHER; 3771 ORPHANET]\n'
 
 
-def test_get_header_info_and_field_names_no_comments(mocker, capsys, mock_logger, mini_hpoa_lines):
-    mocker.patch('encoded.commands.parse_hpoa.has_unexpected_fields', return_value=False)
-    lfields = ph.line2list(mini_hpoa_lines[4])
-    fields, lines = ph.get_header_info_and_field_names(iter(mini_hpoa_lines[4:]), mock_logger)
-    assert fields == lfields
-    assert next(lines).startswith('OMIM:210100')
-    out = capsys.readouterr()[0]
-    assert out == 'INFO: Annotation file info:\n\tdate: unknown\n\tdescription: unknown\n'
-
-
-def test_get_header_info_and_field_names_misformatted(mocker, capsys, mock_logger, mini_hpoa_lines):
-    mini_hpoa_lines.insert(2, 'bad stuff')
-    mocker.patch('encoded.commands.parse_hpoa.has_unexpected_fields', return_value=['bad'])
-    with pytest.raises(SystemExit):
+def test_get_header_info_and_field_names_no_comments(capsys, mock_logger, mini_hpoa_lines):
+    with mock.patch('encoded.commands.parse_hpoa.has_unexpected_fields', return_value=False):
+        lfields = ph.line2list(mini_hpoa_lines[4])
         fields, lines = ph.get_header_info_and_field_names(iter(mini_hpoa_lines[4:]), mock_logger)
-    out = capsys.readouterr()[0]
-    assert out == 'INFO: Annotation file info:\n\tdate: unknown\n\tdescription: unknown\nERROR: UNKNOWN FIELDS FOUND: bad\n'
+        assert fields == lfields
+        assert next(lines).startswith('OMIM:210100')
+        out = capsys.readouterr()[0]
+        assert out == 'INFO: Annotation file info:\n\tdate: unknown\n\tdescription: unknown\n'
+
+
+def test_get_header_info_and_field_names_misformatted(capsys, mock_logger, mini_hpoa_lines):
+    mini_hpoa_lines.insert(2, 'bad stuff')
+    with mock.patch('encoded.commands.parse_hpoa.has_unexpected_fields', return_value=['bad']):
+        with pytest.raises(SystemExit):
+            fields, lines = ph.get_header_info_and_field_names(iter(mini_hpoa_lines[4:]), mock_logger)
+        out = capsys.readouterr()[0]
+        assert out == 'INFO: Annotation file info:\n\tdate: unknown\n\tdescription: unknown\nERROR: UNKNOWN FIELDS FOUND: bad\n'
 
 
 @pytest.fixture
@@ -246,24 +247,24 @@ def test_create_evi_annotation_with_freq_str(hpoa_data, hpo2uid_map):
     assert evi.get('frequency_value') == freq
 
 
-def test_create_evi_annotation_with_hp_modifier(mocker, hpoa_data, hpo2uid_map):
+def test_create_evi_annotation_with_hp_modifier(hpoa_data, hpo2uid_map):
     mod_phe = 'HP:0500252'
     phe_uuid = '05648474-44de-4cdb-b35b-18f5362b8281'
     hpoa_data['Modifier'] = mod_phe
-    mocker.patch('encoded.commands.parse_hpoa.check_hpo_id_and_note_problems', return_value=phe_uuid)
-    evi = ph.create_evi_annotation(hpoa_data, hpo2uid_map, {})
-    assert evi.get('modifier') == phe_uuid
+    with mock.patch('encoded.commands.parse_hpoa.check_hpo_id_and_note_problems', return_value=phe_uuid):
+        evi = ph.create_evi_annotation(hpoa_data, hpo2uid_map, {})
+        assert evi.get('modifier') == phe_uuid
 
 
-def test_create_evi_annotation_with_unknown_hp_modifier(mocker, hpoa_data, hpo2uid_map):
+def test_create_evi_annotation_with_unknown_hp_modifier(hpoa_data, hpo2uid_map):
     mod_phe = 'HP:0000002'
     hpoa_data['Modifier'] = mod_phe
-    mocker.patch('encoded.commands.parse_hpoa.check_hpo_id_and_note_problems', return_value=None)
-    evi = ph.create_evi_annotation(hpoa_data, hpo2uid_map, {})
-    assert 'modifier' not in evi
+    with mock.patch('encoded.commands.parse_hpoa.check_hpo_id_and_note_problems', return_value=None):
+        evi = ph.create_evi_annotation(hpoa_data, hpo2uid_map, {})
+        assert 'modifier' not in evi
 
 
-def test_convert2raw(mocker, embedded_item_dict, raw_item_dict):
+def test_convert2raw(embedded_item_dict, raw_item_dict):
     # this is not really testing much as the mocked return value is what is being
     # checked so no way to know if fields are really being stripped as expected
     # first add some fields that should be ignored when getting raw form
@@ -271,9 +272,9 @@ def test_convert2raw(mocker, embedded_item_dict, raw_item_dict):
     embedded_item_dict['date_created'] = "2020-03-03T20:08:10.690526+00:00"
     embedded_item_dict['institution'] = '/institution/bwh'
     embedded_item_dict["principals_allowed"] = {"view": ["system.Everyone"], "edit": ["group.admin"]}
-    mocker.patch('encoded.commands.parse_hpoa.get_raw_form', return_value=raw_item_dict)
-    raw_item = ph.convert2raw(embedded_item_dict)
-    assert raw_item == raw_item_dict
+    with mock.patch('encoded.commands.parse_hpoa.get_raw_form', return_value=raw_item_dict):
+        raw_item = ph.convert2raw(embedded_item_dict)
+        assert raw_item == raw_item_dict
 
 
 @pytest.fixture
@@ -300,36 +301,36 @@ def evi_items():
     ]
 
 
-def test_compare_existing_to_newly_generated_all_new(mocker, mock_logger, connection, evi_items):
+def test_compare_existing_to_newly_generated_all_new(mock_logger, connection, evi_items):
     itemcnt = len(evi_items)
-    mocker.patch('encoded.commands.parse_hpoa.search_metadata', return_value=[])
-    evi, exist, to_obs = ph.compare_existing_to_newly_generated(mock_logger, connection, evi_items, 'EvidenceDisPheno')
-    assert evi == evi_items
-    assert not to_obs
-    assert exist == 0
+    with mock.patch('encoded.commands.parse_hpoa.search_metadata', return_value=[]):
+        evi, exist, to_obs = ph.compare_existing_to_newly_generated(mock_logger, connection, evi_items, 'EvidenceDisPheno')
+        assert evi == evi_items
+        assert not to_obs
+        assert exist == 0
 
 
-def test_compare_existing_to_newly_generated_all_same(mocker, mock_logger, connection, evi_items):
+def test_compare_existing_to_newly_generated_all_same(mock_logger, connection, evi_items):
     itemcnt = len(evi_items)
-    mocker.patch('encoded.commands.parse_hpoa.search_metadata', return_value=evi_items[:])
-    mocker.patch('encoded.commands.parse_hpoa.get_raw_form', side_effect=evi_items[:])
-    evi, exist, to_obs = ph.compare_existing_to_newly_generated(mock_logger, connection, evi_items, 'EvidenceDisPheno')
-    assert not evi
-    assert not to_obs
-    assert itemcnt == exist
+    with mock.patch('encoded.commands.parse_hpoa.search_metadata', return_value=evi_items[:]):
+         with mock.patch('encoded.commands.parse_hpoa.get_raw_form', side_effect=evi_items[:]):
+            evi, exist, to_obs = ph.compare_existing_to_newly_generated(mock_logger, connection, evi_items, 'EvidenceDisPheno')
+            assert not evi
+            assert not to_obs
+            assert itemcnt == exist
 
 
-def test_compare_existing_to_newly_generated_none_same(mocker, mock_logger, connection, evi_items):
+def test_compare_existing_to_newly_generated_none_same(mock_logger, connection, evi_items):
     dbitems = []
     for e in evi_items:
         dbitems.append({k: v + '9' for k, v in e.items()})
     dbuuids = [d.get('uuid') for d in dbitems]
-    mocker.patch('encoded.commands.parse_hpoa.search_metadata', return_value=dbitems)
-    mocker.patch('encoded.commands.parse_hpoa.get_raw_form', side_effect=dbitems)
-    evi, exist, to_obs = ph.compare_existing_to_newly_generated(mock_logger, connection, evi_items, 'EvidenceDisPheno')
-    assert evi == evi_items
-    assert to_obs == dbuuids
-    assert exist == 0
+    with mock.patch('encoded.commands.parse_hpoa.search_metadata', return_value=dbitems):
+        with mock.patch('encoded.commands.parse_hpoa.get_raw_form', side_effect=dbitems):
+            evi, exist, to_obs = ph.compare_existing_to_newly_generated(mock_logger, connection, evi_items, 'EvidenceDisPheno')
+            assert evi == evi_items
+            assert to_obs == dbuuids
+            assert exist == 0
 
 
 @pytest.fixture
