@@ -1103,8 +1103,12 @@ class CompoundSearchBuilder:
         :param block: blocks to add to it
         :return: combined query
         """
-        # XXX: Something smarter probably needs to happen here, hence why this is a function -Will
-        return '&'.join([flags, block])
+        if '?' in flags:
+            return '&'.join([flags, block])
+        elif '?' in block:
+            return '&'.join([block, flags])
+        else:
+            return '?' + '&'.join([flags, block])
 
     @staticmethod
     def format_filter_set_results(request, es_results, return_generator=False):
@@ -1113,6 +1117,7 @@ class CompoundSearchBuilder:
 
         :param request: current request
         :param es_results: response from ES
+        :param return_generator: whether or not we are returning a generator or a response
         :return: dictionary response
         """
         # if this is a subrequest/gen request, return '@graph' directly
@@ -1145,13 +1150,15 @@ class CompoundSearchBuilder:
         """
         filter_blocks = filter_set.get('filter_blocks', [])
         flags = filter_set.get('flags', None)
-        t = filter_set.get('type', None)
+        t = filter_set.get('type', 'Item')  # if type not set, attempt to search on item
 
         if not t:
             raise HTTPBadRequest('Tried to execute a filter_set without a type!')
 
         # if we have no filter blocks, pass flags alone to search
         if not filter_blocks and flags:
+            if t not in flags:
+                flags += '&type=%s' % t
             subreq = cls.build_subreq_from_single_query(request, flags)
             return request.invoke_subrequest(subreq)
 

@@ -3,6 +3,7 @@ from .workbook_fixtures import app, workbook
 
 
 pytestmark = [pytest.mark.working, pytest.mark.schema]
+COMPOUND_SEARCH_URL = '/compound_search'
 FILTER_SET_URL = '/filter_set'
 COHORT_URL = '/cohort'
 VARIANT_URL = '/variant'
@@ -102,18 +103,18 @@ def test_filter_set_barebones(workbook, testapp, barebones_filter_set):
     testapp.post_json('/index', {})
 
     # execute given the @id of a filter_set
-    compound_search_res = testapp.post_json('/compound_search', {'@id': uuid}).json['@graph']
+    compound_search_res = testapp.post_json(COMPOUND_SEARCH_URL, {'@id': uuid}).json['@graph']
     assert len(compound_search_res) == 4
 
     # execute given flags only
-    compound_search_res = testapp.post_json('/compound_search', {
+    compound_search_res = testapp.post_json(COMPOUND_SEARCH_URL, {
         'flags': '?type=project',
         'type': 'Project'  # NOTE: will work since we are not actually validating this
     }).json['@graph']
     assert len(compound_search_res) == 1
 
     # do it again, this time with a type that will return 404
-    testapp.post_json('/compound_search', {
+    testapp.post_json(COMPOUND_SEARCH_URL, {
         'flags': '?type=gene',
         'type': 'Gene'
     }, status=404)
@@ -126,7 +127,7 @@ def test_filter_set_simple(workbook, testapp, simple_filter_set):
     testapp.post_json('/index', {})
 
     # execute given filter_blocks only
-    compound_search_res = testapp.post_json('/compound_search', {
+    compound_search_res = testapp.post_json(COMPOUND_SEARCH_URL, {
                                                 'filter_blocks': [{
                                                     'query': 'type=variant&CHROM=1',
                                                     'flag_applied': True
@@ -143,7 +144,7 @@ def test_filter_set_simple(workbook, testapp, simple_filter_set):
     assert len(compound_search_res) == 1
 
     # execute the same search using filter_blocks and flags
-    compound_search_res = testapp.post_json('/compound_search', {
+    compound_search_res = testapp.post_json(COMPOUND_SEARCH_URL, {
         'filter_blocks': [{
             'query': 'CHROM=1',
             'flag_applied': True
@@ -154,7 +155,7 @@ def test_filter_set_simple(workbook, testapp, simple_filter_set):
     assert len(compound_search_res) == 4
 
     # do similar search with @id
-    compound_search_res = testapp.post_json('/compound_search', {'@id': uuid}).json['@graph']
+    compound_search_res = testapp.post_json(COMPOUND_SEARCH_URL, {'@id': uuid}).json['@graph']
     assert len(compound_search_res) == 3
 
 
@@ -164,7 +165,7 @@ def test_filter_set_complete(workbook, testapp, standard_filter_set):
     uuid = res['@graph'][0]['@id']
 
     # execute the more complicated filter_set by @id
-    compound_search_res = testapp.post_json('/compound_search', {'@id': uuid}).json['@graph']
+    compound_search_res = testapp.post_json(COMPOUND_SEARCH_URL, {'@id': uuid}).json['@graph']
     assert len(compound_search_res) == 2
 
 
@@ -176,7 +177,7 @@ def test_filter_set_complex(workbook, testapp, complex_filter_set):
     filter_blocks = res['@graph'][0]['filter_blocks']
     flags = res['@graph'][0]['flags']
 
-    compound_search_res = testapp.post_json('/compound_search', {'@id': uuid}).json['@graph']
+    compound_search_res = testapp.post_json(COMPOUND_SEARCH_URL, {'@id': uuid}).json['@graph']
     assert len(compound_search_res) == 4  # all variants will match
 
     # toggle off all the blocks
@@ -187,7 +188,7 @@ def test_filter_set_complex(workbook, testapp, complex_filter_set):
     }
     for block in filter_blocks:
         block['flag_applied'] = False
-        compound_search_res = testapp.post_json('/compound_search', filter_set).json['@graph']
+        compound_search_res = testapp.post_json(COMPOUND_SEARCH_URL, filter_set).json['@graph']
         assert len(compound_search_res) == 4  # should match in all cases
 
     # Modify POS
@@ -197,7 +198,7 @@ def test_filter_set_complex(workbook, testapp, complex_filter_set):
             block['flag_applied'] = True
             block['query'] = 'POS.from=0&POS.to=100000'  # exclude 3/4
             break
-    compound_search_res = testapp.post_json('/compound_search', filter_set).json['@graph']
+    compound_search_res = testapp.post_json(COMPOUND_SEARCH_URL, filter_set).json['@graph']
     assert len(compound_search_res) == 1  # should only match the one case
 
     # Now, toggle the REF=G&ALT=A block, which will re-introduce 1/3
@@ -206,7 +207,7 @@ def test_filter_set_complex(workbook, testapp, complex_filter_set):
         if 'REF' in query:
             block['flag_applied'] = True
             break
-    compound_search_res = testapp.post_json('/compound_search', filter_set).json['@graph']
+    compound_search_res = testapp.post_json(COMPOUND_SEARCH_URL, filter_set).json['@graph']
     assert len(compound_search_res) == 2
 
 
@@ -223,14 +224,14 @@ def test_filter_set_intersection(workbook, testapp, complex_filter_set):
         'flags': flags,
         'intersect': True
     }
-    testapp.post_json('/compound_search', filter_set, status=404)  # AND will eliminate all here
+    testapp.post_json(COMPOUND_SEARCH_URL, filter_set, status=404)  # AND will eliminate all here
 
     # toggle off the REF/ALT requirement, now 2 will match
     for block in filter_blocks:
         if 'REF' in block['query']:
             block['flag_applied'] = False
             break
-    compound_search_res = testapp.post_json('/compound_search', filter_set).json['@graph']
+    compound_search_res = testapp.post_json(COMPOUND_SEARCH_URL, filter_set).json['@graph']
     assert len(compound_search_res) == 2
 
     # toggle off hg19 so all match
@@ -238,5 +239,87 @@ def test_filter_set_intersection(workbook, testapp, complex_filter_set):
         if 'hg19' in block['query']:
             block['flag_applied'] = False
             break
-    compound_search_res = testapp.post_json('/compound_search', filter_set).json['@graph']
+    compound_search_res = testapp.post_json(COMPOUND_SEARCH_URL, filter_set).json['@graph']
     assert len(compound_search_res) == 4
+
+
+# the following tests are distinct in that they aim to test specific behavior associated with
+# the compound_search route, NOT with filter_sets themselves. In particular, we test /search
+# redirects for certain types of filter_sets that we know don't need to proceed through the
+# entire process. - Will 06/17/2020
+
+
+@pytest.fixture
+def filter_set_with_only_flags():
+    return {
+        'type': 'Variant',
+        'flags': 'CHROM=1'
+    }
+
+
+def test_compound_search_only_flags(workbook, testapp, filter_set_with_only_flags):
+    """ Tests compound search with a filter set that has only flags
+        /search redirect is functioning if we get correct facets on the response, which are checked
+        explicitly for correctness in this test.
+    """
+    resp = testapp.post_json(COMPOUND_SEARCH_URL, filter_set_with_only_flags).json
+    assert len(resp['@graph']) == 4
+
+    # verify facet values all sum to 4, since we should only be aggregating on the search results
+    assert 'facets' in resp
+    facets = resp['facets']
+    for facet in facets:
+        count = 0
+        if 'terms' in facet:
+            for term in facet['terms']:
+                count += term['doc_count']
+        else:
+            count += facet['total']
+        assert count == 4
+
+
+@pytest.fixture
+def filter_set_with_single_filter_block():
+    return {
+        'type': 'Variant',
+        'filter_blocks': [{
+            'query': '?type=Variant&POS.from=0&POS.to=10000000',
+            'flag_applied': True
+        }]
+    }
+
+
+def test_compound_search_single_filter_block(workbook, testapp, filter_set_with_single_filter_block):
+    """ Tests compound search with a filter set with only one filter_block.
+        /search redirect is functioning if we get facets on the response.
+    """
+    resp = testapp.post_json(COMPOUND_SEARCH_URL, filter_set_with_single_filter_block).json
+    assert len(resp['@graph']) == 1
+    assert 'facets' in resp
+
+
+@pytest.fixture
+def filter_set_with_single_filter_block_and_flags():
+    return {
+        'type': 'Variant',
+        'filter_blocks': [{
+            'query': '?type=Variant&POS.from=0&POS.to=10000000',
+            'flag_applied': True
+        }],
+        'flags': 'CHROM=1'
+    }
+
+
+def test_compound_search_filter_and_flags(workbook, testapp, filter_set_with_single_filter_block_and_flags):
+    """ Tests compound search with a filter set that has one filter block and flags
+        /search redirect is functioning if we get facets on the response.
+    """
+    resp = testapp.post_json(COMPOUND_SEARCH_URL, filter_set_with_single_filter_block_and_flags).json
+    assert len(resp['@graph']) == 1
+    assert 'facets' in resp
+
+    # disable block, so flag only
+    toggle_filter_blocks(filter_set_with_single_filter_block_and_flags, on=False)
+    resp = testapp.post_json(COMPOUND_SEARCH_URL, filter_set_with_single_filter_block_and_flags).json
+    assert len(resp['@graph']) == 4
+    assert 'facets' in resp
