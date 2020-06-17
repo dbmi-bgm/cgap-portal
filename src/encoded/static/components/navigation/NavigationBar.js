@@ -2,14 +2,11 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import url from 'url';
 import _ from 'underscore';
-import { Navbar, Nav, NavItem } from 'react-bootstrap';
+import Navbar from 'react-bootstrap/esm/Navbar';
 import { console } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { CGAPLogo } from './../viz/CGAPLogo';
-import { productionHost } from './../globals';
-import { navigate } from './../util';
-import { SearchBar, TestWarning, HelpNavItem, UserActionDropdownMenu, CollapsedNav } from './components';
+import { TestWarning, HelpNavItem, UserActionDropdownMenu, CollapsedNav } from './components';
 
 
 /**
