@@ -27,7 +27,7 @@ else
     echo "      You may need '--setup-moto' if moto server doesn't start."
 fi
 
-
+echo "TRAVIS_JOB_ID = ${TRAVIS_JOB_ID}"
 if [ "${TRAVIS_JOB_ID}" = "" -o "${TRAVIS_JOB_ID:0:4}" = "4dn-" ]; then
     export TRAVIS_JOB_ID=4dn-`date "+%m%d%H%M%Y%S"`
     echo "NOTE: Simulating TRAVIS_JOB_ID=$TRAVIS_JOB_ID"
