@@ -28,9 +28,11 @@ else
 fi
 
 echo "TRAVIS_JOB_ID = ${TRAVIS_JOB_ID}"
-if [ "${TRAVIS_JOB_ID}" = "" -o "${TRAVIS_JOB_ID:0:4}" = "4dn-" ]; then
+if [ "${TRAVIS_JOB_ID}" = "" -o "$(echo "$TRAVIS_JOB_ID" | cut -c '1-4')" = "4dn-" ]; then
     export TRAVIS_JOB_ID=4dn-`date "+%m%d%H%M%Y%S"`
-    echo "NOTE: Simulating TRAVIS_JOB_ID=$TRAVIS_JOB_ID"
+    echo "NOTE: Simulating fresh TRAVIS_JOB_ID=${TRAVIS_JOB_ID}"
+else
+    echo "NOTE: Using existing TRAVIS_JOB_ID."
 fi
 
 python $(dirname $0)/test.py "$@"
