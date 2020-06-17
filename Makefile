@@ -79,7 +79,7 @@ test:
 	bin/test -vv --timeout=400
 
 travis-test:
-	bin/test -vv --timeout=400 --aws-auth -m "working" --durations=10 --cov src/encoded --es search-fourfront-builds-uhevxdzfcv7mkm5pj5svcri3aq.us-east-1.es.amazonaws.com:80
+	bin/test -vv --timeout=400 --aws-auth --durations=10 --cov src/encoded --es search-fourfront-builds-uhevxdzfcv7mkm5pj5svcri3aq.us-east-1.es.amazonaws.com:80
 
 update:  # updates dependencies
 	poetry update
