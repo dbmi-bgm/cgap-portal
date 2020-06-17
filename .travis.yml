@@ -23,7 +23,7 @@ addons:
 env:
   global:
   - BOTO_CONFIG=/bogus
-  - PATH="/usr/share/elasticsearch/bin:/usr/lib/postgresql/11/bin:$PATH"
+  - PATH="/usr/share/elasticsearch/bin:/usr/lib/postgresql/9.4/bin:$PATH"
   - ELASTIC_BEANSTALK_LABEL=$TRAVIS_COMMIT
   - USER="4dn-dcic"
   - SNO_REPO="snovault"
