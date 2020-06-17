@@ -1,7 +1,6 @@
 'use strict';
 
 import React from 'react';
-import { NavItem, Navbar } from 'react-bootstrap';
 import _ from 'underscore';
 import * as d3 from 'd3';
 
@@ -102,7 +101,8 @@ export class CGAPLogo extends React.PureComponent {
                 //.delay(250)
                 .on('start', function(){
                     //if (!_this.state.hover) return;
-                    d3.active(this)
+                    // eslint-disable-next-line no-invalid-this
+                    d3.active(this) // `this` refers to the paths here.
                         .duration(400)
                         .attr('transform', commonTransform1Hover2);
                 });
@@ -117,7 +117,8 @@ export class CGAPLogo extends React.PureComponent {
                 //.delay(250)
                 .on('start', function(){
                     //if (!_this.state.hover) return;
-                    d3.active(this)
+                    // eslint-disable-next-line no-invalid-this
+                    d3.active(this) // `this` refers to the paths here.
                         .duration(400)
                         .attr('transform', commonTransform2Hover2);
                 });

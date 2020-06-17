@@ -5,6 +5,7 @@ import _ from 'underscore';
 import ReactTooltip from 'react-tooltip';
 import { object, ajax } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { ClinicianNotes } from './ClinicianNotes';
+import { FileWrapper } from './Files';
 
 
 export function getIndividualDisplayTitle(individual){
@@ -85,7 +86,10 @@ export class IndividualBody extends React.PureComponent {
             onClose,
             diseaseToIndex,
             session,
-            href
+            href,
+            indvSchema,
+            docSchema,
+            imageSchema
         } = this.props;
         const {
             isLoadingIndividual,
@@ -150,6 +154,7 @@ export class IndividualBody extends React.PureComponent {
                     { ancestry ? <InlineDetailRow label="Ancestry" value={ancestry} /> : null }
                     <PhenotypicFeatures features={phenotypic_features} diseaseToIndex={diseaseToIndex} />
                     <ClinicianNotes individual={loadedIndividualItem || individualItem} haveEditPermission={haveEditPermission} />
+                    <FileWrapper individual={loadedIndividualItem || individualItem } {...{ haveEditPermission, indvSchema, docSchema, imageSchema }} />
                     {/*
                     <div className="detail-row row" data-describing="parents">
                         <div className="col-12">

@@ -4,7 +4,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import url from 'url';
 import _ from 'underscore';
-import { Navbar, Nav, NavItem } from 'react-bootstrap';
+import Navbar from 'react-bootstrap/esm/Navbar';
+import Nav from 'react-bootstrap/esm/Nav';
 import { console } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 
 import { SearchBar } from './SearchBar';
