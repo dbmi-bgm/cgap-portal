@@ -32,7 +32,7 @@ def test_setup_eb():
     assert setup_eb.CHANGES in setup_eb.LONG_DESCRIPTION
 
     assert isinstance(setup_eb.DESCRIPTION, str)
-    assert 'dcic' in setup_eb.DESCRIPTION.lower()
+    assert 'cgap' in setup_eb.DESCRIPTION.lower()
 
     assert isinstance(setup_eb.INSTALL_REQUIRES, list)
     assert all(isinstance(requirement, str) for requirement in setup_eb.INSTALL_REQUIRES)

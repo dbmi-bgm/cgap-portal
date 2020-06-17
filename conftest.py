@@ -1,4 +1,5 @@
 import pytest
+import tempfile
 
 def pytest_addoption(parser):
     parser.addoption("--es", action="store", default="", dest='es',
@@ -15,3 +16,10 @@ def remote_es(request):
 @pytest.fixture(scope='session')
 def aws_auth(request):
     return request.config.getoption("--aws-auth")
+
+
+def pytest_configure():
+    # This adjustment is important to set the default choice of temporary filenames to a nice short name
+    # because without it some of the filenames we generate end up being too long, and critical functionality
+    # ends up failing. Some socket-related filenames, for example, seem to have length limits. -kmp 5-Jun-2020
+    tempfile.tempdir = '/tmp'
