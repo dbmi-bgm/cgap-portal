@@ -114,14 +114,14 @@ export default class SearchView extends React.PureComponent {
         };
     }
 
-    renderCaseDetailPane(result, rowNumber, containerWidth, propsFromTable){ 
+    renderCaseDetailPane(result, rowNumber, containerWidth, propsFromTable) {
         const passProps = _.pick(this.props, 'windowWidth', 'href');
         return (
             <CaseDetailPane
                 {...{ passProps, propsFromTable, result, containerWidth, rowNumber }} paddingWidth={47}
-                />
+            />
         );
-    } 
+    }
 
     render(){
         // We don't need full screen btn on CGAP as already full width.
@@ -134,7 +134,6 @@ export default class SearchView extends React.PureComponent {
 
         const isCaseSearch = context['@type'][0] === 'CaseSearchResults' ? true : false;
 
-        console.log("searchview props", this.props);
         return (
             <div className="container-wide search-page-outer-container" id="content">
                 {/* TEMPORARY UNTIL DECIDE WHERE TO PUT

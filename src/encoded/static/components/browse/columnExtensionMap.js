@@ -20,7 +20,7 @@ export const DEFAULT_WIDTH_MAP = { 'lg' : 200, 'md' : 180, 'sm' : 120, 'xs' : 12
 /** Theoretically we could change all these render functions to just be functional React components, maybe a later todo. */
 
 function renderAdvancedColumn(topLeft, status, main, dateTitle, date) {
-    return( 
+    return (
         <div style={{ width: "100%" }}>
             <div className="d-flex justify-content-between">
                 <span className="col-topleft text-ellipsis-container" style={{ fontSize: "13px", fontStyle: "italic" }}>
@@ -35,33 +35,24 @@ function renderAdvancedColumn(topLeft, status, main, dateTitle, date) {
                 {main}
             </div>
             <div className="col-date text-ellipsis-container" style={{ textAlign: "center", fontSize: "12px" }}>
-                <strong>{dateTitle} </strong> 
+                <strong>{dateTitle} </strong>
                 <LocalizedTime timestamp={date} formatType="date-sm" />
             </div>
         </div>
-        );
-
+    );
 }
 
-// renderAdvancedColumn(result.display_title, result.status, result.individual_id, "Accessioned:", result.date_created);
-
-/**
- * Should move this to CGAP at some point probably
- */
 export const DisplayTitleColumnIndividual = React.memo(function DisplayTitleIndividualDefault({ result, link, onClick }) {
     // `href` and `context` reliably refer to search href and context here, i.e. will be passed in from VirtualHrefController.
-    let title = itemUtil.getTitleStringFromContext(result); // Gets display_title || title || accession || ...
+    const title = itemUtil.getTitleStringFromContext(result); // Gets display_title || title || accession || ...
 
     const tooltip = (typeof title === "string" && title.length > 20 && title) || null;
-    
 
-    console.log("result", result);
-    return <div key="title-container" className={`title-block d-flex flex-column`} data-tip={tooltip} data-delay-show={750}>
-        {renderAdvancedColumn(result.individual.display_title, result.individual.status, result.case_id, "Accessioned:", result.individual.date_created)}
-    </div>;
+    return (
+        <div key="title-container" className={`title-block d-flex flex-column`} data-tip={tooltip} data-delay-show={750}>
+            {renderAdvancedColumn(result.individual.display_title, result.individual.status, result.case_id, "Accessioned:", result.individual.date_created)}
+        </div>);
 });
-
-// export const CaseIndividualColumnWrapper
 
 
 
@@ -110,6 +101,23 @@ export const columnExtensionMap = {
             );
         }
     },
+    'accession': {
+        'widthMap' : { 'lg' : 280, 'md' : 250, 'sm' : 200 },
+        'render' : function renderCaseColumn (result, parentProps) {
+            const { href, context, rowNumber, detailOpen, toggleDetailOpen } = parentProps;
+            const { '@type' : itemTypeList = ["Item"], last_modified = {}, status = null, accession = null, aliases = [], display_title } = result;
+
+            // console.log("result", result);
+            if (itemTypeList[0] === "Case") {
+                return (
+                    <a href={result['@id']} style={{ color: "inherit", textDecoration: "inherit" }}>
+                        {renderAdvancedColumn(accession, status, aliases[0] || display_title, "Last Modified:", last_modified.date_modified || null)}
+                    </a>
+                );
+            }
+            return (<a href={result['@id']}> {aliases[0] || display_title } </a>);
+        }
+    },
     'individual': {
         'title': "Individual",
         'widthMap' : { 'lg' : 280, 'md' : 250, 'sm' : 200 },
@@ -118,9 +126,10 @@ export const columnExtensionMap = {
             const { '@type' : itemTypeList = ["Item"] } = result;
 
             if (itemTypeList[0] === "Case") {
-                return (<DisplayTitleColumnWrapper {...{ result, href, context, rowNumber, detailOpen, toggleDetailOpen }}>
-                            <DisplayTitleColumnIndividual {...{ result }}/>
-                     </DisplayTitleColumnWrapper>);
+                return (
+                    <DisplayTitleColumnWrapper {...{ result, href, context, rowNumber, detailOpen, toggleDetailOpen }}>
+                        <DisplayTitleColumnIndividual {...{ result }}/>
+                    </DisplayTitleColumnWrapper>);
             }
             return <DisplayTitleColumnIndividual {...{ result }}/>;
         }
@@ -129,11 +138,8 @@ export const columnExtensionMap = {
         'render' : function renderBioinformaticsColumn(result, parentProps){
             const { href, context, rowNumber, detailOpen, toggleDetailOpen } = parentProps;
             const { '@type' : itemTypeList = ["Item"], individual, sample_processing: { completed_processes = [], last_modified = {}, samples = []} } = result;
-            console.log("detailopen", detailOpen);
             let selected = {};
-            console.log("individual @id", individual['@id']);
-            samples.forEach(sample => {
-                console.log("sample @id", sample['@id']);
+            samples.forEach((sample) => {
                 if (sample.individual['@id'] === individual['@id']){
                     selected = sample;
                 }
@@ -147,9 +153,7 @@ export const columnExtensionMap = {
             const { '@type' : itemTypeList = ["Item"], individual, sample_processing: { samples = []} } = result;
 
             let selected = {};
-            console.log("individual @id", individual['@id']);
-            samples.forEach(sample => {
-                console.log("sample @id", sample['@id']);
+            samples.forEach((sample) => {
                 if (sample.individual['@id'] === individual['@id']){
                     selected = sample;
                 }
@@ -164,9 +168,7 @@ export const columnExtensionMap = {
             const { '@type' : itemTypeList = ["Item"], individual, sample_processing: { samples = []} } = result;
 
             let selected = {};
-            console.log("individual @id", individual['@id']);
-            samples.forEach(sample => {
-                console.log("sample @id", sample['@id']);
+            samples.forEach((sample) => {
                 if (sample.individual['@id'] === individual['@id']){
                     selected = sample;
                 }
@@ -237,6 +239,7 @@ export const columnExtensionMap = {
     'workflow.title' : {
         'title' : "Workflow",
         'render' : function(result, props){
+            const { "@id": link } = result;
             if (!result.workflow || !result.workflow.title) return null;
             const { title }  = result.workflow;
             const workflowHref = object.itemUtil.atId(result.workflow);

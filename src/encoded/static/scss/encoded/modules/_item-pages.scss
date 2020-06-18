@@ -1722,6 +1722,7 @@ $badge-item-min-height: 90px;
 
 .item-page-container {
 
+	.case-summary-card-row,
 	.cohort-summary-card-row {
 		display: flex;
 		flex-wrap: wrap;
@@ -1740,7 +1741,8 @@ $badge-item-min-height: 90px;
 			flex-grow: 1;
 			flex-shrink: 0;
 			flex-basis: 100%;
-			> #cohort-stats {
+			> #cohort-stats,
+			> #case-stats {
 				min-height: 100%;
 			}
 
@@ -1777,6 +1779,7 @@ $badge-item-min-height: 90px;
 	
 	}
 
+	#case-overview-ped-link,
 	#cohort-overview-ped-link {
 		margin-left: 0;
 

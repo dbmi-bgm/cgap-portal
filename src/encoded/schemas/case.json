@@ -77,7 +77,6 @@
     },
     "columns" : {
         "individual" : {
-            "notes" : "display_title is hardcoded to always be present and first column.",
             "title" : "Individual",
             "sort_fields" : [
                 { "field" : "accession", "title" : "Accession (CGAP ID)" },
@@ -86,7 +85,7 @@
             ]
         },
         "display_title" : {
-            "title" : "Case",
+            "title" : "Case Title",
             "default_hidden" : true
         },
         "sample_processing": {
@@ -101,6 +100,9 @@
         },
         "sample_processing.completed_processes" :  {
             "title": "Bioinformatics"
+        },
+        "accession" : {
+            "title": "Case"
         }
     }
 }

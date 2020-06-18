@@ -114,7 +114,7 @@ class FamilySection extends React.Component {
         const { open } = this.state;
         const { family } = this.props;
         return (
-            <div className="family-table-section">
+            <div className="family-table-section" key={family['@id']}>
                 <h4 className="pane-section-title" onClick={this.onToggle}>
                     <i className={"toggle-open-icon icon icon-fw fas icon-" + (open ? 'minus' : 'plus')} />
                     {family.display_title}: <span className="text-200 font-italic">Family &amp; Report History</span>
