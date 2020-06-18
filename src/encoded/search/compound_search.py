@@ -270,7 +270,7 @@ def compound_search(context, request):
     _from = body.get('from', 0)
     limit = body.get('limit', 25)
     return_generator = body.get('return_generator', False)
-    if _from < 0 or limit < 0 or limit < _from:
+    if _from < 0 or limit < 0:
         raise HTTPBadRequest('Passed bad from, to request body params: %s, %s' % (_from, limit))
     return CompoundSearchBuilder.execute_filter_set(context, request, filter_set, from_=_from, to=limit,
                                                     return_generator=return_generator, intersect=intersect)
