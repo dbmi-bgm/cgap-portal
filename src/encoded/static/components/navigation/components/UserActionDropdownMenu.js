@@ -3,8 +3,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import _ from 'underscore';
-import url from 'url';
-import { Nav, NavDropdown, Dropdown } from 'react-bootstrap';
+import Nav from 'react-bootstrap/esm/Nav';
+import NavDropdown from 'react-bootstrap/esm/NavDropdown';
+import Dropdown from 'react-bootstrap/esm/Dropdown';
 
 import { JWT, isServerSide, object, console, memoizedUrlParse } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { LoginController, LogoutController } from '@hms-dbmi-bgm/shared-portal-components/es/components/navigation/components/LoginController';

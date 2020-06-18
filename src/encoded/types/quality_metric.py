@@ -142,3 +142,17 @@ class QualityMetricQclist(QualityMetric):
     item_type = 'quality_metric_qclist'
     schema = load_schema('encoded:schemas/quality_metric_qclist.json')
     embedded_list = QualityMetric.embedded_list
+
+
+@collection(
+    name='quality-metrics-cmphet',
+    properties={
+        'title': 'Compound Het Quality Metrics',
+        'description': 'Listing of Compound Het Quality Metrics'
+    })
+class QualityMetricCmphet(QualityMetric):
+    """Subclass of quality matrics for compound hets"""
+
+    item_type = 'quality_metric_cmphet'
+    schema = load_schema('encoded:schemas/quality_metric_cmphet.json')
+    embedded_list = QualityMetric.embedded_list

@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import memoize from 'memoize-one';
 import _ from 'underscore';
 import { console, layout, ajax, object } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
+import { Schemas } from './../../util';
 import { PedigreeDetailPane } from './../components/PedigreeDetailPane';
 import PedigreeViz, { PedigreeVizView, isRelationshipNode } from './../../viz/PedigreeViz';
 import { FullHeightCalculator } from './../components/FullHeightCalculator';
@@ -155,7 +156,20 @@ export class PedigreeTabViewBody extends React.PureComponent {
 
     renderDetailPane(pedigreeVizProps){
         const { session, href, context } = this.props;
-        return <PedigreeDetailPane {...pedigreeVizProps} {...{ session, href, context }} />;
+
+        // Pass schemas down for use in File Upload Drag and Drop
+        const schemas = Schemas.get();
+        let indvSchema;
+        let docSchema;
+        let imageSchema;
+        if (schemas) {
+            indvSchema = schemas.Individual;
+            docSchema = schemas.Document;
+            imageSchema = schemas.Image;
+        }
+
+        // console.log("schemas[individual]", schemas["Individual"]);
+        return <PedigreeDetailPane {...pedigreeVizProps} {...{ session, href, context, indvSchema, docSchema, imageSchema }} />;
     }
 
     render(){
