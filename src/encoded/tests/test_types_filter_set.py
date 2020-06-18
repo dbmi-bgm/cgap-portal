@@ -250,6 +250,17 @@ def test_filter_set_intersection(workbook, testapp, complex_filter_set):
 # entire process. - Will 06/17/2020
 
 
+def execute_and_verify_generator_search(testapp, filter_set, expected):
+    """ Iterates through generator returned in json_response, comparing number of entries
+        to the number expected
+    """
+    filter_set['return_generator'] = True
+    count = 0
+    for _ in testapp.post_json(COMPOUND_SEARCH_URL, filter_set).json:
+        count += 1
+    assert count == expected
+
+
 @pytest.fixture
 def filter_set_with_only_flags():
     return {
@@ -265,6 +276,9 @@ def test_compound_search_only_flags(workbook, testapp, filter_set_with_only_flag
     """
     resp = testapp.post_json(COMPOUND_SEARCH_URL, filter_set_with_only_flags).json
     assert len(resp['@graph']) == 4
+
+    # do generator search
+    execute_and_verify_generator_search(testapp, filter_set_with_only_flags, 4)
 
     # verify facet values all sum to 4, since we should only be aggregating on the search results
     assert 'facets' in resp
@@ -298,6 +312,9 @@ def test_compound_search_single_filter_block(workbook, testapp, filter_set_with_
     assert len(resp['@graph']) == 1
     assert 'facets' in resp
 
+    # do generator search
+    execute_and_verify_generator_search(testapp, filter_set_with_single_filter_block, 1)
+
 
 @pytest.fixture
 def filter_set_with_single_filter_block_and_flags():
@@ -318,6 +335,10 @@ def test_compound_search_filter_and_flags(workbook, testapp, filter_set_with_sin
     resp = testapp.post_json(COMPOUND_SEARCH_URL, filter_set_with_single_filter_block_and_flags).json
     assert len(resp['@graph']) == 1
     assert 'facets' in resp
+
+    # do generator search
+    execute_and_verify_generator_search(testapp, filter_set_with_single_filter_block_and_flags, 1)
+    filter_set_with_single_filter_block_and_flags['return_generator'] = False
 
     # disable block, so flag only
     toggle_filter_blocks(filter_set_with_single_filter_block_and_flags, on=False)
@@ -359,6 +380,11 @@ def test_compound_search_disabled_filter_blocks(workbook, testapp, filter_set_wi
             count += facet['total']
         assert count == 4
 
+    # do generator search
+    execute_and_verify_generator_search(testapp, filter_set_with_multiple_disabled_flags, 4)
+    filter_set_with_multiple_disabled_flags['limit'] = 2
+    execute_and_verify_generator_search(testapp, filter_set_with_multiple_disabled_flags, 2)
+
 
 @pytest.fixture
 def paginated_request():
@@ -389,9 +415,4 @@ def test_compound_search_from_to(workbook, testapp, paginated_request):
     # attempt with generator
     paginated_request['from'] = 0
     paginated_request['limit'] = 10
-    paginated_request['return_generator'] = True
-    count = 0
-    for _ in testapp.post_json(COMPOUND_SEARCH_URL, paginated_request).json:
-        count += 1
-    assert count == 10
-
+    execute_and_verify_generator_search(testapp, paginated_request, 10)

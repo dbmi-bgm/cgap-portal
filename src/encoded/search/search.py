@@ -1304,6 +1304,7 @@ def compound_search(context, request):
             "from": <int>,  # starting index in ES search results to return, default 0
             "limit": <int>,  # number of results to return, default 25
             "return_generator": true/false, default false
+            "intersect": true/false, if true will compute intersection of filter_blocks, default false
         }
 
     """
