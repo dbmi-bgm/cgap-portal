@@ -2,6 +2,8 @@ from snovault import collection, load_schema, calculated_property
 from .base import Item
 
 
+# XXX: These constants could be defined on CompoundSearchBuilder, but thought they may be
+#      more useful here/more logically belong. - Will
 FLAGS = 'flags'
 FILTER_BLOCKS = 'filter_blocks'
 

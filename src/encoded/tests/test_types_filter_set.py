@@ -368,7 +368,7 @@ def paginated_request():
 
 
 def test_compound_search_from_to(workbook, testapp, paginated_request):
-    """ Tests pagination with compound searches """
+    """ Tests pagination + generator with compound searches """
 
     # first, test failures
     def test_failure(from_, limit):
@@ -385,3 +385,13 @@ def test_compound_search_from_to(workbook, testapp, paginated_request):
     paginated_request['limit'] = 10
     resp = testapp.post_json(COMPOUND_SEARCH_URL, paginated_request).json
     assert len(resp['@graph']) == 10
+
+    # attempt with generator
+    paginated_request['from'] = 0
+    paginated_request['limit'] = 10
+    paginated_request['return_generator'] = True
+    count = 0
+    for _ in testapp.post_json(COMPOUND_SEARCH_URL, paginated_request).json:
+        count += 1
+    assert count == 10
+
