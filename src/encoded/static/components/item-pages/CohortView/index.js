@@ -180,7 +180,7 @@ export default class CohortView extends DefaultItemView {
     /**
      * Hackyish approach to reusing state logic to wrap entire ItemView (or all tabs, at last).
      * Will be easier to migrate to functional components with hooks theoretically this way if needed.
-     * Any controller component can be functional or classical (pun intended :-P).
+     * Any controller component can be functional or classical.
      *
      * Later, could maybe structure as (to be more React-ful):
      * ```
@@ -287,7 +287,7 @@ const CohortSummaryTabView = React.memo(function CohortSummaryTabView(props){
             // By default, click on link elements would trigger ajax request to get new context.
             // (unless are external links)
             navigate("#pedigree", { skipRequest: true });
-        }
+        };
     }, [ /* empty == executed only once ever */ ]);
 
     let cohortSummaryTables;
@@ -365,6 +365,8 @@ const CohortSummaryTabView = React.memo(function CohortSummaryTabView(props){
     const rgs = layout.responsiveGridState(windowWidth);
     let pedWidth;
     let pedBlock = (
+        // Default 'icon' representing pedigree. If pedigree data present and we're at larger screen size, gets
+        // overriden below.
         <div className="d-none d-lg-block pedigree-placeholder" onClick={onViewPedigreeBtnClick} disabled={familiesLen === 0}>
             <div className="text-center h-100">
                 <i className="icon icon-sitemap icon-4x fas" />
