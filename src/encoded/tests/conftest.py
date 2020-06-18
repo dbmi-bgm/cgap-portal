@@ -16,6 +16,12 @@ from .. import main
 from .conftest_settings import make_app_settings_dictionary
 
 
+pytest_plugins = [
+    'encoded.tests.datafixtures',
+    'snovault.tests.serverfixtures',
+]
+
+
 @pytest.fixture(autouse=True)
 def autouse_external_tx(external_tx):
     pass
