@@ -40,7 +40,7 @@ def run_ingest_vcf(app_handle, args):
                     vcf_parser.format_variant_sub_embedded_objects(variant)
                     res = app_handle.post_json('/variant', variant, status=201).json['@graph'][0]  # only one item posted
                     success += 1
-                except:  # ANNOTATION spec validation error, recoverable
+                except Exception:  # ANNOTATION spec validation error, recoverable
                     error += 1
                     continue
                 variant_samples = vcf_parser.create_sample_variant_from_record(record)

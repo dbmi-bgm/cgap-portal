@@ -203,7 +203,7 @@ class MappingTableParser(object):
                                               'key other than "key" or "title": %s ' % type)
         try:
             fmt = json.loads(json_or_str)
-        except:  # just a string is given, use for both name and title
+        except Exception:  # just a string is given, use for both name and title
             return json_or_str
         else:
             return fmt[type]
