@@ -545,10 +545,7 @@ def test_index_data_workbook(app, workbook, testapp, indexer_testapp, htmltestap
         # check items in search result individually
         search_url = '/%s?limit=all' % item_type
         print("search_url=", search_url)
-        res = testapp.get(search_url, status=[200, 301])
-        print("res=", res)
-        res = res.follow()
-        print("res=", res)
+        res = testapp.get(search_url, status=[200, 301]).follow()
         for item_res in res.json.get('@graph', []):
             index_view_res = es.get(index=namespaced_index, doc_type=item_type,
                                     id=item_res['uuid'])['_source']
