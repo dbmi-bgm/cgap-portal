@@ -1,3 +1,4 @@
+import io
 import json
 import os
 import pytest
@@ -5,6 +6,7 @@ import copy
 from io import StringIO
 
 from collections import OrderedDict
+from dcicutils import s3_utils
 from rdflib import URIRef
 from unittest import mock
 from ..commands import generate_items_from_owl as gifo
@@ -65,26 +67,45 @@ def ll_class():
 def mkd_class():
     return gifo.convert2URIRef('http://purl.obolibrary.org/obo/HP_0000003')
 
-import six
-RERAISE = six.reraise
-from unittest import mock
+
+TEST_KEYS_ENV = 'fourfront-cgap'
+TEST_KEYS_STORED = '{"server": "https://cgap.hms.harvard.edu/", "key": "testkey", "secret": "testsecret"}'
+# NOTE: the trailing '/' gets removed along the way. -kmp 21-Jun-2020
+TEST_KEYS_RETURNED = {"server": "https://cgap.hms.harvard.edu", "key": "testkey", "secret": "testsecret"}
+
+
+class MockS3UtilsForAccessKeys:
+
+    def __init__(self, env):
+        assert env == TEST_KEYS_ENV
+
+    def get_access_keys(self):
+        return json.loads(TEST_KEYS_STORED)
+
 
 def test_connect2server_w_env(connection):
-    def mock_raise(tp, value, tb=None):
-        import pdb; pdb.set_trace()
-        return RERAISE(tp, value, tb)
-    with mock.patch("six.reraise", side_effect=mock_raise):
-        # parameters we pass in don't really matter
-        key = "{'server': 'https://cgap.hms.harvard.edu/', 'key': 'testkey', 'secret': 'testsecret'}"
-        with mock.patch('encoded.commands.generate_items_from_owl.get_authentication_with_server', return_value=connection):
-            retval = gifo.connect2server('fourfront-cgap')
-            assert retval == connection
+    non_dictionary = object()
+    with mock.patch.object(s3_utils, "s3Utils", MockS3UtilsForAccessKeys):
+        retval = gifo.connect2server(TEST_KEYS_ENV, key=non_dictionary)
+        assert retval == TEST_KEYS_RETURNED
 
+
+TEST_KEYS_FILE_KEY = "applesauce"
+TEST_KEYS_FILE_CONTENTS = '{"%(key_name)s": %(key_val)s}' % {
+    "key_name": TEST_KEYS_FILE_KEY,
+    "key_val": TEST_KEYS_STORED
+}
 
 def test_connect2server_w_key(connection):
-    # TODO need to mock file open read etc to get this to work
-    with mock.patch('encoded.commands.generate_items_from_owl.os.path.isfile', return_value=True):
-        pass
+    keyfile = "some.file"
+    def mocked_open(filename, mode):
+        assert filename == keyfile
+        assert mode == 'r'
+        return StringIO(TEST_KEYS_FILE_CONTENTS)
+    with mock.patch.object(os.path, 'isfile', return_value=True):
+        with mock.patch.object(io, "open", side_effect=mocked_open):
+            retval = gifo.connect2server(None, keyfile=keyfile, key=TEST_KEYS_FILE_KEY)
+            assert retval == TEST_KEYS_RETURNED
 
 
 def test_prompt_check_for_output_options_w_load_y_and_file(monkeypatch, mock_logger):

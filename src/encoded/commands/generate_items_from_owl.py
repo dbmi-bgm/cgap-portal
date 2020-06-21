@@ -1,5 +1,6 @@
 import argparse
 from datetime import datetime
+import io
 import logging
 import logging.config
 import json
@@ -309,7 +310,7 @@ def connect2server(env=None, key=None, keyfile=None, logger=None):
     if key and keyfile:
         keys = None
         if os.path.isfile(keyfile):
-            with open(keyfile, 'r') as kf:
+            with io.open(keyfile, 'r') as kf:
                 keys_json_string = kf.read()
                 keys = json.loads(keys_json_string)
         if keys:
