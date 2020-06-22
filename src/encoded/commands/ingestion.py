@@ -102,6 +102,11 @@ def main():
     parser.add_argument('--post-gene-inserts', action='store_true', default=False,
                         help='If specified will post gene inserts to portal')
 
+    # Add this option to form links from variant_sample to the VCF file
+    parser.add_argument('--post-vcf-file', action='store_true', default=False,
+                        help='Whether or not to post a file, default no. If a file is posted links from '
+                             'VariantSample to the file will be formed.')
+
     # Required application-level arguments
     parser.add_argument('config_uri', help="path to configfile",
                         default='development.ini')  # to get app

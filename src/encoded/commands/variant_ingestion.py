@@ -22,10 +22,24 @@ def run_variant_table_intake(app_handle, args):
     return True
 
 
+def post_vcf_file(app_handle, filename, project, institution):
+    """ Posts the VCF file to the portal. Returns the uuid of the file."""
+    file = {
+        'filename': filename,
+        'project': project,  # post file associated with variant
+        'institution': institution
+    }
+    file_uuid = app_handle.post_json('/annotated_vcf_file', file, status=201).json['@graph'][0]['@id']
+    return file_uuid
+
+
 def run_ingest_vcf(app_handle, args):
     """ Runs the vcf ingestion step """
     logger.info('Ingesting VCF file: %s' % args.vcf)
     vcf_parser = VCFParser(args.vcf, args.variant, args.sample)
+    file_uuid = None
+    if args.post_vcf_file:
+        file_uuid = post_vcf_file(app_handle, args.vcf, args.variant_project, args.variant_institution)
     if args.post_variant_consequences:
         vcf_parser.post_variant_consequence_items(app_handle, project=args.variant_project,
                                                   institution=args.variant_institution)
@@ -48,6 +62,8 @@ def run_ingest_vcf(app_handle, args):
                     sample['project'] = args.variant_project
                     sample['institution'] = args.variant_institution
                     sample['variant'] = res['@id']  # make link
+                    if file_uuid is not None:
+                        sample['vcf'] = file_uuid
                     app_handle.post_json('/variant_sample', sample, status=201)
         except Exception as e:  # VCF spec validation error, not recoverable
             logger.error('Encountered VCF format error: %s' % str(e))

@@ -1,0 +1,39 @@
+{
+  "title": "Annotated VCF File",
+  "description": "Schema for submitting annotated VCF metadata.",
+  "id": "/profiles/annotated_vcf_file.json",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "required": [
+    "project",
+    "institution"
+  ],
+  "identifyingProperties": [
+    "uuid",
+    "accession",
+    "aliases"
+  ],
+  "additionalProperties": false,
+  "mixinFacets": [],
+  "properties": {
+    "accession": {
+      "accessionType": "FI"
+    },
+    "description": {
+      "title": "Description",
+      "description": "A plain text description of the file.",
+      "type": "string",
+      "lookup": 10,
+      "formInput": "textarea"
+    },
+    "filename": {
+      "title": "File Name",
+      "description": "The local file name used at time of submission. Must be alphanumeric, with the exception of the following special characters: '+=,.@-_'",
+      "s3Upload": true,
+      "ff_flag": "second round",
+      "type": "string",
+      "pattern": "^[\\w+=,.@-]*$",
+      "comment": "ultimately uploaded filename will be uuid/accession, but filename with no directory will be store in metadata as passed in"
+    }
+  }
+}
