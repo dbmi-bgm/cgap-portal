@@ -339,6 +339,8 @@ class VCFParser(object):
 
             # handle annotation fields
             raw = record.INFO.get(key, None)
+            if key == 'MULTIALLELE':
+                import pdb; pdb.set_trace()
             if raw:
                 annotations = self.parse_annotation_field_value(raw)
             else:
@@ -405,7 +407,8 @@ class VCFParser(object):
                 field_value = data.__getattribute__(field)
                 if isinstance(field_value, list):  # could be a list - in this case, force cast to string
                     field_value = ','.join(map(str, field_value))
-                result[field] = field_value
+                if field_value is not None:
+                    result[field] = field_value
 
     def create_sample_variant_from_record(self, record):
         """ Parses the given record to produce the sample variant
@@ -575,15 +578,15 @@ def main():
         app_handle = VirtualApp(app, environ)
         if args.post_variant_consequences:
             vcf_parser.post_variant_consequence_items(app_handle, project=args.project, institution=args.institution)
-        for record in vcf_parser:
+        for idx, record in enumerate(vcf_parser):
             variant = vcf_parser.create_variant_from_record(record)
             variant['project'] = args.project
             variant['institution'] = args.institution
             vcf_parser.format_variant_sub_embedded_objects(variant)
             try:
                 res = app_handle.post_json('/variant', variant, status=201).json['@graph'][0]  # only one item posted
-            except:
-                print('Failed validation')  # some variant gene linkTos do not exist
+            except Exception as e:
+                print('Failed validation at row: %s\n Exception: %s' % (idx, e))  # some variant gene linkTos do not exist
                 continue
             variant_samples = vcf_parser.create_sample_variant_from_record(record)
             for sample in variant_samples:

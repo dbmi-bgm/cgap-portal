@@ -76,3 +76,7 @@ def main():
 
     app = get_app(args.config_uri, args.app_name)
     sys.exit(purge_item_type_from_storage(app, [args.item_type], prod=args.prod))
+
+
+if __name__ == '__main__':
+    main()

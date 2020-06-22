@@ -76,6 +76,7 @@ class Variant(Item):
     item_type = 'variant'
     schema = load_schema('encoded:schemas/variant.json')
     embedded_list = build_variant_embedded_list()
+    unique_key = 'variant.display_title'
 
     @calculated_property(schema={
         "title": "Display Title",
@@ -138,6 +139,9 @@ class VariantSample(Item):
     def AF(self, AD):
         if AD:
             ref, alt = AD.split(',')
+            denominator = int(ref) + int(alt)
+            if denominator == 0:
+                return 0.0
             return round(int(alt) / (int(ref) + int(alt)), 3)  # round to 3 digits
         return 0.0
 
