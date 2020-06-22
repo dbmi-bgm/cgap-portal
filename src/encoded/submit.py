@@ -239,9 +239,12 @@ def create_sample_processing_groups(items, sp_alias):
 
 
 # NOT YET TESTED
-def compare_with_db(alias, virtualapp):
+def compare_with_db(virtualapp, alias):
     try:  # check if already in db
-        result = virtualapp.get(alias + '/?frame=object')
+        result = virtualapp.get('/' + alias + '/?frame=object')
+        if result.status_code == 301:
+            msg = json.loads(result.body).get('message', '')
+            result = virtualapp.get(msg[msg.index('/'):msg.index(';')])
     except Exception as e:  # if not in db
         # print(e)
         if 'HTTPNotFound' in str(e):
@@ -327,9 +330,9 @@ def validate_all_items(virtualapp, json_data):
     all_aliases = [k for itype in json_data for k in json_data[itype]]
     json_data_final = {'post': {}, 'patch': {}}
     validation_results = {}
-    for itemtype in POST_ORDER[:4]:  # don't pre-validate case and report
+    for itemtype in POST_ORDER:  # don't pre-validate case and report
         if itemtype in json_data:
-            profile = virtualapp.get('/profiles/{}.json'.format(itemtype))
+            profile = virtualapp.get('/profiles/{}.json'.format(itemtype)).json
             validation_results[itemtype] = {'validated': 0, 'errors': 0}
         for alias in json_data[itemtype]:
             # TODO : format fields (e.g. int, list, etc.)
@@ -338,9 +341,10 @@ def validate_all_items(virtualapp, json_data):
                 error = validate_item(virtualapp, json_data[itemtype][alias], 'post', itemtype, all_aliases)
                 if error:  # modify to check for presence of validation errors
                     # do something to report validation errors
-                    for e in error:
-                        errors.append('{} {} - Error found: {}'.format(itemtype, alias, e))
-                    validation_results[itemtype]['errors'] += 1
+                    if itemtype not in ['case', 'report']:
+                        for e in error:
+                            errors.append('{} {} - Error found: {}'.format(itemtype, alias, e))
+                        validation_results[itemtype]['errors'] += 1
                 else:
                     json_data_final['post'].setdefault(itemtype, [])
                     json_data_final['post'][itemtype].append(json_data[itemtype][alias])
@@ -369,11 +373,12 @@ def validate_all_items(virtualapp, json_data):
                             val = result.get(field, [])
                             val.extend(json_data[itemtype][alias][field])
                             to_patch[field] = list(set(val))
-                error = validate_item(virtualapp, to_patch, 'post', itemtype, all_aliases, atid=result['@id'])
+                error = validate_item(virtualapp, to_patch, 'patch', itemtype, all_aliases, atid=result['@id'])
                 if error:  # do something to report validation errors
-                    for e in error:
-                        errors.append('{} {} - Error found: {}'.format(itemtype, alias, e))
-                    validation_results[itemtype]['errors'] += 1
+                    if itemtype not in ['case', 'report']:
+                        for e in error:
+                            errors.append('{} {} - Error found: {}'.format(itemtype, alias, e))
+                        validation_results[itemtype]['errors'] += 1
                 else:  # patch
                     json_data_final['patch'].setdefault(itemtype, {})
                     json_data_final['patch'][itemtype][result['@id']] = to_patch
@@ -388,8 +393,8 @@ def validate_all_items(virtualapp, json_data):
         output.append('Validation errors found in items. Please fix spreadsheet before submitting.')
         return ({}, output)
     else:
-        json_data_final['post']['case'] = list(json_data['case'].values())
-        json_data_final['post']['report'] = list(json_data['report'].values())
+        # json_data_final['post']['case'] = list(json_data['case'].values())
+        # json_data_final['post']['report'] = list(json_data['report'].values())
         json_data_final['aliases'] = alias_dict
         output.append('All items validated.')
         return (json_data_final, output)
@@ -447,7 +452,7 @@ def post_and_patch_all_items(virtualapp, json_data_final):
                 output.append(e)
         if final_status[k]['patched'] > 0 or final_status[k]['not patched'] > 0:
             output.append('{}: {} items patched successfully; {} items not patched'.format(
-                itype, final_status[k]['patched'], final_status[k]['not patched']
+                k, final_status[k]['patched'], final_status[k]['not patched']
             ))
     return output
 
