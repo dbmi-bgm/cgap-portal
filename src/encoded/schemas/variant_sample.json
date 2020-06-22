@@ -7,7 +7,8 @@
     ],
     "identifyingProperties": [
         "uuid",
-        "aliases"
+        "aliases",
+        "annotation_id"
     ],
     "additionalProperties": false,
     "mixinProperties": [
@@ -43,6 +44,11 @@
     "description": "Schema for variant info for sample",
     "id": "/profiles/variant_sample.json",
     "properties": {
+        "annotation_id": {
+            "title": "Annotation ID",
+            "type": "string",
+            "uniqueKey": true
+        },
         "QUAL": {
             "title": "Variant Quality",
             "field_name": "QUAL",

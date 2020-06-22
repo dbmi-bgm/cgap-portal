@@ -135,7 +135,8 @@ def test_VCFP_post_sample_variants(testapp, institution, project, test_vcf):
         for sample in variant_samples:
             sample['project'] = 'encode-project'
             sample['institution'] = 'encode-institution'
-            testapp.post_json(VARIANT_SAMPLE_URL, sample, status=201)
+            res = testapp.post_json(VARIANT_SAMPLE_URL, sample, status=201).json
+            assert 'annotation_id' in res['@graph'][0]  # verify annotation_id is added on post
 
 
 def test_VCFP_post_variants(testapp, institution, project, test_vcf, gene_workbook, post_variant_consequence_items):
@@ -147,7 +148,8 @@ def test_VCFP_post_variants(testapp, institution, project, test_vcf, gene_workbo
         variant['project'] = 'encode-project'
         variant['institution'] = 'encode-institution'
         test_vcf.format_variant_sub_embedded_objects(variant)
-        testapp.post_json(VARIANT_URL, variant, status=201)
+        res = testapp.post_json(VARIANT_URL, variant, status=201).json
+        assert 'annotation_id' in res['@graph'][0]  # verify annotation_id is added on post
 
 
 # @pytest.mark.skip  # will not run currently without valid VCF
@@ -176,9 +178,11 @@ def test_VCFP_make_links(testapp, institution, project, test_vcf, gene_workbook,
         variant['institution'] = 'encode-institution'
         test_vcf.format_variant_sub_embedded_objects(variant)
         res = testapp.post_json(VARIANT_URL, variant, status=201).json['@graph'][0]  # only one item posted
+        assert 'annotation_id' in res
         variant_samples = test_vcf.create_sample_variant_from_record(record)
         for sample in variant_samples:
             sample['project'] = 'encode-project'
             sample['institution'] = 'encode-institution'
             sample['variant'] = res['@id']  # make link
-            testapp.post_json(VARIANT_SAMPLE_URL, sample, status=201)
+            res2 = testapp.post_json(VARIANT_SAMPLE_URL, sample, status=201).json
+            assert 'annotation_id' in res2['@graph'][0]

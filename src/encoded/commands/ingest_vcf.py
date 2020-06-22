@@ -339,8 +339,6 @@ class VCFParser(object):
 
             # handle annotation fields
             raw = record.INFO.get(key, None)
-            if key == 'MULTIALLELE':
-                import pdb; pdb.set_trace()
             if raw:
                 annotations = self.parse_annotation_field_value(raw)
             else:
@@ -365,7 +363,9 @@ class VCFParser(object):
                                 result[sub_embedded_group][g_idx] = {}
                             result[sub_embedded_group][g_idx][fn] = self.validate_variant_value(fn, field, key)
                         else:
-                            result[fn] = self.validate_variant_value(fn, field, key)
+                            possible_value = self.validate_variant_value(fn, field, key)
+                            if possible_value is not None:
+                                result[fn] = possible_value
         return result
 
     @staticmethod
@@ -454,6 +454,10 @@ class VCFParser(object):
                         tmp['samplegeno_ad'] = ad
                         tmp['samplegeno_sampleid'] = sample_id
                         s['samplegeno'].append(tmp)
+                elif field == 'multiallele_samplevariantkey':  # XXX: refactor with samplegeno
+                    multiallele = record.INFO.get('MULTIALLELE', None)
+                    if multiallele:
+                        s['multiallele_samplevariantkey'] = multiallele[0]
 
             self.parse_samples(s, sample)  # add sample fields, already formatted
             s.pop('AF', None)  # XXX: comes from VCF but is not actually what we want. Get rid of it.
@@ -586,7 +590,8 @@ def main():
             try:
                 res = app_handle.post_json('/variant', variant, status=201).json['@graph'][0]  # only one item posted
             except Exception as e:
-                print('Failed validation at row: %s\n Exception: %s' % (idx, e))  # some variant gene linkTos do not exist
+                print('Failed validation at row: %s\n'
+                      'Exception: %s' % (idx, e))  # some variant gene linkTos do not exist
                 continue
             variant_samples = vcf_parser.create_sample_variant_from_record(record)
             for sample in variant_samples:

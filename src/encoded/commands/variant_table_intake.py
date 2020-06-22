@@ -415,7 +415,7 @@ class MappingTableParser(object):
         schema['$schema'] = 'http://json-schema.org/draft-04/schema#'
         schema['type'] = 'object'
         schema['required'] = ['institution', 'project']
-        schema['identifyingProperties'] = ['uuid', 'aliases']
+        schema['identifyingProperties'] = ['uuid', 'aliases', 'annotation_id']
         schema['additionalProperties'] = False
         schema['mixinProperties'] = [
             { "$ref": "mixins.json#/schema_version" },
@@ -428,6 +428,17 @@ class MappingTableParser(object):
             { "$ref": "mixins.json#/notes" },
             { "$ref": "mixins.json#/static_embeds" }
         ]
+
+    @staticmethod
+    def add_identifier_field(props):
+        """ Adds the 'annotation_id' field, the unique_key constraint on variant/variant_sample which
+            is an alias for the display_title.
+        """
+        props['annotation_id'] = {
+            'title': 'Annotation ID',
+            'type': 'string',
+            'uniqueKey': True
+        }
 
     def generate_variant_sample_schema(self, sample_props, cols, facs, variant_cols, variant_facs):
         """ Builds the variant_sample.json schema based on sample_props. Will also add variant columns and
@@ -456,6 +467,14 @@ class MappingTableParser(object):
             'type': 'string',
             'linkTo': 'Variant'
         }
+        schema['properties']['vcf'] = {  # link to VCF file uploaded
+            'title': 'VCF File',
+            'type': 'string',
+            'linkTo': 'File'
+        }
+
+        # adds annotation ID field, effectively making display_title a primary key constraint
+        self.add_identifier_field(schema['properties'])
 
         # helper so variant facets work on variant sample
         # XXX: Behavior needs testing

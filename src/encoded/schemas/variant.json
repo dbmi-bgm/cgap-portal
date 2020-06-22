@@ -7,7 +7,8 @@
     ],
     "identifyingProperties": [
         "uuid",
-        "aliases"
+        "aliases",
+        "annotation_id"
     ],
     "additionalProperties": false,
     "mixinProperties": [
@@ -43,6 +44,11 @@
     "description": "Schema for variants",
     "id": "/profiles/variant.json",
     "properties": {
+        "annotation_id": {
+            "title": "Annotation ID",
+            "type": "string",
+            "uniqueKey": true
+        },
         "CHROM": {
             "title": "Chromosome",
             "field_name": "CHROM",

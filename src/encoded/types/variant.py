@@ -13,6 +13,9 @@ from .base import (
 )
 
 
+ANNOTATION_ID = 'annotation_id'
+
+
 def extend_embedded_list(embedded_list, fd, typ, prefix=None):
     """ Extends the given embedded list with embeds from fd. Helper method for
         building embedded lists from files, used for Variant and Variant Sample
@@ -69,14 +72,25 @@ def build_variant_sample_embedded_list():
     properties={
         'title': 'Variants',
         'description': 'List of all variants'
-    })
+    },
+    unique_key='variant.annotation_id')
 class Variant(Item):
     """ Variant class """
 
     item_type = 'variant'
     schema = load_schema('encoded:schemas/variant.json')
     embedded_list = build_variant_embedded_list()
-    unique_key = 'variant.display_title'
+
+    @classmethod
+    def create(cls, registry, uuid, properties, sheets=None):
+        """ Sets the annotation_id field on this variant prior to passing on. """
+        properties[ANNOTATION_ID] = 'chr%s:%s%s_%s' % (  # XXX: replace _ with > field is restricted
+            properties['CHROM'],
+            properties['POS'],
+            properties['REF'],
+            properties['ALT']
+        )
+        return super(Item, cls).create(registry, uuid, properties, sheets)
 
     @calculated_property(schema={
         "title": "Display Title",
@@ -92,13 +106,26 @@ class Variant(Item):
     properties={
         'title': 'Variants (sample)',
         'description': 'List of all variants with sample specific information',
-    })
+    },
+    unique_key='variant_sample:annotation_id')
 class VariantSample(Item):
     """Class for variant samples."""
 
     item_type = 'variant_sample'
     schema = load_schema('encoded:schemas/variant_sample.json')
     embedded_list = build_variant_sample_embedded_list()
+
+    @classmethod
+    def create(cls, registry, uuid, properties, sheets=None):
+        """ Sets the annotation_id field on this variant_sample prior to passing on. """
+        if 'variant' not in properties:
+            properties[ANNOTATION_ID] = '%s:Unknown_Variant%s' % (properties['CALL_INFO'], uuid)
+        else:  # this is what really needs to happen every time
+            properties[ANNOTATION_ID] = '%s:%s' % (
+                properties['CALL_INFO'],
+                properties['variant']
+            )
+        return super(Item, cls).create(registry, uuid, properties, sheets)
 
     @calculated_property(schema={
         "title": "Display Title",
