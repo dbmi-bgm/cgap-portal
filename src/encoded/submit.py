@@ -278,7 +278,7 @@ def parse_exception(e, aliases):
     try:
         # try parsing the exception
         if isinstance(e, VirtualAppError):
-            text = e.raw_exception
+            text = e.raw_exception.args[0]
         else:
             text = e.args[0]
         resp_text = text[text.index('{'):-1]
