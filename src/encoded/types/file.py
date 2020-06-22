@@ -619,7 +619,7 @@ class FileReference(File):
         'title': 'Annotated VCF Files',
         'description': 'Collection of annotated VCF files that have been ingested.'
     })
-class AnnotatedVCFFile(File):
+class AnnotatedVcfFile(File):
     item_type = 'annotated_vcf_file'
     schema = load_schema('encoded:schemas/annotated_vcf_file.json')
     embedded_list = File.embedded_list

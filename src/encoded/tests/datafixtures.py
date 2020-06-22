@@ -11,8 +11,8 @@ ORDER = [
     'quality_metric_cmphet',
     'quality_metric_vcfcheck', 'quality_metric_workflowrun', 'software', 'static_section',
     'tracking_item', 'workflow_mapping', 'workflow_run_awsem',
-    'workflow_run', 'annotation_field', 'variant_sample', 'variant', 'gene_annotation_field',
-    'gene',
+    'workflow_run', 'annotation_field', 'annotated_vcf_file', 'variant_sample', 'variant',
+    'gene_annotation_field', 'gene',
 ]
 
 
