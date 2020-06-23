@@ -184,8 +184,12 @@ class CompoundSearchBuilder:
             if len(sub_queries) == 0:  # if all blocks are disabled, just execute the flags
                 if not flags:
                     flags = cls.DEFAULT_SEARCH
-                elif t not in flags:
-                    flags += '&type=%s' % t
+                type_flag = 'type=%s' % t
+                elif type_flag not in flags:
+                    flags += '?' + type_flag
+                else:
+                    pass
+
                 subreq = cls.build_subreq_from_single_query(request, flags, from_=from_, to=to)
                 return cls.invoke_search(context, request, subreq, return_generator=return_generator)
 
@@ -199,12 +203,12 @@ class CompoundSearchBuilder:
     @classmethod
     def extract_filter_set_from_search_body(cls, request, body):
         """ Validates the compound_search POST request body, returning a dictionary filter_set item.
-            XXX: Test (and should HTTPBadRequest be thrown here?)
 
         :param request: current request
         :param body: body of POST request (in JSON)
         :return: a filter_set, to be executed
         """
+        # TODO: Test (and should HTTPBadRequest be thrown here?) - Will 6-23-2020
         if cls.ID in body:  # prioritize @id
             return get_item_or_none(request, body[cls.ID])
         else:
@@ -270,10 +274,10 @@ def compound_search(context, request):
     body = json.loads(request.body)
     filter_set = CompoundSearchBuilder.extract_filter_set_from_search_body(request, body)
     intersect = True if body.get('intersect', False) else False
-    _from = body.get('from', 0)
+    from_ = body.get('from', 0)
     limit = body.get('limit', 25)
     return_generator = body.get('return_generator', False)
-    if _from < 0 or limit < 0:
-        raise HTTPBadRequest('Passed bad from, to request body params: %s, %s' % (_from, limit))
-    return CompoundSearchBuilder.execute_filter_set(context, request, filter_set, from_=_from, to=limit,
+    if from_ < 0 or limit < 0:
+        raise HTTPBadRequest('Passed bad from, to request body params: %s, %s' % (from_, limit))
+    return CompoundSearchBuilder.execute_filter_set(context, request, filter_set, from_=from_, to=limit,
                                                     return_generator=return_generator, intersect=intersect)
