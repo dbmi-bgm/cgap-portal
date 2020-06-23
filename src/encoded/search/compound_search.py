@@ -120,6 +120,12 @@ class CompoundSearchBuilder:
             request.response.status_code = 404
         return response
 
+    @staticmethod
+    def _add_type_to_flag_if_needed(flags, type_flag):
+        """ Modifies 'flags' in place by adding type query if it is not present """
+        if type_flag not in flags:
+            flags += '&' + type_flag
+
     @classmethod
     def execute_filter_set(cls, context, request, filter_set, from_=0, to=10, return_generator=False, intersect=False):
         """ Executes the given filter_set. This function contains the core functionality of the class.
@@ -140,8 +146,7 @@ class CompoundSearchBuilder:
         # if we have no filter blocks, pass flags alone to search
         if not filter_blocks and flags:
             type_flag = 'type=%s' % t
-            if type_flag not in flags:
-                flags += '&' + type_flag
+            cls._add_type_to_flag_if_needed(flags, type_flag)
             subreq = cls.build_subreq_from_single_query(request, flags, from_=from_, to=to)
             return cls.invoke_search(context, request, subreq, return_generator=return_generator)
 
@@ -185,11 +190,7 @@ class CompoundSearchBuilder:
                 if not flags:
                     flags = cls.DEFAULT_SEARCH
                 type_flag = 'type=%s' % t
-                elif type_flag not in flags:
-                    flags += '?' + type_flag
-                else:
-                    pass
-
+                cls._add_type_to_flag_if_needed(flags, type_flag)
                 subreq = cls.build_subreq_from_single_query(request, flags, from_=from_, to=to)
                 return cls.invoke_search(context, request, subreq, return_generator=return_generator)
 
