@@ -4,17 +4,15 @@ from collections import OrderedDict
 from elasticsearch_dsl.aggs import Terms
 from pyramid.httpexceptions import HTTPBadRequest
 from urllib.parse import urlencode
-from snovault import (
-    TYPES,
-)
+from snovault import TYPES
 from snovault.elasticsearch.create_mapping import determine_if_is_date_field
-from encoded.search.search_utils import (find_nested_path,
-                                         convert_search_to_dictionary,
-                                         QueryConstructionException,
-                                         COMMON_EXCLUDED_URI_PARAMS,
-                                         QUERY, FILTER, MUST, MUST_NOT, BOOL, MATCH, SHOULD,
-                                         EXISTS, FIELD, NESTED, PATH, TERMS, RANGE, AGGS, REVERSE_NESTED,
-                                         schema_for_field, get_query_field)
+from encoded.search.search_utils import (
+    find_nested_path, convert_search_to_dictionary,
+    QueryConstructionException,
+    COMMON_EXCLUDED_URI_PARAMS, QUERY, FILTER, MUST, MUST_NOT, BOOL, MATCH, SHOULD,
+    EXISTS, FIELD, NESTED, PATH, TERMS, RANGE, AGGS, REVERSE_NESTED,
+    schema_for_field, get_query_field
+)
 
 
 log = structlog.getLogger(__name__)
@@ -52,7 +50,7 @@ class LuceneBuilder:
         for range_field, range_def in range_filters.items():
             nested_path = find_nested_path(range_field, es_mapping)
             if nested_path:
-                must_filters.append(('range', {
+                must_filters.append(('range', {  # NOT using the constant, since the 2nd part is the lucene sub-query
                     NESTED: {
                         PATH: nested_path,
                         QUERY: {
@@ -76,9 +74,7 @@ class LuceneBuilder:
 
         :return: dsl-subquery that is effectively an OR of all options on the field. See SHOULD.
         """
-        should_query = {BOOL: {SHOULD: {TERMS: {field_name: []}}}}
-        for option in options:
-            should_query[BOOL][SHOULD][TERMS][field_name].append(option)
+        should_query = {BOOL: {SHOULD: {TERMS: {field_name: options}}}}
         return should_query
 
     @classmethod
@@ -186,8 +182,8 @@ class LuceneBuilder:
         :param final_filters: Collection of filters formatted in lucene, to be extended with nested filters
         :param key: 'must' or 'must_not'
         """
-        key_map = {MUST: MUST_NOT, MUST_NOT: MUST}
-        if key not in key_map:
+        complement_key_map = {MUST: MUST_NOT, MUST_NOT: MUST}
+        if key not in complement_key_map:
             raise QueryConstructionException(
                 query_type='nested',
                 func='handle_nested_filters',
@@ -209,10 +205,16 @@ class LuceneBuilder:
                     if _q[NESTED][PATH] == nested_path:
                         try:
                             if isinstance(query, list):  # reject list structure, if present
+                                if len(query) != 1:
+                                    raise QueryConstructionException(
+                                        query_type='nested',
+                                        func='handle_nested_filters',
+                                        msg='Malformed entry on query field: %s' % query
+                                    )
                                 query = query[0]
 
                             if key not in query[BOOL]:  # we are combining a different type of query on this nested path
-                                opposite_key = key_map[key]
+                                opposite_key = complement_key_map[key]
                                 if opposite_key in query[BOOL]:
                                     _q[NESTED][QUERY][BOOL][opposite_key] = query[BOOL][opposite_key]
                                     found = True
@@ -267,7 +269,7 @@ class LuceneBuilder:
                 # This can happen when adding no value, the opposite 'key' can occur in the sub-query
                 opposite_key = None
                 if key not in query[BOOL]:
-                    opposite_key = key_map[key]
+                    opposite_key = complement_key_map[key]
                     outer_query = query[BOOL][opposite_key]
                 else:
                     outer_query = query[BOOL][key]

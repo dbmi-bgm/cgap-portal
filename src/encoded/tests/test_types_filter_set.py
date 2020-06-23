@@ -39,7 +39,7 @@ def simple_filter_set():
 
 
 @pytest.fixture
-def standard_filter_set():
+def typical_filter_set():
     """ A filter set with two filter blocks and a flag """
     return {
         'type': 'Cohort',
@@ -127,7 +127,7 @@ def test_filter_set_simple(workbook, testapp, simple_filter_set):
     uuid = res['@graph'][0]['@id']
     testapp.post_json('/index', {})
 
-    # execute given filter_blocks only
+    # execute filter_blocks only
     compound_search_res = testapp.post_json(COMPOUND_SEARCH_URL, {
                                                 'filter_blocks': [{
                                                     'query': 'type=variant&CHROM=1',
@@ -160,9 +160,9 @@ def test_filter_set_simple(workbook, testapp, simple_filter_set):
     assert len(compound_search_res) == 3
 
 
-def test_filter_set_complete(workbook, testapp, standard_filter_set):
+def test_filter_set_complete(workbook, testapp, typical_filter_set):
     """ Executes a filter set with multiple filter blocks """
-    res = testapp.post_json(FILTER_SET_URL, standard_filter_set, status=201).json
+    res = testapp.post_json(FILTER_SET_URL, typical_filter_set, status=201).json
     uuid = res['@graph'][0]['@id']
 
     # execute the more complicated filter_set by @id
@@ -197,12 +197,12 @@ def test_filter_set_complex(workbook, testapp, complex_filter_set):
         query = block['query']
         if 'POS' in query:
             block['flag_applied'] = True
-            block['query'] = 'POS.from=0&POS.to=100000'  # exclude 3/4
+            block['query'] = 'POS.from=0&POS.to=100000'  # exclude 3/4 variants
             break
     compound_search_res = testapp.post_json(COMPOUND_SEARCH_URL, filter_set).json['@graph']
     assert len(compound_search_res) == 1  # should only match the one case
 
-    # Now, toggle the REF=G&ALT=A block, which will re-introduce 1/3
+    # Now, toggle the REF=G&ALT=A block, which will re-introduce 1/4 variants, total 2/4
     for block in filter_blocks:
         query = block['query']
         if 'REF' in query:

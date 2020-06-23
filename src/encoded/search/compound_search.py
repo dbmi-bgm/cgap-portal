@@ -1,4 +1,5 @@
 import json
+import urllib
 from pyramid.view import view_config
 from pyramid.request import Request
 from pyramid.httpexceptions import HTTPBadRequest
@@ -68,12 +69,13 @@ class CompoundSearchBuilder:
         :param block: blocks to add to it
         :return: combined query
         """
-        if '?' in flags:
-            return '&'.join([flags, block])
-        elif '?' in block:
-            return '&'.join([block, flags])
-        else:
-            return '?' + '&'.join([flags, block])
+        def query_str_to_dict(x):
+            return dict(urllib.parse.parse_qsl(x.lstrip('?'), keep_blank_values=True))
+
+        def merge_query_strings(x, y):
+            return urllib.parse.urlencode(dict(query_str_to_dict(x), **query_str_to_dict(y)))
+
+        return merge_query_strings(flags, block)
 
     @staticmethod
     def format_filter_set_results(request, es_results, return_generator=False):
@@ -137,8 +139,9 @@ class CompoundSearchBuilder:
 
         # if we have no filter blocks, pass flags alone to search
         if not filter_blocks and flags:
-            if t not in flags:
-                flags += '&type=%s' % t
+            type_flag = 'type=%s' % t
+            if type_flag not in flags:
+                flags += '&' + type_flag
             subreq = cls.build_subreq_from_single_query(request, flags, from_=from_, to=to)
             return cls.invoke_search(context, request, subreq, return_generator=return_generator)
 
