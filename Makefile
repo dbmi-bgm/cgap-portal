@@ -17,7 +17,7 @@ npm-setup:  # runs all front-end setup
 	curl -o aws-ip-ranges.json https://ip-ranges.amazonaws.com/ip-ranges.json
 
 moto-setup:  # optional moto setup that must be done separately
-	pip install "moto[server]"
+	pip install "moto[server]==1.3.7"
 
 macpoetry-install:  # install for OSX Catalina
 	bin/macpoetry-install
