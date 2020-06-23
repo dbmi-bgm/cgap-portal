@@ -80,6 +80,7 @@ class Variant(Item):
     item_type = 'variant'
     schema = load_schema('encoded:schemas/variant.json')
     embedded_list = build_variant_embedded_list()
+    name_key = 'annotation_id'
 
     @classmethod
     def create(cls, registry, uuid, properties, sheets=None):
@@ -107,13 +108,14 @@ class Variant(Item):
         'title': 'Variants (sample)',
         'description': 'List of all variants with sample specific information',
     },
-    unique_key='variant_sample:annotation_id')
+    unique_key='variant_sample.annotation_id')
 class VariantSample(Item):
     """Class for variant samples."""
 
     item_type = 'variant_sample'
     schema = load_schema('encoded:schemas/variant_sample.json')
     embedded_list = build_variant_sample_embedded_list()
+    name_key = 'annotation_id'
 
     @classmethod
     def create(cls, registry, uuid, properties, sheets=None):
