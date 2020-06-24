@@ -32,7 +32,9 @@ class Family(Item):
     item_type = 'family'
     name_key = 'accession'
     schema = load_schema('encoded:schemas/family.json')
-    rev = {'sample_procs': ('SampleProcessing', 'families')}
+    rev = {'sample_procs': ('SampleProcessing', 'families'),
+           'case': ('Case', 'family')}
+
     embedded_list = [
         "members.accession",
         "members.father",
@@ -140,7 +142,7 @@ class Family(Item):
                     ]
                 },
                 "sex": {
-                    "title": "Individual",
+                    "title": "Sex",
                     "type": "string",
                     "enum": [
                         "F",
