@@ -105,6 +105,21 @@ class Family(Item):
     ]
 
     @calculated_property(schema={
+        "title": "Cases",
+        "description": "Cases for this family",
+        "type": "array",
+        "items": {
+            "title": "Case",
+            "type": "string",
+            "linkTo": "Case"
+        }
+    })
+    def case(self, request):
+        rs = self.rev_link_atids(request, "case")
+        if rs:
+            return rs
+
+    @calculated_property(schema={
         "title": "Relationships",
         "description": "Relationships to proband.",
         "type": "array",
