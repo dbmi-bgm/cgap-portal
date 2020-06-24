@@ -107,7 +107,8 @@ class Case(Item):
         "sample_processing.sample_processed_files.processed_files.quality_metric.status",
         "sample_processing.completed_processes",
         "report.last_modified.*",
-        "report.status"
+        "report.status",
+        "family.accession"
     ]
 
     @calculated_property(schema={
