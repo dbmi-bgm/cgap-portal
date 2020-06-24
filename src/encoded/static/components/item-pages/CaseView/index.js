@@ -1,6 +1,7 @@
 'use strict';
 
 import React, { useState, useMemo, useCallback } from 'react';
+import Collapse from 'react-bootstrap/esm/Collapse';
 import PropTypes from 'prop-types';
 import memoize from 'memoize-one';
 import _ from 'underscore';
@@ -289,7 +290,7 @@ const CaseSummaryTabView = React.memo(function CaseSummaryTabView(props){
             // By default, click on link elements would trigger ajax request to get new context.
             // (unless are external links)
             navigate("#pedigree", { skipRequest: true });
-        }
+        };
     }, [ /* empty == executed only once ever */ ]);
 
     let caseSummaryTables;
@@ -299,7 +300,7 @@ const CaseSummaryTabView = React.memo(function CaseSummaryTabView(props){
                 original_pedigree: { display_title: pedFileName } = {},
                 members = []
             } = family;
-            const cls = "summary-table-container family-index-" + idx;
+            const cls = "family-index-" + idx;
             const isCurrentFamily = idx === pedigreeFamiliesIdx;
             const onClick = function(evt){
                 if (isCurrentFamily) {
@@ -308,11 +309,15 @@ const CaseSummaryTabView = React.memo(function CaseSummaryTabView(props){
                     onFamilySelect(idx);
                 }
             };
+
+            const [open, setOpen] = useState(idx === 0); // 1st family open by default
+
             const tip = isCurrentFamily ?
                 "Currently-selected family in Pedigree Visualization"
                 : "Click to view this family in the Pedigree Visualization tab";
             const title = (
-                <h4 data-family-index={idx} className="clickable p-1 d-block">
+                <h4 data-family-index={idx} className="clickable p-2 d-inline-block" onClick={() => setOpen(!open)}>
+                    <i className={"icon p-1 clickable fas icon-sm" + (open ? " icon-minus" : " icon-plus")} />
                     <span className="font-italic text-500">{ family.display_title }</span>
                     <span className="text-300 font-italic">: Status Overview</span>
                     { pedFileName ? <span className="text-300">{ " (" + pedFileName + ")" }</span> : null }
@@ -350,10 +355,11 @@ const CaseSummaryTabView = React.memo(function CaseSummaryTabView(props){
                 return false;
             });
 
+
             return (
                 <div className={cls} key={idx} data-is-current-family={isCurrentFamily}>
                     { title }
-                    <EmbeddedItemSearchTable facets={null} searchHref={`/search/?type=Case`}/>
+                    { open ? <Collapse in={open}><EmbeddedItemSearchTable facets={null} searchHref={`/search/?type=Case`} context={props.context}/></Collapse> : null}
                     {/* <CaseSummaryTable {...family} sampleProcessing={familySpecificSAs} {...{ idx, idToGraphIdentifier, isCurrentFamily }} /> */}
                 </div>
             );
@@ -401,7 +407,6 @@ const CaseSummaryTabView = React.memo(function CaseSummaryTabView(props){
             );
         }
     }
-    console.log("Case props,", props);
 
     return (
         <React.Fragment>
@@ -411,7 +416,6 @@ const CaseSummaryTabView = React.memo(function CaseSummaryTabView(props){
                         <span className="text-500 font-italic">Case Info:  </span>
                         <span className="text-300"> { props.context.display_title }</span>
                     </div>
-                    
                 </h3>
             </div>
             <hr className="tab-section-title-horiz-divider"/>
@@ -465,6 +469,13 @@ const CaseSummaryTabView = React.memo(function CaseSummaryTabView(props){
                     { caseSummaryTables }
                 </div>
             </div>
+            <DotRouter href={props.href}>
+                <DotRouterTab cls="arrow-tab" tabTitle="Accessioning" tabViewRender={(props) => AccessioningTab(props)} dotPath=".accessioning" default />
+                <DotRouterTab cls="arrow-tab" tabTitle="Bioinformatics" tabViewRender={(props) => BioinformaticsTab(props)} dotPath=".bioinformatics" />
+                <DotRouterTab cls="arrow-tab" tabTitle="Filtering" tabViewRender={(props) => FilteringTab(props)} dotPath=".filtering"/>
+                <DotRouterTab cls="arrow-tab" tabTitle="Interpretation" tabViewRender={(props) => InterpretationTab(props)} dotPath=".interpretation" disabled/>
+                <DotRouterTab cls="arrow-tab" tabTitle="Finalize Case" tabViewRender={(props) => ReportingTab(props)} dotPath=".reporting" disabled/>
+            </DotRouter>
         </React.Fragment>
     );
 });
@@ -481,3 +492,110 @@ CaseSummaryTabView.getTabObject = function(props){
         'content' : <CaseSummaryTabView {...props} />
     };
 };
+
+
+class DotRouter extends React.Component {
+    // constructor(props) {
+    //     super(props);
+    // }
+
+    componentDidMount() {
+        const { href, children } = this.props;
+        console.log("children", children);
+    }
+
+    getDotPath() {
+        // Need to add in filter here for specific tab, so each tab can potentially have a dotRouter and
+        // not have them conflict
+        const { href } = this.props;
+        const hashPathSplit = href.split("#");
+        // console.log("hashPathSplit,", hashPathSplit);
+
+        if (hashPathSplit.length > 1) {
+            const dotPathSplit = hashPathSplit[hashPathSplit.length - 1].split(".");
+            // console.log("dotPathSplit", dotPathSplit);
+            return "." + dotPathSplit[dotPathSplit.length - 1];
+        } else {
+            // Path must contain both tab (hashroute) and dotpath to navigate properly
+            return null;
+        }
+    }
+
+    getDefaultTab() {
+        const { children } = this.props;
+        let defaultTab = children.filter((child) => child.props.default === true );
+        if (defaultTab.length === 0) {
+            throw new Error("Must provide default tab to DotRouter by passing default=true prop to a DotRouterTab item");
+        } else {
+            // Select first, if multiple marked as default
+            defaultTab = defaultTab[0];
+        }
+        return defaultTab;
+    }
+
+    getCurrentTab() {
+        const { children } = this.props;
+
+        const dotPath = this.getDotPath();
+        let selectedChild;
+
+        if (dotPath){
+            for (let i = 0; i < children.length; i++) {
+                const currChild = children[i];
+                if (currChild.props.dotPath === dotPath && !currChild.props.disabled) {
+                    selectedChild = currChild;
+                }
+            }
+        }
+
+        return selectedChild || this.getDefaultTab();
+    }
+
+    render() {
+        const { children } = this.props;
+        const currentTab = this.getCurrentTab();
+        console.log("this.getCurrentTab", this.getCurrentTab());
+
+        return (
+            <div className="tab-router container-wide">
+                <nav className="dot-tab-nav">
+                    <ul className="dot-tab-nav-list">
+                        { children }
+                    </ul>
+                </nav>
+                <div className="tab-router-contents">
+                    { currentTab.props.tabViewRender() }
+                </div>
+            </div>
+        );
+    }
+}
+
+function DotRouterTab(props) {
+    const { tabTitle, dotPath, href, cls, disabled } = props;
+    if (disabled) {
+        return <li className={cls + " disabled"} key={tabTitle}><a disabled>{tabTitle}</a></li>;
+    }
+    return <li className={cls} key={tabTitle}><a href={"#case-summary" + dotPath}>{tabTitle}</a></li>;
+}
+
+function AccessioningTab(props) {
+    return <h1>This is the accessioning tab.</h1>;
+}
+function BioinformaticsTab(props) {
+    return (
+        <div>
+            <h1>This is the bioinformatics tab.</h1>
+            <CaseSummaryTable />
+        </div>
+    );
+}
+function FilteringTab(props) {
+    return <h1>This is the filtering tab.</h1>;
+}
+function InterpretationTab(props) {
+    return <h1>This is the interpretation tab.</h1>;
+}
+function ReportingTab(props) {
+    return <h1>This is the reporting tab</h1>;
+}
