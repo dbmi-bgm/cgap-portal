@@ -59,7 +59,7 @@ download-genes: # grabs latest gene list from the below link, unzips and drops i
 	mv gene_inserts_v0.4.5.json src/encoded/annotations/gene_inserts_v0.4.5.json
 
 deploy1:  # starts postgres/ES locally and loads inserts
-	dev-servers development.ini --app-name app --clear --init --load
+	@SNOVAULT_DB_TEST_PORT=`grep 'sqlalchemy[.]url =' development.ini | sed -E 's|.*:([0-9]+)/.*|\1|'` dev-servers development.ini --app-name app --clear --init --load
 
 deploy2:  # spins up waittress to serve the application
 	pserve development.ini
