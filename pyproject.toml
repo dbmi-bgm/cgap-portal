@@ -99,7 +99,7 @@ dcicpyvcf = "1.0.0"
 rdflib = "4.2.2"
 rdflib-jsonld = "0.3"
 "repoze.debug" = "1.0.2"
-requests = "2.23.0"  # "^2.21.0"
+requests = "^2.23.0"
 rfc3987 = "^1.3.6"
 rsa = "3.3"
 rutter = "0.2"
@@ -160,7 +160,6 @@ moto = "1.3.7"
 # # coverage = "4.5.4"
 # coverage = ""
 # responses = "^0"
-"responses" = "0.10.14"
 
 [tool.poetry.scripts]
 # snovault commands
