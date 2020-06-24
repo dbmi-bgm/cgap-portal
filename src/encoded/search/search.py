@@ -23,8 +23,10 @@ from snovault.util import (
 )
 from snovault.typeinfo import AbstractTypeInfo
 from .lucene_builder import LuceneBuilder
-from .search_utils import (find_nested_path, schema_for_field, get_es_index, get_es_mapping,
-                           execute_search, make_search_subreq, NESTED, COMMON_EXCLUDED_URI_PARAMS,
+from .search_utils import (
+    find_nested_path, schema_for_field, get_es_index, get_es_mapping, is_date_field, is_numerical_field,
+    execute_search, make_search_subreq,
+    NESTED, COMMON_EXCLUDED_URI_PARAMS,
 )
 
 
@@ -551,7 +553,7 @@ class SearchBuilder:
         Initialize the facets used for the search. If searching across multiple
         doc_types, only use the default 'Data Type' and 'Status' facets.
         Add facets for custom url filters whether or not they're in the schema.
-        TODO: clean up this method
+        TODO: clean up this method - see comments in C4-71 PR
 
         :param doc_types: Item types (@type) for which we are performing a search for.
         :param prepared_terms: terms to match in ES, keyed by ES field name.
@@ -642,10 +644,7 @@ class SearchBuilder:
                         field_schema = schema_for_field(f_field, self.request, self.doc_types)
 
                         if field_schema:
-                            is_date_field = determine_if_is_date_field(field, field_schema)
-                            is_numerical_field = field_schema['type'] in ("integer", "float", "number")
-
-                            if is_date_field or is_numerical_field:
+                            if is_date_field(field, field_schema) or is_numerical_field(field_schema):
                                 title_field = field_schema.get("title", f_field)
                                 use_field = f_field
                                 aggregation_type = 'stats'
@@ -660,7 +659,7 @@ class SearchBuilder:
 
                 facet_tuple = (use_field, {'title': title_field, 'aggregation_type': aggregation_type})
 
-                # At moment is equivalent to `if aggregation_type == 'stats'`` until/unless more agg types are added for _facets_.
+                # At moment is equivalent to `if aggregation_type == 'stats'` until/unless more agg types are added for _facets_.
                 if aggregation_type != 'terms':
                     # Remove completely if duplicate (e.g. .from and .to both present)
                     if use_field in used_facets:
@@ -683,6 +682,14 @@ class SearchBuilder:
 
         return facets
 
+    def assure_session_id(self):
+        """ Add searchSessionID information if not part of a sub-request, a generator or a limit=all search """
+        if (self.request.__parent__ is None and
+                  not self.return_generator and
+                  self.size != 'all'):  # Probably unnecessary, but skip for non-paged, sub-reqs, etc.
+            self.search_session_id = self.request.cookies.get('searchSessionID', 'SESSION-' + str(uuid.uuid1()))
+            self.search = self.search.params(preference=self.search_session_id)
+
     def build_search_query(self):
         """ Builds the search query utilizing a combination of helper methods within this class
             to build intermediary structures and LuceneBuilder function calls to handle building
@@ -704,16 +711,12 @@ class SearchBuilder:
                                                  self.from_, self.item_type_es_mapping)
 
         # Add preference from session, if available
-        if (self.request.__parent__ is None and
-                  not self.return_generator and
-                  self.size != 'all'):  # Probably unnecessary, but skip for non-paged, sub-reqs, etc.
-            self.search_session_id = self.request.cookies.get('searchSessionID', 'SESSION-' + str(uuid.uuid1()))
-            self.search = self.search.params(preference=self.search_session_id)
+        self.assure_session_id()
 
     @staticmethod
     def fix_and_replace_nested_doc_count(result_facet, aggregations, full_agg_name):
         """
-        3 things must happen here (all occur in place):
+        3 things must happen here (all occurring by side-effect, not value):
             1. front-end does not care about 'nested', only what the inner thing is, so lets pretend (so it doesn't break)
             2. We must overwrite the "second level" doc_count with the "third level" because the "third level"
                is the 'root' level doc_count, which is what we care about, NOT the nested doc count
@@ -739,8 +742,8 @@ class SearchBuilder:
         These are stored within 'aggregations' of the result.
 
         If the frame for the search != embedded, return no facets
-        TODO: refactor this method. -will 05/01/2020
         """
+        # TODO: refactor this method. -Will 05/01/2020
         result = []
         if self.search_frame != 'embedded':
             return result

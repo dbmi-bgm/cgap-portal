@@ -342,3 +342,13 @@ def make_search_subreq(request, path):
         subreq.context = None
     subreq.headers['Accept'] = 'application/json'
     return subreq
+
+
+def is_numerical_field(field_schema):
+    """ Helper method that checks field_schemas type and determines if it is a 'numerical' field. """
+    return field_schema['type'] in ("integer", "float", "number")
+
+
+def is_date_field(field, field_schema):
+    """ Helper method that determines if field_schema is  """
+    return determine_if_is_date_field(field, field_schema)
