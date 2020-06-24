@@ -256,7 +256,7 @@ def compound_search(context, request):
             # uuid of a filter_set item to execute
             "uuid": <uuid>,  # NOTE: if you provide this, the following filter_set related fields are IGNORED
 
-            "type": <item_type>,  # item type this filter_set is searching on
+            "search_type": <item_type>,  # item type this filter_set is searching on
             "flags": <query_string>,  # flags to be applied globally to the search
             "filter_blocks": [  # list of objects with below structure
                 {
