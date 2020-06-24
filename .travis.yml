@@ -48,7 +48,7 @@ install:
 before_script:
 - configure-kibana-index --es-endpoint search-fourfront-builds-uhevxdzfcv7mkm5pj5svcri3aq.us-east-1.es.amazonaws.com:80
 script:
-- make travis-test
+- travis_wait 30 make travis-test
 after_script:
 - echo leader=$BUILD_LEADER status=$BUILD_AGGREGATE_STATUS
 - wipe-test-indices $TRAVIS_JOB_ID search-fourfront-builds-uhevxdzfcv7mkm5pj5svcri3aq.us-east-1.es.amazonaws.com:80
