@@ -32,7 +32,9 @@ class Family(Item):
     item_type = 'family'
     name_key = 'accession'
     schema = load_schema('encoded:schemas/family.json')
-    rev = {'sample_procs': ('SampleProcessing', 'families')}
+    rev = {'sample_procs': ('SampleProcessing', 'families'),
+           'case': ('Case', 'family')}
+
     embedded_list = [
         "members.accession",
         "members.father",
@@ -103,6 +105,403 @@ class Family(Item):
         "analysis_groups.sample_processed_files.processed_files.quality_metric.status",
         "analysis_groups.completed_processes",
     ]
+
+    @calculated_property(schema={
+        "title": "Cases",
+        "description": "Cases for this family",
+        "type": "array",
+        "items": {
+            "title": "Case",
+            "type": "string",
+            "linkTo": "Case"
+        }
+    })
+    def case(self, request):
+        rs = self.rev_link_atids(request, "case")
+        if rs:
+            return rs
+
+    @calculated_property(schema={
+        "title": "Relationships",
+        "description": "Relationships to proband.",
+        "type": "array",
+        "items": {
+            "title": "Relation",
+            "type": "object",
+            "properties": {
+                "individual": {
+                    "title": "Individual",
+                    "type": "string"
+                },
+                "association": {
+                    "title": "Individual",
+                    "type": "string",
+                    "enum": [
+                        "paternal",
+                        "maternal"
+                    ]
+                },
+                "sex": {
+                    "title": "Sex",
+                    "type": "string",
+                    "enum": [
+                        "F",
+                        "M",
+                        "U"
+                    ]
+                },
+                "relationship": {
+                    "title": "Relationship",
+                    "type": "string",
+                    "enum": ['proband',
+                             'father',
+                             'mother',
+                             'brother',
+                             'sister',
+                             'sibling',
+                             'half-brother',
+                             'half-sister',
+                             'half-sibling',
+                             'wife',
+                             'husband',
+                             'grandson',
+                             'granddaughter',
+                             'grandchild',
+                             'grandmother',
+                             'grandfather',
+                             'great-grandmother',
+                             'great-grandfather',
+                             'great-great-grandmother',
+                             'great-great-grandfather',
+                             'nephew',
+                             'niece',
+                             'nibling',
+                             'grandnephew',
+                             'grandniece',
+                             'grandnibling',
+                             'uncle',
+                             'aunt',
+                             'auncle',
+                             'granduncle',
+                             'grandaunt',
+                             'grandauncle',
+                             'cousin',
+                             'cousin once removed (descendant)',
+                             'cousin twice removed (descendant)',
+                             'cousin once removed (ascendant)',
+                             'second cousin',
+                             'second cousin once removed (descendant)',
+                             'second cousin twice removed (descendant)',
+                             'family-in-law',
+                             'extended-family'
+                             ]
+                    }
+                }
+            }
+        })
+    def relationships(self, request, proband=None, members=None):
+        """Calculate relationships"""
+        def generate_ped(all_props, proband, family_id):
+            """Format family information into ped file
+            https://gatk.broadinstitute.org/hc/en-us/articles/360035531972
+            This might be useful in the future for compatibility
+            Ped file columns are
+            *Family ID
+            *Individual ID
+            *Paternal ID
+            *Maternal ID
+            *Sex (1=male; 2=female; U=unknown)
+            *Phenotype (-9 missing 0 missing 1 unaffected 2 affected)
+            (at the moment only on proband has 2 on phenotype)
+            """
+            ped_content = """"""
+            gender_map = {'M': '1', 'F': '2', 'U': '3'}
+            for props in all_props:
+                # all members have unknown phenotype by default
+                phenotype = '0'
+                member_id = props['accession']
+
+                def parent_id(properties, field):
+                    'extract parent accession from member info'
+                    id = properties.get(field)
+                    if id:
+                        return id.split('/')[2]
+                    else:
+                        return ''
+                paternal_id = parent_id(props, 'father')
+                maternal_id = parent_id(props, 'mother')
+                sex = props.get('sex', 'U')
+                ped_sex = gender_map.get(sex, 'U')
+                # if member is proband, add phenotupe
+                if props['@id'] == proband:
+                    phenotype = '2'
+                line_ele = [family_id, member_id, paternal_id, maternal_id, ped_sex, phenotype]
+                ped_content += '\t'.join(line_ele) + '\n'
+            return ped_content
+
+        def extract_vectors(ped_content):
+            """given a ped file content, extract all primary relationship pairs
+            keys are listed in primary_vectors"""
+            fathers = []
+            mothers = []
+            daughters = []
+            sons = []
+            children = []  # when the gender of the kid is not known
+            for a_line in ped_content.split('\n'):
+                if not a_line:
+                    continue
+                fam, ind, father, mother, sex, ph = a_line.split('\t')
+                if father:
+                    fathers.append([father, ind])
+                    if sex == '1':
+                        sons.append([ind, father])
+                    elif sex == '2':
+                        daughters.append([ind, father])
+                    else:
+                        children.append([ind, father])
+                if mother:
+                    mothers.append([mother, ind])
+                    if sex == '1':
+                        sons.append([ind, mother])
+                    elif sex == '2':
+                        daughters.append([ind, mother])
+                    else:
+                        children.append([ind, mother])
+            primary_vectors = {
+                'fathers': fathers,
+                'mothers': mothers,
+                'daughters': daughters,
+                'sons': sons,
+                'children': children  # when the gender of the kid is not known
+            }
+            return primary_vectors
+
+        def construct_links(primary_vectors, seed):
+            """Given the primary vectors, constructs linkages for each individual
+            and filters for the shortest link
+            Use first letter of primary vector keys to construct these links
+            This linkages are calcualted from the seed, often starts with proband
+            seed should be accession"""
+            # starting pack
+            needs_analysis = [[seed, 'p'], ]
+            analyzed = []
+            all_links = {seed: ['p', ]}
+            # loop overy every set of new collected individuals
+            while needs_analysis:
+                collect_connected = []
+                for an_ind, starting_tag in needs_analysis:
+                    if an_ind in analyzed:
+                        continue
+                    analyzed.append(an_ind)
+                    if an_ind not in all_links:
+                        print('should not happen')
+                    for a_key in primary_vectors:
+                        # extend the link list with this letter
+                        extend_tag = a_key[0]
+                        my_links = [i for i in primary_vectors[a_key] if i[1] == an_ind]
+                        for a_link in my_links:
+                            linked_ind = a_link[0]
+                            new_tag = starting_tag + '-' + extend_tag
+                            if linked_ind not in all_links:
+                                all_links[linked_ind] = [new_tag, ]
+                            else:
+                                all_links[linked_ind].append(new_tag)
+                            if linked_ind not in analyzed:
+                                collect_connected.append([linked_ind, new_tag])
+                    needs_analysis = collect_connected
+
+            # return the shortest links
+            def return_shortest(a_list):
+                """filter list for shortest items."""
+                a_list = list(set(a_list))
+                minimum = min(map(len, a_list))
+                return [i for i in a_list if len(i) == minimum]
+            filtered_links = {}
+            for individual in all_links:
+                filtered_links[individual] = return_shortest(all_links[individual])
+            return filtered_links
+
+        def relationships_vocabulary(links):
+            """Convert links to relationships.
+            Nomenclature guided by
+            https://www.devonfhs.org.uk/pdfs/tools/eichhorn-rlationship-chart.pdf"""
+            # return a nested list of  [acc, calculated_relation, association]
+            Converter = {
+                "p": "proband",
+                "p-f": "father", "p-m": "mother", "p-d": "daughter", "p-s": "son", "p-c": "child",
+                "p-f-s": "brother", "p-m-s": "brother",
+                "p-f-d": "sister", "p-m-d": "sister",
+                "p-f-c": "sibling", "p-m-c": "sibling",
+                "p-d-m": "wife", "p-s-m": "wife", "p-c-m": "wife",
+                "p-d-f": "husband", "p-s-f": "husband", "p-c-f": "husband",
+            }
+            # add grandchildren
+            all_children = [i for i in Converter if Converter[i] in ['daughter', 'son', 'child']]
+            for child in all_children:
+                Converter[child + '-s'] = 'grandson'
+                Converter[child + '-d'] = 'granddaughter'
+                Converter[child + '-c'] = 'grandchild'
+            # add niece nephew nibling (we can also add sister brother in law here but will skip non blood relatives)
+            all_siblings = [i for i in Converter if Converter[i] in ['brother', 'sister', 'sibling']]
+            for sib in all_siblings:
+                Converter[sib + '-s'] = 'nephew'
+                Converter[sib + '-d'] = 'niece'
+                Converter[sib + '-c'] = 'nibling'
+            # add grand niece nephew nibling
+            all_niblings = [i for i in Converter if Converter[i] in ['nephew', 'niece', 'nibling']]
+            for nib in all_niblings:
+                Converter[nib + '-s'] = 'grandnephew'
+                Converter[nib + '-d'] = 'grandniece'
+                Converter[nib + '-c'] = 'grandnibling'
+            # add Grandparents
+            all_parents = [i for i in Converter if Converter[i] in ['mother', 'father']]
+            for parent in all_parents:
+                Converter[parent + '-m'] = 'grandmother'
+                Converter[parent + '-f'] = 'grandfather'
+            # add Great-grandparents Uncle Aunt Auncle
+            all_g_parents = [i for i in Converter if Converter[i] in ['grandmother', 'grandfather']]
+            for g_parent in all_g_parents:
+                Converter[g_parent + '-m'] = 'great-grandmother'
+                Converter[g_parent + '-f'] = 'great-grandfather'
+                Converter[g_parent + '-s'] = 'uncle'
+                Converter[g_parent + '-d'] = 'aunt'
+                Converter[g_parent + '-c'] = 'auncle'
+            # add Great-great-grandparents granduncle grandaunt grandauncle
+            all_gg_parents = [i for i in Converter if Converter[i] in ['great-grandmother', 'great-grandfather']]
+            for gg_parent in all_gg_parents:
+                Converter[gg_parent + '-m'] = 'great-great-grandmother'
+                Converter[gg_parent + '-f'] = 'great-great-grandfather'
+                Converter[gg_parent + '-s'] = 'granduncle'
+                Converter[gg_parent + '-d'] = 'grandaunt'
+                Converter[gg_parent + '-c'] = 'grandauncle'
+            # add Cousin
+            all_auncle = [i for i in Converter if Converter[i] in ['uncle', 'aunt', 'auncle']]
+            for auncle in all_auncle:
+                Converter[auncle + '-s'] = 'cousin'
+                Converter[auncle + '-d'] = 'cousin'
+                Converter[auncle + '-c'] = 'cousin'
+            # add Cousin once removed (descendant)
+            all_cousins = [i for i in Converter if Converter[i] in ['cousin']]
+            for cousin in all_cousins:
+                Converter[cousin + '-s'] = 'cousin once removed (descendant)'
+                Converter[cousin + '-d'] = 'cousin once removed (descendant)'
+                Converter[cousin + '-c'] = 'cousin once removed (descendant)'
+            # add Cousin twice removed (descendant)
+            all_cousins_o_r = [i for i in Converter if Converter[i] in ['cousin once removed (descendant)']]
+            for cousin in all_cousins_o_r:
+                Converter[cousin + '-s'] = 'cousin twice removed (descendant)'
+                Converter[cousin + '-d'] = 'cousin twice removed (descendant)'
+                Converter[cousin + '-c'] = 'cousin twice removed (descendant)'
+            # add First cousin once removed (ascendant)
+            all_g_auncle = [i for i in Converter if Converter[i] in ['granduncle', 'grandaunt', 'grandauncle']]
+            for g_auncle in all_g_auncle:
+                Converter[g_auncle + '-s'] = 'cousin once removed (ascendant)'
+                Converter[g_auncle + '-d'] = 'cousin once removed (ascendant)'
+                Converter[g_auncle + '-c'] = 'cousin once removed (ascendant)'
+            # add Second Cousin
+            all_cora = [i for i in Converter if Converter[i] in ['cousin once removed (ascendant)']]
+            for cora in all_cora:
+                Converter[cora + '-s'] = 'second cousin'
+                Converter[cora + '-d'] = 'second cousin'
+                Converter[cora + '-c'] = 'second cousin'
+            # add Second Cousin once removed
+            all_s_cousins = [i for i in Converter if Converter[i] in ['second cousin']]
+            for s_cousin in all_s_cousins:
+                Converter[s_cousin + '-s'] = 'second cousin once removed (descendant)'
+                Converter[s_cousin + '-d'] = 'second cousin once removed (descendant)'
+                Converter[s_cousin + '-c'] = 'second cousin once removed (descendant)'
+            # add Second Cousin twice removed
+            all_s_cousins_o_r = [i for i in Converter if Converter[i] in ['second cousin once removed (descendant)']]
+            for s_cousin_o_r in all_s_cousins_o_r:
+                Converter[s_cousin_o_r + '-s'] = 'second cousin twice removed (descendant)'
+                Converter[s_cousin_o_r + '-d'] = 'second cousin twice removed (descendant)'
+                Converter[s_cousin_o_r + '-c'] = 'second cousin twice removed (descendant)'
+
+            # calculate direction change (if more then 2, not blood relative)
+            def count_direction_change(relation_tag):
+                """If you are going down from proband, you need to keep going down
+                If you are going up from proband, you can change direction once
+                If you are out of these cases, you are not blood relative
+                We make an exception for the Husband and Wife"""
+                up = ['f', 'm']
+                down = ['d', 's', 'c']
+                state = 1
+                changes = 0
+                for a_letter in relation_tag.split('-'):
+                    if a_letter in up:
+                        new_state = 1
+                    elif a_letter in down:
+                        new_state = -1
+                    else:  # p
+                        continue
+                    if state == new_state:
+                        continue
+                    else:
+                        state = new_state
+                        changes += 1
+                return changes
+
+            relations = []
+            for i in links:
+                association = ''
+                val = links[i][0]
+                if val in Converter:
+                    relation = Converter[val]
+                    # calculate half relation for siblings
+                    if relation in ['sister', 'brother', 'sibling']:
+                        # if they are full siblings, they should carry two link of same size
+                        # if not, they are half
+                        if len(links[i]) == 1:
+                            relation = 'half-' + relation
+                    # for extended family calculate paternal/maternal
+                    if len(val) > 4:
+                        # calculate for family that starts by going above 2 levels
+                        if val[2:5] in ['m-m', 'm-f', 'f-f', 'f-m']:
+                            association_pointer = val[2]
+                            if association_pointer == 'f':
+                                association = 'paternal'
+                            elif association_pointer == 'm':
+                                association = 'maternal'
+                else:
+                    dir_change = count_direction_change(val)
+                    if dir_change > 1:
+                        relation = 'family-in-law'
+                    else:
+                        relation = 'extended-family'
+                relations.append([i, relation, association])
+            return relations
+
+        # Start of the function
+        # empty list to accumulate results
+        relations = []
+        # we need both the proband and the members to calculate
+        if not proband or not members:
+            return relations
+        family_id = self.properties['accession']
+        # collect members properties
+        all_props = []
+        for a_member in members:
+            props = get_item_or_none(request, a_member, 'individuals')
+            all_props.append(props)
+        # convert to ped_file format
+        ped_text = generate_ped(all_props, proband, family_id)
+        primary_vectors = extract_vectors(ped_text)
+        proband_acc = proband.split('/')[2]
+        links = construct_links(primary_vectors, proband_acc)
+        relations = relationships_vocabulary(links)
+        results = []
+        for rel in relations:
+            temp = {"individual": '',
+                    "sex": '',
+                    "relationship": ''}
+            temp['individual'] = rel[0]
+            temp['relationship'] = rel[1]
+            if rel[2]:
+                temp['association'] = rel[2]
+            sex = [i for i in all_props if i['accession'] == rel[0]][0].get('sex', 'U')
+            temp['sex'] = sex
+            results.append(temp)
+        return results
 
     def get_parents(self, request, proband=None, members=None):
         parents = []
@@ -323,6 +722,8 @@ class Family(Item):
                             break
             if csns:
                 return csns
+
+
 
 
 @view_config(name='process-pedigree', context=Family, request_method='PATCH',

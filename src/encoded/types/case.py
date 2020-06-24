@@ -78,6 +78,7 @@ class Case(Item):
         "individual.samples.files.quality_metric.url",
         "individual.samples.files.quality_metric.status",
         "individual.samples.completed_processes",
+        "individual.families.uuid",
         "sample_processing.analysis_type",
         "sample_processing.last_modified.*",
         "sample_processing.families.family_id",

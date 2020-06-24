@@ -245,7 +245,7 @@ export const columnExtensionMap = {
             const workflowHref = object.itemUtil.atId(result.workflow);
             let retLink;
             if (workflowHref){
-                retLink = <a href={link}>{ title }</a>;
+                retLink = <a href={workflowHref || link}>{ title }</a>;
             } else {
                 retLink = title;
             }

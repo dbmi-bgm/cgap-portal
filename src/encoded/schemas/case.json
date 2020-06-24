@@ -33,6 +33,12 @@
             "description": "Description of the case",
             "type": "string"
         },
+        "family": {
+            "title": "Family",
+            "description": "Primary family this case is associated with",
+            "type": "string",
+            "linkTo": "Family"
+        },
         "individual": {
             "title": "Individual",
             "description": "The individual who comprises the case",
