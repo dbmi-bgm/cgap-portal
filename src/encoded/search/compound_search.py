@@ -91,7 +91,7 @@ class CompoundSearchBuilder:
             return es_results['hits']['hits']
 
         elif es_results['hits']['total'] == 0:
-            request.response.status_code = 404
+            request.response.status_code = 404  # see google webmaster doc on why
             return {
                 'total': 0,
                 '@graph': []

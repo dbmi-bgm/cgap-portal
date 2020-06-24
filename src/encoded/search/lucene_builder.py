@@ -307,10 +307,18 @@ class LuceneBuilder:
                 })
 
     @classmethod
-    def extract_field_from_to(cls, field):
-        """ Neat helper method provided by Kent to clean up a step in 'handle_range_filters'. """
-        return [(bool(m), m and m.group(1), m and m.group(2))
-                for m in map(lambda x: cls.to_from_pattern.match(x), [field])][0]
+    def extract_field_from_to(cls, query_part):
+        """ Neat helper method provided by Kent to clean up a step in 'handle_range_filters'.
+            Extracts the field_name and whether it is a 'from' or 'to' query
+
+        :param query_part: query part to parse, such as "field.a.from" or "field.to". See the regexp.
+        :return: 3-tuple consisting of whether or not there was a match, the first grouping and the second grouping
+                 ie: (True, field.name, 'from')
+        """
+        match = cls.to_from_pattern.match(query_part)
+        if match is not None:
+            return bool(match), match.group(1), match.group(2)
+        return False, None, None
 
     @classmethod
     def handle_range_filters(cls, request, result, field_filters, doc_types):

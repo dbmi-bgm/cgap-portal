@@ -594,7 +594,8 @@ class SearchBuilder:
                         continue  # Skip disabled facets.
                     facets.append(schema_facet)
 
-        ## Add facets for any non-schema ?field=value filters requested in the search (unless already set)
+        # Add facets for any non-schema ?field=value filters requested in the search (unless already set)
+        # TODO: this use is confusing and should be refactored -Will 6/24/2020
         used_facets = [facet[0] for facet in facets + append_facets]
         used_facet_titles = [
             facet[1]['title'] for facet in facets + append_facets
