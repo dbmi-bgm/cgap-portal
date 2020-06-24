@@ -9,6 +9,7 @@ import queryString from 'querystring';
 import { get as getSchemas, Term } from './../../util/Schemas';
 import { object, ajax, layout, isServerSide, schemaTransforms, memoizedUrlParse } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { columnExtensionMap as columnExtensionMapCGAP } from './../../browse/columnExtensionMap';
+import { CaseDetailPane } from './../../browse/CaseDetailPane';
 
 import { EmbeddedSearchView } from '@hms-dbmi-bgm/shared-portal-components/es/components/browse/EmbeddedSearchView';
 //import { transformedFacets } from './../../../browse/SearchView';
@@ -28,6 +29,7 @@ export class EmbeddedItemSearchTable extends React.PureComponent {
     constructor(props){
         super(props);
         this.getCountCallback = this.getCountCallback.bind(this);
+        this.getCorrectDetailPane = this.getCorrectDetailPane.bind(this);
         this.state = { totalCount: null };
     }
 
@@ -41,13 +43,30 @@ export class EmbeddedItemSearchTable extends React.PureComponent {
         }
     }
 
+    getCorrectDetailPane() {
+        const { renderDetailPane, context } = this.props;
+        const isCaseSearch = context['@type'][0] === 'Case' ? true : false;
+
+        if (isCaseSearch) {
+            return function renderCaseDetailPane(result, rowNumber, containerWidth, propsFromTable) {
+                const passProps = _.pick(this.props, 'windowWidth', 'href');
+                return (
+                    <CaseDetailPane
+                        {...{ passProps, propsFromTable, result, containerWidth, rowNumber }} paddingWidth={47}
+                    />
+                );
+            }.bind(this);
+        }
+        return renderDetailPane;
+    }
+
     render(){
         const {
             title,
             children,
             facets,
             session, schemas: propSchemas,
-            renderDetailPane, defaultOpenIndices, maxHeight,
+            defaultOpenIndices, maxHeight,
             columns, columnExtensionMap,
             searchHref,
             filterFacetFxn, hideFacets,
@@ -60,6 +79,8 @@ export class EmbeddedItemSearchTable extends React.PureComponent {
         }
 
         const schemas = propSchemas || getSchemas() || null; // We might not have this e.g. in placeholders in StaticSections
+
+        const renderDetailPane = this.getCorrectDetailPane();
 
         const passProps = {
             facets, columns, columnExtensionMap, searchHref, session,
