@@ -3,7 +3,7 @@ from webtest import AppError
 from .workbook_fixtures import app, workbook
 
 
-pytestmark = [pytest.mark.working, pytest.mark.schema]
+pytestmark = [pytest.mark.working, pytest.mark.search]
 COMPOUND_SEARCH_URL = '/compound_search'
 FILTER_SET_URL = '/filter_set'
 COHORT_URL = '/cohort'
@@ -14,7 +14,7 @@ VARIANT_URL = '/variant'
 def barebones_filter_set():
     """ A filter set with only the flag that designates the type """
     return {
-        'type': 'Variant',
+        'search_type': 'Variant',
         'flags': '?type=Variant',
         'project': 'hms-dbmi',
         'institution': 'hms-dbmi'
@@ -25,7 +25,7 @@ def barebones_filter_set():
 def simple_filter_set():
     """ A filter set with only the flag that designates the type """
     return {
-        'type': 'Cohort',
+        'search_type': 'Cohort',
         'filter_blocks': [
             {
                 'query': 'families.proband=GAPID5HBSLG6',
@@ -42,7 +42,7 @@ def simple_filter_set():
 def typical_filter_set():
     """ A filter set with two filter blocks and a flag """
     return {
-        'type': 'Cohort',
+        'search_type': 'Cohort',
         'filter_blocks': [
             {
                 'query': 'families.proband=GAPID8J9B9CR',
@@ -63,7 +63,7 @@ def typical_filter_set():
 def complex_filter_set():
     """ A filter set with 3 filter_blocks and a flag """
     return {
-        'type': 'Variant',
+        'search_type': 'Variant',
         'filter_blocks': [
             {
                 'query': 'ALT=T&hg19.hg19_chrom=chr1',
@@ -110,14 +110,14 @@ def test_filter_set_barebones(workbook, testapp, barebones_filter_set):
     # execute given flags only
     compound_search_res = testapp.post_json(COMPOUND_SEARCH_URL, {
         'flags': '?type=project',
-        'type': 'Project'  # NOTE: will work since we are not actually validating this
+        'search_type': 'Project'  # NOTE: will work since we are not actually validating this
     }).json['@graph']
     assert len(compound_search_res) == 1
 
     # do it again, this time with a type that will return 404
     testapp.post_json(COMPOUND_SEARCH_URL, {
         'flags': '?type=gene',
-        'type': 'Gene'
+        'search_type': 'Gene'
     }, status=404)
 
 
@@ -133,14 +133,14 @@ def test_filter_set_simple(workbook, testapp, simple_filter_set):
                                                     'query': 'type=variant&CHROM=1',
                                                     'flag_applied': True
                                                 }],
-                                                'type': 'Variant'
+                                                'search_type': 'Variant'
                                             }).json['@graph']
     assert len(compound_search_res) == 4
 
     # execute given flags only
     compound_search_res = testapp.post_json('/compound_search', {
         'flags': '?type=project',
-        'type': 'Project'
+        'search_type': 'Project'
     }).json['@graph']
     assert len(compound_search_res) == 1
 
@@ -151,7 +151,7 @@ def test_filter_set_simple(workbook, testapp, simple_filter_set):
             'flag_applied': True
         }],
         'flags': 'type=variant',
-        'type': 'Variant'
+        'search_type': 'Variant'
     }).json['@graph']
     assert len(compound_search_res) == 4
 
@@ -174,7 +174,7 @@ def test_filter_set_complex(workbook, testapp, complex_filter_set):
     """ Executes a 'complex' filter set, toggling and re-searching with certain blocks disabled """
     res = testapp.post_json(FILTER_SET_URL, complex_filter_set, status=201).json
     uuid = res['@graph'][0]['@id']
-    t = res['@graph'][0]['type']
+    t = res['@graph'][0]['search_type']
     filter_blocks = res['@graph'][0]['filter_blocks']
     flags = res['@graph'][0]['flags']
 
@@ -183,7 +183,7 @@ def test_filter_set_complex(workbook, testapp, complex_filter_set):
 
     # toggle off all the blocks
     filter_set = {
-        'type': t,
+        'search_type': t,
         'filter_blocks': filter_blocks,
         'flags': flags
     }
@@ -216,11 +216,11 @@ def test_filter_set_intersection(workbook, testapp, complex_filter_set):
     """ Uses the complex filter set with an AND filter_set execution, which should be
         functionally identical but will show slightly different results.
     """
-    t = complex_filter_set['type']
+    t = complex_filter_set['search_type']
     filter_blocks = complex_filter_set['filter_blocks']
     flags = complex_filter_set['flags']
     filter_set = {
-        'type': t,
+        'search_type': t,
         'filter_blocks': filter_blocks,
         'flags': flags,
         'intersect': True
@@ -264,7 +264,7 @@ def execute_and_verify_generator_search(testapp, filter_set, expected):
 @pytest.fixture
 def filter_set_with_only_flags():
     return {
-        'type': 'Variant',
+        'search_type': 'Variant',
         'flags': 'CHROM=1'
     }
 
@@ -296,7 +296,7 @@ def test_compound_search_only_flags(workbook, testapp, filter_set_with_only_flag
 @pytest.fixture
 def filter_set_with_single_filter_block():
     return {
-        'type': 'Variant',
+        'search_type': 'Variant',
         'filter_blocks': [{
             'query': '?type=Variant&POS.from=0&POS.to=10000000',
             'flag_applied': True
@@ -319,7 +319,7 @@ def test_compound_search_single_filter_block(workbook, testapp, filter_set_with_
 @pytest.fixture
 def filter_set_with_single_filter_block_and_flags():
     return {
-        'type': 'Variant',
+        'search_type': 'Variant',
         'filter_blocks': [{
             'query': '?type=Variant&POS.from=0&POS.to=10000000',
             'flag_applied': True
@@ -338,7 +338,7 @@ def test_compound_search_filter_and_flags(workbook, testapp, filter_set_with_sin
 
     # do generator search
     execute_and_verify_generator_search(testapp, filter_set_with_single_filter_block_and_flags, 1)
-    filter_set_with_single_filter_block_and_flags['return_generator'] = False
+    filter_set_with_single_filter_block_and_flags['return_generator'] = False  # undo side-effect
 
     # disable block, so flag only
     toggle_filter_blocks(filter_set_with_single_filter_block_and_flags, on=False)
@@ -350,7 +350,7 @@ def test_compound_search_filter_and_flags(workbook, testapp, filter_set_with_sin
 @pytest.fixture
 def filter_set_with_multiple_disabled_flags():
     return {
-        'type': 'Variant',
+        'search_type': 'Variant',
         'filter_blocks': [{
             'query': '?type=Variant&POS.from=0&POS.to=10000000',
             'flag_applied': False
@@ -387,14 +387,15 @@ def test_compound_search_disabled_filter_blocks(workbook, testapp, filter_set_wi
 
 
 @pytest.fixture
-def paginated_request():
+def request_with_lots_of_results():
     return {
-        'type': 'Item',
+        'search_type': 'Item',
     }
 
 
-def test_compound_search_from_to(workbook, testapp, paginated_request):
+def test_compound_search_from_to(workbook, testapp, request_with_lots_of_results):
     """ Tests pagination + generator with compound searches """
+    paginated_request = request_with_lots_of_results  # since we have a lot of results, paginate through them
 
     # first, test failures
     def test_failure(from_, limit):

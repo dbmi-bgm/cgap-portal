@@ -51,6 +51,7 @@ class SearchBuilder:
         The point is to split apart logic needed for query construction with logic needed for the
         API itself. Search is by far our most complicated API, thus there is a lot of state.
     """
+    DEFAULT_SEARCH_FRAME = 'embedded'
 
     def __init__(self, context, request, search_type=None, return_generator=False, forced_type='Search',
                  custom_aggregations=None, skip_bootstrap=False):
@@ -91,13 +92,16 @@ class SearchBuilder:
         self.search_types = self.build_search_types(self.types, self.doc_types) + [
             self.forced_type]  # item_type hierarchy we are searching on
         self.search_base = self.normalize_query(self.request, self.types, self.doc_types)
-        self.search_frame = self.request.normalized_params.get('frame',
-                                                               'embedded')  # which frame to return, always embedded
-        self.prepared_terms = self.prepare_search_term(
-            self.request)  # handles resolving search term path on mapping (naively)
+        self.search_frame = self.request.normalized_params.get('frame', self.DEFAULT_SEARCH_FRAME)  # embedded
+        self.prepared_terms = self.prepare_search_term(self.request)
 
-        # API Calls
+        # Outside API Calls
         self.item_type_es_mapping = get_es_mapping(self.es, self.es_index)  # mapping for the item type we are searching
+
+    @property
+    def forced_type_token(self):
+        """ Do any processing needed to be applied to self.forced_type """
+        return self.forced_type.lower()
 
     @classmethod
     def from_search(cls, context, request, search, from_=0, size=10):
@@ -164,6 +168,7 @@ class SearchBuilder:
         :returns: query string built from normalized params
         """
 
+        # TODO: Optimize method structure here, see C4-71 PR comments -Will 6/24/2020
         def normalize_param(key, val):
             """
             Process each key/val in the original query param. As part of this,
@@ -208,13 +213,13 @@ class SearchBuilder:
             else:
                 return (key, val)
 
-        normalized_params = (
+        # use a MultiDict to emulate request.params
+        # TODO: Evaluate whether or not MultiDict is really useful here -Will 6/24/2020
+        normalized_params = MultiDict(
             normalize_param(k, v)
             for k, v in request.params.items()
         )
-        # use a MultiDict to emulate request.params
-        normalized_params = MultiDict(normalized_params)
-        # overwrite 'type' if not equal to doc_types
+        # overwrite 'type' if not equal to doc_types to ensure consistency
         if set(normalized_params.getall('type')) != set(doc_types):
             if 'type' in normalized_params:
                 del normalized_params['type']
@@ -224,7 +229,7 @@ class SearchBuilder:
         # these will be used in place of request.params for the rest of search
         setattr(request, 'normalized_params', normalized_params)
         # the query string of the normalized search
-        qs = '?' + urlencode([
+        qs = '?' + urlencode([  # XXX: do we actually need to encode k,v  individually? -Will 6/24/2020
             (k.encode('utf-8'), v.encode('utf-8'))
             for k, v in request.normalized_params.items()
         ])
@@ -324,7 +329,7 @@ class SearchBuilder:
             try:
                 from_ = int(from_)
             except ValueError:
-                size = 0
+                from_ = 0
         self.from_, self.size = from_, size
 
     def build_type_filters(self):
@@ -372,13 +377,13 @@ class SearchBuilder:
         current_search_sort_url = urlencode([("sort", s) for s in current_search_sort])
         if current_search_sort_url:
             clear_qs += '&' + current_search_sort_url
-        return self.request.route_path(self.forced_type.lower(), slash='/') + (('?' + clear_qs) if clear_qs else '')
+        return self.request.route_path(self.forced_type_token, slash='/') + (('?' + clear_qs) if clear_qs else '')
 
     def initialize_search_response(self):
         """ Initializes the search response """
         self.response = {
             '@context': self.request.route_path('jsonld_context'),
-            '@id': '/' + self.forced_type.lower() + '/' + self.search_base,
+            '@id': '/' + self.forced_type_token + '/' + self.search_base,
             '@type': self.search_types,
             'title': self.forced_type,
             'filters': [],
@@ -405,40 +410,38 @@ class SearchBuilder:
             fields = ['embedded.@id', 'embedded.@type']
             for field in fields_requested:
                 fields.append('embedded.' + field)
-        elif self.search_frame in ['embedded', 'object', 'raw']:
-            if self.search_frame != 'embedded':
-                # frame=raw corresponds to 'properties' in ES
-                if self.search_frame == 'raw':
-                    frame = 'properties'
-                else:
-                    frame = self.search_frame
-                # let embedded be searched as well (for faceting)
-                fields = ['embedded.*', frame + '.*']
+        elif self.search_frame == 'embedded':
+            fields = [self.search_frame + '.*']
+        elif self.search_frame in ['object', 'raw']:
+            # frame=raw corresponds to 'properties' in ES
+            if self.search_frame == 'raw':
+                frame = 'properties'
             else:
-                fields = [self.search_frame + '.*']
+                frame = self.search_frame
+            # let embedded be searched as well (for faceting)
+            fields = ['embedded.*', frame + '.*']
         else:
             fields = ['embedded.*']
         return fields
 
-    def build_query(self, source_fields):
+    def build_query(self):
         """
-        Prepare the query within the Search object.
+        Bootstraps our query format, building the q= part of the query if one is specified.
+        If multiple are specified the first one that occurs in the URL will be used.
         """
         query_info = {}
         string_query = None
-        # prepare the query from prepared_terms
+        query_dict = {'query': {'bool': {}}}
+        # locate for 'q' query, if any
         for field, value in self.prepared_terms.items():
             if field == 'q':
                 query_info['query'] = value
                 query_info['lenient'] = True
                 query_info['default_operator'] = 'AND'
                 query_info['fields'] = ['_all']
+                string_query = {'must': {'simple_query_string': query_info}}
+                query_dict = {'query': {'bool': string_query}}
                 break
-        if query_info != {}:
-            string_query = {'must': {'simple_query_string': query_info}}
-            query_dict = {'query': {'bool': string_query}}
-        else:
-            query_dict = {'query': {'bool': {}}}
         self.search.update_from_dict(query_dict)
         self.string_query = string_query
 
@@ -684,7 +687,7 @@ class SearchBuilder:
             to build intermediary structures and LuceneBuilder function calls to handle building
             the actual Elasticsearch query.
         """
-        self.build_query(sorted(self.list_source_fields()))
+        self.build_query()
         self.set_sort_order()
 
         # Transform into filtered search

@@ -1,3 +1,4 @@
+import re
 import structlog
 from copy import deepcopy
 from collections import OrderedDict
@@ -31,6 +32,7 @@ class LuceneBuilder:
         not require additional function calls. Class methods call other methods within the class but could
         be "entry-point" methods as well.
     """
+    to_from_pattern = re.compile("^(.*)[.](to|from)$")
 
     @staticmethod
     def apply_range_filters(range_filters, must_filters, es_mapping):
@@ -107,11 +109,11 @@ class LuceneBuilder:
 
                 if filters['add_no_value'] is True:  # when searching on 'No Value'
                     should_arr = [must_terms] if must_terms else []
-                    should_arr.append({BOOL: {MUST_NOT: {EXISTS: {FIELD: query_field}}}})
+                    should_arr.append({BOOL: {MUST_NOT: {EXISTS: {FIELD: query_field}}}})  # field=value OR field DNE
                     must_filters_nested.append((query_field, should_arr))
                 elif filters['add_no_value'] is False:  # when not searching on 'No Value'
                     should_arr = [must_terms] if must_terms else []
-                    should_arr.append({EXISTS: {FIELD: query_field}})
+                    should_arr.append({EXISTS: {FIELD: query_field}})   # field=value OR field EXISTS
                     must_filters_nested.append((query_field, should_arr))
                 else:
                     if must_terms: must_filters_nested.append((query_field, must_terms))
@@ -124,12 +126,12 @@ class LuceneBuilder:
                 if filters['add_no_value'] is True:
                     # add to must_not in an OR case, which is equivalent to filtering on 'No value'
                     should_arr = [must_terms] if must_terms else []
-                    should_arr.append({BOOL: {MUST_NOT: {EXISTS: {FIELD: query_field}}}})
+                    should_arr.append({BOOL: {MUST_NOT: {EXISTS: {FIELD: query_field}}}})  # field=value OR field DNE
                     must_filters.append((query_field, {BOOL: {SHOULD: should_arr}}))
                 elif filters['add_no_value'] is False:
                     # add to must_not in an OR case, which is equivalent to filtering on '! No value'
                     should_arr = [must_terms] if must_terms else []
-                    should_arr.append({EXISTS: {FIELD: query_field}})
+                    should_arr.append({EXISTS: {FIELD: query_field}})  # field=value OR field EXISTS
                     must_filters.append((query_field, {BOOL: {SHOULD: should_arr}}))
                 else:  # no filtering on 'No value'
                     if must_terms: must_filters.append((query_field, must_terms))
@@ -157,17 +159,13 @@ class LuceneBuilder:
                 msg='Tried to handle nested filter with key other than must/must_not: %s' % key
             )
 
-        # handle length 0, 1 and n cases
-        try:
-            my_filters = filters[key]
-        except KeyError:
-            return {}  # just in case, we want this to be recoverable if for some reason it happens
+        my_filters = filters.get(key, [])
         if len(my_filters) == 0:
             return {}
         elif len(my_filters) == 1:  # see standard bool/match query
             return {BOOL: {MUST: [{MATCH: {query_field: my_filters[0]}}]}}
         else:
-            sub_queries = {BOOL: {MUST: {BOOL: {SHOULD: []}}}}
+            sub_queries = {BOOL: {MUST: {BOOL: {SHOULD: []}}}}  # wrap SHOULD with MUST so the sub-clause is required
             for option in my_filters:  # see how to combine queries on the same field
                 sub_queries[BOOL][MUST][BOOL][SHOULD].append({MATCH: {query_field: option}})
             return sub_queries
@@ -233,9 +231,9 @@ class LuceneBuilder:
                                 else:
                                     insertion_point = _q[NESTED][QUERY][BOOL]
                                     if key not in insertion_point:  # this can happen if we are combining with 'No value'
-                                        _q[NESTED][QUERY][BOOL][key] = query[BOOL][key][0]
+                                       insertion_point[key] = query[BOOL][key][0]
                                     else:
-                                        _q[NESTED][QUERY][BOOL][key].append(query[BOOL][key][0])
+                                        insertion_point[key].append(query[BOOL][key][0])
 
                                 found = True  # break is not sufficient, see below
                                 break
@@ -260,8 +258,10 @@ class LuceneBuilder:
                 # otherwise continue logic below
                 if BOOL not in query:
                     final_filters[BOOL][MUST].append({
-                        NESTED: {PATH: nested_path,
-                                 QUERY: query}
+                        NESTED: {
+                            PATH: nested_path,
+                            QUERY: query
+                        }
                     })
                     continue
 
@@ -306,8 +306,14 @@ class LuceneBuilder:
                              QUERY: sub_query}
                 })
 
-    @staticmethod
-    def handle_range_filters(request, result, field_filters, doc_types):
+    @classmethod
+    def extract_field_from_to(cls, field):
+        """ Neat helper method provided by Kent to clean up a step in 'handle_range_filters'. """
+        return [(bool(m), m and m.group(1), m and m.group(2))
+                for m in map(lambda x: cls.to_from_pattern.match(x), [field])][0]
+
+    @classmethod
+    def handle_range_filters(cls, request, result, field_filters, doc_types):
         """
         Constructs range_filters based on the given filters as part of the MUST sub-query
 
@@ -324,8 +330,7 @@ class LuceneBuilder:
             exists_field = False  # keep track of null values
             range_type = False  # If we determine is a range request (field.to, field.from), will be populated with string 'date' or 'numerical'
             range_direction = None
-            f_field = None
-            if field in COMMON_EXCLUDED_URI_PARAMS + ['q']:
+            if field == 'q' or field in COMMON_EXCLUDED_URI_PARAMS:
                 continue
             elif field == 'type' and term != 'Item':
                 continue
@@ -333,12 +338,11 @@ class LuceneBuilder:
                 exists_field = True
 
             # Check for date or numerical range filters
-            if (len(field) > 3 and field[-3:] == '.to') or (len(field) > 5 and field[-5:] == '.from'):
-                if field[-3:] == '.to':
-                    f_field = field[:-3]
+            is_range, f_field, which = cls.extract_field_from_to(field)
+            if is_range:
+                if which == 'to':
                     range_direction = "lte"
                 else:
-                    f_field = field[:-5]
                     range_direction = "gte"
 
                 # If schema for field is not found (and range_type thus not set),
@@ -387,7 +391,7 @@ class LuceneBuilder:
                         range_filters[query_field]['format'] = 'yyyy-MM-dd HH:mm'
 
                 if range_direction in ('gt', 'gte', 'lt', 'lte'):
-                    if range_type == "date" and len(term) == 10:
+                    if range_type == "date" and len(term) == 10:  # TODO: refactor to use regex -Will 06/24/2020
                         # Correct term to have hours, e.g. 00:00 or 23:59, if not otherwise supplied.
                         if range_direction == 'gt' or range_direction == 'lte':
                             term += ' 23:59'
@@ -404,6 +408,8 @@ class LuceneBuilder:
                         elif range_direction == 'lt' or range_direction == 'lte':
                             if term > range_filters[query_field][range_direction]:
                                 range_filters[query_field][range_direction] = term
+
+            # add these to field_filters directly, handle later with build_sub_queries
             else:
                 if query_field not in field_filters:
                     field_filters[query_field] = {
@@ -560,11 +566,8 @@ class LuceneBuilder:
         facet_filters = deepcopy(search_filters['bool'])
 
         for filter_type in ['must', 'must_not']:
-            if search_filters['bool'][filter_type] == []:
-                continue
-            for active_filter in search_filters['bool'][
-                filter_type]:  # active_filter => e.g. { 'terms' : { 'embedded.@type.raw': ['ExperimentSetReplicate'] } }
-
+            # active_filter => e.g. { 'terms' : { 'embedded.@type.raw': ['ExperimentSetReplicate'] } }
+            for active_filter in search_filters['bool'][filter_type]:
                 if 'bool' in active_filter and 'should' in active_filter['bool']:
                     # handle No value case
                     inner_bool = None

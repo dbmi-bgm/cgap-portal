@@ -23,11 +23,10 @@ class CompoundSearchBuilder:
 
         Entry point is "execute_filter_set".
     """
-    TYPE = 'type'
+    TYPE = 'search_type'
     ID = '@id'
     QUERY = 'query'
     FLAG_APPLIED = 'flag_applied'
-    DEFAULT_SEARCH = '?type=Item'
     BUILD_QUERY_URL = '/build_query/'
 
     @staticmethod
@@ -123,8 +122,9 @@ class CompoundSearchBuilder:
     @staticmethod
     def _add_type_to_flag_if_needed(flags, type_flag):
         """ Modifies 'flags' in place by adding type query if it is not present """
-        if type_flag not in flags:
+        if type_flag not in flags or type_flag.lower() not in flags:
             flags += '&' + type_flag
+        return flags
 
     @classmethod
     def execute_filter_set(cls, context, request, filter_set, from_=0, to=10, return_generator=False, intersect=False):
@@ -140,29 +140,32 @@ class CompoundSearchBuilder:
         filter_blocks = filter_set.get(FILTER_BLOCKS, [])
         flags = filter_set.get(FLAGS, None)
         t = filter_set.get(cls.TYPE, 'Item')  # if type not set, attempt to search on item
-
-        # XXX: handle capitalization? ie: type=gene vs. type=Gene
+        type_flag = 'type=%s' % t
 
         # if we have no filter blocks, pass flags alone to search
         if not filter_blocks and flags:
-            type_flag = 'type=%s' % t
-            cls._add_type_to_flag_if_needed(flags, type_flag)
+            flags = cls._add_type_to_flag_if_needed(flags, type_flag)
             subreq = cls.build_subreq_from_single_query(request, flags, from_=from_, to=to)
             return cls.invoke_search(context, request, subreq, return_generator=return_generator)
 
         # if we have only a single filter block with no flags, pass single filter_block to search
         elif not flags and len(filter_blocks) == 1:
             block = filter_blocks[0]
-            if block['flag_applied']:
-                subreq = cls.build_subreq_from_single_query(request, block['query'], from_=from_, to=to)
+            block_query = block['query']
+            if type_flag not in block:
+                block_query = cls._add_type_to_flag_if_needed(block_query, type_flag)
+            if block[cls.FLAG_APPLIED]:
+                subreq = cls.build_subreq_from_single_query(request, block_query, from_=from_, to=to)
             else:
-                subreq = cls.build_subreq_from_single_query(request, cls.DEFAULT_SEARCH, from_=from_, to=to)
+                subreq = cls.build_subreq_from_single_query(request, type_flag, from_=from_, to=to)
             return cls.invoke_search(context, request, subreq, return_generator=return_generator)
 
         # if given flags and single filter block, combine and pass
         elif flags and len(filter_blocks) == 1:
             block = filter_blocks[0]
-            if block['flag_applied']:
+            if type_flag not in flags and type_flag not in block:
+                flags = cls._add_type_to_flag_if_needed(flags, type_flag)
+            if block[cls.FLAG_APPLIED]:
                 combined_query = cls.combine_flags_and_block(flags, block['query'])
                 subreq = cls.build_subreq_from_single_query(request, combined_query, from_=from_, to=to)
             else:
@@ -183,14 +186,12 @@ class CompoundSearchBuilder:
                                                                     route=cls.BUILD_QUERY_URL, from_=from_, to=to)
                     sub_query = request.invoke_subrequest(subreq).json[cls.QUERY]
                     sub_queries.append(sub_query)
-                else:
-                    continue
 
             if len(sub_queries) == 0:  # if all blocks are disabled, just execute the flags
                 if not flags:
-                    flags = cls.DEFAULT_SEARCH
-                type_flag = 'type=%s' % t
-                cls._add_type_to_flag_if_needed(flags, type_flag)
+                    flags = type_flag
+                else:
+                    flags = cls._add_type_to_flag_if_needed(flags, type_flag)
                 subreq = cls.build_subreq_from_single_query(request, flags, from_=from_, to=to)
                 return cls.invoke_search(context, request, subreq, return_generator=return_generator)
 
