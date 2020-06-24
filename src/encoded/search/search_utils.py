@@ -9,6 +9,7 @@ from snovault import TYPES
 from snovault.util import crawl_schema, find_collection_subtypes
 from snovault.embed import make_subrequest
 from snovault.elasticsearch.indexer_utils import get_namespaced_index
+from snovault.elasticsearch.create_mapping import determine_if_is_date_field
 from ..util import deduplicate_list
 
 
