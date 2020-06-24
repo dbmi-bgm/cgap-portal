@@ -48,7 +48,6 @@ install:
 before_script:
 - configure-kibana-index --es-endpoint search-fourfront-builds-uhevxdzfcv7mkm5pj5svcri3aq.us-east-1.es.amazonaws.com:80
 script:
-# setone is essentially all tests that are not indexing; change here for clarity
 - make travis-test
 after_script:
 - echo leader=$BUILD_LEADER status=$BUILD_AGGREGATE_STATUS
