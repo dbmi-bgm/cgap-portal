@@ -19,7 +19,7 @@ BGM_FIELD_MAPPING = {
 }
 
 
-POST_ORDER = ['sample', 'sample_processing', 'individual', 'family', 'report', 'case']
+POST_ORDER = ['sample', 'individual', 'family', 'sample_processing', 'report', 'case']
 
 
 LINKS = [
@@ -238,7 +238,6 @@ def create_sample_processing_groups(items, sp_alias):
     return new_items
 
 
-# NOT YET TESTED
 def compare_with_db(virtualapp, alias):
     try:  # check if already in db
         result = virtualapp.get('/' + alias + '/?frame=object')
@@ -246,17 +245,14 @@ def compare_with_db(virtualapp, alias):
             msg = json.loads(result.body).get('message', '')
             result = virtualapp.get(msg[msg.index('/'):msg.index(';')])
     except Exception as e:  # if not in db
-        # print(e)
         if 'HTTPNotFound' in str(e):
             return None
     else:
         return result.json
 
 
-# TODO : Handle validation of not-yet-submitted-aliases in fields
 def validate_item(virtualapp, item, method, itemtype, aliases, atid=None):
     if method == 'post':
-        #import pdb; pdb.set_trace()
         try:
             validation = virtualapp.post_json('/{}/?check_only=true'.format(itemtype), item)
         except (AppError, VirtualAppError) as e:
@@ -303,15 +299,30 @@ def parse_exception(e, aliases):
         raise e
 
 
-def patch_item_data():
-    pass
+def compare_fields(profile, aliases, json_item, db_item):
+    to_patch = {}
+    for field in json_item:
+        # if not an array, patch field gets overwritten (if different from db)
+        if profile['properties'][field]['type'] != 'array':
+            val = json_item[field]
+            if isinstance(val, str):
+                if val in aliases:
+                    val = aliases[val]
+            if val != db_item.get(field):
+                to_patch[field] = val
+        else:
+            # if array, patch field vals get added to what's in db
+            if field != 'aliases':
+                val = [aliases[v] if v in aliases else v for v in json_item[field]]
+            else:
+                val = [v for v in json_item[field]]
+            if sorted(val) != sorted(db_item.get(field, [])):
+                new_val = db_item.get(field, [])
+                new_val.extend(val)
+                to_patch[field] = list(set(new_val))
+    return to_patch
 
 
-def post_item_data():
-    pass
-
-
-# NOT FINISHED
 def validate_all_items(virtualapp, json_data):
     '''
     Still in progress, not necessarily functional yet. NOT YET TESTED.
@@ -330,6 +341,7 @@ def validate_all_items(virtualapp, json_data):
     all_aliases = [k for itype in json_data for k in json_data[itype]]
     json_data_final = {'post': {}, 'patch': {}}
     validation_results = {}
+    output = []
     for itemtype in POST_ORDER:  # don't pre-validate case and report
         if itemtype in json_data:
             profile = virtualapp.get('/profiles/{}.json'.format(itemtype)).json
@@ -352,28 +364,8 @@ def validate_all_items(virtualapp, json_data):
             else:
                 # patch if item exists in db
                 alias_dict[alias] = result['@id']
-                to_patch = {}
-                for field in json_data[itemtype][alias]:
-                    # if field in links:
-                        # look up atids of links
-                        # if profile['properties'][field]['type'] != 'array':
-                        #     for i, item in enumerate(json_data[itemtype][alias][field]):
-                        #         if item in alias_dict:
-                        #             json_data[itemtype][alias][field][i] = alias_dict[item]
-                        # elif profile['properties'][field]['type'] == 'string':
-                        #     if item in alias_dict:
-                        #         json_data[itemtype][alias][field] = alias_dict[item]
-                    # if not an array, patch field gets overwritten (if different from db)
-                    if profile['properties'][field]['type'] != 'array':
-                        if json_data[itemtype][alias][field] != result.get(field):
-                            to_patch[field] = json_data[itemtype][alias][field]
-                    else:
-                        # if array, patch field vals get added to what's in db
-                        if sorted(json_data[itemtype][alias][field]) != sorted(result.get(field, [])):
-                            val = result.get(field, [])
-                            val.extend(json_data[itemtype][alias][field])
-                            to_patch[field] = list(set(val))
-                error = validate_item(virtualapp, to_patch, 'patch', itemtype, all_aliases, atid=result['@id'])
+                patch_data = compare_fields(profile, alias_dict, json_data[itemtype][alias], result)
+                error = validate_item(virtualapp, patch_data, 'patch', itemtype, all_aliases, atid=result['@id'])
                 if error:  # do something to report validation errors
                     if itemtype not in ['case', 'report']:
                         for e in error:
@@ -381,10 +373,13 @@ def validate_all_items(virtualapp, json_data):
                         validation_results[itemtype]['errors'] += 1
                 else:  # patch
                     json_data_final['patch'].setdefault(itemtype, {})
-                    json_data_final['patch'][itemtype][result['@id']] = to_patch
+                    if patch_data:
+                        json_data_final['patch'][itemtype][result['@id']] = patch_data
+                    else:
+                        output.append('{} {} - Item already in database, no changes needed'.format(itemtype, alias))
                     # do something to record response
                     validation_results[itemtype]['validated'] += 1
-    output = [error for error in errors]
+    output.extend([error for error in errors])
     for itemtype in validation_results:
         output.append('{} items: {} validated; {} errors'.format(
             itemtype, validation_results[itemtype]['validated'], validation_results[itemtype]['errors']
@@ -393,8 +388,6 @@ def validate_all_items(virtualapp, json_data):
         output.append('Validation errors found in items. Please fix spreadsheet before submitting.')
         return ({}, output)
     else:
-        # json_data_final['post']['case'] = list(json_data['case'].values())
-        # json_data_final['post']['report'] = list(json_data['report'].values())
         json_data_final['aliases'] = alias_dict
         output.append('All items validated.')
         return (json_data_final, output)
@@ -402,9 +395,11 @@ def validate_all_items(virtualapp, json_data):
 
 def post_and_patch_all_items(virtualapp, json_data_final):
     output = []
+    if not json_data_final:
+        return output
     item_names = {'individual': 'individual_id', 'family': 'family_id', 'sample': 'specimen_accession'}
     final_status = {}
-    if json_data_final['post']:
+    if json_data_final.get('post'):
         for k, v in json_data_final['post'].items():
             final_status[k] = {'posted': 0, 'not posted': 0, 'patched': 0, 'not patched': 0}
             for item in v:
@@ -413,10 +408,8 @@ def post_and_patch_all_items(virtualapp, json_data_final):
                     if field in item:
                         patch_info[field] = item[field]
                         del item[field]
-    # return json_data_final
                 try:
                     response = virtualapp.post_json('/' + k, item, status=201)
-                    # aliasdict[item['aliases'][0]] = response.json['@graph'][0]['@id']
                     if response.json['status'] == 'success':
                         final_status[k]['posted'] += 1
                         atid = response.json['@graph'][0]['@id']
@@ -438,7 +431,6 @@ def post_and_patch_all_items(virtualapp, json_data_final):
     for k, v in json_data_final['patch'].items():
         final_status.setdefault(k, {'patched': 0, 'not patched': 0})
         for item_id, patch_data in v.items():
-            # atid = k if k.startswith('/') else aliasdict[k]
             try:
                 response = virtualapp.patch_json('/' + item_id, patch_data, status=200)
                 if response.json['status'] == 'success':
@@ -455,16 +447,6 @@ def post_and_patch_all_items(virtualapp, json_data_final):
                 k, final_status[k]['patched'], final_status[k]['not patched']
             ))
     return output
-
-
-
-# This was just to see if i could post something using testapp in the python command line, currently works.
-# def test_function():
-#     app = get_app('development.ini', 'app')
-#     environ = {'HTTP_ACCEPT': 'application/json', 'REMOTE_USER': 'TEST'}
-#     testapp = TestApp(app, environ)
-#     response = testapp.post_json('/project', {'name': 'test', 'title': 'Test'}, status=201)
-#     print(response)
 
 
 def cell_value(cell, datemode):
