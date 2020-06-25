@@ -414,7 +414,7 @@ class MappingTableParser(object):
         """
         schema['$schema'] = 'http://json-schema.org/draft-04/schema#'
         schema['type'] = 'object'
-        schema['required'] = ['institution', 'project']
+        schema['required'] = ['institution', 'project', 'CHROM', 'POS', 'REF', 'ALT']  # for display_title
         schema['identifyingProperties'] = ['uuid', 'aliases', 'annotation_id']
         schema['additionalProperties'] = False
         schema['mixinProperties'] = [
