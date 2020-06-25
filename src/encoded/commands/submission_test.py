@@ -12,10 +12,10 @@ def main():
     inst = virtualapp.get('/institutions/hms-dbmi/').json
     json_data = xls_to_json('src/encoded/tests/data/documents/cgap_submit_test.xlsx', proj, inst)
     final_json, validation_log = validate_all_items(virtualapp, json_data)
-    print(validation_log)
+    print('\n'.join(validation_log))
     print(json.dumps(final_json, indent=4))
     result = post_and_patch_all_items(virtualapp, final_json)
-    print(result)
+    print('\n'.join(result))
 
 
 if __name__ == '__main__':
