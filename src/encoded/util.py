@@ -17,3 +17,12 @@ def resolve_file_path(path, file_loc=None):
     else:
         path_to_this_file = os.path.abspath(ENCODED_ROOT_DIR)
     return os.path.join(path_to_this_file, path)
+
+
+def deduplicate_list(lst):
+    """ De-duplicates the given list by converting it to a set then back to a list.
+
+    :param lst: list to de-duplicate
+    :return: de-duplicated list
+    """
+    return list(set(lst))
