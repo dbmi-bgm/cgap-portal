@@ -27,6 +27,7 @@ def cohort():
         'institution': 'encode-institution'
     }
 
+
 def test_post_invalid_cohort_title(testapp, project, institution, invalid_cohort_title):
     """ Tries to post an invalid cohort with type mismatch """
     testapp.post_json('/cohort', invalid_cohort_title, status=422)

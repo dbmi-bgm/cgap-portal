@@ -2,7 +2,7 @@
 
 http://pyramid.readthedocs.org/en/latest/narr/testing.html
 '''
-
+import os
 import logging
 import pkg_resources
 import pytest
@@ -35,6 +35,24 @@ def app_settings(request, wsgi_server_host_port, conn, DBSession):
     settings['auth0.audiences'] = 'http://%s:%s' % wsgi_server_host_port
     # add some here for file testing
     settings[DBSESSION] = DBSession
+    return settings
+
+
+@pytest.fixture(scope='session')
+def es_app_settings(wsgi_server_host_port, elasticsearch_server, postgresql_server, aws_auth):
+    settings = make_app_settings_dictionary()
+    settings['create_tables'] = True
+    settings['persona.audiences'] = 'http://%s:%s' % wsgi_server_host_port  # 2-tuple such as: ('localhost', '5000')
+    settings['elasticsearch.server'] = elasticsearch_server
+    settings['sqlalchemy.url'] = postgresql_server
+    settings['collection_datastore'] = 'elasticsearch'
+    settings['item_datastore'] = 'elasticsearch'
+    settings['indexer'] = True
+    settings['indexer.namespace'] = os.environ.get('TRAVIS_JOB_ID', '') # set namespace for tests
+
+    # use aws auth to access elasticsearch
+    if aws_auth:
+        settings['elasticsearch.aws_auth'] = aws_auth
     return settings
 
 

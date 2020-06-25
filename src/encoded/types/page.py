@@ -36,7 +36,7 @@ from urllib.parse import (
     urlparse,
     urlencode
 )
-from ..search import get_iterable_search_results
+from ..search.search import get_iterable_search_results
 from .base import Item
 from .user_content import (
     StaticSection
