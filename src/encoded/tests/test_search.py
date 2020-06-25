@@ -6,16 +6,14 @@ from datetime import (datetime, timedelta)
 from pyramid.httpexceptions import HTTPBadRequest
 from snovault import TYPES, COLLECTIONS
 from snovault.elasticsearch import create_mapping
-from snovault.elasticsearch.create_mapping import MAX_NGRAM
-from encoded.search import verify_search_has_permissions
+from encoded.search.lucene_builder import LuceneBuilder
 from snovault.elasticsearch.indexer_utils import get_namespaced_index
 from snovault.util import add_default_embeds
-from ..commands.run_upgrader_on_inserts import get_inserts
+
 # Use workbook fixture from BDD tests (including elasticsearch)
-from .workbook_fixtures import app_settings, app, workbook
+from .workbook_fixtures import app, workbook
 
-
-pytestmark = [pytest.mark.working, pytest.mark.schema, pytest.mark.indexing]
+pytestmark = [pytest.mark.working, pytest.mark.schema, pytest.mark.indexing, pytest.mark.search]
 
 
 ### IMPORTANT
@@ -593,13 +591,13 @@ def test_search_with_hacked_query(anontestapp, hacked_query):
         verification function should throw an exception if there is any delta in the permissions object
         we explicitly attach to every search query.
     """
-    with mock.patch('encoded.search.convert_search_to_dictionary', return_value=hacked_query):
+    with mock.patch('encoded.search.lucene_builder.convert_search_to_dictionary', return_value=hacked_query):
         mocked_request_with_least_permissive_permissions = MockedRequest()
         with pytest.raises(HTTPBadRequest):
-            verify_search_has_permissions(mocked_request_with_least_permissive_permissions, None)
+            LuceneBuilder.verify_search_has_permissions(mocked_request_with_least_permissive_permissions, None)
         mocked_request_with_same_permissions = MockedRequest(principals_allowed=['system.Everyone',
                                                                                  'group.PERMISSION_YOU_DONT_HAVE'])
-        verify_search_has_permissions(mocked_request_with_same_permissions, None)
+        LuceneBuilder.verify_search_has_permissions(mocked_request_with_same_permissions, None)
 
 
 def test_search_with_principals_allowed_fails(workbook, anontestapp):

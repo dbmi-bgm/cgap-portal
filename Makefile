@@ -5,7 +5,8 @@ clean:  # clear node modules, eggs, npm build stuff
 	rm -f src/encoded/static/css/*.css
 	rm -f src/encoded/static/build/*.js
 	rm -f src/encoded/static/build/*.html
-	rm -rf develop develop-eggs
+	rm -rf develop
+	rm -rf develop-eggs
 
 aws-ip-ranges:
 	curl -o aws-ip-ranges.json https://ip-ranges.amazonaws.com/ip-ranges.json
@@ -14,7 +15,7 @@ npm-setup:  # runs all front-end setup
 	npm ci
 	npm run build | grep -v "node_modules\|\[built\]"
 	npm run build-scss
-	curl -o aws-ip-ranges.json https://ip-ranges.amazonaws.com/ip-ranges.json
+	make aws-ip-ranges
 
 moto-setup:  # optional moto setup that must be done separately
 	pip install "moto[server]==1.3.7"
@@ -42,11 +43,11 @@ build-after-poetry:  # continuation of build after poetry install
 
 build-dev:  # same as build, but sets up locust as well
 	make build
-	pip install locust
+	make build-locust
 
 macbuild-dev:  # same as macbuild, but sets up locust as well
 	make macbuild
-	pip install locust
+	make build-locust
 
 build-locust:  # just pip installs locust - may cause instability
 	pip install locust
@@ -58,7 +59,7 @@ download-genes: # grabs latest gene list from the below link, unzips and drops i
 	mv gene_inserts_v0.4.5.json src/encoded/annotations/gene_inserts_v0.4.5.json
 
 deploy1:  # starts postgres/ES locally and loads inserts
-	dev-servers development.ini --app-name app --clear --init --load
+	@SNOVAULT_DB_TEST_PORT=`grep 'sqlalchemy[.]url =' development.ini | sed -E 's|.*:([0-9]+)/.*|\1|'` dev-servers development.ini --app-name app --clear --init --load
 
 deploy2:  # spins up waittress to serve the application
 	pserve development.ini
@@ -76,7 +77,13 @@ clean-python:
 	pip freeze | xargs pip uninstall -y
 
 test:
-	bin/test -vv --timeout=400
+	bin/test -vv --timeout=200 -m "working and not performance"
+
+test-any:
+	bin/test -vv --timeout=200
+
+travis-test:
+	bin/test -vv --timeout=200 -m "working and not performance" --aws-auth --durations=10 --cov src/encoded --es search-fourfront-builds-uhevxdzfcv7mkm5pj5svcri3aq.us-east-1.es.amazonaws.com:80
 
 travis-test:
 	bin/test -vv --timeout=400 --aws-auth -m "not performance and working" --durations=10 --cov src/encoded --es search-fourfront-builds-uhevxdzfcv7mkm5pj5svcri3aq.us-east-1.es.amazonaws.com:80
@@ -91,7 +98,7 @@ info:
 	@: $(info Here are some 'make' options:)
 	   $(info - Use 'make aws-ip-ranges' to download latest ip range information. Invoked automatically when needed.)
 	   $(info - Use 'make build' (or 'make macbuild' on OSX Catalina) to build only application dependencies.)
-	   $(info - Use 'make build-dev' (or 'make macbuild-dev' on OSX Catalina) to build all dependencies, including locust.)
+	   $(info - Use 'make build-dev' (or 'make macbuild-dev' on OSX Catalina) to build all dependencies, even locust.)
 	   $(info - Use 'make build-locust' to install locust. Do not do this unless you know what you are doing.)
 	   $(info - Use 'make clean' to clear out (non-python) dependencies.)
 	   $(info - Use 'make clean-python' to clear python virtualenv for fresh poetry install.)
@@ -99,8 +106,9 @@ info:
 	   $(info - Use 'make deploy1' to spin up postgres/elasticsearch and load inserts.)
 	   $(info - Use 'make deploy2' to spin up the application server.)
 	   $(info - Use 'make deploy3' to load variants and genes.)
-	   $(info - Use 'make kill' to kill back-end resources.)
+	   $(info - Use 'make kill' to kill postgres and elasticsearch proccesses. Please use with care.)
 	   $(info - Use 'make moto-setup' to install moto, for less flaky tests. Implied by 'make build'.)
 	   $(info - Use 'make npm-setup' to build the front-end. Implied by 'make build'.)
-	   $(info - Use 'make test' to run tests with the normal options we use on travis.)
+	   $(info - Use 'make test' to run tests with normal options we use on travis ('-m "working and not performance"').)
+	   $(info - Use 'make test-any' to run tests without marker constraints (i.e., with no '-m' option).)
 	   $(info - Use 'make update' to update dependencies (and the lock file).)
