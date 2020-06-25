@@ -5,7 +5,8 @@ clean:  # clear node modules, eggs, npm build stuff
 	rm -f src/encoded/static/css/*.css
 	rm -f src/encoded/static/build/*.js
 	rm -f src/encoded/static/build/*.html
-	rm -rf develop develop-eggs
+	rm -rf develop
+	rm -rf develop-eggs
 
 aws-ip-ranges:
 	curl -o aws-ip-ranges.json https://ip-ranges.amazonaws.com/ip-ranges.json
@@ -14,7 +15,7 @@ npm-setup:  # runs all front-end setup
 	npm ci
 	npm run build | grep -v "node_modules\|\[built\]"
 	npm run build-scss
-	curl -o aws-ip-ranges.json https://ip-ranges.amazonaws.com/ip-ranges.json
+	make aws-ip-ranges
 
 moto-setup:  # optional moto setup that must be done separately
 	pip install "moto[server]==1.3.7"
@@ -42,7 +43,7 @@ build-after-poetry:  # continuation of build after poetry install
 
 build-dev:  # same as build, but sets up locust as well
 	make build
-	pip install locust
+	make build-locust
 
 macbuild-dev:  # same as macbuild, but sets up locust as well
 	make macbuild
@@ -91,7 +92,7 @@ help:
 	@make info
 
 info:
-	@: $(info Here are some 'make' options:)
+	@: $(info Printing some info on how to use make)
 	   $(info - Use 'make aws-ip-ranges' to download latest ip range information. Invoked automatically when needed.)
 	   $(info - Use 'make build' (or 'make macbuild' on OSX Catalina) to build only application dependencies.)
 	   $(info - Use 'make build-dev' (or 'make macbuild-dev' on OSX Catalina) to build all dependencies, even locust.)
@@ -102,7 +103,7 @@ info:
 	   $(info - Use 'make deploy1' to spin up postgres/elasticsearch and load inserts.)
 	   $(info - Use 'make deploy2' to spin up the application server.)
 	   $(info - Use 'make deploy3' to load variants and genes.)
-	   $(info - Use 'make kill' to kill back-end resources.)
+	   $(info - Use 'make kill' to kill postgres and elasticsearch proccesses. Please use with care.)
 	   $(info - Use 'make moto-setup' to install moto, for less flaky tests. Implied by 'make build'.)
 	   $(info - Use 'make npm-setup' to build the front-end. Implied by 'make build'.)
 	   $(info - Use 'make test' to run tests with normal options we use on travis ('-m "working and not performance"').)
