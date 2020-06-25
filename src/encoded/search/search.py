@@ -823,7 +823,8 @@ class SearchBuilder:
         """
         if 'aggregations' not in es_results:
             return {}
-        return {k: v for k, v in es_results['aggregations'].items() if k != 'all_items'}
+        return {k: v for k, v in es_results['aggregations'].items()
+                if k != 'all_items'}
 
     def get_collection_actions(self):
         """
@@ -831,7 +832,7 @@ class SearchBuilder:
 
         :return: actions available for this collection at this time
         """
-        type_info = self.types[self.doc_types[0]]
+        type_info = self.types[self.doc_types[0]]  # only care about the "first" collection
         collection = self.request.registry[COLLECTIONS].get(type_info.name)
         if hasattr(collection, 'actions'):
             return collection.actions(self.request)
@@ -946,27 +947,26 @@ class SearchBuilder:
             for hit in subsequent_search_result['hits'].get('hits', []):
                 yield hit
 
-    def execute_search_for_all_results(self):
+    def execute_search_for_all_results(self, size_increment=100):
         """
         Uses the above function to automatically paginate all results.
 
+        :param size_increment: number of results to get per page, default 100
         :return: all es_results that matched the given query
         """
-        size_increment = 100  # Decrease this to like 5 or 10 to test.
-
         first_search = self.search[0:size_increment]  # get aggregations from here
         es_result = execute_search(self.request, first_search)
 
         total_results_expected = es_result['hits'].get('total', 0)
-        extra_requests_needed_count = int(
-            math.ceil(total_results_expected / size_increment)) - 1  # Decrease by 1 (first es_result already happened)
+
+        # Decrease by 1 (first es_result already happened)
+        extra_requests_needed_count = math.ceil(total_results_expected / size_increment) - 1
 
         if extra_requests_needed_count > 0:
-            es_result['hits']['hits'] = itertools.chain(es_result['hits']['hits'],
-                                                        self.get_all_subsequent_results(self.request, es_result,
-                                                                                        self.search,
-                                                                                        extra_requests_needed_count,
-                                                                                        size_increment))
+            es_result['hits']['hits'] = itertools.chain(
+                es_result['hits']['hits'],
+                self.get_all_subsequent_results(
+                    self.request, es_result, self.search, extra_requests_needed_count, size_increment))
         return es_result
 
     def execute_search(self):
@@ -974,7 +974,7 @@ class SearchBuilder:
         LuceneBuilder.verify_search_has_permissions(self.request, self.search)
         if self.size == 'all':
             es_results = self.execute_search_for_all_results()
-        else:
+        else:  # from_, size are integers
             size_search = self.search[self.from_:self.from_ + self.size]
             es_results = execute_search(self.request, size_search)
         return es_results
@@ -1075,7 +1075,6 @@ def collection_view(context, request):
 def get_iterable_search_results(request, search_path='/search/', param_lists=None, **kwargs):
     '''
     Loops through search results, returns 100 (or search_results_chunk_row_size) results at a time. Pass it through itertools.chain.from_iterable to get one big iterable of results.
-    TODO: Maybe make 'limit=all', and instead of calling invoke_subrequest(subrequest), instead call iter_search_results!
 
     :param request: Only needed to pass to do_subreq to make a subrequest with.
     :param search_path: Root path to call, defaults to /search/.
@@ -1106,7 +1105,4 @@ _ASSEMBLY_MAPPER = {
     'WBcel235': 'WBcel235'
 }
 
-hgConnect = ''.join([
-    'http://genome.ucsc.edu/cgi-bin/hgTracks',
-    '?hubClear=',
-])
+hgConnect = 'http://genome.ucsc.edu/cgi-bin/hgTracks?hubClear='
