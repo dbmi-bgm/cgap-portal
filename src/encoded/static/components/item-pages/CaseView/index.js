@@ -253,13 +253,13 @@ const CaseSummaryTabView = React.memo(function CaseSummaryTabView(props){
             case_phenotypic_features: caseFeatures = { case_phenotypic_features: [] },
             description = null,
             actions: permissibleActions = [],
-            sample_processes = []
+            sample_processing
         } = {},
-        idToGraphIdentifier,
         onFamilySelect,
         graphData,
         selectedDiseases,
-        windowWidth
+        windowWidth,
+        currFamily
     } = props;
 
     const familiesLen = families.length;
@@ -293,12 +293,14 @@ const CaseSummaryTabView = React.memo(function CaseSummaryTabView(props){
         };
     }, [ /* empty == executed only once ever */ ]);
 
+
     let caseSummaryTables;
     if (familiesLen > 0) {
         caseSummaryTables = families.map(function(family, idx){
             const {
                 original_pedigree: { display_title: pedFileName } = {},
-                members = []
+                members = [],
+                display_title
             } = family;
             const cls = "family-index-" + idx;
             const isCurrentFamily = idx === pedigreeFamiliesIdx;
@@ -310,56 +312,34 @@ const CaseSummaryTabView = React.memo(function CaseSummaryTabView(props){
                 }
             };
 
+            const uriEncodedDisplayTitle = encodeURI(display_title);
+
             const [open, setOpen] = useState(idx === 0); // 1st family open by default
 
             const tip = isCurrentFamily ?
                 "Currently-selected family in Pedigree Visualization"
                 : "Click to view this family in the Pedigree Visualization tab";
             const title = (
-                <h4 data-family-index={idx} className="clickable p-2 d-inline-block" onClick={() => setOpen(!open)}>
-                    <i className={"icon p-1 clickable fas icon-sm" + (open ? " icon-minus" : " icon-plus")} />
+                <h4 data-family-index={idx} className="clickable p-2 d-inline-block clearfix" onClick={() => setOpen(!open)}>
+                    <i className={"icon p-2 clickable fas icon-sm" + (open ? " icon-minus" : " icon-plus")} />
                     <span className="font-italic text-500">{ family.display_title }</span>
                     <span className="text-300 font-italic">: Status Overview</span>
                     { pedFileName ? <span className="text-300">{ " (" + pedFileName + ")" }</span> : null }
-                    <button type="button" className="btn btn-small btn-primary d-none" data-tip={tip} onClick={onClick}>
+                    <button type="button" className="btn btn-small btn-outline-primary pull-right" data-tip={tip} onClick={onClick}>
                         <i className="icon icon-fw icon-sitemap fas mr-1 small" />
                         { isCurrentFamily ? "View Pedigree in Separate Tab" : "Switch to this Pedigree"}
                     </button>
                 </h4>
             );
 
-            // go through each member in the family and populate a list with all of their samplesIDs...
-            // will match these up with those in sampleanalysis.samples to determine which to render on per family basis
-            const familySpecificSampleIDs = members.reduce(function(m, { samples = [] }){
-                samples.forEach(function({ "@id" : id }){
-                    m[id] = true;
-                });
-                return m;
-            }, {});
-
-            // sampleProcessing objects that have 2 or more matching samples to pass ONLY THOSE through to caseSummaryTable
-            const familySpecificSAs = sample_processes.filter(function(sp){
-                const { samples = [] } = sp;
-                let numMatchingSamples = 0;
-                for (let i = 0; i < samples.length; i++) {
-                    const { "@id": currSampleID } = samples[i];
-
-                    if (familySpecificSampleIDs[currSampleID]) {
-                        numMatchingSamples++;
-                    }
-
-                    if (numMatchingSamples >= 2) {
-                        return true;
-                    }
-                }
-                return false;
-            });
-
-
             return (
                 <div className={cls} key={idx} data-is-current-family={isCurrentFamily}>
                     { title }
-                    { open ? <Collapse in={open}><EmbeddedItemSearchTable facets={null} searchHref={`/search/?type=Case`} context={props.context}/></Collapse> : null}
+                    { open ?
+                        <Collapse in={open}><EmbeddedItemSearchTable facets={null}
+                            searchHref={`/search/?type=Case&family.display_title=${uriEncodedDisplayTitle}`}
+                            context={props.context}/>
+                        </Collapse> : null}
                     {/* <CaseSummaryTable {...family} sampleProcessing={familySpecificSAs} {...{ idx, idToGraphIdentifier, isCurrentFamily }} /> */}
                 </div>
             );
@@ -470,11 +450,11 @@ const CaseSummaryTabView = React.memo(function CaseSummaryTabView(props){
                 </div>
             </div>
             <DotRouter href={props.href}>
-                <DotRouterTab cls="arrow-tab" tabTitle="Accessioning" tabViewRender={(props) => AccessioningTab(props)} dotPath=".accessioning" default />
-                <DotRouterTab cls="arrow-tab" tabTitle="Bioinformatics" tabViewRender={(props) => BioinformaticsTab(props)} dotPath=".bioinformatics" />
-                <DotRouterTab cls="arrow-tab" tabTitle="Filtering" tabViewRender={(props) => FilteringTab(props)} dotPath=".filtering"/>
-                <DotRouterTab cls="arrow-tab" tabTitle="Interpretation" tabViewRender={(props) => InterpretationTab(props)} dotPath=".interpretation" disabled/>
-                <DotRouterTab cls="arrow-tab" tabTitle="Finalize Case" tabViewRender={(props) => ReportingTab(props)} dotPath=".reporting" disabled/>
+                <DotRouterTab cls="arrow-tab" tabTitle="Accessioning" tabViewRender={() => AccessioningTab(props)} dotPath=".accessioning" default />
+                <DotRouterTab cls="arrow-tab" tabTitle="Bioinformatics" tabViewRender={() => BioinformaticsTab({ families, currFamily, pedigreeFamiliesIdx, idToGraphIdentifier, sample_processing, context: props.context })} dotPath=".bioinformatics" />
+                <DotRouterTab cls="arrow-tab" tabTitle="Filtering" tabViewRender={() => FilteringTab(props)} dotPath=".filtering"/>
+                <DotRouterTab cls="arrow-tab" tabTitle="Interpretation" tabViewRender={() => InterpretationTab(props)} dotPath=".interpretation" disabled/>
+                <DotRouterTab cls="arrow-tab" tabTitle="Finalize Case" tabViewRender={() => ReportingTab(props)} dotPath=".reporting" disabled/>
             </DotRouter>
         </React.Fragment>
     );
@@ -495,13 +475,10 @@ CaseSummaryTabView.getTabObject = function(props){
 
 
 class DotRouter extends React.Component {
-    // constructor(props) {
-    //     super(props);
-    // }
 
     componentDidMount() {
         const { href, children } = this.props;
-        console.log("children", children);
+        
     }
 
     getDotPath() {
@@ -509,11 +486,9 @@ class DotRouter extends React.Component {
         // not have them conflict
         const { href } = this.props;
         const hashPathSplit = href.split("#");
-        // console.log("hashPathSplit,", hashPathSplit);
 
         if (hashPathSplit.length > 1) {
             const dotPathSplit = hashPathSplit[hashPathSplit.length - 1].split(".");
-            // console.log("dotPathSplit", dotPathSplit);
             return "." + dotPathSplit[dotPathSplit.length - 1];
         } else {
             // Path must contain both tab (hashroute) and dotpath to navigate properly
@@ -554,10 +529,9 @@ class DotRouter extends React.Component {
     render() {
         const { children } = this.props;
         const currentTab = this.getCurrentTab();
-        console.log("this.getCurrentTab", this.getCurrentTab());
 
         return (
-            <div className="tab-router container-wide">
+            <div className="tab-router container-wide" id="dot-router">
                 <nav className="dot-tab-nav">
                     <ul className="dot-tab-nav-list">
                         { children }
@@ -580,18 +554,111 @@ function DotRouterTab(props) {
 }
 
 function AccessioningTab(props) {
-    return <h1>This is the accessioning tab.</h1>;
+    const {
+        currFamily,
+        context
+    } = props;
+    console.log("accessioning props", props);
+    return (
+        <>
+            <h1>{ context.display_title }: <span className="text-300">Accessioning Report and History</span></h1>
+            <div className="tab-inner-container">
+
+            </div>
+        </>);
 }
 function BioinformaticsTab(props) {
+    const {
+        currFamily,
+        context,
+        families = [],
+        pedigreeFamiliesIdx,
+        idToGraphIdentifier,
+        sample_processing = []
+    } = props;
+
+    // console.log("context", context);
+    console.log("biotab props", props);
+    let caseSummaryTables = [];
+    let display_title;
+    if (props) {
+        console.log("biotab props.pedigreeFamilies", props.families);
+        display_title = props.context.display_title;
+        caseSummaryTables = families.map(function(family, idx){
+            const {
+                original_pedigree: { display_title: pedFileName } = {},
+                members = [],
+                display_title
+            } = family;
+            const cls = "family-index-" + idx;
+            const isCurrentFamily = idx === pedigreeFamiliesIdx;
+            // const onClick = function(evt){
+            //     if (isCurrentFamily) {
+            //         navigate("#pedigree", { skipRequest: true });
+            //     } else {
+            //         // onFamilySelect(idx);
+            //     }
+            // };
+    
+            console.log("case family", family);
+    
+            // const tip = isCurrentFamily ?
+            //     "Currently-selected family in Pedigree Visualization"
+            //     : "Click to view this family in the Pedigree Visualization tab";
+            const title = (
+                <h4 data-family-index={idx} className="clickable p-2 d-inline-block">
+                    <i className={"icon p-1 icon-sitemap fas icon-small"} />
+                    <span className="font-italic text-500">{ display_title }</span>
+                    { pedFileName ? <span className="text-300">{ " (" + pedFileName + ")" }</span> : null }
+                    {/* <button type="button" className="btn btn-small btn-primary" data-tip={tip} onClick={onClick}>
+                        <i className="icon icon-fw icon-sitemap fas mr-1 small" />
+                        { isCurrentFamily ? "View Pedigree in Separate Tab" : "Switch to this Pedigree"}
+                    </button> */}
+                </h4>
+            );
+
+            // sampleProcessing objects that have 2 or more matching samples to pass ONLY THOSE through to caseSummaryTable
+            return (
+                <div className={cls} key={idx} data-is-current-family={isCurrentFamily}>
+                    { title }
+                    <CaseSummaryTable {...family} sampleProcessing={[sample_processing]} {...{ idx, idToGraphIdentifier, isCurrentFamily }} />
+                </div>
+            );
+        });
+    } else {
+        console.log("biotabprops don't exist for whatever reason");
+    }
+
     return (
-        <div>
-            <h1>This is the bioinformatics tab.</h1>
-            <CaseSummaryTable />
-        </div>
+        <>
+            <h1>{ display_title }: <span className="text-300">Bioinformatics Analysis</span></h1>
+            <div className="tab-inner-container clearfix">
+                <span className="text-500">Current Status:</span> PASS
+                <span className="font-italic pull-right">3/28/20</span>
+            </div>
+            <div className="tab-inner-container">
+                <h2 className="section-header">Quality Control Metrics (QC)</h2>
+            </div>
+            <div className="tab-inner-container">
+                <h2 className="section-header">Provenance Table</h2>
+            </div>
+            <div className="tab-inner-container">
+                <h2 className="section-header">Multisample Analysis Table</h2>
+                { caseSummaryTables }
+            </div>
+        </>
     );
 }
 function FilteringTab(props) {
-    return <h1>This is the filtering tab.</h1>;
+    const { currFamily, context } = props;
+    return (
+        <>
+            <h1>{ context.display_title}: <span className="text-300">Variant Filtering and Technical Review</span></h1>
+            <EmbeddedItemSearchTable
+                searchHref={`/search/?type=Variant`} { ...{ context }}
+            />
+        </>
+    );
 }
 function InterpretationTab(props) {
     return <h1>This is the interpretation tab.</h1>;
