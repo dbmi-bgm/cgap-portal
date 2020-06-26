@@ -6,7 +6,7 @@
         "submitted_by": "koray_kirli@hms.harvard.edu",
         "status": "released",
         "uuid": "dcf15d5e-40aa-43bc-b81c-32c70c9afa99",
-        "type": "VariantSample",
+        "search_type": "VariantSample",
         "filter_blocks": [
             {
                 "query": "&variant.CHROM=1&variant.genes.genes_most_severe_consequence.impact=MODERATE",
