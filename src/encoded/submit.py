@@ -71,7 +71,7 @@ def xls_to_json(xls_data, project, institution):
 
     items = {
         'individual': {}, 'family': {}, 'sample': {}, 'sample_processing': {},
-        'case': {}, 'report': {}
+        'case': {}, 'report': {}, 'reports': []
     }
     specimen_ids = {}
     for row in rows:
@@ -84,7 +84,6 @@ def xls_to_json(xls_data, project, institution):
         items = fetch_family_metadata(row, items, indiv_alias, fam_alias)
         # create item for Sample if there is a specimen
         if row['specimen id']:
-            items['reports'] = []
             samp_alias = '{}:sample-{}'.format(project['name'], row['specimen id'])
             if row['specimen id'] in specimen_ids:
                 samp_alias = samp_alias + '-' + specimen_ids[row['specimen id']]
@@ -184,6 +183,7 @@ def fetch_sample_metadata(row, items, indiv_alias, samp_alias, sp_alias, analysi
     new_items['sample_processing'].setdefault(analysis_alias, new_sp_item)
     new_items['sample_processing'][analysis_alias]['samples'].append(samp_alias)
     if row.get('report required').lower().startswith('y'):
+        print('report')
         new_items['reports'].append(samp_alias)
     if fam_alias not in new_items['sample_processing'][analysis_alias]['families']:
         new_items['sample_processing'][analysis_alias]['families'].append(fam_alias)
@@ -209,6 +209,7 @@ def create_case_items(items, proj_name):
                 'individual': indiv
             }
             if sample in items['reports']:
+                print('2')
                 report_alias = case_alias.replace('case', 'report')
                 new_items['report'][report_alias] = {
                     'aliases': [report_alias],
