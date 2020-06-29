@@ -27,7 +27,6 @@ from unittest import mock
 from zope.sqlalchemy import mark_changed
 from .. import main
 from ..verifier import verify_item
-from .workbook_fixtures import app_settings
 
 
 pytestmark = [pytest.mark.working, pytest.mark.indexing, pytest.mark.flaky]
@@ -37,11 +36,11 @@ TEST_COLLECTIONS = ['testing_post_put_patch', 'file_processed']
 
 
 @pytest.yield_fixture(scope='session', params=[False])
-def app(app_settings, request):
+def app(es_app_settings, request):
     # for now, don't run with mpindexer. Add `True` to params above to do so
     if request.param:
-        app_settings['mpindexer'] = True
-    app = main({}, **app_settings)
+        es_app_settings['mpindexer'] = True
+    app = main({}, **es_app_settings)
 
     yield app
 

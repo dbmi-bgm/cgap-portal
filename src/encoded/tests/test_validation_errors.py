@@ -1,5 +1,5 @@
 import pytest
-from .workbook_fixtures import app_settings, workbook
+from .workbook_fixtures import workbook
 
 # XXX: All need refactor
 pytestmark = [pytest.mark.working, pytest.mark.indexing]
