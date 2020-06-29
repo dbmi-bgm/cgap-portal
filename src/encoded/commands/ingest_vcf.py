@@ -223,11 +223,12 @@ class VCFParser(object):
         Raises:
             VCFParserException if there is a type we did not expect
         """
+        def fix_encoding(val):  # decode restricted characters
+            for encoded, decoded in self.RESTRICTED_CHARACTER_ENCODING.items():
+                val = val.replace(encoded, decoded)
+            return val
+
         if type == 'string':
-            def fix_encoding(val):  # decode restricted characters
-                for encoded, decoded in self.RESTRICTED_CHARACTER_ENCODING.items():
-                    val = val.replace(encoded, decoded)
-                return val
             return fix_encoding(value)
         elif type == 'integer':
             try:
@@ -246,7 +247,7 @@ class VCFParser(object):
         elif type == 'array':
             if sub_type:
                 if not isinstance(value, list):
-                    items = value.split('~')
+                    items = fix_encoding(value).split('~') if sub_type == 'string' else value
                 else:
                     items = value
                 return list(map(lambda v: self.cast_field_value(sub_type, v, sub_type=None), items))

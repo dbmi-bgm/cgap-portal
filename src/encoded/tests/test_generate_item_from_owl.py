@@ -64,6 +64,7 @@ def mkd_class():
     return gifo.convert2URIRef('http://purl.obolibrary.org/obo/HP_0000003')
 
 
+@pytest.mark.skip  # XXX: will echo production admin access key if mock fails! DO NOT RE-ENABLE UNTIL REFACTORED - Will
 def test_connect2server_w_env(mocker, connection):
     # parameters we pass in don't really matter
     key = "{'server': 'https://cgap.hms.harvard.edu/', 'key': 'testkey', 'secret': 'testsecret'}"

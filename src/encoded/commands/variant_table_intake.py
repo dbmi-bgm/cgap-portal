@@ -467,10 +467,9 @@ class MappingTableParser(object):
             'type': 'string',
             'linkTo': 'Variant'
         }
-        schema['properties']['vcf'] = {  # link to VCF file uploaded
+        schema['properties']['vcf'] = {  # NOT a linkTo but a "special" field
             'title': 'VCF File',
-            'type': 'string',
-            'linkTo': 'File'
+            'type': 'string'
         }
 
         # adds annotation ID field, effectively making display_title a primary key constraint

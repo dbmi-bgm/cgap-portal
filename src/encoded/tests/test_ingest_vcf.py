@@ -78,6 +78,7 @@ def test_VCFP_multiple_variants(test_vcf):
     assert result['topmed_het'] == 67
     assert result['cosmic_mutation_somatic_status'] == 'Confirmed somatic variant'
     assert result['conservation_phastcons100'] == 0.0
+    assert sorted(result['cosmic_mutation_description']) == ['Missense', 'Substitution']
 
     # check transcript
     assert len(result['transcript'].keys()) == 6
@@ -103,6 +104,8 @@ def test_VCFP_multiple_variants(test_vcf):
     assert result['transcript'][1]['vep_trembl'] == 'A0A096LPJ4'
     assert result['gnomad_ac_afr_male'] == 158
     assert result['topmed_het'] == 403
+
+    # XXX: test string array fields
 
 
 def test_VCFP_multiple_sample_variants(test_vcf):

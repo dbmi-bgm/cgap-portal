@@ -129,13 +129,15 @@ def main():
     parser.add_argument('variant_project', help='project to post inserts under')
     parser.add_argument('variant_institution', help='institution to post inserts under')
     parser.add_argument('config_uri', help="path to configfile")  # to get app
-    parser.add_argument('--write-variant-schemas', action='store_true', default=True,
+    parser.add_argument('--write-variant-schemas', action='store_true', default=False,
                         help='If specified will write new schemas to given locations')
     parser.add_argument('--app-name', help="Pyramid app name in configfile")  # to get app
     parser.add_argument('--post-variants', action='store_true', default=False,
                         help='If specified, will post variant/variant sample inserts, by default False.')
     parser.add_argument('--post-variant-consequences', action='store_true', default=False,
                         help='If specified will post all VariantConsequence items. Required only once.')
+    parser.add_argument('--post-vcf-file', action='store_true', default=False, help='Specify to post the '
+                                                                                    'source VCF file.')
     args = parser.parse_args()
 
     # initialize VirtualApp
@@ -150,10 +152,11 @@ def main():
     try:
         if not args.skip_mp:
             run_variant_table_intake(app_handle, args)
+        #import pdb; pdb.set_trace()
         run_ingest_vcf(app_handle, args)
         exit(0)
     except Exception as e:
-        logger.info('Got exception in variant ingestion: %s' % str(e))
+        logger.error('Got exception in variant ingestion: %s' % str(e))
     # XXX: Catch more exceptions
     exit(1)
 
