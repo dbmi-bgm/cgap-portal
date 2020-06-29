@@ -67,6 +67,12 @@ deploy2:  # spins up waittress to serve the application
 deploy3:  # uploads: GeneAnnotationFields, then Genes, then AnnotationFields, then Variant + VariantSamples
 	python src/encoded/commands/ingestion.py src/encoded/annotations/variant_table_v0.4.6.csv src/encoded/schemas/annotation_field.json src/encoded/schemas/variant.json src/encoded/schemas/variant_sample.json src/encoded/annotations/vcf_v0.4.6.vcf hms-dbmi hms-dbmi src/encoded/annotations/gene_table_v0.4.5.csv src/encoded/schemas/gene_annotation_field.json src/encoded/schemas/gene.json src/encoded/annotations/gene_inserts_v0.4.5.json hms-dbmi hms-dbmi development.ini --post-variant-consequences --post-variants --post-gene-annotation-field-inserts --post-gene-inserts --app-name app
 
+kibana-start:
+	scripts/kibana-start
+
+kibana-stop:
+	scripts/kibana-stop
+
 kill:  # kills back-end processes associated with the application. Use with care.
 	pkill -f postgres &
 	pkill -f elasticsearch &
@@ -103,6 +109,7 @@ info:
 	   $(info - Use 'make deploy1' to spin up postgres/elasticsearch and load inserts.)
 	   $(info - Use 'make deploy2' to spin up the application server.)
 	   $(info - Use 'make deploy3' to load variants and genes.)
+	   $(info - Use 'make kibana-start' to start kibana, and 'make kibana-stop' to stop it.)
 	   $(info - Use 'make kill' to kill postgres and elasticsearch proccesses. Please use with care.)
 	   $(info - Use 'make moto-setup' to install moto, for less flaky tests. Implied by 'make build'.)
 	   $(info - Use 'make npm-setup' to build the front-end. Implied by 'make build'.)
