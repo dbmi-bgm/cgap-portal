@@ -481,6 +481,7 @@ class Family(Item):
         # collect members properties
         all_props = []
         for a_member in members:
+            # This might be a step to optimize if families get larger
             props = get_item_or_none(request, a_member, 'individuals')
             all_props.append(props)
         # convert to ped_file format
