@@ -11,8 +11,7 @@ from ..commands.create_mapping_on_deploy import ITEM_INDEX_ORDER, get_deployment
 pytestmark = [pytest.mark.setone, pytest.mark.working]
 
 
-# XXX: Gene does not get 'genomic_region'
-@pytest.mark.parametrize('item_type', [k for k in ORDER if k != 'gene'])
+@pytest.mark.parametrize('item_type', ORDER)
 def test_create_mapping(registry, item_type):
     """
     This test does not actually use elasticsearch
@@ -39,6 +38,7 @@ def test_create_mapping(registry, item_type):
                 else:
                     assert 'properties' in final_mapping or final_mapping.get('type') == 'object'
             else:
+                # XXX mixins are not being added
                 assert split_ in mapping_pointer['properties']
                 mapping_pointer = mapping_pointer['properties'][split_]
 

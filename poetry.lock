@@ -217,7 +217,7 @@ description = "Storage support for 4DN Data Portals."
 name = "dcicsnovault"
 optional = false
 python-versions = ">=3.6,<3.7"
-version = "3.1.1"
+version = "4.0.0b1"
 
 [package.dependencies]
 MarkupSafe = ">=0.23,<1"
@@ -233,8 +233,8 @@ aws_requests_auth = ">=0.4.1,<0.5.0"
 awscli = ">=1.15.42,<2.0.0"
 "backports.statistics" = "0.1.0"
 boto3 = ">=1.7.42,<2.0.0"
-dcicutils = ">=0.25.0,<1"
-elasticsearch_dsl = ">=5.3.0,<6.0.0"
+dcicutils = "0.32.0b0"
+elasticsearch_dsl = "6.4.0"
 future = ">=0.15.2,<0.16.0"
 futures = ">=3.1.1,<4.0.0"
 html5lib = "0.9999999"
@@ -276,13 +276,13 @@ description = "Utility package for interacting with the 4DN Data Portal and othe
 name = "dcicutils"
 optional = false
 python-versions = ">=3.4,<3.8"
-version = "0.31.1"
+version = "0.32.0b0"
 
 [package.dependencies]
 aws-requests-auth = ">=0.4.2,<1"
 boto3 = ">=1.10.46,<2.0.0"
 botocore = ">=1.13.46,<2.0.0"
-elasticsearch = ">=5.5.3,<6.0.0"
+elasticsearch = "6.4.0"
 gitpython = ">=3.1.2,<4.0.0"
 pytz = ">=2016.4"
 requests = ">=2.21.0,<3.0.0"
@@ -341,13 +341,14 @@ description = "Python client for Elasticsearch"
 name = "elasticsearch"
 optional = false
 python-versions = "*"
-version = "5.5.3"
+version = "6.4.0"
 
 [package.dependencies]
 urllib3 = ">=1.21.1"
 
 [package.extras]
 develop = ["requests (>=2.0.0,<3.0.0)", "nose", "coverage", "mock", "pyaml", "nosexcover", "sphinx", "sphinx-rtd-theme"]
+requests = ["requests (>=2.4.0,<3.0.0)"]
 
 [[package]]
 category = "main"
@@ -355,15 +356,15 @@ description = "Python client for Elasticsearch"
 name = "elasticsearch-dsl"
 optional = false
 python-versions = "*"
-version = "5.4.0"
+version = "6.4.0"
 
 [package.dependencies]
-elasticsearch = ">=5.0.0,<6.0.0"
+elasticsearch = ">=6.0.0,<7.0.0"
 python-dateutil = "*"
 six = "*"
 
 [package.extras]
-develop = ["mock", "pytest (>=3.0.0)", "pytest-cov", "pytz", "sphinx", "sphinx-rtd-theme"]
+develop = ["mock", "pytest (>=3.0.0)", "pytest-cov", "pytz", "coverage (<5.0.0)", "sphinx", "sphinx-rtd-theme"]
 
 [[package]]
 category = "main"
@@ -1574,7 +1575,7 @@ transaction = ">=1.6.0"
 test = ["zope.testing"]
 
 [metadata]
-content-hash = "12bdfa8e74ac35c52a896cb663b689aaf78822d03df367f5091aee5debffed2e"
+content-hash = "5ace8371513927d729a776a077719a1762779ae3868e146884a7b09ea36ae811"
 python-versions = ">=3.6,<3.7"
 
 [metadata.files]
@@ -1718,12 +1719,12 @@ dcicpyvcf = [
     {file = "dcicpyvcf-1.0.0.tar.gz", hash = "sha256:c5bf8d585002ab3b95d13a47803376b456b931865e4189c38a18cca47b108449"},
 ]
 dcicsnovault = [
-    {file = "dcicsnovault-3.1.1-py3-none-any.whl", hash = "sha256:0baf3b4d917969a943c6be69ed29de90d0aa4afc2efd8fc71783551ec13e6e3b"},
-    {file = "dcicsnovault-3.1.1.tar.gz", hash = "sha256:6f41cea9c1cc5f86a1324da3923f6aa461626070419d514cb856b1e08e80dc30"},
+    {file = "dcicsnovault-4.0.0b1-py3-none-any.whl", hash = "sha256:3b16f6103964a53432d55b6e92a1520f9dd61d7ba5bc77baac5e38949a1f4873"},
+    {file = "dcicsnovault-4.0.0b1.tar.gz", hash = "sha256:96a1a3bdd29cfb69e93d9b2cc4377165d5ceea15ed59f7edf7cd5d2379554a7f"},
 ]
 dcicutils = [
-    {file = "dcicutils-0.31.1-py3-none-any.whl", hash = "sha256:9f2728d6ce4fe9b7a0cabdf5a46a20e34039147192854622881c9a46c3707fd1"},
-    {file = "dcicutils-0.31.1.tar.gz", hash = "sha256:d64569962ef43d3091f9d3cb0e81312ee1fc9e529e23d699fd2874429b043686"},
+    {file = "dcicutils-0.32.0b0-py3-none-any.whl", hash = "sha256:63419fff4d01b47c4b03877040b4c9223231dcd736649d8596e8a64687dcac24"},
+    {file = "dcicutils-0.32.0b0.tar.gz", hash = "sha256:525cd37f899698f57aabd46e39b632a46331406eb4bd63d477dabfcf8128ac59"},
 ]
 docker = [
     {file = "docker-4.2.1-py2.py3-none-any.whl", hash = "sha256:672f51aead26d90d1cfce84a87e6f71fca401bbc2a6287be18603583620a28ba"},
@@ -1738,12 +1739,12 @@ ecdsa = [
     {file = "ecdsa-0.15.tar.gz", hash = "sha256:8f12ac317f8a1318efa75757ef0a651abe12e51fc1af8838fb91079445227277"},
 ]
 elasticsearch = [
-    {file = "elasticsearch-5.5.3-py2.py3-none-any.whl", hash = "sha256:658380fd60bdaf746fef12958f0abc49063218ce93ee1ae4ca1fe6291c896433"},
-    {file = "elasticsearch-5.5.3.tar.gz", hash = "sha256:ae91b089f2f2b5b3daa04297949e5f805ab12d187218cb587273f472656fd250"},
+    {file = "elasticsearch-6.4.0-py2.py3-none-any.whl", hash = "sha256:1f0f633e3b500d5042424f75a505badf8c4b9962c1b4734cdfb3087fb67920be"},
+    {file = "elasticsearch-6.4.0.tar.gz", hash = "sha256:fb5ab15ee283f104b5a7a5695c7e879cb2927e4eb5aed9c530811590b41259ad"},
 ]
 elasticsearch-dsl = [
-    {file = "elasticsearch-dsl-5.4.0.tar.gz", hash = "sha256:cbef6467085d7debc870bc450d996c7ba5b8822eb86a6033bba09134ffb01ba8"},
-    {file = "elasticsearch_dsl-5.4.0-py2.py3-none-any.whl", hash = "sha256:197246ddd556b4b7d2738dfa9e4831068c9b5cb21706f6aca035136d42849109"},
+    {file = "elasticsearch-dsl-6.4.0.tar.gz", hash = "sha256:26416f4dd46ceca43d62ef74970d9de4bdd6f4b0f163316f0b432c9e61a08bec"},
+    {file = "elasticsearch_dsl-6.4.0-py2.py3-none-any.whl", hash = "sha256:f60aea7fd756ac1fbe7ce114bbf4949aefbf495dfe8896640e787c67344f12f6"},
 ]
 execnet = [
     {file = "execnet-1.4.1-py2.py3-none-any.whl", hash = "sha256:d2b909c7945832e1c19cfacd96e78da68bdadc656440cfc7dfe59b766744eb8c"},
@@ -2032,6 +2033,7 @@ pycryptodome = [
     {file = "pycryptodome-3.9.8-cp38-cp38-win_amd64.whl", hash = "sha256:55eb61aca2c883db770999f50d091ff7c14016f2769ad7bca3d9b75d1d7c1b68"},
     {file = "pycryptodome-3.9.8-cp39-cp39-manylinux1_i686.whl", hash = "sha256:39ef9fb52d6ec7728fce1f1693cb99d60ce302aeebd59bcedea70ca3203fda60"},
     {file = "pycryptodome-3.9.8-cp39-cp39-manylinux1_x86_64.whl", hash = "sha256:de6e1cd75677423ff64712c337521e62e3a7a4fc84caabbd93207752e831a85a"},
+    {file = "pycryptodome-3.9.8.tar.gz", hash = "sha256:0e24171cf01021bc5dc17d6a9d4f33a048f09d62cc3f62541e95ef104588bda4"},
 ]
 pyjwt = [
     {file = "PyJWT-1.5.3-py2.py3-none-any.whl", hash = "sha256:a4e5f1441e3ca7b382fd0c0b416777ced1f97c64ef0c33bfa39daf38505cfd2f"},

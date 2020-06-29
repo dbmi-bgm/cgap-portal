@@ -440,7 +440,7 @@ class SearchBuilder:
                 query_info['query'] = value
                 query_info['lenient'] = True
                 query_info['default_operator'] = 'AND'
-                query_info['fields'] = ['_all']
+                query_info['fields'] = ['full_text']
                 string_query = {'must': {'simple_query_string': query_info}}
                 query_dict = {'query': {'bool': string_query}}
                 break
