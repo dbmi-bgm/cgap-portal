@@ -590,7 +590,7 @@ def write_outfile(terms, filename, pretty=False):
 
 
 def get_args(args):
-    parser = argparse.ArgumentParser(
+    parser = argparse.ArgumentParser(  # noqa - PyCharm wrongly thinks the formatter_class is invalid
         description="Process specified Ontologies and create OntologyTerm inserts for updates",
         epilog=EPILOG,
         formatter_class=argparse.RawDescriptionHelpFormatter,

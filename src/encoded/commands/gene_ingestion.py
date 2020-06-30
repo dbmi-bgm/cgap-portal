@@ -75,7 +75,7 @@ def main():
         --app-name app --post-annotation-field-inserts --post-inserts
     """
     logging.basicConfig()
-    parser = argparse.ArgumentParser(
+    parser = argparse.ArgumentParser(  # noqa - PyCharm wrongly thinks the formatter_class is invalid
         description="Takes in a gene mapping table and produces inserts/schemas",
         epilog=EPILOG,
         formatter_class=argparse.RawDescriptionHelpFormatter

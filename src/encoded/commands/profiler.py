@@ -77,7 +77,7 @@ def run(testapp, method, path, data, warm_ups, filename, sortby, stats, callers,
 
 def main():
     import argparse
-    parser = argparse.ArgumentParser(
+    parser = argparse.ArgumentParser(  # noqa - PyCharm wrongly thinks the formatter_class is invalid
         description="Update links and keys", epilog=EPILOG,
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
