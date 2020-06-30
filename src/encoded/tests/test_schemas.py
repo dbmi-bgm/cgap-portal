@@ -123,6 +123,8 @@ def pluralize(name):
     # otherwise just add 's'
     if name.endswith('ly'):
         return name[:-1] + 'ies'
+    if name.endswith('s'):
+        return name + 'es'
     return name + 's'
 
 
