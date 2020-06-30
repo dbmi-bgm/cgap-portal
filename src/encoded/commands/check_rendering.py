@@ -74,7 +74,7 @@ def internal_app(configfile, app_name=None, username='TEST', accept='text/html')
 
 def main():
     import argparse
-    parser = argparse.ArgumentParser(
+    parser = argparse.ArgumentParser(  # noqa - PyCharm wrongly thinks the formatter_class is specified wrong here.
         description="Check rendering of items", epilog=EPILOG,
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
