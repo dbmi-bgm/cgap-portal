@@ -3,10 +3,11 @@ import copy
 
 
 ORDER = [
-    'user', 'project', 'institution', 'file_format', 'variant_consequence', 'phenotype',
+    'user', 'project', 'institution', 'filter_set', 'nexus', 'file_format',
+    'variant_consequence', 'phenotype',
     'cohort', 'family', 'individual', 'sample', 'workflow', 'access_key', 'disorder',
     'document', 'file_fastq', 'file_processed', 'file_reference', 'gene', 'sample_processing',
-    'case', 'filter_set', 'report', 'page', 'quality_metric_fastqc', 'evidence_dis_pheno',
+    'case', 'report', 'page', 'quality_metric_fastqc', 'evidence_dis_pheno',
     'quality_metric_bamcheck', 'quality_metric_qclist', 'quality_metric_wgs_bamqc',
     'quality_metric_cmphet',
     'quality_metric_vcfcheck', 'quality_metric_workflowrun', 'software', 'static_section',
