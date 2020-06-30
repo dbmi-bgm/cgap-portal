@@ -15,7 +15,7 @@ import { store } from './../../../store';
 
 import { buildPedigreeGraphData } from './../../viz/PedigreeViz';
 import { CaseSummaryTable } from './CaseSummaryTable';
-import { FamilyReportStackedTable } from './../../browse/CaseDetailPane';
+import { FamilyAccessionStackedTable } from './../../browse/CaseDetailPane';
 import { PedigreeTabViewBody, idToGraphIdentifier } from './PedigreeTabViewBody';
 import { PedigreeTabView, PedigreeTabViewOptionsController } from './PedigreeTabView';
 import { PedigreeFullScreenBtn } from './PedigreeFullScreenBtn';
@@ -382,13 +382,7 @@ const CaseSummaryTabView = React.memo(function CaseSummaryTabView(props){
                         <CaseStats {...{ description, numIndividuals, numWithSamples, caseFeatures }} numFamilies={familiesLen} />
                     </div>
                     <div id="case-overview-ped-link" className="col-pedigree-viz">
-                        <div className="pedigree-vis-heading d-flex justify-content-between" style={{
-                            backgroundColor: "#20445f",
-                            borderTopRightRadius: "10px",
-                            borderTopLeftRadius: "10px",
-                            color: "#ffffff",
-                            padding: "10px 30px"
-                        }}>
+                        <div className="pedigree-vis-heading d-flex justify-content-between">
                             <div>
                                 <i className="icon icon-sitemap fas icon-fw mr-1"></i>
                                 <h4 style={{
@@ -554,7 +548,7 @@ function AccessioningTab(props) {
                 <span className="curr-selection pull-right">Current Selection</span>
             </h1>
             <div className="tab-inner-container">
-                <FamilyReportStackedTable
+                <FamilyAccessionStackedTable
                     result={context}
                     family={context.family} href={href} preventExpand
                     fadeIn={false} collapseLongLists

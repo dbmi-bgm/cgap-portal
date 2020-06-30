@@ -316,3 +316,193 @@ export class FamilyReportStackedTable extends React.PureComponent {
         );
     }
 }
+
+/**
+ * To be used within Case Search OR Accessioning tab on Case View
+ *
+ * Shows individuals within a passed-in family, as well as any sample analyses objects related to that Case.
+ */
+export class FamilyAccessionStackedTable extends React.PureComponent {
+
+    static StackedBlock = StackedBlock
+
+    static builtInHeaders(){
+        // Keeping these builtInHeader methods separate in case we want to build in custom columns later
+        return [
+            { columnClass: 'individual',    title: 'Individual',     initialWidth: 220   },
+            { columnClass: 'libraries',     title: 'Sequencing Libraries',    initialWidth: 220   },
+            { columnClass: 'report',    title: 'Report',          initialWidth: 200  }
+        ];
+    }
+
+    /* Built-in headers */
+    static staticColumnHeaders(columnHeaders){
+        return _.map(FamilyAccessionStackedTable.builtInHeaders(), function(staticCol){
+            return _.extend(
+                _.clone(staticCol),
+                _.findWhere(columnHeaders, { 'title' : staticCol.title }) || {}
+            );
+        }) || [];
+    }
+
+    static propTypes = {
+        // 'columnHeaders'             : PropTypes.array,
+        'result'                    : PropTypes.object,
+        'family'                    : PropTypes.object,
+        // 'collapseLongLists'         : PropTypes.bool,
+        // 'preventExpand'             : PropTypes.bool,
+    };
+
+    static defaultProps = {
+        // 'fadeIn'        : true,
+        'width'         : "100%"
+        // 'collapseLongLists' : true,
+        // 'showMetricColumns' : null,
+        // 'preventExpand'     : false
+    };
+
+    static renderEmptyBlock(columnClass) {
+        return (
+            <StackedBlock {...{ columnClass }} subtitleVisible={false}
+                label={<StackedBlockNameLabel title={null} accession={null} subtitle={null} subtitleVisible={false}/>}>
+                <StackedBlockName>
+                    <span className="name-title">-</span>
+                </StackedBlockName>
+            </StackedBlock>
+        );
+    }
+
+    constructor(props){
+        super(props);
+        this.renderSampleBlock = this.renderSampleBlock.bind(this);
+        this.renderIndividualBlock = this.renderIndividualBlock.bind(this);
+        this.renderIndividualBlockList = this.renderIndividualBlockList.bind(this);
+    }
+
+    renderSampleBlock(sample){
+        const { result } = this.props;
+        const { sample_processing = {} } = result;
+        const { '@id': atId = null, workup_type = "-", display_title = null, accession = null } = sample;
+        const { samples = [], completed_processes = [] } = sample_processing;
+
+        let blockValue = '-';
+        samples.forEach((thisSample) => {
+            if (atId === thisSample['@id']) {
+                blockValue = completed_processes;
+            }
+        });
+
+
+        return (
+            <StackedBlock columnClass="libraries" hideNameOnHover={false} key={atId} id={atId}
+                label={<StackedBlockNameLabel title="Sample" subtitle="Library" accession={accession} subtitleVisible/>}>
+                <StackedBlockName>
+                    <span className="name-title">
+                        { atId ? <a href={atId} className="name-title">{ workup_type }</a> : <span className="name-title">{ workup_type }</span>}
+                    </span>
+                </StackedBlockName>
+                {/* Temporary empty report block - need to update with link to report later */}
+                <StackedBlockList className="report" title="Report">
+                    { FamilyAccessionStackedTable.renderEmptyBlock("report") }
+                </StackedBlockList>
+            </StackedBlock>
+        );
+    }
+
+    renderIndividualBlock(individual, i, role) {
+        const { result } = this.props;
+        console.log('this.props.result', result);
+
+        const { "@id": atId = null, display_title = null, accession = null } = individual;
+
+        let cls;
+        if (result && result.individual && individual) {
+            cls = result.individual['@id'] === atId ? "current-case": null;
+        }
+        console.log("cls", individual.accession, cls);
+
+        console.log("individual", individual, result.individual);
+        console.log("is current case", (result.individual['@id'] === individual['@id']));
+
+        return (
+            <StackedBlock {...{ cls }} hideNameOnHover={false} columnClass="individual"
+                key={atId} id={atId}
+            >
+                <StackedBlockName>
+                    { atId ?
+                        <a href={atId} className={`name-title ${(result.individual['@id'] === individual['@id']) ? "current-case" : ""}`}>
+                            { role || display_title }
+                        </a> : <span className="name-title">{ role || display_title }</span>}
+                    <div>
+                        LOL
+                    </div>
+                </StackedBlockName>
+                <StackedBlockList className="libraries" title="Libraries">
+                    { _.map(individual.samples || [], this.renderSampleBlock) }
+                </StackedBlockList>
+            </StackedBlock>
+        );
+    }
+
+    renderIndividualBlockList() {
+        const { family = null, collapseLimit = 1, collapseShow = 2, preventExpand = false } = this.props;
+        const { members = [], mother = null, father = null, proband = null } = family || {};
+
+        const appendCountStr = members.length <= collapseLimit ? null : ( 'with ' + "#;lp[67gty6" + ' More Individuals ');
+        const showMoreExtTitle = (
+            <React.Fragment>
+                { appendCountStr }
+                { preventExpand ? <a href={object.itemUtil.atId(family)}>(view Family)</a> : null }
+            </React.Fragment>
+        );
+
+        return (
+            <StackedBlockList className="individuals" showMoreExtTitle={showMoreExtTitle} title="Individuals">
+                { members.map((familyMember, i) => {
+                    const currId = familyMember['@id'];
+                    switch(currId) {
+                        case mother['@id']:
+                            return this.renderIndividualBlock(familyMember, i, "Mother");
+                        case father['@id']:
+                            return this.renderIndividualBlock(familyMember, i, "Father");
+                        case proband['@id']:
+                            return this.renderIndividualBlock(familyMember, i, "Proband");
+                        default:
+                            return this.renderIndividualBlock(familyMember, i, null);
+                    }
+                })}
+            </StackedBlockList>
+        );
+    }
+
+    /**
+     * Here we render nested divs for a 'table' of experiments with shared elements spanning multiple rows,
+     * e.g. Individual's height is the combined height of its containing sample rows.
+     *  _______________________________________________________
+     * |                                                       |
+     * |             Sample Library       Analysis & Report    |
+     * |                                                       |
+     * | Individual  __________________________________________|
+     * |                                                       |
+     * |             Sample Library       Analysis & Report    |
+     * |                                                       |
+     * |_______________________________________________________|
+     *
+     * Much of styling/layouting is defined in CSS.
+     */
+    render(){
+        const { columnHeaders: propColHeaders,
+            showMetricsColumns, width, preventExpand = false } = this.props;        
+        const columnHeaders = FamilyAccessionStackedTable.staticColumnHeaders(propColHeaders, showMetricsColumns);
+        return (
+            <div className="stacked-block-table-outer-container overflow-auto">
+                <StackedBlockTable {...{ preventExpand, columnHeaders, width }}
+                    fadeIn allFiles={[]} collapseLongLists={true}
+                    handleFileCheckboxChange={this.handleFileCheckboxChange}>
+                    { this.renderIndividualBlockList()}
+                </StackedBlockTable>
+            </div>
+        );
+    }
+}
+
