@@ -6,6 +6,7 @@ elasticsearch running as subprocesses.
 import json
 import os
 import pytest
+import re
 import time
 import transaction
 import uuid
@@ -21,27 +22,38 @@ from snovault.elasticsearch.create_mapping import (
 )
 from snovault.elasticsearch.interfaces import INDEXER_QUEUE
 from snovault.elasticsearch.indexer_utils import get_namespaced_index
-from sqlalchemy import MetaData
+from sqlalchemy import MetaData, func
 from timeit import default_timer as timer
 from unittest import mock
 from zope.sqlalchemy import mark_changed
 from .. import main
 from ..verifier import verify_item
-from .workbook_fixtures import app_settings
 
 
 pytestmark = [pytest.mark.working, pytest.mark.indexing, pytest.mark.flaky]
+
+
+POSTGRES_MAJOR_VERSION_EXPECTED = 11
+
+
+def test_postgres_version(session):
+
+    (version_info,) = session.query(func.version()).one()
+    print("version_info=", version_info)
+    assert isinstance(version_info, str)
+    assert re.match("PostgreSQL %s([.][0-9]+)? " % POSTGRES_MAJOR_VERSION_EXPECTED, version_info)
+
 
 # subset of collections to run test on
 TEST_COLLECTIONS = ['testing_post_put_patch', 'file_processed']
 
 
 @pytest.yield_fixture(scope='session', params=[False])
-def app(app_settings, request):
+def app(es_app_settings, request):
     # for now, don't run with mpindexer. Add `True` to params above to do so
     if request.param:
-        app_settings['mpindexer'] = True
-    app = main({}, **app_settings)
+        es_app_settings['mpindexer'] = True
+    app = main({}, **es_app_settings)
 
     yield app
 

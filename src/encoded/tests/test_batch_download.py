@@ -1,5 +1,5 @@
 # Use workbook fixture from BDD tests (including elasticsearch)
-from .workbook_fixtures import app_settings, app, workbook
+from .workbook_fixtures import app, workbook
 import pytest
 pytestmark = [pytest.mark.indexing]
 

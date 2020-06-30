@@ -23,6 +23,30 @@ class GeneTableParser(MappingTableParser):
         self.FIELD_TYPE_INDEX = 8
         super(GeneTableParser, self).__init__(*args, **kwargs)
 
+    @staticmethod
+    def add_default_schema_fields(schema):
+        """ Adds default schema fields
+
+        Args:
+            schema: schema to add fields to
+        """
+        schema['$schema'] = 'http://json-schema.org/draft-04/schema#'
+        schema['type'] = 'object'
+        schema['required'] = ['institution', 'project']
+        schema['identifyingProperties'] = ['uuid', 'aliases']
+        schema['additionalProperties'] = False
+        schema['mixinProperties'] = [
+            {"$ref": "mixins.json#/schema_version"},
+            {"$ref": "mixins.json#/uuid"},
+            {"$ref": "mixins.json#/aliases"},
+            {"$ref": "mixins.json#/submitted"},
+            {"$ref": "mixins.json#/modified"},
+            {"$ref": "mixins.json#/status"},
+            {"$ref": "mixins.json#/attribution"},
+            {"$ref": "mixins.json#/notes"},
+            {"$ref": "mixins.json#/static_embeds"}
+        ]
+
     def generate_gene_schema(self, gene_props, columns, facets):
         """
         Builds gene.json schema based on gene_props
