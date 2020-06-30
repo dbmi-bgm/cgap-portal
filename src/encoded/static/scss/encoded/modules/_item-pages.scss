@@ -1785,6 +1785,17 @@ $badge-item-min-height: 90px;
 	#cohort-overview-ped-link {
 		margin-left: 0;
 
+		div.pedigree-vis-heading {
+			background-color: #20445f;
+			color: #ffffff;
+			padding: 10px 30px;
+
+			@include media-breakpoint-up(lg){
+				border-top-right-radius: 10px;
+				border-top-left-radius: 10px;
+			}
+		}
+
 		.pedigree-placeholder {
 			position: relative;
 			// We usually don't want to use this without having a fallback for older browsers
@@ -1900,9 +1911,9 @@ $badge-item-min-height: 90px;
 					font-size: 14px;
 					font-style: normal;
 					font-weight: 400;
-					background-color: cornflowerblue;
+					background-color: lavender;
 					padding: 4px;
-					color: #fff;
+					border: solid 1px #fff;
 				}
 			}
 			h2 {
@@ -1936,9 +1947,15 @@ $badge-item-min-height: 90px;
 					width: 100%;
 				}
 
-				.stacked-block-table-headers {
-					background-color: #2b6088;
-					color: #ffffff;
+				.stacked-block-table {
+					.stacked-block-table-headers {
+						background-color: #2b6088;
+						color: #ffffff;
+					}
+
+					.body .current-case {
+						background-color: lavender;
+					} 
 				}
 			}	
 		}
