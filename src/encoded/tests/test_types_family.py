@@ -39,6 +39,43 @@ def test_family_father(testapp, fam, father):
     assert fam.get('father') == father['@id']
 
 
+def test_relationships_roles(testapp, fam):
+    """This is an end to end test for calculating relationships
+    Test for roles"""
+    calculated_relations = fam.get('relationships', [])
+    expected_values = {
+        "GAPIDPROBAND": "proband",
+        "GAPIDFATHER1": "father",
+        "GAPIDMOTHER1": "mother",
+        "GAPIDBROTHER": "brother",
+        "GAPIDGRANDPA": "grandfather",
+        "GAPINGRANDMA": "grandmother",
+        "GAPIDHALFSIS": "half-sister",
+        "GAPIDUNCLE01": "uncle",
+        "GAPIDCOUSIN1": "cousin"
+                       }
+    for a_relation in calculated_relations:
+        assert a_relation['relationship'] == expected_values[a_relation['individual']]
+
+
+def test_relationships_assosiation(testapp, fam):
+    """This is an end to end test for calculating relationships
+    Test for paternal maternal associations"""
+    calculated_relations = fam.get('relationships', [])
+    expected_values = {
+        "GAPIDPROBAND": "",
+        "GAPIDFATHER1": "",
+        "GAPIDMOTHER1": "",
+        "GAPIDBROTHER": "",
+        "GAPIDGRANDPA": "maternal",
+        "GAPINGRANDMA": "maternal",
+        "GAPIDHALFSIS": "",
+        "GAPIDUNCLE01": "maternal",
+        "GAPIDCOUSIN1": "maternal"
+                       }
+    for a_relation in calculated_relations:
+        assert a_relation.get('association', "") == expected_values[a_relation['individual']]
+
 ##########################
 # PROCESS PEDIGREE TESTS #
 ##########################
@@ -146,6 +183,7 @@ def test_affected_xml_to_phenotypic_features_nonaffected(testapp, family_empty, 
     affected_xml_to_phenotypic_features(testapp, affected, pedigree_ref_data['refs'], data, family_empty['@id'], {})
     assert not data.get('clinic_notes')
     assert not data.get('phenotypic_features')
+
 
 def test_cause_of_death_xml_to_phenotype_term_not_found(testapp, family_empty, pedigree_ref_data, death_info):
     data = {}

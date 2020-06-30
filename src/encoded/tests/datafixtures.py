@@ -145,7 +145,7 @@ def access_key(testapp, submitter):
 @pytest.fixture
 def female_individual(testapp, project, institution):
     item = {
-        "accession": "GAPINOOOAAQ1",
+        "accession": "GAPINGRANDMA",
         "age": 53,
         "age_units": "year",
         'project': project['@id'],
@@ -160,6 +160,7 @@ def female_individual(testapp, project, institution):
 @pytest.fixture
 def grandpa(testapp, project, institution):
     item = {
+        "accession": "GAPIDGRANDPA",
         "age": 53,
         "age_units": "year",
         'project': project['@id'],
@@ -173,6 +174,7 @@ def grandpa(testapp, project, institution):
 @pytest.fixture
 def mother(testapp, project, institution, grandpa, female_individual):
     item = {
+        "accession": "GAPIDMOTHER1",
         "age": 33,
         "age_units": "year",
         'project': project['@id'],
@@ -187,6 +189,7 @@ def mother(testapp, project, institution, grandpa, female_individual):
 @pytest.fixture
 def father(testapp, project, institution):
     item = {
+        "accession": "GAPIDFATHER1",
         "age": 33,
         "age_units": "year",
         'project': project['@id'],
@@ -199,6 +202,7 @@ def father(testapp, project, institution):
 @pytest.fixture
 def uncle(testapp, project, institution, grandpa):
     item = {
+        "accession": "GAPIDUNCLE01",
         "age": 35,
         "age_units": "year",
         'project': project['@id'],
@@ -212,6 +216,7 @@ def uncle(testapp, project, institution, grandpa):
 @pytest.fixture
 def child(testapp, project, institution, mother, father):
     item = {
+        "accession": "GAPIDPROBAND",
         "age": 7,
         "age_units": "year",
         'project': project['@id'],
@@ -226,6 +231,7 @@ def child(testapp, project, institution, mother, father):
 @pytest.fixture
 def cousin(testapp, project, institution, uncle):
     item = {
+        "accession": "GAPIDCOUSIN1",
         "age": 11,
         "age_units": "year",
         'project': project['@id'],
@@ -239,6 +245,7 @@ def cousin(testapp, project, institution, uncle):
 @pytest.fixture
 def sister(testapp, project, institution, mother):
     item = {
+        "accession": "GAPIDHALFSIS",
         "age": 11,
         "age_units": "year",
         'project': project['@id'],
@@ -250,7 +257,23 @@ def sister(testapp, project, institution, mother):
 
 
 @pytest.fixture
-def fam(testapp, project, female_individual, institution, grandpa, mother, father, uncle, child, cousin, sister):
+def brother(testapp, project, institution, mother, father):
+    item = {
+        "accession": "GAPIDBROTHER",
+        "age": 13,
+        "age_units": "year",
+        'project': project['@id'],
+        'institution': institution['@id'],
+        "sex": "M",
+        "mother": mother['@id'],
+        "father": father['@id']
+    }
+    return testapp.post_json('/individual', item).json['@graph'][0]
+
+
+@pytest.fixture
+def fam(testapp, project, female_individual, institution, grandpa, mother, father, uncle,
+        child, cousin, sister, brother):
     item = {
         "project": project['@id'],
         "institution": institution['@id'],
@@ -259,6 +282,7 @@ def fam(testapp, project, female_individual, institution, grandpa, mother, fathe
         "members": [
             child['@id'],
             sister['@id'],
+            brother['@id'],
             mother['@id'],
             father['@id'],
             uncle['@id'],
@@ -279,6 +303,7 @@ def sample_f(testapp, project, institution, female_individual):
         'date_received': '2015-12-7'
     }
     return testapp.post_json('/sample', data).json['@graph'][0]
+
 
 @pytest.fixture
 def sample_proc(testapp, project, institution, sample_f, fam):
