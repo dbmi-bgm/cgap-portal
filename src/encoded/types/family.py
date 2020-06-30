@@ -203,7 +203,7 @@ class Family(Item):
         """Given the primary vectors, constructs linkages for each individual
         and filters for the shortest link
         Use first letter of primary vector keys to construct these links
-        This linkages are calcualted from the seed, often starts with proband
+        This linkages are calcualted from the seed, often starts with proband,
         seed should be accession"""
         # starting pack
         needs_analysis = [[seed, 'p'], ]
@@ -505,27 +505,6 @@ class Family(Item):
             results.append(temp)
         return results
 
-    def get_parents(self, request, proband=None, members=None):
-        parents = []
-        if proband and members:
-            props = get_item_or_none(request, proband, 'individuals')
-            if props:
-                for p in ['mother', 'father']:
-                    if props.get(p):
-                        parents.append(props[p])
-        return parents
-
-    def get_grandparents(self, request, proband=None, members=None, parents=[]):
-        gp = []
-        if proband and members and parents:
-            for item in parents:
-                p_props = get_item_or_none(request, item, 'individuals')
-                if p_props:
-                    for p in ['mother', 'father']:
-                        if p_props.get(p) and p_props[p] in members:
-                            gp.append(p_props[p])
-        return gp
-
     @calculated_property(schema={
         "title": "Display Title",
         "description": "A calculated title for every object in 4DN",
@@ -577,153 +556,6 @@ class Family(Item):
             props = get_item_or_none(request, proband, 'individuals')
             if props and props.get('father') and props['father'] in members:
                 return props['father']
-
-    @calculated_property(schema={
-        "title": "Siblings",
-        "description": "Full siblings of proband",
-        "type": "string",
-        "items": {
-            "title": "Sibling",
-            "description": "Full sibling of proband",
-            "type": "string",
-            "linkTo": "Individual"
-        }
-    })
-    def siblings(self, request, proband=None, members=None):
-        if proband and members:
-            sibs = []
-            parents = self.get_parents(request, proband, members)
-            for member in members:
-                member_props = get_item_or_none(request, member, 'individuals')
-                if member_props and member != proband:
-                    if member_props.get('mother') in parents and member_props.get('father') in parents:
-                        sibs.append(member)
-            if sibs:
-                return sibs
-
-    @calculated_property(schema={
-        "title": "Half-siblings",
-        "description": "Half-siblings of proband",
-        "type": "string",
-        "items": {
-            "title": "Sibling",
-            "description": "Half sibling of proband",
-            "type": "string",
-            "linkTo": "Individual"
-        }
-    })
-    def half_siblings(self, request, proband=None, members=None):
-        if proband and members:
-            sibs = []
-            parents = self.get_parents(request, proband, members)
-            for member in members:
-                member_props = get_item_or_none(request, member, 'individuals')
-                if member_props and member != proband:
-                    if member_props.get('mother') in parents and member_props.get('father') not in parents:
-                        sibs.append(member)
-                    elif member_props.get('mother') not in parents and member_props.get('father') in parents:
-                        sibs.append(member)
-            if sibs:
-                return sibs
-
-    @calculated_property(schema={
-        "title": "Children",
-        "description": "Children of proband",
-        "type": "array",
-        "items": {
-            "title": "Child",
-            "description": "Child of proband",
-            "type": "string",
-            "linkTo": "Individual"
-        }
-    })
-    def children(self, request, proband=None, members=[]):
-        if proband and members:
-            ch = []
-            for member in members:
-                props = get_item_or_none(request, member, 'individuals')
-                if props and any(props.get(p) == proband for p in ['mother', 'father']):
-                    ch.append(member)
-            if ch:
-                return ch
-
-    @calculated_property(schema={
-        "title": "Grandparents",
-        "description": "Grandparents of proband",
-        "type": "array",
-        "items": {
-            "title": "Grandparent",
-            "description": "Grandparent of proband",
-            "type": "string",
-            "linkTo": "Individual"
-        }
-    })
-    def grandparents(self, request, proband=None, members=None):
-        if proband and members:
-            parents = self.get_parents(request, proband, members)
-            gp = self.get_grandparents(request, proband, members, parents=parents)
-            if gp:
-                return gp
-
-    @calculated_property(schema={
-        "title": "Aunts and Uncles",
-        "description": "Aunts and Uncles of proband",
-        "type": "array",
-        "items": {
-            "title": "Aunt or Uncle",
-            "description": "Aunt or Uncle of Proband",
-            "type": "string",
-            "linkTo": "Individual"
-        }
-    })
-    def aunts_and_uncles(self, request, proband=None, members=None):
-        if proband and members:
-            parents = self.get_parents(request, proband, members)
-            gp = self.get_grandparents(request, proband, members, parents)
-            aunts_uncles = []
-            for member in members:
-                member_props = get_item_or_none(request, member, 'individuals')
-                if member_props and member not in parents:
-                    for p in ['mother', 'father']:
-                        if member_props.get(p) and member_props[p] in gp:
-                            aunts_uncles.append(member)
-                            break
-            if aunts_uncles:
-                return aunts_uncles
-
-    @calculated_property(schema={
-        "title": "Cousins",
-        "description": "Cousins of proband",
-        "type": "string",
-        "items": {
-            "title": "Cousin",
-            "description": "Cousin of proband",
-            "type": "string",
-            "linkTo": "Individual"
-        }
-    })
-    def cousins(self, request, proband=None, members=None):
-        if proband and members:
-            csns = []
-            member_props = {}
-            parents = self.get_parents(request, proband, members)
-            gp = self.get_grandparents(request, proband, members, parents)
-            aunts_uncles = []
-            for member in members:
-                member_props[member] = get_item_or_none(request, member, 'individuals')
-                if member_props[member] and member not in parents:
-                    for p in ['mother', 'father']:
-                        if member_props[member].get(p) and member_props[member][p] in gp:
-                            aunts_uncles.append(member)
-                            break
-            for member in members:
-                if member_props[member]:
-                    for p in ['mother', 'father']:
-                        if member_props[member].get(p) and member_props[member][p] in aunts_uncles:
-                            csns.append(member)
-                            break
-            if csns:
-                return csns
 
 
 @view_config(name='process-pedigree', context=Family, request_method='PATCH',
