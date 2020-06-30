@@ -108,7 +108,8 @@ class Case(Item):
         "sample_processing.completed_processes",
         "report.last_modified.*",
         "report.status",
-        "family.accession"
+        "family.accession",
+        "cohort.filter_set.title"
     ]
 
     @calculated_property(schema={
