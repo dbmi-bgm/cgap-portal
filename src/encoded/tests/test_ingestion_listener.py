@@ -4,6 +4,7 @@ from uuid import uuid4
 from ..ingestion_listener import IngestionQueueManager
 
 
+QUEUE_INGESTION_URL = '/queue_ingestion'
 MOCKED_ENV = 'fourfront-cgapother'
 
 
@@ -38,3 +39,18 @@ def test_ingestion_queue_add_and_receive(setup_and_teardown_sqs_state):
     time.sleep(10)
     msgs = queue_manager.receive_messages()
     assert len(msgs) == 2
+
+
+def test_ingestion_queue_add_via_route(setup_and_teardown_sqs_state, testapp):
+    """ Tests adding uuids to the queue via /queue_ingestion """
+    queue_manager = setup_and_teardown_sqs_state
+    request_body = {
+        'uuids': [str(uuid4()), str(uuid4())],
+        'override_name': MOCKED_ENV + '-vcfs'
+    }
+    response = testapp.post_json(QUEUE_INGESTION_URL, request_body).json
+    assert response['notification'] == 'Success'
+    assert response['number_queued'] == 2
+    time.sleep(10)
+    msgs = queue_manager.receive_messages()
+    assert len(msgs) >= 2

@@ -24,8 +24,8 @@ INGESTION_QUEUE = 'ingestion_queue'
 def includeme(config):
     config.add_route('queue_ingestion', '/queue_ingestion')
     config.add_route('ingestion_status', '/ingestion_status')
-    env_name = config.registry.settings.get('env.name')
-    sqs_url = os.environ.get('SQS_URL', None)
+    config.registry[INGESTION_QUEUE] = IngestionQueueManager(config.registry)
+    config.scan(__name__)
 
 
 @view_config(route_name='ingestion_status', request_method='POST', permission='index')
@@ -42,6 +42,7 @@ def queue_ingestion(context, request):
         single request.
     """
     uuids = request.json.get('uuids', [])
+    override_name = request.json.get('override_name', None)
     response = {
         'notification': 'Failure',
         'number_queued': 0,
@@ -49,8 +50,18 @@ def queue_ingestion(context, request):
     }
     if uuids is []:
         return response
-    queue_manager = IngestionQueueManager(request.registry)
-    queue_manager.add_uuids(uuids)
+    queue_manager = request.registry[INGESTION_QUEUE] if not override_name \
+        else IngestionQueueManager(request.registry, override_name=override_name)
+    _, failed = queue_manager.add_uuids(uuids)
+    if not failed:
+        response['notification'] = 'Success'
+        response['number_queued'] = len(uuids)
+        response['detail'] = 'Successfully queued the following uuids: %s' % uuids
+    else:
+        response['number_queued'] = len(uuids) - len(failed)
+        response['detail'] = 'Some uuids failed: %s' % failed
+    return response
+
 
 class IngestionQueueManager:
     """
@@ -62,7 +73,7 @@ class IngestionQueueManager:
     We will use a single queue to keep track of VCF File uuids to be indexed.
     """
 
-    def __init__(self, registry):
+    def __init__(self, registry, override_name=None):
         """ Does initial setup for interacting with SQS """
         self.send_batch_size = 10
         self.receive_batch_size = 10
@@ -76,7 +87,7 @@ class IngestionQueueManager:
             'region_name': 'us-east-1'
         }
         self.client = boto3.client('sqs', **kwargs)
-        self.queue_name = self.env_name + '-vcfs'
+        self.queue_name = self.env_name + '-vcfs' if not override_name else override_name
         self.queue_attrs = {
             self.queue_name: {
                 'DelaySeconds': '1',  # messages initially invisible for 1 sec
