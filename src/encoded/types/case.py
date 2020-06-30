@@ -19,6 +19,7 @@ class Case(Item):
     name_key = 'accession'
     schema = load_schema('encoded:schemas/case.json')
     embedded_list = [
+        "family.*",
         "individual.accession",
         "individual.father",
         "individual.father.samples",
