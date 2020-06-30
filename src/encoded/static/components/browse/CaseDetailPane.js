@@ -73,7 +73,7 @@ export class CaseDetailPane extends React.PureComponent {
                 </div>
                 <div style={{ overflowX : 'auto', width: containerWidth ? (containerWidth - usePadWidth) : null }} className="family-tables-container"> {/*formerly files-tables-container */}
                     {/* Once primary/other family objects added to Case schema, update to use those instead */}
-                    { result.sample_processing.families.map(family => <FamilySection {... {result, family, commonFamilySectionProps}} />)}  
+                    { result.sample_processing.families.map((family) => <FamilySection key={family['@id']} {...{ result, family, commonFamilySectionProps }} />)}
                 </div>
             </div>
         );
@@ -89,7 +89,7 @@ class FamilySection extends React.Component {
         super(props);
         this.state = {
             open: false,
-        }
+        };
         this.onToggle = _.throttle(this.onToggle.bind(this), 600, { 'trailing' : false });
     }
 
@@ -105,7 +105,7 @@ class FamilySection extends React.Component {
                 result={result}
                 family={family} href={href} preventExpand
                 width={containerWidth ? (Math.max(containerWidth - paddingWidth, minimumWidth) /* account for padding of pane */) : null}
-                fadeIn={false} collapseLongLists 
+                fadeIn={false} collapseLongLists
             />
         );
     }
@@ -114,7 +114,7 @@ class FamilySection extends React.Component {
         const { open } = this.state;
         const { family } = this.props;
         return (
-            <div className="family-table-section" key={family['@id']}>
+            <div className="family-table-section">
                 <h4 className="pane-section-title" onClick={this.onToggle}>
                     <i className={"toggle-open-icon icon icon-fw fas icon-" + (open ? 'minus' : 'plus')} />
                     {family.display_title}: <span className="text-200 font-italic">Family &amp; Report History</span>
@@ -124,8 +124,7 @@ class FamilySection extends React.Component {
                 }
             </div>
         );
-    } 
-
+    }
 }
 
 /**
@@ -175,7 +174,7 @@ export class FamilyReportStackedTable extends React.PureComponent {
 
     static renderEmptyBlock(columnClass) {
         return (
-            <StackedBlock {...{columnClass}} subtitleVisible={false}
+            <StackedBlock {...{ columnClass }} subtitleVisible={false}
                 label={<StackedBlockNameLabel title={null} accession={null} subtitle={null} subtitleVisible={false}/>}>
                 <StackedBlockName>
                     <span className="name-title">-</span>
@@ -195,10 +194,10 @@ export class FamilyReportStackedTable extends React.PureComponent {
         const { result } = this.props;
         const { sample_processing = {} } = result;
         const { '@id': atId = null, workup_type = "-", display_title = null, accession = null } = sample;
-        const { samples = [], completed_processes = []} = sample_processing;
+        const { samples = [], completed_processes = [] } = sample_processing;
 
         let blockValue = '-';
-        samples.forEach(thisSample => {
+        samples.forEach((thisSample) => {
             if (atId === thisSample['@id']) {
                 blockValue = completed_processes;
             }
@@ -239,22 +238,21 @@ export class FamilyReportStackedTable extends React.PureComponent {
         if (result && result.individual) {
             cls = result.individual['@id'] === individual['@id'] ? "current-case": null;
         }
-        
+
         return (
             <StackedBlock {...{ cls }} hideNameOnHover={false} columnClass="individual"
                 key={atId} id={atId}
                 label={
-                    <StackedBlockNameLabel title="Accession" accession={accession || display_title} subtitleVisible/>
-            }>
-                    <StackedBlockName>
-                        { atId ? <a href={atId} className="name-title">{ role || display_title }</a> : <span className="name-title">{ role || display_title }</span>}
-                    </StackedBlockName>
-                    <StackedBlockList className="libraries" title="Libraries">
-                        { _.map(individual.samples || [], this.renderSampleBlock) }
-                    </StackedBlockList>
+                    <StackedBlockNameLabel title="Accession" accession={accession || display_title} subtitleVisible/>}
+            >
+                <StackedBlockName>
+                    { atId ? <a href={atId} className="name-title">{ role || display_title }</a> : <span className="name-title">{ role || display_title }</span>}
+                </StackedBlockName>
+                <StackedBlockList className="libraries" title="Libraries">
+                    { _.map(individual.samples || [], this.renderSampleBlock) }
+                </StackedBlockList>
             </StackedBlock>
         );
-
     }
 
     renderIndividualBlockList() {
@@ -317,5 +315,4 @@ export class FamilyReportStackedTable extends React.PureComponent {
             </div>
         );
     }
-
 }
