@@ -68,10 +68,10 @@ def mkd_class():
     return gifo.convert2URIRef('http://purl.obolibrary.org/obo/HP_0000003')
 
 
-TEST_KEYS_ENV = 'fourfront-cgap'
-TEST_KEYS_STORED = '{"server": "https://cgap.hms.harvard.edu/", "key": "testkey", "secret": "testsecret"}'
+TEST_KEYS_ENV = 'fourfront-cgap-simulated'
+TEST_KEYS_STORED = '{"server": "https://cgap-simulated.hms.harvard.edu/", "key": "testkey", "secret": "testsecret"}'
 # NOTE: the trailing '/' gets removed along the way. -kmp 21-Jun-2020
-TEST_KEYS_RETURNED = {"server": "https://cgap.hms.harvard.edu", "key": "testkey", "secret": "testsecret"}
+TEST_KEYS_RETURNED = {"server": "https://cgap-simulated.hms.harvard.edu", "key": "testkey", "secret": "testsecret"}
 
 
 class MockS3UtilsForAccessKeys:
@@ -96,7 +96,7 @@ TEST_KEYS_FILE_CONTENTS = '{"%(key_name)s": %(key_val)s}' % {
     "key_val": TEST_KEYS_STORED
 }
 
-def test_connect2server_w_key(connection):
+def test_connect2server_w_key_and_keyfile(connection):
     keyfile = "some.file"
     def mocked_open(filename, mode):
         assert filename == keyfile
