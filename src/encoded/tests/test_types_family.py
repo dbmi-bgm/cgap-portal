@@ -76,10 +76,10 @@ def test_relationships_assosiation(testapp, fam):
     for a_relation in calculated_relations:
         assert a_relation.get('association', "") == expected_values[a_relation['individual']]
 
+
 ##########################
 # PROCESS PEDIGREE TESTS #
 ##########################
-
 @pytest.fixture
 def pedigree_ref_data(testapp):
     return {

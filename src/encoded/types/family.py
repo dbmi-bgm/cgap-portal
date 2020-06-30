@@ -464,7 +464,8 @@ class Family(Item):
                              'second cousin once removed (descendant)',
                              'second cousin twice removed (descendant)',
                              'family-in-law',
-                             'extended-family'
+                             'extended-family',
+                             'not linked'
                              ]
                     }
                 }
@@ -483,6 +484,8 @@ class Family(Item):
         all_props = []
         for a_member in members:
             # This might be a step to optimize if families get larger
+            # TODO: make sure all mother fathers are in member list, if not fetch them too
+            #  for complete connection tracing
             props = get_item_or_none(request, a_member, 'individuals')
             all_props.append(props)
         # convert to ped_file format
@@ -492,16 +495,26 @@ class Family(Item):
         links = self.construct_links(primary_vectors, proband_acc)
         relations = self.relationships_vocabulary(links)
         results = []
-        for rel in relations:
+        for a_member in members:
+            a_member_resp = [i for i in all_props if i['@id'] == a_member][0]
             temp = {"individual": '',
                     "sex": '',
-                    "relationship": ''}
-            temp['individual'] = rel[0]
-            temp['relationship'] = rel[1]
-            if rel[2]:
-                temp['association'] = rel[2]
-            sex = [i for i in all_props if i['accession'] == rel[0]][0].get('sex', 'U')
+                    "relationship": '',
+                    "association": ''}
+            mem_acc = a_member_resp['accession']
+            temp['individual'] = mem_acc
+            sex = a_member_resp.get('sex', 'U')
             temp['sex'] = sex
+            relation_dic = [i for i in relations if i[0] == mem_acc]
+            if not relation_dic:
+                temp['relationship'] = 'not linked'
+                # the individual is not linked to proband through individuals listed in members
+                results.append(temp)
+                continue
+            relation = relation_dic[0]
+            temp['relationship'] = relation[1]
+            if relation[2]:
+                temp['association'] = relation[2]
             results.append(temp)
         return results
 
