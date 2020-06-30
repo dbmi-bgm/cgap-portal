@@ -15,6 +15,7 @@ import { store } from './../../../store';
 
 import { buildPedigreeGraphData } from './../../viz/PedigreeViz';
 import { CaseSummaryTable } from './CaseSummaryTable';
+import { FamilyReportStackedTable } from './../../browse/CaseDetailPane';
 import { PedigreeTabViewBody, idToGraphIdentifier } from './PedigreeTabViewBody';
 import { PedigreeTabView, PedigreeTabViewOptionsController } from './PedigreeTabView';
 import { PedigreeFullScreenBtn } from './PedigreeFullScreenBtn';
@@ -253,7 +254,10 @@ const CaseSummaryTabView = React.memo(function CaseSummaryTabView(props){
             case_phenotypic_features: caseFeatures = { case_phenotypic_features: [] },
             description = null,
             actions: permissibleActions = [],
-            sample_processing
+            sample_processing,
+            display_title: caseTitle,
+            accession: caseAccession,
+            individual : caseIndividual
         } = {},
         onFamilySelect,
         graphData,
@@ -294,60 +298,33 @@ const CaseSummaryTabView = React.memo(function CaseSummaryTabView(props){
     }, [ /* empty == executed only once ever */ ]);
 
 
-    let caseSummaryTables;
-    if (familiesLen > 0) {
-        caseSummaryTables = families.map(function(family, idx){
-            const {
-                original_pedigree: { display_title: pedFileName } = {},
-                members = [],
-                display_title
-            } = family;
-            const cls = "family-index-" + idx;
-            const isCurrentFamily = idx === pedigreeFamiliesIdx;
-            const onClick = function(evt){
-                if (isCurrentFamily) {
-                    navigate("#pedigree", { skipRequest: true });
-                } else {
-                    onFamilySelect(idx);
-                }
-            };
+    let caseSearchTables;
+    if (caseIndividual) {
+        const [open, setOpen] = useState(true); // 1st family open by default
+        const searchHref=`/search/?type=Case&accession=${caseAccession}`;
 
-            const uriEncodedDisplayTitle = encodeURI(display_title);
+        const title = (
+            <h4 className="clickable p-2 d-inline-block clearfix" onClick={() => setOpen(!open)}>
+                <i className={"icon p-2 clickable fas icon-sm" + (open ? " icon-minus" : " icon-plus")} />
+                <span className="font-italic text-500">{ caseTitle }</span>
+                <span className="text-300 font-italic">: Status Overview</span>
+            </h4>
+        );
 
-            const [open, setOpen] = useState(idx === 0); // 1st family open by default
-
-            const tip = isCurrentFamily ?
-                "Currently-selected family in Pedigree Visualization"
-                : "Click to view this family in the Pedigree Visualization tab";
-            const title = (
-                <h4 data-family-index={idx} className="clickable p-2 d-inline-block clearfix" onClick={() => setOpen(!open)}>
-                    <i className={"icon p-2 clickable fas icon-sm" + (open ? " icon-minus" : " icon-plus")} />
-                    <span className="font-italic text-500">{ family.display_title }</span>
-                    <span className="text-300 font-italic">: Status Overview</span>
-                    { pedFileName ? <span className="text-300">{ " (" + pedFileName + ")" }</span> : null }
-                    <button type="button" className="btn btn-small btn-outline-primary pull-right" data-tip={tip} onClick={onClick}>
-                        <i className="icon icon-fw icon-sitemap fas mr-1 small" />
-                        { isCurrentFamily ? "View Pedigree in Separate Tab" : "Switch to this Pedigree"}
-                    </button>
-                </h4>
-            );
-
-            return (
-                <div className={cls} key={idx} data-is-current-family={isCurrentFamily}>
-                    { title }
-                    { open ?
-                        <Collapse in={open}><EmbeddedItemSearchTable facets={null}
-                            searchHref={`/search/?type=Case&family.display_title=${uriEncodedDisplayTitle}`}
-                            context={props.context}/>
-                        </Collapse> : null}
-                    {/* <CaseSummaryTable {...family} sampleProcessing={familySpecificSAs} {...{ idx, idToGraphIdentifier, isCurrentFamily }} /> */}
-                </div>
-            );
-        });
+        caseSearchTables = (
+            <div>
+                { title }
+                { open ?
+                    <Collapse in={open}><EmbeddedItemSearchTable facets={null}
+                        {...{ searchHref }}
+                        context={props.context}/>
+                    </Collapse> : null}
+            </div>
+        );
     } else {
-        caseSummaryTables = (
+        caseSearchTables = (
             <div className="mt-3">
-                <h4 className="text-400 mb-03">No families available</h4>
+                <h4 className="text-400 mb-03">No individual assigned to this case</h4>
                 { editAction ?
                     <div>{ "Add a family by pressing \"Actions\" at top right of page and then \"Add Family\"."}</div>
                     : null }
@@ -446,12 +423,12 @@ const CaseSummaryTabView = React.memo(function CaseSummaryTabView(props){
             <hr className="tab-section-title-horiz-divider"/>
             <div className="container-wide">
                 <div className="processing-summary-tables-container mt-15">
-                    { caseSummaryTables }
+                    { caseSearchTables }
                 </div>
             </div>
             <DotRouter href={props.href}>
                 <DotRouterTab cls="arrow-tab" tabTitle="Accessioning" tabViewRender={() => AccessioningTab(props)} dotPath=".accessioning" default />
-                <DotRouterTab cls="arrow-tab" tabTitle="Bioinformatics" tabViewRender={() => BioinformaticsTab({ families, currFamily, pedigreeFamiliesIdx, idToGraphIdentifier, sample_processing, context: props.context })} dotPath=".bioinformatics" />
+                <DotRouterTab cls="arrow-tab" tabTitle="Bioinformatics" tabViewRender={() => BioinformaticsTab({ families, currFamily, pedigreeFamiliesIdx, idToGraphIdentifier, sample_processing, context: props.context, onFamilySelect })} dotPath=".bioinformatics" />
                 <DotRouterTab cls="arrow-tab" tabTitle="Filtering" tabViewRender={() => FilteringTab(props)} dotPath=".filtering"/>
                 <DotRouterTab cls="arrow-tab" tabTitle="Interpretation" tabViewRender={() => InterpretationTab(props)} dotPath=".interpretation" disabled/>
                 <DotRouterTab cls="arrow-tab" tabTitle="Finalize Case" tabViewRender={() => ReportingTab(props)} dotPath=".reporting" disabled/>
@@ -475,10 +452,15 @@ CaseSummaryTabView.getTabObject = function(props){
 
 
 class DotRouter extends React.Component {
+    /*
+    Renders a set of child tabs defined by <DotRouterTab> that each render a component below the navbar when clicked.
 
+    Note: Currently there is a bug where if you switch to a main tab and then press "back" to get back,
+    navigation doesn't work... need to look into
+    */
     componentDidMount() {
         const { href, children } = this.props;
-        
+
     }
 
     getDotPath() {
@@ -548,22 +530,35 @@ class DotRouter extends React.Component {
 function DotRouterTab(props) {
     const { tabTitle, dotPath, href, cls, disabled } = props;
     if (disabled) {
-        return <li className={cls + " disabled"} key={tabTitle}><a disabled>{tabTitle}</a></li>;
+        return <li className={cls + " disabled"} key={tabTitle}><button type="button" disabled>{tabTitle}</button></li>;
     }
-    return <li className={cls} key={tabTitle}><a href={"#case-summary" + dotPath}>{tabTitle}</a></li>;
+    return (
+        <li className={cls} key={tabTitle}>
+            <button type="button"
+                onClick={() => navigate("#case-summary" + dotPath, { skipRequest: true })}>
+                {tabTitle}
+            </button>
+        </li>);
 }
 
 function AccessioningTab(props) {
     const {
-        currFamily,
-        context
+        context,
+        href
     } = props;
     console.log("accessioning props", props);
     return (
         <>
-            <h1>{ context.display_title }: <span className="text-300">Accessioning Report and History</span></h1>
+            <h1>
+                { context.display_title }: <span className="text-300">Accessioning Report and History</span>
+                <span className="curr-selection pull-right">Current Selection</span>
+            </h1>
             <div className="tab-inner-container">
-
+                <FamilyReportStackedTable
+                    result={context}
+                    family={context.family} href={href} preventExpand
+                    fadeIn={false} collapseLongLists
+                />
             </div>
         </>);
 }
@@ -592,28 +587,26 @@ function BioinformaticsTab(props) {
             } = family;
             const cls = "family-index-" + idx;
             const isCurrentFamily = idx === pedigreeFamiliesIdx;
-            // const onClick = function(evt){
-            //     if (isCurrentFamily) {
-            //         navigate("#pedigree", { skipRequest: true });
-            //     } else {
-            //         // onFamilySelect(idx);
-            //     }
-            // };
-    
-            console.log("case family", family);
-    
-            // const tip = isCurrentFamily ?
-            //     "Currently-selected family in Pedigree Visualization"
-            //     : "Click to view this family in the Pedigree Visualization tab";
+            const onClick = function(evt){
+                if (isCurrentFamily) {
+                    navigate("#pedigree", { skipRequest: true });
+                } else {
+                    onFamilySelect(idx);
+                }
+            };
+
+            const tip = isCurrentFamily ?
+                "Currently-selected family in Pedigree Visualization"
+                : "Click to view this family in the Pedigree Visualization tab";
             const title = (
-                <h4 data-family-index={idx} className="clickable p-2 d-inline-block">
+                <h4 data-family-index={idx} className="clickable p-2 d-inline-block w-100">
                     <i className={"icon p-1 icon-sitemap fas icon-small"} />
                     <span className="font-italic text-500">{ display_title }</span>
                     { pedFileName ? <span className="text-300">{ " (" + pedFileName + ")" }</span> : null }
-                    {/* <button type="button" className="btn btn-small btn-primary" data-tip={tip} onClick={onClick}>
+                    <button type="button" className="btn btn-small btn-primary pull-right" data-tip={tip} onClick={onClick}>
                         <i className="icon icon-fw icon-sitemap fas mr-1 small" />
                         { isCurrentFamily ? "View Pedigree in Separate Tab" : "Switch to this Pedigree"}
-                    </button> */}
+                    </button>
                 </h4>
             );
 
@@ -626,7 +619,7 @@ function BioinformaticsTab(props) {
             );
         });
     } else {
-        console.log("biotabprops don't exist for whatever reason");
+        console.warn("biotabprops don't exist for whatever reason");
     }
 
     return (
