@@ -20,5 +20,4 @@ class FilterSet(Item):
     """The class to store information about 4DN file formats"""
     item_type = 'filter_set'
     schema = load_schema('encoded:schemas/filter_set.json')
-    name_key = 'title'
     embedded_list = []
