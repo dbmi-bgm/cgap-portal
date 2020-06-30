@@ -56,6 +56,12 @@
             "description": "The report generated from this case",
             "type": "string",
             "linkTo": "Report"
+        },
+        "cohort": {
+            "title" : "Cohort",
+            "description": "Cohort of the family",
+            "type" : "string",
+            "linkTo": "Nexus"
         }
     }
 }
