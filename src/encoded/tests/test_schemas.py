@@ -120,7 +120,7 @@ def pluralize(name):
             return name.replace(sp, sp + 's')
         elif name.startswith(sp) and re.search('setting', name):
             return name.replace(sp, sp + 's')
-    # otherwise just add 's'
+    # otherwise just add 's/es/ies'
     if name.endswith('ly'):
         return name[:-1] + 'ies'
     if name.endswith('s'):
