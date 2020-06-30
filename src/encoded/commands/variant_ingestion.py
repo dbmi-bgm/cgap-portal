@@ -29,7 +29,7 @@ def post_vcf_file(app_handle, filename, project, institution):
         'project': project,  # post file associated with variant
         'institution': institution
     }
-    file_uuid = app_handle.post_json('/annotated_vcf_file', file, status=201).json['@graph'][0]['@id']
+    file_uuid = app_handle.post_json('/file_processed', file, status=201).json['@graph'][0]['@id']
     return file_uuid
 
 

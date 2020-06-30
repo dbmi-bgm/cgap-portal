@@ -610,20 +610,6 @@ class FileReference(File):
     name_key = 'accession'
 
 
-@collection(
-    name='annotated-vcf-files',
-    unique_key='accession',
-    properties={
-        'title': 'Annotated VCF Files',
-        'description': 'Collection of annotated VCF files that have been ingested.'
-    })
-class AnnotatedVcfFile(File):
-    item_type = 'annotated_vcf_file'
-    schema = load_schema('encoded:schemas/annotated_vcf_file.json')
-    embedded_list = File.embedded_list
-    name_key = 'accession'
-
-
 @view_config(name='upload', context=File, request_method='GET',
              permission='edit')
 @debug_log

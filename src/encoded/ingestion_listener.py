@@ -28,11 +28,16 @@ def includeme(config):
     config.scan(__name__)
 
 
-@view_config(route_name='ingestion_status', request_method='POST', permission='index')
+@view_config(route_name='ingestion_status', request_method='GET', permission='index')
 @debug_log
 def ingestion_status(context, request):
     """ Status route, essentially identical to indexing_status. """
-    pass
+    queue_manager = request.registry[INGESTION_QUEUE]
+    n_waiting, n_inflight = queue_manager.get_counts()
+    return {
+        'waiting': n_waiting,
+        'inflight': n_inflight
+    }
 
 
 @view_config(route_name='queue_ingestion', request_method='POST', permission='index')
