@@ -1,6 +1,20 @@
 import pytest
-from dcicutils.env_utils import CGAP_ENV_WEBPROD
+import time
+from uuid import uuid4
 from ..ingestion_listener import IngestionQueueManager
+
+
+MOCKED_ENV = 'fourfront-cgapother'
+
+
+@pytest.yield_fixture(scope='function', autouse=True)
+def setup_and_teardown_sqs_state():
+    registry = MockedRegistry({
+        'env.name': MOCKED_ENV
+    })
+    queue_manager = IngestionQueueManager(registry)
+    yield queue_manager
+    queue_manager.clear_queue()  # clean up messages
 
 
 class MockedRegistry:
@@ -8,11 +22,19 @@ class MockedRegistry:
         self.settings = settings
 
 
-def test_ingestion_queue_manager_basic():
+def test_ingestion_queue_manager_basic(setup_and_teardown_sqs_state):
     """ Tests basic things about initializing the queue manager """
-    registry = MockedRegistry({
-        'env.name': CGAP_ENV_WEBPROD
-    })
-    queue_manager = IngestionQueueManager(registry)
-    assert queue_manager.env_name == CGAP_ENV_WEBPROD
-    assert queue_manager.queue_name == CGAP_ENV_WEBPROD + '-vcfs'
+    queue_manager = setup_and_teardown_sqs_state
+    assert queue_manager.env_name == MOCKED_ENV
+    assert queue_manager.queue_name == MOCKED_ENV + '-vcfs'
+
+
+def test_ingestion_queue_add_and_receive(setup_and_teardown_sqs_state):
+    """ Tests adding/receiving some uuids """
+    queue_manager = setup_and_teardown_sqs_state
+    queue_manager.add_uuids([
+        str(uuid4()), str(uuid4())
+    ])
+    time.sleep(10)
+    msgs = queue_manager.receive_messages()
+    assert len(msgs) == 2

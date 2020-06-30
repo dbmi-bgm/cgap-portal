@@ -52,11 +52,11 @@ def test_create_mapping_item_order(registry):
         assert registry[COLLECTIONS][i_type].type_info.name in ITEM_INDEX_ORDER
 
 
-@patch('encoded.commands.create_mapping_on_deploy.get_my_env', MagicMock(return_value='fourfront-cgap'))
+@patch('encoded.commands.create_mapping_on_deploy.get_my_env', MagicMock(return_value='fourfront-cgapdev'))
 def test_get_deployment_config_prod():
     """ Tests we correctly configure prod """
     cfg = get_deployment_config(None)
-    assert cfg['ENV_NAME'] == 'fourfront-cgap'
+    assert cfg['ENV_NAME'] == 'fourfront-cgapdev'
     assert cfg['WIPE_ES'] is False
 
 

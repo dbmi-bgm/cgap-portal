@@ -12,6 +12,7 @@ from dcicutils.ff_utils import get_health_page
 from pyramid.config import Configurator
 from pyramid.settings import asbool
 from snovault.app import STATIC_MAX_AGE, session, json_from_path, configure_dbsession, changelogs, json_asset
+from .ingestion_listener import INGESTION_QUEUE
 
 
 if sys.version_info.major < 3:
@@ -102,11 +103,6 @@ def app_version(config):
         config.registry.settings[APP_VERSION_REGISTRY_KEY] = version
 
     # Fourfront does GA stuff here that makes no sense in CGAP (yet).
-
-
-def configure_ingestion_queue():
-    """ Creates an SQS queue for keeping track of VCFs to ingest """
-    pass
 
 
 def main(global_config, **local_config):
