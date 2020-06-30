@@ -10,6 +10,7 @@ FILTER_BLOCKS = 'filter_blocks'
 
 @collection(
     name='filter-sets',
+    unique_key='nexus:title',
     properties={
         'title': 'Filter Sets',
         'description': 'Filter Set for combining multiple queries'
@@ -19,5 +20,5 @@ class FilterSet(Item):
     """The class to store information about 4DN file formats"""
     item_type = 'filter_set'
     schema = load_schema('encoded:schemas/filter_set.json')
-    name_key = 'filter_set'
+    name_key = 'title'
     embedded_list = []
