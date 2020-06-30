@@ -10,77 +10,76 @@ import { object, layout } from '@hms-dbmi-bgm/shared-portal-components/es/compon
 import { StackedBlockTable, StackedBlock, StackedBlockList, StackedBlockName, StackedBlockNameLabel } from '@hms-dbmi-bgm/shared-portal-components/es/components/browse/components/StackedBlockTable';
 
 
-export class CaseDetailPane extends React.PureComponent {
 
-    static propTypes = {
-        'result' : PropTypes.object.isRequired,
-        'containerWidth' : PropTypes.number,
-        'paddingWidth' : PropTypes.number,
-        'windowWidth' : PropTypes.number,
-        'href' : PropTypes.string,
-        'minimumWidth' : PropTypes.number
+export const CaseDetailPane = React.memo(function CaseDetailPane (props) {
+    const { paddingWidthMap, paddingWidth, containerWidth, windowWidth, result, minimumWidth, href } = props;
+    const { sample_processing: { families = [] } = {} } = result;
+
+    let usePadWidth = paddingWidth || 0;
+    if (paddingWidthMap){
+        usePadWidth = paddingWidthMap[layout.responsiveGridState(windowWidth)] || paddingWidth;
+    }
+    const commonFamilySectionProps = {
+        containerWidth, result, href, minimumWidth, paddingWidth: usePadWidth
     };
 
-    static defaultProps = {
-        'paddingWidth' : 0,
-        'minimumWidth' : 725,
-    };
+    // Once primary/other family objects added to Case schema, update to use those instead
+    const familySections = families.map(function(family){
+        return <FamilySection {...commonFamilySectionProps} key={family['@id']} {...{ result, family }} />;
+    });
 
-    render(){
-        const { paddingWidthMap, paddingWidth, containerWidth, windowWidth, result, minimumWidth, href } = this.props;
-
-        let usePadWidth = paddingWidth || 0;
-        if (paddingWidthMap){
-            usePadWidth = paddingWidthMap[layout.responsiveGridState(windowWidth)] || paddingWidth;
-        }
-        const commonFamilySectionProps = {
-            containerWidth, result, href, minimumWidth, paddingWidth: usePadWidth
-        };
-
-        return (
-            <div className="family-info-wrapper"> {/* Formerly experiment-set-info-wrapper*/}
-                <div className="family-addinfo"> {/* Formerly expset-addinfo */}
-                    <div className="row">
-                        {/* <div className="col-md-6 addinfo-description-section">
-                            <FlexibleDescriptionBox
-                                windowWidth={windowWidth}
-                                description={ result.description }
-                                fitTo="self"
-                                textClassName="text-normal"
-                                dimensions={null}
-                                linesOfText={2}
-                            />
-                        </div> */}
-                        <div className="col-md-6 addinfo-properties-section">
-                            <div className="row mb-05 clearfix">
-                                <div className="col-4 col-sm-3 text-500">
-                                    Cohort:
-                                </div>
-                                <div className="col-8 col-sm-9 family-addinfo-val">
-                                    { object.itemUtil.generateLink(result.cohort) || <small><em>None</em></small> }
-                                </div>
+    return (
+        <div className="family-info-wrapper"> {/* Formerly experiment-set-info-wrapper*/}
+            <div className="family-addinfo"> {/* Formerly expset-addinfo */}
+                <div className="row">
+                    {/* <div className="col-md-6 addinfo-description-section">
+                        <FlexibleDescriptionBox
+                            windowWidth={windowWidth}
+                            description={ result.description }
+                            fitTo="self"
+                            textClassName="text-normal"
+                            dimensions={null}
+                            linesOfText={2}
+                        />
+                    </div> */}
+                    <div className="col-md-6 addinfo-properties-section">
+                        <div className="row mb-05 clearfix">
+                            <div className="col-4 col-sm-3 text-500">
+                                Cohort:
                             </div>
-                            <div className="row mb-05 clearfix">
-                                <div className="col-4 col-sm-3 text-500">
-                                    Project:
-                                </div>
-                                <div className="col-8 col-sm-9 family-addinfo-val">
-                                    { object.itemUtil.generateLink(result.project) || <small><em>None</em></small> }
-                                </div>
+                            <div className="col-8 col-sm-9 family-addinfo-val">
+                                { object.itemUtil.generateLink(result.cohort) || <small><em>None</em></small> }
+                            </div>
+                        </div>
+                        <div className="row mb-05 clearfix">
+                            <div className="col-4 col-sm-3 text-500">
+                                Project:
+                            </div>
+                            <div className="col-8 col-sm-9 family-addinfo-val">
+                                { object.itemUtil.generateLink(result.project) || <small><em>None</em></small> }
                             </div>
                         </div>
                     </div>
                 </div>
-                <div style={{ overflowX : 'auto', width: containerWidth ? (containerWidth - usePadWidth) : null }} className="family-tables-container"> {/*formerly files-tables-container */}
-                    {/* Once primary/other family objects added to Case schema, update to use those instead */}
-                    { result.sample_processing.families.map((family) => <FamilySection key={family['@id']} {...{ result, family, commonFamilySectionProps }} />)}
-                </div>
             </div>
-        );
-    }
-
-}
-
+            <div style={{ overflowX : 'auto', width: containerWidth ? (containerWidth - usePadWidth) : null }} className="family-tables-container"> {/*formerly files-tables-container */}
+                { familySections }
+            </div>
+        </div>
+    );
+});
+CaseDetailPane.propTypes = {
+    'result' : PropTypes.object.isRequired,
+    'containerWidth' : PropTypes.number,
+    'paddingWidth' : PropTypes.number,
+    'windowWidth' : PropTypes.number,
+    'href' : PropTypes.string,
+    'minimumWidth' : PropTypes.number
+};
+CaseDetailPane.defaultProps = {
+    'paddingWidth' : 0,
+    'minimumWidth' : 725,
+};
 
 
 class FamilySection extends React.Component {
@@ -259,6 +258,7 @@ export class FamilyReportStackedTable extends React.PureComponent {
         const { family = null, collapseLimit = 1, collapseShow = 2, preventExpand = false } = this.props;
         const { members = [], mother = null, father = null, proband = null } = family || {};
 
+        // eslint-disable-next-line no-useless-concat
         const appendCountStr = members.length <= collapseLimit ? null : ( 'with ' + "#;lp[67gty6" + ' More Individuals ');
         const showMoreExtTitle = (
             <React.Fragment>
@@ -302,8 +302,7 @@ export class FamilyReportStackedTable extends React.PureComponent {
      * Much of styling/layouting is defined in CSS.
      */
     render(){
-        const { columnHeaders: propColHeaders,
-            showMetricsColumns, width, preventExpand = false } = this.props;        
+        const { columnHeaders: propColHeaders, showMetricsColumns, width, preventExpand = false } = this.props;
         const columnHeaders = FamilyReportStackedTable.staticColumnHeaders(propColHeaders, showMetricsColumns);
         return (
             <div className="stacked-block-table-outer-container overflow-auto">
@@ -448,6 +447,7 @@ export class FamilyAccessionStackedTable extends React.PureComponent {
         const { family = null, collapseLimit = 1, collapseShow = 2, preventExpand = false } = this.props;
         const { members = [], mother = null, father = null, proband = null } = family || {};
 
+        // eslint-disable-next-line no-useless-concat
         const appendCountStr = members.length <= collapseLimit ? null : ( 'with ' + "#;lp[67gty6" + ' More Individuals ');
         const showMoreExtTitle = (
             <React.Fragment>
@@ -491,8 +491,7 @@ export class FamilyAccessionStackedTable extends React.PureComponent {
      * Much of styling/layouting is defined in CSS.
      */
     render(){
-        const { columnHeaders: propColHeaders,
-            showMetricsColumns, width, preventExpand = false } = this.props;        
+        const { columnHeaders: propColHeaders, showMetricsColumns, width, preventExpand = false } = this.props;
         const columnHeaders = FamilyAccessionStackedTable.staticColumnHeaders(propColHeaders, showMetricsColumns);
         return (
             <div className="stacked-block-table-outer-container overflow-auto">
