@@ -32,7 +32,7 @@ function renderAdvancedColumn(topLeft, status, main, dateTitle, date) {
                 className="col-main text-ellipsis-container"
                 style={{ textTransform: "uppercase", textAlign: "center", fontSize: "20px", fontWeight: "600" }}
             >
-                {main}
+                {main || "-"}
             </div>
             <div className="col-date text-ellipsis-container" style={{ textAlign: "center", fontSize: "12px" }}>
                 <strong>{dateTitle} </strong>
