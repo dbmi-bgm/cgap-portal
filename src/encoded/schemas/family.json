@@ -88,6 +88,12 @@
             "title": "Description",
             "description": "Description of the family",
             "type": "string"
+        },
+        "cohort": {
+            "title" : "Cohort",
+            "description": "Cohort of the family",
+            "type" : "string",
+            "linkTo": "Nexus"
         }
     }
 }
