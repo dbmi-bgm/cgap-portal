@@ -177,6 +177,7 @@ def main(global_config, **local_config):
     # config.include('.batch_download')
     config.include('.loadxl')
     config.include('.visualization')
+    config.include('.ingestion_listener')
 
     if 'elasticsearch.server' in config.registry.settings:
         config.include('snovault.elasticsearch')

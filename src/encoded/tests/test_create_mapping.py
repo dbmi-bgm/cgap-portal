@@ -61,7 +61,7 @@ def test_get_deployment_config_prod():
 
 
 @patch('encoded.commands.create_mapping_on_deploy.get_my_env', MagicMock(return_value='fourfront-cgaptest'))
-def test_get_deployment_config_prod():
+def test_get_deployment_config_test():
     """ Tests we correctly configure cgaptest """
     cfg = get_deployment_config(None)
     assert cfg['ENV_NAME'] == 'fourfront-cgaptest'
@@ -69,7 +69,7 @@ def test_get_deployment_config_prod():
 
 
 @patch('encoded.commands.create_mapping_on_deploy.get_my_env', MagicMock(return_value='fourfront-cgapother'))
-def test_get_deployment_config_prod():
+def test_get_deployment_config_other():
     """ Tests we correct configure a different env not listed yet """
     cfg = get_deployment_config(None)
     assert cfg['ENV_NAME'] == 'fourfront-cgapother'
