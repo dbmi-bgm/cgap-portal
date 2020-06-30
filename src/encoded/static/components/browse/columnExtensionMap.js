@@ -17,7 +17,12 @@ const { Item, ColumnDefinition } = typedefs;
 
 export const DEFAULT_WIDTH_MAP = { 'lg' : 200, 'md' : 180, 'sm' : 120, 'xs' : 120 };
 
-/** Theoretically we could change all these render functions to just be functional React components, maybe a later todo. */
+
+
+/**
+ * Theoretically we could change all these render functions to just be functional React components, maybe a later todo.
+ * And move any compute-logic into here for memoization.
+ */
 
 function renderAdvancedColumn(topLeft, status, main, dateTitle, date) {
     return (
@@ -40,6 +45,22 @@ function renderAdvancedColumn(topLeft, status, main, dateTitle, date) {
             </div>
         </div>
     );
+}
+
+/** @todo use as a memoized function in a reusable component later  */
+function findSelectedCaseSample(allSamples, selectedIndividual){
+    const { '@id' : selectedID } = selectedIndividual || {};
+
+    if (!selectedID) return null;
+    const samplesLen = allSamples.length;
+    for (let i = 0; i < samplesLen; i++) {
+        const { individual : { '@id' : sampleIndividualID = "N/A" } = {} } = allSamples[i];
+        if (selectedID === sampleIndividualID) {
+            // Return as soon as possible (as soon as find match), we don't need to iterate over each.
+            return allSamples[i];
+        }
+    }
+    return null;
 }
 
 export const DisplayTitleColumnIndividual = React.memo(function DisplayTitleIndividualDefault({ result, link, onClick }) {
@@ -136,44 +157,27 @@ export const columnExtensionMap = {
     },
     'sample_processing.completed_processes': {
         'render' : function renderBioinformaticsColumn(result, parentProps){
-            const { href, context, rowNumber, detailOpen, toggleDetailOpen } = parentProps;
-            const { '@type' : itemTypeList = ["Item"], individual, sample_processing: { completed_processes = [], last_modified = {}, samples = []} } = result;
-            let selected = {};
-            samples.forEach((sample) => {
-                if (sample.individual['@id'] === individual['@id']){
-                    selected = sample;
-                }
-            });
+            const { sample_processing: { completed_processes = [], last_modified = {} } } = result;
             return renderAdvancedColumn(null, null, completed_processes, "Last Updated:", last_modified.date_modified || null);
         }
     },
     'sample_processing.sample': {
         'render' : function renderSequencingColumn(result, parentProps){
-            const { href, context, rowNumber, detailOpen, toggleDetailOpen } = parentProps;
-            const { '@type' : itemTypeList = ["Item"], individual, sample_processing: { samples = []} } = result;
-
-            let selected = {};
-            samples.forEach((sample) => {
-                if (sample.individual['@id'] === individual['@id']){
-                    selected = sample;
-                }
-            });
-            return renderAdvancedColumn(null, null, selected.workup_type, "Accessioned:", selected.specimen_accession_date);
+            const { individual, sample_processing: { samples = [] } } = result;
+            const selectedSample = findSelectedCaseSample(samples, individual);
+            if (!selectedSample) return null;
+            const { workup_type, specimen_accession_date } = selectedSample;
+            return renderAdvancedColumn(null, null, workup_type, "Accessioned:", specimen_accession_date);
         }
     },
     'sample_processing': {
         'title': "This won't work right",
         'render' : function renderSampleColumn(result, parentProps){
-            const { href, context, rowNumber, detailOpen, toggleDetailOpen } = parentProps;
-            const { '@type' : itemTypeList = ["Item"], individual, sample_processing: { samples = []} } = result;
-
-            let selected = {};
-            samples.forEach((sample) => {
-                if (sample.individual['@id'] === individual['@id']){
-                    selected = sample;
-                }
-            });
-            return renderAdvancedColumn(selected.accession, selected.status, selected.specimen_type, "Collected:", selected.specimen_collection_date);
+            const { individual, sample_processing: { samples = [] } } = result;
+            const selectedSample = findSelectedCaseSample(samples, individual);
+            if (!selectedSample) return null;
+            const { accession, status, specimen_type, specimen_collection_date } = selectedSample;
+            return renderAdvancedColumn(accession, status, specimen_type, "Collected:", specimen_collection_date);
         }
     },
     'date_published' : {
