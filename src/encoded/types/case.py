@@ -165,6 +165,4 @@ class Case(Item):
             return []
         individual_families = ind_data.get('families', [])
         secondary_families = [i['@id'] for i in individual_families if i['@id'] != family]
-        print(self.properties)
-        print()
         return secondary_families
