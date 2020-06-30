@@ -21,7 +21,7 @@
             "default": "1"
         },
         "accession" : {
-            "accessionType" : "NE"
+            "accessionType" : "CO"
         },
         "title": {
             "title": "Title",
