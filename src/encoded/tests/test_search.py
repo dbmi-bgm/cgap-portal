@@ -625,7 +625,7 @@ class TestNestedSearch(object):
         """ Should match 2 since OR on this field """
         res = testapp.get('/search/?type=Variant'
                           '&hg19.hg19_hgvsg=NC_000001.11:g.12185956del'
-                          '&hg19.hg19_hgvsg=NC_000001.11:g.11901816A>T').json
+                          '&hg19.hg19_hgvsg=NC_000001.11:g.11901816A>T').follow().json
         self.assert_length_is_expected(res, 2)
         for variant in res['@graph']:
             assert variant['uuid'] in ['f6aef055-4c88-4a3e-a306-d37a71535d8b', '852bb349-203e-437d-974a-e8d6cb56810a']
@@ -673,7 +673,7 @@ class TestNestedSearch(object):
         res = testapp.get('/search/?type=Variant'
                           '&hg19.hg19_chrom=chr1'
                           '&hg19.hg19_pos=12185955'
-                          '&hg19.hg19_hgvsg=NC_000001.11:g.12185956del').json
+                          '&hg19.hg19_hgvsg=NC_000001.11:g.12185956del').follow().json
         self.assert_length_is_expected(res, 1)
         assert res['@graph'][0]['uuid'] == 'f6aef055-4c88-4a3e-a306-d37a71535d8b'
         testapp.get('/search/?type=Variant'
@@ -698,7 +698,7 @@ class TestNestedSearch(object):
                           '&hg19.hg19_pos=11780388'
                           '&hg19.hg19_hgvsg=NC_000001.11:g.12185956del'
                           '&hg19.hg19_hgvsg=NC_000001.11:g.11901816A>T'
-                          '&hg19.hg19_hgvsg=NC_000001.11:g.11780388G>A').json
+                          '&hg19.hg19_hgvsg=NC_000001.11:g.11780388G>A').follow().json
         self.assert_length_is_expected(res, 3)
         for variant in res['@graph']:
             assert variant['uuid'] in [
@@ -721,10 +721,10 @@ class TestNestedSearch(object):
                     '&hg19.hg19_hgvsg=NC_000001.11:g.12185956del', status=404)
 
     def test_nested_search_with_no_value(self, workbook, testapp):
-        """ Tests searching on 'No value' alone on a nested field  """
+        """ Tests searching on 'No value' alone on a nested field """
         res = testapp.get('/search/?type=Variant'
-                          '&transcript.vep_domains=No+value').json
-        self.assert_length_is_expected(res, 4)
+                          '&hg19.hg19_chrom!=No+value').follow().json
+        self.assert_length_is_expected(res, 3)
 
     def test_nested_search_with_no_value_combined(self, workbook, testapp):
         """ Tests searching on 'No value' combined with another nested field, in this case
@@ -745,8 +745,8 @@ class TestNestedSearch(object):
     def test_search_nested_with_non_nested_fields(self, workbook, testapp):
         """ Tests that combining a nested search with a non-nested one works in any order """
         res = testapp.get('/search/?type=Variant'
-                          '&hg19.hg19_pos=No+value'
-                          '&POS=88832').json
+                          '&hg19.hg19_pos!=11720331'
+                          '&POS=88832').follow().json
         self.assert_length_is_expected(res, 1)
         assert res['@graph'][0]['uuid'] == 'cedff838-99af-4936-a0ae-4dfc63ba8bf4'
 
@@ -755,8 +755,7 @@ class TestNestedSearch(object):
             field works correctly """
         res = testapp.get('/search/?type=Variant'
                           '&POS=88832'
-                          '&hg19.hg19_pos=No+value'
-                          '&REF=A').follow().json
+                          '&REF=A').json
         self.assert_length_is_expected(res, 1)
         assert res['@graph'][0]['uuid'] == 'cedff838-99af-4936-a0ae-4dfc63ba8bf4'
         testapp.get('/search/?type=Variant'
