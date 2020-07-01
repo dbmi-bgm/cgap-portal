@@ -46,6 +46,19 @@ from snovault.util import debug_log
 CRYPT_CONTEXT = __name__ + ':crypt_context'
 
 
+JWT_ENCODING_ALGORITHM = 'HS256'
+
+# Might need to keep a list of previously used algorithms here, not just the one we use now.
+# Decryption algorithm used to default to a long list,
+# but more recent versions of jwt library say we should stop assuming that.
+#
+# In case it goes away, as far as I can tell, the default for decoding from their
+# default_algorithms() method used to be: ['ES512', 'RS384', 'HS512', 'ES256', 'none',
+# 'RS256', 'PS512', 'ES384', 'HS384', 'ES521', 'PS384', 'HS256', 'PS256', 'RS512']
+# -kmp 15-May-2020
+JWT_DECODING_ALGORITHMS = [JWT_ENCODING_ALGORITHM]
+
+
 def includeme(config):
     config.include('.edw_hash')
     setting_prefix = 'passlib.'
@@ -222,7 +235,9 @@ class Auth0AuthenticationPolicy(CallbackAuthenticationPolicy):
             if auth0_client and auth0_secret:
                 # leeway accounts for clock drift between us and auth0
                 payload = jwt.decode(token, b64decode(auth0_secret, '-_'),
-                                     audience=auth0_client, leeway=30)
+                                     audience=auth0_client, leeway=30,
+                                     algorithms=JWT_DECODING_ALGORITHMS)
+
                 if 'email' in payload and self.email_is_partners_or_hms(payload):
                     request.set_property(lambda r: False, 'auth0_expired')
                     return payload
@@ -427,7 +442,8 @@ def impersonate_user(context, request):
         'aud': auth0_client,
     }
 
-    id_token = jwt.encode(jwt_contents, b64decode(auth0_secret, '-_'), algorithm='HS256')
+    id_token = jwt.encode(jwt_contents, b64decode(auth0_secret, '-_'),
+                          algorithm=JWT_ENCODING_ALGORITHM)
     user_properties['id_token'] = id_token.decode('utf-8')
 
     return user_properties

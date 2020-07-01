@@ -4,7 +4,6 @@ http://pyramid.readthedocs.org/en/latest/narr/testing.html
 '''
 import os
 import logging
-import pkg_resources
 import pytest
 import webtest
 

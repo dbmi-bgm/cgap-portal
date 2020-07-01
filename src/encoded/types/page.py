@@ -1,6 +1,7 @@
 """
 The type file for the collection Pages.  Which is used for static pages on the portal
 """
+import warnings
 
 from pyramid.httpexceptions import ( # 301-307 redirect code response
     HTTPMovedPermanently,
@@ -36,6 +37,7 @@ from urllib.parse import (
     urlparse,
     urlencode
 )
+from ..utils import filtered_warnings
 from ..search.search import get_iterable_search_results
 from .base import Item
 from .user_content import (
@@ -163,14 +165,25 @@ def is_static_page(info, request):
 
 
 def includeme(config):
-    config.add_route(
-        'staticpage',
-        '/*subpath',
-        custom_predicates=[is_static_page],
-        request_method="GET"
-    )
+    with filtered_warnings("ignore", category=DeprecationWarning):
+        config.add_route(
+            'staticpage',
+            '/*subpath',
+            # TODO: Replace custom_predicates=[is_static_page] with something more modern.
+            # The custom_predicates needs to be rewritten.
+            # Although there is a complex rewrite using .add_route_predicate,
+            # the simpler case of just using .add_static_view may bypass a lot of complexity.
+            # But this needs more study to get right. For now this code will work and
+            # we're just going to suppress the warning.  -kmp 16-May-2020
+            # Refs:
+            #  - https://stackoverflow.com/questions/30102767/custom-route-predicates-in-pyramid
+            #  - https://docs.pylonsproject.org/projects/pyramid/en/latest/_modules/pyramid/config/routes.html
+            #  - https://docs.pylonsproject.org/projects/pyramid/en/master/narr/hooks.html#view-and-route-predicates
+            #  - https://docs.pylonsproject.org/projects/pyramid/en/latest/api/config.html
+            custom_predicates=[is_static_page],
+            request_method="GET"
+        )
     config.add_view(static_page, route_name='staticpage')
-
 
 
 @collection(

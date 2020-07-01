@@ -151,12 +151,12 @@ def test_access_key_user_disable_login(anontestapp, no_login_access_key):
 
 def test_access_key_edit(anontestapp, access_key):
     headers = {'Authorization': auth_header(access_key)}
-    NEW_DESCRIPTION = 'new description'
-    properties = {'description': NEW_DESCRIPTION}
+    new_description = 'new description'
+    properties = {'description': new_description}
     anontestapp.put_json(access_key['@id'], properties, headers=headers)
 
     res = anontestapp.get(access_key['@id'], properties, headers=headers)
-    assert res.json['description'] == NEW_DESCRIPTION
+    assert res.json['description'] == new_description
 
 
 @pytest.mark.parametrize('frame', ['', 'raw', 'object', 'embedded', 'page'])
