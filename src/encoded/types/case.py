@@ -170,10 +170,11 @@ class Case(Item):
     @calculated_property(schema={
         "title": "VCF File",
         "description": "VCF file that will be used in variant digestion",
-        "type": "string"
+        "type": "string",
+        "linkTo": "File"
     })
     def vcf_file(self, request, sample_processing=None):
-        vcf_file = ""
+        vcf_file = {}
         """Map the vcf file to be digested
         Currently we have a single file on processed_files field of sample processing"""
         if not sample_processing:
