@@ -19,6 +19,15 @@ $search-results-header-row-height: 52px; // 46px is existing default for both re
 .search-result-row .result-table-row .search-result-column-block {
 
 	> .inner .multi-field-cell {
+		flex: 1 1 0px;
+		width: 100%;
+
+		.top-row,
+		.col-date,
+		.col-main {
+			@extend .text-ellipsis-container;
+		}
+
 		.top-row {
 			display: flex;
 			justify-content: space-between;
@@ -32,7 +41,6 @@ $search-results-header-row-height: 52px; // 46px is existing default for both re
 			margin: 0;
 			font-weight: 400;
 			text-align: center;
-			@extend .text-ellipsis-container;
 		}
 	}
 

@@ -31,12 +31,12 @@ function renderAdvancedColumn(topLeft, status, main, dateTitle, date) {
                 <span className="col-topleft">
                     { topLeft }
                 </span>
-                <i className="item-status-indicator-dot mr-07" data-status={status}/>
+                <i className="item-status-indicator-dot ml-07" data-status={status}/>
             </div>
-            <h4 className="col-main text-ellipsis-container">
+            <h4 className="col-main">
                 { main || "-" }
             </h4>
-            <div className="col-date text-ellipsis-container" style={{ textAlign: "center", fontSize: "12px" }}>
+            <div className="col-date" style={{ textAlign: "center", fontSize: "12px" }}>
                 <strong>{dateTitle} </strong>
                 <LocalizedTime timestamp={date} formatType="date-sm" />
             </div>
@@ -67,6 +67,7 @@ function findSelectedCaseSample(allSamples, selectedIndividual){
     return null;
 }
 
+/** Used to show "Case.individual" ('Individual' item-type) */
 export const DisplayTitleColumnIndividual = React.memo(function DisplayTitleIndividualDefault({ result, link, onClick }) {
     // `href` and `context` reliably refer to search href and context here, i.e. will be passed in from VirtualHrefController.
     const title = itemUtil.getTitleStringFromContext(result); // Gets display_title || title || accession || ...
@@ -137,23 +138,22 @@ export const columnExtensionMap = {
         'widthMap' : { 'lg' : 280, 'md' : 250, 'sm' : 200 },
         'render' : function renderCaseColumn (result, parentProps) {
             const {
+                '@id' : resultHref,
                 '@type' : itemTypeList = ["Item"],
-                last_modified = {},
+                last_modified: { date_modified } = {},
                 status = null,
                 accession = null,
-                aliases = [],
+                aliases: [ firstAlias ] = [],
                 display_title
             } = result;
 
-            // console.log("result", result);
+            const link = <a href={resultHref}>{ firstAlias || display_title }</a>;
+
             if (itemTypeList[0] === "Case") {
-                return (
-                    <a href={result['@id']} style={{ color: "inherit", textDecoration: "inherit" }}>
-                        {renderAdvancedColumn(accession, status, aliases[0] || display_title, "Last Modified:", last_modified.date_modified || null)}
-                    </a>
-                );
+                return renderAdvancedColumn(accession, status, link, "Last Modified:", date_modified || null);
             }
-            return (<a href={result['@id']}> {aliases[0] || display_title } </a>);
+
+            return link;
         }
     },
     'individual': {
