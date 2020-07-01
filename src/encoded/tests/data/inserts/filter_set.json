@@ -24,11 +24,11 @@
 
             {
                 "name": "Flag1",
-                "query": "&variant.transcript.vep_clin_sig=benign%26uncertain_significance&filesampletag"
+                "query": "&variant.transcript.vep_clin_sig=benign%26uncertain_significance"
             },
             {
                 "name": "Flag2",
-                "query": "&variant.genes.genes_most_severe_consequence.impact=MODERATE"
+                "query": "&variant.CHROM=1"
             }
         ]
     }
