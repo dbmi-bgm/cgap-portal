@@ -170,21 +170,22 @@ class Case(Item):
     @calculated_property(schema={
         "title": "VCF File",
         "description": "VCF file that will be used in variant digestion",
-        "type": "string",
-        "LinkTo": "FileProcessed"
+        "type": "string"
     })
     def vcf_file(self, request, sample_processing=None):
+        vcf_file = ""
         """Map the vcf file to be digested
         Currently we have a single file on processed_files field of sample processing"""
         if not sample_processing:
-            return {}
+            return vcf_file
         sp_data = get_item_or_none(request, sample_processing, 'sample-processings')
         if not sp_data:
-            return {}
+            return vcf_file
         files = sp_data.get('processed_files', [])
         if not files:
-            return {}
-        return files[0]
+            return vcf_file
+        vcf_file = files[0]
+        return vcf_file
 
     @calculated_property(schema={
         "title": "Filter Set Flag add-on",
