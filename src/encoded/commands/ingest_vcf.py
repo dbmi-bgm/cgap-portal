@@ -544,7 +544,7 @@ def main():
             hms-dbmi hms-dbmi production.ini --app-name app --post-inserts
     """
     logging.basicConfig()
-    parser = argparse.ArgumentParser(
+    parser = argparse.ArgumentParser(  # noqa - PyCharm wrongly thinks the formatter_class is invalid
         description="Ingests a given VCF file",
         epilog=EPILOG,
         formatter_class=argparse.RawDescriptionHelpFormatter

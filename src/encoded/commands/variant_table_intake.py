@@ -568,7 +568,7 @@ def main():
 
     """
     logging.basicConfig()
-    parser = argparse.ArgumentParser(
+    parser = argparse.ArgumentParser(  # noqa - PyCharm wrongly thinks the formatter_class is invalid
         description="Takes in a mapping table and produces inserts/schemas",
         epilog=EPILOG,
         formatter_class=argparse.RawDescriptionHelpFormatter

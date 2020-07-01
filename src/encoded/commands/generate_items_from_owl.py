@@ -583,7 +583,7 @@ def write_outfile(terms, filename, pretty=False):
         write to file by default as a json list or if pretty
         then same with indents and newlines
     '''
-    with open(filename, 'w') as outfile:
+    with io.open(filename, 'w') as outfile:
         if pretty:
             json.dump(terms, outfile, indent=4)
         else:
@@ -591,7 +591,7 @@ def write_outfile(terms, filename, pretty=False):
 
 
 def get_args(args):
-    parser = argparse.ArgumentParser(
+    parser = argparse.ArgumentParser(  # noqa - PyCharm wrongly thinks the formatter_class is invalid
         description="Process specified Ontologies and create OntologyTerm inserts for updates",
         epilog=EPILOG,
         formatter_class=argparse.RawDescriptionHelpFormatter,
@@ -655,7 +655,7 @@ def post_report_document_to_portal(connection, itype, logfile):
     attach_fn = None
     if os.path.isfile(logfile):
         attach_fn = '{}_update_report_{}.txt'.format(itype, date)
-        with open(logfile, 'rb') as at:
+        with io.open(logfile, 'rb') as at:
             data = at.read()
             data_href = 'data:%s;base64,%s' % (mimetype, b64encode(data).decode('ascii'))
             attach = {'download': attach_fn, 'type': mimetype, 'href': data_href}

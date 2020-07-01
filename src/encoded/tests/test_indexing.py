@@ -145,8 +145,11 @@ def test_create_mapping_on_indexing(app, testapp, registry, elasticsearch):
     # check that mappings and settings are in index
     for item_type in item_types:
         item_mapping = type_mapping(registry[TYPES], item_type)
-        namespaced_index = get_namespaced_index(app, item_type)
-        item_index = es.indices.get(index=namespaced_index)
+        try:
+            namespaced_index = get_namespaced_index(app, item_type)
+            item_index = es.indices.get(index=namespaced_index)
+        except Exception as e:
+            raise AssertionError("Attempt to get index for %s failed: %s" % (item_type, e))
         found_index_mapping_emb = item_index[namespaced_index]['mappings'][item_type]['properties']['embedded']
         found_index_settings = item_index[namespaced_index]['settings']
         assert found_index_mapping_emb

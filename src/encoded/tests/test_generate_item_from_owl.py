@@ -1,16 +1,16 @@
+import copy
 import io
 import json
 import os
 import pytest
-import copy
-from io import StringIO
 
 from collections import OrderedDict
 from dcicutils import s3_utils
-from rdflib import URIRef
+# from rdflib import URIRef
 from unittest import mock
 from ..commands import generate_items_from_owl as gifo
 from ..commands.owltools import Owler
+from ..util import MockFileSystem
 
 
 pytestmark = [pytest.mark.setone, pytest.mark.working]
@@ -96,12 +96,13 @@ TEST_KEYS_FILE_CONTENTS = '{"%(key_name)s": %(key_val)s}' % {
     "key_val": TEST_KEYS_STORED
 }
 
+
 def test_connect2server_w_key_and_keyfile(connection):
     keyfile = "some.file"
     def mocked_open(filename, mode):
         assert filename == keyfile
         assert mode == 'r'
-        return StringIO(TEST_KEYS_FILE_CONTENTS)
+        return io.StringIO(TEST_KEYS_FILE_CONTENTS)
     with mock.patch.object(os.path, 'isfile', return_value=True):
         with mock.patch.object(io, "open", side_effect=mocked_open):
             retval = gifo.connect2server(None, keyfile=keyfile, key=TEST_KEYS_FILE_KEY)
@@ -789,24 +790,36 @@ def test_identify_item_updates_set_obsolete_true_do_not_patch_obsolete_term(term
             assert not to_update
 
 
-def test_write_outfile_pretty(simple_terms):
-    filename = 'tmp_test_file'
-    gifo.write_outfile(list(simple_terms.values()), filename, pretty=True)
-    infile = open(filename, 'r')
-    result = json.load(infile)
-    print(result)
-    for r in result:
-        assert r in simple_terms.values()
-    os.remove(filename)
+def test_write_outfile(simple_terms):
 
+    print("simple_terms =", simple_terms)
 
-def test_write_outfile_notpretty(simple_terms):
-    print(simple_terms)
-    filename = 'tmp_test_file'
-    gifo.write_outfile(list(simple_terms.values()), filename)
-    with open(filename, 'r') as infile:
-        for l in infile:
-            result = json.loads(l)
-            for v in simple_terms.values():
-                assert v in result
-    os.remove(filename)
+    with mock.patch.object(io, "open") as mock_open:
+
+        mock_file_system = MockFileSystem()
+
+        mock_open.side_effect = mock_file_system.open
+
+        # Test the pretty=True case
+
+        filename = 'test_write_outfile_pretty.json'
+        gifo.write_outfile(list(simple_terms.values()), filename, pretty=True)
+        # The simulated write to a file will have gone to our output_stream,
+        # so we have to load from there.
+        infile = io.open(filename, 'r')
+        result = json.load(infile)
+        print("result (pretty) =", result)
+        for r in result:
+            assert r in simple_terms.values()
+
+        # Test the pretty=False case
+
+        filename = 'test_write_outfile_not_pretty.json'
+        gifo.write_outfile(list(simple_terms.values()), filename)
+        with io.open(filename, 'r') as infile:
+            for i, line in enumerate(infile):
+                assert i == 0, "Expected non-pretty output to be all on one line."
+                result = json.loads(line)
+                print("incremental (non-pretty) result=", result)
+                for v in simple_terms.values():
+                    assert v in result

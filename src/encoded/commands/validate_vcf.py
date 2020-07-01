@@ -28,7 +28,7 @@ class VCFValidator(object):
 
 
 def main():
-    parser = argparse.ArgumentParser(
+    parser = argparse.ArgumentParser(  # noqa - PyCharm wrongly thinks the formatter_class is invalid
         description="Ingests a given VCF file",
         epilog=EPILOG,
         formatter_class=argparse.RawDescriptionHelpFormatter
