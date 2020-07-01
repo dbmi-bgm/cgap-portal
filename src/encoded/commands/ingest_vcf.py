@@ -237,7 +237,7 @@ class VCFParser(object):
         elif type == 'number':
             try:
                 return float(value)
-            except:
+            except Exception:
                 return float(value[0])
         elif type == 'boolean':
             if value == '0':
@@ -544,7 +544,7 @@ def main():
             hms-dbmi hms-dbmi production.ini --app-name app --post-inserts
     """
     logging.basicConfig()
-    parser = argparse.ArgumentParser(
+    parser = argparse.ArgumentParser(  # noqa - PyCharm wrongly thinks the formatter_class is invalid
         description="Ingests a given VCF file",
         epilog=EPILOG,
         formatter_class=argparse.RawDescriptionHelpFormatter
@@ -582,7 +582,7 @@ def main():
             vcf_parser.format_variant_sub_embedded_objects(variant)
             try:
                 res = app_handle.post_json('/variant', variant, status=201).json['@graph'][0]  # only one item posted
-            except:
+            except Exception:
                 print('Failed validation')  # some variant gene linkTos do not exist
                 continue
             variant_samples = vcf_parser.create_sample_variant_from_record(record)

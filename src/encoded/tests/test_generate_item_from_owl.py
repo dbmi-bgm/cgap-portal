@@ -1,13 +1,17 @@
+import contextlib
+import copy
+import io
 import json
 import os
 import pytest
-import copy
-from io import StringIO
 
 from collections import OrderedDict
-from rdflib import URIRef
+from dcicutils import s3_utils
+# from rdflib import URIRef
+from unittest import mock
 from ..commands import generate_items_from_owl as gifo
 from ..commands.owltools import Owler
+from ..util import MockFileSystem
 
 
 pytestmark = [pytest.mark.setone, pytest.mark.working]
@@ -64,18 +68,42 @@ def mkd_class():
     return gifo.convert2URIRef('http://purl.obolibrary.org/obo/HP_0000003')
 
 
-def test_connect2server_w_env(mocker, connection):
-    # parameters we pass in don't really matter
-    key = "{'server': 'https://cgap.hms.harvard.edu/', 'key': 'testkey', 'secret': 'testsecret'}"
-    mocker.patch('encoded.commands.generate_items_from_owl.get_authentication_with_server', return_value=connection)
-    retval = gifo.connect2server('fourfront-cgap')
-    assert retval == connection
+TEST_KEYS_ENV = 'fourfront-cgap-simulated'
+TEST_KEYS_STORED = '{"server": "https://cgap-simulated.hms.harvard.edu/", "key": "testkey", "secret": "testsecret"}'
+# NOTE: the trailing '/' gets removed along the way. -kmp 21-Jun-2020
+TEST_KEYS_RETURNED = {"server": "https://cgap-simulated.hms.harvard.edu", "key": "testkey", "secret": "testsecret"}
 
 
-def test_connect2server_w_key(mocker, connection):
-    # TODO need to mock file open read etc to get this to work
-    mocker.patch('encoded.commands.generate_items_from_owl.os.path.isfile', return_value=True)
-    pass
+class MockS3UtilsForAccessKeys:
+    def __init__(self, env):
+        assert env == TEST_KEYS_ENV
+    def get_access_keys(self):
+        return json.loads(TEST_KEYS_STORED)
+
+def test_connect2server_w_env(connection):
+    non_dictionary = object()
+    with mock.patch.object(s3_utils, "s3Utils", MockS3UtilsForAccessKeys):
+        retval = gifo.connect2server(TEST_KEYS_ENV, key=non_dictionary)
+        assert retval == TEST_KEYS_RETURNED
+
+
+TEST_KEYS_FILE_KEY = "applesauce"
+TEST_KEYS_FILE_CONTENTS = '{"%(key_name)s": %(key_val)s}' % {
+    "key_name": TEST_KEYS_FILE_KEY,
+    "key_val": TEST_KEYS_STORED
+}
+
+
+def test_connect2server_w_key_and_keyfile(connection):
+    keyfile = "some.file"
+    def mocked_open(filename, mode):
+        assert filename == keyfile
+        assert mode == 'r'
+        return io.StringIO(TEST_KEYS_FILE_CONTENTS)
+    with mock.patch.object(os.path, 'isfile', return_value=True):
+        with mock.patch.object(io, "open", side_effect=mocked_open):
+            retval = gifo.connect2server(None, keyfile=keyfile, key=TEST_KEYS_FILE_KEY)
+            assert retval == TEST_KEYS_RETURNED
 
 
 def test_prompt_check_for_output_options_w_load_y_and_file(monkeypatch, mock_logger):
@@ -759,24 +787,36 @@ def test_identify_item_updates_set_obsolete_true_do_not_patch_obsolete_term(mock
     assert not to_update
 
 
-def test_write_outfile_pretty(simple_terms):
-    filename = 'tmp_test_file'
-    gifo.write_outfile(list(simple_terms.values()), filename, pretty=True)
-    infile = open(filename, 'r')
-    result = json.load(infile)
-    print(result)
-    for r in result:
-        assert r in simple_terms.values()
-    os.remove(filename)
+def test_write_outfile(simple_terms):
 
+    print("simple_terms =", simple_terms)
 
-def test_write_outfile_notpretty(simple_terms):
-    print(simple_terms)
-    filename = 'tmp_test_file'
-    gifo.write_outfile(list(simple_terms.values()), filename)
-    with open(filename, 'r') as infile:
-        for l in infile:
-            result = json.loads(l)
-            for v in simple_terms.values():
-                assert v in result
-    os.remove(filename)
+    with mock.patch.object(io, "open") as mock_open:
+
+        mock_file_system = MockFileSystem()
+
+        mock_open.side_effect = mock_file_system.open
+
+        # Test the pretty=True case
+
+        filename = 'test_write_outfile_pretty.json'
+        gifo.write_outfile(list(simple_terms.values()), filename, pretty=True)
+        # The simulated write to a file will have gone to our output_stream,
+        # so we have to load from there.
+        infile = io.open(filename, 'r')
+        result = json.load(infile)
+        print("result (pretty) =", result)
+        for r in result:
+            assert r in simple_terms.values()
+
+        # Test the pretty=False case
+
+        filename = 'test_write_outfile_not_pretty.json'
+        gifo.write_outfile(list(simple_terms.values()), filename)
+        with io.open(filename, 'r') as infile:
+            for i, line in enumerate(infile):
+                assert i == 0, "Expected non-pretty output to be all on one line."
+                result = json.loads(line)
+                print("incremental (non-pretty) result=", result)
+                for v in simple_terms.values():
+                    assert v in result

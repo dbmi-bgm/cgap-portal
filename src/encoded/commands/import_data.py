@@ -72,7 +72,7 @@ def main():
         ALLOWED_METHODS.append('PATCH')
 
     import argparse
-    parser = argparse.ArgumentParser(
+    parser = argparse.ArgumentParser(  # noqa - PyCharm wrongly thinks the formatter_class is invalid
         description="Import data", epilog=EPILOG,
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )

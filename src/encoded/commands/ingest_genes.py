@@ -62,7 +62,7 @@ def main():
             path_to_genes (str): path to genes to ingest
     """
     logging.basicConfig()
-    parser = argparse.ArgumentParser(
+    parser = argparse.ArgumentParser(  # noqa - PyCharm wrongly thinks the formatter_class is invalid
         description="Ingests a given gene file containing JSON formatted genes",
         epilog=EPILOG,
         formatter_class=argparse.RawDescriptionHelpFormatter
