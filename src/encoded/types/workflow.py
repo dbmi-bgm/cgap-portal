@@ -697,6 +697,7 @@ class Workflow(Item):
 
 @collection(
     name='workflow-runs',
+    unique_key='accession',
     properties={
         'title': 'Workflow Runs',
         'description': 'Listing of executions of 4DN analysis workflows',
@@ -706,6 +707,7 @@ class WorkflowRun(Item):
 
     item_type = 'workflow_run'
     schema = load_schema('encoded:schemas/workflow_run.json')
+    name_key = 'accession'
     embedded_list = (
         Item.embedded_list +
         # lab_award_attribution_embed_list +
