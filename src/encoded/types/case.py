@@ -186,3 +186,22 @@ class Case(Item):
             return {}
         return files[0]
 
+    @calculated_property(schema={
+        "title": "Filter Set Flag add-on",
+        "description": "tag to be added to the filter set flag for limiting search to varants/sample variants from this case",
+        "type": "string"
+    })
+    def filter_set_flag_addon(self, request, sample_processing=None, individual=None):
+        """use vcf file and sample accessions to limit variant/variantsample to this case"""
+        if not individual or not sample_processing:
+            return ''
+        sample = self.sample(request, individual, sample_processing)
+        if not sample:
+            return ''
+        vcf = self.vcf_file(request, sample_processing)
+        if not vcf:
+            return ''
+        sample_acc = sample.split('/')[2]
+        vcf_acc = vcf.split('/')[2]
+        add_on = "&sample={}&file={}".format(sample_acc, vcf_acc)
+        return add_on
