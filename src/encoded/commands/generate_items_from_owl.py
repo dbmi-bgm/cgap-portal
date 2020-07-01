@@ -1,5 +1,6 @@
 import argparse
 from datetime import datetime
+import io
 import logging
 import logging.config
 import json
@@ -309,7 +310,7 @@ def connect2server(env=None, key=None, keyfile=None, logger=None):
     if key and keyfile:
         keys = None
         if os.path.isfile(keyfile):
-            with open(keyfile, 'r') as kf:
+            with io.open(keyfile, 'r') as kf:
                 keys_json_string = kf.read()
                 keys = json.loads(keys_json_string)
         if keys:
@@ -582,7 +583,7 @@ def write_outfile(terms, filename, pretty=False):
         write to file by default as a json list or if pretty
         then same with indents and newlines
     '''
-    with open(filename, 'w') as outfile:
+    with io.open(filename, 'w') as outfile:
         if pretty:
             json.dump(terms, outfile, indent=4)
         else:
@@ -654,7 +655,7 @@ def post_report_document_to_portal(connection, itype, logfile):
     attach_fn = None
     if os.path.isfile(logfile):
         attach_fn = '{}_update_report_{}.txt'.format(itype, date)
-        with open(logfile, 'rb') as at:
+        with io.open(logfile, 'rb') as at:
             data = at.read()
             data_href = 'data:%s;base64,%s' % (mimetype, b64encode(data).decode('ascii'))
             attach = {'download': attach_fn, 'type': mimetype, 'href': data_href}
