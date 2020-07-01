@@ -1,7 +1,9 @@
 import pytest
 import time
+import mock
+import datetime
 from uuid import uuid4
-from ..ingestion_listener import IngestionQueueManager
+from ..ingestion_listener import IngestionQueueManager, gunzip_content, run
 
 
 QUEUE_INGESTION_URL = '/queue_ingestion'
@@ -74,20 +76,44 @@ def vcf_file_format(testapp, project, institution):
 def mocked_vcf_file(vcf_file_format, testapp, project, institution):
     """ Posts a processed VCF File """
     f = {
+        'uuid': 'cd679bdc-8691-4352-a25b-1c5f48407e9b',
+        'accession': 'GAPFIPYY5V7Y',
         'project': project['@id'],
         'institution': institution['@id'],
-        'filename': 'GAPIDABCD123.vcf.gz',
+        'filename': 'GAPFIPYY5V7Y.vcf.gz',
         'file_format': 'vcf_gz'
     }
     return testapp.post_json('/file_processed', f, status=201).json
 
 
+@pytest.mark.integrated  # uses s3
 def test_posting_vcf_processed_file(testapp, mocked_vcf_file):
     """ Posts a dummy vcf file """
-    pass
+    import requests  # XXX: C4-211 this should NOT be necessary - there is a bug somewhere
+    file_meta = mocked_vcf_file['@graph'][0]
+    file_location = testapp.get(file_meta['href']).location  # if you .follow() this you get 404 erroneously
+    content = requests.get(file_location).content
+    raw_vcf_file = gunzip_content(content)
+    assert "##fileformat=VCFv4.2" in raw_vcf_file
 
 
-def test_ingestion_listener_run(testapp, mocked_vcf_file):
-    """ Tests the 'run' method of ingestion listener """
-    pass
+def test_ingestion_listener_run(testapp, mocked_vcf_file, setup_and_teardown_sqs_state):
+    """ Tests the 'run' method of ingestion listener, which will pull down and ingest a vcf file
+        from the SQS queue.
+    """
+    file_meta = mocked_vcf_file['@graph'][0]
+    uuid = file_meta['uuid']
+    queue_manager = setup_and_teardown_sqs_state
+    queue_manager.add_uuids([uuid])
+    time.sleep(5)
 
+    # configure run for 10 seconds
+    start_time = datetime.datetime.utcnow()
+    end_delta = datetime.timedelta(seconds=10)
+
+    def mocked_should_remain_online():
+        current_time = datetime.datetime.utcnow()
+        return current_time < (start_time + end_delta)
+
+    with mock.patch('encoded.ingestion_listener.should_remain_online', new=mocked_should_remain_online):
+        run(testapp, _queue_manager=queue_manager)

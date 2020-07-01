@@ -1,4 +1,3 @@
-import os
 import boto3
 import time
 import socket
@@ -6,6 +5,8 @@ import argparse
 import structlog
 import datetime
 import json
+import gzip
+from io import BytesIO
 from botocore.exceptions import ClientError
 from pyramid.view import view_config
 from dcicutils.misc_utils import VirtualApp
@@ -190,7 +191,7 @@ class IngestionQueueManager:
             * Makes a boto3 API Call to do so *
         """
         response = self.client.get_queue_attributes(
-            QueueUrl=self.queue_name,
+            QueueUrl=self.queue_url,
             AttributeNames=[
                 'ApproximateNumberOfMessages',
                 'ApproximateNumberOfMessagesNotVisible'
@@ -234,17 +235,26 @@ def should_remain_online(override=None):
     return override()
 
 
-def run(vapp):
+def gunzip_content(content):
+    """ Helper that will gunzip content """
+    f_in = BytesIO()
+    f_in.write(content)
+    f_in.seek(0)
+    with gzip.GzipFile(fileobj=f_in, mode='rb') as f:
+        gunzipped_content = f.read()
+    return gunzipped_content.decode()
+
+
+def run(vapp, _queue_manager=None):
     """ Entry-point for the ingestion listener. """
     log.info('Ingestion Listener starting...')
 
     # ensure ES is up to date. Note that this operation in effect SLOWS Elasticsearch
     # we should investigate whether this is really necessary -Will 06/30/2020
-    es = vapp.app.registry[ELASTIC_SEARCH]
-    es.info()
+    # es = vapp.app.registry[ELASTIC_SEARCH]
+    # es.info()
 
-    queue_manager = IngestionQueueManager(vapp.app.registry)
-
+    queue_manager = IngestionQueueManager(vapp.app.registry) if not _queue_manager else _queue_manager
     while should_remain_online():
         n_waiting, n_in_flight = queue_manager.get_counts()
         if n_waiting == 0 and n_in_flight > 0:
@@ -256,8 +266,31 @@ def run(vapp):
 
             # ingest each VCF file
             for message in messages:
-                # get the uuid
-                import pdb; pdb.set_trace()
+                body = json.loads(message['Body'])
+                uuid = body['uuid']
+
+                # locate file meta data
+                try:
+                    file_meta = vapp.get('/' + uuid).follow().json
+                    location = vapp.get(file_meta['href']).location
+                except Exception as e:
+                    log.error('Could not locate uuid: %s with error: %s' % (uuid, e))
+                    continue
+
+                # attempt download with workaround
+                try:
+                    import requests  # XXX: C4-211 should not be needed but is
+                    raw_content = requests.get(location).content
+                except Exception as e:
+                    log.error('Could not download file uuid: %s with error: %s' % (uuid, e))
+                    continue
+
+                # gunzip content
+                decoded_content = gunzip_content(raw_content)
+
+                # TODO: ingest the VCF File
+                pass
+
 
 
 def main():
