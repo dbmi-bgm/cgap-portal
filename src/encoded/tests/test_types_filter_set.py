@@ -14,7 +14,12 @@ def barebones_filter_set():
     """ A filter set with only the flag that designates the type """
     return {
         'search_type': 'Variant',
-        'flags': '?type=Variant',
+        'flags': [
+            {
+                'name': 'variant',
+                'query': '?type=Variant'
+            }
+        ],
         'project': 'hms-dbmi',
         'institution': 'hms-dbmi'
     }
@@ -28,10 +33,15 @@ def simple_filter_set():
         'filter_blocks': [
             {
                 'query': 'REF=G&ALT=A',
-                'flag_applied': True
+                'flags_applied': ['variant']
             }
         ],
-        'flags': '?type=Variant',
+        'flags': [
+            {
+                'name': 'variant',
+                'query': '?type=Variant'
+            }
+        ],
         'project': 'hms-dbmi',
         'institution': 'hms-dbmi'
     }
@@ -45,14 +55,19 @@ def typical_filter_set():
         'filter_blocks': [
             {
                 'query': 'ALT=T&hg19.hg19_chrom=chr1',
-                'flag_applied': True
+                'flags_applied': ['variant']
             },
             {
                 'query': 'REF=G&ALT=A',
-                'flag_applied': True
+                'flags_applied': ['variant']
             },
         ],
-        'flags': '?type=Variant',
+        'flags': [
+            {
+                'name': 'variant',
+                'query': '?type=Variant'
+            }
+        ],
         'project': 'hms-dbmi',
         'institution': 'hms-dbmi'
     }
@@ -66,18 +81,23 @@ def complex_filter_set():
         'filter_blocks': [
             {
                 'query': 'ALT=T&hg19.hg19_chrom=chr1',
-                'flag_applied': True
+                'flags_applied': ['variant_chrom']
             },
             {
                 'query': 'REF=G&ALT=A',
-                'flag_applied': True
+                'flags_applied': ['variant_chrom']
             },
             {
                 'query': 'POS.from=0&POS.to=12125898',
-                'flag_applied': True
+                'flags_applied': ['variant_chrom']
             }
         ],
-        'flags': '?type=Variant&CHROM=1',
+        'flags': [
+            {
+                'name': 'variant_chrom',
+                'query': '?type=Variant&CHROM=1'
+            }
+        ],
         'project': 'hms-dbmi',
         'institution': 'hms-dbmi',
         'uuid': '5145195f-c203-41be-9642-7ba6fb4bfb16'
@@ -108,14 +128,24 @@ def test_filter_set_barebones(workbook, testapp, barebones_filter_set):
 
     # execute given flags only
     compound_search_res = testapp.post_json(COMPOUND_SEARCH_URL, {
-        'flags': '?type=project',
+        'flags': [  # should have no effect, since no filter_blocks toggle it
+            {
+                'name': 'project',
+                'query': '?type=Project'
+            }
+        ],
         'search_type': 'Project'  # NOTE: will work since we are not actually validating this
     }).json['@graph']
     assert len(compound_search_res) == 1
 
     # do it again, this time with a type that will return 404
     testapp.post_json(COMPOUND_SEARCH_URL, {
-        'flags': '?type=gene',
+        'flags': [  # should have no effect, since no filter_blocks toggle it
+            {
+                'name': 'gene',
+                'query': '?type=Gene'
+            }
+        ],
         'search_type': 'Gene'
     }, status=404)
 
@@ -130,7 +160,7 @@ def test_filter_set_simple(workbook, testapp, simple_filter_set):
     compound_search_res = testapp.post_json(COMPOUND_SEARCH_URL, {
                                                 'filter_blocks': [{
                                                     'query': 'type=variant&CHROM=1',
-                                                    'flag_applied': True
+                                                    'flags_applied': []
                                                 }],
                                                 'search_type': 'Variant'
                                             }).json['@graph']
@@ -138,7 +168,12 @@ def test_filter_set_simple(workbook, testapp, simple_filter_set):
 
     # execute given flags only
     compound_search_res = testapp.post_json('/compound_search', {
-        'flags': '?type=project',
+        'flags': [  # should have no effect, since no filter_blocks toggle it
+            {
+                'name': 'project',
+                'query': '?type=Project'
+            }
+        ],
         'search_type': 'Project'
     }).json['@graph']
     assert len(compound_search_res) == 1
@@ -147,9 +182,14 @@ def test_filter_set_simple(workbook, testapp, simple_filter_set):
     compound_search_res = testapp.post_json(COMPOUND_SEARCH_URL, {
         'filter_blocks': [{
             'query': 'CHROM=1',
-            'flag_applied': True
+            'flags_applied': ['variant']
         }],
-        'flags': 'type=variant',
+        'flags': [
+            {
+                'name': 'variant',
+                'query': '?type=Variant'
+            }
+        ],
         'search_type': 'Variant'
     }).json['@graph']
     assert len(compound_search_res) == 4

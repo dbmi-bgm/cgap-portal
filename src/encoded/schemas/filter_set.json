@@ -39,6 +39,7 @@
                 "properties": {
                     "name": {
                         "title": "Name",
+                        "type": "string",
                         "description": "Name of the filter block"
                     },
                     "query": {
@@ -69,6 +70,7 @@
                 "properties": {
                     "name": {
                         "title": "Name",
+                        "type": "string",
                         "description": "Name of the flag"
                     },
                     "query": {
