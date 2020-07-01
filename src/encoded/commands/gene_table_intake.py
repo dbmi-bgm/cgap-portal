@@ -99,7 +99,7 @@ def main():
                src/encoded/schemas/gene.json development.ini --app-name app --post-inserts
     """
     logging.basicConfig()
-    parser = argparse.ArgumentParser(
+    parser = argparse.ArgumentParser(  # noqa - PyCharm wrongly thinks the formatter_class is invalid
         description="Takes in a variant mapping table and produces variant related inserts/schemas",
         epilog=EPILOG,
         formatter_class=argparse.RawDescriptionHelpFormatter
