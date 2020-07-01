@@ -295,48 +295,21 @@ class Family(Item):
             Converter[gg_parent + '-s'] = 'granduncle'
             Converter[gg_parent + '-d'] = 'grandaunt'
             Converter[gg_parent + '-c'] = 'grandauncle'
-        # add Cousin
-        all_auncle = [i for i in Converter if Converter[i] in ['uncle', 'aunt', 'auncle']]
-        for auncle in all_auncle:
-            Converter[auncle + '-s'] = 'cousin'
-            Converter[auncle + '-d'] = 'cousin'
-            Converter[auncle + '-c'] = 'cousin'
-        # add Cousin once removed (descendant)
-        all_cousins = [i for i in Converter if Converter[i] in ['cousin']]
-        for cousin in all_cousins:
-            Converter[cousin + '-s'] = 'cousin once removed (descendant)'
-            Converter[cousin + '-d'] = 'cousin once removed (descendant)'
-            Converter[cousin + '-c'] = 'cousin once removed (descendant)'
-        # add Cousin twice removed (descendant)
-        all_cousins_o_r = [i for i in Converter if Converter[i] in ['cousin once removed (descendant)']]
-        for cousin in all_cousins_o_r:
-            Converter[cousin + '-s'] = 'cousin twice removed (descendant)'
-            Converter[cousin + '-d'] = 'cousin twice removed (descendant)'
-            Converter[cousin + '-c'] = 'cousin twice removed (descendant)'
-        # add First cousin once removed (ascendant)
-        all_g_auncle = [i for i in Converter if Converter[i] in ['granduncle', 'grandaunt', 'grandauncle']]
-        for g_auncle in all_g_auncle:
-            Converter[g_auncle + '-s'] = 'cousin once removed (ascendant)'
-            Converter[g_auncle + '-d'] = 'cousin once removed (ascendant)'
-            Converter[g_auncle + '-c'] = 'cousin once removed (ascendant)'
-        # add Second Cousin
-        all_cora = [i for i in Converter if Converter[i] in ['cousin once removed (ascendant)']]
-        for cora in all_cora:
-            Converter[cora + '-s'] = 'second cousin'
-            Converter[cora + '-d'] = 'second cousin'
-            Converter[cora + '-c'] = 'second cousin'
-        # add Second Cousin once removed
-        all_s_cousins = [i for i in Converter if Converter[i] in ['second cousin']]
-        for s_cousin in all_s_cousins:
-            Converter[s_cousin + '-s'] = 'second cousin once removed (descendant)'
-            Converter[s_cousin + '-d'] = 'second cousin once removed (descendant)'
-            Converter[s_cousin + '-c'] = 'second cousin once removed (descendant)'
-        # add Second Cousin twice removed
-        all_s_cousins_o_r = [i for i in Converter if Converter[i] in ['second cousin once removed (descendant)']]
-        for s_cousin_o_r in all_s_cousins_o_r:
-            Converter[s_cousin_o_r + '-s'] = 'second cousin twice removed (descendant)'
-            Converter[s_cousin_o_r + '-d'] = 'second cousin twice removed (descendant)'
-            Converter[s_cousin_o_r + '-c'] = 'second cousin twice removed (descendant)'
+        # given a relation, map the new relation for that relations children when new role is gender independent
+        children_roles = [
+            {'roles': ['uncle', 'aunt', 'auncle'], 'children': 'cousin'},
+            {'roles': ['cousin'], 'children': 'cousin once removed (descendant)'},
+            {'roles': ['cousin once removed (descendant)'], 'children': 'cousin twice removed (descendant)'},
+            {'roles': ['granduncle', 'grandaunt', 'grandauncle'], 'children': 'cousin once removed (ascendant)'},
+            {'roles': ['cousin once removed (ascendant)'], 'children': 'second cousin'},
+            {'roles': ['second cousin'], 'children': 'second cousin once removed (descendant)'},
+            {'roles': ['second cousin once removed (descendant)'], 'children': 'second cousin twice removed (descendant)'},
+            ]
+        for an_extension in children_roles:
+            all_combinations = [i for i in Converter if Converter[i] in an_extension['roles']]
+            for a_combination in all_combinations:
+                for a_child_tag in ['-s', '-d', '-c']:
+                    Converter[a_combination + a_child_tag] = an_extension['children']
 
         # calculate direction change (if more then 2, not blood relative)
         def count_direction_change(relation_tag):
