@@ -26,19 +26,16 @@ export const DEFAULT_WIDTH_MAP = { 'lg' : 200, 'md' : 180, 'sm' : 120, 'xs' : 12
 
 function renderAdvancedColumn(topLeft, status, main, dateTitle, date) {
     return (
-        <div style={{ width: "100%" }}>
-            <div className="d-flex justify-content-between">
-                <span className="col-topleft text-ellipsis-container" style={{ fontSize: "13px", fontStyle: "italic" }}>
-                    {topLeft}
+        <div className="multi-field-cell">
+            <div className="top-row">
+                <span className="col-topleft">
+                    { topLeft }
                 </span>
                 <i className="item-status-indicator-dot mr-07" data-status={status}/>
             </div>
-            <div
-                className="col-main text-ellipsis-container"
-                style={{ textTransform: "uppercase", textAlign: "center", fontSize: "20px", fontWeight: "600" }}
-            >
-                {main || "-"}
-            </div>
+            <h4 className="col-main text-ellipsis-container">
+                { main || "-" }
+            </h4>
             <div className="col-date text-ellipsis-container" style={{ textAlign: "center", fontSize: "12px" }}>
                 <strong>{dateTitle} </strong>
                 <LocalizedTime timestamp={date} formatType="date-sm" />
@@ -47,7 +44,14 @@ function renderAdvancedColumn(topLeft, status, main, dateTitle, date) {
     );
 }
 
-/** @todo use as a memoized function in a reusable component later  */
+
+/**
+ * @todo
+ * Use as a memoized function in a reusable component later.
+ * Ideally we could have "SampleProcessingTableCell", "Sample...TableCell", which all use
+ * `findSelectedCaseSample` to grab current sample and then feed appropriate fields from it
+ * into `renderAdvancedColumn` (or the component that it'll eventually become)
+ */
 function findSelectedCaseSample(allSamples, selectedIndividual){
     const { '@id' : selectedID } = selectedIndividual || {};
 
@@ -66,12 +70,19 @@ function findSelectedCaseSample(allSamples, selectedIndividual){
 export const DisplayTitleColumnIndividual = React.memo(function DisplayTitleIndividualDefault({ result, link, onClick }) {
     // `href` and `context` reliably refer to search href and context here, i.e. will be passed in from VirtualHrefController.
     const title = itemUtil.getTitleStringFromContext(result); // Gets display_title || title || accession || ...
-
     const tooltip = (typeof title === "string" && title.length > 20 && title) || null;
+    const {
+        individual : {
+            display_title = null,
+            status = null,
+            date_created = null
+        } = {},
+        case_id = null
+    } = result;
 
     return (
-        <div key="title-container" className={`title-block d-flex flex-column`} data-tip={tooltip} data-delay-show={750}>
-            {renderAdvancedColumn(result.individual.display_title, result.individual.status, result.case_id, "Accessioned:", result.individual.date_created)}
+        <div key="title-container" className="title-block d-flex flex-column" data-tip={tooltip} data-delay-show={750}>
+            { renderAdvancedColumn(display_title, status, case_id, "Accessioned:", date_created) }
         </div>);
 });
 
@@ -125,8 +136,14 @@ export const columnExtensionMap = {
     'accession': {
         'widthMap' : { 'lg' : 280, 'md' : 250, 'sm' : 200 },
         'render' : function renderCaseColumn (result, parentProps) {
-            const { href, context, rowNumber, detailOpen, toggleDetailOpen } = parentProps;
-            const { '@type' : itemTypeList = ["Item"], last_modified = {}, status = null, accession = null, aliases = [], display_title } = result;
+            const {
+                '@type' : itemTypeList = ["Item"],
+                last_modified = {},
+                status = null,
+                accession = null,
+                aliases = [],
+                display_title
+            } = result;
 
             // console.log("result", result);
             if (itemTypeList[0] === "Case") {

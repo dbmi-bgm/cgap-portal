@@ -17,6 +17,25 @@ $search-results-header-row-height: 52px; // 46px is existing default for both re
 
 // Extensions to shared-portal-components searchview table(s):
 .search-result-row .result-table-row .search-result-column-block {
+
+	> .inner .multi-field-cell {
+		.top-row {
+			display: flex;
+			justify-content: space-between;
+		}
+		.top-row,
+		.col-date {
+			line-height: 20px;
+			white-space: nowrap;
+		}
+		.col-main {
+			margin: 0;
+			font-weight: 400;
+			text-align: center;
+			@extend .text-ellipsis-container;
+		}
+	}
+
 	&[data-field="display_title"] {
 		> .inner {
 			> .title-block {
@@ -24,6 +43,35 @@ $search-results-header-row-height: 52px; // 46px is existing default for both re
 			}
 		}
 	}
+
+
+	// Treat Individual col as display_title col for CaseView.
+	.search-view-controls-and-results[data-search-item-type="Case"] & {
+
+		&[data-first-visible-column] > .inner > .title-block {
+			max-height: none;
+			white-space: normal; // Allow to wrap by default (overrides SPC's default white-space: nowrap;) since we have tall-ish rows.
+		}
+
+		&[data-field="individual"] > .inner .multi-field-cell .col-main {
+			// Uppercase Individual's Identifier
+			text-transform: uppercase;
+		}
+
+
+		&[data-field="individual"][data-first-visible-column],
+		&[data-field="accession"] {
+			> .inner {
+				.col-topleft {
+					@extend .text-monospace;
+					font-size: 0.75em;
+				}
+			}
+		}
+
+
+	}
+	
 	&[data-field="status"] {
 		> .inner {
 			i.item-status-indicator-dot {

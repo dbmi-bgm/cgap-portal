@@ -23,59 +23,30 @@ import { Schemas } from './../util';
 import { transformedFacets } from './SearchView';
 
 
-function renderAdvancedColumn(topLeft, status, main, dateTitle, date) {
-    return( 
-        <div>
-            <div>
-                <span className="col-topleft" style={{ fontSize: "13px", fontStyle: "italic" }}>
-                    {topLeft} </span>
-                <i className="item-status-indicator-dot mr-07" data-status={status}/>
-            </div>
-            <span
-                className="d-block col-main"
-                style={{ textTransform: "uppercase", textAlign: "center", fontSize: "20px", fontWeight: "600" }}
-            >
-                {main}
-            </span>
-            <span className="d-block col-date" style={{ textAlign: "center" }}>
-                {dateTitle} 
-                <LocalizedTime timestamp={date} formatType="date-sm" />
-            </span>
-        </div>
-        );
-
-}
-
 
 /**
  * Should move this to CGAP at some point probably
  */
 export const DisplayTitleColumnIndividual = React.memo(function DisplayTitleIndividualDefault({ result, link, onClick }) {
-    const { email = null } = result;
+    const { display_title, status, individual_id, date_created } = result;
 
-    // `href` and `context` reliably refer to search href and context here, i.e. will be passed in from VirtualHrefController.
-    let title = itemUtil.getTitleStringFromContext(result); // Gets display_title || title || accession || ...
-
-    const tooltip = (typeof title === "string" && title.length > 20 && title) || null;
-    let hasPhoto = false;
-
-    if (link){ // This should be the case always
-        title = <a key="title" href={link || '#'} onClick={onClick}>{ title }</a>;
-        if (typeof email === 'string' && email.indexOf('@') > -1){
-            // Specific case for User items. May be removed or more cases added, if needed.
-            hasPhoto = true;
-            title = (
-                <React.Fragment>
-                    { itemUtil.User.gravatar(email, 32, { 'className' : 'in-search-table-title-image', 'data-tip' : email }, 'mm') }
-                    { title }
-                </React.Fragment>
-            );
-        }
-    }
-
-    return <div key="title-container" className={`title-block d-flex flex-column`} data-tip={tooltip} data-delay-show={750}>
-        {renderAdvancedColumn(result.display_title, result.status, result.individual_id, "Accessioned:", result.date_created)}
-    </div>;
+    return (
+        <div key="title-container" className="title-block d-flex flex-column" data-tip={tooltip} data-delay-show={750}>
+            <div>
+                <span className="col-topleft mr-05 text-mono" style={{ fontSize: "13px" }}>
+                    { display_title }
+                </span>
+                <i className="item-status-indicator-dot mr-07" data-status={status}/>
+            </div>
+            <span className="d-block col-main text-center text-600 text-uppercase" style={{ fontSize: "20px" }}>
+                { individual_id }
+            </span>
+            <span className="d-block col-date text-center">
+                <span className="mr-05">Accessioned:</span>
+                <LocalizedTime timestamp={date_created} formatType="date-sm" />
+            </span>
+        </div>
+    );
 });
 
 
