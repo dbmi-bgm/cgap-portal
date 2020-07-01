@@ -61,7 +61,7 @@ class CompoundSearchBuilder:
         return subreq
 
     @staticmethod
-    def combine_flags_and_block(flags, block):
+    def combine_query_strings(qstring1, qstring2):
         """ Builds a single URL query from the given flags and blocks.
 
         :param flags: flags, usually ? prefixed
@@ -74,7 +74,7 @@ class CompoundSearchBuilder:
         def merge_query_strings(x, y):
             return urllib.parse.urlencode(dict(query_str_to_dict(x), **query_str_to_dict(y)))
 
-        return merge_query_strings(flags, block)
+        return merge_query_strings(qstring1, qstring2)
 
     @staticmethod
     def format_filter_set_results(request, es_results, return_generator=False):
@@ -132,54 +132,68 @@ class CompoundSearchBuilder:
         """ Executes the given filter_set. This function contains the core functionality of the class.
             A filter_set with respect to this function is just a dictionary containing the following things:
                 1. 'search_type' is the item type we are executing on. Required.
-                2. 'filter_blocks' contains the filter blocks we would like to apply
-                3. 'flags' is a dictionary
+                2. 'filter_blocks' contains the filter blocks we would like to apply with named flags we
+                    would like to apply on this block as well
+                3. 'flags' is a dictionary containing named flags to be applied to individual filter_blocks
+                    by name.
 
                 NOTE: if neither 'flags' nor 'filter_blocks' is specified then a generic type=Item
-                search will be executed.
+                search will be executed. If just 'flags' is specified with no query
         """
         filter_blocks = filter_set.get(FILTER_BLOCKS, [])
         flags = filter_set.get(FLAGS, None)
         t = filter_set.get(cls.TYPE, 'Item')  # if type not set, attempt to search on item
         type_flag = 'type=%s' % t
 
-        # if we have no filter blocks, pass flags alone to search
+        # if we have no filter blocks, there is no context to enable flags, so
+        # pass type_flag + global_flags
         if not filter_blocks and flags:
-            flags = cls._add_type_to_flag_if_needed(flags, type_flag)
-            subreq = cls.build_subreq_from_single_query(request, flags, from_=from_, to=to)
+            if global_flags:
+                query = cls.combine_query_strings(global_flags, type_flag)
+            else:
+                query = type_flag
+            subreq = cls.build_subreq_from_single_query(request, query, from_=from_, to=to)
             return cls.invoke_search(context, request, subreq, return_generator=return_generator)
 
-        # if we have only a single filter block with no flags, pass single filter_block to search
+        # if we specified global_flags, combine that query with the single filter_block,
+        # otherwise pass the filter_block query directly
         elif not flags and len(filter_blocks) == 1:
             block = filter_blocks[0]
             block_query = block['query']
-            if type_flag not in block:
-                block_query = cls._add_type_to_flag_if_needed(block_query, type_flag)
-            if block[cls.FLAG_APPLIED]:
-                subreq = cls.build_subreq_from_single_query(request, block_query, from_=from_, to=to)
+            if global_flags:
+                query = cls.combine_query_strings(global_flags, block_query)
             else:
-                subreq = cls.build_subreq_from_single_query(request, type_flag, from_=from_, to=to)
+                query = block_query
+            query = cls._add_type_to_flag_if_needed(query, type_flag)
+            subreq = cls.build_subreq_from_single_query(request, query, from_=from_, to=to)
             return cls.invoke_search(context, request, subreq, return_generator=return_generator)
 
-        # if given flags and single filter block, combine and pass
+        # Extract query string and list of applied flags, add global_flags to block_query first
+        # then add flags as applied and type_flag if needed.
         elif flags and len(filter_blocks) == 1:
-            block = filter_blocks[0]
-            if type_flag not in flags and type_flag not in block:
-                flags = cls._add_type_to_flag_if_needed(flags, type_flag)
-            if block[cls.FLAG_APPLIED]:
-                combined_query = cls.combine_flags_and_block(flags, block['query'])
-                subreq = cls.build_subreq_from_single_query(request, combined_query, from_=from_, to=to)
+            block_query = filter_blocks[0]['query']
+            flags_applied = filter_blocks[0]['flags_applied']
+            if global_flags:
+                query = cls.combine_query_strings(global_flags, block_query)
             else:
-                subreq = cls.build_subreq_from_single_query(request, flags, from_=from_, to=to)
+                query = block_query
+            for applied_flag in flags_applied:
+                for flag in flags:
+                    if flag['name'] == applied_flag:
+                        query = cls.combine_query_strings(query, flag['query'])
+                        break
+            query = cls._add_type_to_flag_if_needed(query, type_flag)
+            subreq = cls.build_subreq_from_single_query(request, query, from_=from_, to=to)
             return cls.invoke_search(context, request, subreq, return_generator=return_generator)
 
         # Build the compound_query
+        # TODO NEW: apply flags as specified on every filter_block + global_flags
         else:
             sub_queries = []
             for block in filter_blocks:
                 if block[cls.FLAG_APPLIED]:  # only build sub_query if this block is applied
                     if flags:
-                        combined_query = cls.combine_flags_and_block(flags, block[cls.QUERY])
+                        combined_query = cls.combine_query_strings(flags, block[cls.QUERY])
                         subreq = cls.build_subreq_from_single_query(request, combined_query, route=cls.BUILD_QUERY_URL,
                                                                     from_=from_, to=to)
                     else:
@@ -188,6 +202,7 @@ class CompoundSearchBuilder:
                     sub_query = request.invoke_subrequest(subreq).json[cls.QUERY]
                     sub_queries.append(sub_query)
 
+            # TODO NEW: this logic is no longer possible, since the filter blocks are not toggling anymore
             if len(sub_queries) == 0:  # if all blocks are disabled, just execute the flags
                 if not flags:
                     flags = type_flag
