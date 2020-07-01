@@ -683,7 +683,7 @@ class TestNestedSearch(object):
 
     @pytest.mark.skip  # re-enable once workbook inserts are built out more
     def test_and_search_that_matches_multiple(self, workbook, testapp):
-        """ Check two properties that occur in the same sub-embedded object in 3 cohorts """
+        """ Check two properties that occur in the same sub-embedded object in 3 variants """
         res = testapp.get('/search/?type=Variant'
                           '&families.members.mother.display_title=GAPIDISC7R73'
                           '&families.members.father.display_title=GAPID3PW26SK').json
