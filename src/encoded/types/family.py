@@ -262,6 +262,18 @@ class Family(Item):
             Converter[child + '-s'] = 'grandson'
             Converter[child + '-d'] = 'granddaughter'
             Converter[child + '-c'] = 'grandchild'
+        # add great-grandchildren
+        all_g_children = [i for i in Converter if Converter[i] in ['grandson', 'granddaughter', 'grandchild']]
+        for g_child in all_g_children:
+            Converter[g_child + '-s'] = 'great-grandson'
+            Converter[g_child + '-d'] = 'great-granddaughter'
+            Converter[g_child + '-c'] = 'great-grandchild'
+        # add great-grandchildren
+        all_gg_children = [i for i in Converter if Converter[i] in ['great-grandson', 'great-granddaughter', 'great-grandchild']]
+        for gg_child in all_gg_children:
+            Converter[gg_child + '-s'] = 'great-great-grandson'
+            Converter[gg_child + '-d'] = 'great-great-granddaughter'
+            Converter[gg_child + '-c'] = 'great-great-grandchild'
         # add niece nephew nibling (we can also add sister brother in law here but will skip non blood relatives)
         all_siblings = [i for i in Converter if Converter[i] in ['brother', 'sister', 'sibling']]
         for sib in all_siblings:
@@ -413,6 +425,12 @@ class Family(Item):
                              'grandchild',
                              'grandmother',
                              'grandfather',
+                             'great-grandson',
+                             'great-granddaughter',
+                             'great-grandchild',
+                             'great-great-grandson',
+                             'great-great-granddaughter',
+                             'great-great-grandchild',
                              'great-grandmother',
                              'great-grandfather',
                              'great-great-grandmother',
