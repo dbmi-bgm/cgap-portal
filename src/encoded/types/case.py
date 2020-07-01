@@ -112,7 +112,7 @@ class Case(Item):
         "report.last_modified.*",
         "report.status",
         "family.accession",
-        "cohort.filter_set.title"
+        "cohort.filter_set.*"
     ]
 
     @calculated_property(schema={
@@ -166,3 +166,23 @@ class Case(Item):
         individual_families = ind_data.get('families', [])
         secondary_families = [i['@id'] for i in individual_families if i['@id'] != family]
         return secondary_families
+
+    @calculated_property(schema={
+        "title": "VCF File",
+        "description": "VCF file that will be used in variant digestion",
+        "type": "string",
+        "LinkTo": "FileProcessed"
+    })
+    def vcf_file(self, request, sample_processing=None):
+        """Map the vcf file to be digested
+        Currently we have a single file on processed_files field of sample processing"""
+        if not sample_processing:
+            return {}
+        sp_data = get_item_or_none(request, sample_processing, 'sample-processings')
+        if not sp_data:
+            return {}
+        files = sp_data.get('processed_files', [])
+        if not files:
+            return {}
+        return files[0]
+
