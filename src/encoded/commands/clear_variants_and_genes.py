@@ -22,7 +22,7 @@ def main():
     """ Wipes the variant + gene items in appropriate order """
     logging.basicConfig()
 
-    parser = argparse.ArgumentParser(
+    parser = argparse.ArgumentParser(  # noqa - PyCharm wrongly thinks the formatter_class is invalid
         description='Clear an item type out of metadata storage',
         epilog=EPILOG,
         formatter_class=argparse.RawDescriptionHelpFormatter

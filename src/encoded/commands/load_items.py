@@ -51,7 +51,7 @@ def get_logger(lname, logfile):
 
 
 def parse_args():
-    parser = argparse.ArgumentParser(
+    parser = argparse.ArgumentParser(  # noqa - PyCharm wrongly thinks the formatter_class is invalid
         description="Load json formatted Items to Database from a file or a python list or dict", epilog=EPILOG,
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
