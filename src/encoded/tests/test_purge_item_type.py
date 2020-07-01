@@ -67,6 +67,3 @@ def test_purge_item_type_with_links_fails(testapp, workbook):
     testapp.post_json('/index', {'record': True})  # must index everything so individual links show up
     time.sleep(5)  # wait for indexing to catch up
     assert not purge_item_type_from_storage(testapp, ['individual'])
-    assert purge_item_type_from_storage(testapp, ['cohort']) is True  # this one will work since it is not linkedTo
-    testapp.post_json('/index', {'record': True})
-    testapp.get('/search/?type=Cohort', status=404)

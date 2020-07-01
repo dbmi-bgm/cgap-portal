@@ -127,12 +127,13 @@ class CompoundSearchBuilder:
         return flags
 
     @classmethod
-    def execute_filter_set(cls, context, request, filter_set, from_=0, to=10, return_generator=False, intersect=False):
+    def execute_filter_set(cls, context, request, filter_set, from_=0, to=10,
+                           global_flags=None, return_generator=False, intersect=False):
         """ Executes the given filter_set. This function contains the core functionality of the class.
             A filter_set with respect to this function is just a dictionary containing the following things:
-                1. 'type' is the item type we are executing on. Required.
+                1. 'search_type' is the item type we are executing on. Required.
                 2. 'filter_blocks' contains the filter blocks we would like to apply
-                3. 'flags' contains the query to be combined with all filter_blocks
+                3. 'flags' is a dictionary
 
                 NOTE: if neither 'flags' nor 'filter_blocks' is specified then a generic type=Item
                 search will be executed.
@@ -220,8 +221,8 @@ class CompoundSearchBuilder:
             else:
                 raise HTTPBadRequest('Tried to execute a filter_set without specifying a type!')
             if FLAGS in body:
-                if not isinstance(body[FLAGS], str):
-                    raise HTTPBadRequest('Passed a bad value for flags: %s -- Expected a string.' % body[FLAGS])
+                if not isinstance(body[FLAGS], list):
+                    raise HTTPBadRequest('Passed a bad value for flags: %s -- Expected a dict.' % body[FLAGS])
                 filter_set[FLAGS] = body[FLAGS]
             if FILTER_BLOCKS in body:
                 if not isinstance(body[FILTER_BLOCKS], list):
@@ -253,16 +254,35 @@ def compound_search(context, request):
 
         POST Body Syntax:
         {
+            # flags to be applied globally to the search
+            "global_flags": <query_string>,
+
             # uuid of a filter_set item to execute
             "uuid": <uuid>,  # NOTE: if you provide this, the following filter_set related fields are IGNORED
 
             "search_type": <item_type>,  # item type this filter_set is searching on
-            "flags": <query_string>,  # flags to be applied globally to the search
-            "filter_blocks": [  # list of objects with below structure
+            "flags": [
                 {
-                    "query": <query_string>,
-                    "flag_applied": true/false
+                    "name": "flag_name_one",
+                    "query": <query_string>
+                },
+                {
+                    "name": "flag_name_two",
+                    "query": <query_string>
                 }
+                ...
+            ]
+
+            # list of queries to be compounded with below structure
+            "filter_blocks": [
+                {
+                    "query": <query_string>, (to be combined with global_flags, if specified)
+                    "flags_applied": [
+                        "flag_name_one",
+                        "flag_name_two"
+                    ]
+                }
+                ...
             ]
 
             # other options
@@ -279,7 +299,9 @@ def compound_search(context, request):
     from_ = body.get('from', 0)
     limit = body.get('limit', 25)
     return_generator = body.get('return_generator', False)
+    global_flags = body.get('global_flags', None)
     if from_ < 0 or limit < 0:
         raise HTTPBadRequest('Passed bad from, to request body params: %s, %s' % (from_, limit))
     return CompoundSearchBuilder.execute_filter_set(context, request, filter_set, from_=from_, to=limit,
-                                                    return_generator=return_generator, intersect=intersect)
+                                                    global_flags=global_flags, return_generator=return_generator,
+                                                    intersect=intersect)
