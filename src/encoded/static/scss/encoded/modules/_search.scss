@@ -53,9 +53,10 @@ $search-results-header-row-height: 52px; // 46px is existing default for both re
 	}
 
 
-	// Treat Individual col as display_title col for CaseView.
+	// Styling overrides specific to search results of type Case
 	.search-view-controls-and-results[data-search-item-type="Case"] & {
 
+		// Treat Individual col as display_title col for CaseView.
 		&[data-first-visible-column] > .inner > .title-block {
 			max-height: none;
 			white-space: normal; // Allow to wrap by default (overrides SPC's default white-space: nowrap;) since we have tall-ish rows.
@@ -67,8 +68,9 @@ $search-results-header-row-height: 52px; // 46px is existing default for both re
 		}
 
 
-		&[data-field="individual"][data-first-visible-column],
-		&[data-field="accession"] {
+		&[data-field="individual"],
+		&[data-field="accession"],
+		&[data-field="sample_processing"] {
 			> .inner {
 				.col-topleft {
 					@extend .text-monospace;
