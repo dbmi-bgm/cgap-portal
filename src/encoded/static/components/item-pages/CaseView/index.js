@@ -248,23 +248,25 @@ export default class CaseView extends DefaultItemView {
 
 const CaseSummaryTabView = React.memo(function CaseSummaryTabView(props){
     const {
+        context = {},
+        href,
         pedigreeFamilies: families = [],
         pedigreeFamiliesIdx = 0,
-        context: {
-            case_phenotypic_features: caseFeatures = { case_phenotypic_features: [] },
-            description = null,
-            actions: permissibleActions = [],
-            sample_processing,
-            display_title: caseTitle,
-            accession: caseAccession,
-            individual : caseIndividual
-        } = {},
         onFamilySelect,
         graphData,
         selectedDiseases,
         windowWidth,
         currFamily
     } = props;
+    const {
+        case_phenotypic_features: caseFeatures = { case_phenotypic_features: [] },
+        description = null,
+        actions: permissibleActions = [],
+        sample_processing,
+        display_title: caseTitle,
+        accession: caseAccession,
+        individual : caseIndividual
+    } = context;
 
     const familiesLen = families.length;
     const editAction = _.findWhere(permissibleActions, { name: "edit" });
@@ -304,7 +306,7 @@ const CaseSummaryTabView = React.memo(function CaseSummaryTabView(props){
         const searchHref=`/search/?type=Case&accession=${caseAccession}`;
 
         const title = (
-            <h4 className="clickable p-2 d-inline-block clearfix" onClick={() => setOpen(!open)}>
+            <h4 className="clickable p-2 d-inline-block clearfix mt-0" onClick={() => setOpen(!open)}>
                 <i className={"icon p-2 clickable fas icon-sm" + (open ? " icon-minus" : " icon-plus")} />
                 <span className="font-italic text-500">{ caseTitle }</span>
                 <span className="text-300 font-italic">: Status Overview</span>
@@ -314,11 +316,11 @@ const CaseSummaryTabView = React.memo(function CaseSummaryTabView(props){
         caseSearchTables = (
             <div>
                 { title }
-                { open ?
-                    <Collapse in={open}><EmbeddedItemSearchTable facets={null}
-                        {...{ searchHref }}
-                        context={props.context}/>
-                    </Collapse> : null}
+                { open ? (
+                    <Collapse in={open}>
+                        <EmbeddedItemSearchTable facets={null} {...{ searchHref }} context={props.context}/>
+                    </Collapse>
+                ) : null}
             </div>
         );
     } else {
@@ -385,12 +387,8 @@ const CaseSummaryTabView = React.memo(function CaseSummaryTabView(props){
                         <div className="pedigree-vis-heading d-flex justify-content-between">
                             <div>
                                 <i className="icon icon-sitemap fas icon-fw mr-1"></i>
-                                <h4 style={{
-                                    color: "white",
-                                    fontWeight: "400",
-                                    display: "inline-block",
-                                    margin: "0px 5px"
-                                }}> Pedigree
+                                <h4 className="text-white text-400 d-inline-block mt-0 mb-0 ml-05 mr-05">
+                                    Pedigree
                                 </h4>
                             </div>
                             <button type="button" className="btn btn-primary btn-small" style={{
@@ -415,17 +413,28 @@ const CaseSummaryTabView = React.memo(function CaseSummaryTabView(props){
                 </div>
             </div>
             <hr className="tab-section-title-horiz-divider"/>
-            <div className="container-wide">
-                <div className="processing-summary-tables-container mt-15">
+            <div className="container-wide bg-light py-4">
+                <div className="processing-summary-tables-container mt-0">
                     { caseSearchTables }
                 </div>
             </div>
+
             <DotRouter href={props.href}>
-                <DotRouterTab cls="arrow-tab" tabTitle="Accessioning" tabViewRender={() => AccessioningTab(props)} dotPath=".accessioning" default />
-                <DotRouterTab cls="arrow-tab" tabTitle="Bioinformatics" tabViewRender={() => BioinformaticsTab({ families, currFamily, pedigreeFamiliesIdx, idToGraphIdentifier, sample_processing, context: props.context, onFamilySelect })} dotPath=".bioinformatics" />
-                <DotRouterTab cls="arrow-tab" tabTitle="Filtering" tabViewRender={() => FilteringTab(props)} dotPath=".filtering"/>
-                <DotRouterTab cls="arrow-tab" tabTitle="Interpretation" tabViewRender={() => InterpretationTab(props)} dotPath=".interpretation" disabled/>
-                <DotRouterTab cls="arrow-tab" tabTitle="Finalize Case" tabViewRender={() => ReportingTab(props)} dotPath=".reporting" disabled/>
+                <DotRouterTab cls="arrow-tab" tabTitle="Accessioning" dotPath=".accessioning" default>
+                    <AccessioningTab {...{ context, href }} />
+                </DotRouterTab>
+                <DotRouterTab cls="arrow-tab" tabTitle="Bioinformatics" dotPath=".bioinformatics">
+                    <BioinformaticsTab {...{ context, families, currFamily, pedigreeFamiliesIdx, idToGraphIdentifier, sample_processing, onFamilySelect }} />
+                </DotRouterTab>
+                <DotRouterTab cls="arrow-tab" tabTitle="Filtering" dotPath=".filtering">
+                    <FilteringTab context={context} />
+                </DotRouterTab>
+                <DotRouterTab cls="arrow-tab" tabTitle="Interpretation" dotPath=".interpretation" disabled>
+                    <InterpretationTab {...props} />
+                </DotRouterTab>
+                <DotRouterTab cls="arrow-tab" tabTitle="Finalize Case" dotPath=".reporting" disabled>
+                    <ReportingTab {...props} />
+                </DotRouterTab>
             </DotRouter>
         </React.Fragment>
     );
@@ -446,12 +455,17 @@ CaseSummaryTabView.getTabObject = function(props){
 
 
 class DotRouter extends React.Component {
-    /*
-    Renders a set of child tabs defined by <DotRouterTab> that each render a component below the navbar when clicked.
-
-    Note: Currently there is a bug where if you switch to a main tab and then press "back" to get back,
-    navigation doesn't work... need to look into
-    */
+    /**
+     * Renders a set of child tabs defined by <DotRouterTab> that each render a component below the navbar when clicked.
+     *
+     * Note: Currently there is a bug where if you switch to a main tab and then press "back" to get back,
+     * navigation doesn't work... need to look into
+     *
+     * A: Depends what the intended action is.. ideally we don't want to add each tab to browser history because
+     * gets a bit annoying to have to click back ton of times to get back to search listing or something.
+     *
+     * @todo Detect if hash in window.location; if is dotpath of child tab, if so, activate it.
+     */
     componentDidMount() {
         const { href, children } = this.props;
 
@@ -474,13 +488,23 @@ class DotRouter extends React.Component {
 
     getDefaultTab() {
         const { children } = this.props;
-        let defaultTab = children.filter((child) => child.props.default === true );
-        if (defaultTab.length === 0) {
-            throw new Error("Must provide default tab to DotRouter by passing default=true prop to a DotRouterTab item");
-        } else {
-            // Select first, if multiple marked as default
-            defaultTab = defaultTab[0];
+        let defaultTab = null;
+        const childrenLen = children.length;
+
+        if (childrenLen === 0) {
+            throw new Error("Must provide children and ideally default tab to DotRouter via props.");
         }
+
+        for (var i = 0; i < childrenLen; i++) {
+            if (children[i].props.default === true) {
+                defaultTab = children[i];
+            }
+        }
+
+        if (defaultTab === null) { // Use first child component as default.
+            [ defaultTab ] = children;
+        }
+
         return defaultTab;
     }
 
@@ -514,7 +538,7 @@ class DotRouter extends React.Component {
                     </ul>
                 </nav>
                 <div className="tab-router-contents">
-                    { currentTab.props.tabViewRender() }
+                    { currentTab.props.children }
                 </div>
             </div>
         );
@@ -522,27 +546,25 @@ class DotRouter extends React.Component {
 }
 
 function DotRouterTab(props) {
-    const { tabTitle, dotPath, href, cls, disabled } = props;
+    const { tabTitle, dotPath, href, cls, disabled, children } = props;
+    if (!React.isValidElement(children)) {
+        throw new Error("Expected children to be present and valid JSX");
+    }
     if (disabled) {
         return <li className={cls + " disabled"} key={tabTitle}><button type="button" disabled>{tabTitle}</button></li>;
     }
     return (
         <li className={cls} key={tabTitle}>
-            <button type="button"
-                onClick={() => navigate("#case-summary" + dotPath, { skipRequest: true })}>
-                {tabTitle}
+            <button type="button" onClick={() => navigate("#case-summary" + dotPath, { skipRequest: true })}>
+                { tabTitle }
             </button>
         </li>);
 }
 
-function AccessioningTab(props) {
-    const {
-        context,
-        href
-    } = props;
-    console.log("accessioning props", props);
+const AccessioningTab = React.memo(function AccessioningTab(props) {
+    const { context, href } = props;
     return (
-        <>
+        <React.Fragment>
             <h1>
                 { context.display_title }: <span className="text-300">Accessioning Report and History</span>
                 <span className="curr-selection pull-right">Current Selection</span>
@@ -554,12 +576,12 @@ function AccessioningTab(props) {
                     fadeIn={false} collapseLongLists
                 />
             </div>
-        </>);
-}
-function BioinformaticsTab(props) {
+        </React.Fragment>
+    );
+});
+
+const BioinformaticsTab = React.memo(function BioinformaticsTab(props) {
     const {
-        currFamily,
-        context,
         families = [],
         pedigreeFamiliesIdx,
         idToGraphIdentifier,
@@ -617,7 +639,7 @@ function BioinformaticsTab(props) {
     }
 
     return (
-        <>
+        <React.Fragment>
             <h1>{ display_title }: <span className="text-300">Bioinformatics Analysis</span></h1>
             <div className="tab-inner-container clearfix">
                 <span className="text-500">Current Status:</span> PASS
@@ -633,20 +655,22 @@ function BioinformaticsTab(props) {
                 <h2 className="section-header">Multisample Analysis Table</h2>
                 { caseSummaryTables }
             </div>
-        </>
+        </React.Fragment>
     );
-}
-function FilteringTab(props) {
-    const { currFamily, context } = props;
+});
+
+const FilteringTab = React.memo(function FilteringTab(props) {
+    const { context } = props;
     return (
-        <>
+        <React.Fragment>
             <h1>{ context.display_title}: <span className="text-300">Variant Filtering and Technical Review</span></h1>
             <EmbeddedItemSearchTable
                 searchHref={`/search/?type=Variant`} { ...{ context }}
             />
-        </>
+        </React.Fragment>
     );
-}
+});
+
 function InterpretationTab(props) {
     return <h1>This is the interpretation tab.</h1>;
 }
