@@ -30,21 +30,10 @@ def includeme(config):
 
 # order of items references with linkTo in a field in  'required' in schemas
 ORDER = [
-    'user',
     'project',
     'institution',
+    'user',
     'file_format',
-    'phenotype',
-    'disorder',
-    # 'variant_consequence',
-    # 'variant', # links to ^ variant_consequence
-    # 'variant_sample', # links to ^ variant
-    'cohort',
-    'family',
-    'individual',
-    'case',
-    'report',
-    'sample',
     'workflow',
 ]
 
