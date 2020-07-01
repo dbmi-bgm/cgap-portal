@@ -420,19 +420,19 @@ const CaseSummaryTabView = React.memo(function CaseSummaryTabView(props){
             </div>
 
             <DotRouter href={props.href}>
-                <DotRouterTab cls="arrow-tab" tabTitle="Accessioning" dotPath=".accessioning" default>
+                <DotRouterTab className="arrow-tab" tabTitle="Accessioning" dotPath=".accessioning" default>
                     <AccessioningTab {...{ context, href }} />
                 </DotRouterTab>
-                <DotRouterTab cls="arrow-tab" tabTitle="Bioinformatics" dotPath=".bioinformatics">
+                <DotRouterTab className="arrow-tab" tabTitle="Bioinformatics" dotPath=".bioinformatics">
                     <BioinformaticsTab {...{ context, families, currFamily, pedigreeFamiliesIdx, idToGraphIdentifier, sample_processing, onFamilySelect }} />
                 </DotRouterTab>
-                <DotRouterTab cls="arrow-tab" tabTitle="Filtering" dotPath=".filtering">
+                <DotRouterTab className="arrow-tab" tabTitle="Filtering" dotPath=".filtering">
                     <FilteringTab context={context} />
                 </DotRouterTab>
-                <DotRouterTab cls="arrow-tab" tabTitle="Interpretation" dotPath=".interpretation" disabled>
+                <DotRouterTab className="arrow-tab" tabTitle="Interpretation" dotPath=".interpretation" disabled>
                     <InterpretationTab {...props} />
                 </DotRouterTab>
-                <DotRouterTab cls="arrow-tab" tabTitle="Finalize Case" dotPath=".reporting" disabled>
+                <DotRouterTab className="arrow-tab" tabTitle="Finalize Case" dotPath=".reporting" disabled>
                     <ReportingTab {...props} />
                 </DotRouterTab>
             </DotRouter>
@@ -518,12 +518,12 @@ class DotRouter extends React.Component {
             for (let i = 0; i < children.length; i++) {
                 const currChild = children[i];
                 if (currChild.props.dotPath === dotPath && !currChild.props.disabled) {
-                    selectedChild = currChild;
+                    return currChild;
                 }
             }
         }
 
-        return selectedChild || this.getDefaultTab();
+        return this.getDefaultTab();
     }
 
     render() {
@@ -546,15 +546,15 @@ class DotRouter extends React.Component {
 }
 
 function DotRouterTab(props) {
-    const { tabTitle, dotPath, href, cls, disabled, children } = props;
+    const { tabTitle, dotPath, href, className, disabled, children } = props;
     if (!React.isValidElement(children)) {
         throw new Error("Expected children to be present and valid JSX");
     }
     if (disabled) {
-        return <li className={cls + " disabled"} key={tabTitle}><button type="button" disabled>{tabTitle}</button></li>;
+        return <li className={className + " disabled"} key={tabTitle}><button type="button" disabled>{tabTitle}</button></li>;
     }
     return (
-        <li className={cls} key={tabTitle}>
+        <li className={className} key={tabTitle}>
             <button type="button" onClick={() => navigate("#case-summary" + dotPath, { skipRequest: true })}>
                 { tabTitle }
             </button>
