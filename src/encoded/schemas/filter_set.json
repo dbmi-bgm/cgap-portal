@@ -37,22 +37,46 @@
                 "title": "Filter Block",
                 "type": "object",
                 "properties": {
+                    "name": {
+                        "title": "Name",
+                        "description": "Name of the filter block"
+                    },
                     "query": {
                         "title": "Single query",
                         "type": "string"
                     },
-                    "flag_applied": {
-                        "title": "Flag applied",
-                        "description": "Whether or not this filter_block is toggled",
-                        "type": "boolean"
+                    "flags_applied": {
+                        "title": "Flags applied",
+                        "description": "Flag names that will be applied to this filter block",
+                        "type": "array",
+                        "uniqueItems": true,
+                        "items": {
+                            "title": "Flag",
+                            "type": "string"
+                        }
                     }
                 }
             }
         },
         "flags": {
             "title": "Flags",
-            "description": "Query filter to apply globally on this filter set.",
-            "type": "string"
+            "description": "Flags that will be applied to filter blocks with name mapping.",
+            "type": "array",
+            "uniqueItems": true,
+            "items": {
+                "title": "Flag",
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "title": "Name",
+                        "description": "Name of the flag"
+                    }
+                    "query": {
+                        "title": "Single query",
+                        "type": "string"
+                    }
+                }
+            }
         }
     }
 }
