@@ -371,8 +371,13 @@
         },
         "sample": {
             "title": "Sample",
-            "type": "string",
-            "linkTo": "Sample"
+            "description": "String Accession of the sample",
+            "type": "string"
+        },
+        "file": {
+            "title": "File",
+            "description": "String Accession of the vcf file used in digestion",
+            "type": "string"
         },
         "variant": {
             "title": "Variant",
