@@ -1,4 +1,4 @@
-Cohort/***********************************************************
+/***********************************************************
 Custom Classes & Styling for Item Pages (e.g. Experiment Sets)
 ************************************************************/
 
@@ -1846,9 +1846,9 @@ $badge-item-min-height: 90px;
 		}
 
 		.embedded-search-view-outer-container {
-			margin-left: 20px;
-			margin-right: 20px;
-			padding-top: 24px;
+			// (Can't remember:) Margins might be needed here
+			// to accomodate presence of both vertical + horizontal scroll bars.
+			// I guess we'll find out at some point.
 
 			.search-result-row {
 				&:last-of-type {

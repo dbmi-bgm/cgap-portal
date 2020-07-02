@@ -31,6 +31,9 @@ $search-results-header-row-height: 52px; // 46px is existing default for both re
 		.top-row {
 			display: flex;
 			justify-content: space-between;
+			.col-topleft {
+				@extend .text-ellipsis-container;
+			}
 		}
 		.top-row,
 		.col-date {

@@ -299,31 +299,14 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
         };
     }, [ /* empty == executed only once ever */ ]);
 
-
-    // Hooks declared outside of 'if' condition b.c. React hook execution order
-    // must stay consistent between renders - https://reactjs.org/docs/hooks-rules.html#only-call-hooks-at-the-top-level
-    const [ open, setStatusAreaOpen ] = useState(true); // 1st family open by default
-    const toggleOpenStatusArea = useMemo(function(){
-        return function(){ setStatusAreaOpen(!open); };
-    }, [ open ]);
-
     let caseSearchTables;
     if (caseIndividual) {
-        const searchHref=`/search/?type=Case&accession=${caseAccession}`;
-        const title = (
-            <h4 className="clickable p-2 d-inline-block clearfix mt-0 mb-0" onClick={toggleOpenStatusArea}>
-                <i className={"icon p-2 clickable fas icon-sm align-middle mr-07" + (open ? " icon-minus" : " icon-plus")} />
-                <span className="text-400 align-middle">Status Overview</span>
-            </h4>
-        );
         caseSearchTables = (
             <React.Fragment>
-                { title }
-                <Collapse in={open}>
-                    <div className="search-table-wrapper">
-                        <EmbeddedItemSearchTable facets={null} {...{ context, searchHref }} />
-                    </div>
-                </Collapse>
+                <h4 className="text-400 align-middle mt-0">Status Overview</h4>
+                <div className="search-table-wrapper">
+                    <EmbeddedItemSearchTable facets={null} searchHref={`/search/?type=Case&accession=${caseAccession}`} context={context} />
+                </div>
             </React.Fragment>
         );
     } else {
@@ -380,7 +363,7 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
                     </div>
                 </h3>
             </div>
-            <hr className="tab-section-title-horiz-divider"/>
+            <hr className="tab-section-title-horiz-divider" />
             <div className="container-wide bg-light py-4">
                 <div className="card-group case-summary-card-row">
                     <div className="col-stats">
@@ -415,14 +398,16 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
                     </div>
                 </div>
             </div>
-            <hr className="tab-section-title-horiz-divider" />
-            <div className="container-wide bg-light py-4">
+
+            <div className="container-wide bg-light pt-12 pb-24">
                 <div className="processing-summary-tables-container mt-0">
                     { caseSearchTables }
                 </div>
             </div>
+
             <hr className="tab-section-title-horiz-divider" />
-            <DotRouter href={href} className="container-wide bg-light py-4">
+
+            <DotRouter href={href} className="container-wide bg-light pt-36 pb-24">
                 <DotRouterTab className="arrow-tab" tabTitle="Accessioning" dotPath=".accessioning" default>
                     <AccessioningTab {...{ context, href }} />
                 </DotRouterTab>
