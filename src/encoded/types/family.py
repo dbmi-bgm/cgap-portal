@@ -286,57 +286,6 @@ class Family(Item):
             for a_combination in all_combinations:
                 for ind, parent_tag in enumerate(['-d', '-s', '-c']):
                     Converter[a_combination + parent_tag] = an_extension['children'][ind]
-        # add grandchildren
-        all_children = [i for i in Converter if Converter[i] in ['daughter', 'son', 'child']]
-        for child in all_children:
-            Converter[child + '-s'] = 'grandson'
-            Converter[child + '-d'] = 'granddaughter'
-            Converter[child + '-c'] = 'grandchild'
-        # add great-grandchildren
-        all_g_children = [i for i in Converter if Converter[i] in ['grandson', 'granddaughter', 'grandchild']]
-        for g_child in all_g_children:
-            Converter[g_child + '-s'] = 'great-grandson'
-            Converter[g_child + '-d'] = 'great-granddaughter'
-            Converter[g_child + '-c'] = 'great-grandchild'
-        # add great-grandchildren
-        all_gg_children = [i for i in Converter if Converter[i] in ['great-grandson', 'great-granddaughter', 'great-grandchild']]
-        for gg_child in all_gg_children:
-            Converter[gg_child + '-s'] = 'great-great-grandson'
-            Converter[gg_child + '-d'] = 'great-great-granddaughter'
-            Converter[gg_child + '-c'] = 'great-great-grandchild'
-        # add niece nephew nibling (we can also add sister brother in law here but will skip non blood relatives)
-        all_siblings = [i for i in Converter if Converter[i] in ['brother', 'sister', 'sibling']]
-        for sib in all_siblings:
-            Converter[sib + '-s'] = 'nephew'
-            Converter[sib + '-d'] = 'niece'
-            Converter[sib + '-c'] = 'nibling'
-        # add grand niece nephew nibling
-        all_niblings = [i for i in Converter if Converter[i] in ['nephew', 'niece', 'nibling']]
-        for nib in all_niblings:
-            Converter[nib + '-s'] = 'grandnephew'
-            Converter[nib + '-d'] = 'grandniece'
-            Converter[nib + '-c'] = 'grandnibling'
-        # add Grandparents
-        all_parents = [i for i in Converter if Converter[i] in ['mother', 'father']]
-        for parent in all_parents:
-            Converter[parent + '-m'] = 'grandmother'
-            Converter[parent + '-f'] = 'grandfather'
-        # add Great-grandparents Uncle Aunt Auncle
-        all_g_parents = [i for i in Converter if Converter[i] in ['grandmother', 'grandfather']]
-        for g_parent in all_g_parents:
-            Converter[g_parent + '-m'] = 'great-grandmother'
-            Converter[g_parent + '-f'] = 'great-grandfather'
-            Converter[g_parent + '-s'] = 'uncle'
-            Converter[g_parent + '-d'] = 'aunt'
-            Converter[g_parent + '-c'] = 'auncle'
-        # add Great-great-grandparents granduncle grandaunt grandauncle
-        all_gg_parents = [i for i in Converter if Converter[i] in ['great-grandmother', 'great-grandfather']]
-        for gg_parent in all_gg_parents:
-            Converter[gg_parent + '-m'] = 'great-great-grandmother'
-            Converter[gg_parent + '-f'] = 'great-great-grandfather'
-            Converter[gg_parent + '-s'] = 'granduncle'
-            Converter[gg_parent + '-d'] = 'grandaunt'
-            Converter[gg_parent + '-c'] = 'grandauncle'
         # given a relation, map the new relation for that relations children when new role is gender independent
         children_roles = [
             {'roles': ['uncle', 'aunt', 'auncle'], 'children': 'cousin'},
