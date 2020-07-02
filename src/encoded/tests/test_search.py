@@ -514,7 +514,6 @@ def test_index_data_workbook(app, workbook, testapp, indexer_testapp, htmltestap
     create_mapping.run(app, sync_index=True)
     # check counts and ensure they're equal
     testapp_counts = testapp.get('/counts')
-    print("testapp_counts=", json.dumps(testapp_counts.json, indent=2))
     # e.g., {"db_es_total": "DB: 748 ES: 748 ", ...}
     db_es_total = testapp_counts.json['db_es_total']
     split_counts = db_es_total.split()
@@ -545,13 +544,13 @@ def test_index_data_workbook(app, workbook, testapp, indexer_testapp, htmltestap
         # check items in search result individually
         search_url = '/%s?limit=all' % item_type
         print("search_url=", search_url)
+        # This should never give a 404 because we checked a few lines ago that
+        # the es_item_count and db_item_counts agree and are non-zero.
+        # If there had been zero, we'd have done a 'continue' to next loop iteration.
+        # -kmp 2-Jul-2020
         res = testapp.get(search_url, status=[200, 301]).follow()
-        import webtest
-        assert isinstance(res, webtest.TestResponse)
-        print("res.status_int = %r" % res.status_int)
-        print("res.status_code = %r" % res.status_code)
         print("res.status = %r" % res.status)
-        print("res.json = %s" % json.dumps(res.json, indent=2))
+        print("res.status_code = %r" % res.status_code)
         for item_res in res.json.get('@graph', []):
             index_view_res = es.get(index=namespaced_index, doc_type=item_type,
                                     id=item_res['uuid'])['_source']
@@ -572,7 +571,6 @@ def test_index_data_workbook(app, workbook, testapp, indexer_testapp, htmltestap
                 assert html_res.body.startswith(b'<!DOCTYPE html>')
             except Exception as e:
                 pass
-    assert False, "PASSED"
 
 
 class MockedRequest(object):
