@@ -311,7 +311,7 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
     if (caseIndividual) {
         const searchHref=`/search/?type=Case&accession=${caseAccession}`;
         const title = (
-            <h4 className={"clickable p-2 d-inline-block clearfix mt-0" + (open ? " mb-24" : "")} onClick={toggleOpenStatusArea}>
+            <h4 className="clickable p-2 d-inline-block clearfix mt-0 mb-0" onClick={toggleOpenStatusArea}>
                 <i className={"icon p-2 clickable fas icon-sm align-middle mr-07" + (open ? " icon-minus" : " icon-plus")} />
                 <span className="text-400 align-middle">Status Overview</span>
             </h4>
@@ -319,11 +319,11 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
         caseSearchTables = (
             <React.Fragment>
                 { title }
-                { open ? (
-                    <Collapse in={open}>
-                        <EmbeddedItemSearchTable facets={null} {...{ searchHref }} context={props.context}/>
-                    </Collapse>
-                ) : null}
+                <Collapse in={open}>
+                    <div className="search-table-wrapper">
+                        <EmbeddedItemSearchTable facets={null} {...{ context, searchHref }} />
+                    </div>
+                </Collapse>
             </React.Fragment>
         );
     } else {
