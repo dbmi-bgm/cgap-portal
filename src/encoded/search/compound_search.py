@@ -122,7 +122,12 @@ class CompoundSearchBuilder:
 
     @staticmethod
     def _add_type_to_flag_if_needed(flags, type_flag):
-        """ Modifies 'flags' in place by adding type query if it is not present """
+        """ Modifies 'flags' in place by adding type query if it is not present
+
+        :param flags: query substring
+        :param type_flag: query substring containing type requirement
+        :return: query string that combines the two, if type requirement isn't already there
+        """
         if type_flag not in flags or type_flag.lower() not in flags:
             flags += '&' + type_flag
         return flags
@@ -139,7 +144,8 @@ class CompoundSearchBuilder:
                     by name.
 
                 NOTE: if neither 'flags' nor 'filter_blocks' is specified then a generic type=Item
-                search will be executed. If just 'flags' is specified with no query
+                search will be executed. If just 'flags' is specified with no filter_blocks, the
+                flags will be ignored (since there are no filter_blocks to apply it to).
         """
         filter_blocks = filter_set.get(FILTER_BLOCKS, [])
         flags = filter_set.get(FLAGS, None)
@@ -216,7 +222,7 @@ class CompoundSearchBuilder:
 
     @classmethod
     def validate_flag(cls, flag):
-        """ Validates a given flag has the correct structure """
+        """ Validates a given flag has the correct structure/types """
         if cls.NAME not in flag or cls.QUERY not in flag:  # existence
             raise HTTPBadRequest('Passed a bad flag with missing structure: %s' % flag)
         elif not isinstance(flag[cls.NAME], str) or not isinstance(flag[cls.QUERY], str):  # type
@@ -224,8 +230,11 @@ class CompoundSearchBuilder:
 
     @classmethod
     def validate_filter_block(cls, filter_block):
+        """ Validates a given filter_block has correct structure/types """
         if cls.QUERY not in filter_block or cls.FLAGS_APPLIED not in filter_block:
             raise HTTPBadRequest('Passed a bad filter_block with missing structure: %s' % filter_block)
+        elif not isinstance(filter_block[cls.QUERY], str) or not isinstance(filter_block[cls.FLAGS_APPLIED], list):
+            raise HTTPBadRequest('Passed a bad filter_block with wrong types: %s' % filter_block)
 
     @classmethod
     def extract_filter_set_from_search_body(cls, request, body):

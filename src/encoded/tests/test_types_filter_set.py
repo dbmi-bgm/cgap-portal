@@ -476,6 +476,9 @@ def test_compound_search_rejects_malformed_filter_sets(testapp):
     del filter_set_without_filter_block_sub_fields['filter_blocks'][0]['query']  # no query
     with pytest.raises(AppError):
         testapp.post_json(COMPOUND_SEARCH_URL, filter_set_without_filter_block_sub_fields)
+    filter_set_without_filter_block_sub_fields['filter_blocks'][0]['query'] = ['hello']  # bad type
+    with pytest.raises(AppError):
+        testapp.post_json(COMPOUND_SEARCH_URL, filter_set_without_filter_block_sub_fields)
 
     filter_set_without_flag_sub_fields = {
         'search_type': 'Variant',
@@ -489,5 +492,8 @@ def test_compound_search_rejects_malformed_filter_sets(testapp):
         testapp.post_json(COMPOUND_SEARCH_URL, filter_set_without_flag_sub_fields)
     filter_set_without_flag_sub_fields['flags'][0]['query'] = 'type=Variant'
     del filter_set_without_flag_sub_fields['flags'][0]['name']  # no name
+    with pytest.raises(AppError):
+        testapp.post_json(COMPOUND_SEARCH_URL, filter_set_without_flag_sub_fields)
+    filter_set_without_flag_sub_fields['flags'][0]['name'] = 5  # bad type
     with pytest.raises(AppError):
         testapp.post_json(COMPOUND_SEARCH_URL, filter_set_without_flag_sub_fields)
