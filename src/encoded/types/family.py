@@ -257,13 +257,24 @@ class Family(Item):
             "p-d-m": "wife", "p-s-m": "wife", "p-c-m": "wife",
             "p-d-f": "husband", "p-s-f": "husband", "p-c-f": "husband",
         }
-        # list of dictionary for assigning roles to parents of given set of roles
+        # list of dictionary for assigning roles to members of given set of roles
         # roles : the input roles to be extended
         # parents : new roles that are in sequence female, male, non-gender
         parent_roles = [
             {"roles": ['mother', 'father'], 'parents': ['grandmother', 'grandfather']},
             {"roles": ['grandmother', 'grandfather'], "parents": ['great-grandmother', 'great-grandfather']},
             {"roles": ['great-grandmother', 'great-grandfather'], "parents": ['great-great-grandmother', 'great-great-grandfather']}
+        ]
+        # roles : the input roles to be extended
+        # children : new roles that are in sequence female, male, non-gender
+        children_roles_gendered = [
+            {"roles": ['daughter', 'son', 'child'], "children": ['granddaughter', 'grandson', 'grandchild']},
+            {"roles": ['granddaughter', 'grandson', 'grandchild'], "children": ['great-granddaughter', 'great-grandson', 'great-grandchild']},
+            {"roles": ['great-granddaughter', 'great-grandson', 'great-grandchild'], "children": ['great-great-granddaughter', 'great-great-grandson', 'great-great-grandchild']},
+            {"roles": ['sister', 'brother', 'sibling'], "children": ['niece', 'nephew', 'nibling']},
+            {"roles": ['niece', 'nephew', 'nibling'], "children": ['grandniece', 'grandnephew', 'grandnibling']},
+            {"roles": ['grandmother', 'grandfather'], "children": ['aunt', 'uncle', 'auncle']},
+            {"roles": ['great-grandmother', 'great-grandfather'], "children": ['grandaunt', 'granduncle', 'grandauncle']}
         ]
         # add grandchildren
         all_children = [i for i in Converter if Converter[i] in ['daughter', 'son', 'child']]
