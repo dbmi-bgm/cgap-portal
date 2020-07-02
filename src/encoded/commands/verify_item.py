@@ -30,7 +30,7 @@ def run(app, uuids=None):
 def main():
     ''' Verifies and item against database / ES and checks embeds '''
 
-    parser = argparse.ArgumentParser(
+    parser = argparse.ArgumentParser(  # noqa - PyCharm wrongly thinks the formatter_class is invalid
         description="Verifies and item against database / ES and checks embeds", epilog=EPILOG,
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )

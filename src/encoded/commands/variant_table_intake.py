@@ -203,7 +203,7 @@ class MappingTableParser(object):
                                               'key other than "key" or "title": %s ' % type)
         try:
             fmt = json.loads(json_or_str)
-        except:  # just a string is given, use for both name and title
+        except Exception:  # just a string is given, use for both name and title
             return json_or_str
         else:
             return fmt[type]
@@ -568,7 +568,7 @@ def main():
 
     """
     logging.basicConfig()
-    parser = argparse.ArgumentParser(
+    parser = argparse.ArgumentParser(  # noqa - PyCharm wrongly thinks the formatter_class is invalid
         description="Takes in a mapping table and produces inserts/schemas",
         epilog=EPILOG,
         formatter_class=argparse.RawDescriptionHelpFormatter
