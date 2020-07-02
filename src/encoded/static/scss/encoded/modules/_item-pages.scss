@@ -1848,7 +1848,6 @@ $badge-item-min-height: 90px;
 		.embedded-search-view-outer-container {
 			margin-left: 20px;
 			margin-right: 20px;
-			margin-bottom: 20px;
 
 			.search-result-row {
 				&:last-of-type {
@@ -1880,7 +1879,7 @@ $badge-item-min-height: 90px;
 					padding-right: 10px;
 				}
 				
-				>button {
+				> button {
 					background-color: cornflowerblue;
 					color: #ffff;
 					height: 100%;
@@ -1899,13 +1898,12 @@ $badge-item-min-height: 90px;
 			}
 		}
 		.tab-router-contents {
-			background-color: rgb(230,235,240);
-			padding: 20px 40px 40px 40px;
+			padding-top: 20px;
 
 			h1 {
-				font-size: 29px;
-				font-style: italic;
+				font-size: 2rem;
 				margin-bottom: 20px;
+				font-weight: 500;
 
 				.curr-selection {
 					font-size: 14px;
@@ -1917,7 +1915,7 @@ $badge-item-min-height: 90px;
 				}
 			}
 			h2 {
-				font-size: 18px;
+				font-size: 1.5rem;
 				font-weight: 400;
 			}
 

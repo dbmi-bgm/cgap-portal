@@ -199,7 +199,7 @@ export default class CaseView extends DefaultItemView {
      * function CaseViewBody (props){
      *    const { currFamily, selectedDiseases, ... } = props;
      *    const tabs = [];
-     *    tabs.push(CaseSummaryTabView.getTabObject(props));
+     *    tabs.push(CaseInfoTabView.getTabObject(props));
      *     ... Case-related-logic ..
      *    return <CommonItemView tabs={tabs} />;
      * }
@@ -217,7 +217,7 @@ export default class CaseView extends DefaultItemView {
         const familiesLen = pedigreeFamilies.length;
         const initTabs = [];
 
-        initTabs.push(CaseSummaryTabView.getTabObject({
+        initTabs.push(CaseInfoTabView.getTabObject({
             ...this.props, ...controllerProps
         }));
 
@@ -246,7 +246,7 @@ export default class CaseView extends DefaultItemView {
     }
 }
 
-const CaseSummaryTabView = React.memo(function CaseSummaryTabView(props){
+const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
     const {
         context = {},
         href,
@@ -295,33 +295,36 @@ const CaseSummaryTabView = React.memo(function CaseSummaryTabView(props){
             if (familiesLen === 0) return false;
             // By default, click on link elements would trigger ajax request to get new context.
             // (unless are external links)
-            navigate("#pedigree", { skipRequest: true });
+            navigate("#pedigree", { skipRequest: true, replace: true });
         };
     }, [ /* empty == executed only once ever */ ]);
 
 
+    // Hooks declared outside of 'if' condition b.c. React hook execution order
+    // must stay consistent between renders - https://reactjs.org/docs/hooks-rules.html#only-call-hooks-at-the-top-level
+    const [ open, setStatusAreaOpen ] = useState(true); // 1st family open by default
+    const toggleOpenStatusArea = useMemo(function(){
+        return function(){ setStatusAreaOpen(!open); };
+    }, [ open ]);
+
     let caseSearchTables;
     if (caseIndividual) {
-        const [open, setOpen] = useState(true); // 1st family open by default
         const searchHref=`/search/?type=Case&accession=${caseAccession}`;
-
         const title = (
-            <h4 className="clickable p-2 d-inline-block clearfix mt-0" onClick={() => setOpen(!open)}>
-                <i className={"icon p-2 clickable fas icon-sm" + (open ? " icon-minus" : " icon-plus")} />
-                <span className="font-italic text-500">{ caseTitle }</span>
-                <span className="text-300 font-italic">: Status Overview</span>
+            <h4 className={"clickable p-2 d-inline-block clearfix mt-0" + (open ? " mb-24" : "")} onClick={toggleOpenStatusArea}>
+                <i className={"icon p-2 clickable fas icon-sm align-middle mr-07" + (open ? " icon-minus" : " icon-plus")} />
+                <span className="text-400 align-middle">Status Overview</span>
             </h4>
         );
-
         caseSearchTables = (
-            <div>
+            <React.Fragment>
                 { title }
                 { open ? (
                     <Collapse in={open}>
                         <EmbeddedItemSearchTable facets={null} {...{ searchHref }} context={props.context}/>
                     </Collapse>
                 ) : null}
-            </div>
+            </React.Fragment>
         );
     } else {
         caseSearchTables = (
@@ -372,8 +375,8 @@ const CaseSummaryTabView = React.memo(function CaseSummaryTabView(props){
             <div className="container-wide">
                 <h3 className="tab-section-title">
                     <div>
-                        <span className="text-500 font-italic">Case Info:  </span>
-                        <span className="text-300"> { props.context.display_title }</span>
+                        <span className="text-500">Case Info: </span>
+                        <span className="text-300"> { caseTitle }</span>
                     </div>
                 </h3>
             </div>
@@ -412,14 +415,14 @@ const CaseSummaryTabView = React.memo(function CaseSummaryTabView(props){
                     </div>
                 </div>
             </div>
-            <hr className="tab-section-title-horiz-divider"/>
+            <hr className="tab-section-title-horiz-divider" />
             <div className="container-wide bg-light py-4">
                 <div className="processing-summary-tables-container mt-0">
                     { caseSearchTables }
                 </div>
             </div>
-
-            <DotRouter href={props.href}>
+            <hr className="tab-section-title-horiz-divider" />
+            <DotRouter href={href} className="container-wide bg-light py-4">
                 <DotRouterTab className="arrow-tab" tabTitle="Accessioning" dotPath=".accessioning" default>
                     <AccessioningTab {...{ context, href }} />
                 </DotRouterTab>
@@ -439,17 +442,17 @@ const CaseSummaryTabView = React.memo(function CaseSummaryTabView(props){
         </React.Fragment>
     );
 });
-CaseSummaryTabView.getTabObject = function(props){
+CaseInfoTabView.getTabObject = function(props){
     return {
         'tab' : (
             <React.Fragment>
                 <i className="icon icon-cogs fas icon-fw"/>
-                <span>Case Summary</span>
+                <span>Case Info</span>
             </React.Fragment>
         ),
-        'key' : 'case-summary',
+        'key' : 'case-info',
         'disabled' : false,
-        'content' : <CaseSummaryTabView {...props} />
+        'content' : <CaseInfoTabView {...props} />
     };
 };
 
@@ -488,6 +491,11 @@ class DotRouter extends React.PureComponent {
         // If no default found, use first child component as default.
         return children[0];
     }
+
+    static defaultProps = {
+        "className" : "container-wide bg-light",
+        "elementID" : "dot-router"
+    };
 
     constructor(props){
         super(props);
@@ -532,13 +540,13 @@ class DotRouter extends React.PureComponent {
     }
 
     render() {
-        const { children } = this.props;
+        const { children, className, elementID } = this.props;
         const currentTab = this.getCurrentTab();
 
         return (
             // We could make classNames props (with default values via defaultProps)
             // if plan to make reusable for other views
-            <div className="tab-router container-wide bg-light" id="dot-router">
+            <div className={"tab-router" + (className ? " " + className : "")} id={elementID}>
                 <nav className="dot-tab-nav">
                     <ul className="dot-tab-nav-list">
                         { children }
@@ -553,7 +561,14 @@ class DotRouter extends React.PureComponent {
 }
 
 function DotRouterTab(props) {
-    const { tabTitle, dotPath, href, className, disabled, children } = props;
+    const { tabTitle, dotPath, className, disabled, children } = props;
+
+    const onClick = useMemo(function(){
+        return function(){
+            navigate("#case-summary" + dotPath, { skipRequest: true, replace: true, dontScrollToTop: true });
+        };
+    }, [ dotPath ]);
+
     if (!React.isValidElement(children)) {
         throw new Error("Expected children to be present and valid JSX");
     }
@@ -562,9 +577,7 @@ function DotRouterTab(props) {
     }
     return (
         <li className={className} key={tabTitle}>
-            <button type="button" onClick={() => navigate("#case-summary" + dotPath, { skipRequest: true })}>
-                { tabTitle }
-            </button>
+            <button type="button" onClick={onClick}>{ tabTitle }</button>
         </li>);
 }
 
@@ -610,7 +623,7 @@ const BioinformaticsTab = React.memo(function BioinformaticsTab(props) {
             const isCurrentFamily = idx === pedigreeFamiliesIdx;
             const onClick = function(evt){
                 if (isCurrentFamily) {
-                    navigate("#pedigree", { skipRequest: true });
+                    navigate("#pedigree", { skipRequest: true, replace: true });
                 } else {
                     onFamilySelect(idx);
                 }
