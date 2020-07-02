@@ -56,7 +56,8 @@ JWT_ENCODING_ALGORITHM = 'HS256'
 # default_algorithms() method used to be: ['ES512', 'RS384', 'HS512', 'ES256', 'none',
 # 'RS256', 'PS512', 'ES384', 'HS384', 'ES521', 'PS384', 'HS256', 'PS256', 'RS512']
 # -kmp 15-May-2020
-JWT_DECODING_ALGORITHMS = [JWT_ENCODING_ALGORITHM]
+
+# TODO: JWT_DECODING_ALGORITHMS = [JWT_ENCODING_ALGORITHM]
 
 
 def includeme(config):
@@ -235,9 +236,8 @@ class Auth0AuthenticationPolicy(CallbackAuthenticationPolicy):
             if auth0_client and auth0_secret:
                 # leeway accounts for clock drift between us and auth0
                 payload = jwt.decode(token, b64decode(auth0_secret, '-_'),
-                                     audience=auth0_client, leeway=30,
-                                     algorithms=JWT_DECODING_ALGORITHMS)
-
+                                     # algorithms=JWT_DECODING_ALGORITHMS
+                                     audience=auth0_client, leeway=30)
                 if 'email' in payload and self.email_is_partners_or_hms(payload):
                     request.set_property(lambda r: False, 'auth0_expired')
                     return payload
@@ -443,7 +443,8 @@ def impersonate_user(context, request):
     }
 
     id_token = jwt.encode(jwt_contents, b64decode(auth0_secret, '-_'),
-                          algorithm=JWT_ENCODING_ALGORITHM)
+                          algorithm=JWT_ENCODING_ALGORITHM
+						  )
     user_properties['id_token'] = id_token.decode('utf-8')
 
     return user_properties

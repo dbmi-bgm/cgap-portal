@@ -1,3 +1,5 @@
+
+
 from pkg_resources import resource_filename
 from urllib.parse import urlencode
 from functools import lru_cache
@@ -382,8 +384,13 @@ def should_transform(request, response):
         else:
             raise HTTPNotAcceptable("Improper format URI parameter", comment="The format URI parameter should be set to either html or json.")
 
-    mime_type = best_mime_type(request)
-    format = mime_type.split('/', 1)[1] # Will be 1 of 'html', 'json', 'json-ld'
+    # Web browsers send an Accept request header for initial (e.g. non-AJAX) page requests
+    # which should contain 'text/html'
+    # See: https://tedboy.github.io/flask/generated/generated/werkzeug.Accept.best_match.html#werkzeug-accept-best-match
+    mime_type = request.accept.best_match(['text/html',  'application/json', 'application/ld+json'], 'application/json')
+    # TODO: Maybe use mime_type = best_mime_type(request) instead.
+
+	format = mime_type.split('/', 1)[1] # Will be 1 of 'html', 'json', 'json-ld'
 
     # N.B. ld+json (JSON-LD) is likely more unique case and might be sent by search engines (?) which can parse JSON-LDs.
     # At some point we could maybe have it to be same as making an `@@object` or `?frame=object` request (?) esp if fill
