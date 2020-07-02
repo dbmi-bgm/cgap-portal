@@ -42,18 +42,27 @@ class VCFParser(object):
     GT_REF = '0/0'
     GT_MISSING = './.'
 
-    def __init__(self, _vcf, variant, sample):
+    def __init__(self, _vcf, variant, sample, reader=None):
         """ Constructor for the parser
 
-        Args:
-            _vcf: path to vcf to process
-            variant: path to variant schema to read
-            sample: path to variant_sample schema to read
-
-        Raises:
-            Parsing error within 'vcf' if given VCF is malformed
+        :param _vcf: path to vcf to process
+        :param variant: path to variant schema to read
+        :param sample: path to variant_sample schema to read
+        :param reader: if specified will ignore path passed and set reader directly
+        :raises: Parsing error within 'vcf' if given VCF is malformed
         """
-        self.reader = vcf.Reader(open(_vcf, 'r'))
+        if reader is not None:
+            self.reader = reader
+        else:
+            self.reader = vcf.Reader(open(_vcf, 'r'))
+        self._initialize(variant, sample)
+
+    def _initialize(self, variant, sample):
+        """ Does initialization other than reading/validating the vcf
+
+            :param variant: path to variant schema
+            :param sample: path variant_sample schema
+        """
         self.variant_schema = json.load(open(variant, 'r'))
         self.variant_sample_schema = json.load(open(sample, 'r'))
         self.regex = re.compile(r"""(\s+$|["]|['])""")  # for stripping
@@ -593,6 +602,7 @@ def main():
             except Exception as e:
                 print('Failed validation at row: %s\n'
                       'Exception: %s' % (idx, e))  # some variant gene linkTos do not exist
+                continue
             variant_samples = vcf_parser.create_sample_variant_from_record(record)
             for sample in variant_samples:
                 sample['project'] = args.project

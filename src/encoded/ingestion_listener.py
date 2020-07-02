@@ -7,12 +7,14 @@ import datetime
 import json
 import gzip
 from io import BytesIO
+from vcf import Reader
 from botocore.exceptions import ClientError
 from pyramid.view import view_config
 from dcicutils.misc_utils import VirtualApp
 from snovault.util import debug_log
 from snovault.elasticsearch.es_index_listener import internal_app
 from snovault.elasticsearch.interfaces import ELASTIC_SEARCH
+from .commands.ingest_vcf import VCFParser
 
 
 log = structlog.getLogger(__name__)
@@ -20,6 +22,8 @@ EPILOG = __doc__
 DEFAULT_INTERVAL = 10  # seconds between each poll
 INFLIGHT_INTERVAL = 3  # seconds if we detect messages in flight
 INGESTION_QUEUE = 'ingestion_queue'
+VARIANT_SCHEMA = './src/encoded/schemas/variant.json'
+VARIANT_SAMPLE_SCHEMA = './src/encoded/schemas/variant_sample.json'
 
 
 def includeme(config):
@@ -242,7 +246,7 @@ def gunzip_content(content):
     f_in.seek(0)
     with gzip.GzipFile(fileobj=f_in, mode='rb') as f:
         gunzipped_content = f.read()
-    return gunzipped_content.decode()
+    return gunzipped_content.decode('ascii')
 
 
 def run(vapp, _queue_manager=None):
@@ -285,12 +289,11 @@ def run(vapp, _queue_manager=None):
                     log.error('Could not download file uuid: %s with error: %s' % (uuid, e))
                     continue
 
-                # gunzip content
+                # gunzip content, pass to parser
                 decoded_content = gunzip_content(raw_content)
-
+                parser = VCFParser(None, VARIANT_SCHEMA, VARIANT_SAMPLE_SCHEMA,
+                                   reader=Reader(fsock=decoded_content.split('\n')))
                 # TODO: ingest the VCF File
-                pass
-
 
 
 def main():
