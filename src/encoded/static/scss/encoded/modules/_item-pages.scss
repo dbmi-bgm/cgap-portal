@@ -828,7 +828,7 @@ i.item-status-indicator-dot {
 /** JSON Tree Wrapper (e.g. fallback view) **/
 
 .json-tree-wrapper {
-	border-radius: 4px;
+	border-radius: $border-radius-large;
 	overflow: hidden;
 	> ul {
 		padding: 8px 16px 16px !important;
@@ -1518,7 +1518,7 @@ $badge-item-min-height: 90px;
 				// Embedded Items w/ Attachments
 				.embedded-item-with-attachment {
 					background-color: #f8f8f8;
-					border-radius: 3px;
+					border-radius: $border-radius-base;
 					&:not(.in-array){
 					}
 					.link-to-item-col {
@@ -1731,10 +1731,6 @@ $badge-item-min-height: 90px;
 		> .col-stats,
 		> .col-pedigree-viz {
 			padding: 0 10px;
-
-			@include media-breakpoint-up(lg){
-				min-height: 358px;
-			}
 		}
 
 		> .col-stats {
@@ -1757,10 +1753,11 @@ $badge-item-min-height: 90px;
 			flex-basis: 100%;
 			padding: 0 10px;
 
-			> .pedigree-viz-container > .inner-container {
-				@include border-radius($card-border-radius);
-				box-shadow: 0 1px 5px #0002;
-   				border-color: #d6d6d6;
+			> .card {
+				height: 100%;
+				.pedigree-viz-container .inner-container {
+					background-color: transparent; // let BG color from .card bleed through to allow border radius to appear nicely.
+				}
 			}
 
 			@include media-breakpoint-up(lg){
@@ -1791,8 +1788,8 @@ $badge-item-min-height: 90px;
 			padding: 10px 30px;
 
 			@include media-breakpoint-up(lg){
-				border-top-right-radius: 10px;
-				border-top-left-radius: 10px;
+				border-top-right-radius: $card-border-radius; // prev: 10px;
+				border-top-left-radius: $card-border-radius; // prev: 10px;
 			}
 		}
 
@@ -1808,7 +1805,7 @@ $badge-item-min-height: 90px;
 				margin-left: -40px;
 				margin-top: -32px;
 			}
-			border: 1px solid transparent;
+			border: 1px solid #eee;
 			color: #999;
 			@include border-radius($card-border-radius); // Same as .card (Bootstrap v4)
 			transition: color .3s;
@@ -1836,14 +1833,6 @@ $badge-item-min-height: 90px;
 	}
 
 	.processing-summary-tables-container {
-
-		h4.clickable {
-			background-color: white;
-			border-radius: 5px;
-			width: 100%;
-			box-shadow: 0 1px 5px #0002;
-    		border-color: #d6d6d6;
-		}
 
 		.embedded-search-view-outer-container {
 			// (Can't remember:) Margins might be needed here
@@ -1928,7 +1917,7 @@ $badge-item-min-height: 90px;
 				background-color: #ffffff;
 				margin-bottom: 20px;
 				padding: 20px;
-				border-radius: 5px;
+				border-radius: $border-radius-large;
 				box-shadow: 0 1px 5px #0002;
 				border-color: #d6d6d6;
 
@@ -2114,6 +2103,7 @@ $badge-item-min-height: 90px;
 .item-page-container {
 
 	.pedigree-tab-view-body-container {
+		// When within own top-level pane
 
 		.pedigree-viz-container {
 			// We make this almost full height.

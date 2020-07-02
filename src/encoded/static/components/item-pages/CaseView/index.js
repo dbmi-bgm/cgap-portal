@@ -323,7 +323,7 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
     const rgs = layout.responsiveGridState(windowWidth);
     let pedWidth;
     let pedBlock = (
-        <div className="d-none d-lg-block pedigree-placeholder" onClick={onViewPedigreeBtnClick} disabled={familiesLen === 0}>
+        <div className="d-none d-lg-block pedigree-placeholder flex-fill" onClick={onViewPedigreeBtnClick} disabled={familiesLen === 0}>
             <div className="text-center h-100">
                 <i className="icon icon-sitemap icon-4x fas" />
             </div>
@@ -347,8 +347,10 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
         if (graphData){
             //const width = layout.gridContainerWidth(windowWidth);
             pedBlock = (
-                <PedigreeVizView {...graphData} width={pedWidth} height={300} disableSelect
-                    visibleDiseases={selectedDiseases} showZoomControls={false} enablePinchZoom={false} />
+                <div className="pedigree-pane-wrapper flex-fill">
+                    <PedigreeVizView {...graphData} width={pedWidth} height={300} disableSelect
+                        visibleDiseases={selectedDiseases} showZoomControls={false} enablePinchZoom={false} />
+                </div>
             );
         }
     }
@@ -370,31 +372,33 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
                         <CaseStats {...{ description, numIndividuals, numWithSamples, caseFeatures }} numFamilies={familiesLen} />
                     </div>
                     <div id="case-overview-ped-link" className="col-pedigree-viz">
-                        <div className="pedigree-vis-heading d-flex justify-content-between">
-                            <div>
-                                <i className="icon icon-sitemap fas icon-fw mr-1"></i>
-                                <h4 className="text-white text-400 d-inline-block mt-0 mb-0 ml-05 mr-05">
-                                    Pedigree
-                                </h4>
+                        <div className="card d-flex flex-column">
+                            <div className="pedigree-vis-heading d-flex justify-content-between">
+                                <div>
+                                    <i className="icon icon-sitemap fas icon-fw mr-1"></i>
+                                    <h4 className="text-white text-400 d-inline-block mt-0 mb-0 ml-05 mr-05">
+                                        Pedigree
+                                    </h4>
+                                </div>
+                                <button type="button" className="btn btn-primary btn-small" style={{
+                                    backgroundColor: "cornflowerblue",
+                                    border: "none",
+                                    borderRadius: "50px",
+                                    padding: "0px 20px",
+                                    color: "white",
+                                }} onClick={onViewPedigreeBtnClick} disabled={familiesLen === 0}>
+                                    View Pedigree(s)
+                                </button>
                             </div>
-                            <button type="button" className="btn btn-primary btn-small" style={{
-                                backgroundColor: "cornflowerblue",
-                                border: "none",
-                                borderRadius: "50px",
-                                padding: "0px 20px",
-                                color: "white",
-                            }} onClick={onViewPedigreeBtnClick} disabled={familiesLen === 0}>
-                                View Pedigree(s)
-                            </button>
+                            {/*
+                            <a href="#pedigree" className="card-img-top d-none d-lg-block" rel="noreferrer noopener">
+                                <div className="text-center h-100">
+                                    <i className="icon icon-sitemap icon-4x fas" />
+                                </div>
+                            </a>
+                            */}
+                            { pedBlock }
                         </div>
-                        {/*
-                        <a href="#pedigree" className="card-img-top d-none d-lg-block" rel="noreferrer noopener">
-                            <div className="text-center h-100">
-                                <i className="icon icon-sitemap icon-4x fas" />
-                            </div>
-                        </a>
-                        */}
-                        { pedBlock }
                     </div>
                 </div>
             </div>
