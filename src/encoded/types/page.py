@@ -37,7 +37,7 @@ from urllib.parse import (
     urlparse,
     urlencode
 )
-from ..utils import filtered_warnings
+from dcicutils.misc_utils import filtered_warnings
 from ..search.search import get_iterable_search_results
 from .base import Item
 from .user_content import (

@@ -1,5 +1,3 @@
-
-
 from pkg_resources import resource_filename
 from urllib.parse import urlencode
 from functools import lru_cache
@@ -389,7 +387,6 @@ def should_transform(request, response):
     # See: https://tedboy.github.io/flask/generated/generated/werkzeug.Accept.best_match.html#werkzeug-accept-best-match
     # TODO: Maybe use mime_type = best_mime_type(request) instead.
     mime_type = request.accept.best_match(['text/html',  'application/json', 'application/ld+json'], 'application/json')
-    # TODO: Maybe use mime_type = best_mime_type(request) instead.
     format = mime_type.split('/', 1)[1] # Will be 1 of 'html', 'json', 'json-ld'
 
     # N.B. ld+json (JSON-LD) is likely more unique case and might be sent by search engines (?) which can parse JSON-LDs.

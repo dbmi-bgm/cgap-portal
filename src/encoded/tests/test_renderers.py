@@ -3,7 +3,7 @@ import json
 from dcicutils.misc_utils import ignored
 from pyramid.testing import DummyRequest
 from ..renderers import best_mime_type, MIME_TYPE_DEFAULT, MIME_TYPES_SUPPORTED
-from ..utils import filtered_warnings
+from dcicutils.misc_utils import filtered_warnings
 
 
 def test_best_mime_type():
