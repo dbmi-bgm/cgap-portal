@@ -454,7 +454,50 @@ CaseSummaryTabView.getTabObject = function(props){
 };
 
 
-class DotRouter extends React.Component {
+/**
+ * @todo
+ * iterate on then move into own file for reuse later maybe
+ */
+class DotRouter extends React.PureComponent {
+
+    static getDotPath(href) {
+        const hashPathSplit = href.split("#");
+        if (hashPathSplit.length > 1) {
+            const lastIdx = hashPathSplit.length - 1;
+            const dotPathSplit = hashPathSplit[lastIdx].split(".");
+            return "." + dotPathSplit[lastIdx];
+        } else {
+            // Path must contain both tab (hashroute) and dotpath to navigate properly
+            return null;
+        }
+    }
+
+    static getDefaultTab(children) {
+        const childrenLen = children.length;
+
+        if (childrenLen === 0) {
+            throw new Error("Must provide children and ideally default tab to DotRouter via props.");
+        }
+
+        for (var i = 0; i < childrenLen; i++) {
+            if (children[i].props.default === true) {
+                return children[i];
+            }
+        }
+
+        // If no default found, use first child component as default.
+        return children[0];
+    }
+
+    constructor(props){
+        super(props);
+        this.memoized = {
+            getDefaultTab: memoize(DotRouter.getDefaultTab),
+            // Not sure that makes much/any of measurable improvement.. eh oh well
+            getDotPath: memoize(DotRouter.getDotPath)
+        };
+    }
+
     /**
      * Renders a set of child tabs defined by <DotRouterTab> that each render a component below the navbar when clicked.
      *
@@ -471,48 +514,10 @@ class DotRouter extends React.Component {
 
     }
 
-    getDotPath() {
-        // Need to add in filter here for specific tab, so each tab can potentially have a dotRouter and
-        // not have them conflict
-        const { href } = this.props;
-        const hashPathSplit = href.split("#");
-
-        if (hashPathSplit.length > 1) {
-            const dotPathSplit = hashPathSplit[hashPathSplit.length - 1].split(".");
-            return "." + dotPathSplit[dotPathSplit.length - 1];
-        } else {
-            // Path must contain both tab (hashroute) and dotpath to navigate properly
-            return null;
-        }
-    }
-
-    getDefaultTab() {
-        const { children } = this.props;
-        let defaultTab = null;
-        const childrenLen = children.length;
-
-        if (childrenLen === 0) {
-            throw new Error("Must provide children and ideally default tab to DotRouter via props.");
-        }
-
-        for (var i = 0; i < childrenLen; i++) {
-            if (children[i].props.default === true) {
-                defaultTab = children[i];
-            }
-        }
-
-        if (defaultTab === null) { // Use first child component as default.
-            [ defaultTab ] = children;
-        }
-
-        return defaultTab;
-    }
-
+    /** Method is not explicitly memoized b.c. this component only has 2 props & is a PureComponent itself */
     getCurrentTab() {
-        const { children } = this.props;
-
-        const dotPath = this.getDotPath();
-        let selectedChild;
+        const { children, href } = this.props;
+        const dotPath = this.memoized.getDotPath(href);
 
         if (dotPath){
             for (let i = 0; i < children.length; i++) {
@@ -523,7 +528,7 @@ class DotRouter extends React.Component {
             }
         }
 
-        return this.getDefaultTab();
+        return this.memoize.getDefaultTab(children);
     }
 
     render() {
@@ -562,19 +567,17 @@ function DotRouterTab(props) {
 }
 
 const AccessioningTab = React.memo(function AccessioningTab(props) {
-    const { context, href } = props;
+    const { context: result, href } = props;
+    const { display_title, family } = result;
     return (
         <React.Fragment>
             <h1>
-                { context.display_title }: <span className="text-300">Accessioning Report and History</span>
+                { display_title }: <span className="text-300">Accessioning Report and History</span>
                 <span className="curr-selection pull-right">Current Selection</span>
             </h1>
             <div className="tab-inner-container">
-                <FamilyAccessionStackedTable
-                    result={context}
-                    family={context.family} href={href} preventExpand
-                    fadeIn={false} collapseLongLists
-                />
+                <FamilyAccessionStackedTable {...{ result, family, href }}
+                    preventExpand fadeIn={false} collapseLongLists />
             </div>
         </React.Fragment>
     );
