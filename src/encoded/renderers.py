@@ -318,7 +318,7 @@ def canonical_redirect(event):
 # which should contain 'text/html'
 MIME_TYPES_SUPPORTED = ['text/html', 'application/json', 'application/ld+json']
 MIME_TYPE_DEFAULT = 'application/json'
-MIME_TYPE_TRIAGE_MODE = 'modern'  # if this doesn't work, fall back to 'legacy'
+MIME_TYPE_TRIAGE_MODE = 'legacy'  # 'modern'  # if this doesn't work, fall back to 'legacy'
 
 
 def best_mime_type(request, mode=MIME_TYPE_TRIAGE_MODE):
