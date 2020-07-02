@@ -256,6 +256,11 @@ class Family(Item):
             "p-d-m": "wife", "p-s-m": "wife", "p-c-m": "wife",
             "p-d-f": "husband", "p-s-f": "husband", "p-c-f": "husband",
         }
+        parent_roles = [
+            {"roles": ['mother', 'father'], 'parents': ['grandmother', 'grandfather']},
+            {"roles": ['grandmother', 'grandfather'], "parents": ['great-grandmother', 'great-grandfather']},
+            {"roles": ['great-grandmother', 'great-grandfather'], "parents": ['great-great-grandmother', 'great-great-grandfather']}
+        ]
         # add grandchildren
         all_children = [i for i in Converter if Converter[i] in ['daughter', 'son', 'child']]
         for child in all_children:
