@@ -528,7 +528,7 @@ class DotRouter extends React.PureComponent {
             }
         }
 
-        return this.memoize.getDefaultTab(children);
+        return this.memoized.getDefaultTab(children);
     }
 
     render() {
@@ -536,7 +536,9 @@ class DotRouter extends React.PureComponent {
         const currentTab = this.getCurrentTab();
 
         return (
-            <div className="tab-router container-wide" id="dot-router">
+            // We could make classNames props (with default values via defaultProps)
+            // if plan to make reusable for other views
+            <div className="tab-router container-wide bg-light" id="dot-router">
                 <nav className="dot-tab-nav">
                     <ul className="dot-tab-nav-list">
                         { children }
