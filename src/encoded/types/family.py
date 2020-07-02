@@ -244,6 +244,12 @@ class Family(Item):
     @staticmethod
     def relationships_vocabulary(links):
         """Convert links to relationships.
+        Start with a seed dictionary of basic roles (Converter)
+        Extend going up (parent_roles)
+        Extend going down - gendered (children_roles_gendered)
+                          - and non-gendered (children_roles)
+        All roles should be used in sequence
+        (ie if x created in children_roles, can not be used in parent roles)
         Nomenclature guided by
         https://www.devonfhs.org.uk/pdfs/tools/eichhorn-rlationship-chart.pdf"""
         # return a nested list of  [acc, calculated_relation, association]
