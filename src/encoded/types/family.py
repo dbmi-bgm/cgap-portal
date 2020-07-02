@@ -281,6 +281,11 @@ class Family(Item):
             {"roles": ['grandmother', 'grandfather'], "children": ['aunt', 'uncle', 'auncle']},
             {"roles": ['great-grandmother', 'great-grandfather'], "children": ['grandaunt', 'granduncle', 'grandauncle']}
         ]
+        for an_extension in children_roles_gendered:
+            all_combinations = [i for i in Converter if Converter[i] in an_extension['roles']]
+            for a_combination in all_combinations:
+                for ind, parent_tag in enumerate(['-d', '-s', '-c']):
+                    Converter[a_combination + parent_tag] = an_extension['children'][ind]
         # add grandchildren
         all_children = [i for i in Converter if Converter[i] in ['daughter', 'son', 'child']]
         for child in all_children:
