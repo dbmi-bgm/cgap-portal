@@ -247,6 +247,7 @@ class Family(Item):
         Nomenclature guided by
         https://www.devonfhs.org.uk/pdfs/tools/eichhorn-rlationship-chart.pdf"""
         # return a nested list of  [acc, calculated_relation, association]
+        # start convert with seed roles
         Converter = {
             "p": "proband",
             "p-f": "father", "p-m": "mother", "p-d": "daughter", "p-s": "son", "p-c": "child",
@@ -256,6 +257,9 @@ class Family(Item):
             "p-d-m": "wife", "p-s-m": "wife", "p-c-m": "wife",
             "p-d-f": "husband", "p-s-f": "husband", "p-c-f": "husband",
         }
+        # list of dictionary for assigning roles to parents of given set of roles
+        # roles : the input roles to be extended
+        # parents : new roles that are in sequence female, male, non-gender
         parent_roles = [
             {"roles": ['mother', 'father'], 'parents': ['grandmother', 'grandfather']},
             {"roles": ['grandmother', 'grandfather'], "parents": ['great-grandmother', 'great-grandfather']},
