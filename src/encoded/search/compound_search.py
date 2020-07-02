@@ -26,7 +26,8 @@ class CompoundSearchBuilder:
     TYPE = 'search_type'
     ID = '@id'
     QUERY = 'query'
-    FLAG_APPLIED = 'flag_applied'
+    NAME = 'name'
+    FLAGS_APPLIED = 'flags_applied'
     BUILD_QUERY_URL = '/build_query/'
 
     @staticmethod
@@ -159,7 +160,7 @@ class CompoundSearchBuilder:
         # otherwise pass the filter_block query directly
         elif not flags and len(filter_blocks) == 1:
             block = filter_blocks[0]
-            block_query = block['query']
+            block_query = block[cls.QUERY]
             if global_flags:
                 query = cls.combine_query_strings(global_flags, block_query)
             else:
@@ -171,8 +172,8 @@ class CompoundSearchBuilder:
         # Extract query string and list of applied flags, add global_flags to block_query first
         # then add flags as applied and type_flag if needed.
         elif flags and len(filter_blocks) == 1:
-            block_query = filter_blocks[0]['query']
-            flags_applied = filter_blocks[0]['flags_applied']
+            block_query = filter_blocks[0][cls.QUERY]
+            flags_applied = filter_blocks[0][cls.FLAGS_APPLIED]
             if global_flags:
                 query = cls.combine_query_strings(global_flags, block_query)
             else:
@@ -180,43 +181,51 @@ class CompoundSearchBuilder:
             for applied_flag in flags_applied:
                 for flag in flags:
                     if flag['name'] == applied_flag:
-                        query = cls.combine_query_strings(query, flag['query'])
+                        query = cls.combine_query_strings(query, flag[cls.QUERY])
                         break
             query = cls._add_type_to_flag_if_needed(query, type_flag)
             subreq = cls.build_subreq_from_single_query(request, query, from_=from_, to=to)
             return cls.invoke_search(context, request, subreq, return_generator=return_generator)
 
         # Build the compound_query
-        # TODO NEW: apply flags as specified on every filter_block + global_flags
+        # Iterate through filter_blocks, adding global_flags if specified and adding flags if specified
         else:
             sub_queries = []
             for block in filter_blocks:
-                if block[cls.FLAG_APPLIED]:  # only build sub_query if this block is applied
-                    if flags:
-                        combined_query = cls.combine_query_strings(flags, block[cls.QUERY])
-                        subreq = cls.build_subreq_from_single_query(request, combined_query, route=cls.BUILD_QUERY_URL,
-                                                                    from_=from_, to=to)
-                    else:
-                        subreq = cls.build_subreq_from_single_query(request, block[cls.QUERY],
-                                                                    route=cls.BUILD_QUERY_URL, from_=from_, to=to)
-                    sub_query = request.invoke_subrequest(subreq).json[cls.QUERY]
-                    sub_queries.append(sub_query)
+                block_query = block[cls.QUERY]
+                flags_applied = block[cls.FLAGS_APPLIED]
+                query = block_query
+                if global_flags:
+                    query = cls.combine_query_strings(global_flags, block_query)
+                for applied_flag in flags_applied:
+                    for flag in flags:
+                        if flag['name'] == applied_flag:
+                            query = cls.combine_query_strings(query, flag[cls.QUERY])
+                            break
+                query = cls._add_type_to_flag_if_needed(query, type_flag)
+                subreq = cls.build_subreq_from_single_query(request, query, route=cls.BUILD_QUERY_URL,
+                                                            from_=from_, to=to)
+                sub_query = request.invoke_subrequest(subreq).json[cls.QUERY]
+                sub_queries.append(sub_query)
 
-            # TODO NEW: this logic is no longer possible, since the filter blocks are not toggling anymore
-            if len(sub_queries) == 0:  # if all blocks are disabled, just execute the flags
-                if not flags:
-                    flags = type_flag
-                else:
-                    flags = cls._add_type_to_flag_if_needed(flags, type_flag)
-                subreq = cls.build_subreq_from_single_query(request, flags, from_=from_, to=to)
-                return cls.invoke_search(context, request, subreq, return_generator=return_generator)
+            compound_query = LuceneBuilder.compound_search(sub_queries, intersect=intersect)
+            compound_subreq = cls.build_subreq_from_single_query(request, ('?type=' + t))
+            search = SearchBuilder.from_search(context, compound_subreq, compound_query, from_=from_, size=to)
+            es_results = execute_search(compound_subreq, search.search)
+            return cls.format_filter_set_results(request, es_results, return_generator)
 
-            else:  # build, execute compound query and return a response with @graph containing results
-                compound_query = LuceneBuilder.compound_search(sub_queries, intersect=intersect)
-                subreq = cls.build_subreq_from_single_query(request, ('?type=' + t))
-                search = SearchBuilder.from_search(context, subreq, compound_query, from_=from_, size=to)
-                es_results = execute_search(subreq, search.search)
-                return cls.format_filter_set_results(request, es_results, return_generator)
+    @classmethod
+    def validate_flag(cls, flag):
+        """ Validates a given flag has the correct structure """
+        if cls.NAME not in flag or cls.QUERY not in flag:  # existence
+            raise HTTPBadRequest('Passed a bad flag with missing structure: %s' % flag)
+        elif not isinstance(flag[cls.NAME], str) or not isinstance(flag[cls.QUERY], str):  # type
+            raise HTTPBadRequest('Passed a bad flag with incorrect parameter types: %s' % flag)
+
+    @classmethod
+    def validate_filter_block(cls, filter_block):
+        if cls.QUERY not in filter_block or cls.FLAGS_APPLIED not in filter_block:
+            raise HTTPBadRequest('Passed a bad filter_block with missing structure: %s' % filter_block)
 
     @classmethod
     def extract_filter_set_from_search_body(cls, request, body):
@@ -226,7 +235,6 @@ class CompoundSearchBuilder:
         :param body: body of POST request (in JSON)
         :return: a filter_set, to be executed
         """
-        # TODO: Test (and should HTTPBadRequest be thrown here?) - Will 6-23-2020
         if cls.ID in body:  # prioritize @id
             return get_item_or_none(request, body[cls.ID])
         else:
@@ -238,10 +246,14 @@ class CompoundSearchBuilder:
             if FLAGS in body:
                 if not isinstance(body[FLAGS], list):
                     raise HTTPBadRequest('Passed a bad value for flags: %s -- Expected a dict.' % body[FLAGS])
+                for flag in body[FLAGS]:
+                    cls.validate_flag(flag)
                 filter_set[FLAGS] = body[FLAGS]
             if FILTER_BLOCKS in body:
                 if not isinstance(body[FILTER_BLOCKS], list):
                     raise HTTPBadRequest('Passed a bad value for flags: %s -- Expected a list.' % body[FILTER_BLOCKS])
+                for filter_block in body[FILTER_BLOCKS]:
+                    cls.validate_filter_block(filter_block)
                 filter_set[FILTER_BLOCKS] = body[FILTER_BLOCKS]
             return filter_set
 
