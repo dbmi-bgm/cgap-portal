@@ -268,7 +268,8 @@ class Family(Item):
         for an_extension in parent_roles:
             all_combinations = [i for i in Converter if Converter[i] in an_extension['roles']]
             for a_combination in all_combinations:
-                Converter.update({a_combination + '-m': an_extension['parents'][0], a_combination + '-f': an_extension['parents'][1]})
+                for ind, parent_tag in enumerate(['-m', '-f']):
+                    Converter[a_combination + parent_tag] = an_extension['parents'][ind]
         # roles : the input roles to be extended
         # children : new roles that are in sequence female, male, non-gender
         children_roles_gendered = [
