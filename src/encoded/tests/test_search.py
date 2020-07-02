@@ -517,7 +517,6 @@ def test_index_data_workbook(app, workbook, testapp, indexer_testapp, htmltestap
     # e.g., {"db_es_total": "DB: 748 ES: 748 ", ...}
     db_es_total = testapp_counts.json['db_es_total']
     split_counts = db_es_total.split()
-    print("db_es_total=", db_es_total)
     db_total = int(split_counts[1])
     es_total = int(split_counts[3])
     assert(db_total == es_total)  # 2nd is db, 4th is es
@@ -544,13 +543,7 @@ def test_index_data_workbook(app, workbook, testapp, indexer_testapp, htmltestap
         # check items in search result individually
         search_url = '/%s?limit=all' % item_type
         print("search_url=", search_url)
-        # This should never give a 404 because we checked a few lines ago that
-        # the es_item_count and db_item_counts agree and are non-zero.
-        # If there had been zero, we'd have done a 'continue' to next loop iteration.
-        # -kmp 2-Jul-2020
         res = testapp.get(search_url, status=[200, 301]).follow()
-        print("res.status = %r" % res.status)
-        print("res.status_code = %r" % res.status_code)
         for item_res in res.json.get('@graph', []):
             index_view_res = es.get(index=namespaced_index, doc_type=item_type,
                                     id=item_res['uuid'])['_source']
