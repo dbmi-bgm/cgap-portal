@@ -237,7 +237,7 @@ class LuceneBuilder:
 
                                 found = True  # break is not sufficient, see below
                                 break
-                        except:  # Why? We found a 'range' nested query and must add this one separately
+                        except Exception:  # Why? We found a 'range' nested query and must add this one separately
                             continue  # This behavior is absurd. Somehow it knows to combine separate nested range
                             # queries with AND, but of course not regular queries and of course you cannot
                             # combine the range query here due to syntax  - Will

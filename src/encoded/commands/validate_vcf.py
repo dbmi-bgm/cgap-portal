@@ -22,13 +22,13 @@ class VCFValidator(object):
             for idx, record in enumerate(self.reader):
                 print("Record %s validated" % idx)
             return True
-        except:  # catch all and re-raise, alerting the user to which record
+        except Exception:  # catch all and re-raise, alerting the user to which record
             print("Record %s failed vcf spec validation" % (idx + 1))
             raise
 
 
 def main():
-    parser = argparse.ArgumentParser(
+    parser = argparse.ArgumentParser(  # noqa - PyCharm wrongly thinks the formatter_class is invalid
         description="Ingests a given VCF file",
         epilog=EPILOG,
         formatter_class=argparse.RawDescriptionHelpFormatter
