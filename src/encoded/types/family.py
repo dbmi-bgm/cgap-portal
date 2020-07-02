@@ -265,6 +265,10 @@ class Family(Item):
             {"roles": ['grandmother', 'grandfather'], "parents": ['great-grandmother', 'great-grandfather']},
             {"roles": ['great-grandmother', 'great-grandfather'], "parents": ['great-great-grandmother', 'great-great-grandfather']}
         ]
+        for an_extension in parent_roles:
+            all_combinations = [i for i in Converter if Converter[i] in an_extension['roles']]
+            for a_combination in all_combinations:
+                Converter.update({a_combination + '-m': an_extension['parents'][0], a_combination + '-f': an_extension['parents'][1]})
         # roles : the input roles to be extended
         # children : new roles that are in sequence female, male, non-gender
         children_roles_gendered = [
