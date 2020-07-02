@@ -514,9 +514,17 @@ def test_index_data_workbook(app, workbook, testapp, indexer_testapp, htmltestap
     create_mapping.run(app, sync_index=True)
     # check counts and ensure they're equal
     testapp_counts = testapp.get('/counts')
-    split_counts = testapp_counts.json['db_es_total'].split()
-    assert(int(split_counts[1]) == int(split_counts[3]))  # 2nd is db, 4th is es
+    print("testapp_counts=", json.dumps(testapp_counts.json, indent=2))
+    # e.g., {"db_es_total": "DB: 748 ES: 748 ", ...}
+    db_es_total = testapp_counts.json['db_es_total']
+    split_counts = db_es_total.split()
+    print("db_es_total=", db_es_total)
+    db_total = int(split_counts[1])
+    es_total = int(split_counts[3])
+    assert(db_total == es_total)  # 2nd is db, 4th is es
+    # e.g., {..., "db_es_compare": {"AnalysisStep": "DB: 26 ES: 26 ", ...}, ...}
     for item_name, item_counts in testapp_counts.json['db_es_compare'].items():
+        print("item_name=", item_name, "item_counts=", item_counts)
         # make sure counts for each item match ES counts
         split_item_counts = item_counts.split()
         db_item_count = int(split_item_counts[1])
@@ -533,8 +541,17 @@ def test_index_data_workbook(app, workbook, testapp, indexer_testapp, htmltestap
 
         if es_item_count == 0:
             continue
+
         # check items in search result individually
-        res = testapp.get('/%s?limit=all' % item_type, status=[200, 301]).follow()
+        search_url = '/%s?limit=all' % item_type
+        print("search_url=", search_url)
+        res = testapp.get(search_url, status=[200, 301]).follow()
+        import webtest
+        assert isinstance(res, webtest.TestResponse)
+        print("res.status_int = %r" % res.status_int)
+        print("res.status_code = %r" % res.status_code)
+        print("res.status = %r" % res.status)
+        print("res.json = %s" % json.dumps(res.json, indent=2))
         for item_res in res.json.get('@graph', []):
             index_view_res = es.get(index=namespaced_index, doc_type=item_type,
                                     id=item_res['uuid'])['_source']
@@ -555,6 +572,7 @@ def test_index_data_workbook(app, workbook, testapp, indexer_testapp, htmltestap
                 assert html_res.body.startswith(b'<!DOCTYPE html>')
             except Exception as e:
                 pass
+    assert False, "PASSED"
 
 
 class MockedRequest(object):
