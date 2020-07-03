@@ -1728,6 +1728,10 @@ $badge-item-min-height: 90px;
 		flex-wrap: wrap;
 		margin: 0 -10px;
 
+		@include media-breakpoint-up(lg){
+			min-height: 320px;
+		}
+
 		> .col-stats,
 		> .col-pedigree-viz {
 			padding: 0 10px;
@@ -1785,12 +1789,11 @@ $badge-item-min-height: 90px;
 		div.pedigree-vis-heading {
 			background-color: #20445f;
 			color: #ffffff;
-			padding: 10px 30px;
 
-			@include media-breakpoint-up(lg){
-				border-top-right-radius: $card-border-radius; // prev: 10px;
-				border-top-left-radius: $card-border-radius; // prev: 10px;
-			}
+			// @include media-breakpoint-up(lg){
+			// 	border-top-right-radius: $card-border-radius; // prev: 10px;
+			// 	border-top-left-radius: $card-border-radius; // prev: 10px;
+			// }
 		}
 
 		.pedigree-placeholder {
@@ -1855,37 +1858,68 @@ $badge-item-min-height: 90px;
 	}
 
 	.tab-router {
-		.dot-tab-nav-list {
-			list-style-type: none;
-			margin: 0;
-			padding: 0;
-			display: flex;
-			justify-content: space-evenly;
+		.dot-tab-nav {
 
-			li.arrow-tab {
-				flex-grow: 1;
+			box-shadow: 0 0 7px 0px #0005;
+			border-top: 1px solid #999;
+			border-bottom: 1px dotted #ddd;
 
-				&:not(:last-of-type) {
-					padding-right: 10px;
-				}
-				
-				> button {
-					background-color: cornflowerblue;
-					color: #ffff;
-					height: 100%;
-					display: block;
-					text-align: center;
-					padding: 10px;
-					text-decoration: none;
-					border: none;
-					width: 100%;
-				}
-				&.disabled {
-					>button {
-						background-color: rgb(176, 196, 222);
+			.dot-tab-nav-list {
+				list-style-type: none;
+				margin: 0;
+				padding: 0;
+				display: flex;
+				justify-content: space-evenly;
+
+				.arrow-tab {
+					flex-grow: 1;
+					display: flex;
+					height: $search-results-header-row-height; // Eh why not re-use this, can change always in future.
+					
+
+					&:not(:last-of-type) {
+						padding-right: 10px;
 					}
+					
+					> button {
+						background-color: cornflowerblue;
+						color: #ffff;
+						height: 100%;
+						display: block;
+						text-align: center;
+						padding: 10px;
+						text-decoration: none;
+						border: none;
+						width: 100%;
+					}
+
+					> .btn-append,
+					> .btn-prepend {
+						height: 100%;
+						width: $search-results-header-row-height; // Same as height of parent
+						flex: 1 0 0px;
+						> svg {
+							height: 100%;
+							width: auto;
+							path {
+								fill: cornflowerblue;
+							}
+						}
+					}
+
+					&.disabled {
+						> button {
+							background-color: rgb(176, 196, 222);
+						}
+						> .btn-append > svg path,
+						> .btn-prepend > svg path {
+							fill: rgb(176, 196, 222);
+						}
+					}
+
 				}
 			}
+
 		}
 		.tab-router-contents {
 			padding-top: 20px;

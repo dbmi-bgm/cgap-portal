@@ -373,7 +373,7 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
                     </div>
                     <div id="case-overview-ped-link" className="col-pedigree-viz">
                         <div className="card d-flex flex-column">
-                            <div className="pedigree-vis-heading d-flex justify-content-between">
+                            <div className="pedigree-vis-heading card-header d-flex justify-content-between">
                                 <div>
                                     <i className="icon icon-sitemap fas icon-fw mr-1"></i>
                                     <h4 className="text-white text-400 d-inline-block mt-0 mb-0 ml-05 mr-05">
@@ -403,7 +403,7 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
                 </div>
             </div>
 
-            <div className="container-wide bg-light pt-12 pb-24">
+            <div className="container-wide bg-light pt-12 pb-48">
                 <div className="processing-summary-tables-container mt-0">
                     { caseSearchTables }
                 </div>
@@ -411,20 +411,20 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
 
             <hr className="tab-section-title-horiz-divider" />
 
-            <DotRouter href={href} className="container-wide bg-light pt-36 pb-24">
-                <DotRouterTab className="arrow-tab" tabTitle="Accessioning" dotPath=".accessioning" default>
+            <DotRouter href={href} navClassName="container-wide pt-36 pb-36" contentsClassName="container-wide bg-light pt-36 pb-36">
+                <DotRouterTab tabTitle="Accessioning" dotPath=".accessioning" default>
                     <AccessioningTab {...{ context, href }} />
                 </DotRouterTab>
-                <DotRouterTab className="arrow-tab" tabTitle="Bioinformatics" dotPath=".bioinformatics">
+                <DotRouterTab tabTitle="Bioinformatics" dotPath=".bioinformatics">
                     <BioinformaticsTab {...{ context, families, currFamily, pedigreeFamiliesIdx, idToGraphIdentifier, sample_processing, onFamilySelect }} />
                 </DotRouterTab>
-                <DotRouterTab className="arrow-tab" tabTitle="Filtering" dotPath=".filtering">
+                <DotRouterTab tabTitle="Filtering" dotPath=".filtering">
                     <FilteringTab context={context} />
                 </DotRouterTab>
-                <DotRouterTab className="arrow-tab" tabTitle="Interpretation" dotPath=".interpretation" disabled>
+                <DotRouterTab tabTitle="Interpretation" dotPath=".interpretation" disabled>
                     <InterpretationTab {...props} />
                 </DotRouterTab>
-                <DotRouterTab className="arrow-tab" tabTitle="Finalize Case" dotPath=".reporting" disabled>
+                <DotRouterTab tabTitle="Finalize Case" dotPath=".reporting" disabled>
                     <ReportingTab {...props} />
                 </DotRouterTab>
             </DotRouter>
@@ -482,7 +482,9 @@ class DotRouter extends React.PureComponent {
     }
 
     static defaultProps = {
-        "className" : "container-wide bg-light",
+        "className" : null,
+        "navClassName" : "container-wide",
+        "contentsClassName" : "container-wide",
         "elementID" : "dot-router"
     };
 
@@ -529,19 +531,19 @@ class DotRouter extends React.PureComponent {
     }
 
     render() {
-        const { children, className, elementID } = this.props;
+        const { children, className, navClassName, contentsClassName, elementID } = this.props;
         const currentTab = this.getCurrentTab();
 
         return (
             // We could make classNames props (with default values via defaultProps)
             // if plan to make reusable for other views
             <div className={"tab-router" + (className ? " " + className : "")} id={elementID}>
-                <nav className="dot-tab-nav">
-                    <ul className="dot-tab-nav-list">
+                <nav className={"dot-tab-nav" + (navClassName ? " " + navClassName : "")}>
+                    <div className="dot-tab-nav-list">
                         { children }
-                    </ul>
+                    </div>
                 </nav>
-                <div className="tab-router-contents">
+                <div className={"tab-router-contents" + (contentsClassName ? " " + contentsClassName : "")}>
                     { currentTab.props.children }
                 </div>
             </div>
@@ -561,14 +563,34 @@ function DotRouterTab(props) {
     if (!React.isValidElement(children)) {
         throw new Error("Expected children to be present and valid JSX");
     }
-    if (disabled) {
-        return <li className={className + " disabled"} key={tabTitle}><button type="button" disabled>{tabTitle}</button></li>;
-    }
+
+    //const cls = (className ? className)
+
     return (
-        <li className={className} key={tabTitle}>
-            <button type="button" onClick={onClick}>{ tabTitle }</button>
-        </li>);
+
+        <div className={(className ? className + " " : "") + (disabled ? "disabled " : "")} >
+            <div className="btn-prepend">
+                <svg viewBox="0 0 1.5875 4.2333333" width={6} height={16}>
+                    <path d="M 0,4.2333333 1.5875,2.1166667 v 2.1166666 z"/>
+                    <path d="M 0,3.3e-6 1.5875,0 v 2.1166667 z"/>
+                </svg>
+            </div>
+            <button type="button" onClick={disabled ? null : onClick} disabled={disabled}>{ tabTitle }</button>
+            <div className="btn-append">
+                <svg viewBox="0 0 1.5875 4.2333333" width={6} height={16}>
+                    <path d="M 0,3.3e-6 1.5875,2.1166733 0,4.2333333 Z"/>
+                </svg>
+            </div>
+        </div>
+
+    // <li className={className} key={tabTitle}>
+    //     <button type="button" onClick={onClick}>{ tabTitle }</button>
+    // </li>
+    );
 }
+DotRouterTab.defaultProps = {
+    "className" : "arrow-tab d-flex"
+};
 
 const AccessioningTab = React.memo(function AccessioningTab(props) {
     const { context: result, href } = props;
