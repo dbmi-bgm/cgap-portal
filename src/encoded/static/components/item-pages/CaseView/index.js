@@ -409,8 +409,6 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
                 </div>
             </div>
 
-            <hr className="tab-section-title-horiz-divider" />
-
             <DotRouter href={href} navClassName="container-wide pt-36 pb-36" contentsClassName="container-wide bg-light pt-36 pb-36">
                 <DotRouterTab tabTitle="Accessioning" dotPath=".accessioning" default>
                     <AccessioningTab {...{ context, href }} />
@@ -564,10 +562,7 @@ function DotRouterTab(props) {
         throw new Error("Expected children to be present and valid JSX");
     }
 
-    //const cls = (className ? className)
-
     return (
-
         <div className={(className ? className + " " : "") + (disabled ? "disabled " : "")} >
             <div className="btn-prepend">
                 <svg viewBox="0 0 1.5875 4.2333333" width={6} height={16}>
@@ -582,10 +577,6 @@ function DotRouterTab(props) {
                 </svg>
             </div>
         </div>
-
-    // <li className={className} key={tabTitle}>
-    //     <button type="button" onClick={onClick}>{ tabTitle }</button>
-    // </li>
     );
 }
 DotRouterTab.defaultProps = {

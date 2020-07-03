@@ -1859,10 +1859,12 @@ $badge-item-min-height: 90px;
 
 	.tab-router {
 		.dot-tab-nav {
-
-			box-shadow: 0 0 7px 0px #0005;
+			position: relative;
+			z-index: 5;
+			box-shadow: 0 -2px 7px -1px #0004;
 			border-top: 1px solid #999;
-			border-bottom: 1px dotted #ddd;
+			border-bottom: 1px solid #ccc;
+			
 
 			.dot-tab-nav-list {
 				list-style-type: none;
@@ -1944,7 +1946,10 @@ $badge-item-min-height: 90px;
 			}
 
 			.embedded-search-view-outer-container {
-				background-color: #ffffff;
+				// background-color: #ffffff;
+				.facets-container {
+					background: #ffffff;
+				}
 			}
 
 			.tab-inner-container {
