@@ -1873,14 +1873,17 @@ $badge-item-min-height: 90px;
 				display: flex;
 				justify-content: space-evenly;
 
+				@include media-breakpoint-down(sm) {
+					flex-direction: column;
+				}
+
 				.arrow-tab {
 					flex-grow: 1;
 					display: flex;
 					height: $search-results-header-row-height; // Eh why not re-use this, can change always in future.
-					
 
-					&:not(:last-of-type) {
-						padding-right: 10px;
+					@include media-breakpoint-down(sm) {
+						margin-bottom: 5px;
 					}
 					
 					> button {
@@ -1906,6 +1909,10 @@ $badge-item-min-height: 90px;
 							path {
 								fill: cornflowerblue;
 							}
+						}
+
+						@include media-breakpoint-down(sm) {
+							display: none;
 						}
 					}
 

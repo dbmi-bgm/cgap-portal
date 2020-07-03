@@ -366,7 +366,7 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
                 </h3>
             </div>
             <hr className="tab-section-title-horiz-divider" />
-            <div className="container-wide bg-light py-4">
+            <div className="container-wide bg-light pt-36 pb-36">
                 <div className="card-group case-summary-card-row">
                     <div className="col-stats">
                         <CaseStats {...{ description, numIndividuals, numWithSamples, caseFeatures }} numFamilies={familiesLen} />
@@ -403,7 +403,7 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
                 </div>
             </div>
 
-            <div className="container-wide bg-light pt-12 pb-48">
+            <div className="container-wide bg-light pb-48">
                 <div className="processing-summary-tables-container mt-0">
                     { caseSearchTables }
                 </div>
@@ -564,14 +564,14 @@ function DotRouterTab(props) {
 
     return (
         <div className={(className ? className + " " : "") + (disabled ? "disabled " : "")} >
-            <div className="btn-prepend">
+            <div className="btn-prepend d-xs-none">
                 <svg viewBox="0 0 1.5875 4.2333333" width={6} height={16}>
                     <path d="M 0,4.2333333 1.5875,2.1166667 v 2.1166666 z"/>
                     <path d="M 0,3.3e-6 1.5875,0 v 2.1166667 z"/>
                 </svg>
             </div>
             <button type="button" onClick={disabled ? null : onClick} disabled={disabled}>{ tabTitle }</button>
-            <div className="btn-append">
+            <div className="btn-append d-xs-none">
                 <svg viewBox="0 0 1.5875 4.2333333" width={6} height={16}>
                     <path d="M 0,3.3e-6 1.5875,2.1166733 0,4.2333333 Z"/>
                 </svg>
