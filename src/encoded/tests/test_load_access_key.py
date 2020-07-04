@@ -1,12 +1,13 @@
 import pytest
+
 from unittest import mock
 from ..commands.load_access_keys import generate_access_key
 
 
 pytestmark = [pytest.mark.setone, pytest.mark.working]
 
-
 # TODO: test load_access_keys.get_existing_key_ids, which would use ES
+
 
 def test_gen_access_keys(testapp, admin):
     with mock.patch('encoded.commands.load_access_keys.get_beanstalk_real_url') as mocked_url:
