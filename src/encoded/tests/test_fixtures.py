@@ -1,4 +1,9 @@
 import pytest
+
+from webtest import TestApp
+from .datafixtures import ORDER
+
+
 pytestmark = [pytest.mark.setone, pytest.mark.working, pytest.mark.schema]
 
 
@@ -6,7 +11,6 @@ pytestmark = [pytest.mark.setone, pytest.mark.working, pytest.mark.schema]
 def minitestdata(app, conn):
     tx = conn.begin_nested()
 
-    from webtest import TestApp
     environ = {
         'HTTP_ACCEPT': 'application/json',
         'REMOTE_USER': 'TEST',
@@ -29,7 +33,6 @@ def minitestdata(app, conn):
 def minitestdata2(app, conn):
     tx = conn.begin_nested()
 
-    from webtest import TestApp
     environ = {
         'HTTP_ACCEPT': 'application/json',
         'REMOTE_USER': 'TEST',
@@ -95,8 +98,6 @@ def test_fixtures2(minitestdata2, testapp):
 
 
 def test_order_complete(app, conn):
-    from .datafixtures import ORDER
-    from webtest import TestApp
     ORDER = ORDER + ['access_key']
     environ = {
         'HTTP_ACCEPT': 'application/json',

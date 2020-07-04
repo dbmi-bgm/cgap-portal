@@ -9,6 +9,7 @@ from snovault.elasticsearch import create_mapping
 from encoded.search.lucene_builder import LuceneBuilder
 from snovault.elasticsearch.indexer_utils import get_namespaced_index
 from snovault.util import add_default_embeds
+from webtest import AppError
 
 # Use workbook fixture from BDD tests (including elasticsearch)
 from .workbook_fixtures import app, workbook
@@ -607,7 +608,6 @@ def test_search_with_principals_allowed_fails(workbook, anontestapp):
         XXX IMPORTANT: Since we do permissions in a restrictive way, this works - if our permissions structure is
         modified, it is possible this behavior will need to be revisited -Will 4-24-2020
     """
-    from webtest import AppError
     with pytest.raises(AppError):
         anontestapp.get('/search/?type=Item&principals_allowed.view=group.PERMISSION_YOU_DONT_HAVE')
     with pytest.raises(AppError):

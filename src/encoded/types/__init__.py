@@ -1,18 +1,20 @@
 """init.py lists all the collections that do not have a dedicated types file."""
 
-from snovault.attachment import ItemWithAttachment
-from snovault.crud_views import collection_add as sno_collection_add
-from snovault.schema_utils import validate_request
-from snovault.validation import ValidationFailure
+import transaction
+
+# from pyramid.traversal import find_root
 from snovault import (
     calculated_property,
     collection,
     load_schema,
-    CONNECTION,
+    # CONNECTION,
     COLLECTIONS,
-    display_title_schema
+    # display_title_schema
 )
-# from pyramid.traversal import find_root
+from snovault.attachment import ItemWithAttachment
+from snovault.crud_views import collection_add as sno_collection_add
+from snovault.schema_utils import validate_request
+from snovault.validation import ValidationFailure
 from .base import (
     Item,
     get_item_or_none,
@@ -239,7 +241,6 @@ class TrackingItem(Item):
         Raises:
             ValidationFailure if TrackingItem cannot be validated
         """
-        import transaction
         collection = request.registry[COLLECTIONS]['TrackingItem']
         # set remote_user to standarize permissions
         prior_remote = request.remote_user
