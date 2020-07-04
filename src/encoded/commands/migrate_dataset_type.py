@@ -2,6 +2,7 @@
 Migrate dataset type
 
 """
+import argparse
 import logging
 import transaction
 from pyramid.paster import get_app
@@ -36,7 +37,6 @@ def run(app):
 
 
 def main():
-    import argparse
     parser = argparse.ArgumentParser(  # noqa - PyCharm wrongly thinks the formatter_class is specified wrong here.
         description="Migrate dataset type", epilog=EPILOG,
         formatter_class=argparse.RawDescriptionHelpFormatter,
