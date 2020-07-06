@@ -163,9 +163,8 @@ class File(Item):
         'related_files.relationship_type',
         'related_files.file.accession',
         'quality_metric.display_title',
-        'quality_metric.@type',
-        'institution_project_attribution_embed_list'
-    ]  # + lab_award_attribution_embed_list
+        'quality_metric.@type'
+    ] + institution_project_attribution_embed_list  # + lab_award_attribution_embed_list
     name_key = 'accession'
 
     @calculated_property(schema={
