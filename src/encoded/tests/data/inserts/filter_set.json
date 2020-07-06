@@ -7,6 +7,7 @@
         "status": "released",
         "uuid": "dcf15d5e-40aa-43bc-b81c-32c70c9afa99",
         "search_type": "VariantSample",
+        "title": "Test filter set",
         "filter_blocks": [
             {
                 "query": "&variant.CHROM=1&variant.genes.genes_most_severe_consequence.impact=MODERATE",
