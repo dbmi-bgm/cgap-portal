@@ -424,6 +424,13 @@
                 "title": "Completed process",
                 "type": "string"
             }
+        },
+        "bam_sample_id": {
+            "title": "Bam Sample ID",
+            "description": "ID used for read groups and vcf call info",
+            "type": "string",
+            "lookup": 21,
+            "uniqueKey": true
         }
     }
 }

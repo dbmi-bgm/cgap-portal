@@ -203,7 +203,9 @@ class Case(Item):
         vcf = self.vcf_file(request, sample_processing)
         if not vcf:
             return ''
-        sample_acc = sample.split('/')[2]
+        sample_read_group = sample.get('bam_sample_id', '')
+        if not sample_read_group:
+            return ''
         vcf_acc = vcf.split('/')[2]
-        add_on = "&sample={}&file={}".format(sample_acc, vcf_acc)
+        add_on = "&CALL_INFO={}&file={}".format(sample_read_group, vcf_acc)
         return add_on
