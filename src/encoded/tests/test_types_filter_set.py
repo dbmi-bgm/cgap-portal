@@ -6,7 +6,6 @@ from .workbook_fixtures import app, workbook
 pytestmark = [pytest.mark.working, pytest.mark.search]
 COMPOUND_SEARCH_URL = '/compound_search'
 FILTER_SET_URL = '/filter_set'
-COHORT_URL = '/cohort'
 VARIANT_URL = '/variant'
 
 
@@ -27,14 +26,14 @@ def simple_filter_set():
     """ A filter set with only the flag that designates the type """
     return {
         'title': 'Test filter set',
-        'search_type': 'Cohort',
+        'search_type': 'Variant',
         'filter_blocks': [
             {
-                'query': 'families.proband=GAPID5HBSLG6',
+                'query': 'REF=G&ALT=A',
                 'flag_applied': True
             }
         ],
-        'flags': '?type=Cohort',
+        'flags': '?type=Variant',
         'project': 'hms-dbmi',
         'institution': 'hms-dbmi'
     }
@@ -45,18 +44,18 @@ def typical_filter_set():
     """ A filter set with two filter blocks and a flag """
     return {
         'title': 'Test filter set',
-        'search_type': 'Cohort',
+        'search_type': 'Variant',
         'filter_blocks': [
             {
-                'query': 'families.proband=GAPID8J9B9CR',
+                'query': 'ALT=T&hg19.hg19_chrom=chr1',
                 'flag_applied': True
             },
             {
-                'query': 'families.clinic_notes=xyz',
+                'query': 'REF=G&ALT=A',
                 'flag_applied': True
-            }
+            },
         ],
-        'flags': '?type=Cohort',
+        'flags': '?type=Variant',
         'project': 'hms-dbmi',
         'institution': 'hms-dbmi'
     }
@@ -161,7 +160,7 @@ def test_filter_set_simple(workbook, testapp, simple_filter_set):
 
     # do similar search with @id
     compound_search_res = testapp.post_json(COMPOUND_SEARCH_URL, {'@id': uuid}).json['@graph']
-    assert len(compound_search_res) == 3
+    assert len(compound_search_res) == 1
 
 
 def test_filter_set_complete(workbook, testapp, typical_filter_set):
@@ -171,7 +170,7 @@ def test_filter_set_complete(workbook, testapp, typical_filter_set):
 
     # execute the more complicated filter_set by @id
     compound_search_res = testapp.post_json(COMPOUND_SEARCH_URL, {'@id': uuid}).json['@graph']
-    assert len(compound_search_res) == 2
+    assert len(compound_search_res) == 3  # typical_filter_set matches 3/4 variants
 
 
 def test_filter_set_complex(workbook, testapp, complex_filter_set):
