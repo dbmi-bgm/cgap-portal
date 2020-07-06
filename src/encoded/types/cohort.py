@@ -46,7 +46,7 @@ class Cohort(Item):
     @calculated_property(schema={
         "title": "Phenotypic features",
         "description": "Phenotypic features that define the cohort",
-        "type" : "array",
+        "type": "array",
         "items": {
             "title": "Phenotypic feature",
             "type": "string",
@@ -159,7 +159,7 @@ def process_pedigree(context, request):
     xml_extra = {'ped_datetime': ped_datetime}
 
     family_uuids = create_family_proband(testapp, xml_data, refs, 'managedObjectID',
-                                   cohort, post_extra, xml_extra)
+                                         cohort, post_extra, xml_extra)
 
     # create Document for input pedigree file
     # pbxml files are not handled by default. Do some mimetype processing
@@ -224,7 +224,7 @@ def process_pedigree(context, request):
 
 
 #####################################
-### Pedigree processing functions ###
+# ## Pedigree processing functions ###
 #####################################
 
 
@@ -681,7 +681,7 @@ def create_family_proband(testapp, xml_data, refs, ref_field, cohort,
                         if ref_val is not None and 'xml_ref_fxn' in converted_dict:
                             # will update data in place
                             converted_dict['xml_ref_fxn'](testapp, ref_val, refs, data,
-                                                     cohort, uuids_by_ref)
+                                                          cohort, uuids_by_ref)
                         elif ref_val is not None:
                             data[converted_dict['corresponds_to']] = uuids_by_ref[ref_val]
 
@@ -730,7 +730,7 @@ def create_family_proband(testapp, xml_data, refs, ref_field, cohort,
     # invert uuids_by_ref to sort family members by managedObjectID (xml ref)
     refs_by_uuid = {v: k for k, v in uuids_by_ref.items()}
     family = {'members': sorted([m['uuid'] for m in family_members.values()],
-                                 key=lambda v: int(refs_by_uuid[v]))}
+                                key=lambda v: int(refs_by_uuid[v]))}
     if proband and proband in family_members:
         family['proband'] = family_members[proband]['uuid']
     else:
