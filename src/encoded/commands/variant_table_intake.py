@@ -36,11 +36,12 @@ class MappingTableParser(object):
                           ('variant_sample', EMBEDDED_VARIANT_SAMPLE_FIELDS)]
     NAME_FIELD = 'field_name'
 
-    def __init__(self, _mp, schema):
+    def __init__(self, _mp, schema, skip_embeds=False):
         self.mapping_table = _mp
         self.annotation_field_schema = json.load(open(schema, 'r'))
         self.version, self.date, self.fields = self.read_mp_meta()
-        self.provision_embeds()
+        if not skip_embeds:
+            self.provision_embeds()
 
     @staticmethod
     def process_fields(row):
@@ -414,7 +415,7 @@ class MappingTableParser(object):
         """
         schema['$schema'] = 'http://json-schema.org/draft-04/schema#'
         schema['type'] = 'object'
-        schema['required'] = ['institution', 'project', 'CHROM', 'POS', 'REF', 'ALT']  # for display_title
+        schema['required'] = ['institution', 'project']  # for display_title
         schema['identifyingProperties'] = ['uuid', 'aliases', 'annotation_id']
         schema['additionalProperties'] = False
         schema['mixinProperties'] = [
@@ -428,6 +429,14 @@ class MappingTableParser(object):
             { "$ref": "mixins.json#/notes" },
             { "$ref": "mixins.json#/static_embeds" }
         ]
+
+    @staticmethod
+    def add_variant_required_fields(schema):
+        schema['required'].extend(['CHROM', 'REF', 'ALT', 'POS'])
+
+    @staticmethod
+    def add_variant_sample_required_fields(schema):
+        schema['required'].extend(['CALL_INFO', 'variant', 'file'])
 
     @staticmethod
     def add_identifier_field(props):
@@ -452,6 +461,7 @@ class MappingTableParser(object):
         """
         schema = {}
         self.add_default_schema_fields(schema)
+        self.add_variant_sample_required_fields(schema)
         schema['title'] = 'Sample Variant'
         schema['description'] = "Schema for variant info for sample"
         schema['id'] = '/profiles/variant_sample.json'
@@ -462,14 +472,14 @@ class MappingTableParser(object):
             'type': 'string',
             'linkTo': 'Variant'
         }
-        schema['properties']['sample'] = {  # NOT a linkTo
-            'title': 'Sample',
-            'description': 'String Accession of the sample',
-            'type': 'string'
-        }
-        schema['properties']['file'] = {  # NOT a linkTo
+        schema['properties']['file'] = {  # NOT a linkTo as the ID is sufficient for filtering
             'title': 'File',
             'description': 'String Accession of the vcf file used in digestion',
+            'type': 'string'
+        }
+        schema['properties']['href'] = {
+            'title': 'IGV href',
+            'description': 'Link to IGV image',
             'type': 'string'
         }
 
@@ -506,6 +516,7 @@ class MappingTableParser(object):
         """
         schema = {}
         self.add_default_schema_fields(schema)
+        self.add_variant_required_fields(schema)
         schema['title'] = 'Variants'
         schema['description'] = "Schema for variants"
         schema['id'] = '/profiles/variant.json'

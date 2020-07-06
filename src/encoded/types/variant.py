@@ -84,7 +84,7 @@ class Variant(Item):
     @classmethod
     def create(cls, registry, uuid, properties, sheets=None):
         """ Sets the annotation_id field on this variant prior to passing on. """
-        properties[ANNOTATION_ID] = 'chr%s:%s%s_%s' % (  # XXX: replace _ with > field is restricted
+        properties[ANNOTATION_ID] = 'chr%s:%s%s_%s' % (  # XXX: replace _ with > ('>' char is restricted)
             properties['CHROM'],
             properties['POS'],
             properties['REF'],
@@ -118,13 +118,11 @@ class VariantSample(Item):
     @classmethod
     def create(cls, registry, uuid, properties, sheets=None):
         """ Sets the annotation_id field on this variant_sample prior to passing on. """
-        if 'variant' not in properties:
-            properties[ANNOTATION_ID] = '%s:Unknown_Variant%s' % (properties['CALL_INFO'], uuid)
-        else:  # this is what really needs to happen every time
-            properties[ANNOTATION_ID] = '%s:%s' % (
-                properties['CALL_INFO'],
-                properties['variant']
-            )
+        properties[ANNOTATION_ID] = '%s:%s:%s' % (
+            properties['CALL_INFO'],
+            properties['variant'],
+            properties['file']
+        )
         return super(Item, cls).create(registry, uuid, properties, sheets)
 
     @calculated_property(schema={
