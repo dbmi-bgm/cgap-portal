@@ -13,105 +13,18 @@ VARIANT_URL = '/variant'
 def barebones_filter_set():
     """ A filter set with only the flag that designates the type """
     return {
-        'title': 'Test filter set',
         'search_type': 'Variant',
-<<<<<<< HEAD
         'flags': [
             {
                 'name': 'variant',
                 'query': '?type=Variant'
             }
         ],
-=======
-        'flags': '?type=Variant',
         'project': 'hms-dbmi',
         'institution': 'hms-dbmi'
     }
 
 
-@pytest.fixture
-def simple_filter_set():
-    """ A filter set with only the flag that designates the type """
-    return {
-        'title': 'Test filter set',
-        'search_type': 'Variant',
-        'filter_blocks': [
-            {
-                'query': 'REF=G&ALT=A',
-                'flag_applied': True
-            }
-        ],
-        'flags': '?type=Variant',
-        'project': 'hms-dbmi',
-        'institution': 'hms-dbmi'
-    }
-
-
-@pytest.fixture
-def typical_filter_set():
-    """ A filter set with two filter blocks and a flag """
-    return {
-        'title': 'Test filter set',
-        'search_type': 'Variant',
-        'filter_blocks': [
-            {
-                'query': 'ALT=T&hg19.hg19_chrom=chr1',
-                'flag_applied': True
-            },
-            {
-                'query': 'REF=G&ALT=A',
-                'flag_applied': True
-            },
-        ],
-        'flags': '?type=Variant',
->>>>>>> master
-        'project': 'hms-dbmi',
-        'institution': 'hms-dbmi'
-    }
-
-
-<<<<<<< HEAD
-=======
-@pytest.fixture
-def complex_filter_set():
-    """ A filter set with 3 filter_blocks and a flag """
-    return {
-        'title': 'Test filter set',
-        'search_type': 'Variant',
-        'filter_blocks': [
-            {
-                'query': 'ALT=T&hg19.hg19_chrom=chr1',
-                'flag_applied': True
-            },
-            {
-                'query': 'REF=G&ALT=A',
-                'flag_applied': True
-            },
-            {
-                'query': 'POS.from=0&POS.to=12125898',
-                'flag_applied': True
-            }
-        ],
-        'flags': '?type=Variant&CHROM=1',
-        'project': 'hms-dbmi',
-        'institution': 'hms-dbmi',
-        'uuid': '5145195f-c203-41be-9642-7ba6fb4bfb16'
-    }
-
-
-def toggle_filter_blocks(filter_set, on=True):
-    """ Helper method for testing that will 'toggle' filter blocks to True if on=True else
-        it will disable them with False.
-
-    :param filter_set: set containing filter_blocks we'd like to toggle
-    :param on: whether or not to toggle on, default True
-    """
-    filter_blocks = filter_set.get('filter_blocks', [])
-    for block in filter_blocks:
-        block['flag_applied'] = True if on else False
-
-
->>>>>>> master
 def test_filter_set_barebones(workbook, testapp, barebones_filter_set):
     """ Tests posting a filter set and executing it through the /compound_search route """
     res = testapp.post_json(FILTER_SET_URL, barebones_filter_set, status=201).json
@@ -250,7 +163,6 @@ def test_filter_set_typical(workbook, testapp, typical_filter_set):
 
     # execute the more complicated filter_set by @id
     compound_search_res = testapp.post_json(COMPOUND_SEARCH_URL, {'@id': uuid}).json['@graph']
-<<<<<<< HEAD
     assert len(compound_search_res) == 3
 
 
@@ -283,9 +195,6 @@ def complex_filter_set():
         'institution': 'hms-dbmi',
         'uuid': '5145195f-c203-41be-9642-7ba6fb4bfb16'
     }
-=======
-    assert len(compound_search_res) == 3  # typical_filter_set matches 3/4 variants
->>>>>>> master
 
 
 def test_filter_set_complex(workbook, testapp, complex_filter_set):
@@ -301,7 +210,6 @@ def test_filter_set_complex(workbook, testapp, complex_filter_set):
 
     # Modify POS
     filter_set = {
-        'title': 'Test filter set',
         'search_type': t,
         'filter_blocks': filter_blocks,
         'flags': flags
@@ -323,7 +231,6 @@ def test_filter_set_intersection(workbook, testapp, complex_filter_set):
     filter_blocks = complex_filter_set['filter_blocks']
     flags = complex_filter_set['flags']
     filter_set = {
-        'title': 'Test filter set',
         'search_type': t,
         'filter_blocks': filter_blocks,
         'flags': flags,
@@ -415,7 +322,6 @@ def execute_and_verify_generator_search(testapp, filter_set, expected):
 @pytest.fixture
 def filter_set_with_only_flags():
     return {
-        'title': 'Test filter set',
         'search_type': 'Variant',
         'global_flags': 'CHROM=1'
     }
@@ -436,7 +342,6 @@ def test_compound_search_only_global_flags(workbook, testapp, filter_set_with_on
 @pytest.fixture
 def filter_set_with_single_filter_block():
     return {
-        'title': 'Test filter set',
         'search_type': 'Variant',
         'filter_blocks': [{
             'query': 'POS.from=0&POS.to=10000000',
@@ -461,7 +366,6 @@ def test_compound_search_single_filter_block(workbook, testapp, filter_set_with_
 @pytest.fixture
 def filter_set_with_single_filter_block_and_flags():
     return {
-        'title': 'Test filter set',
         'search_type': 'Variant',
         'filter_blocks': [{
             'query': 'POS.from=0&POS.to=10000000',
@@ -493,7 +397,6 @@ def test_compound_search_filter_and_flags(workbook, testapp, filter_set_with_sin
 @pytest.fixture
 def filter_set_with_multiple_disabled_flags():
     return {
-        'title': 'Test filter set',
         'search_type': 'Variant',
         'filter_blocks': [{
             'query': '?type=Variant&POS.from=0&POS.to=10000000',
