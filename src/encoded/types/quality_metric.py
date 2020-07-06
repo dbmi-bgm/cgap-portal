@@ -156,3 +156,17 @@ class QualityMetricCmphet(QualityMetric):
     item_type = 'quality_metric_cmphet'
     schema = load_schema('encoded:schemas/quality_metric_cmphet.json')
     embedded_list = QualityMetric.embedded_list
+
+
+@collection(
+    name='quality-metrics-vcfqc',
+    properties={
+        'title': 'QC Quality Metrics for VCF files',
+        'description': 'Listing of QC Quality Metrics for VCF files'
+    })
+class QualityMetricVcfqc(QualityMetric):
+    """Subclass of quality matrics for VCF files"""
+
+    item_type = 'quality_metric_vcfqc'
+    schema = load_schema('encoded:schemas/quality_metric_vcfqc.json')
+    embedded_list = QualityMetric.embedded_list
