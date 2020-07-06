@@ -411,7 +411,7 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
 
             <DotRouter href={href} navClassName="container-wide pt-36 pb-36" contentsClassName="container-wide bg-light pt-36 pb-36">
                 <DotRouterTab tabTitle="Accessioning" dotPath=".accessioning" default>
-                    <AccessioningTab {...{ context, href }} />
+                    <AccessioningTab {...{ context, href, families, props }} />
                 </DotRouterTab>
                 <DotRouterTab tabTitle="Bioinformatics" dotPath=".bioinformatics">
                     <BioinformaticsTab {...{ context, families, currFamily, pedigreeFamiliesIdx, idToGraphIdentifier, sample_processing, onFamilySelect }} />
@@ -584,8 +584,10 @@ DotRouterTab.defaultProps = {
 };
 
 const AccessioningTab = React.memo(function AccessioningTab(props) {
-    const { context: result, href } = props;
-    const { display_title, family } = result;
+    const { context: result, href, families = [] } = props;
+    const { display_title } = result;
+
+    // console.log("accessioning props", props);
     return (
         <React.Fragment>
             <h1>
@@ -593,8 +595,14 @@ const AccessioningTab = React.memo(function AccessioningTab(props) {
                 <span className="curr-selection pull-right">Current Selection</span>
             </h1>
             <div className="tab-inner-container">
-                <FamilyAccessionStackedTable {...{ result, family, href }}
-                    preventExpand fadeIn={false} collapseLongLists />
+                { families.map((family) =>
+                    <FamilyAccessionStackedTable
+                        {...{ family, result }}
+                        key={family['@id']}
+                        href={href} preventExpand
+                        fadeIn={false} collapseLongLists
+                    />
+                )}
             </div>
         </React.Fragment>
     );
@@ -608,12 +616,11 @@ const BioinformaticsTab = React.memo(function BioinformaticsTab(props) {
         sample_processing = []
     } = props;
 
-    // console.log("context", context);
-    console.log("biotab props", props);
+    // console.log("biotab props", props);
     let caseSummaryTables = [];
     let display_title;
     if (props) {
-        console.log("biotab props.pedigreeFamilies", props.families);
+        // console.log("biotab props.pedigreeFamilies", props.families);
         display_title = props.context.display_title;
         caseSummaryTables = families.map(function(family, idx){
             const {
@@ -661,16 +668,50 @@ const BioinformaticsTab = React.memo(function BioinformaticsTab(props) {
     return (
         <React.Fragment>
             <h1>{ display_title }: <span className="text-300">Bioinformatics Analysis</span></h1>
-            <div className="tab-inner-container clearfix">
-                <span className="text-500">Current Status:</span> PASS
-                <span className="font-italic pull-right">3/28/20</span>
+            <div className="tab-inner-container clearfix font-italic qc-status">
+                <span className="text-600">Current Status:</span> PASS
+                <span className="pull-right">3/28/20</span>
             </div>
             <div className="tab-inner-container">
                 <h2 className="section-header">Quality Control Metrics (QC)</h2>
+                <div className="row qc-summary">
+                    <div className="col-sm-8 text-600">
+                        Total Number of Reads:
+                    </div>
+                    <div className="col-sm-4">
+                        450 Million
+                    </div>
+                </div>
+                <div className="row qc-summary">
+                    <div className="col-sm-8 text-600">
+                        Coverage:
+                    </div>
+                    <div className="col-sm-4">
+                        30x
+                    </div>
+                </div>
+                <div className="row qc-summary">
+                    <div className="col-sm-8 text-600">
+                        Total Number of Variants Called:
+                    </div>
+                    <div className="col-sm-4">
+                        3-5 Million
+                    </div>
+                </div>
+                <div className="row qc-summary">
+                    <div className="col-sm-8 text-600">
+                        Total number of filtered variants (high-quality exonic variants + clinvar - blacklist):
+                    </div>
+                    <div className="col-sm-4">
+                        10K
+                    </div>
+                </div>
             </div>
+            {/* Placeholder for Provenance Table... may not be necessary... moving elsewhere * }
             <div className="tab-inner-container">
                 <h2 className="section-header">Provenance Table</h2>
-            </div>
+                <img className="w-100" src="/static/img/provenance.png" alt="provenance graph"/>
+            </div> */}
             <div className="tab-inner-container">
                 <h2 className="section-header">Multisample Analysis Table</h2>
                 { caseSummaryTables }

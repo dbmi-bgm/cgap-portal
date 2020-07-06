@@ -18,6 +18,7 @@ export const CaseSummaryTable = React.memo(function CaseSummaryTable(props){
         sampleProcessing = []
     } = props;
 
+    console.log("case summary props", props);
     if (members.length === 0){
         return (
             <div className="processing-summary">
@@ -421,6 +422,7 @@ export const CaseSummaryTable = React.memo(function CaseSummaryTable(props){
 
         const isProband = (probandID && probandID === indvId);
         const genID = idToGraphIdentifier[indvId];
+        console.log("id from graph", indvId, genID);
 
         const indvLink = (
             <div className={`${genID ? "text-ellipsis-container" : ""}`}>

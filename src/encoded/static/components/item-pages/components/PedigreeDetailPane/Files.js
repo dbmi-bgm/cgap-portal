@@ -24,7 +24,7 @@ export class FileWrapper extends React.Component {
 
     findFieldsWithDocumentsOrImages() {  // Q: Does it make sense to memoize this?
         const { indvSchema = {} } = this.props;
-        const { properties = {} } = indvSchema;
+        const { properties = {} } = indvSchema || {};
 
         // Isolate the field/property names of linkTos with type Document or Image
         const allProperties = _.keys(properties);

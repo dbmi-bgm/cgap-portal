@@ -23,6 +23,7 @@ export function idToGraphIdentifier(objectGraph){
         if (isRelationshipNode(node)) return;
         // We use Individual's `@id` as their dataset entry `id`.
         // If this changes, can change to get from `node.data.individualItem['@id']` instead.
+        console.log("id mapped to ", node.id, " : ", node.orderBasedName)
         mapping[node.id] = node.orderBasedName;
     });
     return mapping;

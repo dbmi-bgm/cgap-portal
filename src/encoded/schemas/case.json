@@ -113,6 +113,9 @@
         "sample_processing.completed_processes" :  {
             "title": "Bioinformatics"
         },
+        "report": {
+            "title": "Report"
+        },
         "accession" : {
             "title": "Case"
         }
