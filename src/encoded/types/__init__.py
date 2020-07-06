@@ -308,3 +308,26 @@ class AnnotationField(Item):
     })
     def display_title(self, field_name):
         return field_name
+
+
+@collection(
+    name='nexuses',
+    unique_key='accession',
+    properties={
+        'title': 'Cohorts',
+        'description': 'List of Cohorts',
+    })
+class Nexus(Item):
+    """Class for Cohorts."""
+    item_type = 'nexus'
+    name_key = 'accession'
+    schema = load_schema('encoded:schemas/nexus.json')
+    embedded_list = []
+
+    @calculated_property(schema={
+        "title": "Display Title",
+        "description": "A calculated title for every object in 4DN",
+        "type": "string"
+    })
+    def display_title(self, title):
+        return title
