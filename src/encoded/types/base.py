@@ -186,13 +186,13 @@ static_content_embed_list = [
 institution_project_attribution_embed_list = [
     "project.viewing_group",
     "project.title",
-    "instituion.name",
-    "instituion.state",
-    "instituion.country",
-    "instituion.postal_code",
-    "instituion.city",
-    "instituion.display_title",
-    "instituion.url",
+    "institution.name",
+    "institution.state",
+    "institution.country",
+    "institution.postal_code",
+    "institution.city",
+    "institution.display_title",
+    "institution.url",
     "submitted_by.timezone",
     "submitted_by.job_title"
 ]
