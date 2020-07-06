@@ -369,11 +369,6 @@
         "schema_version": {
             "default": "1"
         },
-        "sample": {
-            "title": "Sample",
-            "description": "String Accession of the sample",
-            "type": "string"
-        },
         "file": {
             "title": "File",
             "description": "String Accession of the vcf file used in digestion",
