@@ -12,7 +12,7 @@
             {
                 "name": "Basic Settings",
                 "query": "&variant.CHROM=1&variant.genes.genes_most_severe_consequence.impact=MODERATE",
-                "flag_applied": ["Flag1", "Flag2"]
+                "flags_applied": ["Flag1", "Flag2"]
             },
             {
                 "name": "Advanced Settings",

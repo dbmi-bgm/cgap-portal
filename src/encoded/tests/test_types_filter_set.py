@@ -217,10 +217,10 @@ def test_filter_set_complex(workbook, testapp, complex_filter_set):
     for block in filter_blocks:
         query = block['query']
         if 'POS' in query:
-            block['query'] = 'POS.from=0&POS.to=100000'  # exclude 3/4 variants
+            block['query'] = 'POS.from=0&POS.to=80000'  # excludes 1/4 variants
             break
     compound_search_res = testapp.post_json(COMPOUND_SEARCH_URL, filter_set).json['@graph']
-    assert len(compound_search_res) == 4
+    assert len(compound_search_res) == 3
 
 
 def test_filter_set_intersection(workbook, testapp, complex_filter_set):

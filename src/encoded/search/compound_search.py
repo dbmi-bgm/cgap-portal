@@ -186,7 +186,7 @@ class CompoundSearchBuilder:
                 query = block_query
             for applied_flag in flags_applied:
                 for flag in flags:
-                    if flag['name'] == applied_flag:
+                    if flag[cls.NAME] == applied_flag:
                         query = cls.combine_query_strings(query, flag[cls.QUERY])
                         break
             query = cls._add_type_to_flag_if_needed(query, type_flag)
@@ -205,7 +205,7 @@ class CompoundSearchBuilder:
                     query = cls.combine_query_strings(global_flags, block_query)
                 for applied_flag in flags_applied:
                     for flag in flags:
-                        if flag['name'] == applied_flag:
+                        if flag[cls.NAME] == applied_flag:
                             query = cls.combine_query_strings(query, flag[cls.QUERY])
                             break
                 query = cls._add_type_to_flag_if_needed(query, type_flag)
@@ -225,16 +225,21 @@ class CompoundSearchBuilder:
         """ Validates a given flag has the correct structure/types """
         if cls.NAME not in flag or cls.QUERY not in flag:  # existence
             raise HTTPBadRequest('Passed a bad flag with missing structure: %s' % flag)
-        elif not isinstance(flag[cls.NAME], str) or not isinstance(flag[cls.QUERY], str):  # type
-            raise HTTPBadRequest('Passed a bad flag with incorrect parameter types: %s' % flag)
+        elif not isinstance(flag[cls.NAME], str):  # type
+            raise HTTPBadRequest('Passed a bad flag with incorrect parameter for field %s: %s' % (cls.NAME, flag))
+        elif not isinstance(flag[cls.QUERY], str):  # type
+            raise HTTPBadRequest('Passed a bad flag with incorrect parameter for field %s: %s' % (cls.QUERY, flag))
 
     @classmethod
     def validate_filter_block(cls, filter_block):
         """ Validates a given filter_block has correct structure/types """
         if cls.QUERY not in filter_block or cls.FLAGS_APPLIED not in filter_block:
             raise HTTPBadRequest('Passed a bad filter_block with missing structure: %s' % filter_block)
-        elif not isinstance(filter_block[cls.QUERY], str) or not isinstance(filter_block[cls.FLAGS_APPLIED], list):
-            raise HTTPBadRequest('Passed a bad filter_block with wrong types: %s' % filter_block)
+        elif not isinstance(filter_block[cls.QUERY], str):
+            raise HTTPBadRequest('Passed a bad filter_block with wrong type for field %s: %s' % (cls.QUERY, filter_block))
+        elif not isinstance(filter_block[cls.FLAGS_APPLIED], list):
+            raise HTTPBadRequest('Passed a bad filter_block with wrong type for field %s: %s' %
+                                 (cls.FLAGS_APPLIED, filter_block))
 
     @classmethod
     def extract_filter_set_from_search_body(cls, request, body):
@@ -254,7 +259,7 @@ class CompoundSearchBuilder:
                 raise HTTPBadRequest('Tried to execute a filter_set without specifying a type!')
             if FLAGS in body:
                 if not isinstance(body[FLAGS], list):
-                    raise HTTPBadRequest('Passed a bad value for flags: %s -- Expected a dict.' % body[FLAGS])
+                    raise HTTPBadRequest('Passed a bad value for flags: %s -- Expected a list.' % body[FLAGS])
                 for flag in body[FLAGS]:
                     cls.validate_flag(flag)
                 filter_set[FLAGS] = body[FLAGS]

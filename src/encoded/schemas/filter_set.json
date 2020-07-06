@@ -44,6 +44,7 @@
                     },
                     "query": {
                         "title": "Single query",
+                        "description": "URL Query string",
                         "type": "string"
                     },
                     "flags_applied": {
@@ -75,6 +76,7 @@
                     },
                     "query": {
                         "title": "Single query",
+                        "description": "URL Query string",
                         "type": "string"
                     }
                 }
