@@ -3,19 +3,22 @@
         "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
         "institution": "hms-dbmi",
         "status": "released",
-        "uuid": "4fdb481a-fbdb-4c0f-a68d-aac87f847bec"
+        "uuid": "4fdb481a-fbdb-4c0f-a68d-aac87f847bec",
+        "bam_sample_id": "test001_sample"
     },
     {
         "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
         "institution": "hms-dbmi",
         "status": "released",
-        "uuid": "283f6047-61cd-4ddb-8881-ec1c87082569"
+        "uuid": "283f6047-61cd-4ddb-8881-ec1c87082569",
+        "bam_sample_id": "test002_sample"
     },
     {
         "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
         "institution": "hms-dbmi",
         "status": "released",
-        "uuid": "f4bbc709-40fe-48a4-afde-8e886b571903"
+        "uuid": "f4bbc709-40fe-48a4-afde-8e886b571903",
+        "bam_sample_id": "test003_sample"
     },
     {
         "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
@@ -29,6 +32,7 @@
         "indication": "cervical cancer",
         "specimen_accession": "12345",
         "specimen_accession_date": "2020-03-01",
+        "bam_sample_id": "test003_sample",
         "requisition_acceptance": {
             "accepted_rejected": "Rejected",
             "rejection_reason": "DOB missing",

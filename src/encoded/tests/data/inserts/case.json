@@ -6,6 +6,8 @@
         "status": "released",
         "uuid": "ad9883a2-6886-4ca0-9402-7c49734c12fa",
         "sample_processing": "4fdb481a-fbdb-4c0f-a68d-aac87f847a67",
-        "individual": "5ec91041-78a0-4758-abef-21c7f5fd9f12"
+        "family": "aa7d83a2-6886-4ca0-9402-7c49734ce3d4",
+        "individual": "5ec91041-78a0-4758-abef-21c7f5fd9f12",
+        "cohort": "cc7d83a2-6886-4ca0-9402-7c49734cf111"
     }
 ]
