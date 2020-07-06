@@ -1,4 +1,4 @@
-Cohort/***********************************************************
+/***********************************************************
 Custom Classes & Styling for Item Pages (e.g. Experiment Sets)
 ************************************************************/
 
@@ -828,7 +828,7 @@ i.item-status-indicator-dot {
 /** JSON Tree Wrapper (e.g. fallback view) **/
 
 .json-tree-wrapper {
-	border-radius: 4px;
+	border-radius: $border-radius-large;
 	overflow: hidden;
 	> ul {
 		padding: 8px 16px 16px !important;
@@ -1518,7 +1518,7 @@ $badge-item-min-height: 90px;
 				// Embedded Items w/ Attachments
 				.embedded-item-with-attachment {
 					background-color: #f8f8f8;
-					border-radius: 3px;
+					border-radius: $border-radius-base;
 					&:not(.in-array){
 					}
 					.link-to-item-col {
@@ -1722,25 +1722,27 @@ $badge-item-min-height: 90px;
 
 .item-page-container {
 
+	.case-summary-card-row,
 	.cohort-summary-card-row {
 		display: flex;
 		flex-wrap: wrap;
 		margin: 0 -10px;
 
+		@include media-breakpoint-up(lg){
+			min-height: 320px;
+		}
+
 		> .col-stats,
 		> .col-pedigree-viz {
 			padding: 0 10px;
-
-			@include media-breakpoint-up(lg){
-				min-height: 358px;
-			}
 		}
 
 		> .col-stats {
 			flex-grow: 1;
 			flex-shrink: 0;
 			flex-basis: 100%;
-			> #cohort-stats {
+			> #cohort-stats,
+			> #case-stats {
 				min-height: 100%;
 			}
 
@@ -1755,8 +1757,11 @@ $badge-item-min-height: 90px;
 			flex-basis: 100%;
 			padding: 0 10px;
 
-			> .pedigree-viz-container > .inner-container {
-				@include border-radius($card-border-radius);
+			> .card {
+				height: 100%;
+				.pedigree-viz-container .inner-container {
+					background-color: transparent; // let BG color from .card bleed through to allow border radius to appear nicely.
+				}
 			}
 
 			@include media-breakpoint-up(lg){
@@ -1777,8 +1782,19 @@ $badge-item-min-height: 90px;
 	
 	}
 
+	#case-overview-ped-link,
 	#cohort-overview-ped-link {
 		margin-left: 0;
+
+		div.pedigree-vis-heading {
+			background-color: #20445f;
+			color: #ffffff;
+
+			// @include media-breakpoint-up(lg){
+			// 	border-top-right-radius: $card-border-radius; // prev: 10px;
+			// 	border-top-left-radius: $card-border-radius; // prev: 10px;
+			// }
+		}
 
 		.pedigree-placeholder {
 			position: relative;
@@ -1792,7 +1808,7 @@ $badge-item-min-height: 90px;
 				margin-left: -40px;
 				margin-top: -32px;
 			}
-			border: 1px solid transparent;
+			border: 1px solid #eee;
 			color: #999;
 			@include border-radius($card-border-radius); // Same as .card (Bootstrap v4)
 			transition: color .3s;
@@ -1818,6 +1834,184 @@ $badge-item-min-height: 90px;
 			display: inline-block;
 		}
 	}
+
+	.processing-summary-tables-container {
+
+		.embedded-search-view-outer-container {
+			// (Can't remember:) Margins might be needed here
+			// to accomodate presence of both vertical + horizontal scroll bars.
+			// I guess we'll find out at some point.
+
+			.search-result-row {
+				&:last-of-type {
+					margin-bottom: 0px;
+				}
+			}
+			.embedded-search-container .fin.search-result-row {
+				display: none;
+			}
+
+		}
+
+
+		
+	}
+
+	.tab-router {
+		.dot-tab-nav {
+			position: relative;
+			z-index: 5;
+			box-shadow: 0 -2px 7px -1px #0004;
+			border-top: 1px solid #999;
+			border-bottom: 1px solid #ccc;
+			
+
+			.dot-tab-nav-list {
+				list-style-type: none;
+				margin: 0;
+				padding: 0;
+				display: flex;
+				justify-content: space-evenly;
+
+				@include media-breakpoint-down(sm) {
+					flex-direction: column;
+				}
+
+				.arrow-tab {
+					flex-grow: 1;
+					display: flex;
+					height: $search-results-header-row-height; // Eh why not re-use this, can change always in future.
+
+					@include media-breakpoint-down(sm) {
+						margin-bottom: 5px;
+					}
+					
+					> button {
+						background-color: cornflowerblue;
+						color: #ffff;
+						height: 100%;
+						display: block;
+						text-align: center;
+						padding: 10px;
+						text-decoration: none;
+						border: none;
+						width: 100%;
+					}
+
+					> .btn-append,
+					> .btn-prepend {
+						height: 100%;
+						width: $search-results-header-row-height; // Same as height of parent
+						flex: 1 0 0px;
+						> svg {
+							height: 100%;
+							width: auto;
+							path {
+								fill: cornflowerblue;
+							}
+						}
+
+						@include media-breakpoint-down(sm) {
+							display: none;
+						}
+					}
+
+					&.disabled {
+						> button {
+							background-color: rgb(176, 196, 222);
+						}
+						> .btn-append > svg path,
+						> .btn-prepend > svg path {
+							fill: rgb(176, 196, 222);
+						}
+					}
+
+				}
+			}
+
+		}
+		.tab-router-contents {
+			padding-top: 20px;
+
+			h1 {
+				font-size: 2rem;
+				margin-bottom: 20px;
+				font-weight: 500;
+
+				.curr-selection {
+					font-size: 14px;
+					font-style: normal;
+					font-weight: 400;
+					background-color: lavender;
+					padding: 4px;
+					border: solid 1px #fff;
+				}
+			}
+			h2 {
+				font-size: 1.5rem;
+				font-weight: 400;
+			}
+
+			.embedded-search-view-outer-container {
+				// background-color: #ffffff;
+				.facets-container {
+					background: #ffffff;
+				}
+			}
+
+			.tab-inner-container {
+				background-color: #ffffff;
+				margin-bottom: 20px;
+				padding: 20px;
+				border-radius: $border-radius-large;
+				box-shadow: 0 1px 5px #0002;
+				border-color: #d6d6d6;
+
+				&.qc-status {
+					font-size: 19px;
+				}
+
+				h2.section-header {
+					background-color: #2b6088;
+					width: calc( 100% + 40px);
+					padding: 10px 10px 10px 20px;
+					color: #ffff;
+					margin-left: -20px;
+					margin-right: -40px;
+					margin-top: -20px;
+				}
+
+				.processing-summary-table {
+					width: 100%;
+				}
+
+				.stacked-block-table {
+					.stacked-block-table-headers {
+						background-color: #2b6088;
+						color: #ffffff;
+					}
+
+					.accession-table {
+						th {
+							font-weight: 600;
+							background-color: rgb(240,240,240);
+							padding: 4px;
+							border: 1px solid rgb(200,200,200);
+						}
+					}
+
+					.body .current-case {
+						background-color: lavender;
+					} 
+				}
+
+				.row.qc-summary {
+					padding: 2px 0;
+				}
+			}	
+		}
+	}
+	
 
 	div.summary-table-container {
 
@@ -1972,6 +2166,7 @@ $badge-item-min-height: 90px;
 .item-page-container {
 
 	.pedigree-tab-view-body-container {
+		// When within own top-level pane
 
 		.pedigree-viz-container {
 			// We make this almost full height.

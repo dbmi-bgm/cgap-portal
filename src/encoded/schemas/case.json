@@ -63,5 +63,61 @@
             "type" : "string",
             "linkTo": "Nexus"
         }
+    },
+    "facets" : {
+        "individual.uuid": {
+            "title": "UUID",
+            "grouping": "Individual"
+        },
+        "individual.sex" : {
+            "title" : "Gender",
+            "grouping": "Individual"
+        },
+        "individual.birth_year" : {
+            "title" : "Birth Year",
+            "notes": "Currently will show up as terms; need to change to date range once able to",
+            "grouping": "Individual"
+        },
+        "individual.disorders" : {
+            "title" : "Disorders",
+            "grouping": "Individual"
+        },
+        "individual.phenotypic_features" : {
+            "title" : "Phenotypic Features",
+            "grouping": "Individual"
+        }
+    },
+    "columns" : {
+        "individual" : {
+            "title" : "Individual",
+            "sort_fields" : [
+                { "field" : "accession", "title" : "Accession (CGAP ID)" },
+                { "field" : "aliases", "title": "User-Defined Alias" },
+                { "field" : "uuid", "title": "UUID"}
+            ]
+        },
+        "display_title" : {
+            "title" : "Case Title",
+            "default_hidden" : true
+        },
+        "sample_processing": {
+            "title": "Sample",
+            "notes": "all samples will be included here, need to map sample to current individual in case search view"
+        },
+        "sample_processing.sample": {
+            "title": "Sequencing",
+            "sort_fields" : [
+                { "field" : "specimen_type", "title": "Specimen Type" }
+            ]
+        },
+        "sample_processing.completed_processes" :  {
+            "title": "Bioinformatics"
+        },
+        "report": {
+            "title": "Report"
+        },
+        "accession" : {
+            "title": "Case"
+        }
     }
 }

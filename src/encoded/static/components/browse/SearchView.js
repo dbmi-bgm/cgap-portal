@@ -9,6 +9,7 @@ import { memoizedUrlParse, schemaTransforms, analytics } from '@hms-dbmi-bgm/sha
 import { SearchView as CommonSearchView } from '@hms-dbmi-bgm/shared-portal-components/es/components/browse/SearchView';
 import { ActiveFiltersBar } from '@hms-dbmi-bgm/shared-portal-components/es/components/browse/components/ActiveFiltersBar';
 import { columnExtensionMap } from './columnExtensionMap';
+import { CaseDetailPane } from './CaseDetailPane';
 import { Schemas } from './../util';
 import { TitleAndSubtitleBeside, PageTitleContainer, TitleAndSubtitleUnder, pageTitleViews, EditingItemPageTitle } from './../PageTitleSection';
 
@@ -108,8 +109,18 @@ export default class SearchView extends React.PureComponent {
         super(props);
         this.memoized = {
             transformedFacets : memoize(SearchView.transformedFacets),
-            filteredFilters: memoize(SearchView.filteredFilters)
+            filteredFilters: memoize(SearchView.filteredFilters),
+            renderCaseDetailPane: memoize(this.renderCaseDetailPane.bind(this))
         };
+    }
+
+    renderCaseDetailPane(result, rowNumber, containerWidth, propsFromTable) {
+        const passProps = _.pick(this.props, 'windowWidth', 'href');
+        return (
+            <CaseDetailPane
+                {...{ passProps, propsFromTable, result, containerWidth, rowNumber }} paddingWidth={47}
+            />
+        );
     }
 
     render(){
@@ -120,6 +131,9 @@ export default class SearchView extends React.PureComponent {
         const facets = this.memoized.transformedFacets(context, currentAction, schemas);
         const tableColumnClassName = "results-column col";
         const facetColumnClassName = "facets-column col-auto";
+
+        const isCaseSearch = context['@type'][0] === 'CaseSearchResults' ? true : false;
+
         return (
             <div className="container-wide search-page-outer-container" id="content">
                 {/* TEMPORARY UNTIL DECIDE WHERE TO PUT
@@ -127,7 +141,7 @@ export default class SearchView extends React.PureComponent {
                     termTransformFxn={Schemas.Term.toName} fieldTransformFxn={Schemas.Field.toName}/>
                 */}
                 <CommonSearchView {...passProps} {...{ columnExtensionMap, tableColumnClassName, facetColumnClassName, facets }}
-                    termTransformFxn={Schemas.Term.toName} separateSingleTermFacets={false} rowHeight={90} openRowHeight={90} />
+                    renderDetailPane={isCaseSearch ? this.memoized.renderCaseDetailPane : null} termTransformFxn={Schemas.Term.toName} separateSingleTermFacets={false} rowHeight={90} openRowHeight={90} />
             </div>
         );
     }
