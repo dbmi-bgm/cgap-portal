@@ -42,18 +42,27 @@ class VCFParser(object):
     GT_REF = '0/0'
     GT_MISSING = './.'
 
-    def __init__(self, _vcf, variant, sample):
+    def __init__(self, _vcf, variant, sample, reader=None):
         """ Constructor for the parser
 
-        Args:
-            _vcf: path to vcf to process
-            variant: path to variant schema to read
-            sample: path to variant_sample schema to read
-
-        Raises:
-            Parsing error within 'vcf' if given VCF is malformed
+        :param _vcf: path to vcf to process
+        :param variant: path to variant schema to read
+        :param sample: path to variant_sample schema to read
+        :param reader: if specified will ignore path passed and set reader directly
+        :raises: Parsing error within 'vcf' if given VCF is malformed
         """
-        self.reader = vcf.Reader(open(_vcf, 'r'))
+        if reader is not None:
+            self.reader = reader
+        else:
+            self.reader = vcf.Reader(open(_vcf, 'r'))
+        self._initialize(variant, sample)
+
+    def _initialize(self, variant, sample):
+        """ Does initialization other than reading/validating the vcf
+
+            :param variant: path to variant schema
+            :param sample: path variant_sample schema
+        """
         self.variant_schema = json.load(open(variant, 'r'))
         self.variant_sample_schema = json.load(open(sample, 'r'))
         self.regex = re.compile(r"""(\s+$|["]|['])""")  # for stripping
@@ -223,11 +232,12 @@ class VCFParser(object):
         Raises:
             VCFParserException if there is a type we did not expect
         """
+        def fix_encoding(val):  # decode restricted characters
+            for encoded, decoded in self.RESTRICTED_CHARACTER_ENCODING.items():
+                val = val.replace(encoded, decoded)
+            return val
+
         if type == 'string':
-            def fix_encoding(val):  # decode restricted characters
-                for encoded, decoded in self.RESTRICTED_CHARACTER_ENCODING.items():
-                    val = val.replace(encoded, decoded)
-                return val
             return fix_encoding(value)
         elif type == 'integer':
             try:
@@ -246,7 +256,7 @@ class VCFParser(object):
         elif type == 'array':
             if sub_type:
                 if not isinstance(value, list):
-                    items = value.split('~')
+                    items = fix_encoding(value).split('~') if sub_type == 'string' else value
                 else:
                     items = value
                 return list(map(lambda v: self.cast_field_value(sub_type, v, sub_type=None), items))
@@ -363,7 +373,9 @@ class VCFParser(object):
                                 result[sub_embedded_group][g_idx] = {}
                             result[sub_embedded_group][g_idx][fn] = self.validate_variant_value(fn, field, key)
                         else:
-                            result[fn] = self.validate_variant_value(fn, field, key)
+                            possible_value = self.validate_variant_value(fn, field, key)
+                            if possible_value is not None:
+                                result[fn] = possible_value
         return result
 
     @staticmethod
@@ -405,7 +417,8 @@ class VCFParser(object):
                 field_value = data.__getattribute__(field)
                 if isinstance(field_value, list):  # could be a list - in this case, force cast to string
                     field_value = ','.join(map(str, field_value))
-                result[field] = field_value
+                if field_value is not None:
+                    result[field] = field_value
 
     def create_sample_variant_from_record(self, record):
         """ Parses the given record to produce the sample variant
@@ -451,6 +464,10 @@ class VCFParser(object):
                         tmp['samplegeno_ad'] = ad
                         tmp['samplegeno_sampleid'] = sample_id
                         s['samplegeno'].append(tmp)
+                elif field == 'multiallele_samplevariantkey':  # XXX: refactor with samplegeno
+                    multiallele = record.INFO.get('MULTIALLELE', None)
+                    if multiallele:
+                        s['multiallele_samplevariantkey'] = multiallele[0]
 
             self.parse_samples(s, sample)  # add sample fields, already formatted
             s.pop('AF', None)  # XXX: comes from VCF but is not actually what we want. Get rid of it.
@@ -575,15 +592,16 @@ def main():
         app_handle = VirtualApp(app, environ)
         if args.post_variant_consequences:
             vcf_parser.post_variant_consequence_items(app_handle, project=args.project, institution=args.institution)
-        for record in vcf_parser:
+        for idx, record in enumerate(vcf_parser):
             variant = vcf_parser.create_variant_from_record(record)
             variant['project'] = args.project
             variant['institution'] = args.institution
             vcf_parser.format_variant_sub_embedded_objects(variant)
             try:
                 res = app_handle.post_json('/variant', variant, status=201).json['@graph'][0]  # only one item posted
-            except Exception:
-                print('Failed validation')  # some variant gene linkTos do not exist
+            except Exception as e:
+                print('Failed validation at row: %s\n'
+                      'Exception: %s' % (idx, e))  # some variant gene linkTos do not exist
                 continue
             variant_samples = vcf_parser.create_sample_variant_from_record(record)
             for sample in variant_samples:

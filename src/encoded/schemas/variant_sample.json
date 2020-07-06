@@ -3,11 +3,15 @@
     "type": "object",
     "required": [
         "institution",
-        "project"
+        "project",
+        "CALL_INFO",
+        "variant",
+        "file"
     ],
     "identifyingProperties": [
         "uuid",
-        "aliases"
+        "aliases",
+        "annotation_id"
     ],
     "additionalProperties": false,
     "mixinProperties": [
@@ -369,15 +373,25 @@
         "schema_version": {
             "default": "1"
         },
+        "variant": {
+            "title": "Variant",
+            "type": "string",
+            "linkTo": "Variant"
+        },
         "file": {
             "title": "File",
             "description": "String Accession of the vcf file used in digestion",
             "type": "string"
         },
-        "variant": {
-            "title": "Variant",
+        "href": {
+            "title": "IGV href",
+            "description": "Link to IGV image",
+            "type": "string"
+        },
+        "annotation_id": {
+            "title": "Annotation ID",
             "type": "string",
-            "linkTo": "Variant"
+            "uniqueKey": true
         }
     },
     "columns": {

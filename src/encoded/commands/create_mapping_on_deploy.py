@@ -53,6 +53,7 @@ ITEM_INDEX_ORDER = [
     'StaticSection',
     'Page',
     'AnnotationField',
+    'AnnotatedVcfFile',
     'Variant',
     'VariantSample',
     'EvidenceDisPheno',

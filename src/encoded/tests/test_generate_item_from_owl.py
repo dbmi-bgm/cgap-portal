@@ -80,6 +80,7 @@ class MockS3UtilsForAccessKeys:
     def get_access_keys(self):
         return json.loads(TEST_KEYS_STORED)
 
+
 def test_connect2server_w_env(connection):
     non_dictionary = object()
     with mock.patch.object(s3_utils, "s3Utils", MockS3UtilsForAccessKeys):

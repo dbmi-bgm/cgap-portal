@@ -21,6 +21,7 @@ class GeneTableParser(MappingTableParser):
 
     def __init__(self, *args, **kwargs):
         self.FIELD_TYPE_INDEX = 8
+        kwargs['skip_embeds'] = True  # do not clear embeds when running gene intake
         super(GeneTableParser, self).__init__(*args, **kwargs)
 
     @staticmethod
@@ -69,7 +70,7 @@ class GeneTableParser(MappingTableParser):
         logger.info('Build gene schema')
         return schema
 
-    def run(self, gs_out=None, write=True):
+    def run(self, gs_out=None, write=False):
         """
         Ingests the gene table, producing the gene schema
 
