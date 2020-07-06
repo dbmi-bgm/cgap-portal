@@ -194,7 +194,7 @@ institution_project_attribution_embed_list = [
     "institution.display_title",
     "institution.url",
     "submitted_by.timezone",
-    "submitted_by.job_title"
+    "submitted_by.role"
 ]
 
 class AbstractCollection(snovault.AbstractCollection):
