@@ -106,7 +106,7 @@ def main():
     elasticsearch = elasticsearch_fixture.server_process(esdata, echo=True)
     nginx = nginx_server_process(echo=True)
     ingestion_listener = ingestion_listener_process(args.config_uri, args.app_name)
-    processes = [postgres, elasticsearch, nginx]
+    processes = [postgres, elasticsearch, nginx, ingestion_listener]
 
 
     @atexit.register
