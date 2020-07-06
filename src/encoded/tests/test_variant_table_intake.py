@@ -163,7 +163,7 @@ def test_generate_variant_sample_schema(MTParser, sample_variant_items):
     assert 'AF' in schema['facets']
     assert 'facets' in schema
     assert 'variant' in properties
-    assert 'sample' in properties
+    assert 'file' in properties
 
 
 def test_generate_variant_schema(MTParser, variant_items):

@@ -129,6 +129,7 @@ def test_VCFP_multiple_sample_variants(test_vcf):
     assert 'samplegeno_gt' in result['samplegeno'][0]
 
 
+@pytest.mark.skip  # variant is required for posting variant_samples, so this test cannot be run now.
 def test_VCFP_post_sample_variants(testapp, institution, project, test_vcf):
     """ Attempts to post all generated sample variants without links"""
     for idx, record in enumerate(test_vcf):
@@ -138,6 +139,7 @@ def test_VCFP_post_sample_variants(testapp, institution, project, test_vcf):
         for sample in variant_samples:
             sample['project'] = 'encode-project'
             sample['institution'] = 'encode-institution'
+            sample['file'] = 'dummy-filename'
             res = testapp.post_json(VARIANT_SAMPLE_URL, sample, status=201).json
             assert 'annotation_id' in res['@graph'][0]  # verify annotation_id is added on post
 
@@ -171,7 +173,9 @@ def test_VCFP_post_variants(testapp, institution, project, test_vcf, gene_workbo
 
 
 def test_VCFP_make_links(testapp, institution, project, test_vcf, gene_workbook, post_variant_consequence_items):
-    """ Will post all generated variants and samples, forming linkTo's from variant_sample to variant """
+    """ Will post all generated variants and samples, forming linkTo's from variant_sample to variant
+        NOTE: This is the most important test functionally speaking.
+    """
     VARIANT_URL, VARIANT_SAMPLE_URL = '/variant', '/variant_sample'
     for idx, record in enumerate(test_vcf):
         if idx == MAX_POSTS_FOR_TESTING:
@@ -187,5 +191,6 @@ def test_VCFP_make_links(testapp, institution, project, test_vcf, gene_workbook,
             sample['project'] = 'encode-project'
             sample['institution'] = 'encode-institution'
             sample['variant'] = res['@id']  # make link
+            sample['file'] = 'dummy-filename'
             res2 = testapp.post_json(VARIANT_SAMPLE_URL, sample, status=201).json
             assert 'annotation_id' in res2['@graph'][0]

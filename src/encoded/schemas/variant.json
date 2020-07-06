@@ -5,9 +5,9 @@
         "institution",
         "project",
         "CHROM",
-        "POS",
         "REF",
-        "ALT"
+        "ALT",
+        "POS"
     ],
     "identifyingProperties": [
         "uuid",
@@ -48,11 +48,6 @@
     "description": "Schema for variants",
     "id": "/profiles/variant.json",
     "properties": {
-        "annotation_id": {
-            "title": "Annotation ID",
-            "type": "string",
-            "uniqueKey": true
-        },
         "CHROM": {
             "title": "Chromosome",
             "field_name": "CHROM",
@@ -3752,6 +3747,11 @@
         },
         "schema_version": {
             "default": "1"
+        },
+        "annotation_id": {
+            "title": "Annotation ID",
+            "type": "string",
+            "uniqueKey": true
         }
     },
     "facets": {

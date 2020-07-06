@@ -524,6 +524,8 @@ class MappingTableParser(object):
         schema['properties']['schema_version'] = {'default': '1'}
         schema['facets'] = facs
         schema['columns'] = cols
+        # adds annotation ID field, effectively making display_title a primary key constraint
+        self.add_identifier_field(schema['properties'])
         logger.info('Build variant schema')
         return schema
 

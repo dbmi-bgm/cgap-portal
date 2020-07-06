@@ -3,7 +3,10 @@
     "type": "object",
     "required": [
         "institution",
-        "project"
+        "project",
+        "CALL_INFO",
+        "variant",
+        "file"
     ],
     "identifyingProperties": [
         "uuid",
@@ -44,11 +47,6 @@
     "description": "Schema for variant info for sample",
     "id": "/profiles/variant_sample.json",
     "properties": {
-        "annotation_id": {
-            "title": "Annotation ID",
-            "type": "string",
-            "uniqueKey": true
-        },
         "QUAL": {
             "title": "Variant Quality",
             "field_name": "QUAL",
@@ -375,20 +373,25 @@
         "schema_version": {
             "default": "1"
         },
-        "sample": {
-            "title": "Sample",
-            "description": "String Accession of the sample",
-            "type": "string"
+        "variant": {
+            "title": "Variant",
+            "type": "string",
+            "linkTo": "Variant"
         },
         "file": {
             "title": "File",
             "description": "String Accession of the vcf file used in digestion",
             "type": "string"
         },
-        "variant": {
-            "title": "Variant",
+        "href": {
+            "title": "IGV href",
+            "description": "Link to IGV image",
+            "type": "string"
+        },
+        "annotation_id": {
+            "title": "Annotation ID",
             "type": "string",
-            "linkTo": "Variant"
+            "uniqueKey": true
         }
     },
     "columns": {
