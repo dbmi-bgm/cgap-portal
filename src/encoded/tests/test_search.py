@@ -92,7 +92,7 @@ def test_search_with_embedding(workbook, testapp):
     """ Searches for a family and checks members.*, an embedded field, is properly resolved """
     res = testapp.get('/search/?type=Family&limit=all').json
     embed = res['@graph'][0]['members']
-    assert embed[0]['father']['display_title'] == 'GAPID3PW26SK'
+    assert embed[0]['father']['display_title'] == 'GAPID3PW26SK'  # all are same so order does not matter
     assert embed[0]['mother']['display_title'] == 'GAPIDISC7R73'
     assert embed[1]['father']['display_title'] == 'GAPID3PW26SK'
     assert embed[1]['mother']['display_title'] == 'GAPIDISC7R73'
@@ -676,7 +676,7 @@ class TestNestedSearch(object):
                           '&hg19.hg19_hgvsg=NC_000001.11:g.12185956del').follow().json
         self.assert_length_is_expected(res, 1)
         assert res['@graph'][0]['uuid'] == 'f6aef055-4c88-4a3e-a306-d37a71535d8b'
-        testapp.get('/search/?type=Variant'
+        testapp.get('/search/?type=Variant'  # should give no results
                     '&hg19.hg19_chrom=chr2'  # change should be sufficient for no results
                     '&hg19.hg19_pos=12185955'
                     '&hg19.hg19_hgvsg=NC_000001.11:g.12185956del', status=404)

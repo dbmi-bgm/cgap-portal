@@ -166,7 +166,7 @@ def test_filter_set_complete(workbook, testapp, typical_filter_set):
 
     # execute the more complicated filter_set by @id
     compound_search_res = testapp.post_json(COMPOUND_SEARCH_URL, {'@id': uuid}).json['@graph']
-    assert len(compound_search_res) == 3
+    assert len(compound_search_res) == 3  # typical_filter_set matches 3/4 variants
 
 
 def test_filter_set_complex(workbook, testapp, complex_filter_set):
