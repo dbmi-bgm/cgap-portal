@@ -1,7 +1,7 @@
 {
-    "title" : "Quality Metric for Compound Het caller Granite ComHet",
+    "title" : "Quality Metric for VCF files",
     "description": "Schema for reporting the specific calculation of an quality metrics",
-    "id": "/profiles/quality_metric_cmphet.json",
+    "id": "/profiles/quality_metric_vcfqc.json",
     "$schema": "http://json-schema.org/draft-04/schema#",
     "type": "object",
     "required": [ "project", "institution"],
