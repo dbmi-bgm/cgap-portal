@@ -203,7 +203,8 @@ class Case(Item):
         vcf = self.vcf_file(request, sample_processing)
         if not vcf:
             return ''
-        sample_read_group = sample.get('bam_sample_id', '')
+        sp_data = get_item_or_none(request, sample_processing, 'sample-processings')
+        sample_read_group = sp_data.get('bam_sample_id', '')
         if not sample_read_group:
             return ''
         vcf_acc = vcf.split('/')[2]
