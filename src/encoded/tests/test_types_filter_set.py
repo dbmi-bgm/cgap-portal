@@ -13,6 +13,7 @@ VARIANT_URL = '/variant'
 def barebones_filter_set():
     """ A filter set with only the flag that designates the type """
     return {
+        'title': 'Test filter set',
         'search_type': 'Variant',
         'flags': '?type=Variant',
         'project': 'hms-dbmi',
@@ -24,6 +25,7 @@ def barebones_filter_set():
 def simple_filter_set():
     """ A filter set with only the flag that designates the type """
     return {
+        'title': 'Test filter set',
         'search_type': 'Variant',
         'filter_blocks': [
             {
@@ -41,6 +43,7 @@ def simple_filter_set():
 def typical_filter_set():
     """ A filter set with two filter blocks and a flag """
     return {
+        'title': 'Test filter set',
         'search_type': 'Variant',
         'filter_blocks': [
             {
@@ -62,6 +65,7 @@ def typical_filter_set():
 def complex_filter_set():
     """ A filter set with 3 filter_blocks and a flag """
     return {
+        'title': 'Test filter set',
         'search_type': 'Variant',
         'filter_blocks': [
             {
@@ -182,6 +186,7 @@ def test_filter_set_complex(workbook, testapp, complex_filter_set):
 
     # toggle off all the blocks
     filter_set = {
+        'title': 'Test filter set',
         'search_type': t,
         'filter_blocks': filter_blocks,
         'flags': flags
@@ -219,6 +224,7 @@ def test_filter_set_intersection(workbook, testapp, complex_filter_set):
     filter_blocks = complex_filter_set['filter_blocks']
     flags = complex_filter_set['flags']
     filter_set = {
+        'title': 'Test filter set',
         'search_type': t,
         'filter_blocks': filter_blocks,
         'flags': flags,
@@ -263,6 +269,7 @@ def execute_and_verify_generator_search(testapp, filter_set, expected):
 @pytest.fixture
 def filter_set_with_only_flags():
     return {
+        'title': 'Test filter set',
         'search_type': 'Variant',
         'flags': 'CHROM=1'
     }
@@ -295,6 +302,7 @@ def test_compound_search_only_flags(workbook, testapp, filter_set_with_only_flag
 @pytest.fixture
 def filter_set_with_single_filter_block():
     return {
+        'title': 'Test filter set',
         'search_type': 'Variant',
         'filter_blocks': [{
             'query': '?type=Variant&POS.from=0&POS.to=10000000',
@@ -318,6 +326,7 @@ def test_compound_search_single_filter_block(workbook, testapp, filter_set_with_
 @pytest.fixture
 def filter_set_with_single_filter_block_and_flags():
     return {
+        'title': 'Test filter set',
         'search_type': 'Variant',
         'filter_blocks': [{
             'query': '?type=Variant&POS.from=0&POS.to=10000000',
@@ -349,6 +358,7 @@ def test_compound_search_filter_and_flags(workbook, testapp, filter_set_with_sin
 @pytest.fixture
 def filter_set_with_multiple_disabled_flags():
     return {
+        'title': 'Test filter set',
         'search_type': 'Variant',
         'filter_blocks': [{
             'query': '?type=Variant&POS.from=0&POS.to=10000000',
