@@ -404,6 +404,9 @@ $tabbar-height: 46px;
 					.icon-container {
 						display: flex;
 						align-items: center;
+						> .icon-fw {
+							transition: transform .25s ease-out;
+						}
 					}
 					// Show to right of icon-container, if 1 present, else not present
 					.title-col {
@@ -412,12 +415,26 @@ $tabbar-height: 46px;
 						text-overflow: ellipsis;
 					}
 				}
+
 				> a.menu-option {
 					color: $body-color;
 					&:hover {
 						text-decoration: none;
 					}
 				}
+
+				&:hover {
+					> .menu-option {
+						.icon-container > .icon-fw {
+							transform: scale3d(.85, .85, 1);
+						}
+						&:hover .icon-container > .icon-fw {
+							transform: scale3d(1.15, 1.15, 1) !important;
+						}
+
+					}
+				}
+
 			}
 
         }

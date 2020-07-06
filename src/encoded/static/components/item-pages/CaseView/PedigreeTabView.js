@@ -148,12 +148,11 @@ export const PedigreeTabView = React.memo(function PedigreeTabView(props){
         context, schemas, windowWidth, windowHeight, href, session, graphData,
         availableDiseases, selectedDiseases, onToggleSelectedDisease, onTogglePedigreeOptionCheckbox,
         showOrderBasedName, showAsDiseases,
-        pedigreeFamilies: families, pedigreeFamiliesIdx, currFamily: currentFamily, onFamilySelect
+        // pedigreeFamilies: families,
+        // pedigreeFamiliesIdx,
+        currFamily: currentFamily,
+        // onFamilySelect
     } = props;
-
-    if (!(Array.isArray(context.sample_processing.families) && context.sample_processing.families.length > 0)){
-        throw new Error("Expected props.context.sample_processing.families to be a non-empty Array.");
-    }
 
     if (!currentFamily){
         throw new Error("Expected non-empty props.currentFamily.");
@@ -177,7 +176,7 @@ export const PedigreeTabView = React.memo(function PedigreeTabView(props){
                         <SelectDiseasesDropdown {...{ showAsDiseases, selectedDiseases, availableDiseases }}
                             onChange={onToggleSelectedDisease} />
                         {/* <ShowAsDiseasesDropdown onSelect={this.handleChangeShowAsDiseases} {...{ showAllDiseases, showAsDiseases }}  /> */}
-                        <FamilySelectionDropdown {...{ families, currentFamilyIdx: pedigreeFamiliesIdx }} onSelect={onFamilySelect} />
+                        {/* <FamilySelectionDropdown {...{ families, currentFamilyIdx: pedigreeFamiliesIdx }} onSelect={onFamilySelect} /> */}
                         <PedigreeFullScreenBtn />
                     </CollapsibleItemViewButtonToolbar>
                 </h3>
@@ -188,17 +187,16 @@ export const PedigreeTabView = React.memo(function PedigreeTabView(props){
     );
 });
 PedigreeTabView.getTabObject = function(props){
-    const { pedigreeFamilies: families = [] } = props;
-    const familiesLen = families.length;
+    const { currFamily } = props;
     return {
         'tab' : (
             <React.Fragment>
                 <i className="icon icon-sitemap fas icon-fw"/>
-                <span>{ "" + familiesLen + " Pedigree" + (familiesLen > 1 ? "s" : "") }</span>
+                <span>Pedigree</span>
             </React.Fragment>
         ),
         'key' : 'pedigree',
-        'disabled' : familiesLen === 0,
+        'disabled' : !(currFamily),
         'content' : <PedigreeTabView {...props} />
     };
 };

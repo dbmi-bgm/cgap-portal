@@ -22,7 +22,8 @@ class Case(Item):
     name_key = 'accession'
     schema = load_schema('encoded:schemas/case.json')
     embedded_list = [
-        "family.*",
+        "family.*", # This embeds all Family fields, but not all Family.members fields.
+        "family.members.*", # We need to have mother and father (or 'parents' maybe eventually) for all members with at least @id.
         "individual.accession",
         "individual.father",
         "individual.father.samples",
