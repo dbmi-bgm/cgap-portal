@@ -13,6 +13,7 @@ VARIANT_URL = '/variant'
 def barebones_filter_set():
     """ A filter set with only the flag that designates the type """
     return {
+        'title': 'Test filter set',
         'search_type': 'Variant',
         'flags': [
             {
@@ -63,6 +64,7 @@ def test_filter_set_barebones(workbook, testapp, barebones_filter_set):
 def simple_filter_set():
     """ A filter set with only the flag that designates the type """
     return {
+        'title': 'Test filter set',
         'search_type': 'Variant',
         'filter_blocks': [
             {
@@ -134,6 +136,7 @@ def test_filter_set_simple(workbook, testapp, simple_filter_set):
 def typical_filter_set():
     """ A filter set with two filter blocks and a flag """
     return {
+        'title': 'Test filter set',
         'search_type': 'Variant',
         'filter_blocks': [
             {
@@ -170,6 +173,7 @@ def test_filter_set_typical(workbook, testapp, typical_filter_set):
 def complex_filter_set():
     """ A filter set with 3 filter_blocks and a flag """
     return {
+        'title': 'Test filter set',
         'search_type': 'Variant',
         'filter_blocks': [
             {
@@ -243,6 +247,7 @@ def test_filter_set_intersection(workbook, testapp, complex_filter_set):
 def filter_set_with_many_flags():
     """ A filter set with 2 filter blocks and 3 flags applied differently across blocks """
     return {
+        'title': 'Test filter set',
         'search_type': 'Variant',
         'filter_blocks': [
             {
