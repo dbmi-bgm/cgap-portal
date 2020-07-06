@@ -40,6 +40,7 @@ def ingestion_status(context, request):
     queue_manager = request.registry[INGESTION_QUEUE]
     n_waiting, n_inflight = queue_manager.get_counts()
     return {
+        'title': 'Ingestion Status',
         'waiting': n_waiting,
         'inflight': n_inflight
     }
@@ -289,11 +290,40 @@ def run(vapp, _queue_manager=None):
                     log.error('Could not download file uuid: %s with error: %s' % (uuid, e))
                     continue
 
-                # gunzip content, pass to parser
+                # gunzip content, pass to parser, post variants/variant_samples
                 decoded_content = gunzip_content(raw_content)
                 parser = VCFParser(None, VARIANT_SCHEMA, VARIANT_SAMPLE_SCHEMA,
                                    reader=Reader(fsock=decoded_content.split('\n')))
-                # TODO: ingest the VCF File
+                success, error = 0, 0
+                for idx, record in enumerate(parser):
+                    try:
+                        variant = parser.create_variant_from_record(record)
+                        variant['project'] = file_meta['project']['uuid']
+                        variant['institution'] = file_meta['institution']['uuid']
+                        parser.format_variant_sub_embedded_objects(variant)
+                        res = vapp.post_json('/variant', variant, status=201).json['@graph'][
+                            0]  # only one item posted
+                        success += 1
+                    except Exception as e:  # ANNOTATION spec validation error, recoverable
+                        log.error('Encountered exception posting variant at row %s: %s ' % (idx, e))
+                        error += 1
+                        continue
+                    variant_samples = parser.create_sample_variant_from_record(record)
+                    for sample in variant_samples:
+                        try:
+                            sample['project'] = file_meta['project']['uuid']
+                            sample['institution'] = file_meta['institution']['uuid']
+                            sample['variant'] = res['@id']  # make links
+                            sample['file'] = file_meta['uuid']
+                            vapp.post_json('/variant_sample', sample, status=201)
+                        except Exception as e:
+                            log.error('Encountered exception posting variant_sample at row %s: %s' % (idx, e))
+                            error += 1
+                            continue
+
+                log.error('INGESTION_REPORT:\n'
+                          'Success: %s\n'
+                          'Error: %s\n')
 
 
 def main():

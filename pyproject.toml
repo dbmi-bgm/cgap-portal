@@ -184,6 +184,7 @@ ingest-genes = "encoded.commands.ingest_genes:main"
 gene-ingestion = "encoded.commands.gene_ingestion:main"
 ingestion = "encoded.commands.ingestion:main"
 clear-variants-and-genes = "encoded.commands.clear_variants_and_genes:main"
+ingestion-listener = "encoded.ingestion_listener:main"
 
 [paste.app_factory]
 main = "encoded:main"

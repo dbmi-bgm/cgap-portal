@@ -457,18 +457,19 @@ class MappingTableParser(object):
         schema['id'] = '/profiles/variant_sample.json'
         schema['properties'] = sample_props
         schema['properties']['schema_version'] = {'default': '1'}
-        schema['properties']['sample'] = {  # link to single sample
-            'title': 'Sample',
-            'type': 'string',
-            'linkTo': 'Sample'
-        }
         schema['properties']['variant'] = {  # link to single variant
             'title': 'Variant',
             'type': 'string',
             'linkTo': 'Variant'
         }
-        schema['properties']['vcf'] = {  # NOT a linkTo but a "special" field
-            'title': 'VCF File',
+        schema['properties']['sample'] = {  # NOT a linkTo
+            'title': 'Sample',
+            'description': 'String Accession of the sample',
+            'type': 'string'
+        }
+        schema['properties']['file'] = {  # NOT a linkTo
+            'title': 'File',
+            'description': 'String Accession of the vcf file used in digestion',
             'type': 'string'
         }
 
