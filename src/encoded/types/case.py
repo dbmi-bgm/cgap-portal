@@ -83,6 +83,8 @@ class Case(Item):
         "individual.samples.files.quality_metric.status",
         "individual.samples.completed_processes",
         "individual.families.uuid",
+        "sample.*",
+        "sample.accession",
         "sample_processing.analysis_type",
         "sample_processing.last_modified.*",
         "sample_processing.families.family_id",
@@ -91,7 +93,13 @@ class Case(Item):
         "sample_processing.families.father.individual_id",
         "sample_processing.families.accession",
         "sample_processing.families.members.individual_id",
+        "sample_processing.families.members.accession",
         "sample_processing.families.members.samples",
+        "sample_processing.families.members.case",
+        "sample_processing.families.members.case.report",
+        "sample_processing.families.members.case.report.accession",
+        "sample_processing.families.members.case.family",
+        "sample_processing.families.members.case.sample.accession",
         "sample_processing.families.members.samples.library_info",
         "sample_processing.families.members.samples.workup_type",
         "sample_processing.families.members.samples.accession",
@@ -129,7 +137,6 @@ class Case(Item):
         "sample_processing.completed_processes",
         "report.last_modified.*",
         "report.status",
-        "family.accession",
         "cohort.filter_set.*"
     ]
 

@@ -156,6 +156,34 @@ export const columnExtensionMap = {
             return link;
         }
     },
+    'report': {
+        'title': "Report",
+        'widthMap' : { 'lg' : 280, 'md' : 250, 'sm' : 200 },
+        'render': function renderReportColumn(result, parentProps) {
+            const {
+                '@type' : itemTypeList = ["Item"],
+                report = null
+            } = result;
+            const {
+                display_title = null,
+                accession = null,
+                status = null,
+                last_modified : { date_modified = null } = {}
+            } = report || {};
+
+            if (!report || !report.accession) {
+                return "-";
+            }
+
+            if (itemTypeList[0] === "Case") {
+                return (
+                    <a href={result['@id']} style={{ color: "inherit", textDecoration: "inherit" }}>
+                        {renderAdvancedColumn(accession, status, display_title, "Last Modified:", date_modified)}
+                    </a>);
+            }
+            return (<a href={result['@id']}> { display_title } </a>);
+        }
+    },
     'individual': {
         'title': "Individual",
         'widthMap' : { 'lg' : 280, 'md' : 250, 'sm' : 200 },
@@ -175,7 +203,7 @@ export const columnExtensionMap = {
     'sample_processing.completed_processes': {
         'render' : function renderBioinformaticsColumn(result, parentProps){
             const { sample_processing: { completed_processes = [], last_modified = {} } } = result;
-            return renderAdvancedColumn(null, null, completed_processes, "Last Updated:", last_modified.date_modified || null);
+            return <a href={result['@id'] + "#case-summary.bioinformatics"} style={{ color: "inherit", textDecoration: "inherit" }}>{renderAdvancedColumn(null, null, completed_processes, "Last Updated:", last_modified.date_modified || null)}</a>;
         }
     },
     'sample_processing.sample': {
@@ -184,7 +212,7 @@ export const columnExtensionMap = {
             const selectedSample = findSelectedCaseSample(samples, individual);
             if (!selectedSample) return null;
             const { workup_type, specimen_accession_date } = selectedSample;
-            return renderAdvancedColumn(null, null, workup_type, "Accessioned:", specimen_accession_date);
+            return <a href={result['@id'] + "#case-summary.bioinformatics"} style={{ color: "inherit", textDecoration: "inherit" }}>{renderAdvancedColumn(null, null, workup_type, "Accessioned:", specimen_accession_date)}</a>;
         }
     },
     'sample_processing': {

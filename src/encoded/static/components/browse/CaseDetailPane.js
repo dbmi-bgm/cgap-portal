@@ -8,7 +8,7 @@ import _ from 'underscore';
 // import { FlexibleDescriptionBox } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/FlexibleDescriptionBox';
 import { object, layout } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { StackedBlockTable, StackedBlock, StackedBlockList, StackedBlockName, StackedBlockNameLabel } from '@hms-dbmi-bgm/shared-portal-components/es/components/browse/components/StackedBlockTable';
-
+import { PartialList } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/PartialList';
 
 
 export const CaseDetailPane = React.memo(function CaseDetailPane (props) {
@@ -378,10 +378,10 @@ export class FamilyAccessionStackedTable extends React.PureComponent {
         this.renderIndividualBlockList = this.renderIndividualBlockList.bind(this);
     }
 
-    renderSampleBlock(sample){
+    renderSampleBlock(sample, reportBlock){
         const { result } = this.props;
         const { sample_processing = {} } = result;
-        const { '@id': atId = null, workup_type = "-", display_title = null, accession = null } = sample;
+        const { '@id': atId = null, specimen_collection_date = null, specimen_type = null, workup_type = null, display_title = null, accession = null } = sample;
         const { samples = [], completed_processes = [] } = sample_processing;
 
         let blockValue = '-';
@@ -391,53 +391,154 @@ export class FamilyAccessionStackedTable extends React.PureComponent {
             }
         });
 
+        const fullTable = (
+            <div className="w-100" style={{ maxWidth: "70%" }}>
+                <table className="accession-table w-100">
+                    <tr>
+                        <th>Sample ID</th>
+                        <th>{accession || "-"}</th>
+                    </tr>
+                    {/* <tr>
+                        <td>Phlebotomy ID</td>
+                        <td>CGAP#####</td>
+                    </tr> */}
+                    { display_title ?
+                        <tr>
+                            <td>CGAP ID</td>
+                            <td>{ display_title }</td>
+                        </tr> : null}
+                    { specimen_type ?
+                        <tr>
+                            <td>Sample Type</td>
+                            <td>{specimen_type }</td>
+                        </tr>: null}
+                    { specimen_collection_date ?
+                        <tr>
+                            <td>Collected</td>
+                            <td>{specimen_collection_date }</td>
+                        </tr>: null}
+                </table>
+            </div>);
+
 
         return (
-            <StackedBlock columnClass="libraries" hideNameOnHover={false} key={atId} id={atId}
-                label={<StackedBlockNameLabel title="Sample" subtitle="Library" accession={accession} subtitleVisible/>}>
-                <StackedBlockName>
-                    <span className="name-title">
-                        { atId ? <a href={atId} className="name-title">{ workup_type }</a> : <span className="name-title">{ workup_type }</span>}
-                    </span>
-                </StackedBlockName>
-                {/* Temporary empty report block - need to update with link to report later */}
+            <StackedBlock columnClass="libraries" hideNameOnHover={false} key={atId} id={atId}>
+                { (atId && workup_type) ?
+                    <StackedBlockName className="flex-row align-items-center justify-content-between">
+                        <div className="d-flex">
+                            <a href={atId} data-tip="View Sample" className={`name-title p-1`}>
+                                { workup_type || "-" }
+                            </a>
+                        </div>
+                        { fullTable }
+                    </StackedBlockName> :
+                    <StackedBlockName>
+                        { workup_type ? null : "No workup type found for sample"}
+                        { atId ?
+                            <a href={atId} data-tip={workup_type ? null: "View Sample"} className={`name-title p-1`}>
+                                { workup_type || accession }
+                            </a> : <span className="name-title p-1">{ workup_type || accession }</span>}
+                    </StackedBlockName>
+                }
+
                 <StackedBlockList className="report" title="Report">
-                    { FamilyAccessionStackedTable.renderEmptyBlock("report") }
+                    { reportBlock ? reportBlock : FamilyAccessionStackedTable.renderEmptyBlock("report") }
                 </StackedBlockList>
             </StackedBlock>
         );
     }
 
-    renderIndividualBlock(individual, i, role) {
+    renderIndividualBlock(individual, role, familyId) {
         const { result } = this.props;
-        console.log('this.props.result', result);
-
-        const { "@id": atId = null, display_title = null, accession = null } = individual;
+        const { "@id": atId = null, display_title = null, case: cases = [], accession = null } = individual;
 
         let cls;
         if (result && result.individual && individual) {
             cls = result.individual['@id'] === atId ? "current-case": null;
         }
-        console.log("cls", individual.accession, cls);
 
-        console.log("individual", individual, result.individual);
-        console.log("is current case", (result.individual['@id'] === individual['@id']));
+        // console.log("individual", individual, result.individual);
+
+        // TODO: Should only be one in this array... need to add a check somewhere
+        const filteredCases = cases.filter((currCase) => {
+            const { family : { '@id': thisFamilyAtId = null } } = currCase;
+            // correct case matches family & individual
+            if (thisFamilyAtId === `/families/${familyId}/`) {
+                return true;
+            }
+            return false;
+        });
+
+        const { 0: caseForCurrIndividual = null } = filteredCases || [];
+        const { report = null, sample: caseSample = null, caseAccession = null, display_title: caseTitle = null } = caseForCurrIndividual || {};
+        console.log("case for currIndividual, ", atId, caseForCurrIndividual);
+        console.log("case result", result);
+
+        let reportBlock = null;
+        if (report) {
+            const { '@id' : reportAtId, display_title : reportTitle = null, accession: reportAccession = null } = report;
+            reportBlock = (
+                <StackedBlock columnClass="report" hideNameOnHover={false} key={reportAtId} id={reportAtId}>
+                    <StackedBlockName className="flex-row align-items-center justify-content-between">
+                        <div className="d-flex">
+                            { reportAtId ?
+                                <a href={reportAtId} className={"name-title p-1"}>
+                                    { reportTitle }
+                                </a> : <span className="name-title p-1">{ reportTitle }</span>}
+                        </div>
+                        <div className="w-100 mw-70">
+                            <table className="accession-table w-100">
+                                <tr>
+                                    <th>Report ID</th>
+                                    <th>{ reportAccession }</th>
+                                </tr>
+                            </table>
+                        </div>
+                    </StackedBlockName>
+                </StackedBlock>
+            );
+        }
 
         return (
             <StackedBlock {...{ cls }} hideNameOnHover={false} columnClass="individual"
                 key={atId} id={atId}
             >
-                <StackedBlockName>
-                    { atId ?
-                        <a href={atId} className={`name-title ${(result.individual['@id'] === individual['@id']) ? "current-case" : ""}`}>
-                            { role || display_title }
-                        </a> : <span className="name-title">{ role || display_title }</span>}
-                    <div>
-                        LOL
+                <StackedBlockName className="flex-row align-items-center justify-content-between">
+                    <div className="d-flex">
+                        { atId ?
+                            <a href={atId} className={`name-title p-1 ${(result.individual['@id'] === individual['@id']) ? "current-case" : ""}`}>
+                                { role || display_title }
+                            </a> : <span className="name-title p-1">{ role || display_title }</span>}
+                    </div>
+                    <div className="w-100" style={{ maxWidth: "70%" }}>
+                        <table className="accession-table w-100">
+                            <tr>
+                                <th>Individual ID</th>
+                                <th>{ accession || "" }</th>
+                            </tr>
+                            <tr>
+                                <td>Family ID</td>
+                                <td>{ familyId || "" }</td>
+                            </tr>
+                            { caseForCurrIndividual ?
+                                <tr>
+                                    <td>Case ID</td>
+                                    <td>{caseAccession || caseTitle}</td>
+                                </tr>
+                                : null}
+                        </table>
                     </div>
                 </StackedBlockName>
                 <StackedBlockList className="libraries" title="Libraries">
-                    { _.map(individual.samples || [], this.renderSampleBlock) }
+                    { individual.samples.map((thisSample) =>
+                    {
+                        const { '@id' : caseSampleAtId } = caseSample || {};
+                        const { '@id' : thisSampleAtId } = thisSample || {};
+                        if (caseSampleAtId === thisSampleAtId) {
+                            return this.renderSampleBlock(thisSample, reportBlock);
+                        }
+                        return this.renderSampleBlock(thisSample, null);
+                    })}
                 </StackedBlockList>
             </StackedBlock>
         );
@@ -445,7 +546,7 @@ export class FamilyAccessionStackedTable extends React.PureComponent {
 
     renderIndividualBlockList() {
         const { family = null, collapseLimit = 1, collapseShow = 2, preventExpand = false } = this.props;
-        const { members = [], mother = null, father = null, proband = null } = family || {};
+        const { members = [], mother = null, father = null, proband = null, accession: familyId = null } = family || {};
 
         // eslint-disable-next-line no-useless-concat
         const appendCountStr = members.length <= collapseLimit ? null : ( 'with ' + "#;lp[67gty6" + ' More Individuals ');
@@ -458,17 +559,17 @@ export class FamilyAccessionStackedTable extends React.PureComponent {
 
         return (
             <StackedBlockList className="individuals" showMoreExtTitle={showMoreExtTitle} title="Individuals">
-                { members.map((familyMember, i) => {
+                { members.map((familyMember) => {
                     const currId = familyMember['@id'];
                     switch(currId) {
                         case mother['@id']:
-                            return this.renderIndividualBlock(familyMember, i, "Mother");
+                            return this.renderIndividualBlock(familyMember, "Mother", familyId);
                         case father['@id']:
-                            return this.renderIndividualBlock(familyMember, i, "Father");
+                            return this.renderIndividualBlock(familyMember, "Father", familyId);
                         case proband['@id']:
-                            return this.renderIndividualBlock(familyMember, i, "Proband");
+                            return this.renderIndividualBlock(familyMember, "Proband", familyId);
                         default:
-                            return this.renderIndividualBlock(familyMember, i, null);
+                            return this.renderIndividualBlock(familyMember, null, familyId);
                     }
                 })}
             </StackedBlockList>
