@@ -4,7 +4,7 @@
     "id": "/profiles/filter_set.json",
     "$schema": "http://json-schema.org/draft-04/schema#",
     "type": "object",
-    "required": ["institution", "project"],
+    "required": ["institution", "project", "title"],
     "identifyingProperties": ["uuid", "aliases"],
     "additionalProperties": false,
     "mixinProperties": [
@@ -21,6 +21,11 @@
     "properties": {
         "schema_version": {
             "default": "1"
+        },
+        "title": {
+            "title": "Title",
+            "description": "Title for this filter set",
+            "type": "string"
         },
         "search_type": {
             "title": "Item Type",
