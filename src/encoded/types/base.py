@@ -183,6 +183,19 @@ static_content_embed_list = [
 #     "submitted_by.job_title"
 # ]
 
+institution_project_attribution_embed_list = [
+    "project.viewing_group",
+    "project.title",
+    "instituion.name",
+    "instituion.state",
+    "instituion.country",
+    "instituion.postal_code",
+    "instituion.city",
+    "instituion.display_title",
+    "instituion.url",
+    "submitted_by.timezone",
+    "submitted_by.job_title"
+]
 
 class AbstractCollection(snovault.AbstractCollection):
     """smth."""

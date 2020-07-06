@@ -19,6 +19,7 @@ from snovault.util import debug_log
 from time import sleep
 from .base import (
     Item,
+    institution_project_attribution_embed_list
     # lab_award_attribution_embed_list
 )
 
@@ -663,6 +664,7 @@ class Workflow(Item):
     embedded_list = (
         Item.embedded_list +
         # lab_award_attribution_embed_list +
+        institution_project_attribution_embed_list +
         [
             'steps.name',
             'steps.inputs',
@@ -711,6 +713,7 @@ class WorkflowRun(Item):
     embedded_list = (
         Item.embedded_list +
         # lab_award_attribution_embed_list +
+        institution_project_attribution_embed_list +
         [
             'workflow.category',
             # 'workflow.experiment_types',
@@ -903,7 +906,7 @@ class WorkflowMapping(Item):
 
     item_type = 'workflow_mapping'
     schema = load_schema('encoded:schemas/workflow_mapping.json')
-    embedded_list = Item.embedded_list  # + lab_award_attribution_embed_list
+    embedded_list = Item.embedded_list + institution_project_attribution_embed_list  # + lab_award_attribution_embed_list
 
 
 def validate_input_json(context, request):
