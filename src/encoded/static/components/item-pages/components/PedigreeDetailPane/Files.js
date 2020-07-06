@@ -4,33 +4,25 @@ import memoize from 'memoize-one';
 import _ from 'underscore';
 import { DragAndDropFileUploadController } from '@hms-dbmi-bgm/shared-portal-components/es/components/forms/components/DragAndDropUpload';
 
-export class FileWrapper extends React.Component {
+
+
+export class FileWrapper extends React.PureComponent {
+
     static propTypes = {
         individual: PropTypes.object,
         haveEditPermission: PropTypes.bool,
         indvSchema: PropTypes.object,
         docSchema: PropTypes.object,
         imageSchema: PropTypes.object
-    }
+    };
 
-    constructor() {
-        super();
-
-        this.findFieldsWithDocumentsOrImages = this.findFieldsWithDocumentsOrImages.bind(this);
-        this.memoized = {
-            fileFields : memoize(this.findFieldsWithDocumentsOrImages)
-        };
-    }
-
-    findFieldsWithDocumentsOrImages() {  // Q: Does it make sense to memoize this?
-        const { indvSchema = {} } = this.props;
+    static findFieldsWithDocumentsOrImages(indvSchema){
         const { properties = {} } = indvSchema || {};
-
         // Isolate the field/property names of linkTos with type Document or Image
         const allProperties = _.keys(properties);
         const relevantFields = [];
 
-        allProperties.forEach((property) => {
+        allProperties.forEach(function(property){
             const propertyFields = properties[property];
             const { type = null, linkTo = null, items = {} } = propertyFields;
 
@@ -51,12 +43,18 @@ export class FileWrapper extends React.Component {
         return relevantFields;
     }
 
+    constructor() {
+        super();
+        this.memoized = {
+            findFieldsWithDocumentsOrImages: memoize(FileWrapper.findFieldsWithDocumentsOrImages)
+        };
+    }
+
     render() {
-        const { individual, haveEditPermission, docSchema, imageSchema, indvSchema } = this.props; 
+        const { individual, haveEditPermission, docSchema, imageSchema, indvSchema = {} } = this.props;
         const { properties = {} } = indvSchema;
         const { "@id": individualId, institution, project } = individual;
-
-        const fieldsToRender = this.memoized.fileFields();
+        const fieldsToRender = this.memoized.findFieldsWithDocumentsOrImages(indvSchema);
 
         return (
             <React.Fragment>
@@ -79,6 +77,7 @@ export class FileWrapper extends React.Component {
 }
 
 class FileArrayField extends React.Component {
+
     static propTypes = {
         fieldDisplayTitle: PropTypes.string.isRequired,
         fieldName: PropTypes.string.isRequired,
@@ -89,11 +88,11 @@ class FileArrayField extends React.Component {
         files: PropTypes.array,
         haveEditPermission: PropTypes.bool,
         fileSchema: PropTypes.object.isRequired
-    }
+    };
 
     static defaultProps = {
         files: []
-    }
+    };
 
     render() {
         const { fieldDisplayTitle, fieldName, fieldType, files, individualId, haveEditPermission = false, institution, project, fileSchema } = this.props;

@@ -1,7 +1,5 @@
 'use strict';
 
-import React from 'react';
-
 /**
  * Parses `context.families` instance
  * into list of Individuals (JSON objects) with
@@ -35,8 +33,8 @@ export function parseFamilyIntoDataset(family){
         // Here we transform phenotypic_features to this vocab (might change later, and/or conditionally)
 
         const diseases = []; // All strings
-        const carrierOfDiseases = [];
-        const asymptoticDiseases = [];
+        const carrierOfDiseases = []; // todo
+        const asymptoticDiseases = []; // todo
 
         phenotypic_features.forEach(function(featureWrapper){
             const feature = (featureWrapper && featureWrapper.phenotypic_feature) || null;
@@ -121,7 +119,12 @@ export function parseFamilyIntoDataset(family){
     });
 }
 
-
+/**
+ * Gathers all phenotypic features from all individual members of a family.
+ * Possibly deprecated.
+ *
+ * @param {{ members: { "@id": string }[], proband: { "@id" : string } }} family - Current Family
+ */
 export function gatherPhenotypicFeatureItems(family){
     if (!family) return [];
     const {
@@ -136,9 +139,12 @@ export function gatherPhenotypicFeatureItems(family){
         const { phenotypic_features = [] } = individual;
         phenotypic_features.forEach(function(pfObj){
             const { phenotypic_feature } = pfObj;
-            const { '@id': featureID, display_title: featureTitle } = phenotypic_feature;
+            const {
+                '@id': featureID,
+                display_title: featureTitle
+            } = phenotypic_feature;
             if (!featureID || seenIDs[featureID]){
-                return;
+                return; // Skip, perhaps no view permission.
             }
             seenIDs[featureID] = true;
             diseases.push(phenotypic_feature);
@@ -154,15 +160,17 @@ export function gatherPhenotypicFeatureItems(family){
 }
 
 /**
- * Maps `context.case_phenotypic_features`
- * to strings.
+ * Maps phenotypic features to plain strings,
+ * usually display_title.
  *
+ * @todo rename to "getPhenotypicFeaturesAsStrings" perhaps.
+ * @todo Or keep phenotypic features as object in case of duplicate titles for some reason.
  * @param {{ @id: string, display_title: string }[]|string[]} [case_phenotypic_features=[]] List of phenotypic feature Items from Case.
  * @returns {string[]}
  */
-export function getPhenotypicFeatureStrings(case_phenotypic_features = []){
+export function getPhenotypicFeatureStrings(family_phenotypic_features = []){
     const strings = [];
-    case_phenotypic_features.forEach(function(feature){
+    family_phenotypic_features.forEach(function(feature){
         if (typeof feature === 'string') return feature;
         const { '@id' : featureID, display_title } = feature;
         if (!featureID) return;

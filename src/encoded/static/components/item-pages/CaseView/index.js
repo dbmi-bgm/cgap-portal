@@ -7,19 +7,17 @@ import memoize from 'memoize-one';
 import _ from 'underscore';
 
 import { console, layout, ajax, object, navigate } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
-import { Alerts } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/Alerts';
 
 import { PedigreeVizView } from './../../viz/PedigreeViz';
 import DefaultItemView from './../DefaultItemView';
-import { store } from './../../../store';
 
-import { buildPedigreeGraphData } from './../../viz/PedigreeViz';
 import { CaseSummaryTable } from './CaseSummaryTable';
 import { FamilyAccessionStackedTable } from './../../browse/CaseDetailPane';
-import { PedigreeTabViewBody, idToGraphIdentifier } from './PedigreeTabViewBody';
+import { PedigreeTabViewBody } from './PedigreeTabViewBody';
 import { PedigreeTabView, PedigreeTabViewOptionsController } from './PedigreeTabView';
 import { PedigreeFullScreenBtn } from './PedigreeFullScreenBtn';
 import { parseFamilyIntoDataset } from './family-parsing';
+import { CurrentFamilyController } from './CurrentFamilyController';
 import { AttachmentInputController, AttachmentInputMenuOption } from './attachment-input';
 import { CaseStats } from './CaseStats';
 import CaseSubmissionView from './CaseSubmissionView';
@@ -36,149 +34,6 @@ export {
 
 
 
-class CurrentFamilyController extends React.PureComponent {
-
-    static haveFullViewPermissionForFamily(family){
-        const { original_pedigree = null, proband = null, members = [] } = family;
-        if (original_pedigree && !object.isAnItem(original_pedigree)){
-            // Tests for presence of display_title and @id, lack of which indicates lack of view permission.
-            return false;
-        }
-        if (proband && !object.isAnItem(proband)){
-            return false;
-        }
-        if (members.length === 0) {
-            return false;
-        }
-        for (var i = 0; i < members.length; i++){
-            if (!object.isAnItem(members[i])){
-                return false;
-            }
-        }
-        return true;
-    }
-
-    constructor(props) {
-        super(props);
-        this.onAddedFamily = this.onAddedFamily.bind(this);
-        this.handleFamilySelect = _.throttle(this.handleFamilySelect.bind(this), 1000);
-        const pedigreeFamilies = (props.context.sample_processing.families || []).filter(CurrentFamilyController.haveFullViewPermissionForFamily);
-        this.state = {
-            pedigreeFamilies,
-            pedigreeFamiliesIdx: 0 // familiesLen - 1
-        };
-        this.memoized = {
-            buildPedigreeGraphData: memoize(buildPedigreeGraphData),
-            parseFamilyIntoDataset: memoize(parseFamilyIntoDataset),
-            idToGraphIdentifier: memoize(idToGraphIdentifier)
-        };
-    }
-
-    componentDidUpdate(pastProps, pastState){
-        const { context } = this.props;
-        const { context: pastContext } = pastProps;
-
-        if (pastContext !== context){
-            const pedigreeFamilies = (context.sample_processing.families || []).filter(CurrentFamilyController.haveFullViewPermissionForFamily);
-            const pastPedigreeFamilies = (pastContext.sample_processing.families || []).filter(CurrentFamilyController.haveFullViewPermissionForFamily);
-            const familiesLen = pedigreeFamilies.length;
-            const pastFamiliesLen = pastPedigreeFamilies.length;
-            if (familiesLen !== pastFamiliesLen){
-                this.setState({
-                    pedigreeFamilies,
-                    pedigreeFamiliesIdx: familiesLen - 1
-                });
-            }
-        }
-    }
-
-    onAddedFamily(response){
-        const { context, status, title } = response;
-        if (!context || status !== "success") return;
-
-        const { families = [] } = context || {};
-        const familiesLen = families.length;
-        const newestFamily = families[familiesLen - 1];
-
-        if (!newestFamily) return;
-
-        const {
-            original_pedigree : {
-                '@id' : pedigreeID,
-                display_title: pedigreeTitle
-            } = {},
-            pedigree_source
-        } = newestFamily;
-        let message = null;
-
-        if (pedigreeTitle && pedigreeID){
-            message = (
-                <React.Fragment>
-                    <p className="mb-0">Added family from pedigree <a href={pedigreeID}>{ pedigreeTitle }</a>.</p>
-                    { pedigree_source? <p className="mb-0 text-small">Source of pedigree: <em>{ pedigree_source }</em></p> : null }
-                </React.Fragment>
-            );
-        }
-        Alerts.queue({
-            "title" : "Added family " + familiesLen,
-            message,
-            "style" : "success"
-        });
-
-        store.dispatch({ type: { context } });
-    }
-
-    handleFamilySelect(key, callback){
-        const callable = () => {
-            this.setState({ 'pedigreeFamiliesIdx' : parseInt(key) }, function(){
-                if (typeof callback === "function") {
-                    callback();
-                }
-            });
-        };
-
-        // Try to defer change to background execution to
-        // avoid 'blocking'/'hanging' UI thread while new
-        // objectGraph is calculated.
-        // @todo Later - maybe attempt to offload PedigreeViz graph-transformer
-        // stuff to a WebWorker instead.
-        if (window && window.requestIdleCallback) {
-            window.requestIdleCallback(callable);
-        } else {
-            setTimeout(callable, 0);
-        }
-    }
-
-    render(){
-        const { children, ...passProps } = this.props;
-
-        const { pedigreeFamilies = [], pedigreeFamiliesIdx } = this.state;
-        const familiesLen = pedigreeFamilies.length;
-
-        let currFamily, graphData, idToGraphIdentifier;
-        if (familiesLen > 0){
-            currFamily = pedigreeFamilies[pedigreeFamiliesIdx];
-            graphData = this.memoized.buildPedigreeGraphData(this.memoized.parseFamilyIntoDataset(currFamily));
-            idToGraphIdentifier = this.memoized.idToGraphIdentifier(graphData.objectGraph);
-        }
-
-        const childProps = {
-            ...passProps,
-            pedigreeFamilies,
-            pedigreeFamiliesIdx,
-            currFamily,
-            graphData,
-            idToGraphIdentifier,
-            onFamilySelect: this.handleFamilySelect,
-        };
-        return React.Children.map(children, function(child){
-            return React.cloneElement(child, childProps);
-        });
-    }
-
-}
-
-
 export default class CaseView extends DefaultItemView {
 
     /**
@@ -186,10 +41,12 @@ export default class CaseView extends DefaultItemView {
      * Will be easier to migrate to functional components with hooks theoretically this way if needed.
      * Any controller component can be functional or classical (pun intended :-P).
      *
+     * @deprecated (Potentially)
+     *
      * Later, could maybe structure as (to be more React-ful):
-     * ```
+     * @example
      * function CaseView (props) {
-     *     ... Case-related-logic ...
+     *     // ... Case-related-logic ...
      *     <CurrentFamilyController context={context}>
      *         <PedigreeTabViewOptionsController>
      *             <CaseViewBody />
@@ -200,10 +57,9 @@ export default class CaseView extends DefaultItemView {
      *    const { currFamily, selectedDiseases, ... } = props;
      *    const tabs = [];
      *    tabs.push(CaseInfoTabView.getTabObject(props));
-     *     ... Case-related-logic ..
+     *    // ... Case-related-logic ..
      *    return <CommonItemView tabs={tabs} />;
      * }
-     * ```
      */
     getControllers(){
         return [
@@ -213,36 +69,42 @@ export default class CaseView extends DefaultItemView {
     }
 
     getTabViewContents(controllerProps = {}){
-        const { pedigreeFamilies = [] } = controllerProps;
-        const familiesLen = pedigreeFamilies.length;
+        // const { pedigreeFamilies = [] } = controllerProps;
+        // const familiesLen = pedigreeFamilies.length;
+        const { context: { family: { members = [] } = {} } } = this.props;
+        const membersLen = members.length;
+        const commonTabProps = { ...this.props, ...controllerProps };
         const initTabs = [];
 
-        initTabs.push(CaseInfoTabView.getTabObject({
-            ...this.props, ...controllerProps
-        }));
+        initTabs.push(CaseInfoTabView.getTabObject(commonTabProps));
 
-        if (familiesLen > 0) {
+        if (membersLen > 0) {
             // Remove this outer if condition if wanna show disabled '0 Pedigrees'
-            initTabs.push(PedigreeTabView.getTabObject({
-                ...this.props, ...controllerProps
-            }));
+            initTabs.push(PedigreeTabView.getTabObject(commonTabProps));
         }
 
         return initTabs.concat(this.getCommonTabs());
     }
 
-    /** Render additional item actions */
+    /**
+     * Render additional item action to Add Family
+     * @deprecated
+     * Disabled for now since can only support one family per Case at moment.
+     * To be removed once UX is more certain.
+     */
     additionalItemActionsContent(){
-        const { context, href } = this.props;
-        const hasEditPermission = _.find(context.actions || [], { 'name' : 'edit' });
-        if (!hasEditPermission){
-            return null;
-        }
-        return (
-            <AttachmentInputController {...{ context, href }} onAddedFamily={this.onAddedFamily}>
-                <AttachmentInputMenuOption />
-            </AttachmentInputController>
-        );
+        return super.additionalItemActionsContent();
+        // const { context, href } = this.props;
+        // const { actions = [] } = context;
+        // const hasEditPermission = _.find(actions, { 'name' : 'edit' });
+        // if (!hasEditPermission){
+        //     return null;
+        // }
+        // return (
+        //     <AttachmentInputController {...{ context, href }} onAddedFamily={this.onAddedFamily}>
+        //         <AttachmentInputMenuOption />
+        //     </AttachmentInputController>
+        // );
     }
 }
 
@@ -256,43 +118,43 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
         graphData,
         selectedDiseases,
         windowWidth,
-        currFamily
+        // currFamily,
+        idToGraphIdentifier
     } = props;
     const {
+        family: currFamily = null, // Previously selected via CurrentFamilyController.js, now just the 1. Unless changed later.
         case_phenotypic_features: caseFeatures = { case_phenotypic_features: [] },
         description = null,
         actions: permissibleActions = [],
         sample_processing,
         display_title: caseTitle,
         accession: caseAccession,
-        individual : caseIndividual
+        individual: caseIndividual
     } = context;
 
-    const familiesLen = families.length;
     const editAction = _.findWhere(permissibleActions, { name: "edit" });
 
     const {
         countIndividuals: numIndividuals,
         countIndividualsWSamples: numWithSamples
     } = useMemo(function(){
+        const { members = [] } = currFamily || {};
         let countIndividuals = 0;
         let countIndividualsWSamples = 0;
-        families.forEach(function({ members = [] }){
-            members.forEach(function({ samples }){
-                if (Array.isArray(samples) && samples.length > 0) {
-                    countIndividualsWSamples++;
-                }
-                countIndividuals++;
-            });
+        members.forEach(function({ samples }){
+            if (Array.isArray(samples) && samples.length > 0) {
+                countIndividualsWSamples++;
+            }
+            countIndividuals++;
         });
         return { countIndividuals, countIndividualsWSamples };
-    }, [ families ]);
+    }, [ currFamily ]);
 
     const onViewPedigreeBtnClick = useMemo(function(){
         return function(evt){
             evt.preventDefault();
             evt.stopPropagation();
-            if (familiesLen === 0) return false;
+            if (!currFamily) return false;
             // By default, click on link elements would trigger ajax request to get new context.
             // (unless are external links)
             navigate("#pedigree", { skipRequest: true, replace: true });
@@ -323,7 +185,7 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
     const rgs = layout.responsiveGridState(windowWidth);
     let pedWidth;
     let pedBlock = (
-        <div className="d-none d-lg-block pedigree-placeholder flex-fill" onClick={onViewPedigreeBtnClick} disabled={familiesLen === 0}>
+        <div className="d-none d-lg-block pedigree-placeholder flex-fill" onClick={onViewPedigreeBtnClick} disabled={!currFamily}>
             <div className="text-center h-100">
                 <i className="icon icon-sitemap icon-4x fas" />
             </div>
@@ -369,7 +231,7 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
             <div className="container-wide bg-light pt-36 pb-36">
                 <div className="card-group case-summary-card-row">
                     <div className="col-stats">
-                        <CaseStats {...{ description, numIndividuals, numWithSamples, caseFeatures }} numFamilies={familiesLen} />
+                        <CaseStats {...{ description, numIndividuals, numWithSamples, caseFeatures }} numFamilies={1} />
                     </div>
                     <div id="case-overview-ped-link" className="col-pedigree-viz">
                         <div className="card d-flex flex-column">
@@ -386,7 +248,7 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
                                     borderRadius: "50px",
                                     padding: "0px 20px",
                                     color: "white",
-                                }} onClick={onViewPedigreeBtnClick} disabled={familiesLen === 0}>
+                                }} onClick={onViewPedigreeBtnClick} disabled={!currFamily}>
                                     View Pedigree(s)
                                 </button>
                             </div>
@@ -610,64 +472,60 @@ const AccessioningTab = React.memo(function AccessioningTab(props) {
 
 const BioinformaticsTab = React.memo(function BioinformaticsTab(props) {
     const {
+        context,
         families = [],
         pedigreeFamiliesIdx,
         idToGraphIdentifier,
         sample_processing = []
     } = props;
 
+    const { display_title: caseDisplayTitle } = context;
+
     // console.log("biotab props", props);
     let caseSummaryTables = [];
-    let display_title;
-    if (props) {
-        // console.log("biotab props.pedigreeFamilies", props.families);
-        display_title = props.context.display_title;
-        caseSummaryTables = families.map(function(family, idx){
-            const {
-                original_pedigree: { display_title: pedFileName } = {},
-                members = [],
-                display_title
-            } = family;
-            const cls = "family-index-" + idx;
-            const isCurrentFamily = idx === pedigreeFamiliesIdx;
-            const onClick = function(evt){
-                if (isCurrentFamily) {
-                    navigate("#pedigree", { skipRequest: true, replace: true });
-                } else {
-                    onFamilySelect(idx);
-                }
-            };
+    caseSummaryTables = families.map(function(family, idx){
+        const {
+            original_pedigree: { display_title: pedFileName } = {},
+            members = [],
+            display_title: familyDisplayTitle
+        } = family;
+        const cls = "family-index-" + idx;
+        const isCurrentFamily = idx === pedigreeFamiliesIdx;
+        const onClick = function(evt){
+            if (isCurrentFamily) {
+                navigate("#pedigree", { skipRequest: true, replace: true });
+            } else {
+                onFamilySelect(idx);
+            }
+        };
 
-            const tip = isCurrentFamily ?
-                "Currently-selected family in Pedigree Visualization"
-                : "Click to view this family in the Pedigree Visualization tab";
-            const title = (
-                <h4 data-family-index={idx} className="clickable p-2 d-inline-block w-100">
-                    <i className={"icon p-1 icon-sitemap fas icon-small"} />
-                    <span className="font-italic text-500">{ display_title }</span>
-                    { pedFileName ? <span className="text-300">{ " (" + pedFileName + ")" }</span> : null }
-                    <button type="button" className="btn btn-small btn-primary pull-right" data-tip={tip} onClick={onClick}>
-                        <i className="icon icon-fw icon-sitemap fas mr-1 small" />
-                        { isCurrentFamily ? "View Pedigree in Separate Tab" : "Switch to this Pedigree"}
-                    </button>
-                </h4>
-            );
+        const tip = isCurrentFamily ?
+            "Currently-selected family in Pedigree Visualization"
+            : "Click to view this family in the Pedigree Visualization tab";
+        const title = (
+            <h4 data-family-index={idx} className="clickable p-2 d-inline-block w-100">
+                <i className={"icon p-1 icon-sitemap fas icon-small"} />
+                <span className="font-italic text-500">{ familyDisplayTitle }</span>
+                { pedFileName ? <span className="text-300">{ " (" + pedFileName + ")" }</span> : null }
+                <button type="button" className="btn btn-small btn-primary pull-right" data-tip={tip} onClick={onClick}>
+                    <i className="icon icon-fw icon-sitemap fas mr-1 small" />
+                    { isCurrentFamily ? "View Pedigree in Separate Tab" : "Switch to this Pedigree"}
+                </button>
+            </h4>
+        );
 
-            // sampleProcessing objects that have 2 or more matching samples to pass ONLY THOSE through to caseSummaryTable
-            return (
-                <div className={cls} key={idx} data-is-current-family={isCurrentFamily}>
-                    { title }
-                    <CaseSummaryTable {...family} sampleProcessing={[sample_processing]} {...{ idx, idToGraphIdentifier, isCurrentFamily }} />
-                </div>
-            );
-        });
-    } else {
-        console.warn("biotabprops don't exist for whatever reason");
-    }
+        // sampleProcessing objects that have 2 or more matching samples to pass ONLY THOSE through to caseSummaryTable
+        return (
+            <div className={cls} key={idx} data-is-current-family={isCurrentFamily}>
+                { title }
+                <CaseSummaryTable {...family} sampleProcessing={[sample_processing]} {...{ idx, idToGraphIdentifier, isCurrentFamily }} />
+            </div>
+        );
+    });
 
     return (
         <React.Fragment>
-            <h1>{ display_title }: <span className="text-300">Bioinformatics Analysis</span></h1>
+            <h1>{ caseDisplayTitle }: <span className="text-300">Bioinformatics Analysis</span></h1>
             <div className="tab-inner-container clearfix font-italic qc-status">
                 <span className="text-600">Current Status:</span> PASS
                 <span className="pull-right">3/28/20</span>

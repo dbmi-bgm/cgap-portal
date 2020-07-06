@@ -6,6 +6,7 @@ import { console, layout, ajax, object, memoizedUrlParse } from '@hms-dbmi-bgm/s
 import { Alerts } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/Alerts';
 
 
+/** Used for uploading Pedigree data. Draft & subject to change. */
 export class AttachmentInputController extends React.PureComponent {
 
     static ErrorObject = {
@@ -76,9 +77,9 @@ export class AttachmentInputController extends React.PureComponent {
     }
 
     render(){
-        const { children, ...passProps }  = this.props;
-        const { loading: loadingPedigreeResult }  = this.state;
-        return React.Children.map(children, (c)=>
+        const { children, ...passProps } = this.props;
+        const { loading: loadingPedigreeResult } = this.state;
+        return React.Children.map(children, (c) =>
             React.cloneElement(c, { ...passProps, loadingPedigreeResult, onFileInputChange: this.handleChange })
         );
     }
