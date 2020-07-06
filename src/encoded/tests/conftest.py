@@ -51,7 +51,7 @@ def es_app_settings(wsgi_server_host_port, elasticsearch_server, postgresql_serv
     settings['collection_datastore'] = 'elasticsearch'
     settings['item_datastore'] = 'elasticsearch'
     settings['indexer'] = True
-    settings['indexer.namespace'] = os.environ.get('TRAVIS_JOB_ID', '') # set namespace for tests
+    settings['indexer.namespace'] = os.environ.get('TRAVIS_JOB_ID', '')  # set namespace for tests
 
     # use aws auth to access elasticsearch
     if aws_auth:
