@@ -5,6 +5,7 @@ import Collapse from 'react-bootstrap/esm/Collapse';
 import PropTypes from 'prop-types';
 import memoize from 'memoize-one';
 import _ from 'underscore';
+import url from 'url';
 
 import { console, layout, ajax, object, navigate } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 
@@ -283,7 +284,7 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
                 </div>
             </div>
 
-            <DotRouter href={href} navClassName="container-wide pt-36 pb-36" contentsClassName="container-wide bg-light pt-36 pb-36">
+            <DotRouter href={href} navClassName="container-wide pt-36 pb-36" contentsClassName="container-wide bg-light pt-36 pb-36" prependDotPath="case-info">
                 <DotRouterTab tabTitle="Accessioning" dotPath=".accessioning" default>
                     <AccessioningTab {...{ context, href, families, props }} />
                 </DotRouterTab>
@@ -325,15 +326,11 @@ CaseInfoTabView.getTabObject = function(props){
 class DotRouter extends React.PureComponent {
 
     static getDotPath(href) {
-        const hashPathSplit = href.split("#");
-        if (hashPathSplit.length > 1) {
-            const lastIdx = hashPathSplit.length - 1;
-            const dotPathSplit = hashPathSplit[lastIdx].split(".");
-            return "." + dotPathSplit[lastIdx];
-        } else {
-            // Path must contain both tab (hashroute) and dotpath to navigate properly
-            return null;
-        }
+        // Path must contain both tab (hashroute) and dotpath to navigate properly
+        const hashString = (url.parse(href, false).hash || "#").slice(1) || null;
+        if (!hashString) return null;
+        const dotPathSplit = hashString.split(".");
+        return "." + dotPathSplit[dotPathSplit.length - 1];
     }
 
     static getDefaultTab(children) {
@@ -364,11 +361,9 @@ class DotRouter extends React.PureComponent {
         super(props);
         this.memoized = {
             getDefaultTab: memoize(DotRouter.getDefaultTab),
-            // Not sure that makes much/any of measurable improvement.. eh oh well
             getDotPath: memoize(DotRouter.getDotPath)
         };
     }
-
 
     /** Method is not explicitly memoized b.c. this component only has 2 props & is a PureComponent itself */
     getCurrentTab() {
@@ -388,13 +383,13 @@ class DotRouter extends React.PureComponent {
     }
 
     render() {
-        const { children, className, navClassName, contentsClassName, elementID } = this.props;
+        const { children, className, prependDotPath, navClassName, contentsClassName, elementID } = this.props;
         const currentTab = this.getCurrentTab();
         const { props : { children: currTabChildren = null, dotPath: currTabDotPath } } = currentTab;
 
         const adjustedChildren = React.Children.map(children, function(childTab){
             const { props : { dotPath } } = childTab;
-            return React.cloneElement(childTab, { key: dotPath, active: currTabDotPath === dotPath });
+            return React.cloneElement(childTab, { key: dotPath, active: currTabDotPath === dotPath, prependDotPath });
         });
 
         return (
@@ -406,7 +401,7 @@ class DotRouter extends React.PureComponent {
                         { adjustedChildren }
                     </div>
                 </nav>
-                <div className={"tab-router-contents" + (contentsClassName ? " " + contentsClassName : "")}>
+                <div className={"tab-router-contents" + (contentsClassName ? " " + contentsClassName : "")} id={(prependDotPath || "") + currTabDotPath}>
                     <TabPaneErrorBoundary key={currTabDotPath}>
                         { currTabChildren }
                     </TabPaneErrorBoundary>
@@ -417,11 +412,15 @@ class DotRouter extends React.PureComponent {
 }
 
 function DotRouterTab(props) {
-    const { tabTitle, dotPath, className, disabled, active, children } = props;
+    const { tabTitle, dotPath, className, disabled, active, prependDotPath, children } = props;
 
     const onClick = useMemo(function(){
         return function(){
-            navigate("#case-summary" + dotPath, { skipRequest: true, replace: true, dontScrollToTop: true });
+            const targetDotPath = prependDotPath + dotPath;
+            navigate("#" + targetDotPath, { skipRequest: true, replace: true, dontScrollToTop: true }, function(){
+                // Maybe uncomment - this could be annoying if someone is also trying to keep Status Overview visible or something.
+                // layout.animateScrollTo(targetDotPath);
+            });
         };
     }, [ dotPath ]);
 
@@ -586,14 +585,12 @@ const BioinformaticsTab = React.memo(function BioinformaticsTab(props) {
 
 const FilteringTab = React.memo(function FilteringTab(props) {
     const { context = null } = props;
-    const { filter_set_flag_addon : filterFlags } = context || {};
+    const { filter_set_flag_addon: filterFlags } = context || {};
 
     return (
         <React.Fragment>
             <h1>{ context.display_title}: <span className="text-300">Variant Filtering and Technical Review</span></h1>
-            <EmbeddedItemSearchTable { ...{ context }}
-                searchHref={`/search/?type=VariantSample${filterFlags ? filterFlags : ""}`}
-            />
+            <EmbeddedItemSearchTable { ...{ context }} searchHref={`/search/?type=VariantSample${filterFlags ? filterFlags : ""}`} key={0} />
         </React.Fragment>
     );
 });
