@@ -259,14 +259,9 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
                                         Pedigree
                                     </h4>
                                 </div>
-                                <button type="button" className="btn btn-primary btn-small" style={{
-                                    backgroundColor: "cornflowerblue",
-                                    border: "none",
-                                    borderRadius: "50px",
-                                    padding: "0px 20px",
-                                    color: "white",
-                                }} onClick={onViewPedigreeBtnClick} disabled={!currFamily}>
-                                    View Pedigree(s)
+                                <button type="button" className="btn btn-primary btn-small view-pedigree-btn"
+                                    onClick={onViewPedigreeBtnClick} disabled={!currFamily}>
+                                    View Pedigree
                                 </button>
                             </div>
                             {/*
@@ -374,21 +369,6 @@ class DotRouter extends React.PureComponent {
         };
     }
 
-    /**
-     * Renders a set of child tabs defined by <DotRouterTab> that each render a component below the navbar when clicked.
-     *
-     * Note: Currently there is a bug where if you switch to a main tab and then press "back" to get back,
-     * navigation doesn't work... need to look into
-     *
-     * A: Depends what the intended action is.. ideally we don't want to add each tab to browser history because
-     * gets a bit annoying to have to click back ton of times to get back to search listing or something.
-     *
-     * @todo Detect if hash in window.location; if is dotpath of child tab, if so, activate it.
-     */
-    componentDidMount() {
-        const { href, children } = this.props;
-
-    }
 
     /** Method is not explicitly memoized b.c. this component only has 2 props & is a PureComponent itself */
     getCurrentTab() {
@@ -410,7 +390,12 @@ class DotRouter extends React.PureComponent {
     render() {
         const { children, className, navClassName, contentsClassName, elementID } = this.props;
         const currentTab = this.getCurrentTab();
-        const { props : { children: currTabChildren = null, tabTitle: currTabTitle } } = currentTab;
+        const { props : { children: currTabChildren = null, dotPath: currTabDotPath } } = currentTab;
+
+        const adjustedChildren = React.Children.map(children, function(childTab){
+            const { props : { dotPath } } = childTab;
+            return React.cloneElement(childTab, { key: dotPath, active: currTabDotPath === dotPath });
+        });
 
         return (
             // We could make classNames props (with default values via defaultProps)
@@ -418,11 +403,11 @@ class DotRouter extends React.PureComponent {
             <div className={"tab-router" + (className ? " " + className : "")} id={elementID}>
                 <nav className={"dot-tab-nav" + (navClassName ? " " + navClassName : "")}>
                     <div className="dot-tab-nav-list">
-                        { children }
+                        { adjustedChildren }
                     </div>
                 </nav>
                 <div className={"tab-router-contents" + (contentsClassName ? " " + contentsClassName : "")}>
-                    <TabPaneErrorBoundary key={currTabTitle}>
+                    <TabPaneErrorBoundary key={currTabDotPath}>
                         { currTabChildren }
                     </TabPaneErrorBoundary>
                 </div>
@@ -432,7 +417,7 @@ class DotRouter extends React.PureComponent {
 }
 
 function DotRouterTab(props) {
-    const { tabTitle, dotPath, className, disabled, children } = props;
+    const { tabTitle, dotPath, className, disabled, active, children } = props;
 
     const onClick = useMemo(function(){
         return function(){
@@ -445,7 +430,7 @@ function DotRouterTab(props) {
     }
 
     return (
-        <div className={(className ? className + " " : "") + (disabled ? "disabled " : "")} >
+        <div className={(className ? className + " " : "") + (disabled ? "disabled " : "") + (active ? " active" : "")} >
             <div className="btn-prepend d-xs-none">
                 <svg viewBox="0 0 1.5875 4.2333333" width={6} height={16}>
                     <path d="M 0,4.2333333 1.5875,2.1166667 v 2.1166666 z"/>

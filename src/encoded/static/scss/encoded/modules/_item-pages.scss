@@ -1818,6 +1818,18 @@ $badge-item-min-height: 90px;
 			// 	border-top-right-radius: $card-border-radius; // prev: 10px;
 			// 	border-top-left-radius: $card-border-radius; // prev: 10px;
 			// }
+
+			.view-pedigree-btn {
+				background-color: cornflowerblue; // TODO: Once settle on good color, maybe apply it to our theme under a SCSS variable for re-use. Then ctrl+find+replace.
+				border-radius: 40px;
+				color: #fff;
+				/* border: 1px solid cornflowerblue; */
+				border: none;
+				padding: 0px 24px;
+				&:hover {
+					background-color: darken($color: cornflowerblue, $amount: 7.5%);
+				}
+			}
 		}
 
 		.pedigree-placeholder {
@@ -1842,6 +1854,7 @@ $badge-item-min-height: 90px;
 				border-color: #ddd;
 			}
 		}
+
 	}
 
 	label.badge-list-label {
@@ -1911,7 +1924,9 @@ $badge-item-min-height: 90px;
 					}
 					
 					> button {
+						// TODO store color in variable, ideally bootstrap one, for re-use in places.
 						background-color: cornflowerblue;
+						transition: background-color .25s;
 						color: #ffff;
 						height: 100%;
 						display: block;
@@ -1920,6 +1935,16 @@ $badge-item-min-height: 90px;
 						text-decoration: none;
 						border: none;
 						width: 100%;
+						&:focus,
+						&:active {
+							outline: none;
+							// Same :hover styling below, should get overriden by other styles
+							// unless someone is using (shift-)tab to navigate instead of mouse cursor.
+							background-color: darken($color: cornflowerblue, $amount: 7.5%);
+							+ .btn-append svg path {
+								fill: darken($color: cornflowerblue, $amount: 7.5%);
+							}
+						}
 					}
 
 					> .btn-append,
@@ -1932,6 +1957,7 @@ $badge-item-min-height: 90px;
 							width: auto;
 							path {
 								fill: cornflowerblue;
+								transition: fill .25s;
 							}
 						}
 
@@ -1942,11 +1968,33 @@ $badge-item-min-height: 90px;
 
 					&.disabled {
 						> button {
-							background-color: rgb(176, 196, 222);
+							background-color: lighten($color: cornflowerblue, $amount: 17.5%) !important;
 						}
-						> .btn-append > svg path,
-						> .btn-prepend > svg path {
-							fill: rgb(176, 196, 222);
+						> .btn-append > svg > path,
+						> .btn-prepend > svg > path {
+							fill: lighten($color: cornflowerblue, $amount: 17.5%) !important;
+						}
+					}
+
+					&:hover:not(.disabled):not(.active) {
+
+						> button {
+							background-color: darken($color: cornflowerblue, $amount: 7.5%) !important;
+						}
+						> .btn-append > svg > path,
+						> .btn-prepend > svg >  path {
+							fill: darken($color: cornflowerblue, $amount: 7.5%) !important;
+						}
+					}
+
+					&.active {
+
+						> button {
+							background-color: darken($color: cornflowerblue, $amount: 15%) !important;
+						}
+						> .btn-append > svg > path,
+						> .btn-prepend > svg > path {
+							fill: darken($color: cornflowerblue, $amount: 15%) !important;
 						}
 					}
 
