@@ -285,19 +285,19 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
             </div>
 
             <DotRouter href={href} navClassName="container-wide pt-36 pb-36" contentsClassName="container-wide bg-light pt-36 pb-36" prependDotPath="case-info">
-                <DotRouterTab tabTitle="Accessioning" dotPath=".accessioning" default>
+                <DotRouterTab tabTitle="Accessioning" dotPath=".accessioning" default cache={false}>
                     <AccessioningTab {...{ context, href, families, props }} />
                 </DotRouterTab>
-                <DotRouterTab tabTitle="Bioinformatics" dotPath=".bioinformatics">
+                <DotRouterTab tabTitle="Bioinformatics" dotPath=".bioinformatics" cache={false}>
                     <BioinformaticsTab {...{ context, families, currFamily, pedigreeFamiliesIdx, idToGraphIdentifier, sample_processing, onFamilySelect }} />
                 </DotRouterTab>
                 <DotRouterTab tabTitle="Filtering" dotPath=".filtering">
                     <FilteringTab context={context} />
                 </DotRouterTab>
-                <DotRouterTab tabTitle="Interpretation" dotPath=".interpretation" disabled>
+                <DotRouterTab tabTitle="Interpretation" dotPath=".interpretation" disabled cache={false}>
                     <InterpretationTab {...props} />
                 </DotRouterTab>
-                <DotRouterTab tabTitle="Finalize Case" dotPath=".reporting" disabled>
+                <DotRouterTab tabTitle="Finalize Case" dotPath=".reporting" disabled cache={false}>
                     <ReportingTab {...props} />
                 </DotRouterTab>
             </DotRouter>
