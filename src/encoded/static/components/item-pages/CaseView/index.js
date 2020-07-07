@@ -112,7 +112,7 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
     const {
         context = {},
         href,
-        pedigreeFamilies: families = [],
+        pedigreeFamilies = [],
         pedigreeFamiliesIdx = 0,
         onFamilySelect,
         graphData,
@@ -123,6 +123,7 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
     } = props;
     const {
         family: currFamily = null, // Previously selected via CurrentFamilyController.js, now just the 1. Unless changed later.
+        secondary_families = null,
         case_phenotypic_features: caseFeatures = { case_phenotypic_features: [] },
         description = null,
         actions: permissibleActions = [],
@@ -216,6 +217,21 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
             );
         }
     }
+
+    // Combine primary and secondary families to get all families associated with case. Primary goes first.
+    let families;
+    const arr = [];
+    if (currFamily) {
+        arr.push(currFamily);
+
+        if (secondary_families && secondary_families.length > 0) {
+            families = arr.concat(secondary_families);
+        } else {
+            families = arr;
+        }
+    }
+    console.log("families", families, currFamily, secondary_families);
+    console.log("props", props);
 
     return (
         <React.Fragment>
@@ -448,6 +464,7 @@ DotRouterTab.defaultProps = {
 const AccessioningTab = React.memo(function AccessioningTab(props) {
     const { context: result, href, families = [] } = props;
     const { display_title } = result;
+    console.log("families,", families);
 
     // console.log("accessioning props", props);
     return (
@@ -579,12 +596,14 @@ const BioinformaticsTab = React.memo(function BioinformaticsTab(props) {
 });
 
 const FilteringTab = React.memo(function FilteringTab(props) {
-    const { context } = props;
+    const { context = null } = props;
+    const { filter_set_flag_addon : filterFlags } = context || {};
+
     return (
         <React.Fragment>
             <h1>{ context.display_title}: <span className="text-300">Variant Filtering and Technical Review</span></h1>
-            <EmbeddedItemSearchTable
-                searchHref={`/search/?type=Variant`} { ...{ context }}
+            <EmbeddedItemSearchTable { ...{ context }}
+                searchHref={`/search/?type=VariantSample${filterFlags ? filterFlags : ""}`}
             />
         </React.Fragment>
     );
