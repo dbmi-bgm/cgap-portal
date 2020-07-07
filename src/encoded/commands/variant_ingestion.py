@@ -27,7 +27,8 @@ def post_vcf_file(app_handle, filename, project, institution):
     file = {
         'filename': filename,
         'project': project,  # post file associated with variant
-        'institution': institution
+        'institution': institution,
+        'file_format': 'vcf'
     }
     file_uuid = app_handle.post_json('/file_processed', file, status=201).json['@graph'][0]['@id']
     return file_uuid
@@ -37,7 +38,7 @@ def run_ingest_vcf(app_handle, args):
     """ Runs the vcf ingestion step """
     logger.info('Ingesting VCF file: %s' % args.vcf)
     vcf_parser = VCFParser(args.vcf, args.variant, args.sample)
-    file_uuid = None
+    file_uuid = 'dummy-file'
     if args.post_vcf_file:
         file_uuid = post_vcf_file(app_handle, args.vcf, args.variant_project, args.variant_institution)
     if args.post_variant_consequences:
@@ -54,7 +55,8 @@ def run_ingest_vcf(app_handle, args):
                     vcf_parser.format_variant_sub_embedded_objects(variant)
                     res = app_handle.post_json('/variant', variant, status=201).json['@graph'][0]  # only one item posted
                     success += 1
-                except Exception:  # ANNOTATION spec validation error, recoverable
+                except Exception as e:  # ANNOTATION spec validation error, recoverable
+                    logger.error('Got exception on variant post: %s' % e)
                     error += 1
                     continue
                 variant_samples = vcf_parser.create_sample_variant_from_record(record)
@@ -62,8 +64,7 @@ def run_ingest_vcf(app_handle, args):
                     sample['project'] = args.variant_project
                     sample['institution'] = args.variant_institution
                     sample['variant'] = res['@id']  # make link
-                    if file_uuid is not None:
-                        sample['vcf'] = file_uuid
+                    sample['file'] = file_uuid
                     app_handle.post_json('/variant_sample', sample, status=201)
         except Exception as e:  # VCF spec validation error, not recoverable
             logger.error('Encountered VCF format error: %s' % str(e))

@@ -416,23 +416,25 @@
             "order": 9,
             "grouping": "Variant Quality"
         },
-        "variant.ID": {
-            "title": "dbSNP ID"
-        },
         "variant.hgvs_hgvsg": {
-            "title": "Variant"
+            "title": "Variant",
+            "order": 10
         },
         "variant.transcript.vep_hgvsc": {
-            "title": "vep_hgvsc"
+            "title": "vep_hgvsc",
+            "order": 33
         },
         "variant.transcript.vep_hgvsp": {
-            "title": "vep_hgvsp"
+            "title": "vep_hgvsp",
+            "order": 34
         },
         "variant.genes.genes_ensg.display_title": {
-            "title": "Gene"
+            "title": "Gene",
+            "order": 20
         },
         "variant.dbsnp_rs_number": {
-            "title": "dbsnp_rs_number"
+            "title": "dbSNP ID",
+            "order": 7
         },
         "variant.max_pop_af_af_popmax": {
             "title": "Gnomad PopMax AF",
@@ -497,6 +499,8 @@
         },
         "variant.transcript.vep_sift_score": {
             "title": "SIFT score",
+            "aggregation_type": "stats",
+            "number_step": "any",
             "order": 17,
             "grouping": "Missense Predictors"
         },
@@ -507,6 +511,8 @@
         },
         "variant.transcript.vep_polyphen_score": {
             "title": "PolyPhen score",
+            "aggregation_type": "stats",
+            "number_step": "any",
             "order": 18,
             "grouping": "Missense Predictors"
         },
@@ -515,7 +521,7 @@
             "order": 18,
             "grouping": "Missense Predictors"
         },
-        "variant.transcript.vep_clin_sig": {
+        "variant.clinvar_clnsig": {
             "title": "Clinvar",
             "order": 27
         },

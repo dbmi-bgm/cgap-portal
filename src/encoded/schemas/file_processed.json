@@ -42,7 +42,8 @@
                 "other",
                 "intermediate file",
                 "raw VCF",
-                "gVCF"
+                "gVCF",
+                "vcf"
             ]
         },
         "file_classification": {

@@ -547,7 +547,7 @@
                     "vep_sift_score": {
                         "title": "SIFT score",
                         "field_name": "vep_sift_score",
-                        "type": "string",
+                        "type": "number",
                         "do_import": true,
                         "source_name": "VEP",
                         "source_version": "v99",
@@ -563,7 +563,7 @@
                     "vep_polyphen_score": {
                         "title": "PolyPhen score",
                         "field_name": "vep_polyphen_score",
-                        "type": "string",
+                        "type": "number",
                         "do_import": true,
                         "source_name": "VEP",
                         "source_version": "v99",
