@@ -249,7 +249,7 @@ def gunzip_content(content):
     return gunzipped_content.decode('ascii')
 
 
-def run(vapp, _queue_manager=None, path='/ingest'):
+def run(vapp, _queue_manager=None, update_status=None):
     """ Entry-point for the ingestion listener. """
     log.info('Ingestion Listener starting...')
 
@@ -319,13 +319,22 @@ def run(vapp, _queue_manager=None, path='/ingest'):
                             log.error('Encountered exception posting variant_sample at row %s: %s' % (idx, e))
                             error += 1
                             continue
-
-                log.error('INGESTION_REPORT:\n'
+                msg = ('INGESTION_REPORT:\n'
                           'Success: %s\n'
                           'Error: %s\n')
+                log.error(msg)
+                update_status(msg=msg)
 
 
+# Composite Application (for wsgi)
 def composite(loader, global_conf, **settings):
+    """ This is a composite pyramid app, meant to run components of an application
+        or an application extension. In our case we are running the ingestion listener,
+        which requires executing a command with application context. This code lives
+        in encoded top-level as it is a wsgi entry-point. Note that the local deployment
+        does NOT run the listener this way, but runs the run method through main directly.
+        This code is heavily based off of the es_index_listener in snovault.
+    """
     listener = None
 
     # Register before app creation.
@@ -353,28 +362,23 @@ def composite(loader, global_conf, **settings):
         'status': {
             'status': 'starting listener',
             'started': timestamp,
-            'errors': [],
-            'results': [],
+            'msgs': []
         },
     }
 
-    def update_status(error=None, result=None, indexed=None, **kw):
+    def update_status(msg=None, **kw):
+        """ Method passed to run to update "global" status. """
         # Setting a value in a dictionary is atomic
         status = status_holder['status'].copy()
-        status.update(**kw)
-        if error is not None:
-            status['errors'] = [error] + status['errors'][:2]
-        if result is not None:
-            status['results'] = [result] + status['results'][:9]
+        status.update(**kw)  # can hold generic info
+        if msg is not None:
+            status['msgs'].append(msg)
         status_holder['status'] = status
 
     kwargs = {
         'app': vapp,
-        'update_status': update_status,
-        'path': path,
+        'update_status': update_status
     }
-    if 'interval' in settings:
-        kwargs['interval'] = float(settings['interval'])
 
     # daemon thread that actually executes `run` method to call /index
     listener = ErrorHandlingThread(target=run, name='listener', kwargs=kwargs)
@@ -382,12 +386,16 @@ def composite(loader, global_conf, **settings):
     log.debug('starting listener')
     listener.start()
 
-    # Register before virtualapp creation.
+    # Register after virtualapp creation.
     @atexit.register
     def shutdown_listener():
+        """ Echo a statement at shutdown """
         log.debug('shutting down listening thread')
 
     def status_app(environ, start_response):
+        """ Allows you to get the status of the ingestion "manager". This will be much
+            more useful once multi-processing is thrown at ingestion.
+        """
         status = '200 OK'
         response_headers = [('Content-type', 'application/json')]
         start_response(status, response_headers)
@@ -396,7 +404,9 @@ def composite(loader, global_conf, **settings):
     return status_app
 
 
+# Command Application (for waitress)
 def main():
+    """ Entry point for the local deployment. """
     parser = argparse.ArgumentParser(
         description='Listen for VCF File uuids to ingest',
         epilog=EPILOG,
