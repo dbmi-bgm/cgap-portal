@@ -355,8 +355,6 @@ def composite(loader, global_conf, **settings):
         'REMOTE_USER': username,
     }
     vapp = VirtualApp(app, environ)
-
-
     timestamp = datetime.datetime.now().isoformat()
     status_holder = {
         'status': {
@@ -376,7 +374,7 @@ def composite(loader, global_conf, **settings):
         status_holder['status'] = status
 
     kwargs = {
-        'app': vapp,
+        'vapp': vapp,
         'update_status': update_status
     }
 
