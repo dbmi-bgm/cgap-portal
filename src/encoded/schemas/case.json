@@ -88,6 +88,13 @@
         }
     },
     "columns" : {
+        "display_title" : {
+            "title" : "Case",
+            "sort_fields" : [
+                { "field" : "accession", "title" : "Accession (CGAP ID)" },
+                { "field" : "aliases", "title": "User-Defined Alias" }
+            ]
+        },
         "individual" : {
             "title" : "Individual",
             "sort_fields" : [
@@ -95,10 +102,6 @@
                 { "field" : "aliases", "title": "User-Defined Alias" },
                 { "field" : "uuid", "title": "UUID"}
             ]
-        },
-        "display_title" : {
-            "title" : "Case Title",
-            "default_hidden" : true
         },
         "sample.specimen_type": {
             "title": "Sample"
@@ -116,9 +119,6 @@
         },
         "report": {
             "title": "Report"
-        },
-        "accession" : {
-            "title": "Case"
         }
     }
 }
