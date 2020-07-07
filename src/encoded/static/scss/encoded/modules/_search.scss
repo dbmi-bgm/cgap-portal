@@ -18,7 +18,7 @@ $search-results-header-row-height: 52px; // 46px is existing default for both re
 // Extensions to shared-portal-components searchview table(s):
 .search-result-row .result-table-row .search-result-column-block {
 
-	> .inner .multi-field-cell {
+	.inner .multi-field-cell {
 		flex: 1 1 0px;
 		width: 100%;
 
@@ -45,10 +45,14 @@ $search-results-header-row-height: 52px; // 46px is existing default for both re
 			font-weight: 400;
 			text-align: center;
 		}
+		.col-topleft {
+			@extend .text-monospace;
+			font-size: 0.75em;
+		}
 	}
 
 	&[data-field="display_title"] {
-		> .inner {
+		.inner {
 			> .title-block {
 				white-space: normal; // Allow to wrap by default (overrides SPC's default white-space: nowrap;) since we have tall-ish rows.
 			}
@@ -59,30 +63,15 @@ $search-results-header-row-height: 52px; // 46px is existing default for both re
 	// Styling overrides specific to search results of type Case
 	.search-view-controls-and-results[data-search-item-type="Case"] & {
 
-		// Treat Individual col as display_title col for CaseView.
-		&[data-first-visible-column] > .inner > .title-block {
+		&[data-first-visible-column] .inner > .title-block {
 			max-height: none;
-			white-space: normal; // Allow to wrap by default (overrides SPC's default white-space: nowrap;) since we have tall-ish rows.
 		}
 
+		&[data-field="display_title"] > .inner .multi-field-cell .col-main,
 		&[data-field="individual"] > .inner .multi-field-cell .col-main {
 			// Uppercase Individual's Identifier
 			text-transform: uppercase;
 		}
-
-
-		&[data-field="individual"],
-		&[data-field="accession"],
-		&[data-field="sample_processing"] {
-			> .inner {
-				.col-topleft {
-					@extend .text-monospace;
-					font-size: 0.75em;
-				}
-			}
-		}
-
-
 	}
 	
 	&[data-field="status"] {

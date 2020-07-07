@@ -88,6 +88,13 @@
         }
     },
     "columns" : {
+        "display_title" : {
+            "title" : "Case",
+            "sort_fields" : [
+                { "field" : "accession", "title" : "Accession (CGAP ID)" },
+                { "field" : "aliases", "title": "User-Defined Alias" }
+            ]
+        },
         "individual" : {
             "title" : "Individual",
             "sort_fields" : [
@@ -96,18 +103,15 @@
                 { "field" : "uuid", "title": "UUID"}
             ]
         },
-        "display_title" : {
-            "title" : "Case Title",
-            "default_hidden" : true
+        "sample.specimen_type": {
+            "title": "Sample"
         },
-        "sample_processing": {
-            "title": "Sample",
-            "notes": "all samples will be included here, need to map sample to current individual in case search view"
-        },
-        "sample_processing.sample": {
+        "sample": {
             "title": "Sequencing",
+            "notes": "The primary sample calculated for a particular case.",
             "sort_fields" : [
-                { "field" : "specimen_type", "title": "Specimen Type" }
+                { "field" : "specimen_collection_date", "title": "Collection Date" },
+                { "field" : "accession", "title": "Accssion (CGAP ID)"}
             ]
         },
         "sample_processing.completed_processes" :  {
@@ -115,9 +119,6 @@
         },
         "report": {
             "title": "Report"
-        },
-        "accession" : {
-            "title": "Case"
         }
     }
 }
