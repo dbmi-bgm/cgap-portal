@@ -206,23 +206,25 @@ export const columnExtensionMap = {
             return <a href={result['@id'] + "#case-summary.bioinformatics"} style={{ color: "inherit", textDecoration: "inherit" }}>{renderAdvancedColumn(null, null, completed_processes, "Last Updated:", last_modified.date_modified || null)}</a>;
         }
     },
-    'sample_processing.sample': {
+    'sample': {
         'render' : function renderSequencingColumn(result, parentProps){
-            const { individual, sample_processing: { samples = [] } } = result;
-            const selectedSample = findSelectedCaseSample(samples, individual);
-            if (!selectedSample) return null;
-            const { workup_type, specimen_accession_date } = selectedSample;
-            return <a href={result['@id'] + "#case-summary.bioinformatics"} style={{ color: "inherit", textDecoration: "inherit" }}>{renderAdvancedColumn(null, null, workup_type, "Accessioned:", specimen_accession_date)}</a>;
+            const { sample = null } = result;
+            const { workup_type, specimen_accession_date } = sample;
+            return (
+                <a href={result['@id'] + "#case-summary.bioinformatics"} style={{ color: "inherit", textDecoration: "inherit" }}>
+                    {renderAdvancedColumn(null, null, workup_type, "Accessioned:", specimen_accession_date)}
+                </a>);
         }
     },
-    'sample_processing': {
-        'title': "This won't work right",
+    'sample.specimen_type': {
         'render' : function renderSampleColumn(result, parentProps){
-            const { individual, sample_processing: { samples = [] } } = result;
-            const selectedSample = findSelectedCaseSample(samples, individual);
-            if (!selectedSample) return null;
-            const { accession, status, specimen_type, specimen_collection_date } = selectedSample;
-            return renderAdvancedColumn(accession, status, specimen_type, "Collected:", specimen_collection_date);
+            const { sample = null } = result;
+            const { '@id': sampleId, accession, status, specimen_type, specimen_collection_date } = sample || {};
+            console.log("sample", sample);
+            return (
+                <a href={sampleId} style={{ color: "inherit", textDecoration: "inherit" }}>
+                    {renderAdvancedColumn(accession, status, specimen_type, "Collected:", specimen_collection_date)}
+                </a>);
         }
     },
     'date_published' : {

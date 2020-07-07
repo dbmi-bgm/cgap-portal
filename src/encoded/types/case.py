@@ -22,7 +22,7 @@ class Case(Item):
     name_key = 'accession'
     schema = load_schema('encoded:schemas/case.json')
     embedded_list = [
-        "filter_set_flag_addon",
+        # "filter_set_flag_addon.*", # Necessary for case view variant filtering... currently causing db error
         "family.*", # This embeds all Family fields, but not all Family.members fields.
         "family.members.*", # We need to have mother and father (or 'parents' maybe eventually) for all members with at least @id.
         "family.members.case",

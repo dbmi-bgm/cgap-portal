@@ -45,6 +45,10 @@ $search-results-header-row-height: 52px; // 46px is existing default for both re
 			font-weight: 400;
 			text-align: center;
 		}
+		.col-topleft {
+			@extend .text-monospace;
+			font-size: 0.75em;
+		}
 	}
 
 	&[data-field="display_title"] {
@@ -69,20 +73,6 @@ $search-results-header-row-height: 52px; // 46px is existing default for both re
 			// Uppercase Individual's Identifier
 			text-transform: uppercase;
 		}
-
-
-		&[data-field="individual"],
-		&[data-field="accession"],
-		&[data-field="sample_processing"] {
-			> .inner {
-				.col-topleft {
-					@extend .text-monospace;
-					font-size: 0.75em;
-				}
-			}
-		}
-
-
 	}
 	
 	&[data-field="status"] {
