@@ -218,6 +218,12 @@ class VCFParser(object):
         else:
             return [s[0].split('|')]
 
+    def fix_encoding(self, val):
+        """ Decodes restricted characters from val, returning hte result"""
+        for encoded, decoded in self.RESTRICTED_CHARACTER_ENCODING.items():
+            val = val.replace(encoded, decoded)
+        return val
+
     def cast_field_value(self, type, value, sub_type=None):
         """ Casts the given value to the type given by 'type'
 
@@ -232,13 +238,8 @@ class VCFParser(object):
         Raises:
             VCFParserException if there is a type we did not expect
         """
-        def fix_encoding(val):  # decode restricted characters
-            for encoded, decoded in self.RESTRICTED_CHARACTER_ENCODING.items():
-                val = val.replace(encoded, decoded)
-            return val
-
         if type == 'string':
-            return fix_encoding(value)
+            return self.fix_encoding(value)
         elif type == 'integer':
             try:
                 return int(value)
@@ -248,7 +249,10 @@ class VCFParser(object):
             try:
                 return float(value)
             except Exception:
-                return float(value[0])
+                try:
+                    return float(value[0])
+                except Exception:  # XXX: This shouldn't happen but does in case of malformed entries, see uk10k_esp_maf
+                    return 0.0
         elif type == 'boolean':
             if value == '0':
                 return False
@@ -256,7 +260,7 @@ class VCFParser(object):
         elif type == 'array':
             if sub_type:
                 if not isinstance(value, list):
-                    items = fix_encoding(value).split('~') if sub_type == 'string' else value
+                    items = self.fix_encoding(value).split('~') if sub_type == 'string' else value
                 else:
                     items = value
                 return list(map(lambda v: self.cast_field_value(sub_type, v, sub_type=None), items))
