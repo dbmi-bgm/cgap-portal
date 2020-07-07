@@ -6,14 +6,13 @@ import structlog
 import datetime
 import json
 import gzip
+import atexit
 from io import BytesIO
 from vcf import Reader
-from botocore.exceptions import ClientError
-from pyramid.view import view_config
 from dcicutils.misc_utils import VirtualApp
+from pyramid.view import view_config
 from snovault.util import debug_log
-from snovault.elasticsearch.es_index_listener import internal_app
-from snovault.elasticsearch.interfaces import ELASTIC_SEARCH
+from snovault.elasticsearch.es_index_listener import internal_app, ErrorHandlingThread
 from .commands.ingest_vcf import VCFParser
 
 
@@ -250,7 +249,7 @@ def gunzip_content(content):
     return gunzipped_content.decode('ascii')
 
 
-def run(vapp, _queue_manager=None):
+def run(vapp, _queue_manager=None, path='/ingest'):
     """ Entry-point for the ingestion listener. """
     log.info('Ingestion Listener starting...')
 
@@ -324,6 +323,77 @@ def run(vapp, _queue_manager=None):
                 log.error('INGESTION_REPORT:\n'
                           'Success: %s\n'
                           'Error: %s\n')
+
+
+def composite(loader, global_conf, **settings):
+    listener = None
+
+    # Register before app creation.
+    @atexit.register
+    def join_listener():
+        if listener:
+            log.debug('joining listening thread')
+            listener.join()
+
+    path = settings.get('path', '/ingest')
+
+    # Composite app is used so we can load the main app
+    app_name = settings.get('app', None)
+    app = loader.get_app(app_name, global_conf=global_conf)
+    username = settings.get('username', 'IMPORT')
+    environ = {
+        'HTTP_ACCEPT': 'application/json',
+        'REMOTE_USER': username,
+    }
+    vapp = VirtualApp(app, environ)
+
+
+    timestamp = datetime.datetime.now().isoformat()
+    status_holder = {
+        'status': {
+            'status': 'starting listener',
+            'started': timestamp,
+            'errors': [],
+            'results': [],
+        },
+    }
+
+    def update_status(error=None, result=None, indexed=None, **kw):
+        # Setting a value in a dictionary is atomic
+        status = status_holder['status'].copy()
+        status.update(**kw)
+        if error is not None:
+            status['errors'] = [error] + status['errors'][:2]
+        if result is not None:
+            status['results'] = [result] + status['results'][:9]
+        status_holder['status'] = status
+
+    kwargs = {
+        'app': vapp,
+        'update_status': update_status,
+        'path': path,
+    }
+    if 'interval' in settings:
+        kwargs['interval'] = float(settings['interval'])
+
+    # daemon thread that actually executes `run` method to call /index
+    listener = ErrorHandlingThread(target=run, name='listener', kwargs=kwargs)
+    listener.daemon = True
+    log.debug('starting listener')
+    listener.start()
+
+    # Register before virtualapp creation.
+    @atexit.register
+    def shutdown_listener():
+        log.debug('shutting down listening thread')
+
+    def status_app(environ, start_response):
+        status = '200 OK'
+        response_headers = [('Content-type', 'application/json')]
+        start_response(status, response_headers)
+        return [json.dumps(status_holder['status'])]
+
+    return status_app
 
 
 def main():
