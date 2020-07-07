@@ -294,9 +294,16 @@ $tabbar-height: 46px;
 	.error-boundary-container {
 		display: flex;
 		align-items: center;
-		height: calc(100vh - 135px);
+
 		.error-msg-container {
 			width: 100%;
+		}
+	}
+
+	.tab-pane-outer {
+		> .error-boundary-container {
+			/* When in top-level tab, have it be near-full-height to center contents */
+			height: calc(100vh - 136px);
 		}
 	}
 }
@@ -1948,7 +1955,15 @@ $badge-item-min-height: 90px;
 
 		}
 		.tab-router-contents {
-			padding-top: 20px;
+			/* Help prevent sudden 'jumps' in screen (height and transitively in scroll position) from changing from tall to short tabs */
+			/* We could consider also making min-height similar as parent tabs': `calc(100vh - (heights of footer + nav + sub-tab-nav))` */
+			/* And in such way make it ... tall and fit neatly into view */
+			min-height: 520px; // Fallback for older browsers
+			min-height: calc(100vh - 89px - 126px); // '126px' subject to change re: dimensions of sub tab nav
+
+			> .error-boundary-container {
+				min-height: 448px; /* 520px parent min-height - 2 * 36px padding */
+			}
 
 			h1 {
 				font-size: 2rem;
@@ -1964,6 +1979,7 @@ $badge-item-min-height: 90px;
 					border: solid 1px #fff;
 				}
 			}
+
 			h2 {
 				font-size: 1.5rem;
 				font-weight: 400;

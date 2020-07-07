@@ -31,7 +31,7 @@ function renderAdvancedColumn(topLeft, status, main, dateTitle, date) {
                 <span className="col-topleft">
                     { topLeft }
                 </span>
-                <i className="item-status-indicator-dot ml-07" data-status={status}/>
+                <i className="item-status-indicator-dot ml-07" data-status={status} data-tip={Schemas.Term.toName("status", status)} />
             </div>
             <h4 className="col-main">
                 { main || "-" }

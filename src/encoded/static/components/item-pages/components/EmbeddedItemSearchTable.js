@@ -52,7 +52,7 @@ export class EmbeddedItemSearchTable extends React.PureComponent {
                 const passProps = _.pick(this.props, 'windowWidth', 'href');
                 return (
                     <CaseDetailPane
-                        {...{ passProps, propsFromTable, result, containerWidth, rowNumber }} paddingWidth={47}
+                        {...{ passProps, propsFromTable, result, containerWidth, rowNumber }} paddingWidth={57}
                     />
                 );
             }.bind(this);

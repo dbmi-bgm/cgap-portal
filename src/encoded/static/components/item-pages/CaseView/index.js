@@ -10,6 +10,7 @@ import { console, layout, ajax, object, navigate } from '@hms-dbmi-bgm/shared-po
 
 import { PedigreeVizView } from './../../viz/PedigreeViz';
 import DefaultItemView from './../DefaultItemView';
+import { TabPaneErrorBoundary } from './../components/TabView';
 
 import { CaseSummaryTable } from './CaseSummaryTable';
 import { FamilyAccessionStackedTable } from './../../browse/CaseDetailPane';
@@ -409,6 +410,7 @@ class DotRouter extends React.PureComponent {
     render() {
         const { children, className, navClassName, contentsClassName, elementID } = this.props;
         const currentTab = this.getCurrentTab();
+        const { props : { children: currTabChildren = null, tabTitle: currTabTitle } } = currentTab;
 
         return (
             // We could make classNames props (with default values via defaultProps)
@@ -420,7 +422,9 @@ class DotRouter extends React.PureComponent {
                     </div>
                 </nav>
                 <div className={"tab-router-contents" + (contentsClassName ? " " + contentsClassName : "")}>
-                    { currentTab.props.children }
+                    <TabPaneErrorBoundary key={currTabTitle}>
+                        { currTabChildren }
+                    </TabPaneErrorBoundary>
                 </div>
             </div>
         );
