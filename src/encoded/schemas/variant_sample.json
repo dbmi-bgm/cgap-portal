@@ -416,7 +416,7 @@
             "order": 9,
             "grouping": "Variant Quality"
         },
-        "variant.hgvs_hgvsg": {
+        "variant.display_title": {
             "title": "Variant",
             "order": 10
         },
