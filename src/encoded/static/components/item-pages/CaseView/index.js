@@ -385,27 +385,33 @@ class DotRouter extends React.PureComponent {
     render() {
         const { children, className, prependDotPath, navClassName, contentsClassName, elementID } = this.props;
         const currentTab = this.getCurrentTab();
-        const { props : { children: currTabChildren = null, dotPath: currTabDotPath } } = currentTab;
+        const { props : { dotPath: currTabDotPath } } = currentTab; // Falls back to default tab if not in hash.
+        const contentClassName = "tab-router-contents" + (contentsClassName ? " " + contentsClassName : "");
+        const allTabContents = [];
 
         const adjustedChildren = React.Children.map(children, function(childTab){
-            const { props : { dotPath } } = childTab;
-            return React.cloneElement(childTab, { key: dotPath, active: currTabDotPath === dotPath, prependDotPath });
+            const { props : { dotPath, children: tabChildren, cache = true } } = childTab;
+            const active = currTabDotPath === dotPath;
+            if (active || cache) {
+                allTabContents.push(
+                    <div className={contentClassName + (!active ? " d-none" : "")} id={(prependDotPath || "") + dotPath} key={dotPath}>
+                        <TabPaneErrorBoundary>
+                            { tabChildren }
+                        </TabPaneErrorBoundary>
+                    </div>
+                );
+            }
+            return React.cloneElement(childTab, { key: dotPath, active, prependDotPath });
         });
 
         return (
-            // We could make classNames props (with default values via defaultProps)
-            // if plan to make reusable for other views
             <div className={"tab-router" + (className ? " " + className : "")} id={elementID}>
                 <nav className={"dot-tab-nav" + (navClassName ? " " + navClassName : "")}>
                     <div className="dot-tab-nav-list">
                         { adjustedChildren }
                     </div>
                 </nav>
-                <div className={"tab-router-contents" + (contentsClassName ? " " + contentsClassName : "")} id={(prependDotPath || "") + currTabDotPath}>
-                    <TabPaneErrorBoundary key={currTabDotPath}>
-                        { currTabChildren }
-                    </TabPaneErrorBoundary>
-                </div>
+                { allTabContents }
             </div>
         );
     }
