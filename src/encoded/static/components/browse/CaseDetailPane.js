@@ -450,18 +450,16 @@ export class FamilyAccessionStackedTable extends React.PureComponent {
 
     renderIndividualBlock(individual, role, familyId) {
         const { result } = this.props;
-        const { "@id": atId = null, display_title = null, case: cases = [], accession = null } = individual;
+        const { "@id": atId = null, display_title = null, case: cases = [], accession = null, samples: indvSamples = [] } = individual;
 
         let cls;
         if (result && result.individual && individual) {
             cls = result.individual['@id'] === atId ? "current-case": null;
         }
 
-        // console.log("individual", individual, result.individual);
-
         // TODO: Should only be one in this array... need to add a check somewhere
         const filteredCases = cases.filter((currCase) => {
-            const { family : { '@id': thisFamilyAtId = null } } = currCase;
+            const { family : { '@id': thisFamilyAtId = null } = {} } = currCase;
             // correct case matches family & individual
             if (thisFamilyAtId === `/families/${familyId}/`) {
                 return true;
@@ -471,8 +469,6 @@ export class FamilyAccessionStackedTable extends React.PureComponent {
 
         const { 0: caseForCurrIndividual = null } = filteredCases || [];
         const { report = null, sample: caseSample = null, caseAccession = null, display_title: caseTitle = null } = caseForCurrIndividual || {};
-        console.log("case for currIndividual, ", atId, caseForCurrIndividual);
-        console.log("case result", result);
 
         let reportBlock = null;
         if (report) {
@@ -530,7 +526,7 @@ export class FamilyAccessionStackedTable extends React.PureComponent {
                     </div>
                 </StackedBlockName>
                 <StackedBlockList className="libraries" title="Libraries">
-                    { individual.samples.map((thisSample) =>
+                    { indvSamples.map((thisSample) =>
                     {
                         const { '@id' : caseSampleAtId } = caseSample || {};
                         const { '@id' : thisSampleAtId } = thisSample || {};
