@@ -472,7 +472,7 @@ const AccessioningTab = React.memo(function AccessioningTab(props) {
                     <FamilyAccessionStackedTable
                         {...{ family, result }}
                         key={family['@id']}
-                        href={href} preventExpand
+                        href={href} preventExpand={false}
                         fadeIn={false} collapseLongLists
                     />
                 )}
