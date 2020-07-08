@@ -2091,6 +2091,106 @@ $badge-item-min-height: 90px;
 				.row.qc-summary {
 					padding: 2px 0;
 				}
+
+				.processing-summary-table-container {
+
+					overflow-x: auto;
+					-webkit-overflow-scrolling: touch;
+		
+					table.processing-summary-table {
+		
+						margin-top: 10px;
+						min-width: 640px;
+						width: 100%;
+		
+						thead {				
+							> tr > th {
+								padding: 6px 8px;
+								
+								&.hidden-th {
+									background-color: #ffffff;
+								}
+							}
+						}
+		
+						tbody {
+							tr {
+								td {
+									padding: 4px 8px;
+									/*
+									&[data-for-column="individual"],
+									&[data-for-column="sample"] {
+										font-family: $font-family-monospace;
+									}
+									*/
+									&[data-for-column="individual"]{
+										.gen-identifier {
+											display: inline-block;
+											min-width: 45px;
+											vertical-align: middle;
+											font-weight: 600;
+										}
+									}
+									i {
+										font-size: 12px;
+									}
+								}
+								&.is-even {
+									background-color: rgba(0, 0, 0, 0.03);
+								}
+								&.is-proband {
+									> td {
+										background-color: #ebf6ff;
+										&:first-child {
+											font-weight: 600;
+										}
+									}
+								}
+								&[data-sample-index="0"] {
+									> td {
+										border-top: 1px solid #f8f8f8;
+									}
+								}
+								&:not([data-sample-index="0"]) {
+									> td[data-for-column="individual"] {
+										visibility: hidden;
+									}
+								}
+								.qcs-container {
+									&.text-ellipses-container {
+										max-width: 140px;
+									}
+									> span {
+										display: inline-block;
+										border-right: solid 1px #bbb;
+										padding: 0 5px;
+										&:last-child {
+											border: none;
+										}
+									}
+									a.qc-status-in-review {
+										font-style: italic;
+									}
+								}
+							}
+						}
+		
+						tfoot {
+							> tr > td {
+								text-align: center;
+								vertical-align: middle !important;
+								padding: 2px 3px;
+								border-top: 1px solid #eeeeee;
+								background-color: #f1f1f1;
+								
+								&:not(.has-value) {
+									background-color: #fff;
+								}
+							}
+						}
+					}
+		
+				}
 			}	
 		}
 	}
@@ -2126,106 +2226,6 @@ $badge-item-min-height: 90px;
 
 		div.processing-summary {
 			margin-bottom: 10px;
-		}
-
-		.processing-summary-table-container {
-
-			overflow-x: auto;
-			-webkit-overflow-scrolling: touch;
-
-			table.processing-summary-table {
-
-				margin-top: 10px;
-				min-width: 640px;
-				width: 100%;
-
-				thead {				
-					> tr > th {
-						padding: 6px 8px;
-						
-						&.hidden-th {
-							background-color: #ffffff;
-						}
-					}
-				}
-
-				tbody {
-					tr {
-						td {
-							padding: 4px 8px;
-							/*
-							&[data-for-column="individual"],
-							&[data-for-column="sample"] {
-								font-family: $font-family-monospace;
-							}
-							*/
-							&[data-for-column="individual"]{
-								.gen-identifier {
-									display: inline-block;
-									min-width: 45px;
-									vertical-align: middle;
-									font-weight: 600;
-								}
-							}
-							i {
-								font-size: 12px;
-							}
-						}
-						&.is-even {
-							background-color: rgba(0, 0, 0, 0.03);
-						}
-						&.is-proband {
-							> td {
-								background-color: #ebf6ff;
-								&:first-child {
-									font-weight: 600;
-								}
-							}
-						}
-						&[data-sample-index="0"] {
-							> td {
-								border-top: 1px solid #f8f8f8;
-							}
-						}
-						&:not([data-sample-index="0"]) {
-							> td[data-for-column="individual"] {
-								visibility: hidden;
-							}
-						}
-						.qcs-container {
-							&.text-ellipses-container {
-								max-width: 140px;
-							}
-							> span {
-								display: inline-block;
-								border-right: solid 1px #bbb;
-								padding: 0 5px;
-								&:last-child {
-									border: none;
-								}
-							}
-							a.qc-status-in-review {
-								font-style: italic;
-							}
-						}
-					}
-				}
-
-				tfoot {
-					> tr > td {
-						text-align: center;
-						vertical-align: middle !important;
-						padding: 2px 3px;
-						border-top: 1px solid #eeeeee;
-						background-color: #f1f1f1;
-						
-						&:not(.has-value) {
-							background-color: #fff;
-						}
-					}
-				}
-			}
-
 		}
 
 		&[data-is-current-family="true"] {

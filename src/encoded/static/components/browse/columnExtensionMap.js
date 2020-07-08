@@ -190,16 +190,16 @@ export const columnExtensionMap = {
             return (<a href={atId}> { display_title } </a>);
         }
     },
-    'sample_processing.completed_processes': {
+    'sample_processing.analysis_type': {
         'render' : function renderBioinformaticsColumn(result, parentProps){
             const {
                 '@id' : resultHrefPath,
-                sample_processing: { completed_processes = [], last_modified = {} }
+                sample_processing: { analysis_type = null, last_modified = {} }
             } = result;
             // Unlikely to show in non-Case item results, so didn't add Case filter
             return (
                 <a href={resultHrefPath + "#case-info.bioinformatics"} className="adv-block-link">
-                    { renderAdvancedColumn(null, null, completed_processes, "Last Update:", last_modified.date_modified || null)}
+                    { renderAdvancedColumn(null, null, analysis_type, "Last Update:", last_modified.date_modified || null)}
                 </a>);
         }
     },
