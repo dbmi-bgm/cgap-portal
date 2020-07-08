@@ -32,7 +32,7 @@
         "indication": "cervical cancer",
         "specimen_accession": "12345",
         "specimen_accession_date": "2020-03-01",
-        "bam_sample_id": "test003_sample",
+        "bam_sample_id": "test004_sample",
         "requisition_acceptance": {
             "accepted_rejected": "Rejected",
             "rejection_reason": "DOB missing",

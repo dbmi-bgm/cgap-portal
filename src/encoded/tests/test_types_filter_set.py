@@ -15,89 +15,15 @@ def barebones_filter_set():
     return {
         'title': 'Test filter set',
         'search_type': 'Variant',
-        'flags': '?type=Variant',
-        'project': 'hms-dbmi',
-        'institution': 'hms-dbmi'
-    }
-
-
-@pytest.fixture
-def simple_filter_set():
-    """ A filter set with only the flag that designates the type """
-    return {
-        'title': 'Test filter set',
-        'search_type': 'Variant',
-        'filter_blocks': [
+        'flags': [
             {
-                'query': 'REF=G&ALT=A',
-                'flag_applied': True
+                'name': 'variant',
+                'query': '?type=Variant'
             }
         ],
-        'flags': '?type=Variant',
         'project': 'hms-dbmi',
         'institution': 'hms-dbmi'
     }
-
-
-@pytest.fixture
-def typical_filter_set():
-    """ A filter set with two filter blocks and a flag """
-    return {
-        'title': 'Test filter set',
-        'search_type': 'Variant',
-        'filter_blocks': [
-            {
-                'query': 'ALT=T&hg19.hg19_chrom=chr1',
-                'flag_applied': True
-            },
-            {
-                'query': 'REF=G&ALT=A',
-                'flag_applied': True
-            },
-        ],
-        'flags': '?type=Variant',
-        'project': 'hms-dbmi',
-        'institution': 'hms-dbmi'
-    }
-
-
-@pytest.fixture
-def complex_filter_set():
-    """ A filter set with 3 filter_blocks and a flag """
-    return {
-        'title': 'Test filter set',
-        'search_type': 'Variant',
-        'filter_blocks': [
-            {
-                'query': 'ALT=T&hg19.hg19_chrom=chr1',
-                'flag_applied': True
-            },
-            {
-                'query': 'REF=G&ALT=A',
-                'flag_applied': True
-            },
-            {
-                'query': 'POS.from=0&POS.to=12125898',
-                'flag_applied': True
-            }
-        ],
-        'flags': '?type=Variant&CHROM=1',
-        'project': 'hms-dbmi',
-        'institution': 'hms-dbmi',
-        'uuid': '5145195f-c203-41be-9642-7ba6fb4bfb16'
-    }
-
-
-def toggle_filter_blocks(filter_set, on=True):
-    """ Helper method for testing that will 'toggle' filter blocks to True if on=True else
-        it will disable them with False.
-
-    :param filter_set: set containing filter_blocks we'd like to toggle
-    :param on: whether or not to toggle on, default True
-    """
-    filter_blocks = filter_set.get('filter_blocks', [])
-    for block in filter_blocks:
-        block['flag_applied'] = True if on else False
 
 
 def test_filter_set_barebones(workbook, testapp, barebones_filter_set):
@@ -112,16 +38,49 @@ def test_filter_set_barebones(workbook, testapp, barebones_filter_set):
 
     # execute given flags only
     compound_search_res = testapp.post_json(COMPOUND_SEARCH_URL, {
-        'flags': '?type=project',
+        'flags': [  # should have no effect, since no filter_blocks toggle it
+            {
+                'name': 'project',
+                'query': '?type=Project'
+            }
+        ],
         'search_type': 'Project'  # NOTE: will work since we are not actually validating this
     }).json['@graph']
     assert len(compound_search_res) == 1
 
     # do it again, this time with a type that will return 404
     testapp.post_json(COMPOUND_SEARCH_URL, {
-        'flags': '?type=gene',
+        'flags': [  # should have no effect, since no filter_blocks toggle it
+            {
+                'name': 'gene',
+                'query': '?type=Gene'
+            }
+        ],
         'search_type': 'Gene'
     }, status=404)
+
+
+@pytest.fixture
+def simple_filter_set():
+    """ A filter set with only the flag that designates the type """
+    return {
+        'title': 'Test filter set',
+        'search_type': 'Variant',
+        'filter_blocks': [
+            {
+                'query': 'REF=G&ALT=A',
+                'flags_applied': ['variant']
+            }
+        ],
+        'flags': [
+            {
+                'name': 'variant',
+                'query': '?type=Variant'
+            }
+        ],
+        'project': 'hms-dbmi',
+        'institution': 'hms-dbmi'
+    }
 
 
 def test_filter_set_simple(workbook, testapp, simple_filter_set):
@@ -134,7 +93,7 @@ def test_filter_set_simple(workbook, testapp, simple_filter_set):
     compound_search_res = testapp.post_json(COMPOUND_SEARCH_URL, {
                                                 'filter_blocks': [{
                                                     'query': 'type=variant&CHROM=1',
-                                                    'flag_applied': True
+                                                    'flags_applied': []
                                                 }],
                                                 'search_type': 'Variant'
                                             }).json['@graph']
@@ -142,7 +101,12 @@ def test_filter_set_simple(workbook, testapp, simple_filter_set):
 
     # execute given flags only
     compound_search_res = testapp.post_json('/compound_search', {
-        'flags': '?type=project',
+        'flags': [  # should have no effect, since no filter_blocks toggle it
+            {
+                'name': 'project',
+                'query': '?type=Project'
+            }
+        ],
         'search_type': 'Project'
     }).json['@graph']
     assert len(compound_search_res) == 1
@@ -151,9 +115,14 @@ def test_filter_set_simple(workbook, testapp, simple_filter_set):
     compound_search_res = testapp.post_json(COMPOUND_SEARCH_URL, {
         'filter_blocks': [{
             'query': 'CHROM=1',
-            'flag_applied': True
+            'flags_applied': ['variant']
         }],
-        'flags': 'type=variant',
+        'flags': [
+            {
+                'name': 'variant',
+                'query': '?type=Variant'
+            }
+        ],
         'search_type': 'Variant'
     }).json['@graph']
     assert len(compound_search_res) == 4
@@ -163,14 +132,73 @@ def test_filter_set_simple(workbook, testapp, simple_filter_set):
     assert len(compound_search_res) == 1
 
 
-def test_filter_set_complete(workbook, testapp, typical_filter_set):
+@pytest.fixture
+def typical_filter_set():
+    """ A filter set with two filter blocks and a flag """
+    return {
+        'title': 'Test filter set',
+        'search_type': 'Variant',
+        'filter_blocks': [
+            {
+                'query': 'ALT=T&hg19.hg19_chrom=chr1',
+                'flags_applied': ['variant']
+            },
+            {
+                'query': 'REF=G&ALT=A',
+                'flags_applied': ['variant']
+            },
+        ],
+        'flags': [
+            {
+                'name': 'variant',
+                'query': '?type=Variant'
+            }
+        ],
+        'project': 'hms-dbmi',
+        'institution': 'hms-dbmi'
+    }
+
+
+def test_filter_set_typical(workbook, testapp, typical_filter_set):
     """ Executes a filter set with multiple filter blocks """
     res = testapp.post_json(FILTER_SET_URL, typical_filter_set, status=201).json
     uuid = res['@graph'][0]['@id']
 
     # execute the more complicated filter_set by @id
     compound_search_res = testapp.post_json(COMPOUND_SEARCH_URL, {'@id': uuid}).json['@graph']
-    assert len(compound_search_res) == 3  # typical_filter_set matches 3/4 variants
+    assert len(compound_search_res) == 3
+
+
+@pytest.fixture
+def complex_filter_set():
+    """ A filter set with 3 filter_blocks and a flag """
+    return {
+        'title': 'Test filter set',
+        'search_type': 'Variant',
+        'filter_blocks': [
+            {
+                'query': 'ALT=T&hg19.hg19_chrom=chr1',
+                'flags_applied': ['variant_chrom']
+            },
+            {
+                'query': 'REF=G&ALT=A',
+                'flags_applied': ['variant_chrom']
+            },
+            {
+                'query': 'POS.from=0&POS.to=12125898',
+                'flags_applied': ['variant_chrom']
+            }
+        ],
+        'flags': [
+            {
+                'name': 'variant_chrom',
+                'query': '?type=Variant&CHROM=1'
+            }
+        ],
+        'project': 'hms-dbmi',
+        'institution': 'hms-dbmi',
+        'uuid': '5145195f-c203-41be-9642-7ba6fb4bfb16'
+    }
 
 
 def test_filter_set_complex(workbook, testapp, complex_filter_set):
@@ -184,36 +212,19 @@ def test_filter_set_complex(workbook, testapp, complex_filter_set):
     compound_search_res = testapp.post_json(COMPOUND_SEARCH_URL, {'@id': uuid}).json['@graph']
     assert len(compound_search_res) == 4  # all variants will match
 
-    # toggle off all the blocks
+    # Modify POS
     filter_set = {
-        'title': 'Test filter set',
         'search_type': t,
         'filter_blocks': filter_blocks,
         'flags': flags
     }
     for block in filter_blocks:
-        block['flag_applied'] = False
-        compound_search_res = testapp.post_json(COMPOUND_SEARCH_URL, filter_set).json['@graph']
-        assert len(compound_search_res) == 4  # should match in all cases
-
-    # Modify POS
-    for block in filter_blocks:
         query = block['query']
         if 'POS' in query:
-            block['flag_applied'] = True
-            block['query'] = 'POS.from=0&POS.to=100000'  # exclude 3/4 variants
+            block['query'] = 'POS.from=0&POS.to=80000'  # excludes 1/4 variants
             break
     compound_search_res = testapp.post_json(COMPOUND_SEARCH_URL, filter_set).json['@graph']
-    assert len(compound_search_res) == 1  # should only match the one case
-
-    # Now, toggle the REF=G&ALT=A block, which will re-introduce 1/4 variants, total 2/4
-    for block in filter_blocks:
-        query = block['query']
-        if 'REF' in query:
-            block['flag_applied'] = True
-            break
-    compound_search_res = testapp.post_json(COMPOUND_SEARCH_URL, filter_set).json['@graph']
-    assert len(compound_search_res) == 2
+    assert len(compound_search_res) == 3
 
 
 def test_filter_set_intersection(workbook, testapp, complex_filter_set):
@@ -224,7 +235,6 @@ def test_filter_set_intersection(workbook, testapp, complex_filter_set):
     filter_blocks = complex_filter_set['filter_blocks']
     flags = complex_filter_set['flags']
     filter_set = {
-        'title': 'Test filter set',
         'search_type': t,
         'filter_blocks': filter_blocks,
         'flags': flags,
@@ -232,21 +242,69 @@ def test_filter_set_intersection(workbook, testapp, complex_filter_set):
     }
     testapp.post_json(COMPOUND_SEARCH_URL, filter_set, status=404)  # AND will eliminate all here
 
-    # toggle off the REF/ALT requirement, now 2 will match
-    for block in filter_blocks:
-        if 'REF' in block['query']:
-            block['flag_applied'] = False
-            break
+
+@pytest.fixture
+def filter_set_with_many_flags():
+    """ A filter set with 2 filter blocks and 3 flags applied differently across blocks """
+    return {
+        'title': 'Test filter set',
+        'search_type': 'Variant',
+        'filter_blocks': [
+            {
+                'query': 'REF=A&ALT=T',
+                'flags_applied': ['position_lower_bound']
+            },
+            {
+                'query': 'REF=A&ALT=G',
+                'flags_applied': ['position_upper_bound']
+            }
+        ],
+        'flags': [
+            {
+                'name': 'variant_chrom',
+                'query': '?type=Variant&CHROM=1'
+            },
+            {
+                'name': 'position_upper_bound',
+                'query': 'POS.to=100000'
+            },
+            {
+                'name': 'position_lower_bound',
+                'query': 'POS.from=100000'
+            },
+            {
+                'name': 'hg19_chrom_is_two',
+                'query': 'hg19.hg19_chrom=chr2'
+            }
+        ],
+        'project': 'hms-dbmi',
+        'institution': 'hms-dbmi',
+        'uuid': 'de3babdb-68da-4c75-a42d-6428c81392d1'
+    }
+
+
+def test_filter_set_selectively_apply_flags(workbook, testapp, filter_set_with_many_flags):
+    """ Executes a complex filter set with multiple flags added selectively across fields """
+    filter_set = filter_set_with_many_flags
     compound_search_res = testapp.post_json(COMPOUND_SEARCH_URL, filter_set).json['@graph']
     assert len(compound_search_res) == 2
 
-    # toggle off hg19 so all match
-    for block in filter_blocks:
-        if 'hg19' in block['query']:
-            block['flag_applied'] = False
-            break
+    # add chr=2 flag, giving no results
+    for filter_block in filter_set['filter_blocks']:
+        filter_block['flags_applied'].append('hg19_chrom_is_two')
+    testapp.post_json(COMPOUND_SEARCH_URL, filter_set, status=404)
+
+    # disable all flags, still only giving 2 results
+    for filter_block in filter_set['filter_blocks']:
+        filter_block['flags_applied'] = []
     compound_search_res = testapp.post_json(COMPOUND_SEARCH_URL, filter_set).json['@graph']
-    assert len(compound_search_res) == 4
+    assert len(compound_search_res) == 2
+
+    # enable multiple flags, which should disqualify 1/2 remaining variants
+    for filter_block in filter_set['filter_blocks']:
+        filter_block['flags_applied'] = ['variant_chrom', 'position_lower_bound']
+    compound_search_res = testapp.post_json(COMPOUND_SEARCH_URL, filter_set).json['@graph']
+    assert len(compound_search_res) == 1
 
 
 # the following tests are distinct in that they aim to test specific behavior associated with
@@ -269,13 +327,12 @@ def execute_and_verify_generator_search(testapp, filter_set, expected):
 @pytest.fixture
 def filter_set_with_only_flags():
     return {
-        'title': 'Test filter set',
         'search_type': 'Variant',
-        'flags': 'CHROM=1'
+        'global_flags': 'CHROM=1'
     }
 
 
-def test_compound_search_only_flags(workbook, testapp, filter_set_with_only_flags):
+def test_compound_search_only_global_flags(workbook, testapp, filter_set_with_only_flags):
     """ Tests compound search with a filter set that has only flags
         /search redirect is functioning if we get correct facets on the response, which are checked
         explicitly for correctness in this test.
@@ -286,28 +343,16 @@ def test_compound_search_only_flags(workbook, testapp, filter_set_with_only_flag
     # do generator search
     execute_and_verify_generator_search(testapp, filter_set_with_only_flags, 4)
 
-    # verify facet values all sum to 4, since we should only be aggregating on the search results
-    assert 'facets' in resp
-    facets = resp['facets']
-    for facet in facets:
-        count = 0
-        if 'terms' in facet:
-            for term in facet['terms']:
-                count += term['doc_count']
-        else:
-            count += facet['total']
-        assert count == 4
-
 
 @pytest.fixture
 def filter_set_with_single_filter_block():
     return {
-        'title': 'Test filter set',
         'search_type': 'Variant',
         'filter_blocks': [{
-            'query': '?type=Variant&POS.from=0&POS.to=10000000',
-            'flag_applied': True
-        }]
+            'query': 'POS.from=0&POS.to=10000000',
+            'flags_applied': []
+        }],
+        'global_flags': '?type=Variant'
     }
 
 
@@ -326,13 +371,18 @@ def test_compound_search_single_filter_block(workbook, testapp, filter_set_with_
 @pytest.fixture
 def filter_set_with_single_filter_block_and_flags():
     return {
-        'title': 'Test filter set',
         'search_type': 'Variant',
         'filter_blocks': [{
-            'query': '?type=Variant&POS.from=0&POS.to=10000000',
-            'flag_applied': True
+            'query': 'POS.from=0&POS.to=10000000',
+            'flags_applied': ['chrom']
         }],
-        'flags': 'CHROM=1'
+        'global_flags': '?type=Variant',
+        'flags': [
+            {
+                'name': 'chrom',
+                'query': 'CHROM=1'
+            }
+        ]
     }
 
 
@@ -348,50 +398,37 @@ def test_compound_search_filter_and_flags(workbook, testapp, filter_set_with_sin
     execute_and_verify_generator_search(testapp, filter_set_with_single_filter_block_and_flags, 1)
     filter_set_with_single_filter_block_and_flags['return_generator'] = False  # undo side-effect
 
-    # disable block, so flag only
-    toggle_filter_blocks(filter_set_with_single_filter_block_and_flags, on=False)
-    resp = testapp.post_json(COMPOUND_SEARCH_URL, filter_set_with_single_filter_block_and_flags).json
-    assert len(resp['@graph']) == 4
-    assert 'facets' in resp
-
 
 @pytest.fixture
 def filter_set_with_multiple_disabled_flags():
     return {
-        'title': 'Test filter set',
         'search_type': 'Variant',
         'filter_blocks': [{
             'query': '?type=Variant&POS.from=0&POS.to=10000000',
-            'flag_applied': False
+            'flags_applied': []
         },
         {
             'query': '?type=Variant&REF=A',
-            'flag_applied': False
+            'flags_applied': []
         }],
-        'flags': 'CHROM=1'
+        'global_flags': '?type=Variant',
+        'flags': [
+            {
+                'name': 'chrom',
+                'query': 'CHROM=1'
+            }
+        ]
     }
 
 
-def test_compound_search_disabled_filter_blocks(workbook, testapp, filter_set_with_multiple_disabled_flags):
-    """ Tests a compound search with all filter_blocks disabled (so will only execute flags). """
+def test_compound_search_disabled_flags(workbook, testapp, filter_set_with_multiple_disabled_flags):
+    """ Tests a compound search with all flags disabled (raw filter_blocks + global_flags). """
     resp = testapp.post_json(COMPOUND_SEARCH_URL, filter_set_with_multiple_disabled_flags).json
-    assert len(resp['@graph']) == 4
-
-    # Test same facet behavior as previously, since we are only executing flags
-    assert 'facets' in resp
-    facets = resp['facets']
-    for facet in facets:
-        count = 0
-        if 'terms' in facet:
-            for term in facet['terms']:
-                count += term['doc_count']
-        else:
-            count += facet['total']
-        assert count == 4
+    assert len(resp['@graph']) == 2
 
     # do generator search
-    execute_and_verify_generator_search(testapp, filter_set_with_multiple_disabled_flags, 4)
-    filter_set_with_multiple_disabled_flags['limit'] = 2
+    execute_and_verify_generator_search(testapp, filter_set_with_multiple_disabled_flags, 2)
+    filter_set_with_multiple_disabled_flags['limit'] = 1
     execute_and_verify_generator_search(testapp, filter_set_with_multiple_disabled_flags, 2)
 
 
@@ -426,3 +463,42 @@ def test_compound_search_from_to(workbook, testapp, request_with_lots_of_results
     paginated_request['from'] = 0
     paginated_request['limit'] = 10
     execute_and_verify_generator_search(testapp, paginated_request, 10)
+
+
+def test_compound_search_rejects_malformed_filter_sets(testapp):
+    """ Tests passing a bunch of malformed filter_sets raises an error. """
+    filter_set_without_filter_block_sub_fields = {
+        'search_type': 'Variant',
+        'filter_blocks': [
+            {
+                'query': 'CHROM=1'  # no flags_applied field
+            }
+        ]
+    }
+    with pytest.raises(AppError):
+        testapp.post_json(COMPOUND_SEARCH_URL, filter_set_without_filter_block_sub_fields)
+    filter_set_without_filter_block_sub_fields['filter_blocks'][0]['flags_applied'] = []
+    del filter_set_without_filter_block_sub_fields['filter_blocks'][0]['query']  # no query
+    with pytest.raises(AppError):
+        testapp.post_json(COMPOUND_SEARCH_URL, filter_set_without_filter_block_sub_fields)
+    filter_set_without_filter_block_sub_fields['filter_blocks'][0]['query'] = ['hello']  # bad type
+    with pytest.raises(AppError):
+        testapp.post_json(COMPOUND_SEARCH_URL, filter_set_without_filter_block_sub_fields)
+
+    filter_set_without_flag_sub_fields = {
+        'search_type': 'Variant',
+        'flags': [
+            {
+                'name': 'something'  # no query
+            }
+        ]
+    }
+    with pytest.raises(AppError):
+        testapp.post_json(COMPOUND_SEARCH_URL, filter_set_without_flag_sub_fields)
+    filter_set_without_flag_sub_fields['flags'][0]['query'] = 'type=Variant'
+    del filter_set_without_flag_sub_fields['flags'][0]['name']  # no name
+    with pytest.raises(AppError):
+        testapp.post_json(COMPOUND_SEARCH_URL, filter_set_without_flag_sub_fields)
+    filter_set_without_flag_sub_fields['flags'][0]['name'] = 5  # bad type
+    with pytest.raises(AppError):
+        testapp.post_json(COMPOUND_SEARCH_URL, filter_set_without_flag_sub_fields)
