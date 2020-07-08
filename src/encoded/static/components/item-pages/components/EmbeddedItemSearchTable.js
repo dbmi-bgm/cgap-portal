@@ -44,8 +44,9 @@ export class EmbeddedItemSearchTable extends React.PureComponent {
     }
 
     getCorrectDetailPane() {
-        const { renderDetailPane, context } = this.props;
-        const isCaseSearch = context['@type'][0] === 'Case' ? true : false;
+        const { renderDetailPane, context = null } = this.props;
+        const { '@type' : [ itemType = 'Item'] = [] } = context || {};
+        const isCaseSearch = itemType === 'Case' ? true : false;
 
         if (isCaseSearch) {
             return function renderCaseDetailPane(result, rowNumber, containerWidth, propsFromTable) {
