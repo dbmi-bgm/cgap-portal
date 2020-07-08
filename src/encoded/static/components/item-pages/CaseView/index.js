@@ -514,11 +514,10 @@ const BioinformaticsTab = React.memo(function BioinformaticsTab(props) {
             "Currently-selected family in Pedigree Visualization"
             : "Click to view this family in the Pedigree Visualization tab";
         const title = (
-            <h4 data-family-index={idx} className="clickable p-2 d-inline-block w-100">
-                <i className={"icon p-1 icon-sitemap fas icon-small"} />
+            <h4 data-family-index={idx} className="pb-0 p-2 mb-0 d-inline-block w-100">
                 <span className="font-italic text-500">{ familyDisplayTitle }</span>
                 { pedFileName ? <span className="text-300">{ " (" + pedFileName + ")" }</span> : null }
-                <button type="button" className="btn btn-small btn-primary pull-right" data-tip={tip} onClick={onClick}>
+                <button type="button" className="btn btn-sm btn-primary pull-right" data-tip={tip} onClick={onClick}>
                     <i className="icon icon-fw icon-sitemap fas mr-1 small" />
                     { isCurrentFamily ? "View Pedigree in Separate Tab" : "Switch to this Pedigree"}
                 </button>
@@ -538,7 +537,7 @@ const BioinformaticsTab = React.memo(function BioinformaticsTab(props) {
         <React.Fragment>
             <h1>{ caseDisplayTitle }: <span className="text-300">Bioinformatics Analysis</span></h1>
             <div className="tab-inner-container clearfix font-italic qc-status">
-                <span className="text-600">Current Status:</span> PASS
+                <span className="text-600">Current Status:</span><span className="text-success"> PASS <i className="icon icon-check fas"></i></span>
                 <span className="pull-right">3/28/20</span>
             </div>
             <div className="tab-inner-container">
