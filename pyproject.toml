@@ -1,7 +1,11 @@
 [tool.poetry]
 # Note: Various modules refer to this system as "encoded", not "cgap-portal".
 name = "encoded"
+<<<<<<< HEAD
 version = "2.2.0b0"
+=======
+version = "2.1.8"
+>>>>>>> master
 description = "Clinical Genomics Analysis Platform"
 authors = ["4DN-DCIC Team <support@4dnucleome.org>"]
 license = "MIT"
