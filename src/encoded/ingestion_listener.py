@@ -1,3 +1,4 @@
+import os
 import boto3
 import time
 import socket
@@ -7,12 +8,18 @@ import datetime
 import json
 import gzip
 import atexit
+import threading
+import signal
+import psycopg2
+import webtest
+import sqlalchemy
+import elasticsearch
 from io import BytesIO
 from vcf import Reader
+from pyramid import paster
 from dcicutils.misc_utils import VirtualApp
 from pyramid.view import view_config
 from snovault.util import debug_log
-from snovault.elasticsearch.es_index_listener import internal_app, ErrorHandlingThread
 from .commands.ingest_vcf import VCFParser
 
 
@@ -249,7 +256,7 @@ def gunzip_content(content):
     return gunzipped_content.decode('ascii')
 
 
-def run(vapp, _queue_manager=None, update_status=None):
+def run(vapp=None, _queue_manager=None, update_status=None):
     """ Entry-point for the ingestion listener. """
     log.info('Ingestion Listener starting...')
 
@@ -258,7 +265,17 @@ def run(vapp, _queue_manager=None, update_status=None):
     # es = vapp.app.registry[ELASTIC_SEARCH]
     # es.info()
 
-    queue_manager = IngestionQueueManager(vapp.app.registry) if not _queue_manager else _queue_manager
+    # Acquire registry
+    registry = None
+    if isinstance(vapp, webtest.TestApp):  # if in testing
+        registry = vapp.app.registry
+    elif isinstance(vapp, VirtualApp):  # if in production
+        registry = vapp.wrapped_app.app.registry
+    elif _queue_manager is None:  # if we got here, we cannot succeed in starting
+        raise Exception('Bad arguments given to run: %s, %s, %s' % (vapp, _queue_manager, update_status))
+
+    queue_manager = IngestionQueueManager(registry) if not _queue_manager else _queue_manager
+    log.info('Ingestion listener successfully online.')
     while should_remain_online():
         n_waiting, n_in_flight = queue_manager.get_counts()
         if n_waiting == 0 and n_in_flight > 0:
@@ -320,10 +337,35 @@ def run(vapp, _queue_manager=None, update_status=None):
                             error += 1
                             continue
                 msg = ('INGESTION_REPORT:\n'
-                          'Success: %s\n'
-                          'Error: %s\n')
+                       'Success: %s\n'
+                       'Error: %s\n')
                 log.error(msg)
                 update_status(msg=msg)
+
+
+class ErrorHandlingThread(threading.Thread):
+    """ Must be duplicated here so logging is correct. """
+
+    def run(self):
+        # interval = self._kwargs.get('interval', DEFAULT_INTERVAL)
+        interval = 60  # DB polling can and should be slower
+        update_status = self._kwargs['update_status']
+        while True:
+            try:
+                self._target(*self._args, **self._kwargs)
+            except (psycopg2.OperationalError, sqlalchemy.exc.OperationalError, elasticsearch.exceptions.ConnectionError) as e:
+                # Handle database restart
+                log.warning('Database not there, maybe starting up: %r', e)
+                timestamp = datetime.datetime.now().isoformat()
+                update_status(msg=repr(e))
+                log.debug('sleeping')
+                time.sleep(interval)
+                continue
+            except Exception:
+                # Unfortunately mod_wsgi does not restart immediately
+                log.exception('Exception in listener, restarting process at next request.')
+                os.kill(os.getpid(), signal.SIGINT)
+            break
 
 
 # Composite Application (for wsgi)
@@ -349,7 +391,7 @@ def composite(loader, global_conf, **settings):
     # Composite app is used so we can load the main app
     app_name = settings.get('app', None)
     app = loader.get_app(app_name, global_conf=global_conf)
-    username = settings.get('username', 'IMPORT')
+    username = settings.get('username', 'INDEXER')
     environ = {
         'HTTP_ACCEPT': 'application/json',
         'REMOTE_USER': username,
@@ -381,7 +423,7 @@ def composite(loader, global_conf, **settings):
     # daemon thread that actually executes `run` method to call /index
     listener = ErrorHandlingThread(target=run, name='listener', kwargs=kwargs)
     listener.daemon = True
-    log.debug('starting listener')
+    log.debug('WSGI Ingestion Listener Started')
     listener.start()
 
     # Register after virtualapp creation.
@@ -416,7 +458,13 @@ def main():
     parser.add_argument('config_uri', help="path to configfile")
     args = parser.parse_args()
 
-    vapp = internal_app(args.config_uri, args.app_name, args.username)
+    app = paster.get_app(args.config_uri, args.app_name)
+    config = {
+        'HTTP_ACCEPT': 'application/json',
+        'REMOTE_USER': args.username,
+    }
+
+    vapp = VirtualApp(app, config)
     return run(vapp)
 
 

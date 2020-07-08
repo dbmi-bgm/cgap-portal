@@ -116,9 +116,7 @@ def test_ingestion_listener_run(testapp, mocked_vcf_file, gene_workbook, setup_a
         current_time = datetime.datetime.utcnow()
         return current_time < (start_time + end_delta)
 
-    # XXX: This is a really hard thing to test, but take my word for it that this is doing "something"
+    # XXX: This is a really hard thing to test, but take my word for it that this is doing "something" -Will
     with mock.patch('encoded.ingestion_listener.should_remain_online', new=mocked_should_remain_online):
-        try:
-            run(testapp, _queue_manager=queue_manager)
-        except ValueError:  # expected in this test since the source VCF is malformed
-            pass
+        with pytest.raises(ValueError):
+            run(testapp, _queue_manager=queue_manager)  # expected in this test since the source VCF is malformed
