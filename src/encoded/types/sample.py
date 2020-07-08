@@ -137,18 +137,27 @@ class SampleProcessing(Item):
                 }
             }
         })
-    def samples_pedigree(self, request, family=None, samples=None):
+    def samples_pedigree(self, request, families=None, samples=None):
         """Filter Family Pedigree for samples to be used in QCs"""
+        # If there are multiple families this will be problematic, return empty
+        # We will need to know the context
         samples_pedigree = []
-        if not family or samples:
+        if not families or samples:
             return samples_pedigree
+        # this part will need word (ie disregard relations and just return parents)
+        if len(families) != 1:
+            return samples_pedigree
+        family = families[0]
         fam_data = get_item_or_none(request, family, 'families', frame='embedded')
+        print(fam_data)
         if not fam_data:
             return samples_pedigree
+        print('B')
         members = fam_data.get('members', [])
         relations = fam_data.get('relationships', [])
         if not members:
             return samples_pedigree
+        print('C')
         for a_sample in samples:
             temp = {
                 "individual": "",
