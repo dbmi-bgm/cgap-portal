@@ -386,7 +386,8 @@
         "href": {
             "title": "IGV href",
             "description": "Link to IGV image",
-            "type": "string"
+            "type": "string",
+            "format": "uri"
         },
         "annotation_id": {
             "title": "Annotation ID",
