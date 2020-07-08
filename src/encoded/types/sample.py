@@ -4,7 +4,8 @@ from snovault import (
     load_schema,
 )
 from .base import (
-    Item
+    Item,
+    get_item_or_none
 )
 
 
@@ -55,3 +56,130 @@ class Sample(Item):
             'date_requisition_received', 'accessioned_by'
         ]):
             return False
+
+
+@collection(
+    name='sample-processings',
+    properties={
+        'title': 'SampleProcessings',
+        'description': 'Listing of Sample Processings',
+    })
+class SampleProcessing(Item):
+    item_type = 'sample_processing'
+    schema = load_schema('encoded:schemas/sample_processing.json')
+    embedded_list = []
+    rev = {'case': ('Case', 'sample_processing')}
+
+    @calculated_property(schema={
+        "title": "Cases",
+        "description": "The case(s) this sample processing is for",
+        "type": "array",
+        "items": {
+            "title": "Case",
+            "type": "string",
+            "linkTo": "Case"
+        }
+    })
+    def cases(self, request):
+        rs = self.rev_link_atids(request, "case")
+        if rs:
+            return rs
+
+    @calculated_property(schema={
+        "title": "Samples Pedigree",
+        "description": "Relationships to proband for samples.",
+        "type": "array",
+        "items": {
+            "title": "Sample Pedigree",
+            "type": "object",
+            "properties": {
+                "individual": {
+                    "title": "Individual",
+                    "type": "string"
+                },
+                "sample_accession": {
+                    "title": "Individual",
+                    "type": "string"
+                },
+                "sample_name": {
+                    "title": "Individual",
+                    "type": "string"
+                },
+                "parents": {
+                    "title": "Parents",
+                    "type": "array",
+                    "items": {
+                        "title": "Parent",
+                        "type": "string"
+                    }
+                },
+                "association": {
+                    "title": "Individual",
+                    "type": "string",
+                    "enum": [
+                        "paternal",
+                        "maternal"
+                    ]
+                },
+                "sex": {
+                    "title": "Sex",
+                    "type": "string",
+                    "enum": [
+                        "F",
+                        "M",
+                        "U"
+                    ]
+                },
+                "relationship": {
+                    "title": "Relationship",
+                    "type": "string"
+                    }
+                }
+            }
+        })
+    def samples_pedigree(self, request, family=None, samples=None):
+        """Filter Family Pedigree for samples to be used in QCs"""
+        samples_pedigree = []
+        if not family or samples:
+            return samples_pedigree
+        fam_data = get_item_or_none(request, family, 'families', frame='embedded')
+        if not fam_data:
+            return samples_pedigree
+        members = fam_data.get('members', [])
+        relations = fam_data.get('relationships', [])
+        if not members:
+            return samples_pedigree
+        for a_sample in samples:
+            temp = {
+                "individual": "",
+                "sample_accession": "",
+                "sample_name": "",
+                "parents": [],
+                "relationship": "",
+                "sex": "",
+                # "association": ""  optional, add if exists
+            }
+            mem_infos = [i for i in members if a_sample in [x['@id'] for x in i.get('samples', [])]]
+            if not mem_infos:
+                continue
+            mem_info = mem_infos[0]
+            sample_info = [i for i in mem_info['samples'] if i['@id'] == a_sample][0]
+            # fetch the calculated relation info
+            relation_infos = [i for i in relations if i['individual'] == mem_info['accession']]
+            # fill in temp dict
+            temp['individual'] = mem_info['accession']
+            temp['sex'] = mem_info.get('sex', 'U')
+            parents = []
+            for a_parent in ['mother', 'father']:
+                if mem_info.get(a_parent):
+                    parents.append(mem_info[a_parent]['display_title'])
+            temp['parents'] = parents
+            temp['sample_accession'] = sample_info['display_title']
+            temp['sample_name'] = sample_info.get('bam_sample_id', '')
+            if relation_infos:
+                relation_info = relation_infos[0]
+                temp['relationship'] = relation_info.get('association', '')
+                if relation_info.get('association', ''):
+                    temp['association'] = relation_info.get('relationship', '')
+            samples_pedigree.append(temp)
+        return samples_pedigree
