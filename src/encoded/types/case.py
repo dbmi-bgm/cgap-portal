@@ -23,6 +23,8 @@ class Case(Item):
     schema = load_schema('encoded:schemas/case.json')
     embedded_list = [
         "family.*", # This embeds all Family fields, but not all Family.members fields.
+        "family.relationships.*",
+        "family.proband.accession",
         "family.members.*", # We need to have mother and father (or 'parents' maybe eventually) for all members with at least @id.
         "family.members.case",
         "family.members.case.report",
@@ -46,6 +48,8 @@ class Case(Item):
         "family.members.samples.files.quality_metric.status",
         "family.analysis_groups.*", # Probably don't need all of this; look into
         "secondary_families.*",
+        "secondary_families.relationships.*",
+        "secondary_families.proband.accession",
         "secondary_families.members.*",
         "secondary_families.members.individual_id",
         "secondary_families.members.accession",
