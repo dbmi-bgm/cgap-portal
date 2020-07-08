@@ -142,10 +142,103 @@ def access_key(testapp, submitter):
     return result
 
 
+# ADD SAMPLES FOR FAMILY MEMBERS
+@pytest.fixture
+def female_individual_sample(testapp, project, institution):
+    item = {
+        "accession": "GAPINGRANDMA",
+        "bam_sample_id": "ext_id_001",
+        "status": "released"
+    }
+    return testapp.post_json('/sample', item).json['@graph'][0]
+
+
+@pytest.fixture
+def grandpa_sample(testapp, project, institution):
+    item = {
+        "accession": "GAPSAGRANDPA",
+        "bam_sample_id": "ext_id_002",
+        "status": "released"
+    }
+    return testapp.post_json('/sample', item).json['@graph'][0]
+
+
+@pytest.fixture
+def mother_sample(testapp, project, institution):
+    item = {
+        "accession": "GAPSAMOTHER1",
+        "bam_sample_id": "ext_id_003",
+        "status": "released"
+    }
+    return testapp.post_json('/sample', item).json['@graph'][0]
+
+
+@pytest.fixture
+def father_sample(testapp, project, institution):
+    item = {
+        "accession": "GAPSAFATHER1",
+        "bam_sample_id": "ext_id_003",
+        "status": "released"
+    }
+    return testapp.post_json('/sample', item).json['@graph'][0]
+
+
+@pytest.fixture
+def uncle_sample(testapp, project, institution):
+    item = {
+        "accession": "GAPSAUNCLE01",
+        "bam_sample_id": "ext_id_003",
+        "status": "released"
+    }
+    return testapp.post_json('/sample', item).json['@graph'][0]
+
+
+@pytest.fixture
+def child_sample(testapp, project, institution):
+    item = {
+        "accession": "GAPSAPROBAND",
+        "bam_sample_id": "ext_id_003",
+        "status": "released"
+    }
+    return testapp.post_json('/sample', item).json['@graph'][0]
+
+
+@pytest.fixture
+def cousin_sample(testapp, project, institution):
+    item = {
+        "accession": "GAPSACOUSIN1",
+        "bam_sample_id": "ext_id_003",
+        "status": "released"
+    }
+    return testapp.post_json('/sample', item).json['@graph'][0]
+
+
+@pytest.fixture
+def sister_sample(testapp, project, institution):
+    item = {
+        "accession": "GAPSAHALFSIS",
+        "bam_sample_id": "ext_id_003",
+        "status": "released"
+    }
+    return testapp.post_json('/sample', item).json['@graph'][0]
+
+
+@pytest.fixture
+def brother_sample(testapp, project, institution):
+    item = {
+        "accession": "GAPSABROTHER",
+        "bam_sample_id": "ext_id_003",
+        "status": "released"
+    }
+    return testapp.post_json('/sample', item).json['@graph'][0]
+
+
+# ADD FAMILY MEMBERS
 @pytest.fixture
 def female_individual(testapp, project, institution):
     item = {
         "accession": "GAPINGRANDMA",
+        "samples": ["GAPSAGRANDMA"],
         "age": 53,
         "age_units": "year",
         'project': project['@id'],
@@ -161,6 +254,7 @@ def female_individual(testapp, project, institution):
 def grandpa(testapp, project, institution):
     item = {
         "accession": "GAPIDGRANDPA",
+        "samples": ["GAPSAGRANDPA"],
         "age": 53,
         "age_units": "year",
         'project': project['@id'],
@@ -175,6 +269,7 @@ def grandpa(testapp, project, institution):
 def mother(testapp, project, institution, grandpa, female_individual):
     item = {
         "accession": "GAPIDMOTHER1",
+        "samples": ["GAPSAMOTHER1"],
         "age": 33,
         "age_units": "year",
         'project': project['@id'],
@@ -190,6 +285,7 @@ def mother(testapp, project, institution, grandpa, female_individual):
 def father(testapp, project, institution):
     item = {
         "accession": "GAPIDFATHER1",
+        "samples": ["GAPSAFATHER1"],
         "age": 33,
         "age_units": "year",
         'project': project['@id'],
@@ -203,6 +299,7 @@ def father(testapp, project, institution):
 def uncle(testapp, project, institution, grandpa):
     item = {
         "accession": "GAPIDUNCLE01",
+        "samples": ["GAPSAUNCLE01"],
         "age": 35,
         "age_units": "year",
         'project': project['@id'],
@@ -217,6 +314,7 @@ def uncle(testapp, project, institution, grandpa):
 def child(testapp, project, institution, mother, father):
     item = {
         "accession": "GAPIDPROBAND",
+        "samples": ["GAPSAPROBAND"],
         "age": 7,
         "age_units": "year",
         'project': project['@id'],
@@ -232,6 +330,7 @@ def child(testapp, project, institution, mother, father):
 def cousin(testapp, project, institution, uncle):
     item = {
         "accession": "GAPIDCOUSIN1",
+        "samples": ["GAPSACOUSIN1"],
         "age": 11,
         "age_units": "year",
         'project': project['@id'],
@@ -246,6 +345,7 @@ def cousin(testapp, project, institution, uncle):
 def sister(testapp, project, institution, mother):
     item = {
         "accession": "GAPIDHALFSIS",
+        "samples": ["GAPSAHALFSIS"],
         "age": 11,
         "age_units": "year",
         'project': project['@id'],
@@ -260,6 +360,7 @@ def sister(testapp, project, institution, mother):
 def brother(testapp, project, institution, mother, father):
     item = {
         "accession": "GAPIDBROTHER",
+        "samples": ["GAPSABROTHER"],
         "age": 13,
         "age_units": "year",
         'project': project['@id'],
