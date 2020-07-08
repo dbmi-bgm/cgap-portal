@@ -258,7 +258,7 @@ def run(vapp, _queue_manager=None, update_status=None):
     # es = vapp.app.registry[ELASTIC_SEARCH]
     # es.info()
 
-    queue_manager = IngestionQueueManager(vapp.registry) if not _queue_manager else _queue_manager
+    queue_manager = IngestionQueueManager(vapp.app.registry) if not _queue_manager else _queue_manager
     while should_remain_online():
         n_waiting, n_in_flight = queue_manager.get_counts()
         if n_waiting == 0 and n_in_flight > 0:
