@@ -123,12 +123,11 @@ class IngestionQueueManager:
                 QueueName=self.queue_name,
                 Attributes=self.queue_attrs[self.queue_name]
             )
+            log.error(response)  # XXX: give info
             queue_url = response['QueueUrl']
-        # except self.client.exceptions.QueueAlreadyExists:
-        #     # try to get queue url again
-        #     queue_url = self._get_queue_url(self.queue_name)
         except Exception as e:
             log.error('Could not create queue with error %s' % e)
+            queue_url = self._get_queue_url(self.queue_name)  # try again anyway
         return queue_url
 
     def _get_queue_url(self, queue_name):
@@ -141,7 +140,7 @@ class IngestionQueueManager:
             )
         except Exception:
             response = {}
-        return response.get('QueueUrl')
+        return response.get('QueueUrl', None)
 
     def _chunk_messages(self, msgs):
         """ Chunks messages into self.send_batch_size batches (for efficiency).
@@ -170,6 +169,7 @@ class IngestionQueueManager:
                 QueueUrl=self.queue_url,
                 Entries=entries
             )
+            log.error(response)  # XXX: give info
             failed_messages = response.get('Failed', [])
 
             # attempt resend of failed messages
@@ -220,6 +220,7 @@ class IngestionQueueManager:
             QueueUrl=self.queue_url,
             MaxNumberOfMessages=self.receive_batch_size
         )
+        log.error(response)  # XXX: give info
         return response.get('Messages', [])
 
     def clear_queue(self):
