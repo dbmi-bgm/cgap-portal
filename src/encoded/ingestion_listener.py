@@ -395,7 +395,7 @@ def composite(loader, global_conf, **settings):
     # Composite app is used so we can load the main app
     app_name = settings.get('app', None)
     app = loader.get_app(app_name, global_conf=global_conf)
-    username = settings.get('username', 'INDEXER')
+    username = settings.get('username', 'IMPORT')
     environ = {
         'HTTP_ACCEPT': 'application/json',
         'REMOTE_USER': username,
@@ -457,7 +457,7 @@ def main():
         formatter_class=argparse.RawDescriptionHelpFormatter
     )
     parser.add_argument('--app-name', help='Pyramid app name in configfile')
-    parser.add_argument('--username', '-u', default='INDEXER', help='Import username')
+    parser.add_argument('--username', '-u', default='IMPORT', help='Import username')
     parser.add_argument('--dry-run', action='store_true', help='Do not post variants, just validate')
     parser.add_argument('config_uri', help="path to configfile")
     args = parser.parse_args()
