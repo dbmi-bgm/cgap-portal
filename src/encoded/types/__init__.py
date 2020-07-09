@@ -30,34 +30,6 @@ def includeme(config):
 
 
 @collection(
-    name='sample-processings',
-    properties={
-        'title': 'SampleProcessings',
-        'description': 'Listing of Sample Processings',
-    })
-class SampleProcessing(Item):
-    item_type = 'sample_processing'
-    schema = load_schema('encoded:schemas/sample_processing.json')
-    embedded_list = []
-    rev = {'case': ('Case', 'sample_processing')}
-
-    @calculated_property(schema={
-        "title": "Cases",
-        "description": "The case(s) this sample processing is for",
-        "type": "array",
-        "items": {
-            "title": "Case",
-            "type": "string",
-            "linkTo": "Case"
-        }
-    })
-    def cases(self, request):
-        rs = self.rev_link_atids(request, "case")
-        if rs:
-            return rs
-
-
-@collection(
     name='reports',
     properties={
         'title': 'Reports',
@@ -308,3 +280,26 @@ class AnnotationField(Item):
     })
     def display_title(self, field_name):
         return field_name
+
+
+@collection(
+    name='nexuses',
+    unique_key='accession',
+    properties={
+        'title': 'Cohorts',
+        'description': 'List of Cohorts',
+    })
+class Nexus(Item):
+    """Class for Cohorts."""
+    item_type = 'nexus'
+    name_key = 'accession'
+    schema = load_schema('encoded:schemas/nexus.json')
+    embedded_list = []
+
+    @calculated_property(schema={
+        "title": "Display Title",
+        "description": "A calculated title for every object in 4DN",
+        "type": "string"
+    })
+    def display_title(self, title):
+        return title

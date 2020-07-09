@@ -30,21 +30,10 @@ def includeme(config):
 
 # order of items references with linkTo in a field in  'required' in schemas
 ORDER = [
-    'user',
     'project',
     'institution',
+    'user',
     'file_format',
-    'phenotype',
-    'disorder',
-    # 'variant_consequence',
-    # 'variant', # links to ^ variant_consequence
-    # 'variant_sample', # links to ^ variant
-    'cohort',
-    'family',
-    'individual',
-    'case',
-    'report',
-    'sample',
     'workflow',
 ]
 
@@ -404,7 +393,7 @@ def load_all_gen(testapp, inserts, docsdir, overwrite=True, itype=None, from_jso
                         # 301 because @id is the existing item path, not uuid
                         testapp.get('/'+an_item['uuid'], status=[200, 301])
                         exists = True
-                    except:
+                    except Exception:
                         pass
                 # skip the items that exists
                 # if overwrite=True, still include them in PATCH round

@@ -5,7 +5,7 @@ import logging
 from pyramid.paster import get_app
 from snovault.elasticsearch.create_mapping import run as run_create_mapping
 from dcicutils.log_utils import set_logging
-from dcicutils.beanstalk_utils import whodaman
+# from dcicutils.beanstalk_utils import whodaman
 
 log = structlog.getLogger(__name__)
 EPILOG = __doc__
@@ -19,13 +19,14 @@ ITEM_INDEX_ORDER = [
     'AccessKey',
     'Cohort',
     'Family',
+    'FilterSet',
+    'Nexus',
     'User',
     'Workflow',
     'WorkflowMapping',
     'WorkflowRun',
     'WorkflowRunAwsem',
     'VariantConsequence',
-    'Disorder',
     'FileFormat',
     'FileFastq',
     'FileProcessed',
@@ -36,7 +37,6 @@ ITEM_INDEX_ORDER = [
     'Disorder',
     'Individual',
     'Case',
-    'FilterSet',
     'Report',
     'Document',
     'QualityMetricBamcheck',
@@ -46,12 +46,12 @@ ITEM_INDEX_ORDER = [
     'QualityMetricCmphet',
     'QualityMetricWorkflowrun',
     'QualityMetricVcfcheck',
+    'QualityMetricVcfqc',
     'TrackingItem',
     'Software',
     'Sample',
     'SampleProcessing',
     'StaticSection',
-    'Document',
     'Page',
     'AnnotationField',
     'Variant',
@@ -81,7 +81,7 @@ NEW_BEANSTALK_PROD_ENVS = [
 
 BEANSTALK_PROD_ENVS = [
     ENV_WEBPROD,
-#   ENV_WEBPROD2,
+    # ENV_WEBPROD2,
 ]
 
 
@@ -155,7 +155,8 @@ def _run_create_mapping(app, args):
         if args.wipe_es:  # override deploy_cfg WIPE_ES option
             log.info('Overriding deploy_cfg and wiping ES')
             deploy_cfg['WIPE_ES'] = True
-        run_create_mapping(app, check_first=(not deploy_cfg['WIPE_ES']), purge_queue=args.clear_queue, item_order=ITEM_INDEX_ORDER)
+        run_create_mapping(app, check_first=(not deploy_cfg['WIPE_ES']), purge_queue=args.clear_queue,
+                           item_order=ITEM_INDEX_ORDER)
     except Exception as e:
         log.error("Exception encountered while gathering deployment information or running create_mapping")
         log.error(str(e))
@@ -163,7 +164,7 @@ def _run_create_mapping(app, args):
 
 
 def main():
-    parser = argparse.ArgumentParser(
+    parser = argparse.ArgumentParser(  # noqa - PyCharm wrongly thinks the formatter_class is invalid
         description="Create Elasticsearch mapping on deployment", epilog=EPILOG,
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
@@ -176,7 +177,8 @@ def main():
     app = get_app(args.config_uri, args.app_name)
     # Loading app will have configured from config file. Reconfigure here:
     set_logging(in_prod=app.registry.settings.get('production'), log_name=__name__, level=logging.DEBUG)
-    # set_logging(app.registry.settings.get('elasticsearch.server'), app.registry.settings.get('production'), level=logging.DEBUG)
+    # set_logging(app.registry.settings.get('elasticsearch.server'), app.registry.settings.get('production'),
+    #             level=logging.DEBUG)
 
     _run_create_mapping(app, args)
     exit(0)

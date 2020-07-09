@@ -20,7 +20,7 @@ encode_url = urlparse.urljoin(SERVER,f_obj.get('href'))
 r = requests.get(encode_url, auth=(AUTHID,AUTHPW), headers=HEADERS, allow_redirects=True, stream=True)
 try:
     r.raise_for_status
-except:
+except Exception:
     print '%s href does not resolve' %(f_obj.get('accession'))
     sys.exit()
 

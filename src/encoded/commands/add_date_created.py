@@ -87,7 +87,7 @@ def run(testapp, collections=None, exclude=None, dry_run=False):
 
 def main():
     import argparse
-    parser = argparse.ArgumentParser(
+    parser = argparse.ArgumentParser(  # noqa - PyCharm wrongly thinks the formatter_class is specified wrong here.
         description="Fix date_created", epilog=EPILOG,
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
