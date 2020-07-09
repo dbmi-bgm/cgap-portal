@@ -449,6 +449,16 @@ class MappingTableParser(object):
             'uniqueKey': True
         }
 
+    @staticmethod
+    def add_extra_variant_sample_columns(cols):
+        """ Adds href, variant display title to columns (fields not on mapping table) """
+        cols['href'] = {
+            'title': 'Genome Snapshot'
+        }
+        cols['variant.display_title'] = {
+            'title': 'Variant'
+        }
+
     def generate_variant_sample_schema(self, sample_props, cols, facs, variant_cols, variant_facs):
         """ Builds the variant_sample.json schema based on sample_props. Will also add variant columns and
             facets since this information is embedded
@@ -478,8 +488,8 @@ class MappingTableParser(object):
             'type': 'string'
         }
         schema['properties']['href'] = {
-            'title': 'IGV href',
-            'description': 'Link to IGV image',
+            'title': 'Genome Snapshot',
+            'description': 'Link to Genome Snapshot Image',
             'type': 'string'
         }
 
@@ -498,6 +508,7 @@ class MappingTableParser(object):
         variant_facs = format_variant_cols_or_facs(variant_facs)
         cols.update(variant_cols)  # add variant stuff since we are embedding this info
         facs.update(variant_facs)
+        self.add_extra_variant_sample_columns(cols)
         schema['columns'] = cols
         schema['facets'] = facs
         logger.info('Built variant_sample schema')

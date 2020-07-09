@@ -70,7 +70,7 @@ def queue_ingestion(context, request):
     queue_manager = request.registry[INGESTION_QUEUE] if not override_name \
         else IngestionQueueManager(request.registry, override_name=override_name)
     _, failed = queue_manager.add_uuids(uuids)
-    log.error(request.registry[INGESTION_QUEUE].__dict__)  # XXX: remove later
+    log.error('queue_ingestion_manager: %s' % request.registry[INGESTION_QUEUE].__dict__)  # XXX: remove later
     if not failed:
         response['notification'] = 'Success'
         response['number_queued'] = len(uuids)
@@ -297,6 +297,7 @@ def run(vapp=None, _queue_manager=None, update_status=None):
                 try:
                     file_meta = vapp.get('/' + uuid).follow().json
                     location = vapp.get(file_meta['href']).location
+                    log.error('Got vcf location: %s' % location)
                 except Exception as e:
                     log.error('Could not locate uuid: %s with error: %s' % (uuid, e))
                     continue
@@ -311,10 +312,12 @@ def run(vapp=None, _queue_manager=None, update_status=None):
 
                 # gunzip content, pass to parser, post variants/variant_samples
                 decoded_content = gunzip_content(raw_content)
+                log.error('Got decoded content: %s' % decoded_content[:20])
                 parser = VCFParser(None, VARIANT_SCHEMA, VARIANT_SAMPLE_SCHEMA,
                                    reader=Reader(fsock=decoded_content.split('\n')))
                 success, error = 0, 0
                 for idx, record in enumerate(parser):
+                    log.error('Attempting parse on record %s' % record)
                     try:
                         variant = parser.create_variant_from_record(record)
                         variant['project'] = file_meta['project']['uuid']
