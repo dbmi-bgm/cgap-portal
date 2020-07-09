@@ -472,7 +472,7 @@ const AccessioningTab = React.memo(function AccessioningTab(props) {
                     <FamilyAccessionStackedTable
                         {...{ family, result }}
                         key={family['@id']}
-                        href={href} preventExpand
+                        href={href} preventExpand={false}
                         fadeIn={false} collapseLongLists
                     />
                 )}
@@ -547,7 +547,7 @@ const BioinformaticsTab = React.memo(function BioinformaticsTab(props) {
                         Total Number of Reads:
                     </div>
                     <div className="col-sm-4">
-                        450 Million
+                        452.3 Million
                     </div>
                 </div>
                 <div className="row qc-summary">
@@ -563,7 +563,7 @@ const BioinformaticsTab = React.memo(function BioinformaticsTab(props) {
                         Total Number of Variants Called:
                     </div>
                     <div className="col-sm-4">
-                        3-5 Million
+                        3.12 Million
                     </div>
                 </div>
                 <div className="row qc-summary">
@@ -571,7 +571,7 @@ const BioinformaticsTab = React.memo(function BioinformaticsTab(props) {
                         Total number of filtered variants (high-quality exonic variants + clinvar - blacklist):
                     </div>
                     <div className="col-sm-4">
-                        10K
+                        9,236
                     </div>
                 </div>
             </div>

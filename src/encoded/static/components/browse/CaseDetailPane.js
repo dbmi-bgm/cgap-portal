@@ -13,7 +13,7 @@ import { PartialList } from '@hms-dbmi-bgm/shared-portal-components/es/component
 
 export const CaseDetailPane = React.memo(function CaseDetailPane (props) {
     const { paddingWidthMap, paddingWidth, containerWidth, windowWidth, result, minimumWidth, href } = props;
-    const { sample_processing: { families = [] } = {} } = result;
+    const { family = null, secondary_families = null } = result;
 
     let usePadWidth = paddingWidth || 0;
     if (paddingWidthMap){
@@ -22,6 +22,14 @@ export const CaseDetailPane = React.memo(function CaseDetailPane (props) {
     const commonFamilySectionProps = {
         containerWidth, result, href, minimumWidth, paddingWidth: usePadWidth
     };
+
+    const families = [];
+    if (family !== null) {
+        families.push(family);
+        if (secondary_families !== null && secondary_families.length > 0) {
+            familes = familes.concat(secondary_families);
+        }
+    }
 
     // Once primary/other family objects added to Case schema, update to use those instead
     const familySections = families.map(function(family){
@@ -101,8 +109,7 @@ class FamilySection extends React.Component {
         const { containerWidth, family, result, href, minimumWidth, paddingWidth } = this.props;
         return (
             <FamilyReportStackedTable
-                result={result}
-                family={family} href={href} preventExpand
+                result={result} family={family} href={href} preventExpand
                 width={containerWidth ? (Math.max(containerWidth - paddingWidth, minimumWidth) /* account for padding of pane */) : null}
                 fadeIn={false} collapseLongLists
             />
@@ -159,16 +166,16 @@ export class FamilyReportStackedTable extends React.PureComponent {
         // 'columnHeaders'             : PropTypes.array,
         'result'                    : PropTypes.object,
         'family'                    : PropTypes.object,
-        // 'collapseLongLists'         : PropTypes.bool,
-        // 'preventExpand'             : PropTypes.bool,
+        'collapseLongLists'         : PropTypes.bool,
+        'preventExpand'             : PropTypes.bool,
     };
 
     static defaultProps = {
-        // 'fadeIn'        : true,
-        'width'         : "100%"
-        // 'collapseLongLists' : true,
-        // 'showMetricColumns' : null,
-        // 'preventExpand'     : false
+        'fadeIn'        : true,
+        'width'          : "100%",
+        'collapseLongLists' : true,
+        'showMetricColumns' : null,
+        'preventExpand'     : false
     };
 
     static renderEmptyBlock(columnClass) {
@@ -227,9 +234,8 @@ export class FamilyReportStackedTable extends React.PureComponent {
         );
     }
 
-    renderIndividualBlock(individual, i, role) {
+    renderIndividualBlock(individual, role) {
         const { result } = this.props;
-        console.log('this.props.result', result);
 
         const { "@id": atId = null, display_title = null, accession = null } = individual;
 
@@ -245,7 +251,7 @@ export class FamilyReportStackedTable extends React.PureComponent {
                     <StackedBlockNameLabel title="Accession" accession={accession || display_title} subtitleVisible/>}
             >
                 <StackedBlockName>
-                    { atId ? <a href={atId} className="name-title">{ role || display_title }</a> : <span className="name-title">{ role || display_title }</span>}
+                    { atId ? <a href={atId} className="name-title text-capitalize">{ role || display_title }</a> : <span className="name-title text-capitalize">{ role || display_title }</span>}
                 </StackedBlockName>
                 <StackedBlockList className="libraries" title="Libraries">
                     { _.map(individual.samples || [], this.renderSampleBlock) }
@@ -255,33 +261,42 @@ export class FamilyReportStackedTable extends React.PureComponent {
     }
 
     renderIndividualBlockList() {
-        const { family = null, collapseLimit = 1, collapseShow = 2, preventExpand = false } = this.props;
-        const { members = [], mother = null, father = null, proband = null } = family || {};
+        const { family = null, preventExpand } = this.props;
+        const { members = [], proband = null, relationships = [] } = family || {};
 
         // eslint-disable-next-line no-useless-concat
-        const appendCountStr = members.length <= collapseLimit ? null : ( 'with ' + "#;lp[67gty6" + ' More Individuals ');
         const showMoreExtTitle = (
             <React.Fragment>
-                { appendCountStr }
                 { preventExpand ? <a href={object.itemUtil.atId(family)}>(view Family)</a> : null }
             </React.Fragment>
         );
 
+        // Create a mapping of individual accessions to relationships/sex
+        const relationshipMapping = {};
+        relationships.forEach((item) => {
+            const { relationship = null, sex = null, individual = null } = item;
+            relationshipMapping[individual] = { sex, relationship };
+        });
+
+        // Sort individuals (proband first, then individuals with samples, then all others)
+        const sortedMembers = _(members).chain().sortBy(function(member) {
+            const { accession = null } = member;
+            const { accession: pAccession = null } = proband;
+            return accession === pAccession;
+        }).sortBy(function(member) {
+            const { samples = [] } = member;
+            return samples.length > 0;
+        }).value().reverse();
+
+        const indvBlocks = sortedMembers.map((familyMember) => {
+            const { accession: currId = null, display_title = null } = familyMember;
+            const { relationship: currRelationship = null, sex: currSex = null } = relationshipMapping[currId] || {};
+            return this.renderIndividualBlock(familyMember, currRelationship || display_title );
+        });
+
         return (
-            <StackedBlockList className="individuals" showMoreExtTitle={showMoreExtTitle} title="Individuals">
-                { members.map((familyMember, i) => {
-                    const currId = familyMember['@id'];
-                    switch(currId) {
-                        case mother['@id']:
-                            return this.renderIndividualBlock(familyMember, i, "Mother");
-                        case father['@id']:
-                            return this.renderIndividualBlock(familyMember, i, "Father");
-                        case proband['@id']:
-                            return this.renderIndividualBlock(familyMember, i, "Proband");
-                        default:
-                            return this.renderIndividualBlock(familyMember, i, null);
-                    }
-                })}
+            <StackedBlockList className="individuals" title="Individuals" showMoreExtTitle={showMoreExtTitle}>
+                { indvBlocks }
             </StackedBlockList>
         );
     }
@@ -306,8 +321,8 @@ export class FamilyReportStackedTable extends React.PureComponent {
         const columnHeaders = FamilyReportStackedTable.staticColumnHeaders(propColHeaders, showMetricsColumns);
         return (
             <div className="stacked-block-table-outer-container overflow-auto">
-                <StackedBlockTable {...{ preventExpand, columnHeaders, width }}
-                    fadeIn allFiles={[]} collapseLongLists={true}
+                <StackedBlockTable {...{ preventExpand, columnHeaders, width }} stackDepth="0" collapseShow="3"
+                    fadeIn allFiles={[]} collapseLongLists={true} defaultCollapsed={true}
                     handleFileCheckboxChange={this.handleFileCheckboxChange}>
                     { this.renderIndividualBlockList()}
                 </StackedBlockTable>
@@ -345,22 +360,22 @@ export class FamilyAccessionStackedTable extends React.PureComponent {
     }
 
     static propTypes = {
-        // 'columnHeaders'             : PropTypes.array,
+        'columnHeaders'             : PropTypes.array,
         'result'                    : PropTypes.object,
         'family'                    : PropTypes.object,
-        // 'collapseLongLists'         : PropTypes.bool,
-        // 'preventExpand'             : PropTypes.bool,
+        'collapseLongLists'         : PropTypes.bool,
+        'preventExpand'             : PropTypes.bool,
     };
 
     static defaultProps = {
-        // 'fadeIn'        : true,
-        'width'         : "100%"
-        // 'collapseLongLists' : true,
-        // 'showMetricColumns' : null,
-        // 'preventExpand'     : false
+        'fadeIn'        : true,
+        'width'         : "100%", // TODO: Fix, seems to fail prop validation
+        'collapseLongLists' : true,
+        'showMetricColumns' : null,
+        'preventExpand'     : false
     };
 
-    static renderEmptyBlock(columnClass) {
+    static renderEmptyBlock(columnClass, depth) {
         return (
             <StackedBlock {...{ columnClass }} subtitleVisible={false}
                 label={<StackedBlockNameLabel title={null} accession={null} subtitle={null} subtitleVisible={false}/>}>
@@ -394,29 +409,31 @@ export class FamilyAccessionStackedTable extends React.PureComponent {
         const fullTable = (
             <div className="w-100" style={{ maxWidth: "70%" }}>
                 <table className="accession-table w-100">
-                    <tr>
-                        <th>Sample ID</th>
-                        <th>{accession || "-"}</th>
-                    </tr>
-                    {/* <tr>
-                        <td>Phlebotomy ID</td>
-                        <td>CGAP#####</td>
-                    </tr> */}
-                    { display_title ?
+                    <tbody>
                         <tr>
-                            <td>CGAP ID</td>
-                            <td>{ display_title }</td>
-                        </tr> : null}
-                    { specimen_type ?
-                        <tr>
-                            <td>Sample Type</td>
-                            <td>{specimen_type }</td>
-                        </tr>: null}
-                    { specimen_collection_date ?
-                        <tr>
-                            <td>Collected</td>
-                            <td>{specimen_collection_date }</td>
-                        </tr>: null}
+                            <th>Sample ID</th>
+                            <th>{accession || "-"}</th>
+                        </tr>
+                        {/* <tr>
+                            <td>Phlebotomy ID</td>
+                            <td>CGAP#####</td>
+                        </tr> */}
+                        { display_title ?
+                            <tr>
+                                <td>CGAP ID</td>
+                                <td>{ display_title }</td>
+                            </tr> : null}
+                        { specimen_type ?
+                            <tr>
+                                <td>Sample Type</td>
+                                <td>{specimen_type }</td>
+                            </tr>: null}
+                        { specimen_collection_date ?
+                            <tr>
+                                <td>Collected</td>
+                                <td>{specimen_collection_date }</td>
+                            </tr>: null }
+                    </tbody>
                 </table>
             </div>);
 
@@ -448,7 +465,7 @@ export class FamilyAccessionStackedTable extends React.PureComponent {
         );
     }
 
-    renderIndividualBlock(individual, role, familyId) {
+    renderIndividualBlock(individual, role, familyId, sex) {
         const { result } = this.props;
         const { "@id": atId = null, display_title = null, case: cases = [], accession = null, samples: indvSamples = [] } = individual;
 
@@ -457,7 +474,7 @@ export class FamilyAccessionStackedTable extends React.PureComponent {
             cls = result.individual['@id'] === atId ? "current-case": null;
         }
 
-        // TODO: Should only be one in this array... need to add a check somewhere
+        // // TODO: Should only be one in this array... need to add a check somewhere
         const filteredCases = cases.filter((currCase) => {
             const { family : { '@id': thisFamilyAtId = null } = {} } = currCase;
             // correct case matches family & individual
@@ -502,26 +519,28 @@ export class FamilyAccessionStackedTable extends React.PureComponent {
                 <StackedBlockName className="flex-row align-items-center justify-content-between">
                     <div className="d-flex">
                         { atId ?
-                            <a href={atId} className={`name-title p-1 ${(result.individual['@id'] === individual['@id']) ? "current-case" : ""}`}>
+                            <a href={atId} className={`name-title p-1 text-capitalize ${(result.individual['@id'] === individual['@id']) ? "current-case" : ""}`}>
                                 { role || display_title }
-                            </a> : <span className="name-title p-1">{ role || display_title }</span>}
+                            </a> : <span className="name-title p-1 text-capitalize">{ role || display_title }</span>}
                     </div>
                     <div className="w-100" style={{ maxWidth: "70%" }}>
                         <table className="accession-table w-100">
-                            <tr>
-                                <th>Individual ID</th>
-                                <th>{ accession || "" }</th>
-                            </tr>
-                            <tr>
-                                <td>Family ID</td>
-                                <td>{ familyId || "" }</td>
-                            </tr>
-                            { caseForCurrIndividual ?
+                            <tbody>
                                 <tr>
-                                    <td>Case ID</td>
-                                    <td>{caseAccession || caseTitle}</td>
+                                    <th>Individual ID</th>
+                                    <th>{ accession || "" }</th>
                                 </tr>
-                                : null}
+                                <tr>
+                                    <td>Family ID</td>
+                                    <td>{ familyId || "" }</td>
+                                </tr>
+                                { caseForCurrIndividual ?
+                                    <tr>
+                                        <td>Case ID</td>
+                                        <td>{caseAccession || caseTitle}</td>
+                                    </tr>
+                                    : null}
+                            </tbody>
                         </table>
                     </div>
                 </StackedBlockName>
@@ -541,33 +560,35 @@ export class FamilyAccessionStackedTable extends React.PureComponent {
     }
 
     renderIndividualBlockList() {
-        const { family = null, collapseLimit = 1, collapseShow = 2, preventExpand = false } = this.props;
-        const { members = [], mother = null, father = null, proband = null, accession: familyId = null } = family || {};
+        const { family = null } = this.props;
+        const { members = [], proband = null, relationships = [], accession: familyId = null } = family || {};
 
-        // eslint-disable-next-line no-useless-concat
-        const appendCountStr = members.length <= collapseLimit ? null : ( 'with ' + "#;lp[67gty6" + ' More Individuals ');
-        const showMoreExtTitle = (
-            <React.Fragment>
-                { appendCountStr }
-                { preventExpand ? <a href={object.itemUtil.atId(family)}>(view Family)</a> : null }
-            </React.Fragment>
-        );
+        // Create a mapping of individual accessions to relationships/sex
+        const relationshipMapping = {};
+        relationships.forEach((item) => {
+            const { relationship = null, sex = null, individual = null } = item;
+            relationshipMapping[individual] = { sex, relationship };
+        });
+
+        // Sort individuals (proband first, then individuals with samples, then all others)
+        const sortedMembers = _(members).chain().sortBy(function(member) {
+            const { accession = null } = member;
+            const { accession: pAccession = null } = proband;
+            return accession === pAccession;
+        }).sortBy(function(member) {
+            const { samples = [] } = member;
+            return samples.length > 0;
+        }).value().reverse();
+
+        const indvBlocks = sortedMembers.map((familyMember) => {
+            const currId = familyMember['accession'];
+            const { relationship: currRelationship = null, sex: currSex = null } = relationshipMapping[currId] || {};
+            return this.renderIndividualBlock(familyMember, currRelationship || currId , familyId, currSex || null );
+        });
 
         return (
-            <StackedBlockList className="individuals" showMoreExtTitle={showMoreExtTitle} title="Individuals">
-                { members.map((familyMember) => {
-                    const currId = familyMember['@id'];
-                    switch(currId) {
-                        case mother['@id']:
-                            return this.renderIndividualBlock(familyMember, "Mother", familyId);
-                        case father['@id']:
-                            return this.renderIndividualBlock(familyMember, "Father", familyId);
-                        case proband['@id']:
-                            return this.renderIndividualBlock(familyMember, "Proband", familyId);
-                        default:
-                            return this.renderIndividualBlock(familyMember, null, familyId);
-                    }
-                })}
+            <StackedBlockList className="individuals" title="Individuals" defaultCollapsed={false}>
+                { indvBlocks }
             </StackedBlockList>
         );
     }
@@ -588,12 +609,12 @@ export class FamilyAccessionStackedTable extends React.PureComponent {
      * Much of styling/layouting is defined in CSS.
      */
     render(){
-        const { columnHeaders: propColHeaders, showMetricsColumns, width, preventExpand = false } = this.props;
+        const { columnHeaders: propColHeaders, showMetricsColumns, width, preventExpand } = this.props;
         const columnHeaders = FamilyAccessionStackedTable.staticColumnHeaders(propColHeaders, showMetricsColumns);
         return (
             <div className="stacked-block-table-outer-container overflow-auto">
-                <StackedBlockTable {...{ preventExpand, columnHeaders, width }}
-                    fadeIn allFiles={[]} collapseLongLists={true}
+                <StackedBlockTable {...{ columnHeaders, width, preventExpand }} stackDepth="0" collapseShow="3"
+                    fadeIn allFiles={[]} collapseLongLists={true} defaultCollapsed={true}
                     handleFileCheckboxChange={this.handleFileCheckboxChange}>
                     { this.renderIndividualBlockList()}
                 </StackedBlockTable>
