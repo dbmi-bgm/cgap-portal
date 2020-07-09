@@ -1,6 +1,6 @@
 'use strict';
 
-import React from 'react';
+import React, { useMemo } from 'react';
 import PropTypes from 'prop-types';
 import _ from 'underscore';
 import url from 'url';
@@ -29,7 +29,6 @@ export class EmbeddedItemSearchTable extends React.PureComponent {
     constructor(props){
         super(props);
         this.getCountCallback = this.getCountCallback.bind(this);
-        this.getCorrectDetailPane = this.getCorrectDetailPane.bind(this);
         this.state = { totalCount: null };
     }
 
@@ -43,24 +42,6 @@ export class EmbeddedItemSearchTable extends React.PureComponent {
         }
     }
 
-    getCorrectDetailPane() {
-        const { renderDetailPane, context = null } = this.props;
-        const { '@type' : [ itemType = 'Item'] = [] } = context || {};
-        const isCaseSearch = itemType === 'Case' ? true : false;
-
-        if (isCaseSearch) {
-            return function renderCaseDetailPane(result, rowNumber, containerWidth, propsFromTable) {
-                const passProps = _.pick(this.props, 'windowWidth', 'href');
-                return (
-                    <CaseDetailPane
-                        {...{ passProps, propsFromTable, result, containerWidth, rowNumber }} paddingWidth={57}
-                    />
-                );
-            }.bind(this);
-        }
-        return renderDetailPane;
-    }
-
     render(){
         const {
             title,
@@ -72,6 +53,7 @@ export class EmbeddedItemSearchTable extends React.PureComponent {
             searchHref,
             filterFacetFxn, hideFacets,
             filterColumnFxn, hideColumns,
+            renderDetailPane
         } = this.props;
         const { totalCount } = this.state;
 
@@ -80,8 +62,6 @@ export class EmbeddedItemSearchTable extends React.PureComponent {
         }
 
         const schemas = propSchemas || getSchemas() || null; // We might not have this e.g. in placeholders in StaticSections
-
-        const renderDetailPane = this.getCorrectDetailPane();
 
         const passProps = {
             facets, columns, columnExtensionMap, searchHref, session,
@@ -109,4 +89,22 @@ export class EmbeddedItemSearchTable extends React.PureComponent {
             </div>
         );
     }
+}
+
+export function EmbeddedCaseSearchTable (props){
+    const { windowWidth, href } = props;
+
+    const renderDetailPane = useMemo(function(){
+        return function renderCaseDetailPane(result, rowNumber, containerWidth, propsFromTable){
+            return (
+                <CaseDetailPane
+                    {...{ passProps, propsFromTable, result, containerWidth, rowNumber }} paddingWidth={57}
+                />
+            );
+        };
+    }, [ windowWidth, href ]);
+
+    return (
+        <EmbeddedItemSearchTable {...props} renderDetailPane={renderDetailPane} />
+    );
 }

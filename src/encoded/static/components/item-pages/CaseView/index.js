@@ -24,7 +24,7 @@ import { AttachmentInputController, AttachmentInputMenuOption } from './attachme
 import { CaseStats } from './CaseStats';
 import CaseSubmissionView from './CaseSubmissionView';
 
-import { EmbeddedItemSearchTable } from '../components/EmbeddedItemSearchTable';
+import { EmbeddedItemSearchTable, EmbeddedCaseSearchTable } from '../components/EmbeddedItemSearchTable';
 
 export {
     CaseSummaryTable,
@@ -170,7 +170,7 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
             <React.Fragment>
                 <h4 className="text-400 align-middle mt-0">Status Overview</h4>
                 <div className="search-table-wrapper">
-                    <EmbeddedItemSearchTable facets={null} searchHref={`/search/?type=Case&accession=${caseAccession}`} context={context} />
+                    <EmbeddedCaseSearchTable facets={null} searchHref={`/search/?type=Case&accession=${caseAccession}`} context={context} />
                 </div>
             </React.Fragment>
         );
