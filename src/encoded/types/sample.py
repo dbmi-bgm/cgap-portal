@@ -142,22 +142,19 @@ class SampleProcessing(Item):
         # If there are multiple families this will be problematic, return empty
         # We will need to know the context
         samples_pedigree = []
-        if not families or samples:
+        if not families or not samples:
             return samples_pedigree
         # this part will need word (ie disregard relations and just return parents)
         if len(families) != 1:
             return samples_pedigree
         family = families[0]
         fam_data = get_item_or_none(request, family, 'families', frame='embedded')
-        print(fam_data)
         if not fam_data:
             return samples_pedigree
-        print('B')
         members = fam_data.get('members', [])
         relations = fam_data.get('relationships', [])
         if not members:
             return samples_pedigree
-        print('C')
         for a_sample in samples:
             temp = {
                 "individual": "",
@@ -187,8 +184,8 @@ class SampleProcessing(Item):
             temp['sample_name'] = sample_info.get('bam_sample_id', '')
             if relation_infos:
                 relation_info = relation_infos[0]
-                temp['relationship'] = relation_info.get('association', '')
+                temp['relationship'] = relation_info.get('relationship', '')
                 if relation_info.get('association', ''):
-                    temp['association'] = relation_info.get('relationship', '')
+                    temp['association'] = relation_info.get('association', '')
             samples_pedigree.append(temp)
         return samples_pedigree

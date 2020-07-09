@@ -105,3 +105,57 @@ def test_sample_requisition_completed_rejected(testapp, sample_one):
     patch_info['date_completed'] = '2020-03-01'
     res2 = testapp.patch_json(res['@id'], {'requisition_acceptance': patch_info}, status=200).json['@graph'][0]
     assert res2.get('requisition_completed') is True
+
+
+# Sample Processing Tests
+@pytest.fixture
+def sample_proc_fam(testapp, project, institution, fam):
+    data = {
+        'project': project['@id'],
+        'institution': institution['@id'],
+        'samples': [
+            "GAPSAPROBAND",
+            "GAPSAFATHER1",
+            "GAPSAMOTHER1",
+            "GAPSABROTHER",
+            "GAPSAGRANDPA",
+            "GAPSAGRANDMA",
+            "GAPSAHALFSIS",
+            "GAPSAUNCLE01",
+            "GAPSACOUSIN1"
+            ],
+        'families': [fam['@id']]
+    }
+    res = testapp.post_json('/sample_processing', data).json['@graph'][0]
+    return res
+
+
+def test_sample_processing_pedigree(testapp, sample_proc_fam):
+    """This is an end to end test for calculating relationships
+    Test for roles"""
+    expected_values = {
+        'GAPIDPROBAND': {'sample_accession': 'GAPSAPROBAND', 'sample_name': 'ext_id_006',
+                         'parents': ['GAPIDMOTHER1', 'GAPIDFATHER1'], 'relationship': 'proband', 'sex': 'M'},
+        'GAPIDFATHER1': {'sample_accession': 'GAPSAFATHER1', 'sample_name': 'ext_id_004',
+                         'parents': [], 'relationship': 'father', 'sex': 'M'},
+        'GAPIDMOTHER1': {'sample_accession': 'GAPSAMOTHER1', 'sample_name': 'ext_id_003',
+                         'parents': ['GAPIDGRANDMA', 'GAPIDGRANDPA'], 'relationship': 'mother', 'sex': 'F'},
+        'GAPIDBROTHER': {'sample_accession': 'GAPSABROTHER', 'sample_name': 'ext_id_009',
+                         'parents': ['GAPIDMOTHER1', 'GAPIDFATHER1'], 'relationship': 'brother', 'sex': 'M'},
+        'GAPIDGRANDPA': {'sample_accession': 'GAPSAGRANDPA', 'sample_name': 'ext_id_002',
+                         'parents': [], 'relationship': 'grandfather', 'sex': 'M', 'association': 'maternal'},
+        'GAPIDGRANDMA': {'sample_accession': 'GAPSAGRANDMA', 'sample_name': 'ext_id_001',
+                         'parents': [], 'relationship': 'grandmother', 'sex': 'F', 'association': 'maternal'},
+        'GAPIDHALFSIS': {'sample_accession': 'GAPSAHALFSIS', 'sample_name': 'ext_id_008',
+                         'parents': ['GAPIDMOTHER1'], 'relationship': 'half-sister', 'sex': 'F'},
+        'GAPIDUNCLE01': {'sample_accession': 'GAPSAUNCLE01', 'sample_name': 'ext_id_005',
+                         'parents': ['GAPIDGRANDPA'], 'relationship': 'uncle', 'sex': 'M', 'association': 'maternal'},
+        'GAPIDCOUSIN1': {'sample_accession': 'GAPSACOUSIN1', 'sample_name': 'ext_id_007',
+                         'parents': ['GAPIDUNCLE01'], 'relationship': 'cousin', 'sex': 'F', 'association': 'maternal'}
+    }
+    calculated_values = sample_proc_fam['samples_pedigree']
+
+    for a_sample in calculated_values:
+        expected_value = expected_values[a_sample['individual']]
+        for a_key in expected_value:
+            assert a_sample[a_key] == expected_value[a_key]
