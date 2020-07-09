@@ -30,34 +30,6 @@ def includeme(config):
 
 
 @collection(
-    name='sample-processings',
-    properties={
-        'title': 'SampleProcessings',
-        'description': 'Listing of Sample Processings',
-    })
-class SampleProcessing(Item):
-    item_type = 'sample_processing'
-    schema = load_schema('encoded:schemas/sample_processing.json')
-    embedded_list = []
-    rev = {'case': ('Case', 'sample_processing')}
-
-    @calculated_property(schema={
-        "title": "Cases",
-        "description": "The case(s) this sample processing is for",
-        "type": "array",
-        "items": {
-            "title": "Case",
-            "type": "string",
-            "linkTo": "Case"
-        }
-    })
-    def cases(self, request):
-        rs = self.rev_link_atids(request, "case")
-        if rs:
-            return rs
-
-
-@collection(
     name='reports',
     properties={
         'title': 'Reports',

@@ -49,7 +49,7 @@ def test_relationships_roles(testapp, fam):
         "GAPIDMOTHER1": "mother",
         "GAPIDBROTHER": "brother",
         "GAPIDGRANDPA": "grandfather",
-        "GAPINGRANDMA": "grandmother",
+        "GAPIDGRANDMA": "grandmother",
         "GAPIDHALFSIS": "half-sister",
         "GAPIDUNCLE01": "uncle",
         "GAPIDCOUSIN1": "cousin"
@@ -68,7 +68,7 @@ def test_relationships_assosiation(testapp, fam):
         "GAPIDMOTHER1": "",
         "GAPIDBROTHER": "",
         "GAPIDGRANDPA": "maternal",
-        "GAPINGRANDMA": "maternal",
+        "GAPIDGRANDMA": "maternal",
         "GAPIDHALFSIS": "",
         "GAPIDUNCLE01": "maternal",
         "GAPIDCOUSIN1": "maternal"
