@@ -60,6 +60,7 @@ class Family(Item):
         "members.phenotypic_features.onset_age",
         "members.phenotypic_features.onset_age_units",
         "members.samples.status",
+        "members.samples.bam_sample_id",
         "members.samples.specimen_type",
         "members.samples.specimen_notes",
         "members.samples.specimen_collection_date",
