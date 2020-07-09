@@ -384,8 +384,8 @@
             "type": "string"
         },
         "href": {
-            "title": "IGV href",
-            "description": "Link to IGV image",
+            "title": "Bam Snapshot",
+            "description": "Link to a snapshot from the bam in the genomic location of the variant",
             "type": "string",
             "format": "uri"
         },
@@ -450,6 +450,11 @@
             "number_step": "any",
             "order": 12,
             "grouping": "Population Frequency"
+        },
+        "href": {
+            "title": "Bam Snapshot",
+            "format": "uri",
+            "order": 30
         }
     },
     "facets": {
