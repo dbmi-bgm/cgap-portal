@@ -137,10 +137,8 @@ def test_generate_variant_json_items(MTParser, inserts):
     assert sub_obj_props['vep_consequence']['items']['type'] == 'string'
 
     # check cols/facs
-    assert 'hgvs_hgvsg' in cols
     assert 'max_pop_af_af_popmax' in cols
     assert 'gnomad_af' in cols
-    assert cols['hgvs_hgvsg']['title'] == 'Variant'
     assert facs['CHROM']['title'] == 'Chromosome'
     assert facs['CHROM']['grouping'] == 'Position'
     assert facs['spliceai_ds_dg']['aggregation_type'] == 'stats'
@@ -168,6 +166,7 @@ def test_generate_variant_sample_schema(MTParser, sample_variant_items):
     assert 'facets' in schema
     assert 'variant' in properties
     assert 'file' in properties
+    assert 'variant.display_title' in cols
 
 
 def test_generate_variant_schema(MTParser, variant_items):
