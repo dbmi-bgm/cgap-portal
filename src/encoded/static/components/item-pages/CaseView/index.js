@@ -6,6 +6,7 @@ import PropTypes from 'prop-types';
 import memoize from 'memoize-one';
 import _ from 'underscore';
 import url from 'url';
+import queryString from 'query-string';
 
 import { console, layout, ajax, object, navigate } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 
@@ -590,12 +591,14 @@ const BioinformaticsTab = React.memo(function BioinformaticsTab(props) {
 
 const FilteringTab = React.memo(function FilteringTab(props) {
     const { context = null } = props;
-    const { filter_set_flag_addon: filterFlags } = context || {};
+    const { filter_set_flag_addon: filterFlags = "" } = context || {};
+
+    const filterFields = !filterFlags ? null : Object.keys(queryString.parse(filterFlags));
 
     return (
         <React.Fragment>
             <h1>{ context.display_title}: <span className="text-300">Variant Filtering and Technical Review</span></h1>
-            <EmbeddedItemSearchTable { ...{ context }} searchHref={`/search/?type=VariantSample${filterFlags ? filterFlags : ""}`} key={0} />
+            <EmbeddedItemSearchTable { ...{ context }} searchHref={`/search/?type=VariantSample${filterFlags ? filterFlags : ""}`} hideFacets={filterFields} />
         </React.Fragment>
     );
 });
