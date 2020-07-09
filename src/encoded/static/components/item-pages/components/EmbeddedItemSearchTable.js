@@ -92,18 +92,11 @@ export class EmbeddedItemSearchTable extends React.PureComponent {
 }
 
 export function EmbeddedCaseSearchTable (props){
-    const { windowWidth, href } = props;
-
     const renderDetailPane = useMemo(function(){
         return function renderCaseDetailPane(result, rowNumber, containerWidth, propsFromTable){
-            return (
-                <CaseDetailPane
-                    {...{ passProps, propsFromTable, result, containerWidth, rowNumber }} paddingWidth={57}
-                />
-            );
+            return <CaseDetailPane {...{ result, containerWidth, rowNumber }} paddingWidth={57} />;
         };
-    }, [ windowWidth, href ]);
-
+    }, []);
     return (
         <EmbeddedItemSearchTable {...props} renderDetailPane={renderDetailPane} />
     );
