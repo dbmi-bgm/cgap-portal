@@ -44,15 +44,16 @@ export class EmbeddedItemSearchTable extends React.PureComponent {
     }
 
     getCorrectDetailPane() {
-        const { renderDetailPane, context } = this.props;
-        const isCaseSearch = context['@type'][0] === 'Case' ? true : false;
+        const { renderDetailPane, context = null } = this.props;
+        const { '@type' : [ itemType = 'Item'] = [] } = context || {};
+        const isCaseSearch = itemType === 'Case' ? true : false;
 
         if (isCaseSearch) {
             return function renderCaseDetailPane(result, rowNumber, containerWidth, propsFromTable) {
                 const passProps = _.pick(this.props, 'windowWidth', 'href');
                 return (
                     <CaseDetailPane
-                        {...{ passProps, propsFromTable, result, containerWidth, rowNumber }} paddingWidth={47}
+                        {...{ passProps, propsFromTable, result, containerWidth, rowNumber }} paddingWidth={57}
                     />
                 );
             }.bind(this);

@@ -23,6 +23,8 @@ class Case(Item):
     schema = load_schema('encoded:schemas/case.json')
     embedded_list = [
         "family.*", # This embeds all Family fields, but not all Family.members fields.
+        "family.relationships.*",
+        "family.proband.accession",
         "family.members.*", # We need to have mother and father (or 'parents' maybe eventually) for all members with at least @id.
         "family.members.case",
         "family.members.case.report",
@@ -30,6 +32,7 @@ class Case(Item):
         "family.members.case.family",
         "family.members.case.sample.accession",
         "family.members.samples",
+        "family.members.samples.completed_processes",
         "family.members.samples.library_info",
         "family.members.samples.workup_type",
         "family.members.samples.accession",
@@ -43,7 +46,10 @@ class Case(Item):
         "family.members.samples.files.quality_metric.overall_quality_status",
         "family.members.samples.files.quality_metric.url",
         "family.members.samples.files.quality_metric.status",
+        "family.analysis_groups.*", # Probably don't need all of this; look into
         "secondary_families.*",
+        "secondary_families.relationships.*",
+        "secondary_families.proband.accession",
         "secondary_families.members.*",
         "secondary_families.members.individual_id",
         "secondary_families.members.accession",
@@ -53,6 +59,7 @@ class Case(Item):
         "secondary_families.members.case.family",
         "secondary_families.members.case.sample.accession",
         "secondary_families.members.samples",
+        "secondary_families.members.samples.completed_processes",
         "secondary_families.members.samples.library_info",
         "secondary_families.members.samples.workup_type",
         "secondary_families.members.samples.accession",
@@ -66,6 +73,7 @@ class Case(Item):
         "secondary_families.members.samples.files.quality_metric.overall_quality_status",
         "secondary_families.members.samples.files.quality_metric.url",
         "secondary_families.members.samples.files.quality_metric.status",
+        "secondary_families.analysis_groups.*",
         "individual.accession",
         "individual.date_created",
         "individual.father",
@@ -172,7 +180,7 @@ class Case(Item):
         # "sample_processing.processed_files.quality_metric.overall_quality_status",
         # "sample_processing.processed_files.quality_metric.url",
         # "sample_processing.processed_files.quality_metric.status",
-        "sample_processing.sample_processed_files",
+        "sample_processing.families.analysis_groups",
         "sample_processing.sample_processed_files.processed_files.last_modified.*",
         "sample_processing.sample_processed_files.sample.accession",
         # "sample_processing.sample_processed_files.processed_files.quality_metric",

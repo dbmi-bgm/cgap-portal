@@ -31,7 +31,7 @@ function renderAdvancedColumn(topLeft, status, main, dateTitle, date) {
                 <span className="col-topleft">
                     { topLeft }
                 </span>
-                <i className="item-status-indicator-dot ml-07" data-status={status}/>
+                <i className="item-status-indicator-dot ml-07" data-status={status} data-tip={Schemas.Term.toName("status", status)} />
             </div>
             <h4 className="col-main">
                 { main || "-" }
@@ -73,6 +73,7 @@ export const DisplayTitleColumnCase = React.memo(function DisplayTitleCaseDefaul
     const title = itemUtil.getTitleStringFromContext(result); // Gets display_title || title || accession || ...
     const tooltip = (typeof title === "string" && title.length > 20 && title) || null;
     const {
+        '@id' : caseHref,
         display_title = null,
         status = null,
         date_created = null,
@@ -80,9 +81,10 @@ export const DisplayTitleColumnCase = React.memo(function DisplayTitleCaseDefaul
     } = result;
 
     return (
-        <div key="title-container" className="title-block d-flex flex-column" data-tip={tooltip} data-delay-show={750}>
+        <a href={caseHref} className="adv-block-link w-100 title-block d-flex flex-column" data-tip={tooltip} data-delay-show={750}>
             { renderAdvancedColumn(display_title, status, case_id, "Accessioned:", date_created) }
-        </div>);
+        </a>
+    );
 });
 
 
@@ -102,10 +104,7 @@ export const columnExtensionMap = {
             if (itemTypeList[0] === "User") {
                 renderElem = <DisplayTitleColumnUser {...{ result }}/>;
             } else if (itemTypeList[0] === "Case") {
-                renderElem = (
-                    <a href={result['@id']} className="w-100" style={{ color: "inherit", textDecoration: "inherit" }}>
-                        <DisplayTitleColumnCase {...{ result }}/>
-                    </a>);
+                renderElem = <DisplayTitleColumnCase {...{ result }}/>;
             } else {
                 renderElem = <DisplayTitleColumnDefault {...{ result }}/>;
             }
@@ -140,6 +139,7 @@ export const columnExtensionMap = {
         'widthMap' : { 'lg' : 280, 'md' : 250, 'sm' : 200 },
         'render': function renderReportColumn(result, parentProps) {
             const {
+                '@id' : resultHref,
                 '@type' : itemTypeList = ["Item"],
                 report = null
             } = result;
@@ -157,9 +157,10 @@ export const columnExtensionMap = {
             // May appear in other non-Case results, where advanced column will look strange, so check and use default rendering otherwise
             if (itemTypeList[0] === "Case") {
                 return (
-                    <a href={result['@id']} style={{ color: "inherit", textDecoration: "inherit" }}>
-                        {renderAdvancedColumn(accession, status, display_title, "Last Modified:", date_modified)}
-                    </a>);
+                    <a href={resultHref} className="adv-block-link">
+                        { renderAdvancedColumn(accession, status, display_title, "Last Modified:", date_modified) }
+                    </a>
+                );
             }
             return (<a href={result['@id']}> { display_title } </a>);
         }
@@ -169,37 +170,49 @@ export const columnExtensionMap = {
         'widthMap' : { 'lg' : 280, 'md' : 250, 'sm' : 200 },
         'render' : function renderIndividualColumn(result, parentProps){
             const { '@type' : itemTypeList = ["Item"], individual } = result;
-            const { '@id' : atId = null, display_title = null, accession = null, status = null, date_created = null } = individual;
+            if (!individual) return null;
+            const {
+                '@id' : atId = null,
+                display_title = null,
+                accession = null,
+                status = null,
+                date_created = null
+            } = individual;
+
             // May appear in other non-Case results, where advanced column will look strange, so check and use default rendering otherwise
             if (itemTypeList[0] === "Case") {
                 return (
-                    <a href={atId} style={{ color: "inherit", textDecoration: "inherit" }}>
-                        {renderAdvancedColumn(accession, status, display_title, "Accessioned:", date_created)}
-                    </a>);
+                    <a href={atId} className="adv-block-link">
+                        { renderAdvancedColumn(accession, status, display_title, "Accessioned:", date_created) }
+                    </a>
+                );
             }
             return (<a href={atId}> { display_title } </a>);
         }
     },
-    'sample_processing.completed_processes': {
+    'sample_processing.analysis_type': {
         'render' : function renderBioinformaticsColumn(result, parentProps){
-            const { sample_processing: { completed_processes = [], last_modified = {} } } = result;
+            const {
+                '@id' : resultHrefPath,
+                sample_processing: { analysis_type = null, last_modified = {} }
+            } = result;
             // Unlikely to show in non-Case item results, so didn't add Case filter
             return (
-                <a href={result['@id'] + "#case-summary.bioinformatics"} style={{ color: "inherit", textDecoration: "inherit" }}>
-                    {renderAdvancedColumn(null, null, completed_processes, "Last Update:", last_modified.date_modified || null)}
+                <a href={resultHrefPath + "#case-info.bioinformatics"} className="adv-block-link">
+                    { renderAdvancedColumn(null, null, analysis_type, "Last Update:", last_modified.date_modified || null)}
                 </a>);
         }
     },
     'sample': {
         'render' : function renderSequencingColumn(result, parentProps){
-            const { '@type' : itemTypeList = ["Item"], sample = null } = result;
+            const { '@id' : resultHrefPath, '@type' : itemTypeList = ["Item"], sample = null } = result;
             const { '@id': sampleId, workup_type, sequencing_date } = sample || {};
             console.log("sample", sample);
             // May appear in other non-Case results, where advanced column will look strange, so check and use default rendering otherwise
             if (itemTypeList[0] === "Case") {
                 return (
-                    <a href={result['@id'] + "#case-summary.bioinformatics"} style={{ color: "inherit", textDecoration: "inherit" }}>
-                        {renderAdvancedColumn(null, null, workup_type, "Sequenced:", sequencing_date)}
+                    <a href={resultHrefPath + "#case-info.bioinformatics"} className="adv-block-link">
+                        { renderAdvancedColumn(null, null, workup_type, "Sequenced:", sequencing_date) }
                     </a>);
             }
             return (<a href={sampleId}> { display_title } </a>);
@@ -211,7 +224,7 @@ export const columnExtensionMap = {
             const { '@id': sampleId, accession, status, specimen_type, specimen_collection_date } = sample || {};
             // Unlikely to show in non-Case item results, so didn't add Case filter
             return (
-                <a href={sampleId} style={{ color: "inherit", textDecoration: "inherit" }}>
+                <a href={sampleId} className="adv-block-link">
                     {renderAdvancedColumn(accession, status, specimen_type, "Collected:", specimen_collection_date)}
                 </a>);
         }

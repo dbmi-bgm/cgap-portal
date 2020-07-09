@@ -42,27 +42,27 @@ export const CaseSummaryTable = React.memo(function CaseSummaryTable(props){
         'sample' : (
             <React.Fragment>
                 <i className="icon icon-fw icon-vial fas mr-05 align-middle"/>
-                Sample
+                <span className="d-none d-lg-inline ml-05">Sample</span>
             </React.Fragment>
         ),
         'individual' : (
             <React.Fragment>
                 <i className="icon icon-fw icon-user fas mr-05 align-middle"/>
-                Individual
+                <span className="d-none d-lg-inline ml-05">Individual</span>
             </React.Fragment>
         ),
         'assayType' : "Assay Type",
         'rawFiles' : (
             <React.Fragment>
                 <i className="icon icon-fw icon-file-code fas mr-05 align-middle"/>
-                <span className="d-none d-lg-inline ml-05">Sequencing</span>
+                Sequencing
             </React.Fragment>
         ),
         'processingType' : "Processing Type",
         'processedFiles' : (
             <React.Fragment>
                 <i className="icon icon-fw icon-file-medical-alt fas mr-05 align-middle"/>
-                <span className="d-none d-lg-inline ml-05">Pipeline</span>
+                Pipeline
             </React.Fragment>
         ),
     };
@@ -73,7 +73,7 @@ export const CaseSummaryTable = React.memo(function CaseSummaryTable(props){
     let hasCombinedMSA = false; // if there is also a combined MSA (for rendering last row only when there's a combined VCF)
     // add multisample analysis column data to column order/titles and data object
     sampleProcessing.forEach((sp) => {
-        const { uuid, processed_files = [], completed_processes = [] , sample_processed_files = [] } = sp;
+        const { uuid, processed_files = [], completed_processes = [], samples = [], sample_processed_files = [] } = sp;
 
         function pushColumn(title) {
             // adds a column to the end of the column order and to the column titles map
@@ -82,14 +82,20 @@ export const CaseSummaryTable = React.memo(function CaseSummaryTable(props){
             h2ColumnOrder.push(title);
         }
 
-        if (sample_processed_files.length > 0) {
+        if (processed_files.length > 0) {
             // add column titles with a flag & some embedded data for identifying column by UUID & rendering pipeline title
             pushColumn(`~MSA|${ completed_processes[0] }|${ uuid }`);
 
             sampleProcessingData[uuid] = {};
             sampleProcessingData[uuid]["MSA"] = generateFileDataObject(processed_files); // populate with multisample analysis objects
 
-            // populate with per sample data
+            // populate with per sample data (no files)
+            samples.forEach((sample) => {
+                const { accession = "" } = sample;
+                sampleProcessingData[uuid][accession] = true;
+            });
+
+            // populate with per sample data (files) (override any previously set)
             sample_processed_files.forEach((set) => {
                 const { sample : { accession = "" } = {}, processed_files: procFiles = [] } = set;
                 sampleProcessingData[uuid][accession] = generateFileDataObject(procFiles);
@@ -442,7 +448,8 @@ export const CaseSummaryTable = React.memo(function CaseSummaryTable(props){
                 specimen_type = null,
                 specimen_collection_date = null,
                 specimen_notes = null,
-                workup_type : assayType
+                workup_type : assayType,
+                analysis_type = null
             } = sample;
 
             const [ , , sampleID ] = samplePath.split("/");
@@ -487,7 +494,7 @@ export const CaseSummaryTable = React.memo(function CaseSummaryTable(props){
                     processedFiles: generateFileDataObject(procFilesWPermissions),
                     rawFiles: generateFileDataObject(rawFilesWPermissions),
                     sampleIdx,
-                    processingType: completed_processes[0] || null,
+                    processingType: analysis_type || completed_processes[0] || null,
                     assayType
                 });
             }
@@ -502,7 +509,7 @@ export const CaseSummaryTable = React.memo(function CaseSummaryTable(props){
     const renderedSummary = (membersWithoutSamplesLen + membersWithoutViewPermissionsLen) > 0 ? (
         <div className="processing-summary">
             { membersWithoutSamplesLen > 0 ?
-                <p className="mb-0">
+                <p className="pl-2 mb-0">
                     <span className="text-600">{ membersWithoutSamplesLen }</span> members without samples.
                 </p>
                 /*
@@ -575,19 +582,26 @@ export const CaseSummaryTable = React.memo(function CaseSummaryTable(props){
             } else if (hasMSAFlag(colName)) { // if a multisample analysis object
                 const [,, uuid] = colName.split("|");
                 const allFileObjects = sampleProcessingData[uuid][sampleId] || {};
-                const extensions = Object.keys(allFileObjects);
 
-                let renderArr = [];
-                extensions.forEach((ext) => {
-                    const jsx = convertFileObjectToJSX(allFileObjects[ext], ext);
-                    renderArr = renderArr.concat(jsx);
-                });
+                if (allFileObjects === true) {
+                    console.log("exts, allFileObjects,", allFileObjects);
+                    colVal = <div className="qcs-container text-ellipsis-container"><i className="icon icon-arrow-alt-circle-down fas"></i> Included in VCF </div>;
+                } else {
+                    const extensions = Object.keys(allFileObjects);
+                    console.log("exts, extensions,", extensions);
 
-                colVal = (
-                    <div className="qcs-container text-ellipsis-container">
-                        { renderArr.length > 0 ? renderArr : '-' }
-                    </div>
-                );
+                    let renderArr = [];
+                    extensions.forEach((ext) => {
+                        const jsx = convertFileObjectToJSX(allFileObjects[ext], ext);
+                        renderArr = renderArr.concat(jsx);
+                    });
+
+                    colVal = (
+                        <div className="qcs-container text-ellipsis-container">
+                            { renderArr.length > 0 ? renderArr : '-' }
+                        </div>
+                    );
+                }
             }
 
             return (

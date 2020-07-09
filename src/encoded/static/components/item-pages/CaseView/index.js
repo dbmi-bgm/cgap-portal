@@ -5,11 +5,13 @@ import Collapse from 'react-bootstrap/esm/Collapse';
 import PropTypes from 'prop-types';
 import memoize from 'memoize-one';
 import _ from 'underscore';
+import url from 'url';
 
 import { console, layout, ajax, object, navigate } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 
 import { PedigreeVizView } from './../../viz/PedigreeViz';
 import DefaultItemView from './../DefaultItemView';
+import { TabPaneErrorBoundary } from './../components/TabView';
 
 import { CaseSummaryTable } from './CaseSummaryTable';
 import { FamilyAccessionStackedTable } from './../../browse/CaseDetailPane';
@@ -258,14 +260,9 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
                                         Pedigree
                                     </h4>
                                 </div>
-                                <button type="button" className="btn btn-primary btn-small" style={{
-                                    backgroundColor: "cornflowerblue",
-                                    border: "none",
-                                    borderRadius: "50px",
-                                    padding: "0px 20px",
-                                    color: "white",
-                                }} onClick={onViewPedigreeBtnClick} disabled={!currFamily}>
-                                    View Pedigree(s)
+                                <button type="button" className="btn btn-primary btn-small view-pedigree-btn"
+                                    onClick={onViewPedigreeBtnClick} disabled={!currFamily}>
+                                    View Pedigree
                                 </button>
                             </div>
                             {/*
@@ -287,20 +284,20 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
                 </div>
             </div>
 
-            <DotRouter href={href} navClassName="container-wide pt-36 pb-36" contentsClassName="container-wide bg-light pt-36 pb-36">
-                <DotRouterTab tabTitle="Accessioning" dotPath=".accessioning" default>
+            <DotRouter href={href} navClassName="container-wide pt-36 pb-36" contentsClassName="container-wide bg-light pt-36 pb-36" prependDotPath="case-info">
+                <DotRouterTab tabTitle="Accessioning" dotPath=".accessioning" default cache={false}>
                     <AccessioningTab {...{ context, href, families, props }} />
                 </DotRouterTab>
-                <DotRouterTab tabTitle="Bioinformatics" dotPath=".bioinformatics">
+                <DotRouterTab tabTitle="Bioinformatics" dotPath=".bioinformatics" cache={false}>
                     <BioinformaticsTab {...{ context, families, currFamily, pedigreeFamiliesIdx, idToGraphIdentifier, sample_processing, onFamilySelect }} />
                 </DotRouterTab>
                 <DotRouterTab tabTitle="Filtering" dotPath=".filtering">
                     <FilteringTab context={context} />
                 </DotRouterTab>
-                <DotRouterTab tabTitle="Interpretation" dotPath=".interpretation" disabled>
+                <DotRouterTab tabTitle="Interpretation" dotPath=".interpretation" disabled cache={false}>
                     <InterpretationTab {...props} />
                 </DotRouterTab>
-                <DotRouterTab tabTitle="Finalize Case" dotPath=".reporting" disabled>
+                <DotRouterTab tabTitle="Finalize Case" dotPath=".reporting" disabled cache={false}>
                     <ReportingTab {...props} />
                 </DotRouterTab>
             </DotRouter>
@@ -329,15 +326,11 @@ CaseInfoTabView.getTabObject = function(props){
 class DotRouter extends React.PureComponent {
 
     static getDotPath(href) {
-        const hashPathSplit = href.split("#");
-        if (hashPathSplit.length > 1) {
-            const lastIdx = hashPathSplit.length - 1;
-            const dotPathSplit = hashPathSplit[lastIdx].split(".");
-            return "." + dotPathSplit[lastIdx];
-        } else {
-            // Path must contain both tab (hashroute) and dotpath to navigate properly
-            return null;
-        }
+        // Path must contain both tab (hashroute) and dotpath to navigate properly
+        const hashString = (url.parse(href, false).hash || "#").slice(1) || null;
+        if (!hashString) return null;
+        const dotPathSplit = hashString.split(".");
+        return "." + dotPathSplit[dotPathSplit.length - 1];
     }
 
     static getDefaultTab(children) {
@@ -368,25 +361,8 @@ class DotRouter extends React.PureComponent {
         super(props);
         this.memoized = {
             getDefaultTab: memoize(DotRouter.getDefaultTab),
-            // Not sure that makes much/any of measurable improvement.. eh oh well
             getDotPath: memoize(DotRouter.getDotPath)
         };
-    }
-
-    /**
-     * Renders a set of child tabs defined by <DotRouterTab> that each render a component below the navbar when clicked.
-     *
-     * Note: Currently there is a bug where if you switch to a main tab and then press "back" to get back,
-     * navigation doesn't work... need to look into
-     *
-     * A: Depends what the intended action is.. ideally we don't want to add each tab to browser history because
-     * gets a bit annoying to have to click back ton of times to get back to search listing or something.
-     *
-     * @todo Detect if hash in window.location; if is dotpath of child tab, if so, activate it.
-     */
-    componentDidMount() {
-        const { href, children } = this.props;
-
     }
 
     /** Method is not explicitly memoized b.c. this component only has 2 props & is a PureComponent itself */
@@ -407,32 +383,50 @@ class DotRouter extends React.PureComponent {
     }
 
     render() {
-        const { children, className, navClassName, contentsClassName, elementID } = this.props;
+        const { children, className, prependDotPath, navClassName, contentsClassName, elementID } = this.props;
         const currentTab = this.getCurrentTab();
+        const { props : { dotPath: currTabDotPath } } = currentTab; // Falls back to default tab if not in hash.
+        const contentClassName = "tab-router-contents" + (contentsClassName ? " " + contentsClassName : "");
+        const allTabContents = [];
+
+        const adjustedChildren = React.Children.map(children, function(childTab){
+            const { props : { dotPath, children: tabChildren, cache = true } } = childTab;
+            const active = currTabDotPath === dotPath;
+            if (active || cache) {
+                allTabContents.push(
+                    <div className={contentClassName + (!active ? " d-none" : "")} id={(prependDotPath || "") + dotPath} key={dotPath}>
+                        <TabPaneErrorBoundary>
+                            { tabChildren }
+                        </TabPaneErrorBoundary>
+                    </div>
+                );
+            }
+            return React.cloneElement(childTab, { key: dotPath, active, prependDotPath });
+        });
 
         return (
-            // We could make classNames props (with default values via defaultProps)
-            // if plan to make reusable for other views
             <div className={"tab-router" + (className ? " " + className : "")} id={elementID}>
                 <nav className={"dot-tab-nav" + (navClassName ? " " + navClassName : "")}>
                     <div className="dot-tab-nav-list">
-                        { children }
+                        { adjustedChildren }
                     </div>
                 </nav>
-                <div className={"tab-router-contents" + (contentsClassName ? " " + contentsClassName : "")}>
-                    { currentTab.props.children }
-                </div>
+                { allTabContents }
             </div>
         );
     }
 }
 
 function DotRouterTab(props) {
-    const { tabTitle, dotPath, className, disabled, children } = props;
+    const { tabTitle, dotPath, className, disabled, active, prependDotPath, children } = props;
 
     const onClick = useMemo(function(){
         return function(){
-            navigate("#case-summary" + dotPath, { skipRequest: true, replace: true, dontScrollToTop: true });
+            const targetDotPath = prependDotPath + dotPath;
+            navigate("#" + targetDotPath, { skipRequest: true, replace: true, dontScrollToTop: true }, function(){
+                // Maybe uncomment - this could be annoying if someone is also trying to keep Status Overview visible or something.
+                // layout.animateScrollTo(targetDotPath);
+            });
         };
     }, [ dotPath ]);
 
@@ -441,7 +435,7 @@ function DotRouterTab(props) {
     }
 
     return (
-        <div className={(className ? className + " " : "") + (disabled ? "disabled " : "")} >
+        <div className={(className ? className + " " : "") + (disabled ? "disabled " : "") + (active ? " active" : "")} >
             <div className="btn-prepend d-xs-none">
                 <svg viewBox="0 0 1.5875 4.2333333" width={6} height={16}>
                     <path d="M 0,4.2333333 1.5875,2.1166667 v 2.1166666 z"/>
@@ -478,7 +472,7 @@ const AccessioningTab = React.memo(function AccessioningTab(props) {
                     <FamilyAccessionStackedTable
                         {...{ family, result }}
                         key={family['@id']}
-                        href={href} preventExpand
+                        href={href} preventExpand={false}
                         fadeIn={false} collapseLongLists
                     />
                 )}
@@ -520,11 +514,10 @@ const BioinformaticsTab = React.memo(function BioinformaticsTab(props) {
             "Currently-selected family in Pedigree Visualization"
             : "Click to view this family in the Pedigree Visualization tab";
         const title = (
-            <h4 data-family-index={idx} className="clickable p-2 d-inline-block w-100">
-                <i className={"icon p-1 icon-sitemap fas icon-small"} />
+            <h4 data-family-index={idx} className="pb-0 p-2 mb-0 d-inline-block w-100">
                 <span className="font-italic text-500">{ familyDisplayTitle }</span>
                 { pedFileName ? <span className="text-300">{ " (" + pedFileName + ")" }</span> : null }
-                <button type="button" className="btn btn-small btn-primary pull-right" data-tip={tip} onClick={onClick}>
+                <button type="button" className="btn btn-sm btn-primary pull-right" data-tip={tip} onClick={onClick}>
                     <i className="icon icon-fw icon-sitemap fas mr-1 small" />
                     { isCurrentFamily ? "View Pedigree in Separate Tab" : "Switch to this Pedigree"}
                 </button>
@@ -544,7 +537,7 @@ const BioinformaticsTab = React.memo(function BioinformaticsTab(props) {
         <React.Fragment>
             <h1>{ caseDisplayTitle }: <span className="text-300">Bioinformatics Analysis</span></h1>
             <div className="tab-inner-container clearfix font-italic qc-status">
-                <span className="text-600">Current Status:</span> PASS
+                <span className="text-600">Current Status:</span><span className="text-success"> PASS <i className="icon icon-check fas"></i></span>
                 <span className="pull-right">3/28/20</span>
             </div>
             <div className="tab-inner-container">
@@ -554,7 +547,7 @@ const BioinformaticsTab = React.memo(function BioinformaticsTab(props) {
                         Total Number of Reads:
                     </div>
                     <div className="col-sm-4">
-                        450 Million
+                        452.3 Million
                     </div>
                 </div>
                 <div className="row qc-summary">
@@ -570,7 +563,7 @@ const BioinformaticsTab = React.memo(function BioinformaticsTab(props) {
                         Total Number of Variants Called:
                     </div>
                     <div className="col-sm-4">
-                        3-5 Million
+                        3.12 Million
                     </div>
                 </div>
                 <div className="row qc-summary">
@@ -578,7 +571,7 @@ const BioinformaticsTab = React.memo(function BioinformaticsTab(props) {
                         Total number of filtered variants (high-quality exonic variants + clinvar - blacklist):
                     </div>
                     <div className="col-sm-4">
-                        10K
+                        9,236
                     </div>
                 </div>
             </div>
@@ -597,14 +590,12 @@ const BioinformaticsTab = React.memo(function BioinformaticsTab(props) {
 
 const FilteringTab = React.memo(function FilteringTab(props) {
     const { context = null } = props;
-    const { filter_set_flag_addon : filterFlags } = context || {};
+    const { filter_set_flag_addon: filterFlags } = context || {};
 
     return (
         <React.Fragment>
             <h1>{ context.display_title}: <span className="text-300">Variant Filtering and Technical Review</span></h1>
-            <EmbeddedItemSearchTable { ...{ context }}
-                searchHref={`/search/?type=VariantSample${filterFlags ? filterFlags : ""}`}
-            />
+            <EmbeddedItemSearchTable { ...{ context }} searchHref={`/search/?type=VariantSample${filterFlags ? filterFlags : ""}`} key={0} />
         </React.Fragment>
     );
 });

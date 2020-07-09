@@ -18,36 +18,54 @@ $search-results-header-row-height: 52px; // 46px is existing default for both re
 // Extensions to shared-portal-components searchview table(s):
 .search-result-row .result-table-row .search-result-column-block {
 
-	.inner .multi-field-cell {
-		flex: 1 1 0px;
-		width: 100%;
+	.inner {
 
-		.top-row,
-		.col-date,
-		.col-main {
-			@extend .text-ellipsis-container;
+		a.adv-block-link {
+			color: $body-color;
+
+			&:hover {
+				color: $link-hover-color;
+				text-decoration: none;
+				h4, h5, h6 {
+					color: $link-hover-color;
+					text-decoration: underline;
+				}
+			}
+
 		}
 
-		.top-row {
-			display: flex;
-			justify-content: space-between;
-			.col-topleft {
+		.multi-field-cell {
+			/* Is usually a child of adv-block-link, but not necessarily (if no link needed). */
+			flex: 1 1 0px;
+			width: 100%;
+
+			.top-row,
+			.col-date,
+			.col-main {
 				@extend .text-ellipsis-container;
 			}
-		}
-		.top-row,
-		.col-date {
-			line-height: 20px;
-			white-space: nowrap;
-		}
-		.col-main {
-			margin: 0;
-			font-weight: 400;
-			text-align: center;
-		}
-		.col-topleft {
-			@extend .text-monospace;
-			font-size: 0.75em;
+
+			.top-row {
+				display: flex;
+				justify-content: space-between;
+				.col-topleft {
+					@extend .text-ellipsis-container;
+				}
+			}
+			.top-row,
+			.col-date {
+				line-height: 20px;
+				white-space: nowrap;
+			}
+			.col-main {
+				margin: 0;
+				font-weight: 400;
+				text-align: center;
+			}
+			.col-topleft {
+				@extend .text-monospace;
+				font-size: 0.75em;
+			}
 		}
 	}
 
