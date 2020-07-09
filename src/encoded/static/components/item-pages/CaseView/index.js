@@ -280,7 +280,7 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
                 </div>
             </div>
 
-            <div className="container-wide bg-light pb-48">
+            <div className="container-wide bg-light pt-12 pb-6">
                 <div className="processing-summary-tables-container mt-0">
                     { caseSearchTables }
                 </div>
@@ -593,7 +593,7 @@ const FilteringTab = React.memo(function FilteringTab(props) {
     // wherein we have minHeight of tabs set to close to windowHeight in SCSS.
     // 405px offset likely would need to be changed if we change height of tab nav, tab title area, etc.
     // Overrides default 400px.
-    const maxHeight = typeof windowHeight === "number" && windowHeight > 600 ? (windowHeight - 405) : undefined;
+    const maxHeight = typeof windowHeight === "number" && windowHeight > 800 ? (windowHeight - 405) : undefined;
 
     return (
         <React.Fragment>
