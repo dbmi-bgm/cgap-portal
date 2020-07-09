@@ -1935,9 +1935,17 @@ $badge-item-min-height: 90px;
 						border: none;
 						width: 100%;
 						box-shadow: none;
-						&:focus,
-						&:active {
+						&:focus:not(.active),
+						&:active:not(.active) {
 							outline: none;
+						}
+					}
+
+					&:not(.active) > button {
+						// Applicable for when navigating with (shift-)tab w.o. mouse.
+						&:focus:not(.active),
+						&:active:not(.active) {
+							
 							// Same :hover styling below, should get overriden by other styles
 							// unless someone is using (shift-)tab to navigate instead of mouse cursor.
 							background-color: darken($color: cornflowerblue, $amount: 7.5%);
@@ -2014,12 +2022,14 @@ $badge-item-min-height: 90px;
 					&.active {
 
 						> button {
-							background-color: darken($color: cornflowerblue, $amount: 15%) !important;
-							box-shadow: 0px 13px 16px -16px #000;
+							// background-color: darken($color: cornflowerblue, $amount: 30%) !important;
+							// box-shadow: 0px 13px 16px -16px #000;
+							background-color: $primary-dark;
 						}
 						> .btn-append > svg > path,
 						> .btn-prepend > svg > path {
-							fill: darken($color: cornflowerblue, $amount: 15%) !important;
+							// fill: darken($color: cornflowerblue, $amount: 30%) !important;
+							fill: $primary-dark;
 						}
 					}
 

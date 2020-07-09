@@ -115,12 +115,13 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
     const {
         context = {},
         href,
-        pedigreeFamilies = [],
-        pedigreeFamiliesIdx = 0,
-        onFamilySelect,
+        // pedigreeFamilies = [],
+        // pedigreeFamiliesIdx = 0,
+        // onFamilySelect,
         graphData,
         selectedDiseases,
         windowWidth,
+        windowHeight,
         // currFamily,
         idToGraphIdentifier
     } = props;
@@ -290,10 +291,10 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
                     <AccessioningTab {...{ context, href, families, props }} />
                 </DotRouterTab>
                 <DotRouterTab tabTitle="Bioinformatics" dotPath=".bioinformatics" cache={false}>
-                    <BioinformaticsTab {...{ context, families, currFamily, pedigreeFamiliesIdx, idToGraphIdentifier, sample_processing, onFamilySelect }} />
+                    <BioinformaticsTab {...{ context, families, currFamily, idToGraphIdentifier, sample_processing }} />
                 </DotRouterTab>
                 <DotRouterTab tabTitle="Filtering" dotPath=".filtering">
-                    <FilteringTab context={context} />
+                    <FilteringTab context={context} windowHeight={windowHeight} />
                 </DotRouterTab>
                 <DotRouterTab tabTitle="Interpretation" dotPath=".interpretation" disabled cache={false}>
                     <InterpretationTab {...props} />
@@ -486,7 +487,6 @@ const BioinformaticsTab = React.memo(function BioinformaticsTab(props) {
     const {
         context,
         families = [],
-        pedigreeFamiliesIdx,
         idToGraphIdentifier,
         sample_processing = []
     } = props;
@@ -502,34 +502,28 @@ const BioinformaticsTab = React.memo(function BioinformaticsTab(props) {
             display_title: familyDisplayTitle
         } = family;
         const cls = "family-index-" + idx;
-        const isCurrentFamily = idx === pedigreeFamiliesIdx;
-        const onClick = function(evt){
-            if (isCurrentFamily) {
+        const onClick = useMemo(function(){
+            return function(evt){
                 navigate("#pedigree", { skipRequest: true, replace: true });
-            } else {
-                onFamilySelect(idx);
-            }
-        };
+            };
+        }, []);
 
-        const tip = isCurrentFamily ?
-            "Currently-selected family in Pedigree Visualization"
-            : "Click to view this family in the Pedigree Visualization tab";
         const title = (
             <h4 data-family-index={idx} className="pb-0 p-2 mb-0 d-inline-block w-100">
                 <span className="font-italic text-500">{ familyDisplayTitle }</span>
                 { pedFileName ? <span className="text-300">{ " (" + pedFileName + ")" }</span> : null }
-                <button type="button" className="btn btn-sm btn-primary pull-right" data-tip={tip} onClick={onClick}>
+                <button type="button" className="btn btn-sm btn-primary pull-right" data-tip="Click to view this family in the Pedigree Visualization tab" onClick={onClick}>
                     <i className="icon icon-fw icon-sitemap fas mr-1 small" />
-                    { isCurrentFamily ? "View Pedigree in Separate Tab" : "Switch to this Pedigree"}
+                    View Pedigree in Separate Tab
                 </button>
             </h4>
         );
 
         // sampleProcessing objects that have 2 or more matching samples to pass ONLY THOSE through to caseSummaryTable
         return (
-            <div className={cls} key={idx} data-is-current-family={isCurrentFamily}>
+            <div className={cls} key={idx} data-is-current-family={true}>
                 { title }
-                <CaseSummaryTable {...family} sampleProcessing={[sample_processing]} {...{ idx, idToGraphIdentifier, isCurrentFamily }} />
+                <CaseSummaryTable {...family} sampleProcessing={[sample_processing]} isCurrentFamily={true} {...{ idx, idToGraphIdentifier }} />
             </div>
         );
     });
@@ -590,15 +584,21 @@ const BioinformaticsTab = React.memo(function BioinformaticsTab(props) {
 });
 
 const FilteringTab = React.memo(function FilteringTab(props) {
-    const { context = null } = props;
+    const { context = null, windowHeight } = props;
     const { filter_set_flag_addon: filterFlags = "" } = context || {};
+    const searchHref = `/search/?type=VariantSample${filterFlags ? filterFlags : ""}`;
+    const hideFacets = !filterFlags ? null : Object.keys(queryString.parse(filterFlags));
 
-    const filterFields = !filterFlags ? null : Object.keys(queryString.parse(filterFlags));
+    // This maxHeight is stylistic and dependent on our view design/style
+    // wherein we have minHeight of tabs set to close to windowHeight in SCSS.
+    // 405px offset likely would need to be changed if we change height of tab nav, tab title area, etc.
+    // Overrides default 400px.
+    const maxHeight = typeof windowHeight === "number" && windowHeight > 600 ? (windowHeight - 405) : undefined;
 
     return (
         <React.Fragment>
             <h1>{ context.display_title}: <span className="text-300">Variant Filtering and Technical Review</span></h1>
-            <EmbeddedItemSearchTable { ...{ context }} searchHref={`/search/?type=VariantSample${filterFlags ? filterFlags : ""}`} hideFacets={filterFields} />
+            <EmbeddedItemSearchTable { ...{ context, searchHref, hideFacets, maxHeight }} />
         </React.Fragment>
     );
 });
