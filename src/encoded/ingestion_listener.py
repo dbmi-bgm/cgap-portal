@@ -70,6 +70,7 @@ def queue_ingestion(context, request):
     queue_manager = request.registry[INGESTION_QUEUE] if not override_name \
         else IngestionQueueManager(request.registry, override_name=override_name)
     _, failed = queue_manager.add_uuids(uuids)
+    log.error(request.registry[INGESTION_QUEUE].__dict__)  # XXX: remove later
     if not failed:
         response['notification'] = 'Success'
         response['number_queued'] = len(uuids)
@@ -123,7 +124,7 @@ class IngestionQueueManager:
                 QueueName=self.queue_name,
                 Attributes=self.queue_attrs[self.queue_name]
             )
-            log.error(response)  # XXX: give info
+            log.error('INIT: %s' % response)  # XXX: give info
             queue_url = response['QueueUrl']
         except Exception as e:
             log.error('Could not create queue with error %s' % e)
@@ -169,7 +170,7 @@ class IngestionQueueManager:
                 QueueUrl=self.queue_url,
                 Entries=entries
             )
-            log.error(response)  # XXX: give info
+            log.error('SEND: %s' % response)  # XXX: give info
             failed_messages = response.get('Failed', [])
 
             # attempt resend of failed messages
@@ -278,18 +279,19 @@ def run(vapp=None, _queue_manager=None, update_status=None):
     queue_manager = IngestionQueueManager(registry) if not _queue_manager else _queue_manager
     log.info('Ingestion listener successfully online.')
     while should_remain_online():
-        n_waiting, n_in_flight = queue_manager.get_counts()
-        if n_waiting == 0 and n_in_flight > 0:
-            time.sleep(INFLIGHT_INTERVAL)
-        elif n_waiting == 0:
+        log.error('Polling for messages...')
+        n_waiting, _ = queue_manager.get_counts()
+        if n_waiting == 0:
             time.sleep(DEFAULT_INTERVAL)
         else:
+            log.error('Trying to get messages...')
             messages = queue_manager.receive_messages()
 
             # ingest each VCF file
             for message in messages:
                 body = json.loads(message['Body'])
                 uuid = body['uuid']
+                log.error('Ingesting uuid %s' % uuid)
 
                 # locate file meta data
                 try:
