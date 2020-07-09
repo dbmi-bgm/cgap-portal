@@ -69,7 +69,8 @@ export class EmbeddedItemSearchTable extends React.PureComponent {
             filterFacetFxn, hideFacets,
             filterColumnFxn, hideColumns,
             onLoad: this.getCountCallback,
-            termTransformFxn: Term.toName
+            termTransformFxn: Term.toName,
+            separateSingleTermFacets: false
         };
 
         const showTitle = !title ? null
