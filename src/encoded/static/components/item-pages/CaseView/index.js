@@ -389,19 +389,19 @@ class DotRouter extends React.PureComponent {
         const contentClassName = "tab-router-contents" + (contentsClassName ? " " + contentsClassName : "");
         const allTabContents = [];
 
-        const adjustedChildren = React.Children.map(children, function(childTab){
+        const adjustedChildren = React.Children.map(children, function(childTab, index){
             const { props : { dotPath, children: tabChildren, cache = true } } = childTab;
             const active = currTabDotPath === dotPath;
             if (active || cache) {
                 allTabContents.push(
-                    <div className={contentClassName + (!active ? " d-none" : "")} id={(prependDotPath || "") + dotPath} key={dotPath}>
+                    <div className={contentClassName + (!active ? " d-none" : "")} id={(prependDotPath || "") + dotPath} data-tab-index={index} key={dotPath}>
                         <TabPaneErrorBoundary>
                             { tabChildren }
                         </TabPaneErrorBoundary>
                     </div>
                 );
             }
-            return React.cloneElement(childTab, { key: dotPath, active, prependDotPath });
+            return React.cloneElement(childTab, { key: dotPath, active, prependDotPath, index });
         });
 
         return (

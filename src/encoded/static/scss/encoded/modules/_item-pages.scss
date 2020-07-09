@@ -7,7 +7,6 @@ Custom Classes & Styling for Item Pages (e.g. Experiment Sets)
 	h1.page-title {
 		margin-bottom: 2px;
 	}
-
 }
 
 /*************************
@@ -1967,13 +1966,37 @@ $badge-item-min-height: 90px;
 						}
 					}
 
+					@include media-breakpoint-up(md) {
+
+						&:first-child {
+							> .btn-prepend {
+								display: none;
+							}
+							> button {
+								padding-left: 24px;
+								border-radius: $border-radius-base 0 0 $border-radius-base;
+							}
+						}
+
+						&:last-child {
+							> .btn-append {
+								display: none;
+							}
+							> button {
+								padding-right: 24px;
+								border-radius: 0 $border-radius-base $border-radius-base 0;
+							}
+						}
+
+					}
+
 					&.disabled {
 						> button {
-							background-color: lighten($color: cornflowerblue, $amount: 17.5%) !important;
+							background-color: desaturate($color: lighten($color: cornflowerblue, $amount: 20%), $amount: 100%) !important;
 						}
 						> .btn-append > svg > path,
 						> .btn-prepend > svg > path {
-							fill: lighten($color: cornflowerblue, $amount: 17.5%) !important;
+							fill: desaturate($color: lighten($color: cornflowerblue, $amount: 20%), $amount: 100%) !important;
 						}
 					}
 
