@@ -159,7 +159,9 @@ class IngestionQueueManager:
         :return: list of any failed messages
         """
         failed = []
+        log.error('Trying to send messages')
         for msg_batch in self._chunk_messages(msgs):
+            log.error('Trying to chunk messages: %s' % msgs)
             entries = []
             for msg in msg_batch:
                 entries.append({
@@ -170,7 +172,7 @@ class IngestionQueueManager:
                 QueueUrl=self.queue_url,
                 Entries=entries
             )
-            log.error('SEND: %s' % response)  # XXX: give info
+            log.error('SEND: %s' % response)
             failed_messages = response.get('Failed', [])
 
             # attempt resend of failed messages
