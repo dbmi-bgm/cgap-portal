@@ -1,0 +1,174 @@
+[
+    {
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "institution": "hms-dbmi",
+        "status": "released",
+        "uuid": "5ec91041-78a0-4758-abef-21c7f5fd9ffc",
+        "individual_id": "hms002i",
+        "sex": "M",
+        "is_deceased": false,
+        "mother": "5c302401-88f6-44b8-9cf9-f062dfaa98c4",
+        "father": "96974f2e-de0a-4f3a-9be5-543359da74a1",
+        "samples": ["4fdb481a-fbdb-4c0f-a68d-aac87f847bec"]
+    },
+    {
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "institution": "hms-dbmi",
+        "status": "released",
+        "uuid": "5c302401-88f6-44b8-9cf9-f062dfaa98c4",
+        "individual_id": "hms003i",
+        "sex": "F",
+        "is_deceased": false
+    },
+    {
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "institution": "hms-dbmi",
+        "status": "released",
+        "uuid": "96974f2e-de0a-4f3a-9be5-543359da74a1",
+        "individual_id": "hms004i",
+        "sex": "M",
+        "is_deceased": true
+    },
+    {
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "institution": "hms-dbmi",
+        "status": "released",
+        "uuid": "5ec91041-78a0-4758-abef-21c7f5fd9f12",
+        "individual_id": "hms005i",
+        "sex": "F",
+        "is_deceased": false,
+        "mother": "5ec91041-78a0-4758-abef-21c7f5fd9f92",
+        "father": "5ec91041-78a0-4758-abef-21c7f5fd9f91",
+        "samples": ["a4b98709-25fe-48a4-afde-8f886b57abc9"]
+    },
+    {
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "institution": "hms-dbmi",
+        "status": "released",
+        "uuid": "5ec91041-78a0-4758-abef-21c7f5fd9f34",
+        "individual_id": "hms006i",
+        "sex": "M",
+        "is_deceased": false,
+        "mother": "5ec91041-78a0-4758-abef-21c7f5fd9f92",
+        "father": "5ec91041-78a0-4758-abef-21c7f5fd9f91"
+    },
+    {
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "institution": "hms-dbmi",
+        "status": "released",
+        "uuid": "5ec91041-78a0-4758-abef-21c7f5fd9f56",
+        "individual_id": "hms007i",
+        "sex": "M",
+        "is_deceased": false,
+        "mother": "5ec91041-78a0-4758-abef-21c7f5fd9f92",
+        "father": "5ec91041-78a0-4758-abef-21c7f5fd9f91"
+    },
+    {
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "institution": "hms-dbmi",
+        "status": "released",
+        "uuid": "5ec91041-78a0-4758-abef-21c7f5fd9f78",
+        "individual_id": "hms008i",
+        "sex": "F",
+        "is_deceased": false
+    },
+    {
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "institution": "hms-dbmi",
+        "status": "released",
+        "uuid": "5ec91041-78a0-4758-abef-21c7f5fd9f91",
+        "individual_id": "hms009i",
+        "sex": "M",
+        "is_deceased": false
+    },
+    {
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "institution": "hms-dbmi",
+        "status": "released",
+        "uuid": "5ec91041-78a0-4758-abef-21c7f5fd9f92",
+        "individual_id": "hms010i",
+        "sex": "F",
+        "is_deceased": false
+    },
+    {
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "institution": "hms-dbmi",
+        "status": "released",
+        "uuid": "5ec91041-78a0-4758-abef-21c7f5fd9f21",
+        "individual_id": "hms011i",
+        "sex": "M",
+        "is_deceased": false,
+        "mother": "5ec91041-78a0-4758-abef-21c7f5fd9f25",
+        "father": "5ec91041-78a0-4758-abef-21c7f5fd9f24"
+    },
+    {
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "institution": "hms-dbmi",
+        "status": "released",
+        "uuid": "5ec91041-78a0-4758-abef-21c7f5fd9f22",
+        "individual_id": "hms012i",
+        "sex": "F",
+        "is_deceased": false,
+        "mother": "5ec91041-78a0-4758-abef-21c7f5fd9f25",
+        "father": "5ec91041-78a0-4758-abef-21c7f5fd9f24"
+    },
+    {
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "institution": "hms-dbmi",
+        "status": "released",
+        "uuid": "5ec91041-78a0-4758-abef-21c7f5fd9f23",
+        "individual_id": "hms013i",
+        "sex": "F",
+        "is_deceased": false,
+        "mother": "5ec91041-78a0-4758-abef-21c7f5fd9f25",
+        "father": "5ec91041-78a0-4758-abef-21c7f5fd9f24"
+    },
+    {
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "institution": "hms-dbmi",
+        "status": "released",
+        "uuid": "5ec91041-78a0-4758-abef-21c7f5fd9f24",
+        "individual_id": "hms014i",
+        "sex": "M",
+        "is_deceased": false
+    },
+    {
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "institution": "hms-dbmi",
+        "status": "released",
+        "uuid": "5ec91041-78a0-4758-abef-21c7f5fd9f25",
+        "individual_id": "hms015i",
+        "sex": "F",
+        "is_deceased": false
+    },
+    {
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "institution": "hms-dbmi",
+        "status": "released",
+        "uuid": "5ec91041-78a0-4758-abef-21c7f5fd9f35",
+        "individual_id": "hms016i",
+        "sex": "F",
+        "father": "5ec91041-78a0-4758-abef-21c7f5fd9f21",
+        "is_deceased": false
+    },
+    {
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "institution": "hms-dbmi",
+        "status": "released",
+        "uuid": "5ec91041-78a0-4758-abef-21c7f5fd9f36",
+        "individual_id": "hms017i",
+        "sex": "F",
+        "father": "5ec91041-78a0-4758-abef-21c7f5fd9f21",
+        "is_deceased": false
+    },
+    {
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "institution": "hms-dbmi",
+        "status": "released",
+        "uuid": "5ec91041-78a0-4758-abef-21c7f5fd9f39",
+        "individual_id": "hms018i",
+        "sex": "F",
+        "mother": "5ec91041-78a0-4758-abef-21c7f5fd9f23",
+        "is_deceased": false
+    }
+]

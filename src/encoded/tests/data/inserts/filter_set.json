@@ -1,0 +1,35 @@
+[
+    {
+        "aliases": ["admin-admin:filter_set"],
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "institution": "hms-dbmi",
+        "submitted_by": "koray_kirli@hms.harvard.edu",
+        "status": "released",
+        "uuid": "dcf15d5e-40aa-43bc-b81c-32c70c9afa99",
+        "search_type": "VariantSample",
+        "title": "Test filter set",
+        "filter_blocks": [
+            {
+                "name": "Basic Settings",
+                "query": "&variant.CHROM=1&variant.genes.genes_most_severe_consequence.impact=MODERATE",
+                "flags_applied": ["Flag1", "Flag2"]
+            },
+            {
+                "name": "Advanced Settings",
+                "query": "&variant.conservation_phylop100.from=0.2&variant.conservation_phylop100.to=1&variant.cytoband_cytoband=1p36.33",
+                "flags_applied": ["Flag2"]
+            }
+        ],
+        "flags": [
+
+            {
+                "name": "Flag1",
+                "query": "&variant.transcript.vep_clin_sig=benign%26uncertain_significance"
+            },
+            {
+                "name": "Flag2",
+                "query": "&variant.CHROM=1"
+            }
+        ]
+    }
+]

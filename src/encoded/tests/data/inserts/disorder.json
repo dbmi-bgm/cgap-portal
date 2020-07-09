@@ -1,0 +1,25 @@
+[
+    {
+        "uuid": "71bae2e1-4532-45cf-8fd7-958b47d7e446",
+        "aliases": ["admin-admin:disorder1"],
+        "disorder_name": "green thumbs",
+        "disorder_id": "MONDO:9999999",
+        "definition": "abnormal color for thumbs and propensity to garden",
+        "synonyms": ["gardener", "plant lover"],
+        "parents": ["5197d1eb-e995-404d-99e1-52b5abde3242"],
+        "disorder_url": "https://www.etsy.com/market/plant_lovers",
+        "comment": "not a disorder",
+        "curated_dbxrefs": ["PL:1234", "IVY:itis"],
+        "dbxrefs": ["PDB:123"]
+    },
+    {
+        "uuid": "5197d1eb-e995-404d-99e1-52b5abde3242",
+        "aliases": ["admin-admin:disorder2"],
+        "disorder_name": "colored thumbs",
+        "disorder_id": "MONDO:9999998",
+        "definition": "odd color for thumbs",
+        "disorder_url": "https://www.example.com",
+        "dbxrefs": ["ODD:123"]
+    }
+
+]

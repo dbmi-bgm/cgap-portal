@@ -1,0 +1,63 @@
+[
+    {
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "institution": "hms-dbmi",
+        "status": "released",
+        "uuid": "4fdb481a-fbdb-4c0f-a68d-aac87f847bec",
+        "bam_sample_id": "test001_sample"
+    },
+    {
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "institution": "hms-dbmi",
+        "status": "released",
+        "uuid": "283f6047-61cd-4ddb-8881-ec1c87082569",
+        "bam_sample_id": "test002_sample"
+    },
+    {
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "institution": "hms-dbmi",
+        "status": "released",
+        "uuid": "f4bbc709-40fe-48a4-afde-8e886b571903",
+        "bam_sample_id": "test003_sample"
+    },
+    {
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "institution": "hms-dbmi",
+        "status": "released",
+        "uuid": "a4b98709-25fe-48a4-afde-8f886b57abc9",
+        "workup_type": "WGS",
+        "specimen_type": "blood",
+        "requisition_type": "BioBank",
+        "date_requisition_received": "2020-01-01",
+        "indication": "cervical cancer",
+        "specimen_accession": "12345",
+        "specimen_accession_date": "2020-03-01",
+        "bam_sample_id": "test004_sample",
+        "requisition_acceptance": {
+            "accepted_rejected": "Rejected",
+            "rejection_reason": "DOB missing",
+            "corrective_action": "emailed XXX regarding missing DOB",
+            "date_sent": "2020-03-04",
+            "date_completed": "2020-03-05"
+        },
+        "other_specimen_ids": [{
+            "id_type": "BCGG-ID",
+            "id": "45678"
+        }],
+        "specimen_collection_date": "2020-03-06",
+        "date_transported": "2020-03-07",
+        "transported_by": "FedEx",
+        "date_received": "2020-03-08",
+        "specimen_accepted": "Yes",
+        "dna_concentration": "100 ng/uL",
+        "library_info": [
+            {"field": "plate ID", "value": "A197"}
+        ],
+        "sequence_id": "BAE12345",
+        "sequencing_date": "2020-03-10",
+        "files": [
+            "10e82a90-49e5-4c33-afab-9ec90d65faa0",
+            "10e82a90-49e5-4c33-afab-9ec90d65faa1"
+        ]
+    }
+]
