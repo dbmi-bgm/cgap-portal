@@ -1,9 +1,0 @@
-[
-    {
-        "uuid": "93721448-7bf1-457c-aa57-cf6b3efc0a8d",
-        "subject_item": "5197d1eb-e995-404d-99e1-52b5abde3242",
-        "object_item": "1127efd7-6ce3-49f2-8363-59df95deff9d",
-        "relationship_name": "has phenotype",
-        "relationship_dbid": "RO:0002200"
-    }
-]
