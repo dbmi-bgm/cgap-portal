@@ -20,6 +20,7 @@ from pyramid import paster
 from dcicutils.misc_utils import VirtualApp
 from pyramid.view import view_config
 from snovault.util import debug_log
+from .util import resolve_file_path
 from .commands.ingest_vcf import VCFParser
 
 
@@ -28,8 +29,8 @@ EPILOG = __doc__
 DEFAULT_INTERVAL = 10  # seconds between each poll
 INFLIGHT_INTERVAL = 3  # seconds if we detect messages in flight
 INGESTION_QUEUE = 'ingestion_queue'
-VARIANT_SCHEMA = './src/encoded/schemas/variant.json'
-VARIANT_SAMPLE_SCHEMA = './src/encoded/schemas/variant_sample.json'
+VARIANT_SCHEMA = resolve_file_path('./schemas/variant.json')
+VARIANT_SAMPLE_SCHEMA = resolve_file_path('./schemas/variant_sample.json')
 
 
 def includeme(config):
