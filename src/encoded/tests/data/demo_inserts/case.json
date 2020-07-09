@@ -1,0 +1,140 @@
+[
+    {
+        "sample_processing": "0a2d5fc7-2bd5-4289-a59c-40f7c633214c",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "aliases": [
+            "hms-dbmi:ashkenazim_trio_father"
+        ],
+        "description": "Benchmarking case for Ashkenazim Trio Father",
+        "case_id": "Ashkenazim Trio Father",
+        "project": "f01ff5be-a72d-43bd-afcf-174fa9dcd282",
+        "cohort": "cc7d83a2-6886-4ca0-9402-7c49734cf879",
+        "family": "5e079547-1575-4e4c-acd1-6aa74b931993",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "individual": "82ac8825-a526-4b21-8fe0-468b9fc4e620",
+        "accession": "GAPCA2Q6KPFN",
+        "status": "released",
+        "uuid": "91678096-7c10-4c5a-8ac3-5e3014e83c7e",
+        "last_modified": {
+            "date_modified": "2020-07-07T15:43:08.388069+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "schema_version": "1",
+        "date_created": "2020-07-07T02:37:08.024108+00:00"
+    },
+    {
+        "sample_processing": "8dd51b60-2d65-4e74-ac86-08ff9159be90",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "aliases": [
+            "hms-dbmi:platinum_trio_husband"
+        ],
+        "description": "Benchmarking case for Platinum Trio Husband",
+        "case_id": "Platinum Trio Husband",
+        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
+        "cohort": "cc7d83a2-6886-4ca0-9402-7c49734cf879",
+        "family": "21f2af73-2c2e-4101-bbfb-bb2754f302ad",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "individual": "7b48eacc-826b-4ecd-9104-9918b0bb5b81",
+        "accession": "GAPCAQPHN61Y",
+        "status": "released",
+        "uuid": "81278096-7c10-4c5a-8ac3-5e3014e83ccc",
+        "last_modified": {
+            "date_modified": "2020-07-07T15:43:09.234840+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "schema_version": "1",
+        "date_created": "2020-07-07T07:18:51.431170+00:00"
+    },
+    {
+        "sample_processing": "8dd51b60-2d65-4e74-ac86-08ff9159be90",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "aliases": [
+            "hms-dbmi:platinum_trio_daughter"
+        ],
+        "description": "Benchmarking case for Platinum Trio Father",
+        "case_id": "Platinum Trio Daughter",
+        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
+        "cohort": "cc7d83a2-6886-4ca0-9402-7c49734cf879",
+        "family": "21f2af73-2c2e-4101-bbfb-bb2754f302ad",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "individual": "4dfca9c9-5f93-48b5-823b-1fd0afaebdae",
+        "accession": "GAPCAKQB9FPJ",
+        "status": "released",
+        "uuid": "81278096-7c10-4c5a-8ac3-5e3014e83bbb",
+        "last_modified": {
+            "date_modified": "2020-07-07T15:43:10.772116+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "schema_version": "1",
+        "date_created": "2020-07-07T07:16:47.429836+00:00"
+    },
+    {
+        "sample_processing": "8dd51b60-2d65-4e74-ac86-08ff9159be90",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "aliases": [
+            "hms-dbmi:platinum_trio_NA12878"
+        ],
+        "description": "Benchmarking case for Platinum Trio Proband",
+        "case_id": "Platinum Trio NA12878",
+        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
+        "cohort": "cc7d83a2-6886-4ca0-9402-7c49734cf879",
+        "family": "21f2af73-2c2e-4101-bbfb-bb2754f302ad",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "individual": "11c429a1-bcb8-4ac6-8f71-be6fb5064ad9",
+        "accession": "GAPCALNEKP7C",
+        "status": "released",
+        "uuid": "81278096-7c10-4c5a-8ac3-5e3014e83aaa",
+        "last_modified": {
+            "date_modified": "2020-07-07T15:55:46.662884+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "schema_version": "1",
+        "date_created": "2020-07-07T07:16:46.286730+00:00"
+    },
+    {
+        "sample_processing": "0a2d5fc7-2bd5-4289-a59c-40f7c633214c",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "aliases": [
+            "hms-dbmi:ashkenazim_trio_proband"
+        ],
+        "description": "Benchmarking case for Ashkenazim Trio Proband",
+        "case_id": "Ashkenazim Trio Proband",
+        "project": "f01ff5be-a72d-43bd-afcf-174fa9dcd282",
+        "cohort": "cc7d83a2-6886-4ca0-9402-7c49734cf879",
+        "family": "5e079547-1575-4e4c-acd1-6aa74b931993",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "individual": "648c6261-e34a-45ff-8995-86b7bee4175f",
+        "accession": "GAPCAW9MJW72",
+        "status": "released",
+        "uuid": "80811e01-9ae6-40a5-8147-938c1a30d0bc",
+        "last_modified": {
+            "date_modified": "2020-07-07T15:43:12.796420+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "schema_version": "1",
+        "date_created": "2020-07-07T02:37:08.245813+00:00"
+    },
+    {
+        "sample_processing": "0a2d5fc7-2bd5-4289-a59c-40f7c633214c",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "aliases": [
+            "hms-dbmi:ashkenazim_trio_mother"
+        ],
+        "description": "Benchmarking case for Ashkenazim Trio Mother",
+        "case_id": "Ashkenazim Trio Mother",
+        "project": "f01ff5be-a72d-43bd-afcf-174fa9dcd282",
+        "cohort": "cc7d83a2-6886-4ca0-9402-7c49734cf879",
+        "family": "5e079547-1575-4e4c-acd1-6aa74b931993",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "individual": "608e2cf2-91d4-4d9d-9091-dce1a1912bb1",
+        "accession": "GAPCAT6SM934",
+        "status": "released",
+        "uuid": "7c685be0-70af-4f03-84a6-9f8914537f26",
+        "last_modified": {
+            "date_modified": "2020-07-07T15:43:13.637996+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "schema_version": "1",
+        "date_created": "2020-07-07T02:37:08.514171+00:00"
+    }
+]

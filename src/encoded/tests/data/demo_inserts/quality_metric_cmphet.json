@@ -1,0 +1,3628 @@
+[
+    {
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "overall_quality_status": "PASS",
+        "by_genes": [
+            {
+                "transcripts": {
+                    "phased": 0,
+                    "total": 11
+                },
+                "variants": {
+                    "phased": 0,
+                    "total": 2
+                },
+                "pairs": {
+                    "phased": 0,
+                    "total": 1
+                },
+                "name": "ENSG00000004455"
+            },
+            {
+                "transcripts": {
+                    "phased": 1,
+                    "total": 1
+                },
+                "variants": {
+                    "phased": 2,
+                    "total": 2
+                },
+                "pairs": {
+                    "phased": 1,
+                    "total": 1
+                },
+                "name": "ENSG00000054690"
+            },
+            {
+                "transcripts": {
+                    "phased": 1,
+                    "total": 1
+                },
+                "variants": {
+                    "phased": 3,
+                    "total": 3
+                },
+                "pairs": {
+                    "phased": 2,
+                    "total": 2
+                },
+                "name": "ENSG00000069424"
+            },
+            {
+                "transcripts": {
+                    "phased": 3,
+                    "total": 3
+                },
+                "variants": {
+                    "phased": 3,
+                    "total": 3
+                },
+                "pairs": {
+                    "phased": 2,
+                    "total": 2
+                },
+                "name": "ENSG00000070182"
+            },
+            {
+                "transcripts": {
+                    "phased": 0,
+                    "total": 1
+                },
+                "variants": {
+                    "phased": 0,
+                    "total": 2
+                },
+                "pairs": {
+                    "phased": 0,
+                    "total": 1
+                },
+                "name": "ENSG00000071991"
+            },
+            {
+                "transcripts": {
+                    "phased": 0,
+                    "total": 1
+                },
+                "variants": {
+                    "phased": 0,
+                    "total": 2
+                },
+                "pairs": {
+                    "phased": 0,
+                    "total": 1
+                },
+                "name": "ENSG00000072195"
+            },
+            {
+                "transcripts": {
+                    "phased": 1,
+                    "total": 1
+                },
+                "variants": {
+                    "phased": 2,
+                    "total": 2
+                },
+                "pairs": {
+                    "phased": 1,
+                    "total": 1
+                },
+                "name": "ENSG00000076067"
+            },
+            {
+                "transcripts": {
+                    "phased": 0,
+                    "total": 7
+                },
+                "variants": {
+                    "phased": 0,
+                    "total": 2
+                },
+                "pairs": {
+                    "phased": 0,
+                    "total": 1
+                },
+                "name": "ENSG00000079974"
+            },
+            {
+                "transcripts": {
+                    "phased": 10,
+                    "total": 10
+                },
+                "variants": {
+                    "phased": 3,
+                    "total": 3
+                },
+                "pairs": {
+                    "phased": 2,
+                    "total": 2
+                },
+                "name": "ENSG00000085276"
+            },
+            {
+                "transcripts": {
+                    "phased": 2,
+                    "total": 2
+                },
+                "variants": {
+                    "phased": 2,
+                    "total": 2
+                },
+                "pairs": {
+                    "phased": 1,
+                    "total": 1
+                },
+                "name": "ENSG00000090857"
+            },
+            {
+                "transcripts": {
+                    "phased": 4,
+                    "total": 4
+                },
+                "variants": {
+                    "phased": 3,
+                    "total": 3
+                },
+                "pairs": {
+                    "phased": 2,
+                    "total": 2
+                },
+                "name": "ENSG00000095777"
+            },
+            {
+                "transcripts": {
+                    "phased": 0,
+                    "total": 4
+                },
+                "variants": {
+                    "phased": 0,
+                    "total": 2
+                },
+                "pairs": {
+                    "phased": 0,
+                    "total": 1
+                },
+                "name": "ENSG00000100271"
+            },
+            {
+                "transcripts": {
+                    "phased": 1,
+                    "total": 1
+                },
+                "variants": {
+                    "phased": 2,
+                    "total": 2
+                },
+                "pairs": {
+                    "phased": 1,
+                    "total": 1
+                },
+                "name": "ENSG00000100350"
+            },
+            {
+                "transcripts": {
+                    "phased": 0,
+                    "total": 0
+                },
+                "variants": {
+                    "phased": 2,
+                    "total": 2
+                },
+                "pairs": {
+                    "phased": 1,
+                    "total": 1
+                },
+                "name": "ENSG00000101266"
+            },
+            {
+                "transcripts": {
+                    "phased": 13,
+                    "total": 13
+                },
+                "variants": {
+                    "phased": 4,
+                    "total": 4
+                },
+                "pairs": {
+                    "phased": 3,
+                    "total": 6
+                },
+                "name": "ENSG00000102081"
+            },
+            {
+                "transcripts": {
+                    "phased": 1,
+                    "total": 1
+                },
+                "variants": {
+                    "phased": 3,
+                    "total": 3
+                },
+                "pairs": {
+                    "phased": 2,
+                    "total": 2
+                },
+                "name": "ENSG00000103150"
+            },
+            {
+                "transcripts": {
+                    "phased": 2,
+                    "total": 2
+                },
+                "variants": {
+                    "phased": 2,
+                    "total": 2
+                },
+                "pairs": {
+                    "phased": 1,
+                    "total": 1
+                },
+                "name": "ENSG00000106460"
+            },
+            {
+                "transcripts": {
+                    "phased": 0,
+                    "total": 0
+                },
+                "variants": {
+                    "phased": 2,
+                    "total": 2
+                },
+                "pairs": {
+                    "phased": 1,
+                    "total": 1
+                },
+                "name": "ENSG00000109339"
+            },
+            {
+                "transcripts": {
+                    "phased": 0,
+                    "total": 1
+                },
+                "variants": {
+                    "phased": 0,
+                    "total": 2
+                },
+                "pairs": {
+                    "phased": 0,
+                    "total": 1
+                },
+                "name": "ENSG00000110090"
+            },
+            {
+                "transcripts": {
+                    "phased": 2,
+                    "total": 2
+                },
+                "variants": {
+                    "phased": 2,
+                    "total": 2
+                },
+                "pairs": {
+                    "phased": 1,
+                    "total": 1
+                },
+                "name": "ENSG00000111335"
+            },
+            {
+                "transcripts": {
+                    "phased": 0,
+                    "total": 1
+                },
+                "variants": {
+                    "phased": 0,
+                    "total": 2
+                },
+                "pairs": {
+                    "phased": 0,
+                    "total": 1
+                },
+                "name": "ENSG00000111859"
+            },
+            {
+                "transcripts": {
+                    "phased": 0,
+                    "total": 0
+                },
+                "variants": {
+                    "phased": 2,
+                    "total": 2
+                },
+                "pairs": {
+                    "phased": 1,
+                    "total": 1
+                },
+                "name": "ENSG00000112339"
+            },
+            {
+                "transcripts": {
+                    "phased": 1,
+                    "total": 1
+                },
+                "variants": {
+                    "phased": 3,
+                    "total": 3
+                },
+                "pairs": {
+                    "phased": 2,
+                    "total": 2
+                },
+                "name": "ENSG00000114554"
+            },
+            {
+                "transcripts": {
+                    "phased": 1,
+                    "total": 1
+                },
+                "variants": {
+                    "phased": 2,
+                    "total": 2
+                },
+                "pairs": {
+                    "phased": 1,
+                    "total": 1
+                },
+                "name": "ENSG00000114573"
+            },
+            {
+                "transcripts": {
+                    "phased": 0,
+                    "total": 0
+                },
+                "variants": {
+                    "phased": 2,
+                    "total": 2
+                },
+                "pairs": {
+                    "phased": 1,
+                    "total": 1
+                },
+                "name": "ENSG00000123384"
+            },
+            {
+                "transcripts": {
+                    "phased": 0,
+                    "total": 1
+                },
+                "variants": {
+                    "phased": 0,
+                    "total": 2
+                },
+                "pairs": {
+                    "phased": 0,
+                    "total": 1
+                },
+                "name": "ENSG00000124201"
+            },
+            {
+                "transcripts": {
+                    "phased": 1,
+                    "total": 1
+                },
+                "variants": {
+                    "phased": 2,
+                    "total": 2
+                },
+                "pairs": {
+                    "phased": 1,
+                    "total": 1
+                },
+                "name": "ENSG00000125735"
+            },
+            {
+                "transcripts": {
+                    "phased": 0,
+                    "total": 0
+                },
+                "variants": {
+                    "phased": 0,
+                    "total": 2
+                },
+                "pairs": {
+                    "phased": 0,
+                    "total": 1
+                },
+                "name": "ENSG00000126773"
+            },
+            {
+                "transcripts": {
+                    "phased": 1,
+                    "total": 1
+                },
+                "variants": {
+                    "phased": 2,
+                    "total": 2
+                },
+                "pairs": {
+                    "phased": 1,
+                    "total": 1
+                },
+                "name": "ENSG00000128567"
+            },
+            {
+                "transcripts": {
+                    "phased": 0,
+                    "total": 1
+                },
+                "variants": {
+                    "phased": 0,
+                    "total": 3
+                },
+                "pairs": {
+                    "phased": 0,
+                    "total": 3
+                },
+                "name": "ENSG00000131711"
+            },
+            {
+                "transcripts": {
+                    "phased": 0,
+                    "total": 2
+                },
+                "variants": {
+                    "phased": 0,
+                    "total": 2
+                },
+                "pairs": {
+                    "phased": 0,
+                    "total": 1
+                },
+                "name": "ENSG00000131781"
+            },
+            {
+                "transcripts": {
+                    "phased": 0,
+                    "total": 1
+                },
+                "variants": {
+                    "phased": 0,
+                    "total": 3
+                },
+                "pairs": {
+                    "phased": 0,
+                    "total": 2
+                },
+                "name": "ENSG00000132932"
+            },
+            {
+                "transcripts": {
+                    "phased": 2,
+                    "total": 2
+                },
+                "variants": {
+                    "phased": 2,
+                    "total": 2
+                },
+                "pairs": {
+                    "phased": 1,
+                    "total": 1
+                },
+                "name": "ENSG00000133316"
+            },
+            {
+                "transcripts": {
+                    "phased": 0,
+                    "total": 1
+                },
+                "variants": {
+                    "phased": 0,
+                    "total": 2
+                },
+                "pairs": {
+                    "phased": 0,
+                    "total": 1
+                },
+                "name": "ENSG00000135144"
+            },
+            {
+                "transcripts": {
+                    "phased": 1,
+                    "total": 1
+                },
+                "variants": {
+                    "phased": 2,
+                    "total": 2
+                },
+                "pairs": {
+                    "phased": 1,
+                    "total": 1
+                },
+                "name": "ENSG00000137720"
+            },
+            {
+                "transcripts": {
+                    "phased": 1,
+                    "total": 1
+                },
+                "variants": {
+                    "phased": 2,
+                    "total": 2
+                },
+                "pairs": {
+                    "phased": 1,
+                    "total": 1
+                },
+                "name": "ENSG00000138443"
+            },
+            {
+                "transcripts": {
+                    "phased": 2,
+                    "total": 2
+                },
+                "variants": {
+                    "phased": 2,
+                    "total": 2
+                },
+                "pairs": {
+                    "phased": 1,
+                    "total": 1
+                },
+                "name": "ENSG00000138593"
+            },
+            {
+                "transcripts": {
+                    "phased": 0,
+                    "total": 0
+                },
+                "variants": {
+                    "phased": 0,
+                    "total": 2
+                },
+                "pairs": {
+                    "phased": 0,
+                    "total": 1
+                },
+                "name": "ENSG00000143147"
+            },
+            {
+                "transcripts": {
+                    "phased": 0,
+                    "total": 1
+                },
+                "variants": {
+                    "phased": 0,
+                    "total": 2
+                },
+                "pairs": {
+                    "phased": 0,
+                    "total": 1
+                },
+                "name": "ENSG00000143869"
+            },
+            {
+                "transcripts": {
+                    "phased": 0,
+                    "total": 2
+                },
+                "variants": {
+                    "phased": 0,
+                    "total": 2
+                },
+                "pairs": {
+                    "phased": 0,
+                    "total": 1
+                },
+                "name": "ENSG00000143970"
+            },
+            {
+                "transcripts": {
+                    "phased": 1,
+                    "total": 1
+                },
+                "variants": {
+                    "phased": 2,
+                    "total": 2
+                },
+                "pairs": {
+                    "phased": 1,
+                    "total": 1
+                },
+                "name": "ENSG00000148019"
+            },
+            {
+                "transcripts": {
+                    "phased": 0,
+                    "total": 4
+                },
+                "variants": {
+                    "phased": 0,
+                    "total": 2
+                },
+                "pairs": {
+                    "phased": 0,
+                    "total": 1
+                },
+                "name": "ENSG00000149115"
+            },
+            {
+                "transcripts": {
+                    "phased": 0,
+                    "total": 1
+                },
+                "variants": {
+                    "phased": 0,
+                    "total": 2
+                },
+                "pairs": {
+                    "phased": 0,
+                    "total": 1
+                },
+                "name": "ENSG00000149596"
+            },
+            {
+                "transcripts": {
+                    "phased": 2,
+                    "total": 2
+                },
+                "variants": {
+                    "phased": 2,
+                    "total": 2
+                },
+                "pairs": {
+                    "phased": 1,
+                    "total": 1
+                },
+                "name": "ENSG00000151503"
+            },
+            {
+                "transcripts": {
+                    "phased": 1,
+                    "total": 1
+                },
+                "variants": {
+                    "phased": 3,
+                    "total": 4
+                },
+                "pairs": {
+                    "phased": 2,
+                    "total": 5
+                },
+                "name": "ENSG00000151789"
+            },
+            {
+                "transcripts": {
+                    "phased": 1,
+                    "total": 1
+                },
+                "variants": {
+                    "phased": 2,
+                    "total": 2
+                },
+                "pairs": {
+                    "phased": 1,
+                    "total": 1
+                },
+                "name": "ENSG00000152104"
+            },
+            {
+                "transcripts": {
+                    "phased": 1,
+                    "total": 1
+                },
+                "variants": {
+                    "phased": 2,
+                    "total": 2
+                },
+                "pairs": {
+                    "phased": 1,
+                    "total": 1
+                },
+                "name": "ENSG00000152484"
+            },
+            {
+                "transcripts": {
+                    "phased": 1,
+                    "total": 1
+                },
+                "variants": {
+                    "phased": 2,
+                    "total": 2
+                },
+                "pairs": {
+                    "phased": 1,
+                    "total": 1
+                },
+                "name": "ENSG00000153187"
+            },
+            {
+                "transcripts": {
+                    "phased": 0,
+                    "total": 1
+                },
+                "variants": {
+                    "phased": 0,
+                    "total": 39
+                },
+                "pairs": {
+                    "phased": 0,
+                    "total": 111
+                },
+                "name": "ENSG00000154080"
+            },
+            {
+                "transcripts": {
+                    "phased": 0,
+                    "total": 0
+                },
+                "variants": {
+                    "phased": 2,
+                    "total": 2
+                },
+                "pairs": {
+                    "phased": 1,
+                    "total": 1
+                },
+                "name": "ENSG00000154380"
+            },
+            {
+                "transcripts": {
+                    "phased": 0,
+                    "total": 2
+                },
+                "variants": {
+                    "phased": 0,
+                    "total": 2
+                },
+                "pairs": {
+                    "phased": 0,
+                    "total": 1
+                },
+                "name": "ENSG00000160882"
+            },
+            {
+                "transcripts": {
+                    "phased": 3,
+                    "total": 3
+                },
+                "variants": {
+                    "phased": 4,
+                    "total": 4
+                },
+                "pairs": {
+                    "phased": 3,
+                    "total": 3
+                },
+                "name": "ENSG00000162433"
+            },
+            {
+                "transcripts": {
+                    "phased": 0,
+                    "total": 1
+                },
+                "variants": {
+                    "phased": 0,
+                    "total": 2
+                },
+                "pairs": {
+                    "phased": 0,
+                    "total": 1
+                },
+                "name": "ENSG00000162769"
+            },
+            {
+                "transcripts": {
+                    "phased": 0,
+                    "total": 2
+                },
+                "variants": {
+                    "phased": 0,
+                    "total": 3
+                },
+                "pairs": {
+                    "phased": 0,
+                    "total": 2
+                },
+                "name": "ENSG00000163453"
+            },
+            {
+                "transcripts": {
+                    "phased": 1,
+                    "total": 1
+                },
+                "variants": {
+                    "phased": 2,
+                    "total": 2
+                },
+                "pairs": {
+                    "phased": 1,
+                    "total": 1
+                },
+                "name": "ENSG00000163590"
+            },
+            {
+                "transcripts": {
+                    "phased": 0,
+                    "total": 1
+                },
+                "variants": {
+                    "phased": 0,
+                    "total": 2
+                },
+                "pairs": {
+                    "phased": 0,
+                    "total": 1
+                },
+                "name": "ENSG00000164366"
+            },
+            {
+                "transcripts": {
+                    "phased": 0,
+                    "total": 2
+                },
+                "variants": {
+                    "phased": 0,
+                    "total": 2
+                },
+                "pairs": {
+                    "phased": 0,
+                    "total": 1
+                },
+                "name": "ENSG00000165061"
+            },
+            {
+                "transcripts": {
+                    "phased": 0,
+                    "total": 4
+                },
+                "variants": {
+                    "phased": 0,
+                    "total": 3
+                },
+                "pairs": {
+                    "phased": 0,
+                    "total": 2
+                },
+                "name": "ENSG00000165480"
+            },
+            {
+                "transcripts": {
+                    "phased": 1,
+                    "total": 1
+                },
+                "variants": {
+                    "phased": 2,
+                    "total": 2
+                },
+                "pairs": {
+                    "phased": 1,
+                    "total": 1
+                },
+                "name": "ENSG00000167291"
+            },
+            {
+                "transcripts": {
+                    "phased": 0,
+                    "total": 0
+                },
+                "variants": {
+                    "phased": 2,
+                    "total": 2
+                },
+                "pairs": {
+                    "phased": 1,
+                    "total": 1
+                },
+                "name": "ENSG00000167395"
+            },
+            {
+                "transcripts": {
+                    "phased": 1,
+                    "total": 1
+                },
+                "variants": {
+                    "phased": 3,
+                    "total": 3
+                },
+                "pairs": {
+                    "phased": 2,
+                    "total": 3
+                },
+                "name": "ENSG00000168792"
+            },
+            {
+                "transcripts": {
+                    "phased": 1,
+                    "total": 1
+                },
+                "variants": {
+                    "phased": 3,
+                    "total": 3
+                },
+                "pairs": {
+                    "phased": 2,
+                    "total": 2
+                },
+                "name": "ENSG00000169436"
+            },
+            {
+                "transcripts": {
+                    "phased": 0,
+                    "total": 1
+                },
+                "variants": {
+                    "phased": 0,
+                    "total": 2
+                },
+                "pairs": {
+                    "phased": 0,
+                    "total": 1
+                },
+                "name": "ENSG00000169750"
+            },
+            {
+                "transcripts": {
+                    "phased": 0,
+                    "total": 3
+                },
+                "variants": {
+                    "phased": 0,
+                    "total": 3
+                },
+                "pairs": {
+                    "phased": 0,
+                    "total": 3
+                },
+                "name": "ENSG00000169894"
+            },
+            {
+                "transcripts": {
+                    "phased": 0,
+                    "total": 2
+                },
+                "variants": {
+                    "phased": 0,
+                    "total": 2
+                },
+                "pairs": {
+                    "phased": 0,
+                    "total": 1
+                },
+                "name": "ENSG00000171936"
+            },
+            {
+                "transcripts": {
+                    "phased": 3,
+                    "total": 3
+                },
+                "variants": {
+                    "phased": 2,
+                    "total": 2
+                },
+                "pairs": {
+                    "phased": 1,
+                    "total": 1
+                },
+                "name": "ENSG00000172893"
+            },
+            {
+                "transcripts": {
+                    "phased": 0,
+                    "total": 0
+                },
+                "variants": {
+                    "phased": 2,
+                    "total": 2
+                },
+                "pairs": {
+                    "phased": 1,
+                    "total": 1
+                },
+                "name": "ENSG00000173163"
+            },
+            {
+                "transcripts": {
+                    "phased": 0,
+                    "total": 0
+                },
+                "variants": {
+                    "phased": 2,
+                    "total": 2
+                },
+                "pairs": {
+                    "phased": 1,
+                    "total": 1
+                },
+                "name": "ENSG00000173218"
+            },
+            {
+                "transcripts": {
+                    "phased": 1,
+                    "total": 1
+                },
+                "variants": {
+                    "phased": 2,
+                    "total": 2
+                },
+                "pairs": {
+                    "phased": 1,
+                    "total": 1
+                },
+                "name": "ENSG00000173714"
+            },
+            {
+                "transcripts": {
+                    "phased": 3,
+                    "total": 3
+                },
+                "variants": {
+                    "phased": 2,
+                    "total": 2
+                },
+                "pairs": {
+                    "phased": 1,
+                    "total": 1
+                },
+                "name": "ENSG00000174989"
+            },
+            {
+                "transcripts": {
+                    "phased": 0,
+                    "total": 3
+                },
+                "variants": {
+                    "phased": 0,
+                    "total": 2
+                },
+                "pairs": {
+                    "phased": 0,
+                    "total": 1
+                },
+                "name": "ENSG00000175216"
+            },
+            {
+                "transcripts": {
+                    "phased": 1,
+                    "total": 1
+                },
+                "variants": {
+                    "phased": 2,
+                    "total": 2
+                },
+                "pairs": {
+                    "phased": 1,
+                    "total": 1
+                },
+                "name": "ENSG00000176248"
+            },
+            {
+                "transcripts": {
+                    "phased": 0,
+                    "total": 1
+                },
+                "variants": {
+                    "phased": 0,
+                    "total": 2
+                },
+                "pairs": {
+                    "phased": 0,
+                    "total": 1
+                },
+                "name": "ENSG00000177570"
+            },
+            {
+                "transcripts": {
+                    "phased": 0,
+                    "total": 0
+                },
+                "variants": {
+                    "phased": 2,
+                    "total": 2
+                },
+                "pairs": {
+                    "phased": 1,
+                    "total": 1
+                },
+                "name": "ENSG00000178104"
+            },
+            {
+                "transcripts": {
+                    "phased": 1,
+                    "total": 1
+                },
+                "variants": {
+                    "phased": 2,
+                    "total": 2
+                },
+                "pairs": {
+                    "phased": 1,
+                    "total": 1
+                },
+                "name": "ENSG00000179796"
+            },
+            {
+                "transcripts": {
+                    "phased": 0,
+                    "total": 2
+                },
+                "variants": {
+                    "phased": 0,
+                    "total": 2
+                },
+                "pairs": {
+                    "phased": 0,
+                    "total": 1
+                },
+                "name": "ENSG00000180979"
+            },
+            {
+                "transcripts": {
+                    "phased": 2,
+                    "total": 2
+                },
+                "variants": {
+                    "phased": 2,
+                    "total": 2
+                },
+                "pairs": {
+                    "phased": 1,
+                    "total": 1
+                },
+                "name": "ENSG00000182606"
+            },
+            {
+                "transcripts": {
+                    "phased": 1,
+                    "total": 1
+                },
+                "variants": {
+                    "phased": 2,
+                    "total": 2
+                },
+                "pairs": {
+                    "phased": 1,
+                    "total": 1
+                },
+                "name": "ENSG00000183023"
+            },
+            {
+                "transcripts": {
+                    "phased": 2,
+                    "total": 2
+                },
+                "variants": {
+                    "phased": 3,
+                    "total": 3
+                },
+                "pairs": {
+                    "phased": 2,
+                    "total": 2
+                },
+                "name": "ENSG00000183354"
+            },
+            {
+                "transcripts": {
+                    "phased": 1,
+                    "total": 1
+                },
+                "variants": {
+                    "phased": 2,
+                    "total": 2
+                },
+                "pairs": {
+                    "phased": 1,
+                    "total": 1
+                },
+                "name": "ENSG00000183742"
+            },
+            {
+                "transcripts": {
+                    "phased": 0,
+                    "total": 0
+                },
+                "variants": {
+                    "phased": 3,
+                    "total": 3
+                },
+                "pairs": {
+                    "phased": 2,
+                    "total": 2
+                },
+                "name": "ENSG00000183778"
+            },
+            {
+                "transcripts": {
+                    "phased": 0,
+                    "total": 1
+                },
+                "variants": {
+                    "phased": 0,
+                    "total": 2
+                },
+                "pairs": {
+                    "phased": 0,
+                    "total": 1
+                },
+                "name": "ENSG00000185070"
+            },
+            {
+                "transcripts": {
+                    "phased": 2,
+                    "total": 2
+                },
+                "variants": {
+                    "phased": 2,
+                    "total": 2
+                },
+                "pairs": {
+                    "phased": 1,
+                    "total": 1
+                },
+                "name": "ENSG00000185565"
+            },
+            {
+                "transcripts": {
+                    "phased": 5,
+                    "total": 5
+                },
+                "variants": {
+                    "phased": 2,
+                    "total": 2
+                },
+                "pairs": {
+                    "phased": 1,
+                    "total": 1
+                },
+                "name": "ENSG00000187607"
+            },
+            {
+                "transcripts": {
+                    "phased": 1,
+                    "total": 1
+                },
+                "variants": {
+                    "phased": 2,
+                    "total": 2
+                },
+                "pairs": {
+                    "phased": 1,
+                    "total": 1
+                },
+                "name": "ENSG00000196177"
+            },
+            {
+                "transcripts": {
+                    "phased": 1,
+                    "total": 1
+                },
+                "variants": {
+                    "phased": 2,
+                    "total": 2
+                },
+                "pairs": {
+                    "phased": 1,
+                    "total": 1
+                },
+                "name": "ENSG00000197063"
+            },
+            {
+                "transcripts": {
+                    "phased": 1,
+                    "total": 1
+                },
+                "variants": {
+                    "phased": 3,
+                    "total": 3
+                },
+                "pairs": {
+                    "phased": 2,
+                    "total": 2
+                },
+                "name": "ENSG00000197136"
+            },
+            {
+                "transcripts": {
+                    "phased": 1,
+                    "total": 1
+                },
+                "variants": {
+                    "phased": 2,
+                    "total": 2
+                },
+                "pairs": {
+                    "phased": 1,
+                    "total": 1
+                },
+                "name": "ENSG00000204149"
+            },
+            {
+                "transcripts": {
+                    "phased": 1,
+                    "total": 1
+                },
+                "variants": {
+                    "phased": 2,
+                    "total": 2
+                },
+                "pairs": {
+                    "phased": 1,
+                    "total": 1
+                },
+                "name": "ENSG00000205476"
+            },
+            {
+                "transcripts": {
+                    "phased": 0,
+                    "total": 0
+                },
+                "variants": {
+                    "phased": 2,
+                    "total": 2
+                },
+                "pairs": {
+                    "phased": 1,
+                    "total": 1
+                },
+                "name": "ENSG00000206562"
+            },
+            {
+                "transcripts": {
+                    "phased": 0,
+                    "total": 2
+                },
+                "variants": {
+                    "phased": 0,
+                    "total": 2
+                },
+                "pairs": {
+                    "phased": 0,
+                    "total": 1
+                },
+                "name": "ENSG00000241973"
+            },
+            {
+                "transcripts": {
+                    "phased": 1,
+                    "total": 1
+                },
+                "variants": {
+                    "phased": 5,
+                    "total": 5
+                },
+                "pairs": {
+                    "phased": 4,
+                    "total": 4
+                },
+                "name": "ENSG00000250120"
+            },
+            {
+                "transcripts": {
+                    "phased": 0,
+                    "total": 0
+                },
+                "variants": {
+                    "phased": 2,
+                    "total": 2
+                },
+                "pairs": {
+                    "phased": 1,
+                    "total": 1
+                },
+                "name": "ENSG00000251322"
+            },
+            {
+                "transcripts": {
+                    "phased": 1,
+                    "total": 1
+                },
+                "variants": {
+                    "phased": 2,
+                    "total": 2
+                },
+                "pairs": {
+                    "phased": 1,
+                    "total": 1
+                },
+                "name": "ENSG00000260220"
+            },
+            {
+                "transcripts": {
+                    "phased": 1,
+                    "total": 1
+                },
+                "variants": {
+                    "phased": 4,
+                    "total": 4
+                },
+                "pairs": {
+                    "phased": 3,
+                    "total": 3
+                },
+                "name": "ENSG00000273079"
+            },
+            {
+                "transcripts": {
+                    "phased": 0,
+                    "total": 9
+                },
+                "variants": {
+                    "phased": 0,
+                    "total": 3
+                },
+                "pairs": {
+                    "phased": 0,
+                    "total": 3
+                },
+                "name": "ENSG00000273136"
+            },
+            {
+                "transcripts": {
+                    "phased": 1,
+                    "total": 1
+                },
+                "variants": {
+                    "phased": 2,
+                    "total": 2
+                },
+                "pairs": {
+                    "phased": 1,
+                    "total": 1
+                },
+                "name": "ENSG00000273540"
+            }
+        ],
+        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
+        "schema_version": "1",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "released",
+        "by_impact": [
+            {
+                "transcripts": {
+                    "phased": 55,
+                    "total": 78
+                },
+                "variants": {
+                    "phased": 49,
+                    "total": 72
+                },
+                "pairs": {
+                    "phased": 27,
+                    "total": 41
+                },
+                "genes": {
+                    "phased": 22,
+                    "total": 31
+                },
+                "name": "MEDIUM_PAIR"
+            },
+            {
+                "transcripts": {
+                    "phased": 3,
+                    "total": 32
+                },
+                "variants": {
+                    "phased": 11,
+                    "total": 33
+                },
+                "pairs": {
+                    "phased": 7,
+                    "total": 21
+                },
+                "genes": {
+                    "phased": 4,
+                    "total": 14
+                },
+                "name": "STRONG_PAIR"
+            },
+            {
+                "transcripts": {
+                    "phased": 45,
+                    "total": 83
+                },
+                "variants": {
+                    "phased": 92,
+                    "total": 169
+                },
+                "pairs": {
+                    "phased": 50,
+                    "total": 182
+                },
+                "genes": {
+                    "phased": 42,
+                    "total": 61
+                },
+                "name": "WEAK_PAIR"
+            }
+        ],
+        "uuid": "ba404b50-1918-4119-8620-39eb2dbb011a",
+        "last_modified": {
+            "date_modified": "2020-07-07T15:43:14.500508+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "by_transcripts": [
+            {
+                "gene": "ENSG00000102081",
+                "pairs": {
+                    "phased": 3,
+                    "total": 6
+                },
+                "name": "ENST00000218200",
+                "variants": {
+                    "phased": 4,
+                    "total": 4
+                }
+            },
+            {
+                "gene": "ENSG00000125735",
+                "pairs": {
+                    "phased": 1,
+                    "total": 1
+                },
+                "name": "ENST00000245912",
+                "variants": {
+                    "phased": 2,
+                    "total": 2
+                }
+            },
+            {
+                "gene": "ENSG00000131781",
+                "pairs": {
+                    "phased": 0,
+                    "total": 1
+                },
+                "name": "ENST00000254090",
+                "variants": {
+                    "phased": 0,
+                    "total": 2
+                }
+            },
+            {
+                "gene": "ENSG00000241973",
+                "pairs": {
+                    "phased": 0,
+                    "total": 1
+                },
+                "name": "ENST00000255882",
+                "variants": {
+                    "phased": 0,
+                    "total": 2
+                }
+            },
+            {
+                "gene": "ENSG00000135144",
+                "pairs": {
+                    "phased": 0,
+                    "total": 1
+                },
+                "name": "ENST00000257600",
+                "variants": {
+                    "phased": 0,
+                    "total": 2
+                }
+            },
+            {
+                "gene": "ENSG00000137720",
+                "pairs": {
+                    "phased": 1,
+                    "total": 1
+                },
+                "name": "ENST00000260276",
+                "variants": {
+                    "phased": 2,
+                    "total": 2
+                }
+            },
+            {
+                "gene": "ENSG00000138593",
+                "pairs": {
+                    "phased": 1,
+                    "total": 1
+                },
+                "name": "ENST00000261847",
+                "variants": {
+                    "phased": 2,
+                    "total": 2
+                }
+            },
+            {
+                "gene": "ENSG00000076067",
+                "pairs": {
+                    "phased": 1,
+                    "total": 1
+                },
+                "name": "ENST00000262031",
+                "variants": {
+                    "phased": 2,
+                    "total": 2
+                }
+            },
+            {
+                "gene": "ENSG00000071991",
+                "pairs": {
+                    "phased": 0,
+                    "total": 1
+                },
+                "name": "ENST00000262150",
+                "variants": {
+                    "phased": 0,
+                    "total": 2
+                }
+            },
+            {
+                "gene": "ENSG00000103150",
+                "pairs": {
+                    "phased": 2,
+                    "total": 2
+                },
+                "name": "ENST00000262430",
+                "variants": {
+                    "phased": 3,
+                    "total": 3
+                }
+            },
+            {
+                "gene": "ENSG00000085276",
+                "pairs": {
+                    "phased": 1,
+                    "total": 1
+                },
+                "name": "ENST00000264674",
+                "variants": {
+                    "phased": 2,
+                    "total": 2
+                }
+            },
+            {
+                "gene": "ENSG00000110090",
+                "pairs": {
+                    "phased": 0,
+                    "total": 1
+                },
+                "name": "ENST00000265641",
+                "variants": {
+                    "phased": 0,
+                    "total": 2
+                }
+            },
+            {
+                "gene": "ENSG00000100271",
+                "pairs": {
+                    "phased": 0,
+                    "total": 1
+                },
+                "name": "ENST00000266254",
+                "variants": {
+                    "phased": 0,
+                    "total": 2
+                }
+            },
+            {
+                "gene": "ENSG00000143869",
+                "pairs": {
+                    "phased": 0,
+                    "total": 1
+                },
+                "name": "ENST00000272224",
+                "variants": {
+                    "phased": 0,
+                    "total": 2
+                }
+            },
+            {
+                "gene": "ENSG00000114573",
+                "pairs": {
+                    "phased": 1,
+                    "total": 1
+                },
+                "name": "ENST00000273398",
+                "variants": {
+                    "phased": 2,
+                    "total": 2
+                }
+            },
+            {
+                "gene": "ENSG00000151789",
+                "pairs": {
+                    "phased": 2,
+                    "total": 5
+                },
+                "name": "ENST00000281523",
+                "variants": {
+                    "phased": 3,
+                    "total": 4
+                }
+            },
+            {
+                "gene": "ENSG00000152484",
+                "pairs": {
+                    "phased": 1,
+                    "total": 1
+                },
+                "name": "ENST00000282344",
+                "variants": {
+                    "phased": 2,
+                    "total": 2
+                }
+            },
+            {
+                "gene": "ENSG00000090857",
+                "pairs": {
+                    "phased": 1,
+                    "total": 1
+                },
+                "name": "ENST00000288050",
+                "variants": {
+                    "phased": 2,
+                    "total": 2
+                }
+            },
+            {
+                "gene": "ENSG00000160882",
+                "pairs": {
+                    "phased": 0,
+                    "total": 1
+                },
+                "name": "ENST00000292427",
+                "variants": {
+                    "phased": 0,
+                    "total": 2
+                }
+            },
+            {
+                "gene": "ENSG00000163453",
+                "pairs": {
+                    "phased": 0,
+                    "total": 2
+                },
+                "name": "ENST00000295666",
+                "variants": {
+                    "phased": 0,
+                    "total": 3
+                }
+            },
+            {
+                "gene": "ENSG00000138443",
+                "pairs": {
+                    "phased": 1,
+                    "total": 1
+                },
+                "name": "ENST00000295851",
+                "variants": {
+                    "phased": 2,
+                    "total": 2
+                }
+            },
+            {
+                "gene": "ENSG00000131711",
+                "pairs": {
+                    "phased": 0,
+                    "total": 3
+                },
+                "name": "ENST00000296755",
+                "variants": {
+                    "phased": 0,
+                    "total": 3
+                }
+            },
+            {
+                "gene": "ENSG00000164366",
+                "pairs": {
+                    "phased": 0,
+                    "total": 1
+                },
+                "name": "ENST00000296824",
+                "variants": {
+                    "phased": 0,
+                    "total": 2
+                }
+            },
+            {
+                "gene": "ENSG00000165061",
+                "pairs": {
+                    "phased": 0,
+                    "total": 1
+                },
+                "name": "ENST00000297737",
+                "variants": {
+                    "phased": 0,
+                    "total": 2
+                }
+            },
+            {
+                "gene": "ENSG00000165480",
+                "pairs": {
+                    "phased": 0,
+                    "total": 2
+                },
+                "name": "ENST00000298260",
+                "variants": {
+                    "phased": 0,
+                    "total": 3
+                }
+            },
+            {
+                "gene": "ENSG00000169436",
+                "pairs": {
+                    "phased": 2,
+                    "total": 2
+                },
+                "name": "ENST00000303045",
+                "variants": {
+                    "phased": 3,
+                    "total": 3
+                }
+            },
+            {
+                "gene": "ENSG00000171936",
+                "pairs": {
+                    "phased": 0,
+                    "total": 1
+                },
+                "name": "ENST00000305892",
+                "variants": {
+                    "phased": 0,
+                    "total": 2
+                }
+            },
+            {
+                "gene": "ENSG00000169750",
+                "pairs": {
+                    "phased": 0,
+                    "total": 1
+                },
+                "name": "ENST00000306897",
+                "variants": {
+                    "phased": 0,
+                    "total": 2
+                }
+            },
+            {
+                "gene": "ENSG00000168792",
+                "pairs": {
+                    "phased": 2,
+                    "total": 3
+                },
+                "name": "ENST00000307201",
+                "variants": {
+                    "phased": 3,
+                    "total": 3
+                }
+            },
+            {
+                "gene": "ENSG00000174989",
+                "pairs": {
+                    "phased": 1,
+                    "total": 1
+                },
+                "name": "ENST00000309909",
+                "variants": {
+                    "phased": 2,
+                    "total": 2
+                }
+            },
+            {
+                "gene": "ENSG00000167291",
+                "pairs": {
+                    "phased": 1,
+                    "total": 1
+                },
+                "name": "ENST00000310924",
+                "variants": {
+                    "phased": 2,
+                    "total": 2
+                }
+            },
+            {
+                "gene": "ENSG00000173714",
+                "pairs": {
+                    "phased": 1,
+                    "total": 1
+                },
+                "name": "ENST00000311378",
+                "variants": {
+                    "phased": 2,
+                    "total": 2
+                }
+            },
+            {
+                "gene": "ENSG00000175216",
+                "pairs": {
+                    "phased": 0,
+                    "total": 1
+                },
+                "name": "ENST00000312055",
+                "variants": {
+                    "phased": 0,
+                    "total": 2
+                }
+            },
+            {
+                "gene": "ENSG00000072195",
+                "pairs": {
+                    "phased": 0,
+                    "total": 1
+                },
+                "name": "ENST00000312358",
+                "variants": {
+                    "phased": 0,
+                    "total": 2
+                }
+            },
+            {
+                "gene": "ENSG00000165480",
+                "pairs": {
+                    "phased": 0,
+                    "total": 2
+                },
+                "name": "ENST00000314759",
+                "variants": {
+                    "phased": 0,
+                    "total": 3
+                }
+            },
+            {
+                "gene": "ENSG00000165061",
+                "pairs": {
+                    "phased": 0,
+                    "total": 1
+                },
+                "name": "ENST00000315769",
+                "variants": {
+                    "phased": 0,
+                    "total": 2
+                }
+            },
+            {
+                "gene": "ENSG00000180979",
+                "pairs": {
+                    "phased": 0,
+                    "total": 1
+                },
+                "name": "ENST00000323443",
+                "variants": {
+                    "phased": 0,
+                    "total": 2
+                }
+            },
+            {
+                "gene": "ENSG00000176248",
+                "pairs": {
+                    "phased": 1,
+                    "total": 1
+                },
+                "name": "ENST00000323927",
+                "variants": {
+                    "phased": 2,
+                    "total": 2
+                }
+            },
+            {
+                "gene": "ENSG00000162433",
+                "pairs": {
+                    "phased": 3,
+                    "total": 3
+                },
+                "name": "ENST00000327299",
+                "variants": {
+                    "phased": 4,
+                    "total": 4
+                }
+            },
+            {
+                "gene": "ENSG00000054690",
+                "pairs": {
+                    "phased": 1,
+                    "total": 1
+                },
+                "name": "ENST00000329153",
+                "variants": {
+                    "phased": 2,
+                    "total": 2
+                }
+            },
+            {
+                "gene": "ENSG00000185070",
+                "pairs": {
+                    "phased": 0,
+                    "total": 1
+                },
+                "name": "ENST00000330753",
+                "variants": {
+                    "phased": 0,
+                    "total": 2
+                }
+            },
+            {
+                "gene": "ENSG00000100271",
+                "pairs": {
+                    "phased": 0,
+                    "total": 1
+                },
+                "name": "ENST00000331018",
+                "variants": {
+                    "phased": 0,
+                    "total": 2
+                }
+            },
+            {
+                "gene": "ENSG00000102081",
+                "pairs": {
+                    "phased": 3,
+                    "total": 6
+                },
+                "name": "ENST00000334557",
+                "variants": {
+                    "phased": 4,
+                    "total": 4
+                }
+            },
+            {
+                "gene": "ENSG00000143970",
+                "pairs": {
+                    "phased": 0,
+                    "total": 1
+                },
+                "name": "ENST00000336112",
+                "variants": {
+                    "phased": 0,
+                    "total": 2
+                }
+            },
+            {
+                "gene": "ENSG00000182606",
+                "pairs": {
+                    "phased": 1,
+                    "total": 1
+                },
+                "name": "ENST00000341421",
+                "variants": {
+                    "phased": 2,
+                    "total": 2
+                }
+            },
+            {
+                "gene": "ENSG00000111335",
+                "pairs": {
+                    "phased": 1,
+                    "total": 1
+                },
+                "name": "ENST00000342315",
+                "variants": {
+                    "phased": 2,
+                    "total": 2
+                }
+            },
+            {
+                "gene": "ENSG00000175216",
+                "pairs": {
+                    "phased": 0,
+                    "total": 1
+                },
+                "name": "ENST00000354558",
+                "variants": {
+                    "phased": 0,
+                    "total": 2
+                }
+            },
+            {
+                "gene": "ENSG00000004455",
+                "pairs": {
+                    "phased": 0,
+                    "total": 1
+                },
+                "name": "ENST00000354858",
+                "variants": {
+                    "phased": 0,
+                    "total": 2
+                }
+            },
+            {
+                "gene": "ENSG00000079974",
+                "pairs": {
+                    "phased": 0,
+                    "total": 1
+                },
+                "name": "ENST00000354869",
+                "variants": {
+                    "phased": 0,
+                    "total": 2
+                }
+            },
+            {
+                "gene": "ENSG00000172893",
+                "pairs": {
+                    "phased": 1,
+                    "total": 1
+                },
+                "name": "ENST00000355527",
+                "variants": {
+                    "phased": 2,
+                    "total": 2
+                }
+            },
+            {
+                "gene": "ENSG00000197136",
+                "pairs": {
+                    "phased": 2,
+                    "total": 2
+                },
+                "name": "ENST00000355703",
+                "variants": {
+                    "phased": 3,
+                    "total": 3
+                }
+            },
+            {
+                "gene": "ENSG00000197063",
+                "pairs": {
+                    "phased": 1,
+                    "total": 1
+                },
+                "name": "ENST00000357736",
+                "variants": {
+                    "phased": 2,
+                    "total": 2
+                }
+            },
+            {
+                "gene": "ENSG00000149115",
+                "pairs": {
+                    "phased": 0,
+                    "total": 1
+                },
+                "name": "ENST00000358252",
+                "variants": {
+                    "phased": 0,
+                    "total": 2
+                }
+            },
+            {
+                "gene": "ENSG00000196177",
+                "pairs": {
+                    "phased": 1,
+                    "total": 1
+                },
+                "name": "ENST00000358776",
+                "variants": {
+                    "phased": 2,
+                    "total": 2
+                }
+            },
+            {
+                "gene": "ENSG00000152104",
+                "pairs": {
+                    "phased": 1,
+                    "total": 1
+                },
+                "name": "ENST00000366956",
+                "variants": {
+                    "phased": 2,
+                    "total": 2
+                }
+            },
+            {
+                "gene": "ENSG00000162769",
+                "pairs": {
+                    "phased": 0,
+                    "total": 1
+                },
+                "name": "ENST00000366971",
+                "variants": {
+                    "phased": 0,
+                    "total": 2
+                }
+            },
+            {
+                "gene": "ENSG00000131781",
+                "pairs": {
+                    "phased": 0,
+                    "total": 1
+                },
+                "name": "ENST00000369272",
+                "variants": {
+                    "phased": 0,
+                    "total": 2
+                }
+            },
+            {
+                "gene": "ENSG00000102081",
+                "pairs": {
+                    "phased": 1,
+                    "total": 1
+                },
+                "name": "ENST00000370470",
+                "variants": {
+                    "phased": 2,
+                    "total": 2
+                }
+            },
+            {
+                "gene": "ENSG00000102081",
+                "pairs": {
+                    "phased": 3,
+                    "total": 6
+                },
+                "name": "ENST00000370471",
+                "variants": {
+                    "phased": 4,
+                    "total": 4
+                }
+            },
+            {
+                "gene": "ENSG00000102081",
+                "pairs": {
+                    "phased": 3,
+                    "total": 6
+                },
+                "name": "ENST00000370475",
+                "variants": {
+                    "phased": 4,
+                    "total": 4
+                }
+            },
+            {
+                "gene": "ENSG00000102081",
+                "pairs": {
+                    "phased": 3,
+                    "total": 6
+                },
+                "name": "ENST00000370477",
+                "variants": {
+                    "phased": 4,
+                    "total": 4
+                }
+            },
+            {
+                "gene": "ENSG00000124201",
+                "pairs": {
+                    "phased": 0,
+                    "total": 1
+                },
+                "name": "ENST00000371744",
+                "variants": {
+                    "phased": 0,
+                    "total": 2
+                }
+            },
+            {
+                "gene": "ENSG00000149596",
+                "pairs": {
+                    "phased": 0,
+                    "total": 1
+                },
+                "name": "ENST00000372980",
+                "variants": {
+                    "phased": 0,
+                    "total": 2
+                }
+            },
+            {
+                "gene": "ENSG00000004455",
+                "pairs": {
+                    "phased": 0,
+                    "total": 1
+                },
+                "name": "ENST00000373449",
+                "variants": {
+                    "phased": 0,
+                    "total": 2
+                }
+            },
+            {
+                "gene": "ENSG00000204149",
+                "pairs": {
+                    "phased": 1,
+                    "total": 1
+                },
+                "name": "ENST00000374056",
+                "variants": {
+                    "phased": 2,
+                    "total": 2
+                }
+            },
+            {
+                "gene": "ENSG00000128567",
+                "pairs": {
+                    "phased": 1,
+                    "total": 1
+                },
+                "name": "ENST00000378555",
+                "variants": {
+                    "phased": 2,
+                    "total": 2
+                }
+            },
+            {
+                "gene": "ENSG00000111859",
+                "pairs": {
+                    "phased": 0,
+                    "total": 1
+                },
+                "name": "ENST00000379433",
+                "variants": {
+                    "phased": 0,
+                    "total": 2
+                }
+            },
+            {
+                "gene": "ENSG00000169894",
+                "pairs": {
+                    "phased": 0,
+                    "total": 3
+                },
+                "name": "ENST00000379458",
+                "variants": {
+                    "phased": 0,
+                    "total": 3
+                }
+            },
+            {
+                "gene": "ENSG00000205476",
+                "pairs": {
+                    "phased": 1,
+                    "total": 1
+                },
+                "name": "ENST00000380243",
+                "variants": {
+                    "phased": 2,
+                    "total": 2
+                }
+            },
+            {
+                "gene": "ENSG00000183354",
+                "pairs": {
+                    "phased": 2,
+                    "total": 2
+                },
+                "name": "ENST00000381461",
+                "variants": {
+                    "phased": 3,
+                    "total": 3
+                }
+            },
+            {
+                "gene": "ENSG00000132932",
+                "pairs": {
+                    "phased": 0,
+                    "total": 2
+                },
+                "name": "ENST00000381655",
+                "variants": {
+                    "phased": 0,
+                    "total": 3
+                }
+            },
+            {
+                "gene": "ENSG00000070182",
+                "pairs": {
+                    "phased": 1,
+                    "total": 1
+                },
+                "name": "ENST00000389720",
+                "variants": {
+                    "phased": 2,
+                    "total": 2
+                }
+            },
+            {
+                "gene": "ENSG00000070182",
+                "pairs": {
+                    "phased": 2,
+                    "total": 2
+                },
+                "name": "ENST00000389722",
+                "variants": {
+                    "phased": 3,
+                    "total": 3
+                }
+            },
+            {
+                "gene": "ENSG00000111335",
+                "pairs": {
+                    "phased": 1,
+                    "total": 1
+                },
+                "name": "ENST00000392583",
+                "variants": {
+                    "phased": 2,
+                    "total": 2
+                }
+            },
+            {
+                "gene": "ENSG00000114554",
+                "pairs": {
+                    "phased": 2,
+                    "total": 2
+                },
+                "name": "ENST00000393409",
+                "variants": {
+                    "phased": 3,
+                    "total": 3
+                }
+            },
+            {
+                "gene": "ENSG00000162433",
+                "pairs": {
+                    "phased": 3,
+                    "total": 3
+                },
+                "name": "ENST00000395334",
+                "variants": {
+                    "phased": 4,
+                    "total": 4
+                }
+            },
+            {
+                "gene": "ENSG00000079974",
+                "pairs": {
+                    "phased": 0,
+                    "total": 1
+                },
+                "name": "ENST00000395591",
+                "variants": {
+                    "phased": 0,
+                    "total": 2
+                }
+            },
+            {
+                "gene": "ENSG00000079974",
+                "pairs": {
+                    "phased": 0,
+                    "total": 1
+                },
+                "name": "ENST00000395593",
+                "variants": {
+                    "phased": 0,
+                    "total": 2
+                }
+            },
+            {
+                "gene": "ENSG00000079974",
+                "pairs": {
+                    "phased": 0,
+                    "total": 1
+                },
+                "name": "ENST00000395595",
+                "variants": {
+                    "phased": 0,
+                    "total": 2
+                }
+            },
+            {
+                "gene": "ENSG00000079974",
+                "pairs": {
+                    "phased": 0,
+                    "total": 1
+                },
+                "name": "ENST00000395598",
+                "variants": {
+                    "phased": 0,
+                    "total": 2
+                }
+            },
+            {
+                "gene": "ENSG00000187607",
+                "pairs": {
+                    "phased": 1,
+                    "total": 1
+                },
+                "name": "ENST00000395894",
+                "variants": {
+                    "phased": 2,
+                    "total": 2
+                }
+            },
+            {
+                "gene": "ENSG00000106460",
+                "pairs": {
+                    "phased": 1,
+                    "total": 1
+                },
+                "name": "ENST00000396667",
+                "variants": {
+                    "phased": 2,
+                    "total": 2
+                }
+            },
+            {
+                "gene": "ENSG00000106460",
+                "pairs": {
+                    "phased": 1,
+                    "total": 1
+                },
+                "name": "ENST00000396668",
+                "variants": {
+                    "phased": 2,
+                    "total": 2
+                }
+            },
+            {
+                "gene": "ENSG00000180979",
+                "pairs": {
+                    "phased": 0,
+                    "total": 1
+                },
+                "name": "ENST00000397130",
+                "variants": {
+                    "phased": 0,
+                    "total": 2
+                }
+            },
+            {
+                "gene": "ENSG00000100350",
+                "pairs": {
+                    "phased": 1,
+                    "total": 1
+                },
+                "name": "ENST00000397224",
+                "variants": {
+                    "phased": 2,
+                    "total": 2
+                }
+            },
+            {
+                "gene": "ENSG00000241973",
+                "pairs": {
+                    "phased": 0,
+                    "total": 1
+                },
+                "name": "ENST00000399213",
+                "variants": {
+                    "phased": 0,
+                    "total": 2
+                }
+            },
+            {
+                "gene": "ENSG00000183354",
+                "pairs": {
+                    "phased": 2,
+                    "total": 2
+                },
+                "name": "ENST00000399933",
+                "variants": {
+                    "phased": 3,
+                    "total": 3
+                }
+            },
+            {
+                "gene": "ENSG00000165480",
+                "pairs": {
+                    "phased": 0,
+                    "total": 2
+                },
+                "name": "ENST00000400018",
+                "variants": {
+                    "phased": 0,
+                    "total": 3
+                }
+            },
+            {
+                "gene": "ENSG00000183742",
+                "pairs": {
+                    "phased": 1,
+                    "total": 1
+                },
+                "name": "ENST00000400331",
+                "variants": {
+                    "phased": 2,
+                    "total": 2
+                }
+            },
+            {
+                "gene": "ENSG00000183023",
+                "pairs": {
+                    "phased": 1,
+                    "total": 1
+                },
+                "name": "ENST00000406785",
+                "variants": {
+                    "phased": 2,
+                    "total": 2
+                }
+            },
+            {
+                "gene": "ENSG00000172893",
+                "pairs": {
+                    "phased": 1,
+                    "total": 1
+                },
+                "name": "ENST00000407721",
+                "variants": {
+                    "phased": 2,
+                    "total": 2
+                }
+            },
+            {
+                "gene": "ENSG00000177570",
+                "pairs": {
+                    "phased": 0,
+                    "total": 1
+                },
+                "name": "ENST00000409003",
+                "variants": {
+                    "phased": 0,
+                    "total": 2
+                }
+            },
+            {
+                "gene": "ENSG00000169894",
+                "pairs": {
+                    "phased": 0,
+                    "total": 3
+                },
+                "name": "ENST00000414964",
+                "variants": {
+                    "phased": 0,
+                    "total": 3
+                }
+            },
+            {
+                "gene": "ENSG00000187607",
+                "pairs": {
+                    "phased": 1,
+                    "total": 1
+                },
+                "name": "ENST00000421016",
+                "variants": {
+                    "phased": 2,
+                    "total": 2
+                }
+            },
+            {
+                "gene": "ENSG00000148019",
+                "pairs": {
+                    "phased": 1,
+                    "total": 1
+                },
+                "name": "ENST00000424347",
+                "variants": {
+                    "phased": 2,
+                    "total": 2
+                }
+            },
+            {
+                "gene": "ENSG00000079974",
+                "pairs": {
+                    "phased": 0,
+                    "total": 1
+                },
+                "name": "ENST00000425098",
+                "variants": {
+                    "phased": 0,
+                    "total": 2
+                }
+            },
+            {
+                "gene": "ENSG00000085276",
+                "pairs": {
+                    "phased": 1,
+                    "total": 1
+                },
+                "name": "ENST00000433243",
+                "variants": {
+                    "phased": 2,
+                    "total": 2
+                }
+            },
+            {
+                "gene": "ENSG00000143970",
+                "pairs": {
+                    "phased": 0,
+                    "total": 1
+                },
+                "name": "ENST00000435504",
+                "variants": {
+                    "phased": 0,
+                    "total": 2
+                }
+            },
+            {
+                "gene": "ENSG00000079974",
+                "pairs": {
+                    "phased": 0,
+                    "total": 1
+                },
+                "name": "ENST00000436958",
+                "variants": {
+                    "phased": 0,
+                    "total": 2
+                }
+            },
+            {
+                "gene": "ENSG00000100271",
+                "pairs": {
+                    "phased": 0,
+                    "total": 1
+                },
+                "name": "ENST00000439248",
+                "variants": {
+                    "phased": 0,
+                    "total": 2
+                }
+            },
+            {
+                "gene": "ENSG00000102081",
+                "pairs": {
+                    "phased": 3,
+                    "total": 6
+                },
+                "name": "ENST00000439526",
+                "variants": {
+                    "phased": 4,
+                    "total": 4
+                }
+            },
+            {
+                "gene": "ENSG00000102081",
+                "pairs": {
+                    "phased": 3,
+                    "total": 6
+                },
+                "name": "ENST00000440235",
+                "variants": {
+                    "phased": 4,
+                    "total": 4
+                }
+            },
+            {
+                "gene": "ENSG00000100271",
+                "pairs": {
+                    "phased": 0,
+                    "total": 1
+                },
+                "name": "ENST00000440761",
+                "variants": {
+                    "phased": 0,
+                    "total": 2
+                }
+            },
+            {
+                "gene": "ENSG00000174989",
+                "pairs": {
+                    "phased": 1,
+                    "total": 1
+                },
+                "name": "ENST00000455858",
+                "variants": {
+                    "phased": 2,
+                    "total": 2
+                }
+            },
+            {
+                "gene": "ENSG00000085276",
+                "pairs": {
+                    "phased": 1,
+                    "total": 1
+                },
+                "name": "ENST00000460814",
+                "variants": {
+                    "phased": 2,
+                    "total": 2
+                }
+            },
+            {
+                "gene": "ENSG00000165480",
+                "pairs": {
+                    "phased": 0,
+                    "total": 1
+                },
+                "name": "ENST00000462482",
+                "variants": {
+                    "phased": 0,
+                    "total": 2
+                }
+            },
+            {
+                "gene": "ENSG00000085276",
+                "pairs": {
+                    "phased": 2,
+                    "total": 2
+                },
+                "name": "ENST00000464456",
+                "variants": {
+                    "phased": 3,
+                    "total": 3
+                }
+            },
+            {
+                "gene": "ENSG00000187607",
+                "pairs": {
+                    "phased": 1,
+                    "total": 1
+                },
+                "name": "ENST00000464847",
+                "variants": {
+                    "phased": 2,
+                    "total": 2
+                }
+            },
+            {
+                "gene": "ENSG00000004455",
+                "pairs": {
+                    "phased": 0,
+                    "total": 1
+                },
+                "name": "ENST00000467905",
+                "variants": {
+                    "phased": 0,
+                    "total": 2
+                }
+            },
+            {
+                "gene": "ENSG00000085276",
+                "pairs": {
+                    "phased": 1,
+                    "total": 1
+                },
+                "name": "ENST00000468789",
+                "variants": {
+                    "phased": 2,
+                    "total": 2
+                }
+            },
+            {
+                "gene": "ENSG00000085276",
+                "pairs": {
+                    "phased": 1,
+                    "total": 1
+                },
+                "name": "ENST00000472280",
+                "variants": {
+                    "phased": 2,
+                    "total": 2
+                }
+            },
+            {
+                "gene": "ENSG00000153187",
+                "pairs": {
+                    "phased": 1,
+                    "total": 1
+                },
+                "name": "ENST00000475997",
+                "variants": {
+                    "phased": 2,
+                    "total": 2
+                }
+            },
+            {
+                "gene": "ENSG00000004455",
+                "pairs": {
+                    "phased": 0,
+                    "total": 1
+                },
+                "name": "ENST00000480134",
+                "variants": {
+                    "phased": 0,
+                    "total": 2
+                }
+            },
+            {
+                "gene": "ENSG00000169894",
+                "pairs": {
+                    "phased": 0,
+                    "total": 3
+                },
+                "name": "ENST00000483366",
+                "variants": {
+                    "phased": 0,
+                    "total": 3
+                }
+            },
+            {
+                "gene": "ENSG00000004455",
+                "pairs": {
+                    "phased": 0,
+                    "total": 1
+                },
+                "name": "ENST00000487289",
+                "variants": {
+                    "phased": 0,
+                    "total": 2
+                }
+            },
+            {
+                "gene": "ENSG00000185565",
+                "pairs": {
+                    "phased": 1,
+                    "total": 1
+                },
+                "name": "ENST00000490035",
+                "variants": {
+                    "phased": 2,
+                    "total": 2
+                }
+            },
+            {
+                "gene": "ENSG00000085276",
+                "pairs": {
+                    "phased": 1,
+                    "total": 1
+                },
+                "name": "ENST00000492586",
+                "variants": {
+                    "phased": 2,
+                    "total": 2
+                }
+            },
+            {
+                "gene": "ENSG00000085276",
+                "pairs": {
+                    "phased": 1,
+                    "total": 1
+                },
+                "name": "ENST00000494292",
+                "variants": {
+                    "phased": 2,
+                    "total": 2
+                }
+            },
+            {
+                "gene": "ENSG00000102081",
+                "pairs": {
+                    "phased": 1,
+                    "total": 1
+                },
+                "name": "ENST00000495717",
+                "variants": {
+                    "phased": 2,
+                    "total": 2
+                }
+            },
+            {
+                "gene": "ENSG00000163590",
+                "pairs": {
+                    "phased": 1,
+                    "total": 1
+                },
+                "name": "ENST00000498165",
+                "variants": {
+                    "phased": 2,
+                    "total": 2
+                }
+            },
+            {
+                "gene": "ENSG00000163453",
+                "pairs": {
+                    "phased": 0,
+                    "total": 2
+                },
+                "name": "ENST00000514062",
+                "variants": {
+                    "phased": 0,
+                    "total": 3
+                }
+            },
+            {
+                "gene": "ENSG00000160882",
+                "pairs": {
+                    "phased": 0,
+                    "total": 1
+                },
+                "name": "ENST00000519285",
+                "variants": {
+                    "phased": 0,
+                    "total": 2
+                }
+            },
+            {
+                "gene": "ENSG00000133316",
+                "pairs": {
+                    "phased": 1,
+                    "total": 1
+                },
+                "name": "ENST00000525239",
+                "variants": {
+                    "phased": 2,
+                    "total": 2
+                }
+            },
+            {
+                "gene": "ENSG00000172893",
+                "pairs": {
+                    "phased": 1,
+                    "total": 1
+                },
+                "name": "ENST00000527316",
+                "variants": {
+                    "phased": 2,
+                    "total": 2
+                }
+            },
+            {
+                "gene": "ENSG00000149115",
+                "pairs": {
+                    "phased": 0,
+                    "total": 1
+                },
+                "name": "ENST00000528882",
+                "variants": {
+                    "phased": 0,
+                    "total": 2
+                }
+            },
+            {
+                "gene": "ENSG00000175216",
+                "pairs": {
+                    "phased": 0,
+                    "total": 1
+                },
+                "name": "ENST00000529230",
+                "variants": {
+                    "phased": 0,
+                    "total": 2
+                }
+            },
+            {
+                "gene": "ENSG00000149115",
+                "pairs": {
+                    "phased": 0,
+                    "total": 1
+                },
+                "name": "ENST00000530920",
+                "variants": {
+                    "phased": 0,
+                    "total": 2
+                }
+            },
+            {
+                "gene": "ENSG00000149115",
+                "pairs": {
+                    "phased": 0,
+                    "total": 1
+                },
+                "name": "ENST00000532437",
+                "variants": {
+                    "phased": 0,
+                    "total": 2
+                }
+            },
+            {
+                "gene": "ENSG00000151503",
+                "pairs": {
+                    "phased": 1,
+                    "total": 1
+                },
+                "name": "ENST00000534532",
+                "variants": {
+                    "phased": 2,
+                    "total": 2
+                }
+            },
+            {
+                "gene": "ENSG00000151503",
+                "pairs": {
+                    "phased": 1,
+                    "total": 1
+                },
+                "name": "ENST00000534548",
+                "variants": {
+                    "phased": 2,
+                    "total": 2
+                }
+            },
+            {
+                "gene": "ENSG00000133316",
+                "pairs": {
+                    "phased": 1,
+                    "total": 1
+                },
+                "name": "ENST00000538098",
+                "variants": {
+                    "phased": 2,
+                    "total": 2
+                }
+            },
+            {
+                "gene": "ENSG00000185565",
+                "pairs": {
+                    "phased": 1,
+                    "total": 1
+                },
+                "name": "ENST00000539563",
+                "variants": {
+                    "phased": 2,
+                    "total": 2
+                }
+            },
+            {
+                "gene": "ENSG00000095777",
+                "pairs": {
+                    "phased": 2,
+                    "total": 2
+                },
+                "name": "ENST00000543632",
+                "variants": {
+                    "phased": 3,
+                    "total": 3
+                }
+            },
+            {
+                "gene": "ENSG00000162433",
+                "pairs": {
+                    "phased": 3,
+                    "total": 3
+                },
+                "name": "ENST00000545314",
+                "variants": {
+                    "phased": 4,
+                    "total": 4
+                }
+            },
+            {
+                "gene": "ENSG00000004455",
+                "pairs": {
+                    "phased": 0,
+                    "total": 1
+                },
+                "name": "ENST00000548033",
+                "variants": {
+                    "phased": 0,
+                    "total": 2
+                }
+            },
+            {
+                "gene": "ENSG00000004455",
+                "pairs": {
+                    "phased": 0,
+                    "total": 1
+                },
+                "name": "ENST00000550338",
+                "variants": {
+                    "phased": 0,
+                    "total": 2
+                }
+            },
+            {
+                "gene": "ENSG00000138593",
+                "pairs": {
+                    "phased": 1,
+                    "total": 1
+                },
+                "name": "ENST00000559471",
+                "variants": {
+                    "phased": 2,
+                    "total": 2
+                }
+            },
+            {
+                "gene": "ENSG00000250120",
+                "pairs": {
+                    "phased": 4,
+                    "total": 4
+                },
+                "name": "ENST00000562220",
+                "variants": {
+                    "phased": 5,
+                    "total": 5
+                }
+            },
+            {
+                "gene": "ENSG00000090857",
+                "pairs": {
+                    "phased": 1,
+                    "total": 1
+                },
+                "name": "ENST00000568530",
+                "variants": {
+                    "phased": 2,
+                    "total": 2
+                }
+            },
+            {
+                "gene": "ENSG00000187607",
+                "pairs": {
+                    "phased": 1,
+                    "total": 1
+                },
+                "name": "ENST00000583566",
+                "variants": {
+                    "phased": 2,
+                    "total": 2
+                }
+            },
+            {
+                "gene": "ENSG00000187607",
+                "pairs": {
+                    "phased": 1,
+                    "total": 1
+                },
+                "name": "ENST00000593105",
+                "variants": {
+                    "phased": 2,
+                    "total": 2
+                }
+            },
+            {
+                "gene": "ENSG00000273079",
+                "pairs": {
+                    "phased": 3,
+                    "total": 3
+                },
+                "name": "ENST00000609686",
+                "variants": {
+                    "phased": 4,
+                    "total": 4
+                }
+            },
+            {
+                "gene": "ENSG00000273136",
+                "pairs": {
+                    "phased": 0,
+                    "total": 3
+                },
+                "name": "ENST00000609741",
+                "variants": {
+                    "phased": 0,
+                    "total": 3
+                }
+            },
+            {
+                "gene": "ENSG00000273136",
+                "pairs": {
+                    "phased": 0,
+                    "total": 3
+                },
+                "name": "ENST00000611287",
+                "variants": {
+                    "phased": 0,
+                    "total": 3
+                }
+            },
+            {
+                "gene": "ENSG00000273136",
+                "pairs": {
+                    "phased": 0,
+                    "total": 1
+                },
+                "name": "ENST00000611702",
+                "variants": {
+                    "phased": 0,
+                    "total": 2
+                }
+            },
+            {
+                "gene": "ENSG00000182606",
+                "pairs": {
+                    "phased": 1,
+                    "total": 1
+                },
+                "name": "ENST00000613405",
+                "variants": {
+                    "phased": 2,
+                    "total": 2
+                }
+            },
+            {
+                "gene": "ENSG00000273540",
+                "pairs": {
+                    "phased": 1,
+                    "total": 1
+                },
+                "name": "ENST00000614907",
+                "variants": {
+                    "phased": 2,
+                    "total": 2
+                }
+            },
+            {
+                "gene": "ENSG00000273136",
+                "pairs": {
+                    "phased": 0,
+                    "total": 1
+                },
+                "name": "ENST00000615145",
+                "variants": {
+                    "phased": 0,
+                    "total": 2
+                }
+            },
+            {
+                "gene": "ENSG00000273136",
+                "pairs": {
+                    "phased": 0,
+                    "total": 1
+                },
+                "name": "ENST00000615219",
+                "variants": {
+                    "phased": 0,
+                    "total": 2
+                }
+            },
+            {
+                "gene": "ENSG00000102081",
+                "pairs": {
+                    "phased": 1,
+                    "total": 1
+                },
+                "name": "ENST00000616382",
+                "variants": {
+                    "phased": 2,
+                    "total": 2
+                }
+            },
+            {
+                "gene": "ENSG00000102081",
+                "pairs": {
+                    "phased": 3,
+                    "total": 6
+                },
+                "name": "ENST00000616614",
+                "variants": {
+                    "phased": 4,
+                    "total": 4
+                }
+            },
+            {
+                "gene": "ENSG00000273136",
+                "pairs": {
+                    "phased": 0,
+                    "total": 3
+                },
+                "name": "ENST00000617913",
+                "variants": {
+                    "phased": 0,
+                    "total": 3
+                }
+            },
+            {
+                "gene": "ENSG00000154080",
+                "pairs": {
+                    "phased": 0,
+                    "total": 111
+                },
+                "name": "ENST00000618847",
+                "variants": {
+                    "phased": 0,
+                    "total": 39
+                }
+            },
+            {
+                "gene": "ENSG00000273136",
+                "pairs": {
+                    "phased": 0,
+                    "total": 1
+                },
+                "name": "ENST00000619748",
+                "variants": {
+                    "phased": 0,
+                    "total": 2
+                }
+            },
+            {
+                "gene": "ENSG00000273136",
+                "pairs": {
+                    "phased": 0,
+                    "total": 3
+                },
+                "name": "ENST00000620612",
+                "variants": {
+                    "phased": 0,
+                    "total": 3
+                }
+            },
+            {
+                "gene": "ENSG00000102081",
+                "pairs": {
+                    "phased": 3,
+                    "total": 6
+                },
+                "name": "ENST00000621453",
+                "variants": {
+                    "phased": 4,
+                    "total": 4
+                }
+            },
+            {
+                "gene": "ENSG00000102081",
+                "pairs": {
+                    "phased": 3,
+                    "total": 6
+                },
+                "name": "ENST00000621987",
+                "variants": {
+                    "phased": 4,
+                    "total": 4
+                }
+            },
+            {
+                "gene": "ENSG00000004455",
+                "pairs": {
+                    "phased": 0,
+                    "total": 1
+                },
+                "name": "ENST00000626911",
+                "variants": {
+                    "phased": 0,
+                    "total": 2
+                }
+            },
+            {
+                "gene": "ENSG00000085276",
+                "pairs": {
+                    "phased": 1,
+                    "total": 1
+                },
+                "name": "ENST00000628990",
+                "variants": {
+                    "phased": 2,
+                    "total": 2
+                }
+            },
+            {
+                "gene": "ENSG00000004455",
+                "pairs": {
+                    "phased": 0,
+                    "total": 1
+                },
+                "name": "ENST00000629371",
+                "variants": {
+                    "phased": 0,
+                    "total": 2
+                }
+            },
+            {
+                "gene": "ENSG00000260220",
+                "pairs": {
+                    "phased": 1,
+                    "total": 1
+                },
+                "name": "ENST00000638797",
+                "variants": {
+                    "phased": 2,
+                    "total": 2
+                }
+            },
+            {
+                "gene": "ENSG00000171936",
+                "pairs": {
+                    "phased": 0,
+                    "total": 1
+                },
+                "name": "ENST00000641646",
+                "variants": {
+                    "phased": 0,
+                    "total": 2
+                }
+            },
+            {
+                "gene": "ENSG00000095777",
+                "pairs": {
+                    "phased": 2,
+                    "total": 2
+                },
+                "name": "ENST00000642197",
+                "variants": {
+                    "phased": 3,
+                    "total": 3
+                }
+            },
+            {
+                "gene": "ENSG00000095777",
+                "pairs": {
+                    "phased": 2,
+                    "total": 2
+                },
+                "name": "ENST00000642920",
+                "variants": {
+                    "phased": 3,
+                    "total": 3
+                }
+            },
+            {
+                "gene": "ENSG00000070182",
+                "pairs": {
+                    "phased": 2,
+                    "total": 2
+                },
+                "name": "ENST00000644917",
+                "variants": {
+                    "phased": 3,
+                    "total": 3
+                }
+            },
+            {
+                "gene": "ENSG00000095777",
+                "pairs": {
+                    "phased": 2,
+                    "total": 2
+                },
+                "name": "ENST00000647478",
+                "variants": {
+                    "phased": 3,
+                    "total": 3
+                }
+            },
+            {
+                "gene": "ENSG00000179796",
+                "pairs": {
+                    "phased": 1,
+                    "total": 1
+                },
+                "name": "ENST00000648296",
+                "variants": {
+                    "phased": 2,
+                    "total": 2
+                }
+            },
+            {
+                "gene": "ENSG00000085276",
+                "pairs": {
+                    "phased": 1,
+                    "total": 1
+                },
+                "name": "ENST00000651503",
+                "variants": {
+                    "phased": 2,
+                    "total": 2
+                }
+            },
+            {
+                "gene": "ENSG00000273136",
+                "pairs": {
+                    "phased": 0,
+                    "total": 3
+                },
+                "name": "ENST00000652444",
+                "variants": {
+                    "phased": 0,
+                    "total": 3
+                }
+            },
+            {
+                "gene": "ENSG00000174989",
+                "pairs": {
+                    "phased": 1,
+                    "total": 1
+                },
+                "name": "ENST00000652555",
+                "variants": {
+                    "phased": 2,
+                    "total": 2
+                }
+            },
+            {
+                "gene": "ENSG00000069424",
+                "pairs": {
+                    "phased": 1,
+                    "total": 1
+                },
+                "name": "ENST00000652845",
+                "variants": {
+                    "phased": 2,
+                    "total": 2
+                }
+            },
+            {
+                "gene": "ENSG00000004455",
+                "pairs": {
+                    "phased": 0,
+                    "total": 1
+                },
+                "name": "ENST00000672715",
+                "variants": {
+                    "phased": 0,
+                    "total": 2
+                }
+            },
+            {
+                "gene": "ENSG00000004455",
+                "pairs": {
+                    "phased": 0,
+                    "total": 1
+                },
+                "name": "ENST00000673291",
+                "variants": {
+                    "phased": 0,
+                    "total": 2
+                }
+            }
+        ],
+        "general": {
+            "transcripts": {
+                "phased": 96,
+                "total": 173
+            },
+            "variants": {
+                "phased": 147,
+                "total": 259
+            },
+            "pairs": {
+                "phased": 84,
+                "total": 244
+            },
+            "genes": {
+                "phased": 63,
+                "total": 97
+            }
+        },
+        "date_created": "2020-07-07T05:57:07.208117+00:00"
+    }
+]

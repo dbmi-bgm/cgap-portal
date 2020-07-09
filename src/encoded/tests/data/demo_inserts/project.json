@@ -1,0 +1,52 @@
+[
+    {
+        "date_created": "2020-07-07T01:18:11.409479+00:00",
+        "aliases": [
+            "hms-dbmi:standards"
+        ],
+        "description": "Project used as collection of most popular datasets",
+        "name": "Community Standards",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "start_date": "2019-05-31",
+        "title": "Community Standards",
+        "pi": "45524d43-01b5-4b71-94c6-32d2d09c1111",
+        "uuid": "f01ff5be-a72d-43bd-afcf-174fa9dcd282",
+        "status": "current",
+        "schema_version": "1",
+        "last_modified": {
+            "date_modified": "2020-07-07T01:18:11.415951+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        }
+    },
+    {
+        "title": "Benchmarking",
+        "pi": "45524d43-01b5-4b71-94c6-32d2d09c1111",
+        "last_modified": {
+            "date_modified": "2020-07-07T05:55:28.015506+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "aliases": [
+            "hms-dbmi:benchmarking"
+        ],
+        "status": "current",
+        "uuid": "9a62ef81-7942-4550-a13c-18a915d70b8d",
+        "start_date": "2019-05-31",
+        "schema_version": "1",
+        "date_created": "2020-07-07T05:55:28.012845+00:00",
+        "name": "Benchmarking"
+    },
+    {
+        "title": "Test Project",
+        "status": "current",
+        "last_modified": {
+            "date_modified": "2020-07-08T17:24:14.032055+00:00",
+            "modified_by": "3202fd57-44d2-44fb-a131-afb1e43d8ae5"
+        },
+        "name": "hms-dbmi",
+        "description": "This is a test project",
+        "schema_version": "1",
+        "uuid": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "date_created": "2020-07-06T23:45:41.001732+00:00"
+    }
+]

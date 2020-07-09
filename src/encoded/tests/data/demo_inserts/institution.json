@@ -1,0 +1,48 @@
+[
+    {
+        "title": "Bioinformatics Core, HMS",
+        "pi": "1d524d43-01b5-4b71-94c6-32d2d09c8323",
+        "last_modified": {
+            "date_modified": "2020-07-07T01:21:39.088410+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "uuid": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "aliases": [
+            "hms-dbmi:bioinformatics_core"
+        ],
+        "status": "current",
+        "contact_persons": [
+            "1d524d43-01b5-4b71-94c6-32d2d09c8323"
+        ],
+        "date_created": "2020-07-07T01:21:39.083512+00:00",
+        "schema_version": "1",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "name": "Bioinformatics Core"
+    },
+    {
+        "schema_version": "1",
+        "name": "hms-dbmi",
+        "address1": "Biomedical Bioinfomatics",
+        "status": "current",
+        "phone2": "000-000-0000",
+        "phone1": "000-000-0000",
+        "state": "MA",
+        "title": "HMS DBMI",
+        "pi": "986b362f-4eb6-4a9c-8173-3ab267307e3a",
+        "last_modified": {
+            "date_modified": "2020-07-08T17:24:14.082828+00:00",
+            "modified_by": "3202fd57-44d2-44fb-a131-afb1e43d8ae5"
+        },
+        "fax": "000-000-0000",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "address2": "10 Schattuck Street",
+        "contact_persons": [
+            "986b362f-4eb6-4a9c-8173-3ab267307e3a"
+        ],
+        "city": "Boston",
+        "date_created": "2020-07-06T23:45:41.074285+00:00",
+        "postal_code": "02115",
+        "uuid": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "country": "USA"
+    }
+]
