@@ -66,7 +66,7 @@ def xls_to_json(xls_data, project, institution):
     counter = 0
     for values in row:
         r = [val for val in values]
-        row_dict = {keys[i].lower(): item for i, item in enumerate(r)}
+        row_dict = {keys[i].lower().rstrip('*'): item for i, item in enumerate(r)}
         rows.append(row_dict)
 
     items = {
@@ -154,26 +154,40 @@ def fetch_sample_metadata(row, items, indiv_alias, samp_alias, sp_alias, analysi
         'workup_type': row.get('workup type'),
         'specimen_type': row.get('specimen type'),
         'specimen_collection_date': row.get('date collected'),
-        'specimen_collection_location': row.get('location collected'),
+        # change collection location to stored location?
+        'specimen_collection_location': row.get('location stored'),
         'specimen_accession': row['specimen id'],
+        # second specimen id
         'date_transported': row.get('date transported'),
         'transported_by': row.get('transport method'),
         'sent_by': row.get('sent by'),
+        # sequencing ref lab
         'date_received': row.get("date rec'd at ref lab"),
         'specimen_accepted': row.get('specimen accepted by ref lab'),
+        # sample ID by ref lab
         'dna_concentration': row.get('dna concentration'),
-        'specimen_notes': row.get('specimen notes')
+        'specimen_notes': row.get('specimen notes'),
+        'files': [],  # TODO: implement creation of file db items
+        'requisition_type': row.get('req type'),
+        # research protocol name
+        'date_requisition_received': row.get("date req rec'd"),
+        'ordering_physician': row.get('physician/provider'),
+        'physician_id': row.get('physician id'),
+        'indication': row.get('indication')
     }
+    req_info = {
+        'accepted_rejected': row.get('req accepted y/n'),
+        'rejection_reason': row.get('reason rejected'),
+        'corrective_action': row.get('corrective action taken'),
+        # corrective action taken by
+        'date_sent': row.get('date sent'),
+        'date_completed': row.get('date completed'),
+        'notes': row.get('correction notes')
+    }
+    info['requisition_acceptance'] = {k, v for k, v in req_info.items() if v}
     new_items['sample'][samp_alias] = {k: v for k, v in info.items() if v}
     if indiv_alias in new_items['individual']:
         new_items['individual'][indiv_alias]['samples'] = [samp_alias]
-    # create SampleProcessing item for that one sample if needed
-    # if row['report required'].lower() in ['yes', 'y']:
-    #     new_items['sample_processing'][sp_alias] = {
-    #         'aliases': [sp_alias],
-    #         'analysis_type': row['workup type'],
-    #         'samples': [samp_alias]
-    #     }
     new_sp_item = {
         # not trivial to add analysis_type here, turn into calculated property
         'aliases': [analysis_alias],
@@ -188,6 +202,20 @@ def fetch_sample_metadata(row, items, indiv_alias, samp_alias, sp_alias, analysi
     if fam_alias not in new_items['sample_processing'][analysis_alias]['families']:
         new_items['sample_processing'][analysis_alias]['families'].append(fam_alias)
     return new_items
+
+
+# TODO: finish implementing this function
+def fetch_file_metadata(filenames):
+    files = []
+    for filename in filenames:
+        file_info = {
+            'aliases': [],
+            'file_format': '',
+            'file_type': '',
+            'filename': ''
+        }
+        files.append(file_info)
+    raise NotImplementedError
 
 
 def create_case_items(items, proj_name):
@@ -209,7 +237,6 @@ def create_case_items(items, proj_name):
                 'individual': indiv
             }
             if sample in items['reports']:
-                print('2')
                 report_alias = case_alias.replace('case', 'report')
                 new_items['report'][report_alias] = {
                     'aliases': [report_alias],
