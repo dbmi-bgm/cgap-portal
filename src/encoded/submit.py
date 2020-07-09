@@ -76,7 +76,7 @@ def xls_to_json(xls_data, project, institution):
     specimen_ids = {}
     for row in rows:
         indiv_alias = '{}:individual-{}'.format(project['name'], row['patient id'])
-        fam_alias = '{}:family-{}'.format(project['name'], row['family id'])
+        fam_alias = '{}:family-{}'.format(project['name'], row['patient id'])
         sp_alias = '{}:sampleproc-{}'.format(project['name'], row['specimen id'])
         # create items for Individual
         items = fetch_individual_metadata(row, items, indiv_alias)
