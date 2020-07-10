@@ -62,7 +62,7 @@ def main():
     """ Entry point for this command """
     logging.basicConfig()
 
-    parser = argparse.ArgumentParser(  # noqa - PyCharm wrongly thinks the formatter_class is invalid
+    parser = argparse.ArgumentParser(  # noqa - PyCharm wrongly thinks the formatter_class is specified wrong here.
         description='Clear an item type out of metadata storage',
         epilog=EPILOG,
         formatter_class=argparse.RawDescriptionHelpFormatter
