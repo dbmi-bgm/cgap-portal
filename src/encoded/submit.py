@@ -12,11 +12,36 @@ import json
 import xlrd
 
 
-BGM_FIELD_MAPPING = {
-    'bcgg-id': 'patient id',
-    'bcgg-f-id': 'family id',
-    "date req rec'd": 'date requisition received'
+GENERIC_FIELD_MAPPING = {
+    'individual': {'patient id': 'individual_id'},
+    'family': {},
+    'sample': {
+        'date collected': 'specimen_collection_date',
+        'location stored': 'specimen_storage_location',
+        'specimen id': 'specimen_accession',
+        'transport method': 'transported_by',
+        'sequencing ref lab': 'sequencing_lab',
+        "date rec'd at ref lab": 'date_received',
+        'specimen accepted by ref lab': 'specimen_accepted',
+        'sample id by ref lab': 'sequence_id',
+        'req type': 'requisition_type',
+        "date req rec'd": 'date_requisition_received',
+        'physician/provider': 'ordering_physician'
+    },
+    'requisition': {
+        'req accepted y/n': 'accepted_rejected',
+        'reason rejected': 'rejection_reason',
+        'corrective action taken': 'corrective_action',
+        'corrective action taken by': 'action_taken_by',
+        'correction notes': 'notes'
+    }
 }
+
+# BGM_FIELD_MAPPING = {
+#     'bcgg-id': 'patient id',
+#     'bcgg-f-id': 'family id',
+#     "date req rec'd": 'date requisition received'
+# }
 
 
 POST_ORDER = ['sample', 'individual', 'family', 'sample_processing', 'report', 'case']
@@ -49,6 +74,15 @@ def submit_data(context, request):
     }
 
     raise NotImplementedError
+
+
+def map_fields(row, metadata_dict, addl_fields, item_type):
+    for map_field in GENERIC_FIELD_MAPPING[item_type]:
+        if map_field in row:
+            metadata_dict[GENERIC_FIELD_MAPPING[item_type][map_field]] = row.get(map_field)
+    for field in addl_fields:
+        metadata_dict[field.replace('_', ' ')] = row.get(field)
+    return metadata_dict
 
 
 def xls_to_json(xls_data, project, institution):
@@ -113,18 +147,15 @@ def xls_to_json(xls_data, project, institution):
 
 def fetch_individual_metadata(row, items, indiv_alias, inst_name):
     new_items = items.copy()
-    info = {
-        'aliases': [indiv_alias],
-        'individual_id': row['patient id'],
-        'sex': row.get('sex'),
-    }
+    info = {'aliases': [indiv_alias]}
+    info = map_fields(row, info, ['sex', 'age', 'birth_year'], 'individual')
     if row.get('other individual id'):
         other_id = {'id': row['other individual id'], 'id_source': inst_name}
         if row.get('other individual id type'):
             other_id['id_source'] = row['other individual id source']
         info['institutional_id'] = other_id
-    info['age'] = int(row['age']) if row.get('age') else None
-    info['birth_year'] = int(row['birth year']) if row.get('birth year') else None
+    info['age'] = int(info['age']) if info.get('age') else None
+    info['birth_year'] = int(info['birth year']) if info.get('birth year') else None
     if indiv_alias not in new_items['individual']:
         new_items['individual'][indiv_alias] = {k: v for k, v in info.items() if v}
     else:
@@ -155,44 +186,18 @@ def fetch_family_metadata(row, items, indiv_alias, fam_alias):
 
 def fetch_sample_metadata(row, items, indiv_alias, samp_alias, analysis_alias, fam_alias, proj_name):
     new_items = items.copy()
-    info = {
-        'aliases': [samp_alias],
-        'workup_type': row.get('workup type'),
-        'specimen_type': row.get('specimen type'),
-        'specimen_collection_date': row.get('date collected'),
-        'specimen_storage_location': row.get('location stored'),
-        'specimen_accession': row['specimen id'],
-        'date_transported': row.get('date transported'),
-        'transported_by': row.get('transport method'),
-        'sent_by': row.get('sent by'),
-        'sequencing_lab': row.get('sequencing ref lab'),
-        'date_received': row.get("date rec'd at ref lab"),
-        'specimen_accepted': row.get('specimen accepted by ref lab'),
-        'sequence_id': row.get('sample id by ref lab'),
-        'dna_concentration': row.get('dna concentration'),
-        'specimen_notes': row.get('specimen notes'),
-        'files': [],  # TODO: implement creation of file db items
-        'requisition_type': row.get('req type'),
-        'research_protocol_name': row.get('research protocol name')
-        'date_requisition_received': row.get("date req rec'd"),
-        'ordering_physician': row.get('physician/provider'),
-        'physician_id': row.get('physician id'),
-        'indication': row.get('indication')
-    }
+    info = {'aliases': [samp_alias], 'files': []}  # TODO: implement creation of file db items
+    fields = [
+        'workup_type', 'specimen_type', 'dna_concentration', 'date_transported',
+        'specimen_notes', 'research_protocol_name', 'sent_by', 'physician_id', 'indication'
+    ]
+    info = map_fields(row, info, fields, 'sample')
     if row.get('second specimen id'):
         other_id = {'id': row['second specimen id'], 'id_type': proj_name}  # add proj info?
         if row.get('second specimen id type'):
             other_id['id_type'] = row['second specimen id type']
         info['other_specimen_ids'] = [other_id]
-    req_info = {
-        'accepted_rejected': row.get('req accepted y/n'),
-        'rejection_reason': row.get('reason rejected'),
-        'corrective_action': row.get('corrective action taken'),
-        'action_taken_by': row.get('corrective action taken by')
-        'date_sent': row.get('date sent'),
-        'date_completed': row.get('date completed'),
-        'notes': row.get('correction notes')
-    }
+    req_info = map_fields(row, {}, ['date sent', 'date completed'], 'requisition')
     info['requisition_acceptance'] = {k, v for k, v in req_info.items() if v}
     new_items['sample'][samp_alias] = {k: v for k, v in info.items() if v}
     if indiv_alias in new_items['individual']:
