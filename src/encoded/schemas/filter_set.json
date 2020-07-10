@@ -4,7 +4,7 @@
     "id": "/profiles/filter_set.json",
     "$schema": "http://json-schema.org/draft-04/schema#",
     "type": "object",
-    "required": ["institution", "project"],
+    "required": ["institution", "project", "title"],
     "identifyingProperties": ["uuid", "aliases"],
     "additionalProperties": false,
     "mixinProperties": [
@@ -22,6 +22,11 @@
         "schema_version": {
             "default": "1"
         },
+        "title": {
+            "title": "Title",
+            "description": "Title for this filter set",
+            "type": "string"
+        },
         "search_type": {
             "title": "Item Type",
             "description": "Item type that the filter set will work on.",
@@ -37,22 +42,50 @@
                 "title": "Filter Block",
                 "type": "object",
                 "properties": {
+                    "name": {
+                        "title": "Name",
+                        "type": "string",
+                        "description": "Name of the filter block"
+                    },
                     "query": {
                         "title": "Single query",
+                        "description": "URL Query string",
                         "type": "string"
                     },
-                    "flag_applied": {
-                        "title": "Flag applied",
-                        "description": "Whether or not this filter_block is toggled",
-                        "type": "boolean"
+                    "flags_applied": {
+                        "title": "Flags applied",
+                        "description": "Flag names that will be applied to this filter block",
+                        "type": "array",
+                        "uniqueItems": true,
+                        "items": {
+                            "title": "Flag",
+                            "type": "string"
+                        }
                     }
                 }
             }
         },
         "flags": {
             "title": "Flags",
-            "description": "Query filter to apply globally on this filter set.",
-            "type": "string"
+            "description": "Flags that will be applied to filter blocks with name mapping.",
+            "type": "array",
+            "uniqueItems": true,
+            "items": {
+                "title": "Flag",
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "title": "Name",
+                        "type": "string",
+                        "description": "Name of the flag"
+                    },
+                    "query": {
+                        "title": "Single query",
+                        "description": "URL Query string",
+                        "type": "string"
+                    }
+                }
+            }
         }
     }
 }
