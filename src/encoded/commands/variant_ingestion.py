@@ -152,11 +152,10 @@ def main():
     try:
         if not args.skip_mp:
             run_variant_table_intake(app_handle, args)
-        #import pdb; pdb.set_trace()
         run_ingest_vcf(app_handle, args)
         exit(0)
     except Exception as e:
-        logger.error('Got exception in variant ingestion: %s' % str(e))
+        logger.error('Got exception in variant ingestion: %s' % e)
     # XXX: Catch more exceptions
     exit(1)
 

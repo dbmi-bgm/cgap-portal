@@ -1,15 +1,23 @@
 import pytest
+import requests   # XXX: C4-211 this should NOT be necessary - there is a bug somewhere
 import time
 import mock
 import datetime
 from uuid import uuid4
-from ..ingestion_listener import IngestionQueueManager, gunzip_content, run
+from ..ingestion_listener import IngestionQueueManager, run, IngestionListener
 from .variant_fixtures import gene_workbook
 
 
 QUEUE_INGESTION_URL = '/queue_ingestion'
 INGESTION_STATUS_URL = '/ingestion_status'
 MOCKED_ENV = 'fourfront-cgapother'
+
+
+def await_for_queue_to_catch_up(n):
+    """ Wait until queue has done the things we told it to do. Right now this just sleeps for 10 seconds
+        assuming most operations should complete within that amount of time.
+    """
+    time.sleep(10)
 
 
 @pytest.yield_fixture(scope='function', autouse=True)
@@ -40,7 +48,7 @@ def test_ingestion_queue_add_and_receive(setup_and_teardown_sqs_state):
     queue_manager.add_uuids([
         str(uuid4()), str(uuid4())
     ])
-    time.sleep(10)
+    await_for_queue_to_catch_up(0)
     msgs = queue_manager.receive_messages()
     assert len(msgs) == 2
 
@@ -55,9 +63,23 @@ def test_ingestion_queue_add_via_route(setup_and_teardown_sqs_state, testapp):
     response = testapp.post_json(QUEUE_INGESTION_URL, request_body).json
     assert response['notification'] == 'Success'
     assert response['number_queued'] == 2
-    time.sleep(10)
+    await_for_queue_to_catch_up(0)
     msgs = queue_manager.receive_messages()
     assert len(msgs) >= 2
+
+
+def test_ingestion_queue_delete(setup_and_teardown_sqs_state, testapp):
+    """ Tests deleting messages from SQS results in no messages being there. """
+    queue_manager = setup_and_teardown_sqs_state
+    request_body = {
+        'uuids': [str(uuid4()), str(uuid4())],
+        'override_name': MOCKED_ENV + '-vcfs'
+    }
+    testapp.post_json(QUEUE_INGESTION_URL, request_body, status=200)
+    msgs = queue_manager.receive_messages()
+    failed = queue_manager.delete_messages(msgs)
+    assert failed == []
+    await_for_queue_to_catch_up(0)
 
 
 @pytest.fixture
@@ -90,11 +112,10 @@ def mocked_vcf_file(vcf_file_format, testapp, project, institution):
 @pytest.mark.integrated  # uses s3
 def test_posting_vcf_processed_file(testapp, mocked_vcf_file):
     """ Posts a dummy vcf file """
-    import requests  # XXX: C4-211 this should NOT be necessary - there is a bug somewhere
     file_meta = mocked_vcf_file['@graph'][0]
     file_location = testapp.get(file_meta['href']).location  # if you .follow() this you get 404 erroneously
     content = requests.get(file_location).content
-    raw_vcf_file = gunzip_content(content)
+    raw_vcf_file = IngestionListener.gunzip_content(content)
     assert "##fileformat=VCFv4.2" in raw_vcf_file
 
 
@@ -106,17 +127,18 @@ def test_ingestion_listener_run(testapp, mocked_vcf_file, gene_workbook, setup_a
     uuid = file_meta['uuid']
     queue_manager = setup_and_teardown_sqs_state
     queue_manager.add_uuids([uuid])
-    time.sleep(5)
+    await_for_queue_to_catch_up(0)
 
     # configure run for 10 seconds
     start_time = datetime.datetime.utcnow()
     end_delta = datetime.timedelta(seconds=10)
 
-    def mocked_should_remain_online():
+    def mocked_should_remain_online(ignore):
         current_time = datetime.datetime.utcnow()
         return current_time < (start_time + end_delta)
 
     # XXX: This is a really hard thing to test, but take my word for it that this is doing "something" -Will
-    with mock.patch('encoded.ingestion_listener.should_remain_online', new=mocked_should_remain_online):
+    with mock.patch('encoded.ingestion_listener.IngestionListener.should_remain_online',
+                    new=mocked_should_remain_online):
         with pytest.raises(ValueError):
             run(testapp, _queue_manager=queue_manager)  # expected in this test since the source VCF is malformed

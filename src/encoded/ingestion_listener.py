@@ -53,6 +53,15 @@ def ingestion_status(context, request):
     }
 
 
+def patch_vcf_file_status(uuids):
+    """ Patches VCF File status to 'Queued'
+        NOTE: This process makes queue_ingestion not scale terribly well.
+              Batching above a certain number may result in 504.
+    """
+    for uuid in uuids:
+        pass  # XXX: How to best do this safely within a route? Async?
+
+
 @view_config(route_name='queue_ingestion', request_method='POST', permission='index')
 @debug_log
 def queue_ingestion(context, request):
@@ -75,6 +84,7 @@ def queue_ingestion(context, request):
         response['notification'] = 'Success'
         response['number_queued'] = len(uuids)
         response['detail'] = 'Successfully queued the following uuids: %s' % uuids
+        patch_vcf_file_status(uuids)  # XXX: does nothing currently
     else:
         response['number_queued'] = len(uuids) - len(failed)
         response['detail'] = 'Some uuids failed: %s' % failed
@@ -93,10 +103,7 @@ class IngestionQueueManager:
 
     def __init__(self, registry, override_name=None):
         """ Does initial setup for interacting with SQS """
-        self.send_batch_size = 10
-        self.receive_batch_size = 10
-        self.delete_batch_size = 10
-        self.replace_batch_size = 10
+        self.batch_size = 10
         self.env_name = registry.settings.get('env.name', None)
         if not self.env_name:  # replace with something usable
             backup = socket.gethostname()[:80].replace('.', '-')
@@ -109,16 +116,15 @@ class IngestionQueueManager:
         self.queue_attrs = {
             self.queue_name: {
                 'DelaySeconds': '1',  # messages initially invisible for 1 sec
-                'VisibilityTimeout': '600',
-                'MessageRetentionPeriod': '1209600',  # 14 days, in seconds
-                'ReceiveMessageWaitTimeSeconds': '2',  # 2 seconds of long polling
+                'VisibilityTimeout': '600',  # 10 mins
+                'MessageRetentionPeriod': '604800',  # 7 days, in seconds
+                'ReceiveMessageWaitTimeSeconds': '5',  # 5 seconds of long polling
             }
         }
         self.queue_url = self._initialize()
 
     def _initialize(self):
         """ Initializes the actual queue - helper method for init """
-        queue_url = None
         try:
             response = self.client.create_queue(
                 QueueName=self.queue_name,
@@ -147,8 +153,8 @@ class IngestionQueueManager:
 
         :param msgs: list of messages to be chunked
         """
-        for i in range(0, len(msgs), self.send_batch_size):
-            yield msgs[i:i + self.send_batch_size]
+        for i in range(0, len(msgs), self.batch_size):
+            yield msgs[i:i + self.batch_size]
 
     def _send_messages(self, msgs, retries=3):
         """ Sends msgs to the ingestion queue.
@@ -181,6 +187,33 @@ class IngestionQueueManager:
                     if msgs_to_retry:
                         failed_messages = self._send_messages(msgs_to_retry, retries=retries - 1)
             failed.extend(failed_messages)
+        return failed
+
+    def delete_messages(self, messages):
+        """
+        Called after a message has been successfully received and processed.
+        Removes message from the queue.
+        Splits messages into a batch size given by self.delete_batch_size.
+        Input should be the messages directly from receive messages. At the
+        very least, needs a list of messages with 'Id' and 'ReceiptHandle'.
+
+        Returns a list with any failed attempts.
+        """
+        failed = []
+        for batch in self._chunk_messages(messages):
+            # need to change message format, since deleting takes slightly
+            # different fields what's return from receiving
+            for i in range(len(batch)):
+                to_delete = {
+                    'Id': batch[i]['MessageId'],
+                    'ReceiptHandle': batch[i]['ReceiptHandle']
+                }
+                batch[i] = to_delete
+            response = self.client.delete_message_batch(
+                QueueUrl=self.queue_url,
+                Entries=batch
+            )
+            failed.extend(response.get('Failed', []))
         return failed
 
     def add_uuids(self, uuids):
@@ -218,7 +251,7 @@ class IngestionQueueManager:
         """ Returns an array of messages, if any that are waiting """
         response = self.client.receive_message(
             QueueUrl=self.queue_url,
-            MaxNumberOfMessages=self.receive_batch_size
+            MaxNumberOfMessages=self.batch_size
         )
         return response.get('Messages', [])
 
@@ -230,60 +263,134 @@ class IngestionQueueManager:
         """
         while True:
             messages = self.receive_messages()
+            self.delete_messages(messages)
             if len(messages) == 0:
                 break
 
 
-def should_remain_online(override=None):
-    """ A function that says whether 'run' should continue. This is provided because it
-        can be mocked in testing.
+class IngestionListener:
+    """ Organizes helper functions for the ingestion listener """
+    STATUS_QUEUED = 'Queued'
+    STATUS_INGESTED = 'Ingested'
 
-        :param override: a lambda that will execute when evaluating if specified
-        :return: True if should stay running, False otherwise
-    """
-    if not override:
-        return True
-    return override()
+    def __init__(self, vapp, _queue_manager=None, _update_status=None):
+        self.vapp = vapp
 
+        # Get queue_manager
+        registry = None
+        if isinstance(self.vapp, webtest.TestApp):  # if in testing
+            registry = self.vapp.app.registry
+        elif isinstance(self.vapp, VirtualApp):  # if in production
+            registry = self.vapp.wrapped_app.app.registry
+        elif _queue_manager is None:  # if we got here, we cannot succeed in starting
+            raise Exception('Bad arguments given to IngestionListener: %s, %s, %s' %
+                            (self.vapp, _queue_manager, _update_status))
+        self.queue_manager = IngestionQueueManager(registry) if not _queue_manager else _queue_manager
+        self.update_status = _update_status
 
-def gunzip_content(content):
-    """ Helper that will gunzip content """
-    f_in = BytesIO()
-    f_in.write(content)
-    f_in.seek(0)
-    with gzip.GzipFile(fileobj=f_in, mode='rb') as f:
-        gunzipped_content = f.read()
-    return gunzipped_content.decode('utf-8')
+    @staticmethod
+    def should_remain_online(override=None):
+        """ A function that says whether 'run' should continue. This is provided because it
+            can be mocked in testing.
 
+            :param override: a lambda that will execute when evaluating if specified
+            :return: True if should stay running, False otherwise
+        """
+        if not override:
+            return True
+        return override()
 
-def run(vapp=None, _queue_manager=None, update_status=None):
-    """ Entry-point for the ingestion listener. """
-    log.info('Ingestion Listener starting...')
+    @staticmethod
+    def gunzip_content(content):
+        """ Helper that will gunzip content """
+        f_in = BytesIO()
+        f_in.write(content)
+        f_in.seek(0)
+        with gzip.GzipFile(fileobj=f_in, mode='rb') as f:
+            gunzipped_content = f.read()
+        return gunzipped_content.decode('utf-8')
 
-    # ensure ES is up to date. Note that this operation in effect SLOWS Elasticsearch
-    # we should investigate whether this is really necessary -Will 06/30/2020
-    # es = vapp.app.registry[ELASTIC_SEARCH]
-    # es.info()
+    def get_messages(self):
+        """ Sleeps (as to not hit SQS too frequently) then requests messages,
+            returning the result bodies.
 
-    # Acquire registry
-    registry = None
-    if isinstance(vapp, webtest.TestApp):  # if in testing
-        registry = vapp.app.registry
-    elif isinstance(vapp, VirtualApp):  # if in production
-        registry = vapp.wrapped_app.app.registry
-    elif _queue_manager is None:  # if we got here, we cannot succeed in starting
-        raise Exception('Bad arguments given to run: %s, %s, %s' % (vapp, _queue_manager, update_status))
+            NOTE: THIS FUNCTION SHOULD NOT BE USED OUTSIDE OF THIS CODE SINCE
+            IT BLOCKS FOR RATE LIMITING REASONS
 
-    queue_manager = IngestionQueueManager(registry) if not _queue_manager else _queue_manager
-    log.info('Ingestion listener successfully online.')
-    while should_remain_online():
-        log.info('Polling for messages...')
-        n_waiting, _ = queue_manager.get_counts()
-        if n_waiting == 0:
-            time.sleep(DEFAULT_INTERVAL)
-        else:
-            log.info('Trying to get messages...')
-            messages = queue_manager.receive_messages()
+        :return: messages available on SQS
+        """
+        time.sleep(DEFAULT_INTERVAL)  # sleep here before polling again
+        return self.queue_manager.receive_messages()
+
+    def delete_messages(self, messages):
+        """ Deletes messages from SQS (after they have been processed). Does not return
+            anything but will log if messages fail deletion.
+
+        :param messages: messages to be deleted
+        """
+        failed = self.queue_manager.delete_messages(messages)
+        while True:
+            tries = 3
+            if failed:
+                if tries > 0:
+                    failed = self.queue_manager.delete_messages(failed)  # try again
+                    tries -= 1
+                else:
+                    log.error('Failed to delete messages from SQS: %s' % failed)
+                    break
+            else:
+                break
+
+    def post_variants_and_variant_samples(self, parser, file_meta):
+        """ Posts variants and variant_sample items given the parser and relevant
+            file metadata.
+
+        :param parser: VCFParser to be used
+        :param file_meta: metadata for the processed VCF file
+        :return: 2-tuple of successful, failed number of posts
+        """
+        success, error = 0, 0
+        for idx, record in enumerate(parser):
+            log.info('Attempting parse on record %s' % record)
+            try:
+                variant = parser.create_variant_from_record(record)
+                variant['project'] = file_meta['project']['uuid']
+                variant['institution'] = file_meta['institution']['uuid']
+                parser.format_variant_sub_embedded_objects(variant)
+                [res] = self.vapp.post_json('/variant', variant, status=201).json['@graph']
+                success += 1
+            except Exception as e:  # ANNOTATION spec validation error, recoverable
+                log.error('Encountered exception posting variant at row %s: %s ' % (idx, e))
+                error += 1
+                continue
+            variant_samples = parser.create_sample_variant_from_record(record)
+            for sample in variant_samples:
+                try:
+                    sample['project'] = file_meta['project']['uuid']
+                    sample['institution'] = file_meta['institution']['uuid']
+                    sample['variant'] = res['@id']  # make links
+                    sample['file'] = file_meta['uuid']
+                    self.vapp.post_json('/variant_sample', sample, status=201)
+                    success += 1
+                except Exception as e:
+                    log.error('Encountered exception posting variant_sample at row %s: %s' % (idx, e))
+                    error += 1
+                    continue
+        return success, error
+
+    def run(self):
+        """ Main process for this class. Runs forever doing ingestion as needed.
+
+            HIGH LEVEL LOGIC:
+                while True:
+                    while there are messages available:
+                        for each message:
+                            download, decompress, ingest, patch file status to "Ingested"
+                        delete processed messages
+        """
+        log.info('Ingestion listener successfully online.')
+        while self.should_remain_online():
+            messages = self.get_messages()  # wait here
 
             # ingest each VCF file
             for message in messages:
@@ -293,58 +400,50 @@ def run(vapp=None, _queue_manager=None, update_status=None):
 
                 # locate file meta data
                 try:
-                    file_meta = vapp.get('/' + uuid).follow().json
-                    location = vapp.get(file_meta['href']).location
+                    file_meta = self.vapp.get('/' + uuid).follow().json
+                    location = self.vapp.get(file_meta['href']).location
                     log.info('Got vcf location: %s' % location)
                 except Exception as e:
                     log.error('Could not locate uuid: %s with error: %s' % (uuid, e))
                     continue
 
+                # if this file has been ingested, do not do anything with this message
+                if file_meta['file_ingestion_status'] == self.STATUS_INGESTED:
+                    continue
+
                 # attempt download with workaround
                 try:
-                    import requests  # XXX: C4-211 should not be needed but is
-                    raw_content = requests.get(location).content
+                    from requests import get  # XXX: C4-211 should not be needed but is
+                    raw_content = get(location).content
                 except Exception as e:
                     log.error('Could not download file uuid: %s with error: %s' % (uuid, e))
                     continue
 
                 # gunzip content, pass to parser, post variants/variant_samples
-                decoded_content = gunzip_content(raw_content)
+                decoded_content = self.gunzip_content(raw_content)
                 log.info('Got decoded content: %s' % decoded_content[:20])
                 parser = VCFParser(None, VARIANT_SCHEMA, VARIANT_SAMPLE_SCHEMA,
                                    reader=Reader(fsock=decoded_content.split('\n')))
-                success, error = 0, 0
-                for idx, record in enumerate(parser):
-                    log.info('Attempting parse on record %s' % record)
-                    try:
-                        variant = parser.create_variant_from_record(record)
-                        variant['project'] = file_meta['project']['uuid']
-                        variant['institution'] = file_meta['institution']['uuid']
-                        parser.format_variant_sub_embedded_objects(variant)
-                        res = vapp.post_json('/variant', variant, status=201).json['@graph'][
-                            0]  # only one item posted
-                        success += 1
-                    except Exception as e:  # ANNOTATION spec validation error, recoverable
-                        log.error('Encountered exception posting variant at row %s: %s ' % (idx, e))
-                        error += 1
-                        continue
-                    variant_samples = parser.create_sample_variant_from_record(record)
-                    for sample in variant_samples:
-                        try:
-                            sample['project'] = file_meta['project']['uuid']
-                            sample['institution'] = file_meta['institution']['uuid']
-                            sample['variant'] = res['@id']  # make links
-                            sample['file'] = file_meta['uuid']
-                            vapp.post_json('/variant_sample', sample, status=201)
-                        except Exception as e:
-                            log.error('Encountered exception posting variant_sample at row %s: %s' % (idx, e))
-                            error += 1
-                            continue
+                success, error = self.post_variants_and_variant_samples(parser, file_meta)
+                if error > 0:
+                    log.error('Some VCF rows for uuid %s failed to post - not marking VCF '
+                              'as ingested.' % uuid)
+                else:
+                    self.vapp.patch_json('/' + uuid, {'file_ingestion_status': 'Ingested'})
                 msg = ('INGESTION_REPORT:\n'
                        'Success: %s\n'
-                       'Error: %s\n')
+                       'Error: %s\n' % (success, error))
                 log.error(msg)  # so we can grep error_log for INGESTION_REPORT
-                update_status(msg=msg)
+                self.update_status(msg=msg)
+
+            # delete messages from queue that have been processed.
+            self.delete_messages(messages)
+
+
+def run(vapp=None, _queue_manager=None, _update_status=None):
+    """ Entry-point for the ingestion listener. """
+    ingestion_listener = IngestionListener(vapp, _queue_manager=_queue_manager, _update_status=_update_status)
+    ingestion_listener.run()
 
 
 class ErrorHandlingThread(threading.Thread):
@@ -401,7 +500,7 @@ def composite(loader, global_conf, **settings):
         'REMOTE_USER': username,
     }
     vapp = VirtualApp(app, environ)
-    timestamp = datetime.datetime.now().isoformat()
+    timestamp = datetime.datetime.utcnow().isoformat()
     status_holder = {
         'status': {
             'status': 'starting listener',

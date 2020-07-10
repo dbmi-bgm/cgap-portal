@@ -101,7 +101,7 @@ class Variant(Item):
             properties['REF'],
             properties['ALT']
         )
-        return super(Item, cls).create(registry, uuid, properties, sheets)
+        return super().create(registry, uuid, properties, sheets)
 
     @calculated_property(schema={
         "title": "Display Title",
@@ -134,7 +134,7 @@ class VariantSample(Item):
             properties['variant'],
             properties['file']
         )
-        return super(Item, cls).create(registry, uuid, properties, sheets)
+        return super().create(registry, uuid, properties, sheets)
 
     @calculated_property(schema={
         "title": "Display Title",
@@ -175,7 +175,10 @@ class VariantSample(Item):
     def AF(self, AD):
         if AD:
             ref, alt = AD.split(',')
-            denominator = int(ref) + int(alt)
+            try:
+                denominator = int(ref) + int(alt)
+            except Exception:
+                raise ValueError('Bad value for AD (used to calculate AF): %s' % AD)
             if denominator == 0:
                 return 0.0
             return round(int(alt) / (int(ref) + int(alt)), 3)  # round to 3 digits
@@ -210,21 +213,3 @@ def download(context, request):
 
     # 307 redirect specifies to keep original method
     raise HTTPTemporaryRedirect(location=location)
-
-
-@view_config(name='variant_ingestion', context=Variant.Collection,
-             request_method='POST', permission='add')
-@debug_log
-def variant_ingestion(context, request):
-    """
-        Variant Ingestion API
-
-        Processes all, or none, of a vcf file based on the loaded annotation
-        fields and on the variant and variant sample schemas
-    """
-    # TODO: Implement this when we need it, though practically speaking it probably takes too long to do this way
-    # get vcf file
-    # build the variants, post a dry run
-    # if dry run is successful, run for real
-    # catch potential errors
-    pass

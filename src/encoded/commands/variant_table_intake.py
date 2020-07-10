@@ -40,7 +40,7 @@ class MappingTableParser(object):
         self.mapping_table = _mp
         self.annotation_field_schema = json.load(open(schema, 'r'))
         self.version, self.date, self.fields = self.read_mp_meta()
-        if not skip_embeds:
+        if not skip_embeds:  # if calling from gene, do not wipe variant/variant_sample embeds
             self.provision_embeds()
 
     @staticmethod

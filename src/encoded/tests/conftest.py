@@ -225,9 +225,10 @@ def wsgi_app(wsgi_server):
     return webtest.TestApp(wsgi_server)
 
 
-# XXX: Moto I find is itself flakier than SQS, unfortunately
+# XXX: Moto I find is itself flakier than SQS in that it causes more problems with the tests
+#      than it actually solves, unfortunately
 #      MARK ALL SQS RELATED TESTS WITH PYTEST.MARK.INTEGRATED
-#      (until moto is "better"...)
+#      (until moto is "better"... which is not likely to happen)
 # def _check_server_is_up(output):
 #     """ Polls the given output file to detect
 #         :args output: file to which server is piping out
