@@ -77,7 +77,7 @@ def xls_to_json(xls_data, project, institution):
     for row in rows:
         indiv_alias = '{}:individual-{}'.format(project['name'], row['patient id'])
         fam_alias = '{}:family-{}'.format(project['name'], row['patient id'])
-        sp_alias = '{}:sampleproc-{}'.format(project['name'], row['specimen id'])
+        # sp_alias = '{}:sampleproc-{}'.format(project['name'], row['specimen id'])
         # create items for Individual
         items = fetch_individual_metadata(row, items, indiv_alias)
         # create/edit items for Family
@@ -91,7 +91,8 @@ def xls_to_json(xls_data, project, institution):
             else:
                 specimen_ids[row['specimen id']] = 1
             analysis_alias = '{}:analysis-{}'.format(project['name'], row['analysis id'])
-            items = fetch_sample_metadata(row, items, indiv_alias, samp_alias, sp_alias, analysis_alias, fam_alias)
+            items = fetch_sample_metadata(row, items, indiv_alias, samp_alias,
+                                          analysis_alias, fam_alias, project['name'])
         else:
             print('WARNING: No specimen id present for patient {},'
                   ' sample will not be created.'.format(row['patient id']))
@@ -147,39 +148,42 @@ def fetch_family_metadata(row, items, indiv_alias, fam_alias):
     return new_items
 
 
-def fetch_sample_metadata(row, items, indiv_alias, samp_alias, sp_alias, analysis_alias, fam_alias):
+def fetch_sample_metadata(row, items, indiv_alias, samp_alias, analysis_alias, fam_alias, proj_name):
     new_items = items.copy()
     info = {
         'aliases': [samp_alias],
         'workup_type': row.get('workup type'),
         'specimen_type': row.get('specimen type'),
         'specimen_collection_date': row.get('date collected'),
-        # change collection location to stored location?
-        'specimen_collection_location': row.get('location stored'),
+        'specimen_storage_location': row.get('location stored'),
         'specimen_accession': row['specimen id'],
-        # second specimen id
         'date_transported': row.get('date transported'),
         'transported_by': row.get('transport method'),
         'sent_by': row.get('sent by'),
-        # sequencing ref lab
+        'sequencing_lab': row.get('sequencing ref lab'),
         'date_received': row.get("date rec'd at ref lab"),
         'specimen_accepted': row.get('specimen accepted by ref lab'),
-        # sample ID by ref lab
+        'sequence_id': row.get('sample id by ref lab'),
         'dna_concentration': row.get('dna concentration'),
         'specimen_notes': row.get('specimen notes'),
         'files': [],  # TODO: implement creation of file db items
         'requisition_type': row.get('req type'),
-        # research protocol name
+        'research_protocol_name': row.get('research protocol name')
         'date_requisition_received': row.get("date req rec'd"),
         'ordering_physician': row.get('physician/provider'),
         'physician_id': row.get('physician id'),
         'indication': row.get('indication')
     }
+    if row.get('second specimen id'):
+        other_id = {'id': row['second specimen id'], 'id_type': proj_name}  # add proj info?
+        if row.get('second specimen id type'):
+            other_id['id_type'] = row['second specimen id type']
+        info['other_specimen_ids'] = [other_id]
     req_info = {
         'accepted_rejected': row.get('req accepted y/n'),
         'rejection_reason': row.get('reason rejected'),
         'corrective_action': row.get('corrective action taken'),
-        # corrective action taken by
+        'action_taken_by': row.get('corrective action taken by')
         'date_sent': row.get('date sent'),
         'date_completed': row.get('date completed'),
         'notes': row.get('correction notes')
@@ -197,7 +201,6 @@ def fetch_sample_metadata(row, items, indiv_alias, samp_alias, sp_alias, analysi
     new_items['sample_processing'].setdefault(analysis_alias, new_sp_item)
     new_items['sample_processing'][analysis_alias]['samples'].append(samp_alias)
     if row.get('report required').lower().startswith('y'):
-        print('report')
         new_items['reports'].append(samp_alias)
     if fam_alias not in new_items['sample_processing'][analysis_alias]['families']:
         new_items['sample_processing'][analysis_alias]['families'].append(fam_alias)
@@ -248,27 +251,27 @@ def create_case_items(items, proj_name):
     return new_items
 
 
-def create_sample_processing_groups(items, sp_alias):
-    new_items = items.copy()
-    for v in new_items['family'].values():
-        if 'members' in v and len(v['members']) > 1:
-            # create sample_processing item
-            samples = [items['individual'][indiv].get('samples', [None])[0] for indiv in v['members']]
-            samples = [s for s in samples if s]
-            if len (samples) > 1:
-                sp = {
-                    'aliases': [sp_alias],
-                    'samples': samples
-                }
-                analysis_type = items['sample'][items['individual'][v['proband']]['samples'][0]]['workup_type']
-                if all([relation in v for relation in ['proband', 'mother', 'father']]) and sorted(
-                    v['members']) == sorted([v['proband'], v['mother'], v['father']]
-                ):
-                    sp['analysis_type'] = analysis_type + '-Trio'
-                else:
-                    sp['analysis_type'] = analysis_type + '-Group'
-                new_items['sample_processing'][sp_alias] = sp
-    return new_items
+# def create_sample_processing_groups(items, sp_alias):
+#     new_items = items.copy()
+#     for v in new_items['family'].values():
+#         if 'members' in v and len(v['members']) > 1:
+#             # create sample_processing item
+#             samples = [items['individual'][indiv].get('samples', [None])[0] for indiv in v['members']]
+#             samples = [s for s in samples if s]
+#             if len (samples) > 1:
+#                 sp = {
+#                     'aliases': [sp_alias],
+#                     'samples': samples
+#                 }
+#                 analysis_type = items['sample'][items['individual'][v['proband']]['samples'][0]]['workup_type']
+#                 if all([relation in v for relation in ['proband', 'mother', 'father']]) and sorted(
+#                     v['members']) == sorted([v['proband'], v['mother'], v['father']]
+#                 ):
+#                     sp['analysis_type'] = analysis_type + '-Trio'
+#                 else:
+#                     sp['analysis_type'] = analysis_type + '-Group'
+#                 new_items['sample_processing'][sp_alias] = sp
+#     return new_items
 
 
 def compare_with_db(virtualapp, alias):
