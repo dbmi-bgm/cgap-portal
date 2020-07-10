@@ -165,7 +165,7 @@ class IngestionQueueManager:
         """
         failed = []
         for msg_batch in self._chunk_messages(msgs):
-            log.error('Trying to chunk messages: %s' % msgs)
+            log.info('Trying to chunk messages: %s' % msgs)
             entries = []
             for msg in msg_batch:
                 entries.append({
@@ -408,7 +408,7 @@ class IngestionListener:
                     continue
 
                 # if this file has been ingested, do not do anything with this message
-                if file_meta['file_ingestion_status'] == self.STATUS_INGESTED:
+                if file_meta.get('file_ingestion_status', 'N/A') == self.STATUS_INGESTED:
                     continue
 
                 # attempt download with workaround
@@ -452,7 +452,7 @@ class ErrorHandlingThread(threading.Thread):
     def run(self):
         # interval = self._kwargs.get('interval', DEFAULT_INTERVAL)
         interval = 60  # DB polling can and should be slower
-        update_status = self._kwargs['update_status']
+        update_status = self._kwargs['_update_status']
         while True:
             try:
                 self._target(*self._args, **self._kwargs)
@@ -520,7 +520,7 @@ def composite(loader, global_conf, **settings):
 
     kwargs = {
         'vapp': vapp,
-        'update_status': update_status
+        '_update_status': update_status
     }
 
     # daemon thread that actually executes `run` method to call /index
