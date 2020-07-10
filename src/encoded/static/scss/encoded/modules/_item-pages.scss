@@ -2024,6 +2024,7 @@ $badge-item-min-height: 90px;
 							// background-color: darken($color: cornflowerblue, $amount: 30%) !important;
 							// box-shadow: 0px 13px 16px -16px #000;
 							background-color: $primary-dark;
+							cursor: default; // Since we on tab already, clicking would have no effect, so dissuade somewhat.
 						}
 						> .btn-append > svg > path,
 						> .btn-prepend > svg > path {

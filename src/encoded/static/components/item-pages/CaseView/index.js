@@ -595,13 +595,24 @@ const FilteringTab = React.memo(function FilteringTab(props) {
     // Overrides default 400px.
     const maxHeight = typeof windowHeight === "number" && windowHeight > 800 ? (windowHeight - 405) : undefined;
 
-    return (
-        <React.Fragment>
-            <h1>{ context.display_title}: <span className="text-300">Variant Filtering and Technical Review</span></h1>
-            <EmbeddedItemSearchTable { ...{ context, searchHref, hideFacets, maxHeight }} />
-        </React.Fragment>
-    );
+    return <EmbeddedItemSearchTable { ...{ context, searchHref, hideFacets, maxHeight }} title={<FilteringTabSubtitle {...{ context }} />} />;
 });
+
+function FilteringTabSubtitle({ totalCount, context: { display_title } }){
+    // We give the span here an 'id' here so later on it'd be easy to find using Cypress
+    // or other testing framework.
+    return (
+        <div className="d-flex flex-column flex-lg-row mb-2 align-items-start align-items-lg-end justify-content-between">
+            <h1 className="mb-0 mt-0">
+                { display_title }: <span className="text-300">Variant Filtering and Technical Review</span>
+            </h1>
+            <h5 className="text-300 mt-0 mb-0">
+                <span id="filtering-variants-found" className="text-400 mr-05">{ totalCount || 0 }</span>
+                Variants found
+            </h5>
+        </div>
+    );
+}
 
 function InterpretationTab(props) {
     return <h1>This is the interpretation tab.</h1>;
