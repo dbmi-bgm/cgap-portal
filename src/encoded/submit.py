@@ -79,7 +79,7 @@ def xls_to_json(xls_data, project, institution):
         fam_alias = '{}:family-{}'.format(project['name'], row['patient id'])
         # sp_alias = '{}:sampleproc-{}'.format(project['name'], row['specimen id'])
         # create items for Individual
-        items = fetch_individual_metadata(row, items, indiv_alias)
+        items = fetch_individual_metadata(row, items, indiv_alias, institution['name'])
         # create/edit items for Family
         items = fetch_family_metadata(row, items, indiv_alias, fam_alias)
         # create item for Sample if there is a specimen
@@ -111,13 +111,18 @@ def xls_to_json(xls_data, project, institution):
     return items
 
 
-def fetch_individual_metadata(row, items, indiv_alias):
+def fetch_individual_metadata(row, items, indiv_alias, inst_name):
     new_items = items.copy()
     info = {
         'aliases': [indiv_alias],
         'individual_id': row['patient id'],
         'sex': row.get('sex'),
     }
+    if row.get('other individual id'):
+        other_id = {'id': row['other individual id'], 'id_source': inst_name}
+        if row.get('other individual id type'):
+            other_id['id_source'] = row['other individual id source']
+        info['institutional_id'] = other_id
     info['age'] = int(row['age']) if row.get('age') else None
     info['birth_year'] = int(row['birth year']) if row.get('birth year') else None
     if indiv_alias not in new_items['individual']:
