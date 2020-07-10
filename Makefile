@@ -47,7 +47,7 @@ build-dev:  # same as build, but sets up locust as well
 
 macbuild-dev:  # same as macbuild, but sets up locust as well
 	make macbuild
-	pip install locust
+	make build-locust
 
 build-locust:  # just pip installs locust - may cause instability
 	pip install locust
@@ -102,7 +102,7 @@ help:
 	@make info
 
 info:
-	@: $(info Printing some info on how to use make)
+	@: $(info Here are some 'make' options:)
 	   $(info - Use 'make aws-ip-ranges' to download latest ip range information. Invoked automatically when needed.)
 	   $(info - Use 'make build' (or 'make macbuild' on OSX Catalina) to build only application dependencies.)
 	   $(info - Use 'make build-dev' (or 'make macbuild-dev' on OSX Catalina) to build all dependencies, even locust.)
