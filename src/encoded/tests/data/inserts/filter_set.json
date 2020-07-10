@@ -7,16 +7,29 @@
         "status": "released",
         "uuid": "dcf15d5e-40aa-43bc-b81c-32c70c9afa99",
         "search_type": "VariantSample",
+        "title": "Test filter set",
         "filter_blocks": [
             {
+                "name": "Basic Settings",
                 "query": "&variant.CHROM=1&variant.genes.genes_most_severe_consequence.impact=MODERATE",
-                "flag_applied": true
+                "flags_applied": ["Flag1", "Flag2"]
             },
             {
+                "name": "Advanced Settings",
                 "query": "&variant.conservation_phylop100.from=0.2&variant.conservation_phylop100.to=1&variant.cytoband_cytoband=1p36.33",
-                "flag_applied": false
+                "flags_applied": ["Flag2"]
             }
         ],
-        "flags": "&variant.transcript.vep_clin_sig=benign%26uncertain_significance"
+        "flags": [
+
+            {
+                "name": "Flag1",
+                "query": "&variant.transcript.vep_clin_sig=benign%26uncertain_significance"
+            },
+            {
+                "name": "Flag2",
+                "query": "&variant.CHROM=1"
+            }
+        ]
     }
 ]

@@ -89,14 +89,13 @@ def test_collections_redirect_to_search(workbook, testapp):
 
 
 def test_search_with_embedding(workbook, testapp):
-    """ Searches for a cohort and checks some embedded items are properly resolved """
-    res = testapp.get('/search/?type=Cohort&limit=all').json
-    res_json = [dis for dis in res['@graph'] if dis['uuid'] == 'cc7d83a2-6886-4ca0-9402-7c49734cf3c4']
-    assert len(res_json) == 1
-    test_json = res_json[0]
-    assert test_json['display_title'] == 'People with Blue Thumbs'
-    assert test_json['project']['display_title'] == 'Test Project'
-    assert test_json['families'][0]['original_pedigree']['uuid'] == 'dcf15d5e-40aa-43bc-b81c-32c70c9afc50'
+    """ Searches for a family and checks members.*, an embedded field, is properly resolved """
+    res = testapp.get('/search/?type=Family&limit=all').json
+    embed = res['@graph'][0]['members']
+    assert embed[0]['father']['display_title'] == 'GAPID3PW26SK'  # all are same so order does not matter
+    assert embed[0]['mother']['display_title'] == 'GAPIDISC7R73'
+    assert embed[1]['father']['display_title'] == 'GAPID3PW26SK'
+    assert embed[1]['mother']['display_title'] == 'GAPIDISC7R73'
 
 
 def test_search_with_simple_query(workbook, testapp):
@@ -187,18 +186,6 @@ def test_search_facets_and_columns_order(workbook, testapp, registry):
         assert res['columns'][key]['title'] == val['title']
 
 
-@pytest.mark.skip # XXX: Not clear how to best port
-def test_search_embedded_file_by_accession(workbook, testapp):
-    res = testapp.get('/search/?type=Cohort&families.original_pedigree.uuid=dcf15d5e-40aa-43bc-b81c-32c70c9afc50').json
-    assert len(res['@graph']) > 0
-    item_uuids = [item['uuid'] for item in res['@graph'] if 'uuid' in item]
-    for item_uuid in item_uuids:
-        item_res = testapp.get('/experiments-hi-c/%s/' % item_uuid, status=301)
-        exp = item_res.follow().json
-        file_uuids = [f['uuid'] for f in exp['files']]
-        assert '46e82a90-49e5-4c33-afab-9ec90d65faa0' in file_uuids
-
-
 @pytest.fixture
 def dd_dts(testapp, workbook):
     # returns a dictionary of strings of various date and datetimes
@@ -278,8 +265,10 @@ def test_search_date_range_dontfind_without(dd_dts, testapp, workbook):
 
 
 def test_search_query_string_AND_NOT_cancel_out(workbook, testapp):
-    # if you use + and - with same field you should get no result
-    search = '/search/?q=cell+-cell&type=Cohort'
+    """
+    Tests if you use + and - with same field you should get no result
+    """
+    search = '/search/?q=cell+-cell&type=Family'
     assert testapp.get(search, status=404)
 
 
@@ -611,13 +600,11 @@ def test_search_with_principals_allowed_fails(workbook, anontestapp):
     with pytest.raises(AppError):
         anontestapp.get('/search/?type=Item&principals_allowed.view=group.PERMISSION_YOU_DONT_HAVE')
     with pytest.raises(AppError):
-        anontestapp.get('/search/?type=Cohort'
-                        '&families.proband.display_title=GAPID8J9B9CR'
+        anontestapp.get('/search/?type=Family'
+                        '&proband.display_title=GAPID8J9B9CR'
                         '&principals_allowed.view=group.PERMISSION_YOU_DONT_HAVE')
     with pytest.raises(AppError):
-        anontestapp.get('/search/?type=Cohort'
-                        '&families.proband.display_title=GAPID5HBSLG6'
-                        '&families.clinic_notes=testing'
+        anontestapp.get('/search/?type=Gene'
                         '&principals_allowed.view=group.PERMISSION_YOU_DONT_HAVE')
 
 
@@ -629,35 +616,6 @@ class TestNestedSearch(object):
         assert len(result['@graph']) == expected
 
     @staticmethod
-    def is_blue_thumbs(result):
-        """ Checks that this result is the 'People with Blue Thumbs' cohort """
-        return 'Blue' in result['title']
-
-    @staticmethod
-    def is_red_feet(result):
-        """ Checks that this result is the 'People with Red Feet' cohort """
-        return 'Red' in result['title']
-
-    @staticmethod
-    def is_swollen_ears(result):
-        """ Checks that this result is the 'People with Swollen Ears' cohort """
-        return 'Swollen' in result['title']
-
-    @staticmethod
-    def result_contains_two(result, f1, f2):
-        compound = True
-        for res in result:
-            compound = compound and (f1(res) or f2(res))
-        return compound
-
-    @staticmethod
-    def result_contains_all(result, f1, f2, f3):
-        compound = True
-        for res in result:
-            compound = compound and (f1(res) or f2(res) or f3(res))
-        return compound
-
-    @staticmethod
     def verify_facet(facets, name, count):
         """ Checks that a given facet name has the correct number of terms """
         for facet in facets:
@@ -666,163 +624,160 @@ class TestNestedSearch(object):
                 return
 
     def test_search_on_single_nested_field(self, workbook, testapp):
-        """ Should match only once since one has a family with a proband with display_title GAPID8J9B9CR """
-        res = testapp.get('/search/?type=Cohort'
-                          '&families.proband.display_title=GAPID8J9B9CR').json
+        """ One match for variant with hg19.hg19_pos=12185955 """
+        res = testapp.get('/search/?type=Variant'
+                          '&hg19.hg19_pos=12185955').json
         self.assert_length_is_expected(res, 1)
-        assert self.is_blue_thumbs(res['@graph'][0])
+        assert res['@graph'][0]['uuid'] == 'f6aef055-4c88-4a3e-a306-d37a71535d8b'
 
     def test_or_search_on_same_nested_field(self, workbook, testapp):
-        """ Should match all 3 since this is interpreted as an OR search on this field """
-        res = testapp.get('/search/?type=Cohort'
-                          '&families.proband.display_title=GAPID8J9B9CR'
-                          '&families.proband.display_title=GAPID5HBSLG6').json
-        self.assert_length_is_expected(res, 3)
-        assert self.result_contains_all(res['@graph'], self.is_blue_thumbs, self.is_red_feet, self.is_swollen_ears)
+        """ Should match 2 since OR on this field """
+        res = testapp.get('/search/?type=Variant'
+                          '&hg19.hg19_hgvsg=NC_000001.11:g.12185956del'
+                          '&hg19.hg19_hgvsg=NC_000001.11:g.11901816A>T').follow().json
+        self.assert_length_is_expected(res, 2)
+        for variant in res['@graph']:
+            assert variant['uuid'] in ['f6aef055-4c88-4a3e-a306-d37a71535d8b', '852bb349-203e-437d-974a-e8d6cb56810a']
 
     def test_and_search_on_nested_field_that_does_not_match(self, workbook, testapp):
-        """ This has clinic notes that do not match with any proband object, so will give no results """
-        testapp.get('/search/?type=Cohort'
-                    '&families.proband.display_title=GAPID8J9B9CR'
-                    '&families.clinic_notes=gnitset', status=404)
+        """ This has a chrom value that does not match the position, so will give no results """
+        testapp.get('/search/?type=Variant'
+                    '&hg19.hg19_pos=12185955'
+                    '&hg19.hg19_chrom=chr3', status=404)
 
     def test_and_search_on_nested_field_that_matches_one(self, workbook, testapp):
-        """ This has the correct 'clinic_notes', so should match """
-        res = testapp.get('/search/?type=Cohort'
-                          '&families.proband.display_title=GAPID5HBSLG6'
-                          '&families.clinic_notes=testing').json
+        """ This has the correct 'hg19_chrom', so should match one """
+        res = testapp.get('/search/?type=Variant'
+                          '&hg19.hg19_pos=12185955'
+                          '&hg19.hg19_chrom=chr1').json
         self.assert_length_is_expected(res, 1)
-        assert self.is_blue_thumbs(res['@graph'][0])
+        assert res['@graph'][0]['uuid'] == 'f6aef055-4c88-4a3e-a306-d37a71535d8b'
 
-    def test_or_search_on_nested_clinic_notes_that_matches_two(self, workbook, testapp):
-        """ Do an OR search on clinic_notes, matching two cohorts """
-        res = testapp.get('/search/?type=Cohort'
-                          '&families.proband.display_title=GAPID5HBSLG6'
-                          '&families.clinic_notes=xyz'
-                          '&families.clinic_notes=testing').json
-        self.assert_length_is_expected(res, 2)
-        assert self.result_contains_two(res['@graph'], self.is_blue_thumbs, self.is_red_feet)
+    def test_or_search_on_nested_hg_19_multiple_match(self, workbook, testapp):
+        """ Do an OR search on hg19.hg19_chrom, matching three variants """
+        res = testapp.get('/search/?type=Variant'
+                          '&hg19.hg19_chrom=chr1').json
+        self.assert_length_is_expected(res, 3)
+        for variant in res['@graph']:
+            assert variant['uuid'] in [
+                'f6aef055-4c88-4a3e-a306-d37a71535d8b',
+                '852bb349-203e-437d-974a-e8d6cb56810a',
+                '842b1b54-32fb-4ff3-bfd1-c5b51bc35d7f'
+            ]
 
     def test_negative_search_on_clinic_notes(self, workbook, testapp):
-        """ Do an OR search with clinic_notes with a negative, should eliminate red_feet and match swollen_ears """
-        res = testapp.get('/search/?type=Cohort'
-                          '&families.proband.display_title=GAPID5HBSLG6'
-                          '&families.clinic_notes!=xyz').follow().json
+        """ Do an OR search with hg19_post with a negative, should eliminate a variant """
+        res = testapp.get('/search/?type=Variant'
+                          '&hg19.hg19_chrom=chr1'
+                          '&hg19.hg19_pos!=12185955').follow().json
         self.assert_length_is_expected(res, 2)
-        assert self.result_contains_two(res['@graph'], self.is_blue_thumbs, self.is_swollen_ears)
+        for variant in res['@graph']:
+            assert variant['uuid'] in [
+                '852bb349-203e-437d-974a-e8d6cb56810a',
+                '842b1b54-32fb-4ff3-bfd1-c5b51bc35d7f'
+            ]
 
     def test_and_search_that_matches_one(self, workbook, testapp):
-        """ Check two properties that occur in the same sub-embedded object in 1 cohort """
-        res = testapp.get('/search/?type=Cohort'
-                          '&families.members.mother.display_title=GAPID6ZUDPO2'
-                          '&families.members.father.display_title=GAPIDRU2NWFO').json
+        """ Check three properties that occur in the same sub-embedded object in 1 variant """
+        res = testapp.get('/search/?type=Variant'
+                          '&hg19.hg19_chrom=chr1'
+                          '&hg19.hg19_pos=12185955'
+                          '&hg19.hg19_hgvsg=NC_000001.11:g.12185956del').follow().json
         self.assert_length_is_expected(res, 1)
-        assert self.is_blue_thumbs(res['@graph'][0])
+        assert res['@graph'][0]['uuid'] == 'f6aef055-4c88-4a3e-a306-d37a71535d8b'
+        testapp.get('/search/?type=Variant'  # should give no results
+                    '&hg19.hg19_chrom=chr2'  # change should be sufficient for no results
+                    '&hg19.hg19_pos=12185955'
+                    '&hg19.hg19_hgvsg=NC_000001.11:g.12185956del', status=404)
 
+    @pytest.mark.skip  # re-enable once workbook inserts are built out more
     def test_and_search_that_matches_multiple(self, workbook, testapp):
-        """ Check two properties that occur in the same sub-embedded object in 3 cohorts """
-        res = testapp.get('/search/?type=Cohort'
+        """ Check two properties that occur in the same sub-embedded object in 3 variants """
+        res = testapp.get('/search/?type=Variant'
                           '&families.members.mother.display_title=GAPIDISC7R73'
                           '&families.members.father.display_title=GAPID3PW26SK').json
         self.assert_length_is_expected(res, 3)
-        assert self.result_contains_all(res['@graph'], self.is_blue_thumbs, self.is_red_feet, self.is_swollen_ears)
-
-    def test_and_search_with_disqualifier(self, workbook, testapp):
-        """ Check three properties - two of which occur in the same sub-embedded object in
-           2 cohorts with an additional property that removes both """
-        testapp.get('/search/?type=Cohort'
-                    '&families.members.mother.display_title=GAPIDISC7R73'
-                    '&families.members.father.display_title=GAPID3PW26SK'
-                    '&families.proband.display_title=GAPID8J9B9CR', status=404)
 
     def test_and_search_on_three_fields(self, workbook, testapp):
-        """ Search for 3 properties that all occur in the cohorts """
-        res = testapp.get('/search/?type=Cohort'
-                          '&families.members.mother.display_title=GAPIDISC7R73'
-                          '&families.members.father.display_title=GAPID3PW26SK'
-                          '&families.proband.display_title=GAPID5HBSLG6').json
+        """ OR search that will match all variants with these fields"""
+        res = testapp.get('/search/?type=Variant'
+                          '&hg19.hg19_chrom=chr1'
+                          '&hg19.hg19_pos=12185955'
+                          '&hg19.hg19_pos=11901816'
+                          '&hg19.hg19_pos=11780388'
+                          '&hg19.hg19_hgvsg=NC_000001.11:g.12185956del'
+                          '&hg19.hg19_hgvsg=NC_000001.11:g.11901816A>T'
+                          '&hg19.hg19_hgvsg=NC_000001.11:g.11780388G>A').follow().json
         self.assert_length_is_expected(res, 3)
-        assert self.result_contains_all(res['@graph'], self.is_blue_thumbs, self.is_red_feet, self.is_swollen_ears)
-
-    def test_and_search_on_three_fields_that_matches_one(self, workbook, testapp):
-        """ Change the parents such that only one cohort matches now """
-        res = testapp.get('/search/?type=Cohort'
-                          '&families.members.mother.display_title=GAPID6ZUDPO2'
-                          '&families.members.father.display_title=GAPIDRU2NWFO'
-                          '&families.proband.display_title=GAPID8J9B9CR').json
-        self.assert_length_is_expected(res, 1)
-        assert self.is_blue_thumbs(res['@graph'][0])
+        for variant in res['@graph']:
+            assert variant['uuid'] in [
+                'f6aef055-4c88-4a3e-a306-d37a71535d8b',
+                '852bb349-203e-437d-974a-e8d6cb56810a',
+                '842b1b54-32fb-4ff3-bfd1-c5b51bc35d7f'
+            ]
 
     def test_search_with_non_existant_combinations(self, workbook, testapp):
         """ Test that swapping around fields that would match across different sub-embedded objects
             does not actually do so (ie: returns no results). """
-        testapp.get('/search/?type=Cohort'  # Swap the parents
-                    '&families.members.mother.display_title=GAPID3PW26SK'
-                    '&families.members.father.display_title=GAPIDISC7R73', status=404)
-        testapp.get('/search/?type=Cohort'  # Swap just the father
-                    '&families.members.mother.display_title=GAPIDISC7R73'
-                    '&families.members.father.display_title=GAPIDRU2NWFO', status=404)
-        testapp.get('/search/?type=Cohort'  # Swap just the mother
-                    '&families.members.mother.display_title=GAPID6ZUDPO2'
-                    '&families.members.father.display_title=GAPIDISC7R73', status=404)
+        testapp.get('/search/?type=Variant'
+                    '&hg19.hg19_pos=12185955'
+                    '&hg19.hg19_hgvsg=NC_000001.11:g.11901816A>T', status=404)
+        testapp.get('/search/?type=Variant'
+                    '&hg19.hg19_pos=11901816'
+                    '&hg19.hg19_hgvsg=NC_000001.11:g.11780388G>A', status=404)
+        testapp.get('/search/?type=Variant'
+                    '&hg19.hg19_pos=11780388'
+                    '&hg19.hg19_hgvsg=NC_000001.11:g.12185956del', status=404)
 
     def test_nested_search_with_no_value(self, workbook, testapp):
-        """ Tests searching on 'No value' alone on a nested field  """
-        res = testapp.get('/search/?type=Cohort'
-                          '&families.clinic_notes=No+value').json
-        self.assert_length_is_expected(res, 1)
-        assert self.is_swollen_ears(res['@graph'][0])
+        """ Tests searching on 'No value' alone on a nested field """
+        res = testapp.get('/search/?type=Variant'
+                          '&hg19.hg19_chrom!=No+value').follow().json
+        self.assert_length_is_expected(res, 3)
 
     def test_nested_search_with_no_value_combined(self, workbook, testapp):
         """ Tests searching on 'No value' combined with another nested field, in this case
             should give no results (no matter the ordering) """
-        testapp.get('/search/?type=Cohort'
-                    '&families.clinic_notes=No+value'
-                    '&families.proband.display_title=GAPID8J9B9CR', status=404)
-        testapp.get('/search/?type=Cohort'
-                    '&families.proband.display_title=GAPID8J9B9CR'
-                    '&families.clinic_notes=No+value', status=404)
-        testapp.get('/search/?type=Cohort'
-                    '&families.clinic_notes=No+value'
-                    '&families.proband.display_title=GAPIDISC7R74', status=404)
-        testapp.get('/search/?type=Cohort'
-                    '&families.proband.display_title=GAPIDISC7R74'
-                    '&families.clinic_notes=No+value', status=404)
+        testapp.get('/search/?type=Variant'
+                    '&hg19.hg19_pos=No+value'
+                    '&hg19.hg19_hgvsg=NC_000001.11:g.12185956del', status=404)
+        testapp.get('/search/?type=Variant'
+                    '&hg19.hg19_pos=No+value'
+                    '&hg19.hg19_hgvsg=NC_000001.11:g.11780388G>A', status=404)
+        testapp.get('/search/?type=Variant'
+                    '&hg19.hg19_pos=No+value'
+                    '&hg19.hg19_hgvsg=NC_000001.11:g.12185956del', status=404)
+        testapp.get('/search/?type=Variant'
+                    '&hg19.hg19_pos=11780388'
+                    '&hg19.hg19_hgvsg=No+value', status=404)
 
     def test_search_nested_with_non_nested_fields(self, workbook, testapp):
         """ Tests that combining a nested search with a non-nested one works in any order """
-        res = testapp.get('/search/?type=Cohort'
-                          '&families.clinic_notes=No+value'
-                          '&title=People+with+Swollen+Ears').json
+        res = testapp.get('/search/?type=Variant'
+                          '&hg19.hg19_pos!=11720331'
+                          '&POS=88832').follow().json
         self.assert_length_is_expected(res, 1)
-        assert self.is_swollen_ears(res['@graph'][0])
-        res = testapp.get('/search/?type=Cohort'
-                          '&title=People+with+Swollen+Ears'
-                          '&families.clinic_notes=No+value').json
-        self.assert_length_is_expected(res, 1)
-        assert self.is_swollen_ears(res['@graph'][0])
+        assert res['@graph'][0]['uuid'] == 'cedff838-99af-4936-a0ae-4dfc63ba8bf4'
 
     def test_search_nested_no_value_with_multiple_other_fields(self, workbook, testapp):
         """ Tests that combining a 'No value' search with another nested search and a different non-nested
             field works correctly """
-        res = testapp.get('/search/?type=Cohort'
-                          '&title=People+with+Swollen+Ears'
-                          '&families.clinic_notes=No+value'
-                          '&families.proband=GAPID5HBSLG6').follow().json
+        res = testapp.get('/search/?type=Variant'
+                          '&POS=88832'
+                          '&REF=A').json
         self.assert_length_is_expected(res, 1)
-        assert self.is_swollen_ears(res['@graph'][0])
-        testapp.get('/search/?type=Cohort'
-                    '&title=People+with+Swollen+Ears'
-                    '&families.clinic_notes=No+value'
-                    '&families.proband=GAPIDISC7R74', status=404)  # proband should disqualify
+        assert res['@graph'][0]['uuid'] == 'cedff838-99af-4936-a0ae-4dfc63ba8bf4'
+        testapp.get('/search/?type=Variant'
+                    '&POS=88832'
+                    '&hg19.hg19_pos=No+value'
+                    '&REF=G', status=404)  # REF should disqualify
 
     def test_search_nested_facets_are_correct(self, workbook, testapp):
         """ Tests that nested facets are properly rendered """
-        facets = testapp.get('/search/?type=Cohort').json['facets']
-        self.verify_facet(facets, 'families.proband.display_title', 3)
-        facets = testapp.get('/search/?type=Cohort'
-                             '&families.proband.display_title=GAPID8J9B9CR').json['facets']
-        self.verify_facet(facets, 'families.proband.display_title', 2)
+        facets = testapp.get('/search/?type=Variant').json['facets']
+        self.verify_facet(facets, 'hg19.hg19_chrom', 1)
+        self.verify_facet(facets, 'hg19.hg19_pos', 3)
+        self.verify_facet(facets, 'hg19.hg19_hgvsg', 3)
 
     def test_search_nested_exists_query(self, testapp):
         """ Tests doing a !=No+value search on a nested sub-field. """

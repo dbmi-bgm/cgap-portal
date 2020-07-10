@@ -369,10 +369,10 @@
         "schema_version": {
             "default": "1"
         },
-        "sample": {
-            "title": "Sample",
-            "type": "string",
-            "linkTo": "Sample"
+        "file": {
+            "title": "File",
+            "description": "String Accession of the vcf file used in digestion",
+            "type": "string"
         },
         "variant": {
             "title": "Variant",
