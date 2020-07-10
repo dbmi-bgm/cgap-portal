@@ -1,4 +1,3 @@
-import contextlib
 import copy
 import io
 import json
@@ -28,9 +27,10 @@ def test_gifo_get_args_defaults():
     assert args.full is False
 
 
-@pytest.fixture
-def owler(mocker):
-    return mocker.patch.object(gifo, 'Owler')
+@pytest.yield_fixture
+def owler():
+    with mock.patch.object(gifo, 'Owler') as mocked:
+        yield mocked
 
 
 @pytest.fixture
@@ -75,10 +75,13 @@ TEST_KEYS_RETURNED = {"server": "https://cgap-simulated.hms.harvard.edu", "key":
 
 
 class MockS3UtilsForAccessKeys:
+
     def __init__(self, env):
         assert env == TEST_KEYS_ENV
+
     def get_access_keys(self):
         return json.loads(TEST_KEYS_STORED)
+
 
 def test_connect2server_w_env(connection):
     non_dictionary = object()
@@ -120,11 +123,11 @@ def test_prompt_check_for_output_options_w_load_y_and_no_file(monkeypatch, mock_
     assert loadit
 
 
-def test_prompt_check_for_output_options_w_load_y_and_no_file_but_wantit(mocker, mock_logger):
-    mocker.patch('builtins.input', side_effect=['y', 'n'])
-    ofile, loadit = gifo.prompt_check_for_output_options(True, None, 'Disorder', 'test_server', mock_logger)
-    assert ofile == 'Disorder.json'
-    assert loadit
+def test_prompt_check_for_output_options_w_load_y_and_no_file_but_wantit(mock_logger):
+    with mock.patch('builtins.input', side_effect=['y', 'n']):
+        ofile, loadit = gifo.prompt_check_for_output_options(True, None, 'Disorder', 'test_server', mock_logger)
+        assert ofile == 'Disorder.json'
+        assert loadit
 
 
 def test_prompt_check_for_output_options_wo_load_nofile(mock_logger):
@@ -149,44 +152,44 @@ def delobs_disorder_gen(delobs_disorders):
     return iter(delobs_disorders)
 
 
-def test_get_existing_items(mocker, connection, rel_disorders, delobs_disorders):
-    ''' Currently this test passes but is not really a unit test and also does not
-        quite mock the correct things so should be refactored
-    '''
+def test_get_existing_items(connection, rel_disorders, delobs_disorders):
+    # TODO: Currently this test passes but is not really a unit test and also does not
+    #       quite mock the correct things so should be refactored
     disorder_ids = [d.get('disorder_id') for d in rel_disorders + delobs_disorders]
-    mocker.patch('encoded.commands.generate_items_from_owl.search_metadata', side_effect=[rel_disorders, delobs_disorders])
-    dbdiseases = gifo.get_existing_items(connection, 'Disorder')
-    assert len(dbdiseases) == len(rel_disorders) + len(delobs_disorders)
-    assert all([d in dbdiseases for d in disorder_ids])
+    with mock.patch('encoded.commands.generate_items_from_owl.search_metadata', side_effect=[rel_disorders, delobs_disorders]):
+        dbdiseases = gifo.get_existing_items(connection, 'Disorder')
+        assert len(dbdiseases) == len(rel_disorders) + len(delobs_disorders)
+        assert all([d in dbdiseases for d in disorder_ids])
 
 
-def test_get_existing_items_from_db_w_deleted(mocker, connection, disorder_gen, delobs_disorder_gen, rel_disorders, delobs_disorders):
+def test_get_existing_items_from_db_w_deleted(connection, disorder_gen, delobs_disorder_gen, rel_disorders, delobs_disorders):
     disorder_ids = [d.get('disorder_id') for d in rel_disorders + delobs_disorders]
-    mocker.patch('encoded.commands.generate_items_from_owl.search_metadata', side_effect=[disorder_gen, delobs_disorder_gen])
-    dbdiseases = list(gifo.get_existing_items_from_db(connection, 'Disorder'))
-    assert len(dbdiseases) == len(rel_disorders) + len(delobs_disorders)
-    assert all([dis.get('disorder_id') in disorder_ids for dis in dbdiseases])
+    with mock.patch('encoded.commands.generate_items_from_owl.search_metadata', side_effect=[disorder_gen, delobs_disorder_gen]):
+        dbdiseases = list(gifo.get_existing_items_from_db(connection, 'Disorder'))
+        assert len(dbdiseases) == len(rel_disorders) + len(delobs_disorders)
+        assert all([dis.get('disorder_id') in disorder_ids for dis in dbdiseases])
 
 
-def test_get_existing_items_from_db_wo_deleted(mocker, connection, disorder_gen, rel_disorders):
+def test_get_existing_items_from_db_wo_deleted(connection, disorder_gen, rel_disorders):
     disorder_ids = [d.get('disorder_id') for d in rel_disorders]
-    mocker.patch('encoded.commands.generate_items_from_owl.search_metadata', side_effect=[disorder_gen])
-    dbdiseases = list(gifo.get_existing_items_from_db(connection, 'Disorder', include_invisible=False))
-    assert len(dbdiseases) == len(rel_disorders)
-    assert all([dis.get('disorder_id') in disorder_ids for dis in dbdiseases])
+    with mock.patch('encoded.commands.generate_items_from_owl.search_metadata', side_effect=[disorder_gen]):
+        dbdiseases = list(gifo.get_existing_items_from_db(connection, 'Disorder', include_invisible=False))
+        assert len(dbdiseases) == len(rel_disorders)
+        assert all([dis.get('disorder_id') in disorder_ids for dis in dbdiseases])
 
 
-def test_get_existing_items_from_db_w_duplicates(mocker, connection, rel_disorders):
-    ''' The tested function is agnostic to duplicates so testing to make sure
-        if duplicates are present they are returned
-    '''
+def test_get_existing_items_from_db_w_duplicates(connection, rel_disorders):
+    """
+    Tests to make sure that if duplicates are present, they are returned 
+    because the tested function is agnostic to duplicates.
+    """
     rel_disorders.append(rel_disorders[0])  # add the duplicate item
     dgen = iter(rel_disorders)
     disorder_ids = [d.get('disorder_id') for d in rel_disorders]
-    mocker.patch('encoded.commands.generate_items_from_owl.search_metadata', side_effect=[dgen])
-    dbdiseases = list(gifo.get_existing_items_from_db(connection, 'Disorder', include_invisible=False))
-    assert len(dbdiseases) == len(rel_disorders)
-    assert all([dis.get('disorder_id') in disorder_ids for dis in dbdiseases])
+    with mock.patch('encoded.commands.generate_items_from_owl.search_metadata', side_effect=[dgen]):
+        dbdiseases = list(gifo.get_existing_items_from_db(connection, 'Disorder', include_invisible=False))
+        assert len(dbdiseases) == len(rel_disorders)
+        assert all([dis.get('disorder_id') in disorder_ids for dis in dbdiseases])
 
 
 def test_create_dict_keyed_by_field_from_items_valid_field_for_all(rel_disorders):
@@ -334,11 +337,11 @@ def test_is_deprecated_not_deprecated(uberon_owler5):
     assert not gifo._is_deprecated(class_, uberon_owler5)
 
 
-def test_create_term_dict(mocker, mkd_class, uberon_owler5):
-    mocker.patch('encoded.commands.generate_items_from_owl.get_term_name_from_rdf',
-                 return_value='Multicystic kidney dysplasia')
-    term = gifo.create_term_dict(mkd_class, 'HP:0000003', uberon_owler5, 'Phenotype')
-    assert term == {'hpo_id': 'HP:0000003', 'hpo_url': 'http://purl.obolibrary.org/obo/HP_0000003', 'phenotype_name': 'Multicystic kidney dysplasia'}
+def test_create_term_dict(mkd_class, uberon_owler5):
+    with mock.patch('encoded.commands.generate_items_from_owl.get_term_name_from_rdf',
+                    return_value='Multicystic kidney dysplasia'):
+        term = gifo.create_term_dict(mkd_class, 'HP:0000003', uberon_owler5, 'Phenotype')
+        assert term == {'hpo_id': 'HP:0000003', 'hpo_url': 'http://purl.obolibrary.org/obo/HP_0000003', 'phenotype_name': 'Multicystic kidney dysplasia'}
 
 
 def test_process_parents(uberon_owler4):
@@ -366,26 +369,26 @@ def simple_terms():
     return OrderedDict(sorted(terms.items(), key=lambda t: t[0]))
 
 
-def test_add_additional_term_info(mocker, simple_terms):
+def test_add_additional_term_info(simple_terms):
     val_lists = [[], ['val1'], ['val1', 'val2']]
     fields = ['definition', 'synonyms', 'dbxrefs', 'alternative_ids']
-    mocker.patch('encoded.commands.generate_items_from_owl.convert2URIRef', return_value='blah')
-    mocker.patch('encoded.commands.generate_items_from_owl.get_synonyms', side_effect=val_lists)
-    mocker.patch('encoded.commands.generate_items_from_owl.get_definitions', side_effect=val_lists)
-    mocker.patch('encoded.commands.generate_items_from_owl.get_dbxrefs', side_effect=val_lists)
-    mocker.patch('encoded.commands.generate_items_from_owl.get_alternative_ids', side_effect=val_lists)
-    result = gifo.add_additional_term_info(simple_terms, 'data', 'synterms', 'defterms', 'Phenotype')
-    for tid, term in result.items():
-        for f in fields:
-            if tid == 't1':
-                assert f not in term
-            else:
-                if f == 'definition':  # only one added
-                    assert term[f] == 'val1'
-                elif tid == 't2':
-                    assert term[f] == val_lists[1]
-                else:
-                    assert term[f] == val_lists[2]
+    with mock.patch('encoded.commands.generate_items_from_owl.convert2URIRef', return_value='blah'):
+        with mock.patch('encoded.commands.generate_items_from_owl.get_synonyms', side_effect=val_lists):
+            with mock.patch('encoded.commands.generate_items_from_owl.get_definitions', side_effect=val_lists):
+                with mock.patch('encoded.commands.generate_items_from_owl.get_dbxrefs', side_effect=val_lists):
+                    with mock.patch('encoded.commands.generate_items_from_owl.get_alternative_ids', side_effect=val_lists):
+                        result = gifo.add_additional_term_info(simple_terms, 'data', 'synterms', 'defterms', 'Phenotype')
+                        for tid, term in result.items():
+                            for f in fields:
+                                if tid == 't1':
+                                    assert f not in term
+                                else:
+                                    if f == 'definition':  # only one added
+                                        assert term[f] == 'val1'
+                                    elif tid == 't2':
+                                        assert term[f] == val_lists[1]
+                                    else:
+                                        assert term[f] == val_lists[2]
 
 
 @pytest.fixture
@@ -398,24 +401,24 @@ def returned_synonyms():
     return copies
 
 
-def test_get_syn_def_dbxref_altid(mocker, owler, returned_synonyms):
-    mocker.patch('encoded.commands.generate_items_from_owl.getObjectLiteralsOfType',
-                 side_effect=returned_synonyms)
-    checks = ['test_val1', 'test_val2']
-    class_ = 'test_class'
-    terms = ['1']
-    for i in range(int(len(returned_synonyms) / 4)):
-        synonyms = gifo.get_synonyms(class_, owler, terms)
-        definitions = gifo.get_definitions(class_, owler, terms)
-        dbxrefs = gifo.get_dbxrefs(class_, owler)
-        altids = gifo.get_alternative_ids(class_, owler)
-        assert synonyms == definitions == dbxrefs == altids
-        if i == 0:
-            assert not synonyms
-        else:
-            assert len(synonyms) == i
-            for syn in synonyms:
-                assert syn in checks
+def test_get_syn_def_dbxref_altid(owler, returned_synonyms):
+    with mock.patch('encoded.commands.generate_items_from_owl.getObjectLiteralsOfType',
+                    side_effect=returned_synonyms):
+        checks = ['test_val1', 'test_val2']
+        class_ = 'test_class'
+        terms = ['1']
+        for i in range(int(len(returned_synonyms) / 4)):
+            synonyms = gifo.get_synonyms(class_, owler, terms)
+            definitions = gifo.get_definitions(class_, owler, terms)
+            dbxrefs = gifo.get_dbxrefs(class_, owler)
+            altids = gifo.get_alternative_ids(class_, owler)
+            assert synonyms == definitions == dbxrefs == altids
+            if i == 0:
+                assert not synonyms
+            else:
+                assert len(synonyms) == i
+                for syn in synonyms:
+                    assert syn in checks
 
 
 @pytest.fixture
@@ -578,9 +581,9 @@ def test_get_raw_form_raw_and_embedded(raw_item_dict, embedded_item_dict):
 
 
 def test_get_raw_form_does_not_convert_object(raw_item_dict, object_item_dict):
-    ''' This may not be necessary but shows object frame of item is not
+    """ This may not be necessary but shows object frame of item is not
         converted - and is in fact unchanged
-    '''
+    """
     rawresult = gifo.get_raw_form(raw_item_dict)
     objresult = gifo.get_raw_form(object_item_dict)
     assert rawresult != objresult
@@ -594,8 +597,8 @@ def test_compare_terms_no_diff(raw_item_dict):
 
 
 def test_compare_terms_extra_field_in_t2(raw_item_dict):
-    ''' should ignore any extra fields in t2
-    '''
+    """ should ignore any extra fields in t2
+    """
     t1 = raw_item_dict
     t2 = raw_item_dict.copy()
     t2['extra_field'] = 'extra_val'
@@ -603,8 +606,8 @@ def test_compare_terms_extra_field_in_t2(raw_item_dict):
 
 
 def test_compare_terms_extra_fields_in_t1(raw_item_dict):
-    ''' should ignore any extra fields in t2
-    '''
+    """ should ignore any extra fields in t2
+    """
     extra_fields = {
         'extra_field1': 'extra_val1',
         'extra_list_field': ['v1', 'v2', 'v3'],
@@ -632,27 +635,27 @@ def test_check_for_fields_to_keep(raw_item_dict):
     assert result == fields_to_keep
 
 
-def test_id_fields2patch_unchanged(mocker, raw_item_dict):
-    mocker.patch('encoded.commands.generate_items_from_owl.get_raw_form', return_value=raw_item_dict)
-    mocker.patch('encoded.commands.generate_items_from_owl.compare_terms', return_value=None)
-    assert not gifo.id_fields2patch(raw_item_dict, raw_item_dict, True)
+def test_id_fields2patch_unchanged(raw_item_dict):
+    with mock.patch('encoded.commands.generate_items_from_owl.get_raw_form', return_value=raw_item_dict):
+        with mock.patch('encoded.commands.generate_items_from_owl.compare_terms', return_value=None):
+            assert not gifo.id_fields2patch(raw_item_dict, raw_item_dict, True)
 
 
-def test_id_fields2patch_keep_term(mocker, raw_item_dict):
-    ''' case when remove unchanged (rm_unch) param is False just returns term
-    '''
-    mocker.patch('encoded.commands.generate_items_from_owl.get_raw_form', return_value=raw_item_dict)
-    mocker.patch('encoded.commands.generate_items_from_owl.compare_terms', return_value=None)
-    assert gifo.id_fields2patch(raw_item_dict, raw_item_dict, False) == raw_item_dict
+def test_id_fields2patch_keep_term(raw_item_dict):
+    """ case when remove unchanged (rm_unch) param is False just returns term
+    """
+    with mock.patch('encoded.commands.generate_items_from_owl.get_raw_form', return_value=raw_item_dict):
+        with mock.patch('encoded.commands.generate_items_from_owl.compare_terms', return_value=None):
+            assert gifo.id_fields2patch(raw_item_dict, raw_item_dict, False) == raw_item_dict
 
 
-def test_id_fields2patch_find_some_fields(mocker, raw_item_dict):
-    ''' case when remove unchanged (rm_unch) param is False just returns term
-    '''
+def test_id_fields2patch_find_some_fields(raw_item_dict):
+    """ case when remove unchanged (rm_unch) param is False just returns term
+    """
     patch = {'uuid': 'uuid1', 'field1': 'val1', 'field2': ['a', 'b']}
-    mocker.patch('encoded.commands.generate_items_from_owl.get_raw_form', return_value=raw_item_dict)
-    mocker.patch('encoded.commands.generate_items_from_owl.compare_terms', return_value=patch)
-    assert gifo.id_fields2patch(raw_item_dict, raw_item_dict, True) == patch
+    with mock.patch('encoded.commands.generate_items_from_owl.get_raw_form', return_value=raw_item_dict):
+        with mock.patch('encoded.commands.generate_items_from_owl.compare_terms', return_value=patch):
+            assert gifo.id_fields2patch(raw_item_dict, raw_item_dict, True) == patch
 
 
 @pytest.fixture
@@ -692,16 +695,16 @@ def test_get_uuids_for_linked_one_missing(term_w_slims_and_parents, mock_logger,
     assert out == 'WARNING: HP0000002 - MISSING FROM IDMAP\n'
 
 
-def test_identify_item_updates_no_changes(mocker, terms, mock_logger):
+def test_identify_item_updates_no_changes(terms, mock_logger):
     dbterms = terms.copy()
     for i, tid in enumerate(dbterms.keys()):
         dbterms[tid].update({'uuid': 'uuid' + str(i + 1)})
-    mocker.patch('encoded.commands.generate_items_from_owl._get_uuids_for_linked', return_value={})
-    mocker.patch('encoded.commands.generate_items_from_owl.id_fields2patch', return_value=None)
-    assert not gifo.identify_item_updates(terms, dbterms, 'Phenotype', logger=mock_logger)
+    with mock.patch('encoded.commands.generate_items_from_owl._get_uuids_for_linked', return_value={}):
+        with mock.patch('encoded.commands.generate_items_from_owl.id_fields2patch', return_value=None):
+            assert not gifo.identify_item_updates(terms, dbterms, 'Phenotype', logger=mock_logger)
 
 
-def test_identify_item_updates_w_new_term(mocker, terms, mock_logger):
+def test_identify_item_updates_w_new_term(terms, mock_logger):
     dbterms = copy.deepcopy(terms)
     for i, tid in enumerate(dbterms.keys()):
         dbterms[tid].update({'uuid': 'uuid' + str(i + 1)})
@@ -709,15 +712,15 @@ def test_identify_item_updates_w_new_term(mocker, terms, mock_logger):
     terms['hp:11'] = new_term
     side_effect = [None] * 9
     side_effect.append(new_term)
-    mocker.patch('encoded.commands.generate_items_from_owl.uuid4', return_value='uuid11')
-    mocker.patch('encoded.commands.generate_items_from_owl._get_uuids_for_linked', return_value={})
-    mocker.patch('encoded.commands.generate_items_from_owl.id_fields2patch', side_effect=side_effect)
-    to_update = gifo.identify_item_updates(terms, dbterms, 'Phenotype', logger=mock_logger)
-    new_term.update({'uuid': 'uuid11'})
-    assert to_update[0] == new_term
+    with mock.patch('encoded.commands.generate_items_from_owl.uuid4', return_value='uuid11'):
+        with mock.patch('encoded.commands.generate_items_from_owl._get_uuids_for_linked', return_value={}):
+            with mock.patch('encoded.commands.generate_items_from_owl.id_fields2patch', side_effect=side_effect):
+                to_update = gifo.identify_item_updates(terms, dbterms, 'Phenotype', logger=mock_logger)
+                new_term.update({'uuid': 'uuid11'})
+                assert to_update[0] == new_term
 
 
-def test_identify_item_updates_w_patch_term(mocker, terms, mock_logger):
+def test_identify_item_updates_w_patch_term(terms, mock_logger):
     dbterms = copy.deepcopy(terms)
     added_field = {'definition': 'this is what it means'}
     for i, tid in enumerate(dbterms.keys()):
@@ -729,16 +732,16 @@ def test_identify_item_updates_w_patch_term(mocker, terms, mock_logger):
         se = copy.deepcopy(added_field)
         se.update({'uuid': 'uuid{}'.format(n)})
         side_effect.append(se)
-    mocker.patch('encoded.commands.generate_items_from_owl._get_uuids_for_linked', return_value={})
-    mocker.patch('encoded.commands.generate_items_from_owl.id_fields2patch', side_effect=side_effect)
-    to_update = gifo.identify_item_updates(terms, dbterms, 'Phenotype', logger=mock_logger)
-    assert len(to_update) == 2
-    for upd in to_update:
-        assert 'uuid' in upd
-        assert upd['definition'] == 'this is what it means'
+    with mock.patch('encoded.commands.generate_items_from_owl._get_uuids_for_linked', return_value={}):
+        with mock.patch('encoded.commands.generate_items_from_owl.id_fields2patch', side_effect=side_effect):
+            to_update = gifo.identify_item_updates(terms, dbterms, 'Phenotype', logger=mock_logger)
+            assert len(to_update) == 2
+            for upd in to_update:
+                assert 'uuid' in upd
+                assert upd['definition'] == 'this is what it means'
 
 
-def test_identify_item_updates_set_obsolete_true_obsolete(mocker, terms, mock_logger):
+def test_identify_item_updates_set_obsolete_true_obsolete(terms, mock_logger):
     """ if set_obsolete is true (the default) then the extra dbterm should be added
         to patches as a term to set to obsolete
     """
@@ -748,16 +751,16 @@ def test_identify_item_updates_set_obsolete_true_obsolete(mocker, terms, mock_lo
     for tid in dbterms.keys():
         uid = tid.replace('hp:', 'uuid')
         dbterms[tid].update({'uuid': uid})
-    mocker.patch('encoded.commands.generate_items_from_owl._get_uuids_for_linked', return_value={})
-    mocker.patch('encoded.commands.generate_items_from_owl.id_fields2patch', return_value=None)
-    to_update = gifo.identify_item_updates(terms, dbterms, 'Phenotype', logger=mock_logger)
-    assert len(to_update) == 1
-    obsterm = to_update[0]
-    assert obsterm['uuid'] == 'uuid10'
-    assert obsterm['status'] == 'obsolete'
+    with mock.patch('encoded.commands.generate_items_from_owl._get_uuids_for_linked', return_value={}):
+        with mock.patch('encoded.commands.generate_items_from_owl.id_fields2patch', return_value=None):
+            to_update = gifo.identify_item_updates(terms, dbterms, 'Phenotype', logger=mock_logger)
+            assert len(to_update) == 1
+            obsterm = to_update[0]
+            assert obsterm['uuid'] == 'uuid10'
+            assert obsterm['status'] == 'obsolete'
 
 
-def test_identify_item_updates_set_obsolete_false_do_not_obsolete_live_term(mocker, terms, mock_logger):
+def test_identify_item_updates_set_obsolete_false_do_not_obsolete_live_term(terms, mock_logger):
     """ if set_obsolete is false then the extra dbterm should not be added to patches
         as a term to set to obsolete as long as it's status is not obsolete or deleted
     """
@@ -766,13 +769,13 @@ def test_identify_item_updates_set_obsolete_false_do_not_obsolete_live_term(mock
     dbterms.update({added_obs['hpo_id']: added_obs})
     for i, tid in enumerate(dbterms.keys()):
         dbterms[tid].update({'uuid': 'uuid' + str(i + 1)})
-    mocker.patch('encoded.commands.generate_items_from_owl._get_uuids_for_linked', return_value={})
-    mocker.patch('encoded.commands.generate_items_from_owl.id_fields2patch', return_value=None)
-    to_update = gifo.identify_item_updates(terms, dbterms, 'Phenotype', set_obsoletes=False, logger=mock_logger)
-    assert not to_update
+    with mock.patch('encoded.commands.generate_items_from_owl._get_uuids_for_linked', return_value={}):
+        with mock.patch('encoded.commands.generate_items_from_owl.id_fields2patch', return_value=None):
+            to_update = gifo.identify_item_updates(terms, dbterms, 'Phenotype', set_obsoletes=False, logger=mock_logger)
+            assert not to_update
 
 
-def test_identify_item_updates_set_obsolete_true_do_not_patch_obsolete_term(mocker, terms, mock_logger):
+def test_identify_item_updates_set_obsolete_true_do_not_patch_obsolete_term(terms, mock_logger):
     """ if set_obsolete is True then the extra dbterm should not be added to patches
         if it's already status = obsolete
     """
@@ -781,10 +784,10 @@ def test_identify_item_updates_set_obsolete_true_do_not_patch_obsolete_term(mock
     dbterms.update({added_obs['hpo_id']: added_obs})
     for i, tid in enumerate(dbterms.keys()):
         dbterms[tid].update({'uuid': 'uuid' + str(i + 1)})
-    mocker.patch('encoded.commands.generate_items_from_owl._get_uuids_for_linked', return_value={})
-    mocker.patch('encoded.commands.generate_items_from_owl.id_fields2patch', return_value=None)
-    to_update = gifo.identify_item_updates(terms, dbterms, 'Phenotype', logger=mock_logger)
-    assert not to_update
+    with mock.patch('encoded.commands.generate_items_from_owl._get_uuids_for_linked', return_value={}):
+        with mock.patch('encoded.commands.generate_items_from_owl.id_fields2patch', return_value=None):
+            to_update = gifo.identify_item_updates(terms, dbterms, 'Phenotype', logger=mock_logger)
+            assert not to_update
 
 
 def test_write_outfile(simple_terms):

@@ -77,7 +77,8 @@ def setup_and_teardown(app):
     # AFTER THE TEST
     session = app.registry[DBSESSION]
     connection = session.connection().connect()
-    meta = MetaData(bind=session.connection(), reflect=True)
+    meta = MetaData(bind=session.connection())
+    meta.reflect()
     for table in meta.sorted_tables:
         print('Clear table %s' % table)
         print('Count before -->', str(connection.scalar("SELECT COUNT(*) FROM %s" % table)))
@@ -257,7 +258,7 @@ def test_real_validation_error(app, indexer_testapp, testapp, institution,
     assert val_err_view['validation_errors'] == es_res['_source']['validation_errors']
 
 
-# @pytest.mark.performance
+@pytest.mark.performance
 @pytest.mark.skip(reason="need to update perf-testing inserts")
 def test_load_and_index_perf_data(testapp, indexer_testapp):
     '''
