@@ -371,6 +371,11 @@ def should_transform(request, response):
     if response.content_type != 'application/json':
         return False
 
+    # If we have a 'frame' that is not None or page, force JSON, since our UI doesn't handle all various forms of the data, just embedded/page.
+    request_frame = request.params.get("frame", "page")
+    if request_frame != "page":
+        return False
+
     # The `format` URI param allows us to override request's 'Accept' header.
     format = request.params.get('format')
     if format is not None:
@@ -386,7 +391,7 @@ def should_transform(request, response):
     # which should contain 'text/html'
     # See: https://tedboy.github.io/flask/generated/generated/werkzeug.Accept.best_match.html#werkzeug-accept-best-match
     # TODO: Maybe use mime_type = best_mime_type(request) instead.
-    mime_type = request.accept.best_match(['text/html',  'application/json', 'application/ld+json'], 'application/json')
+    mime_type = request.accept.best_match(['application/json', 'text/html', 'application/ld+json'], 'application/json')
     format = mime_type.split('/', 1)[1] # Will be 1 of 'html', 'json', 'json-ld'
 
     # N.B. ld+json (JSON-LD) is likely more unique case and might be sent by search engines (?) which can parse JSON-LDs.
