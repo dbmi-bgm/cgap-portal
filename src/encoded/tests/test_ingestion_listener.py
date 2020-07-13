@@ -13,7 +13,7 @@ INGESTION_STATUS_URL = '/ingestion_status'
 MOCKED_ENV = 'fourfront-cgapother'
 
 
-def await_for_queue_to_catch_up(n):
+def wait_for_queue_to_catch_up(n):
     """ Wait until queue has done the things we told it to do. Right now this just sleeps for 10 seconds
         assuming most operations should complete within that amount of time.
     """
@@ -50,7 +50,7 @@ def test_ingestion_queue_add_and_receive(setup_and_teardown_sqs_state):
     queue_manager.add_uuids([
         str(uuid4()), str(uuid4())
     ])
-    await_for_queue_to_catch_up(0)
+    wait_for_queue_to_catch_up(0)
     msgs = queue_manager.receive_messages()
     assert len(msgs) == 2
 
@@ -60,12 +60,12 @@ def test_ingestion_queue_add_via_route(setup_and_teardown_sqs_state, testapp):
     queue_manager = setup_and_teardown_sqs_state
     request_body = {
         'uuids': [str(uuid4()), str(uuid4())],
-        'override_name': MOCKED_ENV + '-vcfs'
+        'override_name': MOCKED_ENV + queue_manager.BUCKET_EXTENSION
     }
     response = testapp.post_json(QUEUE_INGESTION_URL, request_body).json
     assert response['notification'] == 'Success'
     assert response['number_queued'] == 2
-    await_for_queue_to_catch_up(0)
+    wait_for_queue_to_catch_up(0)
     msgs = queue_manager.receive_messages()
     assert len(msgs) >= 2
 
@@ -75,13 +75,13 @@ def test_ingestion_queue_delete(setup_and_teardown_sqs_state, testapp):
     queue_manager = setup_and_teardown_sqs_state
     request_body = {
         'uuids': [str(uuid4()), str(uuid4())],
-        'override_name': MOCKED_ENV + '-vcfs'
+        'override_name': MOCKED_ENV + queue_manager.BUCKET_EXTENSION
     }
     testapp.post_json(QUEUE_INGESTION_URL, request_body, status=200)
     msgs = queue_manager.receive_messages()
     failed = queue_manager.delete_messages(msgs)
     assert failed == []
-    await_for_queue_to_catch_up(0)
+    wait_for_queue_to_catch_up(0)
 
 
 @pytest.fixture
@@ -139,7 +139,7 @@ def test_ingestion_listener_run(testapp, mocked_vcf_file, gene_workbook, setup_a
     uuid = file_meta['uuid']
     queue_manager = setup_and_teardown_sqs_state
     queue_manager.add_uuids([uuid])
-    await_for_queue_to_catch_up(0)
+    wait_for_queue_to_catch_up(0)
 
     # configure run for 10 seconds
     start_time = datetime.datetime.utcnow()

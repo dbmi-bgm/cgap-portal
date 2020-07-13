@@ -6,20 +6,19 @@ import argparse
 import structlog
 import datetime
 import json
-import gzip
 import atexit
 import threading
 import signal
 import psycopg2
 import webtest
 import elasticsearch
-from io import BytesIO
+import requests  # XXX: C4-211 should not be needed but is
 from vcf import Reader
 from pyramid import paster
 from dcicutils.misc_utils import VirtualApp
 from pyramid.view import view_config
 from snovault.util import debug_log
-from .util import resolve_file_path
+from .util import resolve_file_path, gunzip_content
 from .commands.ingest_vcf import VCFParser
 
 
@@ -309,16 +308,6 @@ class IngestionListener:
             return True
         return override()
 
-    @staticmethod
-    def gunzip_content(content):
-        """ Helper that will gunzip content """
-        f_in = BytesIO()
-        f_in.write(content)
-        f_in.seek(0)
-        with gzip.GzipFile(fileobj=f_in, mode='rb') as f:
-            gunzipped_content = f.read()
-        return gunzipped_content.decode('utf-8')
-
     def get_messages(self):
         """ Sleeps (as to not hit SQS too frequently) then requests messages,
             returning the result bodies.
@@ -427,14 +416,13 @@ class IngestionListener:
 
                 # attempt download with workaround
                 try:
-                    from requests import get  # XXX: C4-211 should not be needed but is
-                    raw_content = get(location).content
+                    raw_content = requests.get(location).content
                 except Exception as e:
                     log.error('Could not download file uuid: %s with error: %s' % (uuid, e))
                     continue
 
                 # gunzip content, pass to parser, post variants/variant_samples
-                decoded_content = self.gunzip_content(raw_content)
+                decoded_content = gunzip_content(raw_content)
                 log.info('Got decoded content: %s' % decoded_content[:20])
                 parser = VCFParser(None, VARIANT_SCHEMA, VARIANT_SAMPLE_SCHEMA,
                                    reader=Reader(fsock=decoded_content.split('\n')))
