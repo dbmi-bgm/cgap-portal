@@ -5,6 +5,7 @@ import mock
 import datetime
 from uuid import uuid4
 from ..ingestion_listener import IngestionQueueManager, run, IngestionListener
+from ..util import gunzip_content
 from .variant_fixtures import gene_workbook  # noqa
 
 
@@ -117,7 +118,7 @@ def test_posting_vcf_processed_file(testapp, mocked_vcf_file):
     file_meta = mocked_vcf_file['@graph'][0]
     file_location = testapp.get(file_meta['href']).location  # if you .follow() this you get 404 erroneously
     content = requests.get(file_location).content
-    raw_vcf_file = IngestionListener.gunzip_content(content)
+    raw_vcf_file = gunzip_content(content)
     assert "##fileformat=VCFv4.2" in raw_vcf_file
 
 
