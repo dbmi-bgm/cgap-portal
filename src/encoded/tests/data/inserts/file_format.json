@@ -32,5 +32,15 @@
         "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
         "institution": "hms-dbmi",
         "submitted_by": "koray_kirli@hms.harvard.edu"
+    },
+    {
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "institution": "hms-dbmi",
+        "file_format": "vcf_gz",
+        "uuid": "0cd4e777-a596-4927-95c8-b07716121aa5",
+        "description": "vcf, compressed",
+        "standard_file_extension": "vcf.gz",
+        "other_allowed_extensions": ["vcf"],
+        "valid_item_types": ["FileProcessed"]
     }
 ]

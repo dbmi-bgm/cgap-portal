@@ -78,6 +78,7 @@ def test_VCFP_multiple_variants(test_vcf):
     assert result['topmed_het'] == 67
     assert result['cosmic_mutation_somatic_status'] == 'Confirmed somatic variant'
     assert result['conservation_phastcons100'] == 0.0
+    assert sorted(result['cosmic_mutation_description']) == ['Missense', 'Substitution']
 
     # check transcript
     assert len(result['transcript'].keys()) == 6
@@ -104,6 +105,8 @@ def test_VCFP_multiple_variants(test_vcf):
     assert result['gnomad_ac_afr_male'] == 158
     assert result['topmed_het'] == 403
 
+    # XXX: test string array fields
+
 
 def test_VCFP_multiple_sample_variants(test_vcf):
     """ Generates 3 sample variant items and checks them for correctness """
@@ -126,6 +129,7 @@ def test_VCFP_multiple_sample_variants(test_vcf):
     assert 'samplegeno_gt' in result['samplegeno'][0]
 
 
+@pytest.mark.skip  # variant is required for posting variant_samples, so this test cannot be run now.
 def test_VCFP_post_sample_variants(testapp, institution, project, test_vcf):
     """ Attempts to post all generated sample variants without links"""
     for idx, record in enumerate(test_vcf):
@@ -135,7 +139,9 @@ def test_VCFP_post_sample_variants(testapp, institution, project, test_vcf):
         for sample in variant_samples:
             sample['project'] = 'encode-project'
             sample['institution'] = 'encode-institution'
-            testapp.post_json(VARIANT_SAMPLE_URL, sample, status=201)
+            sample['file'] = 'dummy-filename'
+            res = testapp.post_json(VARIANT_SAMPLE_URL, sample, status=201).json
+            assert 'annotation_id' in res['@graph'][0]  # verify annotation_id is added on post
 
 
 def test_VCFP_post_variants(testapp, institution, project, test_vcf, gene_workbook, post_variant_consequence_items):
@@ -147,7 +153,8 @@ def test_VCFP_post_variants(testapp, institution, project, test_vcf, gene_workbo
         variant['project'] = 'encode-project'
         variant['institution'] = 'encode-institution'
         test_vcf.format_variant_sub_embedded_objects(variant)
-        testapp.post_json(VARIANT_URL, variant, status=201)
+        res = testapp.post_json(VARIANT_URL, variant, status=201).json
+        assert 'annotation_id' in res['@graph'][0]  # verify annotation_id is added on post
 
 
 # @pytest.mark.skip  # will not run currently without valid VCF
@@ -166,7 +173,9 @@ def test_VCFP_post_variants(testapp, institution, project, test_vcf, gene_workbo
 
 
 def test_VCFP_make_links(testapp, institution, project, test_vcf, gene_workbook, post_variant_consequence_items):
-    """ Will post all generated variants and samples, forming linkTo's from variant_sample to variant """
+    """ Will post all generated variants and samples, forming linkTo's from variant_sample to variant
+        NOTE: This is the most important test functionally speaking.
+    """
     VARIANT_URL, VARIANT_SAMPLE_URL = '/variant', '/variant_sample'
     for idx, record in enumerate(test_vcf):
         if idx == MAX_POSTS_FOR_TESTING:
@@ -176,9 +185,12 @@ def test_VCFP_make_links(testapp, institution, project, test_vcf, gene_workbook,
         variant['institution'] = 'encode-institution'
         test_vcf.format_variant_sub_embedded_objects(variant)
         res = testapp.post_json(VARIANT_URL, variant, status=201).json['@graph'][0]  # only one item posted
+        assert 'annotation_id' in res
         variant_samples = test_vcf.create_sample_variant_from_record(record)
         for sample in variant_samples:
             sample['project'] = 'encode-project'
             sample['institution'] = 'encode-institution'
             sample['variant'] = res['@id']  # make link
-            testapp.post_json(VARIANT_SAMPLE_URL, sample, status=201)
+            sample['file'] = 'dummy-filename'
+            res2 = testapp.post_json(VARIANT_SAMPLE_URL, sample, status=201).json
+            assert 'annotation_id' in res2['@graph'][0]

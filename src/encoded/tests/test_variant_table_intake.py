@@ -71,7 +71,7 @@ def test_add_default_schema_fields(MTParser):
 def test_read_variant_table_header(MTParser):
     """ Tests that we can read mapping table header correctly based on the current format """
     assert MTParser.version == 'annV0.4.6'
-    assert MTParser.date == '05.25.2020'
+    assert MTParser.date == '07.07.2020'
     assert sorted(MTParser.fields) == sorted(EXPECTED_FIELDS)
     for field in EXPECTED_FIELDS:  # all fields are categorized by the Parser
         assert field in MTParser.ALL_FIELDS
@@ -82,7 +82,11 @@ def test_process_variant_table_inserts(MTParser, inserts):
         Tests that we properly process annotation field inserts
         There should be 306 total. A hand crafted example is checked
     """
-    assert inserts[0] == EXPECTED_INSERT
+    chrom_insert = None
+    for insert in inserts:
+        if insert['field_name'] == 'CHROM':
+            chrom_insert = insert
+    assert chrom_insert == EXPECTED_INSERT
     assert len(inserts) == NUMBER_ANNOTATION_FIELDS
     sample_fields = MTParser.filter_fields_by_sample(inserts)
     assert len(sample_fields) == SAMPLE_FIELDS_EXPECTED
@@ -133,10 +137,8 @@ def test_generate_variant_json_items(MTParser, inserts):
     assert sub_obj_props['vep_consequence']['items']['type'] == 'string'
 
     # check cols/facs
-    assert 'hgvs_hgvsg' in cols
     assert 'max_pop_af_af_popmax' in cols
     assert 'gnomad_af' in cols
-    assert cols['hgvs_hgvsg']['title'] == 'Variant'
     assert facs['CHROM']['title'] == 'Chromosome'
     assert facs['CHROM']['grouping'] == 'Position'
     assert facs['spliceai_ds_dg']['aggregation_type'] == 'stats'
@@ -163,7 +165,8 @@ def test_generate_variant_sample_schema(MTParser, sample_variant_items):
     assert 'AF' in schema['facets']
     assert 'facets' in schema
     assert 'variant' in properties
-    assert 'sample' in properties
+    assert 'file' in properties
+    assert 'variant.display_title' in cols
 
 
 def test_generate_variant_schema(MTParser, variant_items):
@@ -200,7 +203,6 @@ def test_generate_variant_schema(MTParser, variant_items):
     assert properties['clinvar_submission']['type'] == 'array'
 
     # check cols/facs
-    assert 'ID' in schema['columns']
     assert 'AF' not in schema['columns']
     assert 'CHROM' in schema['facets']
     assert 'POS' in schema['facets']

@@ -42,8 +42,21 @@
                 "other",
                 "intermediate file",
                 "raw VCF",
-                "gVCF"
+                "gVCF",
+                "full annotated VCF"
             ]
+        },
+        "file_ingestion_status": {
+            "title": "Ingestion Status",
+            "description": "Whether or not this processed file has been ingested, if applicable.",
+            "type": "string",
+            "enum": [
+                "N/A",
+                "Waiting",
+                "Queued",
+                "Ingested"
+            ],
+            "default": "N/A"
         },
         "file_classification": {
             "title": "General Classification",
