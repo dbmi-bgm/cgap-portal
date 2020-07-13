@@ -386,7 +386,7 @@
         },
         "bam_snapshot": {
             "title": "Genome Snapshot",
-            "description": "'Link to Genome Snapshot Image",
+            "description": "Link to Genome Snapshot Image",
             "type": "string"
         },
         "annotation_id": {
