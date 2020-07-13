@@ -12,11 +12,36 @@ import json
 import xlrd
 
 
-BGM_FIELD_MAPPING = {
-    'bcgg-id': 'patient id',
-    'bcgg-f-id': 'family id',
-    "date req rec'd": 'date requisition received'
+GENERIC_FIELD_MAPPING = {
+    'individual': {},
+    'family': {},
+    'sample': {
+        'date collected': 'specimen_collection_date',
+        'location stored': 'specimen_storage_location',
+        'specimen id': 'specimen_accession',
+        'transport method': 'transported_by',
+        'sequencing ref lab': 'sequencing_lab',
+        "date rec'd at ref lab": 'date_received',
+        'specimen accepted by ref lab': 'specimen_accepted',
+        'sample id by ref lab': 'sequence_id',
+        'req type': 'requisition_type',
+        "date req rec'd": 'date_requisition_received',
+        'physician/provider': 'ordering_physician'
+    },
+    'requisition': {
+        'req accepted y/n': 'accepted_rejected',
+        'reason rejected': 'rejection_reason',
+        'corrective action taken': 'corrective_action',
+        'corrective action taken by': 'action_taken_by',
+        'correction notes': 'notes'
+    }
 }
+
+# BGM_FIELD_MAPPING = {
+#     'bcgg-id': 'patient id',
+#     'bcgg-f-id': 'family id',
+#     "date req rec'd": 'date requisition received'
+# }
 
 
 POST_ORDER = ['sample', 'individual', 'family', 'sample_processing', 'report', 'case']
@@ -51,6 +76,15 @@ def submit_data(context, request):
     raise NotImplementedError
 
 
+def map_fields(row, metadata_dict, addl_fields, item_type):
+    for map_field in GENERIC_FIELD_MAPPING[item_type]:
+        if map_field in row:
+            metadata_dict[GENERIC_FIELD_MAPPING[item_type][map_field]] = row.get(map_field)
+    for field in addl_fields:
+        metadata_dict[field] = row.get(field.replace('_', ' '))
+    return metadata_dict
+
+
 def xls_to_json(xls_data, project, institution):
     '''
     Converts excel file to json for submission.
@@ -66,7 +100,7 @@ def xls_to_json(xls_data, project, institution):
     counter = 0
     for values in row:
         r = [val for val in values]
-        row_dict = {keys[i].lower(): item for i, item in enumerate(r)}
+        row_dict = {keys[i].lower().rstrip('*'): item for i, item in enumerate(r)}
         rows.append(row_dict)
 
     items = {
@@ -75,11 +109,11 @@ def xls_to_json(xls_data, project, institution):
     }
     specimen_ids = {}
     for row in rows:
-        indiv_alias = '{}:individual-{}'.format(project['name'], row['patient id'])
-        fam_alias = '{}:family-{}'.format(project['name'], row['family id'])
-        sp_alias = '{}:sampleproc-{}'.format(project['name'], row['specimen id'])
+        indiv_alias = '{}:individual-{}'.format(project['name'], row['individual id'])
+        fam_alias = '{}:family-{}'.format(project['name'], row['individual id'])
+        # sp_alias = '{}:sampleproc-{}'.format(project['name'], row['specimen id'])
         # create items for Individual
-        items = fetch_individual_metadata(row, items, indiv_alias)
+        items = fetch_individual_metadata(row, items, indiv_alias, institution['name'])
         # create/edit items for Family
         items = fetch_family_metadata(row, items, indiv_alias, fam_alias)
         # create item for Sample if there is a specimen
@@ -91,10 +125,11 @@ def xls_to_json(xls_data, project, institution):
             else:
                 specimen_ids[row['specimen id']] = 1
             analysis_alias = '{}:analysis-{}'.format(project['name'], row['analysis id'])
-            items = fetch_sample_metadata(row, items, indiv_alias, samp_alias, sp_alias, analysis_alias, fam_alias)
+            items = fetch_sample_metadata(row, items, indiv_alias, samp_alias,
+                                          analysis_alias, fam_alias, project['name'])
         else:
             print('WARNING: No specimen id present for patient {},'
-                  ' sample will not be created.'.format(row['patient id']))
+                  ' sample will not be created.'.format(row['individual id']))
     # create SampleProcessing item for trio/group if needed
     # items = create_sample_processing_groups(items, sp_alias)
     items = create_case_items(items, project['name'])
@@ -110,15 +145,17 @@ def xls_to_json(xls_data, project, institution):
     return items
 
 
-def fetch_individual_metadata(row, items, indiv_alias):
+def fetch_individual_metadata(row, items, indiv_alias, inst_name):
     new_items = items.copy()
-    info = {
-        'aliases': [indiv_alias],
-        'individual_id': row['patient id'],
-        'sex': row.get('sex'),
-    }
-    info['age'] = int(row['age']) if row.get('age') else None
-    info['birth_year'] = int(row['birth year']) if row.get('birth year') else None
+    info = {'aliases': [indiv_alias]}
+    info = map_fields(row, info, ['individual_id', 'sex', 'age', 'birth_year'], 'individual')
+    if row.get('other individual id'):
+        other_id = {'id': row['other individual id'], 'id_source': inst_name}
+        if row.get('other individual id type'):
+            other_id['id_source'] = row['other individual id source']
+        info['institutional_id'] = other_id
+    info['age'] = int(info['age']) if info.get('age') else None
+    info['birth_year'] = int(info['birth year']) if info.get('birth year') else None
     if indiv_alias not in new_items['individual']:
         new_items['individual'][indiv_alias] = {k: v for k, v in info.items() if v}
     else:
@@ -147,33 +184,33 @@ def fetch_family_metadata(row, items, indiv_alias, fam_alias):
     return new_items
 
 
-def fetch_sample_metadata(row, items, indiv_alias, samp_alias, sp_alias, analysis_alias, fam_alias):
+def fetch_sample_metadata(row, items, indiv_alias, samp_alias, analysis_alias, fam_alias, proj_name):
     new_items = items.copy()
-    info = {
-        'aliases': [samp_alias],
-        'workup_type': row.get('workup type'),
-        'specimen_type': row.get('specimen type'),
-        'specimen_collection_date': row.get('date collected'),
-        'specimen_collection_location': row.get('location collected'),
-        'specimen_accession': row['specimen id'],
-        'date_transported': row.get('date transported'),
-        'transported_by': row.get('transport method'),
-        'sent_by': row.get('sent by'),
-        'date_received': row.get("date rec'd at ref lab"),
-        'specimen_accepted': row.get('specimen accepted by ref lab'),
-        'dna_concentration': row.get('dna concentration'),
-        'specimen_notes': row.get('specimen notes')
-    }
+    info = {'aliases': [samp_alias], 'files': []}  # TODO: implement creation of file db items
+    fields = [
+        'workup_type', 'specimen_type', 'dna_concentration', 'date_transported',
+        'specimen_notes', 'research_protocol_name', 'sent_by', 'physician_id', 'indication'
+    ]
+    info = map_fields(row, info, fields, 'sample')
+    if info['specimen_accepted'].lower() == 'y':
+        info['specimen_accepted'] = 'Yes'
+    elif info['specimen_accepted'].lower() == 'n':
+        info['specimen_accepted'] = 'No'
+    if row.get('second specimen id'):
+        other_id = {'id': row['second specimen id'], 'id_type': proj_name}  # add proj info?
+        if row.get('second specimen id type'):
+            other_id['id_type'] = row['second specimen id type']
+        info['other_specimen_ids'] = [other_id]
+    req_info = map_fields(row, {}, ['date sent', 'date completed'], 'requisition')
+    if req_info['accepted_rejected'].lower() in ['yes', 'no', 'y', 'n']:
+        if req_info['accepted_rejected'].lower().startswith('y'):
+            req_info['accepted_rejected'] = 'Accepted'
+        else:
+            req_info['accepted_rejected'] = "Rejected"
+    info['requisition_acceptance'] = {k: v for k, v in req_info.items() if v}
     new_items['sample'][samp_alias] = {k: v for k, v in info.items() if v}
     if indiv_alias in new_items['individual']:
         new_items['individual'][indiv_alias]['samples'] = [samp_alias]
-    # create SampleProcessing item for that one sample if needed
-    # if row['report required'].lower() in ['yes', 'y']:
-    #     new_items['sample_processing'][sp_alias] = {
-    #         'aliases': [sp_alias],
-    #         'analysis_type': row['workup type'],
-    #         'samples': [samp_alias]
-    #     }
     new_sp_item = {
         # not trivial to add analysis_type here, turn into calculated property
         'aliases': [analysis_alias],
@@ -183,11 +220,24 @@ def fetch_sample_metadata(row, items, indiv_alias, samp_alias, sp_alias, analysi
     new_items['sample_processing'].setdefault(analysis_alias, new_sp_item)
     new_items['sample_processing'][analysis_alias]['samples'].append(samp_alias)
     if row.get('report required').lower().startswith('y'):
-        print('report')
         new_items['reports'].append(samp_alias)
     if fam_alias not in new_items['sample_processing'][analysis_alias]['families']:
         new_items['sample_processing'][analysis_alias]['families'].append(fam_alias)
     return new_items
+
+
+# TODO: finish implementing this function
+def fetch_file_metadata(filenames):
+    files = []
+    for filename in filenames:
+        file_info = {
+            'aliases': [],
+            'file_format': '',
+            'file_type': '',
+            'filename': ''
+        }
+        files.append(file_info)
+    raise NotImplementedError
 
 
 def create_case_items(items, proj_name):
@@ -204,12 +254,11 @@ def create_case_items(items, proj_name):
             indiv = [ikey for ikey, ival in items['individual'].items() if sample in ival.get('samples', [])][0]
             case_info = {
                 'aliases': [case_alias],
-                'case_id': case_id,
+                # 'case_id': case_id,
                 'sample_processing': k,
                 'individual': indiv
             }
             if sample in items['reports']:
-                print('2')
                 report_alias = case_alias.replace('case', 'report')
                 new_items['report'][report_alias] = {
                     'aliases': [report_alias],
@@ -221,27 +270,27 @@ def create_case_items(items, proj_name):
     return new_items
 
 
-def create_sample_processing_groups(items, sp_alias):
-    new_items = items.copy()
-    for v in new_items['family'].values():
-        if 'members' in v and len(v['members']) > 1:
-            # create sample_processing item
-            samples = [items['individual'][indiv].get('samples', [None])[0] for indiv in v['members']]
-            samples = [s for s in samples if s]
-            if len (samples) > 1:
-                sp = {
-                    'aliases': [sp_alias],
-                    'samples': samples
-                }
-                analysis_type = items['sample'][items['individual'][v['proband']]['samples'][0]]['workup_type']
-                if all([relation in v for relation in ['proband', 'mother', 'father']]) and sorted(
-                    v['members']) == sorted([v['proband'], v['mother'], v['father']]
-                ):
-                    sp['analysis_type'] = analysis_type + '-Trio'
-                else:
-                    sp['analysis_type'] = analysis_type + '-Group'
-                new_items['sample_processing'][sp_alias] = sp
-    return new_items
+# def create_sample_processing_groups(items, sp_alias):
+#     new_items = items.copy()
+#     for v in new_items['family'].values():
+#         if 'members' in v and len(v['members']) > 1:
+#             # create sample_processing item
+#             samples = [items['individual'][indiv].get('samples', [None])[0] for indiv in v['members']]
+#             samples = [s for s in samples if s]
+#             if len (samples) > 1:
+#                 sp = {
+#                     'aliases': [sp_alias],
+#                     'samples': samples
+#                 }
+#                 analysis_type = items['sample'][items['individual'][v['proband']]['samples'][0]]['workup_type']
+#                 if all([relation in v for relation in ['proband', 'mother', 'father']]) and sorted(
+#                     v['members']) == sorted([v['proband'], v['mother'], v['father']]
+#                 ):
+#                     sp['analysis_type'] = analysis_type + '-Trio'
+#                 else:
+#                     sp['analysis_type'] = analysis_type + '-Group'
+#                 new_items['sample_processing'][sp_alias] = sp
+#     return new_items
 
 
 def compare_with_db(virtualapp, alias):

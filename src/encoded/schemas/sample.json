@@ -54,6 +54,13 @@
             "lookup": 30,
             "description": "Clinical or research consent/protocol"
         },
+        "research_protocol_name": {
+            "title": "Research Protocol Name",
+            "type": "string",
+            "label": "requisition",
+            "lookup": 31,
+            "description": "Consent Protocol Name for Research Requisition"
+        },
         "date_requisition_received": {
             "title": "Date Requisition Received",
             "type": "string",
@@ -131,6 +138,12 @@
                     "lookup": 113,
                     "description": "If requisition was rejected, the corrective action noted/taken"
                 },
+                "action_taken_by": {
+                    "title": "Action Taken By",
+                    "type": "string",
+                    "lookup": 114,
+                    "description": "Name or ID of person who took the corrective action"
+                },
                 "date_sent": {
                     "title": "Date Correction Sent",
                     "type": "string",
@@ -203,6 +216,13 @@
             "type": "string",
             "lookup": 140
         },
+        "specimen_storage_location": {
+            "title": "Specimen Storage Location",
+            "description": "Location of specimen storage",
+            "label": "specimen",
+            "type": "string",
+            "lookup": 144
+        },
         "specimen_accession": {
             "title": "Specimen Accession",
             "description": "Accession of specimen from sequencing lab",
@@ -246,6 +266,13 @@
             "label": "specimen",
             "lookup": 160,
             "description": "ID of person who sent the specimen"
+        },
+        "sequencing_lab": {
+            "title": "Sequencing Lab",
+            "description": "Location performing sequencing on sample",
+            "type": "string",
+            "label": "test",
+            "lookup": 189
         },
         "date_received": {
             "title": "Date Received in Sequencing Lab",
