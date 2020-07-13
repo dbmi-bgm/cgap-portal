@@ -11,9 +11,6 @@ from snovault import (
     calculated_property,
     collection,
     load_schema,
-    # CONNECTION,
-    # COLLECTIONS,
-    # display_title_schema,
 )
 from snovault.util import debug_log
 from webtest import TestApp
