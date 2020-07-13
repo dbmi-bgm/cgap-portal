@@ -384,9 +384,9 @@
             "description": "String Accession of the vcf file used in digestion",
             "type": "string"
         },
-        "href": {
-            "title": "IGV href",
-            "description": "Link to IGV image",
+        "bam_snapshot": {
+            "title": "Genome Snapshot",
+            "description": "'Link to Genome Snapshot Image",
             "type": "string"
         },
         "annotation_id": {
@@ -416,6 +416,9 @@
             "number_step": 1,
             "order": 10,
             "grouping": "Variant Quality"
+        },
+        "bam_snapshot": {
+            "title": "Genome Snapshot"
         },
         "variant.display_title": {
             "title": "Variant"

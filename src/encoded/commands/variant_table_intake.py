@@ -452,7 +452,7 @@ class MappingTableParser(object):
     @staticmethod
     def add_extra_variant_sample_columns(cols):
         """ Adds href, variant display title to columns (fields not on mapping table) """
-        cols['href'] = {
+        cols['bam_snapshot'] = {
             'title': 'Genome Snapshot'
         }
         cols['variant.display_title'] = {
@@ -487,7 +487,7 @@ class MappingTableParser(object):
             'description': 'String Accession of the vcf file used in digestion',
             'type': 'string'
         }
-        schema['properties']['href'] = {
+        schema['properties']['bam_snapshot'] = {
             'title': 'Genome Snapshot',
             'description': 'Link to Genome Snapshot Image',
             'type': 'string'
