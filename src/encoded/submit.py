@@ -110,7 +110,7 @@ def xls_to_json(xls_data, project, institution):
     specimen_ids = {}
     for row in rows:
         indiv_alias = '{}:individual-{}'.format(project['name'], row['individual id'])
-        fam_alias = '{}:family-{}'.format(project['name'], row['individual id'])
+        fam_alias = '{}:family-{}'.format(project['name'], row['family id'])
         # sp_alias = '{}:sampleproc-{}'.format(project['name'], row['specimen id'])
         # create items for Individual
         items = fetch_individual_metadata(row, items, indiv_alias, institution['name'])
@@ -192,9 +192,9 @@ def fetch_sample_metadata(row, items, indiv_alias, samp_alias, analysis_alias, f
         'specimen_notes', 'research_protocol_name', 'sent_by', 'physician_id', 'indication'
     ]
     info = map_fields(row, info, fields, 'sample')
-    if info['specimen_accepted'].lower() == 'y':
+    if info.get('specimen_accepted', '').lower() == 'y':
         info['specimen_accepted'] = 'Yes'
-    elif info['specimen_accepted'].lower() == 'n':
+    elif info.get('specimen_accepted', '').lower() == 'n':
         info['specimen_accepted'] = 'No'
     if row.get('second specimen id'):
         other_id = {'id': row['second specimen id'], 'id_type': proj_name}  # add proj info?
@@ -202,7 +202,7 @@ def fetch_sample_metadata(row, items, indiv_alias, samp_alias, analysis_alias, f
             other_id['id_type'] = row['second specimen id type']
         info['other_specimen_ids'] = [other_id]
     req_info = map_fields(row, {}, ['date sent', 'date completed'], 'requisition')
-    if req_info['accepted_rejected'].lower() in ['yes', 'no', 'y', 'n']:
+    if req_info.get('accepted_rejected', '').lower() in ['yes', 'no', 'y', 'n']:
         if req_info['accepted_rejected'].lower().startswith('y'):
             req_info['accepted_rejected'] = 'Accepted'
         else:
