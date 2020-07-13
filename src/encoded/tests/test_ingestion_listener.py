@@ -5,7 +5,7 @@ import mock
 import datetime
 from uuid import uuid4
 from ..ingestion_listener import IngestionQueueManager, run, IngestionListener
-from .variant_fixtures import gene_workbook
+from .variant_fixtures import gene_workbook  # noqa
 
 
 QUEUE_INGESTION_URL = '/queue_ingestion'
@@ -22,6 +22,7 @@ def await_for_queue_to_catch_up(n):
 
 @pytest.yield_fixture(scope='function', autouse=True)
 def setup_and_teardown_sqs_state():
+    """ Yield fixture that initializes SQS and clears all messages after the each in this module. """
     registry = MockedRegistry({
         'env.name': MOCKED_ENV
     })
@@ -31,6 +32,7 @@ def setup_and_teardown_sqs_state():
 
 
 class MockedRegistry:
+    """ Very simple mock with the single 'settings' field. """
     def __init__(self, settings):
         self.settings = settings
 
@@ -39,7 +41,7 @@ def test_ingestion_queue_manager_basic(setup_and_teardown_sqs_state):
     """ Tests basic things about initializing the queue manager """
     queue_manager = setup_and_teardown_sqs_state
     assert queue_manager.env_name == MOCKED_ENV
-    assert queue_manager.queue_name == MOCKED_ENV + '-vcfs'
+    assert queue_manager.queue_name == MOCKED_ENV + queue_manager.BUCKET_EXTENSION
 
 
 def test_ingestion_queue_add_and_receive(setup_and_teardown_sqs_state):
@@ -119,6 +121,16 @@ def test_posting_vcf_processed_file(testapp, mocked_vcf_file):
     assert "##fileformat=VCFv4.2" in raw_vcf_file
 
 
+def test_ingestion_listener_should_remain_online(setup_and_teardown_sqs_state):
+    """ Tests that the 'should_remain_online' method works """
+    _await = lambda: time.sleep(3)
+    before = datetime.datetime.utcnow()
+    end_delta = datetime.timedelta(seconds=2)  # this diff should not occur if _await is not executed
+    IngestionListener.should_remain_online(override=_await)
+    after = datetime.datetime.utcnow()
+    assert after > (before + end_delta)
+
+
 def test_ingestion_listener_run(testapp, mocked_vcf_file, gene_workbook, setup_and_teardown_sqs_state):
     """ Tests the 'run' method of ingestion listener, which will pull down and ingest a vcf file
         from the SQS queue.
@@ -133,11 +145,12 @@ def test_ingestion_listener_run(testapp, mocked_vcf_file, gene_workbook, setup_a
     start_time = datetime.datetime.utcnow()
     end_delta = datetime.timedelta(seconds=10)
 
-    def mocked_should_remain_online(ignore):
+    def mocked_should_remain_online(ignore):  # staticmethod, so requires 'self' positional arg (that is ignored)
         current_time = datetime.datetime.utcnow()
         return current_time < (start_time + end_delta)
 
     # XXX: This is a really hard thing to test, but take my word for it that this is doing "something" -Will
+    #      If you do not get ValueError here, it means the0
     with mock.patch('encoded.ingestion_listener.IngestionListener.should_remain_online',
                     new=mocked_should_remain_online):
         with pytest.raises(ValueError):

@@ -12,7 +12,6 @@ import threading
 import signal
 import psycopg2
 import webtest
-import sqlalchemy
 import elasticsearch
 from io import BytesIO
 from vcf import Reader
@@ -26,8 +25,6 @@ from .commands.ingest_vcf import VCFParser
 
 log = structlog.getLogger(__name__)
 EPILOG = __doc__
-DEFAULT_INTERVAL = 10  # seconds between each poll
-INFLIGHT_INTERVAL = 3  # seconds if we detect messages in flight
 INGESTION_QUEUE = 'ingestion_queue'
 VARIANT_SCHEMA = resolve_file_path('./schemas/variant.json')
 VARIANT_SAMPLE_SCHEMA = resolve_file_path('./schemas/variant_sample.json')
@@ -100,6 +97,7 @@ class IngestionQueueManager:
 
     We will use a single queue to keep track of VCF File uuids to be indexed.
     """
+    BUCKET_EXTENSION = '-vcfs'
 
     def __init__(self, registry, override_name=None):
         """ Does initial setup for interacting with SQS """
@@ -112,7 +110,7 @@ class IngestionQueueManager:
             'region_name': 'us-east-1'
         }
         self.client = boto3.client('sqs', **kwargs)
-        self.queue_name = self.env_name + '-vcfs' if not override_name else override_name
+        self.queue_name = self.env_name + self.BUCKET_EXTENSION if not override_name else override_name
         self.queue_attrs = {
             self.queue_name: {
                 'DelaySeconds': '1',  # messages initially invisible for 1 sec
@@ -144,7 +142,8 @@ class IngestionQueueManager:
             response = self.client.get_queue_url(
                 QueueName=queue_name
             )
-        except Exception:
+        except Exception as e:
+            log.error('Cannot resolve queue_url: %s' % e)
             response = {}
         return response.get('QueueUrl', None)
 
@@ -157,7 +156,7 @@ class IngestionQueueManager:
             yield msgs[i:i + self.batch_size]
 
     def _send_messages(self, msgs, retries=3):
-        """ Sends msgs to the ingestion queue.
+        """ Sends msgs to the ingestion queue (with retries for failed messages).
 
         :param msgs: to be sent
         :param retries: number of times to resend failed messages, decremented on recursion
@@ -193,11 +192,14 @@ class IngestionQueueManager:
         """
         Called after a message has been successfully received and processed.
         Removes message from the queue.
-        Splits messages into a batch size given by self.delete_batch_size.
         Input should be the messages directly from receive messages. At the
-        very least, needs a list of messages with 'Id' and 'ReceiptHandle'.
+        very least, needs a list of messages with 'Id' and 'ReceiptHandle' as this
+        metadata is necessary to identify the message in SQS internals.
 
-        Returns a list with any failed attempts.
+        NOTE: deletion does NOT have a retry mechanism
+
+        :param messages: messages to be deleted
+        :returns: a list with any failed messages
         """
         failed = []
         for batch in self._chunk_messages(messages):
@@ -219,6 +221,10 @@ class IngestionQueueManager:
     def add_uuids(self, uuids):
         """ Takes a list of string uuids (presumed to be VCF files) and adds them to
             the ingestion queue.
+
+            :precondition: uuids are all of type FileProcessed
+            :param uuids: uuids to be added to the queue.
+            :returns: 2-tuple: uuids queued, failed messages (if any)
         """
         curr_time = datetime.datetime.utcnow().isoformat()
         msgs = []
@@ -233,6 +239,8 @@ class IngestionQueueManager:
     def get_counts(self):
         """ Returns number counts of waiting/inflight messages
             * Makes a boto3 API Call to do so *
+
+            :returns: 2 tuple of waiting, inflight messages
         """
         response = self.client.get_queue_attributes(
             QueueUrl=self.queue_url,
@@ -270,6 +278,7 @@ class IngestionQueueManager:
 
 class IngestionListener:
     """ Organizes helper functions for the ingestion listener """
+    POLL_INTERVAL = 10  # seconds between each poll
     STATUS_QUEUED = 'Queued'
     STATUS_INGESTED = 'Ingested'
 
@@ -319,7 +328,7 @@ class IngestionListener:
 
         :return: messages available on SQS
         """
-        time.sleep(DEFAULT_INTERVAL)  # sleep here before polling again
+        time.sleep(self.POLL_INTERVAL)  # sleep here before polling again
         return self.queue_manager.receive_messages()
 
     def delete_messages(self, messages):
@@ -345,17 +354,22 @@ class IngestionListener:
         """ Posts variants and variant_sample items given the parser and relevant
             file metadata.
 
+            NOTE: There are variations of this code throughout other entry points, but
+            the version here is THE version that should be used.
+
         :param parser: VCFParser to be used
         :param file_meta: metadata for the processed VCF file
         :return: 2-tuple of successful, failed number of posts
         """
         success, error = 0, 0
+        project, institution, file_accession = (file_meta['project']['uuid'], file_meta['institution']['uuid'],
+                                                file_meta['accession'])
         for idx, record in enumerate(parser):
             log.info('Attempting parse on record %s' % record)
             try:
                 variant = parser.create_variant_from_record(record)
-                variant['project'] = file_meta['project']['uuid']
-                variant['institution'] = file_meta['institution']['uuid']
+                variant['project'] = project
+                variant['institution'] = institution
                 parser.format_variant_sub_embedded_objects(variant)
                 [res] = self.vapp.post_json('/variant', variant, status=201).json['@graph']
                 success += 1
@@ -366,10 +380,10 @@ class IngestionListener:
             variant_samples = parser.create_sample_variant_from_record(record)
             for sample in variant_samples:
                 try:
-                    sample['project'] = file_meta['project']['uuid']
-                    sample['institution'] = file_meta['institution']['uuid']
+                    sample['project'] = project
+                    sample['institution'] = institution
                     sample['variant'] = res['@id']  # make links
-                    sample['file'] = file_meta['uuid']
+                    sample['file'] = file_accession
                     self.vapp.post_json('/variant_sample', sample, status=201)
                     success += 1
                 except Exception as e:
@@ -425,23 +439,26 @@ class IngestionListener:
                 parser = VCFParser(None, VARIANT_SCHEMA, VARIANT_SAMPLE_SCHEMA,
                                    reader=Reader(fsock=decoded_content.split('\n')))
                 success, error = self.post_variants_and_variant_samples(parser, file_meta)
+
+                # if we had no errors, patch the file status to 'Ingested'
                 if error > 0:
                     log.error('Some VCF rows for uuid %s failed to post - not marking VCF '
                               'as ingested.' % uuid)
                 else:
-                    self.vapp.patch_json('/' + uuid, {'file_ingestion_status': 'Ingested'})
+                    self.vapp.patch_json('/' + uuid, {'file_ingestion_status': self.STATUS_INGESTED})
+
+                # report results in error_log regardless of status
                 msg = ('INGESTION_REPORT:\n'
                        'Success: %s\n'
                        'Error: %s\n' % (success, error))
-                log.error(msg)  # so we can grep error_log for INGESTION_REPORT
+                log.error(msg)
                 self.update_status(msg=msg)
 
-            # delete messages from queue that have been processed.
             self.delete_messages(messages)
 
 
 def run(vapp=None, _queue_manager=None, _update_status=None):
-    """ Entry-point for the ingestion listener. """
+    """ Entry-point for the ingestion listener for waitress. """
     ingestion_listener = IngestionListener(vapp, _queue_manager=_queue_manager, _update_status=_update_status)
     ingestion_listener.run()
 
@@ -456,17 +473,16 @@ class ErrorHandlingThread(threading.Thread):
         while True:
             try:
                 self._target(*self._args, **self._kwargs)
-            except (psycopg2.OperationalError, sqlalchemy.exc.OperationalError, elasticsearch.exceptions.ConnectionError) as e:
+            except (psycopg2.OperationalError, elasticsearch.exceptions.ConnectionError) as e:
                 # Handle database restart
                 log.warning('Database not there, maybe starting up: %r', e)
-                timestamp = datetime.datetime.now().isoformat()
                 update_status(msg=repr(e))
                 log.debug('sleeping')
                 time.sleep(interval)
                 continue
-            except Exception:
+            except Exception as e:
                 # Unfortunately mod_wsgi does not restart immediately
-                log.exception('Exception in listener, restarting process at next request.')
+                log.exception('Exception in ingestion listener, restarting process at next request: %s' % e)
                 os.kill(os.getpid(), signal.SIGINT)
             break
 
@@ -488,8 +504,6 @@ def composite(loader, global_conf, **settings):
         if listener:
             log.debug('joining listening thread')
             listener.join()
-
-    path = settings.get('path', '/ingest')
 
     # Composite app is used so we can load the main app
     app_name = settings.get('app', None)
