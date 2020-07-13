@@ -1,5 +1,7 @@
 import io
 import os
+import gzip
+from io import BytesIO
 
 
 ENCODED_ROOT_DIR = os.path.dirname(__file__)
@@ -27,6 +29,16 @@ def deduplicate_list(lst):
     :return: de-duplicated list
     """
     return list(set(lst))
+
+
+def gunzip_content(content):
+    """ Helper that will gunzip content """
+    f_in = BytesIO()
+    f_in.write(content)
+    f_in.seek(0)
+    with gzip.GzipFile(fileobj=f_in, mode='rb') as f:
+        gunzipped_content = f.read()
+    return gunzipped_content.decode('utf-8')
 
 
 # TODO: Move this mock file system to dcicutils. -kmp 30-Jun-2020

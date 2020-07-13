@@ -1,7 +1,6 @@
 import argparse
 import csv
 import loremipsum
-import os
 import random
 import re
 import sys

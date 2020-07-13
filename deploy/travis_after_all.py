@@ -121,7 +121,7 @@ try:
         log.error("Others Failed")
         os.environ[BUILD_AGGREGATE_STATUS] = "others_failed"
     else:
-        log.warn("Others Unknown")
+        log.warning("Others Unknown")
         os.environ[BUILD_AGGREGATE_STATUS] = "unknown"
     # since python is subprocess, env variables are exported back via file
     with open(".to_export_back", "w") as export_var:

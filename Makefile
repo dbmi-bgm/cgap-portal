@@ -47,7 +47,7 @@ build-dev:  # same as build, but sets up locust as well
 
 macbuild-dev:  # same as macbuild, but sets up locust as well
 	make macbuild
-	pip install locust
+	make build-locust
 
 build-locust:  # just pip installs locust - may cause instability
 	pip install locust
@@ -62,10 +62,10 @@ deploy1:  # starts postgres/ES locally and loads inserts
 	@SNOVAULT_DB_TEST_PORT=`grep 'sqlalchemy[.]url =' development.ini | sed -E 's|.*:([0-9]+)/.*|\1|'` dev-servers development.ini --app-name app --clear --init --load
 
 deploy2:  # spins up waittress to serve the application
-	pserve development.ini
+	@SNOVAULT_DB_TEST_PORT=`grep 'sqlalchemy[.]url =' development.ini | sed -E 's|.*:([0-9]+)/.*|\1|'` pserve development.ini	
 
 deploy3:  # uploads: GeneAnnotationFields, then Genes, then AnnotationFields, then Variant + VariantSamples
-	python src/encoded/commands/ingestion.py src/encoded/annotations/variant_table_v0.4.6.csv src/encoded/schemas/annotation_field.json src/encoded/schemas/variant.json src/encoded/schemas/variant_sample.json src/encoded/annotations/vcf_v0.4.6.vcf hms-dbmi hms-dbmi src/encoded/annotations/gene_table_v0.4.5.csv src/encoded/schemas/gene_annotation_field.json src/encoded/schemas/gene.json src/encoded/annotations/gene_inserts_v0.4.5.json hms-dbmi hms-dbmi development.ini --post-variant-consequences --post-variants --post-gene-annotation-field-inserts --post-gene-inserts --app-name app
+	python src/encoded/commands/ingestion.py src/encoded/annotations/variant_table_v0.4.6.csv src/encoded/schemas/annotation_field.json src/encoded/schemas/variant.json src/encoded/schemas/variant_sample.json src/encoded/annotations/GAPFI3JX5D2J.vcf hms-dbmi hms-dbmi src/encoded/annotations/gene_table_v0.4.5.csv src/encoded/schemas/gene_annotation_field.json src/encoded/schemas/gene.json src/encoded/annotations/gene_inserts_v0.4.5.json hms-dbmi hms-dbmi development.ini --post-variant-consequences --post-variants --post-gene-annotation-field-inserts --post-gene-inserts --post-vcf-file --app-name app
 
 psql-dev:  # starts psql with the url after 'sqlalchemy.url =' in development.ini
 	@psql `grep 'sqlalchemy[.]url =' development.ini | sed -E 's/^.* = (.*)/\1/'`
@@ -102,7 +102,7 @@ help:
 	@make info
 
 info:
-	@: $(info Printing some info on how to use make)
+	@: $(info Here are some 'make' options:)
 	   $(info - Use 'make aws-ip-ranges' to download latest ip range information. Invoked automatically when needed.)
 	   $(info - Use 'make build' (or 'make macbuild' on OSX Catalina) to build only application dependencies.)
 	   $(info - Use 'make build-dev' (or 'make macbuild-dev' on OSX Catalina) to build all dependencies, even locust.)

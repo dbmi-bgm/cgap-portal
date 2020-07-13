@@ -143,10 +143,10 @@ def test_fictitous_embed(registry):
     assert error is None
 
 
-def test_get_item_if_you_can(content, dummy_request, threadlocals):
+def test_get_item_or_none(content, dummy_request, threadlocals):
     """
     Not necessarily the best place for this test, but test that the
-    `get_item_if_you_can` function works with multiple inputs
+    `get_item_or_none` function works with multiple inputs
     """
     used_item = sources[0]
     # all of these should get the full item
