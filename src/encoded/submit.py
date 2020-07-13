@@ -13,7 +13,7 @@ import xlrd
 
 
 GENERIC_FIELD_MAPPING = {
-    'individual': {'patient id': 'individual_id'},
+    'individual': {},
     'family': {},
     'sample': {
         'date collected': 'specimen_collection_date',
@@ -81,7 +81,7 @@ def map_fields(row, metadata_dict, addl_fields, item_type):
         if map_field in row:
             metadata_dict[GENERIC_FIELD_MAPPING[item_type][map_field]] = row.get(map_field)
     for field in addl_fields:
-        metadata_dict[field.replace('_', ' ')] = row.get(field)
+        metadata_dict[field] = row.get(field.replace('_', ' '))
     return metadata_dict
 
 
@@ -109,8 +109,8 @@ def xls_to_json(xls_data, project, institution):
     }
     specimen_ids = {}
     for row in rows:
-        indiv_alias = '{}:individual-{}'.format(project['name'], row['patient id'])
-        fam_alias = '{}:family-{}'.format(project['name'], row['patient id'])
+        indiv_alias = '{}:individual-{}'.format(project['name'], row['individual id'])
+        fam_alias = '{}:family-{}'.format(project['name'], row['individual id'])
         # sp_alias = '{}:sampleproc-{}'.format(project['name'], row['specimen id'])
         # create items for Individual
         items = fetch_individual_metadata(row, items, indiv_alias, institution['name'])
@@ -129,7 +129,7 @@ def xls_to_json(xls_data, project, institution):
                                           analysis_alias, fam_alias, project['name'])
         else:
             print('WARNING: No specimen id present for patient {},'
-                  ' sample will not be created.'.format(row['patient id']))
+                  ' sample will not be created.'.format(row['individual id']))
     # create SampleProcessing item for trio/group if needed
     # items = create_sample_processing_groups(items, sp_alias)
     items = create_case_items(items, project['name'])
@@ -148,7 +148,7 @@ def xls_to_json(xls_data, project, institution):
 def fetch_individual_metadata(row, items, indiv_alias, inst_name):
     new_items = items.copy()
     info = {'aliases': [indiv_alias]}
-    info = map_fields(row, info, ['sex', 'age', 'birth_year'], 'individual')
+    info = map_fields(row, info, ['individual_id', 'sex', 'age', 'birth_year'], 'individual')
     if row.get('other individual id'):
         other_id = {'id': row['other individual id'], 'id_source': inst_name}
         if row.get('other individual id type'):
@@ -192,13 +192,22 @@ def fetch_sample_metadata(row, items, indiv_alias, samp_alias, analysis_alias, f
         'specimen_notes', 'research_protocol_name', 'sent_by', 'physician_id', 'indication'
     ]
     info = map_fields(row, info, fields, 'sample')
+    if info['specimen_accepted'].lower() == 'y':
+        info['specimen_accepted'] = 'Yes'
+    elif info['specimen_accepted'].lower() == 'n':
+        info['specimen_accepted'] = 'No'
     if row.get('second specimen id'):
         other_id = {'id': row['second specimen id'], 'id_type': proj_name}  # add proj info?
         if row.get('second specimen id type'):
             other_id['id_type'] = row['second specimen id type']
         info['other_specimen_ids'] = [other_id]
     req_info = map_fields(row, {}, ['date sent', 'date completed'], 'requisition')
-    info['requisition_acceptance'] = {k, v for k, v in req_info.items() if v}
+    if req_info['accepted_rejected'].lower() in ['yes', 'no', 'y', 'n']:
+        if req_info['accepted_rejected'].lower().startswith('y'):
+            req_info['accepted_rejected'] = 'Accepted'
+        else:
+            req_info['accepted_rejected'] = "Rejected"
+    info['requisition_acceptance'] = {k: v for k, v in req_info.items() if v}
     new_items['sample'][samp_alias] = {k: v for k, v in info.items() if v}
     if indiv_alias in new_items['individual']:
         new_items['individual'][indiv_alias]['samples'] = [samp_alias]
@@ -245,7 +254,7 @@ def create_case_items(items, proj_name):
             indiv = [ikey for ikey, ival in items['individual'].items() if sample in ival.get('samples', [])][0]
             case_info = {
                 'aliases': [case_alias],
-                'case_id': case_id,
+                # 'case_id': case_id,
                 'sample_processing': k,
                 'individual': indiv
             }
