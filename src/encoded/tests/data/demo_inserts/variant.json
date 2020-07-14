@@ -23,7 +23,7 @@
         "topmed_hom": 6333,
         "transcript": [
             {
-                "vep_sift_score": "0.34",
+                "vep_sift_score": 0.34,
                 "vep_gene": "236d7355-53da-40ad-b0c8-5c688029a5bf",
                 "vep_hgvsc": "ENST00000318602.11:c.2998A>G",
                 "vep_amino_acids": "I/V",
@@ -365,7 +365,7 @@
         "topmed_hom": 0,
         "transcript": [
             {
-                "vep_sift_score": "0.05",
+                "vep_sift_score": 0.05,
                 "vep_gene": "3540ed21-a423-4804-87d4-9a424b9171b5",
                 "vep_hgvsc": "ENST00000405460.9:c.12476A>C",
                 "vep_amino_acids": "H/P",
@@ -400,7 +400,7 @@
                 "vep_hgvsp": "ENSP00000384582.2:p.His4159Pro"
             },
             {
-                "vep_sift_score": "0.02",
+                "vep_sift_score": 0.02,
                 "vep_gene": "3540ed21-a423-4804-87d4-9a424b9171b5",
                 "vep_hgvsc": "ENST00000425867.3:c.1430A>C",
                 "vep_amino_acids": "H/P",
@@ -660,7 +660,7 @@
         "topmed_hom": 0,
         "transcript": [
             {
-                "vep_sift_score": "0.16",
+                "vep_sift_score": 0.16,
                 "vep_gene": "83b31d88-e8a8-4d39-bdbb-2f3b24952188",
                 "vep_hgvsc": "ENST00000301067.11:c.11380C>T",
                 "vep_amino_acids": "P/S",
@@ -932,7 +932,7 @@
         "topmed_hom": 4,
         "transcript": [
             {
-                "vep_sift_score": "0.2",
+                "vep_sift_score": 0.2,
                 "vep_gene": "a9fdde34-ed82-4cf5-a1e1-bfc0a6682ac3",
                 "vep_hgvsc": "ENST00000224140.6:c.59G>A",
                 "vep_amino_acids": "R/H",
@@ -1223,7 +1223,7 @@
         "topmed_hom": 264,
         "transcript": [
             {
-                "vep_sift_score": "0.08",
+                "vep_sift_score": 0.08,
                 "vep_gene": "9c1a6276-f7b4-44f3-b72b-974efeebc478",
                 "vep_hgvsc": "ENST00000357780.5:c.1140G>T",
                 "vep_amino_acids": "Q/H",
@@ -2342,7 +2342,7 @@
         "topmed_hom": 0,
         "transcript": [
             {
-                "vep_sift_score": "0.24",
+                "vep_sift_score": 0.24,
                 "vep_gene": "3540ed21-a423-4804-87d4-9a424b9171b5",
                 "vep_hgvsc": "ENST00000405460.9:c.4939A>G",
                 "vep_amino_acids": "I/V",
@@ -2399,7 +2399,7 @@
                 "vep_biotype": "nonsense_mediated_decay"
             },
             {
-                "vep_sift_score": "0.26",
+                "vep_sift_score": 0.26,
                 "vep_gene": "3540ed21-a423-4804-87d4-9a424b9171b5",
                 "vep_hgvsc": "ENST00000640403.1:c.2230A>G",
                 "vep_amino_acids": "I/V",
@@ -2669,7 +2669,7 @@
         "topmed_hom": 2,
         "transcript": [
             {
-                "vep_sift_score": "0",
+                "vep_sift_score": 0,
                 "vep_gene": "03ca843b-0d71-4a44-8c74-1c11002141eb",
                 "vep_hgvsc": "ENST00000341037.8:c.1342C>G",
                 "vep_amino_acids": "R/G",
@@ -2701,7 +2701,7 @@
                 "vep_hgvsp": "ENSP00000339553.4:p.Arg448Gly"
             },
             {
-                "vep_sift_score": "0",
+                "vep_sift_score": 0,
                 "vep_gene": "03ca843b-0d71-4a44-8c74-1c11002141eb",
                 "vep_hgvsc": "ENST00000350763.9:c.1342C>G",
                 "vep_amino_acids": "R/G",
@@ -2734,7 +2734,7 @@
                 "vep_hgvsp": "ENSP00000265131.4:p.Arg448Gly"
             },
             {
-                "vep_sift_score": "0",
+                "vep_sift_score": 0,
                 "vep_gene": "03ca843b-0d71-4a44-8c74-1c11002141eb",
                 "vep_hgvsc": "ENST00000423613.6:c.1342C>G",
                 "vep_amino_acids": "R/G",
@@ -2766,7 +2766,7 @@
                 "vep_hgvsp": "ENSP00000411406.2:p.Arg448Gly"
             },
             {
-                "vep_sift_score": "0.01",
+                "vep_sift_score": 0.01,
                 "vep_gene": "03ca843b-0d71-4a44-8c74-1c11002141eb",
                 "vep_hgvsc": "ENST00000535648.5:c.1342C>G",
                 "vep_amino_acids": "R/G",
@@ -2798,7 +2798,7 @@
                 "vep_hgvsp": "ENSP00000438152.2:p.Arg448Gly"
             },
             {
-                "vep_sift_score": "0.02",
+                "vep_sift_score": 0.02,
                 "vep_gene": "03ca843b-0d71-4a44-8c74-1c11002141eb",
                 "vep_hgvsc": "ENST00000537320.5:c.1342C>G",
                 "vep_amino_acids": "R/G",
@@ -2846,7 +2846,7 @@
                 "vep_ensp": "ENSP00000442242",
                 "vep_most_severe": false,
                 "vep_feature": "ENST00000542877",
-                "vep_sift_score": "0.01",
+                "vep_sift_score": 0.01,
                 "vep_exon": "2/23",
                 "vep_hgvsp": "ENSP00000442242.1:p.Arg448Gly",
                 "vep_polyphen_score": 0.562,
@@ -4983,7 +4983,7 @@
         "topmed_hom": 1,
         "transcript": [
             {
-                "vep_sift_score": "0.07",
+                "vep_sift_score": 0.07,
                 "vep_gene": "3619a75b-15ec-4fbd-acbc-352d092ac2a4",
                 "vep_hgvsc": "ENST00000263253.9:c.631G>A",
                 "vep_amino_acids": "G/S",
@@ -5023,7 +5023,7 @@
                 "vep_consequence": [
                     "a4d8e291-6993-4250-be4a-0574f4be76e9"
                 ],
-                "vep_sift_score": "0.07",
+                "vep_sift_score": 0.07,
                 "vep_cds_position": "631",
                 "vep_biotype": "protein_coding",
                 "vep_most_severe": false,
@@ -5315,7 +5315,7 @@
         "topmed_hom": 976,
         "transcript": [
             {
-                "vep_sift_score": "0",
+                "vep_sift_score": 0,
                 "vep_gene": "48caba7a-57ff-40f8-9af6-2160d8b01acc",
                 "vep_hgvsc": "ENST00000373968.3:c.161G>A",
                 "vep_amino_acids": "G/D",
@@ -5573,7 +5573,7 @@
         "topmed_hom": 1,
         "transcript": [
             {
-                "vep_sift_score": "1",
+                "vep_sift_score": 1,
                 "vep_gene": "bcaef33a-f441-42c6-abb7-0059c38cd59e",
                 "vep_hgvsc": "ENST00000259008.7:c.577G>A",
                 "vep_amino_acids": "V/I",
@@ -5611,7 +5611,7 @@
                 "vep_hgvsp": "ENSP00000259008.2:p.Val193Ile"
             },
             {
-                "vep_sift_score": "0.82",
+                "vep_sift_score": 0.82,
                 "vep_gene": "bcaef33a-f441-42c6-abb7-0059c38cd59e",
                 "vep_hgvsc": "ENST00000577598.5:c.577G>A",
                 "vep_amino_acids": "V/I",
@@ -6708,7 +6708,7 @@
         "topmed_hom": 0,
         "transcript": [
             {
-                "vep_sift_score": "0.09",
+                "vep_sift_score": 0.09,
                 "vep_gene": "acdd5279-bf79-4c51-86fe-f4423897724f",
                 "vep_hgvsc": "ENST00000357628.8:c.903G>T",
                 "vep_amino_acids": "Q/H",
@@ -6740,7 +6740,7 @@
                 "vep_hgvsp": "ENSP00000350249.3:p.Gln301His"
             },
             {
-                "vep_sift_score": "0.14",
+                "vep_sift_score": 0.14,
                 "vep_gene": "acdd5279-bf79-4c51-86fe-f4423897724f",
                 "vep_hgvsc": "ENST00000393329.5:c.510G>T",
                 "vep_amino_acids": "Q/H",
@@ -6786,7 +6786,7 @@
                 "vep_ensp": "ENSP00000397632",
                 "vep_most_severe": false,
                 "vep_feature": "ENST00000430927",
-                "vep_sift_score": "0.06",
+                "vep_sift_score": 0.06,
                 "vep_exon": "11/19",
                 "vep_hgvsp": "ENSP00000397632.2:p.Gln301His",
                 "vep_polyphen_score": 0.77,
@@ -6811,7 +6811,7 @@
                 "vep_ensp": "ENSP00000388921",
                 "vep_most_severe": false,
                 "vep_feature": "ENST00000446993",
-                "vep_sift_score": "0.01",
+                "vep_sift_score": 0.01,
                 "vep_exon": "9/11",
                 "vep_hgvsp": "ENSP00000388921.2:p.Gln170His",
                 "vep_polyphen_score": 0.77,
@@ -6840,7 +6840,7 @@
                 "vep_ensp": "ENSP00000476506",
                 "vep_most_severe": false,
                 "vep_feature": "ENST00000607932",
-                "vep_sift_score": "0.06",
+                "vep_sift_score": 0.06,
                 "vep_exon": "7/14",
                 "vep_hgvsp": "ENSP00000476506.1:p.Gln301His",
                 "vep_polyphen_score": 0.77,
@@ -6864,7 +6864,7 @@
                 "vep_ensp": "ENSP00000476371",
                 "vep_most_severe": false,
                 "vep_feature": "ENST00000608057",
-                "vep_sift_score": "0.01",
+                "vep_sift_score": 0.01,
                 "vep_exon": "7/16",
                 "vep_hgvsp": "ENSP00000476371.1:p.Gln301His",
                 "vep_polyphen_score": 0.031,
@@ -6888,7 +6888,7 @@
                 "vep_ensp": "ENSP00000476981",
                 "vep_most_severe": false,
                 "vep_feature": "ENST00000609106",
-                "vep_sift_score": "0.07",
+                "vep_sift_score": 0.07,
                 "vep_exon": "11/19",
                 "vep_hgvsp": "ENSP00000476981.1:p.Gln301His",
                 "vep_polyphen_score": 0.77,
@@ -6900,7 +6900,7 @@
                 "vep_consequence": [
                     "a4d8e291-6993-4250-be4a-0574f4be76e9"
                 ],
-                "vep_sift_score": "0.09",
+                "vep_sift_score": 0.09,
                 "vep_cds_position": "903",
                 "vep_biotype": "protein_coding",
                 "vep_trembl": "A0A024R739",
@@ -6934,7 +6934,7 @@
                 "vep_gene": "acdd5279-bf79-4c51-86fe-f4423897724f",
                 "vep_most_severe": false,
                 "vep_hgvsc": "ENST00000653274.1:c.903G>T",
-                "vep_sift_score": "0.06",
+                "vep_sift_score": 0.06,
                 "vep_codons": "caG/caT",
                 "vep_uniparc": "UPI0011488723",
                 "vep_protein_position": "301",
@@ -6981,7 +6981,7 @@
                 "vep_consequence": [
                     "a4d8e291-6993-4250-be4a-0574f4be76e9"
                 ],
-                "vep_sift_score": "0.1",
+                "vep_sift_score": 0.1,
                 "vep_cds_position": "903",
                 "vep_biotype": "protein_coding",
                 "vep_most_severe": false,
@@ -7008,7 +7008,7 @@
                 "vep_consequence": [
                     "a4d8e291-6993-4250-be4a-0574f4be76e9"
                 ],
-                "vep_sift_score": "0.09",
+                "vep_sift_score": 0.09,
                 "vep_cds_position": "903",
                 "vep_biotype": "protein_coding",
                 "vep_trembl": "A0A024R739",
@@ -7072,7 +7072,7 @@
                 "vep_gene": "acdd5279-bf79-4c51-86fe-f4423897724f",
                 "vep_most_severe": false,
                 "vep_hgvsc": "ENST00000661898.1:c.903G>T",
-                "vep_sift_score": "0.06",
+                "vep_sift_score": 0.06,
                 "vep_codons": "caG/caT",
                 "vep_uniparc": "UPI001147CF40",
                 "vep_protein_position": "301",
@@ -7119,7 +7119,7 @@
                 "vep_consequence": [
                     "a4d8e291-6993-4250-be4a-0574f4be76e9"
                 ],
-                "vep_sift_score": "0.09",
+                "vep_sift_score": 0.09,
                 "vep_cds_position": "903",
                 "vep_biotype": "protein_coding",
                 "vep_trembl": "A0A024R739",
@@ -7148,7 +7148,7 @@
                 "vep_consequence": [
                     "a4d8e291-6993-4250-be4a-0574f4be76e9"
                 ],
-                "vep_sift_score": "0.09",
+                "vep_sift_score": 0.09,
                 "vep_cds_position": "903",
                 "vep_biotype": "protein_coding",
                 "vep_trembl": "A0A024R739",
@@ -8300,7 +8300,7 @@
         "topmed_hom": 10,
         "transcript": [
             {
-                "vep_sift_score": "0.03",
+                "vep_sift_score": 0.03,
                 "vep_gene": "e454e0e0-2163-4454-a39c-fce61ad4024f",
                 "vep_hgvsc": "ENST00000264692.8:c.854G>T",
                 "vep_amino_acids": "C/F",
@@ -8338,7 +8338,7 @@
                 "vep_hgvsp": "ENSP00000264692.5:p.Cys285Phe"
             },
             {
-                "vep_sift_score": "0.03",
+                "vep_sift_score": 0.03,
                 "vep_gene": "e454e0e0-2163-4454-a39c-fce61ad4024f",
                 "vep_hgvsc": "ENST00000403665.7:c.1016G>T",
                 "vep_amino_acids": "C/F",
@@ -8387,7 +8387,7 @@
                 "vep_hgvsp": "ENSP00000384957.2:p.Cys339Phe"
             },
             {
-                "vep_sift_score": "0",
+                "vep_sift_score": 0,
                 "vep_gene": "e454e0e0-2163-4454-a39c-fce61ad4024f",
                 "vep_hgvsc": "ENST00000452239.1:c.463G>T",
                 "vep_amino_acids": "C/F",
@@ -8659,7 +8659,7 @@
         "topmed_hom": 0,
         "transcript": [
             {
-                "vep_sift_score": "0",
+                "vep_sift_score": 0,
                 "vep_gene": "3021f6f2-bbc6-463a-a3af-dea6a9d445ef",
                 "vep_hgvsc": "ENST00000307000.7:c.1226A>G",
                 "vep_amino_acids": "Y/C",
@@ -8730,7 +8730,7 @@
                 "vep_biotype": "retained_intron"
             },
             {
-                "vep_sift_score": "0",
+                "vep_sift_score": 0,
                 "vep_gene": "3021f6f2-bbc6-463a-a3af-dea6a9d445ef",
                 "vep_hgvsc": "ENST00000553106.6:c.1241A>G",
                 "vep_amino_acids": "Y/C",
@@ -8798,7 +8798,7 @@
                 "vep_hgvsp": "ENSP00000448059.1:p.Tyr414Cys"
             },
             {
-                "vep_sift_score": "0",
+                "vep_sift_score": 0,
                 "vep_gene": "3021f6f2-bbc6-463a-a3af-dea6a9d445ef",
                 "vep_hgvsc": "ENST00000635477.1:c.345A>G",
                 "vep_amino_acids": "Y/C",
@@ -9089,7 +9089,7 @@
         "topmed_hom": 9205,
         "transcript": [
             {
-                "vep_sift_score": "0.09",
+                "vep_sift_score": 0.09,
                 "vep_gene": "4bf867f2-84b9-441c-a5b9-0964174b1db0",
                 "vep_hgvsc": "ENST00000239374.8:c.1810G>A",
                 "vep_amino_acids": "V/I",
@@ -9591,7 +9591,7 @@
         "topmed_hom": 0,
         "transcript": [
             {
-                "vep_sift_score": "0",
+                "vep_sift_score": 0,
                 "vep_gene": "75a03a76-8b46-4394-b46f-e5936f578df9",
                 "vep_hgvsc": "ENST00000216181.10:c.4198C>T",
                 "vep_amino_acids": "R/W",
@@ -9894,7 +9894,7 @@
         "gnomad_an_afr_male": 19318,
         "transcript": [
             {
-                "vep_sift_score": "0.39",
+                "vep_sift_score": 0.39,
                 "vep_gene": "21f35df5-bb8d-4a0a-9c5c-99d6757c4648",
                 "vep_hgvsc": "ENST00000268057.9:c.791G>T",
                 "vep_amino_acids": "C/F",
@@ -9929,7 +9929,7 @@
                 "vep_hgvsp": "ENSP00000268057.4:p.Cys264Phe"
             },
             {
-                "vep_sift_score": "0.6",
+                "vep_sift_score": 0.6,
                 "vep_gene": "21f35df5-bb8d-4a0a-9c5c-99d6757c4648",
                 "vep_hgvsc": "ENST00000395205.6:c.275G>T",
                 "vep_amino_acids": "C/F",
@@ -10116,7 +10116,7 @@
                 "vep_feature": "ENST00000569151"
             },
             {
-                "vep_sift_score": "0.25",
+                "vep_sift_score": 0.25,
                 "vep_gene": "21f35df5-bb8d-4a0a-9c5c-99d6757c4648",
                 "vep_hgvsc": "ENST00000569338.5:c.713G>T",
                 "vep_amino_acids": "C/F",
@@ -11144,7 +11144,7 @@
         "topmed_hom": 1,
         "transcript": [
             {
-                "vep_sift_score": "0.19",
+                "vep_sift_score": 0.19,
                 "vep_gene": "128158c3-fd6e-4b0b-8730-6611fe8a0f71",
                 "vep_hgvsc": "ENST00000262304.9:c.4018C>T",
                 "vep_amino_acids": "R/W",
@@ -11183,7 +11183,7 @@
                 "vep_hgvsp": "ENSP00000262304.4:p.Arg1340Trp"
             },
             {
-                "vep_sift_score": "0.19",
+                "vep_sift_score": 0.19,
                 "vep_gene": "128158c3-fd6e-4b0b-8730-6611fe8a0f71",
                 "vep_hgvsc": "ENST00000423118.5:c.4018C>T",
                 "vep_amino_acids": "R/W",
@@ -11461,7 +11461,7 @@
         "topmed_hom": 7,
         "transcript": [
             {
-                "vep_sift_score": "0.21",
+                "vep_sift_score": 0.21,
                 "vep_gene": "22687673-5d66-4d1d-81f1-9dcfd4979fa2",
                 "vep_hgvsc": "ENST00000301180.10:c.793G>A",
                 "vep_amino_acids": "D/N",
@@ -11718,7 +11718,7 @@
         "gnomad_an_afr_male": 19220,
         "transcript": [
             {
-                "vep_sift_score": "0",
+                "vep_sift_score": 0,
                 "vep_gene": "b3ddecfc-41df-4d9a-ab86-bf3b8c0d514a",
                 "vep_hgvsc": "ENST00000311485.7:c.1320A>C",
                 "vep_amino_acids": "K/N",
@@ -12062,7 +12062,7 @@
                 "vep_biotype": "protein_coding"
             },
             {
-                "vep_sift_score": "0",
+                "vep_sift_score": 0,
                 "vep_gene": "b3ddecfc-41df-4d9a-ab86-bf3b8c0d514a",
                 "vep_hgvsc": "ENST00000618712.4:c.1320A>C",
                 "vep_amino_acids": "K/N",
@@ -14244,7 +14244,7 @@
         "topmed_hom": 2,
         "transcript": [
             {
-                "vep_sift_score": "0.18",
+                "vep_sift_score": 0.18,
                 "vep_gene": "4300ce00-0656-4ed9-85c3-66795f77c0db",
                 "vep_hgvsc": "ENST00000361983.7:c.518T>C",
                 "vep_amino_acids": "M/T",
@@ -14279,7 +14279,7 @@
                 "vep_hgvsp": "ENSP00000354848.4:p.Met173Thr"
             },
             {
-                "vep_sift_score": "0.1",
+                "vep_sift_score": 0.1,
                 "vep_gene": "4300ce00-0656-4ed9-85c3-66795f77c0db",
                 "vep_hgvsc": "ENST00000626493.1:c.518T>C",
                 "vep_amino_acids": "M/T",
@@ -14312,7 +14312,7 @@
                 "vep_hgvsp": "ENSP00000486692.1:p.Met173Thr"
             },
             {
-                "vep_sift_score": "0.02",
+                "vep_sift_score": 0.02,
                 "vep_gene": "4300ce00-0656-4ed9-85c3-66795f77c0db",
                 "vep_hgvsc": "ENST00000635779.1:c.518T>C",
                 "vep_amino_acids": "M/T",
@@ -14340,7 +14340,7 @@
                 "vep_hgvsp": "ENSP00000489663.1:p.Met173Thr"
             },
             {
-                "vep_sift_score": "0.83",
+                "vep_sift_score": 0.83,
                 "vep_gene": "4300ce00-0656-4ed9-85c3-66795f77c0db",
                 "vep_hgvsc": "ENST00000636200.1:c.407T>C",
                 "vep_amino_acids": "M/T",
@@ -14431,7 +14431,7 @@
                 "vep_biotype": "nonsense_mediated_decay"
             },
             {
-                "vep_sift_score": "1",
+                "vep_sift_score": 1,
                 "vep_gene": "4300ce00-0656-4ed9-85c3-66795f77c0db",
                 "vep_hgvsc": "ENST00000637420.1:c.215T>C",
                 "vep_amino_acids": "M/T",
@@ -14459,7 +14459,7 @@
                 "vep_hgvsp": "ENSP00000490404.1:p.Met72Thr"
             },
             {
-                "vep_sift_score": "0.74",
+                "vep_sift_score": 0.74,
                 "vep_gene": "4300ce00-0656-4ed9-85c3-66795f77c0db",
                 "vep_hgvsc": "ENST00000637738.1:c.335T>C",
                 "vep_amino_acids": "M/T",
@@ -14487,7 +14487,7 @@
                 "vep_hgvsp": "ENSP00000490742.1:p.Met112Thr"
             },
             {
-                "vep_sift_score": "0.62",
+                "vep_sift_score": 0.62,
                 "vep_gene": "4300ce00-0656-4ed9-85c3-66795f77c0db",
                 "vep_hgvsc": "ENST00000638119.1:c.593T>C",
                 "vep_amino_acids": "M/T",
@@ -15900,7 +15900,7 @@
         "topmed_hom": 6,
         "transcript": [
             {
-                "vep_sift_score": "0.03",
+                "vep_sift_score": 0.03,
                 "vep_gene": "31d52a4d-6c08-4296-a299-812dc4c548d8",
                 "vep_hgvsc": "ENST00000269980.7:c.452C>T",
                 "vep_amino_acids": "T/M",
@@ -15964,7 +15964,7 @@
                 "vep_hgvsp": "ENSP00000269980.2:p.Thr151Met"
             },
             {
-                "vep_sift_score": "0.01",
+                "vep_sift_score": 0.01,
                 "vep_gene": "31d52a4d-6c08-4296-a299-812dc4c548d8",
                 "vep_hgvsc": "ENST00000457836.6:c.386C>T",
                 "vep_amino_acids": "T/M",
@@ -16000,7 +16000,7 @@
                 "vep_hgvsp": "ENSP00000416000.2:p.Thr129Met"
             },
             {
-                "vep_sift_score": "0.02",
+                "vep_sift_score": 0.02,
                 "vep_gene": "deb3880b-0458-4c68-b99d-9c51faf686fc",
                 "vep_hgvsc": "ENST00000540732.3:c.554C>T",
                 "vep_amino_acids": "T/M",
@@ -16036,7 +16036,7 @@
                 "vep_hgvsp": "ENSP00000443246.1:p.Thr185Met"
             },
             {
-                "vep_sift_score": "0.02",
+                "vep_sift_score": 0.02,
                 "vep_gene": "31d52a4d-6c08-4296-a299-812dc4c548d8",
                 "vep_hgvsc": "ENST00000541315.1:c.259C>T",
                 "vep_amino_acids": "T/M",
@@ -16071,7 +16071,7 @@
                 "vep_hgvsp": "ENSP00000445809.1:p.Thr87Met"
             },
             {
-                "vep_sift_score": "0.01",
+                "vep_sift_score": 0.01,
                 "vep_gene": "31d52a4d-6c08-4296-a299-812dc4c548d8",
                 "vep_hgvsc": "ENST00000542943.5:c.365C>T",
                 "vep_amino_acids": "T/M",
@@ -16360,7 +16360,7 @@
         "topmed_hom": 4,
         "transcript": [
             {
-                "vep_sift_score": "0.19",
+                "vep_sift_score": 0.19,
                 "vep_gene": "c942e5ea-3135-47e7-a582-82bf9e6989e1",
                 "vep_hgvsc": "ENST00000322507.13:c.8237T>C",
                 "vep_amino_acids": "V/A",
@@ -16394,7 +16394,7 @@
                 "vep_hgvsp": "ENSP00000325146.8:p.Val2746Ala"
             },
             {
-                "vep_sift_score": "0.69",
+                "vep_sift_score": 0.69,
                 "vep_gene": "c942e5ea-3135-47e7-a582-82bf9e6989e1",
                 "vep_hgvsc": "ENST00000345356.10:c.4745T>C",
                 "vep_amino_acids": "V/A",
@@ -16428,7 +16428,7 @@
                 "vep_hgvsp": "ENSP00000305147.9:p.Val1582Ala"
             },
             {
-                "vep_sift_score": "0.28",
+                "vep_sift_score": 0.28,
                 "vep_gene": "c942e5ea-3135-47e7-a582-82bf9e6989e1",
                 "vep_hgvsc": "ENST00000416123.6:c.8009T>C",
                 "vep_amino_acids": "V/A",
@@ -16461,7 +16461,7 @@
                 "vep_hgvsp": "ENSP00000412864.2:p.Val2670Ala"
             },
             {
-                "vep_sift_score": "0.36",
+                "vep_sift_score": 0.36,
                 "vep_gene": "c942e5ea-3135-47e7-a582-82bf9e6989e1",
                 "vep_hgvsc": "ENST00000425443.6:c.1151T>C",
                 "vep_amino_acids": "V/A",
@@ -16493,7 +16493,7 @@
                 "vep_hgvsp": "ENSP00000399812.2:p.Val384Ala"
             },
             {
-                "vep_sift_score": "0.18",
+                "vep_sift_score": 0.18,
                 "vep_gene": "c942e5ea-3135-47e7-a582-82bf9e6989e1",
                 "vep_hgvsc": "ENST00000483888.6:c.8237T>C",
                 "vep_amino_acids": "V/A",
@@ -16526,7 +16526,7 @@
                 "vep_hgvsp": "ENSP00000421216.1:p.Val2746Ala"
             },
             {
-                "vep_sift_score": "0.68",
+                "vep_sift_score": 0.68,
                 "vep_gene": "c942e5ea-3135-47e7-a582-82bf9e6989e1",
                 "vep_hgvsc": "ENST00000615798.4:c.4670T>C",
                 "vep_amino_acids": "V/A",
@@ -17384,7 +17384,7 @@
         "topmed_hom": 2,
         "transcript": [
             {
-                "vep_sift_score": "0.13",
+                "vep_sift_score": 0.13,
                 "vep_gene": "ff8418bb-5857-4fa5-81fb-5f75d2c72d48",
                 "vep_hgvsc": "ENST00000341594.9:c.1934A>G",
                 "vep_amino_acids": "Q/R",
@@ -17416,7 +17416,7 @@
                 "vep_hgvsp": "ENSP00000341887.6:p.Gln645Arg"
             },
             {
-                "vep_sift_score": "0.01",
+                "vep_sift_score": 0.01,
                 "vep_gene": "ff8418bb-5857-4fa5-81fb-5f75d2c72d48",
                 "vep_hgvsc": "ENST00000367248.7:c.1934A>G",
                 "vep_amino_acids": "Q/R",
@@ -17449,7 +17449,7 @@
                 "vep_hgvsp": "ENSP00000356217.3:p.Gln645Arg"
             },
             {
-                "vep_sift_score": "0",
+                "vep_sift_score": 0,
                 "vep_gene": "ff8418bb-5857-4fa5-81fb-5f75d2c72d48",
                 "vep_hgvsc": "ENST00000367253.8:c.1964A>G",
                 "vep_amino_acids": "Q/R",
@@ -17482,7 +17482,7 @@
                 "vep_hgvsp": "ENSP00000356222.4:p.Gln655Arg"
             },
             {
-                "vep_sift_score": "0.02",
+                "vep_sift_score": 0.02,
                 "vep_gene": "ff8418bb-5857-4fa5-81fb-5f75d2c72d48",
                 "vep_hgvsc": "ENST00000367255.10:c.1964A>G",
                 "vep_amino_acids": "Q/R",
@@ -17516,7 +17516,7 @@
                 "vep_hgvsp": "ENSP00000356224.5:p.Gln655Arg"
             },
             {
-                "vep_sift_score": "0.01",
+                "vep_sift_score": 0.01,
                 "vep_gene": "ff8418bb-5857-4fa5-81fb-5f75d2c72d48",
                 "vep_hgvsc": "ENST00000413186.6:c.1964A>G",
                 "vep_amino_acids": "Q/R",
@@ -17549,7 +17549,7 @@
                 "vep_hgvsp": "ENSP00000414510.2:p.Gln655Arg"
             },
             {
-                "vep_sift_score": "0.02",
+                "vep_sift_score": 0.02,
                 "vep_gene": "ff8418bb-5857-4fa5-81fb-5f75d2c72d48",
                 "vep_hgvsc": "ENST00000423061.6:c.1985A>G",
                 "vep_amino_acids": "Q/R",
@@ -17583,7 +17583,7 @@
                 "vep_hgvsp": "ENSP00000396024.1:p.Gln662Arg"
             },
             {
-                "vep_sift_score": "0.02",
+                "vep_sift_score": 0.02,
                 "vep_gene": "ff8418bb-5857-4fa5-81fb-5f75d2c72d48",
                 "vep_hgvsc": "ENST00000466159.6:c.1964A>G",
                 "vep_amino_acids": "Q/R",
@@ -17635,7 +17635,7 @@
                 "vep_biotype": "nonsense_mediated_decay"
             },
             {
-                "vep_sift_score": "0.01",
+                "vep_sift_score": 0.01,
                 "vep_gene": "ff8418bb-5857-4fa5-81fb-5f75d2c72d48",
                 "vep_hgvsc": "ENST00000495090.6:c.665A>G",
                 "vep_amino_acids": "Q/R",
@@ -17677,7 +17677,7 @@
                 "vep_gene": "ff8418bb-5857-4fa5-81fb-5f75d2c72d48",
                 "vep_most_severe": false,
                 "vep_hgvsc": "ENST00000535896.7:c.1958A>G",
-                "vep_sift_score": "0.01",
+                "vep_sift_score": 0.01,
                 "vep_codons": "cAg/cGg",
                 "vep_pubmed": [
                     "25741868~24123876"
@@ -17706,7 +17706,7 @@
                 "vep_biotype": "protein_coding",
                 "vep_most_severe": false,
                 "vep_hgvsc": "ENST00000672122.1:c.1907A>G",
-                "vep_sift_score": "0.01",
+                "vep_sift_score": 0.01,
                 "vep_codons": "cAg/cGg",
                 "vep_gene": "ff8418bb-5857-4fa5-81fb-5f75d2c72d48",
                 "vep_pubmed": [
@@ -17753,7 +17753,7 @@
                 "vep_biotype": "protein_coding",
                 "vep_most_severe": false,
                 "vep_hgvsc": "ENST00000673281.1:c.1958A>G",
-                "vep_sift_score": "0",
+                "vep_sift_score": 0,
                 "vep_codons": "cAg/cGg",
                 "vep_gene": "ff8418bb-5857-4fa5-81fb-5f75d2c72d48",
                 "vep_pubmed": [
@@ -18432,7 +18432,7 @@
         "topmed_hom": 1,
         "transcript": [
             {
-                "vep_sift_score": "0.66",
+                "vep_sift_score": 0.66,
                 "vep_gene": "b0106275-1915-4b04-bcc0-05794d22b267",
                 "vep_hgvsc": "ENST00000255674.11:c.1921A>G",
                 "vep_amino_acids": "I/V",
@@ -18502,7 +18502,7 @@
                 "vep_ensp": "ENSP00000462733",
                 "vep_most_severe": false,
                 "vep_feature": "ENST00000583043",
-                "vep_sift_score": "0.51",
+                "vep_sift_score": 0.51,
                 "vep_exon": "9/43",
                 "vep_hgvsp": "ENSP00000462733.1:p.Ile431Val",
                 "vep_polyphen_score": 0.003,
@@ -18510,7 +18510,7 @@
                 "vep_biotype": "nonsense_mediated_decay"
             },
             {
-                "vep_sift_score": "0.53",
+                "vep_sift_score": 0.53,
                 "vep_gene": "b0106275-1915-4b04-bcc0-05794d22b267",
                 "vep_hgvsc": "ENST00000638251.1:c.1921A>G",
                 "vep_amino_acids": "I/V",
@@ -18538,7 +18538,7 @@
                 "vep_hgvsp": "ENSP00000491968.1:p.Ile641Val"
             },
             {
-                "vep_sift_score": "0.48",
+                "vep_sift_score": 0.48,
                 "vep_gene": "b0106275-1915-4b04-bcc0-05794d22b267",
                 "vep_hgvsc": "ENST00000640376.1:c.1402A>G",
                 "vep_amino_acids": "I/V",
@@ -18570,7 +18570,7 @@
                 "vep_hgvsp": "ENSP00000491654.1:p.Ile468Val"
             },
             {
-                "vep_sift_score": "0.66",
+                "vep_sift_score": 0.66,
                 "vep_gene": "b0106275-1915-4b04-bcc0-05794d22b267",
                 "vep_hgvsc": "ENST00000640769.2:c.1921A>G",
                 "vep_amino_acids": "I/V",
@@ -19269,7 +19269,7 @@
         "topmed_hom": 2,
         "transcript": [
             {
-                "vep_sift_score": "0.02",
+                "vep_sift_score": 0.02,
                 "vep_gene": "871aa3b2-a431-42a5-967e-2ccb74306d3f",
                 "vep_hgvsc": "ENST00000307340.8:c.14074G>A",
                 "vep_amino_acids": "G/R",
@@ -19311,7 +19311,7 @@
                 "vep_consequence": [
                     "a4d8e291-6993-4250-be4a-0574f4be76e9"
                 ],
-                "vep_sift_score": "0.01",
+                "vep_sift_score": 0.01,
                 "vep_cds_position": "14074",
                 "vep_biotype": "protein_coding",
                 "vep_most_severe": false,
@@ -20639,7 +20639,7 @@
         "topmed_hom": 3,
         "transcript": [
             {
-                "vep_sift_score": "0.28",
+                "vep_sift_score": 0.28,
                 "vep_gene": "d65fef22-8076-4d3a-8bc1-d0b0c6e4dad9",
                 "vep_hgvsc": "ENST00000345617.7:c.958G>A",
                 "vep_amino_acids": "V/I",
@@ -20673,7 +20673,7 @@
                 "vep_hgvsp": "ENSP00000264606.3:p.Val320Ile"
             },
             {
-                "vep_sift_score": "0.18",
+                "vep_sift_score": 0.18,
                 "vep_gene": "d65fef22-8076-4d3a-8bc1-d0b0c6e4dad9",
                 "vep_hgvsc": "ENST00000445704.1:c.189G>A",
                 "vep_amino_acids": "V/I",
@@ -20705,7 +20705,7 @@
                 "vep_hgvsp": "ENSP00000391226.1:p.Val64Ile"
             },
             {
-                "vep_sift_score": "0.23",
+                "vep_sift_score": 0.23,
                 "vep_gene": "d65fef22-8076-4d3a-8bc1-d0b0c6e4dad9",
                 "vep_hgvsc": "ENST00000543185.5:c.607G>A",
                 "vep_amino_acids": "V/I",
@@ -21280,7 +21280,7 @@
         "topmed_hom": 5065,
         "transcript": [
             {
-                "vep_sift_score": "0.2",
+                "vep_sift_score": 0.2,
                 "vep_gene": "0ca43240-ca00-481f-a817-9159a686bbca",
                 "vep_hgvsc": "ENST00000292408.9:c.1162G>A",
                 "vep_amino_acids": "G/R",
@@ -21412,7 +21412,7 @@
                 "vep_biotype": "retained_intron"
             },
             {
-                "vep_sift_score": "0.2",
+                "vep_sift_score": 0.2,
                 "vep_gene": "0ca43240-ca00-481f-a817-9159a686bbca",
                 "vep_hgvsc": "ENST00000502906.5:c.1162G>A",
                 "vep_amino_acids": "G/R",
@@ -21535,7 +21535,7 @@
                 "vep_biotype": "protein_coding"
             },
             {
-                "vep_sift_score": "0.05",
+                "vep_sift_score": 0.05,
                 "vep_gene": "0ca43240-ca00-481f-a817-9159a686bbca",
                 "vep_hgvsc": "ENST00000511076.1:c.68G>A",
                 "vep_amino_acids": "G/R",
@@ -21870,7 +21870,7 @@
         "topmed_hom": 8,
         "transcript": [
             {
-                "vep_sift_score": "0.97",
+                "vep_sift_score": 0.97,
                 "vep_gene": "93a7ee12-e6f6-4a54-b54a-0f34f197e7d8",
                 "vep_hgvsc": "ENST00000281172.10:c.2283T>G",
                 "vep_amino_acids": "D/E",
@@ -21920,7 +21920,7 @@
                 "vep_ensp": "ENSP00000441888",
                 "vep_swissprot": "Q12929",
                 "vep_feature": "ENST00000540613",
-                "vep_sift_score": "0.89",
+                "vep_sift_score": 0.89,
                 "vep_exon": "13/14",
                 "vep_hgvsp": "ENSP00000441888.1:p.Asp501Glu",
                 "vep_polyphen_score": 0.001,
@@ -21952,7 +21952,7 @@
                 "vep_ensp": "ENSP00000437806",
                 "vep_swissprot": "Q12929",
                 "vep_feature": "ENST00000542903",
-                "vep_sift_score": "0.89",
+                "vep_sift_score": 0.89,
                 "vep_exon": "13/14",
                 "vep_hgvsp": "ENSP00000437806.1:p.Asp501Glu",
                 "vep_polyphen_score": 0.001,
@@ -21985,7 +21985,7 @@
                 "vep_biotype": "nonsense_mediated_decay"
             },
             {
-                "vep_sift_score": "0.97",
+                "vep_sift_score": 0.97,
                 "vep_gene": "93a7ee12-e6f6-4a54-b54a-0f34f197e7d8",
                 "vep_hgvsc": "ENST00000543523.5:c.2283T>G",
                 "vep_amino_acids": "D/E",
@@ -22018,7 +22018,7 @@
                 "vep_hgvsp": "ENSP00000441867.1:p.Asp761Glu"
             },
             {
-                "vep_sift_score": "0.97",
+                "vep_sift_score": 0.97,
                 "vep_gene": "93a7ee12-e6f6-4a54-b54a-0f34f197e7d8",
                 "vep_hgvsc": "ENST00000543612.5:c.2283T>G",
                 "vep_amino_acids": "D/E",
@@ -22056,7 +22056,7 @@
                 "vep_consequence": [
                     "a4d8e291-6993-4250-be4a-0574f4be76e9"
                 ],
-                "vep_sift_score": "0.97",
+                "vep_sift_score": 0.97,
                 "vep_cds_position": "2283",
                 "vep_biotype": "protein_coding",
                 "vep_most_severe": false,
@@ -22088,7 +22088,7 @@
                 "vep_consequence": [
                     "a4d8e291-6993-4250-be4a-0574f4be76e9"
                 ],
-                "vep_sift_score": "0.97",
+                "vep_sift_score": 0.97,
                 "vep_cds_position": "2334",
                 "vep_biotype": "protein_coding",
                 "vep_trembl": "A0A2R8YE63",
@@ -22117,7 +22117,7 @@
                 "vep_amino_acids": "D/E",
                 "vep_gene": "93a7ee12-e6f6-4a54-b54a-0f34f197e7d8",
                 "vep_hgvsc": "ENST00000644374.1:c.2283T>G",
-                "vep_sift_score": "0.97",
+                "vep_sift_score": 0.97,
                 "vep_consequence": [
                     "a4d8e291-6993-4250-be4a-0574f4be76e9"
                 ],
@@ -22150,7 +22150,7 @@
                 "vep_amino_acids": "D/E",
                 "vep_gene": "93a7ee12-e6f6-4a54-b54a-0f34f197e7d8",
                 "vep_hgvsc": "ENST00000645775.1:c.2283T>G",
-                "vep_sift_score": "0.97",
+                "vep_sift_score": 0.97,
                 "vep_consequence": [
                     "a4d8e291-6993-4250-be4a-0574f4be76e9"
                 ],
@@ -22184,7 +22184,7 @@
                 "vep_consequence": [
                     "a4d8e291-6993-4250-be4a-0574f4be76e9"
                 ],
-                "vep_sift_score": "0.98",
+                "vep_sift_score": 0.98,
                 "vep_cds_position": "2307",
                 "vep_biotype": "protein_coding",
                 "vep_trembl": "A0A2R8Y4W2",
@@ -22214,7 +22214,7 @@
                 "vep_consequence": [
                     "a4d8e291-6993-4250-be4a-0574f4be76e9"
                 ],
-                "vep_sift_score": "0.97",
+                "vep_sift_score": 0.97,
                 "vep_cds_position": "2283",
                 "vep_biotype": "protein_coding",
                 "vep_most_severe": false,
@@ -22246,7 +22246,7 @@
                 "vep_consequence": [
                     "a4d8e291-6993-4250-be4a-0574f4be76e9"
                 ],
-                "vep_sift_score": "0.97",
+                "vep_sift_score": 0.97,
                 "vep_cds_position": "2283",
                 "vep_biotype": "protein_coding",
                 "vep_most_severe": false,
@@ -22278,7 +22278,7 @@
                 "vep_consequence": [
                     "a4d8e291-6993-4250-be4a-0574f4be76e9"
                 ],
-                "vep_sift_score": "0.97",
+                "vep_sift_score": 0.97,
                 "vep_cds_position": "2283",
                 "vep_biotype": "protein_coding",
                 "vep_most_severe": false,
@@ -22310,7 +22310,7 @@
                 "vep_consequence": [
                     "a4d8e291-6993-4250-be4a-0574f4be76e9"
                 ],
-                "vep_sift_score": "0.97",
+                "vep_sift_score": 0.97,
                 "vep_cds_position": "2283",
                 "vep_biotype": "protein_coding",
                 "vep_most_severe": false,
@@ -22564,7 +22564,7 @@
         "topmed_hom": 1,
         "transcript": [
             {
-                "vep_sift_score": "0.33",
+                "vep_sift_score": 0.33,
                 "vep_gene": "0982f39e-6fc3-4aaa-8cd1-8fa31f6e11cd",
                 "vep_hgvsc": "ENST00000233242.5:c.12794T>C",
                 "vep_amino_acids": "V/A",
@@ -24074,7 +24074,7 @@
         "topmed_hom": 0,
         "transcript": [
             {
-                "vep_sift_score": "0.85",
+                "vep_sift_score": 0.85,
                 "vep_gene": "ab03a914-0422-4da1-8245-29858a5435c9",
                 "vep_hgvsc": "ENST00000422843.7:c.1759G>A",
                 "vep_amino_acids": "V/I",
@@ -25216,7 +25216,7 @@
         "topmed_hom": 6187,
         "transcript": [
             {
-                "vep_sift_score": "0.54",
+                "vep_sift_score": 0.54,
                 "vep_gene": "22063c16-2000-4215-9fcb-d2d808b30a31",
                 "vep_hgvsc": "ENST00000263125.10:c.989C>T",
                 "vep_amino_acids": "P/L",
@@ -25251,7 +25251,7 @@
                 "vep_hgvsp": "ENSP00000263125.5:p.Pro330Leu"
             },
             {
-                "vep_sift_score": "0.5",
+                "vep_sift_score": 0.5,
                 "vep_gene": "22063c16-2000-4215-9fcb-d2d808b30a31",
                 "vep_hgvsc": "ENST00000397176.6:c.989C>T",
                 "vep_amino_acids": "P/L",
@@ -25285,7 +25285,7 @@
                 "vep_hgvsp": "ENSP00000380361.2:p.Pro330Leu"
             },
             {
-                "vep_sift_score": "0.48",
+                "vep_sift_score": 0.48,
                 "vep_gene": "22063c16-2000-4215-9fcb-d2d808b30a31",
                 "vep_hgvsc": "ENST00000539722.5:c.614C>T",
                 "vep_amino_acids": "P/L",
@@ -25319,7 +25319,7 @@
                 "vep_hgvsp": "ENSP00000441752.1:p.Pro205Leu"
             },
             {
-                "vep_sift_score": "0.54",
+                "vep_sift_score": 0.54,
                 "vep_gene": "22063c16-2000-4215-9fcb-d2d808b30a31",
                 "vep_hgvsc": "ENST00000610727.1:c.881C>T",
                 "vep_amino_acids": "P/L",
