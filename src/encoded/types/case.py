@@ -2,7 +2,7 @@ from snovault import (
     calculated_property,
     collection,
     load_schema,
-    display_title_schema
+    # display_title_schema
 )
 from .base import (
     Item,
