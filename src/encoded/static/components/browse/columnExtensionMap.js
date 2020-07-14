@@ -158,7 +158,7 @@ export const columnExtensionMap = {
             if (itemTypeList[0] === "Case") {
                 return (
                     <a href={resultHref} className="adv-block-link">
-                        { renderAdvancedColumn(accession, status, display_title, "Last Modified:", date_modified) }
+                        { renderAdvancedColumn(<span className="text-mono">{ accession }</span>, status, display_title, "Last Modified:", date_modified) }
                     </a>
                 );
             }
@@ -183,7 +183,7 @@ export const columnExtensionMap = {
             if (itemTypeList[0] === "Case") {
                 return (
                     <a href={atId} className="adv-block-link">
-                        { renderAdvancedColumn(accession, status, display_title, "Accessioned:", date_created) }
+                        { renderAdvancedColumn(<span className="text-mono">{ accession }</span>, status, display_title, "Accessioned:", date_created) }
                     </a>
                 );
             }
@@ -225,7 +225,7 @@ export const columnExtensionMap = {
             // Unlikely to show in non-Case item results, so didn't add Case filter
             return (
                 <a href={sampleId} className="adv-block-link">
-                    {renderAdvancedColumn(accession, status, specimen_type, "Collected:", specimen_collection_date)}
+                    {renderAdvancedColumn(<span className="text-mono">{ accession }</span>, status, specimen_type, "Collected:", specimen_collection_date)}
                 </a>);
         }
     },

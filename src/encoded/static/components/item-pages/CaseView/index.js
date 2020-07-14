@@ -172,7 +172,7 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
             <React.Fragment>
                 <h4 className="text-400 align-middle mt-0">Status Overview</h4>
                 <div className="search-table-wrapper">
-                    <EmbeddedCaseSearchTable facets={null} searchHref={`/search/?type=Case&accession=${caseAccession}`} context={context} />
+                    <EmbeddedCaseSearchTable facets={null} searchHref={`/search/?type=Case&accession=${caseAccession}`} />
                 </div>
             </React.Fragment>
         );
@@ -595,7 +595,7 @@ const FilteringTab = React.memo(function FilteringTab(props) {
     // Overrides default 400px.
     const maxHeight = typeof windowHeight === "number" && windowHeight > 800 ? (windowHeight - 405) : undefined;
 
-    return <EmbeddedItemSearchTable { ...{ context, searchHref, hideFacets, maxHeight }} title={<FilteringTabSubtitle {...{ context }} />} />;
+    return <EmbeddedItemSearchTable { ...{ searchHref, hideFacets, maxHeight }} title={<FilteringTabSubtitle {...{ context }} />} />;
 });
 
 function FilteringTabSubtitle({ totalCount, context: { display_title } }){

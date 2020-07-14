@@ -63,7 +63,6 @@ $search-results-header-row-height: 52px; // 46px is existing default for both re
 				text-align: center;
 			}
 			.col-topleft {
-				@extend .text-monospace;
 				font-size: 0.75em;
 			}
 		}

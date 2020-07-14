@@ -6,10 +6,11 @@ import moment from 'moment';
 import ReactTooltip from 'react-tooltip';
 import _ from 'underscore';
 
-import { console, ajax } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
+import { console, ajax, JWT } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { LocalizedTime } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/LocalizedTime';
 import { Schemas } from './../../util';
 
+import { EmbeddedCaseSearchTable } from './../../item-pages/components/EmbeddedItemSearchTable';
 
 
 export const UserDashboard = React.memo(function UserDashboard(props){
@@ -63,7 +64,7 @@ export const UserDashboard = React.memo(function UserDashboard(props){
 
                     </div>
 
-                    <RecentCasesCard />
+                    <RecentCasesSection />
 
                 </div>
             </div>
@@ -72,173 +73,36 @@ export const UserDashboard = React.memo(function UserDashboard(props){
 });
 
 
+function RecentCasesSection (props) {
+    // We don't memoize this, can change on each run if User is being
+    // impersonated. We memoize stuff downstream from here, though.
+    const userDetails = JWT.getUserDetails();
+    const { project_roles = [] } = userDetails || {};
 
-class RecentCasesCard extends React.PureComponent {
-
-    static fieldsToRequest = [
-        'display_title',
-        'last_modified.date_modified',
-        'last_modified.modified_by',
-        '@id',
-        'families.members.@id',
-        'status'
-    ];
-
-    constructor(props){
-        super(props);
-        this.state = {
-            loading: true,
-            cases: null,
-            casesCount: null,
-            error: false
-        };
-    }
-
-    componentDidMount(){
-
-        const cb = (res) => {
-            if (res && Array.isArray(res['@graph'])){
-                this.setState({
-                    loading: false,
-                    cases: res['@graph'],
-                    casesCount: res.total
-                }, ReactTooltip.rebuild);
-                return;
-            } else {
-                this.setState({ loading: false, error: true });
-            }
-        };
-
-        const requestHref = (
-            "/search/?type=Case&limit=50&sort=-last_modified.date_modified&" +
-            RecentCasesCard.fieldsToRequest.map(function(f){ return "field=" + encodeURIComponent(f); }).join('&')
+    if (project_roles.length === 0) {
+        // Show single table of all cases available.
+        return (
+            <div className="recent-cases-table-section mt-36">
+                <h3 className="text-400">Recent Cases</h3>
+                <EmbeddedCaseSearchTable facets={null} searchHref="/search/?type=Case" />
+            </div>
         );
-
-        this.setState({ loading: true }, ()=>{
-            ajax.load(requestHref, cb, "GET", cb);
-        });
     }
 
-    render(){
-        const { cases = [], loading, casesCount = null } = this.state;
-
-        let innerBody;
-        let viewAllCasesBtn;
-        let createCaseBtn;
-
-        if (loading){
-            innerBody = (
-                <div className="text-center text-larger">
-                    <i className="icon icon-fw icon-circle-notch icon-spin fas"/>
-                </div>
-            );
-        } else if (!Array.isArray(cases) || cases.length === 0){
-            innerBody = (
-                <div className="text-center text-larger">
-                    You currently have no cases.
-                </div>
-            );
-        } else {
-            const renderedCases = cases.map(function(item){
-                return <CaseListItem item={item} key={item['@id']} />;
-            });
-            innerBody = <div className="case-items">{ renderedCases }</div>;
-            viewAllCasesBtn = (
-                <a href="/search/?type=Case" className="btn btn-outline-dark btn-block">
-                    View All { casesCount ? <span className="text-300">({ casesCount })</span> : null }
-                </a>
-            );
-        }
+    const tableSections = project_roles.map(function({ role, project }){
+        const { name: projectName, '@id' : projectID, display_title: projectTitle } = project;
 
         return (
-            <div className="card mt-5">
-                <h3 className="card-header text-400 my-0">
-                    Recent Cases
+            <div className="recent-cases-table-section mt-36" data-project={projectName} key={projectName}>
+                <h3 className="text-400">
+                    <span className="text-300 mr-06">Recent Cases from</span>
+                    <a href={projectID}>{ projectTitle }</a>
                 </h3>
-                <div className="card-body">
-                    <div className="row">
-                        <div className="col-12 col-md-4 col-xl-3">
-                            { viewAllCasesBtn }
-                            <a href="/search/?type=Case&currentAction=add" className="btn btn-primary btn-block btn-lg">New Case</a>
-                        </div>
-                        <div className="col-12 col-md-8 col-xl-9">
-                            { innerBody }
-                            {/*
-                            <p>
-                                <b>(TODO) Visible cases sorted by date-modified be here</b><br/>
-                                Per-role content or something else could go here also, such as searchview of recent
-                                cases or individuals if are clinician; new pipelines if are pipeline admin, etc.
-                                <br/><br/>
-                                (or per-role content can be above dashboard actions; final layout / location etc TBD)
-                                <br/><br/>
-                                <b>
-                                This could also be visible for public visitors as an entrance to a crowdsourcing UI/UX
-                                Or be daily cat facts here.
-                                </b>
-                            </p>
-                            */}
-                        </div>
-                    </div>
-                </div>
+                <EmbeddedCaseSearchTable facets={null} searchHref="/search/?type=Case" />
             </div>
         );
-    }
+
+    });
+
+    return tableSections;
 }
-
-const CaseListItem = React.memo(function CaseListItem({ item: caseItem }){
-    const {
-        '@id' : caseID,
-        display_title: title,
-        date_created: created,
-        last_modified: { date_modified, modified_by } = {},
-        families = [],
-        status = null
-    } = caseItem;
-    const { display_title: editorName } = modified_by || {};
-    const familiesLen = families.length;
-    // Todo memoize stuff if props are added.
-    const allMembers = families.reduce(function(memo, f){
-        (f.members || []).forEach(function(m){
-            if (!m['@id']) return;
-            memo.add(m['@id']);
-        });
-        return memo;
-    }, new Set());
-    //const membersCount = members.size;
-    const momentTime = moment(date_modified || created);
-    const timeFromNow = momentTime.fromNow();
-    const timeNeat = momentTime.format("dddd, MMMM Do YYYY, h:mm:ss a");
-
-    const outerCls = (
-        "case-item-container" +
-        (familiesLen === 0 ? " no-families" : "") +
-        (allMembers.size === 0 ? " no-individuals" : "")
-    );
-
-    return (
-        <div className={outerCls} key={caseID}>
-            <div className="row">
-                <h5 className="col-12 col-md-5 col-lg-7 text-600 mt-0 mb-0">
-                    <i className="item-status-indicator-dot mr-1" data-status={status} data-html
-                        data-tip={"Status &mdash; " + Schemas.Term.toName("status", status)}/>
-                    <a href={caseID}>{ title }</a>
-                </h5>
-                <div className="col-3 col-md-2 col-lg-1 text-ellipsis-container families-icon-container">
-                    <i className="icon icon-fw icon-users fas mr-1"
-                        data-tip={familiesLen === 0 ? "No families present" : "" + familiesLen + (familiesLen > 1 ? " Families" : " Family")} />
-                    <span>{ familiesLen }</span>
-                </div>
-                <div className="col-3 col-md-2 col-lg-1 text-ellipsis-container individuals-icon-container">
-                    <i className="icon icon-fw icon-user fas mr-1"
-                        data-tip={"" + allMembers.size + " Unique Individual" + (allMembers.size === 1 ? "" : "s")}/>
-                    <span>{ allMembers.size }</span>
-                </div>
-                <div className="col-6 col-md-3 text-right time-from-now-container">
-                    <i className="icon icon-fw icon-clock far mr-05 align-middle text-small" data-html
-                        data-tip={"<div class='text-right'>Last Modified on " + timeNeat + "<br/>by <span class='text-600'>" + (editorName || "<em>Unknown</em>") + "</span></div>"}/>
-                    <span className="align-middle">{ timeFromNow }</span>
-                </div>
-            </div>
-        </div>
-    );
-});
