@@ -1,5 +1,7 @@
 import pytest
 
+from uuid import uuid4
+
 
 ORDER = [
     'user', 'project', 'institution', 'filter_set', 'nexus',
@@ -18,6 +20,7 @@ ORDER = [
 
 
 class MockedLogger(object):
+
     def info(self, msg):
         print('INFO: ' + msg)
 
@@ -461,7 +464,6 @@ def protocol(testapp, protocol_data):
 
 @pytest.fixture
 def file_formats(testapp, institution, project):
-    from uuid import uuid4
     formats = {}
     ef_format_info = {
         # 'pairs_px2': {'standard_file_extension': 'pairs.gz.px2',
