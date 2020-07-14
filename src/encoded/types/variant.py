@@ -184,36 +184,44 @@ class VariantSample(Item):
             return round(int(alt) / (int(ref) + int(alt)), 3)  # round to 3 digits
         return 0.0
 
+    @calculated_property(schema={
+        "title": "bam_snapshot",
+        "description": "Link to Genome Snapshot Image",
+        "type": "string"
+    })
+    def bam_snapshot(self, accession, CHROM, POS):
+        file_path = '/%s/%s/%s:%s.png' % (
+            accession, 'igv_shots', CHROM, POS
+        )
+        return file_path
+
 
 @view_config(name='download', context=VariantSample, request_method='GET',
              permission='view', subpath_segments=[0, 1])
+@debug_log
 def download(context, request):
     """ Navigates to the IGV snapshot hrf
         TODO: test (this is a rough sketch) + enable
     """
-    return {
-        'notification': 'Failure',
-        'detail': 'Route not enabled yet'
+    properties = context.upgrade_properties()
+    s3_client = boto3.client('s3')
+    params_to_get_obj = {
+        'Bucket': request.registry.settings.get('file_wfout_bucket'),
+        'Key': properties['bam_snapshot']
     }
-    # properties = context.upgrade_properties()
-    # s3_client = boto3.client('s3')
-    # params_to_get_obj = {
-    #     'Bucket': request.registry.settings.get('file_wfout_bucket'),
-    #     'Key': properties['href']
-    # }
-    # location = s3_client.generate_presigned_url(
-    #     ClientMethod='get_object',
-    #     Params=params_to_get_obj,
-    #     ExpiresIn=36*60*60
-    # )
-    #
-    # if asbool(request.params.get('soft')):
-    #     expires = int(parse_qs(urlparse(location).query)['Expires'][0])
-    #     return {
-    #         '@type': ['SoftRedirect'],
-    #         'location': location,
-    #         'expires': datetime.datetime.fromtimestamp(expires, pytz.utc).isoformat(),
-    #     }
-    #
-    # # 307 redirect specifies to keep original method
-    # raise HTTPTemporaryRedirect(location=location)
+    location = s3_client.generate_presigned_url(
+        ClientMethod='get_object',
+        Params=params_to_get_obj,
+        ExpiresIn=36*60*60
+    )
+
+    if asbool(request.params.get('soft')):
+        expires = int(parse_qs(urlparse(location).query)['Expires'][0])
+        return {
+            '@type': ['SoftRedirect'],
+            'location': location,
+            'expires': datetime.datetime.fromtimestamp(expires, pytz.utc).isoformat(),
+        }
+
+    # 307 redirect specifies to keep original method
+    raise HTTPTemporaryRedirect(location=location)
