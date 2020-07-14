@@ -1,6 +1,5 @@
 [
     {
-        "case_id": "Ashkenazim Trio Father",
         "sample_processing": "0a2d5fc7-2bd5-4289-a59c-40f7c633214c",
         "description": "Benchmarking case for Ashkenazim Trio Father",
         "project": "f01ff5be-a72d-43bd-afcf-174fa9dcd282",
@@ -23,7 +22,6 @@
         "accession": "GAPCA2Q6KPFN"
     },
     {
-        "case_id": "Platinum Trio Husband",
         "sample_processing": "8dd51b60-2d65-4e74-ac86-08ff9159be90",
         "description": "Benchmarking case for Platinum Trio Husband",
         "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
@@ -46,7 +44,6 @@
         "accession": "GAPCAQPHN61Y"
     },
     {
-        "case_id": "Platinum Trio Daughter",
         "sample_processing": "8dd51b60-2d65-4e74-ac86-08ff9159be90",
         "description": "Benchmarking case for Platinum Trio Father",
         "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
@@ -69,7 +66,6 @@
         "accession": "GAPCAKQB9FPJ"
     },
     {
-        "case_id": "Platinum Trio NA12878",
         "sample_processing": "8dd51b60-2d65-4e74-ac86-08ff9159be90",
         "description": "Benchmarking case for Platinum Trio Proband",
         "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
@@ -92,7 +88,6 @@
         "accession": "GAPCALNEKP7C"
     },
     {
-        "case_id": "Ashkenazim Trio Proband",
         "sample_processing": "0a2d5fc7-2bd5-4289-a59c-40f7c633214c",
         "description": "Benchmarking case for Ashkenazim Trio Proband",
         "project": "f01ff5be-a72d-43bd-afcf-174fa9dcd282",
@@ -115,7 +110,6 @@
         "accession": "GAPCAW9MJW72"
     },
     {
-        "case_id": "Ashkenazim Trio Mother",
         "sample_processing": "0a2d5fc7-2bd5-4289-a59c-40f7c633214c",
         "description": "Benchmarking case for Ashkenazim Trio Mother",
         "project": "f01ff5be-a72d-43bd-afcf-174fa9dcd282",
