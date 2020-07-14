@@ -1,8 +1,6 @@
 import pytest
 from encoded.submit import *
 import json
-# from pyramid.paster import get_app
-# from dcicutils.misc_utils import VirtualApp
 
 
 @pytest.fixture
@@ -59,6 +57,69 @@ def submission_info3(submission_info2):
     return info
 
 
+@pytest.fixture
+def sample_info():
+    return {
+        'workup type': 'WES',
+        'specimen id': '9034',
+        'date collected': '2020-01-06'
+    }
+
+
+@pytest.fixture
+def example_rows():
+    return [
+        {'individual id': '456', 'analysis id': '1111', 'relation to proband': 'proband'},
+        {'individual id': '123', 'analysis id': '1111', 'relation to proband': 'mother'},
+        {'individual id': '789', 'analysis id': '1111', 'relation to proband': 'father'},
+        {'individual id': '456', 'analysis id': '2222', 'relation to proband': 'proband'},
+        {'individual id': '555', 'analysis id': '3333', 'relation to proband': 'proband'},
+        {'individual id': '546', 'analysis id': '3333', 'relation to proband': 'mother'}
+    ]
+
+
+@pytest.fixture
+def new_family(child, mother, father):
+    return {
+        "title": "Smith family",
+        "proband": child['@id'],
+        "members": [
+            child['@id'],
+            mother['@id'],
+            father['@id']
+        ]
+    }
+
+
+@pytest.fixture
+def aunt(testapp, project, institution):
+    item = {
+        "accession": "GAPIDAUNT001",
+        "age": 35,
+        "age_units": "year",
+        'project': project['@id'],
+        'institution': institution['@id'],
+        "sex": "F"
+    }
+    return testapp.post_json('/individual', item).json['@graph'][0]
+
+
+def test_map_fields(sample_info):
+    result = map_fields(sample_info, {}, ['workup_type'], 'sample')
+    assert result['workup_type'] == 'WES'
+    assert result['specimen_accession'] == '9034'
+    assert result['specimen_collection_date'] == '2020-01-06'
+    assert not result.get('sequencing_lab')
+
+
+def test_create_families(example_rows):
+    fams = create_families(example_rows)
+    assert sorted(list(fams.keys())) == ['1111', '2222', '3333']
+    assert fams['1111'] == 'family-456'
+    assert fams['2222'] == 'family-456'
+    assert fams['3333'] == 'family-555'
+
+
 def test_fetch_individual_metadata_new(row_dict, empty_items):
     items_out = fetch_individual_metadata(row_dict, empty_items, 'test-proj:indiv1', 'hms-dbmi')
     assert items_out['individual']['test-proj:indiv1']['aliases'] == ['test-proj:indiv1']
@@ -109,30 +170,50 @@ def test_fetch_sample_metadata_sp(row_dict, empty_items):
     assert items_out['individual']['test-proj:indiv1']['samples'] == ['test-proj:samp1']
 
 
-# def test_create_sample_processing_groups_grp(submission_info2):
-#     items_out = create_sample_processing_groups(submission_info2, 'test-proj:sp-multi')
-#     assert items_out['sample_processing']['test-proj:sp-multi']['analysis_type'] == 'WGS-Group'
-#     assert len(items_out['sample_processing']['test-proj:sp-multi']['samples']) == 2
-#
-#
-# def test_create_sample_processing_groups_one(submission_info):
-#     items_out = create_sample_processing_groups(submission_info, 'test-proj:sp-single')
-#     assert not items_out['sample_processing']
-#
-#
-# def test_create_sample_processing_groups_trio(submission_info3):
-#     items_out = create_sample_processing_groups(submission_info3, 'test-proj:sp-multi')
-#     assert items_out['sample_processing']['test-proj:sp-multi']['analysis_type'] == 'WGS-Group'
-#     submission_info3['family']['test-proj:fam1']['father'] = 'test-proj:indiv3'
-#     items_out = create_sample_processing_groups(submission_info3, 'test-proj:sp-multi')
-#     assert items_out['sample_processing']['test-proj:sp-multi']['analysis_type'] == 'WGS-Trio'
-
-
 def test_xls_to_json(project, institution):
     json_out = xls_to_json('src/encoded/tests/data/documents/cgap_submit_test.xlsx', project, institution)
     assert len(json_out['family']) == 1
+    assert 'encode-project:family-456' in json_out['family']
     assert len(json_out['individual']) == 3
     assert all(['encode-project:individual-' + x in json_out['individual'] for x in ['123', '456', '789']])
+
+
+def test_parse_exception_invalid_alias(testapp, a_case):
+    a_case['invalid_field'] = 'value'
+    a_case['project'] = '/projects/invalid-project/'
+    try:
+        testapp.post_json('/case', a_case)
+    except Exception as e:
+        errors = parse_exception(e, ['/projects/other-project/'])
+    assert len(errors) == 2
+    assert 'Additional properties are not allowed' in ''.join(errors)
+    assert 'not found' in ''.join(errors)
+
+
+def test_parse_exception_with_alias(testapp, a_case):
+    a_case['project'] = '/projects/invalid-project/'
+    errors = None
+    try:
+        testapp.post_json('/case', a_case)
+    except Exception as e:
+        errors = parse_exception(e, ['/projects/invalid-project/'])
+    assert errors == []
+
+
+def test_compare_fields_same(testapp, fam, new_family):
+    profile = testapp.get('/profiles/family.json').json
+    result = compare_fields(profile, [], new_family, fam)
+    assert not result
+
+
+def test_compare_fields_different(testapp, aunt, fam, new_family):
+    new_family['members'].append(aunt['@id'])
+    new_family['title'] = 'Smythe family'
+    profile = testapp.get('/profiles/family.json').json
+    result = compare_fields(profile, [], new_family, fam)
+    assert len(result) == 2
+    assert 'title' in result
+    assert len(result['members']) == len(fam['members']) + 1
 
 
 def test_validate_item_post_valid(testapp, a_case):
