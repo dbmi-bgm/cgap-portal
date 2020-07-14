@@ -1,0 +1,603 @@
+[
+    {
+        "valid_item_types": [
+            "FileReference",
+            "FileProcessed"
+        ],
+        "description": "Tabix index file of vcf, compressed",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "released",
+        "file_format": "vcf_gz_tbi",
+        "uuid": "f84f1922-7f4e-4afc-922f-bec620969bf1",
+        "standard_file_extension": "vcf.gz.tbi",
+        "schema_version": "1",
+        "date_created": "2020-07-07T02:11:44.167289+00:00",
+        "last_modified": {
+            "date_modified": "2020-07-07T06:00:07.515364+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        }
+    },
+    {
+        "valid_item_types": [
+            "FileReference",
+            "FileProcessed"
+        ],
+        "uuid": "1b8f525f-aecb-4211-9ae5-a2c998b05599",
+        "description": "vcf, compressed",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "released",
+        "file_format": "vcf_gz",
+        "extrafile_formats": [
+            "f84f1922-7f4e-4afc-922f-bec620969bf1"
+        ],
+        "standard_file_extension": "vcf.gz",
+        "schema_version": "1",
+        "date_created": "2020-07-07T02:36:54.563040+00:00",
+        "last_modified": {
+            "date_modified": "2020-07-07T06:00:07.953311+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        }
+    },
+    {
+        "valid_item_types": [
+            "FileProcessed"
+        ],
+        "uuid": "d13d06cf-218e-4f61-aaf0-91f226248b3c",
+        "description": "This format is used for aligned reads",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "released",
+        "file_format": "bam",
+        "extrafile_formats": [
+            "d13d06c1-218e-4f61-aaf0-91f226248b3c"
+        ],
+        "standard_file_extension": "bam",
+        "schema_version": "1",
+        "date_created": "2020-07-06T23:45:47.170886+00:00",
+        "last_modified": {
+            "date_modified": "2020-07-07T15:43:46.223809+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        }
+    },
+    {
+        "valid_item_types": [
+            "FileProcessed"
+        ],
+        "description": "Bam index format",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "released",
+        "file_format": "bai",
+        "uuid": "d13d06c1-218e-4f61-aaf0-91f226248b3c",
+        "standard_file_extension": "bam.bai",
+        "schema_version": "1",
+        "date_created": "2020-07-07T02:36:55.075254+00:00",
+        "last_modified": {
+            "date_modified": "2020-07-07T15:43:46.375529+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        }
+    },
+    {
+        "valid_item_types": [
+            "FileFastq",
+            "FileProcessed"
+        ],
+        "description": "This format is used for short read sequence data - more information can be found here https://www.ncbi.nlm.nih.gov/sra/docs/submitformats/#fastq-files",
+        "other_allowed_extensions": [
+            "fq.gz"
+        ],
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "released",
+        "file_format": "fastq",
+        "uuid": "c13d06cf-218e-4f61-aaf0-91f226248b2c",
+        "standard_file_extension": "fastq.gz",
+        "schema_version": "1",
+        "date_created": "2020-07-06T23:45:47.104475+00:00",
+        "last_modified": {
+            "date_modified": "2020-07-07T15:43:46.496124+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        }
+    },
+    {
+        "valid_item_types": [
+            "FileProcessed"
+        ],
+        "description": "Tabix index file of gvcf, compressed",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "released",
+        "file_format": "gvcf_gz_tbi",
+        "uuid": "b01ee86e-b2c7-4725-81d7-798718674485",
+        "standard_file_extension": "gvcf.gz.tbi",
+        "schema_version": "1",
+        "date_created": "2020-07-07T02:36:55.523856+00:00",
+        "last_modified": {
+            "date_modified": "2020-07-07T06:00:15.281877+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        }
+    },
+    {
+        "valid_item_types": [
+            "FileProcessed"
+        ],
+        "uuid": "ad47d469-4561-4234-bce2-820f08f58e7c",
+        "description": "gvcf, compressed",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "released",
+        "file_format": "gvcf_gz",
+        "extrafile_formats": [
+            "b01ee86e-b2c7-4725-81d7-798718674485"
+        ],
+        "standard_file_extension": "gvcf.gz",
+        "schema_version": "1",
+        "date_created": "2020-07-07T02:36:55.832892+00:00",
+        "last_modified": {
+            "date_modified": "2020-07-07T06:00:15.712487+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        }
+    },
+    {
+        "valid_item_types": [
+            "FileProcessed",
+            "FileReference"
+        ],
+        "uuid": "fcc2647d-301b-4888-8d9d-83ea4270309c",
+        "description": "vcf, uncompressed",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "released",
+        "file_format": "vcf",
+        "extrafile_formats": [
+            "ec96f95a-cf13-4633-ab0d-c4a5138bbe0b"
+        ],
+        "standard_file_extension": "vcf",
+        "schema_version": "1",
+        "date_created": "2020-07-07T02:36:58.991230+00:00",
+        "last_modified": {
+            "date_modified": "2020-07-07T06:00:10.973855+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        }
+    },
+    {
+        "valid_item_types": [
+            "FileReference"
+        ],
+        "description": "extra file of genome reference fasta",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "released",
+        "file_format": "fa_fai",
+        "uuid": "fb728bb4-bc56-46d5-8df5-a05562826b9a",
+        "standard_file_extension": "fa.fai",
+        "schema_version": "1",
+        "date_created": "2020-07-07T02:36:56.107462+00:00",
+        "last_modified": {
+            "date_modified": "2020-07-07T06:00:13.355657+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        }
+    },
+    {
+        "valid_item_types": [
+            "FileReference"
+        ],
+        "description": "chain file for coordinates liftover, compressed",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "released",
+        "file_format": "chain",
+        "uuid": "dd1ef82d-da5e-4680-bd5c-cf471a87eb5b",
+        "standard_file_extension": "chain.gz",
+        "schema_version": "1",
+        "date_created": "2020-07-07T05:58:45.787679+00:00",
+        "last_modified": {
+            "date_modified": "2020-07-07T06:00:08.303439+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        }
+    },
+    {
+        "valid_item_types": [
+            "FileReference"
+        ],
+        "uuid": "d7fd1020-ae85-41a9-a45d-c66285efa996",
+        "description": "mutanno index file, compressed",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "released",
+        "file_format": "mti_gz",
+        "extrafile_formats": [
+            "c0a56f31-d1af-4b88-9041-57b0830eeb8a",
+            "a112ef25-bd5d-44c1-824a-d5c6156db0a4"
+        ],
+        "standard_file_extension": "mti.gz",
+        "schema_version": "1",
+        "date_created": "2020-07-07T05:58:46.034766+00:00",
+        "last_modified": {
+            "date_modified": "2020-07-07T06:00:08.614363+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        }
+    },
+    {
+        "valid_item_types": [
+            "FileReference"
+        ],
+        "description": "Tabix index file of mti, compressed",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "released",
+        "file_format": "mti_gz_tbi",
+        "uuid": "c0a56f31-d1af-4b88-9041-57b0830eeb8a",
+        "standard_file_extension": "mti.gz.tbi",
+        "schema_version": "1",
+        "date_created": "2020-07-07T05:58:46.271122+00:00",
+        "last_modified": {
+            "date_modified": "2020-07-07T06:00:08.961257+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        }
+    },
+    {
+        "valid_item_types": [
+            "FileReference"
+        ],
+        "description": "mutanno index info file",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "released",
+        "file_format": "mti_json",
+        "uuid": "a112ef25-bd5d-44c1-824a-d5c6156db0a4",
+        "standard_file_extension": "mti.json",
+        "schema_version": "1",
+        "date_created": "2020-07-07T05:58:46.466907+00:00",
+        "last_modified": {
+            "date_modified": "2020-07-07T06:00:09.286566+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        }
+    },
+    {
+        "valid_item_types": [
+            "FileReference"
+        ],
+        "uuid": "5ced774b-a73e-4d1b-8186-d7fbbde7a3c2",
+        "description": "genome reference fasta",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "released",
+        "file_format": "fa",
+        "extrafile_formats": [
+            "4ed9f7e0-2b2f-4aca-9533-a0a652b43442",
+            "fb728bb4-bc56-46d5-8df5-a05562826b9a"
+        ],
+        "standard_file_extension": "fa",
+        "schema_version": "1",
+        "date_created": "2020-07-07T02:36:56.581313+00:00",
+        "last_modified": {
+            "date_modified": "2020-07-07T06:00:14.607816+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        }
+    },
+    {
+        "valid_item_types": [
+            "FileReference"
+        ],
+        "description": "extra file of genome reference fasta",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "released",
+        "file_format": "dict",
+        "uuid": "4ed9f7e0-2b2f-4aca-9533-a0a652b43442",
+        "standard_file_extension": "dict",
+        "schema_version": "1",
+        "date_created": "2020-07-07T02:36:56.934458+00:00",
+        "last_modified": {
+            "date_modified": "2020-07-07T06:00:14.909704+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        }
+    },
+    {
+        "valid_item_types": [
+            "FileProcessed",
+            "FileReference"
+        ],
+        "description": "This format is used for aligned reads",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "released",
+        "file_format": "txt",
+        "uuid": "0cd4e777-a596-4927-95c8-b07716121aa3",
+        "standard_file_extension": "txt",
+        "schema_version": "1",
+        "date_created": "2020-07-06T23:45:47.240704+00:00",
+        "last_modified": {
+            "date_modified": "2020-07-07T15:43:46.630018+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        }
+    },
+    {
+        "valid_item_types": [
+            "FileProcessed",
+            "FileReference"
+        ],
+        "description": "GATK/IGV-index of vcf, uncompressed",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "released",
+        "file_format": "vcf_idx",
+        "uuid": "ec96f95a-cf13-4633-ab0d-c4a5138bbe0b",
+        "standard_file_extension": "vcf.idx",
+        "schema_version": "1",
+        "date_created": "2020-07-07T02:36:59.301488+00:00",
+        "last_modified": {
+            "date_modified": "2020-07-07T06:00:11.723452+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        }
+    },
+    {
+        "valid_item_types": [
+            "FileReference"
+        ],
+        "uuid": "d243d800-96b6-4b0a-a0ff-fc81be438365",
+        "description": "mutanno index files archive",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "released",
+        "file_format": "mti_tar",
+        "extrafile_formats": [
+            "a112ef25-bd5d-44c1-824a-d5c6156db0a4"
+        ],
+        "standard_file_extension": "mti.tar",
+        "schema_version": "1",
+        "date_created": "2020-07-07T05:58:46.910684+00:00",
+        "last_modified": {
+            "date_modified": "2020-07-07T06:00:10.098567+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        }
+    },
+    {
+        "valid_item_types": [
+            "FileProcessed",
+            "FileReference"
+        ],
+        "description": "Tabix index file of rck, compressed",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "released",
+        "file_format": "rck_gz_tbi",
+        "uuid": "c55ace88-3289-49b0-a67a-c046e1004e5a",
+        "standard_file_extension": "rck.gz.tbi",
+        "schema_version": "1",
+        "date_created": "2020-07-07T05:58:48.170629+00:00",
+        "last_modified": {
+            "date_modified": "2020-07-07T06:00:12.121157+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        }
+    },
+    {
+        "valid_item_types": [
+            "FileReference"
+        ],
+        "description": "An extra file of a bwt file",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "released",
+        "file_format": "amb",
+        "uuid": "8db70ed6-0121-4fe1-a72e-d91dc5aa6cd3",
+        "standard_file_extension": "amb",
+        "schema_version": "1",
+        "date_created": "2020-07-07T02:36:57.599083+00:00",
+        "last_modified": {
+            "date_modified": "2020-07-07T06:00:16.475433+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        }
+    },
+    {
+        "valid_item_types": [
+            "FileReference"
+        ],
+        "uuid": "813b0001-5f3f-4e28-9203-4cdf261e19c4",
+        "description": "BWA genome index, untarred, uncompressed",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "released",
+        "file_format": "bwt",
+        "extrafile_formats": [
+            "106199e5-5a85-4817-9a55-7b31698e1fda",
+            "8db70ed6-0121-4fe1-a72e-d91dc5aa6cd3",
+            "7373ca48-0b3e-467b-967a-80870846f89b",
+            "11f2fc36-9a65-4d60-9365-d8ff241df4f7"
+        ],
+        "standard_file_extension": "bwt",
+        "schema_version": "1",
+        "date_created": "2020-07-07T02:36:57.853968+00:00",
+        "last_modified": {
+            "date_modified": "2020-07-07T06:00:16.857567+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        }
+    },
+    {
+        "valid_item_types": [
+            "FileReference"
+        ],
+        "description": "An extra file of a bwt file",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "released",
+        "file_format": "pac",
+        "uuid": "7373ca48-0b3e-467b-967a-80870846f89b",
+        "standard_file_extension": "pac",
+        "schema_version": "1",
+        "date_created": "2020-07-07T02:36:58.144834+00:00",
+        "last_modified": {
+            "date_modified": "2020-07-07T06:00:17.226264+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        }
+    },
+    {
+        "valid_item_types": [
+            "FileProcessed",
+            "FileReference"
+        ],
+        "uuid": "20d4d3aa-5f1c-4b75-9e25-73f9f370fefa",
+        "description": "read count keeper, compressed",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "released",
+        "file_format": "rck_gz",
+        "extrafile_formats": [
+            "c55ace88-3289-49b0-a67a-c046e1004e5a"
+        ],
+        "standard_file_extension": "rck.gz",
+        "schema_version": "1",
+        "date_created": "2020-07-07T05:58:48.692248+00:00",
+        "last_modified": {
+            "date_modified": "2020-07-07T06:00:12.997126+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        }
+    },
+    {
+        "valid_item_types": [
+            "FileReference"
+        ],
+        "description": "An extra file of a bwt file",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "released",
+        "file_format": "sa",
+        "uuid": "11f2fc36-9a65-4d60-9365-d8ff241df4f7",
+        "standard_file_extension": "sa",
+        "schema_version": "1",
+        "date_created": "2020-07-07T02:36:58.453416+00:00",
+        "last_modified": {
+            "date_modified": "2020-07-07T06:00:17.599279+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        }
+    },
+    {
+        "valid_item_types": [
+            "FileReference"
+        ],
+        "description": "An extra file of a bwt file",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "released",
+        "file_format": "ann",
+        "uuid": "106199e5-5a85-4817-9a55-7b31698e1fda",
+        "standard_file_extension": "ann",
+        "schema_version": "1",
+        "date_created": "2020-07-07T02:36:58.739722+00:00",
+        "last_modified": {
+            "date_modified": "2020-07-07T06:00:17.960056+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        }
+    },
+    {
+        "valid_item_types": [
+            "FileProcessed",
+            "FileReference"
+        ],
+        "uuid": "39f836d8-bbb1-46c7-80d4-e321d4a44204",
+        "description": "rck files archive, compressed",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "released",
+        "file_format": "rck_tar",
+        "extrafile_formats": [
+            "1c7dc723-811c-4fcf-b8e5-d5e17a2013f7"
+        ],
+        "standard_file_extension": "rck.tar",
+        "schema_version": "1",
+        "date_created": "2020-07-07T05:58:47.146022+00:00",
+        "last_modified": {
+            "date_modified": "2020-07-07T06:00:10.391357+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        }
+    },
+    {
+        "valid_item_types": [
+            "FileProcessed",
+            "FileReference"
+        ],
+        "description": "index file for rck archive",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "released",
+        "file_format": "rck_tar_index",
+        "uuid": "1c7dc723-811c-4fcf-b8e5-d5e17a2013f7",
+        "standard_file_extension": "rck.tar.index",
+        "schema_version": "1",
+        "date_created": "2020-07-07T05:58:47.353991+00:00",
+        "last_modified": {
+            "date_modified": "2020-07-07T06:00:10.676828+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        }
+    },
+    {
+        "valid_item_types": [
+            "FileProcessed",
+            "FileReference"
+        ],
+        "description": "binary index genome",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "released",
+        "file_format": "big",
+        "uuid": "f66af4df-c107-44f0-bc94-227f1b4ccf72",
+        "standard_file_extension": "big",
+        "schema_version": "1",
+        "date_created": "2020-07-07T05:58:47.777192+00:00",
+        "last_modified": {
+            "date_modified": "2020-07-07T06:00:11.370297+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        }
+    },
+    {
+        "valid_item_types": [
+            "FileProcessed",
+            "FileReference"
+        ],
+        "description": "bed, uncompressed",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "released",
+        "file_format": "bed",
+        "uuid": "4c04f6de-89a7-4477-8dc4-811b50c67401",
+        "standard_file_extension": "bed",
+        "schema_version": "1",
+        "date_created": "2020-07-07T05:58:48.417133+00:00",
+        "last_modified": {
+            "date_modified": "2020-07-07T06:00:12.609566+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        }
+    }
+]
