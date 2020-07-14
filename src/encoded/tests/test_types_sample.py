@@ -108,28 +108,6 @@ def test_sample_requisition_completed_rejected(testapp, sample_one):
 
 
 # Sample Processing Tests
-@pytest.fixture
-def sample_proc_fam(testapp, project, institution, fam):
-    data = {
-        'project': project['@id'],
-        'institution': institution['@id'],
-        'samples': [
-            "GAPSAPROBAND",
-            "GAPSAFATHER1",
-            "GAPSAMOTHER1",
-            "GAPSABROTHER",
-            "GAPSAGRANDPA",
-            "GAPSAGRANDMA",
-            "GAPSAHALFSIS",
-            "GAPSAUNCLE01",
-            "GAPSACOUSIN1"
-            ],
-        'families': [fam['@id']]
-    }
-    res = testapp.post_json('/sample_processing', data).json['@graph'][0]
-    return res
-
-
 def test_sample_processing_pedigree(testapp, sample_proc_fam):
     """This is an end to end test for calculating relationships
     Test for roles"""
