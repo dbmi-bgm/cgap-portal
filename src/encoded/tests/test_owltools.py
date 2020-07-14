@@ -1,6 +1,6 @@
 import pytest
 
-from rdflib import RDFS, BNode, URIRef, Literal
+from rdflib import BNode, Literal
 from unittest import mock
 from ..commands import owltools as ot
 

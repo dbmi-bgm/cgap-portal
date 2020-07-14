@@ -32,7 +32,9 @@ class Family(Item):
     item_type = 'family'
     name_key = 'accession'
     schema = load_schema('encoded:schemas/family.json')
-    rev = {'sample_procs': ('SampleProcessing', 'families')}
+    rev = {'sample_procs': ('SampleProcessing', 'families'),
+           'case': ('Case', 'family')}
+
     embedded_list = [
         "members.accession",
         "members.father",
@@ -58,6 +60,7 @@ class Family(Item):
         "members.phenotypic_features.onset_age",
         "members.phenotypic_features.onset_age_units",
         "members.samples.status",
+        "members.samples.bam_sample_id",
         "members.samples.specimen_type",
         "members.samples.specimen_notes",
         "members.samples.specimen_collection_date",
@@ -104,26 +107,393 @@ class Family(Item):
         "analysis_groups.completed_processes",
     ]
 
-    def get_parents(self, request, proband=None, members=None):
-        parents = []
-        if proband and members:
-            props = get_item_or_none(request, proband, 'individuals')
-            if props:
-                for p in ['mother', 'father']:
-                    if props.get(p):
-                        parents.append(props[p])
-        return parents
+    @calculated_property(schema={
+        "title": "Cases",
+        "description": "Cases for this family",
+        "type": "array",
+        "items": {
+            "title": "Case",
+            "type": "string",
+            "linkTo": "Case"
+        }
+    })
+    def case(self, request):
+        rs = self.rev_link_atids(request, "case")
+        if rs:
+            return rs
 
-    def get_grandparents(self, request, proband=None, members=None, parents=[]):
-        gp = []
-        if proband and members and parents:
-            for item in parents:
-                p_props = get_item_or_none(request, item, 'individuals')
-                if p_props:
-                    for p in ['mother', 'father']:
-                        if p_props.get(p) and p_props[p] in members:
-                            gp.append(p_props[p])
-        return gp
+    @staticmethod
+    def generate_ped(all_props, proband, family_id):
+        """Format family information into ped file
+        https://gatk.broadinstitute.org/hc/en-us/articles/360035531972
+        This might be useful in the future for compatibility
+        Ped file columns are
+        *Family ID
+        *Individual ID
+        *Paternal ID
+        *Maternal ID
+        *Sex (1=male; 2=female; U=unknown)
+        *Phenotype (-9 missing 0 missing 1 unaffected 2 affected)
+        (at the moment only on proband has 2 on phenotype)
+        """
+        ped_content = """"""
+        gender_map = {'M': '1', 'F': '2', 'U': '3'}
+        for props in all_props:
+            # all members have unknown phenotype by default
+            phenotype = '0'
+            member_id = props['accession']
+
+            def parent_id(properties, field):
+                'extract parent accession from member info'
+                id = properties.get(field)
+                if id:
+                    return id.split('/')[2]
+                else:
+                    return ''
+            paternal_id = parent_id(props, 'father')
+            maternal_id = parent_id(props, 'mother')
+            sex = props.get('sex', 'U')
+            ped_sex = gender_map.get(sex, 'U')
+            # if member is proband, add phenotupe
+            if props['@id'] == proband:
+                phenotype = '2'
+            line_ele = [family_id, member_id, paternal_id, maternal_id, ped_sex, phenotype]
+            ped_content += '\t'.join(line_ele) + '\n'
+        return ped_content
+
+    @staticmethod
+    def extract_vectors(ped_content):
+        """given a ped file content, extract all primary relationship pairs
+        keys are listed in primary_vectors"""
+        fathers = []
+        mothers = []
+        daughters = []
+        sons = []
+        children = []  # when the gender of the kid is not known
+        for a_line in ped_content.split('\n'):
+            if not a_line:
+                continue
+            fam, ind, father, mother, sex, ph = a_line.split('\t')
+            if father:
+                fathers.append([father, ind])
+                if sex == '1':
+                    sons.append([ind, father])
+                elif sex == '2':
+                    daughters.append([ind, father])
+                else:
+                    children.append([ind, father])
+            if mother:
+                mothers.append([mother, ind])
+                if sex == '1':
+                    sons.append([ind, mother])
+                elif sex == '2':
+                    daughters.append([ind, mother])
+                else:
+                    children.append([ind, mother])
+        primary_vectors = {
+            'fathers': fathers,
+            'mothers': mothers,
+            'daughters': daughters,
+            'sons': sons,
+            'children': children  # when the gender of the kid is not known
+        }
+        return primary_vectors
+
+    @staticmethod
+    def construct_links(primary_vectors, seed):
+        """Given the primary vectors, constructs linkages for each individual
+        and filters for the shortest link
+        Use first letter of primary vector keys to construct these links
+        This linkages are calcualted from the seed, often starts with proband,
+        seed should be accession"""
+        # starting pack
+        needs_analysis = [[seed, 'p'], ]
+        analyzed = []
+        all_links = {seed: ['p', ]}
+        # loop overy every set of new collected individuals
+        while needs_analysis:
+            collect_connected = []
+            for an_ind, starting_tag in needs_analysis:
+                if an_ind in analyzed:
+                    continue
+                analyzed.append(an_ind)
+                if an_ind not in all_links:
+                    print('should not happen')
+                for a_key in primary_vectors:
+                    # extend the link list with this letter
+                    extend_tag = a_key[0]
+                    my_links = [i for i in primary_vectors[a_key] if i[1] == an_ind]
+                    for a_link in my_links:
+                        linked_ind = a_link[0]
+                        new_tag = starting_tag + '-' + extend_tag
+                        if linked_ind not in all_links:
+                            all_links[linked_ind] = [new_tag, ]
+                        else:
+                            all_links[linked_ind].append(new_tag)
+                        if linked_ind not in analyzed:
+                            collect_connected.append([linked_ind, new_tag])
+                needs_analysis = collect_connected
+        filtered_links = {}
+        for individual in all_links:
+            # Return shorts links
+            a_list = list(set(all_links[individual]))
+            minimum = min(map(len, a_list))
+            a_list = [i for i in a_list if len(i) == minimum]
+            filtered_links[individual] = a_list
+        return filtered_links
+
+    @staticmethod
+    def relationships_vocabulary(links):
+        """Convert links to relationships.
+        Start with a seed dictionary of basic roles (Converter)
+        Extend going up (parent_roles)
+        Extend going down - gendered (children_roles_gendered)
+                          - and non-gendered (children_roles)
+        All roles should be used in sequence
+        (ie if x created in children_roles, can not be used in parent roles)
+        Nomenclature guided by
+        https://www.devonfhs.org.uk/pdfs/tools/eichhorn-rlationship-chart.pdf"""
+        # return a nested list of  [acc, calculated_relation, association]
+        # start convert with seed roles
+        Converter = {
+            "p": "proband",
+            "p-f": "father", "p-m": "mother", "p-d": "daughter", "p-s": "son", "p-c": "child",
+            "p-f-s": "brother", "p-m-s": "brother",
+            "p-f-d": "sister", "p-m-d": "sister",
+            "p-f-c": "sibling", "p-m-c": "sibling",
+            "p-d-m": "wife", "p-s-m": "wife", "p-c-m": "wife",
+            "p-d-f": "husband", "p-s-f": "husband", "p-c-f": "husband",
+        }
+        # list of dictionary for assigning roles to members of given set of roles
+        # roles : the input roles to be extended
+        # parents : new roles that are in sequence female, male, non-gender
+        parent_roles = [
+            {"roles": ['mother', 'father'], 'parents': ['grandmother', 'grandfather']},
+            {"roles": ['grandmother', 'grandfather'], "parents": ['great-grandmother', 'great-grandfather']},
+            {"roles": ['great-grandmother', 'great-grandfather'], "parents": ['great-great-grandmother', 'great-great-grandfather']}
+        ]
+        for an_extension in parent_roles:
+            all_combinations = [i for i in Converter if Converter[i] in an_extension['roles']]
+            for a_combination in all_combinations:
+                for ind, parent_tag in enumerate(['-m', '-f']):
+                    Converter[a_combination + parent_tag] = an_extension['parents'][ind]
+        # roles : the input roles to be extended
+        # children : new roles that are in sequence female, male, non-gender
+        children_roles_gendered = [
+            {"roles": ['daughter', 'son', 'child'], "children": ['granddaughter', 'grandson', 'grandchild']},
+            {"roles": ['granddaughter', 'grandson', 'grandchild'], "children": ['great-granddaughter', 'great-grandson', 'great-grandchild']},
+            {"roles": ['great-granddaughter', 'great-grandson', 'great-grandchild'], "children": ['great-great-granddaughter', 'great-great-grandson', 'great-great-grandchild']},
+            {"roles": ['sister', 'brother', 'sibling'], "children": ['niece', 'nephew', 'nibling']},
+            {"roles": ['niece', 'nephew', 'nibling'], "children": ['grandniece', 'grandnephew', 'grandnibling']},
+            {"roles": ['grandmother', 'grandfather'], "children": ['aunt', 'uncle', 'auncle']},
+            {"roles": ['great-grandmother', 'great-grandfather'], "children": ['grandaunt', 'granduncle', 'grandauncle']}
+        ]
+        for an_extension in children_roles_gendered:
+            all_combinations = [i for i in Converter if Converter[i] in an_extension['roles']]
+            for a_combination in all_combinations:
+                for ind, parent_tag in enumerate(['-d', '-s', '-c']):
+                    Converter[a_combination + parent_tag] = an_extension['children'][ind]
+        # given a relation, map the new relation for that relations children when new role is gender independent
+        children_roles = [
+            {'roles': ['uncle', 'aunt', 'auncle'], 'children': 'cousin'},
+            {'roles': ['cousin'], 'children': 'cousin once removed (descendant)'},
+            {'roles': ['cousin once removed (descendant)'], 'children': 'cousin twice removed (descendant)'},
+            {'roles': ['granduncle', 'grandaunt', 'grandauncle'], 'children': 'cousin once removed (ascendant)'},
+            {'roles': ['cousin once removed (ascendant)'], 'children': 'second cousin'},
+            {'roles': ['second cousin'], 'children': 'second cousin once removed (descendant)'},
+            {'roles': ['second cousin once removed (descendant)'], 'children': 'second cousin twice removed (descendant)'},
+            ]
+        for an_extension in children_roles:
+            all_combinations = [i for i in Converter if Converter[i] in an_extension['roles']]
+            for a_combination in all_combinations:
+                for a_child_tag in ['-s', '-d', '-c']:
+                    Converter[a_combination + a_child_tag] = an_extension['children']
+
+        # calculate direction change (if more then 2, not blood relative)
+        def count_direction_change(relation_tag):
+            """If you are going down from proband, you need to keep going down
+            If you are going up from proband, you can change direction once
+            If you are out of these cases, you are not blood relative
+            We make an exception for the Husband and Wife"""
+            up = ['f', 'm']
+            down = ['d', 's', 'c']
+            state = 1
+            changes = 0
+            for a_letter in relation_tag.split('-'):
+                if a_letter in up:
+                    new_state = 1
+                elif a_letter in down:
+                    new_state = -1
+                else:  # p
+                    continue
+                if state == new_state:
+                    continue
+                else:
+                    state = new_state
+                    changes += 1
+            return changes
+
+        relations = []
+        for i in links:
+            association = ''
+            val = links[i][0]
+            if val in Converter:
+                relation = Converter[val]
+                # calculate half relation for siblings
+                if relation in ['sister', 'brother', 'sibling']:
+                    # if they are full siblings, they should carry two link of same size
+                    # if not, they are half
+                    if len(links[i]) == 1:
+                        relation = 'half-' + relation
+                # for extended family calculate paternal/maternal
+                if len(val) > 4:
+                    # calculate for family that starts by going above 2 levels
+                    if val[2:5] in ['m-m', 'm-f', 'f-f', 'f-m']:
+                        association_pointer = val[2]
+                        if association_pointer == 'f':
+                            association = 'paternal'
+                        elif association_pointer == 'm':
+                            association = 'maternal'
+            else:
+                dir_change = count_direction_change(val)
+                if dir_change > 1:
+                    relation = 'family-in-law'
+                else:
+                    relation = 'extended-family'
+            relations.append([i, relation, association])
+        return relations
+
+    @calculated_property(schema={
+        "title": "Relationships",
+        "description": "Relationships to proband.",
+        "type": "array",
+        "items": {
+            "title": "Relation",
+            "type": "object",
+            "properties": {
+                "individual": {
+                    "title": "Individual",
+                    "type": "string"
+                },
+                "association": {
+                    "title": "Individual",
+                    "type": "string",
+                    "enum": [
+                        "paternal",
+                        "maternal"
+                    ]
+                },
+                "sex": {
+                    "title": "Sex",
+                    "type": "string",
+                    "enum": [
+                        "F",
+                        "M",
+                        "U"
+                    ]
+                },
+                "relationship": {
+                    "title": "Relationship",
+                    "type": "string",
+                    "enum": ['proband',
+                             'father',
+                             'mother',
+                             'brother',
+                             'sister',
+                             'sibling',
+                             'half-brother',
+                             'half-sister',
+                             'half-sibling',
+                             'wife',
+                             'husband',
+                             'grandson',
+                             'granddaughter',
+                             'grandchild',
+                             'grandmother',
+                             'grandfather',
+                             'great-grandson',
+                             'great-granddaughter',
+                             'great-grandchild',
+                             'great-great-grandson',
+                             'great-great-granddaughter',
+                             'great-great-grandchild',
+                             'great-grandmother',
+                             'great-grandfather',
+                             'great-great-grandmother',
+                             'great-great-grandfather',
+                             'nephew',
+                             'niece',
+                             'nibling',
+                             'grandnephew',
+                             'grandniece',
+                             'grandnibling',
+                             'uncle',
+                             'aunt',
+                             'auncle',
+                             'granduncle',
+                             'grandaunt',
+                             'grandauncle',
+                             'cousin',
+                             'cousin once removed (descendant)',
+                             'cousin twice removed (descendant)',
+                             'cousin once removed (ascendant)',
+                             'second cousin',
+                             'second cousin once removed (descendant)',
+                             'second cousin twice removed (descendant)',
+                             'family-in-law',
+                             'extended-family',
+                             'not linked'
+                             ]
+                    }
+                }
+            }
+        })
+    def relationships(self, request, proband=None, members=None):
+        """Calculate relationships"""
+        # Start of the function
+        # empty list to accumulate results
+        relations = []
+        # we need both the proband and the members to calculate
+        if not proband or not members:
+            return relations
+        family_id = self.properties['accession']
+        # collect members properties
+        all_props = []
+        for a_member in members:
+            # This might be a step to optimize if families get larger
+            # TODO: make sure all mother fathers are in member list, if not fetch them too
+            #  for complete connection tracing
+            props = get_item_or_none(request, a_member, 'individuals')
+            all_props.append(props)
+        # convert to ped_file format
+        ped_text = self.generate_ped(all_props, proband, family_id)
+        primary_vectors = self.extract_vectors(ped_text)
+        proband_acc = proband.split('/')[2]
+        links = self.construct_links(primary_vectors, proband_acc)
+        relations = self.relationships_vocabulary(links)
+        results = []
+        for a_member in members:
+            a_member_resp = [i for i in all_props if i['@id'] == a_member][0]
+            temp = {"individual": '',
+                    "sex": '',
+                    "relationship": '',
+                    "association": ''}
+            mem_acc = a_member_resp['accession']
+            temp['individual'] = mem_acc
+            sex = a_member_resp.get('sex', 'U')
+            temp['sex'] = sex
+            relation_dic = [i for i in relations if i[0] == mem_acc]
+            if not relation_dic:
+                temp['relationship'] = 'not linked'
+                # the individual is not linked to proband through individuals listed in members
+                results.append(temp)
+                continue
+            relation = relation_dic[0]
+            temp['relationship'] = relation[1]
+            if relation[2]:
+                temp['association'] = relation[2]
+            results.append(temp)
+        return results
 
     @calculated_property(schema={
         "title": "Display Title",
@@ -176,153 +546,6 @@ class Family(Item):
             props = get_item_or_none(request, proband, 'individuals')
             if props and props.get('father') and props['father'] in members:
                 return props['father']
-
-    @calculated_property(schema={
-        "title": "Siblings",
-        "description": "Full siblings of proband",
-        "type": "string",
-        "items": {
-            "title": "Sibling",
-            "description": "Full sibling of proband",
-            "type": "string",
-            "linkTo": "Individual"
-        }
-    })
-    def siblings(self, request, proband=None, members=None):
-        if proband and members:
-            sibs = []
-            parents = self.get_parents(request, proband, members)
-            for member in members:
-                member_props = get_item_or_none(request, member, 'individuals')
-                if member_props and member != proband:
-                    if member_props.get('mother') in parents and member_props.get('father') in parents:
-                        sibs.append(member)
-            if sibs:
-                return sibs
-
-    @calculated_property(schema={
-        "title": "Half-siblings",
-        "description": "Half-siblings of proband",
-        "type": "string",
-        "items": {
-            "title": "Sibling",
-            "description": "Half sibling of proband",
-            "type": "string",
-            "linkTo": "Individual"
-        }
-    })
-    def half_siblings(self, request, proband=None, members=None):
-        if proband and members:
-            sibs = []
-            parents = self.get_parents(request, proband, members)
-            for member in members:
-                member_props = get_item_or_none(request, member, 'individuals')
-                if member_props and member != proband:
-                    if member_props.get('mother') in parents and member_props.get('father') not in parents:
-                        sibs.append(member)
-                    elif member_props.get('mother') not in parents and member_props.get('father') in parents:
-                        sibs.append(member)
-            if sibs:
-                return sibs
-
-    @calculated_property(schema={
-        "title": "Children",
-        "description": "Children of proband",
-        "type": "array",
-        "items": {
-            "title": "Child",
-            "description": "Child of proband",
-            "type": "string",
-            "linkTo": "Individual"
-        }
-    })
-    def children(self, request, proband=None, members=[]):
-        if proband and members:
-            ch = []
-            for member in members:
-                props = get_item_or_none(request, member, 'individuals')
-                if props and any(props.get(p) == proband for p in ['mother', 'father']):
-                    ch.append(member)
-            if ch:
-                return ch
-
-    @calculated_property(schema={
-        "title": "Grandparents",
-        "description": "Grandparents of proband",
-        "type": "array",
-        "items": {
-            "title": "Grandparent",
-            "description": "Grandparent of proband",
-            "type": "string",
-            "linkTo": "Individual"
-        }
-    })
-    def grandparents(self, request, proband=None, members=None):
-        if proband and members:
-            parents = self.get_parents(request, proband, members)
-            gp = self.get_grandparents(request, proband, members, parents=parents)
-            if gp:
-                return gp
-
-    @calculated_property(schema={
-        "title": "Aunts and Uncles",
-        "description": "Aunts and Uncles of proband",
-        "type": "array",
-        "items": {
-            "title": "Aunt or Uncle",
-            "description": "Aunt or Uncle of Proband",
-            "type": "string",
-            "linkTo": "Individual"
-        }
-    })
-    def aunts_and_uncles(self, request, proband=None, members=None):
-        if proband and members:
-            parents = self.get_parents(request, proband, members)
-            gp = self.get_grandparents(request, proband, members, parents)
-            aunts_uncles = []
-            for member in members:
-                member_props = get_item_or_none(request, member, 'individuals')
-                if member_props and member not in parents:
-                    for p in ['mother', 'father']:
-                        if member_props.get(p) and member_props[p] in gp:
-                            aunts_uncles.append(member)
-                            break
-            if aunts_uncles:
-                return aunts_uncles
-
-    @calculated_property(schema={
-        "title": "Cousins",
-        "description": "Cousins of proband",
-        "type": "string",
-        "items": {
-            "title": "Cousin",
-            "description": "Cousin of proband",
-            "type": "string",
-            "linkTo": "Individual"
-        }
-    })
-    def cousins(self, request, proband=None, members=None):
-        if proband and members:
-            csns = []
-            member_props = {}
-            parents = self.get_parents(request, proband, members)
-            gp = self.get_grandparents(request, proband, members, parents)
-            aunts_uncles = []
-            for member in members:
-                member_props[member] = get_item_or_none(request, member, 'individuals')
-                if member_props[member] and member not in parents:
-                    for p in ['mother', 'father']:
-                        if member_props[member].get(p) and member_props[member][p] in gp:
-                            aunts_uncles.append(member)
-                            break
-            for member in members:
-                if member_props[member]:
-                    for p in ['mother', 'father']:
-                        if member_props[member].get(p) and member_props[member][p] in aunts_uncles:
-                            csns.append(member)
-                            break
-            if csns:
-                return csns
 
 
 @view_config(name='process-pedigree', context=Family, request_method='PATCH',
@@ -416,7 +639,7 @@ def process_pedigree(context, request):
     xml_extra = {'ped_datetime': ped_datetime}
 
     family_uuids = create_family_proband(testapp, xml_data, refs, 'managedObjectID',
-                                   family_item, post_extra, xml_extra)
+                                         family_item, post_extra, xml_extra)
 
     # create Document for input pedigree file
     # pbxml files are not handled by default. Do some mimetype processing
@@ -481,7 +704,7 @@ def process_pedigree(context, request):
 
 
 #####################################
-### Pedigree processing functions ###
+# ## Pedigree processing functions ###
 #####################################
 
 
@@ -938,7 +1161,7 @@ def create_family_proband(testapp, xml_data, refs, ref_field, family_item,
                         if ref_val is not None and 'xml_ref_fxn' in converted_dict:
                             # will update data in place
                             converted_dict['xml_ref_fxn'](testapp, ref_val, refs, data,
-                                                     family_item, uuids_by_ref)
+                                                          family_item, uuids_by_ref)
                         elif ref_val is not None:
                             data[converted_dict['corresponds_to']] = uuids_by_ref[ref_val]
 
@@ -987,7 +1210,7 @@ def create_family_proband(testapp, xml_data, refs, ref_field, family_item,
     # invert uuids_by_ref to sort family members by managedObjectID (xml ref)
     refs_by_uuid = {v: k for k, v in uuids_by_ref.items()}
     family = {'members': sorted([m['uuid'] for m in family_members.values()],
-                                 key=lambda v: int(refs_by_uuid[v]))}
+                                key=lambda v: int(refs_by_uuid[v]))}
     if proband and proband in family_members:
         family['proband'] = family_members[proband]['uuid']
     else:

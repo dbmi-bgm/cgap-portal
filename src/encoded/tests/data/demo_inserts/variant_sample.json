@@ -1,0 +1,5165 @@
+[
+    {
+        "variant": "225bcbbd-38ed-4901-ad9c-dce33cfdc433",
+        "QUAL": 1731.95,
+        "last_modified": {
+            "date_modified": "2020-07-14T00:41:03.972368+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "DP": 45,
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "samplegeno": [
+            {
+                "samplegeno_gt": "CAGG/CAGG",
+                "samplegeno_ad": "0/23",
+                "samplegeno_numgt": "1/1",
+                "samplegeno_sampleid": "NA12877_sample"
+            },
+            {
+                "samplegeno_gt": "C/C",
+                "samplegeno_ad": "40/0",
+                "samplegeno_numgt": "0/0",
+                "samplegeno_sampleid": "NA12878_sample"
+            },
+            {
+                "samplegeno_gt": "C/CAGG",
+                "samplegeno_ad": "28/17",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12879_sample"
+            }
+        ],
+        "PL": "713,0,1311",
+        "GQ": 99,
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "in review",
+        "AD": "28,17",
+        "uuid": "ff2efca4-d7a3-4dfb-805f-c6b942b945e2",
+        "GT": "0/1",
+        "href": "https://maestro-resources.s3.amazonaws.com/IGV_temp/chr1%3A169888699.png",
+        "schema_version": "1",
+        "date_created": "2020-06-22T19:08:56.323025+00:00",
+        "file": "GAPFIPZSZYEK",
+        "annotation_id": "NA12879_sample:225bcbbd-38ed-4901-ad9c-dce33cfdc433:GAPFIPZSZYEK",
+        "CALL_INFO": "NA12879_sample"
+    },
+    {
+        "variant": "225bcbbd-38ed-4901-ad9c-dce33cfdc433",
+        "QUAL": 1731.95,
+        "last_modified": {
+            "date_modified": "2020-07-14T00:41:04.113830+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "DP": 23,
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "samplegeno": [
+            {
+                "samplegeno_gt": "CAGG/CAGG",
+                "samplegeno_ad": "0/23",
+                "samplegeno_numgt": "1/1",
+                "samplegeno_sampleid": "NA12877_sample"
+            },
+            {
+                "samplegeno_gt": "C/C",
+                "samplegeno_ad": "40/0",
+                "samplegeno_numgt": "0/0",
+                "samplegeno_sampleid": "NA12878_sample"
+            },
+            {
+                "samplegeno_gt": "C/CAGG",
+                "samplegeno_ad": "28/17",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12879_sample"
+            }
+        ],
+        "PL": "1035,69,0",
+        "GQ": 69,
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "in review",
+        "AD": "0,23",
+        "uuid": "fd855b9e-e0bf-42de-b2cb-c7737c8c90e8",
+        "GT": "1/1",
+        "href": "https://maestro-resources.s3.amazonaws.com/IGV_temp/chr1%3A169888699.png",
+        "schema_version": "1",
+        "date_created": "2020-06-22T19:08:56.250321+00:00",
+        "file": "GAPFIPZSZYEK",
+        "annotation_id": "NA12877_sample:225bcbbd-38ed-4901-ad9c-dce33cfdc433:GAPFIPZSZYEK",
+        "CALL_INFO": "NA12877_sample"
+    },
+    {
+        "variant": "4b82a972-00f8-4eee-b837-064149ddbabb",
+        "QUAL": 1244.12,
+        "last_modified": {
+            "date_modified": "2020-07-14T00:52:29.985691+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "DP": 43,
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "samplegeno": [
+            {
+                "samplegeno_gt": "A/A",
+                "samplegeno_ad": "39/0",
+                "samplegeno_numgt": "0/0",
+                "samplegeno_sampleid": "NA12877_sample"
+            },
+            {
+                "samplegeno_gt": "A/G",
+                "samplegeno_ad": "22/23",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12878_sample"
+            },
+            {
+                "samplegeno_gt": "A/G",
+                "samplegeno_ad": "22/21",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12879_sample"
+            }
+        ],
+        "PL": "591,0,635",
+        "GQ": 99,
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "in review",
+        "AD": "22,21",
+        "uuid": "fcd60031-ed9c-44a8-8528-ab9308717175",
+        "GT": "0/1",
+        "href": "https://maestro-resources.s3.amazonaws.com/IGV_temp/chr1%3A169888699.png",
+        "schema_version": "1",
+        "date_created": "2020-06-22T18:56:47.125755+00:00",
+        "file": "GAPFIPZSZYEK",
+        "annotation_id": "NA12879_sample:4b82a972-00f8-4eee-b837-064149ddbabb:GAPFIPZSZYEK",
+        "CALL_INFO": "NA12879_sample"
+    },
+    {
+        "variant": "ce546cf0-b69c-4387-b1eb-e30dab52081f",
+        "QUAL": 824.12,
+        "last_modified": {
+            "date_modified": "2020-07-14T00:49:37.711158+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "DP": 31,
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "samplegeno": [
+            {
+                "samplegeno_gt": "C/T",
+                "samplegeno_ad": "18/20",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12877_sample"
+            },
+            {
+                "samplegeno_gt": "C/C",
+                "samplegeno_ad": "36/0",
+                "samplegeno_numgt": "0/0",
+                "samplegeno_sampleid": "NA12878_sample"
+            },
+            {
+                "samplegeno_gt": "C/T",
+                "samplegeno_ad": "20/11",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12879_sample"
+            }
+        ],
+        "PL": "280,0,552",
+        "GQ": 99,
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "in review",
+        "AD": "20,11",
+        "uuid": "fa2ba5e9-a270-4ff9-a53a-fc40cd9c8506",
+        "GT": "0/1",
+        "href": "https://maestro-resources.s3.amazonaws.com/IGV_temp/chr1%3A169888699.png",
+        "schema_version": "1",
+        "date_created": "2020-06-22T18:59:37.417234+00:00",
+        "file": "GAPFIPZSZYEK",
+        "annotation_id": "NA12879_sample:ce546cf0-b69c-4387-b1eb-e30dab52081f:GAPFIPZSZYEK",
+        "CALL_INFO": "NA12879_sample"
+    },
+    {
+        "variant": "71f4c690-be97-4e3c-a057-2b175b0c59e7",
+        "QUAL": 4201.94,
+        "last_modified": {
+            "date_modified": "2020-07-14T00:55:51.359981+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "DP": 63,
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "samplegeno": [
+            {
+                "samplegeno_gt": "A/G",
+                "samplegeno_ad": "20/37",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12877_sample"
+            },
+            {
+                "samplegeno_gt": "A/G",
+                "samplegeno_ad": "25/32",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12878_sample"
+            },
+            {
+                "samplegeno_gt": "G/G",
+                "samplegeno_ad": "0/63",
+                "samplegeno_numgt": "1/1",
+                "samplegeno_sampleid": "NA12879_sample"
+            }
+        ],
+        "PL": "2189,190,0",
+        "GQ": 99,
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "in review",
+        "AD": "0,63",
+        "uuid": "f72bdfc4-8142-42bc-bde0-5ff08f36dcce",
+        "GT": "1/1",
+        "href": "https://maestro-resources.s3.amazonaws.com/IGV_temp/chr1%3A169888699.png",
+        "schema_version": "1",
+        "date_created": "2020-06-22T18:53:02.837801+00:00",
+        "file": "GAPFIPZSZYEK",
+        "annotation_id": "NA12879_sample:71f4c690-be97-4e3c-a057-2b175b0c59e7:GAPFIPZSZYEK",
+        "CALL_INFO": "NA12879_sample"
+    },
+    {
+        "variant": "0671330e-be76-4e0d-b102-fbe9df2619ff",
+        "QUAL": 1493.12,
+        "last_modified": {
+            "date_modified": "2020-07-14T00:51:36.128124+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "DP": 52,
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "samplegeno": [
+            {
+                "samplegeno_gt": "G/A",
+                "samplegeno_ad": "33/28",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12877_sample"
+            },
+            {
+                "samplegeno_gt": "G/G",
+                "samplegeno_ad": "40/0",
+                "samplegeno_numgt": "0/0",
+                "samplegeno_sampleid": "NA12878_sample"
+            },
+            {
+                "samplegeno_gt": "G/A",
+                "samplegeno_ad": "26/26",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12879_sample"
+            }
+        ],
+        "PL": "744,0,744",
+        "GQ": 99,
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "in review",
+        "AD": "26,26",
+        "uuid": "f503b308-e315-4a04-ab5e-17d48410111d",
+        "GT": "0/1",
+        "href": "https://maestro-resources.s3.amazonaws.com/IGV_temp/chr1%3A169888699.png",
+        "schema_version": "1",
+        "date_created": "2020-06-22T18:57:41.610559+00:00",
+        "file": "GAPFIPZSZYEK",
+        "annotation_id": "NA12879_sample:0671330e-be76-4e0d-b102-fbe9df2619ff:GAPFIPZSZYEK",
+        "CALL_INFO": "NA12879_sample"
+    },
+    {
+        "variant": "bfda8e20-8a43-49da-96f6-2bab66218db1",
+        "QUAL": 1283.12,
+        "last_modified": {
+            "date_modified": "2020-07-14T00:54:01.118907+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "DP": 38,
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "samplegeno": [
+            {
+                "samplegeno_gt": "T/C",
+                "samplegeno_ad": "18/20",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12877_sample"
+            },
+            {
+                "samplegeno_gt": "T/T",
+                "samplegeno_ad": "39/0",
+                "samplegeno_numgt": "0/0",
+                "samplegeno_sampleid": "NA12878_sample"
+            },
+            {
+                "samplegeno_gt": "T/C",
+                "samplegeno_ad": "12/25",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12879_sample"
+            }
+        ],
+        "PL": "546,0,509",
+        "GQ": 99,
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "in review",
+        "AD": "18,20",
+        "uuid": "f3a63f41-f47d-470e-b5c1-2f101642f97c",
+        "GT": "0/1",
+        "href": "https://maestro-resources.s3.amazonaws.com/IGV_temp/chr1%3A169888699.png",
+        "schema_version": "1",
+        "date_created": "2020-06-22T18:55:10.028887+00:00",
+        "file": "GAPFIPZSZYEK",
+        "annotation_id": "NA12877_sample:bfda8e20-8a43-49da-96f6-2bab66218db1:GAPFIPZSZYEK",
+        "CALL_INFO": "NA12877_sample"
+    },
+    {
+        "variant": "d760c9a2-3136-418c-a533-348b978866e7",
+        "QUAL": 597.12,
+        "last_modified": {
+            "date_modified": "2020-07-14T00:45:15.669185+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "DP": 28,
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "samplegeno": [
+            {
+                "samplegeno_gt": "C/T",
+                "samplegeno_ad": "17/11",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12877_sample"
+            },
+            {
+                "samplegeno_gt": "C/C",
+                "samplegeno_ad": "28/0",
+                "samplegeno_numgt": "0/0",
+                "samplegeno_sampleid": "NA12878_sample"
+            },
+            {
+                "samplegeno_gt": "C/T",
+                "samplegeno_ad": "13/11",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12879_sample"
+            }
+        ],
+        "PL": "298,0,506",
+        "GQ": 99,
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "in review",
+        "AD": "17,11",
+        "uuid": "f3201610-f79e-4e10-acc8-29d9fc2a97af",
+        "GT": "0/1",
+        "href": "https://maestro-resources.s3.amazonaws.com/IGV_temp/chr1%3A169888699.png",
+        "schema_version": "1",
+        "date_created": "2020-06-22T19:04:23.802356+00:00",
+        "file": "GAPFIPZSZYEK",
+        "annotation_id": "NA12877_sample:d760c9a2-3136-418c-a533-348b978866e7:GAPFIPZSZYEK",
+        "CALL_INFO": "NA12877_sample"
+    },
+    {
+        "variant": "87a1045d-fcb1-41fb-8af0-dc306ad6268a",
+        "QUAL": 359.25,
+        "last_modified": {
+            "date_modified": "2020-07-14T00:48:45.846220+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "DP": 28,
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "samplegeno": [
+            {
+                "samplegeno_gt": "T/T",
+                "samplegeno_ad": "37/0",
+                "samplegeno_numgt": "0/0",
+                "samplegeno_sampleid": "NA12877_sample"
+            },
+            {
+                "samplegeno_gt": "T/C",
+                "samplegeno_ad": "15/13",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12878_sample"
+            },
+            {
+                "samplegeno_gt": "T/T",
+                "samplegeno_ad": "30/0",
+                "samplegeno_numgt": "0/0",
+                "samplegeno_sampleid": "NA12879_sample"
+            }
+        ],
+        "PL": "368,0,427",
+        "GQ": 99,
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "in review",
+        "AD": "15,13",
+        "uuid": "ecda82dd-f177-47a3-af17-29dd0b7538a8",
+        "GT": "0/1",
+        "href": "https://maestro-resources.s3.amazonaws.com/IGV_temp/chr1%3A169888699.png",
+        "schema_version": "1",
+        "date_created": "2020-06-22T19:00:41.513911+00:00",
+        "file": "GAPFIPZSZYEK",
+        "annotation_id": "NA12878_sample:87a1045d-fcb1-41fb-8af0-dc306ad6268a:GAPFIPZSZYEK",
+        "CALL_INFO": "NA12878_sample"
+    },
+    {
+        "variant": "1bbb6480-96b7-421c-89ab-b86363c59774",
+        "PS": 17276557,
+        "GT": "1|1",
+        "PL": "1692,117,0",
+        "GQ": 99,
+        "PGT": "1|1",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "in review",
+        "AD": "0,35",
+        "uuid": "ec31a297-16ae-4c43-8238-76cae097fddf",
+        "PID": "17276557_A_C",
+        "CALL_INFO": "NA12879_sample",
+        "file": "GAPFIPZSZYEK",
+        "last_modified": {
+            "date_modified": "2020-07-14T00:49:04.419793+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "annotation_id": "NA12879_sample:1bbb6480-96b7-421c-89ab-b86363c59774:GAPFIPZSZYEK",
+        "QUAL": 5392.69,
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "samplegeno": [
+            {
+                "samplegeno_gt": "G/G",
+                "samplegeno_ad": "0/39",
+                "samplegeno_numgt": "1/1",
+                "samplegeno_sampleid": "NA12877_sample"
+            },
+            {
+                "samplegeno_gt": "G/G",
+                "samplegeno_ad": "0/44",
+                "samplegeno_numgt": "1/1",
+                "samplegeno_sampleid": "NA12878_sample"
+            },
+            {
+                "samplegeno_gt": "G/G",
+                "samplegeno_ad": "0/35",
+                "samplegeno_numgt": "1/1",
+                "samplegeno_sampleid": "NA12879_sample"
+            }
+        ],
+        "href": "https://maestro-resources.s3.amazonaws.com/IGV_temp/chr1%3A169888699.png",
+        "schema_version": "1",
+        "date_created": "2020-06-22T19:00:18.414061+00:00",
+        "DP": 35,
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b"
+    },
+    {
+        "variant": "5fba8dfa-1c91-4de9-a50d-f2e19b2c9caa",
+        "QUAL": 375.25,
+        "last_modified": {
+            "date_modified": "2020-07-14T00:43:13.660653+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "DP": 34,
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "samplegeno": [
+            {
+                "samplegeno_gt": "G/G",
+                "samplegeno_ad": "38/0",
+                "samplegeno_numgt": "0/0",
+                "samplegeno_sampleid": "NA12877_sample"
+            },
+            {
+                "samplegeno_gt": "G/A",
+                "samplegeno_ad": "20/14",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12878_sample"
+            },
+            {
+                "samplegeno_gt": "G/G",
+                "samplegeno_ad": "25/0",
+                "samplegeno_numgt": "0/0",
+                "samplegeno_sampleid": "NA12879_sample"
+            }
+        ],
+        "PL": "384,0,562",
+        "GQ": 99,
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "in review",
+        "AD": "20,14",
+        "uuid": "e6c6b7e4-4e86-487e-b72b-8c9318e83708",
+        "GT": "0/1",
+        "href": "https://maestro-resources.s3.amazonaws.com/IGV_temp/chr1%3A169888699.png",
+        "schema_version": "1",
+        "date_created": "2020-06-22T19:06:35.500324+00:00",
+        "file": "GAPFIPZSZYEK",
+        "annotation_id": "NA12878_sample:5fba8dfa-1c91-4de9-a50d-f2e19b2c9caa:GAPFIPZSZYEK",
+        "CALL_INFO": "NA12878_sample"
+    },
+    {
+        "variant": "53e15310-8f7f-40da-b465-0bba2d145a62",
+        "QUAL": 770.25,
+        "last_modified": {
+            "date_modified": "2020-07-14T00:52:44.811126+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "DP": 58,
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "samplegeno": [
+            {
+                "samplegeno_gt": "A/G",
+                "samplegeno_ad": "30/28",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12877_sample"
+            },
+            {
+                "samplegeno_gt": "A/A",
+                "samplegeno_ad": "38/0",
+                "samplegeno_numgt": "0/0",
+                "samplegeno_sampleid": "NA12878_sample"
+            },
+            {
+                "samplegeno_gt": "A/A",
+                "samplegeno_ad": "40/0",
+                "samplegeno_numgt": "0/0",
+                "samplegeno_sampleid": "NA12879_sample"
+            }
+        ],
+        "PL": "779,0,868",
+        "GQ": 99,
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "in review",
+        "AD": "30,28",
+        "uuid": "e57083bc-ad96-4449-949a-3943a5ab13ee",
+        "GT": "0/1",
+        "href": "https://maestro-resources.s3.amazonaws.com/IGV_temp/chr1%3A169888699.png",
+        "schema_version": "1",
+        "date_created": "2020-06-22T18:56:34.644905+00:00",
+        "file": "GAPFIPZSZYEK",
+        "annotation_id": "NA12877_sample:53e15310-8f7f-40da-b465-0bba2d145a62:GAPFIPZSZYEK",
+        "CALL_INFO": "NA12877_sample"
+    },
+    {
+        "variant": "0a0fa690-8128-4d0a-a9c2-8e7f3fac0ffb",
+        "QUAL": 621.25,
+        "last_modified": {
+            "date_modified": "2020-07-14T00:44:06.867642+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "DP": 27,
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "samplegeno": [
+            {
+                "samplegeno_gt": "GC/G",
+                "samplegeno_ad": "9/18",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12877_sample"
+            },
+            {
+                "samplegeno_gt": "GC/GC",
+                "samplegeno_ad": "29/0",
+                "samplegeno_numgt": "0/0",
+                "samplegeno_sampleid": "NA12878_sample"
+            },
+            {
+                "samplegeno_gt": "GC/GC",
+                "samplegeno_ad": "32/0",
+                "samplegeno_numgt": "0/0",
+                "samplegeno_sampleid": "NA12879_sample"
+            }
+        ],
+        "PL": "630,0,280",
+        "GQ": 99,
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "in review",
+        "AD": "9,18",
+        "uuid": "e5101b20-fced-403f-ba41-a0ff7345fac9",
+        "GT": "0/1",
+        "href": "https://maestro-resources.s3.amazonaws.com/IGV_temp/chr1%3A169888699.png",
+        "schema_version": "1",
+        "date_created": "2020-06-22T19:05:40.697696+00:00",
+        "file": "GAPFIPZSZYEK",
+        "annotation_id": "NA12877_sample:0a0fa690-8128-4d0a-a9c2-8e7f3fac0ffb:GAPFIPZSZYEK",
+        "CALL_INFO": "NA12877_sample"
+    },
+    {
+        "variant": "11689f17-55e0-48f0-9a5b-e5767c82211c",
+        "QUAL": 572.25,
+        "last_modified": {
+            "date_modified": "2020-07-14T00:43:26.029668+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "DP": 43,
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "samplegeno": [
+            {
+                "samplegeno_gt": "G/A",
+                "samplegeno_ad": "22/21",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12877_sample"
+            },
+            {
+                "samplegeno_gt": "G/G",
+                "samplegeno_ad": "38/0",
+                "samplegeno_numgt": "0/0",
+                "samplegeno_sampleid": "NA12878_sample"
+            },
+            {
+                "samplegeno_gt": "G/G",
+                "samplegeno_ad": "34/0",
+                "samplegeno_numgt": "0/0",
+                "samplegeno_sampleid": "NA12879_sample"
+            }
+        ],
+        "PL": "581,0,624",
+        "GQ": 99,
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "in review",
+        "AD": "22,21",
+        "uuid": "e4deebc8-1170-455e-ae68-517a41be0363",
+        "GT": "0/1",
+        "href": "https://maestro-resources.s3.amazonaws.com/IGV_temp/chr1%3A169888699.png",
+        "schema_version": "1",
+        "date_created": "2020-06-22T19:06:20.477666+00:00",
+        "file": "GAPFIPZSZYEK",
+        "annotation_id": "NA12877_sample:11689f17-55e0-48f0-9a5b-e5767c82211c:GAPFIPZSZYEK",
+        "CALL_INFO": "NA12877_sample"
+    },
+    {
+        "variant": "b61e6733-3cf5-456e-a70d-7b95dd600c53",
+        "QUAL": 1933.12,
+        "last_modified": {
+            "date_modified": "2020-07-14T00:49:21.243917+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "DP": 67,
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "samplegeno": [
+            {
+                "samplegeno_gt": "T/T",
+                "samplegeno_ad": "34/0",
+                "samplegeno_numgt": "0/0",
+                "samplegeno_sampleid": "NA12877_sample"
+            },
+            {
+                "samplegeno_gt": "T/C",
+                "samplegeno_ad": "30/37",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12878_sample"
+            },
+            {
+                "samplegeno_gt": "T/C",
+                "samplegeno_ad": "30/31",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12879_sample"
+            }
+        ],
+        "PL": "1053,0,841",
+        "GQ": 99,
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "in review",
+        "AD": "30,37",
+        "uuid": "e4d9d482-9b4d-41c9-a2c9-5e7e1692b0dd",
+        "GT": "0/1",
+        "href": "https://maestro-resources.s3.amazonaws.com/IGV_temp/chr1%3A169888699.png",
+        "schema_version": "1",
+        "date_created": "2020-06-22T18:59:56.343748+00:00",
+        "file": "GAPFIPZSZYEK",
+        "annotation_id": "NA12878_sample:b61e6733-3cf5-456e-a70d-7b95dd600c53:GAPFIPZSZYEK",
+        "CALL_INFO": "NA12878_sample"
+    },
+    {
+        "variant": "40707514-afb3-498a-b22d-7472d276f2c9",
+        "QUAL": 2823.94,
+        "last_modified": {
+            "date_modified": "2020-07-14T00:49:41.161011+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "DP": 44,
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "samplegeno": [
+            {
+                "samplegeno_gt": "T/C",
+                "samplegeno_ad": "22/24",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12877_sample"
+            },
+            {
+                "samplegeno_gt": "C/C",
+                "samplegeno_ad": "0/44",
+                "samplegeno_numgt": "1/1",
+                "samplegeno_sampleid": "NA12878_sample"
+            },
+            {
+                "samplegeno_gt": "T/C",
+                "samplegeno_ad": "23/26",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12879_sample"
+            }
+        ],
+        "PL": "1439,131,0",
+        "GQ": 99,
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "in review",
+        "AD": "0,44",
+        "uuid": "e40f39e2-1290-4674-ac8f-cc799bfb8cd2",
+        "GT": "1/1",
+        "href": "https://maestro-resources.s3.amazonaws.com/IGV_temp/chr1%3A169888699.png",
+        "schema_version": "1",
+        "date_created": "2020-06-22T18:59:33.837725+00:00",
+        "file": "GAPFIPZSZYEK",
+        "annotation_id": "NA12878_sample:40707514-afb3-498a-b22d-7472d276f2c9:GAPFIPZSZYEK",
+        "CALL_INFO": "NA12878_sample"
+    },
+    {
+        "variant": "f9389c3a-ebf2-4669-ae61-9dbfc6892eb0",
+        "QUAL": 1303.12,
+        "last_modified": {
+            "date_modified": "2020-07-14T00:48:27.983324+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "DP": 45,
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "samplegeno": [
+            {
+                "samplegeno_gt": "C/C",
+                "samplegeno_ad": "39/0",
+                "samplegeno_numgt": "0/0",
+                "samplegeno_sampleid": "NA12877_sample"
+            },
+            {
+                "samplegeno_gt": "C/A",
+                "samplegeno_ad": "21/24",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12878_sample"
+            },
+            {
+                "samplegeno_gt": "C/A",
+                "samplegeno_ad": "30/24",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12879_sample"
+            }
+        ],
+        "PL": "676,0,565",
+        "GQ": 99,
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "in review",
+        "AD": "21,24",
+        "uuid": "e3e56066-dd7c-476d-b761-5bcea746f2e6",
+        "GT": "0/1",
+        "href": "https://maestro-resources.s3.amazonaws.com/IGV_temp/chr1%3A169888699.png",
+        "schema_version": "1",
+        "date_created": "2020-06-22T19:01:03.110308+00:00",
+        "file": "GAPFIPZSZYEK",
+        "annotation_id": "NA12878_sample:f9389c3a-ebf2-4669-ae61-9dbfc6892eb0:GAPFIPZSZYEK",
+        "CALL_INFO": "NA12878_sample"
+    },
+    {
+        "variant": "880aa5ef-5605-42f3-986a-39b2a717d3d2",
+        "QUAL": 59.95,
+        "last_modified": {
+            "date_modified": "2020-07-14T00:49:00.447701+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "DP": 45,
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "samplegeno": [
+            {
+                "samplegeno_gt": "T/T",
+                "samplegeno_ad": "46/0",
+                "samplegeno_numgt": "0/0",
+                "samplegeno_sampleid": "NA12877_sample"
+            },
+            {
+                "samplegeno_gt": "T/G",
+                "samplegeno_ad": "35/10",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12878_sample"
+            },
+            {
+                "samplegeno_gt": "T/T",
+                "samplegeno_ad": "25/0",
+                "samplegeno_numgt": "0/0",
+                "samplegeno_sampleid": "NA12879_sample"
+            }
+        ],
+        "PL": "66,0,899",
+        "GQ": 66,
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "in review",
+        "AD": "35,10",
+        "uuid": "e2f74f81-9a1b-4a5f-bdaf-ef2577b32db5",
+        "GT": "0/1",
+        "href": "https://maestro-resources.s3.amazonaws.com/IGV_temp/chr1%3A169888699.png",
+        "schema_version": "1",
+        "date_created": "2020-06-22T19:00:25.268228+00:00",
+        "file": "GAPFIPZSZYEK",
+        "annotation_id": "NA12878_sample:880aa5ef-5605-42f3-986a-39b2a717d3d2:GAPFIPZSZYEK",
+        "CALL_INFO": "NA12878_sample"
+    },
+    {
+        "variant": "f969a951-a9f2-419d-b34d-4d92753f54d1",
+        "QUAL": 814.25,
+        "last_modified": {
+            "date_modified": "2020-07-14T00:50:04.351559+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "DP": 58,
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "samplegeno": [
+            {
+                "samplegeno_gt": "C/T",
+                "samplegeno_ad": "29/29",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12877_sample"
+            },
+            {
+                "samplegeno_gt": "C/C",
+                "samplegeno_ad": "38/0",
+                "samplegeno_numgt": "0/0",
+                "samplegeno_sampleid": "NA12878_sample"
+            },
+            {
+                "samplegeno_gt": "C/C",
+                "samplegeno_ad": "40/0",
+                "samplegeno_numgt": "0/0",
+                "samplegeno_sampleid": "NA12879_sample"
+            }
+        ],
+        "PL": "823,0,823",
+        "GQ": 99,
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "in review",
+        "AD": "29,29",
+        "uuid": "e032227e-325c-4ef1-ada6-52795948f9a7",
+        "GT": "0/1",
+        "href": "https://maestro-resources.s3.amazonaws.com/IGV_temp/chr1%3A169888699.png",
+        "schema_version": "1",
+        "date_created": "2020-06-22T18:59:14.233678+00:00",
+        "file": "GAPFIPZSZYEK",
+        "annotation_id": "NA12877_sample:f969a951-a9f2-419d-b34d-4d92753f54d1:GAPFIPZSZYEK",
+        "CALL_INFO": "NA12877_sample"
+    },
+    {
+        "variant": "45a92839-5392-44bf-ae21-da1a62f190d3",
+        "QUAL": 1370.12,
+        "last_modified": {
+            "date_modified": "2020-07-14T00:43:30.578327+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "DP": 36,
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "samplegeno": [
+            {
+                "samplegeno_gt": "T/C",
+                "samplegeno_ad": "19/32",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12877_sample"
+            },
+            {
+                "samplegeno_gt": "T/T",
+                "samplegeno_ad": "35/0",
+                "samplegeno_numgt": "0/0",
+                "samplegeno_sampleid": "NA12878_sample"
+            },
+            {
+                "samplegeno_gt": "T/C",
+                "samplegeno_ad": "20/16",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12879_sample"
+            }
+        ],
+        "PL": "447,0,587",
+        "GQ": 99,
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "in review",
+        "AD": "20,16",
+        "uuid": "de3d98d1-be7c-41a7-809d-5b4737d1b80b",
+        "GT": "0/1",
+        "href": "https://maestro-resources.s3.amazonaws.com/IGV_temp/chr1%3A169888699.png",
+        "schema_version": "1",
+        "date_created": "2020-06-22T19:06:14.986327+00:00",
+        "file": "GAPFIPZSZYEK",
+        "annotation_id": "NA12879_sample:45a92839-5392-44bf-ae21-da1a62f190d3:GAPFIPZSZYEK",
+        "CALL_INFO": "NA12879_sample"
+    },
+    {
+        "variant": "6937c0de-a11c-4015-bb34-3f86ff2f810e",
+        "QUAL": 960.25,
+        "last_modified": {
+            "date_modified": "2020-07-14T00:49:34.439661+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "DP": 59,
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "samplegeno": [
+            {
+                "samplegeno_gt": "T/C",
+                "samplegeno_ad": "26/33",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12877_sample"
+            },
+            {
+                "samplegeno_gt": "T/T",
+                "samplegeno_ad": "39/0",
+                "samplegeno_numgt": "0/0",
+                "samplegeno_sampleid": "NA12878_sample"
+            },
+            {
+                "samplegeno_gt": "T/T",
+                "samplegeno_ad": "46/0",
+                "samplegeno_numgt": "0/0",
+                "samplegeno_sampleid": "NA12879_sample"
+            }
+        ],
+        "PL": "969,0,726",
+        "GQ": 99,
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "in review",
+        "AD": "26,33",
+        "uuid": "dde7a5f6-6f72-41b1-aa56-8b66d115a0cf",
+        "GT": "0/1",
+        "href": "https://maestro-resources.s3.amazonaws.com/IGV_temp/chr1%3A169888699.png",
+        "schema_version": "1",
+        "date_created": "2020-06-22T18:59:41.517560+00:00",
+        "file": "GAPFIPZSZYEK",
+        "annotation_id": "NA12877_sample:6937c0de-a11c-4015-bb34-3f86ff2f810e:GAPFIPZSZYEK",
+        "CALL_INFO": "NA12877_sample"
+    },
+    {
+        "variant": "3d4f6f19-9852-4de3-85b3-b93ccb5f23b4",
+        "QUAL": 1662.91,
+        "last_modified": {
+            "date_modified": "2020-07-14T00:41:01.981209+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "DP": 34,
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "samplegeno": [
+            {
+                "samplegeno_gt": "T/T",
+                "samplegeno_ad": "0/33",
+                "samplegeno_numgt": "1/1",
+                "samplegeno_sampleid": "NA12877_sample"
+            },
+            {
+                "samplegeno_gt": "C/C",
+                "samplegeno_ad": "37/0",
+                "samplegeno_numgt": "0/0",
+                "samplegeno_sampleid": "NA12878_sample"
+            },
+            {
+                "samplegeno_gt": "C/T",
+                "samplegeno_ad": "15/19",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12879_sample"
+            }
+        ],
+        "PL": "533,0,418",
+        "GQ": 99,
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "in review",
+        "AD": "15,19",
+        "uuid": "dd20f84a-d906-4f8d-bc02-57972f84fcda",
+        "GT": "0/1",
+        "href": "https://maestro-resources.s3.amazonaws.com/IGV_temp/chr1%3A169888699.png",
+        "schema_version": "1",
+        "date_created": "2020-06-22T19:08:58.274070+00:00",
+        "file": "GAPFIPZSZYEK",
+        "annotation_id": "NA12879_sample:3d4f6f19-9852-4de3-85b3-b93ccb5f23b4:GAPFIPZSZYEK",
+        "CALL_INFO": "NA12879_sample"
+    },
+    {
+        "variant": "72ec58c2-6000-415a-944c-d25c54f6a063",
+        "QUAL": 2322.91,
+        "last_modified": {
+            "date_modified": "2020-07-14T00:53:58.232480+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "DP": 43,
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "samplegeno": [
+            {
+                "samplegeno_gt": "A/A",
+                "samplegeno_ad": "0/47",
+                "samplegeno_numgt": "1/1",
+                "samplegeno_sampleid": "NA12877_sample"
+            },
+            {
+                "samplegeno_gt": "G/G",
+                "samplegeno_ad": "37/0",
+                "samplegeno_numgt": "0/0",
+                "samplegeno_sampleid": "NA12878_sample"
+            },
+            {
+                "samplegeno_gt": "G/A",
+                "samplegeno_ad": "19/24",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12879_sample"
+            }
+        ],
+        "PL": "705,0,521",
+        "GQ": 99,
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "in review",
+        "AD": "19,24",
+        "uuid": "db705e6d-4df0-4209-a985-ba701655074a",
+        "GT": "0/1",
+        "href": "https://maestro-resources.s3.amazonaws.com/IGV_temp/chr1%3A169888699.png",
+        "schema_version": "1",
+        "date_created": "2020-06-22T18:55:13.536075+00:00",
+        "file": "GAPFIPZSZYEK",
+        "annotation_id": "NA12879_sample:72ec58c2-6000-415a-944c-d25c54f6a063:GAPFIPZSZYEK",
+        "CALL_INFO": "NA12879_sample"
+    },
+    {
+        "variant": "7ee2eb3a-7575-48a5-a436-515c4d030da0",
+        "QUAL": 460.25,
+        "last_modified": {
+            "date_modified": "2020-07-14T00:45:48.754479+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "DP": 36,
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "novoPP": 6.89004765508178e-16,
+        "samplegeno": [
+            {
+                "samplegeno_gt": "GGGGCAGGGGCAAGGGCAGGGGCAGGGGCAGGGGCAA/G",
+                "samplegeno_ad": "23/13",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12877_sample"
+            },
+            {
+                "samplegeno_gt": "GGGGCAGGGGCAAGGGCAGGGGCAGGGGCAGGGGCAA/GGGGCAGGGGCAAGGGCAGGGGCAGGGGCAGGGGCAA",
+                "samplegeno_ad": "39/0",
+                "samplegeno_numgt": "0/0",
+                "samplegeno_sampleid": "NA12878_sample"
+            },
+            {
+                "samplegeno_gt": "GGGGCAGGGGCAAGGGCAGGGGCAGGGGCAGGGGCAA/GGGGCAGGGGCAAGGGCAGGGGCAGGGGCAGGGGCAA",
+                "samplegeno_ad": "23/0",
+                "samplegeno_numgt": "0/0",
+                "samplegeno_sampleid": "NA12879_sample"
+            }
+        ],
+        "PL": "469,0,925",
+        "GQ": 99,
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "in review",
+        "AD": "23,13",
+        "uuid": "db649b48-a486-4b43-b67c-f8dc4d1f24d3",
+        "GT": "0/1",
+        "href": "https://maestro-resources.s3.amazonaws.com/IGV_temp/chr1%3A169888699.png",
+        "schema_version": "1",
+        "date_created": "2020-06-22T19:03:48.393724+00:00",
+        "file": "GAPFIPZSZYEK",
+        "annotation_id": "NA12877_sample:7ee2eb3a-7575-48a5-a436-515c4d030da0:GAPFIPZSZYEK",
+        "CALL_INFO": "NA12877_sample"
+    },
+    {
+        "variant": "40707514-afb3-498a-b22d-7472d276f2c9",
+        "QUAL": 2823.94,
+        "last_modified": {
+            "date_modified": "2020-07-14T00:49:41.326467+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "DP": 46,
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "samplegeno": [
+            {
+                "samplegeno_gt": "T/C",
+                "samplegeno_ad": "22/24",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12877_sample"
+            },
+            {
+                "samplegeno_gt": "C/C",
+                "samplegeno_ad": "0/44",
+                "samplegeno_numgt": "1/1",
+                "samplegeno_sampleid": "NA12878_sample"
+            },
+            {
+                "samplegeno_gt": "T/C",
+                "samplegeno_ad": "23/26",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12879_sample"
+            }
+        ],
+        "PL": "686,0,602",
+        "GQ": 99,
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "in review",
+        "AD": "22,24",
+        "uuid": "d8ca94b9-b2fc-41cd-93bb-b07ad20de328",
+        "GT": "0/1",
+        "href": "https://maestro-resources.s3.amazonaws.com/IGV_temp/chr1%3A169888699.png",
+        "schema_version": "1",
+        "date_created": "2020-06-22T18:59:33.764269+00:00",
+        "file": "GAPFIPZSZYEK",
+        "annotation_id": "NA12877_sample:40707514-afb3-498a-b22d-7472d276f2c9:GAPFIPZSZYEK",
+        "CALL_INFO": "NA12877_sample"
+    },
+    {
+        "variant": "5668faae-ac2b-4f6c-804d-cfb00894c7b6",
+        "PS": 6478619,
+        "GT": "0|1",
+        "PL": "956,0,1836",
+        "GQ": 99,
+        "PGT": "0|1",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "in review",
+        "AD": "29,25",
+        "uuid": "d40aada2-8745-463b-a07f-2034ffe27c16",
+        "PID": "6478619_G_A",
+        "CALL_INFO": "NA12877_sample",
+        "file": "GAPFIPZSZYEK",
+        "last_modified": {
+            "date_modified": "2020-07-14T00:44:47.412951+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "annotation_id": "NA12877_sample:5668faae-ac2b-4f6c-804d-cfb00894c7b6:GAPFIPZSZYEK",
+        "QUAL": 947.25,
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "samplegeno": [
+            {
+                "samplegeno_gt": "G/A",
+                "samplegeno_ad": "29/25",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12877_sample"
+            },
+            {
+                "samplegeno_gt": "G/G",
+                "samplegeno_ad": "39/0",
+                "samplegeno_numgt": "0/0",
+                "samplegeno_sampleid": "NA12878_sample"
+            },
+            {
+                "samplegeno_gt": "G/G",
+                "samplegeno_ad": "36/0",
+                "samplegeno_numgt": "0/0",
+                "samplegeno_sampleid": "NA12879_sample"
+            }
+        ],
+        "href": "https://maestro-resources.s3.amazonaws.com/IGV_temp/chr1%3A169888699.png",
+        "schema_version": "1",
+        "date_created": "2020-06-22T19:04:54.751074+00:00",
+        "DP": 54,
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b"
+    },
+    {
+        "variant": "9d5bdc32-9176-44d8-ae39-6e1a0d0d3dd1",
+        "QUAL": 1351.12,
+        "last_modified": {
+            "date_modified": "2020-07-14T00:41:32.066475+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "DP": 47,
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "samplegeno": [
+            {
+                "samplegeno_gt": "G/G",
+                "samplegeno_ad": "28/0",
+                "samplegeno_numgt": "0/0",
+                "samplegeno_sampleid": "NA12877_sample"
+            },
+            {
+                "samplegeno_gt": "G/A",
+                "samplegeno_ad": "27/20",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12878_sample"
+            },
+            {
+                "samplegeno_gt": "G/A",
+                "samplegeno_ad": "16/27",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12879_sample"
+            }
+        ],
+        "PL": "553,0,797",
+        "GQ": 99,
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "in review",
+        "AD": "27,20",
+        "uuid": "d40552bf-87e4-4129-8820-5673c3c08faf",
+        "GT": "0/1",
+        "href": "https://maestro-resources.s3.amazonaws.com/IGV_temp/chr1%3A169888699.png",
+        "schema_version": "1",
+        "date_created": "2020-06-22T19:08:25.892838+00:00",
+        "file": "GAPFIPZSZYEK",
+        "annotation_id": "NA12878_sample:9d5bdc32-9176-44d8-ae39-6e1a0d0d3dd1:GAPFIPZSZYEK",
+        "CALL_INFO": "NA12878_sample"
+    },
+    {
+        "variant": "fff95aee-5d1b-4251-814e-80f654c8c6ff",
+        "QUAL": 1897.93,
+        "last_modified": {
+            "date_modified": "2020-07-14T00:48:16.700897+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "DP": 49,
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "samplegeno": [
+            {
+                "samplegeno_gt": "T/C",
+                "samplegeno_ad": "30/29",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12877_sample"
+            },
+            {
+                "samplegeno_gt": "T/C",
+                "samplegeno_ad": "20/20",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12878_sample"
+            },
+            {
+                "samplegeno_gt": "T/C",
+                "samplegeno_ad": "30/19",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12879_sample"
+            }
+        ],
+        "PL": "512,0,895",
+        "GQ": 99,
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "in review",
+        "AD": "30,19",
+        "uuid": "cf3b57f2-bd6a-4b64-aabf-45400fb9a883",
+        "GT": "0/1",
+        "href": "https://maestro-resources.s3.amazonaws.com/IGV_temp/chr1%3A169888699.png",
+        "schema_version": "1",
+        "date_created": "2020-06-22T19:01:17.055153+00:00",
+        "file": "GAPFIPZSZYEK",
+        "annotation_id": "NA12879_sample:fff95aee-5d1b-4251-814e-80f654c8c6ff:GAPFIPZSZYEK",
+        "CALL_INFO": "NA12879_sample"
+    },
+    {
+        "variant": "f35eabcf-6c76-4ac3-8c3d-6805df357f06",
+        "QUAL": 1355.12,
+        "last_modified": {
+            "date_modified": "2020-07-14T00:48:30.028191+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "DP": 54,
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "samplegeno": [
+            {
+                "samplegeno_gt": "G/G",
+                "samplegeno_ad": "39/0",
+                "samplegeno_numgt": "0/0",
+                "samplegeno_sampleid": "NA12877_sample"
+            },
+            {
+                "samplegeno_gt": "G/A",
+                "samplegeno_ad": "35/20",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12878_sample"
+            },
+            {
+                "samplegeno_gt": "G/A",
+                "samplegeno_ad": "24/30",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12879_sample"
+            }
+        ],
+        "PL": "876,0,661",
+        "GQ": 99,
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "in review",
+        "AD": "24,30",
+        "uuid": "cecf92f8-d200-4562-9f09-3c545b1b532c",
+        "GT": "0/1",
+        "href": "https://maestro-resources.s3.amazonaws.com/IGV_temp/chr1%3A169888699.png",
+        "schema_version": "1",
+        "date_created": "2020-06-22T19:01:00.364920+00:00",
+        "file": "GAPFIPZSZYEK",
+        "annotation_id": "NA12879_sample:f35eabcf-6c76-4ac3-8c3d-6805df357f06:GAPFIPZSZYEK",
+        "CALL_INFO": "NA12879_sample"
+    },
+    {
+        "variant": "b230ffd3-0cff-49ce-8c17-f9d0c2af86e9",
+        "QUAL": 891.25,
+        "last_modified": {
+            "date_modified": "2020-07-14T00:54:00.468702+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "DP": 51,
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "samplegeno": [
+            {
+                "samplegeno_gt": "G/T",
+                "samplegeno_ad": "20/31",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12877_sample"
+            },
+            {
+                "samplegeno_gt": "G/G",
+                "samplegeno_ad": "36/0",
+                "samplegeno_numgt": "0/0",
+                "samplegeno_sampleid": "NA12878_sample"
+            },
+            {
+                "samplegeno_gt": "G/G",
+                "samplegeno_ad": "43/0",
+                "samplegeno_numgt": "0/0",
+                "samplegeno_sampleid": "NA12879_sample"
+            }
+        ],
+        "PL": "900,0,541",
+        "GQ": 99,
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "in review",
+        "AD": "20,31",
+        "uuid": "c995dfd6-b9aa-46ea-adba-d4fbdb7c3981",
+        "GT": "0/1",
+        "href": "https://maestro-resources.s3.amazonaws.com/IGV_temp/chr1%3A169888699.png",
+        "schema_version": "1",
+        "date_created": "2020-06-22T18:55:10.813816+00:00",
+        "file": "GAPFIPZSZYEK",
+        "annotation_id": "NA12877_sample:b230ffd3-0cff-49ce-8c17-f9d0c2af86e9:GAPFIPZSZYEK",
+        "CALL_INFO": "NA12877_sample"
+    },
+    {
+        "variant": "ffa62fa0-2873-493a-89cd-d144ba1694e2",
+        "QUAL": 853.25,
+        "last_modified": {
+            "date_modified": "2020-07-14T00:53:40.273508+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "DP": 52,
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "samplegeno": [
+            {
+                "samplegeno_gt": "A/C",
+                "samplegeno_ad": "22/30",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12877_sample"
+            },
+            {
+                "samplegeno_gt": "A/A",
+                "samplegeno_ad": "38/0",
+                "samplegeno_numgt": "0/0",
+                "samplegeno_sampleid": "NA12878_sample"
+            },
+            {
+                "samplegeno_gt": "A/A",
+                "samplegeno_ad": "40/0",
+                "samplegeno_numgt": "0/0",
+                "samplegeno_sampleid": "NA12879_sample"
+            }
+        ],
+        "PL": "862,0,609",
+        "GQ": 99,
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "in review",
+        "AD": "22,30",
+        "uuid": "c93cdf3e-7f41-4920-b7f8-5f947bd88b24",
+        "GT": "0/1",
+        "href": "https://maestro-resources.s3.amazonaws.com/IGV_temp/chr1%3A169888699.png",
+        "schema_version": "1",
+        "date_created": "2020-06-22T18:55:33.918102+00:00",
+        "file": "GAPFIPZSZYEK",
+        "annotation_id": "NA12877_sample:ffa62fa0-2873-493a-89cd-d144ba1694e2:GAPFIPZSZYEK",
+        "CALL_INFO": "NA12877_sample"
+    },
+    {
+        "variant": "1bbb6480-96b7-421c-89ab-b86363c59774",
+        "PS": 17276557,
+        "GT": "1|1",
+        "PL": "1966,138,0",
+        "GQ": 99,
+        "PGT": "1|1",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "in review",
+        "AD": "0,44",
+        "uuid": "c6d6491d-1cb6-4497-9548-c1c8759bbdc3",
+        "PID": "17276557_A_C",
+        "CALL_INFO": "NA12878_sample",
+        "file": "GAPFIPZSZYEK",
+        "last_modified": {
+            "date_modified": "2020-07-14T00:49:04.555439+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "annotation_id": "NA12878_sample:1bbb6480-96b7-421c-89ab-b86363c59774:GAPFIPZSZYEK",
+        "QUAL": 5392.69,
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "samplegeno": [
+            {
+                "samplegeno_gt": "G/G",
+                "samplegeno_ad": "0/39",
+                "samplegeno_numgt": "1/1",
+                "samplegeno_sampleid": "NA12877_sample"
+            },
+            {
+                "samplegeno_gt": "G/G",
+                "samplegeno_ad": "0/44",
+                "samplegeno_numgt": "1/1",
+                "samplegeno_sampleid": "NA12878_sample"
+            },
+            {
+                "samplegeno_gt": "G/G",
+                "samplegeno_ad": "0/35",
+                "samplegeno_numgt": "1/1",
+                "samplegeno_sampleid": "NA12879_sample"
+            }
+        ],
+        "href": "https://maestro-resources.s3.amazonaws.com/IGV_temp/chr1%3A169888699.png",
+        "schema_version": "1",
+        "date_created": "2020-06-22T19:00:18.322702+00:00",
+        "DP": 44,
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b"
+    },
+    {
+        "variant": "b61e6733-3cf5-456e-a70d-7b95dd600c53",
+        "QUAL": 1933.12,
+        "last_modified": {
+            "date_modified": "2020-07-14T00:49:21.125537+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "DP": 61,
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "samplegeno": [
+            {
+                "samplegeno_gt": "T/T",
+                "samplegeno_ad": "34/0",
+                "samplegeno_numgt": "0/0",
+                "samplegeno_sampleid": "NA12877_sample"
+            },
+            {
+                "samplegeno_gt": "T/C",
+                "samplegeno_ad": "30/37",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12878_sample"
+            },
+            {
+                "samplegeno_gt": "T/C",
+                "samplegeno_ad": "30/31",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12879_sample"
+            }
+        ],
+        "PL": "891,0,859",
+        "GQ": 99,
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "in review",
+        "AD": "30,31",
+        "uuid": "c5d77d0e-0b7f-4edc-8a03-a463c194b9f5",
+        "GT": "0/1",
+        "href": "https://maestro-resources.s3.amazonaws.com/IGV_temp/chr1%3A169888699.png",
+        "schema_version": "1",
+        "date_created": "2020-06-22T18:59:56.397171+00:00",
+        "file": "GAPFIPZSZYEK",
+        "annotation_id": "NA12879_sample:b61e6733-3cf5-456e-a70d-7b95dd600c53:GAPFIPZSZYEK",
+        "CALL_INFO": "NA12879_sample"
+    },
+    {
+        "variant": "af8e0caf-188c-4809-889c-045d3f524aaf",
+        "QUAL": 851.25,
+        "last_modified": {
+            "date_modified": "2020-07-14T00:47:46.735515+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "DP": 46,
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "samplegeno": [
+            {
+                "samplegeno_gt": "T/T",
+                "samplegeno_ad": "42/0",
+                "samplegeno_numgt": "0/0",
+                "samplegeno_sampleid": "NA12877_sample"
+            },
+            {
+                "samplegeno_gt": "T/C",
+                "samplegeno_ad": "17/29",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12878_sample"
+            },
+            {
+                "samplegeno_gt": "T/T",
+                "samplegeno_ad": "27/0",
+                "samplegeno_numgt": "0/0",
+                "samplegeno_sampleid": "NA12879_sample"
+            }
+        ],
+        "PL": "860,0,452",
+        "GQ": 99,
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "in review",
+        "AD": "17,29",
+        "uuid": "c4ba78e8-e4c4-46f4-8b46-0d38624319f7",
+        "GT": "0/1",
+        "href": "https://maestro-resources.s3.amazonaws.com/IGV_temp/chr1%3A169888699.png",
+        "schema_version": "1",
+        "date_created": "2020-06-22T19:01:50.454037+00:00",
+        "file": "GAPFIPZSZYEK",
+        "annotation_id": "NA12878_sample:af8e0caf-188c-4809-889c-045d3f524aaf:GAPFIPZSZYEK",
+        "CALL_INFO": "NA12878_sample"
+    },
+    {
+        "variant": "fff95aee-5d1b-4251-814e-80f654c8c6ff",
+        "QUAL": 1897.93,
+        "last_modified": {
+            "date_modified": "2020-07-14T00:48:16.959768+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "DP": 59,
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "samplegeno": [
+            {
+                "samplegeno_gt": "T/C",
+                "samplegeno_ad": "30/29",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12877_sample"
+            },
+            {
+                "samplegeno_gt": "T/C",
+                "samplegeno_ad": "20/20",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12878_sample"
+            },
+            {
+                "samplegeno_gt": "T/C",
+                "samplegeno_ad": "30/19",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12879_sample"
+            }
+        ],
+        "PL": "821,0,864",
+        "GQ": 99,
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "in review",
+        "AD": "30,29",
+        "uuid": "c18a423e-2d27-4ca7-93e5-f334505cada9",
+        "GT": "0/1",
+        "href": "https://maestro-resources.s3.amazonaws.com/IGV_temp/chr1%3A169888699.png",
+        "schema_version": "1",
+        "date_created": "2020-06-22T19:01:16.892105+00:00",
+        "file": "GAPFIPZSZYEK",
+        "annotation_id": "NA12877_sample:fff95aee-5d1b-4251-814e-80f654c8c6ff:GAPFIPZSZYEK",
+        "CALL_INFO": "NA12877_sample"
+    },
+    {
+        "variant": "496a7272-fd5e-4f29-8631-a55645d36c27",
+        "QUAL": 1648.16,
+        "last_modified": {
+            "date_modified": "2020-07-14T00:43:42.071640+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "DP": 39,
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "samplegeno": [
+            {
+                "samplegeno_gt": "T/TTC",
+                "samplegeno_ad": "15/22",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12877_sample"
+            },
+            {
+                "samplegeno_gt": "T/T",
+                "samplegeno_ad": "37/0",
+                "samplegeno_numgt": "0/0",
+                "samplegeno_sampleid": "NA12878_sample"
+            },
+            {
+                "samplegeno_gt": "T/TTC",
+                "samplegeno_ad": "19/20",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12879_sample"
+            }
+        ],
+        "PL": "758,0,720",
+        "GQ": 99,
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "in review",
+        "AD": "19,20",
+        "uuid": "b519a628-2afb-4efb-a338-e82b5fec33a0",
+        "GT": "0/1",
+        "href": "https://maestro-resources.s3.amazonaws.com/IGV_temp/chr1%3A169888699.png",
+        "schema_version": "1",
+        "date_created": "2020-06-22T19:06:02.897332+00:00",
+        "file": "GAPFIPZSZYEK",
+        "annotation_id": "NA12879_sample:496a7272-fd5e-4f29-8631-a55645d36c27:GAPFIPZSZYEK",
+        "CALL_INFO": "NA12879_sample"
+    },
+    {
+        "variant": "0056a58f-100b-4561-969c-52d70dd639f6",
+        "QUAL": 1487.12,
+        "last_modified": {
+            "date_modified": "2020-07-14T00:49:51.383777+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "DP": 50,
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "samplegeno": [
+            {
+                "samplegeno_gt": "G/A",
+                "samplegeno_ad": "18/23",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12877_sample"
+            },
+            {
+                "samplegeno_gt": "G/G",
+                "samplegeno_ad": "39/0",
+                "samplegeno_numgt": "0/0",
+                "samplegeno_sampleid": "NA12878_sample"
+            },
+            {
+                "samplegeno_gt": "G/A",
+                "samplegeno_ad": "22/28",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12879_sample"
+            }
+        ],
+        "PL": "822,0,614",
+        "GQ": 99,
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "in review",
+        "AD": "22,28",
+        "uuid": "b27d04ca-2672-450e-be98-e7ca5a1afb1d",
+        "GT": "0/1",
+        "href": "https://maestro-resources.s3.amazonaws.com/IGV_temp/chr1%3A169888699.png",
+        "schema_version": "1",
+        "date_created": "2020-06-22T18:59:24.644477+00:00",
+        "file": "GAPFIPZSZYEK",
+        "annotation_id": "NA12879_sample:0056a58f-100b-4561-969c-52d70dd639f6:GAPFIPZSZYEK",
+        "CALL_INFO": "NA12879_sample"
+    },
+    {
+        "variant": "8d989027-9d60-4e88-913d-4f1d8c892243",
+        "QUAL": 723.25,
+        "last_modified": {
+            "date_modified": "2020-07-14T00:44:47.220191+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "DP": 47,
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "samplegeno": [
+            {
+                "samplegeno_gt": "C/C",
+                "samplegeno_ad": "33/0",
+                "samplegeno_numgt": "0/0",
+                "samplegeno_sampleid": "NA12877_sample"
+            },
+            {
+                "samplegeno_gt": "C/T",
+                "samplegeno_ad": "21/26",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12878_sample"
+            },
+            {
+                "samplegeno_gt": "C/C",
+                "samplegeno_ad": "35/0",
+                "samplegeno_numgt": "0/0",
+                "samplegeno_sampleid": "NA12879_sample"
+            }
+        ],
+        "PL": "732,0,589",
+        "GQ": 99,
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "in review",
+        "AD": "21,26",
+        "uuid": "b1e896d9-334c-41a8-97b4-3afcbb34d800",
+        "GT": "0/1",
+        "href": "https://maestro-resources.s3.amazonaws.com/IGV_temp/chr1%3A169888699.png",
+        "schema_version": "1",
+        "date_created": "2020-06-22T19:04:55.054764+00:00",
+        "file": "GAPFIPZSZYEK",
+        "annotation_id": "NA12878_sample:8d989027-9d60-4e88-913d-4f1d8c892243:GAPFIPZSZYEK",
+        "CALL_INFO": "NA12878_sample"
+    },
+    {
+        "variant": "45a92839-5392-44bf-ae21-da1a62f190d3",
+        "QUAL": 1370.12,
+        "last_modified": {
+            "date_modified": "2020-07-14T00:43:30.678499+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "DP": 51,
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "samplegeno": [
+            {
+                "samplegeno_gt": "T/C",
+                "samplegeno_ad": "19/32",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12877_sample"
+            },
+            {
+                "samplegeno_gt": "T/T",
+                "samplegeno_ad": "35/0",
+                "samplegeno_numgt": "0/0",
+                "samplegeno_sampleid": "NA12878_sample"
+            },
+            {
+                "samplegeno_gt": "T/C",
+                "samplegeno_ad": "20/16",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12879_sample"
+            }
+        ],
+        "PL": "934,0,488",
+        "GQ": 99,
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "in review",
+        "AD": "19,32",
+        "uuid": "aa16fd63-b622-4164-8a75-ade6bc7fbd03",
+        "GT": "0/1",
+        "href": "https://maestro-resources.s3.amazonaws.com/IGV_temp/chr1%3A169888699.png",
+        "schema_version": "1",
+        "date_created": "2020-06-22T19:06:14.903702+00:00",
+        "file": "GAPFIPZSZYEK",
+        "annotation_id": "NA12877_sample:45a92839-5392-44bf-ae21-da1a62f190d3:GAPFIPZSZYEK",
+        "CALL_INFO": "NA12877_sample"
+    },
+    {
+        "variant": "f1f59171-a7e8-423f-83c7-8fa9e3c7e363",
+        "QUAL": 1164.12,
+        "last_modified": {
+            "date_modified": "2020-07-14T00:48:57.488944+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "DP": 43,
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "samplegeno": [
+            {
+                "samplegeno_gt": "C/C",
+                "samplegeno_ad": "36/0",
+                "samplegeno_numgt": "0/0",
+                "samplegeno_sampleid": "NA12877_sample"
+            },
+            {
+                "samplegeno_gt": "C/T",
+                "samplegeno_ad": "28/23",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12878_sample"
+            },
+            {
+                "samplegeno_gt": "C/T",
+                "samplegeno_ad": "24/19",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12879_sample"
+            }
+        ],
+        "PL": "530,0,703",
+        "GQ": 99,
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "in review",
+        "AD": "24,19",
+        "uuid": "a9060ec0-5ecf-4f27-917c-cad8f5b9fac7",
+        "GT": "0/1",
+        "href": "https://maestro-resources.s3.amazonaws.com/IGV_temp/chr1%3A169888699.png",
+        "schema_version": "1",
+        "date_created": "2020-06-22T19:00:28.476963+00:00",
+        "file": "GAPFIPZSZYEK",
+        "annotation_id": "NA12879_sample:f1f59171-a7e8-423f-83c7-8fa9e3c7e363:GAPFIPZSZYEK",
+        "CALL_INFO": "NA12879_sample"
+    },
+    {
+        "variant": "ce546cf0-b69c-4387-b1eb-e30dab52081f",
+        "QUAL": 824.12,
+        "last_modified": {
+            "date_modified": "2020-07-14T00:49:37.817612+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "DP": 38,
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "samplegeno": [
+            {
+                "samplegeno_gt": "C/T",
+                "samplegeno_ad": "18/20",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12877_sample"
+            },
+            {
+                "samplegeno_gt": "C/C",
+                "samplegeno_ad": "36/0",
+                "samplegeno_numgt": "0/0",
+                "samplegeno_sampleid": "NA12878_sample"
+            },
+            {
+                "samplegeno_gt": "C/T",
+                "samplegeno_ad": "20/11",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12879_sample"
+            }
+        ],
+        "PL": "555,0,492",
+        "GQ": 99,
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "in review",
+        "AD": "18,20",
+        "uuid": "a8de7d54-957f-428f-83ae-32dfc3d86672",
+        "GT": "0/1",
+        "href": "https://maestro-resources.s3.amazonaws.com/IGV_temp/chr1%3A169888699.png",
+        "schema_version": "1",
+        "date_created": "2020-06-22T18:59:37.365321+00:00",
+        "file": "GAPFIPZSZYEK",
+        "annotation_id": "NA12877_sample:ce546cf0-b69c-4387-b1eb-e30dab52081f:GAPFIPZSZYEK",
+        "CALL_INFO": "NA12877_sample"
+    },
+    {
+        "variant": "d2410d35-7efe-4f8e-97a7-d0e65fdf41ba",
+        "QUAL": 587.25,
+        "last_modified": {
+            "date_modified": "2020-07-14T00:41:27.059717+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "DP": 44,
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "samplegeno": [
+            {
+                "samplegeno_gt": "G/A",
+                "samplegeno_ad": "22/22",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12877_sample"
+            },
+            {
+                "samplegeno_gt": "G/G",
+                "samplegeno_ad": "35/0",
+                "samplegeno_numgt": "0/0",
+                "samplegeno_sampleid": "NA12878_sample"
+            },
+            {
+                "samplegeno_gt": "G/G",
+                "samplegeno_ad": "37/0",
+                "samplegeno_numgt": "0/0",
+                "samplegeno_sampleid": "NA12879_sample"
+            }
+        ],
+        "PL": "596,0,608",
+        "GQ": 99,
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "in review",
+        "AD": "22,22",
+        "uuid": "a56191e9-a0ea-4e89-a40f-db79e4bbb3d3",
+        "GT": "0/1",
+        "href": "https://maestro-resources.s3.amazonaws.com/IGV_temp/chr1%3A169888699.png",
+        "schema_version": "1",
+        "date_created": "2020-06-22T19:08:31.044197+00:00",
+        "file": "GAPFIPZSZYEK",
+        "annotation_id": "NA12877_sample:d2410d35-7efe-4f8e-97a7-d0e65fdf41ba:GAPFIPZSZYEK",
+        "CALL_INFO": "NA12877_sample"
+    },
+    {
+        "variant": "9d5bdc32-9176-44d8-ae39-6e1a0d0d3dd1",
+        "QUAL": 1351.12,
+        "last_modified": {
+            "date_modified": "2020-07-14T00:41:31.927072+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "DP": 43,
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "samplegeno": [
+            {
+                "samplegeno_gt": "G/G",
+                "samplegeno_ad": "28/0",
+                "samplegeno_numgt": "0/0",
+                "samplegeno_sampleid": "NA12877_sample"
+            },
+            {
+                "samplegeno_gt": "G/A",
+                "samplegeno_ad": "27/20",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12878_sample"
+            },
+            {
+                "samplegeno_gt": "G/A",
+                "samplegeno_ad": "16/27",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12879_sample"
+            }
+        ],
+        "PL": "809,0,387",
+        "GQ": 99,
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "in review",
+        "AD": "16,27",
+        "uuid": "a3f73ad6-8385-4c0a-ab33-943763c15706",
+        "GT": "0/1",
+        "href": "https://maestro-resources.s3.amazonaws.com/IGV_temp/chr1%3A169888699.png",
+        "schema_version": "1",
+        "date_created": "2020-06-22T19:08:26.004358+00:00",
+        "file": "GAPFIPZSZYEK",
+        "annotation_id": "NA12879_sample:9d5bdc32-9176-44d8-ae39-6e1a0d0d3dd1:GAPFIPZSZYEK",
+        "CALL_INFO": "NA12879_sample"
+    },
+    {
+        "variant": "2ece9452-265d-456f-9aaf-4996aacac2cc",
+        "QUAL": 1063.12,
+        "last_modified": {
+            "date_modified": "2020-07-14T00:55:41.301295+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "DP": 37,
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "samplegeno": [
+            {
+                "samplegeno_gt": "C/C",
+                "samplegeno_ad": "37/0",
+                "samplegeno_numgt": "0/0",
+                "samplegeno_sampleid": "NA12877_sample"
+            },
+            {
+                "samplegeno_gt": "C/T",
+                "samplegeno_ad": "26/19",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12878_sample"
+            },
+            {
+                "samplegeno_gt": "C/T",
+                "samplegeno_ad": "18/19",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12879_sample"
+            }
+        ],
+        "PL": "549,0,504",
+        "GQ": 99,
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "in review",
+        "AD": "18,19",
+        "uuid": "a20e2d38-1151-4286-840c-80e73ba8be88",
+        "GT": "0/1",
+        "href": "https://maestro-resources.s3.amazonaws.com/IGV_temp/chr1%3A169888699.png",
+        "schema_version": "1",
+        "date_created": "2020-06-22T18:53:15.387700+00:00",
+        "file": "GAPFIPZSZYEK",
+        "annotation_id": "NA12879_sample:2ece9452-265d-456f-9aaf-4996aacac2cc:GAPFIPZSZYEK",
+        "CALL_INFO": "NA12879_sample"
+    },
+    {
+        "variant": "eb50d743-4370-4198-a214-3b0dfd6e9fae",
+        "QUAL": 972.12,
+        "last_modified": {
+            "date_modified": "2020-07-14T00:50:13.674622+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "DP": 35,
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "samplegeno": [
+            {
+                "samplegeno_gt": "G/C",
+                "samplegeno_ad": "14/18",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12877_sample"
+            },
+            {
+                "samplegeno_gt": "G/G",
+                "samplegeno_ad": "39/0",
+                "samplegeno_numgt": "0/0",
+                "samplegeno_sampleid": "NA12878_sample"
+            },
+            {
+                "samplegeno_gt": "G/C",
+                "samplegeno_ad": "18/17",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12879_sample"
+            }
+        ],
+        "PL": "465,0,446",
+        "GQ": 99,
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "in review",
+        "AD": "18,17",
+        "uuid": "9f2e664b-0286-45a7-afa2-52bf28a8ab8b",
+        "GT": "0/1",
+        "href": "https://maestro-resources.s3.amazonaws.com/IGV_temp/chr1%3A169888699.png",
+        "schema_version": "1",
+        "date_created": "2020-06-22T18:59:06.515541+00:00",
+        "file": "GAPFIPZSZYEK",
+        "annotation_id": "NA12879_sample:eb50d743-4370-4198-a214-3b0dfd6e9fae:GAPFIPZSZYEK",
+        "CALL_INFO": "NA12879_sample"
+    },
+    {
+        "variant": "48abf801-94fa-42fc-a334-0caf8d3b4b71",
+        "QUAL": 1441.12,
+        "last_modified": {
+            "date_modified": "2020-07-14T00:52:23.412493+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "DP": 55,
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "samplegeno": [
+            {
+                "samplegeno_gt": "T/T",
+                "samplegeno_ad": "37/0",
+                "samplegeno_numgt": "0/0",
+                "samplegeno_sampleid": "NA12877_sample"
+            },
+            {
+                "samplegeno_gt": "T/C",
+                "samplegeno_ad": "22/26",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12878_sample"
+            },
+            {
+                "samplegeno_gt": "T/C",
+                "samplegeno_ad": "30/25",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12879_sample"
+            }
+        ],
+        "PL": "703,0,877",
+        "GQ": 99,
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "in review",
+        "AD": "30,25",
+        "uuid": "9e776bac-d59a-49a4-9df3-cf1fe7653523",
+        "GT": "0/1",
+        "href": "https://maestro-resources.s3.amazonaws.com/IGV_temp/chr1%3A169888699.png",
+        "schema_version": "1",
+        "date_created": "2020-06-22T18:56:53.181904+00:00",
+        "file": "GAPFIPZSZYEK",
+        "annotation_id": "NA12879_sample:48abf801-94fa-42fc-a334-0caf8d3b4b71:GAPFIPZSZYEK",
+        "CALL_INFO": "NA12879_sample"
+    },
+    {
+        "variant": "9ce8a7b1-df65-49af-a722-8627d18b27c0",
+        "QUAL": 39.48,
+        "last_modified": {
+            "date_modified": "2020-07-14T00:45:59.597825+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "DP": 34,
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "samplegeno": [
+            {
+                "samplegeno_gt": "G/G",
+                "samplegeno_ad": "37/3",
+                "samplegeno_numgt": "0/0",
+                "samplegeno_sampleid": "NA12877_sample"
+            },
+            {
+                "samplegeno_gt": "G/T",
+                "samplegeno_ad": "27/7",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12878_sample"
+            },
+            {
+                "samplegeno_gt": "G/G",
+                "samplegeno_ad": "42/0",
+                "samplegeno_numgt": "0/0",
+                "samplegeno_sampleid": "NA12879_sample"
+            }
+        ],
+        "PL": "47,0,806",
+        "GQ": 47,
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "in review",
+        "AD": "27,7",
+        "uuid": "9776edda-5290-4582-a47d-25338209ddfa",
+        "GT": "0/1",
+        "href": "https://maestro-resources.s3.amazonaws.com/IGV_temp/chr1%3A169888699.png",
+        "schema_version": "1",
+        "date_created": "2020-06-22T19:03:37.431942+00:00",
+        "file": "GAPFIPZSZYEK",
+        "annotation_id": "NA12878_sample:9ce8a7b1-df65-49af-a722-8627d18b27c0:GAPFIPZSZYEK",
+        "CALL_INFO": "NA12878_sample"
+    },
+    {
+        "variant": "ca31eaf0-e848-49d3-aca6-c331d1b8e1fc",
+        "QUAL": 1860.12,
+        "last_modified": {
+            "date_modified": "2020-07-14T00:44:22.152862+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "DP": 65,
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "samplegeno": [
+            {
+                "samplegeno_gt": "C/T",
+                "samplegeno_ad": "28/26",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12877_sample"
+            },
+            {
+                "samplegeno_gt": "C/C",
+                "samplegeno_ad": "38/0",
+                "samplegeno_numgt": "0/0",
+                "samplegeno_sampleid": "NA12878_sample"
+            },
+            {
+                "samplegeno_gt": "C/T",
+                "samplegeno_ad": "26/39",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12879_sample"
+            }
+        ],
+        "PL": "1140,0,683",
+        "GQ": 99,
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "in review",
+        "AD": "26,39",
+        "uuid": "94a6dd55-3e74-48ad-8d3d-d2935ec1f000",
+        "GT": "0/1",
+        "href": "https://maestro-resources.s3.amazonaws.com/IGV_temp/chr1%3A169888699.png",
+        "schema_version": "1",
+        "date_created": "2020-06-22T19:05:23.835283+00:00",
+        "file": "GAPFIPZSZYEK",
+        "annotation_id": "NA12879_sample:ca31eaf0-e848-49d3-aca6-c331d1b8e1fc:GAPFIPZSZYEK",
+        "CALL_INFO": "NA12879_sample"
+    },
+    {
+        "variant": "bfda8e20-8a43-49da-96f6-2bab66218db1",
+        "QUAL": 1283.12,
+        "last_modified": {
+            "date_modified": "2020-07-14T00:54:01.017937+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "DP": 37,
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "samplegeno": [
+            {
+                "samplegeno_gt": "T/C",
+                "samplegeno_ad": "18/20",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12877_sample"
+            },
+            {
+                "samplegeno_gt": "T/T",
+                "samplegeno_ad": "39/0",
+                "samplegeno_numgt": "0/0",
+                "samplegeno_sampleid": "NA12878_sample"
+            },
+            {
+                "samplegeno_gt": "T/C",
+                "samplegeno_ad": "12/25",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12879_sample"
+            }
+        ],
+        "PL": "748,0,296",
+        "GQ": 99,
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "in review",
+        "AD": "12,25",
+        "uuid": "91656f36-dbea-41ad-9d19-72b564cd2c0a",
+        "GT": "0/1",
+        "href": "https://maestro-resources.s3.amazonaws.com/IGV_temp/chr1%3A169888699.png",
+        "schema_version": "1",
+        "date_created": "2020-06-22T18:55:10.089145+00:00",
+        "file": "GAPFIPZSZYEK",
+        "annotation_id": "NA12879_sample:bfda8e20-8a43-49da-96f6-2bab66218db1:GAPFIPZSZYEK",
+        "CALL_INFO": "NA12879_sample"
+    },
+    {
+        "variant": "2f316f66-f0ea-455f-9ea6-69066a35d5ab",
+        "QUAL": 1269.12,
+        "last_modified": {
+            "date_modified": "2020-07-14T00:52:24.290841+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "DP": 53,
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "samplegeno": [
+            {
+                "samplegeno_gt": "G/A",
+                "samplegeno_ad": "28/25",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12877_sample"
+            },
+            {
+                "samplegeno_gt": "G/G",
+                "samplegeno_ad": "36/0",
+                "samplegeno_numgt": "0/0",
+                "samplegeno_sampleid": "NA12878_sample"
+            },
+            {
+                "samplegeno_gt": "G/A",
+                "samplegeno_ad": "26/22",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12879_sample"
+            }
+        ],
+        "PL": "689,0,769",
+        "GQ": 99,
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "in review",
+        "AD": "28,25",
+        "uuid": "8e95a19c-93b0-4d9c-83b2-424e7819d3d4",
+        "GT": "0/1",
+        "href": "https://maestro-resources.s3.amazonaws.com/IGV_temp/chr1%3A169888699.png",
+        "schema_version": "1",
+        "date_created": "2020-06-22T18:56:52.079803+00:00",
+        "file": "GAPFIPZSZYEK",
+        "annotation_id": "NA12877_sample:2f316f66-f0ea-455f-9ea6-69066a35d5ab:GAPFIPZSZYEK",
+        "CALL_INFO": "NA12877_sample"
+    },
+    {
+        "variant": "c8ab2e57-c357-4ee7-9768-d6dad67bb9e9",
+        "QUAL": 460.92,
+        "last_modified": {
+            "date_modified": "2020-07-14T00:44:38.000674+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "DP": 8,
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "novoPP": 4.201417453458817e-10,
+        "samplegeno": [
+            {
+                "samplegeno_gt": "AGGGCTGCAGGGGGGATGCTGGGGGTGCAGGGGAGATGCTGGGG/A",
+                "samplegeno_ad": "8/5",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12877_sample"
+            },
+            {
+                "samplegeno_gt": "A/A",
+                "samplegeno_ad": "0/8",
+                "samplegeno_numgt": "1/1",
+                "samplegeno_sampleid": "NA12878_sample"
+            },
+            {
+                "samplegeno_gt": "AGGGCTGCAGGGGGGATGCTGGGGGTGCAGGGGAGATGCTGGGG/AGGGCTGCAGGGGGGATGCTGGGGGTGCAGGGGAGATGCTGGGG",
+                "samplegeno_ad": "7/0",
+                "samplegeno_numgt": "0/0",
+                "samplegeno_sampleid": "NA12879_sample"
+            }
+        ],
+        "PL": "342,25,0",
+        "GQ": 25,
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "in review",
+        "AD": "0,8",
+        "uuid": "8872fa62-48ad-4ade-9f72-006e00fd075d",
+        "GT": "1/1",
+        "href": "https://maestro-resources.s3.amazonaws.com/IGV_temp/chr1%3A169888699.png",
+        "schema_version": "1",
+        "date_created": "2020-06-22T19:05:06.318395+00:00",
+        "file": "GAPFIPZSZYEK",
+        "annotation_id": "NA12878_sample:c8ab2e57-c357-4ee7-9768-d6dad67bb9e9:GAPFIPZSZYEK",
+        "CALL_INFO": "NA12878_sample"
+    },
+    {
+        "variant": "1bbb6480-96b7-421c-89ab-b86363c59774",
+        "PS": 17276557,
+        "GT": "1|1",
+        "PL": "1748,123,0",
+        "GQ": 99,
+        "PGT": "1|1",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "in review",
+        "AD": "0,39",
+        "uuid": "87420b70-ce22-4048-b3d0-721ad03897ce",
+        "PID": "17276557_A_C",
+        "CALL_INFO": "NA12877_sample",
+        "file": "GAPFIPZSZYEK",
+        "last_modified": {
+            "date_modified": "2020-07-14T00:49:04.684251+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "annotation_id": "NA12877_sample:1bbb6480-96b7-421c-89ab-b86363c59774:GAPFIPZSZYEK",
+        "QUAL": 5392.69,
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "samplegeno": [
+            {
+                "samplegeno_gt": "G/G",
+                "samplegeno_ad": "0/39",
+                "samplegeno_numgt": "1/1",
+                "samplegeno_sampleid": "NA12877_sample"
+            },
+            {
+                "samplegeno_gt": "G/G",
+                "samplegeno_ad": "0/44",
+                "samplegeno_numgt": "1/1",
+                "samplegeno_sampleid": "NA12878_sample"
+            },
+            {
+                "samplegeno_gt": "G/G",
+                "samplegeno_ad": "0/35",
+                "samplegeno_numgt": "1/1",
+                "samplegeno_sampleid": "NA12879_sample"
+            }
+        ],
+        "href": "https://maestro-resources.s3.amazonaws.com/IGV_temp/chr1%3A169888699.png",
+        "schema_version": "1",
+        "date_created": "2020-06-22T19:00:18.251654+00:00",
+        "DP": 39,
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b"
+    },
+    {
+        "variant": "1fc532d9-c0b2-4c45-9211-2917d0431d52",
+        "QUAL": 1303.12,
+        "last_modified": {
+            "date_modified": "2020-07-14T00:48:11.648945+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "DP": 47,
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "samplegeno": [
+            {
+                "samplegeno_gt": "A/C",
+                "samplegeno_ad": "20/27",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12877_sample"
+            },
+            {
+                "samplegeno_gt": "A/A",
+                "samplegeno_ad": "48/0",
+                "samplegeno_numgt": "0/0",
+                "samplegeno_sampleid": "NA12878_sample"
+            },
+            {
+                "samplegeno_gt": "A/C",
+                "samplegeno_ad": "22/19",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12879_sample"
+            }
+        ],
+        "PL": "797,0,554",
+        "GQ": 99,
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "in review",
+        "AD": "20,27",
+        "uuid": "8318efb7-40d6-4dfc-9baf-9608a2193529",
+        "GT": "0/1",
+        "href": "https://maestro-resources.s3.amazonaws.com/IGV_temp/chr1%3A169888699.png",
+        "schema_version": "1",
+        "date_created": "2020-06-22T19:01:22.462996+00:00",
+        "file": "GAPFIPZSZYEK",
+        "annotation_id": "NA12877_sample:1fc532d9-c0b2-4c45-9211-2917d0431d52:GAPFIPZSZYEK",
+        "CALL_INFO": "NA12877_sample"
+    },
+    {
+        "variant": "48abf801-94fa-42fc-a334-0caf8d3b4b71",
+        "QUAL": 1441.12,
+        "last_modified": {
+            "date_modified": "2020-07-14T00:52:23.552941+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "DP": 48,
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "samplegeno": [
+            {
+                "samplegeno_gt": "T/T",
+                "samplegeno_ad": "37/0",
+                "samplegeno_numgt": "0/0",
+                "samplegeno_sampleid": "NA12877_sample"
+            },
+            {
+                "samplegeno_gt": "T/C",
+                "samplegeno_ad": "22/26",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12878_sample"
+            },
+            {
+                "samplegeno_gt": "T/C",
+                "samplegeno_ad": "30/25",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12879_sample"
+            }
+        ],
+        "PL": "749,0,609",
+        "GQ": 99,
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "in review",
+        "AD": "22,26",
+        "uuid": "7f2eb676-82fd-4220-ba23-1f4c386d9ea4",
+        "GT": "0/1",
+        "href": "https://maestro-resources.s3.amazonaws.com/IGV_temp/chr1%3A169888699.png",
+        "schema_version": "1",
+        "date_created": "2020-06-22T18:56:53.122439+00:00",
+        "file": "GAPFIPZSZYEK",
+        "annotation_id": "NA12878_sample:48abf801-94fa-42fc-a334-0caf8d3b4b71:GAPFIPZSZYEK",
+        "CALL_INFO": "NA12878_sample"
+    },
+    {
+        "variant": "6a10f693-c894-4e9f-8293-bba51b344a58",
+        "QUAL": 832.25,
+        "last_modified": {
+            "date_modified": "2020-07-14T00:49:07.441329+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "DP": 44,
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "samplegeno": [
+            {
+                "samplegeno_gt": "C/C",
+                "samplegeno_ad": "33/0",
+                "samplegeno_numgt": "0/0",
+                "samplegeno_sampleid": "NA12877_sample"
+            },
+            {
+                "samplegeno_gt": "C/T",
+                "samplegeno_ad": "15/29",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12878_sample"
+            },
+            {
+                "samplegeno_gt": "C/C",
+                "samplegeno_ad": "34/0",
+                "samplegeno_numgt": "0/0",
+                "samplegeno_sampleid": "NA12879_sample"
+            }
+        ],
+        "PL": "841,0,380",
+        "GQ": 99,
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "in review",
+        "AD": "15,29",
+        "uuid": "7cb26393-f1ad-4c4a-b5a4-2fe266dbe857",
+        "GT": "0/1",
+        "href": "https://maestro-resources.s3.amazonaws.com/IGV_temp/chr1%3A169888699.png",
+        "schema_version": "1",
+        "date_created": "2020-06-22T19:00:15.008819+00:00",
+        "file": "GAPFIPZSZYEK",
+        "annotation_id": "NA12878_sample:6a10f693-c894-4e9f-8293-bba51b344a58:GAPFIPZSZYEK",
+        "CALL_INFO": "NA12878_sample"
+    },
+    {
+        "variant": "20d75853-f25a-471b-98c5-a0fbaf65a5d4",
+        "QUAL": 405.25,
+        "last_modified": {
+            "date_modified": "2020-07-14T00:53:13.352596+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "DP": 27,
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "samplegeno": [
+            {
+                "samplegeno_gt": "G/G",
+                "samplegeno_ad": "36/0",
+                "samplegeno_numgt": "0/0",
+                "samplegeno_sampleid": "NA12877_sample"
+            },
+            {
+                "samplegeno_gt": "G/A",
+                "samplegeno_ad": "11/16",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12878_sample"
+            },
+            {
+                "samplegeno_gt": "G/G",
+                "samplegeno_ad": "35/0",
+                "samplegeno_numgt": "0/0",
+                "samplegeno_sampleid": "NA12879_sample"
+            }
+        ],
+        "PL": "414,0,289",
+        "GQ": 99,
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "in review",
+        "AD": "11,16",
+        "uuid": "7bff070c-88ed-41e6-b24d-248fff7684b0",
+        "GT": "0/1",
+        "href": "https://maestro-resources.s3.amazonaws.com/IGV_temp/chr1%3A169888699.png",
+        "schema_version": "1",
+        "date_created": "2020-06-22T18:56:02.825350+00:00",
+        "file": "GAPFIPZSZYEK",
+        "annotation_id": "NA12878_sample:20d75853-f25a-471b-98c5-a0fbaf65a5d4:GAPFIPZSZYEK",
+        "CALL_INFO": "NA12878_sample"
+    },
+    {
+        "variant": "1fc532d9-c0b2-4c45-9211-2917d0431d52",
+        "QUAL": 1303.12,
+        "last_modified": {
+            "date_modified": "2020-07-14T00:48:11.475046+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "DP": 41,
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "samplegeno": [
+            {
+                "samplegeno_gt": "A/C",
+                "samplegeno_ad": "20/27",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12877_sample"
+            },
+            {
+                "samplegeno_gt": "A/A",
+                "samplegeno_ad": "48/0",
+                "samplegeno_numgt": "0/0",
+                "samplegeno_sampleid": "NA12878_sample"
+            },
+            {
+                "samplegeno_gt": "A/C",
+                "samplegeno_ad": "22/19",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12879_sample"
+            }
+        ],
+        "PL": "517,0,607",
+        "GQ": 99,
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "in review",
+        "AD": "22,19",
+        "uuid": "76a3c83d-7162-4f8f-8792-c48826d769bf",
+        "GT": "0/1",
+        "href": "https://maestro-resources.s3.amazonaws.com/IGV_temp/chr1%3A169888699.png",
+        "schema_version": "1",
+        "date_created": "2020-06-22T19:01:22.560393+00:00",
+        "file": "GAPFIPZSZYEK",
+        "annotation_id": "NA12879_sample:1fc532d9-c0b2-4c45-9211-2917d0431d52:GAPFIPZSZYEK",
+        "CALL_INFO": "NA12879_sample"
+    },
+    {
+        "variant": "e2156ab1-7ec8-4209-9bac-141560e7780f",
+        "QUAL": 482.25,
+        "last_modified": {
+            "date_modified": "2020-07-14T00:46:43.017854+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "DP": 36,
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "samplegeno": [
+            {
+                "samplegeno_gt": "C/C",
+                "samplegeno_ad": "30/0",
+                "samplegeno_numgt": "0/0",
+                "samplegeno_sampleid": "NA12877_sample"
+            },
+            {
+                "samplegeno_gt": "C/T",
+                "samplegeno_ad": "18/18",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12878_sample"
+            },
+            {
+                "samplegeno_gt": "C/C",
+                "samplegeno_ad": "36/0",
+                "samplegeno_numgt": "0/0",
+                "samplegeno_sampleid": "NA12879_sample"
+            }
+        ],
+        "PL": "491,0,516",
+        "GQ": 99,
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "in review",
+        "AD": "18,18",
+        "uuid": "75a780f7-65c8-40c2-8fb2-b1fe5bde2137",
+        "GT": "0/1",
+        "href": "https://maestro-resources.s3.amazonaws.com/IGV_temp/chr1%3A169888699.png",
+        "schema_version": "1",
+        "date_created": "2020-06-22T19:02:51.013914+00:00",
+        "file": "GAPFIPZSZYEK",
+        "annotation_id": "NA12878_sample:e2156ab1-7ec8-4209-9bac-141560e7780f:GAPFIPZSZYEK",
+        "CALL_INFO": "NA12878_sample"
+    },
+    {
+        "variant": "064dc6d1-12e2-4423-be07-4f0c5fe91636",
+        "QUAL": 1175.12,
+        "last_modified": {
+            "date_modified": "2020-07-14T00:45:38.250090+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "DP": 37,
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "samplegeno": [
+            {
+                "samplegeno_gt": "G/G",
+                "samplegeno_ad": "33/0",
+                "samplegeno_numgt": "0/0",
+                "samplegeno_sampleid": "NA12877_sample"
+            },
+            {
+                "samplegeno_gt": "G/A",
+                "samplegeno_ad": "22/21",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12878_sample"
+            },
+            {
+                "samplegeno_gt": "G/A",
+                "samplegeno_ad": "16/21",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12879_sample"
+            }
+        ],
+        "PL": "616,0,443",
+        "GQ": 99,
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "in review",
+        "AD": "16,21",
+        "uuid": "73acf5bd-b7c3-4672-b8d5-8e629de95d80",
+        "GT": "0/1",
+        "href": "https://maestro-resources.s3.amazonaws.com/IGV_temp/chr1%3A169888699.png",
+        "schema_version": "1",
+        "date_created": "2020-06-22T19:03:58.674759+00:00",
+        "file": "GAPFIPZSZYEK",
+        "annotation_id": "NA12879_sample:064dc6d1-12e2-4423-be07-4f0c5fe91636:GAPFIPZSZYEK",
+        "CALL_INFO": "NA12879_sample"
+    },
+    {
+        "variant": "0056a58f-100b-4561-969c-52d70dd639f6",
+        "QUAL": 1487.12,
+        "last_modified": {
+            "date_modified": "2020-07-14T00:49:51.518409+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "DP": 41,
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "samplegeno": [
+            {
+                "samplegeno_gt": "G/A",
+                "samplegeno_ad": "18/23",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12877_sample"
+            },
+            {
+                "samplegeno_gt": "G/G",
+                "samplegeno_ad": "39/0",
+                "samplegeno_numgt": "0/0",
+                "samplegeno_sampleid": "NA12878_sample"
+            },
+            {
+                "samplegeno_gt": "G/A",
+                "samplegeno_ad": "22/28",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12879_sample"
+            }
+        ],
+        "PL": "676,0,481",
+        "GQ": 99,
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "in review",
+        "AD": "18,23",
+        "uuid": "73684383-1761-4686-a25c-1a12f0796f9a",
+        "GT": "0/1",
+        "href": "https://maestro-resources.s3.amazonaws.com/IGV_temp/chr1%3A169888699.png",
+        "schema_version": "1",
+        "date_created": "2020-06-22T18:59:24.596820+00:00",
+        "file": "GAPFIPZSZYEK",
+        "annotation_id": "NA12877_sample:0056a58f-100b-4561-969c-52d70dd639f6:GAPFIPZSZYEK",
+        "CALL_INFO": "NA12877_sample"
+    },
+    {
+        "variant": "2ece9452-265d-456f-9aaf-4996aacac2cc",
+        "QUAL": 1063.12,
+        "last_modified": {
+            "date_modified": "2020-07-14T00:55:41.437496+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "DP": 45,
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "samplegeno": [
+            {
+                "samplegeno_gt": "C/C",
+                "samplegeno_ad": "37/0",
+                "samplegeno_numgt": "0/0",
+                "samplegeno_sampleid": "NA12877_sample"
+            },
+            {
+                "samplegeno_gt": "C/T",
+                "samplegeno_ad": "26/19",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12878_sample"
+            },
+            {
+                "samplegeno_gt": "C/T",
+                "samplegeno_ad": "18/19",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12879_sample"
+            }
+        ],
+        "PL": "525,0,758",
+        "GQ": 99,
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "in review",
+        "AD": "26,19",
+        "uuid": "71853a10-cfcc-4ddb-a965-bbd8d484b63f",
+        "GT": "0/1",
+        "href": "https://maestro-resources.s3.amazonaws.com/IGV_temp/chr1%3A169888699.png",
+        "schema_version": "1",
+        "date_created": "2020-06-22T18:53:15.336016+00:00",
+        "file": "GAPFIPZSZYEK",
+        "annotation_id": "NA12878_sample:2ece9452-265d-456f-9aaf-4996aacac2cc:GAPFIPZSZYEK",
+        "CALL_INFO": "NA12878_sample"
+    },
+    {
+        "variant": "ead44ac3-4a44-4462-a759-248868d0365f",
+        "QUAL": 992.12,
+        "last_modified": {
+            "date_modified": "2020-07-14T00:42:44.556780+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "DP": 37,
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "samplegeno": [
+            {
+                "samplegeno_gt": "C/C",
+                "samplegeno_ad": "38/0",
+                "samplegeno_numgt": "0/0",
+                "samplegeno_sampleid": "NA12877_sample"
+            },
+            {
+                "samplegeno_gt": "C/T",
+                "samplegeno_ad": "21/16",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12878_sample"
+            },
+            {
+                "samplegeno_gt": "C/T",
+                "samplegeno_ad": "22/20",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12879_sample"
+            }
+        ],
+        "PL": "435,0,618",
+        "GQ": 99,
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "in review",
+        "AD": "21,16",
+        "uuid": "64c82c3b-7ef2-4a02-8e2e-3dc417ea5c99",
+        "GT": "0/1",
+        "href": "https://maestro-resources.s3.amazonaws.com/IGV_temp/chr1%3A169888699.png",
+        "schema_version": "1",
+        "date_created": "2020-06-22T19:07:08.918319+00:00",
+        "file": "GAPFIPZSZYEK",
+        "annotation_id": "NA12878_sample:ead44ac3-4a44-4462-a759-248868d0365f:GAPFIPZSZYEK",
+        "CALL_INFO": "NA12878_sample"
+    },
+    {
+        "variant": "40707514-afb3-498a-b22d-7472d276f2c9",
+        "QUAL": 2823.94,
+        "last_modified": {
+            "date_modified": "2020-07-14T00:49:41.054698+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "DP": 49,
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "samplegeno": [
+            {
+                "samplegeno_gt": "T/C",
+                "samplegeno_ad": "22/24",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12877_sample"
+            },
+            {
+                "samplegeno_gt": "C/C",
+                "samplegeno_ad": "0/44",
+                "samplegeno_numgt": "1/1",
+                "samplegeno_sampleid": "NA12878_sample"
+            },
+            {
+                "samplegeno_gt": "T/C",
+                "samplegeno_ad": "23/26",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12879_sample"
+            }
+        ],
+        "PL": "712,0,653",
+        "GQ": 99,
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "in review",
+        "AD": "23,26",
+        "uuid": "63160c72-357f-4c2c-ae37-cec19a1452d4",
+        "GT": "0/1",
+        "href": "https://maestro-resources.s3.amazonaws.com/IGV_temp/chr1%3A169888699.png",
+        "schema_version": "1",
+        "date_created": "2020-06-22T18:59:33.890396+00:00",
+        "file": "GAPFIPZSZYEK",
+        "annotation_id": "NA12879_sample:40707514-afb3-498a-b22d-7472d276f2c9:GAPFIPZSZYEK",
+        "CALL_INFO": "NA12879_sample"
+    },
+    {
+        "variant": "aec87f33-019e-4950-9ed2-a412f0a3b7b8",
+        "QUAL": 1289.12,
+        "last_modified": {
+            "date_modified": "2020-07-14T00:52:24.585646+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "DP": 48,
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "samplegeno": [
+            {
+                "samplegeno_gt": "G/A",
+                "samplegeno_ad": "27/21",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12877_sample"
+            },
+            {
+                "samplegeno_gt": "G/G",
+                "samplegeno_ad": "39/0",
+                "samplegeno_numgt": "0/0",
+                "samplegeno_sampleid": "NA12878_sample"
+            },
+            {
+                "samplegeno_gt": "G/A",
+                "samplegeno_ad": "18/25",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12879_sample"
+            }
+        ],
+        "PL": "586,0,774",
+        "GQ": 99,
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "in review",
+        "AD": "27,21",
+        "uuid": "62766941-e068-481d-a0a0-a54d4abee012",
+        "GT": "0/1",
+        "href": "https://maestro-resources.s3.amazonaws.com/IGV_temp/chr1%3A169888699.png",
+        "schema_version": "1",
+        "date_created": "2020-06-22T18:56:51.897408+00:00",
+        "file": "GAPFIPZSZYEK",
+        "annotation_id": "NA12877_sample:aec87f33-019e-4950-9ed2-a412f0a3b7b8:GAPFIPZSZYEK",
+        "CALL_INFO": "NA12877_sample"
+    },
+    {
+        "variant": "72ec58c2-6000-415a-944c-d25c54f6a063",
+        "QUAL": 2322.91,
+        "last_modified": {
+            "date_modified": "2020-07-14T00:53:58.487036+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "DP": 47,
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "samplegeno": [
+            {
+                "samplegeno_gt": "A/A",
+                "samplegeno_ad": "0/47",
+                "samplegeno_numgt": "1/1",
+                "samplegeno_sampleid": "NA12877_sample"
+            },
+            {
+                "samplegeno_gt": "G/G",
+                "samplegeno_ad": "37/0",
+                "samplegeno_numgt": "0/0",
+                "samplegeno_sampleid": "NA12878_sample"
+            },
+            {
+                "samplegeno_gt": "G/A",
+                "samplegeno_ad": "19/24",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12879_sample"
+            }
+        ],
+        "PL": "1634,141,0",
+        "GQ": 99,
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "in review",
+        "AD": "0,47",
+        "uuid": "6033931a-f25c-4327-9bf1-65e40cb81ca1",
+        "GT": "1/1",
+        "href": "https://maestro-resources.s3.amazonaws.com/IGV_temp/chr1%3A169888699.png",
+        "schema_version": "1",
+        "date_created": "2020-06-22T18:55:13.374700+00:00",
+        "file": "GAPFIPZSZYEK",
+        "annotation_id": "NA12877_sample:72ec58c2-6000-415a-944c-d25c54f6a063:GAPFIPZSZYEK",
+        "CALL_INFO": "NA12877_sample"
+    },
+    {
+        "variant": "4563a77d-dd59-492d-9e08-b09bd4d86bed",
+        "QUAL": 292.25,
+        "last_modified": {
+            "date_modified": "2020-07-14T00:42:12.818427+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "DP": 27,
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "samplegeno": [
+            {
+                "samplegeno_gt": "C/C",
+                "samplegeno_ad": "37/0",
+                "samplegeno_numgt": "0/0",
+                "samplegeno_sampleid": "NA12877_sample"
+            },
+            {
+                "samplegeno_gt": "C/T",
+                "samplegeno_ad": "16/11",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12878_sample"
+            },
+            {
+                "samplegeno_gt": "C/C",
+                "samplegeno_ad": "39/0",
+                "samplegeno_numgt": "0/0",
+                "samplegeno_sampleid": "NA12879_sample"
+            }
+        ],
+        "PL": "301,0,465",
+        "GQ": 99,
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "in review",
+        "AD": "16,11",
+        "uuid": "5bd20e67-8d24-47d0-9021-925d792ee7af",
+        "GT": "0/1",
+        "href": "https://maestro-resources.s3.amazonaws.com/IGV_temp/chr1%3A169888699.png",
+        "schema_version": "1",
+        "date_created": "2020-06-22T19:07:42.775103+00:00",
+        "file": "GAPFIPZSZYEK",
+        "annotation_id": "NA12878_sample:4563a77d-dd59-492d-9e08-b09bd4d86bed:GAPFIPZSZYEK",
+        "CALL_INFO": "NA12878_sample"
+    },
+    {
+        "variant": "2f316f66-f0ea-455f-9ea6-69066a35d5ab",
+        "QUAL": 1269.12,
+        "last_modified": {
+            "date_modified": "2020-07-14T00:52:24.187991+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "DP": 48,
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "samplegeno": [
+            {
+                "samplegeno_gt": "G/A",
+                "samplegeno_ad": "28/25",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12877_sample"
+            },
+            {
+                "samplegeno_gt": "G/G",
+                "samplegeno_ad": "36/0",
+                "samplegeno_numgt": "0/0",
+                "samplegeno_sampleid": "NA12878_sample"
+            },
+            {
+                "samplegeno_gt": "G/A",
+                "samplegeno_ad": "26/22",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12879_sample"
+            }
+        ],
+        "PL": "591,0,699",
+        "GQ": 99,
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "in review",
+        "AD": "26,22",
+        "uuid": "5a36688d-d60a-4e77-962e-dd624867434c",
+        "GT": "0/1",
+        "href": "https://maestro-resources.s3.amazonaws.com/IGV_temp/chr1%3A169888699.png",
+        "schema_version": "1",
+        "date_created": "2020-06-22T18:56:52.130930+00:00",
+        "file": "GAPFIPZSZYEK",
+        "annotation_id": "NA12879_sample:2f316f66-f0ea-455f-9ea6-69066a35d5ab:GAPFIPZSZYEK",
+        "CALL_INFO": "NA12879_sample"
+    },
+    {
+        "variant": "14c3d8ce-0938-4bad-afcc-ced147f8b3cb",
+        "QUAL": 457.25,
+        "last_modified": {
+            "date_modified": "2020-07-14T00:53:07.027857+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "DP": 31,
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "samplegeno": [
+            {
+                "samplegeno_gt": "G/G",
+                "samplegeno_ad": "37/0",
+                "samplegeno_numgt": "0/0",
+                "samplegeno_sampleid": "NA12877_sample"
+            },
+            {
+                "samplegeno_gt": "G/A",
+                "samplegeno_ad": "14/17",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12878_sample"
+            },
+            {
+                "samplegeno_gt": "G/G",
+                "samplegeno_ad": "37/0",
+                "samplegeno_numgt": "0/0",
+                "samplegeno_sampleid": "NA12879_sample"
+            }
+        ],
+        "PL": "466,0,381",
+        "GQ": 99,
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "in review",
+        "AD": "14,17",
+        "uuid": "597415a6-fe82-4c42-b2f0-89f65020892e",
+        "GT": "0/1",
+        "href": "https://maestro-resources.s3.amazonaws.com/IGV_temp/chr1%3A169888699.png",
+        "schema_version": "1",
+        "date_created": "2020-06-22T18:56:10.402463+00:00",
+        "file": "GAPFIPZSZYEK",
+        "annotation_id": "NA12878_sample:14c3d8ce-0938-4bad-afcc-ced147f8b3cb:GAPFIPZSZYEK",
+        "CALL_INFO": "NA12878_sample"
+    },
+    {
+        "variant": "f35eabcf-6c76-4ac3-8c3d-6805df357f06",
+        "QUAL": 1355.12,
+        "last_modified": {
+            "date_modified": "2020-07-14T00:48:30.145650+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "DP": 55,
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "samplegeno": [
+            {
+                "samplegeno_gt": "G/G",
+                "samplegeno_ad": "39/0",
+                "samplegeno_numgt": "0/0",
+                "samplegeno_sampleid": "NA12877_sample"
+            },
+            {
+                "samplegeno_gt": "G/A",
+                "samplegeno_ad": "35/20",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12878_sample"
+            },
+            {
+                "samplegeno_gt": "G/A",
+                "samplegeno_ad": "24/30",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12879_sample"
+            }
+        ],
+        "PL": "490,0,987",
+        "GQ": 99,
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "in review",
+        "AD": "35,20",
+        "uuid": "58be8245-c2ad-46d1-acff-9358c4e90a7b",
+        "GT": "0/1",
+        "href": "https://maestro-resources.s3.amazonaws.com/IGV_temp/chr1%3A169888699.png",
+        "schema_version": "1",
+        "date_created": "2020-06-22T19:01:00.322417+00:00",
+        "file": "GAPFIPZSZYEK",
+        "annotation_id": "NA12878_sample:f35eabcf-6c76-4ac3-8c3d-6805df357f06:GAPFIPZSZYEK",
+        "CALL_INFO": "NA12878_sample"
+    },
+    {
+        "variant": "ead44ac3-4a44-4462-a759-248868d0365f",
+        "QUAL": 992.12,
+        "last_modified": {
+            "date_modified": "2020-07-14T00:42:44.424246+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "DP": 42,
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "samplegeno": [
+            {
+                "samplegeno_gt": "C/C",
+                "samplegeno_ad": "38/0",
+                "samplegeno_numgt": "0/0",
+                "samplegeno_sampleid": "NA12877_sample"
+            },
+            {
+                "samplegeno_gt": "C/T",
+                "samplegeno_ad": "21/16",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12878_sample"
+            },
+            {
+                "samplegeno_gt": "C/T",
+                "samplegeno_ad": "22/20",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12879_sample"
+            }
+        ],
+        "PL": "568,0,628",
+        "GQ": 99,
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "in review",
+        "AD": "22,20",
+        "uuid": "5789d4b8-755d-43da-8bfc-b00f4f800394",
+        "GT": "0/1",
+        "href": "https://maestro-resources.s3.amazonaws.com/IGV_temp/chr1%3A169888699.png",
+        "schema_version": "1",
+        "date_created": "2020-06-22T19:07:08.973303+00:00",
+        "file": "GAPFIPZSZYEK",
+        "annotation_id": "NA12879_sample:ead44ac3-4a44-4462-a759-248868d0365f:GAPFIPZSZYEK",
+        "CALL_INFO": "NA12879_sample"
+    },
+    {
+        "variant": "c8ab2e57-c357-4ee7-9768-d6dad67bb9e9",
+        "QUAL": 460.92,
+        "last_modified": {
+            "date_modified": "2020-07-14T00:44:38.129177+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "DP": 13,
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "novoPP": 4.201417453458817e-10,
+        "samplegeno": [
+            {
+                "samplegeno_gt": "AGGGCTGCAGGGGGGATGCTGGGGGTGCAGGGGAGATGCTGGGG/A",
+                "samplegeno_ad": "8/5",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12877_sample"
+            },
+            {
+                "samplegeno_gt": "A/A",
+                "samplegeno_ad": "0/8",
+                "samplegeno_numgt": "1/1",
+                "samplegeno_sampleid": "NA12878_sample"
+            },
+            {
+                "samplegeno_gt": "AGGGCTGCAGGGGGGATGCTGGGGGTGCAGGGGAGATGCTGGGG/AGGGCTGCAGGGGGGATGCTGGGGGTGCAGGGGAGATGCTGGGG",
+                "samplegeno_ad": "7/0",
+                "samplegeno_numgt": "0/0",
+                "samplegeno_sampleid": "NA12879_sample"
+            }
+        ],
+        "PL": "135,0,208",
+        "GQ": 99,
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "in review",
+        "AD": "8,5",
+        "uuid": "55209186-98bc-4d2f-8204-cd309fb739a5",
+        "GT": "0/1",
+        "href": "https://maestro-resources.s3.amazonaws.com/IGV_temp/chr1%3A169888699.png",
+        "schema_version": "1",
+        "date_created": "2020-06-22T19:05:06.254951+00:00",
+        "file": "GAPFIPZSZYEK",
+        "annotation_id": "NA12877_sample:c8ab2e57-c357-4ee7-9768-d6dad67bb9e9:GAPFIPZSZYEK",
+        "CALL_INFO": "NA12877_sample"
+    },
+    {
+        "variant": "102a2db0-6e9c-4d2e-8305-fee57c4e6020",
+        "QUAL": 600.25,
+        "last_modified": {
+            "date_modified": "2020-07-14T00:53:17.295504+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "DP": 37,
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "samplegeno": [
+            {
+                "samplegeno_gt": "G/A",
+                "samplegeno_ad": "16/21",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12877_sample"
+            },
+            {
+                "samplegeno_gt": "G/G",
+                "samplegeno_ad": "39/0",
+                "samplegeno_numgt": "0/0",
+                "samplegeno_sampleid": "NA12878_sample"
+            },
+            {
+                "samplegeno_gt": "G/G",
+                "samplegeno_ad": "39/0",
+                "samplegeno_numgt": "0/0",
+                "samplegeno_sampleid": "NA12879_sample"
+            }
+        ],
+        "PL": "609,0,425",
+        "GQ": 99,
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "in review",
+        "AD": "16,21",
+        "uuid": "4f78adfd-d5d6-4930-8518-698a31108d33",
+        "GT": "0/1",
+        "href": "https://maestro-resources.s3.amazonaws.com/IGV_temp/chr1%3A169888699.png",
+        "schema_version": "1",
+        "date_created": "2020-06-22T18:55:58.002358+00:00",
+        "file": "GAPFIPZSZYEK",
+        "annotation_id": "NA12877_sample:102a2db0-6e9c-4d2e-8305-fee57c4e6020:GAPFIPZSZYEK",
+        "CALL_INFO": "NA12877_sample"
+    },
+    {
+        "variant": "8bb27416-908c-4f96-8cd5-9424ff151553",
+        "QUAL": 496.25,
+        "last_modified": {
+            "date_modified": "2020-07-14T00:45:38.122488+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "DP": 32,
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "samplegeno": [
+            {
+                "samplegeno_gt": "G/A",
+                "samplegeno_ad": "14/18",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12877_sample"
+            },
+            {
+                "samplegeno_gt": "G/G",
+                "samplegeno_ad": "35/0",
+                "samplegeno_numgt": "0/0",
+                "samplegeno_sampleid": "NA12878_sample"
+            },
+            {
+                "samplegeno_gt": "G/G",
+                "samplegeno_ad": "34/0",
+                "samplegeno_numgt": "0/0",
+                "samplegeno_sampleid": "NA12879_sample"
+            }
+        ],
+        "PL": "505,0,340",
+        "GQ": 99,
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "in review",
+        "AD": "14,18",
+        "uuid": "4c7d7e84-ceec-4151-bbef-99df48d176cb",
+        "GT": "0/1",
+        "href": "https://maestro-resources.s3.amazonaws.com/IGV_temp/chr1%3A169888699.png",
+        "schema_version": "1",
+        "date_created": "2020-06-22T19:03:58.852595+00:00",
+        "file": "GAPFIPZSZYEK",
+        "annotation_id": "NA12877_sample:8bb27416-908c-4f96-8cd5-9424ff151553:GAPFIPZSZYEK",
+        "CALL_INFO": "NA12877_sample"
+    },
+    {
+        "variant": "4b82a972-00f8-4eee-b837-064149ddbabb",
+        "QUAL": 1244.12,
+        "last_modified": {
+            "date_modified": "2020-07-14T00:52:30.096724+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "DP": 45,
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "samplegeno": [
+            {
+                "samplegeno_gt": "A/A",
+                "samplegeno_ad": "39/0",
+                "samplegeno_numgt": "0/0",
+                "samplegeno_sampleid": "NA12877_sample"
+            },
+            {
+                "samplegeno_gt": "A/G",
+                "samplegeno_ad": "22/23",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12878_sample"
+            },
+            {
+                "samplegeno_gt": "A/G",
+                "samplegeno_ad": "22/21",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12879_sample"
+            }
+        ],
+        "PL": "664,0,609",
+        "GQ": 99,
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "in review",
+        "AD": "22,23",
+        "uuid": "484afb40-f341-4f39-b7c7-ea2e3dfaae66",
+        "GT": "0/1",
+        "href": "https://maestro-resources.s3.amazonaws.com/IGV_temp/chr1%3A169888699.png",
+        "schema_version": "1",
+        "date_created": "2020-06-22T18:56:47.060580+00:00",
+        "file": "GAPFIPZSZYEK",
+        "annotation_id": "NA12878_sample:4b82a972-00f8-4eee-b837-064149ddbabb:GAPFIPZSZYEK",
+        "CALL_INFO": "NA12878_sample"
+    },
+    {
+        "variant": "5565df94-7626-4439-bf61-78c3459f058c",
+        "QUAL": 646.25,
+        "last_modified": {
+            "date_modified": "2020-07-14T00:42:50.569688+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "DP": 48,
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "samplegeno": [
+            {
+                "samplegeno_gt": "C/C",
+                "samplegeno_ad": "40/0",
+                "samplegeno_numgt": "0/0",
+                "samplegeno_sampleid": "NA12877_sample"
+            },
+            {
+                "samplegeno_gt": "C/T",
+                "samplegeno_ad": "24/24",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12878_sample"
+            },
+            {
+                "samplegeno_gt": "C/C",
+                "samplegeno_ad": "37/0",
+                "samplegeno_numgt": "0/0",
+                "samplegeno_sampleid": "NA12879_sample"
+            }
+        ],
+        "PL": "655,0,670",
+        "GQ": 99,
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "in review",
+        "AD": "24,24",
+        "uuid": "47ca6fe9-3a13-4ad5-a2da-66d56a2f0bb4",
+        "GT": "0/1",
+        "href": "https://maestro-resources.s3.amazonaws.com/IGV_temp/chr1%3A169888699.png",
+        "schema_version": "1",
+        "date_created": "2020-06-22T19:07:01.289873+00:00",
+        "file": "GAPFIPZSZYEK",
+        "annotation_id": "NA12878_sample:5565df94-7626-4439-bf61-78c3459f058c:GAPFIPZSZYEK",
+        "CALL_INFO": "NA12878_sample"
+    },
+    {
+        "variant": "46d98b8b-1cc6-4d52-87a0-4970dad64cc3",
+        "QUAL": 906.12,
+        "last_modified": {
+            "date_modified": "2020-07-14T00:43:30.992124+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "DP": 49,
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "samplegeno": [
+            {
+                "samplegeno_gt": "G/A",
+                "samplegeno_ad": "23/16",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12877_sample"
+            },
+            {
+                "samplegeno_gt": "G/G",
+                "samplegeno_ad": "39/0",
+                "samplegeno_numgt": "0/0",
+                "samplegeno_sampleid": "NA12878_sample"
+            },
+            {
+                "samplegeno_gt": "G/A",
+                "samplegeno_ad": "31/18",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12879_sample"
+            }
+        ],
+        "PL": "478,0,900",
+        "GQ": 99,
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "in review",
+        "AD": "31,18",
+        "uuid": "427fc5c5-e0a5-493c-b528-f0ee660c0167",
+        "GT": "0/1",
+        "href": "https://maestro-resources.s3.amazonaws.com/IGV_temp/chr1%3A169888699.png",
+        "schema_version": "1",
+        "date_created": "2020-06-22T19:06:14.270360+00:00",
+        "file": "GAPFIPZSZYEK",
+        "annotation_id": "NA12879_sample:46d98b8b-1cc6-4d52-87a0-4970dad64cc3:GAPFIPZSZYEK",
+        "CALL_INFO": "NA12879_sample"
+    },
+    {
+        "variant": "496a7272-fd5e-4f29-8631-a55645d36c27",
+        "QUAL": 1648.16,
+        "last_modified": {
+            "date_modified": "2020-07-14T00:43:42.179007+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "DP": 37,
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "samplegeno": [
+            {
+                "samplegeno_gt": "T/TTC",
+                "samplegeno_ad": "15/22",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12877_sample"
+            },
+            {
+                "samplegeno_gt": "T/T",
+                "samplegeno_ad": "37/0",
+                "samplegeno_numgt": "0/0",
+                "samplegeno_sampleid": "NA12878_sample"
+            },
+            {
+                "samplegeno_gt": "T/TTC",
+                "samplegeno_ad": "19/20",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12879_sample"
+            }
+        ],
+        "PL": "901,0,553",
+        "GQ": 99,
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "in review",
+        "AD": "15,22",
+        "uuid": "41378a4c-9b8c-4230-afb3-36fa6397396f",
+        "GT": "0/1",
+        "href": "https://maestro-resources.s3.amazonaws.com/IGV_temp/chr1%3A169888699.png",
+        "schema_version": "1",
+        "date_created": "2020-06-22T19:06:02.718265+00:00",
+        "file": "GAPFIPZSZYEK",
+        "annotation_id": "NA12877_sample:496a7272-fd5e-4f29-8631-a55645d36c27:GAPFIPZSZYEK",
+        "CALL_INFO": "NA12877_sample"
+    },
+    {
+        "variant": "edfa942b-06e9-4540-a4f7-a56bc3a390fb",
+        "QUAL": 842.25,
+        "last_modified": {
+            "date_modified": "2020-07-14T00:53:40.369792+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "DP": 52,
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "samplegeno": [
+            {
+                "samplegeno_gt": "A/A",
+                "samplegeno_ad": "39/0",
+                "samplegeno_numgt": "0/0",
+                "samplegeno_sampleid": "NA12877_sample"
+            },
+            {
+                "samplegeno_gt": "A/G",
+                "samplegeno_ad": "23/29",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12878_sample"
+            },
+            {
+                "samplegeno_gt": "A/A",
+                "samplegeno_ad": "39/0",
+                "samplegeno_numgt": "0/0",
+                "samplegeno_sampleid": "NA12879_sample"
+            }
+        ],
+        "PL": "851,0,643",
+        "GQ": 99,
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "in review",
+        "AD": "23,29",
+        "uuid": "3e5c7b00-2c48-44a4-a965-290b5c488ae4",
+        "GT": "0/1",
+        "href": "https://maestro-resources.s3.amazonaws.com/IGV_temp/chr1%3A169888699.png",
+        "schema_version": "1",
+        "date_created": "2020-06-22T18:55:33.707543+00:00",
+        "file": "GAPFIPZSZYEK",
+        "annotation_id": "NA12878_sample:edfa942b-06e9-4540-a4f7-a56bc3a390fb:GAPFIPZSZYEK",
+        "CALL_INFO": "NA12878_sample"
+    },
+    {
+        "variant": "d760c9a2-3136-418c-a533-348b978866e7",
+        "QUAL": 597.12,
+        "last_modified": {
+            "date_modified": "2020-07-14T00:45:15.542605+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "DP": 24,
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "samplegeno": [
+            {
+                "samplegeno_gt": "C/T",
+                "samplegeno_ad": "17/11",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12877_sample"
+            },
+            {
+                "samplegeno_gt": "C/C",
+                "samplegeno_ad": "28/0",
+                "samplegeno_numgt": "0/0",
+                "samplegeno_sampleid": "NA12878_sample"
+            },
+            {
+                "samplegeno_gt": "C/T",
+                "samplegeno_ad": "13/11",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12879_sample"
+            }
+        ],
+        "PL": "310,0,340",
+        "GQ": 99,
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "in review",
+        "AD": "13,11",
+        "uuid": "3cc1e4f3-f4dc-49f4-91d0-4fce58116529",
+        "GT": "0/1",
+        "href": "https://maestro-resources.s3.amazonaws.com/IGV_temp/chr1%3A169888699.png",
+        "schema_version": "1",
+        "date_created": "2020-06-22T19:04:23.857545+00:00",
+        "file": "GAPFIPZSZYEK",
+        "annotation_id": "NA12879_sample:d760c9a2-3136-418c-a533-348b978866e7:GAPFIPZSZYEK",
+        "CALL_INFO": "NA12879_sample"
+    },
+    {
+        "variant": "aec87f33-019e-4950-9ed2-a412f0a3b7b8",
+        "QUAL": 1289.12,
+        "last_modified": {
+            "date_modified": "2020-07-14T00:52:24.402816+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "DP": 43,
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "samplegeno": [
+            {
+                "samplegeno_gt": "G/A",
+                "samplegeno_ad": "27/21",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12877_sample"
+            },
+            {
+                "samplegeno_gt": "G/G",
+                "samplegeno_ad": "39/0",
+                "samplegeno_numgt": "0/0",
+                "samplegeno_sampleid": "NA12878_sample"
+            },
+            {
+                "samplegeno_gt": "G/A",
+                "samplegeno_ad": "18/25",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12879_sample"
+            }
+        ],
+        "PL": "714,0,497",
+        "GQ": 99,
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "in review",
+        "AD": "18,25",
+        "uuid": "3c43ea25-15df-4b76-b6b5-69ceb716cce6",
+        "GT": "0/1",
+        "href": "https://maestro-resources.s3.amazonaws.com/IGV_temp/chr1%3A169888699.png",
+        "schema_version": "1",
+        "date_created": "2020-06-22T18:56:51.950308+00:00",
+        "file": "GAPFIPZSZYEK",
+        "annotation_id": "NA12879_sample:aec87f33-019e-4950-9ed2-a412f0a3b7b8:GAPFIPZSZYEK",
+        "CALL_INFO": "NA12879_sample"
+    },
+    {
+        "variant": "89c7fd62-9b44-4fcc-8a70-3eb12505215e",
+        "QUAL": 863.25,
+        "last_modified": {
+            "date_modified": "2020-07-14T00:48:03.268654+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "DP": 55,
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "samplegeno": [
+            {
+                "samplegeno_gt": "G/G",
+                "samplegeno_ad": "38/0",
+                "samplegeno_numgt": "0/0",
+                "samplegeno_sampleid": "NA12877_sample"
+            },
+            {
+                "samplegeno_gt": "G/A",
+                "samplegeno_ad": "24/31",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12878_sample"
+            },
+            {
+                "samplegeno_gt": "G/G",
+                "samplegeno_ad": "35/0",
+                "samplegeno_numgt": "0/0",
+                "samplegeno_sampleid": "NA12879_sample"
+            }
+        ],
+        "PL": "872,0,649",
+        "GQ": 99,
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "in review",
+        "AD": "24,31",
+        "uuid": "398851c2-2da8-4355-8758-c1fc73582efc",
+        "GT": "0/1",
+        "href": "https://maestro-resources.s3.amazonaws.com/IGV_temp/chr1%3A169888699.png",
+        "schema_version": "1",
+        "date_created": "2020-06-22T19:01:32.415086+00:00",
+        "file": "GAPFIPZSZYEK",
+        "annotation_id": "NA12878_sample:89c7fd62-9b44-4fcc-8a70-3eb12505215e:GAPFIPZSZYEK",
+        "CALL_INFO": "NA12878_sample"
+    },
+    {
+        "variant": "bdf79b2b-f5a1-4d21-9eba-a8c2d26b80d0",
+        "QUAL": 748.25,
+        "last_modified": {
+            "date_modified": "2020-07-14T00:51:35.926758+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "DP": 52,
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "samplegeno": [
+            {
+                "samplegeno_gt": "C/A",
+                "samplegeno_ad": "25/27",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12877_sample"
+            },
+            {
+                "samplegeno_gt": "C/C",
+                "samplegeno_ad": "37/0",
+                "samplegeno_numgt": "0/0",
+                "samplegeno_sampleid": "NA12878_sample"
+            },
+            {
+                "samplegeno_gt": "C/C",
+                "samplegeno_ad": "37/0",
+                "samplegeno_numgt": "0/0",
+                "samplegeno_sampleid": "NA12879_sample"
+            }
+        ],
+        "PL": "757,0,713",
+        "GQ": 99,
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "in review",
+        "AD": "25,27",
+        "uuid": "376969db-105b-458c-a16d-dec1349f5628",
+        "GT": "0/1",
+        "href": "https://maestro-resources.s3.amazonaws.com/IGV_temp/chr1%3A169888699.png",
+        "schema_version": "1",
+        "date_created": "2020-06-22T18:57:42.433607+00:00",
+        "file": "GAPFIPZSZYEK",
+        "annotation_id": "NA12877_sample:bdf79b2b-f5a1-4d21-9eba-a8c2d26b80d0:GAPFIPZSZYEK",
+        "CALL_INFO": "NA12877_sample"
+    },
+    {
+        "variant": "e91f6597-025e-477a-b42c-be371693b1ca",
+        "QUAL": 641.25,
+        "last_modified": {
+            "date_modified": "2020-07-14T00:47:07.047140+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "DP": 43,
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "samplegeno": [
+            {
+                "samplegeno_gt": "C/C",
+                "samplegeno_ad": "36/0",
+                "samplegeno_numgt": "0/0",
+                "samplegeno_sampleid": "NA12877_sample"
+            },
+            {
+                "samplegeno_gt": "C/T",
+                "samplegeno_ad": "20/23",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12878_sample"
+            },
+            {
+                "samplegeno_gt": "C/C",
+                "samplegeno_ad": "42/0",
+                "samplegeno_numgt": "0/0",
+                "samplegeno_sampleid": "NA12879_sample"
+            }
+        ],
+        "PL": "650,0,566",
+        "GQ": 99,
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "in review",
+        "AD": "20,23",
+        "uuid": "35924b0a-7071-42fb-b304-2a7ffa98f2e2",
+        "GT": "0/1",
+        "href": "https://maestro-resources.s3.amazonaws.com/IGV_temp/chr1%3A169888699.png",
+        "schema_version": "1",
+        "date_created": "2020-06-22T19:02:26.792180+00:00",
+        "file": "GAPFIPZSZYEK",
+        "annotation_id": "NA12878_sample:e91f6597-025e-477a-b42c-be371693b1ca:GAPFIPZSZYEK",
+        "CALL_INFO": "NA12878_sample"
+    },
+    {
+        "variant": "eb50d743-4370-4198-a214-3b0dfd6e9fae",
+        "QUAL": 972.12,
+        "last_modified": {
+            "date_modified": "2020-07-14T00:50:13.870949+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "DP": 32,
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "samplegeno": [
+            {
+                "samplegeno_gt": "G/C",
+                "samplegeno_ad": "14/18",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12877_sample"
+            },
+            {
+                "samplegeno_gt": "G/G",
+                "samplegeno_ad": "39/0",
+                "samplegeno_numgt": "0/0",
+                "samplegeno_sampleid": "NA12878_sample"
+            },
+            {
+                "samplegeno_gt": "G/C",
+                "samplegeno_ad": "18/17",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12879_sample"
+            }
+        ],
+        "PL": "518,0,380",
+        "GQ": 99,
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "in review",
+        "AD": "14,18",
+        "uuid": "2c4cdba8-a8f7-41c4-96fb-fe08f034752f",
+        "GT": "0/1",
+        "href": "https://maestro-resources.s3.amazonaws.com/IGV_temp/chr1%3A169888699.png",
+        "schema_version": "1",
+        "date_created": "2020-06-22T18:59:06.476910+00:00",
+        "file": "GAPFIPZSZYEK",
+        "annotation_id": "NA12877_sample:eb50d743-4370-4198-a214-3b0dfd6e9fae:GAPFIPZSZYEK",
+        "CALL_INFO": "NA12877_sample"
+    },
+    {
+        "variant": "8063f239-3521-4c83-b81d-8ac1e4644263",
+        "QUAL": 1033.12,
+        "last_modified": {
+            "date_modified": "2020-07-14T00:41:19.270355+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "DP": 40,
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "samplegeno": [
+            {
+                "samplegeno_gt": "G/G",
+                "samplegeno_ad": "34/0",
+                "samplegeno_numgt": "0/0",
+                "samplegeno_sampleid": "NA12877_sample"
+            },
+            {
+                "samplegeno_gt": "G/C",
+                "samplegeno_ad": "19/20",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12878_sample"
+            },
+            {
+                "samplegeno_gt": "G/C",
+                "samplegeno_ad": "21/19",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12879_sample"
+            }
+        ],
+        "PL": "476,0,549",
+        "GQ": 99,
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "in review",
+        "AD": "21,19",
+        "uuid": "2779be96-dd33-4d4a-a2b6-58046c9c8458",
+        "GT": "0/1",
+        "href": "https://maestro-resources.s3.amazonaws.com/IGV_temp/chr1%3A169888699.png",
+        "schema_version": "1",
+        "date_created": "2020-06-22T19:08:39.445476+00:00",
+        "file": "GAPFIPZSZYEK",
+        "annotation_id": "NA12879_sample:8063f239-3521-4c83-b81d-8ac1e4644263:GAPFIPZSZYEK",
+        "CALL_INFO": "NA12879_sample"
+    },
+    {
+        "variant": "8c84fe56-794b-451a-b322-fa55148579ce",
+        "QUAL": 617.25,
+        "last_modified": {
+            "date_modified": "2020-07-14T00:54:06.771851+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "DP": 46,
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "samplegeno": [
+            {
+                "samplegeno_gt": "A/A",
+                "samplegeno_ad": "39/0",
+                "samplegeno_numgt": "0/0",
+                "samplegeno_sampleid": "NA12877_sample"
+            },
+            {
+                "samplegeno_gt": "A/G",
+                "samplegeno_ad": "24/22",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12878_sample"
+            },
+            {
+                "samplegeno_gt": "A/A",
+                "samplegeno_ad": "39/0",
+                "samplegeno_numgt": "0/0",
+                "samplegeno_sampleid": "NA12879_sample"
+            }
+        ],
+        "PL": "626,0,696",
+        "GQ": 99,
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "in review",
+        "AD": "24,22",
+        "uuid": "265bc826-6bb9-4678-b0f3-f0c41be39253",
+        "GT": "0/1",
+        "href": "https://maestro-resources.s3.amazonaws.com/IGV_temp/chr1%3A169888699.png",
+        "schema_version": "1",
+        "date_created": "2020-06-22T18:55:01.938993+00:00",
+        "file": "GAPFIPZSZYEK",
+        "annotation_id": "NA12878_sample:8c84fe56-794b-451a-b322-fa55148579ce:GAPFIPZSZYEK",
+        "CALL_INFO": "NA12878_sample"
+    },
+    {
+        "variant": "56b0ee72-d779-47f4-b439-dc7e258aebe3",
+        "QUAL": 1170.12,
+        "last_modified": {
+            "date_modified": "2020-07-14T00:41:51.010778+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "DP": 50,
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "samplegeno": [
+            {
+                "samplegeno_gt": "C/C",
+                "samplegeno_ad": "38/0",
+                "samplegeno_numgt": "0/0",
+                "samplegeno_sampleid": "NA12877_sample"
+            },
+            {
+                "samplegeno_gt": "C/T",
+                "samplegeno_ad": "22/21",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12878_sample"
+            },
+            {
+                "samplegeno_gt": "C/T",
+                "samplegeno_ad": "28/22",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12879_sample"
+            }
+        ],
+        "PL": "580,0,768",
+        "GQ": 99,
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "in review",
+        "AD": "28,22",
+        "uuid": "1b362852-6b5d-4253-8284-1df3db1abd04",
+        "GT": "0/1",
+        "href": "https://maestro-resources.s3.amazonaws.com/IGV_temp/chr1%3A169888699.png",
+        "schema_version": "1",
+        "date_created": "2020-06-22T19:08:03.299355+00:00",
+        "file": "GAPFIPZSZYEK",
+        "annotation_id": "NA12879_sample:56b0ee72-d779-47f4-b439-dc7e258aebe3:GAPFIPZSZYEK",
+        "CALL_INFO": "NA12879_sample"
+    },
+    {
+        "variant": "fae4f239-f4ce-4cf2-8d35-576e692eb2fa",
+        "QUAL": 537.25,
+        "last_modified": {
+            "date_modified": "2020-07-14T00:48:04.817226+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "DP": 43,
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "samplegeno": [
+            {
+                "samplegeno_gt": "G/G",
+                "samplegeno_ad": "37/0",
+                "samplegeno_numgt": "0/0",
+                "samplegeno_sampleid": "NA12877_sample"
+            },
+            {
+                "samplegeno_gt": "G/A",
+                "samplegeno_ad": "23/20",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12878_sample"
+            },
+            {
+                "samplegeno_gt": "G/G",
+                "samplegeno_ad": "36/0",
+                "samplegeno_numgt": "0/0",
+                "samplegeno_sampleid": "NA12879_sample"
+            }
+        ],
+        "PL": "546,0,657",
+        "GQ": 99,
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "in review",
+        "AD": "23,20",
+        "uuid": "1754570a-af51-45b1-80e6-99253ab86597",
+        "GT": "0/1",
+        "href": "https://maestro-resources.s3.amazonaws.com/IGV_temp/chr1%3A169888699.png",
+        "schema_version": "1",
+        "date_created": "2020-06-22T19:01:30.971939+00:00",
+        "file": "GAPFIPZSZYEK",
+        "annotation_id": "NA12878_sample:fae4f239-f4ce-4cf2-8d35-576e692eb2fa:GAPFIPZSZYEK",
+        "CALL_INFO": "NA12878_sample"
+    },
+    {
+        "variant": "46d98b8b-1cc6-4d52-87a0-4970dad64cc3",
+        "QUAL": 906.12,
+        "last_modified": {
+            "date_modified": "2020-07-14T00:43:31.092051+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "DP": 39,
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "samplegeno": [
+            {
+                "samplegeno_gt": "G/A",
+                "samplegeno_ad": "23/16",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12877_sample"
+            },
+            {
+                "samplegeno_gt": "G/G",
+                "samplegeno_ad": "39/0",
+                "samplegeno_numgt": "0/0",
+                "samplegeno_sampleid": "NA12878_sample"
+            },
+            {
+                "samplegeno_gt": "G/A",
+                "samplegeno_ad": "31/18",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12879_sample"
+            }
+        ],
+        "PL": "439,0,682",
+        "GQ": 99,
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "in review",
+        "AD": "23,16",
+        "uuid": "131e4b46-b23d-479a-8cf8-f6f510f74146",
+        "GT": "0/1",
+        "href": "https://maestro-resources.s3.amazonaws.com/IGV_temp/chr1%3A169888699.png",
+        "schema_version": "1",
+        "date_created": "2020-06-22T19:06:14.222731+00:00",
+        "file": "GAPFIPZSZYEK",
+        "annotation_id": "NA12877_sample:46d98b8b-1cc6-4d52-87a0-4970dad64cc3:GAPFIPZSZYEK",
+        "CALL_INFO": "NA12877_sample"
+    },
+    {
+        "variant": "3d4f6f19-9852-4de3-85b3-b93ccb5f23b4",
+        "QUAL": 1662.91,
+        "last_modified": {
+            "date_modified": "2020-07-14T00:41:02.202632+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "DP": 33,
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "samplegeno": [
+            {
+                "samplegeno_gt": "T/T",
+                "samplegeno_ad": "0/33",
+                "samplegeno_numgt": "1/1",
+                "samplegeno_sampleid": "NA12877_sample"
+            },
+            {
+                "samplegeno_gt": "C/C",
+                "samplegeno_ad": "37/0",
+                "samplegeno_numgt": "0/0",
+                "samplegeno_sampleid": "NA12878_sample"
+            },
+            {
+                "samplegeno_gt": "C/T",
+                "samplegeno_ad": "15/19",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12879_sample"
+            }
+        ],
+        "PL": "1146,99,0",
+        "GQ": 99,
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "in review",
+        "AD": "0,33",
+        "uuid": "12ca998b-8550-414d-bdb0-f53ba998e75d",
+        "GT": "1/1",
+        "href": "https://maestro-resources.s3.amazonaws.com/IGV_temp/chr1%3A169888699.png",
+        "schema_version": "1",
+        "date_created": "2020-06-22T19:08:58.231245+00:00",
+        "file": "GAPFIPZSZYEK",
+        "annotation_id": "NA12877_sample:3d4f6f19-9852-4de3-85b3-b93ccb5f23b4:GAPFIPZSZYEK",
+        "CALL_INFO": "NA12877_sample"
+    },
+    {
+        "variant": "8fba3c62-ce0d-453f-9ff5-b8037e2723a7",
+        "QUAL": 817.25,
+        "last_modified": {
+            "date_modified": "2020-07-14T00:54:06.646465+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "DP": 52,
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "samplegeno": [
+            {
+                "samplegeno_gt": "C/C",
+                "samplegeno_ad": "42/0",
+                "samplegeno_numgt": "0/0",
+                "samplegeno_sampleid": "NA12877_sample"
+            },
+            {
+                "samplegeno_gt": "C/A",
+                "samplegeno_ad": "23/29",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12878_sample"
+            },
+            {
+                "samplegeno_gt": "C/C",
+                "samplegeno_ad": "36/0",
+                "samplegeno_numgt": "0/0",
+                "samplegeno_sampleid": "NA12879_sample"
+            }
+        ],
+        "PL": "826,0,642",
+        "GQ": 99,
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "in review",
+        "AD": "23,29",
+        "uuid": "1170b173-e666-4f11-abdf-e5015c4df572",
+        "GT": "0/1",
+        "href": "https://maestro-resources.s3.amazonaws.com/IGV_temp/chr1%3A169888699.png",
+        "schema_version": "1",
+        "date_created": "2020-06-22T18:55:02.224095+00:00",
+        "file": "GAPFIPZSZYEK",
+        "annotation_id": "NA12878_sample:8fba3c62-ce0d-453f-9ff5-b8037e2723a7:GAPFIPZSZYEK",
+        "CALL_INFO": "NA12878_sample"
+    },
+    {
+        "variant": "bca58584-0f7f-4938-b684-cfe655e3c862",
+        "QUAL": 1180.25,
+        "last_modified": {
+            "date_modified": "2020-07-14T00:54:19.071292+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "DP": 67,
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "samplegeno": [
+            {
+                "samplegeno_gt": "G/A",
+                "samplegeno_ad": "27/40",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12877_sample"
+            },
+            {
+                "samplegeno_gt": "G/G",
+                "samplegeno_ad": "37/0",
+                "samplegeno_numgt": "0/0",
+                "samplegeno_sampleid": "NA12878_sample"
+            },
+            {
+                "samplegeno_gt": "G/G",
+                "samplegeno_ad": "40/0",
+                "samplegeno_numgt": "0/0",
+                "samplegeno_sampleid": "NA12879_sample"
+            }
+        ],
+        "PL": "1189,0,737",
+        "GQ": 99,
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "in review",
+        "AD": "27,40",
+        "uuid": "10a7cabe-3b83-4647-b74d-1fbf201fac36",
+        "GT": "0/1",
+        "href": "https://maestro-resources.s3.amazonaws.com/IGV_temp/chr1%3A169888699.png",
+        "schema_version": "1",
+        "date_created": "2020-06-22T18:54:45.934007+00:00",
+        "file": "GAPFIPZSZYEK",
+        "annotation_id": "NA12877_sample:bca58584-0f7f-4938-b684-cfe655e3c862:GAPFIPZSZYEK",
+        "CALL_INFO": "NA12877_sample"
+    },
+    {
+        "variant": "ca31eaf0-e848-49d3-aca6-c331d1b8e1fc",
+        "QUAL": 1860.12,
+        "last_modified": {
+            "date_modified": "2020-07-14T00:44:22.375368+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "DP": 54,
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "samplegeno": [
+            {
+                "samplegeno_gt": "C/T",
+                "samplegeno_ad": "28/26",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12877_sample"
+            },
+            {
+                "samplegeno_gt": "C/C",
+                "samplegeno_ad": "38/0",
+                "samplegeno_numgt": "0/0",
+                "samplegeno_sampleid": "NA12878_sample"
+            },
+            {
+                "samplegeno_gt": "C/T",
+                "samplegeno_ad": "26/39",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12879_sample"
+            }
+        ],
+        "PL": "731,0,801",
+        "GQ": 99,
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "in review",
+        "AD": "28,26",
+        "uuid": "10425682-c704-464a-91c7-115dee2d8df6",
+        "GT": "0/1",
+        "href": "https://maestro-resources.s3.amazonaws.com/IGV_temp/chr1%3A169888699.png",
+        "schema_version": "1",
+        "date_created": "2020-06-22T19:05:23.766075+00:00",
+        "file": "GAPFIPZSZYEK",
+        "annotation_id": "NA12877_sample:ca31eaf0-e848-49d3-aca6-c331d1b8e1fc:GAPFIPZSZYEK",
+        "CALL_INFO": "NA12877_sample"
+    },
+    {
+        "variant": "fff95aee-5d1b-4251-814e-80f654c8c6ff",
+        "QUAL": 1897.93,
+        "last_modified": {
+            "date_modified": "2020-07-14T00:48:16.814451+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "DP": 40,
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "samplegeno": [
+            {
+                "samplegeno_gt": "T/C",
+                "samplegeno_ad": "30/29",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12877_sample"
+            },
+            {
+                "samplegeno_gt": "T/C",
+                "samplegeno_ad": "20/20",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12878_sample"
+            },
+            {
+                "samplegeno_gt": "T/C",
+                "samplegeno_ad": "30/19",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12879_sample"
+            }
+        ],
+        "PL": "575,0,540",
+        "GQ": 99,
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "in review",
+        "AD": "20,20",
+        "uuid": "0eb164a7-67b0-41b4-8207-8fbedc252527",
+        "GT": "0/1",
+        "href": "https://maestro-resources.s3.amazonaws.com/IGV_temp/chr1%3A169888699.png",
+        "schema_version": "1",
+        "date_created": "2020-06-22T19:01:16.966663+00:00",
+        "file": "GAPFIPZSZYEK",
+        "annotation_id": "NA12878_sample:fff95aee-5d1b-4251-814e-80f654c8c6ff:GAPFIPZSZYEK",
+        "CALL_INFO": "NA12878_sample"
+    },
+    {
+        "variant": "f1f59171-a7e8-423f-83c7-8fa9e3c7e363",
+        "QUAL": 1164.12,
+        "last_modified": {
+            "date_modified": "2020-07-14T00:48:57.584583+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "DP": 51,
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "samplegeno": [
+            {
+                "samplegeno_gt": "C/C",
+                "samplegeno_ad": "36/0",
+                "samplegeno_numgt": "0/0",
+                "samplegeno_sampleid": "NA12877_sample"
+            },
+            {
+                "samplegeno_gt": "C/T",
+                "samplegeno_ad": "28/23",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12878_sample"
+            },
+            {
+                "samplegeno_gt": "C/T",
+                "samplegeno_ad": "24/19",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12879_sample"
+            }
+        ],
+        "PL": "645,0,820",
+        "GQ": 99,
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "in review",
+        "AD": "28,23",
+        "uuid": "0c2f38cd-846f-4182-b211-a1a6fef61da0",
+        "GT": "0/1",
+        "href": "https://maestro-resources.s3.amazonaws.com/IGV_temp/chr1%3A169888699.png",
+        "schema_version": "1",
+        "date_created": "2020-06-22T19:00:28.418712+00:00",
+        "file": "GAPFIPZSZYEK",
+        "annotation_id": "NA12878_sample:f1f59171-a7e8-423f-83c7-8fa9e3c7e363:GAPFIPZSZYEK",
+        "CALL_INFO": "NA12878_sample"
+    },
+    {
+        "variant": "8063f239-3521-4c83-b81d-8ac1e4644263",
+        "QUAL": 1033.12,
+        "last_modified": {
+            "date_modified": "2020-07-14T00:41:19.408427+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "DP": 39,
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "samplegeno": [
+            {
+                "samplegeno_gt": "G/G",
+                "samplegeno_ad": "34/0",
+                "samplegeno_numgt": "0/0",
+                "samplegeno_sampleid": "NA12877_sample"
+            },
+            {
+                "samplegeno_gt": "G/C",
+                "samplegeno_ad": "19/20",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12878_sample"
+            },
+            {
+                "samplegeno_gt": "G/C",
+                "samplegeno_ad": "21/19",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12879_sample"
+            }
+        ],
+        "PL": "568,0,482",
+        "GQ": 99,
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "in review",
+        "AD": "19,20",
+        "uuid": "0a077df1-c2f6-4b3a-a9d0-91e070efbf77",
+        "GT": "0/1",
+        "href": "https://maestro-resources.s3.amazonaws.com/IGV_temp/chr1%3A169888699.png",
+        "schema_version": "1",
+        "date_created": "2020-06-22T19:08:39.405250+00:00",
+        "file": "GAPFIPZSZYEK",
+        "annotation_id": "NA12878_sample:8063f239-3521-4c83-b81d-8ac1e4644263:GAPFIPZSZYEK",
+        "CALL_INFO": "NA12878_sample"
+    },
+    {
+        "variant": "56b0ee72-d779-47f4-b439-dc7e258aebe3",
+        "QUAL": 1170.12,
+        "last_modified": {
+            "date_modified": "2020-07-14T00:41:51.170846+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "DP": 43,
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "samplegeno": [
+            {
+                "samplegeno_gt": "C/C",
+                "samplegeno_ad": "38/0",
+                "samplegeno_numgt": "0/0",
+                "samplegeno_sampleid": "NA12877_sample"
+            },
+            {
+                "samplegeno_gt": "C/T",
+                "samplegeno_ad": "22/21",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12878_sample"
+            },
+            {
+                "samplegeno_gt": "C/T",
+                "samplegeno_ad": "28/22",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12879_sample"
+            }
+        ],
+        "PL": "601,0,635",
+        "GQ": 99,
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "in review",
+        "AD": "22,21",
+        "uuid": "090ac34d-28ac-4746-9385-9b82fb0f457d",
+        "GT": "0/1",
+        "href": "https://maestro-resources.s3.amazonaws.com/IGV_temp/chr1%3A169888699.png",
+        "schema_version": "1",
+        "date_created": "2020-06-22T19:08:03.242476+00:00",
+        "file": "GAPFIPZSZYEK",
+        "annotation_id": "NA12878_sample:56b0ee72-d779-47f4-b439-dc7e258aebe3:GAPFIPZSZYEK",
+        "CALL_INFO": "NA12878_sample"
+    },
+    {
+        "variant": "0671330e-be76-4e0d-b102-fbe9df2619ff",
+        "QUAL": 1493.12,
+        "last_modified": {
+            "date_modified": "2020-07-14T00:51:36.258073+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "DP": 61,
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "samplegeno": [
+            {
+                "samplegeno_gt": "G/A",
+                "samplegeno_ad": "33/28",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12877_sample"
+            },
+            {
+                "samplegeno_gt": "G/G",
+                "samplegeno_ad": "40/0",
+                "samplegeno_numgt": "0/0",
+                "samplegeno_sampleid": "NA12878_sample"
+            },
+            {
+                "samplegeno_gt": "G/A",
+                "samplegeno_ad": "26/26",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12879_sample"
+            }
+        ],
+        "PL": "760,0,961",
+        "GQ": 99,
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "in review",
+        "AD": "33,28",
+        "uuid": "0576dbfa-ad63-4e67-9b85-d367d8e7d0f9",
+        "GT": "0/1",
+        "href": "https://maestro-resources.s3.amazonaws.com/IGV_temp/chr1%3A169888699.png",
+        "schema_version": "1",
+        "date_created": "2020-06-22T18:57:41.553760+00:00",
+        "file": "GAPFIPZSZYEK",
+        "annotation_id": "NA12877_sample:0671330e-be76-4e0d-b102-fbe9df2619ff:GAPFIPZSZYEK",
+        "CALL_INFO": "NA12877_sample"
+    },
+    {
+        "variant": "f9389c3a-ebf2-4669-ae61-9dbfc6892eb0",
+        "QUAL": 1303.12,
+        "last_modified": {
+            "date_modified": "2020-07-14T00:48:27.843948+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "DP": 54,
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "samplegeno": [
+            {
+                "samplegeno_gt": "C/C",
+                "samplegeno_ad": "39/0",
+                "samplegeno_numgt": "0/0",
+                "samplegeno_sampleid": "NA12877_sample"
+            },
+            {
+                "samplegeno_gt": "C/A",
+                "samplegeno_ad": "21/24",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12878_sample"
+            },
+            {
+                "samplegeno_gt": "C/A",
+                "samplegeno_ad": "30/24",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12879_sample"
+            }
+        ],
+        "PL": "638,0,821",
+        "GQ": 99,
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "in review",
+        "AD": "30,24",
+        "uuid": "03d10299-e60d-4478-aa4f-35facd8ffa6b",
+        "GT": "0/1",
+        "href": "https://maestro-resources.s3.amazonaws.com/IGV_temp/chr1%3A169888699.png",
+        "schema_version": "1",
+        "date_created": "2020-06-22T19:01:03.174826+00:00",
+        "file": "GAPFIPZSZYEK",
+        "annotation_id": "NA12879_sample:f9389c3a-ebf2-4669-ae61-9dbfc6892eb0:GAPFIPZSZYEK",
+        "CALL_INFO": "NA12879_sample"
+    },
+    {
+        "variant": "064dc6d1-12e2-4423-be07-4f0c5fe91636",
+        "QUAL": 1175.12,
+        "last_modified": {
+            "date_modified": "2020-07-14T00:45:38.373656+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "DP": 43,
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "samplegeno": [
+            {
+                "samplegeno_gt": "G/G",
+                "samplegeno_ad": "33/0",
+                "samplegeno_numgt": "0/0",
+                "samplegeno_sampleid": "NA12877_sample"
+            },
+            {
+                "samplegeno_gt": "G/A",
+                "samplegeno_ad": "22/21",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12878_sample"
+            },
+            {
+                "samplegeno_gt": "G/A",
+                "samplegeno_ad": "16/21",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12879_sample"
+            }
+        ],
+        "PL": "570,0,608",
+        "GQ": 99,
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "in review",
+        "AD": "22,21",
+        "uuid": "0392246b-a457-4266-a61e-533fbbf4ad93",
+        "GT": "0/1",
+        "href": "https://maestro-resources.s3.amazonaws.com/IGV_temp/chr1%3A169888699.png",
+        "schema_version": "1",
+        "date_created": "2020-06-22T19:03:58.624738+00:00",
+        "file": "GAPFIPZSZYEK",
+        "annotation_id": "NA12878_sample:064dc6d1-12e2-4423-be07-4f0c5fe91636:GAPFIPZSZYEK",
+        "CALL_INFO": "NA12878_sample"
+    },
+    {
+        "variant": "1f3c6a42-d33d-41e9-9122-d4743e2ff87a",
+        "QUAL": 1810.12,
+        "last_modified": {
+            "date_modified": "2020-07-14T00:56:42.017785+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "DP": 64,
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "samplegeno": [
+            {
+                "samplegeno_gt": "A/A",
+                "samplegeno_ad": "37/0",
+                "samplegeno_numgt": "0/0",
+                "samplegeno_sampleid": "NA12877_sample"
+            },
+            {
+                "samplegeno_gt": "A/G",
+                "samplegeno_ad": "27/28",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12878_sample"
+            },
+            {
+                "samplegeno_gt": "A/G",
+                "samplegeno_ad": "29/35",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12879_sample"
+            }
+        ],
+        "PL": "1014,0,815",
+        "GQ": 99,
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "in review",
+        "AD": "29,35",
+        "uuid": "fcb8bb7b-518a-4895-afe5-503301b31c86",
+        "GT": "0/1",
+        "href": "https://maestro-resources.s3.amazonaws.com/IGV_temp/chr1%3A169888699.png",
+        "schema_version": "1",
+        "date_created": "2020-06-22T18:52:04.648470+00:00",
+        "file": "GAPFIPZSZYEK",
+        "annotation_id": "NA12879_sample:1f3c6a42-d33d-41e9-9122-d4743e2ff87a:GAPFIPZSZYEK",
+        "CALL_INFO": "NA12879_sample"
+    },
+    {
+        "variant": "453f89f3-c130-4d65-aa9e-41c0bdde82dc",
+        "QUAL": 1330.12,
+        "last_modified": {
+            "date_modified": "2020-07-14T00:56:59.538451+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "DP": 49,
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "samplegeno": [
+            {
+                "samplegeno_gt": "C/C",
+                "samplegeno_ad": "41/0",
+                "samplegeno_numgt": "0/0",
+                "samplegeno_sampleid": "NA12877_sample"
+            },
+            {
+                "samplegeno_gt": "C/T",
+                "samplegeno_ad": "24/25",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12878_sample"
+            },
+            {
+                "samplegeno_gt": "C/T",
+                "samplegeno_ad": "33/23",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12879_sample"
+            }
+        ],
+        "PL": "722,0,666",
+        "GQ": 99,
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "in review",
+        "AD": "24,25",
+        "uuid": "f37b50ce-de0a-4def-baf7-5a5a50d3c281",
+        "GT": "0/1",
+        "href": "https://maestro-resources.s3.amazonaws.com/IGV_temp/chr1%3A169888699.png",
+        "schema_version": "1",
+        "date_created": "2020-06-22T18:51:46.673782+00:00",
+        "file": "GAPFIPZSZYEK",
+        "annotation_id": "NA12878_sample:453f89f3-c130-4d65-aa9e-41c0bdde82dc:GAPFIPZSZYEK",
+        "CALL_INFO": "NA12878_sample"
+    },
+    {
+        "variant": "71f4c690-be97-4e3c-a057-2b175b0c59e7",
+        "QUAL": 4201.94,
+        "last_modified": {
+            "date_modified": "2020-07-14T00:55:51.463588+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "DP": 57,
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "samplegeno": [
+            {
+                "samplegeno_gt": "A/G",
+                "samplegeno_ad": "20/37",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12877_sample"
+            },
+            {
+                "samplegeno_gt": "A/G",
+                "samplegeno_ad": "25/32",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12878_sample"
+            },
+            {
+                "samplegeno_gt": "G/G",
+                "samplegeno_ad": "0/63",
+                "samplegeno_numgt": "1/1",
+                "samplegeno_sampleid": "NA12879_sample"
+            }
+        ],
+        "PL": "921,0,688",
+        "GQ": 99,
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "in review",
+        "AD": "25,32",
+        "uuid": "dc4839c9-40e8-425f-b560-885dd68164f8",
+        "GT": "0/1",
+        "href": "https://maestro-resources.s3.amazonaws.com/IGV_temp/chr1%3A169888699.png",
+        "schema_version": "1",
+        "date_created": "2020-06-22T18:53:02.790252+00:00",
+        "file": "GAPFIPZSZYEK",
+        "annotation_id": "NA12878_sample:71f4c690-be97-4e3c-a057-2b175b0c59e7:GAPFIPZSZYEK",
+        "CALL_INFO": "NA12878_sample"
+    },
+    {
+        "variant": "451c90e5-6314-41d3-95d1-081fabba1309",
+        "QUAL": 2737.91,
+        "last_modified": {
+            "date_modified": "2020-07-14T00:57:09.868496+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "DP": 49,
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "samplegeno": [
+            {
+                "samplegeno_gt": "C/C",
+                "samplegeno_ad": "0/49",
+                "samplegeno_numgt": "1/1",
+                "samplegeno_sampleid": "NA12877_sample"
+            },
+            {
+                "samplegeno_gt": "T/T",
+                "samplegeno_ad": "38/0",
+                "samplegeno_numgt": "0/0",
+                "samplegeno_sampleid": "NA12878_sample"
+            },
+            {
+                "samplegeno_gt": "T/C",
+                "samplegeno_ad": "26/37",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12879_sample"
+            }
+        ],
+        "PL": "1682,147,0",
+        "GQ": 99,
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "in review",
+        "AD": "0,49",
+        "uuid": "d93b8b43-17fe-4670-80db-96012bd33076",
+        "GT": "1/1",
+        "href": "https://maestro-resources.s3.amazonaws.com/IGV_temp/chr1%3A169888699.png",
+        "schema_version": "1",
+        "date_created": "2020-06-22T18:51:33.673193+00:00",
+        "file": "GAPFIPZSZYEK",
+        "annotation_id": "NA12877_sample:451c90e5-6314-41d3-95d1-081fabba1309:GAPFIPZSZYEK",
+        "CALL_INFO": "NA12877_sample"
+    },
+    {
+        "variant": "c3a12ffc-ad7c-4441-870c-89e3c803ec11",
+        "QUAL": 2552.91,
+        "last_modified": {
+            "date_modified": "2020-07-14T00:57:10.358039+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "DP": 50,
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "samplegeno": [
+            {
+                "samplegeno_gt": "T/T",
+                "samplegeno_ad": "0/50",
+                "samplegeno_numgt": "1/1",
+                "samplegeno_sampleid": "NA12877_sample"
+            },
+            {
+                "samplegeno_gt": "G/G",
+                "samplegeno_ad": "39/0",
+                "samplegeno_numgt": "0/0",
+                "samplegeno_sampleid": "NA12878_sample"
+            },
+            {
+                "samplegeno_gt": "G/T",
+                "samplegeno_ad": "30/29",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12879_sample"
+            }
+        ],
+        "PL": "1738,150,0",
+        "GQ": 99,
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "in review",
+        "AD": "0,50",
+        "uuid": "c9620ff1-1d72-4de3-a32e-30883db3f9ba",
+        "GT": "1/1",
+        "href": "https://maestro-resources.s3.amazonaws.com/IGV_temp/chr1%3A169888699.png",
+        "schema_version": "1",
+        "date_created": "2020-06-22T18:51:33.389069+00:00",
+        "file": "GAPFIPZSZYEK",
+        "annotation_id": "NA12877_sample:c3a12ffc-ad7c-4441-870c-89e3c803ec11:GAPFIPZSZYEK",
+        "CALL_INFO": "NA12877_sample"
+    },
+    {
+        "variant": "f5148fe2-55b9-4b9e-be61-ec0b7815e52b",
+        "QUAL": 757.25,
+        "last_modified": {
+            "date_modified": "2020-07-14T00:57:10.586332+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "DP": 69,
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "samplegeno": [
+            {
+                "samplegeno_gt": "C/A",
+                "samplegeno_ad": "40/29",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12877_sample"
+            },
+            {
+                "samplegeno_gt": "C/C",
+                "samplegeno_ad": "37/0",
+                "samplegeno_numgt": "0/0",
+                "samplegeno_sampleid": "NA12878_sample"
+            },
+            {
+                "samplegeno_gt": "C/C",
+                "samplegeno_ad": "39/0",
+                "samplegeno_numgt": "0/0",
+                "samplegeno_sampleid": "NA12879_sample"
+            }
+        ],
+        "PL": "766,0,1138",
+        "GQ": 99,
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "in review",
+        "AD": "40,29",
+        "uuid": "b7d02fd0-dbc4-4538-97aa-15ce979d19d6",
+        "GT": "0/1",
+        "href": "https://maestro-resources.s3.amazonaws.com/IGV_temp/chr1%3A169888699.png",
+        "schema_version": "1",
+        "date_created": "2020-06-22T18:51:33.171326+00:00",
+        "file": "GAPFIPZSZYEK",
+        "annotation_id": "NA12877_sample:f5148fe2-55b9-4b9e-be61-ec0b7815e52b:GAPFIPZSZYEK",
+        "CALL_INFO": "NA12877_sample"
+    },
+    {
+        "variant": "684cd444-02c2-4332-b195-bd85f93611c9",
+        "QUAL": 553.25,
+        "last_modified": {
+            "date_modified": "2020-07-14T00:57:40.516803+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "DP": 36,
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "samplegeno": [
+            {
+                "samplegeno_gt": "C/T",
+                "samplegeno_ad": "16/20",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12877_sample"
+            },
+            {
+                "samplegeno_gt": "C/C",
+                "samplegeno_ad": "34/0",
+                "samplegeno_numgt": "0/0",
+                "samplegeno_sampleid": "NA12878_sample"
+            },
+            {
+                "samplegeno_gt": "C/C",
+                "samplegeno_ad": "40/0",
+                "samplegeno_numgt": "0/0",
+                "samplegeno_sampleid": "NA12879_sample"
+            }
+        ],
+        "PL": "562,0,448",
+        "GQ": 99,
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "in review",
+        "AD": "16,20",
+        "uuid": "a7bcc417-af2f-421c-ab02-be81da35c7b8",
+        "GT": "0/1",
+        "href": "https://maestro-resources.s3.amazonaws.com/IGV_temp/chr1%3A169888699.png",
+        "schema_version": "1",
+        "date_created": "2020-06-22T18:51:01.114085+00:00",
+        "file": "GAPFIPZSZYEK",
+        "annotation_id": "NA12877_sample:684cd444-02c2-4332-b195-bd85f93611c9:GAPFIPZSZYEK",
+        "CALL_INFO": "NA12877_sample"
+    },
+    {
+        "variant": "453f89f3-c130-4d65-aa9e-41c0bdde82dc",
+        "QUAL": 1330.12,
+        "last_modified": {
+            "date_modified": "2020-07-14T00:56:59.333436+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "DP": 56,
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "samplegeno": [
+            {
+                "samplegeno_gt": "C/C",
+                "samplegeno_ad": "41/0",
+                "samplegeno_numgt": "0/0",
+                "samplegeno_sampleid": "NA12877_sample"
+            },
+            {
+                "samplegeno_gt": "C/T",
+                "samplegeno_ad": "24/25",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12878_sample"
+            },
+            {
+                "samplegeno_gt": "C/T",
+                "samplegeno_ad": "33/23",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12879_sample"
+            }
+        ],
+        "PL": "619,0,979",
+        "GQ": 99,
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "in review",
+        "AD": "33,23",
+        "uuid": "86330730-4ac1-42e4-b6a2-40987d97caac",
+        "GT": "0/1",
+        "href": "https://maestro-resources.s3.amazonaws.com/IGV_temp/chr1%3A169888699.png",
+        "schema_version": "1",
+        "date_created": "2020-06-22T18:51:46.712033+00:00",
+        "file": "GAPFIPZSZYEK",
+        "annotation_id": "NA12879_sample:453f89f3-c130-4d65-aa9e-41c0bdde82dc:GAPFIPZSZYEK",
+        "CALL_INFO": "NA12879_sample"
+    },
+    {
+        "variant": "451c90e5-6314-41d3-95d1-081fabba1309",
+        "QUAL": 2737.91,
+        "last_modified": {
+            "date_modified": "2020-07-14T00:57:09.751855+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "DP": 63,
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "samplegeno": [
+            {
+                "samplegeno_gt": "C/C",
+                "samplegeno_ad": "0/49",
+                "samplegeno_numgt": "1/1",
+                "samplegeno_sampleid": "NA12877_sample"
+            },
+            {
+                "samplegeno_gt": "T/T",
+                "samplegeno_ad": "38/0",
+                "samplegeno_numgt": "0/0",
+                "samplegeno_sampleid": "NA12878_sample"
+            },
+            {
+                "samplegeno_gt": "T/C",
+                "samplegeno_ad": "26/37",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12879_sample"
+            }
+        ],
+        "PL": "1072,0,713",
+        "GQ": 99,
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "in review",
+        "AD": "26,37",
+        "uuid": "78c7fe87-2ba1-4440-a35e-1df15c935af5",
+        "GT": "0/1",
+        "href": "https://maestro-resources.s3.amazonaws.com/IGV_temp/chr1%3A169888699.png",
+        "schema_version": "1",
+        "date_created": "2020-06-22T18:51:33.710483+00:00",
+        "file": "GAPFIPZSZYEK",
+        "annotation_id": "NA12879_sample:451c90e5-6314-41d3-95d1-081fabba1309:GAPFIPZSZYEK",
+        "CALL_INFO": "NA12879_sample"
+    },
+    {
+        "variant": "b445d4e3-698d-494c-b5d8-23db33727451",
+        "QUAL": 805.25,
+        "last_modified": {
+            "date_modified": "2020-07-14T00:57:10.458662+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "DP": 68,
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "samplegeno": [
+            {
+                "samplegeno_gt": "C/T",
+                "samplegeno_ad": "38/30",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12877_sample"
+            },
+            {
+                "samplegeno_gt": "C/C",
+                "samplegeno_ad": "40/0",
+                "samplegeno_numgt": "0/0",
+                "samplegeno_sampleid": "NA12878_sample"
+            },
+            {
+                "samplegeno_gt": "C/C",
+                "samplegeno_ad": "40/0",
+                "samplegeno_numgt": "0/0",
+                "samplegeno_sampleid": "NA12879_sample"
+            }
+        ],
+        "PL": "814,0,1073",
+        "GQ": 99,
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "in review",
+        "AD": "38,30",
+        "uuid": "73228ecc-3550-4283-8e24-7cce40ac3105",
+        "GT": "0/1",
+        "href": "https://maestro-resources.s3.amazonaws.com/IGV_temp/chr1%3A169888699.png",
+        "schema_version": "1",
+        "date_created": "2020-06-22T18:51:33.267462+00:00",
+        "file": "GAPFIPZSZYEK",
+        "annotation_id": "NA12877_sample:b445d4e3-698d-494c-b5d8-23db33727451:GAPFIPZSZYEK",
+        "CALL_INFO": "NA12877_sample"
+    },
+    {
+        "variant": "e64384b7-acf9-41bf-af94-47f7e3361153",
+        "QUAL": 1594.12,
+        "last_modified": {
+            "date_modified": "2020-07-14T00:56:07.369678+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "DP": 56,
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "samplegeno": [
+            {
+                "samplegeno_gt": "A/A",
+                "samplegeno_ad": "40/0",
+                "samplegeno_numgt": "0/0",
+                "samplegeno_sampleid": "NA12877_sample"
+            },
+            {
+                "samplegeno_gt": "A/G",
+                "samplegeno_ad": "20/31",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12878_sample"
+            },
+            {
+                "samplegeno_gt": "A/G",
+                "samplegeno_ad": "31/25",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12879_sample"
+            }
+        ],
+        "PL": "691,0,907",
+        "GQ": 99,
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "in review",
+        "AD": "31,25",
+        "uuid": "61ac1fed-1b41-4f15-b391-13dc3cc0a5f8",
+        "GT": "0/1",
+        "href": "https://maestro-resources.s3.amazonaws.com/IGV_temp/chr1%3A169888699.png",
+        "schema_version": "1",
+        "date_created": "2020-06-22T18:52:42.987680+00:00",
+        "file": "GAPFIPZSZYEK",
+        "annotation_id": "NA12879_sample:e64384b7-acf9-41bf-af94-47f7e3361153:GAPFIPZSZYEK",
+        "CALL_INFO": "NA12879_sample"
+    },
+    {
+        "variant": "1f3c6a42-d33d-41e9-9122-d4743e2ff87a",
+        "QUAL": 1810.12,
+        "last_modified": {
+            "date_modified": "2020-07-14T00:56:42.185213+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "DP": 55,
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "samplegeno": [
+            {
+                "samplegeno_gt": "A/A",
+                "samplegeno_ad": "37/0",
+                "samplegeno_numgt": "0/0",
+                "samplegeno_sampleid": "NA12877_sample"
+            },
+            {
+                "samplegeno_gt": "A/G",
+                "samplegeno_ad": "27/28",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12878_sample"
+            },
+            {
+                "samplegeno_gt": "A/G",
+                "samplegeno_ad": "29/35",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12879_sample"
+            }
+        ],
+        "PL": "807,0,773",
+        "GQ": 99,
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "in review",
+        "AD": "27,28",
+        "uuid": "5257c2e5-932b-43fe-84a5-a97faae082f7",
+        "GT": "0/1",
+        "href": "https://maestro-resources.s3.amazonaws.com/IGV_temp/chr1%3A169888699.png",
+        "schema_version": "1",
+        "date_created": "2020-06-22T18:52:04.584936+00:00",
+        "file": "GAPFIPZSZYEK",
+        "annotation_id": "NA12878_sample:1f3c6a42-d33d-41e9-9122-d4743e2ff87a:GAPFIPZSZYEK",
+        "CALL_INFO": "NA12878_sample"
+    },
+    {
+        "variant": "acaaf4cf-a22c-403f-8776-f23f674e9f07",
+        "QUAL": 3063.91,
+        "last_modified": {
+            "date_modified": "2020-07-14T00:57:09.981200+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "DP": 63,
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "samplegeno": [
+            {
+                "samplegeno_gt": "A/A",
+                "samplegeno_ad": "0/62",
+                "samplegeno_numgt": "1/1",
+                "samplegeno_sampleid": "NA12877_sample"
+            },
+            {
+                "samplegeno_gt": "G/G",
+                "samplegeno_ad": "38/0",
+                "samplegeno_numgt": "0/0",
+                "samplegeno_sampleid": "NA12878_sample"
+            },
+            {
+                "samplegeno_gt": "G/A",
+                "samplegeno_ad": "30/33",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12879_sample"
+            }
+        ],
+        "PL": "958,0,843",
+        "GQ": 99,
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "in review",
+        "AD": "30,33",
+        "uuid": "4a872f92-b762-465b-bd7c-fee82f6f15ba",
+        "GT": "0/1",
+        "href": "https://maestro-resources.s3.amazonaws.com/IGV_temp/chr1%3A169888699.png",
+        "schema_version": "1",
+        "date_created": "2020-06-22T18:51:33.593542+00:00",
+        "file": "GAPFIPZSZYEK",
+        "annotation_id": "NA12879_sample:acaaf4cf-a22c-403f-8776-f23f674e9f07:GAPFIPZSZYEK",
+        "CALL_INFO": "NA12879_sample"
+    },
+    {
+        "variant": "71f4c690-be97-4e3c-a057-2b175b0c59e7",
+        "QUAL": 4201.94,
+        "last_modified": {
+            "date_modified": "2020-07-14T00:55:51.592444+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "DP": 57,
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "samplegeno": [
+            {
+                "samplegeno_gt": "A/G",
+                "samplegeno_ad": "20/37",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12877_sample"
+            },
+            {
+                "samplegeno_gt": "A/G",
+                "samplegeno_ad": "25/32",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12878_sample"
+            },
+            {
+                "samplegeno_gt": "G/G",
+                "samplegeno_ad": "0/63",
+                "samplegeno_numgt": "1/1",
+                "samplegeno_sampleid": "NA12879_sample"
+            }
+        ],
+        "PL": "1105,0,524",
+        "GQ": 99,
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "in review",
+        "AD": "20,37",
+        "uuid": "3f88c253-aa3a-4620-b119-07ca9df8e961",
+        "GT": "0/1",
+        "href": "https://maestro-resources.s3.amazonaws.com/IGV_temp/chr1%3A169888699.png",
+        "schema_version": "1",
+        "date_created": "2020-06-22T18:53:02.749227+00:00",
+        "file": "GAPFIPZSZYEK",
+        "annotation_id": "NA12877_sample:71f4c690-be97-4e3c-a057-2b175b0c59e7:GAPFIPZSZYEK",
+        "CALL_INFO": "NA12877_sample"
+    },
+    {
+        "variant": "c3a12ffc-ad7c-4441-870c-89e3c803ec11",
+        "QUAL": 2552.91,
+        "last_modified": {
+            "date_modified": "2020-07-14T00:57:10.219059+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "DP": 59,
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "samplegeno": [
+            {
+                "samplegeno_gt": "T/T",
+                "samplegeno_ad": "0/50",
+                "samplegeno_numgt": "1/1",
+                "samplegeno_sampleid": "NA12877_sample"
+            },
+            {
+                "samplegeno_gt": "G/G",
+                "samplegeno_ad": "39/0",
+                "samplegeno_numgt": "0/0",
+                "samplegeno_sampleid": "NA12878_sample"
+            },
+            {
+                "samplegeno_gt": "G/T",
+                "samplegeno_ad": "30/29",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12879_sample"
+            }
+        ],
+        "PL": "831,0,855",
+        "GQ": 99,
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "in review",
+        "AD": "30,29",
+        "uuid": "3ba912aa-c978-4ce2-9058-ed9b61243450",
+        "GT": "0/1",
+        "href": "https://maestro-resources.s3.amazonaws.com/IGV_temp/chr1%3A169888699.png",
+        "schema_version": "1",
+        "date_created": "2020-06-22T18:51:33.440491+00:00",
+        "file": "GAPFIPZSZYEK",
+        "annotation_id": "NA12879_sample:c3a12ffc-ad7c-4441-870c-89e3c803ec11:GAPFIPZSZYEK",
+        "CALL_INFO": "NA12879_sample"
+    },
+    {
+        "variant": "e64384b7-acf9-41bf-af94-47f7e3361153",
+        "QUAL": 1594.12,
+        "last_modified": {
+            "date_modified": "2020-07-14T00:56:07.483672+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "DP": 51,
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "samplegeno": [
+            {
+                "samplegeno_gt": "A/A",
+                "samplegeno_ad": "40/0",
+                "samplegeno_numgt": "0/0",
+                "samplegeno_sampleid": "NA12877_sample"
+            },
+            {
+                "samplegeno_gt": "A/G",
+                "samplegeno_ad": "20/31",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12878_sample"
+            },
+            {
+                "samplegeno_gt": "A/G",
+                "samplegeno_ad": "31/25",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12879_sample"
+            }
+        ],
+        "PL": "914,0,542",
+        "GQ": 99,
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "in review",
+        "AD": "20,31",
+        "uuid": "3418e2b9-f3f7-42dc-a812-3543795e87e3",
+        "GT": "0/1",
+        "href": "https://maestro-resources.s3.amazonaws.com/IGV_temp/chr1%3A169888699.png",
+        "schema_version": "1",
+        "date_created": "2020-06-22T18:52:42.917874+00:00",
+        "file": "GAPFIPZSZYEK",
+        "annotation_id": "NA12878_sample:e64384b7-acf9-41bf-af94-47f7e3361153:GAPFIPZSZYEK",
+        "CALL_INFO": "NA12878_sample"
+    },
+    {
+        "variant": "acaaf4cf-a22c-403f-8776-f23f674e9f07",
+        "QUAL": 3063.91,
+        "last_modified": {
+            "date_modified": "2020-07-14T00:57:10.094058+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "DP": 62,
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "samplegeno": [
+            {
+                "samplegeno_gt": "A/A",
+                "samplegeno_ad": "0/62",
+                "samplegeno_numgt": "1/1",
+                "samplegeno_sampleid": "NA12877_sample"
+            },
+            {
+                "samplegeno_gt": "G/G",
+                "samplegeno_ad": "38/0",
+                "samplegeno_numgt": "0/0",
+                "samplegeno_sampleid": "NA12878_sample"
+            },
+            {
+                "samplegeno_gt": "G/A",
+                "samplegeno_ad": "30/33",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA12879_sample"
+            }
+        ],
+        "PL": "2122,187,0",
+        "GQ": 99,
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "in review",
+        "AD": "0,62",
+        "uuid": "0970db00-92e5-4ee8-bda1-5796b6d2b747",
+        "GT": "1/1",
+        "href": "https://maestro-resources.s3.amazonaws.com/IGV_temp/chr1%3A169888699.png",
+        "schema_version": "1",
+        "date_created": "2020-06-22T18:51:33.546853+00:00",
+        "file": "GAPFIPZSZYEK",
+        "annotation_id": "NA12877_sample:acaaf4cf-a22c-403f-8776-f23f674e9f07:GAPFIPZSZYEK",
+        "CALL_INFO": "NA12877_sample"
+    }
+]

@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
 """Load collections and determine the order."""
-import mimetypes
-import structlog
-import magic
+
 import json
+import magic
+import mimetypes
 import os
+import structlog
+import webtest
 
 from base64 import b64encode
 from past.builtins import basestring
@@ -14,7 +16,6 @@ from pyramid.paster import get_app
 from pyramid.response import Response
 from pyramid.view import view_config
 from snovault.util import debug_log
-from webtest import TestApp
 from .server_defaults import add_last_modified
 
 
@@ -30,21 +31,10 @@ def includeme(config):
 
 # order of items references with linkTo in a field in  'required' in schemas
 ORDER = [
-    'user',
     'project',
     'institution',
+    'user',
     'file_format',
-    'phenotype',
-    'disorder',
-    # 'variant_consequence',
-    # 'variant', # links to ^ variant_consequence
-    # 'variant_sample', # links to ^ variant
-    'cohort',
-    'family',
-    'individual',
-    'case',
-    'report',
-    'sample',
     'workflow',
 ]
 
@@ -109,7 +99,7 @@ def load_data_view(context, request):
     post_only = request.json.get('post_only', False)
     app = get_app(config_uri, 'app')
     environ = {'HTTP_ACCEPT': 'application/json', 'REMOTE_USER': 'TEST'}
-    testapp = TestApp(app, environ)
+    testapp = webtest.TestApp(app, environ)
     # expected response
     request.response.status = 200
     result = {
@@ -483,7 +473,7 @@ def load_data(app, indir='inserts', docsdir=None, overwrite=False,
         'HTTP_ACCEPT': 'application/json',
         'REMOTE_USER': 'TEST',
     }
-    testapp = TestApp(app, environ)
+    testapp = webtest.TestApp(app, environ)
     # load master-inserts by default
     if indir != 'master-inserts' and use_master_inserts:
         master_inserts = resource_filename('encoded', 'tests/data/master-inserts/')

@@ -1,0 +1,112 @@
+[
+    {
+        "email": "koray_kirli@hms.harvard.edu",
+        "schema_version": "1",
+        "last_name": "Kirli",
+        "timezone": "US/Eastern",
+        "first_name": "Koray",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "status": "current",
+        "uuid": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "groups": [
+            "admin"
+        ],
+        "date_created": "2020-07-06T23:45:41.961031+00:00",
+        "submits_for": [
+            "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989"
+        ],
+        "last_modified": {
+            "date_modified": "2020-07-09T01:14:21.818871+00:00",
+            "modified_by": "3202fd57-44d2-44fb-a131-afb1e43d8ae5"
+        },
+        "role": "scientist"
+    },
+    {
+        "email": "danavuzman@gmail.com",
+        "schema_version": "1",
+        "last_name": "Vuzman",
+        "timezone": "US/Eastern",
+        "first_name": "Dana",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "status": "current",
+        "uuid": "986b362f-4eb6-4a9c-8173-3ab267307e3a",
+        "groups": [
+            "admin"
+        ],
+        "date_created": "2020-07-06T23:45:41.459967+00:00",
+        "submits_for": [
+            "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989"
+        ],
+        "last_modified": {
+            "date_modified": "2020-07-09T01:14:21.529805+00:00",
+            "modified_by": "3202fd57-44d2-44fb-a131-afb1e43d8ae5"
+        },
+        "role": "director"
+    },
+    {
+        "email": "burak_alver@hms.harvard.edu",
+        "schema_version": "1",
+        "last_name": "Alver",
+        "timezone": "US/Eastern",
+        "first_name": "Burak",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "status": "current",
+        "uuid": "45524d43-01b5-4b71-94c6-32d2d09c1111",
+        "groups": [
+            "admin"
+        ],
+        "date_created": "2020-07-06T23:45:42.239432+00:00",
+        "submits_for": [
+            "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989"
+        ],
+        "last_modified": {
+            "date_modified": "2020-07-09T01:14:21.982000+00:00",
+            "modified_by": "3202fd57-44d2-44fb-a131-afb1e43d8ae5"
+        },
+        "role": "scientist"
+    },
+    {
+        "email": "loadxl@hms.harvard.edu",
+        "schema_version": "1",
+        "last_name": "loadxl",
+        "timezone": "US/Pacific",
+        "last_modified": {
+            "date_modified": "2020-07-09T01:14:21.467431+00:00",
+            "modified_by": "3202fd57-44d2-44fb-a131-afb1e43d8ae5"
+        },
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "status": "current",
+        "uuid": "3202fd57-44d2-44fb-a131-afb1e43d8ae5",
+        "groups": [
+            "admin"
+        ],
+        "date_created": "2020-01-28T00:00:00.000000+00:00",
+        "submits_for": [
+            "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989"
+        ],
+        "first_name": "loadxl",
+        "role": "other"
+    },
+    {
+        "email": "duplexa@gmail.com",
+        "schema_version": "1",
+        "last_name": "Lee",
+        "timezone": "US/Eastern",
+        "first_name": "Soo",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "status": "current",
+        "uuid": "1d524d43-01b5-4b71-94c6-32d2d09c8323",
+        "groups": [
+            "admin"
+        ],
+        "date_created": "2020-07-06T23:45:42.016499+00:00",
+        "submits_for": [
+            "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989"
+        ],
+        "last_modified": {
+            "date_modified": "2020-07-09T01:14:21.853880+00:00",
+            "modified_by": "3202fd57-44d2-44fb-a131-afb1e43d8ae5"
+        },
+        "role": "scientist"
+    }
+]

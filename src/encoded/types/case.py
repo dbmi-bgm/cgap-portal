@@ -4,7 +4,10 @@ from snovault import (
     load_schema,
     display_title_schema
 )
-from .base import Item
+from .base import (
+    Item,
+    get_item_or_none
+)
 
 
 @collection(
@@ -69,6 +72,7 @@ class Case(Item):
         "individual.samples.files.quality_metric.url",
         "individual.samples.files.quality_metric.status",
         "individual.samples.completed_processes",
+        "individual.families.uuid",
         "sample_processing.analysis_type",
         "sample_processing.last_modified.*",
         "sample_processing.families.family_id",
@@ -106,7 +110,9 @@ class Case(Item):
         "sample_processing.sample_processed_files.processed_files.quality_metric.status",
         "sample_processing.completed_processes",
         "report.last_modified.*",
-        "report.status"
+        "report.status",
+        "family.accession",
+        "cohort.filter_set.*"
     ]
 
     @calculated_property(schema={
@@ -119,3 +125,88 @@ class Case(Item):
             return title + ' ({})'.format(accession)
         else:
             return accession
+
+    @calculated_property(schema={
+        "title": "Sample",
+        "description": "Primary sample used for this case",
+        "type": "string",
+        "linkTo": 'Sample'
+    })
+    def sample(self, request, individual=None, sample_processing=None):
+        if not individual or not sample_processing:
+            return {}
+        ind_data = get_item_or_none(request, individual, 'individuals')
+        sp_data = get_item_or_none(request, sample_processing, 'sample-processings')
+        ind_samples = ind_data.get('samples', [])
+        sp_samples = sp_data.get('samples', [])
+        intersection = [i for i in ind_samples if i in sp_samples]
+        if not intersection:
+            return {}
+        if len(intersection) != 1:
+            # To Do we need to invoke a validation error
+            return {}
+        return intersection[0]
+
+    @calculated_property(schema={
+        "title": "Secondary Families",
+        "description": "Secondary families associated with the case",
+        "type": "array",
+        "items": {
+            "title": "Secondary Family",
+            "type": "string",
+            "linkTo": "Family"
+        }
+    })
+    def secondary_families(self, request, individual=None, family=None):
+        if not individual or not family:
+            return []
+        ind_data = get_item_or_none(request, individual, 'individuals', frame='embedded')
+        if not ind_data:
+            return []
+        individual_families = ind_data.get('families', [])
+        secondary_families = [i['@id'] for i in individual_families if i['@id'] != family]
+        return secondary_families
+
+    @calculated_property(schema={
+        "title": "VCF File",
+        "description": "VCF file that will be used in variant digestion",
+        "type": "string",
+        "linkTo": "File"
+    })
+    def vcf_file(self, request, sample_processing=None):
+        vcf_file = {}
+        """Map the vcf file to be digested
+        Currently we have a single file on processed_files field of sample processing"""
+        if not sample_processing:
+            return vcf_file
+        sp_data = get_item_or_none(request, sample_processing, 'sample-processings')
+        if not sp_data:
+            return vcf_file
+        files = sp_data.get('processed_files', [])
+        if not files:
+            return vcf_file
+        vcf_file = files[0]
+        return vcf_file
+
+    @calculated_property(schema={
+        "title": "Filter Set Flag add-on",
+        "description": "tag to be added to the filter set flag for limiting search to varants/sample variants from this case",
+        "type": "string"
+    })
+    def filter_set_flag_addon(self, request, sample_processing=None, individual=None):
+        """use vcf file and sample accessions to limit variant/variantsample to this case"""
+        if not individual or not sample_processing:
+            return ''
+        sample = self.sample(request, individual, sample_processing)
+        if not sample:
+            return ''
+        vcf = self.vcf_file(request, sample_processing)
+        if not vcf:
+            return ''
+        sp_data = get_item_or_none(request, sample, 'sample')
+        sample_read_group = sp_data.get('bam_sample_id', '')
+        if not sample_read_group:
+            return ''
+        vcf_acc = vcf.split('/')[2]
+        add_on = "&CALL_INFO={}&file={}".format(sample_read_group, vcf_acc)
+        return add_on

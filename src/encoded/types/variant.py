@@ -1,5 +1,16 @@
 import json
+import boto3
+import pytz
+import datetime
 from pyramid.view import view_config
+from pyramid.settings import asbool
+from urllib.parse import (
+    parse_qs,
+    urlparse,
+)
+from pyramid.httpexceptions import (
+    HTTPTemporaryRedirect
+)
 from snovault.util import debug_log
 from encoded.util import resolve_file_path
 from snovault import (
@@ -11,6 +22,9 @@ from .base import (
     Item,
     get_item_or_none,
 )
+
+
+ANNOTATION_ID = 'annotation_id'
 
 
 def extend_embedded_list(embedded_list, fd, typ, prefix=None):
@@ -69,13 +83,25 @@ def build_variant_sample_embedded_list():
     properties={
         'title': 'Variants',
         'description': 'List of all variants'
-    })
+    },
+    unique_key='variant.annotation_id')
 class Variant(Item):
     """ Variant class """
 
     item_type = 'variant'
     schema = load_schema('encoded:schemas/variant.json')
     embedded_list = build_variant_embedded_list()
+
+    @classmethod
+    def create(cls, registry, uuid, properties, sheets=None):
+        """ Sets the annotation_id field on this variant prior to passing on. """
+        properties[ANNOTATION_ID] = 'chr%s:%s%s_%s' % (  # XXX: replace _ with > ('>' char is restricted)
+            properties['CHROM'],
+            properties['POS'],
+            properties['REF'],
+            properties['ALT']
+        )
+        return super().create(registry, uuid, properties, sheets)
 
     @calculated_property(schema={
         "title": "Display Title",
@@ -91,13 +117,24 @@ class Variant(Item):
     properties={
         'title': 'Variants (sample)',
         'description': 'List of all variants with sample specific information',
-    })
+    },
+    unique_key='variant_sample.annotation_id')
 class VariantSample(Item):
     """Class for variant samples."""
 
     item_type = 'variant_sample'
     schema = load_schema('encoded:schemas/variant_sample.json')
     embedded_list = build_variant_sample_embedded_list()
+
+    @classmethod
+    def create(cls, registry, uuid, properties, sheets=None):
+        """ Sets the annotation_id field on this variant_sample prior to passing on. """
+        properties[ANNOTATION_ID] = '%s:%s:%s' % (
+            properties['CALL_INFO'],
+            properties['variant'],
+            properties['file']
+        )
+        return super().create(registry, uuid, properties, sheets)
 
     @calculated_property(schema={
         "title": "Display Title",
@@ -138,23 +175,45 @@ class VariantSample(Item):
     def AF(self, AD):
         if AD:
             ref, alt = AD.split(',')
+            try:
+                denominator = int(ref) + int(alt)
+            except Exception:
+                raise ValueError('Bad value for AD (used to calculate AF): %s' % AD)
+            if denominator == 0:
+                return 0.0
             return round(int(alt) / (int(ref) + int(alt)), 3)  # round to 3 digits
         return 0.0
 
 
-@view_config(name='variant_ingestion', context=Variant.Collection,
-             request_method='POST', permission='add')
-@debug_log
-def variant_ingestion(context, request):
+@view_config(name='download', context=VariantSample, request_method='GET',
+             permission='view', subpath_segments=[0, 1])
+def download(context, request):
+    """ Navigates to the IGV snapshot hrf
+        TODO: test (this is a rough sketch) + enable
     """
-        Variant Ingestion API
-
-        Processes all, or none, of a vcf file based on the loaded annotation
-        fields and on the variant and variant sample schemas
-    """
-    # TODO: Implement this when we need it, though practically speaking it probably takes too long to do this way
-    # get vcf file
-    # build the variants, post a dry run
-    # if dry run is successful, run for real
-    # catch potential errors
-    pass
+    return {
+        'notification': 'Failure',
+        'detail': 'Route not enabled yet'
+    }
+    # properties = context.upgrade_properties()
+    # s3_client = boto3.client('s3')
+    # params_to_get_obj = {
+    #     'Bucket': request.registry.settings.get('file_wfout_bucket'),
+    #     'Key': properties['href']
+    # }
+    # location = s3_client.generate_presigned_url(
+    #     ClientMethod='get_object',
+    #     Params=params_to_get_obj,
+    #     ExpiresIn=36*60*60
+    # )
+    #
+    # if asbool(request.params.get('soft')):
+    #     expires = int(parse_qs(urlparse(location).query)['Expires'][0])
+    #     return {
+    #         '@type': ['SoftRedirect'],
+    #         'location': location,
+    #         'expires': datetime.datetime.fromtimestamp(expires, pytz.utc).isoformat(),
+    #     }
+    #
+    # # 307 redirect specifies to keep original method
+    # raise HTTPTemporaryRedirect(location=location)

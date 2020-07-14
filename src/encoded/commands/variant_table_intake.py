@@ -36,11 +36,12 @@ class MappingTableParser(object):
                           ('variant_sample', EMBEDDED_VARIANT_SAMPLE_FIELDS)]
     NAME_FIELD = 'field_name'
 
-    def __init__(self, _mp, schema):
+    def __init__(self, _mp, schema, skip_embeds=False):
         self.mapping_table = _mp
         self.annotation_field_schema = json.load(open(schema, 'r'))
         self.version, self.date, self.fields = self.read_mp_meta()
-        self.provision_embeds()
+        if not skip_embeds:  # if calling from gene, do not wipe variant/variant_sample embeds
+            self.provision_embeds()
 
     @staticmethod
     def process_fields(row):
@@ -414,8 +415,8 @@ class MappingTableParser(object):
         """
         schema['$schema'] = 'http://json-schema.org/draft-04/schema#'
         schema['type'] = 'object'
-        schema['required'] = ['institution', 'project', 'CHROM', 'POS', 'REF', 'ALT']  # for display_title
-        schema['identifyingProperties'] = ['uuid', 'aliases']
+        schema['required'] = ['institution', 'project']  # for display_title
+        schema['identifyingProperties'] = ['uuid', 'aliases', 'annotation_id']
         schema['additionalProperties'] = False
         schema['mixinProperties'] = [
             { "$ref": "mixins.json#/schema_version" },
@@ -429,6 +430,35 @@ class MappingTableParser(object):
             { "$ref": "mixins.json#/static_embeds" }
         ]
 
+    @staticmethod
+    def add_variant_required_fields(schema):
+        schema['required'].extend(['CHROM', 'REF', 'ALT', 'POS'])
+
+    @staticmethod
+    def add_variant_sample_required_fields(schema):
+        schema['required'].extend(['CALL_INFO', 'variant', 'file'])
+
+    @staticmethod
+    def add_identifier_field(props):
+        """ Adds the 'annotation_id' field, the unique_key constraint on variant/variant_sample which
+            is an alias for the display_title.
+        """
+        props['annotation_id'] = {
+            'title': 'Annotation ID',
+            'type': 'string',
+            'uniqueKey': True
+        }
+
+    @staticmethod
+    def add_extra_variant_sample_columns(cols):
+        """ Adds href, variant display title to columns (fields not on mapping table) """
+        cols['bam_snapshot'] = {
+            'title': 'Genome Snapshot'
+        }
+        cols['variant.display_title'] = {
+            'title': 'Variant'
+        }
+
     def generate_variant_sample_schema(self, sample_props, cols, facs, variant_cols, variant_facs):
         """ Builds the variant_sample.json schema based on sample_props. Will also add variant columns and
             facets since this information is embedded
@@ -441,21 +471,30 @@ class MappingTableParser(object):
         """
         schema = {}
         self.add_default_schema_fields(schema)
+        self.add_variant_sample_required_fields(schema)
         schema['title'] = 'Sample Variant'
         schema['description'] = "Schema for variant info for sample"
         schema['id'] = '/profiles/variant_sample.json'
         schema['properties'] = sample_props
         schema['properties']['schema_version'] = {'default': '1'}
-        schema['properties']['sample'] = {  # link to single sample
-            'title': 'Sample',
-            'type': 'string',
-            'linkTo': 'Sample'
-        }
         schema['properties']['variant'] = {  # link to single variant
             'title': 'Variant',
             'type': 'string',
             'linkTo': 'Variant'
         }
+        schema['properties']['file'] = {  # NOT a linkTo as the ID is sufficient for filtering
+            'title': 'File',
+            'description': 'String Accession of the vcf file used in digestion',
+            'type': 'string'
+        }
+        schema['properties']['bam_snapshot'] = {
+            'title': 'Genome Snapshot',
+            'description': 'Link to Genome Snapshot Image',
+            'type': 'string'
+        }
+
+        # adds annotation ID field, effectively making display_title a primary key constraint
+        self.add_identifier_field(schema['properties'])
 
         # helper so variant facets work on variant sample
         # XXX: Behavior needs testing
@@ -469,6 +508,7 @@ class MappingTableParser(object):
         variant_facs = format_variant_cols_or_facs(variant_facs)
         cols.update(variant_cols)  # add variant stuff since we are embedding this info
         facs.update(variant_facs)
+        self.add_extra_variant_sample_columns(cols)
         schema['columns'] = cols
         schema['facets'] = facs
         logger.info('Built variant_sample schema')
@@ -487,6 +527,7 @@ class MappingTableParser(object):
         """
         schema = {}
         self.add_default_schema_fields(schema)
+        self.add_variant_required_fields(schema)
         schema['title'] = 'Variants'
         schema['description'] = "Schema for variants"
         schema['id'] = '/profiles/variant.json'
@@ -494,6 +535,8 @@ class MappingTableParser(object):
         schema['properties']['schema_version'] = {'default': '1'}
         schema['facets'] = facs
         schema['columns'] = cols
+        # adds annotation ID field, effectively making display_title a primary key constraint
+        self.add_identifier_field(schema['properties'])
         logger.info('Build variant schema')
         return schema
 
