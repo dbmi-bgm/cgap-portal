@@ -69,12 +69,12 @@ def sample_info():
 @pytest.fixture
 def example_rows():
     return [
-        {'individual id': '456', 'analysis id': '1111', 'relation to proband': 'proband'},
-        {'individual id': '123', 'analysis id': '1111', 'relation to proband': 'mother'},
-        {'individual id': '789', 'analysis id': '1111', 'relation to proband': 'father'},
-        {'individual id': '456', 'analysis id': '2222', 'relation to proband': 'proband'},
-        {'individual id': '555', 'analysis id': '3333', 'relation to proband': 'proband'},
-        {'individual id': '546', 'analysis id': '3333', 'relation to proband': 'mother'}
+        {'individual id': '456', 'analysis id': '1111', 'relation to proband': 'proband', 'workup type': 'WGS'},
+        {'individual id': '123', 'analysis id': '1111', 'relation to proband': 'mother', 'workup type': 'WGS'},
+        {'individual id': '789', 'analysis id': '1111', 'relation to proband': 'father', 'workup type': 'WGS'},
+        {'individual id': '456', 'analysis id': '2222', 'relation to proband': 'proband', 'workup type': 'WGS'},
+        {'individual id': '555', 'analysis id': '3333', 'relation to proband': 'proband', 'workup type': 'WES'},
+        {'individual id': '546', 'analysis id': '3333', 'relation to proband': 'mother', 'workup type': 'WES'}
     ]
 
 
@@ -118,6 +118,16 @@ def test_create_families(example_rows):
     assert fams['1111'] == 'family-456'
     assert fams['2222'] == 'family-456'
     assert fams['3333'] == 'family-555'
+
+
+def test_get_analysis_types(example_rows):
+    a_types = get_analysis_types(example_rows)
+    assert a_types['1111'] == 'WGS-Trio'
+    assert a_types['2222'] == 'WGS'
+    assert a_types['3333'] == 'WES-Group'
+    example_rows[1]['workup type'] = 'WES'
+    new_a_types = get_analysis_types(example_rows)
+    assert new_a_types['1111'] is None
 
 
 def test_fetch_individual_metadata_new(row_dict, empty_items):
