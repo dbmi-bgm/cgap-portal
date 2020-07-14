@@ -22,6 +22,38 @@
         "status": {
             "default": "current"
         },
+        "project_roles": {
+            "title": "User Roles for Projects",
+            "description": "Role of user for each project he/she is part of",
+            "type": "array",
+            "permission": "import_items",
+            "items": {
+                "title": "User Role",
+                "type": "object",
+                "properties": {
+                    "Role": {
+                        "title": "Role",
+                        "description": "The role of the user.",
+                        "type": "string",
+                        "enum": [
+                            "clinician",
+                            "scientist",
+                            "developer",
+                            "director",
+                            "project_member",
+                            "patient",
+                            "other",
+                            "unknown"
+                        ]
+                    },
+                    "Project": {
+                        "title": "Project",
+                        "type": "string",
+                        "linkTo": "Project"
+                    }
+                }
+            }
+        },
         "submits_for": {
             "title": "Submits for",
             "description": "Institutions user is authorized to submit data for.",
@@ -29,6 +61,7 @@
             "permission": "import_items",
             "lookup": 70,
             "uniqueItems": true,
+            "notes": "This property is obsolete, and should be taken out with next permission implementation",
             "items": {
                 "description": "An institution user is authorized to submit for.",
                 "type": "string",
