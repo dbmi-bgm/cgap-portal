@@ -108,9 +108,10 @@ def xls_to_json(xls_data, project, institution):
         'case': {}, 'report': {}, 'reports': []
     }
     specimen_ids = {}
+    family_dict = create_families(rows)
     for row in rows:
         indiv_alias = '{}:individual-{}'.format(project['name'], row['individual id'])
-        fam_alias = '{}:family-{}'.format(project['name'], row['family id'])
+        fam_alias = '{}:{}'.format(project['name'], family_dict[row['analysis id']])
         # sp_alias = '{}:sampleproc-{}'.format(project['name'], row['specimen id'])
         # create items for Individual
         items = fetch_individual_metadata(row, items, indiv_alias, institution['name'])
@@ -143,6 +144,12 @@ def xls_to_json(xls_data, project, institution):
             val2['institution'] = institution['@id']
 
     return items
+
+
+def create_families(rows):
+    proband_rows = [row for row in rows if row.get('relation to proband').lower() == 'proband']
+    fams = {row.get('analysis id'): 'family-{}'.format(row.get('individual id')) for row in proband_rows}
+    return fams
 
 
 def fetch_individual_metadata(row, items, indiv_alias, inst_name):
@@ -372,9 +379,11 @@ def compare_fields(profile, aliases, json_item, db_item):
             else:
                 val = [v for v in json_item[field]]
             if sorted(val) != sorted(db_item.get(field, [])):
-                if len(val) == 1 and val not in db_item.get(field, []):
+                # if len(val) == 1 and val not in db_item.get(field, []):
+                #     continue
+                if all(v in db_item.get(field, []) for v in val):
                     continue
-                new_val = db_item.get(field, [])
+                new_val = [item for item in db_item.get(field, [])]
                 new_val.extend(val)
                 to_patch[field] = list(set(new_val))
     return to_patch
