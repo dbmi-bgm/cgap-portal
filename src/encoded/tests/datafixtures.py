@@ -442,10 +442,10 @@ def proband_case(testapp, project, institution, fam, sample_proc_fam):
         'project': project['@id'],
         'institution': institution['@id'],
         'family': fam['@id'],
-        'individual': 'GAPSAPROBAND',
+        'individual': 'GAPIDPROBAND',
         'sample_processing': sample_proc_fam['@id']
     }
-    res = testapp.post_json('/sample_processing', data).json['@graph'][0]
+    res = testapp.post_json('/case', data).json['@graph'][0]
     return res
 
 
@@ -455,10 +455,10 @@ def mother_case(testapp, project, institution, fam, sample_proc_fam):
         'project': project['@id'],
         'institution': institution['@id'],
         'family': fam['@id'],
-        'individual': 'GAPSAMOTHER1',
+        'individual': 'GAPIDMOTHER1',
         'sample_processing': sample_proc_fam['@id']
     }
-    res = testapp.post_json('/sample_processing', data).json['@graph'][0]
+    res = testapp.post_json('/case', data).json['@graph'][0]
     return res
 
 
