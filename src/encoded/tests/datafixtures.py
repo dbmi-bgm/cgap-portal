@@ -439,6 +439,7 @@ def sample_proc_fam(testapp, project, institution, fam):
 @pytest.fixture
 def proband_case(testapp, project, institution, fam, sample_proc_fam):
     data = {
+        "accession": "GAPCAP4E4GMG",
         'project': project['@id'],
         'institution': institution['@id'],
         'family': fam['@id'],
@@ -452,6 +453,7 @@ def proband_case(testapp, project, institution, fam, sample_proc_fam):
 @pytest.fixture
 def mother_case(testapp, project, institution, fam, sample_proc_fam):
     data = {
+        "accession": "GAPCAU1K3F5A",
         'project': project['@id'],
         'institution': institution['@id'],
         'family': fam['@id'],

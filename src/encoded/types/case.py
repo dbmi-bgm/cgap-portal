@@ -120,7 +120,8 @@ class Case(Item):
         "description": "A calculated title for every object in 4DN",
         "type": "string"
     })
-    def display_title(self, accession, title=None):
+    def display_title(self, request, accession, individual=None, family=None, sample_processing=None):
+        title = self.case_title(request, individual, family, sample_processing)
         if title:
             return title + ' ({})'.format(accession)
         else:
