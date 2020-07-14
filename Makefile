@@ -24,6 +24,7 @@ macpoetry-install:  # Same as 'poetry install' except that on OSX Catalina, an e
 	bin/macpoetry-install
 
 configure:  # does any pre-requisite installs
+	pip install --upgrade pip
 	pip install poetry
 
 macbuild:  # builds for Catalina

@@ -2,9 +2,10 @@ import boto3
 import datetime
 import json
 import logging
-import pytz
 import os
+import pytz
 import structlog
+import transaction
 
 from botocore.exceptions import ClientError
 from copy import deepcopy
@@ -15,6 +16,7 @@ from pyramid.httpexceptions import (
 )
 from pyramid.response import Response
 from pyramid.settings import asbool
+from pyramid.threadlocal import get_current_request
 from pyramid.traversal import resource_path
 from pyramid.view import view_config
 from dcicutils.env_utils import CGAP_ENV_WEBPROD
@@ -32,6 +34,7 @@ from snovault.crud_views import (
     item_edit,
 )
 from snovault.elasticsearch import ELASTIC_SEARCH
+from snovault.invalidation import add_to_indexing_queue
 from snovault.schema_utils import schema_validator
 from snovault.util import debug_log
 from snovault.validators import (
@@ -53,7 +56,7 @@ from .base import (
     Item,
     ALLOW_SUBMITTER_ADD,
     get_item_or_none,
-    # lab_award_attribution_embed_list
+    # lab_award_attribution_embed_list,
 )
 
 
@@ -89,13 +92,12 @@ def show_upload_credentials(request=None, context=None, status=None):
 
 
 def external_creds(bucket, key, name=None, profile_name=None):
-    '''
+    """
     if name is None, we want the link to s3 but no need to generate
     an access token.  This is useful for linking metadata to files that
     already exist on s3.
-    '''
+    """
 
-    import logging
     logging.getLogger('boto3').setLevel(logging.CRITICAL)
     credentials = {}
     if name is not None:
@@ -340,9 +342,6 @@ class File(Item):
                         target_relation.get('relationship_type') == rev_switch):
                         break
                 else:
-                    import transaction
-                    from pyramid.threadlocal import get_current_request
-                    from snovault.invalidation import add_to_indexing_queue
                     # Get the current request in order to queue the forced
                     # update for indexing. This is bad form.
                     # Don't do this anywhere else, please!

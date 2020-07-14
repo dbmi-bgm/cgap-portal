@@ -3,12 +3,14 @@ import pytest
 import mock
 
 from datetime import (datetime, timedelta)
+from dcicutils.misc_utils import Retry
 from pyramid.httpexceptions import HTTPBadRequest
 from snovault import TYPES, COLLECTIONS
 from snovault.elasticsearch import create_mapping
 from encoded.search.lucene_builder import LuceneBuilder
 from snovault.elasticsearch.indexer_utils import get_namespaced_index
 from snovault.util import add_default_embeds
+from webtest import AppError
 
 # Use workbook fixture from BDD tests (including elasticsearch)
 from .workbook_fixtures import app, workbook
@@ -497,6 +499,12 @@ def test_collection_actions_filtered_by_permission(workbook, testapp, anontestap
     assert len(res.json['@graph']) == 0
 
 
+@Retry.retry_allowed('test_index_data_workbook.check', wait_seconds=1, retries_allowed=5)
+def check_item_type(client, item_type):
+    # This might get a 404 if not enough time has elapsed, so try a few times before giving up.
+    return client.get('/%s?limit=all' % item_type, status=[200, 301]).follow()
+
+
 def test_index_data_workbook(app, workbook, testapp, indexer_testapp, htmltestapp):
     es = app.registry['elasticsearch']
     # we need to reindex the collections to make sure numbers are correct
@@ -532,7 +540,7 @@ def test_index_data_workbook(app, workbook, testapp, indexer_testapp, htmltestap
         # check items in search result individually
         search_url = '/%s?limit=all' % item_type
         print("search_url=", search_url)
-        res = testapp.get(search_url, status=[200, 301]).follow()
+        res = check_item_type(client=testapp, item_type=item_type)
         for item_res in res.json.get('@graph', []):
             index_view_res = es.get(index=namespaced_index, doc_type=item_type,
                                     id=item_res['uuid'])['_source']
@@ -596,7 +604,6 @@ def test_search_with_principals_allowed_fails(workbook, anontestapp):
         XXX IMPORTANT: Since we do permissions in a restrictive way, this works - if our permissions structure is
         modified, it is possible this behavior will need to be revisited -Will 4-24-2020
     """
-    from webtest import AppError
     with pytest.raises(AppError):
         anontestapp.get('/search/?type=Item&principals_allowed.view=group.PERMISSION_YOU_DONT_HAVE')
     with pytest.raises(AppError):

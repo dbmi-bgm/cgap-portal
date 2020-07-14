@@ -1,7 +1,10 @@
-import json
+import hashlib
+# import json
 import logging  # not used in Fourfront, but used in CGAP? -kmp 8-Apr-2020
+import mimetypes
 import netaddr
 import os
+import pkg_resources
 import subprocess
 import sys
 
@@ -10,9 +13,13 @@ from dcicutils.log_utils import set_logging
 from dcicutils.env_utils import get_mirror_env_from_context
 from dcicutils.ff_utils import get_health_page
 from pyramid.config import Configurator
+from pyramid_localroles import LocalRolesAuthorizationPolicy
 from pyramid.settings import asbool
 from snovault.app import STATIC_MAX_AGE, session, json_from_path, configure_dbsession, changelogs, json_asset
+from snovault.elasticsearch import APP_FACTORY
+from webtest import TestApp
 from .ingestion_listener import INGESTION_QUEUE
+from .loadxl import load_all
 
 
 if sys.version_info.major < 3:
@@ -24,10 +31,8 @@ BEANSTALK_ENV_PATH = "/opt/python/current/env"
 
 
 def static_resources(config):
-    from pkg_resources import resource_filename
-    import mimetypes
     mimetypes.init()
-    mimetypes.init([resource_filename('encoded', 'static/mime.types')])
+    mimetypes.init([pkg_resources.resource_filename('encoded', 'static/mime.types')])
     config.add_static_view('static', 'static', cache_max_age=STATIC_MAX_AGE)
     config.add_static_view('profiles', 'schemas', cache_max_age=STATIC_MAX_AGE)
 
@@ -67,8 +72,6 @@ def static_resources(config):
 
 
 def load_workbook(app, workbook_filename, docsdir):
-    from .loadxl import load_all
-    from webtest import TestApp
     environ = {
         'HTTP_ACCEPT': 'application/json',
         'REMOTE_USER': 'IMPORT',
@@ -84,7 +87,6 @@ APP_VERSION_REGISTRY_KEY = 'snovault.app_version'
 
 
 def app_version(config):
-    import hashlib
     if not config.registry.settings.get(APP_VERSION_REGISTRY_KEY):
         # we update version as part of deployment process `deploy_beanstalk.py`
         # but if we didn't check env then git
@@ -142,12 +144,10 @@ def main(global_config, **local_config):
         settings['mirror_health'] = get_health_page(ff_env=mirror)
     config = Configurator(settings=settings)
 
-    from snovault.elasticsearch import APP_FACTORY
     config.registry[APP_FACTORY] = main  # used by mp_indexer
     config.include(app_version)
 
     config.include('pyramid_multiauth')  # must be before calling set_authorization_policy
-    from pyramid_localroles import LocalRolesAuthorizationPolicy
     # Override default authz policy set by pyramid_multiauth
     config.set_authorization_policy(LocalRolesAuthorizationPolicy())
     config.include(session)
