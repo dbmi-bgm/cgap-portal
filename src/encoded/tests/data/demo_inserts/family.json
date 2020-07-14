@@ -1,6 +1,7 @@
 [
     {
         "title": "Ashkenazim Trio",
+        "family_id": "Ashkenazim",
         "project": "f01ff5be-a72d-43bd-afcf-174fa9dcd282",
         "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
         "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
@@ -22,6 +23,7 @@
     },
     {
         "timestamp": "2019-11-18T16:38:11.442813+00:00",
+        "family_id": "Platinum",
         "title": "Platinum Genomes",
         "last_modified": {
             "date_modified": "2020-07-07T15:43:51.301802+00:00",

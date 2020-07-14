@@ -6,7 +6,8 @@
         "project",
         "CALL_INFO",
         "variant",
-        "file"
+        "file",
+        "AD"
     ],
     "identifyingProperties": [
         "uuid",

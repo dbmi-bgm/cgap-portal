@@ -417,6 +417,57 @@ def fam(testapp, project, female_individual, institution, grandpa, mother, fathe
 
 
 @pytest.fixture
+def sample_proc_fam(testapp, project, institution, fam):
+    data = {
+        'project': project['@id'],
+        'institution': institution['@id'],
+        'analysis_type': "WGS-Group",
+        'samples': [
+            "GAPSAPROBAND",
+            "GAPSAFATHER1",
+            "GAPSAMOTHER1",
+            "GAPSABROTHER",
+            "GAPSAGRANDPA",
+            "GAPSAGRANDMA",
+            "GAPSAHALFSIS",
+            "GAPSAUNCLE01",
+            "GAPSACOUSIN1"
+            ],
+        'families': [fam['@id']]
+    }
+    res = testapp.post_json('/sample_processing', data).json['@graph'][0]
+    return res
+
+
+@pytest.fixture
+def proband_case(testapp, project, institution, fam, sample_proc_fam):
+    data = {
+        "accession": "GAPCAP4E4GMG",
+        'project': project['@id'],
+        'institution': institution['@id'],
+        'family': fam['@id'],
+        'individual': 'GAPIDPROBAND',
+        'sample_processing': sample_proc_fam['@id']
+    }
+    res = testapp.post_json('/case', data).json['@graph'][0]
+    return res
+
+
+@pytest.fixture
+def mother_case(testapp, project, institution, fam, sample_proc_fam):
+    data = {
+        "accession": "GAPCAU1K3F5A",
+        'project': project['@id'],
+        'institution': institution['@id'],
+        'family': fam['@id'],
+        'individual': 'GAPIDMOTHER1',
+        'sample_processing': sample_proc_fam['@id']
+    }
+    res = testapp.post_json('/case', data).json['@graph'][0]
+    return res
+
+
+@pytest.fixture
 def sample_f(testapp, project, institution, female_individual):
     data = {
         'project': project['@id'],
