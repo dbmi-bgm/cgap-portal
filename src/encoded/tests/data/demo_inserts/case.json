@@ -89,23 +89,6 @@
         "report": "8dd51b60-2d65-4e74-ac86-08ff9159aaaa"
     },
     {
-        "sample_processing": "8dd51b60-2d65-4e74-ac86-08ff9159abcd",
-        "description": "Benchmarking case for Platinum Proband only",
-        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
-        "family": "21f2af73-2c2e-4101-bbfb-bb2754f302ad",
-        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
-        "status": "released",
-        "aliases": [
-            "hms-dbmi:platinum_single_NA12878"
-        ],
-        "cohort": "cc7d83a2-6886-4ca0-9402-7c49734cf879",
-        "uuid": "81278096-7c10-4c5a-8ac3-5e3014e8abcd",
-        "schema_version": "1",
-        "individual": "11c429a1-bcb8-4ac6-8f71-be6fb5064ad9",
-        "accession": "GAPCALNEABCD",
-        "report": "8dd51b60-2d65-4e74-ac86-08ff9159abcd"
-    },
-    {
         "sample_processing": "0a2d5fc7-2bd5-4289-a59c-40f7c633214c",
         "description": "Benchmarking case for Ashkenazim Trio Proband",
         "project": "f01ff5be-a72d-43bd-afcf-174fa9dcd282",
@@ -149,5 +132,22 @@
         },
         "individual": "608e2cf2-91d4-4d9d-9091-dce1a1912bb1",
         "accession": "GAPCAT6SM934"
+    },
+    {
+        "sample_processing": "8dd51b60-2d65-4e74-ac86-08ff9159abcd",
+        "description": "Benchmarking case for Platinum Proband only",
+        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
+        "family": "21f2af73-2c2e-4101-bbfb-bb2754f302ad",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "status": "released",
+        "aliases": [
+            "hms-dbmi:platinum_single_NA12878"
+        ],
+        "cohort": "cc7d83a2-6886-4ca0-9402-7c49734cf879",
+        "uuid": "81278096-7c10-4c5a-8ac3-5e3014e8abcd",
+        "schema_version": "1",
+        "individual": "11c429a1-bcb8-4ac6-8f71-be6fb5064ad9",
+        "accession": "GAPCALNEABCD",
+        "report": "0a2d5fc7-2bd5-4289-a59c-40f7c633abcd"
     }
 ]

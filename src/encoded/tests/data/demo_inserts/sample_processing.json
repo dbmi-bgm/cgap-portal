@@ -32,30 +32,6 @@
     },
     {
         "families": [
-            "21f2af73-2c2e-4101-bbfb-bb2754f302ad"
-        ],
-        "processed_files": [
-            "bd12fe4d-eb8d-4bd5-9e56-c2ecc9baabcd"
-        ],
-        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
-        "analysis_type": "WGS",
-        "samples": [
-            "f0add14e-42b8-4f6f-9867-22506b45bd27"
-        ],
-        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-        "status": "released",
-        "aliases": [
-            "cgap:msa_GAPSAER8DDOY"
-        ],
-        "uuid": "8dd51b60-2d65-4e74-ac86-08ff9159abcd",
-        "completed_processes": [
-            "WGS PartII V13"
-        ],
-        "schema_version": "1"
-    },
-    {
-        "families": [
             "5e079547-1575-4e4c-acd1-6aa74b931993"
         ],
         "processed_files": [
@@ -84,5 +60,29 @@
             "date_modified": "2020-07-07T15:50:02.293439+00:00",
             "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
         }
+    },
+    {
+        "families": [
+            "21f2af73-2c2e-4101-bbfb-bb2754f302ad"
+        ],
+        "processed_files": [
+            "bd12fe4d-eb8d-4bd5-9e56-c2ecc9baabcd"
+        ],
+        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
+        "analysis_type": "WGS",
+        "samples": [
+            "f0add14e-42b8-4f6f-9867-22506b45bd27"
+        ],
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "released",
+        "aliases": [
+            "cgap:msa_GAPSAER8DDOY"
+        ],
+        "uuid": "8dd51b60-2d65-4e74-ac86-08ff9159abcd",
+        "completed_processes": [
+            "WGS PartII V13"
+        ],
+        "schema_version": "1"
     }
 ]
