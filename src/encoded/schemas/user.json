@@ -31,7 +31,7 @@
                 "title": "User Role",
                 "type": "object",
                 "properties": {
-                    "Role": {
+                    "role": {
                         "title": "Role",
                         "description": "The role of the user.",
                         "type": "string",
@@ -46,7 +46,7 @@
                             "unknown"
                         ]
                     },
-                    "Project": {
+                    "project": {
                         "title": "Project",
                         "type": "string",
                         "linkTo": "Project"
