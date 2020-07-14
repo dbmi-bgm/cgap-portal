@@ -1,0 +1,60 @@
+[
+    {
+        "title": "Ashkenazim Trio",
+        "project": "f01ff5be-a72d-43bd-afcf-174fa9dcd282",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "released",
+        "proband": "648c6261-e34a-45ff-8995-86b7bee4175f",
+        "accession": "GAPFAMCRLK6O",
+        "uuid": "5e079547-1575-4e4c-acd1-6aa74b931993",
+        "members": [
+            "648c6261-e34a-45ff-8995-86b7bee4175f",
+            "608e2cf2-91d4-4d9d-9091-dce1a1912bb1",
+            "82ac8825-a526-4b21-8fe0-468b9fc4e620"
+        ],
+        "schema_version": "1",
+        "date_created": "2020-07-07T02:42:23.599451+00:00",
+        "last_modified": {
+            "date_modified": "2020-07-07T15:43:51.008247+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        }
+    },
+    {
+        "timestamp": "2019-11-18T16:38:11.442813+00:00",
+        "title": "Platinum Genomes",
+        "last_modified": {
+            "date_modified": "2020-07-07T15:43:51.301802+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "pedigree_source": "Proband app 2.0.0",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "released",
+        "proband": "11c429a1-bcb8-4ac6-8f71-be6fb5064ad9",
+        "accession": "GAPFAWY7YCIR",
+        "uuid": "21f2af73-2c2e-4101-bbfb-bb2754f302ad",
+        "members": [
+            "4684702a-3639-4073-8db4-d44eb8b31135",
+            "b8e17d98-e364-43c6-919c-a739afa619ad",
+            "9d5ed31c-489d-4dc6-8bdd-1c818a779a6c",
+            "826de967-ae04-43d0-ab13-75a0c992aaad",
+            "ab4328a2-d6ae-47a8-b0a9-93f5318a65ce",
+            "4ac7399a-a417-4565-bc62-f34cd73c2a15",
+            "878237f3-6643-40b2-a9c4-e48421ae3302",
+            "0dca2d65-387e-4042-945a-459e1a334507",
+            "4846fe87-237b-44e4-adbb-315cd7e7f005",
+            "6fd4ff52-9674-4e67-8641-92731372c2db",
+            "3adced93-a305-43d5-983b-0d8dfa5d1bb7",
+            "34bcf545-bc25-4288-9f0a-b1d8297ce306",
+            "e39da58c-664e-4e08-aa71-4217adc379d8",
+            "7b48eacc-826b-4ecd-9104-9918b0bb5b81",
+            "11c429a1-bcb8-4ac6-8f71-be6fb5064ad9",
+            "d246d630-62be-4607-af9a-56d97b885331",
+            "4dfca9c9-5f93-48b5-823b-1fd0afaebdae"
+        ],
+        "schema_version": "1",
+        "date_created": "2020-07-07T05:57:06.897372+00:00",
+        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d"
+    }
+]
