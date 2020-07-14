@@ -36,6 +36,7 @@ ORDER = [
     'user',
     'file_format',
     'workflow',
+    'variant'
 ]
 
 IS_ATTACHMENT = [
