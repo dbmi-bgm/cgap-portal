@@ -133,13 +133,14 @@ class RecentCasesSection extends React.PureComponent {
             const { name: projectName, '@id' : projectID, display_title: projectTitle } = project;
             const onCasesWithReportsToggle = (e) => this.toggleCasesWithReports(projectName);
             const casesWithReportsOnly = !projectsWithAllCases[projectName];
-            const searchHref = "/search/?type=Case&project.name=" + encodeURIComponent(projectName) + (casesWithReportsOnly ? "&report.uuid!=No+value" : "");
+            const allCasesHref = "/search/?type=Case&project.name=" + encodeURIComponent(projectName);
+            const searchHrefFull = allCasesHref + (casesWithReportsOnly ? "&report.uuid!=No+value" : "");
             return (
                 <div className="recent-cases-table-section mt-36 mb-36" data-project={projectName} key={projectName}>
                     <div className="d-flex align-items-center mb-1">
                         <h4 className="text-400 flex-fill mb-0 mt-0">
                             <span className="text-300 mr-06">Recent Cases from</span>
-                            <a href={projectID}>{ projectTitle }</a>
+                            <a href={allCasesHref} data-tip="View all Cases for this Project.">{ projectTitle }</a>
                         </h4>
                         <div className="toggle-reports">
                             <Checkbox onChange={onCasesWithReportsToggle} checked={casesWithReportsOnly} labelClassName="mb-0 text-400 text-small">
@@ -147,7 +148,7 @@ class RecentCasesSection extends React.PureComponent {
                             </Checkbox>
                         </div>
                     </div>
-                    <EmbeddedCaseSearchTable facets={null} searchHref={searchHref} />
+                    <EmbeddedCaseSearchTable facets={null} searchHref={searchHrefFull} />
                 </div>
             );
 
