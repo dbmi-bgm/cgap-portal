@@ -555,7 +555,9 @@ def file_formats(testapp, institution, project):
                    "valid_item_types": ["FileProcessed", "FileReference"]},
         'bed': {"standard_file_extension": "bed.gz",
                 "extrafile_formats": ['beddb'],
-                "valid_item_types": ["FileProcessed", "FileReference"]}
+                "valid_item_types": ["FileProcessed", "FileReference"]},
+        'vcf_gz': {"standard_file_extension": "vcf.gz",
+                   "valid_item_types": ["FileProcessed"]}
     }
 
     for eff, info in ef_format_info.items():
@@ -600,6 +602,18 @@ def file_fastq(testapp, institution, project, file_formats):
         'status': 'uploaded',  # avoid s3 upload codepath
     }
     return testapp.post_json('/file_fastq', item).json['@graph'][0]
+
+
+@pytest.fixture
+def file_vcf(testapp, institution, project, file_formats):
+    item = {
+        'file_format': file_formats.get('vcf_gz').get('@id'),
+        'md5sum': 'd41d8cd9f00b204e9800998ecf84211',
+        'institution': institution['@id'],
+        'project': project['@id'],
+        'status': 'uploaded',  # avoid s3 upload codepath
+    }
+    return testapp.post_json('/file_processed', item).json['@graph'][0]
 
 
 RED_DOT = """data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUA
