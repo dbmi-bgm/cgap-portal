@@ -1,3 +1,12 @@
+import mimetypes
+import structlog
+
+from base64 import b64encode
+from datetime import datetime
+from dateutil.relativedelta import relativedelta
+from pyramid.httpexceptions import HTTPUnprocessableEntity
+from pyramid.paster import get_app
+from pyramid.view import view_config
 from snovault import (
     calculated_property,
     collection,
@@ -7,15 +16,9 @@ from snovault import (
     display_title_schema
 )
 from snovault.util import debug_log
-from .base import (
-    Item,
-    get_item_or_none
-)
-from pyramid.httpexceptions import HTTPUnprocessableEntity
-from pyramid.view import view_config
-from datetime import datetime
-from dateutil.relativedelta import relativedelta
-import structlog
+from webtest import TestApp
+from xml.etree.ElementTree import fromstring
+from .base import Item, get_item_or_none
 
 
 log = structlog.getLogger(__name__)
@@ -573,11 +576,6 @@ def process_pedigree(context, request):
     Raises:
         HTTPUnprocessableEntity: on an error. Extra information may be logged
     """
-    import mimetypes
-    from pyramid.paster import get_app
-    from webtest import TestApp
-    from base64 import b64encode
-    from xml.etree.ElementTree import fromstring
 
     family_item = str(context.uuid)  # used in logging
 

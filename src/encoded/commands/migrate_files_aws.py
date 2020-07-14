@@ -2,6 +2,7 @@
 Update files with AWS metadata
 
 """
+import argparse
 import json
 import logging
 import transaction
@@ -40,7 +41,6 @@ def run(app, files):
 
 
 def main():
-    import argparse
     parser = argparse.ArgumentParser(  # noqa - PyCharm wrongly thinks the formatter_class is specified wrong here.
         description="Migrate files to AWS", epilog=EPILOG,
         formatter_class=argparse.RawDescriptionHelpFormatter,

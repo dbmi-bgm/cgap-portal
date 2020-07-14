@@ -5,19 +5,21 @@ For the development.ini you must supply the paster app name:
     %(prog)s development.ini --app-name app --init --clear
 
 """
-from pkg_resources import resource_filename
-from pyramid.paster import get_app, get_appsettings
 
+import argparse
 import atexit
 import logging
 import os.path
 import select
 import shutil
+import subprocess
 import sys
-try:
-    import subprocess32 as subprocess
-except ImportError:
-    import subprocess
+
+from pkg_resources import resource_filename
+from pyramid.paster import get_app, get_appsettings
+from pyramid.path import DottedNameResolver
+from snovault.elasticsearch import create_mapping
+from snovault.tests import elasticsearch_fixture, postgresql_fixture
 
 
 EPILOG = __doc__
@@ -47,8 +49,26 @@ def nginx_server_process(prefix='', echo=False):
     return process
 
 
+def ingestion_listener_process(config_uri, app_name, echo=True):
+    """ Uses Popen to start up the ingestion-listener. """
+    args = [
+        'poetry', 'run', 'ingestion-listener', config_uri, '--app-name', app_name
+    ]
+
+    process = subprocess.Popen(
+        args,
+        close_fds=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+    )
+
+    if echo:
+        print('Starting Ingestion Listener...')
+
+    return process
+
+
 def main():
-    import argparse
     parser = argparse.ArgumentParser(
         description="Run development servers", epilog=EPILOG,
         formatter_class=argparse.RawDescriptionHelpFormatter,
@@ -68,8 +88,6 @@ def main():
     # get the config and see if we want to connect to non-local servers
     config = get_appsettings(args.config_uri, args.app_name)
 
-    from snovault.tests import elasticsearch_fixture, postgresql_fixture
-    from snovault.elasticsearch import create_mapping
     datadir = os.path.abspath(args.datadir)
     pgdata = os.path.join(datadir, 'pgdata')
     esdata = os.path.join(datadir, 'esdata')
@@ -86,7 +104,8 @@ def main():
     postgres = postgresql_fixture.server_process(pgdata, echo=True)
     elasticsearch = elasticsearch_fixture.server_process(esdata, echo=True)
     nginx = nginx_server_process(echo=True)
-    processes = [postgres, elasticsearch, nginx]
+    ingestion_listener = ingestion_listener_process(args.config_uri, args.app_name)
+    processes = [postgres, elasticsearch, nginx, ingestion_listener]
 
 
     @atexit.register
@@ -111,7 +130,6 @@ def main():
         create_mapping.run(app, skip_indexing=True, purge_queue=False)
 
     if args.init and args.load:
-        from pyramid.path import DottedNameResolver
         load_test_data = app.registry.settings.get('load_test_data')
         load_test_data = DottedNameResolver().resolve(load_test_data)
         load_res = load_test_data(app)
