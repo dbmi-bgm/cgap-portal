@@ -109,6 +109,7 @@ def xls_to_json(xls_data, project, institution):
     }
     specimen_ids = {}
     family_dict = create_families(rows)
+    a_types = get_analysis_types(rows)
     for row in rows:
         indiv_alias = '{}:individual-{}'.format(project['name'], row['individual id'])
         fam_alias = '{}:{}'.format(project['name'], family_dict[row['analysis id']])
@@ -126,8 +127,8 @@ def xls_to_json(xls_data, project, institution):
             else:
                 specimen_ids[row['specimen id']] = 1
             analysis_alias = '{}:analysis-{}'.format(project['name'], row['analysis id'])
-            items = fetch_sample_metadata(row, items, indiv_alias, samp_alias,
-                                          analysis_alias, fam_alias, project['name'])
+            items = fetch_sample_metadata(row, items, indiv_alias, samp_alias, analysis_alias,
+                                          fam_alias, project['name'], a_types)
         else:
             print('WARNING: No specimen id present for patient {},'
                   ' sample will not be created.'.format(row['individual id']))
@@ -150,6 +151,26 @@ def create_families(rows):
     proband_rows = [row for row in rows if row.get('relation to proband').lower() == 'proband']
     fams = {row.get('analysis id'): 'family-{}'.format(row.get('individual id')) for row in proband_rows}
     return fams
+
+
+def get_analysis_types(rows):
+    analysis_relations = {}
+    analysis_types = {}
+    for row in rows:
+        analysis_relations.setdefault(row.get('analysis id'), [[], []])
+        analysis_relations[row.get('analysis id')][0].append(row.get('relation to proband', '').lower())
+        analysis_relations[row.get('analysis id')][1].append(row.get('workup type', '').upper())
+    for k, v in analysis_relations.items():
+        if len(list(set(v[1]))) == 1:
+            if len(v[0]) == 1:
+                analysis_types[k] = v[1][0]
+            elif sorted(v[0]) == ['father', 'mother', 'proband']:
+                analysis_types[k] = v[1][0] + '-Trio'
+            else:
+                analysis_types[k] = v[1][0] + '-Group'
+        else:
+            analysis_types[k] = None
+    return analysis_types
 
 
 def fetch_individual_metadata(row, items, indiv_alias, inst_name):
@@ -191,7 +212,7 @@ def fetch_family_metadata(row, items, indiv_alias, fam_alias):
     return new_items
 
 
-def fetch_sample_metadata(row, items, indiv_alias, samp_alias, analysis_alias, fam_alias, proj_name):
+def fetch_sample_metadata(row, items, indiv_alias, samp_alias, analysis_alias, fam_alias, proj_name, analysis_type_dict):
     new_items = items.copy()
     info = {'aliases': [samp_alias], 'files': []}  # TODO: implement creation of file db items
     fields = [
@@ -224,6 +245,8 @@ def fetch_sample_metadata(row, items, indiv_alias, samp_alias, analysis_alias, f
         'samples': [],
         'families': []
     }
+    if row.get('analysis id') in analysis_type_dict:
+        new_sp_item['analysis_type'] = analysis_type_dict[row.get('analysis id')]
     new_items['sample_processing'].setdefault(analysis_alias, new_sp_item)
     new_items['sample_processing'][analysis_alias]['samples'].append(samp_alias)
     if row.get('report required').lower().startswith('y'):
