@@ -3,7 +3,8 @@
     "type": "object",
     "required": [
         "institution",
-        "project"
+        "project",
+        "gene_symbol"
     ],
     "identifyingProperties": [
         "uuid",
