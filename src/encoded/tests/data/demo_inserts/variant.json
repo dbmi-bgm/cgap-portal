@@ -35,7 +35,7 @@
                 ],
                 "vep_canonical": false,
                 "vep_swissprot": "P01023",
-                "vep_polyphen_score": "0.02",
+                "vep_polyphen_score": 0.02,
                 "vep_cds_position": "2998",
                 "vep_domains": [
                     "Gene3D:1.50.10.20",
@@ -378,7 +378,7 @@
                 "vep_canonical": false,
                 "vep_strand": true,
                 "vep_swissprot": "Q8WXG9",
-                "vep_polyphen_score": "0.129",
+                "vep_polyphen_score": 0.129,
                 "vep_cds_position": "12476",
                 "vep_domains": [
                     "Gene3D:2.60.40.2030",
@@ -412,7 +412,7 @@
                 ],
                 "vep_canonical": false,
                 "vep_strand": true,
-                "vep_polyphen_score": "0.642",
+                "vep_polyphen_score": 0.642,
                 "vep_cds_position": "1430",
                 "vep_domains": [
                     "Gene3D:2.60.40.2030",
@@ -669,7 +669,7 @@
                 ],
                 "vep_canonical": false,
                 "vep_swissprot": "O14686",
-                "vep_polyphen_score": "0.014",
+                "vep_polyphen_score": 0.014,
                 "vep_cds_position": "11380",
                 "vep_domains": [
                     "PANTHER:PTHR45888",
@@ -944,7 +944,7 @@
                 ],
                 "vep_canonical": false,
                 "vep_swissprot": "Q7Z333",
-                "vep_polyphen_score": "0",
+                "vep_polyphen_score": 0,
                 "vep_cds_position": "59",
                 "vep_feature_ncbi": "XP_011516710",
                 "vep_ensp": "ENSP00000224140",
@@ -1235,7 +1235,7 @@
                 ],
                 "vep_canonical": false,
                 "vep_swissprot": "P06727",
-                "vep_polyphen_score": "0.019",
+                "vep_polyphen_score": 0.019,
                 "vep_cds_position": "1140",
                 "vep_domains": [
                     "Low_complexity_(Seg):seg",
@@ -2355,7 +2355,7 @@
                 "vep_canonical": false,
                 "vep_strand": true,
                 "vep_swissprot": "Q8WXG9",
-                "vep_polyphen_score": "0.006",
+                "vep_polyphen_score": 0.006,
                 "vep_cds_position": "4939",
                 "vep_domains": [
                     "Gene3D:2.60.40.2030",
@@ -2411,7 +2411,7 @@
                 ],
                 "vep_canonical": false,
                 "vep_strand": true,
-                "vep_polyphen_score": "0.003",
+                "vep_polyphen_score": 0.003,
                 "vep_cds_position": "2230",
                 "vep_domains": [
                     "PANTHER:PTHR46682",
@@ -2677,7 +2677,7 @@
                     "a4d8e291-6993-4250-be4a-0574f4be76e9"
                 ],
                 "vep_canonical": false,
-                "vep_polyphen_score": "0.23",
+                "vep_polyphen_score": 0.23,
                 "vep_cds_position": "1342",
                 "vep_domains": [
                     "Gene3D:2.10.25.10",
@@ -2710,7 +2710,7 @@
                 ],
                 "vep_canonical": false,
                 "vep_swissprot": "P24821",
-                "vep_polyphen_score": "0.491",
+                "vep_polyphen_score": 0.491,
                 "vep_cds_position": "1342",
                 "vep_domains": [
                     "Gene3D:2.10.25.10",
@@ -2742,7 +2742,7 @@
                     "a4d8e291-6993-4250-be4a-0574f4be76e9"
                 ],
                 "vep_canonical": false,
-                "vep_polyphen_score": "0.506",
+                "vep_polyphen_score": 0.506,
                 "vep_cds_position": "1342",
                 "vep_domains": [
                     "Gene3D:2.10.25.10",
@@ -2774,7 +2774,7 @@
                     "a4d8e291-6993-4250-be4a-0574f4be76e9"
                 ],
                 "vep_canonical": false,
-                "vep_polyphen_score": "0.562",
+                "vep_polyphen_score": 0.562,
                 "vep_cds_position": "1342",
                 "vep_domains": [
                     "Gene3D:2.10.25.10",
@@ -2807,7 +2807,7 @@
                 ],
                 "vep_canonical": false,
                 "vep_swissprot": "P24821",
-                "vep_polyphen_score": "0.185",
+                "vep_polyphen_score": 0.185,
                 "vep_cds_position": "1342",
                 "vep_domains": [
                     "Gene3D:2.10.25.10",
@@ -2849,7 +2849,7 @@
                 "vep_sift_score": "0.01",
                 "vep_exon": "2/23",
                 "vep_hgvsp": "ENSP00000442242.1:p.Arg448Gly",
-                "vep_polyphen_score": "0.562",
+                "vep_polyphen_score": 0.562,
                 "vep_domains": [
                     "Gene3D:2.10.25.10",
                     "Pfam:PF18720",
@@ -4401,7 +4401,7 @@
                 "vep_hgvsp": "ENSP00000476690.1:p.Gly19Glu",
                 "vep_amino_acids": "G/E",
                 "vep_exon": "1/1",
-                "vep_polyphen_score": "0",
+                "vep_polyphen_score": 0,
                 "vep_cdna_position": "56",
                 "vep_feature": "ENST00000609748"
             }
@@ -4996,7 +4996,7 @@
                 "vep_canonical": false,
                 "vep_strand": true,
                 "vep_swissprot": "Q09472",
-                "vep_polyphen_score": "0.118",
+                "vep_polyphen_score": 0.118,
                 "vep_cds_position": "631",
                 "vep_domains": [
                     "MobiDB_lite:mobidb-lite",
@@ -5327,7 +5327,7 @@
                 ],
                 "vep_canonical": false,
                 "vep_swissprot": "P11226",
-                "vep_polyphen_score": "0.999",
+                "vep_polyphen_score": 0.999,
                 "vep_cds_position": "161",
                 "vep_domains": [
                     "Pfam:PF01391",
@@ -5585,7 +5585,7 @@
                 ],
                 "vep_canonical": false,
                 "vep_swissprot": "Q9BX63",
-                "vep_polyphen_score": "0.003",
+                "vep_polyphen_score": 0.003,
                 "vep_cds_position": "577",
                 "vep_domains": [
                     "PROSITE_profiles:PS51193",
@@ -5623,7 +5623,7 @@
                 ],
                 "vep_canonical": false,
                 "vep_swissprot": "Q9BX63",
-                "vep_polyphen_score": "0.001",
+                "vep_polyphen_score": 0.001,
                 "vep_cds_position": "577",
                 "vep_domains": [
                     "PROSITE_profiles:PS51193",
@@ -6717,7 +6717,7 @@
                 ],
                 "vep_canonical": false,
                 "vep_swissprot": "Q9NUX5",
-                "vep_polyphen_score": "0.77",
+                "vep_polyphen_score": 0.77,
                 "vep_cds_position": "903",
                 "vep_domains": [
                     "Coiled-coils_(Ncoils):Coil",
@@ -6748,7 +6748,7 @@
                     "a4d8e291-6993-4250-be4a-0574f4be76e9"
                 ],
                 "vep_canonical": false,
-                "vep_polyphen_score": "0.77",
+                "vep_polyphen_score": 0.77,
                 "vep_cds_position": "510",
                 "vep_domains": [
                     "Coiled-coils_(Ncoils):Coil",
@@ -6789,7 +6789,7 @@
                 "vep_sift_score": "0.06",
                 "vep_exon": "11/19",
                 "vep_hgvsp": "ENSP00000397632.2:p.Gln301His",
-                "vep_polyphen_score": "0.77",
+                "vep_polyphen_score": 0.77,
                 "vep_cdna_position": "1358",
                 "vep_feature_ncbi": "NR_003103",
                 "vep_biotype": "nonsense_mediated_decay"
@@ -6814,7 +6814,7 @@
                 "vep_sift_score": "0.01",
                 "vep_exon": "9/11",
                 "vep_hgvsp": "ENSP00000388921.2:p.Gln170His",
-                "vep_polyphen_score": "0.77",
+                "vep_polyphen_score": 0.77,
                 "vep_domains": [
                     "Coiled-coils_(Ncoils):Coil",
                     "PANTHER:PTHR14513",
@@ -6843,7 +6843,7 @@
                 "vep_sift_score": "0.06",
                 "vep_exon": "7/14",
                 "vep_hgvsp": "ENSP00000476506.1:p.Gln301His",
-                "vep_polyphen_score": "0.77",
+                "vep_polyphen_score": 0.77,
                 "vep_cdna_position": "914",
                 "vep_biotype": "nonsense_mediated_decay"
             },
@@ -6867,7 +6867,7 @@
                 "vep_sift_score": "0.01",
                 "vep_exon": "7/16",
                 "vep_hgvsp": "ENSP00000476371.1:p.Gln301His",
-                "vep_polyphen_score": "0.031",
+                "vep_polyphen_score": 0.031,
                 "vep_cdna_position": "914",
                 "vep_biotype": "nonsense_mediated_decay"
             },
@@ -6891,7 +6891,7 @@
                 "vep_sift_score": "0.07",
                 "vep_exon": "11/19",
                 "vep_hgvsp": "ENSP00000476981.1:p.Gln301His",
-                "vep_polyphen_score": "0.77",
+                "vep_polyphen_score": 0.77,
                 "vep_cdna_position": "1659",
                 "vep_biotype": "nonsense_mediated_decay"
             },
@@ -6915,7 +6915,7 @@
                 "vep_amino_acids": "Q/H",
                 "vep_exon": "11/19",
                 "vep_ccds": "CCDS5793.1",
-                "vep_polyphen_score": "0.77",
+                "vep_polyphen_score": 0.77,
                 "vep_domains": [
                     "Coiled-coils_(Ncoils):Coil",
                     "PANTHER:PTHR14513",
@@ -6942,7 +6942,7 @@
                 "vep_hgvsp": "ENSP00000499382.1:p.Gln301His",
                 "vep_amino_acids": "Q/H",
                 "vep_exon": "11/20",
-                "vep_polyphen_score": "0.031",
+                "vep_polyphen_score": 0.031,
                 "vep_cdna_position": "1353",
                 "vep_feature": "ENST00000653274"
             },
@@ -6994,7 +6994,7 @@
                 "vep_hgvsp": "ENSP00000499395.1:p.Gln301His",
                 "vep_amino_acids": "Q/H",
                 "vep_exon": "11/17",
-                "vep_polyphen_score": "0.046",
+                "vep_polyphen_score": 0.046,
                 "vep_domains": [
                     "Coiled-coils_(Ncoils):Coil",
                     "PANTHER:PTHR14513",
@@ -7023,7 +7023,7 @@
                 "vep_amino_acids": "Q/H",
                 "vep_exon": "12/20",
                 "vep_ccds": "CCDS5793.1",
-                "vep_polyphen_score": "0.77",
+                "vep_polyphen_score": 0.77,
                 "vep_domains": [
                     "Coiled-coils_(Ncoils):Coil",
                     "PANTHER:PTHR14513",
@@ -7080,7 +7080,7 @@
                 "vep_hgvsp": "ENSP00000499528.1:p.Gln301His",
                 "vep_amino_acids": "Q/H",
                 "vep_exon": "11/19",
-                "vep_polyphen_score": "0.019",
+                "vep_polyphen_score": 0.019,
                 "vep_cdna_position": "1353",
                 "vep_feature": "ENST00000661898"
             },
@@ -7134,7 +7134,7 @@
                 "vep_amino_acids": "Q/H",
                 "vep_exon": "11/19",
                 "vep_ccds": "CCDS5793.1",
-                "vep_polyphen_score": "0.77",
+                "vep_polyphen_score": 0.77,
                 "vep_domains": [
                     "Coiled-coils_(Ncoils):Coil",
                     "PANTHER:PTHR14513",
@@ -7163,7 +7163,7 @@
                 "vep_amino_acids": "Q/H",
                 "vep_exon": "11/19",
                 "vep_ccds": "CCDS5793.1",
-                "vep_polyphen_score": "0.77",
+                "vep_polyphen_score": 0.77,
                 "vep_domains": [
                     "PANTHER:PTHR14513:SF2",
                     "PANTHER:PTHR14513",
@@ -8313,7 +8313,7 @@
                 "vep_canonical": false,
                 "vep_strand": true,
                 "vep_swissprot": "P03951",
-                "vep_polyphen_score": "0.246",
+                "vep_polyphen_score": 0.246,
                 "vep_cds_position": "854",
                 "vep_domains": [
                     "CDD:cd01100",
@@ -8351,7 +8351,7 @@
                 "vep_canonical": false,
                 "vep_strand": true,
                 "vep_swissprot": "P03951",
-                "vep_polyphen_score": "0.552",
+                "vep_polyphen_score": 0.552,
                 "vep_cds_position": "1016",
                 "vep_domains": [
                     "PDB-ENSP_mappings:5eod.A",
@@ -8399,7 +8399,7 @@
                 ],
                 "vep_canonical": false,
                 "vep_strand": true,
-                "vep_polyphen_score": "0.842",
+                "vep_polyphen_score": 0.842,
                 "vep_cds_position": "464",
                 "vep_domains": [
                     "PROSITE_profiles:PS50948",
@@ -8670,7 +8670,7 @@
                     "23757202~22112818~17935162~23500595~2044609~12655553~11385716~12501224~15557004~18538294~22526846~8889590~21953985~2014036"
                 ],
                 "vep_canonical": false,
-                "vep_polyphen_score": "1",
+                "vep_polyphen_score": 1,
                 "vep_cds_position": "1226",
                 "vep_domains": [
                     "PROSITE_profiles:PS51410",
@@ -8742,7 +8742,7 @@
                 ],
                 "vep_canonical": false,
                 "vep_swissprot": "P00439",
-                "vep_polyphen_score": "1",
+                "vep_polyphen_score": 1,
                 "vep_cds_position": "1241",
                 "vep_domains": [
                     "Gene3D:1.10.800.10",
@@ -8809,7 +8809,7 @@
                     "23757202~22112818~17935162~23500595~2044609~12655553~11385716~12501224~15557004~18538294~22526846~8889590~21953985~2014036"
                 ],
                 "vep_canonical": false,
-                "vep_polyphen_score": "0.999",
+                "vep_polyphen_score": 0.999,
                 "vep_cds_position": "347",
                 "vep_domains": [
                     "Gene3D:1.10.800.10",
@@ -9102,7 +9102,7 @@
                 "vep_canonical": false,
                 "vep_strand": true,
                 "vep_swissprot": "Q8IYT3",
-                "vep_polyphen_score": "0.015",
+                "vep_polyphen_score": 0.015,
                 "vep_cds_position": "1810",
                 "vep_domains": [
                     "Coiled-coils_(Ncoils):Coil",
@@ -9603,7 +9603,7 @@
                 ],
                 "vep_canonical": false,
                 "vep_swissprot": "P35579",
-                "vep_polyphen_score": "0.953",
+                "vep_polyphen_score": 0.953,
                 "vep_cds_position": "4198",
                 "vep_domains": [
                     "Coiled-coils_(Ncoils):Coil",
@@ -9904,7 +9904,7 @@
                 "vep_canonical": false,
                 "vep_strand": true,
                 "vep_swissprot": "Q96RK4",
-                "vep_polyphen_score": "0.025",
+                "vep_polyphen_score": 0.025,
                 "vep_cds_position": "791",
                 "vep_domains": [
                     "PROSITE_profiles:PS50293",
@@ -9939,7 +9939,7 @@
                 "vep_canonical": false,
                 "vep_strand": true,
                 "vep_swissprot": "Q96RK4",
-                "vep_polyphen_score": "0.025",
+                "vep_polyphen_score": 0.025,
                 "vep_cds_position": "275",
                 "vep_domains": [
                     "PROSITE_profiles:PS50293",
@@ -10125,7 +10125,7 @@
                 ],
                 "vep_canonical": false,
                 "vep_strand": true,
-                "vep_polyphen_score": "0.007",
+                "vep_polyphen_score": 0.007,
                 "vep_cds_position": "713",
                 "vep_domains": [
                     "PROSITE_profiles:PS50005",
@@ -11156,7 +11156,7 @@
                 ],
                 "vep_canonical": false,
                 "vep_swissprot": "P98161",
-                "vep_polyphen_score": "0.022",
+                "vep_polyphen_score": 0.022,
                 "vep_cds_position": "4018",
                 "vep_domains": [
                     "Gene3D:2.60.40.10",
@@ -11195,7 +11195,7 @@
                 ],
                 "vep_canonical": false,
                 "vep_swissprot": "P98161",
-                "vep_polyphen_score": "0.005",
+                "vep_polyphen_score": 0.005,
                 "vep_cds_position": "4018",
                 "vep_domains": [
                     "Gene3D:2.60.40.10",
@@ -11474,7 +11474,7 @@
                 "vep_canonical": false,
                 "vep_strand": true,
                 "vep_swissprot": "Q9P265",
-                "vep_polyphen_score": "0.02",
+                "vep_polyphen_score": 0.02,
                 "vep_cds_position": "793",
                 "vep_domains": [
                     "PANTHER:PTHR22754",
@@ -11727,7 +11727,7 @@
                 ],
                 "vep_canonical": false,
                 "vep_swissprot": "P55895",
-                "vep_polyphen_score": "0.572",
+                "vep_polyphen_score": 0.572,
                 "vep_cds_position": "1320",
                 "vep_domains": [
                     "CDD:cd15569",
@@ -12071,7 +12071,7 @@
                 ],
                 "vep_canonical": false,
                 "vep_swissprot": "P55895",
-                "vep_polyphen_score": "0.572",
+                "vep_polyphen_score": 0.572,
                 "vep_cds_position": "1320",
                 "vep_domains": [
                     "Pfam:PF13341",
@@ -14257,7 +14257,7 @@
                 "vep_canonical": false,
                 "vep_strand": true,
                 "vep_swissprot": "Q96EK5",
-                "vep_polyphen_score": "0.019",
+                "vep_polyphen_score": 0.019,
                 "vep_cds_position": "518",
                 "vep_domains": [
                     "Gene3D:1.25.40.10",
@@ -14291,7 +14291,7 @@
                 ],
                 "vep_canonical": false,
                 "vep_strand": true,
-                "vep_polyphen_score": "0.054",
+                "vep_polyphen_score": 0.054,
                 "vep_cds_position": "518",
                 "vep_domains": [
                     "Gene3D:1.25.40.10",
@@ -14324,7 +14324,7 @@
                 ],
                 "vep_canonical": false,
                 "vep_strand": true,
-                "vep_polyphen_score": "0.031",
+                "vep_polyphen_score": 0.031,
                 "vep_cds_position": "518",
                 "vep_ensp": "ENSP00000489663",
                 "vep_tsl": 5,
@@ -14352,7 +14352,7 @@
                 ],
                 "vep_canonical": false,
                 "vep_strand": true,
-                "vep_polyphen_score": "0.022",
+                "vep_polyphen_score": 0.022,
                 "vep_cds_position": "407",
                 "vep_ensp": "ENSP00000490113",
                 "vep_tsl": 5,
@@ -14443,7 +14443,7 @@
                 ],
                 "vep_canonical": false,
                 "vep_strand": true,
-                "vep_polyphen_score": "0.018",
+                "vep_polyphen_score": 0.018,
                 "vep_cds_position": "215",
                 "vep_ensp": "ENSP00000490404",
                 "vep_tsl": 5,
@@ -14471,7 +14471,7 @@
                 ],
                 "vep_canonical": false,
                 "vep_strand": true,
-                "vep_polyphen_score": "0.031",
+                "vep_polyphen_score": 0.031,
                 "vep_cds_position": "335",
                 "vep_ensp": "ENSP00000490742",
                 "vep_tsl": 5,
@@ -14499,7 +14499,7 @@
                 ],
                 "vep_canonical": false,
                 "vep_strand": true,
-                "vep_polyphen_score": "0.031",
+                "vep_polyphen_score": 0.031,
                 "vep_cds_position": "593",
                 "vep_domains": [
                     "Gene3D:1.25.40.10",
@@ -15913,7 +15913,7 @@
                 "vep_canonical": false,
                 "vep_strand": true,
                 "vep_swissprot": "P12694",
-                "vep_polyphen_score": "0.722",
+                "vep_polyphen_score": 0.722,
                 "vep_cds_position": "452",
                 "vep_domains": [
                     "PDB-ENSP_mappings:1dtw.A",
@@ -15977,7 +15977,7 @@
                 "vep_canonical": false,
                 "vep_strand": true,
                 "vep_swissprot": "P12694",
-                "vep_polyphen_score": "0.806",
+                "vep_polyphen_score": 0.806,
                 "vep_cds_position": "386",
                 "vep_domains": [
                     "Gene3D:3.40.50.970",
@@ -16012,7 +16012,7 @@
                 ],
                 "vep_canonical": false,
                 "vep_strand": true,
-                "vep_polyphen_score": "0.6",
+                "vep_polyphen_score": 0.6,
                 "vep_cds_position": "554",
                 "vep_domains": [
                     "Gene3D:3.40.50.970",
@@ -16048,7 +16048,7 @@
                 ],
                 "vep_canonical": false,
                 "vep_strand": true,
-                "vep_polyphen_score": "0.62",
+                "vep_polyphen_score": 0.62,
                 "vep_cds_position": "260",
                 "vep_domains": [
                     "Gene3D:3.40.50.970",
@@ -16083,7 +16083,7 @@
                 ],
                 "vep_canonical": false,
                 "vep_strand": true,
-                "vep_polyphen_score": "0.62",
+                "vep_polyphen_score": 0.62,
                 "vep_cds_position": "365",
                 "vep_domains": [
                     "Gene3D:3.40.50.970",
@@ -16372,7 +16372,7 @@
                 ],
                 "vep_canonical": false,
                 "vep_swissprot": "Q99715",
-                "vep_polyphen_score": "0.472",
+                "vep_polyphen_score": 0.472,
                 "vep_cds_position": "8237",
                 "vep_domains": [
                     "PANTHER:PTHR24020",
@@ -16406,7 +16406,7 @@
                 ],
                 "vep_canonical": false,
                 "vep_swissprot": "Q99715",
-                "vep_polyphen_score": "0.269",
+                "vep_polyphen_score": 0.269,
                 "vep_cds_position": "4745",
                 "vep_domains": [
                     "PANTHER:PTHR24020",
@@ -16440,7 +16440,7 @@
                 ],
                 "vep_canonical": false,
                 "vep_swissprot": "Q99715",
-                "vep_polyphen_score": "0.049",
+                "vep_polyphen_score": 0.049,
                 "vep_cds_position": "8009",
                 "vep_domains": [
                     "PANTHER:PTHR24020",
@@ -16472,7 +16472,7 @@
                     "25741868"
                 ],
                 "vep_canonical": false,
-                "vep_polyphen_score": "0.511",
+                "vep_polyphen_score": 0.511,
                 "vep_cds_position": "1151",
                 "vep_domains": [
                     "PANTHER:PTHR24020",
@@ -16504,7 +16504,7 @@
                     "25741868"
                 ],
                 "vep_canonical": false,
-                "vep_polyphen_score": "0.472",
+                "vep_polyphen_score": 0.472,
                 "vep_cds_position": "8237",
                 "vep_domains": [
                     "PANTHER:PTHR24020",
@@ -16537,7 +16537,7 @@
                     "25741868"
                 ],
                 "vep_canonical": false,
-                "vep_polyphen_score": "0.472",
+                "vep_polyphen_score": 0.472,
                 "vep_cds_position": "4670",
                 "vep_domains": [
                     "PANTHER:PTHR24020",
@@ -17395,7 +17395,7 @@
                     "25741868~24123876"
                 ],
                 "vep_canonical": false,
-                "vep_polyphen_score": "0.933",
+                "vep_polyphen_score": 0.933,
                 "vep_cds_position": "1934",
                 "vep_domains": [
                     "PANTHER:PTHR14514",
@@ -17427,7 +17427,7 @@
                     "25741868~24123876"
                 ],
                 "vep_canonical": false,
-                "vep_polyphen_score": "0.933",
+                "vep_polyphen_score": 0.933,
                 "vep_cds_position": "1934",
                 "vep_domains": [
                     "Gene3D:1.20.58.1940",
@@ -17461,7 +17461,7 @@
                 ],
                 "vep_canonical": false,
                 "vep_swissprot": "Q8NF91",
-                "vep_polyphen_score": "0.997",
+                "vep_polyphen_score": 0.997,
                 "vep_cds_position": "1964",
                 "vep_domains": [
                     "Gene3D:1.20.58.1940",
@@ -17494,7 +17494,7 @@
                 ],
                 "vep_canonical": false,
                 "vep_swissprot": "Q8NF91",
-                "vep_polyphen_score": "0.893",
+                "vep_polyphen_score": 0.893,
                 "vep_cds_position": "1964",
                 "vep_domains": [
                     "PANTHER:PTHR14514",
@@ -17528,7 +17528,7 @@
                 ],
                 "vep_canonical": false,
                 "vep_swissprot": "Q8NF91",
-                "vep_polyphen_score": "0.933",
+                "vep_polyphen_score": 0.933,
                 "vep_cds_position": "1964",
                 "vep_domains": [
                     "PANTHER:PTHR47535",
@@ -17560,7 +17560,7 @@
                     "25741868~24123876"
                 ],
                 "vep_canonical": false,
-                "vep_polyphen_score": "0.95",
+                "vep_polyphen_score": 0.95,
                 "vep_cds_position": "1985",
                 "vep_domains": [
                     "PANTHER:PTHR14514",
@@ -17594,7 +17594,7 @@
                     "25741868~24123876"
                 ],
                 "vep_canonical": false,
-                "vep_polyphen_score": "0.765",
+                "vep_polyphen_score": 0.765,
                 "vep_cds_position": "1964",
                 "vep_domains": [
                     "PANTHER:PTHR47535",
@@ -17646,7 +17646,7 @@
                     "25741868~24123876"
                 ],
                 "vep_canonical": false,
-                "vep_polyphen_score": "0.74",
+                "vep_polyphen_score": 0.74,
                 "vep_cds_position": "665",
                 "vep_domains": [
                     "PANTHER:PTHR47535:SF5",
@@ -17688,7 +17688,7 @@
                 "vep_amino_acids": "Q/R",
                 "vep_exon": "18/19",
                 "vep_hgvsp": "ENSP00000500235.1:p.Gln653Arg",
-                "vep_polyphen_score": "0.902",
+                "vep_polyphen_score": 0.902,
                 "vep_domains": [
                     "Superfamily:SSF46966",
                     "PANTHER:PTHR47535",
@@ -17717,7 +17717,7 @@
                 "vep_feature": "ENST00000672122",
                 "vep_amino_acids": "Q/R",
                 "vep_exon": "17/31",
-                "vep_polyphen_score": "0.963",
+                "vep_polyphen_score": 0.963,
                 "vep_domains": [
                     "Gene3D:1.20.58.1940",
                     "PANTHER:PTHR47535",
@@ -17764,7 +17764,7 @@
                 "vep_feature": "ENST00000673281",
                 "vep_amino_acids": "Q/R",
                 "vep_exon": "18/34",
-                "vep_polyphen_score": "0.973",
+                "vep_polyphen_score": 0.973,
                 "vep_domains": [
                     "Gene3D:1.20.58.1940",
                     "Superfamily:SSF46966",
@@ -18444,7 +18444,7 @@
                 ],
                 "vep_canonical": false,
                 "vep_swissprot": "Q86VV8",
-                "vep_polyphen_score": "0.001",
+                "vep_polyphen_score": 0.001,
                 "vep_cds_position": "1921",
                 "vep_domains": [
                     "PANTHER:PTHR31691",
@@ -18505,7 +18505,7 @@
                 "vep_sift_score": "0.51",
                 "vep_exon": "9/43",
                 "vep_hgvsp": "ENSP00000462733.1:p.Ile431Val",
-                "vep_polyphen_score": "0.003",
+                "vep_polyphen_score": 0.003,
                 "vep_cdna_position": "1291",
                 "vep_biotype": "nonsense_mediated_decay"
             },
@@ -18521,7 +18521,7 @@
                     "25741868"
                 ],
                 "vep_canonical": false,
-                "vep_polyphen_score": "0.011",
+                "vep_polyphen_score": 0.011,
                 "vep_cds_position": "1921",
                 "vep_feature_ncbi": "XR_935213",
                 "vep_ensp": "ENSP00000491968",
@@ -18549,7 +18549,7 @@
                     "25741868"
                 ],
                 "vep_canonical": false,
-                "vep_polyphen_score": "0.044",
+                "vep_polyphen_score": 0.044,
                 "vep_cds_position": "1402",
                 "vep_domains": [
                     "PANTHER:PTHR31691",
@@ -18582,7 +18582,7 @@
                 ],
                 "vep_canonical": false,
                 "vep_swissprot": "Q86VV8",
-                "vep_polyphen_score": "0.009",
+                "vep_polyphen_score": 0.009,
                 "vep_cds_position": "1921",
                 "vep_domains": [
                     "PANTHER:PTHR31691",
@@ -19281,7 +19281,7 @@
                 ],
                 "vep_canonical": false,
                 "vep_swissprot": "O75445",
-                "vep_polyphen_score": "0.987",
+                "vep_polyphen_score": 0.987,
                 "vep_cds_position": "14074",
                 "vep_domains": [
                     "CDD:cd00063",
@@ -19327,7 +19327,7 @@
                 "vep_feature": "ENST00000674083",
                 "vep_amino_acids": "G/R",
                 "vep_exon": "64/73",
-                "vep_polyphen_score": "0.904",
+                "vep_polyphen_score": 0.904,
                 "vep_domains": [
                     "CDD:cd00063",
                     "Gene3D:2.60.40.10",
@@ -20651,7 +20651,7 @@
                 ],
                 "vep_canonical": false,
                 "vep_swissprot": "P56524",
-                "vep_polyphen_score": "0.001",
+                "vep_polyphen_score": 0.001,
                 "vep_cds_position": "958",
                 "vep_domains": [
                     "PIRSF:PIRSF037911",
@@ -20684,7 +20684,7 @@
                     "25335771"
                 ],
                 "vep_canonical": false,
-                "vep_polyphen_score": "0.576",
+                "vep_polyphen_score": 0.576,
                 "vep_cds_position": "190",
                 "vep_domains": [
                     "PANTHER:PTHR45364",
@@ -20717,7 +20717,7 @@
                 ],
                 "vep_canonical": false,
                 "vep_swissprot": "P56524",
-                "vep_polyphen_score": "0.001",
+                "vep_polyphen_score": 0.001,
                 "vep_cds_position": "607",
                 "vep_domains": [
                     "PIRSF:PIRSF037911",
@@ -21293,7 +21293,7 @@
                 "vep_canonical": false,
                 "vep_strand": true,
                 "vep_swissprot": "P22455",
-                "vep_polyphen_score": "0.7",
+                "vep_polyphen_score": 0.7,
                 "vep_cds_position": "1162",
                 "vep_domains": [
                     "PIRSF:PIRSF000628",
@@ -21425,7 +21425,7 @@
                 "vep_canonical": false,
                 "vep_strand": true,
                 "vep_swissprot": "P22455",
-                "vep_polyphen_score": "0.7",
+                "vep_polyphen_score": 0.7,
                 "vep_cds_position": "1162",
                 "vep_domains": [
                     "Low_complexity_(Seg):seg",
@@ -21547,7 +21547,7 @@
                 ],
                 "vep_canonical": false,
                 "vep_strand": true,
-                "vep_polyphen_score": "0.845",
+                "vep_polyphen_score": 0.845,
                 "vep_cds_position": "70",
                 "vep_domains": [
                     "Low_complexity_(Seg):seg",
@@ -21879,7 +21879,7 @@
                 ],
                 "vep_canonical": false,
                 "vep_swissprot": "Q12929",
-                "vep_polyphen_score": "0.001",
+                "vep_polyphen_score": 0.001,
                 "vep_cds_position": "2283",
                 "vep_domains": [
                     "Gene3D:1.10.150.50",
@@ -21923,7 +21923,7 @@
                 "vep_sift_score": "0.89",
                 "vep_exon": "13/14",
                 "vep_hgvsp": "ENSP00000441888.1:p.Asp501Glu",
-                "vep_polyphen_score": "0.001",
+                "vep_polyphen_score": 0.001,
                 "vep_domains": [
                     "Gene3D:1.10.150.50",
                     "Pfam:PF18016",
@@ -21955,7 +21955,7 @@
                 "vep_sift_score": "0.89",
                 "vep_exon": "13/14",
                 "vep_hgvsp": "ENSP00000437806.1:p.Asp501Glu",
-                "vep_polyphen_score": "0.001",
+                "vep_polyphen_score": 0.001,
                 "vep_domains": [
                     "Gene3D:1.10.150.50",
                     "Pfam:PF18016",
@@ -21994,7 +21994,7 @@
                 ],
                 "vep_canonical": false,
                 "vep_swissprot": "Q12929",
-                "vep_polyphen_score": "0.001",
+                "vep_polyphen_score": 0.001,
                 "vep_cds_position": "2283",
                 "vep_domains": [
                     "Gene3D:1.10.150.50",
@@ -22027,7 +22027,7 @@
                 ],
                 "vep_canonical": false,
                 "vep_swissprot": "Q12929",
-                "vep_polyphen_score": "0.001",
+                "vep_polyphen_score": 0.001,
                 "vep_cds_position": "2283",
                 "vep_domains": [
                     "Gene3D:1.10.150.50",
@@ -22071,7 +22071,7 @@
                 "vep_amino_acids": "D/E",
                 "vep_exon": "20/21",
                 "vep_ccds": "CCDS31753.1",
-                "vep_polyphen_score": "0.001",
+                "vep_polyphen_score": 0.001,
                 "vep_domains": [
                     "Gene3D:1.10.150.50",
                     "PDB-ENSP_mappings:2e8m.A",
@@ -22102,7 +22102,7 @@
                 "vep_hgvsp": "ENSP00000495312.1:p.Asp778Glu",
                 "vep_amino_acids": "D/E",
                 "vep_exon": "22/23",
-                "vep_polyphen_score": "0.027",
+                "vep_polyphen_score": 0.027,
                 "vep_domains": [
                     "Gene3D:1.10.150.50",
                     "Pfam:PF18016",
@@ -22123,7 +22123,7 @@
                 ],
                 "vep_canonical": false,
                 "vep_swissprot": "Q12929",
-                "vep_polyphen_score": "0.001",
+                "vep_polyphen_score": 0.001,
                 "vep_cds_position": "2283",
                 "vep_domains": [
                     "Gene3D:1.10.150.50",
@@ -22156,7 +22156,7 @@
                 ],
                 "vep_canonical": false,
                 "vep_swissprot": "Q12929",
-                "vep_polyphen_score": "0.001",
+                "vep_polyphen_score": 0.001,
                 "vep_cds_position": "2283",
                 "vep_domains": [
                     "Gene3D:1.10.150.50",
@@ -22198,7 +22198,7 @@
                 "vep_hgvsp": "ENSP00000494338.1:p.Asp769Glu",
                 "vep_amino_acids": "D/E",
                 "vep_exon": "21/22",
-                "vep_polyphen_score": "0.027",
+                "vep_polyphen_score": 0.027,
                 "vep_domains": [
                     "Gene3D:1.10.150.50",
                     "Pfam:PF18016",
@@ -22229,7 +22229,7 @@
                 "vep_amino_acids": "D/E",
                 "vep_exon": "23/24",
                 "vep_ccds": "CCDS31753.1",
-                "vep_polyphen_score": "0.001",
+                "vep_polyphen_score": 0.001,
                 "vep_domains": [
                     "Gene3D:1.10.150.50",
                     "PDB-ENSP_mappings:2e8m.A",
@@ -22261,7 +22261,7 @@
                 "vep_amino_acids": "D/E",
                 "vep_exon": "23/24",
                 "vep_ccds": "CCDS31753.1",
-                "vep_polyphen_score": "0.001",
+                "vep_polyphen_score": 0.001,
                 "vep_domains": [
                     "Gene3D:1.10.150.50",
                     "PDB-ENSP_mappings:2e8m.A",
@@ -22293,7 +22293,7 @@
                 "vep_amino_acids": "D/E",
                 "vep_exon": "22/23",
                 "vep_ccds": "CCDS31753.1",
-                "vep_polyphen_score": "0.001",
+                "vep_polyphen_score": 0.001,
                 "vep_domains": [
                     "Gene3D:1.10.150.50",
                     "PDB-ENSP_mappings:2e8m.A",
@@ -22325,7 +22325,7 @@
                 "vep_amino_acids": "D/E",
                 "vep_exon": "21/22",
                 "vep_ccds": "CCDS31753.1",
-                "vep_polyphen_score": "0.001",
+                "vep_polyphen_score": 0.001,
                 "vep_domains": [
                     "Gene3D:1.10.150.50",
                     "PDB-ENSP_mappings:2e8m.A",
@@ -22576,7 +22576,7 @@
                 ],
                 "vep_canonical": false,
                 "vep_swissprot": "P04114",
-                "vep_polyphen_score": "0.003",
+                "vep_polyphen_score": 0.003,
                 "vep_cds_position": "12794",
                 "vep_domains": [
                     "PANTHER:PTHR13769",
@@ -24084,7 +24084,7 @@
                 "vep_canonical": false,
                 "vep_strand": true,
                 "vep_swissprot": "Q08881",
-                "vep_polyphen_score": "0",
+                "vep_polyphen_score": 0,
                 "vep_cds_position": "1759",
                 "vep_domains": [
                     "PDB-ENSP_mappings:3miy.A",
@@ -25228,7 +25228,7 @@
                 ],
                 "vep_canonical": false,
                 "vep_swissprot": "Q04759",
-                "vep_polyphen_score": "0",
+                "vep_polyphen_score": 0,
                 "vep_cds_position": "989",
                 "vep_domains": [
                     "PIRSF:PIRSF501105",
@@ -25263,7 +25263,7 @@
                 ],
                 "vep_canonical": false,
                 "vep_swissprot": "Q04759",
-                "vep_polyphen_score": "0",
+                "vep_polyphen_score": 0,
                 "vep_cds_position": "989",
                 "vep_domains": [
                     "PIRSF:PIRSF000551",
@@ -25297,7 +25297,7 @@
                 ],
                 "vep_canonical": false,
                 "vep_swissprot": "Q04759",
-                "vep_polyphen_score": "0",
+                "vep_polyphen_score": 0,
                 "vep_cds_position": "614",
                 "vep_domains": [
                     "PIRSF:PIRSF000551",
@@ -25330,7 +25330,7 @@
                     "16642433~26974007~16385451~30828974"
                 ],
                 "vep_canonical": false,
-                "vep_polyphen_score": "0",
+                "vep_polyphen_score": 0,
                 "vep_cds_position": "881",
                 "vep_domains": [
                     "PIRSF:PIRSF000551",
