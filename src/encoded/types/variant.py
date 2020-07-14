@@ -11,6 +11,7 @@ from urllib.parse import (
 from pyramid.httpexceptions import (
     HTTPTemporaryRedirect
 )
+from snovault.calculated import calculate_properties
 from snovault.util import debug_log
 from encoded.util import resolve_file_path
 from snovault import (
@@ -189,9 +190,10 @@ class VariantSample(Item):
         "description": "Link to Genome Snapshot Image",
         "type": "string"
     })
-    def bam_snapshot(self, accession, CHROM, POS):
-        file_path = '/%s/%s/%s:%s.png' % (
-            accession, 'igv_shots', CHROM, POS
+    def bam_snapshot(self, request, file, variant):
+        variant_props = get_item_or_none(request, variant, 'Variant')
+        file_path = '%s/%s/chr%s-%s.png' % (  # file = accession of associated VCF file
+            file, 'bamsnap', variant_props['CHROM'], variant_props['POS']
         )
         return file_path
 
@@ -200,14 +202,12 @@ class VariantSample(Item):
              permission='view', subpath_segments=[0, 1])
 @debug_log
 def download(context, request):
-    """ Navigates to the IGV snapshot hrf
-        TODO: test (this is a rough sketch) + enable
-    """
-    properties = context.upgrade_properties()
+    """ Navigates to the IGV snapshot hrf on the bam_snapshot field. """
+    calculated = calculate_properties(context, request)
     s3_client = boto3.client('s3')
     params_to_get_obj = {
         'Bucket': request.registry.settings.get('file_wfout_bucket'),
-        'Key': properties['bam_snapshot']
+        'Key': calculated['bam_snapshot']
     }
     location = s3_client.generate_presigned_url(
         ClientMethod='get_object',

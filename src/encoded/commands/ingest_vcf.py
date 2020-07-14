@@ -40,6 +40,7 @@ class VCFParser(object):
     SUBEMBEDDED = 'Subembedded'
     FORMAT = 'Format'
     GT_REF = '0/0'
+    GT_REF_PHASED = '0|0'
     GT_MISSING = './.'
 
     def __init__(self, _vcf, variant, sample, reader=None):
@@ -477,7 +478,7 @@ class VCFParser(object):
             s.pop('AF', None)  # XXX: comes from VCF but is not actually what we want. Get rid of it.
 
             # DROP SV's that are REF/REF
-            if s.get('GT', None) in [self.GT_REF, self.GT_MISSING]:
+            if s.get('GT', None) in [self.GT_REF, self.GT_MISSING, self.GT_REF_PHASED]:
                 continue
             result.append(s)
         return result
