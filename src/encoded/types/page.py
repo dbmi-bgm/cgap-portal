@@ -1,7 +1,6 @@
 """
 The type file for the collection Pages.  Which is used for static pages on the portal
 """
-import warnings
 
 from pyramid.httpexceptions import ( # 301-307 redirect code response
     HTTPMovedPermanently,
