@@ -75,14 +75,17 @@ export const DisplayTitleColumnCase = React.memo(function DisplayTitleCaseDefaul
     const {
         '@id' : caseHref,
         display_title = null,
+        accession = null,
         status = null,
         date_created = null,
-        case_id = null
+        case_title = null
     } = result;
+
+    const mainTitle = accession && case_title ? case_title : display_title;
 
     return (
         <a href={caseHref} className="adv-block-link w-100 title-block d-flex flex-column" data-tip={tooltip} data-delay-show={750}>
-            { renderAdvancedColumn(display_title, status, case_id, "Accessioned:", date_created) }
+            { renderAdvancedColumn(<span className="accession">{ accession }</span>, status, mainTitle, "Accessioned:", date_created) }
         </a>
     );
 });
@@ -158,7 +161,7 @@ export const columnExtensionMap = {
             if (itemTypeList[0] === "Case") {
                 return (
                     <a href={resultHref} className="adv-block-link">
-                        { renderAdvancedColumn(<span className="text-mono">{ accession }</span>, status, display_title, "Last Modified:", date_modified) }
+                        { renderAdvancedColumn(<span className="accession">{ accession }</span>, status, display_title, "Last Modified:", date_modified) }
                     </a>
                 );
             }
@@ -183,7 +186,7 @@ export const columnExtensionMap = {
             if (itemTypeList[0] === "Case") {
                 return (
                     <a href={atId} className="adv-block-link">
-                        { renderAdvancedColumn(<span className="text-mono">{ accession }</span>, status, display_title, "Accessioned:", date_created) }
+                        { renderAdvancedColumn(<span className="accession">{ accession }</span>, status, display_title, "Accessioned:", date_created) }
                     </a>
                 );
             }
@@ -225,7 +228,7 @@ export const columnExtensionMap = {
             // Unlikely to show in non-Case item results, so didn't add Case filter
             return (
                 <a href={sampleId} className="adv-block-link">
-                    {renderAdvancedColumn(<span className="text-mono">{ accession }</span>, status, specimen_type, "Collected:", specimen_collection_date)}
+                    {renderAdvancedColumn(<span className="accession">{ accession }</span>, status, specimen_type, "Collected:", specimen_collection_date)}
                 </a>);
         }
     },

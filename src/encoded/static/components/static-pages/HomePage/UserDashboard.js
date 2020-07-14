@@ -124,6 +124,7 @@ class RecentCasesSection extends React.PureComponent {
                 </div>
             );
         }
+
         if (project_roles.length === 0) {
             return null;
         }
@@ -134,14 +135,14 @@ class RecentCasesSection extends React.PureComponent {
             const casesWithReportsOnly = !projectsWithAllCases[projectName];
             const searchHref = "/search/?type=Case&project.name=" + encodeURIComponent(projectName) + (casesWithReportsOnly ? "&report.uuid!=No+value" : "");
             return (
-                <div className="recent-cases-table-section mt-36" data-project={projectName} key={projectName}>
-                    <div className="d-flex align-items-center">
-                        <h3 className="text-400 flex-fill">
+                <div className="recent-cases-table-section mt-36 mb-36" data-project={projectName} key={projectName}>
+                    <div className="d-flex align-items-center mb-1">
+                        <h4 className="text-400 flex-fill mb-0 mt-0">
                             <span className="text-300 mr-06">Recent Cases from</span>
                             <a href={projectID}>{ projectTitle }</a>
-                        </h3>
+                        </h4>
                         <div className="toggle-reports">
-                            <Checkbox onChange={onCasesWithReportsToggle} checked={casesWithReportsOnly}>
+                            <Checkbox onChange={onCasesWithReportsToggle} checked={casesWithReportsOnly} labelClassName="mb-0 text-400 text-small">
                                 Show Cases with Reports Only
                             </Checkbox>
                         </div>
