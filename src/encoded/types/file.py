@@ -19,6 +19,7 @@ from pyramid.settings import asbool
 from pyramid.threadlocal import get_current_request
 from pyramid.traversal import resource_path
 from pyramid.view import view_config
+from dcicutils.env_utils import CGAP_ENV_WEBPROD
 from snovault import (
     AfterModified,
     BeforeModified,
@@ -708,11 +709,13 @@ def is_file_to_download(properties, file_format, expected_filename=None):
 @view_config(name='download', context=File, request_method='GET',
              permission='view', subpath_segments=[0, 1])
 def download(context, request):
+    # disable if not on cgap prod
+    if request.registry.settings.get('env.name', None) != CGAP_ENV_WEBPROD:
+        raise HTTPForbidden('Downloads disabled when not on cgap-prod!')
+
     # first check for restricted status
-    if True:  # XXX: restrict all downloads for now
-        raise HTTPForbidden('This is a restricted file not available for download')
     try:
-        user_props = session_properties(request)
+        user_props = session_properties(context, request)
     except Exception as e:
         user_props = {'error': str(e)}
     tracking_values = {'user_agent': request.user_agent, 'remote_ip': request.remote_addr,

@@ -4,7 +4,7 @@ import logging
 from encoded.commands.variant_ingestion import run_variant_table_intake, run_ingest_vcf
 from encoded.commands.gene_ingestion import run_gene_table_intake, run_ingest_genes
 from dcicutils.misc_utils import VirtualApp
-from dcicutils.env_utils import CGAP_ENV_DEV
+from dcicutils.env_utils import CGAP_ENV_DEV, CGAP_ENV_WOLF
 from pyramid.paster import get_app
 
 
@@ -102,6 +102,11 @@ def main():
     parser.add_argument('--post-gene-inserts', action='store_true', default=False,
                         help='If specified will post gene inserts to portal')
 
+    # Add this option to form links from variant_sample to the VCF file
+    parser.add_argument('--post-vcf-file', action='store_true', default=False,
+                        help='Whether or not to post a file, default no. If a file is posted links from '
+                             'VariantSample to the file will be formed.')
+
     # Required application-level arguments
     parser.add_argument('config_uri', help="path to configfile",
                         default='development.ini')  # to get app
@@ -120,8 +125,8 @@ def main():
     }
     app = get_app(args.config_uri, args.app_name)
     app_bs_env = app.registry.settings.get('env.name', 'local')
-    if app_bs_env not in [CGAP_ENV_DEV, 'local']:
-        print('Tried to run ingestion not on cgapdev, which is temporarily disabled.')
+    if app_bs_env not in [CGAP_ENV_WOLF, CGAP_ENV_DEV, 'local']:
+        print('Tried to run ingestion not on cgapdev/cgapwolf, which is temporarily disabled.')
         exit(1)
     app_handle = VirtualApp(app, environ)
     gene_ingestion_result = run_gene_table_intake(app_handle, args) and run_ingest_genes(app_handle, args)

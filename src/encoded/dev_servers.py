@@ -49,6 +49,25 @@ def nginx_server_process(prefix='', echo=False):
     return process
 
 
+def ingestion_listener_process(config_uri, app_name, echo=True):
+    """ Uses Popen to start up the ingestion-listener. """
+    args = [
+        'poetry', 'run', 'ingestion-listener', config_uri, '--app-name', app_name
+    ]
+
+    process = subprocess.Popen(
+        args,
+        close_fds=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+    )
+
+    if echo:
+        print('Starting Ingestion Listener...')
+
+    return process
+
+
 def main():
     parser = argparse.ArgumentParser(
         description="Run development servers", epilog=EPILOG,
@@ -85,7 +104,8 @@ def main():
     postgres = postgresql_fixture.server_process(pgdata, echo=True)
     elasticsearch = elasticsearch_fixture.server_process(esdata, echo=True)
     nginx = nginx_server_process(echo=True)
-    processes = [postgres, elasticsearch, nginx]
+    ingestion_listener = ingestion_listener_process(args.config_uri, args.app_name)
+    processes = [postgres, elasticsearch, nginx, ingestion_listener]
 
 
     @atexit.register

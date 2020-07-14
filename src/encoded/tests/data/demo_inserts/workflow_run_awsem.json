@@ -1,0 +1,4042 @@
+[
+    {
+        "parameters": [
+            {
+                "value": "[{\"individual\": \"NA12877\",\"sample_name\": \"NA12877_sample\",\"gender\": \"M\",\"parents\": []},{\"individual\": \"NA12878\",\"sample_name\": \"NA12878_sample\",\"gender\": \"F\",\"parents\": []},{\"individual\": \"NA12879\",\"sample_name\": \"NA12879_sample\",\"gender\": \"F\",\"parents\": [\"NA12878\", \"NA12877\"]}]",
+                "dimension": "0",
+                "workflow_argument_name": "pedigree",
+                "ordinal": 1
+            },
+            {
+                "value": "['NA12879_sample', 'NA12878_sample', 'NA12877_sample']",
+                "dimension": "0",
+                "workflow_argument_name": "samples",
+                "ordinal": 1
+            },
+            {
+                "value": "True",
+                "dimension": "0",
+                "workflow_argument_name": "trio_errors",
+                "ordinal": 1
+            },
+            {
+                "value": "True",
+                "dimension": "0",
+                "workflow_argument_name": "het_hom",
+                "ordinal": 1
+            },
+            {
+                "value": "False",
+                "dimension": "0",
+                "workflow_argument_name": "ti_tv",
+                "ordinal": 1
+            }
+        ],
+        "run_platform": "AWSEM",
+        "date_created": "2020-07-14T01:22:07.993863+00:00",
+        "last_modified": {
+            "date_modified": "2020-07-14T01:23:14.055706+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "title": "workflow_granite-qcVCF v1 run 2020-07-13 14:44:54.574442",
+        "workflow": "33a85705-b757-49e0-aaef-d786695d6d03",
+        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
+        "quality_metric": "49206384-c7de-4f19-bf4d-d5c1b179921e",
+        "run_status": "complete",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "in review",
+        "metadata_only": false,
+        "uuid": "ce33da44-7be3-4231-9aa2-b8e7525c2789",
+        "awsem_app_name": "workflow_granite-qcVCF",
+        "schema_version": "3",
+        "input_files": [
+            {
+                "value": "bd12fe4d-eb8d-4bd5-9e56-c2ecc9badc1d",
+                "dimension": "0",
+                "workflow_argument_name": "input_vcf",
+                "ordinal": 1
+            }
+        ],
+        "awsem_job_id": "",
+        "output_files": [
+            {
+                "workflow_argument_name": "qc_json",
+                "value_qc": "576f2d32-cf91-4d5c-9cf2-a47c35f3e23c",
+                "type": "Output QC file"
+            }
+        ],
+        "awsem_postrun_json": "https://s3.amazonaws.com/tibanna-output/xa33jrzaCSiB.postrun.json"
+    },
+    {
+        "parameters": [],
+        "run_platform": "AWSEM",
+        "date_created": "2020-07-07T02:42:00.527037+00:00",
+        "last_modified": {
+            "date_modified": "2020-07-07T15:42:56.027023+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "title": "workflow_gatk-GenotypeGVCFs-check v13 run 2020-05-08 20:01:11.711735",
+        "workflow": "4fbad226-859d-40d4-8192-10c305e819da",
+        "project": "f01ff5be-a72d-43bd-afcf-174fa9dcd282",
+        "quality_metric": "2a817497-0d49-47c5-a232-d05cab53d1fb",
+        "run_status": "complete",
+        "run_url": "https://console.aws.amazon.com/states/home?region=us-east-1#/executions/details/arn:aws:states:us-east-1:643366669028:execution:tibanna_zebra:workflow_gatk-GenotypeGVCFs-check_GAPFIJ1GWUBX",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "released",
+        "metadata_only": false,
+        "uuid": "ab2824ed-6186-489c-98c7-348bd27ce2b5",
+        "awsem_app_name": "workflow_gatk-GenotypeGVCFs-check",
+        "schema_version": "3",
+        "input_files": [
+            {
+                "value": "a1d504ee-a313-4064-b6ae-65fed9738980",
+                "dimension": "0",
+                "workflow_argument_name": "chromosomes",
+                "ordinal": 1
+            },
+            {
+                "value": "0e5c57a2-2dbd-4281-9c98-5ed2ff129a02",
+                "dimension": "0",
+                "workflow_argument_name": "input_gvcf",
+                "ordinal": 1
+            },
+            {
+                "value": "8ed35691-0af4-467a-adbc-81eb088549f0",
+                "dimension": "0",
+                "workflow_argument_name": "known-sites-snp",
+                "ordinal": 1
+            },
+            {
+                "value": "1936f246-22e1-45dc-bb5c-9cfd55537fe7",
+                "dimension": "0",
+                "workflow_argument_name": "reference",
+                "ordinal": 1
+            }
+        ],
+        "awsem_job_id": "HgvZkHhJ4lUN",
+        "output_files": [
+            {
+                "extra_files": [
+                    {
+                        "filename": "GAPFI2RLHI8R",
+                        "status": "uploading",
+                        "file_format": "/file-formats/vcf_gz_tbi/",
+                        "accession": "GAPFI2RLHI8R",
+                        "uuid": "77b3aa12-fd02-445b-bc0e-5a93a16f8fe0",
+                        "href": "/77b3aa12-fd02-445b-bc0e-5a93a16f8fe0/@@download/GAPFI2RLHI8R.vcf.gz.tbi",
+                        "upload_key": "77b3aa12-fd02-445b-bc0e-5a93a16f8fe0/GAPFI2RLHI8R.vcf.gz.tbi"
+                    }
+                ],
+                "format": "/file-formats/vcf_gz/",
+                "type": "Output processed file",
+                "value": "77b3aa12-fd02-445b-bc0e-5a93a16f8fe0",
+                "workflow_argument_name": "vcf",
+                "secondary_file_formats": [
+                    "/file-formats/vcf_gz_tbi/"
+                ],
+                "upload_key": "77b3aa12-fd02-445b-bc0e-5a93a16f8fe0/GAPFI2RLHI8R.vcf.gz"
+            },
+            {
+                "workflow_argument_name": "vcf-check",
+                "value_qc": "9a189ef6-8738-4a59-a0cb-45b9f34758e0",
+                "type": "Output QC file"
+            }
+        ],
+        "awsem_postrun_json": "https://s3.amazonaws.com/tibanna-output/HgvZkHhJ4lUN.postrun.json"
+    },
+    {
+        "parameters": [
+            {
+                "value": "1",
+                "dimension": "0",
+                "workflow_argument_name": "nthreads",
+                "ordinal": 1
+            }
+        ],
+        "run_platform": "AWSEM",
+        "date_created": "2020-07-07T06:01:26.848167+00:00",
+        "last_modified": {
+            "date_modified": "2020-07-07T15:42:56.219329+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "title": "workflow_mutanno-annot-check v14 run 2020-06-26 16:16:06.219746",
+        "workflow": "62f16824-4d4b-43fb-9f2f-3bb5b328431a",
+        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
+        "quality_metric": "bb824030-446b-43e6-a502-d0fe245e0c7c",
+        "run_status": "complete",
+        "run_url": "https://console.aws.amazon.com/states/home?region=us-east-1#/executions/details/arn:aws:states:us-east-1:643366669028:execution:tibanna_zebra:run_workflow_mutanno-annot-check",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "released",
+        "metadata_only": false,
+        "uuid": "3cf70f7c-111c-440b-83b0-bfb783615cc0",
+        "awsem_app_name": "workflow_mutanno-annot-check",
+        "schema_version": "3",
+        "input_files": [
+            {
+                "value": "ce06ddfd-3624-4ab4-a2eb-19a1f2df65ff",
+                "dimension": "0",
+                "workflow_argument_name": "input_vcf",
+                "ordinal": 1
+            },
+            {
+                "value": "297c872a-5b6b-4fc3-83d3-f4a853f8805c",
+                "dimension": "0",
+                "workflow_argument_name": "chainfile",
+                "ordinal": 1
+            },
+            {
+                "value": "3832e0d9-dfd0-4108-998e-a31c3291a7cf",
+                "dimension": "0",
+                "workflow_argument_name": "mti",
+                "ordinal": 1
+            },
+            {
+                "value": "1c07a3aa-e2a3-498c-b838-15991c4a2f28",
+                "dimension": "0",
+                "workflow_argument_name": "regions",
+                "ordinal": 1
+            }
+        ],
+        "awsem_job_id": "lAjGcLCvBwsj",
+        "output_files": [
+            {
+                "extra_files": [
+                    {
+                        "filename": "GAPFIPZSZYEK",
+                        "status": "uploading",
+                        "file_format": "/file-formats/vcf_gz_tbi/",
+                        "accession": "GAPFIPZSZYEK",
+                        "uuid": "bd12fe4d-eb8d-4bd5-9e56-c2ecc9badc1d",
+                        "href": "/bd12fe4d-eb8d-4bd5-9e56-c2ecc9badc1d/@@download/GAPFIPZSZYEK.vcf.gz.tbi",
+                        "upload_key": "bd12fe4d-eb8d-4bd5-9e56-c2ecc9badc1d/GAPFIPZSZYEK.vcf.gz.tbi"
+                    }
+                ],
+                "format": "/file-formats/vcf_gz/",
+                "type": "Output processed file",
+                "value": "bd12fe4d-eb8d-4bd5-9e56-c2ecc9badc1d",
+                "workflow_argument_name": "annotated_vcf",
+                "secondary_file_formats": [
+                    "/file-formats/vcf_gz_tbi/"
+                ],
+                "upload_key": "bd12fe4d-eb8d-4bd5-9e56-c2ecc9badc1d/GAPFIPZSZYEK.vcf.gz"
+            },
+            {
+                "workflow_argument_name": "annotated_vcf-check",
+                "value_qc": "1ef57ffb-2c75-4621-a5fe-f583a90e040c",
+                "type": "Output QC file"
+            }
+        ],
+        "awsem_postrun_json": "https://s3.amazonaws.com/tibanna-output/lAjGcLCvBwsj.postrun.json"
+    },
+    {
+        "parameters": [],
+        "quality_metric": "9243fd99-21e8-4b1f-9f8b-4b5b03defb9e",
+        "run_platform": "AWSEM",
+        "output_files": [
+            {
+                "extra_files": [
+                    {
+                        "filename": "GAPFIYDEQQUJ",
+                        "status": "uploading",
+                        "file_format": "/file-formats/gvcf_gz_tbi/",
+                        "accession": "GAPFIYDEQQUJ",
+                        "uuid": "80492971-5645-4036-a943-3a55d0705a55",
+                        "href": "/80492971-5645-4036-a943-3a55d0705a55/@@download/GAPFIYDEQQUJ.gvcf.gz.tbi",
+                        "upload_key": "80492971-5645-4036-a943-3a55d0705a55/GAPFIYDEQQUJ.gvcf.gz.tbi"
+                    }
+                ],
+                "format": "/file-formats/gvcf_gz/",
+                "type": "Output processed file",
+                "value": "80492971-5645-4036-a943-3a55d0705a55",
+                "workflow_argument_name": "gvcf",
+                "secondary_file_formats": [
+                    "/file-formats/gvcf_gz_tbi/"
+                ],
+                "upload_key": "80492971-5645-4036-a943-3a55d0705a55/GAPFIYDEQQUJ.gvcf.gz"
+            }
+        ],
+        "metadata_only": false,
+        "run_url": "https://console.aws.amazon.com/states/home?region=us-east-1#/executions/details/arn:aws:states:us-east-1:643366669028:execution:tibanna_zebra:workflow_gatk-HaplotypeCaller_GAPFID3VNGDY",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "released",
+        "uuid": "fae0fde7-4ae8-4eae-b9e3-165cc4d9625c",
+        "awsem_job_id": "m1XKt7AAUoMs",
+        "awsem_postrun_json": "https://s3.amazonaws.com/tibanna-output/m1XKt7AAUoMs.postrun.json",
+        "input_files": [
+            {
+                "value": "b49682db-bbea-4d5d-b376-0f68e5e3e4a8",
+                "dimension": "0",
+                "workflow_argument_name": "input_bam",
+                "ordinal": 1
+            },
+            {
+                "value": "1936f246-22e1-45dc-bb5c-9cfd55537fe7",
+                "dimension": "0",
+                "workflow_argument_name": "reference",
+                "ordinal": 1
+            },
+            {
+                "value": "1c07a3aa-e2a3-498c-b838-15991c4a2f28",
+                "dimension": "0",
+                "workflow_argument_name": "regions",
+                "ordinal": 1
+            }
+        ],
+        "description": "-",
+        "last_modified": {
+            "date_modified": "2020-07-07T15:42:56.405487+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "workflow": "d6465b5f-1768-4c94-b025-edc96e101ac5",
+        "run_status": "complete",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "title": "workflow_gatk-HaplotypeCaller v10 run 2019-10-16 04:11:09.023237",
+        "awsem_app_name": "workflow_gatk-HaplotypeCaller",
+        "schema_version": "3",
+        "date_created": "2020-07-07T02:42:00.865111+00:00",
+        "project": "f01ff5be-a72d-43bd-afcf-174fa9dcd282"
+    },
+    {
+        "parameters": [],
+        "run_platform": "AWSEM",
+        "date_created": "2020-07-07T02:42:01.158145+00:00",
+        "last_modified": {
+            "date_modified": "2020-07-07T15:42:56.542064+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "title": "md5 0.2.6 run 2019-09-08 03:25:01.630032",
+        "workflow": "c77a117b-9a58-477e-aaa5-291a109a99f6",
+        "project": "f01ff5be-a72d-43bd-afcf-174fa9dcd282",
+        "quality_metric": "cb84cdff-3fd4-45df-bb2c-afeae42e5dd5",
+        "run_status": "complete",
+        "run_url": "https://console.aws.amazon.com/states/home?region=us-east-1#/executions/details/arn:aws:states:us-east-1:643366669028:execution:tibanna_zebra:md5_GAPFI367BFRE",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "released",
+        "metadata_only": false,
+        "uuid": "f24e7ec2-e6b0-4527-9d3c-96a871d2b5a0",
+        "awsem_app_name": "md5",
+        "schema_version": "3",
+        "input_files": [
+            {
+                "value": "a4ea498b-d1af-4053-b485-92e810ba9060",
+                "dimension": "0",
+                "workflow_argument_name": "input_file",
+                "ordinal": 1
+            }
+        ],
+        "awsem_job_id": "sNVhYyJsSj10",
+        "output_files": [
+            {
+                "workflow_argument_name": "report",
+                "type": "Output report file"
+            }
+        ],
+        "awsem_postrun_json": "https://s3.amazonaws.com/tibanna-output/sNVhYyJsSj10.postrun.json"
+    },
+    {
+        "parameters": [],
+        "run_platform": "AWSEM",
+        "date_created": "2020-07-07T02:42:01.436419+00:00",
+        "last_modified": {
+            "date_modified": "2020-07-07T15:42:56.702747+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "title": "fastqc-0-11-4-1 0.2.0 run 2019-09-08 04:34:02.517008",
+        "workflow": "2324ad76-ff37-4157-8bcc-3ce72b7dace9",
+        "project": "f01ff5be-a72d-43bd-afcf-174fa9dcd282",
+        "quality_metric": "8a986f94-6209-4af9-89af-70cb27d42740",
+        "run_status": "complete",
+        "run_url": "https://console.aws.amazon.com/states/home?region=us-east-1#/executions/details/arn:aws:states:us-east-1:643366669028:execution:tibanna_zebra:fastqc-0-11-4-1_GAPFI1UBTPZG",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "released",
+        "metadata_only": false,
+        "uuid": "ebc1c46f-3078-4f8d-8db6-7e897fd555a1",
+        "awsem_app_name": "fastqc-0-11-4-1",
+        "schema_version": "3",
+        "input_files": [
+            {
+                "value": "9015950c-0e1d-4066-924e-b197759f50c9",
+                "dimension": "0",
+                "workflow_argument_name": "input_fastq",
+                "ordinal": 1
+            }
+        ],
+        "awsem_job_id": "w2gj8yaGhYr3",
+        "output_files": [
+            {
+                "workflow_argument_name": "report_zip",
+                "value_qc": "359fb22f-b498-452f-827e-c17fd373d178",
+                "type": "Output QC file"
+            }
+        ],
+        "awsem_postrun_json": "https://s3.amazonaws.com/tibanna-output/w2gj8yaGhYr3.postrun.json"
+    },
+    {
+        "parameters": [],
+        "run_platform": "AWSEM",
+        "date_created": "2020-07-07T02:42:01.709515+00:00",
+        "last_modified": {
+            "date_modified": "2020-07-07T15:42:56.842582+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "title": "workflow_gatk-CombineGVCFs v13 run 2020-05-08 16:54:16.365221",
+        "workflow": "c7223a1c-ed48-4c54-a39f-35f05d61e850",
+        "project": "f01ff5be-a72d-43bd-afcf-174fa9dcd282",
+        "quality_metric": "6e92a0ae-c452-49f3-8413-46308c8dd71c",
+        "run_status": "complete",
+        "run_url": "https://console.aws.amazon.com/states/home?region=us-east-1#/executions/details/arn:aws:states:us-east-1:643366669028:execution:tibanna_zebra:workflow_gatk-CombineGVCFs_GAPFIWYDXQ7O_GAPFIWGRY4A4_GAPFIYDEQQUJ",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "released",
+        "metadata_only": false,
+        "uuid": "e7be0cbe-5299-47bf-ab62-d19cba3dd3b7",
+        "awsem_app_name": "workflow_gatk-CombineGVCFs",
+        "schema_version": "3",
+        "input_files": [
+            {
+                "value": "a1d504ee-a313-4064-b6ae-65fed9738980",
+                "dimension": "0",
+                "workflow_argument_name": "chromosomes",
+                "ordinal": 1
+            },
+            {
+                "value": "30308414-fa4e-4347-b964-3642f8bd0b6a",
+                "dimension": "0",
+                "workflow_argument_name": "input_gvcfs",
+                "ordinal": 1
+            },
+            {
+                "value": "88d5fcec-668b-45fd-a384-3182685dd384",
+                "dimension": "1",
+                "workflow_argument_name": "input_gvcfs",
+                "ordinal": 2
+            },
+            {
+                "value": "80492971-5645-4036-a943-3a55d0705a55",
+                "dimension": "2",
+                "workflow_argument_name": "input_gvcfs",
+                "ordinal": 3
+            },
+            {
+                "value": "1936f246-22e1-45dc-bb5c-9cfd55537fe7",
+                "dimension": "0",
+                "workflow_argument_name": "reference",
+                "ordinal": 1
+            }
+        ],
+        "awsem_job_id": "hXODo2yGavYI",
+        "output_files": [
+            {
+                "extra_files": [
+                    {
+                        "filename": "GAPFIJ1GWUBX",
+                        "status": "uploading",
+                        "file_format": "/file-formats/gvcf_gz_tbi/",
+                        "accession": "GAPFIJ1GWUBX",
+                        "uuid": "0e5c57a2-2dbd-4281-9c98-5ed2ff129a02",
+                        "href": "/0e5c57a2-2dbd-4281-9c98-5ed2ff129a02/@@download/GAPFIJ1GWUBX.gvcf.gz.tbi",
+                        "upload_key": "0e5c57a2-2dbd-4281-9c98-5ed2ff129a02/GAPFIJ1GWUBX.gvcf.gz.tbi"
+                    }
+                ],
+                "format": "/file-formats/gvcf_gz/",
+                "type": "Output processed file",
+                "value": "0e5c57a2-2dbd-4281-9c98-5ed2ff129a02",
+                "workflow_argument_name": "combined_gvcf",
+                "secondary_file_formats": [
+                    "/file-formats/gvcf_gz_tbi/"
+                ],
+                "upload_key": "0e5c57a2-2dbd-4281-9c98-5ed2ff129a02/GAPFIJ1GWUBX.gvcf.gz"
+            }
+        ],
+        "awsem_postrun_json": "https://s3.amazonaws.com/tibanna-output/hXODo2yGavYI.postrun.json"
+    },
+    {
+        "parameters": [],
+        "run_platform": "AWSEM",
+        "date_created": "2020-07-07T02:42:02.016986+00:00",
+        "last_modified": {
+            "date_modified": "2020-07-07T15:42:57.094192+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "title": "workflow_bwa-mem_no_unzip-check v9 run 2019-09-08 05:20:30.384276",
+        "workflow": "9e094699-561b-4396-8d6a-ffc45f98c5e1",
+        "project": "f01ff5be-a72d-43bd-afcf-174fa9dcd282",
+        "quality_metric": "2cdfb703-337a-4a06-9585-448313c51a84",
+        "run_status": "complete",
+        "run_url": "https://console.aws.amazon.com/states/home?region=us-east-1#/executions/details/arn:aws:states:us-east-1:643366669028:execution:tibanna_zebra:workflow_bwa-mem_no_unzip-check_GAPFI367BFRE_GAPFI1UBTPZG",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "released",
+        "metadata_only": false,
+        "uuid": "de3f31e5-6a33-4082-b783-91c12e6a8b44",
+        "awsem_app_name": "workflow_bwa-mem_no_unzip-check",
+        "schema_version": "3",
+        "input_files": [
+            {
+                "value": "a4ea498b-d1af-4053-b485-92e810ba9060",
+                "dimension": "0",
+                "workflow_argument_name": "fastq_R1",
+                "ordinal": 1
+            },
+            {
+                "value": "9015950c-0e1d-4066-924e-b197759f50c9",
+                "dimension": "0",
+                "workflow_argument_name": "fastq_R2",
+                "ordinal": 1
+            },
+            {
+                "value": "b24ed5ed-a037-48a0-a938-3fecfb90d0cf",
+                "dimension": "0",
+                "workflow_argument_name": "reference",
+                "ordinal": 1
+            }
+        ],
+        "awsem_job_id": "VtYJPcpgmKd9",
+        "output_files": [
+            {
+                "value": "46e9dbad-f2d7-40ef-9495-e75b69c11eb1",
+                "workflow_argument_name": "raw_bam",
+                "format": "/file-formats/bam/",
+                "upload_key": "46e9dbad-f2d7-40ef-9495-e75b69c11eb1/GAPFIW6CACEV.bam",
+                "type": "Output processed file"
+            },
+            {
+                "workflow_argument_name": "raw_bam-check",
+                "value_qc": "8d41a82f-5239-412f-988a-ea88d5ed4f23",
+                "type": "Output QC file"
+            }
+        ],
+        "awsem_postrun_json": "https://s3.amazonaws.com/tibanna-output/VtYJPcpgmKd9.postrun.json"
+    },
+    {
+        "parameters": [],
+        "run_platform": "AWSEM",
+        "date_created": "2020-07-07T02:42:02.292132+00:00",
+        "last_modified": {
+            "date_modified": "2020-07-07T15:42:57.233275+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "title": "fastqc-0-11-4-1 0.2.0 run 2019-09-08 04:34:06.398452",
+        "workflow": "2324ad76-ff37-4157-8bcc-3ce72b7dace9",
+        "project": "f01ff5be-a72d-43bd-afcf-174fa9dcd282",
+        "quality_metric": "5e900fff-3656-4be9-8a1d-c6c9444ad43e",
+        "run_status": "complete",
+        "run_url": "https://console.aws.amazon.com/states/home?region=us-east-1#/executions/details/arn:aws:states:us-east-1:643366669028:execution:tibanna_zebra:fastqc-0-11-4-1_GAPFI367BFRE",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "released",
+        "metadata_only": false,
+        "uuid": "dc9c17ae-7847-4a8e-a5d2-c3e876b3b0b8",
+        "awsem_app_name": "fastqc-0-11-4-1",
+        "schema_version": "3",
+        "input_files": [
+            {
+                "value": "a4ea498b-d1af-4053-b485-92e810ba9060",
+                "dimension": "0",
+                "workflow_argument_name": "input_fastq",
+                "ordinal": 1
+            }
+        ],
+        "awsem_job_id": "ZQkwiFJtRka7",
+        "output_files": [
+            {
+                "workflow_argument_name": "report_zip",
+                "value_qc": "db39e7e2-b39a-4765-94e9-a24dc49e21b0",
+                "type": "Output QC file"
+            }
+        ],
+        "awsem_postrun_json": "https://s3.amazonaws.com/tibanna-output/ZQkwiFJtRka7.postrun.json"
+    },
+    {
+        "parameters": [],
+        "run_platform": "AWSEM",
+        "date_created": "2020-07-07T06:01:34.379555+00:00",
+        "last_modified": {
+            "date_modified": "2020-07-07T15:42:57.346767+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "title": "workflow_bwa-mem_no_unzip-check v11 run 2019-11-24 23:01:19.306440",
+        "workflow": "9e094699-561b-4396-8d6a-ffc45f98c5e1",
+        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
+        "quality_metric": "ed55c8c3-5b5d-4f03-9508-9c3513706b83",
+        "run_status": "complete",
+        "run_url": "https://console.aws.amazon.com/states/home?region=us-east-1#/executions/details/arn:aws:states:us-east-1:643366669028:execution:tibanna_zebra:workflow_bwa-mem_no_unzip-check_GAPFIK2ZO8UI_GAPFIUCATWEO-1d1ec18a-7249-49fe-8b",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "released",
+        "metadata_only": false,
+        "uuid": "d58b6153-438f-4c3b-a631-ebff9c9ca4d5",
+        "awsem_app_name": "workflow_bwa-mem_no_unzip-check",
+        "schema_version": "3",
+        "input_files": [
+            {
+                "value": "5b49ade0-7299-44a1-bcc8-9c2b6e32516c",
+                "dimension": "0",
+                "workflow_argument_name": "fastq_R1",
+                "ordinal": 1
+            },
+            {
+                "value": "a9f52239-712a-485b-9eb2-b3bcdcbfae77",
+                "dimension": "0",
+                "workflow_argument_name": "fastq_R2",
+                "ordinal": 1
+            },
+            {
+                "value": "b24ed5ed-a037-48a0-a938-3fecfb90d0cf",
+                "dimension": "0",
+                "workflow_argument_name": "reference",
+                "ordinal": 1
+            }
+        ],
+        "awsem_job_id": "IUaYtGHleFep",
+        "output_files": [
+            {
+                "value": "20c51c3c-c242-4489-8f5d-2bfe33ee7552",
+                "workflow_argument_name": "raw_bam",
+                "format": "/file-formats/bam/",
+                "upload_key": "20c51c3c-c242-4489-8f5d-2bfe33ee7552/GAPFI9HDXSSI.bam",
+                "type": "Output processed file"
+            },
+            {
+                "workflow_argument_name": "raw_bam-check",
+                "value_qc": "18c2ff4f-e88c-489b-aef1-6a411a36a3fc",
+                "type": "Output QC file"
+            }
+        ],
+        "awsem_postrun_json": "https://s3.amazonaws.com/tibanna-output/IUaYtGHleFep.postrun.json"
+    },
+    {
+        "parameters": [],
+        "run_platform": "AWSEM",
+        "date_created": "2020-07-07T06:01:34.646615+00:00",
+        "last_modified": {
+            "date_modified": "2020-07-07T15:42:57.453843+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "title": "workflow_bwa-mem_no_unzip-check v11 run 2019-11-24 23:01:28.062492",
+        "workflow": "9e094699-561b-4396-8d6a-ffc45f98c5e1",
+        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
+        "quality_metric": "5bfad74f-3b86-4b8f-be8f-af33eebcdfef",
+        "run_status": "complete",
+        "run_url": "https://console.aws.amazon.com/states/home?region=us-east-1#/executions/details/arn:aws:states:us-east-1:643366669028:execution:tibanna_zebra:workflow_bwa-mem_no_unzip-check_GAPFI1HVXJ5F_GAPFIOFWFYZE-eee3a98d-0443-4d06-b5",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "released",
+        "metadata_only": false,
+        "uuid": "d05d398a-0887-4de3-a4cd-a2151b8863f0",
+        "awsem_app_name": "workflow_bwa-mem_no_unzip-check",
+        "schema_version": "3",
+        "input_files": [
+            {
+                "value": "00735f91-c5fd-4d63-84fd-0ef6c460abc4",
+                "dimension": "0",
+                "workflow_argument_name": "fastq_R1",
+                "ordinal": 1
+            },
+            {
+                "value": "d7e176e7-a7ed-4d20-aa4f-8dc25a73a3c7",
+                "dimension": "0",
+                "workflow_argument_name": "fastq_R2",
+                "ordinal": 1
+            },
+            {
+                "value": "b24ed5ed-a037-48a0-a938-3fecfb90d0cf",
+                "dimension": "0",
+                "workflow_argument_name": "reference",
+                "ordinal": 1
+            }
+        ],
+        "awsem_job_id": "xF7QaNPdhfEL",
+        "output_files": [
+            {
+                "value": "eca5a9ac-f00a-4279-aab9-3f4ed17015c9",
+                "workflow_argument_name": "raw_bam",
+                "format": "/file-formats/bam/",
+                "upload_key": "eca5a9ac-f00a-4279-aab9-3f4ed17015c9/GAPFI5V1GIRY.bam",
+                "type": "Output processed file"
+            },
+            {
+                "workflow_argument_name": "raw_bam-check",
+                "value_qc": "0cbb2e67-0c45-40a0-9aa0-837ff5dec1a1",
+                "type": "Output QC file"
+            }
+        ],
+        "awsem_postrun_json": "https://s3.amazonaws.com/tibanna-output/xF7QaNPdhfEL.postrun.json"
+    },
+    {
+        "parameters": [],
+        "run_platform": "AWSEM",
+        "date_created": "2020-07-07T02:42:02.535810+00:00",
+        "last_modified": {
+            "date_modified": "2020-07-07T15:42:57.572748+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "title": "workflow_gatk-ApplyBQSR-check v9 run 2019-09-09 11:24:39.311506",
+        "workflow": "6c9c6f49-f954-4e76-8dfb-d385cddcebd6",
+        "project": "f01ff5be-a72d-43bd-afcf-174fa9dcd282",
+        "quality_metric": "42d97c06-7976-4cda-bdb8-d5345879fb4c",
+        "run_status": "complete",
+        "run_url": "https://console.aws.amazon.com/states/home?region=us-east-1#/executions/details/arn:aws:states:us-east-1:643366669028:execution:tibanna_zebra:workflow_gatk-ApplyBQSR-check_GAPFIO3W5CXP",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "released",
+        "metadata_only": false,
+        "uuid": "cacdccc7-2b0b-4119-8d8d-9074110fa67f",
+        "awsem_app_name": "workflow_gatk-ApplyBQSR-check",
+        "schema_version": "3",
+        "input_files": [
+            {
+                "value": "0752c459-5267-4db4-93d6-e79a2bf93cb1",
+                "dimension": "0",
+                "workflow_argument_name": "input_bam",
+                "ordinal": 1
+            },
+            {
+                "value": "94c76cd9-bb6f-41a2-a33d-9ac02eb4c899",
+                "dimension": "0",
+                "workflow_argument_name": "recalibration_report",
+                "ordinal": 1
+            },
+            {
+                "value": "1936f246-22e1-45dc-bb5c-9cfd55537fe7",
+                "dimension": "0",
+                "workflow_argument_name": "reference",
+                "ordinal": 1
+            }
+        ],
+        "awsem_job_id": "741Ho6bh2eMc",
+        "output_files": [
+            {
+                "extra_files": [
+                    {
+                        "filename": "GAPFIU4NR412",
+                        "status": "uploading",
+                        "file_format": "/file-formats/bai/",
+                        "accession": "GAPFIU4NR412",
+                        "uuid": "e5dd2ccd-50f0-47c8-aeae-c967129201b6",
+                        "href": "/e5dd2ccd-50f0-47c8-aeae-c967129201b6/@@download/GAPFIU4NR412.bam.bai",
+                        "upload_key": "e5dd2ccd-50f0-47c8-aeae-c967129201b6/GAPFIU4NR412.bam.bai"
+                    }
+                ],
+                "format": "/file-formats/bam/",
+                "type": "Output processed file",
+                "value": "e5dd2ccd-50f0-47c8-aeae-c967129201b6",
+                "workflow_argument_name": "recalibrated_bam",
+                "secondary_file_formats": [
+                    "/file-formats/bai/"
+                ],
+                "upload_key": "e5dd2ccd-50f0-47c8-aeae-c967129201b6/GAPFIU4NR412.bam"
+            },
+            {
+                "workflow_argument_name": "recalibrated_bam-check",
+                "value_qc": "f2c9a87f-0a46-4e95-9e75-c67e1073d180",
+                "type": "Output QC file"
+            }
+        ],
+        "awsem_postrun_json": "https://s3.amazonaws.com/tibanna-output/741Ho6bh2eMc.postrun.json"
+    },
+    {
+        "parameters": [],
+        "run_platform": "AWSEM",
+        "date_created": "2020-07-07T02:42:02.801760+00:00",
+        "last_modified": {
+            "date_modified": "2020-07-07T15:42:57.674741+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "title": "fastqc-0-11-4-1 0.2.0 run 2019-09-08 04:33:49.435599",
+        "workflow": "2324ad76-ff37-4157-8bcc-3ce72b7dace9",
+        "project": "f01ff5be-a72d-43bd-afcf-174fa9dcd282",
+        "quality_metric": "b0e2b5c5-67aa-4beb-bfce-75dbe4387815",
+        "run_status": "complete",
+        "run_url": "https://console.aws.amazon.com/states/home?region=us-east-1#/executions/details/arn:aws:states:us-east-1:643366669028:execution:tibanna_zebra:fastqc-0-11-4-1_GAPFI9FZPWSX",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "released",
+        "metadata_only": false,
+        "uuid": "c5601c0f-494f-4adf-b670-82ab6259b555",
+        "awsem_app_name": "fastqc-0-11-4-1",
+        "schema_version": "3",
+        "input_files": [
+            {
+                "value": "4b6e5f84-4d62-4883-9c0d-981f12c9e26b",
+                "dimension": "0",
+                "workflow_argument_name": "input_fastq",
+                "ordinal": 1
+            }
+        ],
+        "awsem_job_id": "wd9KOeyqXJbj",
+        "output_files": [
+            {
+                "workflow_argument_name": "report_zip",
+                "value_qc": "d2605958-36f0-403a-bcc5-71ac4cf33b18",
+                "type": "Output QC file"
+            }
+        ],
+        "awsem_postrun_json": "https://s3.amazonaws.com/tibanna-output/wd9KOeyqXJbj.postrun.json"
+    },
+    {
+        "parameters": [],
+        "run_platform": "AWSEM",
+        "date_created": "2020-07-07T02:42:03.067286+00:00",
+        "last_modified": {
+            "date_modified": "2020-07-07T15:42:57.801911+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "title": "workflow_gatk-ApplyBQSR-check v9 run 2019-09-09 11:24:48.121298",
+        "workflow": "6c9c6f49-f954-4e76-8dfb-d385cddcebd6",
+        "project": "f01ff5be-a72d-43bd-afcf-174fa9dcd282",
+        "quality_metric": "f21638d4-056b-478c-9fcf-3da547c657d1",
+        "run_status": "complete",
+        "run_url": "https://console.aws.amazon.com/states/home?region=us-east-1#/executions/details/arn:aws:states:us-east-1:643366669028:execution:tibanna_zebra:workflow_gatk-ApplyBQSR-check_GAPFI3T86RWJ",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "released",
+        "metadata_only": false,
+        "uuid": "b7391dff-cfcf-447e-905b-2bdf3e378e9f",
+        "awsem_app_name": "workflow_gatk-ApplyBQSR-check",
+        "schema_version": "3",
+        "input_files": [
+            {
+                "value": "dc896cba-e679-40af-8749-647df78dec8d",
+                "dimension": "0",
+                "workflow_argument_name": "input_bam",
+                "ordinal": 1
+            },
+            {
+                "value": "a513f513-cd30-4deb-9c7a-f20cbf47d8a3",
+                "dimension": "0",
+                "workflow_argument_name": "recalibration_report",
+                "ordinal": 1
+            },
+            {
+                "value": "1936f246-22e1-45dc-bb5c-9cfd55537fe7",
+                "dimension": "0",
+                "workflow_argument_name": "reference",
+                "ordinal": 1
+            }
+        ],
+        "awsem_job_id": "zFJRFRInkEOT",
+        "output_files": [
+            {
+                "extra_files": [
+                    {
+                        "filename": "GAPFICSPH3JS",
+                        "status": "uploading",
+                        "file_format": "/file-formats/bai/",
+                        "accession": "GAPFICSPH3JS",
+                        "uuid": "0eadbe82-ae79-4d49-ad85-501b0573c2ce",
+                        "href": "/0eadbe82-ae79-4d49-ad85-501b0573c2ce/@@download/GAPFICSPH3JS.bam.bai",
+                        "upload_key": "0eadbe82-ae79-4d49-ad85-501b0573c2ce/GAPFICSPH3JS.bam.bai"
+                    }
+                ],
+                "format": "/file-formats/bam/",
+                "type": "Output processed file",
+                "value": "0eadbe82-ae79-4d49-ad85-501b0573c2ce",
+                "workflow_argument_name": "recalibrated_bam",
+                "secondary_file_formats": [
+                    "/file-formats/bai/"
+                ],
+                "upload_key": "0eadbe82-ae79-4d49-ad85-501b0573c2ce/GAPFICSPH3JS.bam"
+            },
+            {
+                "workflow_argument_name": "recalibrated_bam-check",
+                "value_qc": "bd217372-3451-4f02-88f4-79f43da48f36",
+                "type": "Output QC file"
+            }
+        ],
+        "awsem_postrun_json": "https://s3.amazonaws.com/tibanna-output/zFJRFRInkEOT.postrun.json"
+    },
+    {
+        "parameters": [],
+        "run_platform": "AWSEM",
+        "date_created": "2020-07-07T06:01:34.912639+00:00",
+        "last_modified": {
+            "date_modified": "2020-07-07T15:42:57.946205+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "title": "workflow_bwa-mem_no_unzip-check v11 run 2019-11-24 23:01:14.954747",
+        "workflow": "9e094699-561b-4396-8d6a-ffc45f98c5e1",
+        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
+        "quality_metric": "52668985-35fe-4e10-b838-8a2957b0e48c",
+        "run_status": "complete",
+        "run_url": "https://console.aws.amazon.com/states/home?region=us-east-1#/executions/details/arn:aws:states:us-east-1:643366669028:execution:tibanna_zebra:workflow_bwa-mem_no_unzip-check_GAPFIHVO2FZQ_GAPFIB4MJASV-32d8495b-59c4-4ca4-8b",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "released",
+        "metadata_only": false,
+        "uuid": "ad95e345-3f42-4717-9ffd-93d80af722a0",
+        "awsem_app_name": "workflow_bwa-mem_no_unzip-check",
+        "schema_version": "3",
+        "input_files": [
+            {
+                "value": "11318a6f-c9eb-433b-844d-20fa46f66a59",
+                "dimension": "0",
+                "workflow_argument_name": "fastq_R1",
+                "ordinal": 1
+            },
+            {
+                "value": "d2dcb300-84d8-4b89-9af0-eb75c75226f8",
+                "dimension": "0",
+                "workflow_argument_name": "fastq_R2",
+                "ordinal": 1
+            },
+            {
+                "value": "b24ed5ed-a037-48a0-a938-3fecfb90d0cf",
+                "dimension": "0",
+                "workflow_argument_name": "reference",
+                "ordinal": 1
+            }
+        ],
+        "awsem_job_id": "xIq2opXzDxXx",
+        "output_files": [
+            {
+                "value": "afd716d4-714f-4df3-80be-014269c2821d",
+                "workflow_argument_name": "raw_bam",
+                "format": "/file-formats/bam/",
+                "upload_key": "afd716d4-714f-4df3-80be-014269c2821d/GAPFIH1A1SPG.bam",
+                "type": "Output processed file"
+            },
+            {
+                "workflow_argument_name": "raw_bam-check",
+                "value_qc": "cba2a229-0844-435c-822b-00f19be400f6",
+                "type": "Output QC file"
+            }
+        ],
+        "awsem_postrun_json": "https://s3.amazonaws.com/tibanna-output/xIq2opXzDxXx.postrun.json"
+    },
+    {
+        "parameters": [],
+        "run_platform": "AWSEM",
+        "date_created": "2020-07-07T02:42:03.314488+00:00",
+        "last_modified": {
+            "date_modified": "2020-07-07T15:42:59.106968+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "title": "fastqc-0-11-4-1 0.2.0 run 2019-09-08 04:33:45.318924",
+        "workflow": "2324ad76-ff37-4157-8bcc-3ce72b7dace9",
+        "project": "f01ff5be-a72d-43bd-afcf-174fa9dcd282",
+        "quality_metric": "ca540f2b-a25f-401a-b0ce-475293e5830c",
+        "run_status": "complete",
+        "run_url": "https://console.aws.amazon.com/states/home?region=us-east-1#/executions/details/arn:aws:states:us-east-1:643366669028:execution:tibanna_zebra:fastqc-0-11-4-1_GAPFI2V6XRYN",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "released",
+        "metadata_only": false,
+        "uuid": "aa29f34c-f252-48cf-87c6-df08afbd430c",
+        "awsem_app_name": "fastqc-0-11-4-1",
+        "schema_version": "3",
+        "input_files": [
+            {
+                "value": "d590fb80-f5e2-41cb-9fd3-48b382e32fb9",
+                "dimension": "0",
+                "workflow_argument_name": "input_fastq",
+                "ordinal": 1
+            }
+        ],
+        "awsem_job_id": "wrSt62Bv547I",
+        "output_files": [
+            {
+                "workflow_argument_name": "report_zip",
+                "value_qc": "8ced5a64-bed8-47de-9061-731320f4c20a",
+                "type": "Output QC file"
+            }
+        ],
+        "awsem_postrun_json": "https://s3.amazonaws.com/tibanna-output/wrSt62Bv547I.postrun.json"
+    },
+    {
+        "parameters": [
+            {
+                "value": "15",
+                "dimension": "0",
+                "workflow_argument_name": "nthreads",
+                "ordinal": 1
+            }
+        ],
+        "run_platform": "AWSEM",
+        "date_created": "2020-07-07T06:01:28.029872+00:00",
+        "last_modified": {
+            "date_modified": "2020-07-07T15:42:59.286213+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "title": "workflow_granite-mpileupCounts v14 run 2020-03-26 02:23:04.643398",
+        "workflow": "6e89bc5d-b4a0-4954-9c3f-361477d5f537",
+        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
+        "quality_metric": "be61df1a-dade-4972-b1aa-81f633260907",
+        "run_status": "complete",
+        "run_url": "https://console.aws.amazon.com/states/home?region=us-east-1#/executions/details/arn:aws:states:us-east-1:643366669028:execution:tibanna_zebra:run_workflow_granite-mpileupCounts-ae664fb5-9f46-4704-ae84-971c6a744854",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "released",
+        "metadata_only": false,
+        "uuid": "a1a7aef5-a111-4a5f-b231-1b72a478ebf0",
+        "awsem_app_name": "workflow_granite-mpileupCounts",
+        "schema_version": "3",
+        "input_files": [
+            {
+                "value": "f50655c9-e3ad-4110-8c56-5ad905b2cddc",
+                "dimension": "0",
+                "workflow_argument_name": "input_bam",
+                "ordinal": 1
+            },
+            {
+                "value": "1936f246-22e1-45dc-bb5c-9cfd55537fe7",
+                "dimension": "0",
+                "workflow_argument_name": "reference",
+                "ordinal": 1
+            },
+            {
+                "value": "1c07a3aa-e2a3-498c-b838-15991c4a2f28",
+                "dimension": "0",
+                "workflow_argument_name": "regions",
+                "ordinal": 1
+            }
+        ],
+        "awsem_job_id": "StJeQXDNiWTh",
+        "output_files": [
+            {
+                "extra_files": [
+                    {
+                        "filename": "GAPFIPMKG3YG",
+                        "status": "uploading",
+                        "file_format": "/file-formats/rck_gz_tbi/",
+                        "accession": "GAPFIPMKG3YG",
+                        "uuid": "620ce445-fc71-4f65-b429-353e9ed02d2c",
+                        "href": "/620ce445-fc71-4f65-b429-353e9ed02d2c/@@download/GAPFIPMKG3YG.rck.gz.tbi",
+                        "upload_key": "620ce445-fc71-4f65-b429-353e9ed02d2c/GAPFIPMKG3YG.rck.gz.tbi"
+                    }
+                ],
+                "format": "/file-formats/rck_gz/",
+                "type": "Output processed file",
+                "value": "620ce445-fc71-4f65-b429-353e9ed02d2c",
+                "workflow_argument_name": "rck",
+                "secondary_file_formats": [
+                    "/file-formats/rck_gz_tbi/"
+                ],
+                "upload_key": "620ce445-fc71-4f65-b429-353e9ed02d2c/GAPFIPMKG3YG.rck.gz"
+            }
+        ],
+        "awsem_postrun_json": "https://s3.amazonaws.com/tibanna-output/StJeQXDNiWTh.postrun.json"
+    },
+    {
+        "parameters": [],
+        "run_platform": "AWSEM",
+        "date_created": "2020-07-07T06:01:32.312703+00:00",
+        "last_modified": {
+            "date_modified": "2020-07-07T15:42:59.426939+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "title": "workflow_gatk-HaplotypeCaller v11 run 2019-11-26 17:01:07.966962",
+        "workflow": "7fd67e19-3425-45f8-8149-c7cac4278fdb",
+        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
+        "quality_metric": "0d5f34bf-f850-4a0c-af2a-28f14cccca6d",
+        "run_status": "complete",
+        "run_url": "https://console.aws.amazon.com/states/home?region=us-east-1#/executions/details/arn:aws:states:us-east-1:643366669028:execution:tibanna_zebra:workflow_gatk-HaplotypeCaller_GAPFIEL2PMO2",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "released",
+        "metadata_only": false,
+        "uuid": "9c01319d-e8ee-4b3f-a8aa-4fd4bbca8510",
+        "awsem_app_name": "workflow_gatk-HaplotypeCaller",
+        "schema_version": "3",
+        "input_files": [
+            {
+                "value": "f573cbeb-036c-4348-bed7-27a108126d09",
+                "dimension": "0",
+                "workflow_argument_name": "input_bam",
+                "ordinal": 1
+            },
+            {
+                "value": "1936f246-22e1-45dc-bb5c-9cfd55537fe7",
+                "dimension": "0",
+                "workflow_argument_name": "reference",
+                "ordinal": 1
+            },
+            {
+                "value": "1c07a3aa-e2a3-498c-b838-15991c4a2f28",
+                "dimension": "0",
+                "workflow_argument_name": "regions",
+                "ordinal": 1
+            }
+        ],
+        "awsem_job_id": "q0LiYmsspk3F",
+        "output_files": [
+            {
+                "extra_files": [
+                    {
+                        "filename": "GAPFIMK9Z47X",
+                        "status": "uploading",
+                        "file_format": "/file-formats/gvcf_gz_tbi/",
+                        "accession": "GAPFIMK9Z47X",
+                        "uuid": "7966b49e-8c78-4df7-9433-c2548be23088",
+                        "href": "/7966b49e-8c78-4df7-9433-c2548be23088/@@download/GAPFIMK9Z47X.gvcf.gz.tbi",
+                        "upload_key": "7966b49e-8c78-4df7-9433-c2548be23088/GAPFIMK9Z47X.gvcf.gz.tbi"
+                    }
+                ],
+                "format": "/file-formats/gvcf_gz/",
+                "type": "Output processed file",
+                "value": "7966b49e-8c78-4df7-9433-c2548be23088",
+                "workflow_argument_name": "gvcf",
+                "secondary_file_formats": [
+                    "/file-formats/gvcf_gz_tbi/"
+                ],
+                "upload_key": "7966b49e-8c78-4df7-9433-c2548be23088/GAPFIMK9Z47X.gvcf.gz"
+            }
+        ],
+        "awsem_postrun_json": "https://s3.amazonaws.com/tibanna-output/q0LiYmsspk3F.postrun.json"
+    },
+    {
+        "parameters": [],
+        "run_platform": "AWSEM",
+        "date_created": "2020-07-07T02:42:03.579335+00:00",
+        "last_modified": {
+            "date_modified": "2020-07-07T15:42:59.574324+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "title": "workflow_gatk-HaplotypeCaller v10 run 2019-10-16 04:11:17.490082",
+        "workflow": "d6465b5f-1768-4c94-b025-edc96e101ac5",
+        "project": "f01ff5be-a72d-43bd-afcf-174fa9dcd282",
+        "quality_metric": "e3e90864-7ab3-46dc-930f-80fd4d76c403",
+        "run_status": "complete",
+        "run_url": "https://console.aws.amazon.com/states/home?region=us-east-1#/executions/details/arn:aws:states:us-east-1:643366669028:execution:tibanna_zebra:workflow_gatk-HaplotypeCaller_GAPFICSPH3JS",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "released",
+        "metadata_only": false,
+        "uuid": "97104718-0134-4168-b6e1-9fa55d772827",
+        "awsem_app_name": "workflow_gatk-HaplotypeCaller",
+        "schema_version": "3",
+        "input_files": [
+            {
+                "value": "0eadbe82-ae79-4d49-ad85-501b0573c2ce",
+                "dimension": "0",
+                "workflow_argument_name": "input_bam",
+                "ordinal": 1
+            },
+            {
+                "value": "1936f246-22e1-45dc-bb5c-9cfd55537fe7",
+                "dimension": "0",
+                "workflow_argument_name": "reference",
+                "ordinal": 1
+            },
+            {
+                "value": "1c07a3aa-e2a3-498c-b838-15991c4a2f28",
+                "dimension": "0",
+                "workflow_argument_name": "regions",
+                "ordinal": 1
+            }
+        ],
+        "awsem_job_id": "GMyUKSzquLDr",
+        "output_files": [
+            {
+                "extra_files": [
+                    {
+                        "filename": "GAPFIWYDXQ7O",
+                        "status": "uploading",
+                        "file_format": "/file-formats/gvcf_gz_tbi/",
+                        "accession": "GAPFIWYDXQ7O",
+                        "uuid": "30308414-fa4e-4347-b964-3642f8bd0b6a",
+                        "href": "/30308414-fa4e-4347-b964-3642f8bd0b6a/@@download/GAPFIWYDXQ7O.gvcf.gz.tbi",
+                        "upload_key": "30308414-fa4e-4347-b964-3642f8bd0b6a/GAPFIWYDXQ7O.gvcf.gz.tbi"
+                    }
+                ],
+                "format": "/file-formats/gvcf_gz/",
+                "type": "Output processed file",
+                "value": "30308414-fa4e-4347-b964-3642f8bd0b6a",
+                "workflow_argument_name": "gvcf",
+                "secondary_file_formats": [
+                    "/file-formats/gvcf_gz_tbi/"
+                ],
+                "upload_key": "30308414-fa4e-4347-b964-3642f8bd0b6a/GAPFIWYDXQ7O.gvcf.gz"
+            }
+        ],
+        "awsem_postrun_json": "https://s3.amazonaws.com/tibanna-output/GMyUKSzquLDr.postrun.json"
+    },
+    {
+        "parameters": [],
+        "run_platform": "AWSEM",
+        "date_created": "2020-07-07T02:42:03.805904+00:00",
+        "last_modified": {
+            "date_modified": "2020-07-07T15:42:59.701631+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "title": "md5 0.2.6 run 2019-09-08 03:24:41.308908",
+        "workflow": "c77a117b-9a58-477e-aaa5-291a109a99f6",
+        "project": "f01ff5be-a72d-43bd-afcf-174fa9dcd282",
+        "quality_metric": "0ed01bd8-a6a9-4207-8c56-dc1fab5de9e5",
+        "run_status": "complete",
+        "run_url": "https://console.aws.amazon.com/states/home?region=us-east-1#/executions/details/arn:aws:states:us-east-1:643366669028:execution:tibanna_zebra:md5_GAPFI2V6XRYN",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "released",
+        "metadata_only": false,
+        "uuid": "90a8388c-e298-4b6f-b8a4-e0ae58717460",
+        "awsem_app_name": "md5",
+        "schema_version": "3",
+        "input_files": [
+            {
+                "value": "d590fb80-f5e2-41cb-9fd3-48b382e32fb9",
+                "dimension": "0",
+                "workflow_argument_name": "input_file",
+                "ordinal": 1
+            }
+        ],
+        "awsem_job_id": "8CyG4NgReOgf",
+        "output_files": [
+            {
+                "workflow_argument_name": "report",
+                "type": "Output report file"
+            }
+        ],
+        "awsem_postrun_json": "https://s3.amazonaws.com/tibanna-output/8CyG4NgReOgf.postrun.json"
+    },
+    {
+        "parameters": [],
+        "run_platform": "AWSEM",
+        "date_created": "2020-07-07T06:01:32.578171+00:00",
+        "last_modified": {
+            "date_modified": "2020-07-07T15:42:59.858186+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "title": "workflow_gatk-HaplotypeCaller v11 run 2019-11-26 17:00:59.566478",
+        "workflow": "7fd67e19-3425-45f8-8149-c7cac4278fdb",
+        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
+        "quality_metric": "2823684b-64cf-4810-bb5e-a10721f40603",
+        "run_status": "complete",
+        "run_url": "https://console.aws.amazon.com/states/home?region=us-east-1#/executions/details/arn:aws:states:us-east-1:643366669028:execution:tibanna_zebra:workflow_gatk-HaplotypeCaller_GAPFIUIDX1RI",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "released",
+        "metadata_only": false,
+        "uuid": "89c25e37-c64a-42cf-83fb-dea656bb2140",
+        "awsem_app_name": "workflow_gatk-HaplotypeCaller",
+        "schema_version": "3",
+        "input_files": [
+            {
+                "value": "93f9cefb-c30e-4b03-8e2b-3215a72c5dd9",
+                "dimension": "0",
+                "workflow_argument_name": "input_bam",
+                "ordinal": 1
+            },
+            {
+                "value": "1936f246-22e1-45dc-bb5c-9cfd55537fe7",
+                "dimension": "0",
+                "workflow_argument_name": "reference",
+                "ordinal": 1
+            },
+            {
+                "value": "1c07a3aa-e2a3-498c-b838-15991c4a2f28",
+                "dimension": "0",
+                "workflow_argument_name": "regions",
+                "ordinal": 1
+            }
+        ],
+        "awsem_job_id": "7P0XuCQXo9wb",
+        "output_files": [
+            {
+                "extra_files": [
+                    {
+                        "filename": "GAPFIDCQG5OX",
+                        "status": "uploading",
+                        "file_format": "/file-formats/gvcf_gz_tbi/",
+                        "accession": "GAPFIDCQG5OX",
+                        "uuid": "14ca4678-05a9-48b7-b225-374dee54cccb",
+                        "href": "/14ca4678-05a9-48b7-b225-374dee54cccb/@@download/GAPFIDCQG5OX.gvcf.gz.tbi",
+                        "upload_key": "14ca4678-05a9-48b7-b225-374dee54cccb/GAPFIDCQG5OX.gvcf.gz.tbi"
+                    }
+                ],
+                "format": "/file-formats/gvcf_gz/",
+                "type": "Output processed file",
+                "value": "14ca4678-05a9-48b7-b225-374dee54cccb",
+                "workflow_argument_name": "gvcf",
+                "secondary_file_formats": [
+                    "/file-formats/gvcf_gz_tbi/"
+                ],
+                "upload_key": "14ca4678-05a9-48b7-b225-374dee54cccb/GAPFIDCQG5OX.gvcf.gz"
+            }
+        ],
+        "awsem_postrun_json": "https://s3.amazonaws.com/tibanna-output/7P0XuCQXo9wb.postrun.json"
+    },
+    {
+        "parameters": [],
+        "run_platform": "AWSEM",
+        "date_created": "2020-07-07T06:01:29.515862+00:00",
+        "last_modified": {
+            "date_modified": "2020-07-07T15:43:00.060325+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "title": "workflow_gatk-ApplyBQSR-check v11 run 2019-11-26 07:01:23.583662",
+        "workflow": "6c9c6f49-f954-4e76-8dfb-d385cddcebd6",
+        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
+        "quality_metric": "b58cf74b-4460-4b33-a941-858eb6cddce1",
+        "run_status": "complete",
+        "run_url": "https://console.aws.amazon.com/states/home?region=us-east-1#/executions/details/arn:aws:states:us-east-1:643366669028:execution:tibanna_zebra:workflow_gatk-ApplyBQSR-check_GAPFIJG8GL3V",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "released",
+        "metadata_only": false,
+        "uuid": "843f2c0d-084e-4f2a-bf3b-693f3dd5a406",
+        "awsem_app_name": "workflow_gatk-ApplyBQSR-check",
+        "schema_version": "3",
+        "input_files": [
+            {
+                "value": "d87b2ea0-d0d3-4e4b-84e5-e32ee572ae96",
+                "dimension": "0",
+                "workflow_argument_name": "input_bam",
+                "ordinal": 1
+            },
+            {
+                "value": "3e51d717-bc6f-444d-98dd-fca2a60df2be",
+                "dimension": "0",
+                "workflow_argument_name": "recalibration_report",
+                "ordinal": 1
+            },
+            {
+                "value": "1936f246-22e1-45dc-bb5c-9cfd55537fe7",
+                "dimension": "0",
+                "workflow_argument_name": "reference",
+                "ordinal": 1
+            }
+        ],
+        "awsem_job_id": "0wDKO96gWF1G",
+        "output_files": [
+            {
+                "extra_files": [
+                    {
+                        "filename": "GAPFIEL2PMO2",
+                        "status": "uploading",
+                        "file_format": "/file-formats/bai/",
+                        "accession": "GAPFIEL2PMO2",
+                        "uuid": "f573cbeb-036c-4348-bed7-27a108126d09",
+                        "href": "/f573cbeb-036c-4348-bed7-27a108126d09/@@download/GAPFIEL2PMO2.bam.bai",
+                        "upload_key": "f573cbeb-036c-4348-bed7-27a108126d09/GAPFIEL2PMO2.bam.bai"
+                    }
+                ],
+                "format": "/file-formats/bam/",
+                "type": "Output processed file",
+                "value": "f573cbeb-036c-4348-bed7-27a108126d09",
+                "workflow_argument_name": "recalibrated_bam",
+                "secondary_file_formats": [
+                    "/file-formats/bai/"
+                ],
+                "upload_key": "f573cbeb-036c-4348-bed7-27a108126d09/GAPFIEL2PMO2.bam"
+            },
+            {
+                "workflow_argument_name": "recalibrated_bam-check",
+                "value_qc": "f1a7f082-3bcd-449a-afe1-71ff82798a10",
+                "type": "Output QC file"
+            }
+        ],
+        "awsem_postrun_json": "https://s3.amazonaws.com/tibanna-output/0wDKO96gWF1G.postrun.json"
+    },
+    {
+        "parameters": [],
+        "run_platform": "AWSEM",
+        "date_created": "2020-07-07T02:42:04.062052+00:00",
+        "last_modified": {
+            "date_modified": "2020-07-07T15:43:00.193365+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "title": "md5 0.2.6 run 2019-09-08 03:24:43.871762",
+        "workflow": "c77a117b-9a58-477e-aaa5-291a109a99f6",
+        "project": "f01ff5be-a72d-43bd-afcf-174fa9dcd282",
+        "quality_metric": "33743c1d-fa2f-4f1b-8698-e484a1e392c3",
+        "run_status": "complete",
+        "run_url": "https://console.aws.amazon.com/states/home?region=us-east-1#/executions/details/arn:aws:states:us-east-1:643366669028:execution:tibanna_zebra:md5_GAPFI9FZPWSX",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "released",
+        "metadata_only": false,
+        "uuid": "7d43ffd0-d204-4d82-b377-49c01e057e82",
+        "awsem_app_name": "md5",
+        "schema_version": "3",
+        "input_files": [
+            {
+                "value": "4b6e5f84-4d62-4883-9c0d-981f12c9e26b",
+                "dimension": "0",
+                "workflow_argument_name": "input_file",
+                "ordinal": 1
+            }
+        ],
+        "awsem_job_id": "y5baXH7zYVmc",
+        "output_files": [
+            {
+                "workflow_argument_name": "report",
+                "type": "Output report file"
+            }
+        ],
+        "awsem_postrun_json": "https://s3.amazonaws.com/tibanna-output/y5baXH7zYVmc.postrun.json"
+    },
+    {
+        "parameters": [],
+        "run_platform": "AWSEM",
+        "date_created": "2020-07-07T02:42:04.477131+00:00",
+        "last_modified": {
+            "date_modified": "2020-07-07T15:43:00.342525+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "title": "workflow_gatk-ApplyBQSR-check v9 run 2019-09-09 11:24:36.371957",
+        "workflow": "6c9c6f49-f954-4e76-8dfb-d385cddcebd6",
+        "project": "f01ff5be-a72d-43bd-afcf-174fa9dcd282",
+        "quality_metric": "600ebc56-c147-471f-bbf3-934500847675",
+        "run_status": "complete",
+        "run_url": "https://console.aws.amazon.com/states/home?region=us-east-1#/executions/details/arn:aws:states:us-east-1:643366669028:execution:tibanna_zebra:workflow_gatk-ApplyBQSR-check_GAPFIO4ZFVNY",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "released",
+        "metadata_only": false,
+        "uuid": "77d2789b-22d6-4a3a-a858-c187c51a6579",
+        "awsem_app_name": "workflow_gatk-ApplyBQSR-check",
+        "schema_version": "3",
+        "input_files": [
+            {
+                "value": "4a1a7f00-9aa6-46ac-a642-99a85e397c0e",
+                "dimension": "0",
+                "workflow_argument_name": "input_bam",
+                "ordinal": 1
+            },
+            {
+                "value": "69c4a959-e0b3-4c2e-87e1-ec2a479cd54a",
+                "dimension": "0",
+                "workflow_argument_name": "recalibration_report",
+                "ordinal": 1
+            },
+            {
+                "value": "1936f246-22e1-45dc-bb5c-9cfd55537fe7",
+                "dimension": "0",
+                "workflow_argument_name": "reference",
+                "ordinal": 1
+            }
+        ],
+        "awsem_job_id": "zhxPR3ySRpbR",
+        "output_files": [
+            {
+                "extra_files": [
+                    {
+                        "filename": "GAPFID3VNGDY",
+                        "status": "uploading",
+                        "file_format": "/file-formats/bai/",
+                        "accession": "GAPFID3VNGDY",
+                        "uuid": "b49682db-bbea-4d5d-b376-0f68e5e3e4a8",
+                        "href": "/b49682db-bbea-4d5d-b376-0f68e5e3e4a8/@@download/GAPFID3VNGDY.bam.bai",
+                        "upload_key": "b49682db-bbea-4d5d-b376-0f68e5e3e4a8/GAPFID3VNGDY.bam.bai"
+                    }
+                ],
+                "format": "/file-formats/bam/",
+                "type": "Output processed file",
+                "value": "b49682db-bbea-4d5d-b376-0f68e5e3e4a8",
+                "workflow_argument_name": "recalibrated_bam",
+                "secondary_file_formats": [
+                    "/file-formats/bai/"
+                ],
+                "upload_key": "b49682db-bbea-4d5d-b376-0f68e5e3e4a8/GAPFID3VNGDY.bam"
+            },
+            {
+                "workflow_argument_name": "recalibrated_bam-check",
+                "value_qc": "23359821-5c00-4e5c-981c-9c6e8b3e1a1f",
+                "type": "Output QC file"
+            }
+        ],
+        "awsem_postrun_json": "https://s3.amazonaws.com/tibanna-output/zhxPR3ySRpbR.postrun.json"
+    },
+    {
+        "parameters": [],
+        "run_platform": "AWSEM",
+        "date_created": "2020-07-07T06:01:29.771485+00:00",
+        "last_modified": {
+            "date_modified": "2020-07-07T15:43:00.526073+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "title": "workflow_gatk-ApplyBQSR-check v11 run 2019-11-26 07:01:15.645224",
+        "workflow": "6c9c6f49-f954-4e76-8dfb-d385cddcebd6",
+        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
+        "quality_metric": "2bfa3a04-3edc-488f-8e10-f77ab2847e3b",
+        "run_status": "complete",
+        "run_url": "https://console.aws.amazon.com/states/home?region=us-east-1#/executions/details/arn:aws:states:us-east-1:643366669028:execution:tibanna_zebra:workflow_gatk-ApplyBQSR-check_GAPFIJ9BD3JU",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "released",
+        "metadata_only": false,
+        "uuid": "75c45927-8d80-47aa-ae97-ee8f44ab886d",
+        "awsem_app_name": "workflow_gatk-ApplyBQSR-check",
+        "schema_version": "3",
+        "input_files": [
+            {
+                "value": "6577ba40-57ef-40c7-95cb-1557718d3005",
+                "dimension": "0",
+                "workflow_argument_name": "input_bam",
+                "ordinal": 1
+            },
+            {
+                "value": "2005cb42-9613-4e9a-931c-22be0b5af1e1",
+                "dimension": "0",
+                "workflow_argument_name": "recalibration_report",
+                "ordinal": 1
+            },
+            {
+                "value": "1936f246-22e1-45dc-bb5c-9cfd55537fe7",
+                "dimension": "0",
+                "workflow_argument_name": "reference",
+                "ordinal": 1
+            }
+        ],
+        "awsem_job_id": "HmRURzR41O8A",
+        "output_files": [
+            {
+                "extra_files": [
+                    {
+                        "filename": "GAPFIUIDX1RI",
+                        "status": "uploading",
+                        "file_format": "/file-formats/bai/",
+                        "accession": "GAPFIUIDX1RI",
+                        "uuid": "93f9cefb-c30e-4b03-8e2b-3215a72c5dd9",
+                        "href": "/93f9cefb-c30e-4b03-8e2b-3215a72c5dd9/@@download/GAPFIUIDX1RI.bam.bai",
+                        "upload_key": "93f9cefb-c30e-4b03-8e2b-3215a72c5dd9/GAPFIUIDX1RI.bam.bai"
+                    }
+                ],
+                "format": "/file-formats/bam/",
+                "type": "Output processed file",
+                "value": "93f9cefb-c30e-4b03-8e2b-3215a72c5dd9",
+                "workflow_argument_name": "recalibrated_bam",
+                "secondary_file_formats": [
+                    "/file-formats/bai/"
+                ],
+                "upload_key": "93f9cefb-c30e-4b03-8e2b-3215a72c5dd9/GAPFIUIDX1RI.bam"
+            },
+            {
+                "workflow_argument_name": "recalibrated_bam-check",
+                "value_qc": "5105cba1-64a4-4907-a6cc-f79a3b72ecef",
+                "type": "Output QC file"
+            }
+        ],
+        "awsem_postrun_json": "https://s3.amazonaws.com/tibanna-output/HmRURzR41O8A.postrun.json"
+    },
+    {
+        "parameters": [],
+        "run_platform": "AWSEM",
+        "date_created": "2020-07-07T02:42:04.723309+00:00",
+        "last_modified": {
+            "date_modified": "2020-07-07T15:43:00.681677+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "title": "fastqc-0-11-4-1 0.2.0 run 2019-09-08 04:33:53.713827",
+        "workflow": "2324ad76-ff37-4157-8bcc-3ce72b7dace9",
+        "project": "f01ff5be-a72d-43bd-afcf-174fa9dcd282",
+        "quality_metric": "899d6ba5-7256-4e0d-9377-94d6d1833912",
+        "run_status": "complete",
+        "run_url": "https://console.aws.amazon.com/states/home?region=us-east-1#/executions/details/arn:aws:states:us-east-1:643366669028:execution:tibanna_zebra:fastqc-0-11-4-1_GAPFI9QV1Z8Q",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "released",
+        "metadata_only": false,
+        "uuid": "70d219e6-901f-4e44-91fc-6eb554c23d4a",
+        "awsem_app_name": "fastqc-0-11-4-1",
+        "schema_version": "3",
+        "input_files": [
+            {
+                "value": "b1574039-421b-4eb5-b19e-3e24b89443f0",
+                "dimension": "0",
+                "workflow_argument_name": "input_fastq",
+                "ordinal": 1
+            }
+        ],
+        "awsem_job_id": "nIj622FPZcDK",
+        "output_files": [
+            {
+                "workflow_argument_name": "report_zip",
+                "value_qc": "de954df8-091a-4b64-8446-9504f296d94b",
+                "type": "Output QC file"
+            }
+        ],
+        "awsem_postrun_json": "https://s3.amazonaws.com/tibanna-output/nIj622FPZcDK.postrun.json"
+    },
+    {
+        "parameters": [],
+        "run_platform": "AWSEM",
+        "date_created": "2020-07-07T02:42:05.067666+00:00",
+        "last_modified": {
+            "date_modified": "2020-07-07T15:43:00.841455+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "title": "fastqc-0-11-4-1 0.2.0 run 2019-09-08 04:33:58.129715",
+        "workflow": "2324ad76-ff37-4157-8bcc-3ce72b7dace9",
+        "project": "f01ff5be-a72d-43bd-afcf-174fa9dcd282",
+        "quality_metric": "c77aaac1-256a-460c-a6d5-58491b58abaa",
+        "run_status": "complete",
+        "run_url": "https://console.aws.amazon.com/states/home?region=us-east-1#/executions/details/arn:aws:states:us-east-1:643366669028:execution:tibanna_zebra:fastqc-0-11-4-1_GAPFI4ELFNSI",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "released",
+        "metadata_only": false,
+        "uuid": "6c796d9e-c863-40c3-a062-6a474a7b3591",
+        "awsem_app_name": "fastqc-0-11-4-1",
+        "schema_version": "3",
+        "input_files": [
+            {
+                "value": "c4306817-f6e6-4e9e-8e90-70e3cf1f1af4",
+                "dimension": "0",
+                "workflow_argument_name": "input_fastq",
+                "ordinal": 1
+            }
+        ],
+        "awsem_job_id": "oC7kM9t2BXLP",
+        "output_files": [
+            {
+                "workflow_argument_name": "report_zip",
+                "value_qc": "ddf93538-7fde-4c1f-afca-c3a05b1e641d",
+                "type": "Output QC file"
+            }
+        ],
+        "awsem_postrun_json": "https://s3.amazonaws.com/tibanna-output/oC7kM9t2BXLP.postrun.json"
+    },
+    {
+        "parameters": [
+            {
+                "value": "15",
+                "dimension": "0",
+                "workflow_argument_name": "nthreads",
+                "ordinal": 1
+            }
+        ],
+        "run_platform": "AWSEM",
+        "date_created": "2020-07-07T06:01:28.652452+00:00",
+        "last_modified": {
+            "date_modified": "2020-07-07T15:43:01.003794+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "title": "workflow_granite-mpileupCounts v14 run 2020-03-26 02:21:47.207475",
+        "workflow": "6e89bc5d-b4a0-4954-9c3f-361477d5f537",
+        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
+        "quality_metric": "9663f838-5843-411b-b6dc-9dd288fedf35",
+        "run_status": "complete",
+        "run_url": "https://console.aws.amazon.com/states/home?region=us-east-1#/executions/details/arn:aws:states:us-east-1:643366669028:execution:tibanna_zebra:run_workflow_granite-mpileupCounts-53e2c29d-a0c6-412a-b956-5d5c5939162a",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "released",
+        "metadata_only": false,
+        "uuid": "636bd7d3-da45-44d3-84d7-27e19065bd01",
+        "awsem_app_name": "workflow_granite-mpileupCounts",
+        "schema_version": "3",
+        "input_files": [
+            {
+                "value": "f573cbeb-036c-4348-bed7-27a108126d09",
+                "dimension": "0",
+                "workflow_argument_name": "input_bam",
+                "ordinal": 1
+            },
+            {
+                "value": "1936f246-22e1-45dc-bb5c-9cfd55537fe7",
+                "dimension": "0",
+                "workflow_argument_name": "reference",
+                "ordinal": 1
+            },
+            {
+                "value": "1c07a3aa-e2a3-498c-b838-15991c4a2f28",
+                "dimension": "0",
+                "workflow_argument_name": "regions",
+                "ordinal": 1
+            }
+        ],
+        "awsem_job_id": "FcLHXpEiCw8z",
+        "output_files": [
+            {
+                "extra_files": [
+                    {
+                        "filename": "GAPFIDS4QABG",
+                        "status": "uploading",
+                        "file_format": "/file-formats/rck_gz_tbi/",
+                        "accession": "GAPFIDS4QABG",
+                        "uuid": "ea43a01e-03a6-4ac5-a3fd-2a922bb2adf4",
+                        "href": "/ea43a01e-03a6-4ac5-a3fd-2a922bb2adf4/@@download/GAPFIDS4QABG.rck.gz.tbi",
+                        "upload_key": "ea43a01e-03a6-4ac5-a3fd-2a922bb2adf4/GAPFIDS4QABG.rck.gz.tbi"
+                    }
+                ],
+                "format": "/file-formats/rck_gz/",
+                "type": "Output processed file",
+                "value": "ea43a01e-03a6-4ac5-a3fd-2a922bb2adf4",
+                "workflow_argument_name": "rck",
+                "secondary_file_formats": [
+                    "/file-formats/rck_gz_tbi/"
+                ],
+                "upload_key": "ea43a01e-03a6-4ac5-a3fd-2a922bb2adf4/GAPFIDS4QABG.rck.gz"
+            }
+        ],
+        "awsem_postrun_json": "https://s3.amazonaws.com/tibanna-output/FcLHXpEiCw8z.postrun.json"
+    },
+    {
+        "parameters": [],
+        "run_platform": "AWSEM",
+        "date_created": "2020-07-07T02:42:05.375130+00:00",
+        "last_modified": {
+            "date_modified": "2020-07-07T15:43:01.158017+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "title": "md5 0.2.6 run 2019-09-08 03:24:56.792633",
+        "workflow": "c77a117b-9a58-477e-aaa5-291a109a99f6",
+        "project": "f01ff5be-a72d-43bd-afcf-174fa9dcd282",
+        "quality_metric": "be2528e6-7830-4c77-9b1c-b716ca647c10",
+        "run_status": "complete",
+        "run_url": "https://console.aws.amazon.com/states/home?region=us-east-1#/executions/details/arn:aws:states:us-east-1:643366669028:execution:tibanna_zebra:md5_GAPFI1UBTPZG",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "released",
+        "metadata_only": false,
+        "uuid": "622be1d9-a418-4a0c-b190-2fc19a76d46e",
+        "awsem_app_name": "md5",
+        "schema_version": "3",
+        "input_files": [
+            {
+                "value": "9015950c-0e1d-4066-924e-b197759f50c9",
+                "dimension": "0",
+                "workflow_argument_name": "input_file",
+                "ordinal": 1
+            }
+        ],
+        "awsem_job_id": "zDQ8IZ4Jy4n8",
+        "output_files": [
+            {
+                "workflow_argument_name": "report",
+                "type": "Output report file"
+            }
+        ],
+        "awsem_postrun_json": "https://s3.amazonaws.com/tibanna-output/zDQ8IZ4Jy4n8.postrun.json"
+    },
+    {
+        "parameters": [
+            {
+                "value": "15",
+                "dimension": "0",
+                "workflow_argument_name": "nthreads",
+                "ordinal": 1
+            }
+        ],
+        "run_platform": "AWSEM",
+        "date_created": "2020-07-07T06:01:28.898219+00:00",
+        "last_modified": {
+            "date_modified": "2020-07-07T15:43:01.293395+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "title": "workflow_granite-mpileupCounts v14 run 2020-03-26 02:22:26.349781",
+        "workflow": "6e89bc5d-b4a0-4954-9c3f-361477d5f537",
+        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
+        "quality_metric": "daa6d41e-bbc0-43c5-a47c-25ac782b188e",
+        "run_status": "complete",
+        "run_url": "https://console.aws.amazon.com/states/home?region=us-east-1#/executions/details/arn:aws:states:us-east-1:643366669028:execution:tibanna_zebra:run_workflow_granite-mpileupCounts-0a88fe87-c27d-44b4-8edf-7f2033c50ef9",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "released",
+        "metadata_only": false,
+        "uuid": "43d7bbe5-ad57-4d92-871f-9fa9489dc7f2",
+        "awsem_app_name": "workflow_granite-mpileupCounts",
+        "schema_version": "3",
+        "input_files": [
+            {
+                "value": "93f9cefb-c30e-4b03-8e2b-3215a72c5dd9",
+                "dimension": "0",
+                "workflow_argument_name": "input_bam",
+                "ordinal": 1
+            },
+            {
+                "value": "1936f246-22e1-45dc-bb5c-9cfd55537fe7",
+                "dimension": "0",
+                "workflow_argument_name": "reference",
+                "ordinal": 1
+            },
+            {
+                "value": "1c07a3aa-e2a3-498c-b838-15991c4a2f28",
+                "dimension": "0",
+                "workflow_argument_name": "regions",
+                "ordinal": 1
+            }
+        ],
+        "awsem_job_id": "su1Sh4OHWDqs",
+        "output_files": [
+            {
+                "extra_files": [
+                    {
+                        "filename": "GAPFIS77ACGJ",
+                        "status": "uploading",
+                        "file_format": "/file-formats/rck_gz_tbi/",
+                        "accession": "GAPFIS77ACGJ",
+                        "uuid": "2a4ca6dd-611b-4961-8e52-4ee297c682ff",
+                        "href": "/2a4ca6dd-611b-4961-8e52-4ee297c682ff/@@download/GAPFIS77ACGJ.rck.gz.tbi",
+                        "upload_key": "2a4ca6dd-611b-4961-8e52-4ee297c682ff/GAPFIS77ACGJ.rck.gz.tbi"
+                    }
+                ],
+                "format": "/file-formats/rck_gz/",
+                "type": "Output processed file",
+                "value": "2a4ca6dd-611b-4961-8e52-4ee297c682ff",
+                "workflow_argument_name": "rck",
+                "secondary_file_formats": [
+                    "/file-formats/rck_gz_tbi/"
+                ],
+                "upload_key": "2a4ca6dd-611b-4961-8e52-4ee297c682ff/GAPFIS77ACGJ.rck.gz"
+            }
+        ],
+        "awsem_postrun_json": "https://s3.amazonaws.com/tibanna-output/su1Sh4OHWDqs.postrun.json"
+    },
+    {
+        "parameters": [],
+        "run_platform": "AWSEM",
+        "date_created": "2020-07-07T06:01:31.012975+00:00",
+        "last_modified": {
+            "date_modified": "2020-07-07T15:43:01.472059+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "title": "workflow_gatk-CombineGVCFs v11 run 2019-12-17 21:31:53.042956",
+        "workflow": "c7223a1c-ed48-4c54-a39f-35f05d61e850",
+        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
+        "quality_metric": "997c9b14-db8a-40db-b8de-4a7ea732140c",
+        "run_status": "complete",
+        "run_url": "https://console.aws.amazon.com/states/home?region=us-east-1#/executions/details/arn:aws:states:us-east-1:643366669028:execution:tibanna_zebra_dev:run_workflow_gatk-CombineGVCFs-9487979a-6fe3-4a69-a3cd-889844d48815",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "released",
+        "metadata_only": false,
+        "uuid": "417969d6-41f1-4ba9-8e00-76b082d5f50c",
+        "awsem_app_name": "workflow_gatk-CombineGVCFs",
+        "schema_version": "3",
+        "input_files": [
+            {
+                "value": "14ca4678-05a9-48b7-b225-374dee54cccb",
+                "dimension": "0",
+                "workflow_argument_name": "input_gvcfs",
+                "ordinal": 1
+            },
+            {
+                "value": "7966b49e-8c78-4df7-9433-c2548be23088",
+                "dimension": "1",
+                "workflow_argument_name": "input_gvcfs",
+                "ordinal": 2
+            },
+            {
+                "value": "82b54421-d76d-4383-b49b-607d68cd703e",
+                "dimension": "2",
+                "workflow_argument_name": "input_gvcfs",
+                "ordinal": 3
+            },
+            {
+                "value": "1936f246-22e1-45dc-bb5c-9cfd55537fe7",
+                "dimension": "0",
+                "workflow_argument_name": "reference",
+                "ordinal": 1
+            },
+            {
+                "value": "a1d504ee-a313-4064-b6ae-65fed9738980",
+                "dimension": "0",
+                "workflow_argument_name": "chromosomes",
+                "ordinal": 1
+            }
+        ],
+        "awsem_job_id": "ehRReyKHgZ9D",
+        "output_files": [
+            {
+                "extra_files": [
+                    {
+                        "filename": "GAPFIJK5P7K2",
+                        "status": "uploading",
+                        "file_format": "/file-formats/gvcf_gz_tbi/",
+                        "accession": "GAPFIJK5P7K2",
+                        "uuid": "b3eea806-3f55-4a8c-b7f7-3438bb4ac1b3",
+                        "href": "/b3eea806-3f55-4a8c-b7f7-3438bb4ac1b3/@@download/GAPFIJK5P7K2.gvcf.gz.tbi",
+                        "upload_key": "b3eea806-3f55-4a8c-b7f7-3438bb4ac1b3/GAPFIJK5P7K2.gvcf.gz.tbi"
+                    }
+                ],
+                "format": "/file-formats/gvcf_gz/",
+                "type": "Output processed file",
+                "value": "b3eea806-3f55-4a8c-b7f7-3438bb4ac1b3",
+                "workflow_argument_name": "combined_gvcf",
+                "secondary_file_formats": [
+                    "/file-formats/gvcf_gz_tbi/"
+                ],
+                "upload_key": "b3eea806-3f55-4a8c-b7f7-3438bb4ac1b3/GAPFIJK5P7K2.gvcf.gz"
+            }
+        ],
+        "awsem_postrun_json": "https://s3.amazonaws.com/tibanna-output/ehRReyKHgZ9D.postrun.json"
+    },
+    {
+        "parameters": [],
+        "run_platform": "AWSEM",
+        "date_created": "2020-07-07T02:42:05.630141+00:00",
+        "last_modified": {
+            "date_modified": "2020-07-07T15:43:01.628464+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "title": "md5 0.2.6 run 2019-09-08 03:24:52.538221",
+        "workflow": "c77a117b-9a58-477e-aaa5-291a109a99f6",
+        "project": "f01ff5be-a72d-43bd-afcf-174fa9dcd282",
+        "quality_metric": "cc9fe7df-cef6-44d7-b2b3-e7b652d1ae7d",
+        "run_status": "complete",
+        "run_url": "https://console.aws.amazon.com/states/home?region=us-east-1#/executions/details/arn:aws:states:us-east-1:643366669028:execution:tibanna_zebra:md5_GAPFI4ELFNSI",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "released",
+        "metadata_only": false,
+        "uuid": "2d71fbab-b491-4455-a923-43b6b76b89a8",
+        "awsem_app_name": "md5",
+        "schema_version": "3",
+        "input_files": [
+            {
+                "value": "c4306817-f6e6-4e9e-8e90-70e3cf1f1af4",
+                "dimension": "0",
+                "workflow_argument_name": "input_file",
+                "ordinal": 1
+            }
+        ],
+        "awsem_job_id": "L9NjqUA5zsoe",
+        "output_files": [
+            {
+                "workflow_argument_name": "report",
+                "type": "Output report file"
+            }
+        ],
+        "awsem_postrun_json": "https://s3.amazonaws.com/tibanna-output/L9NjqUA5zsoe.postrun.json"
+    },
+    {
+        "parameters": [],
+        "run_platform": "AWSEM",
+        "date_created": "2020-07-07T02:42:05.903955+00:00",
+        "last_modified": {
+            "date_modified": "2020-07-07T15:43:01.763693+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "title": "workflow_gatk-HaplotypeCaller v10 run 2019-10-16 04:11:13.263824",
+        "workflow": "d6465b5f-1768-4c94-b025-edc96e101ac5",
+        "project": "f01ff5be-a72d-43bd-afcf-174fa9dcd282",
+        "quality_metric": "1e9e3990-90b0-43e8-b959-446039bde303",
+        "run_status": "complete",
+        "run_url": "https://console.aws.amazon.com/states/home?region=us-east-1#/executions/details/arn:aws:states:us-east-1:643366669028:execution:tibanna_zebra:workflow_gatk-HaplotypeCaller_GAPFIU4NR412",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "released",
+        "metadata_only": false,
+        "uuid": "25a68d32-d1af-4a0c-9838-4852dc16fd09",
+        "awsem_app_name": "workflow_gatk-HaplotypeCaller",
+        "schema_version": "3",
+        "input_files": [
+            {
+                "value": "e5dd2ccd-50f0-47c8-aeae-c967129201b6",
+                "dimension": "0",
+                "workflow_argument_name": "input_bam",
+                "ordinal": 1
+            },
+            {
+                "value": "1936f246-22e1-45dc-bb5c-9cfd55537fe7",
+                "dimension": "0",
+                "workflow_argument_name": "reference",
+                "ordinal": 1
+            },
+            {
+                "value": "1c07a3aa-e2a3-498c-b838-15991c4a2f28",
+                "dimension": "0",
+                "workflow_argument_name": "regions",
+                "ordinal": 1
+            }
+        ],
+        "awsem_job_id": "NenU4t3hRy63",
+        "output_files": [
+            {
+                "extra_files": [
+                    {
+                        "filename": "GAPFIWGRY4A4",
+                        "status": "uploading",
+                        "file_format": "/file-formats/gvcf_gz_tbi/",
+                        "accession": "GAPFIWGRY4A4",
+                        "uuid": "88d5fcec-668b-45fd-a384-3182685dd384",
+                        "href": "/88d5fcec-668b-45fd-a384-3182685dd384/@@download/GAPFIWGRY4A4.gvcf.gz.tbi",
+                        "upload_key": "88d5fcec-668b-45fd-a384-3182685dd384/GAPFIWGRY4A4.gvcf.gz.tbi"
+                    }
+                ],
+                "format": "/file-formats/gvcf_gz/",
+                "type": "Output processed file",
+                "value": "88d5fcec-668b-45fd-a384-3182685dd384",
+                "workflow_argument_name": "gvcf",
+                "secondary_file_formats": [
+                    "/file-formats/gvcf_gz_tbi/"
+                ],
+                "upload_key": "88d5fcec-668b-45fd-a384-3182685dd384/GAPFIWGRY4A4.gvcf.gz"
+            }
+        ],
+        "awsem_postrun_json": "https://s3.amazonaws.com/tibanna-output/NenU4t3hRy63.postrun.json"
+    },
+    {
+        "parameters": [],
+        "run_platform": "AWSEM",
+        "date_created": "2020-07-07T02:42:06.141277+00:00",
+        "last_modified": {
+            "date_modified": "2020-07-07T15:43:01.944783+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "title": "md5 0.2.6 run 2019-09-08 03:24:48.289408",
+        "workflow": "c77a117b-9a58-477e-aaa5-291a109a99f6",
+        "project": "f01ff5be-a72d-43bd-afcf-174fa9dcd282",
+        "quality_metric": "5daf8a9d-79cd-40b7-8a51-119d21301bbb",
+        "run_status": "complete",
+        "run_url": "https://console.aws.amazon.com/states/home?region=us-east-1#/executions/details/arn:aws:states:us-east-1:643366669028:execution:tibanna_zebra:md5_GAPFI9QV1Z8Q",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "released",
+        "metadata_only": false,
+        "uuid": "2300688f-74f8-42bf-ac2b-d4a929851eb5",
+        "awsem_app_name": "md5",
+        "schema_version": "3",
+        "input_files": [
+            {
+                "value": "b1574039-421b-4eb5-b19e-3e24b89443f0",
+                "dimension": "0",
+                "workflow_argument_name": "input_file",
+                "ordinal": 1
+            }
+        ],
+        "awsem_job_id": "YzGWu9lHY1EG",
+        "output_files": [
+            {
+                "workflow_argument_name": "report",
+                "type": "Output report file"
+            }
+        ],
+        "awsem_postrun_json": "https://s3.amazonaws.com/tibanna-output/YzGWu9lHY1EG.postrun.json"
+    },
+    {
+        "parameters": [],
+        "run_platform": "AWSEM",
+        "date_created": "2020-07-07T02:42:06.385563+00:00",
+        "last_modified": {
+            "date_modified": "2020-07-07T15:43:02.182393+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "title": "workflow_bwa-mem_no_unzip-check v9 run 2019-09-08 05:20:23.225236",
+        "workflow": "9e094699-561b-4396-8d6a-ffc45f98c5e1",
+        "project": "f01ff5be-a72d-43bd-afcf-174fa9dcd282",
+        "quality_metric": "6c8519e0-d6b1-42fc-8155-a2f5327b6f0c",
+        "run_status": "complete",
+        "run_url": "https://console.aws.amazon.com/states/home?region=us-east-1#/executions/details/arn:aws:states:us-east-1:643366669028:execution:tibanna_zebra:workflow_bwa-mem_no_unzip-check_GAPFI9FZPWSX_GAPFI2V6XRYN",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "released",
+        "metadata_only": false,
+        "uuid": "2259bbf7-0f2b-4f4f-8664-7052b7fe3432",
+        "awsem_app_name": "workflow_bwa-mem_no_unzip-check",
+        "schema_version": "3",
+        "input_files": [
+            {
+                "value": "4b6e5f84-4d62-4883-9c0d-981f12c9e26b",
+                "dimension": "0",
+                "workflow_argument_name": "fastq_R1",
+                "ordinal": 1
+            },
+            {
+                "value": "d590fb80-f5e2-41cb-9fd3-48b382e32fb9",
+                "dimension": "0",
+                "workflow_argument_name": "fastq_R2",
+                "ordinal": 1
+            },
+            {
+                "value": "b24ed5ed-a037-48a0-a938-3fecfb90d0cf",
+                "dimension": "0",
+                "workflow_argument_name": "reference",
+                "ordinal": 1
+            }
+        ],
+        "awsem_job_id": "003XXkptF9BN",
+        "output_files": [
+            {
+                "value": "57ce346f-caec-4803-b6c0-d6f394110bf6",
+                "workflow_argument_name": "raw_bam",
+                "format": "/file-formats/bam/",
+                "upload_key": "57ce346f-caec-4803-b6c0-d6f394110bf6/GAPFIGJ43YY2.bam",
+                "type": "Output processed file"
+            },
+            {
+                "workflow_argument_name": "raw_bam-check",
+                "value_qc": "76997416-4594-410a-8950-93a82158c93d",
+                "type": "Output QC file"
+            }
+        ],
+        "awsem_postrun_json": "https://s3.amazonaws.com/tibanna-output/003XXkptF9BN.postrun.json"
+    },
+    {
+        "parameters": [],
+        "run_platform": "AWSEM",
+        "date_created": "2020-07-07T06:01:33.081598+00:00",
+        "last_modified": {
+            "date_modified": "2020-07-07T15:43:02.326873+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "title": "workflow_gatk-HaplotypeCaller v11 run 2019-11-26 18:00:51.098249",
+        "workflow": "7fd67e19-3425-45f8-8149-c7cac4278fdb",
+        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
+        "quality_metric": "de0c8bd0-cd95-4dfa-9fb6-eebfaa450db9",
+        "run_status": "complete",
+        "run_url": "https://console.aws.amazon.com/states/home?region=us-east-1#/executions/details/arn:aws:states:us-east-1:643366669028:execution:tibanna_zebra:workflow_gatk-HaplotypeCaller_GAPFI3HBDVLI",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "released",
+        "metadata_only": false,
+        "uuid": "1f95d4e2-f83d-43aa-b205-68d3dd007311",
+        "awsem_app_name": "workflow_gatk-HaplotypeCaller",
+        "schema_version": "3",
+        "input_files": [
+            {
+                "value": "f50655c9-e3ad-4110-8c56-5ad905b2cddc",
+                "dimension": "0",
+                "workflow_argument_name": "input_bam",
+                "ordinal": 1
+            },
+            {
+                "value": "1936f246-22e1-45dc-bb5c-9cfd55537fe7",
+                "dimension": "0",
+                "workflow_argument_name": "reference",
+                "ordinal": 1
+            },
+            {
+                "value": "1c07a3aa-e2a3-498c-b838-15991c4a2f28",
+                "dimension": "0",
+                "workflow_argument_name": "regions",
+                "ordinal": 1
+            }
+        ],
+        "awsem_job_id": "d1qxts7ocvmB",
+        "output_files": [
+            {
+                "extra_files": [
+                    {
+                        "filename": "GAPFIJ2IGMQI",
+                        "status": "uploading",
+                        "file_format": "/file-formats/gvcf_gz_tbi/",
+                        "accession": "GAPFIJ2IGMQI",
+                        "uuid": "82b54421-d76d-4383-b49b-607d68cd703e",
+                        "href": "/82b54421-d76d-4383-b49b-607d68cd703e/@@download/GAPFIJ2IGMQI.gvcf.gz.tbi",
+                        "upload_key": "82b54421-d76d-4383-b49b-607d68cd703e/GAPFIJ2IGMQI.gvcf.gz.tbi"
+                    }
+                ],
+                "format": "/file-formats/gvcf_gz/",
+                "type": "Output processed file",
+                "value": "82b54421-d76d-4383-b49b-607d68cd703e",
+                "workflow_argument_name": "gvcf",
+                "secondary_file_formats": [
+                    "/file-formats/gvcf_gz_tbi/"
+                ],
+                "upload_key": "82b54421-d76d-4383-b49b-607d68cd703e/GAPFIJ2IGMQI.gvcf.gz"
+            }
+        ],
+        "awsem_postrun_json": "https://s3.amazonaws.com/tibanna-output/d1qxts7ocvmB.postrun.json"
+    },
+    {
+        "parameters": [],
+        "run_platform": "AWSEM",
+        "date_created": "2020-07-07T06:01:29.999156+00:00",
+        "last_modified": {
+            "date_modified": "2020-07-07T15:43:02.458146+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "title": "workflow_gatk-ApplyBQSR-check v11 run 2019-11-26 07:01:11.330080",
+        "workflow": "6c9c6f49-f954-4e76-8dfb-d385cddcebd6",
+        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
+        "quality_metric": "ddf67724-39f4-4e96-8ba2-454b3042da50",
+        "run_status": "complete",
+        "run_url": "https://console.aws.amazon.com/states/home?region=us-east-1#/executions/details/arn:aws:states:us-east-1:643366669028:execution:tibanna_zebra:workflow_gatk-ApplyBQSR-check_GAPFID38UPJ1",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "released",
+        "metadata_only": false,
+        "uuid": "1c6848a3-9d65-4023-a598-d5bfc54fb65b",
+        "awsem_app_name": "workflow_gatk-ApplyBQSR-check",
+        "schema_version": "3",
+        "input_files": [
+            {
+                "value": "bafedc46-753b-409a-a76f-cdc3a3065e7d",
+                "dimension": "0",
+                "workflow_argument_name": "input_bam",
+                "ordinal": 1
+            },
+            {
+                "value": "61703fbc-4024-4d5d-8ba7-4ebcbd43f528",
+                "dimension": "0",
+                "workflow_argument_name": "recalibration_report",
+                "ordinal": 1
+            },
+            {
+                "value": "1936f246-22e1-45dc-bb5c-9cfd55537fe7",
+                "dimension": "0",
+                "workflow_argument_name": "reference",
+                "ordinal": 1
+            }
+        ],
+        "awsem_job_id": "acHLQnkcfO56",
+        "output_files": [
+            {
+                "extra_files": [
+                    {
+                        "filename": "GAPFI3HBDVLI",
+                        "status": "uploading",
+                        "file_format": "/file-formats/bai/",
+                        "accession": "GAPFI3HBDVLI",
+                        "uuid": "f50655c9-e3ad-4110-8c56-5ad905b2cddc",
+                        "href": "/f50655c9-e3ad-4110-8c56-5ad905b2cddc/@@download/GAPFI3HBDVLI.bam.bai",
+                        "upload_key": "f50655c9-e3ad-4110-8c56-5ad905b2cddc/GAPFI3HBDVLI.bam.bai"
+                    }
+                ],
+                "format": "/file-formats/bam/",
+                "type": "Output processed file",
+                "value": "f50655c9-e3ad-4110-8c56-5ad905b2cddc",
+                "workflow_argument_name": "recalibrated_bam",
+                "secondary_file_formats": [
+                    "/file-formats/bai/"
+                ],
+                "upload_key": "f50655c9-e3ad-4110-8c56-5ad905b2cddc/GAPFI3HBDVLI.bam"
+            },
+            {
+                "workflow_argument_name": "recalibrated_bam-check",
+                "value_qc": "71663988-1d7e-451f-a815-c47d3fcd450c",
+                "type": "Output QC file"
+            }
+        ],
+        "awsem_postrun_json": "https://s3.amazonaws.com/tibanna-output/acHLQnkcfO56.postrun.json"
+    },
+    {
+        "parameters": [],
+        "run_platform": "AWSEM",
+        "date_created": "2020-07-07T02:42:06.651825+00:00",
+        "last_modified": {
+            "date_modified": "2020-07-07T15:43:02.586491+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "title": "workflow_bwa-mem_no_unzip-check v9 run 2019-09-08 05:20:25.895473",
+        "workflow": "9e094699-561b-4396-8d6a-ffc45f98c5e1",
+        "project": "f01ff5be-a72d-43bd-afcf-174fa9dcd282",
+        "quality_metric": "a950ba5d-747c-4795-805b-d6bcb6eb7eaa",
+        "run_status": "complete",
+        "run_url": "https://console.aws.amazon.com/states/home?region=us-east-1#/executions/details/arn:aws:states:us-east-1:643366669028:execution:tibanna_zebra:workflow_bwa-mem_no_unzip-check_GAPFI4ELFNSI_GAPFI9QV1Z8Q",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "released",
+        "metadata_only": false,
+        "uuid": "108d7a3f-a195-481c-8e3d-78e14833129e",
+        "awsem_app_name": "workflow_bwa-mem_no_unzip-check",
+        "schema_version": "3",
+        "input_files": [
+            {
+                "value": "c4306817-f6e6-4e9e-8e90-70e3cf1f1af4",
+                "dimension": "0",
+                "workflow_argument_name": "fastq_R1",
+                "ordinal": 1
+            },
+            {
+                "value": "b1574039-421b-4eb5-b19e-3e24b89443f0",
+                "dimension": "0",
+                "workflow_argument_name": "fastq_R2",
+                "ordinal": 1
+            },
+            {
+                "value": "b24ed5ed-a037-48a0-a938-3fecfb90d0cf",
+                "dimension": "0",
+                "workflow_argument_name": "reference",
+                "ordinal": 1
+            }
+        ],
+        "awsem_job_id": "5qDNBYyOmHNh",
+        "output_files": [
+            {
+                "value": "cfe24e13-e8ac-4e2f-a5ac-b672262bf03c",
+                "workflow_argument_name": "raw_bam",
+                "format": "/file-formats/bam/",
+                "upload_key": "cfe24e13-e8ac-4e2f-a5ac-b672262bf03c/GAPFIJM8NUPI.bam",
+                "type": "Output processed file"
+            },
+            {
+                "workflow_argument_name": "raw_bam-check",
+                "value_qc": "77c4e232-0d84-4ed7-8e4b-d1e11b5406fb",
+                "type": "Output QC file"
+            }
+        ],
+        "awsem_postrun_json": "https://s3.amazonaws.com/tibanna-output/5qDNBYyOmHNh.postrun.json"
+    },
+    {
+        "parameters": [
+            {
+                "value": "['NA12879_sample', 'NA12877_sample', 'NA12878_sample']",
+                "dimension": "0",
+                "workflow_argument_name": "trio",
+                "ordinal": 1
+            }
+        ],
+        "run_platform": "AWSEM",
+        "date_created": "2020-07-07T06:01:27.075551+00:00",
+        "last_modified": {
+            "date_modified": "2020-07-07T15:43:02.709916+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "title": "workflow_granite-comHet-check v14 run 2020-06-18 15:48:57.231709",
+        "workflow": "4973be36-5e56-41be-98ef-dd771481f629",
+        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
+        "quality_metric": "dd3bfbb8-633d-4bce-a13c-a8c37a073851",
+        "run_status": "complete",
+        "run_url": "https://console.aws.amazon.com/states/home?region=us-east-1#/executions/details/arn:aws:states:us-east-1:643366669028:execution:tibanna_zebra:workflow_granite-comHet-check_2e100752-aea8-43f3-b395-ea41d8d559f4",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "released",
+        "metadata_only": false,
+        "uuid": "097d152d-9762-4359-ad6a-eebd69828581",
+        "awsem_app_name": "workflow_granite-comHet-check",
+        "schema_version": "3",
+        "input_files": [
+            {
+                "value": "74423e1f-010f-4989-b2d3-b5e92b0e85e0",
+                "dimension": "0",
+                "workflow_argument_name": "input_vcf",
+                "ordinal": 1
+            }
+        ],
+        "awsem_job_id": "IT4QkvX2ash6",
+        "output_files": [
+            {
+                "extra_files": [
+                    {
+                        "filename": "GAPFI3JX5D2J",
+                        "status": "uploading",
+                        "file_format": "/file-formats/vcf_gz_tbi/",
+                        "accession": "GAPFI3JX5D2J",
+                        "uuid": "ce06ddfd-3624-4ab4-a2eb-19a1f2df65ff",
+                        "href": "/ce06ddfd-3624-4ab4-a2eb-19a1f2df65ff/@@download/GAPFI3JX5D2J.vcf.gz.tbi",
+                        "upload_key": "ce06ddfd-3624-4ab4-a2eb-19a1f2df65ff/GAPFI3JX5D2J.vcf.gz.tbi"
+                    }
+                ],
+                "format": "/file-formats/vcf_gz/",
+                "type": "Output processed file",
+                "value": "ce06ddfd-3624-4ab4-a2eb-19a1f2df65ff",
+                "workflow_argument_name": "comHet_vcf",
+                "secondary_file_formats": [
+                    "/file-formats/vcf_gz_tbi/"
+                ],
+                "upload_key": "ce06ddfd-3624-4ab4-a2eb-19a1f2df65ff/GAPFI3JX5D2J.vcf.gz"
+            },
+            {
+                "workflow_argument_name": "comHet_vcf-json",
+                "value_qc": "ba404b50-1918-4119-8620-39eb2dbb011a",
+                "type": "Output QC file"
+            },
+            {
+                "workflow_argument_name": "comHet_vcf-check",
+                "value_qc": "9f86c3f6-2202-4fa1-b711-5b788623f9bf",
+                "type": "Output QC file"
+            }
+        ],
+        "awsem_postrun_json": "https://s3.amazonaws.com/tibanna-output/IT4QkvX2ash6.postrun.json"
+    },
+    {
+        "parameters": [],
+        "run_platform": "AWSEM",
+        "date_created": "2020-07-07T06:01:29.269306+00:00",
+        "last_modified": {
+            "date_modified": "2020-07-07T15:43:02.844527+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "title": "workflow_gatk-GenotypeGVCFs-check v11 run 2020-02-13 21:41:41.779140",
+        "workflow": "4fbad226-859d-40d4-8192-10c305e819da",
+        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
+        "quality_metric": "06d23bba-9caf-410d-b994-1d1e0ccdb760",
+        "run_status": "complete",
+        "run_url": "https://console.aws.amazon.com/states/home?region=us-east-1#/executions/details/arn:aws:states:us-east-1:643366669028:execution:tibanna_zebra_dev:test-r",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "released",
+        "metadata_only": false,
+        "uuid": "fc7463c8-95e0-4ab7-afc8-c8f1c6ce21c1",
+        "awsem_app_name": "workflow_gatk-GenotypeGVCFs-check",
+        "schema_version": "3",
+        "input_files": [
+            {
+                "value": "b3eea806-3f55-4a8c-b7f7-3438bb4ac1b3",
+                "dimension": "0",
+                "workflow_argument_name": "input_gvcf",
+                "ordinal": 1
+            },
+            {
+                "value": "1936f246-22e1-45dc-bb5c-9cfd55537fe7",
+                "dimension": "0",
+                "workflow_argument_name": "reference",
+                "ordinal": 1
+            },
+            {
+                "value": "8ed35691-0af4-467a-adbc-81eb088549f0",
+                "dimension": "0",
+                "workflow_argument_name": "known-sites-snp",
+                "ordinal": 1
+            },
+            {
+                "value": "a1d504ee-a313-4064-b6ae-65fed9738980",
+                "dimension": "0",
+                "workflow_argument_name": "chromosomes",
+                "ordinal": 1
+            }
+        ],
+        "awsem_job_id": "OEhQxbjQ0XwH",
+        "output_files": [
+            {
+                "extra_files": [
+                    {
+                        "filename": "GAPFIS8ZSPEO",
+                        "status": "uploading",
+                        "file_format": "/file-formats/vcf_gz_tbi/",
+                        "accession": "GAPFIS8ZSPEO",
+                        "uuid": "340c57ac-0c62-43ee-8758-c7c6e78eaeda",
+                        "href": "/340c57ac-0c62-43ee-8758-c7c6e78eaeda/@@download/GAPFIS8ZSPEO.vcf.gz.tbi",
+                        "upload_key": "340c57ac-0c62-43ee-8758-c7c6e78eaeda/GAPFIS8ZSPEO.vcf.gz.tbi"
+                    }
+                ],
+                "format": "/file-formats/vcf_gz/",
+                "type": "Output processed file",
+                "value": "340c57ac-0c62-43ee-8758-c7c6e78eaeda",
+                "workflow_argument_name": "vcf",
+                "secondary_file_formats": [
+                    "/file-formats/vcf_gz_tbi/"
+                ],
+                "upload_key": "340c57ac-0c62-43ee-8758-c7c6e78eaeda/GAPFIS8ZSPEO.vcf.gz"
+            },
+            {
+                "workflow_argument_name": "vcf-check",
+                "value_qc": "3672769b-ae55-4b3d-a679-956e74bbfec3",
+                "type": "Output QC file"
+            }
+        ],
+        "awsem_postrun_json": "https://s3.amazonaws.com/tibanna-output/OEhQxbjQ0XwH.postrun.json"
+    },
+    {
+        "parameters": [],
+        "run_platform": "AWSEM",
+        "date_created": "2020-07-07T06:01:30.234745+00:00",
+        "last_modified": {
+            "date_modified": "2020-07-07T15:43:02.994183+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "title": "workflow_sort-bam-check v11 run 2019-11-25 21:01:14.363970",
+        "workflow": "560f5194-cd3a-4799-9b1a-6a2d2c371c89",
+        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
+        "quality_metric": "59d9c913-8b9f-4eaf-ac93-8307cd896b70",
+        "run_status": "complete",
+        "run_url": "https://console.aws.amazon.com/states/home?region=us-east-1#/executions/details/arn:aws:states:us-east-1:643366669028:execution:tibanna_zebra:workflow_sort-bam-check_GAPFIIKU363K-6f904717-336b-4bec-82b5-507b9cd4be65",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "released",
+        "metadata_only": false,
+        "uuid": "e73e0b52-27e7-40d5-8019-a484c678c61e",
+        "awsem_app_name": "workflow_sort-bam-check",
+        "schema_version": "3",
+        "input_files": [
+            {
+                "value": "76696a96-ffbf-47d6-9f04-3ce233ddb4cb",
+                "dimension": "0",
+                "workflow_argument_name": "input_bam",
+                "ordinal": 1
+            }
+        ],
+        "awsem_job_id": "0D6ZBfqd9RHo",
+        "output_files": [
+            {
+                "value": "bafedc46-753b-409a-a76f-cdc3a3065e7d",
+                "workflow_argument_name": "sorted_bam",
+                "format": "/file-formats/bam/",
+                "upload_key": "bafedc46-753b-409a-a76f-cdc3a3065e7d/GAPFI67T8YV5.bam",
+                "type": "Output processed file"
+            },
+            {
+                "workflow_argument_name": "sorted_bam-check",
+                "value_qc": "b0ce1bd6-ecdb-44a2-a977-4ae59edf21d1",
+                "type": "Output QC file"
+            }
+        ],
+        "awsem_postrun_json": "https://s3.amazonaws.com/tibanna-output/0D6ZBfqd9RHo.postrun.json"
+    },
+    {
+        "parameters": [],
+        "run_platform": "AWSEM",
+        "date_created": "2020-07-07T02:42:06.889401+00:00",
+        "last_modified": {
+            "date_modified": "2020-07-07T15:43:03.199112+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "title": "workflow_gatk-BaseRecalibrator v9 run 2019-09-09 02:21:49.828151",
+        "workflow": "455b3056-64ca-4a9b-b546-294b01c9ca92",
+        "project": "f01ff5be-a72d-43bd-afcf-174fa9dcd282",
+        "quality_metric": "08bbe7a3-d1d3-4bc2-a87d-01e1e5d28f4c",
+        "run_status": "complete",
+        "run_url": "https://console.aws.amazon.com/states/home?region=us-east-1#/executions/details/arn:aws:states:us-east-1:643366669028:execution:tibanna_zebra:workflow_gatk-BaseRecalibrator_GAPFIPDWDTXX",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "released",
+        "metadata_only": false,
+        "uuid": "e6966db1-7fc7-4434-9a3e-f3fc9123216d",
+        "awsem_app_name": "workflow_gatk-BaseRecalibrator",
+        "schema_version": "3",
+        "input_files": [
+            {
+                "value": "0752c459-5267-4db4-93d6-e79a2bf93cb1",
+                "dimension": "0",
+                "workflow_argument_name": "input_bam",
+                "ordinal": 1
+            },
+            {
+                "value": "55ac5044-f927-4df7-afa2-bf713764ee57",
+                "dimension": "0",
+                "workflow_argument_name": "known-sites-indels",
+                "ordinal": 1
+            },
+            {
+                "value": "8ed35691-0af4-467a-adbc-81eb088549f0",
+                "dimension": "0",
+                "workflow_argument_name": "known-sites-snp",
+                "ordinal": 1
+            },
+            {
+                "value": "1936f246-22e1-45dc-bb5c-9cfd55537fe7",
+                "dimension": "0",
+                "workflow_argument_name": "reference",
+                "ordinal": 1
+            }
+        ],
+        "awsem_job_id": "4P4YcNI0XY5J",
+        "output_files": [
+            {
+                "value": "94c76cd9-bb6f-41a2-a33d-9ac02eb4c899",
+                "workflow_argument_name": "recalibration_report",
+                "format": "/file-formats/txt/",
+                "upload_key": "94c76cd9-bb6f-41a2-a33d-9ac02eb4c899/GAPFIO3W5CXP.txt",
+                "type": "Output processed file"
+            }
+        ],
+        "awsem_postrun_json": "https://s3.amazonaws.com/tibanna-output/4P4YcNI0XY5J.postrun.json"
+    },
+    {
+        "parameters": [],
+        "run_platform": "AWSEM",
+        "date_created": "2020-07-07T02:42:07.115072+00:00",
+        "last_modified": {
+            "date_modified": "2020-07-07T15:43:03.348446+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "title": "workflow_sort-bam-check v9 run 2019-09-09 00:53:20.174146",
+        "workflow": "560f5194-cd3a-4799-9b1a-6a2d2c371c89",
+        "project": "f01ff5be-a72d-43bd-afcf-174fa9dcd282",
+        "quality_metric": "403566e3-39b2-470f-8cda-bf892b207695",
+        "run_status": "complete",
+        "run_url": "https://console.aws.amazon.com/states/home?region=us-east-1#/executions/details/arn:aws:states:us-east-1:643366669028:execution:tibanna_zebra:workflow_sort-bam-check_GAPFIB8SD5R4",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "released",
+        "metadata_only": false,
+        "uuid": "d6de1e1a-d617-4968-91a3-33f839db5bc3",
+        "awsem_app_name": "workflow_sort-bam-check",
+        "schema_version": "3",
+        "input_files": [
+            {
+                "value": "176af024-f26f-4f28-851b-8f7f3172e673",
+                "dimension": "0",
+                "workflow_argument_name": "input_bam",
+                "ordinal": 1
+            }
+        ],
+        "awsem_job_id": "LhS9asv6a3UU",
+        "output_files": [
+            {
+                "value": "0752c459-5267-4db4-93d6-e79a2bf93cb1",
+                "workflow_argument_name": "sorted_bam",
+                "format": "/file-formats/bam/",
+                "upload_key": "0752c459-5267-4db4-93d6-e79a2bf93cb1/GAPFIPDWDTXX.bam",
+                "type": "Output processed file"
+            },
+            {
+                "workflow_argument_name": "sorted_bam-check",
+                "value_qc": "e9b00bde-1a62-4920-8a51-c0665f8dec23",
+                "type": "Output QC file"
+            }
+        ],
+        "awsem_postrun_json": "https://s3.amazonaws.com/tibanna-output/LhS9asv6a3UU.postrun.json"
+    },
+    {
+        "parameters": [],
+        "run_platform": "AWSEM",
+        "date_created": "2020-07-07T06:01:27.813374+00:00",
+        "last_modified": {
+            "date_modified": "2020-07-07T15:43:03.484685+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "title": "workflow_granite-rckTar v13 run 2020-03-26 18:59:55.871084",
+        "workflow": "778149e7-98d7-4362-83a4-9e80af1da101",
+        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
+        "quality_metric": "138f6ee5-37cd-4e38-9ffa-e9db09bbf5ac",
+        "run_status": "complete",
+        "run_url": "https://console.aws.amazon.com/states/home?region=us-east-1#/executions/details/arn:aws:states:us-east-1:643366669028:execution:tibanna_zebra:run_workflow_granite-rckTar-3956f9e6-6b85-47a1-88dd-e825fd47ec81",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "released",
+        "metadata_only": false,
+        "uuid": "c260cde4-06c4-4339-9553-2e172c9b3a82",
+        "awsem_app_name": "workflow_granite-rckTar",
+        "schema_version": "3",
+        "input_files": [
+            {
+                "value": "ea43a01e-03a6-4ac5-a3fd-2a922bb2adf4",
+                "dimension": "0",
+                "workflow_argument_name": "input_rcks",
+                "ordinal": 1
+            },
+            {
+                "value": "2a4ca6dd-611b-4961-8e52-4ee297c682ff",
+                "dimension": "1",
+                "workflow_argument_name": "input_rcks",
+                "ordinal": 2
+            },
+            {
+                "value": "620ce445-fc71-4f65-b429-353e9ed02d2c",
+                "dimension": "2",
+                "workflow_argument_name": "input_rcks",
+                "ordinal": 3
+            }
+        ],
+        "awsem_job_id": "vsYpcoKqr3uD",
+        "output_files": [
+            {
+                "extra_files": [
+                    {
+                        "filename": "GAPFIMX6X8RI",
+                        "status": "uploading",
+                        "file_format": "/file-formats/rck_tar_index/",
+                        "accession": "GAPFIMX6X8RI",
+                        "uuid": "475ee0a6-609c-4ee4-8636-3b180d4a730f",
+                        "href": "/475ee0a6-609c-4ee4-8636-3b180d4a730f/@@download/GAPFIMX6X8RI.rck.tar.index",
+                        "upload_key": "475ee0a6-609c-4ee4-8636-3b180d4a730f/GAPFIMX6X8RI.rck.tar.index"
+                    }
+                ],
+                "format": "/file-formats/rck_tar/",
+                "type": "Output processed file",
+                "value": "475ee0a6-609c-4ee4-8636-3b180d4a730f",
+                "workflow_argument_name": "rck_tar",
+                "secondary_file_formats": [
+                    "/file-formats/rck_tar_index/"
+                ],
+                "upload_key": "475ee0a6-609c-4ee4-8636-3b180d4a730f/GAPFIMX6X8RI.rck.tar"
+            }
+        ],
+        "awsem_postrun_json": "https://s3.amazonaws.com/tibanna-output/vsYpcoKqr3uD.postrun.json"
+    },
+    {
+        "parameters": [],
+        "run_platform": "AWSEM",
+        "date_created": "2020-07-07T02:42:07.371077+00:00",
+        "last_modified": {
+            "date_modified": "2020-07-07T15:43:03.636994+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "title": "workflow_sort-bam-check v9 run 2019-09-09 00:53:18.658624",
+        "workflow": "560f5194-cd3a-4799-9b1a-6a2d2c371c89",
+        "project": "f01ff5be-a72d-43bd-afcf-174fa9dcd282",
+        "quality_metric": "d19957c2-a322-4273-acb8-6a52707fbe0d",
+        "run_status": "complete",
+        "run_url": "https://console.aws.amazon.com/states/home?region=us-east-1#/executions/details/arn:aws:states:us-east-1:643366669028:execution:tibanna_zebra:workflow_sort-bam-check_GAPFI9GNISBC",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "released",
+        "metadata_only": false,
+        "uuid": "bf56ced4-0422-4805-a4a1-77933f2fb7ee",
+        "awsem_app_name": "workflow_sort-bam-check",
+        "schema_version": "3",
+        "input_files": [
+            {
+                "value": "c91025d5-6155-4587-a232-6e16f5bb7acb",
+                "dimension": "0",
+                "workflow_argument_name": "input_bam",
+                "ordinal": 1
+            }
+        ],
+        "awsem_job_id": "vYSquvWbBbjv",
+        "output_files": [
+            {
+                "value": "4a1a7f00-9aa6-46ac-a642-99a85e397c0e",
+                "workflow_argument_name": "sorted_bam",
+                "format": "/file-formats/bam/",
+                "upload_key": "4a1a7f00-9aa6-46ac-a642-99a85e397c0e/GAPFIG8RH19W.bam",
+                "type": "Output processed file"
+            },
+            {
+                "workflow_argument_name": "sorted_bam-check",
+                "value_qc": "50ddb9cc-dcc3-4f24-adaf-3bf745533557",
+                "type": "Output QC file"
+            }
+        ],
+        "awsem_postrun_json": "https://s3.amazonaws.com/tibanna-output/vYSquvWbBbjv.postrun.json"
+    },
+    {
+        "parameters": [],
+        "run_platform": "AWSEM",
+        "date_created": "2020-07-07T02:42:07.807629+00:00",
+        "last_modified": {
+            "date_modified": "2020-07-07T15:43:03.762389+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "title": "workflow_sort-bam-check v9 run 2019-09-09 00:53:25.231958",
+        "workflow": "560f5194-cd3a-4799-9b1a-6a2d2c371c89",
+        "project": "f01ff5be-a72d-43bd-afcf-174fa9dcd282",
+        "quality_metric": "a41e4654-4275-489c-8501-d5200d94e00c",
+        "run_status": "complete",
+        "run_url": "https://console.aws.amazon.com/states/home?region=us-east-1#/executions/details/arn:aws:states:us-east-1:643366669028:execution:tibanna_zebra:workflow_sort-bam-check_GAPFIQQICRPW",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "released",
+        "metadata_only": false,
+        "uuid": "b0f2859c-fc7f-48b6-aa02-747cd09877a1",
+        "awsem_app_name": "workflow_sort-bam-check",
+        "schema_version": "3",
+        "input_files": [
+            {
+                "value": "5e7d50cd-69b5-4f83-af11-7516562b4000",
+                "dimension": "0",
+                "workflow_argument_name": "input_bam",
+                "ordinal": 1
+            }
+        ],
+        "awsem_job_id": "5483cjscXq3E",
+        "output_files": [
+            {
+                "value": "dc896cba-e679-40af-8749-647df78dec8d",
+                "workflow_argument_name": "sorted_bam",
+                "format": "/file-formats/bam/",
+                "upload_key": "dc896cba-e679-40af-8749-647df78dec8d/GAPFI1EFMR85.bam",
+                "type": "Output processed file"
+            },
+            {
+                "workflow_argument_name": "sorted_bam-check",
+                "value_qc": "3b97c1f2-e1eb-45c1-afe6-847775f96886",
+                "type": "Output QC file"
+            }
+        ],
+        "awsem_postrun_json": "https://s3.amazonaws.com/tibanna-output/5483cjscXq3E.postrun.json"
+    },
+    {
+        "parameters": [
+            {
+                "value": "NA12877_sample",
+                "dimension": "0",
+                "workflow_argument_name": "sample_name",
+                "ordinal": 1
+            }
+        ],
+        "run_platform": "AWSEM",
+        "date_created": "2020-07-07T06:01:33.616263+00:00",
+        "last_modified": {
+            "date_modified": "2020-07-07T15:43:03.911637+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "title": "workflow_add-readgroups-check v11 run 2019-11-25 06:01:10.109581",
+        "workflow": "1ebf697c-949d-46b2-b9a4-8b1a7699ef1f",
+        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
+        "quality_metric": "81d407e4-a089-4dab-a249-44439d5dac46",
+        "run_status": "complete",
+        "run_url": "https://console.aws.amazon.com/states/home?region=us-east-1#/executions/details/arn:aws:states:us-east-1:643366669028:execution:tibanna_zebra:workflow_add-readgroups-check_GAPFI5V1GIRY",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "released",
+        "metadata_only": false,
+        "uuid": "9ef1362f-a319-4ed2-93f7-720a765e5599",
+        "awsem_app_name": "workflow_add-readgroups-check",
+        "schema_version": "3",
+        "input_files": [
+            {
+                "value": "eca5a9ac-f00a-4279-aab9-3f4ed17015c9",
+                "dimension": "0",
+                "workflow_argument_name": "input_bam",
+                "ordinal": 1
+            }
+        ],
+        "awsem_job_id": "k7GRt9129OdD",
+        "output_files": [
+            {
+                "value": "6744d4c8-a0a2-4619-ada4-1f68991fb994",
+                "workflow_argument_name": "bam_w_readgroups",
+                "format": "/file-formats/bam/",
+                "upload_key": "6744d4c8-a0a2-4619-ada4-1f68991fb994/GAPFI9PUMN3F.bam",
+                "type": "Output processed file"
+            },
+            {
+                "workflow_argument_name": "bam_w_readgroups-check",
+                "value_qc": "38d19a8f-eda7-44db-a3e6-c2c23cc0c43a",
+                "type": "Output QC file"
+            }
+        ],
+        "awsem_postrun_json": "https://s3.amazonaws.com/tibanna-output/k7GRt9129OdD.postrun.json"
+    },
+    {
+        "parameters": [
+            {
+                "value": "NA24385_sample",
+                "dimension": "0",
+                "workflow_argument_name": "sample_name",
+                "ordinal": 1
+            }
+        ],
+        "run_platform": "AWSEM",
+        "date_created": "2020-07-07T02:42:08.060289+00:00",
+        "last_modified": {
+            "date_modified": "2020-07-07T15:43:04.062895+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "title": "workflow_add-readgroups-check v9 run 2019-09-08 15:56:11.583242",
+        "workflow": "548e63a4-1936-4f68-8e8d-8e4658767911",
+        "project": "f01ff5be-a72d-43bd-afcf-174fa9dcd282",
+        "quality_metric": "507a1081-6145-45cf-bf7c-53e4c7de2385",
+        "run_status": "complete",
+        "run_url": "https://console.aws.amazon.com/states/home?region=us-east-1#/executions/details/arn:aws:states:us-east-1:643366669028:execution:tibanna_zebra:workflow_add-readgroups-check_GAPFIW6CACEV",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "released",
+        "metadata_only": false,
+        "uuid": "9d719cf4-1be7-4273-92cd-da9812c4c2dc",
+        "awsem_app_name": "workflow_add-readgroups-check",
+        "schema_version": "3",
+        "input_files": [
+            {
+                "value": "46e9dbad-f2d7-40ef-9495-e75b69c11eb1",
+                "dimension": "0",
+                "workflow_argument_name": "input_bam",
+                "ordinal": 1
+            }
+        ],
+        "awsem_job_id": "7GMhQHU5snqR",
+        "output_files": [
+            {
+                "value": "7d224460-7562-4403-abb0-b3661eeb3f39",
+                "workflow_argument_name": "bam_w_readgroups",
+                "format": "/file-formats/bam/",
+                "upload_key": "7d224460-7562-4403-abb0-b3661eeb3f39/GAPFIQV6ZFSI.bam",
+                "type": "Output processed file"
+            },
+            {
+                "workflow_argument_name": "bam_w_readgroups-check",
+                "value_qc": "2023e80f-7fd1-4102-b497-2798a4194b3d",
+                "type": "Output QC file"
+            }
+        ],
+        "awsem_postrun_json": "https://s3.amazonaws.com/tibanna-output/7GMhQHU5snqR.postrun.json"
+    },
+    {
+        "parameters": [],
+        "run_platform": "AWSEM",
+        "date_created": "2020-07-07T06:01:30.481691+00:00",
+        "last_modified": {
+            "date_modified": "2020-07-07T15:43:04.265109+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "title": "workflow_gatk-BaseRecalibrator v11 run 2019-11-26 00:01:17.575258",
+        "workflow": "455b3056-64ca-4a9b-b546-294b01c9ca92",
+        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
+        "quality_metric": "ba0c2fe4-d2bd-43c0-99dc-668ae6882b15",
+        "run_status": "complete",
+        "run_url": "https://console.aws.amazon.com/states/home?region=us-east-1#/executions/details/arn:aws:states:us-east-1:643366669028:execution:tibanna_zebra:workflow_gatk-BaseRecalibrator_GAPFI67T8YV5",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "released",
+        "metadata_only": false,
+        "uuid": "8779aabd-6efb-4471-8b20-d348de73ccd5",
+        "awsem_app_name": "workflow_gatk-BaseRecalibrator",
+        "schema_version": "3",
+        "input_files": [
+            {
+                "value": "bafedc46-753b-409a-a76f-cdc3a3065e7d",
+                "dimension": "0",
+                "workflow_argument_name": "input_bam",
+                "ordinal": 1
+            },
+            {
+                "value": "55ac5044-f927-4df7-afa2-bf713764ee57",
+                "dimension": "0",
+                "workflow_argument_name": "known-sites-indels",
+                "ordinal": 1
+            },
+            {
+                "value": "8ed35691-0af4-467a-adbc-81eb088549f0",
+                "dimension": "0",
+                "workflow_argument_name": "known-sites-snp",
+                "ordinal": 1
+            },
+            {
+                "value": "1936f246-22e1-45dc-bb5c-9cfd55537fe7",
+                "dimension": "0",
+                "workflow_argument_name": "reference",
+                "ordinal": 1
+            }
+        ],
+        "awsem_job_id": "ertlS7dzW8Z9",
+        "output_files": [
+            {
+                "value": "61703fbc-4024-4d5d-8ba7-4ebcbd43f528",
+                "workflow_argument_name": "recalibration_report",
+                "format": "/file-formats/txt/",
+                "upload_key": "61703fbc-4024-4d5d-8ba7-4ebcbd43f528/GAPFID38UPJ1.txt",
+                "type": "Output processed file"
+            }
+        ],
+        "awsem_postrun_json": "https://s3.amazonaws.com/tibanna-output/ertlS7dzW8Z9.postrun.json"
+    },
+    {
+        "parameters": [
+            {
+                "value": "NA24149_sample",
+                "dimension": "0",
+                "workflow_argument_name": "sample_name",
+                "ordinal": 1
+            }
+        ],
+        "run_platform": "AWSEM",
+        "date_created": "2020-07-07T02:42:08.414880+00:00",
+        "last_modified": {
+            "date_modified": "2020-07-07T15:43:04.407517+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "title": "workflow_add-readgroups-check v9 run 2019-09-08 15:56:05.249909",
+        "workflow": "548e63a4-1936-4f68-8e8d-8e4658767911",
+        "project": "f01ff5be-a72d-43bd-afcf-174fa9dcd282",
+        "quality_metric": "fe02f276-1da9-4862-aef3-c40783c1359d",
+        "run_status": "complete",
+        "run_url": "https://console.aws.amazon.com/states/home?region=us-east-1#/executions/details/arn:aws:states:us-east-1:643366669028:execution:tibanna_zebra:workflow_add-readgroups-check_GAPFIGJ43YY2",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "released",
+        "metadata_only": false,
+        "uuid": "7669b5d4-d52f-45a2-8f81-44380e7117e9",
+        "awsem_app_name": "workflow_add-readgroups-check",
+        "schema_version": "3",
+        "input_files": [
+            {
+                "value": "57ce346f-caec-4803-b6c0-d6f394110bf6",
+                "dimension": "0",
+                "workflow_argument_name": "input_bam",
+                "ordinal": 1
+            }
+        ],
+        "awsem_job_id": "vSQOcwCI4AgG",
+        "output_files": [
+            {
+                "value": "485b9e11-6ccf-435a-8d4e-95af4b0d2bd6",
+                "workflow_argument_name": "bam_w_readgroups",
+                "format": "/file-formats/bam/",
+                "upload_key": "485b9e11-6ccf-435a-8d4e-95af4b0d2bd6/GAPFI2JA7G1O.bam",
+                "type": "Output processed file"
+            },
+            {
+                "workflow_argument_name": "bam_w_readgroups-check",
+                "value_qc": "1c91f050-c2f7-400a-909b-85c38eccf4ea",
+                "type": "Output QC file"
+            }
+        ],
+        "awsem_postrun_json": "https://s3.amazonaws.com/tibanna-output/vSQOcwCI4AgG.postrun.json"
+    },
+    {
+        "parameters": [],
+        "run_platform": "AWSEM",
+        "date_created": "2020-07-07T02:42:08.779979+00:00",
+        "last_modified": {
+            "date_modified": "2020-07-07T15:43:04.562411+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "title": "workflow_gatk-BaseRecalibrator v9 run 2019-09-09 02:21:54.519702",
+        "workflow": "455b3056-64ca-4a9b-b546-294b01c9ca92",
+        "project": "f01ff5be-a72d-43bd-afcf-174fa9dcd282",
+        "quality_metric": "cc3a931f-8e40-4cdd-a75c-1eaff711ffd3",
+        "run_status": "complete",
+        "run_url": "https://console.aws.amazon.com/states/home?region=us-east-1#/executions/details/arn:aws:states:us-east-1:643366669028:execution:tibanna_zebra:workflow_gatk-BaseRecalibrator_GAPFI1EFMR85",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "released",
+        "metadata_only": false,
+        "uuid": "5c7edaab-c6c0-47ea-9248-1a2f213bef90",
+        "awsem_app_name": "workflow_gatk-BaseRecalibrator",
+        "schema_version": "3",
+        "input_files": [
+            {
+                "value": "dc896cba-e679-40af-8749-647df78dec8d",
+                "dimension": "0",
+                "workflow_argument_name": "input_bam",
+                "ordinal": 1
+            },
+            {
+                "value": "55ac5044-f927-4df7-afa2-bf713764ee57",
+                "dimension": "0",
+                "workflow_argument_name": "known-sites-indels",
+                "ordinal": 1
+            },
+            {
+                "value": "8ed35691-0af4-467a-adbc-81eb088549f0",
+                "dimension": "0",
+                "workflow_argument_name": "known-sites-snp",
+                "ordinal": 1
+            },
+            {
+                "value": "1936f246-22e1-45dc-bb5c-9cfd55537fe7",
+                "dimension": "0",
+                "workflow_argument_name": "reference",
+                "ordinal": 1
+            }
+        ],
+        "awsem_job_id": "mgQ8qT5RwE9g",
+        "output_files": [
+            {
+                "value": "a513f513-cd30-4deb-9c7a-f20cbf47d8a3",
+                "workflow_argument_name": "recalibration_report",
+                "format": "/file-formats/txt/",
+                "upload_key": "a513f513-cd30-4deb-9c7a-f20cbf47d8a3/GAPFI3T86RWJ.txt",
+                "type": "Output processed file"
+            }
+        ],
+        "awsem_postrun_json": "https://s3.amazonaws.com/tibanna-output/mgQ8qT5RwE9g.postrun.json"
+    },
+    {
+        "parameters": [],
+        "run_platform": "AWSEM",
+        "date_created": "2020-07-07T06:01:30.748217+00:00",
+        "last_modified": {
+            "date_modified": "2020-07-07T15:43:04.745945+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "title": "workflow_gatk-BaseRecalibrator v11 run 2019-11-26 00:01:30.213701",
+        "workflow": "455b3056-64ca-4a9b-b546-294b01c9ca92",
+        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
+        "quality_metric": "75a18d62-9c09-4614-895f-b98dae1103a2",
+        "run_status": "complete",
+        "run_url": "https://console.aws.amazon.com/states/home?region=us-east-1#/executions/details/arn:aws:states:us-east-1:643366669028:execution:tibanna_zebra:workflow_gatk-BaseRecalibrator_GAPFISSWY513",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "released",
+        "metadata_only": false,
+        "uuid": "5c565340-5f12-4d30-b043-0e4fadcd71f5",
+        "awsem_app_name": "workflow_gatk-BaseRecalibrator",
+        "schema_version": "3",
+        "input_files": [
+            {
+                "value": "d87b2ea0-d0d3-4e4b-84e5-e32ee572ae96",
+                "dimension": "0",
+                "workflow_argument_name": "input_bam",
+                "ordinal": 1
+            },
+            {
+                "value": "55ac5044-f927-4df7-afa2-bf713764ee57",
+                "dimension": "0",
+                "workflow_argument_name": "known-sites-indels",
+                "ordinal": 1
+            },
+            {
+                "value": "8ed35691-0af4-467a-adbc-81eb088549f0",
+                "dimension": "0",
+                "workflow_argument_name": "known-sites-snp",
+                "ordinal": 1
+            },
+            {
+                "value": "1936f246-22e1-45dc-bb5c-9cfd55537fe7",
+                "dimension": "0",
+                "workflow_argument_name": "reference",
+                "ordinal": 1
+            }
+        ],
+        "awsem_job_id": "yb9Z9bXaN5SC",
+        "output_files": [
+            {
+                "value": "3e51d717-bc6f-444d-98dd-fca2a60df2be",
+                "workflow_argument_name": "recalibration_report",
+                "format": "/file-formats/txt/",
+                "upload_key": "3e51d717-bc6f-444d-98dd-fca2a60df2be/GAPFIJG8GL3V.txt",
+                "type": "Output processed file"
+            }
+        ],
+        "awsem_postrun_json": "https://s3.amazonaws.com/tibanna-output/yb9Z9bXaN5SC.postrun.json"
+    },
+    {
+        "parameters": [
+            {
+                "value": "NA24143_sample",
+                "dimension": "0",
+                "workflow_argument_name": "sample_name",
+                "ordinal": 1
+            }
+        ],
+        "run_platform": "AWSEM",
+        "date_created": "2020-07-07T02:42:09.143932+00:00",
+        "last_modified": {
+            "date_modified": "2020-07-07T15:43:04.869385+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "title": "workflow_add-readgroups-check v9 run 2019-09-08 15:56:07.708902",
+        "workflow": "548e63a4-1936-4f68-8e8d-8e4658767911",
+        "project": "f01ff5be-a72d-43bd-afcf-174fa9dcd282",
+        "quality_metric": "df3ff7ca-1ea6-4900-ba2b-b22c64fff0da",
+        "run_status": "complete",
+        "run_url": "https://console.aws.amazon.com/states/home?region=us-east-1#/executions/details/arn:aws:states:us-east-1:643366669028:execution:tibanna_zebra:workflow_add-readgroups-check_GAPFIJM8NUPI",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "released",
+        "metadata_only": false,
+        "uuid": "524f97fd-6f5b-4be3-a325-ab45b9d8ce1e",
+        "awsem_app_name": "workflow_add-readgroups-check",
+        "schema_version": "3",
+        "input_files": [
+            {
+                "value": "cfe24e13-e8ac-4e2f-a5ac-b672262bf03c",
+                "dimension": "0",
+                "workflow_argument_name": "input_bam",
+                "ordinal": 1
+            }
+        ],
+        "awsem_job_id": "OdyncuEZR5Vm",
+        "output_files": [
+            {
+                "value": "0db61334-b47a-46e2-9dae-da55b3173203",
+                "workflow_argument_name": "bam_w_readgroups",
+                "format": "/file-formats/bam/",
+                "upload_key": "0db61334-b47a-46e2-9dae-da55b3173203/GAPFI5SGVADF.bam",
+                "type": "Output processed file"
+            },
+            {
+                "workflow_argument_name": "bam_w_readgroups-check",
+                "value_qc": "4bd0430d-9c2d-43a0-97dc-35f68c6d14ba",
+                "type": "Output QC file"
+            }
+        ],
+        "awsem_postrun_json": "https://s3.amazonaws.com/tibanna-output/OdyncuEZR5Vm.postrun.json"
+    },
+    {
+        "parameters": [
+            {
+                "value": "NA12878_sample",
+                "dimension": "0",
+                "workflow_argument_name": "sample_name",
+                "ordinal": 1
+            }
+        ],
+        "run_platform": "AWSEM",
+        "date_created": "2020-07-07T06:01:33.849137+00:00",
+        "last_modified": {
+            "date_modified": "2020-07-07T15:43:05.114230+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "title": "workflow_add-readgroups-check v11 run 2019-11-25 06:01:06.289362",
+        "workflow": "1ebf697c-949d-46b2-b9a4-8b1a7699ef1f",
+        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
+        "quality_metric": "4af22cf0-261b-4f08-ad9f-83fd817de987",
+        "run_status": "complete",
+        "run_url": "https://console.aws.amazon.com/states/home?region=us-east-1#/executions/details/arn:aws:states:us-east-1:643366669028:execution:tibanna_zebra:workflow_add-readgroups-check_GAPFI9HDXSSI",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "released",
+        "metadata_only": false,
+        "uuid": "4eb16594-4a41-4ec2-a031-d9f3258dca64",
+        "awsem_app_name": "workflow_add-readgroups-check",
+        "schema_version": "3",
+        "input_files": [
+            {
+                "value": "20c51c3c-c242-4489-8f5d-2bfe33ee7552",
+                "dimension": "0",
+                "workflow_argument_name": "input_bam",
+                "ordinal": 1
+            }
+        ],
+        "awsem_job_id": "t0os9WZyPeg5",
+        "output_files": [
+            {
+                "value": "ec82bb3f-a033-4889-9872-14cd948e155b",
+                "workflow_argument_name": "bam_w_readgroups",
+                "format": "/file-formats/bam/",
+                "upload_key": "ec82bb3f-a033-4889-9872-14cd948e155b/GAPFILRE7OY6.bam",
+                "type": "Output processed file"
+            },
+            {
+                "workflow_argument_name": "bam_w_readgroups-check",
+                "value_qc": "310c7958-6f7c-4bab-93fa-c5f3f49f5773",
+                "type": "Output QC file"
+            }
+        ],
+        "awsem_postrun_json": "https://s3.amazonaws.com/tibanna-output/t0os9WZyPeg5.postrun.json"
+    },
+    {
+        "parameters": [],
+        "run_platform": "AWSEM",
+        "date_created": "2020-07-07T06:01:31.259950+00:00",
+        "last_modified": {
+            "date_modified": "2020-07-07T15:43:05.256148+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "title": "workflow_sort-bam-check v11 run 2019-11-25 21:01:18.274129",
+        "workflow": "560f5194-cd3a-4799-9b1a-6a2d2c371c89",
+        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
+        "quality_metric": "03d460e2-60cf-45f9-88d8-8561cfa6d600",
+        "run_status": "complete",
+        "run_url": "https://console.aws.amazon.com/states/home?region=us-east-1#/executions/details/arn:aws:states:us-east-1:643366669028:execution:tibanna_zebra:workflow_sort-bam-check_GAPFIK3FA7LW-6b7b1170-380b-4afc-9974-b12e1d8f907f",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "released",
+        "metadata_only": false,
+        "uuid": "3d9ad889-925f-439a-a74c-720d47ddede6",
+        "awsem_app_name": "workflow_sort-bam-check",
+        "schema_version": "3",
+        "input_files": [
+            {
+                "value": "74085ab7-de6e-4a90-8b58-a4394d010609",
+                "dimension": "0",
+                "workflow_argument_name": "input_bam",
+                "ordinal": 1
+            }
+        ],
+        "awsem_job_id": "gG8tIL7XpgO2",
+        "output_files": [
+            {
+                "value": "6577ba40-57ef-40c7-95cb-1557718d3005",
+                "workflow_argument_name": "sorted_bam",
+                "format": "/file-formats/bam/",
+                "upload_key": "6577ba40-57ef-40c7-95cb-1557718d3005/GAPFIB7BFZ58.bam",
+                "type": "Output processed file"
+            },
+            {
+                "workflow_argument_name": "sorted_bam-check",
+                "value_qc": "3a46b41e-7cb0-4398-ac47-ba8d80b34281",
+                "type": "Output QC file"
+            }
+        ],
+        "awsem_postrun_json": "https://s3.amazonaws.com/tibanna-output/gG8tIL7XpgO2.postrun.json"
+    },
+    {
+        "parameters": [],
+        "run_platform": "AWSEM",
+        "date_created": "2020-07-07T06:01:31.494707+00:00",
+        "last_modified": {
+            "date_modified": "2020-07-07T15:43:05.385269+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "title": "workflow_gatk-BaseRecalibrator v11 run 2019-11-26 00:01:21.877407",
+        "workflow": "455b3056-64ca-4a9b-b546-294b01c9ca92",
+        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
+        "quality_metric": "803da8f3-daab-452c-9f7e-116d25b3e431",
+        "run_status": "complete",
+        "run_url": "https://console.aws.amazon.com/states/home?region=us-east-1#/executions/details/arn:aws:states:us-east-1:643366669028:execution:tibanna_zebra:workflow_gatk-BaseRecalibrator_GAPFIB7BFZ58",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "released",
+        "metadata_only": false,
+        "uuid": "3a2b9ffb-6c90-4d65-947e-54817883142c",
+        "awsem_app_name": "workflow_gatk-BaseRecalibrator",
+        "schema_version": "3",
+        "input_files": [
+            {
+                "value": "6577ba40-57ef-40c7-95cb-1557718d3005",
+                "dimension": "0",
+                "workflow_argument_name": "input_bam",
+                "ordinal": 1
+            },
+            {
+                "value": "55ac5044-f927-4df7-afa2-bf713764ee57",
+                "dimension": "0",
+                "workflow_argument_name": "known-sites-indels",
+                "ordinal": 1
+            },
+            {
+                "value": "8ed35691-0af4-467a-adbc-81eb088549f0",
+                "dimension": "0",
+                "workflow_argument_name": "known-sites-snp",
+                "ordinal": 1
+            },
+            {
+                "value": "1936f246-22e1-45dc-bb5c-9cfd55537fe7",
+                "dimension": "0",
+                "workflow_argument_name": "reference",
+                "ordinal": 1
+            }
+        ],
+        "awsem_job_id": "EF1VE1n9fjHD",
+        "output_files": [
+            {
+                "value": "2005cb42-9613-4e9a-931c-22be0b5af1e1",
+                "workflow_argument_name": "recalibration_report",
+                "format": "/file-formats/txt/",
+                "upload_key": "2005cb42-9613-4e9a-931c-22be0b5af1e1/GAPFIJ9BD3JU.txt",
+                "type": "Output processed file"
+            }
+        ],
+        "awsem_postrun_json": "https://s3.amazonaws.com/tibanna-output/EF1VE1n9fjHD.postrun.json"
+    },
+    {
+        "parameters": [],
+        "run_platform": "AWSEM",
+        "date_created": "2020-07-07T06:01:31.732697+00:00",
+        "last_modified": {
+            "date_modified": "2020-07-07T15:43:05.517544+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "title": "workflow_sort-bam-check v11 run 2019-11-25 21:01:26.551370",
+        "workflow": "560f5194-cd3a-4799-9b1a-6a2d2c371c89",
+        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
+        "quality_metric": "7cf33ff2-a7e8-4036-9beb-2f507b482716",
+        "run_status": "complete",
+        "run_url": "https://console.aws.amazon.com/states/home?region=us-east-1#/executions/details/arn:aws:states:us-east-1:643366669028:execution:tibanna_zebra:workflow_sort-bam-check_GAPFIQHUBRKU-053330b6-59e6-4115-9536-1ba9c1ff60ed",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "released",
+        "metadata_only": false,
+        "uuid": "2be2ec26-c846-48bd-9e61-4ebdca8a631a",
+        "awsem_app_name": "workflow_sort-bam-check",
+        "schema_version": "3",
+        "input_files": [
+            {
+                "value": "3999a31d-d15d-433e-8bdf-88150fbfcbd4",
+                "dimension": "0",
+                "workflow_argument_name": "input_bam",
+                "ordinal": 1
+            }
+        ],
+        "awsem_job_id": "P5qfQvKEs8Bx",
+        "output_files": [
+            {
+                "value": "d87b2ea0-d0d3-4e4b-84e5-e32ee572ae96",
+                "workflow_argument_name": "sorted_bam",
+                "format": "/file-formats/bam/",
+                "upload_key": "d87b2ea0-d0d3-4e4b-84e5-e32ee572ae96/GAPFISSWY513.bam",
+                "type": "Output processed file"
+            },
+            {
+                "workflow_argument_name": "sorted_bam-check",
+                "value_qc": "ded50f6d-a746-466c-abf6-7715fba65da6",
+                "type": "Output QC file"
+            }
+        ],
+        "awsem_postrun_json": "https://s3.amazonaws.com/tibanna-output/P5qfQvKEs8Bx.postrun.json"
+    },
+    {
+        "parameters": [],
+        "run_platform": "AWSEM",
+        "date_created": "2020-07-07T02:42:09.388679+00:00",
+        "last_modified": {
+            "date_modified": "2020-07-07T15:43:05.690081+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "title": "workflow_gatk-BaseRecalibrator v9 run 2019-09-09 02:21:46.910174",
+        "workflow": "455b3056-64ca-4a9b-b546-294b01c9ca92",
+        "project": "f01ff5be-a72d-43bd-afcf-174fa9dcd282",
+        "quality_metric": "fc643841-3dd8-476f-a32b-31f31db76af2",
+        "run_status": "complete",
+        "run_url": "https://console.aws.amazon.com/states/home?region=us-east-1#/executions/details/arn:aws:states:us-east-1:643366669028:execution:tibanna_zebra:workflow_gatk-BaseRecalibrator_GAPFIG8RH19W",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "released",
+        "metadata_only": false,
+        "uuid": "14f131fb-7d6e-4e25-bcf3-f0b5d937c50c",
+        "awsem_app_name": "workflow_gatk-BaseRecalibrator",
+        "schema_version": "3",
+        "input_files": [
+            {
+                "value": "4a1a7f00-9aa6-46ac-a642-99a85e397c0e",
+                "dimension": "0",
+                "workflow_argument_name": "input_bam",
+                "ordinal": 1
+            },
+            {
+                "value": "55ac5044-f927-4df7-afa2-bf713764ee57",
+                "dimension": "0",
+                "workflow_argument_name": "known-sites-indels",
+                "ordinal": 1
+            },
+            {
+                "value": "8ed35691-0af4-467a-adbc-81eb088549f0",
+                "dimension": "0",
+                "workflow_argument_name": "known-sites-snp",
+                "ordinal": 1
+            },
+            {
+                "value": "1936f246-22e1-45dc-bb5c-9cfd55537fe7",
+                "dimension": "0",
+                "workflow_argument_name": "reference",
+                "ordinal": 1
+            }
+        ],
+        "awsem_job_id": "MVbjlOSMBrUM",
+        "output_files": [
+            {
+                "value": "69c4a959-e0b3-4c2e-87e1-ec2a479cd54a",
+                "workflow_argument_name": "recalibration_report",
+                "format": "/file-formats/txt/",
+                "upload_key": "69c4a959-e0b3-4c2e-87e1-ec2a479cd54a/GAPFIO4ZFVNY.txt",
+                "type": "Output processed file"
+            }
+        ],
+        "awsem_postrun_json": "https://s3.amazonaws.com/tibanna-output/MVbjlOSMBrUM.postrun.json"
+    },
+    {
+        "parameters": [
+            {
+                "value": "NA12879_sample",
+                "dimension": "0",
+                "workflow_argument_name": "sample_name",
+                "ordinal": 1
+            }
+        ],
+        "run_platform": "AWSEM",
+        "date_created": "2020-07-07T06:01:34.074708+00:00",
+        "last_modified": {
+            "date_modified": "2020-07-07T15:43:05.837425+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "title": "workflow_add-readgroups-check v11 run 2019-11-25 06:01:02.450654",
+        "workflow": "1ebf697c-949d-46b2-b9a4-8b1a7699ef1f",
+        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
+        "quality_metric": "bfaa50e6-61cb-4091-a9c0-1c5c4d468e7b",
+        "run_status": "complete",
+        "run_url": "https://console.aws.amazon.com/states/home?region=us-east-1#/executions/details/arn:aws:states:us-east-1:643366669028:execution:tibanna_zebra:workflow_add-readgroups-check_GAPFIH1A1SPG",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "released",
+        "metadata_only": false,
+        "uuid": "0ea92f22-30d2-4551-a18a-6233fa1bc324",
+        "awsem_app_name": "workflow_add-readgroups-check",
+        "schema_version": "3",
+        "input_files": [
+            {
+                "value": "afd716d4-714f-4df3-80be-014269c2821d",
+                "dimension": "0",
+                "workflow_argument_name": "input_bam",
+                "ordinal": 1
+            }
+        ],
+        "awsem_job_id": "ongMzQuBtE0L",
+        "output_files": [
+            {
+                "value": "eb793b65-fa13-4d17-931e-267abf10ccc2",
+                "workflow_argument_name": "bam_w_readgroups",
+                "format": "/file-formats/bam/",
+                "upload_key": "eb793b65-fa13-4d17-931e-267abf10ccc2/GAPFIOH2AVOD.bam",
+                "type": "Output processed file"
+            },
+            {
+                "workflow_argument_name": "bam_w_readgroups-check",
+                "value_qc": "329cf33f-f30e-4634-a848-8a9a145ecfed",
+                "type": "Output QC file"
+            }
+        ],
+        "awsem_postrun_json": "https://s3.amazonaws.com/tibanna-output/ongMzQuBtE0L.postrun.json"
+    },
+    {
+        "parameters": [],
+        "run_platform": "AWSEM",
+        "date_created": "2020-07-07T06:01:27.321153+00:00",
+        "last_modified": {
+            "date_modified": "2020-07-07T15:43:06.062368+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "title": "workflow_granite-novoCaller-rck-check v14 run 2020-06-18 15:07:29.537555",
+        "workflow": "f38b91fb-7e0c-44e0-a871-a91a58227b34",
+        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
+        "quality_metric": "87d28770-53ee-4529-8224-f93a4693419b",
+        "run_status": "complete",
+        "run_url": "https://console.aws.amazon.com/states/home?region=us-east-1#/executions/details/arn:aws:states:us-east-1:643366669028:execution:tibanna_zebra:workflow_granite-novoCaller-rck-check_ada8c1cb-5db5-4fbc-87b8-601d30ddf41d",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "released",
+        "metadata_only": false,
+        "uuid": "a7ecbeef-2b5a-4af8-8d91-3bfa0bad7b27",
+        "awsem_app_name": "workflow_granite-novoCaller-rck-check",
+        "schema_version": "3",
+        "input_files": [
+            {
+                "value": "9bd2426c-06b6-4e90-a67f-6727bf1b359f",
+                "dimension": "0",
+                "workflow_argument_name": "input_vcf",
+                "ordinal": 1
+            },
+            {
+                "value": "77953507-7be8-4d78-a50e-97ddab7e1c13",
+                "dimension": "0",
+                "workflow_argument_name": "unrelated",
+                "ordinal": 1
+            },
+            {
+                "value": "475ee0a6-609c-4ee4-8636-3b180d4a730f",
+                "dimension": "0",
+                "workflow_argument_name": "trio",
+                "ordinal": 1
+            }
+        ],
+        "awsem_job_id": "kICwowuPUtWB",
+        "output_files": [
+            {
+                "extra_files": [
+                    {
+                        "filename": "GAPFIVKNFBQD",
+                        "status": "uploading",
+                        "file_format": "/file-formats/vcf_gz_tbi/",
+                        "accession": "GAPFIVKNFBQD",
+                        "uuid": "74423e1f-010f-4989-b2d3-b5e92b0e85e0",
+                        "href": "/74423e1f-010f-4989-b2d3-b5e92b0e85e0/@@download/GAPFIVKNFBQD.vcf.gz.tbi",
+                        "upload_key": "74423e1f-010f-4989-b2d3-b5e92b0e85e0/GAPFIVKNFBQD.vcf.gz.tbi"
+                    }
+                ],
+                "format": "/file-formats/vcf_gz/",
+                "type": "Output processed file",
+                "value": "74423e1f-010f-4989-b2d3-b5e92b0e85e0",
+                "workflow_argument_name": "novoCaller_vcf",
+                "secondary_file_formats": [
+                    "/file-formats/vcf_gz_tbi/"
+                ],
+                "upload_key": "74423e1f-010f-4989-b2d3-b5e92b0e85e0/GAPFIVKNFBQD.vcf.gz"
+            },
+            {
+                "workflow_argument_name": "novoCaller_vcf-check",
+                "value_qc": "7b965546-829b-4ccb-a7bd-412bfee31038",
+                "type": "Output QC file"
+            }
+        ],
+        "awsem_postrun_json": "https://s3.amazonaws.com/tibanna-output/kICwowuPUtWB.postrun.json"
+    },
+    {
+        "parameters": [],
+        "run_platform": "AWSEM",
+        "date_created": "2020-07-07T06:01:31.968693+00:00",
+        "last_modified": {
+            "date_modified": "2020-07-07T15:43:06.196469+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "title": "workflow_picard-MarkDuplicates-check v11 run 2019-11-25 10:01:25.174585",
+        "workflow": "beb2b340-94ee-4afe-b4e3-66caaf063397",
+        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
+        "quality_metric": "7a696905-4d62-41b1-892f-018a6b3f7185",
+        "run_status": "complete",
+        "run_url": "https://console.aws.amazon.com/states/home?region=us-east-1#/executions/details/arn:aws:states:us-east-1:643366669028:execution:tibanna_zebra:workflow_picard-MarkDuplicates-check_GAPFILRE7OY6",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "released",
+        "metadata_only": false,
+        "uuid": "f6b45d86-0e42-4504-b3a9-464c613f2f51",
+        "awsem_app_name": "workflow_picard-MarkDuplicates-check",
+        "schema_version": "3",
+        "input_files": [
+            {
+                "value": "ec82bb3f-a033-4889-9872-14cd948e155b",
+                "dimension": "0",
+                "workflow_argument_name": "input_bam",
+                "ordinal": 1
+            }
+        ],
+        "awsem_job_id": "qxgV9QHsr42g",
+        "output_files": [
+            {
+                "value": "74085ab7-de6e-4a90-8b58-a4394d010609",
+                "workflow_argument_name": "dupmarked_bam",
+                "format": "/file-formats/bam/",
+                "upload_key": "74085ab7-de6e-4a90-8b58-a4394d010609/GAPFIK3FA7LW.bam",
+                "type": "Output processed file"
+            },
+            {
+                "value": "b8473e3e-31c5-4e8c-b35e-3873ec83a449",
+                "workflow_argument_name": "duplicate_metrics",
+                "format": "/file-formats/txt/",
+                "upload_key": "b8473e3e-31c5-4e8c-b35e-3873ec83a449/GAPFIOIKS654.txt",
+                "type": "Output processed file"
+            },
+            {
+                "workflow_argument_name": "dupmarked_bam-check",
+                "value_qc": "cf55bd29-2c1b-46fc-87c0-7004df5c93fc",
+                "type": "Output QC file"
+            }
+        ],
+        "awsem_postrun_json": "https://s3.amazonaws.com/tibanna-output/qxgV9QHsr42g.postrun.json"
+    },
+    {
+        "parameters": [],
+        "run_platform": "AWSEM",
+        "date_created": "2020-07-07T02:42:09.635934+00:00",
+        "last_modified": {
+            "date_modified": "2020-07-07T15:43:06.309588+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "title": "workflow_picard-MarkDuplicates-check v9 run 2019-09-08 19:32:06.312382",
+        "workflow": "beb2b340-94ee-4afe-b4e3-66caaf063397",
+        "project": "f01ff5be-a72d-43bd-afcf-174fa9dcd282",
+        "quality_metric": "d5b988ed-e471-4c2d-a2fc-27ec3da16f70",
+        "run_status": "complete",
+        "run_url": "https://console.aws.amazon.com/states/home?region=us-east-1#/executions/details/arn:aws:states:us-east-1:643366669028:execution:tibanna_zebra:workflow_picard-MarkDuplicates-check_GAPFI5SGVADF",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "released",
+        "metadata_only": false,
+        "uuid": "e429cfe5-a5f2-4a26-937d-122e4d22231a",
+        "awsem_app_name": "workflow_picard-MarkDuplicates-check",
+        "schema_version": "3",
+        "input_files": [
+            {
+                "value": "0db61334-b47a-46e2-9dae-da55b3173203",
+                "dimension": "0",
+                "workflow_argument_name": "input_bam",
+                "ordinal": 1
+            }
+        ],
+        "awsem_job_id": "nWIC6uGpFT2D",
+        "output_files": [
+            {
+                "value": "176af024-f26f-4f28-851b-8f7f3172e673",
+                "workflow_argument_name": "dupmarked_bam",
+                "format": "/file-formats/bam/",
+                "upload_key": "176af024-f26f-4f28-851b-8f7f3172e673/GAPFIB8SD5R4.bam",
+                "type": "Output processed file"
+            },
+            {
+                "value": "2c2022aa-9113-40dd-b07c-8658a4146f19",
+                "workflow_argument_name": "duplicate_metrics",
+                "format": "/file-formats/txt/",
+                "upload_key": "2c2022aa-9113-40dd-b07c-8658a4146f19/GAPFIYUWB72H.txt",
+                "type": "Output processed file"
+            },
+            {
+                "workflow_argument_name": "dupmarked_bam-check",
+                "value_qc": "29165e49-05e5-4091-bc7a-c21f55ecb0d7",
+                "type": "Output QC file"
+            }
+        ],
+        "awsem_postrun_json": "https://s3.amazonaws.com/tibanna-output/nWIC6uGpFT2D.postrun.json"
+    },
+    {
+        "parameters": [
+            {
+                "value": "70",
+                "dimension": "0",
+                "workflow_argument_name": "nthreads",
+                "ordinal": 1
+            }
+        ],
+        "run_platform": "AWSEM",
+        "date_created": "2020-07-07T06:01:28.324705+00:00",
+        "last_modified": {
+            "date_modified": "2020-07-07T15:43:06.463797+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "title": "workflow_mutanno-micro-annot-check v14 run 2020-06-16 19:55:03.813826",
+        "workflow": "de9c4579-30e2-432c-80e3-7f324d3d7dcb",
+        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
+        "quality_metric": "106e7c85-36fa-40c6-b283-e85cc6424d98",
+        "run_status": "complete",
+        "run_url": "https://console.aws.amazon.com/states/home?region=us-east-1#/executions/details/arn:aws:states:us-east-1:643366669028:execution:tibanna_zebra:workflow_mutanno-micro-annot-check_7666d5a5-229b-4efa-b7d7-d2e58f60700e",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "released",
+        "metadata_only": false,
+        "uuid": "873f15e3-f7ac-4cb8-85b9-09792bdea81a",
+        "awsem_app_name": "workflow_mutanno-micro-annot-check",
+        "schema_version": "3",
+        "input_files": [
+            {
+                "value": "340c57ac-0c62-43ee-8758-c7c6e78eaeda",
+                "dimension": "0",
+                "workflow_argument_name": "input_vcf",
+                "ordinal": 1
+            },
+            {
+                "value": "1408ceb9-7ae3-4002-aed7-c9a301014de2",
+                "dimension": "0",
+                "workflow_argument_name": "mti",
+                "ordinal": 1
+            },
+            {
+                "value": "1c07a3aa-e2a3-498c-b838-15991c4a2f28",
+                "dimension": "0",
+                "workflow_argument_name": "regions",
+                "ordinal": 1
+            }
+        ],
+        "awsem_job_id": "EwEwzwgc5WXq",
+        "output_files": [
+            {
+                "extra_files": [
+                    {
+                        "filename": "GAPFIP83PL7E",
+                        "status": "uploading",
+                        "file_format": "/file-formats/vcf_gz_tbi/",
+                        "accession": "GAPFIP83PL7E",
+                        "uuid": "06430f6a-e533-4cd3-b20c-f7fe8cdef0bd",
+                        "href": "/06430f6a-e533-4cd3-b20c-f7fe8cdef0bd/@@download/GAPFIP83PL7E.vcf.gz.tbi",
+                        "upload_key": "06430f6a-e533-4cd3-b20c-f7fe8cdef0bd/GAPFIP83PL7E.vcf.gz.tbi"
+                    }
+                ],
+                "format": "/file-formats/vcf_gz/",
+                "type": "Output processed file",
+                "value": "06430f6a-e533-4cd3-b20c-f7fe8cdef0bd",
+                "workflow_argument_name": "annotated_vcf",
+                "secondary_file_formats": [
+                    "/file-formats/vcf_gz_tbi/"
+                ],
+                "upload_key": "06430f6a-e533-4cd3-b20c-f7fe8cdef0bd/GAPFIP83PL7E.vcf.gz"
+            },
+            {
+                "workflow_argument_name": "annotated_vcf-check",
+                "value_qc": "7c942764-3578-4d89-9a0e-25f5ae21c32b",
+                "type": "Output QC file"
+            }
+        ],
+        "awsem_postrun_json": "https://s3.amazonaws.com/tibanna-output/EwEwzwgc5WXq.postrun.json"
+    },
+    {
+        "parameters": [],
+        "run_platform": "AWSEM",
+        "date_created": "2020-07-07T02:42:09.959998+00:00",
+        "last_modified": {
+            "date_modified": "2020-07-07T15:43:06.668977+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "title": "workflow_picard-MarkDuplicates-check v9 run 2019-09-08 19:32:10.546651",
+        "workflow": "beb2b340-94ee-4afe-b4e3-66caaf063397",
+        "project": "f01ff5be-a72d-43bd-afcf-174fa9dcd282",
+        "quality_metric": "bda6521a-9a53-4137-89ab-b07469677fb9",
+        "run_status": "complete",
+        "run_url": "https://console.aws.amazon.com/states/home?region=us-east-1#/executions/details/arn:aws:states:us-east-1:643366669028:execution:tibanna_zebra:workflow_picard-MarkDuplicates-check_GAPFIQV6ZFSI",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "released",
+        "metadata_only": false,
+        "uuid": "8489db0b-2f79-4e1d-848e-726531e2d26a",
+        "awsem_app_name": "workflow_picard-MarkDuplicates-check",
+        "schema_version": "3",
+        "input_files": [
+            {
+                "value": "7d224460-7562-4403-abb0-b3661eeb3f39",
+                "dimension": "0",
+                "workflow_argument_name": "input_bam",
+                "ordinal": 1
+            }
+        ],
+        "awsem_job_id": "hWvicBHIC7kW",
+        "output_files": [
+            {
+                "value": "5e7d50cd-69b5-4f83-af11-7516562b4000",
+                "workflow_argument_name": "dupmarked_bam",
+                "format": "/file-formats/bam/",
+                "upload_key": "5e7d50cd-69b5-4f83-af11-7516562b4000/GAPFIQQICRPW.bam",
+                "type": "Output processed file"
+            },
+            {
+                "value": "2a0b9f60-2d71-4321-85a5-bd809f03d269",
+                "workflow_argument_name": "duplicate_metrics",
+                "format": "/file-formats/txt/",
+                "upload_key": "2a0b9f60-2d71-4321-85a5-bd809f03d269/GAPFIOIH7EZA.txt",
+                "type": "Output processed file"
+            },
+            {
+                "workflow_argument_name": "dupmarked_bam-check",
+                "value_qc": "ec39ba13-6860-4daf-a2e0-a907aceea72e",
+                "type": "Output QC file"
+            }
+        ],
+        "awsem_postrun_json": "https://s3.amazonaws.com/tibanna-output/hWvicBHIC7kW.postrun.json"
+    },
+    {
+        "parameters": [],
+        "run_platform": "AWSEM",
+        "date_created": "2020-07-07T06:01:32.834827+00:00",
+        "last_modified": {
+            "date_modified": "2020-07-07T15:43:06.815984+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "title": "workflow_picard-MarkDuplicates-check v11 run 2019-11-25 10:01:21.281177",
+        "workflow": "beb2b340-94ee-4afe-b4e3-66caaf063397",
+        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
+        "quality_metric": "a9387b26-1a0a-4e99-9a2c-f4c8dc52f49f",
+        "run_status": "complete",
+        "run_url": "https://console.aws.amazon.com/states/home?region=us-east-1#/executions/details/arn:aws:states:us-east-1:643366669028:execution:tibanna_zebra:workflow_picard-MarkDuplicates-check_GAPFIOH2AVOD",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "released",
+        "metadata_only": false,
+        "uuid": "746041de-a167-42bf-9216-e8db6c7aab36",
+        "awsem_app_name": "workflow_picard-MarkDuplicates-check",
+        "schema_version": "3",
+        "input_files": [
+            {
+                "value": "eb793b65-fa13-4d17-931e-267abf10ccc2",
+                "dimension": "0",
+                "workflow_argument_name": "input_bam",
+                "ordinal": 1
+            }
+        ],
+        "awsem_job_id": "bYv18wa1NtmR",
+        "output_files": [
+            {
+                "value": "76696a96-ffbf-47d6-9f04-3ce233ddb4cb",
+                "workflow_argument_name": "dupmarked_bam",
+                "format": "/file-formats/bam/",
+                "upload_key": "76696a96-ffbf-47d6-9f04-3ce233ddb4cb/GAPFIIKU363K.bam",
+                "type": "Output processed file"
+            },
+            {
+                "value": "4191d2e2-a518-448f-8fd5-0c7e134e225f",
+                "workflow_argument_name": "duplicate_metrics",
+                "format": "/file-formats/txt/",
+                "upload_key": "4191d2e2-a518-448f-8fd5-0c7e134e225f/GAPFIRKBUASE.txt",
+                "type": "Output processed file"
+            },
+            {
+                "workflow_argument_name": "dupmarked_bam-check",
+                "value_qc": "35e411a6-0586-4e4e-a30e-42aa1a5d7b6a",
+                "type": "Output QC file"
+            }
+        ],
+        "awsem_postrun_json": "https://s3.amazonaws.com/tibanna-output/bYv18wa1NtmR.postrun.json"
+    },
+    {
+        "parameters": [],
+        "run_platform": "AWSEM",
+        "date_created": "2020-07-07T02:42:10.208017+00:00",
+        "last_modified": {
+            "date_modified": "2020-07-07T15:43:07.066332+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "title": "workflow_picard-MarkDuplicates-check v9 run 2019-09-08 19:32:04.422657",
+        "workflow": "beb2b340-94ee-4afe-b4e3-66caaf063397",
+        "project": "f01ff5be-a72d-43bd-afcf-174fa9dcd282",
+        "quality_metric": "d175df4f-2de2-4462-a772-883545fd1963",
+        "run_status": "complete",
+        "run_url": "https://console.aws.amazon.com/states/home?region=us-east-1#/executions/details/arn:aws:states:us-east-1:643366669028:execution:tibanna_zebra:workflow_picard-MarkDuplicates-check_GAPFI2JA7G1O",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "released",
+        "metadata_only": false,
+        "uuid": "490ff3ad-ea25-460d-a51e-768f0c5f78b1",
+        "awsem_app_name": "workflow_picard-MarkDuplicates-check",
+        "schema_version": "3",
+        "input_files": [
+            {
+                "value": "485b9e11-6ccf-435a-8d4e-95af4b0d2bd6",
+                "dimension": "0",
+                "workflow_argument_name": "input_bam",
+                "ordinal": 1
+            }
+        ],
+        "awsem_job_id": "SNKP2MTOHBTQ",
+        "output_files": [
+            {
+                "value": "c91025d5-6155-4587-a232-6e16f5bb7acb",
+                "workflow_argument_name": "dupmarked_bam",
+                "format": "/file-formats/bam/",
+                "upload_key": "c91025d5-6155-4587-a232-6e16f5bb7acb/GAPFI9GNISBC.bam",
+                "type": "Output processed file"
+            },
+            {
+                "value": "6b06d446-17e2-4e52-ad53-0bcb9fb0fbc0",
+                "workflow_argument_name": "duplicate_metrics",
+                "format": "/file-formats/txt/",
+                "upload_key": "6b06d446-17e2-4e52-ad53-0bcb9fb0fbc0/GAPFIR42XYN7.txt",
+                "type": "Output processed file"
+            },
+            {
+                "workflow_argument_name": "dupmarked_bam-check",
+                "value_qc": "2997f675-656c-47c8-80cc-6ac53c72d746",
+                "type": "Output QC file"
+            }
+        ],
+        "awsem_postrun_json": "https://s3.amazonaws.com/tibanna-output/SNKP2MTOHBTQ.postrun.json"
+    },
+    {
+        "parameters": [],
+        "run_platform": "AWSEM",
+        "date_created": "2020-07-07T06:01:33.375390+00:00",
+        "last_modified": {
+            "date_modified": "2020-07-07T15:43:07.210237+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "title": "workflow_picard-MarkDuplicates-check v11 run 2019-11-25 10:01:28.882673",
+        "workflow": "beb2b340-94ee-4afe-b4e3-66caaf063397",
+        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
+        "quality_metric": "1015eef1-534c-43b0-b75a-9a017f5bb87d",
+        "run_status": "complete",
+        "run_url": "https://console.aws.amazon.com/states/home?region=us-east-1#/executions/details/arn:aws:states:us-east-1:643366669028:execution:tibanna_zebra:workflow_picard-MarkDuplicates-check_GAPFI9PUMN3F",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "released",
+        "metadata_only": false,
+        "uuid": "1acf44d1-d7ce-42be-ba39-31d3c47a93eb",
+        "awsem_app_name": "workflow_picard-MarkDuplicates-check",
+        "schema_version": "3",
+        "input_files": [
+            {
+                "value": "6744d4c8-a0a2-4619-ada4-1f68991fb994",
+                "dimension": "0",
+                "workflow_argument_name": "input_bam",
+                "ordinal": 1
+            }
+        ],
+        "awsem_job_id": "rRxmD8DokUEv",
+        "output_files": [
+            {
+                "value": "3999a31d-d15d-433e-8bdf-88150fbfcbd4",
+                "workflow_argument_name": "dupmarked_bam",
+                "format": "/file-formats/bam/",
+                "upload_key": "3999a31d-d15d-433e-8bdf-88150fbfcbd4/GAPFIQHUBRKU.bam",
+                "type": "Output processed file"
+            },
+            {
+                "value": "1625a872-1546-42f7-9689-b77fa0d1d25f",
+                "workflow_argument_name": "duplicate_metrics",
+                "format": "/file-formats/txt/",
+                "upload_key": "1625a872-1546-42f7-9689-b77fa0d1d25f/GAPFIAST6ER2.txt",
+                "type": "Output processed file"
+            },
+            {
+                "workflow_argument_name": "dupmarked_bam-check",
+                "value_qc": "85de219f-42ae-4ac2-b7ad-62b7d381baed",
+                "type": "Output QC file"
+            }
+        ],
+        "awsem_postrun_json": "https://s3.amazonaws.com/tibanna-output/rRxmD8DokUEv.postrun.json"
+    },
+    {
+        "parameters": [
+            {
+                "value": "gnomADgenome",
+                "dimension": "0",
+                "workflow_argument_name": "aftag",
+                "ordinal": 1
+            },
+            {
+                "value": "0.01",
+                "dimension": "0",
+                "workflow_argument_name": "afthr",
+                "ordinal": 1
+            }
+        ],
+        "run_platform": "AWSEM",
+        "date_created": "2020-07-07T06:01:27.572539+00:00",
+        "last_modified": {
+            "date_modified": "2020-07-07T15:43:07.371466+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "title": "workflow_granite-filtering-check v14 run 2020-06-18 14:49:53.713485",
+        "workflow": "cb85683c-54a6-44e8-820c-1800aec9fdcd",
+        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
+        "quality_metric": "a930f8b0-bfc4-4fc6-8abc-afba1996e015",
+        "run_status": "complete",
+        "run_url": "https://console.aws.amazon.com/states/home?region=us-east-1#/executions/details/arn:aws:states:us-east-1:643366669028:execution:tibanna_zebra:workflow_granite-filtering-check_82a94d55-bb77-427d-b74a-8c8b607100a1",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "released",
+        "metadata_only": false,
+        "uuid": "ef5b441d-6ae9-439d-9c59-1f587c62b65c",
+        "awsem_app_name": "workflow_granite-filtering-check",
+        "schema_version": "3",
+        "input_files": [
+            {
+                "value": "06430f6a-e533-4cd3-b20c-f7fe8cdef0bd",
+                "dimension": "0",
+                "workflow_argument_name": "input_vcf",
+                "ordinal": 1
+            },
+            {
+                "value": "20004873-b672-4d84-a7c1-7fd5c0407519",
+                "dimension": "0",
+                "workflow_argument_name": "bigfile",
+                "ordinal": 1
+            }
+        ],
+        "awsem_job_id": "OSwnZiTnh5pL",
+        "output_files": [
+            {
+                "extra_files": [
+                    {
+                        "filename": "GAPFIQ16YQT8",
+                        "status": "uploading",
+                        "file_format": "/file-formats/vcf_gz_tbi/",
+                        "accession": "GAPFIQ16YQT8",
+                        "uuid": "9bd2426c-06b6-4e90-a67f-6727bf1b359f",
+                        "href": "/9bd2426c-06b6-4e90-a67f-6727bf1b359f/@@download/GAPFIQ16YQT8.vcf.gz.tbi",
+                        "upload_key": "9bd2426c-06b6-4e90-a67f-6727bf1b359f/GAPFIQ16YQT8.vcf.gz.tbi"
+                    }
+                ],
+                "format": "/file-formats/vcf_gz/",
+                "type": "Output processed file",
+                "value": "9bd2426c-06b6-4e90-a67f-6727bf1b359f",
+                "workflow_argument_name": "merged_vcf",
+                "secondary_file_formats": [
+                    "/file-formats/vcf_gz_tbi/"
+                ],
+                "upload_key": "9bd2426c-06b6-4e90-a67f-6727bf1b359f/GAPFIQ16YQT8.vcf.gz"
+            },
+            {
+                "workflow_argument_name": "merged_vcf-check",
+                "value_qc": "caba631a-908f-4a6e-a4bc-1f582d0f38bd",
+                "type": "Output QC file"
+            }
+        ],
+        "awsem_postrun_json": "https://s3.amazonaws.com/tibanna-output/OSwnZiTnh5pL.postrun.json"
+    },
+    {
+        "parameters": [
+            {
+                "value": "[{\"individual\": \"NA12877\",\"sample_name\": \"NA12877_sample\",\"gender\": \"M\",\"parents\": []},{\"individual\": \"NA12878\",\"sample_name\": \"NA12878_sample\",\"gender\": \"F\",\"parents\": []},{\"individual\": \"NA12879\",\"sample_name\": \"NA12879_sample\",\"gender\": \"F\",\"parents\": [\"NA12878\", \"NA12877\"]}]",
+                "dimension": "0",
+                "workflow_argument_name": "pedigree",
+                "ordinal": 1
+            },
+            {
+                "value": "['NA12879_sample', 'NA12878_sample', 'NA12877_sample']",
+                "dimension": "0",
+                "workflow_argument_name": "samples",
+                "ordinal": 1
+            },
+            {
+                "value": "True",
+                "dimension": "0",
+                "workflow_argument_name": "trio_errors",
+                "ordinal": 1
+            },
+            {
+                "value": "True",
+                "dimension": "0",
+                "workflow_argument_name": "het_hom",
+                "ordinal": 1
+            },
+            {
+                "value": "True",
+                "dimension": "0",
+                "workflow_argument_name": "ti_tv",
+                "ordinal": 1
+            }
+        ],
+        "run_platform": "AWSEM",
+        "date_created": "2020-07-14T01:22:08.194650+00:00",
+        "last_modified": {
+            "date_modified": "2020-07-14T01:23:14.143702+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "title": "workflow_granite-qcVCF v1 run 2020-07-09 16:12:57.826811",
+        "workflow": "33a85705-b757-49e0-aaef-d786695d6d03",
+        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
+        "quality_metric": "4aed475e-c061-4c42-bf50-8fc381c6277e",
+        "run_status": "complete",
+        "run_url": "https://console.aws.amazon.com/states/home?region=us-east-1#/executions/details/arn:aws:states:us-east-1:643366669028:execution:tibanna_zebra:run_workflow_granite-qcVCF-e2ad5763-19dd-476d-adbc-5a44635f13da",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "in review",
+        "metadata_only": false,
+        "uuid": "72c9fd55-878b-4f9c-9bab-90556403a2b3",
+        "awsem_app_name": "workflow_granite-qcVCF",
+        "schema_version": "3",
+        "input_files": [
+            {
+                "value": "06430f6a-e533-4cd3-b20c-f7fe8cdef0bd",
+                "dimension": "0",
+                "workflow_argument_name": "input_vcf",
+                "ordinal": 1
+            }
+        ],
+        "awsem_job_id": "2sDK0ZQrjfVw",
+        "output_files": [
+            {
+                "workflow_argument_name": "qc_json",
+                "value_qc": "d918bc25-0888-4658-811b-53c20b944b76",
+                "type": "Output QC file"
+            }
+        ],
+        "awsem_postrun_json": "https://s3.amazonaws.com/tibanna-output/2sDK0ZQrjfVw.postrun.json"
+    }
+]
