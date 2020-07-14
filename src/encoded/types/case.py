@@ -221,8 +221,47 @@ class Case(Item):
             return False
         family_info = get_item_or_none(request, family, 'family')
         proband = family_info.get('proband', {})
-        proband_id = proband.get('@id', '')
-        print(proband_id)
-        if proband_id == individual:
+        if proband == individual:
             return True
         return False
+
+    @calculated_property(schema={
+        "title": "Case Title",
+        "description": "Title of the case",
+        "type": "string"
+    })
+    def case_title(self, request, individual=None, family=None, sample_processing=None):
+        title = ''
+        if not individual or not family:
+            return title
+        if not sample_processing:
+            return title
+        family_info = get_item_or_none(request, family, 'family')
+        proband = family_info.get('proband', {})
+        proband_case = False
+        if proband == individual:
+            proband_case = True
+        # individual info to get the id, use instition id, if not use accession
+        ind_id = ''
+        ind_data = get_item_or_none(request, individual, 'individual')
+        if ind_data.get('individual_id'):
+            ind_id = ind_data['individual_id']
+        else:
+            ind_id = ind_data['accession']
+        # if individual is not proband, get the id for proband
+        pro_id = ''
+        if not proband_case:
+            pro_data = get_item_or_none(request, proband, 'individual')
+            if pro_data.get('individual_id'):
+                pro_id = pro_data['individual_id']
+            else:
+                pro_id = pro_data['accession']
+            # append p for proband
+            pro_id += 'p'
+        sp_data = get_item_or_none(request, sample_processing, 'sample-processings')
+        analysis = sp_data.get('analysis_type', 'missing analysis')
+        if proband_case:
+            title = "{} {}".format(ind_id, analysis)
+        else:
+            title = "{} {} - in {}".format(ind_id, analysis, pro_id)
+        return title
