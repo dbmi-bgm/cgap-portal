@@ -1,6 +1,5 @@
 [
     {
-        "age": 10,
         "is_still_birth": false,
         "uuid": "e39da58c-664e-4e08-aa71-4217adc379d8",
         "last_modified": {
@@ -15,6 +14,7 @@
         "aliases": [
             "cgap:NA12880"
         ],
+        "individual_id": "NA12880",
         "accession": "GAPIDV97G6HN",
         "mother": "11c429a1-bcb8-4ac6-8f71-be6fb5064ad9",
         "is_pregnancy": false,
@@ -45,6 +45,7 @@
         "aliases": [
             "cgap:NA12890"
         ],
+        "individual_id": "NA12890",
         "accession": "GAPID4B529UM",
         "uuid": "d246d630-62be-4607-af9a-56d97b885331",
         "is_termination_of_pregnancy": false,
@@ -58,7 +59,6 @@
         "life_status": "alive"
     },
     {
-        "age": 1,
         "is_still_birth": false,
         "uuid": "b8e17d98-e364-43c6-919c-a739afa619ad",
         "last_modified": {
@@ -73,6 +73,7 @@
         "aliases": [
             "cgap:NA12893"
         ],
+        "individual_id": "NA12893",
         "accession": "GAPID63EXICS",
         "mother": "11c429a1-bcb8-4ac6-8f71-be6fb5064ad9",
         "is_pregnancy": false,
@@ -89,7 +90,6 @@
         "project": "9a62ef81-7942-4550-a13c-18a915d70b8d"
     },
     {
-        "age": 5,
         "is_still_birth": false,
         "uuid": "ab4328a2-d6ae-47a8-b0a9-93f5318a65ce",
         "last_modified": {
@@ -104,6 +104,7 @@
         "aliases": [
             "cgap:NA12885"
         ],
+        "individual_id": "NA12885",
         "accession": "GAPIDHJBFV7A",
         "mother": "11c429a1-bcb8-4ac6-8f71-be6fb5064ad9",
         "is_pregnancy": false,
@@ -134,6 +135,7 @@
         "aliases": [
             "cgap:NA12892"
         ],
+        "individual_id": "NA12892",
         "accession": "GAPIDXNTIBXD",
         "uuid": "9d5ed31c-489d-4dc6-8bdd-1c818a779a6c",
         "is_termination_of_pregnancy": false,
@@ -147,7 +149,6 @@
         "life_status": "alive"
     },
     {
-        "age": 4,
         "is_still_birth": false,
         "uuid": "878237f3-6643-40b2-a9c4-e48421ae3302",
         "last_modified": {
@@ -162,6 +163,7 @@
         "aliases": [
             "cgap:NA12886"
         ],
+        "individual_id": "NA12886",
         "accession": "GAPIDCWN1PYZ",
         "mother": "11c429a1-bcb8-4ac6-8f71-be6fb5064ad9",
         "is_pregnancy": false,
@@ -190,6 +192,7 @@
         "aliases": [
             "cgap:NA24149"
         ],
+        "individual_id": "NA24149",
         "accession": "GAPIDZ6EQTKD",
         "uuid": "82ac8825-a526-4b21-8fe0-468b9fc4e620",
         "schema_version": "1",
@@ -214,6 +217,7 @@
         "aliases": [
             "cgap:NA12889"
         ],
+        "individual_id": "NA12889",
         "accession": "GAPIDEPNNBDO",
         "uuid": "826de967-ae04-43d0-ab13-75a0c992aaad",
         "is_termination_of_pregnancy": false,
@@ -243,6 +247,7 @@
         "aliases": [
             "cgap:NA12877"
         ],
+        "individual_id": "NA12877",
         "accession": "GAPIDERSF9QH",
         "mother": "d246d630-62be-4607-af9a-56d97b885331",
         "is_pregnancy": false,
@@ -259,7 +264,6 @@
         "project": "9a62ef81-7942-4550-a13c-18a915d70b8d"
     },
     {
-        "age": 9,
         "is_still_birth": false,
         "uuid": "6fd4ff52-9674-4e67-8641-92731372c2db",
         "last_modified": {
@@ -274,6 +278,7 @@
         "aliases": [
             "cgap:NA12881"
         ],
+        "individual_id": "NA12881",
         "accession": "GAPIDTKPCJH5",
         "mother": "11c429a1-bcb8-4ac6-8f71-be6fb5064ad9",
         "is_pregnancy": false,
@@ -304,6 +309,7 @@
         "aliases": [
             "cgap:NA24385"
         ],
+        "individual_id": "NA24385",
         "accession": "GAPIDWGJQKEK",
         "mother": "608e2cf2-91d4-4d9d-9091-dce1a1912bb1",
         "schema_version": "1",
@@ -326,6 +332,7 @@
         "aliases": [
             "cgap:NA24143"
         ],
+        "individual_id": "NA24143",
         "accession": "GAPIDCEC97XU",
         "uuid": "608e2cf2-91d4-4d9d-9091-dce1a1912bb1",
         "schema_version": "1",
@@ -336,7 +343,6 @@
         }
     },
     {
-        "age": 11,
         "is_still_birth": false,
         "uuid": "4dfca9c9-5f93-48b5-823b-1fd0afaebdae",
         "is_infertile": false,
@@ -350,6 +356,7 @@
         "aliases": [
             "cgap:NA12879"
         ],
+        "individual_id": "NA12879",
         "accession": "GAPID832VXDG",
         "mother": "11c429a1-bcb8-4ac6-8f71-be6fb5064ad9",
         "is_pregnancy": false,
@@ -370,7 +377,6 @@
         }
     },
     {
-        "age": 2,
         "is_still_birth": false,
         "uuid": "4ac7399a-a417-4565-bc62-f34cd73c2a15",
         "last_modified": {
@@ -385,6 +391,7 @@
         "aliases": [
             "cgap:NA12888"
         ],
+        "individual_id": "NA12888",
         "accession": "GAPIDNFOS6TJ",
         "mother": "11c429a1-bcb8-4ac6-8f71-be6fb5064ad9",
         "is_pregnancy": false,
@@ -401,7 +408,6 @@
         "project": "9a62ef81-7942-4550-a13c-18a915d70b8d"
     },
     {
-        "age": 7,
         "is_still_birth": false,
         "uuid": "4846fe87-237b-44e4-adbb-315cd7e7f005",
         "last_modified": {
@@ -416,6 +422,7 @@
         "aliases": [
             "cgap:NA12883"
         ],
+        "individual_id": "NA12883",
         "accession": "GAPIDAZOSERO",
         "mother": "11c429a1-bcb8-4ac6-8f71-be6fb5064ad9",
         "is_pregnancy": false,
@@ -432,7 +439,6 @@
         "project": "9a62ef81-7942-4550-a13c-18a915d70b8d"
     },
     {
-        "age": 3,
         "is_still_birth": false,
         "uuid": "4684702a-3639-4073-8db4-d44eb8b31135",
         "last_modified": {
@@ -447,6 +453,7 @@
         "aliases": [
             "cgap:NA12887"
         ],
+        "individual_id": "NA12887",
         "accession": "GAPIDHBDD29C",
         "mother": "11c429a1-bcb8-4ac6-8f71-be6fb5064ad9",
         "is_pregnancy": false,
@@ -463,7 +470,6 @@
         "project": "9a62ef81-7942-4550-a13c-18a915d70b8d"
     },
     {
-        "age": 8,
         "is_still_birth": false,
         "uuid": "3adced93-a305-43d5-983b-0d8dfa5d1bb7",
         "last_modified": {
@@ -478,6 +484,7 @@
         "aliases": [
             "cgap:NA12882"
         ],
+        "individual_id": "NA12882",
         "accession": "GAPIDQN87MIU",
         "mother": "11c429a1-bcb8-4ac6-8f71-be6fb5064ad9",
         "is_pregnancy": false,
@@ -508,6 +515,7 @@
         "aliases": [
             "cgap:NA12891"
         ],
+        "individual_id": "NA12891",
         "accession": "GAPID4OF2L13",
         "uuid": "34bcf545-bc25-4288-9f0a-b1d8297ce306",
         "is_termination_of_pregnancy": false,
@@ -535,6 +543,7 @@
         "aliases": [
             "cgap:NA12878"
         ],
+        "individual_id": "NA12878",
         "accession": "GAPIDGE5KLIH",
         "mother": "9d5ed31c-489d-4dc6-8bdd-1c818a779a6c",
         "schema_version": "1",
@@ -546,7 +555,6 @@
         "life_status": "alive"
     },
     {
-        "age": 6,
         "is_still_birth": false,
         "uuid": "0dca2d65-387e-4042-945a-459e1a334507",
         "last_modified": {
@@ -561,6 +569,7 @@
         "aliases": [
             "cgap:NA12884"
         ],
+        "individual_id": "NA12884",
         "accession": "GAPIDQ14ESUP",
         "mother": "11c429a1-bcb8-4ac6-8f71-be6fb5064ad9",
         "is_pregnancy": false,
