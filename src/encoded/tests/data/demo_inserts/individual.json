@@ -1,6 +1,5 @@
 [
     {
-        "age": 10,
         "is_still_birth": false,
         "uuid": "e39da58c-664e-4e08-aa71-4217adc379d8",
         "last_modified": {
@@ -60,7 +59,6 @@
         "life_status": "alive"
     },
     {
-        "age": 1,
         "is_still_birth": false,
         "uuid": "b8e17d98-e364-43c6-919c-a739afa619ad",
         "last_modified": {
@@ -92,7 +90,6 @@
         "project": "9a62ef81-7942-4550-a13c-18a915d70b8d"
     },
     {
-        "age": 5,
         "is_still_birth": false,
         "uuid": "ab4328a2-d6ae-47a8-b0a9-93f5318a65ce",
         "last_modified": {
@@ -152,7 +149,6 @@
         "life_status": "alive"
     },
     {
-        "age": 4,
         "is_still_birth": false,
         "uuid": "878237f3-6643-40b2-a9c4-e48421ae3302",
         "last_modified": {
@@ -268,7 +264,6 @@
         "project": "9a62ef81-7942-4550-a13c-18a915d70b8d"
     },
     {
-        "age": 9,
         "is_still_birth": false,
         "uuid": "6fd4ff52-9674-4e67-8641-92731372c2db",
         "last_modified": {
@@ -348,7 +343,6 @@
         }
     },
     {
-        "age": 11,
         "is_still_birth": false,
         "uuid": "4dfca9c9-5f93-48b5-823b-1fd0afaebdae",
         "is_infertile": false,
@@ -383,7 +377,6 @@
         }
     },
     {
-        "age": 2,
         "is_still_birth": false,
         "uuid": "4ac7399a-a417-4565-bc62-f34cd73c2a15",
         "last_modified": {
@@ -415,7 +408,6 @@
         "project": "9a62ef81-7942-4550-a13c-18a915d70b8d"
     },
     {
-        "age": 7,
         "is_still_birth": false,
         "uuid": "4846fe87-237b-44e4-adbb-315cd7e7f005",
         "last_modified": {
@@ -447,7 +439,6 @@
         "project": "9a62ef81-7942-4550-a13c-18a915d70b8d"
     },
     {
-        "age": 3,
         "is_still_birth": false,
         "uuid": "4684702a-3639-4073-8db4-d44eb8b31135",
         "last_modified": {
@@ -479,7 +470,6 @@
         "project": "9a62ef81-7942-4550-a13c-18a915d70b8d"
     },
     {
-        "age": 8,
         "is_still_birth": false,
         "uuid": "3adced93-a305-43d5-983b-0d8dfa5d1bb7",
         "last_modified": {
@@ -565,7 +555,6 @@
         "life_status": "alive"
     },
     {
-        "age": 6,
         "is_still_birth": false,
         "uuid": "0dca2d65-387e-4042-945a-459e1a334507",
         "last_modified": {
