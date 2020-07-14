@@ -192,7 +192,7 @@ class VariantSample(Item):
     })
     def bam_snapshot(self, request, file, variant):
         variant_props = get_item_or_none(request, variant, 'Variant')
-        file_path = '%s/%s/chr%s-%s.png' % (  # file = accession of associated VCF file
+        file_path = '%s/%s/chr%s:%s.png' % (  # file = accession of associated VCF file
             file, 'bamsnap', variant_props['CHROM'], variant_props['POS']
         )
         return file_path
