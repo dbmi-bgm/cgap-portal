@@ -8,6 +8,7 @@ import _ from 'underscore';
 
 import { console, ajax, JWT } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { LocalizedTime } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/LocalizedTime';
+import { Checkbox } from '@hms-dbmi-bgm/shared-portal-components/es/components/forms/components/Checkbox';
 import { Schemas } from './../../util';
 
 import { EmbeddedCaseSearchTable } from './../../item-pages/components/EmbeddedItemSearchTable';
@@ -18,6 +19,14 @@ export const UserDashboard = React.memo(function UserDashboard(props){
     // We can convert dashboard-header into tabs, similar to Item pages.
     // We can do novel stuff like sidebar menu or something.
     // Various options.
+
+    // Since UserDashboard visible, we assume user is logged in.
+    // We use email as unique component key for components
+    // which need to make AJAX requests. This way we can just
+    // re-initialize component upon 'Impersonate User' action
+    // insteat of handling w. componentDidUpdate or similar.
+    const { uuid: userUUID = null } = JWT.getUserDetails() || {};
+
     return (
         <React.Fragment>
             <div className="dashboard-header">
@@ -64,7 +73,7 @@ export const UserDashboard = React.memo(function UserDashboard(props){
 
                     </div>
 
-                    <RecentCasesSection />
+                    <RecentCasesSection userUUID={userUUID} key={userUUID} />
 
                 </div>
             </div>
@@ -73,36 +82,77 @@ export const UserDashboard = React.memo(function UserDashboard(props){
 });
 
 
-function RecentCasesSection (props) {
-    // We don't memoize this, can change on each run if User is being
-    // impersonated. We memoize stuff downstream from here, though.
-    const userDetails = JWT.getUserDetails();
-    const { project_roles = [] } = userDetails || {};
+class RecentCasesSection extends React.PureComponent {
 
-    if (project_roles.length === 0) {
-        // Show single table of all cases available.
-        return (
-            <div className="recent-cases-table-section mt-36">
-                <h3 className="text-400">Recent Cases</h3>
-                <EmbeddedCaseSearchTable facets={null} searchHref="/search/?type=Case" />
-            </div>
-        );
+    constructor(props){
+        super(props);
+        this.toggleCasesWithReports = this.toggleCasesWithReports.bind(this);
+        this.state = {
+            project_roles: null, // 'null' will indicate loading, also. While empty arr is lack/failed.
+            projectsWithAllCases : {
+                // Lack of presence here means only Cases with reports will be shown for this project.
+                // Unless toggled later. Keyed by project name (uniqueKey).
+            }
+        };
     }
 
-    const tableSections = project_roles.map(function({ role, project }){
-        const { name: projectName, '@id' : projectID, display_title: projectTitle } = project;
+    componentDidMount(){
+        const { userUUID } = this.props;
+        const cb = (resp) => {
+            const { project_roles = [] } = resp;
+            this.setState({ project_roles });
+        };
+        ajax.load("/users/" + userUUID, cb, 'GET', cb);
+    }
 
-        return (
-            <div className="recent-cases-table-section mt-36" data-project={projectName} key={projectName}>
-                <h3 className="text-400">
-                    <span className="text-300 mr-06">Recent Cases from</span>
-                    <a href={projectID}>{ projectTitle }</a>
-                </h3>
-                <EmbeddedCaseSearchTable facets={null} searchHref="/search/?type=Case" />
-            </div>
-        );
+    toggleCasesWithReports(projectName){
+        this.setState(function({ projectsWithAllCases: existingStateMap }){
+            const projectsWithAllCases = {
+                ...existingStateMap,
+                [projectName]: !existingStateMap[projectName]
+            };
+            return { projectsWithAllCases };
+        });
+    }
 
-    });
+    render(){
+        const { project_roles, projectsWithAllCases } = this.state;
+        if (project_roles === null) {
+            return (
+                <div className="py-3 text-center">
+                    <h3><i className="icon icon-spin fas icon-circle-notch"/></h3>
+                </div>
+            );
+        }
+        if (project_roles.length === 0) {
+            return null;
+        }
 
-    return tableSections;
+        const tableSections = project_roles.map(({ role, project })=>{
+            const { name: projectName, '@id' : projectID, display_title: projectTitle } = project;
+            const onCasesWithReportsToggle = (e) => this.toggleCasesWithReports(projectName);
+            const casesWithReportsOnly = !projectsWithAllCases[projectName];
+            const searchHref = "/search/?type=Case&project.name=" + encodeURIComponent(projectName) + (casesWithReportsOnly ? "&report.uuid!=No+value" : "");
+            return (
+                <div className="recent-cases-table-section mt-36" data-project={projectName} key={projectName}>
+                    <div className="d-flex align-items-center">
+                        <h3 className="text-400 flex-fill">
+                            <span className="text-300 mr-06">Recent Cases from</span>
+                            <a href={projectID}>{ projectTitle }</a>
+                        </h3>
+                        <div className="toggle-reports">
+                            <Checkbox onChange={onCasesWithReportsToggle} checked={casesWithReportsOnly}>
+                                Show Cases with Reports Only
+                            </Checkbox>
+                        </div>
+                    </div>
+                    <EmbeddedCaseSearchTable facets={null} searchHref={searchHref} />
+                </div>
+            );
+
+        });
+
+        return tableSections;
+    }
+
 }

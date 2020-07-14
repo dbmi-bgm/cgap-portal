@@ -194,7 +194,8 @@ class Case(Item):
         "sample_processing.completed_processes",
         "report.last_modified.*",
         "report.status",
-        "cohort.filter_set.*"
+        "cohort.filter_set.*",
+        "project.name"
     ]
 
     @calculated_property(schema={

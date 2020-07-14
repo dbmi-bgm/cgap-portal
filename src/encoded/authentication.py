@@ -350,7 +350,7 @@ def get_basic_properties_for_user(request, userid):
     user_dict = user.__json__(request)
 
     # Only include certain/applicable fields from profile
-    include_detail_fields = ['email', 'first_name', 'last_name', 'groups', 'timezone', 'status', 'project_roles']
+    include_detail_fields = ['email', 'first_name', 'last_name', 'groups', 'timezone', 'status']
     user_actions = calculate_properties(user, request, category='user_action')
 
     properties = {
