@@ -1,10 +1,18 @@
 [
     {
-        "description": "Report for proband of Platinum family",
+        "description": "Report for proband of Platinum family trio",
         "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
         "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
         "status": "released",
         "uuid": "8dd51b60-2d65-4e74-ac86-08ff9159aaaa",
+        "schema_version": "1"
+    },
+    {
+        "description": "Report for proband of Platinum family single",
+        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "status": "released",
+        "uuid": "8dd51b60-2d65-4e74-ac86-08ff9159abcd",
         "schema_version": "1"
     },
     {
@@ -16,3 +24,6 @@
         "schema_version": "1"
     }
 ]
+
+
+

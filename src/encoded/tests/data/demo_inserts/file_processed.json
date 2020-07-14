@@ -1,5 +1,33 @@
 [
     {
+        "md5sum": "5f74b85af70feb155169bc6facae88ce",
+        "file_classification": "processed file",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "file_size": 4931417,
+        "quality_metric": "eef6aab7-9b58-4635-917e-b2802792782d",
+        "extra_files": [
+            {
+                "filename": "GAPFIPZSABCD",
+                "status": "uploaded",
+                "file_format": "f84f1922-7f4e-4afc-922f-bec620969bf1",
+                "accession": "GAPFIPZSABCD",
+                "uuid": "bd12fe4d-eb8d-4bd5-9e56-c2ecc9badc1d",
+                "href": "/files-processed/GAPFIPZSABCD/@@download/GAPFIPZSABCD.vcf.gz.tbi",
+                "md5sum": "0194707bc879bad1d39e3ee8f743b06a",
+                "file_size": 53463,
+                "upload_key": "bd12fe4d-eb8d-4bd5-9e56-c2ecc9badc1d/GAPFIPZSABCD.vcf.gz.tbi"
+            }
+        ],
+        "status": "uploaded",
+        "file_format": "1b8f525f-aecb-4211-9ae5-a2c998b05599",
+        "accession": "GAPFIPZSABCD",
+        "uuid": "bd12fe4d-eb8d-4bd5-9e56-c2ecc9baabcd",
+        "genome_assembly": "GRCh38",
+        "schema_version": "3",
+        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
+        "source_samples": []
+    },
+    {
         "md5sum": "5f74b85af70feb155169bc6facae88cd",
         "file_classification": "processed file",
         "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
