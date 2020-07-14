@@ -180,7 +180,7 @@
             "date_modified": "2020-07-07T03:10:51.266677+00:00",
             "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
         },
-        "uk10k_esp_maf": 3.0,
+        "uk10k_esp_maf": [3.0],
         "gnomad_ac_sas": 569,
         "gnomad_ac_oth_female": 329,
         "gnomad_ac": 46976,
@@ -1011,7 +1011,7 @@
             "date_modified": "2020-07-07T03:11:33.400715+00:00",
             "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
         },
-        "uk10k_esp_maf": 1.0,
+        "uk10k_esp_maf": [1.0],
         "gnomad_ac_sas": 48,
         "gnomad_ac_oth_female": 3,
         "gnomad_ac": 891,
@@ -1309,7 +1309,7 @@
             "date_modified": "2020-07-07T03:10:22.782044+00:00",
             "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
         },
-        "uk10k_esp_maf": 8.0,
+        "uk10k_esp_maf": [8.0],
         "gnomad_ac_sas": 59,
         "gnomad_ac_oth_female": 59,
         "gnomad_ac": 7530,
@@ -2158,7 +2158,7 @@
             "date_modified": "2020-07-07T03:11:24.493945+00:00",
             "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
         },
-        "uk10k_esp_maf": 0.0,
+        "uk10k_esp_maf": [0.0],
         "gnomad_ac_sas": 0,
         "gnomad_ac_oth_female": 4,
         "gnomad_ac": 473,
@@ -2483,7 +2483,7 @@
             "date_modified": "2020-07-07T03:11:50.188529+00:00",
             "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
         },
-        "uk10k_esp_maf": 0.0,
+        "uk10k_esp_maf": [0.0],
         "gnomad_ac_sas": 10,
         "gnomad_ac_oth_female": 11,
         "gnomad_ac": 711,
@@ -2911,7 +2911,7 @@
             "date_modified": "2020-07-07T03:11:50.009346+00:00",
             "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
         },
-        "uk10k_esp_maf": 0.0,
+        "uk10k_esp_maf": [0.0],
         "gnomad_ac_sas": 2,
         "gnomad_ac_oth_female": 4,
         "gnomad_ac": 638,
@@ -3189,7 +3189,7 @@
             "date_modified": "2020-07-07T03:07:46.600283+00:00",
             "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
         },
-        "uk10k_esp_maf": 0.0,
+        "uk10k_esp_maf": [0.0],
         "gnomad_ac_sas": 0,
         "gnomad_ac_oth_female": 1,
         "gnomad_ac": 258,
@@ -3706,7 +3706,7 @@
             "date_modified": "2020-07-07T03:10:22.048491+00:00",
             "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
         },
-        "uk10k_esp_maf": 1.0,
+        "uk10k_esp_maf": [1.0],
         "gnomad_ac_sas": 10,
         "gnomad_ac_oth_female": 5,
         "gnomad_ac": 1037,
@@ -4198,7 +4198,7 @@
             "date_modified": "2020-07-07T03:14:21.486027+00:00",
             "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
         },
-        "uk10k_esp_maf": 0.0,
+        "uk10k_esp_maf": [0.0],
         "gnomad_ac_sas": 0,
         "gnomad_ac_oth_female": 2,
         "gnomad_ac": 101,
@@ -4456,7 +4456,7 @@
             "date_modified": "2020-07-07T03:11:16.886629+00:00",
             "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
         },
-        "uk10k_esp_maf": 1.0,
+        "uk10k_esp_maf": [1.0],
         "gnomad_ac_sas": 5,
         "gnomad_ac_oth_female": 7,
         "gnomad_ac": 1244,
@@ -4785,7 +4785,7 @@
             "date_modified": "2020-07-07T03:10:06.319699+00:00",
             "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
         },
-        "uk10k_esp_maf": 1.0,
+        "uk10k_esp_maf": [1.0],
         "gnomad_ac_sas": 11,
         "gnomad_ac_oth_female": 14,
         "gnomad_ac": 1216,
@@ -4967,7 +4967,7 @@
         "clinvar_clnvi": "Illumina_Clinical_Services_Laboratory,Illumina:164439",
         "gnomad_ac_afr_female": 50,
         "conservation_phylop30": 0.227,
-        "uk10k_esp_maf": 0.0,
+        "uk10k_esp_maf": [0.0],
         "gnomad_an_raw": 143376,
         "gnomad_af_nfe_female": 0.00823573,
         "gnomad_ac_male": 426,
@@ -5400,7 +5400,7 @@
             "date_modified": "2020-07-07T03:11:34.754978+00:00",
             "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
         },
-        "uk10k_esp_maf": 1.0,
+        "uk10k_esp_maf": [1.0],
         "gnomad_ac_sas": 401,
         "gnomad_ac_oth_female": 138,
         "gnomad_ac": 16289,
@@ -5698,7 +5698,7 @@
             "date_modified": "2020-07-07T03:09:01.331454+00:00",
             "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
         },
-        "uk10k_esp_maf": 0.0,
+        "uk10k_esp_maf": [0.0],
         "gnomad_ac_sas": 5,
         "gnomad_ac_oth_female": 1,
         "gnomad_ac": 432,
@@ -6511,7 +6511,7 @@
             "date_modified": "2020-07-07T03:13:15.429616+00:00",
             "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
         },
-        "uk10k_esp_maf": 1.0,
+        "uk10k_esp_maf": [1.0],
         "gnomad_ac_sas": 23,
         "gnomad_ac_oth_female": 18,
         "gnomad_ac": 1300,
@@ -7223,7 +7223,7 @@
             "date_modified": "2020-07-07T03:11:53.527943+00:00",
             "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
         },
-        "uk10k_esp_maf": 0.0,
+        "uk10k_esp_maf": [0.0],
         "gnomad_ac_sas": 5,
         "gnomad_ac_oth_female": 5,
         "gnomad_ac": 431,
@@ -8475,7 +8475,7 @@
             "date_modified": "2020-07-07T03:13:13.728273+00:00",
             "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
         },
-        "uk10k_esp_maf": 0.0,
+        "uk10k_esp_maf": [0.0],
         "gnomad_ac_sas": 0,
         "gnomad_ac_oth_female": 5,
         "gnomad_ac": 822,
@@ -9073,7 +9073,7 @@
         "clinvar_clnvi": "UniProtKB_(protein):Q8IYT3#VAR_028859",
         "gnomad_ac_afr_female": 11267,
         "conservation_phylop30": 0.228,
-        "uk10k_esp_maf": 3.0,
+        "uk10k_esp_maf": [3.0],
         "gnomad_an_raw": 143336,
         "gnomad_af_nfe_female": 0.321123,
         "gnomad_ac_male": 24263,
@@ -9678,7 +9678,7 @@
             "date_modified": "2020-07-07T03:08:27.447356+00:00",
             "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
         },
-        "uk10k_esp_maf": 0.0,
+        "uk10k_esp_maf": [0.0],
         "gnomad_ac_sas": 0,
         "gnomad_ac_oth_female": 1,
         "gnomad_ac": 173,
@@ -10555,7 +10555,7 @@
             "date_modified": "2020-07-07T03:13:33.073319+00:00",
             "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
         },
-        "uk10k_esp_maf": 0.0,
+        "uk10k_esp_maf": [0.0],
         "gnomad_ac_sas": 5,
         "gnomad_ac_oth_female": 3,
         "gnomad_ac": 157,
@@ -10947,7 +10947,7 @@
             "date_modified": "2020-07-07T03:07:23.202845+00:00",
             "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
         },
-        "uk10k_esp_maf": 0.0,
+        "uk10k_esp_maf": [0.0],
         "gnomad_ac_sas": 2,
         "gnomad_ac_oth_female": 5,
         "gnomad_ac": 352,
@@ -11545,7 +11545,7 @@
             "date_modified": "2020-07-07T03:10:22.625888+00:00",
             "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
         },
-        "uk10k_esp_maf": 1.0,
+        "uk10k_esp_maf": [1.0],
         "gnomad_ac_sas": 0,
         "gnomad_ac_oth_female": 4,
         "gnomad_ac": 937,
@@ -12810,7 +12810,7 @@
         "clinvar_clnvi": "OMIM_Allelic_Variant:608893.0005",
         "gnomad_ac_afr_female": 7135,
         "conservation_phylop30": -0.832,
-        "uk10k_esp_maf": 2.0,
+        "uk10k_esp_maf": [2.0],
         "gnomad_an_raw": 143372,
         "gnomad_af_nfe_female": 0.231461,
         "gnomad_ac_male": 17073,
@@ -13203,7 +13203,7 @@
             "date_modified": "2020-07-07T03:13:42.307292+00:00",
             "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
         },
-        "uk10k_esp_maf": 0.0,
+        "uk10k_esp_maf": [0.0],
         "gnomad_ac_sas": 0,
         "gnomad_ac_oth_female": 3,
         "gnomad_ac": 428,
@@ -14570,7 +14570,7 @@
             "date_modified": "2020-07-07T03:11:27.722888+00:00",
             "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
         },
-        "uk10k_esp_maf": 0.0,
+        "uk10k_esp_maf": [0.0],
         "gnomad_ac_sas": 21,
         "gnomad_ac_oth_female": 17,
         "gnomad_ac": 876,
@@ -15301,7 +15301,7 @@
             "date_modified": "2020-07-07T03:07:17.586475+00:00",
             "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
         },
-        "uk10k_esp_maf": 0.0,
+        "uk10k_esp_maf": [0.0],
         "gnomad_ac_sas": 1,
         "gnomad_ac_oth_female": 4,
         "gnomad_ac": 251,
@@ -15725,7 +15725,7 @@
             "date_modified": "2020-07-07T03:07:30.802888+00:00",
             "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
         },
-        "uk10k_esp_maf": 0.0,
+        "uk10k_esp_maf": [0.0],
         "gnomad_ac_sas": 5,
         "gnomad_ac_oth_female": 9,
         "gnomad_ac": 876,
@@ -15884,7 +15884,7 @@
         "clinvar_clnvi": "HGMD:CM021497~Illumina_Clinical_Services_Laboratory,Illumina:87397~UniProtKB_(protein):P12694#VAR_034361~ARUP_Laboratories,_Molecular_Genetics_and_Genomics,_ARUP_Laboratories:42408",
         "gnomad_ac_afr_female": 44,
         "conservation_phylop30": 1.026,
-        "uk10k_esp_maf": 1.0,
+        "uk10k_esp_maf": [1.0],
         "gnomad_an_raw": 143396,
         "gnomad_af_nfe_female": 0.0099738,
         "gnomad_ac_male": 601,
@@ -16607,7 +16607,7 @@
             "date_modified": "2020-07-07T03:13:29.595894+00:00",
             "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
         },
-        "uk10k_esp_maf": 1.0,
+        "uk10k_esp_maf": [1.0],
         "gnomad_ac_sas": 8,
         "gnomad_ac_oth_female": 9,
         "gnomad_ac": 1340,
@@ -17151,7 +17151,7 @@
             "date_modified": "2020-07-07T03:09:04.554221+00:00",
             "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
         },
-        "uk10k_esp_maf": 1.0,
+        "uk10k_esp_maf": [1.0],
         "gnomad_ac_sas": 7,
         "gnomad_ac_oth_female": 9,
         "gnomad_ac": 1277,
@@ -17822,7 +17822,7 @@
             "date_modified": "2020-07-07T03:12:09.328168+00:00",
             "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
         },
-        "uk10k_esp_maf": 0.0,
+        "uk10k_esp_maf": [0.0],
         "gnomad_ac_sas": 1,
         "gnomad_ac_oth_female": 2,
         "gnomad_ac": 863,
@@ -18248,7 +18248,7 @@
             "date_modified": "2020-07-07T03:07:59.564738+00:00",
             "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
         },
-        "uk10k_esp_maf": 0.0,
+        "uk10k_esp_maf": [0.0],
         "gnomad_ac_sas": 25,
         "gnomad_ac_oth_female": 9,
         "gnomad_ac": 853,
@@ -18653,7 +18653,7 @@
             "date_modified": "2020-07-07T03:07:58.561762+00:00",
             "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
         },
-        "uk10k_esp_maf": 0.0,
+        "uk10k_esp_maf": [0.0],
         "gnomad_ac_sas": 25,
         "gnomad_ac_oth_female": 9,
         "gnomad_ac": 844,
@@ -19073,7 +19073,7 @@
             "date_modified": "2020-07-07T03:09:06.148418+00:00",
             "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
         },
-        "uk10k_esp_maf": 0.0,
+        "uk10k_esp_maf": [0.0],
         "gnomad_ac_sas": 8,
         "gnomad_ac_oth_female": 2,
         "gnomad_ac": 547,
@@ -19391,7 +19391,7 @@
             "date_modified": "2020-07-07T03:14:52.559049+00:00",
             "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
         },
-        "uk10k_esp_maf": 0.0,
+        "uk10k_esp_maf": [0.0],
         "gnomad_ac_sas": 10,
         "gnomad_ac_oth_female": 4,
         "gnomad_ac": 597,
@@ -20239,7 +20239,7 @@
             "date_modified": "2020-07-07T03:07:20.560562+00:00",
             "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
         },
-        "uk10k_esp_maf": 1.0,
+        "uk10k_esp_maf": [1.0],
         "gnomad_ac_sas": 4,
         "gnomad_ac_oth_female": 13,
         "gnomad_ac": 914,
@@ -20788,7 +20788,7 @@
             "date_modified": "2020-07-07T03:15:16.268659+00:00",
             "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
         },
-        "uk10k_esp_maf": 0.0,
+        "uk10k_esp_maf": [0.0],
         "gnomad_ac_sas": 2,
         "gnomad_ac_oth_female": 1,
         "gnomad_ac": 462,
@@ -21116,7 +21116,7 @@
             "date_modified": "2020-07-07T03:07:25.655130+00:00",
             "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
         },
-        "uk10k_esp_maf": 0.0,
+        "uk10k_esp_maf": [0.0],
         "gnomad_ac_sas": 0,
         "gnomad_ac_oth_female": 1,
         "gnomad_ac": 113,
@@ -21264,7 +21264,7 @@
         "clinvar_clnvi": "UniProtKB_(protein):P22455#VAR_014797~OMIM_Allelic_Variant:134935.0001",
         "gnomad_ac_afr_female": 3056,
         "conservation_phylop30": 1.101,
-        "uk10k_esp_maf": 3.0,
+        "uk10k_esp_maf": [3.0],
         "gnomad_an_raw": 143322,
         "gnomad_af_nfe_female": 0.306232,
         "gnomad_ac_male": 18546,
@@ -22388,7 +22388,7 @@
             "date_modified": "2020-07-07T03:10:40.382573+00:00",
             "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
         },
-        "uk10k_esp_maf": 1.0,
+        "uk10k_esp_maf": [1.0],
         "gnomad_ac_sas": 20,
         "gnomad_ac_oth_female": 8,
         "gnomad_ac": 1076,
@@ -22646,7 +22646,7 @@
             "date_modified": "2020-07-07T03:14:17.998149+00:00",
             "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
         },
-        "uk10k_esp_maf": 0.0,
+        "uk10k_esp_maf": [0.0],
         "gnomad_ac_sas": 12,
         "gnomad_ac_oth_female": 10,
         "gnomad_ac": 736,
@@ -23418,7 +23418,7 @@
             "date_modified": "2020-07-07T03:12:06.694719+00:00",
             "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
         },
-        "uk10k_esp_maf": 0.0,
+        "uk10k_esp_maf": [0.0],
         "gnomad_ac_sas": 1,
         "gnomad_ac_oth_female": 7,
         "gnomad_ac": 825,
@@ -23891,7 +23891,7 @@
             "date_modified": "2020-07-07T03:07:48.721322+00:00",
             "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
         },
-        "uk10k_esp_maf": 0.0,
+        "uk10k_esp_maf": [0.0],
         "gnomad_ac_sas": 2,
         "gnomad_ac_oth_female": 2,
         "gnomad_ac": 270,
@@ -24218,7 +24218,7 @@
             "date_modified": "2020-07-07T03:12:29.081748+00:00",
             "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
         },
-        "uk10k_esp_maf": 0.0,
+        "uk10k_esp_maf": [0.0],
         "gnomad_ac_sas": 11,
         "gnomad_ac_oth_female": 1,
         "gnomad_ac": 484,
@@ -24734,7 +24734,7 @@
             "date_modified": "2020-07-07T03:07:40.325239+00:00",
             "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
         },
-        "uk10k_esp_maf": 0.0,
+        "uk10k_esp_maf": [0.0],
         "gnomad_ac_sas": 0,
         "gnomad_ac_oth_female": 0,
         "gnomad_ac": 41,
@@ -25034,7 +25034,7 @@
             "date_modified": "2020-07-07T03:10:09.255996+00:00",
             "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
         },
-        "uk10k_esp_maf": 0.0,
+        "uk10k_esp_maf": [0.0],
         "gnomad_ac_sas": 0,
         "gnomad_ac_oth_female": 2,
         "gnomad_ac": 629,
@@ -25401,7 +25401,7 @@
             "date_modified": "2020-07-07T03:11:10.423616+00:00",
             "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
         },
-        "uk10k_esp_maf": 2.0,
+        "uk10k_esp_maf": [2.0],
         "gnomad_ac_sas": 1317,
         "gnomad_ac_oth_female": 337,
         "gnomad_ac": 42652,
@@ -25803,7 +25803,7 @@
             "date_modified": "2020-07-07T03:13:33.649871+00:00",
             "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
         },
-        "uk10k_esp_maf": 0.0,
+        "uk10k_esp_maf": [0.0],
         "gnomad_ac_sas": 0,
         "gnomad_ac_oth_female": 2,
         "gnomad_ac": 138,
@@ -26346,7 +26346,7 @@
             "date_modified": "2020-07-07T03:10:59.793167+00:00",
             "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
         },
-        "uk10k_esp_maf": 0.0,
+        "uk10k_esp_maf": [0.0],
         "gnomad_ac_sas": 13,
         "gnomad_ac_oth_female": 2,
         "gnomad_ac": 387,
@@ -26653,7 +26653,7 @@
             "date_modified": "2020-07-07T03:07:23.722161+00:00",
             "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
         },
-        "uk10k_esp_maf": 1.0,
+        "uk10k_esp_maf": [1.0],
         "gnomad_ac_sas": 2,
         "gnomad_ac_oth_female": 8,
         "gnomad_ac": 994,
@@ -27077,7 +27077,7 @@
             "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
         },
         "nested_repeats_repclass": "LINE",
-        "uk10k_esp_maf": 0.0,
+        "uk10k_esp_maf": [0.0],
         "gnomad_ac_sas": 0,
         "gnomad_ac_oth_female": 0,
         "gnomad_ac": 11,
