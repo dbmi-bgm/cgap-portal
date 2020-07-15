@@ -109,6 +109,7 @@ def xls_to_json(xls_data, project, institution):
     }
     specimen_ids = {}
     family_dict = create_families(rows)
+    a_types = get_analysis_types(rows)
     for row in rows:
         indiv_alias = '{}:individual-{}'.format(project['name'], row['individual id'])
         fam_alias = '{}:{}'.format(project['name'], family_dict[row['analysis id']])
@@ -126,13 +127,14 @@ def xls_to_json(xls_data, project, institution):
             else:
                 specimen_ids[row['specimen id']] = 1
             analysis_alias = '{}:analysis-{}'.format(project['name'], row['analysis id'])
-            items = fetch_sample_metadata(row, items, indiv_alias, samp_alias,
-                                          analysis_alias, fam_alias, project['name'])
+            items = fetch_sample_metadata(row, items, indiv_alias, samp_alias, analysis_alias,
+                                          fam_alias, project['name'], a_types)
         else:
             print('WARNING: No specimen id present for patient {},'
                   ' sample will not be created.'.format(row['individual id']))
     # create SampleProcessing item for trio/group if needed
     # items = create_sample_processing_groups(items, sp_alias)
+    items = add_relations(items)
     items = create_case_items(items, project['name'])
     # removed unused fields, add project and institution
     for val1 in items.values():
@@ -150,6 +152,26 @@ def create_families(rows):
     proband_rows = [row for row in rows if row.get('relation to proband').lower() == 'proband']
     fams = {row.get('analysis id'): 'family-{}'.format(row.get('individual id')) for row in proband_rows}
     return fams
+
+
+def get_analysis_types(rows):
+    analysis_relations = {}
+    analysis_types = {}
+    for row in rows:
+        analysis_relations.setdefault(row.get('analysis id'), [[], []])
+        analysis_relations[row.get('analysis id')][0].append(row.get('relation to proband', '').lower())
+        analysis_relations[row.get('analysis id')][1].append(row.get('workup type', '').upper())
+    for k, v in analysis_relations.items():
+        if len(list(set(v[1]))) == 1:
+            if len(v[0]) == 1:
+                analysis_types[k] = v[1][0]
+            elif sorted(v[0]) == ['father', 'mother', 'proband']:
+                analysis_types[k] = v[1][0] + '-Trio'
+            else:
+                analysis_types[k] = v[1][0] + '-Group'
+        else:
+            analysis_types[k] = None
+    return analysis_types
 
 
 def fetch_individual_metadata(row, items, indiv_alias, inst_name):
@@ -179,19 +201,17 @@ def fetch_family_metadata(row, items, indiv_alias, fam_alias):
         'family_id': row['family id'],
         'members': [indiv_alias]
     }
-    if row.get('relation to proband', '').lower() == 'proband':
-        info['proband'] = indiv_alias
     if fam_alias not in new_items['family']:
         new_items['family'][fam_alias] = info
-    else:
-        if indiv_alias not in new_items['family'][fam_alias]['members']:
-            new_items['family'][fam_alias]['members'].append(indiv_alias)
-        if row.get('relation to proband', '').lower() == 'proband' and 'proband' not in new_items['family'][fam_alias]:
-            new_items['family'][fam_alias]['proband'] = indiv_alias
+    if indiv_alias not in new_items['family'][fam_alias]['members']:
+        new_items['family'][fam_alias]['members'].append(indiv_alias)
+    for relation in ['proband', 'mother', 'father', 'brother', 'sister', 'sibling']:
+        if row.get('relation to proband', '').lower() == relation and relation not in new_items['family'][fam_alias]:
+            new_items['family'][fam_alias][relation] = indiv_alias
     return new_items
 
 
-def fetch_sample_metadata(row, items, indiv_alias, samp_alias, analysis_alias, fam_alias, proj_name):
+def fetch_sample_metadata(row, items, indiv_alias, samp_alias, analysis_alias, fam_alias, proj_name, analysis_type_dict):
     new_items = items.copy()
     info = {'aliases': [samp_alias], 'files': []}  # TODO: implement creation of file db items
     fields = [
@@ -224,6 +244,8 @@ def fetch_sample_metadata(row, items, indiv_alias, samp_alias, analysis_alias, f
         'samples': [],
         'families': []
     }
+    if row.get('analysis id') in analysis_type_dict:
+        new_sp_item['analysis_type'] = analysis_type_dict[row.get('analysis id')]
     new_items['sample_processing'].setdefault(analysis_alias, new_sp_item)
     new_items['sample_processing'][analysis_alias]['samples'].append(samp_alias)
     if row.get('report required').lower().startswith('y'):
@@ -277,27 +299,24 @@ def create_case_items(items, proj_name):
     return new_items
 
 
-# def create_sample_processing_groups(items, sp_alias):
-#     new_items = items.copy()
-#     for v in new_items['family'].values():
-#         if 'members' in v and len(v['members']) > 1:
-#             # create sample_processing item
-#             samples = [items['individual'][indiv].get('samples', [None])[0] for indiv in v['members']]
-#             samples = [s for s in samples if s]
-#             if len (samples) > 1:
-#                 sp = {
-#                     'aliases': [sp_alias],
-#                     'samples': samples
-#                 }
-#                 analysis_type = items['sample'][items['individual'][v['proband']]['samples'][0]]['workup_type']
-#                 if all([relation in v for relation in ['proband', 'mother', 'father']]) and sorted(
-#                     v['members']) == sorted([v['proband'], v['mother'], v['father']]
-#                 ):
-#                     sp['analysis_type'] = analysis_type + '-Trio'
-#                 else:
-#                     sp['analysis_type'] = analysis_type + '-Group'
-#                 new_items['sample_processing'][sp_alias] = sp
-#     return new_items
+def add_relations(items):
+    new_items = items.copy()
+    for alias, fam in items['family'].items():
+        parents = False
+        for relation in ['mother', 'father']:
+            if fam.get(relation):
+                if fam.get('proband'):
+                    new_items['individual'][fam['proband']][relation] = fam[relation]
+                    parents = True
+                del new_items['family'][alias][relation]
+        for relation in ['brother', 'sister', 'sibling']:
+            if fam.get(relation):
+                if parents:
+                    for parent in ['mother', 'father']:
+                        if new_items['individual'][fam['proband']].get(parent):
+                            new_items['individual'][fam[relation]][parent] = new_items['individual'][fam['proband']][parent]
+                del new_items['family'][alias][relation]
+    return new_items
 
 
 def compare_with_db(virtualapp, alias):
@@ -374,18 +393,18 @@ def compare_fields(profile, aliases, json_item, db_item):
                 to_patch[field] = val
         else:
             # if array, patch field vals get added to what's in db
-            if field != 'aliases':
+            if field != 'aliases' and profile['properties'][field].get('items', {}).get('linkTo'):
                 val = [aliases[v] if v in aliases else v for v in json_item[field]]
             else:
                 val = [v for v in json_item[field]]
-            if sorted(val) != sorted(db_item.get(field, [])):
+            # if sorted(val) != sorted(db_item.get(field, [])):
                 # if len(val) == 1 and val not in db_item.get(field, []):
                 #     continue
-                if all(v in db_item.get(field, []) for v in val):
-                    continue
-                new_val = [item for item in db_item.get(field, [])]
-                new_val.extend(val)
-                to_patch[field] = list(set(new_val))
+            if all(v in db_item.get(field, []) for v in val):
+                continue
+            new_val = [item for item in db_item.get(field, [])]
+            new_val.extend(val)
+            to_patch[field] = list(set(new_val))
     return to_patch
 
 
