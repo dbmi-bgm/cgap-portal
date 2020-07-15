@@ -1,0 +1,286 @@
+[
+    {
+        "var_conseq_name": "inframe_deletion",
+        "var_conseq_id": "SO:0001822",
+        "location": "CDS",
+        "severity_order_estimate": 10,
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "definition": "An inframe non synonymous variant that deletes bases from the coding sequence",
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "in review",
+        "coding_effect": "Inframe indel",
+        "uuid": "d5a57c17-51e5-4dc1-9259-a8bb77d2d36f",
+        "impact": "MODERATE",
+        "schema_version": "1",
+        "date_created": "2020-05-27T14:55:43.152861+00:00",
+        "last_modified": {
+            "date_modified": "2020-07-07T00:26:07.222171+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        }
+    },
+    {
+        "var_conseq_name": "3_prime_UTR_variant",
+        "var_conseq_id": "SO:0001624",
+        "location": "UTR",
+        "severity_order_estimate": 21,
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "definition": "A UTR variant of the 3 UTR",
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "in review",
+        "uuid": "d2ca7570-10b9-4314-bc2c-fa6d276c21fb",
+        "impact": "MODIFIER",
+        "schema_version": "1",
+        "date_created": "2020-05-27T14:55:43.658561+00:00",
+        "last_modified": {
+            "date_modified": "2020-07-07T00:26:04.351596+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        }
+    },
+    {
+        "var_conseq_name": "upstream_gene_variant",
+        "var_conseq_id": "SO:0001631",
+        "severity_order_estimate": 26,
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "definition": "A sequence variant located 5 of a gene",
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "in review",
+        "uuid": "b898b66a-c60b-4e00-b63f-5b5e18c34a48",
+        "impact": "MODIFIER",
+        "schema_version": "1",
+        "date_created": "2020-05-27T14:55:43.874452+00:00",
+        "last_modified": {
+            "date_modified": "2020-07-07T00:26:03.018644+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        }
+    },
+    {
+        "var_conseq_name": "splice_region_variant",
+        "var_conseq_id": "SO:0001630",
+        "location": "splice site",
+        "severity_order_estimate": 13,
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "definition": "A sequence variant in which a change has occurred within the region of the splice site, either within 1-3 bases of the exon or 3-8 bases of the intron",
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "in review",
+        "uuid": "aab001e0-907d-4979-b9a9-c71a82e57d02",
+        "impact": "LOW",
+        "schema_version": "1",
+        "date_created": "2020-05-27T14:55:43.329519+00:00",
+        "last_modified": {
+            "date_modified": "2020-07-07T00:26:06.329593+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        }
+    },
+    {
+        "var_conseq_name": "missense_variant",
+        "var_conseq_id": "SO:0001583",
+        "location": "CDS",
+        "severity_order_estimate": 11,
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "definition": "A sequence variant, that changes one or more bases, resulting in a different amino acid sequence but where the length is preserved",
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "in review",
+        "coding_effect": "Missense",
+        "uuid": "a4d8e291-6993-4250-be4a-0574f4be76e9",
+        "impact": "MODERATE",
+        "schema_version": "1",
+        "date_created": "2020-05-27T14:55:43.204034+00:00",
+        "last_modified": {
+            "date_modified": "2020-07-07T00:26:06.954482+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        }
+    },
+    {
+        "var_conseq_name": "downstream_gene_variant",
+        "var_conseq_id": "SO:0001632",
+        "severity_order_estimate": 27,
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "definition": "A sequence variant located 3 of a gene",
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "in review",
+        "uuid": "a150ec92-01fe-457d-9b84-1655ed68129e",
+        "impact": "MODIFIER",
+        "schema_version": "1",
+        "date_created": "2020-05-27T14:55:43.907106+00:00",
+        "last_modified": {
+            "date_modified": "2020-07-07T00:26:02.713025+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        }
+    },
+    {
+        "var_conseq_name": "splice_acceptor_variant",
+        "var_conseq_id": "SO:0001574",
+        "location": "splice site",
+        "severity_order_estimate": 2,
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "definition": "A splice variant that changes the 2 base region at the 3 end of an intron",
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "in review",
+        "uuid": "946b2bc0-031a-4e2a-9892-14f5066bc3db",
+        "impact": "HIGH",
+        "schema_version": "1",
+        "date_created": "2020-05-27T14:55:42.822385+00:00",
+        "last_modified": {
+            "date_modified": "2020-07-07T00:26:09.442495+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        }
+    },
+    {
+        "var_conseq_name": "frameshift_variant",
+        "var_conseq_id": "SO:0001589",
+        "location": "CDS",
+        "severity_order_estimate": 5,
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "definition": "A sequence variant which causes a disruption of the translational reading frame, because the number of nucleotides inserted or deleted is not a multiple of three",
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "in review",
+        "coding_effect": "Frameshift",
+        "uuid": "91729abe-2039-40f9-8098-e83cd55bfa98",
+        "impact": "HIGH",
+        "schema_version": "1",
+        "date_created": "2020-05-27T14:55:42.926405+00:00",
+        "last_modified": {
+            "date_modified": "2020-07-07T00:26:08.690488+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        }
+    },
+    {
+        "var_conseq_name": "intron_variant",
+        "var_conseq_id": "SO:0001627",
+        "severity_order_estimate": 23,
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "definition": "A transcript variant occurring within an intron",
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "in review",
+        "uuid": "90cf5e7d-4e3e-42da-9b8d-f3d912029284",
+        "impact": "MODIFIER",
+        "schema_version": "1",
+        "date_created": "2020-05-27T14:55:43.751019+00:00",
+        "last_modified": {
+            "date_modified": "2020-07-07T00:26:03.722142+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        }
+    },
+    {
+        "var_conseq_name": "inframe_insertion",
+        "var_conseq_id": "SO:0001821",
+        "location": "CDS",
+        "severity_order_estimate": 9,
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "definition": "An inframe non synonymous variant that inserts bases into in the coding sequence",
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "in review",
+        "coding_effect": "Inframe indel",
+        "uuid": "6020d169-f6b5-4317-8518-5576233e77c4",
+        "impact": "MODERATE",
+        "schema_version": "1",
+        "date_created": "2020-05-27T14:55:43.118425+00:00",
+        "last_modified": {
+            "date_modified": "2020-07-07T00:26:07.496866+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        }
+    },
+    {
+        "var_conseq_name": "non_coding_transcript_variant",
+        "var_conseq_id": "SO:0001619",
+        "severity_order_estimate": 25,
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "definition": "A transcript variant of a non coding RNA gene",
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "in review",
+        "uuid": "54d41bf5-0783-43b2-8edc-5daee8191457",
+        "impact": "MODIFIER",
+        "schema_version": "1",
+        "date_created": "2020-05-27T14:55:43.834844+00:00",
+        "last_modified": {
+            "date_modified": "2020-07-07T00:26:03.253869+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        }
+    },
+    {
+        "var_conseq_name": "non_coding_transcript_exon_variant",
+        "var_conseq_id": "SO:0001792",
+        "severity_order_estimate": 22,
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "definition": "A sequence variant that changes non-coding exon sequence in a non-coding transcript",
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "in review",
+        "uuid": "45f660ff-88ec-4155-a526-efdc644e6780",
+        "impact": "MODIFIER",
+        "schema_version": "1",
+        "date_created": "2020-05-27T14:55:43.702813+00:00",
+        "last_modified": {
+            "date_modified": "2020-07-07T00:26:04.115303+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        }
+    },
+    {
+        "var_conseq_name": "NMD_transcript_variant",
+        "var_conseq_id": "SO:0001621",
+        "severity_order_estimate": 24,
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "definition": "A variant in a transcript that is the target of NMD",
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "in review",
+        "uuid": "4507ceb2-f76e-441c-9d66-3eb22bb04095",
+        "impact": "MODIFIER",
+        "schema_version": "1",
+        "date_created": "2020-05-27T14:55:43.799022+00:00",
+        "last_modified": {
+            "date_modified": "2020-07-07T00:26:03.500046+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        }
+    },
+    {
+        "var_conseq_name": "synonymous_variant",
+        "var_conseq_id": "SO:0001819",
+        "location": "CDS",
+        "severity_order_estimate": 17,
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "definition": "A sequence variant where there is no resulting change to the encoded amino acid",
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "in review",
+        "coding_effect": "Synonymous",
+        "uuid": "3c1a33c5-5899-4299-ae4f-a3b0b14771ba",
+        "impact": "LOW",
+        "schema_version": "1",
+        "date_created": "2020-05-27T14:55:43.495923+00:00",
+        "last_modified": {
+            "date_modified": "2020-07-07T00:26:05.295859+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        }
+    },
+    {
+        "var_conseq_name": "5_prime_UTR_variant",
+        "var_conseq_id": "SO:0001623",
+        "location": "UTR",
+        "severity_order_estimate": 20,
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "definition": "A UTR variant of the 5 UTR",
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "in review",
+        "uuid": "3bb1eb38-2aee-4232-bc63-dc4690a9b87c",
+        "impact": "MODIFIER",
+        "schema_version": "1",
+        "date_created": "2020-05-27T14:55:43.616673+00:00",
+        "last_modified": {
+            "date_modified": "2020-07-07T00:26:04.576370+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        }
+    }
+]

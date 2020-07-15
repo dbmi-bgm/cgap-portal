@@ -1,10 +1,15 @@
-from pyramid import paster
-from urllib.parse import urlparse
+import argparse
+import json
+import logging
+import requests
+import time
+
 from multiprocessing.pool import ThreadPool
+from pyramid import paster
 from simplejson.scanner import JSONDecodeError
 from socket import gaierror
-import time
-import requests, logging, json
+from urllib.parse import urlparse
+
 
 EPILOG = __doc__
 
@@ -96,7 +101,6 @@ def run(search_url, username='', password=''):
 
 
 def main():
-    import argparse
     parser = argparse.ArgumentParser(  # noqa - PyCharm wrongly thinks the formatter_class is specified wrong here.
         description="Export Data", epilog=EPILOG,
         formatter_class=argparse.RawDescriptionHelpFormatter,
