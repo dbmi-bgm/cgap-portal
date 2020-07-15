@@ -1751,6 +1751,14 @@ $badge-item-min-height: 90px;
 		flex-wrap: wrap;
 		margin: 0 -10px;
 
+		#case-stats {
+			.row.overlapping .card {
+				position: absolute;
+				width: calc(100% - 20px);
+				z-index: 1;
+			}
+		}
+
 		@include media-breakpoint-up(lg){
 			min-height: 320px;
 		}
@@ -1781,7 +1789,10 @@ $badge-item-min-height: 90px;
 			padding: 0 10px;
 
 			> .card {
-				height: 100%;
+				@include media-breakpoint-up(lg){
+					height: 100%;
+				}
+
 				.pedigree-viz-container .inner-container {
 					background-color: transparent; // let BG color from .card bleed through to allow border radius to appear nicely.
 				}
@@ -1807,16 +1818,20 @@ $badge-item-min-height: 90px;
 
 	#case-overview-ped-link,
 	#cohort-overview-ped-link {
+		max-height: 336px;
 		margin-left: 0;
+
+		> .card {
+			@include media-breakpoint-down(lg){
+				margin-top: 70px;
+				border-bottom-right-radius: $card-border-radius; // prev: 10px;
+				border-bottom-left-radius: $card-border-radius; // prev: 10px;
+			}
+		}
 
 		div.pedigree-vis-heading {
 			background-color: $primary-dark; // previous value: $navbar-background-color (#20445f);
 			color: #ffffff;
-
-			// @include media-breakpoint-up(lg){
-			// 	border-top-right-radius: $card-border-radius; // prev: 10px;
-			// 	border-top-left-radius: $card-border-radius; // prev: 10px;
-			// }
 
 			.view-pedigree-btn {
 				background-color: cornflowerblue; // TODO: Once settle on good color, maybe apply it to our theme under a SCSS variable for re-use. Then ctrl+find+replace.
@@ -2107,14 +2122,26 @@ $badge-item-min-height: 90px;
 						color: #ffffff;
 					}
 
+					.s-block.libraries .col-libraries > div {
+						margin: 0 auto;
+					}
+
 					.accession-table {
-						th {
+						margin-left: 10px; 
+
+						tr:not(:last-child) {
+							border-bottom: 1px solid #ddd;
+						}
+
+						td.accession-table-title {
 							font-weight: 600;
-							background-color: rgb(240,240,240);
-							padding: 4px;
-							border: 1px solid rgb(200,200,200);
+							text-align: left;
+							margin-left: 20px;
+							min-width: 75px;
 						}
 					}
+				
+					
 
 					.body .current-case {
 						background-color: lavender;

@@ -251,9 +251,9 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
             <div className="container-wide bg-light pt-36 pb-36">
                 <div className="card-group case-summary-card-row">
                     <div className="col-stats">
-                        <CaseStats {...{ description, numIndividuals, numWithSamples, caseFeatures }} numFamilies={1} />
+                        <CaseStats caseItem={context} {...{ description, numIndividuals, numWithSamples, caseFeatures }} numFamilies={1} />
                     </div>
-                    <div id="case-overview-ped-link" className="col-pedigree-viz">
+                    <div id="case-overview-ped-link" className="col-pedigree-viz mh-350">
                         <div className="card d-flex flex-column">
                             <div className="pedigree-vis-heading card-header d-flex justify-content-between">
                                 <div>
@@ -460,9 +460,7 @@ DotRouterTab.defaultProps = {
 const AccessioningTab = React.memo(function AccessioningTab(props) {
     const { context: result, href, families = [] } = props;
     const { display_title } = result;
-    console.log("families,", families);
 
-    // console.log("accessioning props", props);
     return (
         <React.Fragment>
             <h1>
@@ -528,6 +526,8 @@ const BioinformaticsTab = React.memo(function BioinformaticsTab(props) {
         );
     });
 
+    const dataTip = "Exonic and splice variants, clinvar pathogenic or conflicting submissions, spliceAI>0.2, not seen in 2 individuals among a set of 20 unrelated samples.";
+
     return (
         <React.Fragment>
             <h1>{ caseDisplayTitle }: <span className="text-300">Bioinformatics Analysis</span></h1>
@@ -558,15 +558,17 @@ const BioinformaticsTab = React.memo(function BioinformaticsTab(props) {
                         Total Number of Variants Called:
                     </div>
                     <div className="col-sm-4">
-                        3.12 Million
+                        4,769,578
                     </div>
                 </div>
                 <div className="row qc-summary">
                     <div className="col-sm-8 text-600">
                         Total number of filtered variants (high-quality exonic variants + clinvar - blacklist):
+                        <i className="icon icon-info-circle fas icon-fw ml-05"
+                            data-tip={dataTip} />
                     </div>
                     <div className="col-sm-4">
-                        9,236
+                        2,291
                     </div>
                 </div>
             </div>
