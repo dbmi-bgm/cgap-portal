@@ -1,10 +1,13 @@
 import pytest
-from pkg_resources import resource_listdir
-from snovault.schema_utils import load_schema
-from snovault.util import crawl_schema
 import re
 
+from pkg_resources import resource_listdir
+from snovault import COLLECTIONS, TYPES
+from snovault.schema_utils import load_schema
+
+
 pytestmark = [pytest.mark.setone, pytest.mark.working, pytest.mark.schema]
+
 
 SCHEMA_FILES = [
     f for f in resource_listdir('encoded', 'schemas')
@@ -14,13 +17,13 @@ SCHEMA_FILES = [
 
 @pytest.fixture
 def pattern_fields():
-    ''' This fixture returns a dictionary keyed by schema fields that use the 'pattern' attribute.
+    """ This fixture returns a dictionary keyed by schema fields that use the 'pattern' attribute.
         The value is a dict of 2 lists:
             'good' is list of values that should pass the pattern regex
             'bad'  is list of values that should fail the pattern regex
         This fixture is used in test_load_schema
         More fields can be added if more pattern attributes are added to fields
-    '''
+    """
     return {
         'schema_version': {  # "^\\d+(\\.\\d+)*$"
             'good': ['1', '20', '3.2', '30.11'],
@@ -36,7 +39,8 @@ def pattern_fields():
         },
         'ensgid': {  # "^ENSG[0-9]{11}$"
             'good': ['ENSG11111111111'],
-            'bad': ['ensg11111111111', 'AENSG1111111111', '1111ENSG1111111', 'ENSG11111111', ' ENSG11111111111', 'ENSG11111111111 ']
+            'bad': ['ensg11111111111', 'AENSG1111111111', '1111ENSG1111111',
+                    'ENSG11111111', ' ENSG11111111111', 'ENSG11111111111 ']
         },
         'ucsc_id': {  # "^uc[0-9]{3}[a-z]{3}\\.[0-9]$"
             'good': ['uc031tlb.1', 'uc001aak.4', 'uc010nxu.2'],
@@ -48,11 +52,13 @@ def pattern_fields():
         },
         'ccds_id': {  # "^CCDS[0-9]+"
             'good': ['CCDS30547', 'CCDS2', 'CCDS3'],
-            'bad': [' CCDS30547', 'CCDS30547 ', 'CCCDS30547', 'ccds30547', 'CCDS30547D', 'CCDS30547.1', 'CCDS:30547', 'CCDS 30547']
+            'bad': [' CCDS30547', 'CCDS30547 ', 'CCCDS30547', 'ccds30547', 'CCDS30547D', 'CCDS30547.1',
+                    'CCDS:30547', 'CCDS 30547']
         },
         'mgd_id': {  # "^MGI:[0-9]+"
             'good': ['MGI:3031137', 'MGI:2446220', 'MGI:1931051'],
-            'bad': ['MGI3031137', ' MGI:3031137', 'MGI:3031137 ', 'mgi3031137', 'MGI 3031137', 'MGI:3031137:', 'MGI:3031137M', 'MGI 3031137']
+            'bad': ['MGI3031137', ' MGI:3031137', 'MGI:3031137 ', 'mgi3031137', 'MGI 3031137',
+                    'MGI:3031137:', 'MGI:3031137M', 'MGI 3031137']
         },
         'omim_id': {  # "^[0-9]+$"
             'good': ['103320', '6', '00612090'],
@@ -68,15 +74,18 @@ def pattern_fields():
         },
         'clingendis.disease_id': {  # "^MONDO_[0-9]+$"
             'good': ['MONDO_103320', 'MONDO_6', 'MONDO_00612090'],
-            'bad': [' MONDO_1003320', 'MONDO_103320 ', 'MONDO:103320', 'MONDO_103a320', 'MONDO_103320.1', 'MONDO_103_320', 'MONDO_v103320']
+            'bad': [' MONDO_1003320', 'MONDO_103320 ', 'MONDO:103320', 'MONDO_103a320', 'MONDO_103320.1',
+                    'MONDO_103_320', 'MONDO_v103320']
         },
         'transcript.enstid': {  # ^ENST[0-9]{11}$"
             'good': ['ENST11111111111'],
-            'bad': ['enst11111111111', 'AENST111111111', '1111ENST1111111', 'ENST11111111', ' ENST11111111111', 'ENST11111111111 ']
+            'bad': ['enst11111111111', 'AENST111111111', '1111ENST1111111', 'ENST11111111',
+                    ' ENST11111111111', 'ENST11111111111 ']
         },
         'transcript.enspid': {  # ^ENSP[0-9]{11}$"
             'good': ['ENSP11111111111'],
-            'bad': ['ensp11111111111', 'AENSP1111111111', '1111ENSP1111111', 'ENSP11111111', ' ENSP11111111111', 'ENSP11111111111 ']
+            'bad': ['ensp11111111111', 'AENSP1111111111', '1111ENSP1111111',
+                    'ENSP11111111', ' ENSP11111111111', 'ENSP11111111111 ']
         }
     }
 
@@ -135,8 +144,6 @@ def pluralize(name):
 # XXX: Mismatch with image.json?
 @pytest.mark.parametrize('schema', [k for k in SCHEMA_FILES if k != 'image.json'])
 def test_load_schema(schema, master_mixins, registry, pattern_fields, testapp):
-    from snovault import TYPES
-    from snovault import COLLECTIONS
 
     abstract = [
         'microscope_setting.json',
@@ -230,9 +237,9 @@ def verify_property(loaded_schema, property):
 
 
 def verify_mixins(loaded_schema, master_mixins):
-    '''
+    """
     test to ensure that we didn't accidently overwrite mixins somehow
-    '''
+    """
     for mixin in loaded_schema.get('mixinProperties', []):
         # get the mixin name from {'$ref':'mixins.json#/schema_version'}
         mixin_file_name, mixin_name = mixin['$ref'].split('/')
@@ -254,7 +261,6 @@ def test_linkTo_saves_uuid(root, submitter, institution):
 
 
 def test_mixinProperties():
-    from snovault.schema_utils import load_schema
     schema = load_schema('encoded:schemas/access_key.json')
     assert schema['properties']['uuid']['type'] == 'string'
 
@@ -268,7 +274,6 @@ def test_dependencies(testapp):
 
 
 def test_changelogs(testapp, registry):
-    from snovault import TYPES
     for typeinfo in registry[TYPES].by_item_type.values():
         changelog = typeinfo.schema.get('changelog')
         if changelog is not None:

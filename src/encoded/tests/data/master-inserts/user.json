@@ -10,7 +10,10 @@
         "submits_for": ["hms-dbmi"],
         "timezone": "US/Pacific",
         "uuid": "3202fd57-44d2-44fb-a131-afb1e43d8ae5",
-        "date_created": "2020-01-28T00:00:00.000000+00:00"
+        "date_created": "2020-01-28T00:00:00.000000+00:00",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "project_roles": [{"project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+                           "role": "developer"}]
     },
     {
         "email" : "cgap.platform@gmail.com",
@@ -21,7 +24,9 @@
         "submits_for": ["hms-dbmi"],
         "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
         "uuid": "b5f738b6-455a-42e5-bc1c-77fbfd9b15d2",
-        "date_created": "2019-06-20T00:00:00.0000000+00:00"
+        "date_created": "2019-06-20T00:00:00.0000000+00:00",
+        "project_roles": [{"project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+                           "role": "developer"}]
     },
     {
         "email": "danavuzman@gmail.com",
@@ -31,7 +36,9 @@
         "uuid": "986b362f-4eb6-4a9c-8173-3ab267307e3a",
         "groups": ["admin"],
         "submits_for": ["hms-dbmi"],
-        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b"
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "project_roles": [{"project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+                           "role": "developer"}]
     },
     {
         "email": "dvuzman@research.bwh.harvard.edu",
@@ -41,7 +48,9 @@
         "uuid": "986b362f-4eb6-4a9c-8173-3ab267307e4b",
         "groups": ["admin"],
         "submits_for": ["hms-dbmi"],
-        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b"
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "project_roles": [{"project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+                           "role": "developer"}]
     },
     {
         "email": "alexander_balashov@hms.harvard.edu",
@@ -51,7 +60,9 @@
         "uuid": "986b362f-4eb6-4a9c-8173-3ab245628888",
         "groups": ["admin"],
         "submits_for": ["hms-dbmi"],
-        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b"
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "project_roles": [{"project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+                           "role": "developer"}]
     },
     {
         "email": "carl_vitzthum@hms.harvard.edu",
@@ -61,7 +72,9 @@
         "uuid": "986b362f-4eb6-4a9c-8173-3ab267226988",
         "groups": ["admin"],
         "submits_for": ["hms-dbmi"],
-        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b"
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "project_roles": [{"project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+                           "role": "developer"}]
     },
     {
         "email": "william_ronchetti@hms.harvard.edu",
@@ -71,7 +84,9 @@
         "uuid": "986b362f-4eb6-4a9c-8173-3ab267226992",
         "groups": ["admin"],
         "submits_for": ["hms-dbmi"],
-        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b"
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "project_roles": [{"project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+                           "role": "developer"}]
     },
     {
         "email": "kent_pitman@hms.harvard.edu",
@@ -81,7 +96,9 @@
         "uuid": "27d2ac03-7d12-442b-9375-211d3c5c5f97",
         "groups": ["admin"],
         "submits_for": ["hms-dbmi"],
-        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b"
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "project_roles": [{"project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+                           "role": "developer"}]
     },
     {
         "email": "eric_berg@hms.harvard.edu",
@@ -91,7 +108,9 @@
         "uuid": "3f0052c9-218d-42e1-94bd-4319d0615681",
         "groups": ["admin"],
         "submits_for": ["hms-dbmi"],
-        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b"
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "project_roles": [{"project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+                           "role": "developer"}]
     },
     {
         "email": "jkrier@bwh.harvard.edu",
@@ -101,7 +120,9 @@
         "uuid": "986b362f-4eb6-4a9c-8173-3acba722bba1",
         "groups": ["admin"],
         "submits_for": ["bwh"],
-        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b"
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "project_roles": [{"project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+                           "role": "developer"}]
     },
     {
         "email": "andrew_schroeder@hms.harvard.edu",
@@ -111,7 +132,9 @@
         "uuid": "986b362f-4eb6-4a9c-8173-3ab267227777",
         "groups": ["admin"],
         "submits_for": ["hms-dbmi"],
-        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b"
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "project_roles": [{"project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+                           "role": "developer"}]
     },
     {
         "email": "koray_kirli@hms.harvard.edu",
@@ -121,7 +144,9 @@
         "uuid": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "groups": ["admin"],
         "submits_for": ["hms-dbmi"],
-        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b"
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "project_roles": [{"project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+                           "role": "developer"}]
     },
     {
         "email": "duplexa@gmail.com",
@@ -131,7 +156,9 @@
         "uuid": "1d524d43-01b5-4b71-94c6-32d2d09c8323",
         "groups": ["admin"],
         "submits_for": ["hms-dbmi"],
-        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b"
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "project_roles": [{"project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+                           "role": "developer"}]
     },
     {
         "last_name": "App",
@@ -143,7 +170,9 @@
         "email": "foursight.app@gmail.com",
         "uuid": "7677f8a8-79d2-4cff-ab0a-a967a2a68e39",
         "submits_for": ["hms-dbmi"],
-        "role": "other"
+        "role": "other",
+        "project_roles": [{"project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+                           "role": "developer"}]
     },
     {
         "last_name": "App",
@@ -156,7 +185,9 @@
         "email": "tibanna.app@gmail.com",
         "uuid": "b041dba8-e2b2-4e54-a621-97edb508a0c4",
         "submits_for": ["hms-dbmi"],
-        "role": "other"
+        "role": "other",
+        "project_roles": [{"project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+                           "role": "developer"}]
     },
     {
         "email": "bianca_morris@hms.harvard.edu",
@@ -166,7 +197,9 @@
         "uuid": "70060f34-ec8f-4c34-a6c3-1b7b9ce8d314",
         "groups": ["admin"],
         "submits_for": ["hms-dbmi"],
-        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b"
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "project_roles": [{"project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+                           "role": "developer"}]
     },
     {
         "email": "burak_alver@hms.harvard.edu",
@@ -176,7 +209,9 @@
         "uuid": "45524d43-01b5-4b71-94c6-32d2d09c1111",
         "groups": ["admin"],
         "submits_for": ["hms-dbmi"],
-        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b"
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "project_roles": [{"project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+                           "role": "developer"}]
     },
     {
         "email": "michele_berselli@hms.harvard.edu",
@@ -186,7 +221,9 @@
         "uuid": "f9524d43-01b5-4b71-94c6-32d2d09c2222",
         "groups": ["admin"],
         "submits_for": ["hms-dbmi"],
-        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b"
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "project_roles": [{"project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+                           "role": "developer"}]
     },
     {
         "email": "aghazani@bwh.harvard.edu",
@@ -196,7 +233,9 @@
         "uuid": "f9524d43-01b5-4b71-94c6-32d2d09c3343",
         "groups": ["admin"],
         "submits_for": ["bwh"],
-        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b"
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "project_roles": [{"project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+                           "role": "developer"}]
     },
     {
         "email": "shira.rockowitz@childrens.harvard.edu",
@@ -206,7 +245,9 @@
         "uuid": "f9524d43-01b5-4b71-94c6-32d2d09c4433",
         "groups": ["admin"],
         "submits_for": ["bch"],
-        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b"
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "project_roles": [{"project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+                           "role": "developer"}]
     },
     {
         "email": "guilherme_yamamoto@hms.harvard.edu",
@@ -216,7 +257,9 @@
         "uuid": "f9524d43-01b5-4b71-94c6-32d2d09c5633",
         "groups": ["admin"],
         "submits_for": ["bch"],
-        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b"
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "project_roles": [{"project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+                           "role": "developer"}]
     },
     {
         "email": "iris_braunstein@hms.harvard.edu",
@@ -226,7 +269,9 @@
         "uuid": "f9524d43-01b5-4b71-94c6-32d2d09c7893",
         "groups": ["admin"],
         "submits_for": ["hms-dbmi"],
-        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b"
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "project_roles": [{"project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+                           "role": "developer"}]
     },
     {
         "email": "sarah_reiff@hms.harvard.edu",
@@ -236,7 +281,9 @@
         "uuid": "834559db-a3f6-462c-81a4-f5d7e5e65707",
         "groups": ["admin"],
         "submits_for": ["hms-dbmi"],
-        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b"
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "project_roles": [{"project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+                           "role": "developer"}]
     }
 
 ]

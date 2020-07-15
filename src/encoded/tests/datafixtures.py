@@ -1,5 +1,7 @@
 import pytest
 
+from uuid import uuid4
+
 
 ORDER = [
     'user', 'project', 'institution', 'filter_set', 'nexus',
@@ -18,6 +20,7 @@ ORDER = [
 
 
 class MockedLogger(object):
+
     def info(self, msg):
         print('INFO: ' + msg)
 
@@ -415,6 +418,57 @@ def fam(testapp, project, female_individual, institution, grandpa, mother, fathe
 
 
 @pytest.fixture
+def sample_proc_fam(testapp, project, institution, fam):
+    data = {
+        'project': project['@id'],
+        'institution': institution['@id'],
+        'analysis_type': "WGS-Group",
+        'samples': [
+            "GAPSAPROBAND",
+            "GAPSAFATHER1",
+            "GAPSAMOTHER1",
+            "GAPSABROTHER",
+            "GAPSAGRANDPA",
+            "GAPSAGRANDMA",
+            "GAPSAHALFSIS",
+            "GAPSAUNCLE01",
+            "GAPSACOUSIN1"
+            ],
+        'families': [fam['@id']]
+    }
+    res = testapp.post_json('/sample_processing', data).json['@graph'][0]
+    return res
+
+
+@pytest.fixture
+def proband_case(testapp, project, institution, fam, sample_proc_fam):
+    data = {
+        "accession": "GAPCAP4E4GMG",
+        'project': project['@id'],
+        'institution': institution['@id'],
+        'family': fam['@id'],
+        'individual': 'GAPIDPROBAND',
+        'sample_processing': sample_proc_fam['@id']
+    }
+    res = testapp.post_json('/case', data).json['@graph'][0]
+    return res
+
+
+@pytest.fixture
+def mother_case(testapp, project, institution, fam, sample_proc_fam):
+    data = {
+        "accession": "GAPCAU1K3F5A",
+        'project': project['@id'],
+        'institution': institution['@id'],
+        'family': fam['@id'],
+        'individual': 'GAPIDMOTHER1',
+        'sample_processing': sample_proc_fam['@id']
+    }
+    res = testapp.post_json('/case', data).json['@graph'][0]
+    return res
+
+
+@pytest.fixture
 def sample_f(testapp, project, institution, female_individual):
     data = {
         'project': project['@id'],
@@ -462,7 +516,6 @@ def protocol(testapp, protocol_data):
 
 @pytest.fixture
 def file_formats(testapp, institution, project):
-    from uuid import uuid4
     formats = {}
     ef_format_info = {
         # 'pairs_px2': {'standard_file_extension': 'pairs.gz.px2',
@@ -503,7 +556,9 @@ def file_formats(testapp, institution, project):
                    "valid_item_types": ["FileProcessed", "FileReference"]},
         'bed': {"standard_file_extension": "bed.gz",
                 "extrafile_formats": ['beddb'],
-                "valid_item_types": ["FileProcessed", "FileReference"]}
+                "valid_item_types": ["FileProcessed", "FileReference"]},
+        'vcf_gz': {"standard_file_extension": "vcf.gz",
+                   "valid_item_types": ["FileProcessed"]}
     }
 
     for eff, info in ef_format_info.items():
@@ -548,6 +603,18 @@ def file_fastq(testapp, institution, project, file_formats):
         'status': 'uploaded',  # avoid s3 upload codepath
     }
     return testapp.post_json('/file_fastq', item).json['@graph'][0]
+
+
+@pytest.fixture
+def file_vcf(testapp, institution, project, file_formats):
+    item = {
+        'file_format': file_formats.get('vcf_gz').get('@id'),
+        'md5sum': 'd41d8cd9f00b204e9800998ecf84211',
+        'institution': institution['@id'],
+        'project': project['@id'],
+        'status': 'uploaded',  # avoid s3 upload codepath
+    }
+    return testapp.post_json('/file_processed', item).json['@graph'][0]
 
 
 RED_DOT = """data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUA
