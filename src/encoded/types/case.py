@@ -203,8 +203,8 @@ class Case(Item):
         "description": "A calculated title for every object in 4DN",
         "type": "string"
     })
-    def display_title(self, request, accession, individual=None, family=None, sample_processing=None):
-        title = self.case_title(request, individual, family, sample_processing)
+    def display_title(self, request, accession, individual=None, family=None, sample_processing=None, case_id=None):
+        title = self.case_title(request, individual, family, sample_processing, case_id)
         if title:
             return title + ' ({})'.format(accession)
         else:
@@ -314,7 +314,9 @@ class Case(Item):
         "description": "Title of the case",
         "type": "string"
     })
-    def case_title(self, request, individual=None, family=None, sample_processing=None):
+    def case_title(self, request, individual=None, family=None, sample_processing=None, case_id=None):
+        if case_id:
+            return case_id
         title = ''
         if not individual or not family:
             return title
