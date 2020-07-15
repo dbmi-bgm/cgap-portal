@@ -78,6 +78,14 @@
                 { "field" : "aliases", "title": "User-Defined Alias" }
             ]
         },
+        "family" : {
+            "title" : "Family",
+            "sort_fields" : [
+                { "field" : "title", "title" : "Family title" },
+                { "field" : "family_id", "title" : "Family id" },
+                { "field" : "accession", "title": "Accession (CGAP ID)" }
+            ]
+        },
         "individual" : {
             "title" : "Individual",
             "sort_fields" : [
