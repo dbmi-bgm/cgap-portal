@@ -81,17 +81,18 @@
         "family" : {
             "title" : "Family",
             "sort_fields" : [
-                { "field" : "title", "title" : "Family title" },
-                { "field" : "family_id", "title" : "Family id" },
-                { "field" : "accession", "title": "Accession (CGAP ID)" }
+                { "field" : "family.accession", "title": "Family Accession (CGAP ID)" },
+                { "field" : "family.title", "title" : "Family Title" },
+                { "field" : "family.family_id", "title" : "Family ID" }
             ]
         },
         "individual" : {
             "title" : "Individual",
+            "description" : "Proband Individual of this Case",
             "sort_fields" : [
-                { "field" : "accession", "title" : "Accession (CGAP ID)" },
-                { "field" : "aliases", "title": "User-Defined Alias" },
-                { "field" : "uuid", "title": "UUID"}
+                { "field" : "individual.accession", "title" : "Individual Accession (CGAP ID)" },
+                { "field" : "individual.aliases", "title": "User-Defined Alias" },
+                { "field" : "individual.uuid", "title": "UUID"}
             ]
         },
         "sample.specimen_type": {
@@ -101,8 +102,8 @@
             "title": "Sequencing",
             "notes": "The primary sample calculated for a particular case.",
             "sort_fields" : [
-                { "field" : "specimen_collection_date", "title": "Collection Date" },
-                { "field" : "accession", "title": "Accssion (CGAP ID)"}
+                { "field" : "sample.specimen_collection_date", "title": "Sample Collection Date" },
+                { "field" : "sample.accession", "title": "Sample Accession (CGAP ID)"}
             ]
         },
         "sample_processing.analysis_type" :  {

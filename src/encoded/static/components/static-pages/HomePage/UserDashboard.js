@@ -29,69 +29,53 @@ export const UserDashboard = React.memo(function UserDashboard(props){
 
     return (
         <React.Fragment>
+
             <div className="dashboard-header">
                 <div className="container-wide d-flex align-items-center">
                     <i className="icon icon-fw icon-home fas mr-1" />
                     <h5 className="mt-0 mb-0 text-400">Home Dashboard</h5>
                 </div>
             </div>
-            <div className="home-dashboard-area bg-light py-5" id="content">
-                <div className="container">
 
-                    <div className="card">
-                        <h3 className="card-header text-400 my-0">
-                            Actions
+            {/* We apply .bg-light class here instead of .container-wide child divs because home-dashboard-area height is calculated off of window height in stylesheet */}
+            <div className="home-dashboard-area bg-light" id="content">
+
+                <div className="container-wide py-0 bg-white">
+                    <div className="tab-section-title">
+                        <h3 className="text-400 my-0">
+                            Recent Cases <span className="text-300">by Project</span>
                         </h3>
-                        <div className="card-body pb-0">
-                            <p>
-                                {"We might create a set of mini-dashboards like \"Recent Cases\" below and then display & order them based on user role,\
-                                permissions, & similar."}
-                            </p>
-
-                            <div className="row">
-                                <div className="col-xs-12 col-md-6 col-lg-4">
-                                    <a className="btn btn-primary btn-block btn-lg mb-2" href="/search/?type=Case&currentAction=add">New Case</a>
-                                </div>
-                                <div className="col-xs-12 col-md-6 col-lg-4">
-                                    <a className="btn btn-primary btn-block btn-lg mb-2 disabled" href="#" >Pipeline Admin</a>
-                                </div>
-                                <div className="col-xs-12 col-md-6 col-lg-4">
-                                    <a className="btn btn-primary btn-block btn-lg mb-2 disabled" href="#">Quality Controls</a>
-                                </div>
-                                <div className="col-xs-12 col-md-6 col-lg-4">
-                                    <a className="btn btn-primary btn-block btn-lg mb-2 disabled" href="#">Curation</a>
-                                </div>
-                                <div className="col-xs-12 col-md-6 col-lg-4">
-                                    <a className="btn btn-primary btn-block btn-lg mb-2 disabled" href="#">Crowdsourcing</a>
-                                </div>
-                                <div className="col-xs-12 col-md-6 col-lg-4">
-                                    <a className="btn btn-primary btn-block btn-lg mb-2" href="/search/?type=Item">Clinical Reports</a>
-                                </div>
-                            </div>
-
+                        <div className="btn-container">
+                            <a className="btn btn-primary btn-block" href="/search/?type=Case&currentAction=add">
+                                <i className="icon icon-plus fas mr-07" />
+                                New Case
+                            </a>
                         </div>
-
                     </div>
-
-                    <RecentCasesSection userUUID={userUUID} key={userUUID} />
-
                 </div>
+
+                <hr className="tab-section-title-horiz-divider"/>
+
+                <div className="container-wide py-2">
+                    <RecentCasesTables userUUID={userUUID} key={userUUID} />
+                </div>
+
             </div>
         </React.Fragment>
     );
 });
 
 
-class RecentCasesSection extends React.PureComponent {
+class RecentCasesTables extends React.PureComponent {
 
     constructor(props){
         super(props);
-        this.toggleCasesWithReports = this.toggleCasesWithReports.bind(this);
+        this.toggleCasesWithReportsByProject = {}; // Dictionary of methods bound to this + [projectName], filled on User load.
         this.state = {
             project_roles: null, // 'null' will indicate loading, also. While empty arr is lack/failed.
             projectsWithAllCases : {
                 // Lack of presence here means only Cases with reports will be shown for this project.
-                // Unless toggled later. Keyed by project name (uniqueKey).
+                // Unless toggled later. Keyed by project `name` (uniqueKey) - if "name" field changed or removed, should change to `@id`.
             }
         };
     }
@@ -100,7 +84,12 @@ class RecentCasesSection extends React.PureComponent {
         const { userUUID } = this.props;
         const cb = (resp) => {
             const { project_roles = [] } = resp;
-            this.setState({ project_roles });
+            const projectsWithAllCases = {};
+            project_roles.forEach(({ project : { name: projectName } }) => {
+                projectsWithAllCases[projectName] = false;
+                this.toggleCasesWithReportsByProject[projectName] = this.toggleCasesWithReports.bind(this, projectName);
+            });
+            this.setState({ project_roles, projectsWithAllCases });
         };
         ajax.load("/users/" + userUUID, cb, 'GET', cb);
     }
@@ -117,10 +106,14 @@ class RecentCasesSection extends React.PureComponent {
 
     render(){
         const { project_roles, projectsWithAllCases } = this.state;
-        if (project_roles === null) {
+        if (project_roles === null) { // == Still loading
+            // Eventually we could make cool graphic/CSS-animation of DNA strand pulsing or something... hmmm
             return (
                 <div className="py-3 text-center">
-                    <h3><i className="icon icon-spin fas icon-circle-notch"/></h3>
+                    <h3 className="bg-transparent spinner-grow" role="status">
+                        <i className="icon fas icon-dna"/>
+                        <span className="sr-only">Loading...</span>
+                    </h3>
                 </div>
             );
         }
@@ -131,20 +124,20 @@ class RecentCasesSection extends React.PureComponent {
 
         const tableSections = project_roles.map(({ role, project })=>{
             const { name: projectName, '@id' : projectID, display_title: projectTitle } = project;
-            const onCasesWithReportsToggle = (e) => this.toggleCasesWithReports(projectName);
             const casesWithReportsOnly = !projectsWithAllCases[projectName];
             const allCasesHref = "/search/?type=Case&project.name=" + encodeURIComponent(projectName);
             const searchHrefFull = allCasesHref + (casesWithReportsOnly ? "&report.uuid!=No+value" : "");
+            const titleTipName = projectName === projectTitle ? projectTitle : `${projectTitle} (${projectName})`;
+            const titleTip = "View all Cases from " + titleTipName + "<br/><label class='mb-0'>Role:</label> " + role;
             return (
-                <div className="recent-cases-table-section mt-36 mb-36" data-project={projectName} key={projectName}>
+                <div className="recent-cases-table-section mt-12 mb-36" data-project={projectName} key={projectName}>
                     <div className="d-flex align-items-center mb-1">
                         <h4 className="text-400 flex-fill mb-0 mt-0">
-                            <span className="text-300 mr-06">Recent Cases from</span>
-                            <a href={allCasesHref} data-tip="View all Cases for this Project.">{ projectTitle }</a>
+                            <a href={allCasesHref} data-tip={titleTip} data-html data-place="right">{ projectTitle }</a>
                         </h4>
                         <div className="toggle-reports">
-                            <Checkbox onChange={onCasesWithReportsToggle} checked={casesWithReportsOnly} labelClassName="mb-0 text-400 text-small">
-                                Show Cases with Reports Only
+                            <Checkbox onChange={this.toggleCasesWithReportsByProject[projectName]} checked={casesWithReportsOnly} labelClassName="mb-0 text-400 text-small">
+                                Show Only Cases with Reports
                             </Checkbox>
                         </div>
                     </div>
