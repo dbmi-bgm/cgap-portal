@@ -541,7 +541,7 @@ class FileProcessed(File):
     """Collection for individual processed files."""
     item_type = 'file_processed'
     schema = load_schema('encoded:schemas/file_processed.json')
-    embedded_list = File.embedded_list  # + file_workflow_run_embeds_processed
+    embedded_list = File.embedded_list + file_workflow_run_embeds_processed
     name_key = 'accession'
     rev = dict(File.rev, **{
         'workflow_run_inputs': ('WorkflowRun', 'input_files.value'),
