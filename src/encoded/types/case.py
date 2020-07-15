@@ -25,6 +25,7 @@ class Case(Item):
         "family.*", # This embeds all Family fields, but not all Family.members fields.
         "family.relationships.*",
         "family.proband.accession",
+        "family.family_phenotypic_features",
         "family.members.*", # We need to have mother and father (or 'parents' maybe eventually) for all members with at least @id.
         "family.members.case",
         "family.members.case.report",
@@ -35,6 +36,8 @@ class Case(Item):
         "family.members.samples.completed_processes",
         "family.members.samples.library_info",
         "family.members.samples.workup_type",
+        "family.members.samples.specimen_type",
+        "family.members.samples.specimen_collection_date",
         "family.members.samples.accession",
         "family.members.samples.processed_files.last_modified.*",
         "family.members.samples.files.last_modified.*",
@@ -62,6 +65,9 @@ class Case(Item):
         "secondary_families.members.samples.completed_processes",
         "secondary_families.members.samples.library_info",
         "secondary_families.members.samples.workup_type",
+        "secondary_families.members.samples.specimen_collection_date",
+        "secondary_families.members.samples.specimen_type",
+        "secondary_families.family_phenotypic_features",
         "secondary_families.members.samples.accession",
         "secondary_families.members.samples.processed_files.last_modified.*",
         "secondary_families.members.samples.files.last_modified.*",
@@ -194,6 +200,8 @@ class Case(Item):
         "sample_processing.completed_processes",
         "report.last_modified.*",
         "report.status",
+        "report.accession",
+        "report.case.accession",
         "cohort.filter_set.*",
         "project.name"
     ]
