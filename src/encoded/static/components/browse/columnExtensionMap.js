@@ -139,7 +139,6 @@ export const columnExtensionMap = {
     },
     'report': {
         'title': "Report",
-        'widthMap' : { 'lg' : 280, 'md' : 250, 'sm' : 200 },
         'render': function renderReportColumn(result, parentProps) {
             const {
                 '@id' : resultHref,
@@ -159,13 +158,38 @@ export const columnExtensionMap = {
 
             // May appear in other non-Case results, where advanced column will look strange, so check and use default rendering otherwise
             if (itemTypeList[0] === "Case") {
+                const showAccessionSeparately = accession !== display_title;
                 return (
                     <a href={resultHref} className="adv-block-link">
-                        { renderAdvancedColumn(<span className="accession">{ accession }</span>, status, display_title, "Last Modified:", date_modified) }
+                        { renderAdvancedColumn(showAccessionSeparately ? <span className="accession">{ accession }</span>: null, status, display_title, "Last Modified:", date_modified) }
                     </a>
                 );
             }
             return (<a href={result['@id']}> { display_title } </a>);
+        }
+    },
+    'family': {
+        'render' : function renderFamilyColumn(result, parentProps) {
+            const { '@type' : itemTypeList = ["Item"], family } = result;
+            if (!family) return null;
+            const {
+                '@id' : atId = null,
+                display_title = null,
+                accession = null,
+                status = null,
+                date_created = null,
+                family_id = null
+            } = family;
+
+            // May appear in other non-Case results, where advanced column will look strange, so check and use default rendering otherwise
+            if (itemTypeList[0] === "Case") {
+                return (
+                    <a href={atId} className="adv-block-link">
+                        { renderAdvancedColumn(<span className="accession">{ accession }</span>, status, family_id, "Accessioned:", date_created) }
+                    </a>
+                );
+            }
+            return (<a href={atId}> { display_title } </a>);
         }
     },
     'individual': {
@@ -306,6 +330,22 @@ export const columnExtensionMap = {
                 retLink = title;
             }
             return <span className="value">{ retLink }</span>;
+        }
+    },
+    'bam_snapshot': {
+        'render' : function(result, props) {
+            const { bam_snapshot = null } = result;
+            if (bam_snapshot) {
+                return (
+                    <div className="mx-auto">
+                        <a target="__blank" href={bam_snapshot}>
+                            View BAM Snapshot
+                        </a>
+                        <i className="ml-1 icon-sm icon fas icon-external-link-alt"></i>
+                    </div>
+                );
+            }
+            return null;
         }
     }
 };
