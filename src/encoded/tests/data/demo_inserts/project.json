@@ -1,52 +1,53 @@
 [
     {
-        "pi": "45524d43-01b5-4b71-94c6-32d2d09c1111",
-        "title": "Community Standards",
-        "description": "Project used as collection of most popular datasets",
-        "last_modified": {
-            "date_modified": "2020-07-07T01:18:11.415951+00:00",
-            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
-        },
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-        "start_date": "2019-05-31",
         "status": "current",
+        "start_date": "2019-05-31",
+        "pi": "45524d43-01b5-4b71-94c6-32d2d09c1111",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "title": "Community Standards",
         "name": "Community Standards",
-        "uuid": "f01ff5be-a72d-43bd-afcf-174fa9dcd282",
+        "description": "Project used as collection of most popular datasets",
+        "date_created": "2020-07-15T02:37:34.210019+00:00",
+        "schema_version": "1",
         "aliases": [
             "hms-dbmi:standards"
         ],
-        "schema_version": "1",
-        "date_created": "2020-07-07T01:18:11.409479+00:00"
+        "uuid": "f01ff5be-a72d-43bd-afcf-174fa9dcd282",
+        "last_modified": {
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+            "date_modified": "2020-07-15T02:41:04.879237+00:00"
+        }
     },
     {
-        "uuid": "9a62ef81-7942-4550-a13c-18a915d70b8d",
-        "schema_version": "1",
-        "start_date": "2019-05-31",
         "status": "current",
-        "name": "Benchmarking",
-        "title": "Benchmarking",
+        "start_date": "2019-05-31",
         "pi": "45524d43-01b5-4b71-94c6-32d2d09c1111",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "uuid": "9a62ef81-7942-4550-a13c-18a915d70b8d",
+        "title": "Benchmarking",
+        "schema_version": "1",
         "aliases": [
             "hms-dbmi:benchmarking"
         ],
+        "name": "Benchmarking",
+        "date_created": "2020-07-15T02:37:35.115956+00:00",
         "last_modified": {
-            "date_modified": "2020-07-07T05:55:28.015506+00:00",
-            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
-        },
-        "date_created": "2020-07-07T05:55:28.012845+00:00",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+            "date_modified": "2020-07-15T02:41:05.049227+00:00"
+        }
     },
     {
-        "uuid": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
         "status": "current",
+        "date_created": "2020-07-15T02:26:28.509115+00:00",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "uuid": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "title": "CGAP Core",
+        "schema_version": "1",
         "name": "hms-dbmi",
-        "title": "Test Project",
-        "description": "This is a test project",
+        "description": "Core Project for all items that are in general use",
         "last_modified": {
-            "date_modified": "2020-07-09T01:14:21.107063+00:00",
-            "modified_by": "3202fd57-44d2-44fb-a131-afb1e43d8ae5"
-        },
-        "date_created": "2020-07-06T23:45:41.001732+00:00",
-        "schema_version": "1"
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+            "date_modified": "2020-07-15T03:01:34.951484+00:00"
+        }
     }
 ]

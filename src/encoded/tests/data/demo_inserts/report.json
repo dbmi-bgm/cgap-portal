@@ -1,29 +1,47 @@
 [
     {
-        "description": "Report for proband of Platinum family trio",
-        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
-        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
         "status": "released",
+        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
+        "date_created": "2020-07-15T02:38:06.533666+00:00",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "uuid": "8dd51b60-2d65-4e74-ac86-08ff9159aaaa",
-        "schema_version": "1"
-    },
-    {
-        "description": "Report for proband of Askenazim family",
-        "project": "f01ff5be-a72d-43bd-afcf-174fa9dcd282",
+        "schema_version": "1",
+        "accession": "GAPREEIM2FI1",
         "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
-        "status": "released",
-        "uuid": "0a2d5fc7-2bd5-4289-a59c-40f7c633aaaa",
-        "schema_version": "1"
+        "description": "Report for proband of Platinum family trio",
+        "last_modified": {
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+            "date_modified": "2020-07-15T02:42:35.160149+00:00"
+        }
     },
     {
-        "description": "Report for proband of Platinum family single",
+        "status": "released",
         "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
-        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
-        "status": "released",
+        "date_created": "2020-07-15T02:38:07.232476+00:00",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "uuid": "0a2d5fc7-2bd5-4289-a59c-40f7c633abcd",
-        "schema_version": "1"
+        "schema_version": "1",
+        "accession": "GAPREGWZR9BI",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "description": "Report for proband of Platinum family single",
+        "last_modified": {
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+            "date_modified": "2020-07-15T02:42:36.012331+00:00"
+        }
+    },
+    {
+        "status": "released",
+        "project": "f01ff5be-a72d-43bd-afcf-174fa9dcd282",
+        "date_created": "2020-07-15T02:38:06.925580+00:00",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "uuid": "0a2d5fc7-2bd5-4289-a59c-40f7c633aaaa",
+        "schema_version": "1",
+        "accession": "GAPREIRNO1LH",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "description": "Report for proband of Askenazim family",
+        "last_modified": {
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+            "date_modified": "2020-07-15T02:42:35.675541+00:00"
+        }
     }
 ]
-
-
-

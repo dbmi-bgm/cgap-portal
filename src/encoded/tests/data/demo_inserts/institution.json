@@ -1,98 +1,100 @@
 [
     {
-        "uuid": "84ac37a8-c135-4c95-86cb-93028399d37e",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "status": "current",
-        "name": "Bioinformatics Core",
-        "title": "Bioinformatics Core, HMS",
+        "date_created": "2020-07-15T02:37:35.895348+00:00",
         "pi": "1d524d43-01b5-4b71-94c6-32d2d09c8323",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "contact_persons": [
+            "1d524d43-01b5-4b71-94c6-32d2d09c8323"
+        ],
+        "title": "Bioinformatics Core, HMS",
+        "schema_version": "1",
         "aliases": [
             "hms-dbmi:bioinformatics_core"
         ],
+        "name": "Bioinformatics Core",
+        "uuid": "84ac37a8-c135-4c95-86cb-93028399d37e",
         "last_modified": {
-            "date_modified": "2020-07-07T01:21:39.088410+00:00",
-            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
-        },
-        "date_created": "2020-07-07T01:21:39.083512+00:00",
-        "schema_version": "1",
-        "contact_persons": [
-            "1d524d43-01b5-4b71-94c6-32d2d09c8323"
-        ]
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+            "date_modified": "2020-07-15T02:41:05.259798+00:00"
+        }
     },
     {
-        "date_created": "2020-07-06T23:45:41.272938+00:00",
-        "pi": "986b362f-4eb6-4a9c-8173-3ab267307e4b",
-        "title": "BCH",
-        "address1": "Boston Children's Hospital",
-        "phone1": "000-000-0000",
-        "last_modified": {
-            "date_modified": "2020-07-09T01:14:21.432911+00:00",
-            "modified_by": "3202fd57-44d2-44fb-a131-afb1e43d8ae5"
-        },
-        "country": "USA",
-        "address2": "300 Longwood Avenue",
-        "state": "MA",
-        "name": "bch",
-        "uuid": "828cd4fe-ebb0-4b36-ccbb-d2e3a36ca765",
-        "fax": "000-000-0000",
         "status": "current",
-        "postal_code": "02115",
-        "schema_version": "1",
         "phone2": "000-000-0000",
-        "city": "Boston",
+        "pi": "986b362f-4eb6-4a9c-8173-3ab267307e4b",
+        "schema_version": "1",
+        "address2": "300 Longwood Avenue",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "contact_persons": [
             "986b362f-4eb6-4a9c-8173-3ab267307e4b"
-        ]
+        ],
+        "country": "USA",
+        "name": "bch",
+        "state": "MA",
+        "date_created": "2020-07-15T02:26:28.821063+00:00",
+        "title": "BCH",
+        "uuid": "828cd4fe-ebb0-4b36-ccbb-d2e3a36ca765",
+        "fax": "000-000-0000",
+        "phone1": "000-000-0000",
+        "address1": "Boston Children's Hospital",
+        "postal_code": "02115",
+        "city": "Boston",
+        "last_modified": {
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+            "date_modified": "2020-07-15T02:41:05.358722+00:00"
+        }
     },
     {
-        "date_created": "2020-07-06T23:45:41.216159+00:00",
-        "pi": "986b362f-4eb6-4a9c-8173-3acba722bba1",
-        "title": "BWH",
-        "address1": "Brigham and Women's Hospital",
-        "phone1": "000-000-0000",
-        "last_modified": {
-            "date_modified": "2020-07-09T01:14:21.260676+00:00",
-            "modified_by": "3202fd57-44d2-44fb-a131-afb1e43d8ae5"
-        },
-        "country": "USA",
-        "address2": "75 Francis Street",
-        "state": "MA",
-        "name": "bwh",
-        "uuid": "828cd4fe-ebb0-4b36-ccbb-d2e3a36ca234",
-        "fax": "000-000-0000",
         "status": "current",
-        "postal_code": "02115",
-        "schema_version": "1",
         "phone2": "000-000-0000",
-        "city": "Boston",
+        "pi": "986b362f-4eb6-4a9c-8173-3acba722bba1",
+        "schema_version": "1",
+        "address2": "75 Francis Street",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "contact_persons": [
             "986b362f-4eb6-4a9c-8173-3acba722bba1"
-        ]
+        ],
+        "country": "USA",
+        "name": "bwh",
+        "state": "MA",
+        "date_created": "2020-07-15T02:26:28.738572+00:00",
+        "title": "BWH",
+        "uuid": "828cd4fe-ebb0-4b36-ccbb-d2e3a36ca234",
+        "fax": "000-000-0000",
+        "phone1": "000-000-0000",
+        "address1": "Brigham and Women's Hospital",
+        "postal_code": "02115",
+        "city": "Boston",
+        "last_modified": {
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+            "date_modified": "2020-07-15T02:41:05.559439+00:00"
+        }
     },
     {
-        "date_created": "2020-07-06T23:45:41.074285+00:00",
+        "status": "current",
+        "phone2": "000-000-0000",
         "pi": "986b362f-4eb6-4a9c-8173-3ab267307e3a",
-        "title": "HMS DBMI",
-        "address1": "Biomedical Bioinfomatics",
-        "phone1": "000-000-0000",
-        "last_modified": {
-            "date_modified": "2020-07-09T01:14:21.212995+00:00",
-            "modified_by": "3202fd57-44d2-44fb-a131-afb1e43d8ae5"
-        },
-        "country": "USA",
+        "schema_version": "1",
         "address2": "10 Schattuck Street",
         "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-        "state": "MA",
-        "name": "hms-dbmi",
-        "uuid": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
-        "fax": "000-000-0000",
-        "status": "current",
-        "postal_code": "02115",
-        "schema_version": "1",
-        "phone2": "000-000-0000",
-        "city": "Boston",
         "contact_persons": [
             "986b362f-4eb6-4a9c-8173-3ab267307e3a"
-        ]
+        ],
+        "country": "USA",
+        "name": "hms-dbmi",
+        "state": "MA",
+        "date_created": "2020-07-15T02:26:28.666072+00:00",
+        "title": "HMS DBMI",
+        "uuid": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "fax": "000-000-0000",
+        "phone1": "000-000-0000",
+        "address1": "Biomedical Bioinfomatics",
+        "postal_code": "02115",
+        "city": "Boston",
+        "last_modified": {
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+            "date_modified": "2020-07-15T02:41:05.684750+00:00"
+        }
     }
 ]
