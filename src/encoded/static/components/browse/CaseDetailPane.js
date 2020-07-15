@@ -109,7 +109,7 @@ class FamilySection extends React.Component {
         const { containerWidth, family, result, href, minimumWidth, paddingWidth } = this.props;
         return (
             <FamilyReportStackedTable
-                result={result} family={family} href={href} preventExpand
+                result={result} family={family} href={href} preventExpand={false}
                 width={containerWidth ? (Math.max(containerWidth - paddingWidth, minimumWidth) /* account for padding of pane */) : null}
                 fadeIn={false} collapseLongLists
             />
@@ -411,8 +411,8 @@ export class FamilyAccessionStackedTable extends React.PureComponent {
                 <table className="accession-table w-100">
                     <tbody>
                         <tr>
-                            <th>Sample ID</th>
-                            <th>{accession || "-"}</th>
+                            <td className="accession-table-title">Sample ID</td>
+                            <td>{accession || "-"}</td>
                         </tr>
                         {/* <tr>
                             <td>Phlebotomy ID</td>
@@ -420,17 +420,17 @@ export class FamilyAccessionStackedTable extends React.PureComponent {
                         </tr> */}
                         { display_title ?
                             <tr>
-                                <td>CGAP ID</td>
+                                <td className="accession-table-title">CGAP ID</td>
                                 <td>{ display_title }</td>
                             </tr> : null}
                         { specimen_type ?
                             <tr>
-                                <td>Sample Type</td>
+                                <td className="accession-table-title">Sample Type</td>
                                 <td>{specimen_type }</td>
                             </tr>: null}
                         { specimen_collection_date ?
                             <tr>
-                                <td>Collected</td>
+                                <td className="accession-table-title">Collected</td>
                                 <td>{specimen_collection_date }</td>
                             </tr>: null }
                     </tbody>
@@ -502,8 +502,8 @@ export class FamilyAccessionStackedTable extends React.PureComponent {
                         <div className="w-100 mw-70">
                             <table className="accession-table w-100">
                                 <tr>
-                                    <th>Report ID</th>
-                                    <th>{ reportAccession }</th>
+                                    <td className="accession-table-title">Report ID</td>
+                                    <td>{ reportAccession }</td>
                                 </tr>
                             </table>
                         </div>
@@ -517,26 +517,23 @@ export class FamilyAccessionStackedTable extends React.PureComponent {
                 key={atId} id={atId}
             >
                 <StackedBlockName className="flex-row align-items-center justify-content-between">
-                    <div className="d-flex">
+                    <div className="d-flex flex-column">
                         { atId ?
                             <a href={atId} className={`name-title p-1 text-capitalize ${(result.individual['@id'] === individual['@id']) ? "current-case" : ""}`}>
                                 { role || display_title }
                             </a> : <span className="name-title p-1 text-capitalize">{ role || display_title }</span>}
+                        <span className="d-block text-small">({ accession || "" })</span>
                     </div>
                     <div className="w-100" style={{ maxWidth: "70%" }}>
                         <table className="accession-table w-100">
                             <tbody>
                                 <tr>
-                                    <th>Individual ID</th>
-                                    <th>{ accession || "" }</th>
-                                </tr>
-                                <tr>
-                                    <td>Family ID</td>
+                                    <td className="accession-table-title">Family ID</td>
                                     <td>{ familyId || "" }</td>
                                 </tr>
                                 { caseForCurrIndividual ?
                                     <tr>
-                                        <td>Case ID</td>
+                                        <td className="accession-table-title">Case ID</td>
                                         <td>{caseAccession || caseTitle}</td>
                                     </tr>
                                     : null}
