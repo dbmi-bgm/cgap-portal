@@ -44,7 +44,10 @@ GENERIC_FIELD_MAPPING = {
 # }
 
 
-POST_ORDER = ['sample', 'individual', 'family', 'sample_processing', 'report', 'case']
+POST_ORDER = [
+    'file_fastq', 'file_processed', 'sample', 'individual',
+    'family', 'sample_processing', 'report', 'case'
+]
 
 
 LINKS = [
@@ -105,8 +108,10 @@ def xls_to_json(xls_data, project, institution):
 
     items = {
         'individual': {}, 'family': {}, 'sample': {}, 'sample_processing': {},
-        'case': {}, 'report': {}, 'reports': []
+        'file_fastq': {}, 'file_processed': {}, 'case': {}, 'report': {},
+        'reports': []
     }
+    file_errors = []
     specimen_ids = {}
     family_dict = create_families(rows)
     a_types = get_analysis_types(rows)
@@ -119,7 +124,7 @@ def xls_to_json(xls_data, project, institution):
         # create/edit items for Family
         items = fetch_family_metadata(row, items, indiv_alias, fam_alias)
         # create item for Sample if there is a specimen
-        if row['specimen id']:
+        if row.get('specimen id'):
             samp_alias = '{}:sample-{}'.format(project['name'], row['specimen id'])
             if row['specimen id'] in specimen_ids:
                 samp_alias = samp_alias + '-' + specimen_ids[row['specimen id']]
@@ -129,6 +134,11 @@ def xls_to_json(xls_data, project, institution):
             analysis_alias = '{}:analysis-{}'.format(project['name'], row['analysis id'])
             items = fetch_sample_metadata(row, items, indiv_alias, samp_alias, analysis_alias,
                                           fam_alias, project['name'], a_types)
+            if row.get('files'):
+                file_items = fetch_file_metadata(row['files'].split(','), project['name'])
+                file_errors.extend(file_items['errors'])
+                items['file_fastq'].update(file_items['file_fastq'])
+                items['file_processed'].update(file_items['file_processed'])
         else:
             print('WARNING: No specimen id present for patient {},'
                   ' sample will not be created.'.format(row['individual id']))
@@ -144,7 +154,7 @@ def xls_to_json(xls_data, project, institution):
                 del val2[key]
             val2['project'] = project['@id']
             val2['institution'] = institution['@id']
-
+    items['file_errors'] = file_errors
     return items
 
 
@@ -256,17 +266,36 @@ def fetch_sample_metadata(row, items, indiv_alias, samp_alias, analysis_alias, f
 
 
 # TODO: finish implementing this function
-def fetch_file_metadata(filenames):
-    files = []
+def fetch_file_metadata(filenames, proj_name):
+    valid_extensions = {
+        '.fastq.gz': ('fastq', 'reads'),
+        '.fq.gz': ('fastq', 'reads'),
+        '.cram': ('cram', 'alignments'),
+        '.vcf.gz': ('vcf_gz', 'raw VCF')
+    }
+    files = {'file_fastq': {}, 'file_processed': {}, 'errors': []}
     for filename in filenames:
+        extension = [ext for ext in valid_extensions if filename.endswith(ext)]
+        if not extension:
+            if [ext for ext in ['.fastq', '.fq', '.vcf'] if filename.endswith(ext)]:
+                files['errors'].append('File must be compressed - please gzip file {}'.format(filename))
+            else:
+                files['errors'].append('File extension on {} not supported - expecting one of: '
+                              '.fastq.gz, .fq.gz, .cram, .vcf.gz'.format(filename))
+            continue
+        file_alias = '{}:{}'.format(proj_name, filename.lstrip(' '))
+        fmt = valid_extensions[extension[0]][0]
         file_info = {
-            'aliases': [],
-            'file_format': '',
-            'file_type': '',
-            'filename': ''
+            'aliases': [file_alias],
+            'file_format': '/file-formats/{}/'.format(fmt),
+            'file_type': valid_extensions[extension[0]][1],
+            'filename': filename  # causes problems without functional file upload
         }
-        files.append(file_info)
-    raise NotImplementedError
+        if fmt == 'fastq':
+            files['file_fastq'][file_alias] = file_info
+        else:
+            files['file_processed'][file_alias] = file_info
+    return files
 
 
 def create_case_items(items, proj_name):
@@ -386,9 +415,8 @@ def compare_fields(profile, aliases, json_item, db_item):
         # if not an array, patch field gets overwritten (if different from db)
         if profile['properties'][field]['type'] != 'array':
             val = json_item[field]
-            if isinstance(val, str):
-                if val in aliases:
-                    val = aliases[val]
+            if profile['properties'][field]['type'] == 'string' and val in aliases:
+                val = aliases[val]
             if val != db_item.get(field):
                 to_patch[field] = val
         else:
@@ -404,7 +432,10 @@ def compare_fields(profile, aliases, json_item, db_item):
                 continue
             new_val = [item for item in db_item.get(field, [])]
             new_val.extend(val)
-            to_patch[field] = list(set(new_val))
+            try:
+                to_patch[field] = list(set(new_val))
+            except TypeError:  # above doesn't handle list of dictionaries
+                to_patch[field] = [dict(t) for t in {tuple(d.items()) for d in new_val}]
     return to_patch
 
 
@@ -422,7 +453,7 @@ def validate_all_items(virtualapp, json_data):
     written or tested.
     '''
     alias_dict = {}
-    errors = []
+    errors = json_data['file_errors']
     all_aliases = [k for itype in json_data for k in json_data[itype]]
     json_data_final = {'post': {}, 'patch': {}}
     validation_results = {}
@@ -431,10 +462,17 @@ def validate_all_items(virtualapp, json_data):
         if itemtype in json_data:
             profile = virtualapp.get('/profiles/{}.json'.format(itemtype)).json
             validation_results[itemtype] = {'validated': 0, 'errors': 0}
+            db_results = {}
         for alias in json_data[itemtype]:
-            # TODO : format fields (e.g. int, list, etc.)
-            result = compare_with_db(virtualapp, alias)
-            if not result:
+            # first collect all atids before comparing and validating items
+            db_result = compare_with_db(virtualapp, alias)
+            if db_result:
+                alias_dict[alias] = db_result['@id']
+                db_results[alias] = db_result
+        for alias in json_data[itemtype]:
+            if 'filename' in json_data[itemtype][alias]:  # until we have functional file upload
+                del json_data[itemtype][alias]['filename']
+            if not db_results.get(alias):
                 error = validate_item(virtualapp, json_data[itemtype][alias], 'post', itemtype, all_aliases)
                 if error:  # modify to check for presence of validation errors
                     # do something to report validation errors
@@ -442,25 +480,32 @@ def validate_all_items(virtualapp, json_data):
                         for e in error:
                             errors.append('{} {} - Error found: {}'.format(itemtype, alias, e))
                         validation_results[itemtype]['errors'] += 1
+                elif json_data[itemtype][alias].get('filename') and \
+                        json_data[itemtype][alias]['filename'] in ''.join(json_data['file_errors']):
+                    validation_results[itemtype]['errors'] += 1
                 else:
                     json_data_final['post'].setdefault(itemtype, [])
                     json_data_final['post'][itemtype].append(json_data[itemtype][alias])
                     validation_results[itemtype]['validated'] += 1
             else:
                 # patch if item exists in db
-                alias_dict[alias] = result['@id']
-                patch_data = compare_fields(profile, alias_dict, json_data[itemtype][alias], result)
-                error = validate_item(virtualapp, patch_data, 'patch', itemtype, all_aliases, atid=result['@id'])
+                # alias_dict[alias] = results[alias]['@id']
+                patch_data = compare_fields(profile, alias_dict, json_data[itemtype][alias], db_results[alias])
+                error = validate_item(virtualapp, patch_data, 'patch', itemtype,
+                                      all_aliases, atid=db_results[alias]['@id'])
                 if error:  # do something to report validation errors
                     if itemtype not in ['case', 'report']:
                         for e in error:
                             errors.append('{} {} - Error found: {}'.format(itemtype, alias, e))
                         validation_results[itemtype]['errors'] += 1
+                elif json_data[itemtype][alias].get('filename') and \
+                        json_data[itemtype][alias]['filename'] in ''.join(json_data['file_errors']):
+                    validation_results[itemtype]['errors'] += 1
                 else:  # patch
                     json_data_final['patch'].setdefault(itemtype, {})
                     if patch_data:
-                        json_data_final['patch'][itemtype][result['@id']] = patch_data
-                    else:
+                        json_data_final['patch'][itemtype][db_results[alias]['@id']] = patch_data
+                    elif itemtype not in ['case', 'report']:
                         output.append('{} {} - Item already in database, no changes needed'.format(itemtype, alias))
                     # do something to record response
                     validation_results[itemtype]['validated'] += 1
@@ -489,6 +534,8 @@ def post_and_patch_all_items(virtualapp, json_data_final):
             final_status[k] = {'posted': 0, 'not posted': 0, 'patched': 0, 'not patched': 0}
             for item in v:
                 patch_info = {}
+                # if 'filename' in item:  # until we have functional file upload
+                #     del item['filename']
                 for field in LINKS:
                     if field in item:
                         patch_info[field] = item[field]
@@ -507,7 +554,7 @@ def post_and_patch_all_items(virtualapp, json_data_final):
                         final_status[k]['not posted'] += 1
                 except Exception as e:
                     final_status[k]['not posted'] += 1
-                    output.append(e)
+                    output.append(str(e))
         for itype in final_status:
             if final_status[itype]['posted'] > 0 or final_status[itype]['not posted'] > 0:
                 output.append('{}: {} items posted successfully; {} items not posted'.format(
@@ -516,6 +563,8 @@ def post_and_patch_all_items(virtualapp, json_data_final):
     for k, v in json_data_final['patch'].items():
         final_status.setdefault(k, {'patched': 0, 'not patched': 0})
         for item_id, patch_data in v.items():
+            # if 'filename' in patch_data:  # until we have functional file upload
+            #     del patch_data['filename']
             try:
                 response = virtualapp.patch_json('/' + item_id, patch_data, status=200)
                 if response.json['status'] == 'success':
@@ -526,7 +575,7 @@ def post_and_patch_all_items(virtualapp, json_data_final):
                     final_status[k]['not patched'] += 1
             except Exception as e:
                 final_status[k]['not patched'] += 1
-                output.append(e)
+                output.append(str(e))
         if final_status[k]['patched'] > 0 or final_status[k]['not patched'] > 0:
             output.append('{}: {} items patched successfully; {} items not patched'.format(
                 k, final_status[k]['patched'], final_status[k]['not patched']

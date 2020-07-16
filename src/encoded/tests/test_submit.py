@@ -173,7 +173,8 @@ def test_fetch_sample_metadata_sp(row_dict, empty_items):
     items = empty_items.copy()
     items['individual'] = {'test-proj:indiv1': {}}
     items_out = fetch_sample_metadata(
-        row_dict, items, 'test-proj:indiv1', 'test-proj:samp1', 'test-proj:sp1', 'test-proj:fam1', 'test-proj'
+        row_dict, items, 'test-proj:indiv1', 'test-proj:samp1',
+        'test-proj:sp1', 'test-proj:fam1', 'test-proj', {}
     )
     assert items_out['sample']['test-proj:samp1']['specimen_accession'] == row_dict['specimen id']
     assert items_out['sample_processing']['test-proj:sp1']['samples'] == ['test-proj:samp1']
