@@ -196,7 +196,7 @@ export class FamilyReportStackedTable extends React.PureComponent {
         this.renderIndividualBlockList = this.renderIndividualBlockList.bind(this);
     }
 
-    renderSampleBlock(sample){
+    renderSampleBlock(sample, reportBlocks = null){
         const { result } = this.props;
         const { sample_processing = {} } = result;
         const { '@id': atId = null, workup_type = "-", display_title = null, accession = null } = sample;
@@ -226,7 +226,7 @@ export class FamilyReportStackedTable extends React.PureComponent {
                         </StackedBlockName>
                         {/* Temporary empty report block - need to update with link to report later */}
                         <StackedBlockList className="report" title="Report">
-                            { FamilyReportStackedTable.renderEmptyBlock("report") }
+                            { reportBlocks.length > 0 ? <StackedBlockList className="report" title="Report">{reportBlocks}</StackedBlockList> : FamilyReportStackedTable.renderEmptyBlock("report") }
                         </StackedBlockList>
                     </StackedBlock>
                 </StackedBlockList>
@@ -235,26 +235,64 @@ export class FamilyReportStackedTable extends React.PureComponent {
     }
 
     renderIndividualBlock(individual, role) {
-        const { result } = this.props;
+        // Break out useful values from result; used in determining whether the passed in individual === the result case individual
+        const { result = null } = this.props;
+        const { "@id": resultCaseAtId = null, individual: resultIndividual = null, report: resultReport = null, sample: resultSample = null } = result || {};
+        const { "@id": resultIndvAtId = null } = resultIndividual || {};
+        const { "@id": resultReportAtId = null } = resultReport || {};
+        const { "@id": resultSampleId = null } = resultSample || {};
 
-        const { "@id": atId = null, display_title = null, accession = null } = individual;
+        // Passed in Individual
+        const { "@id": atId = null, individual_id = null, display_title = null, case: cases = [], accession = null, samples: indvSamples = [] } = individual || {};
 
         let cls;
-        if (result && result.individual) {
-            cls = result.individual['@id'] === individual['@id'] ? "current-case": null;
+        if (resultIndividual) {
+            cls = resultIndvAtId === atId ? "current-case": null;
         }
+
+        const sampleToCaseReportBlockMap = {};
+
+        cases.forEach((currCase) => {
+            const { '@id': caseAtId = null, accession: caseAccession = null, case_title = null, sample = null, report = null } = currCase || {};
+            const { '@id': sampleAtId = null, accession: sampleAccession = null } = sample || {};
+            const { '@id' : reportAtId = null, display_title : reportTitle = null, accession: reportAccession = null } = report || {};
+
+            // const isResultCase = caseAtId === resultCaseAtId;
+
+            if (sampleAtId) {
+                const thisReportBlock = (
+                    <StackedBlock columnClass="report" hideNameOnHover={false} key={reportAtId} id={reportAtId}
+                        label={<StackedBlockNameLabel title={null} accession={null} subtitleVisible/>}
+                    >
+                        <StackedBlockName>
+                            { reportAtId ? <a href={reportAtId} className="name-title text-capitalize">{ reportTitle }</a> : <span className="name-title text-capitalize">{ reportTitle }</span>}
+                        </StackedBlockName>
+                    </StackedBlock>);
+
+                if (sampleToCaseReportBlockMap[sampleAtId] === undefined) {
+                    sampleToCaseReportBlockMap[sampleAtId] = [thisReportBlock];
+                } else {
+                    sampleToCaseReportBlockMap[sampleAtId].push(thisReportBlock);
+                }
+            }
+        });
 
         return (
             <StackedBlock {...{ cls }} hideNameOnHover={false} columnClass="individual"
                 key={atId} id={atId}
                 label={
-                    <StackedBlockNameLabel title="Accession" accession={accession || display_title} subtitleVisible/>}
+                    <StackedBlockNameLabel title="Accession" accession={accession} subtitleVisible/>}
             >
                 <StackedBlockName>
                     { atId ? <a href={atId} className="name-title text-capitalize">{ role || display_title }</a> : <span className="name-title text-capitalize">{ role || display_title }</span>}
                 </StackedBlockName>
                 <StackedBlockList className="libraries" title="Libraries">
-                    { _.map(individual.samples || [], this.renderSampleBlock) }
+                    { indvSamples.map((thisSample) =>
+                    {
+                        const { '@id' : thisSampleAtId } = thisSample || {};
+                        const reportBlocks = sampleToCaseReportBlockMap[thisSampleAtId];
+                        return this.renderSampleBlock(thisSample, reportBlocks);
+                    })}
                 </StackedBlockList>
             </StackedBlock>
         );
@@ -393,11 +431,14 @@ export class FamilyAccessionStackedTable extends React.PureComponent {
         this.renderIndividualBlockList = this.renderIndividualBlockList.bind(this);
     }
 
-    renderSampleBlock(sample, reportBlock){
+    renderSampleBlock(sample, reportBlocks = null){
         const { result } = this.props;
-        const { sample_processing = {} } = result;
-        const { '@id': atId = null, specimen_collection_date = null, specimen_type = null, workup_type = null, display_title = null, accession = null } = sample;
+        const { sample: resultSample = null, sample_processing = {} } = result;
         const { samples = [], completed_processes = [] } = sample_processing;
+        const { '@id': resultSampleAtId = null } = resultSample;
+
+
+        const { '@id': atId = null, specimen_collection_date = null, specimen_type = null, workup_type = null, display_title = null, accession = null } = sample;
 
         let blockValue = '-';
         samples.forEach((thisSample) => {
@@ -405,6 +446,8 @@ export class FamilyAccessionStackedTable extends React.PureComponent {
                 blockValue = completed_processes;
             }
         });
+
+        const isSampleForResult = resultSampleAtId === atId;
 
         const fullTable = (
             <div className="w-100" style={{ maxWidth: "70%" }}>
@@ -414,11 +457,7 @@ export class FamilyAccessionStackedTable extends React.PureComponent {
                             <td className="accession-table-title">Sample ID</td>
                             <td>{accession || "-"}</td>
                         </tr>
-                        {/* <tr>
-                            <td>Phlebotomy ID</td>
-                            <td>CGAP#####</td>
-                        </tr> */}
-                        { display_title ?
+                        { display_title && (display_title !== accession) ?
                             <tr>
                                 <td className="accession-table-title">CGAP ID</td>
                                 <td>{ display_title }</td>
@@ -443,7 +482,7 @@ export class FamilyAccessionStackedTable extends React.PureComponent {
                 { (atId && workup_type) ?
                     <StackedBlockName className="flex-row align-items-center justify-content-between">
                         <div className="d-flex">
-                            <a href={atId} data-tip="View Sample" className={`name-title p-1`}>
+                            <a href={atId} data-tip="View Sample" className={`name-title p-1 ${isSampleForResult ? 'current-case' : ''}`}>
                                 { workup_type || "-" }
                             </a>
                         </div>
@@ -459,58 +498,75 @@ export class FamilyAccessionStackedTable extends React.PureComponent {
                 }
 
                 <StackedBlockList className="report" title="Report">
-                    { reportBlock ? reportBlock : FamilyAccessionStackedTable.renderEmptyBlock("report") }
+                    { reportBlocks ? reportBlocks : FamilyAccessionStackedTable.renderEmptyBlock("report") }
                 </StackedBlockList>
             </StackedBlock>
         );
     }
 
     renderIndividualBlock(individual, role, familyId, sex) {
-        const { result } = this.props;
-        const { "@id": atId = null, display_title = null, case: cases = [], accession = null, samples: indvSamples = [] } = individual;
+        // Break out useful values from result; used in determining whether the passed in individual === the result case individual
+        const { result = null } = this.props;
+        const { "@id": resultCaseAtId = null, individual: resultIndividual = null, report: resultReport = null, sample: resultSample = null } = result || {};
+        const { "@id": resultIndvAtId = null } = resultIndividual || {};
+        const { "@id": resultReportAtId = null } = resultReport || {};
+        const { "@id": resultSampleId = null } = resultSample || {};
+
+        // Passed in Individual
+        const { "@id": atId = null, individual_id = null, display_title = null, case: cases = [], accession = null, samples: indvSamples = [] } = individual || {};
 
         let cls;
         if (result && result.individual && individual) {
             cls = result.individual['@id'] === atId ? "current-case": null;
         }
 
-        // // TODO: Should only be one in this array... need to add a check somewhere
-        const filteredCases = cases.filter((currCase) => {
-            const { family : { '@id': thisFamilyAtId = null } = {} } = currCase;
-            // correct case matches family & individual
-            if (thisFamilyAtId === `/families/${familyId}/`) {
-                return true;
+        const sampleToCaseReportBlockMap = {};
+
+        cases.forEach((currCase) => {
+            const { '@id': caseAtId = null, accession: caseAccession = null, case_title = null, sample = null, report = null } = currCase || {};
+            const { '@id': sampleAtId = null, accession: sampleAccession = null } = sample || {};
+            const { '@id' : reportAtId = null, display_title : reportTitle = null, accession: reportAccession = null } = report || {};
+
+            const isResultCase = caseAtId === resultCaseAtId;
+
+            if (sampleAtId) {
+                const thisReportBlock = (
+                    <StackedBlock columnClass="report" hideNameOnHover={false} key={reportAtId} id={reportAtId}>
+                        <StackedBlockName className="flex-row align-items-center justify-content-between">
+                            <div className="d-flex">
+                                { reportAtId ?
+                                    <a href={reportAtId} className={"name-title p-1" + (isResultCase ? " current-case": "")}>
+                                        { reportTitle || "N/A" }
+                                    </a> : <span className={"name-title p-1" + (isResultCase ? " current-case": "")}>{ reportTitle || "N/A" }</span>}
+                            </div>
+                            <div className="w-100" style={{ maxWidth: "70%" }}>
+                                <table className="accession-table w-100">
+                                    <tbody>
+                                        { caseAtId ?
+                                            <tr>
+                                                <td className="accession-table-title">Case ID</td>
+                                                <td>{caseAccession}</td>
+                                            </tr>
+                                            : null}
+                                        { case_title ?
+                                            <tr>
+                                                <td className="accession-table-title">Case Title</td>
+                                                <td>{case_title}</td>
+                                            </tr>
+                                            : null}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </StackedBlockName>
+                    </StackedBlock>);
+
+                if (sampleToCaseReportBlockMap[sampleAtId] === undefined) {
+                    sampleToCaseReportBlockMap[sampleAtId] = [thisReportBlock];
+                } else {
+                    sampleToCaseReportBlockMap[sampleAtId].push(thisReportBlock);
+                }
             }
-            return false;
         });
-
-        const { 0: caseForCurrIndividual = null } = filteredCases || [];
-        const { report = null, sample: caseSample = null, caseAccession = null, display_title: caseTitle = null } = caseForCurrIndividual || {};
-
-        let reportBlock = null;
-        if (report) {
-            const { '@id' : reportAtId, display_title : reportTitle = null, accession: reportAccession = null } = report;
-            reportBlock = (
-                <StackedBlock columnClass="report" hideNameOnHover={false} key={reportAtId} id={reportAtId}>
-                    <StackedBlockName className="flex-row align-items-center justify-content-between">
-                        <div className="d-flex">
-                            { reportAtId ?
-                                <a href={reportAtId} className={"name-title p-1"}>
-                                    { reportTitle }
-                                </a> : <span className="name-title p-1">{ reportTitle }</span>}
-                        </div>
-                        <div className="w-100 mw-70">
-                            <table className="accession-table w-100">
-                                <tr>
-                                    <td className="accession-table-title">Report ID</td>
-                                    <td>{ reportAccession }</td>
-                                </tr>
-                            </table>
-                        </div>
-                    </StackedBlockName>
-                </StackedBlock>
-            );
-        }
 
         return (
             <StackedBlock {...{ cls }} hideNameOnHover={false} columnClass="individual"
@@ -529,14 +585,12 @@ export class FamilyAccessionStackedTable extends React.PureComponent {
                             <tbody>
                                 <tr>
                                     <td className="accession-table-title">Family ID</td>
-                                    <td>{ familyId || "" }</td>
+                                    <td>{ familyId || "N/A" }</td>
                                 </tr>
-                                { caseForCurrIndividual ?
-                                    <tr>
-                                        <td className="accession-table-title">Case ID</td>
-                                        <td>{caseAccession || caseTitle}</td>
-                                    </tr>
-                                    : null}
+                                <tr>
+                                    <td className="accession-table-title">Individual Title</td>
+                                    <td>{ individual_id ? individual_id : (display_title !== accession) ? display_title : "N/A" }</td>
+                                </tr>
                             </tbody>
                         </table>
                     </div>
@@ -544,12 +598,10 @@ export class FamilyAccessionStackedTable extends React.PureComponent {
                 <StackedBlockList className="libraries" title="Libraries">
                     { indvSamples.map((thisSample) =>
                     {
-                        const { '@id' : caseSampleAtId } = caseSample || {};
                         const { '@id' : thisSampleAtId } = thisSample || {};
-                        if (caseSampleAtId === thisSampleAtId) {
-                            return this.renderSampleBlock(thisSample, reportBlock);
-                        }
-                        return this.renderSampleBlock(thisSample, null);
+
+                        const reportBlocks = sampleToCaseReportBlockMap[thisSampleAtId];
+                        return this.renderSampleBlock(thisSample, reportBlocks);
                     })}
                 </StackedBlockList>
             </StackedBlock>
