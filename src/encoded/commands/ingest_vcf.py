@@ -3,6 +3,7 @@ import vcf
 import json
 import argparse
 import logging
+import itertools
 from pyramid.paster import get_app
 from dcicutils.misc_utils import VirtualApp
 from collections import OrderedDict
@@ -33,6 +34,8 @@ class VCFParser(object):
         '%7C': '|',
         '%3B': ';'
     }
+    MUTANNO = 'MUTANNO'  # annotation field from MUTANNO
+    GRANITE = 'GRANITE'  # annotation field from GRANITE
     VARIANT_SAMPLE_SUBEMBEDDED = ['SAMPLEGENO']
     VCF_FIELDS = ['CHROM', 'POS', 'ID', 'REF', 'ALT']
     VCF_SAMPLE_FIELDS = ['FILTER', 'QUAL']
@@ -40,6 +43,7 @@ class VCFParser(object):
     SUBEMBEDDED = 'Subembedded'
     FORMAT = 'Format'
     GT_REF = '0/0'
+    GT_REF_PHASED = '0|0'
     GT_MISSING = './.'
 
     def __init__(self, _vcf, variant, sample, reader=None):
@@ -77,9 +81,9 @@ class VCFParser(object):
         return self.reader
 
     def read_vcf_metadata(self):
-        """ Parses VCF file meta data to get annotation fields under MUTANNO
-        """
-        for field in self.reader.metadata['MUTANNO']:
+        """ Parses VCF file meta data to get annotation fields under MUTANNO/GRANITE """
+        for field in itertools.chain(self.reader.metadata.get(self.MUTANNO, []),
+                                     self.reader.metadata.get(self.GRANITE, [])):
             self.annotation_keys[field['ID']] = True
 
     def _strip(self, s):
@@ -477,7 +481,7 @@ class VCFParser(object):
             s.pop('AF', None)  # XXX: comes from VCF but is not actually what we want. Get rid of it.
 
             # DROP SV's that are REF/REF
-            if s.get('GT', None) in [self.GT_REF, self.GT_MISSING]:
+            if s.get('GT', None) in [self.GT_REF, self.GT_MISSING, self.GT_REF_PHASED]:
                 continue
             result.append(s)
         return result

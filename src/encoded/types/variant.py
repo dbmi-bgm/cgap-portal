@@ -11,6 +11,7 @@ from urllib.parse import (
 from pyramid.httpexceptions import (
     HTTPTemporaryRedirect
 )
+from snovault.calculated import calculate_properties
 from snovault.util import debug_log
 from encoded.util import resolve_file_path
 from snovault import (
@@ -184,36 +185,43 @@ class VariantSample(Item):
             return round(int(alt) / (int(ref) + int(alt)), 3)  # round to 3 digits
         return 0.0
 
+    @calculated_property(schema={
+        "title": "bam_snapshot",
+        "description": "Link to Genome Snapshot Image",
+        "type": "string"
+    })
+    def bam_snapshot(self, request, file, variant):
+        variant_props = get_item_or_none(request, variant, 'Variant')
+        file_path = '%s/bamsnap/chr%s:%s.png' % (  # file = accession of associated VCF file
+            file, variant_props['CHROM'], variant_props['POS']
+        )
+        return file_path
+
 
 @view_config(name='download', context=VariantSample, request_method='GET',
              permission='view', subpath_segments=[0, 1])
+@debug_log
 def download(context, request):
-    """ Navigates to the IGV snapshot hrf
-        TODO: test (this is a rough sketch) + enable
-    """
-    return {
-        'notification': 'Failure',
-        'detail': 'Route not enabled yet'
+    """ Navigates to the IGV snapshot hrf on the bam_snapshot field. """
+    calculated = calculate_properties(context, request)
+    s3_client = boto3.client('s3')
+    params_to_get_obj = {
+        'Bucket': request.registry.settings.get('file_wfout_bucket'),
+        'Key': calculated['bam_snapshot']
     }
-    # properties = context.upgrade_properties()
-    # s3_client = boto3.client('s3')
-    # params_to_get_obj = {
-    #     'Bucket': request.registry.settings.get('file_wfout_bucket'),
-    #     'Key': properties['href']
-    # }
-    # location = s3_client.generate_presigned_url(
-    #     ClientMethod='get_object',
-    #     Params=params_to_get_obj,
-    #     ExpiresIn=36*60*60
-    # )
-    #
-    # if asbool(request.params.get('soft')):
-    #     expires = int(parse_qs(urlparse(location).query)['Expires'][0])
-    #     return {
-    #         '@type': ['SoftRedirect'],
-    #         'location': location,
-    #         'expires': datetime.datetime.fromtimestamp(expires, pytz.utc).isoformat(),
-    #     }
-    #
-    # # 307 redirect specifies to keep original method
-    # raise HTTPTemporaryRedirect(location=location)
+    location = s3_client.generate_presigned_url(
+        ClientMethod='get_object',
+        Params=params_to_get_obj,
+        ExpiresIn=36*60*60
+    )
+
+    if asbool(request.params.get('soft')):
+        expires = int(parse_qs(urlparse(location).query)['Expires'][0])
+        return {
+            '@type': ['SoftRedirect'],
+            'location': location,
+            'expires': datetime.datetime.fromtimestamp(expires, pytz.utc).isoformat(),
+        }
+
+    # 307 redirect specifies to keep original method
+    raise HTTPTemporaryRedirect(location=location)  # 307
