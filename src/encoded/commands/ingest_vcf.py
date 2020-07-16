@@ -82,7 +82,8 @@ class VCFParser(object):
 
     def read_vcf_metadata(self):
         """ Parses VCF file meta data to get annotation fields under MUTANNO/GRANITE """
-        for field in itertools.chain(self.reader.metadata[self.MUTANNO], self.reader.metadata[self.GRANITE]):
+        for field in itertools.chain(self.reader.metadata.get(self.MUTANNO, []),
+                                     self.reader.metadata.get(self.GRANITE, [])):
             self.annotation_keys[field['ID']] = True
 
     def _strip(self, s):
