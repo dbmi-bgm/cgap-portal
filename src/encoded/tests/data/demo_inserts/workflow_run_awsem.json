@@ -147,6 +147,91 @@
         }
     },
     {
+        "status": "in review",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "run_status": "complete",
+        "submitted_by": "b041dba8-e2b2-4e54-a621-97edb508a0c4",
+        "title": "workflow_mutanno-annot-check v14 run 2020-06-26 18:16:26.450768",
+        "awsem_job_id": "FgD9rjjeneFf",
+        "parameters": [
+            {
+                "ordinal": 1,
+                "value": "1",
+                "workflow_argument_name": "nthreads",
+                "dimension": "0"
+            }
+        ],
+        "workflow": "62f16824-4d4b-43fb-9f2f-3bb5b328431a",
+        "date_created": "2020-06-26T18:16:26.485838+00:00",
+        "output_files": [
+            {
+                "format": "/file-formats/vcf_gz/",
+                "secondary_file_formats": [
+                    "/file-formats/vcf_gz_tbi/"
+                ],
+                "type": "Output processed file",
+                "extra_files": [
+                    {
+                        "status": "uploading",
+                        "upload_key": "3ffb69af-bd41-4dfe-ba90-686aa765b025/GAPFIRHN9YOZ.vcf.gz.tbi",
+                        "filename": "GAPFIRHN9YOZ",
+                        "href": "/3ffb69af-bd41-4dfe-ba90-686aa765b025/@@download/GAPFIRHN9YOZ.vcf.gz.tbi",
+                        "accession": "GAPFIRHN9YOZ",
+                        "file_format": "/file-formats/vcf_gz_tbi/",
+                        "uuid": "3ffb69af-bd41-4dfe-ba90-686aa765b025"
+                    }
+                ],
+                "upload_key": "3ffb69af-bd41-4dfe-ba90-686aa765b025/GAPFIRHN9YOZ.vcf.gz",
+                "value": "3ffb69af-bd41-4dfe-ba90-686aa765b025",
+                "workflow_argument_name": "annotated_vcf"
+            },
+            {
+                "value_qc": "4b96fb95-cb0d-44f5-83d9-8d8f39e9c73a",
+                "workflow_argument_name": "annotated_vcf-check",
+                "type": "Output QC file"
+            }
+        ],
+        "run_platform": "AWSEM",
+        "input_files": [
+            {
+                "ordinal": 1,
+                "value": "35035a19-6af3-41c7-acfa-021bd71c2f7e",
+                "workflow_argument_name": "input_vcf",
+                "dimension": "0"
+            },
+            {
+                "ordinal": 1,
+                "value": "297c872a-5b6b-4fc3-83d3-f4a853f8805c",
+                "workflow_argument_name": "chainfile",
+                "dimension": "0"
+            },
+            {
+                "ordinal": 1,
+                "value": "3832e0d9-dfd0-4108-998e-a31c3291a7cf",
+                "workflow_argument_name": "mti",
+                "dimension": "0"
+            },
+            {
+                "ordinal": 1,
+                "value": "1c07a3aa-e2a3-498c-b838-15991c4a2f28",
+                "workflow_argument_name": "regions",
+                "dimension": "0"
+            }
+        ],
+        "quality_metric": "9b3232a8-785a-4838-861c-0e71faa23497",
+        "uuid": "a168bd9a-fa7b-4c77-990d-0b87f87485f7",
+        "schema_version": "3",
+        "awsem_postrun_json": "https://s3.amazonaws.com/tibanna-output/FgD9rjjeneFf.postrun.json",
+        "run_url": "https://console.aws.amazon.com/states/home?region=us-east-1#/executions/details/arn:aws:states:us-east-1:643366669028:execution:tibanna_zebra:run_workflow_mutanno-annot-check-96687012-16ef-4484-8f06-8c8416ebbad9",
+        "metadata_only": false,
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "awsem_app_name": "workflow_mutanno-annot-check",
+        "last_modified": {
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+            "date_modified": "2020-07-16T00:05:01.697690+00:00"
+        }
+    },
+    {
         "status": "released",
         "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
         "run_status": "complete",
@@ -453,6 +538,84 @@
         "last_modified": {
             "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
             "date_modified": "2020-07-15T02:42:37.564990+00:00"
+        }
+    },
+    {
+        "status": "in review",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "run_status": "complete",
+        "submitted_by": "b041dba8-e2b2-4e54-a621-97edb508a0c4",
+        "title": "workflow_gatk-GenotypeGVCFs-check v13 run 2020-06-12 14:48:15.923892",
+        "awsem_job_id": "NXeX3EZllcZM",
+        "parameters": [],
+        "workflow": "4fbad226-859d-40d4-8192-10c305e819da",
+        "date_created": "2020-06-12T14:48:15.959735+00:00",
+        "output_files": [
+            {
+                "format": "/file-formats/vcf_gz/",
+                "secondary_file_formats": [
+                    "/file-formats/vcf_gz_tbi/"
+                ],
+                "type": "Output processed file",
+                "extra_files": [
+                    {
+                        "status": "uploading",
+                        "upload_key": "c3e51fa9-ee3f-4dd4-8264-5b96a91ced2b/GAPFIS6URTPJ.vcf.gz.tbi",
+                        "filename": "GAPFIS6URTPJ",
+                        "href": "/c3e51fa9-ee3f-4dd4-8264-5b96a91ced2b/@@download/GAPFIS6URTPJ.vcf.gz.tbi",
+                        "accession": "GAPFIS6URTPJ",
+                        "file_format": "/file-formats/vcf_gz_tbi/",
+                        "uuid": "c3e51fa9-ee3f-4dd4-8264-5b96a91ced2b"
+                    }
+                ],
+                "upload_key": "c3e51fa9-ee3f-4dd4-8264-5b96a91ced2b/GAPFIS6URTPJ.vcf.gz",
+                "value": "c3e51fa9-ee3f-4dd4-8264-5b96a91ced2b",
+                "workflow_argument_name": "vcf"
+            },
+            {
+                "value_qc": "a66a2390-bae0-41b4-945a-f1990aff3a8e",
+                "workflow_argument_name": "vcf-check",
+                "type": "Output QC file"
+            }
+        ],
+        "run_platform": "AWSEM",
+        "input_files": [
+            {
+                "ordinal": 1,
+                "value": "82b54421-d76d-4383-b49b-607d68cd703e",
+                "workflow_argument_name": "input_gvcf",
+                "dimension": "0"
+            },
+            {
+                "ordinal": 1,
+                "value": "1936f246-22e1-45dc-bb5c-9cfd55537fe7",
+                "workflow_argument_name": "reference",
+                "dimension": "0"
+            },
+            {
+                "ordinal": 1,
+                "value": "8ed35691-0af4-467a-adbc-81eb088549f0",
+                "workflow_argument_name": "known-sites-snp",
+                "dimension": "0"
+            },
+            {
+                "ordinal": 1,
+                "value": "a1d504ee-a313-4064-b6ae-65fed9738980",
+                "workflow_argument_name": "chromosomes",
+                "dimension": "0"
+            }
+        ],
+        "quality_metric": "2fdee1d3-6e52-4e8d-9730-74fa4c162fee",
+        "uuid": "e689b830-97ae-405f-ae5a-3f27c1d919cc",
+        "schema_version": "3",
+        "awsem_postrun_json": "https://s3.amazonaws.com/tibanna-output/NXeX3EZllcZM.postrun.json",
+        "run_url": "https://console.aws.amazon.com/states/home?region=us-east-1#/executions/details/arn:aws:states:us-east-1:643366669028:execution:tibanna_zebra:workflow_gatk-GenotypeGVCFs-check_679117cc-fc76-42c8-b55c-63b30f76861f",
+        "metadata_only": false,
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "awsem_app_name": "workflow_gatk-GenotypeGVCFs-check",
+        "last_modified": {
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+            "date_modified": "2020-07-16T00:05:02.410880+00:00"
         }
     },
     {
@@ -2257,6 +2420,78 @@
         }
     },
     {
+        "status": "in review",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "run_status": "complete",
+        "submitted_by": "b041dba8-e2b2-4e54-a621-97edb508a0c4",
+        "title": "workflow_granite-comHet-check v14 run 2020-06-18 17:46:26.147958",
+        "awsem_job_id": "C4keSieNvmff",
+        "parameters": [
+            {
+                "ordinal": 1,
+                "value": "['NA12879_sample']",
+                "workflow_argument_name": "trio",
+                "dimension": "0"
+            }
+        ],
+        "workflow": "4973be36-5e56-41be-98ef-dd771481f629",
+        "date_created": "2020-06-18T17:46:26.188175+00:00",
+        "output_files": [
+            {
+                "format": "/file-formats/vcf_gz/",
+                "secondary_file_formats": [
+                    "/file-formats/vcf_gz_tbi/"
+                ],
+                "type": "Output processed file",
+                "extra_files": [
+                    {
+                        "status": "uploading",
+                        "upload_key": "35035a19-6af3-41c7-acfa-021bd71c2f7e/GAPFIT75W5KW.vcf.gz.tbi",
+                        "filename": "GAPFIT75W5KW",
+                        "href": "/35035a19-6af3-41c7-acfa-021bd71c2f7e/@@download/GAPFIT75W5KW.vcf.gz.tbi",
+                        "accession": "GAPFIT75W5KW",
+                        "file_format": "/file-formats/vcf_gz_tbi/",
+                        "uuid": "35035a19-6af3-41c7-acfa-021bd71c2f7e"
+                    }
+                ],
+                "upload_key": "35035a19-6af3-41c7-acfa-021bd71c2f7e/GAPFIT75W5KW.vcf.gz",
+                "value": "35035a19-6af3-41c7-acfa-021bd71c2f7e",
+                "workflow_argument_name": "comHet_vcf"
+            },
+            {
+                "value_qc": "0fa65a36-40ff-4d54-86dd-ae9b4d2212fe",
+                "workflow_argument_name": "comHet_vcf-json",
+                "type": "Output QC file"
+            },
+            {
+                "value_qc": "c05c5758-b323-4857-aec0-c9145a47ca85",
+                "workflow_argument_name": "comHet_vcf-check",
+                "type": "Output QC file"
+            }
+        ],
+        "run_platform": "AWSEM",
+        "input_files": [
+            {
+                "ordinal": 1,
+                "value": "227a03fc-1a45-4990-9882-ec7aa9717173",
+                "workflow_argument_name": "input_vcf",
+                "dimension": "0"
+            }
+        ],
+        "quality_metric": "a7793a6f-a8b5-4dee-89ad-2770a6629476",
+        "uuid": "6f109de2-607f-44a8-aa43-f100a1ef6542",
+        "schema_version": "3",
+        "awsem_postrun_json": "https://s3.amazonaws.com/tibanna-output/C4keSieNvmff.postrun.json",
+        "run_url": "https://console.aws.amazon.com/states/home?region=us-east-1#/executions/details/arn:aws:states:us-east-1:643366669028:execution:tibanna_zebra:run_workflow_granite-comHet-check-79eb2818-9ff3-423d-acb2-89b3758f873b",
+        "metadata_only": false,
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "awsem_app_name": "workflow_granite-comHet-check",
+        "last_modified": {
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+            "date_modified": "2020-07-16T00:05:01.853385+00:00"
+        }
+    },
+    {
         "status": "released",
         "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
         "run_status": "complete",
@@ -2555,6 +2790,85 @@
         "last_modified": {
             "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
             "date_modified": "2020-07-15T02:42:43.511646+00:00"
+        }
+    },
+    {
+        "status": "in review",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "run_status": "complete",
+        "submitted_by": "b041dba8-e2b2-4e54-a621-97edb508a0c4",
+        "title": "workflow_mutanno-micro-annot-check v14 run 2020-06-16 19:55:16.356834",
+        "awsem_job_id": "WSuKXulEwToD",
+        "parameters": [
+            {
+                "ordinal": 1,
+                "value": "70",
+                "workflow_argument_name": "nthreads",
+                "dimension": "0"
+            }
+        ],
+        "workflow": "de9c4579-30e2-432c-80e3-7f324d3d7dcb",
+        "date_created": "2020-06-16T19:55:16.385158+00:00",
+        "output_files": [
+            {
+                "format": "/file-formats/vcf_gz/",
+                "secondary_file_formats": [
+                    "/file-formats/vcf_gz_tbi/"
+                ],
+                "type": "Output processed file",
+                "extra_files": [
+                    {
+                        "status": "uploading",
+                        "upload_key": "5f8beaf4-9571-44ee-bb61-4b68a0062f9e/GAPFINOPV5EP.vcf.gz.tbi",
+                        "filename": "GAPFINOPV5EP",
+                        "href": "/5f8beaf4-9571-44ee-bb61-4b68a0062f9e/@@download/GAPFINOPV5EP.vcf.gz.tbi",
+                        "accession": "GAPFINOPV5EP",
+                        "file_format": "/file-formats/vcf_gz_tbi/",
+                        "uuid": "5f8beaf4-9571-44ee-bb61-4b68a0062f9e"
+                    }
+                ],
+                "upload_key": "5f8beaf4-9571-44ee-bb61-4b68a0062f9e/GAPFINOPV5EP.vcf.gz",
+                "value": "5f8beaf4-9571-44ee-bb61-4b68a0062f9e",
+                "workflow_argument_name": "annotated_vcf"
+            },
+            {
+                "value_qc": "a66688c5-aea7-47c3-9897-33cc3040697e",
+                "workflow_argument_name": "annotated_vcf-check",
+                "type": "Output QC file"
+            }
+        ],
+        "run_platform": "AWSEM",
+        "input_files": [
+            {
+                "ordinal": 1,
+                "value": "c3e51fa9-ee3f-4dd4-8264-5b96a91ced2b",
+                "workflow_argument_name": "input_vcf",
+                "dimension": "0"
+            },
+            {
+                "ordinal": 1,
+                "value": "1408ceb9-7ae3-4002-aed7-c9a301014de2",
+                "workflow_argument_name": "mti",
+                "dimension": "0"
+            },
+            {
+                "ordinal": 1,
+                "value": "1c07a3aa-e2a3-498c-b838-15991c4a2f28",
+                "workflow_argument_name": "regions",
+                "dimension": "0"
+            }
+        ],
+        "quality_metric": "93d68d75-c96a-45a3-bcad-46bf9666fcf4",
+        "uuid": "c64d798d-8230-4201-a199-010524666846",
+        "schema_version": "3",
+        "awsem_postrun_json": "https://s3.amazonaws.com/tibanna-output/WSuKXulEwToD.postrun.json",
+        "run_url": "https://console.aws.amazon.com/states/home?region=us-east-1#/executions/details/arn:aws:states:us-east-1:643366669028:execution:tibanna_zebra:workflow_mutanno-micro-annot-check_01f42bfb-0a21-4bf1-a297-e1f12fdd2f9f",
+        "metadata_only": false,
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "awsem_app_name": "workflow_mutanno-micro-annot-check",
+        "last_modified": {
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+            "date_modified": "2020-07-16T00:05:02.293506+00:00"
         }
     },
     {
@@ -3491,6 +3805,85 @@
         "last_modified": {
             "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
             "date_modified": "2020-07-15T02:42:45.950383+00:00"
+        }
+    },
+    {
+        "status": "in review",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "run_status": "complete",
+        "submitted_by": "b041dba8-e2b2-4e54-a621-97edb508a0c4",
+        "title": "workflow_granite-filtering-check v14 run 2020-06-18 01:37:24.570004",
+        "awsem_job_id": "1HBLb9Snz4wC",
+        "parameters": [
+            {
+                "ordinal": 1,
+                "value": "gnomADgenome",
+                "workflow_argument_name": "aftag",
+                "dimension": "0"
+            },
+            {
+                "ordinal": 1,
+                "value": "0.01",
+                "workflow_argument_name": "afthr",
+                "dimension": "0"
+            }
+        ],
+        "workflow": "cb85683c-54a6-44e8-820c-1800aec9fdcd",
+        "date_created": "2020-06-18T01:37:24.612932+00:00",
+        "output_files": [
+            {
+                "format": "/file-formats/vcf_gz/",
+                "secondary_file_formats": [
+                    "/file-formats/vcf_gz_tbi/"
+                ],
+                "type": "Output processed file",
+                "extra_files": [
+                    {
+                        "status": "uploading",
+                        "upload_key": "227a03fc-1a45-4990-9882-ec7aa9717173/GAPFI1B9VBVM.vcf.gz.tbi",
+                        "filename": "GAPFI1B9VBVM",
+                        "href": "/227a03fc-1a45-4990-9882-ec7aa9717173/@@download/GAPFI1B9VBVM.vcf.gz.tbi",
+                        "accession": "GAPFI1B9VBVM",
+                        "file_format": "/file-formats/vcf_gz_tbi/",
+                        "uuid": "227a03fc-1a45-4990-9882-ec7aa9717173"
+                    }
+                ],
+                "upload_key": "227a03fc-1a45-4990-9882-ec7aa9717173/GAPFI1B9VBVM.vcf.gz",
+                "value": "227a03fc-1a45-4990-9882-ec7aa9717173",
+                "workflow_argument_name": "merged_vcf"
+            },
+            {
+                "value_qc": "63d1dd62-492b-4687-8122-8774c651a701",
+                "workflow_argument_name": "merged_vcf-check",
+                "type": "Output QC file"
+            }
+        ],
+        "run_platform": "AWSEM",
+        "input_files": [
+            {
+                "ordinal": 1,
+                "value": "5f8beaf4-9571-44ee-bb61-4b68a0062f9e",
+                "workflow_argument_name": "input_vcf",
+                "dimension": "0"
+            },
+            {
+                "ordinal": 1,
+                "value": "20004873-b672-4d84-a7c1-7fd5c0407519",
+                "workflow_argument_name": "bigfile",
+                "dimension": "0"
+            }
+        ],
+        "quality_metric": "fbea480c-17ec-40da-b552-546516ffdfb4",
+        "uuid": "972d061c-be2f-40f6-90a7-22d23ca691d6",
+        "schema_version": "3",
+        "awsem_postrun_json": "https://s3.amazonaws.com/tibanna-output/1HBLb9Snz4wC.postrun.json",
+        "run_url": "https://console.aws.amazon.com/states/home?region=us-east-1#/executions/details/arn:aws:states:us-east-1:643366669028:execution:tibanna_zebra:workflow_granite-filtering-check_9e602805-d5aa-4648-a39d-e533bf28404b",
+        "metadata_only": false,
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "awsem_app_name": "workflow_granite-filtering-check",
+        "last_modified": {
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+            "date_modified": "2020-07-16T00:05:02.142771+00:00"
         }
     },
     {

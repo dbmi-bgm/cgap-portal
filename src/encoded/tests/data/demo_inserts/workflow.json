@@ -2949,6 +2949,214 @@
         "arguments": [
             {
                 "argument_type": "Input file",
+                "workflow_argument_name": "input_vcf",
+                "argument_format": "1b8f525f-aecb-4211-9ae5-a2c998b05599"
+            },
+            {
+                "argument_type": "Input file",
+                "workflow_argument_name": "mti",
+                "argument_format": "d7fd1020-ae85-41a9-a45d-c66285efa996"
+            },
+            {
+                "argument_type": "Input file",
+                "workflow_argument_name": "regions",
+                "argument_format": "0cd4e777-a596-4927-95c8-b07716121aa3"
+            },
+            {
+                "argument_type": "Output processed file",
+                "secondary_file_formats": [
+                    "f84f1922-7f4e-4afc-922f-bec620969bf1"
+                ],
+                "argument_format": "1b8f525f-aecb-4211-9ae5-a2c998b05599",
+                "workflow_argument_name": "annotated_vcf"
+            },
+            {
+                "qc_table": true,
+                "argument_type": "Output QC file",
+                "argument_to_be_attached_to": "annotated_vcf",
+                "workflow_argument_name": "annotated_vcf-check",
+                "qc_type": "quality_metric_vcfcheck",
+                "qc_zipped": false,
+                "qc_json": false,
+                "qc_html": false
+            },
+            {
+                "argument_type": "parameter",
+                "workflow_argument_name": "nthreads"
+            }
+        ],
+        "title": "Run mutanno micro-annot plus output integrity-check",
+        "previous_version": [
+            "04caaa82-6a32-46d3-b52c-c1017cc0490a"
+        ],
+        "name": "workflow_mutanno-micro-annot-check_v14",
+        "workflow_language": "CWL",
+        "app_version": "v14",
+        "docker_registry_url": "https://hub.docker.com/",
+        "docker_image_name": "cgap/cgap:v14",
+        "cwl_pointer": "",
+        "steps": [
+            {
+                "inputs": [
+                    {
+                        "source": [
+                            {
+                                "name": "input_vcf"
+                            }
+                        ],
+                        "name": "input_vcf",
+                        "meta": {
+                            "file_format": "1b8f525f-aecb-4211-9ae5-a2c998b05599",
+                            "global": true,
+                            "cardinality": "single",
+                            "type": "data file"
+                        }
+                    },
+                    {
+                        "source": [
+                            {
+                                "name": "mti"
+                            }
+                        ],
+                        "name": "mti",
+                        "meta": {
+                            "file_format": "d7fd1020-ae85-41a9-a45d-c66285efa996",
+                            "global": true,
+                            "cardinality": "single",
+                            "type": "reference file"
+                        }
+                    },
+                    {
+                        "source": [
+                            {
+                                "name": "regions"
+                            }
+                        ],
+                        "name": "regions",
+                        "meta": {
+                            "file_format": "0cd4e777-a596-4927-95c8-b07716121aa3",
+                            "global": true,
+                            "cardinality": "single",
+                            "type": "reference file"
+                        }
+                    },
+                    {
+                        "source": [
+                            {
+                                "name": "nthreads"
+                            }
+                        ],
+                        "name": "nthreads",
+                        "meta": {
+                            "global": true,
+                            "cardinality": "single",
+                            "type": "parameter"
+                        }
+                    }
+                ],
+                "name": "annot",
+                "meta": {
+                    "software_used": [
+                        "1d28b7b8-1033-492f-8a1a-d4ac5b1ab55e"
+                    ],
+                    "analysis_step_types": [
+                        "Run mutanno annot"
+                    ]
+                },
+                "outputs": [
+                    {
+                        "target": [
+                            {
+                                "name": "annotated_vcf",
+                                "step": "vcf-integrity-check"
+                            }
+                        ],
+                        "name": "annotated_vcf",
+                        "meta": {
+                            "file_format": "vcf_gz",
+                            "global": true,
+                            "cardinality": "single",
+                            "type": "data file"
+                        }
+                    }
+                ]
+            },
+            {
+                "inputs": [
+                    {
+                        "source": [
+                            {
+                                "name": "annotated_vcf",
+                                "step": "annot"
+                            }
+                        ],
+                        "name": "annotated_vcf",
+                        "meta": {
+                            "file_format": "1b8f525f-aecb-4211-9ae5-a2c998b05599",
+                            "global": false,
+                            "cardinality": "single",
+                            "type": "data file"
+                        }
+                    }
+                ],
+                "name": "vcf-integrity-check",
+                "meta": {
+                    "software_used": [
+                        "f7ac2c5f-9203-49fa-b918-cede02bf46f7"
+                    ],
+                    "analysis_step_types": [
+                        "Check integrity of vcf output file"
+                    ]
+                },
+                "outputs": [
+                    {
+                        "target": [
+                            {
+                                "name": "annotated_vcf-check"
+                            }
+                        ],
+                        "name": "annotated_vcf-check",
+                        "meta": {
+                            "global": true,
+                            "cardinality": "single",
+                            "type": "QC"
+                        }
+                    }
+                ]
+            }
+        ],
+        "aliases": [
+            "cgap:workflow_mutanno-micro-annot-check_v14"
+        ],
+        "app_name": "workflow_mutanno-micro-annot-check",
+        "uuid": "de9c4579-30e2-432c-80e3-7f324d3d7dcb",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "released",
+        "date_created": "2020-07-15T02:37:59.405428+00:00",
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "accession": "GAPP8T9E313F",
+        "cwl_child_filenames": [
+            "mutanno-annot.cwl",
+            "vcf-integrity-check.cwl"
+        ],
+        "version_upgrade_log": "Workflow is now using a single data source file instead of archive",
+        "description": "Run mutanno annot on vcf input file. Produce a micro-annotated vcf file. An integrity check is performed on the output file",
+        "cwl_main_filename": "workflow_mutanno-micro-annot_plus_vcf-integrity-check.cwl",
+        "schema_version": "7",
+        "cwl_directory_url_v1": "https://raw.githubusercontent.com/dbmi-bgm/cgap-pipeline/v14/cwl",
+        "last_modified": {
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+            "date_modified": "2020-07-15T02:41:16.553150+00:00"
+        }
+    },
+    {
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "category": [
+            "processing"
+        ],
+        "arguments": [
+            {
+                "argument_type": "Input file",
                 "workflow_argument_name": "input_rcks",
                 "argument_format": "20d4d3aa-5f1c-4b75-9e25-73f9f370fefa"
             },
@@ -3988,8 +4196,266 @@
             },
             {
                 "argument_type": "Input file",
+                "workflow_argument_name": "BEDfile",
+                "argument_format": "4c04f6de-89a7-4477-8dc4-811b50c67401"
+            },
+            {
+                "argument_type": "Input file",
+                "workflow_argument_name": "bigfile",
+                "argument_format": "f66af4df-c107-44f0-bc94-227f1b4ccf72"
+            },
+            {
+                "argument_type": "Output processed file",
+                "secondary_file_formats": [
+                    "f84f1922-7f4e-4afc-922f-bec620969bf1"
+                ],
+                "argument_format": "1b8f525f-aecb-4211-9ae5-a2c998b05599",
+                "workflow_argument_name": "merged_vcf"
+            },
+            {
+                "qc_table": true,
+                "argument_type": "Output QC file",
+                "argument_to_be_attached_to": "merged_vcf",
+                "workflow_argument_name": "merged_vcf-check",
+                "qc_type": "quality_metric_vcfcheck",
+                "qc_zipped": false,
+                "qc_json": false,
+                "qc_html": false
+            },
+            {
+                "argument_type": "parameter",
+                "workflow_argument_name": "SpliceAI"
+            },
+            {
+                "argument_type": "parameter",
+                "workflow_argument_name": "VEPsep"
+            },
+            {
+                "argument_type": "parameter",
+                "workflow_argument_name": "aftag"
+            },
+            {
+                "argument_type": "parameter",
+                "workflow_argument_name": "afthr"
+            }
+        ],
+        "title": "Run granite to filter and clean input vcf (whiteList, cleanVCF, blackList) plus output integrity-check",
+        "name": "workflow_granite-filtering-check_v14",
+        "app_version": "v14",
+        "docker_registry_url": "https://hub.docker.com/",
+        "docker_image_name": "cgap/cgap:v14",
+        "cwl_pointer": "",
+        "steps": [
+            {
+                "inputs": [
+                    {
+                        "source": [
+                            {
+                                "name": "input_vcf"
+                            }
+                        ],
+                        "name": "input_vcf",
+                        "meta": {
+                            "file_format": "1b8f525f-aecb-4211-9ae5-a2c998b05599",
+                            "global": true,
+                            "cardinality": "single",
+                            "type": "data file"
+                        }
+                    },
+                    {
+                        "source": [
+                            {
+                                "name": "BEDfile"
+                            }
+                        ],
+                        "name": "BEDfile",
+                        "meta": {
+                            "file_format": "4c04f6de-89a7-4477-8dc4-811b50c67401",
+                            "global": true,
+                            "cardinality": "single",
+                            "type": "reference file"
+                        }
+                    },
+                    {
+                        "source": [
+                            {
+                                "name": "bigfile"
+                            }
+                        ],
+                        "name": "bigfile",
+                        "meta": {
+                            "file_format": "f66af4df-c107-44f0-bc94-227f1b4ccf72",
+                            "global": true,
+                            "cardinality": "single",
+                            "type": "reference file"
+                        }
+                    },
+                    {
+                        "source": [
+                            {
+                                "name": "SpliceAI"
+                            }
+                        ],
+                        "name": "SpliceAI",
+                        "meta": {
+                            "global": true,
+                            "cardinality": "single",
+                            "type": "parameter"
+                        }
+                    },
+                    {
+                        "source": [
+                            {
+                                "name": "VEPsep"
+                            }
+                        ],
+                        "name": "VEPsep",
+                        "meta": {
+                            "global": true,
+                            "cardinality": "single",
+                            "type": "parameter"
+                        }
+                    },
+                    {
+                        "source": [
+                            {
+                                "name": "aftag"
+                            }
+                        ],
+                        "name": "aftag",
+                        "meta": {
+                            "global": true,
+                            "cardinality": "single",
+                            "type": "parameter"
+                        }
+                    },
+                    {
+                        "source": [
+                            {
+                                "name": "afthr"
+                            }
+                        ],
+                        "name": "afthr",
+                        "meta": {
+                            "global": true,
+                            "cardinality": "single",
+                            "type": "parameter"
+                        }
+                    }
+                ],
+                "name": "granite",
+                "meta": {
+                    "software_used": [
+                        "5a0b864e-dc16-4484-bcf3-c64e35a25df9"
+                    ],
+                    "analysis_step_types": [
+                        "Run granite whiteList, cleanVCF, blackList"
+                    ]
+                },
+                "outputs": [
+                    {
+                        "target": [
+                            {
+                                "name": "merged_vcf",
+                                "step": "vcf-integrity-check"
+                            }
+                        ],
+                        "name": "merged_vcf",
+                        "meta": {
+                            "file_format": "vcf_gz",
+                            "global": true,
+                            "cardinality": "single",
+                            "type": "data file"
+                        }
+                    }
+                ]
+            },
+            {
+                "inputs": [
+                    {
+                        "source": [
+                            {
+                                "name": "merged_vcf",
+                                "step": "granite"
+                            }
+                        ],
+                        "name": "merged_vcf",
+                        "meta": {
+                            "file_format": "1b8f525f-aecb-4211-9ae5-a2c998b05599",
+                            "global": false,
+                            "cardinality": "single",
+                            "type": "data file"
+                        }
+                    }
+                ],
+                "name": "vcf-integrity-check",
+                "meta": {
+                    "software_used": [
+                        "f7ac2c5f-9203-49fa-b918-cede02bf46f7"
+                    ],
+                    "analysis_step_types": [
+                        "Check integrity of vcf output file"
+                    ]
+                },
+                "outputs": [
+                    {
+                        "target": [
+                            {
+                                "name": "merged_vcf-check"
+                            }
+                        ],
+                        "name": "merged_vcf-check",
+                        "meta": {
+                            "global": true,
+                            "cardinality": "single",
+                            "type": "QC"
+                        }
+                    }
+                ]
+            }
+        ],
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "aliases": [
+            "cgap:workflow_granite-filtering-check_v14"
+        ],
+        "app_name": "workflow_granite-filtering-check",
+        "uuid": "cb85683c-54a6-44e8-820c-1800aec9fdcd",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "released",
+        "date_created": "2020-07-15T02:38:00.338542+00:00",
+        "workflow_language": "CWL",
+        "accession": "GAPG8L8B113P",
+        "cwl_child_filenames": [
+            "granite-whiteList.cwl",
+            "granite-cleanVCF.cwl",
+            "granite-blackList.cwl",
+            "merge-sort-vcf.cwl",
+            "vcf-integrity-check.cwl"
+        ],
+        "cwl_directory_url_v1": "https://raw.githubusercontent.com/dbmi-bgm/cgap-pipeline/v14/cwl",
+        "description": "Filter and clean the input vcf using granite (whiteList, cleanVCF, blackList). An integrity check is performed on the output file",
+        "cwl_main_filename": "workflow_granite-filtering_plus_vcf-integrity-check.cwl",
+        "schema_version": "7",
+        "last_modified": {
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+            "date_modified": "2020-07-15T02:41:17.199459+00:00"
+        }
+    },
+    {
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "category": [
+            "processing"
+        ],
+        "arguments": [
+            {
+                "argument_type": "Input file",
+                "workflow_argument_name": "input_vcf",
+                "argument_format": "1b8f525f-aecb-4211-9ae5-a2c998b05599"
+            },
+            {
+                "argument_type": "Input file",
                 "workflow_argument_name": "mti",
-                "argument_format": "d7fd1020-ae85-41a9-a45d-c66285efa996"
+                "argument_format": "d243d800-96b6-4b0a-a0ff-fc81be438365"
             },
             {
                 "argument_type": "Input file",
@@ -4016,18 +4482,18 @@
             },
             {
                 "argument_type": "parameter",
+                "workflow_argument_name": "blocksize"
+            },
+            {
+                "argument_type": "parameter",
                 "workflow_argument_name": "nthreads"
             }
         ],
         "title": "Run mutanno micro-annot plus output integrity-check",
-        "previous_version": [
-            "04caaa82-6a32-46d3-b52c-c1017cc0490a"
-        ],
-        "name": "workflow_mutanno-micro-annot-check_v14",
-        "workflow_language": "CWL",
-        "app_version": "v14",
+        "name": "workflow_mutanno-micro-annot-check_v13",
+        "app_version": "v13",
         "docker_registry_url": "https://hub.docker.com/",
-        "docker_image_name": "cgap/cgap:v14",
+        "docker_image_name": "cgap/cgap:v13",
         "cwl_pointer": "",
         "steps": [
             {
@@ -4054,7 +4520,7 @@
                         ],
                         "name": "mti",
                         "meta": {
-                            "file_format": "d7fd1020-ae85-41a9-a45d-c66285efa996",
+                            "file_format": "d243d800-96b6-4b0a-a0ff-fc81be438365",
                             "global": true,
                             "cardinality": "single",
                             "type": "reference file"
@@ -4077,6 +4543,19 @@
                     {
                         "source": [
                             {
+                                "name": "blocksize"
+                            }
+                        ],
+                        "name": "blocksize",
+                        "meta": {
+                            "global": true,
+                            "cardinality": "single",
+                            "type": "parameter"
+                        }
+                    },
+                    {
+                        "source": [
+                            {
                                 "name": "nthreads"
                             }
                         ],
@@ -4091,7 +4570,7 @@
                 "name": "annot",
                 "meta": {
                     "software_used": [
-                        "1d28b7b8-1033-492f-8a1a-d4ac5b1ab55e"
+                        "76479248-09d2-48e5-9ab3-94c167e51cc6"
                     ],
                     "analysis_step_types": [
                         "Run mutanno annot"
@@ -4159,28 +4638,28 @@
                 ]
             }
         ],
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
         "aliases": [
-            "cgap:workflow_mutanno-micro-annot-check_v14"
+            "cgap:workflow_mutanno-micro-annot-check_v13"
         ],
         "app_name": "workflow_mutanno-micro-annot-check",
-        "uuid": "de9c4579-30e2-432c-80e3-7f324d3d7dcb",
+        "uuid": "04caaa82-6a32-46d3-b52c-c1017cc0490a",
         "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "status": "released",
-        "date_created": "2020-07-15T02:37:59.405428+00:00",
-        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
-        "accession": "GAPP8T9E313F",
+        "date_created": "2020-07-15T02:38:00.614545+00:00",
+        "workflow_language": "CWL",
+        "accession": "GAPP8T75K13F",
         "cwl_child_filenames": [
             "mutanno-annot.cwl",
             "vcf-integrity-check.cwl"
         ],
-        "version_upgrade_log": "Workflow is now using a single data source file instead of archive",
+        "cwl_directory_url_v1": "https://raw.githubusercontent.com/dbmi-bgm/cgap-pipeline/v13/cwl",
         "description": "Run mutanno annot on vcf input file. Produce a micro-annotated vcf file. An integrity check is performed on the output file",
         "cwl_main_filename": "workflow_mutanno-micro-annot_plus_vcf-integrity-check.cwl",
         "schema_version": "7",
-        "cwl_directory_url_v1": "https://raw.githubusercontent.com/dbmi-bgm/cgap-pipeline/v14/cwl",
         "last_modified": {
             "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-            "date_modified": "2020-07-15T02:41:16.553150+00:00"
+            "date_modified": "2020-07-15T02:41:17.359932+00:00"
         }
     },
     {
@@ -4691,485 +5170,6 @@
         "last_modified": {
             "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
             "date_modified": "2020-07-15T02:41:16.999905+00:00"
-        }
-    },
-    {
-        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
-        "category": [
-            "processing"
-        ],
-        "arguments": [
-            {
-                "argument_type": "Input file",
-                "workflow_argument_name": "input_vcf",
-                "argument_format": "1b8f525f-aecb-4211-9ae5-a2c998b05599"
-            },
-            {
-                "argument_type": "Input file",
-                "workflow_argument_name": "BEDfile",
-                "argument_format": "4c04f6de-89a7-4477-8dc4-811b50c67401"
-            },
-            {
-                "argument_type": "Input file",
-                "workflow_argument_name": "bigfile",
-                "argument_format": "f66af4df-c107-44f0-bc94-227f1b4ccf72"
-            },
-            {
-                "argument_type": "Output processed file",
-                "secondary_file_formats": [
-                    "f84f1922-7f4e-4afc-922f-bec620969bf1"
-                ],
-                "argument_format": "1b8f525f-aecb-4211-9ae5-a2c998b05599",
-                "workflow_argument_name": "merged_vcf"
-            },
-            {
-                "qc_table": true,
-                "argument_type": "Output QC file",
-                "argument_to_be_attached_to": "merged_vcf",
-                "workflow_argument_name": "merged_vcf-check",
-                "qc_type": "quality_metric_vcfcheck",
-                "qc_zipped": false,
-                "qc_json": false,
-                "qc_html": false
-            },
-            {
-                "argument_type": "parameter",
-                "workflow_argument_name": "SpliceAI"
-            },
-            {
-                "argument_type": "parameter",
-                "workflow_argument_name": "VEPsep"
-            },
-            {
-                "argument_type": "parameter",
-                "workflow_argument_name": "aftag"
-            },
-            {
-                "argument_type": "parameter",
-                "workflow_argument_name": "afthr"
-            }
-        ],
-        "title": "Run granite to filter and clean input vcf (whiteList, cleanVCF, blackList) plus output integrity-check",
-        "name": "workflow_granite-filtering-check_v14",
-        "app_version": "v14",
-        "docker_registry_url": "https://hub.docker.com/",
-        "docker_image_name": "cgap/cgap:v14",
-        "cwl_pointer": "",
-        "steps": [
-            {
-                "inputs": [
-                    {
-                        "source": [
-                            {
-                                "name": "input_vcf"
-                            }
-                        ],
-                        "name": "input_vcf",
-                        "meta": {
-                            "file_format": "1b8f525f-aecb-4211-9ae5-a2c998b05599",
-                            "global": true,
-                            "cardinality": "single",
-                            "type": "data file"
-                        }
-                    },
-                    {
-                        "source": [
-                            {
-                                "name": "BEDfile"
-                            }
-                        ],
-                        "name": "BEDfile",
-                        "meta": {
-                            "file_format": "4c04f6de-89a7-4477-8dc4-811b50c67401",
-                            "global": true,
-                            "cardinality": "single",
-                            "type": "reference file"
-                        }
-                    },
-                    {
-                        "source": [
-                            {
-                                "name": "bigfile"
-                            }
-                        ],
-                        "name": "bigfile",
-                        "meta": {
-                            "file_format": "f66af4df-c107-44f0-bc94-227f1b4ccf72",
-                            "global": true,
-                            "cardinality": "single",
-                            "type": "reference file"
-                        }
-                    },
-                    {
-                        "source": [
-                            {
-                                "name": "SpliceAI"
-                            }
-                        ],
-                        "name": "SpliceAI",
-                        "meta": {
-                            "global": true,
-                            "cardinality": "single",
-                            "type": "parameter"
-                        }
-                    },
-                    {
-                        "source": [
-                            {
-                                "name": "VEPsep"
-                            }
-                        ],
-                        "name": "VEPsep",
-                        "meta": {
-                            "global": true,
-                            "cardinality": "single",
-                            "type": "parameter"
-                        }
-                    },
-                    {
-                        "source": [
-                            {
-                                "name": "aftag"
-                            }
-                        ],
-                        "name": "aftag",
-                        "meta": {
-                            "global": true,
-                            "cardinality": "single",
-                            "type": "parameter"
-                        }
-                    },
-                    {
-                        "source": [
-                            {
-                                "name": "afthr"
-                            }
-                        ],
-                        "name": "afthr",
-                        "meta": {
-                            "global": true,
-                            "cardinality": "single",
-                            "type": "parameter"
-                        }
-                    }
-                ],
-                "name": "granite",
-                "meta": {
-                    "software_used": [
-                        "5a0b864e-dc16-4484-bcf3-c64e35a25df9"
-                    ],
-                    "analysis_step_types": [
-                        "Run granite whiteList, cleanVCF, blackList"
-                    ]
-                },
-                "outputs": [
-                    {
-                        "target": [
-                            {
-                                "name": "merged_vcf",
-                                "step": "vcf-integrity-check"
-                            }
-                        ],
-                        "name": "merged_vcf",
-                        "meta": {
-                            "file_format": "vcf_gz",
-                            "global": true,
-                            "cardinality": "single",
-                            "type": "data file"
-                        }
-                    }
-                ]
-            },
-            {
-                "inputs": [
-                    {
-                        "source": [
-                            {
-                                "name": "merged_vcf",
-                                "step": "granite"
-                            }
-                        ],
-                        "name": "merged_vcf",
-                        "meta": {
-                            "file_format": "1b8f525f-aecb-4211-9ae5-a2c998b05599",
-                            "global": false,
-                            "cardinality": "single",
-                            "type": "data file"
-                        }
-                    }
-                ],
-                "name": "vcf-integrity-check",
-                "meta": {
-                    "software_used": [
-                        "f7ac2c5f-9203-49fa-b918-cede02bf46f7"
-                    ],
-                    "analysis_step_types": [
-                        "Check integrity of vcf output file"
-                    ]
-                },
-                "outputs": [
-                    {
-                        "target": [
-                            {
-                                "name": "merged_vcf-check"
-                            }
-                        ],
-                        "name": "merged_vcf-check",
-                        "meta": {
-                            "global": true,
-                            "cardinality": "single",
-                            "type": "QC"
-                        }
-                    }
-                ]
-            }
-        ],
-        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
-        "aliases": [
-            "cgap:workflow_granite-filtering-check_v14"
-        ],
-        "app_name": "workflow_granite-filtering-check",
-        "uuid": "cb85683c-54a6-44e8-820c-1800aec9fdcd",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-        "status": "released",
-        "date_created": "2020-07-15T02:38:00.338542+00:00",
-        "workflow_language": "CWL",
-        "accession": "GAPG8L8B113P",
-        "cwl_child_filenames": [
-            "granite-whiteList.cwl",
-            "granite-cleanVCF.cwl",
-            "granite-blackList.cwl",
-            "merge-sort-vcf.cwl",
-            "vcf-integrity-check.cwl"
-        ],
-        "cwl_directory_url_v1": "https://raw.githubusercontent.com/dbmi-bgm/cgap-pipeline/v14/cwl",
-        "description": "Filter and clean the input vcf using granite (whiteList, cleanVCF, blackList). An integrity check is performed on the output file",
-        "cwl_main_filename": "workflow_granite-filtering_plus_vcf-integrity-check.cwl",
-        "schema_version": "7",
-        "last_modified": {
-            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-            "date_modified": "2020-07-15T02:41:17.199459+00:00"
-        }
-    },
-    {
-        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
-        "category": [
-            "processing"
-        ],
-        "arguments": [
-            {
-                "argument_type": "Input file",
-                "workflow_argument_name": "input_vcf",
-                "argument_format": "1b8f525f-aecb-4211-9ae5-a2c998b05599"
-            },
-            {
-                "argument_type": "Input file",
-                "workflow_argument_name": "mti",
-                "argument_format": "d243d800-96b6-4b0a-a0ff-fc81be438365"
-            },
-            {
-                "argument_type": "Input file",
-                "workflow_argument_name": "regions",
-                "argument_format": "0cd4e777-a596-4927-95c8-b07716121aa3"
-            },
-            {
-                "argument_type": "Output processed file",
-                "secondary_file_formats": [
-                    "f84f1922-7f4e-4afc-922f-bec620969bf1"
-                ],
-                "argument_format": "1b8f525f-aecb-4211-9ae5-a2c998b05599",
-                "workflow_argument_name": "annotated_vcf"
-            },
-            {
-                "qc_table": true,
-                "argument_type": "Output QC file",
-                "argument_to_be_attached_to": "annotated_vcf",
-                "workflow_argument_name": "annotated_vcf-check",
-                "qc_type": "quality_metric_vcfcheck",
-                "qc_zipped": false,
-                "qc_json": false,
-                "qc_html": false
-            },
-            {
-                "argument_type": "parameter",
-                "workflow_argument_name": "blocksize"
-            },
-            {
-                "argument_type": "parameter",
-                "workflow_argument_name": "nthreads"
-            }
-        ],
-        "title": "Run mutanno micro-annot plus output integrity-check",
-        "name": "workflow_mutanno-micro-annot-check_v13",
-        "app_version": "v13",
-        "docker_registry_url": "https://hub.docker.com/",
-        "docker_image_name": "cgap/cgap:v13",
-        "cwl_pointer": "",
-        "steps": [
-            {
-                "inputs": [
-                    {
-                        "source": [
-                            {
-                                "name": "input_vcf"
-                            }
-                        ],
-                        "name": "input_vcf",
-                        "meta": {
-                            "file_format": "1b8f525f-aecb-4211-9ae5-a2c998b05599",
-                            "global": true,
-                            "cardinality": "single",
-                            "type": "data file"
-                        }
-                    },
-                    {
-                        "source": [
-                            {
-                                "name": "mti"
-                            }
-                        ],
-                        "name": "mti",
-                        "meta": {
-                            "file_format": "d243d800-96b6-4b0a-a0ff-fc81be438365",
-                            "global": true,
-                            "cardinality": "single",
-                            "type": "reference file"
-                        }
-                    },
-                    {
-                        "source": [
-                            {
-                                "name": "regions"
-                            }
-                        ],
-                        "name": "regions",
-                        "meta": {
-                            "file_format": "0cd4e777-a596-4927-95c8-b07716121aa3",
-                            "global": true,
-                            "cardinality": "single",
-                            "type": "reference file"
-                        }
-                    },
-                    {
-                        "source": [
-                            {
-                                "name": "blocksize"
-                            }
-                        ],
-                        "name": "blocksize",
-                        "meta": {
-                            "global": true,
-                            "cardinality": "single",
-                            "type": "parameter"
-                        }
-                    },
-                    {
-                        "source": [
-                            {
-                                "name": "nthreads"
-                            }
-                        ],
-                        "name": "nthreads",
-                        "meta": {
-                            "global": true,
-                            "cardinality": "single",
-                            "type": "parameter"
-                        }
-                    }
-                ],
-                "name": "annot",
-                "meta": {
-                    "software_used": [
-                        "76479248-09d2-48e5-9ab3-94c167e51cc6"
-                    ],
-                    "analysis_step_types": [
-                        "Run mutanno annot"
-                    ]
-                },
-                "outputs": [
-                    {
-                        "target": [
-                            {
-                                "name": "annotated_vcf",
-                                "step": "vcf-integrity-check"
-                            }
-                        ],
-                        "name": "annotated_vcf",
-                        "meta": {
-                            "file_format": "vcf_gz",
-                            "global": true,
-                            "cardinality": "single",
-                            "type": "data file"
-                        }
-                    }
-                ]
-            },
-            {
-                "inputs": [
-                    {
-                        "source": [
-                            {
-                                "name": "annotated_vcf",
-                                "step": "annot"
-                            }
-                        ],
-                        "name": "annotated_vcf",
-                        "meta": {
-                            "file_format": "1b8f525f-aecb-4211-9ae5-a2c998b05599",
-                            "global": false,
-                            "cardinality": "single",
-                            "type": "data file"
-                        }
-                    }
-                ],
-                "name": "vcf-integrity-check",
-                "meta": {
-                    "software_used": [
-                        "f7ac2c5f-9203-49fa-b918-cede02bf46f7"
-                    ],
-                    "analysis_step_types": [
-                        "Check integrity of vcf output file"
-                    ]
-                },
-                "outputs": [
-                    {
-                        "target": [
-                            {
-                                "name": "annotated_vcf-check"
-                            }
-                        ],
-                        "name": "annotated_vcf-check",
-                        "meta": {
-                            "global": true,
-                            "cardinality": "single",
-                            "type": "QC"
-                        }
-                    }
-                ]
-            }
-        ],
-        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
-        "aliases": [
-            "cgap:workflow_mutanno-micro-annot-check_v13"
-        ],
-        "app_name": "workflow_mutanno-micro-annot-check",
-        "uuid": "04caaa82-6a32-46d3-b52c-c1017cc0490a",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-        "status": "released",
-        "date_created": "2020-07-15T02:38:00.614545+00:00",
-        "workflow_language": "CWL",
-        "accession": "GAPP8T75K13F",
-        "cwl_child_filenames": [
-            "mutanno-annot.cwl",
-            "vcf-integrity-check.cwl"
-        ],
-        "cwl_directory_url_v1": "https://raw.githubusercontent.com/dbmi-bgm/cgap-pipeline/v13/cwl",
-        "description": "Run mutanno annot on vcf input file. Produce a micro-annotated vcf file. An integrity check is performed on the output file",
-        "cwl_main_filename": "workflow_mutanno-micro-annot_plus_vcf-integrity-check.cwl",
-        "schema_version": "7",
-        "last_modified": {
-            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-            "date_modified": "2020-07-15T02:41:17.359932+00:00"
         }
     }
 ]

@@ -2,6 +2,21 @@
     {
         "status": "released",
         "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
+        "date_created": "2020-07-15T23:38:48.016449+00:00",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "uuid": "c620e937-2294-4321-982c-4897aa2ba721",
+        "schema_version": "1",
+        "accession": "GAPREPV84RJG",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "description": "Report for proband of Platinum family single",
+        "last_modified": {
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+            "date_modified": "2020-07-15T23:38:48.034589+00:00"
+        }
+    },
+    {
+        "status": "released",
+        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
         "date_created": "2020-07-15T02:38:06.533666+00:00",
         "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "uuid": "8dd51b60-2d65-4e74-ac86-08ff9159aaaa",

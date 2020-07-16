@@ -106,6 +106,41 @@
         "institution": "84ac37a8-c135-4c95-86cb-93028399d37e"
     },
     {
+        "status": "uploaded",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "filename": "GAPFIRHN9YOZ.vcf.gz",
+        "md5sum": "b7927656b9eb604b47484ffb9fa07b9e",
+        "submitted_by": "b041dba8-e2b2-4e54-a621-97edb508a0c4",
+        "extra_files": [
+            {
+                "status": "uploaded",
+                "upload_key": "3ffb69af-bd41-4dfe-ba90-686aa765b025/GAPFIRHN9YOZ.vcf.gz.tbi",
+                "filename": "GAPFIRHN9YOZ",
+                "md5sum": "a48d7df8438566683a8cc0df5aa049e0",
+                "href": "/files-processed/GAPFIRHN9YOZ/@@download/GAPFIRHN9YOZ.vcf.gz.tbi",
+                "file_format": "f84f1922-7f4e-4afc-922f-bec620969bf1",
+                "accession": "GAPFIRHN9YOZ",
+                "file_size": 30617,
+                "uuid": "3ffb69af-bd41-4dfe-ba90-686aa765b025"
+            }
+        ],
+        "file_classification": "processed file",
+        "accession": "GAPFIRHN9YOZ",
+        "genome_assembly": "GRCh38",
+        "file_format": "1b8f525f-aecb-4211-9ae5-a2c998b05599",
+        "date_created": "2020-06-26T18:16:26.085431+00:00",
+        "quality_metric": "4b96fb95-cb0d-44f5-83d9-8d8f39e9c73a",
+        "last_modified": {
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+            "date_modified": "2020-07-16T00:20:26.346012+00:00"
+        },
+        "schema_version": "3",
+        "file_size": 1975849,
+        "source_samples": [],
+        "uuid": "3ffb69af-bd41-4dfe-ba90-686aa765b025",
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989"
+    },
+    {
         "status": "released",
         "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
         "md5sum": "666e24391f38e5ad4a77fb3f9d3908d2",
@@ -566,6 +601,40 @@
         }
     },
     {
+        "status": "uploaded",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "md5sum": "11afa00ea8be1d40c03e5940e88934c8",
+        "submitted_by": "b041dba8-e2b2-4e54-a621-97edb508a0c4",
+        "extra_files": [
+            {
+                "status": "uploaded",
+                "upload_key": "35035a19-6af3-41c7-acfa-021bd71c2f7e/GAPFIT75W5KW.vcf.gz.tbi",
+                "filename": "GAPFIT75W5KW",
+                "md5sum": "8ac3e1b57d12a33eeef3355d496e5cc8",
+                "href": "/files-processed/GAPFIT75W5KW/@@download/GAPFIT75W5KW.vcf.gz.tbi",
+                "file_format": "f84f1922-7f4e-4afc-922f-bec620969bf1",
+                "accession": "GAPFIT75W5KW",
+                "file_size": 30209,
+                "uuid": "35035a19-6af3-41c7-acfa-021bd71c2f7e"
+            }
+        ],
+        "file_classification": "processed file",
+        "accession": "GAPFIT75W5KW",
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "file_format": "1b8f525f-aecb-4211-9ae5-a2c998b05599",
+        "date_created": "2020-06-18T17:46:25.643523+00:00",
+        "quality_metric": "432a1603-d452-4112-9e2e-446ae840fa19",
+        "schema_version": "3",
+        "file_size": 244226,
+        "source_samples": [],
+        "genome_assembly": "GRCh38",
+        "uuid": "35035a19-6af3-41c7-acfa-021bd71c2f7e",
+        "last_modified": {
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+            "date_modified": "2020-07-16T00:05:03.292125+00:00"
+        }
+    },
+    {
         "status": "released",
         "project": "f01ff5be-a72d-43bd-afcf-174fa9dcd282",
         "md5sum": "d5777824ade2c34cc3f3893498bc322e",
@@ -724,6 +793,40 @@
         "source_samples": [],
         "file_type": "intermediate file",
         "institution": "84ac37a8-c135-4c95-86cb-93028399d37e"
+    },
+    {
+        "status": "uploaded",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "md5sum": "1abbe41cfa9a404c43ee5a8a2525c364",
+        "submitted_by": "b041dba8-e2b2-4e54-a621-97edb508a0c4",
+        "extra_files": [
+            {
+                "status": "uploaded",
+                "upload_key": "c3e51fa9-ee3f-4dd4-8264-5b96a91ced2b/GAPFIS6URTPJ.vcf.gz.tbi",
+                "filename": "GAPFIS6URTPJ",
+                "md5sum": "41e5779ac20cf0a9e366248c800e2330",
+                "href": "/files-processed/GAPFIS6URTPJ/@@download/GAPFIS6URTPJ.vcf.gz.tbi",
+                "file_format": "f84f1922-7f4e-4afc-922f-bec620969bf1",
+                "accession": "GAPFIS6URTPJ",
+                "file_size": 1630968,
+                "uuid": "c3e51fa9-ee3f-4dd4-8264-5b96a91ced2b"
+            }
+        ],
+        "file_classification": "processed file",
+        "accession": "GAPFIS6URTPJ",
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "file_format": "1b8f525f-aecb-4211-9ae5-a2c998b05599",
+        "date_created": "2020-06-12T14:48:15.489706+00:00",
+        "quality_metric": "a66a2390-bae0-41b4-945a-f1990aff3a8e",
+        "schema_version": "3",
+        "file_size": 202218543,
+        "source_samples": [],
+        "genome_assembly": "GRCh38",
+        "uuid": "c3e51fa9-ee3f-4dd4-8264-5b96a91ced2b",
+        "last_modified": {
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+            "date_modified": "2020-07-16T00:05:03.910332+00:00"
+        }
     },
     {
         "status": "released",
@@ -1175,6 +1278,40 @@
         }
     },
     {
+        "status": "uploaded",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "md5sum": "6de804e5f0bd596db4948d64db75e416",
+        "submitted_by": "b041dba8-e2b2-4e54-a621-97edb508a0c4",
+        "extra_files": [
+            {
+                "status": "uploaded",
+                "upload_key": "227a03fc-1a45-4990-9882-ec7aa9717173/GAPFI1B9VBVM.vcf.gz.tbi",
+                "filename": "GAPFI1B9VBVM",
+                "md5sum": "cb9ce0061a22587f543f54be0df4976a",
+                "href": "/files-processed/GAPFI1B9VBVM/@@download/GAPFI1B9VBVM.vcf.gz.tbi",
+                "file_format": "f84f1922-7f4e-4afc-922f-bec620969bf1",
+                "accession": "GAPFI1B9VBVM",
+                "file_size": 30184,
+                "uuid": "227a03fc-1a45-4990-9882-ec7aa9717173"
+            }
+        ],
+        "file_classification": "processed file",
+        "accession": "GAPFI1B9VBVM",
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "file_format": "1b8f525f-aecb-4211-9ae5-a2c998b05599",
+        "date_created": "2020-06-18T01:37:24.202939+00:00",
+        "quality_metric": "63d1dd62-492b-4687-8122-8774c651a701",
+        "schema_version": "3",
+        "file_size": 231563,
+        "source_samples": [],
+        "genome_assembly": "GRCh38",
+        "uuid": "227a03fc-1a45-4990-9882-ec7aa9717173",
+        "last_modified": {
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+            "date_modified": "2020-07-16T00:05:03.518054+00:00"
+        }
+    },
+    {
         "status": "released",
         "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
         "md5sum": "584e99bfa282f9c3c9f1daabfcad14de",
@@ -1334,6 +1471,40 @@
         "source_samples": [],
         "file_type": "intermediate file",
         "institution": "84ac37a8-c135-4c95-86cb-93028399d37e"
+    },
+    {
+        "status": "uploaded",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "md5sum": "142a1619d8c9d93eed9707d9d1ef7704",
+        "submitted_by": "b041dba8-e2b2-4e54-a621-97edb508a0c4",
+        "extra_files": [
+            {
+                "status": "uploaded",
+                "upload_key": "5f8beaf4-9571-44ee-bb61-4b68a0062f9e/GAPFINOPV5EP.vcf.gz.tbi",
+                "filename": "GAPFINOPV5EP",
+                "md5sum": "5debc9a1ad7391e3ada84620f4e25473",
+                "href": "/files-processed/GAPFINOPV5EP/@@download/GAPFINOPV5EP.vcf.gz.tbi",
+                "file_format": "f84f1922-7f4e-4afc-922f-bec620969bf1",
+                "accession": "GAPFINOPV5EP",
+                "file_size": 1735632,
+                "uuid": "5f8beaf4-9571-44ee-bb61-4b68a0062f9e"
+            }
+        ],
+        "file_classification": "processed file",
+        "accession": "GAPFINOPV5EP",
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "file_format": "1b8f525f-aecb-4211-9ae5-a2c998b05599",
+        "date_created": "2020-06-16T19:55:15.985316+00:00",
+        "quality_metric": "a66688c5-aea7-47c3-9897-33cc3040697e",
+        "schema_version": "3",
+        "file_size": 293321614,
+        "source_samples": [],
+        "genome_assembly": "GRCh38",
+        "uuid": "5f8beaf4-9571-44ee-bb61-4b68a0062f9e",
+        "last_modified": {
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+            "date_modified": "2020-07-16T00:05:03.732697+00:00"
+        }
     },
     {
         "status": "released",
@@ -1592,6 +1763,30 @@
     {
         "status": "released",
         "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
+        "md5sum": "00ffe8369c83fcad7a3c6888e2b7ef14",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "file_classification": "processed file",
+        "accession": "GAPFI19F1RAG",
+        "genome_assembly": "GRCh38",
+        "file_format": "f66af4df-c107-44f0-bc94-227f1b4ccf72",
+        "content_md5sum": "00ffe8369c83fcad7a3c6888e2b7ef14",
+        "description": "big test file, from 20 unrelated rck files with MQ = 0 and BQ = 0, 2 reads in 2 unrelated",
+        "date_created": "2020-07-15T02:39:19.399165+00:00",
+        "schema_version": "3",
+        "last_modified": {
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+            "date_modified": "2020-07-15T02:43:21.054548+00:00"
+        },
+        "file_size": 1158138156,
+        "aliases": [
+            "hms-dbmi:big_test_00_2_2"
+        ],
+        "uuid": "20004873-b672-4d84-a7c1-7fd5c0407519",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e"
+    },
+    {
+        "status": "released",
+        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
         "md5sum": "b4dfc1ae5716a6ba41a2ef3cf845206c",
         "file_size": 3527,
         "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
@@ -1742,29 +1937,5 @@
             "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
             "date_modified": "2020-07-15T02:43:20.811227+00:00"
         }
-    },
-    {
-        "status": "released",
-        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
-        "md5sum": "00ffe8369c83fcad7a3c6888e2b7ef14",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-        "file_classification": "processed file",
-        "accession": "GAPFI19F1RAG",
-        "genome_assembly": "GRCh38",
-        "file_format": "f66af4df-c107-44f0-bc94-227f1b4ccf72",
-        "content_md5sum": "00ffe8369c83fcad7a3c6888e2b7ef14",
-        "description": "big test file, from 20 unrelated rck files with MQ = 0 and BQ = 0, 2 reads in 2 unrelated",
-        "date_created": "2020-07-15T02:39:19.399165+00:00",
-        "schema_version": "3",
-        "last_modified": {
-            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-            "date_modified": "2020-07-15T02:43:21.054548+00:00"
-        },
-        "file_size": 1158138156,
-        "aliases": [
-            "hms-dbmi:big_test_00_2_2"
-        ],
-        "uuid": "20004873-b672-4d84-a7c1-7fd5c0407519",
-        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e"
     }
 ]

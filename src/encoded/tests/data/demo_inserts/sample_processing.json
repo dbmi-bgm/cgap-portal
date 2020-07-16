@@ -61,6 +61,35 @@
     },
     {
         "status": "released",
+        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "processed_files": [
+            "3ffb69af-bd41-4dfe-ba90-686aa765b025"
+        ],
+        "date_created": "2020-07-15T23:26:00.465294+00:00",
+        "analysis_type": "WGS",
+        "families": [
+            "21f2af73-2c2e-4101-bbfb-bb2754f302ad"
+        ],
+        "completed_processes": [
+            "WGS PartIII V14"
+        ],
+        "samples": [
+            "b26ea811-8430-45aa-9cf0-b365e3024b70"
+        ],
+        "schema_version": "1",
+        "aliases": [
+            "cgap:msa_GAPSAT5GKNCF"
+        ],
+        "uuid": "7067a6de-b212-4355-9b0a-487952e75a5b",
+        "last_modified": {
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+            "date_modified": "2020-07-16T00:21:51.920477+00:00"
+        }
+    },
+    {
+        "status": "released",
         "project": "f01ff5be-a72d-43bd-afcf-174fa9dcd282",
         "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
         "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
