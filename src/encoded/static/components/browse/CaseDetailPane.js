@@ -196,11 +196,14 @@ export class FamilyReportStackedTable extends React.PureComponent {
         this.renderIndividualBlockList = this.renderIndividualBlockList.bind(this);
     }
 
-    renderSampleBlock(sample, reportBlocks = null){
-        const { result } = this.props;
+    renderSampleBlock(sample, reportBlockMapping = null){
+        const { result, family } = this.props;
+        const { analysis_groups: analysisGroups = [] } = family || {};
         const { sample_processing = {} } = result;
         const { '@id': atId = null, workup_type = "-", display_title = null, accession = null } = sample;
         const { samples = [], completed_processes = [] } = sample_processing;
+
+        console.log("analysis_groups", analysisGroups);
 
         let blockValue = '-';
         samples.forEach((thisSample) => {
@@ -208,7 +211,6 @@ export class FamilyReportStackedTable extends React.PureComponent {
                 blockValue = completed_processes;
             }
         });
-
 
         return (
             <StackedBlock columnClass="libraries" hideNameOnHover={false} key={atId} id={atId}
@@ -219,16 +221,29 @@ export class FamilyReportStackedTable extends React.PureComponent {
                     </span>
                 </StackedBlockName>
                 <StackedBlockList className="analysis" title="Analysis">
-                    <StackedBlock columnClass="analysis" hideNameOnHover={false}
-                        label={<StackedBlockNameLabel title={null} subtitle={null} accession={null} subtitleVisible/>}>
-                        <StackedBlockName>
-                            <span className="name-title">{ blockValue }</span>
-                        </StackedBlockName>
-                        {/* Temporary empty report block - need to update with link to report later */}
-                        <StackedBlockList className="report" title="Report">
-                            { reportBlocks.length > 0 ? <StackedBlockList className="report" title="Report">{reportBlocks}</StackedBlockList> : FamilyReportStackedTable.renderEmptyBlock("report") }
-                        </StackedBlockList>
-                    </StackedBlock>
+                    {analysisGroups.map((group) => {
+                        const { analysis_type = null, samples = [] } = group || {};
+                        let reportBlocks = [];
+                        samples.forEach((sample) => {
+                            if (sample['@id'] === atId) {
+                                console.log("atId, sample['@id]", atId, sample['@id']);
+                                reportBlocks = reportBlockMapping[atId];
+                            }
+                        });
+
+                        return (
+                            <StackedBlock key={analysis_type} columnClass="analysis" hideNameOnHover={false}
+                                label={<StackedBlockNameLabel title={null} subtitle={null} accession={null} subtitleVisible/>}>
+                                <StackedBlockName>
+                                    <span className="name-title">{ analysis_type }</span>
+                                </StackedBlockName>
+                                {/* Temporary empty report block - need to update with link to report later */}
+                                <StackedBlockList className="report" title="Report">
+                                    { reportBlocks.length > 0 ? <StackedBlockList className="report" title="Report">{reportBlocks}</StackedBlockList> : FamilyReportStackedTable.renderEmptyBlock("report") }
+                                </StackedBlockList>
+                            </StackedBlock>);
+                    }
+                    )}
                 </StackedBlockList>
             </StackedBlock>
         );
@@ -236,7 +251,8 @@ export class FamilyReportStackedTable extends React.PureComponent {
 
     renderIndividualBlock(individual, role) {
         // Break out useful values from result; used in determining whether the passed in individual === the result case individual
-        const { result = null } = this.props;
+        const { result = null, family = null } = this.props;
+        const { analysis_groups: analysisGroups = [] } = family || {};
         const { "@id": resultCaseAtId = null, individual: resultIndividual = null, report: resultReport = null, sample: resultSample = null } = result || {};
         const { "@id": resultIndvAtId = null } = resultIndividual || {};
         const { "@id": resultReportAtId = null } = resultReport || {};
@@ -257,7 +273,6 @@ export class FamilyReportStackedTable extends React.PureComponent {
             const { '@id': sampleAtId = null, accession: sampleAccession = null } = sample || {};
             const { '@id' : reportAtId = null, display_title : reportTitle = null, accession: reportAccession = null } = report || {};
 
-            // const isResultCase = caseAtId === resultCaseAtId;
 
             if (sampleAtId) {
                 const thisReportBlock = (
@@ -268,6 +283,20 @@ export class FamilyReportStackedTable extends React.PureComponent {
                             { reportAtId ? <a href={reportAtId} className="name-title text-capitalize">{ reportTitle }</a> : <span className="name-title text-capitalize">{ reportTitle }</span>}
                         </StackedBlockName>
                     </StackedBlock>);
+
+                // // Figure out what analysis group this report block should appear for
+                // const analysisGrouping = {};
+                // // Search each analysis group for one with the current case to use as title
+                // analysisGroups.forEach((analysisGroup) => {
+                //     const { cases: casesInAnalysisGroup = [], analysis_type = null } = analysisGroup || {};
+                //     casesInAnalysisGroup.forEach((agCase) => {
+                //         const { '@id': agCaseAtId } = agCase || {};
+                //         if (agCaseAtId === caseAtId) {
+                //             analysisGrouping.analysisType = analysis_type;
+                //             if ()
+                //         }
+                //     });
+                // });
 
                 if (sampleToCaseReportBlockMap[sampleAtId] === undefined) {
                     sampleToCaseReportBlockMap[sampleAtId] = [thisReportBlock];
@@ -287,12 +316,7 @@ export class FamilyReportStackedTable extends React.PureComponent {
                     { atId ? <a href={atId} className="name-title text-capitalize">{ role || display_title }</a> : <span className="name-title text-capitalize">{ role || display_title }</span>}
                 </StackedBlockName>
                 <StackedBlockList className="libraries" title="Libraries">
-                    { indvSamples.map((thisSample) =>
-                    {
-                        const { '@id' : thisSampleAtId } = thisSample || {};
-                        const reportBlocks = sampleToCaseReportBlockMap[thisSampleAtId];
-                        return this.renderSampleBlock(thisSample, reportBlocks);
-                    })}
+                    { indvSamples.map((thisSample) => this.renderSampleBlock(thisSample, sampleToCaseReportBlockMap))}
                 </StackedBlockList>
             </StackedBlock>
         );
@@ -505,8 +529,10 @@ export class FamilyAccessionStackedTable extends React.PureComponent {
     }
 
     renderIndividualBlock(individual, role, familyId, sex) {
-        // Break out useful values from result; used in determining whether the passed in individual === the result case individual
-        const { result = null } = this.props;
+        // Break out useful values from result and family; used in determining whether the passed in individual === the result case individual
+        const { result = null, family = null } = this.props;
+        const { analysis_groups: analysisGroups = [] } = family || {};
+
         const { "@id": resultCaseAtId = null, individual: resultIndividual = null, report: resultReport = null, sample: resultSample = null } = result || {};
         const { "@id": resultIndvAtId = null } = resultIndividual || {};
         const { "@id": resultReportAtId = null } = resultReport || {};
@@ -529,6 +555,19 @@ export class FamilyAccessionStackedTable extends React.PureComponent {
 
             const isResultCase = caseAtId === resultCaseAtId;
 
+            let analysisType = 'N/A';
+
+            // Search each analysis group for one with the current case to use as title
+            analysisGroups.forEach((analysisGroup) => {
+                const { cases: casesInAnalysisGroup = [], analysis_type = null } = analysisGroup || {};
+                casesInAnalysisGroup.forEach((agCase) => {
+                    const { '@id': agCaseAtId } = agCase || {};
+                    if (agCaseAtId === caseAtId) {
+                        analysisType = analysis_type;
+                    }
+                });
+            });
+
             if (sampleAtId) {
                 const thisReportBlock = (
                     <StackedBlock columnClass="report" hideNameOnHover={false} key={reportAtId} id={reportAtId}>
@@ -536,12 +575,18 @@ export class FamilyAccessionStackedTable extends React.PureComponent {
                             <div className="d-flex">
                                 { reportAtId ?
                                     <a href={reportAtId} className={"name-title p-1" + (isResultCase ? " current-case": "")}>
-                                        { reportTitle || "N/A" }
-                                    </a> : <span className={"name-title p-1" + (isResultCase ? " current-case": "")}>{ reportTitle || "N/A" }</span>}
+                                        { analysisType }
+                                    </a> : <span className={"name-title p-1" + (isResultCase ? " current-case": "")}>{ analysisType }</span>}
                             </div>
                             <div className="w-100" style={{ maxWidth: "70%" }}>
                                 <table className="accession-table w-100">
                                     <tbody>
+                                        { reportAtId ?
+                                            <tr>
+                                                <td className="accession-table-title">Report ID</td>
+                                                <td>{reportAccession}</td>
+                                            </tr>
+                                            : null}
                                         { caseAtId ?
                                             <tr>
                                                 <td className="accession-table-title">Case ID</td>
