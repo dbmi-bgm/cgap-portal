@@ -51,8 +51,8 @@ export const CaseStats = React.memo(function CaseStats(props){
                     </StatDrop>
                 </div>
                 <div className="col-md-6">
-                    <StatDrop title="Family Phenotypic Features" {...{ className }}>
-                        <PhenotypicFeatures {...family} />
+                    <StatDrop title="Phenotypic Features" {...{ className }}>
+                        <PhenotypicFeatures {...props} />
                     </StatDrop>
                 </div>
             </div>
@@ -75,7 +75,7 @@ export const StatDrop = React.memo(function StatDrop(props){
     return (
         <div className={cls + " mb-2"}>
             <h4 className="clickable card-header mt-0 text-600" onClick={toggleOpen}>
-                <i className="icon icon-plus fas mr-2"></i>
+                <i className={"icon fas mr-2" + (open ? " icon-minus" : " icon-plus")} ></i>
                 { title } <span className="text-300">{ subtitle || null }</span>
             </h4>
             <Collapse in={open}>
@@ -101,7 +101,10 @@ export const PatientInfo = React.memo(function PatientInfo(props = null) {
         status = null,
         date_created = null,
         life_status = null,
-        phenotypic_features = []
+        phenotypic_features = [],
+        individual_id = null,
+        display_title = null,
+        aliases = null
     } = individual || {};
 
     return (
@@ -125,7 +128,10 @@ export const PatientInfo = React.memo(function PatientInfo(props = null) {
             </div>
             <div className="col-md-6">
                 <div className="card-text mb-1">
-                    <label className="mb-0">Phenotypic Features:</label> {mapFeaturesToBadges(phenotypic_features)}
+                    <label className="mb-0">Individual Title:</label> {individual_id || display_title}
+                </div>
+                <div className="card-text mb-1">
+                    <label className="mb-0">Aliases:</label> {aliases || "N/A"}
                 </div>
             </div>
         </div>
@@ -134,10 +140,13 @@ export const PatientInfo = React.memo(function PatientInfo(props = null) {
 
 
 export const PhenotypicFeatures = React.memo(function PhenotypicFeatures(props = null) {
-    const { family = null } = props || {};
-    const { family_phenotypic_features: familyFeatures = [] } = family || {};
-    const renderedPhenotypicFeatures = mapFeaturesToBadges(familyFeatures);
-    return renderedPhenotypicFeatures;
+    const {
+        caseItem = null
+    } = props || {};
+    const { individual = null } = caseItem || {};
+    const { phenotypic_features = [] } = individual || {};
+
+    return mapFeaturesToBadges(phenotypic_features);
 });
 
 
@@ -145,10 +154,16 @@ export const FamilyInfo = React.memo(function FamilyInfo(props = null) {
     const {
         family = null
     } = props || {};
-    const { display_title : family_display_title = null, title: family_title= null, cohort = null, project = null } = family || {};
+    const {
+        display_title : family_display_title = null,
+        title: family_title= null,
+        family_phenotypic_features: familyFeatures = [],
+        cohort = null,
+        project = null
+    } = family || {};
     const { display_title: project_title } = project || {};
 
-    console.log("family props", family);
+    const renderedPhenotypicFeatures = mapFeaturesToBadges(familyFeatures);
 
     return (
         <>
@@ -160,6 +175,9 @@ export const FamilyInfo = React.memo(function FamilyInfo(props = null) {
             </div>
             <div className="card-text mb-1">
                 <label className="mb-0">Project:</label> { project_title || "N/A" }
+            </div>
+            <div className="card-text mb-1">
+                <label className="mb-0">Family Phenotypic Features: </label> {renderedPhenotypicFeatures}
             </div>
         </>);
 });
