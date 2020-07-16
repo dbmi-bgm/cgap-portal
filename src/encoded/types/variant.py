@@ -192,8 +192,8 @@ class VariantSample(Item):
     })
     def bam_snapshot(self, request, file, variant):
         variant_props = get_item_or_none(request, variant, 'Variant')
-        file_path = '%s/%s/chr%s:%s.png' % (  # file = accession of associated VCF file
-            file, 'bamsnap', variant_props['CHROM'], variant_props['POS']
+        file_path = '%s/bamsnap/chr%s:%s.png' % (  # file = accession of associated VCF file
+            file, variant_props['CHROM'], variant_props['POS']
         )
         return file_path
 
@@ -224,4 +224,4 @@ def download(context, request):
         }
 
     # 307 redirect specifies to keep original method
-    raise HTTPTemporaryRedirect(location=location)
+    raise HTTPTemporaryRedirect(location=location)  # 307

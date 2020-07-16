@@ -3,6 +3,7 @@ import vcf
 import json
 import argparse
 import logging
+import itertools
 from pyramid.paster import get_app
 from dcicutils.misc_utils import VirtualApp
 from collections import OrderedDict
@@ -33,6 +34,8 @@ class VCFParser(object):
         '%7C': '|',
         '%3B': ';'
     }
+    MUTANNO = 'MUTANNO'  # annotation field from MUTANNO
+    GRANITE = 'GRANITE'  # annotation field from GRANITE
     VARIANT_SAMPLE_SUBEMBEDDED = ['SAMPLEGENO']
     VCF_FIELDS = ['CHROM', 'POS', 'ID', 'REF', 'ALT']
     VCF_SAMPLE_FIELDS = ['FILTER', 'QUAL']
@@ -78,9 +81,8 @@ class VCFParser(object):
         return self.reader
 
     def read_vcf_metadata(self):
-        """ Parses VCF file meta data to get annotation fields under MUTANNO
-        """
-        for field in self.reader.metadata['MUTANNO']:
+        """ Parses VCF file meta data to get annotation fields under MUTANNO/GRANITE """
+        for field in itertools.chain(self.reader.metadata[self.MUTANNO], self.reader.metadata[self.GRANITE]):
             self.annotation_keys[field['ID']] = True
 
     def _strip(self, s):
