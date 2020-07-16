@@ -203,14 +203,16 @@ export const columnExtensionMap = {
                 display_title = null,
                 accession = null,
                 status = null,
-                date_created = null
+                date_created = null,
+                individual_id = null
             } = individual;
 
+            const title = individual_id ? individual_id : display_title;
             // May appear in other non-Case results, where advanced column will look strange, so check and use default rendering otherwise
             if (itemTypeList[0] === "Case") {
                 return (
                     <a href={atId} className="adv-block-link">
-                        { renderAdvancedColumn(<span className="accession">{ accession }</span>, status, display_title, "Accessioned:", date_created) }
+                        { renderAdvancedColumn(<span className="accession">{ accession }</span>, status, title, "Accessioned:", date_created) }
                     </a>
                 );
             }
