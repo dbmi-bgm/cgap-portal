@@ -181,6 +181,34 @@ def test_fetch_sample_metadata_sp(row_dict, empty_items):
     assert items_out['individual']['test-proj:indiv1']['samples'] == ['test-proj:samp1']
 
 
+def test_fetch_file_metadata_valid():
+    results = fetch_file_metadata(['f1.fastq.gz', 'f2.cram', 'f3.vcf.gz'], 'test-proj')
+    assert 'test-proj:f1.fastq.gz' in results['file_fastq']
+    assert results['file_fastq']['test-proj:f1.fastq.gz']['file_format'] == '/file-formats/fastq/'
+    assert results['file_fastq']['test-proj:f1.fastq.gz']['file_type'] == 'reads'
+    assert 'test-proj:f2.cram' in results['file_processed']
+    assert 'test-proj:f3.vcf.gz' in results['file_processed']
+    assert not results['errors']
+
+
+def test_fetch_file_metadata_uncompressed():
+    results = fetch_file_metadata(['f1.fastq', 'f2.cram', 'f3.vcf'], 'test-proj')
+    assert not results['file_fastq']
+    assert 'test-proj:f2.cram' in results['file_processed']
+    assert 'test-proj:f3.vcf' not in results['file_processed']
+    assert len(results['errors']) == 2
+    assert all('File must be compressed' in error for error in results['errors'])
+
+
+def test_fetch_file_metadata_invalid():
+    results = fetch_file_metadata(['f3.gvcf.gz'], 'test-proj')
+    assert all(not results[key] for key in ['file_fastq', 'file_processed'])
+    assert results['errors'] == [
+        'File extension on f3.gvcf.gz not supported - '
+        'expecting one of: .fastq.gz, .fq.gz, .cram, .vcf.gz'
+    ]
+
+
 def test_xls_to_json(project, institution):
     json_out = xls_to_json('src/encoded/tests/data/documents/cgap_submit_test.xlsx', project, institution)
     assert len(json_out['family']) == 1
