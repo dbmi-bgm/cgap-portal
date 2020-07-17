@@ -7,7 +7,7 @@ from encoded.tests.variant_fixtures import ANNOTATION_FIELD_URL
 
 # XXX: These constants should probably be handled in a more intelligent way -will
 pytestmark = [pytest.mark.working, pytest.mark.ingestion]
-MT_LOC = resolve_file_path('annotations/variant_table_v0.4.6.csv')
+MT_LOC = resolve_file_path('annotations/variant_table_v0.4.7.csv')
 ANNOTATION_FIELD_SCHEMA = resolve_file_path('schemas/annotation_field.json')
 EXPECTED_FIELDS = ['no', 'field_name', 'source_name', 'source_version', 'sub_embedding_group',
                    'field_type', 'is_list',
@@ -27,10 +27,10 @@ EXPECTED_INSERT = {'no': 1, 'field_name': 'CHROM', 'schema_title': 'Chromosome',
 VEP_CONSEQUENCE_EMBEDS = ['transcript.vep_consequence.var_conseq_id', 'transcript.vep_consequence.definition',
                           'transcript.vep_consequence.impact', 'transcript.vep_consequence.location',
                           'transcript.vep_consequence.coding_effect']
-NUMBER_ANNOTATION_FIELDS = 340
-SAMPLE_FIELDS_EXPECTED = 25
+NUMBER_ANNOTATION_FIELDS = 342
+SAMPLE_FIELDS_EXPECTED = 27
 VARIANT_FIELDS_EXPECTED = 315
-TRANSCRIPT_FIELDS_EXPECTED = 39
+TRANSCRIPT_FIELDS_EXPECTED = 35
 
 
 @pytest.fixture
@@ -70,8 +70,8 @@ def test_add_default_schema_fields(MTParser):
 
 def test_read_variant_table_header(MTParser):
     """ Tests that we can read mapping table header correctly based on the current format """
-    assert MTParser.version == 'annV0.4.6'
-    assert MTParser.date == '07.07.2020'
+    assert MTParser.version == 'annV0.4.7'
+    assert MTParser.date == '07.16.2020'
     assert sorted(MTParser.fields) == sorted(EXPECTED_FIELDS)
     for field in EXPECTED_FIELDS:  # all fields are categorized by the Parser
         assert field in MTParser.ALL_FIELDS
@@ -138,7 +138,7 @@ def test_generate_variant_json_items(MTParser, inserts):
 
     # check cols/facs
     assert 'max_pop_af_af_popmax' in cols
-    assert 'gnomad_af' in cols
+    assert 'gnomad_af' in facs
     assert facs['CHROM']['title'] == 'Chromosome'
     assert facs['CHROM']['grouping'] == 'Position'
     assert facs['spliceai_ds_dg']['aggregation_type'] == 'stats'
@@ -157,6 +157,10 @@ def test_generate_variant_sample_schema(MTParser, sample_variant_items):
     assert 'samplegeno_ad' in properties['samplegeno']['items']['properties']
     assert 'samplegeno_gt' in properties['samplegeno']['items']['properties']
     assert 'samplegeno_numgt' in properties['samplegeno']['items']['properties']
+
+    # check comhet sub-embedded obj
+    assert 'cmphet' in properties
+    assert 'comhet_gene'in properties['cmphet']['items']['properties']
 
     assert 'GT' in properties
     assert 'GQ' in properties
@@ -193,9 +197,9 @@ def test_generate_variant_schema(MTParser, variant_items):
     assert sub_obj_props['vep_consequence']['items']['linkTo'] == 'VariantConsequence'
     assert sub_obj_props['vep_domains']['type'] == 'array'
     assert sub_obj_props['vep_domains']['items']['type'] == 'string'
-    assert sub_obj_props['vep_clin_sig']['type'] == 'string'
-    assert sub_obj_props['vep_somatic']['type'] == 'array'
-    assert sub_obj_props['vep_somatic']['items']['type'] == 'boolean'
+    assert sub_obj_props['vep_tsl']['type'] == 'integer'
+    assert sub_obj_props['vep_domains']['type'] == 'array'
+    assert sub_obj_props['vep_domains']['items']['type'] == 'string'
 
     # check (existence of) different sub-embedded object fields
     assert properties['genes']['type'] == 'array'

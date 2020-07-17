@@ -151,7 +151,7 @@ def test_ingestion_listener_run(testapp, mocked_vcf_file, gene_workbook, setup_a
         return current_time < (start_time + end_delta)
 
     # XXX: This is a really hard thing to test, but take my word for it that this is doing "something" -Will
-    #      If you do not get ValueError here, it means the0
+    #      If you do not get ValueError here, it means
     with mock.patch('encoded.ingestion_listener.IngestionListener.should_remain_online',
                     new=mocked_should_remain_online):
         with pytest.raises(ValueError):
