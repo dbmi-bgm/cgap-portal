@@ -711,7 +711,7 @@ def is_file_to_download(properties, file_format, expected_filename=None):
 def download(context, request):
     # disable if not on cgap prod
     if request.registry.settings.get('env.name', 'localhost') not in [CGAP_ENV_WEBPROD, 'localhost']:
-        raise HTTPForbidden('Downloads disabled when not on cgap-prod!')
+        raise HTTPForbidden('Downloads disabled when not on cgap-prod (or testing)!')
 
     # first check for restricted status
     try:
