@@ -7,22 +7,33 @@ import { LocalizedTime, formatPublicationDate } from '@hms-dbmi-bgm/shared-porta
 
 /**
  * Returns an array of phenotypic features styled as an unordered list of Bootstrap badges.
- * @param {Array} features An array of phenotypic features item
+ * @param {Array} features An array of phenotypic features items
  */
 function mapFeaturesToBadges(features = []) {
     if (features.length === 0) {
-        console.log("no features found");
         return (<em>None</em>);
     }
     const arr = features.map((feature) => {
-        const { display_title: title, '@id': featureID } = feature;
+        const { phenotypic_feature = null } = feature;
+        const { display_title = null, '@id': featureID } = phenotypic_feature || {};
         return (
-            <li key={featureID} className="pr-1">
-                <a className="badge badge-info" href={featureID} rel="noopener noreferrer">{title}</a>
+            <li key={featureID} className="pr-1 d-inline">
+                <a className="badge badge-info" href={featureID} rel="noopener noreferrer">{ display_title }</a>
             </li>
         );
     });
-    return (<ul>{ arr }</ul>);
+    return (
+        <ul style={{
+            listStyleType: "none",
+            maxWidth: "100%",
+            maxHeight: "25px",
+            overflowX: "scroll",
+            paddingLeft: "unset",
+            marginBottom: "unset",
+        }}>
+            { arr }
+        </ul>
+    );
 }
 
 /** @param {Object} props - Contents of a family sub-embedded object. */
@@ -36,53 +47,38 @@ export const CaseStats = React.memo(function CaseStats(props){
     } = props;
 
     const { individual = null, family = null } = caseItem || {};
-    const { accession: indvAccession = null } = individual || {};
+    const { individual_id = null } = individual || {};
     const { accession: famAccession = null } = family || {};
 
     return (
-        <div id="case-stats">
-            <StatDrop defaultOpen={true} title="Patient Info:" subtitle={indvAccession} {...{ className }}>
+        <div id="case-stats" className="d-flex flex-row justify-content-between">
+            <StatCard title="Patient Info:" subtitle={individual_id} {...{ className }} style={{ flexBasis: "calc(50% - 10px)" }}>
                 <PatientInfo {...props} />
-            </StatDrop>
-            <div className="row overlapping">
-                <div className="col-md-6">
-                    <StatDrop title="Family Info:" subtitle={famAccession} {...{ className }}>
-                        <FamilyInfo {...{ numFamilies, numIndividuals, numWithSamples, family }} />
-                    </StatDrop>
-                </div>
-                <div className="col-md-6">
-                    <StatDrop title="Phenotypic Features" {...{ className }}>
-                        <PhenotypicFeatures {...props} />
-                    </StatDrop>
-                </div>
+            </StatCard>
+            <div className="d-flex flex-column justify-content-between" style={{ flexBasis: "calc(50% - 10px)" }}>
+                <StatCard title="Phenotypic Features" {...{ className }}>
+                    <PhenotypicFeatures {...props} />
+                </StatCard>
+                <StatCard title="Family Info:" subtitle={famAccession} {...{ className }}>
+                    <FamilyInfo {...{ numFamilies, numIndividuals, numWithSamples, family }} />
+                </StatCard>
             </div>
         </div>
     );
 });
 
-export const StatDrop = React.memo(function StatDrop(props){
-    const { defaultOpen = false, title = null, subtitle = null, children = null, className = "" } = props || {};
-
-    // Hooks declared outside of 'if' condition b.c. React hook execution order
-    // must stay consistent between renders - https://reactjs.org/docs/hooks-rules.html#only-call-hooks-at-the-top-level
-    const [ open, setOpen ] = useState(defaultOpen);
-    const toggleOpen = useMemo(function(){
-        return function(){ setOpen(!open); };
-    }, [ open ]);
-
+export const StatCard = React.memo(function StatDrop(props){
+    const { title = null, subtitle = null, children = null, className = "", style = null } = props || {};
     const cls = ("card " + className);
 
     return (
-        <div className={cls + " mb-2"}>
-            <h4 className="clickable card-header mt-0 text-600" onClick={toggleOpen}>
-                <i className={"icon fas mr-2" + (open ? " icon-minus" : " icon-plus")} ></i>
+        <div className={cls} style={style}>
+            <h4 className="card-header mt-0 text-600">
                 { title } <span className="text-300">{ subtitle || null }</span>
             </h4>
-            <Collapse in={open}>
-                <div className="card-body">
-                    { children }
-                </div>
-            </Collapse>
+            <div className="card-body">
+                { children }
+            </div>
         </div>
     );
 });
@@ -101,40 +97,34 @@ export const PatientInfo = React.memo(function PatientInfo(props = null) {
         status = null,
         date_created = null,
         life_status = null,
-        phenotypic_features = [],
-        individual_id = null,
         display_title = null,
         aliases = null
     } = individual || {};
 
     return (
-        <div className="row">
-            <div className="col-md-6">
-                <div className="card-text mb-1">
-                    <label className="mb-0">Sex:</label> { sex || 'N/A'}
-                </div>
-                <div className="card-text mb-1">
-                    <label className="mb-0">Age: </label> { age && age_units ? `${age} age_units` : "N/A" }
-                </div>
-                <div className="card-text mb-1">
-                    <label className="mb-0">Life Status:</label> { life_status || 'N/A' }
-                </div>
-                <div className="card-text mb-1">
-                    <label className="mb-0">Status:</label> { status } <i className="item-status-indicator-dot ml-02" />
-                </div>
-                <div className="card-text mb-1">
-                    <label className="mb-0">Accessioned:</label> { date_created ? <LocalizedTime timestamp={date_created} formatType="date-sm"/> : "N/A" }
-                </div>
+        <>
+            <div className="card-text mb-1">
+                <label className="mb-0">CGAP ID:</label> { accession }
             </div>
-            <div className="col-md-6">
-                <div className="card-text mb-1">
-                    <label className="mb-0">Individual Title:</label> {individual_id || display_title}
-                </div>
-                <div className="card-text mb-1">
-                    <label className="mb-0">Aliases:</label> {aliases || "N/A"}
-                </div>
+            <div className="card-text mb-1">
+                <label className="mb-0">Sex:</label> { sex || 'N/A'}
             </div>
-        </div>
+            <div className="card-text mb-1">
+                <label className="mb-0">Age: </label> { age && age_units ? `${age} age_units` : "N/A" }
+            </div>
+            <div className="card-text mb-1">
+                <label className="mb-0">Life Status:</label> { life_status || 'N/A' }
+            </div>
+            <div className="card-text mb-1">
+                <label className="mb-0">Status:</label> { status } <i className="item-status-indicator-dot ml-02" />
+            </div>
+            <div className="card-text mb-1">
+                <label className="mb-0">Accessioned:</label> { date_created ? <LocalizedTime timestamp={date_created} formatType="date-sm"/> : "N/A" }
+            </div>
+            <div className="card-text mb-1">
+                <label className="mb-0">Aliases:</label> {aliases || "N/A"}
+            </div>
+        </>
     );
 });
 
