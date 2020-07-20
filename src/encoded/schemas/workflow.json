@@ -336,6 +336,11 @@
                         "description": "QC object type inherited from quality_metric to be used to represent QC",
                         "type": "string"
                     },
+                    "qc_acl": {
+                        "title": "QC Acl",
+                        "description": "ACL permission for QC files, public-read by default if not set",
+                        "type": "string"
+                    },
                     "to_be_unzippped": {
                         "title": "to_be_unzipped",
                         "description": "unzip program if the file must be unzipped before workflow run",
