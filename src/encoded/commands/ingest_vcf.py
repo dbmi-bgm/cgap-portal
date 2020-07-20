@@ -346,10 +346,13 @@ class VCFParser(object):
 
     @staticmethod
     def get_record_attribute(record, field):
-        try:
-            return getattr(record, field)
-        except Exception:
-            return None
+        return getattr(record, field, None)
+
+    @staticmethod
+    def remove_prefix(prefix, text):
+        if not text.startswith(prefix):
+            raise ValueError('Prefix %s is not the initial substring of %s' % (prefix, text))
+        return text[len(prefix):]
 
     def create_variant_from_record(self, record):
         """ Produces a dictionary containing all the annotation fields for this record
@@ -374,10 +377,10 @@ class VCFParser(object):
             if vcf_key == 'ALT':  # requires special care
                 result[vcf_key] = getattr(record, vcf_key)[0].sequence
             elif vcf_key == 'CHROM':
-                result[vcf_key] = getattr(record, vcf_key)[3:]  # splice chr off
+                result[vcf_key] = self.remove_prefix('chr', getattr(record, vcf_key))  # splice chr off
             else:
-                if self.get_record_attribute(record, vcf_key) is not None:
-                    result[vcf_key] = self.get_record_attribute(record, vcf_key)
+                attr = self.get_record_attribute(record, vcf_key)
+                result[vcf_key] = attr if attr is not None else None
 
         for key in self.format.keys():
 
@@ -445,9 +448,8 @@ class VCFParser(object):
 
     def format_variant_sub_embedded_objects(self, result):
         """ Applies 'format_variant' for all sub_embedded_object fields (detected) """
-        variant_props = self.variant_schema['properties']
         for key in self.sub_embedded_mapping.values():
-            if key in variant_props:
+            if key in self.variant_props:
                 self.format_variant(result, seo=key)
 
     def parse_samples(self, result, sample):
@@ -513,7 +515,7 @@ class VCFParser(object):
                 elif field == 'multiallele_samplevariantkey':  # XXX: refactor with samplegeno
                     multiallele = record.INFO.get('MULTIALLELE', None)
                     if multiallele:
-                        s['multiallele_samplevariantkey'] = multiallele[0]
+                        s['multiallele_samplevariantkey'] = self.fix_encoding(multiallele[0])
                 elif field == 'cmphet':  # XXX: refactor as well
                     comhet = record.INFO.get('comHet', None)
                     if comhet:
@@ -522,7 +524,7 @@ class VCFParser(object):
                         for group in comhet:
                             annotations = {}
                             for field_name, value in zip(field_names, group.split('|')):
-                                annotations[field_name] = value
+                                annotations[field_name] = self.fix_encoding(value)
                             s['cmphet'].append(annotations)
 
             self.parse_samples(s, sample)  # add sample fields, already formatted
