@@ -1766,6 +1766,10 @@ $badge-item-min-height: 90px;
 		> .col-stats,
 		> .col-pedigree-viz {
 			padding: 0 10px;
+
+			@include media-breakpoint-up(lg){
+				min-height: 358px;
+			}
 		}
 
 		> .col-stats {
@@ -1821,13 +1825,13 @@ $badge-item-min-height: 90px;
 		max-height: 336px;
 		margin-left: 0;
 
-		> .card {
-			@include media-breakpoint-down(lg){
-				margin-top: 70px;
-				border-bottom-right-radius: $card-border-radius; // prev: 10px;
-				border-bottom-left-radius: $card-border-radius; // prev: 10px;
-			}
-		}
+		// > .card {
+		// 	@include media-breakpoint-down(lg){
+		// 		margin-top: 70px;
+		// 		border-bottom-right-radius: $card-border-radius; // prev: 10px;
+		// 		border-bottom-left-radius: $card-border-radius; // prev: 10px;
+		// 	}
+		// }
 
 		div.pedigree-vis-heading {
 			background-color: $primary-dark; // previous value: $navbar-background-color (#20445f);

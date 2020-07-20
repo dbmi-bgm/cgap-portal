@@ -253,7 +253,7 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
                     <div className="col-stats">
                         <CaseStats caseItem={context} {...{ description, numIndividuals, numWithSamples, caseFeatures }} numFamilies={1} />
                     </div>
-                    <div id="case-overview-ped-link" className="col-pedigree-viz mh-350">
+                    <div id="case-overview-ped-link" className="col-pedigree-viz">
                         <div className="card d-flex flex-column">
                             <div className="pedigree-vis-heading card-header d-flex justify-content-between">
                                 <div>
