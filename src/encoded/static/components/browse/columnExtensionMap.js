@@ -336,11 +336,11 @@ export const columnExtensionMap = {
     },
     'bam_snapshot': {
         'render' : function(result, props) {
-            const { bam_snapshot = null } = result;
+            const { bam_snapshot = null, uuid = null } = result;
             if (bam_snapshot) {
                 return (
                     <div className="mx-auto">
-                        <a target="__blank" href={bam_snapshot}>
+                        <a target="_blank" rel="noreferrer" href={`/${uuid}/@@download`}>
                             View BAM Snapshot
                         </a>
                         <i className="ml-1 icon-sm icon fas icon-external-link-alt"></i>
