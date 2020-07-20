@@ -563,6 +563,30 @@ const BioinformaticsTab = React.memo(function BioinformaticsTab(props) {
                 </div>
                 <div className="row qc-summary">
                     <div className="col-sm-8 text-600">
+                        Transition-Tansversion ratio:
+                    </div>
+                    <div className="col-sm-4">
+                        1.96
+                    </div>
+                </div>
+                <div className="row qc-summary">
+                    <div className="col-sm-8 text-600">
+                        Heterozygosity ratio:
+                    </div>
+                    <div className="col-sm-4">
+                        1.24
+                    </div>
+                </div>
+                <div className="row qc-summary">
+                    <div className="col-sm-8 text-600">
+                        De novo Fraction:
+                    </div>
+                    <div className="col-sm-4">
+                        2%
+                    </div>
+                </div>
+                <div className="row qc-summary">
+                    <div className="col-sm-8 text-600">
                         Total number of filtered variants (high-quality exonic variants + clinvar - blacklist):
                         <i className="icon icon-info-circle fas icon-fw ml-05"
                             data-tip={dataTip} />
