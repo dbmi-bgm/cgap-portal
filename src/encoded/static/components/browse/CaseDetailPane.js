@@ -196,7 +196,7 @@ export class FamilyReportStackedTable extends React.PureComponent {
         this.renderIndividualBlockList = this.renderIndividualBlockList.bind(this);
     }
 
-    renderSampleBlock(sample, reportBlockMapping = null, reportToCaseMap = null){
+    renderSampleBlock(sample, reportBlockMapping = null, caseToReportMap = null){
         const { result = null, family = null } = this.props;
         const { analysis_groups: analysisGroups = [] } = family || {};
         const { sample_processing = null } = result || {};
@@ -223,21 +223,14 @@ export class FamilyReportStackedTable extends React.PureComponent {
                         const { analysis_type = null, samples = [], cases = [] } = group || {};
                         let reportBlock = null;
 
+                        // Figure out which report is associated with the current analysis group & sample
                         cases.forEach((groupCase) => {
-                            // console.log("case sample ant", analysis_type, groupCase);
                             const { '@id': thisCaseAtId = null, sample: caseSample = null } = groupCase || {};
                             const { '@id': sampleAtId = null } = caseSample || {};
-                            // console.log("case sample", caseSample);
                             if (sampleAtId === atId) {
-                                console.log("sampleAtId, atId", sampleAtId, atId);
-                                const reportBlockId = reportToCaseMap[thisCaseAtId];
-                               
-                                console.log("reportToCaseMap", reportToCaseMap[thisCaseAtId], thisCaseAtId, reportToCaseMap);
+                                const reportBlockId = caseToReportMap[thisCaseAtId];
                                 if (reportBlockId) {
-                                    console.log("reportBlockId", reportBlockId);
-                                    console.log("reportBlockMapping", reportBlockMapping);
                                     reportBlock = reportBlockMapping[reportBlockId];
-                                    console.log("reportBlock", reportBlock);
                                 }
                             }
                         });
@@ -278,7 +271,7 @@ export class FamilyReportStackedTable extends React.PureComponent {
         }
 
         const reportToReportBlockMap = {};
-        const reportToCaseMap = {};
+        const caseToReportMap = {};
 
         cases.forEach((currCase) => {
             const { '@id': caseAtId = null, accession: caseAccession = null, case_title = null, sample = null, report = null } = currCase || {};
@@ -294,7 +287,7 @@ export class FamilyReportStackedTable extends React.PureComponent {
                             { reportAtId ? <a href={reportAtId} className="name-title text-capitalize">{ reportTitle }</a> : <span className="name-title text-capitalize">{ reportTitle }</span>}
                         </StackedBlockName>
                     </StackedBlock>);
-                reportToCaseMap[caseAtId] = reportAtId;
+                caseToReportMap[caseAtId] = reportAtId;
             }
         });
 
@@ -309,7 +302,7 @@ export class FamilyReportStackedTable extends React.PureComponent {
                     { individual_id ? `(${individual_id})`: null }
                 </StackedBlockName>
                 <StackedBlockList className="libraries" title="Libraries">
-                    { indvSamples.map((thisSample) => this.renderSampleBlock(thisSample, reportToReportBlockMap, reportToCaseMap))}
+                    { indvSamples.map((thisSample) => this.renderSampleBlock(thisSample, reportToReportBlockMap, caseToReportMap))}
                 </StackedBlockList>
             </StackedBlock>
         );
@@ -319,7 +312,6 @@ export class FamilyReportStackedTable extends React.PureComponent {
         const { family = null, preventExpand } = this.props;
         const { members = [], proband = null, relationships = [] } = family || {};
 
-        // eslint-disable-next-line no-useless-concat
         const showMoreExtTitle = (
             <React.Fragment>
                 { preventExpand ? <a href={object.itemUtil.atId(family)}>(view Family)</a> : null }
