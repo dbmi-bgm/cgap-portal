@@ -81,20 +81,24 @@ class VCFParser(object):
 
     @property
     def variant_props(self):
+        """ Variant schema properties """
         return self.variant_schema['properties']
 
     @property
     def variant_sample_props(self):
+        """ Variant sample schema properties """
         return self.variant_sample_schema['properties']
 
     @property
     def variant_sub_embedded_fields(self):
+        """ Fields in the variant properties that are nested """
         return [prop for prop in self.variant_props.keys()
                 if self.variant_props[prop].get('type', None) == 'array' and
                 self.variant_props[prop]['items']['type'] == 'object']
 
     @property
     def variant_sample_sub_embedded_fields(self):
+        """ Fields in the variant sample properties that are nested """
         return [prop for prop in self.variant_sample_props.keys()
                 if self.variant_sample_props[prop].get('type', None) == 'array' and
                 self.variant_sample_props[prop]['items']['type'] == 'object']
@@ -660,6 +664,7 @@ def main():
                 sample['project'] = args.project
                 sample['institution'] = args.institution
                 sample['variant'] = res['@id']  # make link
+                sample['file'] = 'dummy-file'  # XXX: loading this way is just for testing!
                 app_handle.post_json('/variant_sample', sample, status=201)
 
         logger.info('Succesfully posted VCF entries')
