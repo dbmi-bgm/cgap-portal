@@ -140,18 +140,18 @@ class TestIngestVCF:
         record = test_vcf.read_next_record()
         result = test_vcf.create_sample_variant_from_record(record)
         for sample in result:
-            assert sample['GT'] != '0/0'  # this VCF has one of these that should be dropped
+            assert self.get_top_level_field(sample, 'GT') != '0/0'  # this VCF has one of these that should be dropped
         assert result[0]['FS'] == 0.0
 
         record = test_vcf.read_next_record()
         result = test_vcf.create_sample_variant_from_record(record)[0]
-        assert result['DP'] == 25
-        assert result['GT'] == '0/1'
-        assert result['GQ'] == 99
-        assert result['PL'] == '362,0,599'
+        assert self.get_top_level_field(result, 'DP') == 25
+        assert self.get_top_level_field(result, 'GT') == '0/1'
+        assert self.get_top_level_field(result, 'GQ') == 99
+        assert self.get_top_level_field(result, 'PL') == '362,0,599'
         record = test_vcf.read_next_record()
         result = test_vcf.create_sample_variant_from_record(record)[0]
-        assert result['DP'] == 29
+        assert self.get_top_level_field(result, 'DP') == 29
         assert len(result['samplegeno']) == 1
         assert 'samplegeno_numgt' in result['samplegeno'][0]
         assert 'samplegeno_ad' in result['samplegeno'][0]
