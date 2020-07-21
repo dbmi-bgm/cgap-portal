@@ -649,7 +649,7 @@ export class FamilyAccessionStackedTable extends React.PureComponent {
                 key={atId} id={atId}
             >
                 <StackedBlockName className="flex-row align-items-center justify-content-between">
-                    <div className="d-flex flex-column">
+                    <div className="d-flex flex-column individual-role">
                         { atId ?
                             <a href={atId} className={`name-title text-capitalize ${(result.individual['@id'] === individual['@id']) ? "current-case pl-1" : ""}`}>
                                 { role || display_title }
