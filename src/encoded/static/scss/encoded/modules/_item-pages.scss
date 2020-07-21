@@ -2126,6 +2126,10 @@ $badge-item-min-height: 90px;
 						color: #ffffff;
 					}
 
+					.s-block.individual .col-individual * {
+						text-align: left;
+					}
+				
 					.s-block.libraries .col-libraries > div {
 						margin: 0 auto;
 					}
@@ -2144,8 +2148,6 @@ $badge-item-min-height: 90px;
 							min-width: 75px;
 						}
 					}
-				
-					
 
 					.body .current-case {
 						background-color: lavender;
