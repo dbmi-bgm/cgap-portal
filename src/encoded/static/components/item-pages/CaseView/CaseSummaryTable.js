@@ -89,6 +89,7 @@ export const CaseSummaryTable = React.memo(function CaseSummaryTable(props){
     // add multisample analysis column data to column order/titles and data object
     sampleProcessing.forEach((sp) => {
         const { uuid, processed_files = [], completed_processes = [], samples = [], sample_processed_files = [] } = sp;
+        const spProcFilesWithPermission = processed_files.filter(hasViewPermisison);
 
         function pushColumn(title) {
             // adds a column to the end of the column order and to the column titles map
@@ -97,12 +98,12 @@ export const CaseSummaryTable = React.memo(function CaseSummaryTable(props){
             h2ColumnOrder.push(title);
         }
 
-        if (processed_files.length > 0) {
+        if (spProcFilesWithPermission.length > 0) {
             // add column titles with a flag & some embedded data for identifying column by UUID & rendering pipeline title
             pushColumn(`~MSA|${ completed_processes[0] }|${ uuid }`);
 
             sampleProcessingData[uuid] = {};
-            sampleProcessingData[uuid]["MSA"] = generateFileDataObject(processed_files.filter(hasViewPermisison)); // populate with multisample analysis objects
+            sampleProcessingData[uuid]["MSA"] = generateFileDataObject(spProcFilesWithPermission); // populate with multisample analysis objects
 
             // populate with per sample data (no files)
             samples.forEach((sample) => {
@@ -113,12 +114,12 @@ export const CaseSummaryTable = React.memo(function CaseSummaryTable(props){
             // populate with per sample data (files) (override any previously set)
             sample_processed_files.forEach((set) => {
                 const { sample : { accession = "" } = {}, processed_files: procFiles = [] } = set;
-                sampleProcessingData[uuid][accession] = generateFileDataObject(processed_files.filter(hasViewPermisison));
+                sampleProcessingData[uuid][accession] = generateFileDataObject(procFiles.filter(hasViewPermisison));
             });
             hasMSA = true;
         }
 
-        if (processed_files.length > 0) {
+        if (spProcFilesWithPermission.length > 0) {
             hasCombinedMSA = true;
         }
 
