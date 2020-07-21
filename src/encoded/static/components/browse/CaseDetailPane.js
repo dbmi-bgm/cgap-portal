@@ -220,17 +220,17 @@ export class FamilyReportStackedTable extends React.PureComponent {
                 <StackedBlockList className="analysis" title="Analysis">
                     {analysisGroups.map((group) => {
                         const { analysis_type = null, samples = [], cases = [] } = group || {};
-                        let reportBlock = null;           
+                        let reportBlock = null;
 
                         // Figure out which report is associated with the current analysis group & sample
                         cases.forEach((groupCase) => {
                             const { '@id': thisCaseAtId = null, sample: caseSample = null } = groupCase || {};
                             const { '@id': sampleAtId = null } = caseSample || {};
                             if (sampleAtId === atId) {
-                                
+
                                 const reportBlockId = caseToReportMap[thisCaseAtId];
                                 const fallbackKey = 'case-' + thisCaseAtId;
-                                
+
                                 if (reportBlockId) {
                                     reportBlock = reportBlockMapping[reportBlockId];
                                 // TODO: Rework this entire method of passing case through; didn't realize case was necessary early on and needed this
@@ -505,7 +505,7 @@ export class FamilyAccessionStackedTable extends React.PureComponent {
                         }
                         { other_specimen_ids ?
                             other_specimen_ids.map((obj) => {
-                                const { id_type = null, id = null } = obj; 
+                                const { id_type = null, id = null } = obj;
                                 return (
                                     <tr key={id+id_type}>
                                         <td className="accession-table-title">{id_type}</td>
@@ -665,7 +665,7 @@ export class FamilyAccessionStackedTable extends React.PureComponent {
                                         <td className="accession-table-title">CGAP Individual ID</td>
                                         <td>{ accession || "" }</td>
                                     </tr> : null }
-                                
+
                                 { familyId ?
                                     <tr>
                                         <td className="accession-table-title">Family ID</td>
