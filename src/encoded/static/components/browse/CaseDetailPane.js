@@ -182,7 +182,7 @@ export class FamilyReportStackedTable extends React.PureComponent {
             <StackedBlock {...{ columnClass }} subtitleVisible={false}
                 label={<StackedBlockNameLabel title={null} accession={null} subtitle={null} subtitleVisible={false}/>}>
                 <StackedBlockName>
-                    <span className="name-title">-</span>
+                    <span className="name-title"></span>
                 </StackedBlockName>
             </StackedBlock>
         );
@@ -199,10 +199,10 @@ export class FamilyReportStackedTable extends React.PureComponent {
         const { result = null, family = null } = this.props;
         const { analysis_groups: analysisGroups = [] } = family || {};
         const { sample_processing = null } = result || {};
-        const { '@id': atId = null, workup_type = "-", display_title = null, accession = null } = sample || {};
+        const { '@id': atId = null, workup_type = null, display_title = null, accession = null } = sample || {};
         const { samples = [], completed_processes = [] } = sample_processing || {};
 
-        let blockValue = '-';
+        let blockValue = null;
         samples.forEach((thisSample) => {
             if (atId === thisSample['@id']) {
                 blockValue = completed_processes;
@@ -475,7 +475,7 @@ export class FamilyAccessionStackedTable extends React.PureComponent {
             workup_type = null, display_title = null, accession = null, sequence_id = null,
             bam_sample_id = null, other_specimen_ids, specimen_accession = null } = sample;
 
-        let blockValue = '-';
+        let blockValue = null;
         samples.forEach((thisSample) => {
             if (atId === thisSample['@id']) {
                 blockValue = completed_processes;
@@ -515,7 +515,7 @@ export class FamilyAccessionStackedTable extends React.PureComponent {
                         }
                         <tr>
                             <td className="accession-table-title">CGAP Sample ID</td>
-                            <td>{accession || "-"}</td>
+                            <td>{accession}</td>
                         </tr>
                         { specimen_type ?
                             <tr>
@@ -538,7 +538,7 @@ export class FamilyAccessionStackedTable extends React.PureComponent {
                     <StackedBlockName className="flex-row align-items-center justify-content-between">
                         <div className="d-flex">
                             <a href={atId} data-tip="View Sample" className={`name-title p-1 ${isSampleForResult ? 'current-case' : ''}`}>
-                                { workup_type || "-" }
+                                { workup_type }
                             </a>
                         </div>
                         { fullTable }
@@ -570,8 +570,7 @@ export class FamilyAccessionStackedTable extends React.PureComponent {
         const { "@id": resultSampleId = null } = resultSample || {};
 
         // Passed in Individual
-        const { "@id": atId = null, individual_id = null, display_title = null, case: cases = [], accession = null, samples: indvSamples = [], institution = null } = individual || {};
-        const { display_title: institution_id = null } = institution || {};
+        const { "@id": atId = null, individual_id = null, display_title = null, case: cases = [], accession = null, samples: indvSamples = [] } = individual || {};
 
         let cls;
         if (result && result.individual && individual) {
@@ -650,7 +649,7 @@ export class FamilyAccessionStackedTable extends React.PureComponent {
                 key={atId} id={atId}
             >
                 <StackedBlockName className="flex-row align-items-center justify-content-between">
-                    <div className="d-flex flex-column">
+                    <div className="d-flex flex-column individual-role">
                         { atId ?
                             <a href={atId} className={`name-title text-capitalize ${(result.individual['@id'] === individual['@id']) ? "current-case pl-1" : ""}`}>
                                 { role || display_title }
@@ -660,12 +659,16 @@ export class FamilyAccessionStackedTable extends React.PureComponent {
                     <div className="w-100" style={{ maxWidth: "70%" }}>
                         <table className="accession-table w-100">
                             <tbody>
+                                { individual_id ?
+                                    <tr>
+                                        <td className="accession-table-title">Institutional ID</td>
+                                        <td>{ individual_id }</td>
+                                    </tr> : null }
                                 { accession ?
                                     <tr>
                                         <td className="accession-table-title">CGAP Individual ID</td>
-                                        <td>{ accession || "" }</td>
+                                        <td>{ accession }</td>
                                     </tr> : null }
-
                                 { familyId ?
                                     <tr>
                                         <td className="accession-table-title">Family ID</td>
@@ -675,11 +678,6 @@ export class FamilyAccessionStackedTable extends React.PureComponent {
                                     <tr>
                                         <td className="accession-table-title">CGAP Family ID</td>
                                         <td>{ familyAccession }</td>
-                                    </tr> : null }
-                                { institution_id ?
-                                    <tr>
-                                        <td className="accession-table-title">CGAP Institution ID</td>
-                                        <td>{ institution_id || "N/A" }</td>
                                     </tr> : null }
                             </tbody>
                         </table>
