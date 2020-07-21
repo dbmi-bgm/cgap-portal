@@ -183,6 +183,11 @@
             "title": "Comments",
             "description": "Comments on this field",
             "type": "string"
+        },
+        "annotation_space_location": {
+            "title": "Annotation Space Location",
+            "description": "String identifier",
+            "type": "string"
         }
     },
     "facets": {
