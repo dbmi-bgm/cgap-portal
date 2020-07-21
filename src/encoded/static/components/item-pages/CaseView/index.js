@@ -505,48 +505,30 @@ const BioinformaticsTab = React.memo(function BioinformaticsTab(props) {
         idToGraphIdentifier,
         sample_processing = []
     } = props;
-    const { display_title: caseDisplayTitle } = context;
+    const { display_title: caseDisplayTitle, family = null } = context;
 
-    // Combine primary and secondary families to get all families associated with case. Primary goes first.
-    const families = [ ...secondary_families ];
-    if (currFamily){
-        families.unshift(currFamily);
-    }
+    const {
+        original_pedigree: { display_title: pedFileName } = {},
+        members = [],
+        display_title: familyDisplayTitle
+    } = family;
+    const onClick = useMemo(function(){
+        return function(evt){
+            navigate("#pedigree", { skipRequest: true, replace: true });
+        };
+    }, []);
 
-    // console.log("biotab props", props);
-    let caseSummaryTables = [];
-    caseSummaryTables = families.map(function(family, idx){
-        const {
-            original_pedigree: { display_title: pedFileName } = {},
-            members = [],
-            display_title: familyDisplayTitle
-        } = family;
-        const cls = "family-index-" + idx;
-        const onClick = useMemo(function(){
-            return function(evt){
-                navigate("#pedigree", { skipRequest: true, replace: true });
-            };
-        }, []);
+    const title = (
+        <h4 data-family-index={0} className="pb-0 p-2 mb-0 d-inline-block w-100">
+            <span className="font-italic text-500">{ familyDisplayTitle }</span>
+            { pedFileName ? <span className="text-300">{ " (" + pedFileName + ")" }</span> : null }
+            <button type="button" className="btn btn-sm btn-primary pull-right" data-tip="Click to view this family in the Pedigree Visualization tab" onClick={onClick}>
+                <i className="icon icon-fw icon-sitemap fas mr-1 small" />
+                View Pedigree in Separate Tab
+            </button>
+        </h4>
+    );
 
-        const title = (
-            <h4 data-family-index={idx} className="pb-0 p-2 mb-0 d-inline-block w-100">
-                <span className="font-italic text-500">{ familyDisplayTitle }</span>
-                { pedFileName ? <span className="text-300">{ " (" + pedFileName + ")" }</span> : null }
-                <button type="button" className="btn btn-sm btn-primary pull-right" data-tip="Click to view this family in the Pedigree Visualization tab" onClick={onClick}>
-                    <i className="icon icon-fw icon-sitemap fas mr-1 small" />
-                    View Pedigree in Separate Tab
-                </button>
-            </h4>
-        );
-
-        // sampleProcessing objects that have 2 or more matching samples to pass ONLY THOSE through to caseSummaryTable
-        return (
-            <div className={cls} key={idx} data-is-current-family={true}>
-                { title }
-                <CaseSummaryTable {...family} sampleProcessing={[sample_processing]} isCurrentFamily={true} {...{ idx, idToGraphIdentifier }} />
-            </div>
-        );
-    });
 
     const dataTip = "Exonic and splice variants, clinvar pathogenic or conflicting submissions, spliceAI>0.2, not seen in 2 individuals among a set of 20 unrelated samples.";
 
@@ -620,7 +602,10 @@ const BioinformaticsTab = React.memo(function BioinformaticsTab(props) {
             </div>
             <div className="tab-inner-container">
                 <h2 className="section-header">Multisample Analysis Table</h2>
-                { caseSummaryTables }
+                <div className="family-index-0" data-is-current-family={true}>
+                    { title }
+                    <CaseSummaryTable {...family} sampleProcessing={[sample_processing]} isCurrentFamily={true} idx={0} {...{ idToGraphIdentifier }} />
+                </div>
             </div>
         </React.Fragment>
     );
