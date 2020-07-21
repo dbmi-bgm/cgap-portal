@@ -496,7 +496,7 @@ class FileFastq(File):
         "quality_metric.Total Sequences",
         "quality_metric.Sequence length",
         "quality_metric.url"
-    ]  # + file_workflow_run_embeds
+    ]  + file_workflow_run_embeds
     name_key = 'accession'
     rev = dict(File.rev, **{
         'workflow_run_inputs': ('WorkflowRun', 'input_files.value'),

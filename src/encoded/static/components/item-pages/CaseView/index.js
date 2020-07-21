@@ -9,6 +9,7 @@ import url from 'url';
 import queryString from 'query-string';
 
 import { console, layout, ajax, object, navigate } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
+import { PartialList } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/PartialList';
 
 import { PedigreeVizView } from './../../viz/PedigreeViz';
 import DefaultItemView from './../DefaultItemView';
@@ -222,21 +223,6 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
         }
     }
 
-    // Combine primary and secondary families to get all families associated with case. Primary goes first.
-    let families;
-    const arr = [];
-    if (currFamily) {
-        arr.push(currFamily);
-
-        if (secondary_families && secondary_families.length > 0) {
-            families = arr.concat(secondary_families);
-        } else {
-            families = arr;
-        }
-    }
-    console.log("families", families, currFamily, secondary_families);
-    console.log("props", props);
-
     return (
         <React.Fragment>
             <div className="container-wide">
@@ -288,10 +274,10 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
 
             <DotRouter href={href} navClassName="container-wide pt-36 pb-36" contentsClassName="container-wide bg-light pt-36 pb-36" prependDotPath="case-info">
                 <DotRouterTab tabTitle="Accessioning" dotPath=".accessioning" default cache={false}>
-                    <AccessioningTab {...{ context, href, families, props }} />
+                    <AccessioningTab {...{ context, href, currFamily, secondary_families, }} />
                 </DotRouterTab>
                 <DotRouterTab tabTitle="Bioinformatics" dotPath=".bioinformatics" cache={false}>
-                    <BioinformaticsTab {...{ context, families, currFamily, idToGraphIdentifier, sample_processing }} />
+                    <BioinformaticsTab {...{ context, currFamily, secondary_families, idToGraphIdentifier, sample_processing }} />
                 </DotRouterTab>
                 <DotRouterTab tabTitle="Filtering" dotPath=".filtering">
                     <FilteringTab context={context} windowHeight={windowHeight} />
@@ -458,24 +444,54 @@ DotRouterTab.defaultProps = {
 };
 
 const AccessioningTab = React.memo(function AccessioningTab(props) {
-    const { context: result, href, families = [] } = props;
-    const { display_title } = result;
+    const { context, currFamily, secondary_families = [] } = props;
+    const { display_title: caseDisplayTitle } = context;
+    const { display_title: primaryFamilyTitle, '@id' : currFamilyID } = currFamily;
+    const [ isSecondaryFamiliesOpen, setSecondaryFamiliesOpen ] = useState(false);
+    const secondaryFamiliesLen = secondary_families.length;
+    console.log("families", currFamily, secondary_families);
 
+    const viewSecondaryFamiliesBtn = secondaryFamiliesLen === 0 ? null : (
+        <button type="button" className="btn btn-block btn-outline-dark mt-1" onClick={function(){ setSecondaryFamiliesOpen(!isSecondaryFamiliesOpen); }}>
+            { !isSecondaryFamiliesOpen ? `Show ${secondaryFamiliesLen} more famil${secondaryFamiliesLen > 1 ? 'ies' : 'y'} that proband is member of` : 'Hide secondary families' }
+        </button>
+    );
+
+    // Using PartialList since we have it already, it hides DOM elements when collapsed.
+    // In long run maybe a differing UI might be better, idk.
     return (
         <React.Fragment>
             <h1>
-                { display_title }: <span className="text-300">Accessioning Report and History</span>
+                { caseDisplayTitle }: <span className="text-300">Accessioning Report and History</span>
                 <span className="curr-selection pull-right">Current Selection</span>
             </h1>
             <div className="tab-inner-container">
-                { families.map((family) =>
-                    <FamilyAccessionStackedTable
-                        {...{ family, result }}
-                        key={family['@id']}
-                        href={href} preventExpand={false}
-                        fadeIn={false} collapseLongLists
-                    />
-                )}
+                <PartialList className="mb-0" open={isSecondaryFamiliesOpen}
+                    persistent={[
+                        <div className="pt-0 pb-24" key={currFamilyID}>
+                            <h4 className="mt-0 mb-05 text-400">
+                                <span className="text-300">Primary Cases from </span>
+                                { primaryFamilyTitle }
+                            </h4>
+                            <FamilyAccessionStackedTable family={currFamily} result={context}
+                                fadeIn={false} collapseLongLists collapseShow={1} />
+                        </div>
+                    ]}
+                    collapsible={
+                        secondary_families.map(function(family){
+                            const { display_title } = family;
+                            return (
+                                <div className="py-3" key={family['@id']}>
+                                    <h4 className="mt-0 mb-05 text-400">
+                                        <span className="text-300">Related Cases from </span>
+                                        { display_title }
+                                    </h4>
+                                    <FamilyAccessionStackedTable result={context} family={family} collapseLongLists/>
+                                </div>
+                            );
+                        })
+                    } />
+                { viewSecondaryFamiliesBtn }
             </div>
         </React.Fragment>
     );
@@ -484,12 +500,18 @@ const AccessioningTab = React.memo(function AccessioningTab(props) {
 const BioinformaticsTab = React.memo(function BioinformaticsTab(props) {
     const {
         context,
-        families = [],
+        currFamily,
+        secondary_families = [],
         idToGraphIdentifier,
         sample_processing = []
     } = props;
-
     const { display_title: caseDisplayTitle } = context;
+
+    // Combine primary and secondary families to get all families associated with case. Primary goes first.
+    const families = [ ...secondary_families ];
+    if (currFamily){
+        families.unshift(currFamily);
+    }
 
     // console.log("biotab props", props);
     let caseSummaryTables = [];

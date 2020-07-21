@@ -313,6 +313,8 @@ class Case(Item):
             return title
         family_info = get_item_or_none(request, family, 'family')
         proband = family_info.get('proband', {})
+        if not proband:
+            return title
         proband_case = False
         if proband == individual:
             proband_case = True
