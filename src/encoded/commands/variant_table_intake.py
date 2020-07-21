@@ -28,7 +28,7 @@ class MappingTableParser(object):
     STRING_FIELDS = ['field_name', 'source_name', 'source_version', 'sub_embedding_group',
                      'annotation_category', 'separator', 'description', 'value_example',
                      'scope', 'schema_title', 'pattern', 'link', 'comments']
-    SPECIAL_FIELDS = ['field_type', 'enum_list', 'links_to']
+    SPECIAL_FIELDS = ['field_type', 'enum_list', 'links_to', 'annotation_space_location']
     ALL_FIELDS = INTEGER_FIELDS + BOOLEAN_FIELDS + STRING_FIELDS + SPECIAL_FIELDS
     EMBEDDED_VARIANT_FIELDS = resolve_file_path('schemas/variant_embeds.json')
     EMBEDDED_VARIANT_SAMPLE_FIELDS = resolve_file_path('schemas/variant_sample_embeds.json')  # XXX: unused currently

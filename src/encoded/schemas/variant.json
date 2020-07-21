@@ -103,57 +103,19 @@
             "schema_title": "Position",
             "facet_order": 2
         },
-        "ID": {
-            "title": "dbSNP ID",
-            "field_name": "ID",
+        "cytoband_cytoband": {
+            "title": "Cytoband",
+            "field_name": "cytoband_cytoband",
             "type": "string",
             "do_import": true,
-            "source_name": "VCF",
-            "source_version": "VCFv4.2",
+            "source_name": "CYTOBAND",
+            "source_version": "2017-07-17",
             "annotation_category": "Position",
-            "description": "dbSNP ID",
-            "value_example": "rs1921",
+            "description": "cytoband",
+            "value_example": "1p36.33;1p36.32;1p36.31;1p36.23;1p36.22;1p36.21;1p36.13;1p36.12;1p36.11;1p35.3;1p35.2;1p35.1;1p34.3",
             "scope": "variant",
-            "schema_title": "dbSNP ID"
-        },
-        "REF": {
-            "title": "Ref",
-            "field_name": "REF",
-            "type": "string",
-            "do_import": true,
-            "source_name": "VCF",
-            "source_version": "VCFv4.2",
-            "annotation_category": "Position",
-            "description": "Reference allele",
-            "value_example": "G",
-            "scope": "variant",
-            "schema_title": "Ref"
-        },
-        "ALT": {
-            "title": "Alt",
-            "field_name": "ALT",
-            "type": "string",
-            "do_import": true,
-            "source_name": "VCF",
-            "source_version": "VCFv4.2",
-            "annotation_category": "Position",
-            "description": "Alternative allele",
-            "value_example": "A;T;C;G;GAAATCA",
-            "scope": "variant",
-            "schema_title": "Alt"
-        },
-        "mutanno_hgvsg": {
-            "title": "Variant",
-            "field_name": "mutanno_hgvsg",
-            "type": "string",
-            "do_import": true,
-            "source_name": "MUTANNO",
-            "source_version": "v0.4",
-            "annotation_category": "Position",
-            "description": "HGVS genome sequence name",
-            "scope": "variant",
-            "schema_title": "Variant",
-            "column_order": 10
+            "schema_title": "Cytoband",
+            "facet_order": 3
         },
         "mutanno_variant_class": {
             "title": "Variant Type",
@@ -174,54 +136,95 @@
             "schema_title": "Variant Type",
             "facet_order": 4
         },
-        "hg19": {
-            "title": "hg19 Coordinates",
-            "type": "array",
-            "items": {
-                "title": "hg19 Coordinates",
-                "type": "object",
-                "properties": {
-                    "hg19_hgvsg": {
-                        "title": "Variant",
-                        "field_name": "hg19_hgvsg",
-                        "type": "string",
-                        "do_import": true,
-                        "source_name": "HG19",
-                        "source_version": "v0.4",
-                        "sub_embedding_group": "{\"key\": \"hg19\", \"title\": \"hg19 Coordinates\"}",
-                        "annotation_category": "Position",
-                        "description": "HGVS genome sequence name (hg19)",
-                        "scope": "variant",
-                        "schema_title": "Variant"
-                    },
-                    "hg19_chrom": {
-                        "title": "Chromosome (hg19)",
-                        "field_name": "hg19_chrom",
-                        "type": "string",
-                        "do_import": true,
-                        "source_name": "HG19",
-                        "source_version": "v0.4",
-                        "sub_embedding_group": "{\"key\": \"hg19\", \"title\": \"hg19 Coordinates\"}",
-                        "annotation_category": "Position",
-                        "description": "hg19 coordinate chromosome",
-                        "scope": "variant",
-                        "schema_title": "Chromosome (hg19)"
-                    },
-                    "hg19_pos": {
-                        "title": "Position (hg19)",
-                        "field_name": "hg19_pos",
-                        "type": "integer",
-                        "do_import": true,
-                        "source_name": "HG19",
-                        "source_version": "v0.4",
-                        "sub_embedding_group": "{\"key\": \"hg19\", \"title\": \"hg19 Coordinates\"}",
-                        "annotation_category": "Position",
-                        "description": "hg19 coordinate position",
-                        "scope": "variant",
-                        "schema_title": "Position (hg19)"
-                    }
-                }
-            }
+        "gnomad_af": {
+            "title": "GnomAD Alt AF - Total",
+            "field_name": "gnomad_af",
+            "type": "number",
+            "do_import": true,
+            "source_name": "GNOMAD",
+            "source_version": "v3.0",
+            "annotation_category": "Population Frequency",
+            "description": "Alternate allele frequency in samples",
+            "value_example": "8.09887e-06;2.34771e-05;1.47076e-05;6.97778e-06;2.79111e-05;1.39552e-05;6.97710e-06;6.97642e-06;2.79162e-05;3.20951e-03;6.98149e-06;6.97827e-06;6.98032e-06;6.97924e-06;6.98841e-06;6.98207e-06;1.39632e-05;4.04977e-04;1.39610e-05;2.79341e-05",
+            "scope": "variant",
+            "schema_title": "GnomAD Alt AF - Total",
+            "column_order": 60,
+            "facet_order": 18,
+            "max": 1
+        },
+        "max_pop_af_af_popmax": {
+            "title": "GnomAD Alt AF - PopMax",
+            "field_name": "max_pop_af_af_popmax",
+            "type": "number",
+            "do_import": true,
+            "source_name": "GNOMAD",
+            "source_version": "v3.0",
+            "annotation_category": "Population Frequency",
+            "description": "maximum population allele frequency from gnomAD gnome v3.0",
+            "value_example": "1.65366e-05;9.1985e-05;5.35045e-05;1.54828e-05;1.54851e-05;0.000146456;1.54823e-05;0.000957854;0.0106084;1.54871e-05;2.37937e-05;0.000319285;1.54861e-05;1.54832e-05;0.000319081;1.54847e-05;1.54914e-05;7.32601e-05;4.761e-05;0.00135785",
+            "scope": "variant",
+            "schema_title": "GnomAD Alt AF - PopMax",
+            "column_order": 61,
+            "facet_order": 19,
+            "max": 1
+        },
+        "gnomad_an": {
+            "title": "GnomAD Total Allele Number",
+            "field_name": "gnomad_an",
+            "type": "integer",
+            "do_import": true,
+            "source_name": "GNOMAD",
+            "source_version": "v3.0",
+            "annotation_category": "Population Frequency",
+            "description": "Total number of alleles in samples",
+            "value_example": "123474;127784;135984;143312;143316;143326;143340;143286;143324;143236;143302;143260;143282;143094;143224;143234;143218;143256;143194;143046",
+            "scope": "variant",
+            "schema_title": "GnomAD Total Allele Number",
+            "facet_order": 20
+        },
+        "gnomad_nhomalt": {
+            "title": "GnomAD Homozgyous Count",
+            "field_name": "gnomad_nhomalt",
+            "type": "integer",
+            "do_import": true,
+            "source_name": "GNOMAD",
+            "source_version": "v3.0",
+            "annotation_category": "Population Frequency",
+            "description": "Count of homozygous individuals in samples",
+            "value_example": "8.09887e-06;2.34771e-05;1.47076e-05;6.97778e-06;2.79111e-05;1.39552e-05;6.97710e-06;6.97642e-06;2.79162e-05;3.20951e-03;6.98149e-06;6.97827e-06;6.98032e-06;6.97924e-06;6.98841e-06;6.98207e-06;1.39632e-05;4.04977e-04;1.39610e-05;2.79341e-05",
+            "scope": "variant",
+            "schema_title": "GnomAD Homozgyous Count",
+            "facet_order": 21
+        },
+        "conservation_phylop100": {
+            "title": "PhyloP (100 Vertabrates)",
+            "field_name": "conservation_phylop100",
+            "type": "number",
+            "do_import": true,
+            "source_name": "CONSERVATION",
+            "source_version": "2017-07-17",
+            "annotation_category": "Conservation",
+            "description": "PhyloP 100 way score",
+            "value_example": "0.214;0.252;0.240;0.213;-1.036;-0.984;-0.852;-1.095;-1.103;-2.621;-0.838;-1.387;0.121;0.221;0.198;-1.216;0.196;-0.931;0.232;-0.987",
+            "scope": "variant",
+            "schema_title": "PhyloP (100 Vertabrates)",
+            "facet_order": 22,
+            "min": -20,
+            "max": 10
+        },
+        "cadd_phred": {
+            "title": "CADD",
+            "field_name": "cadd_phred",
+            "type": "number",
+            "do_import": true,
+            "source_name": "CADD",
+            "source_version": "v1.5",
+            "annotation_category": "Missense Predictors",
+            "description": "CADD Phred score",
+            "value_example": "3.550;3.815;4.132;2.642;2.221;2.366;4.235;4.711;4.425;4.484;4.738;5.035;2.836;2.396;2.548;3.269;2.794;2.959;2.948;3.627",
+            "scope": "variant",
+            "schema_title": "CADD",
+            "facet_order": 23
         },
         "transcript": {
             "title": "Transcript",
@@ -230,6 +233,54 @@
                 "title": "Transcript",
                 "type": "object",
                 "properties": {
+                    "vep_sift_score": {
+                        "title": "SIFT score",
+                        "field_name": "vep_sift_score",
+                        "type": "number",
+                        "do_import": true,
+                        "source_name": "VEP",
+                        "source_version": "v99",
+                        "sub_embedding_group": "{\"key\": \"transcript\", \"title\": \"Transcript\"}",
+                        "annotation_category": "Missense Predictors",
+                        "description": "SIFT score",
+                        "value_example": "0.23;0;0.11;0.01;0.26;0.08;0.18;0.03;0.02;0.04;0.27;0.48;1;0.07;0.15;0.25;0.52;0.5;0.41",
+                        "scope": "variant",
+                        "schema_title": "SIFT score",
+                        "comments": "copy to worst effect transcript gene also for filtering",
+                        "facet_order": 24
+                    },
+                    "vep_polyphen_score": {
+                        "title": "PolyPhen score",
+                        "field_name": "vep_polyphen_score",
+                        "type": "number",
+                        "do_import": true,
+                        "source_name": "VEP",
+                        "source_version": "v99",
+                        "sub_embedding_group": "{\"key\": \"transcript\", \"title\": \"Transcript\"}",
+                        "annotation_category": "Missense Predictors",
+                        "description": "PolyPhen score",
+                        "value_example": "0;0.013;0.029;0.001;0.033;0.13;0.068;0.037;0.57;0.243;0.003;0.396;0.084;0.007;0.336;0.006;0.129;0.163;0.41",
+                        "scope": "variant",
+                        "schema_title": "PolyPhen score",
+                        "comments": "copy to worst effect transcript gene also for filtering",
+                        "facet_order": 25
+                    },
+                    "vep_maxentscan_diff": {
+                        "title": "MaxEntScan",
+                        "field_name": "vep_maxentscan_diff",
+                        "type": "number",
+                        "do_import": true,
+                        "source_name": "VEP",
+                        "source_version": "v99",
+                        "sub_embedding_group": "{\"key\": \"transcript\", \"title\": \"Transcript\"}",
+                        "annotation_category": "Splice Predictors",
+                        "description": "MaxEntScan score difference",
+                        "value_example": "-2.272;-0.220;-1.701;-0.589;-1.438;-1.782;0.414;0.937;-0.064;0.360;-0.471;-0.740;0.879;-0.482;-0.440;3.139;-0.288;0.681;0.747",
+                        "scope": "variant",
+                        "schema_title": "MaxEntScan",
+                        "comments": "copy to worst effect transcript gene also for filtering",
+                        "facet_order": 31
+                    },
                     "vep_consequence": {
                         "title": "vep_consequence",
                         "type": "array",
@@ -285,8 +336,7 @@
                         "sub_embedding_group": "{\"key\": \"transcript\", \"title\": \"Transcript\"}",
                         "description": "Stable ID of feature",
                         "value_example": "XP_011539961;NM_017891;NR_038869;NR_029639;NR_029834;NR_029957;XR_132470;XR_001737088;XP_016856395;NM_153254;XM_017002722;NM_004195;NM_148902;XP_016857617;NM_024848;NR_024489;NM_001301060;NR_125361;XP_016855621",
-                        "scope": "variant",
-                        "comments": "needs a link"
+                        "scope": "variant"
                     },
                     "vep_biotype": {
                         "title": "vep_biotype",
@@ -334,8 +384,7 @@
                         "sub_embedding_group": "{\"key\": \"transcript\", \"title\": \"Transcript\"}",
                         "description": "HGVS coding sequence name",
                         "value_example": "ENST00000379319.5:c.-136+5977A>T;ENST00000379325.7:c.-135-7876A>T;ENST00000379339.5:c.-135-7876A>T;ENST00000421241.6:c.-135-7876A>T;ENST00000434641.5:c.-135-7876A>T;ENST00000462097.5:c.-136+5977A>T;ENST00000467751.5:c.-135-7876A>T;ENST00000472741.5:n.29-7876A>T;ENST00000475119.5:c.-179-7876A>T;ENST00000477196.5:c.-135-7876A>T;ENST00000480643.1:c.-136+5977A>T;ENST00000482816.5:n.185-7876A>T;ENST00000648183.1:n.529+1866T>A;ENST00000379319.5:c.-136+5977A>C;ENST00000379325.7:c.-135-7876A>C;ENST00000379339.5:c.-135-7876A>C;ENST00000421241.6:c.-135-7876A>C;ENST00000434641.5:c.-135-7876A>C;ENST00000462097.5:c.-136+5977A>C;ENST00000467751.5:c.-135-7876A>C",
-                        "scope": "variant",
-                        "column_order": 33
+                        "scope": "variant"
                     },
                     "vep_hgvsp": {
                         "title": "vep_hgvsp",
@@ -347,8 +396,7 @@
                         "sub_embedding_group": "{\"key\": \"transcript\", \"title\": \"Transcript\"}",
                         "description": "HGVS protein sequence name",
                         "value_example": "ENSP00000368591.1:p.Met1?;ENSP00000368592.1:p.Met1?;ENSP00000500959.1:p.Met1?;ENSP00000368591.1:p.Asp2Asn;ENSP00000368592.1:p.Asp2Asn;ENSP00000500959.1:p.Asp2Asn;ENSP00000368591.1:p.Asp2Tyr;ENSP00000368592.1:p.Asp2Tyr;ENSP00000500959.1:p.Asp2Tyr;ENSP00000368591.1:p.Asp2His;ENSP00000368592.1:p.Asp2His;ENSP00000500959.1:p.Asp2His;ENSP00000368591.1:p.Asp2Val;ENSP00000368592.1:p.Asp2Val;ENSP00000500959.1:p.Asp2Val;ENSP00000368591.1:p.Asp2Gly;ENSP00000368592.1:p.Asp2Gly;ENSP00000500959.1:p.Asp2Gly;ENSP00000368591.1:p.Asp2Ala",
-                        "scope": "variant",
-                        "column_order": 34
+                        "scope": "variant"
                     },
                     "vep_cdna_position": {
                         "title": "vep_cdna_position",
@@ -532,22 +580,6 @@
                         "value_example": "UPI0000049DAC;UPI0000048F44;UPI000013EF85;UPI0003F47F17;UPI000268AE20;UPI0000205ACB;UPI000268AE21;UPI000048B028;UPI0003F48015;UPI0000205ADB;UPI000013EF63;UPI000268AE23;UPI000002B5CE;UPI0000035975;UPI000015B651;UPI000268AE24;UPI00001359DE;UPI000007293C;UPI00002039D7",
                         "scope": "variant"
                     },
-                    "vep_sift_score": {
-                        "title": "SIFT score",
-                        "field_name": "vep_sift_score",
-                        "type": "number",
-                        "do_import": true,
-                        "source_name": "VEP",
-                        "source_version": "v99",
-                        "sub_embedding_group": "{\"key\": \"transcript\", \"title\": \"Transcript\"}",
-                        "annotation_category": "Missense Predictors",
-                        "description": "SIFT score",
-                        "value_example": "0.23;0;0.11;0.01;0.26;0.08;0.18;0.03;0.02;0.04;0.27;0.48;1;0.07;0.15;0.25;0.52;0.5;0.41",
-                        "scope": "variant",
-                        "schema_title": "SIFT score",
-                        "comments": "we should convert this to float. then we can take categories from here: https://sift.bii.a-star.edu.sg/www/SIFT_help.html",
-                        "facet_order": 23
-                    },
                     "vep_sift_prediction": {
                         "title": "SIFT prediction",
                         "field_name": "vep_sift_prediction",
@@ -563,24 +595,7 @@
                         "description": "SIFT prediction (tolerated:0.05<=score<=1, deleterious:0<=score<=0.05)",
                         "value_example": "Tolerated (low confidence)",
                         "scope": "variant",
-                        "schema_title": "SIFT prediction",
-                        "comments": "we should convert this to float. then we can take categories from here: https://sift.bii.a-star.edu.sg/www/SIFT_help.html"
-                    },
-                    "vep_polyphen_score": {
-                        "title": "PolyPhen score",
-                        "field_name": "vep_polyphen_score",
-                        "type": "number",
-                        "do_import": true,
-                        "source_name": "VEP",
-                        "source_version": "v99",
-                        "sub_embedding_group": "{\"key\": \"transcript\", \"title\": \"Transcript\"}",
-                        "annotation_category": "Missense Predictors",
-                        "description": "PolyPhen score",
-                        "value_example": "0;0.013;0.029;0.001;0.033;0.13;0.068;0.037;0.57;0.243;0.003;0.396;0.084;0.007;0.336;0.006;0.129;0.163;0.41",
-                        "scope": "variant",
-                        "schema_title": "PolyPhen score",
-                        "comments": "we should convert this to float",
-                        "facet_order": 24
+                        "schema_title": "SIFT prediction"
                     },
                     "vep_domains": {
                         "title": "vep_domains",
@@ -619,10 +634,9 @@
                         "source_name": "VEP",
                         "source_version": "v99",
                         "sub_embedding_group": "{\"key\": \"transcript\", \"title\": \"Transcript\"}",
-                        "description": "Indicates by how many bases the HGVS notations for this variant have been shifted",
+                        "description": "Indicates by how many bases the HGVS notations for this variant have been shifted, for indels",
                         "value_example": "-1;-2;1;2;5;3",
-                        "scope": "variant",
-                        "comments": "what is this? => If a variant is a indel, this indicates base position offset. We don't need this."
+                        "scope": "variant"
                     },
                     "vep_pubmed": {
                         "title": "vep_pubmed",
@@ -637,7 +651,8 @@
                             "sub_embedding_group": "{\"key\": \"transcript\", \"title\": \"Transcript\"}",
                             "description": "Pubmed ID(s) of publications that cite existing variant",
                             "value_example": "20964851;24074042;21492446;20964851~19176549;21686129;21686129~27374108;20964851~21686129~27374108;27603512~31117970;27004216~21686129~28364128;30999277;31231424~29956763~30373632;31231424~30373632;18564129;25741868;25741868~24033266;24033266;22984993~16327884;16054854;25380769",
-                            "scope": "variant"
+                            "scope": "variant",
+                            "comments": "link needed"
                         }
                     },
                     "vep_maxentscan_alt": {
@@ -653,21 +668,6 @@
                         "value_example": "6.692;4.641;6.121;5.009;5.858;6.202;4.006;3.483;4.484;4.060;4.891;5.160;3.541;4.902;4.860;1.281;4.708;3.739;3.673",
                         "scope": "variant",
                         "schema_title": "MaxEntScan - Alt"
-                    },
-                    "vep_maxentscan_diff": {
-                        "title": "MaxEntScan",
-                        "field_name": "vep_maxentscan_diff",
-                        "type": "number",
-                        "do_import": true,
-                        "source_name": "VEP",
-                        "source_version": "v99",
-                        "sub_embedding_group": "{\"key\": \"transcript\", \"title\": \"Transcript\"}",
-                        "annotation_category": "Splice Predictors",
-                        "description": "MaxEntScan score difference",
-                        "value_example": "-2.272;-0.220;-1.701;-0.589;-1.438;-1.782;0.414;0.937;-0.064;0.360;-0.471;-0.740;0.879;-0.482;-0.440;3.139;-0.288;0.681;0.747",
-                        "scope": "variant",
-                        "schema_title": "MaxEntScan",
-                        "facet_order": 30
                     },
                     "vep_maxentscan_ref": {
                         "title": "MaxEntScan - Ref",
@@ -699,6 +699,107 @@
                 }
             }
         },
+        "spliceai_ds_ag": {
+            "title": "SpliceAI-AG",
+            "field_name": "spliceai_ds_ag",
+            "type": "number",
+            "do_import": true,
+            "source_name": "SPLICEAI",
+            "source_version": "20191004",
+            "annotation_category": "Splice Predictors",
+            "description": "delta scores (DS) for acceptor gain (AG)",
+            "value_example": "0.00;0.02;0.01;0.04;0.12;0.07;0.03;0.05;0.06;0.21;0.15;0.08;0.11;0.09;0.10;0.13;0.23;0.14;0.20;0.25",
+            "scope": "variant",
+            "schema_title": "SpliceAI-AG",
+            "facet_order": 27,
+            "max": 1
+        },
+        "spliceai_ds_al": {
+            "title": "SpliceAI-AL",
+            "field_name": "spliceai_ds_al",
+            "type": "number",
+            "do_import": true,
+            "source_name": "SPLICEAI",
+            "source_version": "20191004",
+            "annotation_category": "Splice Predictors",
+            "description": "delta scores (DS) for acceptor loss (AL)",
+            "value_example": "0.00;0.01;0.05;0.03;0.02;0.07;0.06;0.04;0.08;0.10;0.09;0.16;0.15;0.14;0.13;0.11;0.12;0.17;0.18;0.24",
+            "scope": "variant",
+            "schema_title": "SpliceAI-AL",
+            "facet_order": 28,
+            "max": 1
+        },
+        "spliceai_ds_dg": {
+            "title": "SpliceAI-DG",
+            "field_name": "spliceai_ds_dg",
+            "type": "number",
+            "do_import": true,
+            "source_name": "SPLICEAI",
+            "source_version": "20191004",
+            "annotation_category": "Splice Predictors",
+            "description": "delta scores (DS) for donor gain (DG)",
+            "value_example": "0.00;0.01;0.02;0.06;0.09;0.03;0.05;0.04;0.08;0.17;0.10;0.21;0.07;0.25;0.20;0.16;0.12;0.11;0.70;0.37",
+            "scope": "variant",
+            "schema_title": "SpliceAI-DG",
+            "facet_order": 29,
+            "max": 1
+        },
+        "spliceai_ds_dl": {
+            "title": "SpliceAI-DL",
+            "field_name": "spliceai_ds_dl",
+            "type": "number",
+            "do_import": true,
+            "source_name": "SPLICEAI",
+            "source_version": "20191004",
+            "annotation_category": "Splice Predictors",
+            "description": "delta scores (DS) for donor loss (DL)",
+            "value_example": "0.00;0.01;0.02;0.05;0.03;0.04;0.10;0.09;0.07;0.06;0.08;0.23;0.21;0.27;0.26;0.28;0.22;0.17;0.11;0.14",
+            "scope": "variant",
+            "schema_title": "SpliceAI-DL",
+            "facet_order": 30,
+            "max": 1
+        },
+        "clinvar_clnsig": {
+            "title": "Clinvar",
+            "field_name": "clinvar_clnsig",
+            "type": "string",
+            "do_import": true,
+            "source_name": "CLINVAR",
+            "source_version": "20191021",
+            "annotation_category": "variant database",
+            "description": "Clinical significance for this single variant",
+            "value_example": "Benign;Likely_benign;Conflicting_interpretations_of_pathogenicity;Uncertain_significance;Benign/Likely_benign;Pathogenic/Likely_pathogenic;Pathogenic;Likely_pathogenic;not_provided",
+            "scope": "variant",
+            "schema_title": "Clinvar",
+            "facet_order": 36
+        },
+        "mutanno_hgvsg": {
+            "title": "Variant",
+            "field_name": "mutanno_hgvsg",
+            "type": "string",
+            "do_import": true,
+            "source_name": "MUTANNO",
+            "source_version": "v0.4",
+            "annotation_category": "Position",
+            "description": "HGVS genome sequence name",
+            "scope": "variant",
+            "schema_title": "Variant",
+            "column_order": 10
+        },
+        "dbsnp_rs_number": {
+            "title": "dbSNP ID",
+            "field_name": "dbsnp_rs_number",
+            "type": "string",
+            "do_import": true,
+            "source_name": "DBSNP",
+            "source_version": "20190722",
+            "annotation_category": "Position",
+            "description": "dbSNP RS number",
+            "value_example": "rs900106464;rs996778209;rs1043209779;rs905587020;rs1189475219;rs1249477666;rs1427170431;rs1417276159;rs955405035;rs1169259779;rs999338640;rs1184193019;rs556755331;rs115660024;rs1412590796;rs1330927510;rs1423684909;rs1434757437;rs756473995;rs1277176852",
+            "scope": "variant",
+            "schema_title": "dbSNP ID",
+            "column_order": 11
+        },
         "genes": {
             "title": "Gene",
             "type": "array",
@@ -721,14 +822,16 @@
                         "column_order": 40
                     },
                     "genes_most_severe_transcript": {
-                        "title": "genes_most_severe_transcript",
+                        "title": "Transcript",
                         "field_name": "genes_most_severe_transcript",
                         "type": "string",
                         "do_import": true,
                         "source_name": "GENES",
                         "source_version": "v99",
                         "sub_embedding_group": "{\"key\": \"genes\", \"title\": \"Gene\"}",
+                        "annotation_category": "Gene",
                         "scope": "variant",
+                        "schema_title": "Transcript",
                         "column_order": 41
                     },
                     "genes_most_severe_consequence": {
@@ -745,19 +848,106 @@
                 }
             }
         },
-        "cytoband_cytoband": {
-            "title": "Cytoband",
-            "field_name": "cytoband_cytoband",
+        "clinvar_variationid": {
+            "title": "Clinvar ID",
+            "field_name": "clinvar_variationid",
             "type": "string",
             "do_import": true,
-            "source_name": "CYTOBAND",
-            "source_version": "2017-07-17",
-            "annotation_category": "Position",
-            "description": "cytoband",
-            "value_example": "1p36.33;1p36.32;1p36.31;1p36.23;1p36.22;1p36.21;1p36.13;1p36.12;1p36.11;1p35.3;1p35.2;1p35.1;1p34.3",
+            "source_name": "CLINVAR",
+            "source_version": "20191021",
+            "annotation_category": "variant database",
+            "description": "ClinVar variantion ID",
             "scope": "variant",
-            "schema_title": "Cytoband",
-            "facet_order": 3
+            "schema_title": "Clinvar ID",
+            "column_order": 70
+        },
+        "ID": {
+            "title": "dbSNP ID",
+            "field_name": "ID",
+            "type": "string",
+            "do_import": true,
+            "source_name": "VCF",
+            "source_version": "VCFv4.2",
+            "annotation_category": "Position",
+            "description": "dbSNP ID",
+            "value_example": "rs1921",
+            "scope": "variant",
+            "schema_title": "dbSNP ID"
+        },
+        "REF": {
+            "title": "Ref",
+            "field_name": "REF",
+            "type": "string",
+            "do_import": true,
+            "source_name": "VCF",
+            "source_version": "VCFv4.2",
+            "annotation_category": "Position",
+            "description": "Reference allele",
+            "value_example": "G",
+            "scope": "variant",
+            "schema_title": "Ref"
+        },
+        "ALT": {
+            "title": "Alt",
+            "field_name": "ALT",
+            "type": "string",
+            "do_import": true,
+            "source_name": "VCF",
+            "source_version": "VCFv4.2",
+            "annotation_category": "Position",
+            "description": "Alternative allele",
+            "value_example": "A;T;C;G;GAAATCA",
+            "scope": "variant",
+            "schema_title": "Alt"
+        },
+        "hg19": {
+            "title": "hg19 Coordinates",
+            "type": "array",
+            "items": {
+                "title": "hg19 Coordinates",
+                "type": "object",
+                "properties": {
+                    "hg19_hgvsg": {
+                        "title": "Variant",
+                        "field_name": "hg19_hgvsg",
+                        "type": "string",
+                        "do_import": true,
+                        "source_name": "HG19",
+                        "source_version": "v0.4",
+                        "sub_embedding_group": "{\"key\": \"hg19\", \"title\": \"hg19 Coordinates\"}",
+                        "annotation_category": "Position",
+                        "description": "HGVS genome sequence name (hg19)",
+                        "scope": "variant",
+                        "schema_title": "Variant"
+                    },
+                    "hg19_chrom": {
+                        "title": "Chromosome (hg19)",
+                        "field_name": "hg19_chrom",
+                        "type": "string",
+                        "do_import": true,
+                        "source_name": "HG19",
+                        "source_version": "v0.4",
+                        "sub_embedding_group": "{\"key\": \"hg19\", \"title\": \"hg19 Coordinates\"}",
+                        "annotation_category": "Position",
+                        "description": "hg19 coordinate chromosome",
+                        "scope": "variant",
+                        "schema_title": "Chromosome (hg19)"
+                    },
+                    "hg19_pos": {
+                        "title": "Position (hg19)",
+                        "field_name": "hg19_pos",
+                        "type": "integer",
+                        "do_import": true,
+                        "source_name": "HG19",
+                        "source_version": "v0.4",
+                        "sub_embedding_group": "{\"key\": \"hg19\", \"title\": \"hg19 Coordinates\"}",
+                        "annotation_category": "Position",
+                        "description": "hg19 coordinate position",
+                        "scope": "variant",
+                        "schema_title": "Position (hg19)"
+                    }
+                }
+            }
         },
         "uniprot_transmem_uniprotkb_ac": {
             "title": "uniprot_transmem_uniprotkb_ac",
@@ -786,20 +976,6 @@
                 "scope": "variant"
             }
         },
-        "dbsnp_rs_number": {
-            "title": "dbSNP ID",
-            "field_name": "dbsnp_rs_number",
-            "type": "string",
-            "do_import": true,
-            "source_name": "DBSNP",
-            "source_version": "20190722",
-            "annotation_category": "Position",
-            "description": "dbSNP RS number",
-            "value_example": "rs900106464;rs996778209;rs1043209779;rs905587020;rs1189475219;rs1249477666;rs1427170431;rs1417276159;rs955405035;rs1169259779;rs999338640;rs1184193019;rs556755331;rs115660024;rs1412590796;rs1330927510;rs1423684909;rs1434757437;rs756473995;rs1277176852",
-            "scope": "variant",
-            "schema_title": "dbSNP ID",
-            "column_order": 11
-        },
         "conservation_phastcons100": {
             "title": "PhastCons (100 Vertebrates)",
             "field_name": "conservation_phastcons100",
@@ -825,20 +1001,6 @@
             "value_example": "0.126;0.147;0.164;0.179;0.192;0.203;0.211;0.219;0.224;0.228;0.231;0.250;0.266;0.281;0.294;0.305;0.314;0.321;0.326;0.330",
             "scope": "variant",
             "schema_title": "PhastCons (30 Vertebrates)"
-        },
-        "conservation_phylop100": {
-            "title": "PhyloP (100 Vertabrates)",
-            "field_name": "conservation_phylop100",
-            "type": "number",
-            "do_import": true,
-            "source_name": "CONSERVATION",
-            "source_version": "2017-07-17",
-            "annotation_category": "Conservation",
-            "description": "PhyloP 100 way score",
-            "value_example": "0.214;0.252;0.240;0.213;-1.036;-0.984;-0.852;-1.095;-1.103;-2.621;-0.838;-1.387;0.121;0.221;0.198;-1.216;0.196;-0.931;0.232;-0.987",
-            "scope": "variant",
-            "schema_title": "PhyloP (100 Vertabrates)",
-            "facet_order": 21
         },
         "conservation_phastcons20": {
             "title": "PhastCons (20 Vertebrates)",
@@ -929,20 +1091,6 @@
             "scope": "variant",
             "schema_title": "PrimateAI (DL score)"
         },
-        "cadd_phred": {
-            "title": "CADD",
-            "field_name": "cadd_phred",
-            "type": "number",
-            "do_import": true,
-            "source_name": "CADD",
-            "source_version": "v1.5",
-            "annotation_category": "Missense Predictors",
-            "description": "CADD Phred score",
-            "value_example": "3.550;3.815;4.132;2.642;2.221;2.366;4.235;4.711;4.425;4.484;4.738;5.035;2.836;2.396;2.548;3.269;2.794;2.959;2.948;3.627",
-            "scope": "variant",
-            "schema_title": "CADD",
-            "facet_order": 22
-        },
         "spliceai_symbol": {
             "title": "spliceai_symbol",
             "field_name": "spliceai_symbol",
@@ -954,62 +1102,6 @@
             "description": "affected gene symbol",
             "value_example": "C1orf159;TTLL10;SKI;MORN1;AL589739.1;RER1;MEGF6;AJAP1;NPHP4;KCNAB2;CAMTA1;SLC45A1;RERE;SLC25A33;TMEM201;CASZ1;KIAA2013;PLOD1;MFN2;HNRNPCL2",
             "scope": "variant"
-        },
-        "spliceai_ds_ag": {
-            "title": "SpliceAI-AG",
-            "field_name": "spliceai_ds_ag",
-            "type": "number",
-            "do_import": true,
-            "source_name": "SPLICEAI",
-            "source_version": "20191004",
-            "annotation_category": "Splice Predictors",
-            "description": "delta scores (DS) for acceptor gain (AG)",
-            "value_example": "0.00;0.02;0.01;0.04;0.12;0.07;0.03;0.05;0.06;0.21;0.15;0.08;0.11;0.09;0.10;0.13;0.23;0.14;0.20;0.25",
-            "scope": "variant",
-            "schema_title": "SpliceAI-AG",
-            "facet_order": 26
-        },
-        "spliceai_ds_al": {
-            "title": "SpliceAI-AL",
-            "field_name": "spliceai_ds_al",
-            "type": "number",
-            "do_import": true,
-            "source_name": "SPLICEAI",
-            "source_version": "20191004",
-            "annotation_category": "Splice Predictors",
-            "description": "delta scores (DS) for acceptor loss (AL)",
-            "value_example": "0.00;0.01;0.05;0.03;0.02;0.07;0.06;0.04;0.08;0.10;0.09;0.16;0.15;0.14;0.13;0.11;0.12;0.17;0.18;0.24",
-            "scope": "variant",
-            "schema_title": "SpliceAI-AL",
-            "facet_order": 27
-        },
-        "spliceai_ds_dg": {
-            "title": "SpliceAI-DG",
-            "field_name": "spliceai_ds_dg",
-            "type": "number",
-            "do_import": true,
-            "source_name": "SPLICEAI",
-            "source_version": "20191004",
-            "annotation_category": "Splice Predictors",
-            "description": "delta scores (DS) for donor gain (DG)",
-            "value_example": "0.00;0.01;0.02;0.06;0.09;0.03;0.05;0.04;0.08;0.17;0.10;0.21;0.07;0.25;0.20;0.16;0.12;0.11;0.70;0.37",
-            "scope": "variant",
-            "schema_title": "SpliceAI-DG",
-            "facet_order": 28
-        },
-        "spliceai_ds_dl": {
-            "title": "SpliceAI-DL",
-            "field_name": "spliceai_ds_dl",
-            "type": "number",
-            "do_import": true,
-            "source_name": "SPLICEAI",
-            "source_version": "20191004",
-            "annotation_category": "Splice Predictors",
-            "description": "delta scores (DS) for donor loss (DL)",
-            "value_example": "0.00;0.01;0.02;0.05;0.03;0.04;0.10;0.09;0.07;0.06;0.08;0.23;0.21;0.27;0.26;0.28;0.22;0.17;0.11;0.14",
-            "scope": "variant",
-            "schema_title": "SpliceAI-DL",
-            "facet_order": 29
         },
         "spliceai_dp_ag": {
             "title": "spliceai_dp_ag",
@@ -1072,7 +1164,7 @@
             "schema_title": "SpliceAI max score"
         },
         "gnomad_ac": {
-            "title": "Gnomad Allele Count",
+            "title": "GnomAD Alt Allele Count",
             "field_name": "gnomad_ac",
             "type": "integer",
             "do_import": true,
@@ -1082,25 +1174,10 @@
             "description": "Alternate allele count for samples",
             "value_example": "1;3;2;4;460;58;12;1149;5;1227;65;20;7;441;23;10;11;991;215;6",
             "scope": "variant",
-            "schema_title": "Gnomad Allele Count"
-        },
-        "max_pop_af_af_popmax": {
-            "title": "Gnomad PopMax AF",
-            "field_name": "max_pop_af_af_popmax",
-            "type": "number",
-            "do_import": true,
-            "source_name": "GNOMAD",
-            "source_version": "v3.0",
-            "annotation_category": "Population Frequency",
-            "description": "maximum population allele frequency from gnomAD gnome v3.0",
-            "value_example": "1.65366e-05;9.1985e-05;5.35045e-05;1.54828e-05;1.54851e-05;0.000146456;1.54823e-05;0.000957854;0.0106084;1.54871e-05;2.37937e-05;0.000319285;1.54861e-05;1.54832e-05;0.000319081;1.54847e-05;1.54914e-05;7.32601e-05;4.761e-05;0.00135785",
-            "scope": "variant",
-            "schema_title": "Gnomad PopMax AF",
-            "column_order": 61,
-            "facet_order": 18
+            "schema_title": "GnomAD Alt Allele Count"
         },
         "gnomad_ac_afr": {
-            "title": "Gnomad Allele Count (Afr)",
+            "title": "GnomAD Alt AC - African-American/African",
             "field_name": "gnomad_ac_afr",
             "type": "integer",
             "do_import": true,
@@ -1110,10 +1187,10 @@
             "description": "Alternate allele count for samples of African-American/African ancestry",
             "value_example": "0;3;2;446;1;57;4;7;1099;1158;58;428;908;8;6;40;5;6951;21;10",
             "scope": "variant",
-            "schema_title": "Gnomad Allele Count (Afr)"
+            "schema_title": "GnomAD Alt AC - African-American/African"
         },
         "gnomad_ac_ami": {
-            "title": "gnomad_ac_ami",
+            "title": "GnomAD Alt AC - Amish",
             "field_name": "gnomad_ac_ami",
             "type": "integer",
             "do_import": true,
@@ -1122,10 +1199,11 @@
             "annotation_category": "Population Frequency",
             "description": "Alternate allele count for samples of Amish ancestry",
             "value_example": "0;11;326;16;291;106;293;5;104;14;30;6;2;1;8;3;73;7;43;13",
-            "scope": "variant"
+            "scope": "variant",
+            "schema_title": "GnomAD Alt AC - Amish"
         },
         "gnomad_ac_amr": {
-            "title": "gnomad_ac_amr",
+            "title": "GnomAD Alt AC - Latino",
             "field_name": "gnomad_ac_amr",
             "type": "integer",
             "do_import": true,
@@ -1134,10 +1212,11 @@
             "annotation_category": "Population Frequency",
             "description": "Alternate allele count for samples of Latino ancestry",
             "value_example": "0;2;10;1;36;41;5;13;8;19;23;2428;3;9;16;82;21;17;15;80",
-            "scope": "variant"
+            "scope": "variant",
+            "schema_title": "GnomAD Alt AC - Latino"
         },
         "gnomad_ac_asj": {
-            "title": "gnomad_ac_asj",
+            "title": "GnomAD Alt AC - Ashkenazi Jewish",
             "field_name": "gnomad_ac_asj",
             "type": "integer",
             "do_import": true,
@@ -1146,10 +1225,11 @@
             "annotation_category": "Population Frequency",
             "description": "Alternate allele count for samples of Ashkenazi Jewish ancestry",
             "value_example": "0;1;6;8;914;3;9;85;12;641;677;589;588;582;619;674;670;672;47;61",
-            "scope": "variant"
+            "scope": "variant",
+            "schema_title": "GnomAD Alt AC - Ashkenazi Jewish"
         },
         "gnomad_ac_eas": {
-            "title": "gnomad_ac_eas",
+            "title": "GnomAD Alt AC - East Asian",
             "field_name": "gnomad_ac_eas",
             "type": "integer",
             "do_import": true,
@@ -1158,10 +1238,11 @@
             "annotation_category": "Population Frequency",
             "description": "Alternate allele count for samples of East Asian ancestry",
             "value_example": "0;3;1;14;7;2;70;6;5;68;658;657;10;654;67;655;660;9;37;29",
-            "scope": "variant"
+            "scope": "variant",
+            "schema_title": "GnomAD Alt AC - East Asian"
         },
         "gnomad_ac_fin": {
-            "title": "gnomad_ac_fin",
+            "title": "GnomAD Alt AC - Finnish",
             "field_name": "gnomad_ac_fin",
             "type": "integer",
             "do_import": true,
@@ -1170,10 +1251,11 @@
             "annotation_category": "Population Frequency",
             "description": "Alternate allele count for samples of Finnish ancestry",
             "value_example": "0;12;1;57;7;3225;189;24;5;217;493;13;2612;2;1128;491;3;9;637;492",
-            "scope": "variant"
+            "scope": "variant",
+            "schema_title": "GnomAD Alt AC - Finnish"
         },
         "gnomad_ac_nfe": {
-            "title": "gnomad_ac_nfe",
+            "title": "GnomAD Alt AC - Non-Finnish European",
             "field_name": "gnomad_ac_nfe",
             "type": "integer",
             "do_import": true,
@@ -1182,10 +1264,11 @@
             "annotation_category": "Population Frequency",
             "description": "Alternate allele count for samples of Non-Finnish European ancestry",
             "value_example": "1;0;5;3;13;2;11;7;29;112;19;4;299;8;6;21844;10;21;9;273",
-            "scope": "variant"
+            "scope": "variant",
+            "schema_title": "GnomAD Alt AC - Non-Finnish European"
         },
         "gnomad_ac_sas": {
-            "title": "gnomad_ac_sas",
+            "title": "GnomAD Alt AC - South Asian",
             "field_name": "gnomad_ac_sas",
             "type": "integer",
             "do_import": true,
@@ -1194,10 +1277,11 @@
             "annotation_category": "Population Frequency",
             "description": "Alternate allele count for samples of South Asian ancestry",
             "value_example": "0;4;1;3;474;2;5;44;412;689;46;640;47;627;415;10;685;686;665;26",
-            "scope": "variant"
+            "scope": "variant",
+            "schema_title": "GnomAD Alt AC - South Asian"
         },
         "gnomad_ac_oth": {
-            "title": "gnomad_ac_oth",
+            "title": "GnomAD Alt AC - Other Ancestry",
             "field_name": "gnomad_ac_oth",
             "type": "integer",
             "do_import": true,
@@ -1206,10 +1290,11 @@
             "annotation_category": "Population Frequency",
             "description": "Alternate allele count for samples of Other ancestry",
             "value_example": "0;4;10;15;1;5;3;496;33;77;2;361;536;111;425;438;13;302;360;7",
-            "scope": "variant"
+            "scope": "variant",
+            "schema_title": "GnomAD Alt AC - Other Ancestry"
         },
         "gnomad_ac_male": {
-            "title": "gnomad_ac_male",
+            "title": "GnomAD Alt AC - male",
             "field_name": "gnomad_ac_male",
             "type": "integer",
             "do_import": true,
@@ -1218,10 +1303,11 @@
             "annotation_category": "Population Frequency",
             "description": "Alternate allele count for male samples",
             "value_example": "1;2;0;219;22;4;542;572;26;201;14;447;107;3;15;169;11;17501;6;10",
-            "scope": "variant"
+            "scope": "variant",
+            "schema_title": "GnomAD Alt AC - male"
         },
         "gnomad_ac_afr_male": {
-            "title": "gnomad_ac_afr_male",
+            "title": "GnomAD Alt AC - male African-American/African",
             "field_name": "gnomad_ac_afr_male",
             "type": "integer",
             "do_import": true,
@@ -1230,10 +1316,11 @@
             "annotation_category": "Population Frequency",
             "description": "Alternate allele count for male samples of African-American/African ancestry",
             "value_example": "0;1;2;213;21;3;519;538;23;192;400;4;18;3194;6;12;9;17;337;55",
-            "scope": "variant"
+            "scope": "variant",
+            "schema_title": "GnomAD Alt AC - male African-American/African"
         },
         "gnomad_ac_ami_male": {
-            "title": "gnomad_ac_ami_male",
+            "title": "GnomAD Alt AC - male Amish",
             "field_name": "gnomad_ac_ami_male",
             "type": "integer",
             "do_import": true,
@@ -1242,10 +1329,11 @@
             "annotation_category": "Population Frequency",
             "description": "Alternate allele count for male samples of Amish ancestry",
             "value_example": "0;6;159;4;136;56;3;54;15;1;5;38;2;24;17;37;40;55;18;53",
-            "scope": "variant"
+            "scope": "variant",
+            "schema_title": "GnomAD Alt AC - male Amish"
         },
         "gnomad_ac_amr_male": {
-            "title": "gnomad_ac_amr_male",
+            "title": "GnomAD Alt AC - male Latino",
             "field_name": "gnomad_ac_amr_male",
             "type": "integer",
             "do_import": true,
@@ -1254,10 +1342,11 @@
             "annotation_category": "Population Frequency",
             "description": "Alternate allele count for male samples of Latino ancestry",
             "value_example": "0;1;3;17;24;9;2;26;11;10;1364;6;7;52;20;4;14;8;45;146",
-            "scope": "variant"
+            "scope": "variant",
+            "schema_title": "GnomAD Alt AC - male Latino"
         },
         "gnomad_ac_asj_male": {
-            "title": "gnomad_ac_asj_male",
+            "title": "GnomAD Alt AC - male Ashkenazi Jewish",
             "field_name": "gnomad_ac_asj_male",
             "type": "integer",
             "do_import": true,
@@ -1266,10 +1355,11 @@
             "annotation_category": "Population Frequency",
             "description": "Alternate allele count for male samples of Ashkenazi Jewish ancestry",
             "value_example": "0;3;5;424;1;2;42;6;297;313;269;268;266;288;309;310;19;34;14;12",
-            "scope": "variant"
+            "scope": "variant",
+            "schema_title": "GnomAD Alt AC - male Ashkenazi Jewish"
         },
         "gnomad_ac_eas_male": {
-            "title": "gnomad_ac_eas_male",
+            "title": "GnomAD Alt AC - male East Asian",
             "field_name": "gnomad_ac_eas_male",
             "type": "integer",
             "do_import": true,
@@ -1278,10 +1368,11 @@
             "annotation_category": "Population Frequency",
             "description": "Alternate allele count for male samples of East Asian ancestry",
             "value_example": "0;1;4;45;2;40;341;339;335;337;342;5;20;9;34;29;187;16;27;6",
-            "scope": "variant"
+            "scope": "variant",
+            "schema_title": "GnomAD Alt AC - male East Asian"
         },
         "gnomad_ac_fin_male": {
-            "title": "gnomad_ac_fin_male",
+            "title": "GnomAD Alt AC - male Finnish",
             "field_name": "gnomad_ac_fin_male",
             "type": "integer",
             "do_import": true,
@@ -1290,10 +1381,11 @@
             "annotation_category": "Population Frequency",
             "description": "Alternate allele count for male samples of Finnish ancestry",
             "value_example": "0;9;40;1;3;2421;148;18;5;169;373;10;1959;835;371;2;7;464;372;467",
-            "scope": "variant"
+            "scope": "variant",
+            "schema_title": "GnomAD Alt AC - male Finnish"
         },
         "gnomad_ac_nfe_male": {
-            "title": "gnomad_ac_nfe_male",
+            "title": "GnomAD Alt AC - male Non-Finnish European",
             "field_name": "gnomad_ac_nfe_male",
             "type": "integer",
             "do_import": true,
@@ -1302,10 +1394,11 @@
             "annotation_category": "Population Frequency",
             "description": "Alternate allele count for male samples of Non-Finnish European ancestry",
             "value_example": "1;0;2;5;13;44;8;3;133;4;9261;7;10;118;9;11;72;687;70;28",
-            "scope": "variant"
+            "scope": "variant",
+            "schema_title": "GnomAD Alt AC - male Non-Finnish European"
         },
         "gnomad_ac_sas_male": {
-            "title": "gnomad_ac_sas_male",
+            "title": "GnomAD Alt AC - male South Asian",
             "field_name": "gnomad_ac_sas_male",
             "type": "integer",
             "do_import": true,
@@ -1314,10 +1407,11 @@
             "annotation_category": "Population Frequency",
             "description": "Alternate allele count for male samples of South Asian ancestry",
             "value_example": "0;2;1;393;4;40;5;328;558;41;517;42;506;331;9;555;3;556;538;20",
-            "scope": "variant"
+            "scope": "variant",
+            "schema_title": "GnomAD Alt AC - male South Asian"
         },
         "gnomad_ac_oth_male": {
-            "title": "gnomad_ac_oth_male",
+            "title": "GnomAD Alt AC - male Other Ancestry",
             "field_name": "gnomad_ac_oth_male",
             "type": "integer",
             "do_import": true,
@@ -1326,10 +1420,11 @@
             "annotation_category": "Population Frequency",
             "description": "Alternate allele count for male samples of Other ancestry",
             "value_example": "0;3;5;7;2;240;1;4;15;35;169;258;53;204;208;9;146;168;256;268",
-            "scope": "variant"
+            "scope": "variant",
+            "schema_title": "GnomAD Alt AC - male Other Ancestry"
         },
         "gnomad_ac_female": {
-            "title": "gnomad_ac_female",
+            "title": "GnomAD Alt AC - female",
             "field_name": "gnomad_ac_female",
             "type": "integer",
             "do_import": true,
@@ -1338,10 +1433,11 @@
             "annotation_category": "Population Frequency",
             "description": "Alternate allele count for female samples",
             "value_example": "0;2;1;241;36;3;8;607;655;39;16;240;9;10;544;108;20;209;4;6",
-            "scope": "variant"
+            "scope": "variant",
+            "schema_title": "GnomAD Alt AC - female"
         },
         "gnomad_ac_afr_female": {
-            "title": "gnomad_ac_afr_female",
+            "title": "GnomAD Alt AC - female African-American/African",
             "field_name": "gnomad_ac_afr_female",
             "type": "integer",
             "do_import": true,
@@ -1350,10 +1446,11 @@
             "annotation_category": "Population Frequency",
             "description": "Alternate allele count for female samples of African-American/African ancestry",
             "value_example": "0;2;233;1;36;3;4;580;620;35;236;508;6;22;3757;17;16;7;32;415",
-            "scope": "variant"
+            "scope": "variant",
+            "schema_title": "GnomAD Alt AC - female African-American/African"
         },
         "gnomad_ac_ami_female": {
-            "title": "gnomad_ac_ami_female",
+            "title": "GnomAD Alt AC - female Amish",
             "field_name": "gnomad_ac_ami_female",
             "type": "integer",
             "do_import": true,
@@ -1362,10 +1459,11 @@
             "annotation_category": "Population Frequency",
             "description": "Alternate allele count for female samples of Amish ancestry",
             "value_example": "0;5;167;12;155;50;157;2;8;15;3;1;35;19;7;20;38;21;48;49",
-            "scope": "variant"
+            "scope": "variant",
+            "schema_title": "GnomAD Alt AC - female Amish"
         },
         "gnomad_ac_amr_female": {
-            "title": "gnomad_ac_amr_female",
+            "title": "GnomAD Alt AC - female Latino",
             "field_name": "gnomad_ac_amr_female",
             "type": "integer",
             "do_import": true,
@@ -1374,10 +1472,11 @@
             "annotation_category": "Population Frequency",
             "description": "Alternate allele count for female samples of Latino ancestry",
             "value_example": "0;1;7;19;17;2;4;6;15;8;5;13;1064;3;30;9;35;104;917;1157",
-            "scope": "variant"
+            "scope": "variant",
+            "schema_title": "GnomAD Alt AC - female Latino"
         },
         "gnomad_ac_asj_female": {
-            "title": "gnomad_ac_asj_female",
+            "title": "GnomAD Alt AC - female Ashkenazi Jewish",
             "field_name": "gnomad_ac_asj_female",
             "type": "integer",
             "do_import": true,
@@ -1386,10 +1485,11 @@
             "annotation_category": "Population Frequency",
             "description": "Alternate allele count for female samples of Ashkenazi Jewish ancestry",
             "value_example": "0;1;3;490;6;43;344;364;320;316;331;361;9;362;28;27;2;14;22;196",
-            "scope": "variant"
+            "scope": "variant",
+            "schema_title": "GnomAD Alt AC - female Ashkenazi Jewish"
         },
         "gnomad_ac_eas_female": {
-            "title": "gnomad_ac_eas_female",
+            "title": "GnomAD Alt AC - female East Asian",
             "field_name": "gnomad_ac_eas_female",
             "type": "integer",
             "do_import": true,
@@ -1398,10 +1498,11 @@
             "annotation_category": "Population Frequency",
             "description": "Alternate allele count for female samples of East Asian ancestry",
             "value_example": "0;2;1;10;3;25;4;28;317;318;319;6;315;27;320;17;20;36;21;171",
-            "scope": "variant"
+            "scope": "variant",
+            "schema_title": "GnomAD Alt AC - female East Asian"
         },
         "gnomad_ac_fin_female": {
-            "title": "gnomad_ac_fin_female",
+            "title": "GnomAD Alt AC - female Finnish",
             "field_name": "gnomad_ac_fin_female",
             "type": "integer",
             "do_import": true,
@@ -1410,10 +1511,11 @@
             "annotation_category": "Population Frequency",
             "description": "Alternate allele count for female samples of Finnish ancestry",
             "value_example": "0;3;1;17;4;804;41;6;48;120;2;653;293;173;33;292;291;66;286;9",
-            "scope": "variant"
+            "scope": "variant",
+            "schema_title": "GnomAD Alt AC - female Finnish"
         },
         "gnomad_ac_nfe_female": {
-            "title": "gnomad_ac_nfe_female",
+            "title": "GnomAD Alt AC - female Non-Finnish European",
             "field_name": "gnomad_ac_nfe_female",
             "type": "integer",
             "do_import": true,
@@ -1422,10 +1524,11 @@
             "annotation_category": "Population Frequency",
             "description": "Alternate allele count for female samples of Non-Finnish European ancestry",
             "value_example": "0;1;4;8;6;16;68;2;11;166;12583;3;7;155;10;22;9;12;79;941",
-            "scope": "variant"
+            "scope": "variant",
+            "schema_title": "GnomAD Alt AC - female Non-Finnish European"
         },
         "gnomad_ac_sas_female": {
-            "title": "gnomad_ac_sas_female",
+            "title": "GnomAD Alt AC - female South Asian",
             "field_name": "gnomad_ac_sas_female",
             "type": "integer",
             "do_import": true,
@@ -1434,10 +1537,11 @@
             "annotation_category": "Population Frequency",
             "description": "Alternate allele count for female samples of South Asian ancestry",
             "value_example": "0;2;1;81;4;84;131;5;123;121;130;127;6;7;20;42;3;40;9;46",
-            "scope": "variant"
+            "scope": "variant",
+            "schema_title": "GnomAD Alt AC - female South Asian"
         },
         "gnomad_ac_oth_female": {
-            "title": "gnomad_ac_oth_female",
+            "title": "GnomAD Alt AC - female Other Ancestry",
             "field_name": "gnomad_ac_oth_female",
             "type": "integer",
             "do_import": true,
@@ -1446,10 +1550,11 @@
             "annotation_category": "Population Frequency",
             "description": "Alternate allele count for female samples of Other ancestry",
             "value_example": "0;1;7;10;5;3;256;2;18;42;192;278;58;221;230;4;156;290;272;6",
-            "scope": "variant"
+            "scope": "variant",
+            "schema_title": "GnomAD Alt AC - female Other Ancestry"
         },
         "gnomad_ac_raw": {
-            "title": "gnomad_ac_raw",
+            "title": "GnomAD Alt AC - including low-confidence genotypes",
             "field_name": "gnomad_ac_raw",
             "type": "integer",
             "do_import": true,
@@ -1458,10 +1563,11 @@
             "annotation_category": "Population Frequency",
             "description": "Alternate allele count for samples before removing low-confidence genotypes",
             "value_example": "1;3;2;4;460;58;12;1155;5;1230;65;20;7;441;23;10;11;1006;234;6",
-            "scope": "variant"
+            "scope": "variant",
+            "schema_title": "GnomAD Alt AC - including low-confidence genotypes"
         },
         "gnomad_an_afr": {
-            "title": "gnomad_an_afr",
+            "title": "GnomAD Total AN - African-American/African",
             "field_name": "gnomad_an_afr",
             "type": "integer",
             "do_import": true,
@@ -1470,10 +1576,11 @@
             "annotation_category": "Population Frequency",
             "description": "Total number of alleles in samples of African-American/African ancestry",
             "value_example": "30198;32614;37380;42030;42040;42052;42046;42056;42042;42006;42028;42008;42036;42012;41946;42002;41978;41992;41906;41804",
-            "scope": "variant"
+            "scope": "variant",
+            "schema_title": "GnomAD Total AN - African-American/African"
         },
         "gnomad_an_ami": {
-            "title": "gnomad_an_ami",
+            "title": "GnomAD Total AN - Amish",
             "field_name": "gnomad_an_ami",
             "type": "integer",
             "do_import": true,
@@ -1482,24 +1589,11 @@
             "annotation_category": "Population Frequency",
             "description": "Total number of alleles in samples of Amish ancestry",
             "value_example": "848;856;874;900;898;896;888;882;884;876;878;880;886;890;892;894;870;872;846;820",
-            "scope": "variant"
-        },
-        "gnomad_an": {
-            "title": "Gnomad Allele Depth",
-            "field_name": "gnomad_an",
-            "type": "integer",
-            "do_import": true,
-            "source_name": "GNOMAD",
-            "source_version": "v3.0",
-            "annotation_category": "Population Frequency",
-            "description": "Total number of alleles in samples",
-            "value_example": "123474;127784;135984;143312;143316;143326;143340;143286;143324;143236;143302;143260;143282;143094;143224;143234;143218;143256;143194;143046",
             "scope": "variant",
-            "schema_title": "Gnomad Allele Depth",
-            "facet_order": 19
+            "schema_title": "GnomAD Total AN - Amish"
         },
         "gnomad_an_amr": {
-            "title": "gnomad_an_amr",
+            "title": "GnomAD Total AN - Latino",
             "field_name": "gnomad_an_amr",
             "type": "integer",
             "do_import": true,
@@ -1508,10 +1602,11 @@
             "annotation_category": "Population Frequency",
             "description": "Total number of alleles in samples of Latino ancestry",
             "value_example": "12176;12454;13138;13660;13654;13656;13662;13658;13652;13650;13648;13640;13644;13646;13572;13568;13634;13664;13642;13618",
-            "scope": "variant"
+            "scope": "variant",
+            "schema_title": "GnomAD Total AN - Latino"
         },
         "gnomad_an_asj": {
-            "title": "gnomad_an_asj",
+            "title": "GnomAD Total AN - Ashkenazi Jewish",
             "field_name": "gnomad_an_asj",
             "type": "integer",
             "do_import": true,
@@ -1520,10 +1615,11 @@
             "annotation_category": "Population Frequency",
             "description": "Total number of alleles in samples of Ashkenazi Jewish ancestry",
             "value_example": "3024;3088;3220;3324;3322;3320;3318;3316;3314;3154;3158;3182;3312;3310;3298;3300;3292;3302;3290;3288",
-            "scope": "variant"
+            "scope": "variant",
+            "schema_title": "GnomAD Total AN - Ashkenazi Jewish"
         },
         "gnomad_an_eas": {
-            "title": "gnomad_an_eas",
+            "title": "GnomAD Total AN - East Asian",
             "field_name": "gnomad_an_eas",
             "type": "integer",
             "do_import": true,
@@ -1532,10 +1628,11 @@
             "annotation_category": "Population Frequency",
             "description": "Total number of alleles in samples of East Asian ancestry",
             "value_example": "2936;2984;3080;3134;3132;3130;3128;3126;3122;3124;3118;3104;3120;3110;3098;3116;3090;3082;3094;3050",
-            "scope": "variant"
+            "scope": "variant",
+            "schema_title": "GnomAD Total AN - East Asian"
         },
         "gnomad_an_fin": {
-            "title": "gnomad_an_fin",
+            "title": "GnomAD Total AN - Finnish",
             "field_name": "gnomad_an_fin",
             "type": "integer",
             "do_import": true,
@@ -1544,10 +1641,11 @@
             "annotation_category": "Population Frequency",
             "description": "Total number of alleles in samples of Finnish ancestry",
             "value_example": "9288;9522;10016;10476;10480;10462;10468;10482;10478;10458;10466;10452;10406;10446;10448;10486;10484;10444;10472;10470",
-            "scope": "variant"
+            "scope": "variant",
+            "schema_title": "GnomAD Total AN - Finnish"
         },
         "gnomad_an_nfe": {
-            "title": "gnomad_an_nfe",
+            "title": "GnomAD Total AN - Non-Finnish European",
             "field_name": "gnomad_an_nfe",
             "type": "integer",
             "do_import": true,
@@ -1556,10 +1654,11 @@
             "annotation_category": "Population Frequency",
             "description": "Total number of alleles in samples of Non-Finnish European ancestry",
             "value_example": "60472;61584;63356;64588;64578;64584;64590;64566;64570;64592;64574;64586;64580;64552;64572;64582;64568;64576;64562;64556",
-            "scope": "variant"
+            "scope": "variant",
+            "schema_title": "GnomAD Total AN - Non-Finnish European"
         },
         "gnomad_an_sas": {
-            "title": "gnomad_an_sas",
+            "title": "GnomAD Total AN - South Asian",
             "field_name": "gnomad_an_sas",
             "type": "integer",
             "do_import": true,
@@ -1568,10 +1667,11 @@
             "annotation_category": "Population Frequency",
             "description": "Total number of alleles in samples of South Asian ancestry",
             "value_example": "2668;2764;2864;3048;3050;3046;3038;3052;3044;3042;3040;3030;3036;3034;3024;3032;3028;3026;3020;3014",
-            "scope": "variant"
+            "scope": "variant",
+            "schema_title": "GnomAD Total AN - South Asian"
         },
         "gnomad_an_oth": {
-            "title": "gnomad_an_oth",
+            "title": "GnomAD Total AN - Other Ancestry",
             "field_name": "gnomad_an_oth",
             "type": "integer",
             "do_import": true,
@@ -1580,10 +1680,11 @@
             "annotation_category": "Population Frequency",
             "description": "Total number of alleles in samples of Other ancestry",
             "value_example": "1864;1918;2056;2152;2154;2150;2128;2132;2144;2146;2148;2142;2124;2126;2130;2138;2118;1930;1932;1978",
-            "scope": "variant"
+            "scope": "variant",
+            "schema_title": "GnomAD Total AN - Other Ancestry"
         },
         "gnomad_an_male": {
-            "title": "gnomad_an_male",
+            "title": "GnomAD Total AN - male",
             "field_name": "gnomad_an_male",
             "type": "integer",
             "do_import": true,
@@ -1592,10 +1693,11 @@
             "annotation_category": "Population Frequency",
             "description": "Total number of alleles in male samples",
             "value_example": "59752;61784;65762;69456;69464;69448;69474;69438;69470;69404;69452;69426;69424;69326;69394;69408;69396;69416;69390;69310",
-            "scope": "variant"
+            "scope": "variant",
+            "schema_title": "GnomAD Total AN - male"
         },
         "gnomad_an_afr_male": {
-            "title": "gnomad_an_afr_male",
+            "title": "GnomAD Total AN - male African-American/African",
             "field_name": "gnomad_an_afr_male",
             "type": "integer",
             "do_import": true,
@@ -1604,10 +1706,11 @@
             "annotation_category": "Population Frequency",
             "description": "Total number of alleles in male samples of African-American/African ancestry",
             "value_example": "13862;14930;17116;19342;19348;19350;19338;19324;19336;19316;19328;19306;19326;19310;19260;19210;19224;19220;19304;18248",
-            "scope": "variant"
+            "scope": "variant",
+            "schema_title": "GnomAD Total AN - male African-American/African"
         },
         "gnomad_an_ami_male": {
-            "title": "gnomad_an_ami_male",
+            "title": "GnomAD Total AN - male Amish",
             "field_name": "gnomad_an_ami_male",
             "type": "integer",
             "do_import": true,
@@ -1616,10 +1719,11 @@
             "annotation_category": "Population Frequency",
             "description": "Total number of alleles in male samples of Amish ancestry",
             "value_example": "394;400;416;430;428;424;420;422;418;426;412;396;320;336;330;226;376;354;348;392",
-            "scope": "variant"
+            "scope": "variant",
+            "schema_title": "GnomAD Total AN - male Amish"
         },
         "gnomad_an_amr_male": {
-            "title": "gnomad_an_amr_male",
+            "title": "GnomAD Total AN - male Latino",
             "field_name": "gnomad_an_amr_male",
             "type": "integer",
             "do_import": true,
@@ -1628,10 +1732,11 @@
             "annotation_category": "Population Frequency",
             "description": "Total number of alleles in male samples of Latino ancestry",
             "value_example": "6844;7012;7428;7746;7742;7750;7748;7752;7740;7734;7738;7702;7698;7724;7736;7744;7732;7728;7710;7712",
-            "scope": "variant"
+            "scope": "variant",
+            "schema_title": "GnomAD Total AN - male Latino"
         },
         "gnomad_an_asj_male": {
-            "title": "gnomad_an_asj_male",
+            "title": "GnomAD Total AN - male Ashkenazi Jewish",
             "field_name": "gnomad_an_asj_male",
             "type": "integer",
             "do_import": true,
@@ -1640,10 +1745,11 @@
             "annotation_category": "Population Frequency",
             "description": "Total number of alleles in male samples of Ashkenazi Jewish ancestry",
             "value_example": "1426;1458;1520;1562;1560;1558;1556;1478;1480;1494;1554;1550;1542;1546;1552;1538;1524;1540;1548;1518",
-            "scope": "variant"
+            "scope": "variant",
+            "schema_title": "GnomAD Total AN - male Ashkenazi Jewish"
         },
         "gnomad_an_eas_male": {
-            "title": "gnomad_an_eas_male",
+            "title": "GnomAD Total AN - male East Asian",
             "field_name": "gnomad_an_eas_male",
             "type": "integer",
             "do_import": true,
@@ -1652,10 +1758,11 @@
             "annotation_category": "Population Frequency",
             "description": "Total number of alleles in male samples of East Asian ancestry",
             "value_example": "1582;1614;1658;1686;1684;1682;1680;1678;1664;1674;1672;1668;1662;1670;1650;1640;1636;1656;1666;1660",
-            "scope": "variant"
+            "scope": "variant",
+            "schema_title": "GnomAD Total AN - male East Asian"
         },
         "gnomad_an_fin_male": {
-            "title": "gnomad_an_fin_male",
+            "title": "GnomAD Total AN - male Finnish",
             "field_name": "gnomad_an_fin_male",
             "type": "integer",
             "do_import": true,
@@ -1664,10 +1771,11 @@
             "annotation_category": "Population Frequency",
             "description": "Total number of alleles in male samples of Finnish ancestry",
             "value_example": "7048;7238;7612;7970;7976;7958;7964;7978;7972;7974;7954;7962;7948;7956;7910;7944;7980;7982;7946;7968",
-            "scope": "variant"
+            "scope": "variant",
+            "schema_title": "GnomAD Total AN - male Finnish"
         },
         "gnomad_an_nfe_male": {
-            "title": "gnomad_an_nfe_male",
+            "title": "GnomAD Total AN - male Non-Finnish European",
             "field_name": "gnomad_an_nfe_male",
             "type": "integer",
             "do_import": true,
@@ -1676,10 +1784,11 @@
             "annotation_category": "Population Frequency",
             "description": "Total number of alleles in male samples of Non-Finnish European ancestry",
             "value_example": "25500;25946;26672;27186;27184;27190;27172;27188;27182;27180;27166;27176;27192;27170;27174;27118;27098;27104;27080;27072",
-            "scope": "variant"
+            "scope": "variant",
+            "schema_title": "GnomAD Total AN - male Non-Finnish European"
         },
         "gnomad_an_sas_male": {
-            "title": "gnomad_an_sas_male",
+            "title": "GnomAD Total AN - male South Asian",
             "field_name": "gnomad_an_sas_male",
             "type": "integer",
             "do_import": true,
@@ -1688,10 +1797,11 @@
             "annotation_category": "Population Frequency",
             "description": "Total number of alleles in male samples of South Asian ancestry",
             "value_example": "2182;2256;2336;2482;2484;2480;2474;2486;2478;2476;2472;2464;2470;2466;2462;2468;2460;2456;2370;2364",
-            "scope": "variant"
+            "scope": "variant",
+            "schema_title": "GnomAD Total AN - male South Asian"
         },
         "gnomad_an_oth_male": {
-            "title": "gnomad_an_oth_male",
+            "title": "GnomAD Total AN - male Other Ancestry",
             "field_name": "gnomad_an_oth_male",
             "type": "integer",
             "do_import": true,
@@ -1700,10 +1810,11 @@
             "annotation_category": "Population Frequency",
             "description": "Total number of alleles in male samples of Other ancestry",
             "value_example": "914;930;1004;1052;1054;1050;1046;1048;1038;1034;1036;1044;944;972;1042;1040;996;988;1008;1014",
-            "scope": "variant"
+            "scope": "variant",
+            "schema_title": "GnomAD Total AN - male Other Ancestry"
         },
         "gnomad_an_female": {
-            "title": "gnomad_an_female",
+            "title": "GnomAD Total AN - female",
             "field_name": "gnomad_an_female",
             "type": "integer",
             "do_import": true,
@@ -1712,10 +1823,11 @@
             "annotation_category": "Population Frequency",
             "description": "Total number of alleles in female samples",
             "value_example": "63722;66000;70222;73856;73848;73868;73870;73866;73854;73832;73850;73834;73844;73836;73768;73830;73826;73822;73840;73804",
-            "scope": "variant"
+            "scope": "variant",
+            "schema_title": "GnomAD Total AN - female"
         },
         "gnomad_an_afr_female": {
-            "title": "gnomad_an_afr_female",
+            "title": "GnomAD Total AN - female African-American/African",
             "field_name": "gnomad_an_afr_female",
             "type": "integer",
             "do_import": true,
@@ -1724,10 +1836,11 @@
             "annotation_category": "Population Frequency",
             "description": "Total number of alleles in female samples of African-American/African ancestry",
             "value_example": "16336;17684;20264;22688;22692;22704;22706;22700;22682;22694;22684;22680;22640;22678;22672;22646;22594;22582;22650;22648",
-            "scope": "variant"
+            "scope": "variant",
+            "schema_title": "GnomAD Total AN - female African-American/African"
         },
         "gnomad_an_ami_female": {
-            "title": "gnomad_an_ami_female",
+            "title": "GnomAD Total AN - female Amish",
             "field_name": "gnomad_an_ami_female",
             "type": "integer",
             "do_import": true,
@@ -1736,10 +1849,11 @@
             "annotation_category": "Population Frequency",
             "description": "Total number of alleles in female samples of Amish ancestry",
             "value_example": "454;456;458;470;468;464;462;460;466;448;452;434;424;322;376;360;244;450;418;398",
-            "scope": "variant"
+            "scope": "variant",
+            "schema_title": "GnomAD Total AN - female Amish"
         },
         "gnomad_an_amr_female": {
-            "title": "gnomad_an_amr_female",
+            "title": "GnomAD Total AN - female Latino",
             "field_name": "gnomad_an_amr_female",
             "type": "integer",
             "do_import": true,
@@ -1748,10 +1862,11 @@
             "annotation_category": "Population Frequency",
             "description": "Total number of alleles in female samples of Latino ancestry",
             "value_example": "5332;5442;5710;5914;5912;5916;5906;5902;5904;5908;5870;5910;5894;5886;5890;5896;5866;5862;5888;5864",
-            "scope": "variant"
+            "scope": "variant",
+            "schema_title": "GnomAD Total AN - female Latino"
         },
         "gnomad_an_asj_female": {
-            "title": "gnomad_an_asj_female",
+            "title": "GnomAD Total AN - female Ashkenazi Jewish",
             "field_name": "gnomad_an_asj_female",
             "type": "integer",
             "do_import": true,
@@ -1760,10 +1875,11 @@
             "annotation_category": "Population Frequency",
             "description": "Total number of alleles in female samples of Ashkenazi Jewish ancestry",
             "value_example": "1598;1630;1700;1762;1760;1758;1756;1754;1676;1678;1688;1744;1746;1742;1748;1738;1752;1750;1736;1728",
-            "scope": "variant"
+            "scope": "variant",
+            "schema_title": "GnomAD Total AN - female Ashkenazi Jewish"
         },
         "gnomad_an_eas_female": {
-            "title": "gnomad_an_eas_female",
+            "title": "GnomAD Total AN - female East Asian",
             "field_name": "gnomad_an_eas_female",
             "type": "integer",
             "do_import": true,
@@ -1772,10 +1888,11 @@
             "annotation_category": "Population Frequency",
             "description": "Total number of alleles in female samples of East Asian ancestry",
             "value_example": "1354;1370;1422;1448;1446;1444;1442;1440;1438;1436;1432;1430;1428;1424;1426;1410;1398;1412;1414;1400",
-            "scope": "variant"
+            "scope": "variant",
+            "schema_title": "GnomAD Total AN - female East Asian"
         },
         "gnomad_an_fin_female": {
-            "title": "gnomad_an_fin_female",
+            "title": "GnomAD Total AN - female Finnish",
             "field_name": "gnomad_an_fin_female",
             "type": "integer",
             "do_import": true,
@@ -1784,10 +1901,11 @@
             "annotation_category": "Population Frequency",
             "description": "Total number of alleles in female samples of Finnish ancestry",
             "value_example": "2240;2284;2404;2506;2504;2502;2496;2500;2498;2488;2468;2466;2458;2492;2456;2472;2480;2476;2494;2482",
-            "scope": "variant"
+            "scope": "variant",
+            "schema_title": "GnomAD Total AN - female Finnish"
         },
         "gnomad_an_nfe_female": {
-            "title": "gnomad_an_nfe_female",
+            "title": "GnomAD Total AN - female Non-Finnish European",
             "field_name": "gnomad_an_nfe_female",
             "type": "integer",
             "do_import": true,
@@ -1796,10 +1914,11 @@
             "annotation_category": "Population Frequency",
             "description": "Total number of alleles in female samples of Non-Finnish European ancestry",
             "value_example": "34972;35638;36684;37402;37394;37400;37398;37404;37392;37386;37396;37388;37382;37390;37384;37374;37362;37296;37264;37286",
-            "scope": "variant"
+            "scope": "variant",
+            "schema_title": "GnomAD Total AN - female Non-Finnish European"
         },
         "gnomad_an_sas_female": {
-            "title": "gnomad_an_sas_female",
+            "title": "GnomAD Total AN - female South Asian",
             "field_name": "gnomad_an_sas_female",
             "type": "integer",
             "do_import": true,
@@ -1808,10 +1927,11 @@
             "annotation_category": "Population Frequency",
             "description": "Total number of alleles in female samples of South Asian ancestry",
             "value_example": "486;508;528;566;564;562;558;560;556;554;550;552;540;544;498;538;546;514;534;494",
-            "scope": "variant"
+            "scope": "variant",
+            "schema_title": "GnomAD Total AN - female South Asian"
         },
         "gnomad_an_oth_female": {
-            "title": "gnomad_an_oth_female",
+            "title": "GnomAD Total AN - female Other Ancestry",
             "field_name": "gnomad_an_oth_female",
             "type": "integer",
             "do_import": true,
@@ -1820,10 +1940,11 @@
             "annotation_category": "Population Frequency",
             "description": "Total number of alleles in female samples of Other ancestry",
             "value_example": "950;988;1052;1100;1098;1082;1084;1096;1094;1090;1092;1088;986;1006;1086;1050;1074;1038;1036;1022",
-            "scope": "variant"
+            "scope": "variant",
+            "schema_title": "GnomAD Total AN - female Other Ancestry"
         },
         "gnomad_an_raw": {
-            "title": "gnomad_an_raw",
+            "title": "GnomAD Total AN - including low-confidence genotypes",
             "field_name": "gnomad_an_raw",
             "type": "integer",
             "do_import": true,
@@ -1832,10 +1953,11 @@
             "annotation_category": "Population Frequency",
             "description": "Total number of alleles in samples before removing low-confidence genotypes",
             "value_example": "128854;132628;138990;143380;143378;143382;143388;143392;143384;143354;143376;143370;143348;143364;143344;143318;143346;143362;143316;143292",
-            "scope": "variant"
+            "scope": "variant",
+            "schema_title": "GnomAD Total AN - including low-confidence genotypes"
         },
         "gnomad_af_afr": {
-            "title": "gnomad_af_afr",
+            "title": "GnomAD Alt AF - African-American/African",
             "field_name": "gnomad_af_afr",
             "type": "number",
             "do_import": true,
@@ -1845,10 +1967,11 @@
             "description": "Alternate allele frequency in samples of African-American/African ancestry",
             "value_example": "0.00000e+00;9.19850e-05;5.35045e-05;1.06084e-02;2.37937e-05;4.76100e-05;1.35785e-03;2.38141e-05;9.54517e-05;2.39212e-05;1.67456e-04;2.38345e-05;2.61966e-02;1.00771e-04;2.50689e-05;2.90342e-02;1.37977e-03;2.37914e-05;4.75670e-05;7.13504e-05",
             "scope": "variant",
+            "schema_title": "GnomAD Alt AF - African-American/African",
             "max": 1
         },
         "gnomad_af_ami": {
-            "title": "gnomad_af_ami",
+            "title": "GnomAD Alt AF - Amish",
             "field_name": "gnomad_af_ami",
             "type": "number",
             "do_import": true,
@@ -1858,10 +1981,11 @@
             "description": "Alternate allele frequency in samples of Amish ancestry",
             "value_example": "0.00000e+00;1.22494e-02;3.63839e-01;1.78174e-02;3.24777e-01;1.18040e-01;1.17778e-01;3.25556e-01;5.55556e-03;1.16071e-01;1.19369e-01;4.43038e-02;9.86842e-02;2.02703e-02;6.21118e-03;7.09220e-03;3.12500e-03;8.88889e-03;3.34076e-03;8.37156e-02",
             "scope": "variant",
+            "schema_title": "GnomAD Alt AF - Amish",
             "max": 1
         },
         "gnomad_af_amr": {
-            "title": "gnomad_af_amr",
+            "title": "GnomAD Alt AF - Latino",
             "field_name": "gnomad_af_amr",
             "type": "number",
             "do_import": true,
@@ -1871,25 +1995,11 @@
             "description": "Alternate allele frequency in samples of Latino ancestry",
             "value_example": "0.00000e+00;1.46456e-04;7.32279e-04;7.32601e-05;7.32386e-05;7.32172e-05;2.63659e-03;3.02182e-03;3.66247e-04;7.32708e-05;9.51684e-04;7.34322e-05;5.87458e-04;7.32493e-05;3.00895e-03;1.39439e-03;7.38116e-05;5.86682e-04;7.36052e-05;7.35294e-05",
             "scope": "variant",
-            "max": 1
-        },
-        "gnomad_af": {
-            "title": "Gnomad Total AF",
-            "field_name": "gnomad_af",
-            "type": "number",
-            "do_import": true,
-            "source_name": "GNOMAD",
-            "source_version": "v3.0",
-            "annotation_category": "Population Frequency",
-            "description": "Alternate allele frequency in samples",
-            "value_example": "8.09887e-06;2.34771e-05;1.47076e-05;6.97778e-06;2.79111e-05;1.39552e-05;6.97710e-06;6.97642e-06;2.79162e-05;3.20951e-03;6.98149e-06;6.97827e-06;6.98032e-06;6.97924e-06;6.98841e-06;6.98207e-06;1.39632e-05;4.04977e-04;1.39610e-05;2.79341e-05",
-            "scope": "variant",
-            "schema_title": "Gnomad Total AF",
-            "facet_order": 17,
+            "schema_title": "GnomAD Alt AF - Latino",
             "max": 1
         },
         "gnomad_af_asj": {
-            "title": "gnomad_af_asj",
+            "title": "GnomAD Alt AF - Ashkenazi Jewish",
             "field_name": "gnomad_af_asj",
             "type": "number",
             "do_import": true,
@@ -1899,10 +2009,11 @@
             "description": "Alternate allele frequency in samples of Ashkenazi Jewish ancestry",
             "value_example": "0.00000e+00;3.01205e-04;1.80723e-03;2.40674e-03;2.74970e-01;3.01023e-04;9.04159e-04;2.71084e-03;2.56024e-02;3.61228e-03;9.03614e-04;3.00842e-04;1.93072e-01;2.03916e-01;2.55716e-02;1.85104e-01;1.77429e-01;1.75407e-01;1.86446e-01;1.80614e-03",
             "scope": "variant",
+            "schema_title": "GnomAD Alt AF - Ashkenazi Jewish",
             "max": 1
         },
         "gnomad_af_eas": {
-            "title": "gnomad_af_eas",
+            "title": "GnomAD Alt AF - East Asian",
             "field_name": "gnomad_af_eas",
             "type": "number",
             "do_import": true,
@@ -1912,10 +2023,11 @@
             "description": "Alternate allele frequency in samples of East Asian ancestry",
             "value_example": "0.00000e+00;9.57854e-04;3.19285e-04;3.19081e-04;3.19489e-04;4.47570e-03;2.23642e-03;3.19898e-04;9.59079e-04;6.38978e-04;2.23928e-02;2.23499e-03;6.39795e-04;3.20102e-04;6.38162e-04;1.91449e-03;6.39386e-04;6.38570e-04;1.59847e-03;2.23785e-03",
             "scope": "variant",
+            "schema_title": "GnomAD Alt AF - East Asian",
             "max": 1
         },
         "gnomad_af_fin": {
-            "title": "gnomad_af_fin",
+            "title": "GnomAD Alt AF - Finnish",
             "field_name": "gnomad_af_fin",
             "type": "number",
             "do_import": true,
@@ -1925,10 +2037,11 @@
             "description": "Alternate allele frequency in samples of Finnish ancestry",
             "value_example": "0.00000e+00;1.14745e-03;9.54016e-05;5.47656e-03;9.71251e-05;9.68992e-05;9.54563e-05;9.65997e-05;6.76721e-04;3.11173e-01;9.55657e-05;9.53652e-05;1.81034e-02;2.29226e-03;4.77190e-04;9.54198e-05;2.07934e-02;4.71409e-02;1.24402e-03;4.77920e-04",
             "scope": "variant",
+            "schema_title": "GnomAD Alt AF - Finnish",
             "max": 1
         },
         "gnomad_af_nfe": {
-            "title": "gnomad_af_nfe",
+            "title": "GnomAD Alt AF - Non-Finnish European",
             "field_name": "gnomad_af_nfe",
             "type": "number",
             "do_import": true,
@@ -1938,10 +2051,11 @@
             "description": "Alternate allele frequency in samples of Non-Finnish European ancestry",
             "value_example": "1.65366e-05;0.00000e+00;1.54828e-05;1.54851e-05;1.54823e-05;1.54880e-05;1.54871e-05;1.54861e-05;1.54832e-05;1.54847e-05;1.54914e-05;1.54837e-05;7.74401e-05;4.64569e-05;1.54890e-05;1.54904e-05;2.01376e-04;1.54842e-05;3.09693e-05;1.54875e-05",
             "scope": "variant",
+            "schema_title": "GnomAD Alt AF - Non-Finnish European",
             "max": 1
         },
         "gnomad_af_sas": {
-            "title": "gnomad_af_sas",
+            "title": "GnomAD Alt AF - South Asian",
             "field_name": "gnomad_af_sas",
             "type": "number",
             "do_import": true,
@@ -1951,10 +2065,11 @@
             "description": "Alternate allele frequency in samples of South Asian ancestry",
             "value_example": "0.00000e+00;1.31148e-03;3.27654e-04;3.28299e-04;9.84898e-04;3.28515e-04;1.56539e-01;3.28947e-04;6.60502e-04;9.86842e-04;3.30251e-04;3.29164e-04;3.29815e-04;3.30033e-04;1.64908e-03;1.64799e-03;1.31234e-03;1.44737e-02;1.63934e-03;6.57895e-04",
             "scope": "variant",
+            "schema_title": "GnomAD Alt AF - South Asian",
             "max": 1
         },
         "gnomad_af_oth": {
-            "title": "gnomad_af_oth",
+            "title": "GnomAD Alt AF - Other Ancestry",
             "field_name": "gnomad_af_oth",
             "type": "number",
             "do_import": true,
@@ -1964,10 +2079,11 @@
             "description": "Alternate allele frequency in samples of Other ancestry",
             "value_example": "0.00000e+00;1.86047e-03;4.64253e-03;7.03565e-03;4.65116e-04;2.32126e-03;4.65549e-04;4.64684e-04;4.65116e-03;1.85874e-03;4.66418e-04;1.39535e-03;2.31993e-01;6.96379e-03;4.64253e-04;2.32558e-03;1.39276e-03;1.39405e-03;2.33427e-03;1.53488e-02",
             "scope": "variant",
+            "schema_title": "GnomAD Alt AF - Other Ancestry",
             "max": 1
         },
         "gnomad_af_male": {
-            "title": "gnomad_af_male",
+            "title": "GnomAD Alt AF - male",
             "field_name": "gnomad_af_male",
             "type": "number",
             "do_import": true,
@@ -1977,10 +2093,11 @@
             "description": "Alternate allele frequency in male samples",
             "value_example": "1.67358e-05;1.61854e-05;3.04127e-05;0.00000e+00;2.87919e-05;1.43993e-05;2.88027e-05;3.15244e-03;1.44084e-05;1.44013e-05;1.44246e-05;1.44105e-05;1.44076e-05;3.17021e-04;1.44059e-05;1.44113e-05;5.76934e-05;7.80642e-03;2.92834e-05;1.46310e-05",
             "scope": "variant",
+            "schema_title": "GnomAD Alt AF - male",
             "max": 1
         },
         "gnomad_af_afr_male": {
-            "title": "gnomad_af_afr_male",
+            "title": "GnomAD Alt AF - male African-American/African",
             "field_name": "gnomad_af_afr_male",
             "type": "number",
             "do_import": true,
@@ -1990,10 +2107,11 @@
             "description": "Alternate allele frequency in male samples of African-American/African ancestry",
             "value_example": "0.00000e+00;6.69792e-05;1.16850e-04;1.10123e-02;5.17438e-05;1.08774e-03;5.19211e-05;1.56087e-04;2.68856e-02;5.48005e-05;2.93540e-02;1.18974e-03;5.17331e-05;1.03455e-04;5.17117e-05;9.92556e-03;5.17224e-05;5.17974e-05;5.22357e-05;2.07275e-02",
             "scope": "variant",
+            "schema_title": "GnomAD Alt AF - male African-American/African",
             "max": 1
         },
         "gnomad_af_ami_male": {
-            "title": "gnomad_af_ami_male",
+            "title": "GnomAD Alt AF - male Amish",
             "field_name": "gnomad_af_ami_male",
             "type": "number",
             "do_import": true,
@@ -2003,10 +2121,11 @@
             "description": "Alternate allele frequency in male samples of Amish ancestry",
             "value_example": "0.00000e+00;1.40187e-02;3.71495e-01;9.30233e-03;3.17757e-01;1.30233e-01;3.16279e-01;6.97674e-03;1.26168e-01;1.26761e-01;3.48837e-02;9.14634e-02;1.82927e-02;5.74713e-03;6.66667e-03;5.68182e-03;1.16279e-02;9.04762e-02;2.33645e-03;1.13636e-02",
             "scope": "variant",
+            "schema_title": "GnomAD Alt AF - male Amish",
             "max": 1
         },
         "gnomad_af_amr_male": {
-            "title": "gnomad_af_amr_male",
+            "title": "GnomAD Alt AF - male Latino",
             "field_name": "gnomad_af_amr_male",
             "type": "number",
             "do_import": true,
@@ -2016,10 +2135,11 @@
             "description": "Alternate allele frequency in male samples of Latino ancestry",
             "value_example": "0.00000e+00;1.29166e-04;3.87097e-04;1.29232e-04;1.29199e-04;2.19468e-03;3.11769e-03;3.87497e-04;1.16129e-03;2.58799e-04;3.36004e-03;1.42156e-03;3.87797e-04;1.29601e-04;1.29534e-04;2.59471e-04;1.29433e-03;1.29500e-04;1.29132e-04;1.76592e-01",
             "scope": "variant",
+            "schema_title": "GnomAD Alt AF - male Latino",
             "max": 1
         },
         "gnomad_af_asj_male": {
-            "title": "gnomad_af_asj_male",
+            "title": "GnomAD Alt AF - male Ashkenazi Jewish",
             "field_name": "gnomad_af_asj_male",
             "type": "number",
             "do_import": true,
@@ -2029,10 +2149,11 @@
             "description": "Alternate allele frequency in male samples of Ashkenazi Jewish ancestry",
             "value_example": "0.00000e+00;1.92061e-03;3.20102e-03;2.71447e-01;6.41026e-04;1.28205e-03;2.68886e-02;3.84123e-03;1.28041e-03;6.40205e-04;1.90141e-01;2.00641e-01;1.80054e-01;1.72458e-01;2.69576e-02;1.70732e-01;1.84615e-01;2.00384e-01;1.98842e-01;1.92308e-03",
             "scope": "variant",
+            "schema_title": "GnomAD Alt AF - male Ashkenazi Jewish",
             "max": 1
         },
         "gnomad_af_eas_male": {
-            "title": "gnomad_af_eas_male",
+            "title": "GnomAD Alt AF - male East Asian",
             "field_name": "gnomad_af_eas_male",
             "type": "number",
             "do_import": true,
@@ -2042,10 +2163,11 @@
             "description": "Alternate allele frequency in male samples of East Asian ancestry",
             "value_example": "0.00000e+00;5.93824e-04;2.37812e-03;2.37530e-03;5.93120e-04;5.94530e-04;2.68176e-02;2.37248e-03;1.18765e-03;5.95238e-04;1.18624e-03;2.38095e-03;2.37530e-02;2.02735e-01;2.01786e-01;2.02026e-01;2.38095e-02;2.01322e-01;5.98086e-04;2.01555e-01",
             "scope": "variant",
+            "schema_title": "GnomAD Alt AF - male East Asian",
             "max": 1
         },
         "gnomad_af_fin_male": {
-            "title": "gnomad_af_fin_male",
+            "title": "GnomAD Alt AF - male Finnish",
             "field_name": "gnomad_af_fin_male",
             "type": "number",
             "do_import": true,
@@ -2055,10 +2177,11 @@
             "description": "Alternate allele frequency in male samples of Finnish ancestry",
             "value_example": "0.00000e+00;1.13151e-03;5.05306e-03;1.27551e-04;1.27356e-04;1.25439e-04;1.26839e-04;3.80904e-04;3.07780e-01;1.25628e-04;1.86492e-02;2.25790e-03;6.27195e-04;2.12954e-02;4.68946e-02;1.25755e-03;3.76979e-04;1.25502e-04;2.46912e-01;1.25471e-04",
             "scope": "variant",
+            "schema_title": "GnomAD Alt AF - male Finnish",
             "max": 1
         },
         "gnomad_af_nfe_male": {
-            "title": "gnomad_af_nfe_male",
+            "title": "GnomAD Alt AF - male Non-Finnish European",
             "field_name": "gnomad_af_nfe_male",
             "type": "number",
             "do_import": true,
@@ -2068,10 +2191,11 @@
             "description": "Alternate allele frequency in male samples of Non-Finnish European ancestry",
             "value_example": "3.92157e-05;0.00000e+00;3.68026e-05;3.67809e-05;3.68107e-05;3.67863e-05;7.35673e-05;3.67918e-05;1.84013e-04;3.67891e-05;3.68053e-05;1.83999e-04;3.67782e-05;3.69276e-05;3.69385e-05;4.78539e-04;1.61967e-03;3.68134e-05;3.68161e-05;2.94377e-04",
             "scope": "variant",
+            "schema_title": "GnomAD Alt AF - male Non-Finnish European",
             "max": 1
         },
         "gnomad_af_sas_male": {
-            "title": "gnomad_af_sas_male",
+            "title": "GnomAD Alt AF - male South Asian",
             "field_name": "gnomad_af_sas_male",
             "type": "number",
             "do_import": true,
@@ -2081,10 +2205,11 @@
             "description": "Alternate allele frequency in male samples of South Asian ancestry",
             "value_example": "0.00000e+00;8.05153e-04;4.02253e-04;4.03226e-04;4.02901e-04;4.03551e-04;1.59626e-01;8.11030e-04;8.07754e-04;4.04204e-04;4.04858e-04;4.04531e-04;1.62075e-03;1.61812e-03;1.61160e-03;4.03877e-04;1.61421e-02;2.01288e-03;1.32472e-01;2.26461e-01",
             "scope": "variant",
+            "schema_title": "GnomAD Alt AF - male South Asian",
             "max": 1
         },
         "gnomad_af_oth_male": {
-            "title": "gnomad_af_oth_male",
+            "title": "GnomAD Alt AF - male Other Ancestry",
             "field_name": "gnomad_af_oth_male",
             "type": "number",
             "do_import": true,
@@ -2094,10 +2219,11 @@
             "description": "Alternate allele frequency in male samples of Other ancestry",
             "value_example": "0.00000e+00;2.85171e-03;2.84630e-03;4.77099e-03;6.65399e-03;1.90476e-03;2.29885e-01;9.52381e-04;4.74383e-03;9.50570e-04;9.48767e-04;1.90114e-03;3.83142e-03;1.42857e-02;3.32700e-02;9.54198e-04;1.60646e-01;2.46183e-01;5.03802e-02;1.05932e-03",
             "scope": "variant",
+            "schema_title": "GnomAD Alt AF - male Other Ancestry",
             "max": 1
         },
         "gnomad_af_female": {
-            "title": "gnomad_af_female",
+            "title": "GnomAD Alt AF - female",
             "field_name": "gnomad_af_female",
             "type": "number",
             "do_import": true,
@@ -2107,10 +2233,11 @@
             "description": "Alternate allele frequency in female samples",
             "value_example": "0.00000e+00;3.03030e-05;1.35399e-05;2.70827e-05;1.35413e-05;1.35377e-05;1.35373e-05;1.35380e-05;3.26319e-03;1.35410e-05;1.35439e-05;1.35435e-05;1.35443e-05;1.35454e-05;4.87660e-04;1.35428e-05;4.06482e-05;1.35619e-05;1.35586e-05;1.08522e-04",
             "scope": "variant",
+            "schema_title": "GnomAD Alt AF - female",
             "max": 1
         },
         "gnomad_af_afr_female": {
-            "title": "gnomad_af_afr_female",
+            "title": "GnomAD Alt AF - female African-American/African",
             "field_name": "gnomad_af_afr_female",
             "type": "number",
             "do_import": true,
@@ -2120,10 +2247,11 @@
             "description": "Alternate allele frequency in female samples of African-American/African ancestry",
             "value_example": "0.00000e+00;1.13097e-04;1.02643e-02;4.40684e-05;4.40878e-05;1.58786e-03;1.32474e-04;4.42595e-05;1.77132e-04;4.41501e-05;2.56093e-02;1.39886e-04;4.63822e-05;2.87623e-02;1.54158e-03;8.80747e-05;1.03937e-02;4.40529e-05;4.40412e-05;1.32755e-04",
             "scope": "variant",
+            "schema_title": "GnomAD Alt AF - female African-American/African",
             "max": 1
         },
         "gnomad_af_ami_female": {
-            "title": "gnomad_af_ami_female",
+            "title": "GnomAD Alt AF - female Amish",
             "field_name": "gnomad_af_ami_female",
             "type": "number",
             "do_import": true,
@@ -2133,10 +2261,11 @@
             "description": "Alternate allele frequency in female samples of Amish ancestry",
             "value_example": "0.00000e+00;1.06383e-02;3.56838e-01;2.56410e-02;3.31197e-01;1.06838e-01;1.06383e-01;3.34043e-01;4.25532e-03;1.09170e-01;5.55556e-02;1.07143e-01;2.27273e-02;6.75676e-03;7.57576e-03;6.38298e-03;7.74336e-02;8.15217e-03;2.46305e-03;1.48438e-01",
             "scope": "variant",
+            "schema_title": "GnomAD Alt AF - female Amish",
             "max": 1
         },
         "gnomad_af_amr_female": {
-            "title": "gnomad_af_amr_female",
+            "title": "GnomAD Alt AF - female Latino",
             "field_name": "gnomad_af_amr_female",
             "type": "number",
             "do_import": true,
@@ -2146,10 +2275,11 @@
             "description": "Alternate allele frequency in female samples of Latino ancestry",
             "value_example": "0.00000e+00;1.69090e-04;1.18524e-03;3.21598e-03;2.89608e-03;3.38409e-04;1.69319e-04;6.76819e-04;1.69664e-04;1.01868e-03;1.69434e-04;2.54755e-03;1.35870e-03;1.70532e-04;8.47458e-04;2.20938e-03;1.69377e-04;1.80891e-01;3.38524e-04;3.38753e-04",
             "scope": "variant",
+            "schema_title": "GnomAD Alt AF - female Latino",
             "max": 1
         },
         "gnomad_af_asj_female": {
-            "title": "gnomad_af_asj_female",
+            "title": "GnomAD Alt AF - female Ashkenazi Jewish",
             "field_name": "gnomad_af_asj_female",
             "type": "number",
             "do_import": true,
@@ -2159,10 +2289,11 @@
             "description": "Alternate allele frequency in female samples of Ashkenazi Jewish ancestry",
             "value_example": "0.00000e+00;5.68828e-04;1.70648e-03;1.70261e-03;2.78093e-01;3.41297e-03;2.44596e-02;3.40909e-03;1.95677e-01;2.06818e-01;2.44041e-02;1.89573e-01;1.81818e-01;1.79545e-01;1.88068e-01;1.70455e-03;2.05815e-01;2.05347e-01;5.11945e-03;2.06621e-01",
             "scope": "variant",
+            "schema_title": "GnomAD Alt AF - female Ashkenazi Jewish",
             "max": 1
         },
         "gnomad_af_eas_female": {
-            "title": "gnomad_af_eas_female",
+            "title": "GnomAD Alt AF - female East Asian",
             "field_name": "gnomad_af_eas_female",
             "type": "number",
             "do_import": true,
@@ -2172,10 +2303,11 @@
             "description": "Alternate allele frequency in female samples of East Asian ancestry",
             "value_example": "0.00000e+00;1.38122e-03;6.90608e-04;6.91563e-04;6.91563e-03;2.07469e-03;6.93481e-04;1.38313e-03;6.92521e-04;1.72652e-02;2.76243e-03;2.76625e-03;2.07182e-03;1.93906e-02;2.19834e-01;2.20222e-01;2.20609e-01;4.14365e-03;2.18144e-01;1.86722e-02",
             "scope": "variant",
+            "schema_title": "GnomAD Alt AF - female East Asian",
             "max": 1
         },
         "gnomad_af_fin_female": {
-            "title": "gnomad_af_fin_female",
+            "title": "GnomAD Alt AF - female Finnish",
             "field_name": "gnomad_af_fin_female",
             "type": "number",
             "do_import": true,
@@ -2185,10 +2317,11 @@
             "description": "Alternate allele frequency in female samples of Finnish ancestry",
             "value_example": "0.00000e+00;1.19808e-03;3.99680e-04;6.82183e-03;1.62075e-03;3.21857e-01;3.99042e-04;1.63738e-02;2.40192e-03;1.92000e-02;4.79233e-02;1.20096e-03;7.98722e-04;3.99361e-04;2.61200e-01;1.17200e-01;4.79616e-02;4.43262e-04;8.88889e-04;7.60105e-02",
             "scope": "variant",
+            "schema_title": "GnomAD Alt AF - female Finnish",
             "max": 1
         },
         "gnomad_af_nfe_female": {
-            "title": "gnomad_af_nfe_female",
+            "title": "GnomAD Alt AF - female Non-Finnish European",
             "field_name": "gnomad_af_nfe_female",
             "type": "number",
             "do_import": true,
@@ -2198,10 +2331,11 @@
             "description": "Alternate allele frequency in female samples of Non-Finnish European ancestry",
             "value_example": "0.00000e+00;2.67365e-05;2.67423e-05;2.67380e-05;2.67437e-05;2.67394e-05;1.07003e-04;2.67451e-05;2.13995e-04;2.67465e-05;2.67408e-05;2.67566e-05;2.67652e-05;1.60479e-04;1.60436e-04;2.68442e-05;2.68586e-05;2.67580e-05;4.28128e-04;1.81954e-03",
             "scope": "variant",
+            "schema_title": "GnomAD Alt AF - female Non-Finnish European",
             "max": 1
         },
         "gnomad_af_sas_female": {
-            "title": "gnomad_af_sas_female",
+            "title": "GnomAD Alt AF - female South Asian",
             "field_name": "gnomad_af_sas_female",
             "type": "number",
             "do_import": true,
@@ -2211,10 +2345,11 @@
             "description": "Alternate allele frequency in female samples of South Asian ancestry",
             "value_example": "0.00000e+00;3.53357e-03;3.54610e-03;1.76678e-03;1.43110e-01;1.77305e-03;1.77936e-03;7.11744e-03;1.48410e-01;2.32270e-01;8.86525e-03;2.22826e-01;2.21223e-01;8.96057e-03;2.14539e-01;1.48936e-01;2.32143e-01;2.30496e-01;2.30072e-01;5.26316e-02",
             "scope": "variant",
+            "schema_title": "GnomAD Alt AF - female South Asian",
             "max": 1
         },
         "gnomad_af_oth_female": {
-            "title": "gnomad_af_oth_female",
+            "title": "GnomAD Alt AF - female Other Ancestry",
             "field_name": "gnomad_af_oth_female",
             "type": "number",
             "do_import": true,
@@ -2224,10 +2359,11 @@
             "description": "Alternate allele frequency in female samples of Other ancestry",
             "value_example": "0.00000e+00;9.10747e-04;6.36364e-03;9.22509e-03;9.09091e-04;4.54545e-03;2.73224e-03;9.12409e-04;2.34004e-01;9.09091e-03;1.82149e-03;2.72727e-03;1.63636e-02;3.81818e-02;1.81818e-03;1.74863e-01;2.53650e-01;5.27273e-02;1.01420e-03;2.19682e-01",
             "scope": "variant",
+            "schema_title": "GnomAD Alt AF - female Other Ancestry",
             "max": 1
         },
         "gnomad_af_raw": {
-            "title": "gnomad_af_raw",
+            "title": "GnomAD Alt AF - including low-confidence genotypes",
             "field_name": "gnomad_af_raw",
             "type": "number",
             "do_import": true,
@@ -2237,10 +2373,11 @@
             "description": "Alternate allele frequency in samples before removing low-confidence genotypes",
             "value_example": "7.76072e-06;2.26197e-05;1.43895e-05;6.97447e-06;2.78983e-05;6.97457e-06;1.39488e-05;6.97408e-06;6.97389e-06;2.78979e-05;3.20817e-03;6.97574e-06;6.97467e-06;6.97496e-06;6.97603e-06;6.97525e-06;6.97623e-06;6.97749e-06;1.39523e-05;4.04570e-04",
             "scope": "variant",
+            "schema_title": "GnomAD Alt AF - including low-confidence genotypes",
             "max": 1
         },
         "gnomad_nhomalt_afr": {
-            "title": "gnomad_nhomalt_afr",
+            "title": "GnomAD Homozgyous Count - African-American/African",
             "field_name": "gnomad_nhomalt_afr",
             "type": "integer",
             "do_import": true,
@@ -2249,10 +2386,11 @@
             "annotation_category": "Population Frequency",
             "description": "Count of homozygous individuals in samples of African-American/African ancestry",
             "value_example": "0.00000e+00;9.19850e-05;5.35045e-05;1.06084e-02;2.37937e-05;4.76100e-05;1.35785e-03;2.38141e-05;9.54517e-05;2.39212e-05;1.67456e-04;2.38345e-05;2.61966e-02;1.00771e-04;2.50689e-05;2.90342e-02;1.37977e-03;2.37914e-05;4.75670e-05;7.13504e-05",
-            "scope": "variant"
+            "scope": "variant",
+            "schema_title": "GnomAD Homozgyous Count - African-American/African"
         },
         "gnomad_nhomalt_ami": {
-            "title": "gnomad_nhomalt_ami",
+            "title": "GnomAD Homozgyous Count - Amish",
             "field_name": "gnomad_nhomalt_ami",
             "type": "integer",
             "do_import": true,
@@ -2261,10 +2399,11 @@
             "annotation_category": "Population Frequency",
             "description": "Count of homozygous individuals in samples of Amish ancestry",
             "value_example": "0.00000e+00;1.22494e-02;3.63839e-01;1.78174e-02;3.24777e-01;1.18040e-01;1.17778e-01;3.25556e-01;5.55556e-03;1.16071e-01;1.19369e-01;4.43038e-02;9.86842e-02;2.02703e-02;6.21118e-03;7.09220e-03;3.12500e-03;8.88889e-03;3.34076e-03;8.37156e-02",
-            "scope": "variant"
+            "scope": "variant",
+            "schema_title": "GnomAD Homozgyous Count - Amish"
         },
         "gnomad_nhomalt_amr": {
-            "title": "gnomad_nhomalt_amr",
+            "title": "GnomAD Homozgyous Count - Latino",
             "field_name": "gnomad_nhomalt_amr",
             "type": "integer",
             "do_import": true,
@@ -2273,24 +2412,11 @@
             "annotation_category": "Population Frequency",
             "description": "Count of homozygous individuals in samples of Latino ancestry",
             "value_example": "0.00000e+00;1.46456e-04;7.32279e-04;7.32601e-05;7.32386e-05;7.32172e-05;2.63659e-03;3.02182e-03;3.66247e-04;7.32708e-05;9.51684e-04;7.34322e-05;5.87458e-04;7.32493e-05;3.00895e-03;1.39439e-03;7.38116e-05;5.86682e-04;7.36052e-05;7.35294e-05",
-            "scope": "variant"
-        },
-        "gnomad_nhomalt": {
-            "title": "Gnomad Homozygous",
-            "field_name": "gnomad_nhomalt",
-            "type": "integer",
-            "do_import": true,
-            "source_name": "GNOMAD",
-            "source_version": "v3.0",
-            "annotation_category": "Population Frequency",
-            "description": "Count of homozygous individuals in samples",
-            "value_example": "8.09887e-06;2.34771e-05;1.47076e-05;6.97778e-06;2.79111e-05;1.39552e-05;6.97710e-06;6.97642e-06;2.79162e-05;3.20951e-03;6.98149e-06;6.97827e-06;6.98032e-06;6.97924e-06;6.98841e-06;6.98207e-06;1.39632e-05;4.04977e-04;1.39610e-05;2.79341e-05",
             "scope": "variant",
-            "schema_title": "Gnomad Homozygous",
-            "facet_order": 20
+            "schema_title": "GnomAD Homozgyous Count - Latino"
         },
         "gnomad_nhomalt_asj": {
-            "title": "gnomad_nhomalt_asj",
+            "title": "GnomAD Homozgyous Count - Ashkenazi Jewish",
             "field_name": "gnomad_nhomalt_asj",
             "type": "integer",
             "do_import": true,
@@ -2299,10 +2425,11 @@
             "annotation_category": "Population Frequency",
             "description": "Count of homozygous individuals in samples of Ashkenazi Jewish ancestry",
             "value_example": "0.00000e+00;3.01205e-04;1.80723e-03;2.40674e-03;2.74970e-01;3.01023e-04;9.04159e-04;2.71084e-03;2.56024e-02;3.61228e-03;9.03614e-04;3.00842e-04;1.93072e-01;2.03916e-01;2.55716e-02;1.85104e-01;1.77429e-01;1.75407e-01;1.86446e-01;1.80614e-03",
-            "scope": "variant"
+            "scope": "variant",
+            "schema_title": "GnomAD Homozgyous Count - Ashkenazi Jewish"
         },
         "gnomad_nhomalt_eas": {
-            "title": "gnomad_nhomalt_eas",
+            "title": "GnomAD Homozgyous Count - East Asian",
             "field_name": "gnomad_nhomalt_eas",
             "type": "integer",
             "do_import": true,
@@ -2311,10 +2438,11 @@
             "annotation_category": "Population Frequency",
             "description": "Count of homozygous individuals in samples of East Asian ancestry",
             "value_example": "0.00000e+00;9.57854e-04;3.19285e-04;3.19081e-04;3.19489e-04;4.47570e-03;2.23642e-03;3.19898e-04;9.59079e-04;6.38978e-04;2.23928e-02;2.23499e-03;6.39795e-04;3.20102e-04;6.38162e-04;1.91449e-03;6.39386e-04;6.38570e-04;1.59847e-03;2.23785e-03",
-            "scope": "variant"
+            "scope": "variant",
+            "schema_title": "GnomAD Homozgyous Count - East Asian"
         },
         "gnomad_nhomalt_fin": {
-            "title": "gnomad_nhomalt_fin",
+            "title": "GnomAD Homozgyous Count - Finnish",
             "field_name": "gnomad_nhomalt_fin",
             "type": "integer",
             "do_import": true,
@@ -2323,10 +2451,11 @@
             "annotation_category": "Population Frequency",
             "description": "Count of homozygous individuals in samples of Finnish ancestry",
             "value_example": "0.00000e+00;1.14745e-03;9.54016e-05;5.47656e-03;9.71251e-05;9.68992e-05;9.54563e-05;9.65997e-05;6.76721e-04;3.11173e-01;9.55657e-05;9.53652e-05;1.81034e-02;2.29226e-03;4.77190e-04;9.54198e-05;2.07934e-02;4.71409e-02;1.24402e-03;4.77920e-04",
-            "scope": "variant"
+            "scope": "variant",
+            "schema_title": "GnomAD Homozgyous Count - Finnish"
         },
         "gnomad_nhomalt_nfe": {
-            "title": "gnomad_nhomalt_nfe",
+            "title": "GnomAD Homozgyous Count - Non-Finnish European",
             "field_name": "gnomad_nhomalt_nfe",
             "type": "integer",
             "do_import": true,
@@ -2335,10 +2464,11 @@
             "annotation_category": "Population Frequency",
             "description": "Count of homozygous individuals in samples of Non-Finnish European ancestry",
             "value_example": "1.65366e-05;0.00000e+00;1.54828e-05;1.54851e-05;1.54823e-05;1.54880e-05;1.54871e-05;1.54861e-05;1.54832e-05;1.54847e-05;1.54914e-05;1.54837e-05;7.74401e-05;4.64569e-05;1.54890e-05;1.54904e-05;2.01376e-04;1.54842e-05;3.09693e-05;1.54875e-05",
-            "scope": "variant"
+            "scope": "variant",
+            "schema_title": "GnomAD Homozgyous Count - Non-Finnish European"
         },
         "gnomad_nhomalt_sas": {
-            "title": "gnomad_nhomalt_sas",
+            "title": "GnomAD Homozgyous Count - South Asian",
             "field_name": "gnomad_nhomalt_sas",
             "type": "integer",
             "do_import": true,
@@ -2347,10 +2477,11 @@
             "annotation_category": "Population Frequency",
             "description": "Count of homozygous individuals in samples of South Asian ancestry",
             "value_example": "0.00000e+00;1.31148e-03;3.27654e-04;3.28299e-04;9.84898e-04;3.28515e-04;1.56539e-01;3.28947e-04;6.60502e-04;9.86842e-04;3.30251e-04;3.29164e-04;3.29815e-04;3.30033e-04;1.64908e-03;1.64799e-03;1.31234e-03;1.44737e-02;1.63934e-03;6.57895e-04",
-            "scope": "variant"
+            "scope": "variant",
+            "schema_title": "GnomAD Homozgyous Count - South Asian"
         },
         "gnomad_nhomalt_oth": {
-            "title": "gnomad_nhomalt_oth",
+            "title": "GnomAD Homozgyous Count - Other Ancestry",
             "field_name": "gnomad_nhomalt_oth",
             "type": "integer",
             "do_import": true,
@@ -2359,10 +2490,11 @@
             "annotation_category": "Population Frequency",
             "description": "Count of homozygous individuals in samples of Other ancestry",
             "value_example": "0.00000e+00;1.86047e-03;4.64253e-03;7.03565e-03;4.65116e-04;2.32126e-03;4.65549e-04;4.64684e-04;4.65116e-03;1.85874e-03;4.66418e-04;1.39535e-03;2.31993e-01;6.96379e-03;4.64253e-04;2.32558e-03;1.39276e-03;1.39405e-03;2.33427e-03;1.53488e-02",
-            "scope": "variant"
+            "scope": "variant",
+            "schema_title": "GnomAD Homozgyous Count - Other Ancestry"
         },
         "gnomad_nhomalt_male": {
-            "title": "gnomad_nhomalt_male",
+            "title": "GnomAD Homozgyous Count - male",
             "field_name": "gnomad_nhomalt_male",
             "type": "integer",
             "do_import": true,
@@ -2371,10 +2503,11 @@
             "annotation_category": "Population Frequency",
             "description": "Count of homozygous individuals in male samples",
             "value_example": "1.67358e-05;1.61854e-05;3.04127e-05;0.00000e+00;2.87919e-05;1.43993e-05;2.88027e-05;3.15244e-03;1.44084e-05;1.44013e-05;1.44246e-05;1.44105e-05;1.44076e-05;3.17021e-04;1.44059e-05;1.44113e-05;5.76934e-05;7.80642e-03;2.92834e-05;1.46310e-05",
-            "scope": "variant"
+            "scope": "variant",
+            "schema_title": "GnomAD Homozgyous Count - male"
         },
         "gnomad_nhomalt_afr_male": {
-            "title": "gnomad_nhomalt_afr_male",
+            "title": "GnomAD Homozgyous Count - male African-American/African",
             "field_name": "gnomad_nhomalt_afr_male",
             "type": "integer",
             "do_import": true,
@@ -2383,10 +2516,11 @@
             "annotation_category": "Population Frequency",
             "description": "Count of homozygous individuals in male samples of African-American/African ancestry",
             "value_example": "0.00000e+00;6.69792e-05;1.16850e-04;1.10123e-02;5.17438e-05;1.08774e-03;5.19211e-05;1.56087e-04;2.68856e-02;5.48005e-05;2.93540e-02;1.18974e-03;5.17331e-05;1.03455e-04;5.17117e-05;9.92556e-03;5.17224e-05;5.17974e-05;5.22357e-05;2.07275e-02",
-            "scope": "variant"
+            "scope": "variant",
+            "schema_title": "GnomAD Homozgyous Count - male African-American/African"
         },
         "gnomad_nhomalt_ami_male": {
-            "title": "gnomad_nhomalt_ami_male",
+            "title": "GnomAD Homozgyous Count - male Amish",
             "field_name": "gnomad_nhomalt_ami_male",
             "type": "integer",
             "do_import": true,
@@ -2395,10 +2529,11 @@
             "annotation_category": "Population Frequency",
             "description": "Count of homozygous individuals in male samples of Amish ancestry",
             "value_example": "0.00000e+00;1.40187e-02;3.71495e-01;9.30233e-03;3.17757e-01;1.30233e-01;3.16279e-01;6.97674e-03;1.26168e-01;1.26761e-01;3.48837e-02;9.14634e-02;1.82927e-02;5.74713e-03;6.66667e-03;5.68182e-03;1.16279e-02;9.04762e-02;2.33645e-03;1.13636e-02",
-            "scope": "variant"
+            "scope": "variant",
+            "schema_title": "GnomAD Homozgyous Count - male Amish"
         },
         "gnomad_nhomalt_amr_male": {
-            "title": "gnomad_nhomalt_amr_male",
+            "title": "GnomAD Homozgyous Count - male Latino",
             "field_name": "gnomad_nhomalt_amr_male",
             "type": "integer",
             "do_import": true,
@@ -2407,10 +2542,11 @@
             "annotation_category": "Population Frequency",
             "description": "Count of homozygous individuals in male samples of Latino ancestry",
             "value_example": "0.00000e+00;1.29166e-04;3.87097e-04;1.29232e-04;1.29199e-04;2.19468e-03;3.11769e-03;3.87497e-04;1.16129e-03;2.58799e-04;3.36004e-03;1.42156e-03;3.87797e-04;1.29601e-04;1.29534e-04;2.59471e-04;1.29433e-03;1.29500e-04;1.29132e-04;1.76592e-01",
-            "scope": "variant"
+            "scope": "variant",
+            "schema_title": "GnomAD Homozgyous Count - male Latino"
         },
         "gnomad_nhomalt_asj_male": {
-            "title": "gnomad_nhomalt_asj_male",
+            "title": "GnomAD Homozgyous Count - male Ashkenazi Jewish",
             "field_name": "gnomad_nhomalt_asj_male",
             "type": "integer",
             "do_import": true,
@@ -2419,10 +2555,11 @@
             "annotation_category": "Population Frequency",
             "description": "Count of homozygous individuals in male samples of Ashkenazi Jewish ancestry",
             "value_example": "0.00000e+00;1.92061e-03;3.20102e-03;2.71447e-01;6.41026e-04;1.28205e-03;2.68886e-02;3.84123e-03;1.28041e-03;6.40205e-04;1.90141e-01;2.00641e-01;1.80054e-01;1.72458e-01;2.69576e-02;1.70732e-01;1.84615e-01;2.00384e-01;1.98842e-01;1.92308e-03",
-            "scope": "variant"
+            "scope": "variant",
+            "schema_title": "GnomAD Homozgyous Count - male Ashkenazi Jewish"
         },
         "gnomad_nhomalt_eas_male": {
-            "title": "gnomad_nhomalt_eas_male",
+            "title": "GnomAD Homozgyous Count - male East Asian",
             "field_name": "gnomad_nhomalt_eas_male",
             "type": "integer",
             "do_import": true,
@@ -2431,10 +2568,11 @@
             "annotation_category": "Population Frequency",
             "description": "Count of homozygous individuals in male samples of East Asian ancestry",
             "value_example": "0.00000e+00;5.93824e-04;2.37812e-03;2.37530e-03;5.93120e-04;5.94530e-04;2.68176e-02;2.37248e-03;1.18765e-03;5.95238e-04;1.18624e-03;2.38095e-03;2.37530e-02;2.02735e-01;2.01786e-01;2.02026e-01;2.38095e-02;2.01322e-01;5.98086e-04;2.01555e-01",
-            "scope": "variant"
+            "scope": "variant",
+            "schema_title": "GnomAD Homozgyous Count - male East Asian"
         },
         "gnomad_nhomalt_fin_male": {
-            "title": "gnomad_nhomalt_fin_male",
+            "title": "GnomAD Homozgyous Count - male Finnish",
             "field_name": "gnomad_nhomalt_fin_male",
             "type": "integer",
             "do_import": true,
@@ -2443,10 +2581,11 @@
             "annotation_category": "Population Frequency",
             "description": "Count of homozygous individuals in male samples of Finnish ancestry",
             "value_example": "0.00000e+00;1.13151e-03;5.05306e-03;1.27551e-04;1.27356e-04;1.25439e-04;1.26839e-04;3.80904e-04;3.07780e-01;1.25628e-04;1.86492e-02;2.25790e-03;6.27195e-04;2.12954e-02;4.68946e-02;1.25755e-03;3.76979e-04;1.25502e-04;2.46912e-01;1.25471e-04",
-            "scope": "variant"
+            "scope": "variant",
+            "schema_title": "GnomAD Homozgyous Count - male Finnish"
         },
         "gnomad_nhomalt_nfe_male": {
-            "title": "gnomad_nhomalt_nfe_male",
+            "title": "GnomAD Homozgyous Count - male Non-Finnish European",
             "field_name": "gnomad_nhomalt_nfe_male",
             "type": "integer",
             "do_import": true,
@@ -2455,10 +2594,11 @@
             "annotation_category": "Population Frequency",
             "description": "Count of homozygous individuals in male samples of Non-Finnish European ancestry",
             "value_example": "3.92157e-05;0.00000e+00;3.68026e-05;3.67809e-05;3.68107e-05;3.67863e-05;7.35673e-05;3.67918e-05;1.84013e-04;3.67891e-05;3.68053e-05;1.83999e-04;3.67782e-05;3.69276e-05;3.69385e-05;4.78539e-04;1.61967e-03;3.68134e-05;3.68161e-05;2.94377e-04",
-            "scope": "variant"
+            "scope": "variant",
+            "schema_title": "GnomAD Homozgyous Count - male Non-Finnish European"
         },
         "gnomad_nhomalt_sas_male": {
-            "title": "gnomad_nhomalt_sas_male",
+            "title": "GnomAD Homozgyous Count - male South Asian",
             "field_name": "gnomad_nhomalt_sas_male",
             "type": "integer",
             "do_import": true,
@@ -2467,10 +2607,11 @@
             "annotation_category": "Population Frequency",
             "description": "Count of homozygous individuals in male samples of South Asian ancestry",
             "value_example": "0.00000e+00;8.05153e-04;4.02253e-04;4.03226e-04;4.02901e-04;4.03551e-04;1.59626e-01;8.11030e-04;8.07754e-04;4.04204e-04;4.04858e-04;4.04531e-04;1.62075e-03;1.61812e-03;1.61160e-03;4.03877e-04;1.61421e-02;2.01288e-03;1.32472e-01;2.26461e-01",
-            "scope": "variant"
+            "scope": "variant",
+            "schema_title": "GnomAD Homozgyous Count - male South Asian"
         },
         "gnomad_nhomalt_oth_male": {
-            "title": "gnomad_nhomalt_oth_male",
+            "title": "GnomAD Homozgyous Count - male Other Ancestry",
             "field_name": "gnomad_nhomalt_oth_male",
             "type": "integer",
             "do_import": true,
@@ -2479,10 +2620,11 @@
             "annotation_category": "Population Frequency",
             "description": "Count of homozygous individuals in male samples of Other ancestry",
             "value_example": "0.00000e+00;2.85171e-03;2.84630e-03;4.77099e-03;6.65399e-03;1.90476e-03;2.29885e-01;9.52381e-04;4.74383e-03;9.50570e-04;9.48767e-04;1.90114e-03;3.83142e-03;1.42857e-02;3.32700e-02;9.54198e-04;1.60646e-01;2.46183e-01;5.03802e-02;1.05932e-03",
-            "scope": "variant"
+            "scope": "variant",
+            "schema_title": "GnomAD Homozgyous Count - male Other Ancestry"
         },
         "gnomad_nhomalt_female": {
-            "title": "gnomad_nhomalt_female",
+            "title": "GnomAD Homozgyous Count - female",
             "field_name": "gnomad_nhomalt_female",
             "type": "integer",
             "do_import": true,
@@ -2491,10 +2633,11 @@
             "annotation_category": "Population Frequency",
             "description": "Count of homozygous individuals in female samples",
             "value_example": "0.00000e+00;3.03030e-05;1.35399e-05;2.70827e-05;1.35413e-05;1.35377e-05;1.35373e-05;1.35380e-05;3.26319e-03;1.35410e-05;1.35439e-05;1.35435e-05;1.35443e-05;1.35454e-05;4.87660e-04;1.35428e-05;4.06482e-05;1.35619e-05;1.35586e-05;1.08522e-04",
-            "scope": "variant"
+            "scope": "variant",
+            "schema_title": "GnomAD Homozgyous Count - female"
         },
         "gnomad_nhomalt_afr_female": {
-            "title": "gnomad_nhomalt_afr_female",
+            "title": "GnomAD Homozgyous Count - female African-American/African",
             "field_name": "gnomad_nhomalt_afr_female",
             "type": "integer",
             "do_import": true,
@@ -2503,10 +2646,11 @@
             "annotation_category": "Population Frequency",
             "description": "Count of homozygous individuals in female samples of African-American/African ancestry",
             "value_example": "0.00000e+00;1.13097e-04;1.02643e-02;4.40684e-05;4.40878e-05;1.58786e-03;1.32474e-04;4.42595e-05;1.77132e-04;4.41501e-05;2.56093e-02;1.39886e-04;4.63822e-05;2.87623e-02;1.54158e-03;8.80747e-05;1.03937e-02;4.40529e-05;4.40412e-05;1.32755e-04",
-            "scope": "variant"
+            "scope": "variant",
+            "schema_title": "GnomAD Homozgyous Count - female African-American/African"
         },
         "gnomad_nhomalt_ami_female": {
-            "title": "gnomad_nhomalt_ami_female",
+            "title": "GnomAD Homozgyous Count - female Amish",
             "field_name": "gnomad_nhomalt_ami_female",
             "type": "integer",
             "do_import": true,
@@ -2515,10 +2659,11 @@
             "annotation_category": "Population Frequency",
             "description": "Count of homozygous individuals in female samples of Amish ancestry",
             "value_example": "0.00000e+00;1.06383e-02;3.56838e-01;2.56410e-02;3.31197e-01;1.06838e-01;1.06383e-01;3.34043e-01;4.25532e-03;1.09170e-01;5.55556e-02;1.07143e-01;2.27273e-02;6.75676e-03;7.57576e-03;6.38298e-03;7.74336e-02;8.15217e-03;2.46305e-03;1.48438e-01",
-            "scope": "variant"
+            "scope": "variant",
+            "schema_title": "GnomAD Homozgyous Count - female Amish"
         },
         "gnomad_nhomalt_amr_female": {
-            "title": "gnomad_nhomalt_amr_female",
+            "title": "GnomAD Homozgyous Count - female Latino",
             "field_name": "gnomad_nhomalt_amr_female",
             "type": "integer",
             "do_import": true,
@@ -2527,10 +2672,11 @@
             "annotation_category": "Population Frequency",
             "description": "Count of homozygous individuals in female samples of Latino ancestry",
             "value_example": "0.00000e+00;1.69090e-04;1.18524e-03;3.21598e-03;2.89608e-03;3.38409e-04;1.69319e-04;6.76819e-04;1.69664e-04;1.01868e-03;1.69434e-04;2.54755e-03;1.35870e-03;1.70532e-04;8.47458e-04;2.20938e-03;1.69377e-04;1.80891e-01;3.38524e-04;3.38753e-04",
-            "scope": "variant"
+            "scope": "variant",
+            "schema_title": "GnomAD Homozgyous Count - female Latino"
         },
         "gnomad_nhomalt_asj_female": {
-            "title": "gnomad_nhomalt_asj_female",
+            "title": "GnomAD Homozgyous Count - female Ashkenazi Jewish",
             "field_name": "gnomad_nhomalt_asj_female",
             "type": "integer",
             "do_import": true,
@@ -2539,10 +2685,11 @@
             "annotation_category": "Population Frequency",
             "description": "Count of homozygous individuals in female samples of Ashkenazi Jewish ancestry",
             "value_example": "0.00000e+00;5.68828e-04;1.70648e-03;1.70261e-03;2.78093e-01;3.41297e-03;2.44596e-02;3.40909e-03;1.95677e-01;2.06818e-01;2.44041e-02;1.89573e-01;1.81818e-01;1.79545e-01;1.88068e-01;1.70455e-03;2.05815e-01;2.05347e-01;5.11945e-03;2.06621e-01",
-            "scope": "variant"
+            "scope": "variant",
+            "schema_title": "GnomAD Homozgyous Count - female Ashkenazi Jewish"
         },
         "gnomad_nhomalt_eas_female": {
-            "title": "gnomad_nhomalt_eas_female",
+            "title": "GnomAD Homozgyous Count - female East Asian",
             "field_name": "gnomad_nhomalt_eas_female",
             "type": "integer",
             "do_import": true,
@@ -2551,10 +2698,11 @@
             "annotation_category": "Population Frequency",
             "description": "Count of homozygous individuals in female samples of East Asian ancestry",
             "value_example": "0.00000e+00;1.38122e-03;6.90608e-04;6.91563e-04;6.91563e-03;2.07469e-03;6.93481e-04;1.38313e-03;6.92521e-04;1.72652e-02;2.76243e-03;2.76625e-03;2.07182e-03;1.93906e-02;2.19834e-01;2.20222e-01;2.20609e-01;4.14365e-03;2.18144e-01;1.86722e-02",
-            "scope": "variant"
+            "scope": "variant",
+            "schema_title": "GnomAD Homozgyous Count - female East Asian"
         },
         "gnomad_nhomalt_fin_female": {
-            "title": "gnomad_nhomalt_fin_female",
+            "title": "GnomAD Homozgyous Count - female Finnish",
             "field_name": "gnomad_nhomalt_fin_female",
             "type": "integer",
             "do_import": true,
@@ -2563,10 +2711,11 @@
             "annotation_category": "Population Frequency",
             "description": "Count of homozygous individuals in female samples of Finnish ancestry",
             "value_example": "0.00000e+00;1.19808e-03;3.99680e-04;6.82183e-03;1.62075e-03;3.21857e-01;3.99042e-04;1.63738e-02;2.40192e-03;1.92000e-02;4.79233e-02;1.20096e-03;7.98722e-04;3.99361e-04;2.61200e-01;1.17200e-01;4.79616e-02;4.43262e-04;8.88889e-04;7.60105e-02",
-            "scope": "variant"
+            "scope": "variant",
+            "schema_title": "GnomAD Homozgyous Count - female Finnish"
         },
         "gnomad_nhomalt_nfe_female": {
-            "title": "gnomad_nhomalt_nfe_female",
+            "title": "GnomAD Homozgyous Count - female Non-Finnish European",
             "field_name": "gnomad_nhomalt_nfe_female",
             "type": "integer",
             "do_import": true,
@@ -2575,10 +2724,11 @@
             "annotation_category": "Population Frequency",
             "description": "Count of homozygous individuals in female samples of Non-Finnish European ancestry",
             "value_example": "0.00000e+00;2.67365e-05;2.67423e-05;2.67380e-05;2.67437e-05;2.67394e-05;1.07003e-04;2.67451e-05;2.13995e-04;2.67465e-05;2.67408e-05;2.67566e-05;2.67652e-05;1.60479e-04;1.60436e-04;2.68442e-05;2.68586e-05;2.67580e-05;4.28128e-04;1.81954e-03",
-            "scope": "variant"
+            "scope": "variant",
+            "schema_title": "GnomAD Homozgyous Count - female Non-Finnish European"
         },
         "gnomad_nhomalt_sas_female": {
-            "title": "gnomad_nhomalt_sas_female",
+            "title": "GnomAD Homozgyous Count - female South Asian",
             "field_name": "gnomad_nhomalt_sas_female",
             "type": "integer",
             "do_import": true,
@@ -2587,10 +2737,11 @@
             "annotation_category": "Population Frequency",
             "description": "Count of homozygous individuals in female samples of South Asian ancestry",
             "value_example": "0.00000e+00;3.53357e-03;3.54610e-03;1.76678e-03;1.43110e-01;1.77305e-03;1.77936e-03;7.11744e-03;1.48410e-01;2.32270e-01;8.86525e-03;2.22826e-01;2.21223e-01;8.96057e-03;2.14539e-01;1.48936e-01;2.32143e-01;2.30496e-01;2.30072e-01;5.26316e-02",
-            "scope": "variant"
+            "scope": "variant",
+            "schema_title": "GnomAD Homozgyous Count - female South Asian"
         },
         "gnomad_nhomalt_oth_female": {
-            "title": "gnomad_nhomalt_oth_female",
+            "title": "GnomAD Homozgyous Count - female Other Ancestry",
             "field_name": "gnomad_nhomalt_oth_female",
             "type": "integer",
             "do_import": true,
@@ -2599,10 +2750,11 @@
             "annotation_category": "Population Frequency",
             "description": "Count of homozygous individuals in female samples of Other ancestry",
             "value_example": "0.00000e+00;9.10747e-04;6.36364e-03;9.22509e-03;9.09091e-04;4.54545e-03;2.73224e-03;9.12409e-04;2.34004e-01;9.09091e-03;1.82149e-03;2.72727e-03;1.63636e-02;3.81818e-02;1.81818e-03;1.74863e-01;2.53650e-01;5.27273e-02;1.01420e-03;2.19682e-01",
-            "scope": "variant"
+            "scope": "variant",
+            "schema_title": "GnomAD Homozgyous Count - female Other Ancestry"
         },
         "gnomad_nhomalt_raw": {
-            "title": "gnomad_nhomalt_raw",
+            "title": "GnomAD Homozgyous Count - including low-confidence genotypes",
             "field_name": "gnomad_nhomalt_raw",
             "type": "integer",
             "do_import": true,
@@ -2611,7 +2763,8 @@
             "annotation_category": "Population Frequency",
             "description": "Count of homozygous individuals in samples before removing low-confidence genotypes",
             "value_example": "7.76072e-06;2.26197e-05;1.43895e-05;6.97447e-06;2.78983e-05;6.97457e-06;1.39488e-05;6.97408e-06;6.97389e-06;2.78979e-05;3.20817e-03;6.97574e-06;6.97467e-06;6.97496e-06;6.97603e-06;6.97525e-06;6.97623e-06;6.97749e-06;1.39523e-05;4.04570e-04",
-            "scope": "variant"
+            "scope": "variant",
+            "schema_title": "GnomAD Homozgyous Count - including low-confidence genotypes"
         },
         "gnomad_dp": {
             "title": "gnomad_dp",
@@ -3116,18 +3269,6 @@
             "value_example": "3538745;7129955;7197678;8320734;8372543;8386023;9523560;9531886;10700117;11944454;14354688;15544186;19145543;19196018;20309956;23932132;25147864;26324536;26359886;28760315",
             "scope": "variant"
         },
-        "clinvar_variationid": {
-            "title": "clinvar_variationid",
-            "field_name": "clinvar_variationid",
-            "type": "string",
-            "do_import": true,
-            "source_name": "CLINVAR",
-            "source_version": "20191021",
-            "annotation_category": "variant database",
-            "description": "ClinVar variantion ID",
-            "scope": "variant",
-            "column_order": 70
-        },
         "clinvar_clndn": {
             "title": "clinvar_clndn",
             "type": "array",
@@ -3219,20 +3360,6 @@
                 "value_example": "criteria_provided~_single_submitter;criteria_provided~_conflicting_interpretations;criteria_provided~_multiple_submitters~_no_conflicts;no_assertion_criteria_provided;no_interpretation_for_the_single_variant;no_assertion_provided",
                 "scope": "variant"
             }
-        },
-        "clinvar_clnsig": {
-            "title": "Clinvar",
-            "field_name": "clinvar_clnsig",
-            "type": "string",
-            "do_import": true,
-            "source_name": "CLINVAR",
-            "source_version": "20191021",
-            "annotation_category": "variant database",
-            "description": "Clinical significance for this single variant",
-            "value_example": "Benign;Likely_benign;Conflicting_interpretations_of_pathogenicity;Uncertain_significance;Benign/Likely_benign;Pathogenic/Likely_pathogenic;Pathogenic;Likely_pathogenic;not_provided",
-            "scope": "variant",
-            "schema_title": "Clinvar",
-            "facet_order": 35
         },
         "clinvar_clnsigconf": {
             "title": "clinvar_clnsigconf",
@@ -3754,56 +3881,19 @@
             "order": 2,
             "grouping": "Position"
         },
+        "cytoband_cytoband": {
+            "title": "Cytoband",
+            "order": 3,
+            "grouping": "Position"
+        },
         "mutanno_variant_class": {
             "title": "Variant Type",
             "order": 4,
             "grouping": "Variant Type"
         },
-        "transcript.vep_sift_score": {
-            "title": "SIFT score",
-            "aggregation_type": "stats",
-            "number_step": "any",
-            "order": 23,
-            "grouping": "Missense Predictors"
-        },
-        "transcript.vep_polyphen_score": {
-            "title": "PolyPhen score",
-            "aggregation_type": "stats",
-            "number_step": "any",
-            "order": 24,
-            "grouping": "Missense Predictors"
-        },
-        "transcript.vep_maxentscan_diff": {
-            "title": "MaxEntScan",
-            "aggregation_type": "stats",
-            "number_step": "any",
-            "order": 30,
-            "grouping": "Splice Predictors"
-        },
-        "genes.genes_ensg.s_het": {
-            "title": "S_het",
-            "aggregation_type": "stats",
-            "number_step": "any",
-            "order": 31,
-            "grouping": "Constraint Metrics"
-        },
-        "genes.genes_ensg.oe_mis": {
-            "title": "o/e (missense)",
-            "aggregation_type": "stats",
-            "number_step": "any",
-            "order": 32,
-            "grouping": "Constraint Metrics"
-        },
-        "genes.genes_ensg.oe_lof": {
-            "title": "o/e (LoF)",
-            "aggregation_type": "stats",
-            "number_step": "any",
-            "order": 33,
-            "grouping": "Constraint Metrics"
-        },
-        "genes.genes_most_severe_consequence.impact": {
-            "title": "Impact",
-            "order": 7,
+        "genes.genes_most_severe_consequence.coding_effect": {
+            "title": "Coding Effect",
+            "order": 5,
             "grouping": "Consequence"
         },
         "genes.genes_most_severe_consequence.location": {
@@ -3811,120 +3901,163 @@
             "order": 6,
             "grouping": "Consequence"
         },
-        "genes.genes_most_severe_consequence.coding_effect": {
-            "title": "Coding Effect",
-            "order": 5,
+        "genes.genes_most_severe_consequence.impact": {
+            "title": "Impact",
+            "order": 7,
             "grouping": "Consequence"
         },
-        "cytoband_cytoband": {
-            "title": "Cytoband",
-            "order": 3,
-            "grouping": "Position"
+        "gnomad_af": {
+            "title": "GnomAD Alt AF - Total",
+            "aggregation_type": "stats",
+            "number_step": "any",
+            "order": 18,
+            "grouping": "Population Frequency"
+        },
+        "max_pop_af_af_popmax": {
+            "title": "GnomAD Alt AF - PopMax",
+            "aggregation_type": "stats",
+            "number_step": "any",
+            "order": 19,
+            "grouping": "Population Frequency"
+        },
+        "gnomad_an": {
+            "title": "GnomAD Total Allele Number",
+            "aggregation_type": "stats",
+            "number_step": 1,
+            "order": 20,
+            "grouping": "Population Frequency"
+        },
+        "gnomad_nhomalt": {
+            "title": "GnomAD Homozgyous Count",
+            "aggregation_type": "stats",
+            "number_step": 1,
+            "order": 21,
+            "grouping": "Population Frequency"
         },
         "conservation_phylop100": {
             "title": "PhyloP (100 Vertabrates)",
             "aggregation_type": "stats",
             "number_step": "any",
-            "order": 21,
+            "order": 22,
             "grouping": "Conservation"
         },
         "cadd_phred": {
             "title": "CADD",
             "aggregation_type": "stats",
             "number_step": "any",
-            "order": 22,
+            "order": 23,
+            "grouping": "Missense Predictors"
+        },
+        "transcript.vep_sift_score": {
+            "title": "SIFT score",
+            "aggregation_type": "stats",
+            "number_step": "any",
+            "order": 24,
+            "grouping": "Missense Predictors"
+        },
+        "transcript.vep_polyphen_score": {
+            "title": "PolyPhen score",
+            "aggregation_type": "stats",
+            "number_step": "any",
+            "order": 25,
             "grouping": "Missense Predictors"
         },
         "spliceai_ds_ag": {
             "title": "SpliceAI-AG",
             "aggregation_type": "stats",
             "number_step": "any",
-            "order": 26,
+            "order": 27,
             "grouping": "Splice Predictors"
         },
         "spliceai_ds_al": {
             "title": "SpliceAI-AL",
             "aggregation_type": "stats",
             "number_step": "any",
-            "order": 27,
+            "order": 28,
             "grouping": "Splice Predictors"
         },
         "spliceai_ds_dg": {
             "title": "SpliceAI-DG",
             "aggregation_type": "stats",
             "number_step": "any",
-            "order": 28,
+            "order": 29,
             "grouping": "Splice Predictors"
         },
         "spliceai_ds_dl": {
             "title": "SpliceAI-DL",
             "aggregation_type": "stats",
             "number_step": "any",
-            "order": 29,
+            "order": 30,
             "grouping": "Splice Predictors"
         },
-        "max_pop_af_af_popmax": {
-            "title": "Gnomad PopMax AF",
+        "transcript.vep_maxentscan_diff": {
+            "title": "MaxEntScan",
+            "aggregation_type": "stats",
+            "number_step": "any",
+            "order": 31,
+            "grouping": "Splice Predictors"
+        },
+        "genes.genes_ensg.s_het": {
+            "title": "S_het",
+            "aggregation_type": "stats",
+            "number_step": "any",
+            "order": 32,
+            "grouping": "Constraint Metrics"
+        },
+        "genes.genes_ensg.oe_mis": {
+            "title": "o/e (missense)",
+            "aggregation_type": "stats",
+            "number_step": "any",
+            "order": 33,
+            "grouping": "Constraint Metrics"
+        },
+        "genes.genes_ensg.oe_lof": {
+            "title": "o/e (LoF)",
+            "aggregation_type": "stats",
+            "number_step": "any",
+            "order": 34,
+            "grouping": "Constraint Metrics"
+        },
+        "clinvar_clnsig": {
+            "title": "Clinvar",
+            "order": 36,
+            "grouping": "variant database"
+        }
+    },
+    "columns": {
+        "genes.genes_most_severe_consequence.coding_effect": {
+            "title": "Coding Effect",
+            "order": 5,
+            "grouping": "Consequence"
+        },
+        "gnomad_af": {
+            "title": "GnomAD Alt AF - Total",
             "aggregation_type": "stats",
             "number_step": "any",
             "order": 18,
             "grouping": "Population Frequency"
         },
-        "gnomad_an": {
-            "title": "Gnomad Allele Depth",
+        "max_pop_af_af_popmax": {
+            "title": "GnomAD Alt AF - PopMax",
             "aggregation_type": "stats",
-            "number_step": 1,
+            "number_step": "any",
             "order": 19,
             "grouping": "Population Frequency"
         },
-        "gnomad_af": {
-            "title": "Gnomad Total AF",
-            "aggregation_type": "stats",
-            "number_step": "any",
-            "order": 17,
-            "grouping": "Population Frequency"
-        },
-        "gnomad_nhomalt": {
-            "title": "Gnomad Homozygous",
-            "aggregation_type": "stats",
-            "number_step": 1,
-            "order": 20,
-            "grouping": "Population Frequency"
-        },
-        "clinvar_clnsig": {
-            "title": "Clinvar",
-            "order": 35,
-            "grouping": "variant database"
-        }
-    },
-    "columns": {
         "mutanno_hgvsg": {
             "title": "Variant"
         },
-        "transcript.vep_hgvsc": {
-            "title": "vep_hgvsc"
-        },
-        "transcript.vep_hgvsp": {
-            "title": "vep_hgvsp"
+        "dbsnp_rs_number": {
+            "title": "dbSNP ID"
         },
         "genes.genes_ensg.display_title": {
             "title": "Gene"
         },
         "genes.genes_most_severe_transcript": {
-            "title": "genes_most_severe_transcript"
-        },
-        "dbsnp_rs_number": {
-            "title": "dbSNP ID"
-        },
-        "max_pop_af_af_popmax": {
-            "title": "Gnomad PopMax AF",
-            "aggregation_type": "stats",
-            "number_step": "any",
-            "order": 18,
-            "grouping": "Population Frequency"
+            "title": "Transcript"
         },
         "clinvar_variationid": {
-            "title": "clinvar_variationid"
+            "title": "Clinvar ID"
         }
     }
 }

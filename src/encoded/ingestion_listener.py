@@ -341,6 +341,35 @@ class IngestionListener:
             else:
                 break
 
+    @staticmethod
+    def build_variant_display_title(variant):
+        return 'chr%s:%s%s>%s' % (variant['CHROM'], variant['POS'], variant['REF'], variant['ALT'])
+
+    def build_and_post_variant(self, parser, record, project, institution):
+        """ Helper method for below that builds and posts a variant item given a record """
+        variant = parser.create_variant_from_record(record)
+        variant['project'] = project
+        variant['institution'] = institution
+        parser.format_variant_sub_embedded_objects(variant)
+        self.vapp.post_json('/variant', variant, status=201)
+        return variant
+
+    def build_and_post_variant_samples(self, parser, record, project, institution, variant, file):
+        """ Helper method that builds and posts all variant_samples associated with a record """
+        if variant is None:
+            return
+        variant_samples = parser.create_sample_variant_from_record(record)
+        for sample in variant_samples:
+            try:
+                sample['project'] = project
+                sample['institution'] = institution
+                sample['variant'] = self.build_variant_display_title(variant)  # make links
+                sample['file'] = file
+                self.vapp.post_json('/variant_sample', sample, status=201)
+            except Exception as e:
+                log.error('Encountered exception posting variant_sample %s: %s' % e)
+                continue
+
     def post_variants_and_variant_samples(self, parser, file_meta):
         """ Posts variants and variant_sample items given the parser and relevant
             file metadata.
@@ -358,29 +387,13 @@ class IngestionListener:
         for idx, record in enumerate(parser):
             log.info('Attempting parse on record %s' % record)
             try:
-                variant = parser.create_variant_from_record(record)
-                variant['project'] = project
-                variant['institution'] = institution
-                parser.format_variant_sub_embedded_objects(variant)
-                [res] = self.vapp.post_json('/variant', variant, status=201).json['@graph']
+                variant = self.build_and_post_variant(parser, record, project, institution)
+                self.build_and_post_variant_samples(parser, record, project, institution, variant, file_accession)
                 success += 1
             except Exception as e:  # ANNOTATION spec validation error, recoverable
                 log.error('Encountered exception posting variant at row %s: %s ' % (idx, e))
                 error += 1
-                continue
-            variant_samples = parser.create_sample_variant_from_record(record)
-            for sample in variant_samples:
-                try:
-                    sample['project'] = project
-                    sample['institution'] = institution
-                    sample['variant'] = res['@id']  # make links
-                    sample['file'] = file_accession
-                    self.vapp.post_json('/variant_sample', sample, status=201)
-                    success += 1
-                except Exception as e:
-                    log.error('Encountered exception posting variant_sample at row %s: %s' % (idx, e))
-                    error += 1
-                    continue
+
         return success, error
 
     def run(self):
