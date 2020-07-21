@@ -351,7 +351,7 @@ class IngestionListener:
         variant['project'] = project
         variant['institution'] = institution
         parser.format_variant_sub_embedded_objects(variant)
-        self.vapp.post_json('/variant', variant, status=201)
+        self.vapp.post_json('/variant', variant, status=[201, 409])
         return variant
 
     def build_and_post_variant_samples(self, parser, record, project, institution, variant, file):
