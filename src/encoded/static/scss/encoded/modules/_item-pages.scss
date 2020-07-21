@@ -2147,6 +2147,9 @@ $badge-item-min-height: 90px;
 							margin-left: 20px;
 							min-width: 75px;
 						}
+						td:not(.accession-table-title) {
+							text-align: right;
+						}
 					}
 
 					.body .current-case {
