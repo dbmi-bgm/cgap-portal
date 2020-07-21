@@ -452,9 +452,11 @@ const AccessioningTab = React.memo(function AccessioningTab(props) {
     console.log("families", currFamily, secondary_families);
 
     const viewSecondaryFamiliesBtn = secondaryFamiliesLen === 0 ? null : (
-        <button type="button" className="btn btn-block btn-outline-dark mt-1" onClick={function(){ setSecondaryFamiliesOpen(!isSecondaryFamiliesOpen); }}>
-            { !isSecondaryFamiliesOpen ? `Show ${secondaryFamiliesLen} more famil${secondaryFamiliesLen > 1 ? 'ies' : 'y'} that proband is member of` : 'Hide secondary families' }
-        </button>
+        <div className="pt-2">
+            <button type="button" className="btn btn-block btn-outline-dark" onClick={function(){ setSecondaryFamiliesOpen(!isSecondaryFamiliesOpen); }}>
+                { !isSecondaryFamiliesOpen ? `Show ${secondaryFamiliesLen} more famil${secondaryFamiliesLen > 1 ? 'ies' : 'y'} that proband is member of` : 'Hide secondary families' }
+            </button>
+        </div>
     );
 
     // Using PartialList since we have it already, it hides DOM elements when collapsed.
@@ -468,20 +470,20 @@ const AccessioningTab = React.memo(function AccessioningTab(props) {
             <div className="tab-inner-container">
                 <PartialList className="mb-0" open={isSecondaryFamiliesOpen}
                     persistent={[
-                        <div className="pt-0 pb-24" key={currFamilyID}>
+                        <div key={currFamilyID} className="primary-family">
                             <h4 className="mt-0 mb-05 text-400">
                                 <span className="text-300">Primary Cases from </span>
                                 { primaryFamilyTitle }
                             </h4>
                             <FamilyAccessionStackedTable family={currFamily} result={context}
-                                fadeIn={false} collapseLongLists collapseShow={1} />
+                                fadeIn collapseLongLists collapseShow={1} />
                         </div>
                     ]}
                     collapsible={
                         secondary_families.map(function(family){
-                            const { display_title } = family;
+                            const { display_title, '@id' : familyID } = family;
                             return (
-                                <div className="py-3" key={family['@id']}>
+                                <div className="py-4 secondary-family" key={familyID}>
                                     <h4 className="mt-0 mb-05 text-400">
                                         <span className="text-300">Related Cases from </span>
                                         { display_title }

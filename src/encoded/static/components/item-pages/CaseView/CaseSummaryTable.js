@@ -89,6 +89,7 @@ export const CaseSummaryTable = React.memo(function CaseSummaryTable(props){
     // add multisample analysis column data to column order/titles and data object
     sampleProcessing.forEach((sp) => {
         const { uuid, processed_files = [], completed_processes = [], samples = [], sample_processed_files = [] } = sp;
+        // TODO: If processed_files.length !== spProcFilesWithPermission.length, maybe inform user about this?
         const spProcFilesWithPermission = processed_files.filter(hasViewPermisison);
 
         function pushColumn(title) {
