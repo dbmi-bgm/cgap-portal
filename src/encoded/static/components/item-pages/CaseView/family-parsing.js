@@ -88,12 +88,12 @@ export function parseFamilyIntoDataset(family){
             ageNumerical = calcAgeNum(age, age_units);
         }
 
-        // Older Accession-based identifier below.
         let name = individual_id;   // Use user-supplied identifier where possible.
         if (!name) {                // Fallback to accession if not available.
             name = displayTitle;
             if (displayTitle.slice(0,5) === "GAPID"){
                 // <span>s don't work inside SVGs
+                // We could theoretically do multiple lines using SVG text... but... then can't sort by this.
                 /*
                 name = (
                     <React.Fragment>
