@@ -11,6 +11,7 @@ import { LocalizedTime } from '@hms-dbmi-bgm/shared-portal-components/es/compone
 /** @param {Object} props - Contents of a family sub-embedded object. */
 export const CaseSummaryTable = React.memo(function CaseSummaryTable(props){
     const {
+        relationships = [],
         members = [],
         proband: { '@id' : probandID } = {},
         original_pedigree = null,
@@ -66,6 +67,14 @@ export const CaseSummaryTable = React.memo(function CaseSummaryTable(props){
             </React.Fragment>
         ),
     };
+
+    // Create a mapping of individuals to relationship and sex
+    const relationshipMapping = {};
+    relationships.forEach((item) => {
+        const { relationship = null, sex = null, individual = null } = item;
+        relationshipMapping[individual] = { sex, relationship };
+    });
+    console.log("relationshipMapping", relationshipMapping);
 
     const sampleProcessingData = {}; // maps sample analysis UUIDs to sample IDs to file data Objects for MSAs and samples
 
@@ -410,7 +419,9 @@ export const CaseSummaryTable = React.memo(function CaseSummaryTable(props){
     // how many individual have samples there... so it might make sense to move this
     members.forEach(function(individual){
         const {
+            accession = null,
             display_title: indvDisplayTitle = null,
+            individual_id = null,
             '@id' : indvId,
             error = null,
             samples = []
@@ -428,13 +439,19 @@ export const CaseSummaryTable = React.memo(function CaseSummaryTable(props){
 
         const isProband = (probandID && probandID === indvId);
         const genID = idToGraphIdentifier[indvId];
+
+        // Assign roles to the individual
+        const infoObj = relationshipMapping[accession] || relationshipMapping[indvDisplayTitle];
+        const role = infoObj["relationship"] || null;
+        const sex = infoObj["sex"] || null;
         console.log("id from graph", indvId, genID);
 
         const indvLink = (
             <div className={`${genID ? "text-ellipsis-container" : ""}`}>
                 { isProband ? <span className="font-weight-bold d-block">Proband</span> : null}
+                { (role && role !== "proband") ? <span className="d-block font-weight-semibold text-capitalize">{role}</span> : null}
                 { genID ? <span className="text-serif text-small gen-identifier d-block text-center">{ genID }</span>: null}
-                <a href={indvId} className="accession d-block">{ indvDisplayTitle }</a>
+                <a href={indvId} className="accession d-block">{ individual_id || indvDisplayTitle }</a>
             </div>);
 
         samples.forEach(function(sample, sampleIdx){
