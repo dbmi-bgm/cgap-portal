@@ -153,8 +153,8 @@ class VariantSample(Item):
         "description": "Reference AD",
         "type": "integer"
     })
-    def AD_REF(self, AD):
-        if AD:
+    def AD_REF(self, AD=None):
+        if AD is not None:
             return int(AD.split(',')[0])
         return -1
 
@@ -163,8 +163,8 @@ class VariantSample(Item):
         "description": "Alternate AD",
         "type": "integer"
     })
-    def AD_ALT(self, AD):
-        if AD:
+    def AD_ALT(self, AD=None):
+        if AD is not None:
             return int(AD.split(',')[1])
         return -1
 
@@ -173,8 +173,8 @@ class VariantSample(Item):
         "description": "Allele Frequency",
         "type": "number"
     })
-    def AF(self, AD):
-        if AD:
+    def AF(self, AD=None):
+        if AD is not None:
             ref, alt = AD.split(',')
             try:
                 denominator = int(ref) + int(alt)

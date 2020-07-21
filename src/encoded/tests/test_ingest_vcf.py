@@ -1,15 +1,15 @@
 import pytest
-from encoded.tests.data.variant_workbook.expected import (
+from .data.variant_workbook.expected import (
     VARIANT_SCHEMA,
     VARIANT_SAMPLE_SCHEMA,
     EXPECTED_ANNOTATION_FIELDS,
     TEST_VCF,
     RAW_INFOTAG_DESCRIPTION,
 )
-from encoded.commands.ingest_vcf import (
+from ..commands.ingest_vcf import (
     VCFParser
 )
-from encoded.tests.variant_fixtures import (  # noqa
+from .variant_fixtures import (  # noqa
     gene_workbook,
     post_variant_consequence_items,
     MAX_POSTS_FOR_TESTING,
@@ -27,171 +27,170 @@ def test_vcf():
     return parser
 
 
-def test_VCFP_meta(test_vcf):
-    """ Checks that we can correctly read which fields are annotation """
-    annotation_fields = test_vcf.annotation_keys
-    for annot_field in EXPECTED_ANNOTATION_FIELDS:
-        assert annot_field in annotation_fields
-    assert test_vcf.get_sub_embedded_label('VEP') == 'transcript'
-    assert test_vcf.get_sub_embedded_label('GENES') == 'genes'
-    assert test_vcf.get_sub_embedded_label('HG19') == 'hg19'
-    assert test_vcf.get_sub_embedded_label('CLINVAR_SUBMISSION') == 'clinvar_submission'
-    assert test_vcf.get_sub_embedded_label('ANNOVAR') is None
+class TestIngestVCF:
 
+    VEP_IDENTIFIER = 'transcript'
+    GENE_IDENTIFIER = 'genes'
+    HG19_IDENTIFIER = 'hg19'
 
-def test_VCFP_one_variant(test_vcf):
-    """
-    Tests that we can correctly process a single VCF variant
-    Checks many specific things about the record for correctness
-    For all the following tests we check a 'representative subset' of information
-    """
-    record = test_vcf.read_next_record()
-    result = test_vcf.create_variant_from_record(record)
+    @staticmethod
+    def get_top_level_field(item, field):
+        if field not in item:
+            return None
+        return item[field]
 
-    # check top level fields
-    assert result['CHROM'] == '1'
-    assert result['cytoband_cytoband'] == '1p36.33'
-    assert result['conservation_phastcons30'] == 0.545
-    assert result['dbsnp_rs_number'] == 'rs72631890'
-    assert result['gnomad_an_raw'] == 143376
+    def _get_sub_annotation_field(self, item, idx, identifier, field):
+        annotations = self.get_top_level_field(item, identifier)
+        if annotations is None:
+            return None
+        if idx > len(annotations):
+            raise ValueError('Index out of range on annotations %s, idx: %s' % (identifier, idx))
+        return annotations[idx].get(field, None)
 
-    # check sub-embedded object fields
-    assert result['transcript'][0]['vep_consequence'] == ['missense_variant']
-    assert result['transcript'][0]['vep_gene'] == 'ENSG00000188976'
-    assert result['transcript'][0]['vep_canonical'] is True
-    assert result['transcript'][10]['vep_tsl'] == 5
+    def get_transcript_field(self, item, idx, field):
+        return self._get_sub_annotation_field(item, idx, self.VEP_IDENTIFIER, field)
 
+    def get_genes_field(self, item, idx, field):
+        return self._get_sub_annotation_field(item, idx, self.GENE_IDENTIFIER, field)
 
-def test_VCFP_multiple_variants(test_vcf):
-    """
-    Tests that we can correctly process an annotated VCF with multiple records
-    """
-    test_VCFP_one_variant(test_vcf)  # run previous test
+    def get_hg19_field(self, item, idx, field):
+        return self._get_sub_annotation_field(item, idx, self.HG19_IDENTIFIER, field)
 
-    # check record 2
-    record = test_vcf.read_next_record()
-    result = test_vcf.create_variant_from_record(record)
+    def test_parser_meta(self, test_vcf):
+        """ Checks that we can correctly read which fields are annotation """
+        annotation_fields = test_vcf.annotation_keys
+        for annot_field in EXPECTED_ANNOTATION_FIELDS:
+            assert annot_field in annotation_fields
+        assert test_vcf.get_sub_embedded_label('VEP') == ('transcript', True)
+        assert test_vcf.get_sub_embedded_label('GENES') == ('genes', True)
+        assert test_vcf.get_sub_embedded_label('HG19') == ('hg19', True)
+        assert test_vcf.get_sub_embedded_label('CLINVAR_SUBMISSION') == ('clinvar_submission', True)
+        assert test_vcf.get_sub_embedded_label('ANNOVAR') == (None, False)
+        assert test_vcf.get_sub_embedded_label('comHet') == ('cmphet', False)
 
-    # check top level fields
-    assert result['conservation_phylop20'] == -0.91
-    assert result['conservation_phylop30'] == -1.239
-    assert result['topmed_het'] == 67
-    assert result['cosmic_mutation_somatic_status'] == 'Confirmed somatic variant'
-    assert result['conservation_phastcons100'] == 0.0
-    assert sorted(result['cosmic_mutation_description']) == ['Missense', 'Substitution']
+    def test_build_one_variant(self, test_vcf):
+        """
+        Tests that we can correctly process a single VCF variant
+        Checks many specific things about the record for correctness
+        For all the following tests we check a 'representative subset' of information
+        """
+        record = test_vcf.read_next_record()
+        result = test_vcf.create_variant_from_record(record)
 
-    # check transcript
-    assert len(result['transcript'].keys()) == 6
-    assert result['transcript'][0]['vep_consequence'] == ['inframe_deletion']
-    assert result['transcript'][3]['vep_consequence'] == ['downstream_gene_variant']
-    assert result['transcript'][0]['vep_feature'] == 'ENST00000341290'
-    assert result['transcript'][5]['vep_feature'] == 'ENST00000491024'
-    assert result['transcript'][0]['vep_domains'] == ['PANTHER:PTHR47282']
+        # check top level fields
+        assert self.get_top_level_field(result, 'CHROM') == '1'
+        assert self.get_top_level_field(result, 'cytoband_cytoband') == '1p36.33'
+        assert self.get_top_level_field(result, 'conservation_phastcons30') == 0.002
+        assert self.get_top_level_field(result, 'dbsnp_rs_number') == 'rs748758211'
+        assert self.get_top_level_field(result, 'gnomad_an_raw') == 143382
 
-    # check genes
-    assert result['genes'][0]['genes_ensg'] == 'ENSG00000187642'
-    assert result['genes'][1]['genes_ensg'] == 'ENSG00000187583'
+        # check sub-embedded object fields
+        assert len(result['transcript']) == 2
+        assert self.get_transcript_field(result, 0, 'vep_consequence') == ['inframe_deletion']
+        assert self.get_transcript_field(result, 0, 'vep_gene') == 'ENSG00000187642'
+        assert self.get_transcript_field(result, 0, 'vep_canonical') is False
+        assert self.get_transcript_field(result, 1, 'vep_tsl') == 5
 
-    # check hg19
-    assert result['hg19'][0]['hg19_pos'] == 914414
+    def test_build_multiple_variants(self, test_vcf):
+        """
+        Tests that we can correctly process an annotated VCF with multiple records
+        """
+        self.test_build_one_variant(test_vcf)  # run previous test
 
-    # check record 3 (only a few things)
-    record = test_vcf.read_next_record()
-    result = test_vcf.create_variant_from_record(record)
-    assert len(result['transcript'].keys()) == 3
-    assert result['transcript'][0]['vep_consequence'] == ['intron_variant']
-    assert result['transcript'][0]['vep_feature'] == 'ENST00000624652'
-    assert result['transcript'][1]['vep_trembl'] == 'A0A096LPJ4'
-    assert result['gnomad_ac_afr_male'] == 158
-    assert result['topmed_het'] == 403
+        # check record 2
+        record = test_vcf.read_next_record()
+        result = test_vcf.create_variant_from_record(record)
 
-    # XXX: test string array fields
+        # check top level fields
+        assert self.get_top_level_field(result, 'mutanno_variant_class') == 'DEL'
+        assert self.get_top_level_field(result, 'mutanno_hgvsg') == 'NC_000001.11:g.1013550_1013556del'
+        assert self.get_top_level_field(result, 'conservation_phylop20') == 0.655
+        assert self.get_top_level_field(result, 'conservation_phylop30') == 0.777
+        assert self.get_top_level_field(result, 'topmed_het') == 403
+        assert self.get_top_level_field(result, 'conservation_phastcons100') == 0.0
 
+        # check transcript
+        assert len(result['transcript'].keys()) == 1
+        assert self.get_transcript_field(result, 0, 'vep_consequence') == ['5_prime_UTR_variant']
+        assert self.get_transcript_field(result, 0, 'vep_feature') == 'ENST00000649529'
 
-def test_VCFP_multiple_sample_variants(test_vcf):
-    """ Generates 3 sample variant items and checks them for correctness """
-    record = test_vcf.read_next_record()
-    result = test_vcf.create_sample_variant_from_record(record)
-    for sample in result:
-        assert sample['GT'] != '0/0'  # this VCF has one of these that should be dropped
-    record = test_vcf.read_next_record()
-    result = test_vcf.create_sample_variant_from_record(record)[0]
-    assert result['DP'] == 38
-    assert result['GT'] == '0/1'
-    assert result['GQ'] == 99
-    assert result['PL'] == '876,0,605'
-    record = test_vcf.read_next_record()
-    result = test_vcf.create_sample_variant_from_record(record)[0]
-    assert result['DP'] == 52
-    assert len(result['samplegeno']) == 3
-    assert 'samplegeno_numgt' in result['samplegeno'][0]
-    assert 'samplegeno_ad' in result['samplegeno'][0]
-    assert 'samplegeno_gt' in result['samplegeno'][0]
+        # check genes
+        assert self.get_genes_field(result, 0, 'genes_ensg') == 'ENSG00000187608'
+        assert self.get_genes_field(result, 0, 'genes_most_severe_transcript') == 'ENST00000649529'
 
+        # check hg19
+        assert self.get_hg19_field(result, 0, 'hg19_pos') == 948929
 
-@pytest.mark.skip  # variant is required for posting variant_samples, so this test cannot be run now.
-def test_VCFP_post_sample_variants(testapp, institution, project, test_vcf):
-    """ Attempts to post all generated sample variants without links"""
-    for idx, record in enumerate(test_vcf):
-        if idx == MAX_POSTS_FOR_TESTING:
-            break
-        variant_samples = test_vcf.create_sample_variant_from_record(record)
-        for sample in variant_samples:
-            sample['project'] = 'encode-project'
-            sample['institution'] = 'encode-institution'
-            sample['file'] = 'dummy-filename'
-            res = testapp.post_json(VARIANT_SAMPLE_URL, sample, status=201).json
+        # check record 3 (only a few things)
+        record = test_vcf.read_next_record()
+        result = test_vcf.create_variant_from_record(record)
+        assert len(result[self.VEP_IDENTIFIER].keys()) == 4
+        assert self.get_transcript_field(result, 0, 'vep_consequence') == ['missense_variant']
+        assert self.get_transcript_field(result, 0, 'vep_feature') == 'ENST00000379370'
+        assert self.get_transcript_field(result, 1, 'vep_trembl') == 'A0A087X208'
+        assert self.get_top_level_field(result, 'gnomad_ac_afr_male') == 0
+        assert self.get_top_level_field(result, 'topmed_het') == 1
+        assert sorted(self.get_transcript_field(result, 0, 'vep_domains')) == sorted(
+            ['Gene3D:3.30.60.30', 'PANTHER:PTHR10574', 'PANTHER:PTHR10574:SF288', 'SMART:SM00181', 'SMART:SM00274',
+             'Superfamily:SSF100895']
+        )
+
+    def test_build_multiple_sample_variants(self, test_vcf):
+        """ Generates 3 sample variant items and checks them for correctness """
+        record = test_vcf.read_next_record()
+        result = test_vcf.create_sample_variant_from_record(record)
+        for sample in result:
+            assert self.get_top_level_field(sample, 'GT') != '0/0'  # this VCF has one of these that should be dropped
+        assert result[0]['FS'] == 0.0
+
+        record = test_vcf.read_next_record()
+        result = test_vcf.create_sample_variant_from_record(record)[0]
+        assert self.get_top_level_field(result, 'DP') == 25
+        assert self.get_top_level_field(result, 'GT') == '0/1'
+        assert self.get_top_level_field(result, 'GQ') == 99
+        assert self.get_top_level_field(result, 'PL') == '362,0,599'
+        record = test_vcf.read_next_record()
+        result = test_vcf.create_sample_variant_from_record(record)[0]
+        assert self.get_top_level_field(result, 'DP') == 29
+        assert len(result['samplegeno']) == 1
+        assert 'samplegeno_numgt' in result['samplegeno'][0]
+        assert 'samplegeno_ad' in result['samplegeno'][0]
+        assert 'samplegeno_gt' in result['samplegeno'][0]
+        assert 'cmphet' in result
+
+    def test_post_variants(self, testapp, institution, project, test_vcf, gene_workbook, post_variant_consequence_items):
+        """ Attempts to post all generated variants without links """
+        for idx, record in enumerate(test_vcf):
+            if idx == MAX_POSTS_FOR_TESTING:
+                break
+            variant = test_vcf.create_variant_from_record(record)
+            variant['project'] = 'encode-project'
+            variant['institution'] = 'encode-institution'
+            test_vcf.format_variant_sub_embedded_objects(variant)
+            res = testapp.post_json(VARIANT_URL, variant, status=201).json
             assert 'annotation_id' in res['@graph'][0]  # verify annotation_id is added on post
 
-
-def test_VCFP_post_variants(testapp, institution, project, test_vcf, gene_workbook, post_variant_consequence_items):
-    """ Attempts to post all generated variants without links """
-    for idx, record in enumerate(test_vcf):
-        if idx == MAX_POSTS_FOR_TESTING:
-            break
-        variant = test_vcf.create_variant_from_record(record)
-        variant['project'] = 'encode-project'
-        variant['institution'] = 'encode-institution'
-        test_vcf.format_variant_sub_embedded_objects(variant)
-        res = testapp.post_json(VARIANT_URL, variant, status=201).json
-        assert 'annotation_id' in res['@graph'][0]  # verify annotation_id is added on post
-
-
-# @pytest.mark.skip  # will not run currently without valid VCF
-# def test_VCFP_run(testapp, institution, project, test_vcf, gene_workbook, post_variant_consequence_items):
-#     """ Tests the 'run' method, which processes all the VCF records
-#         Actual results are already validated in previous 3 tests, just
-#         check to see that we get the 3 that we expect and they post correctly
-#     """
-#     vss, vs = test_vcf.run(project='encode-project', institution='encode-institution')
-#     assert len(vss) == 20
-#     assert len(vs) == 11
-#     for v in vs[:MAX_POSTS_FOR_TESTING]:
-#         testapp.post_json('/variant', v, status=201)
-#     for vs in vss[:MAX_POSTS_FOR_TESTING]:
-#         testapp.post_json('/variant_sample', vs, status=201)
-
-
-def test_VCFP_make_links(testapp, institution, project, test_vcf, gene_workbook, post_variant_consequence_items):
-    """ Will post all generated variants and samples, forming linkTo's from variant_sample to variant
-        NOTE: This is the most important test functionally speaking.
-    """
-    VARIANT_URL, VARIANT_SAMPLE_URL = '/variant', '/variant_sample'
-    for idx, record in enumerate(test_vcf):
-        if idx == MAX_POSTS_FOR_TESTING:
-            break
-        variant = test_vcf.create_variant_from_record(record)
-        variant['project'] = 'encode-project'
-        variant['institution'] = 'encode-institution'
-        test_vcf.format_variant_sub_embedded_objects(variant)
-        res = testapp.post_json(VARIANT_URL, variant, status=201).json['@graph'][0]  # only one item posted
-        assert 'annotation_id' in res
-        variant_samples = test_vcf.create_sample_variant_from_record(record)
-        for sample in variant_samples:
-            sample['project'] = 'encode-project'
-            sample['institution'] = 'encode-institution'
-            sample['variant'] = res['@id']  # make link
-            sample['file'] = 'dummy-filename'
-            res2 = testapp.post_json(VARIANT_SAMPLE_URL, sample, status=201).json
-            assert 'annotation_id' in res2['@graph'][0]
-            assert 'bam_snapshot' in res2['@graph'][0]
+    def test_post_variants_and_samples_with_links(self, testapp, institution, project, test_vcf, gene_workbook,
+                                                  post_variant_consequence_items):
+        """ Will post all generated variants and samples, forming linkTo's from variant_sample to variant
+            NOTE: This is the most important test functionally speaking.
+        """
+        VARIANT_URL, VARIANT_SAMPLE_URL = '/variant', '/variant_sample'
+        for idx, record in enumerate(test_vcf):
+            if idx == MAX_POSTS_FOR_TESTING:
+                break
+            variant = test_vcf.create_variant_from_record(record)
+            variant['project'] = 'encode-project'
+            variant['institution'] = 'encode-institution'
+            test_vcf.format_variant_sub_embedded_objects(variant)
+            res = testapp.post_json(VARIANT_URL, variant, status=201).json['@graph'][0]  # only one item posted
+            assert 'annotation_id' in res
+            variant_samples = test_vcf.create_sample_variant_from_record(record)
+            for sample in variant_samples:
+                sample['project'] = 'encode-project'
+                sample['institution'] = 'encode-institution'
+                sample['variant'] = res['@id']  # make link
+                sample['file'] = 'dummy-filename'
+                res2 = testapp.post_json(VARIANT_SAMPLE_URL, sample, status=201).json
+                assert 'annotation_id' in res2['@graph'][0]
+                assert 'bam_snapshot' in res2['@graph'][0]

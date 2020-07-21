@@ -560,5 +560,202 @@
   "gtex_expression": "ENSG00000188157.14",
   "brainspan_rnaseq": "ENSG00000188157",
   "brainatlas_microarray": "AGRN"
+},
+  {
+  "chrom": "1",
+  "spos": 1311585,
+  "epos": 1324691,
+  "ensgid": "ENSG00000127054",
+  "strand": "-",
+  "gene_version": "20",
+  "gene_symbol": "INTS11",
+  "gene_biotype": "protein_coding",
+  "chrom_hg19": "1",
+  "spos_hg19": 1246965,
+  "epos_hg19": 1260071,
+  "strand_hg19": "-",
+  "cytoband": [
+    "1p36.33"
+  ],
+  "hgnc_id": "26052",
+  "name": "integrator complex subunit 11",
+  "entrez_id": "54973",
+  "ucsc_id": "uc001aee.3",
+  "refseq_accession": [
+    "NM_017871"
+  ],
+  "ccds_id": [
+    "CCDS21",
+    "CCDS57959",
+    "CCDS57960",
+    "CCDS57961",
+    "CCDS72678"
+  ],
+  "uniprot_ids": [
+    "Q5TA45"
+  ],
+  "mgd_id": [
+    "MGI:1919207"
+  ],
+  "omim_id": [
+    "611354"
+  ],
+  "transcriptid": [
+    {
+      "ensembl_trs": "ENST00000419704",
+      "ensembl_pro": "ENSP00000404886"
+    },
+    {
+      "ensembl_trs": "ENST00000435064",
+      "ensembl_pro": "ENSP00000413493"
+    },
+    {
+      "ensembl_trs": "ENST00000450926",
+      "ensembl_pro": "ENSP00000392848"
+    },
+    {
+      "ensembl_trs": "ENST00000540437",
+      "ensembl_pro": "ENSP00000445001"
+    },
+    {
+      "ensembl_trs": "ENST00000545578",
+      "ensembl_pro": "ENSP00000444672"
+    },
+    {
+      "ensembl_trs": "ENST00000411962",
+      "ensembl_pro": "ENSP00000400548"
+    },
+    {
+      "ensembl_trs": "ENST00000421495",
+      "ensembl_pro": "ENSP00000464436"
+    },
+    {
+      "ensembl_trs": "ENST00000458452",
+      "ensembl_pro": "ENSP00000433930"
+    },
+    {
+      "ensembl_trs": "ENST00000532772",
+      "ensembl_pro": "ENSP00000431214"
+    },
+    {
+      "ensembl_trs": "ENST00000527098",
+      "ensembl_pro": "ENSP00000431952"
+    },
+    {
+      "ensembl_trs": "ENST00000528879",
+      "ensembl_pro": "ENSP00000432777"
+    },
+    {
+      "ensembl_trs": "ENST00000531377",
+      "ensembl_pro": "ENSP00000433264"
+    },
+    {
+      "ensembl_trs": "ENST00000527383",
+      "ensembl_pro": "ENSP00000431425"
+    },
+    {
+      "ensembl_trs": "ENST00000434694",
+      "ensembl_pro": "ENSP00000411233"
+    },
+    {
+      "ensembl_trs": "ENST00000526797",
+      "ensembl_pro": "ENSP00000435418"
+    },
+    {
+      "ensembl_trs": "ENST00000526332",
+      "ensembl_pro": "ENSP00000434790"
+    },
+    {
+      "ensembl_trs": "ENST00000430786",
+      "ensembl_pro": "ENSP00000404012"
+    },
+    {
+      "ensembl_trs": "ENST00000527719",
+      "ensembl_pro": "ENSP00000436743"
+    },
+    {
+      "ensembl_trs": "ENST00000530031",
+      "ensembl_pro": "ENSP00000432009"
+    },
+    {
+      "ensembl_trs": "ENST00000429572",
+      "ensembl_pro": "ENSP00000481275"
+    },
+    {
+      "ensembl_trs": "ENST00000534345",
+      "ensembl_pro": "ENSP00000435772"
+    },
+    {
+      "ensembl_trs": "ENST00000531019",
+      "ensembl_pro": "ENSP00000433733"
+    },
+    {
+      "ensembl_trs": "ENST00000498476",
+      "ensembl_pro": "ENSP00000436824"
+    },
+    {
+      "ensembl_trs": "ENST00000470679",
+      "ensembl_pro": "ENSP00000434782"
+    },
+    {
+      "ensembl_trs": "ENST00000525285",
+      "ensembl_pro": "ENSP00000436396"
+    },
+    {
+      "ensembl_trs": "ENST00000620829",
+      "ensembl_pro": "ENSP00000481821"
+    },
+    {
+      "ensembl_trs": "ENST00000618806",
+      "ensembl_pro": "ENSP00000480957"
+    }
+  ],
+  "pdb": [
+    "5V8W"
+  ],
+  "biogrid": [
+    "120310"
+  ],
+  "string": [
+    "9606.ENSP00000445001"
+  ],
+  "genecards": "ENSG00000127054",
+  "pharmgkb": [
+    "PA142672080"
+  ],
+  "trait_association_gwas": [
+    "Inflammatory bowel disease",
+    "Systolic blood pressure",
+    "Systemic lupus erythematosus",
+    "Pulse pressure",
+    "Ulcerative colitis"
+  ],
+  "trait_association_gwas_pmid": [
+    "28067908",
+    "28135244",
+    "28714469",
+    "28135244~28135244",
+    "28067908"
+  ],
+  "rvis_exac": -1.203961754,
+  "rvis_percentile_exac": 6.517679658,
+  "mgi_mouse_gene": "Ints11",
+  "obs_mis": 357,
+  "exp_mis": 387.14,
+  "oe_mis": 0.92215,
+  "obs_syn": 228,
+  "exp_syn": 162.94,
+  "oe_syn": 1.3993,
+  "obs_lof": 26,
+  "exp_lof": 36.284,
+  "oe_lof": 0.71657,
+  "cds_length": 1818,
+  "num_coding_exons": 17,
+  "marrvel": "INTS11",
+  "s_het": 0.004533236,
+  "gtex_expression": "ENSG00000127054.20",
+  "brainspan_microarray": "CPSF3L",
+  "brainspan_rnaseq": "ENSG00000127054",
+  "brainatlas_microarray": "CPSF3L"
 }
 ]
