@@ -128,9 +128,11 @@ class IngestionQueueManager:
                 Attributes=self.queue_attrs[self.queue_name]
             )
             queue_url = response['QueueUrl']
+        except self.client.exceptions.QueueNameExists as e:
+            queue_url = self._get_queue_url(self.queue_name)
         except Exception as e:
-            log.error('Could not create queue with error %s' % e)
-            queue_url = self._get_queue_url(self.queue_name)  # try again anyway
+            log.error('Error while attempting to create queue: %s' % e)
+            queue_url = self._get_queue_url(self.queue_name)
         return queue_url
 
     def _get_queue_url(self, queue_name):

@@ -102,7 +102,7 @@ def test_generate_gene_schema(gene_schema):
 def test_gene_table_run(GTParser, testapp):
     """ Runs the gene table ingestion process, building the schema into the test location
         and posting the resulting inserts """
-    inserts = GTParser.run(gs_out=GENE_SCHEMA_TEST_LOC, write=True)
+    inserts = GTParser.run(gs_out=GENE_SCHEMA_TEST_LOC, write=False)
     for item in inserts:
         testapp.post_json(GENE_ANNOTATION_FIELD_URL, item, status=201)
 

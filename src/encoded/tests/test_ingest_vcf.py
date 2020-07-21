@@ -194,3 +194,4 @@ def test_VCFP_make_links(testapp, institution, project, test_vcf, gene_workbook,
             sample['file'] = 'dummy-filename'
             res2 = testapp.post_json(VARIANT_SAMPLE_URL, sample, status=201).json
             assert 'annotation_id' in res2['@graph'][0]
+            assert 'bam_snapshot' in res2['@graph'][0]

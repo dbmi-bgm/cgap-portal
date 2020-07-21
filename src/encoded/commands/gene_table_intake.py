@@ -33,7 +33,7 @@ class GeneTableParser(MappingTableParser):
         """
         schema['$schema'] = 'http://json-schema.org/draft-04/schema#'
         schema['type'] = 'object'
-        schema['required'] = ['institution', 'project']
+        schema['required'] = ['institution', 'project', 'gene_symbol']
         schema['identifyingProperties'] = ['uuid', 'aliases']
         schema['additionalProperties'] = False
         schema['mixinProperties'] = [
