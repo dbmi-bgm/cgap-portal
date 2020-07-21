@@ -28,7 +28,6 @@ class Case(Item):
         "family.family_phenotypic_features",
         "family.members.*", # We need to have mother and father (or 'parents' maybe eventually) for all members with at least @id.
         "family.members.individual_id",
-        "family.members.institution",
         "family.members.case",
         "family.members.case.case_title",
         "family.members.case.accession",
@@ -64,7 +63,6 @@ class Case(Item):
         "secondary_families.relationships.*",
         "secondary_families.proband.accession",
         "secondary_families.members.*",
-        "secondary_families.members.institution",
         "secondary_families.members.individual_id",
         "secondary_families.members.accession",
         "secondary_families.members.case",
