@@ -22,11 +22,11 @@ export const CaseDetailPane = React.memo(function CaseDetailPane (props) {
         containerWidth, result, minimumWidth, paddingWidth: usePadWidth
     };
 
-    const families = [];
+    let families = [];
     if (family !== null) {
         families.push(family);
         if (secondary_families !== null && secondary_families.length > 0) {
-            familes = familes.concat(secondary_families);
+            families = families.concat(secondary_families);
         }
     }
 
@@ -221,15 +221,24 @@ export class FamilyReportStackedTable extends React.PureComponent {
                     {analysisGroups.map((group) => {
                         const { analysis_type = null, samples = [], cases = [] } = group || {};
                         let reportBlock = null;
+                        console.log("case- analysis group:", group);
 
                         // Figure out which report is associated with the current analysis group & sample
                         cases.forEach((groupCase) => {
                             const { '@id': thisCaseAtId = null, sample: caseSample = null } = groupCase || {};
                             const { '@id': sampleAtId = null } = caseSample || {};
                             if (sampleAtId === atId) {
+                                console.log("reportblockmapping,", reportBlockMapping);
                                 const reportBlockId = caseToReportMap[thisCaseAtId];
+                                const fallbackKey = 'case-' + thisCaseAtId;
+                                console.log(fallbackKey);
                                 if (reportBlockId) {
                                     reportBlock = reportBlockMapping[reportBlockId];
+                                // TODO: Rework this entire method of passing case through; didn't realize case was necessary early on and needed this
+                                } else if (
+                                    reportBlockMapping[fallbackKey]
+                                ) {
+                                    reportBlock = reportBlockMapping[fallbackKey] || null;
                                 }
                             }
                         });
@@ -283,7 +292,24 @@ export class FamilyReportStackedTable extends React.PureComponent {
                         label={<StackedBlockNameLabel title={null} accession={null} subtitleVisible/>}
                     >
                         <StackedBlockName>
-                            { reportAtId ? <a href={reportAtId} className="name-title text-capitalize">{ reportTitle }</a> : <span className="name-title text-capitalize">{ reportTitle }</span>}
+                            <span className="d-inline">
+                                Case ID: { caseAtId ? <a href={caseAtId} className="name-title text-capitalize">{ case_title }</a> : <span className="name-title text-capitalize">{ case_title }</span>}
+                            </span>
+                            <span className="d-inline">
+                                { reportAtId ? <>Report: <a href={reportAtId} className="name-title text-capitalize">{ reportTitle }</a></> : <>Report: <span className="name-title text-capitalize">{ reportTitle }</span></>}
+                            </span>
+                        </StackedBlockName>
+                    </StackedBlock>);
+                caseToReportMap[caseAtId] = reportAtId;
+            } else {
+                reportToReportBlockMap['case-' + caseAtId] = (
+                    <StackedBlock columnClass="report" hideNameOnHover={false} key={reportAtId} id={reportAtId}
+                        label={<StackedBlockNameLabel title={null} accession={null} subtitleVisible/>}
+                    >
+                        <StackedBlockName>
+                            <span className="d-inline">
+                                Case ID: { caseAtId ? <a href={caseAtId} className="name-title text-capitalize">{ case_title }</a> : <span className="name-title text-capitalize">{ case_title }</span>}
+                            </span>
                         </StackedBlockName>
                     </StackedBlock>);
                 caseToReportMap[caseAtId] = reportAtId;
@@ -539,7 +565,7 @@ export class FamilyAccessionStackedTable extends React.PureComponent {
 
             const isResultCase = caseAtId === resultCaseAtId;
 
-            let analysisType = 'N/A';
+            let analysisType = null;
 
             // Search each analysis group for one with the current case to use as title
             analysisGroups.forEach((analysisGroup) => {
