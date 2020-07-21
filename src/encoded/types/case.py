@@ -28,7 +28,7 @@ class Case(Item):
         "family.family_phenotypic_features",
         "family.members.*", # We need to have mother and father (or 'parents' maybe eventually) for all members with at least @id.
         "family.members.individual_id",
-        "family.members.institution.institution",
+        "family.members.institution",
         "family.members.case",
         "family.members.case.case_title",
         "family.members.case.accession",
