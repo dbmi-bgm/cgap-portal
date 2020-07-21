@@ -447,7 +447,7 @@ export class FamilyAccessionStackedTable extends React.PureComponent {
         const { '@id': resultSampleAtId = null } = resultSample;
 
 
-        const { '@id': atId = null, specimen_collection_date = null, specimen_type = null, workup_type = null, display_title = null, accession = null } = sample;
+        const { '@id': atId = null, sample_id = null, specimen_collection_date = null, specimen_type = null, workup_type = null, display_title = null, accession = null } = sample;
 
         let blockValue = '-';
         samples.forEach((thisSample) => {
@@ -462,15 +462,15 @@ export class FamilyAccessionStackedTable extends React.PureComponent {
             <div className="w-100" style={{ maxWidth: "70%" }}>
                 <table className="accession-table w-100">
                     <tbody>
+                        { sample_id || (display_title && (display_title !== accession)) ?
+                            <tr>
+                                <td className="accession-table-title">Sample ID</td>
+                                <td>{ sample_id || display_title }</td>
+                            </tr> : null}
                         <tr>
-                            <td className="accession-table-title">Sample ID</td>
+                            <td className="accession-table-title">CGAP Sample ID</td>
                             <td>{accession || "-"}</td>
                         </tr>
-                        { display_title && (display_title !== accession) ?
-                            <tr>
-                                <td className="accession-table-title">CGAP ID</td>
-                                <td>{ display_title }</td>
-                            </tr> : null}
                         { specimen_type ?
                             <tr>
                                 <td className="accession-table-title">Sample Type</td>
@@ -574,7 +574,7 @@ export class FamilyAccessionStackedTable extends React.PureComponent {
                                             : null}
                                         { caseAtId ?
                                             <tr>
-                                                <td className="accession-table-title">CGAP ID</td>
+                                                <td className="accession-table-title">CGAP Case ID</td>
                                                 <td>{caseAccession}</td>
                                             </tr>
                                             : null}
@@ -605,16 +605,16 @@ export class FamilyAccessionStackedTable extends React.PureComponent {
                 <StackedBlockName className="flex-row align-items-center justify-content-between">
                     <div className="d-flex flex-column">
                         { atId ?
-                            <a href={atId} className={`name-title p-1 text-capitalize ${(result.individual['@id'] === individual['@id']) ? "current-case" : ""}`}>
+                            <a href={atId} className={`name-title text-capitalize ${(result.individual['@id'] === individual['@id']) ? "current-case pl-1" : ""}`}>
                                 { role || display_title }
-                            </a> : <span className="name-title p-1 text-capitalize">{ role || display_title }</span>}
+                            </a> : <span className={`name-title text-capitalize ${(result.individual['@id'] === individual['@id']) ? "current-case pl-1" : ""}`}>{ role || display_title }</span>}
                         <span className="d-block text-small">({ individual_id ? individual_id : (display_title !== accession) ? display_title : "N/A" })</span>
                     </div>
                     <div className="w-100" style={{ maxWidth: "70%" }}>
                         <table className="accession-table w-100">
                             <tbody>
                                 <tr>
-                                    <td className="accession-table-title">CGAP ID</td>
+                                    <td className="accession-table-title">CGAP Individual ID</td>
                                     <td>{ accession || "" }</td>
                                 </tr>
                                 <tr>
