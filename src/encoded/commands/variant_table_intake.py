@@ -453,7 +453,8 @@ class MappingTableParser(object):
     def add_extra_variant_sample_columns(cols):
         """ Adds href, variant display title to columns (fields not on mapping table) """
         cols['bam_snapshot'] = {
-            'title': 'Genome Snapshot'
+            'title': 'Genome Snapshot',
+            'order': 81
         }
         cols['variant.display_title'] = {
             'title': 'Variant'

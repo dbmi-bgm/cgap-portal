@@ -4,6 +4,7 @@ import time
 import mock
 import datetime
 from uuid import uuid4
+from dcicutils.qa_utils import ignored
 from ..ingestion_listener import IngestionQueueManager, run, IngestionListener
 from ..util import gunzip_content
 from .variant_fixtures import gene_workbook  # noqa
@@ -146,12 +147,14 @@ def test_ingestion_listener_run(testapp, mocked_vcf_file, gene_workbook, setup_a
     start_time = datetime.datetime.utcnow()
     end_delta = datetime.timedelta(seconds=10)
 
-    def mocked_should_remain_online(ignore):  # staticmethod, so requires 'self' positional arg (that is ignored)
+    def mocked_should_remain_online(override=None):
+        ignored(override)
         current_time = datetime.datetime.utcnow()
         return current_time < (start_time + end_delta)
 
     # XXX: This is a really hard thing to test, but take my word for it that this is doing "something" -Will
-    #      If you do not get ValueError here, it means the0
+    #      If you do not get ValueError here, it means the VCF wasn't processed in the run method or a different
+    #      error occurred.
     with mock.patch('encoded.ingestion_listener.IngestionListener.should_remain_online',
                     new=mocked_should_remain_online):
         with pytest.raises(ValueError):
