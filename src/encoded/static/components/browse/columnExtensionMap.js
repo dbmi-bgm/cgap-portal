@@ -224,25 +224,26 @@ export const columnExtensionMap = {
     /** "Sequencing" column title */
     'sample': {
         'render' : function renderSequencingColumn(result, parentProps){
-            const { '@id' : resultHrefPath, '@type' : itemTypeList = ["Item"], sample = null } = result;
+            const { '@id' : resultHrefPath, sample = null } = result;
             if (!sample) return null; // Unsure if possible, but fallback to null / '-' in case so (not showing datetitle etc)
             const {
                 workup_type: mainTitle = null,
                 sequencing_date: date = null,
                 completed_processes = []
-            } = sample || {};
+            } = sample;
+            const complProcLen = completed_processes.length;
 
             // We have colors bound to 'data-status' attribute values in SCSS to statuses, so we'll just
             // re-use one of those here rather than creating separate 'color map' for this.
             // And override tooltip.
 
             let status, statusTip;
-            if (completed_processes.length > 0){
+            if (complProcLen > 0){
                 status = "released";
-                statusTip = "This sample/case has some completed processes.";
+                statusTip = `This sample/case has ${complProcLen} completed process` + (complProcLen > 1 ? 'es' : '');
             } else {
                 status = "uploading";
-                statusTip = "This sample/case has no completed processes yet.";
+                statusTip = "This sample/case has no completed processes yet";
             }
 
             return (
@@ -255,22 +256,22 @@ export const columnExtensionMap = {
     /** "Bioinformatics" column title */
     'sample_processing.analysis_type': {
         'render' : function renderBioinformaticsColumn(result, parentProps){
+            const { '@id' : resultHrefPath, sample_processing = null } = result;
+            if (!sample_processing) return null; // Unsure if possible, but fallback to null / '-' in case so (not showing datetitle etc)
             const {
-                '@id' : resultHrefPath,
-                sample_processing: {
-                    analysis_type: mainTitle = null,
-                    last_modified: { date_modified: date = null } = {},
-                    completed_processes = []
-                }
-            } = result;
+                analysis_type: mainTitle = null,
+                last_modified: { date_modified: date = null } = {},
+                completed_processes = []
+            } = sample_processing;
+            const complProcLen = completed_processes.length;
 
             let status, statusTip;
-            if (completed_processes.length > 0){
+            if (complProcLen > 0){
                 status = "released";
-                statusTip = "This sample/case has some completed processes.";
+                statusTip = `This sample/case has ${complProcLen} completed processes`;
             } else {
                 status = "uploading";
-                statusTip = "This sample/case has no completed processes yet.";
+                statusTip = "This sample/case has no completed processes yet";
             }
 
             // Unlikely to show in non-Case item results, so didn't add Case filter
