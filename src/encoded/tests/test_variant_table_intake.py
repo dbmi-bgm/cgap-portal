@@ -14,7 +14,8 @@ EXPECTED_FIELDS = ['no', 'field_name', 'source_name', 'source_version', 'sub_emb
                    'description', 'value_example', 'enum_list', 'do_import',
                    'facet_order', 'column_order', 'annotation_category',
                    'scope', 'schema_title', 'links_to', 'embedded_field',
-                   'calculated_property', 'pattern', 'default', 'min', 'max', 'link', 'comments']
+                   'calculated_property', 'pattern', 'default', 'min', 'max', 'link', 'comments',
+                   'annotation_space_location']
 EXPECTED_INSERT = {'no': 1, 'field_name': 'CHROM', 'schema_title': 'Chromosome',
                    'do_import': True, 'scope': 'variant', 'source_name': 'VCF',
                    'source_version': 'VCFv4.2', 'description': 'Chromosome',
@@ -23,13 +24,13 @@ EXPECTED_INSERT = {'no': 1, 'field_name': 'CHROM', 'schema_title': 'Chromosome',
                    'enum_list': ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10',
                                  '11', '12', '13', '14', '15', '16', '17', '18', '19',
                                  '20', '21', '22', 'X', 'Y', 'M'],
-                   'value_example': '1;2;3;4;5;6;22;X;Y;M'}
+                   'value_example': '1;2;3;4;5;6;22;X;Y;M', 'annotation_space_location': 'Position'}
 VEP_CONSEQUENCE_EMBEDS = ['transcript.vep_consequence.var_conseq_id', 'transcript.vep_consequence.definition',
                           'transcript.vep_consequence.impact', 'transcript.vep_consequence.location',
-                          'transcript.vep_consequence.coding_effect']
-NUMBER_ANNOTATION_FIELDS = 342
+                          'transcript.vep_consequence.coding_effect', 'transcript.vep_gene.display_title']
+NUMBER_ANNOTATION_FIELDS = 343
 SAMPLE_FIELDS_EXPECTED = 27
-VARIANT_FIELDS_EXPECTED = 315
+VARIANT_FIELDS_EXPECTED = 316
 TRANSCRIPT_FIELDS_EXPECTED = 35
 
 
@@ -109,7 +110,7 @@ def test_generate_sample_json_items(MTParser, inserts):
     # check cols/facs (there are none now)
     assert 'AF' in cols
     assert 'DP' in cols
-    assert 'GQ' in cols
+    assert 'GQ' in facs
     assert 'novoPP' in facs
 
 
@@ -171,6 +172,11 @@ def test_generate_variant_sample_schema(MTParser, sample_variant_items):
     assert 'variant' in properties
     assert 'file' in properties
     assert 'variant.display_title' in cols
+    assert facs['DP']['order'] == 8
+    assert facs['AF']['order'] == 9
+    assert cols['DP']['order'] == 20
+    assert cols['AF']['order'] == 21
+    assert cols['GT']['order'] == 30
 
 
 def test_generate_variant_schema(MTParser, variant_items):
@@ -211,6 +217,8 @@ def test_generate_variant_schema(MTParser, variant_items):
     assert 'CHROM' in schema['facets']
     assert 'POS' in schema['facets']
     assert 'order' in schema['facets']['POS']
+    assert cols['genes.genes_ensg.display_title']['order'] == 40
+    assert cols['clinvar_variationid']['order'] == 70
 
     # check embedded fields are there
     with open(MTParser.EMBEDDED_VARIANT_FIELDS, 'r') as fd:
@@ -238,6 +246,6 @@ def test_post_inserts_via_run(MTParser, project, institution, testapp):
     """ Tests that we can run the above test using the 'run' method """
     inserts = MTParser.run(institution='encode-institution', project='encode-project',
                            vs_out=resolve_file_path('schemas/variant_sample.json'),
-                           v_out=resolve_file_path('schemas/variant.json'), write=False)  # enable to generate schemas
+                           v_out=resolve_file_path('schemas/variant.json'), write=True)  # enable to generate schemas
     for item in inserts:
         testapp.post_json(ANNOTATION_FIELD_URL, item, status=201)

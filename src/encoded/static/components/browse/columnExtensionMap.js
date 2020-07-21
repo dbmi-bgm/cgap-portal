@@ -22,27 +22,40 @@ export const DEFAULT_WIDTH_MAP = { 'lg' : 200, 'md' : 180, 'sm' : 120, 'xs' : 12
 /**
  * Theoretically we could change all these render functions to just be functional React components, maybe a later todo.
  * And move any compute-logic into here for memoization.
+ * Not sure if this memoization is fully worthwhile as is often comparing strings (== arrays of characters), tho
+ * it'd probably do that in react virtual dom diff otherwise later anyway... need to check.
+ *
+ * Another thought - it's unlikely that the props passed to this component will _ever_ change, I think.
+ * Maybe we could have something like 'shouldComponentUpdate(){ return false; }` to prevent it from ever even
+ * attempting to compare props for performance gain (since many table cells).
  */
-
-function renderAdvancedColumn(topLeft, status, main, dateTitle, date) {
+const MultiLevelColumn = React.memo(function MultiLevelColumn(props){
+    const {
+        topLeft,
+        status,
+        statusTip = null,
+        mainTitle = null,
+        dateTitle = "Created:",
+        date
+    } = props;
     return (
         <div className="multi-field-cell">
             <div className="top-row">
                 <span className="col-topleft">
                     { topLeft }
                 </span>
-                <i className="item-status-indicator-dot ml-07" data-status={status} data-tip={Schemas.Term.toName("status", status)} />
+                <i className="item-status-indicator-dot ml-07" data-status={status} data-tip={statusTip || Schemas.Term.toName("status", status)} />
             </div>
             <h4 className="col-main">
-                { main || "-" }
+                { mainTitle || "-" }
             </h4>
-            <div className="col-date" style={{ textAlign: "center", fontSize: "12px" }}>
-                <strong>{dateTitle} </strong>
+            <div className="col-date text-center text-smaller">
+                <span className="text-600">{ dateTitle } </span>
                 { date ? <LocalizedTime timestamp={date} formatType="date-sm"/> : "N/A" }
             </div>
         </div>
     );
-}
+});
 
 
 /**
@@ -77,7 +90,7 @@ export const DisplayTitleColumnCase = React.memo(function DisplayTitleCaseDefaul
         display_title = null,
         accession = null,
         status = null,
-        date_created = null,
+        date_created: date = null,
         case_title = null
     } = result;
 
@@ -85,7 +98,7 @@ export const DisplayTitleColumnCase = React.memo(function DisplayTitleCaseDefaul
 
     return (
         <a href={caseHref} className="adv-block-link w-100 title-block d-flex flex-column" data-tip={tooltip} data-delay-show={750}>
-            { renderAdvancedColumn(<span className="accession">{ accession }</span>, status, mainTitle, "Accessioned:", date_created) }
+            <MultiLevelColumn {...{ mainTitle, date, status }} dateTitle="Accessioned:" topLeft={<span className="accession">{ accession }</span>} />
         </a>
     );
 });
@@ -146,10 +159,10 @@ export const columnExtensionMap = {
                 report = null
             } = result;
             const {
-                display_title = null,
+                display_title: mainTitle = null,
                 accession = null,
                 status = null,
-                last_modified : { date_modified = null } = {}
+                last_modified : { date_modified: date = null } = {}
             } = report || {};
 
             if (!report || !report.accession) {
@@ -157,15 +170,12 @@ export const columnExtensionMap = {
             }
 
             // May appear in other non-Case results, where advanced column will look strange, so check and use default rendering otherwise
-            if (itemTypeList[0] === "Case") {
-                const showAccessionSeparately = accession !== display_title;
-                return (
-                    <a href={resultHref} className="adv-block-link">
-                        { renderAdvancedColumn(showAccessionSeparately ? <span className="accession">{ accession }</span>: null, status, display_title, "Last Modified:", date_modified) }
-                    </a>
-                );
-            }
-            return (<a href={result['@id']}> { display_title } </a>);
+            const showAccessionSeparately = accession !== mainTitle;
+            return (
+                <a href={resultHref} className="adv-block-link">
+                    <MultiLevelColumn {...{ mainTitle, date, status }} dateTitle="Last Modified:" topLeft={showAccessionSeparately ? <span className="accession">{ accession }</span> : null} />
+                </a>
+            );
         }
     },
     'family': {
@@ -174,22 +184,17 @@ export const columnExtensionMap = {
             if (!family) return null;
             const {
                 '@id' : atId = null,
-                display_title = null,
                 accession = null,
                 status = null,
-                date_created = null,
-                family_id = null
+                date_created: date = null,
+                family_id: mainTitle = null
             } = family;
 
-            // May appear in other non-Case results, where advanced column will look strange, so check and use default rendering otherwise
-            if (itemTypeList[0] === "Case") {
-                return (
-                    <a href={atId} className="adv-block-link">
-                        { renderAdvancedColumn(<span className="accession">{ accession }</span>, status, family_id, "Accessioned:", date_created) }
-                    </a>
-                );
-            }
-            return (<a href={atId}> { display_title } </a>);
+            return (
+                <a href={atId} className="adv-block-link">
+                    <MultiLevelColumn {...{ mainTitle, date, status }} dateTitle="Last Modified:" topLeft={<span className="accession">{ accession }</span>} />
+                </a>
+            );
         }
     },
     'individual': {
@@ -203,58 +208,89 @@ export const columnExtensionMap = {
                 display_title = null,
                 accession = null,
                 status = null,
-                date_created = null,
+                date_created: date = null,
                 individual_id = null
             } = individual;
 
-            const title = individual_id ? individual_id : display_title;
-            // May appear in other non-Case results, where advanced column will look strange, so check and use default rendering otherwise
-            if (itemTypeList[0] === "Case") {
-                return (
-                    <a href={atId} className="adv-block-link">
-                        { renderAdvancedColumn(<span className="accession">{ accession }</span>, status, title, "Accessioned:", date_created) }
-                    </a>
-                );
-            }
-            return (<a href={atId}> { display_title } </a>);
+            const mainTitle = individual_id ? individual_id : display_title;
+
+            return (
+                <a href={atId} className="adv-block-link">
+                    <MultiLevelColumn {...{ mainTitle, date, status }} dateTitle="Accessioned:" topLeft={<span className="accession">{ accession }</span>} />
+                </a>
+            );
         }
     },
+    /** "Sequencing" column title */
+    'sample': {
+        'render' : function renderSequencingColumn(result, parentProps){
+            const { '@id' : resultHrefPath, sample = null } = result;
+            if (!sample) return null; // Unsure if possible, but fallback to null / '-' in case so (not showing datetitle etc)
+            const {
+                workup_type: mainTitle = null,
+                sequencing_date: date = null,
+                completed_processes = []
+            } = sample;
+            const complProcLen = completed_processes.length;
+
+            // We have colors bound to 'data-status' attribute values in SCSS to statuses, so we'll just
+            // re-use one of those here rather than creating separate 'color map' for this.
+            // And override tooltip.
+
+            let status, statusTip;
+            if (complProcLen > 0){
+                status = "released";
+                statusTip = `This sample/case has ${complProcLen} completed process` + (complProcLen > 1 ? 'es' : '');
+            } else {
+                status = "uploading";
+                statusTip = "This sample/case has no completed processes yet";
+            }
+
+            return (
+                <a href={resultHrefPath + "#case-info.bioinformatics"} className="adv-block-link">
+                    <MultiLevelColumn {...{ mainTitle, date, status, statusTip }} dateTitle="Sequenced:" />
+                </a>
+            );
+        }
+    },
+    /** "Bioinformatics" column title */
     'sample_processing.analysis_type': {
         'render' : function renderBioinformaticsColumn(result, parentProps){
+            const { '@id' : resultHrefPath, sample_processing = null } = result;
+            if (!sample_processing) return null; // Unsure if possible, but fallback to null / '-' in case so (not showing datetitle etc)
             const {
-                '@id' : resultHrefPath,
-                sample_processing: { analysis_type = null, last_modified = {} }
-            } = result;
+                analysis_type: mainTitle = null,
+                last_modified: { date_modified: date = null } = {},
+                completed_processes = []
+            } = sample_processing;
+            const complProcLen = completed_processes.length;
+
+            let status, statusTip;
+            if (complProcLen > 0){
+                status = "released";
+                statusTip = `This sample/case has ${complProcLen} completed processes`;
+            } else {
+                status = "uploading";
+                statusTip = "This sample/case has no completed processes yet";
+            }
+
             // Unlikely to show in non-Case item results, so didn't add Case filter
             return (
                 <a href={resultHrefPath + "#case-info.bioinformatics"} className="adv-block-link">
-                    { renderAdvancedColumn(null, null, analysis_type, "Last Update:", last_modified.date_modified || null)}
-                </a>);
+                    <MultiLevelColumn {...{ mainTitle, date, status, statusTip }} dateTitle="Last Update:" />
+                </a>
+            );
         }
     },
-    'sample': {
-        'render' : function renderSequencingColumn(result, parentProps){
-            const { '@id' : resultHrefPath, '@type' : itemTypeList = ["Item"], sample = null } = result;
-            const { '@id': sampleId, workup_type, sequencing_date } = sample || {};
-            console.log("sample", sample);
-            // May appear in other non-Case results, where advanced column will look strange, so check and use default rendering otherwise
-            if (itemTypeList[0] === "Case") {
-                return (
-                    <a href={resultHrefPath + "#case-info.bioinformatics"} className="adv-block-link">
-                        { renderAdvancedColumn(null, null, workup_type, "Sequenced:", sequencing_date) }
-                    </a>);
-            }
-            return (<a href={sampleId}> { display_title } </a>);
-        }
-    },
+    /** "Sample" column title */
     'sample.specimen_type': {
         'render' : function renderSampleColumn(result, parentProps){
-            const { '@type' : itemTypeList = ["Item"], sample = null } = result;
-            const { '@id': sampleId, accession, status, specimen_type, specimen_collection_date } = sample || {};
+            const { sample = null } = result;
+            const { '@id': sampleId, accession, status, specimen_type: mainTitle, specimen_collection_date: date } = sample || {};
             // Unlikely to show in non-Case item results, so didn't add Case filter
             return (
                 <a href={sampleId} className="adv-block-link">
-                    {renderAdvancedColumn(<span className="accession">{ accession }</span>, status, specimen_type, "Collected:", specimen_collection_date)}
+                    <MultiLevelColumn {...{ mainTitle, date, status }} dateTitle="Collected:" topLeft={<span className="accession">{ accession }</span>} />
                 </a>);
         }
     },

@@ -10,6 +10,7 @@ from ..util import gunzip_content
 from .variant_fixtures import gene_workbook  # noqa
 
 
+pytestmark = [pytest.mark.working, pytest.mark.ingestion]
 QUEUE_INGESTION_URL = '/queue_ingestion'
 INGESTION_STATUS_URL = '/ingestion_status'
 MOCKED_ENV = 'fourfront-cgapother'
