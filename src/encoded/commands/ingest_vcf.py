@@ -380,7 +380,8 @@ class VCFParser(object):
                 result[vcf_key] = self.remove_prefix('chr', getattr(record, vcf_key))  # splice chr off
             else:
                 attr = self.get_record_attribute(record, vcf_key)
-                result[vcf_key] = attr if attr is not None else None
+                if attr is not None:
+                    result[vcf_key] = attr
 
         for key in self.format.keys():
 
