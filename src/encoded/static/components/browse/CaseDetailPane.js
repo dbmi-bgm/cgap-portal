@@ -182,7 +182,7 @@ export class FamilyReportStackedTable extends React.PureComponent {
             <StackedBlock {...{ columnClass }} subtitleVisible={false}
                 label={<StackedBlockNameLabel title={null} accession={null} subtitle={null} subtitleVisible={false}/>}>
                 <StackedBlockName>
-                    <span className="name-title">-</span>
+                    <span className="name-title"></span>
                 </StackedBlockName>
             </StackedBlock>
         );
@@ -202,7 +202,7 @@ export class FamilyReportStackedTable extends React.PureComponent {
         const { '@id': atId = null, workup_type = null, display_title = null, accession = null } = sample || {};
         const { samples = [], completed_processes = [] } = sample_processing || {};
 
-        let blockValue = '-';
+        let blockValue = null;
         samples.forEach((thisSample) => {
             if (atId === thisSample['@id']) {
                 blockValue = completed_processes;
@@ -475,7 +475,7 @@ export class FamilyAccessionStackedTable extends React.PureComponent {
             workup_type = null, display_title = null, accession = null, sequence_id = null,
             bam_sample_id = null, other_specimen_ids, specimen_accession = null } = sample;
 
-        let blockValue = '-';
+        let blockValue = null;
         samples.forEach((thisSample) => {
             if (atId === thisSample['@id']) {
                 blockValue = completed_processes;
