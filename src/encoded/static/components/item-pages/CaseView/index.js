@@ -609,20 +609,15 @@ const BioinformaticsTab = React.memo(function BioinformaticsTab(props) {
                 </div>
                 <div className="row qc-summary">
                     <div className="col-sm-8 text-600">
-                        Total number of filtered variants (high-quality exonic variants + clinvar - blacklist):
+                        Variants after hard filters:
                         <i className="icon icon-info-circle fas icon-fw ml-05"
-                            data-tip={dataTip} />
+                            data-tip={dataTip} data-place="right"/>
                     </div>
                     <div className="col-sm-4">
                         2,291
                     </div>
                 </div>
             </div>
-            {/* Placeholder for Provenance Table... may not be necessary... moving elsewhere * }
-            <div className="tab-inner-container">
-                <h2 className="section-header">Provenance Table</h2>
-                <img className="w-100" src="/static/img/provenance.png" alt="provenance graph"/>
-            </div> */}
             <div className="tab-inner-container">
                 <h2 className="section-header">Multisample Analysis Table</h2>
                 { caseSummaryTables }
