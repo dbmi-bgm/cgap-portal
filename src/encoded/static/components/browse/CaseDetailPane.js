@@ -8,11 +8,10 @@ import _ from 'underscore';
 // import { FlexibleDescriptionBox } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/FlexibleDescriptionBox';
 import { object, layout } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { StackedBlockTable, StackedBlock, StackedBlockList, StackedBlockName, StackedBlockNameLabel } from '@hms-dbmi-bgm/shared-portal-components/es/components/browse/components/StackedBlockTable';
-import { PartialList } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/PartialList';
 
 
 export const CaseDetailPane = React.memo(function CaseDetailPane (props) {
-    const { paddingWidthMap, paddingWidth, containerWidth, windowWidth, result, minimumWidth, href } = props;
+    const { paddingWidthMap, paddingWidth, containerWidth, windowWidth, result, minimumWidth } = props;
     const { family = null, secondary_families = null } = result;
 
     let usePadWidth = paddingWidth || 0;
@@ -20,7 +19,7 @@ export const CaseDetailPane = React.memo(function CaseDetailPane (props) {
         usePadWidth = paddingWidthMap[layout.responsiveGridState(windowWidth)] || paddingWidth;
     }
     const commonFamilySectionProps = {
-        containerWidth, result, href, minimumWidth, paddingWidth: usePadWidth
+        containerWidth, result, minimumWidth, paddingWidth: usePadWidth
     };
 
     const families = [];
@@ -106,10 +105,10 @@ class FamilySection extends React.Component {
     }
 
     innerTabContents() {
-        const { containerWidth, family, result, href, minimumWidth, paddingWidth } = this.props;
+        const { containerWidth, family, result, minimumWidth, paddingWidth } = this.props;
         return (
             <FamilyReportStackedTable
-                result={result} family={family} href={href} preventExpand={false}
+                result={result} family={family} preventExpand={false}
                 width={containerWidth ? (Math.max(containerWidth - paddingWidth, minimumWidth) /* account for padding of pane */) : null}
                 fadeIn={false} collapseLongLists
             />
@@ -688,11 +687,21 @@ export class FamilyAccessionStackedTable extends React.PureComponent {
      * Much of styling/layouting is defined in CSS.
      */
     render(){
-        const { columnHeaders: propColHeaders, showMetricsColumns, width, preventExpand } = this.props;
+        const {
+            columnHeaders: propColHeaders,
+            className = null,
+            collapseShow = 3,
+            showMetricsColumns,
+            // TODO: forgot if `width` is actually necessary anymore; used to be display:table-cell blocks with float left before was refactored to flex.
+            // If not needed, we could delete here and in SPC, else pass down via like utility function `getWideContainerWidth(windowWidth)`.
+            width,
+            preventExpand
+        } = this.props;
         const columnHeaders = FamilyAccessionStackedTable.staticColumnHeaders(propColHeaders, showMetricsColumns);
+        const cls = "stacked-block-table-outer-container overflow-auto" + (cls ? " " + cls : "");
         return (
-            <div className="stacked-block-table-outer-container overflow-auto">
-                <StackedBlockTable {...{ columnHeaders, width, preventExpand }} stackDepth="0" collapseShow="3"
+            <div className={cls}>
+                <StackedBlockTable {...{ columnHeaders, width, preventExpand, collapseShow }} stackDepth={0}
                     fadeIn allFiles={[]} collapseLongLists={true} defaultCollapsed={true}
                     handleFileCheckboxChange={this.handleFileCheckboxChange}>
                     { this.renderIndividualBlockList()}
