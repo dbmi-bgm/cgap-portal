@@ -172,6 +172,11 @@ def test_generate_variant_sample_schema(MTParser, sample_variant_items):
     assert 'variant' in properties
     assert 'file' in properties
     assert 'variant.display_title' in cols
+    assert facs['DP']['order'] == 8
+    assert facs['AF']['order'] == 9
+    assert cols['DP']['order'] == 20
+    assert cols['AF']['order'] == 21
+    assert cols['GT']['order'] == 30
 
 
 def test_generate_variant_schema(MTParser, variant_items):
@@ -212,6 +217,8 @@ def test_generate_variant_schema(MTParser, variant_items):
     assert 'CHROM' in schema['facets']
     assert 'POS' in schema['facets']
     assert 'order' in schema['facets']['POS']
+    assert cols['genes.genes_ensg.display_title']['order'] == 40
+    assert cols['clinvar_variationid']['order'] == 70
 
     # check embedded fields are there
     with open(MTParser.EMBEDDED_VARIANT_FIELDS, 'r') as fd:

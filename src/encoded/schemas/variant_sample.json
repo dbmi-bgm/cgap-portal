@@ -432,52 +432,49 @@
             "title": "Coverage",
             "aggregation_type": "stats",
             "number_step": 1,
-            "order": 8,
-            "grouping": "Variant Quality"
+            "order": 20
         },
         "AF": {
             "title": "VAF",
             "aggregation_type": "stats",
             "number_step": "any",
-            "order": 9,
-            "grouping": "Variant Quality"
+            "order": 21
         },
         "GT": {
-            "title": "Genotype"
+            "title": "Genotype",
+            "order": 30
         },
         "variant.genes.genes_most_severe_consequence.coding_effect": {
             "title": "Coding Effect",
-            "order": 5,
-            "grouping": "Consequence"
+            "order": 42
         },
         "variant.gnomad_af": {
             "title": "GnomAD Alt AF - Total",
             "aggregation_type": "stats",
             "number_step": "any",
-            "order": 18,
-            "grouping": "Population Frequency"
+            "order": 60
         },
         "variant.max_pop_af_af_popmax": {
             "title": "GnomAD Alt AF - PopMax",
             "aggregation_type": "stats",
             "number_step": "any",
-            "order": 19,
-            "grouping": "Population Frequency"
-        },
-        "variant.mutanno_hgvsg": {
-            "title": "Variant"
+            "order": 61
         },
         "variant.dbsnp_rs_number": {
-            "title": "dbSNP ID"
+            "title": "dbSNP ID",
+            "order": 11
         },
         "variant.genes.genes_ensg.display_title": {
-            "title": "Gene"
+            "title": "Gene",
+            "order": 40
         },
         "variant.genes.genes_most_severe_transcript": {
-            "title": "Transcript"
+            "title": "Transcript",
+            "order": 41
         },
         "variant.clinvar_variationid": {
-            "title": "Clinvar ID"
+            "title": "Clinvar ID",
+            "order": 70
         },
         "bam_snapshot": {
             "title": "Genome Snapshot",

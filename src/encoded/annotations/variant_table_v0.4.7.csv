@@ -32,7 +32,7 @@ no,field_name,schema_title,do_import,value_example,scope,source_name,source_vers
 88,genes_ensg.oe_mis,o/e (missense),Y,,variant,gnomADmetrics,v2.1.1,Observed/Expected Missense,number,"{""key"": ""genes"", ""title"": ""Gene""}",N,Constraint Metrics,33,,,,,,,,Y,,,,
 89,genes_ensg.oe_lof,o/e (LoF),Y,,variant,gnomADmetrics,v2.1.1,Observed/Expected Loss of function,number,"{""key"": ""genes"", ""title"": ""Gene""}",N,Constraint Metrics,34,,,,,,,,Y,,,,
 295,clinvar_clnsig,Clinvar,Y,Benign;Likely_benign;Conflicting_interpretations_of_pathogenicity;Uncertain_significance;Benign/Likely_benign;Pathogenic/Likely_pathogenic;Pathogenic;Likely_pathogenic;not_provided,variant,CLINVAR,20191021,Clinical significance for this single variant,string,,N,variant database,36,,,,,,,,,,,,
-27,mutanno_hgvsg,Variant,Y,,variant,MUTANNO,v0.4,HGVS genome sequence name,string,,N,Position,,10,,,,,,,,,,,Position
+27,mutanno_hgvsg,Variant,Y,,variant,MUTANNO,v0.4,HGVS genome sequence name,string,,N,Position,,,,,,,,,,,,,Position
 100,dbsnp_rs_number,dbSNP ID,Y,rs900106464;rs996778209;rs1043209779;rs905587020;rs1189475219;rs1249477666;rs1427170431;rs1417276159;rs955405035;rs1169259779;rs999338640;rs1184193019;rs556755331;rs115660024;rs1412590796;rs1330927510;rs1423684909;rs1434757437;rs756473995;rs1277176852,variant,DBSNP,20190722,dbSNP RS number,string,,N,Position,,11,,,,,,,,,,,
 9,GT,Genotype,Y,"0/1,0/2,1/2",sample_variant,VCF,VCFv4.2,Genotype,string,,N,Genotype,,30,,,,,,,,,,,
 86,genes_ensg,Gene,Y,,variant,GENES,v99,,string,"{""key"": ""genes"", ""title"": ""Gene""}",N,Gene,,40,,,,,,Gene,,,,,

@@ -263,43 +263,42 @@ class MappingTableParser(object):
                 if item.get(a_field) and a_field != 'no':
                     features[a_field] = int(item[a_field])
 
-            if True:
-                # handle sub_embedded object
-                if item.get('sub_embedding_group'):
-                    sub_temp = OrderedDict()
-                    prop = OrderedDict()
-                    sum_ob_name = self.format_sub_embedding_group_name(item['sub_embedding_group'], type='key')
-                    sub_title = self.format_sub_embedding_group_name(item['sub_embedding_group'], type='title')
+            # handle sub_embedded object
+            if item.get('sub_embedding_group'):
+                sub_temp = OrderedDict()
+                prop = OrderedDict()
+                sum_ob_name = self.format_sub_embedding_group_name(item['sub_embedding_group'], type='key')
+                sub_title = self.format_sub_embedding_group_name(item['sub_embedding_group'], type='title')
 
-                    # handle sub-embedded object that is an array
-                    if item.get('is_list'):
-                        prop[prop_name] = {
-                            'title': item.get(self.NAME_FIELD, 'None provided'),
-                            'type': 'array',
-                            'items': features
-                        }
-                        sub_temp.update({
-                            'title': sum_ob_name,
-                            'type': 'array',
-                            'items': {
-                                'title': sub_title,
-                                'type': 'object',
-                                'properties': prop
-                                }
-                        })
-                    else:
-                        prop[prop_name] = features
-                        sub_temp.update({
+                # handle sub-embedded object that is an array
+                if item.get('is_list'):
+                    prop[prop_name] = {
+                        'title': item.get(self.NAME_FIELD, 'None provided'),
+                        'type': 'array',
+                        'items': features
+                    }
+                    sub_temp.update({
+                        'title': sum_ob_name,
+                        'type': 'array',
+                        'items': {
+                            'title': sub_title,
+                            'type': 'object',
+                            'properties': prop
+                            }
+                    })
+                else:
+                    prop[prop_name] = features
+                    sub_temp.update({
+                        "title": sub_title,
+                        "type": "array",
+                        "items": {
                             "title": sub_title,
-                            "type": "array",
-                            "items": {
-                                "title": sub_title,
-                                "type": "object",
-                                "properties": prop
-                                }
-                            })
-                    temp[sum_ob_name] = sub_temp
-                    return temp
+                            "type": "object",
+                            "properties": prop
+                            }
+                        })
+                temp[sum_ob_name] = sub_temp
+                return temp
 
             # convert to array structure
             if item.get('is_list'):
@@ -350,7 +349,7 @@ class MappingTableParser(object):
         def has_grouping(o):
             return o.get('annotation_category', False)
 
-        def insert_column_or_facet(d, o):
+        def insert_column_or_facet(d, o, facet=True):
             val = {'title': o.get('schema_title', o.get(self.NAME_FIELD))}
             if is_numbered_field(o) and is_facet(o):
                 val['aggregation_type'] = 'stats'
@@ -363,11 +362,13 @@ class MappingTableParser(object):
                     # but adding 'documentation through redundancy', if such thing is a thing.
                     val['number_step'] = "any"
 
-            # add facet grouping
-            if is_facet(o) is not None:
+            # add facet (or column) order/grouping
+            if facet and is_facet(o) is not None:
                 val['order'] = is_facet(o)
                 if has_grouping(o) is not False:
                     val['grouping'] = o.get('annotation_category')
+            if not facet and is_column(o) is not None:
+                val['order'] = is_column(o)
 
             if is_sub_embedded_object(o):
                 if is_link_to(o):  # add .display_title if we are a linkTo
@@ -385,22 +386,18 @@ class MappingTableParser(object):
         # go through all annotation objects generating schema properties and
         # adding columns/facets as defined by the mapping table
         for obj in inserts:
-            if variant:
-                update(props, get_prop(obj))
-                if is_variant(obj) and is_facet(obj):
+            update(props, get_prop(obj))
+            if variant:  # we are doing variant, so take columns only from variant context
+                if is_variant(obj):
+                    if is_facet(obj):
+                        insert_column_or_facet(facs, obj)
+                    if is_column(obj):
+                        insert_column_or_facet(cols, obj, facet=False)
+            else:  # we are doing variant_sample, so we should take columns/facets from BOTH
+                if is_facet(obj):
                     insert_column_or_facet(facs, obj)
-                if is_variant(obj) and is_column(obj):
-                    insert_column_or_facet(cols, obj)
-                else:
-                    continue
-            else:
-                update(props, get_prop(obj))
-                if not is_variant(obj) and is_facet(obj):
-                    insert_column_or_facet(facs, obj)
-                if not is_variant(obj) and is_column(obj):
-                    insert_column_or_facet(cols, obj)
-                else:
-                    continue
+                if is_column(obj):
+                    insert_column_or_facet(cols, obj, facet=False)
 
         if not props:
             raise MappingTableIntakeException('Got no properties on schema!')

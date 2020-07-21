@@ -783,8 +783,7 @@
             "annotation_category": "Position",
             "description": "HGVS genome sequence name",
             "scope": "variant",
-            "schema_title": "Variant",
-            "column_order": 10
+            "schema_title": "Variant"
         },
         "dbsnp_rs_number": {
             "title": "dbSNP ID",
@@ -4027,37 +4026,35 @@
     "columns": {
         "genes.genes_most_severe_consequence.coding_effect": {
             "title": "Coding Effect",
-            "order": 5,
-            "grouping": "Consequence"
+            "order": 42
         },
         "gnomad_af": {
             "title": "GnomAD Alt AF - Total",
             "aggregation_type": "stats",
             "number_step": "any",
-            "order": 18,
-            "grouping": "Population Frequency"
+            "order": 60
         },
         "max_pop_af_af_popmax": {
             "title": "GnomAD Alt AF - PopMax",
             "aggregation_type": "stats",
             "number_step": "any",
-            "order": 19,
-            "grouping": "Population Frequency"
-        },
-        "mutanno_hgvsg": {
-            "title": "Variant"
+            "order": 61
         },
         "dbsnp_rs_number": {
-            "title": "dbSNP ID"
+            "title": "dbSNP ID",
+            "order": 11
         },
         "genes.genes_ensg.display_title": {
-            "title": "Gene"
+            "title": "Gene",
+            "order": 40
         },
         "genes.genes_most_severe_transcript": {
-            "title": "Transcript"
+            "title": "Transcript",
+            "order": 41
         },
         "clinvar_variationid": {
-            "title": "Clinvar ID"
+            "title": "Clinvar ID",
+            "order": 70
         }
     }
 }
