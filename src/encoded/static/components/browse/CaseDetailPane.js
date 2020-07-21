@@ -220,18 +220,17 @@ export class FamilyReportStackedTable extends React.PureComponent {
                 <StackedBlockList className="analysis" title="Analysis">
                     {analysisGroups.map((group) => {
                         const { analysis_type = null, samples = [], cases = [] } = group || {};
-                        let reportBlock = null;
-                        console.log("case- analysis group:", group);
+                        let reportBlock = null;           
 
                         // Figure out which report is associated with the current analysis group & sample
                         cases.forEach((groupCase) => {
                             const { '@id': thisCaseAtId = null, sample: caseSample = null } = groupCase || {};
                             const { '@id': sampleAtId = null } = caseSample || {};
                             if (sampleAtId === atId) {
-                                console.log("reportblockmapping,", reportBlockMapping);
+                                
                                 const reportBlockId = caseToReportMap[thisCaseAtId];
                                 const fallbackKey = 'case-' + thisCaseAtId;
-                                console.log(fallbackKey);
+                                
                                 if (reportBlockId) {
                                     reportBlock = reportBlockMapping[reportBlockId];
                                 // TODO: Rework this entire method of passing case through; didn't realize case was necessary early on and needed this
@@ -472,7 +471,9 @@ export class FamilyAccessionStackedTable extends React.PureComponent {
         const { '@id': resultSampleAtId = null } = resultSample;
 
 
-        const { '@id': atId = null, sample_id = null, specimen_collection_date = null, specimen_type = null, workup_type = null, display_title = null, accession = null } = sample;
+        const { '@id': atId = null, specimen_collection_date = null, specimen_type = null,
+            workup_type = null, display_title = null, accession = null, sequence_id = null,
+            bam_sample_id = null, other_specimen_ids, specimen_accession = null } = sample;
 
         let blockValue = '-';
         samples.forEach((thisSample) => {
@@ -480,18 +481,38 @@ export class FamilyAccessionStackedTable extends React.PureComponent {
                 blockValue = completed_processes;
             }
         });
-
         const isSampleForResult = resultSampleAtId === atId;
 
         const fullTable = (
             <div className="w-100" style={{ maxWidth: "70%" }}>
                 <table className="accession-table w-100">
                     <tbody>
-                        { sample_id || (display_title && (display_title !== accession)) ?
+                        { bam_sample_id ?
                             <tr>
-                                <td className="accession-table-title">Sample ID</td>
-                                <td>{ sample_id || display_title }</td>
-                            </tr> : null}
+                                <td className="accession-table-title">BAM Sample ID</td>
+                                <td>{ bam_sample_id }</td>
+                            </tr>: null }
+                        { sequence_id ?
+                            <tr>
+                                <td className="accession-table-title">Sequence ID</td>
+                                <td>{ sequence_id }</td>
+                            </tr>: null }
+                        { specimen_accession ?
+                            <tr>
+                                <td className="accession-table-title">Specimen Accession</td>
+                                <td>{ specimen_accession }</td>
+                            </tr>: null
+                        }
+                        { other_specimen_ids ?
+                            other_specimen_ids.map((obj) => {
+                                const { id_type = null, id = null } = obj; 
+                                return (
+                                    <tr key={id+id_type}>
+                                        <td className="accession-table-title">{id_type}</td>
+                                        <td>{ id }</td>
+                                    </tr>);
+                            }): null
+                        }
                         <tr>
                             <td className="accession-table-title">CGAP Sample ID</td>
                             <td>{accession || "-"}</td>
@@ -538,7 +559,7 @@ export class FamilyAccessionStackedTable extends React.PureComponent {
         );
     }
 
-    renderIndividualBlock(individual, role, familyId, sex) {
+    renderIndividualBlock(individual = null, role = null, familyId = null, familyAccession = null) {
         // Break out useful values from result and family; used in determining whether the passed in individual === the result case individual
         const { result = null, family = null } = this.props;
         const { analysis_groups: analysisGroups = [] } = family || {};
@@ -549,7 +570,8 @@ export class FamilyAccessionStackedTable extends React.PureComponent {
         const { "@id": resultSampleId = null } = resultSample || {};
 
         // Passed in Individual
-        const { "@id": atId = null, individual_id = null, display_title = null, case: cases = [], accession = null, samples: indvSamples = [] } = individual || {};
+        const { "@id": atId = null, individual_id = null, display_title = null, case: cases = [], accession = null, samples: indvSamples = [], institution = null } = individual || {};
+        const { display_title: institution_id = null } = institution || {};
 
         let cls;
         if (result && result.individual && individual) {
@@ -638,14 +660,27 @@ export class FamilyAccessionStackedTable extends React.PureComponent {
                     <div className="w-100" style={{ maxWidth: "70%" }}>
                         <table className="accession-table w-100">
                             <tbody>
-                                <tr>
-                                    <td className="accession-table-title">CGAP Individual ID</td>
-                                    <td>{ accession || "" }</td>
-                                </tr>
-                                <tr>
-                                    <td className="accession-table-title">Family ID</td>
-                                    <td>{ familyId || "N/A" }</td>
-                                </tr>
+                                { accession ?
+                                    <tr>
+                                        <td className="accession-table-title">CGAP Individual ID</td>
+                                        <td>{ accession || "" }</td>
+                                    </tr> : null }
+                                
+                                { familyId ?
+                                    <tr>
+                                        <td className="accession-table-title">Family ID</td>
+                                        <td>{ familyId }</td>
+                                    </tr> : null }
+                                { familyAccession ?
+                                    <tr>
+                                        <td className="accession-table-title">CGAP Family ID</td>
+                                        <td>{ familyAccession }</td>
+                                    </tr> : null }
+                                { institution_id ?
+                                    <tr>
+                                        <td className="accession-table-title">CGAP Institution ID</td>
+                                        <td>{ institution_id || "N/A" }</td>
+                                    </tr> : null }
                             </tbody>
                         </table>
                     </div>
@@ -665,7 +700,7 @@ export class FamilyAccessionStackedTable extends React.PureComponent {
 
     renderIndividualBlockList() {
         const { family = null } = this.props;
-        const { members = [], proband = null, relationships = [], accession: familyId = null } = family || {};
+        const { members = [], proband = null, relationships = [], accession: familyAccession = null, family_id: familyId } = family || {};
 
         // Create a mapping of individual accessions to relationships/sex
         const relationshipMapping = {};
@@ -687,7 +722,7 @@ export class FamilyAccessionStackedTable extends React.PureComponent {
         const indvBlocks = sortedMembers.map((familyMember) => {
             const currId = familyMember['accession'];
             const { relationship: currRelationship = null, sex: currSex = null } = relationshipMapping[currId] || {};
-            return this.renderIndividualBlock(familyMember, currRelationship || currId , familyId, currSex || null );
+            return this.renderIndividualBlock(familyMember, currRelationship || currId , familyId, familyAccession );
         });
 
         return (
