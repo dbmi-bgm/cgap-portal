@@ -157,15 +157,12 @@ export const columnExtensionMap = {
             }
 
             // May appear in other non-Case results, where advanced column will look strange, so check and use default rendering otherwise
-            if (itemTypeList[0] === "Case") {
-                const showAccessionSeparately = accession !== display_title;
-                return (
-                    <a href={resultHref} className="adv-block-link">
-                        { renderAdvancedColumn(showAccessionSeparately ? <span className="accession">{ accession }</span>: null, status, display_title, "Last Modified:", date_modified) }
-                    </a>
-                );
-            }
-            return (<a href={result['@id']}> { display_title } </a>);
+            const showAccessionSeparately = accession !== display_title;
+            return (
+                <a href={resultHref} className="adv-block-link">
+                    { renderAdvancedColumn(showAccessionSeparately ? <span className="accession">{ accession }</span>: null, status, display_title, "Last Modified:", date_modified) }
+                </a>
+            );
         }
     },
     'family': {
@@ -182,14 +179,11 @@ export const columnExtensionMap = {
             } = family;
 
             // May appear in other non-Case results, where advanced column will look strange, so check and use default rendering otherwise
-            if (itemTypeList[0] === "Case") {
-                return (
-                    <a href={atId} className="adv-block-link">
-                        { renderAdvancedColumn(<span className="accession">{ accession }</span>, status, family_id, "Accessioned:", date_created) }
-                    </a>
-                );
-            }
-            return (<a href={atId}> { display_title } </a>);
+            return (
+                <a href={atId} className="adv-block-link">
+                    { renderAdvancedColumn(<span className="accession">{ accession }</span>, status, family_id, "Accessioned:", date_created) }
+                </a>
+            );
         }
     },
     'individual': {
@@ -209,14 +203,11 @@ export const columnExtensionMap = {
 
             const title = individual_id ? individual_id : display_title;
             // May appear in other non-Case results, where advanced column will look strange, so check and use default rendering otherwise
-            if (itemTypeList[0] === "Case") {
-                return (
-                    <a href={atId} className="adv-block-link">
-                        { renderAdvancedColumn(<span className="accession">{ accession }</span>, status, title, "Accessioned:", date_created) }
-                    </a>
-                );
-            }
-            return (<a href={atId}> { display_title } </a>);
+            return (
+                <a href={atId} className="adv-block-link">
+                    { renderAdvancedColumn(<span className="accession">{ accession }</span>, status, title, "Accessioned:", date_created) }
+                </a>
+            );
         }
     },
     'sample_processing.analysis_type': {
@@ -229,7 +220,8 @@ export const columnExtensionMap = {
             return (
                 <a href={resultHrefPath + "#case-info.bioinformatics"} className="adv-block-link">
                     { renderAdvancedColumn(null, null, analysis_type, "Last Update:", last_modified.date_modified || null)}
-                </a>);
+                </a>
+            );
         }
     },
     'sample': {
@@ -238,13 +230,11 @@ export const columnExtensionMap = {
             const { '@id': sampleId, workup_type, sequencing_date } = sample || {};
             console.log("sample", sample);
             // May appear in other non-Case results, where advanced column will look strange, so check and use default rendering otherwise
-            if (itemTypeList[0] === "Case") {
-                return (
-                    <a href={resultHrefPath + "#case-info.bioinformatics"} className="adv-block-link">
-                        { renderAdvancedColumn(null, null, workup_type, "Sequenced:", sequencing_date) }
-                    </a>);
-            }
-            return (<a href={sampleId}> { display_title } </a>);
+            return (
+                <a href={resultHrefPath + "#case-info.bioinformatics"} className="adv-block-link">
+                    { renderAdvancedColumn(null, null, workup_type, "Sequenced:", sequencing_date) }
+                </a>
+            );
         }
     },
     'sample.specimen_type': {

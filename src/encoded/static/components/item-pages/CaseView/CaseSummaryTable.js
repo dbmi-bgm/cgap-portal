@@ -8,6 +8,12 @@ import { Schemas } from './../../util';
 import { LocalizedTime } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/LocalizedTime';
 
 
+
+function hasViewPermisison({ '@id' : itemID, display_title }) {
+    return itemID && display_title;
+}
+
+
 /** @param {Object} props - Contents of a family sub-embedded object. */
 export const CaseSummaryTable = React.memo(function CaseSummaryTable(props){
     const {
@@ -96,7 +102,7 @@ export const CaseSummaryTable = React.memo(function CaseSummaryTable(props){
             pushColumn(`~MSA|${ completed_processes[0] }|${ uuid }`);
 
             sampleProcessingData[uuid] = {};
-            sampleProcessingData[uuid]["MSA"] = generateFileDataObject(processed_files); // populate with multisample analysis objects
+            sampleProcessingData[uuid]["MSA"] = generateFileDataObject(processed_files.filter(hasViewPermisison)); // populate with multisample analysis objects
 
             // populate with per sample data (no files)
             samples.forEach((sample) => {
@@ -107,7 +113,7 @@ export const CaseSummaryTable = React.memo(function CaseSummaryTable(props){
             // populate with per sample data (files) (override any previously set)
             sample_processed_files.forEach((set) => {
                 const { sample : { accession = "" } = {}, processed_files: procFiles = [] } = set;
-                sampleProcessingData[uuid][accession] = generateFileDataObject(procFiles);
+                sampleProcessingData[uuid][accession] = generateFileDataObject(processed_files.filter(hasViewPermisison));
             });
             hasMSA = true;
         }
@@ -480,13 +486,6 @@ export const CaseSummaryTable = React.memo(function CaseSummaryTable(props){
                 });
                 return;
             } else {
-                const procFilesWPermissions = processed_files.filter(function(file){
-                    return file['@id'] && file.display_title;
-                });
-                const rawFilesWPermissions = files.filter(function(file){
-                    return file['@id'] && file.display_title;
-                });
-
                 rows.push({
                     individual : indvLink,
                     isProband,
@@ -508,8 +507,8 @@ export const CaseSummaryTable = React.memo(function CaseSummaryTable(props){
                     individualGroup,
                     sampleId: sampleID,
                     sampleGroup,
-                    processedFiles: generateFileDataObject(procFilesWPermissions),
-                    rawFiles: generateFileDataObject(rawFilesWPermissions),
+                    processedFiles: generateFileDataObject(processed_files.filter(hasViewPermisison)),
+                    rawFiles: generateFileDataObject(files.filter(hasViewPermisison)),
                     sampleIdx,
                     processingType: analysis_type || completed_processes[0] || null,
                     assayType
