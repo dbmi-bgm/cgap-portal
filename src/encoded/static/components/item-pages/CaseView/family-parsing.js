@@ -4,7 +4,14 @@
  * Parses `context.families` instance
  * into list of Individuals (JSON objects) with
  * PedigreeViz-compliant properties.
+ *
+ * This is contextual to CGAP, with assumption that
+ * stuff in PedigreeViz directory is meant to be
+ * ambiguous re: who using it, so as to be reusable
+ * and independently publishable eventually as own
+ * NPM library.
  */
+
 export function parseFamilyIntoDataset(family){
     const { members = [], proband, original_pedigree } = family;
     const probandID = (proband && (typeof proband === 'string' ? proband : proband['@id'])) || null;
@@ -23,7 +30,8 @@ export function parseFamilyIntoDataset(family){
             phenotypic_features = [],
             age = null, age_units = null,
             age_at_death = null, age_at_death_units = null,
-            ancestry = []
+            ancestry = [],
+            individual_id = null // Optional user-supplied name or identifier.
         } = individual;
 
         const fatherStr = (father && (typeof father === 'string' ? father : father['@id'])) || null;
@@ -80,21 +88,25 @@ export function parseFamilyIntoDataset(family){
             ageNumerical = calcAgeNum(age, age_units);
         }
 
-        let name = displayTitle;
-        if (displayTitle.slice(0,5) === "GAPID"){
-            // <span>s don't work inside SVGs
-            /*
-            name = (
-                <React.Fragment>
-                    <span className="small">CGAPID</span>
-                    <span>{ displayTitle.slice(5) }</span>
-                </React.Fragment>
-            );
-            */
-            //name = "ɢᴀᴘɪᴅ" + displayTitle.slice(5);
-            //name = "ᴳᴬᴾᴵᴰ " + displayTitle.slice(5);
-            //name = "ᴵᴰ " + displayTitle.slice(5);
-            name = "ɪᴅ: " + displayTitle.slice(5);
+        // Older Accession-based identifier below.
+        let name = individual_id;   // Use user-supplied identifier where possible.
+        if (!name) {                // Fallback to accession if not available.
+            name = displayTitle;
+            if (displayTitle.slice(0,5) === "GAPID"){
+                // <span>s don't work inside SVGs
+                /*
+                name = (
+                    <React.Fragment>
+                        <span className="small">CGAPID</span>
+                        <span>{ displayTitle.slice(5) }</span>
+                    </React.Fragment>
+                );
+                */
+                //name = "ɢᴀᴘɪᴅ" + displayTitle.slice(5);
+                //name = "ᴳᴬᴾᴵᴰ " + displayTitle.slice(5);
+                //name = "ᴵᴰ " + displayTitle.slice(5);
+                name = "ɪᴅ: " + displayTitle.slice(5);
+            }
         }
 
         return {
