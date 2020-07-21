@@ -44,7 +44,7 @@ const MultiLevelColumn = React.memo(function MultiLevelColumn(props){
                 <span className="col-topleft">
                     { topLeft }
                 </span>
-                <i className="item-status-indicator-dot ml-07" data-status={status} data-tip={statusTip || Schemas.Term.toName("status", status)} />
+                <i className="item-status-indicator-dot ml-07" data-status={status} data-tip={statusTip || Schemas.Term.toName("status", status)} data-html />
             </div>
             <h4 className="col-main">
                 { mainTitle || "-" }
@@ -236,11 +236,15 @@ export const columnExtensionMap = {
             // We have colors bound to 'data-status' attribute values in SCSS to statuses, so we'll just
             // re-use one of those here rather than creating separate 'color map' for this.
             // And override tooltip.
-
+            // TODO move into reusable func if after while we keep statusTip etc sample between this and sample_processing.analysis_type
             let status, statusTip;
             if (complProcLen > 0){
                 status = "released";
-                statusTip = `This sample/case has ${complProcLen} completed process` + (complProcLen > 1 ? 'es' : '');
+                if (complProcLen === 1) {
+                    statusTip = `Process <span class="text-600">${completed_processes[0]}</span> has completed`;
+                } else {
+                    statusTip = `This sample/case has <strong>${complProcLen}</strong> completed processes`;
+                }
             } else {
                 status = "uploading";
                 statusTip = "This sample/case has no completed processes yet";
@@ -261,14 +265,22 @@ export const columnExtensionMap = {
             const {
                 analysis_type: mainTitle = null,
                 last_modified: { date_modified: date = null } = {},
-                completed_processes = []
+                completed_processes = [] // This is a list of _string_ values such as ["WGS_partI_V11", ..]
             } = sample_processing;
             const complProcLen = completed_processes.length;
 
+            // We have colors bound to 'data-status' attribute values in SCSS to statuses, so we'll just
+            // re-use one of those here rather than creating separate 'color map' for this.
+            // And override tooltip.
+            // TODO move into reusable func if after while we keep statusTip etc sample between this and sample_processing.analysis_type
             let status, statusTip;
             if (complProcLen > 0){
                 status = "released";
-                statusTip = `This sample/case has ${complProcLen} completed processes`;
+                if (complProcLen === 1) {
+                    statusTip = `Process <span class="text-600">${completed_processes[0]}</span> has completed`;
+                } else {
+                    statusTip = `This sample/case has <strong>${complProcLen}</strong> completed processes`;
+                }
             } else {
                 status = "uploading";
                 statusTip = "This sample/case has no completed processes yet";
