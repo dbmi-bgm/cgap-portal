@@ -104,7 +104,7 @@ export const PatientInfo = React.memo(function PatientInfo(props = null) {
     return (
         <>
             <div className="card-text mb-1">
-                <label className="mb-0">CGAP ID:</label> { accession }
+                <label className="mb-0">CGAP Individual ID:</label> { accession }
             </div>
             <div className="card-text mb-1">
                 <label className="mb-0">Sex:</label> { sex || 'N/A'}
