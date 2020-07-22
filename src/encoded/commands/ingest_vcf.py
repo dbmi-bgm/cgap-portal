@@ -36,7 +36,6 @@ class VCFParser(object):
     }
     MUTANNO = 'MUTANNO'  # annotation field from MUTANNO
     GRANITE = 'GRANITE'  # annotation field from GRANITE
-    VARIANT_SAMPLE_SUBEMBEDDED = ['SAMPLEGENO']
     VCF_FIELDS = ['CHROM', 'POS', 'ID', 'REF', 'ALT']
     VCF_SAMPLE_FIELDS = ['FILTER', 'QUAL']
     DROPPED_FIELD = 'DROPPED'
@@ -79,6 +78,30 @@ class VCFParser(object):
     def __iter__(self):
         """ Return generator to VCF rows """
         return self.reader
+
+    @property
+    def variant_props(self):
+        """ Variant schema properties """
+        return self.variant_schema['properties']
+
+    @property
+    def variant_sample_props(self):
+        """ Variant sample schema properties """
+        return self.variant_sample_schema['properties']
+
+    @property
+    def variant_sub_embedded_fields(self):
+        """ Fields in the variant properties that are nested """
+        return [prop for prop in self.variant_props.keys()
+                if self.variant_props[prop].get('type', None) == 'array' and
+                self.variant_props[prop]['items']['type'] == 'object']
+
+    @property
+    def variant_sample_sub_embedded_fields(self):
+        """ Fields in the variant sample properties that are nested """
+        return [prop for prop in self.variant_sample_props.keys()
+                if self.variant_sample_props[prop].get('type', None) == 'array' and
+                self.variant_sample_props[prop]['items']['type'] == 'object']
 
     def read_vcf_metadata(self):
         """ Parses VCF file meta data to get annotation fields under MUTANNO/GRANITE """
@@ -190,18 +213,23 @@ class VCFParser(object):
             annotation: name of annotation to check (VEP)
 
         Returns:
-            sub_embedding_group on the variant schema
+            2-tuple of the annotation grouping and whether it is a variant label. _, True means the given annotation
+            is a variant field. _, False indicates an annotation field on variant_sample. None, _ indicates an
+            annotation field that doesn't exist.
 
         Raises:
             VCFParserException if the sub_embedding_group on the VCF does not match
             what we got from the mapping table
         """
         if annotation not in self.sub_embedded_mapping:
-            return None
+            return None, False
         grouping = self.sub_embedded_mapping[annotation]
-        if grouping not in self.variant_schema['properties']:
+        if grouping in self.variant_schema['properties']:
+            return grouping, True
+        elif grouping in self.variant_sample_schema['properties']:
+            return grouping, False
+        else:
             raise VCFParserException('Sub_embedding_group for %s from the vcf does not match the schema' % annotation)
-        return grouping
 
     @staticmethod
     def parse_annotation_field_value(s):
@@ -223,7 +251,7 @@ class VCFParser(object):
             return [s[0].split('|')]
 
     def fix_encoding(self, val):
-        """ Decodes restricted characters from val, returning hte result"""
+        """ Decodes restricted characters from val, returning the result"""
         for encoded, decoded in self.RESTRICTED_CHARACTER_ENCODING.items():
             val = val.replace(encoded, decoded)
         return val
@@ -316,6 +344,16 @@ class VCFParser(object):
                 sub_type = props[field]['items']['type']
         return self.cast_field_value(type, value, sub_type)
 
+    @staticmethod
+    def get_record_attribute(record, field):
+        return getattr(record, field, None)
+
+    @staticmethod
+    def remove_prefix(prefix, text):
+        if not text.startswith(prefix):
+            raise ValueError('Prefix %s is not the initial substring of %s' % (prefix, text))
+        return text[len(prefix):]
+
     def create_variant_from_record(self, record):
         """ Produces a dictionary containing all the annotation fields for this record
 
@@ -339,13 +377,13 @@ class VCFParser(object):
             if vcf_key == 'ALT':  # requires special care
                 result[vcf_key] = getattr(record, vcf_key)[0].sequence
             elif vcf_key == 'CHROM':
-                result[vcf_key] = getattr(record, vcf_key)[3:]  # XXX: splice chr off for now
+                result[vcf_key] = self.remove_prefix('chr', getattr(record, vcf_key))  # splice chr off
             else:
-                result[vcf_key] = getattr(record, vcf_key) or ''
+                attr = self.get_record_attribute(record, vcf_key)
+                if attr is not None:
+                    result[vcf_key] = attr
+
         for key in self.format.keys():
-            # Skip Sample fields
-            if key in self.VARIANT_SAMPLE_SUBEMBEDDED:
-                continue
 
             # handle non-annotation fields
             if key not in self.annotation_keys:
@@ -353,6 +391,11 @@ class VCFParser(object):
                     val = self.validate_variant_value(key, record.INFO.get(key), exit_on_validation=False)
                     if val is not None:
                         result[key] = val
+                continue
+
+            # drop if variant_sample sub-embedded field
+            sub_embedded_group = self.sub_embedded_mapping.get(key, None)
+            if sub_embedded_group in self.variant_sample_sub_embedded_fields:
                 continue
 
             # handle annotation fields
@@ -374,7 +417,6 @@ class VCFParser(object):
 
                         # handle sub-embedded
                         if key in self.sub_embedded_mapping:
-                            sub_embedded_group = self.sub_embedded_mapping[key]
                             if sub_embedded_group not in result:  # create sub-embedded group if not there
                                 result[sub_embedded_group] = {}
                             if g_idx not in result[sub_embedded_group]:
@@ -408,7 +450,7 @@ class VCFParser(object):
     def format_variant_sub_embedded_objects(self, result):
         """ Applies 'format_variant' for all sub_embedded_object fields (detected) """
         for key in self.sub_embedded_mapping.values():
-            if key not in self.VARIANT_SAMPLE_SUBEMBEDDED:
+            if key in self.variant_props:
                 self.format_variant(result, seo=key)
 
     def parse_samples(self, result, sample):
@@ -441,15 +483,14 @@ class VCFParser(object):
             a (dict) sample_variant item
         """
         result = []
-        props = self.variant_sample_schema['properties']
         for sample in record.samples:
             s = {}
-            for field in props.keys():
-                if record.INFO.get(field, None):  # first check INFO tag, then check record attributes
+            for field in self.variant_sample_props.keys():
+                if record.INFO.get(field) is not None:  # first check INFO tag, then check record attributes
                     val = record.INFO.get(field)
-                    prop_type = props[field]['type']
+                    prop_type = self.variant_sample_props[field]['type']
                     if prop_type == 'array':
-                        sub_type = props[field]['items']['type']
+                        sub_type = self.variant_sample_props[field]['items']['type']
                         s[field] = self.cast_field_value(prop_type, val, sub_type)
                     else:
                         s[field] = self.cast_field_value(prop_type, val)
@@ -475,7 +516,17 @@ class VCFParser(object):
                 elif field == 'multiallele_samplevariantkey':  # XXX: refactor with samplegeno
                     multiallele = record.INFO.get('MULTIALLELE', None)
                     if multiallele:
-                        s['multiallele_samplevariantkey'] = multiallele[0]
+                        s['multiallele_samplevariantkey'] = self.fix_encoding(multiallele[0])
+                elif field == 'cmphet':  # XXX: refactor as well
+                    comhet = record.INFO.get('comHet', None)
+                    if comhet:
+                        s['cmphet'] = []
+                        field_names = self.format['comHet']
+                        for group in comhet:
+                            annotations = {}
+                            for field_name, value in zip(field_names, group.split('|')):
+                                annotations[field_name] = self.fix_encoding(value)
+                            s['cmphet'].append(annotations)
 
             self.parse_samples(s, sample)  # add sample fields, already formatted
             s.pop('AF', None)  # XXX: comes from VCF but is not actually what we want. Get rid of it.
@@ -616,6 +667,7 @@ def main():
                 sample['project'] = args.project
                 sample['institution'] = args.institution
                 sample['variant'] = res['@id']  # make link
+                sample['file'] = 'dummy-file'  # XXX: loading this way is just for testing!
                 app_handle.post_json('/variant_sample', sample, status=201)
 
         logger.info('Succesfully posted VCF entries')
