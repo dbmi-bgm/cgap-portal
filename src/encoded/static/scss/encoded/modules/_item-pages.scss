@@ -1532,9 +1532,6 @@ $badge-item-min-height: 90px;
 					}
 					&.btn-sm {
 						padding-bottom: 4px; // Overrides 5
-						i.icon-external-link {
-							//top: 0px;
-						}
 					}
 				}
 
@@ -1542,17 +1539,10 @@ $badge-item-min-height: 90px;
 				.embedded-item-with-attachment {
 					background-color: #f8f8f8;
 					border-radius: $border-radius-base;
-					&:not(.in-array){
-					}
 					.link-to-item-col {
 						white-space: nowrap;
 						text-overflow: ellipsis;
 						overflow: hidden;
-						&.in-array {
-							//> .inner {
-							//	padding-left: 30px;
-							//}
-						}
 						> .inner {
 							line-height: 28px;
 							> span, > a {
@@ -1569,9 +1559,6 @@ $badge-item-min-height: 90px;
 					}
 					.view-attachment-button-col {
 						padding-right: 4px;
-						> a.btn {
-
-						}
 					}
 
 					&.is-image {
@@ -1629,21 +1616,6 @@ $badge-item-min-height: 90px;
 						}
 					}
 
-					&.embedded-item-with-attachment-container {
-						> div.overview-list-element {
-
-						}
-					}
-
-				}
-
-				> ul.overview-list-elements-container,
-				> ol.overview-list-elements-container {
-					> li {
-						> div {
-
-						}
-					}
 				}
 
 			}
@@ -2071,14 +2043,18 @@ $badge-item-min-height: 90px;
 				font-size: 2rem;
 				margin-bottom: 20px;
 				font-weight: 500;
+			}
 
-				.curr-selection {
-					font-size: 14px;
-					font-style: normal;
-					font-weight: 400;
+			/* 'Current Case' selection marker/styling */
+			&#case-info\.accessioning {
+				.current-case {
 					background-color: lavender;
-					padding: 4px;
+					padding: 3px 5px;
+					/* Cancel out the above padding somewhat to align text with other non-selected text */
+					/* Maybe not cleanest approach... */
+					margin: -2px -5px;
 					border: solid 1px #fff;
+					border-radius: $border-radius-base;
 				}
 			}
 
@@ -2128,6 +2104,7 @@ $badge-item-min-height: 90px;
 
 					.s-block.individual .col-individual .individual-role {
 						text-align: left;
+						align-items: start; // prevent 100% width, align to left.
 					}
 				
 					.s-block.libraries .col-libraries > div {
@@ -2151,10 +2128,6 @@ $badge-item-min-height: 90px;
 							text-align: right;
 						}
 					}
-
-					.body .current-case {
-						background-color: lavender;
-					} 
 				}
 
 				.row.qc-summary {

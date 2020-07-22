@@ -463,9 +463,13 @@ const AccessioningTab = React.memo(function AccessioningTab(props) {
     // In long run maybe a differing UI might be better, idk.
     return (
         <React.Fragment>
-            <h1>
-                { caseDisplayTitle }: <span className="text-300">Accessioning Report and History</span>
-                <span className="curr-selection pull-right">Current Selection</span>
+            <h1 className="row align-items-center">
+                <div className="col">
+                    { caseDisplayTitle }: <span className="text-300">Accessioning Report and History</span>
+                </div>
+                <div className="col-auto">
+                    <span className="current-case text-small text-400 m-0">Current Selection</span>
+                </div>
             </h1>
             <div className="tab-inner-container">
                 <PartialList className="mb-0" open={isSecondaryFamiliesOpen}

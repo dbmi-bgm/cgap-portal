@@ -272,11 +272,6 @@ export class FamilyReportStackedTable extends React.PureComponent {
         // Passed in Individual
         const { "@id": atId = null, individual_id = null, display_title = null, case: cases = [], accession = null, samples: indvSamples = [] } = individual || {};
 
-        let cls;
-        if (resultIndividual) {
-            cls = resultIndvAtId === atId ? "current-case": null;
-        }
-
         const reportToReportBlockMap = {};
         const caseToReportMap = {};
 
@@ -288,8 +283,7 @@ export class FamilyReportStackedTable extends React.PureComponent {
             if (sampleAtId && reportAtId) {
                 reportToReportBlockMap[reportAtId] = (
                     <StackedBlock columnClass="report" hideNameOnHover={false} key={reportAtId} id={reportAtId}
-                        label={<StackedBlockNameLabel title={null} accession={null} subtitleVisible/>}
-                    >
+                        label={<StackedBlockNameLabel title={null} accession={null} subtitleVisible/>}>
                         <StackedBlockName>
                             <span className="d-inline">
                                 Case ID: { caseAtId ? <a href={caseAtId} className="name-title text-capitalize">{ case_title }</a> : <span className="name-title text-capitalize">{ case_title }</span>}
@@ -316,7 +310,7 @@ export class FamilyReportStackedTable extends React.PureComponent {
         });
 
         return (
-            <StackedBlock {...{ cls }} hideNameOnHover={false} columnClass="individual"
+            <StackedBlock hideNameOnHover={false} columnClass="individual"
                 key={atId} id={atId}
                 label={
                     <StackedBlockNameLabel title="CGAP ID" accession={accession} subtitleVisible/>}
@@ -537,7 +531,7 @@ export class FamilyAccessionStackedTable extends React.PureComponent {
                 { (atId && workup_type) ?
                     <StackedBlockName className="flex-row align-items-center justify-content-between">
                         <div className="d-flex">
-                            <a href={atId} data-tip="View Sample" className={`name-title p-1 ${isSampleForResult ? 'current-case' : ''}`}>
+                            <a href={atId} data-tip="View Sample" className={`name-title ${isSampleForResult ? 'current-case' : ''}`}>
                                 { workup_type }
                             </a>
                         </div>
@@ -546,9 +540,9 @@ export class FamilyAccessionStackedTable extends React.PureComponent {
                     <StackedBlockName>
                         { workup_type ? null : "No workup type found for sample"}
                         { atId ?
-                            <a href={atId} data-tip={workup_type ? null: "View Sample"} className={`name-title p-1`}>
+                            <a href={atId} data-tip={workup_type ? null: "View Sample"} className="name-title">
                                 { workup_type || accession }
-                            </a> : <span className="name-title p-1">{ workup_type || accession }</span>}
+                            </a> : <span className="name-title">{ workup_type || accession }</span>}
                     </StackedBlockName>
                 }
 
@@ -571,11 +565,6 @@ export class FamilyAccessionStackedTable extends React.PureComponent {
 
         // Passed in Individual
         const { "@id": atId = null, individual_id = null, display_title = null, case: cases = [], accession = null, samples: indvSamples = [] } = individual || {};
-
-        let cls;
-        if (result && result.individual && individual) {
-            cls = result.individual['@id'] === atId ? "current-case": null;
-        }
 
         const sampleToCaseReportBlockMap = {};
 
@@ -605,9 +594,9 @@ export class FamilyAccessionStackedTable extends React.PureComponent {
                         <StackedBlockName className="flex-row align-items-center justify-content-between">
                             <div className="d-flex">
                                 { reportAtId ?
-                                    <a href={reportAtId} className={"name-title p-1" + (isResultCase ? " current-case": "")}>
+                                    <a href={reportAtId} className={"name-title" + (isResultCase ? " current-case": "")}>
                                         { analysisType }
-                                    </a> : <span className={"name-title p-1" + (isResultCase ? " current-case": "")}>{ analysisType }</span>}
+                                    </a> : <span className={"name-title" + (isResultCase ? " current-case": "")}>{ analysisType }</span>}
                             </div>
                             <div className="w-100" style={{ maxWidth: "70%" }}>
                                 <table className="accession-table w-100">
@@ -644,16 +633,14 @@ export class FamilyAccessionStackedTable extends React.PureComponent {
             }
         });
 
-        return (
-            <StackedBlock {...{ cls }} hideNameOnHover={false} columnClass="individual"
-                key={atId} id={atId}
-            >
+        return ( // We can pass 'className={..}' to this if needed.
+            <StackedBlock hideNameOnHover={false} columnClass="individual" key={atId} id={atId}>
                 <StackedBlockName className="flex-row align-items-center justify-content-between">
                     <div className="d-flex flex-column individual-role">
                         { atId ?
-                            <a href={atId} className={`name-title text-capitalize ${(result.individual['@id'] === individual['@id']) ? "current-case pl-1" : ""}`}>
+                            <a href={atId} className={`name-title text-capitalize ${(result.individual['@id'] === individual['@id']) ? "current-case" : ""}`}>
                                 { role || display_title }
-                            </a> : <span className={`name-title text-capitalize ${(result.individual['@id'] === individual['@id']) ? "current-case pl-1" : ""}`}>{ role || display_title }</span>}
+                            </a> : <span className={`name-title text-capitalize ${(result.individual['@id'] === individual['@id']) ? "current-case" : ""}`}>{ role || display_title }</span>}
                         <span className="d-block text-small">({ individual_id ? individual_id : (display_title !== accession) ? display_title : "N/A" })</span>
                     </div>
                     <div className="w-100" style={{ maxWidth: "70%" }}>
