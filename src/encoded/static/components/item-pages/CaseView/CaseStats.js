@@ -1,6 +1,7 @@
 'use strict';
 
 import React, { useState, useMemo } from 'react';
+import _ from 'underscore';
 import { Collapse } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/Collapse';
 import { LocalizedTime, formatPublicationDate } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/LocalizedTime';
 
@@ -11,29 +12,18 @@ import { LocalizedTime, formatPublicationDate } from '@hms-dbmi-bgm/shared-porta
  */
 function mapFeaturesToBadges(features = []) {
     if (features.length === 0) {
-        return (<em>None</em>);
+        return <em>None</em>;
     }
-    const arr = features.map((feature) => {
-        const { phenotypic_feature = null } = feature;
-        const { display_title = null, '@id': featureID } = phenotypic_feature || {};
+    return features.map(function(feature){
+        const { display_title = null, '@id': featureID } = feature;
         return (
-            <li key={featureID} className="pr-1 d-inline">
-                <a className="badge badge-info" href={featureID} rel="noopener noreferrer">{ display_title }</a>
-            </li>
+            // TODO: create own ~ `.tag` styling or override Bootstrap's default. Maybe.
+            <a className="badge badge-pill badge-info text-400 text-small d-inline-block mr-03 mb-03 pb-04"
+                href={featureID} target="_blank" rel="noopener noreferrer" key={featureID}>
+                { display_title }
+            </a>
         );
     });
-    return (
-        <ul style={{
-            listStyleType: "none",
-            maxWidth: "100%",
-            maxHeight: "25px",
-            overflowX: "scroll",
-            paddingLeft: "unset",
-            marginBottom: "unset",
-        }}>
-            { arr }
-        </ul>
-    );
 }
 
 /** @param {Object} props - Contents of a family sub-embedded object. */
@@ -51,13 +41,15 @@ export const CaseStats = React.memo(function CaseStats(props){
     const { accession: famAccession = null } = family || {};
 
     return (
-        <div id="case-stats" className="d-flex flex-row justify-content-between">
-            <StatCard title="Patient Info:" subtitle={individual_id} {...{ className }} style={{ flexBasis: "calc(50% - 10px)" }}>
-                <PatientInfo {...props} />
-            </StatCard>
-            <div className="d-flex flex-column justify-content-between" style={{ flexBasis: "calc(50% - 10px)" }}>
-                <StatCard title="Phenotypic Features" {...{ className }}>
-                    <PhenotypicFeatures {...props} />
+        <div id="case-stats" className="row">
+            <div className="col">
+                <StatCard title="Patient Info:" subtitle={individual_id} className="h-100">
+                    <PatientInfo {...props} />
+                </StatCard>
+            </div>
+            <div className="col">
+                <StatCard title="Patient Phenotypic Features" className="mb-3">
+                    <PhenotypicFeatures caseItem={caseItem} />
                 </StatCard>
                 <StatCard title="Family Info:" subtitle={famAccession} {...{ className }}>
                     <FamilyInfo {...{ numFamilies, numIndividuals, numWithSamples, family }} />
@@ -69,12 +61,12 @@ export const CaseStats = React.memo(function CaseStats(props){
 
 export const StatCard = React.memo(function StatDrop(props){
     const { title = null, subtitle = null, children = null, className = "", style = null } = props || {};
-    const cls = ("card " + className);
+    const cls = "card" + (className ? " " + className : "");
 
     return (
         <div className={cls} style={style}>
             <h4 className="card-header mt-0 text-600">
-                { title } <span className="text-300">{ subtitle || null }</span>
+                { title } { subtitle ? <span className="text-300">{ subtitle }</span> : null }
             </h4>
             <div className="card-body">
                 { children }
@@ -83,7 +75,7 @@ export const StatCard = React.memo(function StatDrop(props){
     );
 });
 
-export const PatientInfo = React.memo(function PatientInfo(props = null) {
+export const PatientInfo = React.memo(function PatientInfo(props) {
     const {
         caseItem = null
     } = props || {};
@@ -129,21 +121,15 @@ export const PatientInfo = React.memo(function PatientInfo(props = null) {
 });
 
 
-export const PhenotypicFeatures = React.memo(function PhenotypicFeatures(props = null) {
-    const {
-        caseItem = null
-    } = props || {};
+export const PhenotypicFeatures = React.memo(function PhenotypicFeatures({ caseItem }) {
     const { individual = null } = caseItem || {};
     const { phenotypic_features = [] } = individual || {};
 
-    return mapFeaturesToBadges(phenotypic_features);
+    return mapFeaturesToBadges(_.pluck(phenotypic_features, 'phenotypic_feature'));
 });
 
 
-export const FamilyInfo = React.memo(function FamilyInfo(props = null) {
-    const {
-        family = null
-    } = props || {};
+export const FamilyInfo = React.memo(function FamilyInfo({ family }) {
     const {
         display_title : family_display_title = null,
         title: family_title= null,
@@ -166,8 +152,9 @@ export const FamilyInfo = React.memo(function FamilyInfo(props = null) {
             <div className="card-text mb-1">
                 <label className="mb-0">Project:</label> { project_title || "N/A" }
             </div>
-            <div className="card-text mb-1">
-                <label className="mb-0">Family Phenotypic Features: </label> {renderedPhenotypicFeatures}
+            <div className="card-text">
+                <label className="mb-03">Family Phenotypic Features: </label>
+                <div>{renderedPhenotypicFeatures}</div>
             </div>
         </>);
 });
