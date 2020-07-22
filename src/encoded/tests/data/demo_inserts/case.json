@@ -1,179 +1,253 @@
 [
     {
-        "status": "released",
-        "project": "f01ff5be-a72d-43bd-afcf-174fa9dcd282",
-        "family": "5e079547-1575-4e4c-acd1-6aa74b931993",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-        "accession": "GAPCA2Q6KPFN",
-        "description": "Benchmarking case for Ashkenazim Trio Father",
-        "date_created": "2020-07-15T02:38:01.246690+00:00",
+        "individual": "7dd17757-6c4d-4724-897a-fdb16f6759a3",
+        "last_modified": {
+            "date_modified": "2020-07-22T02:52:51.512382+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "accession": "GAPCA3LWTDSJ",
         "schema_version": "1",
-        "individual": "82ac8825-a526-4b21-8fe0-468b9fc4e620",
+        "sample_processing": "e7b6a6cb-b526-4d7c-b4a2-8bc62c7d0515",
+        "status": "in review",
+        "project": "91336042-f277-4f69-97e5-5c8a5f6d6058",
+        "date_created": "2020-07-21T19:57:12.970067+00:00",
         "cohort": "cc7d83a2-6886-4ca0-9402-7c49734cf879",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "institution": "828cd4fe-ebb0-4b36-ccbb-d2e3a36ca234",
+        "family": "48a238c6-3a9f-4ee5-b07c-a90ae658d90b",
+        "uuid": "abfe76b8-dfab-4bf2-a9a2-7f5d4319635b"
+    },
+    {
+        "individual": "82ac8825-a526-4b21-8fe0-468b9fc4e620",
+        "last_modified": {
+            "date_modified": "2020-07-21T15:21:43.823410+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "accession": "GAPCA2Q6KPFN",
+        "schema_version": "1",
+        "sample_processing": "0a2d5fc7-2bd5-4289-a59c-40f7c633214c",
+        "status": "in review",
+        "project": "f01ff5be-a72d-43bd-afcf-174fa9dcd282",
+        "date_created": "2020-07-15T02:38:01.246690+00:00",
+        "cohort": "cc7d83a2-6886-4ca0-9402-7c49734cf879",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
         "aliases": [
             "hms-dbmi:ashkenazim_trio_father"
         ],
-        "sample_processing": "0a2d5fc7-2bd5-4289-a59c-40f7c633214c",
-        "uuid": "91678096-7c10-4c5a-8ac3-5e3014e83c7e",
-        "last_modified": {
-            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-            "date_modified": "2020-07-15T02:47:11.969551+00:00"
-        }
+        "family": "5e079547-1575-4e4c-acd1-6aa74b931993",
+        "description": "Benchmarking case for Ashkenazim Trio Father",
+        "uuid": "91678096-7c10-4c5a-8ac3-5e3014e83c7e"
     },
     {
-        "status": "released",
-        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
-        "family": "45f2af73-2c2e-4101-bbfb-bb2754f30321",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-        "accession": "GAPCALNEABCD",
         "date_created": "2020-07-15T02:38:03.131832+00:00",
+        "last_modified": {
+            "date_modified": "2020-07-21T15:02:09.927914+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "accession": "GAPCALNEABCD",
         "report": "0a2d5fc7-2bd5-4289-a59c-40f7c633abcd",
+        "sample_processing": "8dd51b60-2d65-4e74-ac86-08ff9159abcd",
         "schema_version": "1",
+        "status": "in review",
         "individual": "11c429a1-bcb8-4ac6-8f71-be6fb5064ad9",
-        "description": "Benchmarking case for Platinum Proband only",
+        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
         "cohort": "cc7d83a2-6886-4ca0-9402-7c49734cf879",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
         "aliases": [
             "hms-dbmi:platinum_single_NA12878"
         ],
-        "sample_processing": "8dd51b60-2d65-4e74-ac86-08ff9159abcd",
-        "uuid": "81278096-7c10-4c5a-8ac3-5e3014e8abcd",
-        "last_modified": {
-            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-            "date_modified": "2020-07-15T16:12:16.795656+00:00"
-        }
+        "family": "45f2af73-2c2e-4101-bbfb-bb2754f30321",
+        "description": "Benchmarking case for Platinum Proband only ",
+        "uuid": "81278096-7c10-4c5a-8ac3-5e3014e8abcd"
     },
     {
+        "individual": "7b48eacc-826b-4ecd-9104-9918b0bb5b81",
+        "last_modified": {
+            "date_modified": "2020-07-15T02:47:14.902984+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "accession": "GAPCAQPHN61Y",
+        "schema_version": "1",
+        "sample_processing": "8dd51b60-2d65-4e74-ac86-08ff9159be90",
         "status": "released",
         "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
-        "family": "21f2af73-2c2e-4101-bbfb-bb2754f302ad",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-        "accession": "GAPCAQPHN61Y",
-        "description": "Benchmarking case for Platinum Trio Husband",
         "date_created": "2020-07-15T02:38:01.529954+00:00",
-        "schema_version": "1",
-        "individual": "7b48eacc-826b-4ecd-9104-9918b0bb5b81",
         "cohort": "cc7d83a2-6886-4ca0-9402-7c49734cf879",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
         "aliases": [
             "hms-dbmi:platinum_trio_husband"
         ],
-        "sample_processing": "8dd51b60-2d65-4e74-ac86-08ff9159be90",
-        "uuid": "81278096-7c10-4c5a-8ac3-5e3014e83ccc",
-        "last_modified": {
-            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-            "date_modified": "2020-07-15T02:47:14.902984+00:00"
-        }
+        "family": "21f2af73-2c2e-4101-bbfb-bb2754f302ad",
+        "description": "Benchmarking case for Platinum Trio Husband",
+        "uuid": "81278096-7c10-4c5a-8ac3-5e3014e83ccc"
     },
     {
-        "status": "released",
-        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
-        "family": "21f2af73-2c2e-4101-bbfb-bb2754f302ad",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-        "accession": "GAPCAKQB9FPJ",
         "date_created": "2020-07-15T02:38:01.861276+00:00",
+        "last_modified": {
+            "date_modified": "2020-07-15T23:33:08.269776+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "accession": "GAPCAKQB9FPJ",
         "report": "8dd51b60-2d65-4e74-ac86-08ff9159aaaa",
+        "sample_processing": "8dd51b60-2d65-4e74-ac86-08ff9159be90",
         "schema_version": "1",
+        "status": "released",
         "individual": "4dfca9c9-5f93-48b5-823b-1fd0afaebdae",
-        "description": "Benchmarking case for Platinum Trio Father",
+        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
         "cohort": "cc7d83a2-6886-4ca0-9402-7c49734cf879",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
         "aliases": [
             "hms-dbmi:platinum_trio_daughter"
         ],
-        "sample_processing": "8dd51b60-2d65-4e74-ac86-08ff9159be90",
-        "uuid": "81278096-7c10-4c5a-8ac3-5e3014e83bbb",
-        "last_modified": {
-            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-            "date_modified": "2020-07-15T23:33:08.269776+00:00"
-        }
+        "family": "21f2af73-2c2e-4101-bbfb-bb2754f302ad",
+        "description": "Benchmarking case for Platinum Trio Father",
+        "uuid": "81278096-7c10-4c5a-8ac3-5e3014e83bbb"
     },
     {
-        "status": "released",
-        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
-        "family": "21f2af73-2c2e-4101-bbfb-bb2754f302ad",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-        "accession": "GAPCALNEKP7C",
-        "description": "Benchmarking case for Platinum Trio Proband",
         "date_created": "2020-07-15T02:38:02.193356+00:00",
+        "last_modified": {
+            "date_modified": "2020-07-20T17:55:57.958924+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "accession": "GAPCALNEKP7C",
+        "report": "f5210b6a-efcf-47bd-8f63-1f310072a4af",
+        "sample_processing": "8dd51b60-2d65-4e74-ac86-08ff9159be90",
         "schema_version": "1",
+        "status": "released",
         "individual": "11c429a1-bcb8-4ac6-8f71-be6fb5064ad9",
+        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
         "cohort": "cc7d83a2-6886-4ca0-9402-7c49734cf879",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
         "aliases": [
             "hms-dbmi:platinum_trio_NA12878"
         ],
-        "sample_processing": "8dd51b60-2d65-4e74-ac86-08ff9159be90",
-        "uuid": "81278096-7c10-4c5a-8ac3-5e3014e83aaa",
-        "last_modified": {
-            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-            "date_modified": "2020-07-15T23:32:12.626713+00:00"
-        }
+        "family": "21f2af73-2c2e-4101-bbfb-bb2754f302ad",
+        "description": "Benchmarking case for Platinum Trio Proband",
+        "uuid": "81278096-7c10-4c5a-8ac3-5e3014e83aaa"
     },
     {
-        "status": "released",
-        "project": "f01ff5be-a72d-43bd-afcf-174fa9dcd282",
-        "family": "5e079547-1575-4e4c-acd1-6aa74b931993",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-        "accession": "GAPCAW9MJW72",
         "date_created": "2020-07-15T02:38:02.462322+00:00",
+        "last_modified": {
+            "date_modified": "2020-07-21T15:21:30.187852+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "accession": "GAPCAW9MJW72",
         "report": "0a2d5fc7-2bd5-4289-a59c-40f7c633aaaa",
+        "sample_processing": "0a2d5fc7-2bd5-4289-a59c-40f7c633214c",
         "schema_version": "1",
+        "status": "in review",
         "individual": "648c6261-e34a-45ff-8995-86b7bee4175f",
-        "description": "Benchmarking case for Ashkenazim Trio Proband",
+        "project": "f01ff5be-a72d-43bd-afcf-174fa9dcd282",
         "cohort": "cc7d83a2-6886-4ca0-9402-7c49734cf879",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
         "aliases": [
             "hms-dbmi:ashkenazim_trio_proband"
         ],
-        "sample_processing": "0a2d5fc7-2bd5-4289-a59c-40f7c633214c",
-        "uuid": "80811e01-9ae6-40a5-8147-938c1a30d0bc",
-        "last_modified": {
-            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-            "date_modified": "2020-07-15T02:47:33.779956+00:00"
-        }
+        "family": "5e079547-1575-4e4c-acd1-6aa74b931993",
+        "description": "Benchmarking case for Ashkenazim Trio Proband",
+        "uuid": "80811e01-9ae6-40a5-8147-938c1a30d0bc"
     },
     {
-        "status": "released",
-        "project": "f01ff5be-a72d-43bd-afcf-174fa9dcd282",
-        "family": "5e079547-1575-4e4c-acd1-6aa74b931993",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-        "accession": "GAPCAT6SM934",
-        "description": "Benchmarking case for Ashkenazim Trio Mother",
-        "date_created": "2020-07-15T02:38:02.817517+00:00",
-        "schema_version": "1",
         "individual": "608e2cf2-91d4-4d9d-9091-dce1a1912bb1",
+        "last_modified": {
+            "date_modified": "2020-07-21T15:21:36.909599+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "accession": "GAPCAT6SM934",
+        "schema_version": "1",
+        "sample_processing": "0a2d5fc7-2bd5-4289-a59c-40f7c633214c",
+        "status": "in review",
+        "project": "f01ff5be-a72d-43bd-afcf-174fa9dcd282",
+        "date_created": "2020-07-15T02:38:02.817517+00:00",
         "cohort": "cc7d83a2-6886-4ca0-9402-7c49734cf879",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
         "aliases": [
             "hms-dbmi:ashkenazim_trio_mother"
         ],
-        "sample_processing": "0a2d5fc7-2bd5-4289-a59c-40f7c633214c",
-        "uuid": "7c685be0-70af-4f03-84a6-9f8914537f26",
-        "last_modified": {
-            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-            "date_modified": "2020-07-15T02:47:36.536533+00:00"
-        }
+        "family": "5e079547-1575-4e4c-acd1-6aa74b931993",
+        "description": "Benchmarking case for Ashkenazim Trio Mother",
+        "uuid": "7c685be0-70af-4f03-84a6-9f8914537f26"
     },
     {
+        "individual": "cb3f2a68-3300-48b0-889e-7aca2dfe68e3",
+        "last_modified": {
+            "date_modified": "2020-07-22T02:52:01.573720+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "accession": "GAPCAH7GRQIX",
+        "report": "bc029a7e-0a71-4771-9c0e-be88445c8b1c",
+        "sample_processing": "e7b6a6cb-b526-4d7c-b4a2-8bc62c7d0515",
+        "schema_version": "1",
+        "status": "in review",
+        "project": "91336042-f277-4f69-97e5-5c8a5f6d6058",
+        "date_created": "2020-07-21T19:57:06.581221+00:00",
+        "cohort": "cc7d83a2-6886-4ca0-9402-7c49734cf879",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "institution": "828cd4fe-ebb0-4b36-ccbb-d2e3a36ca234",
+        "family": "48a238c6-3a9f-4ee5-b07c-a90ae658d90b",
+        "uuid": "66ff3c2a-1541-427a-a291-9577f0e251a3"
+    },
+    {
+        "individual": "939d85bc-6c95-43cf-a6c0-6deb9836cfc2",
+        "last_modified": {
+            "date_modified": "2020-07-22T02:53:03.014361+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "accession": "GAPCABTQXDER",
+        "schema_version": "1",
+        "sample_processing": "e7b6a6cb-b526-4d7c-b4a2-8bc62c7d0515",
+        "status": "in review",
+        "project": "91336042-f277-4f69-97e5-5c8a5f6d6058",
+        "date_created": "2020-07-21T19:56:59.582804+00:00",
+        "cohort": "cc7d83a2-6886-4ca0-9402-7c49734cf879",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "institution": "828cd4fe-ebb0-4b36-ccbb-d2e3a36ca234",
+        "family": "48a238c6-3a9f-4ee5-b07c-a90ae658d90b",
+        "uuid": "6387ed7f-68c2-425c-9d79-16e8fa8b1f09"
+    },
+    {
+        "individual": "ba129170-42dc-417f-9022-814314c41274",
+        "last_modified": {
+            "date_modified": "2020-07-22T02:53:16.744938+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "accession": "GAPCAA7EYJEP",
+        "schema_version": "1",
+        "sample_processing": "e7b6a6cb-b526-4d7c-b4a2-8bc62c7d0515",
+        "status": "in review",
+        "project": "91336042-f277-4f69-97e5-5c8a5f6d6058",
+        "date_created": "2020-07-21T19:56:54.508942+00:00",
+        "cohort": "cc7d83a2-6886-4ca0-9402-7c49734cf879",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "institution": "828cd4fe-ebb0-4b36-ccbb-d2e3a36ca234",
+        "family": "48a238c6-3a9f-4ee5-b07c-a90ae658d90b",
+        "uuid": "26d969d7-f2e5-4855-8fe7-fae6088fd8b4"
+    },
+    {
+        "individual": "4dfca9c9-5f93-48b5-823b-1fd0afaebdae",
+        "last_modified": {
+            "date_modified": "2020-07-15T23:41:17.630573+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "accession": "GAPCAFUTFLG1",
+        "report": "c620e937-2294-4321-982c-4897aa2ba721",
+        "sample_processing": "7067a6de-b212-4355-9b0a-487952e75a5b",
+        "schema_version": "1",
         "status": "released",
         "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
-        "family": "21f2af73-2c2e-4101-bbfb-bb2754f302ad",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-        "accession": "GAPCAFUTFLG1",
         "date_created": "2020-07-15T23:27:32.133011+00:00",
-        "report": "c620e937-2294-4321-982c-4897aa2ba721",
-        "schema_version": "1",
-        "individual": "4dfca9c9-5f93-48b5-823b-1fd0afaebdae",
-        "description": "Benchmarking case for Platinum Trio Father",
         "cohort": "cc7d83a2-6886-4ca0-9402-7c49734cf879",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
-        "sample_processing": "7067a6de-b212-4355-9b0a-487952e75a5b",
-        "uuid": "0694cffc-4695-494b-844f-874b668c6361",
-        "last_modified": {
-            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-            "date_modified": "2020-07-15T23:41:17.630573+00:00"
-        }
+        "family": "21f2af73-2c2e-4101-bbfb-bb2754f302ad",
+        "description": "Benchmarking case for Platinum Trio Father",
+        "uuid": "0694cffc-4695-494b-844f-874b668c6361"
     }
 ]

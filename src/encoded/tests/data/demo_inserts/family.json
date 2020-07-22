@@ -1,37 +1,85 @@
 [
     {
-        "status": "released",
-        "project": "f01ff5be-a72d-43bd-afcf-174fa9dcd282",
-        "schema_version": "1",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-        "title": "Ashkenazim Trio",
         "proband": "648c6261-e34a-45ff-8995-86b7bee4175f",
         "date_created": "2020-07-15T02:38:59.533935+00:00",
+        "last_modified": {
+            "date_modified": "2020-07-15T02:43:06.462438+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
         "accession": "GAPFAMCRLK6O",
+        "schema_version": "1",
         "members": [
             "648c6261-e34a-45ff-8995-86b7bee4175f",
             "608e2cf2-91d4-4d9d-9091-dce1a1912bb1",
             "82ac8825-a526-4b21-8fe0-468b9fc4e620"
         ],
-        "uuid": "5e079547-1575-4e4c-acd1-6aa74b931993",
+        "title": "Ashkenazim Trio",
+        "status": "released",
+        "project": "f01ff5be-a72d-43bd-afcf-174fa9dcd282",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
         "family_id": "Ashkenazim",
-        "last_modified": {
-            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-            "date_modified": "2020-07-15T02:43:06.462438+00:00"
-        }
+        "uuid": "5e079547-1575-4e4c-acd1-6aa74b931993"
     },
     {
+        "proband": "cb3f2a68-3300-48b0-889e-7aca2dfe68e3",
+        "date_created": "2020-07-21T17:33:27.884431+00:00",
+        "last_modified": {
+            "date_modified": "2020-07-21T20:01:52.874833+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "pedigree_source": "Proband app 2.0.0",
+        "accession": "GAPFAQ74I7EW",
+        "family_id": "BGM0339",
+        "members": [
+            "d0a03d3b-44c7-4b96-a53e-3ddfb323c518",
+            "7dd17757-6c4d-4724-897a-fdb16f6759a3",
+            "2196aac1-2512-44c1-957a-ea29a7875ec2",
+            "54559fbc-f522-47db-a4e2-e25c00d8481d",
+            "db29af10-e8e8-4c67-acf8-8b3518bfda29",
+            "e4873179-4e6a-4ac2-b617-0ae8bd9fed28",
+            "0df482b9-23c2-4a66-9521-5852b696a279",
+            "d2253961-12be-45cf-9491-55a3f72b0645",
+            "4d2f102f-926c-45c0-9c18-7a75cc59f2dc",
+            "5afeb400-e296-45cf-a99f-911f88dd7307",
+            "2429f9d0-dade-4c0a-9fe5-d03652880fd7",
+            "939d85bc-6c95-43cf-a6c0-6deb9836cfc2",
+            "2d27fe5d-74f1-4372-a4c1-62373b922bfc",
+            "727b33fd-0345-435e-aba1-3e0a7c1e652b",
+            "ed9ed5e6-61d1-47c8-b963-617cc8fc457c",
+            "cb3f2a68-3300-48b0-889e-7aca2dfe68e3",
+            "cecaf416-3390-465b-82bd-b00752fdcc03",
+            "e4b98928-1ee5-4aea-baea-73b97846ac90",
+            "c3fedef3-c6d7-41db-a55c-89baacd0783f",
+            "ba129170-42dc-417f-9022-814314c41274"
+        ],
+        "title": "BGM 0339",
         "status": "released",
-        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
+        "project": "91336042-f277-4f69-97e5-5c8a5f6d6058",
         "schema_version": "1",
+        "family_phenotypic_features": [
+            "6342771a-49ab-491d-8e9f-c59c35dec3fc",
+            "7e00a190-7851-43f9-a6d5-b24031bb5bf9",
+            "17af4443-393a-4e27-abc5-a564640832fa",
+            "1d5571e9-f0d6-4cf4-8d58-678754d1043d"
+        ],
+        "timestamp": "2019-09-10T22:18:05.434026+00:00",
         "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-        "timestamp": "2019-11-18T16:38:11.442813+00:00",
-        "title": "Platinum Genomes II",
+        "institution": "828cd4fe-ebb0-4b36-ccbb-d2e3a36ca234",
+        "original_pedigree": "0938cab5-5f81-4da7-b299-46e4aa5d63f9",
+        "clinic_notes": "This is our demo case",
+        "uuid": "48a238c6-3a9f-4ee5-b07c-a90ae658d90b"
+    },
+    {
         "proband": "11c429a1-bcb8-4ac6-8f71-be6fb5064ad9",
         "date_created": "2020-07-15T16:09:54.362411+00:00",
-        "accession": "GAPFABU4HGIR",
+        "last_modified": {
+            "date_modified": "2020-07-20T17:53:10.995790+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
         "pedigree_source": "Proband app 2.0.0",
+        "accession": "GAPFABU4HGIR",
+        "schema_version": "1",
         "members": [
             "4684702a-3639-4073-8db4-d44eb8b31135",
             "b8e17d98-e364-43c6-919c-a739afa619ad",
@@ -51,25 +99,25 @@
             "d246d630-62be-4607-af9a-56d97b885331",
             "4dfca9c9-5f93-48b5-823b-1fd0afaebdae"
         ],
-        "uuid": "45f2af73-2c2e-4101-bbfb-bb2754f30321",
-        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
-        "family_id": "Platinum II",
-        "last_modified": {
-            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-            "date_modified": "2020-07-15T16:09:54.401112+00:00"
-        }
-    },
-    {
+        "title": "Platinum Genomes",
         "status": "released",
         "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
-        "schema_version": "1",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "timestamp": "2019-11-18T16:38:11.442813+00:00",
-        "title": "Platinum Genomes",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "family_id": "Platinum",
+        "uuid": "45f2af73-2c2e-4101-bbfb-bb2754f30321"
+    },
+    {
         "proband": "4dfca9c9-5f93-48b5-823b-1fd0afaebdae",
         "date_created": "2020-07-15T02:38:59.766625+00:00",
-        "accession": "GAPFAWY7YCIR",
+        "last_modified": {
+            "date_modified": "2020-07-15T14:42:36.437652+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
         "pedigree_source": "Proband app 2.0.0",
+        "accession": "GAPFAWY7YCIR",
+        "schema_version": "1",
         "members": [
             "4684702a-3639-4073-8db4-d44eb8b31135",
             "b8e17d98-e364-43c6-919c-a739afa619ad",
@@ -89,12 +137,13 @@
             "d246d630-62be-4607-af9a-56d97b885331",
             "4dfca9c9-5f93-48b5-823b-1fd0afaebdae"
         ],
-        "uuid": "21f2af73-2c2e-4101-bbfb-bb2754f302ad",
+        "title": "Platinum Genomes",
+        "status": "released",
+        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
+        "timestamp": "2019-11-18T16:38:11.442813+00:00",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
         "family_id": "Platinum",
-        "last_modified": {
-            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-            "date_modified": "2020-07-15T14:42:36.437652+00:00"
-        }
+        "uuid": "21f2af73-2c2e-4101-bbfb-bb2754f302ad"
     }
 ]

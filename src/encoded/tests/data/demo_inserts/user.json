@@ -1,51 +1,22 @@
 [
     {
-        "status": "current",
-        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "date_created": "2020-07-15T02:26:30.654187+00:00",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "last_modified": {
+            "date_modified": "2020-07-22T02:57:24.893266+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
         "schema_version": "1",
-        "last_name": "Braunstein",
-        "project_roles": [
-            {
-                "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
-                "role": "developer"
-            },
-            {
-                "project": "f01ff5be-a72d-43bd-afcf-174fa9dcd282",
-                "role": "developer"
-            },
-            {
-                "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
-                "role": "developer"
-            }
-        ],
+        "first_name": "Iris",
         "email": "iris_braunstein@hms.harvard.edu",
         "groups": [
             "admin"
         ],
-        "first_name": "Iris",
-        "date_created": "2020-07-15T02:26:30.654187+00:00",
-        "submits_for": [
-            "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989"
-        ],
-        "role": "scientist",
-        "last_modified": {
-            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-            "date_modified": "2020-07-15T02:59:02.385818+00:00"
-        },
-        "timezone": "US/Eastern",
-        "uuid": "f9524d43-01b5-4b71-94c6-32d2d09c7893",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
-    },
-    {
         "status": "current",
         "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
-        "schema_version": "1",
-        "last_name": "Yamamoto",
+        "role": "scientist",
+        "last_name": "Braunstein",
         "project_roles": [
-            {
-                "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
-                "role": "developer"
-            },
             {
                 "project": "f01ff5be-a72d-43bd-afcf-174fa9dcd282",
                 "role": "developer"
@@ -53,36 +24,36 @@
             {
                 "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
                 "role": "developer"
+            },
+            {
+                "project": "91336042-f277-4f69-97e5-5c8a5f6d6058",
+                "role": "developer"
             }
         ],
+        "submits_for": [
+            "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989"
+        ],
+        "uuid": "f9524d43-01b5-4b71-94c6-32d2d09c7893",
+        "timezone": "US/Eastern"
+    },
+    {
+        "date_created": "2020-07-15T02:26:30.543984+00:00",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "last_modified": {
+            "date_modified": "2020-07-22T02:57:25.032012+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "schema_version": "1",
+        "first_name": "Guilherme",
         "email": "guilherme_yamamoto@hms.harvard.edu",
         "groups": [
             "admin"
         ],
-        "first_name": "Guilherme",
-        "date_created": "2020-07-15T02:26:30.543984+00:00",
-        "submits_for": [
-            "828cd4fe-ebb0-4b36-ccbb-d2e3a36ca765"
-        ],
-        "role": "clinician",
-        "last_modified": {
-            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-            "date_modified": "2020-07-15T02:59:02.524158+00:00"
-        },
-        "timezone": "US/Eastern",
-        "uuid": "f9524d43-01b5-4b71-94c6-32d2d09c5633",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
-    },
-    {
         "status": "current",
         "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
-        "schema_version": "1",
-        "last_name": "Rockowitz",
+        "role": "clinician",
+        "last_name": "Yamamoto",
         "project_roles": [
-            {
-                "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
-                "role": "developer"
-            },
             {
                 "project": "f01ff5be-a72d-43bd-afcf-174fa9dcd282",
                 "role": "developer"
@@ -90,36 +61,36 @@
             {
                 "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
                 "role": "developer"
+            },
+            {
+                "project": "91336042-f277-4f69-97e5-5c8a5f6d6058",
+                "role": "developer"
             }
         ],
+        "submits_for": [
+            "828cd4fe-ebb0-4b36-ccbb-d2e3a36ca765"
+        ],
+        "uuid": "f9524d43-01b5-4b71-94c6-32d2d09c5633",
+        "timezone": "US/Eastern"
+    },
+    {
+        "date_created": "2020-07-15T02:26:30.479071+00:00",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "last_modified": {
+            "date_modified": "2020-07-22T02:57:26.187567+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "schema_version": "1",
+        "first_name": "Shira",
         "email": "shira.rockowitz@childrens.harvard.edu",
         "groups": [
             "admin"
         ],
-        "first_name": "Shira",
-        "date_created": "2020-07-15T02:26:30.479071+00:00",
-        "submits_for": [
-            "828cd4fe-ebb0-4b36-ccbb-d2e3a36ca765"
-        ],
-        "role": "clinician",
-        "last_modified": {
-            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-            "date_modified": "2020-07-15T02:59:02.652325+00:00"
-        },
-        "timezone": "US/Eastern",
-        "uuid": "f9524d43-01b5-4b71-94c6-32d2d09c4433",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
-    },
-    {
         "status": "current",
         "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
-        "schema_version": "1",
-        "last_name": "Ghazani",
+        "role": "clinician",
+        "last_name": "Rockowitz",
         "project_roles": [
-            {
-                "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
-                "role": "developer"
-            },
             {
                 "project": "f01ff5be-a72d-43bd-afcf-174fa9dcd282",
                 "role": "developer"
@@ -127,36 +98,36 @@
             {
                 "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
                 "role": "developer"
+            },
+            {
+                "project": "91336042-f277-4f69-97e5-5c8a5f6d6058",
+                "role": "developer"
             }
         ],
+        "submits_for": [
+            "828cd4fe-ebb0-4b36-ccbb-d2e3a36ca765"
+        ],
+        "uuid": "f9524d43-01b5-4b71-94c6-32d2d09c4433",
+        "timezone": "US/Eastern"
+    },
+    {
+        "date_created": "2020-07-15T02:26:30.413672+00:00",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "last_modified": {
+            "date_modified": "2020-07-22T02:57:26.315618+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "schema_version": "1",
+        "first_name": "Arezou",
         "email": "aghazani@bwh.harvard.edu",
         "groups": [
             "admin"
         ],
-        "first_name": "Arezou",
-        "date_created": "2020-07-15T02:26:30.413672+00:00",
-        "submits_for": [
-            "828cd4fe-ebb0-4b36-ccbb-d2e3a36ca234"
-        ],
-        "role": "clinician",
-        "last_modified": {
-            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-            "date_modified": "2020-07-15T02:59:02.790830+00:00"
-        },
-        "timezone": "US/Eastern",
-        "uuid": "f9524d43-01b5-4b71-94c6-32d2d09c3343",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
-    },
-    {
         "status": "current",
         "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
-        "schema_version": "1",
-        "last_name": "Berselli",
+        "role": "clinician",
+        "last_name": "Ghazani",
         "project_roles": [
-            {
-                "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
-                "role": "developer"
-            },
             {
                 "project": "f01ff5be-a72d-43bd-afcf-174fa9dcd282",
                 "role": "developer"
@@ -164,36 +135,36 @@
             {
                 "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
                 "role": "developer"
+            },
+            {
+                "project": "91336042-f277-4f69-97e5-5c8a5f6d6058",
+                "role": "developer"
             }
         ],
+        "submits_for": [
+            "828cd4fe-ebb0-4b36-ccbb-d2e3a36ca234"
+        ],
+        "uuid": "f9524d43-01b5-4b71-94c6-32d2d09c3343",
+        "timezone": "US/Eastern"
+    },
+    {
+        "date_created": "2020-07-15T02:26:30.348240+00:00",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "last_modified": {
+            "date_modified": "2020-07-22T02:57:26.413351+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "schema_version": "1",
+        "first_name": "Michele",
         "email": "michele_berselli@hms.harvard.edu",
         "groups": [
             "admin"
         ],
-        "first_name": "Michele",
-        "date_created": "2020-07-15T02:26:30.348240+00:00",
-        "submits_for": [
-            "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989"
-        ],
-        "role": "scientist",
-        "last_modified": {
-            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-            "date_modified": "2020-07-15T02:59:02.947898+00:00"
-        },
-        "timezone": "US/Eastern",
-        "uuid": "f9524d43-01b5-4b71-94c6-32d2d09c2222",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
-    },
-    {
         "status": "current",
         "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
-        "schema_version": "1",
-        "last_name": "Administration",
+        "role": "scientist",
+        "last_name": "Berselli",
         "project_roles": [
-            {
-                "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
-                "role": "developer"
-            },
             {
                 "project": "f01ff5be-a72d-43bd-afcf-174fa9dcd282",
                 "role": "developer"
@@ -201,36 +172,36 @@
             {
                 "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
                 "role": "developer"
+            },
+            {
+                "project": "91336042-f277-4f69-97e5-5c8a5f6d6058",
+                "role": "developer"
             }
         ],
+        "submits_for": [
+            "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989"
+        ],
+        "uuid": "f9524d43-01b5-4b71-94c6-32d2d09c2222",
+        "timezone": "US/Eastern"
+    },
+    {
+        "date_created": "2019-06-20T00:00:00.0000000+00:00",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "last_modified": {
+            "date_modified": "2020-07-22T02:57:30.214775+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "schema_version": "1",
+        "first_name": "Genomics Platform",
         "email": "cgap.platform@gmail.com",
         "groups": [
             "admin"
         ],
-        "first_name": "Genomics Platform",
-        "date_created": "2019-06-20T00:00:00.0000000+00:00",
-        "submits_for": [
-            "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989"
-        ],
-        "role": "developer",
-        "last_modified": {
-            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-            "date_modified": "2020-07-15T02:59:03.056431+00:00"
-        },
-        "timezone": "US/Eastern",
-        "uuid": "b5f738b6-455a-42e5-bc1c-77fbfd9b15d2",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
-    },
-    {
         "status": "current",
         "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
-        "schema_version": "1",
-        "last_name": "App",
+        "role": "developer",
+        "last_name": "Administration",
         "project_roles": [
-            {
-                "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
-                "role": "developer"
-            },
             {
                 "project": "f01ff5be-a72d-43bd-afcf-174fa9dcd282",
                 "role": "developer"
@@ -238,39 +209,39 @@
             {
                 "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
                 "role": "developer"
+            },
+            {
+                "project": "91336042-f277-4f69-97e5-5c8a5f6d6058",
+                "role": "developer"
             }
         ],
+        "submits_for": [
+            "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989"
+        ],
+        "uuid": "b5f738b6-455a-42e5-bc1c-77fbfd9b15d2",
+        "timezone": "US/Eastern"
+    },
+    {
+        "date_created": "2020-07-15T02:26:30.135602+00:00",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "last_modified": {
+            "date_modified": "2020-07-22T02:57:26.926161+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "schema_version": "1",
+        "first_name": "Tibanna",
         "email": "tibanna.app@gmail.com",
         "groups": [
             "admin"
         ],
-        "first_name": "Tibanna",
-        "date_created": "2020-07-15T02:26:30.135602+00:00",
-        "submits_for": [
-            "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989"
-        ],
+        "status": "current",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
         "role": "other",
-        "last_modified": {
-            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-            "date_modified": "2020-07-15T02:59:03.154382+00:00"
-        },
+        "last_name": "App",
         "aliases": [
             "hms-dbmi:tibanna_app"
         ],
-        "timezone": "US/Eastern",
-        "uuid": "b041dba8-e2b2-4e54-a621-97edb508a0c4",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
-    },
-    {
-        "status": "current",
-        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
-        "schema_version": "1",
-        "last_name": "Krier",
         "project_roles": [
-            {
-                "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
-                "role": "developer"
-            },
             {
                 "project": "f01ff5be-a72d-43bd-afcf-174fa9dcd282",
                 "role": "developer"
@@ -278,36 +249,36 @@
             {
                 "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
                 "role": "developer"
+            },
+            {
+                "project": "91336042-f277-4f69-97e5-5c8a5f6d6058",
+                "role": "developer"
             }
         ],
+        "submits_for": [
+            "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989"
+        ],
+        "uuid": "b041dba8-e2b2-4e54-a621-97edb508a0c4",
+        "timezone": "US/Eastern"
+    },
+    {
+        "date_created": "2020-07-15T02:26:29.701552+00:00",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "last_modified": {
+            "date_modified": "2020-07-22T02:57:28.897370+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "schema_version": "1",
+        "first_name": "Joel",
         "email": "jkrier@bwh.harvard.edu",
         "groups": [
             "admin"
         ],
-        "first_name": "Joel",
-        "date_created": "2020-07-15T02:26:29.701552+00:00",
-        "submits_for": [
-            "828cd4fe-ebb0-4b36-ccbb-d2e3a36ca234"
-        ],
-        "role": "clinician",
-        "last_modified": {
-            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-            "date_modified": "2020-07-15T02:59:03.251556+00:00"
-        },
-        "timezone": "US/Eastern",
-        "uuid": "986b362f-4eb6-4a9c-8173-3acba722bba1",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
-    },
-    {
         "status": "current",
         "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
-        "schema_version": "1",
-        "last_name": "Vuzman",
+        "role": "clinician",
+        "last_name": "Krier",
         "project_roles": [
-            {
-                "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
-                "role": "developer"
-            },
             {
                 "project": "f01ff5be-a72d-43bd-afcf-174fa9dcd282",
                 "role": "developer"
@@ -315,36 +286,36 @@
             {
                 "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
                 "role": "developer"
+            },
+            {
+                "project": "91336042-f277-4f69-97e5-5c8a5f6d6058",
+                "role": "developer"
             }
         ],
+        "submits_for": [
+            "828cd4fe-ebb0-4b36-ccbb-d2e3a36ca234"
+        ],
+        "uuid": "986b362f-4eb6-4a9c-8173-3acba722bba1",
+        "timezone": "US/Eastern"
+    },
+    {
+        "date_created": "2020-07-15T02:26:29.186335+00:00",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "last_modified": {
+            "date_modified": "2020-07-22T02:57:29.666244+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "schema_version": "1",
+        "first_name": "Dana",
         "email": "dvuzman@research.bwh.harvard.edu",
         "groups": [
             "admin"
         ],
-        "first_name": "Dana",
-        "date_created": "2020-07-15T02:26:29.186335+00:00",
-        "submits_for": [
-            "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989"
-        ],
-        "role": "director",
-        "last_modified": {
-            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-            "date_modified": "2020-07-15T02:59:03.410788+00:00"
-        },
-        "timezone": "US/Eastern",
-        "uuid": "986b362f-4eb6-4a9c-8173-3ab267307e4b",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
-    },
-    {
         "status": "current",
         "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
-        "schema_version": "1",
+        "role": "director",
         "last_name": "Vuzman",
         "project_roles": [
-            {
-                "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
-                "role": "developer"
-            },
             {
                 "project": "f01ff5be-a72d-43bd-afcf-174fa9dcd282",
                 "role": "developer"
@@ -352,36 +323,36 @@
             {
                 "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
                 "role": "developer"
+            },
+            {
+                "project": "91336042-f277-4f69-97e5-5c8a5f6d6058",
+                "role": "developer"
             }
         ],
+        "submits_for": [
+            "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989"
+        ],
+        "uuid": "986b362f-4eb6-4a9c-8173-3ab267307e4b",
+        "timezone": "US/Eastern"
+    },
+    {
+        "date_created": "2020-07-15T02:26:29.117795+00:00",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "last_modified": {
+            "date_modified": "2020-07-22T02:57:29.928713+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "schema_version": "1",
+        "first_name": "Dana",
         "email": "danavuzman@gmail.com",
         "groups": [
             "admin"
         ],
-        "first_name": "Dana",
-        "date_created": "2020-07-15T02:26:29.117795+00:00",
-        "submits_for": [
-            "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989"
-        ],
-        "role": "director",
-        "last_modified": {
-            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-            "date_modified": "2020-07-15T02:59:03.540784+00:00"
-        },
-        "timezone": "US/Eastern",
-        "uuid": "986b362f-4eb6-4a9c-8173-3ab267307e3a",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
-    },
-    {
         "status": "current",
         "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
-        "schema_version": "1",
-        "last_name": "Schroeder",
+        "role": "director",
+        "last_name": "Vuzman",
         "project_roles": [
-            {
-                "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
-                "role": "developer"
-            },
             {
                 "project": "f01ff5be-a72d-43bd-afcf-174fa9dcd282",
                 "role": "developer"
@@ -389,36 +360,36 @@
             {
                 "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
                 "role": "developer"
+            },
+            {
+                "project": "91336042-f277-4f69-97e5-5c8a5f6d6058",
+                "role": "developer"
             }
         ],
+        "submits_for": [
+            "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989"
+        ],
+        "uuid": "986b362f-4eb6-4a9c-8173-3ab267307e3a",
+        "timezone": "US/Eastern"
+    },
+    {
+        "date_created": "2020-07-15T02:26:29.825203+00:00",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "last_modified": {
+            "date_modified": "2020-07-22T02:57:28.721617+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "schema_version": "1",
+        "first_name": "Andy",
         "email": "andrew_schroeder@hms.harvard.edu",
         "groups": [
             "admin"
         ],
-        "first_name": "Andy",
-        "date_created": "2020-07-15T02:26:29.825203+00:00",
-        "submits_for": [
-            "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989"
-        ],
-        "role": "scientist",
-        "last_modified": {
-            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-            "date_modified": "2020-07-15T02:59:03.646175+00:00"
-        },
-        "timezone": "US/Eastern",
-        "uuid": "986b362f-4eb6-4a9c-8173-3ab267227777",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
-    },
-    {
         "status": "current",
         "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
-        "schema_version": "1",
-        "last_name": "Ronchetti",
+        "role": "scientist",
+        "last_name": "Schroeder",
         "project_roles": [
-            {
-                "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
-                "role": "developer"
-            },
             {
                 "project": "f01ff5be-a72d-43bd-afcf-174fa9dcd282",
                 "role": "developer"
@@ -426,36 +397,36 @@
             {
                 "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
                 "role": "developer"
+            },
+            {
+                "project": "91336042-f277-4f69-97e5-5c8a5f6d6058",
+                "role": "developer"
             }
         ],
+        "submits_for": [
+            "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989"
+        ],
+        "uuid": "986b362f-4eb6-4a9c-8173-3ab267227777",
+        "timezone": "US/Eastern"
+    },
+    {
+        "date_created": "2020-07-15T02:26:29.393876+00:00",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "last_modified": {
+            "date_modified": "2020-07-22T02:57:29.278839+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "schema_version": "1",
+        "first_name": "Will",
         "email": "william_ronchetti@hms.harvard.edu",
         "groups": [
             "admin"
         ],
-        "first_name": "Will",
-        "date_created": "2020-07-15T02:26:29.393876+00:00",
-        "submits_for": [
-            "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989"
-        ],
-        "role": "developer",
-        "last_modified": {
-            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-            "date_modified": "2020-07-15T02:59:03.745984+00:00"
-        },
-        "timezone": "US/Eastern",
-        "uuid": "986b362f-4eb6-4a9c-8173-3ab267226992",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
-    },
-    {
         "status": "current",
         "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
-        "schema_version": "1",
-        "last_name": "Vitzthum",
+        "role": "developer",
+        "last_name": "Ronchetti",
         "project_roles": [
-            {
-                "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
-                "role": "developer"
-            },
             {
                 "project": "f01ff5be-a72d-43bd-afcf-174fa9dcd282",
                 "role": "developer"
@@ -463,36 +434,36 @@
             {
                 "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
                 "role": "developer"
+            },
+            {
+                "project": "91336042-f277-4f69-97e5-5c8a5f6d6058",
+                "role": "developer"
             }
         ],
+        "submits_for": [
+            "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989"
+        ],
+        "uuid": "986b362f-4eb6-4a9c-8173-3ab267226992",
+        "timezone": "US/Eastern"
+    },
+    {
+        "date_created": "2020-07-15T02:26:29.327216+00:00",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "last_modified": {
+            "date_modified": "2020-07-22T02:57:29.423384+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "schema_version": "1",
+        "first_name": "Carl",
         "email": "carl_vitzthum@hms.harvard.edu",
         "groups": [
             "admin"
         ],
-        "first_name": "Carl",
-        "date_created": "2020-07-15T02:26:29.327216+00:00",
-        "submits_for": [
-            "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989"
-        ],
-        "role": "developer",
-        "last_modified": {
-            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-            "date_modified": "2020-07-15T02:59:03.844310+00:00"
-        },
-        "timezone": "US/Eastern",
-        "uuid": "986b362f-4eb6-4a9c-8173-3ab267226988",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
-    },
-    {
         "status": "current",
         "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
-        "schema_version": "1",
-        "last_name": "Kirli",
+        "role": "developer",
+        "last_name": "Vitzthum",
         "project_roles": [
-            {
-                "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
-                "role": "developer"
-            },
             {
                 "project": "f01ff5be-a72d-43bd-afcf-174fa9dcd282",
                 "role": "developer"
@@ -500,36 +471,36 @@
             {
                 "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
                 "role": "developer"
+            },
+            {
+                "project": "91336042-f277-4f69-97e5-5c8a5f6d6058",
+                "role": "developer"
             }
         ],
+        "submits_for": [
+            "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989"
+        ],
+        "uuid": "986b362f-4eb6-4a9c-8173-3ab267226988",
+        "timezone": "US/Eastern"
+    },
+    {
+        "date_created": "2020-07-15T02:26:29.902354+00:00",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "last_modified": {
+            "date_modified": "2020-07-22T02:57:28.590501+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "schema_version": "1",
+        "first_name": "Koray",
         "email": "koray_kirli@hms.harvard.edu",
         "groups": [
             "admin"
         ],
-        "first_name": "Koray",
-        "date_created": "2020-07-15T02:26:29.902354+00:00",
-        "submits_for": [
-            "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989"
-        ],
-        "role": "scientist",
-        "last_modified": {
-            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-            "date_modified": "2020-07-15T02:59:03.940710+00:00"
-        },
-        "timezone": "US/Eastern",
-        "uuid": "986b362f-4eb6-4a9c-8173-3ab267221234",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
-    },
-    {
         "status": "current",
         "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
-        "schema_version": "1",
-        "last_name": "Balashov",
+        "role": "scientist",
+        "last_name": "Kirli",
         "project_roles": [
-            {
-                "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
-                "role": "developer"
-            },
             {
                 "project": "f01ff5be-a72d-43bd-afcf-174fa9dcd282",
                 "role": "developer"
@@ -537,36 +508,36 @@
             {
                 "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
                 "role": "developer"
+            },
+            {
+                "project": "91336042-f277-4f69-97e5-5c8a5f6d6058",
+                "role": "developer"
             }
         ],
+        "submits_for": [
+            "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989"
+        ],
+        "uuid": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "timezone": "US/Eastern"
+    },
+    {
+        "date_created": "2020-07-15T02:26:29.257956+00:00",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "last_modified": {
+            "date_modified": "2020-07-22T02:57:29.538185+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "schema_version": "1",
+        "first_name": "Alex",
         "email": "alexander_balashov@hms.harvard.edu",
         "groups": [
             "admin"
         ],
-        "first_name": "Alex",
-        "date_created": "2020-07-15T02:26:29.257956+00:00",
-        "submits_for": [
-            "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989"
-        ],
-        "role": "developer",
-        "last_modified": {
-            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-            "date_modified": "2020-07-15T02:59:04.071021+00:00"
-        },
-        "timezone": "US/Eastern",
-        "uuid": "986b362f-4eb6-4a9c-8173-3ab245628888",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
-    },
-    {
         "status": "current",
         "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
-        "schema_version": "1",
-        "last_name": "Reiff",
+        "role": "developer",
+        "last_name": "Balashov",
         "project_roles": [
-            {
-                "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
-                "role": "developer"
-            },
             {
                 "project": "f01ff5be-a72d-43bd-afcf-174fa9dcd282",
                 "role": "developer"
@@ -574,36 +545,36 @@
             {
                 "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
                 "role": "developer"
+            },
+            {
+                "project": "91336042-f277-4f69-97e5-5c8a5f6d6058",
+                "role": "developer"
             }
         ],
+        "submits_for": [
+            "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989"
+        ],
+        "uuid": "986b362f-4eb6-4a9c-8173-3ab245628888",
+        "timezone": "US/Eastern"
+    },
+    {
+        "date_created": "2020-07-15T02:26:30.721926+00:00",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "last_modified": {
+            "date_modified": "2020-07-22T02:57:24.731437+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "schema_version": "1",
+        "first_name": "Sarah",
         "email": "sarah_reiff@hms.harvard.edu",
         "groups": [
             "admin"
         ],
-        "first_name": "Sarah",
-        "date_created": "2020-07-15T02:26:30.721926+00:00",
-        "submits_for": [
-            "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989"
-        ],
-        "role": "scientist",
-        "last_modified": {
-            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-            "date_modified": "2020-07-15T02:59:04.168543+00:00"
-        },
-        "timezone": "US/Eastern",
-        "uuid": "834559db-a3f6-462c-81a4-f5d7e5e65707",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
-    },
-    {
         "status": "current",
         "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
-        "schema_version": "1",
-        "last_name": "App",
+        "role": "scientist",
+        "last_name": "Reiff",
         "project_roles": [
-            {
-                "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
-                "role": "developer"
-            },
             {
                 "project": "f01ff5be-a72d-43bd-afcf-174fa9dcd282",
                 "role": "developer"
@@ -611,39 +582,39 @@
             {
                 "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
                 "role": "developer"
+            },
+            {
+                "project": "91336042-f277-4f69-97e5-5c8a5f6d6058",
+                "role": "developer"
             }
         ],
+        "submits_for": [
+            "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989"
+        ],
+        "uuid": "834559db-a3f6-462c-81a4-f5d7e5e65707",
+        "timezone": "US/Eastern"
+    },
+    {
+        "date_created": "2020-07-15T02:26:30.058159+00:00",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "last_modified": {
+            "date_modified": "2020-07-22T02:57:27.130182+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "schema_version": "1",
+        "first_name": "Foursight",
         "email": "foursight.app@gmail.com",
         "groups": [
             "admin"
         ],
-        "first_name": "Foursight",
-        "date_created": "2020-07-15T02:26:30.058159+00:00",
-        "submits_for": [
-            "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989"
-        ],
+        "status": "current",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
         "role": "other",
-        "last_modified": {
-            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-            "date_modified": "2020-07-15T02:59:04.365924+00:00"
-        },
+        "last_name": "App",
         "aliases": [
             "hms-dbmi:foursight_app"
         ],
-        "timezone": "US/Eastern",
-        "uuid": "7677f8a8-79d2-4cff-ab0a-a967a2a68e39",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
-    },
-    {
-        "status": "current",
-        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
-        "schema_version": "1",
-        "last_name": "Morris",
         "project_roles": [
-            {
-                "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
-                "role": "developer"
-            },
             {
                 "project": "f01ff5be-a72d-43bd-afcf-174fa9dcd282",
                 "role": "developer"
@@ -651,36 +622,36 @@
             {
                 "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
                 "role": "developer"
+            },
+            {
+                "project": "91336042-f277-4f69-97e5-5c8a5f6d6058",
+                "role": "developer"
             }
         ],
+        "submits_for": [
+            "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989"
+        ],
+        "uuid": "7677f8a8-79d2-4cff-ab0a-a967a2a68e39",
+        "timezone": "US/Eastern"
+    },
+    {
+        "date_created": "2020-07-15T02:26:30.211315+00:00",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "last_modified": {
+            "date_modified": "2020-07-22T02:57:26.787503+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "schema_version": "1",
+        "first_name": "Bianca",
         "email": "bianca_morris@hms.harvard.edu",
         "groups": [
             "admin"
         ],
-        "first_name": "Bianca",
-        "date_created": "2020-07-15T02:26:30.211315+00:00",
-        "submits_for": [
-            "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989"
-        ],
-        "role": "developer",
-        "last_modified": {
-            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-            "date_modified": "2020-07-15T02:59:04.471265+00:00"
-        },
-        "timezone": "US/Eastern",
-        "uuid": "70060f34-ec8f-4c34-a6c3-1b7b9ce8d314",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
-    },
-    {
         "status": "current",
         "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
-        "schema_version": "1",
-        "last_name": "Alver",
+        "role": "developer",
+        "last_name": "Morris",
         "project_roles": [
-            {
-                "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
-                "role": "developer"
-            },
             {
                 "project": "f01ff5be-a72d-43bd-afcf-174fa9dcd282",
                 "role": "developer"
@@ -688,36 +659,36 @@
             {
                 "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
                 "role": "developer"
+            },
+            {
+                "project": "91336042-f277-4f69-97e5-5c8a5f6d6058",
+                "role": "developer"
             }
         ],
+        "submits_for": [
+            "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989"
+        ],
+        "uuid": "70060f34-ec8f-4c34-a6c3-1b7b9ce8d314",
+        "timezone": "US/Eastern"
+    },
+    {
+        "date_created": "2020-07-15T02:26:30.280626+00:00",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "last_modified": {
+            "date_modified": "2020-07-22T02:57:26.562281+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "schema_version": "1",
+        "first_name": "Burak",
         "email": "burak_alver@hms.harvard.edu",
         "groups": [
             "admin"
         ],
-        "first_name": "Burak",
-        "date_created": "2020-07-15T02:26:30.280626+00:00",
-        "submits_for": [
-            "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989"
-        ],
-        "role": "scientist",
-        "last_modified": {
-            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-            "date_modified": "2020-07-15T02:59:04.571247+00:00"
-        },
-        "timezone": "US/Eastern",
-        "uuid": "45524d43-01b5-4b71-94c6-32d2d09c1111",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
-    },
-    {
         "status": "current",
         "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
-        "schema_version": "1",
-        "last_name": "Berg",
+        "role": "scientist",
+        "last_name": "Alver",
         "project_roles": [
-            {
-                "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
-                "role": "developer"
-            },
             {
                 "project": "f01ff5be-a72d-43bd-afcf-174fa9dcd282",
                 "role": "developer"
@@ -725,36 +696,36 @@
             {
                 "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
                 "role": "developer"
+            },
+            {
+                "project": "91336042-f277-4f69-97e5-5c8a5f6d6058",
+                "role": "developer"
             }
         ],
+        "submits_for": [
+            "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989"
+        ],
+        "uuid": "45524d43-01b5-4b71-94c6-32d2d09c1111",
+        "timezone": "US/Eastern"
+    },
+    {
+        "date_created": "2020-07-15T02:26:29.587490+00:00",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "last_modified": {
+            "date_modified": "2020-07-22T02:57:29.010679+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "schema_version": "1",
+        "first_name": "Eric",
         "email": "eric_berg@hms.harvard.edu",
         "groups": [
             "admin"
         ],
-        "first_name": "Eric",
-        "date_created": "2020-07-15T02:26:29.587490+00:00",
-        "submits_for": [
-            "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989"
-        ],
-        "role": "developer",
-        "last_modified": {
-            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-            "date_modified": "2020-07-15T02:59:04.661030+00:00"
-        },
-        "timezone": "US/Eastern",
-        "uuid": "3f0052c9-218d-42e1-94bd-4319d0615681",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
-    },
-    {
         "status": "current",
         "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
-        "schema_version": "1",
-        "last_name": "loadxl",
+        "role": "developer",
+        "last_name": "Berg",
         "project_roles": [
-            {
-                "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
-                "role": "developer"
-            },
             {
                 "project": "f01ff5be-a72d-43bd-afcf-174fa9dcd282",
                 "role": "developer"
@@ -762,37 +733,37 @@
             {
                 "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
                 "role": "developer"
+            },
+            {
+                "project": "91336042-f277-4f69-97e5-5c8a5f6d6058",
+                "role": "developer"
             }
         ],
+        "submits_for": [
+            "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989"
+        ],
+        "uuid": "3f0052c9-218d-42e1-94bd-4319d0615681",
+        "timezone": "US/Eastern"
+    },
+    {
+        "date_created": "2020-01-28T00:00:00.000000+00:00",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "last_modified": {
+            "date_modified": "2020-07-22T02:57:30.082997+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "schema_version": "1",
+        "first_name": "loadxl",
         "email": "loadxl@hms.harvard.edu",
         "groups": [
             "admin"
         ],
-        "first_name": "loadxl",
-        "date_created": "2020-01-28T00:00:00.000000+00:00",
-        "submits_for": [
-            "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989"
-        ],
-        "last_modified": {
-            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-            "date_modified": "2020-07-15T02:59:04.768524+00:00"
-        },
-        "role": "other",
-        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
-        "timezone": "US/Pacific",
-        "uuid": "3202fd57-44d2-44fb-a131-afb1e43d8ae5",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
-    },
-    {
         "status": "current",
         "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
-        "schema_version": "1",
-        "last_name": "Pitman",
+        "role": "other",
+        "last_name": "loadxl",
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
         "project_roles": [
-            {
-                "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
-                "role": "developer"
-            },
             {
                 "project": "f01ff5be-a72d-43bd-afcf-174fa9dcd282",
                 "role": "developer"
@@ -800,37 +771,36 @@
             {
                 "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
                 "role": "developer"
+            },
+            {
+                "project": "91336042-f277-4f69-97e5-5c8a5f6d6058",
+                "role": "developer"
             }
         ],
+        "submits_for": [
+            "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989"
+        ],
+        "uuid": "3202fd57-44d2-44fb-a131-afb1e43d8ae5",
+        "timezone": "US/Pacific"
+    },
+    {
+        "date_created": "2020-07-15T02:26:29.457757+00:00",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "last_modified": {
+            "date_modified": "2020-07-22T02:57:29.160415+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "schema_version": "1",
+        "first_name": "Kent",
         "email": "kent_pitman@hms.harvard.edu",
         "groups": [
             "admin"
         ],
-        "first_name": "Kent",
-        "date_created": "2020-07-15T02:26:29.457757+00:00",
-        "submits_for": [
-            "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989"
-        ],
-        "role": "developer",
-        "last_modified": {
-            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-            "date_modified": "2020-07-15T02:59:04.883676+00:00"
-        },
-        "timezone": "US/Eastern",
-        "uuid": "27d2ac03-7d12-442b-9375-211d3c5c5f97",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
-    },
-    {
         "status": "current",
         "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
-        "email": "soohyun_lee@hms.harvard.edu",
-        "schema_version": "1",
-        "last_name": "Lee",
+        "role": "developer",
+        "last_name": "Pitman",
         "project_roles": [
-            {
-                "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
-                "role": "developer"
-            },
             {
                 "project": "f01ff5be-a72d-43bd-afcf-174fa9dcd282",
                 "role": "developer"
@@ -838,24 +808,53 @@
             {
                 "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
                 "role": "developer"
+            },
+            {
+                "project": "91336042-f277-4f69-97e5-5c8a5f6d6058",
+                "role": "developer"
             }
         ],
-        "email": "duplexa@gmail.com",
-        "groups": [
-            "admin"
-        ],
-        "first_name": "Soo",
-        "date_created": "2020-07-15T02:26:29.969291+00:00",
         "submits_for": [
             "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989"
         ],
-        "role": "scientist",
+        "uuid": "27d2ac03-7d12-442b-9375-211d3c5c5f97",
+        "timezone": "US/Eastern"
+    },
+    {
+        "date_created": "2020-07-15T02:26:29.969291+00:00",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "last_modified": {
-            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-            "date_modified": "2020-07-15T02:59:05.011350+00:00"
+            "date_modified": "2020-07-22T02:57:27.474441+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
         },
-        "timezone": "US/Eastern",
+        "schema_version": "1",
+        "first_name": "Soo",
+        "email": "soohyun_lee@hms.harvard.edu",
+        "groups": [
+            "admin"
+        ],
+        "status": "current",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "role": "scientist",
+        "last_name": "Lee",
+        "project_roles": [
+            {
+                "project": "f01ff5be-a72d-43bd-afcf-174fa9dcd282",
+                "role": "developer"
+            },
+            {
+                "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
+                "role": "developer"
+            },
+            {
+                "project": "91336042-f277-4f69-97e5-5c8a5f6d6058",
+                "role": "developer"
+            }
+        ],
+        "submits_for": [
+            "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989"
+        ],
         "uuid": "1d524d43-01b5-4b71-94c6-32d2d09c8323",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        "timezone": "US/Eastern"
     }
 ]

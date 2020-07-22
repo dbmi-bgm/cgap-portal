@@ -1,362 +1,486 @@
 [
     {
-        "project": "f01ff5be-a72d-43bd-afcf-174fa9dcd282",
-        "processed_files": [
-            "e5dd2ccd-50f0-47c8-aeae-c967129201b6",
-            "88d5fcec-668b-45fd-a384-3182685dd384"
-        ],
-        "library_info": [
-            {
-                "value": "A101",
-                "field": "plate ID"
-            }
-        ],
-        "dna_concentration": "100 ng/uL",
-        "files": [
-            "c4306817-f6e6-4e9e-8e90-70e3cf1f1af4",
-            "b1574039-421b-4eb5-b19e-3e24b89443f0"
-        ],
-        "date_requisition_received": "2019-01-01",
-        "specimen_accepted": "Yes",
-        "bam_sample_id": "NA24143_sample",
         "date_created": "2020-07-15T02:38:33.602131+00:00",
+        "requisition_type": "BioBank",
+        "schema_version": "1",
+        "specimen_accession_date": "2019-01-02",
+        "specimen_collection_date": "2019-01-06",
         "other_specimen_ids": [
             {
                 "id_type": "BCGG-ID",
                 "id": "99101"
             }
         ],
-        "sequence_id": "BAE2101",
-        "indication": "Not specified",
-        "requisition_type": "BioBank",
-        "aliases": [
-            "cgap:NA24143_sample"
-        ],
-        "uuid": "f41d8f1c-2508-4a76-bec4-b074641000fa",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-        "status": "released",
+        "dna_concentration": "100 ng/uL",
         "sequencing_date": "2019-01-10",
-        "specimen_accession_date": "2019-01-02",
-        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
-        "accession": "GAPSALYLZ7YL",
-        "date_received": "2019-03-08",
-        "specimen_type": "blood",
-        "transported_by": "FedEx",
-        "specimen_collection_date": "2019-01-06",
+        "date_requisition_received": "2019-01-01",
+        "workup_type": "WGS",
+        "indication": "Not specified",
         "completed_processes": [
             "WGS_partI_V11"
         ],
-        "workup_type": "WGS",
-        "date_transported": "2019-01-07",
-        "schema_version": "1",
+        "processed_files": [
+            "e5dd2ccd-50f0-47c8-aeae-c967129201b6",
+            "88d5fcec-668b-45fd-a384-3182685dd384"
+        ],
+        "bam_sample_id": "NA24143_sample",
+        "date_received": "2019-03-08",
         "requisition_acceptance": {
             "accepted_rejected": "Accepted",
-            "date_completed": "2019-01-05",
-            "date_sent": "2019-01-04"
+            "date_sent": "2019-01-04",
+            "date_completed": "2019-01-05"
         },
+        "date_transported": "2019-01-07",
         "last_modified": {
-            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-            "date_modified": "2020-07-15T02:42:50.336168+00:00"
-        }
-    },
-    {
-        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
-        "processed_files": [
-            "93f9cefb-c30e-4b03-8e2b-3215a72c5dd9",
-            "14ca4678-05a9-48b7-b225-374dee54cccb"
+            "date_modified": "2020-07-15T02:42:50.336168+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "accession": "GAPSALYLZ7YL",
+        "transported_by": "FedEx",
+        "sequence_id": "BAE2101",
+        "uuid": "f41d8f1c-2508-4a76-bec4-b074641000fa",
+        "specimen_type": "blood",
+        "status": "released",
+        "project": "f01ff5be-a72d-43bd-afcf-174fa9dcd282",
+        "specimen_accepted": "Yes",
+        "files": [
+            "c4306817-f6e6-4e9e-8e90-70e3cf1f1af4",
+            "b1574039-421b-4eb5-b19e-3e24b89443f0"
+        ],
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "aliases": [
+            "cgap:NA24143_sample"
         ],
         "library_info": [
             {
-                "value": "A201",
-                "field": "plate ID"
+                "field": "plate ID",
+                "value": "A101"
             }
-        ],
-        "dna_concentration": "80 ng/uL",
-        "files": [
-            "5b49ade0-7299-44a1-bcc8-9c2b6e32516c",
-            "a9f52239-712a-485b-9eb2-b3bcdcbfae77"
-        ],
-        "date_requisition_received": "2019-03-01",
-        "specimen_accepted": "Yes",
-        "bam_sample_id": "NA12878_sample",
+        ]
+    },
+    {
         "date_created": "2020-07-15T02:38:33.885703+00:00",
+        "requisition_type": "BioBank",
+        "schema_version": "1",
+        "specimen_accession_date": "2019-03-02",
+        "specimen_collection_date": "2019-03-06",
         "other_specimen_ids": [
             {
                 "id_type": "BCGG-ID",
                 "id": "99201"
             }
         ],
-        "sequence_id": "BAE2201",
-        "indication": "Not specified",
-        "requisition_type": "BioBank",
-        "aliases": [
-            "cgap:NA12878_sample"
-        ],
-        "uuid": "f0add14e-42b8-4f6f-9867-22506b45bd27",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-        "status": "released",
+        "dna_concentration": "80 ng/uL",
         "sequencing_date": "2019-03-10",
-        "specimen_accession_date": "2019-03-02",
-        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
-        "accession": "GAPSAER8DDOY",
-        "date_received": "2019-03-08",
-        "specimen_type": "blood",
-        "transported_by": "FedEx",
-        "specimen_collection_date": "2019-03-06",
+        "date_requisition_received": "2019-03-01",
+        "workup_type": "WGS",
+        "indication": "Not specified",
         "completed_processes": [
             "WGS_partI_V11"
         ],
-        "workup_type": "WGS",
-        "date_transported": "2019-03-07",
-        "schema_version": "1",
+        "processed_files": [
+            "93f9cefb-c30e-4b03-8e2b-3215a72c5dd9",
+            "14ca4678-05a9-48b7-b225-374dee54cccb"
+        ],
+        "bam_sample_id": "NA12878_sample",
+        "date_received": "2019-03-08",
         "requisition_acceptance": {
             "accepted_rejected": "Accepted",
-            "date_completed": "2019-03-05",
-            "date_sent": "2019-03-04"
+            "date_sent": "2019-03-04",
+            "date_completed": "2019-03-05"
         },
+        "date_transported": "2019-03-07",
         "last_modified": {
-            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-            "date_modified": "2020-07-15T02:42:50.489725+00:00"
-        }
-    },
-    {
+            "date_modified": "2020-07-15T02:42:50.489725+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "accession": "GAPSAER8DDOY",
+        "transported_by": "FedEx",
+        "sequence_id": "BAE2201",
+        "uuid": "f0add14e-42b8-4f6f-9867-22506b45bd27",
+        "specimen_type": "blood",
+        "status": "released",
         "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
-        "processed_files": [
-            "f573cbeb-036c-4348-bed7-27a108126d09",
-            "7966b49e-8c78-4df7-9433-c2548be23088"
+        "specimen_accepted": "Yes",
+        "files": [
+            "5b49ade0-7299-44a1-bcc8-9c2b6e32516c",
+            "a9f52239-712a-485b-9eb2-b3bcdcbfae77"
+        ],
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "aliases": [
+            "cgap:NA12878_sample"
         ],
         "library_info": [
             {
-                "value": "A202",
-                "field": "plate ID"
+                "field": "plate ID",
+                "value": "A201"
             }
+        ]
+    },
+    {
+        "date_created": "2020-07-21T17:33:07.248246+00:00",
+        "last_modified": {
+            "date_modified": "2020-07-21T20:01:32.501306+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "accession": "GAPSAT8883UV",
+        "schema_version": "1",
+        "completed_processes": [
+            "WGS_partI_V11"
         ],
-        "dna_concentration": "80 ng/uL",
+        "specimen_type": "blood",
+        "status": "released",
+        "project": "91336042-f277-4f69-97e5-5c8a5f6d6058",
         "files": [
-            "00735f91-c5fd-4d63-84fd-0ef6c460abc4",
-            "d7e176e7-a7ed-4d20-aa4f-8dc25a73a3c7"
+            "94a76279-15a4-40fa-9e53-8efab5ca83f4",
+            "346e2366-b9c8-4de8-a3c2-923151bf37c3"
         ],
-        "date_requisition_received": "2019-03-01",
-        "specimen_accepted": "Yes",
-        "bam_sample_id": "NA12877_sample",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "institution": "828cd4fe-ebb0-4b36-ccbb-d2e3a36ca234",
+        "aliases": [
+            "cgap:UDN191434_sample"
+        ],
+        "processed_files": [
+            "05322531-1372-4432-aa76-10522d4656fd",
+            "874cbd4d-509e-4889-bab9-84ca4bc92f0d"
+        ],
+        "bam_sample_id": "UDN191434_sample",
+        "uuid": "cacc5929-216c-4bbd-9686-aad111d81561",
+        "workup_type": "WGS"
+    },
+    {
         "date_created": "2020-07-15T02:38:34.250552+00:00",
+        "requisition_type": "BioBank",
+        "schema_version": "1",
+        "specimen_accession_date": "2019-03-02",
+        "specimen_collection_date": "2019-03-06",
         "other_specimen_ids": [
             {
                 "id_type": "BCGG-ID",
                 "id": "99202"
             }
         ],
-        "sequence_id": "BAE2202",
-        "indication": "Not specified",
-        "requisition_type": "BioBank",
-        "aliases": [
-            "cgap:NA12877_sample"
-        ],
-        "uuid": "c47f57d8-0cdc-49c7-a183-83182c64d2b1",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-        "status": "released",
+        "dna_concentration": "80 ng/uL",
         "sequencing_date": "2019-03-10",
-        "specimen_accession_date": "2019-03-02",
-        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
-        "accession": "GAPSAGFNU47D",
-        "date_received": "2019-03-08",
-        "specimen_type": "blood",
-        "transported_by": "FedEx",
-        "specimen_collection_date": "2019-03-06",
+        "date_requisition_received": "2019-03-01",
+        "workup_type": "WGS",
+        "indication": "Not specified",
         "completed_processes": [
             "WGS_partI_V11"
         ],
-        "workup_type": "WGS",
-        "date_transported": "2019-03-07",
-        "schema_version": "1",
+        "processed_files": [
+            "f573cbeb-036c-4348-bed7-27a108126d09",
+            "7966b49e-8c78-4df7-9433-c2548be23088"
+        ],
+        "bam_sample_id": "NA12877_sample",
+        "date_received": "2019-03-08",
         "requisition_acceptance": {
             "accepted_rejected": "Accepted",
-            "date_completed": "2019-03-05",
-            "date_sent": "2019-03-04"
+            "date_sent": "2019-03-04",
+            "date_completed": "2019-03-05"
         },
+        "date_transported": "2019-03-07",
         "last_modified": {
-            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-            "date_modified": "2020-07-15T02:42:50.685734+00:00"
-        }
-    },
-    {
+            "date_modified": "2020-07-15T02:42:50.685734+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "accession": "GAPSAGFNU47D",
+        "transported_by": "FedEx",
+        "sequence_id": "BAE2202",
+        "uuid": "c47f57d8-0cdc-49c7-a183-83182c64d2b1",
+        "specimen_type": "blood",
+        "status": "released",
         "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
-        "processed_files": [
-            "f50655c9-e3ad-4110-8c56-5ad905b2cddc",
-            "82b54421-d76d-4383-b49b-607d68cd703e"
+        "specimen_accepted": "Yes",
+        "files": [
+            "00735f91-c5fd-4d63-84fd-0ef6c460abc4",
+            "d7e176e7-a7ed-4d20-aa4f-8dc25a73a3c7"
+        ],
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "aliases": [
+            "cgap:NA12877_sample"
         ],
         "library_info": [
             {
-                "value": "A203",
-                "field": "plate ID"
+                "field": "plate ID",
+                "value": "A202"
             }
-        ],
-        "dna_concentration": "85 ng/uL",
-        "files": [
-            "11318a6f-c9eb-433b-844d-20fa46f66a59",
-            "d2dcb300-84d8-4b89-9af0-eb75c75226f8"
-        ],
-        "date_requisition_received": "2019-03-01",
-        "specimen_accepted": "Yes",
-        "bam_sample_id": "NA12879_sample",
+        ]
+    },
+    {
         "date_created": "2020-07-15T02:38:34.643643+00:00",
+        "requisition_type": "BioBank",
+        "schema_version": "1",
+        "specimen_accession_date": "2019-03-02",
+        "specimen_collection_date": "2019-03-06",
         "other_specimen_ids": [
             {
                 "id_type": "BCGG-ID",
                 "id": "99203"
             }
         ],
-        "sequence_id": "BAE2203",
+        "dna_concentration": "85 ng/uL",
+        "sequencing_date": "2019-03-10",
+        "date_requisition_received": "2019-03-01",
+        "workup_type": "WGS",
         "indication": "Not specified",
-        "requisition_type": "BioBank",
+        "completed_processes": [
+            "WGS_partI_V11"
+        ],
+        "processed_files": [
+            "f50655c9-e3ad-4110-8c56-5ad905b2cddc",
+            "82b54421-d76d-4383-b49b-607d68cd703e"
+        ],
+        "bam_sample_id": "NA12879_sample",
+        "date_received": "2019-03-08",
+        "requisition_acceptance": {
+            "accepted_rejected": "Accepted",
+            "date_sent": "2019-03-04",
+            "date_completed": "2019-03-05"
+        },
+        "date_transported": "2019-03-07",
+        "last_modified": {
+            "date_modified": "2020-07-15T02:42:50.844914+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "accession": "GAPSAT5GKNCF",
+        "transported_by": "FedEx",
+        "sequence_id": "BAE2203",
+        "uuid": "b26ea811-8430-45aa-9cf0-b365e3024b70",
+        "specimen_type": "blood",
+        "status": "released",
+        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
+        "specimen_accepted": "Yes",
+        "files": [
+            "11318a6f-c9eb-433b-844d-20fa46f66a59",
+            "d2dcb300-84d8-4b89-9af0-eb75c75226f8"
+        ],
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
         "aliases": [
             "cgap:NA12879_sample"
         ],
-        "uuid": "b26ea811-8430-45aa-9cf0-b365e3024b70",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-        "status": "released",
-        "sequencing_date": "2019-03-10",
-        "specimen_accession_date": "2019-03-02",
-        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
-        "accession": "GAPSAT5GKNCF",
-        "date_received": "2019-03-08",
-        "specimen_type": "blood",
-        "transported_by": "FedEx",
-        "specimen_collection_date": "2019-03-06",
+        "library_info": [
+            {
+                "field": "plate ID",
+                "value": "A203"
+            }
+        ]
+    },
+    {
+        "date_created": "2020-07-21T17:33:07.681063+00:00",
+        "last_modified": {
+            "date_modified": "2020-07-21T20:01:10.780908+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "accession": "GAPSAGS6JV6O",
+        "schema_version": "1",
         "completed_processes": [
             "WGS_partI_V11"
         ],
-        "workup_type": "WGS",
-        "date_transported": "2019-03-07",
-        "schema_version": "1",
-        "requisition_acceptance": {
-            "accepted_rejected": "Accepted",
-            "date_completed": "2019-03-05",
-            "date_sent": "2019-03-04"
-        },
-        "last_modified": {
-            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-            "date_modified": "2020-07-15T02:42:50.844914+00:00"
-        }
-    },
-    {
-        "project": "f01ff5be-a72d-43bd-afcf-174fa9dcd282",
-        "processed_files": [
-            "b49682db-bbea-4d5d-b376-0f68e5e3e4a8",
-            "80492971-5645-4036-a943-3a55d0705a55"
-        ],
-        "library_info": [
-            {
-                "value": "A102",
-                "field": "plate ID"
-            }
-        ],
-        "dna_concentration": "75 ng/uL",
+        "specimen_type": "blood",
+        "status": "released",
+        "project": "91336042-f277-4f69-97e5-5c8a5f6d6058",
         "files": [
-            "4b6e5f84-4d62-4883-9c0d-981f12c9e26b",
-            "d590fb80-f5e2-41cb-9fd3-48b382e32fb9"
+            "3485b1df-67fa-4804-b8a1-39a3c77f88e4",
+            "ceeb71d2-d769-47fd-9d50-27e862a7ab6a"
         ],
-        "date_requisition_received": "2019-01-01",
-        "specimen_accepted": "Yes",
-        "bam_sample_id": "NA24149_sample",
-        "date_created": "2020-07-15T02:38:34.924344+00:00",
-        "other_specimen_ids": [
-            {
-                "id_type": "BCGG-ID",
-                "id": "99102"
-            }
-        ],
-        "sequence_id": "BAE2102",
-        "indication": "Not specified",
-        "requisition_type": "BioBank",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "institution": "828cd4fe-ebb0-4b36-ccbb-d2e3a36ca234",
         "aliases": [
-            "cgap:NA24149_sample"
+            "cgap:UDN687271_sample"
         ],
-        "uuid": "a4c0c1da-df72-4a05-a5b6-5725a7735b5c",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-        "status": "released",
-        "sequencing_date": "2019-01-10",
-        "specimen_accession_date": "2019-01-02",
-        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
-        "accession": "GAPSAWMFIMJ5",
-        "date_received": "2019-03-08",
-        "specimen_type": "blood",
-        "transported_by": "FedEx",
-        "specimen_collection_date": "2019-01-06",
+        "processed_files": [
+            "e38c51a7-fb38-4222-81a9-e486c1f89c4a",
+            "e740a6c4-e0f7-41f4-be5d-738f5536886c"
+        ],
+        "bam_sample_id": "UDN687271_sample",
+        "uuid": "a70abd5e-7a32-4f3e-abb2-b37dc9a01373",
+        "workup_type": "WGS"
+    },
+    {
+        "date_created": "2020-07-21T17:33:07.987238+00:00",
+        "last_modified": {
+            "date_modified": "2020-07-21T20:00:53.687325+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "accession": "GAPSAWNMQVPA",
+        "schema_version": "1",
         "completed_processes": [
             "WGS_partI_V11"
         ],
-        "workup_type": "WGS",
-        "date_transported": "2019-01-07",
-        "schema_version": "1",
-        "requisition_acceptance": {
-            "accepted_rejected": "Accepted",
-            "date_completed": "2019-01-05",
-            "date_sent": "2019-01-04"
-        },
-        "last_modified": {
-            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-            "date_modified": "2020-07-15T02:42:51.004231+00:00"
-        }
+        "specimen_type": "blood",
+        "status": "released",
+        "project": "91336042-f277-4f69-97e5-5c8a5f6d6058",
+        "files": [
+            "621f17da-d596-40f7-af97-dcfb80ba6167",
+            "e63e3595-744b-44c0-922a-d8edd28ade27"
+        ],
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "institution": "828cd4fe-ebb0-4b36-ccbb-d2e3a36ca234",
+        "aliases": [
+            "cgap:UDN452807_sample"
+        ],
+        "processed_files": [
+            "b0abc318-2cce-4760-9809-1e41cbb85f63",
+            "48b8378d-50d8-44bf-90b7-846d3f8f0be2"
+        ],
+        "bam_sample_id": "UDN452807_sample",
+        "uuid": "a4cecf10-5eee-4f78-b094-3ea8a55a5a3b",
+        "workup_type": "WGS"
     },
     {
-        "project": "f01ff5be-a72d-43bd-afcf-174fa9dcd282",
-        "processed_files": [
-            "0eadbe82-ae79-4d49-ad85-501b0573c2ce",
-            "30308414-fa4e-4347-b964-3642f8bd0b6a"
-        ],
-        "library_info": [
-            {
-                "value": "A103",
-                "field": "plate ID"
-            }
-        ],
-        "dna_concentration": "90 ng/uL",
-        "files": [
-            "a4ea498b-d1af-4053-b485-92e810ba9060",
-            "9015950c-0e1d-4066-924e-b197759f50c9"
-        ],
-        "date_requisition_received": "2019-01-01",
-        "specimen_accepted": "Yes",
-        "bam_sample_id": "NA24385_sample",
         "date_created": "2020-07-15T02:38:35.270300+00:00",
+        "requisition_type": "BioBank",
+        "schema_version": "1",
+        "specimen_accession_date": "2019-01-02",
+        "specimen_collection_date": "2019-01-06",
         "other_specimen_ids": [
             {
                 "id_type": "BCGG-ID",
                 "id": "99103"
             }
         ],
-        "sequence_id": "BAE2103",
-        "indication": "Not specified",
-        "requisition_type": "BioBank",
-        "aliases": [
-            "cgap:NA24385_sample"
-        ],
-        "uuid": "84bef6f5-fdb2-463c-857a-559c747698e1",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-        "status": "released",
+        "dna_concentration": "90 ng/uL",
         "sequencing_date": "2019-01-10",
-        "specimen_accession_date": "2019-01-02",
-        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
-        "accession": "GAPSAZON42TE",
-        "date_received": "2019-03-08",
-        "specimen_type": "blood",
-        "transported_by": "FedEx",
-        "specimen_collection_date": "2019-01-06",
+        "date_requisition_received": "2019-01-01",
+        "workup_type": "WGS",
+        "indication": "Not specified",
         "completed_processes": [
             "WGS_partI_V11"
         ],
-        "workup_type": "WGS",
-        "date_transported": "2019-01-07",
-        "schema_version": "1",
+        "processed_files": [
+            "0eadbe82-ae79-4d49-ad85-501b0573c2ce",
+            "30308414-fa4e-4347-b964-3642f8bd0b6a"
+        ],
+        "bam_sample_id": "NA24385_sample",
+        "date_received": "2019-03-08",
         "requisition_acceptance": {
             "accepted_rejected": "Accepted",
-            "date_completed": "2019-01-05",
-            "date_sent": "2019-01-04"
+            "date_sent": "2019-01-04",
+            "date_completed": "2019-01-05"
         },
+        "date_transported": "2019-01-07",
         "last_modified": {
-            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-            "date_modified": "2020-07-15T02:42:51.145236+00:00"
-        }
+            "date_modified": "2020-07-15T02:42:51.145236+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "accession": "GAPSAZON42TE",
+        "transported_by": "FedEx",
+        "sequence_id": "BAE2103",
+        "uuid": "84bef6f5-fdb2-463c-857a-559c747698e1",
+        "specimen_type": "blood",
+        "status": "released",
+        "project": "f01ff5be-a72d-43bd-afcf-174fa9dcd282",
+        "specimen_accepted": "Yes",
+        "files": [
+            "a4ea498b-d1af-4053-b485-92e810ba9060",
+            "9015950c-0e1d-4066-924e-b197759f50c9"
+        ],
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "aliases": [
+            "cgap:NA24385_sample"
+        ],
+        "library_info": [
+            {
+                "field": "plate ID",
+                "value": "A103"
+            }
+        ]
+    },
+    {
+        "date_created": "2020-07-21T17:33:08.263739+00:00",
+        "last_modified": {
+            "date_modified": "2020-07-21T20:00:37.568634+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "accession": "GAPSAXFL78HB",
+        "schema_version": "1",
+        "completed_processes": [
+            "WGS_partI_V11"
+        ],
+        "specimen_type": "blood",
+        "status": "released",
+        "project": "91336042-f277-4f69-97e5-5c8a5f6d6058",
+        "files": [
+            "bd082eb8-4c87-418d-88fd-97b38cade26a",
+            "2cc8b0c7-17d7-4666-8468-d60ac0081e77"
+        ],
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "institution": "828cd4fe-ebb0-4b36-ccbb-d2e3a36ca234",
+        "aliases": [
+            "cgap:UDN287108_sample"
+        ],
+        "processed_files": [
+            "40eb5638-4088-470e-9f7d-8b008150cc9c",
+            "29f42804-adf7-4ca1-8c74-5874d9370356"
+        ],
+        "bam_sample_id": "UDN287108_sample",
+        "uuid": "0e06e761-bc1b-498c-a82a-9a4aa1fffc48",
+        "workup_type": "WGS"
+    },
+    {
+        "date_created": "2020-07-15T02:38:34.924344+00:00",
+        "requisition_type": "BioBank",
+        "schema_version": "1",
+        "specimen_accession_date": "2019-01-02",
+        "specimen_collection_date": "2019-01-06",
+        "other_specimen_ids": [
+            {
+                "id_type": "BCGG-ID",
+                "id": "99102"
+            }
+        ],
+        "dna_concentration": "75 ng/uL",
+        "sequencing_date": "2019-01-10",
+        "date_requisition_received": "2019-01-01",
+        "workup_type": "WGS",
+        "indication": "Not specified",
+        "completed_processes": [
+            "WGS_partI_V11"
+        ],
+        "processed_files": [
+            "b49682db-bbea-4d5d-b376-0f68e5e3e4a8",
+            "80492971-5645-4036-a943-3a55d0705a55"
+        ],
+        "bam_sample_id": "NA24149_sample",
+        "date_received": "2019-03-08",
+        "requisition_acceptance": {
+            "accepted_rejected": "Accepted",
+            "date_sent": "2019-01-04",
+            "date_completed": "2019-01-05"
+        },
+        "date_transported": "2019-01-07",
+        "last_modified": {
+            "date_modified": "2020-07-15T02:42:51.004231+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "accession": "GAPSAWMFIMJ5",
+        "transported_by": "FedEx",
+        "sequence_id": "BAE2102",
+        "uuid": "a4c0c1da-df72-4a05-a5b6-5725a7735b5c",
+        "specimen_type": "blood",
+        "status": "released",
+        "project": "f01ff5be-a72d-43bd-afcf-174fa9dcd282",
+        "specimen_accepted": "Yes",
+        "files": [
+            "4b6e5f84-4d62-4883-9c0d-981f12c9e26b",
+            "d590fb80-f5e2-41cb-9fd3-48b382e32fb9"
+        ],
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "aliases": [
+            "cgap:NA24149_sample"
+        ],
+        "library_info": [
+            {
+                "field": "plate ID",
+                "value": "A102"
+            }
+        ]
     }
 ]

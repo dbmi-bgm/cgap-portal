@@ -1,1112 +1,1532 @@
 [
     {
-        "status": "released",
-        "url": "https://tibanna-output.s3.amazonaws.com/lAjGcLCvBwsj.metrics/metrics.html",
-        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
-        "schema_version": "1",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "overall_quality_status": "PASS",
-        "uuid": "bb824030-446b-43e6-a502-d0fe245e0c7c",
-        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
         "date_created": "2020-07-15T02:38:36.881159+00:00",
-        "last_modified": {
-            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-            "date_modified": "2020-07-15T02:42:55.795000+00:00"
-        }
-    },
-    {
-        "status": "in review",
-        "url": "https://tibanna-output.s3.amazonaws.com/FgD9rjjeneFf.metrics/metrics.html",
-        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
-        "schema_version": "1",
-        "submitted_by": "b041dba8-e2b2-4e54-a621-97edb508a0c4",
-        "overall_quality_status": "PASS",
-        "uuid": "9b3232a8-785a-4838-861c-0e71faa23497",
-        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
-        "date_created": "2020-06-26T19:26:57.475510+00:00",
-        "last_modified": {
-            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-            "date_modified": "2020-07-16T00:05:04.024706+00:00"
-        }
-    },
-    {
-        "status": "in review",
-        "url": "https://tibanna-output.s3.amazonaws.com/xa33jrzaCSiB.metrics/metrics.html",
-        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
-        "schema_version": "1",
+        "url": "https://tibanna-output.s3.amazonaws.com/lAjGcLCvBwsj.metrics/metrics.html",
         "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-        "overall_quality_status": "PASS",
-        "uuid": "49206384-c7de-4f19-bf4d-d5c1b179921e",
         "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "schema_version": "1",
+        "last_modified": {
+            "date_modified": "2020-07-15T02:42:55.795000+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "status": "released",
+        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
+        "uuid": "bb824030-446b-43e6-a502-d0fe245e0c7c"
+    },
+    {
+        "overall_quality_status": "PASS",
         "date_created": "2020-07-15T02:38:37.156559+00:00",
+        "url": "https://tibanna-output.s3.amazonaws.com/xa33jrzaCSiB.metrics/metrics.html",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "schema_version": "1",
         "last_modified": {
-            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-            "date_modified": "2020-07-15T02:42:55.888978+00:00"
-        }
+            "date_modified": "2020-07-15T02:42:55.888978+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "status": "in review",
+        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
+        "uuid": "49206384-c7de-4f19-bf4d-d5c1b179921e"
     },
     {
-        "status": "released",
-        "url": "https://tibanna-output.s3.amazonaws.com/HgvZkHhJ4lUN.metrics/metrics.html",
-        "project": "f01ff5be-a72d-43bd-afcf-174fa9dcd282",
-        "schema_version": "1",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "overall_quality_status": "PASS",
-        "uuid": "2a817497-0d49-47c5-a232-d05cab53d1fb",
-        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
         "date_created": "2020-07-15T02:38:37.412895+00:00",
+        "url": "https://tibanna-output.s3.amazonaws.com/HgvZkHhJ4lUN.metrics/metrics.html",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "schema_version": "1",
         "last_modified": {
-            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-            "date_modified": "2020-07-15T02:42:55.992953+00:00"
-        }
-    },
-    {
+            "date_modified": "2020-07-15T02:42:55.992953+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
         "status": "released",
-        "url": "https://tibanna-output.s3.amazonaws.com/zFJRFRInkEOT.metrics/metrics.html",
         "project": "f01ff5be-a72d-43bd-afcf-174fa9dcd282",
-        "schema_version": "1",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-        "overall_quality_status": "PASS",
-        "uuid": "f21638d4-056b-478c-9fcf-3da547c657d1",
-        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
-        "date_created": "2020-07-15T02:38:37.668037+00:00",
-        "last_modified": {
-            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-            "date_modified": "2020-07-15T02:42:56.094581+00:00"
-        }
+        "uuid": "2a817497-0d49-47c5-a232-d05cab53d1fb"
     },
     {
-        "status": "released",
-        "url": "https://tibanna-output.s3.amazonaws.com/IUaYtGHleFep.metrics/metrics.html",
-        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
-        "schema_version": "1",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "overall_quality_status": "PASS",
-        "uuid": "ed55c8c3-5b5d-4f03-9508-9c3513706b83",
-        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
-        "date_created": "2020-07-15T02:38:37.927636+00:00",
+        "date_created": "2020-06-26T19:26:57.475510+00:00",
+        "url": "https://tibanna-output.s3.amazonaws.com/FgD9rjjeneFf.metrics/metrics.html",
+        "submitted_by": "b041dba8-e2b2-4e54-a621-97edb508a0c4",
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "schema_version": "1",
         "last_modified": {
-            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-            "date_modified": "2020-07-15T02:42:56.207621+00:00"
-        }
+            "date_modified": "2020-07-16T00:05:04.024706+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "status": "in review",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "uuid": "9b3232a8-785a-4838-861c-0e71faa23497"
     },
     {
-        "status": "released",
-        "url": "https://tibanna-output.s3.amazonaws.com/GMyUKSzquLDr.metrics/metrics.html",
-        "project": "f01ff5be-a72d-43bd-afcf-174fa9dcd282",
-        "schema_version": "1",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "overall_quality_status": "PASS",
-        "uuid": "e3e90864-7ab3-46dc-930f-80fd4d76c403",
-        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
-        "date_created": "2020-07-15T02:38:38.210800+00:00",
+        "date_created": "2020-07-21T17:33:38.425999+00:00",
+        "url": "https://tibanna-output.s3.amazonaws.com/sO0RaIAfafuZ.metrics/metrics.html",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "institution": "828cd4fe-ebb0-4b36-ccbb-d2e3a36ca234",
+        "schema_version": "1",
         "last_modified": {
-            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-            "date_modified": "2020-07-15T02:42:56.316982+00:00"
-        }
+            "date_modified": "2020-07-21T18:00:19.221528+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "status": "in review",
+        "project": "91336042-f277-4f69-97e5-5c8a5f6d6058",
+        "uuid": "ffd13602-2bf0-49cc-8388-58c081ca8136"
     },
     {
-        "status": "released",
-        "url": "https://tibanna-output.s3.amazonaws.com/d1qxts7ocvmB.metrics/metrics.html",
-        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
-        "schema_version": "1",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "overall_quality_status": "PASS",
-        "uuid": "de0c8bd0-cd95-4dfa-9fb6-eebfaa450db9",
-        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
         "date_created": "2020-07-15T02:38:38.475012+00:00",
+        "url": "https://tibanna-output.s3.amazonaws.com/d1qxts7ocvmB.metrics/metrics.html",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "schema_version": "1",
         "last_modified": {
-            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-            "date_modified": "2020-07-15T02:42:56.432255+00:00"
-        }
+            "date_modified": "2020-07-15T02:42:56.432255+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "status": "released",
+        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
+        "uuid": "de0c8bd0-cd95-4dfa-9fb6-eebfaa450db9"
     },
     {
-        "status": "released",
-        "url": "https://tibanna-output.s3.amazonaws.com/acHLQnkcfO56.metrics/metrics.html",
-        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
-        "schema_version": "1",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "overall_quality_status": "PASS",
-        "uuid": "ddf67724-39f4-4e96-8ba2-454b3042da50",
-        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
         "date_created": "2020-07-15T02:38:38.720021+00:00",
+        "url": "https://tibanna-output.s3.amazonaws.com/acHLQnkcfO56.metrics/metrics.html",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "schema_version": "1",
         "last_modified": {
-            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-            "date_modified": "2020-07-15T02:42:56.556791+00:00"
-        }
-    },
-    {
+            "date_modified": "2020-07-15T02:42:56.556791+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
         "status": "released",
-        "url": "https://tibanna-output.s3.amazonaws.com/su1Sh4OHWDqs.metrics/metrics.html",
         "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
-        "schema_version": "1",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-        "overall_quality_status": "PASS",
-        "uuid": "daa6d41e-bbc0-43c5-a47c-25ac782b188e",
-        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
-        "date_created": "2020-07-15T02:38:38.951193+00:00",
-        "last_modified": {
-            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-            "date_modified": "2020-07-15T02:42:56.788286+00:00"
-        }
+        "uuid": "ddf67724-39f4-4e96-8ba2-454b3042da50"
     },
     {
-        "status": "released",
-        "url": "https://tibanna-output.s3.amazonaws.com/L9NjqUA5zsoe.metrics/metrics.html",
-        "project": "f01ff5be-a72d-43bd-afcf-174fa9dcd282",
-        "schema_version": "1",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "overall_quality_status": "PASS",
-        "uuid": "cc9fe7df-cef6-44d7-b2b3-e7b652d1ae7d",
-        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
-        "date_created": "2020-07-15T02:38:39.222496+00:00",
-        "last_modified": {
-            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-            "date_modified": "2020-07-15T02:42:56.916792+00:00"
-        }
-    },
-    {
-        "status": "released",
-        "url": "https://tibanna-output.s3.amazonaws.com/sNVhYyJsSj10.metrics/metrics.html",
-        "project": "f01ff5be-a72d-43bd-afcf-174fa9dcd282",
-        "schema_version": "1",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-        "overall_quality_status": "PASS",
-        "uuid": "cb84cdff-3fd4-45df-bb2c-afeae42e5dd5",
-        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
         "date_created": "2020-07-15T02:38:39.438631+00:00",
+        "url": "https://tibanna-output.s3.amazonaws.com/sNVhYyJsSj10.metrics/metrics.html",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "schema_version": "1",
         "last_modified": {
-            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-            "date_modified": "2020-07-15T02:42:57.053968+00:00"
-        }
-    },
-    {
+            "date_modified": "2020-07-15T02:42:57.053968+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
         "status": "released",
-        "url": "https://tibanna-output.s3.amazonaws.com/wrSt62Bv547I.metrics/metrics.html",
         "project": "f01ff5be-a72d-43bd-afcf-174fa9dcd282",
-        "schema_version": "1",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-        "overall_quality_status": "PASS",
-        "uuid": "ca540f2b-a25f-401a-b0ce-475293e5830c",
-        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
-        "date_created": "2020-07-15T02:38:39.665338+00:00",
-        "last_modified": {
-            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-            "date_modified": "2020-07-15T02:42:57.155851+00:00"
-        }
+        "uuid": "cb84cdff-3fd4-45df-bb2c-afeae42e5dd5"
     },
     {
-        "status": "released",
-        "url": "https://tibanna-output.s3.amazonaws.com/oC7kM9t2BXLP.metrics/metrics.html",
-        "project": "f01ff5be-a72d-43bd-afcf-174fa9dcd282",
-        "schema_version": "1",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "overall_quality_status": "PASS",
-        "uuid": "c77aaac1-256a-460c-a6d5-58491b58abaa",
-        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
-        "date_created": "2020-07-15T02:38:39.913915+00:00",
-        "last_modified": {
-            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-            "date_modified": "2020-07-15T02:42:57.279911+00:00"
-        }
-    },
-    {
-        "status": "released",
-        "url": "https://tibanna-output.s3.amazonaws.com/StJeQXDNiWTh.metrics/metrics.html",
-        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
-        "schema_version": "1",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-        "overall_quality_status": "PASS",
-        "uuid": "be61df1a-dade-4972-b1aa-81f633260907",
-        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
         "date_created": "2020-07-15T02:38:40.172226+00:00",
+        "url": "https://tibanna-output.s3.amazonaws.com/StJeQXDNiWTh.metrics/metrics.html",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "schema_version": "1",
         "last_modified": {
-            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-            "date_modified": "2020-07-15T02:42:57.426870+00:00"
-        }
+            "date_modified": "2020-07-15T02:42:57.426870+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "status": "released",
+        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
+        "uuid": "be61df1a-dade-4972-b1aa-81f633260907"
     },
     {
-        "status": "released",
-        "url": "https://tibanna-output.s3.amazonaws.com/zDQ8IZ4Jy4n8.metrics/metrics.html",
-        "project": "f01ff5be-a72d-43bd-afcf-174fa9dcd282",
-        "schema_version": "1",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "overall_quality_status": "PASS",
-        "uuid": "be2528e6-7830-4c77-9b1c-b716ca647c10",
-        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
         "date_created": "2020-07-15T02:38:40.427756+00:00",
+        "url": "https://tibanna-output.s3.amazonaws.com/zDQ8IZ4Jy4n8.metrics/metrics.html",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "schema_version": "1",
         "last_modified": {
-            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-            "date_modified": "2020-07-15T02:42:57.567378+00:00"
-        }
+            "date_modified": "2020-07-15T02:42:57.567378+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "status": "released",
+        "project": "f01ff5be-a72d-43bd-afcf-174fa9dcd282",
+        "uuid": "be2528e6-7830-4c77-9b1c-b716ca647c10"
     },
     {
-        "status": "released",
-        "url": "https://tibanna-output.s3.amazonaws.com/0wDKO96gWF1G.metrics/metrics.html",
-        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
-        "schema_version": "1",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "overall_quality_status": "PASS",
-        "uuid": "b58cf74b-4460-4b33-a941-858eb6cddce1",
-        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
         "date_created": "2020-07-15T02:38:40.690864+00:00",
+        "url": "https://tibanna-output.s3.amazonaws.com/0wDKO96gWF1G.metrics/metrics.html",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "schema_version": "1",
         "last_modified": {
-            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-            "date_modified": "2020-07-15T02:42:57.788261+00:00"
-        }
+            "date_modified": "2020-07-15T02:42:57.788261+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "status": "released",
+        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
+        "uuid": "b58cf74b-4460-4b33-a941-858eb6cddce1"
     },
     {
-        "status": "released",
-        "url": "https://tibanna-output.s3.amazonaws.com/wd9KOeyqXJbj.metrics/metrics.html",
-        "project": "f01ff5be-a72d-43bd-afcf-174fa9dcd282",
-        "schema_version": "1",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "overall_quality_status": "PASS",
-        "uuid": "b0e2b5c5-67aa-4beb-bfce-75dbe4387815",
-        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
         "date_created": "2020-07-15T02:38:40.946934+00:00",
+        "url": "https://tibanna-output.s3.amazonaws.com/wd9KOeyqXJbj.metrics/metrics.html",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "schema_version": "1",
         "last_modified": {
-            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-            "date_modified": "2020-07-15T02:42:57.908236+00:00"
-        }
+            "date_modified": "2020-07-15T02:42:57.908236+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "status": "released",
+        "project": "f01ff5be-a72d-43bd-afcf-174fa9dcd282",
+        "uuid": "b0e2b5c5-67aa-4beb-bfce-75dbe4387815"
     },
     {
-        "status": "released",
-        "url": "https://tibanna-output.s3.amazonaws.com/5qDNBYyOmHNh.metrics/metrics.html",
-        "project": "f01ff5be-a72d-43bd-afcf-174fa9dcd282",
-        "schema_version": "1",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "overall_quality_status": "PASS",
-        "uuid": "a950ba5d-747c-4795-805b-d6bcb6eb7eaa",
-        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
         "date_created": "2020-07-15T02:38:41.204504+00:00",
-        "last_modified": {
-            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-            "date_modified": "2020-07-15T02:42:58.036125+00:00"
-        }
-    },
-    {
-        "status": "released",
-        "url": "https://tibanna-output.s3.amazonaws.com/ehRReyKHgZ9D.metrics/metrics.html",
-        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
-        "schema_version": "1",
+        "url": "https://tibanna-output.s3.amazonaws.com/5qDNBYyOmHNh.metrics/metrics.html",
         "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-        "overall_quality_status": "PASS",
-        "uuid": "997c9b14-db8a-40db-b8de-4a7ea732140c",
         "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
-        "date_created": "2020-07-15T02:38:41.449460+00:00",
-        "last_modified": {
-            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-            "date_modified": "2020-07-15T02:42:58.164372+00:00"
-        }
-    },
-    {
-        "status": "released",
-        "url": "https://tibanna-output.s3.amazonaws.com/FcLHXpEiCw8z.metrics/metrics.html",
-        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
         "schema_version": "1",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-        "overall_quality_status": "PASS",
-        "uuid": "9663f838-5843-411b-b6dc-9dd288fedf35",
-        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
-        "date_created": "2020-07-15T02:38:41.726009+00:00",
         "last_modified": {
-            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-            "date_modified": "2020-07-15T02:42:58.286375+00:00"
-        }
-    },
-    {
+            "date_modified": "2020-07-15T02:42:58.036125+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
         "status": "released",
-        "url": "https://tibanna-output.s3.amazonaws.com/m1XKt7AAUoMs.metrics/metrics.html",
         "project": "f01ff5be-a72d-43bd-afcf-174fa9dcd282",
-        "schema_version": "1",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-        "overall_quality_status": "PASS",
-        "uuid": "9243fd99-21e8-4b1f-9f8b-4b5b03defb9e",
-        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
-        "date_created": "2020-07-15T02:38:42.040961+00:00",
-        "last_modified": {
-            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-            "date_modified": "2020-07-15T02:42:58.391654+00:00"
-        }
+        "uuid": "a950ba5d-747c-4795-805b-d6bcb6eb7eaa"
     },
     {
-        "status": "released",
-        "url": "https://tibanna-output.s3.amazonaws.com/w2gj8yaGhYr3.metrics/metrics.html",
-        "project": "f01ff5be-a72d-43bd-afcf-174fa9dcd282",
-        "schema_version": "1",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "overall_quality_status": "PASS",
-        "uuid": "8a986f94-6209-4af9-89af-70cb27d42740",
-        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
-        "date_created": "2020-07-15T02:38:42.335949+00:00",
-        "last_modified": {
-            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-            "date_modified": "2020-07-15T02:42:58.565866+00:00"
-        }
-    },
-    {
-        "status": "released",
-        "url": "https://tibanna-output.s3.amazonaws.com/nIj622FPZcDK.metrics/metrics.html",
-        "project": "f01ff5be-a72d-43bd-afcf-174fa9dcd282",
-        "schema_version": "1",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-        "overall_quality_status": "PASS",
-        "uuid": "899d6ba5-7256-4e0d-9377-94d6d1833912",
-        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
-        "date_created": "2020-07-15T02:38:42.571575+00:00",
-        "last_modified": {
-            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-            "date_modified": "2020-07-15T02:42:58.669617+00:00"
-        }
-    },
-    {
-        "status": "released",
-        "url": "https://tibanna-output.s3.amazonaws.com/hXODo2yGavYI.metrics/metrics.html",
-        "project": "f01ff5be-a72d-43bd-afcf-174fa9dcd282",
-        "schema_version": "1",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-        "overall_quality_status": "PASS",
-        "uuid": "6e92a0ae-c452-49f3-8413-46308c8dd71c",
-        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
-        "date_created": "2020-07-15T02:38:42.817196+00:00",
-        "last_modified": {
-            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-            "date_modified": "2020-07-15T02:42:58.773516+00:00"
-        }
-    },
-    {
-        "status": "released",
-        "url": "https://tibanna-output.s3.amazonaws.com/003XXkptF9BN.metrics/metrics.html",
-        "project": "f01ff5be-a72d-43bd-afcf-174fa9dcd282",
-        "schema_version": "1",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-        "overall_quality_status": "PASS",
-        "uuid": "6c8519e0-d6b1-42fc-8155-a2f5327b6f0c",
-        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
-        "date_created": "2020-07-15T02:38:43.082035+00:00",
-        "last_modified": {
-            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-            "date_modified": "2020-07-15T02:42:58.923149+00:00"
-        }
-    },
-    {
-        "status": "released",
-        "url": "https://tibanna-output.s3.amazonaws.com/zhxPR3ySRpbR.metrics/metrics.html",
-        "project": "f01ff5be-a72d-43bd-afcf-174fa9dcd282",
-        "schema_version": "1",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-        "overall_quality_status": "PASS",
-        "uuid": "600ebc56-c147-471f-bbf3-934500847675",
-        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
-        "date_created": "2020-07-15T02:38:43.338372+00:00",
-        "last_modified": {
-            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-            "date_modified": "2020-07-15T02:42:59.016585+00:00"
-        }
-    },
-    {
-        "status": "released",
-        "url": "https://tibanna-output.s3.amazonaws.com/ZQkwiFJtRka7.metrics/metrics.html",
-        "project": "f01ff5be-a72d-43bd-afcf-174fa9dcd282",
-        "schema_version": "1",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-        "overall_quality_status": "PASS",
-        "uuid": "5e900fff-3656-4be9-8a1d-c6c9444ad43e",
-        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
-        "date_created": "2020-07-15T02:38:43.565890+00:00",
-        "last_modified": {
-            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-            "date_modified": "2020-07-15T02:42:59.148043+00:00"
-        }
-    },
-    {
-        "status": "released",
-        "url": "https://tibanna-output.s3.amazonaws.com/YzGWu9lHY1EG.metrics/metrics.html",
-        "project": "f01ff5be-a72d-43bd-afcf-174fa9dcd282",
-        "schema_version": "1",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-        "overall_quality_status": "PASS",
-        "uuid": "5daf8a9d-79cd-40b7-8a51-119d21301bbb",
-        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
-        "date_created": "2020-07-15T02:38:43.781526+00:00",
-        "last_modified": {
-            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-            "date_modified": "2020-07-15T02:42:59.268867+00:00"
-        }
-    },
-    {
-        "status": "released",
-        "url": "https://tibanna-output.s3.amazonaws.com/xF7QaNPdhfEL.metrics/metrics.html",
-        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
-        "schema_version": "1",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-        "overall_quality_status": "PASS",
-        "uuid": "5bfad74f-3b86-4b8f-be8f-af33eebcdfef",
-        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
-        "date_created": "2020-07-15T02:38:44.015428+00:00",
-        "last_modified": {
-            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-            "date_modified": "2020-07-15T02:42:59.400904+00:00"
-        }
-    },
-    {
-        "status": "released",
-        "url": "https://tibanna-output.s3.amazonaws.com/xIq2opXzDxXx.metrics/metrics.html",
-        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
-        "schema_version": "1",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-        "overall_quality_status": "PASS",
-        "uuid": "52668985-35fe-4e10-b838-8a2957b0e48c",
-        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
-        "date_created": "2020-07-15T02:38:44.305331+00:00",
-        "last_modified": {
-            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-            "date_modified": "2020-07-15T02:42:59.523897+00:00"
-        }
-    },
-    {
-        "status": "released",
-        "url": "https://tibanna-output.s3.amazonaws.com/741Ho6bh2eMc.metrics/metrics.html",
-        "project": "f01ff5be-a72d-43bd-afcf-174fa9dcd282",
-        "schema_version": "1",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-        "overall_quality_status": "PASS",
-        "uuid": "42d97c06-7976-4cda-bdb8-d5345879fb4c",
-        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
-        "date_created": "2020-07-15T02:38:44.619556+00:00",
-        "last_modified": {
-            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-            "date_modified": "2020-07-15T02:42:59.652290+00:00"
-        }
-    },
-    {
-        "status": "released",
-        "url": "https://tibanna-output.s3.amazonaws.com/y5baXH7zYVmc.metrics/metrics.html",
-        "project": "f01ff5be-a72d-43bd-afcf-174fa9dcd282",
-        "schema_version": "1",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-        "overall_quality_status": "PASS",
-        "uuid": "33743c1d-fa2f-4f1b-8698-e484a1e392c3",
-        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
-        "date_created": "2020-07-15T02:38:44.884920+00:00",
-        "last_modified": {
-            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-            "date_modified": "2020-07-15T02:42:59.760018+00:00"
-        }
-    },
-    {
-        "status": "in review",
-        "url": "https://tibanna-output.s3.amazonaws.com/NXeX3EZllcZM.metrics/metrics.html",
-        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
-        "schema_version": "1",
-        "submitted_by": "b041dba8-e2b2-4e54-a621-97edb508a0c4",
-        "overall_quality_status": "PASS",
-        "uuid": "2fdee1d3-6e52-4e8d-9730-74fa4c162fee",
-        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
-        "date_created": "2020-06-12T15:03:30.504963+00:00",
-        "last_modified": {
-            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-            "date_modified": "2020-07-16T00:05:04.414936+00:00"
-        }
-    },
-    {
-        "status": "released",
-        "url": "https://tibanna-output.s3.amazonaws.com/VtYJPcpgmKd9.metrics/metrics.html",
-        "project": "f01ff5be-a72d-43bd-afcf-174fa9dcd282",
-        "schema_version": "1",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-        "overall_quality_status": "PASS",
-        "uuid": "2cdfb703-337a-4a06-9585-448313c51a84",
-        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
-        "date_created": "2020-07-15T02:38:45.222192+00:00",
-        "last_modified": {
-            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-            "date_modified": "2020-07-15T02:42:59.858237+00:00"
-        }
-    },
-    {
-        "status": "released",
-        "url": "https://tibanna-output.s3.amazonaws.com/HmRURzR41O8A.metrics/metrics.html",
-        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
-        "schema_version": "1",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-        "overall_quality_status": "PASS",
-        "uuid": "2bfa3a04-3edc-488f-8e10-f77ab2847e3b",
-        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
-        "date_created": "2020-07-15T02:38:45.505057+00:00",
-        "last_modified": {
-            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-            "date_modified": "2020-07-15T02:42:59.962965+00:00"
-        }
-    },
-    {
-        "status": "released",
-        "url": "https://tibanna-output.s3.amazonaws.com/7P0XuCQXo9wb.metrics/metrics.html",
-        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
-        "schema_version": "1",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-        "overall_quality_status": "PASS",
-        "uuid": "2823684b-64cf-4810-bb5e-a10721f40603",
-        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
-        "date_created": "2020-07-15T02:38:45.772538+00:00",
-        "last_modified": {
-            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-            "date_modified": "2020-07-15T02:43:00.049044+00:00"
-        }
-    },
-    {
-        "status": "released",
-        "url": "https://tibanna-output.s3.amazonaws.com/NenU4t3hRy63.metrics/metrics.html",
-        "project": "f01ff5be-a72d-43bd-afcf-174fa9dcd282",
-        "schema_version": "1",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-        "overall_quality_status": "PASS",
-        "uuid": "1e9e3990-90b0-43e8-b959-446039bde303",
-        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
-        "date_created": "2020-07-15T02:38:46.028936+00:00",
-        "last_modified": {
-            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-            "date_modified": "2020-07-15T02:43:00.138279+00:00"
-        }
-    },
-    {
-        "status": "released",
-        "url": "https://tibanna-output.s3.amazonaws.com/8CyG4NgReOgf.metrics/metrics.html",
-        "project": "f01ff5be-a72d-43bd-afcf-174fa9dcd282",
-        "schema_version": "1",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-        "overall_quality_status": "PASS",
-        "uuid": "0ed01bd8-a6a9-4207-8c56-dc1fab5de9e5",
-        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
-        "date_created": "2020-07-15T02:38:46.284304+00:00",
-        "last_modified": {
-            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-            "date_modified": "2020-07-15T02:43:00.285290+00:00"
-        }
-    },
-    {
-        "status": "released",
-        "url": "https://tibanna-output.s3.amazonaws.com/q0LiYmsspk3F.metrics/metrics.html",
-        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
-        "schema_version": "1",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-        "overall_quality_status": "PASS",
-        "uuid": "0d5f34bf-f850-4a0c-af2a-28f14cccca6d",
-        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
-        "date_created": "2020-07-15T02:38:46.578142+00:00",
-        "last_modified": {
-            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-            "date_modified": "2020-07-15T02:43:00.407929+00:00"
-        }
-    },
-    {
-        "status": "released",
-        "url": "https://tibanna-output.s3.amazonaws.com/IT4QkvX2ash6.metrics/metrics.html",
-        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
-        "schema_version": "1",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-        "overall_quality_status": "PASS",
-        "uuid": "dd3bfbb8-633d-4bce-a13c-a8c37a073851",
-        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
-        "date_created": "2020-07-15T02:38:46.834287+00:00",
-        "last_modified": {
-            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-            "date_modified": "2020-07-15T02:43:00.516983+00:00"
-        }
-    },
-    {
-        "status": "in review",
-        "url": "https://tibanna-output.s3.amazonaws.com/C4keSieNvmff.metrics/metrics.html",
-        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
-        "schema_version": "1",
-        "submitted_by": "b041dba8-e2b2-4e54-a621-97edb508a0c4",
-        "overall_quality_status": "PASS",
-        "uuid": "a7793a6f-a8b5-4dee-89ad-2770a6629476",
-        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
         "date_created": "2020-06-18T17:51:41.859472+00:00",
+        "url": "https://tibanna-output.s3.amazonaws.com/C4keSieNvmff.metrics/metrics.html",
+        "submitted_by": "b041dba8-e2b2-4e54-a621-97edb508a0c4",
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "schema_version": "1",
         "last_modified": {
-            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-            "date_modified": "2020-07-16T00:05:04.119142+00:00"
-        }
+            "date_modified": "2020-07-16T00:05:04.119142+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "status": "in review",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "uuid": "a7793a6f-a8b5-4dee-89ad-2770a6629476"
     },
     {
-        "status": "released",
-        "url": "https://tibanna-output.s3.amazonaws.com/vSQOcwCI4AgG.metrics/metrics.html",
-        "project": "f01ff5be-a72d-43bd-afcf-174fa9dcd282",
-        "schema_version": "1",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "overall_quality_status": "PASS",
-        "uuid": "fe02f276-1da9-4862-aef3-c40783c1359d",
+        "date_created": "2020-07-15T02:38:41.449460+00:00",
+        "url": "https://tibanna-output.s3.amazonaws.com/ehRReyKHgZ9D.metrics/metrics.html",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "schema_version": "1",
+        "last_modified": {
+            "date_modified": "2020-07-15T02:42:58.164372+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "status": "released",
+        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
+        "uuid": "997c9b14-db8a-40db-b8de-4a7ea732140c"
+    },
+    {
+        "overall_quality_status": "PASS",
+        "date_created": "2020-07-15T02:38:41.726009+00:00",
+        "url": "https://tibanna-output.s3.amazonaws.com/FcLHXpEiCw8z.metrics/metrics.html",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "schema_version": "1",
+        "last_modified": {
+            "date_modified": "2020-07-15T02:42:58.286375+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "status": "released",
+        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
+        "uuid": "9663f838-5843-411b-b6dc-9dd288fedf35"
+    },
+    {
+        "overall_quality_status": "PASS",
+        "date_created": "2020-07-15T02:38:42.040961+00:00",
+        "url": "https://tibanna-output.s3.amazonaws.com/m1XKt7AAUoMs.metrics/metrics.html",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "schema_version": "1",
+        "last_modified": {
+            "date_modified": "2020-07-15T02:42:58.391654+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "status": "released",
+        "project": "f01ff5be-a72d-43bd-afcf-174fa9dcd282",
+        "uuid": "9243fd99-21e8-4b1f-9f8b-4b5b03defb9e"
+    },
+    {
+        "overall_quality_status": "PASS",
+        "date_created": "2020-07-15T02:38:42.335949+00:00",
+        "url": "https://tibanna-output.s3.amazonaws.com/w2gj8yaGhYr3.metrics/metrics.html",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "schema_version": "1",
+        "last_modified": {
+            "date_modified": "2020-07-15T02:42:58.565866+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "status": "released",
+        "project": "f01ff5be-a72d-43bd-afcf-174fa9dcd282",
+        "uuid": "8a986f94-6209-4af9-89af-70cb27d42740"
+    },
+    {
+        "overall_quality_status": "PASS",
+        "date_created": "2020-07-21T17:33:39.704459+00:00",
+        "url": "https://tibanna-output.s3.amazonaws.com/4OKtKe1v76zn.metrics/metrics.html",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "institution": "828cd4fe-ebb0-4b36-ccbb-d2e3a36ca234",
+        "schema_version": "1",
+        "last_modified": {
+            "date_modified": "2020-07-21T18:00:19.896345+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "status": "in review",
+        "project": "91336042-f277-4f69-97e5-5c8a5f6d6058",
+        "uuid": "8215bd9f-e2b7-4b72-b2cb-851a45e49c77"
+    },
+    {
+        "overall_quality_status": "PASS",
+        "date_created": "2020-07-21T17:33:44.607500+00:00",
+        "url": "https://tibanna-output.s3.amazonaws.com/MPs3TTfbkP0F.metrics/metrics.html",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "institution": "828cd4fe-ebb0-4b36-ccbb-d2e3a36ca234",
+        "schema_version": "1",
+        "last_modified": {
+            "date_modified": "2020-07-21T18:00:22.568312+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "status": "in review",
+        "project": "91336042-f277-4f69-97e5-5c8a5f6d6058",
+        "uuid": "7b4a4f39-cddd-4fe0-9425-4ef39bf277a3"
+    },
+    {
+        "overall_quality_status": "PASS",
+        "date_created": "2020-07-15T02:38:42.817196+00:00",
+        "url": "https://tibanna-output.s3.amazonaws.com/hXODo2yGavYI.metrics/metrics.html",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "schema_version": "1",
+        "last_modified": {
+            "date_modified": "2020-07-15T02:42:58.773516+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "status": "released",
+        "project": "f01ff5be-a72d-43bd-afcf-174fa9dcd282",
+        "uuid": "6e92a0ae-c452-49f3-8413-46308c8dd71c"
+    },
+    {
+        "overall_quality_status": "PASS",
+        "date_created": "2020-07-15T02:38:43.781526+00:00",
+        "url": "https://tibanna-output.s3.amazonaws.com/YzGWu9lHY1EG.metrics/metrics.html",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "schema_version": "1",
+        "last_modified": {
+            "date_modified": "2020-07-15T02:42:59.268867+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "status": "released",
+        "project": "f01ff5be-a72d-43bd-afcf-174fa9dcd282",
+        "uuid": "5daf8a9d-79cd-40b7-8a51-119d21301bbb"
+    },
+    {
+        "overall_quality_status": "PASS",
+        "date_created": "2020-07-15T02:38:44.619556+00:00",
+        "url": "https://tibanna-output.s3.amazonaws.com/741Ho6bh2eMc.metrics/metrics.html",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "schema_version": "1",
+        "last_modified": {
+            "date_modified": "2020-07-15T02:42:59.652290+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "status": "released",
+        "project": "f01ff5be-a72d-43bd-afcf-174fa9dcd282",
+        "uuid": "42d97c06-7976-4cda-bdb8-d5345879fb4c"
+    },
+    {
+        "overall_quality_status": "PASS",
+        "date_created": "2020-07-15T02:38:44.884920+00:00",
+        "url": "https://tibanna-output.s3.amazonaws.com/y5baXH7zYVmc.metrics/metrics.html",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "schema_version": "1",
+        "last_modified": {
+            "date_modified": "2020-07-15T02:42:59.760018+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "status": "released",
+        "project": "f01ff5be-a72d-43bd-afcf-174fa9dcd282",
+        "uuid": "33743c1d-fa2f-4f1b-8698-e484a1e392c3"
+    },
+    {
+        "overall_quality_status": "PASS",
+        "date_created": "2020-06-12T15:03:30.504963+00:00",
+        "url": "https://tibanna-output.s3.amazonaws.com/NXeX3EZllcZM.metrics/metrics.html",
+        "submitted_by": "b041dba8-e2b2-4e54-a621-97edb508a0c4",
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "schema_version": "1",
+        "last_modified": {
+            "date_modified": "2020-07-16T00:05:04.414936+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "status": "in review",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "uuid": "2fdee1d3-6e52-4e8d-9730-74fa4c162fee"
+    },
+    {
+        "overall_quality_status": "PASS",
+        "date_created": "2020-07-15T02:38:45.222192+00:00",
+        "url": "https://tibanna-output.s3.amazonaws.com/VtYJPcpgmKd9.metrics/metrics.html",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "schema_version": "1",
+        "last_modified": {
+            "date_modified": "2020-07-15T02:42:59.858237+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "status": "released",
+        "project": "f01ff5be-a72d-43bd-afcf-174fa9dcd282",
+        "uuid": "2cdfb703-337a-4a06-9585-448313c51a84"
+    },
+    {
+        "overall_quality_status": "PASS",
+        "date_created": "2020-07-15T02:38:45.505057+00:00",
+        "url": "https://tibanna-output.s3.amazonaws.com/HmRURzR41O8A.metrics/metrics.html",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "schema_version": "1",
+        "last_modified": {
+            "date_modified": "2020-07-15T02:42:59.962965+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "status": "released",
+        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
+        "uuid": "2bfa3a04-3edc-488f-8e10-f77ab2847e3b"
+    },
+    {
+        "overall_quality_status": "PASS",
+        "date_created": "2020-07-21T17:33:40.030835+00:00",
+        "url": "https://tibanna-output.s3.amazonaws.com/1G1Lotu4sjsJ.metrics/metrics.html",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "institution": "828cd4fe-ebb0-4b36-ccbb-d2e3a36ca234",
+        "schema_version": "1",
+        "last_modified": {
+            "date_modified": "2020-07-21T18:00:20.003586+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "status": "in review",
+        "project": "91336042-f277-4f69-97e5-5c8a5f6d6058",
+        "uuid": "28987ef1-788f-4ba9-93d4-e62a4b61d788"
+    },
+    {
+        "overall_quality_status": "PASS",
+        "date_created": "2020-07-15T02:38:46.028936+00:00",
+        "url": "https://tibanna-output.s3.amazonaws.com/NenU4t3hRy63.metrics/metrics.html",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "schema_version": "1",
+        "last_modified": {
+            "date_modified": "2020-07-15T02:43:00.138279+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "status": "released",
+        "project": "f01ff5be-a72d-43bd-afcf-174fa9dcd282",
+        "uuid": "1e9e3990-90b0-43e8-b959-446039bde303"
+    },
+    {
+        "overall_quality_status": "PASS",
+        "date_created": "2020-07-21T17:33:40.274987+00:00",
+        "url": "https://tibanna-output.s3.amazonaws.com/1dF5w0WAoRvv.metrics/metrics.html",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "institution": "828cd4fe-ebb0-4b36-ccbb-d2e3a36ca234",
+        "schema_version": "1",
+        "last_modified": {
+            "date_modified": "2020-07-21T18:00:20.128458+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "status": "in review",
+        "project": "91336042-f277-4f69-97e5-5c8a5f6d6058",
+        "uuid": "148eef10-6596-44ea-b8e6-cd6bc72b4e59"
+    },
+    {
+        "overall_quality_status": "PASS",
+        "date_created": "2020-07-15T02:38:37.668037+00:00",
+        "url": "https://tibanna-output.s3.amazonaws.com/zFJRFRInkEOT.metrics/metrics.html",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "schema_version": "1",
+        "last_modified": {
+            "date_modified": "2020-07-15T02:42:56.094581+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "status": "released",
+        "project": "f01ff5be-a72d-43bd-afcf-174fa9dcd282",
+        "uuid": "f21638d4-056b-478c-9fcf-3da547c657d1"
+    },
+    {
+        "overall_quality_status": "PASS",
+        "date_created": "2020-07-21T17:33:38.684072+00:00",
+        "url": "https://tibanna-output.s3.amazonaws.com/tDSnl4SM8FeT.metrics/metrics.html",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "institution": "828cd4fe-ebb0-4b36-ccbb-d2e3a36ca234",
+        "schema_version": "1",
+        "last_modified": {
+            "date_modified": "2020-07-21T18:00:19.328307+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "status": "in review",
+        "project": "91336042-f277-4f69-97e5-5c8a5f6d6058",
+        "uuid": "ed64f410-40e5-44aa-ae97-f1e34e1b2961"
+    },
+    {
+        "overall_quality_status": "PASS",
+        "date_created": "2020-07-15T02:38:37.927636+00:00",
+        "url": "https://tibanna-output.s3.amazonaws.com/IUaYtGHleFep.metrics/metrics.html",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "schema_version": "1",
+        "last_modified": {
+            "date_modified": "2020-07-15T02:42:56.207621+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "status": "released",
+        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
+        "uuid": "ed55c8c3-5b5d-4f03-9508-9c3513706b83"
+    },
+    {
+        "overall_quality_status": "PASS",
+        "date_created": "2020-07-21T17:33:38.927258+00:00",
+        "url": "https://tibanna-output.s3.amazonaws.com/acaVWNaQwn2R.metrics/metrics.html",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "institution": "828cd4fe-ebb0-4b36-ccbb-d2e3a36ca234",
+        "schema_version": "1",
+        "last_modified": {
+            "date_modified": "2020-07-21T18:00:19.445125+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "status": "in review",
+        "project": "91336042-f277-4f69-97e5-5c8a5f6d6058",
+        "uuid": "eb138403-4b56-4c71-a518-7be4d7be0609"
+    },
+    {
+        "overall_quality_status": "PASS",
+        "date_created": "2020-07-15T02:38:38.210800+00:00",
+        "url": "https://tibanna-output.s3.amazonaws.com/GMyUKSzquLDr.metrics/metrics.html",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "schema_version": "1",
+        "last_modified": {
+            "date_modified": "2020-07-15T02:42:56.316982+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "status": "released",
+        "project": "f01ff5be-a72d-43bd-afcf-174fa9dcd282",
+        "uuid": "e3e90864-7ab3-46dc-930f-80fd4d76c403"
+    },
+    {
+        "overall_quality_status": "PASS",
+        "date_created": "2020-07-15T02:38:46.834287+00:00",
+        "url": "https://tibanna-output.s3.amazonaws.com/IT4QkvX2ash6.metrics/metrics.html",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "schema_version": "1",
+        "last_modified": {
+            "date_modified": "2020-07-15T02:43:00.516983+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "status": "released",
+        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
+        "uuid": "dd3bfbb8-633d-4bce-a13c-a8c37a073851"
+    },
+    {
+        "overall_quality_status": "PASS",
+        "date_created": "2020-07-15T02:38:38.951193+00:00",
+        "url": "https://tibanna-output.s3.amazonaws.com/su1Sh4OHWDqs.metrics/metrics.html",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "schema_version": "1",
+        "last_modified": {
+            "date_modified": "2020-07-15T02:42:56.788286+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "status": "released",
+        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
+        "uuid": "daa6d41e-bbc0-43c5-a47c-25ac782b188e"
+    },
+    {
+        "overall_quality_status": "PASS",
+        "date_created": "2020-07-21T17:33:39.152713+00:00",
+        "url": "https://tibanna-output.s3.amazonaws.com/KJ8wJrYHcEgw.metrics/metrics.html",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "institution": "828cd4fe-ebb0-4b36-ccbb-d2e3a36ca234",
+        "schema_version": "1",
+        "last_modified": {
+            "date_modified": "2020-07-21T18:00:19.573477+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "status": "in review",
+        "project": "91336042-f277-4f69-97e5-5c8a5f6d6058",
+        "uuid": "d4a5d2eb-1e32-4af8-a7cb-c39680376664"
+    },
+    {
+        "overall_quality_status": "PASS",
+        "date_created": "2020-07-15T02:38:39.222496+00:00",
+        "url": "https://tibanna-output.s3.amazonaws.com/L9NjqUA5zsoe.metrics/metrics.html",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "schema_version": "1",
+        "last_modified": {
+            "date_modified": "2020-07-15T02:42:56.916792+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "status": "released",
+        "project": "f01ff5be-a72d-43bd-afcf-174fa9dcd282",
+        "uuid": "cc9fe7df-cef6-44d7-b2b3-e7b652d1ae7d"
+    },
+    {
+        "overall_quality_status": "PASS",
+        "date_created": "2020-07-15T02:38:39.665338+00:00",
+        "url": "https://tibanna-output.s3.amazonaws.com/wrSt62Bv547I.metrics/metrics.html",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "schema_version": "1",
+        "last_modified": {
+            "date_modified": "2020-07-15T02:42:57.155851+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "status": "released",
+        "project": "f01ff5be-a72d-43bd-afcf-174fa9dcd282",
+        "uuid": "ca540f2b-a25f-401a-b0ce-475293e5830c"
+    },
+    {
+        "overall_quality_status": "PASS",
+        "date_created": "2020-07-15T02:38:39.913915+00:00",
+        "url": "https://tibanna-output.s3.amazonaws.com/oC7kM9t2BXLP.metrics/metrics.html",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "schema_version": "1",
+        "last_modified": {
+            "date_modified": "2020-07-15T02:42:57.279911+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "status": "released",
+        "project": "f01ff5be-a72d-43bd-afcf-174fa9dcd282",
+        "uuid": "c77aaac1-256a-460c-a6d5-58491b58abaa"
+    },
+    {
+        "overall_quality_status": "PASS",
+        "date_created": "2020-07-21T17:33:44.312941+00:00",
+        "url": "https://tibanna-output.s3.amazonaws.com/Ngb93cGjsljo.metrics/metrics.html",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "institution": "828cd4fe-ebb0-4b36-ccbb-d2e3a36ca234",
+        "schema_version": "1",
+        "last_modified": {
+            "date_modified": "2020-07-21T18:00:22.438631+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "status": "in review",
+        "project": "91336042-f277-4f69-97e5-5c8a5f6d6058",
+        "uuid": "9bd8ffb6-cc43-4593-aece-8dcb7d8facbf"
+    },
+    {
+        "overall_quality_status": "PASS",
+        "date_created": "2020-07-21T17:33:39.428835+00:00",
+        "url": "https://tibanna-output.s3.amazonaws.com/oNhYfbxbJJxH.metrics/metrics.html",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "institution": "828cd4fe-ebb0-4b36-ccbb-d2e3a36ca234",
+        "schema_version": "1",
+        "last_modified": {
+            "date_modified": "2020-07-21T18:00:19.764376+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "status": "in review",
+        "project": "91336042-f277-4f69-97e5-5c8a5f6d6058",
+        "uuid": "92c84a76-dd96-472b-95b3-74dd02e0a103"
+    },
+    {
+        "overall_quality_status": "PASS",
+        "date_created": "2020-07-15T02:38:42.571575+00:00",
+        "url": "https://tibanna-output.s3.amazonaws.com/nIj622FPZcDK.metrics/metrics.html",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "schema_version": "1",
+        "last_modified": {
+            "date_modified": "2020-07-15T02:42:58.669617+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "status": "released",
+        "project": "f01ff5be-a72d-43bd-afcf-174fa9dcd282",
+        "uuid": "899d6ba5-7256-4e0d-9377-94d6d1833912"
+    },
+    {
+        "overall_quality_status": "PASS",
+        "date_created": "2020-07-21T17:33:44.807262+00:00",
+        "url": "https://tibanna-output.s3.amazonaws.com/3YwwyKnCpMdU.metrics/metrics.html",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "institution": "828cd4fe-ebb0-4b36-ccbb-d2e3a36ca234",
+        "schema_version": "1",
+        "last_modified": {
+            "date_modified": "2020-07-21T18:00:22.685068+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "status": "in review",
+        "project": "91336042-f277-4f69-97e5-5c8a5f6d6058",
+        "uuid": "6d76925e-6eff-4590-aaa8-a57e76cb205a"
+    },
+    {
+        "overall_quality_status": "PASS",
+        "date_created": "2020-07-15T02:38:43.082035+00:00",
+        "url": "https://tibanna-output.s3.amazonaws.com/003XXkptF9BN.metrics/metrics.html",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "schema_version": "1",
+        "last_modified": {
+            "date_modified": "2020-07-15T02:42:58.923149+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "status": "released",
+        "project": "f01ff5be-a72d-43bd-afcf-174fa9dcd282",
+        "uuid": "6c8519e0-d6b1-42fc-8155-a2f5327b6f0c"
+    },
+    {
+        "overall_quality_status": "PASS",
+        "date_created": "2020-07-21T17:33:45.019531+00:00",
+        "url": "https://tibanna-output.s3.amazonaws.com/TLUZ4GSveP6u.metrics/metrics.html",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "institution": "828cd4fe-ebb0-4b36-ccbb-d2e3a36ca234",
+        "schema_version": "1",
+        "last_modified": {
+            "date_modified": "2020-07-21T18:00:22.803455+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "status": "in review",
+        "project": "91336042-f277-4f69-97e5-5c8a5f6d6058",
+        "uuid": "67aed1a2-cbca-496b-9370-36d5dbc67691"
+    },
+    {
+        "overall_quality_status": "PASS",
+        "date_created": "2020-07-15T02:38:43.338372+00:00",
+        "url": "https://tibanna-output.s3.amazonaws.com/zhxPR3ySRpbR.metrics/metrics.html",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "schema_version": "1",
+        "last_modified": {
+            "date_modified": "2020-07-15T02:42:59.016585+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "status": "released",
+        "project": "f01ff5be-a72d-43bd-afcf-174fa9dcd282",
+        "uuid": "600ebc56-c147-471f-bbf3-934500847675"
+    },
+    {
+        "overall_quality_status": "PASS",
+        "date_created": "2020-07-15T02:38:43.565890+00:00",
+        "url": "https://tibanna-output.s3.amazonaws.com/ZQkwiFJtRka7.metrics/metrics.html",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "schema_version": "1",
+        "last_modified": {
+            "date_modified": "2020-07-15T02:42:59.148043+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "status": "released",
+        "project": "f01ff5be-a72d-43bd-afcf-174fa9dcd282",
+        "uuid": "5e900fff-3656-4be9-8a1d-c6c9444ad43e"
+    },
+    {
+        "overall_quality_status": "PASS",
+        "date_created": "2020-07-15T02:38:44.015428+00:00",
+        "url": "https://tibanna-output.s3.amazonaws.com/xF7QaNPdhfEL.metrics/metrics.html",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "schema_version": "1",
+        "last_modified": {
+            "date_modified": "2020-07-15T02:42:59.400904+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "status": "released",
+        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
+        "uuid": "5bfad74f-3b86-4b8f-be8f-af33eebcdfef"
+    },
+    {
+        "overall_quality_status": "PASS",
+        "date_created": "2020-07-15T02:38:44.305331+00:00",
+        "url": "https://tibanna-output.s3.amazonaws.com/xIq2opXzDxXx.metrics/metrics.html",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "schema_version": "1",
+        "last_modified": {
+            "date_modified": "2020-07-15T02:42:59.523897+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "status": "released",
+        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
+        "uuid": "52668985-35fe-4e10-b838-8a2957b0e48c"
+    },
+    {
+        "overall_quality_status": "PASS",
+        "date_created": "2020-07-15T02:38:45.772538+00:00",
+        "url": "https://tibanna-output.s3.amazonaws.com/7P0XuCQXo9wb.metrics/metrics.html",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "schema_version": "1",
+        "last_modified": {
+            "date_modified": "2020-07-15T02:43:00.049044+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "status": "released",
+        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
+        "uuid": "2823684b-64cf-4810-bb5e-a10721f40603"
+    },
+    {
+        "overall_quality_status": "PASS",
+        "date_created": "2020-07-15T02:38:46.284304+00:00",
+        "url": "https://tibanna-output.s3.amazonaws.com/8CyG4NgReOgf.metrics/metrics.html",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "schema_version": "1",
+        "last_modified": {
+            "date_modified": "2020-07-15T02:43:00.285290+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "status": "released",
+        "project": "f01ff5be-a72d-43bd-afcf-174fa9dcd282",
+        "uuid": "0ed01bd8-a6a9-4207-8c56-dc1fab5de9e5"
+    },
+    {
+        "overall_quality_status": "PASS",
+        "date_created": "2020-07-15T02:38:46.578142+00:00",
+        "url": "https://tibanna-output.s3.amazonaws.com/q0LiYmsspk3F.metrics/metrics.html",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "schema_version": "1",
+        "last_modified": {
+            "date_modified": "2020-07-15T02:43:00.407929+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "status": "released",
+        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
+        "uuid": "0d5f34bf-f850-4a0c-af2a-28f14cccca6d"
+    },
+    {
+        "overall_quality_status": "PASS",
         "date_created": "2020-07-15T02:38:47.110546+00:00",
+        "url": "https://tibanna-output.s3.amazonaws.com/vSQOcwCI4AgG.metrics/metrics.html",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "schema_version": "1",
         "last_modified": {
-            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-            "date_modified": "2020-07-15T02:43:00.618965+00:00"
-        }
+            "date_modified": "2020-07-15T02:43:00.618965+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "status": "released",
+        "project": "f01ff5be-a72d-43bd-afcf-174fa9dcd282",
+        "uuid": "fe02f276-1da9-4862-aef3-c40783c1359d"
     },
     {
-        "status": "released",
-        "url": "https://tibanna-output.s3.amazonaws.com/MVbjlOSMBrUM.metrics/metrics.html",
-        "project": "f01ff5be-a72d-43bd-afcf-174fa9dcd282",
-        "schema_version": "1",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "overall_quality_status": "PASS",
-        "uuid": "fc643841-3dd8-476f-a32b-31f31db76af2",
-        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
         "date_created": "2020-07-15T02:38:47.407249+00:00",
+        "url": "https://tibanna-output.s3.amazonaws.com/MVbjlOSMBrUM.metrics/metrics.html",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "schema_version": "1",
         "last_modified": {
-            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-            "date_modified": "2020-07-15T02:43:00.735705+00:00"
-        }
-    },
-    {
+            "date_modified": "2020-07-15T02:43:00.735705+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
         "status": "released",
-        "url": "https://tibanna-output.s3.amazonaws.com/OdyncuEZR5Vm.metrics/metrics.html",
         "project": "f01ff5be-a72d-43bd-afcf-174fa9dcd282",
-        "schema_version": "1",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-        "overall_quality_status": "PASS",
-        "uuid": "df3ff7ca-1ea6-4900-ba2b-b22c64fff0da",
-        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
-        "date_created": "2020-07-15T02:38:47.659220+00:00",
-        "last_modified": {
-            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-            "date_modified": "2020-07-15T02:43:00.852109+00:00"
-        }
+        "uuid": "fc643841-3dd8-476f-a32b-31f31db76af2"
     },
     {
-        "status": "released",
-        "url": "https://tibanna-output.s3.amazonaws.com/vYSquvWbBbjv.metrics/metrics.html",
-        "project": "f01ff5be-a72d-43bd-afcf-174fa9dcd282",
-        "schema_version": "1",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "overall_quality_status": "PASS",
-        "uuid": "d19957c2-a322-4273-acb8-6a52707fbe0d",
-        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
-        "date_created": "2020-07-15T02:38:47.917192+00:00",
-        "last_modified": {
-            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-            "date_modified": "2020-07-15T02:43:00.967916+00:00"
-        }
-    },
-    {
-        "status": "released",
-        "url": "https://tibanna-output.s3.amazonaws.com/mgQ8qT5RwE9g.metrics/metrics.html",
-        "project": "f01ff5be-a72d-43bd-afcf-174fa9dcd282",
-        "schema_version": "1",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-        "overall_quality_status": "PASS",
-        "uuid": "cc3a931f-8e40-4cdd-a75c-1eaff711ffd3",
-        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
-        "date_created": "2020-07-15T02:38:48.183701+00:00",
-        "last_modified": {
-            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-            "date_modified": "2020-07-15T02:43:01.083806+00:00"
-        }
-    },
-    {
-        "status": "released",
-        "url": "https://tibanna-output.s3.amazonaws.com/ongMzQuBtE0L.metrics/metrics.html",
-        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
-        "schema_version": "1",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-        "overall_quality_status": "PASS",
-        "uuid": "bfaa50e6-61cb-4091-a9c0-1c5c4d468e7b",
-        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
-        "date_created": "2020-07-15T02:38:48.449821+00:00",
-        "last_modified": {
-            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-            "date_modified": "2020-07-15T02:43:01.194593+00:00"
-        }
-    },
-    {
-        "status": "released",
-        "url": "https://tibanna-output.s3.amazonaws.com/ertlS7dzW8Z9.metrics/metrics.html",
-        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
-        "schema_version": "1",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-        "overall_quality_status": "PASS",
-        "uuid": "ba0c2fe4-d2bd-43c0-99dc-668ae6882b15",
-        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
-        "date_created": "2020-07-15T02:38:48.685760+00:00",
-        "last_modified": {
-            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-            "date_modified": "2020-07-15T02:43:01.304920+00:00"
-        }
-    },
-    {
-        "status": "released",
-        "url": "https://tibanna-output.s3.amazonaws.com/5483cjscXq3E.metrics/metrics.html",
-        "project": "f01ff5be-a72d-43bd-afcf-174fa9dcd282",
-        "schema_version": "1",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-        "overall_quality_status": "PASS",
-        "uuid": "a41e4654-4275-489c-8501-d5200d94e00c",
-        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
-        "date_created": "2020-07-15T02:38:48.932708+00:00",
-        "last_modified": {
-            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-            "date_modified": "2020-07-15T02:43:01.424265+00:00"
-        }
-    },
-    {
-        "status": "in review",
-        "url": "https://tibanna-output.s3.amazonaws.com/WSuKXulEwToD.metrics/metrics.html",
-        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
-        "schema_version": "1",
-        "submitted_by": "b041dba8-e2b2-4e54-a621-97edb508a0c4",
-        "overall_quality_status": "PASS",
-        "uuid": "93d68d75-c96a-45a3-bcad-46bf9666fcf4",
-        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
-        "date_created": "2020-06-16T20:40:41.228962+00:00",
-        "last_modified": {
-            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-            "date_modified": "2020-07-16T00:05:04.314742+00:00"
-        }
-    },
-    {
-        "status": "released",
-        "url": "https://tibanna-output.s3.amazonaws.com/k7GRt9129OdD.metrics/metrics.html",
-        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
-        "schema_version": "1",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-        "overall_quality_status": "PASS",
-        "uuid": "81d407e4-a089-4dab-a249-44439d5dac46",
-        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
-        "date_created": "2020-07-15T02:38:49.267519+00:00",
-        "last_modified": {
-            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-            "date_modified": "2020-07-15T02:43:01.534390+00:00"
-        }
-    },
-    {
-        "status": "released",
-        "url": "https://tibanna-output.s3.amazonaws.com/EF1VE1n9fjHD.metrics/metrics.html",
-        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
-        "schema_version": "1",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-        "overall_quality_status": "PASS",
-        "uuid": "803da8f3-daab-452c-9f7e-116d25b3e431",
-        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
-        "date_created": "2020-07-15T02:38:49.558066+00:00",
-        "last_modified": {
-            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-            "date_modified": "2020-07-15T02:43:01.643119+00:00"
-        }
-    },
-    {
-        "status": "released",
-        "url": "https://tibanna-output.s3.amazonaws.com/P5qfQvKEs8Bx.metrics/metrics.html",
-        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
-        "schema_version": "1",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-        "overall_quality_status": "PASS",
-        "uuid": "7cf33ff2-a7e8-4036-9beb-2f507b482716",
-        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
-        "date_created": "2020-07-15T02:38:49.827723+00:00",
-        "last_modified": {
-            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-            "date_modified": "2020-07-15T02:43:01.768432+00:00"
-        }
-    },
-    {
-        "status": "released",
-        "url": "https://tibanna-output.s3.amazonaws.com/yb9Z9bXaN5SC.metrics/metrics.html",
-        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
-        "schema_version": "1",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-        "overall_quality_status": "PASS",
-        "uuid": "75a18d62-9c09-4614-895f-b98dae1103a2",
-        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
-        "date_created": "2020-07-15T02:38:50.105439+00:00",
-        "last_modified": {
-            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-            "date_modified": "2020-07-15T02:43:01.866590+00:00"
-        }
-    },
-    {
-        "status": "released",
-        "url": "https://tibanna-output.s3.amazonaws.com/0D6ZBfqd9RHo.metrics/metrics.html",
-        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
-        "schema_version": "1",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-        "overall_quality_status": "PASS",
-        "uuid": "59d9c913-8b9f-4eaf-ac93-8307cd896b70",
-        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
-        "date_created": "2020-07-15T02:38:50.378370+00:00",
-        "last_modified": {
-            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-            "date_modified": "2020-07-15T02:43:01.967723+00:00"
-        }
-    },
-    {
-        "status": "released",
-        "url": "https://tibanna-output.s3.amazonaws.com/7GMhQHU5snqR.metrics/metrics.html",
-        "project": "f01ff5be-a72d-43bd-afcf-174fa9dcd282",
-        "schema_version": "1",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-        "overall_quality_status": "PASS",
-        "uuid": "507a1081-6145-45cf-bf7c-53e4c7de2385",
-        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
-        "date_created": "2020-07-15T02:38:50.634624+00:00",
-        "last_modified": {
-            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-            "date_modified": "2020-07-15T02:43:02.115945+00:00"
-        }
-    },
-    {
-        "status": "released",
-        "url": "https://tibanna-output.s3.amazonaws.com/t0os9WZyPeg5.metrics/metrics.html",
-        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
-        "schema_version": "1",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-        "overall_quality_status": "PASS",
-        "uuid": "4af22cf0-261b-4f08-ad9f-83fd817de987",
-        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
-        "date_created": "2020-07-15T02:38:50.923994+00:00",
-        "last_modified": {
-            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-            "date_modified": "2020-07-15T02:43:02.242188+00:00"
-        }
-    },
-    {
-        "status": "released",
-        "url": "https://tibanna-output.s3.amazonaws.com/LhS9asv6a3UU.metrics/metrics.html",
-        "project": "f01ff5be-a72d-43bd-afcf-174fa9dcd282",
-        "schema_version": "1",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-        "overall_quality_status": "PASS",
-        "uuid": "403566e3-39b2-470f-8cda-bf892b207695",
-        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
-        "date_created": "2020-07-15T02:38:51.176975+00:00",
-        "last_modified": {
-            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-            "date_modified": "2020-07-15T02:43:02.368019+00:00"
-        }
-    },
-    {
-        "status": "released",
-        "url": "https://tibanna-output.s3.amazonaws.com/vsYpcoKqr3uD.metrics/metrics.html",
-        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
-        "schema_version": "1",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-        "overall_quality_status": "PASS",
-        "uuid": "138f6ee5-37cd-4e38-9ffa-e9db09bbf5ac",
-        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
-        "date_created": "2020-07-15T02:38:51.402981+00:00",
-        "last_modified": {
-            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-            "date_modified": "2020-07-15T02:43:02.485174+00:00"
-        }
-    },
-    {
-        "status": "released",
-        "url": "https://tibanna-output.s3.amazonaws.com/4P4YcNI0XY5J.metrics/metrics.html",
-        "project": "f01ff5be-a72d-43bd-afcf-174fa9dcd282",
-        "schema_version": "1",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-        "overall_quality_status": "PASS",
-        "uuid": "08bbe7a3-d1d3-4bc2-a87d-01e1e5d28f4c",
-        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
-        "date_created": "2020-07-15T02:38:51.667966+00:00",
-        "last_modified": {
-            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-            "date_modified": "2020-07-15T02:43:02.611509+00:00"
-        }
-    },
-    {
-        "status": "released",
-        "url": "https://tibanna-output.s3.amazonaws.com/OEhQxbjQ0XwH.metrics/metrics.html",
-        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
-        "schema_version": "1",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-        "overall_quality_status": "PASS",
-        "uuid": "06d23bba-9caf-410d-b994-1d1e0ccdb760",
-        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
-        "date_created": "2020-07-15T02:38:51.943731+00:00",
-        "last_modified": {
-            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-            "date_modified": "2020-07-15T02:43:02.765280+00:00"
-        }
-    },
-    {
-        "status": "released",
-        "url": "https://tibanna-output.s3.amazonaws.com/gG8tIL7XpgO2.metrics/metrics.html",
-        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
-        "schema_version": "1",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-        "overall_quality_status": "PASS",
-        "uuid": "03d460e2-60cf-45f9-88d8-8561cfa6d600",
-        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
-        "date_created": "2020-07-15T02:38:52.289530+00:00",
-        "last_modified": {
-            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-            "date_modified": "2020-07-15T02:43:02.869168+00:00"
-        }
-    },
-    {
-        "status": "in review",
-        "url": "https://tibanna-output.s3.amazonaws.com/1HBLb9Snz4wC.metrics/metrics.html",
-        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
-        "schema_version": "1",
-        "submitted_by": "b041dba8-e2b2-4e54-a621-97edb508a0c4",
-        "overall_quality_status": "PASS",
-        "uuid": "fbea480c-17ec-40da-b552-546516ffdfb4",
-        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
         "date_created": "2020-06-18T01:47:35.616670+00:00",
-        "last_modified": {
-            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-            "date_modified": "2020-07-16T00:05:04.216986+00:00"
-        }
-    },
-    {
-        "status": "released",
-        "url": "https://tibanna-output.s3.amazonaws.com/kICwowuPUtWB.metrics/metrics.html",
-        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
+        "url": "https://tibanna-output.s3.amazonaws.com/1HBLb9Snz4wC.metrics/metrics.html",
+        "submitted_by": "b041dba8-e2b2-4e54-a621-97edb508a0c4",
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
         "schema_version": "1",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-        "overall_quality_status": "PASS",
-        "uuid": "87d28770-53ee-4529-8224-f93a4693419b",
-        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
-        "date_created": "2020-07-15T02:38:52.524690+00:00",
         "last_modified": {
-            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-            "date_modified": "2020-07-15T02:43:02.966865+00:00"
-        }
-    },
-    {
-        "status": "released",
-        "url": "https://tibanna-output.s3.amazonaws.com/nWIC6uGpFT2D.metrics/metrics.html",
-        "project": "f01ff5be-a72d-43bd-afcf-174fa9dcd282",
-        "schema_version": "1",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-        "overall_quality_status": "PASS",
-        "uuid": "d5b988ed-e471-4c2d-a2fc-27ec3da16f70",
-        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
-        "date_created": "2020-07-15T02:38:52.792001+00:00",
-        "last_modified": {
-            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-            "date_modified": "2020-07-15T02:43:03.065672+00:00"
-        }
-    },
-    {
-        "status": "released",
-        "url": "https://tibanna-output.s3.amazonaws.com/SNKP2MTOHBTQ.metrics/metrics.html",
-        "project": "f01ff5be-a72d-43bd-afcf-174fa9dcd282",
-        "schema_version": "1",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-        "overall_quality_status": "PASS",
-        "uuid": "d175df4f-2de2-4462-a772-883545fd1963",
-        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
-        "date_created": "2020-07-15T02:38:53.038027+00:00",
-        "last_modified": {
-            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-            "date_modified": "2020-07-15T02:43:03.171263+00:00"
-        }
-    },
-    {
-        "status": "released",
-        "url": "https://tibanna-output.s3.amazonaws.com/hWvicBHIC7kW.metrics/metrics.html",
-        "project": "f01ff5be-a72d-43bd-afcf-174fa9dcd282",
-        "schema_version": "1",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-        "overall_quality_status": "PASS",
-        "uuid": "bda6521a-9a53-4137-89ab-b07469677fb9",
-        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
-        "date_created": "2020-07-15T02:38:53.343317+00:00",
-        "last_modified": {
-            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-            "date_modified": "2020-07-15T02:43:03.274340+00:00"
-        }
-    },
-    {
-        "status": "released",
-        "url": "https://tibanna-output.s3.amazonaws.com/bYv18wa1NtmR.metrics/metrics.html",
-        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
-        "schema_version": "1",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-        "overall_quality_status": "PASS",
-        "uuid": "a9387b26-1a0a-4e99-9a2c-f4c8dc52f49f",
-        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
-        "date_created": "2020-07-15T02:38:53.648772+00:00",
-        "last_modified": {
-            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-            "date_modified": "2020-07-15T02:43:03.379115+00:00"
-        }
-    },
-    {
-        "status": "released",
-        "url": "https://tibanna-output.s3.amazonaws.com/qxgV9QHsr42g.metrics/metrics.html",
-        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
-        "schema_version": "1",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-        "overall_quality_status": "PASS",
-        "uuid": "7a696905-4d62-41b1-892f-018a6b3f7185",
-        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
-        "date_created": "2020-07-15T02:38:53.894573+00:00",
-        "last_modified": {
-            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-            "date_modified": "2020-07-15T02:43:03.504608+00:00"
-        }
-    },
-    {
-        "status": "released",
-        "url": "https://tibanna-output.s3.amazonaws.com/EwEwzwgc5WXq.metrics/metrics.html",
-        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
-        "schema_version": "1",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-        "overall_quality_status": "PASS",
-        "uuid": "106e7c85-36fa-40c6-b283-e85cc6424d98",
-        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
-        "date_created": "2020-07-15T02:38:54.150659+00:00",
-        "last_modified": {
-            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-            "date_modified": "2020-07-15T02:43:03.608944+00:00"
-        }
-    },
-    {
-        "status": "released",
-        "url": "https://tibanna-output.s3.amazonaws.com/rRxmD8DokUEv.metrics/metrics.html",
-        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
-        "schema_version": "1",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-        "overall_quality_status": "PASS",
-        "uuid": "1015eef1-534c-43b0-b75a-9a017f5bb87d",
-        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
-        "date_created": "2020-07-15T02:38:54.505045+00:00",
-        "last_modified": {
-            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-            "date_modified": "2020-07-15T02:43:03.725348+00:00"
-        }
-    },
-    {
-        "status": "released",
-        "url": "https://tibanna-output.s3.amazonaws.com/OSwnZiTnh5pL.metrics/metrics.html",
-        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
-        "schema_version": "1",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-        "overall_quality_status": "PASS",
-        "uuid": "a930f8b0-bfc4-4fc6-8abc-afba1996e015",
-        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
-        "date_created": "2020-07-15T02:38:54.751638+00:00",
-        "last_modified": {
-            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-            "date_modified": "2020-07-15T02:43:03.819585+00:00"
-        }
-    },
-    {
+            "date_modified": "2020-07-16T00:05:04.216986+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
         "status": "in review",
-        "url": "https://tibanna-output.s3.amazonaws.com/2sDK0ZQrjfVw.metrics/metrics.html",
-        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
-        "schema_version": "1",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "uuid": "fbea480c-17ec-40da-b552-546516ffdfb4"
+    },
+    {
         "overall_quality_status": "PASS",
-        "uuid": "4aed475e-c061-4c42-bf50-8fc381c6277e",
-        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
-        "date_created": "2020-07-15T02:38:55.017209+00:00",
+        "date_created": "2020-07-21T17:33:40.481989+00:00",
+        "url": "https://tibanna-output.s3.amazonaws.com/HbNA0X59CkdF.metrics/metrics.html",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "institution": "828cd4fe-ebb0-4b36-ccbb-d2e3a36ca234",
+        "schema_version": "1",
         "last_modified": {
-            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-            "date_modified": "2020-07-15T02:43:03.924093+00:00"
-        }
+            "date_modified": "2020-07-21T18:00:20.377783+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "status": "in review",
+        "project": "91336042-f277-4f69-97e5-5c8a5f6d6058",
+        "uuid": "e26dd187-6bc2-4e6d-9247-d6f8c891ca65"
+    },
+    {
+        "overall_quality_status": "PASS",
+        "date_created": "2020-07-21T17:33:40.720190+00:00",
+        "url": "https://tibanna-output.s3.amazonaws.com/nlzfsEjqVsbI.metrics/metrics.html",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "institution": "828cd4fe-ebb0-4b36-ccbb-d2e3a36ca234",
+        "schema_version": "1",
+        "last_modified": {
+            "date_modified": "2020-07-21T18:00:20.512693+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "status": "in review",
+        "project": "91336042-f277-4f69-97e5-5c8a5f6d6058",
+        "uuid": "e12f7d05-f788-4a4b-ae9d-e7c9c9392242"
+    },
+    {
+        "overall_quality_status": "PASS",
+        "date_created": "2020-07-15T02:38:47.659220+00:00",
+        "url": "https://tibanna-output.s3.amazonaws.com/OdyncuEZR5Vm.metrics/metrics.html",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "schema_version": "1",
+        "last_modified": {
+            "date_modified": "2020-07-15T02:43:00.852109+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "status": "released",
+        "project": "f01ff5be-a72d-43bd-afcf-174fa9dcd282",
+        "uuid": "df3ff7ca-1ea6-4900-ba2b-b22c64fff0da"
+    },
+    {
+        "overall_quality_status": "PASS",
+        "date_created": "2020-07-21T17:33:43.397102+00:00",
+        "url": "https://tibanna-output.s3.amazonaws.com/3IZrGesklPKT.metrics/metrics.html",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "institution": "828cd4fe-ebb0-4b36-ccbb-d2e3a36ca234",
+        "schema_version": "1",
+        "last_modified": {
+            "date_modified": "2020-07-21T18:00:21.955196+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "status": "in review",
+        "project": "91336042-f277-4f69-97e5-5c8a5f6d6058",
+        "uuid": "d6f7a9d3-952a-4eb3-8507-f3f18c400fd7"
+    },
+    {
+        "overall_quality_status": "PASS",
+        "date_created": "2020-07-15T02:38:47.917192+00:00",
+        "url": "https://tibanna-output.s3.amazonaws.com/vYSquvWbBbjv.metrics/metrics.html",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "schema_version": "1",
+        "last_modified": {
+            "date_modified": "2020-07-15T02:43:00.967916+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "status": "released",
+        "project": "f01ff5be-a72d-43bd-afcf-174fa9dcd282",
+        "uuid": "d19957c2-a322-4273-acb8-6a52707fbe0d"
+    },
+    {
+        "overall_quality_status": "PASS",
+        "date_created": "2020-07-15T02:38:48.183701+00:00",
+        "url": "https://tibanna-output.s3.amazonaws.com/mgQ8qT5RwE9g.metrics/metrics.html",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "schema_version": "1",
+        "last_modified": {
+            "date_modified": "2020-07-15T02:43:01.083806+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "status": "released",
+        "project": "f01ff5be-a72d-43bd-afcf-174fa9dcd282",
+        "uuid": "cc3a931f-8e40-4cdd-a75c-1eaff711ffd3"
+    },
+    {
+        "overall_quality_status": "PASS",
+        "date_created": "2020-07-21T17:33:40.964041+00:00",
+        "url": "https://tibanna-output.s3.amazonaws.com/FI6dbih1nBem.metrics/metrics.html",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "institution": "828cd4fe-ebb0-4b36-ccbb-d2e3a36ca234",
+        "schema_version": "1",
+        "last_modified": {
+            "date_modified": "2020-07-21T18:00:20.629636+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "status": "in review",
+        "project": "91336042-f277-4f69-97e5-5c8a5f6d6058",
+        "uuid": "c19ba051-b0d0-4ab1-8608-42dfac6fefb0"
+    },
+    {
+        "overall_quality_status": "PASS",
+        "date_created": "2020-07-21T17:33:41.191905+00:00",
+        "url": "https://tibanna-output.s3.amazonaws.com/HSwK4J1PyqRT.metrics/metrics.html",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "institution": "828cd4fe-ebb0-4b36-ccbb-d2e3a36ca234",
+        "schema_version": "1",
+        "last_modified": {
+            "date_modified": "2020-07-21T18:00:20.773899+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "status": "in review",
+        "project": "91336042-f277-4f69-97e5-5c8a5f6d6058",
+        "uuid": "c0cdf91d-b6d5-4ddf-b038-287699918827"
+    },
+    {
+        "overall_quality_status": "PASS",
+        "date_created": "2020-07-15T02:38:48.449821+00:00",
+        "url": "https://tibanna-output.s3.amazonaws.com/ongMzQuBtE0L.metrics/metrics.html",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "schema_version": "1",
+        "last_modified": {
+            "date_modified": "2020-07-15T02:43:01.194593+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "status": "released",
+        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
+        "uuid": "bfaa50e6-61cb-4091-a9c0-1c5c4d468e7b"
+    },
+    {
+        "overall_quality_status": "PASS",
+        "date_created": "2020-07-15T02:38:48.685760+00:00",
+        "url": "https://tibanna-output.s3.amazonaws.com/ertlS7dzW8Z9.metrics/metrics.html",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "schema_version": "1",
+        "last_modified": {
+            "date_modified": "2020-07-15T02:43:01.304920+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "status": "released",
+        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
+        "uuid": "ba0c2fe4-d2bd-43c0-99dc-668ae6882b15"
+    },
+    {
+        "overall_quality_status": "PASS",
+        "date_created": "2020-07-15T02:38:48.932708+00:00",
+        "url": "https://tibanna-output.s3.amazonaws.com/5483cjscXq3E.metrics/metrics.html",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "schema_version": "1",
+        "last_modified": {
+            "date_modified": "2020-07-15T02:43:01.424265+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "status": "released",
+        "project": "f01ff5be-a72d-43bd-afcf-174fa9dcd282",
+        "uuid": "a41e4654-4275-489c-8501-d5200d94e00c"
+    },
+    {
+        "overall_quality_status": "PASS",
+        "date_created": "2020-07-21T17:33:41.436576+00:00",
+        "url": "https://tibanna-output.s3.amazonaws.com/sMlqLKV5PoSU.metrics/metrics.html",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "institution": "828cd4fe-ebb0-4b36-ccbb-d2e3a36ca234",
+        "schema_version": "1",
+        "last_modified": {
+            "date_modified": "2020-07-21T18:00:20.883502+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "status": "in review",
+        "project": "91336042-f277-4f69-97e5-5c8a5f6d6058",
+        "uuid": "9ce196f5-51f2-4e3e-8c89-8e5c880003a0"
+    },
+    {
+        "overall_quality_status": "PASS",
+        "date_created": "2020-06-16T20:40:41.228962+00:00",
+        "url": "https://tibanna-output.s3.amazonaws.com/WSuKXulEwToD.metrics/metrics.html",
+        "submitted_by": "b041dba8-e2b2-4e54-a621-97edb508a0c4",
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "schema_version": "1",
+        "last_modified": {
+            "date_modified": "2020-07-16T00:05:04.314742+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "status": "in review",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "uuid": "93d68d75-c96a-45a3-bcad-46bf9666fcf4"
+    },
+    {
+        "overall_quality_status": "PASS",
+        "date_created": "2020-07-15T02:38:52.524690+00:00",
+        "url": "https://tibanna-output.s3.amazonaws.com/kICwowuPUtWB.metrics/metrics.html",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "schema_version": "1",
+        "last_modified": {
+            "date_modified": "2020-07-15T02:43:02.966865+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "status": "released",
+        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
+        "uuid": "87d28770-53ee-4529-8224-f93a4693419b"
+    },
+    {
+        "overall_quality_status": "PASS",
+        "date_created": "2020-07-15T02:38:49.267519+00:00",
+        "url": "https://tibanna-output.s3.amazonaws.com/k7GRt9129OdD.metrics/metrics.html",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "schema_version": "1",
+        "last_modified": {
+            "date_modified": "2020-07-15T02:43:01.534390+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "status": "released",
+        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
+        "uuid": "81d407e4-a089-4dab-a249-44439d5dac46"
+    },
+    {
+        "overall_quality_status": "PASS",
+        "date_created": "2020-07-15T02:38:49.558066+00:00",
+        "url": "https://tibanna-output.s3.amazonaws.com/EF1VE1n9fjHD.metrics/metrics.html",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "schema_version": "1",
+        "last_modified": {
+            "date_modified": "2020-07-15T02:43:01.643119+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "status": "released",
+        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
+        "uuid": "803da8f3-daab-452c-9f7e-116d25b3e431"
+    },
+    {
+        "overall_quality_status": "PASS",
+        "date_created": "2020-07-15T02:38:49.827723+00:00",
+        "url": "https://tibanna-output.s3.amazonaws.com/P5qfQvKEs8Bx.metrics/metrics.html",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "schema_version": "1",
+        "last_modified": {
+            "date_modified": "2020-07-15T02:43:01.768432+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "status": "released",
+        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
+        "uuid": "7cf33ff2-a7e8-4036-9beb-2f507b482716"
+    },
+    {
+        "overall_quality_status": "PASS",
+        "date_created": "2020-07-15T02:38:50.105439+00:00",
+        "url": "https://tibanna-output.s3.amazonaws.com/yb9Z9bXaN5SC.metrics/metrics.html",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "schema_version": "1",
+        "last_modified": {
+            "date_modified": "2020-07-15T02:43:01.866590+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "status": "released",
+        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
+        "uuid": "75a18d62-9c09-4614-895f-b98dae1103a2"
+    },
+    {
+        "overall_quality_status": "PASS",
+        "date_created": "2020-07-15T02:38:50.378370+00:00",
+        "url": "https://tibanna-output.s3.amazonaws.com/0D6ZBfqd9RHo.metrics/metrics.html",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "schema_version": "1",
+        "last_modified": {
+            "date_modified": "2020-07-15T02:43:01.967723+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "status": "released",
+        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
+        "uuid": "59d9c913-8b9f-4eaf-ac93-8307cd896b70"
+    },
+    {
+        "overall_quality_status": "PASS",
+        "date_created": "2020-07-21T17:33:43.661476+00:00",
+        "url": "https://tibanna-output.s3.amazonaws.com/7s4tyxb57lBr.metrics/metrics.html",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "institution": "828cd4fe-ebb0-4b36-ccbb-d2e3a36ca234",
+        "schema_version": "1",
+        "last_modified": {
+            "date_modified": "2020-07-21T18:00:22.088589+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "status": "in review",
+        "project": "91336042-f277-4f69-97e5-5c8a5f6d6058",
+        "uuid": "5306b907-9292-4f16-a6cc-4b3d97f08cb0"
+    },
+    {
+        "overall_quality_status": "PASS",
+        "date_created": "2020-07-15T02:38:50.634624+00:00",
+        "url": "https://tibanna-output.s3.amazonaws.com/7GMhQHU5snqR.metrics/metrics.html",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "schema_version": "1",
+        "last_modified": {
+            "date_modified": "2020-07-15T02:43:02.115945+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "status": "released",
+        "project": "f01ff5be-a72d-43bd-afcf-174fa9dcd282",
+        "uuid": "507a1081-6145-45cf-bf7c-53e4c7de2385"
+    },
+    {
+        "overall_quality_status": "PASS",
+        "date_created": "2020-07-15T02:38:50.923994+00:00",
+        "url": "https://tibanna-output.s3.amazonaws.com/t0os9WZyPeg5.metrics/metrics.html",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "schema_version": "1",
+        "last_modified": {
+            "date_modified": "2020-07-15T02:43:02.242188+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "status": "released",
+        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
+        "uuid": "4af22cf0-261b-4f08-ad9f-83fd817de987"
+    },
+    {
+        "overall_quality_status": "PASS",
+        "date_created": "2020-07-21T17:33:43.867407+00:00",
+        "url": "https://tibanna-output.s3.amazonaws.com/YW937Nrp6ofT.metrics/metrics.html",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "institution": "828cd4fe-ebb0-4b36-ccbb-d2e3a36ca234",
+        "schema_version": "1",
+        "last_modified": {
+            "date_modified": "2020-07-21T18:00:22.185914+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "status": "in review",
+        "project": "91336042-f277-4f69-97e5-5c8a5f6d6058",
+        "uuid": "49ac74b4-e38d-4286-a15f-5d05a91a1a77"
+    },
+    {
+        "overall_quality_status": "PASS",
+        "date_created": "2020-07-21T17:33:41.694801+00:00",
+        "url": "https://tibanna-output.s3.amazonaws.com/1n8CYNQ8bx9V.metrics/metrics.html",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "institution": "828cd4fe-ebb0-4b36-ccbb-d2e3a36ca234",
+        "schema_version": "1",
+        "last_modified": {
+            "date_modified": "2020-07-21T18:00:21.019704+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "status": "in review",
+        "project": "91336042-f277-4f69-97e5-5c8a5f6d6058",
+        "uuid": "48c0ad5a-2cf1-4284-bf4f-4f105adb0376"
+    },
+    {
+        "overall_quality_status": "PASS",
+        "date_created": "2020-07-15T02:38:51.176975+00:00",
+        "url": "https://tibanna-output.s3.amazonaws.com/LhS9asv6a3UU.metrics/metrics.html",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "schema_version": "1",
+        "last_modified": {
+            "date_modified": "2020-07-15T02:43:02.368019+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "status": "released",
+        "project": "f01ff5be-a72d-43bd-afcf-174fa9dcd282",
+        "uuid": "403566e3-39b2-470f-8cda-bf892b207695"
+    },
+    {
+        "overall_quality_status": "PASS",
+        "date_created": "2020-07-21T17:33:41.950575+00:00",
+        "url": "https://tibanna-output.s3.amazonaws.com/SHvN156Dpsxp.metrics/metrics.html",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "institution": "828cd4fe-ebb0-4b36-ccbb-d2e3a36ca234",
+        "schema_version": "1",
+        "last_modified": {
+            "date_modified": "2020-07-21T18:00:21.178600+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "status": "in review",
+        "project": "91336042-f277-4f69-97e5-5c8a5f6d6058",
+        "uuid": "17a9cb34-f7fa-415e-9a12-cc11d3cd21a4"
+    },
+    {
+        "overall_quality_status": "PASS",
+        "date_created": "2020-07-15T02:38:51.402981+00:00",
+        "url": "https://tibanna-output.s3.amazonaws.com/vsYpcoKqr3uD.metrics/metrics.html",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "schema_version": "1",
+        "last_modified": {
+            "date_modified": "2020-07-15T02:43:02.485174+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "status": "released",
+        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
+        "uuid": "138f6ee5-37cd-4e38-9ffa-e9db09bbf5ac"
+    },
+    {
+        "overall_quality_status": "PASS",
+        "date_created": "2020-07-21T17:33:44.093646+00:00",
+        "url": "https://tibanna-output.s3.amazonaws.com/9y0tU4FCmlE8.metrics/metrics.html",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "institution": "828cd4fe-ebb0-4b36-ccbb-d2e3a36ca234",
+        "schema_version": "1",
+        "last_modified": {
+            "date_modified": "2020-07-21T18:00:22.346425+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "status": "in review",
+        "project": "91336042-f277-4f69-97e5-5c8a5f6d6058",
+        "uuid": "11fe3734-4065-4110-81c2-5a5addc2a38b"
+    },
+    {
+        "overall_quality_status": "PASS",
+        "date_created": "2020-07-15T02:38:51.667966+00:00",
+        "url": "https://tibanna-output.s3.amazonaws.com/4P4YcNI0XY5J.metrics/metrics.html",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "schema_version": "1",
+        "last_modified": {
+            "date_modified": "2020-07-15T02:43:02.611509+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "status": "released",
+        "project": "f01ff5be-a72d-43bd-afcf-174fa9dcd282",
+        "uuid": "08bbe7a3-d1d3-4bc2-a87d-01e1e5d28f4c"
+    },
+    {
+        "overall_quality_status": "PASS",
+        "date_created": "2020-07-15T02:38:51.943731+00:00",
+        "url": "https://tibanna-output.s3.amazonaws.com/OEhQxbjQ0XwH.metrics/metrics.html",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "schema_version": "1",
+        "last_modified": {
+            "date_modified": "2020-07-15T02:43:02.765280+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "status": "released",
+        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
+        "uuid": "06d23bba-9caf-410d-b994-1d1e0ccdb760"
+    },
+    {
+        "overall_quality_status": "PASS",
+        "date_created": "2020-07-21T17:33:42.156267+00:00",
+        "url": "https://tibanna-output.s3.amazonaws.com/7eRQEjHZSLWq.metrics/metrics.html",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "institution": "828cd4fe-ebb0-4b36-ccbb-d2e3a36ca234",
+        "schema_version": "1",
+        "last_modified": {
+            "date_modified": "2020-07-21T18:00:21.272821+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "status": "in review",
+        "project": "91336042-f277-4f69-97e5-5c8a5f6d6058",
+        "uuid": "069c0e0f-c1d4-4484-b652-399dcffa11e1"
+    },
+    {
+        "overall_quality_status": "PASS",
+        "date_created": "2020-07-15T02:38:52.289530+00:00",
+        "url": "https://tibanna-output.s3.amazonaws.com/gG8tIL7XpgO2.metrics/metrics.html",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "schema_version": "1",
+        "last_modified": {
+            "date_modified": "2020-07-15T02:43:02.869168+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "status": "released",
+        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
+        "uuid": "03d460e2-60cf-45f9-88d8-8561cfa6d600"
+    },
+    {
+        "overall_quality_status": "PASS",
+        "date_created": "2020-07-15T02:38:52.792001+00:00",
+        "url": "https://tibanna-output.s3.amazonaws.com/nWIC6uGpFT2D.metrics/metrics.html",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "schema_version": "1",
+        "last_modified": {
+            "date_modified": "2020-07-15T02:43:03.065672+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "status": "released",
+        "project": "f01ff5be-a72d-43bd-afcf-174fa9dcd282",
+        "uuid": "d5b988ed-e471-4c2d-a2fc-27ec3da16f70"
+    },
+    {
+        "overall_quality_status": "PASS",
+        "date_created": "2020-07-15T02:38:53.038027+00:00",
+        "url": "https://tibanna-output.s3.amazonaws.com/SNKP2MTOHBTQ.metrics/metrics.html",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "schema_version": "1",
+        "last_modified": {
+            "date_modified": "2020-07-15T02:43:03.171263+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "status": "released",
+        "project": "f01ff5be-a72d-43bd-afcf-174fa9dcd282",
+        "uuid": "d175df4f-2de2-4462-a772-883545fd1963"
+    },
+    {
+        "overall_quality_status": "PASS",
+        "date_created": "2020-07-15T02:38:53.343317+00:00",
+        "url": "https://tibanna-output.s3.amazonaws.com/hWvicBHIC7kW.metrics/metrics.html",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "schema_version": "1",
+        "last_modified": {
+            "date_modified": "2020-07-15T02:43:03.274340+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "status": "released",
+        "project": "f01ff5be-a72d-43bd-afcf-174fa9dcd282",
+        "uuid": "bda6521a-9a53-4137-89ab-b07469677fb9"
+    },
+    {
+        "overall_quality_status": "PASS",
+        "date_created": "2020-07-15T02:38:53.648772+00:00",
+        "url": "https://tibanna-output.s3.amazonaws.com/bYv18wa1NtmR.metrics/metrics.html",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "schema_version": "1",
+        "last_modified": {
+            "date_modified": "2020-07-15T02:43:03.379115+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "status": "released",
+        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
+        "uuid": "a9387b26-1a0a-4e99-9a2c-f4c8dc52f49f"
+    },
+    {
+        "overall_quality_status": "PASS",
+        "date_created": "2020-07-15T02:38:54.751638+00:00",
+        "url": "https://tibanna-output.s3.amazonaws.com/OSwnZiTnh5pL.metrics/metrics.html",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "schema_version": "1",
+        "last_modified": {
+            "date_modified": "2020-07-15T02:43:03.819585+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "status": "released",
+        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
+        "uuid": "a930f8b0-bfc4-4fc6-8abc-afba1996e015"
+    },
+    {
+        "overall_quality_status": "PASS",
+        "date_created": "2020-07-21T17:33:42.382146+00:00",
+        "url": "https://tibanna-output.s3.amazonaws.com/bB0cKdycBYa5.metrics/metrics.html",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "institution": "828cd4fe-ebb0-4b36-ccbb-d2e3a36ca234",
+        "schema_version": "1",
+        "last_modified": {
+            "date_modified": "2020-07-21T18:00:21.357774+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "status": "in review",
+        "project": "91336042-f277-4f69-97e5-5c8a5f6d6058",
+        "uuid": "902f4cf5-beee-4d80-a00b-1d0b1f01547e"
+    },
+    {
+        "overall_quality_status": "PASS",
+        "date_created": "2020-07-15T02:38:53.894573+00:00",
+        "url": "https://tibanna-output.s3.amazonaws.com/qxgV9QHsr42g.metrics/metrics.html",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "schema_version": "1",
+        "last_modified": {
+            "date_modified": "2020-07-15T02:43:03.504608+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "status": "released",
+        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
+        "uuid": "7a696905-4d62-41b1-892f-018a6b3f7185"
+    },
+    {
+        "overall_quality_status": "PASS",
+        "date_created": "2020-07-21T17:33:42.590129+00:00",
+        "url": "https://tibanna-output.s3.amazonaws.com/mOkgYQAC4i0R.metrics/metrics.html",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "institution": "828cd4fe-ebb0-4b36-ccbb-d2e3a36ca234",
+        "schema_version": "1",
+        "last_modified": {
+            "date_modified": "2020-07-21T18:00:21.474975+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "status": "in review",
+        "project": "91336042-f277-4f69-97e5-5c8a5f6d6058",
+        "uuid": "669ec993-001b-4128-bb1b-af8307b66d6e"
+    },
+    {
+        "overall_quality_status": "PASS",
+        "date_created": "2020-07-21T17:33:42.875546+00:00",
+        "url": "https://tibanna-output.s3.amazonaws.com/DviMHPrh2fvK.metrics/metrics.html",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "institution": "828cd4fe-ebb0-4b36-ccbb-d2e3a36ca234",
+        "schema_version": "1",
+        "last_modified": {
+            "date_modified": "2020-07-21T18:00:21.581449+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "status": "in review",
+        "project": "91336042-f277-4f69-97e5-5c8a5f6d6058",
+        "uuid": "4482b5ce-7054-446f-a623-3dc5c5d1ba90"
+    },
+    {
+        "overall_quality_status": "PASS",
+        "date_created": "2020-07-21T17:33:43.111372+00:00",
+        "url": "https://tibanna-output.s3.amazonaws.com/7Nrg6nJOlWlE.metrics/metrics.html",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "institution": "828cd4fe-ebb0-4b36-ccbb-d2e3a36ca234",
+        "schema_version": "1",
+        "last_modified": {
+            "date_modified": "2020-07-21T18:00:21.777336+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "status": "in review",
+        "project": "91336042-f277-4f69-97e5-5c8a5f6d6058",
+        "uuid": "428d6cd7-c2eb-42c6-9703-1762e6305cb4"
+    },
+    {
+        "overall_quality_status": "PASS",
+        "date_created": "2020-07-15T02:38:54.150659+00:00",
+        "url": "https://tibanna-output.s3.amazonaws.com/EwEwzwgc5WXq.metrics/metrics.html",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "schema_version": "1",
+        "last_modified": {
+            "date_modified": "2020-07-15T02:43:03.608944+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "status": "released",
+        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
+        "uuid": "106e7c85-36fa-40c6-b283-e85cc6424d98"
+    },
+    {
+        "overall_quality_status": "PASS",
+        "date_created": "2020-07-15T02:38:54.505045+00:00",
+        "url": "https://tibanna-output.s3.amazonaws.com/rRxmD8DokUEv.metrics/metrics.html",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "schema_version": "1",
+        "last_modified": {
+            "date_modified": "2020-07-15T02:43:03.725348+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "status": "released",
+        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
+        "uuid": "1015eef1-534c-43b0-b75a-9a017f5bb87d"
+    },
+    {
+        "overall_quality_status": "PASS",
+        "date_created": "2020-07-15T02:38:55.017209+00:00",
+        "url": "https://tibanna-output.s3.amazonaws.com/2sDK0ZQrjfVw.metrics/metrics.html",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "schema_version": "1",
+        "last_modified": {
+            "date_modified": "2020-07-15T02:43:03.924093+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "status": "in review",
+        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
+        "uuid": "4aed475e-c061-4c42-bf50-8fc381c6277e"
     }
 ]

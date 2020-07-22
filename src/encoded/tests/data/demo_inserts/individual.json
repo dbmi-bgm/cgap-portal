@@ -1,588 +1,1230 @@
 [
     {
-        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
-        "life_status": "alive",
-        "father": "7b48eacc-826b-4ecd-9104-9918b0bb5b81",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-        "age_units": "day",
-        "mother": "11c429a1-bcb8-4ac6-8f71-be6fb5064ad9",
-        "date_created": "2020-07-15T02:38:28.623689+00:00",
-        "individual_id": "NA12893",
-        "is_termination_of_pregnancy": false,
+        "is_still_birth": false,
+        "date_created": "2020-07-21T17:33:08.630143+00:00",
+        "schema_version": "1",
+        "is_deceased": false,
         "is_infertile": false,
+        "quantity": 2,
+        "is_pregnancy": false,
+        "last_modified": {
+            "date_modified": "2020-07-21T17:59:56.666658+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "accession": "GAPIDXVOJPAR",
+        "is_no_children_by_choice": false,
+        "is_spontaneous_abortion": false,
+        "sex": "F",
+        "status": "in review",
+        "project": "91336042-f277-4f69-97e5-5c8a5f6d6058",
+        "age_units": "year",
+        "father": "2429f9d0-dade-4c0a-9fe5-d03652880fd7",
+        "life_status": "alive and well",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "institution": "828cd4fe-ebb0-4b36-ccbb-d2e3a36ca234",
+        "is_termination_of_pregnancy": false,
+        "uuid": "ed9ed5e6-61d1-47c8-b963-617cc8fc457c",
+        "age_at_death_units": "year"
+    },
+    {
+        "is_still_birth": false,
+        "date_created": "2020-07-21T17:33:09.249854+00:00",
+        "schema_version": "1",
+        "is_deceased": false,
+        "is_infertile": false,
+        "is_pregnancy": false,
+        "quantity": 1,
+        "phenotypic_features": [
+            {
+                "phenotypic_feature": "afdca5e6-6e27-4c43-a731-42acdfa39ea6"
+            },
+            {
+                "phenotypic_feature": "f5ff7c15-e35a-41f5-9ded-cce307940ea1"
+            }
+        ],
+        "mother": "54559fbc-f522-47db-a4e2-e25c00d8481d",
+        "last_modified": {
+            "date_modified": "2020-07-21T17:59:56.982233+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "accession": "GAPID256GDYJ",
+        "is_no_children_by_choice": false,
+        "is_spontaneous_abortion": false,
+        "sex": "M",
+        "status": "in review",
+        "project": "91336042-f277-4f69-97e5-5c8a5f6d6058",
+        "age_units": "year",
+        "father": "0df482b9-23c2-4a66-9521-5852b696a279",
+        "life_status": "alive",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "institution": "828cd4fe-ebb0-4b36-ccbb-d2e3a36ca234",
+        "is_termination_of_pregnancy": false,
+        "uuid": "db29af10-e8e8-4c67-acf8-8b3518bfda29",
+        "age_at_death_units": "year"
+    },
+    {
+        "is_still_birth": false,
+        "date_created": "2020-07-15T02:38:28.393822+00:00",
+        "is_pregnancy": false,
+        "last_modified": {
+            "date_modified": "2020-07-15T02:42:47.539803+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "accession": "GAPID4B529UM",
+        "schema_version": "1",
+        "is_deceased": false,
+        "status": "released",
+        "sex": "F",
+        "is_no_children_by_choice": false,
+        "is_infertile": false,
+        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
+        "uuid": "d246d630-62be-4607-af9a-56d97b885331",
+        "is_spontaneous_abortion": false,
+        "quantity": 1,
+        "life_status": "alive",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "aliases": [
+            "cgap:NA12890"
+        ],
+        "is_termination_of_pregnancy": false,
+        "individual_id": "NA12890"
+    },
+    {
+        "is_still_birth": false,
+        "date_created": "2020-07-21T17:33:09.703486+00:00",
+        "schema_version": "1",
+        "is_deceased": false,
+        "is_infertile": false,
+        "is_pregnancy": false,
+        "quantity": 1,
+        "mother": "2196aac1-2512-44c1-957a-ea29a7875ec2",
+        "last_modified": {
+            "date_modified": "2020-07-21T17:59:57.180251+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "accession": "GAPID124M95V",
+        "is_no_children_by_choice": false,
+        "is_spontaneous_abortion": false,
+        "sex": "M",
+        "status": "in review",
+        "project": "91336042-f277-4f69-97e5-5c8a5f6d6058",
+        "age_units": "year",
+        "father": "e4873179-4e6a-4ac2-b617-0ae8bd9fed28",
+        "life_status": "alive and well",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "institution": "828cd4fe-ebb0-4b36-ccbb-d2e3a36ca234",
+        "is_termination_of_pregnancy": false,
+        "uuid": "d0a03d3b-44c7-4b96-a53e-3ddfb323c518",
+        "age_at_death_units": "year"
+    },
+    {
+        "date_created": "2020-07-21T17:33:10.255495+00:00",
+        "age": 9,
+        "schema_version": "1",
+        "father": "7dd17757-6c4d-4724-897a-fdb16f6759a3",
+        "samples": [
+            "a4cecf10-5eee-4f78-b094-3ea8a55a5a3b"
+        ],
+        "quantity": 1,
+        "phenotypic_features": [
+            {
+                "phenotypic_feature": "17af4443-393a-4e27-abc5-a564640832fa"
+            },
+            {
+                "phenotypic_feature": "1d5571e9-f0d6-4cf4-8d58-678754d1043d"
+            },
+            {
+                "phenotypic_feature": "7e00a190-7851-43f9-a6d5-b24031bb5bf9"
+            },
+            {
+                "phenotypic_feature": "6342771a-49ab-491d-8e9f-c59c35dec3fc"
+            }
+        ],
+        "age_at_death_units": "year",
+        "mother": "ba129170-42dc-417f-9022-814314c41274",
+        "last_modified": {
+            "date_modified": "2020-07-22T02:54:46.607722+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "accession": "GAPIDSLB882Z",
+        "uuid": "cb3f2a68-3300-48b0-889e-7aca2dfe68e3",
+        "individual_id": "UDN452807",
+        "status": "released",
+        "project": "91336042-f277-4f69-97e5-5c8a5f6d6058",
+        "age_units": "year",
+        "life_status": "alive",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "institution": "828cd4fe-ebb0-4b36-ccbb-d2e3a36ca234",
+        "clinic_notes": "Case bgm0339\nGAPIDVUCTCDB",
+        "sex": "F",
+        "birth_year": 2010
+    },
+    {
+        "is_still_birth": false,
+        "date_created": "2020-07-21T17:33:10.571441+00:00",
+        "age": 12,
+        "schema_version": "1",
+        "father": "7dd17757-6c4d-4724-897a-fdb16f6759a3",
+        "is_infertile": false,
+        "is_pregnancy": false,
+        "quantity": 1,
+        "phenotypic_features": [
+            {
+                "phenotypic_feature": "4fac7a16-e6dd-42e3-914b-c8fed305dc5d"
+            }
+        ],
+        "age_at_death_units": "year",
+        "mother": "ba129170-42dc-417f-9022-814314c41274",
+        "last_modified": {
+            "date_modified": "2020-07-21T17:59:57.534466+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "accession": "GAPIDYGGA5B7",
+        "is_no_children_by_choice": false,
+        "is_spontaneous_abortion": false,
+        "sex": "F",
+        "status": "in review",
+        "project": "91336042-f277-4f69-97e5-5c8a5f6d6058",
+        "age_units": "year",
+        "is_deceased": false,
+        "life_status": "alive",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "institution": "828cd4fe-ebb0-4b36-ccbb-d2e3a36ca234",
+        "is_termination_of_pregnancy": false,
+        "uuid": "c3fedef3-c6d7-41db-a55c-89baacd0783f",
+        "birth_year": 2007
+    },
+    {
+        "individual_id": "UDN191434",
+        "mother": "2196aac1-2512-44c1-957a-ea29a7875ec2",
+        "last_modified": {
+            "date_modified": "2020-07-22T02:55:04.974879+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "accession": "GAPID4B1MXDP",
+        "schema_version": "1",
+        "father": "e4873179-4e6a-4ac2-b617-0ae8bd9fed28",
+        "sex": "F",
+        "status": "released",
+        "project": "91336042-f277-4f69-97e5-5c8a5f6d6058",
+        "date_created": "2020-07-21T17:33:10.797225+00:00",
+        "age_units": "year",
+        "quantity": 1,
+        "phenotypic_features": [
+            {
+                "phenotypic_feature": "ec93dc91-1a7d-4969-9773-0168e7126579"
+            },
+            {
+                "phenotypic_feature": "42ceec48-0001-49a9-adc9-a8a256fa9710"
+            }
+        ],
+        "life_status": "alive",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "institution": "828cd4fe-ebb0-4b36-ccbb-d2e3a36ca234",
+        "uuid": "ba129170-42dc-417f-9022-814314c41274",
+        "samples": [
+            "cacc5929-216c-4bbd-9686-aad111d81561"
+        ],
+        "age_at_death_units": "year"
+    },
+    {
+        "is_still_birth": false,
+        "date_created": "2020-07-15T02:38:28.623689+00:00",
+        "schema_version": "1",
+        "is_deceased": false,
+        "is_infertile": false,
+        "is_pregnancy": false,
+        "quantity": 1,
+        "mother": "11c429a1-bcb8-4ac6-8f71-be6fb5064ad9",
+        "last_modified": {
+            "date_modified": "2020-07-15T02:42:47.679470+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "accession": "GAPID63EXICS",
+        "is_no_children_by_choice": false,
+        "uuid": "b8e17d98-e364-43c6-919c-a739afa619ad",
+        "is_spontaneous_abortion": false,
+        "sex": "M",
+        "status": "released",
+        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
+        "age_units": "day",
+        "father": "7b48eacc-826b-4ecd-9104-9918b0bb5b81",
+        "life_status": "alive",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
         "aliases": [
             "cgap:NA12893"
         ],
-        "is_spontaneous_abortion": false,
-        "uuid": "b8e17d98-e364-43c6-919c-a739afa619ad",
-        "status": "released",
-        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
-        "quantity": 1,
-        "accession": "GAPID63EXICS",
-        "is_deceased": false,
-        "sex": "M",
-        "is_still_birth": false,
-        "is_no_children_by_choice": false,
-        "is_pregnancy": false,
-        "schema_version": "1",
-        "last_modified": {
-            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-            "date_modified": "2020-07-15T02:42:47.679470+00:00"
-        }
+        "is_termination_of_pregnancy": false,
+        "individual_id": "NA12893"
     },
     {
-        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
-        "life_status": "alive",
-        "father": "7b48eacc-826b-4ecd-9104-9918b0bb5b81",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-        "age_units": "day",
-        "mother": "11c429a1-bcb8-4ac6-8f71-be6fb5064ad9",
+        "is_still_birth": false,
         "date_created": "2020-07-15T02:38:28.866838+00:00",
-        "individual_id": "NA12885",
-        "is_termination_of_pregnancy": false,
+        "schema_version": "1",
+        "is_deceased": false,
         "is_infertile": false,
+        "is_pregnancy": false,
+        "quantity": 1,
+        "mother": "11c429a1-bcb8-4ac6-8f71-be6fb5064ad9",
+        "last_modified": {
+            "date_modified": "2020-07-15T02:42:47.828972+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "accession": "GAPIDHJBFV7A",
+        "is_no_children_by_choice": false,
+        "uuid": "ab4328a2-d6ae-47a8-b0a9-93f5318a65ce",
+        "is_spontaneous_abortion": false,
+        "sex": "F",
+        "status": "released",
+        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
+        "age_units": "day",
+        "father": "7b48eacc-826b-4ecd-9104-9918b0bb5b81",
+        "life_status": "alive",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
         "aliases": [
             "cgap:NA12885"
         ],
-        "is_spontaneous_abortion": false,
-        "uuid": "ab4328a2-d6ae-47a8-b0a9-93f5318a65ce",
-        "status": "released",
-        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
-        "quantity": 1,
-        "accession": "GAPIDHJBFV7A",
-        "is_deceased": false,
-        "sex": "F",
-        "is_still_birth": false,
-        "is_no_children_by_choice": false,
-        "is_pregnancy": false,
-        "schema_version": "1",
-        "last_modified": {
-            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-            "date_modified": "2020-07-15T02:42:47.828972+00:00"
-        }
+        "is_termination_of_pregnancy": false,
+        "individual_id": "NA12885"
     },
     {
-        "status": "released",
-        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
-        "schema_version": "1",
-        "quantity": 1,
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-        "life_status": "alive",
+        "is_still_birth": false,
+        "date_created": "2020-07-15T02:38:29.111046+00:00",
+        "is_pregnancy": false,
+        "last_modified": {
+            "date_modified": "2020-07-15T02:42:47.944485+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
         "accession": "GAPIDXNTIBXD",
+        "schema_version": "1",
+        "is_deceased": false,
+        "status": "released",
+        "sex": "F",
+        "is_no_children_by_choice": false,
+        "is_infertile": false,
+        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
+        "uuid": "9d5ed31c-489d-4dc6-8bdd-1c818a779a6c",
+        "is_spontaneous_abortion": false,
+        "quantity": 1,
+        "life_status": "alive",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
         "aliases": [
             "cgap:NA12892"
         ],
-        "sex": "F",
-        "is_still_birth": false,
-        "date_created": "2020-07-15T02:38:29.111046+00:00",
-        "individual_id": "NA12892",
-        "is_no_children_by_choice": false,
-        "is_pregnancy": false,
         "is_termination_of_pregnancy": false,
-        "is_infertile": false,
-        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
-        "is_deceased": false,
-        "is_spontaneous_abortion": false,
-        "uuid": "9d5ed31c-489d-4dc6-8bdd-1c818a779a6c",
-        "last_modified": {
-            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-            "date_modified": "2020-07-15T02:42:47.944485+00:00"
-        }
+        "individual_id": "NA12892"
     },
     {
+        "date_created": "2020-07-21T17:33:11.013449+00:00",
+        "age": 16,
+        "schema_version": "1",
+        "father": "7dd17757-6c4d-4724-897a-fdb16f6759a3",
+        "samples": [
+            "a70abd5e-7a32-4f3e-abb2-b37dc9a01373"
+        ],
+        "quantity": 1,
+        "phenotypic_features": [
+            {
+                "phenotypic_feature": "614604a1-9a4e-4724-b027-560f5e45fc79"
+            },
+            {
+                "phenotypic_feature": "e79b3b03-fecf-42ac-87fe-de38c8f6df53"
+            },
+            {
+                "phenotypic_feature": "eacead00-33be-437d-96df-a8c311d9a9df"
+            }
+        ],
+        "age_at_death_units": "year",
+        "mother": "ba129170-42dc-417f-9022-814314c41274",
+        "last_modified": {
+            "date_modified": "2020-07-22T02:54:55.842393+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "accession": "GAPIDCTP66J6",
+        "uuid": "939d85bc-6c95-43cf-a6c0-6deb9836cfc2",
+        "individual_id": "UDN687271",
+        "status": "released",
+        "project": "91336042-f277-4f69-97e5-5c8a5f6d6058",
+        "age_units": "year",
+        "life_status": "alive",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "institution": "828cd4fe-ebb0-4b36-ccbb-d2e3a36ca234",
+        "clinic_notes": "GAPIDI3Y3ZDI\nCase bgm0339",
+        "sex": "M",
+        "birth_year": 2003
+    },
+    {
+        "is_still_birth": false,
+        "date_created": "2020-07-15T02:38:29.349027+00:00",
+        "schema_version": "1",
+        "is_deceased": false,
+        "is_infertile": false,
+        "is_pregnancy": false,
+        "quantity": 1,
+        "mother": "11c429a1-bcb8-4ac6-8f71-be6fb5064ad9",
+        "last_modified": {
+            "date_modified": "2020-07-15T02:42:48.095574+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "accession": "GAPIDCWN1PYZ",
+        "is_no_children_by_choice": false,
+        "uuid": "878237f3-6643-40b2-a9c4-e48421ae3302",
+        "is_spontaneous_abortion": false,
+        "sex": "M",
+        "status": "released",
+        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
+        "age_units": "day",
+        "father": "7b48eacc-826b-4ecd-9104-9918b0bb5b81",
+        "life_status": "alive",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "aliases": [
+            "cgap:NA12886"
+        ],
+        "is_termination_of_pregnancy": false,
+        "individual_id": "NA12886"
+    },
+    {
+        "date_created": "2020-07-15T02:38:29.614712+00:00",
+        "last_modified": {
+            "date_modified": "2020-07-15T02:42:48.219260+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "accession": "GAPIDZ6EQTKD",
+        "sex": "M",
+        "is_deceased": false,
+        "individual_id": "NA24149",
+        "schema_version": "1",
         "status": "released",
         "project": "f01ff5be-a72d-43bd-afcf-174fa9dcd282",
-        "schema_version": "1",
+        "uuid": "82ac8825-a526-4b21-8fe0-468b9fc4e620",
         "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-        "accession": "GAPIDZ6EQTKD",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
         "aliases": [
             "cgap:NA24149"
         ],
-        "sex": "M",
-        "date_created": "2020-07-15T02:38:29.614712+00:00",
-        "individual_id": "NA24149",
         "samples": [
             "a4c0c1da-df72-4a05-a5b6-5725a7735b5c"
-        ],
-        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
-        "is_deceased": false,
-        "uuid": "82ac8825-a526-4b21-8fe0-468b9fc4e620",
-        "last_modified": {
-            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-            "date_modified": "2020-07-15T02:42:48.219260+00:00"
-        }
+        ]
     },
     {
-        "status": "released",
-        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
-        "schema_version": "1",
-        "quantity": 1,
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-        "life_status": "alive",
+        "is_still_birth": false,
+        "date_created": "2020-07-15T02:38:29.861555+00:00",
+        "is_pregnancy": false,
+        "last_modified": {
+            "date_modified": "2020-07-15T02:42:48.355209+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
         "accession": "GAPIDEPNNBDO",
+        "schema_version": "1",
+        "is_deceased": false,
+        "status": "released",
+        "sex": "M",
+        "is_no_children_by_choice": false,
+        "is_infertile": false,
+        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
+        "uuid": "826de967-ae04-43d0-ab13-75a0c992aaad",
+        "is_spontaneous_abortion": false,
+        "quantity": 1,
+        "life_status": "alive",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
         "aliases": [
             "cgap:NA12889"
         ],
-        "sex": "M",
-        "is_still_birth": false,
-        "date_created": "2020-07-15T02:38:29.861555+00:00",
-        "individual_id": "NA12889",
-        "is_no_children_by_choice": false,
-        "is_pregnancy": false,
         "is_termination_of_pregnancy": false,
-        "is_infertile": false,
-        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
-        "is_deceased": false,
-        "is_spontaneous_abortion": false,
-        "uuid": "826de967-ae04-43d0-ab13-75a0c992aaad",
-        "last_modified": {
-            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-            "date_modified": "2020-07-15T02:42:48.355209+00:00"
-        }
+        "individual_id": "NA12889"
     },
     {
-        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
+        "individual_id": "UDN287108",
+        "mother": "54559fbc-f522-47db-a4e2-e25c00d8481d",
+        "last_modified": {
+            "date_modified": "2020-07-22T02:54:37.124150+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "accession": "GAPIDON1XPYI",
+        "schema_version": "1",
+        "father": "0df482b9-23c2-4a66-9521-5852b696a279",
+        "sex": "M",
+        "status": "released",
+        "project": "91336042-f277-4f69-97e5-5c8a5f6d6058",
+        "date_created": "2020-07-21T17:33:11.278434+00:00",
+        "age_units": "year",
+        "quantity": 1,
+        "phenotypic_features": [
+            {
+                "phenotypic_feature": "1f71177f-a21f-4420-a48f-3784807c8a83"
+            },
+            {
+                "phenotypic_feature": "f5ff7c15-e35a-41f5-9ded-cce307940ea1"
+            },
+            {
+                "phenotypic_feature": "ea6f1e0d-274d-450f-b3cf-6d1d6175c0d7"
+            }
+        ],
         "life_status": "alive",
-        "father": "826de967-ae04-43d0-ab13-75a0c992aaad",
         "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-        "mother": "d246d630-62be-4607-af9a-56d97b885331",
+        "institution": "828cd4fe-ebb0-4b36-ccbb-d2e3a36ca234",
+        "clinic_notes": "Diagnosis: Visceral Hemangioma",
+        "uuid": "7dd17757-6c4d-4724-897a-fdb16f6759a3",
+        "samples": [
+            "0e06e761-bc1b-498c-a82a-9a4aa1fffc48"
+        ],
+        "age_at_death_units": "year"
+    },
+    {
+        "is_still_birth": false,
         "date_created": "2020-07-15T02:38:30.161092+00:00",
-        "individual_id": "NA12877",
+        "schema_version": "1",
+        "is_deceased": false,
+        "is_infertile": false,
+        "is_pregnancy": false,
         "samples": [
             "c47f57d8-0cdc-49c7-a183-83182c64d2b1"
         ],
-        "is_infertile": false,
+        "quantity": 1,
+        "mother": "d246d630-62be-4607-af9a-56d97b885331",
+        "last_modified": {
+            "date_modified": "2020-07-15T02:42:48.509314+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "accession": "GAPIDERSF9QH",
+        "is_no_children_by_choice": false,
+        "is_spontaneous_abortion": false,
+        "sex": "M",
+        "status": "released",
+        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
+        "uuid": "7b48eacc-826b-4ecd-9104-9918b0bb5b81",
+        "father": "826de967-ae04-43d0-ab13-75a0c992aaad",
+        "life_status": "alive",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
         "aliases": [
             "cgap:NA12877"
         ],
-        "is_spontaneous_abortion": false,
         "is_termination_of_pregnancy": false,
-        "status": "released",
-        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
-        "quantity": 1,
-        "accession": "GAPIDERSF9QH",
-        "is_deceased": false,
-        "sex": "M",
-        "is_still_birth": false,
-        "is_no_children_by_choice": false,
-        "is_pregnancy": false,
-        "uuid": "7b48eacc-826b-4ecd-9104-9918b0bb5b81",
-        "schema_version": "1",
-        "last_modified": {
-            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-            "date_modified": "2020-07-15T02:42:48.509314+00:00"
-        }
+        "individual_id": "NA12877"
     },
     {
-        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
-        "life_status": "alive",
-        "father": "7b48eacc-826b-4ecd-9104-9918b0bb5b81",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-        "age_units": "day",
-        "mother": "11c429a1-bcb8-4ac6-8f71-be6fb5064ad9",
-        "date_created": "2020-07-15T02:38:30.443183+00:00",
-        "individual_id": "NA12881",
-        "is_termination_of_pregnancy": false,
+        "is_still_birth": false,
+        "date_created": "2020-07-21T17:33:11.555813+00:00",
+        "schema_version": "1",
+        "is_deceased": true,
         "is_infertile": false,
+        "is_pregnancy": false,
+        "quantity": 2,
+        "mother": "ba129170-42dc-417f-9022-814314c41274",
+        "last_modified": {
+            "date_modified": "2020-07-21T17:59:58.184599+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "life_status": "deceased",
+        "accession": "GAPID7729P1H",
+        "is_no_children_by_choice": false,
+        "is_spontaneous_abortion": true,
+        "sex": "U",
+        "status": "in review",
+        "project": "91336042-f277-4f69-97e5-5c8a5f6d6058",
+        "age_units": "year",
+        "father": "7dd17757-6c4d-4724-897a-fdb16f6759a3",
+        "age_at_death": 10,
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "institution": "828cd4fe-ebb0-4b36-ccbb-d2e3a36ca234",
+        "is_termination_of_pregnancy": false,
+        "uuid": "727b33fd-0345-435e-aba1-3e0a7c1e652b",
+        "age_at_death_units": "week"
+    },
+    {
+        "is_still_birth": false,
+        "date_created": "2020-07-15T02:38:30.443183+00:00",
+        "schema_version": "1",
+        "is_deceased": false,
+        "is_infertile": false,
+        "is_pregnancy": false,
+        "quantity": 1,
+        "mother": "11c429a1-bcb8-4ac6-8f71-be6fb5064ad9",
+        "last_modified": {
+            "date_modified": "2020-07-15T02:42:48.665943+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "accession": "GAPIDTKPCJH5",
+        "is_no_children_by_choice": false,
+        "uuid": "6fd4ff52-9674-4e67-8641-92731372c2db",
+        "is_spontaneous_abortion": false,
+        "sex": "F",
+        "status": "released",
+        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
+        "age_units": "day",
+        "father": "7b48eacc-826b-4ecd-9104-9918b0bb5b81",
+        "life_status": "alive",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
         "aliases": [
             "cgap:NA12881"
         ],
-        "is_spontaneous_abortion": false,
-        "uuid": "6fd4ff52-9674-4e67-8641-92731372c2db",
-        "status": "released",
-        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
-        "quantity": 1,
-        "accession": "GAPIDTKPCJH5",
-        "is_deceased": false,
-        "sex": "F",
-        "is_still_birth": false,
-        "is_no_children_by_choice": false,
-        "is_pregnancy": false,
-        "schema_version": "1",
-        "last_modified": {
-            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-            "date_modified": "2020-07-15T02:42:48.665943+00:00"
-        }
+        "is_termination_of_pregnancy": false,
+        "individual_id": "NA12881"
     },
     {
+        "mother": "608e2cf2-91d4-4d9d-9091-dce1a1912bb1",
+        "last_modified": {
+            "date_modified": "2020-07-15T02:42:48.830338+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "accession": "GAPIDWGJQKEK",
+        "schema_version": "1",
+        "is_deceased": false,
+        "sex": "M",
         "status": "released",
         "project": "f01ff5be-a72d-43bd-afcf-174fa9dcd282",
-        "schema_version": "1",
+        "date_created": "2020-07-15T02:38:30.689431+00:00",
+        "individual_id": "NA24385",
         "father": "82ac8825-a526-4b21-8fe0-468b9fc4e620",
         "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-        "accession": "GAPIDWGJQKEK",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
         "aliases": [
             "cgap:NA24385"
         ],
-        "mother": "608e2cf2-91d4-4d9d-9091-dce1a1912bb1",
-        "sex": "M",
-        "date_created": "2020-07-15T02:38:30.689431+00:00",
-        "individual_id": "NA24385",
+        "uuid": "648c6261-e34a-45ff-8995-86b7bee4175f",
         "samples": [
             "84bef6f5-fdb2-463c-857a-559c747698e1"
-        ],
-        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
-        "is_deceased": false,
-        "uuid": "648c6261-e34a-45ff-8995-86b7bee4175f",
-        "last_modified": {
-            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-            "date_modified": "2020-07-15T02:42:48.830338+00:00"
-        }
+        ]
     },
     {
+        "date_created": "2020-07-15T02:38:30.963461+00:00",
+        "last_modified": {
+            "date_modified": "2020-07-15T02:42:48.971721+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "accession": "GAPIDCEC97XU",
+        "sex": "F",
+        "is_deceased": false,
+        "individual_id": "NA24143",
+        "schema_version": "1",
         "status": "released",
         "project": "f01ff5be-a72d-43bd-afcf-174fa9dcd282",
-        "schema_version": "1",
+        "uuid": "608e2cf2-91d4-4d9d-9091-dce1a1912bb1",
         "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-        "accession": "GAPIDCEC97XU",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
         "aliases": [
             "cgap:NA24143"
         ],
-        "sex": "F",
-        "date_created": "2020-07-15T02:38:30.963461+00:00",
-        "individual_id": "NA24143",
         "samples": [
             "f41d8f1c-2508-4a76-bec4-b074641000fa"
-        ],
-        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
-        "is_deceased": false,
-        "uuid": "608e2cf2-91d4-4d9d-9091-dce1a1912bb1",
-        "last_modified": {
-            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-            "date_modified": "2020-07-15T02:42:48.971721+00:00"
-        }
+        ]
     },
     {
-        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
+        "is_still_birth": false,
+        "date_created": "2020-07-21T17:33:12.125805+00:00",
+        "age": 75,
+        "schema_version": "1",
+        "is_deceased": false,
+        "is_infertile": false,
+        "quantity": 1,
+        "phenotypic_features": [
+            {
+                "phenotypic_feature": "b814493e-d54d-4aeb-a3ce-fda6e94f6d57"
+            }
+        ],
+        "age_at_death_units": "year",
+        "is_pregnancy": false,
+        "last_modified": {
+            "date_modified": "2020-07-21T17:59:58.494602+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "accession": "GAPIDO3PBYB8",
+        "is_no_children_by_choice": false,
+        "is_spontaneous_abortion": false,
+        "sex": "F",
+        "status": "in review",
+        "project": "91336042-f277-4f69-97e5-5c8a5f6d6058",
+        "age_units": "year",
         "life_status": "alive",
-        "father": "7b48eacc-826b-4ecd-9104-9918b0bb5b81",
         "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-        "age_units": "day",
-        "mother": "11c429a1-bcb8-4ac6-8f71-be6fb5064ad9",
+        "institution": "828cd4fe-ebb0-4b36-ccbb-d2e3a36ca234",
+        "clinic_notes": "Armenian, English, Scottish",
+        "is_termination_of_pregnancy": false,
+        "uuid": "54559fbc-f522-47db-a4e2-e25c00d8481d",
+        "birth_year": 1944
+    },
+    {
+        "is_still_birth": false,
         "date_created": "2020-07-15T02:38:31.338974+00:00",
-        "individual_id": "NA12879",
+        "schema_version": "1",
+        "father": "7b48eacc-826b-4ecd-9104-9918b0bb5b81",
+        "is_infertile": false,
+        "is_pregnancy": false,
         "samples": [
             "b26ea811-8430-45aa-9cf0-b365e3024b70"
         ],
-        "is_infertile": false,
-        "is_deceased": false,
-        "is_spontaneous_abortion": false,
-        "is_termination_of_pregnancy": false,
-        "status": "released",
-        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
         "quantity": 1,
+        "mother": "11c429a1-bcb8-4ac6-8f71-be6fb5064ad9",
+        "last_modified": {
+            "date_modified": "2020-07-15T02:42:49.135090+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
         "accession": "GAPID832VXDG",
+        "is_no_children_by_choice": false,
+        "uuid": "4dfca9c9-5f93-48b5-823b-1fd0afaebdae",
+        "is_spontaneous_abortion": false,
+        "individual_id": "NA12879",
+        "status": "released",
+        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
+        "age_units": "day",
+        "is_deceased": false,
+        "life_status": "alive",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
         "aliases": [
             "cgap:NA12879"
         ],
+        "is_termination_of_pregnancy": false,
+        "sex": "F"
+    },
+    {
+        "is_still_birth": false,
+        "date_created": "2020-07-21T17:33:12.391136+00:00",
+        "schema_version": "1",
+        "is_deceased": false,
+        "is_infertile": false,
+        "is_pregnancy": false,
+        "quantity": 1,
+        "mother": "2196aac1-2512-44c1-957a-ea29a7875ec2",
+        "last_modified": {
+            "date_modified": "2020-07-21T17:59:58.627721+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "accession": "GAPIDSGSM5MJ",
+        "is_no_children_by_choice": false,
+        "is_spontaneous_abortion": false,
+        "sex": "M",
+        "status": "in review",
+        "project": "91336042-f277-4f69-97e5-5c8a5f6d6058",
+        "age_units": "year",
+        "father": "e4873179-4e6a-4ac2-b617-0ae8bd9fed28",
+        "life_status": "alive and well",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "institution": "828cd4fe-ebb0-4b36-ccbb-d2e3a36ca234",
+        "is_termination_of_pregnancy": false,
+        "uuid": "4d2f102f-926c-45c0-9c18-7a75cc59f2dc",
+        "age_at_death_units": "year"
+    },
+    {
+        "is_still_birth": false,
+        "date_created": "2020-07-15T02:38:32.086130+00:00",
+        "schema_version": "1",
+        "is_deceased": false,
+        "is_infertile": false,
+        "is_pregnancy": false,
+        "quantity": 1,
+        "mother": "11c429a1-bcb8-4ac6-8f71-be6fb5064ad9",
+        "last_modified": {
+            "date_modified": "2020-07-15T02:42:49.612644+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "accession": "GAPIDHBDD29C",
+        "is_no_children_by_choice": false,
+        "uuid": "4684702a-3639-4073-8db4-d44eb8b31135",
+        "is_spontaneous_abortion": false,
         "sex": "F",
-        "is_still_birth": false,
-        "is_no_children_by_choice": false,
-        "is_pregnancy": false,
-        "uuid": "4dfca9c9-5f93-48b5-823b-1fd0afaebdae",
-        "schema_version": "1",
-        "last_modified": {
-            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-            "date_modified": "2020-07-15T02:42:49.135090+00:00"
-        }
-    },
-    {
-        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
-        "life_status": "alive",
-        "father": "7b48eacc-826b-4ecd-9104-9918b0bb5b81",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-        "age_units": "day",
-        "mother": "11c429a1-bcb8-4ac6-8f71-be6fb5064ad9",
-        "date_created": "2020-07-15T02:38:31.593910+00:00",
-        "individual_id": "NA12888",
-        "is_termination_of_pregnancy": false,
-        "is_infertile": false,
-        "aliases": [
-            "cgap:NA12888"
-        ],
-        "is_spontaneous_abortion": false,
-        "uuid": "4ac7399a-a417-4565-bc62-f34cd73c2a15",
         "status": "released",
-        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
-        "quantity": 1,
-        "accession": "GAPIDNFOS6TJ",
-        "is_deceased": false,
-        "sex": "M",
-        "is_still_birth": false,
-        "is_no_children_by_choice": false,
-        "is_pregnancy": false,
-        "schema_version": "1",
-        "last_modified": {
-            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-            "date_modified": "2020-07-15T02:42:49.347271+00:00"
-        }
-    },
-    {
         "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
-        "life_status": "alive",
-        "father": "7b48eacc-826b-4ecd-9104-9918b0bb5b81",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "age_units": "day",
-        "mother": "11c429a1-bcb8-4ac6-8f71-be6fb5064ad9",
-        "date_created": "2020-07-15T02:38:31.821484+00:00",
-        "individual_id": "NA12883",
-        "is_termination_of_pregnancy": false,
-        "is_infertile": false,
+        "father": "7b48eacc-826b-4ecd-9104-9918b0bb5b81",
+        "life_status": "alive",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
         "aliases": [
-            "cgap:NA12883"
+            "cgap:NA12887"
         ],
-        "is_spontaneous_abortion": false,
-        "uuid": "4846fe87-237b-44e4-adbb-315cd7e7f005",
-        "status": "released",
-        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
-        "quantity": 1,
-        "accession": "GAPIDAZOSERO",
-        "is_deceased": false,
-        "sex": "M",
-        "is_still_birth": false,
-        "is_no_children_by_choice": false,
-        "is_pregnancy": false,
-        "schema_version": "1",
-        "last_modified": {
-            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-            "date_modified": "2020-07-15T02:42:49.487375+00:00"
-        }
+        "is_termination_of_pregnancy": false,
+        "individual_id": "NA12887"
     },
     {
-        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
-        "life_status": "alive",
-        "father": "7b48eacc-826b-4ecd-9104-9918b0bb5b81",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-        "age_units": "day",
-        "mother": "11c429a1-bcb8-4ac6-8f71-be6fb5064ad9",
+        "is_still_birth": false,
         "date_created": "2020-07-15T02:38:32.312090+00:00",
-        "individual_id": "NA12882",
-        "is_termination_of_pregnancy": false,
+        "schema_version": "1",
+        "is_deceased": false,
         "is_infertile": false,
+        "is_pregnancy": false,
+        "quantity": 1,
+        "mother": "11c429a1-bcb8-4ac6-8f71-be6fb5064ad9",
+        "last_modified": {
+            "date_modified": "2020-07-15T02:42:49.760509+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "accession": "GAPIDQN87MIU",
+        "is_no_children_by_choice": false,
+        "uuid": "3adced93-a305-43d5-983b-0d8dfa5d1bb7",
+        "is_spontaneous_abortion": false,
+        "sex": "M",
+        "status": "released",
+        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
+        "age_units": "day",
+        "father": "7b48eacc-826b-4ecd-9104-9918b0bb5b81",
+        "life_status": "alive",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
         "aliases": [
             "cgap:NA12882"
         ],
-        "is_spontaneous_abortion": false,
-        "uuid": "3adced93-a305-43d5-983b-0d8dfa5d1bb7",
-        "status": "released",
-        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
-        "quantity": 1,
-        "accession": "GAPIDQN87MIU",
-        "is_deceased": false,
-        "sex": "M",
-        "is_still_birth": false,
-        "is_no_children_by_choice": false,
-        "is_pregnancy": false,
-        "schema_version": "1",
-        "last_modified": {
-            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-            "date_modified": "2020-07-15T02:42:49.760509+00:00"
-        }
+        "is_termination_of_pregnancy": false,
+        "individual_id": "NA12882"
     },
     {
-        "status": "released",
-        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
-        "schema_version": "1",
-        "quantity": 1,
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-        "life_status": "alive",
+        "is_still_birth": false,
+        "date_created": "2020-07-15T02:38:32.586385+00:00",
+        "is_pregnancy": false,
+        "last_modified": {
+            "date_modified": "2020-07-15T02:42:49.891907+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
         "accession": "GAPID4OF2L13",
+        "schema_version": "1",
+        "is_deceased": false,
+        "status": "released",
+        "sex": "M",
+        "is_no_children_by_choice": false,
+        "is_infertile": false,
+        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
+        "uuid": "34bcf545-bc25-4288-9f0a-b1d8297ce306",
+        "is_spontaneous_abortion": false,
+        "quantity": 1,
+        "life_status": "alive",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
         "aliases": [
             "cgap:NA12891"
         ],
-        "sex": "M",
-        "is_still_birth": false,
-        "date_created": "2020-07-15T02:38:32.586385+00:00",
-        "individual_id": "NA12891",
-        "is_no_children_by_choice": false,
-        "is_pregnancy": false,
         "is_termination_of_pregnancy": false,
-        "is_infertile": false,
-        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
-        "is_deceased": false,
-        "is_spontaneous_abortion": false,
-        "uuid": "34bcf545-bc25-4288-9f0a-b1d8297ce306",
-        "last_modified": {
-            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-            "date_modified": "2020-07-15T02:42:49.891907+00:00"
-        }
+        "individual_id": "NA12891"
     },
     {
+        "is_still_birth": false,
+        "date_created": "2020-07-21T17:33:13.413528+00:00",
+        "schema_version": "1",
+        "is_deceased": true,
+        "is_infertile": false,
+        "quantity": 1,
+        "phenotypic_features": [
+            {
+                "phenotypic_feature": "42ceec48-0001-49a9-adc9-a8a256fa9710"
+            },
+            {
+                "phenotypic_feature": "a77cebe6-bdee-4626-ac34-47dd070a9468",
+                "onset_age_units": "year",
+                "onset_age": 25
+            }
+        ],
+        "is_pregnancy": false,
+        "last_modified": {
+            "date_modified": "2020-07-21T17:59:59.580923+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "life_status": "deceased",
+        "accession": "GAPIDEBJW5YN",
+        "is_no_children_by_choice": false,
+        "cause_of_death": "a77cebe6-bdee-4626-ac34-47dd070a9468",
+        "sex": "M",
+        "status": "in review",
+        "project": "91336042-f277-4f69-97e5-5c8a5f6d6058",
+        "age_units": "year",
+        "age_at_death": 55,
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "institution": "828cd4fe-ebb0-4b36-ccbb-d2e3a36ca234",
+        "is_spontaneous_abortion": false,
+        "clinic_notes": "Armenian, English, Scottish",
+        "is_termination_of_pregnancy": false,
+        "uuid": "0df482b9-23c2-4a66-9521-5852b696a279",
+        "age_at_death_units": "year"
+    },
+    {
+        "is_still_birth": false,
+        "date_created": "2020-07-21T17:33:08.826645+00:00",
+        "schema_version": "1",
+        "is_deceased": false,
+        "is_infertile": false,
+        "quantity": 3,
+        "is_pregnancy": false,
+        "last_modified": {
+            "date_modified": "2020-07-21T17:59:56.765077+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "accession": "GAPID1DMQMML",
+        "is_no_children_by_choice": false,
+        "is_spontaneous_abortion": false,
+        "sex": "F",
+        "status": "in review",
+        "project": "91336042-f277-4f69-97e5-5c8a5f6d6058",
+        "age_units": "year",
+        "father": "db29af10-e8e8-4c67-acf8-8b3518bfda29",
+        "life_status": "alive and well",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "institution": "828cd4fe-ebb0-4b36-ccbb-d2e3a36ca234",
+        "is_termination_of_pregnancy": false,
+        "uuid": "e4b98928-1ee5-4aea-baea-73b97846ac90",
+        "age_at_death_units": "year"
+    },
+    {
+        "is_still_birth": false,
+        "date_created": "2020-07-21T17:33:09.052504+00:00",
+        "age": 79,
+        "schema_version": "1",
+        "is_deceased": false,
+        "is_infertile": false,
+        "quantity": 1,
+        "phenotypic_features": [
+            {
+                "phenotypic_feature": "8f362140-7b93-4008-8c10-e5744262ae03"
+            },
+            {
+                "phenotypic_feature": "f5ff7c15-e35a-41f5-9ded-cce307940ea1"
+            }
+        ],
+        "age_at_death_units": "year",
+        "is_pregnancy": false,
+        "last_modified": {
+            "date_modified": "2020-07-21T17:59:56.865490+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "accession": "GAPIDMPL34LX",
+        "is_no_children_by_choice": false,
+        "is_spontaneous_abortion": false,
+        "sex": "M",
+        "status": "in review",
+        "project": "91336042-f277-4f69-97e5-5c8a5f6d6058",
+        "age_units": "year",
+        "life_status": "alive",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "institution": "828cd4fe-ebb0-4b36-ccbb-d2e3a36ca234",
+        "clinic_notes": "Irish, Italian\nDiagnosis: diverticulosis",
+        "is_termination_of_pregnancy": false,
+        "uuid": "e4873179-4e6a-4ac2-b617-0ae8bd9fed28",
+        "birth_year": 1940
+    },
+    {
+        "is_still_birth": false,
+        "date_created": "2020-07-15T02:38:28.157772+00:00",
+        "schema_version": "1",
+        "is_deceased": false,
+        "is_infertile": false,
+        "is_pregnancy": false,
+        "quantity": 1,
+        "mother": "11c429a1-bcb8-4ac6-8f71-be6fb5064ad9",
+        "last_modified": {
+            "date_modified": "2020-07-15T02:42:47.417699+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "accession": "GAPIDV97G6HN",
+        "is_no_children_by_choice": false,
+        "uuid": "e39da58c-664e-4e08-aa71-4217adc379d8",
+        "is_spontaneous_abortion": false,
+        "sex": "F",
         "status": "released",
         "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
+        "age_units": "day",
+        "father": "7b48eacc-826b-4ecd-9104-9918b0bb5b81",
+        "life_status": "alive",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "aliases": [
+            "cgap:NA12880"
+        ],
+        "is_termination_of_pregnancy": false,
+        "individual_id": "NA12880"
+    },
+    {
+        "is_still_birth": false,
+        "date_created": "2020-07-21T17:33:09.446727+00:00",
+        "schema_version": "1",
+        "is_deceased": false,
+        "is_infertile": false,
+        "quantity": 2,
+        "is_pregnancy": false,
+        "last_modified": {
+            "date_modified": "2020-07-21T17:59:57.091711+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "accession": "GAPID3TN7UBN",
+        "is_no_children_by_choice": false,
+        "is_spontaneous_abortion": false,
+        "sex": "F",
+        "status": "in review",
+        "project": "91336042-f277-4f69-97e5-5c8a5f6d6058",
+        "age_units": "year",
+        "father": "4d2f102f-926c-45c0-9c18-7a75cc59f2dc",
+        "life_status": "alive and well",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "institution": "828cd4fe-ebb0-4b36-ccbb-d2e3a36ca234",
+        "is_termination_of_pregnancy": false,
+        "uuid": "d2253961-12be-45cf-9491-55a3f72b0645",
+        "age_at_death_units": "year"
+    },
+    {
+        "is_still_birth": false,
+        "date_created": "2020-07-21T17:33:09.969729+00:00",
+        "schema_version": "1",
+        "is_deceased": false,
+        "is_infertile": false,
+        "quantity": 2,
+        "is_pregnancy": false,
+        "last_modified": {
+            "date_modified": "2020-07-21T17:59:57.285952+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "accession": "GAPIDHFREPON",
+        "is_no_children_by_choice": false,
+        "is_spontaneous_abortion": false,
+        "sex": "M",
+        "status": "in review",
+        "project": "91336042-f277-4f69-97e5-5c8a5f6d6058",
+        "age_units": "year",
+        "father": "d0a03d3b-44c7-4b96-a53e-3ddfb323c518",
+        "life_status": "alive and well",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "institution": "828cd4fe-ebb0-4b36-ccbb-d2e3a36ca234",
+        "is_termination_of_pregnancy": false,
+        "uuid": "cecaf416-3390-465b-82bd-b00752fdcc03",
+        "age_at_death_units": "year"
+    },
+    {
+        "is_still_birth": false,
+        "date_created": "2020-07-21T17:33:11.811740+00:00",
+        "schema_version": "1",
+        "is_deceased": false,
+        "is_infertile": false,
+        "quantity": 3,
+        "is_pregnancy": false,
+        "last_modified": {
+            "date_modified": "2020-07-21T17:59:58.318467+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "accession": "GAPIDM84GQLC",
+        "is_no_children_by_choice": false,
+        "is_spontaneous_abortion": false,
+        "sex": "F",
+        "status": "in review",
+        "project": "91336042-f277-4f69-97e5-5c8a5f6d6058",
+        "age_units": "year",
+        "father": "2d27fe5d-74f1-4372-a4c1-62373b922bfc",
+        "life_status": "alive and well",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "institution": "828cd4fe-ebb0-4b36-ccbb-d2e3a36ca234",
+        "is_termination_of_pregnancy": false,
+        "uuid": "5afeb400-e296-45cf-a99f-911f88dd7307",
+        "age_at_death_units": "year"
+    },
+    {
+        "is_still_birth": false,
+        "date_created": "2020-07-15T02:38:31.593910+00:00",
+        "schema_version": "1",
+        "is_deceased": false,
+        "is_infertile": false,
+        "is_pregnancy": false,
+        "quantity": 1,
+        "mother": "11c429a1-bcb8-4ac6-8f71-be6fb5064ad9",
+        "last_modified": {
+            "date_modified": "2020-07-15T02:42:49.347271+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "accession": "GAPIDNFOS6TJ",
+        "is_no_children_by_choice": false,
+        "uuid": "4ac7399a-a417-4565-bc62-f34cd73c2a15",
+        "is_spontaneous_abortion": false,
+        "sex": "M",
+        "status": "released",
+        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
+        "age_units": "day",
+        "father": "7b48eacc-826b-4ecd-9104-9918b0bb5b81",
+        "life_status": "alive",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "aliases": [
+            "cgap:NA12888"
+        ],
+        "is_termination_of_pregnancy": false,
+        "individual_id": "NA12888"
+    },
+    {
+        "is_still_birth": false,
+        "date_created": "2020-07-15T02:38:31.821484+00:00",
+        "schema_version": "1",
+        "is_deceased": false,
+        "is_infertile": false,
+        "is_pregnancy": false,
+        "quantity": 1,
+        "mother": "11c429a1-bcb8-4ac6-8f71-be6fb5064ad9",
+        "last_modified": {
+            "date_modified": "2020-07-15T02:42:49.487375+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "accession": "GAPIDAZOSERO",
+        "is_no_children_by_choice": false,
+        "uuid": "4846fe87-237b-44e4-adbb-315cd7e7f005",
+        "is_spontaneous_abortion": false,
+        "sex": "M",
+        "status": "released",
+        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
+        "age_units": "day",
+        "father": "7b48eacc-826b-4ecd-9104-9918b0bb5b81",
+        "life_status": "alive",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "aliases": [
+            "cgap:NA12883"
+        ],
+        "is_termination_of_pregnancy": false,
+        "individual_id": "NA12883"
+    },
+    {
+        "is_still_birth": false,
+        "date_created": "2020-07-21T17:33:12.658017+00:00",
+        "schema_version": "1",
+        "is_deceased": false,
+        "is_infertile": false,
+        "is_pregnancy": false,
+        "quantity": 1,
+        "mother": "54559fbc-f522-47db-a4e2-e25c00d8481d",
+        "last_modified": {
+            "date_modified": "2020-07-21T17:59:58.752709+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "accession": "GAPID178VXVC",
+        "is_no_children_by_choice": false,
+        "is_spontaneous_abortion": false,
+        "sex": "M",
+        "status": "in review",
+        "project": "91336042-f277-4f69-97e5-5c8a5f6d6058",
+        "age_units": "year",
+        "father": "0df482b9-23c2-4a66-9521-5852b696a279",
+        "life_status": "alive and well",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "institution": "828cd4fe-ebb0-4b36-ccbb-d2e3a36ca234",
+        "is_termination_of_pregnancy": false,
+        "uuid": "2d27fe5d-74f1-4372-a4c1-62373b922bfc",
+        "age_at_death_units": "year"
+    },
+    {
+        "is_still_birth": false,
+        "date_created": "2020-07-21T17:33:12.902366+00:00",
+        "schema_version": "1",
+        "is_deceased": false,
+        "is_infertile": false,
+        "is_pregnancy": false,
+        "quantity": 1,
+        "mother": "2196aac1-2512-44c1-957a-ea29a7875ec2",
+        "last_modified": {
+            "date_modified": "2020-07-21T17:59:59.126292+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "accession": "GAPID98Q6A3K",
+        "is_no_children_by_choice": false,
+        "is_spontaneous_abortion": false,
+        "sex": "M",
+        "status": "in review",
+        "project": "91336042-f277-4f69-97e5-5c8a5f6d6058",
+        "age_units": "year",
+        "father": "e4873179-4e6a-4ac2-b617-0ae8bd9fed28",
+        "life_status": "alive and well",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "institution": "828cd4fe-ebb0-4b36-ccbb-d2e3a36ca234",
+        "is_termination_of_pregnancy": false,
+        "uuid": "2429f9d0-dade-4c0a-9fe5-d03652880fd7",
+        "age_at_death_units": "year"
+    },
+    {
+        "is_still_birth": false,
+        "date_created": "2020-07-21T17:33:13.128800+00:00",
+        "age": 75,
+        "schema_version": "1",
+        "is_deceased": false,
+        "is_infertile": false,
+        "quantity": 1,
+        "phenotypic_features": [
+            {
+                "phenotypic_feature": "f5ff7c15-e35a-41f5-9ded-cce307940ea1"
+            }
+        ],
+        "age_at_death_units": "year",
+        "is_pregnancy": false,
+        "last_modified": {
+            "date_modified": "2020-07-21T17:59:59.405190+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "accession": "GAPID9338V4Q",
+        "is_no_children_by_choice": false,
+        "is_spontaneous_abortion": false,
+        "sex": "F",
+        "status": "in review",
+        "project": "91336042-f277-4f69-97e5-5c8a5f6d6058",
+        "age_units": "year",
+        "life_status": "alive",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "institution": "828cd4fe-ebb0-4b36-ccbb-d2e3a36ca234",
+        "clinic_notes": "Irish, Italian",
+        "is_termination_of_pregnancy": false,
+        "uuid": "2196aac1-2512-44c1-957a-ea29a7875ec2",
+        "birth_year": 1944
+    },
+    {
+        "mother": "9d5ed31c-489d-4dc6-8bdd-1c818a779a6c",
+        "last_modified": {
+            "date_modified": "2020-07-15T02:42:50.014857+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "accession": "GAPIDGE5KLIH",
         "schema_version": "1",
         "father": "34bcf545-bc25-4288-9f0a-b1d8297ce306",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-        "life_status": "alive",
-        "accession": "GAPIDGE5KLIH",
-        "mother": "9d5ed31c-489d-4dc6-8bdd-1c818a779a6c",
         "sex": "F",
+        "status": "released",
+        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
         "date_created": "2020-07-15T02:38:32.844436+00:00",
         "individual_id": "NA12878",
-        "samples": [
-            "f0add14e-42b8-4f6f-9867-22506b45bd27"
-        ],
         "quantity": 1,
+        "life_status": "alive",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
         "aliases": [
             "cgap:NA12878"
         ],
         "uuid": "11c429a1-bcb8-4ac6-8f71-be6fb5064ad9",
-        "last_modified": {
-            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-            "date_modified": "2020-07-15T02:42:50.014857+00:00"
-        }
+        "samples": [
+            "f0add14e-42b8-4f6f-9867-22506b45bd27"
+        ]
     },
     {
-        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
-        "life_status": "alive",
-        "father": "7b48eacc-826b-4ecd-9104-9918b0bb5b81",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-        "age_units": "day",
-        "mother": "11c429a1-bcb8-4ac6-8f71-be6fb5064ad9",
+        "is_still_birth": false,
         "date_created": "2020-07-15T02:38:33.091557+00:00",
-        "individual_id": "NA12884",
-        "is_termination_of_pregnancy": false,
+        "schema_version": "1",
+        "is_deceased": false,
         "is_infertile": false,
+        "is_pregnancy": false,
+        "quantity": 1,
+        "mother": "11c429a1-bcb8-4ac6-8f71-be6fb5064ad9",
+        "last_modified": {
+            "date_modified": "2020-07-15T02:42:50.215774+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "accession": "GAPIDQ14ESUP",
+        "is_no_children_by_choice": false,
+        "uuid": "0dca2d65-387e-4042-945a-459e1a334507",
+        "is_spontaneous_abortion": false,
+        "sex": "M",
+        "status": "released",
+        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
+        "age_units": "day",
+        "father": "7b48eacc-826b-4ecd-9104-9918b0bb5b81",
+        "life_status": "alive",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
         "aliases": [
             "cgap:NA12884"
         ],
-        "is_spontaneous_abortion": false,
-        "uuid": "0dca2d65-387e-4042-945a-459e1a334507",
-        "status": "released",
-        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
-        "quantity": 1,
-        "accession": "GAPIDQ14ESUP",
-        "is_deceased": false,
-        "sex": "M",
-        "is_still_birth": false,
-        "is_no_children_by_choice": false,
-        "is_pregnancy": false,
-        "schema_version": "1",
-        "last_modified": {
-            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-            "date_modified": "2020-07-15T02:42:50.215774+00:00"
-        }
-    },
-    {
-        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
-        "life_status": "alive",
-        "father": "7b48eacc-826b-4ecd-9104-9918b0bb5b81",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-        "age_units": "day",
-        "mother": "11c429a1-bcb8-4ac6-8f71-be6fb5064ad9",
-        "date_created": "2020-07-15T02:38:28.157772+00:00",
-        "individual_id": "NA12880",
         "is_termination_of_pregnancy": false,
-        "is_infertile": false,
-        "aliases": [
-            "cgap:NA12880"
-        ],
-        "is_spontaneous_abortion": false,
-        "uuid": "e39da58c-664e-4e08-aa71-4217adc379d8",
-        "status": "released",
-        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
-        "quantity": 1,
-        "accession": "GAPIDV97G6HN",
-        "is_deceased": false,
-        "sex": "F",
-        "is_still_birth": false,
-        "is_no_children_by_choice": false,
-        "is_pregnancy": false,
-        "schema_version": "1",
-        "last_modified": {
-            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-            "date_modified": "2020-07-15T02:42:47.417699+00:00"
-        }
-    },
-    {
-        "status": "released",
-        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
-        "schema_version": "1",
-        "quantity": 1,
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-        "life_status": "alive",
-        "accession": "GAPID4B529UM",
-        "aliases": [
-            "cgap:NA12890"
-        ],
-        "sex": "F",
-        "is_still_birth": false,
-        "date_created": "2020-07-15T02:38:28.393822+00:00",
-        "individual_id": "NA12890",
-        "is_no_children_by_choice": false,
-        "is_pregnancy": false,
-        "is_termination_of_pregnancy": false,
-        "is_infertile": false,
-        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
-        "is_deceased": false,
-        "is_spontaneous_abortion": false,
-        "uuid": "d246d630-62be-4607-af9a-56d97b885331",
-        "last_modified": {
-            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-            "date_modified": "2020-07-15T02:42:47.539803+00:00"
-        }
-    },
-    {
-        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
-        "life_status": "alive",
-        "father": "7b48eacc-826b-4ecd-9104-9918b0bb5b81",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-        "age_units": "day",
-        "mother": "11c429a1-bcb8-4ac6-8f71-be6fb5064ad9",
-        "date_created": "2020-07-15T02:38:29.349027+00:00",
-        "individual_id": "NA12886",
-        "is_termination_of_pregnancy": false,
-        "is_infertile": false,
-        "aliases": [
-            "cgap:NA12886"
-        ],
-        "is_spontaneous_abortion": false,
-        "uuid": "878237f3-6643-40b2-a9c4-e48421ae3302",
-        "status": "released",
-        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
-        "quantity": 1,
-        "accession": "GAPIDCWN1PYZ",
-        "is_deceased": false,
-        "sex": "M",
-        "is_still_birth": false,
-        "is_no_children_by_choice": false,
-        "is_pregnancy": false,
-        "schema_version": "1",
-        "last_modified": {
-            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-            "date_modified": "2020-07-15T02:42:48.095574+00:00"
-        }
-    },
-    {
-        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
-        "life_status": "alive",
-        "father": "7b48eacc-826b-4ecd-9104-9918b0bb5b81",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-        "age_units": "day",
-        "mother": "11c429a1-bcb8-4ac6-8f71-be6fb5064ad9",
-        "date_created": "2020-07-15T02:38:32.086130+00:00",
-        "individual_id": "NA12887",
-        "is_termination_of_pregnancy": false,
-        "is_infertile": false,
-        "aliases": [
-            "cgap:NA12887"
-        ],
-        "is_spontaneous_abortion": false,
-        "uuid": "4684702a-3639-4073-8db4-d44eb8b31135",
-        "status": "released",
-        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
-        "quantity": 1,
-        "accession": "GAPIDHBDD29C",
-        "is_deceased": false,
-        "sex": "F",
-        "is_still_birth": false,
-        "is_no_children_by_choice": false,
-        "is_pregnancy": false,
-        "schema_version": "1",
-        "last_modified": {
-            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-            "date_modified": "2020-07-15T02:42:49.612644+00:00"
-        }
+        "individual_id": "NA12884"
     }
 ]
