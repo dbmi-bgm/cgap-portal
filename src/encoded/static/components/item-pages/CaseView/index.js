@@ -236,7 +236,7 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
             <hr className="tab-section-title-horiz-divider" />
             <div className="container-wide bg-light pt-36 pb-36">
                 <div className="card-group case-summary-card-row">
-                    <div className="col-stats">
+                    <div className="col-stats mb-2 mb-lg-0">
                         <CaseStats caseItem={context} {...{ description, numIndividuals, numWithSamples, caseFeatures }} numFamilies={1} />
                     </div>
                     <div id="case-overview-ped-link" className="col-pedigree-viz">

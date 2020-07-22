@@ -41,17 +41,18 @@ export const CaseStats = React.memo(function CaseStats(props){
     const { accession: famAccession = null } = family || {};
 
     return (
+        // Stack into one column at small window size.
         <div id="case-stats" className="row">
-            <div className="col">
+            <div className="col-12 col-sm mb-2 mb-sm-0">
                 <StatCard title="Patient Info:" subtitle={individual_id} className="h-100">
                     <PatientInfo {...props} />
                 </StatCard>
             </div>
-            <div className="col">
-                <StatCard title="Patient Phenotypic Features" className="mb-3">
+            <div className="col-12 col-sm d-flex flex-column">
+                <StatCard title="Patient Phenotypic Features" className="mb-2">
                     <PhenotypicFeatures caseItem={caseItem} />
                 </StatCard>
-                <StatCard title="Family Info:" subtitle={famAccession} {...{ className }}>
+                <StatCard title="Family Info:" subtitle={famAccession} className="flex-fill">
                     <FamilyInfo {...{ numFamilies, numIndividuals, numWithSamples, family }} />
                 </StatCard>
             </div>
