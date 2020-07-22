@@ -341,9 +341,17 @@ class IngestionListener:
             else:
                 break
 
-    @staticmethod
-    def build_variant_display_title(variant):
-        return 'chr%s:%s%s>%s' % (variant['CHROM'], variant['POS'], variant['REF'], variant['ALT'])
+    def build_variant_link(self, variant):
+        """ This function takes a variant record and returns the corresponding UUID of this variant
+            in the portal via search.
+
+            XXX: This should be refactored to be unneeded. You should be able to form the link from
+            annotation_id (or display_title). This slows down the ingestion process by a decent amount,
+            but is tolerable since it still proceeds at the same rate as indexing.
+        """
+        display_title = 'chr%s:%s%s_%s' % (variant['CHROM'], variant['POS'], variant['REF'], variant['ALT'])
+        variant = self.vapp.get('/search/?type=Variant&display_title=%s' % display_title).follow().json
+        return variant['@graph'][0]['uuid']
 
     def build_and_post_variant(self, parser, record, project, institution):
         """ Helper method for below that builds and posts a variant item given a record """
@@ -363,11 +371,11 @@ class IngestionListener:
             try:
                 sample['project'] = project
                 sample['institution'] = institution
-                sample['variant'] = self.build_variant_display_title(variant)  # make links
+                sample['variant'] = self.build_variant_link(variant)  # make links
                 sample['file'] = file
                 self.vapp.post_json('/variant_sample', sample, status=201)
             except Exception as e:
-                log.error('Encountered exception posting variant_sample %s: %s' % e)
+                log.error('Encountered exception posting variant_sample: %s' % e)
                 continue
 
     def post_variants_and_variant_samples(self, parser, file_meta):
