@@ -213,10 +213,10 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
         }
 
         if (graphData){
-            //const width = layout.gridContainerWidth(windowWidth);
+            // Potential to-do, onComponentDidUpdate, find height in DOM of container, set to state, pass down here.
             pedBlock = (
                 <div className="pedigree-pane-wrapper flex-fill">
-                    <PedigreeVizView {...graphData} width={pedWidth} height={300} disableSelect
+                    <PedigreeVizView {...graphData} width={pedWidth} height={300} disableSelect showNotes={false}
                         visibleDiseases={selectedDiseases} showZoomControls={false} enablePinchZoom={false} />
                 </div>
             );
