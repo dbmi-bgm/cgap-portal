@@ -53,7 +53,8 @@ export class EmbeddedItemSearchTable extends React.PureComponent {
             searchHref,
             filterFacetFxn, hideFacets,
             filterColumnFxn, hideColumns,
-            renderDetailPane
+            renderDetailPane,
+            rowHeight = 90 // Keep in sync w CSS
         } = this.props;
         const { totalCount } = this.state;
 
@@ -66,6 +67,7 @@ export class EmbeddedItemSearchTable extends React.PureComponent {
         const passProps = {
             facets, columns, columnExtensionMap, searchHref, session,
             schemas, renderDetailPane, defaultOpenIndices, maxHeight,
+            rowHeight,
             filterFacetFxn, hideFacets,
             filterColumnFxn, hideColumns,
             onLoad: this.getCountCallback,
