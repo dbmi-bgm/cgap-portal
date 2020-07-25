@@ -15,8 +15,7 @@
       }
     ],
     "CHROM": "1",
-    "topmed_an": 125568,
-    "hgvs_hgvsg": "NC_000001.11:g.12125899del"
+    "topmed_an": 125568
   },
   {
     "project": "hms-dbmi",

@@ -284,6 +284,18 @@
         "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
         "project_roles": [{"project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
                            "role": "developer"}]
+    },
+    {
+        "email": "peter_park@hms.harvard.edu",
+        "first_name": "Peter",
+        "last_name": "Park",
+        "role": "scientist",
+        "uuid": "bf91416d-5d99-48bd-9035-3c6e520131a2",
+        "groups": ["admin"],
+        "submits_for": ["hms-dbmi"],
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "project_roles": [{"project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+                           "role": "developer"}]
     }
 
 ]
