@@ -1,15 +1,16 @@
-from pyramid.paster import get_app
-from pyramid.response import Response
-from pyramid.view import view_config
-from snovault.util import debug_log
-# from webtest import TestApp
-from dcicutils.misc_utils import VirtualApp, VirtualAppError
-from dcicutils import ff_utils
-from webtest.app import AppError
 import ast
 import datetime
 import json
 import xlrd
+
+from dcicutils.misc_utils import VirtualApp, VirtualAppError
+from dcicutils import ff_utils
+from pyramid.paster import get_app
+from pyramid.response import Response
+from snovault.util import debug_log
+from pyramid.view import view_config
+from webtest.app import AppError
+from .util import s3_local_file, debuglog
 
 
 GENERIC_FIELD_MAPPING = {
@@ -56,7 +57,17 @@ LINKS = [
 ]
 
 
-# This is a placeholder for a submission endpoint modified from loadxl
+
+# This "/submit_data" endpoint is a placeholder for a submission endpoint modified from loadxl.
+#
+# NOTES FROM KMP (25-Jul-2020):
+#
+#  This will be done differently soon as part of the "/submit_for_ingestion" endpoint that
+#  will be in ingestion_listener.py. That endpoint will need an "?ingestion type=data_bundle"
+#  as query parameter. That "data_bundle" ingestion type will defined in ingestion_engines.py.
+#  The new entry point here that will be needed is submit_data_bundle, and then this temporary
+#  "/submit_data" endpoint can presumably go away.. -kmp 25-Jul-2020
+
 @view_config(route_name='submit_data', request_method='POST', permission='add')
 @debug_log
 def submit_data(context, request):
@@ -78,6 +89,27 @@ def submit_data(context, request):
 
     raise NotImplementedError
 
+# This endpoint will soon be the primary entry point. Please keep it working as-is and do not remove it.
+# -kmp 25-Jul-2020
+def submit_data_bundle(*, s3_client, bucket, key, project, institution, vapp):  # All keyword arguments, all required.
+    """
+    Handles processing of a submitted workbook.
+
+    Args:
+        data_stream: an open stream to xls workbook data
+        project: a project identifier
+        institution: an institution identifier
+        vapp: a VirtualApp object
+        log: a logging object capable of .info, .warning, .error, or .debug messages
+    """
+    with s3_local_file(s3_client, bucket=bucket, key=key) as file:
+        project_json = vapp.get(project).json
+        institution_json = vapp.get(institution).json
+        json_data = xls_to_json(file, project=project_json, institution=institution_json)
+        final_json, validation_log_lines = validate_all_items(vapp, json_data)
+        result_lines = post_and_patch_all_items(vapp, final_json)
+        return validation_log_lines, final_json, result_lines
+
 
 def map_fields(row, metadata_dict, addl_fields, item_type):
     for map_field in GENERIC_FIELD_MAPPING[item_type]:
@@ -97,8 +129,11 @@ def xls_to_json(xls_data, project, institution):
     sheet, = book.sheets()
     row = row_generator(sheet)
     top_header = next(row)
+    debuglog("top_header:", top_header)  # Temporary instrumentation for debugging to go away soon. -kmp 25-Jul-2020
     keys = next(row)
-    next(row)
+    debuglog("keys:", keys)  # Temporary instrumentation for debugging to go away soon. -kmp 25-Jul-2020
+    descriptions = next(row)
+    debuglog("descriptions:", descriptions)  # Temporary instrumentation for debugging to go away soon. -kmp 25-Jul-2020
     rows = []
     counter = 0
     for values in row:
@@ -116,6 +151,7 @@ def xls_to_json(xls_data, project, institution):
     family_dict = create_families(rows)
     a_types = get_analysis_types(rows)
     for row in rows:
+        debuglog("row:", repr(row))  # Temporary instrumentation for debugging to go away soon. -kmp 25-Jul-2020
         indiv_alias = '{}:individual-{}'.format(project['name'], row['individual id'])
         fam_alias = '{}:{}'.format(project['name'], family_dict[row['analysis id']])
         # sp_alias = '{}:sampleproc-{}'.format(project['name'], row['specimen id'])
@@ -463,12 +499,21 @@ def validate_all_items(virtualapp, json_data):
             profile = virtualapp.get('/profiles/{}.json'.format(itemtype)).json
             validation_results[itemtype] = {'validated': 0, 'errors': 0}
             db_results = {}
+        # TODO: json_data[itemtype] but item_type might not be in json_data according to previous "if" statement.
+        #       Maybe we want "for alias in json_data.get(item_type, {}):" here?
+        #       Alternatively, maybe give "json_data.get(item_type, {})" a variable name so that it can be referred
+        #       to more concisely in the several places below that it's needed.
+        #       -kmp 25-Jul-2020
         for alias in json_data[itemtype]:
             # first collect all atids before comparing and validating items
             db_result = compare_with_db(virtualapp, alias)
             if db_result:
                 alias_dict[alias] = db_result['@id']
+                # TODO: db_results is only conditionally assigned in the prevous "if".
+                #       Perhaps the db_results = {} above should be moved up outside the "if"?
+                #       Are we supposed to have a new dictionary on each iteration? -kmp 25-Jul-2020
                 db_results[alias] = db_result
+        # TODO: Likewise this should probably loop over json_data.get(itemtype, {}). -kmp 25-Jul-2020
         for alias in json_data[itemtype]:
             if 'filename' in json_data[itemtype][alias]:  # until we have functional file upload
                 del json_data[itemtype][alias]['filename']
@@ -480,6 +525,10 @@ def validate_all_items(virtualapp, json_data):
                         for e in error:
                             errors.append('{} {} - Error found: {}'.format(itemtype, alias, e))
                         validation_results[itemtype]['errors'] += 1
+                # TODO: If itemtype might not be in json_data (and conditionals above suggest that's so),
+                #       then json_data[item_type][alias] seems suspect. It does work to do
+                #       json_data.get(item_type, {}).get(alias, {}).get('filename') but I would put that
+                #       quantity in a variable rather than compute it twice in a row. -kmp 25-Jul-2020
                 elif json_data[itemtype][alias].get('filename') and \
                         json_data[itemtype][alias]['filename'] in ''.join(json_data['file_errors']):
                     validation_results[itemtype]['errors'] += 1
@@ -490,6 +539,7 @@ def validate_all_items(virtualapp, json_data):
             else:
                 # patch if item exists in db
                 # alias_dict[alias] = results[alias]['@id']
+                # TODO: profile is only conditionally assigned in an "if" above. -kmp 25-Jul-2020
                 patch_data = compare_fields(profile, alias_dict, json_data[itemtype][alias], db_results[alias])
                 error = validate_item(virtualapp, patch_data, 'patch', itemtype,
                                       all_aliases, atid=db_results[alias]['@id'])

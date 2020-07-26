@@ -1,25 +1,32 @@
-import os
-import boto3
-import time
-import socket
 import argparse
-import structlog
-import datetime
-import json
 import atexit
-import threading
-import signal
-import psycopg2
-import webtest
+import boto3
+import botocore.exceptions
+import datetime
 import elasticsearch
+import io
+import json
+import os
+import psycopg2
 import requests  # XXX: C4-211 should not be needed but is
-from vcf import Reader
+import signal
+import socket
+import structlog
+import threading
+import time
+import uuid
+import webtest
+
+from dcicutils.misc_utils import VirtualApp, ignored
 from pyramid import paster
-from dcicutils.misc_utils import VirtualApp
+from pyramid.response import Response
 from pyramid.view import view_config
 from snovault.util import debug_log
-from .util import resolve_file_path, gunzip_content
+from vcf import Reader
 from .commands.ingest_vcf import VCFParser
+from .common import register_path_content_type, DATA_BUNDLE_BUCKET, SubmissionFailure
+from .ingestion_engines import get_ingestion_processor
+from .util import resolve_file_path, gunzip_content, debuglog
 
 
 log = structlog.getLogger(__name__)
@@ -32,8 +39,97 @@ VARIANT_SAMPLE_SCHEMA = resolve_file_path('./schemas/variant_sample.json')
 def includeme(config):
     config.add_route('queue_ingestion', '/queue_ingestion')
     config.add_route('ingestion_status', '/ingestion_status')
+    config.add_route('prompt_for_ingestion', '/prompt_for_ingestion')
+    config.add_route('submit_for_ingestion', '/submit_for_ingestion')
     config.registry[INGESTION_QUEUE] = IngestionQueueManager(config.registry)
     config.scan(__name__)
+
+
+@view_config(route_name='prompt_for_ingestion', request_method='GET')
+@debug_log
+def prompt_for_ingestion(context, request):
+    ignored(context, request)
+    return Response(PROMPT_FOR_INGESTION)
+
+
+register_path_content_type(path='/submit_for_ingestion', content_type='multipart/form-data')
+@view_config(route_name='submit_for_ingestion', request_method='POST', accept='multipart/form-data')
+@debug_log
+def submit_for_ingestion(context, request):
+
+    ignored(context)
+
+    ingestion_type = request.POST['ingestion_type']
+    filename = request.POST['datafile'].filename
+    override_name = request.POST.get('override_name', None)
+    parameters = dict(request.POST)
+    parameters['datafile'] = filename
+
+    # ``input_file`` contains the actual file data which needs to be
+    # stored somewhere.
+
+    input_file_stream = request.POST['datafile'].file
+    input_file_stream.seek(0)
+
+    # NOTE: Some reference information about uploading files to s3 is here:
+    #   https://boto3.amazonaws.com/v1/documentation/api/latest/guide/s3-uploading-files.html
+
+    upload_id = str(uuid.uuid4())
+    _, ext = os.path.splitext(filename)
+    object_name = "{id}/datafile{ext}".format(id=upload_id, ext=ext)
+    manifest_name = "{id}/manifest.json".format(id=upload_id)
+
+    s3_client = boto3.client('s3')
+
+    upload_time = datetime.datetime.utcnow().isoformat()
+    success = True
+    message = "Uploaded successfully."
+
+    try:
+        s3_client.upload_fileobj(input_file_stream, Bucket=DATA_BUNDLE_BUCKET, Key=object_name)
+
+    except botocore.exceptions.ClientError as e:
+
+        log.error(e)
+
+        success = False
+        message = "{error_type}: {error_message}".format(error_type=type(e), error_message=str(e))
+
+    result = {
+        "filename": filename,
+        "object_name": object_name,
+        "bucket": DATA_BUNDLE_BUCKET,
+        "success": success,
+        "message": message,
+        "upload_time": upload_time,
+        "parameters": parameters
+    }
+
+    pretty_result = json.dumps(result, indent=2)
+
+    if success:
+
+        try:
+            with io.BytesIO(pretty_result.encode('utf-8')) as fp:
+                s3_client.upload_fileobj(fp, Bucket=DATA_BUNDLE_BUCKET, Key=manifest_name)
+
+        except botocore.exceptions.ClientError as e:
+
+            log.error(e)
+
+            message = "{error_type} (while uploading metadata): {error_message}".format(error_type=type(e),
+                                                                                        error_message=str(e))
+
+            raise SubmissionFailure(message)
+
+    queue_manager = get_queue_manager(request, override_name=override_name)
+    _, failed = queue_manager.add_uuids([upload_id], ingestion_type=ingestion_type)
+
+    if failed:
+        # If there's a failure, failed will be a list of one problem description since we only submitted one thing.
+        raise SubmissionFailure(failed[0])
+
+    return result
 
 
 @view_config(route_name='ingestion_status', request_method='GET', permission='index')
@@ -66,6 +162,10 @@ def queue_ingestion(context, request):
     """
     uuids = request.json.get('uuids', [])
     override_name = request.json.get('override_name', None)
+    return enqueue_uuids_for_request(request, uuids, override_name=override_name)
+
+
+def enqueue_uuids_for_request(request, uuids, *, ingestion_type='vcf', override_name=None):
     response = {
         'notification': 'Failure',
         'number_queued': 0,
@@ -73,8 +173,7 @@ def queue_ingestion(context, request):
     }
     if uuids is []:
         return response
-    queue_manager = request.registry[INGESTION_QUEUE] if not override_name \
-        else IngestionQueueManager(request.registry, override_name=override_name)
+    queue_manager = get_queue_manager(request, override_name=override_name)
     _, failed = queue_manager.add_uuids(uuids)
     if not failed:
         response['notification'] = 'Success'
@@ -85,6 +184,12 @@ def queue_ingestion(context, request):
         response['number_queued'] = len(uuids) - len(failed)
         response['detail'] = 'Some uuids failed: %s' % failed
     return response
+
+
+def get_queue_manager(request, *, override_name):
+    return (request.registry[INGESTION_QUEUE]
+            if not override_name
+            else IngestionQueueManager(request.registry, override_name=override_name))
 
 
 class IngestionQueueManager:
@@ -219,9 +324,9 @@ class IngestionQueueManager:
             failed.extend(response.get('Failed', []))
         return failed
 
-    def add_uuids(self, uuids):
-        """ Takes a list of string uuids (presumed to be VCF files) and adds them to
-            the ingestion queue.
+    def add_uuids(self, uuids, ingestion_type='vcf'):
+        """ Takes a list of string uuids and adds them to the ingestion queue.
+            If ingestion_type is not specified, it defaults to 'vcf'.
 
             :precondition: uuids are all of type FileProcessed
             :param uuids: uuids to be added to the queue.
@@ -231,7 +336,9 @@ class IngestionQueueManager:
         msgs = []
         for uuid in uuids:
             current_msg = {
-                'uuid': uuid, 'timestamp': curr_time
+                'ingestion_type': ingestion_type,
+                'uuid': uuid,
+                'timestamp': curr_time
             }
             msgs.append(current_msg)
         failed = self._send_messages(msgs)
@@ -330,8 +437,10 @@ class IngestionListener:
         """
         failed = self.queue_manager.delete_messages(messages)
         while True:
+            debuglog("Trying to delete messages")
             tries = 3
             if failed:
+                debuglog("Failed to delete messages")
                 if tries > 0:
                     failed = self.queue_manager.delete_messages(failed)  # try again
                     tries -= 1
@@ -339,6 +448,7 @@ class IngestionListener:
                     log.error('Failed to delete messages from SQS: %s' % failed)
                     break
             else:
+                debuglog("Deleted messages")
                 break
 
     def build_variant_link(self, variant):
@@ -415,14 +525,36 @@ class IngestionListener:
                         delete processed messages
         """
         log.info('Ingestion listener successfully online.')
+
+        debuglog("Ingestion listener started.")
+
         while self.should_remain_online():
+
+            debuglog("About to get messages.")
+
             messages = self.get_messages()  # wait here
+
+            debuglog("Got", len(messages), "messages.")
 
             # ingest each VCF file
             for message in messages:
+
+                debuglog("Message:", message)
+
                 body = json.loads(message['Body'])
                 uuid = body['uuid']
+                ingestion_type = body['ingestion_type']
                 log.info('Ingesting uuid %s' % uuid)
+
+                if ingestion_type != 'vcf':
+                    # Let's minimally disrupt things for now. We can refactor this later
+                    # to make all the parts work the same -kmp
+                    handler = get_ingestion_processor(ingestion_type)
+                    handler(uuid=uuid, ingestion_type=ingestion_type, vapp=self.vapp, log=log)
+                    print("HANDLED", uuid)
+                    continue
+
+                debuglog("Did NOT process", uuid, "as", ingestion_type)
 
                 # locate file meta data
                 try:
@@ -471,7 +603,11 @@ class IngestionListener:
 def run(vapp=None, _queue_manager=None, _update_status=None):
     """ Entry-point for the ingestion listener for waitress. """
     ingestion_listener = IngestionListener(vapp, _queue_manager=_queue_manager, _update_status=_update_status)
-    ingestion_listener.run()
+    try:
+        ingestion_listener.run()
+    except Exception as e:
+        debuglog(str(e))
+        raise
 
 
 class ErrorHandlingThread(threading.Thread):
@@ -594,6 +730,79 @@ def main():
 
     vapp = VirtualApp(app, config)
     return run(vapp)
+
+PROMPT_FOR_INGESTION = """
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Submit for Ingestion</title>
+    <style>
+  body { background-color: #eeddee; font-size: 14pt; font-weight: bold; margin-left: 25px; }
+  div.banner { margin-bottom: 25px; padding: 10px; text-align: center;
+                   border: 1px solid black; background-color: #ffeeff; width: 50%;
+         }
+      table { border-spacing: 5px; margin-left: 25px; }
+      td.formlabel { text-align: right; }
+      td.formsubmit { text-align: center; padding-top: 10px; }
+      td, input, select { font-size: 14pt; font-weight: bold; }
+      select { padding: 4px; }
+      input { padding: 10px; }
+      input.submit { border: 2px solid black; border-radius: 8px; padding: 10px; width: 100%; }
+    </style>
+  </head>
+  <body>
+    <div class="banner">
+      <p>This page is a demonstration of the ability to kick off an ingestion by form.</p>
+    </div>
+    <h1>Submit for Ingestion</h1>
+    <form action="/submit_for_ingestion" method="post" accept-charset="utf-8"
+          enctype="multipart/form-data">
+      <table>
+        <tr>
+          <td class="formlabel">
+            <label for="ingestion_type">Ingestion Type:</label>
+          </td>
+          <td>
+            <select id="ingestion_type" name="ingestion_type">
+              <option value="data_bundle">Data Bundle&nbsp;</option>
+            </select>
+          </td>
+        </tr>
+        <tr>
+          <td class="formlabel">
+            <label for="project">Project:</label>
+          </td>
+          <td>
+            <input type="text" id="project" name="project" value="/projects/12a92962-8265-4fc0-b2f8-cf14f05db58b/" />
+          </td>
+        </tr>
+        <tr>
+          <td class="formlabel">
+            <label for="institution">Institution:</label>
+          </td>
+          <td>
+            <input type="text" id="institution" name="institution" value="/institutions/hms-dbmi/" />
+          </td>
+        </tr>
+        <tr>
+          <td class="formlabel">
+            <label for="datafile">Submit Datafile:</label>
+          </td>
+          <td>
+            <input type="file" id="datafile" name="datafile" value="" />
+          </td>
+        </tr>
+        <tr>
+          <td class="formsubmit" colspan="2">
+            <input class="submit" id="submit" type="submit" value="Submit" />
+          </td>
+        </tr>
+      </table>
+    </form>
+  </body>
+</html>
+"""
+
 
 
 if __name__ == '__main__':

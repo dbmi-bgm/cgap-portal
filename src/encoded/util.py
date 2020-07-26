@@ -1,6 +1,10 @@
+import contextlib
+import datetime
+import gzip
 import io
 import os
-import gzip
+import tempfile
+
 from io import BytesIO
 
 
@@ -92,3 +96,106 @@ class MockFileSystem:
                 self.file_system.files[file] = text
 
         return MockFileWriter(file_system=file_system, file=file)
+
+
+DEBUGLOG_ENABLED = os.environ.get('DEBUGLOG_ENABLED', "FALSE").lower() == "true"
+
+
+def debuglog(*args):
+    """
+    As the name implies, this is a low-tech logging facility for temporary debugging info.
+    Prints info to a file in user's home directory.
+
+    The debuglog facility allows simple debugging for temporary debugging of disparate parts of the system.
+    It takes arguments like print or one of the logging operations and outputs to ~/DEBUGLOG-yyyymmdd.txt.
+    Each line in the log is timestamped.
+    """
+    if DEBUGLOG_ENABLED:
+        nowstr = str(datetime.datetime.now())
+        dateid = nowstr[:10].replace('-', '')
+        with io.open(os.path.expanduser("~/DEBUGLOG-%s.txt" % dateid), "a+") as fp:
+            print(nowstr, *args, file=fp)
+
+
+# These next few could be in dcicutils.s3_utils as part of s3Utils, but details of interfaces would have to change.
+# For now, for expedience, they can live here and we can refactor later. -kmp 25-Jul-2020
+
+@contextlib.contextmanager
+def s3_output_stream(s3_client, bucket, key):
+    """
+    This context manager allows one to write:
+
+        with s3_output_stream(s3_client, bucket, key) as fp:
+            print("foo", file=fp)
+
+    to do output to an s3 bucket.
+
+    In fact, an intermediate local file is involved, so this function yields a file pointer (fp) to a
+    temporary local file that is open for write. That fp should be used to supply content to the file
+    during the dynamic scope of the context manager. Once the context manager's body executes, the
+    file will be closed, its contents will be copied to s3, and finally the temporary local file will
+    be deleted.
+
+    Args:
+        s3_client: a client object that results from a boto3.client('s3', ...) call.
+        bucket str: an S3 bucket name
+        key str: the name of a key within the given S3 bucket
+    """
+
+    tempfile_name = tempfile.mktemp()
+    try:
+        with io.open(tempfile_name, 'w') as fp:
+            yield fp
+        s3_client.upload_file(Filename=tempfile_name, Bucket=bucket, Key=key)
+    finally:
+        try:
+            os.remove(tempfile_name)
+        except Exception:
+            pass
+
+
+
+@contextlib.contextmanager
+def s3_local_file(s3_client, bucket, key):
+    """
+    This context manager allows one to write:
+
+        with s3_local_file(s3_client, bucket, key) as file:
+            with io.open(local_file, 'r') as fp:
+                dictionary = json.load(fp)
+
+    to do input from an s3 bucket.
+    """
+
+    tempfile_name = tempfile.mktemp()
+    try:
+        s3_client.download_file(Bucket=bucket, Key=key, Filename=tempfile_name)
+        yield tempfile_name
+    finally:
+        try:
+            os.remove(tempfile_name)
+        except Exception:
+            pass
+
+
+@contextlib.contextmanager
+def s3_input_stream(s3_client, bucket, key, mode='r'):
+    """
+    This context manager allows one to write:
+
+        with s3_input_stream(s3_client, bucket, key) as fp:
+            dictionary = json.load(fp)
+
+    to do input from an s3 bucket.
+
+    In fact, an intermediate local file is created, copied, and deleted.
+    """
+
+    with s3_local_file(s3_client, bucket, key) as file:
+        with io.open(file, mode=mode) as fp:
+            yield fp
+
+
+def create_empty_s3_file(s3_client, bucket, key):
+    empty_file = "/dev/null"
+    s3_client.upload_file(empty_file, Bucket=bucket, Key=key)

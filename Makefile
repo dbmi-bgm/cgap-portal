@@ -62,6 +62,12 @@ download-genes: # grabs latest gene list from the below link, unzips and drops i
 deploy1:  # starts postgres/ES locally and loads inserts
 	@SNOVAULT_DB_TEST_PORT=`grep 'sqlalchemy[.]url =' development.ini | sed -E 's|.*:([0-9]+)/.*|\1|'` dev-servers development.ini --app-name app --clear --init --load
 
+deploy1a:  # starts postgres/ES locally and loads inserts
+	@SNOVAULT_DB_TEST_PORT=`grep 'sqlalchemy[.]url =' development.ini | sed -E 's|.*:([0-9]+)/.*|\1|'` dev-servers development.ini --app-name app --clear --init --load --no_ingest
+
+deploy1b:  # starts postgres/ES locally and loads inserts
+	@echo "Starting ingestion listener. Press ^C to exit." && SNOVAULT_DB_TEST_PORT=`grep 'sqlalchemy[.]url =' development.ini | sed -E 's|.*:([0-9]+)/.*|\1|'` poetry run ingestion-listener development.ini --app-name app
+
 deploy2:  # spins up waittress to serve the application
 	@SNOVAULT_DB_TEST_PORT=`grep 'sqlalchemy[.]url =' development.ini | sed -E 's|.*:([0-9]+)/.*|\1|'` pserve development.ini
 
