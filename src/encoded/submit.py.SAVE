@@ -10,7 +10,7 @@ from pyramid.response import Response
 from snovault.util import debug_log
 from pyramid.view import view_config
 from webtest.app import AppError
-from .util import s3_local_file, debuglog
+from .common import s3_local_file, debuglog
 
 
 GENERIC_FIELD_MAPPING = {
@@ -103,11 +103,9 @@ def submit_data_bundle(*, s3_client, bucket, key, project, institution, vapp):  
         log: a logging object capable of .info, .warning, .error, or .debug messages
     """
     with s3_local_file(s3_client, bucket=bucket, key=key) as file:
-        assert isinstance(project, dict)
-        assert isinstance(institution, dict)
-        # project_json = vapp.get(project).json
-        # institution_json = vapp.get(institution).json
-        json_data = xls_to_json(file, project=project, institution=institution)
+        project_json = vapp.get(project).json
+        institution_json = vapp.get(institution).json
+        json_data = xls_to_json(file, project=project_json, institution=institution_json)
         final_json, validation_log_lines = validate_all_items(vapp, json_data)
         result_lines = post_and_patch_all_items(vapp, final_json)
         return validation_log_lines, final_json, result_lines

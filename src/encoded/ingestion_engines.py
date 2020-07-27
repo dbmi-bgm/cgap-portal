@@ -76,6 +76,23 @@ def handle_data_bundle(*, uuid, ingestion_type, vapp, log):
 
     try:
 
+        if isinstance(institution, str):
+            institution = vapp.get(institution).json
+        if isinstance(project, str):
+            project = vapp.get(project).json
+
+        vapp.patch_json("/ingestion-submission", {
+            "object_name": manifest['object_name'],
+            "ingestion_type": ingestion_type,
+            "submission_id": uuid,
+            "parameters": manifest['parameters'],
+            "institution": institution,
+            "project": project,
+            "processing_status": {
+                "state": "processing",
+            }
+        })
+
         validation_log_lines, final_json, result_lines = submit_data_bundle(s3_client=s3_client,
                                                                             bucket=DATA_BUNDLE_BUCKET,
                                                                             key=data_key,
@@ -96,6 +113,15 @@ def handle_data_bundle(*, uuid, ingestion_type, vapp, log):
         with s3_output_stream(s3_client, bucket=DATA_BUNDLE_BUCKET, key=submission_response_key) as fp:
             _show_report_lines(result_lines, fp)
 
+        vapp.patch_json("ingestion-submission", {
+            "submission_id": uuid,
+            "progress": {
+                "state": "done",
+                "outcome": "failure" if validation_log_lines else "success",
+                "progress": "complete",
+            },
+        })
+
     except Exception as e:
 
         resolution["traceback_key"] = traceback_key = "%s/traceback.json" % uuid
@@ -104,6 +130,15 @@ def handle_data_bundle(*, uuid, ingestion_type, vapp, log):
 
         resolution["error_type"] = e.__class__.__name__
         resolution["error_message"] = str(e)
+
+        vapp.patch_json("ingestion-submission", {
+            "submission_id": uuid,
+            "progress": {
+                "state": "done",
+                "outcome": "error",
+                "progress": "incomplete",
+            },
+        })
 
     with s3_output_stream(s3_client, bucket=DATA_BUNDLE_BUCKET, key="%s/resolution.json" % uuid) as fp:
         print(json.dumps(resolution, indent=2), file=fp)

@@ -74,10 +74,10 @@ def submit_for_ingestion(context, request):
     # NOTE: Some reference information about uploading files to s3 is here:
     #   https://boto3.amazonaws.com/v1/documentation/api/latest/guide/s3-uploading-files.html
 
-    upload_id = str(uuid.uuid4())
+    submission_id = str(uuid.uuid4())
     _, ext = os.path.splitext(filename)
-    object_name = "{id}/datafile{ext}".format(id=upload_id, ext=ext)
-    manifest_name = "{id}/manifest.json".format(id=upload_id)
+    object_name = "{id}/datafile{ext}".format(id=submission_id, ext=ext)
+    manifest_name = "{id}/manifest.json".format(id=submission_id)
 
     s3_client = boto3.client('s3')
 
@@ -98,6 +98,7 @@ def submit_for_ingestion(context, request):
     result = {
         "filename": filename,
         "object_name": object_name,
+        "submission_id": submission_id,
         "bucket": DATA_BUNDLE_BUCKET,
         "success": success,
         "message": message,
@@ -123,7 +124,7 @@ def submit_for_ingestion(context, request):
             raise SubmissionFailure(message)
 
     queue_manager = get_queue_manager(request, override_name=override_name)
-    _, failed = queue_manager.add_uuids([upload_id], ingestion_type=ingestion_type)
+    _, failed = queue_manager.add_uuids([submission_id], ingestion_type=ingestion_type)
 
     if failed:
         # If there's a failure, failed will be a list of one problem description since we only submitted one thing.
@@ -214,7 +215,7 @@ class IngestionQueueManager:
             'region_name': 'us-east-1'
         }
         self.client = boto3.client('sqs', **kwargs)
-        self.queue_name = self.env_name + self.BUCKET_EXTENSION if not override_name else override_name
+        self.queue_name = override_name or (self.env_name + self.BUCKET_EXTENSION)
         self.queue_attrs = {
             self.queue_name: {
                 'DelaySeconds': '1',  # messages initially invisible for 1 sec
@@ -549,9 +550,17 @@ class IngestionListener:
                 if ingestion_type != 'vcf':
                     # Let's minimally disrupt things for now. We can refactor this later
                     # to make all the parts work the same -kmp
+                    self.vapp.post_json("/ingestion-submission", {
+                        "ingestion_type": ingestion_type,
+                        "submission_id": uuid,
+                    })
                     handler = get_ingestion_processor(ingestion_type)
                     handler(uuid=uuid, ingestion_type=ingestion_type, vapp=self.vapp, log=log)
-                    print("HANDLED", uuid)
+                    # TODO: If we delete messages at the end of each loop, I think we'll here need to do this,
+                    #       since we're bypassing bottom of lop with the 'continue':
+                    #          self.delete_messages([message])
+                    #          messages.remove(message)
+                    debuglog("HANDLED", uuid)
                     continue
 
                 debuglog("Did NOT process", uuid, "as", ingestion_type)
@@ -597,6 +606,9 @@ class IngestionListener:
                 log.error(msg)
                 self.update_status(msg=msg)
 
+            # TODO: I worry waiting to delete multiple messages means that if there's an error
+            #       we'll have things that were completed not get deleted. Should delete one per iteration?
+            #       -kmp 26-Jul-2020
             self.delete_messages(messages)
 
 
