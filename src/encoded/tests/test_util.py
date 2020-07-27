@@ -3,7 +3,7 @@ import os
 import pytest
 
 from unittest import mock
-from ..util import MockFileSystem
+from dcicutils.qa_utils import MockFileSystem
 
 
 def test_mock_file_system():
