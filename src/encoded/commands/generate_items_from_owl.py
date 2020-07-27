@@ -9,13 +9,7 @@ import sys
 from base64 import b64encode
 from collections import Counter
 from datetime import datetime
-from dcicutils.ff_utils import (
-    get_authentication_with_server,
-    # get_metadata,
-    search_metadata,
-    # unified_authentication,
-    post_metadata
-)
+from dcicutils.ff_utils import get_authentication_with_server, search_metadata, post_metadata
 from uuid import uuid4
 from ..commands.load_items import load_items
 from ..commands.owltools import (
@@ -23,7 +17,6 @@ from ..commands.owltools import (
     Owler,
     splitNameFromNamespace,
     convert2URIRef,
-    # isURIRef,
     isBlankNode,
     getObjectLiteralsOfType,
     Deprecated,

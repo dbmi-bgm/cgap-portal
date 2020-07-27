@@ -84,19 +84,13 @@ def main():
     parser.add_argument('--load', action="store_true", help="Load test set")
     parser.add_argument('--datadir', default='/tmp/snovault', help="path to datadir")
     parser.add_argument('--no_ingest', action="store_true", default=False, help="Don't start the ingestion process.")
-    parser.add_argument('--ingest_only', action="store_true", default=False, help="Only start the ingestion engine.")
     args = parser.parse_args()
 
     run(app_name=args.app_name, config_uri=args.config_uri, datadir=args.datadir,
-        clear=args.clear, init=args.init, load=args.load, no_ingest=args.no_ingest, ingest_only=args.ingest_only)
+        clear=args.clear, init=args.init, load=args.load, ingest=not args.no_ingest)
 
 
-def run(app_name, config_uri, datadir, clear=False, init=False, load=False, no_ingest=False, ingest_only=False):
-
-    if ingest_only:
-        clear = False
-        init = False
-        load = False
+def run(app_name, config_uri, datadir, clear=False, init=False, load=False, ingest=True):
 
     logging.basicConfig(format='')
     # Loading app will have configured from config file. Reconfigure here:
@@ -119,21 +113,18 @@ def run(app_name, config_uri, datadir, clear=False, init=False, load=False, no_i
     # ----- ... to HERE to disable recreation of test db
     # ----- may have to `rm /tmp/snovault/pgdata/postmaster.pid`
 
-    if ingest_only:
-        print("Do this instead: ",
-              "SNOVAULT_DB_TEST_PORT=" + os.environ["SNOVAULT_DB_TEST_PORT"],
-              " ".join(ingestion_listener_compute_command(config_uri, app_name)))
-        return
-
     processes = []
-    if not ingest_only:
-        postgres = postgresql_fixture.server_process(pgdata, echo=True)
-        processes.append(postgres)
-        elasticsearch = elasticsearch_fixture.server_process(esdata, echo=True)
-        processes.append(elasticsearch)
-        nginx = nginx_server_process(echo=True)
-        processes.append(nginx)
-    if not no_ingest:
+
+    postgres = postgresql_fixture.server_process(pgdata, echo=True)
+    processes.append(postgres)
+
+    elasticsearch = elasticsearch_fixture.server_process(esdata, echo=True)
+    processes.append(elasticsearch)
+
+    nginx = nginx_server_process(echo=True)
+    processes.append(nginx)
+
+    if ingest:
         ingestion_listener = ingestion_listener_process(config_uri, app_name)
         processes.append(ingestion_listener)
 
