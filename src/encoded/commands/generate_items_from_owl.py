@@ -100,8 +100,8 @@ def iterative_parents(nodes, terms, data):
         until there are no more parents
     """
     results = []
-    while 1:
-        newNodes = []
+    while True:
+        new_nodes = []
         if len(nodes) == 0:
             break
         for node in nodes:
@@ -111,8 +111,8 @@ def iterative_parents(nodes, terms, data):
             if terms[node].get(data):
                 for parent in terms[node][data]:
                     if parent not in results:
-                        newNodes.append(parent)
-        nodes = list(set(newNodes))
+                        new_nodes.append(parent)
+        nodes = list(set(new_nodes))
     return list(set(results))
 
 
@@ -230,7 +230,7 @@ def add_slim_to_term(term, slim_terms, itype):
 def add_slim_terms(terms, slim_terms, itype):
     for termid, term in terms.items():
         term = get_all_ancestors(term, terms, 'parents', itype)
-        term = add_slim_to_term(term, slim_terms, itype)
+        add_slim_to_term(term, slim_terms, itype)
     terms = _cleanup_non_fields(terms)
     return terms
 
@@ -253,6 +253,9 @@ def get_term_uris_as_ns(itype, conf_name):
         item type
     """
     uris = [convert2namespace(uri) for uri in ITEM2OWL.get(conf_name, [])]
+    # TODO: PyCharm is worried that this next line has the wrong type in play:
+    #        Expected type 'str' (matched generic type 'Union[_VT_co, _T]'), got 'list' instead.
+    #       Its checker is heuristic, but it looks like possibl a bug to me, too. -kmp 27-Jul-2020
     uris.extend([convert2namespace(uri) for uri in ITEM2OWL[itype].get(conf_name, [])])
     return uris
 
@@ -545,10 +548,12 @@ def _is_deprecated(class_, data):
     return False
 
 
-def download_and_process_owl(itype, input, terms={}, simple=False):
+def download_and_process_owl(itype, input_uri, terms=None, simple=False):
+    if terms is None:
+        terms = {}
     synonym_terms = get_term_uris_as_ns(itype, 'synonym_uris')
     definition_terms = get_term_uris_as_ns(itype, 'definition_uris')
-    data = Owler(input)
+    data = Owler(input_uri)
     ontv = data.versionIRI
     name_field = ITEM2OWL[itype].get('name_field')
     for class_ in data.allclasses:
@@ -709,13 +714,16 @@ def main():
     slim_terms = get_slim_term_ids_from_db_terms(db_terms, itype)
     terms = {}
 
-    input = args.input
-    if not input:
-        input = ITEM2OWL[itype].get('download_url', None)  # TODO: PyCharm distrusts the data type flow on this line.
-    if input:
+    input_uri = args.input
+    if not input_uri:
+        # We had been using a default of None for this .get(), but PyCharm was worried about the type of the URI
+        # not being None, so Andy and I have agreed to use the empty string as an argument, hoping that works.
+        # -kmp 27-Jul-2020
+        input_uri = ITEM2OWL[itype].get('download_url', "")
+    if input_uri:
         # get all the terms for an ontology with simple processing
-        logger.info("Will get ontology data using = {}".format(input))
-        terms, ontv = download_and_process_owl(itype, input, terms, True)
+        logger.info("Will get ontology data using = {}".format(input_uri))
+        terms, ontv = download_and_process_owl(itype, input_uri, terms, True)
     else:
         # bail out
         logger.error("Need url to download file from")
@@ -723,7 +731,7 @@ def main():
 
     # at this point we've processed the rdf of all the ontologies
     if not ontv:
-        ontv = input
+        ontv = input_uri
     logger.info("Ontology Version Info: {}".format(ontv))
     if terms:
         terms = add_slim_terms(terms, slim_terms, itype)
