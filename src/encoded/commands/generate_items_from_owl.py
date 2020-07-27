@@ -38,6 +38,9 @@ ITEM2OWL = {
         'http://www.geneontology.org/formats/oboInOwl#hasNarrowSynonym',
         'http://www.geneontology.org/formats/oboInOwl#RelatedSynonym',
     ],
+    # NOTE: There could theoretically also be a 'definition_uris': [...] or 'synonym_urls': [...]
+    #       with more specific terminology information in the dictionaries that follow here,
+    #       and the code in get_term_uris_as_ns would find it. -kmp 27-Jul-2020
     'Disorder': {
         'download_url': 'http://purl.obolibrary.org/obo/mondo.owl',
         'ontology_prefix': 'MONDO',
@@ -253,10 +256,11 @@ def get_term_uris_as_ns(itype, conf_name):
         item type
     """
     uris = [convert2namespace(uri) for uri in ITEM2OWL.get(conf_name, [])]
-    # TODO: PyCharm is worried that this next line has the wrong type in play:
-    #        Expected type 'str' (matched generic type 'Union[_VT_co, _T]'), got 'list' instead.
-    #       Its checker is heuristic, but it looks like possibl a bug to me, too. -kmp 27-Jul-2020
-    uris.extend([convert2namespace(uri) for uri in ITEM2OWL[itype].get(conf_name, [])])
+    # For this second situation, ajs says it's possible for a given itype (e.g., Phenotype or Disorder) that
+    # there is additional vocabulary that could be added. to extend that set. Right now there is no such
+    # 'definition_urls' or 'synonym_urls' declared, so PyCharm gets nervous. The 'NoQA' here is about that.
+    # -kmp 27-Jul-2020
+    uris.extend([convert2namespace(uri) for uri in ITEM2OWL[itype].get(conf_name, [])])  # NoQA - See comment above
     return uris
 
 
