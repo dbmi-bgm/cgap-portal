@@ -64,7 +64,7 @@
             "title": "Location",
             "description": "The location within the gene/transcript upon which the variant has its consequence",
             "type": "string",
-            "enum": ["splice site", "CDS", "miRNA", "UTR"]
+            "enum": ["splice site", "CDS", "miRNA", "UTR", "intron", "downstream", "upstream"]
         },
         "coding_effect": {
             "title": "Coding Effect",
