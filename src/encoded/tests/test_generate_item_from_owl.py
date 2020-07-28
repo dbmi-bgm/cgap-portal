@@ -10,7 +10,7 @@ from dcicutils import s3_utils
 from unittest import mock
 from ..commands import generate_items_from_owl as gifo
 from ..commands.owltools import Owler
-from ..util import MockFileSystem
+from dcicutils.qa_utils import MockFileSystem
 
 
 pytestmark = [pytest.mark.setone, pytest.mark.working]
