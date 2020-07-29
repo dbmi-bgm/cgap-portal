@@ -5,6 +5,7 @@ import mimetypes
 import netaddr
 import os
 import pkg_resources
+import sentry_sdk
 import subprocess
 import sys
 
@@ -15,6 +16,7 @@ from dcicutils.ff_utils import get_health_page
 from pyramid.config import Configurator
 from pyramid_localroles import LocalRolesAuthorizationPolicy
 from pyramid.settings import asbool
+from sentry_sdk.integrations.pyramid import PyramidIntegration
 from snovault.app import STATIC_MAX_AGE, session, json_from_path, configure_dbsession, changelogs, json_asset
 from snovault.elasticsearch import APP_FACTORY
 from webtest import TestApp
@@ -111,6 +113,13 @@ def main(global_config, **local_config):
     """
     This function returns a Pyramid WSGI application.
     """
+
+    # should this failing prevent the application from starting?
+    # should the 'dsn' be stored elsewhere in case it needs updating?
+    sentry_sdk.init(
+        dsn="https://45645f06b60d4299b056b661a928339f@o427308.ingest.sentry.io/5371166",
+        integrations=[PyramidIntegration()]
+    )
 
     settings = global_config
     settings.update(local_config)
