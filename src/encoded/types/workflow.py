@@ -919,6 +919,7 @@ def validate_input_json(context, request):
              permission='add', validators=[validate_input_json])
 @debug_log
 def pseudo_run(context, request):
+    """ XXX: This needs documentation badly. """
     input_json = request.json
 
     # set env_name for awsem runner in tibanna
@@ -942,7 +943,14 @@ def pseudo_run(context, request):
                             Payload=json.dumps(input_json))
     res_decode = res['Payload'].read().decode()
     res_dict = json.loads(res_decode)
-    arn = res_dict['_tibanna']['response']['executionArn']
+
+    # known to fail and propagate exception
+    try:
+        arn = res_dict['_tibanna']['response']['executionArn']
+    except Exception as e:
+        # XXX: do something
+        raise e
+
     # just loop until we get proper status
     for i in range(100):
         res = aws_lambda.invoke(FunctionName=TIBANNA_WORKFLOW_STATUS_LAMBDA_FUNCTION,

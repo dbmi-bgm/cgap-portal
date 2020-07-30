@@ -349,9 +349,8 @@ class IngestionListener:
             annotation_id (or display_title). This slows down the ingestion process by a decent amount,
             but is tolerable since it still proceeds at the same rate as indexing.
         """
-        display_title = 'chr%s:%s%s_%s' % (variant['CHROM'], variant['POS'], variant['REF'], variant['ALT'])
-        variant = self.vapp.get('/search/?type=Variant&display_title=%s' % display_title).follow().json
-        return variant['@graph'][0]['uuid']
+        annotation_id = 'chr%s:%s%s_%s' % (variant['CHROM'], variant['POS'], variant['REF'], variant['ALT'])
+        return annotation_id
 
     def build_and_post_variant(self, parser, record, project, institution):
         """ Helper method for below that builds and posts a variant item given a record """
