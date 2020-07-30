@@ -7,7 +7,7 @@ from snovault import (
 )
 from .base import (
     Item,
-    get_item_if_you_can,
+    get_item_or_none,
     ALLOW_SUBMITTER_ADD,
 )
 

@@ -19,8 +19,12 @@ class Individual(Item):
     item_type = 'individual'
     name_key = 'accession'
     schema = load_schema('encoded:schemas/individual.json')
-    rev = {'children_f': ('Individual', 'father'),
-           'children_m': ('Individual', 'mother')}
+    rev = {
+        'children_f': ('Individual', 'father'),
+        'children_m': ('Individual', 'mother'),
+        'families': ('Family', 'members'),
+        'case': ('Case', 'individual')
+    }
 
     embedded_list = [
         'father.is_deceased',
@@ -31,7 +35,7 @@ class Individual(Item):
 
     @calculated_property(schema={
         "title": "Display Title",
-        "description": "A calculated title for every object in 4DN",
+        "description": "Individual's Identifier",
         "type": "string"
     })
     def display_title(self, request, accession, bgm_id=None, other_id=None):
@@ -55,5 +59,37 @@ class Individual(Item):
         }
     })
     def children(self, request):
-        return (self.rev_link_atids(request, "children_f") +
+        kids = (self.rev_link_atids(request, "children_f") +
                 self.rev_link_atids(request, "children_m"))
+        if kids:
+            return kids
+
+    @calculated_property(schema={
+        "title": "Families",
+        "description": "Families this individual is a member of",
+        "type": "array",
+        "items": {
+            "title": "Family",
+            "type": "string",
+            "linkTo": "Family"
+        }
+    })
+    def families(self, request):
+        fams = self.rev_link_atids(request, "families")
+        if fams:
+            return fams
+
+    @calculated_property(schema={
+        "title": "Cases",
+        "description": "Cases for this individual",
+        "type": "array",
+        "items": {
+            "title": "Case",
+            "type": "string",
+            "linkTo": "Case"
+        }
+    })
+    def case(self, request):
+        rs = self.rev_link_atids(request, "case")
+        if rs:
+            return rs

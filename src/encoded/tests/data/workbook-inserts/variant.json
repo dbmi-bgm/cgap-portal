@@ -1,0 +1,64 @@
+[
+  {
+    "project": "hms-dbmi",
+    "institution": "hms-dbmi",
+    "uuid": "f6aef055-4c88-4a3e-a306-d37a71535d8b",
+    "ID": "rs564328546",
+    "ALT": "T",
+    "POS": 12125898,
+    "REF": "TG",
+    "hg19": [
+      {
+        "hg19_pos": 12185955,
+        "hg19_chrom": "chr1",
+        "hg19_hgvsg": "NC_000001.11:g.12185956del"
+      }
+    ],
+    "CHROM": "1",
+    "topmed_an": 125568
+  },
+  {
+    "project": "hms-dbmi",
+    "institution": "hms-dbmi",
+    "uuid": "852bb349-203e-437d-974a-e8d6cb56810a",
+    "ID": "rs72640270",
+    "ALT": "T",
+    "POS": 11841759,
+    "REF": "A",
+    "hg19": [
+      {
+        "hg19_pos": 11901816,
+        "hg19_chrom": "chr1",
+        "hg19_hgvsg": "NC_000001.11:g.11901816A>T"
+      }
+    ],
+    "CHROM": "1"
+  },
+  {
+    "project": "hms-dbmi",
+    "institution": "hms-dbmi",
+    "uuid": "842b1b54-32fb-4ff3-bfd1-c5b51bc35d7f",
+    "ID": "",
+    "ALT": "A",
+    "POS": 11720331,
+    "REF": "G",
+    "hg19": [
+      {
+        "hg19_pos": 11780388,
+        "hg19_chrom": "chr1",
+        "hg19_hgvsg": "NC_000001.11:g.11780388G>A"
+      }
+    ],
+    "CHROM": "1",
+    "rmsk_repname": "AluSq2"
+  },
+  {
+    "project": "hms-dbmi",
+    "institution": "hms-dbmi",
+    "uuid": "cedff838-99af-4936-a0ae-4dfc63ba8bf4",
+    "CHROM": "1",
+    "POS": 88832,
+    "REF": "A",
+    "ALT": "G"
+  }
+]

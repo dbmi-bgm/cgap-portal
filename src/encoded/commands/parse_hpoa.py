@@ -316,7 +316,7 @@ def log_problems(logger, problems):
 
 
 def get_args(args):  # pragma: no cover
-    parser = argparse.ArgumentParser(
+    parser = argparse.ArgumentParser(  # noqa - PyCharm wrongly thinks the formatter_class is invalid
         description='Given an HPOA file or url for download generate EvidenceDisPheno items and optionally load',
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
@@ -445,7 +445,7 @@ def main():  # pragma: no cover
     end = datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
     logger.info("FINISHED - START: {}\tEND: {}".format(start, end))
     if args.post_report:
-        post_report_document_to_portal(connection, itype, logfile)
+        post_report_document_to_portal(connection, ITEMTYPE, logfile)
 
 
 if __name__ == '__main__':  # pragma: no cover

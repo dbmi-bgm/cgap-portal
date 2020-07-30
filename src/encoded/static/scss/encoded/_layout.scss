@@ -179,12 +179,12 @@ blockquote {
 
 	/* top padding for small & large screens re: fixed nav & sticky footer */
 	@include media-breakpoint-up(md) {
-		padding-top: 81px;
+		padding-top: 80px;
 		padding-bottom: 50px;
 		body.scolled-past-top &,
 		body.is-full-screen &,
 		body.is-item-view & {
-			padding-top: 41px;
+			padding-top: 40px;
 		}
 
 	}
@@ -441,13 +441,6 @@ body.is-full-screen {
 	> label {
 		cursor: pointer;
 	}
-}
-
-.no-user-select {
-	-webkit-user-select: none;
-	-moz-user-select: none;
-	-ms-user-select: none;
-	user-select: none;
 }
 
 /** Equal Height Columns in Bootstrap Row on IE9+ **/

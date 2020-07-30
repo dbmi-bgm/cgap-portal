@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import memoize from 'memoize-one';
 import _ from 'underscore';
 import { console, layout, ajax, object } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
+import { Schemas } from './../../util';
 import { PedigreeDetailPane } from './../components/PedigreeDetailPane';
 import PedigreeViz, { PedigreeVizView, isRelationshipNode } from './../../viz/PedigreeViz';
 import { FullHeightCalculator } from './../components/FullHeightCalculator';
@@ -155,7 +156,20 @@ export class PedigreeTabViewBody extends React.PureComponent {
 
     renderDetailPane(pedigreeVizProps){
         const { session, href, context } = this.props;
-        return <PedigreeDetailPane {...pedigreeVizProps} {...{ session, href, context }} />;
+
+        // Pass schemas down for use in File Upload Drag and Drop
+        const schemas = Schemas.get();
+        let indvSchema;
+        let docSchema;
+        let imageSchema;
+        if (schemas) {
+            indvSchema = schemas.Individual;
+            docSchema = schemas.Document;
+            imageSchema = schemas.Image;
+        }
+
+        // console.log("schemas[individual]", schemas["Individual"]);
+        return <PedigreeDetailPane {...pedigreeVizProps} {...{ session, href, context, indvSchema, docSchema, imageSchema }} />;
     }
 
     render(){
@@ -172,8 +186,9 @@ export class PedigreeTabViewBody extends React.PureComponent {
         const { isBrowserFullscreen, isPedigreeFullscreen } = this.state;
         const propName = "height"; //(isBrowserFullscreen ? "height" : "minimumHeight");
         const cls = (
-            "pedigree-tab-view-body-container" +
-            (isBrowserFullscreen ? "browser-is-full-screen" : "") +
+            "pedigree-tab-view-body-container bg-light" +
+            // Maybe should have this as data attributes.. eh prly doesn't matter
+            (isBrowserFullscreen ? " browser-is-full-screen" : "") +
             (isPedigreeFullscreen ? " view-is-full-screen" : "")
         );
         // `FullHeightCalculator` will use defaultProps.heightDiff if this is
@@ -207,7 +222,8 @@ export class PedigreeTabViewBody extends React.PureComponent {
         */
 
         // Will lose ability to move top/bottom with touchpad if this is enabled.
-        // Need to consider further.
+        // Need to consider further. Currently is enabled w. ctrl+wheel which might
+        // be fine as long as inform of this ability in UX (todo later).
         const enableMouseWheelZoom = false;
 
         /**
@@ -232,9 +248,11 @@ export class PedigreeTabViewBody extends React.PureComponent {
         return (
             <div id={containerId} className={cls}>
                 <FullHeightCalculator {...{ windowWidth, windowHeight, propName, heightDiff }}>
-                    { graphData ? // If already have parsed graph data
+                    { graphData ?
+                        // If already have parsed graph data
                         <PedigreeVizView {...pedigreeVizProps} {...graphData} />
                         :
+                        // If letting PedigreeViz parse on the fly (this mostly for local demo/test data)
                         <PedigreeViz {...pedigreeVizProps} dataset={dataset} />
                     }
                 </FullHeightCalculator>

@@ -1,16 +1,12 @@
 """The user collection."""
 # -*- coding: utf-8 -*-
 
-from pyramid.view import (
-    view_config,
-)
+import logging
+import transaction
+
 from pyramid.httpexceptions import HTTPUnprocessableEntity
-from pyramid.security import (
-    Allow,
-    Deny,
-    Everyone,
-)
-from .base import Item
+from pyramid.security import Allow, Deny, Everyone
+from pyramid.view import view_config
 from snovault import (
     CONNECTION,
     calculated_property,
@@ -18,16 +14,13 @@ from snovault import (
     load_schema,
     display_title_schema
 )
-
-from snovault.storage import User as AuthUser
-from snovault.schema_utils import validate_request
 from snovault.crud_views import collection_add
-from snovault.calculated import calculate_properties
 from snovault.resource_views import item_view_page
+from snovault.schema_utils import validate_request
+from snovault.storage import User as AuthUser
 from snovault.util import debug_log
-from dcicutils.s3_utils import s3Utils
-import requests
-import logging
+from .base import Item
+
 
 logging.getLogger('boto3').setLevel(logging.INFO)
 log = logging.getLogger(__name__)
@@ -166,7 +159,6 @@ def user_add(context, request):
             db = request.registry['dbsession']
             db.add(auth_user)
 
-            import transaction
             transaction.commit()
     return result
 

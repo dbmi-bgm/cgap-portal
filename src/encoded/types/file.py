@@ -2,9 +2,10 @@ import boto3
 import datetime
 import json
 import logging
-import pytz
 import os
+import pytz
 import structlog
+import transaction
 
 from botocore.exceptions import ClientError
 from copy import deepcopy
@@ -15,8 +16,10 @@ from pyramid.httpexceptions import (
 )
 from pyramid.response import Response
 from pyramid.settings import asbool
+from pyramid.threadlocal import get_current_request
 from pyramid.traversal import resource_path
 from pyramid.view import view_config
+from dcicutils.env_utils import CGAP_ENV_WEBPROD
 from snovault import (
     AfterModified,
     BeforeModified,
@@ -26,12 +29,12 @@ from snovault import (
     load_schema,
     abstract_collection,
 )
-from snovault.attachment import ItemWithAttachment
 from snovault.crud_views import (
     collection_add,
     item_edit,
 )
 from snovault.elasticsearch import ELASTIC_SEARCH
+from snovault.invalidation import add_to_indexing_queue
 from snovault.schema_utils import schema_validator
 from snovault.util import debug_log
 from snovault.validators import (
@@ -48,13 +51,12 @@ from urllib.parse import (
     urlparse,
 )
 from ..authentication import session_properties
-from ..search import make_search_subreq
-from . import TrackingItem
+from ..search.search import make_search_subreq
 from .base import (
     Item,
     ALLOW_SUBMITTER_ADD,
-    get_item_if_you_can,
-    # lab_award_attribution_embed_list
+    get_item_or_none,
+    # lab_award_attribution_embed_list,
 )
 
 
@@ -90,13 +92,12 @@ def show_upload_credentials(request=None, context=None, status=None):
 
 
 def external_creds(bucket, key, name=None, profile_name=None):
-    '''
+    """
     if name is None, we want the link to s3 but no need to generate
     an access token.  This is useful for linking metadata to files that
     already exist on s3.
-    '''
+    """
 
-    import logging
     logging.getLogger('boto3').setLevel(logging.CRITICAL)
     credentials = {}
     if name is not None:
@@ -175,7 +176,7 @@ class File(Item):
     })
     def display_title(self, request, file_format, accession=None, external_accession=None):
         accession = accession or external_accession
-        file_format_item = get_item_if_you_can(request, file_format, 'file-formats')
+        file_format_item = get_item_or_none(request, file_format, 'file-formats')
         try:
             file_extension = '.' + file_format_item.get('standard_file_extension')
         except AttributeError:
@@ -189,7 +190,7 @@ class File(Item):
     })
     def file_type_detailed(self, request, file_format, file_type=None):
         outString = (file_type or 'other')
-        file_format_item = get_item_if_you_can(request, file_format, 'file-formats')
+        file_format_item = get_item_or_none(request, file_format, 'file-formats')
         try:
             fformat = file_format_item.get('file_format')
             outString = outString + ' (' + fformat + ')'
@@ -250,7 +251,7 @@ class File(Item):
             # get @id for parent file
             try:
                 at_id = resource_path(self)
-            except:
+            except Exception:
                 at_id = "/" + str(uuid) + "/"
             # ensure at_id ends with a slash
             if not at_id.endswith('/'):
@@ -327,7 +328,7 @@ class File(Item):
                     rev_switch = DicRefRelation[switch]
                     related_fl = relation["file"]
                     relationship_entry = {"relationship_type": rev_switch, "file": my_uuid}
-                except:
+                except Exception:
                     log.error('Error updating related_files on %s _update. %s'
                               % (my_uuid, relation))
                     continue
@@ -341,9 +342,6 @@ class File(Item):
                         target_relation.get('relationship_type') == rev_switch):
                         break
                 else:
-                    import transaction
-                    from pyramid.threadlocal import get_current_request
-                    from snovault.invalidation import add_to_indexing_queue
                     # Get the current request in order to queue the forced
                     # update for indexing. This is bad form.
                     # Don't do this anywhere else, please!
@@ -390,7 +388,7 @@ class File(Item):
         "description": "Use this link to download this file."
     })
     def href(self, request, file_format, accession=None, external_accession=None):
-        fformat = get_item_if_you_can(request, file_format, 'file-formats')
+        fformat = get_item_or_none(request, file_format, 'file-formats')
         try:
             file_extension = '.' + fformat.get('standard_file_extension')
         except AttributeError:
@@ -498,7 +496,7 @@ class FileFastq(File):
         "quality_metric.Total Sequences",
         "quality_metric.Sequence length",
         "quality_metric.url"
-    ]  # + file_workflow_run_embeds
+    ]  + file_workflow_run_embeds
     name_key = 'accession'
     rev = dict(File.rev, **{
         'workflow_run_inputs': ('WorkflowRun', 'input_files.value'),
@@ -543,7 +541,7 @@ class FileProcessed(File):
     """Collection for individual processed files."""
     item_type = 'file_processed'
     schema = load_schema('encoded:schemas/file_processed.json')
-    embedded_list = File.embedded_list  # + file_workflow_run_embeds_processed
+    embedded_list = File.embedded_list + file_workflow_run_embeds_processed
     name_key = 'accession'
     rev = dict(File.rev, **{
         'workflow_run_inputs': ('WorkflowRun', 'input_files.value'),
@@ -648,7 +646,7 @@ def post_upload(context, request):
         bucket = request.registry.settings['file_upload_bucket']
         # maybe this should be properties.uuid
         uuid = context.uuid
-        file_format = get_item_if_you_can(request, properties.get('file_format'), 'file-formats')
+        file_format = get_item_or_none(request, properties.get('file_format'), 'file-formats')
         try:
             file_extension = '.' + file_format.get('standard_file_extension')
         except AttributeError:
@@ -711,11 +709,13 @@ def is_file_to_download(properties, file_format, expected_filename=None):
 @view_config(name='download', context=File, request_method='GET',
              permission='view', subpath_segments=[0, 1])
 def download(context, request):
+    # disable if not on cgap prod
+    if request.registry.settings.get('env.name', 'localhost') not in [CGAP_ENV_WEBPROD, 'localhost']:
+        raise HTTPForbidden('Downloads disabled when not on cgap-prod (or testing)!')
+
     # first check for restricted status
-    if True:  # XXX: restrict all downloads for now
-        raise HTTPForbidden('This is a restricted file not available for download')
     try:
-        user_props = session_properties(request)
+        user_props = session_properties(context, request)
     except Exception as e:
         user_props = {'error': str(e)}
     tracking_values = {'user_agent': request.user_agent, 'remote_ip': request.remote_addr,
@@ -733,7 +733,7 @@ def download(context, request):
     # or one of the files in extra files, the following logic will
     # search to find the "right" file and redirect to a download link for that one
     properties = context.upgrade_properties()
-    file_format = get_item_if_you_can(request, properties.get('file_format'), 'file-formats')
+    file_format = get_item_or_none(request, properties.get('file_format'), 'file-formats')
     _filename = None
     if request.subpath:
         _filename, = request.subpath
@@ -741,7 +741,7 @@ def download(context, request):
     if not filename:
         found = False
         for extra in properties.get('extra_files', []):
-            eformat = get_item_if_you_can(request, extra.get('file_format'), 'file-formats')
+            eformat = get_item_or_none(request, extra.get('file_format'), 'file-formats')
             filename = is_file_to_download(extra, eformat, _filename)
             if filename:
                 found = True
@@ -826,7 +826,7 @@ def validate_file_format_validity_for_file_type(context, request):
     """
     data = request.json
     if 'file_format' in data:
-        file_format_item = get_item_if_you_can(request, data['file_format'], 'file-formats')
+        file_format_item = get_item_or_none(request, data['file_format'], 'file-formats')
         if not file_format_item:
             # item level validation will take care of generating the error
             return
@@ -854,7 +854,7 @@ def validate_file_filename(context, request):
     ff = data.get('file_format')
     if not ff:
         ff = context.properties.get('file_format')
-    file_format_item = get_item_if_you_can(request, ff, 'file-formats')
+    file_format_item = get_item_or_none(request, ff, 'file-formats')
     if not file_format_item:
         msg = 'Problem getting file_format for %s' % filename
         request.errors.add('body', 'File: no format', msg)
@@ -933,7 +933,7 @@ def validate_processed_file_produced_from_field(context, request):
     files2chk = data['produced_from']
     for i, f in enumerate(files2chk):
         try:
-            fid = get_item_if_you_can(request, f, 'files').get('uuid')
+            fid = get_item_or_none(request, f, 'files').get('uuid')
         except AttributeError:
             files_ok = False
             request.errors.add('body', 'File: invalid produced_from id', "'%s' not found" % f)
@@ -960,7 +960,7 @@ def validate_extra_file_format(context, request):
     ff = data.get('file_format')
     if not ff:
         ff = context.properties.get('file_format')
-    file_format_item = get_item_if_you_can(request, ff, 'file-formats')
+    file_format_item = get_item_or_none(request, ff, 'file-formats')
     if not file_format_item or 'standard_file_extension' not in file_format_item:
         request.errors.add('body', 'File: no extra_file format', "Can't find parent file format for extra_files")
         return
@@ -975,7 +975,7 @@ def validate_extra_file_format(context, request):
     else:
         valid_ext_formats = []
         for ok_format in schema_eformats:
-            ok_format_item = get_item_if_you_can(request, ok_format, 'file-formats')
+            ok_format_item = get_item_or_none(request, ok_format, 'file-formats')
             try:
                 off_uuid = ok_format_item.get('uuid')
             except AttributeError:
@@ -988,7 +988,7 @@ def validate_extra_file_format(context, request):
         eformat = ef.get('file_format')
         if eformat is None:
             return  # will fail the required extra_file.file_format
-        eformat_item = get_item_if_you_can(request, eformat, 'file-formats')
+        eformat_item = get_item_or_none(request, eformat, 'file-formats')
         try:
             ef_uuid = eformat_item.get('uuid')
         except AttributeError:

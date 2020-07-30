@@ -1,0 +1,1388 @@
+[
+  {
+  "chrom": "1",
+  "spos": 944203,
+  "epos": 959309,
+  "ensgid": "ENSG00000188976",
+  "strand": "-",
+  "gene_version": "11",
+  "gene_symbol": "NOC2L",
+  "gene_biotype": "protein_coding",
+  "chrom_hg19": "1",
+  "spos_hg19": 879584,
+  "epos_hg19": 894689,
+  "strand_hg19": "-",
+  "cytoband": [
+    "1p36.33"
+  ],
+  "gene_summary": "The protein encoded by this gene is expressed in neurons of most regions of the brain. It contains an N-terminal BTB domain, which mediates dimerization of the protein, and a C-terminal Kelch domain, which mediates binding to F-actin. This protein may play a key role in the regulation of actin-based neuronal function. [provided by RefSeq, Aug 2010].",
+  "hgnc_id": "24517",
+  "name": "NOC2 like nucleolar associated transcriptional repressor",
+  "entrez_id": "26155",
+  "ucsc_id": "uc001abz.5",
+  "refseq_accession": [
+    "NM_015658"
+  ],
+  "ccds_id": [
+    "CCDS3"
+  ],
+  "uniprot_ids": [
+    "Q9Y3T9"
+  ],
+  "mgd_id": [
+    "MGI:1931051"
+  ],
+  "omim_id": [
+    "610770"
+  ],
+  "transcriptid": [
+    {
+      "ensembl_trs": "ENST00000327044",
+      "ensembl_pro": "ENSP00000317992"
+    }
+  ],
+  "biogrid": [
+    "117586"
+  ],
+  "string": [
+    "9606.ENSP00000317992"
+  ],
+  "genecards": "ENSG00000188976",
+  "pharmgkb": [
+    "PA142671261"
+  ],
+  "trait_association_gwas": [
+    "Pancreatic cancer"
+  ],
+  "trait_association_gwas_pmid": [
+    "29422604"
+  ],
+  "rvis_exac": 0.231569638,
+  "rvis_percentile_exac": 65.47195952,
+  "gdi_phred": 5.53337,
+  "gdp": "Medium",
+  "mgi_mouse_gene": "Noc2l",
+  "mgi_mouse_phenotype": "endocrine/exocrine gland phenotype; cellular phenotype; mortality/aging (the observable characteristics related to the ability of a mammalian organism to live and age that are manifested throughout development and life span); hematopoietic system phenotype; immune system phenotype",
+  "obs_mis": 577,
+  "exp_mis": 462.01,
+  "oe_mis": 1.2489,
+  "obs_syn": 320,
+  "exp_syn": 199.38,
+  "oe_syn": 1.6049,
+  "obs_lof": 43,
+  "exp_lof": 41.785,
+  "oe_lof": 1.0291,
+  "cds_length": 2247,
+  "num_coding_exons": 19,
+  "marrvel": "NOC2L",
+  "s_het": 0.005405258,
+  "gtex_expression": "ENSG00000188976.10",
+  "brainspan_microarray": "NOC2L",
+  "brainspan_rnaseq": "ENSG00000188976",
+  "brainatlas_microarray": "NOC2L"
+},
+  {
+  "chrom": "1",
+  "spos": 923928,
+  "epos": 944581,
+  "ensgid": "ENSG00000187634",
+  "strand": "+",
+  "gene_version": "12",
+  "gene_symbol": "SAMD11",
+  "gene_biotype": "protein_coding",
+  "chrom_hg19": "1",
+  "spos_hg19": 860260,
+  "epos_hg19": 879955,
+  "strand_hg19": "+",
+  "cytoband": [
+    "1p36.33"
+  ],
+  "hgnc_id": "28706",
+  "name": "sterile alpha motif domain containing 11",
+  "entrez_id": "148398",
+  "ucsc_id": "uc001abw.2",
+  "refseq_accession": [
+    "NM_152486"
+  ],
+  "ccds_id": [
+    "CCDS2"
+  ],
+  "uniprot_ids": [
+    "Q96NU1"
+  ],
+  "mgd_id": [
+    "MGI:2446220"
+  ],
+  "omim_id": [
+    "616765"
+  ],
+  "transcriptid": [
+    {
+      "ensembl_trs": "ENST00000420190",
+      "ensembl_pro": "ENSP00000411579"
+    },
+    {
+      "ensembl_trs": "ENST00000437963",
+      "ensembl_pro": "ENSP00000393181"
+    },
+    {
+      "ensembl_trs": "ENST00000342066",
+      "ensembl_pro": "ENSP00000342313"
+    },
+    {
+      "ensembl_trs": "ENST00000341065",
+      "ensembl_pro": "ENSP00000349216"
+    },
+    {
+      "ensembl_trs": "ENST00000455979",
+      "ensembl_pro": "ENSP00000412228"
+    },
+    {
+      "ensembl_trs": "ENST00000618181",
+      "ensembl_pro": "ENSP00000480870"
+    },
+    {
+      "ensembl_trs": "ENST00000622503",
+      "ensembl_pro": "ENSP00000482138"
+    },
+    {
+      "ensembl_trs": "ENST00000618323",
+      "ensembl_pro": "ENSP00000480678"
+    },
+    {
+      "ensembl_trs": "ENST00000616016",
+      "ensembl_pro": "ENSP00000478421"
+    },
+    {
+      "ensembl_trs": "ENST00000618779",
+      "ensembl_pro": "ENSP00000484256"
+    },
+    {
+      "ensembl_trs": "ENST00000616125",
+      "ensembl_pro": "ENSP00000484643"
+    },
+    {
+      "ensembl_trs": "ENST00000620200",
+      "ensembl_pro": "ENSP00000484820"
+    },
+    {
+      "ensembl_trs": "ENST00000617307",
+      "ensembl_pro": "ENSP00000482090"
+    }
+  ],
+  "biogrid": [
+    "127146"
+  ],
+  "string": [
+    "9606.ENSP00000342313"
+  ],
+  "genecards": "ENSG00000187634",
+  "pharmgkb": [
+    "PA134968665"
+  ],
+  "rvis_exac": 2.274410941,
+  "rvis_percentile_exac": 98.9036805,
+  "gdi_phred": 5.65821,
+  "gdp": "Medium",
+  "mgi_mouse_gene": "Samd11",
+  "obs_mis": 546,
+  "exp_mis": 362.02,
+  "oe_mis": 1.5082,
+  "obs_syn": 270,
+  "exp_syn": 158.98,
+  "oe_syn": 1.6983,
+  "obs_lof": 22,
+  "exp_lof": 24.538,
+  "oe_lof": 0.89656,
+  "cds_length": 2043,
+  "num_coding_exons": 13,
+  "marrvel": "SAMD11",
+  "s_het": 0.007702292,
+  "gtex_expression": "ENSG00000187634.11",
+  "brainspan_microarray": "SAMD11",
+  "brainspan_rnaseq": "ENSG00000187634",
+  "brainatlas_microarray": "SAMD11"
+},
+  {
+  "chrom": "1",
+  "spos": 975204,
+  "epos": 982093,
+  "ensgid": "ENSG00000187642",
+  "strand": "-",
+  "gene_version": "9",
+  "gene_symbol": "PERM1",
+  "gene_biotype": "protein_coding",
+  "chrom_hg19": "1",
+  "spos_hg19": 910579,
+  "epos_hg19": 917497,
+  "strand_hg19": "-",
+  "cytoband": [
+    "1p36.33"
+  ],
+  "hgnc_id": "28208",
+  "name": "PPARGC1 and ESRR induced regulator, muscle 1",
+  "entrez_id": "84808",
+  "refseq_accession": [
+    "NR_027693"
+  ],
+  "ccds_id": [
+    "CCDS76083"
+  ],
+  "uniprot_ids": [
+    "Q5SV97"
+  ],
+  "mgd_id": [
+    "MGI:1921433"
+  ],
+  "omim_id": [
+    "615921"
+  ],
+  "transcriptid": [
+    {
+      "ensembl_trs": "ENST00000341290",
+      "ensembl_pro": "ENSP00000343864"
+    },
+    {
+      "ensembl_trs": "ENST00000433179",
+      "ensembl_pro": "ENSP00000414022"
+    }
+  ],
+  "biogrid": [
+    "124270"
+  ],
+  "string": [
+    "9606.ENSP00000414022"
+  ],
+  "genecards": "ENSG00000187642",
+  "mgi_mouse_gene": "Perm1",
+  "obs_mis": 422,
+  "exp_mis": 391.1,
+  "oe_mis": 1.079,
+  "obs_syn": 215,
+  "exp_syn": 174.81,
+  "oe_syn": 1.2299,
+  "obs_lof": 21,
+  "exp_lof": 17.757,
+  "oe_lof": 1.1826,
+  "cds_length": 2088,
+  "num_coding_exons": 5,
+  "marrvel": "PERM1",
+  "gtex_expression": "ENSG00000187642.9",
+  "brainspan_microarray": "C1orf170",
+  "brainspan_rnaseq": "ENSG00000187642"
+},
+  {
+  "chrom": "1",
+  "spos": 966482,
+  "epos": 975865,
+  "ensgid": "ENSG00000187583",
+  "strand": "+",
+  "gene_version": "11",
+  "gene_symbol": "PLEKHN1",
+  "gene_biotype": "protein_coding",
+  "chrom_hg19": "1",
+  "spos_hg19": 901877,
+  "epos_hg19": 911245,
+  "strand_hg19": "+",
+  "cytoband": [
+    "1p36.33"
+  ],
+  "gene_summary": "The protein encoded by this gene is expressed in neurons of most regions of the brain. It contains an N-terminal BTB domain, which mediates dimerization of the protein, and a C-terminal Kelch domain, which mediates binding to F-actin. This protein may play a key role in the regulation of actin-based neuronal function. [provided by RefSeq, Aug 2010].",
+  "hgnc_id": "25284",
+  "name": "pleckstrin homology domain containing N1",
+  "entrez_id": "84069",
+  "ucsc_id": "uc001acd.4",
+  "refseq_accession": [
+    "NM_032129"
+  ],
+  "ccds_id": [
+    "CCDS4",
+    "CCDS53256"
+  ],
+  "uniprot_ids": [
+    "Q494U1"
+  ],
+  "mgd_id": [
+    "MGI:2387630"
+  ],
+  "transcriptid": [
+    {
+      "ensembl_trs": "ENST00000379407",
+      "ensembl_pro": "ENSP00000368717"
+    },
+    {
+      "ensembl_trs": "ENST00000379409",
+      "ensembl_pro": "ENSP00000368719"
+    },
+    {
+      "ensembl_trs": "ENST00000379410",
+      "ensembl_pro": "ENSP00000368720"
+    },
+    {
+      "ensembl_trs": "ENST00000491024",
+      "ensembl_pro": "ENSP00000462558"
+    }
+  ],
+  "biogrid": [
+    "123864"
+  ],
+  "string": [
+    "9606.ENSP00000368720"
+  ],
+  "genecards": "ENSG00000187583",
+  "pharmgkb": [
+    "PA142671166"
+  ],
+  "trait_association_gwas": [
+    "Parkinson's disease"
+  ],
+  "trait_association_gwas_pmid": [
+    "26227905"
+  ],
+  "rvis_exac": 1.879999506,
+  "rvis_percentile_exac": 97.96397807,
+  "gdi_phred": 5.29021,
+  "gdp": "Medium",
+  "mgi_mouse_gene": "Plekhn1",
+  "obs_mis": 480,
+  "exp_mis": 381.17,
+  "oe_mis": 1.2593,
+  "obs_syn": 216,
+  "exp_syn": 174.52,
+  "oe_syn": 1.2377,
+  "obs_lof": 25,
+  "exp_lof": 31.069,
+  "oe_lof": 0.80467,
+  "cds_length": 1833,
+  "num_coding_exons": 16,
+  "marrvel": "PLEKHN1",
+  "s_het": 0.006848947,
+  "gtex_expression": "ENSG00000187583.10",
+  "brainspan_microarray": "PLEKHN1",
+  "brainspan_rnaseq": "ENSG00000187583",
+  "brainatlas_microarray": "PLEKHN1"
+},
+  {
+  "chrom": "1",
+  "spos": 1001138,
+  "epos": 1014540,
+  "ensgid": "ENSG00000187608",
+  "strand": "+",
+  "gene_version": "10",
+  "gene_symbol": "ISG15",
+  "gene_biotype": "protein_coding",
+  "chrom_hg19": "1",
+  "spos_hg19": 948803,
+  "epos_hg19": 949920,
+  "strand_hg19": "+",
+  "cytoband": [
+    "1p36.33"
+  ],
+  "gene_summary": "The protein encoded by this gene is a ubiquitin-like protein that is conjugated to intracellular target proteins upon activation by interferon-alpha and interferon-beta. Several functions have been ascribed to the encoded protein, including chemotactic activity towards neutrophils, direction of ligated target proteins to intermediate filaments, cell-to-cell signaling, and antiviral activity during viral infections. While conjugates of this protein have been found to be noncovalently attached to intermediate filaments, this protein is sometimes secreted. [provided by RefSeq, Dec 2012].",
+  "hgnc_id": "4053",
+  "name": "ISG15 ubiquitin like modifier",
+  "entrez_id": "9636",
+  "ucsc_id": "uc001acj.5",
+  "refseq_accession": [
+    "NM_005101"
+  ],
+  "ccds_id": [
+    "CCDS6"
+  ],
+  "uniprot_ids": [
+    "P05161"
+  ],
+  "mgd_id": [
+    "MGI:1855694"
+  ],
+  "omim_id": [
+    "147571"
+  ],
+  "orphanet": "315470",
+  "transcriptid": [
+    {
+      "ensembl_trs": "ENST00000624697",
+      "ensembl_pro": "ENSP00000485643"
+    },
+    {
+      "ensembl_trs": "ENST00000624652",
+      "ensembl_pro": "ENSP00000485313"
+    },
+    {
+      "ensembl_trs": "ENST00000649529",
+      "ensembl_pro": "ENSP00000496832"
+    }
+  ],
+  "pdb": [
+    "1Z2M",
+    "2HJ8",
+    "3PHX",
+    "3PSE",
+    "3R66",
+    "3RT3",
+    "3SDL",
+    "5TL6",
+    "5W8T",
+    "5W8U",
+    "6BI8",
+    "6FFA"
+  ],
+  "biogrid": [
+    "114995"
+  ],
+  "string": [
+    "9606.ENSP00000368699"
+  ],
+  "genecards": "ENSG00000187608",
+  "pharmgkb": [
+    "PA28465"
+  ],
+  "trait_association_gwas": [
+    "Blood protein levels"
+  ],
+  "trait_association_gwas_pmid": [
+    "29875488~30072576"
+  ],
+  "rvis_exac": 0.410434686,
+  "rvis_percentile_exac": 74.54370219,
+  "gdi_phred": 6.95277,
+  "gdp": "Medium",
+  "mgi_mouse_gene": "Isg15",
+  "mgi_mouse_phenotype": "skeleton phenotype",
+  "obs_mis": 117,
+  "exp_mis": 115.66,
+  "oe_mis": 1.0115,
+  "obs_syn": 63,
+  "exp_syn": 58.149,
+  "oe_syn": 1.0834,
+  "obs_lof": 0,
+  "exp_lof": 1.1056,
+  "oe_lof": 0.0,
+  "cds_length": 495,
+  "num_coding_exons": 2,
+  "marrvel": "ISG15",
+  "s_het": 0.008602742,
+  "gtex_expression": "ENSG00000187608.8",
+  "brainspan_microarray": "ISG15",
+  "brainspan_rnaseq": "ENSG00000187608",
+  "brainatlas_microarray": "ISG15"
+},
+  {
+  "chrom": "1",
+  "spos": 1020120,
+  "epos": 1056118,
+  "ensgid": "ENSG00000188157",
+  "strand": "+",
+  "gene_version": "15",
+  "gene_symbol": "AGRN",
+  "gene_biotype": "protein_coding",
+  "chrom_hg19": "1",
+  "spos_hg19": 955503,
+  "epos_hg19": 991496,
+  "strand_hg19": "+",
+  "cytoband": [
+    "1p36.33"
+  ],
+  "gene_summary": "This gene encodes one of several proteins that are critical in the development of the neuromuscular junction (NMJ), as identified in mouse knock-out studies. The encoded protein contains several laminin G, Kazal type serine protease inhibitor, and epidermal growth factor domains. Additional post-translational modifications occur to add glycosaminoglycans and disulfide bonds. In one family with congenital myasthenic syndrome affecting limb-girdle muscles, a mutation in this gene was found. Alternative splicing results in multiple transcript variants encoding different isoforms. [provided by RefSeq, Mar 2015].",
+  "hgnc_id": "329",
+  "name": "agrin",
+  "entrez_id": "375790",
+  "ucsc_id": "uc001ack.3",
+  "refseq_accession": [
+    "NM_198576"
+  ],
+  "ccds_id": [
+    "CCDS30551"
+  ],
+  "uniprot_ids": [
+    "O00468"
+  ],
+  "mgd_id": [
+    "MGI:87961"
+  ],
+  "omim_id": [
+    "103320"
+  ],
+  "orphanet": "233062",
+  "clingen": "329",
+  "transcriptid": [
+    {
+      "ensembl_trs": "ENST00000379370",
+      "ensembl_pro": "ENSP00000368678"
+    },
+    {
+      "ensembl_trs": "ENST00000652369",
+      "ensembl_pro": "ENSP00000498543"
+    },
+    {
+      "ensembl_trs": "ENST00000651234",
+      "ensembl_pro": "ENSP00000499046"
+    },
+    {
+      "ensembl_trs": "ENST00000620552",
+      "ensembl_pro": "ENSP00000484607"
+    }
+  ],
+  "biogrid": [
+    "132000"
+  ],
+  "string": [
+    "9606.ENSP00000368678"
+  ],
+  "genecards": "ENSG00000188157",
+  "pharmgkb": [
+    "PA24626"
+  ],
+  "genereviews": [
+    "AGRN"
+  ],
+  "pathway_kegg_id": "hsa04512",
+  "pathway_kegg_full": "ECM-receptor interaction",
+  "rvis_exac": 0.70374788,
+  "rvis_percentile_exac": 85.01897476,
+  "gdi_phred": 6.8699,
+  "gdp": "Medium",
+  "mgi_mouse_gene": "Agrn",
+  "mgi_mouse_phenotype": "growth/size/body region phenotype; homeostasis/metabolism phenotype; muscle phenotype; cardiovascular system phenotype (the observable morphological and physiological characteristics of the mammalian heart, blood vessels, or circulatory system that are manifested through development and lifespan); normal phenotype; mortality/aging (the observable characteristics related to the ability of a mammalian organism to live and age that are manifested throughout development and life span); behavior/neurological phenotype (the observable actions or reactions of mammalian organisms that are manifested through development and lifespan); respiratory system phenotype; renal/urinary system phenotype; limbs/digits/tail phenotype; nervous system phenotype (the observable morphological and physiological characteristics of the extensive, intricate network of electochemical structures in the body that is comprised of the brain, spinal cord, nerves, ganglia and parts of the receptor organs that are manifested through development and lifespan)",
+  "obs_mis": 1303,
+  "exp_mis": 1326.1,
+  "oe_mis": 0.98257,
+  "obs_syn": 727,
+  "exp_syn": 603.35,
+  "oe_syn": 1.2049,
+  "obs_lof": 29,
+  "exp_lof": 90.87,
+  "oe_lof": 0.31914,
+  "cds_length": 6135,
+  "num_coding_exons": 36,
+  "marrvel": "AGRN",
+  "s_het": 0.02313541,
+  "gtex_expression": "ENSG00000188157.14",
+  "brainspan_rnaseq": "ENSG00000188157",
+  "brainatlas_microarray": "AGRN"
+},
+  {
+  "chrom": "1",
+  "spos": 1311585,
+  "epos": 1324691,
+  "ensgid": "ENSG00000127054",
+  "strand": "-",
+  "gene_version": "20",
+  "gene_symbol": "INTS11",
+  "gene_biotype": "protein_coding",
+  "chrom_hg19": "1",
+  "spos_hg19": 1246965,
+  "epos_hg19": 1260071,
+  "strand_hg19": "-",
+  "cytoband": [
+    "1p36.33"
+  ],
+  "hgnc_id": "26052",
+  "name": "integrator complex subunit 11",
+  "entrez_id": "54973",
+  "ucsc_id": "uc001aee.3",
+  "refseq_accession": [
+    "NM_017871"
+  ],
+  "ccds_id": [
+    "CCDS21",
+    "CCDS57959",
+    "CCDS57960",
+    "CCDS57961",
+    "CCDS72678"
+  ],
+  "uniprot_ids": [
+    "Q5TA45"
+  ],
+  "mgd_id": [
+    "MGI:1919207"
+  ],
+  "omim_id": [
+    "611354"
+  ],
+  "transcriptid": [
+    {
+      "ensembl_trs": "ENST00000419704",
+      "ensembl_pro": "ENSP00000404886"
+    },
+    {
+      "ensembl_trs": "ENST00000435064",
+      "ensembl_pro": "ENSP00000413493"
+    },
+    {
+      "ensembl_trs": "ENST00000450926",
+      "ensembl_pro": "ENSP00000392848"
+    },
+    {
+      "ensembl_trs": "ENST00000540437",
+      "ensembl_pro": "ENSP00000445001"
+    },
+    {
+      "ensembl_trs": "ENST00000545578",
+      "ensembl_pro": "ENSP00000444672"
+    },
+    {
+      "ensembl_trs": "ENST00000411962",
+      "ensembl_pro": "ENSP00000400548"
+    },
+    {
+      "ensembl_trs": "ENST00000421495",
+      "ensembl_pro": "ENSP00000464436"
+    },
+    {
+      "ensembl_trs": "ENST00000458452",
+      "ensembl_pro": "ENSP00000433930"
+    },
+    {
+      "ensembl_trs": "ENST00000532772",
+      "ensembl_pro": "ENSP00000431214"
+    },
+    {
+      "ensembl_trs": "ENST00000527098",
+      "ensembl_pro": "ENSP00000431952"
+    },
+    {
+      "ensembl_trs": "ENST00000528879",
+      "ensembl_pro": "ENSP00000432777"
+    },
+    {
+      "ensembl_trs": "ENST00000531377",
+      "ensembl_pro": "ENSP00000433264"
+    },
+    {
+      "ensembl_trs": "ENST00000527383",
+      "ensembl_pro": "ENSP00000431425"
+    },
+    {
+      "ensembl_trs": "ENST00000434694",
+      "ensembl_pro": "ENSP00000411233"
+    },
+    {
+      "ensembl_trs": "ENST00000526797",
+      "ensembl_pro": "ENSP00000435418"
+    },
+    {
+      "ensembl_trs": "ENST00000526332",
+      "ensembl_pro": "ENSP00000434790"
+    },
+    {
+      "ensembl_trs": "ENST00000430786",
+      "ensembl_pro": "ENSP00000404012"
+    },
+    {
+      "ensembl_trs": "ENST00000527719",
+      "ensembl_pro": "ENSP00000436743"
+    },
+    {
+      "ensembl_trs": "ENST00000530031",
+      "ensembl_pro": "ENSP00000432009"
+    },
+    {
+      "ensembl_trs": "ENST00000429572",
+      "ensembl_pro": "ENSP00000481275"
+    },
+    {
+      "ensembl_trs": "ENST00000534345",
+      "ensembl_pro": "ENSP00000435772"
+    },
+    {
+      "ensembl_trs": "ENST00000531019",
+      "ensembl_pro": "ENSP00000433733"
+    },
+    {
+      "ensembl_trs": "ENST00000498476",
+      "ensembl_pro": "ENSP00000436824"
+    },
+    {
+      "ensembl_trs": "ENST00000470679",
+      "ensembl_pro": "ENSP00000434782"
+    },
+    {
+      "ensembl_trs": "ENST00000525285",
+      "ensembl_pro": "ENSP00000436396"
+    },
+    {
+      "ensembl_trs": "ENST00000620829",
+      "ensembl_pro": "ENSP00000481821"
+    },
+    {
+      "ensembl_trs": "ENST00000618806",
+      "ensembl_pro": "ENSP00000480957"
+    }
+  ],
+  "pdb": [
+    "5V8W"
+  ],
+  "biogrid": [
+    "120310"
+  ],
+  "string": [
+    "9606.ENSP00000445001"
+  ],
+  "genecards": "ENSG00000127054",
+  "pharmgkb": [
+    "PA142672080"
+  ],
+  "trait_association_gwas": [
+    "Inflammatory bowel disease",
+    "Systolic blood pressure",
+    "Systemic lupus erythematosus",
+    "Pulse pressure",
+    "Ulcerative colitis"
+  ],
+  "trait_association_gwas_pmid": [
+    "28067908",
+    "28135244",
+    "28714469",
+    "28135244~28135244",
+    "28067908"
+  ],
+  "rvis_exac": -1.203961754,
+  "rvis_percentile_exac": 6.517679658,
+  "mgi_mouse_gene": "Ints11",
+  "obs_mis": 357,
+  "exp_mis": 387.14,
+  "oe_mis": 0.92215,
+  "obs_syn": 228,
+  "exp_syn": 162.94,
+  "oe_syn": 1.3993,
+  "obs_lof": 26,
+  "exp_lof": 36.284,
+  "oe_lof": 0.71657,
+  "cds_length": 1818,
+  "num_coding_exons": 17,
+  "marrvel": "INTS11",
+  "s_het": 0.004533236,
+  "gtex_expression": "ENSG00000127054.20",
+  "brainspan_microarray": "CPSF3L",
+  "brainspan_rnaseq": "ENSG00000127054",
+  "brainatlas_microarray": "CPSF3L"
+},
+  {
+  "chrom": "1",
+  "spos": 1308597,
+  "epos": 1311677,
+  "ensgid": "ENSG00000169972",
+  "strand": "+",
+  "gene_version": "12",
+  "gene_symbol": "PUSL1",
+  "gene_biotype": "protein_coding",
+  "chrom_hg19": "1",
+  "spos_hg19": 1243947,
+  "epos_hg19": 1247057,
+  "strand_hg19": "+",
+  "cytoband": [
+    "1p36.33"
+  ],
+  "hgnc_id": "26914",
+  "name": "pseudouridine synthase like 1",
+  "entrez_id": "126789",
+  "ucsc_id": "uc001aed.4",
+  "refseq_accession": [
+    "NM_153339"
+  ],
+  "ccds_id": [
+    "CCDS20"
+  ],
+  "uniprot_ids": [
+    "Q8N0Z8"
+  ],
+  "mgd_id": [
+    "MGI:3047787"
+  ],
+  "transcriptid": [
+    {
+      "ensembl_trs": "ENST00000379031",
+      "ensembl_pro": "ENSP00000368318"
+    },
+    {
+      "ensembl_trs": "ENST00000467712",
+      "ensembl_pro": "ENSP00000462968"
+    }]
+  },
+  {
+  "chrom": "1",
+  "spos": 1312502,
+  "epos": 1312566,
+  "ensgid": "ENSG00000283712",
+  "strand": "-",
+  "gene_version": "1",
+  "gene_symbol": "MIR6727",
+  "gene_biotype": "miRNA",
+  "cytoband": [
+    "1p36.33"
+  ],
+  "hgnc_id": "50171",
+  "name": "microRNA 6727",
+  "entrez_id": "102465435",
+  "refseq_accession": [
+    "NR_106785"
+  ],
+  "marrvel": "MIR6727",
+  "gtex_expression": "ENSG00000283712.1"
+}, {
+  "chrom": "1",
+  "spos": 1331280,
+  "epos": 1335314,
+  "ensgid": "ENSG00000169962",
+  "strand": "+",
+  "gene_version": "5",
+  "gene_symbol": "TAS1R3",
+  "gene_biotype": "protein_coding",
+  "chrom_hg19": "1",
+  "spos_hg19": 1266694,
+  "epos_hg19": 1270686,
+  "strand_hg19": "+",
+  "cytoband": [
+    "1p36.33"
+  ],
+  "gene_summary": "DVL1, the human homolog of the Drosophila dishevelled gene (dsh) encodes a cytoplasmic phosphoprotein that regulates cell proliferation, acting as a transducer molecule for developmental processes, including segmentation and neuroblast specification. DVL1 is a candidate gene for neuroblastomatous transformation. The Schwartz-Jampel syndrome and Charcot-Marie-Tooth disease type 2A have been mapped to the same region as DVL1. The phenotypes of these diseases may be consistent with defects which might be expected from aberrant expression of a DVL gene during development. [provided by RefSeq, Jul 2008].",
+  "hgnc_id": "15661",
+  "name": "taste 1 receptor member 3",
+  "entrez_id": "83756",
+  "ucsc_id": "uc010nyk.3",
+  "refseq_accession": [
+    "NM_152228"
+  ],
+  "ccds_id": [
+    "CCDS30556"
+  ],
+  "uniprot_ids": [
+    "Q7RTX0"
+  ],
+  "mgd_id": [
+    "MGI:1933547"
+  ],
+  "omim_id": [
+    "605865"
+  ],
+  "transcriptid": [
+    {
+      "ensembl_trs": "ENST00000339381",
+      "ensembl_pro": "ENSP00000344411"
+    }
+  ],
+  "biogrid": [
+    "123757"
+  ],
+  "string": [
+    "9606.ENSP00000344411"
+  ],
+  "genecards": "ENSG00000169962",
+  "pharmgkb": [
+    "PA38012"
+  ],
+  "pathway_kegg_id": "hsa04742",
+  "pathway_kegg_full": "Taste transduction",
+  "trait_association_gwas": [
+    "Inflammatory bowel disease",
+    "Ulcerative colitis"
+  ],
+  "trait_association_gwas_pmid": [
+    "28067908",
+    "28067908"
+  ],
+  "rvis_exac": 2.383358179,
+  "rvis_percentile_exac": 99.00006024,
+  "gdi_phred": 4.39394,
+  "gdp": "Medium",
+  "mgi_mouse_gene": "Tas1r3",
+  "mgi_mouse_phenotype": "taste/olfaction phenotype; nervous system phenotype (the observable morphological and physiological characteristics of the extensive, intricate network of electochemical structures in the body that is comprised of the brain, spinal cord, nerves, ganglia and parts of the receptor organs that are manifested through development and lifespan)",
+  "obs_mis": 732,
+  "exp_mis": 571.75,
+  "oe_mis": 1.2803,
+  "obs_syn": 387,
+  "exp_syn": 276.14,
+  "oe_syn": 1.4015,
+  "obs_lof": 34,
+  "exp_lof": 28.932,
+  "oe_lof": 1.1752,
+  "cds_length": 2556,
+  "num_coding_exons": 6,
+  "marrvel": "TAS1R3",
+  "gtex_expression": "ENSG00000169962.4",
+  "brainspan_rnaseq": "ENSG00000169962",
+  "brainatlas_microarray": "TAS1R3"
+}, {
+  "chrom": "1",
+  "spos": 1324756,
+  "epos": 1328896,
+  "ensgid": "ENSG00000224051",
+  "strand": "+",
+  "gene_version": "7",
+  "gene_symbol": "CPTP",
+  "gene_biotype": "protein_coding",
+  "chrom_hg19": "1",
+  "spos_hg19": 1260136,
+  "epos_hg19": 1264277,
+  "strand_hg19": "+",
+  "cytoband": [
+    "1p36.33"
+  ],
+  "hgnc_id": "28116",
+  "name": "ceramide-1-phosphate transfer protein",
+  "entrez_id": "80772",
+  "refseq_accession": [
+    "NM_001029885"
+  ],
+  "ccds_id": [
+    "CCDS30555"
+  ],
+  "uniprot_ids": [
+    "Q5TA50"
+  ],
+  "mgd_id": [
+    "MGI:1933107"
+  ],
+  "omim_id": [
+    "615467"
+  ],
+  "transcriptid": [
+    {
+      "ensembl_trs": "ENST00000343938",
+      "ensembl_pro": "ENSP00000343890"
+    },
+    {
+      "ensembl_trs": "ENST00000488011",
+      "ensembl_pro": "ENSP00000462636"
+    }
+  ],
+  "pdb": [
+    "4K80",
+    "4K84",
+    "4K85",
+    "4K8N",
+    "4KBS",
+    "4KF6"
+  ],
+  "biogrid": [
+    "123305"
+  ],
+  "string": [
+    "9606.ENSP00000343890"
+  ],
+  "genecards": "ENSG00000224051",
+  "pharmgkb": [
+    "PA162389853"
+  ],
+  "trait_association_gwas": [
+    "Inflammatory bowel disease",
+    "Ulcerative colitis"
+  ],
+  "trait_association_gwas_pmid": [
+    "28067908",
+    "28067908"
+  ],
+  "rvis_exac": 1.053077318,
+  "rvis_percentile_exac": 91.75350882,
+  "mgi_mouse_gene": "Cptp",
+  "obs_mis": 158,
+  "exp_mis": 154.74,
+  "oe_mis": 1.0211,
+  "obs_syn": 88,
+  "exp_syn": 76.737,
+  "oe_syn": 1.1468,
+  "obs_lof": 3,
+  "exp_lof": 5.3083,
+  "oe_lof": 0.56516,
+  "cds_length": 642,
+  "num_coding_exons": 2,
+  "marrvel": "CPTP",
+  "s_het": 0.006516495,
+  "gtex_expression": "ENSG00000224051.6",
+  "brainspan_rnaseq": "ENSG00000224051",
+  "brainatlas_microarray": "GLTPD1"
+}, {
+  "chrom": "1",
+  "spos": 1335276,
+  "epos": 1349418,
+  "ensgid": "ENSG00000107404",
+  "strand": "-",
+  "gene_version": "20",
+  "gene_symbol": "DVL1",
+  "gene_biotype": "protein_coding",
+  "chrom_hg19": "1",
+  "spos_hg19": 1270656,
+  "epos_hg19": 1284730,
+  "strand_hg19": "-",
+  "cytoband": [
+    "1p36.33"
+  ],
+  "gene_summary": "DVL1, the human homolog of the Drosophila dishevelled gene (dsh) encodes a cytoplasmic phosphoprotein that regulates cell proliferation, acting as a transducer molecule for developmental processes, including segmentation and neuroblast specification. DVL1 is a candidate gene for neuroblastomatous transformation. The Schwartz-Jampel syndrome and Charcot-Marie-Tooth disease type 2A have been mapped to the same region as DVL1. The phenotypes of these diseases may be consistent with defects which might be expected from aberrant expression of a DVL gene during development. [provided by RefSeq, Jul 2008].",
+  "hgnc_id": "3084",
+  "name": "dishevelled segment polarity protein 1",
+  "entrez_id": "1855",
+  "ucsc_id": "uc002quu.4",
+  "refseq_accession": [
+    "NM_004421"
+  ],
+  "ccds_id": [
+    "CCDS22",
+    "CCDS81252"
+  ],
+  "uniprot_ids": [
+    "O14640"
+  ],
+  "mgd_id": [
+    "MGI:94941"
+  ],
+  "omim_id": [
+    "601365"
+  ],
+  "orphanet": "426034",
+  "transcriptid": [
+    {
+      "ensembl_trs": "ENST00000378888",
+      "ensembl_pro": "ENSP00000368166"
+    },
+    {
+      "ensembl_trs": "ENST00000378891",
+      "ensembl_pro": "ENSP00000368169"
+    },
+    {
+      "ensembl_trs": "ENST00000632445",
+      "ensembl_pro": "ENSP00000488888"
+    },
+    {
+      "ensembl_trs": "ENST00000631679",
+      "ensembl_pro": "ENSP00000488181"
+    },
+    {
+      "ensembl_trs": "ENST00000610709",
+      "ensembl_pro": "ENSP00000480077"
+    }
+  ],
+  "biogrid": [
+    "108188"
+  ],
+  "string": [
+    "9606.ENSP00000368169"
+  ],
+  "genecards": "ENSG00000107404",
+  "pharmgkb": [
+    "PA27540"
+  ],
+  "genereviews": [
+    "DVL1"
+  ],
+  "pathway_kegg_id": "hsa04310;hsa04330;hsa04916;hsa05210;hsa05217",
+  "pathway_kegg_full": "Wnt signaling pathway;Notch signaling pathway;Melanogenesis;Colorectal cancer;Basal cell carcinoma",
+  "trait_association_gwas": [
+    "Inflammatory bowel disease",
+    "Ulcerative colitis"
+  ],
+  "trait_association_gwas_pmid": [
+    "28067908",
+    "28067908"
+  ],
+  "rvis_exac": -0.531325214,
+  "rvis_percentile_exac": 20.4927414,
+  "gdi_phred": 2.46667,
+  "gdp": "Medium",
+  "mgi_mouse_gene": "Dvl1",
+  "mgi_mouse_phenotype": "hearing/vestibular/ear phenotype; nervous system phenotype (the observable morphological and physiological characteristics of the extensive, intricate network of electochemical structures in the body that is comprised of the brain, spinal cord, nerves, ganglia and parts of the receptor organs that are manifested through development and lifespan); skeleton phenotype; embryo phenotype; behavior/neurological phenotype (the observable actions or reactions of mammalian organisms that are manifested through development and lifespan); mortality/aging (the observable characteristics related to the ability of a mammalian organism to live and age that are manifested throughout development and life span); normal phenotype; cardiovascular system phenotype (the observable morphological and physiological characteristics of the mammalian heart, blood vessels, or circulatory system that are manifested through development and lifespan)",
+  "obs_mis": 554,
+  "exp_mis": 484.18,
+  "oe_mis": 1.1442,
+  "obs_syn": 294,
+  "exp_syn": 203.72,
+  "oe_syn": 1.4431,
+  "obs_lof": 14,
+  "exp_lof": 29.868,
+  "oe_lof": 0.46872,
+  "cds_length": 2010,
+  "num_coding_exons": 15,
+  "marrvel": "DVL1",
+  "s_het": 0.03182546,
+  "gtex_expression": "ENSG00000107404.19",
+  "brainspan_microarray": "DVL1",
+  "brainspan_rnaseq": "ENSG00000107404",
+  "brainatlas_microarray": "DVL1"
+}, {
+  "chrom": "1",
+  "spos": 1352689,
+  "epos": 1361777,
+  "ensgid": "ENSG00000162576",
+  "strand": "-",
+  "gene_version": "16",
+  "gene_symbol": "MXRA8",
+  "gene_biotype": "protein_coding",
+  "chrom_hg19": "1",
+  "spos_hg19": 1288069,
+  "epos_hg19": 1297157,
+  "strand_hg19": "-",
+  "cytoband": [
+    "1p36.33"
+  ],
+  "gene_summary": "DVL1, the human homolog of the Drosophila dishevelled gene (dsh) encodes a cytoplasmic phosphoprotein that regulates cell proliferation, acting as a transducer molecule for developmental processes, including segmentation and neuroblast specification. DVL1 is a candidate gene for neuroblastomatous transformation. The Schwartz-Jampel syndrome and Charcot-Marie-Tooth disease type 2A have been mapped to the same region as DVL1. The phenotypes of these diseases may be consistent with defects which might be expected from aberrant expression of a DVL gene during development. [provided by RefSeq, Jul 2008].",
+  "hgnc_id": "7542",
+  "name": "matrix remodeling associated 8",
+  "entrez_id": "54587",
+  "ucsc_id": "uc001aew.5",
+  "refseq_accession": [
+    "NM_032348"
+  ],
+  "ccds_id": [
+    "CCDS24",
+    "CCDS59950",
+    "CCDS59951",
+    "CCDS59952"
+  ],
+  "uniprot_ids": [
+    "Q9BRK3"
+  ],
+  "mgd_id": [
+    "MGI:1922011"
+  ],
+  "omim_id": [
+    "617293"
+  ],
+  "transcriptid": [
+    {
+      "ensembl_trs": "ENST00000309212",
+      "ensembl_pro": "ENSP00000307887"
+    },
+    {
+      "ensembl_trs": "ENST00000342753",
+      "ensembl_pro": "ENSP00000344998"
+    },
+    {
+      "ensembl_trs": "ENST00000445648",
+      "ensembl_pro": "ENSP00000399229"
+    },
+    {
+      "ensembl_trs": "ENST00000477278",
+      "ensembl_pro": "ENSP00000436135"
+    }
+  ],
+  "pdb": [
+    "6JO8"
+  ],
+  "biogrid": [
+    "120064"
+  ],
+  "string": [
+    "9606.ENSP00000399229"
+  ],
+  "genecards": "ENSG00000162576",
+  "pharmgkb": [
+    "PA31343"
+  ],
+  "trait_association_gwas": [
+    "Inflammatory bowel disease",
+    "Ulcerative colitis",
+    "Intraocular pressure"
+  ],
+  "trait_association_gwas_pmid": [
+    "28067908",
+    "28067908",
+    "29617998~29617998"
+  ],
+  "rvis_exac": -0.202191696,
+  "rvis_percentile_exac": 36.75682188,
+  "gdi_phred": 3.87909,
+  "gdp": "Medium",
+  "mgi_mouse_gene": "Mxra8",
+  "mgi_mouse_phenotype": "normal phenotype",
+  "obs_mis": 208,
+  "exp_mis": 255.34,
+  "oe_mis": 0.81461,
+  "obs_syn": 143,
+  "exp_syn": 121.78,
+  "oe_syn": 1.1743,
+  "obs_lof": 13,
+  "exp_lof": 18.29,
+  "oe_lof": 0.71077,
+  "cds_length": 1326,
+  "num_coding_exons": 10,
+  "marrvel": "MXRA8",
+  "s_het": 0.019663958,
+  "gtex_expression": "ENSG00000162576.16",
+  "brainspan_microarray": "MXRA8",
+  "brainspan_rnaseq": "ENSG00000162576",
+  "brainatlas_microarray": "MXRA8"
+}, {
+  "chrom": "1",
+  "spos": 1471765,
+  "epos": 1497848,
+  "ensgid": "ENSG00000160072",
+  "strand": "+",
+  "gene_version": "20",
+  "gene_symbol": "ATAD3B",
+  "gene_biotype": "protein_coding",
+  "chrom_hg19": "1",
+  "spos_hg19": 1407143,
+  "epos_hg19": 1433228,
+  "strand_hg19": "+",
+  "cytoband": [
+    "1p36.33"
+  ],
+  "hgnc_id": "24007",
+  "name": "ATPase family AAA domain containing 3B",
+  "entrez_id": "83858",
+  "ucsc_id": "uc001afv.4",
+  "refseq_accession": [
+    "NM_031921"
+  ],
+  "ccds_id": [
+    "CCDS30"
+  ],
+  "uniprot_ids": [
+    "Q5T9A4"
+  ],
+  "mgd_id": [
+    "MGI:1919214"
+  ],
+  "omim_id": [
+    "612317"
+  ],
+  "transcriptid": [
+    {
+      "ensembl_trs": "ENST00000673477",
+      "ensembl_pro": "ENSP00000500094"
+    },
+    {
+      "ensembl_trs": "ENST00000308647",
+      "ensembl_pro": "ENSP00000311766"
+    }
+  ],
+  "biogrid": [
+    "123774"
+  ],
+  "string": [
+    "9606.ENSP00000311766"
+  ],
+  "genecards": "ENSG00000160072",
+  "pharmgkb": [
+    "PA134993325"
+  ],
+  "trait_association_gwas": [
+    "Body mass index"
+  ],
+  "trait_association_gwas_pmid": [
+    "26426971"
+  ],
+  "rvis_exac": 2.490540243,
+  "rvis_percentile_exac": 99.11451117,
+  "gdi_phred": 16.40046,
+  "gdp": "High",
+  "mgi_mouse_gene": "Atad3a",
+  "mgi_mouse_phenotype": "muscle phenotype; homeostasis/metabolism phenotype; cellular phenotype; growth/size/body region phenotype; skeleton phenotype; embryo phenotype; behavior/neurological phenotype (the observable actions or reactions of mammalian organisms that are manifested through development and lifespan); mortality/aging (the observable characteristics related to the ability of a mammalian organism to live and age that are manifested throughout development and life span)",
+  "obs_mis": 557,
+  "exp_mis": 399.85,
+  "oe_mis": 1.393,
+  "obs_syn": 233,
+  "exp_syn": 174.84,
+  "oe_syn": 1.3327,
+  "obs_lof": 32,
+  "exp_lof": 29.105,
+  "oe_lof": 1.0995,
+  "cds_length": 1944,
+  "num_coding_exons": 16,
+  "marrvel": "ATAD3B",
+  "s_het": 0.007010136,
+  "gtex_expression": "ENSG00000160072.19",
+  "brainspan_rnaseq": "ENSG00000160072",
+  "brainatlas_microarray": "ATAD3B"
+}, {
+  "chrom": "1",
+  "spos": 1512162,
+  "epos": 1534685,
+  "ensgid": "ENSG00000197785",
+  "strand": "+",
+  "gene_version": "14",
+  "gene_symbol": "ATAD3A",
+  "gene_biotype": "protein_coding",
+  "chrom_hg19": "1",
+  "spos_hg19": 1447531,
+  "epos_hg19": 1470067,
+  "strand_hg19": "+",
+  "cytoband": [
+    "1p36.33"
+  ],
+  "gene_summary": "This gene encodes a transmembrane-domain containing protein found in the brain and cerebellum. Mutations in this gene result in spinocerebellar ataxia 21. [provided by RefSeq, Dec 2014].",
+  "hgnc_id": "25567",
+  "name": "ATPase family AAA domain containing 3A",
+  "entrez_id": "55210",
+  "ucsc_id": "uc001aga.3",
+  "refseq_accession": [
+    "NM_018188"
+  ],
+  "ccds_id": [
+    "CCDS31",
+    "CCDS53259",
+    "CCDS53260"
+  ],
+  "uniprot_ids": [
+    "Q9NVI7"
+  ],
+  "mgd_id": [
+    "MGI:1919214"
+  ],
+  "omim_id": [
+    "612316"
+  ],
+  "orphanet": "469968",
+  "transcriptid": [
+    {
+      "ensembl_trs": "ENST00000378755",
+      "ensembl_pro": "ENSP00000368030"
+    },
+    {
+      "ensembl_trs": "ENST00000378756",
+      "ensembl_pro": "ENSP00000368031"
+    },
+    {
+      "ensembl_trs": "ENST00000536055",
+      "ensembl_pro": "ENSP00000439290"
+    },
+    {
+      "ensembl_trs": "ENST00000339113",
+      "ensembl_pro": "ENSP00000339421"
+    },
+    {
+      "ensembl_trs": "ENST00000400830",
+      "ensembl_pro": "ENSP00000383631"
+    }
+  ],
+  "biogrid": [
+    "120506"
+  ],
+  "string": [
+    "9606.ENSP00000368030"
+  ],
+  "genecards": "ENSG00000197785",
+  "pharmgkb": [
+    "PA134872099"
+  ],
+  "trait_association_gwas": [
+    "Body mass index"
+  ],
+  "trait_association_gwas_pmid": [
+    "26426971"
+  ],
+  "rvis_exac": 1.057439959,
+  "rvis_percentile_exac": 91.83784109,
+  "gdi_phred": 7.22185,
+  "gdp": "Medium",
+  "mgi_mouse_gene": "Atad3a",
+  "mgi_mouse_phenotype": "muscle phenotype; homeostasis/metabolism phenotype; cellular phenotype; growth/size/body region phenotype; skeleton phenotype; embryo phenotype; behavior/neurological phenotype (the observable actions or reactions of mammalian organisms that are manifested through development and lifespan); mortality/aging (the observable characteristics related to the ability of a mammalian organism to live and age that are manifested throughout development and life span)",
+  "obs_mis": 401,
+  "exp_mis": 401.71,
+  "oe_mis": 0.99824,
+  "obs_syn": 188,
+  "exp_syn": 171.46,
+  "oe_syn": 1.0965,
+  "obs_lof": 19,
+  "exp_lof": 33.718,
+  "oe_lof": 0.5635,
+  "cds_length": 1902,
+  "num_coding_exons": 16,
+  "marrvel": "ATAD3A",
+  "s_het": 0.022281632,
+  "gtex_expression": "ENSG00000197785.13",
+  "brainspan_microarray": "ATAD3A",
+  "brainspan_rnaseq": "ENSG00000197785",
+  "brainatlas_microarray": "ATAD3A"
+}
+]

@@ -1,49 +1,38 @@
-from future.standard_library import install_aliases
-install_aliases()  # NOQA
-import base64
-import codecs
-import json
+import hashlib
+# import json
+import logging  # not used in Fourfront, but used in CGAP? -kmp 8-Apr-2020
+import mimetypes
 import netaddr
 import os
-try:
-    import subprocess32 as subprocess  # Closes pipes on failure
-except ImportError:
-    import subprocess
-from pyramid.config import Configurator
-from pyramid.path import (
-    AssetResolver,
-    caller_package,
-)
-from pyramid.authorization import ACLAuthorizationPolicy
-from pyramid.session import SignedCookieSessionFactory
-from pyramid.settings import (
-    aslist,
-    asbool,
-)
-from sqlalchemy import engine_from_config
-from webob.cookies import JSONSerializer
-from snovault.json_renderer import json_renderer
-from snovault.app import (
-    STATIC_MAX_AGE,
-    session,
-    json_from_path,
-    configure_dbsession,
-    changelogs,
-    json_asset
-)
+import pkg_resources
+import subprocess
+import sys
+
+from dcicutils.beanstalk_utils import source_beanstalk_env_vars
 from dcicutils.log_utils import set_logging
-import structlog
-import logging
+from dcicutils.env_utils import get_mirror_env_from_context
+from dcicutils.ff_utils import get_health_page
+from pyramid.config import Configurator
+from pyramid_localroles import LocalRolesAuthorizationPolicy
+from pyramid.settings import asbool
+from snovault.app import STATIC_MAX_AGE, session, json_from_path, configure_dbsession, changelogs, json_asset
+from snovault.elasticsearch import APP_FACTORY
+from webtest import TestApp
+from .ingestion_listener import INGESTION_QUEUE
+from .loadxl import load_all
+
+
+if sys.version_info.major < 3:
+    raise EnvironmentError("The CGAP encoded library no longer supports Python 2.")
+
 
 # location of environment variables on elasticbeanstalk
 BEANSTALK_ENV_PATH = "/opt/python/current/env"
 
 
 def static_resources(config):
-    from pkg_resources import resource_filename
-    import mimetypes
     mimetypes.init()
-    mimetypes.init([resource_filename('encoded', 'static/mime.types')])
+    mimetypes.init([pkg_resources.resource_filename('encoded', 'static/mime.types')])
     config.add_static_view('static', 'static', cache_max_age=STATIC_MAX_AGE)
     config.add_static_view('profiles', 'schemas', cache_max_age=STATIC_MAX_AGE)
 
@@ -83,8 +72,6 @@ def static_resources(config):
 
 
 def load_workbook(app, workbook_filename, docsdir):
-    from .loadxl import load_all
-    from webtest import TestApp
     environ = {
         'HTTP_ACCEPT': 'application/json',
         'REMOTE_USER': 'IMPORT',
@@ -93,25 +80,14 @@ def load_workbook(app, workbook_filename, docsdir):
     load_all(testapp, workbook_filename, docsdir)
 
 
-def source_beanstalk_env_vars(config_file=BEANSTALK_ENV_PATH):
-    """
-    set environment variables if we are on Elastic Beanstalk
-    AWS_ACCESS_KEY_ID is indicative of whether or not env vars are sourced
-    Args:
-        config_file (str): filepath to load env vars from
-    """
-    if os.path.exists(config_file) and not os.environ.get("AWS_ACCESS_KEY_ID"):
-        command = ['bash', '-c', 'source ' + config_file + ' && env']
-        proc = subprocess.Popen(command, stdout=subprocess.PIPE, universal_newlines=True)
-        for line in proc.stdout:
-            key, _, value = line.partition("=")
-            os.environ[key] = value[:-1]
-        proc.communicate()
+# This key is best interpreted not as the 'snovault version' but rather the 'version of the app built on snovault'.
+# As such, it should be left this way, even though it may appear redundant with the 'eb_app_version' registry key
+# that we also have, which tries to be the value eb uses. -kmp 28-Apr-2020
+APP_VERSION_REGISTRY_KEY = 'snovault.app_version'
 
 
 def app_version(config):
-    import hashlib
-    if not config.registry.settings.get('snovault.app_version'):
+    if not config.registry.settings.get(APP_VERSION_REGISTRY_KEY):
         # we update version as part of deployment process `deploy_beanstalk.py`
         # but if we didn't check env then git
         version = os.environ.get("ENCODED_VERSION")
@@ -123,61 +99,12 @@ def app_version(config):
                     ['git', '-C', os.path.dirname(__file__), 'diff', '--no-ext-diff'])
                 if diff:
                     version += '-patch' + hashlib.sha1(diff).hexdigest()[:7]
-            except:
+            except Exception:
                 version = "test"
 
-        config.registry.settings['snovault.app_version'] = version
+        config.registry.settings[APP_VERSION_REGISTRY_KEY] = version
 
-'''
-def add_schemas_to_html_responses(config):
-
-    from pyramid.events import BeforeRender
-    from snovault.schema_views import schemas
-    from .renderers import should_transform
-
-    # Exclude some keys, to make response smaller.
-    exclude_schema_keys = [
-        'AccessKey', 'Image', 'ImagingPath', 'PublicationTracking', 'Modification',
-        'QualityMetricBamqc', 'QualityMetricFastqc', 'QualityMetricFlag', 'QualityMetricPairsqc',
-        'TestingDependencies', 'TestingDownload', 'TestingKey', 'TestingLinkSource', 'TestingPostPutPatch',
-        'TestingServerDefault'
-    ]
-
-    def add_schemas(event):
-        request = event.get('request')
-        if request is not None:
-
-            if event.get('renderer_name') != 'null_renderer' and ('application/html' in request.accept or 'text/html' in request.accept):
-                #print('\n\n\n\n')
-                #print(event.keys())
-                #print(event.get('renderer_name'))
-                #print(should_transform(request, request.response))
-                #print(request.response.content_type)
-
-                if event.rendering_val.get('@type') is not None and event.rendering_val.get('@id') is not None and event.rendering_val.get('schemas') is None:
-                    schemasDict = {
-                        k:v for k,v in schemas(None, request).items() if k not in exclude_schema_keys
-                    }
-                    for schema in schemasDict.values():
-                        if schema.get('@type') is not None:
-                            del schema['@type']
-                        if schema.get('mixinProperties') is not None:
-                            del schema['mixinProperties']
-                        if schema.get('properties') is not None:
-                            if schema['properties'].get('@id') is not None:
-                                del schema['properties']['@id']
-                            if schema['properties'].get('@type') is not None:
-                                del schema['properties']['@type']
-                            if schema['properties'].get('display_title') is not None:
-                                del schema['properties']['display_title']
-                            if schema['properties'].get('schema_version') is not None:
-                                del schema['properties']['schema_version']
-                            if schema['properties'].get('uuid') is not None:
-                                del schema['properties']['uuid']
-                    event.rendering_val['schemas'] = schemasDict
-
-    config.add_subscriber(add_schemas, BeforeRender)
-'''
+    # Fourfront does GA stuff here that makes no sense in CGAP (yet).
 
 
 def main(global_config, **local_config):
@@ -188,11 +115,13 @@ def main(global_config, **local_config):
     settings = global_config
     settings.update(local_config)
 
+    # BEGIN PART THAT'S NOT IN FOURFRONT
     # adjust log levels for some annoying loggers
     lnames = ['boto', 'urllib', 'elasticsearch', 'dcicutils']
     for name in logging.Logger.manager.loggerDict:
         if any(logname in name for logname in lnames):
             logging.getLogger(name).setLevel(logging.WARNING)
+    # END PART THAT'S NOT IN FOURFRONT
     set_logging(in_prod=settings.get('production'))
     # set_logging(settings.get('elasticsearch.server'), settings.get('production'))
 
@@ -208,16 +137,17 @@ def main(global_config, **local_config):
     # set google reCAPTCHA keys
     settings['g.recaptcha.key'] = os.environ.get('reCaptchaKey')
     settings['g.recaptcha.secret'] = os.environ.get('reCaptchaSecret')
-    # set mirrored Elasticsearch location (for webprod/webprod2)
-    settings['mirror.env.name'] = os.environ.get('MIRROR_ENV_NAME')
+    # set mirrored Elasticsearch location (for staging and production servers)
+    mirror = get_mirror_env_from_context(settings)
+    if mirror is not None:
+        settings['mirror.env.name'] = mirror
+        settings['mirror_health'] = get_health_page(ff_env=mirror)
     config = Configurator(settings=settings)
 
-    from snovault.elasticsearch import APP_FACTORY
     config.registry[APP_FACTORY] = main  # used by mp_indexer
     config.include(app_version)
 
     config.include('pyramid_multiauth')  # must be before calling set_authorization_policy
-    from pyramid_localroles import LocalRolesAuthorizationPolicy
     # Override default authz policy set by pyramid_multiauth
     config.set_authorization_policy(LocalRolesAuthorizationPolicy())
     config.include(session)
@@ -225,23 +155,30 @@ def main(global_config, **local_config):
     # must include, as tm.attempts was removed from pyramid_tm
     config.include('pyramid_retry')
 
+    # for CGAP, always enable type=nested mapping
+    # NOTE: this MUST occur prior to including Snovault, otherwise it will not work
+    config.add_settings({'mappings.use_nested': True})
     config.include(configure_dbsession)
     config.include('snovault')
     config.commit()  # commit so search can override listing
 
     # Render an HTML page to browsers and a JSON document for API clients
-    #config.include(add_schemas_to_html_responses)
+    # config.include(add_schemas_to_html_responses)
     config.include('.renderers')
     config.include('.authentication')
     config.include('.server_defaults')
     config.include('.root')
     config.include('.types')
+    # Fourfront does this. Do we need that here? -kmp 8-Apr-2020
+    # config.include('.batch_download')
     config.include('.loadxl')
     config.include('.visualization')
+    config.include('.ingestion_listener')
 
     if 'elasticsearch.server' in config.registry.settings:
         config.include('snovault.elasticsearch')
-        config.include('.search')
+        config.include('.search.search')
+        config.include('.search.compound_search')  # could make enabling configurable
 
     # this contains fall back url, so make sure it comes just before static_resoruces
     config.include('.types.page')
@@ -268,6 +205,5 @@ def main(global_config, **local_config):
         docsdir = [path.strip() for path in docsdir.strip().split('\n')]
     if workbook_filename:
         load_workbook(app, workbook_filename, docsdir)
-
 
     return app

@@ -1,21 +1,21 @@
+import mimetypes
+import structlog
+
+from base64 import b64encode
+from datetime import datetime
+from dateutil.relativedelta import relativedelta
+from pyramid.httpexceptions import HTTPUnprocessableEntity
+from pyramid.paster import get_app
+from pyramid.view import view_config
 from snovault import (
     calculated_property,
     collection,
     load_schema,
-    CONNECTION,
-    COLLECTIONS,
-    display_title_schema
 )
 from snovault.util import debug_log
-from .base import (
-    Item,
-    get_item_if_you_can
-)
-from pyramid.httpexceptions import HTTPUnprocessableEntity
-from pyramid.view import view_config
-from datetime import datetime
-from dateutil.relativedelta import relativedelta
-import structlog
+from webtest import TestApp
+from xml.etree.ElementTree import fromstring
+from .base import Item, get_item_or_none
 
 
 log = structlog.getLogger(__name__)
@@ -105,7 +105,6 @@ class Cohort(Item):
 
     @calculated_property(schema={
         "title": "Display Title",
-        "description": "A calculated title for every object in 4DN",
         "type": "string"
     })
     def display_title(self, title):
@@ -114,7 +113,7 @@ class Cohort(Item):
     @calculated_property(schema={
         "title": "Phenotypic features",
         "description": "Phenotypic features that define the cohort",
-        "type" : "array",
+        "type": "array",
         "items": {
             "title": "Phenotypic feature",
             "type": "string",
@@ -161,11 +160,6 @@ def process_pedigree(context, request):
     Raises:
         HTTPUnprocessableEntity: on an error. Extra information may be logged
     """
-    import mimetypes
-    from pyramid.paster import get_app
-    from webtest import TestApp
-    from base64 import b64encode
-    from xml.etree.ElementTree import fromstring
 
     cohort = str(context.uuid)  # used in logging
 
@@ -197,7 +191,7 @@ def process_pedigree(context, request):
                 break
         if not user_uuid:
             raise HTTPUnprocessableEntity('Cohort %s: Must provide authentication' % cohort)
-        user_props = get_item_if_you_can(request, user_uuid)
+        user_props = get_item_or_none(request, user_uuid)
         email = user_props['email']
     environ = {'HTTP_ACCEPT': 'application/json', 'REMOTE_USER': email}
     testapp = TestApp(app, environ)
@@ -227,7 +221,7 @@ def process_pedigree(context, request):
     xml_extra = {'ped_datetime': ped_datetime}
 
     family_uuids = create_family_proband(testapp, xml_data, refs, 'managedObjectID',
-                                   cohort, post_extra, xml_extra)
+                                         cohort, post_extra, xml_extra)
 
     # create Document for input pedigree file
     # pbxml files are not handled by default. Do some mimetype processing
@@ -292,7 +286,7 @@ def process_pedigree(context, request):
 
 
 #####################################
-### Pedigree processing functions ###
+# ## Pedigree processing functions ###
 #####################################
 
 
@@ -749,7 +743,7 @@ def create_family_proband(testapp, xml_data, refs, ref_field, cohort,
                         if ref_val is not None and 'xml_ref_fxn' in converted_dict:
                             # will update data in place
                             converted_dict['xml_ref_fxn'](testapp, ref_val, refs, data,
-                                                     cohort, uuids_by_ref)
+                                                          cohort, uuids_by_ref)
                         elif ref_val is not None:
                             data[converted_dict['corresponds_to']] = uuids_by_ref[ref_val]
 
@@ -798,7 +792,7 @@ def create_family_proband(testapp, xml_data, refs, ref_field, cohort,
     # invert uuids_by_ref to sort family members by managedObjectID (xml ref)
     refs_by_uuid = {v: k for k, v in uuids_by_ref.items()}
     family = {'members': sorted([m['uuid'] for m in family_members.values()],
-                                 key=lambda v: int(refs_by_uuid[v]))}
+                                key=lambda v: int(refs_by_uuid[v]))}
     if proband and proband in family_members:
         family['proband'] = family_members[proband]['uuid']
     else:

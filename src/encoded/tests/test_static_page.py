@@ -1,7 +1,11 @@
 import pytest
-import time
-from .workbook_fixtures import app_settings, app
-from webtest import AppError
+import webtest
+
+from dcicutils.qa_utils import notice_pytest_fixtures
+from .workbook_fixtures import app
+
+
+notice_pytest_fixtures(app)
 
 pytestmark = [pytest.mark.indexing, pytest.mark.working]
 
@@ -12,7 +16,7 @@ def help_page_section_json():
         "title": "",
         "name" : "help.user-guide.rest-api.rest_api_submission",
         "file": "/docs/source/rest_api_submission.rst",
-        "uuid" : "442c8aa0-dc6c-43d7-814a-854af460b020"
+        "uuid" : "442c8aa0-dc6c-43d7-814a-854af460c020"
     }
 
 @pytest.fixture(scope='module')
@@ -20,7 +24,7 @@ def help_page_json():
     return {
         "name": "help/user-guide/rest-api",
         "title": "The REST-API",
-        "content": ["442c8aa0-dc6c-43d7-814a-854af460b020"],
+        "content": ["442c8aa0-dc6c-43d7-814a-854af460c020"],
         "uuid": "a2aa8bb9-9dd9-4c80-bdb6-2349b7a3540d",
         "table-of-contents": {
             "enabled": True,
@@ -34,7 +38,7 @@ def help_page_json_draft():
     return {
         "name": "help/user-guide/rest-api-draft",
         "title": "The REST-API",
-        "content": ["442c8aa0-dc6c-43d7-814a-854af460b020"],
+        "content": ["442c8aa0-dc6c-43d7-814a-854af460c020"],
         "uuid": "a2aa8bb9-9dd9-4c80-bdb6-2349b7a3540c",
         "table-of-contents": {
             "enabled": True,
@@ -49,7 +53,7 @@ def help_page_json_deleted():
     return {
         "name": "help/user-guide/rest-api-deleted",
         "title": "The REST-API",
-        "content": ["442c8aa0-dc6c-43d7-814a-854af460b020"],
+        "content": ["442c8aa0-dc6c-43d7-814a-854af460c020"],
         "uuid": "a2aa8bb9-9dd9-4c80-bdb6-2349b7a3540a",
         "table-of-contents": {
             "enabled": True,
@@ -71,7 +75,7 @@ def help_page(testapp, posted_help_page_section, help_page_json):
     try:
         res = testapp.post_json('/pages/', help_page_json, status=201)
         val = res.json['@graph'][0]
-    except AppError:
+    except webtest.AppError:
         res = testapp.get('/' + help_page_json['uuid'], status=301).follow()
         val = res.json
     return val
@@ -82,7 +86,7 @@ def help_page_deleted(testapp, posted_help_page_section, help_page_json_draft):
     try:
         res = testapp.post_json('/pages/', help_page_json_draft, status=201)
         val = res.json['@graph'][0]
-    except AppError:
+    except webtest.AppError:
         res = testapp.get('/' + help_page_json_draft['uuid'], status=301).follow()
         val = res.json
     return val
@@ -93,7 +97,7 @@ def help_page_restricted(testapp, posted_help_page_section, help_page_json_delet
     try:
         res = testapp.post_json('/pages/', help_page_json_deleted, status=201)
         val = res.json['@graph'][0]
-    except AppError:
+    except webtest.AppError:
         res = testapp.get('/' + help_page_json_deleted['uuid'], status=301).follow()
         val = res.json
     return val
@@ -102,10 +106,6 @@ def help_page_restricted(testapp, posted_help_page_section, help_page_json_delet
 def test_get_help_page(testapp, help_page):
     help_page_url = "/" + help_page['name']
     res = testapp.get(help_page_url, status=200)
-
-    #import pdb
-    #pdb.set_trace()
-
     assert res.json['@id'] == help_page_url
     assert res.json['@context'] == help_page_url
     assert 'HelpPage' in res.json['@type']
@@ -131,7 +131,10 @@ def test_page_unique_name(testapp, help_page, help_page_deleted):
     new_page = {'name': help_page['name']}
     res = testapp.post_json('/page', new_page, status=422)
     expected_val_err = "%s already exists with name '%s'" % (help_page['uuid'], new_page['name'])
-    assert expected_val_err in res.json['errors'][0]['description']
+    actual_error_description = res.json['errors'][0]['description']
+    print("expected:", expected_val_err)
+    print("actual:", actual_error_description)
+    assert expected_val_err in actual_error_description
 
     # also test PATCH of an existing page with another name
     res = testapp.patch_json(help_page_deleted['@id'], {'name': new_page['name']}, status=422)

@@ -1,10 +1,12 @@
-from pkg_resources import resource_filename
-from urllib.parse import urlencode
+import json
+import logging
+import os
+import psutil
+import time
+
 from functools import lru_cache
-from pyramid.events import (
-    BeforeRender,
-    subscriber,
-)
+from pkg_resources import resource_filename
+from pyramid.events import BeforeRender, subscriber
 from pyramid.httpexceptions import (
     HTTPMovedPermanently,
     HTTPPreconditionFailed,
@@ -14,25 +16,16 @@ from pyramid.httpexceptions import (
     HTTPNotAcceptable,
     HTTPServerError
 )
+from pyramid.response import Response
 from pyramid.security import forget
 from pyramid.settings import asbool
-from pyramid.threadlocal import (
-    manager,
-)
-from pyramid.response import Response
-from pyramid.traversal import (
-    split_path_info,
-    _join_path_tuple,
-)
-
+from pyramid.threadlocal import manager
+from pyramid.traversal import split_path_info, _join_path_tuple
 from snovault.validation import CSRFTokenError
 from subprocess_middleware.tween import SubprocessTween
 from subprocess_middleware.worker import TransformWorker
-import logging
-import os
-import psutil
-import time
-import json
+from urllib.parse import urlencode
+from webob.cookies import Cookie
 
 
 log = logging.getLogger(__name__)
@@ -222,7 +215,6 @@ def remove_expired_session_cookies_tween_factory(handler, registry):
     their removal in security_tween_factory & authentication.py as well as client-side
     (upon "Logout" action). If needed for some reason, can re-enable.
     '''
-    from webob.cookies import Cookie
 
     ignore = {
         '/favicon.ico',
@@ -314,6 +306,46 @@ def canonical_redirect(event):
     raise HTTPMovedPermanently(location=location, detail="Redirected from " + str(request.path_info))
 
 
+# Web browsers send an Accept request header for initial (e.g. non-AJAX) page requests
+# which should contain 'text/html'
+MIME_TYPES_SUPPORTED = ['text/html', 'application/json', 'application/ld+json']
+MIME_TYPE_DEFAULT = 'application/json'
+MIME_TYPE_TRIAGE_MODE = 'legacy'  # 'modern'  # if this doesn't work, fall back to 'legacy'
+
+
+def best_mime_type(request, mode=MIME_TYPE_TRIAGE_MODE):
+    """
+    Given a request, tries to figure out the best kind of MIME type to use in response
+    based on what kinds of responses we support and what was requested.
+
+    In the case we can't comply, we just use application/json whether or not that's what was asked for.
+    """
+    if mode == 'legacy':
+        # See: https://tedboy.github.io/flask/generated/generated/werkzeug.Accept.best_match.html#werkzeug-accept-best-match
+        # Note that this is now deprecated, or will be. The message is oddly worded ("will be deprecated")
+        # that presumably means "will be removed". Deprecation IS the warning of actual action, not the action itself.
+        # "This is currently maintained for backward compatibility, and will be deprecated in the future.
+        #  AcceptValidHeader.best_match() uses its own algorithm (one not specified in RFC 7231) to determine
+        #  what is a best match. The algorithm has many issues, and does not conform to RFC 7231."
+        # Anyway, we were getting this warning during testing:
+        #   DeprecationWarning: The behavior of AcceptValidHeader.best_match is currently
+        #      being maintained for backward compatibility, but it will be deprecated in the future,
+        #      as it does not conform to the RFC.
+        # TODO: Once the modern replacement is shown to work, we should remove this conditional branch.
+        return request.accept.best_match(MIME_TYPES_SUPPORTED, MIME_TYPE_DEFAULT)
+    else:
+        options = request.accept.acceptable_offers(MIME_TYPES_SUPPORTED)
+        if not options:
+            # TODO: Probably we should return a 406 response by raising HTTPNotAcceptable if
+            #       no acceptable types are available. (Certainly returning JSON in this case is
+            #       not some kind of friendly help toa naive user with an old browser.)
+            #       Ref: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status
+            return MIME_TYPE_DEFAULT
+        else:
+            mime_type, score = options[0]
+            return mime_type
+
+
 @lru_cache(maxsize=16)
 def should_transform(request, response):
     '''
@@ -345,6 +377,7 @@ def should_transform(request, response):
     # Web browsers send an Accept request header for initial (e.g. non-AJAX) page requests
     # which should contain 'text/html'
     # See: https://tedboy.github.io/flask/generated/generated/werkzeug.Accept.best_match.html#werkzeug-accept-best-match
+    # TODO: Maybe use mime_type = best_mime_type(request) instead.
     mime_type = request.accept.best_match(['text/html',  'application/json', 'application/ld+json'], 'application/json')
     format = mime_type.split('/', 1)[1] # Will be 1 of 'html', 'json', 'json-ld'
 

@@ -1,7 +1,9 @@
 'use strict';
 
 import React from 'react';
-import { DropdownButton, DropdownItem } from 'react-bootstrap';
+import DropdownButton from 'react-bootstrap/esm/DropdownButton';
+import DropdownItem from 'react-bootstrap/esm/DropdownItem';
+
 import { Checkbox } from '@hms-dbmi-bgm/shared-portal-components/es/components/forms/components/Checkbox';
 import { CollapsibleItemViewButtonToolbar } from './../CollapsibleItemViewButtonToolbar';
 

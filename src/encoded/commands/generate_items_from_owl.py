@@ -1,19 +1,15 @@
 import argparse
-from datetime import datetime
+import io
+import json
 import logging
 import logging.config
-import json
 import os
 import sys
 
+from base64 import b64encode
 from collections import Counter
-from dcicutils.ff_utils import (
-    get_authentication_with_server,
-    get_metadata,
-    search_metadata,
-    unified_authentication,
-    post_metadata
-)
+from datetime import datetime
+from dcicutils.ff_utils import get_authentication_with_server, search_metadata, post_metadata
 from uuid import uuid4
 from ..commands.load_items import load_items
 from ..commands.owltools import (
@@ -21,7 +17,6 @@ from ..commands.owltools import (
     Owler,
     splitNameFromNamespace,
     convert2URIRef,
-    isURIRef,
     isBlankNode,
     getObjectLiteralsOfType,
     Deprecated,
@@ -43,6 +38,9 @@ ITEM2OWL = {
         'http://www.geneontology.org/formats/oboInOwl#hasNarrowSynonym',
         'http://www.geneontology.org/formats/oboInOwl#RelatedSynonym',
     ],
+    # NOTE: There could theoretically also be a 'definition_uris': [...] or 'synonym_urls': [...]
+    #       with more specific terminology information in the dictionaries that follow here,
+    #       and the code in get_term_uris_as_ns would find it. -kmp 27-Jul-2020
     'Disorder': {
         'download_url': 'http://purl.obolibrary.org/obo/mondo.owl',
         'ontology_prefix': 'MONDO',
@@ -100,13 +98,13 @@ def get_logger(lname, logfile):
 
 
 def iterative_parents(nodes, terms, data):
-    '''returns all the parents traversing the term graph structure
+    """returns all the parents traversing the term graph structure
         - (not the direct RDF graph) by iteratively following parents
         until there are no more parents
-    '''
+    """
     results = []
-    while 1:
-        newNodes = []
+    while True:
+        new_nodes = []
         if len(nodes) == 0:
             break
         for node in nodes:
@@ -116,15 +114,15 @@ def iterative_parents(nodes, terms, data):
             if terms[node].get(data):
                 for parent in terms[node][data]:
                     if parent not in results:
-                        newNodes.append(parent)
-        nodes = list(set(newNodes))
+                        new_nodes.append(parent)
+        nodes = list(set(new_nodes))
     return list(set(results))
 
 
 def get_all_ancestors(term, terms, field, itype):
-    '''Adds a list of all the term's ancestors to a term up to the root
+    """Adds a list of all the term's ancestors to a term up to the root
         of the ontology and adds to closure fields - used in adding slims
-    '''
+    """
     closure = 'closure'
     id_field = ITEM2OWL[itype].get('id_field')
     if closure not in term:
@@ -137,14 +135,14 @@ def get_all_ancestors(term, terms, field, itype):
 
 
 def get_termid_from_uri(uri):
-    '''Given a uri - takes the last part (name) and converts _ to :
+    """Given a uri - takes the last part (name) and converts _ to :
         eg. http://www.ebi.ac.uk/efo/EFO_0002784 => EFO:0002784
-    '''
+    """
     return splitNameFromNamespace(uri)[0].replace('_', ':')
 
 
 def get_term_name_from_rdf(class_, data):
-    '''Looks for label for class in the rdf graph'''
+    """Looks for label for class in the rdf graph"""
     name = None
     try:
         name = data.rdfGraph.label(class_).__str__()
@@ -154,8 +152,8 @@ def get_term_name_from_rdf(class_, data):
 
 
 def create_term_dict(class_, termid, data, itype):
-    '''Adds basic term info to the dictionary of all terms
-    '''
+    """Adds basic term info to the dictionary of all terms
+    """
     id_field = ITEM2OWL[itype].get('id_field')
     url_field = ITEM2OWL[itype].get('url_field')
     name_field = ITEM2OWL[itype].get('name_field')
@@ -169,8 +167,8 @@ def create_term_dict(class_, termid, data, itype):
 
 
 def process_parents(class_, data, terms):
-    '''Gets the direct parents of the class
-    '''
+    """Gets the direct parents of the class
+    """
     termid = get_termid_from_uri(class_)
     for parent in data.get_classDirectSupers(class_):
         terms[termid].setdefault('parents', []).append(get_termid_from_uri(parent))
@@ -178,31 +176,31 @@ def process_parents(class_, data, terms):
 
 
 def get_synonyms(class_, data, synonym_terms):
-    '''Gets synonyms for the class as strings
-    '''
+    """Gets synonyms for the class as strings
+    """
     return getObjectLiteralsOfType(class_, data, synonym_terms)
 
 
 def get_definitions(class_, data, definition_terms):
-    '''Gets definitions for the class as strings
-    '''
+    """Gets definitions for the class as strings
+    """
     return getObjectLiteralsOfType(class_, data, definition_terms)
 
 
 def get_dbxrefs(class_, data):
-    '''Gets dbxrefs for the class as strings
-    '''
+    """Gets dbxrefs for the class as strings
+    """
     return getObjectLiteralsOfType(class_, data, [hasDbXref])
 
 
 def get_alternative_ids(class_, data):
-    ''' Gets alternative IDs for the class as strings
-    '''
+    """ Gets alternative IDs for the class as strings
+    """
     return getObjectLiteralsOfType(class_, data, [hasAltId])
 
 
 def _cleanup_non_fields(terms):
-    '''Removes unwanted fields and empty terms from final json'''
+    """Removes unwanted fields and empty terms from final json"""
     to_delete = 'closure'
     tids2delete = []
     for termid, term in terms.items():
@@ -217,9 +215,9 @@ def _cleanup_non_fields(terms):
 
 
 def add_slim_to_term(term, slim_terms, itype):
-    '''Checks the list of ancestor terms to see if any are slim_terms
+    """Checks the list of ancestor terms to see if any are slim_terms
         and if so adds the slim_term to the term in slim_term slot
-    '''
+    """
     id_field = ITEM2OWL[itype].get('id_field')
     if not id_field:
         return term
@@ -235,7 +233,7 @@ def add_slim_to_term(term, slim_terms, itype):
 def add_slim_terms(terms, slim_terms, itype):
     for termid, term in terms.items():
         term = get_all_ancestors(term, terms, 'parents', itype)
-        term = add_slim_to_term(term, slim_terms, itype)
+        add_slim_to_term(term, slim_terms, itype)
     terms = _cleanup_non_fields(terms)
     return terms
 
@@ -252,36 +250,40 @@ def convert2namespace(uri):
 
 
 def get_term_uris_as_ns(itype, conf_name):
-    ''' will get namespace URIs for synonym or definition terms
+    """ will get namespace URIs for synonym or definition terms
         as specified in the config file - will check for general
         case by conf_name and then specific cases in the specific
         item type
-    '''
+    """
     uris = [convert2namespace(uri) for uri in ITEM2OWL.get(conf_name, [])]
-    uris.extend([convert2namespace(uri) for uri in ITEM2OWL[itype].get(conf_name, [])])
+    # For this second situation, ajs says it's possible for a given itype (e.g., Phenotype or Disorder) that
+    # there is additional vocabulary that could be added. to extend that set. Right now there is no such
+    # 'definition_urls' or 'synonym_urls' declared, so PyCharm gets nervous. The 'NoQA' here is about that.
+    # -kmp 27-Jul-2020
+    uris.extend([convert2namespace(uri) for uri in ITEM2OWL[itype].get(conf_name, [])])  # NoQA - See comment above
     return uris
 
 
 def get_slim_term_ids_from_db_terms(db_terms, itype):
-    '''Retrieves all items from the provided type with 'is_slim_for'
+    """Retrieves all items from the provided type with 'is_slim_for'
         field populated
-    '''
+    """
     return [t.get(ITEM2OWL[itype].get('id_field')) for t in db_terms.values() if t.get('is_slim_for')]
 
 
 def get_existing_items(connection, itype):
-    '''Retrieves all existing items of itype from db '''
+    """Retrieves all existing items of itype from db """
     terms = get_existing_items_from_db(connection, itype)
     return create_dict_keyed_by_field_from_items(terms, ITEM2OWL[itype].get('id_field'))
 
 
 def get_existing_items_from_db(connection, itype, include_invisible=True):
-    ''' Retrieves all existing items of itype from db and returns a generator
+    """ Retrieves all existing items of itype from db and returns a generator
         by default includes deleted and restricted terms which are usually
         filtered from search results
         include_invisible=False excludes deleted and restricted
         return Generator of item dicts
-    '''
+    """
     invisible_stati = ['deleted', 'replaced']
     gens = []
     search_suffix = 'search/?type={}'.format(itype)
@@ -295,21 +297,21 @@ def get_existing_items_from_db(connection, itype, include_invisible=True):
 
 
 def create_dict_keyed_by_field_from_items(items, keyfield):
-    ''' given a field and iterable of items with that field
+    """ given a field and iterable of items with that field
         return a dict keyed by that field with item as values
-    '''
+    """
     return {i.get(keyfield): i for i in items if i and keyfield in i}
 
 
 def connect2server(env=None, key=None, keyfile=None, logger=None):
-    '''Sets up credentials for accessing the server.  Generates a key using info
+    """Sets up credentials for accessing the server.  Generates a key using info
        from the named keyname in the keyfile and checks that the server can be
        reached with that key.
-       Also handles keyfiles stored in s3 using the env param'''
+       Also handles keyfiles stored in s3 using the env param"""
     if key and keyfile:
         keys = None
         if os.path.isfile(keyfile):
-            with open(keyfile, 'r') as kf:
+            with io.open(keyfile, 'r') as kf:
                 keys_json_string = kf.read()
                 keys = json.loads(keys_json_string)
         if keys:
@@ -352,11 +354,11 @@ def _format_as_raw(val):
 
 
 def get_raw_form(term):
-    ''' takes a term dict that is in embedded frame format
+    """ takes a term dict that is in embedded frame format
         and transforms to raw (so uuids) are used for linked items
         WARNING: DOES NOT work for object frame - won't convert @ids
         and should not change an already raw frame json
-    '''
+    """
     raw_term = {}
     for field, val in term.items():
         if isinstance(val, (str, int, float, bool)):
@@ -370,13 +372,13 @@ def get_raw_form(term):
 
 
 def compare_terms(t1, t2):
-    ''' compare t1 to t2 and if a key is not in t2 or
+    """ compare t1 to t2 and if a key is not in t2 or
         the key is there but the value is different
         returns a dict of the new key:val of t1
 
         NOTE: could be false positives if the order of fields in a subembedded object differ
         consider revisting (though we don't have that use case at this time)
-    '''
+    """
     diff = {}
     for k, val in t1.items():
         if k not in t2:
@@ -390,10 +392,10 @@ def compare_terms(t1, t2):
 
 
 def check_for_fields_to_keep(term, dbterm):
-    ''' see if any of the fields that are not added from the owl
+    """ see if any of the fields that are not added from the owl
         are present and also check for only other fields that have
         changed
-    '''
+    """
     patches = {'uuid': term.get('uuid')}
     if 'is_slim_for' in dbterm:
         patches['is_slim_for'] = dbterm['is_slim_for']
@@ -403,8 +405,8 @@ def check_for_fields_to_keep(term, dbterm):
 
 
 def id_fields2patch(term, dbterm, rm_unch):
-    ''' Looks at 2 terms and determines what fields to update
-    '''
+    """ Looks at 2 terms and determines what fields to update
+    """
     rawdbterm = get_raw_form(dbterm)
     diff = compare_terms(term, rawdbterm)
     if rm_unch and not diff:
@@ -418,7 +420,7 @@ def id_fields2patch(term, dbterm, rm_unch):
 
 
 def identify_item_updates(terms, dbterms, itype, rm_unchanged=True, set_obsoletes=True, logger=None):
-    ''' compares items generated from the owl file to items of that type that are already in db
+    """ compares items generated from the owl file to items of that type that are already in db
         - if item is in the db and has not changed and rm_unchanged is True items are removed
           from the items to be updated
         - if rm_unchanged is False all items are added to the updates
@@ -427,7 +429,7 @@ def identify_item_updates(terms, dbterms, itype, rm_unchanged=True, set_obsolete
           in the same fields in the item from the db those fields are added as a patch to the updates
         - if set_obsoletes is True (the default) then an item that exists in the db that is not present
           in the items created from the owl is added as a patch to obsolete status to the updates
-    '''
+    """
     to_update = []
     to_post = []
     to_patch = {}
@@ -513,7 +515,7 @@ def add_additional_term_info(terms, data, synonym_terms, definition_terms, itype
     for termid, term in terms.items():
         try:
             termuri = convert2URIRef(term[url_field])
-        except Exception as e:
+        except Exception:
             continue
 
         # add any missing synonyms
@@ -550,10 +552,12 @@ def _is_deprecated(class_, data):
     return False
 
 
-def download_and_process_owl(itype, input, terms={}, simple=False):
+def download_and_process_owl(itype, input_uri, terms=None, simple=False):
+    if terms is None:
+        terms = {}
     synonym_terms = get_term_uris_as_ns(itype, 'synonym_uris')
     definition_terms = get_term_uris_as_ns(itype, 'definition_uris')
-    data = Owler(input)
+    data = Owler(input_uri)
     ontv = data.versionIRI
     name_field = ITEM2OWL[itype].get('name_field')
     for class_ in data.allclasses:
@@ -578,11 +582,11 @@ def download_and_process_owl(itype, input, terms={}, simple=False):
 
 
 def write_outfile(terms, filename, pretty=False):
-    '''terms is a list of dicts
+    """terms is a list of dicts
         write to file by default as a json list or if pretty
         then same with indents and newlines
-    '''
-    with open(filename, 'w') as outfile:
+    """
+    with io.open(filename, 'w') as outfile:
         if pretty:
             json.dump(terms, outfile, indent=4)
         else:
@@ -590,7 +594,7 @@ def write_outfile(terms, filename, pretty=False):
 
 
 def get_args(args):
-    parser = argparse.ArgumentParser(
+    parser = argparse.ArgumentParser(  # noqa - PyCharm wrongly thinks the formatter_class is invalid
         description="Process specified Ontologies and create OntologyTerm inserts for updates",
         epilog=EPILOG,
         formatter_class=argparse.RawDescriptionHelpFormatter,
@@ -600,11 +604,13 @@ def get_args(args):
                         help="Item Types to generate from owl ontology - currently Phenotype or Disorder")
     parser.add_argument('--env',
                         default='local',
-                        help="The environment to use i.e. fourfront-cgap, cgap-test ....\
-                        Default is 'local')")
+                        help="The environment to use i.e. fourfront-cgap, cgap-test ....\n"
+                             "Default is 'local')")
     parser.add_argument('--input',
-                        help="optional url or path to owlfile - overrides the download_url present in script ITEM2OWL config info \
-                        Useful for generating items from a specific verion of ontology - otherwise will use current latest")
+                        help="optional url or path to owlfile -"
+                             " overrides the download_url present in script ITEM2OWL config info\n"
+                             "Useful for generating items from a specific verion of ontology -"
+                             " otherwise will use current latest")
     parser.add_argument('--key',
                         help="The keypair identifier from the keyfile")
     parser.add_argument('--keyfile',
@@ -616,7 +622,8 @@ def get_args(args):
     parser.add_argument('--load',
                         action='store_true',
                         default=False,
-                        help="Default False - WARNING: currently only works with --env and not key and secret - use to load data directly from json to the server that the connection refers to")
+                        help="Default False - WARNING: currently only works with --env and not key and secret -"
+                             " use to load data directly from json to the server that the connection refers to")
     parser.add_argument('--post_report',
                         action='store_true',
                         default=False,
@@ -628,7 +635,8 @@ def get_args(args):
     parser.add_argument('--full',
                         default=False,
                         action='store_true',
-                        help="Default False - set True to generate full file to load - do not filter out existing unchanged terms")
+                        help="Default False - set True to generate full file to load -"
+                             " do not filter out existing unchanged terms")
     return parser.parse_args(args)
 
 
@@ -638,23 +646,21 @@ def owl_runner(value):
 
 
 def post_report_document_to_portal(connection, itype, logfile):
-    ''' Read the log file and encode it for upload as an attachment (blob) and
+    """ Read the log file and encode it for upload as an attachment (blob) and
         post a Document for the log file
 
         TD: the institution and project are hard coded.  should get this info
         from the user running script?
-    '''
-    from base64 import b64encode
+    """
     inst = '828cd4fe-ebb0-4b36-a94a-d2e3a36cc989'
     proj = '12a92962-8265-4fc0-b2f8-cf14f05db58b'
     meta = {'institution': inst, 'project': proj}
     mimetype = "text/plain"
     rtype = 'document'
     date = datetime.utcnow().strftime("%Y-%m-%dT%H-%M-%SZ")
-    attach_fn = None
     if os.path.isfile(logfile):
         attach_fn = '{}_update_report_{}.txt'.format(itype, date)
-        with open(logfile, 'rb') as at:
+        with io.open(logfile, 'rb') as at:
             data = at.read()
             data_href = 'data:%s;base64,%s' % (mimetype, b64encode(data).decode('ascii'))
             attach = {'download': attach_fn, 'type': mimetype, 'href': data_href}
@@ -670,7 +676,8 @@ def post_report_document_to_portal(connection, itype, logfile):
 
 def prompt_check_for_output_options(load, outfile, itype, server, logger=None):
     if load:
-        choice1 = str(input("load is True - are you sure you want to directly load the output to {} (y/n)?: ".format(server)))
+        choice1 = str(input("load is True - are you sure you want to directly load the output to {} (y/n)?: "
+                            .format(server)))
         if choice1.lower() == 'y':
             logger.info('Will load output directly to {}'.format(server))
             if not outfile:
@@ -687,14 +694,14 @@ def prompt_check_for_output_options(load, outfile, itype, server, logger=None):
 
 
 def main():
-    ''' Given a item type (Disorder or Phenotype) will process owl file containing ontology terms
+    """ Given a item type (Disorder or Phenotype) will process owl file containing ontology terms
         for the given item from a url or file provided in script config or via --input parameter
         and comparing to what is currently in system will generate json to post new items or patch
         existing items and either generate a json file specified with --outfile or load directly
         into system if --load is used.
 
         logging/tracking info
-    '''
+    """
     start = datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
     args = get_args(sys.argv[1:])
     itype = args.item_type
@@ -711,13 +718,16 @@ def main():
     slim_terms = get_slim_term_ids_from_db_terms(db_terms, itype)
     terms = {}
 
-    input = args.input
-    if not input:
-        input = ITEM2OWL[itype].get('download_url', None)
-    if input:
+    input_uri = args.input
+    if not input_uri:
+        # We had been using a default of None for this .get(), but PyCharm was worried about the type of the URI
+        # not being None, so Andy and I have agreed to use the empty string as an argument, hoping that works.
+        # -kmp 27-Jul-2020
+        input_uri = ITEM2OWL[itype].get('download_url', "")
+    if input_uri:
         # get all the terms for an ontology with simple processing
-        logger.info("Will get ontology data using = {}".format(input))
-        terms, ontv = download_and_process_owl(itype, input, terms, True)
+        logger.info("Will get ontology data using = {}".format(input_uri))
+        terms, ontv = download_and_process_owl(itype, input_uri, terms, True)
     else:
         # bail out
         logger.error("Need url to download file from")
@@ -725,7 +735,7 @@ def main():
 
     # at this point we've processed the rdf of all the ontologies
     if not ontv:
-        ontv = input
+        ontv = input_uri
     logger.info("Ontology Version Info: {}".format(ontv))
     if terms:
         terms = add_slim_terms(terms, slim_terms, itype)

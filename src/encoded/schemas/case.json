@@ -1,0 +1,67 @@
+{
+    "title": "Case",
+    "id": "/profiles/case.json",
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "type": "object",
+    "required": ["project", "institution"],
+    "identifyingProperties": ["uuid", "accession", "aliases"],
+    "additionalProperties": false,
+    "mixinProperties": [
+        { "$ref": "mixins.json#/schema_version" },
+        { "$ref": "mixins.json#/accession" },
+        { "$ref": "mixins.json#/aliases" },
+        { "$ref": "mixins.json#/uuid" },
+        { "$ref": "mixins.json#/submitted" },
+        { "$ref": "mixins.json#/modified" },
+        { "$ref": "mixins.json#/status" },
+        { "$ref": "mixins.json#/attribution" }
+    ],
+    "properties": {
+        "schema_version": {
+            "default": "1"
+        },
+        "accession" : {
+            "accessionType" : "CA"
+        },
+        "case_id": {
+            "title": "Case ID",
+            "description": "An identifier for this case",
+            "type": "string"
+        },
+        "description": {
+            "title": "Description",
+            "description": "Description of the case",
+            "type": "string"
+        },
+        "family": {
+            "title": "Family",
+            "description": "Primary family this case is associated with",
+            "type": "string",
+            "linkTo": "Family"
+        },
+        "individual": {
+            "title": "Individual",
+            "description": "The individual who comprises the case",
+            "type": "string",
+            "linkTo": "Individual"
+        },
+        "sample_processing": {
+            "title": "Sample Processing",
+            "description": "Downstream analysis performed on relevant sample",
+            "type": "string",
+            "linkTo": "SampleProcessing"
+        },
+        "report": {
+            "title": "Report",
+            "description": "The report generated from this case",
+            "type": "string",
+            "linkTo": "Report"
+        },
+        "cohort": {
+            "title" : "Cohort",
+            "description": "Cohort of the family",
+            "type" : "string",
+            "linkTo": "Nexus"
+        }
+    }
+}

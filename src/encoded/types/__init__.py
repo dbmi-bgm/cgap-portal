@@ -1,21 +1,23 @@
 """init.py lists all the collections that do not have a dedicated types file."""
 
-from snovault.attachment import ItemWithAttachment
-from snovault.crud_views import collection_add as sno_collection_add
-from snovault.schema_utils import validate_request
-from snovault.validation import ValidationFailure
+import transaction
+
+# from pyramid.traversal import find_root
 from snovault import (
     calculated_property,
     collection,
     load_schema,
-    CONNECTION,
+    # CONNECTION,
     COLLECTIONS,
-    display_title_schema
+    # display_title_schema
 )
-# from pyramid.traversal import find_root
+from snovault.attachment import ItemWithAttachment
+from snovault.crud_views import collection_add as sno_collection_add
+from snovault.schema_utils import validate_request
+from snovault.validation import ValidationFailure
 from .base import (
     Item,
-    get_item_if_you_can,
+    get_item_or_none,
     set_namekey_from_title,
     ALLOW_OWNER_EDIT,
     ALLOW_CURRENT,
@@ -30,21 +32,45 @@ def includeme(config):
 
 
 @collection(
-    name='sample-processings',
+    name='reports',
     properties={
-        'title': 'SampleProcessings',
-        'description': 'Listing of Sample Processings',
+        'title': 'Reports',
+        'description': 'Listing of Reports',
     })
-class SampleProcessing(Item):
-    item_type = 'sample_processing'
-    schema = load_schema('encoded:schemas/sample_processing.json')
+class Report(Item):
+    item_type = 'report'
+    schema = load_schema('encoded:schemas/report.json')
     embedded_list = []
+    rev = {'case': ('Case', 'report')}
+
+    @calculated_property(schema={
+        "title": "Case",
+        "description": "The case this sample processing is for",
+        "type": "string",
+        "linkTo": "Case"
+    })
+    def case(self, request):
+        rs = self.rev_link_atids(request, "case")
+        if rs:
+            return rs[0]
+
+    @calculated_property(schema={
+        "title": "Display Title",
+        "description": "A calculated title for every object in 4DN",
+        "type": "string"
+    })
+    def display_title(self, request, accession):
+        case = self.rev_link_atids(request, "case")
+        if case:
+            case_props = get_item_or_none(request, case[0], 'cases')
+            if case_props and case_props.get('case_id'):
+                return case_props['case_id'] + ' Case Report'
+        return accession
 
 
 @collection(
     name='genes',
-    unique_key='gene:gene_id',
-    lookup_key='preferred_symbol',
+    unique_key='gene:ensgid',
     properties={
         'title': 'Genes',
         'description': 'Gene items',
@@ -52,19 +78,40 @@ class SampleProcessing(Item):
 class Gene(Item):
     """Gene class."""
     item_type = 'gene'
-    name_key = 'gene_id'
+    name_key = 'ensgid'  # use the ENSEMBL Gene ID as the identifier
     schema = load_schema('encoded:schemas/gene.json')
     embedded_list = []
+
+    @calculated_property(schema={
+        "title": "Display Title",
+        "description": "Gene ID",
+        "type": "string"
+    })
+    def display_title(self, gene_symbol):
+        return gene_symbol
+
+
+@collection(
+    name='gene-annotation-fields',
+    unique_key='gene_annotation_field:field_name',
+    properties={
+        'title': 'Gene Annotation Fields',
+        'description': 'List of gene annotation fields',
+    })
+class GeneAnnotationField(Item):
+    """Class for gene annotation fields."""
+
+    item_type = 'gene_annotation_field'
+    name_key = 'field_name'
+    schema = load_schema('encoded:schemas/gene_annotation_field.json')
 
     @calculated_property(schema={
         "title": "Display Title",
         "description": "A calculated title for every object in 4DN",
         "type": "string"
     })
-    def display_title(self, request, gene_id, preferred_symbol=None):
-        if preferred_symbol:
-            return preferred_symbol
-        return 'GENE ID:{}'.format(gene_id)
+    def display_title(self, source_name, field_name):
+        return ':'.join([source_name, field_name])
 
 
 @collection(
@@ -93,7 +140,7 @@ class Document(ItemWithAttachment, Item):
 
     @calculated_property(schema={
         "title": "Display Title",
-        "description": "A calculated title for every object in 4DN",
+        "description": "Document filename, if available.",
         "type": "string"
     })
     def display_title(self, attachment=None):
@@ -119,7 +166,7 @@ class FileFormat(Item, ItemWithAttachment):
 
     @calculated_property(schema={
         "title": "Display Title",
-        "description": "A calculated title",
+        "description": "File Format name or extension.",
         "type": "string"
     })
     def display_title(self, file_format):
@@ -166,7 +213,6 @@ class TrackingItem(Item):
         Raises:
             ValidationFailure if TrackingItem cannot be validated
         """
-        import transaction
         collection = request.registry[COLLECTIONS]['TrackingItem']
         # set remote_user to standarize permissions
         prior_remote = request.remote_user
@@ -189,7 +235,7 @@ class TrackingItem(Item):
 
     @calculated_property(schema={
         "title": "Display Title",
-        "description": "A calculated title for every object in 4DN",
+        "description": "Descriptor of TrackingItem",
         "type": "string"
     })
     def display_title(self, tracking_type, date_created=None, google_analytics=None):
@@ -212,3 +258,49 @@ class TrackingItem(Item):
             if date_created:
                 title = title + ' from ' + date_created
             return title
+
+
+@collection(
+    name='annotation-fields',
+    unique_key='annotation_field:field_name',
+    properties={
+        'title': 'Annotation Fields',
+        'description': 'List of annotation fields',
+    })
+class AnnotationField(Item):
+    """Class for annotation fields."""
+
+    item_type = 'annotation_field'
+    name_key = 'field_name'
+    schema = load_schema('encoded:schemas/annotation_field.json')
+
+    @calculated_property(schema={
+        "title": "Display Title",
+        "description": "A calculated title for every object in 4DN",
+        "type": "string"
+    })
+    def display_title(self, field_name):
+        return field_name
+
+
+@collection(
+    name='nexuses',
+    unique_key='accession',
+    properties={
+        'title': 'Cohorts',
+        'description': 'List of Cohorts',
+    })
+class Nexus(Item):
+    """Class for Cohorts."""
+    item_type = 'nexus'
+    name_key = 'accession'
+    schema = load_schema('encoded:schemas/nexus.json')
+    embedded_list = []
+
+    @calculated_property(schema={
+        "title": "Display Title",
+        "description": "A calculated title for every object in 4DN",
+        "type": "string"
+    })
+    def display_title(self, title):
+        return title

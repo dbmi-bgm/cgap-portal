@@ -1,0 +1,88 @@
+[
+    {
+        "families": [
+            "21f2af73-2c2e-4101-bbfb-bb2754f302ad"
+        ],
+        "processed_files": [
+            "bd12fe4d-eb8d-4bd5-9e56-c2ecc9badc1d"
+        ],
+        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
+        "analysis_type": "WGS-Trio",
+        "samples": [
+            "c47f57d8-0cdc-49c7-a183-83182c64d2b1",
+            "f0add14e-42b8-4f6f-9867-22506b45bd27",
+            "b26ea811-8430-45aa-9cf0-b365e3024b70"
+        ],
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "released",
+        "aliases": [
+            "cgap:msa_GAPSAGFNU47D-GAPSAER8DDOY-GAPSAT5GKNCF"
+        ],
+        "uuid": "8dd51b60-2d65-4e74-ac86-08ff9159be90",
+        "completed_processes": [
+            "WGS PartIII V14"
+        ],
+        "schema_version": "1",
+        "date_created": "2020-07-07T06:50:27.067731+00:00",
+        "last_modified": {
+            "date_modified": "2020-07-09T14:08:37.870985+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        }
+    },
+    {
+        "families": [
+            "5e079547-1575-4e4c-acd1-6aa74b931993"
+        ],
+        "processed_files": [
+            "77b3aa12-fd02-445b-bc0e-5a93a16f8fe0"
+        ],
+        "project": "f01ff5be-a72d-43bd-afcf-174fa9dcd282",
+        "analysis_type": "WGS-Trio",
+        "samples": [
+            "84bef6f5-fdb2-463c-857a-559c747698e1",
+            "f41d8f1c-2508-4a76-bec4-b074641000fa",
+            "a4c0c1da-df72-4a05-a5b6-5725a7735b5c"
+        ],
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "released",
+        "aliases": [
+            "cgap:msa_GAPSAZON42TE-GAPSALYLZ7YL-GAPSAWMFIMJ5"
+        ],
+        "uuid": "0a2d5fc7-2bd5-4289-a59c-40f7c633214c",
+        "completed_processes": [
+            "WGS PartII V13"
+        ],
+        "schema_version": "1",
+        "date_created": "2020-07-07T02:42:23.222924+00:00",
+        "last_modified": {
+            "date_modified": "2020-07-07T15:50:02.293439+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        }
+    },
+    {
+        "families": [
+            "21f2af73-2c2e-4101-bbfb-bb2754f302ad"
+        ],
+        "processed_files": [
+            "bd12fe4d-eb8d-4bd5-9e56-c2ecc9baabcd"
+        ],
+        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
+        "analysis_type": "WGS",
+        "samples": [
+            "f0add14e-42b8-4f6f-9867-22506b45bd27"
+        ],
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "released",
+        "aliases": [
+            "cgap:msa_GAPSAER8DDOY"
+        ],
+        "uuid": "8dd51b60-2d65-4e74-ac86-08ff9159abcd",
+        "completed_processes": [
+            "WGS PartII V13"
+        ],
+        "schema_version": "1"
+    }
+]

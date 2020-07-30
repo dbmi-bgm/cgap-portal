@@ -70,5 +70,15 @@
     "plugins": [
         "react",
         "cypress"
+    ],
+    "overrides": [
+        {
+            "files" : ["./src/encoded/static/data/*.jsx"],
+            "rules" : {
+                "react/jsx-no-undef" : 0,
+                "semi" : 0,
+                "react/react-in-jsx-scope" : 0
+            }
+        }
     ]
 }
