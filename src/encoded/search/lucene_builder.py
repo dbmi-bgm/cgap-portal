@@ -812,8 +812,8 @@ class LuceneBuilder:
                                     found = True
                                     break
         except QueryConstructionException:
-            log.error('SEARCH: Detected URL query param manipulation, principals_allowed.view was '
-                      'modified from %s to %s' % (request.effective_principals,
+            log.error('SEARCH: Detected URL query param manipulation, principals_allowed.view was'
+                      ' modified from %s to %s' % (request.effective_principals,
                                                   effective_principals_on_query))
             raise HTTPBadRequest('The search failed - the DCIC team has been notified.')
         except KeyError:

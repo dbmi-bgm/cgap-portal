@@ -11,7 +11,7 @@ import pstats
 from collections import OrderedDict, deque
 from dcicutils.env_utils import CGAP_ENV_WEBDEV, is_stg_or_prd_env, prod_bucket_env
 from inspect import signature
-from pyramid.httpexceptions import HTTPUnprocessableEntity
+from pyramid.httpexceptions import HTTPUnprocessableEntity, HTTPBadRequest
 from pyramid.response import Response
 from pyramid.view import view_config
 from snovault import calculated_property, collection, load_schema, CONNECTION, TYPES
@@ -944,12 +944,12 @@ def pseudo_run(context, request):
     res_decode = res['Payload'].read().decode()
     res_dict = json.loads(res_decode)
 
-    # known to fail and propagate exception
+    # propagate response and error up if encountered
     try:
         arn = res_dict['_tibanna']['response']['executionArn']
     except Exception as e:
-        # XXX: do something
-        raise e
+        raise HTTPBadRequest('Exception encountered getting response from lambda: %s\n'
+                             'Response: %s' % (e, res_dict))
 
     # just loop until we get proper status
     for i in range(100):
