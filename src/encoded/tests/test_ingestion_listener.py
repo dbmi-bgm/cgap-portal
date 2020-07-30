@@ -159,5 +159,5 @@ def test_ingestion_listener_run(testapp, mocked_vcf_file, gene_workbook, post_va
     #      error occurred.
     with mock.patch('encoded.ingestion_listener.IngestionListener.should_remain_online',
                     new=mocked_should_remain_online):
-        #with pytest.raises(ValueError):
-        run(testapp, _queue_manager=queue_manager)  # expected in this test since the source VCF is malformed
+        with pytest.raises(ValueError):
+            run(testapp, _queue_manager=queue_manager)  # expected in this test since the source VCF is malformed
