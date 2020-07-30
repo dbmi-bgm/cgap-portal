@@ -24,8 +24,9 @@ from pyramid.view import view_config
 from snovault.util import debug_log
 from vcf import Reader
 from .commands.ingest_vcf import VCFParser
-from .common import register_path_content_type, DATA_BUNDLE_BUCKET, SubmissionFailure
-from .ingestion_engines import get_ingestion_processor
+from .ingestion.common import register_path_content_type, DATA_BUNDLE_BUCKET, SubmissionFailure
+from .ingestion.processors import get_ingestion_processor
+from .types.ingestion import SubmissionFolio
 from .util import resolve_file_path, gunzip_content, debuglog
 
 
@@ -550,12 +551,9 @@ class IngestionListener:
                 if ingestion_type != 'vcf':
                     # Let's minimally disrupt things for now. We can refactor this later
                     # to make all the parts work the same -kmp
-                    self.vapp.post_json("/ingestion-submission", {
-                        "ingestion_type": ingestion_type,
-                        "submission_id": uuid,
-                    })
+                    submission = SubmissionFolio(vapp=self.vapp, ingestion_type=ingestion_type, submission_id=uuid)
                     handler = get_ingestion_processor(ingestion_type)
-                    handler(uuid=uuid, ingestion_type=ingestion_type, vapp=self.vapp, log=log)
+                    handler(submission)
                     # TODO: If we delete messages at the end of each loop, I think we'll here need to do this,
                     #       since we're bypassing bottom of lop with the 'continue':
                     #          self.delete_messages([message])

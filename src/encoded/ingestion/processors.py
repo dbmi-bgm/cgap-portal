@@ -2,9 +2,10 @@ import boto3
 import json
 import traceback
 
-from .common import DATA_BUNDLE_BUCKET, get_parameter
-from .util import debuglog, s3_output_stream, create_empty_s3_file
-from .submit import submit_data_bundle
+from encoded.ingestion.common import DATA_BUNDLE_BUCKET, get_parameter
+from encoded.util import debuglog, s3_output_stream, create_empty_s3_file
+from encoded.submit import submit_data_bundle
+from .exceptions import UndefinedIngestionProcessorType
 
 
 INGESTION_UPLOADERS = {}
@@ -22,13 +23,6 @@ def ingestion_processor(processor_type):
     return ingestion_type_decorator
 
 
-class UndefinedIngestionProcessorType(Exception):
-
-    def __init__(self, processor_type):
-        self.ingestion_type_name = processor_type
-        super().__init__("No ingestion processor type %r is defined." % processor_type)
-
-
 def get_ingestion_processor(processor_type):
     handler = INGESTION_UPLOADERS.get(processor_type, None)
     if not handler:
@@ -42,15 +36,17 @@ def _show_report_lines(lines, fp, default="Nothing to report."):
 
 
 @ingestion_processor('data_bundle')
-def handle_data_bundle(*, uuid, ingestion_type, vapp, log):
+def handle_data_bundle(submission):
 
-    log.info("Processing {uuid} as {ingestion_type}.".format(uuid=uuid, ingestion_type=ingestion_type))
+    submission.log.info("Processing {submission_id} as {ingestion_type}."
+                        .format(submission_id=submission.submission_id, ingestion_type=submission.ingestion_type))
 
-    if ingestion_type != 'data_bundle':
+    if submission.ingestion_type != 'data_bundle':
         raise RuntimeError("handle_data_bundle only works for ingestion_type data_bundle.")
 
+    submission_id = submission.submission_id
     s3_client = boto3.client('s3')
-    manifest_key = "%s/manifest.json" % uuid
+    manifest_key = "%s/manifest.json" % submission_id
     response = s3_client.get_object(Bucket=DATA_BUNDLE_BUCKET, Key=manifest_key)
     manifest = json.load(response['Body'])
 
@@ -59,10 +55,10 @@ def handle_data_bundle(*, uuid, ingestion_type, vapp, log):
     institution = get_parameter(parameters, 'institution')
     project = get_parameter(parameters, 'project')
 
-    debuglog(uuid, "data_key:", data_key)
-    debuglog(uuid, "parameters:", parameters)
+    debuglog(submission_id, "data_key:", data_key)
+    debuglog(submission_id, "parameters:", parameters)
 
-    started_key = "%s/started.txt" % uuid
+    started_key = "%s/started.txt" % submission_id
     create_empty_s3_file(s3_client, bucket=DATA_BUNDLE_BUCKET, key=started_key)
 
     # PyCharm thinks this is unused. -kmp 26-Jul-2020
@@ -76,33 +72,24 @@ def handle_data_bundle(*, uuid, ingestion_type, vapp, log):
 
     try:
 
-        if isinstance(institution, str):
-            institution = vapp.get(institution).json
-        if isinstance(project, str):
-            project = vapp.get(project).json
+        submission.set_item_detail(object_name=manifest['object_name'], parameters=manifest['parameters'],
+                                   institution=institution, project=project)
 
-        vapp.patch_json("/ingestion-submission", {
-            "object_name": manifest['object_name'],
-            "ingestion_type": ingestion_type,
-            "submission_id": uuid,
-            "parameters": manifest['parameters'],
-            "institution": institution,
-            "project": project,
-            "processing_status": {
-                "state": "processing",
-            }
-        })
+        if isinstance(institution, str):
+            institution = submission.vapp.get(institution).json
+        if isinstance(project, str):
+            project = submission.vapp.get(project).json
 
         validation_log_lines, final_json, result_lines = submit_data_bundle(s3_client=s3_client,
                                                                             bucket=DATA_BUNDLE_BUCKET,
                                                                             key=data_key,
                                                                             project=project,
                                                                             institution=institution,
-                                                                            vapp=vapp)
+                                                                            vapp=submission.vapp)
 
-        resolution["validation_report_key"] = validation_report_key = "%s/validation-report.txt" % uuid
-        resolution["submission_key"] = submission_key = "%s/submission.json" % uuid
-        resolution["submission_response_key"] = submission_response_key = "%s/submission-response.txt" % uuid
+        resolution["validation_report_key"] = validation_report_key = "%s/validation-report.txt" % submission_id
+        resolution["submission_key"] = submission_key = "%s/submission.json" % submission_id
+        resolution["submission_response_key"] = submission_response_key = "%s/submission-response.txt" % submission_id
 
         with s3_output_stream(s3_client, bucket=DATA_BUNDLE_BUCKET, key=validation_report_key) as fp:
             _show_report_lines(validation_log_lines, fp)
@@ -113,32 +100,19 @@ def handle_data_bundle(*, uuid, ingestion_type, vapp, log):
         with s3_output_stream(s3_client, bucket=DATA_BUNDLE_BUCKET, key=submission_response_key) as fp:
             _show_report_lines(result_lines, fp)
 
-        vapp.patch_json("ingestion-submission", {
-            "submission_id": uuid,
-            "progress": {
-                "state": "done",
-                "outcome": "failure" if validation_log_lines else "success",
-                "progress": "complete",
-            },
-        })
+        # TODO: Sarah will provide a way to tell success from failure. -kmp 28-Jul-2020
+        submission.patch_item(processing_status={"state": "done", "outcome": "success", "progress": "complete"})
 
     except Exception as e:
 
-        resolution["traceback_key"] = traceback_key = "%s/traceback.json" % uuid
+        resolution["traceback_key"] = traceback_key = "%s/traceback.txt" % submission_id
         with s3_output_stream(s3_client, bucket=DATA_BUNDLE_BUCKET, key=traceback_key) as fp:
             traceback.print_exc(file=fp)
 
         resolution["error_type"] = e.__class__.__name__
         resolution["error_message"] = str(e)
 
-        vapp.patch_json("ingestion-submission", {
-            "submission_id": uuid,
-            "progress": {
-                "state": "done",
-                "outcome": "error",
-                "progress": "incomplete",
-            },
-        })
+        submission.patch_item(processing_status={"state": "done", "outcome": "error", "progress": "incomplete"})
 
-    with s3_output_stream(s3_client, bucket=DATA_BUNDLE_BUCKET, key="%s/resolution.json" % uuid) as fp:
+    with s3_output_stream(s3_client, bucket=DATA_BUNDLE_BUCKET, key="%s/resolution.json" % submission_id) as fp:
         print(json.dumps(resolution, indent=2), file=fp)

@@ -7,16 +7,10 @@ import contextlib
 import io
 import os
 import tempfile
-
-
-
+from .exceptions import SubmissionFailure, MissingParameter
 
 
 DATA_BUNDLE_BUCKET = 'cgap-data-bundles'
-
-
-class SubmissionFailure(Exception):
-    pass
 
 
 CONTENT_TYPE_SPECIAL_CASES = {
@@ -54,13 +48,6 @@ def content_type_allowed(request):
                 return True
 
     return False
-
-
-class MissingParameter(Exception):
-
-    def __init__(self, parameter_name):
-        self.parameter_name = parameter_name
-        super().__init__("Missing parameter: %s" % parameter_name)
 
 
 _NO_DEFAULT = object()

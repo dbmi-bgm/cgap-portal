@@ -64,16 +64,16 @@ LINKS = [
 #
 #  This will be done differently soon as part of the "/submit_for_ingestion" endpoint that
 #  will be in ingestion_listener.py. That endpoint will need an "?ingestion type=data_bundle"
-#  as query parameter. That "data_bundle" ingestion type will defined in ingestion_engines.py.
+#  as query parameter. That "data_bundle" ingestion type will defined in ingestion/processors.py.
 #  The new entry point here that will be needed is submit_data_bundle, and then this temporary
 #  "/submit_data" endpoint can presumably go away.. -kmp 25-Jul-2020
 
 @view_config(route_name='submit_data', request_method='POST', permission='add')
 @debug_log
 def submit_data(context, request):
-    '''
+    """
     usage notes here later
-    '''
+    """
     config_uri = request.json.get('config_uri', 'production.ini')
     patch_only = request.json.get('patch_only', False)
     post_only = request.json.get('post_only', False)
