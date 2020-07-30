@@ -16,7 +16,7 @@ import subprocess
 import sys
 
 from pkg_resources import resource_filename
-from pyramid.paster import get_app, get_appsettings
+from pyramid.paster import get_app  # , get_appsettings
 from pyramid.path import DottedNameResolver
 from snovault.elasticsearch import create_mapping
 from snovault.tests import elasticsearch_fixture, postgresql_fixture
@@ -73,7 +73,7 @@ def ingestion_listener_process(config_uri, app_name, echo=True):
 
 
 def main():
-    parser = argparse.ArgumentParser(
+    parser = argparse.ArgumentParser(  # noqa - PyCharm wrongly thinks the formatter_class is specified wrong here.
         description="Run development servers", epilog=EPILOG,
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
@@ -84,18 +84,12 @@ def main():
     parser.add_argument('--load', action="store_true", help="Load test set")
     parser.add_argument('--datadir', default='/tmp/snovault', help="path to datadir")
     parser.add_argument('--no_ingest', action="store_true", default=False, help="Don't start the ingestion process.")
-    parser.add_argument('--ingest_only', action="store_true", default=False, help="Only start the ingestion engine.")
     args = parser.parse_args()
 
     run(app_name=args.app_name, config_uri=args.config_uri, datadir=args.datadir,
-        clear=args.clear, init=args.init, load=args.load, no_ingest=args.no_ingest, ingest_only=args.ingest_only)
+        clear=args.clear, init=args.init, load=args.load, ingest=not args.no_ingest)
 
-def run(app_name, config_uri, datadir, clear=False, init=False, load=False, no_ingest=False, ingest_only=False):
-
-    if ingest_only:
-        clear = False
-        init = False
-        load = False
+def run(app_name, config_uri, datadir, clear=False, init=False, load=False, ingest=True):
 
     logging.basicConfig(format='')
     # Loading app will have configured from config file. Reconfigure here:
@@ -103,36 +97,33 @@ def run(app_name, config_uri, datadir, clear=False, init=False, load=False, no_i
 
     # get the config and see if we want to connect to non-local servers
     # TODO: This variable seems to not get used? -kmp 25-Jul-2020
-    config = get_appsettings(config_uri, app_name)
+    # config = get_appsettings(config_uri, app_name)
 
     datadir = os.path.abspath(datadir)
     pgdata = os.path.join(datadir, 'pgdata')
     esdata = os.path.join(datadir, 'esdata')
-    ### comment out from HERE...
+    # ----- comment out from HERE...
     if clear:
         for dirname in [pgdata, esdata]:
             if os.path.exists(dirname):
                 shutil.rmtree(dirname)
     if init:
         postgresql_fixture.initdb(pgdata, echo=True)
-    ### ... to HERE to disable recreation of test db
-    ### may have to `rm /tmp/snovault/pgdata/postmaster.pid`
-
-    if ingest_only:
-        print("Do this instead: ",
-              "SNOVAULT_DB_TEST_PORT=" + os.environ["SNOVAULT_DB_TEST_PORT"],
-              " ".join(ingestion_listener_compute_command(config_uri, app_name)))
-        return
+    # ----- ... to HERE to disable recreation of test db
+    # ----- may have to `rm /tmp/snovault/pgdata/postmaster.pid`
 
     processes = []
-    if not ingest_only:
-        postgres = postgresql_fixture.server_process(pgdata, echo=True)
-        processes.append(postgres)
-        elasticsearch = elasticsearch_fixture.server_process(esdata, echo=True)
-        processes.append(elasticsearch)
-        nginx = nginx_server_process(echo=True)
-        processes.append(nginx)
-    if not no_ingest:
+
+    postgres = postgresql_fixture.server_process(pgdata, echo=True)
+    processes.append(postgres)
+
+    elasticsearch = elasticsearch_fixture.server_process(esdata, echo=True)
+    processes.append(elasticsearch)
+
+    nginx = nginx_server_process(echo=True)
+    processes.append(nginx)
+
+    if ingest:
         ingestion_listener = ingestion_listener_process(config_uri, app_name)
         processes.append(ingestion_listener)
 
@@ -154,7 +145,6 @@ def run(app_name, config_uri, datadir, clear=False, init=False, load=False, no_i
     else:
         app = None
 
-
     # clear queues and initialize indices before loading data. No indexing yet.
     # this is needed for items with properties stored in ES
     if init:
@@ -165,7 +155,7 @@ def run(app_name, config_uri, datadir, clear=False, init=False, load=False, no_i
         load_test_data = DottedNameResolver().resolve(load_test_data)
         load_res = load_test_data(app)
         if load_res:  # None if successful
-            raise(load_res)
+            raise load_res
 
         # now clear the queues and queue items for indexing
         create_mapping.run(app, check_first=True, strict=True, purge_queue=False)
@@ -185,6 +175,7 @@ def run(app_name, config_uri, datadir, clear=False, init=False, load=False, no_i
                 for line in iter(stdout.readline, b''):
                     sys.stdout.write(line.decode('utf-8'))
             break
+
 
 if __name__ == '__main__':
     main()

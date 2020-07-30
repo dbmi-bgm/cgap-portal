@@ -1,0 +1,2 @@
+This is some text
+for use in testing gzip tools.
