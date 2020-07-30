@@ -344,10 +344,6 @@ class IngestionListener:
     def build_variant_link(self, variant):
         """ This function takes a variant record and returns the corresponding UUID of this variant
             in the portal via search.
-
-            XXX: This should be refactored to be unneeded. You should be able to form the link from
-            annotation_id (or display_title). This slows down the ingestion process by a decent amount,
-            but is tolerable since it still proceeds at the same rate as indexing.
         """
         annotation_id = 'chr%s:%s%s_%s' % (variant['CHROM'], variant['POS'], variant['REF'], variant['ALT'])
         return annotation_id
