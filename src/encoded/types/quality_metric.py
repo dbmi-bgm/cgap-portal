@@ -225,6 +225,12 @@ class QualityMetricVcfqc(QualityMetric):
         qc = self.properties
         qc_summary = []
         
+        def denovo_fraction(total, de_novo):
+            '''calculate percentage of de_novo in total'''
+            if total < 0:
+                return -1
+            return round((int(de_novo) / int(total)) * 100 * 1000) / 1000
+
         if 'transition-transversion ratio' in qc:
             # full set
             for tv in qc.get("total variants"):
@@ -251,9 +257,9 @@ class QualityMetricVcfqc(QualityMetric):
                 denovo = me.get("counts", {}).get("het", {}).get("de_novo")
                 qc_summary.append({"title": "De Novo Fraction",
                                    "sample": me.get("name"),
-                                   "value": str(denovo/total) if total>0 else '-1',
+                                   "value": str(denovo_fraction(total, de_novo)),
                                    "tooltip": "Fraction of GATK-based de novo mutations among heterozygous SNVs",
-                                   "numberType": "float"})
+                                   "numberType": "percent"})
         else:
         # filtered set
             for tv in qc.get("total variants"):
