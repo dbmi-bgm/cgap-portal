@@ -1,4 +1,5 @@
 """The type file for the collection Quality Metric."""
+from snovault.calculated import calculate_properties
 from snovault import (
     abstract_collection,
     # calculated_property,
