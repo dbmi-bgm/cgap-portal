@@ -228,19 +228,19 @@ class QualityMetricVcfqc(QualityMetric):
             # full set
             for tv in qc.get("total variants"):
                 qc_summary.append({"title": "Total Variants Called",
-                                   "sample": tv.get("name")
+                                   "sample": tv.get("name"),
                                    "value": str(tv.get("total")),
                                    "numberType": "integer"})
 
             for ttr in qc.get("transition-transversion ratio"):
                 qc_summary.append({"title": "Transition-Transversion Ratio",
-                                   "sample": ttr.get("name")
+                                   "sample": ttr.get("name"),
                                    "value": str(ttr.get("ratio")),
                                    "numberType": "float"})
 
             for hr in qc.get("heterozygosity ratio"):
                 qc_summary.append({"title": "Heterozygosity Ratio",
-                                   "sample": hr.get("name")
+                                   "sample": hr.get("name"),
                                    "value": str(hr.get("ratio")),
                                    "tooltip": "Het/Homo ratio",
                                    "numberType": "float"})
@@ -249,7 +249,7 @@ class QualityMetricVcfqc(QualityMetric):
                 total = me.get("counts", {}).get("het", {}).get("total")
                 denovo = me.get("counts", {}).get("het", {}).get("de_novo")
                 qc_summary.append({"title": "De Novo Fraction",
-                                   "sample": me.get("name")
+                                   "sample": me.get("name"),
                                    "value": str(denovo/total) if total>0 else '-1',
                                    "tooltip": "Fraction of GATK-based de novo mutations among heterozygous SNVs",
                                    "numberType": "float"})
@@ -257,7 +257,7 @@ class QualityMetricVcfqc(QualityMetric):
         # filtered set
             for tv in qc.get("total variants"):
                 qc_summary.append({"title": "Filtered Variants",
-                                   "sample": tv.get("name")
+                                   "sample": tv.get("name"),
                                    "value": str(tv.get("total")),
                                    "tooltip": "Exonic and splice variants, clinvar pathogenic" +
                                               "/Likely Pathogenic or conflicting submissions, spliceAI>0.2," +
