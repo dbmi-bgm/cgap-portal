@@ -254,7 +254,7 @@ class QualityMetricVcfqc(QualityMetric):
  
             for me in qc.get("mendelian errors in trio", {}).get("SNV"):
                 total = me.get("counts", {}).get("het", {}).get("total")
-                denovo = me.get("counts", {}).get("het", {}).get("de_novo")
+                de_novo = me.get("counts", {}).get("het", {}).get("de_novo")
                 qc_summary.append({"title": "De Novo Fraction",
                                    "sample": me.get("name"),
                                    "value": str(denovo_fraction(total, de_novo)),
