@@ -227,7 +227,7 @@ class QualityMetricVcfqc(QualityMetric):
         
         def denovo_fraction(total, de_novo):
             '''calculate percentage of de_novo in total'''
-            if total < 0:
+            if total <= 0:
                 return -1
             return round((int(de_novo) / int(total)) * 100 * 1000) / 1000
 
@@ -253,8 +253,8 @@ class QualityMetricVcfqc(QualityMetric):
                                    "numberType": "float"})
  
             for me in qc.get("mendelian errors in trio", {}).get("SNV"):
-                total = me.get("counts", {}).get("het", {}).get("total")
-                de_novo = me.get("counts", {}).get("het", {}).get("de_novo")
+                total = me.get("counts", {}).get("het", {}).get("total", 0)
+                de_novo = me.get("counts", {}).get("het", {}).get("de_novo", 0)
                 qc_summary.append({"title": "De Novo Fraction",
                                    "sample": me.get("name"),
                                    "value": str(denovo_fraction(total, de_novo)),
