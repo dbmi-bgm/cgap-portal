@@ -261,7 +261,7 @@ class QualityMetricVcfqc(QualityMetric):
                                    "value": str(tv.get("total")),
                                    "tooltip": "Exonic and splice variants, clinvar pathogenic" +
                                               "/Likely Pathogenic or conflicting submissions, spliceAI>0.2," +
-                                              "not seen in 2 individuals among a set of 20 unrelated samples"
+                                              "not seen in 2 individuals among a set of 20 unrelated samples",
                                    "numberType": "integer"})
 
         return qc_summary
