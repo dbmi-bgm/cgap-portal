@@ -12,6 +12,54 @@ from .base import (
     # lab_award_attribution_embed_list
 )
 
+"""Schema for QCs' quality_metric_summary calculated property"""
+QC_SUMMARY_SCHEMA = {
+    "type": "array",
+    "title": "Quality Metric Summary",
+    "description": "Selected Quality Metrics for Summary",
+    "exclude_from": ["submit4dn", "FFedit-create"],
+    "items": {
+            "title": "Selected Quality Metric",
+            "type": "object",
+            "required": ["title", "value", "numberType"],
+            "additionalProperties": False,
+            "properties": {
+                "title": {
+                    "type": "string",
+                    "title": "Title",
+                    "description": "Title of the Quality Metric",
+                },
+                "title_tooltip": {
+                    "type": "string",
+                    "title": "Tooltip Title",
+                    "description": "tooltip for the quality metric title to be displayed upon mouseover"
+                },
+                "sample": {
+                    "type": "string",
+                    "title": "Sample",
+                    "description": "sample for which the quality metric was calculated"
+                },
+                "value": {
+                    "type": "string",
+                    "title": "Value",
+                    "description": "value of the quality metric as a string"
+                },
+                "tooltip": {
+                    "type": "string",
+                    "title": "Tooltip",
+                    "description": "tooltip for the quality metric to be displayed upon mouseover"
+                },
+                "numberType": {
+                    "type": "string",
+                    "title": "Type",
+                    "description": "type of the quality metric",
+                    "enum": ["string", "integer", "float", "percent"]
+                }
+            }
+    }
+}
+
+
 """OVERALL QAULITY SCORE INFO
 All QC objects come with a field 'overall_quality_status', which is by default set to 'PASS'
 For some qc object we don't have a current protocol to judge the overall quality based on the
@@ -170,3 +218,51 @@ class QualityMetricVcfqc(QualityMetric):
     item_type = 'quality_metric_vcfqc'
     schema = load_schema('encoded:schemas/quality_metric_vcfqc.json')
     embedded_list = QualityMetric.embedded_list
+
+    @calculated_property(schema=QC_SUMMARY_SCHEMA)
+    def quality_metric_summary(self, request):
+        qc = self.properties
+        qc_summary = []
+        
+        if 'transition-transversion ratio' in qc:
+            # full set
+            for tv in qc.get("total variants"):
+                qc_summary.append({"title": "Total Variants Called",
+                                   "sample": tv.get("name")
+                                   "value": str(tv.get("total")),
+                                   "numberType": "integer"})
+
+            for ttr in qc.get("transition-transversion ratio"):
+                qc_summary.append({"title": "Transition-Transversion Ratio",
+                                   "sample": ttr.get("name")
+                                   "value": str(ttr.get("ratio")),
+                                   "numberType": "float"})
+
+            for hr in qc.get("heterozygosity ratio"):
+                qc_summary.append({"title": "Heterozygosity Ratio",
+                                   "sample": hr.get("name")
+                                   "value": str(hr.get("ratio")),
+                                   "tooltip": "Het/Homo ratio",
+                                   "numberType": "float"})
+ 
+            for me in qc.get("mendelian errors in trio", {}).get("SNV"):
+                total = me.get("counts", {}).get("het", {}).get("total")
+                denovo = me.get("counts", {}).get("het", {}).get("de_novo")
+                qc_summary.append({"title": "De Novo Fraction",
+                                   "sample": me.get("name")
+                                   "value": str(denovo/total) if total>0 else '-1',
+                                   "tooltip": "Fraction of GATK-based de novo mutations among heterozygous SNVs",
+                                   "numberType": "float"})
+        else:
+        # filtered set
+            for tv in qc.get("total variants"):
+                qc_summary.append({"title": "Filtered Variants",
+                                   "sample": tv.get("name")
+                                   "value": str(tv.get("total")),
+                                   "tooltip": "Exonic and splice variants, clinvar pathogenic" +
+                                              "/Likely Pathogenic or conflicting submissions, spliceAI>0.2," +
+                                              "not seen in 2 individuals among a set of 20 unrelated samples"
+                                   "numberType": "integer"})
+
+        return qc_summary
+
