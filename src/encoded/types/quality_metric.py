@@ -2,7 +2,7 @@
 from snovault.calculated import calculate_properties
 from snovault import (
     abstract_collection,
-    # calculated_property,
+    calculated_property,
     collection,
     load_schema,
 )
