@@ -109,7 +109,8 @@ def submit_data_bundle(*, s3_client, bucket, key, project, institution, vapp):  
             'success': False,
             'validation_output': [],
             'final_json': {},
-            'post_output': []
+            'post_output': [],
+            'file_info': []
         }
         json_data, json_success = xls_to_json(file, project=project_json, institution=institution_json)
         if not json_success:
@@ -121,9 +122,10 @@ def submit_data_bundle(*, s3_client, bucket, key, project, institution, vapp):  
         if not validate_success:
             return results
         results['success'] = validate_success
-        result_lines, post_success = post_and_patch_all_items(vapp, final_json)
+        result_lines, post_success, files_to_upload = post_and_patch_all_items(vapp, final_json)
         results['post_output'] = result_lines
         results['success'] = post_success
+        results['file_info'] = files_to_upload
         return results
 
 
@@ -386,7 +388,7 @@ def fetch_file_metadata(idx, filenames, proj_name):
             'row': idx,
             'file_format': '/file-formats/{}/'.format(fmt),
             'file_type': valid_extensions[extension[0]][1],
-            'filename': filename  # causes problems without functional file upload
+            'filename': filename.strip()  # causes problems without functional file upload
         }
         if fmt == 'fastq':
             files['file_fastq'][file_alias] = file_info
@@ -666,6 +668,7 @@ def validate_all_items(virtualapp, json_data):
 
 def post_and_patch_all_items(virtualapp, json_data_final):
     output = []
+    files = []
     if not json_data_final:
         return output, 'not run'
     item_names = {'individual': 'individual_id', 'family': 'family_id', 'sample': 'specimen_accession'}
@@ -676,11 +679,14 @@ def post_and_patch_all_items(virtualapp, json_data_final):
             final_status[k] = {'posted': 0, 'not posted': 0, 'patched': 0, 'not patched': 0}
             for item in v:
                 patch_info = {}
-                row = item['row']
+                row = item.get('row')
                 if row:
                     del item['row']
                 # if 'filename' in item:  # until we have functional file upload
                 #     del item['filename']
+                fname = item.get('filename')
+                if fname:
+                    del item['filename']
                 for field in LINKS:
                     if field in item:
                         patch_info[field] = item[field]
@@ -695,6 +701,11 @@ def post_and_patch_all_items(virtualapp, json_data_final):
                         json_data_final['patch'][k][atid] = patch_info
                         if k in item_names:
                             output.append('Success - {} {} posted'.format(k, item[item_names[k]]))
+                        if fname:
+                            files.append({
+                                'uuid': response.json['@graph'][0]['uuid'],
+                                'filename': fname
+                            })
                     else:
                         final_status[k]['not posted'] += 1
                         no_errors = False
@@ -712,12 +723,20 @@ def post_and_patch_all_items(virtualapp, json_data_final):
         for item_id, patch_data in v.items():
             # if 'filename' in patch_data:  # until we have functional file upload
             #     del patch_data['filename']
+            fname = patch_data.get('filename')
+            if fname:
+                del patch_data['filename']
             try:
                 response = virtualapp.patch_json('/' + item_id, patch_data, status=200)
                 if response.json['status'] == 'success':
                     # if k in item_names:
                     #     output.append('Success - {} {} patched'.format(k, patch_data[item_names[k]]))
                     final_status[k]['patched'] += 1
+                    if fname:
+                        files.append({
+                            'uuid': response.json['@graph'][0]['uuid'],
+                            'filename': fname
+                        })
                 else:
                     final_status[k]['not patched'] += 1
                     no_errors = False
@@ -729,7 +748,7 @@ def post_and_patch_all_items(virtualapp, json_data_final):
             output.append('{}: {} items patched successfully; {} items not patched'.format(
                 k, final_status[k]['patched'], final_status[k]['not patched']
             ))
-    return output, no_errors
+    return output, no_errors, files
 
 
 def cell_value(cell, datemode):

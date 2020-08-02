@@ -154,6 +154,7 @@ def handle_data_bundle(*, uuid, ingestion_type, vapp, log):
         resolution["validation_report_key"] = validation_report_key = "%s/validation-report.txt" % uuid
         resolution["submission_key"] = submission_key = "%s/submission.json" % uuid
         resolution["submission_response_key"] = submission_response_key = "%s/submission-response.txt" % uuid
+        resolution["info_for_file_upload_key"] = info_for_file_upload_key = "%s/info_for_file_upload.txt" % uuid
 
         with s3_output_stream(s3_client, bucket=DATA_BUNDLE_BUCKET, key=validation_report_key) as fp:
             _show_report_lines(data_bundle_result['validation_output'], fp)
@@ -166,6 +167,10 @@ def handle_data_bundle(*, uuid, ingestion_type, vapp, log):
         if data_bundle_result['post_output']:
             with s3_output_stream(s3_client, bucket=DATA_BUNDLE_BUCKET, key=submission_response_key) as fp:
                 _show_report_lines(data_bundle_result['post_output'], fp)
+
+        if data_bundle_result['file_info']:
+            with s3_output_stream(s3_client, bucket=DATA_BUNDLE_BUCKET, key=info_for_file_upload_key) as fp:
+                _show_report_lines(data_bundle_result['file_info'], fp)
 
     except Exception as e:
 
