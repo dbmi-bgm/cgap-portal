@@ -170,7 +170,7 @@ def handle_data_bundle(*, uuid, ingestion_type, vapp, log):
 
         if data_bundle_result['file_info']:
             with s3_output_stream(s3_client, bucket=DATA_BUNDLE_BUCKET, key=info_for_file_upload_key) as fp:
-                _show_report_lines(data_bundle_result['file_info'], fp)
+                print(json.dumps(data_bundle_result['file_info'], indent=2), file=fp)
 
     except Exception as e:
 
