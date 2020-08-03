@@ -243,12 +243,12 @@ class QualityMetricVcfqc(QualityMetric):
                                    "sample": ttr.get("name"),
                                    "value": str(ttr.get("ratio")),
                                    "numberType": "float"})
-           # for hr in qc.get("heterozygosity ratio"):
-           #     qc_summary.append({"title": "Heterozygosity Ratio",
-           #                        "sample": hr.get("name"),
-           #                        "value": str(hr.get("ratio")),
-           #                        "tooltip": "Het/Homo ratio",
-           #                        "numberType": "float"})
+            for hr in qc.get("heterozygosity ratio", {}).get("SNV"):
+                qc_summary.append({"title": "Heterozygosity Ratio",
+                                   "sample": hr.get("name"),
+                                   "value": str(hr.get("ratio")),
+                                   "tooltip": "Het/Homo ratio",
+                                   "numberType": "float"})
            # for me in qc.get("mendelian errors in trio", {}).get("SNV"):
            #    total = me.get("counts", {}).get("het", {}).get("total", 0)
            #    de_novo = me.get("counts", {}).get("het", {}).get("de_novo", 0)
