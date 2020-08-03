@@ -3,6 +3,7 @@
         "uuid": "595e3ec5-e4f8-4930-9c70-6e65e9a72d93",
         "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
         "institution": "hms-dbmi",
-        "submitted_by": "soohyun_lee@hms.harvard.edu"
+        "submitted_by": "soohyun_lee@hms.harvard.edu",
+        "filtering_condition": "((Exonic and splice variants OR spliceAI>0.2) AND (gnomAD AF<0.01 AND not seen in 2 individuals among a set of 20 unrelated samples)) OR (Clinvar Pathogenic/Likely Pathogenic or Conflicting Submissions)"
     }
 ]
