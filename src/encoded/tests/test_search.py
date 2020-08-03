@@ -789,3 +789,10 @@ class TestNestedSearch(object):
     def test_search_nested_exists_query(self, testapp):
         """ Tests doing a !=No+value search on a nested sub-field. """
         testapp.get('/search/?type=SampleProcessing&samples.uuid!=No+value', status=404)
+
+    def test_search_nested_field_no_value(self, workbook, testapp):
+        """ Tests that we can do item.sub_embedded_object=No+value and get correct results """
+        res = testapp.get('/search/?type=Variant&hg19=No+value').json
+        self.assert_length_is_expected(res, 1)
+        res = testapp.get('/search/?type=Variant&hg19!=No+value').follow().json
+        self.assert_length_is_expected(res, 3)
