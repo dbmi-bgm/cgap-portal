@@ -263,9 +263,7 @@ class QualityMetricVcfqc(QualityMetric):
                 qc_summary.append({"title": "Filtered Variants",
                                    "sample": tv.get("name"),
                                    "value": str(tv.get("total")),
-                                   "tooltip": "Exonic and splice variants, clinvar pathogenic" +
-                                              "/Likely Pathogenic or conflicting submissions, spliceAI>0.2," +
-                                              "not seen in 2 individuals among a set of 20 unrelated samples",
+                                   "tooltip": qc.get("filtering_condition"),
                                    "numberType": "integer"})
 
         return qc_summary
