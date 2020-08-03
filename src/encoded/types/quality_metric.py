@@ -249,14 +249,14 @@ class QualityMetricVcfqc(QualityMetric):
                                    "value": str(hr.get("ratio")),
                                    "tooltip": "Het/Homo ratio",
                                    "numberType": "float"})
-           # for me in qc.get("mendelian errors in trio", {}).get("SNV"):
-           #    total = me.get("counts", {}).get("het", {}).get("total", 0)
-           #    de_novo = me.get("counts", {}).get("het", {}).get("de_novo", 0)
-           #    qc_summary.append({"title": "De Novo Fraction",
-           #                       "sample": me.get("name"),
-           #                       "value": str(denovo_fraction(total, de_novo)),
-           #                       "tooltip": "Fraction of GATK-based de novo mutations among heterozygous SNVs",
-           #                       "numberType": "percent"})
+            for me in qc.get("mendelian errors in trio", {}).get("SNV"):
+               total = me.get("counts", {}).get("het", {}).get("total", 0)
+               de_novo = me.get("counts", {}).get("het", {}).get("de_novo", 0)
+               qc_summary.append({"title": "De Novo Fraction",
+                                  "sample": me.get("name"),
+                                  "value": str(denovo_fraction(total, de_novo)),
+                                  "tooltip": "Fraction of GATK-based de novo mutations among heterozygous SNVs",
+                                  "numberType": "percent"})
         else:
             # filtered set
             for tv in qc.get("total variants"):
