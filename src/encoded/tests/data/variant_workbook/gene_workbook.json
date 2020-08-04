@@ -757,5 +757,632 @@
   "brainspan_microarray": "CPSF3L",
   "brainspan_rnaseq": "ENSG00000127054",
   "brainatlas_microarray": "CPSF3L"
+},
+  {
+  "chrom": "1",
+  "spos": 1308597,
+  "epos": 1311677,
+  "ensgid": "ENSG00000169972",
+  "strand": "+",
+  "gene_version": "12",
+  "gene_symbol": "PUSL1",
+  "gene_biotype": "protein_coding",
+  "chrom_hg19": "1",
+  "spos_hg19": 1243947,
+  "epos_hg19": 1247057,
+  "strand_hg19": "+",
+  "cytoband": [
+    "1p36.33"
+  ],
+  "hgnc_id": "26914",
+  "name": "pseudouridine synthase like 1",
+  "entrez_id": "126789",
+  "ucsc_id": "uc001aed.4",
+  "refseq_accession": [
+    "NM_153339"
+  ],
+  "ccds_id": [
+    "CCDS20"
+  ],
+  "uniprot_ids": [
+    "Q8N0Z8"
+  ],
+  "mgd_id": [
+    "MGI:3047787"
+  ],
+  "transcriptid": [
+    {
+      "ensembl_trs": "ENST00000379031",
+      "ensembl_pro": "ENSP00000368318"
+    },
+    {
+      "ensembl_trs": "ENST00000467712",
+      "ensembl_pro": "ENSP00000462968"
+    }]
+  },
+  {
+  "chrom": "1",
+  "spos": 1312502,
+  "epos": 1312566,
+  "ensgid": "ENSG00000283712",
+  "strand": "-",
+  "gene_version": "1",
+  "gene_symbol": "MIR6727",
+  "gene_biotype": "miRNA",
+  "cytoband": [
+    "1p36.33"
+  ],
+  "hgnc_id": "50171",
+  "name": "microRNA 6727",
+  "entrez_id": "102465435",
+  "refseq_accession": [
+    "NR_106785"
+  ],
+  "marrvel": "MIR6727",
+  "gtex_expression": "ENSG00000283712.1"
+}, {
+  "chrom": "1",
+  "spos": 1331280,
+  "epos": 1335314,
+  "ensgid": "ENSG00000169962",
+  "strand": "+",
+  "gene_version": "5",
+  "gene_symbol": "TAS1R3",
+  "gene_biotype": "protein_coding",
+  "chrom_hg19": "1",
+  "spos_hg19": 1266694,
+  "epos_hg19": 1270686,
+  "strand_hg19": "+",
+  "cytoband": [
+    "1p36.33"
+  ],
+  "gene_summary": "DVL1, the human homolog of the Drosophila dishevelled gene (dsh) encodes a cytoplasmic phosphoprotein that regulates cell proliferation, acting as a transducer molecule for developmental processes, including segmentation and neuroblast specification. DVL1 is a candidate gene for neuroblastomatous transformation. The Schwartz-Jampel syndrome and Charcot-Marie-Tooth disease type 2A have been mapped to the same region as DVL1. The phenotypes of these diseases may be consistent with defects which might be expected from aberrant expression of a DVL gene during development. [provided by RefSeq, Jul 2008].",
+  "hgnc_id": "15661",
+  "name": "taste 1 receptor member 3",
+  "entrez_id": "83756",
+  "ucsc_id": "uc010nyk.3",
+  "refseq_accession": [
+    "NM_152228"
+  ],
+  "ccds_id": [
+    "CCDS30556"
+  ],
+  "uniprot_ids": [
+    "Q7RTX0"
+  ],
+  "mgd_id": [
+    "MGI:1933547"
+  ],
+  "omim_id": [
+    "605865"
+  ],
+  "transcriptid": [
+    {
+      "ensembl_trs": "ENST00000339381",
+      "ensembl_pro": "ENSP00000344411"
+    }
+  ],
+  "biogrid": [
+    "123757"
+  ],
+  "string": [
+    "9606.ENSP00000344411"
+  ],
+  "genecards": "ENSG00000169962",
+  "pharmgkb": [
+    "PA38012"
+  ],
+  "pathway_kegg_id": "hsa04742",
+  "pathway_kegg_full": "Taste transduction",
+  "trait_association_gwas": [
+    "Inflammatory bowel disease",
+    "Ulcerative colitis"
+  ],
+  "trait_association_gwas_pmid": [
+    "28067908",
+    "28067908"
+  ],
+  "rvis_exac": 2.383358179,
+  "rvis_percentile_exac": 99.00006024,
+  "gdi_phred": 4.39394,
+  "gdp": "Medium",
+  "mgi_mouse_gene": "Tas1r3",
+  "mgi_mouse_phenotype": "taste/olfaction phenotype; nervous system phenotype (the observable morphological and physiological characteristics of the extensive, intricate network of electochemical structures in the body that is comprised of the brain, spinal cord, nerves, ganglia and parts of the receptor organs that are manifested through development and lifespan)",
+  "obs_mis": 732,
+  "exp_mis": 571.75,
+  "oe_mis": 1.2803,
+  "obs_syn": 387,
+  "exp_syn": 276.14,
+  "oe_syn": 1.4015,
+  "obs_lof": 34,
+  "exp_lof": 28.932,
+  "oe_lof": 1.1752,
+  "cds_length": 2556,
+  "num_coding_exons": 6,
+  "marrvel": "TAS1R3",
+  "gtex_expression": "ENSG00000169962.4",
+  "brainspan_rnaseq": "ENSG00000169962",
+  "brainatlas_microarray": "TAS1R3"
+}, {
+  "chrom": "1",
+  "spos": 1324756,
+  "epos": 1328896,
+  "ensgid": "ENSG00000224051",
+  "strand": "+",
+  "gene_version": "7",
+  "gene_symbol": "CPTP",
+  "gene_biotype": "protein_coding",
+  "chrom_hg19": "1",
+  "spos_hg19": 1260136,
+  "epos_hg19": 1264277,
+  "strand_hg19": "+",
+  "cytoband": [
+    "1p36.33"
+  ],
+  "hgnc_id": "28116",
+  "name": "ceramide-1-phosphate transfer protein",
+  "entrez_id": "80772",
+  "refseq_accession": [
+    "NM_001029885"
+  ],
+  "ccds_id": [
+    "CCDS30555"
+  ],
+  "uniprot_ids": [
+    "Q5TA50"
+  ],
+  "mgd_id": [
+    "MGI:1933107"
+  ],
+  "omim_id": [
+    "615467"
+  ],
+  "transcriptid": [
+    {
+      "ensembl_trs": "ENST00000343938",
+      "ensembl_pro": "ENSP00000343890"
+    },
+    {
+      "ensembl_trs": "ENST00000488011",
+      "ensembl_pro": "ENSP00000462636"
+    }
+  ],
+  "pdb": [
+    "4K80",
+    "4K84",
+    "4K85",
+    "4K8N",
+    "4KBS",
+    "4KF6"
+  ],
+  "biogrid": [
+    "123305"
+  ],
+  "string": [
+    "9606.ENSP00000343890"
+  ],
+  "genecards": "ENSG00000224051",
+  "pharmgkb": [
+    "PA162389853"
+  ],
+  "trait_association_gwas": [
+    "Inflammatory bowel disease",
+    "Ulcerative colitis"
+  ],
+  "trait_association_gwas_pmid": [
+    "28067908",
+    "28067908"
+  ],
+  "rvis_exac": 1.053077318,
+  "rvis_percentile_exac": 91.75350882,
+  "mgi_mouse_gene": "Cptp",
+  "obs_mis": 158,
+  "exp_mis": 154.74,
+  "oe_mis": 1.0211,
+  "obs_syn": 88,
+  "exp_syn": 76.737,
+  "oe_syn": 1.1468,
+  "obs_lof": 3,
+  "exp_lof": 5.3083,
+  "oe_lof": 0.56516,
+  "cds_length": 642,
+  "num_coding_exons": 2,
+  "marrvel": "CPTP",
+  "s_het": 0.006516495,
+  "gtex_expression": "ENSG00000224051.6",
+  "brainspan_rnaseq": "ENSG00000224051",
+  "brainatlas_microarray": "GLTPD1"
+}, {
+  "chrom": "1",
+  "spos": 1335276,
+  "epos": 1349418,
+  "ensgid": "ENSG00000107404",
+  "strand": "-",
+  "gene_version": "20",
+  "gene_symbol": "DVL1",
+  "gene_biotype": "protein_coding",
+  "chrom_hg19": "1",
+  "spos_hg19": 1270656,
+  "epos_hg19": 1284730,
+  "strand_hg19": "-",
+  "cytoband": [
+    "1p36.33"
+  ],
+  "gene_summary": "DVL1, the human homolog of the Drosophila dishevelled gene (dsh) encodes a cytoplasmic phosphoprotein that regulates cell proliferation, acting as a transducer molecule for developmental processes, including segmentation and neuroblast specification. DVL1 is a candidate gene for neuroblastomatous transformation. The Schwartz-Jampel syndrome and Charcot-Marie-Tooth disease type 2A have been mapped to the same region as DVL1. The phenotypes of these diseases may be consistent with defects which might be expected from aberrant expression of a DVL gene during development. [provided by RefSeq, Jul 2008].",
+  "hgnc_id": "3084",
+  "name": "dishevelled segment polarity protein 1",
+  "entrez_id": "1855",
+  "ucsc_id": "uc002quu.4",
+  "refseq_accession": [
+    "NM_004421"
+  ],
+  "ccds_id": [
+    "CCDS22",
+    "CCDS81252"
+  ],
+  "uniprot_ids": [
+    "O14640"
+  ],
+  "mgd_id": [
+    "MGI:94941"
+  ],
+  "omim_id": [
+    "601365"
+  ],
+  "orphanet": "426034",
+  "transcriptid": [
+    {
+      "ensembl_trs": "ENST00000378888",
+      "ensembl_pro": "ENSP00000368166"
+    },
+    {
+      "ensembl_trs": "ENST00000378891",
+      "ensembl_pro": "ENSP00000368169"
+    },
+    {
+      "ensembl_trs": "ENST00000632445",
+      "ensembl_pro": "ENSP00000488888"
+    },
+    {
+      "ensembl_trs": "ENST00000631679",
+      "ensembl_pro": "ENSP00000488181"
+    },
+    {
+      "ensembl_trs": "ENST00000610709",
+      "ensembl_pro": "ENSP00000480077"
+    }
+  ],
+  "biogrid": [
+    "108188"
+  ],
+  "string": [
+    "9606.ENSP00000368169"
+  ],
+  "genecards": "ENSG00000107404",
+  "pharmgkb": [
+    "PA27540"
+  ],
+  "genereviews": [
+    "DVL1"
+  ],
+  "pathway_kegg_id": "hsa04310;hsa04330;hsa04916;hsa05210;hsa05217",
+  "pathway_kegg_full": "Wnt signaling pathway;Notch signaling pathway;Melanogenesis;Colorectal cancer;Basal cell carcinoma",
+  "trait_association_gwas": [
+    "Inflammatory bowel disease",
+    "Ulcerative colitis"
+  ],
+  "trait_association_gwas_pmid": [
+    "28067908",
+    "28067908"
+  ],
+  "rvis_exac": -0.531325214,
+  "rvis_percentile_exac": 20.4927414,
+  "gdi_phred": 2.46667,
+  "gdp": "Medium",
+  "mgi_mouse_gene": "Dvl1",
+  "mgi_mouse_phenotype": "hearing/vestibular/ear phenotype; nervous system phenotype (the observable morphological and physiological characteristics of the extensive, intricate network of electochemical structures in the body that is comprised of the brain, spinal cord, nerves, ganglia and parts of the receptor organs that are manifested through development and lifespan); skeleton phenotype; embryo phenotype; behavior/neurological phenotype (the observable actions or reactions of mammalian organisms that are manifested through development and lifespan); mortality/aging (the observable characteristics related to the ability of a mammalian organism to live and age that are manifested throughout development and life span); normal phenotype; cardiovascular system phenotype (the observable morphological and physiological characteristics of the mammalian heart, blood vessels, or circulatory system that are manifested through development and lifespan)",
+  "obs_mis": 554,
+  "exp_mis": 484.18,
+  "oe_mis": 1.1442,
+  "obs_syn": 294,
+  "exp_syn": 203.72,
+  "oe_syn": 1.4431,
+  "obs_lof": 14,
+  "exp_lof": 29.868,
+  "oe_lof": 0.46872,
+  "cds_length": 2010,
+  "num_coding_exons": 15,
+  "marrvel": "DVL1",
+  "s_het": 0.03182546,
+  "gtex_expression": "ENSG00000107404.19",
+  "brainspan_microarray": "DVL1",
+  "brainspan_rnaseq": "ENSG00000107404",
+  "brainatlas_microarray": "DVL1"
+}, {
+  "chrom": "1",
+  "spos": 1352689,
+  "epos": 1361777,
+  "ensgid": "ENSG00000162576",
+  "strand": "-",
+  "gene_version": "16",
+  "gene_symbol": "MXRA8",
+  "gene_biotype": "protein_coding",
+  "chrom_hg19": "1",
+  "spos_hg19": 1288069,
+  "epos_hg19": 1297157,
+  "strand_hg19": "-",
+  "cytoband": [
+    "1p36.33"
+  ],
+  "gene_summary": "DVL1, the human homolog of the Drosophila dishevelled gene (dsh) encodes a cytoplasmic phosphoprotein that regulates cell proliferation, acting as a transducer molecule for developmental processes, including segmentation and neuroblast specification. DVL1 is a candidate gene for neuroblastomatous transformation. The Schwartz-Jampel syndrome and Charcot-Marie-Tooth disease type 2A have been mapped to the same region as DVL1. The phenotypes of these diseases may be consistent with defects which might be expected from aberrant expression of a DVL gene during development. [provided by RefSeq, Jul 2008].",
+  "hgnc_id": "7542",
+  "name": "matrix remodeling associated 8",
+  "entrez_id": "54587",
+  "ucsc_id": "uc001aew.5",
+  "refseq_accession": [
+    "NM_032348"
+  ],
+  "ccds_id": [
+    "CCDS24",
+    "CCDS59950",
+    "CCDS59951",
+    "CCDS59952"
+  ],
+  "uniprot_ids": [
+    "Q9BRK3"
+  ],
+  "mgd_id": [
+    "MGI:1922011"
+  ],
+  "omim_id": [
+    "617293"
+  ],
+  "transcriptid": [
+    {
+      "ensembl_trs": "ENST00000309212",
+      "ensembl_pro": "ENSP00000307887"
+    },
+    {
+      "ensembl_trs": "ENST00000342753",
+      "ensembl_pro": "ENSP00000344998"
+    },
+    {
+      "ensembl_trs": "ENST00000445648",
+      "ensembl_pro": "ENSP00000399229"
+    },
+    {
+      "ensembl_trs": "ENST00000477278",
+      "ensembl_pro": "ENSP00000436135"
+    }
+  ],
+  "pdb": [
+    "6JO8"
+  ],
+  "biogrid": [
+    "120064"
+  ],
+  "string": [
+    "9606.ENSP00000399229"
+  ],
+  "genecards": "ENSG00000162576",
+  "pharmgkb": [
+    "PA31343"
+  ],
+  "trait_association_gwas": [
+    "Inflammatory bowel disease",
+    "Ulcerative colitis",
+    "Intraocular pressure"
+  ],
+  "trait_association_gwas_pmid": [
+    "28067908",
+    "28067908",
+    "29617998~29617998"
+  ],
+  "rvis_exac": -0.202191696,
+  "rvis_percentile_exac": 36.75682188,
+  "gdi_phred": 3.87909,
+  "gdp": "Medium",
+  "mgi_mouse_gene": "Mxra8",
+  "mgi_mouse_phenotype": "normal phenotype",
+  "obs_mis": 208,
+  "exp_mis": 255.34,
+  "oe_mis": 0.81461,
+  "obs_syn": 143,
+  "exp_syn": 121.78,
+  "oe_syn": 1.1743,
+  "obs_lof": 13,
+  "exp_lof": 18.29,
+  "oe_lof": 0.71077,
+  "cds_length": 1326,
+  "num_coding_exons": 10,
+  "marrvel": "MXRA8",
+  "s_het": 0.019663958,
+  "gtex_expression": "ENSG00000162576.16",
+  "brainspan_microarray": "MXRA8",
+  "brainspan_rnaseq": "ENSG00000162576",
+  "brainatlas_microarray": "MXRA8"
+}, {
+  "chrom": "1",
+  "spos": 1471765,
+  "epos": 1497848,
+  "ensgid": "ENSG00000160072",
+  "strand": "+",
+  "gene_version": "20",
+  "gene_symbol": "ATAD3B",
+  "gene_biotype": "protein_coding",
+  "chrom_hg19": "1",
+  "spos_hg19": 1407143,
+  "epos_hg19": 1433228,
+  "strand_hg19": "+",
+  "cytoband": [
+    "1p36.33"
+  ],
+  "hgnc_id": "24007",
+  "name": "ATPase family AAA domain containing 3B",
+  "entrez_id": "83858",
+  "ucsc_id": "uc001afv.4",
+  "refseq_accession": [
+    "NM_031921"
+  ],
+  "ccds_id": [
+    "CCDS30"
+  ],
+  "uniprot_ids": [
+    "Q5T9A4"
+  ],
+  "mgd_id": [
+    "MGI:1919214"
+  ],
+  "omim_id": [
+    "612317"
+  ],
+  "transcriptid": [
+    {
+      "ensembl_trs": "ENST00000673477",
+      "ensembl_pro": "ENSP00000500094"
+    },
+    {
+      "ensembl_trs": "ENST00000308647",
+      "ensembl_pro": "ENSP00000311766"
+    }
+  ],
+  "biogrid": [
+    "123774"
+  ],
+  "string": [
+    "9606.ENSP00000311766"
+  ],
+  "genecards": "ENSG00000160072",
+  "pharmgkb": [
+    "PA134993325"
+  ],
+  "trait_association_gwas": [
+    "Body mass index"
+  ],
+  "trait_association_gwas_pmid": [
+    "26426971"
+  ],
+  "rvis_exac": 2.490540243,
+  "rvis_percentile_exac": 99.11451117,
+  "gdi_phred": 16.40046,
+  "gdp": "High",
+  "mgi_mouse_gene": "Atad3a",
+  "mgi_mouse_phenotype": "muscle phenotype; homeostasis/metabolism phenotype; cellular phenotype; growth/size/body region phenotype; skeleton phenotype; embryo phenotype; behavior/neurological phenotype (the observable actions or reactions of mammalian organisms that are manifested through development and lifespan); mortality/aging (the observable characteristics related to the ability of a mammalian organism to live and age that are manifested throughout development and life span)",
+  "obs_mis": 557,
+  "exp_mis": 399.85,
+  "oe_mis": 1.393,
+  "obs_syn": 233,
+  "exp_syn": 174.84,
+  "oe_syn": 1.3327,
+  "obs_lof": 32,
+  "exp_lof": 29.105,
+  "oe_lof": 1.0995,
+  "cds_length": 1944,
+  "num_coding_exons": 16,
+  "marrvel": "ATAD3B",
+  "s_het": 0.007010136,
+  "gtex_expression": "ENSG00000160072.19",
+  "brainspan_rnaseq": "ENSG00000160072",
+  "brainatlas_microarray": "ATAD3B"
+}, {
+  "chrom": "1",
+  "spos": 1512162,
+  "epos": 1534685,
+  "ensgid": "ENSG00000197785",
+  "strand": "+",
+  "gene_version": "14",
+  "gene_symbol": "ATAD3A",
+  "gene_biotype": "protein_coding",
+  "chrom_hg19": "1",
+  "spos_hg19": 1447531,
+  "epos_hg19": 1470067,
+  "strand_hg19": "+",
+  "cytoband": [
+    "1p36.33"
+  ],
+  "gene_summary": "This gene encodes a transmembrane-domain containing protein found in the brain and cerebellum. Mutations in this gene result in spinocerebellar ataxia 21. [provided by RefSeq, Dec 2014].",
+  "hgnc_id": "25567",
+  "name": "ATPase family AAA domain containing 3A",
+  "entrez_id": "55210",
+  "ucsc_id": "uc001aga.3",
+  "refseq_accession": [
+    "NM_018188"
+  ],
+  "ccds_id": [
+    "CCDS31",
+    "CCDS53259",
+    "CCDS53260"
+  ],
+  "uniprot_ids": [
+    "Q9NVI7"
+  ],
+  "mgd_id": [
+    "MGI:1919214"
+  ],
+  "omim_id": [
+    "612316"
+  ],
+  "orphanet": "469968",
+  "transcriptid": [
+    {
+      "ensembl_trs": "ENST00000378755",
+      "ensembl_pro": "ENSP00000368030"
+    },
+    {
+      "ensembl_trs": "ENST00000378756",
+      "ensembl_pro": "ENSP00000368031"
+    },
+    {
+      "ensembl_trs": "ENST00000536055",
+      "ensembl_pro": "ENSP00000439290"
+    },
+    {
+      "ensembl_trs": "ENST00000339113",
+      "ensembl_pro": "ENSP00000339421"
+    },
+    {
+      "ensembl_trs": "ENST00000400830",
+      "ensembl_pro": "ENSP00000383631"
+    }
+  ],
+  "biogrid": [
+    "120506"
+  ],
+  "string": [
+    "9606.ENSP00000368030"
+  ],
+  "genecards": "ENSG00000197785",
+  "pharmgkb": [
+    "PA134872099"
+  ],
+  "trait_association_gwas": [
+    "Body mass index"
+  ],
+  "trait_association_gwas_pmid": [
+    "26426971"
+  ],
+  "rvis_exac": 1.057439959,
+  "rvis_percentile_exac": 91.83784109,
+  "gdi_phred": 7.22185,
+  "gdp": "Medium",
+  "mgi_mouse_gene": "Atad3a",
+  "mgi_mouse_phenotype": "muscle phenotype; homeostasis/metabolism phenotype; cellular phenotype; growth/size/body region phenotype; skeleton phenotype; embryo phenotype; behavior/neurological phenotype (the observable actions or reactions of mammalian organisms that are manifested through development and lifespan); mortality/aging (the observable characteristics related to the ability of a mammalian organism to live and age that are manifested throughout development and life span)",
+  "obs_mis": 401,
+  "exp_mis": 401.71,
+  "oe_mis": 0.99824,
+  "obs_syn": 188,
+  "exp_syn": 171.46,
+  "oe_syn": 1.0965,
+  "obs_lof": 19,
+  "exp_lof": 33.718,
+  "oe_lof": 0.5635,
+  "cds_length": 1902,
+  "num_coding_exons": 16,
+  "marrvel": "ATAD3A",
+  "s_het": 0.022281632,
+  "gtex_expression": "ENSG00000197785.13",
+  "brainspan_microarray": "ATAD3A",
+  "brainspan_rnaseq": "ENSG00000197785",
+  "brainatlas_microarray": "ATAD3A"
 }
 ]
