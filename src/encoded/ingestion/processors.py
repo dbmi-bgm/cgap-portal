@@ -50,12 +50,12 @@ def handle_data_bundle(submission):
     response = s3_client.get_object(Bucket=DATA_BUNDLE_BUCKET, Key=manifest_key)
     manifest = json.load(response['Body'])
 
-    data_key = manifest['object_name']
+    object_name = manifest['object_name']
     parameters = manifest['parameters']
     institution = get_parameter(parameters, 'institution')
     project = get_parameter(parameters, 'project')
 
-    debuglog(submission_id, "data_key:", data_key)
+    debuglog(submission_id, "object_name:", object_name)
     debuglog(submission_id, "parameters:", parameters)
 
     started_key = "%s/started.txt" % submission_id
@@ -65,15 +65,17 @@ def handle_data_bundle(submission):
     # data_stream = s3_client.get_object(Bucket=DATA_BUNDLE_BUCKET, Key="%s/manifest.json" % uuid)['Body']
 
     resolution = {
-        "data_key": data_key,
+        "data_key": object_name,
         "manifest_key": manifest_key,
         "started_key": started_key,
     }
 
     try:
 
-        submission.set_item_detail(object_name=manifest['object_name'], parameters=manifest['parameters'],
-                                   institution=institution, project=project)
+        submission.patch_item(submission_id=submission_id,
+                              object_name=object_name,
+                              parameters=parameters,
+                              processing_status={"state": "processing"})
 
         if isinstance(institution, str):
             institution = submission.vapp.get(institution).json
@@ -82,7 +84,7 @@ def handle_data_bundle(submission):
 
         validation_log_lines, final_json, result_lines = submit_data_bundle(s3_client=s3_client,
                                                                             bucket=DATA_BUNDLE_BUCKET,
-                                                                            key=data_key,
+                                                                            key=object_name,
                                                                             project=project,
                                                                             institution=institution,
                                                                             vapp=submission.vapp)

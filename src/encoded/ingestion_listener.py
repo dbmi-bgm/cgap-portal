@@ -8,26 +8,34 @@ import io
 import json
 import os
 import psycopg2
-import requests  # XXX: C4-211 should not be needed but is
+import pyramid.request
+import requests  # XXX: C4-211 should not be needed but is // KMP needs this, too, until subrequest posts work
 import signal
 import socket
 import structlog
 import threading
 import time
+import urllib.parse
 import uuid
 import webtest
 
 from dcicutils.misc_utils import VirtualApp, ignored
 from pyramid import paster
+from pyramid.request import Request
 from pyramid.response import Response
 from pyramid.view import view_config
+from requests.auth import HTTPBasicAuth
+from snovault import COLLECTIONS, Collection
+from snovault.crud_views import collection_add as sno_collection_add
+from snovault.embed import make_subrequest
+from snovault.schema_utils import validate_request
 from snovault.util import debug_log
 from vcf import Reader
 from .commands.ingest_vcf import VCFParser
 from .ingestion.common import register_path_content_type, DATA_BUNDLE_BUCKET, SubmissionFailure
 from .ingestion.processors import get_ingestion_processor
 from .types.ingestion import SubmissionFolio
-from .util import resolve_file_path, gunzip_content, debuglog
+from .util import resolve_file_path, gunzip_content, debuglog, subrequest_item_creation
 
 
 log = structlog.getLogger(__name__)
@@ -42,8 +50,73 @@ def includeme(config):
     config.add_route('ingestion_status', '/ingestion_status')
     config.add_route('prompt_for_ingestion', '/prompt_for_ingestion')
     config.add_route('submit_for_ingestion', '/submit_for_ingestion')
+
+    # THESE TWO ARE FOR DEBUGGING ONLY.
+    config.add_route('prompt_for_subrequest', '/prompt_for_subrequest')
+    config.add_route('submit_subrequest', '/submit_subrequest')
+
     config.registry[INGESTION_QUEUE] = IngestionQueueManager(config.registry)
     config.scan(__name__)
+
+
+# Moved to util.py and modified.
+# def subrequest_item_creation(request: pyramid.request.Request, item_type: str, json_body: dict = None) -> dict:
+#     if json_body is None:
+#         json_body = {}
+#     collection_path = '/' + item_type
+#     method = 'POST'
+#     # json_utf8 = json.dumps(json_body).encode('utf-8')  # Unused, but here just in case
+#     subrequest = make_subrequest(request=request, path=collection_path, method=method, json_body=json_body)
+#     subrequest.remote_user = 'EMBED'
+#     subrequest.registry = request.registry
+#     # Maybe...
+#     # validated = json_body.copy()
+#     # subrequest.validated = validated
+#     collection: Collection = subrequest.registry[COLLECTIONS][item_type]
+#     check_true(subrequest.json_body, "subrequest.json_body is not properly initialized.")
+#     check_true(not subrequest.validated, "subrequest was unexpectedly validated already.")
+#     check_true(subrequest.remote_user == 'EMBED', "subrequest.remote_user is not 'EMBED'.")
+#     check_true(not subrequest.errors, "subrequest.errors already has errors before trying to validate.")
+#     check_true(subrequest.remote_user is None, "subrequest.remote_user should have been None before we set it.")
+#     check_true(request.remote_user is None, "request.remote_user should have been None before we set it.")
+#     request.remote_user = 'EMBED'
+#     validate_request(schema=collection.type_info.schema, request=subrequest, data=json_body)
+#     if not subrequest.validated:
+#         return {
+#             "@type": ["Exception"],
+#             "errors": subrequest.errors
+#         }
+#     else:
+#         json_result: dict = sno_collection_add(context=collection, request=subrequest, render=False)
+#         return json_result
+
+
+# FOR DEBUGGING ONLY
+@view_config(route_name='prompt_for_subrequest', request_method='GET')
+@debug_log
+def prompt_for_subrequest(context, request):
+    ignored(context, request)
+    return Response(PROMPT_FOR_SUBREQUEST)
+
+
+# FOR DEBUGGING ONLY
+register_path_content_type(path='/submit_subrequest', content_type='multipart/form-data')
+@view_config(route_name='submit_subrequest', request_method='POST', accept='multipart/form-data')
+@debug_log
+def submit_subrequest(context, request):
+    # import pdb; pdb.set_trace()
+    institution = "/institutions/hms-dbmi/"
+    project = "/projects/12a92962-8265-4fc0-b2f8-cf14f05db58b/"
+    # institution = request.invoke_subrequest(make_subrequest(request, institution)).json
+    print("institution=", institution)
+    # project = request.invoke_subrequest(make_subrequest(request, project)).json
+    print("project=", project)
+    json_body = {
+        "ingestion_type": 'data_bundle',
+        "institution": institution,
+        "project": project,
+    }
+    return subrequest_item_creation(request=request, item_type='IngestionSubmission', json_body=json_body)
 
 
 @view_config(route_name='prompt_for_ingestion', request_method='GET')
@@ -65,6 +138,14 @@ def submit_for_ingestion(context, request):
     override_name = request.POST.get('override_name', None)
     parameters = dict(request.POST)
     parameters['datafile'] = filename
+    institution = parameters.get('institution', 'institution-missing')
+    project = parameters.get('project', 'project-missing')
+
+    submission_id = SubmissionFolio.create_item(request,
+                                                ingestion_type=ingestion_type,
+                                                institution=institution,
+                                                project=project)
+
 
     # ``input_file`` contains the actual file data which needs to be
     # stored somewhere.
@@ -75,7 +156,10 @@ def submit_for_ingestion(context, request):
     # NOTE: Some reference information about uploading files to s3 is here:
     #   https://boto3.amazonaws.com/v1/documentation/api/latest/guide/s3-uploading-files.html
 
-    submission_id = str(uuid.uuid4())
+    # submission.set_item_detail(object_name=manifest['object_name'], parameters=manifest['parameters'],
+    #                            institution=institution, project=project)
+
+    # submission_id = str(uuid.uuid4())
     _, ext = os.path.splitext(filename)
     object_name = "{id}/datafile{ext}".format(id=submission_id, ext=ext)
     manifest_name = "{id}/manifest.json".format(id=submission_id)
@@ -525,6 +609,14 @@ class IngestionListener:
 
         debuglog("Ingestion listener started.")
 
+        messages = []  # This'll get a better value below in each loop iteration. This is just a declaration of intent.
+
+        def discard(msg):
+            self.delete_messages([msg])
+            # Assuming we didn't get an error trying to remove it,
+            # it should also get removed from our to-do list.
+            messages.remove(msg)
+
         while self.should_remain_online():
 
             debuglog("About to get messages.")
@@ -548,12 +640,14 @@ class IngestionListener:
                     # to make all the parts work the same -kmp
                     submission = SubmissionFolio(vapp=self.vapp, ingestion_type=ingestion_type, submission_id=uuid)
                     handler = get_ingestion_processor(ingestion_type)
-                    handler(submission)
-                    # TODO: If we delete messages at the end of each loop, I think we'll here need to do this,
-                    #       since we're bypassing bottom of lop with the 'continue':
-                    #          self.delete_messages([message])
-                    #          messages.remove(message)
-                    debuglog("HANDLED", uuid)
+                    try:
+                        debuglog("HANDLING:", uuid)
+                        handler(submission)
+                        debuglog("HANDLED:", uuid)
+                    except Exception as e:
+                        log.error(e)
+                    # If we suceeded, we don't need to do it again, and if we failed we don't need to fail again.
+                    discard(message)
                     continue
 
                 debuglog("Did NOT process", uuid, "as", ingestion_type)
@@ -599,9 +693,10 @@ class IngestionListener:
                 log.error(msg)
                 self.update_status(msg=msg)
 
-            # TODO: I worry waiting to delete multiple messages means that if there's an error
-            #       we'll have things that were completed not get deleted. Should delete one per iteration?
-            #       -kmp 26-Jul-2020
+                discard(message)
+
+            # This is just fallback cleanup in case messages weren't cleaned up within the loop.
+            # In normal operation, they will be.
             self.delete_messages(messages)
 
 
@@ -716,7 +811,7 @@ def composite(loader, global_conf, **settings):
 # Command Application (for waitress)
 def main():
     """ Entry point for the local deployment. """
-    parser = argparse.ArgumentParser(
+    parser = argparse.ArgumentParser(  # noqa - PyCharm wrongly thinks the formatter_class is specified wrong here.
         description='Listen for VCF File uuids to ingest',
         epilog=EPILOG,
         formatter_class=argparse.RawDescriptionHelpFormatter
@@ -736,13 +831,13 @@ def main():
     vapp = VirtualApp(app, config)
     return run(vapp)
 
-PROMPT_FOR_INGESTION = """
+PROMPT_TEMPLATE = """
 <!DOCTYPE html>
 <html lang="en">
   <head>
     <title>Submit for Ingestion</title>
     <style>
-  body { background-color: #eeddee; font-size: 14pt; font-weight: bold; margin-left: 25px; }
+  body { background-color: <COLOR>; font-size: 14pt; font-weight: bold; margin-left: 25px; }
   div.banner { margin-bottom: 25px; padding: 10px; text-align: center;
                    border: 1px solid black; background-color: #ffeeff; width: 50%;
          }
@@ -760,7 +855,7 @@ PROMPT_FOR_INGESTION = """
       <p>This page is a demonstration of the ability to kick off an ingestion by form.</p>
     </div>
     <h1>Submit for Ingestion</h1>
-    <form action="/submit_for_ingestion" method="post" accept-charset="utf-8"
+    <form action="<TARGET-URL>" method="post" accept-charset="utf-8"
           enctype="multipart/form-data">
       <table>
         <tr>
@@ -808,7 +903,8 @@ PROMPT_FOR_INGESTION = """
 </html>
 """
 
-
+PROMPT_FOR_INGESTION = PROMPT_TEMPLATE.replace("<TARGET-URL>", "/submit_for_ingestion").replace("<COLOR>", "#eeddee")
+PROMPT_FOR_SUBREQUEST = PROMPT_TEMPLATE.replace("<TARGET-URL>", "/submit_subrequest").replace("<COLOR>", "#ddeedd")
 
 if __name__ == '__main__':
     main()

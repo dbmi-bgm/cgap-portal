@@ -311,7 +311,7 @@ description = "Utility package for interacting with the 4DN Data Portal and othe
 name = "dcicutils"
 optional = false
 python-versions = ">=3.4,<3.8"
-version = "0.37.0"
+version = "0.38.0"
 
 [package.dependencies]
 aws-requests-auth = ">=0.4.2,<1"
@@ -1410,7 +1410,7 @@ description = "Fast, Extensible Progress Meter"
 name = "tqdm"
 optional = false
 python-versions = ">=2.6, !=3.0.*, !=3.1.*"
-version = "4.48.0"
+version = "4.48.1"
 
 [package.extras]
 dev = ["py-make (>=0.1.0)", "twine", "argopt", "pydoc-markdown"]
@@ -1655,7 +1655,7 @@ transaction = ">=1.6.0"
 test = ["zope.testing"]
 
 [metadata]
-content-hash = "b245acd5efed1e52abfe3baf811585ca3307212bde8931f0067ec94e41fbf345"
+content-hash = "26aaf14a00bb85d74fb32f02edf89778c1e361710661b2c8ab844e09b33d16c3"
 lock-version = "1.0"
 python-versions = ">=3.6,<3.7"
 
@@ -1819,8 +1819,8 @@ dcicsnovault = [
     {file = "dcicsnovault-3.1.9.tar.gz", hash = "sha256:347ab5ee3053a80273b081803f93fe115ed48ad53e6ce91c65a5d21a8f02d0e2"},
 ]
 dcicutils = [
-    {file = "dcicutils-0.37.0-py3-none-any.whl", hash = "sha256:faa5f6c84a70a9b04ad6b5abac0afba67cc7e9b0f2a342d4bfff746c750355d6"},
-    {file = "dcicutils-0.37.0.tar.gz", hash = "sha256:eff330adbf34ac4b8e65ecc48c2b1fe91251f8f25691f8c614825669d40ba128"},
+    {file = "dcicutils-0.38.0-py3-none-any.whl", hash = "sha256:57636fa6b802881a02375123080d3e121a8f22fbe731d7c2312e1a17fa69e575"},
+    {file = "dcicutils-0.38.0.tar.gz", hash = "sha256:fcdd88e6169b0b98393e052859bf09d98a31102d5d55f79339046d3e67b5edf9"},
 ]
 docker = [
     {file = "docker-4.2.2-py2.py3-none-any.whl", hash = "sha256:03a46400c4080cb6f7aa997f881ddd84fef855499ece219d75fbdb53289c17ab"},
@@ -2381,8 +2381,8 @@ toml = [
     {file = "toml-0.10.1.tar.gz", hash = "sha256:926b612be1e5ce0634a2ca03470f95169cf16f939018233a670519cb4ac58b0f"},
 ]
 tqdm = [
-    {file = "tqdm-4.48.0-py2.py3-none-any.whl", hash = "sha256:fcb7cb5b729b60a27f300b15c1ffd4744f080fb483b88f31dc8654b082cc8ea5"},
-    {file = "tqdm-4.48.0.tar.gz", hash = "sha256:6baa75a88582b1db6d34ce4690da5501d2a1cb65c34664840a456b2c9f794d29"},
+    {file = "tqdm-4.48.1-py2.py3-none-any.whl", hash = "sha256:44b896c38f70f91826a3f83a3195b23c0460322bfc729566ec8e4e89bb5ad713"},
+    {file = "tqdm-4.48.1.tar.gz", hash = "sha256:7b7dd59cd9f03b89365ba67eb8515f5d2803fd1eb707abdbb914691a3123d9df"},
 ]
 transaction = [
     {file = "transaction-2.4.0-py2.py3-none-any.whl", hash = "sha256:b96a5e9aaa73f905759bc9ccf0021bf4864c01ac36666e0d28395e871f6d584a"},

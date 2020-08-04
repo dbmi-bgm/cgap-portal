@@ -4,8 +4,12 @@ Collection for objects related to ingestion submissions.
 
 import json
 import logging
+import re
+import uuid
 
+from dcicutils.misc_utils import ignored
 from snovault import collection, load_schema
+from pyramid.request import Request
 from pyramid.security import Allow, Deny, Everyone
 from .base import (
     Item,
@@ -17,6 +21,7 @@ from .base import (
 from .institution import (
     ONLY_ADMIN_VIEW,
 )
+from ..util import debuglog, subrequest_item_creation, check_true
 
 
 ALLOW_SUBMITTER_VIEW = (
@@ -37,48 +42,61 @@ class SubmissionFolio:
         self.vapp = vapp
         self.ingestion_type = ingestion_type
         self.log = log or logging
-        self.folio_id = None  # This will be more properly initialized in _create_item()
         self.submission_id = submission_id
-        self._create_item()
+
+    def __str__(self):
+        return "<SubmissionFolio(%s) %s>" % (self.ingestion_type, self.submission_id)
 
     @property
-    def folio_uri(self):
-        if not self.folio_id:
-            raise RuntimeError("%s.folio_id has not been set." % self)
-        return "/" + self.folio_id
+    def submission_uri(self):
+        return "/ingestion-submissions/" + self.submission_id
 
-    def _create_item(self):
-        res = self.vapp.post_json(self.INGESTION_SUBMISSION_URI, {
-            "ingestion_type": self.ingestion_type,
-            "submission_id": self.submission_id,
-            "processing_status": {
-                "state": "submitted"
-            }
-        })
-        [item] = res.json['@graph']
-        print(json.dumps(item, indent=2))
-        self.folio_id = item['uuid']
+    SUBMISSION_PATTERN = re.compile(r'^/ingestion-submissions/([0-9a-fA-F-]+)/?$')
 
-    def set_item_detail(self, object_name, parameters, institution, project):
-        res = self.vapp.patch_json(self.folio_uri, {
-            "object_name": object_name,
-            "ingestion_type": self.ingestion_type,
-            "submission_id": self.submission_id,
-            "parameters": parameters,
+    @classmethod
+    def create_item(cls, request, institution, project, ingestion_type, **kwargs):
+        ignored(kwargs)
+        json_body = {
+            "ingestion_type": ingestion_type,
             "institution": institution,
             "project": project,
             "processing_status": {
-                "state": "processing",
+                "state": "submitted"
             }
-        })
-        [item] = res.json['@graph']
-        print(json.dumps(item, indent=2))
+        }
+        guid = None
+        item_url, res_json = None, None
+        try:
+            res_json = subrequest_item_creation(request=request, item_type='IngestionSubmission', json_body=json_body)
+            [item_url] = res_json['@graph']
+            matched = cls.SUBMISSION_PATTERN.match(item_url)
+            if matched:
+                guid = matched.group(1)
+        except Exception as e:
+            logging.error("%s: %s" % (e.__class__.__name__, e))
+            pass
+        check_true(guid, "Guid was not extracted from %s in %s" % (item_url, json.dumps(res_json)))
+        return guid
 
+    # def set_item_detail(self, object_name, parameters, institution, project):
+    #     res = self.vapp.patch_json(self.submission_uri, {
+    #         "object_name": object_name,
+    #         "ingestion_type": self.ingestion_type,
+    #         "submission_id": self.submission_id,
+    #         "parameters": parameters,
+    #         "institution": institution,
+    #         "project": project,
+    #         "processing_status": {
+    #             "state": "processing",
+    #         }
+    #     })
+    #     [item] = res.json['@graph']
+    #     print(json.dumps(item, indent=2))
 
     def patch_item(self, **kwargs):
-        res = self.vapp.patch_json(self.folio_uri, kwargs)
+        res = self.vapp.patch_json(self.submission_uri, kwargs)
         [item] = res.json['@graph']
-        print(json.dumps(item, indent=2))
+        debuglog(json.dumps(item))
 
 
 @collection(

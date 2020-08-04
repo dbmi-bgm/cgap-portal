@@ -3,9 +3,15 @@ import datetime
 import gzip
 import io
 import os
+import pyramid.request
 import tempfile
 
 from io import BytesIO
+from snovault import COLLECTIONS, Collection
+from snovault.crud_views import collection_add as sno_collection_add
+from snovault.embed import make_subrequest
+from snovault.schema_utils import validate_request
+from typing import Type
 
 
 ENCODED_ROOT_DIR = os.path.dirname(__file__)
@@ -74,11 +80,55 @@ def debuglog(*args):
             print(nowstr, *args, file=fp)
 
 
+def check_true(test_value: object,
+               message: str,
+               error_class: Type[Exception] = RuntimeError):
+    """
+    If the first argument does not evaluate to a true value, an error is raised.
+
+    The error, if one is raised, will be of type error_class, and its message will be given by message.
+    """
+    if not test_value:
+        raise error_class(message)
+
+
+def subrequest_item_creation(request: pyramid.request.Request, item_type: str, json_body: dict = None) -> dict:
+    if json_body is None:
+        json_body = {}
+    collection_path = '/' + item_type
+    method = 'POST'
+    # json_utf8 = json.dumps(json_body).encode('utf-8')  # Unused, but here just in case
+    check_true(not request.remote_user, "request.remote_user has %s before we set it." % request.remote_user)
+    request.remote_user = 'EMBED'
+    subrequest = make_subrequest(request=request, path=collection_path, method=method, json_body=json_body)
+    subrequest.remote_user = 'EMBED'
+    subrequest.registry = request.registry
+    # Maybe...
+    # validated = json_body.copy()
+    # subrequest.validated = validated
+    collection: Collection = subrequest.registry[COLLECTIONS][item_type]
+    check_true(subrequest.json_body, "subrequest.json_body is not properly initialized.")
+    check_true(not subrequest.validated, "subrequest was unexpectedly validated already.")
+    check_true(not subrequest.errors, "subrequest.errors already has errors before trying to validate.")
+    check_true(subrequest.remote_user == request.remote_user,
+               "Mismatch: subrequest.remote_user=%r request.remote_user=%r"
+               % (subrequest.remote_user, request.remote_user))
+    validate_request(schema=collection.type_info.schema, request=subrequest, data=json_body)
+    if not subrequest.validated:
+        return {
+            "@type": ["Exception"],
+            "errors": subrequest.errors
+        }
+    else:
+        json_result: dict = sno_collection_add(context=collection, request=subrequest, render=False)
+        return json_result
+
+
 # These next few could be in dcicutils.s3_utils as part of s3Utils, but details of interfaces would have to change.
 # For now, for expedience, they can live here and we can refactor later. -kmp 25-Jul-2020
 
 @contextlib.contextmanager
-def s3_output_stream(s3_client, bucket, key):
+def s3_output_stream(s3_client, bucket: str, key: str):
     """
     This context manager allows one to write:
 
@@ -95,8 +145,8 @@ def s3_output_stream(s3_client, bucket, key):
 
     Args:
         s3_client: a client object that results from a boto3.client('s3', ...) call.
-        bucket str: an S3 bucket name
-        key str: the name of a key within the given S3 bucket
+        bucket: an S3 bucket name
+        key: the name of a key within the given S3 bucket
     """
 
     tempfile_name = tempfile.mktemp()
@@ -111,9 +161,8 @@ def s3_output_stream(s3_client, bucket, key):
             pass
 
 
-
 @contextlib.contextmanager
-def s3_local_file(s3_client, bucket, key):
+def s3_local_file(s3_client, bucket: str, key: str):
     """
     This context manager allows one to write:
 
@@ -122,6 +171,11 @@ def s3_local_file(s3_client, bucket, key):
                 dictionary = json.load(fp)
 
     to do input from an s3 bucket.
+
+    Args:
+        s3_client: a client object that results from a boto3.client('s3', ...) call.
+        bucket: an S3 bucket name
+        key: the name of a key within the given S3 bucket
     """
 
     tempfile_name = tempfile.mktemp()
@@ -136,7 +190,7 @@ def s3_local_file(s3_client, bucket, key):
 
 
 @contextlib.contextmanager
-def s3_input_stream(s3_client, bucket, key, mode='r'):
+def s3_input_stream(s3_client, bucket: str, key: str, mode: str = 'r'):
     """
     This context manager allows one to write:
 
@@ -146,6 +200,12 @@ def s3_input_stream(s3_client, bucket, key, mode='r'):
     to do input from an s3 bucket.
 
     In fact, an intermediate local file is created, copied, and deleted.
+
+    Args:
+        s3_client: a client object that results from a boto3.client('s3', ...) call.
+        bucket: an S3 bucket name
+        key: the name of a key within the given S3 bucket
+        mode: an input mode acceptable to io.open
     """
 
     with s3_local_file(s3_client, bucket, key) as file:
@@ -153,6 +213,12 @@ def s3_input_stream(s3_client, bucket, key, mode='r'):
             yield fp
 
 
-def create_empty_s3_file(s3_client, bucket, key):
+def create_empty_s3_file(s3_client, bucket: str, key: str):
+    """
+    Args:
+        s3_client: a client object that results from a boto3.client('s3', ...) call.
+        bucket: an S3 bucket name
+        key: the name of a key within the given S3 bucket
+    """
     empty_file = "/dev/null"
     s3_client.upload_file(empty_file, Bucket=bucket, Key=key)
