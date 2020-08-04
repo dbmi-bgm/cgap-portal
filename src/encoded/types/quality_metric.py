@@ -268,3 +268,29 @@ class QualityMetricVcfqc(QualityMetric):
 
         return qc_summary
 
+
+@collection(
+    name='quality-metrics-bamqc',
+    properties={
+        'title': 'QC Quality metrics for Bam QC',
+        'description': 'Listing of QC Quality Metrics for Bam QC.',
+    })
+class QualityMetricBamqc(QualityMetric):
+    """Subclass of quality matrics for bam files."""
+
+    item_type = 'quality_metric_bamqc'
+    schema = load_schema('encoded:schemas/quality_metric_bamqc.json')
+    embedded_list = QualityMetric.embedded_list
+
+    @calculated_property(schema=QC_SUMMARY_SCHEMA)
+    def quality_metric_summary(self, request):
+        qc = self.properties
+        qc_summary = []
+
+        qc_summary.append({"title": "Total Reads",
+                           "value": str(qc.get("mapping stats", {}).get("total reads")),
+                           "numberType": "integer"})
+        qc_summary.append({"title": "Coverage",
+                           "value": qc.get("coverage"),
+                           "numberType": "string"})
+        return qc_summary

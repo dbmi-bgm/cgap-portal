@@ -1,0 +1,12 @@
+[
+    {
+        "uuid": "05be2a64-b03a-462b-8ee0-54d49d3b1ee0",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "institution": "hms-dbmi",
+        "submitted_by": "soohyun_lee@hms.harvard.edu",
+        "mapping stats": {
+            "total reads": 467863567
+        },
+        "coverage": "30x"
+    }
+]
