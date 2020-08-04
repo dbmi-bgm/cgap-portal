@@ -196,10 +196,15 @@ def xls_to_json(xls_data, project, institution):
         missing_required = [col for col in required if col not in row or not row[col]]
         if missing_required:
             items['errors'].append(
-                'Spreadsheet row {} cannot be processed - missing required field(s) {}'
+                'Row {} - missing required field(s) {}. This row cannot be processed.'
                 ''.format(row_num, ', '.join(missing_required))
             )
         indiv_alias = '{}:individual-{}'.format(project['name'], row['individual id'])
+        if not family_dict.get(row['analysis id']):
+            msg = ('Row {} - Proband for this analysis could not be found. '
+                   'This row cannot be processed.'.format(i))
+            items['errors'].append(msg)
+            continue
         fam_alias = '{}:{}'.format(project['name'], family_dict[row['analysis id']])
         # sp_alias = '{}:sampleproc-{}'.format(project['name'], row['specimen id'])
         # create items for Individual
@@ -239,6 +244,7 @@ def xls_to_json(xls_data, project, institution):
                 val2['project'] = project['@id']
                 val2['institution'] = institution['@id']
     items['errors'].extend(file_errors)
+    items['errors'] = list(set(items['errors']))
     return items, True  # most errors passed to next step in order to combine with validation errors
 
 
@@ -311,7 +317,7 @@ def fetch_family_metadata(idx, row, items, indiv_alias, fam_alias):
             relation_found = True
             break
     if not relation_found:
-        msg = 'Row {}: Invalid relation "{}" for individual {} - Relation should be one of: {}'.format(
+        msg = 'Row {} - Invalid relation "{}" for individual {} - Relation should be one of: {}'.format(
             idx, row.get('relation to proband'), row.get('individual id'), ', '.join(valid_relations)
         )
         items['errors'].append(msg)
@@ -354,6 +360,10 @@ def fetch_sample_metadata(idx, row, items, indiv_alias, samp_alias, analysis_ali
     }
     if row.get('analysis id') in analysis_type_dict:
         new_sp_item['analysis_type'] = analysis_type_dict[row.get('analysis id')]
+        if not analysis_type_dict[row.get('analysis id')]:
+            msg = ('Row {} - Samples with analysis ID {} contain mis-matched or invalid workup type values. '
+                   'Sample cannot be processed.'.format(idx, row.get('analysis id')))
+            items['errors'].append(msg)
     new_items['sample_processing'].setdefault(analysis_alias, new_sp_item)
     new_items['sample_processing'][analysis_alias]['samples'].append(samp_alias)
     if row.get('report required').lower().startswith('y'):
@@ -611,7 +621,7 @@ def validate_all_items(virtualapp, json_data):
                     if itemtype not in ['case', 'report']:
                         for e in error:
                             if row:
-                                errors.append('Row {} {} - Error found: {}'.format(row, itemtype, e))
+                                errors.append('Row {} - Error found: {}'.format(row, e))
                             else:
                                 errors.append('{} {} - Error found: {}'.format(itemtype, alias, e))
                         validation_results[itemtype]['errors'] += 1
@@ -648,8 +658,15 @@ def validate_all_items(virtualapp, json_data):
                     json_data_final['patch'].setdefault(itemtype, {})
                     if patch_data:
                         json_data_final['patch'][itemtype][db_results[alias]['@id']] = patch_data
-                    elif itemtype not in ['case', 'report', 'sample_processing']:
-                        output.append('{} {} - Item already in database, no changes needed'.format(itemtype, alias))
+                    elif itemtype not in ['case', 'report', 'sample_processing', 'file_fastq']:
+                        item_name = alias[alias.index(':')+1:]
+                        if item_name.startswith(itemtype + '-'):
+                            item_name = item_name[item_name.index('-') + 1:]
+                        if itemtype == 'family':
+                            item_name = 'family for ' + item_name
+                        else:
+                            item_name = itemtype + ' ' + item_name
+                        output.append('{} - Item already in database, no changes needed'.format(item_name))
                     # do something to record response
                     validation_results[itemtype]['validated'] += 1
     output.extend([error for error in errors])
@@ -658,7 +675,7 @@ def validate_all_items(virtualapp, json_data):
             itemtype, validation_results[itemtype]['validated'], validation_results[itemtype]['errors']
         ))
     if errors:
-        output.append('Validation errors found in items. Please fix spreadsheet before submitting.')
+        output.append('Errors found in items. Please fix spreadsheet before submitting.')
         return {}, output, False
     else:
         json_data_final['aliases'] = alias_dict
