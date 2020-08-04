@@ -167,7 +167,7 @@ def xls_to_json(xls_data, project, institution):
     # debuglog("descriptions:", descriptions)  # Temporary instrumentation for debugging to go away soon. -kmp 25-Jul-2020
     rows = []
     # keys = [key.lower().strip().rstrip('*').rstrip() for key in keys]
-    required = ['individual id', 'relation to proband', 'report required', 'analysis id']
+    required = ['individual id', 'relation to proband', 'report required', 'analysis id', 'specimen id']
     missing = [col for col in required if col not in keys]
     if missing:
         msg = 'Column(s) "{}" not found in spreadsheet! Spreadsheet cannot be processed.'.format('", "'.join(missing))
@@ -193,7 +193,7 @@ def xls_to_json(xls_data, project, institution):
     for i, row in enumerate(rows):
         debuglog("row:", repr(row))  # Temporary instrumentation for debugging to go away soon. -kmp 25-Jul-2020
         row_num = i + counter + 1
-        missing_required = [col for col in required if col not in row]
+        missing_required = [col for col in required if col not in row or not row[col]]
         if missing_required:
             items['errors'].append(
                 'Spreadsheet row {} cannot be processed - missing required field(s) {}'
@@ -222,9 +222,9 @@ def xls_to_json(xls_data, project, institution):
                 file_errors.extend(file_items['errors'])
                 items['file_fastq'].update(file_items['file_fastq'])
                 items['file_processed'].update(file_items['file_processed'])
-        else:
-            items['errors'].append('WARNING: No specimen id present for patient {},'
-                                   ' sample will not be created.'.format(row['individual id']))
+        # else:
+        #     items['errors'].append('WARNING: No specimen id present for patient {},'
+        #                            ' sample will not be created.'.format(row['individual id']))
     # create SampleProcessing item for trio/group if needed
     # items = create_sample_processing_groups(items, sp_alias)
     items = add_relations(items)
@@ -670,7 +670,7 @@ def post_and_patch_all_items(virtualapp, json_data_final):
     output = []
     files = []
     if not json_data_final:
-        return output, 'not run'
+        return output, 'not run', []
     item_names = {'individual': 'individual_id', 'family': 'family_id', 'sample': 'specimen_accession'}
     final_status = {}
     no_errors = True
