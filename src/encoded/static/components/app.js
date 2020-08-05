@@ -482,7 +482,7 @@ export default class App extends React.PureComponent {
             const tHrefParts = url.parse(targetHref);
             const pHrefParts = memoizedUrlParse(href);
             let tHrefHash = tHrefParts.hash;
-            const samePath = pHrefParts.path === tHrefParts.path;
+            const samePath = pHrefParts.path === tHrefParts.path; // Occurs when click link which has same path but different hash, most often.
             const navOpts = {
                 // Same pathname & search but maybe different hash. Don't add history entry etc.
                 'replace'           : samePath,
@@ -498,9 +498,11 @@ export default class App extends React.PureComponent {
             navigate(targetHref, navOpts, function(){
                 if (targetOffset) targetOffset = parseInt(targetOffset);
                 if (!targetOffset || isNaN(targetOffset)) targetOffset = 112;
-                if (tHrefHash && typeof hrefHash === 'string' && tHrefHash.length > 1 && tHrefHash[1] !== '!'){
+                if (tHrefHash && typeof tHrefHash === 'string' && tHrefHash.length > 1 && tHrefHash[1] !== '!'){
                     tHrefHash = tHrefHash.slice(1); // Strip out '#'
-                    setTimeout(layout.animateScrollTo.bind(null, tHrefHash, 750, targetOffset), 100);
+                    setTimeout(function(){
+                        layout.animateScrollTo(tHrefHash, 750, targetOffset);
+                    }, 100);
                 }
             });
 

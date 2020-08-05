@@ -64,8 +64,7 @@ class User(Item):
     item_type = 'user'
     schema = load_schema('encoded:schemas/user.json')
     embedded_list = [
-        'institution.name',
-        'project.name',
+        'project_roles.project.name',
         'submits_for.name',
         'submits_for.display_title'
     ]

@@ -103,10 +103,5 @@
         background-color: $card-bg;
     }
 
-    .card-header:first-child {
-        /* Original value: calc(.25rem - 1px) calc(.25rem - 1px) 0 0; */
-        border-radius: 3px;
-    }
-
 }
 

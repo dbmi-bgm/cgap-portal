@@ -105,6 +105,79 @@ table.matrix {
 	margin-bottom: 0px;
 }
 
+/** Experiment Set Detail Pane **/
+.family-info-wrapper {
+
+	position: relative;
+	z-index: 1;
+
+
+	.family-addinfo {
+		text-align: left;
+		//border-bottom: 1px solid #ccc;
+		position: relative;
+		overflow: hidden;
+		min-height: 62px; //104px;
+
+		.addinfo-description-section,
+		.addinfo-properties-section {
+			padding-top: 12px;
+			padding-bottom: 8px;
+			position: static;
+		}
+
+		.family-addinfo-val {
+			padding-right: 25px;
+		}
+	}
+
+	.family-tables-container {
+
+		// Only when present on item page(s)
+		@include media-breakpoint-down(sm){
+			.item-page-table-row-container & {
+				border-bottom: 1px solid #ddd;
+			}
+		}
+
+		.family-table-section {
+			border-top: 1px solid #ddd;
+		}
+
+		h4.pane-section-title {
+			font-weight: 300;
+			margin-top: 12px;
+			margin-bottom: 12px;
+			cursor: pointer;
+
+			i.icon {
+				font-size: 0.875rem;
+				margin-right: 3px;
+				position: relative;
+				top: -1px;
+				&.toggle-open-icon {
+					cursor: pointer;
+					margin-right: 6px;
+					padding: 2px 0;
+					margin-left: 8px;
+					opacity: 0.66;
+				}
+			}
+
+			&:hover {
+				text-shadow: 0 0 0;
+				i.icon.toggle-open-icon {
+					opacity: 1;
+				}
+			}
+		}
+
+	}
+
+
+
+}
+
 
 
 /*** Stacked Block Table Import & 4DN-specific overrides ***/
