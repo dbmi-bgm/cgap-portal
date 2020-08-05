@@ -7,6 +7,7 @@
         "mapping stats": {
             "total reads": 467863567
         },
-        "coverage": "30x"
+        "coverage": "30x",
+        "sample": "NA12878_sample"
     }
 ]
