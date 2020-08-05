@@ -104,17 +104,6 @@
             "properties": {},
             "default": {}
         },
-        "output": {
-            "title": "Output",
-            "description": "A list of ordinary output lines that were printed while processing.",
-            "type": "array",
-            "items": {
-                "title": "Output Line",
-                "description": "One of possibly several lines of output printed during processing.",
-                "type": "string"
-            },
-            "default": []
-        },
         "errors": {
             "title": "Errors",
             "description": "A list of error messages if processing was aborted before results were obtained.",
@@ -125,6 +114,14 @@
                 "type": "string"
             },
             "default": []
+        },
+        "additional_data": {
+            "title": "Additional Data",
+            "description": "Additional structured information resulting from processing, the nature of which may vary by ingestion_type and other factors.",
+            "type": "object",
+            "additionalItems": true,
+            "properties": {},
+            "default": {}
         }
     }
 }

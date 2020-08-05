@@ -103,14 +103,30 @@ def submit_data_bundle(*, s3_client, bucket, key, project, institution, vapp):  
         log: a logging object capable of .info, .warning, .error, or .debug messages
     """
     with s3_local_file(s3_client, bucket=bucket, key=key) as file:
-        assert isinstance(project, dict)
-        assert isinstance(institution, dict)
-        # project_json = vapp.get(project).json
-        # institution_json = vapp.get(institution).json
-        json_data = xls_to_json(file, project=project, institution=institution)
-        final_json, validation_log_lines = validate_all_items(vapp, json_data)
-        result_lines = post_and_patch_all_items(vapp, final_json)
-        return validation_log_lines, final_json, result_lines
+        project_json = vapp.get(project).json
+        institution_json = vapp.get(institution).json
+        results = {
+            'success': False,
+            'validation_output': [],
+            'final_json': {},
+            'post_output': [],
+            'upload_info': []
+        }
+        json_data, json_success = xls_to_json(file, project=project_json, institution=institution_json)
+        if not json_success:
+            results['validation_output'] = json_data['errors']
+            return results
+        processing_result, validation_log_lines, validate_success = validate_all_items(vapp, json_data)
+        results['result'] = processing_result
+        results['validation_output'] = validation_log_lines
+        if not validate_success:
+            return results
+        results['success'] = validate_success
+        result_lines, post_success, upload_info = post_and_patch_all_items(vapp, json_data_final=processing_result)
+        results['post_output'] = result_lines
+        results['success'] = post_success
+        results['upload_info'] = upload_info
+        return results
 
 
 def map_fields(row, metadata_dict, addl_fields, item_type):
@@ -130,37 +146,71 @@ def xls_to_json(xls_data, project, institution):
     book = xlrd.open_workbook(xls_data)
     sheet, = book.sheets()
     row = row_generator(sheet)
-    top_header = next(row)
-    debuglog("top_header:", top_header)  # Temporary instrumentation for debugging to go away soon. -kmp 25-Jul-2020
-    keys = next(row)
-    debuglog("keys:", keys)  # Temporary instrumentation for debugging to go away soon. -kmp 25-Jul-2020
-    descriptions = next(row)
-    debuglog("descriptions:", descriptions)  # Temporary instrumentation for debugging to go away soon. -kmp 25-Jul-2020
-    rows = []
+    header = False
     counter = 0
+    # debuglog("top_header:", top_header)  # Temporary instrumentation for debugging to go away soon. -kmp 25-Jul-2020
+    while True:
+        try:
+            keys = next(row)
+            keys = [key.lower().strip().rstrip('*').rstrip() for key in keys]
+            counter += 1
+            if 'individual id' in keys:
+                header = True
+                break
+        except StopIteration:
+            break
+    if not header:
+        msg = 'Column headers not detected in spreadsheet! "Individual ID*" column must be present in header.'
+        return {'errors': [msg]}, False
+    # debuglog("keys:", keys)  # Temporary instrumentation for debugging to go away soon. -kmp 25-Jul-2020
+    # descriptions = next(row)
+    # debuglog("descriptions:", descriptions)  # Temporary instrumentation for debugging to go away soon. -kmp 25-Jul-2020
+    rows = []
+    # keys = [key.lower().strip().rstrip('*').rstrip() for key in keys]
+    required = ['individual id', 'relation to proband', 'report required', 'analysis id', 'specimen id']
+    missing = [col for col in required if col not in keys]
+    if missing:
+        msg = 'Column(s) "{}" not found in spreadsheet! Spreadsheet cannot be processed.'.format('", "'.join(missing))
+        return {'errors': [msg]}, False
+
     for values in row:
         r = [val for val in values]
-        row_dict = {keys[i].lower().rstrip('*'): item for i, item in enumerate(r)}
+        if 'y/n' in ''.join(r).lower() or ''.join(r) == '':  # skip comments/description/blank row if present
+            counter += 1
+            continue
+        row_dict = {keys[i]: item for i, item in enumerate(r)}
         rows.append(row_dict)
 
     items = {
         'individual': {}, 'family': {}, 'sample': {}, 'sample_processing': {},
         'file_fastq': {}, 'file_processed': {}, 'case': {}, 'report': {},
-        'reports': []
+        'reports': [], 'errors': []
     }
     file_errors = []
     specimen_ids = {}
     family_dict = create_families(rows)
     a_types = get_analysis_types(rows)
-    for row in rows:
+    for i, row in enumerate(rows):
         debuglog("row:", repr(row))  # Temporary instrumentation for debugging to go away soon. -kmp 25-Jul-2020
+        row_num = i + counter + 1
+        missing_required = [col for col in required if col not in row or not row[col]]
+        if missing_required:
+            items['errors'].append(
+                'Row {} - missing required field(s) {}. This row cannot be processed.'
+                ''.format(row_num, ', '.join(missing_required))
+            )
         indiv_alias = '{}:individual-{}'.format(project['name'], row['individual id'])
+        if not family_dict.get(row['analysis id']):
+            msg = ('Row {} - Proband for this analysis could not be found. '
+                   'This row cannot be processed.'.format(i))
+            items['errors'].append(msg)
+            continue
         fam_alias = '{}:{}'.format(project['name'], family_dict[row['analysis id']])
         # sp_alias = '{}:sampleproc-{}'.format(project['name'], row['specimen id'])
         # create items for Individual
-        items = fetch_individual_metadata(row, items, indiv_alias, institution['name'])
+        items = fetch_individual_metadata(row_num, row, items, indiv_alias, institution['name'])
         # create/edit items for Family
-        items = fetch_family_metadata(row, items, indiv_alias, fam_alias)
+        items = fetch_family_metadata(row_num, row, items, indiv_alias, fam_alias)
         # create item for Sample if there is a specimen
         if row.get('specimen id'):
             samp_alias = '{}:sample-{}'.format(project['name'], row['specimen id'])
@@ -170,30 +220,32 @@ def xls_to_json(xls_data, project, institution):
             else:
                 specimen_ids[row['specimen id']] = 1
             analysis_alias = '{}:analysis-{}'.format(project['name'], row['analysis id'])
-            items = fetch_sample_metadata(row, items, indiv_alias, samp_alias, analysis_alias,
+            items = fetch_sample_metadata(row_num, row, items, indiv_alias, samp_alias, analysis_alias,
                                           fam_alias, project['name'], a_types)
             if row.get('files'):
-                file_items = fetch_file_metadata(row['files'].split(','), project['name'])
+                file_items = fetch_file_metadata(row_num, row['files'].split(','), project['name'])
                 file_errors.extend(file_items['errors'])
                 items['file_fastq'].update(file_items['file_fastq'])
                 items['file_processed'].update(file_items['file_processed'])
-        else:
-            print('WARNING: No specimen id present for patient {},'
-                  ' sample will not be created.'.format(row['individual id']))
+        # else:
+        #     items['errors'].append('WARNING: No specimen id present for patient {},'
+        #                            ' sample will not be created.'.format(row['individual id']))
     # create SampleProcessing item for trio/group if needed
     # items = create_sample_processing_groups(items, sp_alias)
     items = add_relations(items)
     items = create_case_items(items, project['name'])
     # removed unused fields, add project and institution
     for val1 in items.values():
-        for val2 in val1.values():
-            remove_keys = [k for k, v in val2.items() if not v]
-            for key in remove_keys:
-                del val2[key]
-            val2['project'] = project['@id']
-            val2['institution'] = institution['@id']
-    items['file_errors'] = file_errors
-    return items
+        if isinstance(val1, dict):
+            for val2 in val1.values():
+                remove_keys = [k for k, v in val2.items() if not v]
+                for key in remove_keys:
+                    del val2[key]
+                val2['project'] = project['@id']
+                val2['institution'] = institution['@id']
+    items['errors'].extend(file_errors)
+    items['errors'] = list(set(items['errors']))
+    return items, True  # most errors passed to next step in order to combine with validation errors
 
 
 def create_families(rows):
@@ -210,7 +262,8 @@ def get_analysis_types(rows):
         analysis_relations[row.get('analysis id')][0].append(row.get('relation to proband', '').lower())
         analysis_relations[row.get('analysis id')][1].append(row.get('workup type', '').upper())
     for k, v in analysis_relations.items():
-        if len(list(set(v[1]))) == 1:
+        workup = list(set(v[1]))
+        if len(workup) == 1 and '' not in workup:
             if len(v[0]) == 1:
                 analysis_types[k] = v[1][0]
             elif sorted(v[0]) == ['father', 'mother', 'proband']:
@@ -222,7 +275,7 @@ def get_analysis_types(rows):
     return analysis_types
 
 
-def fetch_individual_metadata(row, items, indiv_alias, inst_name):
+def fetch_individual_metadata(idx, row, items, indiv_alias, inst_name):
     new_items = items.copy()
     info = {'aliases': [indiv_alias]}
     info = map_fields(row, info, ['individual_id', 'sex', 'age', 'birth_year'], 'individual')
@@ -231,10 +284,12 @@ def fetch_individual_metadata(row, items, indiv_alias, inst_name):
         if row.get('other individual id type'):
             other_id['id_source'] = row['other individual id source']
         info['institutional_id'] = other_id
-    info['age'] = int(info['age']) if info.get('age') else None
-    info['birth_year'] = int(info['birth year']) if info.get('birth year') else None
+    for col in ['age', 'birth_year']:
+        if info.get(col) and isinstance(info[col], str) and info[col].isnumeric():
+            info[col] = int(info[col])
     if indiv_alias not in new_items['individual']:
         new_items['individual'][indiv_alias] = {k: v for k, v in info.items() if v}
+        new_items['individual'][indiv_alias]['row'] = idx
     else:
         for key in info:
             if key not in new_items['individual'][indiv_alias]:
@@ -242,24 +297,34 @@ def fetch_individual_metadata(row, items, indiv_alias, inst_name):
     return new_items
 
 
-def fetch_family_metadata(row, items, indiv_alias, fam_alias):
+def fetch_family_metadata(idx, row, items, indiv_alias, fam_alias):
     new_items = items.copy()
     info = {
         'aliases': [fam_alias],
         'family_id': row['family id'],
-        'members': [indiv_alias]
+        'members': [indiv_alias],
+        'row': idx
     }
     if fam_alias not in new_items['family']:
         new_items['family'][fam_alias] = info
     if indiv_alias not in new_items['family'][fam_alias]['members']:
         new_items['family'][fam_alias]['members'].append(indiv_alias)
-    for relation in ['proband', 'mother', 'father', 'brother', 'sister', 'sibling']:
-        if row.get('relation to proband', '').lower() == relation and relation not in new_items['family'][fam_alias]:
+    valid_relations = ['proband', 'mother', 'father', 'brother', 'sister', 'sibling']
+    relation_found = False
+    for relation in valid_relations:
+        if row.get('relation to proband', '').lower().startswith(relation) and relation not in new_items['family'][fam_alias]:
             new_items['family'][fam_alias][relation] = indiv_alias
+            relation_found = True
+            break
+    if not relation_found:
+        msg = 'Row {} - Invalid relation "{}" for individual {} - Relation should be one of: {}'.format(
+            idx, row.get('relation to proband'), row.get('individual id'), ', '.join(valid_relations)
+        )
+        items['errors'].append(msg)
     return new_items
 
 
-def fetch_sample_metadata(row, items, indiv_alias, samp_alias, analysis_alias, fam_alias, proj_name, analysis_type_dict):
+def fetch_sample_metadata(idx, row, items, indiv_alias, samp_alias, analysis_alias, fam_alias, proj_name, analysis_type_dict):
     new_items = items.copy()
     info = {'aliases': [samp_alias], 'files': []}  # TODO: implement creation of file db items
     fields = [
@@ -267,9 +332,10 @@ def fetch_sample_metadata(row, items, indiv_alias, samp_alias, analysis_alias, f
         'specimen_notes', 'research_protocol_name', 'sent_by', 'physician_id', 'indication'
     ]
     info = map_fields(row, info, fields, 'sample')
-    if info.get('specimen_accepted', '').lower() == 'y':
+    info['row'] = idx
+    if info.get('specimen_accepted', '').lower() in ['y', 'yes']:
         info['specimen_accepted'] = 'Yes'
-    elif info.get('specimen_accepted', '').lower() == 'n':
+    elif info.get('specimen_accepted', '').lower() in ['n', 'no']:
         info['specimen_accepted'] = 'No'
     if row.get('second specimen id'):
         other_id = {'id': row['second specimen id'], 'id_type': proj_name}  # add proj info?
@@ -294,6 +360,10 @@ def fetch_sample_metadata(row, items, indiv_alias, samp_alias, analysis_alias, f
     }
     if row.get('analysis id') in analysis_type_dict:
         new_sp_item['analysis_type'] = analysis_type_dict[row.get('analysis id')]
+        if not analysis_type_dict[row.get('analysis id')]:
+            msg = ('Row {} - Samples with analysis ID {} contain mis-matched or invalid workup type values. '
+                   'Sample cannot be processed.'.format(idx, row.get('analysis id')))
+            items['errors'].append(msg)
     new_items['sample_processing'].setdefault(analysis_alias, new_sp_item)
     new_items['sample_processing'][analysis_alias]['samples'].append(samp_alias)
     if row.get('report required').lower().startswith('y'):
@@ -304,7 +374,7 @@ def fetch_sample_metadata(row, items, indiv_alias, samp_alias, analysis_alias, f
 
 
 # TODO: finish implementing this function
-def fetch_file_metadata(filenames, proj_name):
+def fetch_file_metadata(idx, filenames, proj_name):
     valid_extensions = {
         '.fastq.gz': ('fastq', 'reads'),
         '.fq.gz': ('fastq', 'reads'),
@@ -325,9 +395,10 @@ def fetch_file_metadata(filenames, proj_name):
         fmt = valid_extensions[extension[0]][0]
         file_info = {
             'aliases': [file_alias],
+            'row': idx,
             'file_format': '/file-formats/{}/'.format(fmt),
             'file_type': valid_extensions[extension[0]][1],
-            'filename': filename  # causes problems without functional file upload
+            'filename': filename.strip()  # causes problems without functional file upload
         }
         if fmt == 'fastq':
             files['file_fastq'][file_alias] = file_info
@@ -429,22 +500,42 @@ def parse_exception(e, aliases):
         else:
             text = e.args[0]
         resp_text = text[text.index('{'):-1]
-        resp_dict = json.loads(resp_text.replace('\\', ''))
+        resp_dict = json.loads(resp_text.replace('\\"', "\'").replace('\\', ''))
     except Exception:  # pragma: no cover
         raise e
     if resp_dict.get('description') == 'Failed validation':
         keep = []
-        resp_list = [error['description'] for error in resp_dict['errors']]
+        resp_list = [error['name'] + ' - ' + error['description'] for error in resp_dict['errors']]
         for error in resp_list:
             # if error is caused by linkTo to item not submitted yet but in aliases list,
             # remove that error
             if 'not found' in error and error.split("'")[1] in aliases:
                 continue
             else:
+                error = error.lstrip('Schema: ')
+                field_name = error[:error.index(' - ')]
+                field = None
+                if field_name in GENERIC_FIELD_MAPPING['sample'].values():
+                    field = [key for key, val in GENERIC_FIELD_MAPPING['sample'].items() if val == field_name][0]
+                elif field_name == 'requisition_acceptance.accepted_rejected':
+                    field = 'Req Accepted Y\\N'
+                error = map_enum_options(field_name, error)
+                if not field:
+                    field = field_name.replace('_', ' ')
+
+                error = 'field: ' + error.replace(field_name, field)
                 keep.append(error)
         return keep
     else:
         raise e
+
+
+def map_enum_options(fieldname, error_message):
+    if fieldname == 'requisition_acceptance.accepted_rejected':
+        error_message = error_message.replace("['Accepted', 'Rejected']", "['Y', 'N']")
+    elif fieldname == 'specimen_accepted':
+        error_message = error_message.replace("['Yes', 'No']", "['Y', 'N']")
+    return error_message
 
 
 def compare_fields(profile, aliases, json_item, db_item):
@@ -491,7 +582,7 @@ def validate_all_items(virtualapp, json_data):
     written or tested.
     '''
     alias_dict = {}
-    errors = json_data['file_errors']
+    errors = json_data['errors']
     all_aliases = [k for itype in json_data for k in json_data[itype]]
     json_data_final = {'post': {}, 'patch': {}}
     validation_results = {}
@@ -517,22 +608,29 @@ def validate_all_items(virtualapp, json_data):
                 db_results[alias] = db_result
         # TODO: Likewise this should probably loop over json_data.get(itemtype, {}). -kmp 25-Jul-2020
         for alias in json_data[itemtype]:
-            if 'filename' in json_data[itemtype][alias]:  # until we have functional file upload
-                del json_data[itemtype][alias]['filename']
+            data = json_data[itemtype][alias].copy()
+            row = data.get('row')
+            if row:
+                del data['row']
+            if 'filename' in data:  # until we have functional file upload
+                del data['filename']
             if not db_results.get(alias):
-                error = validate_item(virtualapp, json_data[itemtype][alias], 'post', itemtype, all_aliases)
+                error = validate_item(virtualapp, data, 'post', itemtype, all_aliases)
                 if error:  # modify to check for presence of validation errors
                     # do something to report validation errors
                     if itemtype not in ['case', 'report']:
                         for e in error:
-                            errors.append('{} {} - Error found: {}'.format(itemtype, alias, e))
+                            if row:
+                                errors.append('Row {} - Error found: {}'.format(row, e))
+                            else:
+                                errors.append('{} {} - Error found: {}'.format(itemtype, alias, e))
                         validation_results[itemtype]['errors'] += 1
                 # TODO: If itemtype might not be in json_data (and conditionals above suggest that's so),
                 #       then json_data[item_type][alias] seems suspect. It does work to do
                 #       json_data.get(item_type, {}).get(alias, {}).get('filename') but I would put that
                 #       quantity in a variable rather than compute it twice in a row. -kmp 25-Jul-2020
                 elif json_data[itemtype][alias].get('filename') and \
-                        json_data[itemtype][alias]['filename'] in ''.join(json_data['file_errors']):
+                        json_data[itemtype][alias]['filename'] in ''.join(json_data['errors']):
                     validation_results[itemtype]['errors'] += 1
                 else:
                     json_data_final['post'].setdefault(itemtype, [])
@@ -542,23 +640,33 @@ def validate_all_items(virtualapp, json_data):
                 # patch if item exists in db
                 # alias_dict[alias] = results[alias]['@id']
                 # TODO: profile is only conditionally assigned in an "if" above. -kmp 25-Jul-2020
-                patch_data = compare_fields(profile, alias_dict, json_data[itemtype][alias], db_results[alias])
+                patch_data = compare_fields(profile, alias_dict, data, db_results[alias])
                 error = validate_item(virtualapp, patch_data, 'patch', itemtype,
                                       all_aliases, atid=db_results[alias]['@id'])
                 if error:  # do something to report validation errors
                     if itemtype not in ['case', 'report']:
                         for e in error:
-                            errors.append('{} {} - Error found: {}'.format(itemtype, alias, e))
+                            if row:
+                                errors.append('Row {} {} - Error found: {}'.format(row, itemtype, e))
+                            else:
+                                errors.append('{} {} - Error found: {}'.format(itemtype, alias, e))
                         validation_results[itemtype]['errors'] += 1
                 elif json_data[itemtype][alias].get('filename') and \
-                        json_data[itemtype][alias]['filename'] in ''.join(json_data['file_errors']):
+                        json_data[itemtype][alias]['filename'] in ''.join(json_data['errors']):
                     validation_results[itemtype]['errors'] += 1
                 else:  # patch
                     json_data_final['patch'].setdefault(itemtype, {})
                     if patch_data:
                         json_data_final['patch'][itemtype][db_results[alias]['@id']] = patch_data
-                    elif itemtype not in ['case', 'report']:
-                        output.append('{} {} - Item already in database, no changes needed'.format(itemtype, alias))
+                    elif itemtype not in ['case', 'report', 'sample_processing', 'file_fastq']:
+                        item_name = alias[alias.index(':')+1:]
+                        if item_name.startswith(itemtype + '-'):
+                            item_name = item_name[item_name.index('-') + 1:]
+                        if itemtype == 'family':
+                            item_name = 'family for ' + item_name
+                        else:
+                            item_name = itemtype + ' ' + item_name
+                        output.append('{} - Item already in database, no changes needed'.format(item_name))
                     # do something to record response
                     validation_results[itemtype]['validated'] += 1
     output.extend([error for error in errors])
@@ -567,27 +675,35 @@ def validate_all_items(virtualapp, json_data):
             itemtype, validation_results[itemtype]['validated'], validation_results[itemtype]['errors']
         ))
     if errors:
-        output.append('Validation errors found in items. Please fix spreadsheet before submitting.')
-        return ({}, output)
+        output.append('Errors found in items. Please fix spreadsheet before submitting.')
+        return {}, output, False
     else:
         json_data_final['aliases'] = alias_dict
         output.append('All items validated.')
-        return (json_data_final, output)
+        return json_data_final, output, True
 
 
 def post_and_patch_all_items(virtualapp, json_data_final):
     output = []
+    files = []
     if not json_data_final:
-        return output
+        return output, 'not run', []
     item_names = {'individual': 'individual_id', 'family': 'family_id', 'sample': 'specimen_accession'}
     final_status = {}
+    no_errors = True
     if json_data_final.get('post'):
         for k, v in json_data_final['post'].items():
             final_status[k] = {'posted': 0, 'not posted': 0, 'patched': 0, 'not patched': 0}
             for item in v:
                 patch_info = {}
+                row = item.get('row')
+                if row:
+                    del item['row']
                 # if 'filename' in item:  # until we have functional file upload
                 #     del item['filename']
+                fname = item.get('filename')
+                if fname:
+                    del item['filename']
                 for field in LINKS:
                     if field in item:
                         patch_info[field] = item[field]
@@ -602,11 +718,18 @@ def post_and_patch_all_items(virtualapp, json_data_final):
                         json_data_final['patch'][k][atid] = patch_info
                         if k in item_names:
                             output.append('Success - {} {} posted'.format(k, item[item_names[k]]))
+                        if fname:
+                            files.append({
+                                'uuid': response.json['@graph'][0]['uuid'],
+                                'filename': fname
+                            })
                     else:
                         final_status[k]['not posted'] += 1
+                        no_errors = False
                 except Exception as e:
                     final_status[k]['not posted'] += 1
                     output.append(str(e))
+                    no_errors = False
         for itype in final_status:
             if final_status[itype]['posted'] > 0 or final_status[itype]['not posted'] > 0:
                 output.append('{}: {} items posted successfully; {} items not posted'.format(
@@ -617,22 +740,32 @@ def post_and_patch_all_items(virtualapp, json_data_final):
         for item_id, patch_data in v.items():
             # if 'filename' in patch_data:  # until we have functional file upload
             #     del patch_data['filename']
+            fname = patch_data.get('filename')
+            if fname:
+                del patch_data['filename']
             try:
                 response = virtualapp.patch_json('/' + item_id, patch_data, status=200)
                 if response.json['status'] == 'success':
                     # if k in item_names:
                     #     output.append('Success - {} {} patched'.format(k, patch_data[item_names[k]]))
                     final_status[k]['patched'] += 1
+                    if fname:
+                        files.append({
+                            'uuid': response.json['@graph'][0]['uuid'],
+                            'filename': fname
+                        })
                 else:
                     final_status[k]['not patched'] += 1
+                    no_errors = False
             except Exception as e:
                 final_status[k]['not patched'] += 1
                 output.append(str(e))
+                no_errors = False
         if final_status[k]['patched'] > 0 or final_status[k]['not patched'] > 0:
             output.append('{}: {} items patched successfully; {} items not patched'.format(
                 k, final_status[k]['patched'], final_status[k]['not patched']
             ))
-    return output
+    return output, no_errors, files
 
 
 def cell_value(cell, datemode):

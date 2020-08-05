@@ -62,7 +62,7 @@ def handle_data_bundle(submission):
     create_empty_s3_file(s3_client, bucket=DATA_BUNDLE_BUCKET, key=started_key)
 
     # PyCharm thinks this is unused. -kmp 26-Jul-2020
-    # data_stream = s3_client.get_object(Bucket=DATA_BUNDLE_BUCKET, Key="%s/manifest.json" % uuid)['Body']
+    # data_stream = s3_client.get_object(Bucket=DATA_BUNDLE_BUCKET, Key="%s/manifest.json" % submission_id)['Body']
 
     resolution = {
         "data_key": object_name,
@@ -77,33 +77,54 @@ def handle_data_bundle(submission):
                               parameters=parameters,
                               processing_status={"state": "processing"})
 
-        if isinstance(institution, str):
-            institution = submission.vapp.get(institution).json
-        if isinstance(project, str):
-            project = submission.vapp.get(project).json
+        # if isinstance(institution, str):
+        #     institution = submission.vapp.get(institution).json
+        # if isinstance(project, str):
+        #     project = submission.vapp.get(project).json
 
-        validation_log_lines, final_json, result_lines = submit_data_bundle(s3_client=s3_client,
-                                                                            bucket=DATA_BUNDLE_BUCKET,
-                                                                            key=object_name,
-                                                                            project=project,
-                                                                            institution=institution,
-                                                                            vapp=submission.vapp)
+        data_bundle_result = submit_data_bundle(s3_client=s3_client,
+                                                bucket=DATA_BUNDLE_BUCKET,
+                                                key=object_name,
+                                                project=project,
+                                                institution=institution,
+                                                vapp=submission.vapp)
 
         resolution["validation_report_key"] = validation_report_key = "%s/validation-report.txt" % submission_id
         resolution["submission_key"] = submission_key = "%s/submission.json" % submission_id
         resolution["submission_response_key"] = submission_response_key = "%s/submission-response.txt" % submission_id
+        resolution["upload_info_key"] = upload_info_key = "%s/upload_info.txt" % submission_id
+
+        other_details = {}
+
+        def note_additional_datum(key, bundle_key=None):
+            other_details['additional_data'] = additional_data = other_details.get('additional_data', {})
+            additional_data[key] = data_bundle_result[bundle_key or key]
 
         with s3_output_stream(s3_client, bucket=DATA_BUNDLE_BUCKET, key=validation_report_key) as fp:
-            _show_report_lines(validation_log_lines, fp)
+            _show_report_lines(data_bundle_result['validation_output'], fp)
+            note_additional_datum('validation_output')
 
-        with s3_output_stream(s3_client, bucket=DATA_BUNDLE_BUCKET, key=submission_key) as fp:
-            print(json.dumps(final_json, indent=2), file=fp)
+        # Next several files are created only if relevant.
 
-        with s3_output_stream(s3_client, bucket=DATA_BUNDLE_BUCKET, key=submission_response_key) as fp:
-            _show_report_lines(result_lines, fp)
+        if data_bundle_result['result']:
+            with s3_output_stream(s3_client, bucket=DATA_BUNDLE_BUCKET, key=submission_key) as fp:
+                print(json.dumps(data_bundle_result['result'], indent=2), file=fp)
+                other_details['result'] = data_bundle_result['result']
 
-        # TODO: Sarah will provide a way to tell success from failure. -kmp 28-Jul-2020
-        submission.patch_item(processing_status={"state": "done", "outcome": "success", "progress": "complete"})
+        if data_bundle_result['post_output']:
+            with s3_output_stream(s3_client, bucket=DATA_BUNDLE_BUCKET, key=submission_response_key) as fp:
+                _show_report_lines(data_bundle_result['post_output'], fp)
+                note_additional_datum('post_output')
+
+        if data_bundle_result['upload_info']:
+            with s3_output_stream(s3_client, bucket=DATA_BUNDLE_BUCKET, key=upload_info_key) as fp:
+                print(json.dumps(data_bundle_result['upload_info'], indent=2), file=fp)
+                note_additional_datum('upload_info')
+
+        outcome = "success" if data_bundle_result['success'] else "failure"
+
+        submission.patch_item(processing_status={"state": "done", "outcome": outcome, "progress": "complete"},
+                              **other_details)
 
     except Exception as e:
 

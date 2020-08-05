@@ -2,6 +2,7 @@ import argparse
 import atexit
 import boto3
 import botocore.exceptions
+import cgi
 import datetime
 import elasticsearch
 import io
@@ -33,6 +34,7 @@ from snovault.util import debug_log
 from vcf import Reader
 from .commands.ingest_vcf import VCFParser
 from .ingestion.common import register_path_content_type, DATA_BUNDLE_BUCKET, SubmissionFailure
+from .ingestion.exceptions import UnspecifiedFormParameter
 from .ingestion.processors import get_ingestion_processor
 from .types.ingestion import SubmissionFolio
 from .util import resolve_file_path, gunzip_content, debuglog, subrequest_item_creation
@@ -134,7 +136,13 @@ def submit_for_ingestion(context, request):
     ignored(context)
 
     ingestion_type = request.POST['ingestion_type']
-    filename = request.POST['datafile'].filename
+    datafile = request.POST['datafile']
+    if not isinstance(datafile, cgi.FieldStorage):
+        # e.g., specifically it might be b'' when no file is selected,
+        # but IMPORTANTLY, cgi.FieldStorage has no predefined boolean value,
+        # so we can't just ask to check 'not datafile'. Sigh. -kmp 5-Aug-2020
+        raise UnspecifiedFormParameter('datafile')
+    filename = datafile.filename
     override_name = request.POST.get('override_name', None)
     parameters = dict(request.POST)
     parameters['datafile'] = filename
