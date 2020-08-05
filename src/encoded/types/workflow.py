@@ -11,7 +11,7 @@ import pstats
 from collections import OrderedDict, deque
 from dcicutils.env_utils import CGAP_ENV_WEBDEV, is_stg_or_prd_env, prod_bucket_env
 from inspect import signature
-from pyramid.httpexceptions import HTTPUnprocessableEntity
+from pyramid.httpexceptions import HTTPUnprocessableEntity, HTTPBadRequest
 from pyramid.response import Response
 from pyramid.view import view_config
 from snovault import calculated_property, collection, load_schema, CONNECTION, TYPES
@@ -919,6 +919,7 @@ def validate_input_json(context, request):
              permission='add', validators=[validate_input_json])
 @debug_log
 def pseudo_run(context, request):
+    """ XXX: This needs documentation badly. """
     input_json = request.json
 
     # set env_name for awsem runner in tibanna
@@ -942,7 +943,14 @@ def pseudo_run(context, request):
                             Payload=json.dumps(input_json))
     res_decode = res['Payload'].read().decode()
     res_dict = json.loads(res_decode)
-    arn = res_dict['_tibanna']['response']['executionArn']
+
+    # propagate response and error up if encountered
+    try:
+        arn = res_dict['_tibanna']['response']['executionArn']
+    except Exception as e:
+        raise HTTPBadRequest('Exception encountered getting response from lambda: %s\n'
+                             'Response: %s' % (e, res_dict))
+
     # just loop until we get proper status
     for i in range(100):
         res = aws_lambda.invoke(FunctionName=TIBANNA_WORKFLOW_STATUS_LAMBDA_FUNCTION,

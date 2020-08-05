@@ -4,16 +4,17 @@ import time
 import mock
 import datetime
 from uuid import uuid4
-from dcicutils.qa_utils import ignored
+from dcicutils.qa_utils import ignored, notice_pytest_fixtures
 from ..ingestion_listener import IngestionQueueManager, run, IngestionListener
 from ..util import gunzip_content
-from .variant_fixtures import gene_workbook  # noqa
+from .variant_fixtures import gene_workbook, post_variant_consequence_items
 
 
 pytestmark = [pytest.mark.working, pytest.mark.ingestion]
 QUEUE_INGESTION_URL = '/queue_ingestion'
 INGESTION_STATUS_URL = '/ingestion_status'
 MOCKED_ENV = 'fourfront-cgapother'
+notice_pytest_fixtures(gene_workbook, post_variant_consequence_items)
 
 
 def wait_for_queue_to_catch_up(n):
@@ -54,7 +55,14 @@ def test_ingestion_queue_add_and_receive(setup_and_teardown_sqs_state):
         str(uuid4()), str(uuid4())
     ])
     wait_for_queue_to_catch_up(0)
-    msgs = queue_manager.receive_messages()
+    tries, msgs = 5, []
+    while len(msgs) < 2:
+        if tries < 0:
+            break
+        _msgs = queue_manager.receive_messages(batch_size=1)  # should reduce flakiness
+        msgs.extend(_msgs)
+        wait_for_queue_to_catch_up(0)
+        tries -= 1
     assert len(msgs) == 2
 
 
@@ -134,7 +142,8 @@ def test_ingestion_listener_should_remain_online(setup_and_teardown_sqs_state):
     assert after > (before + end_delta)
 
 
-def test_ingestion_listener_run(testapp, mocked_vcf_file, gene_workbook, setup_and_teardown_sqs_state):
+def test_ingestion_listener_run(testapp, mocked_vcf_file, gene_workbook, setup_and_teardown_sqs_state,
+                                post_variant_consequence_items):
     """ Tests the 'run' method of ingestion listener, which will pull down and ingest a vcf file
         from the SQS queue.
     """

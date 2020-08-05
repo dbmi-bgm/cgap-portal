@@ -85,11 +85,12 @@ def build_variant_sample_embedded_list():
         'title': 'Variants',
         'description': 'List of all variants'
     },
-    unique_key='variant.annotation_id')
+    unique_key='variant:annotation_id')
 class Variant(Item):
     """ Variant class """
 
     item_type = 'variant'
+    name_key = 'annotation_id'
     schema = load_schema('encoded:schemas/variant.json')
     embedded_list = build_variant_embedded_list()
 
@@ -119,7 +120,7 @@ class Variant(Item):
         'title': 'Variants (sample)',
         'description': 'List of all variants with sample specific information',
     },
-    unique_key='variant_sample.annotation_id')
+    unique_key='variant_sample:annotation_id')
 class VariantSample(Item):
     """Class for variant samples."""
 

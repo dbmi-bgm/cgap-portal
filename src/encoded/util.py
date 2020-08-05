@@ -1,6 +1,8 @@
+import datetime
+import gzip
 import io
 import os
-import gzip
+
 from io import BytesIO
 
 
@@ -15,7 +17,12 @@ def resolve_file_path(path, file_loc=None):
     :param file_loc: absolute path to location path is relative to, by default path/to/encoded/src/
     :return: absolute path to location specified by path
     """
+    if path.startswith("~"):
+        # Really this shouldn't happen, so we could instead raise an error, but at least this is semantically correct.
+        path = os.path.expanduser(path)
     if file_loc:
+        if file_loc.startswith("~"):
+            file_loc = os.path.expanduser(file_loc)
         path_to_this_file = os.path.abspath(os.path.dirname(file_loc))
     else:
         path_to_this_file = os.path.abspath(ENCODED_ROOT_DIR)
@@ -24,6 +31,11 @@ def resolve_file_path(path, file_loc=None):
 
 def deduplicate_list(lst):
     """ De-duplicates the given list by converting it to a set then back to a list.
+
+    NOTES:
+    * The list must contain 'hashable' type elements that can be used in sets.
+    * The result list might not be ordered the same as the input list.
+    * This will also take tuples as input, though the result will be a list.
 
     :param lst: list to de-duplicate
     :return: de-duplicated list
@@ -41,54 +53,20 @@ def gunzip_content(content):
     return gunzipped_content.decode('utf-8')
 
 
-# TODO: Move this mock file system to dcicutils. -kmp 30-Jun-2020
+DEBUGLOG_ENABLED = os.environ.get('DEBUGLOG_ENABLED', "FALSE").lower() == "true"
 
-FILE_SYSTEM_VERBOSE = True
 
-class MockFileSystem:
-    """Extremely low-tech mock file system."""
+def debuglog(*args):
+    """
+    As the name implies, this is a low-tech logging facility for temporary debugging info.
+    Prints info to a file in user's home directory.
 
-    def __init__(self):
-        self.files = {}
-
-    def exists(self, file):
-        return bool(self.files.get(file))
-
-    def remove(self, file):
-        if not self.files.pop(file, None):
-            raise FileNotFoundError("No such file or directory: %s" % file)
-
-    def open(self, file, mode='r'):
-        if FILE_SYSTEM_VERBOSE: print("Opening %r in mode %r." % (file, mode))
-        if mode == 'w':
-            return self._open_for_write(file_system=self, file=file)
-        elif mode == 'r':
-            return self._open_for_read(file)
-        else:
-            raise AssertionError("Mocked io.open doesn't handle mode=%r." % mode)
-
-    def _open_for_read(self, file):
-        text = self.files.get(file)
-        if text is None:
-            raise FileNotFoundError("No such file or directory: %s" % file)
-        if FILE_SYSTEM_VERBOSE: print("Read %s to %s." % (text, file))
-        return io.StringIO(text)
-
-    def _open_for_write(self, file_system, file):
-
-        class MockFileWriter:
-
-            def __init__(self, file_system, file):
-                self.file_system = file_system
-                self.file = file
-                self.stream = io.StringIO()
-
-            def __enter__(self):
-                return self.stream
-
-            def __exit__(self, exc_type, exc_val, exc_tb):
-                text = self.stream.getvalue()
-                if FILE_SYSTEM_VERBOSE: print("Writing %s to %s." % (text, file))
-                self.file_system.files[file] = text
-
-        return MockFileWriter(file_system=file_system, file=file)
+    The debuglog facility allows simple debugging for temporary debugging of disparate parts of the system.
+    It takes arguments like print or one of the logging operations and outputs to ~/DEBUGLOG-yyyymmdd.txt.
+    Each line in the log is timestamped.
+    """
+    if DEBUGLOG_ENABLED:
+        nowstr = str(datetime.datetime.now())
+        dateid = nowstr[:10].replace('-', '')
+        with io.open(os.path.expanduser("~/DEBUGLOG-%s.txt" % dateid), "a+") as fp:
+            print(nowstr, *args, file=fp)
