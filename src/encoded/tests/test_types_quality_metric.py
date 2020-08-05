@@ -99,6 +99,7 @@ def bam_qc(testapp, institution, project):
         "status": "in review",
         "coverage": "30x",
         "mapping stats": {"total reads": 467863567},
+        "sample": "NA12879_sample",
         "overall_quality_status": "PASS",
         "uuid": "d918bc25-0888-4658-811b-53c20b944122"
     }
@@ -145,8 +146,8 @@ def test_quality_metric_summary_vcfqc(vcf_qc):
 def test_quality_metric_summary_bamqc(bam_qc):
     summary = bam_qc['quality_metric_summary']
     expected_summary = [
-        {'title': 'Total Reads', 'value': '467863567', 'numberType': 'integer'},
-        {'title': 'Coverage', 'value': '30x', 'numberType': 'string'}
+        {'title': 'Total Reads', 'sample': 'NA12879_sample', 'value': '467863567', 'numberType': 'integer'},
+        {'title': 'Coverage', 'sample': 'NA12879_sample', 'value': '30x', 'numberType': 'string'}
         ]
     for an_exp_info in expected_summary:
         assert an_exp_info in summary

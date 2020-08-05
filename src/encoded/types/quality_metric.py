@@ -288,9 +288,11 @@ class QualityMetricBamqc(QualityMetric):
         qc_summary = []
 
         qc_summary.append({"title": "Total Reads",
+                           "sample": qc.get("sample"),
                            "value": str(qc.get("mapping stats", {}).get("total reads")),
                            "numberType": "integer"})
         qc_summary.append({"title": "Coverage",
+                           "sample": qc.get("sample"),
                            "value": qc.get("coverage"),
                            "numberType": "string"})
         return qc_summary
