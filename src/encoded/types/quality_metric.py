@@ -224,7 +224,7 @@ class QualityMetricVcfqc(QualityMetric):
     def quality_metric_summary(self, request):
         qc = self.properties
         qc_summary = []
-        
+
         def denovo_fraction(total, de_novo):
             '''calculate percentage of de_novo in total'''
             if total <= 0:
@@ -233,23 +233,23 @@ class QualityMetricVcfqc(QualityMetric):
 
         if 'transition-transversion ratio' in qc:
             # full set
-            for tv in qc.get("total variants"):
+            for tv in qc.get("total variants", {}):
                 qc_summary.append({"title": "Total Variants Called",
                                    "sample": tv.get("name"),
                                    "value": str(tv.get("total")),
                                    "numberType": "integer"})
-            for ttr in qc.get("transition-transversion ratio"):
+            for ttr in qc.get("transition-transversion ratio", {}):
                 qc_summary.append({"title": "Transition-Transversion Ratio",
                                    "sample": ttr.get("name"),
                                    "value": str(ttr.get("ratio")),
                                    "numberType": "float"})
-            for hr in qc.get("heterozygosity ratio", {}).get("SNV"):
+            for hr in qc.get("heterozygosity ratio", {}).get("SNV", {}):
                 qc_summary.append({"title": "Heterozygosity Ratio",
                                    "sample": hr.get("name"),
                                    "value": str(hr.get("ratio")),
                                    "tooltip": "Het/Homo ratio",
                                    "numberType": "float"})
-            for me in qc.get("mendelian errors in trio", {}).get("SNV"):
+            for me in qc.get("mendelian errors in trio", {}).get("SNV", {}):
                total = me.get("counts", {}).get("het", {}).get("total", 0)
                de_novo = me.get("counts", {}).get("het", {}).get("de_novo", 0)
                qc_summary.append({"title": "De Novo Fraction",
@@ -259,7 +259,7 @@ class QualityMetricVcfqc(QualityMetric):
                                   "numberType": "percent"})
         else:
             # filtered set
-            for tv in qc.get("total variants"):
+            for tv in qc.get("total variants", {}):
                 qc_summary.append({"title": "Filtered Variants",
                                    "sample": tv.get("name"),
                                    "value": str(tv.get("total")),
