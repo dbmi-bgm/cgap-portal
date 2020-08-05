@@ -122,13 +122,13 @@ def test_html_collections(htmltestapp, item_type):
 def test_html_server_pages(item_type, wsgi_app):
     res = wsgi_app.get(
         '/%s?limit=1' % item_type,
-        headers={'Accept': 'text/html'},
+        headers={'Accept': 'application/json'},
     ).follow(
         status=200,
-        headers={'Accept': 'text/html'},
+        headers={'Accept': 'application/json'},
     )
     for item in res.json['@graph']:
-        res = wsgi_app.get(item['@id'], status=200)
+        res = wsgi_app.get(item['@id'], headers={ 'Accept': 'text/html' }, status=200)
         assert res.body.startswith(b'<!DOCTYPE html>')
         assert b'Internal Server Error' not in res.body
 
