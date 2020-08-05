@@ -122,10 +122,10 @@ def test_html_collections(htmltestapp, item_type):
 def test_html_server_pages(item_type, wsgi_app):
     res = wsgi_app.get(
         '/%s?limit=1' % item_type,
-        headers={'Accept': 'application/json'},
+        headers={'Accept': 'text/html'},
     ).follow(
         status=200,
-        headers={'Accept': 'application/json'},
+        headers={'Accept': 'text/html'},
     )
     for item in res.json['@graph']:
         res = wsgi_app.get(item['@id'], status=200)
@@ -142,7 +142,7 @@ def test_json(testapp, item_type):
 def test_json_basic_auth(anonhtmltestapp):
     url = '/'
     value = "Authorization: Basic %s" % ascii_native_(b64encode(b'nobody:pass'))
-    res = anonhtmltestapp.get(url, headers={'Authorization': value}, status=401)
+    res = anonhtmltestapp.get(url, headers={ 'Authorization': value, 'Accept' : "application/json" }, status=401)
     assert res.content_type == 'application/json'
 
 
