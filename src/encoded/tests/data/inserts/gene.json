@@ -1,17 +1,26 @@
 [
     {
         "uuid": "cf2e7ca1-8538-41f8-b945-2c1591bc4d3a",
-        "official_symbol": "A2ML1",
-        "gene_id": "HGNC:23336"
+        "gene_symbol": "A2ML1",
+        "hgnc_id": "HGNC:23336",
+        "ensgid": "ENSG00000166535",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "institution": "hms-dbmi"
     },
     {
         "uuid": "8ec55434-025c-4204-86ca-fa896d582805",
-        "official_symbol": "AFF2",
-        "gene_id": "HGNC:3776"
+        "gene_symbol": "AFF2",
+        "hgnc_id": "HGNC:3776",
+        "ensgid": "ENSG00000155966",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "institution": "hms-dbmi"
     },
     {
         "uuid": "8c809b76-0ed3-407f-98a6-9cd1831231ed",
-        "official_symbol": "FA2H",
-        "gene_id": "HGNC:21197"
+        "gene_symbol": "FA2H",
+        "hgnc_id": "HGNC:21197",
+        "ensgid": "ENSG00000103089",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "institution": "hms-dbmi"
     }
 ]

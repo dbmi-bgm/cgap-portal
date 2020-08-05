@@ -21,6 +21,7 @@
             "imported manually asserted information used in automatic assertion",
             "sequencing assay evidence"
         ],
-        "attribution_info": "omim|orphanet"
+        "original_source": ["OMIM", "ORPHANET"],
+        "attributed_pubs": ["PMID:12345"]
     }
 ]

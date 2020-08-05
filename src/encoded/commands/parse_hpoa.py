@@ -36,6 +36,11 @@ HPOA_URL = 'http://compbio.charite.de/jenkins/job/hpo.annotations.current/lastSu
 
 ''' Dictionary for field mapping between hpoa file and cgap disorder schema
 '''
+HEADER_MAP = {
+    'date': 'date: ',
+    'description': 'description: '
+}
+
 FIELD_MAPPING = {
     'DatabaseID': 'using_id',
     'DiseaseName': 'unused field',
@@ -167,41 +172,59 @@ def line2list(line):
     return [d.strip() for d in line.split('\t')]
 
 
-def has_unexpected_fields(data):
-    ''' Checks keys of dict to make sure that the keys correspond to a field from the
-        expected field mapping
-        return True if unexpected fields found
+def has_unexpected_members(members, expected_members):
+    ''' Checks list of values against a list of expected values
+        returns list of unexpected values
     '''
-    return [f for f in data if (f != DIS_NAME_FIELD_FROM_INPUT and f not in FIELD_MAPPING)]
+    return [f for f in members if f not in expected_members]
 
 
-def get_header_info_and_field_names(lines, logger):
-    ''' expects hash commented lines at beginning of file and the first uncommented lines
-        to contain the field names - if no preceeding comments will still work but report
-        info about file as 'unknown' but if any uncommented lines before field line then
-        program exit
+def get_header_info_and_field_name_line(lines, headermap=None, logger=None, first_nohash=True):
+    ''' Gets any hash commented lines at beginning of file and uses supplied
+        field dict to parse out info from the header and log
+        Also returns the line that contains field names - either:
+        - the first uncommented line by default
+        - or the final commented line of the header - first_nohash=False
     '''
-    fields = []
-    dtag = 'date: '
-    fdtag = 'description: '
-    date = 'unknown'
-    fdesc = 'unknown'
+    if not headermap:
+        logger.info("Nothing provided to parse header info from file")
+    hinfo = {}
+    prev_line = None
     while True:
         line = next(lines)
         if not line.startswith("#"):
+            if not first_nohash:
+                if not prev_line:
+                    logger.warn("Field name problem - fields expected in commented header lines but no commented lines found")
+                    return
+                line = prev_line.replace('#', '', 1).strip()
             break
-        elif dtag in line:
-            # get the date that the file was generated
-            _, date = line.split(dtag)
-        elif fdtag in line:
-            _, fdesc = line.split(fdtag)
-    logger.info("Annotation file info:\n\tdate: {}\n\tdescription: {}".format(date, fdesc))
+        for h, tag in headermap.items():
+            if tag in line:  # found the tag in the header
+                _, info = line.split(tag)
+                hinfo[h] = info
+        prev_line = line
+    if hinfo:
+        logger.info("Annotation file info:\n")
+        for f, v in hinfo.items():
+            logger.info("\t{}: {}".format(f, v))
+    else:
+        logger.info("No header in the file")
+    return line
+
+
+def get_fields_from_line(line, logger, expected_fields=None):
+    ''' Converts a line to a list of putative field names
+        Will check to see if names match what is expected if expected names are provided
+    '''
+    # line holds the first non-commented line
     fields = line2list(line)
-    bad_fields = has_unexpected_fields(fields)
-    if bad_fields:
-        logger.error("UNKNOWN FIELDS FOUND: {}".format(', '.join(bad_fields)))
-        sys.exit()
-    return fields, lines
+    if expected_fields:
+        bad_fields = has_unexpected_members(fields, expected_fields)
+        if bad_fields:
+            logger.error("UNKNOWN FIELDS FOUND: {}".format(', '.join(bad_fields)))
+            sys.exit()
+    return fields
 
 
 def find_disorder_uid_using_file_id(data, xref2disorder):
@@ -383,12 +406,15 @@ def main():  # pragma: no cover
     # this a generator for all the lines of annotation data
     lines = get_input_gen(insrc)
 
-    fields, lines = get_header_info_and_field_names(lines, logger)
+    field_line = get_header_info_and_field_name_line(lines, HEADER_MAP, logger, False)
+    fields = get_fields_from_line(field_line, logger, FIELD_MAPPING.keys())
 
     for line in lines:
         if line.startswith("#"):
             continue
         data_list = line2list(line)
+        if data_list == fields:  # don't want to treat the field line as data
+            continue
         data = dict(zip(fields, data_list))
 
         # find the  disorder_uuid to refer to subject_item

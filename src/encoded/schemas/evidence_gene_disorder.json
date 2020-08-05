@@ -99,10 +99,25 @@
                 "Other"
             ]
         },
-        "attribution_info": {
-            "title": "Attribution",
-            "description": "source of the information used for the annotation. This may be the primary datasource if data is obtained from an aggregated source",
-            "type": "string"
+        "original_source": {
+            "title": "Originating source(s)",
+            "description": "Source(s) of the information used for the annotation. This may be the primary datasource if data is obtained from an aggregated source",
+            "type": "array",
+            "items": {
+                "type": "string",
+                "title": "Source DB",
+                "uniqueItems": true
+            }
+        },
+        "attributed_pubs": {
+            "title": "Source Publications",
+            "description": "Publicatons sources used to make connection",
+            "type": "array",
+            "items": {
+                "type": "string",
+                "title": "Publication ID",
+                "uniqueItems": true
+            }
         },
         "curation_history": {
             "title": "Curation History",
