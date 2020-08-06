@@ -62,6 +62,12 @@
             "description": "Cohort of the family",
             "type" : "string",
             "linkTo": "Nexus"
+        },
+        "default_filter_set": {
+            "title": "Default FilterSet",
+            "description": "The default filterset defined by the user for this case",
+            "type": "string",
+            "linkTo": "FilterSet"
         }
     },
     "facets" : {
