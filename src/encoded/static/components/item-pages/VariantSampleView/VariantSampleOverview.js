@@ -90,8 +90,8 @@ function VariantSampleInfoHeader (props) {
     const geneList = useMemo(function(){
         return extractListOfGenes(context);
     }, [ context ]);
+    const geneListLen = geneList.length;
     const selectedGene = useMemo(function(){
-        const geneListLen = geneList.length;
         for (let i = 0; i < geneListLen; i++) {
             const gene = geneList[i];
             if (gene["@id"] === currentGeneID) {
@@ -119,13 +119,14 @@ function VariantSampleInfoHeader (props) {
             { currentGeneTitle }
             { currentGeneItemLoading ? <i className="ml-07 icon icon-spin fas icon-circle-notch"/> : null }
         </span>
-    ) : <em>No gene selected</em>;
+    ) : (geneListLen === 0 ? <em>No genes available</em> : <em>No gene selected</em>);
 
     // TODO consider common styling for .info-header title, maybe it could be display: flex with align-items: center and vertically
     // center its children equally regardless if text or DropdownButton (and maybe is applied to a div where h4 would become child of it)
     return (
-        <div className="row">
-            <div className="col-2">
+        // Stack these into flex column until large responsive size, then make into row.
+        <div className="row flex-column flex-lg-row">
+            <div className="col col-lg-2">
                 <h4 className="info-header-title">
                     Case ID
                 </h4>
@@ -144,7 +145,7 @@ function VariantSampleInfoHeader (props) {
             <div className="col">
                 <div className="d-flex">
                     <h4 className="info-header-title">
-                        <DropdownButton title={geneTitleToShow} variant="outline-dark" onSelect={onSelectGene}>
+                        <DropdownButton title={geneTitleToShow} variant="outline-dark" onSelect={onSelectGene} disabled={geneListLen === 0}>
                             { geneListOptions }
                         </DropdownButton>
                     </h4>
