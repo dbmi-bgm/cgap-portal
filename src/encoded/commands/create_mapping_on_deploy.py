@@ -33,6 +33,7 @@ ITEM_INDEX_ORDER = [
     'FileReference',
     'Image',
     'Gene',
+    'GeneList',
     'Phenotype',
     'Disorder',
     'Individual',
