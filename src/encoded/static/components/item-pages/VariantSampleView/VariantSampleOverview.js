@@ -14,21 +14,20 @@ export class VariantSampleOverview extends React.PureComponent {
     constructor(props){
         super(props);
         this.loadGene = this.loadGene.bind(this);
-        this.onSelectGene = this.onSelectGene.bind(this);
-        const {
-            context: {
-                variant: {
-                    transcript = []
-                } = {}
-            }
-        } = props;
+        this.onSelectTranscript = this.onSelectTranscript.bind(this);
+        // const {
+        //     context: {
+        //         variant: {
+        //             transcript = []
+        //         } = {}
+        //     }
+        // } = props;
 
         // TODO maybe one of these things will have 'is_default' or something to better-select.
-        const [ { vep_gene: { '@id' : firstGeneID = null } = {} } = {} ] = transcript;
+        // const [ { vep_gene: { '@id' : firstGeneID = null } = {} } = {} ] = transcript;
 
         this.state = {
-            // TODO: Maybe change this to be currentTranscriptIndex, since some genes are duplicated in test inserts.. figuring out
-            currentGeneID: firstGeneID,
+            currentTranscriptIdx: 0,
             currentGeneItem: null,
             currentGeneItemLoading: false
         };
@@ -40,15 +39,18 @@ export class VariantSampleOverview extends React.PureComponent {
     }
 
     componentDidUpdate(pastProps, pastState){
-        const { currentGeneID } = this.state;
-        const { currentGeneID: pastGeneID } = pastState;
-        if (pastGeneID !== currentGeneID) {
+        const { currentTranscriptIdx } = this.state;
+        const { currentTranscriptIdx: pastTranscriptIndex } = pastState;
+        if (pastTranscriptIndex !== currentTranscriptIdx) {
             this.loadGene();
         }
     }
 
     loadGene(){
-        const { currentGeneID } = this.state;
+        const { context } = this.props;
+        const { currentTranscriptIdx } = this.state;
+        const currentGeneID = getCurrentTranscriptGeneID(context, currentTranscriptIdx);
+        console.log("GID", currentGeneID);
         const cachedGeneItem = this.loadedGeneCache[currentGeneID];
         if (cachedGeneItem) {
             this.setState({ currentGeneItem: cachedGeneItem });
@@ -56,22 +58,23 @@ export class VariantSampleOverview extends React.PureComponent {
         }
         this.setState({ currentGeneItemLoading: true }, ()=>{
             ajax.load(currentGeneID, (currentGeneItem)=>{
+                this.loadedGeneCache[currentGeneID] = currentGeneItem;
                 this.setState({ currentGeneItem, currentGeneItemLoading: false });
             });
         });
     }
 
-    onSelectGene(geneID){
-        this.setState({ currentGeneID: geneID });
+    onSelectTranscript(transcriptIndex){
+        this.setState({ currentTranscriptIdx: transcriptIndex });
     }
 
     render(){
         const { context } = this.props;
-        const { currentGeneID, currentGeneItem, currentGeneItemLoading } = this.state;
+        const { currentTranscriptIdx, currentGeneItem, currentGeneItemLoading } = this.state;
         return (
             <div className="sample-variant-overview sample-variant-annotation-space-body">
                 {/* BA1, BS1, BS2, BS3 etc markers here */}
-                <VariantSampleInfoHeader { ...{ context, currentGeneID, currentGeneItemLoading }} onSelectGene={this.onSelectGene} />
+                <VariantSampleInfoHeader { ...{ context, currentTranscriptIdx, currentGeneItemLoading }} onSelectTranscript={this.onSelectTranscript} />
                 <VariantSampleOverviewTabView {...{ context, currentGeneItem, currentGeneItemLoading }} />
             </div>
         );
@@ -79,29 +82,24 @@ export class VariantSampleOverview extends React.PureComponent {
 
 }
 
+function getCurrentTranscriptGeneID(context, transcriptIndex){
+    const { variant: { transcript: geneTranscriptList = [] } = {} } = context;
+    const { vep_gene : { "@id" : geneID = null } = {} } = geneTranscriptList[transcriptIndex] || {};
+    return geneID;
+}
+
 function VariantSampleInfoHeader (props) {
-    const { context, currentGeneID, currentGeneItemLoading, onSelectGene } = props;
+    const { context, currentTranscriptIdx, currentGeneItemLoading, onSelectTranscript } = props;
     const { variant: { transcript: geneTranscriptList = [] } = {} } = context;
     const geneTranscriptListLen = geneTranscriptList.length;
 
     // Grab it from embedded item, rather than the AJAXed in currentGeneItem, as is more 'up-to-date'.
-    const selectedGeneTranscript = useMemo(function(){
-        for (let i = 0; i < geneTranscriptListLen; i++) {
-            const transcript = geneTranscriptList[i];
-            if (transcript.vep_gene["@id"] === currentGeneID) {
-                return transcript;
-            }
-        }
-        return null;
-    }, [ geneTranscriptList, currentGeneID ]);
+    const selectedGeneTranscript = geneTranscriptList[currentTranscriptIdx];
+    const selectedGeneTitle = <GeneTranscriptDisplayTitle transcript={selectedGeneTranscript} />;
 
-    const currentGeneTitle = <GeneTranscriptDisplayTitle transcript={selectedGeneTranscript} />;
-
-    const geneListOptions = geneTranscriptList.map(function(transcript){
-        const { vep_gene : { '@id' : geneID = null } = {} } = transcript;
-        const active = (geneID === currentGeneID);
+    const geneListOptions = geneTranscriptList.map(function(transcript, idx){
         return (
-            <DropdownItem key={geneID} eventKey={geneID} active={active}>
+            <DropdownItem key={idx} eventKey={idx} active={idx === currentTranscriptIdx}>
                 <GeneTranscriptDisplayTitle transcript={transcript} />
             </DropdownItem>
         );
@@ -109,7 +107,7 @@ function VariantSampleInfoHeader (props) {
 
     const geneTitleToShow = selectedGeneTranscript ? (
         <span>
-            { currentGeneTitle }
+            { selectedGeneTitle }
             { currentGeneItemLoading ? <i className="ml-07 icon icon-spin fas icon-circle-notch"/> : null }
         </span>
     ) : (geneTranscriptListLen === 0 ? <em>No genes available</em> : <em>No gene selected</em>);
@@ -118,46 +116,52 @@ function VariantSampleInfoHeader (props) {
     // center its children equally regardless if text or DropdownButton (and maybe is applied to a div where h4 would become child of it)
     return (
         // Stack these into flex column until large responsive size, then make into row.
-        <div className="row flex-column flex-lg-row">
-            <div className="col col-lg-2">
-                <h4 className="info-header-title">
-                    Case ID
-                </h4>
-                <div className="info-body">
+        <div className="card mb-24">
+            <div className="card-body">
+                <div className="row flex-column flex-lg-row">
+                    <div className="col col-lg-2">
+                        <h4 className="info-header-title">
+                            Case ID
+                        </h4>
+                        <div className="info-body">
 
-                </div>
-            </div>
-            <div className="col">
-                <h4 className="info-header-title">
-                    Position
-                </h4>
-                <div className="info-body">
-
-                </div>
-            </div>
-            <div className="col">
-                <div className="d-flex">
-                    <h4 className="info-header-title">
-                        <DropdownButton title={geneTitleToShow} variant="outline-dark" onSelect={onSelectGene} disabled={geneTranscriptListLen === 0}>
-                            { geneListOptions }
-                        </DropdownButton>
-                    </h4>
-                    <div className="flex-grow-1 text-right">
-                        {/* BA1, BS1 here maybe */}
+                        </div>
                     </div>
-                </div>
-                <div className="info-body">
+                    <div className="col">
+                        <h4 className="info-header-title">
+                            Position
+                        </h4>
+                        <div className="info-body">
 
+                        </div>
+                    </div>
+                    <div className="col">
+                        <div className="d-flex">
+                            <h4 className="info-header-title">
+                                <DropdownButton title={geneTitleToShow} variant="outline-dark" onSelect={onSelectTranscript} disabled={geneTranscriptListLen === 0}>
+                                    { geneListOptions }
+                                </DropdownButton>
+                            </h4>
+                            <div className="flex-grow-1 text-right">
+                                {/* BA1, BS1 here maybe */}
+                            </div>
+                        </div>
+                        <div className="info-body">
+
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     );
 }
 
-function GeneTranscriptDisplayTitle({ transcript, className = null }){
+function GeneTranscriptDisplayTitle({ transcript, className = "text-600" }){
     if (!transcript) return null;
     const {
         vep_canonical = false,
+        vep_feature_ncbi = null,
+        vep_feature = <em>No Name</em>,
         vep_biotype = null,
         vep_gene : {
             display_title: geneDisplayTitle = null
@@ -165,9 +169,9 @@ function GeneTranscriptDisplayTitle({ transcript, className = null }){
     } = transcript;
     return (
         <span className={className}>
-            <span>{ geneDisplayTitle || <em>No Gene</em> }</span>
+            <span>{ vep_feature_ncbi || vep_feature }</span>
+            <span className="text-400"> ({ geneDisplayTitle || <em>No Gene</em> })</span>
             { vep_canonical ? <span className="text-300"> (canonical)</span> : null }
-            { vep_biotype ? <span className="text-300"> ({ vep_biotype })</span> : null }
         </span>
     );
 }

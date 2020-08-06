@@ -2390,6 +2390,16 @@ $badge-item-min-height: 90px;
 
 
 .sample-variant-annotation-space-body {
+
+	.info-header-title {
+		display: flex;
+		align-items: center;
+		> h4 {
+			font-weight: 600;
+			margin: 0;
+		}
+	}
+
 	.sample-variant-overview-tab-view-container {
 		.tabs-column {
 			//flex-grow: 0; // Will adjust via responsive Bootstrap classNames
