@@ -513,18 +513,21 @@ def parse_exception(e, aliases):
                 continue
             else:
                 error = error.lstrip('Schema: ')
-                field_name = error[:error.index(' - ')]
-                field = None
-                if field_name in GENERIC_FIELD_MAPPING['sample'].values():
-                    field = [key for key, val in GENERIC_FIELD_MAPPING['sample'].items() if val == field_name][0]
-                elif field_name == 'requisition_acceptance.accepted_rejected':
-                    field = 'Req Accepted Y\\N'
-                error = map_enum_options(field_name, error)
-                if not field:
-                    field = field_name.replace('_', ' ')
+                if error.index('- ') > 0:
+                    field_name = error[:error.index(' - ')]
+                    field = None
+                    if field_name in GENERIC_FIELD_MAPPING['sample'].values():
+                        field = [key for key, val in GENERIC_FIELD_MAPPING['sample'].items() if val == field_name][0]
+                    elif field_name == 'requisition_acceptance.accepted_rejected':
+                        field = 'Req Accepted Y\\N'
+                    error = map_enum_options(field_name, error)
+                    if not field:
+                        field = field_name.replace('_', ' ')
 
-                error = 'field: ' + error.replace(field_name, field)
-                keep.append(error)
+                    error = 'field: ' + error.replace(field_name, field)
+                    keep.append(error)
+                elif 'Additional properties are not allowed' in error:
+                    keep.append(error[2:])
         return keep
     else:
         raise e
