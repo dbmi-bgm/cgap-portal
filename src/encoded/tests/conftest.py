@@ -147,15 +147,35 @@ def root(registry):
 
 @pytest.fixture
 def anonhtmltestapp(app):
-    return webtest.TestApp(app)
+    environ = {
+        'HTTP_ACCEPT': 'text/html'
+    }
+    test_app = webtest.TestApp(app, environ)
+    # original_get = test_app.get
+    # # Emulate client acting as a browser when making requests to this (unless other header supplied)
+    # def new_get_request(url, params=None, headers=None, **kwargs):
+    #     new_headers = { "Accept" : "text/html" }
+    #     new_headers.update(headers or {})
+    #     return original_get(url, params=params, headers=new_headers, **kwargs)
+    # setattr(test_app, "get", new_get_request)
+    return test_app
 
 
 @pytest.fixture
 def htmltestapp(app):
     environ = {
+        'HTTP_ACCEPT': 'text/html',
         'REMOTE_USER': 'TEST',
     }
-    return webtest.TestApp(app, environ)
+    test_app = webtest.TestApp(app, environ)
+    # original_get = test_app.get
+    # # Emulate client acting as a browser when making requests to this (unless other header supplied)
+    # def new_get_request(url, params=None, headers=None, **kwargs):
+    #     new_headers = { "Accept" : "text/html" }
+    #     new_headers.update(headers or {})
+    #     return original_get(url, params=params, headers=new_headers, **kwargs)
+    # setattr(test_app, "get", new_get_request)
+    return test_app
 
 
 @pytest.fixture(scope="module")

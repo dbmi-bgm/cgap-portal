@@ -1,6 +1,6 @@
 'use strict';
 
-import React from 'react';
+import React, { useMemo } from 'react';
 import PropTypes from 'prop-types';
 import _ from 'underscore';
 import url from 'url';
@@ -9,6 +9,7 @@ import queryString from 'querystring';
 import { get as getSchemas, Term } from './../../util/Schemas';
 import { object, ajax, layout, isServerSide, schemaTransforms, memoizedUrlParse } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { columnExtensionMap as columnExtensionMapCGAP } from './../../browse/columnExtensionMap';
+import { CaseDetailPane } from './../../browse/CaseDetailPane';
 
 import { EmbeddedSearchView } from '@hms-dbmi-bgm/shared-portal-components/es/components/browse/EmbeddedSearchView';
 //import { transformedFacets } from './../../../browse/SearchView';
@@ -47,11 +48,13 @@ export class EmbeddedItemSearchTable extends React.PureComponent {
             children,
             facets,
             session, schemas: propSchemas,
-            renderDetailPane, defaultOpenIndices, maxHeight,
+            defaultOpenIndices, maxHeight,
             columns, columnExtensionMap,
             searchHref,
             filterFacetFxn, hideFacets,
             filterColumnFxn, hideColumns,
+            renderDetailPane,
+            rowHeight = 90 // Keep in sync w CSS
         } = this.props;
         const { totalCount } = this.state;
 
@@ -64,10 +67,12 @@ export class EmbeddedItemSearchTable extends React.PureComponent {
         const passProps = {
             facets, columns, columnExtensionMap, searchHref, session,
             schemas, renderDetailPane, defaultOpenIndices, maxHeight,
+            rowHeight,
             filterFacetFxn, hideFacets,
             filterColumnFxn, hideColumns,
             onLoad: this.getCountCallback,
-            termTransformFxn: Term.toName
+            termTransformFxn: Term.toName,
+            separateSingleTermFacets: false
         };
 
         const showTitle = !title ? null
@@ -87,4 +92,15 @@ export class EmbeddedItemSearchTable extends React.PureComponent {
             </div>
         );
     }
+}
+
+export function EmbeddedCaseSearchTable (props){
+    const renderDetailPane = useMemo(function(){
+        return function renderCaseDetailPane(result, rowNumber, containerWidth, propsFromTable){
+            return <CaseDetailPane {...{ result, containerWidth, rowNumber }} paddingWidth={57} />;
+        };
+    }, []);
+    return (
+        <EmbeddedItemSearchTable {...props} renderDetailPane={renderDetailPane} />
+    );
 }
