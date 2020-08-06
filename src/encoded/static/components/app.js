@@ -1802,8 +1802,7 @@ class BodyElement extends React.PureComponent {
 
                 <div id="overlays-container" ref={this.overlaysContainerRef}/>
 
-                <ReactTooltip effect="solid" ref={this.tooltipRef} globalEventOff="click" key="tooltip"
-                    afterHide={this.onAfterTooltipHide} />
+                <ReactTooltip effect="solid" globalEventOff="click" key="tooltip" uuid="primary-tooltip-fake-uuid" />
 
             </body>
         );
