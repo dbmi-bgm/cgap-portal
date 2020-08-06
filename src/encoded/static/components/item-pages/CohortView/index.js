@@ -16,8 +16,8 @@ import { buildPedigreeGraphData } from './../../viz/PedigreeViz';
 import { CohortSummaryTable } from './CohortSummaryTable';
 import { PedigreeTabViewBody, idToGraphIdentifier } from './PedigreeTabViewBody';
 import { PedigreeTabView, PedigreeTabViewOptionsController } from './PedigreeTabView';
-import { PedigreeFullScreenBtn } from './PedigreeFullScreenBtn';
-import { parseFamilyIntoDataset } from './family-parsing';
+import { PedigreeFullScreenBtn } from './../CaseView/PedigreeFullScreenBtn';
+import { parseFamilyIntoDataset } from './../CaseView/family-parsing';
 import { AttachmentInputController, AttachmentInputMenuOption } from './attachment-input';
 import { CohortStats } from './CohortStats';
 import CohortSubmissionView from './CohortSubmissionView';
@@ -30,6 +30,11 @@ export {
     CohortSubmissionView
 };
 
+
+/**
+ * @module
+ * DEPRECATED & TO BE DELETED.
+ */
 
 
 class CurrentFamilyController extends React.PureComponent {
@@ -230,16 +235,24 @@ export default class CohortView extends DefaultItemView {
     /** Render additional item actions */
     additionalItemActionsContent(){
         const { context, href } = this.props;
-        const hasEditPermission = _.find(context.actions || [], { 'name' : 'edit' });
-        if (!hasEditPermission){
-            return null;
-        }
-        return (
-            <AttachmentInputController {...{ context, href }} onAddedFamily={this.onAddedFamily}>
-                <AttachmentInputMenuOption />
-            </AttachmentInputController>
-        );
+        return <AdditionalCaseActions {...{ context, href }} onAddedFamily={this.onAddedFamily} />;
     }
+}
+
+function AdditionalCaseActions({ context, href, onAddedFamily }){
+    const hasEditPermission = useMemo(function(){
+        return !!(_.find(context.actions || [], { 'name' : 'edit' }));
+    }, [ context ]);
+
+    if (!hasEditPermission){
+        return null;
+    }
+
+    return (
+        <AttachmentInputController {...{ context, href, onAddedFamily }}>
+            <AttachmentInputMenuOption />
+        </AttachmentInputController>
+    );
 }
 
 const CohortSummaryTabView = React.memo(function CohortSummaryTabView(props){
@@ -287,7 +300,7 @@ const CohortSummaryTabView = React.memo(function CohortSummaryTabView(props){
             // By default, click on link elements would trigger ajax request to get new context.
             // (unless are external links)
             navigate("#pedigree", { skipRequest: true });
-        }
+        };
     }, [ /* empty == executed only once ever */ ]);
 
     let cohortSummaryTables;
@@ -419,7 +432,7 @@ const CohortSummaryTabView = React.memo(function CohortSummaryTabView(props){
                         { pedBlock }
                         <button type="button" className="btn btn-primary btn-lg btn-block mt-1"
                             onClick={onViewPedigreeBtnClick} disabled={familiesLen === 0}>
-                            View Pedigree(s)
+                            View Pedigree
                         </button>
                     </div>
                 </div>

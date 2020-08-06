@@ -164,7 +164,7 @@ export class CGAPLogo extends React.PureComponent {
 
         return (
             <div className={containerCls} onClick={onClick} onMouseEnter={this.setHoverStateOn} onMouseLeave={this.setHoverStateOff}>
-                <svg id={id} ref={this.svgRef} style={outerStyle} viewBox="0 0 90 90">
+                <svg id={id} ref={this.svgRef} style={outerStyle} viewBox="0 0 92 92">
                     <g transform={groupTransform}>
                         <path d="m 81.314453,24.175781 3.75,7.5 h 10.796875 l -3.71875,-7.5 z" style={style1} className="path-g-1" />
                         <path d="M 61.289062,4.3085938 55.621094,11.865234 84.261719,31.1875 80.705078,24.072266 Z" style={style1} className="path-g-1" />

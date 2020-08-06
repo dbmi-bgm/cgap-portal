@@ -55,8 +55,7 @@
                 "Waiting",
                 "Queued",
                 "Ingested"
-            ],
-            "default": "N/A"
+            ]
         },
         "file_classification": {
             "title": "General Classification",

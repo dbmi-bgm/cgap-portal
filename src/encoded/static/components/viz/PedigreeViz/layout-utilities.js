@@ -549,8 +549,14 @@ function buildAncestralPositions(spansByHeightIndex, q, seenDirectInRelation = {
                 console.log('children sorty-b', a.id, b.id, aMarPos, bMarPos, aDist, bDist);
                 if (aDist === bDist){
                     // Most likely Infinity for both, default to age in case one does not have it defined (else is 0).
-                    return sortByAge(a,b);
-                    //return 0;
+                    const ageRes = sortByAge(a,b);
+                    if (ageRes === 0 && a.name && b.name) {
+                        if (a.name < b.name) return -1;
+                        if (a.name > b.name) return 1;
+                        return 0;
+                    } else {
+                        return 0;
+                    }
                 }
                 if (aDist < bDist) {
                     if (aMarPos > horizPos) {

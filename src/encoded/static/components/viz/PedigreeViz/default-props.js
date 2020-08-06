@@ -165,6 +165,15 @@ export const pedigreeVizViewDefaultProps = {
     "showOrderBasedName" : true,
 
     /**
+     * If true, will show diseases currently that aren't part of color-coded ones.
+     * This might change later, maybe could select from enum something to display,
+     * etc.
+     *
+     * @type {boolean}
+     */
+    "showNotes" : true,
+
+    /**
      * Initial zoom/scale.
      * Will be overriden if `zoomToExtentsOnMount` is true,
      * after mount.

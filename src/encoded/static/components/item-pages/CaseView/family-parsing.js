@@ -1,12 +1,17 @@
 'use strict';
 
-import React from 'react';
-
 /**
  * Parses `context.families` instance
  * into list of Individuals (JSON objects) with
  * PedigreeViz-compliant properties.
+ *
+ * This is contextual to CGAP, with assumption that
+ * stuff in PedigreeViz directory is meant to be
+ * ambiguous re: who using it, so as to be reusable
+ * and independently publishable eventually as own
+ * NPM library.
  */
+
 export function parseFamilyIntoDataset(family){
     const { members = [], proband, original_pedigree } = family;
     const probandID = (proband && (typeof proband === 'string' ? proband : proband['@id'])) || null;
@@ -25,7 +30,8 @@ export function parseFamilyIntoDataset(family){
             phenotypic_features = [],
             age = null, age_units = null,
             age_at_death = null, age_at_death_units = null,
-            ancestry = []
+            ancestry = [],
+            individual_id = null // Optional user-supplied name or identifier.
         } = individual;
 
         const fatherStr = (father && (typeof father === 'string' ? father : father['@id'])) || null;
@@ -35,8 +41,8 @@ export function parseFamilyIntoDataset(family){
         // Here we transform phenotypic_features to this vocab (might change later, and/or conditionally)
 
         const diseases = []; // All strings
-        const carrierOfDiseases = [];
-        const asymptoticDiseases = [];
+        const carrierOfDiseases = []; // todo
+        const asymptoticDiseases = []; // todo
 
         phenotypic_features.forEach(function(featureWrapper){
             const feature = (featureWrapper && featureWrapper.phenotypic_feature) || null;
@@ -82,21 +88,25 @@ export function parseFamilyIntoDataset(family){
             ageNumerical = calcAgeNum(age, age_units);
         }
 
-        let name = displayTitle;
-        if (displayTitle.slice(0,5) === "GAPID"){
-            // <span>s don't work inside SVGs
-            /*
-            name = (
-                <React.Fragment>
-                    <span className="small">CGAPID</span>
-                    <span>{ displayTitle.slice(5) }</span>
-                </React.Fragment>
-            );
-            */
-            //name = "ɢᴀᴘɪᴅ" + displayTitle.slice(5);
-            //name = "ᴳᴬᴾᴵᴰ " + displayTitle.slice(5);
-            //name = "ᴵᴰ " + displayTitle.slice(5);
-            name = "ɪᴅ: " + displayTitle.slice(5);
+        let name = individual_id;   // Use user-supplied identifier where possible.
+        if (!name) {                // Fallback to accession if not available.
+            name = displayTitle;
+            if (displayTitle.slice(0,5) === "GAPID"){
+                // <span>s don't work inside SVGs
+                // We could theoretically do multiple lines using SVG text... but... then can't sort by this.
+                /*
+                name = (
+                    <React.Fragment>
+                        <span className="small">CGAPID</span>
+                        <span>{ displayTitle.slice(5) }</span>
+                    </React.Fragment>
+                );
+                */
+                //name = "ɢᴀᴘɪᴅ" + displayTitle.slice(5);
+                //name = "ᴳᴬᴾᴵᴰ " + displayTitle.slice(5);
+                //name = "ᴵᴰ " + displayTitle.slice(5);
+                name = "ɪᴅ: " + displayTitle.slice(5);
+            }
         }
 
         return {
@@ -121,7 +131,12 @@ export function parseFamilyIntoDataset(family){
     });
 }
 
-
+/**
+ * Gathers all phenotypic features from all individual members of a family.
+ * Possibly deprecated.
+ *
+ * @param {{ members: { "@id": string }[], proband: { "@id" : string } }} family - Current Family
+ */
 export function gatherPhenotypicFeatureItems(family){
     if (!family) return [];
     const {
@@ -136,9 +151,12 @@ export function gatherPhenotypicFeatureItems(family){
         const { phenotypic_features = [] } = individual;
         phenotypic_features.forEach(function(pfObj){
             const { phenotypic_feature } = pfObj;
-            const { '@id': featureID, display_title: featureTitle } = phenotypic_feature;
+            const {
+                '@id': featureID,
+                display_title: featureTitle
+            } = phenotypic_feature;
             if (!featureID || seenIDs[featureID]){
-                return;
+                return; // Skip, perhaps no view permission.
             }
             seenIDs[featureID] = true;
             diseases.push(phenotypic_feature);
@@ -154,15 +172,17 @@ export function gatherPhenotypicFeatureItems(family){
 }
 
 /**
- * Maps `context.cohort_phenotypic_features`
- * to strings.
+ * Maps phenotypic features to plain strings,
+ * usually display_title.
  *
- * @param {{ @id: string, display_title: string }[]|string[]} [cohort_phenotypic_features=[]] List of phenotypic feature Items from Cohort.
+ * @todo rename to "getPhenotypicFeaturesAsStrings" perhaps.
+ * @todo Or keep phenotypic features as object in case of duplicate titles for some reason.
+ * @param {{ @id: string, display_title: string }[]|string[]} [case_phenotypic_features=[]] List of phenotypic feature Items from Case.
  * @returns {string[]}
  */
-export function getPhenotypicFeatureStrings(cohort_phenotypic_features = []){
+export function getPhenotypicFeatureStrings(family_phenotypic_features = []){
     const strings = [];
-    cohort_phenotypic_features.forEach(function(feature){
+    family_phenotypic_features.forEach(function(feature){
         if (typeof feature === 'string') return feature;
         const { '@id' : featureID, display_title } = feature;
         if (!featureID) return;
