@@ -47,6 +47,12 @@
                 "type" : "string",
                 "linkTo" : "Disorder"
             }
+        },
+        "source_file": {
+            "title" : "Source File",
+            "description": "The original gene list file used for generating this gene list item",
+            "type" : "string",
+            "linkTo": "Document"
         }
     }
 }
