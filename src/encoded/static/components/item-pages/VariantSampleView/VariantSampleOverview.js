@@ -15,11 +15,19 @@ export class VariantSampleOverview extends React.PureComponent {
         super(props);
         this.loadGene = this.loadGene.bind(this);
         this.onSelectGene = this.onSelectGene.bind(this);
+        const {
+            context: {
+                variant: {
+                    transcript = []
+                } = {}
+            }
+        } = props;
 
         // TODO maybe one of these things will have 'is_default' or something to better-select.
-        const [ { '@id' : firstGeneID = null } = {} ] = extractListOfGenes(props.context);
+        const [ { vep_gene: { '@id' : firstGeneID = null } = {} } = {} ] = transcript;
 
         this.state = {
+            // TODO: Maybe change this to be currentTranscriptIndex, since some genes are duplicated in test inserts.. figuring out
             currentGeneID: firstGeneID,
             currentGeneItem: null,
             currentGeneItemLoading: false
@@ -71,55 +79,40 @@ export class VariantSampleOverview extends React.PureComponent {
 
 }
 
-/** Grab list of gene embedded Items from VariantSample.variant.transcript.vep_gene */
-export function extractListOfGenes(variantSampleContext) {
-    const { variant : { transcript = [] } = {} } = variantSampleContext;
-    // TODO change what this returns as/if needed; maybe return entire transcript if
-    // need to build title out of those fields, idk.
-    return transcript.map(function({ vep_gene = null }){
-        return vep_gene;
-    }).filter(function(vep_gene){
-        // Eventually we maybe don't filter out vep_gene with view permission 'error'
-        // and instead show as disabled option.
-        return !vep_gene || vep_gene.error;
-    });
-}
-
 function VariantSampleInfoHeader (props) {
     const { context, currentGeneID, currentGeneItemLoading, onSelectGene } = props;
-    const geneList = useMemo(function(){
-        return extractListOfGenes(context);
-    }, [ context ]);
-    const geneListLen = geneList.length;
-    const selectedGene = useMemo(function(){
-        for (let i = 0; i < geneListLen; i++) {
-            const gene = geneList[i];
-            if (gene["@id"] === currentGeneID) {
-                return gene;
+    const { variant: { transcript: geneTranscriptList = [] } = {} } = context;
+    const geneTranscriptListLen = geneTranscriptList.length;
+
+    // Grab it from embedded item, rather than the AJAXed in currentGeneItem, as is more 'up-to-date'.
+    const selectedGeneTranscript = useMemo(function(){
+        for (let i = 0; i < geneTranscriptListLen; i++) {
+            const transcript = geneTranscriptList[i];
+            if (transcript.vep_gene["@id"] === currentGeneID) {
+                return transcript;
             }
         }
         return null;
-    }, [ geneList, currentGeneID ]);
+    }, [ geneTranscriptList, currentGeneID ]);
 
-    // Grab it from embedded item, rather than the AJAXed in currentGeneItem, as is more 'up-to-date'.
-    const { display_title: currentGeneTitle = null } = selectedGene || {};
+    const currentGeneTitle = <GeneTranscriptDisplayTitle transcript={selectedGeneTranscript} />;
 
-    const geneListOptions = geneList.map(function(gene){
-        const { display_title: geneDisplayTitle, '@id' : geneID } = gene;
+    const geneListOptions = geneTranscriptList.map(function(transcript){
+        const { vep_gene : { '@id' : geneID = null } = {} } = transcript;
         const active = (geneID === currentGeneID);
         return (
             <DropdownItem key={geneID} eventKey={geneID} active={active}>
-                { geneDisplayTitle }
+                <GeneTranscriptDisplayTitle transcript={transcript} />
             </DropdownItem>
         );
     });
 
-    const geneTitleToShow = currentGeneTitle ? (
+    const geneTitleToShow = selectedGeneTranscript ? (
         <span>
             { currentGeneTitle }
             { currentGeneItemLoading ? <i className="ml-07 icon icon-spin fas icon-circle-notch"/> : null }
         </span>
-    ) : (geneListLen === 0 ? <em>No genes available</em> : <em>No gene selected</em>);
+    ) : (geneTranscriptListLen === 0 ? <em>No genes available</em> : <em>No gene selected</em>);
 
     // TODO consider common styling for .info-header title, maybe it could be display: flex with align-items: center and vertically
     // center its children equally regardless if text or DropdownButton (and maybe is applied to a div where h4 would become child of it)
@@ -145,7 +138,7 @@ function VariantSampleInfoHeader (props) {
             <div className="col">
                 <div className="d-flex">
                     <h4 className="info-header-title">
-                        <DropdownButton title={geneTitleToShow} variant="outline-dark" onSelect={onSelectGene} disabled={geneListLen === 0}>
+                        <DropdownButton title={geneTitleToShow} variant="outline-dark" onSelect={onSelectGene} disabled={geneTranscriptListLen === 0}>
                             { geneListOptions }
                         </DropdownButton>
                     </h4>
@@ -158,6 +151,24 @@ function VariantSampleInfoHeader (props) {
                 </div>
             </div>
         </div>
+    );
+}
+
+function GeneTranscriptDisplayTitle({ transcript, className = null }){
+    if (!transcript) return null;
+    const {
+        vep_canonical = false,
+        vep_biotype = null,
+        vep_gene : {
+            display_title: geneDisplayTitle = null
+        } = {}
+    } = transcript;
+    return (
+        <span className={className}>
+            <span>{ geneDisplayTitle || <em>No Gene</em> }</span>
+            { vep_canonical ? <span className="text-300"> (canonical)</span> : null }
+            { vep_biotype ? <span className="text-300"> ({ vep_biotype })</span> : null }
+        </span>
     );
 }
 
@@ -188,7 +199,7 @@ function VariantSampleOverviewTabView(props){
     // TODO in SCSS: give tabs-column hard-coded width, give content-column flex-width
     return (
         <div className="d-flex align-items-flex-start sample-variant-overview-tab-view-container">
-            <div className="tabs-column" onClick={onClick}>
+            <div className="tabs-column col col-lg-2 px-0" onClick={onClick}>
                 <OverviewTabTitle {...{ currentTab }} title="Variant" />
                 <OverviewTabTitle {...{ currentTab }} title="Gene" />
                 <OverviewTabTitle {...{ currentTab }} title="Sample" />
