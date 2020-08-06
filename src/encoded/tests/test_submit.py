@@ -30,8 +30,9 @@ def xls_list():
 @pytest.fixture
 def empty_items():
     return {
-        'individual': {}, 'family': {}, 'sample': {}, 'sample_processing': {},
-        'case': {}, 'report': {}, 'reports': []
+        'individual': {}, 'family': {}, 'file_fastq': {},
+        'file_processed': {}, 'sample': {}, 'sample_processing': {},
+        'case': {}, 'report': {}, 'reports': [], 'errors': []
     }
 
 
@@ -44,7 +45,8 @@ def submission_info():
         }},
         'individual': {'test-proj:indiv1': {'samples': ['test-proj:samp1']}},
         'sample': {'test-proj:samp1': {'workup_type': 'WGS'}},
-        'sample_processing': {}
+        'sample_processing': {},
+        'errors': []
     }
 
 
@@ -141,7 +143,7 @@ def test_get_analysis_types(example_rows):
 
 
 def test_fetch_individual_metadata_new(row_dict, empty_items):
-    items_out = fetch_individual_metadata(row_dict, empty_items, 'test-proj:indiv1', 'hms-dbmi')
+    items_out = fetch_individual_metadata(1, row_dict, empty_items, 'test-proj:indiv1', 'hms-dbmi')
     assert items_out['individual']['test-proj:indiv1']['aliases'] == ['test-proj:indiv1']
     assert items_out['individual']['test-proj:indiv1']['individual_id'] == '456'
 
@@ -153,14 +155,14 @@ def test_fetch_individual_metadata_old(row_dict, empty_items):
         'age': 46,
         'aliases': ['test-proj:indiv1']
     }}
-    items_out = fetch_individual_metadata(row_dict, items, 'test-proj:indiv1', 'hms-dbmi')
+    items_out = fetch_individual_metadata(1, row_dict, items, 'test-proj:indiv1', 'hms-dbmi')
     assert len(items['individual']) == len(items_out['individual'])
     assert 'sex' in items_out['individual']['test-proj:indiv1']
     assert 'age' in items_out['individual']['test-proj:indiv1']
 
 
 def test_fetch_family_metadata_new(row_dict, empty_items):
-    items_out = fetch_family_metadata(row_dict, empty_items, 'test-proj:indiv1', 'test-proj:fam1')
+    items_out = fetch_family_metadata(1, row_dict, empty_items, 'test-proj:indiv1', 'test-proj:fam1')
     assert items_out['family']['test-proj:fam1']['members'] == ['test-proj:indiv1']
     assert items_out['family']['test-proj:fam1']['proband'] == 'test-proj:indiv1'
 
@@ -173,7 +175,7 @@ def test_fetch_family_metadata_old(row_dict, empty_items):
         'members': ['test-proj:indiv2'],
         'mother': 'test-proj:indiv2'
     }}
-    items_out = fetch_family_metadata(row_dict, items, 'test-proj:indiv1', 'test-proj:fam1')
+    items_out = fetch_family_metadata(1, row_dict, items, 'test-proj:indiv1', 'test-proj:fam1')
     assert items_out['family']['test-proj:fam1']['members'] == ['test-proj:indiv2', 'test-proj:indiv1']
     assert items_out['family']['test-proj:fam1']['proband'] == 'test-proj:indiv1'
     assert items_out['family']['test-proj:fam1']['mother'] == 'test-proj:indiv2'
@@ -183,7 +185,7 @@ def test_fetch_sample_metadata_sp(row_dict, empty_items):
     items = empty_items.copy()
     items['individual'] = {'test-proj:indiv1': {}}
     items_out = fetch_sample_metadata(
-        row_dict, items, 'test-proj:indiv1', 'test-proj:samp1',
+        1, row_dict, items, 'test-proj:indiv1', 'test-proj:samp1',
         'test-proj:sp1', 'test-proj:fam1', 'test-proj', {}
     )
     assert items_out['sample']['test-proj:samp1']['specimen_accession'] == row_dict['specimen id']
@@ -192,7 +194,7 @@ def test_fetch_sample_metadata_sp(row_dict, empty_items):
 
 
 def test_fetch_file_metadata_valid():
-    results = fetch_file_metadata(['f1.fastq.gz', 'f2.cram', 'f3.vcf.gz'], 'test-proj')
+    results = fetch_file_metadata(1, ['f1.fastq.gz', 'f2.cram', 'f3.vcf.gz'], 'test-proj')
     assert 'test-proj:f1.fastq.gz' in results['file_fastq']
     assert results['file_fastq']['test-proj:f1.fastq.gz']['file_format'] == '/file-formats/fastq/'
     assert results['file_fastq']['test-proj:f1.fastq.gz']['file_type'] == 'reads'
@@ -202,7 +204,7 @@ def test_fetch_file_metadata_valid():
 
 
 def test_fetch_file_metadata_uncompressed():
-    results = fetch_file_metadata(['f1.fastq', 'f2.cram', 'f3.vcf'], 'test-proj')
+    results = fetch_file_metadata(1, ['f1.fastq', 'f2.cram', 'f3.vcf'], 'test-proj')
     assert not results['file_fastq']
     assert 'test-proj:f2.cram' in results['file_processed']
     assert 'test-proj:f3.vcf' not in results['file_processed']
@@ -211,7 +213,7 @@ def test_fetch_file_metadata_uncompressed():
 
 
 def test_fetch_file_metadata_invalid():
-    results = fetch_file_metadata(['f3.gvcf.gz'], 'test-proj')
+    results = fetch_file_metadata(1, ['f3.gvcf.gz'], 'test-proj')
     assert all(not results[key] for key in ['file_fastq', 'file_processed'])
     assert results['errors'] == [
         'File extension on f3.gvcf.gz not supported - '
@@ -220,7 +222,7 @@ def test_fetch_file_metadata_invalid():
 
 
 def test_xls_to_json(project, institution):
-    json_out = xls_to_json('src/encoded/tests/data/documents/cgap_submit_test.xlsx', project, institution)
+    json_out, success = xls_to_json('src/encoded/tests/data/documents/cgap_submit_test.xlsx', project, institution)
     assert len(json_out['family']) == 1
     assert 'encode-project:family-456' in json_out['family']
     assert len(json_out['individual']) == 3
@@ -342,8 +344,9 @@ def test_validate_all_items_errors(testapp, mother, empty_items):
     }
     items = empty_items
     items['individual']['new-individual-alias'] = new_individual
-    data_out, result = validate_all_items(testapp, items)
+    data_out, result, success = validate_all_items(testapp, items)
     assert not data_out
+    assert not success
     assert len(result) > 1
     errors = ' '.join(result)
     assert "'test-proj:invalid-project-alias' not found" in errors
