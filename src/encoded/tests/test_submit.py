@@ -1,5 +1,7 @@
 import pytest
 from encoded.submit import *
+from unittest import mock
+import xlrd
 import json
 
 
@@ -15,6 +17,14 @@ def row_dict():
         'specimen type': 'blood',
         'workup type': 'WGS'
     }
+
+
+@pytest.fixture
+def xls_list():
+    book = xlrd.open_workbook('src/encoded/tests/data/documents/cgap_submit_test.xlsx')
+    sheet, = book.sheets()
+    row = row_generator(sheet)
+    return list(row)
 
 
 @pytest.fixture
@@ -215,6 +225,43 @@ def test_xls_to_json(project, institution):
     assert 'encode-project:family-456' in json_out['family']
     assert len(json_out['individual']) == 3
     assert all(['encode-project:individual-' + x in json_out['individual'] for x in ['123', '456', '789']])
+
+
+def test_xls_to_json_no_header(project, institution, xls_list):
+    no_top_header = xls_list[1:]  # top header missing should work ok (e.g. 'Patient Information', etc)
+    no_main_header = [xls_list[0]] + xls_list[2:]  # main header missing should cause a caught error
+    no_comments = xls_list[0:2] + xls_list[3:]
+    with mock.patch('encoded.submit.row_generator') as row_gen:
+        row_gen.return_value = iter(no_top_header)
+        json_out, success = xls_to_json('src/encoded/tests/data/documents/cgap_submit_test.xlsx', project, institution)
+        assert success
+        row_gen.return_value = iter(no_main_header)
+        json_out, success = xls_to_json('src/encoded/tests/data/documents/cgap_submit_test.xlsx', project, institution)
+        assert not success
+        row_gen.return_value = iter(no_comments)
+        json_out, success = xls_to_json('src/encoded/tests/data/documents/cgap_submit_test.xlsx', project, institution)
+        assert success
+
+
+def test_xls_to_json_missing_req_col(project, institution, xls_list):
+    # test error is caught when a required column in missing from excel file
+    idx = xls_list[1].index('Specimen ID')
+    rows = [row[0:idx] + row[idx+1:] for row in xls_list]
+    with mock.patch('encoded.submit.row_generator') as row_gen:
+        row_gen.return_value = iter(rows)
+        json_out, success = xls_to_json('src/encoded/tests/data/documents/cgap_submit_test.xlsx', project, institution)
+        assert not success
+
+
+def test_xls_to_json_missing_req_val(project, institution, xls_list):
+    # test error is caught when a required column is present but value is missing in a row
+    idx = xls_list[1].index('Specimen ID')
+    xls_list[4] = xls_list[4][0:idx] + [''] + xls_list[4][idx+1:]
+    with mock.patch('encoded.submit.row_generator') as row_gen:
+        row_gen.return_value = iter(xls_list)
+        json_out, success = xls_to_json('src/encoded/tests/data/documents/cgap_submit_test.xlsx', project, institution)
+        assert json_out['errors']
+        assert success
 
 
 def test_parse_exception_invalid_alias(testapp, a_case):
