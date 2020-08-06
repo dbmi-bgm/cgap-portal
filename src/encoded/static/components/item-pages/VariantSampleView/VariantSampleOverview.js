@@ -120,28 +120,28 @@ function VariantSampleInfoHeader (props) {
             <div className="card-body">
                 <div className="row flex-column flex-lg-row">
                     <div className="col col-lg-2">
-                        <h4 className="info-header-title">
-                            Case ID
-                        </h4>
+                        <div className="info-header-title">
+                            <h4>Case ID</h4>
+                        </div>
                         <div className="info-body">
 
                         </div>
                     </div>
                     <div className="col">
-                        <h4 className="info-header-title">
-                            Position
-                        </h4>
+                        <div className="info-header-title">
+                            <h4>Position</h4>
+                        </div>
                         <div className="info-body">
 
                         </div>
                     </div>
                     <div className="col">
                         <div className="d-flex">
-                            <h4 className="info-header-title">
+                            <div className="info-header-title">
                                 <DropdownButton title={geneTitleToShow} variant="outline-dark" onSelect={onSelectTranscript} disabled={geneTranscriptListLen === 0}>
                                     { geneListOptions }
                                 </DropdownButton>
-                            </h4>
+                            </div>
                             <div className="flex-grow-1 text-right">
                                 {/* BA1, BS1 here maybe */}
                             </div>
