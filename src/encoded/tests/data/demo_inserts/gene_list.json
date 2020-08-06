@@ -1,0 +1,40 @@
+[
+    {
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "title": "Breast Cancer Example Gene List",
+        "status": "in review",
+        "genes": [
+            "d24c1007-93cf-4378-870a-1d4808871412",
+            "78dd604e-67e6-495e-8cf9-a3e8b7f45d7b",
+            "05778ccc-2648-411a-a4a5-02b6a717acb4",
+            "d706c51b-9d18-475f-9701-942ef0881a18",
+            "914e6aea-faa0-4235-ad18-21235aed59bb",
+            "a113d699-e511-4458-9005-deedaf089414",
+            "bcaef33a-f441-42c6-abb7-0059c38cd59e",
+            "80807d97-58ae-410f-b10b-5cac8ce61778",
+            "c69d356c-4954-40d2-8cd6-89932b4d8830",
+            "164d8c15-84e6-49b2-b684-77f29ac84676",
+            "a8f1eb13-720e-4423-a572-10797bd70164",
+            "b3929fa4-01e4-4c1e-8f1b-d3906da8145a",
+            "58c9b6a9-5c2e-41fa-b6f2-5256d37581df",
+            "bf5e24fa-3eaf-4dd7-aa59-62c65bbb805f",
+            "b833a22c-6bec-47e8-922f-24467b8e5265",
+            "a5d84ab0-e7c7-41ae-97c0-82b56ebc7518",
+            "0c0c9069-19ff-4e56-91aa-feab75624c31",
+            "37e2bbb7-747c-473c-918c-84cc5320f4ff",
+            "aaceaa46-0229-4318-a957-c4edef09f21e",
+            "8d5040fd-73d2-4a8f-92ed-228111cb186f",
+            "508ead8c-7cd2-452f-a6b5-6ef1127b9155",
+            "47d8e129-975e-4d69-b74d-cb729daa0c96",
+            "f0c87332-17af-44f1-a5c1-78f80422fd02",
+            "f39cae40-efdb-4a56-b800-c7a63e9ce1f4",
+            "0c274c6f-95de-4632-b9db-7b3d2998673f",
+            "349292f5-c053-4e4b-9b0d-5f5ba0e3f0fd",
+            "b043c061-6598-486e-8660-9ee31ee4e863",
+            "82915e28-9d7a-4641-8572-417a2430309e"
+        ],
+        "source_file": "0938cab5-5f81-4da7-b299-46e4aad22222",
+        "uuid": "0938cab5-5f81-4da7-b299-46e4aal22222"
+    }
+]

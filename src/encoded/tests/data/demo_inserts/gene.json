@@ -1031,7 +1031,7 @@
         "chrom_hg19": "10",
         "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
         "s_het": 0.232436078,
-        "oe_lof": 0.0,
+        "oe_lof": 0,
         "num_coding_exons": 8,
         "marrvel": "SHOC2",
         "mgi_mouse_phenotype": "growth/size/body region phenotype; integument phenotype (the observable morphological and physiological characteristics of the skin and its associated structures, such as the hair, nails, sweat glands, sebaceous glands and other secretory glands that are manifested through development and lifespan); homeostasis/metabolism phenotype; cardiovascular system phenotype (the observable morphological and physiological characteristics of the mammalian heart, blood vessels, or circulatory system that are manifested through development and lifespan); normal phenotype; mortality/aging (the observable characteristics related to the ability of a mammalian organism to live and age that are manifested throughout development and life span); respiratory system phenotype; embryo phenotype",
@@ -1185,7 +1185,7 @@
         "chrom_hg19": "2",
         "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
         "s_het": 0.252436808,
-        "oe_lof": 0.0,
+        "oe_lof": 0,
         "num_coding_exons": 26,
         "marrvel": "HDAC4",
         "mgi_mouse_phenotype": "growth/size/body region phenotype; integument phenotype (the observable morphological and physiological characteristics of the skin and its associated structures, such as the hair, nails, sweat glands, sebaceous glands and other secretory glands that are manifested through development and lifespan); muscle phenotype; craniofacial phenotype; skeleton phenotype; behavior/neurological phenotype (the observable actions or reactions of mammalian organisms that are manifested through development and lifespan); mortality/aging (the observable characteristics related to the ability of a mammalian organism to live and age that are manifested throughout development and life span); nervous system phenotype (the observable morphological and physiological characteristics of the extensive, intricate network of electochemical structures in the body that is comprised of the brain, spinal cord, nerves, ganglia and parts of the receptor organs that are manifested through development and lifespan)",
@@ -1775,7 +1775,7 @@
         "pharmgkb": [
             "PA27489"
         ],
-        "exp_mis": 481.0,
+        "exp_mis": 481,
         "pathway_kegg_full": "Cell Communication",
         "chrom": "18",
         "name": "desmocollin 2",
@@ -4592,7 +4592,7 @@
         "chrom_hg19": "X",
         "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
         "s_het": 0.204509873,
-        "oe_lof": 0.0,
+        "oe_lof": 0,
         "num_coding_exons": 38,
         "marrvel": "TAF1",
         "pathway_kegg_id": "hsa03022",
@@ -4650,7 +4650,7 @@
         "gdp": "Medium",
         "mgi_mouse_gene": "Sbf1",
         "rvis_percentile_exac": 0.548159749,
-        "exp_mis": 1231.0,
+        "exp_mis": 1231,
         "chrom": "22",
         "name": "SET binding factor 1",
         "schema_version": "1",
@@ -5718,7 +5718,7 @@
         "refseq_accession": [
             "NM_000709"
         ],
-        "exp_syn": 121.0,
+        "exp_syn": 121,
         "trait_association_gwas": [
             "Height"
         ],
@@ -8067,7 +8067,7 @@
             "28448500~28448500"
         ],
         "rvis_percentile_exac": 45.32257093,
-        "exp_mis": 200.0,
+        "exp_mis": 200,
         "chrom": "11",
         "name": "nucleobindin 2",
         "schema_version": "1",
@@ -8558,7 +8558,7 @@
         "biogrid": [
             "113242"
         ],
-        "exp_syn": 1012.0,
+        "exp_syn": 1012,
         "last_modified": {
             "date_modified": "2020-07-15T02:43:27.379254+00:00",
             "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
@@ -8841,7 +8841,7 @@
         "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "chrom_hg19": "X",
         "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
-        "oe_lof": 0.0,
+        "oe_lof": 0,
         "num_coding_exons": 7,
         "marrvel": "GLA",
         "mgi_mouse_phenotype": "growth/size/body region phenotype; muscle phenotype; cellular phenotype; homeostasis/metabolism phenotype; renal/urinary system phenotype; behavior/neurological phenotype (the observable actions or reactions of mammalian organisms that are manifested through development and lifespan); liver/biliary system phenotype; mortality/aging (the observable characteristics related to the ability of a mammalian organism to live and age that are manifested throughout development and life span); cardiovascular system phenotype (the observable morphological and physiological characteristics of the mammalian heart, blood vessels, or circulatory system that are manifested through development and lifespan); nervous system phenotype (the observable morphological and physiological characteristics of the extensive, intricate network of electochemical structures in the body that is comprised of the brain, spinal cord, nerves, ganglia and parts of the receptor organs that are manifested through development and lifespan); vision/eye phenotype",
@@ -9157,7 +9157,7 @@
         "chrom_hg19": "11",
         "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
         "s_het": 0.220689436,
-        "oe_lof": 0.0,
+        "oe_lof": 0,
         "num_coding_exons": 5,
         "marrvel": "TAF10",
         "mgi_mouse_phenotype": "homeostasis/metabolism phenotype; cellular phenotype; growth/size/body region phenotype; integument phenotype (the observable morphological and physiological characteristics of the skin and its associated structures, such as the hair, nails, sweat glands, sebaceous glands and other secretory glands that are manifested through development and lifespan); embryo phenotype; mortality/aging (the observable characteristics related to the ability of a mammalian organism to live and age that are manifested throughout development and life span)",
@@ -9581,5 +9581,4581 @@
         "uuid": "05cc89c0-a34d-4548-8941-6fea23d8bded",
         "oe_syn": 1.0187,
         "genecards": "ENSG00000166352"
+    },
+    {
+        "oe_syn": 1.047,
+        "exp_lof": 29.084,
+        "mgi_mouse_gene": "Akt1",
+        "brainatlas_microarray": "AKT1",
+        "status": "in review",
+        "schema_version": "1",
+        "chrom": "14",
+        "brainspan_microarray": "AKT1",
+        "strand": "-",
+        "omim_id": [
+            "164730"
+        ],
+        "pdb": [
+            "1H10",
+            "1UNP",
+            "1UNQ",
+            "1UNR",
+            "2UVM",
+            "2UZR",
+            "2UZS",
+            "3CQU",
+            "3CQW",
+            "3MV5",
+            "3MVH",
+            "3O96",
+            "3OCB",
+            "3OW4",
+            "3QKK",
+            "3QKL",
+            "3QKM",
+            "4EJN",
+            "4EKK",
+            "4EKL",
+            "4GV1",
+            "5KCV",
+            "6BUU",
+            "6CCY",
+            "6HHF",
+            "6HHG",
+            "6HHH",
+            "6HHI",
+            "6HHJ",
+            "6NPZ"
+        ],
+        "gene_version": "16",
+        "rvis_exac": -1.039772304,
+        "genecards": "ENSG00000142208",
+        "gdp": "Medium",
+        "orphanet": "281472",
+        "hgnc_id": "391",
+        "ucsc_id": "uc001ypm.4",
+        "oe_lof": 0.13753,
+        "epos": 104795751,
+        "uuid": "78dd604e-67e6-495e-8cf9-a3e8b7f45d7b",
+        "pharmgkb": [
+            "PA24684"
+        ],
+        "epos_hg19": 105262088,
+        "gene_symbol": "AKT1",
+        "num_coding_exons": 13,
+        "trait_association_gwas_pmid": [
+            "28334899",
+            "27135401",
+            "27135401",
+            "24097068~25961943"
+        ],
+        "date_created": "2020-07-15T13:12:09.061701+00:00",
+        "last_modified": {
+            "date_modified": "2020-07-15T13:12:09.068951+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "s_het": 0.095740705,
+        "exp_mis": 329.71,
+        "uniprot_ids": [
+            "P31749"
+        ],
+        "gtex_expression": "ENSG00000142208.15",
+        "oe_mis": 0.46102,
+        "obs_mis": 152,
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "spos_hg19": 105235686,
+        "trait_association_gwas": [
+            "HDL cholesterol levels",
+            "Endometrial cancer",
+            "Endometrial endometrioid carcinoma",
+            "HDL cholesterol"
+        ],
+        "refseq_accession": [
+            "NM_005163"
+        ],
+        "rvis_percentile_exac": 8.433226914,
+        "strand_hg19": "-",
+        "genereviews": [
+            "AKT1"
+        ],
+        "mgd_id": [
+            "MGI:87986"
+        ],
+        "gene_biotype": "protein_coding",
+        "chrom_hg19": "14",
+        "mgi_mouse_phenotype": "muscle phenotype; homeostasis/metabolism phenotype; cellular phenotype; growth/size/body region phenotype; integument phenotype (the observable morphological and physiological characteristics of the skin and its associated structures, such as the hair, nails, sweat glands, sebaceous glands and other secretory glands that are manifested through development and lifespan); adipose tissue phenotype (the observable morphological and physiological characteristics of mammalian fat tissue that are manifested through development and lifespan); neoplasm; endocrine/exocrine gland phenotype; nervous system phenotype (the observable morphological and physiological characteristics of the extensive, intricate network of electochemical structures in the body that is comprised of the brain, spinal cord, nerves, ganglia and parts of the receptor organs that are manifested through development and lifespan); immune system phenotype; skeleton phenotype; embryo phenotype; behavior/neurological phenotype (the observable actions or reactions of mammalian organisms that are manifested through development and lifespan); respiratory system phenotype; liver/biliary system phenotype; cardiovascular system phenotype (the observable morphological and physiological characteristics of the mammalian heart, blood vessels, or circulatory system that are manifested through development and lifespan); hematopoietic system phenotype; mortality/aging (the observable characteristics related to the ability of a mammalian organism to live and age that are manifested throughout development and life span); normal phenotype; reproductive system phenotype",
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "cds_length": 1440,
+        "exp_syn": 131.81,
+        "marrvel": "AKT1",
+        "pathway_kegg_id": "hsa04010;hsa04012;hsa04150;hsa04210;hsa04370;hsa04510;hsa04530;hsa04620;hsa04630;hsa04660;hsa04662;hsa04664;hsa04910;hsa04920;hsa05210;hsa05211;hsa05212;hsa05213;hsa05214;hsa05215;hsa05218;hsa05220;hsa05221;hsa05222;hsa05223",
+        "obs_syn": 138,
+        "transcriptid": [
+            {
+                "ensembl_pro": "ENSP00000270202",
+                "ensembl_trs": "ENST00000349310"
+            },
+            {
+                "ensembl_pro": "ENSP00000385326",
+                "ensembl_trs": "ENST00000402615"
+            },
+            {
+                "ensembl_pro": "ENSP00000384293",
+                "ensembl_trs": "ENST00000407796"
+            },
+            {
+                "ensembl_pro": "ENSP00000451828",
+                "ensembl_trs": "ENST00000554581"
+            },
+            {
+                "ensembl_pro": "ENSP00000451166",
+                "ensembl_trs": "ENST00000554848"
+            },
+            {
+                "ensembl_pro": "ENSP00000450688",
+                "ensembl_trs": "ENST00000555528"
+            },
+            {
+                "ensembl_pro": "ENSP00000497822",
+                "ensembl_trs": "ENST00000649815"
+            },
+            {
+                "ensembl_pro": "ENSP00000451470",
+                "ensembl_trs": "ENST00000555458"
+            },
+            {
+                "ensembl_pro": "ENSP00000450681",
+                "ensembl_trs": "ENST00000554192"
+            },
+            {
+                "ensembl_pro": "ENSP00000481526",
+                "ensembl_trs": "ENST00000554585"
+            },
+            {
+                "ensembl_pro": "ENSP00000451824",
+                "ensembl_trs": "ENST00000555926"
+            }
+        ],
+        "ensgid": "ENSG00000142208",
+        "ccds_id": [
+            "CCDS9994"
+        ],
+        "cytoband": [
+            "14q32.33"
+        ],
+        "gdi_phred": 0.45861,
+        "entrez_id": "207",
+        "biogrid": [
+            "106710"
+        ],
+        "obs_lof": 4,
+        "name": "AKT serine/threonine kinase 1",
+        "string": [
+            "9606.ENSP00000451828"
+        ],
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "brainspan_rnaseq": "ENSG00000142208",
+        "gene_summary": "The serine-threonine protein kinase encoded by the AKT1 gene is catalytically inactive in serum-starved primary and immortalized fibroblasts. AKT1 and the related AKT2 are activated by platelet-derived growth factor. The activation is rapid and specific, and it is abrogated by mutations in the pleckstrin homology domain of AKT1. It was shown that the activation occurs through phosphatidylinositol 3-kinase. In the developing nervous system AKT is a critical mediator of growth factor-induced neuronal survival. Survival factors can suppress apoptosis in a transcription-independent manner by activating the serine/threonine kinase AKT1, which then phosphorylates and inactivates components of the apoptotic machinery. Mutations in this gene have been associated with the Proteus syndrome. Multiple alternatively spliced transcript variants have been found for this gene. [provided by RefSeq, Jul 2011].",
+        "pathway_kegg_full": "MAPK signaling pathway;ErbB signaling pathway;mTOR signaling pathway;Apoptosis;VEGF signaling pathway;Focal adhesion;Tight junction;Toll-like receptor signaling pathway;Jak-STAT signaling pathway;T cell receptor signaling pathway;B cell receptor signaling pathway;Fc epsilon RI signaling pathway;Insulin signaling pathway;Adipocytokine signaling pathway;Colorectal cancer;Renal cell carcinoma;Pancreatic cancer;Endometrial cancer;Glioma;Prostate cancer;Melanoma;Chronic myeloid leukemia;Acute myeloid leukemia;Small cell lung cancer;Non-small cell lung cancer",
+        "spos": 104769349
+    },
+    {
+        "oe_syn": 1.0478,
+        "exp_lof": 170.95,
+        "mgi_mouse_gene": "Atm",
+        "status": "in review",
+        "schema_version": "1",
+        "chrom": "11",
+        "brainspan_microarray": "ATM",
+        "strand": "+",
+        "omim_id": [
+            "607585"
+        ],
+        "pdb": [
+            "5NP0",
+            "5NP1",
+            "6HKA"
+        ],
+        "gene_version": "18",
+        "rvis_exac": -0.116999554,
+        "genecards": "ENSG00000149311",
+        "gdp": "High",
+        "orphanet": "121474",
+        "hgnc_id": "795",
+        "ucsc_id": "uc001pkb.1",
+        "oe_lof": 0.60251,
+        "epos": 108369102,
+        "uuid": "05778ccc-2648-411a-a4a5-02b6a717acb4",
+        "pharmgkb": [
+            "PA61"
+        ],
+        "epos_hg19": 108239829,
+        "gene_symbol": "ATM",
+        "name": "ATM serine/threonine kinase",
+        "trait_association_gwas_pmid": [
+            "28714976",
+            "21983787~28212542",
+            "21186350",
+            "27863252",
+            "29403010",
+            "27863252",
+            "30194396~30194396~30194396",
+            "28598434",
+            "24390342~24390342",
+            "26098866~26098866",
+            "26098866~26098866",
+            "29892016",
+            "27863252"
+        ],
+        "date_created": "2020-07-15T13:14:12.594817+00:00",
+        "last_modified": {
+            "date_modified": "2020-07-15T13:14:12.600663+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "s_het": 0.009948425,
+        "exp_mis": 1532.7,
+        "uniprot_ids": [
+            "Q13315"
+        ],
+        "gtex_expression": "ENSG00000149311.18",
+        "oe_mis": 0.92061,
+        "obs_mis": 1411,
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "spos_hg19": 108093211,
+        "trait_association_gwas": [
+            "Alzheimer's disease (late onset)",
+            "Melanoma",
+            "Response to metformin in type 2 diabetes (glycemic)",
+            "Eosinophil counts",
+            "Red blood cell count",
+            "Sum eosinophil basophil counts",
+            "Uterine fibroids",
+            "Renal cell carcinoma",
+            "Rheumatoid arthritis",
+            "Gastric adenocarcinoma (histologically verified)",
+            "Gastric cancer",
+            "Prostate cancer",
+            "Eosinophil percentage of white cells"
+        ],
+        "refseq_accession": [
+            "NM_000051"
+        ],
+        "rvis_percentile_exac": 42.0998735,
+        "strand_hg19": "+",
+        "genereviews": [
+            "ATM"
+        ],
+        "mgd_id": [
+            "MGI:107202"
+        ],
+        "gene_biotype": "protein_coding",
+        "chrom_hg19": "11",
+        "mgi_mouse_phenotype": "nervous system phenotype (the observable morphological and physiological characteristics of the extensive, intricate network of electochemical structures in the body that is comprised of the brain, spinal cord, nerves, ganglia and parts of the receptor organs that are manifested through development and lifespan); immune system phenotype; embryo phenotype; behavior/neurological phenotype (the observable actions or reactions of mammalian organisms that are manifested through development and lifespan); mortality/aging (the observable characteristics related to the ability of a mammalian organism to live and age that are manifested throughout development and life span); reproductive system phenotype; hematopoietic system phenotype; cardiovascular system phenotype (the observable morphological and physiological characteristics of the mammalian heart, blood vessels, or circulatory system that are manifested through development and lifespan); adipose tissue phenotype (the observable morphological and physiological characteristics of mammalian fat tissue that are manifested through development and lifespan); neoplasm; endocrine/exocrine gland phenotype; cellular phenotype; homeostasis/metabolism phenotype; integument phenotype (the observable morphological and physiological characteristics of the skin and its associated structures, such as the hair, nails, sweat glands, sebaceous glands and other secretory glands that are manifested through development and lifespan); growth/size/body region phenotype",
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "cds_length": 9168,
+        "exp_syn": 529.69,
+        "marrvel": "ATM",
+        "obs_syn": 555,
+        "transcriptid": [
+            {
+                "ensembl_pro": "ENSP00000435747",
+                "ensembl_trs": "ENST00000527805"
+            },
+            {
+                "ensembl_pro": "ENSP00000433955",
+                "ensembl_trs": "ENST00000527891"
+            },
+            {
+                "ensembl_pro": "ENSP00000432318",
+                "ensembl_trs": "ENST00000532931"
+            },
+            {
+                "ensembl_pro": "ENSP00000483338",
+                "ensembl_trs": "ENST00000530958"
+            },
+            {
+                "ensembl_pro": "ENSP00000278616",
+                "ensembl_trs": "ENST00000278616"
+            },
+            {
+                "ensembl_pro": "ENSP00000388058",
+                "ensembl_trs": "ENST00000452508"
+            },
+            {
+                "ensembl_pro": "ENSP00000480205",
+                "ensembl_trs": "ENST00000526567"
+            },
+            {
+                "ensembl_pro": "ENSP00000491957",
+                "ensembl_trs": "ENST00000638443"
+            },
+            {
+                "ensembl_pro": "ENSP00000491585",
+                "ensembl_trs": "ENST00000639240"
+            },
+            {
+                "ensembl_pro": "ENSP00000492487",
+                "ensembl_trs": "ENST00000639953"
+            },
+            {
+                "ensembl_pro": "ENSP00000492354",
+                "ensembl_trs": "ENST00000640388"
+            },
+            {
+                "ensembl_pro": "ENSP00000469471",
+                "ensembl_trs": "ENST00000601453"
+            },
+            {
+                "ensembl_pro": "ENSP00000434327",
+                "ensembl_trs": "ENST00000531525"
+            },
+            {
+                "ensembl_pro": "ENSP00000435524",
+                "ensembl_trs": "ENST00000529588"
+            }
+        ],
+        "ensgid": "ENSG00000149311",
+        "ccds_id": [
+            "CCDS31669",
+            "CCDS86245"
+        ],
+        "cytoband": [
+            "11q22.3"
+        ],
+        "clingendis": [
+            {
+                "disease_label": "hereditary nonpolyposis colon cancer",
+                "disease_id": "MONDO_0018630",
+                "classification": "Moderate"
+            },
+            {
+                "disease_label": "hereditary breast carcinoma",
+                "disease_id": "MONDO_0016419",
+                "classification": "Definitive"
+            },
+            {
+                "disease_label": "familial ovarian cancer",
+                "disease_id": "MONDO_0016248",
+                "classification": "Limited"
+            }
+        ],
+        "gdi_phred": 15.6216,
+        "entrez_id": "472",
+        "num_coding_exons": 62,
+        "biogrid": [
+            "106962"
+        ],
+        "obs_lof": 103,
+        "clingen": "795",
+        "string": [
+            "9606.ENSP00000278616"
+        ],
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "brainspan_rnaseq": "ENSG00000149311",
+        "pathway_kegg_id": "hsa04110;hsa04115;hsa04210",
+        "pathway_kegg_full": "Cell cycle;p53 signaling pathway;Apoptosis",
+        "spos": 108222484
+    },
+    {
+        "oe_syn": 1.1146,
+        "exp_lof": 35.02,
+        "mgi_mouse_gene": "Bard1",
+        "brainatlas_microarray": "BARD1",
+        "status": "in review",
+        "schema_version": "1",
+        "chrom": "2",
+        "brainspan_microarray": "BARD1",
+        "strand": "-",
+        "omim_id": [
+            "601593"
+        ],
+        "pdb": [
+            "1JM7",
+            "2NTE",
+            "2R1Z",
+            "3C5R",
+            "3FA2"
+        ],
+        "gene_version": "11",
+        "rvis_exac": -0.695339093,
+        "genecards": "ENSG00000138376",
+        "gdp": "High",
+        "orphanet": "201093",
+        "hgnc_id": "952",
+        "ucsc_id": "uc021vwi.2",
+        "oe_lof": 1.028,
+        "epos": 214809683,
+        "uuid": "d706c51b-9d18-475f-9701-942ef0881a18",
+        "pharmgkb": [
+            "PA25256"
+        ],
+        "epos_hg19": 215674428,
+        "gene_symbol": "BARD1",
+        "name": "BRCA1 associated RING domain 1",
+        "trait_association_gwas_pmid": [
+            "19412175",
+            "28545128",
+            "21124317~22941191",
+            "28924153"
+        ],
+        "date_created": "2020-07-15T13:03:46.848992+00:00",
+        "last_modified": {
+            "date_modified": "2020-07-15T13:03:46.852658+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "s_het": 0.007902273,
+        "exp_mis": 415.54,
+        "uniprot_ids": [
+            "Q99728"
+        ],
+        "gtex_expression": "ENSG00000138376.10",
+        "oe_mis": 1.0757,
+        "obs_mis": 447,
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "spos_hg19": 215590370,
+        "trait_association_gwas": [
+            "Neuroblastoma (high-risk)",
+            "Sporadic neuroblastoma",
+            "Neuroblastoma",
+            "Neuroblastoma (MYCN amplification)"
+        ],
+        "refseq_accession": [
+            "NM_000465"
+        ],
+        "rvis_percentile_exac": 15.65568339,
+        "strand_hg19": "-",
+        "mgd_id": [
+            "MGI:1328361"
+        ],
+        "gene_biotype": "protein_coding",
+        "chrom_hg19": "2",
+        "mgi_mouse_phenotype": "growth/size/body region phenotype; cellular phenotype; normal phenotype; mortality/aging (the observable characteristics related to the ability of a mammalian organism to live and age that are manifested throughout development and life span); neoplasm; embryo phenotype; nervous system phenotype (the observable morphological and physiological characteristics of the extensive, intricate network of electochemical structures in the body that is comprised of the brain, spinal cord, nerves, ganglia and parts of the receptor organs that are manifested through development and lifespan)",
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "cds_length": 2331,
+        "exp_syn": 154.32,
+        "marrvel": "BARD1",
+        "obs_syn": 172,
+        "transcriptid": [
+            {
+                "ensembl_pro": "ENSP00000260947",
+                "ensembl_trs": "ENST00000260947"
+            },
+            {
+                "ensembl_pro": "ENSP00000480470",
+                "ensembl_trs": "ENST00000617164"
+            },
+            {
+                "ensembl_pro": "ENSP00000481988",
+                "ensembl_trs": "ENST00000620057"
+            },
+            {
+                "ensembl_pro": "ENSP00000405020",
+                "ensembl_trs": "ENST00000432456"
+            },
+            {
+                "ensembl_pro": "ENSP00000482293",
+                "ensembl_trs": "ENST00000619009"
+            },
+            {
+                "ensembl_pro": "ENSP00000484464",
+                "ensembl_trs": "ENST00000613374"
+            },
+            {
+                "ensembl_pro": "ENSP00000498880",
+                "ensembl_trs": "ENST00000650978"
+            },
+            {
+                "ensembl_pro": "ENSP00000484976",
+                "ensembl_trs": "ENST00000613706"
+            },
+            {
+                "ensembl_pro": "ENSP00000392245",
+                "ensembl_trs": "ENST00000421162"
+            },
+            {
+                "ensembl_pro": "ENSP00000483275",
+                "ensembl_trs": "ENST00000613192"
+            },
+            {
+                "ensembl_pro": "ENSP00000412186",
+                "ensembl_trs": "ENST00000455743"
+            }
+        ],
+        "ensgid": "ENSG00000138376",
+        "ccds_id": [
+            "CCDS2397",
+            "CCDS74645",
+            "CCDS74646",
+            "CCDS74647",
+            "CCDS74648"
+        ],
+        "cytoband": [
+            "2q35"
+        ],
+        "clingendis": [
+            {
+                "disease_label": "hereditary breast carcinoma",
+                "disease_id": "MONDO_0016419",
+                "classification": "Definitive"
+            },
+            {
+                "disease_label": "hereditary nonpolyposis colon cancer",
+                "disease_id": "MONDO_0018630",
+                "classification": "Limited"
+            },
+            {
+                "disease_label": "familial ovarian cancer",
+                "disease_id": "MONDO_0016248",
+                "classification": "Limited"
+            }
+        ],
+        "gdi_phred": 13.90957,
+        "entrez_id": "580",
+        "num_coding_exons": 11,
+        "biogrid": [
+            "107056"
+        ],
+        "obs_lof": 36,
+        "clingen": "952",
+        "string": [
+            "9606.ENSP00000260947"
+        ],
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "brainspan_rnaseq": "ENSG00000138376",
+        "gene_summary": "This gene encodes a protein which interacts with the N-terminal region of BRCA1. In addition to its ability to bind BRCA1 in vivo and in vitro, it shares homology with the 2 most conserved regions of BRCA1: the N-terminal RING motif and the C-terminal BRCT domain. The RING motif is a cysteine-rich sequence found in a variety of proteins that regulate cell growth, including the products of tumor suppressor genes and dominant protooncogenes. This protein also contains 3 tandem ankyrin repeats. The BARD1/BRCA1 interaction is disrupted by tumorigenic amino acid substitutions in BRCA1, implying that the formation of a stable complex between these proteins may be an essential aspect of BRCA1 tumor suppression. This protein may be the target of oncogenic mutations in breast or ovarian cancer. Multiple alternatively spliced transcript variants encoding different isoforms have been found for this gene. [provided by RefSeq, Sep 2013].",
+        "spos": 214725646
+    },
+    {
+        "oe_syn": 0.9648,
+        "exp_lof": 75.229,
+        "mgi_mouse_gene": "Brca1",
+        "brainatlas_microarray": "BRCA1",
+        "status": "in review",
+        "schema_version": "1",
+        "chrom": "17",
+        "brainspan_microarray": "BRCA1",
+        "strand": "-",
+        "omim_id": [
+            "113705"
+        ],
+        "pdb": [
+            "1JM7",
+            "1JNX",
+            "1N5O",
+            "1OQA",
+            "1T15",
+            "1T29",
+            "1T2U",
+            "1T2V",
+            "1Y98",
+            "2ING",
+            "3COJ",
+            "3K0H",
+            "3K0K",
+            "3K15",
+            "3K16",
+            "3PXA",
+            "3PXB",
+            "3PXC",
+            "3PXD",
+            "3PXE",
+            "4IFI",
+            "4IGK",
+            "4JLU",
+            "4OFB",
+            "4U4A",
+            "4Y18",
+            "4Y2G",
+            "6G2I"
+        ],
+        "gene_version": "23",
+        "rvis_exac": -0.546858258,
+        "genecards": "ENSG00000012048",
+        "gdp": "Medium",
+        "orphanet": "119068",
+        "hgnc_id": "1100",
+        "ucsc_id": "uc002ict.4",
+        "oe_lof": 0.7311,
+        "epos": 43170245,
+        "uuid": "914e6aea-faa0-4235-ad18-21235aed59bb",
+        "pharmgkb": [
+            "PA25411"
+        ],
+        "epos_hg19": 41277500,
+        "gene_symbol": "BRCA1",
+        "name": "BRCA1 DNA repair associated",
+        "trait_association_gwas_pmid": [
+            "26414677~29773799"
+        ],
+        "date_created": "2020-07-15T13:01:24.800818+00:00",
+        "last_modified": {
+            "date_modified": "2020-07-15T13:01:24.807785+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "s_het": 0.007834657,
+        "exp_mis": 941.26,
+        "uniprot_ids": [
+            "P38398"
+        ],
+        "gtex_expression": "ENSG00000012048.20",
+        "oe_mis": 0.9466,
+        "obs_mis": 891,
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "spos_hg19": 41196312,
+        "trait_association_gwas": [
+            "Menopause (age at onset)"
+        ],
+        "refseq_accession": [
+            "NM_007294"
+        ],
+        "rvis_percentile_exac": 20.09517499,
+        "strand_hg19": "-",
+        "genereviews": [
+            "BRCA1"
+        ],
+        "mgd_id": [
+            "MGI:104537"
+        ],
+        "gene_biotype": "protein_coding",
+        "chrom_hg19": "17",
+        "mgi_mouse_phenotype": "mortality/aging (the observable characteristics related to the ability of a mammalian organism to live and age that are manifested throughout development and life span); normal phenotype; reproductive system phenotype; cardiovascular system phenotype (the observable morphological and physiological characteristics of the mammalian heart, blood vessels, or circulatory system that are manifested through development and lifespan); hematopoietic system phenotype; neoplasm; pigmentation phenotype; embryo phenotype; behavior/neurological phenotype (the observable actions or reactions of mammalian organisms that are manifested through development and lifespan); respiratory system phenotype; immune system phenotype; renal/urinary system phenotype; skeleton phenotype; nervous system phenotype (the observable morphological and physiological characteristics of the extensive, intricate network of electochemical structures in the body that is comprised of the brain, spinal cord, nerves, ganglia and parts of the receptor organs that are manifested through development and lifespan); limbs/digits/tail phenotype; digestive/alimentary phenotype; integument phenotype (the observable morphological and physiological characteristics of the skin and its associated structures, such as the hair, nails, sweat glands, sebaceous glands and other secretory glands that are manifested through development and lifespan); growth/size/body region phenotype; adipose tissue phenotype (the observable morphological and physiological characteristics of mammalian fat tissue that are manifested through development and lifespan); endocrine/exocrine gland phenotype; cellular phenotype; homeostasis/metabolism phenotype; muscle phenotype",
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "cds_length": 5652,
+        "exp_syn": 341,
+        "marrvel": "BRCA1",
+        "pathway_kegg_id": "hsa04120",
+        "obs_syn": 329,
+        "transcriptid": [
+            {
+                "ensembl_pro": "ENSP00000312236",
+                "ensembl_trs": "ENST00000352993"
+            },
+            {
+                "ensembl_pro": "ENSP00000350283",
+                "ensembl_trs": "ENST00000357654"
+            },
+            {
+                "ensembl_pro": "ENSP00000418548",
+                "ensembl_trs": "ENST00000461221"
+            },
+            {
+                "ensembl_pro": "ENSP00000417988",
+                "ensembl_trs": "ENST00000461798"
+            },
+            {
+                "ensembl_pro": "ENSP00000417148",
+                "ensembl_trs": "ENST00000468300"
+            },
+            {
+                "ensembl_pro": "ENSP00000418960",
+                "ensembl_trs": "ENST00000471181"
+            },
+            {
+                "ensembl_pro": "ENSP00000420705",
+                "ensembl_trs": "ENST00000491747"
+            },
+            {
+                "ensembl_pro": "ENSP00000418775",
+                "ensembl_trs": "ENST00000493795"
+            },
+            {
+                "ensembl_pro": "ENSP00000496570",
+                "ensembl_trs": "ENST00000644379"
+            },
+            {
+                "ensembl_pro": "ENSP00000465818",
+                "ensembl_trs": "ENST00000586385"
+            },
+            {
+                "ensembl_pro": "ENSP00000467329",
+                "ensembl_trs": "ENST00000591534"
+            },
+            {
+                "ensembl_pro": "ENSP00000465347",
+                "ensembl_trs": "ENST00000591849"
+            },
+            {
+                "ensembl_pro": "ENSP00000419481",
+                "ensembl_trs": "ENST00000484087"
+            },
+            {
+                "ensembl_pro": "ENSP00000420412",
+                "ensembl_trs": "ENST00000478531"
+            },
+            {
+                "ensembl_pro": "ENSP00000418819",
+                "ensembl_trs": "ENST00000493919"
+            },
+            {
+                "ensembl_pro": "ENSP00000418212",
+                "ensembl_trs": "ENST00000487825"
+            },
+            {
+                "ensembl_pro": "ENSP00000417241",
+                "ensembl_trs": "ENST00000461574"
+            },
+            {
+                "ensembl_pro": "ENSP00000326002",
+                "ensembl_trs": "ENST00000354071"
+            },
+            {
+                "ensembl_pro": "ENSP00000489431",
+                "ensembl_trs": "ENST00000634433"
+            },
+            {
+                "ensembl_pro": "ENSP00000397145",
+                "ensembl_trs": "ENST00000412061"
+            },
+            {
+                "ensembl_pro": "ENSP00000419274",
+                "ensembl_trs": "ENST00000470026"
+            },
+            {
+                "ensembl_pro": "ENSP00000498906",
+                "ensembl_trs": "ENST00000652672"
+            },
+            {
+                "ensembl_pro": "ENSP00000419988",
+                "ensembl_trs": "ENST00000477152"
+            },
+            {
+                "ensembl_pro": "ENSP00000420253",
+                "ensembl_trs": "ENST00000492859"
+            },
+            {
+                "ensembl_pro": "ENSP00000418986",
+                "ensembl_trs": "ENST00000497488"
+            },
+            {
+                "ensembl_pro": "ENSP00000419103",
+                "ensembl_trs": "ENST00000494123"
+            },
+            {
+                "ensembl_pro": "ENSP00000420201",
+                "ensembl_trs": "ENST00000473961"
+            },
+            {
+                "ensembl_pro": "ENSP00000495897",
+                "ensembl_trs": "ENST00000642945"
+            },
+            {
+                "ensembl_pro": "ENSP00000417554",
+                "ensembl_trs": "ENST00000476777"
+            },
+            {
+                "ensembl_pro": "ENSP00000420781",
+                "ensembl_trs": "ENST00000489037"
+            },
+            {
+                "ensembl_pro": "ENSP00000494614",
+                "ensembl_trs": "ENST00000644555"
+            },
+            {
+                "ensembl_pro": "ENSP00000478114",
+                "ensembl_trs": "ENST00000618469"
+            }
+        ],
+        "ensgid": "ENSG00000012048",
+        "ccds_id": [
+            "CCDS11453",
+            "CCDS11454",
+            "CCDS11455",
+            "CCDS11456",
+            "CCDS11459"
+        ],
+        "cytoband": [
+            "17q21.31"
+        ],
+        "clingendis": [
+            {
+                "disease_label": "breast-ovarian cancer, familial, susceptibility to, 1",
+                "disease_id": "MONDO_0011450",
+                "classification": "Definitive"
+            },
+            {
+                "disease_label": "Fanconi anemia, complementation group S",
+                "disease_id": "MONDO_0054748",
+                "classification": "Definitive"
+            }
+        ],
+        "gdi_phred": 12.15413,
+        "entrez_id": "672",
+        "num_coding_exons": 23,
+        "biogrid": [
+            "107140"
+        ],
+        "obs_lof": 55,
+        "clingen": "1100",
+        "string": [
+            "9606.ENSP00000418960"
+        ],
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "brainspan_rnaseq": "ENSG00000012048",
+        "gene_summary": "This gene encodes a nuclear phosphoprotein that plays a role in maintaining genomic stability, and it also acts as a tumor suppressor. The encoded protein combines with other tumor suppressors, DNA damage sensors, and signal transducers to form a large multi-subunit protein complex known as the BRCA1-associated genome surveillance complex (BASC). This gene product associates with RNA polymerase II, and through the C-terminal domain, also interacts with histone deacetylase complexes. This protein thus plays a role in transcription, DNA repair of double-stranded breaks, and recombination. Mutations in this gene are responsible for approximately 40% of inherited breast cancers and more than 80% of inherited breast and ovarian cancers. Alternative splicing plays a role in modulating the subcellular localization and physiological function of this gene. Many alternatively spliced transcript variants, some of which are disease-associated mutations, have been described for this gene, but the full-length natures of only some of these variants has been described. A related pseudogene, which is also located on chromosome 17, has been identified. [provided by RefSeq, May 2009].",
+        "pathway_kegg_full": "Ubiquitin mediated proteolysis",
+        "spos": 43044295
+    },
+    {
+        "oe_syn": 0.98882,
+        "exp_lof": 118.9,
+        "mgi_mouse_gene": "Brca2",
+        "brainatlas_microarray": "BRCA2",
+        "status": "in review",
+        "schema_version": "1",
+        "chrom": "13",
+        "brainspan_microarray": "BRCA2",
+        "strand": "+",
+        "omim_id": [
+            "600185"
+        ],
+        "pdb": [
+            "1N0W",
+            "3EU7"
+        ],
+        "gene_version": "15",
+        "rvis_exac": -0.142205075,
+        "genecards": "ENSG00000139618",
+        "gdp": "Medium",
+        "orphanet": "119072",
+        "hgnc_id": "1101",
+        "ucsc_id": "uc001uub.2",
+        "oe_lof": 0.51305,
+        "epos": 32400266,
+        "uuid": "a113d699-e511-4458-9005-deedaf089414",
+        "pharmgkb": [
+            "PA25412"
+        ],
+        "epos_hg19": 32973805,
+        "gene_symbol": "BRCA2",
+        "name": "BRCA2 DNA repair associated",
+        "trait_association_gwas_pmid": [
+            "28604730",
+            "28604730",
+            "24880342~24880342~28604730",
+            "28604730",
+            "27197191",
+            "23535733~23535729~29059683",
+            "28334899~28334899~28334899",
+            "24097068",
+            "27197191"
+        ],
+        "date_created": "2020-07-15T13:12:38.165016+00:00",
+        "last_modified": {
+            "date_modified": "2020-07-15T13:12:38.169124+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "s_het": 0.014262719,
+        "exp_mis": 1664,
+        "uniprot_ids": [
+            "P51587"
+        ],
+        "gtex_expression": "ENSG00000139618.14",
+        "oe_mis": 1.0889,
+        "obs_mis": 1812,
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "spos_hg19": 32889611,
+        "trait_association_gwas": [
+            "Small cell lung carcinoma",
+            "Lung cancer in ever smokers",
+            "Lung cancer",
+            "Squamous cell lung carcinoma",
+            "Cancer (pleiotropy)",
+            "Breast cancer",
+            "LDL cholesterol levels",
+            "LDL cholesterol",
+            "Cancer"
+        ],
+        "refseq_accession": [
+            "NM_000059"
+        ],
+        "rvis_percentile_exac": 40.50358412,
+        "strand_hg19": "+",
+        "genereviews": [
+            "BRCA2"
+        ],
+        "mgd_id": [
+            "MGI:109337"
+        ],
+        "gene_biotype": "protein_coding",
+        "chrom_hg19": "13",
+        "mgi_mouse_phenotype": "limbs/digits/tail phenotype; nervous system phenotype (the observable morphological and physiological characteristics of the extensive, intricate network of electochemical structures in the body that is comprised of the brain, spinal cord, nerves, ganglia and parts of the receptor organs that are manifested through development and lifespan); digestive/alimentary phenotype; immune system phenotype; skeleton phenotype; embryo phenotype; behavior/neurological phenotype (the observable actions or reactions of mammalian organisms that are manifested through development and lifespan); normal phenotype; mortality/aging (the observable characteristics related to the ability of a mammalian organism to live and age that are manifested throughout development and life span); reproductive system phenotype; hematopoietic system phenotype; neoplasm; endocrine/exocrine gland phenotype; cellular phenotype; homeostasis/metabolism phenotype; integument phenotype (the observable morphological and physiological characteristics of the skin and its associated structures, such as the hair, nails, sweat glands, sebaceous glands and other secretory glands that are manifested through development and lifespan); growth/size/body region phenotype",
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "cds_length": 10254,
+        "exp_syn": 593.63,
+        "marrvel": "BRCA2",
+        "pathway_kegg_id": "hsa03440;hsa05212",
+        "obs_syn": 587,
+        "transcriptid": [
+            {
+                "ensembl_pro": "ENSP00000499625",
+                "ensembl_trs": "ENST00000670614"
+            },
+            {
+                "ensembl_pro": "ENSP00000499308",
+                "ensembl_trs": "ENST00000671466"
+            },
+            {
+                "ensembl_pro": "ENSP00000369497",
+                "ensembl_trs": "ENST00000380152"
+            },
+            {
+                "ensembl_pro": "ENSP00000439902",
+                "ensembl_trs": "ENST00000544455"
+            },
+            {
+                "ensembl_pro": "ENSP00000433168",
+                "ensembl_trs": "ENST00000528762"
+            },
+            {
+                "ensembl_pro": "ENSP00000434898",
+                "ensembl_trs": "ENST00000470094"
+            }
+        ],
+        "ensgid": "ENSG00000139618",
+        "ccds_id": [
+            "CCDS9344"
+        ],
+        "cytoband": [
+            "13q13.1"
+        ],
+        "clingendis": [
+            {
+                "disease_label": "breast-ovarian cancer, familial, susceptibility to, 2",
+                "disease_id": "MONDO_0012933",
+                "classification": "Definitive"
+            },
+            {
+                "disease_label": "Fanconi anemia complementation group D1",
+                "disease_id": "MONDO_0011584",
+                "classification": "Definitive"
+            }
+        ],
+        "gdi_phred": 5.51436,
+        "entrez_id": "675",
+        "num_coding_exons": 26,
+        "biogrid": [
+            "107142"
+        ],
+        "obs_lof": 61,
+        "clingen": "1101",
+        "string": [
+            "9606.ENSP00000369497"
+        ],
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "brainspan_rnaseq": "ENSG00000139618",
+        "gene_summary": "This gene encodes a member of the ZAR1 family that is predominantly expressed in oocytes and early embryos. The protein may function as an RNA regulator in early embryos. [provided by RefSeq, Apr 2010].",
+        "pathway_kegg_full": "Homologous recombination;Pancreatic cancer",
+        "spos": 32315086
+    },
+    {
+        "oe_syn": 0.99177,
+        "exp_lof": 36.519,
+        "mgi_mouse_gene": "Cdh1",
+        "status": "in review",
+        "schema_version": "1",
+        "chrom": "16",
+        "brainspan_microarray": "CDH1",
+        "strand": "+",
+        "omim_id": [
+            "192090"
+        ],
+        "pdb": [
+            "1O6S",
+            "2O72",
+            "2OMT",
+            "2OMU",
+            "2OMV",
+            "2OMX",
+            "2OMY",
+            "2OMZ",
+            "3FF7",
+            "3FF8",
+            "3L6X",
+            "3L6Y",
+            "4ZT1",
+            "4ZTE",
+            "6CXY",
+            "6OLE",
+            "6OLF",
+            "6OLG"
+        ],
+        "gene_version": "19",
+        "rvis_exac": -0.675033219,
+        "genecards": "ENSG00000039068",
+        "gdp": "Medium",
+        "orphanet": "119276",
+        "hgnc_id": "1748",
+        "ucsc_id": "uc002ewg.2",
+        "oe_lof": 0.24645,
+        "epos": 68835541,
+        "uuid": "80807d97-58ae-410f-b10b-5cac8ce61778",
+        "pharmgkb": [
+            "PA26282"
+        ],
+        "epos_hg19": 68869451,
+        "name": "cadherin 1",
+        "trait_association_gwas_pmid": [
+            "27863252",
+            "27863252",
+            "27863252",
+            "27863252",
+            "27863252",
+            "26237428",
+            "19011631",
+            "27770636",
+            "27863252",
+            "19915572"
+        ],
+        "date_created": "2020-07-15T13:01:33.660751+00:00",
+        "last_modified": {
+            "date_modified": "2020-07-15T13:01:33.663829+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "gene_symbol": "CDH1",
+        "exp_mis": 492.08,
+        "uniprot_ids": [
+            "P12830"
+        ],
+        "gtex_expression": "ENSG00000039068.18",
+        "oe_mis": 0.91042,
+        "obs_mis": 448,
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "spos_hg19": 68771128,
+        "trait_association_gwas": [
+            "High light scatter reticulocyte percentage of red cells",
+            "Mean corpuscular hemoglobin",
+            "Reticulocyte fraction of red cells",
+            "Mean corpuscular volume",
+            "Reticulocyte count",
+            "Cutaneous malignant melanoma",
+            "Colorectal cancer",
+            "Late-onset Alzheimer's disease",
+            "High light scatter reticulocyte count",
+            "Ulcerative colitis"
+        ],
+        "refseq_accession": [
+            "NM_004360"
+        ],
+        "rvis_percentile_exac": 16.14962954,
+        "strand_hg19": "+",
+        "genereviews": [
+            "CDH1"
+        ],
+        "mgd_id": [
+            "MGI:88354"
+        ],
+        "gene_biotype": "protein_coding",
+        "chrom_hg19": "16",
+        "mgi_mouse_phenotype": "digestive/alimentary phenotype; immune system phenotype; embryo phenotype; neoplasm; reproductive system phenotype; mortality/aging (the observable characteristics related to the ability of a mammalian organism to live and age that are manifested throughout development and life span); normal phenotype; integument phenotype (the observable morphological and physiological characteristics of the skin and its associated structures, such as the hair, nails, sweat glands, sebaceous glands and other secretory glands that are manifested through development and lifespan); cardiovascular system phenotype (the observable morphological and physiological characteristics of the mammalian heart, blood vessels, or circulatory system that are manifested through development and lifespan); growth/size/body region phenotype; cellular phenotype; homeostasis/metabolism phenotype; endocrine/exocrine gland phenotype",
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "cds_length": 2646,
+        "exp_syn": 201.66,
+        "marrvel": "CDH1",
+        "pathway_kegg_id": "hsa04514;hsa04520;hsa05130;hsa05131;hsa05213;hsa05216;hsa05218;hsa05219",
+        "obs_syn": 200,
+        "transcriptid": [
+            {
+                "ensembl_pro": "ENSP00000261769",
+                "ensembl_trs": "ENST00000261769"
+            },
+            {
+                "ensembl_pro": "ENSP00000414946",
+                "ensembl_trs": "ENST00000422392"
+            },
+            {
+                "ensembl_pro": "ENSP00000454782",
+                "ensembl_trs": "ENST00000566612"
+            },
+            {
+                "ensembl_pro": "ENSP00000458139",
+                "ensembl_trs": "ENST00000566510"
+            },
+            {
+                "ensembl_pro": "ENSP00000463170",
+                "ensembl_trs": "ENST00000561751"
+            },
+            {
+                "ensembl_pro": "ENSP00000478360",
+                "ensembl_trs": "ENST00000612417"
+            },
+            {
+                "ensembl_pro": "ENSP00000480664",
+                "ensembl_trs": "ENST00000621016"
+            },
+            {
+                "ensembl_pro": "ENSP00000481063",
+                "ensembl_trs": "ENST00000611625"
+            }
+        ],
+        "ensgid": "ENSG00000039068",
+        "ccds_id": [
+            "CCDS10869",
+            "CCDS82005"
+        ],
+        "cytoband": [
+            "16q22.1"
+        ],
+        "clingendis": [
+            {
+                "disease_label": "familial ovarian cancer",
+                "disease_id": "MONDO_0016248",
+                "classification": "No Reported Evidence"
+            },
+            {
+                "disease_label": "hereditary nonpolyposis colon cancer",
+                "disease_id": "MONDO_0018630",
+                "classification": "Limited"
+            },
+            {
+                "disease_label": "hereditary breast carcinoma",
+                "disease_id": "MONDO_0016419",
+                "classification": "Definitive"
+            },
+            {
+                "disease_label": "hereditary diffuse gastric adenocarcinoma",
+                "disease_id": "MONDO_0007648",
+                "classification": "Definitive"
+            }
+        ],
+        "gdi_phred": 2.41215,
+        "entrez_id": "999",
+        "num_coding_exons": 16,
+        "biogrid": [
+            "107434"
+        ],
+        "obs_lof": 9,
+        "clingen": "1748",
+        "string": [
+            "9606.ENSP00000261769"
+        ],
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "brainspan_rnaseq": "ENSG00000039068",
+        "gene_summary": "This gene encodes a classical cadherin of the cadherin superfamily. Alternative splicing results in multiple transcript variants, at least one of which encodes a preproprotein that is proteolytically processed to generate the mature glycoprotein. This calcium-dependent cell-cell adhesion protein is comprised of five extracellular cadherin repeats, a transmembrane region and a highly conserved cytoplasmic tail. Mutations in this gene are correlated with gastric, breast, colorectal, thyroid and ovarian cancer. Loss of function of this gene is thought to contribute to cancer progression by increasing proliferation, invasion, and/or metastasis. The ectodomain of this protein mediates bacterial adhesion to mammalian cells and the cytoplasmic domain is required for internalization. This gene is present in a gene cluster with other members of the cadherin family on chromosome 16. [provided by RefSeq, Nov 2015].",
+        "pathway_kegg_full": "Cell adhesion molecules (CAMs);Adherens junction;Pathogenic Escherichia coli infection;EPEC;Endometrial cancer;Thyroid cancer;Melanoma;Bladder cancer",
+        "spos": 68737292
+    },
+    {
+        "oe_syn": 0.86181,
+        "exp_lof": 29.567,
+        "mgi_mouse_gene": "Chek2",
+        "brainatlas_microarray": "CDS1",
+        "status": "in review",
+        "schema_version": "1",
+        "chrom": "22",
+        "brainspan_microarray": "CHEK2",
+        "strand": "-",
+        "omim_id": [
+            "604373"
+        ],
+        "pdb": [
+            "1GXC",
+            "2CN5",
+            "2CN8",
+            "2W0J",
+            "2W7X",
+            "2WTC",
+            "2WTD",
+            "2WTI",
+            "2WTJ",
+            "2XBJ",
+            "2XK9",
+            "2XM8",
+            "2XM9",
+            "2YCF",
+            "2YCQ",
+            "2YCR",
+            "2YCS",
+            "2YIQ",
+            "2YIR",
+            "2YIT",
+            "3I6U",
+            "3I6W",
+            "3VA4",
+            "4A9R",
+            "4A9S",
+            "4A9T",
+            "4A9U",
+            "4BDA",
+            "4BDB",
+            "4BDC",
+            "4BDD",
+            "4BDE",
+            "4BDF",
+            "4BDG",
+            "4BDH",
+            "4BDI",
+            "4BDJ",
+            "4BDK"
+        ],
+        "gene_version": "22",
+        "rvis_exac": 0.322951443,
+        "genecards": "ENSG00000183765",
+        "gdp": "Medium",
+        "orphanet": "119394",
+        "hgnc_id": "16627",
+        "ucsc_id": "uc003adu.2",
+        "oe_lof": 1.1499,
+        "epos": 28742422,
+        "uuid": "c69d356c-4954-40d2-8cd6-89932b4d8830",
+        "pharmgkb": [
+            "PA404"
+        ],
+        "epos_hg19": 29138410,
+        "gene_symbol": "CHEK2",
+        "name": "checkpoint kinase 2",
+        "trait_association_gwas_pmid": [
+            "20729852",
+            "25631615~25631615~28073927~28073927",
+            "24880342~24880342",
+            "22747683",
+            "27863252",
+            "25241763~20548946~28073927~28073927",
+            "23535729~29059683",
+            "29891935",
+            "26414677",
+            "25086665",
+            "22960999",
+            "25129146",
+            "28073927~28073927",
+            "29117387"
+        ],
+        "date_created": "2020-07-15T12:55:59.976262+00:00",
+        "last_modified": {
+            "date_modified": "2020-07-15T12:55:59.983770+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "s_het": 0.021519419,
+        "exp_mis": 304.89,
+        "uniprot_ids": [
+            "O96017"
+        ],
+        "gtex_expression": "ENSG00000183765.20",
+        "oe_mis": 1.0725,
+        "obs_mis": 327,
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "spos_hg19": 29083731,
+        "trait_association_gwas": [
+            "Esophageal cancer and gastric cancer",
+            "Optic cup area",
+            "Lung cancer",
+            "Breast size",
+            "Plateletcrit",
+            "Vertical cup-disc ratio",
+            "Breast cancer",
+            "Glaucoma (primary open-angle)",
+            "Menopause (age at onset)",
+            "Pancreatic cancer",
+            "Esophageal cancer (squamous cell)",
+            "Esophageal squamous cell carcinoma",
+            "Optic disc area",
+            "Prostate cancer"
+        ],
+        "refseq_accession": [
+            "NM_001005735"
+        ],
+        "rvis_percentile_exac": 70.3391362,
+        "strand_hg19": "-",
+        "mgd_id": [
+            "MGI:1355321"
+        ],
+        "gene_biotype": "protein_coding",
+        "chrom_hg19": "22",
+        "mgi_mouse_phenotype": "mortality/aging (the observable characteristics related to the ability of a mammalian organism to live and age that are manifested throughout development and life span); hematopoietic system phenotype; neoplasm; immune system phenotype; nervous system phenotype (the observable morphological and physiological characteristics of the extensive, intricate network of electochemical structures in the body that is comprised of the brain, spinal cord, nerves, ganglia and parts of the receptor organs that are manifested through development and lifespan); endocrine/exocrine gland phenotype; cellular phenotype; homeostasis/metabolism phenotype",
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "cds_length": 1758,
+        "exp_syn": 110.23,
+        "marrvel": "CHEK2",
+        "pathway_kegg_id": "hsa04110;hsa04115",
+        "obs_syn": 95,
+        "transcriptid": [
+            {
+                "ensembl_pro": "ENSP00000416721",
+                "ensembl_trs": "ENST00000434810"
+            },
+            {
+                "ensembl_pro": "ENSP00000394430",
+                "ensembl_trs": "ENST00000456369"
+            },
+            {
+                "ensembl_pro": "ENSP00000329012",
+                "ensembl_trs": "ENST00000348295"
+            },
+            {
+                "ensembl_pro": "ENSP00000372023",
+                "ensembl_trs": "ENST00000382580"
+            },
+            {
+                "ensembl_pro": "ENSP00000384835",
+                "ensembl_trs": "ENST00000402731"
+            },
+            {
+                "ensembl_pro": "ENSP00000384919",
+                "ensembl_trs": "ENST00000403642"
+            },
+            {
+                "ensembl_pro": "ENSP00000385747",
+                "ensembl_trs": "ENST00000404276"
+            },
+            {
+                "ensembl_pro": "ENSP00000386087",
+                "ensembl_trs": "ENST00000405598"
+            },
+            {
+                "ensembl_pro": "ENSP00000412901",
+                "ensembl_trs": "ENST00000417588"
+            },
+            {
+                "ensembl_pro": "ENSP00000404400",
+                "ensembl_trs": "ENST00000433728"
+            },
+            {
+                "ensembl_pro": "ENSP00000404567",
+                "ensembl_trs": "ENST00000448511"
+            },
+            {
+                "ensembl_pro": "ENSP00000496928",
+                "ensembl_trs": "ENST00000649563"
+            },
+            {
+                "ensembl_pro": "ENSP00000497000",
+                "ensembl_trs": "ENST00000650281"
+            },
+            {
+                "ensembl_pro": "ENSP00000372006",
+                "ensembl_trs": "ENST00000382565"
+            },
+            {
+                "ensembl_pro": "ENSP00000402225",
+                "ensembl_trs": "ENST00000416671"
+            },
+            {
+                "ensembl_pro": "ENSP00000397478",
+                "ensembl_trs": "ENST00000447421"
+            },
+            {
+                "ensembl_pro": "ENSP00000403659",
+                "ensembl_trs": "ENST00000433028"
+            },
+            {
+                "ensembl_pro": "ENSP00000483777",
+                "ensembl_trs": "ENST00000464581"
+            },
+            {
+                "ensembl_pro": "ENSP00000390244",
+                "ensembl_trs": "ENST00000425190"
+            },
+            {
+                "ensembl_pro": "ENSP00000396903",
+                "ensembl_trs": "ENST00000439346"
+            },
+            {
+                "ensembl_pro": "ENSP00000408065",
+                "ensembl_trs": "ENST00000439200"
+            },
+            {
+                "ensembl_pro": "ENSP00000387451",
+                "ensembl_trs": "ENST00000454252"
+            },
+            {
+                "ensembl_pro": "ENSP00000497699",
+                "ensembl_trs": "ENST00000650233"
+            },
+            {
+                "ensembl_pro": "ENSP00000381099",
+                "ensembl_trs": "ENST00000398017"
+            }
+        ],
+        "ensgid": "ENSG00000183765",
+        "ccds_id": [
+            "CCDS13843",
+            "CCDS13844",
+            "CCDS33629"
+        ],
+        "cytoband": [
+            "22q12.1"
+        ],
+        "clingendis": [
+            {
+                "disease_label": "hereditary nonpolyposis colon cancer",
+                "disease_id": "MONDO_0018630",
+                "classification": "Limited"
+            },
+            {
+                "disease_label": "hereditary breast carcinoma",
+                "disease_id": "MONDO_0016419",
+                "classification": "Definitive"
+            },
+            {
+                "disease_label": "familial ovarian cancer",
+                "disease_id": "MONDO_0016248",
+                "classification": "Disputed"
+            }
+        ],
+        "gdi_phred": 2.56375,
+        "entrez_id": "11200",
+        "num_coding_exons": 15,
+        "biogrid": [
+            "116369"
+        ],
+        "obs_lof": 34,
+        "clingen": "16627",
+        "string": [
+            "9606.ENSP00000372023"
+        ],
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "brainspan_rnaseq": "ENSG00000183765",
+        "gene_summary": "In response to DNA damage and replication blocks, cell cycle progression is halted through the control of critical cell cycle regulators. The protein encoded by this gene is a cell cycle checkpoint regulator and putative tumor suppressor. It contains a forkhead-associated protein interaction domain essential for activation in response to DNA damage and is rapidly phosphorylated in response to replication blocks and DNA damage. When activated, the encoded protein is known to inhibit CDC25C phosphatase, preventing entry into mitosis, and has been shown to stabilize the tumor suppressor protein p53, leading to cell cycle arrest in G1. In addition, this protein interacts with and phosphorylates BRCA1, allowing BRCA1 to restore survival after DNA damage. Mutations in this gene have been linked with Li-Fraumeni syndrome, a highly penetrant familial cancer phenotype usually associated with inherited mutations in TP53. Also, mutations in this gene are thought to confer a predisposition to sarcomas, breast cancer, and brain tumors. This nuclear protein is a member of the CDS1 subfamily of serine/threonine protein kinases. Several transcript variants encoding different isoforms have been found for this gene. [provided by RefSeq, Apr 2012].",
+        "pathway_kegg_full": "Cell cycle;p53 signaling pathway",
+        "spos": 28687743
+    },
+    {
+        "oe_syn": 1.0867,
+        "exp_lof": 32.348,
+        "mgi_mouse_gene": "Fancc",
+        "brainatlas_microarray": "FANCC",
+        "status": "in review",
+        "schema_version": "1",
+        "chrom": "9",
+        "brainspan_microarray": "FANCC",
+        "strand": "-",
+        "omim_id": [
+            "613899"
+        ],
+        "mgi_mouse_phenotype": "cellular phenotype; endocrine/exocrine gland phenotype; liver/biliary system phenotype; immune system phenotype; skeleton phenotype; hematopoietic system phenotype; reproductive system phenotype",
+        "gene_version": "13",
+        "rvis_exac": -0.308412385,
+        "genecards": "ENSG00000158169",
+        "gdp": "Medium",
+        "orphanet": "121705",
+        "hgnc_id": "3584",
+        "ucsc_id": "uc004avh.4",
+        "oe_lof": 0.74194,
+        "epos": 95426796,
+        "uuid": "164d8c15-84e6-49b2-b684-77f29ac84676",
+        "pharmgkb": [
+            "PA27997"
+        ],
+        "epos_hg19": 98079991,
+        "gene_symbol": "FANCC",
+        "name": "FA complementation group C",
+        "trait_association_gwas_pmid": [
+            "26284813"
+        ],
+        "date_created": "2020-07-15T13:14:24.085384+00:00",
+        "last_modified": {
+            "date_modified": "2020-07-15T13:14:24.089942+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "s_het": 0.008939895,
+        "exp_mis": 296.6,
+        "uniprot_ids": [
+            "Q00597"
+        ],
+        "gtex_expression": "ENSG00000158169.12",
+        "oe_mis": 1.0317,
+        "obs_mis": 306,
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "spos_hg19": 97861336,
+        "trait_association_gwas": [
+            "Polycystic ovary syndrome"
+        ],
+        "refseq_accession": [
+            "NM_000136"
+        ],
+        "rvis_percentile_exac": 30.90175291,
+        "strand_hg19": "-",
+        "genereviews": [
+            "FANCC"
+        ],
+        "mgd_id": [
+            "MGI:95480"
+        ],
+        "gene_biotype": "protein_coding",
+        "chrom_hg19": "9",
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "cds_length": 1674,
+        "exp_syn": 112.27,
+        "marrvel": "FANCC",
+        "obs_syn": 122,
+        "transcriptid": [
+            {
+                "ensembl_pro": "ENSP00000289081",
+                "ensembl_trs": "ENST00000289081"
+            },
+            {
+                "ensembl_pro": "ENSP00000364454",
+                "ensembl_trs": "ENST00000375305"
+            },
+            {
+                "ensembl_pro": "ENSP00000497735",
+                "ensembl_trs": "ENST00000649334"
+            },
+            {
+                "ensembl_pro": "ENSP00000479931",
+                "ensembl_trs": "ENST00000490972"
+            },
+            {
+                "ensembl_pro": "ENSP00000497729",
+                "ensembl_trs": "ENST00000474949"
+            },
+            {
+                "ensembl_pro": "ENSP00000497630",
+                "ensembl_trs": "ENST00000649519"
+            },
+            {
+                "ensembl_pro": "ENSP00000498125",
+                "ensembl_trs": "ENST00000647778"
+            },
+            {
+                "ensembl_pro": "ENSP00000406908",
+                "ensembl_trs": "ENST00000433829"
+            },
+            {
+                "ensembl_pro": "ENSP00000497025",
+                "ensembl_trs": "ENST00000647882"
+            },
+            {
+                "ensembl_pro": "ENSP00000497195",
+                "ensembl_trs": "ENST00000649872"
+            },
+            {
+                "ensembl_pro": "ENSP00000497986",
+                "ensembl_trs": "ENST00000649611"
+            }
+        ],
+        "ensgid": "ENSG00000158169",
+        "ccds_id": [
+            "CCDS35071",
+            "CCDS75861"
+        ],
+        "cytoband": [
+            "9q22.32"
+        ],
+        "clingendis": [
+            {
+                "disease_label": "Fanconi anemia complementation group C",
+                "disease_id": "MONDO_0009213",
+                "classification": "Definitive"
+            }
+        ],
+        "gdi_phred": 3.37227,
+        "entrez_id": "2176",
+        "num_coding_exons": 14,
+        "biogrid": [
+            "108473"
+        ],
+        "obs_lof": 24,
+        "clingen": "3584",
+        "string": [
+            "9606.ENSP00000289081"
+        ],
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "brainspan_rnaseq": "ENSG00000158169",
+        "gene_summary": "The Fanconi anemia complementation group (FANC) currently includes FANCA, FANCB, FANCC, FANCD1 (also called BRCA2), FANCD2, FANCE, FANCF, FANCG, FANCI, FANCJ (also called BRIP1), FANCL, FANCM and FANCN (also called PALB2). The previously defined group FANCH is the same as FANCA. Fanconi anemia is a genetically heterogeneous recessive disorder characterized by cytogenetic instability, hypersensitivity to DNA crosslinking agents, increased chromosomal breakage, and defective DNA repair. The members of the Fanconi anemia complementation group do not share sequence similarity; they are related by their assembly into a common nuclear protein complex. This gene encodes the protein for complementation group C. [provided by RefSeq, Jul 2008].",
+        "spos": 95099054
+    },
+    {
+        "oe_syn": 1.0003,
+        "exp_lof": 87.863,
+        "mgi_mouse_gene": "Fancm",
+        "brainatlas_microarray": "FANCM",
+        "status": "in review",
+        "schema_version": "1",
+        "chrom": "14",
+        "brainspan_microarray": "FANCM",
+        "strand": "+",
+        "omim_id": [
+            "609644"
+        ],
+        "pdb": [
+            "4BXO",
+            "4DAY",
+            "4DRB",
+            "4E45",
+            "4M6W"
+        ],
+        "gene_version": "11",
+        "rvis_exac": 1.536335286,
+        "genecards": "ENSG00000187790",
+        "gdp": "High",
+        "orphanet": "121730",
+        "hgnc_id": "23168",
+        "ucsc_id": "uc001wwd.5",
+        "oe_lof": 0.45525,
+        "epos": 45200890,
+        "uuid": "a8f1eb13-720e-4423-a572-10797bd70164",
+        "pharmgkb": [
+            "PA134943156"
+        ],
+        "epos_hg19": 45670093,
+        "num_coding_exons": 23,
+        "trait_association_gwas_pmid": [
+            "26379185"
+        ],
+        "date_created": "2020-07-15T13:02:35.053513+00:00",
+        "last_modified": {
+            "date_modified": "2020-07-15T13:02:35.057808+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "gene_symbol": "FANCM",
+        "exp_mis": 1041,
+        "uniprot_ids": [
+            "Q8IYD8"
+        ],
+        "gtex_expression": "ENSG00000187790.10",
+        "oe_mis": 1.0115,
+        "obs_mis": 1053,
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "spos_hg19": 45605143,
+        "trait_association_gwas": [
+            "Severe influenza A (H1N1) infection"
+        ],
+        "refseq_accession": [
+            "NM_020937"
+        ],
+        "rvis_percentile_exac": 96.40985483,
+        "strand_hg19": "+",
+        "genereviews": [
+            "FANCM"
+        ],
+        "mgd_id": [
+            "MGI:2442306"
+        ],
+        "gene_biotype": "protein_coding",
+        "chrom_hg19": "14",
+        "mgi_mouse_phenotype": "liver/biliary system phenotype; neoplasm; mortality/aging (the observable characteristics related to the ability of a mammalian organism to live and age that are manifested throughout development and life span); reproductive system phenotype; cellular phenotype; endocrine/exocrine gland phenotype",
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "cds_length": 6144,
+        "exp_syn": 368.88,
+        "marrvel": "FANCM",
+        "obs_syn": 369,
+        "transcriptid": [
+            {
+                "ensembl_pro": "ENSP00000267430",
+                "ensembl_trs": "ENST00000267430"
+            },
+            {
+                "ensembl_pro": "ENSP00000442493",
+                "ensembl_trs": "ENST00000542564"
+            },
+            {
+                "ensembl_pro": "ENSP00000450596",
+                "ensembl_trs": "ENST00000556036"
+            },
+            {
+                "ensembl_pro": "ENSP00000452033",
+                "ensembl_trs": "ENST00000556250"
+            },
+            {
+                "ensembl_pro": "ENSP00000450632",
+                "ensembl_trs": "ENST00000554809"
+            },
+            {
+                "ensembl_pro": "ENSP00000451846",
+                "ensembl_trs": "ENST00000557110"
+            },
+            {
+                "ensembl_pro": "ENSP00000450797",
+                "ensembl_trs": "ENST00000555484"
+            }
+        ],
+        "ensgid": "ENSG00000187790",
+        "ccds_id": [
+            "CCDS32070",
+            "CCDS76677",
+            "CCDS81802"
+        ],
+        "cytoband": [
+            "14q21.2"
+        ],
+        "gdi_phred": 16.68075,
+        "entrez_id": "57697",
+        "biogrid": [
+            "121722"
+        ],
+        "obs_lof": 40,
+        "name": "FA complementation group M",
+        "string": [
+            "9606.ENSP00000267430"
+        ],
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "brainspan_rnaseq": "ENSG00000187790",
+        "gene_summary": "The Fanconi anemia complementation group (FANC) currently includes FANCA, FANCB, FANCC, FANCD1 (also called BRCA2), FANCD2, FANCE, FANCF, FANCG, FANCI, FANCJ (also called BRIP1), FANCL, FANCM and FANCN (also called PALB2). The previously defined group FANCH is the same as FANCA. Fanconi anemia is a genetically heterogeneous recessive disorder characterized by cytogenetic instability, hypersensitivity to DNA crosslinking agents, increased chromosomal breakage, and defective DNA repair. The members of the Fanconi anemia complementation group do not share sequence similarity; they are related by their assembly into a common nuclear protein complex. This gene encodes the protein for complementation group M. Alternative splicing results in multiple transcript variants. [provided by RefSeq, Apr 2015].",
+        "spos": 45135930
+    },
+    {
+        "oe_syn": 1.1102,
+        "exp_lof": 42.994,
+        "mgi_mouse_gene": "Mre11a",
+        "brainatlas_microarray": "MRE11A",
+        "gene_version": "12",
+        "status": "in review",
+        "schema_version": "1",
+        "chrom": "11",
+        "brainspan_microarray": "MRE11A",
+        "strand": "-",
+        "omim_id": [
+            "600814"
+        ],
+        "pdb": [
+            "3T1I"
+        ],
+        "exp_mis": 385.18,
+        "rvis_exac": -0.742663335,
+        "genecards": "ENSG00000020922",
+        "epos": 94493908,
+        "orphanet": "123483",
+        "hgnc_id": "7230",
+        "ucsc_id": "uc001peu.4",
+        "oe_lof": 0.60473,
+        "uuid": "b3929fa4-01e4-4c1e-8f1b-d3906da8145a",
+        "pharmgkb": [
+            "PA30934"
+        ],
+        "epos_hg19": 94227074,
+        "gene_symbol": "MRE11",
+        "name": "MRE11 homolog, double strand break repair nuclease",
+        "trait_association_gwas_pmid": [
+            "26977737"
+        ],
+        "date_created": "2020-07-15T13:13:24.336784+00:00",
+        "s_het": 0.008565906,
+        "mgd_id": [
+            "MGI:1100512"
+        ],
+        "uniprot_ids": [
+            "P49959"
+        ],
+        "gtex_expression": "ENSG00000020922.12",
+        "oe_mis": 0.98136,
+        "obs_mis": 378,
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "spos_hg19": 94152895,
+        "trait_association_gwas": [
+            "Obstructive sleep apnea trait (apnea hypopnea index)"
+        ],
+        "refseq_accession": [
+            "NM_005591"
+        ],
+        "rvis_percentile_exac": 14.28829589,
+        "strand_hg19": "-",
+        "last_modified": {
+            "date_modified": "2020-07-15T13:13:24.341528+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "gene_biotype": "protein_coding",
+        "chrom_hg19": "11",
+        "mgi_mouse_phenotype": "embryo phenotype; behavior/neurological phenotype (the observable actions or reactions of mammalian organisms that are manifested through development and lifespan); mortality/aging (the observable characteristics related to the ability of a mammalian organism to live and age that are manifested throughout development and life span); reproductive system phenotype; hematopoietic system phenotype; cardiovascular system phenotype (the observable morphological and physiological characteristics of the mammalian heart, blood vessels, or circulatory system that are manifested through development and lifespan); neoplasm; immune system phenotype; cellular phenotype; homeostasis/metabolism phenotype",
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "cds_length": 2124,
+        "exp_syn": 124.3,
+        "marrvel": "MRE11",
+        "pathway_kegg_id": "hsa03440;hsa03450",
+        "obs_syn": 138,
+        "transcriptid": [
+            {
+                "ensembl_pro": "ENSP00000325863",
+                "ensembl_trs": "ENST00000323929"
+            },
+            {
+                "ensembl_pro": "ENSP00000326094",
+                "ensembl_trs": "ENST00000323977"
+            },
+            {
+                "ensembl_pro": "ENSP00000385614",
+                "ensembl_trs": "ENST00000407439"
+            },
+            {
+                "ensembl_pro": "ENSP00000376933",
+                "ensembl_trs": "ENST00000393241"
+            },
+            {
+                "ensembl_pro": "ENSP00000440986",
+                "ensembl_trs": "ENST00000540013"
+            },
+            {
+                "ensembl_pro": "ENSP00000439511",
+                "ensembl_trs": "ENST00000536754"
+            },
+            {
+                "ensembl_pro": "ENSP00000442809",
+                "ensembl_trs": "ENST00000538923"
+            }
+        ],
+        "ensgid": "ENSG00000020922",
+        "ccds_id": [
+            "CCDS8298",
+            "CCDS8299",
+            "CCDS81617"
+        ],
+        "cytoband": [
+            "11q21"
+        ],
+        "clingendis": [
+            {
+                "disease_label": "familial ovarian cancer",
+                "disease_id": "MONDO_0016248",
+                "classification": "Disputed"
+            },
+            {
+                "disease_label": "hereditary breast carcinoma",
+                "disease_id": "MONDO_0016419",
+                "classification": "Disputed"
+            }
+        ],
+        "entrez_id": "4361",
+        "num_coding_exons": 19,
+        "biogrid": [
+            "110501"
+        ],
+        "obs_lof": 26,
+        "clingen": "7230",
+        "string": [
+            "9606.ENSP00000325863"
+        ],
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "brainspan_rnaseq": "ENSG00000020922",
+        "gene_summary": "This gene encodes a nuclear protein involved in homologous recombination, telomere length maintenance, and DNA double-strand break repair. By itself, the protein has 3' to 5' exonuclease activity and endonuclease activity. The protein forms a complex with the RAD50 homolog; this complex is required for nonhomologous joining of DNA ends and possesses increased single-stranded DNA endonuclease and 3' to 5' exonuclease activities. In conjunction with a DNA ligase, this protein promotes the joining of noncomplementary ends in vitro using short homologies near the ends of the DNA fragments. This gene has a pseudogene on chromosome 3. Alternative splicing of this gene results in two transcript variants encoding different isoforms. [provided by RefSeq, Jul 2008].",
+        "pathway_kegg_full": "Homologous recombination;Non-homologous end-joining",
+        "spos": 94415578
+    },
+    {
+        "oe_syn": 1.0145,
+        "exp_lof": 34.178,
+        "mgi_mouse_gene": "Mutyh",
+        "brainatlas_microarray": "MUTYH",
+        "status": "in review",
+        "schema_version": "1",
+        "chrom": "1",
+        "brainspan_microarray": "MUTYH",
+        "strand": "-",
+        "omim_id": [
+            "604933"
+        ],
+        "pdb": [
+            "1X51",
+            "3N5N"
+        ],
+        "gene_version": "18",
+        "rvis_exac": 0.057251574,
+        "genecards": "ENSG00000132781",
+        "gdp": "Medium",
+        "orphanet": "123585",
+        "hgnc_id": "7527",
+        "ucsc_id": "uc001cnm.4",
+        "oe_lof": 0.87777,
+        "epos": 45340893,
+        "uuid": "58c9b6a9-5c2e-41fa-b6f2-5256d37581df",
+        "pharmgkb": [
+            "PA31328"
+        ],
+        "epos_hg19": 45806142,
+        "name": "mutY DNA glycosylase",
+        "date_created": "2020-07-15T13:04:41.232552+00:00",
+        "last_modified": {
+            "date_modified": "2020-07-15T13:04:41.243953+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "gene_symbol": "MUTYH",
+        "exp_mis": 311.71,
+        "uniprot_ids": [
+            "Q9UIF7"
+        ],
+        "gtex_expression": "ENSG00000132781.17",
+        "oe_mis": 1.033,
+        "obs_mis": 322,
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "spos_hg19": 45794835,
+        "refseq_accession": [
+            "NM_012222"
+        ],
+        "rvis_percentile_exac": 54.37021866,
+        "strand_hg19": "-",
+        "genereviews": [
+            "MUTYH"
+        ],
+        "mgd_id": [
+            "MGI:1917853"
+        ],
+        "gene_biotype": "protein_coding",
+        "chrom_hg19": "1",
+        "mgi_mouse_phenotype": "cellular phenotype; homeostasis/metabolism phenotype; nervous system phenotype (the observable morphological and physiological characteristics of the extensive, intricate network of electochemical structures in the body that is comprised of the brain, spinal cord, nerves, ganglia and parts of the receptor organs that are manifested through development and lifespan); mortality/aging (the observable characteristics related to the ability of a mammalian organism to live and age that are manifested throughout development and life span); neoplasm",
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "cds_length": 1638,
+        "exp_syn": 124.2,
+        "marrvel": "MUTYH",
+        "pathway_kegg_id": "hsa03410",
+        "obs_syn": 126,
+        "transcriptid": [
+            {
+                "ensembl_pro": "ENSP00000432330",
+                "ensembl_trs": "ENST00000488731"
+            },
+            {
+                "ensembl_pro": "ENSP00000437093",
+                "ensembl_trs": "ENST00000529984"
+            },
+            {
+                "ensembl_pro": "ENSP00000431264",
+                "ensembl_trs": "ENST00000485271"
+            },
+            {
+                "ensembl_pro": "ENSP00000346354",
+                "ensembl_trs": "ENST00000354383"
+            },
+            {
+                "ensembl_pro": "ENSP00000347685",
+                "ensembl_trs": "ENST00000355498"
+            },
+            {
+                "ensembl_pro": "ENSP00000361170",
+                "ensembl_trs": "ENST00000372098"
+            },
+            {
+                "ensembl_pro": "ENSP00000361176",
+                "ensembl_trs": "ENST00000372104"
+            },
+            {
+                "ensembl_pro": "ENSP00000361182",
+                "ensembl_trs": "ENST00000372110"
+            },
+            {
+                "ensembl_pro": "ENSP00000361187",
+                "ensembl_trs": "ENST00000372115"
+            },
+            {
+                "ensembl_pro": "ENSP00000409718",
+                "ensembl_trs": "ENST00000448481"
+            },
+            {
+                "ensembl_pro": "ENSP00000407590",
+                "ensembl_trs": "ENST00000456914"
+            },
+            {
+                "ensembl_pro": "ENSP00000500891",
+                "ensembl_trs": "ENST00000672818"
+            },
+            {
+                "ensembl_pro": "ENSP00000433843",
+                "ensembl_trs": "ENST00000475516"
+            },
+            {
+                "ensembl_pro": "ENSP00000500455",
+                "ensembl_trs": "ENST00000672593"
+            },
+            {
+                "ensembl_pro": "ENSP00000500526",
+                "ensembl_trs": "ENST00000673134"
+            },
+            {
+                "ensembl_pro": "ENSP00000437166",
+                "ensembl_trs": "ENST00000461495"
+            },
+            {
+                "ensembl_pro": "ENSP00000436597",
+                "ensembl_trs": "ENST00000481571"
+            },
+            {
+                "ensembl_pro": "ENSP00000431292",
+                "ensembl_trs": "ENST00000531105"
+            },
+            {
+                "ensembl_pro": "ENSP00000435889",
+                "ensembl_trs": "ENST00000467459"
+            },
+            {
+                "ensembl_pro": "ENSP00000432528",
+                "ensembl_trs": "ENST00000529892"
+            },
+            {
+                "ensembl_pro": "ENSP00000436430",
+                "ensembl_trs": "ENST00000533178"
+            },
+            {
+                "ensembl_pro": "ENSP00000433130",
+                "ensembl_trs": "ENST00000528013"
+            },
+            {
+                "ensembl_pro": "ENSP00000410263",
+                "ensembl_trs": "ENST00000412971"
+            },
+            {
+                "ensembl_pro": "ENSP00000434985",
+                "ensembl_trs": "ENST00000470256"
+            },
+            {
+                "ensembl_pro": "ENSP00000403655",
+                "ensembl_trs": "ENST00000435155"
+            },
+            {
+                "ensembl_pro": "ENSP00000436478",
+                "ensembl_trs": "ENST00000467940"
+            },
+            {
+                "ensembl_pro": "ENSP00000431568",
+                "ensembl_trs": "ENST00000525160"
+            },
+            {
+                "ensembl_pro": "ENSP00000436469",
+                "ensembl_trs": "ENST00000483127"
+            },
+            {
+                "ensembl_pro": "ENSP00000408176",
+                "ensembl_trs": "ENST00000450313"
+            }
+        ],
+        "ensgid": "ENSG00000132781",
+        "ccds_id": [
+            "CCDS520",
+            "CCDS41320",
+            "CCDS41321",
+            "CCDS41322",
+            "CCDS72776",
+            "CCDS72777"
+        ],
+        "cytoband": [
+            "1p34.1"
+        ],
+        "clingendis": [
+            {
+                "disease_label": "MUTYH-related attenuated familial adenomatous polyposis",
+                "disease_id": "MONDO_0012041",
+                "classification": "Moderate"
+            },
+            {
+                "disease_label": "MUTYH-related attenuated familial adenomatous polyposis",
+                "disease_id": "MONDO_0012041",
+                "classification": "Definitive"
+            },
+            {
+                "disease_label": "familial ovarian cancer",
+                "disease_id": "MONDO_0016248",
+                "classification": "Limited"
+            },
+            {
+                "disease_label": "hereditary breast carcinoma",
+                "disease_id": "MONDO_0016419",
+                "classification": "No Reported Evidence"
+            },
+            {
+                "disease_label": "familial ovarian cancer",
+                "disease_id": "MONDO_0016248",
+                "classification": "Limited"
+            },
+            {
+                "disease_label": "hereditary breast carcinoma",
+                "disease_id": "MONDO_0016419",
+                "classification": "No Reported Evidence"
+            }
+        ],
+        "gdi_phred": 7.69141,
+        "entrez_id": "4595",
+        "num_coding_exons": 16,
+        "biogrid": [
+            "110681"
+        ],
+        "obs_lof": 30,
+        "clingen": "7527",
+        "string": [
+            "9606.ENSP00000361170"
+        ],
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "brainspan_rnaseq": "ENSG00000132781",
+        "gene_summary": "This gene encodes a DNA glycosylase involved in oxidative DNA damage repair. The enzyme excises adenine bases from the DNA backbone at sites where adenine is inappropriately paired with guanine, cytosine, or 8-oxo-7,8-dihydroguanine, a major oxidatively damaged DNA lesion. The protein is localized to the nucleus and mitochondria. This gene product is thought to play a role in signaling apoptosis by the introduction of single-strand breaks following oxidative damage. Mutations in this gene result in heritable predisposition to colorectal cancer, termed MUTYH-associated polyposis (MAP). Multiple transcript variants encoding different isoforms have been found for this gene. [provided by RefSeq, Apr 2017].",
+        "pathway_kegg_full": "Base excision repair",
+        "spos": 45329163
+    },
+    {
+        "oe_syn": 1.074,
+        "exp_lof": 40.274,
+        "mgi_mouse_gene": "Nbn",
+        "brainatlas_microarray": "NBN",
+        "status": "in review",
+        "schema_version": "1",
+        "chrom": "8",
+        "brainspan_microarray": "NBN",
+        "strand": "-",
+        "omim_id": [
+            "602667"
+        ],
+        "pdb": [
+            "5WQD"
+        ],
+        "gene_version": "13",
+        "rvis_exac": 0.749544972,
+        "genecards": "ENSG00000104320",
+        "gdp": "Medium",
+        "orphanet": "123688",
+        "hgnc_id": "7652",
+        "ucsc_id": "uc003yej.2",
+        "oe_lof": 0.74489,
+        "epos": 90003228,
+        "uuid": "bf5e24fa-3eaf-4dd7-aa59-62c65bbb805f",
+        "pharmgkb": [
+            "PA31457"
+        ],
+        "epos_hg19": 91015456,
+        "gene_symbol": "NBN",
+        "name": "nibrin",
+        "date_created": "2020-07-15T13:02:57.184273+00:00",
+        "last_modified": {
+            "date_modified": "2020-07-15T13:02:57.189870+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "s_het": 0.00773255,
+        "exp_mis": 377.3,
+        "uniprot_ids": [
+            "O60934"
+        ],
+        "gtex_expression": "ENSG00000104320.13",
+        "oe_mis": 0.91175,
+        "obs_mis": 344,
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "spos_hg19": 90945564,
+        "refseq_accession": [
+            "NM_001024688"
+        ],
+        "rvis_percentile_exac": 86.06710439,
+        "strand_hg19": "-",
+        "genereviews": [
+            "NBN"
+        ],
+        "mgd_id": [
+            "MGI:1351625"
+        ],
+        "gene_biotype": "protein_coding",
+        "chrom_hg19": "8",
+        "mgi_mouse_phenotype": "immune system phenotype; nervous system phenotype (the observable morphological and physiological characteristics of the extensive, intricate network of electochemical structures in the body that is comprised of the brain, spinal cord, nerves, ganglia and parts of the receptor organs that are manifested through development and lifespan); neoplasm; reproductive system phenotype; mortality/aging (the observable characteristics related to the ability of a mammalian organism to live and age that are manifested throughout development and life span); hematopoietic system phenotype; behavior/neurological phenotype (the observable actions or reactions of mammalian organisms that are manifested through development and lifespan); embryo phenotype; cellular phenotype; homeostasis/metabolism phenotype; endocrine/exocrine gland phenotype; growth/size/body region phenotype",
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "cds_length": 2262,
+        "exp_syn": 135.01,
+        "marrvel": "NBN",
+        "pathway_kegg_id": "hsa03440",
+        "obs_syn": 145,
+        "transcriptid": [
+            {
+                "ensembl_pro": "ENSP00000265433",
+                "ensembl_trs": "ENST00000265433"
+            },
+            {
+                "ensembl_pro": "ENSP00000379551",
+                "ensembl_trs": "ENST00000396252"
+            },
+            {
+                "ensembl_pro": "ENSP00000428252",
+                "ensembl_trs": "ENST00000523444"
+            },
+            {
+                "ensembl_pro": "ENSP00000386924",
+                "ensembl_trs": "ENST00000409330"
+            },
+            {
+                "ensembl_pro": "ENSP00000484487",
+                "ensembl_trs": "ENST00000613033"
+            },
+            {
+                "ensembl_pro": "ENSP00000430983",
+                "ensembl_trs": "ENST00000519426"
+            },
+            {
+                "ensembl_pro": "ENSP00000428717",
+                "ensembl_trs": "ENST00000517772"
+            },
+            {
+                "ensembl_pro": "ENSP00000429971",
+                "ensembl_trs": "ENST00000517337"
+            }
+        ],
+        "ensgid": "ENSG00000104320",
+        "ccds_id": [
+            "CCDS6249",
+            "CCDS43753"
+        ],
+        "cytoband": [
+            "8q21.3"
+        ],
+        "clingendis": [
+            {
+                "disease_label": "Nijmegen breakage syndrome",
+                "disease_id": "MONDO_0009623",
+                "classification": "Definitive"
+            },
+            {
+                "disease_label": "hereditary breast carcinoma",
+                "disease_id": "MONDO_0016419",
+                "classification": "Limited"
+            }
+        ],
+        "gdi_phred": 9.39528,
+        "entrez_id": "4683",
+        "num_coding_exons": 16,
+        "biogrid": [
+            "110763"
+        ],
+        "obs_lof": 30,
+        "clingen": "7652",
+        "string": [
+            "9606.ENSP00000265433"
+        ],
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "brainspan_rnaseq": "ENSG00000104320",
+        "gene_summary": "Mutations in this gene are associated with Nijmegen breakage syndrome, an autosomal recessive chromosomal instability syndrome characterized by microcephaly, growth retardation, immunodeficiency, and cancer predisposition. The encoded protein is a member of the MRE11/RAD50 double-strand break repair complex which consists of 5 proteins. This gene product is thought to be involved in DNA double-strand break repair and DNA damage-induced checkpoint activation. [provided by RefSeq, Jul 2008].",
+        "pathway_kegg_full": "Homologous recombination",
+        "spos": 89933336
+    },
+    {
+        "oe_syn": 0.93806,
+        "exp_lof": 144.17,
+        "mgi_mouse_gene": "Nf1",
+        "brainatlas_microarray": "NF1",
+        "status": "in review",
+        "schema_version": "1",
+        "chrom": "17",
+        "brainspan_microarray": "NF1",
+        "strand": "+",
+        "omim_id": [
+            "613113"
+        ],
+        "pdb": [
+            "1NF1",
+            "2D4Q",
+            "2E2X",
+            "3P7Z",
+            "3PEG",
+            "3PG7"
+        ],
+        "gene_version": "18",
+        "rvis_exac": -4.245138737,
+        "genecards": "ENSG00000196712",
+        "gdp": "Medium",
+        "orphanet": "123772",
+        "hgnc_id": "7765",
+        "ucsc_id": "uc002hgh.3",
+        "oe_lof": 0.21503,
+        "epos": 31382116,
+        "uuid": "b833a22c-6bec-47e8-922f-24467b8e5265",
+        "pharmgkb": [
+            "PA31572"
+        ],
+        "epos_hg19": 29709134,
+        "gene_symbol": "NF1",
+        "name": "neurofibromin 1",
+        "trait_association_gwas_pmid": [
+            "30093612",
+            "25673412",
+            "30093612",
+            "29924316~29924316"
+        ],
+        "date_created": "2020-07-15T13:10:25.319207+00:00",
+        "last_modified": {
+            "date_modified": "2020-07-15T13:10:25.323560+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "s_het": 0.061408511,
+        "exp_mis": 1479.1,
+        "uniprot_ids": [
+            "P21359"
+        ],
+        "gtex_expression": "ENSG00000196712.17",
+        "oe_mis": 0.52127,
+        "obs_mis": 771,
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "spos_hg19": 29421945,
+        "trait_association_gwas": [
+            "Endometrial cancer ((endometrioid histology)",
+            "Hip circumference",
+            "Endometrial cancer",
+            "Familial squamous cell lung carcinoma"
+        ],
+        "refseq_accession": [
+            "NM_000267"
+        ],
+        "rvis_percentile_exac": 0.204806939,
+        "strand_hg19": "+",
+        "genereviews": [
+            "NF1"
+        ],
+        "mgd_id": [
+            "MGI:97306"
+        ],
+        "gene_biotype": "protein_coding",
+        "chrom_hg19": "17",
+        "mgi_mouse_phenotype": "growth/size/body region phenotype; integument phenotype (the observable morphological and physiological characteristics of the skin and its associated structures, such as the hair, nails, sweat glands, sebaceous glands and other secretory glands that are manifested through development and lifespan); endocrine/exocrine gland phenotype; muscle phenotype; craniofacial phenotype; homeostasis/metabolism phenotype; cellular phenotype; skeleton phenotype; renal/urinary system phenotype; embryo phenotype; behavior/neurological phenotype (the observable actions or reactions of mammalian organisms that are manifested through development and lifespan); liver/biliary system phenotype; respiratory system phenotype; cardiovascular system phenotype (the observable morphological and physiological characteristics of the mammalian heart, blood vessels, or circulatory system that are manifested through development and lifespan); hematopoietic system phenotype; normal phenotype; mortality/aging (the observable characteristics related to the ability of a mammalian organism to live and age that are manifested throughout development and life span); pigmentation phenotype; neoplasm; digestive/alimentary phenotype; limbs/digits/tail phenotype; hearing/vestibular/ear phenotype; nervous system phenotype (the observable morphological and physiological characteristics of the extensive, intricate network of electochemical structures in the body that is comprised of the brain, spinal cord, nerves, ganglia and parts of the receptor organs that are manifested through development and lifespan); vision/eye phenotype; immune system phenotype",
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "cds_length": 8517,
+        "exp_syn": 529.82,
+        "marrvel": "NF1",
+        "pathway_kegg_id": "hsa04010",
+        "obs_syn": 497,
+        "transcriptid": [
+            {
+                "ensembl_pro": "ENSP00000348498",
+                "ensembl_trs": "ENST00000356175"
+            },
+            {
+                "ensembl_pro": "ENSP00000351015",
+                "ensembl_trs": "ENST00000358273"
+            },
+            {
+                "ensembl_pro": "ENSP00000412921",
+                "ensembl_trs": "ENST00000431387"
+            },
+            {
+                "ensembl_pro": "ENSP00000491589",
+                "ensembl_trs": "ENST00000487476"
+            },
+            {
+                "ensembl_pro": "ENSP00000462408",
+                "ensembl_trs": "ENST00000579081"
+            },
+            {
+                "ensembl_pro": "ENSP00000463682",
+                "ensembl_trs": "ENST00000495910"
+            },
+            {
+                "ensembl_pro": "ENSP00000491431",
+                "ensembl_trs": "ENST00000490416"
+            },
+            {
+                "ensembl_pro": "ENSP00000389907",
+                "ensembl_trs": "ENST00000456735"
+            },
+            {
+                "ensembl_pro": "ENSP00000463819",
+                "ensembl_trs": "ENST00000466819"
+            },
+            {
+                "ensembl_pro": "ENSP00000462157",
+                "ensembl_trs": "ENST00000479614"
+            },
+            {
+                "ensembl_pro": "ENSP00000492721",
+                "ensembl_trs": "ENST00000581113"
+            },
+            {
+                "ensembl_pro": "ENSP00000467080",
+                "ensembl_trs": "ENST00000479536"
+            },
+            {
+                "ensembl_pro": "ENSP00000462700",
+                "ensembl_trs": "ENST00000581790"
+            },
+            {
+                "ensembl_pro": "ENSP00000464678",
+                "ensembl_trs": "ENST00000471572"
+            },
+            {
+                "ensembl_pro": "ENSP00000464702",
+                "ensembl_trs": "ENST00000468273"
+            },
+            {
+                "ensembl_pro": "ENSP00000465138",
+                "ensembl_trs": "ENST00000422121"
+            }
+        ],
+        "ensgid": "ENSG00000196712",
+        "ccds_id": [
+            "CCDS11264",
+            "CCDS42292",
+            "CCDS45645"
+        ],
+        "cytoband": [
+            "17q11.2"
+        ],
+        "clingendis": [
+            {
+                "disease_label": "obsolete neurofibromatosis, type 1",
+                "disease_id": "MONDO_0008077",
+                "classification": "Definitive"
+            },
+            {
+                "disease_label": "familial ovarian cancer",
+                "disease_id": "MONDO_0016248",
+                "classification": "No Reported Evidence"
+            }
+        ],
+        "gdi_phred": 3.04463,
+        "entrez_id": "4763",
+        "num_coding_exons": 58,
+        "biogrid": [
+            "110836"
+        ],
+        "obs_lof": 31,
+        "clingen": "7765",
+        "string": [
+            "9606.ENSP00000351015"
+        ],
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "brainspan_rnaseq": "ENSG00000196712",
+        "gene_summary": "This gene product appears to function as a negative regulator of the ras signal transduction pathway. Mutations in this gene have been linked to neurofibromatosis type 1, juvenile myelomonocytic leukemia and Watson syndrome. The mRNA for this gene is subject to RNA editing (CGA>UGA->Arg1306Term) resulting in premature translation termination. Alternatively spliced transcript variants encoding different isoforms have also been described for this gene. [provided by RefSeq, Jul 2008].",
+        "pathway_kegg_full": "MAPK signaling pathway",
+        "spos": 31094927
+    },
+    {
+        "oe_syn": 1.0624,
+        "exp_lof": 46.121,
+        "mgi_mouse_gene": "Palb2",
+        "brainatlas_microarray": "PALB2",
+        "status": "in review",
+        "schema_version": "1",
+        "chrom": "16",
+        "brainspan_microarray": "PALB2",
+        "strand": "-",
+        "omim_id": [
+            "610355"
+        ],
+        "pdb": [
+            "2W18",
+            "3EU7"
+        ],
+        "gene_version": "10",
+        "rvis_exac": -0.612722785,
+        "genecards": "ENSG00000083093",
+        "gdp": "Medium",
+        "orphanet": "139189",
+        "hgnc_id": "26144",
+        "ucsc_id": "uc002dlx.2",
+        "oe_lof": 0.75888,
+        "epos": 23641310,
+        "uuid": "a5d84ab0-e7c7-41ae-97c0-82b56ebc7518",
+        "pharmgkb": [
+            "PA162398608"
+        ],
+        "epos_hg19": 23652631,
+        "gene_symbol": "PALB2",
+        "name": "partner and localizer of BRCA2",
+        "trait_association_gwas_pmid": [
+            "17554300"
+        ],
+        "date_created": "2020-07-15T13:10:56.261132+00:00",
+        "last_modified": {
+            "date_modified": "2020-07-15T13:10:56.265199+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "s_het": 0.011004153,
+        "exp_mis": 586.82,
+        "uniprot_ids": [
+            "Q86YC2"
+        ],
+        "gtex_expression": "ENSG00000083093.9",
+        "oe_mis": 0.96793,
+        "obs_mis": 568,
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "spos_hg19": 23614488,
+        "trait_association_gwas": [
+            "Bipolar disorder"
+        ],
+        "refseq_accession": [
+            "NM_024675"
+        ],
+        "rvis_percentile_exac": 17.89048852,
+        "strand_hg19": "-",
+        "genereviews": [
+            "PALB2"
+        ],
+        "mgd_id": [
+            "MGI:3040695"
+        ],
+        "gene_biotype": "protein_coding",
+        "chrom_hg19": "16",
+        "mgi_mouse_phenotype": "integument phenotype (the observable morphological and physiological characteristics of the skin and its associated structures, such as the hair, nails, sweat glands, sebaceous glands and other secretory glands that are manifested through development and lifespan); growth/size/body region phenotype; cellular phenotype; behavior/neurological phenotype (the observable actions or reactions of mammalian organisms that are manifested through development and lifespan); embryo phenotype; neoplasm; mortality/aging (the observable characteristics related to the ability of a mammalian organism to live and age that are manifested throughout development and life span); cardiovascular system phenotype (the observable morphological and physiological characteristics of the mammalian heart, blood vessels, or circulatory system that are manifested through development and lifespan); limbs/digits/tail phenotype; nervous system phenotype (the observable morphological and physiological characteristics of the extensive, intricate network of electochemical structures in the body that is comprised of the brain, spinal cord, nerves, ganglia and parts of the receptor organs that are manifested through development and lifespan)",
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "cds_length": 3558,
+        "exp_syn": 223.07,
+        "marrvel": "PALB2",
+        "obs_syn": 237,
+        "transcriptid": [
+            {
+                "ensembl_pro": "ENSP00000459237",
+                "ensembl_trs": "ENST00000566069"
+            },
+            {
+                "ensembl_pro": "ENSP00000454703",
+                "ensembl_trs": "ENST00000568219"
+            },
+            {
+                "ensembl_pro": "ENSP00000261584",
+                "ensembl_trs": "ENST00000261584"
+            },
+            {
+                "ensembl_pro": "ENSP00000459882",
+                "ensembl_trs": "ENST00000565038"
+            },
+            {
+                "ensembl_pro": "ENSP00000460666",
+                "ensembl_trs": "ENST00000561514"
+            }
+        ],
+        "ensgid": "ENSG00000083093",
+        "ccds_id": [
+            "CCDS32406"
+        ],
+        "cytoband": [
+            "16p12.2"
+        ],
+        "clingendis": [
+            {
+                "disease_label": "hereditary nonpolyposis colon cancer",
+                "disease_id": "MONDO_0018630",
+                "classification": "Limited"
+            },
+            {
+                "disease_label": "hereditary breast carcinoma",
+                "disease_id": "MONDO_0016419",
+                "classification": "Definitive"
+            },
+            {
+                "disease_label": "familial ovarian cancer",
+                "disease_id": "MONDO_0016248",
+                "classification": "Moderate"
+            },
+            {
+                "disease_label": "Fanconi anemia complementation group N",
+                "disease_id": "MONDO_0012565",
+                "classification": "Definitive"
+            }
+        ],
+        "gdi_phred": 3.67511,
+        "entrez_id": "79728",
+        "num_coding_exons": 13,
+        "biogrid": [
+            "122843"
+        ],
+        "obs_lof": 35,
+        "clingen": "26144",
+        "string": [
+            "9606.ENSP00000261584"
+        ],
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "brainspan_rnaseq": "ENSG00000083093",
+        "gene_summary": "This gene encodes a protein that may function in tumor suppression. This protein binds to and colocalizes with the breast cancer 2 early onset protein (BRCA2) in nuclear foci and likely permits the stable intranuclear localization and accumulation of BRCA2. [provided by RefSeq, Jul 2008].",
+        "spos": 23603160
+    },
+    {
+        "oe_syn": 0.77945,
+        "exp_lof": 66.391,
+        "mgi_mouse_gene": "Pik3ca",
+        "brainatlas_microarray": "PIK3CA",
+        "status": "in review",
+        "schema_version": "1",
+        "chrom": "3",
+        "brainspan_microarray": "PIK3CA",
+        "strand": "+",
+        "omim_id": [
+            "171834"
+        ],
+        "pdb": [
+            "2ENQ",
+            "2RD0",
+            "3HHM",
+            "3HIZ",
+            "3ZIM",
+            "4JPS",
+            "4L1B",
+            "4L23",
+            "4L2Y",
+            "4OVU",
+            "4OVV",
+            "4TUU",
+            "4TV3",
+            "4WAF",
+            "4YKN",
+            "4ZOP",
+            "5DXH",
+            "5DXT",
+            "5FI4",
+            "5ITD",
+            "5SW8",
+            "5SWG",
+            "5SWO",
+            "5SWP",
+            "5SWR",
+            "5SWT",
+            "5SX8",
+            "5SX9",
+            "5SXA",
+            "5SXB",
+            "5SXC",
+            "5SXD",
+            "5SXE",
+            "5SXF",
+            "5SXI",
+            "5SXJ",
+            "5SXK",
+            "5UBR",
+            "5UK8",
+            "5UKJ",
+            "5UL1",
+            "5XGH",
+            "5XGI",
+            "5XGJ",
+            "6GVF",
+            "6GVG",
+            "6GVH",
+            "6GVI",
+            "6NCT",
+            "6OAC",
+            "6PYS"
+        ],
+        "gene_version": "5",
+        "rvis_exac": -1.011184923,
+        "genecards": "ENSG00000121879",
+        "gdp": "Medium",
+        "orphanet": "117820",
+        "hgnc_id": "8975",
+        "ucsc_id": "uc003fjk.4",
+        "oe_lof": 0.045187,
+        "epos": 179240093,
+        "uuid": "0c0c9069-19ff-4e56-91aa-feab75624c31",
+        "pharmgkb": [
+            "PA33308"
+        ],
+        "epos_hg19": 178957881,
+        "gene_symbol": "PIK3CA",
+        "name": "phosphatidylinositol-4,5-bisphosphate 3-kinase catalytic subunit alpha",
+        "trait_association_gwas_pmid": [
+            "29403010"
+        ],
+        "date_created": "2020-07-15T13:04:51.067306+00:00",
+        "last_modified": {
+            "date_modified": "2020-07-15T13:04:51.072759+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "s_het": 0.222465261,
+        "exp_mis": 565.73,
+        "uniprot_ids": [
+            "P42336"
+        ],
+        "gtex_expression": "ENSG00000121879.3",
+        "oe_mis": 0.33762,
+        "obs_mis": 191,
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "spos_hg19": 178865902,
+        "trait_association_gwas": [
+            "Mean corpuscular hemoglobin"
+        ],
+        "refseq_accession": [
+            "NM_006218"
+        ],
+        "rvis_percentile_exac": 8.830793326,
+        "strand_hg19": "+",
+        "genereviews": [
+            "PIK3CA"
+        ],
+        "mgd_id": [
+            "MGI:1206581"
+        ],
+        "gene_biotype": "protein_coding",
+        "chrom_hg19": "3",
+        "mgi_mouse_phenotype": "adipose tissue phenotype (the observable morphological and physiological characteristics of mammalian fat tissue that are manifested through development and lifespan); endocrine/exocrine gland phenotype; integument phenotype (the observable morphological and physiological characteristics of the skin and its associated structures, such as the hair, nails, sweat glands, sebaceous glands and other secretory glands that are manifested through development and lifespan); growth/size/body region phenotype; cellular phenotype; homeostasis/metabolism phenotype; nervous system phenotype (the observable morphological and physiological characteristics of the extensive, intricate network of electochemical structures in the body that is comprised of the brain, spinal cord, nerves, ganglia and parts of the receptor organs that are manifested through development and lifespan); muscle phenotype; neoplasm; mortality/aging (the observable characteristics related to the ability of a mammalian organism to live and age that are manifested throughout development and life span); reproductive system phenotype; cardiovascular system phenotype (the observable morphological and physiological characteristics of the mammalian heart, blood vessels, or circulatory system that are manifested through development and lifespan); behavior/neurological phenotype (the observable actions or reactions of mammalian organisms that are manifested through development and lifespan); embryo phenotype; skeleton phenotype; immune system phenotype; vision/eye phenotype",
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "cds_length": 3204,
+        "exp_syn": 184.75,
+        "marrvel": "PIK3CA",
+        "pathway_kegg_id": "hsa00562;hsa04012;hsa04070;hsa04150;hsa04210;hsa04370;hsa04510;hsa04620;hsa04630;hsa04650;hsa04660;hsa04662;hsa04664;hsa04670;hsa04810;hsa04910;hsa04930;hsa05210;hsa05211;hsa05212;hsa05213;hsa05214;hsa05215;hsa05218;hsa05220;hsa05221;hsa05222;hsa05223",
+        "obs_syn": 144,
+        "transcriptid": [
+            {
+                "ensembl_pro": "ENSP00000418145",
+                "ensembl_trs": "ENST00000477735"
+            },
+            {
+                "ensembl_pro": "ENSP00000263967",
+                "ensembl_trs": "ENST00000263967"
+            },
+            {
+                "ensembl_pro": "ENSP00000493507",
+                "ensembl_trs": "ENST00000643187"
+            },
+            {
+                "ensembl_pro": "ENSP00000417479",
+                "ensembl_trs": "ENST00000468036"
+            }
+        ],
+        "ensgid": "ENSG00000121879",
+        "ccds_id": [
+            "CCDS43171"
+        ],
+        "cytoband": [
+            "3q26.32"
+        ],
+        "clingendis": [
+            {
+                "disease_label": "familial ovarian cancer",
+                "disease_id": "MONDO_0016248",
+                "classification": "No Reported Evidence"
+            },
+            {
+                "disease_label": "hereditary breast carcinoma",
+                "disease_id": "MONDO_0016419",
+                "classification": "No Reported Evidence"
+            }
+        ],
+        "gdi_phred": 4.24624,
+        "entrez_id": "5290",
+        "num_coding_exons": 20,
+        "biogrid": [
+            "111308"
+        ],
+        "obs_lof": 3,
+        "clingen": "8975",
+        "string": [
+            "9606.ENSP00000263967"
+        ],
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "brainspan_rnaseq": "ENSG00000121879",
+        "gene_summary": "Phosphatidylinositol 3-kinase is composed of an 85 kDa regulatory subunit and a 110 kDa catalytic subunit. The protein encoded by this gene represents the catalytic subunit, which uses ATP to phosphorylate PtdIns, PtdIns4P and PtdIns(4,5)P2. This gene has been found to be oncogenic and has been implicated in cervical cancers. A pseudogene of this gene has been defined on chromosome 22. [provided by RefSeq, Apr 2016].",
+        "pathway_kegg_full": "Inositol phosphate metabolism;ErbB signaling pathway;Phosphatidylinositol signaling system;mTOR signaling pathway;Apoptosis;VEGF signaling pathway;Focal adhesion;Toll-like receptor signaling pathway;Jak-STAT signaling pathway;Natural killer cell mediated cytotoxicity;T cell receptor signaling pathway;B cell receptor signaling pathway;Fc epsilon RI signaling pathway;Leukocyte transendothelial migration;Regulation of actin cytoskeleton;Insulin signaling pathway;Type II diabetes mellitus;Colorectal cancer;Renal cell carcinoma;Pancreatic cancer;Endometrial cancer;Glioma;Prostate cancer;Melanoma;Chronic myeloid leukemia;Acute myeloid leukemia;Small cell lung cancer;Non-small cell lung cancer",
+        "spos": 179148114
+    },
+    {
+        "oe_syn": 1.0183,
+        "exp_lof": 20.753,
+        "mgi_mouse_gene": "Pten",
+        "brainatlas_microarray": "PTEN",
+        "status": "in review",
+        "schema_version": "1",
+        "chrom": "10",
+        "brainspan_microarray": "PTEN",
+        "strand": "+",
+        "omim_id": [
+            "601728"
+        ],
+        "pdb": [
+            "1D5R",
+            "2KYL",
+            "4O1V",
+            "5BUG",
+            "5BZX",
+            "5BZZ"
+        ],
+        "gene_version": "11",
+        "rvis_exac": -0.161420196,
+        "genecards": "ENSG00000171862",
+        "gdp": "Medium",
+        "orphanet": "118128",
+        "hgnc_id": "9588",
+        "ucsc_id": "uc001kfb.4",
+        "oe_lof": 0.24093,
+        "epos": 87971930,
+        "uuid": "37e2bbb7-747c-473c-918c-84cc5320f4ff",
+        "pharmgkb": [
+            "PA33942"
+        ],
+        "epos_hg19": 89731687,
+        "gene_symbol": "PTEN",
+        "name": "phosphatase and tensin homolog",
+        "trait_association_gwas_pmid": [
+            "24509480",
+            "27863252",
+            "27863252",
+            "28537254",
+            "29403010",
+            "26025379",
+            "27863252",
+            "27863252",
+            "24024966",
+            "27863252"
+        ],
+        "date_created": "2020-07-15T13:13:38.162488+00:00",
+        "last_modified": {
+            "date_modified": "2020-07-15T13:13:38.167087+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "s_het": 0.126160206,
+        "exp_mis": 216.41,
+        "uniprot_ids": [
+            "P60484"
+        ],
+        "gtex_expression": "ENSG00000171862.10",
+        "oe_mis": 0.33271,
+        "obs_mis": 72,
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "spos_hg19": 89622870,
+        "trait_association_gwas": [
+            "Type 2 diabetes",
+            "Sum eosinophil basophil counts",
+            "Eosinophil percentage of granulocytes",
+            "Psoriasis",
+            "White blood cell count (basophil)",
+            "Mercury levels",
+            "Eosinophil counts",
+            "Neutrophil percentage of granulocytes",
+            "Periodontitis (Mean PAL)",
+            "Eosinophil percentage of white cells"
+        ],
+        "refseq_accession": [
+            "NM_000314"
+        ],
+        "rvis_percentile_exac": 39.14824408,
+        "strand_hg19": "+",
+        "genereviews": [
+            "PTEN"
+        ],
+        "mgd_id": [
+            "MGI:109583"
+        ],
+        "gene_biotype": "protein_coding",
+        "chrom_hg19": "10",
+        "mgi_mouse_phenotype": "muscle phenotype; cellular phenotype; homeostasis/metabolism phenotype; adipose tissue phenotype (the observable morphological and physiological characteristics of mammalian fat tissue that are manifested through development and lifespan); endocrine/exocrine gland phenotype; taste/olfaction phenotype; pigmentation phenotype; normal phenotype; integument phenotype (the observable morphological and physiological characteristics of the skin and its associated structures, such as the hair, nails, sweat glands, sebaceous glands and other secretory glands that are manifested through development and lifespan); mortality/aging (the observable characteristics related to the ability of a mammalian organism to live and age that are manifested throughout development and life span); reproductive system phenotype; growth/size/body region phenotype; cardiovascular system phenotype (the observable morphological and physiological characteristics of the mammalian heart, blood vessels, or circulatory system that are manifested through development and lifespan); hematopoietic system phenotype; vision/eye phenotype; limbs/digits/tail phenotype; nervous system phenotype (the observable morphological and physiological characteristics of the extensive, intricate network of electochemical structures in the body that is comprised of the brain, spinal cord, nerves, ganglia and parts of the receptor organs that are manifested through development and lifespan); digestive/alimentary phenotype; skeleton phenotype; renal/urinary system phenotype; immune system phenotype; behavior/neurological phenotype (the observable actions or reactions of mammalian organisms that are manifested through development and lifespan); liver/biliary system phenotype; respiratory system phenotype; embryo phenotype; neoplasm",
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "cds_length": 1209,
+        "exp_syn": 72.669,
+        "marrvel": "PTEN",
+        "pathway_kegg_id": "hsa00562;hsa04070;hsa04115;hsa04510;hsa04530;hsa05213;hsa05214;hsa05215;hsa05218;hsa05222",
+        "obs_syn": 74,
+        "transcriptid": [
+            {
+                "ensembl_pro": "ENSP00000361021",
+                "ensembl_trs": "ENST00000371953"
+            },
+            {
+                "ensembl_pro": "ENSP00000483066",
+                "ensembl_trs": "ENST00000472832"
+            }
+        ],
+        "ensgid": "ENSG00000171862",
+        "ccds_id": [
+            "CCDS31238"
+        ],
+        "cytoband": [
+            "10q23.31"
+        ],
+        "clingendis": [
+            {
+                "disease_label": "PTEN hamartoma tumor syndrome",
+                "disease_id": "MONDO_0017623",
+                "classification": "Definitive"
+            }
+        ],
+        "gdi_phred": 0.13188,
+        "entrez_id": "5728",
+        "num_coding_exons": 9,
+        "biogrid": [
+            "111700"
+        ],
+        "obs_lof": 5,
+        "clingen": "9588",
+        "string": [
+            "9606.ENSP00000361021"
+        ],
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "brainspan_rnaseq": "ENSG00000171862",
+        "gene_summary": "This gene was identified as a tumor suppressor that is mutated in a large number of cancers at high frequency. The protein encoded by this gene is a phosphatidylinositol-3,4,5-trisphosphate 3-phosphatase. It contains a tensin like domain as well as a catalytic domain similar to that of the dual specificity protein tyrosine phosphatases. Unlike most of the protein tyrosine phosphatases, this protein preferentially dephosphorylates phosphoinositide substrates. It negatively regulates intracellular levels of phosphatidylinositol-3,4,5-trisphosphate in cells and functions as a tumor suppressor by negatively regulating AKT/PKB signaling pathway. The use of a non-canonical (CUG) upstream initiation site produces a longer isoform that initiates translation with a leucine, and is thought to be preferentially associated with the mitochondrial inner membrane. This longer isoform may help regulate energy metabolism in the mitochondria. A pseudogene of this gene is found on chromosome 9. Alternative splicing and the use of multiple translation start codons results in multiple transcript variants encoding different isoforms. [provided by RefSeq, Feb 2015].",
+        "pathway_kegg_full": "Inositol phosphate metabolism;Phosphatidylinositol signaling system;p53 signaling pathway;Focal adhesion;Tight junction;Endometrial cancer;Glioma;Prostate cancer;Melanoma;Small cell lung cancer",
+        "spos": 87863625
+    },
+    {
+        "oe_syn": 1.0732,
+        "exp_lof": 77.621,
+        "mgi_mouse_gene": "Rad50",
+        "brainatlas_microarray": "RAD50",
+        "status": "in review",
+        "schema_version": "1",
+        "chrom": "5",
+        "brainspan_microarray": "RAD50",
+        "strand": "+",
+        "omim_id": [
+            "604040"
+        ],
+        "pdb": [
+            "5GOX"
+        ],
+        "gene_version": "14",
+        "rvis_exac": -0.216894362,
+        "genecards": "ENSG00000113522",
+        "gdp": "Medium",
+        "orphanet": "242004",
+        "hgnc_id": "9816",
+        "ucsc_id": "uc003kxi.4",
+        "oe_lof": 0.69568,
+        "epos": 132646349,
+        "uuid": "aaceaa46-0229-4318-a957-c4edef09f21e",
+        "pharmgkb": [
+            "PA34175"
+        ],
+        "epos_hg19": 131980313,
+        "gene_symbol": "RAD50",
+        "name": "RAD50 double strand break repair protein",
+        "trait_association_gwas_pmid": [
+            "26416764",
+            "27863252~29403010",
+            "28199695",
+            "18846228",
+            "25574825",
+            "20159242~27611488~27182965~29273806~29273806",
+            "28203683",
+            "29771307",
+            "27863252",
+            "27863252",
+            "29083406",
+            "23886662~26482879~25865352~25574825",
+            "27863252",
+            "30013184",
+            "24241537~29273806",
+            "27863252"
+        ],
+        "date_created": "2020-07-15T13:16:13.216369+00:00",
+        "last_modified": {
+            "date_modified": "2020-07-15T13:16:13.224069+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "s_het": 0.005974749,
+        "exp_mis": 678.63,
+        "uniprot_ids": [
+            "Q92878"
+        ],
+        "gtex_expression": "ENSG00000113522.13",
+        "oe_mis": 0.86497,
+        "obs_mis": 587,
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "spos_hg19": 131891711,
+        "trait_association_gwas": [
+            "Polycystic ovary syndrome",
+            "Eosinophil counts",
+            "Itch intensity from mosquito bite",
+            "IgE levels",
+            "Inflammatory skin disease",
+            "Asthma",
+            "Venous thromboembolism adjusted for sickle cell variant rs77121243-T",
+            "Rosacea symptom severity",
+            "Sum eosinophil basophil counts",
+            "Eosinophil percentage of granulocytes",
+            "Allergic disease (asthma, hay fever or eczema)",
+            "Atopic dermatitis",
+            "Neutrophil percentage of white cells",
+            "Allergic rhinitis",
+            "Asthma (childhood onset)",
+            "Eosinophil percentage of white cells"
+        ],
+        "refseq_accession": [
+            "NM_005732"
+        ],
+        "rvis_percentile_exac": 36.00987892,
+        "strand_hg19": "+",
+        "mgd_id": [
+            "MGI:109292"
+        ],
+        "gene_biotype": "protein_coding",
+        "chrom_hg19": "5",
+        "mgi_mouse_phenotype": "cellular phenotype; endocrine/exocrine gland phenotype; neoplasm; growth/size/body region phenotype; hematopoietic system phenotype; mortality/aging (the observable characteristics related to the ability of a mammalian organism to live and age that are manifested throughout development and life span); integument phenotype (the observable morphological and physiological characteristics of the skin and its associated structures, such as the hair, nails, sweat glands, sebaceous glands and other secretory glands that are manifested through development and lifespan); reproductive system phenotype; digestive/alimentary phenotype; nervous system phenotype (the observable morphological and physiological characteristics of the extensive, intricate network of electochemical structures in the body that is comprised of the brain, spinal cord, nerves, ganglia and parts of the receptor organs that are manifested through development and lifespan); limbs/digits/tail phenotype; immune system phenotype; behavior/neurological phenotype (the observable actions or reactions of mammalian organisms that are manifested through development and lifespan); respiratory system phenotype; liver/biliary system phenotype; embryo phenotype; pigmentation phenotype",
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "cds_length": 3936,
+        "exp_syn": 222.69,
+        "marrvel": "RAD50",
+        "pathway_kegg_id": "hsa03440;hsa03450",
+        "obs_syn": 239,
+        "transcriptid": [
+            {
+                "ensembl_pro": "ENSP00000389515",
+                "ensembl_trs": "ENST00000416135"
+            },
+            {
+                "ensembl_pro": "ENSP00000498795",
+                "ensembl_trs": "ENST00000651541"
+            },
+            {
+                "ensembl_pro": "ENSP00000431225",
+                "ensembl_trs": "ENST00000533482"
+            },
+            {
+                "ensembl_pro": "ENSP00000368100",
+                "ensembl_trs": "ENST00000378823"
+            },
+            {
+                "ensembl_pro": "ENSP00000498267",
+                "ensembl_trs": "ENST00000652016"
+            },
+            {
+                "ensembl_pro": "ENSP00000498973",
+                "ensembl_trs": "ENST00000652485"
+            },
+            {
+                "ensembl_pro": "ENSP00000498829",
+                "ensembl_trs": "ENST00000651160"
+            },
+            {
+                "ensembl_pro": "ENSP00000498237",
+                "ensembl_trs": "ENST00000651723"
+            },
+            {
+                "ensembl_pro": "ENSP00000400049",
+                "ensembl_trs": "ENST00000453394"
+            },
+            {
+                "ensembl_pro": "ENSP00000390971",
+                "ensembl_trs": "ENST00000423956"
+            },
+            {
+                "ensembl_pro": "ENSP00000396100",
+                "ensembl_trs": "ENST00000434288"
+            },
+            {
+                "ensembl_pro": "ENSP00000498257",
+                "ensembl_trs": "ENST00000651249"
+            },
+            {
+                "ensembl_pro": "ENSP00000396860",
+                "ensembl_trs": "ENST00000455677"
+            }
+        ],
+        "ensgid": "ENSG00000113522",
+        "ccds_id": [
+            "CCDS34233"
+        ],
+        "cytoband": [
+            "5q31.1"
+        ],
+        "clingendis": [
+            {
+                "disease_label": "hereditary breast carcinoma",
+                "disease_id": "MONDO_0016419",
+                "classification": "Limited"
+            },
+            {
+                "disease_label": "familial ovarian cancer",
+                "disease_id": "MONDO_0016248",
+                "classification": "Disputed"
+            }
+        ],
+        "gdi_phred": 2.87907,
+        "entrez_id": "10111",
+        "num_coding_exons": 25,
+        "biogrid": [
+            "115417"
+        ],
+        "obs_lof": 54,
+        "clingen": "9816",
+        "string": [
+            "9606.ENSP00000368100"
+        ],
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "brainspan_rnaseq": "ENSG00000113522",
+        "gene_summary": "The protein encoded by this gene is highly similar to Saccharomyces cerevisiae Rad50, a protein involved in DNA double-strand break repair. This protein forms a complex with MRE11 and NBS1. The protein complex binds to DNA and displays numerous enzymatic activities that are required for nonhomologous joining of DNA ends. This protein, cooperating with its partners, is important for DNA double-strand break repair, cell cycle checkpoint activation, telomere maintenance, and meiotic recombination. Knockout studies of the mouse homolog suggest this gene is essential for cell growth and viability. Mutations in this gene are the cause of Nijmegen breakage syndrome-like disorder.[provided by RefSeq, Apr 2010].",
+        "pathway_kegg_full": "Homologous recombination;Non-homologous end-joining",
+        "spos": 132556019
+    },
+    {
+        "oe_syn": 0.97218,
+        "exp_lof": 19.475,
+        "mgi_mouse_gene": "Rad51c",
+        "brainatlas_microarray": "RAD51C",
+        "status": "in review",
+        "schema_version": "1",
+        "chrom": "17",
+        "brainspan_microarray": "RAD51C",
+        "strand": "+",
+        "omim_id": [
+            "602774"
+        ],
+        "mgi_mouse_phenotype": "embryo phenotype; reproductive system phenotype; mortality/aging (the observable characteristics related to the ability of a mammalian organism to live and age that are manifested throughout development and life span); growth/size/body region phenotype; endocrine/exocrine gland phenotype",
+        "gene_version": "15",
+        "rvis_exac": -0.135962233,
+        "genecards": "ENSG00000108384",
+        "gdp": "Medium",
+        "orphanet": "229784",
+        "hgnc_id": "9820",
+        "ucsc_id": "uc002iwu.5",
+        "oe_lof": 1.0269,
+        "epos": 58735611,
+        "uuid": "8d5040fd-73d2-4a8f-92ed-228111cb186f",
+        "pharmgkb": [
+            "PA34177"
+        ],
+        "epos_hg19": 56811703,
+        "gene_symbol": "RAD51C",
+        "name": "RAD51 paralog C",
+        "trait_association_gwas_pmid": [
+            "23704328",
+            "23666240~23666239",
+            "25644384"
+        ],
+        "date_created": "2020-07-15T13:11:31.950989+00:00",
+        "last_modified": {
+            "date_modified": "2020-07-15T13:11:31.955873+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "s_het": 0.005013505,
+        "exp_mis": 205.09,
+        "uniprot_ids": [
+            "O43502"
+        ],
+        "gtex_expression": "ENSG00000108384.14",
+        "oe_mis": 0.9752,
+        "obs_mis": 200,
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "spos_hg19": 56769934,
+        "trait_association_gwas": [
+            "Primary tooth development (time to first tooth eruption)",
+            "Testicular germ cell tumor",
+            "Cognitive function"
+        ],
+        "refseq_accession": [
+            "NM_058216"
+        ],
+        "rvis_percentile_exac": 40.85296067,
+        "strand_hg19": "+",
+        "genereviews": [
+            "RAD51C"
+        ],
+        "mgd_id": [
+            "MGI:2150020"
+        ],
+        "gene_biotype": "protein_coding",
+        "chrom_hg19": "17",
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "cds_length": 1128,
+        "exp_syn": 70.974,
+        "marrvel": "RAD51C",
+        "pathway_kegg_id": "hsa03440",
+        "obs_syn": 69,
+        "transcriptid": [
+            {
+                "ensembl_pro": "ENSP00000464056",
+                "ensembl_trs": "ENST00000461271"
+            },
+            {
+                "ensembl_pro": "ENSP00000463121",
+                "ensembl_trs": "ENST00000583539"
+            },
+            {
+                "ensembl_pro": "ENSP00000336701",
+                "ensembl_trs": "ENST00000337432"
+            },
+            {
+                "ensembl_pro": "ENSP00000391450",
+                "ensembl_trs": "ENST00000421782"
+            },
+            {
+                "ensembl_pro": "ENSP00000432421",
+                "ensembl_trs": "ENST00000475762"
+            },
+            {
+                "ensembl_pro": "ENSP00000436761",
+                "ensembl_trs": "ENST00000486827"
+            },
+            {
+                "ensembl_pro": "ENSP00000433332",
+                "ensembl_trs": "ENST00000482007"
+            },
+            {
+                "ensembl_pro": "ENSP00000431637",
+                "ensembl_trs": "ENST00000487525"
+            },
+            {
+                "ensembl_pro": "ENSP00000463473",
+                "ensembl_trs": "ENST00000584617"
+            },
+            {
+                "ensembl_pro": "ENSP00000407282",
+                "ensembl_trs": "ENST00000425173"
+            },
+            {
+                "ensembl_pro": "ENSP00000482326",
+                "ensembl_trs": "ENST00000622327"
+            },
+            {
+                "ensembl_pro": "ENSP00000401741",
+                "ensembl_trs": "ENST00000413590"
+            },
+            {
+                "ensembl_pro": "ENSP00000463658",
+                "ensembl_trs": "ENST00000584804"
+            }
+        ],
+        "ensgid": "ENSG00000108384",
+        "ccds_id": [
+            "CCDS11611",
+            "CCDS45745"
+        ],
+        "cytoband": [
+            "17q22"
+        ],
+        "clingendis": [
+            {
+                "disease_label": "familial ovarian cancer",
+                "disease_id": "MONDO_0016248",
+                "classification": "Definitive"
+            },
+            {
+                "disease_label": "Fanconi anemia",
+                "disease_id": "MONDO_0019391",
+                "classification": "Moderate"
+            },
+            {
+                "disease_label": "hereditary breast carcinoma",
+                "disease_id": "MONDO_0016419",
+                "classification": "Disputed"
+            }
+        ],
+        "gdi_phred": 1.58201,
+        "entrez_id": "5889",
+        "num_coding_exons": 9,
+        "biogrid": [
+            "111826"
+        ],
+        "obs_lof": 20,
+        "clingen": "9820",
+        "string": [
+            "9606.ENSP00000336701"
+        ],
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "brainspan_rnaseq": "ENSG00000108384",
+        "gene_summary": "This gene is a member of the RAD51 family. RAD51 family members are highly similar to bacterial RecA and Saccharomyces cerevisiae Rad51 and are known to be involved in the homologous recombination and repair of DNA. This protein can interact with other RAD51 paralogs and is reported to be important for Holliday junction resolution. Mutations in this gene are associated with Fanconi anemia-like syndrome. This gene is one of four localized to a region of chromosome 17q23 where amplification occurs frequently in breast tumors. Overexpression of the four genes during amplification has been observed and suggests a possible role in tumor progression. Alternative splicing results in multiple transcript variants. [provided by RefSeq, Jul 2013].",
+        "pathway_kegg_full": "Homologous recombination",
+        "spos": 58692573
+    },
+    {
+        "oe_syn": 1.0061,
+        "exp_lof": 19.953,
+        "mgi_mouse_gene": "Rad51d",
+        "brainatlas_microarray": "RAD51L3",
+        "status": "in review",
+        "schema_version": "1",
+        "chrom": "17",
+        "brainspan_microarray": "RAD51D",
+        "strand": "-",
+        "omim_id": [
+            "602954"
+        ],
+        "pdb": [
+            "2KZ3"
+        ],
+        "gene_version": "20",
+        "rvis_exac": 0.481812836,
+        "genecards": "ENSG00000185379",
+        "gdp": "Medium",
+        "orphanet": "297209",
+        "hgnc_id": "9823",
+        "ucsc_id": "uc002hir.4",
+        "oe_lof": 0.80189,
+        "epos": 35121522,
+        "uuid": "508ead8c-7cd2-452f-a6b5-6ef1127b9155",
+        "pharmgkb": [
+            "PA34179"
+        ],
+        "epos_hg19": 33448541,
+        "gene_symbol": "RAD51D",
+        "name": "RAD51 paralog D",
+        "date_created": "2020-07-15T13:01:59.557696+00:00",
+        "last_modified": {
+            "date_modified": "2020-07-15T13:01:59.560715+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "s_het": 0.008342913,
+        "exp_mis": 193.6,
+        "uniprot_ids": [
+            "O75771"
+        ],
+        "gtex_expression": "ENSG00000185379.20",
+        "oe_mis": 1.0227,
+        "obs_mis": 198,
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "spos_hg19": 33426811,
+        "refseq_accession": [
+            "NM_002878"
+        ],
+        "rvis_percentile_exac": 77.48328414,
+        "strand_hg19": "-",
+        "mgd_id": [
+            "MGI:1261809"
+        ],
+        "gene_biotype": "protein_coding",
+        "chrom_hg19": "17",
+        "mgi_mouse_phenotype": "growth/size/body region phenotype; cellular phenotype; homeostasis/metabolism phenotype; mortality/aging (the observable characteristics related to the ability of a mammalian organism to live and age that are manifested throughout development and life span); cardiovascular system phenotype (the observable morphological and physiological characteristics of the mammalian heart, blood vessels, or circulatory system that are manifested through development and lifespan); embryo phenotype; limbs/digits/tail phenotype; nervous system phenotype (the observable morphological and physiological characteristics of the extensive, intricate network of electochemical structures in the body that is comprised of the brain, spinal cord, nerves, ganglia and parts of the receptor organs that are manifested through development and lifespan)",
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "cds_length": 1044,
+        "exp_syn": 80.51,
+        "marrvel": "RAD51D",
+        "pathway_kegg_id": "hsa03440",
+        "obs_syn": 81,
+        "transcriptid": [
+            {
+                "ensembl_pro": "ENSP00000338408",
+                "ensembl_trs": "ENST00000335858"
+            },
+            {
+                "ensembl_pro": "ENSP00000338790",
+                "ensembl_trs": "ENST00000345365"
+            },
+            {
+                "ensembl_pro": "ENSP00000378090",
+                "ensembl_trs": "ENST00000394589"
+            },
+            {
+                "ensembl_pro": "ENSP00000465584",
+                "ensembl_trs": "ENST00000586044"
+            },
+            {
+                "ensembl_pro": "ENSP00000466587",
+                "ensembl_trs": "ENST00000587977"
+            },
+            {
+                "ensembl_pro": "ENSP00000465366",
+                "ensembl_trs": "ENST00000588594"
+            },
+            {
+                "ensembl_pro": "ENSP00000466399",
+                "ensembl_trs": "ENST00000590016"
+            },
+            {
+                "ensembl_pro": "ENSP00000468764",
+                "ensembl_trs": "ENST00000588372"
+            },
+            {
+                "ensembl_pro": "ENSP00000465612",
+                "ensembl_trs": "ENST00000586210"
+            },
+            {
+                "ensembl_pro": "ENSP00000464356",
+                "ensembl_trs": "ENST00000460118"
+            },
+            {
+                "ensembl_pro": "ENSP00000466478",
+                "ensembl_trs": "ENST00000587405"
+            },
+            {
+                "ensembl_pro": "ENSP00000466839",
+                "ensembl_trs": "ENST00000592577"
+            },
+            {
+                "ensembl_pro": "ENSP00000465033",
+                "ensembl_trs": "ENST00000590631"
+            },
+            {
+                "ensembl_pro": "ENSP00000465007",
+                "ensembl_trs": "ENST00000585343"
+            },
+            {
+                "ensembl_pro": "ENSP00000468724",
+                "ensembl_trs": "ENST00000592850"
+            },
+            {
+                "ensembl_pro": "ENSP00000468273",
+                "ensembl_trs": "ENST00000586186"
+            }
+        ],
+        "ensgid": "ENSG00000185379",
+        "ccds_id": [
+            "CCDS11287",
+            "CCDS11288",
+            "CCDS45646"
+        ],
+        "cytoband": [
+            "17q12"
+        ],
+        "clingendis": [
+            {
+                "disease_label": "familial ovarian cancer",
+                "disease_id": "MONDO_0016248",
+                "classification": "Definitive"
+            },
+            {
+                "disease_label": "hereditary breast carcinoma",
+                "disease_id": "MONDO_0016419",
+                "classification": "Limited"
+            }
+        ],
+        "gdi_phred": 0.71347,
+        "entrez_id": "5892",
+        "num_coding_exons": 10,
+        "biogrid": [
+            "111829"
+        ],
+        "obs_lof": 16,
+        "clingen": "9823",
+        "string": [
+            "9606.ENSP00000466834"
+        ],
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "brainspan_rnaseq": "ENSG00000185379",
+        "gene_summary": "The protein encoded by this gene is a member of the RAD51 protein family. RAD51 family members are highly similar to bacterial RecA and Saccharomyces cerevisiae Rad51, which are known to be involved in the homologous recombination and repair of DNA. This protein forms a complex with several other members of the RAD51 family, including RAD51L1, RAD51L2, and XRCC2. The protein complex formed with this protein has been shown to catalyze homologous pairing between single- and double-stranded DNA, and is thought to play a role in the early stage of recombinational repair of DNA. Alternative splicing results in multiple transcript variants. Read-through transcription also exists between this gene and the downstream ring finger and FYVE-like domain containing 1 (RFFL) gene. [provided by RefSeq, Jan 2011].",
+        "pathway_kegg_full": "Homologous recombination",
+        "spos": 35092208
+    },
+    {
+        "oe_syn": 1.0444,
+        "exp_lof": 31.974,
+        "mgi_mouse_gene": "Recql",
+        "brainatlas_microarray": "RECQL",
+        "status": "in review",
+        "schema_version": "1",
+        "chrom": "12",
+        "brainspan_microarray": "RECQL",
+        "strand": "-",
+        "omim_id": [
+            "600537"
+        ],
+        "pdb": [
+            "2V1X",
+            "2WWY",
+            "4U7D"
+        ],
+        "rvis_exac": -0.073642932,
+        "genecards": "ENSG00000004700",
+        "gdp": "Medium",
+        "gene_version": "16",
+        "hgnc_id": "9948",
+        "ucsc_id": "uc001rey.4",
+        "oe_lof": 0.96953,
+        "epos": 21501669,
+        "uuid": "47d8e129-975e-4d69-b74d-cb729daa0c96",
+        "pharmgkb": [
+            "PA34315"
+        ],
+        "epos_hg19": 21654603,
+        "gene_symbol": "RECQL",
+        "name": "RecQ like helicase",
+        "trait_association_gwas_pmid": [
+            "30072576"
+        ],
+        "date_created": "2020-07-15T13:13:18.725804+00:00",
+        "last_modified": {
+            "date_modified": "2020-07-15T13:13:18.730145+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "s_het": 0.005200084,
+        "exp_mis": 334.85,
+        "uniprot_ids": [
+            "P46063"
+        ],
+        "gtex_expression": "ENSG00000004700.15",
+        "oe_mis": 0.96163,
+        "obs_mis": 322,
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "spos_hg19": 21621845,
+        "trait_association_gwas": [
+            "Blood protein levels"
+        ],
+        "refseq_accession": [
+            "NM_002907"
+        ],
+        "rvis_percentile_exac": 45.30449973,
+        "strand_hg19": "-",
+        "mgd_id": [
+            "MGI:103021"
+        ],
+        "gene_biotype": "protein_coding",
+        "chrom_hg19": "12",
+        "mgi_mouse_phenotype": "cellular phenotype",
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "cds_length": 1947,
+        "exp_syn": 115.86,
+        "marrvel": "RECQL",
+        "obs_syn": 121,
+        "transcriptid": [
+            {
+                "ensembl_pro": "ENSP00000395449",
+                "ensembl_trs": "ENST00000421138"
+            },
+            {
+                "ensembl_pro": "ENSP00000416739",
+                "ensembl_trs": "ENST00000444129"
+            },
+            {
+                "ensembl_pro": "ENSP00000379400",
+                "ensembl_trs": "ENST00000396093"
+            },
+            {
+                "ensembl_pro": "ENSP00000318727",
+                "ensembl_trs": "ENST00000314748"
+            },
+            {
+                "ensembl_pro": "ENSP00000445555",
+                "ensembl_trs": "ENST00000542432"
+            },
+            {
+                "ensembl_pro": "ENSP00000439069",
+                "ensembl_trs": "ENST00000536240"
+            },
+            {
+                "ensembl_pro": "ENSP00000446036",
+                "ensembl_trs": "ENST00000536964"
+            },
+            {
+                "ensembl_pro": "ENSP00000440700",
+                "ensembl_trs": "ENST00000539672"
+            }
+        ],
+        "ensgid": "ENSG00000004700",
+        "ccds_id": [
+            "CCDS31756"
+        ],
+        "cytoband": [
+            "12p12.1"
+        ],
+        "clingendis": [
+            {
+                "disease_label": "hereditary breast carcinoma",
+                "disease_id": "MONDO_0016419",
+                "classification": "Moderate"
+            },
+            {
+                "disease_label": "familial ovarian cancer",
+                "disease_id": "MONDO_0016248",
+                "classification": "No Reported Evidence"
+            }
+        ],
+        "gdi_phred": 4.96976,
+        "entrez_id": "5965",
+        "num_coding_exons": 14,
+        "biogrid": [
+            "111897"
+        ],
+        "obs_lof": 31,
+        "clingen": "9948",
+        "string": [
+            "9606.ENSP00000416739"
+        ],
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "brainspan_rnaseq": "ENSG00000004700",
+        "gene_summary": "This gene encodes a nuclear-cytoplasmic pyridine nucleotide-disulphide reductase (PNDR). PNDRs are flavoproteins that catalyze the pyridine nucleotide-dependent reduction of thiol residues in other proteins. The encoded protein belongs to the class I pyridine nucleotide-disulphide oxidoreductase family but lacks the C-terminal dimerization domain found in other family members and instead has a C-terminal nitrile reductase domain. It localizes to the nucleus and to striated sarcomeric compartments. Naturally occurring mutations in this gene cause early-onset myopathy with internalized nuclei and myofibrillar disorganization. A pseudogene of this gene has been defined on chromosome 11. [provided by RefSeq, Apr 2017].",
+        "spos": 21468910
+    },
+    {
+        "oe_syn": 1.0503,
+        "exp_lof": 45.061,
+        "mgi_mouse_gene": "Rint1",
+        "brainatlas_microarray": "RINT1",
+        "status": "in review",
+        "schema_version": "1",
+        "chrom": "7",
+        "brainspan_microarray": "RINT1",
+        "strand": "+",
+        "omim_id": [
+            "610089"
+        ],
+        "mgi_mouse_phenotype": "embryo phenotype; reproductive system phenotype; mortality/aging (the observable characteristics related to the ability of a mammalian organism to live and age that are manifested throughout development and life span); neoplasm; integument phenotype (the observable morphological and physiological characteristics of the skin and its associated structures, such as the hair, nails, sweat glands, sebaceous glands and other secretory glands that are manifested through development and lifespan); homeostasis/metabolism phenotype",
+        "rvis_exac": -0.355119127,
+        "genecards": "ENSG00000135249",
+        "gdp": "Medium",
+        "gene_version": "8",
+        "hgnc_id": "21876",
+        "ucsc_id": "uc003vda.1",
+        "oe_lof": 0.59919,
+        "epos": 105567677,
+        "uuid": "f0c87332-17af-44f1-a5c1-78f80422fd02",
+        "pharmgkb": [
+            "PA143485595"
+        ],
+        "epos_hg19": 105208124,
+        "gene_symbol": "RINT1",
+        "name": "RAD50 interactor 1",
+        "date_created": "2020-07-15T13:14:28.770609+00:00",
+        "last_modified": {
+            "date_modified": "2020-07-15T13:14:28.774724+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "s_het": 0.010379161,
+        "exp_mis": 410.01,
+        "uniprot_ids": [
+            "Q6NUQ1"
+        ],
+        "gtex_expression": "ENSG00000135249.7",
+        "oe_mis": 0.88533,
+        "obs_mis": 363,
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "spos_hg19": 105172532,
+        "refseq_accession": [
+            "NM_021930"
+        ],
+        "rvis_percentile_exac": 28.40792723,
+        "strand_hg19": "+",
+        "mgd_id": [
+            "MGI:1916233"
+        ],
+        "gene_biotype": "protein_coding",
+        "chrom_hg19": "7",
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "cds_length": 2376,
+        "exp_syn": 150.44,
+        "marrvel": "RINT1",
+        "obs_syn": 158,
+        "transcriptid": [
+            {
+                "ensembl_pro": "ENSP00000257700",
+                "ensembl_trs": "ENST00000257700"
+            },
+            {
+                "ensembl_pro": "ENSP00000418805",
+                "ensembl_trs": "ENST00000467392"
+            },
+            {
+                "ensembl_pro": "ENSP00000417107",
+                "ensembl_trs": "ENST00000482041"
+            },
+            {
+                "ensembl_pro": "ENSP00000417954",
+                "ensembl_trs": "ENST00000493041"
+            },
+            {
+                "ensembl_pro": "ENSP00000420582",
+                "ensembl_trs": "ENST00000497979"
+            }
+        ],
+        "ensgid": "ENSG00000135249",
+        "ccds_id": [
+            "CCDS34726"
+        ],
+        "cytoband": [
+            "7q22.3"
+        ],
+        "clingendis": [
+            {
+                "disease_label": "familial ovarian cancer",
+                "disease_id": "MONDO_0016248",
+                "classification": "No Reported Evidence"
+            },
+            {
+                "disease_label": "hereditary breast carcinoma",
+                "disease_id": "MONDO_0016419",
+                "classification": "Disputed"
+            }
+        ],
+        "gdi_phred": 5.58288,
+        "entrez_id": "60561",
+        "num_coding_exons": 15,
+        "biogrid": [
+            "121942"
+        ],
+        "obs_lof": 27,
+        "clingen": "21876",
+        "string": [
+            "9606.ENSP00000257700"
+        ],
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "brainspan_rnaseq": "ENSG00000135249",
+        "gene_summary": "This gene encodes a protein first identified for its ability to interact with the RAD50 double strand break repair protein, with the resulting interaction implicated in the regulation of cell cycle progression and telomere length. The encoded protein may also play a role in trafficking of cellular cargo from the endosome to the trans-Golgi network. Mutations in this gene may be associated with breast cancer in human patients. [provided by RefSeq, Oct 2016].",
+        "spos": 105532169
+    },
+    {
+        "oe_syn": 0.99574,
+        "exp_lof": 19.037,
+        "mgi_mouse_gene": "Sdhb",
+        "brainatlas_microarray": "SDHB",
+        "status": "in review",
+        "schema_version": "1",
+        "chrom": "1",
+        "brainspan_microarray": "SDHB",
+        "strand": "-",
+        "omim_id": [
+            "185470"
+        ],
+        "mgi_mouse_phenotype": "homeostasis/metabolism phenotype; endocrine/exocrine gland phenotype; hematopoietic system phenotype; cardiovascular system phenotype (the observable morphological and physiological characteristics of the mammalian heart, blood vessels, or circulatory system that are manifested through development and lifespan); normal phenotype; mortality/aging (the observable characteristics related to the ability of a mammalian organism to live and age that are manifested throughout development and life span); renal/urinary system phenotype; neoplasm",
+        "gene_version": "10",
+        "rvis_exac": 0.191437473,
+        "genecards": "ENSG00000117118",
+        "gdp": "Medium",
+        "orphanet": "118554",
+        "hgnc_id": "10681",
+        "ucsc_id": "uc001bae.5",
+        "oe_lof": 0.47277,
+        "epos": 17054032,
+        "uuid": "f39cae40-efdb-4a56-b800-c7a63e9ce1f4",
+        "pharmgkb": [
+            "PA35606"
+        ],
+        "epos_hg19": 17380665,
+        "gene_symbol": "SDHB",
+        "name": "succinate dehydrogenase complex iron sulfur subunit B",
+        "trait_association_gwas_pmid": [
+            "20189936"
+        ],
+        "date_created": "2020-07-15T13:05:40.595207+00:00",
+        "last_modified": {
+            "date_modified": "2020-07-15T13:05:40.599284+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "s_het": 0.020158134,
+        "exp_mis": 154.44,
+        "uniprot_ids": [
+            "P21912"
+        ],
+        "gtex_expression": "ENSG00000117118.9",
+        "oe_mis": 1.0231,
+        "obs_mis": 158,
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "spos_hg19": 17345217,
+        "trait_association_gwas": [
+            "Height"
+        ],
+        "refseq_accession": [
+            "NM_003000"
+        ],
+        "rvis_percentile_exac": 63.29739172,
+        "strand_hg19": "-",
+        "genereviews": [
+            "SDHB"
+        ],
+        "mgd_id": [
+            "MGI:1914930"
+        ],
+        "gene_biotype": "protein_coding",
+        "chrom_hg19": "1",
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "cds_length": 840,
+        "exp_syn": 52.222,
+        "marrvel": "SDHB",
+        "pathway_kegg_id": "hsa00020;hsa00190",
+        "obs_syn": 52,
+        "transcriptid": [
+            {
+                "ensembl_pro": "ENSP00000364649",
+                "ensembl_trs": "ENST00000375499"
+            },
+            {
+                "ensembl_pro": "ENSP00000480482",
+                "ensembl_trs": "ENST00000491274"
+            },
+            {
+                "ensembl_pro": "ENSP00000481376",
+                "ensembl_trs": "ENST00000463045"
+            }
+        ],
+        "ensgid": "ENSG00000117118",
+        "ccds_id": [
+            "CCDS176"
+        ],
+        "cytoband": [
+            "1p36.13"
+        ],
+        "gdi_phred": 2.67455,
+        "entrez_id": "6390",
+        "num_coding_exons": 8,
+        "biogrid": [
+            "112291"
+        ],
+        "obs_lof": 9,
+        "clingen": "10681",
+        "string": [
+            "9606.ENSP00000364649"
+        ],
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "brainspan_rnaseq": "ENSG00000117118",
+        "gene_summary": "Complex II of the respiratory chain, which is specifically involved in the oxidation of succinate, carries electrons from FADH to CoQ. The complex is composed of four nuclear-encoded subunits and is localized in the mitochondrial inner membrane. The iron-sulfur subunit is highly conserved and contains three cysteine-rich clusters which may comprise the iron-sulfur centers of the enzyme. Sporadic and familial mutations in this gene result in paragangliomas and pheochromocytoma, and support a link between mitochondrial dysfunction and tumorigenesis. [provided by RefSeq, Jul 2008].",
+        "pathway_kegg_full": "Citrate cycle (TCA cycle);Oxidative phosphorylation",
+        "spos": 17018722
+    },
+    {
+        "oe_syn": 0.8355,
+        "exp_lof": 8.6129,
+        "mgi_mouse_gene": "Sdhd",
+        "brainatlas_microarray": "SDHD",
+        "status": "in review",
+        "schema_version": "1",
+        "chrom": "11",
+        "brainspan_microarray": "SDHD",
+        "strand": "+",
+        "omim_id": [
+            "602690"
+        ],
+        "mgi_mouse_phenotype": "endocrine/exocrine gland phenotype; growth/size/body region phenotype; cellular phenotype; homeostasis/metabolism phenotype; nervous system phenotype (the observable morphological and physiological characteristics of the extensive, intricate network of electochemical structures in the body that is comprised of the brain, spinal cord, nerves, ganglia and parts of the receptor organs that are manifested through development and lifespan); mortality/aging (the observable characteristics related to the ability of a mammalian organism to live and age that are manifested throughout development and life span); normal phenotype; hematopoietic system phenotype; cardiovascular system phenotype (the observable morphological and physiological characteristics of the mammalian heart, blood vessels, or circulatory system that are manifested through development and lifespan); behavior/neurological phenotype (the observable actions or reactions of mammalian organisms that are manifested through development and lifespan); embryo phenotype",
+        "gene_version": "12",
+        "rvis_exac": 0.214091234,
+        "genecards": "ENSG00000204370",
+        "gdp": "Medium",
+        "orphanet": "118561",
+        "hgnc_id": "10683",
+        "ucsc_id": "uc001pmz.5",
+        "oe_lof": 0.23221,
+        "epos": 112120016,
+        "uuid": "0c274c6f-95de-4632-b9db-7b3d2998673f",
+        "pharmgkb": [
+            "PA35608"
+        ],
+        "epos_hg19": 111990353,
+        "gene_symbol": "SDHD",
+        "name": "succinate dehydrogenase complex subunit D",
+        "date_created": "2020-07-15T13:13:18.162721+00:00",
+        "last_modified": {
+            "date_modified": "2020-07-15T13:13:18.169869+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "s_het": 0.085119743,
+        "exp_mis": 85.674,
+        "uniprot_ids": [
+            "O14521"
+        ],
+        "gtex_expression": "ENSG00000204370.9",
+        "oe_mis": 1.0505,
+        "obs_mis": 90,
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "spos_hg19": 111957497,
+        "refseq_accession": [
+            "NM_003002"
+        ],
+        "rvis_percentile_exac": 64.52623336,
+        "strand_hg19": "+",
+        "genereviews": [
+            "SDHD"
+        ],
+        "mgd_id": [
+            "MGI:1914175"
+        ],
+        "gene_biotype": "protein_coding",
+        "chrom_hg19": "11",
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "cds_length": 477,
+        "exp_syn": 33.513,
+        "marrvel": "SDHD",
+        "pathway_kegg_id": "hsa00020;hsa00190",
+        "obs_syn": 28,
+        "transcriptid": [
+            {
+                "ensembl_pro": "ENSP00000491141",
+                "ensembl_trs": "ENST00000640554"
+            },
+            {
+                "ensembl_pro": "ENSP00000435475",
+                "ensembl_trs": "ENST00000528182"
+            },
+            {
+                "ensembl_pro": "ENSP00000364699",
+                "ensembl_trs": "ENST00000375549"
+            },
+            {
+                "ensembl_pro": "ENSP00000436669",
+                "ensembl_trs": "ENST00000525291"
+            },
+            {
+                "ensembl_pro": "ENSP00000432005",
+                "ensembl_trs": "ENST00000526592"
+            },
+            {
+                "ensembl_pro": "ENSP00000436217",
+                "ensembl_trs": "ENST00000528048"
+            },
+            {
+                "ensembl_pro": "ENSP00000480666",
+                "ensembl_trs": "ENST00000614349"
+            },
+            {
+                "ensembl_pro": "ENSP00000432465",
+                "ensembl_trs": "ENST00000528021"
+            },
+            {
+                "ensembl_pro": "ENSP00000432946",
+                "ensembl_trs": "ENST00000530923"
+            },
+            {
+                "ensembl_pro": "ENSP00000433202",
+                "ensembl_trs": "ENST00000534010"
+            }
+        ],
+        "ensgid": "ENSG00000204370",
+        "ccds_id": [
+            "CCDS31678",
+            "CCDS60958",
+            "CCDS60959",
+            "CCDS60960"
+        ],
+        "cytoband": [
+            "11q23.1"
+        ],
+        "gdi_phred": 1.64674,
+        "entrez_id": "6392",
+        "num_coding_exons": 4,
+        "biogrid": [
+            "112293"
+        ],
+        "obs_lof": 2,
+        "clingen": "10683",
+        "string": [
+            "9606.ENSP00000364699"
+        ],
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "brainspan_rnaseq": "ENSG00000204370",
+        "gene_summary": "This gene encodes a member of complex II of the respiratory chain, which is responsible for the oxidation of succinate. The encoded protein is one of two integral membrane proteins anchoring the complex to the matrix side of the mitochondrial inner membrane. Mutations in this gene are associated with the formation of tumors, including hereditary paraganglioma. Transmission of disease occurs almost exclusively through the paternal allele, suggesting that this locus may be maternally imprinted. There are pseudogenes for this gene on chromosomes 1, 2, 3, 7, and 18. Alternative splicing results in multiple transcript variants. [provided by RefSeq, Feb 2013]. COMPLETENESS: complete on the 3' end.",
+        "pathway_kegg_full": "Citrate cycle (TCA cycle);Oxidative phosphorylation",
+        "spos": 112086824
+    },
+    {
+        "oe_syn": 1.329,
+        "exp_lof": 19.368,
+        "mgi_mouse_gene": "Stk11",
+        "brainatlas_microarray": "STK11",
+        "status": "in review",
+        "schema_version": "1",
+        "chrom": "19",
+        "brainspan_microarray": "STK11",
+        "strand": "+",
+        "omim_id": [
+            "602216"
+        ],
+        "pdb": [
+            "2WTK",
+            "4ZDR",
+            "5WXN"
+        ],
+        "gene_version": "16",
+        "rvis_exac": -0.189382779,
+        "genecards": "ENSG00000118046",
+        "gdp": "Medium",
+        "orphanet": "119884",
+        "hgnc_id": "11389",
+        "ucsc_id": "uc002lrl.2",
+        "oe_lof": 0.051631,
+        "epos": 1228431,
+        "uuid": "349292f5-c053-4e4b-9b0d-5f5ba0e3f0fd",
+        "pharmgkb": [
+            "PA36198"
+        ],
+        "epos_hg19": 1228428,
+        "gene_symbol": "STK11",
+        "name": "serine/threonine kinase 11",
+        "trait_association_gwas_pmid": [
+            "28067908",
+            "22005930",
+            "27863252",
+            "26974007",
+            "28067908"
+        ],
+        "date_created": "2020-07-15T13:11:22.537747+00:00",
+        "last_modified": {
+            "date_modified": "2020-07-15T13:11:22.541488+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "s_het": 0.202297268,
+        "exp_mis": 277.92,
+        "uniprot_ids": [
+            "Q15831"
+        ],
+        "gtex_expression": "ENSG00000118046.14",
+        "oe_mis": 0.73043,
+        "obs_mis": 203,
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "spos_hg19": 1189406,
+        "trait_association_gwas": [
+            "Inflammatory bowel disease",
+            "Psychosis in Alzheimer's disease",
+            "Lymphocyte counts",
+            "Chronic inflammatory diseases (ankylosing spondylitis, Crohn's disease, psoriasis, primary sclerosing cholangitis, ulcerative colitis) (pleiotropy)",
+            "Crohn's disease"
+        ],
+        "refseq_accession": [
+            "NM_000455"
+        ],
+        "rvis_percentile_exac": 37.52183603,
+        "strand_hg19": "+",
+        "genereviews": [
+            "STK11"
+        ],
+        "mgd_id": [
+            "MGI:1341870"
+        ],
+        "gene_biotype": "protein_coding",
+        "chrom_hg19": "19",
+        "mgi_mouse_phenotype": "endocrine/exocrine gland phenotype; integument phenotype (the observable morphological and physiological characteristics of the skin and its associated structures, such as the hair, nails, sweat glands, sebaceous glands and other secretory glands that are manifested through development and lifespan); growth/size/body region phenotype; cellular phenotype; homeostasis/metabolism phenotype; craniofacial phenotype; nervous system phenotype (the observable morphological and physiological characteristics of the extensive, intricate network of electochemical structures in the body that is comprised of the brain, spinal cord, nerves, ganglia and parts of the receptor organs that are manifested through development and lifespan); muscle phenotype; digestive/alimentary phenotype; neoplasm; mortality/aging (the observable characteristics related to the ability of a mammalian organism to live and age that are manifested throughout development and life span); normal phenotype; reproductive system phenotype; hematopoietic system phenotype; cardiovascular system phenotype (the observable morphological and physiological characteristics of the mammalian heart, blood vessels, or circulatory system that are manifested through development and lifespan); behavior/neurological phenotype (the observable actions or reactions of mammalian organisms that are manifested through development and lifespan); respiratory system phenotype; liver/biliary system phenotype; embryo phenotype; renal/urinary system phenotype; immune system phenotype; vision/eye phenotype",
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "cds_length": 1299,
+        "exp_syn": 125.66,
+        "marrvel": "STK11",
+        "pathway_kegg_id": "hsa04150;hsa04920",
+        "obs_syn": 167,
+        "transcriptid": [
+            {
+                "ensembl_pro": "ENSP00000477641",
+                "ensembl_trs": "ENST00000585748"
+            },
+            {
+                "ensembl_pro": "ENSP00000324856",
+                "ensembl_trs": "ENST00000326873"
+            },
+            {
+                "ensembl_pro": "ENSP00000498804",
+                "ensembl_trs": "ENST00000652231"
+            },
+            {
+                "ensembl_pro": "ENSP00000466610",
+                "ensembl_trs": "ENST00000593219"
+            },
+            {
+                "ensembl_pro": "ENSP00000467912",
+                "ensembl_trs": "ENST00000585851"
+            },
+            {
+                "ensembl_pro": "ENSP00000490268",
+                "ensembl_trs": "ENST00000585465"
+            },
+            {
+                "ensembl_pro": "ENSP00000467240",
+                "ensembl_trs": "ENST00000586243"
+            }
+        ],
+        "ensgid": "ENSG00000118046",
+        "ccds_id": [
+            "CCDS45896"
+        ],
+        "cytoband": [
+            "19p13.3"
+        ],
+        "clingendis": [
+            {
+                "disease_label": "familial ovarian cancer",
+                "disease_id": "MONDO_0016248",
+                "classification": "No Reported Evidence"
+            },
+            {
+                "disease_label": "Peutz-Jeghers syndrome",
+                "disease_id": "MONDO_0008280",
+                "classification": "Definitive"
+            }
+        ],
+        "gdi_phred": 1.40507,
+        "entrez_id": "6794",
+        "num_coding_exons": 9,
+        "biogrid": [
+            "112670"
+        ],
+        "obs_lof": 1,
+        "clingen": "11389",
+        "string": [
+            "9606.ENSP00000324856"
+        ],
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "brainspan_rnaseq": "ENSG00000118046",
+        "gene_summary": "This gene, which encodes a member of the serine/threonine kinase family, regulates cell polarity and functions as a tumor suppressor. Mutations in this gene have been associated with Peutz-Jeghers syndrome, an autosomal dominant disorder characterized by the growth of polyps in the gastrointestinal tract, pigmented macules on the skin and mouth, and other neoplasms. Alternate transcriptional splice variants of this gene have been observed but have not been thoroughly characterized. [provided by RefSeq, Jul 2008].",
+        "pathway_kegg_full": "mTOR signaling pathway;Adipocytokine signaling pathway",
+        "spos": 1177558
+    },
+    {
+        "oe_syn": 1.0732,
+        "exp_lof": 19.535,
+        "mgi_mouse_gene": "Trp53",
+        "brainatlas_microarray": "TP53",
+        "status": "in review",
+        "schema_version": "1",
+        "chrom": "17",
+        "brainspan_microarray": "TP53",
+        "strand": "-",
+        "omim_id": [
+            "191170"
+        ],
+        "pdb": [
+            "1A1U",
+            "1AIE",
+            "1C26",
+            "1DT7",
+            "1GZH",
+            "1H26",
+            "1HS5",
+            "1JSP",
+            "1KZY",
+            "1MA3",
+            "1OLG",
+            "1OLH",
+            "1PES",
+            "1PET",
+            "1SAE",
+            "1SAF",
+            "1SAK",
+            "1SAL",
+            "1TSR",
+            "1TUP",
+            "1UOL",
+            "1XQH",
+            "1YC5",
+            "1YCQ",
+            "1YCR",
+            "1YCS",
+            "2AC0",
+            "2ADY",
+            "2AHI",
+            "2ATA",
+            "2B3G",
+            "2BIM",
+            "2BIN",
+            "2BIO",
+            "2BIP",
+            "2BIQ",
+            "2F1X",
+            "2FEJ",
+            "2FOJ",
+            "2FOO",
+            "2GS0",
+            "2H1L",
+            "2H2D",
+            "2H2F",
+            "2H4F",
+            "2H4H",
+            "2H4J",
+            "2H59",
+            "2J0Z",
+            "2J10",
+            "2J11",
+            "2J1W",
+            "2J1X",
+            "2J1Y",
+            "2J1Z",
+            "2J20",
+            "2J21",
+            "2K8F",
+            "2L14",
+            "2LY4",
+            "2MEJ",
+            "2MWO",
+            "2MWP",
+            "2MWY",
+            "2MZD",
+            "2OCJ",
+            "2PCX",
+            "2RUK",
+            "2VUK",
+            "2WGX",
+            "2X0U",
+            "2X0V",
+            "2X0W",
+            "2XWR",
+            "2YBG",
+            "2YDR",
+            "2Z5S",
+            "2Z5T",
+            "3D05",
+            "3D06",
+            "3D07",
+            "3D08",
+            "3D09",
+            "3D0A",
+            "3DAB",
+            "3DAC",
+            "3IGK",
+            "3IGL",
+            "3KMD",
+            "3KZ8",
+            "3LW1",
+            "3OQ5",
+            "3PDH",
+            "3Q01",
+            "3Q05",
+            "3Q06",
+            "3SAK",
+            "3TG5",
+            "3TS8",
+            "3ZME",
+            "4AGL",
+            "4AGM",
+            "4AGN",
+            "4AGO",
+            "4AGP",
+            "4AGQ",
+            "4BUZ",
+            "4BV2",
+            "4HFZ",
+            "4HJE",
+            "4IBQ",
+            "4IBS",
+            "4IBT",
+            "4IBU",
+            "4IBV",
+            "4IBW",
+            "4IBY",
+            "4IBZ",
+            "4IJT",
+            "4KVP",
+            "4LO9",
+            "4LOE",
+            "4LOF",
+            "4MZI",
+            "4MZR",
+            "4QO1",
+            "4RP6",
+            "4RP7",
+            "4X34",
+            "4XR8",
+            "4ZZJ",
+            "5A7B",
+            "5AB9",
+            "5ABA",
+            "5AOI",
+            "5AOJ",
+            "5AOK",
+            "5AOL",
+            "5AOM",
+            "5BUA",
+            "5ECG",
+            "5G4M",
+            "5G4N",
+            "5G4O",
+            "5HOU",
+            "5HP0",
+            "5HPD",
+            "5LAP",
+            "5LGY",
+            "5MCT",
+            "5MCU",
+            "5MCV",
+            "5MCW",
+            "5MF7",
+            "5MG7",
+            "5MHC",
+            "5MOC",
+            "5O1A",
+            "5O1B",
+            "5O1C",
+            "5O1D",
+            "5O1E",
+            "5O1F",
+            "5O1G",
+            "5O1H",
+            "5O1I",
+            "5OL0",
+            "5UN8",
+            "5XZC",
+            "6FF9",
+            "6FJ5",
+            "6GGA",
+            "6GGB",
+            "6GGC",
+            "6GGD",
+            "6GGE",
+            "6GGF"
+        ],
+        "gene_version": "17",
+        "rvis_exac": -0.1111262,
+        "genecards": "ENSG00000141510",
+        "gdp": "Medium",
+        "orphanet": "120204",
+        "hgnc_id": "11998",
+        "ucsc_id": "uc060aur.1",
+        "oe_lof": 0.20476,
+        "epos": 7687550,
+        "uuid": "b043c061-6598-486e-8660-9ee31ee4e863",
+        "pharmgkb": [
+            "PA36679"
+        ],
+        "epos_hg19": 7590856,
+        "gene_symbol": "TP53",
+        "name": "tumor protein p53",
+        "trait_association_gwas_pmid": [
+            "30194396",
+            "21946351~24403052~27539887~25855136",
+            "27863252",
+            "28346443~29743610~29743610",
+            "30152087~30152087~30152087",
+            "26014426",
+            "28135244",
+            "28346443~29743610~29743610",
+            "28135244~28135244",
+            "25129146",
+            "28545128",
+            "28346443~29743610~29743610"
+        ],
+        "date_created": "2020-07-15T13:10:59.366214+00:00",
+        "last_modified": {
+            "date_modified": "2020-07-15T13:10:59.377288+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "s_het": 0.122624777,
+        "exp_mis": 234.32,
+        "uniprot_ids": [
+            "P04637"
+        ],
+        "gtex_expression": "ENSG00000141510.16",
+        "oe_mis": 0.81938,
+        "obs_mis": 192,
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "spos_hg19": 7565097,
+        "trait_association_gwas": [
+            "Uterine fibroids",
+            "Basal cell carcinoma",
+            "Mean corpuscular hemoglobin",
+            "Glioma",
+            "Glioblastoma (age-stratified)",
+            "Sex hormone levels",
+            "Diastolic blood pressure",
+            "Glioblastoma",
+            "Pulse pressure",
+            "Esophageal squamous cell carcinoma",
+            "Sporadic neuroblastoma",
+            "Non-glioblastoma glioma"
+        ],
+        "refseq_accession": [
+            "NM_000546"
+        ],
+        "rvis_percentile_exac": 42.39503644,
+        "strand_hg19": "-",
+        "genereviews": [
+            "TP53"
+        ],
+        "mgd_id": [
+            "MGI:98834"
+        ],
+        "gene_biotype": "protein_coding",
+        "chrom_hg19": "17",
+        "mgi_mouse_phenotype": "behavior/neurological phenotype (the observable actions or reactions of mammalian organisms that are manifested through development and lifespan); liver/biliary system phenotype; respiratory system phenotype; embryo phenotype; neoplasm; pigmentation phenotype; normal phenotype; mortality/aging (the observable characteristics related to the ability of a mammalian organism to live and age that are manifested throughout development and life span); reproductive system phenotype; hematopoietic system phenotype; cardiovascular system phenotype (the observable morphological and physiological characteristics of the mammalian heart, blood vessels, or circulatory system that are manifested through development and lifespan); vision/eye phenotype; limbs/digits/tail phenotype; hearing/vestibular/ear phenotype; nervous system phenotype (the observable morphological and physiological characteristics of the extensive, intricate network of electochemical structures in the body that is comprised of the brain, spinal cord, nerves, ganglia and parts of the receptor organs that are manifested through development and lifespan); digestive/alimentary phenotype; renal/urinary system phenotype; skeleton phenotype; cellular phenotype; immune system phenotype; homeostasis/metabolism phenotype; adipose tissue phenotype (the observable morphological and physiological characteristics of mammalian fat tissue that are manifested through development and lifespan); endocrine/exocrine gland phenotype; integument phenotype (the observable morphological and physiological characteristics of the skin and its associated structures, such as the hair, nails, sweat glands, sebaceous glands and other secretory glands that are manifested through development and lifespan); growth/size/body region phenotype; craniofacial phenotype; muscle phenotype",
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "cds_length": 1179,
+        "exp_syn": 89.45,
+        "marrvel": "TP53",
+        "pathway_kegg_id": "hsa04010;hsa04110;hsa04115;hsa04210;hsa04310;hsa05030;hsa05040;hsa05210;hsa05212;hsa05213;hsa05214;hsa05215;hsa05216;hsa05217;hsa05218;hsa05219;hsa05220;hsa05222;hsa05223",
+        "obs_syn": 96,
+        "transcriptid": [
+            {
+                "ensembl_pro": "ENSP00000410739",
+                "ensembl_trs": "ENST00000413465"
+            },
+            {
+                "ensembl_pro": "ENSP00000488924",
+                "ensembl_trs": "ENST00000635293"
+            },
+            {
+                "ensembl_pro": "ENSP00000352610",
+                "ensembl_trs": "ENST00000359597"
+            },
+            {
+                "ensembl_pro": "ENSP00000269305",
+                "ensembl_trs": "ENST00000269305"
+            },
+            {
+                "ensembl_pro": "ENSP00000391127",
+                "ensembl_trs": "ENST00000420246"
+            },
+            {
+                "ensembl_pro": "ENSP00000391478",
+                "ensembl_trs": "ENST00000445888"
+            },
+            {
+                "ensembl_pro": "ENSP00000398846",
+                "ensembl_trs": "ENST00000455263"
+            },
+            {
+                "ensembl_pro": "ENSP00000484409",
+                "ensembl_trs": "ENST00000504290"
+            },
+            {
+                "ensembl_pro": "ENSP00000481179",
+                "ensembl_trs": "ENST00000504937"
+            },
+            {
+                "ensembl_pro": "ENSP00000478499",
+                "ensembl_trs": "ENST00000510385"
+            },
+            {
+                "ensembl_pro": "ENSP00000478219",
+                "ensembl_trs": "ENST00000610292"
+            },
+            {
+                "ensembl_pro": "ENSP00000480868",
+                "ensembl_trs": "ENST00000610538"
+            },
+            {
+                "ensembl_pro": "ENSP00000482258",
+                "ensembl_trs": "ENST00000617185"
+            },
+            {
+                "ensembl_pro": "ENSP00000482537",
+                "ensembl_trs": "ENST00000619485"
+            },
+            {
+                "ensembl_pro": "ENSP00000481638",
+                "ensembl_trs": "ENST00000620739"
+            },
+            {
+                "ensembl_pro": "ENSP00000482222",
+                "ensembl_trs": "ENST00000622645"
+            },
+            {
+                "ensembl_pro": "ENSP00000484375",
+                "ensembl_trs": "ENST00000619186"
+            },
+            {
+                "ensembl_pro": "ENSP00000481401",
+                "ensembl_trs": "ENST00000618944"
+            },
+            {
+                "ensembl_pro": "ENSP00000477531",
+                "ensembl_trs": "ENST00000610623"
+            },
+            {
+                "ensembl_pro": "ENSP00000458393",
+                "ensembl_trs": "ENST00000576024"
+            },
+            {
+                "ensembl_pro": "ENSP00000425104",
+                "ensembl_trs": "ENST00000509690"
+            },
+            {
+                "ensembl_pro": "ENSP00000423862",
+                "ensembl_trs": "ENST00000514944"
+            },
+            {
+                "ensembl_pro": "ENSP00000424104",
+                "ensembl_trs": "ENST00000508793"
+            },
+            {
+                "ensembl_pro": "ENSP00000473895",
+                "ensembl_trs": "ENST00000604348"
+            },
+            {
+                "ensembl_pro": "ENSP00000426252",
+                "ensembl_trs": "ENST00000503591"
+            },
+            {
+                "ensembl_pro": "ENSP00000482903",
+                "ensembl_trs": "ENST00000615910"
+            }
+        ],
+        "ensgid": "ENSG00000141510",
+        "ccds_id": [
+            "CCDS11118",
+            "CCDS45605",
+            "CCDS45606",
+            "CCDS73963",
+            "CCDS73964",
+            "CCDS73965",
+            "CCDS73966",
+            "CCDS73967",
+            "CCDS73968",
+            "CCDS73969",
+            "CCDS73970",
+            "CCDS73971"
+        ],
+        "cytoband": [
+            "17p13.1"
+        ],
+        "clingendis": [
+            {
+                "disease_label": "familial ovarian cancer",
+                "disease_id": "MONDO_0016248",
+                "classification": "Limited"
+            },
+            {
+                "disease_label": "Li-Fraumeni syndrome",
+                "disease_id": "MONDO_0018875",
+                "classification": "Definitive"
+            }
+        ],
+        "gdi_phred": 0.55115,
+        "entrez_id": "7157",
+        "num_coding_exons": 10,
+        "biogrid": [
+            "113010"
+        ],
+        "obs_lof": 4,
+        "clingen": "11998",
+        "string": [
+            "9606.ENSP00000269305"
+        ],
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "brainspan_rnaseq": "ENSG00000141510",
+        "gene_summary": "This gene encodes an essential component of the telomerase holoenzyme complex, a ribonucleoprotein complex required for telomere synthesis. This protein is enriched in Cajal bodies, nuclear sites of RNP processing that are important for telomerase function. It interacts with dyskerin, TERT and TERC, other components of active telomerase, and with small Cajal body RNAs (scaRNAs), which are involved in modifying splicing RNAs. This mRNA also functions as a p53 antisense transcript, that regulates endogenous p53 mRNA levels and further induction of p53 protein by targeting the 5' untranslated region of p53 mRNA. Alternatively spliced transcript variants which differ only in the 5' UTR have been found for this gene. [provided by RefSeq, Mar 2011].",
+        "pathway_kegg_full": "MAPK signaling pathway;Cell cycle;p53 signaling pathway;Apoptosis;Wnt signaling pathway;Amyotrophic lateral sclerosis (ALS);Huntington's disease;Colorectal cancer;Pancreatic cancer;Endometrial cancer;Glioma;Prostate cancer;Thyroid cancer;Basal cell carcinoma;Melanoma;Bladder cancer;Chronic myeloid leukemia;Small cell lung cancer;Non-small cell lung cancer",
+        "spos": 7661779
+    },
+    {
+        "oe_syn": 0.81032,
+        "exp_lof": 13.271,
+        "mgi_mouse_gene": "Xrcc2",
+        "brainatlas_microarray": "XRCC2",
+        "status": "in review",
+        "schema_version": "1",
+        "chrom": "7",
+        "brainspan_microarray": "XRCC2",
+        "strand": "-",
+        "omim_id": [
+            "600375"
+        ],
+        "mgi_mouse_phenotype": "neoplasm; mortality/aging (the observable characteristics related to the ability of a mammalian organism to live and age that are manifested throughout development and life span); respiratory system phenotype; embryo phenotype; nervous system phenotype (the observable morphological and physiological characteristics of the extensive, intricate network of electochemical structures in the body that is comprised of the brain, spinal cord, nerves, ganglia and parts of the receptor organs that are manifested through development and lifespan); limbs/digits/tail phenotype; growth/size/body region phenotype; integument phenotype (the observable morphological and physiological characteristics of the skin and its associated structures, such as the hair, nails, sweat glands, sebaceous glands and other secretory glands that are manifested through development and lifespan); homeostasis/metabolism phenotype; cellular phenotype; craniofacial phenotype",
+        "gene_version": "3",
+        "rvis_exac": -0.072699292,
+        "genecards": "ENSG00000196584",
+        "gdp": "Medium",
+        "orphanet": "299649",
+        "hgnc_id": "12829",
+        "ucsc_id": "uc003wld.4",
+        "oe_lof": 0.82885,
+        "epos": 152676141,
+        "uuid": "82915e28-9d7a-4641-8572-417a2430309e",
+        "pharmgkb": [
+            "PA37421"
+        ],
+        "epos_hg19": 152373250,
+        "gene_symbol": "XRCC2",
+        "name": "X-ray repair cross complementing 2",
+        "trait_association_gwas_pmid": [
+            "27863252",
+            "23362303",
+            "26305897"
+        ],
+        "date_created": "2020-07-15T13:02:30.420372+00:00",
+        "last_modified": {
+            "date_modified": "2020-07-15T13:02:30.424484+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "s_het": 0.005425948,
+        "exp_mis": 147.67,
+        "uniprot_ids": [
+            "O43543"
+        ],
+        "gtex_expression": "ENSG00000196584.2",
+        "oe_mis": 1.0293,
+        "obs_mis": 152,
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "spos_hg19": 152341864,
+        "trait_association_gwas": [
+            "Mean platelet volume",
+            "Palmitic acid (16:0) levels",
+            "Diabetic kidney disease"
+        ],
+        "refseq_accession": [
+            "NM_005431"
+        ],
+        "rvis_percentile_exac": 45.36473706,
+        "strand_hg19": "-",
+        "genereviews": [
+            "XRCC2"
+        ],
+        "mgd_id": [
+            "MGI:1927345"
+        ],
+        "gene_biotype": "protein_coding",
+        "chrom_hg19": "7",
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "cds_length": 840,
+        "exp_syn": 53.066,
+        "marrvel": "XRCC2",
+        "pathway_kegg_id": "hsa03440",
+        "obs_syn": 43,
+        "transcriptid": [
+            {
+                "ensembl_pro": "ENSP00000352271",
+                "ensembl_trs": "ENST00000359321"
+            }
+        ],
+        "ensgid": "ENSG00000196584",
+        "ccds_id": [
+            "CCDS5933"
+        ],
+        "cytoband": [
+            "7q36.1"
+        ],
+        "clingendis": [
+            {
+                "disease_label": "hereditary breast carcinoma",
+                "disease_id": "MONDO_0016419",
+                "classification": "Limited"
+            },
+            {
+                "disease_label": "familial ovarian cancer",
+                "disease_id": "MONDO_0016248",
+                "classification": "No Reported Evidence"
+            }
+        ],
+        "gdi_phred": 4.15569,
+        "entrez_id": "7516",
+        "num_coding_exons": 3,
+        "biogrid": [
+            "113350"
+        ],
+        "obs_lof": 11,
+        "clingen": "12829",
+        "string": [
+            "9606.ENSP00000352271"
+        ],
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "brainspan_rnaseq": "ENSG00000196584",
+        "gene_summary": "This gene encodes a member of the RecA/Rad51-related protein family that participates in homologous recombination to maintain chromosome stability and repair DNA damage. This gene is involved in the repair of DNA double-strand breaks by homologous recombination and it functionally complements Chinese hamster irs1, a repair-deficient mutant that exhibits hypersensitivity to a number of different DNA-damaging agents. [provided by RefSeq, Jul 2008].",
+        "pathway_kegg_full": "Homologous recombination",
+        "spos": 152644776
     }
 ]
