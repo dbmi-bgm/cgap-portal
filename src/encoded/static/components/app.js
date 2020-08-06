@@ -1331,7 +1331,6 @@ class BodyElement extends React.PureComponent {
         this.hideTestWarning = this.hideTestWarning.bind(this);
         this.onResize = _.debounce(this.onResize.bind(this), 300);
         this.setupScrollHandler = this.setupScrollHandler.bind(this);
-        this.onAfterTooltipHide = this.onAfterTooltipHide.bind(this);
 
         this.registerWindowOnResizeHandler = this.registerWindowOnResizeHandler.bind(this);
         this.registerWindowOnScrollHandler = this.registerWindowOnScrollHandler.bind(this);
@@ -1661,18 +1660,6 @@ class BodyElement extends React.PureComponent {
 
         window.addEventListener("scroll", this.throttledScrollHandler);
         setTimeout(this.throttledScrollHandler, 100, null);
-    }
-
-    onAfterTooltipHide(e){
-        // Grab tip & unset style.left and style.top using same method tooltip does internally.
-        const ref = this.tooltipRef && this.tooltipRef.current;
-        const node = (ref && ref.tooltipRef) || null;
-        if (!node || !node.style) {
-            console.warn("Tooltip to hide not found");
-            return;
-        }
-        node.style.left = null;
-        node.style.top = null;
     }
 
     toggleFullScreen(isFullscreen, callback){
