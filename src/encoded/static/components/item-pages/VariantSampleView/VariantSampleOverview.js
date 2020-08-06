@@ -65,7 +65,7 @@ export class VariantSampleOverview extends React.PureComponent {
     }
 
     onSelectTranscript(transcriptIndex){
-        this.setState({ currentTranscriptIdx: transcriptIndex });
+        this.setState({ currentTranscriptIdx: parseInt(transcriptIndex) });
     }
 
     render(){
