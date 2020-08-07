@@ -1,7 +1,7 @@
 [tool.poetry]
 # Note: Various modules refer to this system as "encoded", not "cgap-portal".
 name = "encoded"
-version = "2.3.1.1b0"  # Preparing for minor version bump (2.4.0 probably)
+version = "2.4.1.1b0"  # Preparing for minor version bump (2.5.0 probably)
 description = "Clinical Genomics Analysis Platform"
 authors = ["4DN-DCIC Team <support@4dnucleome.org>"]
 license = "MIT"

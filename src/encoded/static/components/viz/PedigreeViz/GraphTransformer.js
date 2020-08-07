@@ -1,6 +1,5 @@
 
-import React from 'react';
-import memoize from 'memoize-one';
+import React, { useMemo } from 'react';
 import { standardizeObjectsInList, createObjectGraph, createRelationships } from './data-utilities';
 import { assignTreeHeightIndices, orderObjectGraph, positionObjectGraph } from './layout-utilities';
 import { getGraphHeight, getGraphWidth, createEdges } from './layout-utilities-drawing';
@@ -63,21 +62,15 @@ function getFullDims(dimensionOpts = {}){
     return dims;
 }
 
-export class GraphTransformer extends React.PureComponent {
+/** React Component wrapper */
+export function GraphTransformer(props){
+    const { dataset, children, dimensionOpts, filterUnrelatedIndividuals, ...passProps } = props;
+    const graphData = useMemo(function(){
+        return buildGraphData(dataset, dimensionOpts, filterUnrelatedIndividuals);
+    }, [ dataset, dimensionOpts, filterUnrelatedIndividuals ]);
+    const viewProps = { ...passProps, ...graphData };
 
-    static propTypes = graphTransformerPropTypes;
-
-    static defaultProps = graphTransformerDefaultProps;
-
-    constructor(props){
-        super(props);
-        this.buildGraphData = memoize(buildGraphData);
-    }
-
-    render(){
-        const { dataset, children, dimensionOpts, filterUnrelatedIndividuals, ...passProps } = this.props;
-        const graphData = this.buildGraphData(dataset, dimensionOpts, filterUnrelatedIndividuals);
-        const viewProps = { ...passProps, ...graphData };
-        return React.Children.map(children, (child) => React.cloneElement(child, viewProps));
-    }
+    return React.Children.map(children, function(child){ return React.cloneElement(child, viewProps); });
 }
+GraphTransformer.propTypes = graphTransformerPropTypes;
+GraphTransformer.defaultProps = graphTransformerDefaultProps;

@@ -1,7 +1,8 @@
 """The type file for the collection Quality Metric."""
+from snovault.calculated import calculate_properties
 from snovault import (
     abstract_collection,
-    # calculated_property,
+    calculated_property,
     collection,
     load_schema,
 )
@@ -11,6 +12,54 @@ from .base import (
     ALLOW_SUBMITTER_ADD,
     # lab_award_attribution_embed_list
 )
+
+"""Schema for QCs' quality_metric_summary calculated property"""
+QC_SUMMARY_SCHEMA = {
+    "type": "array",
+    "title": "Quality Metric Summary",
+    "description": "Selected Quality Metrics for Summary",
+    "exclude_from": ["submit4dn", "FFedit-create"],
+    "items": {
+            "title": "Selected Quality Metric",
+            "type": "object",
+            "required": ["title", "value", "numberType"],
+            "additionalProperties": False,
+            "properties": {
+                "title": {
+                    "type": "string",
+                    "title": "Title",
+                    "description": "Title of the Quality Metric",
+                },
+                "title_tooltip": {
+                    "type": "string",
+                    "title": "Tooltip Title",
+                    "description": "tooltip for the quality metric title to be displayed upon mouseover"
+                },
+                "sample": {
+                    "type": "string",
+                    "title": "Sample",
+                    "description": "sample for which the quality metric was calculated"
+                },
+                "value": {
+                    "type": "string",
+                    "title": "Value",
+                    "description": "value of the quality metric as a string"
+                },
+                "tooltip": {
+                    "type": "string",
+                    "title": "Tooltip",
+                    "description": "tooltip for the quality metric to be displayed upon mouseover"
+                },
+                "numberType": {
+                    "type": "string",
+                    "title": "Type",
+                    "description": "type of the quality metric",
+                    "enum": ["string", "integer", "float", "percent"]
+                }
+            }
+    }
+}
+
 
 """OVERALL QAULITY SCORE INFO
 All QC objects come with a field 'overall_quality_status', which is by default set to 'PASS'
@@ -170,3 +219,80 @@ class QualityMetricVcfqc(QualityMetric):
     item_type = 'quality_metric_vcfqc'
     schema = load_schema('encoded:schemas/quality_metric_vcfqc.json')
     embedded_list = QualityMetric.embedded_list
+
+    @calculated_property(schema=QC_SUMMARY_SCHEMA)
+    def quality_metric_summary(self, request):
+        qc = self.properties
+        qc_summary = []
+
+        def denovo_fraction(total, de_novo):
+            '''calculate percentage of de_novo in total'''
+            if total <= 0:
+                return -1
+            return round((int(de_novo) / int(total)) * 100 * 1000) / 1000
+
+        if 'transition-transversion ratio' in qc:
+            # full set
+            for tv in qc.get("total variants", {}):
+                qc_summary.append({"title": "Total Variants Called",
+                                   "sample": tv.get("name"),
+                                   "value": str(tv.get("total")),
+                                   "numberType": "integer"})
+            for ttr in qc.get("transition-transversion ratio", {}):
+                qc_summary.append({"title": "Transition-Transversion Ratio",
+                                   "sample": ttr.get("name"),
+                                   "value": str(ttr.get("ratio")),
+                                   "numberType": "float"})
+            for hr in qc.get("heterozygosity ratio", {}).get("SNV", {}):
+                qc_summary.append({"title": "Heterozygosity Ratio",
+                                   "sample": hr.get("name"),
+                                   "value": str(hr.get("ratio")),
+                                   "tooltip": "Het/Homo ratio",
+                                   "numberType": "float"})
+            for me in qc.get("mendelian errors in trio", {}).get("SNV", {}):
+               total = me.get("counts", {}).get("het", {}).get("total", 0)
+               de_novo = me.get("counts", {}).get("het", {}).get("de_novo", 0)
+               qc_summary.append({"title": "De Novo Fraction",
+                                  "sample": me.get("name"),
+                                  "value": str(denovo_fraction(total, de_novo)),
+                                  "tooltip": "Fraction of GATK-based de novo mutations among heterozygous SNVs",
+                                  "numberType": "percent"})
+        else:
+            # filtered set
+            for tv in qc.get("total variants", {}):
+                qc_summary.append({"title": "Filtered Variants",
+                                   "sample": tv.get("name"),
+                                   "value": str(tv.get("total")),
+                                   "tooltip": qc.get("filtering_condition"),
+                                   "numberType": "integer"})
+
+        return qc_summary
+
+
+@collection(
+    name='quality-metrics-bamqc',
+    properties={
+        'title': 'QC Quality metrics for Bam QC',
+        'description': 'Listing of QC Quality Metrics for Bam QC.',
+    })
+class QualityMetricBamqc(QualityMetric):
+    """Subclass of quality matrics for bam files."""
+
+    item_type = 'quality_metric_bamqc'
+    schema = load_schema('encoded:schemas/quality_metric_bamqc.json')
+    embedded_list = QualityMetric.embedded_list
+
+    @calculated_property(schema=QC_SUMMARY_SCHEMA)
+    def quality_metric_summary(self, request):
+        qc = self.properties
+        qc_summary = []
+
+        qc_summary.append({"title": "Total Reads",
+                           "sample": qc.get("sample"),
+                           "value": str(qc.get("mapping stats", {}).get("total reads")),
+                           "numberType": "integer"})
+        qc_summary.append({"title": "Coverage",
+                           "sample": qc.get("sample"),
+                           "value": qc.get("coverage"),
+                           "numberType": "string"})
+        return qc_summary

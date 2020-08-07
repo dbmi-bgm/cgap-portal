@@ -1,0 +1,2164 @@
+[
+    {
+        "definition": "Pierre Robin malformation is a sequence of developmental malformations characterized by micrognathia (mandibular hypoplasia), glossoptosis and cleft palate.",
+        "parents": [
+            "2257cd3e-77ef-4a70-80cf-d3ac716b2865"
+        ],
+        "last_modified": {
+            "date_modified": "2020-07-21T17:59:45.489640+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "slim_terms": [
+            "16c0b141-183d-42cd-80f1-8080434d51af"
+        ],
+        "schema_version": "1",
+        "status": "released",
+        "date_created": "2020-07-21T17:32:49.085043+00:00",
+        "uuid": "7e00a190-7851-43f9-a6d5-b24031bb5bf9",
+        "phenotype_name": "Pierre-Robin sequence",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "dbxrefs": [
+            "UMLS:C0031900",
+            "SNOMEDCT_US:4602007",
+            "MSH:D010855"
+        ],
+        "hpo_url": "http://purl.obolibrary.org/obo/HP_0000201",
+        "synonyms": [
+            "Robin sequence",
+            "Pierre-robin anomaly",
+            "Pierre Robin sequence",
+            "Pierre-robin deformity",
+            "Pierre-robin malformation"
+        ],
+        "hpo_id": "HP:0000201"
+    },
+    {
+        "definition": "A delay in the achievement of motor or mental milestones in the domains of development of a child, including motor skills, speech and language, cognitive skills, and social and emotional skills. This term should only be used to describe children younger than five years of age.",
+        "parents": [
+            "cee16299-e22b-4cf0-aade-c27a86bd1031"
+        ],
+        "last_modified": {
+            "date_modified": "2020-07-21T17:59:45.586059+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "slim_terms": [
+            "cfa14e52-2ef2-46bc-ac5d-cd6bbf76942c"
+        ],
+        "schema_version": "1",
+        "status": "released",
+        "date_created": "2020-07-21T17:32:49.382227+00:00",
+        "uuid": "6342771a-49ab-491d-8e9f-c59c35dec3fc",
+        "phenotype_name": "Global developmental delay",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "dbxrefs": [
+            "UMLS:C1864897",
+            "UMLS:C0557874",
+            "SNOMEDCT_US:224958001",
+            "UMLS:C4020875"
+        ],
+        "hpo_url": "http://purl.obolibrary.org/obo/HP_0001263",
+        "synonyms": [
+            "Psychomotor developmental delay",
+            "Delayed developmental milestones",
+            "Delayed intellectual development",
+            "Psychomotor development failure",
+            "Psychomotor delay",
+            "Lack of psychomotor development",
+            "Delayed cognitive development",
+            "Developmental delay, global",
+            "Retarded mental development",
+            "Psychomotor development deficiency",
+            "Motor and developmental delay",
+            "Developmental delay in early childhood",
+            "Developmental retardation",
+            "Delayed development",
+            "Delayed psychomotor development",
+            "Delayed milestones",
+            "Retarded psychomotor development",
+            "Developmental delay",
+            "Retarded development"
+        ],
+        "hpo_id": "HP:0001263"
+    },
+    {
+        "definition": "The onset of secondary sexual characteristics before a normal age. Although it is difficult to define normal age ranges because of the marked variation with which puberty begins in normal children, precocious puberty can be defined as the onset of puberty before the age of 8 years in girls or 9 years in boys.",
+        "parents": [
+            "4d2f9699-f86f-4ae4-99ad-18b9000f79c8"
+        ],
+        "last_modified": {
+            "date_modified": "2020-07-21T17:59:45.804759+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "slim_terms": [
+            "2a0ccce5-5edf-4777-910a-cacd3c71c5f6"
+        ],
+        "schema_version": "1",
+        "status": "released",
+        "date_created": "2020-07-21T17:32:49.866950+00:00",
+        "uuid": "17af4443-393a-4e27-abc5-a564640832fa",
+        "phenotype_name": "Precocious puberty",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "dbxrefs": [
+            "SNOMEDCT_US:400179000",
+            "SNOMEDCT_US:123527003",
+            "UMLS:C0034013",
+            "MSH:D011629"
+        ],
+        "hpo_url": "http://purl.obolibrary.org/obo/HP_0000826",
+        "synonyms": [
+            "Early onset of puberty",
+            "Early puberty"
+        ],
+        "hpo_id": "HP:0000826"
+    },
+    {
+        "definition": "Cerebellar ataxia refers to ataxia due to dysfunction of the cerebellum. This causes a variety of elementary neurological deficits including asynergy (lack of coordination between muscles, limbs and joints), dysmetria (lack of ability to judge distances that can lead to under- oder overshoot in grasping movements), and dysdiadochokinesia (inability to perform rapid movements requiring antagonizing muscle groups to be switched on and off repeatedly).",
+        "parents": [
+            "e884ceb8-52bc-4680-bf63-69e523c13f02"
+        ],
+        "last_modified": {
+            "date_modified": "2020-07-21T17:59:45.706706+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "slim_terms": [
+            "cfa14e52-2ef2-46bc-ac5d-cd6bbf76942c"
+        ],
+        "schema_version": "1",
+        "status": "released",
+        "date_created": "2020-07-21T17:32:49.606613+00:00",
+        "uuid": "1d5571e9-f0d6-4cf4-8d58-678754d1043d",
+        "phenotype_name": "Ataxia",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "dbxrefs": [
+            "MSH:D002524",
+            "SNOMEDCT_US:85102008",
+            "UMLS:C0007758"
+        ],
+        "hpo_url": "http://purl.obolibrary.org/obo/HP_0001251",
+        "synonyms": [
+            "Cerebellar ataxia"
+        ],
+        "hpo_id": "HP:0001251"
+    },
+    {
+        "definition": "The presence of chronic increased pressure in the systemic arterial system.",
+        "parents": [
+            "722515d1-cae1-4b98-a6ef-02efdc5e3b7e"
+        ],
+        "last_modified": {
+            "date_modified": "2020-07-21T17:59:45.931469+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "slim_terms": [
+            "7690f700-985b-41c2-9082-8a46a5b08499"
+        ],
+        "schema_version": "1",
+        "status": "released",
+        "date_created": "2020-07-21T17:32:50.107808+00:00",
+        "uuid": "f5ff7c15-e35a-41f5-9ded-cce307940ea1",
+        "phenotype_name": "Hypertension",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "dbxrefs": [
+            "SNOMEDCT_US:24184005",
+            "UMLS:C0497247",
+            "UMLS:C0020538",
+            "MSH:D006973",
+            "SNOMEDCT_US:38341003"
+        ],
+        "hpo_url": "http://purl.obolibrary.org/obo/HP_0000822",
+        "synonyms": [
+            "Systemic hypertension"
+        ],
+        "hpo_id": "HP:0000822"
+    },
+    {
+        "definition": "Abnormal (retrograde) movement of urine from the bladder into ureters or kidneys related to inadequacy of the valvular mechanism at the ureterovesicular junction or other causes.",
+        "parents": [
+            "46c9c67e-34c8-42b0-ba64-c2a909c0e1ce",
+            "ad0f5089-67f4-4eaf-8549-0b89b6f5400b"
+        ],
+        "last_modified": {
+            "date_modified": "2020-07-21T17:59:46.021553+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "slim_terms": [
+            "d4bf685e-87a2-4642-8a9d-0e6916e1f673"
+        ],
+        "schema_version": "1",
+        "status": "released",
+        "date_created": "2020-07-21T17:32:50.357811+00:00",
+        "uuid": "ec93dc91-1a7d-4969-9773-0168e7126579",
+        "phenotype_name": "Vesicoureteral reflux",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "dbxrefs": [
+            "MSH:D014718",
+            "UMLS:C0042580",
+            "SNOMEDCT_US:197811007",
+            "Fyler:4510"
+        ],
+        "hpo_url": "http://purl.obolibrary.org/obo/HP_0000076",
+        "synonyms": [
+            "Vesicoureteric reflux",
+            "Ureteric reflux",
+            "Ureteral reflux"
+        ],
+        "hpo_id": "HP:0000076"
+    },
+    {
+        "definition": "A degree of language development that is significantly below the norm for a child of a specified age.",
+        "parents": [
+            "cee16299-e22b-4cf0-aade-c27a86bd1031"
+        ],
+        "last_modified": {
+            "date_modified": "2020-07-21T17:59:46.118084+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "slim_terms": [
+            "cfa14e52-2ef2-46bc-ac5d-cd6bbf76942c"
+        ],
+        "schema_version": "1",
+        "status": "released",
+        "date_created": "2020-07-21T17:32:50.741093+00:00",
+        "uuid": "eacead00-33be-437d-96df-a8c311d9a9df",
+        "phenotype_name": "Delayed speech and language development",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "dbxrefs": [
+            "SNOMEDCT_US:29164008",
+            "UMLS:C0233715",
+            "SNOMEDCT_US:62415009",
+            "SNOMEDCT_US:162294008",
+            "UMLS:C0241210",
+            "MSH:D007805",
+            "UMLS:C0454644",
+            "SNOMEDCT_US:229721007",
+            "UMLS:C0023012"
+        ],
+        "hpo_url": "http://purl.obolibrary.org/obo/HP_0000750",
+        "synonyms": [
+            "Speech delay",
+            "Impaired speech and language development",
+            "Delayed speech",
+            "Language delayed",
+            "Delayed speech development",
+            "Deficiency of speech development",
+            "Delayed speech acquisition",
+            "Impaired speech development",
+            "Language delay",
+            "Speech and language difficulties",
+            "Delayed language development",
+            "Late-onset speech development",
+            "Speech and language delay",
+            "Delayed speech and language development",
+            "Language development deficit",
+            "Poor language development"
+        ],
+        "hpo_id": "HP:0000750"
+    },
+    {
+        "definition": "Any structural abnormality of a lingual artery.",
+        "parents": [
+            "a8ea9bab-b4a1-416d-8a77-a4461678ffcc",
+            "cce71ae5-dd30-4315-948d-86e63da9737b",
+            "d4268e08-ef18-4e6f-9a85-c784890a21c7"
+        ],
+        "last_modified": {
+            "date_modified": "2020-07-21T17:59:46.249734+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "slim_terms": [
+            "16c0b141-183d-42cd-80f1-8080434d51af",
+            "7690f700-985b-41c2-9082-8a46a5b08499"
+        ],
+        "schema_version": "1",
+        "status": "released",
+        "date_created": "2020-07-21T17:32:51.024929+00:00",
+        "uuid": "ea6f1e0d-274d-450f-b3cf-6d1d6175c0d7",
+        "phenotype_name": "Abnormal lingual artery morphology",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "dbxrefs": [
+            "UMLS:C4073281"
+        ],
+        "hpo_url": "http://purl.obolibrary.org/obo/HP_3000074",
+        "synonyms": [
+            "Abnormality of lingual artery"
+        ],
+        "hpo_id": "HP:3000074"
+    },
+    {
+        "parents": [
+            "477f3e02-d389-4269-a6b8-db7d7d701e2e"
+        ],
+        "last_modified": {
+            "date_modified": "2020-07-21T17:59:46.373638+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "slim_terms": [
+            "cfa14e52-2ef2-46bc-ac5d-cd6bbf76942c"
+        ],
+        "schema_version": "1",
+        "status": "released",
+        "date_created": "2020-07-21T17:32:51.242276+00:00",
+        "uuid": "e884ceb8-52bc-4680-bf63-69e523c13f02",
+        "phenotype_name": "Abnormality of coordination",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "dbxrefs": [
+            "UMLS:C4023353"
+        ],
+        "hpo_url": "http://purl.obolibrary.org/obo/HP_0011443",
+        "synonyms": [
+            "Coordination issue",
+            "Abnormality of coordination"
+        ],
+        "hpo_id": "HP:0011443"
+    },
+    {
+        "definition": "Impairment of certain skills such as reading or writing, coordination, self-control, or attention that interfere with the ability to learn. The impairment is not related to a global deficiency of intelligence.",
+        "parents": [
+            "b89ade3e-4dbc-4369-841a-511d4c2ff060"
+        ],
+        "last_modified": {
+            "date_modified": "2020-07-21T17:59:46.494828+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "slim_terms": [
+            "cfa14e52-2ef2-46bc-ac5d-cd6bbf76942c"
+        ],
+        "schema_version": "1",
+        "status": "released",
+        "date_created": "2020-07-21T17:32:51.476910+00:00",
+        "uuid": "e79b3b03-fecf-42ac-87fe-de38c8f6df53",
+        "phenotype_name": "Specific learning disability",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "dbxrefs": [
+            "UMLS:C4025790"
+        ],
+        "hpo_url": "http://purl.obolibrary.org/obo/HP_0001328",
+        "hpo_id": "HP:0001328"
+    },
+    {
+        "phenotype_name": "Abnormality of the nervous system",
+        "date_created": "2020-07-15T02:26:32.054765+00:00",
+        "is_slim_for": "Phenotypic abnormality",
+        "last_modified": {
+            "date_modified": "2020-07-15T02:26:34.882278+00:00",
+            "modified_by": "3202fd57-44d2-44fb-a131-afb1e43d8ae5"
+        },
+        "schema_version": "1",
+        "hpo_url": "http://purl.obolibrary.org/obo/HP_0000707",
+        "status": "released",
+        "hpo_id": "HP:0000707",
+        "uuid": "cfa14e52-2ef2-46bc-ac5d-cd6bbf76942c"
+    },
+    {
+        "parents": [
+            "b89ade3e-4dbc-4369-841a-511d4c2ff060"
+        ],
+        "last_modified": {
+            "date_modified": "2020-07-21T17:59:46.590829+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "slim_terms": [
+            "cfa14e52-2ef2-46bc-ac5d-cd6bbf76942c"
+        ],
+        "schema_version": "1",
+        "status": "released",
+        "date_created": "2020-07-21T17:32:51.675314+00:00",
+        "uuid": "cee16299-e22b-4cf0-aade-c27a86bd1031",
+        "phenotype_name": "Neurodevelopmental delay",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "dbxrefs": [
+            "UMLS:C4022738"
+        ],
+        "hpo_url": "http://purl.obolibrary.org/obo/HP_0012758",
+        "hpo_id": "HP:0012758"
+    },
+    {
+        "definition": "An increased concentration of cholesterol in the blood.",
+        "parents": [
+            "1aefad8f-2dd3-4670-aea5-84ef842fe6c6"
+        ],
+        "last_modified": {
+            "date_modified": "2020-07-21T17:59:46.668953+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "slim_terms": [
+            "82ddd4b7-23de-4d36-931d-e2e115334f26"
+        ],
+        "schema_version": "1",
+        "status": "released",
+        "date_created": "2020-07-21T17:32:51.891857+00:00",
+        "uuid": "b814493e-d54d-4aeb-a3ce-fda6e94f6d57",
+        "phenotype_name": "Hypercholesterolemia",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "dbxrefs": [
+            "SNOMEDCT_US:166830008",
+            "SNOMEDCT_US:13644009",
+            "UMLS:C0595929",
+            "UMLS:C0020443",
+            "MSH:D006937"
+        ],
+        "hpo_url": "http://purl.obolibrary.org/obo/HP_0003124",
+        "synonyms": [
+            "Increased total cholesterol",
+            "Elevated serum cholesterol",
+            "Elevated total cholesterol"
+        ],
+        "hpo_id": "HP:0003124"
+    },
+    {
+        "definition": "A type of diabetes mellitus initially characterized by insulin resistance and hyperinsulinemia and subsequently by glucose interolerance and hyperglycemia.",
+        "parents": [
+            "48f33cfb-3ec9-4d81-a861-984862014d2f"
+        ],
+        "last_modified": {
+            "date_modified": "2020-07-21T17:59:46.749566+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "slim_terms": [
+            "2a0ccce5-5edf-4777-910a-cacd3c71c5f6",
+            "82ddd4b7-23de-4d36-931d-e2e115334f26"
+        ],
+        "schema_version": "1",
+        "status": "released",
+        "date_created": "2020-07-21T17:32:52.137102+00:00",
+        "uuid": "afdca5e6-6e27-4c43-a731-42acdfa39ea6",
+        "phenotype_name": "Type II diabetes mellitus",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "dbxrefs": [
+            "SNOMEDCT_US:44054006",
+            "MSH:D003924",
+            "UMLS:C0011860"
+        ],
+        "hpo_url": "http://purl.obolibrary.org/obo/HP_0005978",
+        "synonyms": [
+            "Non-insulin dependent diabetes",
+            "Noninsulin-dependent diabetes",
+            "Type II diabetes",
+            "NIDDM diabetes mellitus",
+            "Type 2 diabetes",
+            "Noninsulin dependent diabetes mellitus",
+            "Diabetes mellitus, noninsulin-dependent",
+            "NIDDM",
+            "Diabetes mellitus Type II"
+        ],
+        "hpo_id": "HP:0005978"
+    },
+    {
+        "definition": "A chronic condition in which the pancreas produces little or no insulin. Type I diabetes mellitus is manifested by the sudden onset of severe hyperglycemia with rapid progression to diabetic ketoacidosis unless treated with insulin.",
+        "parents": [
+            "48f33cfb-3ec9-4d81-a861-984862014d2f"
+        ],
+        "last_modified": {
+            "date_modified": "2020-07-21T17:59:46.828340+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "slim_terms": [
+            "2a0ccce5-5edf-4777-910a-cacd3c71c5f6",
+            "82ddd4b7-23de-4d36-931d-e2e115334f26"
+        ],
+        "schema_version": "1",
+        "status": "released",
+        "date_created": "2020-07-21T17:32:52.354754+00:00",
+        "uuid": "a77cebe6-bdee-4626-ac34-47dd070a9468",
+        "phenotype_name": "Type I diabetes mellitus",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "dbxrefs": [
+            "MSH:D003922",
+            "UMLS:C0011854",
+            "SNOMEDCT_US:46635009"
+        ],
+        "hpo_url": "http://purl.obolibrary.org/obo/HP_0100651",
+        "synonyms": [
+            "Juvenile diabetes mellitus",
+            "Type 1 diabetes",
+            "Diabetes mellitus Type I",
+            "Type I diabetes"
+        ],
+        "hpo_id": "HP:0100651"
+    },
+    {
+        "definition": "Underdevelopment of the external ear.",
+        "parents": [
+            "235e1372-55c2-435e-b62c-c66c6dd01598",
+            "010ad287-9a2c-4b6a-9a2f-ae2f86260f84"
+        ],
+        "last_modified": {
+            "date_modified": "2020-07-21T17:59:47.104481+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "slim_terms": [
+            "ac3ff33f-b57a-4054-b158-4e669afe5816"
+        ],
+        "schema_version": "1",
+        "status": "released",
+        "date_created": "2020-07-21T17:32:53.033696+00:00",
+        "uuid": "4fac7a16-e6dd-42e3-914b-c8fed305dc5d",
+        "phenotype_name": "Microtia",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "dbxrefs": [
+            "MSH:D065817",
+            "SNOMEDCT_US:35045004",
+            "UMLS:C0152423"
+        ],
+        "hpo_url": "http://purl.obolibrary.org/obo/HP_0008551",
+        "synonyms": [
+            "Hypoplasia of the external ear",
+            "Hypoplastic ears",
+            "Small pinnae",
+            "Hypoplastic pinna",
+            "Small ears",
+            "Bilateral microtia",
+            "Underdeveloped ears"
+        ],
+        "hpo_id": "HP:0008551"
+    },
+    {
+        "definition": "An early onset of puberty, in this case early does not refer to precocious.",
+        "parents": [
+            "16d9ffa5-6c5b-4c0f-adf5-65be9645438f"
+        ],
+        "last_modified": {
+            "date_modified": "2020-07-21T17:59:47.201016+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "slim_terms": [
+            "2a0ccce5-5edf-4777-910a-cacd3c71c5f6"
+        ],
+        "schema_version": "1",
+        "status": "released",
+        "date_created": "2020-07-21T17:32:53.250107+00:00",
+        "uuid": "4d2f9699-f86f-4ae4-99ad-18b9000f79c8",
+        "phenotype_name": "Early onset of sexual maturation",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "dbxrefs": [
+            "UMLS:C4022392"
+        ],
+        "hpo_url": "http://purl.obolibrary.org/obo/HP_0100000",
+        "synonyms": [
+            "Early onset of sexual maturation"
+        ],
+        "hpo_id": "HP:0100000"
+    },
+    {
+        "definition": "One or both of the leaflets (cusps) of the mitral valve bulges back into the left atrium upon contraction of the left ventricle.",
+        "parents": [
+            "3c294753-0371-41cb-845a-c81a48c17384"
+        ],
+        "last_modified": {
+            "date_modified": "2020-07-21T17:59:47.299325+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "slim_terms": [
+            "7690f700-985b-41c2-9082-8a46a5b08499"
+        ],
+        "schema_version": "1",
+        "status": "released",
+        "date_created": "2020-07-21T17:32:53.515958+00:00",
+        "uuid": "42ceec48-0001-49a9-adc9-a8a256fa9710",
+        "phenotype_name": "Mitral valve prolapse",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "dbxrefs": [
+            "UMLS:C0026267",
+            "MSH:D008945",
+            "SNOMEDCT_US:8074002",
+            "SNOMEDCT_US:409712001",
+            "Fyler:1533"
+        ],
+        "hpo_url": "http://purl.obolibrary.org/obo/HP_0001634",
+        "hpo_id": "HP:0001634"
+    },
+    {
+        "phenotype_name": "Abnormality of the endocrine system",
+        "date_created": "2020-07-15T02:26:31.615642+00:00",
+        "is_slim_for": "Phenotypic abnormality",
+        "last_modified": {
+            "date_modified": "2020-07-15T02:26:34.659386+00:00",
+            "modified_by": "3202fd57-44d2-44fb-a131-afb1e43d8ae5"
+        },
+        "schema_version": "1",
+        "hpo_url": "http://purl.obolibrary.org/obo/HP_0000818",
+        "status": "released",
+        "hpo_id": "HP:0000818",
+        "uuid": "2a0ccce5-5edf-4777-910a-cacd3c71c5f6"
+    },
+    {
+        "definition": "Any structural anomaly of the mouth, which is also known as the oral cavity.",
+        "parents": [
+            "f80472c6-538b-4501-be0a-cfe2995536f1"
+        ],
+        "last_modified": {
+            "date_modified": "2020-07-21T17:59:47.408233+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "slim_terms": [
+            "16c0b141-183d-42cd-80f1-8080434d51af"
+        ],
+        "schema_version": "1",
+        "status": "released",
+        "date_created": "2020-07-21T17:32:53.751481+00:00",
+        "uuid": "2257cd3e-77ef-4a70-80cf-d3ac716b2865",
+        "phenotype_name": "Abnormal oral morphology",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "hpo_url": "http://purl.obolibrary.org/obo/HP_0031816",
+        "hpo_id": "HP:0031816"
+    },
+    {
+        "definition": "An abnormally increased chloride concentration in the blood.",
+        "parents": [
+            "dcb583e5-fc24-45c2-9cf5-e497834622ab"
+        ],
+        "last_modified": {
+            "date_modified": "2020-07-21T17:59:47.506397+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "slim_terms": [
+            "82ddd4b7-23de-4d36-931d-e2e115334f26"
+        ],
+        "schema_version": "1",
+        "status": "released",
+        "date_created": "2020-07-21T17:32:53.998310+00:00",
+        "uuid": "1f71177f-a21f-4420-a48f-3784807c8a83",
+        "phenotype_name": "Hyperchloremia",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "dbxrefs": [
+            "UMLS:C0085679",
+            "SNOMEDCT_US:74450001"
+        ],
+        "hpo_url": "http://purl.obolibrary.org/obo/HP_0011423",
+        "hpo_id": "HP:0011423"
+    },
+    {
+        "phenotype_name": "Abnormality of head or neck",
+        "date_created": "2020-07-15T02:26:31.001879+00:00",
+        "is_slim_for": "Phenotypic abnormality",
+        "last_modified": {
+            "date_modified": "2020-07-15T02:26:34.365091+00:00",
+            "modified_by": "3202fd57-44d2-44fb-a131-afb1e43d8ae5"
+        },
+        "schema_version": "1",
+        "hpo_url": "http://purl.obolibrary.org/obo/HP_0000152",
+        "status": "released",
+        "hpo_id": "HP:0000152",
+        "uuid": "16c0b141-183d-42cd-80f1-8080434d51af"
+    },
+    {
+        "definition": "Recurrent attacks of acute inflammatory arthritis of a joint or set of joints caused by elevated levels of uric acid in the blood which crystallize and are deposited in joints, tendons, and surrounding tissues.",
+        "parents": [
+            "3547ae72-d9ae-4f1f-a6c3-657ab4760587"
+        ],
+        "last_modified": {
+            "date_modified": "2020-07-21T17:59:46.907681+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "slim_terms": [
+            "1262c802-99bc-4d04-a2b4-910115662bdd"
+        ],
+        "schema_version": "1",
+        "status": "released",
+        "date_created": "2020-07-21T17:32:52.572227+00:00",
+        "uuid": "8f362140-7b93-4008-8c10-e5744262ae03",
+        "phenotype_name": "Gout",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "dbxrefs": [
+            "SNOMEDCT_US:170733007",
+            "MSH:D015210",
+            "MSH:D006073",
+            "SNOMEDCT_US:48440001",
+            "UMLS:C0003868",
+            "UMLS:C0018099",
+            "SNOMEDCT_US:90560007",
+            "SNOMEDCT_US:190828008"
+        ],
+        "hpo_url": "http://purl.obolibrary.org/obo/HP_0001997",
+        "synonyms": [
+            "Gouty arthritis"
+        ],
+        "hpo_id": "HP:0001997"
+    },
+    {
+        "definition": "Asthma is characterized by increased responsiveness of the tracheobronchial tree to multiple stimuli, leading to narrowing of the air passages with resultant dyspnea, cough, and wheezing.",
+        "parents": [
+            "5ba4df5a-a7b1-4a0a-9144-e9b15b3906f4",
+            "eac0a561-8574-400c-a03b-b885b62edf13"
+        ],
+        "last_modified": {
+            "date_modified": "2020-07-21T17:59:46.997105+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "slim_terms": [
+            "304c1c04-7e26-495c-8b8a-ee3c423cea78",
+            "22f67013-0d5a-4fec-935e-94cec7d76d9a"
+        ],
+        "schema_version": "1",
+        "status": "released",
+        "date_created": "2020-07-21T17:32:52.797368+00:00",
+        "uuid": "614604a1-9a4e-4724-b027-560f5e45fc79",
+        "phenotype_name": "Asthma",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "dbxrefs": [
+            "SNOMEDCT_US:991000119106",
+            "UMLS:C3714497",
+            "MSH:D001249",
+            "UMLS:C0004096",
+            "SNOMEDCT_US:195967001"
+        ],
+        "hpo_url": "http://purl.obolibrary.org/obo/HP_0002099",
+        "synonyms": [
+            "Asthma",
+            "Bronchial asthma"
+        ],
+        "hpo_id": "HP:0002099"
+    },
+    {
+        "definition": "An abnormality of the mouth.",
+        "parents": [
+            "969d84ae-8ae8-4bf8-a082-1013089ab0ee"
+        ],
+        "last_modified": {
+            "date_modified": "2020-07-21T17:59:47.664625+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "slim_terms": [
+            "16c0b141-183d-42cd-80f1-8080434d51af"
+        ],
+        "schema_version": "1",
+        "status": "released",
+        "date_created": "2020-07-21T17:32:54.292962+00:00",
+        "uuid": "f80472c6-538b-4501-be0a-cfe2995536f1",
+        "phenotype_name": "Abnormality of the mouth",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "dbxrefs": [
+            "UMLS:C0026633",
+            "SNOMEDCT_US:128334002",
+            "MSH:D009056"
+        ],
+        "hpo_url": "http://purl.obolibrary.org/obo/HP_0000153",
+        "synonyms": [
+            "Abnormal mouth",
+            "Abnormality of the mouth"
+        ],
+        "hpo_id": "HP:0000153"
+    },
+    {
+        "definition": "Immunological states where the immune system produces harmful responses upon reexposure to sensitising antigens.",
+        "parents": [
+            "57f190db-ae7e-453a-a672-c20ccc59396f"
+        ],
+        "last_modified": {
+            "date_modified": "2020-07-21T17:59:47.749641+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "slim_terms": [
+            "304c1c04-7e26-495c-8b8a-ee3c423cea78"
+        ],
+        "schema_version": "1",
+        "status": "released",
+        "date_created": "2020-07-21T17:32:54.590237+00:00",
+        "uuid": "eac0a561-8574-400c-a03b-b885b62edf13",
+        "phenotype_name": "Immunologic hypersensitivity",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "dbxrefs": [
+            "UMLS:C0237653"
+        ],
+        "hpo_url": "http://purl.obolibrary.org/obo/HP_0100326",
+        "hpo_id": "HP:0100326"
+    },
+    {
+        "definition": "An abnormality of chloride homeostasis or concentration in the body.",
+        "parents": [
+            "a32a1ef1-2cfe-47f6-80b1-fe6d8d3377f3"
+        ],
+        "last_modified": {
+            "date_modified": "2020-07-21T17:59:47.852357+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "slim_terms": [
+            "82ddd4b7-23de-4d36-931d-e2e115334f26"
+        ],
+        "schema_version": "1",
+        "status": "released",
+        "date_created": "2020-07-21T17:32:54.824644+00:00",
+        "uuid": "dcb583e5-fc24-45c2-9cf5-e497834622ab",
+        "phenotype_name": "Abnormal blood chloride concentration",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "dbxrefs": [
+            "UMLS:C4023367"
+        ],
+        "hpo_url": "http://purl.obolibrary.org/obo/HP_0011422",
+        "synonyms": [
+            "Abnormality of chloride homeostasis",
+            "Abnormal blood Cl concentration",
+            "Abnormal blood Cl- concentration"
+        ],
+        "hpo_id": "HP:0011422"
+    },
+    {
+        "phenotype_name": "Abnormality of the genitourinary system",
+        "date_created": "2020-07-15T02:26:31.750615+00:00",
+        "is_slim_for": "Phenotypic abnormality",
+        "last_modified": {
+            "date_modified": "2020-07-15T02:26:34.739658+00:00",
+            "modified_by": "3202fd57-44d2-44fb-a131-afb1e43d8ae5"
+        },
+        "schema_version": "1",
+        "hpo_url": "http://purl.obolibrary.org/obo/HP_0000119",
+        "status": "released",
+        "hpo_id": "HP:0000119",
+        "uuid": "d4bf685e-87a2-4642-8a9d-0e6916e1f673"
+    },
+    {
+        "definition": "An abnormality of a blood vessel of the head, including branches of the arterial and venous systems of the head.",
+        "parents": [
+            "44af3a7a-b28f-443e-86bf-e5831ad159f5",
+            "54fbcc65-123f-4458-932c-f399cf921139"
+        ],
+        "last_modified": {
+            "date_modified": "2020-07-21T17:59:47.934310+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "slim_terms": [
+            "16c0b141-183d-42cd-80f1-8080434d51af",
+            "7690f700-985b-41c2-9082-8a46a5b08499"
+        ],
+        "schema_version": "1",
+        "status": "released",
+        "date_created": "2020-07-21T17:32:55.060977+00:00",
+        "uuid": "d4268e08-ef18-4e6f-9a85-c784890a21c7",
+        "phenotype_name": "Abnormality of head blood vessel",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "dbxrefs": [
+            "UMLS:C4073244"
+        ],
+        "hpo_url": "http://purl.obolibrary.org/obo/HP_3000036",
+        "synonyms": [
+            "Abnormality of blood vessel of head",
+            "Abnormality of head blood vessel",
+            "Abnormality of vasculature of head"
+        ],
+        "hpo_id": "HP:3000036"
+    },
+    {
+        "definition": "Any structural anomaly of the tongue.",
+        "parents": [
+            "34d76c2f-f087-4af1-aff7-db49822ae00d"
+        ],
+        "last_modified": {
+            "date_modified": "2020-07-21T17:59:48.049529+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "slim_terms": [
+            "16c0b141-183d-42cd-80f1-8080434d51af"
+        ],
+        "schema_version": "1",
+        "status": "released",
+        "date_created": "2020-07-21T17:32:55.278746+00:00",
+        "uuid": "cce71ae5-dd30-4315-948d-86e63da9737b",
+        "phenotype_name": "Abnormal tongue morphology",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "dbxrefs": [
+            "UMLS:C4280755"
+        ],
+        "hpo_url": "http://purl.obolibrary.org/obo/HP_0030809",
+        "hpo_id": "HP:0030809"
+    },
+    {
+        "definition": "A deviation from normal of the neurological development of a child, which may include any or all of the aspects of the development of personal, social, gross or fine motor, and cognitive abilities.",
+        "parents": [
+            "0dcfc7c1-3f6c-49f6-81ed-bc0d64e5426c"
+        ],
+        "last_modified": {
+            "date_modified": "2020-07-21T17:59:48.166589+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "slim_terms": [
+            "cfa14e52-2ef2-46bc-ac5d-cd6bbf76942c"
+        ],
+        "schema_version": "1",
+        "status": "released",
+        "date_created": "2020-07-21T17:32:55.615943+00:00",
+        "uuid": "b89ade3e-4dbc-4369-841a-511d4c2ff060",
+        "phenotype_name": "Neurodevelopmental abnormality",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "dbxrefs": [
+            "UMLS:C4022737"
+        ],
+        "hpo_url": "http://purl.obolibrary.org/obo/HP_0012759",
+        "hpo_id": "HP:0012759"
+    },
+    {
+        "definition": "A functional abnormality of the ureter. The ureter is the duct by which urine passes from the kidney to the bladder.",
+        "parents": [
+            "60fcacb5-bf5c-4905-875a-889ddb0faeff"
+        ],
+        "last_modified": {
+            "date_modified": "2020-07-21T17:59:48.256323+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "slim_terms": [
+            "d4bf685e-87a2-4642-8a9d-0e6916e1f673"
+        ],
+        "schema_version": "1",
+        "status": "released",
+        "date_created": "2020-07-21T17:32:55.889178+00:00",
+        "uuid": "ad0f5089-67f4-4eaf-8549-0b89b6f5400b",
+        "phenotype_name": "Abnormal ureter physiology",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "hpo_url": "http://purl.obolibrary.org/obo/HP_0025634",
+        "hpo_id": "HP:0025634"
+    },
+    {
+        "phenotype_name": "Abnormality of the ear",
+        "date_created": "2020-07-15T02:26:31.546208+00:00",
+        "is_slim_for": "Phenotypic abnormality",
+        "last_modified": {
+            "date_modified": "2020-07-15T02:26:34.624815+00:00",
+            "modified_by": "3202fd57-44d2-44fb-a131-afb1e43d8ae5"
+        },
+        "schema_version": "1",
+        "hpo_url": "http://purl.obolibrary.org/obo/HP_0000598",
+        "status": "released",
+        "hpo_id": "HP:0000598",
+        "uuid": "ac3ff33f-b57a-4054-b158-4e669afe5816"
+    },
+    {
+        "definition": "An abnormality of the systemic arterial tree, which consists of the aorta and other systemic arteries.",
+        "parents": [
+            "894cb09a-8e4c-4b9e-b2e3-9437cae6f019"
+        ],
+        "last_modified": {
+            "date_modified": "2020-07-21T17:59:48.353757+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "slim_terms": [
+            "7690f700-985b-41c2-9082-8a46a5b08499"
+        ],
+        "schema_version": "1",
+        "status": "released",
+        "date_created": "2020-07-21T17:32:56.126080+00:00",
+        "uuid": "a8ea9bab-b4a1-416d-8a77-a4461678ffcc",
+        "phenotype_name": "Abnormal systemic arterial morphology",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "dbxrefs": [
+            "UMLS:C0151489",
+            "Fyler:2600",
+            "UMLS:C4021205",
+            "SNOMEDCT_US:234119001"
+        ],
+        "hpo_url": "http://purl.obolibrary.org/obo/HP_0011004",
+        "synonyms": [
+            "Systemic artery abnormality",
+            "Abnormality of the systemic arterial tree",
+            "Abnormal systemic artery morphology"
+        ],
+        "hpo_id": "HP:0011004"
+    },
+    {
+        "phenotype_name": "Abnormality of metabolism/homeostasis",
+        "date_created": "2020-07-15T02:26:31.148115+00:00",
+        "is_slim_for": "Phenotypic abnormality",
+        "last_modified": {
+            "date_modified": "2020-07-15T02:26:34.431213+00:00",
+            "modified_by": "3202fd57-44d2-44fb-a131-afb1e43d8ae5"
+        },
+        "schema_version": "1",
+        "hpo_url": "http://purl.obolibrary.org/obo/HP_0001939",
+        "status": "released",
+        "hpo_id": "HP:0001939",
+        "uuid": "82ddd4b7-23de-4d36-931d-e2e115334f26"
+    },
+    {
+        "phenotype_name": "Abnormality of the cardiovascular system",
+        "date_created": "2020-07-15T02:26:31.410653+00:00",
+        "is_slim_for": "Phenotypic abnormality",
+        "last_modified": {
+            "date_modified": "2020-07-15T02:26:34.536717+00:00",
+            "modified_by": "3202fd57-44d2-44fb-a131-afb1e43d8ae5"
+        },
+        "schema_version": "1",
+        "hpo_url": "http://purl.obolibrary.org/obo/HP_0001626",
+        "status": "released",
+        "hpo_id": "HP:0001626",
+        "uuid": "7690f700-985b-41c2-9082-8a46a5b08499"
+    },
+    {
+        "definition": "Abnormal increase in blood pressure. An individual measurement of increased blood pressure does not necessarily imply hypertension. In practical terms, multiple measurements are recommended to diagnose the presence of hypertension.",
+        "parents": [
+            "b6426e04-cc9d-4385-8944-993268180726"
+        ],
+        "last_modified": {
+            "date_modified": "2020-07-21T17:59:48.443596+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "slim_terms": [
+            "7690f700-985b-41c2-9082-8a46a5b08499"
+        ],
+        "schema_version": "1",
+        "status": "released",
+        "date_created": "2020-07-21T17:32:56.421064+00:00",
+        "uuid": "722515d1-cae1-4b98-a6ef-02efdc5e3b7e",
+        "phenotype_name": "Increased blood pressure",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "hpo_url": "http://purl.obolibrary.org/obo/HP_0032263",
+        "synonyms": [
+            "Increased BP"
+        ],
+        "hpo_id": "HP:0032263"
+    },
+    {
+        "parents": [
+            "22f67013-0d5a-4fec-935e-94cec7d76d9a"
+        ],
+        "last_modified": {
+            "date_modified": "2020-07-21T17:59:48.558430+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "slim_terms": [
+            "22f67013-0d5a-4fec-935e-94cec7d76d9a"
+        ],
+        "schema_version": "1",
+        "status": "released",
+        "date_created": "2020-07-21T17:32:56.647876+00:00",
+        "uuid": "5ba4df5a-a7b1-4a0a-9144-e9b15b3906f4",
+        "phenotype_name": "Functional respiratory abnormality",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "dbxrefs": [
+            "UMLS:C4025677",
+            "Fyler:4200"
+        ],
+        "hpo_url": "http://purl.obolibrary.org/obo/HP_0002795",
+        "synonyms": [
+            "Functional respiratory abnormality",
+            "Abnormal respiration"
+        ],
+        "hpo_id": "HP:0002795"
+    },
+    {
+        "definition": "A group of abnormalities characterized by hyperglycemia and glucose intolerance.",
+        "parents": [
+            "2a0ccce5-5edf-4777-910a-cacd3c71c5f6",
+            "f9c4255f-aa07-4a9d-9c66-d98ccf67e1dd"
+        ],
+        "last_modified": {
+            "date_modified": "2020-07-21T17:59:48.640070+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "slim_terms": [
+            "2a0ccce5-5edf-4777-910a-cacd3c71c5f6",
+            "82ddd4b7-23de-4d36-931d-e2e115334f26"
+        ],
+        "schema_version": "1",
+        "status": "released",
+        "date_created": "2020-07-21T17:32:56.894163+00:00",
+        "uuid": "48f33cfb-3ec9-4d81-a861-984862014d2f",
+        "phenotype_name": "Diabetes mellitus",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "dbxrefs": [
+            "MSH:D003920",
+            "UMLS:C0011849",
+            "SNOMEDCT_US:73211009"
+        ],
+        "hpo_url": "http://purl.obolibrary.org/obo/HP_0000819",
+        "hpo_id": "HP:0000819"
+    },
+    {
+        "definition": "An anomaly of the control or production of movement in the central nervous system.",
+        "parents": [
+            "0dcfc7c1-3f6c-49f6-81ed-bc0d64e5426c"
+        ],
+        "last_modified": {
+            "date_modified": "2020-07-21T17:59:48.746610+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "slim_terms": [
+            "cfa14e52-2ef2-46bc-ac5d-cd6bbf76942c"
+        ],
+        "schema_version": "1",
+        "status": "released",
+        "date_created": "2020-07-21T17:32:57.129340+00:00",
+        "uuid": "477f3e02-d389-4269-a6b8-db7d7d701e2e",
+        "phenotype_name": "Abnormality of central motor function",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "dbxrefs": [
+            "UMLS:C4023354"
+        ],
+        "hpo_url": "http://purl.obolibrary.org/obo/HP_0011442",
+        "hpo_id": "HP:0011442"
+    },
+    {
+        "definition": "Dysfunction of the urinary bladder.",
+        "parents": [
+            "632ad692-8b1f-4f90-b5bd-60e4e27d4a1a"
+        ],
+        "last_modified": {
+            "date_modified": "2020-07-21T17:59:48.827856+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "slim_terms": [
+            "d4bf685e-87a2-4642-8a9d-0e6916e1f673"
+        ],
+        "schema_version": "1",
+        "status": "released",
+        "date_created": "2020-07-21T17:32:57.346654+00:00",
+        "uuid": "46c9c67e-34c8-42b0-ba64-c2a909c0e1ce",
+        "phenotype_name": "Functional abnormality of the bladder",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "dbxrefs": [
+            "UMLS:C3806583"
+        ],
+        "hpo_url": "http://purl.obolibrary.org/obo/HP_0000009",
+        "synonyms": [
+            "Poor bladder function"
+        ],
+        "hpo_id": "HP:0000009"
+    },
+    {
+        "definition": "Any structural anomaly of the mitral valve.",
+        "parents": [
+            "d7fa40cf-3423-4f5d-a794-9e00c842aab2"
+        ],
+        "last_modified": {
+            "date_modified": "2020-07-21T17:59:48.934567+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "slim_terms": [
+            "7690f700-985b-41c2-9082-8a46a5b08499"
+        ],
+        "schema_version": "1",
+        "status": "released",
+        "date_created": "2020-07-21T17:32:57.592027+00:00",
+        "uuid": "3c294753-0371-41cb-845a-c81a48c17384",
+        "phenotype_name": "Abnormal mitral valve morphology",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "dbxrefs": [
+            "UMLS:C4025759"
+        ],
+        "hpo_url": "http://purl.obolibrary.org/obo/HP_0001633",
+        "synonyms": [
+            "Abnormality of the mitral valve"
+        ],
+        "hpo_id": "HP:0001633"
+    },
+    {
+        "definition": "Inflammation of a joint.",
+        "parents": [
+            "41d013b9-f4e2-4387-bde3-b3e016fa92de"
+        ],
+        "last_modified": {
+            "date_modified": "2020-07-21T17:59:49.033290+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "slim_terms": [
+            "1262c802-99bc-4d04-a2b4-910115662bdd"
+        ],
+        "schema_version": "1",
+        "status": "released",
+        "date_created": "2020-07-21T17:32:57.788172+00:00",
+        "uuid": "3547ae72-d9ae-4f1f-a6c3-657ab4760587",
+        "phenotype_name": "Arthritis",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "dbxrefs": [
+            "MSH:D001168",
+            "SNOMEDCT_US:3723001",
+            "UMLS:C0003864"
+        ],
+        "hpo_url": "http://purl.obolibrary.org/obo/HP_0001369",
+        "synonyms": [
+            "Joint inflammation",
+            "Arthritis"
+        ],
+        "hpo_id": "HP:0001369"
+    },
+    {
+        "phenotype_name": "Abnormality of the immune system",
+        "date_created": "2020-07-15T02:26:31.822871+00:00",
+        "is_slim_for": "Phenotypic abnormality",
+        "last_modified": {
+            "date_modified": "2020-07-15T02:26:34.771216+00:00",
+            "modified_by": "3202fd57-44d2-44fb-a131-afb1e43d8ae5"
+        },
+        "schema_version": "1",
+        "hpo_url": "http://purl.obolibrary.org/obo/HP_0002715",
+        "status": "released",
+        "hpo_id": "HP:0002715",
+        "uuid": "304c1c04-7e26-495c-8b8a-ee3c423cea78"
+    },
+    {
+        "definition": "The presence of aplasia or developmental hypoplasia of all or part of the external ear.",
+        "parents": [
+            "91dca6da-88c7-46fc-b691-0b0d713e7e26",
+            "eca167c4-d5e0-46e1-8be8-863e8ed3a9bf"
+        ],
+        "last_modified": {
+            "date_modified": "2020-07-21T17:59:49.121965+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "slim_terms": [
+            "ac3ff33f-b57a-4054-b158-4e669afe5816"
+        ],
+        "schema_version": "1",
+        "status": "released",
+        "date_created": "2020-07-21T17:32:58.054421+00:00",
+        "uuid": "235e1372-55c2-435e-b62c-c66c6dd01598",
+        "phenotype_name": "Aplasia/Hypoplasia of the external ear",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "dbxrefs": [
+            "UMLS:C4024626"
+        ],
+        "hpo_url": "http://purl.obolibrary.org/obo/HP_0008772",
+        "synonyms": [
+            "Absent/underdeveloped external ear",
+            "Absent/small external ear"
+        ],
+        "hpo_id": "HP:0008772"
+    },
+    {
+        "phenotype_name": "Abnormality of the respiratory system",
+        "date_created": "2020-07-15T02:26:32.132330+00:00",
+        "is_slim_for": "Phenotypic abnormality",
+        "last_modified": {
+            "date_modified": "2020-07-15T02:26:34.914046+00:00",
+            "modified_by": "3202fd57-44d2-44fb-a131-afb1e43d8ae5"
+        },
+        "schema_version": "1",
+        "hpo_url": "http://purl.obolibrary.org/obo/HP_0002086",
+        "status": "released",
+        "hpo_id": "HP:0002086",
+        "uuid": "22f67013-0d5a-4fec-935e-94cec7d76d9a"
+    },
+    {
+        "definition": "Any deviation from the normal concentration of cholesterol in the blood circulation.",
+        "parents": [
+            "1dec75f8-38c4-48e1-995a-7c0c4be63a4f"
+        ],
+        "last_modified": {
+            "date_modified": "2020-07-21T17:59:49.210203+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "slim_terms": [
+            "82ddd4b7-23de-4d36-931d-e2e115334f26"
+        ],
+        "schema_version": "1",
+        "status": "released",
+        "date_created": "2020-07-21T17:32:58.261934+00:00",
+        "uuid": "1aefad8f-2dd3-4670-aea5-84ef842fe6c6",
+        "phenotype_name": "Abnormal circulating cholesterol concentration",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "dbxrefs": [
+            "UMLS:C4025656"
+        ],
+        "hpo_url": "http://purl.obolibrary.org/obo/HP_0003107",
+        "synonyms": [
+            "Abnormality of cholesterol metabolism",
+            "Abnormal cholesterol homeostasis"
+        ],
+        "hpo_id": "HP:0003107"
+    },
+    {
+        "parents": [
+            "2a0ccce5-5edf-4777-910a-cacd3c71c5f6"
+        ],
+        "last_modified": {
+            "date_modified": "2020-07-21T17:59:49.477268+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "slim_terms": [
+            "2a0ccce5-5edf-4777-910a-cacd3c71c5f6"
+        ],
+        "schema_version": "1",
+        "status": "released",
+        "date_created": "2020-07-21T17:32:58.745552+00:00",
+        "uuid": "16d9ffa5-6c5b-4c0f-adf5-65be9645438f",
+        "phenotype_name": "Puberty and gonadal disorders",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "dbxrefs": [
+            "UMLS:C4024685"
+        ],
+        "hpo_url": "http://purl.obolibrary.org/obo/HP_0008373",
+        "synonyms": [
+            "Puberty and gonadal disorders"
+        ],
+        "hpo_id": "HP:0008373"
+    },
+    {
+        "phenotype_name": "Abnormality of the skeletal system",
+        "date_created": "2020-07-15T02:26:32.200954+00:00",
+        "is_slim_for": "Phenotypic abnormality",
+        "last_modified": {
+            "date_modified": "2020-07-15T02:26:34.945788+00:00",
+            "modified_by": "3202fd57-44d2-44fb-a131-afb1e43d8ae5"
+        },
+        "schema_version": "1",
+        "hpo_url": "http://purl.obolibrary.org/obo/HP_0000924",
+        "status": "released",
+        "hpo_id": "HP:0000924",
+        "uuid": "1262c802-99bc-4d04-a2b4-910115662bdd"
+    },
+    {
+        "definition": "An abnormality of the pinna, which is also referred to as the auricle or external ear.",
+        "parents": [
+            "91dca6da-88c7-46fc-b691-0b0d713e7e26"
+        ],
+        "last_modified": {
+            "date_modified": "2020-07-21T17:59:49.586984+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "slim_terms": [
+            "ac3ff33f-b57a-4054-b158-4e669afe5816"
+        ],
+        "schema_version": "1",
+        "status": "released",
+        "date_created": "2020-07-21T17:32:58.995004+00:00",
+        "uuid": "010ad287-9a2c-4b6a-9a2f-ae2f86260f84",
+        "phenotype_name": "Abnormality of the pinna",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "dbxrefs": [
+            "UMLS:C0431483",
+            "UMLS:C0857379",
+            "SNOMEDCT_US:253255002"
+        ],
+        "hpo_url": "http://purl.obolibrary.org/obo/HP_0000377",
+        "synonyms": [
+            "Deformed auricles",
+            "Auricular malformation",
+            "Abnormally shaped ears",
+            "Deformed ears",
+            "Poorly defined conchae",
+            "Dysplastic ears",
+            "Malformed external ears",
+            "Malformed ears",
+            "Malformed auricles",
+            "Minor malformation of the auricles",
+            "Malformation of auricle",
+            "Abnormal form of ears"
+        ],
+        "hpo_id": "HP:0000377"
+    },
+    {
+        "definition": "The presence of aplasia or developmental hypoplasia of the ear.",
+        "parents": [
+            "306ee104-eb1c-4742-8899-938f9a008945"
+        ],
+        "last_modified": {
+            "date_modified": "2020-07-21T17:59:49.881419+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "slim_terms": [
+            "ac3ff33f-b57a-4054-b158-4e669afe5816"
+        ],
+        "schema_version": "1",
+        "status": "released",
+        "date_created": "2020-07-21T17:32:59.516517+00:00",
+        "uuid": "eca167c4-d5e0-46e1-8be8-863e8ed3a9bf",
+        "phenotype_name": "Aplasia/Hypoplasia of the ear",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "dbxrefs": [
+            "UMLS:C4024627"
+        ],
+        "hpo_url": "http://purl.obolibrary.org/obo/HP_0008771",
+        "synonyms": [
+            "Absent/small ear",
+            "Absent/underdeveloped ear"
+        ],
+        "hpo_id": "HP:0008771"
+    },
+    {
+        "definition": "Abnormality of the homeostasis (concentration) of a monoatomic ion.",
+        "parents": [
+            "e8a72192-c3c6-4873-89ff-470f51cb6536"
+        ],
+        "last_modified": {
+            "date_modified": "2020-07-21T17:59:50.580260+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "slim_terms": [
+            "82ddd4b7-23de-4d36-931d-e2e115334f26"
+        ],
+        "schema_version": "1",
+        "status": "released",
+        "date_created": "2020-07-21T17:33:00.477479+00:00",
+        "uuid": "a32a1ef1-2cfe-47f6-80b1-fe6d8d3377f3",
+        "phenotype_name": "Abnormal blood ion concentration",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "dbxrefs": [
+            "SNOMEDCT_US:237840007",
+            "UMLS:C4025654",
+            "UMLS:C1704431"
+        ],
+        "hpo_url": "http://purl.obolibrary.org/obo/HP_0003111",
+        "synonyms": [
+            "Electrolyte disorders",
+            "Abnormality of ion homeostasis"
+        ],
+        "hpo_id": "HP:0003111"
+    },
+    {
+        "definition": "An abnormality of the vasculature.",
+        "parents": [
+            "7690f700-985b-41c2-9082-8a46a5b08499"
+        ],
+        "last_modified": {
+            "date_modified": "2020-07-21T17:59:52.537055+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "slim_terms": [
+            "7690f700-985b-41c2-9082-8a46a5b08499"
+        ],
+        "schema_version": "1",
+        "status": "released",
+        "date_created": "2020-07-21T17:33:02.362157+00:00",
+        "uuid": "54fbcc65-123f-4458-932c-f399cf921139",
+        "phenotype_name": "Abnormality of the vasculature",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "dbxrefs": [
+            "UMLS:C0241657"
+        ],
+        "hpo_url": "http://purl.obolibrary.org/obo/HP_0002597",
+        "synonyms": [
+            "Abnormality of blood vessels",
+            "Abnormality of the vasculature",
+            "Vascular abnormalities"
+        ],
+        "hpo_id": "HP:0002597"
+    },
+    {
+        "definition": "An abnormality of the head.",
+        "parents": [
+            "16c0b141-183d-42cd-80f1-8080434d51af"
+        ],
+        "last_modified": {
+            "date_modified": "2020-07-21T17:59:52.625006+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "slim_terms": [
+            "16c0b141-183d-42cd-80f1-8080434d51af"
+        ],
+        "schema_version": "1",
+        "status": "released",
+        "date_created": "2020-07-21T17:33:02.623509+00:00",
+        "uuid": "44af3a7a-b28f-443e-86bf-e5831ad159f5",
+        "phenotype_name": "Abnormality of the head",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "dbxrefs": [
+            "UMLS:C4021812"
+        ],
+        "hpo_url": "http://purl.obolibrary.org/obo/HP_0000234",
+        "synonyms": [
+            "Abnormal head",
+            "Abnormality of the head",
+            "Head abnormality"
+        ],
+        "hpo_id": "HP:0000234"
+    },
+    {
+        "definition": "An abnormal structure or form of the joints, i.e., one or more of the articulations where two bones join.",
+        "parents": [
+            "6dda9547-489f-4e33-b9d1-f504f6e7df2e"
+        ],
+        "last_modified": {
+            "date_modified": "2020-07-21T17:59:52.726585+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "slim_terms": [
+            "1262c802-99bc-4d04-a2b4-910115662bdd"
+        ],
+        "schema_version": "1",
+        "status": "released",
+        "date_created": "2020-07-21T17:33:02.870433+00:00",
+        "uuid": "41d013b9-f4e2-4387-bde3-b3e016fa92de",
+        "phenotype_name": "Abnormal joint morphology",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "dbxrefs": [
+            "UMLS:C0240083",
+            "MSH:D007592",
+            "UMLS:C0022408",
+            "SNOMEDCT_US:399269003"
+        ],
+        "hpo_url": "http://purl.obolibrary.org/obo/HP_0001367",
+        "synonyms": [
+            "Abnormality of the joints",
+            "Anomaly of the joints",
+            "Abnormal shape of joints"
+        ],
+        "hpo_id": "HP:0001367"
+    },
+    {
+        "definition": "Any abnormality of the tongue.",
+        "parents": [
+            "70f0061b-346b-4450-9f53-bb8515935676"
+        ],
+        "last_modified": {
+            "date_modified": "2020-07-21T17:59:52.843696+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "slim_terms": [
+            "16c0b141-183d-42cd-80f1-8080434d51af"
+        ],
+        "schema_version": "1",
+        "status": "released",
+        "date_created": "2020-07-21T17:33:03.184892+00:00",
+        "uuid": "34d76c2f-f087-4af1-aff7-db49822ae00d",
+        "phenotype_name": "Abnormality of the tongue",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "dbxrefs": [
+            "UMLS:C0878638"
+        ],
+        "hpo_url": "http://purl.obolibrary.org/obo/HP_0000157",
+        "synonyms": [
+            "Lingual abnormality",
+            "Glossal abnormality",
+            "Abnormality of the tongue",
+            "Tongue abnormality",
+            "Abnormal tongue"
+        ],
+        "hpo_id": "HP:0000157"
+    },
+    {
+        "definition": "A functional anomaly of the nervous system.",
+        "parents": [
+            "cfa14e52-2ef2-46bc-ac5d-cd6bbf76942c"
+        ],
+        "last_modified": {
+            "date_modified": "2020-07-21T17:59:53.039205+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "slim_terms": [
+            "cfa14e52-2ef2-46bc-ac5d-cd6bbf76942c"
+        ],
+        "schema_version": "1",
+        "status": "released",
+        "date_created": "2020-07-21T17:33:03.789169+00:00",
+        "uuid": "0dcfc7c1-3f6c-49f6-81ed-bc0d64e5426c",
+        "phenotype_name": "Abnormality of nervous system physiology",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "dbxrefs": [
+            "UMLS:C4022811"
+        ],
+        "hpo_url": "http://purl.obolibrary.org/obo/HP_0012638",
+        "hpo_id": "HP:0012638"
+    },
+    {
+        "definition": "Glucose intolerance (GI) can be defined as dysglycemia that comprises both prediabetes and diabetes. It includes the conditions of impaired fasting glucose (IFG) and impaired glucose tolerance (IGT) and diabetes mellitus (DM).",
+        "parents": [
+            "176fe5d2-1641-46a5-9e00-73a10416c7b1"
+        ],
+        "last_modified": {
+            "date_modified": "2020-07-21T17:59:49.766760+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "slim_terms": [
+            "82ddd4b7-23de-4d36-931d-e2e115334f26"
+        ],
+        "schema_version": "1",
+        "status": "released",
+        "date_created": "2020-07-21T17:32:59.226886+00:00",
+        "uuid": "f9c4255f-aa07-4a9d-9c66-d98ccf67e1dd",
+        "phenotype_name": "Glucose intolerance",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "dbxrefs": [
+            "UMLS:C0235401"
+        ],
+        "hpo_url": "http://purl.obolibrary.org/obo/HP_0001952",
+        "synonyms": [
+            "Glucose intolerance",
+            "Abnormal glucose tolerance"
+        ],
+        "hpo_id": "HP:0001952"
+    },
+    {
+        "definition": "An abnormality of an atrioventricular valve.",
+        "parents": [
+            "452eb5df-5afb-413b-8d51-cf3cbe18838b"
+        ],
+        "last_modified": {
+            "date_modified": "2020-07-21T17:59:50.129499+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "slim_terms": [
+            "7690f700-985b-41c2-9082-8a46a5b08499"
+        ],
+        "schema_version": "1",
+        "status": "released",
+        "date_created": "2020-07-21T17:32:59.975734+00:00",
+        "uuid": "d7fa40cf-3423-4f5d-a794-9e00c842aab2",
+        "phenotype_name": "Abnormal atrioventricular valve morphology",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "dbxrefs": [
+            "UMLS:C4024995"
+        ],
+        "hpo_url": "http://purl.obolibrary.org/obo/HP_0006705",
+        "synonyms": [
+            "Abnormality of the atrioventricular valves"
+        ],
+        "hpo_id": "HP:0006705"
+    },
+    {
+        "definition": "A chronic deviation from normal pressure in the systemic arterial system.",
+        "parents": [
+            "481bdebc-0a24-4210-a64a-728580129a40"
+        ],
+        "last_modified": {
+            "date_modified": "2020-07-21T17:59:50.406617+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "slim_terms": [
+            "7690f700-985b-41c2-9082-8a46a5b08499"
+        ],
+        "schema_version": "1",
+        "status": "released",
+        "date_created": "2020-07-21T17:33:00.251694+00:00",
+        "uuid": "b6426e04-cc9d-4385-8944-993268180726",
+        "phenotype_name": "Abnormal systemic blood pressure",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "hpo_url": "http://purl.obolibrary.org/obo/HP_0030972",
+        "synonyms": [
+            "Abnormal systemic BP"
+        ],
+        "hpo_id": "HP:0030972"
+    },
+    {
+        "definition": "An abnormality of the face.",
+        "parents": [
+            "44af3a7a-b28f-443e-86bf-e5831ad159f5"
+        ],
+        "last_modified": {
+            "date_modified": "2020-07-21T17:59:50.766802+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "slim_terms": [
+            "16c0b141-183d-42cd-80f1-8080434d51af"
+        ],
+        "schema_version": "1",
+        "status": "released",
+        "date_created": "2020-07-21T17:33:00.782917+00:00",
+        "uuid": "969d84ae-8ae8-4bf8-a082-1013089ab0ee",
+        "phenotype_name": "Abnormality of the face",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "dbxrefs": [
+            "SNOMEDCT_US:398206004",
+            "SNOMEDCT_US:118930001",
+            "UMLS:C0266617",
+            "SNOMEDCT_US:398302004",
+            "UMLS:C1290857",
+            "SNOMEDCT_US:32003007",
+            "UMLS:C4025871"
+        ],
+        "hpo_url": "http://purl.obolibrary.org/obo/HP_0000271",
+        "synonyms": [
+            "Facial abnormality",
+            "Abnormality of the face",
+            "Abnormal face",
+            "Disorder of the face"
+        ],
+        "hpo_id": "HP:0000271"
+    },
+    {
+        "definition": "An abnormality of the external ear.",
+        "parents": [
+            "306ee104-eb1c-4742-8899-938f9a008945"
+        ],
+        "last_modified": {
+            "date_modified": "2020-07-21T17:59:51.019402+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "slim_terms": [
+            "ac3ff33f-b57a-4054-b158-4e669afe5816"
+        ],
+        "schema_version": "1",
+        "status": "released",
+        "date_created": "2020-07-21T17:33:01.056466+00:00",
+        "uuid": "91dca6da-88c7-46fc-b691-0b0d713e7e26",
+        "phenotype_name": "Abnormality of the outer ear",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "dbxrefs": [
+            "SNOMEDCT_US:275259005",
+            "UMLS:C1846460",
+            "UMLS:C0266589"
+        ],
+        "hpo_url": "http://purl.obolibrary.org/obo/HP_0000356",
+        "synonyms": [
+            "Abnormality of the auricle",
+            "Outer ear abnormality",
+            "Abnormality of the outer ear",
+            "Malformed pinnae",
+            "Abnormality of the external ear",
+            "Abnormal pinnae",
+            "Ear anomalies",
+            "External ear malformations"
+        ],
+        "hpo_id": "HP:0000356"
+    },
+    {
+        "phenotype_name": "Abnormal vascular morphology",
+        "parents": [
+            "54fbcc65-123f-4458-932c-f399cf921139",
+            "1ab7482a-623a-45fd-be70-dd930e550039"
+        ],
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "last_modified": {
+            "date_modified": "2020-07-21T17:59:51.131285+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "slim_terms": [
+            "7690f700-985b-41c2-9082-8a46a5b08499"
+        ],
+        "schema_version": "1",
+        "hpo_url": "http://purl.obolibrary.org/obo/HP_0025015",
+        "status": "released",
+        "hpo_id": "HP:0025015",
+        "date_created": "2020-07-21T17:33:01.293182+00:00",
+        "uuid": "894cb09a-8e4c-4b9e-b2e3-9437cae6f019"
+    },
+    {
+        "definition": "An abnormality of the urinary bladder.",
+        "parents": [
+            "8839d2ca-a29a-45d1-b3fa-53437df8539b"
+        ],
+        "last_modified": {
+            "date_modified": "2020-07-21T17:59:52.246519+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "slim_terms": [
+            "d4bf685e-87a2-4642-8a9d-0e6916e1f673"
+        ],
+        "schema_version": "1",
+        "status": "released",
+        "date_created": "2020-07-21T17:33:01.519540+00:00",
+        "uuid": "632ad692-8b1f-4f90-b5bd-60e4e27d4a1a",
+        "phenotype_name": "Abnormality of the bladder",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "dbxrefs": [
+            "UMLS:C0149632"
+        ],
+        "hpo_url": "http://purl.obolibrary.org/obo/HP_0000014",
+        "hpo_id": "HP:0000014"
+    },
+    {
+        "definition": "An abnormality of the ureter. The ureter is the duct by which urine passes from the kidney to the bladder.",
+        "parents": [
+            "843b3ea4-0563-4552-9d86-b840559fe373"
+        ],
+        "last_modified": {
+            "date_modified": "2020-07-21T17:59:52.354697+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "slim_terms": [
+            "d4bf685e-87a2-4642-8a9d-0e6916e1f673"
+        ],
+        "schema_version": "1",
+        "status": "released",
+        "date_created": "2020-07-21T17:33:01.757279+00:00",
+        "uuid": "60fcacb5-bf5c-4905-875a-889ddb0faeff",
+        "phenotype_name": "Abnormality of the ureter",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "dbxrefs": [
+            "UMLS:C1840382"
+        ],
+        "hpo_url": "http://purl.obolibrary.org/obo/HP_0000069",
+        "synonyms": [
+            "Abnormality of the ureters",
+            "Ureter issue",
+            "Ureteral anomalies"
+        ],
+        "hpo_id": "HP:0000069"
+    },
+    {
+        "definition": "A functional abnormality of the immune system.",
+        "parents": [
+            "304c1c04-7e26-495c-8b8a-ee3c423cea78"
+        ],
+        "last_modified": {
+            "date_modified": "2020-07-21T17:59:52.448161+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "slim_terms": [
+            "304c1c04-7e26-495c-8b8a-ee3c423cea78"
+        ],
+        "schema_version": "1",
+        "status": "released",
+        "date_created": "2020-07-21T17:33:02.142029+00:00",
+        "uuid": "57f190db-ae7e-453a-a672-c20ccc59396f",
+        "phenotype_name": "Abnormality of immune system physiology",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "dbxrefs": [
+            "UMLS:C4023616"
+        ],
+        "hpo_url": "http://purl.obolibrary.org/obo/HP_0010978",
+        "hpo_id": "HP:0010978"
+    },
+    {
+        "definition": "An abnormality in the of lipid metabolism.",
+        "parents": [
+            "e8a72192-c3c6-4873-89ff-470f51cb6536"
+        ],
+        "last_modified": {
+            "date_modified": "2020-07-21T17:59:52.960499+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "slim_terms": [
+            "82ddd4b7-23de-4d36-931d-e2e115334f26"
+        ],
+        "schema_version": "1",
+        "status": "released",
+        "date_created": "2020-07-21T17:33:03.412043+00:00",
+        "uuid": "1dec75f8-38c4-48e1-995a-7c0c4be63a4f",
+        "phenotype_name": "Abnormal circulating lipid concentration",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "dbxrefs": [
+            "UMLS:C0242339",
+            "SNOMEDCT_US:370992007",
+            "MSH:D050171",
+            "UMLS:C4025650"
+        ],
+        "hpo_url": "http://purl.obolibrary.org/obo/HP_0003119",
+        "hpo_id": "HP:0003119"
+    },
+    {
+        "definition": "An abnormality of the lower urinary tract.",
+        "parents": [
+            "b6caaabe-46cc-4581-8038-f99bb685881e"
+        ],
+        "last_modified": {
+            "date_modified": "2020-07-21T17:59:54.328306+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "slim_terms": [
+            "d4bf685e-87a2-4642-8a9d-0e6916e1f673"
+        ],
+        "schema_version": "1",
+        "status": "released",
+        "date_created": "2020-07-21T17:33:04.367245+00:00",
+        "uuid": "8839d2ca-a29a-45d1-b3fa-53437df8539b",
+        "phenotype_name": "Abnormality of the lower urinary tract",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "dbxrefs": [
+            "UMLS:C4023640"
+        ],
+        "hpo_url": "http://purl.obolibrary.org/obo/HP_0010936",
+        "hpo_id": "HP:0010936"
+    },
+    {
+        "definition": "An abnormality of the form, structure, or size of the skeletal system.",
+        "parents": [
+            "1262c802-99bc-4d04-a2b4-910115662bdd"
+        ],
+        "last_modified": {
+            "date_modified": "2020-07-21T17:59:54.797139+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "slim_terms": [
+            "1262c802-99bc-4d04-a2b4-910115662bdd"
+        ],
+        "schema_version": "1",
+        "status": "released",
+        "date_created": "2020-07-21T17:33:05.095009+00:00",
+        "uuid": "6dda9547-489f-4e33-b9d1-f504f6e7df2e",
+        "phenotype_name": "Abnormality of skeletal morphology",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "dbxrefs": [
+            "UMLS:C4023165"
+        ],
+        "hpo_url": "http://purl.obolibrary.org/obo/HP_0011842",
+        "synonyms": [
+            "Abnormally shaped skeletal"
+        ],
+        "hpo_id": "HP:0011842"
+    },
+    {
+        "definition": "Abnormal functionality of the cardiovascular system.",
+        "parents": [
+            "7690f700-985b-41c2-9082-8a46a5b08499"
+        ],
+        "last_modified": {
+            "date_modified": "2020-07-21T17:59:54.913007+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "slim_terms": [
+            "7690f700-985b-41c2-9082-8a46a5b08499"
+        ],
+        "schema_version": "1",
+        "status": "released",
+        "date_created": "2020-07-21T17:33:05.310995+00:00",
+        "uuid": "481bdebc-0a24-4210-a64a-728580129a40",
+        "phenotype_name": "Abnormal cardiovascular system physiology",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "dbxrefs": [
+            "UMLS:C4023587"
+        ],
+        "hpo_url": "http://purl.obolibrary.org/obo/HP_0011025",
+        "synonyms": [
+            "Abnormality of cardiovascular system physiology"
+        ],
+        "hpo_id": "HP:0011025"
+    },
+    {
+        "definition": "Any structural anomaly of the ear.",
+        "parents": [
+            "ac3ff33f-b57a-4054-b158-4e669afe5816"
+        ],
+        "last_modified": {
+            "date_modified": "2020-07-21T17:59:55.141160+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "slim_terms": [
+            "ac3ff33f-b57a-4054-b158-4e669afe5816"
+        ],
+        "schema_version": "1",
+        "status": "released",
+        "date_created": "2020-07-21T17:33:05.753954+00:00",
+        "uuid": "306ee104-eb1c-4742-8899-938f9a008945",
+        "phenotype_name": "Abnormal ear morphology",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "dbxrefs": [
+            "Fyler:4867"
+        ],
+        "hpo_url": "http://purl.obolibrary.org/obo/HP_0031703",
+        "hpo_id": "HP:0031703"
+    },
+    {
+        "definition": "An abnormal level of an analyte measured in the blood.",
+        "parents": [
+            "82ddd4b7-23de-4d36-931d-e2e115334f26"
+        ],
+        "last_modified": {
+            "date_modified": "2020-07-21T17:59:53.137217+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "slim_terms": [
+            "82ddd4b7-23de-4d36-931d-e2e115334f26"
+        ],
+        "schema_version": "1",
+        "status": "released",
+        "date_created": "2020-07-21T17:33:04.110803+00:00",
+        "uuid": "e8a72192-c3c6-4873-89ff-470f51cb6536",
+        "phenotype_name": "Abnormal circulating metabolite concentration",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "hpo_url": "http://purl.obolibrary.org/obo/HP_0032180",
+        "hpo_id": "HP:0032180"
+    },
+    {
+        "definition": "An abnormality of the upper urinary tract.",
+        "parents": [
+            "b6caaabe-46cc-4581-8038-f99bb685881e"
+        ],
+        "last_modified": {
+            "date_modified": "2020-07-21T17:59:54.526962+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "slim_terms": [
+            "d4bf685e-87a2-4642-8a9d-0e6916e1f673"
+        ],
+        "schema_version": "1",
+        "status": "released",
+        "date_created": "2020-07-21T17:33:04.592807+00:00",
+        "uuid": "843b3ea4-0563-4552-9d86-b840559fe373",
+        "phenotype_name": "Abnormality of the upper urinary tract",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "dbxrefs": [
+            "UMLS:C4023641"
+        ],
+        "hpo_url": "http://purl.obolibrary.org/obo/HP_0010935",
+        "synonyms": [
+            "Abnormality of the upper urinary tract"
+        ],
+        "hpo_id": "HP:0010935"
+    },
+    {
+        "definition": "Abnormality of the oral cavity, i.e., the opening or hollow part of the mouth.",
+        "parents": [
+            "2257cd3e-77ef-4a70-80cf-d3ac716b2865"
+        ],
+        "last_modified": {
+            "date_modified": "2020-07-21T17:59:54.653081+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "slim_terms": [
+            "16c0b141-183d-42cd-80f1-8080434d51af"
+        ],
+        "schema_version": "1",
+        "status": "released",
+        "date_created": "2020-07-21T17:33:04.848748+00:00",
+        "uuid": "70f0061b-346b-4450-9f53-bb8515935676",
+        "phenotype_name": "Abnormal oral cavity morphology",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "dbxrefs": [
+            "UMLS:C4025887"
+        ],
+        "hpo_url": "http://purl.obolibrary.org/obo/HP_0000163",
+        "synonyms": [
+            "Abnormality of the oral cavity"
+        ],
+        "hpo_id": "HP:0000163"
+    },
+    {
+        "definition": "Any structural abnormality of a cardiac valve.",
+        "parents": [
+            "32e14b19-fcb4-4820-8bbe-29be594c1161"
+        ],
+        "last_modified": {
+            "date_modified": "2020-07-21T17:59:55.023196+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "slim_terms": [
+            "7690f700-985b-41c2-9082-8a46a5b08499"
+        ],
+        "schema_version": "1",
+        "status": "released",
+        "date_created": "2020-07-21T17:33:05.527777+00:00",
+        "uuid": "452eb5df-5afb-413b-8d51-cf3cbe18838b",
+        "phenotype_name": "Abnormal heart valve morphology",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "dbxrefs": [
+            "SNOMEDCT_US:368009",
+            "UMLS:C0018824",
+            "MSH:D006349",
+            "UMLS:C0241654"
+        ],
+        "hpo_url": "http://purl.obolibrary.org/obo/HP_0001654",
+        "synonyms": [
+            "Abnormality of the heart valves",
+            "Valvular abnormality"
+        ],
+        "hpo_id": "HP:0001654"
+    },
+    {
+        "definition": "Any structural anomaly of the heart and great vessels.",
+        "parents": [
+            "7690f700-985b-41c2-9082-8a46a5b08499"
+        ],
+        "last_modified": {
+            "date_modified": "2020-07-21T17:59:55.463975+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "slim_terms": [
+            "7690f700-985b-41c2-9082-8a46a5b08499"
+        ],
+        "schema_version": "1",
+        "status": "released",
+        "date_created": "2020-07-21T17:33:05.969878+00:00",
+        "uuid": "1ab7482a-623a-45fd-be70-dd930e550039",
+        "phenotype_name": "Abnormality of cardiovascular system morphology",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "dbxrefs": [
+            "UMLS:C4049796"
+        ],
+        "hpo_url": "http://purl.obolibrary.org/obo/HP_0030680",
+        "synonyms": [
+            "Cardiovascular malformations"
+        ],
+        "hpo_id": "HP:0030680"
+    },
+    {
+        "definition": "Abnormality of glucose homeostasis.",
+        "parents": [
+            "f90ac617-c5b4-43d7-af94-ededa1a866af"
+        ],
+        "last_modified": {
+            "date_modified": "2020-07-21T17:59:55.742820+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "slim_terms": [
+            "82ddd4b7-23de-4d36-931d-e2e115334f26"
+        ],
+        "schema_version": "1",
+        "status": "released",
+        "date_created": "2020-07-21T17:33:06.187665+00:00",
+        "uuid": "176fe5d2-1641-46a5-9e00-73a10416c7b1",
+        "phenotype_name": "Abnormal glucose homeostasis",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "dbxrefs": [
+            "UMLS:C4023598"
+        ],
+        "hpo_url": "http://purl.obolibrary.org/obo/HP_0011014",
+        "hpo_id": "HP:0011014"
+    },
+    {
+        "definition": "An anomaly in the processes involved in the maintenance of an internal equilibrium.",
+        "parents": [
+            "82ddd4b7-23de-4d36-931d-e2e115334f26"
+        ],
+        "last_modified": {
+            "date_modified": "2020-07-21T17:59:55.849597+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "slim_terms": [
+            "82ddd4b7-23de-4d36-931d-e2e115334f26"
+        ],
+        "schema_version": "1",
+        "status": "released",
+        "date_created": "2020-07-21T17:33:06.413704+00:00",
+        "uuid": "f90ac617-c5b4-43d7-af94-ededa1a866af",
+        "phenotype_name": "Abnormal homeostasis",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "dbxrefs": [
+            "MP:0001764",
+            "UMLS:C4022950"
+        ],
+        "hpo_url": "http://purl.obolibrary.org/obo/HP_0012337",
+        "hpo_id": "HP:0012337"
+    },
+    {
+        "definition": "An abnormality of the urinary system.",
+        "parents": [
+            "d4bf685e-87a2-4642-8a9d-0e6916e1f673"
+        ],
+        "last_modified": {
+            "date_modified": "2020-07-21T17:59:55.950508+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "slim_terms": [
+            "d4bf685e-87a2-4642-8a9d-0e6916e1f673"
+        ],
+        "schema_version": "1",
+        "status": "released",
+        "date_created": "2020-07-21T17:33:06.661607+00:00",
+        "uuid": "b6caaabe-46cc-4581-8038-f99bb685881e",
+        "phenotype_name": "Abnormality of the urinary system",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "dbxrefs": [
+            "UMLS:C4021821"
+        ],
+        "hpo_url": "http://purl.obolibrary.org/obo/HP_0000079",
+        "synonyms": [
+            "Urinary tract abnormality",
+            "Urinary tract abnormalities",
+            "Urinary tract anomalies"
+        ],
+        "hpo_id": "HP:0000079"
+    },
+    {
+        "definition": "Any structural anomaly of the heart.",
+        "parents": [
+            "1ab7482a-623a-45fd-be70-dd930e550039"
+        ],
+        "last_modified": {
+            "date_modified": "2020-07-21T17:59:56.060884+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "slim_terms": [
+            "7690f700-985b-41c2-9082-8a46a5b08499"
+        ],
+        "schema_version": "1",
+        "status": "released",
+        "date_created": "2020-07-21T17:33:06.887341+00:00",
+        "uuid": "32e14b19-fcb4-4820-8bbe-29be594c1161",
+        "phenotype_name": "Abnormal heart morphology",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "dbxrefs": [
+            "SNOMEDCT_US:13213009",
+            "UMLS:C0152021",
+            "UMLS:C0018798",
+            "MSH:D006330"
+        ],
+        "hpo_url": "http://purl.obolibrary.org/obo/HP_0001627",
+        "synonyms": [
+            "Cardiac abnormality",
+            "Congenital heart defect",
+            "Congenital heart defects",
+            "Abnormally shaped heart",
+            "Abnormality of cardiac morphology",
+            "Cardiac anomalies",
+            "Abnormality of the heart"
+        ],
+        "hpo_id": "HP:0001627"
+    }
+]
