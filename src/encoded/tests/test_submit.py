@@ -1,6 +1,7 @@
 import pytest
 from encoded.submit import *
 from unittest import mock
+from copy import deepcopy
 import xlrd
 import json
 
@@ -161,6 +162,23 @@ def test_fetch_individual_metadata_old(row_dict, empty_items):
     assert 'age' in items_out['individual']['test-proj:indiv1']
 
 
+def test_fetch_individual_metadata_nums(row_dict, empty_items):
+    items2 = deepcopy(empty_items)
+    row_dict['age'] = '33'
+    row_dict['birth year'] = '1988'
+    items_out_nums = fetch_individual_metadata(1, row_dict, empty_items, 'test-proj:indiv1', 'hms-dbmi')
+    assert not items_out_nums['errors']
+    assert isinstance(items_out_nums['individual']['test-proj:indiv1']['age'], int)
+    assert isinstance(items_out_nums['individual']['test-proj:indiv1']['birth_year'], int)
+    # text values for age and birth year should be passed on without errors to eventually fail validation
+    row_dict['age'] = 'abc'
+    row_dict['birth year'] = 'def'
+    items_out_text = fetch_individual_metadata(1, row_dict, items2, 'test-proj:indiv1', 'hms-dbmi')
+    assert not items_out_text['errors']
+    assert isinstance(items_out_text['individual']['test-proj:indiv1']['age'], str)
+    assert isinstance(items_out_text['individual']['test-proj:indiv1']['birth_year'], str)
+
+
 def test_fetch_family_metadata_new(row_dict, empty_items):
     items_out = fetch_family_metadata(1, row_dict, empty_items, 'test-proj:indiv1', 'test-proj:fam1')
     assert items_out['family']['test-proj:fam1']['members'] == ['test-proj:indiv1']
@@ -181,14 +199,25 @@ def test_fetch_family_metadata_old(row_dict, empty_items):
     assert items_out['family']['test-proj:fam1']['mother'] == 'test-proj:indiv2'
 
 
+def test_fetch_family_metadata_invalid_relation(row_dict, empty_items):
+    row_dict['relation to proband'] = 'grandmother'
+    items_out = fetch_family_metadata(1, row_dict, empty_items, 'test-proj:indiv1', 'test-proj:fam1')
+    assert 'Row 1 - Invalid relation' in items_out['errors'][0]
+
+
 def test_fetch_sample_metadata_sp(row_dict, empty_items):
     items = empty_items.copy()
     items['individual'] = {'test-proj:indiv1': {}}
+    row_dict['req accepted y/n'] = 'Yes'
+    row_dict['specimen accepted by ref lab'] = "n"
     items_out = fetch_sample_metadata(
         1, row_dict, items, 'test-proj:indiv1', 'test-proj:samp1',
         'test-proj:sp1', 'test-proj:fam1', 'test-proj', {}
     )
+    print(items_out['sample']['test-proj:samp1'])
     assert items_out['sample']['test-proj:samp1']['specimen_accession'] == row_dict['specimen id']
+    assert items_out['sample']['test-proj:samp1']['specimen_accepted'] == 'No'
+    assert items_out['sample']['test-proj:samp1']['requisition_acceptance']['accepted_rejected'] == 'Accepted'
     assert items_out['sample_processing']['test-proj:sp1']['samples'] == ['test-proj:samp1']
     assert items_out['individual']['test-proj:indiv1']['samples'] == ['test-proj:samp1']
 
@@ -266,6 +295,38 @@ def test_xls_to_json_missing_req_val(project, institution, xls_list):
         assert success
 
 
+def test_xls_to_json_invalid_workup(project, institution, xls_list):
+    # invalid workup type is caught as an error
+    idx = xls_list[1].index('Workup Type')
+    xls_list[4] = xls_list[4][0:idx] + ['Other'] + xls_list[4][idx+1:]
+    with mock.patch('encoded.submit.row_generator') as row_gen:
+        row_gen.return_value = iter(xls_list)
+        json_out, success = xls_to_json('src/encoded/tests/data/documents/cgap_submit_test.xlsx', project, institution)
+        assert json_out['errors']
+        print(json_out['errors'])
+        assert success
+        assert ('Row 5 - Samples with analysis ID 55432 contain mis-matched '
+                'or invalid workup type values.') in ''.join(json_out['errors'])
+
+
+def test_xls_to_json_mixed_workup(project, institution, xls_list):
+    # mixed workup types per analysis caught as an error
+    idx = xls_list[1].index('Workup Type')
+    xls_list[3] = xls_list[3][0:idx] + ['WES'] + xls_list[3][idx+1:]
+    one_row = xls_list[:4]
+    with mock.patch('encoded.submit.row_generator') as row_gen:
+        row_gen.return_value = iter(xls_list)
+        json_out, success = xls_to_json('src/encoded/tests/data/documents/cgap_submit_test.xlsx', project, institution)
+        assert json_out['errors']
+        print(json_out['errors'])
+        assert success
+        assert ('Row 5 - Samples with analysis ID 55432 contain mis-matched '
+                'or invalid workup type values.') in ''.join(json_out['errors'])
+        row_gen.return_value = iter(one_row)
+        one_json_out, one_success = xls_to_json('src/encoded/tests/data/documents/cgap_submit_test.xlsx', project, institution)
+        assert not one_json_out['errors']
+
+
 def test_parse_exception_invalid_alias(testapp, a_case):
     a_case['invalid_field'] = 'value'
     a_case['project'] = '/projects/invalid-project/'
@@ -313,6 +374,17 @@ def test_validate_item_post_invalid(testapp, a_case):
     a_case['project'] = '/projects/invalid-project/'
     result = validate_item(testapp, a_case, 'post', 'case', [])
     assert 'not found' in result[0]
+
+
+def test_validate_item_post_invalid_yn(testapp, sample_info):
+    sample_info['req accepted y/n'] = 'not sure'
+    sample_info['specimen accepted by ref lab'] = "I don't know"
+    sample_item = map_fields(sample_info, {}, ['workup_type'], 'sample')
+    req_info = map_fields(sample_info, {}, ['date sent', 'date completed'], 'requisition')
+    sample_item['requisition_acceptance'] = req_info
+    result = validate_item(testapp, sample_item, 'post', 'sample', [])
+    assert len(result) == 2
+    assert all("is not one of ['Y', 'N']" in error for error in result)
 
 
 def test_validate_item_patch_valid(testapp, mother, grandpa):

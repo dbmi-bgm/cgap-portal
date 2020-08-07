@@ -320,7 +320,7 @@ def fetch_family_metadata(idx, row, items, indiv_alias, fam_alias):
         msg = 'Row {} - Invalid relation "{}" for individual {} - Relation should be one of: {}'.format(
             idx, row.get('relation to proband'), row.get('individual id'), ', '.join(valid_relations)
         )
-        items['errors'].append(msg)
+        new_items['errors'].append(msg)
     return new_items
 
 
@@ -363,7 +363,7 @@ def fetch_sample_metadata(idx, row, items, indiv_alias, samp_alias, analysis_ali
         if not analysis_type_dict[row.get('analysis id')]:
             msg = ('Row {} - Samples with analysis ID {} contain mis-matched or invalid workup type values. '
                    'Sample cannot be processed.'.format(idx, row.get('analysis id')))
-            items['errors'].append(msg)
+            new_items['errors'].append(msg)
     new_items['sample_processing'].setdefault(analysis_alias, new_sp_item)
     new_items['sample_processing'][analysis_alias]['samples'].append(samp_alias)
     if row.get('report required').lower().startswith('y'):
