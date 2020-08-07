@@ -95,3 +95,12 @@ def test_case_flag(testapp, sample_proc_fam, file_vcf, proband_case, mother_case
 def test_case_proband_case(testapp, proband_case, mother_case):
     assert proband_case['proband_case'] is True
     assert mother_case['proband_case'] is False
+
+
+def test_case_default_title_case_id(testapp, proband_case):
+    testapp.patch_json(proband_case['@id'], {'case_id': 'proband case from a family'})
+    proband = testapp.get(proband_case['@id']).json
+    proband_case_title = 'proband case from a family'
+    proband_case_d_title = 'proband case from a family (GAPCAP4E4GMG)'
+    assert proband['case_title'] == proband_case_title
+    assert proband['display_title'] == proband_case_d_title
