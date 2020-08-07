@@ -289,7 +289,7 @@ def fetch_family_metadata(idx, row, items, indiv_alias, fam_alias):
         msg = 'Row {} - Invalid relation "{}" for individual {} - Relation should be one of: {}'.format(
             idx, row.get('relation to proband'), row.get('individual id'), ', '.join(valid_relations)
         )
-        items['errors'].append(msg)
+        new_items['errors'].append(msg)
     return new_items
 
 
@@ -332,7 +332,7 @@ def fetch_sample_metadata(idx, row, items, indiv_alias, samp_alias, analysis_ali
         if not analysis_type_dict[row.get('analysis id')]:
             msg = ('Row {} - Samples with analysis ID {} contain mis-matched or invalid workup type values. '
                    'Sample cannot be processed.'.format(idx, row.get('analysis id')))
-            items['errors'].append(msg)
+            new_items['errors'].append(msg)
     new_items['sample_processing'].setdefault(analysis_alias, new_sp_item)
     new_items['sample_processing'][analysis_alias]['samples'].append(samp_alias)
     if row.get('report required').lower().startswith('y'):
@@ -482,18 +482,21 @@ def parse_exception(e, aliases):
                 continue
             else:
                 error = error.lstrip('Schema: ')
-                field_name = error[:error.index(' - ')]
-                field = None
-                if field_name in GENERIC_FIELD_MAPPING['sample'].values():
-                    field = [key for key, val in GENERIC_FIELD_MAPPING['sample'].items() if val == field_name][0]
-                elif field_name == 'requisition_acceptance.accepted_rejected':
-                    field = 'Req Accepted Y\\N'
-                error = map_enum_options(field_name, error)
-                if not field:
-                    field = field_name.replace('_', ' ')
+                if error.index('- ') > 0:
+                    field_name = error[:error.index(' - ')]
+                    field = None
+                    if field_name in GENERIC_FIELD_MAPPING['sample'].values():
+                        field = [key for key, val in GENERIC_FIELD_MAPPING['sample'].items() if val == field_name][0]
+                    elif field_name == 'requisition_acceptance.accepted_rejected':
+                        field = 'Req Accepted Y\\N'
+                    error = map_enum_options(field_name, error)
+                    if not field:
+                        field = field_name.replace('_', ' ')
 
-                error = 'field: ' + error.replace(field_name, field)
-                keep.append(error)
+                    error = 'field: ' + error.replace(field_name, field)
+                    keep.append(error)
+                elif 'Additional properties are not allowed' in error:
+                    keep.append(error[2:])
         return keep
     else:
         raise e

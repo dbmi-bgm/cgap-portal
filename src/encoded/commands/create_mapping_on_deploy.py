@@ -60,6 +60,7 @@ ITEM_INDEX_ORDER = [
     'EvidenceDisPheno',
     'Page',
     'GeneAnnotationField',
+    'IngestionSubmission'
 ]
 
 ENV_HOTSEAT = 'fourfront-cgaphot'

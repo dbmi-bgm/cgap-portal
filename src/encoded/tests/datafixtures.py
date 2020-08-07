@@ -15,7 +15,7 @@ ORDER = [
     'quality_metric_vcfqc', 'quality_metric_bamqc',
     'software', 'static_section', 'tracking_item', 'workflow_mapping',
     'workflow_run_awsem', 'workflow_run', 'annotation_field', 'variant_sample',
-    'variant', 'gene_annotation_field', 'gene',
+    'variant', 'gene_annotation_field', 'gene', 'ingestion_submission'
 ]
 
 
