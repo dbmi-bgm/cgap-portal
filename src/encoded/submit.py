@@ -57,41 +57,8 @@ LINKS = [
 ]
 
 
-
-# This "/submit_data" endpoint is a placeholder for a submission endpoint modified from loadxl.
-#
-# NOTES FROM KMP (25-Jul-2020):
-#
-#  This will be done differently soon as part of the "/submit_for_ingestion" endpoint that
-#  will be in ingestion_listener.py. That endpoint will need an "?ingestion type=data_bundle"
-#  as query parameter. That "data_bundle" ingestion type will defined in ingestion/processors.py.
-#  The new entry point here that will be needed is submit_data_bundle, and then this temporary
-#  "/submit_data" endpoint can presumably go away.. -kmp 25-Jul-2020
-
-@view_config(route_name='submit_data', request_method='POST', permission='add')
-@debug_log
-def submit_data(context, request):
-    """
-    usage notes here later
-    """
-    config_uri = request.json.get('config_uri', 'production.ini')
-    patch_only = request.json.get('patch_only', False)
-    post_only = request.json.get('post_only', False)
-    app = get_app(config_uri, 'app')
-    environ = {'HTTP_ACCEPT': 'application/json', 'REMOTE_USER': 'TEST'}
-    virtualapp = VirtualApp(app, environ)
-    # expected response
-    request.response.status = 200
-    result = {
-        'status': 'success',
-        '@type': ['result'],
-    }
-
-    raise NotImplementedError
-
-# This endpoint will soon be the primary entry point. Please keep it working as-is and do not remove it.
-# -kmp 25-Jul-2020
-def submit_data_bundle(*, s3_client, bucket, key, project, institution, vapp):  # All keyword arguments, all required.
+def submit_data_bundle(*, s3_client, bucket, key, project, institution, vapp,  # <- All keyword arguments, all required.
+                       validate_only=False):  # <-- Additional options with defaults.
     """
     Handles processing of a submitted workbook.
 
@@ -122,6 +89,8 @@ def submit_data_bundle(*, s3_client, bucket, key, project, institution, vapp):  
         if not validate_success:
             return results
         results['success'] = validate_success
+        if validate_only:
+            return results
         result_lines, post_success, upload_info = post_and_patch_all_items(vapp, json_data_final=processing_result)
         results['post_output'] = result_lines
         results['success'] = post_success

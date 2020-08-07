@@ -23,6 +23,17 @@ class MissingParameter(HTTPBadRequest):
         super().__init__(detail="Missing parameter: %s" % parameter_name)
 
 
+class BadParameter(HTTPBadRequest):
+
+    def __init__(self, parameter_name, parameter_value, extra_detail=None):
+        self.parameter_name = parameter_name
+        self.parameter_value = parameter_value
+        self.extra_detail = extra_detail
+        suffix = " " + extra_detail if extra_detail else ""
+        super().__init__(detail="The value of the %s parameter, %r, is invalid.%s"
+                                % (parameter_name, parameter_value, suffix))
+
+
 class UnspecifiedFormParameter(HTTPBadRequest):
 
     def __init__(self, parameter_name):

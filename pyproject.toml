@@ -175,6 +175,7 @@ purge-item-type = "encoded.commands.purge_item_type:main"
 run-upgrade-on-inserts = "encoded.commands.run_upgrader_on_inserts:main"
 spreadsheet-to-json = "encoded.commands.spreadsheet_to_json:main"
 submission-test = "encoded.commands.submission_test:main"
+submit-data-bundle = "encoded.commands.submit_data_bundle:main"
 update-inserts-from-server = "encoded.commands.update_inserts_from_server:main"
 verify-item = "encoded.commands.verify_item:main"
 

@@ -33,7 +33,7 @@ from snovault.schema_utils import validate_request
 from snovault.util import debug_log
 from vcf import Reader
 from .commands.ingest_vcf import VCFParser
-from .ingestion.common import register_path_content_type, DATA_BUNDLE_BUCKET, SubmissionFailure
+from .ingestion.common import register_path_content_type, DATA_BUNDLE_BUCKET, SubmissionFailure, get_parameter
 from .ingestion.exceptions import UnspecifiedFormParameter
 from .ingestion.processors import get_ingestion_processor
 from .types.ingestion import SubmissionFolio
@@ -52,75 +52,11 @@ def includeme(config):
     config.add_route('ingestion_status', '/ingestion_status')
     config.add_route('prompt_for_ingestion', '/prompt_for_ingestion')
     config.add_route('submit_for_ingestion', '/submit_for_ingestion')
-
-    # THESE TWO ARE FOR DEBUGGING ONLY.
-    config.add_route('prompt_for_subrequest', '/prompt_for_subrequest')
-    config.add_route('submit_subrequest', '/submit_subrequest')
-
     config.registry[INGESTION_QUEUE] = IngestionQueueManager(config.registry)
     config.scan(__name__)
 
 
-# Moved to util.py and modified.
-# def subrequest_item_creation(request: pyramid.request.Request, item_type: str, json_body: dict = None) -> dict:
-#     if json_body is None:
-#         json_body = {}
-#     collection_path = '/' + item_type
-#     method = 'POST'
-#     # json_utf8 = json.dumps(json_body).encode('utf-8')  # Unused, but here just in case
-#     subrequest = make_subrequest(request=request, path=collection_path, method=method, json_body=json_body)
-#     subrequest.remote_user = 'EMBED'
-#     subrequest.registry = request.registry
-#     # Maybe...
-#     # validated = json_body.copy()
-#     # subrequest.validated = validated
-#     collection: Collection = subrequest.registry[COLLECTIONS][item_type]
-#     check_true(subrequest.json_body, "subrequest.json_body is not properly initialized.")
-#     check_true(not subrequest.validated, "subrequest was unexpectedly validated already.")
-#     check_true(subrequest.remote_user == 'EMBED', "subrequest.remote_user is not 'EMBED'.")
-#     check_true(not subrequest.errors, "subrequest.errors already has errors before trying to validate.")
-#     check_true(subrequest.remote_user is None, "subrequest.remote_user should have been None before we set it.")
-#     check_true(request.remote_user is None, "request.remote_user should have been None before we set it.")
-#     request.remote_user = 'EMBED'
-#     validate_request(schema=collection.type_info.schema, request=subrequest, data=json_body)
-#     if not subrequest.validated:
-#         return {
-#             "@type": ["Exception"],
-#             "errors": subrequest.errors
-#         }
-#     else:
-#         json_result: dict = sno_collection_add(context=collection, request=subrequest, render=False)
-#         return json_result
-
-
-# FOR DEBUGGING ONLY
-@view_config(route_name='prompt_for_subrequest', request_method='GET')
-@debug_log
-def prompt_for_subrequest(context, request):
-    ignored(context, request)
-    return Response(PROMPT_FOR_SUBREQUEST)
-
-
-# FOR DEBUGGING ONLY
-register_path_content_type(path='/submit_subrequest', content_type='multipart/form-data')
-@view_config(route_name='submit_subrequest', request_method='POST', accept='multipart/form-data')
-@debug_log
-def submit_subrequest(context, request):
-    # import pdb; pdb.set_trace()
-    institution = "/institutions/hms-dbmi/"
-    project = "/projects/12a92962-8265-4fc0-b2f8-cf14f05db58b/"
-    # institution = request.invoke_subrequest(make_subrequest(request, institution)).json
-    print("institution=", institution)
-    # project = request.invoke_subrequest(make_subrequest(request, project)).json
-    print("project=", project)
-    json_body = {
-        "ingestion_type": 'data_bundle',
-        "institution": institution,
-        "project": project,
-    }
-    return subrequest_item_creation(request=request, item_type='IngestionSubmission', json_body=json_body)
-
-
+# This endpoint is intended only for debugging. Use the command line tool.
 @view_config(route_name='prompt_for_ingestion', request_method='GET')
 @debug_log
 def prompt_for_ingestion(context, request):
@@ -146,14 +82,14 @@ def submit_for_ingestion(context, request):
     override_name = request.POST.get('override_name', None)
     parameters = dict(request.POST)
     parameters['datafile'] = filename
-    institution = parameters.get('institution', 'institution-missing')
-    project = parameters.get('project', 'project-missing')
+    institution = get_parameter(parameters, 'institution')
+    project = get_parameter(parameters, 'project')
+    # Other parameters, like validate_only, will ride in on parameters via the manifest on s3
 
     submission_id = SubmissionFolio.create_item(request,
                                                 ingestion_type=ingestion_type,
                                                 institution=institution,
                                                 project=project)
-
 
     # ``input_file`` contains the actual file data which needs to be
     # stored somewhere.
@@ -192,6 +128,7 @@ def submit_for_ingestion(context, request):
         "filename": filename,
         "object_name": object_name,
         "submission_id": submission_id,
+        "submission_uri": SubmissionFolio.make_submission_uri(submission_id),
         "bucket": DATA_BUNDLE_BUCKET,
         "success": success,
         "message": message,
@@ -898,6 +835,13 @@ PROMPT_TEMPLATE = """
           </td>
           <td>
             <input type="file" id="datafile" name="datafile" value="" />
+          </td>
+        </tr>
+        <tr>
+          <td><i>Special Options:</i><br /></td>
+          <td>
+            <input type="checkbox" id="validate_only" name="validate_only" value="true" />
+            <label for="validate_only"> Validate Only</label>
           </td>
         </tr>
         <tr>

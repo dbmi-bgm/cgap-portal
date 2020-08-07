@@ -47,15 +47,18 @@ class SubmissionFolio:
     def __str__(self):
         return "<SubmissionFolio(%s) %s>" % (self.ingestion_type, self.submission_id)
 
+    @classmethod
+    def make_submission_uri(cls, submission_id):
+        return "/ingestion-submissions/" + submission_id
+
     @property
     def submission_uri(self):
-        return "/ingestion-submissions/" + self.submission_id
+        return self.make_submission_uri(self.submission_id)
 
     SUBMISSION_PATTERN = re.compile(r'^/ingestion-submissions/([0-9a-fA-F-]+)/?$')
 
     @classmethod
-    def create_item(cls, request, institution, project, ingestion_type, **kwargs):
-        ignored(kwargs)
+    def create_item(cls, request, institution, project, ingestion_type):
         json_body = {
             "ingestion_type": ingestion_type,
             "institution": institution,
@@ -77,21 +80,6 @@ class SubmissionFolio:
             pass
         check_true(guid, "Guid was not extracted from %s in %s" % (item_url, json.dumps(res_json)))
         return guid
-
-    # def set_item_detail(self, object_name, parameters, institution, project):
-    #     res = self.vapp.patch_json(self.submission_uri, {
-    #         "object_name": object_name,
-    #         "ingestion_type": self.ingestion_type,
-    #         "submission_id": self.submission_id,
-    #         "parameters": parameters,
-    #         "institution": institution,
-    #         "project": project,
-    #         "processing_status": {
-    #             "state": "processing",
-    #         }
-    #     })
-    #     [item] = res.json['@graph']
-    #     print(json.dumps(item, indent=2))
 
     def patch_item(self, **kwargs):
         res = self.vapp.patch_json(self.submission_uri, kwargs)

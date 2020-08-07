@@ -54,6 +54,7 @@ def handle_data_bundle(submission):
     parameters = manifest['parameters']
     institution = get_parameter(parameters, 'institution')
     project = get_parameter(parameters, 'project')
+    validate_only = get_parameter(parameters, 'validate_only', as_type=bool, default=False)
 
     debuglog(submission_id, "object_name:", object_name)
     debuglog(submission_id, "parameters:", parameters)
@@ -87,7 +88,8 @@ def handle_data_bundle(submission):
                                                 key=object_name,
                                                 project=project,
                                                 institution=institution,
-                                                vapp=submission.vapp)
+                                                vapp=submission.vapp,
+                                                validate_only=validate_only)
 
         resolution["validation_report_key"] = validation_report_key = "%s/validation-report.txt" % submission_id
         resolution["submission_key"] = submission_key = "%s/submission.json" % submission_id
