@@ -21,6 +21,7 @@ import ReleaseUpdates           from './static-pages/ReleaseUpdates';
 
 import DefaultItemView          from './item-pages/DefaultItemView';
 import CohortView, { CohortSubmissionView } from './item-pages/CohortView';
+import CaseView, { CaseSubmissionView } from './item-pages/CaseView';
 import IndividualView           from './item-pages/IndividualView';
 import FileProcessedView        from './item-pages/FileProcessedView';
 import SampleView               from './item-pages/SampleView';
@@ -45,6 +46,7 @@ content_views.register(HomePage,                'HomePage');
 content_views.register(ReleaseUpdates,          'Release-updatesPage');
 
 content_views.register(DefaultItemView,         'Item');
+content_views.register(CaseView,                'Case');
 content_views.register(CohortView,              'Cohort');
 content_views.register(IndividualView,          'Individual');
 content_views.register(FileProcessedView,       'FileProcessed');

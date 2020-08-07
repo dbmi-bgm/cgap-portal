@@ -1,65 +1,47 @@
 [
     {
         "overall_quality_status": "PASS",
+        "last_modified": {
+            "date_modified": "2020-07-15T02:43:33.765871+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "schema_version": "1",
+        "status": "in review",
+        "date_created": "2020-07-15T02:39:46.620471+00:00",
+        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
+        "total variants": [
+            {
+                "MAV": 0,
+                "name": "NA12879_sample",
+                "total": 2249,
+                "MNV": 0,
+                "SNV": 1977,
+                "INS": 113,
+                "DEL": 159
+            },
+            {
+                "MAV": 0,
+                "name": "NA12878_sample",
+                "total": 2291,
+                "MNV": 0,
+                "SNV": 2011,
+                "INS": 117,
+                "DEL": 163
+            },
+            {
+                "MAV": 0,
+                "name": "NA12877_sample",
+                "total": 2254,
+                "MNV": 0,
+                "SNV": 2020,
+                "INS": 95,
+                "DEL": 139
+            }
+        ],
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "uuid": "576f2d32-cf91-4d5c-9cf2-a47c35f3e23c",
         "heterozygosity ratio": {
-            "SNV": [
-                {
-                    "ratio": 55.49,
-                    "counts": {
-                        "total": 1977,
-                        "hom": 35,
-                        "het": 1942
-                    },
-                    "name": "NA12879_sample"
-                },
-                {
-                    "ratio": 49.27,
-                    "counts": {
-                        "total": 2011,
-                        "hom": 40,
-                        "het": 1971
-                    },
-                    "name": "NA12878_sample"
-                },
-                {
-                    "ratio": 33.24,
-                    "counts": {
-                        "total": 2020,
-                        "hom": 59,
-                        "het": 1961
-                    },
-                    "name": "NA12877_sample"
-                }
-            ],
-            "INS": [
-                {
-                    "ratio": 6.53,
-                    "counts": {
-                        "total": 113,
-                        "hom": 15,
-                        "het": 98
-                    },
-                    "name": "NA12879_sample"
-                },
-                {
-                    "ratio": 8.0,
-                    "counts": {
-                        "total": 117,
-                        "hom": 13,
-                        "het": 104
-                    },
-                    "name": "NA12878_sample"
-                },
-                {
-                    "ratio": 5.79,
-                    "counts": {
-                        "total": 95,
-                        "hom": 14,
-                        "het": 81
-                    },
-                    "name": "NA12877_sample"
-                }
-            ],
             "MNV": [
                 {
                     "counts": {
@@ -86,84 +68,108 @@
                     "name": "NA12877_sample"
                 }
             ],
+            "SNV": [
+                {
+                    "ratio": 55.49,
+                    "name": "NA12879_sample",
+                    "counts": {
+                        "total": 1977,
+                        "hom": 35,
+                        "het": 1942
+                    }
+                },
+                {
+                    "ratio": 49.27,
+                    "name": "NA12878_sample",
+                    "counts": {
+                        "total": 2011,
+                        "hom": 40,
+                        "het": 1971
+                    }
+                },
+                {
+                    "ratio": 33.24,
+                    "name": "NA12877_sample",
+                    "counts": {
+                        "total": 2020,
+                        "hom": 59,
+                        "het": 1961
+                    }
+                }
+            ],
+            "INS": [
+                {
+                    "ratio": 6.53,
+                    "name": "NA12879_sample",
+                    "counts": {
+                        "total": 113,
+                        "hom": 15,
+                        "het": 98
+                    }
+                },
+                {
+                    "ratio": 8.0,
+                    "name": "NA12878_sample",
+                    "counts": {
+                        "total": 117,
+                        "hom": 13,
+                        "het": 104
+                    }
+                },
+                {
+                    "ratio": 5.79,
+                    "name": "NA12877_sample",
+                    "counts": {
+                        "total": 95,
+                        "hom": 14,
+                        "het": 81
+                    }
+                }
+            ],
             "DEL": [
                 {
                     "ratio": 21.71,
+                    "name": "NA12879_sample",
                     "counts": {
                         "total": 159,
                         "hom": 7,
                         "het": 152
-                    },
-                    "name": "NA12879_sample"
+                    }
                 },
                 {
                     "ratio": 15.3,
+                    "name": "NA12878_sample",
                     "counts": {
                         "total": 163,
                         "hom": 10,
                         "het": 153
-                    },
-                    "name": "NA12878_sample"
+                    }
                 },
                 {
                     "ratio": 8.93,
+                    "name": "NA12877_sample",
                     "counts": {
                         "total": 139,
                         "hom": 14,
                         "het": 125
-                    },
-                    "name": "NA12877_sample"
+                    }
                 }
             ]
         },
-        "total variants": [
-            {
-                "INS": 113,
-                "MAV": 0,
-                "MNV": 0,
-                "DEL": 159,
-                "SNV": 1977,
-                "name": "NA12879_sample",
-                "total": 2249
-            },
-            {
-                "INS": 117,
-                "MAV": 0,
-                "MNV": 0,
-                "DEL": 163,
-                "SNV": 2011,
-                "name": "NA12878_sample",
-                "total": 2291
-            },
-            {
-                "INS": 95,
-                "MAV": 0,
-                "MNV": 0,
-                "DEL": 139,
-                "SNV": 2020,
-                "name": "NA12877_sample",
-                "total": 2254
-            }
-        ],
-        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
-        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-        "status": "in review",
-        "uuid": "576f2d32-cf91-4d5c-9cf2-a47c35f3e23c",
         "mendelian errors in trio": {
             "SNV": [
                 {
                     "counts": {
                         "hom": {
                             "total": 35,
-                            "errors": 5,
-                            "miss": 4
+                            "miss": 4,
+                            "errors": 5
                         },
                         "het": {
                             "total": 1942,
-                            "errors": 0,
                             "de_novo": 126,
-                            "miss": 13
+                            "miss": 13,
+                            "errors": 0
                         }
                     },
                     "name": "NA12879_sample"
@@ -174,14 +180,14 @@
                     "counts": {
                         "hom": {
                             "total": 15,
-                            "errors": 4,
-                            "miss": 2
+                            "miss": 2,
+                            "errors": 4
                         },
                         "het": {
                             "total": 98,
-                            "errors": 0,
                             "de_novo": 25,
-                            "miss": 0
+                            "miss": 0,
+                            "errors": 0
                         }
                     },
                     "name": "NA12879_sample"
@@ -192,195 +198,251 @@
                     "counts": {
                         "hom": {
                             "total": 7,
-                            "errors": 4,
-                            "miss": 0
+                            "miss": 0,
+                            "errors": 4
                         },
                         "het": {
                             "total": 152,
-                            "errors": 0,
                             "de_novo": 37,
-                            "miss": 1
+                            "miss": 1,
+                            "errors": 0
                         }
                     },
                     "name": "NA12879_sample"
                 }
             ]
-        },
-        "schema_version": "1",
-        "date_created": "2020-07-14T01:22:08.800832+00:00",
-        "last_modified": {
-            "date_modified": "2020-07-14T01:23:14.471866+00:00",
-            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
         }
     },
     {
         "overall_quality_status": "PASS",
+        "last_modified": {
+            "date_modified": "2020-07-15T02:43:33.882131+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "schema_version": "1",
+        "transition-transversion ratio": [
+            {
+                "ratio": 1.96,
+                "name": "NA12879_sample",
+                "counts": {
+                    "C_G": 167659,
+                    "C_A": 171036,
+                    "A_C": 165266,
+                    "G_T": 172242,
+                    "T_G": 165740,
+                    "A_G": 617248,
+                    "T_C": 619292,
+                    "G_C": 168644,
+                    "T_A": 145387,
+                    "G_A": 664537,
+                    "C_T": 653634,
+                    "A_T": 144477
+                }
+            },
+            {
+                "ratio": 1.96,
+                "name": "NA12878_sample",
+                "counts": {
+                    "C_G": 167602,
+                    "C_A": 170823,
+                    "A_C": 166307,
+                    "G_T": 171814,
+                    "T_G": 165775,
+                    "A_G": 617461,
+                    "T_C": 620088,
+                    "G_C": 168584,
+                    "T_A": 145098,
+                    "G_A": 661335,
+                    "C_T": 653909,
+                    "A_T": 144256
+                }
+            },
+            {
+                "ratio": 1.96,
+                "name": "NA12877_sample",
+                "counts": {
+                    "C_G": 167110,
+                    "C_A": 169674,
+                    "A_C": 164624,
+                    "G_T": 171572,
+                    "T_G": 166198,
+                    "A_G": 615233,
+                    "T_C": 616100,
+                    "G_C": 167800,
+                    "T_A": 144703,
+                    "G_A": 657779,
+                    "C_T": 649293,
+                    "A_T": 143916
+                }
+            }
+        ],
+        "status": "in review",
+        "date_created": "2020-07-15T02:39:46.878395+00:00",
+        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
+        "total variants": [
+            {
+                "MAV": 0,
+                "name": "NA12879_sample",
+                "total": 4761496,
+                "MNV": 2962,
+                "SNV": 3855162,
+                "INS": 427047,
+                "DEL": 476325
+            },
+            {
+                "MAV": 0,
+                "name": "NA12878_sample",
+                "total": 4769578,
+                "MNV": 2948,
+                "SNV": 3853052,
+                "INS": 432004,
+                "DEL": 481574
+            },
+            {
+                "MAV": 0,
+                "name": "NA12877_sample",
+                "total": 4765215,
+                "MNV": 3083,
+                "SNV": 3834002,
+                "INS": 441348,
+                "DEL": 486782
+            }
+        ],
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "uuid": "d918bc25-0888-4658-811b-53c20b944b76",
         "heterozygosity ratio": {
+            "MNV": [
+                {
+                    "ratio": 0.52,
+                    "name": "NA12879_sample",
+                    "counts": {
+                        "total": 2962,
+                        "hom": 1951,
+                        "het": 1011
+                    }
+                },
+                {
+                    "ratio": 0.47,
+                    "name": "NA12878_sample",
+                    "counts": {
+                        "total": 2948,
+                        "hom": 2007,
+                        "het": 941
+                    }
+                },
+                {
+                    "ratio": 0.46,
+                    "name": "NA12877_sample",
+                    "counts": {
+                        "total": 3083,
+                        "hom": 2110,
+                        "het": 973
+                    }
+                }
+            ],
             "SNV": [
                 {
                     "ratio": 1.63,
+                    "name": "NA12879_sample",
                     "counts": {
                         "total": 3855162,
                         "hom": 1466829,
                         "het": 2388333
-                    },
-                    "name": "NA12879_sample"
+                    }
                 },
                 {
                     "ratio": 1.63,
+                    "name": "NA12878_sample",
                     "counts": {
                         "total": 3853052,
                         "hom": 1466489,
                         "het": 2386563
-                    },
-                    "name": "NA12878_sample"
+                    }
                 },
                 {
                     "ratio": 1.56,
+                    "name": "NA12877_sample",
                     "counts": {
                         "total": 3834002,
                         "hom": 1494798,
                         "het": 2339204
-                    },
-                    "name": "NA12877_sample"
+                    }
                 }
             ],
             "INS": [
                 {
                     "ratio": 1.12,
+                    "name": "NA12879_sample",
                     "counts": {
                         "total": 427047,
                         "hom": 201404,
                         "het": 225643
-                    },
-                    "name": "NA12879_sample"
+                    }
                 },
                 {
                     "ratio": 1.11,
+                    "name": "NA12878_sample",
                     "counts": {
                         "total": 432004,
                         "hom": 205055,
                         "het": 226949
-                    },
-                    "name": "NA12878_sample"
+                    }
                 },
                 {
                     "ratio": 1.05,
+                    "name": "NA12877_sample",
                     "counts": {
                         "total": 441348,
                         "hom": 215218,
                         "het": 226130
-                    },
-                    "name": "NA12877_sample"
-                }
-            ],
-            "MNV": [
-                {
-                    "ratio": 0.52,
-                    "counts": {
-                        "total": 2962,
-                        "hom": 1951,
-                        "het": 1011
-                    },
-                    "name": "NA12879_sample"
-                },
-                {
-                    "ratio": 0.47,
-                    "counts": {
-                        "total": 2948,
-                        "hom": 2007,
-                        "het": 941
-                    },
-                    "name": "NA12878_sample"
-                },
-                {
-                    "ratio": 0.46,
-                    "counts": {
-                        "total": 3083,
-                        "hom": 2110,
-                        "het": 973
-                    },
-                    "name": "NA12877_sample"
+                    }
                 }
             ],
             "DEL": [
                 {
                     "ratio": 1.23,
+                    "name": "NA12879_sample",
                     "counts": {
                         "total": 476325,
                         "hom": 213303,
                         "het": 263022
-                    },
-                    "name": "NA12879_sample"
+                    }
                 },
                 {
                     "ratio": 1.21,
+                    "name": "NA12878_sample",
                     "counts": {
                         "total": 481574,
                         "hom": 218320,
                         "het": 263254
-                    },
-                    "name": "NA12878_sample"
+                    }
                 },
                 {
                     "ratio": 1.16,
+                    "name": "NA12877_sample",
                     "counts": {
                         "total": 486782,
                         "hom": 225216,
                         "het": 261566
-                    },
-                    "name": "NA12877_sample"
+                    }
                 }
             ]
         },
-        "total variants": [
-            {
-                "INS": 427047,
-                "MAV": 0,
-                "MNV": 2962,
-                "DEL": 476325,
-                "SNV": 3855162,
-                "name": "NA12879_sample",
-                "total": 4761496
-            },
-            {
-                "INS": 432004,
-                "MAV": 0,
-                "MNV": 2948,
-                "DEL": 481574,
-                "SNV": 3853052,
-                "name": "NA12878_sample",
-                "total": 4769578
-            },
-            {
-                "INS": 441348,
-                "MAV": 0,
-                "MNV": 3083,
-                "DEL": 486782,
-                "SNV": 3834002,
-                "name": "NA12877_sample",
-                "total": 4765215
-            }
-        ],
-        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
-        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-        "status": "in review",
-        "uuid": "d918bc25-0888-4658-811b-53c20b944b76",
         "mendelian errors in trio": {
             "SNV": [
                 {
                     "counts": {
                         "hom": {
                             "total": 1466829,
-                            "errors": 21467,
-                            "miss": 27539
+                            "miss": 27539,
+                            "errors": 21467
                         },
                         "het": {
                             "total": 2388333,
-                            "errors": 1223,
                             "de_novo": 48148,
-                            "miss": 25792
+                            "miss": 25792,
+                            "errors": 1223
                         }
                     },
                     "name": "NA12879_sample"
@@ -391,14 +453,14 @@
                     "counts": {
                         "hom": {
                             "total": 201404,
-                            "errors": 60034,
-                            "miss": 2090
+                            "miss": 2090,
+                            "errors": 60034
                         },
                         "het": {
                             "total": 225643,
-                            "errors": 2475,
                             "de_novo": 12153,
-                            "miss": 2268
+                            "miss": 2268,
+                            "errors": 2475
                         }
                     },
                     "name": "NA12879_sample"
@@ -409,81 +471,19 @@
                     "counts": {
                         "hom": {
                             "total": 213303,
-                            "errors": 62044,
-                            "miss": 1965
+                            "miss": 1965,
+                            "errors": 62044
                         },
                         "het": {
                             "total": 263022,
-                            "errors": 3077,
                             "de_novo": 15852,
-                            "miss": 2469
+                            "miss": 2469,
+                            "errors": 3077
                         }
                     },
                     "name": "NA12879_sample"
                 }
             ]
-        },
-        "schema_version": "1",
-        "date_created": "2020-07-14T01:22:08.515410+00:00",
-        "last_modified": {
-            "date_modified": "2020-07-14T01:23:14.227772+00:00",
-            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
-        },
-        "transition-transversion ratio": [
-            {
-                "ratio": 1.96,
-                "counts": {
-                    "A_G": 617248,
-                    "G_A": 664537,
-                    "G_C": 168644,
-                    "C_A": 171036,
-                    "T_C": 619292,
-                    "T_A": 145387,
-                    "G_T": 172242,
-                    "A_T": 144477,
-                    "C_T": 653634,
-                    "A_C": 165266,
-                    "T_G": 165740,
-                    "C_G": 167659
-                },
-                "name": "NA12879_sample"
-            },
-            {
-                "ratio": 1.96,
-                "counts": {
-                    "A_G": 617461,
-                    "G_A": 661335,
-                    "G_C": 168584,
-                    "C_A": 170823,
-                    "T_C": 620088,
-                    "T_A": 145098,
-                    "G_T": 171814,
-                    "A_T": 144256,
-                    "C_T": 653909,
-                    "A_C": 166307,
-                    "T_G": 165775,
-                    "C_G": 167602
-                },
-                "name": "NA12878_sample"
-            },
-            {
-                "ratio": 1.96,
-                "counts": {
-                    "A_G": 615233,
-                    "G_A": 657779,
-                    "G_C": 167800,
-                    "C_A": 169674,
-                    "T_C": 616100,
-                    "T_A": 144703,
-                    "G_T": 171572,
-                    "A_T": 143916,
-                    "C_T": 649293,
-                    "A_C": 164624,
-                    "T_G": 166198,
-                    "C_G": 167110
-                },
-                "name": "NA12877_sample"
-            }
-        ]
+        }
     }
 ]

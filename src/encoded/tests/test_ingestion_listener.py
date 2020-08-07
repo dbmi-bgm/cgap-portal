@@ -55,7 +55,14 @@ def test_ingestion_queue_add_and_receive(setup_and_teardown_sqs_state):
         str(uuid4()), str(uuid4())
     ])
     wait_for_queue_to_catch_up(0)
-    msgs = queue_manager.receive_messages()
+    tries, msgs = 5, []
+    while len(msgs) < 2:
+        if tries < 0:
+            break
+        _msgs = queue_manager.receive_messages(batch_size=1)  # should reduce flakiness
+        msgs.extend(_msgs)
+        wait_for_queue_to_catch_up(0)
+        tries -= 1
     assert len(msgs) == 2
 
 

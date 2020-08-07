@@ -482,7 +482,7 @@ export default class App extends React.PureComponent {
             const tHrefParts = url.parse(targetHref);
             const pHrefParts = memoizedUrlParse(href);
             let tHrefHash = tHrefParts.hash;
-            const samePath = pHrefParts.path === tHrefParts.path;
+            const samePath = pHrefParts.path === tHrefParts.path; // Occurs when click link which has same path but different hash, most often.
             const navOpts = {
                 // Same pathname & search but maybe different hash. Don't add history entry etc.
                 'replace'           : samePath,
@@ -498,9 +498,11 @@ export default class App extends React.PureComponent {
             navigate(targetHref, navOpts, function(){
                 if (targetOffset) targetOffset = parseInt(targetOffset);
                 if (!targetOffset || isNaN(targetOffset)) targetOffset = 112;
-                if (tHrefHash && typeof hrefHash === 'string' && tHrefHash.length > 1 && tHrefHash[1] !== '!'){
+                if (tHrefHash && typeof tHrefHash === 'string' && tHrefHash.length > 1 && tHrefHash[1] !== '!'){
                     tHrefHash = tHrefHash.slice(1); // Strip out '#'
-                    setTimeout(layout.animateScrollTo.bind(null, tHrefHash, 750, targetOffset), 100);
+                    setTimeout(function(){
+                        layout.animateScrollTo(tHrefHash, 750, targetOffset);
+                    }, 100);
                 }
             });
 
@@ -1329,7 +1331,6 @@ class BodyElement extends React.PureComponent {
         this.hideTestWarning = this.hideTestWarning.bind(this);
         this.onResize = _.debounce(this.onResize.bind(this), 300);
         this.setupScrollHandler = this.setupScrollHandler.bind(this);
-        this.onAfterTooltipHide = this.onAfterTooltipHide.bind(this);
 
         this.registerWindowOnResizeHandler = this.registerWindowOnResizeHandler.bind(this);
         this.registerWindowOnScrollHandler = this.registerWindowOnScrollHandler.bind(this);
@@ -1661,18 +1662,6 @@ class BodyElement extends React.PureComponent {
         setTimeout(this.throttledScrollHandler, 100, null);
     }
 
-    onAfterTooltipHide(e){
-        // Grab tip & unset style.left and style.top using same method tooltip does internally.
-        const ref = this.tooltipRef && this.tooltipRef.current;
-        const node = (ref && ref.tooltipRef) || null;
-        if (!node || !node.style) {
-            console.warn("Tooltip to hide not found");
-            return;
-        }
-        node.style.left = null;
-        node.style.top = null;
-    }
-
     toggleFullScreen(isFullscreen, callback){
         if (typeof isFullscreen === 'boolean'){
             this.setState({ isFullscreen }, callback);
@@ -1800,8 +1789,7 @@ class BodyElement extends React.PureComponent {
 
                 <div id="overlays-container" ref={this.overlaysContainerRef}/>
 
-                <ReactTooltip effect="solid" ref={this.tooltipRef} globalEventOff="click" key="tooltip"
-                    afterHide={this.onAfterTooltipHide} />
+                <ReactTooltip effect="solid" globalEventOff="click" key="tooltip" uuid="primary-tooltip-fake-uuid" />
 
             </body>
         );

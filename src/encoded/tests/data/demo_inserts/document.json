@@ -1,0 +1,22 @@
+[
+    {
+        "attachment": {
+            "download": "bgm0339-koray_V4.pbxml",
+            "type": "application/proband+xml",
+            "href": "@@download/attachment/bgm0339-koray_V4.pbxml",
+            "md5sum": "8dae78069f85fce77ea7c0a6e43e0274",
+            "blob_id": "9fdd87b7-a04d-4c93-b7e0-539527072167"
+        },
+        "date_created": "2020-07-21T17:33:45.486329+00:00",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "last_modified": {
+            "date_modified": "2020-07-21T18:00:23.009102+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "institution": "828cd4fe-ebb0-4b36-ccbb-d2e3a36ca234",
+        "schema_version": "1",
+        "status": "in review",
+        "project": "91336042-f277-4f69-97e5-5c8a5f6d6058",
+        "uuid": "0938cab5-5f81-4da7-b299-46e4aa5d63f9"
+    }
+]

@@ -25,6 +25,10 @@
     "properties": {
         "schema_version": {
             "default": "1"
+        },
+        "filtering_condition": {
+            "type": "string",
+            "description": "Condition for filtering (applicable only to filtered vcfs)"
         }
     },
     "facets": {
