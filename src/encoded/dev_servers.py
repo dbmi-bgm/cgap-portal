@@ -89,6 +89,7 @@ def main():
     run(app_name=args.app_name, config_uri=args.config_uri, datadir=args.datadir,
         clear=args.clear, init=args.init, load=args.load, ingest=not args.no_ingest)
 
+
 def run(app_name, config_uri, datadir, clear=False, init=False, load=False, ingest=True):
 
     logging.basicConfig(format='')
