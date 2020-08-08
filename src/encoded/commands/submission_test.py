@@ -1,7 +1,8 @@
-from pyramid.paster import get_app
-from encoded.submit import *
-from dcicutils.misc_utils import VirtualApp
 import json
+
+from dcicutils.misc_utils import VirtualApp
+from encoded.submit import xls_to_json, validate_all_items, post_and_patch_all_items
+from pyramid.paster import get_app
 
 
 def main():
