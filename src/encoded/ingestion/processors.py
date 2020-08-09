@@ -91,6 +91,8 @@ def handle_data_bundle(submission):
                                                 vapp=submission.vapp,
                                                 validate_only=validate_only)
 
+        debuglog(submission_id, "data_bundle_result:", json.dumps(data_bundle_result, indent=2))
+
         resolution["validation_report_key"] = validation_report_key = "%s/validation-report.txt" % submission_id
         resolution["submission_key"] = submission_key = "%s/submission.json" % submission_id
         resolution["submission_response_key"] = submission_response_key = "%s/submission-response.txt" % submission_id
