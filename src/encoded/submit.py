@@ -90,11 +90,14 @@ def submit_data_bundle(*, s3_client, bucket, key, project, institution, vapp,  #
             return results
         results['success'] = validate_success
         if validate_only:
+            debuglog("submit_data_bundle (validate_only=True) returns", json.dumps(results, indent=2))
             return results
         result_lines, post_success, upload_info = post_and_patch_all_items(vapp, json_data_final=processing_result)
+        debuglog("in submit_data_bundle, upload_info=", json.dumps(upload_info, indent=2))
         results['post_output'] = result_lines
         results['success'] = post_success
         results['upload_info'] = upload_info
+        debuglog("submit_data_bundle returns", json.dumps(results, indent=2))
         return results
 
 
@@ -737,6 +740,7 @@ def post_and_patch_all_items(virtualapp, json_data_final):
             output.append('{}: {} items patched successfully; {} items not patched'.format(
                 k, final_status[k]['patched'], final_status[k]['not patched']
             ))
+    debuglog("post_and_patch_all_items returns files:", files)
     return output, no_errors, files
 
 
