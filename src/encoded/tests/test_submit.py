@@ -3,6 +3,7 @@ import xlrd
 
 from copy import deepcopy
 from unittest import mock
+from .. import submit
 from ..submit import (
     compare_fields,
     create_families,
@@ -276,7 +277,7 @@ def test_xls_to_json_no_header(project, institution, xls_list):
     no_top_header = xls_list[1:]  # top header missing should work ok (e.g. 'Patient Information', etc)
     no_main_header = [xls_list[0]] + xls_list[2:]  # main header missing should cause a caught error
     no_comments = xls_list[0:2] + xls_list[3:]
-    with mock.patch('encoded.submit.row_generator') as row_gen:
+    with mock.patch.object(submit, 'row_generator') as row_gen:
         row_gen.return_value = iter(no_top_header)
         json_out, success = xls_to_json('src/encoded/tests/data/documents/cgap_submit_test.xlsx', project, institution)
         assert success
@@ -292,7 +293,7 @@ def test_xls_to_json_missing_req_col(project, institution, xls_list):
     # test error is caught when a required column in missing from excel file
     idx = xls_list[1].index('Specimen ID')
     rows = [row[0:idx] + row[idx+1:] for row in xls_list]
-    with mock.patch('encoded.submit.row_generator') as row_gen:
+    with mock.patch.object(submit, 'row_generator') as row_gen:
         row_gen.return_value = iter(rows)
         json_out, success = xls_to_json('src/encoded/tests/data/documents/cgap_submit_test.xlsx', project, institution)
         assert not success
@@ -302,7 +303,7 @@ def test_xls_to_json_missing_req_val(project, institution, xls_list):
     # test error is caught when a required column is present but value is missing in a row
     idx = xls_list[1].index('Specimen ID')
     xls_list[4] = xls_list[4][0:idx] + [''] + xls_list[4][idx+1:]
-    with mock.patch('encoded.submit.row_generator') as row_gen:
+    with mock.patch.object(submit, 'row_generator') as row_gen:
         row_gen.return_value = iter(xls_list)
         json_out, success = xls_to_json('src/encoded/tests/data/documents/cgap_submit_test.xlsx', project, institution)
         assert json_out['errors']
@@ -313,7 +314,7 @@ def test_xls_to_json_invalid_workup(project, institution, xls_list):
     # invalid workup type is caught as an error
     idx = xls_list[1].index('Workup Type')
     xls_list[4] = xls_list[4][0:idx] + ['Other'] + xls_list[4][idx+1:]
-    with mock.patch('encoded.submit.row_generator') as row_gen:
+    with mock.patch.object(submit, 'row_generator') as row_gen:
         row_gen.return_value = iter(xls_list)
         json_out, success = xls_to_json('src/encoded/tests/data/documents/cgap_submit_test.xlsx', project, institution)
         assert json_out['errors']
@@ -328,7 +329,7 @@ def test_xls_to_json_mixed_workup(project, institution, xls_list):
     idx = xls_list[1].index('Workup Type')
     xls_list[3] = xls_list[3][0:idx] + ['WES'] + xls_list[3][idx+1:]
     one_row = xls_list[:4]
-    with mock.patch('encoded.submit.row_generator') as row_gen:
+    with mock.patch.object(submit, 'row_generator') as row_gen:
         row_gen.return_value = iter(xls_list)
         json_out, success = xls_to_json('src/encoded/tests/data/documents/cgap_submit_test.xlsx', project, institution)
         assert json_out['errors']
