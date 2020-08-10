@@ -65,7 +65,10 @@ def process_genelist(context, request):
                                       ' keys: download, type, href. Found: %s'
                                       % (genelist_item, request.json.keys()))
     # verification on the attachment.
-    if request.json['type'] != '' or not request.json['download'].endswith('.pbxml'):
+    accepted_types = ['text/plain', 'text/csv']
+    accepted_extensions = ['.txt', '.csv']
+    extension = request.json['download'].split('.')[-1]
+    if request.json['type'] not in accepted_types or extension not in accepted_extensions:
         raise HTTPUnprocessableEntity('GeneList %s: Bad file upload. Use .txt'
                                       ' file. Found: %s (file type), %s (file name)'
                                       % (genelist_item, request.json['type'], request.json['download']))
@@ -91,9 +94,9 @@ def process_genelist(context, request):
     try:
         content = request.json['href']
         # use following as delimenter [space, tab, new line, comma, colon, semicolon]
-        for delimeter in [' ', '\t', '\n', ',', ':', ';']:
+        for delimeter in [' ', '\t', '\r\n', '\r', '\n', ',', ':', ';']:
             content = content.replace(delimeter, ',')
-        genes = [i.strip().upper() for i in content.split(',')]
+        genes = [i.strip().upper() for i in content.split(',') if i]
         assert genes
     except Exception as exc:
         response['status'] = 'failure'
