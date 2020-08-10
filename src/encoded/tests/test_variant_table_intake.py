@@ -7,7 +7,7 @@ from encoded.tests.variant_fixtures import ANNOTATION_FIELD_URL
 
 # XXX: These constants should probably be handled in a more intelligent way -will
 pytestmark = [pytest.mark.working, pytest.mark.ingestion]
-MT_LOC = resolve_file_path('annotations/variant_table_v0.4.7.csv')
+MT_LOC = resolve_file_path('annotations/variant_table_v0.4.8.csv')
 ANNOTATION_FIELD_SCHEMA = resolve_file_path('schemas/annotation_field.json')
 EXPECTED_FIELDS = ['no', 'field_name', 'source_name', 'source_version', 'sub_embedding_group',
                    'field_type', 'is_list',
@@ -27,10 +27,11 @@ EXPECTED_INSERT = {'no': 1, 'field_name': 'CHROM', 'schema_title': 'Chromosome',
                    'value_example': '1;2;3;4;5;6;22;X;Y;M', 'annotation_space_location': 'Position'}
 VEP_CONSEQUENCE_EMBEDS = ['transcript.vep_consequence.var_conseq_id', 'transcript.vep_consequence.definition',
                           'transcript.vep_consequence.impact', 'transcript.vep_consequence.location',
-                          'transcript.vep_consequence.coding_effect', 'transcript.vep_gene.display_title']
-NUMBER_ANNOTATION_FIELDS = 343
+                          'transcript.vep_consequence.coding_effect', 'transcript.vep_gene.display_title',
+                          'transcript.vep_gene.gene_symbol', 'transcript.vep_gene.ensgid']
+NUMBER_ANNOTATION_FIELDS = 353
 SAMPLE_FIELDS_EXPECTED = 27
-VARIANT_FIELDS_EXPECTED = 316
+VARIANT_FIELDS_EXPECTED = 326
 TRANSCRIPT_FIELDS_EXPECTED = 35
 
 
@@ -71,8 +72,8 @@ def test_add_default_schema_fields(MTParser):
 
 def test_read_variant_table_header(MTParser):
     """ Tests that we can read mapping table header correctly based on the current format """
-    assert MTParser.version == 'annV0.4.7'
-    assert MTParser.date == '07.16.2020'
+    assert MTParser.version == 'annV0.4.8'
+    assert MTParser.date == '08.10.2020'
     assert sorted(MTParser.fields) == sorted(EXPECTED_FIELDS)
     for field in EXPECTED_FIELDS:  # all fields are categorized by the Parser
         assert field in MTParser.ALL_FIELDS
@@ -142,7 +143,8 @@ def test_generate_variant_json_items(MTParser, inserts):
     assert 'gnomad_af' in facs
     assert facs['CHROM']['title'] == 'Chromosome'
     assert facs['CHROM']['grouping'] == 'Position'
-    assert facs['spliceai_ds_dg']['aggregation_type'] == 'stats'
+    assert facs['transcript.vep_sift_score']['aggregation_type'] == 'stats'
+    assert facs['transcript.vep_sift_score']['order'] == 24
 
 
 def test_generate_variant_sample_schema(MTParser, sample_variant_items):

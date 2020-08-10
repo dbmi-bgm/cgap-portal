@@ -80,16 +80,15 @@ class TestIngestVCF:
         # check top level fields
         assert self.get_top_level_field(result, 'CHROM') == '1'
         assert self.get_top_level_field(result, 'cytoband_cytoband') == '1p36.33'
-        assert self.get_top_level_field(result, 'conservation_phastcons30') == 0.002
-        assert self.get_top_level_field(result, 'dbsnp_rs_number') == 'rs748758211'
-        assert self.get_top_level_field(result, 'gnomad_an_raw') == 143382
+        assert self.get_top_level_field(result, 'conservation_phastcons30') == 0.545
+        assert self.get_top_level_field(result, 'dbsnp_rs_number') == 'rs72631890'
+        assert self.get_top_level_field(result, 'gnomad_an_raw') == 143376
 
         # check sub-embedded object fields
-        assert len(result['transcript']) == 2
-        assert self.get_transcript_field(result, 0, 'vep_consequence') == ['inframe_deletion']
-        assert self.get_transcript_field(result, 0, 'vep_gene') == 'ENSG00000187642'
-        assert self.get_transcript_field(result, 0, 'vep_canonical') is False
-        assert self.get_transcript_field(result, 1, 'vep_tsl') == 5
+        assert len(result['transcript']) == 1
+        assert self.get_transcript_field(result, 0, 'vep_consequence') == ['missense_variant']
+        assert self.get_transcript_field(result, 0, 'vep_gene') == 'ENSG00000188976'
+        assert self.get_transcript_field(result, 0, 'vep_canonical') is True
 
     def test_build_multiple_variants(self, test_vcf):
         """
@@ -103,37 +102,34 @@ class TestIngestVCF:
 
         # check top level fields
         assert self.get_top_level_field(result, 'mutanno_variant_class') == 'DEL'
-        assert self.get_top_level_field(result, 'mutanno_hgvsg') == 'NC_000001.11:g.1013550_1013556del'
-        assert self.get_top_level_field(result, 'conservation_phylop20') == 0.655
-        assert self.get_top_level_field(result, 'conservation_phylop30') == 0.777
-        assert self.get_top_level_field(result, 'topmed_het') == 403
+        assert self.get_top_level_field(result, 'mutanno_hgvsg') == 'NC_000001.11:g.979035_979037del'
+        assert self.get_top_level_field(result, 'conservation_phylop20') == -0.91
+        assert self.get_top_level_field(result, 'conservation_phylop30') == -1.239
+        assert self.get_top_level_field(result, 'topmed_het') == 67
         assert self.get_top_level_field(result, 'conservation_phastcons100') == 0.0
 
         # check transcript
-        assert len(result['transcript'].keys()) == 1
-        assert self.get_transcript_field(result, 0, 'vep_consequence') == ['5_prime_UTR_variant']
-        assert self.get_transcript_field(result, 0, 'vep_feature') == 'ENST00000649529'
+        assert len(result['transcript'].keys()) == 2
+        assert self.get_transcript_field(result, 0, 'vep_consequence') == ['inframe_deletion']
+        assert self.get_transcript_field(result, 0, 'vep_feature') == 'ENST00000341290'
+        assert self.get_transcript_field(result, 0, 'vep_domains') == ['PANTHER:PTHR47282']
 
         # check genes
-        assert self.get_genes_field(result, 0, 'genes_ensg') == 'ENSG00000187608'
-        assert self.get_genes_field(result, 0, 'genes_most_severe_transcript') == 'ENST00000649529'
+        assert self.get_genes_field(result, 0, 'genes_ensg') == 'ENSG00000187642'
+        assert self.get_genes_field(result, 0, 'genes_most_severe_transcript') == 'ENST00000433179'
 
         # check hg19
-        assert self.get_hg19_field(result, 0, 'hg19_pos') == 948929
+        assert self.get_hg19_field(result, 0, 'hg19_pos') == 914414
 
         # check record 3 (only a few things)
         record = test_vcf.read_next_record()
         result = test_vcf.create_variant_from_record(record)
-        assert len(result[self.VEP_IDENTIFIER].keys()) == 4
-        assert self.get_transcript_field(result, 0, 'vep_consequence') == ['missense_variant']
-        assert self.get_transcript_field(result, 0, 'vep_feature') == 'ENST00000379370'
-        assert self.get_transcript_field(result, 1, 'vep_trembl') == 'A0A087X208'
-        assert self.get_top_level_field(result, 'gnomad_ac_afr_male') == 0
-        assert self.get_top_level_field(result, 'topmed_het') == 1
-        assert sorted(self.get_transcript_field(result, 0, 'vep_domains')) == sorted(
-            ['Gene3D:3.30.60.30', 'PANTHER:PTHR10574', 'PANTHER:PTHR10574:SF288', 'SMART:SM00181', 'SMART:SM00274',
-             'Superfamily:SSF100895']
-        )
+        assert len(result[self.VEP_IDENTIFIER].keys()) == 1
+        assert self.get_transcript_field(result, 0, 'vep_consequence') == ['5_prime_UTR_variant']
+        assert self.get_transcript_field(result, 0, 'vep_feature') == 'ENST00000649529'
+        assert self.get_transcript_field(result, 0, 'vep_trembl') == None
+        assert self.get_top_level_field(result, 'gnomad_ac_afr_male') == 158
+        assert self.get_top_level_field(result, 'topmed_het') == 403
 
     def test_build_multiple_sample_variants(self, test_vcf):
         """ Generates 3 sample variant items and checks them for correctness """
@@ -141,22 +137,21 @@ class TestIngestVCF:
         result = test_vcf.create_sample_variant_from_record(record)
         for sample in result:
             assert self.get_top_level_field(sample, 'GT') != '0/0'  # this VCF has one of these that should be dropped
-        assert result[0]['FS'] == 0.0
+        assert result[0]['FS'] == 1.28
 
         record = test_vcf.read_next_record()
         result = test_vcf.create_sample_variant_from_record(record)[0]
-        assert self.get_top_level_field(result, 'DP') == 25
+        assert self.get_top_level_field(result, 'DP') == 38
         assert self.get_top_level_field(result, 'GT') == '0/1'
         assert self.get_top_level_field(result, 'GQ') == 99
-        assert self.get_top_level_field(result, 'PL') == '362,0,599'
+        assert self.get_top_level_field(result, 'PL') == '876,0,605'
         record = test_vcf.read_next_record()
         result = test_vcf.create_sample_variant_from_record(record)[0]
-        assert self.get_top_level_field(result, 'DP') == 29
-        assert len(result['samplegeno']) == 1
+        assert self.get_top_level_field(result, 'DP') == 52
+        assert len(result['samplegeno']) == 3
         assert 'samplegeno_numgt' in result['samplegeno'][0]
         assert 'samplegeno_ad' in result['samplegeno'][0]
         assert 'samplegeno_gt' in result['samplegeno'][0]
-        assert 'cmphet' in result
 
     def test_post_variants(self, testapp, institution, project, test_vcf, gene_workbook, post_variant_consequence_items):
         """ Attempts to post all generated variants without links """
