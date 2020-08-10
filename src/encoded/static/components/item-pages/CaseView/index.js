@@ -64,8 +64,8 @@ export default class CaseView extends DefaultItemView {
      */
     getControllers(){
         return [
-            CurrentFamilyController,
-            PedigreeTabViewOptionsController
+            CurrentFamilyController
+            // PedigreeTabViewOptionsController // TODO: re-fix; seems broken
         ];
     }
 
