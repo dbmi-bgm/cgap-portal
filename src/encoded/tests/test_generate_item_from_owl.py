@@ -156,7 +156,7 @@ def test_get_existing_items(connection, rel_disorders, delobs_disorders):
     # TODO: Currently this test passes but is not really a unit test and also does not
     #       quite mock the correct things so should be refactored
     disorder_ids = [d.get('disorder_id') for d in rel_disorders + delobs_disorders]
-    with mock.patch('encoded.commands.generate_items_from_owl.search_metadata', side_effect=[rel_disorders, delobs_disorders]):
+    with mock.patch.object(gifo, 'search_metadata', side_effect=[rel_disorders, delobs_disorders]):
         dbdiseases = gifo.get_existing_items(connection, 'Disorder')
         assert len(dbdiseases) == len(rel_disorders) + len(delobs_disorders)
         assert all([d in dbdiseases for d in disorder_ids])
@@ -164,7 +164,7 @@ def test_get_existing_items(connection, rel_disorders, delobs_disorders):
 
 def test_get_existing_items_from_db_w_deleted(connection, disorder_gen, delobs_disorder_gen, rel_disorders, delobs_disorders):
     disorder_ids = [d.get('disorder_id') for d in rel_disorders + delobs_disorders]
-    with mock.patch('encoded.commands.generate_items_from_owl.search_metadata', side_effect=[disorder_gen, delobs_disorder_gen]):
+    with mock.patch.object(gifo, 'search_metadata', side_effect=[disorder_gen, delobs_disorder_gen]):
         dbdiseases = list(gifo.get_existing_items_from_db(connection, 'Disorder'))
         assert len(dbdiseases) == len(rel_disorders) + len(delobs_disorders)
         assert all([dis.get('disorder_id') in disorder_ids for dis in dbdiseases])
@@ -172,7 +172,7 @@ def test_get_existing_items_from_db_w_deleted(connection, disorder_gen, delobs_d
 
 def test_get_existing_items_from_db_wo_deleted(connection, disorder_gen, rel_disorders):
     disorder_ids = [d.get('disorder_id') for d in rel_disorders]
-    with mock.patch('encoded.commands.generate_items_from_owl.search_metadata', side_effect=[disorder_gen]):
+    with mock.patch.object(gifo, 'search_metadata', side_effect=[disorder_gen]):
         dbdiseases = list(gifo.get_existing_items_from_db(connection, 'Disorder', include_invisible=False))
         assert len(dbdiseases) == len(rel_disorders)
         assert all([dis.get('disorder_id') in disorder_ids for dis in dbdiseases])
@@ -186,7 +186,7 @@ def test_get_existing_items_from_db_w_duplicates(connection, rel_disorders):
     rel_disorders.append(rel_disorders[0])  # add the duplicate item
     dgen = iter(rel_disorders)
     disorder_ids = [d.get('disorder_id') for d in rel_disorders]
-    with mock.patch('encoded.commands.generate_items_from_owl.search_metadata', side_effect=[dgen]):
+    with mock.patch.object(gifo, 'search_metadata', side_effect=[dgen]):
         dbdiseases = list(gifo.get_existing_items_from_db(connection, 'Disorder', include_invisible=False))
         assert len(dbdiseases) == len(rel_disorders)
         assert all([dis.get('disorder_id') in disorder_ids for dis in dbdiseases])
@@ -338,7 +338,7 @@ def test_is_deprecated_not_deprecated(uberon_owler5):
 
 
 def test_create_term_dict(mkd_class, uberon_owler5):
-    with mock.patch('encoded.commands.generate_items_from_owl.get_term_name_from_rdf',
+    with mock.patch.object(gifo, 'get_term_name_from_rdf',
                     return_value='Multicystic kidney dysplasia'):
         term = gifo.create_term_dict(mkd_class, 'HP:0000003', uberon_owler5, 'Phenotype')
         assert term == {'hpo_id': 'HP:0000003', 'hpo_url': 'http://purl.obolibrary.org/obo/HP_0000003', 'phenotype_name': 'Multicystic kidney dysplasia'}
@@ -372,11 +372,11 @@ def simple_terms():
 def test_add_additional_term_info(simple_terms):
     val_lists = [[], ['val1'], ['val1', 'val2']]
     fields = ['definition', 'synonyms', 'dbxrefs', 'alternative_ids']
-    with mock.patch('encoded.commands.generate_items_from_owl.convert2URIRef', return_value='blah'):
-        with mock.patch('encoded.commands.generate_items_from_owl.get_synonyms', side_effect=val_lists):
-            with mock.patch('encoded.commands.generate_items_from_owl.get_definitions', side_effect=val_lists):
-                with mock.patch('encoded.commands.generate_items_from_owl.get_dbxrefs', side_effect=val_lists):
-                    with mock.patch('encoded.commands.generate_items_from_owl.get_alternative_ids', side_effect=val_lists):
+    with mock.patch.object(gifo, 'convert2URIRef', return_value='blah'):
+        with mock.patch.object(gifo, 'get_synonyms', side_effect=val_lists):
+            with mock.patch.object(gifo, 'get_definitions', side_effect=val_lists):
+                with mock.patch.object(gifo, 'get_dbxrefs', side_effect=val_lists):
+                    with mock.patch.object(gifo, 'get_alternative_ids', side_effect=val_lists):
                         result = gifo.add_additional_term_info(simple_terms, 'data', 'synterms', 'defterms', 'Phenotype')
                         for tid, term in result.items():
                             for f in fields:
@@ -402,7 +402,7 @@ def returned_synonyms():
 
 
 def test_get_syn_def_dbxref_altid(owler, returned_synonyms):
-    with mock.patch('encoded.commands.generate_items_from_owl.getObjectLiteralsOfType',
+    with mock.patch.object(gifo, 'getObjectLiteralsOfType',
                     side_effect=returned_synonyms):
         checks = ['test_val1', 'test_val2']
         class_ = 'test_class'
@@ -636,16 +636,16 @@ def test_check_for_fields_to_keep(raw_item_dict):
 
 
 def test_id_fields2patch_unchanged(raw_item_dict):
-    with mock.patch('encoded.commands.generate_items_from_owl.get_raw_form', return_value=raw_item_dict):
-        with mock.patch('encoded.commands.generate_items_from_owl.compare_terms', return_value=None):
+    with mock.patch.object(gifo, 'get_raw_form', return_value=raw_item_dict):
+        with mock.patch.object(gifo, 'compare_terms', return_value=None):
             assert not gifo.id_fields2patch(raw_item_dict, raw_item_dict, True)
 
 
 def test_id_fields2patch_keep_term(raw_item_dict):
     """ case when remove unchanged (rm_unch) param is False just returns term
     """
-    with mock.patch('encoded.commands.generate_items_from_owl.get_raw_form', return_value=raw_item_dict):
-        with mock.patch('encoded.commands.generate_items_from_owl.compare_terms', return_value=None):
+    with mock.patch.object(gifo, 'get_raw_form', return_value=raw_item_dict):
+        with mock.patch.object(gifo, 'compare_terms', return_value=None):
             assert gifo.id_fields2patch(raw_item_dict, raw_item_dict, False) == raw_item_dict
 
 
@@ -653,8 +653,8 @@ def test_id_fields2patch_find_some_fields(raw_item_dict):
     """ case when remove unchanged (rm_unch) param is False just returns term
     """
     patch = {'uuid': 'uuid1', 'field1': 'val1', 'field2': ['a', 'b']}
-    with mock.patch('encoded.commands.generate_items_from_owl.get_raw_form', return_value=raw_item_dict):
-        with mock.patch('encoded.commands.generate_items_from_owl.compare_terms', return_value=patch):
+    with mock.patch.object(gifo, 'get_raw_form', return_value=raw_item_dict):
+        with mock.patch.object(gifo, 'compare_terms', return_value=patch):
             assert gifo.id_fields2patch(raw_item_dict, raw_item_dict, True) == patch
 
 
@@ -699,8 +699,8 @@ def test_identify_item_updates_no_changes(terms, mock_logger):
     dbterms = terms.copy()
     for i, tid in enumerate(dbterms.keys()):
         dbterms[tid].update({'uuid': 'uuid' + str(i + 1)})
-    with mock.patch('encoded.commands.generate_items_from_owl._get_uuids_for_linked', return_value={}):
-        with mock.patch('encoded.commands.generate_items_from_owl.id_fields2patch', return_value=None):
+    with mock.patch.object(gifo, '_get_uuids_for_linked', return_value={}):
+        with mock.patch.object(gifo, 'id_fields2patch', return_value=None):
             assert not gifo.identify_item_updates(terms, dbterms, 'Phenotype', logger=mock_logger)
 
 
@@ -712,9 +712,9 @@ def test_identify_item_updates_w_new_term(terms, mock_logger):
     terms['hp:11'] = new_term
     side_effect = [None] * 9
     side_effect.append(new_term)
-    with mock.patch('encoded.commands.generate_items_from_owl.uuid4', return_value='uuid11'):
-        with mock.patch('encoded.commands.generate_items_from_owl._get_uuids_for_linked', return_value={}):
-            with mock.patch('encoded.commands.generate_items_from_owl.id_fields2patch', side_effect=side_effect):
+    with mock.patch.object(gifo, 'uuid4', return_value='uuid11'):
+        with mock.patch.object(gifo, '_get_uuids_for_linked', return_value={}):
+            with mock.patch.object(gifo, 'id_fields2patch', side_effect=side_effect):
                 to_update = gifo.identify_item_updates(terms, dbterms, 'Phenotype', logger=mock_logger)
                 new_term.update({'uuid': 'uuid11'})
                 assert to_update[0] == new_term
@@ -732,8 +732,8 @@ def test_identify_item_updates_w_patch_term(terms, mock_logger):
         se = copy.deepcopy(added_field)
         se.update({'uuid': 'uuid{}'.format(n)})
         side_effect.append(se)
-    with mock.patch('encoded.commands.generate_items_from_owl._get_uuids_for_linked', return_value={}):
-        with mock.patch('encoded.commands.generate_items_from_owl.id_fields2patch', side_effect=side_effect):
+    with mock.patch.object(gifo, '_get_uuids_for_linked', return_value={}):
+        with mock.patch.object(gifo, 'id_fields2patch', side_effect=side_effect):
             to_update = gifo.identify_item_updates(terms, dbterms, 'Phenotype', logger=mock_logger)
             assert len(to_update) == 2
             for upd in to_update:
@@ -751,8 +751,8 @@ def test_identify_item_updates_set_obsolete_true_obsolete(terms, mock_logger):
     for tid in dbterms.keys():
         uid = tid.replace('hp:', 'uuid')
         dbterms[tid].update({'uuid': uid})
-    with mock.patch('encoded.commands.generate_items_from_owl._get_uuids_for_linked', return_value={}):
-        with mock.patch('encoded.commands.generate_items_from_owl.id_fields2patch', return_value=None):
+    with mock.patch.object(gifo, '_get_uuids_for_linked', return_value={}):
+        with mock.patch.object(gifo, 'id_fields2patch', return_value=None):
             to_update = gifo.identify_item_updates(terms, dbterms, 'Phenotype', logger=mock_logger)
             assert len(to_update) == 1
             obsterm = to_update[0]
@@ -769,8 +769,8 @@ def test_identify_item_updates_set_obsolete_false_do_not_obsolete_live_term(term
     dbterms.update({added_obs['hpo_id']: added_obs})
     for i, tid in enumerate(dbterms.keys()):
         dbterms[tid].update({'uuid': 'uuid' + str(i + 1)})
-    with mock.patch('encoded.commands.generate_items_from_owl._get_uuids_for_linked', return_value={}):
-        with mock.patch('encoded.commands.generate_items_from_owl.id_fields2patch', return_value=None):
+    with mock.patch.object(gifo, '_get_uuids_for_linked', return_value={}):
+        with mock.patch.object(gifo, 'id_fields2patch', return_value=None):
             to_update = gifo.identify_item_updates(terms, dbterms, 'Phenotype', set_obsoletes=False, logger=mock_logger)
             assert not to_update
 
@@ -784,8 +784,8 @@ def test_identify_item_updates_set_obsolete_true_do_not_patch_obsolete_term(term
     dbterms.update({added_obs['hpo_id']: added_obs})
     for i, tid in enumerate(dbterms.keys()):
         dbterms[tid].update({'uuid': 'uuid' + str(i + 1)})
-    with mock.patch('encoded.commands.generate_items_from_owl._get_uuids_for_linked', return_value={}):
-        with mock.patch('encoded.commands.generate_items_from_owl.id_fields2patch', return_value=None):
+    with mock.patch.object(gifo, '_get_uuids_for_linked', return_value={}):
+        with mock.patch.object(gifo, 'id_fields2patch', return_value=None):
             to_update = gifo.identify_item_updates(terms, dbterms, 'Phenotype', logger=mock_logger)
             assert not to_update
 

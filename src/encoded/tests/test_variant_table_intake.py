@@ -1,8 +1,9 @@
 import json
 import pytest
-from encoded.util import resolve_file_path
-from encoded.commands.variant_table_intake import MappingTableParser
-from encoded.tests.variant_fixtures import ANNOTATION_FIELD_URL
+
+from ..util import resolve_file_path
+from ..commands.variant_table_intake import MappingTableParser
+from .variant_fixtures import ANNOTATION_FIELD_URL
 
 
 # XXX: These constants should probably be handled in a more intelligent way -will

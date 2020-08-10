@@ -3,8 +3,8 @@ import argparse
 import logging
 from pyramid.paster import get_app
 from dcicutils.misc_utils import VirtualApp
-from encoded.commands.gene_table_intake import GeneTableParser, GeneTableIntakeException
-from encoded.commands.ingest_genes import GeneIngestion
+from ..commands.gene_table_intake import GeneTableParser, GeneTableIntakeException
+from ..commands.ingest_genes import GeneIngestion
 from tqdm import tqdm
 
 logger = logging.getLogger(__name__)

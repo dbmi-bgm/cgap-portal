@@ -165,7 +165,6 @@ def test_ingestion_listener_run(testapp, mocked_vcf_file, gene_workbook, setup_a
     # XXX: This is a really hard thing to test, but take my word for it that this is doing "something" -Will
     #      If you do not get ValueError here, it means the VCF wasn't processed in the run method or a different
     #      error occurred.
-    with mock.patch('encoded.ingestion_listener.IngestionListener.should_remain_online',
-                    new=mocked_should_remain_online):
+    with mock.patch.object(IngestionListener, 'should_remain_online', new=mocked_should_remain_online):
         with pytest.raises(ValueError):
             run(testapp, _queue_manager=queue_manager)  # expected in this test since the source VCF is malformed
