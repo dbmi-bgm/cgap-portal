@@ -19,7 +19,7 @@ from pyramid.settings import asbool
 from pyramid.threadlocal import get_current_request
 from pyramid.traversal import resource_path
 from pyramid.view import view_config
-from dcicutils.env_utils import CGAP_ENV_WEBPROD
+from dcicutils.env_utils import CGAP_ENV_WEBPROD, CGAP_ENV_WOLF
 from snovault import (
     AfterModified,
     BeforeModified,
@@ -709,10 +709,7 @@ def is_file_to_download(properties, file_format, expected_filename=None):
 @view_config(name='download', context=File, request_method='GET',
              permission='view', subpath_segments=[0, 1])
 def download(context, request):
-    # disable if not on cgap prod
-    if request.registry.settings.get('env.name', 'localhost') not in [CGAP_ENV_WEBPROD, 'localhost']:
-        raise HTTPForbidden('Downloads disabled when not on cgap-prod (or testing)!')
-
+    """ File download route. Generates a pre-signed S3 URL for the object that expires eventually. """
     # first check for restricted status
     try:
         user_props = session_properties(context, request)

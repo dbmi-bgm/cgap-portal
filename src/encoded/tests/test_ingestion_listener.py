@@ -55,7 +55,7 @@ def test_ingestion_queue_add_and_receive(setup_and_teardown_sqs_state):
         str(uuid4()), str(uuid4())
     ])
     wait_for_queue_to_catch_up(0)
-    tries, msgs = 5, []
+    tries, msgs = 10, []
     while len(msgs) < 2:
         if tries < 0:
             break
