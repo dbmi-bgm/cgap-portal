@@ -120,20 +120,23 @@ export const PedigreeTabViewOptionsController = React.memo(function PedigreeTabV
         return false;
     }
 
-    const { selectedDiseases, availableDiseases, onToggleSelectedDisease } = usePhenotypicFeatureStrings(currentFamily);
-    const childProps = {
-        ...props,
-        availableDiseases,
-        selectedDiseases,
-        onToggleSelectedDisease,
-        onTogglePedigreeOptionCheckbox,
-        showOrderBasedName,
-        // showAsDiseases,
-        // setShowAsDiseases
-    };
-    return React.Children.map(children, function(child){
-        return React.cloneElement(child, childProps);
-    });
+    if (currentFamily) {
+        const { selectedDiseases, availableDiseases, onToggleSelectedDisease } = usePhenotypicFeatureStrings(currentFamily);
+        const childProps = {
+            ...props,
+            availableDiseases,
+            selectedDiseases,
+            onToggleSelectedDisease,
+            onTogglePedigreeOptionCheckbox,
+            showOrderBasedName,
+            // showAsDiseases,
+            // setShowAsDiseases
+        };
+        return React.Children.map(children, function(child){
+            return React.cloneElement(child, childProps);
+        });
+    }
+    return null;
 });
 
 
