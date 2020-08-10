@@ -4,6 +4,7 @@ import time
 import mock
 import datetime
 from uuid import uuid4
+from dcicutils.misc_utils import Retry
 from dcicutils.qa_utils import ignored, notice_pytest_fixtures
 from ..ingestion_listener import IngestionQueueManager, run, IngestionListener
 from ..util import gunzip_content
@@ -48,22 +49,26 @@ def test_ingestion_queue_manager_basic(setup_and_teardown_sqs_state):
     assert queue_manager.queue_name == MOCKED_ENV + queue_manager.BUCKET_EXTENSION
 
 
-def test_ingestion_queue_add_and_receive(setup_and_teardown_sqs_state):
-    """ Tests adding/receiving some uuids """
-    queue_manager = setup_and_teardown_sqs_state
-    queue_manager.add_uuids([
-        str(uuid4()), str(uuid4())
-    ])
+def _expect_n_messages(queue_manager, n):
     wait_for_queue_to_catch_up(0)
     tries, msgs = 5, []
-    while len(msgs) < 2:
+    while len(msgs) < n:
         if tries < 0:
             break
         _msgs = queue_manager.receive_messages(batch_size=1)  # should reduce flakiness
         msgs.extend(_msgs)
         wait_for_queue_to_catch_up(0)
         tries -= 1
-    assert len(msgs) == 2
+    assert len(msgs) == n
+
+
+def test_ingestion_queue_add_and_receive(setup_and_teardown_sqs_state):
+    """ Tests adding/receiving some uuids """
+    queue_manager = setup_and_teardown_sqs_state
+    queue_manager.add_uuids([
+        str(uuid4()), str(uuid4())
+    ])
+    _expect_n_messages(queue_manager, 2)
 
 
 def test_ingestion_queue_add_via_route(setup_and_teardown_sqs_state, testapp):
@@ -76,9 +81,7 @@ def test_ingestion_queue_add_via_route(setup_and_teardown_sqs_state, testapp):
     response = testapp.post_json(QUEUE_INGESTION_URL, request_body).json
     assert response['notification'] == 'Success'
     assert response['number_queued'] == 2
-    wait_for_queue_to_catch_up(0)
-    msgs = queue_manager.receive_messages()
-    assert len(msgs) >= 2
+    _expect_n_messages(queue_manager, 2)
 
 
 def test_ingestion_queue_delete(setup_and_teardown_sqs_state, testapp):
@@ -168,3 +171,9 @@ def test_ingestion_listener_run(testapp, mocked_vcf_file, gene_workbook, setup_a
     with mock.patch.object(IngestionListener, 'should_remain_online', new=mocked_should_remain_online):
         with pytest.raises(ValueError):
             run(testapp, _queue_manager=queue_manager)  # expected in this test since the source VCF is malformed
+
+
+def test_test_port():
+
+    from snovault.tests.test_postgresql_fixture import SNOVAULT_DB_TEST_PORT
+    assert SNOVAULT_DB_TEST_PORT == 5440
