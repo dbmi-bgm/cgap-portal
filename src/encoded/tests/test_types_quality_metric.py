@@ -105,16 +105,16 @@ def bam_qc(testapp, institution, project):
     return testapp.post_json('/quality_metric_bamqc', item).json['@graph'][0]
 
 
-
 @pytest.fixture
-def qclist(testapp, institution, project):
+def qclist(testapp, institution, project, bam_qc):
     item = {
         'institution': institution['@id'],
         'project': project['@id'],
         "status": "in review",
         "overall_quality_status": "PASS",
-        "uuid": "f94b0c13-24f9-4be4-9663-5d2213c5678e"
-        "qc_list": ["d918bc25-0888-4658-811b-53c20b944122"]
+        "uuid": "f94b0c13-24f9-4be4-9663-5d2213c5678e",
+        "qc_list": [{'qc_type': "quality_metric_bamqc",
+                     'value': bam_qc['@id']}]
     }
     return testapp.post_json('/quality_metric_qclist', item).json['@graph'][0]
 
