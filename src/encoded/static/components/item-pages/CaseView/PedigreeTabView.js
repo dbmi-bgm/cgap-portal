@@ -136,7 +136,7 @@ export const PedigreeTabViewOptionsController = React.memo(function PedigreeTabV
             return React.cloneElement(child, childProps);
         });
     }
-    return null;
+    return children;
 });
 
 
