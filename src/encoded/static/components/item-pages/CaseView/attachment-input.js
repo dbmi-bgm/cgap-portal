@@ -45,8 +45,10 @@ export class AttachmentInputController extends React.PureComponent {
             fileReader.onloadend = (e) => {
                 if (e.target.result) {
                     attachment_props.href = e.target.result;
+                    const patchURL = '/' + case_uuid + '/process-pedigree?config_uri=' + config_uri;
+                    console.log(`Attempting Pedigree Ingestion. \n\nPatching to: ${patchURL}`);
                     ajax.promise(
-                        '/' + case_uuid + '/process-pedigree?config_uri=' + config_uri,
+                        patchURL,
                         'PATCH',
                         {},
                         JSON.stringify(attachment_props)
@@ -64,9 +66,10 @@ export class AttachmentInputController extends React.PureComponent {
                         this.setState({ loading: false }, function(){
                             Alerts.queue(AttachmentInputController.ErrorObject);
                         });
-                        console.error(data);
+                        console.error("Pedigree Ingestion Error: ", data);
                     });
                 } else {
+                    console.error("Pedigree Ingestion Error: Loading file contents into FileReader failed.");
                     this.setState({ loading: false }, function(){
                         Alerts.queue(AttachmentInputController.ErrorObject);
                     });
