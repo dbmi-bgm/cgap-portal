@@ -88,12 +88,31 @@ def check_true(test_value: object,
     If the first argument does not evaluate to a true value, an error is raised.
 
     The error, if one is raised, will be of type error_class, and its message will be given by message.
+    The error_class defaults to RuntimeError, but may be any Exception class.
     """
     if not test_value:
         raise error_class(message)
 
 
 def subrequest_item_creation(request: pyramid.request.Request, item_type: str, json_body: dict = None) -> dict:
+    """
+    Acting as proxy on behalf of request, this creates a new item of the given item_type with attributes per json_body.
+
+    For example,
+
+        subrequest_item_creation(request=request, item_type='NobelPrize',
+                                 json_body={'category': 'peace', 'year': 2016))
+
+    Args:
+        request: the request on behalf of which this subrequest is done
+        item_type: the name of the item item type to be created
+        json_body: a python dictionary representing JSON containing data to use in initializing the newly created item
+
+    Returns:
+        a python dictionary (JSON description) of the item created
+
+    """
+
     if json_body is None:
         json_body = {}
     collection_path = '/' + item_type
