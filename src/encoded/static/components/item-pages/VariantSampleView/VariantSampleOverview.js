@@ -205,10 +205,10 @@ function VariantSampleOverviewTabView(props){
         <div className="d-flex align-items-flex-start sample-variant-overview-tab-view-container">
             <div className="tabs-column col col-lg-2 px-0" onClick={onClick}>
                 <OverviewTabTitle {...{ currentTab }} title="Variant" />
-                <OverviewTabTitle {...{ currentTab }} title="Gene" />
+                <OverviewTabTitle {...{ currentTab }} title="Gene" disabled={!currentGeneItem} />
                 <OverviewTabTitle {...{ currentTab }} title="Sample" />
             </div>
-            <div className="content-column">
+            <div className="content-column card">
                 { tabViewBody }
             </div>
         </div>
@@ -217,10 +217,10 @@ function VariantSampleOverviewTabView(props){
 
 
 const OverviewTabTitle = React.memo(function OverviewTabTitle(props){
-    const { currentTab, title } = props;
+    const { currentTab, title, disabled = false } = props;
     const active = (currentTab === title);
     return (
-        <button type="button" className="d-block overview-tab" data-tab-title={title} data-active={active} disabled={active}>
+        <button type="button" className="d-block overview-tab" data-tab-title={title} data-active={active} disabled={disabled}>
             { title }
         </button>
     );
@@ -231,7 +231,57 @@ function VariantTabBody(props){
 }
 
 function GeneTabBody(props){
-    return "Test2";
+    const { currentGeneItemLoading, currentGeneItem, context } = props;
+    if (currentGeneItemLoading) {
+        return (
+            <div className="gene-tab-body card-body py-5 text-center text-large">
+                <i className="icon icon-spin fas icon-circle-notch" />
+            </div>
+        );
+    }
+    return (
+        <div className="gene-tab-body card-body">
+            <div className="row">
+                <div className="col">
+                    <div className="info-header-title">
+                        <h4>Overview</h4>
+                    </div>
+                    <div className="info-body">
+                        ABCS
+                    </div>
+                    <div className="info-header-title">
+                        <h4>Conditions</h4>
+                    </div>
+                    <div className="info-body">
+                        ABCDEF<br/>
+                        ABCDFSDFS<br/>
+                        ABCDFSDFS
+                    </div>
+                </div>
+                <div className="col d-flex flex-column">
+
+                    <div className="flex-grow-1">
+                        <div className="info-header-title">
+                            <h4>External Databases</h4>
+                        </div>
+                        <div className="info-body">
+                            ABCDFSDFS
+                        </div>
+                    </div>
+
+                    <div className="flex-grow-0">
+                        <div className="info-header-title">
+                            <h4>Constraint Scores</h4>
+                        </div>
+                        <div className="info-body">
+                            ABCDFSDFS
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    );
 }
 
 function SampleTabBody(props){

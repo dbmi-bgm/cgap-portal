@@ -2394,8 +2394,9 @@ $badge-item-min-height: 90px;
 	.info-header-title {
 		display: flex;
 		align-items: center;
-		height: 42px;
+		height: 38px;
 		> h4 {
+			// todo: maybe add color if to be just for this section (?)
 			font-weight: 600;
 			margin: 0;
 		}
@@ -2403,6 +2404,8 @@ $badge-item-min-height: 90px;
 
 	.sample-variant-overview-tab-view-container {
 		.tabs-column {
+			position: relative;
+			z-index: 2;
 			//flex-grow: 0; // Will adjust via responsive Bootstrap classNames
 			//flex-shrink: 0;
 			> button.overview-tab {
@@ -2411,6 +2414,12 @@ $badge-item-min-height: 90px;
 				display: block;
 				border: none;
 				margin-bottom: 5px;
+				font-weight: 600;
+				border-radius: 0;
+				&[data-active="true"] {
+					background-color: $primary-dark;
+					color: #fff;
+				}
 			}
 		}
 		.content-column {
