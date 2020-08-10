@@ -36,7 +36,7 @@ from .commands.ingest_vcf import VCFParser
 from .ingestion.common import register_path_content_type, DATA_BUNDLE_BUCKET, SubmissionFailure, get_parameter
 from .ingestion.exceptions import UnspecifiedFormParameter
 from .ingestion.processors import get_ingestion_processor
-from .types.ingestion import SubmissionFolio
+from .types.ingestion import SubmissionFolio, ALLOW_SUBMITTER_ADD
 from .util import resolve_file_path, gunzip_content, debuglog, subrequest_item_creation
 
 
@@ -57,7 +57,7 @@ def includeme(config):
 
 
 # This endpoint is intended only for debugging. Use the command line tool.
-@view_config(route_name='prompt_for_ingestion', request_method='GET')
+@view_config(route_name='prompt_for_ingestion', request_method='GET', permission='add')
 @debug_log
 def prompt_for_ingestion(context, request):
     ignored(context, request)

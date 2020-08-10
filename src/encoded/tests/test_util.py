@@ -6,7 +6,9 @@ import tempfile
 
 from unittest import mock
 from dcicutils.qa_utils import ControlledTime
-from ..util import debuglog, deduplicate_list, gunzip_content, resolve_file_path, ENCODED_ROOT_DIR, check_true
+from ..util import (
+    debuglog, deduplicate_list, gunzip_content, resolve_file_path, ENCODED_ROOT_DIR, check_true, generate_fastq_file,
+)
 from .. import util as util_module
 
 
@@ -205,3 +207,7 @@ def test_debuglog():
                 "2010-07-04 12:30:00.007812 test 1\n"
                 "2010-07-04 12:30:00.015624 test 2\n"
             )
+
+
+# def test_generate_fastq_file():
+#     ... Need test of generate_fastq_file here ...

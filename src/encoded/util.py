@@ -3,6 +3,7 @@ import datetime
 import gzip
 import io
 import os
+import random
 import pyramid.request
 import tempfile
 
@@ -222,3 +223,40 @@ def create_empty_s3_file(s3_client, bucket: str, key: str):
     """
     empty_file = "/dev/null"
     s3_client.upload_file(empty_file, Bucket=bucket, Key=key)
+
+
+def generate_fastq_file(filename, num=10, length=10):
+    """
+    Creates a new fastq file with the given name, containing (pseudo)randomly generated content.
+
+    Example usage:
+
+        fastq_generator('fastq_sample.fastq.gz', 25, 50)
+           creates a new fastq file with 25 sequences, each of length 50.
+
+        fastq_generator('fastq_sample.fastq.gz')
+           creates a new fastq file with default characteristics (10 sequences, each of length 10).
+
+    Args:
+        filename str: the name of a file to create
+        num int: the number of random sequences (default 10)
+        length int: the length of the random sequences (default 10)
+
+    Returns:
+        the filename
+
+    """
+    if not filename.endswith('.fastq.gz'):
+        filename = filename.rstrip('fastq').rstrip('fq').rstrip('.') + '.fastq.gz'
+    content = ''
+    bases = 'ACTG'
+
+    for i in range(num):
+        content += '@SEQUENCE{} length={}\n'.format(i, length)
+        content += ''.join(random.choice(bases) for i in range(length)) + '\n'
+        content += '+\n'
+        content += 'I' * length + '\n'
+    with gzip.open(filename, 'w') as outfile:
+        outfile.write(content.encode('ascii'))
+
+    return filename
