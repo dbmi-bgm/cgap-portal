@@ -7,7 +7,7 @@ from dcicutils.misc_utils import Retry
 from pyramid.httpexceptions import HTTPBadRequest
 from snovault import TYPES, COLLECTIONS
 from snovault.elasticsearch import create_mapping
-from encoded.search.lucene_builder import LuceneBuilder
+from ..search.lucene_builder import LuceneBuilder
 from snovault.elasticsearch.indexer_utils import get_namespaced_index
 from snovault.util import add_default_embeds
 from webtest import AppError

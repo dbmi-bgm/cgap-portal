@@ -7,7 +7,7 @@ from pyramid.httpexceptions import HTTPBadRequest
 from urllib.parse import urlencode
 from snovault import TYPES
 from snovault.elasticsearch.create_mapping import determine_if_is_date_field
-from encoded.search.search_utils import (
+from .search_utils import (
     find_nested_path, convert_search_to_dictionary,
     QueryConstructionException,
     COMMON_EXCLUDED_URI_PARAMS, QUERY, FILTER, MUST, MUST_NOT, BOOL, MATCH, SHOULD,

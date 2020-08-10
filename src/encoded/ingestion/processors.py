@@ -2,9 +2,9 @@ import boto3
 import json
 import traceback
 
-from encoded.ingestion.common import DATA_BUNDLE_BUCKET, get_parameter
-from encoded.util import debuglog, s3_output_stream, create_empty_s3_file
-from encoded.submit import submit_data_bundle
+from ..ingestion.common import DATA_BUNDLE_BUCKET, get_parameter
+from ..util import debuglog, s3_output_stream, create_empty_s3_file
+from ..submit import submit_data_bundle
 from .exceptions import UndefinedIngestionProcessorType
 
 

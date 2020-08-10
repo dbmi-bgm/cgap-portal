@@ -1,9 +1,23 @@
 import pytest
-from encoded.submit import *
-from unittest import mock
-from copy import deepcopy
 import xlrd
-import json
+
+from copy import deepcopy
+from unittest import mock
+from ..submit import (
+    compare_fields,
+    create_families,
+    fetch_family_metadata,
+    fetch_file_metadata,
+    fetch_individual_metadata,
+    fetch_sample_metadata,
+    get_analysis_types,
+    map_fields,
+    parse_exception,
+    row_generator,
+    validate_all_items,
+    validate_item,
+    xls_to_json,
+)
 
 
 @pytest.fixture
@@ -323,13 +337,15 @@ def test_xls_to_json_mixed_workup(project, institution, xls_list):
         assert ('Row 5 - Samples with analysis ID 55432 contain mis-matched '
                 'or invalid workup type values.') in ''.join(json_out['errors'])
         row_gen.return_value = iter(one_row)
-        one_json_out, one_success = xls_to_json('src/encoded/tests/data/documents/cgap_submit_test.xlsx', project, institution)
+        one_json_out, one_success = xls_to_json('src/encoded/tests/data/documents/cgap_submit_test.xlsx',
+                                                project, institution)
         assert not one_json_out['errors']
 
 
 def test_parse_exception_invalid_alias(testapp, a_case):
     a_case['invalid_field'] = 'value'
     a_case['project'] = '/projects/invalid-project/'
+    errors = []
     try:
         testapp.post_json('/case', a_case)
     except Exception as e:
