@@ -17,7 +17,9 @@ from vcf import Reader
 from pyramid import paster
 from dcicutils.misc_utils import VirtualApp
 from pyramid.view import view_config
+from pyramid.httpexceptions import HTTPUnprocessableEntity, HTTPConflict
 from snovault.util import debug_log
+from .types.base import get_item_or_none
 from .util import resolve_file_path, gunzip_content
 from .commands.ingest_vcf import VCFParser
 
@@ -27,6 +29,8 @@ EPILOG = __doc__
 INGESTION_QUEUE = 'ingestion_queue'
 VARIANT_SCHEMA = resolve_file_path('./schemas/variant.json')
 VARIANT_SAMPLE_SCHEMA = resolve_file_path('./schemas/variant_sample.json')
+STATUS_QUEUED = 'Queued'
+STATUS_INGESTED = 'Ingested'
 
 
 def includeme(config):
@@ -49,13 +53,36 @@ def ingestion_status(context, request):
     }
 
 
-def patch_vcf_file_status(uuids):
+def patch_vcf_file_status(request, uuids):
     """ Patches VCF File status to 'Queued'
         NOTE: This process makes queue_ingestion not scale terribly well.
               Batching above a certain number may result in 504.
     """
+    env = request.registry.settings.get('env.name', None)
+    if env == 'localhost':
+        config_uri = 'development.ini'
+    elif env:
+        config_uri = 'production.ini'
+    else:
+        config_uri = 'test.ini'
+    app = paster.get_app(config_uri, 'app')
+    email = getattr(request, '_auth0_authenticated', None)
+    if not email:
+        user_uuid = None
+        for principal in request.effective_principals:
+            if principal.startswith('userid.'):
+                user_uuid = principal[7:]
+                break
+        if not user_uuid:
+            raise HTTPUnprocessableEntity('Unauthenticated user tried to patch vcf files %s' % uuids)
+        user_props = get_item_or_none(request, user_uuid)
+        email = user_props['email']
+    environ = {'HTTP_ACCEPT': 'application/json', 'REMOTE_USER': email}
+    vapp = VirtualApp(app, environ)
     for uuid in uuids:
-        pass  # XXX: How to best do this safely within a route? Async?
+        vapp.patch_json('/' + uuid, {
+            'file_ingestion_status': STATUS_QUEUED
+        })
 
 
 @view_config(route_name='queue_ingestion', request_method='POST', permission='index')
@@ -80,7 +107,7 @@ def queue_ingestion(context, request):
         response['notification'] = 'Success'
         response['number_queued'] = len(uuids)
         response['detail'] = 'Successfully queued the following uuids: %s' % uuids
-        patch_vcf_file_status(uuids)  # XXX: does nothing currently
+        patch_vcf_file_status(request, uuids)  # XXX: does nothing currently
     else:
         response['number_queued'] = len(uuids) - len(failed)
         response['detail'] = 'Some uuids failed: %s' % failed
@@ -284,8 +311,6 @@ class IngestionQueueManager:
 class IngestionListener:
     """ Organizes helper functions for the ingestion listener """
     POLL_INTERVAL = 10  # seconds between each poll
-    STATUS_QUEUED = 'Queued'
-    STATUS_INGESTED = 'Ingested'
 
     def __init__(self, vapp, _queue_manager=None, _update_status=None):
         self.vapp = vapp
@@ -358,7 +383,15 @@ class IngestionListener:
         variant['project'] = project
         variant['institution'] = institution
         parser.format_variant_sub_embedded_objects(variant)
-        self.vapp.post_json('/variant', variant, status=[201, 409])
+        try:
+            self.vapp.post_json('/variant', variant, status=201)
+        except HTTPConflict:
+            self.vapp.patch_json('/variant/chr%s:%s%s_%s' % (
+                variant['CHROM'],
+                variant['POS'],
+                variant['REF'],
+                variant['ALT']
+            ), variant, status=200)
         return variant
 
     def build_and_post_variant_samples(self, parser, record, project, institution, variant, file):
@@ -433,7 +466,7 @@ class IngestionListener:
                     continue
 
                 # if this file has been ingested, do not do anything with this message
-                if file_meta.get('file_ingestion_status', 'N/A') == self.STATUS_INGESTED:
+                if file_meta.get('file_ingestion_status', 'N/A') == STATUS_INGESTED:
                     continue
 
                 # attempt download with workaround
@@ -455,7 +488,7 @@ class IngestionListener:
                     log.error('Some VCF rows for uuid %s failed to post - not marking VCF '
                               'as ingested.' % uuid)
                 else:
-                    self.vapp.patch_json('/' + uuid, {'file_ingestion_status': self.STATUS_INGESTED})
+                    self.vapp.patch_json('/' + uuid, {'file_ingestion_status': STATUS_INGESTED})
 
                 # report results in error_log regardless of status
                 msg = ('INGESTION_REPORT:\n'

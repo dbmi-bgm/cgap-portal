@@ -16,15 +16,14 @@ EXPECTED_FIELDS = ['no', 'field_name', 'source_name', 'source_version', 'sub_emb
                    'scope', 'schema_title', 'links_to', 'embedded_field',
                    'calculated_property', 'pattern', 'default', 'min', 'max', 'link', 'comments',
                    'annotation_space_location']
-EXPECTED_INSERT = {'no': 1, 'field_name': 'CHROM', 'schema_title': 'Chromosome',
+EXPECTED_INSERT = {'field_name': 'CHROM', 'schema_title': 'Chromosome',
                    'do_import': True, 'scope': 'variant', 'source_name': 'VCF',
                    'source_version': 'VCFv4.2', 'description': 'Chromosome',
                    'field_type': 'string', 'is_list': False, 'annotation_category': 'Position',
                    'facet_order': 1,
                    'enum_list': ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10',
                                  '11', '12', '13', '14', '15', '16', '17', '18', '19',
-                                 '20', '21', '22', 'X', 'Y', 'M'],
-                   'value_example': '1;2;3;4;5;6;22;X;Y;M', 'annotation_space_location': 'Position'}
+                                 '20', '21', '22', 'X', 'Y', 'M']}
 VEP_CONSEQUENCE_EMBEDS = ['transcript.vep_consequence.var_conseq_id', 'transcript.vep_consequence.definition',
                           'transcript.vep_consequence.impact', 'transcript.vep_consequence.location',
                           'transcript.vep_consequence.coding_effect', 'transcript.vep_gene.display_title',
@@ -248,6 +247,6 @@ def test_post_inserts_via_run(MTParser, project, institution, testapp):
     """ Tests that we can run the above test using the 'run' method """
     inserts = MTParser.run(institution='encode-institution', project='encode-project',
                            vs_out=resolve_file_path('schemas/variant_sample.json'),
-                           v_out=resolve_file_path('schemas/variant.json'), write=True)  # enable to generate schemas
+                           v_out=resolve_file_path('schemas/variant.json'), write=False)  # enable to generate schemas
     for item in inserts:
         testapp.post_json(ANNOTATION_FIELD_URL, item, status=201)

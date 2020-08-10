@@ -119,7 +119,7 @@ class MappingTableParser(object):
                 if row_idx <= self.HEADER_ROW_INDEX:  # skip header rows
                     continue
                 for field_name, entry in zip(self.fields, row):
-                    if not entry:
+                    if field_name not in self.annotation_field_schema['properties'] or not entry:
                         continue
                     if field_name in self.INTEGER_FIELDS:  # handle int fields
                         if entry:

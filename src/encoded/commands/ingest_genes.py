@@ -51,7 +51,7 @@ class GeneIngestion(object):
                 gene['project'] = project
             if institution:
                 gene['institution'] = institution
-            vapp.post_json(self.GENE_ENDPOINT, gene, status=201)
+            vapp.post_json(self.GENE_ENDPOINT, gene, status=[201, 409])  # allow conflict if already present
 
 
 def main():

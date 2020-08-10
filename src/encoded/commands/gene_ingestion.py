@@ -106,5 +106,6 @@ def main():
     app_handle = VirtualApp(app, environ)
     sys.exit(run_gene_table_intake(app_handle, args) and run_ingest_genes(app_handle, args))
 
+
 if __name__ == '__main__':
     main()
