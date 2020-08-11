@@ -3,9 +3,13 @@
 import React, { useMemo, useState } from 'react';
 import PropTypes from 'prop-types';
 import _ from 'underscore';
-import { console, layout, ajax } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import DropdownButton from 'react-bootstrap/esm/DropdownButton';
 import DropdownItem from 'react-bootstrap/esm/DropdownItem';
+import { console, layout, ajax } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
+import { Alerts } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/Alerts';
+
+import { GeneTabBody } from './GeneTabBody';
+
 
 
 
@@ -39,10 +43,16 @@ export class VariantSampleOverview extends React.PureComponent {
     }
 
     componentDidUpdate(pastProps, pastState){
+        const { context } = this.props;
         const { currentTranscriptIdx } = this.state;
+        const { context: pastContext } = pastProps;
         const { currentTranscriptIdx: pastTranscriptIndex } = pastState;
         if (pastTranscriptIndex !== currentTranscriptIdx) {
-            this.loadGene();
+            const currentGeneID = getCurrentTranscriptGeneID(context, currentTranscriptIdx);
+            const pastGeneID = getCurrentTranscriptGeneID(pastContext, pastTranscriptIndex);
+            if (currentGeneID !== pastGeneID) {
+                this.loadGene();
+            }
         }
     }
 
@@ -69,13 +79,13 @@ export class VariantSampleOverview extends React.PureComponent {
     }
 
     render(){
-        const { context } = this.props;
+        const { context, schemas } = this.props;
         const { currentTranscriptIdx, currentGeneItem, currentGeneItemLoading } = this.state;
         return (
             <div className="sample-variant-overview sample-variant-annotation-space-body">
                 {/* BA1, BS1, BS2, BS3 etc markers here */}
                 <VariantSampleInfoHeader { ...{ context, currentTranscriptIdx, currentGeneItemLoading }} onSelectTranscript={this.onSelectTranscript} />
-                <VariantSampleOverviewTabView {...{ context, currentGeneItem, currentGeneItemLoading }} />
+                <VariantSampleOverviewTabView {...{ context, schemas, currentGeneItem, currentGeneItemLoading }} />
             </div>
         );
     }
@@ -179,14 +189,14 @@ function GeneTranscriptDisplayTitle({ transcript, className = "text-600" }){
 
 /** @todo probably eventually move into own file, along w child tabs */
 function VariantSampleOverviewTabView(props){
-    const { context, currentGeneItem, currentGeneItemLoading } = props;
+    const { context, schemas, currentGeneItem, currentGeneItemLoading } = props;
     const [ currentTab, setCurrentTab ] = useState("Variant");
     // TODO change eventually to use 'if' condition or something and distribute props as needed.
     let tabViewBody = null;// { "Variant" : VariantTabBody, "Gene" : GeneTabBody, "Sample" : SampleTabBody }[currentTab];
     if (currentTab === "Variant"){
         tabViewBody = <VariantTabBody {...{ context }} />;
     } else if (currentTab === "Gene") {
-        tabViewBody = <GeneTabBody {...{ context, currentGeneItem, currentGeneItemLoading }} />;
+        tabViewBody = <GeneTabBody {...{ context, schemas, currentGeneItem, currentGeneItemLoading }} />;
     } else if (currentTab === "Sample") {
         tabViewBody = <SampleTabBody {...{ context }} />;
     }
@@ -230,59 +240,7 @@ function VariantTabBody(props){
     return "Test1";
 }
 
-function GeneTabBody(props){
-    const { currentGeneItemLoading, currentGeneItem, context } = props;
-    if (currentGeneItemLoading) {
-        return (
-            <div className="gene-tab-body card-body py-5 text-center text-large">
-                <i className="icon icon-spin fas icon-circle-notch" />
-            </div>
-        );
-    }
-    return (
-        <div className="gene-tab-body card-body">
-            <div className="row">
-                <div className="col">
-                    <div className="info-header-title">
-                        <h4>Overview</h4>
-                    </div>
-                    <div className="info-body">
-                        ABCS
-                    </div>
-                    <div className="info-header-title">
-                        <h4>Conditions</h4>
-                    </div>
-                    <div className="info-body">
-                        ABCDEF<br/>
-                        ABCDFSDFS<br/>
-                        ABCDFSDFS
-                    </div>
-                </div>
-                <div className="col d-flex flex-column">
 
-                    <div className="flex-grow-1">
-                        <div className="info-header-title">
-                            <h4>External Databases</h4>
-                        </div>
-                        <div className="info-body">
-                            ABCDFSDFS
-                        </div>
-                    </div>
-
-                    <div className="flex-grow-0">
-                        <div className="info-header-title">
-                            <h4>Constraint Scores</h4>
-                        </div>
-                        <div className="info-body">
-                            ABCDFSDFS
-                        </div>
-                    </div>
-
-                </div>
-            </div>
-        </div>
-    );
-}
 
 function SampleTabBody(props){
     return "Test3";
