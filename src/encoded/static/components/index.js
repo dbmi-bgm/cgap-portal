@@ -60,7 +60,7 @@ content_views.register(CGAPSubmissionView,      'Item', 'edit');
 content_views.register(CGAPSubmissionView,      'Item', 'create');
 content_views.register(CGAPSubmissionView,      'Item', 'clone');
 content_views.register(CGAPSubmissionView,      'Search', 'add');
-content_views.register(CaseSubmissionView,      'CaseSearchResults', 'add');
+// content_views.register(CaseSubmissionView,      'CaseSearchResults', 'add');
 
 content_views.register(SearchView,              'Search');
 content_views.register(SearchView,              'Search', 'selection');
