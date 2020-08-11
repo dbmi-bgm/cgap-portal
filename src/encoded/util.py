@@ -62,7 +62,7 @@ def gunzip_content(content):
     return gunzipped_content.decode('utf-8')
 
 
-DEBUGLOG_ENABLED = os.environ.get('DEBUGLOG_ENABLED', "FALSE").lower() == "true"
+DEBUGLOG = os.environ.get('DEBUGLOG_PATH', "")
 
 
 def debuglog(*args):
@@ -74,10 +74,10 @@ def debuglog(*args):
     It takes arguments like print or one of the logging operations and outputs to ~/DEBUGLOG-yyyymmdd.txt.
     Each line in the log is timestamped.
     """
-    if DEBUGLOG_ENABLED:
+    if DEBUGLOG:
         nowstr = str(datetime.datetime.now())
         dateid = nowstr[:10].replace('-', '')
-        with io.open(os.path.expanduser("~/DEBUGLOG-%s.txt" % dateid), "a+") as fp:
+        with io.open(os.path.expanduser(os.path.join(DEBUGLOG, "DEBUGLOG-%s.txt" % dateid)), "a+") as fp:
             print(nowstr, *args, file=fp)
 
 
