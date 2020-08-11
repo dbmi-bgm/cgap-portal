@@ -22,11 +22,96 @@ class Case(Item):
     name_key = 'accession'
     schema = load_schema('encoded:schemas/case.json')
     embedded_list = [
+        "family.*", # This embeds all Family fields, but not all Family.members fields.
+        "family.relationships.*",
+        "family.proband.accession",
+        "family.family_phenotypic_features",
+        "family.members.*", # We need to have mother and father (or 'parents' maybe eventually) for all members with at least @id.
+        "family.members.individual_id",
+        "family.members.case",
+        "family.members.case.case_title",
+        "family.members.case.accession",
+        "family.members.case.report",
+        "family.members.case.report.accession",
+        "family.members.case.family",
+        "family.members.case.sample.accession",
+        "family.members.case.sample.workup_type",
+        "family.members.samples",
+        "family.members.samples.bam_sample_id",
+        "family.members.samples.sequence_id",
+        "family.members.samples.other_specimen_ids",
+        "family.members.samples.specimen_accession",
+        "family.members.samples.completed_processes",
+        "family.members.samples.library_info",
+        "family.members.samples.workup_type",
+        "family.members.samples.specimen_type",
+        "family.members.samples.specimen_collection_date",
+        "family.members.samples.accession",
+        "family.members.samples.processed_files.last_modified.*",
+        "family.members.samples.files.last_modified.*",
+        "family.members.samples.files.quality_metric",
+        "family.members.samples.files.quality_metric.qc_list.qc_type",
+        "family.members.samples.files.quality_metric.qc_list.value.overall_quality_status",
+        "family.members.samples.files.quality_metric.qc_list.value.url",
+        "family.members.samples.files.quality_metric.qc_list.value.status",
+        "family.members.samples.files.quality_metric.overall_quality_status",
+        "family.members.samples.files.quality_metric.url",
+        "family.members.samples.files.quality_metric.status",
+        "family.analysis_groups.*", # Probably don't need all of this; look into
+        "family.analysis_groups.cases.sample",
+        "secondary_families.*",
+        "secondary_families.relationships.*",
+        "secondary_families.proband.accession",
+        "secondary_families.members.*",
+        "secondary_families.members.individual_id",
+        "secondary_families.members.accession",
+        "secondary_families.members.case",
+        "secondary_families.members.case.accession",
+        "secondary_families.members.case.case_title",
+        "secondary_families.members.case.report",
+        "secondary_families.members.case.report.accession",
+        "secondary_families.members.case.family",
+        "secondary_families.members.case.sample.workup_type",
+        "secondary_families.members.case.sample.accession",
+        "secondary_families.members.samples",
+        "secondary_families.members.samples.specimen_accession",
+        "secondary_families.members.samples.bam_sample_id",
+        "secondary_families.members.samples.sequence_id",
+        "secondary_families.members.samples.other_specimen_ids",
+        "secondary_families.members.samples.completed_processes",
+        "secondary_families.members.samples.library_info",
+        "secondary_families.members.samples.workup_type",
+        "secondary_families.members.samples.specimen_collection_date",
+        "secondary_families.members.samples.specimen_type",
+        "secondary_families.family_phenotypic_features",
+        "secondary_families.members.samples.accession",
+        "secondary_families.members.samples.processed_files.last_modified.*",
+        "secondary_families.members.samples.files.last_modified.*",
+        "secondary_families.members.samples.files.quality_metric",
+        "secondary_families.members.samples.files.quality_metric.qc_list.qc_type",
+        "secondary_families.members.samples.files.quality_metric.qc_list.value.overall_quality_status",
+        "secondary_families.members.samples.files.quality_metric.qc_list.value.url",
+        "secondary_families.members.samples.files.quality_metric.qc_list.value.status",
+        "secondary_families.members.samples.files.quality_metric.overall_quality_status",
+        "secondary_families.members.samples.files.quality_metric.url",
+        "secondary_families.members.samples.files.quality_metric.status",
+        "secondary_families.analysis_groups.*",
+        "secondary_families.analysis_groups.cases.sample",
         "individual.accession",
+        "individual.date_created",
         "individual.father",
+        "individual.father.samples",
+        "individual.father.samples.library_info",
+        "individual.father.samples.workup_type",
+        "individual.father.samples.accession",
         "individual.mother",
+        "individual.mother.samples",
+        "individual.mother.samples.library_info",
+        "individual.mother.samples.workup_type",
+        "individual.mother.samples.accession",
         "individual.status",
         "individual.sex",
+        "individual.individual_id",
         "individual.is_deceased",
         "individual.is_pregnancy",
         "individual.is_termination_of_pregnancy",
@@ -73,6 +158,14 @@ class Case(Item):
         "individual.samples.files.quality_metric.status",
         "individual.samples.completed_processes",
         "individual.families.uuid",
+        "sample.*",
+        "sample.accession",
+        "sample.library_info",
+        "sample.workup_type",
+        "sample.accession",
+        "sample.last_modified.*",
+        "sample.specimen_collection_date",
+        "sample.sequencing_date",
         "sample_processing.analysis_type",
         "sample_processing.last_modified.*",
         "sample_processing.families.family_id",
@@ -80,39 +173,26 @@ class Case(Item):
         "sample_processing.families.mother.individual_id",
         "sample_processing.families.father.individual_id",
         "sample_processing.families.accession",
+        "sample_processing.families.members.individual_id",
+        "sample_processing.families.members.accession",
+        "sample_processing.families.members.samples",
+        "sample_processing.families.members.case",
+        "sample_processing.families.members.case.report",
+        "sample_processing.families.members.case.report.accession",
+        "sample_processing.families.members.case.family",
+        "sample_processing.families.members.case.sample.accession",
         "sample_processing.samples.accession",
-        "sample_processing.samples.specimen_collection_date",
-        "sample_processing.samples.sequence_id",
-        "sample_processing.samples.other_specimen_ids.*",
-        "sample_processing.samples.individual.individual_id",
-        "sample_processing.samples.last_modified.*",
-        "sample_processing.samples.workup_type",
         "sample_processing.processed_files",
-        "sample_processing.processed_files.last_modified.*",
-        "sample_processing.processed_files.quality_metric",
-        "sample_processing.processed_files.quality_metric.qc_list.qc_type",
-        "sample_processing.processed_files.quality_metric.qc_list.value.overall_quality_status",
-        "sample_processing.processed_files.quality_metric.qc_list.value.url",
-        "sample_processing.processed_files.quality_metric.qc_list.value.status",
-        "sample_processing.processed_files.quality_metric.overall_quality_status",
-        "sample_processing.processed_files.quality_metric.url",
-        "sample_processing.processed_files.quality_metric.status",
-        "sample_processing.sample_processed_files",
+        "sample_processing.families.analysis_groups",
         "sample_processing.sample_processed_files.processed_files.last_modified.*",
         "sample_processing.sample_processed_files.sample.accession",
-        "sample_processing.sample_processed_files.processed_files.quality_metric",
-        "sample_processing.sample_processed_files.processed_files.quality_metric.qc_list.qc_type",
-        "sample_processing.sample_processed_files.processed_files.quality_metric.qc_list.value.overall_quality_status",
-        "sample_processing.sample_processed_files.processed_files.quality_metric.qc_list.value.url",
-        "sample_processing.sample_processed_files.processed_files.quality_metric.qc_list.value.status",
-        "sample_processing.sample_processed_files.processed_files.quality_metric.overall_quality_status",
-        "sample_processing.sample_processed_files.processed_files.quality_metric.url",
-        "sample_processing.sample_processed_files.processed_files.quality_metric.status",
         "sample_processing.completed_processes",
         "report.last_modified.*",
         "report.status",
-        "family.accession",
-        "cohort.filter_set.*"
+        "report.accession",
+        "report.case.accession",
+        "cohort.filter_set.*",
+        "project.name"
     ]
 
     @calculated_property(schema={
@@ -120,8 +200,8 @@ class Case(Item):
         "description": "A calculated title for every object in 4DN",
         "type": "string"
     })
-    def display_title(self, request, accession, individual=None, family=None, sample_processing=None):
-        title = self.case_title(request, individual, family, sample_processing)
+    def display_title(self, request, accession, individual=None, family=None, sample_processing=None, case_id=None):
+        title = self.case_title(request, individual, family, sample_processing, case_id)
         if title:
             return title + ' ({})'.format(accession)
         else:
@@ -231,7 +311,9 @@ class Case(Item):
         "description": "Title of the case",
         "type": "string"
     })
-    def case_title(self, request, individual=None, family=None, sample_processing=None):
+    def case_title(self, request, individual=None, family=None, sample_processing=None, case_id=None):
+        if case_id:
+            return case_id
         title = ''
         if not individual or not family:
             return title
@@ -239,6 +321,8 @@ class Case(Item):
             return title
         family_info = get_item_or_none(request, family, 'family')
         proband = family_info.get('proband', {})
+        if not proband:
+            return title
         proband_case = False
         if proband == individual:
             proband_case = True

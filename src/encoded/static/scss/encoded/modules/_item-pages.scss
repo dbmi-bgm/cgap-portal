@@ -1,4 +1,4 @@
-Cohort/***********************************************************
+/***********************************************************
 Custom Classes & Styling for Item Pages (e.g. Experiment Sets)
 ************************************************************/
 
@@ -7,7 +7,6 @@ Custom Classes & Styling for Item Pages (e.g. Experiment Sets)
 	h1.page-title {
 		margin-bottom: 2px;
 	}
-
 }
 
 /*************************
@@ -294,9 +293,16 @@ $tabbar-height: 46px;
 	.error-boundary-container {
 		display: flex;
 		align-items: center;
-		height: calc(100vh - 135px);
+
 		.error-msg-container {
 			width: 100%;
+		}
+	}
+
+	.tab-pane-outer {
+		> .error-boundary-container {
+			/* When in top-level tab, have it be near-full-height to center contents */
+			height: calc(100vh - 136px);
 		}
 	}
 }
@@ -404,6 +410,9 @@ $tabbar-height: 46px;
 					.icon-container {
 						display: flex;
 						align-items: center;
+						> .icon-fw {
+							transition: transform .25s ease-out;
+						}
 					}
 					// Show to right of icon-container, if 1 present, else not present
 					.title-col {
@@ -412,12 +421,26 @@ $tabbar-height: 46px;
 						text-overflow: ellipsis;
 					}
 				}
+
 				> a.menu-option {
 					color: $body-color;
 					&:hover {
 						text-decoration: none;
 					}
 				}
+
+				&:hover {
+					> .menu-option {
+						.icon-container > .icon-fw {
+							transform: scale3d(.85, .85, 1);
+						}
+						&:hover .icon-container > .icon-fw {
+							transform: scale3d(1.15, 1.15, 1) !important;
+						}
+
+					}
+				}
+
 			}
 
         }
@@ -828,7 +851,7 @@ i.item-status-indicator-dot {
 /** JSON Tree Wrapper (e.g. fallback view) **/
 
 .json-tree-wrapper {
-	border-radius: 4px;
+	border-radius: $border-radius-large;
 	overflow: hidden;
 	> ul {
 		padding: 8px 16px 16px !important;
@@ -1509,27 +1532,17 @@ $badge-item-min-height: 90px;
 					}
 					&.btn-sm {
 						padding-bottom: 4px; // Overrides 5
-						i.icon-external-link {
-							//top: 0px;
-						}
 					}
 				}
 
 				// Embedded Items w/ Attachments
 				.embedded-item-with-attachment {
 					background-color: #f8f8f8;
-					border-radius: 3px;
-					&:not(.in-array){
-					}
+					border-radius: $border-radius-base;
 					.link-to-item-col {
 						white-space: nowrap;
 						text-overflow: ellipsis;
 						overflow: hidden;
-						&.in-array {
-							//> .inner {
-							//	padding-left: 30px;
-							//}
-						}
 						> .inner {
 							line-height: 28px;
 							> span, > a {
@@ -1546,9 +1559,6 @@ $badge-item-min-height: 90px;
 					}
 					.view-attachment-button-col {
 						padding-right: 4px;
-						> a.btn {
-
-						}
 					}
 
 					&.is-image {
@@ -1606,21 +1616,6 @@ $badge-item-min-height: 90px;
 						}
 					}
 
-					&.embedded-item-with-attachment-container {
-						> div.overview-list-element {
-
-						}
-					}
-
-				}
-
-				> ul.overview-list-elements-container,
-				> ol.overview-list-elements-container {
-					> li {
-						> div {
-
-						}
-					}
 				}
 
 			}
@@ -1722,10 +1717,23 @@ $badge-item-min-height: 90px;
 
 .item-page-container {
 
+	.case-summary-card-row,
 	.cohort-summary-card-row {
 		display: flex;
 		flex-wrap: wrap;
 		margin: 0 -10px;
+
+		#case-stats {
+			.row.overlapping .card {
+				position: absolute;
+				width: calc(100% - 20px);
+				z-index: 1;
+			}
+		}
+
+		@include media-breakpoint-up(lg){
+			min-height: 320px;
+		}
 
 		> .col-stats,
 		> .col-pedigree-viz {
@@ -1740,7 +1748,8 @@ $badge-item-min-height: 90px;
 			flex-grow: 1;
 			flex-shrink: 0;
 			flex-basis: 100%;
-			> #cohort-stats {
+			> #cohort-stats,
+			> #case-stats {
 				min-height: 100%;
 			}
 
@@ -1755,8 +1764,14 @@ $badge-item-min-height: 90px;
 			flex-basis: 100%;
 			padding: 0 10px;
 
-			> .pedigree-viz-container > .inner-container {
-				@include border-radius($card-border-radius);
+			> .card {
+				@include media-breakpoint-up(lg){
+					height: 100%;
+				}
+
+				.pedigree-viz-container .inner-container {
+					background-color: transparent; // let BG color from .card bleed through to allow border radius to appear nicely.
+				}
 			}
 
 			@include media-breakpoint-up(lg){
@@ -1777,8 +1792,35 @@ $badge-item-min-height: 90px;
 	
 	}
 
+	#case-overview-ped-link,
 	#cohort-overview-ped-link {
+		/* max-height: 336px; */
 		margin-left: 0;
+
+		// > .card {
+		// 	@include media-breakpoint-down(lg){
+		// 		margin-top: 70px;
+		// 		border-bottom-right-radius: $card-border-radius; // prev: 10px;
+		// 		border-bottom-left-radius: $card-border-radius; // prev: 10px;
+		// 	}
+		// }
+
+		div.pedigree-vis-heading {
+			background-color: $primary-dark; // previous value: $navbar-background-color (#20445f);
+			color: #ffffff;
+
+			.view-pedigree-btn {
+				background-color: cornflowerblue; // TODO: Once settle on good color, maybe apply it to our theme under a SCSS variable for re-use. Then ctrl+find+replace.
+				border-radius: 40px;
+				color: #fff;
+				/* border: 1px solid cornflowerblue; */
+				border: none;
+				padding: 0px 24px;
+				&:hover {
+					background-color: darken($color: cornflowerblue, $amount: 7.5%);
+				}
+			}
+		}
 
 		.pedigree-placeholder {
 			position: relative;
@@ -1792,7 +1834,7 @@ $badge-item-min-height: 90px;
 				margin-left: -40px;
 				margin-top: -32px;
 			}
-			border: 1px solid transparent;
+			border: 1px solid #eee;
 			color: #999;
 			@include border-radius($card-border-radius); // Same as .card (Bootstrap v4)
 			transition: color .3s;
@@ -1802,6 +1844,7 @@ $badge-item-min-height: 90px;
 				border-color: #ddd;
 			}
 		}
+
 	}
 
 	label.badge-list-label {
@@ -1818,6 +1861,382 @@ $badge-item-min-height: 90px;
 			display: inline-block;
 		}
 	}
+
+	.processing-summary-tables-container {
+
+		.embedded-search-view-outer-container {
+			// (Can't remember:) Margins might be needed here
+			// to accomodate presence of both vertical + horizontal scroll bars.
+			// I guess we'll find out at some point.
+
+			.search-result-row {
+				&:last-of-type {
+					margin-bottom: 0px;
+				}
+			}
+			.embedded-search-container .fin.search-result-row {
+				display: none;
+			}
+
+		}
+
+
+		
+	}
+
+	.tab-router {
+		.dot-tab-nav {
+			position: relative;
+			z-index: 5;
+			border-top: 1px solid #ddd;
+			border-bottom: 1px solid #ddd;
+			
+
+			.dot-tab-nav-list {
+				list-style-type: none;
+				margin: 0;
+				padding: 0;
+				display: flex;
+				justify-content: space-evenly;
+
+				@include media-breakpoint-down(sm) {
+					flex-direction: column;
+				}
+
+				.arrow-tab {
+					flex-grow: 1;
+					display: flex;
+					height: $search-results-header-row-height; // Eh why not re-use this, can change always in future.
+
+					@include media-breakpoint-down(sm) {
+						margin-bottom: 5px;
+					}
+					
+					> button {
+						// TODO store color in variable, ideally bootstrap one, for re-use in places.
+						background-color: cornflowerblue;
+						transition: background-color .25s, box-shadow .5s;
+						color: #ffff;
+						height: 100%;
+						display: block;
+						text-align: center;
+						padding: 10px;
+						text-decoration: none;
+						border: none;
+						width: 100%;
+						box-shadow: none;
+						&:focus:not(.active),
+						&:active:not(.active) {
+							outline: none;
+						}
+					}
+
+					&:not(.active) > button {
+						// Applicable for when navigating with (shift-)tab w.o. mouse.
+						&:focus:not(.active),
+						&:active:not(.active) {
+							
+							// Same :hover styling below, should get overriden by other styles
+							// unless someone is using (shift-)tab to navigate instead of mouse cursor.
+							background-color: darken($color: cornflowerblue, $amount: 7.5%);
+							+ .btn-append svg path {
+								fill: darken($color: cornflowerblue, $amount: 7.5%);
+							}
+						}
+					}
+
+					> .btn-append,
+					> .btn-prepend {
+						height: 100%;
+						width: $search-results-header-row-height; // Same as height of parent
+						flex: 1 0 0px;
+						> svg {
+							height: 100%;
+							width: auto;
+							path {
+								fill: cornflowerblue;
+								transition: fill .25s;
+							}
+						}
+
+						@include media-breakpoint-down(sm) {
+							display: none;
+						}
+					}
+
+					@include media-breakpoint-up(md) {
+
+						&:first-child {
+							> .btn-prepend {
+								display: none;
+							}
+							> button {
+								padding-left: 24px;
+								border-radius: $border-radius-base 0 0 $border-radius-base;
+							}
+						}
+
+						&:last-child {
+							> .btn-append {
+								display: none;
+							}
+							> button {
+								padding-right: 24px;
+								border-radius: 0 $border-radius-base $border-radius-base 0;
+							}
+						}
+
+					}
+
+					&.disabled {
+						> button {
+							background-color: desaturate($color: lighten($color: cornflowerblue, $amount: 20%), $amount: 100%) !important;
+						}
+						> .btn-append > svg > path,
+						> .btn-prepend > svg > path {
+							fill: desaturate($color: lighten($color: cornflowerblue, $amount: 20%), $amount: 100%) !important;
+						}
+					}
+
+					&:hover:not(.disabled):not(.active) {
+
+						> button {
+							background-color: darken($color: cornflowerblue, $amount: 7.5%) !important;
+						}
+						> .btn-append > svg > path,
+						> .btn-prepend > svg >  path {
+							fill: darken($color: cornflowerblue, $amount: 7.5%) !important;
+						}
+					}
+
+					&.active {
+
+						> button {
+							// background-color: darken($color: cornflowerblue, $amount: 30%) !important;
+							// box-shadow: 0px 13px 16px -16px #000;
+							background-color: $primary-dark;
+							cursor: default; // Since we on tab already, clicking would have no effect, so dissuade somewhat.
+						}
+						> .btn-append > svg > path,
+						> .btn-prepend > svg > path {
+							// fill: darken($color: cornflowerblue, $amount: 30%) !important;
+							fill: $primary-dark;
+						}
+					}
+
+				}
+			}
+
+		}
+		.tab-router-contents {
+			/* Help prevent sudden 'jumps' in screen (height and transitively in scroll position) from changing from tall to short tabs */
+			/* We could consider also making min-height similar as parent tabs': `calc(100vh - (heights of footer + nav + sub-tab-nav))` */
+			/* And in such way make it ... tall and fit neatly into view */
+			min-height: 520px; // Fallback for older browsers
+			min-height: calc(100vh - 89px - 126px); // '126px' subject to change re: dimensions of sub tab nav
+
+			> .error-boundary-container {
+				min-height: 448px; /* 520px parent min-height - 2 * 36px padding */
+			}
+
+			h1 {
+				font-size: 2rem;
+				margin-bottom: 20px;
+				font-weight: 500;
+			}
+
+			/* 'Current Case' selection marker/styling */
+			&#case-info\.accessioning {
+				.current-case {
+					background-color: lavender;
+					padding: 3px 5px;
+					/* Cancel out the above padding somewhat to align text with other non-selected text */
+					/* Maybe not cleanest approach... */
+					margin: -2px -5px;
+					border: solid 1px #fff;
+					border-radius: $border-radius-base;
+				}
+			}
+
+			h2 {
+				font-size: 1.5rem;
+				font-weight: 400;
+			}
+
+			.embedded-search-view-outer-container {
+				// background-color: #ffffff;
+				.facets-container {
+					background: #ffffff;
+				}
+			}
+
+			.tab-inner-container {
+				background-color: #ffffff;
+				margin-bottom: 20px;
+				padding: 20px;
+				border-radius: $border-radius-large;
+				box-shadow: 0 1px 5px #0002;
+				border-color: #d6d6d6;
+
+				&.qc-status {
+					font-size: 19px;
+				}
+
+				h2.section-header {
+					background-color: $primary-dark;
+					width: calc( 100% + 40px);
+					padding: 10px 10px 10px 20px;
+					color: #ffff;
+					margin-left: -20px;
+					margin-right: -40px;
+					margin-top: -20px;
+				}
+
+				.processing-summary-table {
+					width: 100%;
+				}
+
+				.stacked-block-table {
+					.stacked-block-table-headers {
+						background-color: $primary-dark;
+						color: #ffffff;
+					}
+
+					.s-block.individual .col-individual .individual-role {
+						text-align: left;
+						align-items: start; // prevent 100% width, align to left.
+					}
+				
+					.s-block.libraries .col-libraries > div {
+						margin: 0 auto;
+					}
+
+					.accession-table {
+						margin-left: 10px; 
+
+						tr:not(:last-child) {
+							border-bottom: 1px solid #ddd;
+						}
+
+						td.accession-table-title {
+							font-weight: 600;
+							text-align: left;
+							margin-left: 20px;
+							min-width: 75px;
+						}
+						td:not(.accession-table-title) {
+							text-align: right;
+						}
+					}
+				}
+
+				.row.qc-summary {
+					padding: 2px 0;
+				}
+
+				.processing-summary-table-container {
+
+					overflow-x: auto;
+					-webkit-overflow-scrolling: touch;
+		
+					table.processing-summary-table {
+		
+						margin-top: 10px;
+						min-width: 640px;
+						width: 100%;
+		
+						thead {				
+							> tr > th {
+								padding: 6px 8px;
+								
+								&.hidden-th {
+									background-color: #ffffff;
+								}
+							}
+						}
+		
+						tbody {
+							tr {
+								td {
+									padding: 4px 8px;
+									/*
+									&[data-for-column="individual"],
+									&[data-for-column="sample"] {
+										font-family: $font-family-monospace;
+									}
+									*/
+									&[data-for-column="individual"]{
+										.gen-identifier {
+											display: inline-block;
+											min-width: 45px;
+											vertical-align: middle;
+											font-weight: 600;
+										}
+									}
+									i {
+										font-size: 12px;
+									}
+								}
+								&.is-even {
+									background-color: rgba(0, 0, 0, 0.03);
+								}
+								&.is-proband {
+									> td {
+										background-color: #ebf6ff;
+										&:first-child {
+											font-weight: 600;
+										}
+									}
+								}
+								&[data-sample-index="0"] {
+									> td {
+										border-top: 1px solid #f8f8f8;
+									}
+								}
+								&:not([data-sample-index="0"]) {
+									> td[data-for-column="individual"] {
+										visibility: hidden;
+									}
+								}
+								.qcs-container {
+									&.text-ellipses-container {
+										max-width: 140px;
+									}
+									> span {
+										display: inline-block;
+										border-right: solid 1px #bbb;
+										padding: 0 5px;
+										&:last-child {
+											border: none;
+										}
+									}
+									a.qc-status-in-review {
+										font-style: italic;
+									}
+								}
+							}
+						}
+		
+						tfoot {
+							> tr > td {
+								text-align: center;
+								vertical-align: middle !important;
+								padding: 2px 3px;
+								border-top: 1px solid #eeeeee;
+								background-color: #f1f1f1;
+								
+								&:not(.has-value) {
+									background-color: #fff;
+								}
+							}
+						}
+					}
+		
+				}
+			}	
+		}
+	}
+	
 
 	div.summary-table-container {
 
@@ -1851,106 +2270,6 @@ $badge-item-min-height: 90px;
 			margin-bottom: 10px;
 		}
 
-		.processing-summary-table-container {
-
-			overflow-x: auto;
-			-webkit-overflow-scrolling: touch;
-
-			table.processing-summary-table {
-
-				margin-top: 10px;
-				min-width: 640px;
-				width: 100%;
-
-				thead {				
-					> tr > th {
-						padding: 6px 8px;
-						
-						&.hidden-th {
-							background-color: #ffffff;
-						}
-					}
-				}
-
-				tbody {
-					tr {
-						td {
-							padding: 4px 8px;
-							/*
-							&[data-for-column="individual"],
-							&[data-for-column="sample"] {
-								font-family: $font-family-monospace;
-							}
-							*/
-							&[data-for-column="individual"]{
-								.gen-identifier {
-									display: inline-block;
-									min-width: 45px;
-									vertical-align: middle;
-									font-weight: 600;
-								}
-							}
-							i {
-								font-size: 12px;
-							}
-						}
-						&.is-even {
-							background-color: rgba(0, 0, 0, 0.03);
-						}
-						&.is-proband {
-							> td {
-								background-color: #ebf6ff;
-								&:first-child {
-									font-weight: 600;
-								}
-							}
-						}
-						&[data-sample-index="0"] {
-							> td {
-								border-top: 1px solid #f8f8f8;
-							}
-						}
-						&:not([data-sample-index="0"]) {
-							> td[data-for-column="individual"] {
-								visibility: hidden;
-							}
-						}
-						.qcs-container {
-							&.text-ellipses-container {
-								max-width: 140px;
-							}
-							> span {
-								display: inline-block;
-								border-right: solid 1px #bbb;
-								padding: 0 5px;
-								&:last-child {
-									border: none;
-								}
-							}
-							a.qc-status-in-review {
-								font-style: italic;
-							}
-						}
-					}
-				}
-
-				tfoot {
-					> tr > td {
-						text-align: center;
-						vertical-align: middle !important;
-						padding: 2px 3px;
-						border-top: 1px solid #eeeeee;
-						background-color: #f1f1f1;
-						
-						&:not(.has-value) {
-							background-color: #fff;
-						}
-					}
-				}
-			}
-
-		}
-
 		&[data-is-current-family="true"] {
 			> h4:first-child {
 				> i.icon {
@@ -1972,6 +2291,7 @@ $badge-item-min-height: 90px;
 .item-page-container {
 
 	.pedigree-tab-view-body-container {
+		// When within own top-level pane
 
 		.pedigree-viz-container {
 			// We make this almost full height.
@@ -2013,7 +2333,7 @@ $badge-item-min-height: 90px;
 				@include media-breakpoint-up(md){
 					> .detail-pane-container {
 						.detail-pane-inner {
-							top: 0px;
+							top: 0px !important;
 						}
 					}
 				}

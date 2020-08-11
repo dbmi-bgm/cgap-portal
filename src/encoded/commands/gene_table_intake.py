@@ -33,7 +33,7 @@ class GeneTableParser(MappingTableParser):
         """
         schema['$schema'] = 'http://json-schema.org/draft-04/schema#'
         schema['type'] = 'object'
-        schema['required'] = ['institution', 'project', 'gene_symbol']
+        schema['required'] = ['institution', 'project', 'gene_symbol', 'ensgid']
         schema['identifyingProperties'] = ['uuid', 'aliases']
         schema['additionalProperties'] = False
         schema['mixinProperties'] = [
@@ -70,7 +70,7 @@ class GeneTableParser(MappingTableParser):
         logger.info('Build gene schema')
         return schema
 
-    def run(self, gs_out=None, write=False):  # noqa
+    def run(self, gs_out=None, write=False):  # noqa - args are different then in superclass but we don't care
         """
         Ingests the gene table, producing the gene schema
 

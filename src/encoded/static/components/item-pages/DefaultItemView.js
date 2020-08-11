@@ -423,7 +423,7 @@ export class ItemActionsTab extends React.PureComponent {
         'itemActionsExtras': {
             'edit'      : {
                 description: 'Edit the properties of this Item.',
-                icon: "pencil fas"
+                icon: "pencil-alt fas"
             },
             'create'    : {
                 description: 'Create a blank new Item of the same type.',

@@ -56,7 +56,9 @@ export const Term = {
             case 'date_modified':
             case 'public_release':
             case 'project_release':
-                if (allowJSXOutput) return <LocalizedTime timestamp={term} />;
+                if (allowJSXOutput){
+                    return <LocalizedTime timestamp={term} localize={false} />;
+                }
                 return dateFormat(term);
             case 'is_pregnancy':
             case 'is_spontaneous_abortion':

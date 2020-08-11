@@ -63,5 +63,54 @@
             "type" : "string",
             "linkTo": "Nexus"
         }
+    },
+    "facets" : {
+        "individual.sex" : {
+            "title" : "Gender",
+            "grouping": "Individual"
+        }
+    },
+    "columns" : {
+        "display_title" : {
+            "title" : "Case",
+            "sort_fields" : [
+                { "field" : "accession", "title" : "Accession (CGAP ID)" },
+                { "field" : "aliases", "title": "User-Defined Alias" }
+            ]
+        },
+        "family" : {
+            "title" : "Family",
+            "sort_fields" : [
+                { "field" : "family.accession", "title": "Family Accession (CGAP ID)" },
+                { "field" : "family.title", "title" : "Family Title" },
+                { "field" : "family.family_id", "title" : "Family ID" }
+            ]
+        },
+        "individual" : {
+            "title" : "Individual",
+            "description" : "Proband Individual of this Case",
+            "sort_fields" : [
+                { "field" : "individual.accession", "title" : "Individual Accession (CGAP ID)" },
+                { "field" : "individual.aliases", "title": "User-Defined Alias" },
+                { "field" : "individual.uuid", "title": "UUID"}
+            ]
+        },
+        "sample.specimen_type": {
+            "title": "Sample"
+        },
+        "sample": {
+            "title": "Sequencing",
+            "notes": "The primary sample calculated for a particular case.",
+            "sort_fields" : [
+                { "field" : "sample.specimen_collection_date", "title": "Sample Collection Date" },
+                { "field" : "sample.accession", "title": "Sample Accession (CGAP ID)"}
+            ]
+        },
+        "sample_processing.analysis_type" :  {
+            "title": "Bioinformatics"
+        },
+        "report": {
+            "title": "Report"
+        }
     }
 }

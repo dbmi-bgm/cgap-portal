@@ -15,8 +15,8 @@ import { Checkbox } from '@hms-dbmi-bgm/shared-portal-components/es/components/f
 import { CollapsibleItemViewButtonToolbar } from './../components/CollapsibleItemViewButtonToolbar';
 
 import { PedigreeTabViewBody } from './PedigreeTabViewBody';
-import { PedigreeFullScreenBtn } from './PedigreeFullScreenBtn';
-import { gatherPhenotypicFeatureItems, getPhenotypicFeatureStrings } from './family-parsing';
+import { PedigreeFullScreenBtn } from './../CaseView/PedigreeFullScreenBtn';
+import { gatherPhenotypicFeatureItems, getPhenotypicFeatureStrings } from './../CaseView/family-parsing';
 
 /**
  * Hooks for PedigreeTabView & related.
