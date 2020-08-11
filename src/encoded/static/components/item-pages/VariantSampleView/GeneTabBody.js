@@ -20,12 +20,10 @@ export function GeneTabBody(props){
         );
     }
 
-    // TODO: Figure out all gene external reference properties from VCF mapping table
-    // Gather them all from Gene, map into JSX elements.
-    // Then maybe split into 2 columns if >=4 external references.
+    // IN FUTURE WE WON"T HAVE THIS LIST
+    // AND INSTEAD GATHER THE PROPERTIES FROM SCHEMA
+    // ACCORDING TO PERHAPS "annotation_category" :"dbxref"
     // Clinvar, medgen not exist yet it seems.
-    // TODO2: Separate component for the External DBs part
-
     const externalDatabaseFieldnames = ["genecards", "gnomad", "clinvar", "medgen", "omim_id", "hpa", "gtex_expression", "brainatlas_microarray", "marrvel", "mgi_id"];
 
     const externalDBSection = useMemo(function(){
@@ -39,13 +37,19 @@ export function GeneTabBody(props){
         });
 
         const externalDatabaseElems = externalDatabaseSchemaFields.map(function([ fieldName, fieldSchema ]){
-            const { link: linkFormat, title } = fieldSchema;
+            const {
+                link: linkFormat = null,
+                title = null,
+                description = null
+            } = fieldSchema;
             const externalID = currentGeneItem[fieldName];
+            // IN FUTURE WE WILL GET LINK BACK FROM BACK-END RATHER THAN MAKE IT HERE.
             const linkToID = linkFormat.replace("<ID>", externalID);
             return (
-                <a className="row" key={fieldName} href={linkToID} tagret="_blank" rel="noopener noreferrer">
+                <a className="row" key={fieldName} href={linkToID || null} tagret="_blank"
+                    rel="noopener noreferrer" data-tip={description}>
                     <h5 className="col my-1 text-600">
-                        { title }
+                        { title || fieldName }
                     </h5>
                     <div className="col-auto col-lg-4">
                         <i className="icon icon-fw icon-external-link-alt fas small text-secondary" />
@@ -80,25 +84,33 @@ export function GeneTabBody(props){
     return (
         <div className="gene-tab-body card-body">
             <div className="row">
-                <div className="col">
-                    <div className="info-header-title">
-                        <h4>Overview</h4>
+                <div className="col d-flex flex-column">
+
+                    <div className="flex-grow-1 pb-2">
+                        <div className="info-header-title">
+                            <h4>Overview</h4>
+                        </div>
+                        <div className="info-body">
+                            ABCS
+                        </div>
                     </div>
-                    <div className="info-body">
-                        ABCS
+
+                    <div className="flex-grow-0">
+                        <div className="info-header-title">
+                            <h4>Conditions</h4>
+                        </div>
+                        <div className="info-body">
+                            ABCDEF<br/>
+                            ABCDFSDFS<br/>
+                            ABCDFSDFS
+                        </div>
                     </div>
-                    <div className="info-header-title">
-                        <h4>Conditions</h4>
-                    </div>
-                    <div className="info-body">
-                        ABCDEF<br/>
-                        ABCDFSDFS<br/>
-                        ABCDFSDFS
-                    </div>
+
+
                 </div>
                 <div className="col d-flex flex-column">
 
-                    <div className="flex-grow-1">
+                    <div className="flex-grow-1 pb-2">
                         <div className="info-header-title">
                             <h4>External Databases</h4>
                         </div>
