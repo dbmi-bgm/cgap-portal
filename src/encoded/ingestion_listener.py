@@ -17,9 +17,9 @@ from vcf import Reader
 from pyramid import paster
 from dcicutils.misc_utils import VirtualApp
 from pyramid.view import view_config
-from pyramid.httpexceptions import HTTPUnprocessableEntity, HTTPConflict
+from pyramid.httpexceptions import HTTPConflict
+from pyramid.request import Request
 from snovault.util import debug_log
-from .types.base import get_item_or_none
 from .util import resolve_file_path, gunzip_content
 from .commands.ingest_vcf import VCFParser
 
@@ -56,33 +56,24 @@ def ingestion_status(context, request):
 def patch_vcf_file_status(request, uuids):
     """ Patches VCF File status to 'Queued'
         NOTE: This process makes queue_ingestion not scale terribly well.
-              Batching above a certain number may result in 504.
+              Batching above a certain number may result in 504. There are
+              also permissions concerns here that are not dealt with.
     """
-    env = request.registry.settings.get('env.name', None)
-    if env == 'localhost':
-        config_uri = 'development.ini'
-    elif env:
-        config_uri = 'production.ini'
-    else:
-        config_uri = 'test.ini'
-    app = paster.get_app(config_uri, 'app')
-    email = getattr(request, '_auth0_authenticated', None)
-    if not email:
-        user_uuid = None
-        for principal in request.effective_principals:
-            if principal.startswith('userid.'):
-                user_uuid = principal[7:]
-                break
-        if not user_uuid:
-            raise HTTPUnprocessableEntity('Unauthenticated user tried to patch vcf files %s' % uuids)
-        user_props = get_item_or_none(request, user_uuid)
-        email = user_props['email']
-    environ = {'HTTP_ACCEPT': 'application/json', 'REMOTE_USER': email}
-    vapp = VirtualApp(app, environ)
     for uuid in uuids:
-        vapp.patch_json('/' + uuid, {
-            'file_ingestion_status': STATUS_QUEUED
-        })
+        kwargs = {
+            'method': 'PATCH',
+            'content_type': 'application/json',
+            'POST': json.dumps({
+                'file_ingestion_status': STATUS_QUEUED
+            }).encode('utf-8')
+        }
+        subreq = Request.blank('/' + uuid, **kwargs)
+        resp = None
+        try:
+            resp = request.invoke_subrequest(subreq, use_tweens=True)
+            assert resp.status_code == 200
+        except AssertionError:
+            log.error('Tried to patch %s but item does not exist: %s' % (uuid, resp))
 
 
 @view_config(route_name='queue_ingestion', request_method='POST', permission='index')
