@@ -556,7 +556,7 @@ class VCFParser(object):
             # DROP SV's that are REF/REF
             if s.get('GT', None) in [self.GT_REF, self.GT_MISSING, self.GT_REF_PHASED]:
                 continue
-            result.append(s)
+            result.append(dict(self.variant_sample_defaults, **s))  # copy in defaults, replace with s
         return result
 
     def run(self, project=None, institution=None):
