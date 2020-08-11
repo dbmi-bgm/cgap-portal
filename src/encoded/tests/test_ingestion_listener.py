@@ -4,7 +4,6 @@ import time
 import mock
 import datetime
 from uuid import uuid4
-from dcicutils.misc_utils import Retry
 from dcicutils.qa_utils import ignored, notice_pytest_fixtures
 from ..ingestion_listener import IngestionQueueManager, run, IngestionListener
 from ..util import gunzip_content
