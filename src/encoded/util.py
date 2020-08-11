@@ -75,10 +75,16 @@ def debuglog(*args):
     Each line in the log is timestamped.
     """
     if DEBUGLOG:
-        nowstr = str(datetime.datetime.now())
-        dateid = nowstr[:10].replace('-', '')
-        with io.open(os.path.expanduser(os.path.join(DEBUGLOG, "DEBUGLOG-%s.txt" % dateid)), "a+") as fp:
-            print(nowstr, *args, file=fp)
+        try:
+            nowstr = str(datetime.datetime.now())
+            dateid = nowstr[:10].replace('-', '')
+            with io.open(os.path.expanduser(os.path.join(DEBUGLOG, "DEBUGLOG-%s.txt" % dateid)), "a+") as fp:
+                print(nowstr, *args, file=fp)
+        except Exception:
+            # There are many things that could go wrong, but none of them are important enough to fuss over.
+            # Maybe it was a bad pathname? Out of disk space? Network error?
+            # It doesn't really matter. Just continue...
+            pass
 
 
 def check_true(test_value: object,
