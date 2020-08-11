@@ -26,7 +26,7 @@ export function getIconForCustomTab(tabName){
             return 'file-text';
         case 'data_processing':
             return 'area-chart';
-        case 'cohort_summary':
+        case 'case_summary':
         case 'processed_files':
             return 'microchip';
         case 'higlass':

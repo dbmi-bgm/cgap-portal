@@ -20,7 +20,6 @@ import ReleaseUpdates                       from './static-pages/ReleaseUpdates'
 
 
 import DefaultItemView                      from './item-pages/DefaultItemView';
-import CohortView, { CohortSubmissionView } from './item-pages/CohortView';
 import CaseView, { CaseSubmissionView }     from './item-pages/CaseView';
 import VariantSampleView                    from './item-pages/VariantSampleView';
 import IndividualView                       from './item-pages/IndividualView';
@@ -40,15 +39,14 @@ import SearchView                           from './browse/SearchView';
  * the item-type-view files might not be included in the compiled build.js
  * due to webpack/babel tree-shaking config/plugins.
  */
-content_views.register(StaticPage,    'StaticPage');
-content_views.register(DirectoryPage, 'DirectoryPage');
+content_views.register(StaticPage,              'StaticPage');
+content_views.register(DirectoryPage,           'DirectoryPage');
 
 content_views.register(HomePage,                'HomePage');
 content_views.register(ReleaseUpdates,          'Release-updatesPage');
 
 content_views.register(DefaultItemView,         'Item');
 content_views.register(CaseView,                'Case');
-content_views.register(CohortView,              'Cohort');
 content_views.register(VariantSampleView,       'VariantSample');
 content_views.register(IndividualView,          'Individual');
 content_views.register(FileProcessedView,       'FileProcessed');
@@ -64,7 +62,7 @@ content_views.register(CGAPSubmissionView,      'Item', 'edit');
 content_views.register(CGAPSubmissionView,      'Item', 'create');
 content_views.register(CGAPSubmissionView,      'Item', 'clone');
 content_views.register(CGAPSubmissionView,      'Search', 'add');
-content_views.register(CohortSubmissionView,    'CohortSearchResults', 'add');
+// content_views.register(CaseSubmissionView,      'CaseSearchResults', 'add');
 
 content_views.register(SearchView,              'Search');
 content_views.register(SearchView,              'Search', 'selection');
