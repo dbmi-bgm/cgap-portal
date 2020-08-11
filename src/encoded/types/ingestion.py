@@ -7,7 +7,7 @@ import logging
 import re
 import uuid
 
-from dcicutils.misc_utils import ignored
+from dcicutils.misc_utils import ignored, check_true
 from snovault import collection, load_schema
 from pyramid.request import Request
 from pyramid.security import Allow, Deny, Everyone
@@ -21,7 +21,7 @@ from .base import (
 from .institution import (
     ONLY_ADMIN_VIEW,
 )
-from ..util import debuglog, subrequest_item_creation, check_true
+from ..util import debuglog, subrequest_item_creation
 
 
 ALLOW_SUBMITTER_VIEW = (

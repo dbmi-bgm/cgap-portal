@@ -583,7 +583,7 @@ class IngestionListener:
 
                 body = json.loads(message['Body'])
                 uuid = body['uuid']
-                ingestion_type = body['ingestion_type']
+                ingestion_type = body.get('ingestion_type', 'vcf')  # Older protocol doesn't yet know to expect this
                 log.info('Ingesting uuid %s' % uuid)
 
                 if ingestion_type != 'vcf':

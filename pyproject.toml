@@ -43,7 +43,7 @@ chardet = "3.0.4"
 colorama = "0.3.3"
 dcicpyvcf = "1.0.0"
 dcicsnovault = ">=3.1.9,<4"  # Fixes build problems in 3.1.8
-dcicutils = ">=0.38.0,<1"  # has the LockoutManager needed for Snovault
+dcicutils = ">=0.38.1,<1"  # has LockoutManager 0.38.0 and check_true 0.38.1
 docutils = "0.12"
 elasticsearch = "5.5.3"
 elasticsearch-dsl = "^5.4.0"

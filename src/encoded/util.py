@@ -7,6 +7,7 @@ import random
 import pyramid.request
 import tempfile
 
+from dcicutils.misc_utils import check_true
 from io import BytesIO
 from snovault import COLLECTIONS, Collection
 from snovault.crud_views import collection_add as sno_collection_add
@@ -79,18 +80,6 @@ def debuglog(*args):
         dateid = nowstr[:10].replace('-', '')
         with io.open(os.path.expanduser("~/DEBUGLOG-%s.txt" % dateid), "a+") as fp:
             print(nowstr, *args, file=fp)
-
-
-def check_true(test_value: object,
-               message: str,
-               error_class: Type[Exception] = RuntimeError):
-    """
-    If the first argument does not evaluate to a true value, an error is raised.
-
-    The error, if one is raised, will be of type error_class, and its message will be given by message.
-    """
-    if not test_value:
-        raise error_class(message)
 
 
 def subrequest_item_creation(request: pyramid.request.Request, item_type: str, json_body: dict = None) -> dict:
