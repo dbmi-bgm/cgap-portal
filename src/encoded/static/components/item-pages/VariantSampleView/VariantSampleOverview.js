@@ -8,6 +8,7 @@ import DropdownItem from 'react-bootstrap/esm/DropdownItem';
 import { console, layout, ajax } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { Alerts } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/Alerts';
 
+import { VariantSampleInfoHeader } from './VariantSampleInfoHeader';
 import { GeneTabBody } from './GeneTabBody';
 
 
@@ -19,19 +20,31 @@ export class VariantSampleOverview extends React.PureComponent {
         super(props);
         this.loadGene = this.loadGene.bind(this);
         this.onSelectTranscript = this.onSelectTranscript.bind(this);
-        // const {
-        //     context: {
-        //         variant: {
-        //             transcript = []
-        //         } = {}
-        //     }
-        // } = props;
+        const {
+            context: {
+                variant: {
+                    transcript = []
+                } = {}
+            }
+        } = props;
 
-        // TODO maybe one of these things will have 'is_default' or something to better-select.
-        // const [ { vep_gene: { '@id' : firstGeneID = null } = {} } = {} ] = transcript;
+        // Set initial index to most severe or canonical transcript.
+        let initialIndex = transcript.findIndex(function({ vep_most_severe }){
+            return !!(vep_most_severe);
+        });
+
+        if (initialIndex === -1){
+            initialIndex = transcript.findIndex(function({ vap_canonical }){
+                return !!(vap_canonical);
+            });
+        }
+
+        if (initialIndex === -1){
+            initialIndex = 0;
+        }
 
         this.state = {
-            currentTranscriptIdx: 0,
+            currentTranscriptIdx: initialIndex,
             currentGeneItem: null,
             currentGeneItemLoading: false
         };
@@ -84,7 +97,7 @@ export class VariantSampleOverview extends React.PureComponent {
         return (
             <div className="sample-variant-overview sample-variant-annotation-space-body">
                 {/* BA1, BS1, BS2, BS3 etc markers here */}
-                <VariantSampleInfoHeader { ...{ context, currentTranscriptIdx, currentGeneItemLoading }} onSelectTranscript={this.onSelectTranscript} />
+                <VariantSampleInfoHeader { ...{ context, currentTranscriptIdx, currentGeneItemLoading, currentGeneItem }} onSelectTranscript={this.onSelectTranscript} />
                 <VariantSampleOverviewTabView {...{ context, schemas, currentGeneItem, currentGeneItemLoading }} />
             </div>
         );
@@ -98,93 +111,6 @@ function getCurrentTranscriptGeneID(context, transcriptIndex){
     return geneID;
 }
 
-function VariantSampleInfoHeader (props) {
-    const { context, currentTranscriptIdx, currentGeneItemLoading, onSelectTranscript } = props;
-    const { variant: { transcript: geneTranscriptList = [] } = {} } = context;
-    const geneTranscriptListLen = geneTranscriptList.length;
-
-    // Grab it from embedded item, rather than the AJAXed in currentGeneItem, as is more 'up-to-date'.
-    const selectedGeneTranscript = geneTranscriptList[currentTranscriptIdx];
-    const selectedGeneTitle = <GeneTranscriptDisplayTitle transcript={selectedGeneTranscript} />;
-
-    const geneListOptions = geneTranscriptList.map(function(transcript, idx){
-        return (
-            <DropdownItem key={idx} eventKey={idx} active={idx === currentTranscriptIdx}>
-                <GeneTranscriptDisplayTitle transcript={transcript} />
-            </DropdownItem>
-        );
-    });
-
-    const geneTitleToShow = selectedGeneTranscript ? (
-        <span>
-            { selectedGeneTitle }
-            { currentGeneItemLoading ? <i className="ml-07 icon icon-spin fas icon-circle-notch"/> : null }
-        </span>
-    ) : (geneTranscriptListLen === 0 ? <em>No genes available</em> : <em>No gene selected</em>);
-
-    // TODO consider common styling for .info-header title, maybe it could be display: flex with align-items: center and vertically
-    // center its children equally regardless if text or DropdownButton (and maybe is applied to a div where h4 would become child of it)
-    return (
-        // Stack these into flex column until large responsive size, then make into row.
-        <div className="card mb-24">
-            <div className="card-body">
-                <div className="row flex-column flex-lg-row">
-                    <div className="col col-lg-2">
-                        <div className="info-header-title">
-                            <h4>Case ID</h4>
-                        </div>
-                        <div className="info-body">
-
-                        </div>
-                    </div>
-                    <div className="col">
-                        <div className="info-header-title">
-                            <h4>Position</h4>
-                        </div>
-                        <div className="info-body">
-
-                        </div>
-                    </div>
-                    <div className="col">
-                        <div className="d-flex">
-                            <div className="info-header-title">
-                                <DropdownButton title={geneTitleToShow} variant="outline-dark" onSelect={onSelectTranscript} disabled={geneTranscriptListLen === 0}>
-                                    { geneListOptions }
-                                </DropdownButton>
-                            </div>
-                            <div className="flex-grow-1 text-right">
-                                {/* BA1, BS1 here maybe */}
-                            </div>
-                        </div>
-                        <div className="info-body">
-
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    );
-}
-
-function GeneTranscriptDisplayTitle({ transcript, className = "text-600" }){
-    if (!transcript) return null;
-    const {
-        vep_canonical = false,
-        vep_feature_ncbi = null,
-        vep_feature = <em>No Name</em>,
-        vep_biotype = null,
-        vep_gene : {
-            display_title: geneDisplayTitle = null
-        } = {}
-    } = transcript;
-    return (
-        <span className={className}>
-            <span>{ vep_feature_ncbi || vep_feature }</span>
-            <span className="text-400"> ({ geneDisplayTitle || <em>No Gene</em> })</span>
-            { vep_canonical ? <span className="text-300"> (canonical)</span> : null }
-        </span>
-    );
-}
 
 
 /** @todo probably eventually move into own file, along w child tabs */

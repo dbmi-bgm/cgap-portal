@@ -11,6 +11,7 @@ import { Alerts } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/
 
 export function GeneTabBody(props){
     const { currentGeneItemLoading, currentGeneItem, context, schemas } = props;
+
     if (currentGeneItemLoading) {
         return (
             <div className="gene-tab-body card-body py-5 text-center text-large">
@@ -74,7 +75,16 @@ export function GeneTabBody(props){
 }
 
 const ExternalDatabasesSection = React.memo(function ExternalDatabasesSection({ schemas = null, currentGeneItem }){
-    const { Gene: { properties: geneSchemaProperties = null } = {} } = schemas || {};
+
+    if (!schemas) {
+        return (
+            <div className="text-center">
+                <i className="icon icon-spin icon-circle-notch fas" />
+            </div>
+        );
+    }
+
+    const { Gene: { properties: geneSchemaProperties } } = schemas;
 
     // IN FUTURE WE WON"T HAVE THIS LIST
     // AND INSTEAD GATHER THE PROPERTIES FROM SCHEMA
@@ -82,7 +92,7 @@ const ExternalDatabasesSection = React.memo(function ExternalDatabasesSection({ 
     // Clinvar, medgen not exist yet it seems.
     const externalDatabaseFieldnames = ["genecards", "gnomad", "clinvar", "medgen", "omim_id", "hpa", "gtex_expression", "brainatlas_microarray", "marrvel", "mgi_id"];
 
-    const externalDatabaseSchemaFields = !geneSchemaProperties ? null : externalDatabaseFieldnames.map(function(fieldName){
+    const externalDatabaseSchemaFields = externalDatabaseFieldnames.map(function(fieldName){
         return [ fieldName, geneSchemaProperties[fieldName] ];
     }).filter(function(f){
         // Filter out fields which don't exist in schema yet.
