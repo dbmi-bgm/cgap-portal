@@ -47,7 +47,7 @@ export function GeneTabBody(props){
                     <h5 className="col my-1 text-600">
                         { title }
                     </h5>
-                    <div className="col-4">
+                    <div className="col-auto col-lg-4">
                         <i className="icon icon-fw icon-external-link-alt fas small text-secondary" />
                     </div>
                 </a>
@@ -61,10 +61,10 @@ export function GeneTabBody(props){
             const col2 = externalDatabaseElems.slice(mp);
             externalDBSection = (
                 <div className="row">
-                    <div className="col-12 col-md-6">
+                    <div className="col-12 col-xl-6">
                         { col1 }
                     </div>
-                    <div className="col-12 col-md-6">
+                    <div className="col-12 col-xl-6">
                         { col2 }
                     </div>
                 </div>
