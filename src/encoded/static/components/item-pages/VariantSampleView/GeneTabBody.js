@@ -43,23 +43,26 @@ export function GeneTabBody(props){
                 description = null
             } = fieldSchema;
             const externalID = currentGeneItem[fieldName];
+            if (!externalID) {
+                return null;
+            }
             // IN FUTURE WE WILL GET LINK BACK FROM BACK-END RATHER THAN MAKE IT HERE.
             const linkToID = linkFormat.replace("<ID>", externalID);
             return (
-                <a className="row" key={fieldName} href={linkToID || null} tagret="_blank"
-                    rel="noopener noreferrer" data-tip={description}>
-                    <h5 className="col my-1 text-600">
+                <div className="row mb-03" key={fieldName} data-tip={description}>
+                    <div className="col text-600">
                         { title || fieldName }
-                    </h5>
-                    <div className="col-auto col-lg-4">
-                        <i className="icon icon-fw icon-external-link-alt fas small text-secondary" />
                     </div>
-                </a>
+                    <a className="col-auto" href={linkToID || null} tagret="_blank" rel="noopener noreferrer">
+                        <span>{ externalID }</span>
+                        <i className="ml-05 icon icon-fw icon-external-link-alt fas small text-secondary" />
+                    </a>
+                </div>
             );
-        });
+        }).filter(function(elem){ return !!elem; });
 
         const externalDatabaseElemsLen = externalDatabaseElems.length;
-        if (externalDatabaseElemsLen > 4) {
+        if (externalDatabaseElemsLen >= 4) {
             const mp = Math.ceil(externalDatabaseElemsLen / 2);
             const col1 = externalDatabaseElems.slice(0, mp);
             const col2 = externalDatabaseElems.slice(mp);
