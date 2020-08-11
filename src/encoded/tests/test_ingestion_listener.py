@@ -32,7 +32,6 @@ def setup_and_teardown_sqs_state():
     })
     queue_manager = IngestionQueueManager(registry)
     yield queue_manager
-    queue_manager.clear_queue()  # clean up messages
 
 
 class MockedRegistry:

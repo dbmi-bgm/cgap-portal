@@ -17,7 +17,7 @@ from vcf import Reader
 from pyramid import paster
 from dcicutils.misc_utils import VirtualApp
 from pyramid.view import view_config
-from pyramid.httpexceptions import HTTPConflict
+from pyramid.httpexceptions import HTTPConflict, HTTPNotFound
 from pyramid.request import Request
 from snovault.util import debug_log
 from .util import resolve_file_path, gunzip_content
@@ -70,9 +70,8 @@ def patch_vcf_file_status(request, uuids):
         subreq = Request.blank('/' + uuid, **kwargs)
         resp = None
         try:
-            resp = request.invoke_subrequest(subreq, use_tweens=True)
-            assert resp.status_code == 200
-        except AssertionError:
+            resp = request.invoke_subrequest(subreq)
+        except HTTPNotFound:
             log.error('Tried to patch %s but item does not exist: %s' % (uuid, resp))
 
 

@@ -193,6 +193,9 @@ def test_generate_variant_schema(MTParser, variant_items):
     assert 'enum' in properties['CHROM']
     assert properties['ALT']['field_name'] == 'ALT'
     assert properties['ALT']['type'] == 'string'
+    assert properties['max_pop_af_af_popmax']['default'] == 0
+    assert properties['max_pop_af_af_popmax']['min'] == 0
+    assert properties['max_pop_af_af_popmax']['max'] == 1
 
     # check sub-embedded object fields
     assert properties['transcript']['type'] == 'array'

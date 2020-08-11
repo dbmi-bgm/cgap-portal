@@ -84,6 +84,10 @@ class TestIngestVCF:
         assert self.get_top_level_field(result, 'dbsnp_rs_number') == 'rs72631890'
         assert self.get_top_level_field(result, 'gnomad_an_raw') == 143376
 
+        # check default values
+        assert self.get_top_level_field(result, 'gnomad_nhomalt') == 0  # actual
+        assert self.get_top_level_field(result, 'uk10k_af_asn') == 0  # should be populated from default
+
         # check sub-embedded object fields
         assert len(result['transcript']) == 1
         assert self.get_transcript_field(result, 0, 'vep_consequence') == ['missense_variant']

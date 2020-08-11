@@ -122,7 +122,7 @@ class MappingTableParser(object):
                     if field_name not in self.annotation_field_schema['properties'] or not entry:
                         continue
                     if field_name in self.INTEGER_FIELDS:  # handle int fields
-                        if entry:
+                        if entry is not None:
                             insert[field_name] = int(entry)
                     elif field_name in self.BOOLEAN_FIELDS:  # handle bool fields
                         if entry:
@@ -260,7 +260,7 @@ class MappingTableParser(object):
 
             # handle int fields
             for a_field in self.INTEGER_FIELDS:
-                if item.get(a_field) and a_field != 'no':
+                if item.get(a_field) is not None:
                     features[a_field] = int(item[a_field])
 
             # handle sub_embedded object

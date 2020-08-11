@@ -103,6 +103,28 @@ class VCFParser(object):
                 if self.variant_sample_props[prop].get('type', None) == 'array' and
                 self.variant_sample_props[prop]['items']['type'] == 'object']
 
+    @property
+    def variant_defaults(self):
+        """ Acquires all default values for *top-level* fields on variant """
+        _defaults = {}
+        for name, props in self.variant_props.items():
+            if name == 'schema_version':
+                continue
+            if 'default' in props:
+                _defaults[name] = props['default']
+        return _defaults
+
+    @property
+    def variant_sample_defaults(self):
+        """ Acquires all default values for *top-level* fields on variant sample """
+        _defaults = {}
+        for name, props in self.variant_sample_props.items():
+            if name == 'schema_version':
+                continue
+            if 'default' in props:
+                _defaults[name] = props['default']
+        return _defaults
+
     def read_vcf_metadata(self):
         """ Parses VCF file meta data to get annotation fields under MUTANNO/GRANITE """
         for field in itertools.chain(self.reader.metadata.get(self.MUTANNO, []),
@@ -426,7 +448,7 @@ class VCFParser(object):
                             possible_value = self.validate_variant_value(fn, field, key)
                             if possible_value is not None:
                                 result[fn] = possible_value
-        return result
+        return dict(self.variant_defaults, **result)  # copy defaults, merge in result
 
     @staticmethod
     def format_variant(result, seo='transcript'):

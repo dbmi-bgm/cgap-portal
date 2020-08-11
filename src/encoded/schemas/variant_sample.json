@@ -56,7 +56,6 @@
             "source_version": "VCFv4.2",
             "annotation_category": "Variant Quality",
             "description": "phred-scaled quality score for the assertion made in ALT (multi-sample)",
-            "value_example": "302.6",
             "scope": "sample_variant",
             "schema_title": "Variant Quality"
         },
@@ -69,7 +68,6 @@
             "source_version": "VCFv4.2",
             "annotation_category": "Genotype",
             "description": "Calling info",
-            "value_example": "0/1:33,14:47:99:310,0,927",
             "scope": "sample_variant",
             "schema_title": "Sample ID"
         },
@@ -82,7 +80,6 @@
             "source_version": "VCFv4.2",
             "annotation_category": "Genotype",
             "description": "Genotype",
-            "value_example": "0/1,0/2,1/2",
             "scope": "sample_variant",
             "schema_title": "Genotype",
             "column_order": 30
@@ -96,7 +93,6 @@
             "source_version": "VCFv4.2",
             "annotation_category": "Variant Quality",
             "description": "Allelic depth",
-            "value_example": "33,14",
             "scope": "sample_variant",
             "schema_title": "AD"
         },
@@ -110,7 +106,6 @@
             "source_version": "VCFv4.2",
             "annotation_category": "Variant Quality",
             "description": "Reference allelic depth",
-            "value_example": "33",
             "scope": "sample_variant",
             "schema_title": "AD (Ref)"
         },
@@ -124,7 +119,6 @@
             "source_version": "VCFv4.2",
             "annotation_category": "Variant Quality",
             "description": "Alternate allelic depth",
-            "value_example": "14",
             "scope": "sample_variant",
             "schema_title": "AD (Alt)"
         },
@@ -137,11 +131,11 @@
             "source_version": "VCFv4.2",
             "annotation_category": "Variant Quality",
             "description": "Approximate read depth",
-            "value_example": "47",
             "scope": "sample_variant",
             "schema_title": "Coverage",
             "column_order": 20,
-            "facet_order": 8
+            "facet_order": 8,
+            "min": 0
         },
         "GQ": {
             "title": "Genotype Quality",
@@ -152,7 +146,6 @@
             "source_version": "VCFv4.2",
             "annotation_category": "Variant Quality",
             "description": "phred-scaled quality score that the genotype is accurate [min(99,PL(max)-PL(second))]",
-            "value_example": "99",
             "scope": "sample_variant",
             "schema_title": "Genotype Quality",
             "facet_order": 11
@@ -166,7 +159,6 @@
             "source_version": "VCFv4.2",
             "annotation_category": "Variant Quality",
             "description": "Phred-scaled likelihoods for genotype (Ref/Ref, Ref/Alt, Alt/Alt)",
-            "value_example": "310,200,100",
             "scope": "sample_variant",
             "schema_title": "Genotype Likelihoods (0/0,0/1,1/1)"
         },
@@ -179,7 +171,6 @@
             "source_version": "VCFv4.2",
             "annotation_category": "Genotype",
             "description": "Physical phasing haplotype information",
-            "value_example": "0|1",
             "scope": "sample_variant",
             "schema_title": "Phasing information"
         },
@@ -192,7 +183,6 @@
             "source_version": "VCFv4.2",
             "annotation_category": "Genotype",
             "description": "Physical phasing ID information",
-            "value_example": "985446_G_T",
             "scope": "sample_variant",
             "schema_title": "Phasing ID"
         },
@@ -205,7 +195,6 @@
             "source_version": "VCFv4.2",
             "annotation_category": "Genotype",
             "description": "Phasing set ID",
-            "value_example": "985446",
             "scope": "sample_variant",
             "schema_title": "Phasing Set"
         },
@@ -219,11 +208,11 @@
             "source_version": "VCFv4.2",
             "annotation_category": "Variant Quality",
             "description": "Variant allele fraction",
-            "value_example": "0.2979",
             "scope": "sample_variant",
             "schema_title": "VAF",
             "column_order": 21,
             "facet_order": 9,
+            "min": 0,
             "max": 1
         },
         "FS": {
@@ -248,10 +237,10 @@
             "source_version": "VCFv4.2",
             "annotation_category": "Genotype",
             "description": "Posterior probability of de novo mutation",
-            "value_example": "1.0;0.9999999999999998",
             "scope": "sample_variant",
             "schema_title": "novoCaller PP",
             "facet_order": 16,
+            "min": 0,
             "max": 1
         },
         "samplegeno": {
@@ -271,7 +260,6 @@
                         "sub_embedding_group": "{\"key\": \"samplegeno\", \"title\": \"Sample Genotype\"}",
                         "annotation_category": "Genotype",
                         "description": "Sample genotype (number format)",
-                        "value_example": "0/1",
                         "scope": "sample_variant",
                         "schema_title": "Sample Genotype (Numeric)"
                     },
@@ -285,7 +273,6 @@
                         "sub_embedding_group": "{\"key\": \"samplegeno\", \"title\": \"Sample Genotype\"}",
                         "annotation_category": "Genotype",
                         "description": "Sample genotype (nucletide format)",
-                        "value_example": "G/T",
                         "scope": "sample_variant",
                         "schema_title": "Sample Genotype (Nucleotide)"
                     },
@@ -299,7 +286,6 @@
                         "sub_embedding_group": "{\"key\": \"samplegeno\", \"title\": \"Sample Genotype\"}",
                         "annotation_category": "Genotype",
                         "description": "Allelic depth",
-                        "value_example": "21/10",
                         "scope": "sample_variant",
                         "schema_title": "Sample Genotype (Allele Depth)"
                     },
