@@ -1,10 +1,12 @@
+import datetime
+import json
+import mock
 import pytest
 import requests   # XXX: C4-211 this should NOT be necessary - there is a bug somewhere
 import time
-import mock
-import datetime
-from uuid import uuid4
+
 from dcicutils.qa_utils import ignored, notice_pytest_fixtures
+from uuid import uuid4
 from ..ingestion_listener import IngestionQueueManager, run, IngestionListener
 from ..util import gunzip_content
 from .variant_fixtures import gene_workbook, post_variant_consequence_items
@@ -48,8 +50,10 @@ def test_ingestion_queue_manager_basic(setup_and_teardown_sqs_state):
     assert queue_manager.queue_name == MOCKED_ENV + queue_manager.BUCKET_EXTENSION
 
 
-def _expect_n_messages(queue_manager, n):
-    print("Expecting", n, "messages")
+def _expect_message_uuids(queue_manager, expected_uuids):
+    checklist = set(expected_uuids)
+    n = len(expected_uuids)
+    print("Expecting: %s" % expected_uuids)
     wait_for_queue_to_catch_up(0)
     try_count, msgs = 0, []
     max_tries = 6
@@ -59,7 +63,13 @@ def _expect_n_messages(queue_manager, n):
             print(str(datetime.datetime.now()), "Giving up")
             break
         _msgs = queue_manager.receive_messages(batch_size=1)  # should reduce flakiness
-        print(str(datetime.datetime.now()), "Received this try:", len(_msgs))
+        for _msg in _msgs:
+            print("Received: %r" % _msg)
+            # Double-check that any message we received was ours.
+            uuid = json.loads(_msg['Body'])['uuid']
+            assert uuid in expected_uuids, "Unexpected message uuid: %r" % uuid
+            checklist.remove(uuid)  # No longer waiting to see this
+        print(str(datetime.datetime.now()), "Total received this try:", len(_msgs))
         msgs.extend(_msgs)
         if len(msgs) >= n:  # Stop if we have enough
             print(str(datetime.datetime.now()), "Reached threshold")
@@ -68,28 +78,31 @@ def _expect_n_messages(queue_manager, n):
         try_count += 1
     print(str(datetime.datetime.now()), "Total messages seen:", len(msgs))
     assert len(msgs) == n
+    assert checklist == set()
 
 
 def test_ingestion_queue_add_and_receive(setup_and_teardown_sqs_state):
     """ Tests adding/receiving some uuids """
     queue_manager = setup_and_teardown_sqs_state
-    queue_manager.add_uuids([
-        str(uuid4()), str(uuid4())
-    ])
-    _expect_n_messages(queue_manager, 2)
+    test_uuids = [str(uuid4()), str(uuid4())]
+    queue_manager.add_uuids(test_uuids)
+    _expect_message_uuids(queue_manager, test_uuids)
 
 
 def test_ingestion_queue_add_via_route(setup_and_teardown_sqs_state, testapp):
     """ Tests adding uuids to the queue via /queue_ingestion """
     queue_manager = setup_and_teardown_sqs_state
+    assert queue_manager.queue_name == MOCKED_ENV + queue_manager.BUCKET_EXTENSION
+    test_uuids = [str(uuid4()), str(uuid4())]
     request_body = {
-        'uuids': [str(uuid4()), str(uuid4())],
-        'override_name': MOCKED_ENV + queue_manager.BUCKET_EXTENSION
+        'uuids': test_uuids,
+        'override_name': queue_manager.queue_name
     }
     response = testapp.post_json(QUEUE_INGESTION_URL, request_body).json
+    print(json.dumps(response, indent=2))
     assert response['notification'] == 'Success'
     assert response['number_queued'] == 2
-    _expect_n_messages(queue_manager, 2)
+    _expect_message_uuids(queue_manager, test_uuids)
 
 
 def test_ingestion_queue_delete(setup_and_teardown_sqs_state, testapp):
