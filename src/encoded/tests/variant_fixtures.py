@@ -1,7 +1,7 @@
 import pytest
 import json
-from encoded.util import resolve_file_path
-from encoded.commands.ingest_genes import GeneIngestion
+from ..util import resolve_file_path
+from ..commands.ingest_genes import GeneIngestion
 
 
 GENES_LOC = resolve_file_path('tests/data/variant_workbook/gene_inserts_partial.json')

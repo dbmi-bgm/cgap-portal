@@ -2,7 +2,7 @@ import argparse
 import logging
 from pyramid.paster import get_app
 from dcicutils.misc_utils import VirtualApp
-from encoded.commands.variant_table_intake import MappingTableParser
+from ..commands.variant_table_intake import MappingTableParser
 
 
 logger = logging.getLogger(__name__)
