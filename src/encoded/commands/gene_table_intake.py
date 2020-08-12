@@ -70,7 +70,7 @@ class GeneTableParser(MappingTableParser):
         logger.info('Build gene schema')
         return schema
 
-    def run(self, gs_out=None, write=False):
+    def run(self, gs_out=None, write=False):  # noqa - args are different then in superclass but we don't care
         """
         Ingests the gene table, producing the gene schema
 

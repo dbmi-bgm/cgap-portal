@@ -378,7 +378,7 @@ class PanelOne extends React.PureComponent {
             });
         };
 
-        const postData = { title, institution, project };
+        const postData = { case_id: title, institution, project };
 
         this.setState({ isCreating: true }, ()=>{
             this.request = ajax.load(

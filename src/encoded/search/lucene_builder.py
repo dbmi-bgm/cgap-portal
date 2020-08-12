@@ -100,8 +100,22 @@ class LuceneBuilder:
 
         for query_field, filters in field_filters.items():
             # if we are nested, we must construct the query differently than normal
-            if find_nested_path(query_field, es_mapping):
+            nested_path = find_nested_path(query_field, es_mapping)
+            if nested_path is not None:
                 query_field = query_field.replace('.properties', '')
+                strip_raw = query_field.replace('.raw', '')
+
+                # if we are searching on the nested field itself, we must do something "special"
+                if nested_path == strip_raw:
+                    query_field = strip_raw
+
+                    # if searching on 'No Value' on a nested field, the query has to be written
+                    # slightly differently - note that you cannot combine a 'No value' search with
+                    # anything else on this field path
+                    if filters['add_no_value'] is True:
+                        should_arr = [{EXISTS: {FIELD: query_field}}]
+                        must_not_filters_nested.append((query_field, should_arr))
+                        continue
 
                 # Build must/must_not sub-queries
                 must_terms = cls.construct_nested_sub_queries(query_field, filters, key='must_terms')
@@ -257,7 +271,7 @@ class LuceneBuilder:
                 # if there is no boolean clause in this sub-query, add it directly to final_filters
                 # otherwise continue logic below
                 if BOOL not in query:
-                    final_filters[BOOL][MUST].append({
+                    final_filters[BOOL][key].append({
                         NESTED: {
                             PATH: nested_path,
                             QUERY: query
