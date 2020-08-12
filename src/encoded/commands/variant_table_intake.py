@@ -539,13 +539,27 @@ class MappingTableParser(object):
         return schema
 
     @staticmethod
-    def write_schema(schema, fname):
+    def sort_schema_properties(schema):
+        """ Helper method that sorts schema properties by key by inserting sorted key, values into a new
+            dictionary (since in Python3.6>= all dicts are ordered). Schemas from this point forward
+            will have their properties sorted alphabetically so it is easier to visualize changes.
+
+        Args:
+            schema: schema with key 'properties' to be sorted
+        """
+        sorted_properties = {}
+        for key, value in sorted(schema['properties'].items()):
+            sorted_properties[key] = value
+        return sorted_properties
+
+    def write_schema(self, schema, fname):
         """ Writes the given schema (JSON) to the given file 'fname'
 
         Args:
             schema: dictionary to write as json as the schema
             fname: file to write out to
         """
+        schema['properties'] = self.sort_schema_properties(schema)
         with open(fname, 'w+') as out:
             json.dump(schema, out, indent=4)
         logger.info('Successfully wrote schema: %s to file: %s\n' % (schema['title'], fname))
