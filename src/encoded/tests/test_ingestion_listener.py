@@ -49,15 +49,24 @@ def test_ingestion_queue_manager_basic(setup_and_teardown_sqs_state):
 
 
 def _expect_n_messages(queue_manager, n):
+    print("Expecting", n, "messages")
     wait_for_queue_to_catch_up(0)
-    tries, msgs = 5, []
+    try_count, msgs = 0, []
+    max_tries = 6
     while len(msgs) < n:
-        if tries < 0:
+        print(str(datetime.datetime.now()), "Try", try_count, "...")
+        if try_count >= max_tries:
+            print(str(datetime.datetime.now()), "Giving up")
             break
         _msgs = queue_manager.receive_messages(batch_size=1)  # should reduce flakiness
+        print(str(datetime.datetime.now()), "Received this try:", len(_msgs))
         msgs.extend(_msgs)
+        if len(msgs) >= n:  # Stop if we have enough
+            print(str(datetime.datetime.now()), "Reached threshold")
+            break
         wait_for_queue_to_catch_up(0)
-        tries -= 1
+        try_count += 1
+    print(str(datetime.datetime.now()), "Total messages seen:", len(msgs))
     assert len(msgs) == n
 
 
