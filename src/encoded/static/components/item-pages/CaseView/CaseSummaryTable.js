@@ -527,25 +527,9 @@ export const CaseSummaryTable = React.memo(function CaseSummaryTable(props){
     const renderedSummary = (membersWithoutSamplesLen + membersWithoutViewPermissionsLen) > 0 ? (
         <div className="processing-summary">
             { membersWithoutSamplesLen > 0 ?
-                <p className="pl-2 mb-0">
+                <p className="pl-1 mb-0">
                     <span className="text-600">{ membersWithoutSamplesLen }</span> members without samples.
                 </p>
-                /*
-                <React.Fragment>
-                    <p className="mb-0">{ (membersWithoutSamplesLen + " members without samples: ") }</p>
-                    {
-                        membersWithoutSamples.map(function(member, idx){
-                            const { '@id' : id, display_title } = member;
-                            return (
-                                <React.Fragment key={id}>
-                                    { idx !== 0 ? ", " : null }
-                                    <a href={id}>{ display_title }</a>
-                                </React.Fragment>
-                            );
-                        })
-                    }
-                </React.Fragment>
-                */
                 : null }
             { membersWithoutViewPermissionsLen > 0 ?
                 <p className="mb-0">

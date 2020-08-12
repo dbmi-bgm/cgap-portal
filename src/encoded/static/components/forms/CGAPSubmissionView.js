@@ -3,7 +3,7 @@ import memoize from 'memoize-one';
 import url from 'url';
 
 import SubmissionView from '@hms-dbmi-bgm/shared-portal-components/es/components/forms/SubmissionView';
-import CohortSubmissionView from './../item-pages/CohortView/CohortSubmissionView';
+// import CaseSubmissionView from './../item-pages/CaseView/CaseSubmissionView';
 
 
 export function getSubmissionItemType(context, href){

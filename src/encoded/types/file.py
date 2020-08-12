@@ -165,7 +165,9 @@ class File(Item):
         'related_files.relationship_type',
         'related_files.file.accession',
         'quality_metric.display_title',
-        'quality_metric.@type'
+        'quality_metric.@type',
+        'quality_metric.qc_list.qc_type',
+        'quality_metric.qc_list.value.uuid'
     ]  # + lab_award_attribution_embed_list
     name_key = 'accession'
 
@@ -496,7 +498,7 @@ class FileFastq(File):
         "quality_metric.Total Sequences",
         "quality_metric.Sequence length",
         "quality_metric.url"
-    ]  + file_workflow_run_embeds
+        ] + file_workflow_run_embeds
     name_key = 'accession'
     rev = dict(File.rev, **{
         'workflow_run_inputs': ('WorkflowRun', 'input_files.value'),
