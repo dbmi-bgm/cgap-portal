@@ -5,12 +5,42 @@ import PropTypes from 'prop-types';
 import _ from 'underscore';
 import DropdownButton from 'react-bootstrap/esm/DropdownButton';
 import DropdownItem from 'react-bootstrap/esm/DropdownItem';
-import { console, layout, ajax } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
+import { console, schemaTransforms } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { Alerts } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/Alerts';
 
+import { Schemas } from './../../util';
 
+
+/**
+ * I feel like we can maybe re-use this as an overview tab for Gene ItemView eventually.
+ * The only difference is instead of currentGeneItem, we'd get data from context. And there'd
+ * be no currentGeneItemLoading.
+ *
+ * What we can do then is rename this component to "GeneOverview" or something and rename `currentGeneItem` to `context`
+ * in this component and remove `currentGeneItemLoading` and logic re it. Then compose new component GeneTabBody
+ * that simply does the currentGeneItemLoading logic or returns <GeneOverview context={currentGeneItem} />
+ */
 export function GeneTabBody(props){
     const { currentGeneItemLoading, currentGeneItem, context, schemas } = props;
+    const {
+        error               = null,
+        '@id' : geneAtID    = null,
+        name                = <em>None</em>,
+        gene_symbol         = null,
+        gene_biotype        = <em>None</em>,
+        alias_symbol        = <em>Todo 2</em>,
+        alias_name          = <em>Todo 3</em>,
+        gene_summary        = <em>No summary available</em>
+    } = currentGeneItem;
+
+    const getTipForField = useMemo(function(){
+        if (!schemas) return function(){ return null; };
+        return function(field, itemType = "Gene"){
+            // Func is scoped within GeneTabBody
+            const schemaProperty = schemaTransforms.getSchemaProperty(field, schemas, itemType);
+            return (schemaProperty || {}).description || null;
+        };
+    }, [ schemas ]);
 
     if (currentGeneItemLoading) {
         return (
@@ -20,34 +50,127 @@ export function GeneTabBody(props){
         );
     }
 
+    if (error || !geneAtID) {
+        // It's possible yet unlikely there might be view permission error or something.
+        // Actually yeah.. this shouldnt happen since won't have been able to get ID
+        // to load this w anyway.. will remove.
+        // Added 'if no gene id' case to loadGene in VariantSampleOverview which would leave
+        // Gene tab disabled - might be worth to enable and show this value tho by setting
+        // currentGeneItem to { error: "no view permissions" } (instd of leaving as null).
+        return (
+            <div className="gene-tab-body card-body py-5 text-center">
+                <em>{ error || "Gene Item not available." }</em>
+            </div>
+        );
+    }
+
     return (
         <div className="gene-tab-body card-body">
             <div className="row">
-                <div className="col d-flex flex-column">
+                <div className="col-12 col-md-6 d-flex flex-column">
 
-                    <div className="flex-grow-1 pb-2">
+                    <div className="flex-grow-1">
                         <div className="info-header-title">
                             <h4>Overview</h4>
                         </div>
                         <div className="info-body">
-                            ABCS
+
+                            <div className="row mb-03">
+                                <div className="col-12 col-xl-3">
+                                    <label htmlFor="variant.transcript.vep_gene.name" className="mb-0" data-tip={getTipForField("name")}>
+                                        Gene Name:
+                                    </label>
+                                </div>
+                                <div className="col-12 col-xl-9" id="variant.transcript.vep_gene.name">
+                                    { name }
+                                </div>
+                            </div>
+
+                            <div className="row mb-03">
+                                <div className="col-12 col-xl-3">
+                                    <label htmlFor="variant.transcript.vep_gene.gene_symbol" className="mb-0" data-tip={getTipForField("gene_symbol")}>
+                                        Symbol:
+                                    </label>
+                                </div>
+                                <div className="col-12 col-xl-9" id="variant.transcript.vep_gene.gene_symbol">
+                                    { gene_symbol }
+                                </div>
+                            </div>
+
+                            <div className="row mb-03">
+                                <div className="col-12 col-xl-3">
+                                    <label htmlFor="variant.transcript.vep_gene.todo1" className="mb-0" data-tip={null}>
+                                        Gene Location:
+                                    </label>
+                                </div>
+                                <div className="col-12 col-xl-9" id="variant.transcript.vep_gene.todo1">
+                                    { <em>Todo 1</em> }
+                                </div>
+                            </div>
+
+                            <div className="row mb-03">
+                                <div className="col-12 col-xl-3">
+                                    <label htmlFor="variant.transcript.vep_gene.gene_biotype" className="mb-0" data-tip={getTipForField("gene_biotype")}>
+                                        Gene Type:
+                                    </label>
+                                </div>
+                                <div className="col-12 col-xl-9" id="variant.transcript.vep_gene.gene_biotype">
+                                    { Schemas.Term.toName("gene_biotype", gene_biotype) }
+                                </div>
+                            </div>
+
+                            <div className="row mb-03">
+                                <div className="col-12 col-xl-3">
+                                    <label htmlFor="variant.transcript.vep_gene.todo2" className="mb-0" data-tip={null}>
+                                        Alias Symbol:
+                                    </label>
+                                </div>
+                                <div className="col-12 col-xl-9" id="variant.transcript.vep_gene.todo2">
+                                    { alias_symbol }
+                                </div>
+                            </div>
+
+                            <div className="row mb-03">
+                                <div className="col-12 col-xl-3">
+                                    <label htmlFor="variant.transcript.vep_gene.todo3" className="mb-0" data-tip={null}>
+                                        Alias Names:
+                                    </label>
+                                </div>
+                                <div className="col-12 col-xl-9" id="variant.transcript.vep_gene.todo3">
+                                    { alias_name }
+                                </div>
+                            </div>
+
+                            <div className="row mb-03">
+                                <div className="col-12 col-xl-3">
+                                    <label htmlFor="variant.transcript.vep_gene.gene_summary" className="mb-0" data-tip={getTipForField("gene_summary")}>
+                                        Gene Summary:
+                                    </label>
+                                </div>
+                                <div className="col-12 col-xl-9" id="variant.transcript.vep_gene.gene_summary">
+                                    { gene_summary }
+                                </div>
+                            </div>
+
                         </div>
                     </div>
 
+                    {/* Won't be ready for some time -
                     <div className="flex-grow-0">
                         <div className="info-header-title">
                             <h4>Conditions</h4>
                         </div>
                         <div className="info-body">
-                            ABCDEF<br/>
-                            ABCDFSDFS<br/>
-                            ABCDFSDFS
+                            TODO<br/>
+                            TODO TODO<br/>
+                            TODO TODO TODO
                         </div>
                     </div>
+                    */}
 
 
                 </div>
-                <div className="col d-flex flex-column">
+                <div className="col-12 col-md-6 d-flex flex-column">
 
                     <div className="flex-grow-1 pb-2">
                         <div className="info-header-title">
@@ -64,7 +187,7 @@ export function GeneTabBody(props){
                             <h4>Constraint Scores</h4>
                         </div>
                         <div className="info-body">
-                            ABCDFSDFS
+                            <ConstraintScoresSection {...{ schemas, currentGeneItem, getTipForField }} />
                         </div>
                     </div>
 
@@ -113,11 +236,11 @@ const ExternalDatabasesSection = React.memo(function ExternalDatabasesSection({ 
         // IN FUTURE WE WILL GET LINK BACK FROM BACK-END RATHER THAN MAKE IT HERE.
         const linkToID = linkFormat.replace("<ID>", externalID);
         return (
-            <div className="row mb-03" key={fieldName} data-tip={description}>
-                <div className="col-12 col-xl text-600">
-                    { title || fieldName }
+            <div className="row mb-03" key={fieldName}>
+                <div className="col-12 col-xl">
+                    <label className="mb-0" htmlFor={"variant.transcript.vep_gene." + fieldName} data-tip={description}>{ title || fieldName }</label>
                 </div>
-                <a className="col-12 col-xl-auto" href={linkToID || null} tagret="_blank" rel="noopener noreferrer">
+                <a className="col-12 col-xl-auto" href={linkToID || null} tagret="_blank" rel="noopener noreferrer" id={"variant.transcript.vep_gene." + fieldName}>
                     <span>{ externalID }</span>
                     <i className="ml-05 icon icon-fw icon-external-link-alt fas small text-secondary" />
                 </a>
@@ -148,6 +271,43 @@ const ExternalDatabasesSection = React.memo(function ExternalDatabasesSection({ 
 
 });
 
-function ConstraintScoresSection({ schemas = null, currentGeneItem }){
-    // todo
+function ConstraintScoresSection({ schemas = null, currentGeneItem, getTipForField }){
+    const {
+        exp_lof, exp_mis, exp_syn,
+        obs_lof, obs_mis, obs_syn,
+        oe_lof,  oe_mis,  oe_syn,
+        // more todo
+    } = currentGeneItem;
+    return (
+        <table className="w-100">
+            <thead>
+                <tr>
+                    <th>Constraint</th>
+                    <th>Synonymous</th>
+                    <th>Missense</th>
+                    <th>LoF</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td className="text-600">{"Exp. SNV's"}</td>
+                    <td data-tip={getTipForField("exp_syn")}>{ exp_syn }</td>
+                    <td data-tip={getTipForField("exp_mis")}>{ exp_mis }</td>
+                    <td data-tip={getTipForField("exp_lof")}>{ exp_lof }</td>
+                </tr>
+                <tr>
+                    <td className="text-600">{"Obs. SNV's"}</td>
+                    <td data-tip={getTipForField("obs_syn")}>{ obs_syn }</td>
+                    <td data-tip={getTipForField("obs_mis")}>{ obs_mis }</td>
+                    <td data-tip={getTipForField("obs_lof")}>{ obs_lof }</td>
+                </tr>
+                <tr>
+                    <td className="text-600">{"o/e"}</td>
+                    <td data-tip={getTipForField("oe_syn")}>{ oe_syn }</td>
+                    <td data-tip={getTipForField("oe_mis")}>{ oe_mis }</td>
+                    <td data-tip={getTipForField("oe_lof")}>{ oe_lof }</td>
+                </tr>
+            </tbody>
+        </table>
+    );
 }

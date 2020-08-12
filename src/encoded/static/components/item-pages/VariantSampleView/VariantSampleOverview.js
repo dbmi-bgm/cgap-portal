@@ -1,8 +1,9 @@
 'use strict';
 
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import _ from 'underscore';
+import ReactTooltip from 'react-tooltip';
 import DropdownButton from 'react-bootstrap/esm/DropdownButton';
 import DropdownItem from 'react-bootstrap/esm/DropdownItem';
 import { console, layout, ajax } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
@@ -74,6 +75,13 @@ export class VariantSampleOverview extends React.PureComponent {
         const { currentTranscriptIdx } = this.state;
         const currentGeneID = getCurrentTranscriptGeneID(context, currentTranscriptIdx);
         console.log("GID", currentGeneID);
+
+        if (!currentGeneID) {
+            // Likely no view permisison or something.
+            // Probably quite unlikely but just incase.
+            return;
+        }
+
         const cachedGeneItem = this.loadedGeneCache[currentGeneID];
         if (cachedGeneItem) {
             this.setState({ currentGeneItem: cachedGeneItem });
@@ -117,6 +125,7 @@ function getCurrentTranscriptGeneID(context, transcriptIndex){
 function VariantSampleOverviewTabView(props){
     const { context, schemas, currentGeneItem, currentGeneItemLoading } = props;
     const [ currentTab, setCurrentTab ] = useState("Variant");
+
     // TODO change eventually to use 'if' condition or something and distribute props as needed.
     let tabViewBody = null;// { "Variant" : VariantTabBody, "Gene" : GeneTabBody, "Sample" : SampleTabBody }[currentTab];
     if (currentTab === "Variant"){
@@ -126,6 +135,7 @@ function VariantSampleOverviewTabView(props){
     } else if (currentTab === "Sample") {
         tabViewBody = <SampleTabBody {...{ context }} />;
     }
+
     const onClick = useMemo(function(){
         return function(e){
             // Event delegation cuz why not. Less event listeners is good usually, tho somewhat moot in React
@@ -136,9 +146,20 @@ function VariantSampleOverviewTabView(props){
             }
         };
     }, []);
+
+    useEffect(function(){
+        // ReactTooltip.rebuild is called by App upon navigation
+        // to rebuild tooltips from current DOM.
+        // However most tabs' DOM contents not visible until swithc to them
+        // so we needa rebuild tooltip upon that.
+        // If DotRouter can be reused/integrated here or similar, we can
+        // remove this useEffect.
+        setTimeout(ReactTooltip.rebuild, 200);
+    }, [ currentTab ]);
+
     // TODO in SCSS: give tabs-column hard-coded width, give content-column flex-width
     return (
-        <div className="d-flex align-items-flex-start sample-variant-overview-tab-view-container">
+        <div className="d-flex align-items-flex-start sample-variant-overview-tab-view-container flex-column flex-lg-row">
             <div className="tabs-column col col-lg-2 col-xl-1 px-0" onClick={onClick}>
                 <OverviewTabTitle {...{ currentTab }} title="Variant" />
                 <OverviewTabTitle {...{ currentTab }} title="Gene" disabled={!currentGeneItem} />
