@@ -29,13 +29,13 @@ def wait_for_queue_to_catch_up(queue_manager, n, initially=False):
 
 class MockedEnv:
 
-    MOCKED_ENV = 'fourfront-cgapother'
+    MOCKED_ENV_PREFIX = 'fourfront-cgapother'
     _last_version = 0
 
     @classmethod
     def new_name(cls):
         cls._last_version = last_version = int(datetime.datetime.now().timestamp() * 1000000)
-        return "%s%s" % (cls.MOCKED_ENV, last_version)
+        return "%s%s" % (cls.MOCKED_ENV_PREFIX, last_version)
 
 
 class IngestionQueueManagerForTesting(IngestionQueueManager):
@@ -71,8 +71,8 @@ def test_ingestion_queue_manager_basic(fresh_ingestion_queue_manager_for_testing
     """ Tests basic things about initializing the queue manager """
     queue_manager = fresh_ingestion_queue_manager_for_testing
     # The env name will start with a constant string and have a bunch of digits.
-    assert queue_manager.env_name.startswith(MockedEnv.MOCKED_ENV)
-    assert queue_manager.env_name[len(MockedEnv.MOCKED_ENV)].isdigit()
+    assert queue_manager.env_name.startswith(MockedEnv.MOCKED_ENV_PREFIX)
+    assert queue_manager.env_name[len(MockedEnv.MOCKED_ENV_PREFIX)].isdigit()
     # The queue name will have a suffix attached.
     assert queue_manager.queue_name == queue_manager.env_name + queue_manager.BUCKET_EXTENSION
 
