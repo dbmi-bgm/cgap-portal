@@ -17,13 +17,80 @@ $search-results-header-row-height: 52px; // 46px is existing default for both re
 
 // Extensions to shared-portal-components searchview table(s):
 .search-result-row .result-table-row .search-result-column-block {
+
+	.inner {
+
+		a.adv-block-link {
+			color: $body-color;
+
+			&:hover {
+				color: $link-hover-color;
+				text-decoration: none;
+				h4, h5, h6 {
+					color: $link-hover-color;
+					text-decoration: underline;
+				}
+			}
+
+		}
+
+		.multi-field-cell {
+			/* Is usually a child of adv-block-link, but not necessarily (if no link needed). */
+			flex: 1 1 0px;
+			width: 100%;
+
+			.top-row,
+			.col-date,
+			.col-main {
+				@extend .text-ellipsis-container;
+			}
+
+			.top-row {
+				display: flex;
+				justify-content: space-between;
+				.col-topleft {
+					@extend .text-ellipsis-container;
+				}
+			}
+			.top-row,
+			.col-date {
+				line-height: 20px;
+				white-space: nowrap;
+			}
+			.col-main {
+				margin: 0;
+				font-weight: 400;
+				text-align: center;
+			}
+			.col-topleft {
+				font-size: 0.75em;
+			}
+		}
+	}
+
 	&[data-field="display_title"] {
-		> .inner {
+		.inner {
 			> .title-block {
 				white-space: normal; // Allow to wrap by default (overrides SPC's default white-space: nowrap;) since we have tall-ish rows.
 			}
 		}
 	}
+
+
+	// Styling overrides specific to search results of type Case
+	.search-view-controls-and-results[data-search-item-type="Case"] & {
+
+		&[data-first-visible-column] .inner > .title-block {
+			max-height: none;
+		}
+
+		&[data-field="display_title"] > .inner .multi-field-cell .col-main,
+		&[data-field="individual"] > .inner .multi-field-cell .col-main {
+			// Uppercase Individual's Identifier
+			text-transform: uppercase;
+		}
+	}
+	
 	&[data-field="status"] {
 		> .inner {
 			i.item-status-indicator-dot {

@@ -8,9 +8,16 @@ import { Schemas } from './../../util';
 import { LocalizedTime } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/LocalizedTime';
 
 
+
+function hasViewPermisison({ '@id' : itemID, display_title }) {
+    return itemID && display_title;
+}
+
+
 /** @param {Object} props - Contents of a family sub-embedded object. */
-export const CohortSummaryTable = React.memo(function CohortSummaryTable(props){
+export const CaseSummaryTable = React.memo(function CaseSummaryTable(props){
     const {
+        relationships = [],
         members = [],
         proband: { '@id' : probandID } = {},
         original_pedigree = null,
@@ -18,6 +25,7 @@ export const CohortSummaryTable = React.memo(function CohortSummaryTable(props){
         sampleProcessing = []
     } = props;
 
+    console.log("case summary props", props);
     if (members.length === 0){
         return (
             <div className="processing-summary">
@@ -41,30 +49,38 @@ export const CohortSummaryTable = React.memo(function CohortSummaryTable(props){
         'sample' : (
             <React.Fragment>
                 <i className="icon icon-fw icon-vial fas mr-05 align-middle"/>
-                Sample
+                <span className="d-none d-lg-inline ml-05">Sample</span>
             </React.Fragment>
         ),
         'individual' : (
             <React.Fragment>
                 <i className="icon icon-fw icon-user fas mr-05 align-middle"/>
-                Individual
+                <span className="d-none d-lg-inline ml-05">Individual</span>
             </React.Fragment>
         ),
         'assayType' : "Assay Type",
         'rawFiles' : (
             <React.Fragment>
                 <i className="icon icon-fw icon-file-code fas mr-05 align-middle"/>
-                <span className="d-none d-lg-inline ml-05">Sequencing</span>
+                Sequencing
             </React.Fragment>
         ),
         'processingType' : "Processing Type",
         'processedFiles' : (
             <React.Fragment>
                 <i className="icon icon-fw icon-file-medical-alt fas mr-05 align-middle"/>
-                <span className="d-none d-lg-inline ml-05">Pipeline</span>
+                Pipeline
             </React.Fragment>
         ),
     };
+
+    // Create a mapping of individuals to relationship and sex
+    const relationshipMapping = {};
+    relationships.forEach((item) => {
+        const { relationship = null, sex = null, individual = null } = item;
+        relationshipMapping[individual] = { sex, relationship };
+    });
+    console.log("relationshipMapping", relationshipMapping);
 
     const sampleProcessingData = {}; // maps sample analysis UUIDs to sample IDs to file data Objects for MSAs and samples
 
@@ -72,7 +88,9 @@ export const CohortSummaryTable = React.memo(function CohortSummaryTable(props){
     let hasCombinedMSA = false; // if there is also a combined MSA (for rendering last row only when there's a combined VCF)
     // add multisample analysis column data to column order/titles and data object
     sampleProcessing.forEach((sp) => {
-        const { uuid, processed_files = [], completed_processes = [] , sample_processed_files = [] } = sp;
+        const { uuid, processed_files = [], completed_processes = [], samples = [], sample_processed_files = [] } = sp;
+        // TODO: If processed_files.length !== spProcFilesWithPermission.length, maybe inform user about this?
+        const spProcFilesWithPermission = processed_files.filter(hasViewPermisison);
 
         function pushColumn(title) {
             // adds a column to the end of the column order and to the column titles map
@@ -81,22 +99,28 @@ export const CohortSummaryTable = React.memo(function CohortSummaryTable(props){
             h2ColumnOrder.push(title);
         }
 
-        if (sample_processed_files.length > 0) {
+        if (spProcFilesWithPermission.length > 0) {
             // add column titles with a flag & some embedded data for identifying column by UUID & rendering pipeline title
             pushColumn(`~MSA|${ completed_processes[0] }|${ uuid }`);
 
             sampleProcessingData[uuid] = {};
-            sampleProcessingData[uuid]["MSA"] = generateFileDataObject(processed_files); // populate with multisample analysis objects
+            sampleProcessingData[uuid]["MSA"] = generateFileDataObject(spProcFilesWithPermission); // populate with multisample analysis objects
 
-            // populate with per sample data
+            // populate with per sample data (no files)
+            samples.forEach((sample) => {
+                const { accession = "" } = sample;
+                sampleProcessingData[uuid][accession] = true;
+            });
+
+            // populate with per sample data (files) (override any previously set)
             sample_processed_files.forEach((set) => {
                 const { sample : { accession = "" } = {}, processed_files: procFiles = [] } = set;
-                sampleProcessingData[uuid][accession] = generateFileDataObject(procFiles);
+                sampleProcessingData[uuid][accession] = generateFileDataObject(procFiles.filter(hasViewPermisison));
             });
             hasMSA = true;
         }
 
-        if (processed_files.length > 0) {
+        if (spProcFilesWithPermission.length > 0) {
             hasCombinedMSA = true;
         }
 
@@ -399,11 +423,13 @@ export const CohortSummaryTable = React.memo(function CohortSummaryTable(props){
     }
 
     // Gather rows from family.members - 1 per sample (or individual, if no sample).
-    // todo: consider moving this block to Cohort index; we're already doing a pass to figure out
+    // todo: consider moving this block to Case index; we're already doing a pass to figure out
     // how many individual have samples there... so it might make sense to move this
     members.forEach(function(individual){
         const {
+            accession = null,
             display_title: indvDisplayTitle = null,
+            individual_id = null,
             '@id' : indvId,
             error = null,
             samples = []
@@ -422,11 +448,18 @@ export const CohortSummaryTable = React.memo(function CohortSummaryTable(props){
         const isProband = (probandID && probandID === indvId);
         const genID = idToGraphIdentifier[indvId];
 
+        // Assign roles to the individual
+        const infoObj = relationshipMapping[accession] || relationshipMapping[indvDisplayTitle];
+        const role = infoObj["relationship"] || null;
+        const sex = infoObj["sex"] || null;
+        console.log("id from graph", indvId, genID);
+
         const indvLink = (
             <div className={`${genID ? "text-ellipsis-container" : ""}`}>
                 { isProband ? <span className="font-weight-bold d-block">Proband</span> : null}
+                { (role && role !== "proband") ? <span className="d-block font-weight-semibold text-capitalize">{role}</span> : null}
                 { genID ? <span className="text-serif text-small gen-identifier d-block text-center">{ genID }</span>: null}
-                <a href={indvId} className="accession d-block">{ indvDisplayTitle }</a>
+                <a href={indvId} className="accession d-block">{ individual_id || indvDisplayTitle }</a>
             </div>);
 
         samples.forEach(function(sample, sampleIdx){
@@ -440,7 +473,8 @@ export const CohortSummaryTable = React.memo(function CohortSummaryTable(props){
                 specimen_type = null,
                 specimen_collection_date = null,
                 specimen_notes = null,
-                workup_type : assayType
+                workup_type : assayType,
+                analysis_type = null
             } = sample;
 
             const [ , , sampleID ] = samplePath.split("/");
@@ -454,13 +488,6 @@ export const CohortSummaryTable = React.memo(function CohortSummaryTable(props){
                 });
                 return;
             } else {
-                const procFilesWPermissions = processed_files.filter(function(file){
-                    return file['@id'] && file.display_title;
-                });
-                const rawFilesWPermissions = files.filter(function(file){
-                    return file['@id'] && file.display_title;
-                });
-
                 rows.push({
                     individual : indvLink,
                     isProband,
@@ -482,10 +509,10 @@ export const CohortSummaryTable = React.memo(function CohortSummaryTable(props){
                     individualGroup,
                     sampleId: sampleID,
                     sampleGroup,
-                    processedFiles: generateFileDataObject(procFilesWPermissions),
-                    rawFiles: generateFileDataObject(rawFilesWPermissions),
+                    processedFiles: generateFileDataObject(processed_files.filter(hasViewPermisison)),
+                    rawFiles: generateFileDataObject(files.filter(hasViewPermisison)),
                     sampleIdx,
-                    processingType: completed_processes[0] || null,
+                    processingType: analysis_type || completed_processes[0] || null,
                     assayType
                 });
             }
@@ -500,25 +527,9 @@ export const CohortSummaryTable = React.memo(function CohortSummaryTable(props){
     const renderedSummary = (membersWithoutSamplesLen + membersWithoutViewPermissionsLen) > 0 ? (
         <div className="processing-summary">
             { membersWithoutSamplesLen > 0 ?
-                <p className="mb-0">
+                <p className="pl-1 mb-0">
                     <span className="text-600">{ membersWithoutSamplesLen }</span> members without samples.
                 </p>
-                /*
-                <React.Fragment>
-                    <p className="mb-0">{ (membersWithoutSamplesLen + " members without samples: ") }</p>
-                    {
-                        membersWithoutSamples.map(function(member, idx){
-                            const { '@id' : id, display_title } = member;
-                            return (
-                                <React.Fragment key={id}>
-                                    { idx !== 0 ? ", " : null }
-                                    <a href={id}>{ display_title }</a>
-                                </React.Fragment>
-                            );
-                        })
-                    }
-                </React.Fragment>
-                */
                 : null }
             { membersWithoutViewPermissionsLen > 0 ?
                 <p className="mb-0">
@@ -573,19 +584,26 @@ export const CohortSummaryTable = React.memo(function CohortSummaryTable(props){
             } else if (hasMSAFlag(colName)) { // if a multisample analysis object
                 const [,, uuid] = colName.split("|");
                 const allFileObjects = sampleProcessingData[uuid][sampleId] || {};
-                const extensions = Object.keys(allFileObjects);
 
-                let renderArr = [];
-                extensions.forEach((ext) => {
-                    const jsx = convertFileObjectToJSX(allFileObjects[ext], ext);
-                    renderArr = renderArr.concat(jsx);
-                });
+                if (allFileObjects === true) {
+                    console.log("exts, allFileObjects,", allFileObjects);
+                    colVal = <div className="qcs-container text-ellipsis-container"><i className="icon icon-arrow-alt-circle-down fas"></i> Included in VCF </div>;
+                } else {
+                    const extensions = Object.keys(allFileObjects);
+                    console.log("exts, extensions,", extensions);
 
-                colVal = (
-                    <div className="qcs-container text-ellipsis-container">
-                        { renderArr.length > 0 ? renderArr : '-' }
-                    </div>
-                );
+                    let renderArr = [];
+                    extensions.forEach((ext) => {
+                        const jsx = convertFileObjectToJSX(allFileObjects[ext], ext);
+                        renderArr = renderArr.concat(jsx);
+                    });
+
+                    colVal = (
+                        <div className="qcs-container text-ellipsis-container">
+                            { renderArr.length > 0 ? renderArr : '-' }
+                        </div>
+                    );
+                }
             }
 
             return (
@@ -684,7 +702,7 @@ export const CohortSummaryTable = React.memo(function CohortSummaryTable(props){
         </React.Fragment>
     );
 });
-CohortSummaryTable.propTypes = { // todo: update with required fields
+CaseSummaryTable.propTypes = { // todo: update with required fields
     clinic_notes : PropTypes.string,
     family_phenotypic_features : PropTypes.arrayOf(PropTypes.shape({
         "@id": PropTypes.string,

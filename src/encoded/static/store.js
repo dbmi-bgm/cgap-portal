@@ -1,6 +1,5 @@
 import { createStore, combineReducers } from 'redux';
 import _ from 'underscore';
-import { JWT, isServerSide } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 
 // Create a redux store to manage state for the whole application
 // Not sure why everything is saved to & reduced from `action.type` but w/e .. this could likely
@@ -14,19 +13,7 @@ export const reducers = {
 
     'context' : function(state={}, action){
         if (action.type && typeof action.type.context !== 'undefined'){
-            var context = action.type.context ? action.type.context : state;
-            if (!isServerSide() && context && context['@type'] && context['@type'].indexOf('User') > -1){
-                // If context type is user, and is of current user, update localStorage user_info appropriately.
-                // E.g. in case of user editing their own profile, or just keep localStorage up-to-date w/ any other changes
-                var userInfo = JWT.getUserInfo();
-                if (userInfo && userInfo.details && userInfo.details.email === context.email){
-                    _.each(userInfo.details, function(val, key){
-                        if (context[key] && context[key] !== userInfo.details[key]) userInfo.details[key] = context[key];
-                    });
-                }
-                JWT.saveUserInfoLocalStorage(userInfo);
-            }
-            return context;
+            return action.type.context ? action.type.context : state;
         } else {
             return state;
         }
@@ -50,6 +37,8 @@ export const reducers = {
         return state;
     },
 
+    // Deprecated, from 4DN, keeping later in case helps influence
+    // implementation for different role/view 'states' (idk)
     'browseBaseState' : function(state='only_4dn', action){
         return (action.type && action.type.browseBaseState) || state;
     }

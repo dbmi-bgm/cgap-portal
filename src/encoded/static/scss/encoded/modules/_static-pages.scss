@@ -493,14 +493,14 @@
 		/* 100% window height - 50px footer - 81px header+border - $tabbar-height dashboard header */
 		min-height: calc(100vh - 50px - 81px - #{$tabbar-height});
 
-		.cohort-items {
+		.case-items {
 
 			overflow-y: auto;
 			min-height: 240px;
 			max-height: 360px;
 			height: 25vh;
 
-			.cohort-item-container {
+			.case-item-container {
 				padding: 8px 12px;
 				background-color: #f4f4f4;
 				border: 1px solid #eee;

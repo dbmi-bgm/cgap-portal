@@ -13,7 +13,7 @@ ORDER = [
     'case', 'report', 'page', 'quality_metric_fastqc', 'evidence_dis_pheno', 'evidence_gene_disorder',
     'quality_metric_bamcheck', 'quality_metric_qclist', 'quality_metric_wgs_bamqc',
     'quality_metric_cmphet', 'quality_metric_vcfcheck', 'quality_metric_workflowrun',
-    'quality_metric_vcfqc',
+    'quality_metric_vcfqc', 'quality_metric_bamqc',
     'software', 'static_section', 'tracking_item', 'workflow_mapping',
     'workflow_run_awsem', 'workflow_run', 'annotation_field', 'variant_sample',
     'variant', 'gene_annotation_field', 'gene',

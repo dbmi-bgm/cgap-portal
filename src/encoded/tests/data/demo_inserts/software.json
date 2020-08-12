@@ -1,242 +1,242 @@
 [
     {
-        "commit": "954e607",
-        "title": "vcf-tools_954e607",
-        "source_url": "https://github.com/vcftools/vcftools",
-        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
-        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-        "status": "released",
-        "name": "vcf-tools",
-        "uuid": "f7ac2c5f-9203-49fa-b918-cede02bf46f7",
-        "schema_version": "1",
-        "date_created": "2020-07-07T02:37:05.552492+00:00",
+        "date_created": "2020-07-15T02:39:19.833449+00:00",
         "last_modified": {
-            "date_modified": "2020-07-07T15:43:48.741837+00:00",
+            "date_modified": "2020-07-15T02:43:21.176407+00:00",
             "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
         },
+        "source_url": "https://github.com/vcftools/vcftools",
+        "name": "vcf-tools",
+        "schema_version": "1",
+        "title": "vcf-tools_954e607",
+        "status": "released",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "software_type": [
             "quality metric generator"
-        ]
+        ],
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "uuid": "f7ac2c5f-9203-49fa-b918-cede02bf46f7",
+        "commit": "954e607"
     },
     {
+        "date_created": "2020-07-15T02:39:20.119950+00:00",
+        "last_modified": {
+            "date_modified": "2020-07-15T02:43:21.312470+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
         "source_url": "https://software.broadinstitute.org/gatk/gatk4",
-        "title": "gatk_4.1.2.0",
-        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
-        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-        "status": "released",
-        "version": "4.1.2.0",
-        "uuid": "4ae88fb4-23f2-4939-8852-4644069d14d9",
         "name": "gatk",
         "schema_version": "1",
-        "date_created": "2020-07-07T02:37:05.818897+00:00",
-        "last_modified": {
-            "date_modified": "2020-07-07T15:43:48.856057+00:00",
-            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
-        },
+        "title": "gatk_4.1.2.0",
+        "status": "released",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "software_type": [
             "variant caller"
-        ]
+        ],
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "uuid": "4ae88fb4-23f2-4939-8852-4644069d14d9",
+        "version": "4.1.2.0"
     },
     {
-        "commit": "695d590",
-        "title": "granite_695d590",
-        "source_url": "https://github.com/dbmi-bgm/granite",
-        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
-        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-        "status": "in review",
-        "name": "granite",
-        "uuid": "48d44723-0ebe-4f12-a444-50cab323aad1",
-        "schema_version": "1",
-        "date_created": "2020-07-14T01:22:06.559369+00:00",
+        "date_created": "2020-07-15T02:39:20.749206+00:00",
         "last_modified": {
-            "date_modified": "2020-07-14T01:23:13.479200+00:00",
+            "date_modified": "2020-07-15T02:43:21.600705+00:00",
             "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
         },
-        "software_type": [
-            "filter"
-        ]
-    },
-    {
-        "commit": "0.4.2",
+        "source_url": "https://github.com/dbmi-bgm/mutanno",
+        "name": "mutanno",
+        "schema_version": "1",
         "title": "mutanno_0.4.2",
-        "source_url": "https://github.com/dbmi-bgm/mutanno",
-        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
-        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "status": "released",
-        "name": "mutanno",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "software_type": [
+            "annotator"
+        ],
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
         "uuid": "1d28b7b8-1033-492f-8a1a-d4ac5b1ab55e",
-        "schema_version": "1",
-        "date_created": "2020-07-07T06:01:56.468509+00:00",
-        "last_modified": {
-            "date_modified": "2020-07-07T15:43:48.968542+00:00",
-            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
-        },
-        "software_type": [
-            "annotator"
-        ]
+        "commit": "0.4.2"
     },
     {
-        "commit": "8a780bd",
-        "title": "mutanno_8a780bd",
-        "source_url": "https://github.com/dbmi-bgm/mutanno",
-        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
-        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-        "status": "released",
-        "name": "mutanno",
-        "uuid": "76479248-09d2-48e5-9ab3-94c167e51cc6",
-        "schema_version": "1",
-        "date_created": "2020-07-07T06:01:56.685642+00:00",
+        "date_created": "2020-07-15T02:39:20.404197+00:00",
         "last_modified": {
-            "date_modified": "2020-07-07T15:43:49.104777+00:00",
+            "date_modified": "2020-07-15T02:43:21.429101+00:00",
             "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
         },
-        "software_type": [
-            "annotator"
-        ]
-    },
-    {
-        "commit": "2dd8a0d",
-        "title": "granite_2dd8a0d",
         "source_url": "https://github.com/dbmi-bgm/granite",
-        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
-        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-        "status": "released",
         "name": "granite",
-        "uuid": "5a0b864e-dc16-4484-bcf3-c64e35a25df9",
         "schema_version": "1",
-        "date_created": "2020-07-07T06:01:56.977826+00:00",
-        "last_modified": {
-            "date_modified": "2020-07-07T15:43:49.212933+00:00",
-            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
-        },
+        "title": "granite_695d590",
+        "status": "in review",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "software_type": [
             "filter"
-        ]
+        ],
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "uuid": "48d44723-0ebe-4f12-a444-50cab323aad1",
+        "commit": "695d590"
     },
     {
-        "version": "0.7.17",
-        "title": "bwa_0.7.17",
-        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
-        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "date_created": "2020-07-15T02:39:21.005370+00:00",
+        "last_modified": {
+            "date_modified": "2020-07-15T02:43:21.747089+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "source_url": "https://github.com/dbmi-bgm/mutanno",
+        "name": "mutanno",
+        "schema_version": "1",
+        "title": "mutanno_8a780bd",
         "status": "released",
-        "aliases": [],
-        "uuid": "42adeb1b-c46c-4ba8-b191-56036ddcd544",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "software_type": [
+            "annotator"
+        ],
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "uuid": "76479248-09d2-48e5-9ab3-94c167e51cc6",
+        "commit": "8a780bd"
+    },
+    {
+        "date_created": "2020-07-15T02:39:21.283928+00:00",
+        "last_modified": {
+            "date_modified": "2020-07-15T02:43:21.864631+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "source_url": "https://github.com/dbmi-bgm/granite",
+        "name": "granite",
+        "schema_version": "1",
+        "title": "granite_2dd8a0d",
+        "status": "released",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "software_type": [
+            "filter"
+        ],
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "uuid": "5a0b864e-dc16-4484-bcf3-c64e35a25df9",
+        "commit": "2dd8a0d"
+    },
+    {
+        "date_created": "2020-07-15T02:39:21.609991+00:00",
+        "last_modified": {
+            "date_modified": "2020-07-15T02:43:21.983064+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
         "name": "bwa",
         "schema_version": "1",
-        "date_created": "2020-07-07T02:37:06.062540+00:00",
-        "last_modified": {
-            "date_modified": "2020-07-07T15:43:49.324966+00:00",
-            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
-        },
+        "title": "bwa_0.7.17",
+        "status": "released",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "software_type": [
             "aligner"
-        ]
+        ],
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "aliases": [],
+        "uuid": "42adeb1b-c46c-4ba8-b191-56036ddcd544",
+        "version": "0.7.17"
     },
     {
-        "source_url": "https://github.com/samtools/samtools",
-        "title": "samtools_1.9",
-        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
-        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-        "status": "released",
-        "version": "1.9",
-        "uuid": "3f2d3b0e-0365-4212-9468-c16ad9531c4d",
-        "name": "samtools",
-        "schema_version": "1",
-        "date_created": "2020-07-07T02:37:06.338201+00:00",
+        "date_created": "2020-07-15T02:39:22.248498+00:00",
         "last_modified": {
-            "date_modified": "2020-07-07T15:43:49.429040+00:00",
+            "date_modified": "2020-07-15T02:43:22.190280+00:00",
             "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
         },
-        "software_type": [
-            "file format converter"
-        ]
-    },
-    {
-        "version": "0.11.4",
-        "title": "fastqc_0.11.4",
-        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
-        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-        "status": "released",
-        "aliases": [],
-        "uuid": "02d636b9-d82d-4da9-950c-2ca994a13131",
         "name": "fastqc",
         "schema_version": "1",
-        "date_created": "2020-07-07T02:37:06.589736+00:00",
-        "last_modified": {
-            "date_modified": "2020-07-07T15:43:49.579544+00:00",
-            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
-        },
+        "title": "fastqc_0.11.4",
+        "status": "released",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "software_type": [
             "quality metric generator"
-        ]
+        ],
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "aliases": [],
+        "uuid": "02d636b9-d82d-4da9-950c-2ca994a13131",
+        "version": "0.11.4"
     },
     {
-        "commit": "e1f8aa3",
-        "title": "granite_e1f8aa3",
-        "source_url": "https://github.com/dbmi-bgm/granite",
-        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
-        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-        "status": "released",
-        "name": "granite",
-        "uuid": "8d4ca59b-750b-4c22-8a34-c5d4e795b8ad",
-        "schema_version": "1",
-        "date_created": "2020-07-07T06:01:57.255432+00:00",
+        "date_created": "2020-07-15T02:39:21.864263+00:00",
         "last_modified": {
-            "date_modified": "2020-07-07T15:43:49.705024+00:00",
+            "date_modified": "2020-07-15T02:43:22.095033+00:00",
             "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
         },
+        "source_url": "https://github.com/samtools/samtools",
+        "name": "samtools",
+        "schema_version": "1",
+        "title": "samtools_1.9",
+        "status": "released",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "software_type": [
-            "filter"
-        ]
+            "file format converter"
+        ],
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "uuid": "3f2d3b0e-0365-4212-9468-c16ad9531c4d",
+        "version": "1.9"
     },
     {
-        "commit": "81ca652",
-        "title": "add-readgroups_81ca652",
-        "source_url": "https://github.com/dbmi-bgm/cgap-pipeline/blob/master/dockerfiles/cgap-docker/AddReadGroups.py",
-        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
-        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-        "status": "released",
-        "name": "add-readgroups",
-        "uuid": "d7ac4c75-e133-4a8e-a19e-b7e87873cc16",
-        "schema_version": "1",
-        "date_created": "2020-07-07T02:37:06.834620+00:00",
+        "date_created": "2020-07-15T02:39:22.907386+00:00",
         "last_modified": {
-            "date_modified": "2020-07-07T15:43:49.832745+00:00",
+            "date_modified": "2020-07-15T02:43:22.417328+00:00",
             "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
         },
+        "source_url": "https://github.com/dbmi-bgm/cgap-pipeline/blob/master/dockerfiles/cgap-docker/AddReadGroups.py",
+        "name": "add-readgroups",
+        "schema_version": "1",
+        "title": "add-readgroups_81ca652",
+        "status": "released",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "software_type": [
             "annotator"
-        ]
+        ],
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "uuid": "d7ac4c75-e133-4a8e-a19e-b7e87873cc16",
+        "commit": "81ca652"
     },
     {
-        "source_url": "https://broadinstitute.github.io/picard/",
-        "title": "picard_2.20.2",
-        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
-        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-        "status": "released",
-        "version": "2.20.2",
-        "uuid": "586cef39-6505-4bf6-920a-4b26a500d210",
-        "name": "picard",
-        "schema_version": "1",
-        "date_created": "2020-07-07T02:37:07.097432+00:00",
+        "date_created": "2020-07-15T02:39:22.613567+00:00",
         "last_modified": {
-            "date_modified": "2020-07-07T15:43:49.952022+00:00",
+            "date_modified": "2020-07-15T02:43:22.295865+00:00",
             "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
         },
+        "source_url": "https://github.com/dbmi-bgm/granite",
+        "name": "granite",
+        "schema_version": "1",
+        "title": "granite_e1f8aa3",
+        "status": "released",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "software_type": [
             "filter"
-        ]
+        ],
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "uuid": "8d4ca59b-750b-4c22-8a34-c5d4e795b8ad",
+        "commit": "e1f8aa3"
+    },
+    {
+        "date_created": "2020-07-15T02:39:23.204072+00:00",
+        "last_modified": {
+            "date_modified": "2020-07-15T02:43:22.524107+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "source_url": "https://broadinstitute.github.io/picard/",
+        "name": "picard",
+        "schema_version": "1",
+        "title": "picard_2.20.2",
+        "status": "released",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "software_type": [
+            "filter"
+        ],
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "uuid": "586cef39-6505-4bf6-920a-4b26a500d210",
+        "version": "2.20.2"
     }
 ]

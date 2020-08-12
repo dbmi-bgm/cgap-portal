@@ -518,23 +518,30 @@ def load_test_data(app, overwrite=False):
 
 def load_local_data(app, overwrite=False):
     """
-    Load temp-local-inserts. If not present, load inserts and master-inserts
+    Load inserts from temporary insert folders, if present and populated
+    with .json insert files.
+    If not present, load inserts and master-inserts.
 
     Returns:
         None if successful, otherwise Exception encountered
     """
-    # if we have any json files in temp-local-inserts, use those
-    chk_dir = resource_filename('encoded', 'tests/data/temp-local-inserts')
-    use_temp_local = False
-    for (dirpath, dirnames, filenames) in os.walk(chk_dir):
-        use_temp_local = any([fn for fn in filenames if fn.endswith('.json')])
 
-    if use_temp_local:
-        return load_data(app, docsdir='documents', indir='temp-local-inserts',
-                         use_master_inserts=False, overwrite=overwrite)
-    else:
-        return load_data(app, docsdir='documents', indir='inserts',
-                         overwrite=overwrite)
+    test_insert_dirs = [
+        'temp-local-inserts',
+        'demo_inserts'
+    ]
+
+    for test_insert_dir in test_insert_dirs:
+        chk_dir = resource_filename('encoded', "tests/data/" + test_insert_dir)
+        for (dirpath, dirnames, filenames) in os.walk(chk_dir):
+            if any([fn for fn in filenames if fn.endswith('.json')]):
+                logger.info('Loading inserts from "{}" directory.'.format(test_insert_dir))
+                return load_data(app, docsdir='documents', indir=test_insert_dir,
+                            use_master_inserts=False, overwrite=overwrite)
+    
+    # Default to 'inserts' if no temp inserts found.
+    return load_data(app, docsdir='documents', indir='inserts',
+                         use_master_inserts=True, overwrite=overwrite)
 
 
 def load_prod_data(app, overwrite=False):

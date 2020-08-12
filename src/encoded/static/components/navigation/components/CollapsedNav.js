@@ -35,12 +35,13 @@ export const CollapsedNav = React.memo(function CollapsedNav(props){
 const LeftNavAuthenticated = React.memo(function LeftNavAuthenticated(props){
     const { href, ...passProps } = props;
     const { query = {} } = url.parse(href, true);
-    const isCohortsLinkActive = query.type === 'Cohort';
+    const isCasesLinkActive = query.type === 'Case';
+    // TODO: query seems to be coming in empty, need to fix to get highlighting working again
 
     return (
         <Nav className="mr-auto">
-            <Nav.Link key="browse-menu-item" href="/cohorts/" active={isCohortsLinkActive} className="browse-nav-btn">
-                Cohorts
+            <Nav.Link key="browse-menu-item" href="/cases/" active={isCasesLinkActive} className="browse-nav-btn">
+                Cases
             </Nav.Link>
             <HelpNavItem {...props} />
         </Nav>

@@ -1,35 +1,35 @@
 [
     {
-        "filter_set": "dcf15d5e-40aa-43bc-b81c-32c70c9afbbb",
-        "uuid": "cc7d83a2-6886-4ca0-9402-7c49734cf879",
-        "title": "Rare Disease Trio Cohort",
-        "description": "Cohort for test institute Trio cases of rare diseases",
-        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
-        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-        "status": "released",
-        "accession": "GAPCO8A7TOOO",
-        "pipeline": "Efficient Trio Analysis V10",
-        "schema_version": "1",
-        "date_created": "2020-07-07T02:37:05.041452+00:00",
+        "date_created": "2020-07-15T02:39:53.421566+00:00",
         "last_modified": {
-            "date_modified": "2020-07-07T02:42:42.177097+00:00",
-            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
-        }
-    },
-    {
-        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-        "status": "released",
-        "title": "Rare Disease Trio Cohort",
-        "uuid": "cc7d83a2-6886-4ca0-9402-7c49734cf111",
-        "schema_version": "1",
-        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
-        "date_created": "2020-07-06T23:45:48.276326+00:00",
-        "last_modified": {
-            "date_modified": "2020-07-07T15:42:55.846061+00:00",
+            "date_modified": "2020-07-15T02:43:36.282856+00:00",
             "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
         },
-        "accession": "GAPCOU22MKDT"
+        "accession": "GAPCO8A7TOOO",
+        "schema_version": "1",
+        "pipeline": "Efficient Trio Analysis V10",
+        "title": "Rare Disease Trio Cohort",
+        "status": "released",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "filter_set": "dcf15d5e-40aa-43bc-b81c-32c70c9afbbb",
+        "description": "Cohort for test institute Trio cases of rare diseases",
+        "uuid": "cc7d83a2-6886-4ca0-9402-7c49734cf879"
+    },
+    {
+        "date_created": "2020-07-15T02:39:53.746543+00:00",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "last_modified": {
+            "date_modified": "2020-07-15T02:43:36.399445+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "accession": "GAPCOU22MKDT",
+        "schema_version": "1",
+        "title": "Rare Disease Trio Cohort",
+        "status": "released",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "uuid": "cc7d83a2-6886-4ca0-9402-7c49734cf111"
     }
 ]

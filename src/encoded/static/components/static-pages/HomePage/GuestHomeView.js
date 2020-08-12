@@ -8,57 +8,58 @@ import _ from 'underscore';
 
 
 export const GuestHomeView = React.memo(function GuestHomeView(props){
-    return (<React.Fragment>
-        <div className="jumbotron mb-0" style={{ borderRadius: 0, backgroundImage: "url('/static/img/homepage-banner3.jpeg')", backgroundSize: "cover" }}>
-            <div className="container">
-            <h2 style={{ color: "#ffffff" }} className="homepage-section-title">Streamline Your Bioinformatics Pipeline</h2>
-                <hr style={{ borderColor: "#ffffff"}} />
-                <h4 style={{ color: "#ffffff" }} className="text-500">Get Actionable Data, Fast.</h4>
-                <p style={{ color: "#ffffff", maxWidth: "70%" }}>
-                    CGAP (the Clinical Genome Analysis Project) lorem ipsum dolor sit amet, consectetur adipiscing elit, 
-                    sed do eiusmod tempor Harvard Medical School incididunt ut labore et dolore magna aliqua. 
-                    Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris 
-                    nisi ut aliquip ex ea commodo consequat.
-                </p>
-                {/* <button className="btn btn-outline-light btn-large">Request More Info</button> */}
-            </div> 
-        </div>
-        <div className="container home-content-area" id="content">
-            <div className="row">
-                <div className="col-xs-12 col-md-4">
-                    <h4 className="text-400 mb-15 mt-25">Discover Novel Pathogenic Variants</h4>
-                    <div style={{ 
-                        width: "100%",
-                        height: "100px",
-                        backgroundImage:"url('/static/img/Testtubes.jpeg')",
-                        backgroundPositionY: "center",
-                        backgroundSize: "cover"
-                    }}></div>
-                    <p style={{ marginTop: "1rem"}}>
-                    Excepteur sint occaecat cupidatat non in reprehenderit in
-                    proident, sunt in culpa qui officia deserunt mollit anim id est laborum. 
+    return (
+        <React.Fragment>
+            <div className="jumbotron mb-0" style={{ borderRadius: 0, backgroundImage: "url('/static/img/homepage-banner3.jpeg')", backgroundSize: "cover" }}>
+                <div className="container">
+                    <h2 className="homepage-section-title text-white">Streamline Your Bioinformatics Pipeline</h2>
+                    <hr style={{ borderColor: "#ffffff"}} />
+                    <h4 className="text-500 text-white">Get Actionable Data, Fast.</h4>
+                    <p style={{ color: "#ffffff", maxWidth: "70%" }}>
+                        CGAP (the Clinical Genome Analysis Project) lorem ipsum dolor sit amet, consectetur adipiscing elit, 
+                        sed do eiusmod tempor Harvard Medical School incididunt ut labore et dolore magna aliqua. 
+                        Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris 
+                        nisi ut aliquip ex ea commodo consequat.
                     </p>
-                </div>
-                <div className="col-xs-12 col-md-4">
-                    <h4 className="text-400 mb-15 mt-25">Collaborate in the Clinic or the Lab</h4>
-                    <div style={{ 
-                        width: "100%",
-                        height: "100px",
-                        backgroundImage:"url('/static/img/Research.jpeg')",
-                        backgroundPositionY: "center",
-                        backgroundSize: "cover"
-                    }}></div>
-                    <p style={{ marginTop: "1rem"}}>
-                    Duis aute irure dolor in reprehenderit in voluptate velit esse cillum 
-                    dolore <strong>CLIA-compatible workflow</strong> eu fugiat nulla pariatur. 
-                    </p>
-                </div>
-                <div className="col-xs-12 col-md-4 pull-right">
-                    <LinksColumn {..._.pick(props, 'windowWidth')} />
+                    {/* <button className="btn btn-outline-light btn-large">Request More Info</button> */}
                 </div>
             </div>
-        </div>
-    </React.Fragment>
+            <div className="container home-content-area" id="content">
+                <div className="row">
+                    <div className="col-xs-12 col-md-4">
+                        <h4 className="text-400 mb-15 mt-25">Discover Novel Pathogenic Variants</h4>
+                        <div style={{
+                            width: "100%",
+                            height: "100px",
+                            backgroundImage: "url('/static/img/Testtubes.jpeg')",
+                            backgroundPositionY: "center",
+                            backgroundSize: "cover"
+                        }} />
+                        <p style={{ marginTop: "1rem" }}>
+                            Excepteur sint occaecat cupidatat non in reprehenderit in
+                            proident, sunt in culpa qui officia deserunt mollit anim id est laborum. 
+                        </p>
+                    </div>
+                    <div className="col-xs-12 col-md-4">
+                        <h4 className="text-400 mb-15 mt-25">Collaborate in the Clinic or the Lab</h4>
+                        <div style={{
+                            width: "100%",
+                            height: "100px",
+                            backgroundImage: "url('/static/img/Research.jpeg')",
+                            backgroundPositionY: "center",
+                            backgroundSize: "cover"
+                        }} />
+                        <p style={{ marginTop: "1rem" }}>
+                            Duis aute irure dolor in reprehenderit in voluptate velit esse cillum 
+                            dolore <strong>CLIA-compatible workflow</strong> eu fugiat nulla pariatur.
+                        </p>
+                    </div>
+                    <div className="col-xs-12 col-md-4 pull-right">
+                        <LinksColumn {..._.pick(props, 'windowWidth')} />
+                    </div>
+                </div>
+            </div>
+        </React.Fragment>
     );
 });
 

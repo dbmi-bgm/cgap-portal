@@ -256,11 +256,15 @@ class IngestionQueueManager:
         }
         return formatted['waiting'], formatted['inflight']
 
-    def receive_messages(self):
-        """ Returns an array of messages, if any that are waiting """
+    def receive_messages(self, batch_size=None):
+        """ Returns an array of messages, if any that are waiting
+
+            :param batch_size: an integer number of messages
+            :returns: messages received or [] if no messages were ready to be received
+        """
         response = self.client.receive_message(
             QueueUrl=self.queue_url,
-            MaxNumberOfMessages=self.batch_size
+            MaxNumberOfMessages=self.batch_size if batch_size is None else batch_size
         )
         return response.get('Messages', [])
 
