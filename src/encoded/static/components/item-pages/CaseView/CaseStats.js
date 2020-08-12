@@ -1,8 +1,7 @@
 'use strict';
 
-import React, { useState, useMemo } from 'react';
+import React from 'react';
 import _ from 'underscore';
-import { Collapse } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/Collapse';
 import { LocalizedTime, formatPublicationDate } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/LocalizedTime';
 
 
@@ -26,12 +25,9 @@ function mapFeaturesToBadges(features = []) {
     });
 }
 
-/** @param {Object} props - Contents of a family sub-embedded object. */
+/** @param {Object} props - Contents of a caseItem */
 export const CaseStats = React.memo(function CaseStats(props){
     const {
-        numFamilies = 0,
-        numIndividuals = 0,
-        numWithSamples = 0,
         className = '',
         caseItem = null
     } = props;
@@ -53,7 +49,7 @@ export const CaseStats = React.memo(function CaseStats(props){
                     <PhenotypicFeatures caseItem={caseItem} />
                 </StatCard>
                 <StatCard title="Family Info:" subtitle={famAccession} className="flex-fill">
-                    <FamilyInfo {...{ numFamilies, numIndividuals, numWithSamples, family }} />
+                    <FamilyInfo {...{ family, caseItem }} />
                 </StatCard>
             </div>
         </div>
@@ -80,7 +76,6 @@ export const PatientInfo = React.memo(function PatientInfo(props) {
     const {
         caseItem = null
     } = props || {};
-    console.log("patientinfo props", props);
 
     const { '@id': atId, case_title = null, individual = null } = caseItem || {};
     const {
@@ -103,7 +98,7 @@ export const PatientInfo = React.memo(function PatientInfo(props) {
                 <label className="mb-0">Sex:</label> { sex || 'N/A'}
             </div>
             <div className="card-text mb-1">
-                <label className="mb-0">Age: </label> { age && age_units ? `${age} age_units` : "N/A" }
+                <label className="mb-0">Age: </label> { age && age_units ? `${age} ${age_units}(s)` : "N/A" }
             </div>
             <div className="card-text mb-1">
                 <label className="mb-0">Life Status:</label> { life_status || 'N/A' }
@@ -130,28 +125,31 @@ export const PhenotypicFeatures = React.memo(function PhenotypicFeatures({ caseI
 });
 
 
-export const FamilyInfo = React.memo(function FamilyInfo({ family }) {
+export const FamilyInfo = React.memo(function FamilyInfo({ family, caseItem }) {
     const {
-        display_title : family_display_title = null,
-        title: family_title= null,
+        display_title : familyDisplayTitle = null,
+        title: familyTitle= null,
         family_phenotypic_features: familyFeatures = [],
-        cohort = null,
         project = null
     } = family || {};
-    const { display_title: project_title } = project || {};
+    const { display_title: projectTitle } = project || {};
+    const {
+        cohort = null
+    } = caseItem || {};
+    const { display_title: cohortTitle = null } = cohort || {};
 
     const renderedPhenotypicFeatures = mapFeaturesToBadges(familyFeatures);
 
     return (
         <>
             <div className="card-text mb-1">
-                <label className="mb-0">Family:</label> { family_title || family_display_title || "N/A" }
+                <label className="mb-0">Family:</label> { familyTitle || familyDisplayTitle || "N/A" }
             </div>
             <div className="card-text mb-1">
-                <label className="mb-0">Cohort:</label> { cohort || "N/A" }
+                <label className="mb-0">Cohort:</label> { cohortTitle || "N/A" }
             </div>
             <div className="card-text mb-1">
-                <label className="mb-0">Project:</label> { project_title || "N/A" }
+                <label className="mb-0">Project:</label> { projectTitle || "N/A" }
             </div>
             <div className="card-text">
                 <label className="mb-03">Family Phenotypic Features: </label>
