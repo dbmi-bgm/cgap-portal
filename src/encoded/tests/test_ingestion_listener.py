@@ -66,7 +66,7 @@ def test_ingestion_queue_manager_basic(setup_and_teardown_sqs_state):
     """ Tests basic things about initializing the queue manager """
     queue_manager = setup_and_teardown_sqs_state
     assert queue_manager.env_name == MockedEnv.current_name()
-    assert queue_manager.queue_name == MockedEnv.current_name() + queue_manager.BUCKET_EXTENSION
+    assert queue_manager.queue_name == queue_manager.env_name + queue_manager.BUCKET_EXTENSION
 
 
 def _expect_message_uuids(queue_manager, expected_uuids, max_tries=12):
@@ -141,9 +141,10 @@ def test_ingestion_queue_add_via_route(setup_and_teardown_sqs_state, testapp):
 def test_ingestion_queue_delete(setup_and_teardown_sqs_state, testapp):
     """ Tests deleting messages from SQS results in no messages being there. """
     queue_manager = setup_and_teardown_sqs_state
+    assert queue_manager.queue_name == MockedEnv.current_name() + queue_manager.BUCKET_EXTENSION
     request_body = {
         'uuids': [str(uuid4()), str(uuid4())],
-        'override_name': MockedEnv.current_name() + queue_manager.BUCKET_EXTENSION
+        'override_name': queue_manager.queue_name
     }
     testapp.post_json(QUEUE_INGESTION_URL, request_body, status=200)
     msgs = queue_manager.receive_messages()
