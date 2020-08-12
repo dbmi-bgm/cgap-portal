@@ -233,6 +233,5 @@ def test_debuglog():
             pass
 
 
-
 # def test_generate_fastq_file():
 #     ... Need test of generate_fastq_file here ...
