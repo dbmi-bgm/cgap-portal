@@ -54,7 +54,7 @@ class GeneIngestion(object):
                 gene['institution'] = institution
             try:
                 vapp.post_json(self.GENE_ENDPOINT, gene, status=201)
-            except HTTPConflict:  # PATCH on conflict
+            except HTTPConflict:  # XXX: PATCH on conflict - Should use put instead - See C4-272
                 vapp.patch_json('/'.join([self.GENE_ENDPOINT, gene['ensgid']]), gene)
 
 

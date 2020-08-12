@@ -19,6 +19,7 @@ EXPECTED_INSERT = {'field_name': 'chrom',
                                  '17', '18', '19', '20', '21', '22', 'X', 'Y', 'M']}
 CLINGENDIS_FIELDS_EXPECTED = 4
 TRANSCRIPT_FIELDS_EXPECTED = 15
+CHROM_INDEX = 74  # 74 is index of CHROM now
 
 
 @pytest.fixture
@@ -47,9 +48,9 @@ def test_read_gene_table_header(GTParser):
 def test_process_gene_table_inserts(inserts):
     """
         Tests that we properly process gene annotation field inserts
-        There should be 254 total. A hand crafted example is checked
+        A hand crafted example is checked
     """
-    assert inserts[74] == EXPECTED_INSERT  # 74 is index of CHROM now
+    assert inserts[CHROM_INDEX] == EXPECTED_INSERT
     assert len(inserts) == NUMBER_ANNOTATION_FIELDS
 
 

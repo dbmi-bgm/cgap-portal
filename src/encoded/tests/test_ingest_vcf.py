@@ -152,7 +152,7 @@ class TestIngestVCF:
         record = test_vcf.read_next_record()
         result = test_vcf.create_sample_variant_from_record(record)[0]
         assert self.get_top_level_field(result, 'DP') == 52
-        assert len(result['samplegeno']) == 3
+        assert len(result['samplegeno']) == 3  # just check field presence
         assert 'samplegeno_numgt' in result['samplegeno'][0]
         assert 'samplegeno_ad' in result['samplegeno'][0]
         assert 'samplegeno_gt' in result['samplegeno'][0]

@@ -122,16 +122,16 @@ class MappingTableParser(object):
                     if field_name not in self.annotation_field_schema['properties'] or not entry:
                         continue
                     if field_name in self.INTEGER_FIELDS:  # handle int fields
-                        if entry is not None:
+                        if entry is not None:  # entry=0 is a normal value
                             insert[field_name] = int(entry)
                     elif field_name in self.BOOLEAN_FIELDS:  # handle bool fields
-                        if entry:
+                        if entry is not None:
                             if entry == 'Y':
                                 insert[field_name] = True
-                            else:
+                            else:  # assume False if anything other than 'Y' is present
                                 insert[field_name] = False
                     elif field_name in ['enum_list']:  # handle enum fields
-                        if entry:
+                        if entry is not None:
                             field_type = row[self.FIELD_TYPE_INDEX]
                             val_list = []
                             if field_type == 'string':

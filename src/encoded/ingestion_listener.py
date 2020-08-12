@@ -22,6 +22,7 @@ from pyramid.request import Request
 from snovault.util import debug_log
 from .util import resolve_file_path, gunzip_content
 from .commands.ingest_vcf import VCFParser
+from .types.variant import build_variant_display_title, ANNOTATION_ID_SEP
 
 
 log = structlog.getLogger(__name__)
@@ -361,11 +362,13 @@ class IngestionListener:
             else:
                 break
 
-    def build_variant_link(self, variant):
+    @staticmethod
+    def build_variant_link(variant):
         """ This function takes a variant record and returns the corresponding UUID of this variant
             in the portal via search.
         """
-        annotation_id = 'chr%s:%s%s_%s' % (variant['CHROM'], variant['POS'], variant['REF'], variant['ALT'])
+        annotation_id = build_variant_display_title(variant['CHROM'], variant['POS'], variant['REF'], variant['ALT'],
+                                                    sep=ANNOTATION_ID_SEP)
         return annotation_id
 
     def build_and_post_variant(self, parser, record, project, institution):
@@ -377,11 +380,12 @@ class IngestionListener:
         try:
             self.vapp.post_json('/variant', variant, status=201)
         except HTTPConflict:
-            self.vapp.patch_json('/variant/chr%s:%s%s_%s' % (
+            self.vapp.patch_json('/variant/%s' % build_variant_display_title(
                 variant['CHROM'],
                 variant['POS'],
                 variant['REF'],
-                variant['ALT']
+                variant['ALT'],
+                sep=ANNOTATION_ID_SEP
             ), variant, status=200)
         return variant
 
