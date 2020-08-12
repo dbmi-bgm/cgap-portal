@@ -5,18 +5,25 @@ import PropTypes from 'prop-types';
 import _ from 'underscore';
 import DropdownButton from 'react-bootstrap/esm/DropdownButton';
 import DropdownItem from 'react-bootstrap/esm/DropdownItem';
-import { console, layout, ajax } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
+import { console, layout, ajax, object, schemaTransforms } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { Alerts } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/Alerts';
 
 
 
 export function VariantSampleInfoHeader(props) {
-    const { context, currentTranscriptIdx, currentGeneItemLoading, onSelectTranscript } = props;
+    const { context, currentTranscriptIdx, currentGeneItemLoading, onSelectTranscript, schemas } = props;
     const { variant = {} } = context;
     const {
         transcript: geneTranscriptList = [],
         dbsnp_rs_number = <em>N/A</em>
     } = variant;
+
+    function getTipForField(field, itemType = "VariantSample"){
+        if (!schemas) return null;
+        const schemaProperty = schemaTransforms.getSchemaProperty(field, schemas, itemType);
+        return (schemaProperty || {}).description || null;
+    }
+
     const geneTranscriptListLen = geneTranscriptList.length;
 
     // Grab it from embedded item, rather than the AJAXed in currentGeneItem, as is more 'up-to-date'.
@@ -60,7 +67,7 @@ export function VariantSampleInfoHeader(props) {
         <div className="card mb-24">
             <div className="card-body">
                 <div className="row flex-column flex-lg-row">
-                    <div className="col col-lg-2">
+                    <div className="col col-lg-2 col-xl-1">
                         <div className="info-header-title">
                             <h4>Case ID</h4>
                         </div>
@@ -88,7 +95,9 @@ export function VariantSampleInfoHeader(props) {
 
                             <div className="row mb-03">
                                 <div className="col-12 col-xl-2">
-                                    <label htmlFor="variant.dbsnp_rs_number" className="mb-0">dbSNP:</label>
+                                    <label htmlFor="variant.dbsnp_rs_number" className="mb-0" data-tip={getTipForField("variant.dbsnp_rs_number")}>
+                                        dbSNP:
+                                    </label>
                                 </div>
                                 {/**
                                  * 'col[-xl]-auto' allows entire item to ellide to next row.
@@ -121,20 +130,23 @@ export function VariantSampleInfoHeader(props) {
 
                                     <div className="row mb-03">
                                         <div className="col-12 col-xl-3">
-                                            <label htmlFor="variant.transcript.vep_gene.display_title" className="mb-0">Gene:</label>
+                                            <label htmlFor="variant.transcript.vep_gene.display_title" className="mb-0" data-tip={getTipForField("transcript.vep_gene", "Variant")}>
+                                                Gene:
+                                            </label>
                                         </div>
                                         {/**
-                                          * 'col[-xl]-auto' allows entire item to ellide to next row.
-                                          * May or may not be preferable depending on value content/type.
+                                          * 'col-xl' (instead of 'col-xl-9') allows entire item to ellide to next row.
+                                          * May or may not be preferable depending on value content/type/label-size.
+                                          * Will consider consistency more after.
                                           */}
-                                        <div className="col-12 col-xl-auto" id="variant.transcript.vep_gene.display_title">
+                                        <div className="col-12 col-xl" id="variant.transcript.vep_gene.display_title">
                                             { currentGeneDisplayTitle || <em>No transcript selected.</em> }
                                         </div>
                                     </div>
 
                                     <div className="row mb-03">
                                         <div className="col-12 col-xl-3">
-                                            <label htmlFor="vep_hgvsc" className="mb-0">cDNA:</label>
+                                            <label htmlFor="vep_hgvsc" className="mb-0" data-tip={getTipForField("transcript.vep_hgvsc", "Variant")}>cDNA:</label>
                                         </div>
                                         <div className="col-12 col-xl-auto" id="variant.transcript.vep_hgvsc">
                                             { vep_hgvsc }
@@ -143,9 +155,9 @@ export function VariantSampleInfoHeader(props) {
 
                                     <div className="row mb-03">
                                         <div className="col-12 col-xl-3">
-                                            <label htmlFor="vep_hgvsp" className="mb-0">AA / AA:</label>
+                                            <label htmlFor="vep_hgvsp" className="mb-0" data-tip={getTipForField("transcript.vep_hgvsp", "Variant")}>AA / AA:</label>
                                         </div>
-                                        <div className="col-12 col-xl-auto" id="variant.transcript.vep_hgvsp">
+                                        <div className="col-12 col-xl" id="variant.transcript.vep_hgvsp">
                                             { vep_hgvsp }
                                         </div>
                                     </div>
@@ -157,18 +169,21 @@ export function VariantSampleInfoHeader(props) {
 
                                     <div className="row mb-03">
                                         <div className="col-12 col-xl-6">
-                                            <label htmlFor="vep_exon" className="mb-0">Location:</label>
+                                            <label htmlFor="vep_exon" className="mb-0" data-tip={getTipForField("transcript.vep_exon", "Variant")}>Location:</label>
                                         </div>
-                                        <div className="col-12 col-xl-auto" id="variant.transcript.vep_exon">
+                                        <div className="col-12 col-xl" id="variant.transcript.vep_exon">
                                             { vep_exon ? "Exon " + vep_exon : <em>No exon location</em> }
                                         </div>
                                     </div>
 
                                     <div className="row mb-03">
                                         <div className="col-12 col-xl-6">
-                                            <label htmlFor="variant.transcript.vep_consequence" className="mb-0">Coding Effect:</label>
+                                            <label htmlFor="variant.transcript.vep_consequence" className="mb-0"
+                                                data-tip={getTipForField("transcript.vep_consequence", "Variant")}>
+                                                Coding Effect:
+                                            </label>
                                         </div>
-                                        <div className="col-12 col-xl-auto" id="variant.transcript.vep_consequence">
+                                        <div className="col-12 col-xl" id="variant.transcript.vep_consequence">
                                             <CodingEffectValue vep_consequence={vep_consequence} />
                                         </div>
                                     </div>
@@ -206,15 +221,41 @@ function GeneTranscriptDisplayTitle({ transcript, className = "text-600" }){
 
 function GDNAList({ context }){
     const { variant = {} } = context;
-    const { hg19 } = variant;
+    const {
+        mutanno_hgvsg = <em>N/A</em>,
+        // POS: pos,
+        CHROM: chrom = <em>N/A</em>,
+        hg19 = []
+    } = variant;
 
-    // TODO: Figure out where to get data for this from...
+    const renderedRows = [];
 
-    return null;
+    // Canononical GRCh38 entry
+    renderedRows.push(
+        <div className="row" key="GRCh38">
+            <div className="col-12 col-md-3 text-italic"><em>GRCh38</em></div>
+            <div className="col-12 col-md-2 ">{ chrom }</div>
+            <div className="col-12 col-md-7">{ mutanno_hgvsg }</div>
+        </div>
+    );
+
+    // Legacy GRCh37/hg19 support.
+    hg19.forEach(function({ hg19_pos, hg19_chrom, hg19_hgvsg }, idx){
+        renderedRows.push(
+            <div className="row pt-1 pt-md-03" key={idx}>
+                <div className="col-12 col-md-3 text-italic"><em>GRCh37 (hg19)</em></div>
+                <div className="col-12 col-md-2 ">{ hg19_chrom }</div>
+                <div className="col-12 col-md-7">{ hg19_hgvsg }</div>
+            </div>
+        );
+    });
+
+    return renderedRows;
 }
 
 const CodingEffectValue = React.memo(function CodingEffectValue({ vep_consequence = [] }){
     // TODO grab most severe one?
+    // This will likely need/get feedback and may change
     const vcLen = vep_consequence.length;
     let mostSevereConsequence = null;
 

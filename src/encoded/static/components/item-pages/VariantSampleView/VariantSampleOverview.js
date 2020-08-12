@@ -97,7 +97,7 @@ export class VariantSampleOverview extends React.PureComponent {
         return (
             <div className="sample-variant-overview sample-variant-annotation-space-body">
                 {/* BA1, BS1, BS2, BS3 etc markers here */}
-                <VariantSampleInfoHeader { ...{ context, currentTranscriptIdx, currentGeneItemLoading, currentGeneItem }} onSelectTranscript={this.onSelectTranscript} />
+                <VariantSampleInfoHeader { ...{ context, schemas, currentTranscriptIdx, currentGeneItemLoading, currentGeneItem }} onSelectTranscript={this.onSelectTranscript} />
                 <VariantSampleOverviewTabView {...{ context, schemas, currentGeneItem, currentGeneItemLoading }} />
             </div>
         );
@@ -139,7 +139,7 @@ function VariantSampleOverviewTabView(props){
     // TODO in SCSS: give tabs-column hard-coded width, give content-column flex-width
     return (
         <div className="d-flex align-items-flex-start sample-variant-overview-tab-view-container">
-            <div className="tabs-column col col-lg-2 px-0" onClick={onClick}>
+            <div className="tabs-column col col-lg-2 col-xl-1 px-0" onClick={onClick}>
                 <OverviewTabTitle {...{ currentTab }} title="Variant" />
                 <OverviewTabTitle {...{ currentTab }} title="Gene" disabled={!currentGeneItem} />
                 <OverviewTabTitle {...{ currentTab }} title="Sample" />
