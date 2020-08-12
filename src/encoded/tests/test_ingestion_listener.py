@@ -50,34 +50,42 @@ def test_ingestion_queue_manager_basic(setup_and_teardown_sqs_state):
     assert queue_manager.queue_name == MOCKED_ENV + queue_manager.BUCKET_EXTENSION
 
 
-def _expect_message_uuids(queue_manager, expected_uuids):
+def _expect_message_uuids(queue_manager, expected_uuids, max_tries=12):
     checklist = set(expected_uuids)
     n = len(expected_uuids)
     print("Expecting: %s" % expected_uuids)
     wait_for_queue_to_catch_up(0)
-    try_count, msgs = 0, []
-    max_tries = 6
-    while len(msgs) < n:
+    try_count, good_msgs, bad_msgs = 0, [], []
+    while len(good_msgs) < n:
         print(str(datetime.datetime.now()), "Try", try_count, "...")
         if try_count >= max_tries:
             print(str(datetime.datetime.now()), "Giving up")
             break
         _msgs = queue_manager.receive_messages(batch_size=1)  # should reduce flakiness
+        _good_msgs = []
+        _bad_msgs = []
         for _msg in _msgs:
             print("Received: %r" % _msg)
             # Double-check that any message we received was ours.
             uuid = json.loads(_msg['Body'])['uuid']
-            assert uuid in expected_uuids, "Unexpected message uuid: %r" % uuid
-            checklist.remove(uuid)  # No longer waiting to see this
-        print(str(datetime.datetime.now()), "Total received this try:", len(_msgs))
-        msgs.extend(_msgs)
-        if len(msgs) >= n:  # Stop if we have enough
+            if uuid in expected_uuids:
+                _good_msgs.append(_msg)
+                checklist.remove(uuid)  # No longer waiting to see this
+            else:
+                _bad_msgs.append(_msg)
+                print("Unexpected message uuid: %r" % uuid)
+        print(str(datetime.datetime.now()), "Received this try:", len(_msgs), "good", _good_msgs, "bad", _bad_msgs)
+        good_msgs.extend(_good_msgs)  # We're looking for specific ones
+        if len(good_msgs) >= n:  # Stop if we have enough
             print(str(datetime.datetime.now()), "Reached threshold")
             break
         wait_for_queue_to_catch_up(0)
         try_count += 1
-    print(str(datetime.datetime.now()), "Total messages seen:", len(msgs))
-    assert len(msgs) == n
+    print(str(datetime.datetime.now()), "Total expected messages seen:", len(good_msgs))
+    print(str(datetime.datetime.now()), "Total stray messages seen:", len(bad_msgs))
+    # The receipt of stray messages does not void our success. Some other test is probably leaving junk around.
+    # -kmp 12-Aug-2020
+    assert len(good_msgs) == n
     assert checklist == set()
 
 
@@ -85,6 +93,8 @@ def test_ingestion_queue_add_and_receive(setup_and_teardown_sqs_state):
     """ Tests adding/receiving some uuids """
     queue_manager = setup_and_teardown_sqs_state
     test_uuids = [str(uuid4()), str(uuid4())]
+    print(str(datetime.datetime.now()), "test_uuids =", test_uuids)
+    print(str(datetime.datetime.now()), "queue_manager.queue_name =", queue_manager.queue_name)
     queue_manager.add_uuids(test_uuids)
     _expect_message_uuids(queue_manager, test_uuids)
 
@@ -94,6 +104,8 @@ def test_ingestion_queue_add_via_route(setup_and_teardown_sqs_state, testapp):
     queue_manager = setup_and_teardown_sqs_state
     assert queue_manager.queue_name == MOCKED_ENV + queue_manager.BUCKET_EXTENSION
     test_uuids = [str(uuid4()), str(uuid4())]
+    print(str(datetime.datetime.now()), "test_uuids =", test_uuids)
+    print(str(datetime.datetime.now()), "queue_manager.queue_name =", queue_manager.queue_name)
     request_body = {
         'uuids': test_uuids,
         'override_name': queue_manager.queue_name
