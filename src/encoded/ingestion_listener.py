@@ -17,9 +17,12 @@ from vcf import Reader
 from pyramid import paster
 from dcicutils.misc_utils import VirtualApp
 from pyramid.view import view_config
+from pyramid.httpexceptions import HTTPConflict, HTTPNotFound
+from pyramid.request import Request
 from snovault.util import debug_log
 from .util import resolve_file_path, gunzip_content
 from .commands.ingest_vcf import VCFParser
+from .types.variant import build_variant_display_title, ANNOTATION_ID_SEP
 
 
 log = structlog.getLogger(__name__)
@@ -27,6 +30,8 @@ EPILOG = __doc__
 INGESTION_QUEUE = 'ingestion_queue'
 VARIANT_SCHEMA = resolve_file_path('./schemas/variant.json')
 VARIANT_SAMPLE_SCHEMA = resolve_file_path('./schemas/variant_sample.json')
+STATUS_QUEUED = 'Queued'
+STATUS_INGESTED = 'Ingested'
 
 
 def includeme(config):
@@ -49,13 +54,26 @@ def ingestion_status(context, request):
     }
 
 
-def patch_vcf_file_status(uuids):
+def patch_vcf_file_status(request, uuids):
     """ Patches VCF File status to 'Queued'
         NOTE: This process makes queue_ingestion not scale terribly well.
-              Batching above a certain number may result in 504.
+              Batching above a certain number may result in 504. There are
+              also permissions concerns here that are not dealt with.
     """
     for uuid in uuids:
-        pass  # XXX: How to best do this safely within a route? Async?
+        kwargs = {
+            'method': 'PATCH',
+            'content_type': 'application/json',
+            'POST': json.dumps({
+                'file_ingestion_status': STATUS_QUEUED
+            }).encode('utf-8')
+        }
+        subreq = Request.blank('/' + uuid, **kwargs)
+        resp = None
+        try:
+            resp = request.invoke_subrequest(subreq)
+        except HTTPNotFound:
+            log.error('Tried to patch %s but item does not exist: %s' % (uuid, resp))
 
 
 @view_config(route_name='queue_ingestion', request_method='POST', permission='index')
@@ -81,7 +99,7 @@ def queue_ingestion(context, request):
         response['notification'] = 'Success'
         response['number_queued'] = len(uuids)
         response['detail'] = 'Successfully queued the following uuids: %s' % uuids
-        patch_vcf_file_status(uuids)  # XXX: does nothing currently
+        patch_vcf_file_status(request, uuids)
     else:
         response['number_queued'] = len(uuids) - len(failed)
         response['detail'] = 'Some uuids failed: %s' % failed
@@ -285,8 +303,6 @@ class IngestionQueueManager:
 class IngestionListener:
     """ Organizes helper functions for the ingestion listener """
     POLL_INTERVAL = 10  # seconds between each poll
-    STATUS_QUEUED = 'Queued'
-    STATUS_INGESTED = 'Ingested'
 
     def __init__(self, vapp, _queue_manager=None, _update_status=None):
         self.vapp = vapp
@@ -346,11 +362,13 @@ class IngestionListener:
             else:
                 break
 
-    def build_variant_link(self, variant):
+    @staticmethod
+    def build_variant_link(variant):
         """ This function takes a variant record and returns the corresponding UUID of this variant
             in the portal via search.
         """
-        annotation_id = 'chr%s:%s%s_%s' % (variant['CHROM'], variant['POS'], variant['REF'], variant['ALT'])
+        annotation_id = build_variant_display_title(variant['CHROM'], variant['POS'], variant['REF'], variant['ALT'],
+                                                    sep=ANNOTATION_ID_SEP)
         return annotation_id
 
     def build_and_post_variant(self, parser, record, project, institution):
@@ -359,7 +377,16 @@ class IngestionListener:
         variant['project'] = project
         variant['institution'] = institution
         parser.format_variant_sub_embedded_objects(variant)
-        self.vapp.post_json('/variant', variant, status=[201, 409])
+        try:
+            self.vapp.post_json('/variant', variant, status=201)
+        except HTTPConflict:
+            self.vapp.patch_json('/variant/%s' % build_variant_display_title(
+                variant['CHROM'],
+                variant['POS'],
+                variant['REF'],
+                variant['ALT'],
+                sep=ANNOTATION_ID_SEP
+            ), variant, status=200)
         return variant
 
     def build_and_post_variant_samples(self, parser, record, project, institution, variant, file):
@@ -434,7 +461,7 @@ class IngestionListener:
                     continue
 
                 # if this file has been ingested, do not do anything with this message
-                if file_meta.get('file_ingestion_status', 'N/A') == self.STATUS_INGESTED:
+                if file_meta.get('file_ingestion_status', 'N/A') == STATUS_INGESTED:
                     continue
 
                 # attempt download with workaround
@@ -456,7 +483,7 @@ class IngestionListener:
                     log.error('Some VCF rows for uuid %s failed to post - not marking VCF '
                               'as ingested.' % uuid)
                 else:
-                    self.vapp.patch_json('/' + uuid, {'file_ingestion_status': self.STATUS_INGESTED})
+                    self.vapp.patch_json('/' + uuid, {'file_ingestion_status': STATUS_INGESTED})
 
                 # report results in error_log regardless of status
                 msg = ('INGESTION_REPORT:\n'
