@@ -119,19 +119,19 @@ class MappingTableParser(object):
                 if row_idx <= self.HEADER_ROW_INDEX:  # skip header rows
                     continue
                 for field_name, entry in zip(self.fields, row):
-                    if not entry:
+                    if field_name not in self.annotation_field_schema['properties'] or not entry:
                         continue
                     if field_name in self.INTEGER_FIELDS:  # handle int fields
-                        if entry:
+                        if entry is not None:  # entry=0 is a normal value
                             insert[field_name] = int(entry)
                     elif field_name in self.BOOLEAN_FIELDS:  # handle bool fields
-                        if entry:
+                        if entry is not None:
                             if entry == 'Y':
                                 insert[field_name] = True
-                            else:
+                            else:  # assume False if anything other than 'Y' is present
                                 insert[field_name] = False
                     elif field_name in ['enum_list']:  # handle enum fields
-                        if entry:
+                        if entry is not None:
                             field_type = row[self.FIELD_TYPE_INDEX]
                             val_list = []
                             if field_type == 'string':
@@ -260,7 +260,7 @@ class MappingTableParser(object):
 
             # handle int fields
             for a_field in self.INTEGER_FIELDS:
-                if item.get(a_field) and a_field != 'no':
+                if item.get(a_field) is not None:
                     features[a_field] = int(item[a_field])
 
             # handle sub_embedded object
@@ -539,13 +539,27 @@ class MappingTableParser(object):
         return schema
 
     @staticmethod
-    def write_schema(schema, fname):
+    def sort_schema_properties(schema):
+        """ Helper method that sorts schema properties by key by inserting sorted key, values into a new
+            dictionary (since in Python3.6>= all dicts are ordered). Schemas from this point forward
+            will have their properties sorted alphabetically so it is easier to visualize changes.
+
+        Args:
+            schema: schema with key 'properties' to be sorted
+        """
+        sorted_properties = {}
+        for key, value in sorted(schema['properties'].items()):
+            sorted_properties[key] = value
+        return sorted_properties
+
+    def write_schema(self, schema, fname):
         """ Writes the given schema (JSON) to the given file 'fname'
 
         Args:
             schema: dictionary to write as json as the schema
             fname: file to write out to
         """
+        schema['properties'] = self.sort_schema_properties(schema)
         with open(fname, 'w+') as out:
             json.dump(schema, out, indent=4)
         logger.info('Successfully wrote schema: %s to file: %s\n' % (schema['title'], fname))
