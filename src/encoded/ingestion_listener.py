@@ -90,8 +90,9 @@ def queue_ingestion(context, request):
     }
     if uuids is []:
         return response
-    queue_manager = request.registry[INGESTION_QUEUE] if not override_name \
-        else IngestionQueueManager(request.registry, override_name=override_name)
+    queue_manager = (request.registry[INGESTION_QUEUE]
+                     if not override_name
+                     else IngestionQueueManager(request.registry, override_name=override_name))
     _, failed = queue_manager.add_uuids(uuids)
     if not failed:
         response['notification'] = 'Success'

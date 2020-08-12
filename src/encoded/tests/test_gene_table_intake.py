@@ -1,10 +1,10 @@
 import pytest
-from encoded.tests.test_variant_table_intake import (
-    ANNOTATION_FIELD_SCHEMA,
-)
-from encoded.util import resolve_file_path
-from encoded.tests.variant_fixtures import GENE_ANNOTATION_FIELD_URL
-from encoded.commands.gene_table_intake import GeneTableParser
+
+from ..util import resolve_file_path
+from ..commands.gene_table_intake import GeneTableParser
+from .test_variant_table_intake import ANNOTATION_FIELD_SCHEMA
+from .variant_fixtures import GENE_ANNOTATION_FIELD_URL
+
 
 pytestmark = [pytest.mark.working, pytest.mark.ingestion]
 MT_LOC = resolve_file_path('annotations/gene_table_v0.4.6.csv')

@@ -13,7 +13,7 @@ from pyramid.httpexceptions import (
 )
 from snovault.calculated import calculate_properties
 from snovault.util import debug_log
-from encoded.util import resolve_file_path
+from ..util import resolve_file_path
 from snovault import (
     calculated_property,
     collection,

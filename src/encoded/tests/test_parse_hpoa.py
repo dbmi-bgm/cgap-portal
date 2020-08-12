@@ -82,7 +82,7 @@ def mini_hpoa_lines():
 
 
 def test_get_header_info_and_field_names(capsys, mock_logger, mini_hpoa_lines):
-    with mock.patch('encoded.commands.parse_hpoa.has_unexpected_fields', return_value=False):
+    with mock.patch.object(ph, 'has_unexpected_fields', return_value=False):
         lfields = ph.line2list(mini_hpoa_lines[4])
         fields, lines = ph.get_header_info_and_field_names(iter(mini_hpoa_lines), mock_logger)
         assert fields == lfields
@@ -92,7 +92,7 @@ def test_get_header_info_and_field_names(capsys, mock_logger, mini_hpoa_lines):
 
 
 def test_get_header_info_and_field_names_no_comments(capsys, mock_logger, mini_hpoa_lines):
-    with mock.patch('encoded.commands.parse_hpoa.has_unexpected_fields', return_value=False):
+    with mock.patch.object(ph, 'has_unexpected_fields', return_value=False):
         lfields = ph.line2list(mini_hpoa_lines[4])
         fields, lines = ph.get_header_info_and_field_names(iter(mini_hpoa_lines[4:]), mock_logger)
         assert fields == lfields
@@ -103,7 +103,7 @@ def test_get_header_info_and_field_names_no_comments(capsys, mock_logger, mini_h
 
 def test_get_header_info_and_field_names_misformatted(capsys, mock_logger, mini_hpoa_lines):
     mini_hpoa_lines.insert(2, 'bad stuff')
-    with mock.patch('encoded.commands.parse_hpoa.has_unexpected_fields', return_value=['bad']):
+    with mock.patch.object(ph, 'has_unexpected_fields', return_value=['bad']):
         with pytest.raises(SystemExit):
             fields, lines = ph.get_header_info_and_field_names(iter(mini_hpoa_lines[4:]), mock_logger)
         out = capsys.readouterr()[0]
@@ -251,7 +251,7 @@ def test_create_evi_annotation_with_hp_modifier(hpoa_data, hpo2uid_map):
     mod_phe = 'HP:0500252'
     phe_uuid = '05648474-44de-4cdb-b35b-18f5362b8281'
     hpoa_data['Modifier'] = mod_phe
-    with mock.patch('encoded.commands.parse_hpoa.check_hpo_id_and_note_problems', return_value=phe_uuid):
+    with mock.patch.object(ph, 'check_hpo_id_and_note_problems', return_value=phe_uuid):
         evi = ph.create_evi_annotation(hpoa_data, hpo2uid_map, {})
         assert evi.get('modifier') == phe_uuid
 
@@ -259,7 +259,7 @@ def test_create_evi_annotation_with_hp_modifier(hpoa_data, hpo2uid_map):
 def test_create_evi_annotation_with_unknown_hp_modifier(hpoa_data, hpo2uid_map):
     mod_phe = 'HP:0000002'
     hpoa_data['Modifier'] = mod_phe
-    with mock.patch('encoded.commands.parse_hpoa.check_hpo_id_and_note_problems', return_value=None):
+    with mock.patch.object(ph, 'check_hpo_id_and_note_problems', return_value=None):
         evi = ph.create_evi_annotation(hpoa_data, hpo2uid_map, {})
         assert 'modifier' not in evi
 
@@ -272,7 +272,7 @@ def test_convert2raw(embedded_item_dict, raw_item_dict):
     embedded_item_dict['date_created'] = "2020-03-03T20:08:10.690526+00:00"
     embedded_item_dict['institution'] = '/institution/bwh'
     embedded_item_dict["principals_allowed"] = {"view": ["system.Everyone"], "edit": ["group.admin"]}
-    with mock.patch('encoded.commands.parse_hpoa.get_raw_form', return_value=raw_item_dict):
+    with mock.patch.object(ph, 'get_raw_form', return_value=raw_item_dict):
         raw_item = ph.convert2raw(embedded_item_dict)
         assert raw_item == raw_item_dict
 
@@ -303,7 +303,7 @@ def evi_items():
 
 def test_compare_existing_to_newly_generated_all_new(mock_logger, connection, evi_items):
     itemcnt = len(evi_items)
-    with mock.patch('encoded.commands.parse_hpoa.search_metadata', return_value=[]):
+    with mock.patch.object(ph, 'search_metadata', return_value=[]):
         evi, exist, to_obs = ph.compare_existing_to_newly_generated(mock_logger, connection, evi_items, 'EvidenceDisPheno')
         assert evi == evi_items
         assert not to_obs
@@ -312,8 +312,8 @@ def test_compare_existing_to_newly_generated_all_new(mock_logger, connection, ev
 
 def test_compare_existing_to_newly_generated_all_same(mock_logger, connection, evi_items):
     itemcnt = len(evi_items)
-    with mock.patch('encoded.commands.parse_hpoa.search_metadata', return_value=evi_items[:]):
-         with mock.patch('encoded.commands.parse_hpoa.get_raw_form', side_effect=evi_items[:]):
+    with mock.patch.object(ph, 'search_metadata', return_value=evi_items[:]):
+         with mock.patch.object(ph, 'get_raw_form', side_effect=evi_items[:]):
             evi, exist, to_obs = ph.compare_existing_to_newly_generated(mock_logger, connection, evi_items, 'EvidenceDisPheno')
             assert not evi
             assert not to_obs
@@ -325,8 +325,8 @@ def test_compare_existing_to_newly_generated_none_same(mock_logger, connection, 
     for e in evi_items:
         dbitems.append({k: v + '9' for k, v in e.items()})
     dbuuids = [d.get('uuid') for d in dbitems]
-    with mock.patch('encoded.commands.parse_hpoa.search_metadata', return_value=dbitems):
-        with mock.patch('encoded.commands.parse_hpoa.get_raw_form', side_effect=dbitems):
+    with mock.patch.object(ph, 'search_metadata', return_value=dbitems):
+        with mock.patch.object(ph, 'get_raw_form', side_effect=dbitems):
             evi, exist, to_obs = ph.compare_existing_to_newly_generated(mock_logger, connection, evi_items, 'EvidenceDisPheno')
             assert evi == evi_items
             assert to_obs == dbuuids
