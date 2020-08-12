@@ -7,20 +7,9 @@ import tempfile
 from unittest import mock
 from dcicutils.qa_utils import ControlledTime
 from ..util import (
-    debuglog, deduplicate_list, gunzip_content, resolve_file_path, ENCODED_ROOT_DIR, check_true, generate_fastq_file,
+    debuglog, deduplicate_list, gunzip_content, resolve_file_path, ENCODED_ROOT_DIR, generate_fastq_file,
 )
 from .. import util as util_module
-
-
-def test_check_true():
-
-    x = [1, 2, 3]
-    check_true(x == [1, 2, 3], "x is not a list of one, two, and three.")
-
-    msg = "x is not a list of four, five, and six."
-    with pytest.raises(RuntimeError) as e:
-        check_true(x == [4, 5, 6], msg)
-    assert msg in str(e)
 
 
 def test_deduplicate_list():
