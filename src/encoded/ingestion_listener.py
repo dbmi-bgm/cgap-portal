@@ -97,7 +97,7 @@ def queue_ingestion(context, request):
         response['notification'] = 'Success'
         response['number_queued'] = len(uuids)
         response['detail'] = 'Successfully queued the following uuids: %s' % uuids
-        patch_vcf_file_status(request, uuids)  # XXX: does nothing currently
+        patch_vcf_file_status(request, uuids)
     else:
         response['number_queued'] = len(uuids) - len(failed)
         response['detail'] = 'Some uuids failed: %s' % failed
