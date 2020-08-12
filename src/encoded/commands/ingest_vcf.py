@@ -7,7 +7,7 @@ import itertools
 from pyramid.paster import get_app
 from dcicutils.misc_utils import VirtualApp
 from collections import OrderedDict
-from encoded.util import resolve_file_path
+from ..util import resolve_file_path
 
 logger = logging.getLogger(__name__)
 EPILOG = __doc__
