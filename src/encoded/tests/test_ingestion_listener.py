@@ -18,42 +18,47 @@ INGESTION_STATUS_URL = '/ingestion_status'
 notice_pytest_fixtures(gene_workbook, post_variant_consequence_items)
 
 
-def wait_for_queue_to_catch_up(n):
+def wait_for_queue_to_catch_up(queue_manager, n, initially=False):
     """ Wait until queue has done the things we told it to do. Right now this just sleeps for 10 seconds
         assuming most operations should complete within that amount of time.
     """
-    time.sleep(10)
+    ignored(queue_manager, n)
+    if not initially:
+        time.sleep(3)
 
 
 class MockedEnv:
 
     MOCKED_ENV = 'fourfront-cgapother'
-    _count = 0
-
-    @classmethod
-    def bump_version(cls):
-        cls._count += 1
-
-    @classmethod
-    def current_name(cls):
-        return "%s%s" % (cls.MOCKED_ENV, cls._count)
+    _last_version = 0
 
     @classmethod
     def new_name(cls):
-        cls.bump_version()
-        return cls.current_name()
+        cls._last_version = last_version = int(datetime.datetime.now().timestamp() * 1000000)
+        return "%s%s" % (cls.MOCKED_ENV, last_version)
+
+
+class IngestionQueueManagerForTesting(IngestionQueueManager):
+
+    def __init__(self):
+
+        mocked_env = MockedEnv.new_name()
+        registry = MockedRegistry({
+            'env.name': mocked_env
+        })
+        super().__init__(registry)
+
+    def delete_queue(self):
+        """ Deletes the queue, rendering this object unusable. You have to promise not to use it after this. """
+        self.client.delete_queue(QueueUrl=self.queue_url)
 
 
 @pytest.yield_fixture(scope='function', autouse=True)
-def setup_and_teardown_sqs_state():
+def fresh_ingestion_queue_manager_for_testing():
     """ Yield fixture that initializes SQS and clears all messages after the each in this module. """
-    mocked_env = MockedEnv.new_name()
-    registry = MockedRegistry({
-        'env.name': mocked_env
-    })
-    queue_manager = IngestionQueueManager(registry)
+    queue_manager = IngestionQueueManagerForTesting()
     yield queue_manager
-    queue_manager.clear_queue()  # clean up messages
+    queue_manager.delete_queue()  # reclaim the AWS resource
 
 
 class MockedRegistry:
@@ -62,18 +67,25 @@ class MockedRegistry:
         self.settings = settings
 
 
-def test_ingestion_queue_manager_basic(setup_and_teardown_sqs_state):
+def test_ingestion_queue_manager_basic(fresh_ingestion_queue_manager_for_testing):
     """ Tests basic things about initializing the queue manager """
-    queue_manager = setup_and_teardown_sqs_state
-    assert queue_manager.env_name == MockedEnv.current_name()
+    queue_manager = fresh_ingestion_queue_manager_for_testing
+    # The env name will start with a constant string and have a bunch of digits.
+    assert queue_manager.env_name.startswith(MockedEnv.MOCKED_ENV)
+    assert queue_manager.env_name[len(MockedEnv.MOCKED_ENV)].isdigit()
+    # The queue name will have a suffix attached.
     assert queue_manager.queue_name == queue_manager.env_name + queue_manager.BUCKET_EXTENSION
+
+    # This has to be done after the above, so that there's not a gap between fixture creation and testing its name.
+    # This tests that each call gets a new name.
+    assert MockedEnv.new_name() != MockedEnv.new_name()
 
 
 def _expect_message_uuids(queue_manager, expected_uuids, max_tries=12):
     checklist = set(expected_uuids)
     n = len(expected_uuids)
     print("Expecting: %s" % expected_uuids)
-    wait_for_queue_to_catch_up(0)
+    wait_for_queue_to_catch_up(queue_manager, 0, initially=True)
     try_count, expected_seen, strays_seen = 0, [], []
     while True:
         print(str(datetime.datetime.now()), "Try", try_count, "...")
@@ -100,7 +112,7 @@ def _expect_message_uuids(queue_manager, expected_uuids, max_tries=12):
         if not checklist:  # Stop if we have nothing more to look for
             print(str(datetime.datetime.now()), "Got what we wanted")
             break
-        wait_for_queue_to_catch_up(0)
+        wait_for_queue_to_catch_up(queue_manager, 0)
         try_count += 1
     print(str(datetime.datetime.now()), "Total expected messages seen:", len(expected_seen))
     print(str(datetime.datetime.now()), "Total stray messages seen:", len(strays_seen))
@@ -110,9 +122,9 @@ def _expect_message_uuids(queue_manager, expected_uuids, max_tries=12):
     assert not checklist  # empty set
 
 
-def test_ingestion_queue_add_and_receive(setup_and_teardown_sqs_state):
+def test_ingestion_queue_add_and_receive(fresh_ingestion_queue_manager_for_testing):
     """ Tests adding/receiving some uuids """
-    queue_manager = setup_and_teardown_sqs_state
+    queue_manager = fresh_ingestion_queue_manager_for_testing
     test_uuids = [str(uuid4()), str(uuid4())]
     print(str(datetime.datetime.now()), "test_uuids =", test_uuids)
     print(str(datetime.datetime.now()), "queue_manager.queue_name =", queue_manager.queue_name)
@@ -120,10 +132,9 @@ def test_ingestion_queue_add_and_receive(setup_and_teardown_sqs_state):
     _expect_message_uuids(queue_manager, test_uuids)
 
 
-def test_ingestion_queue_add_via_route(setup_and_teardown_sqs_state, testapp):
+def test_ingestion_queue_add_via_route(fresh_ingestion_queue_manager_for_testing, testapp):
     """ Tests adding uuids to the queue via /queue_ingestion """
-    queue_manager = setup_and_teardown_sqs_state
-    assert queue_manager.queue_name == MockedEnv.current_name() + queue_manager.BUCKET_EXTENSION
+    queue_manager = fresh_ingestion_queue_manager_for_testing
     test_uuids = [str(uuid4()), str(uuid4())]
     print(str(datetime.datetime.now()), "test_uuids =", test_uuids)
     print(str(datetime.datetime.now()), "queue_manager.queue_name =", queue_manager.queue_name)
@@ -138,10 +149,9 @@ def test_ingestion_queue_add_via_route(setup_and_teardown_sqs_state, testapp):
     _expect_message_uuids(queue_manager, test_uuids)
 
 
-def test_ingestion_queue_delete(setup_and_teardown_sqs_state, testapp):
+def test_ingestion_queue_delete(fresh_ingestion_queue_manager_for_testing, testapp):
     """ Tests deleting messages from SQS results in no messages being there. """
-    queue_manager = setup_and_teardown_sqs_state
-    assert queue_manager.queue_name == MockedEnv.current_name() + queue_manager.BUCKET_EXTENSION
+    queue_manager = fresh_ingestion_queue_manager_for_testing
     request_body = {
         'uuids': [str(uuid4()), str(uuid4())],
         'override_name': queue_manager.queue_name
@@ -150,7 +160,7 @@ def test_ingestion_queue_delete(setup_and_teardown_sqs_state, testapp):
     msgs = queue_manager.receive_messages()
     failed = queue_manager.delete_messages(msgs)
     assert failed == []
-    wait_for_queue_to_catch_up(0)
+    wait_for_queue_to_catch_up(queue_manager, 0)
 
 
 @pytest.fixture
@@ -190,7 +200,7 @@ def test_posting_vcf_processed_file(testapp, mocked_vcf_file):
     assert "##fileformat=VCFv4.2" in raw_vcf_file
 
 
-def test_ingestion_listener_should_remain_online(setup_and_teardown_sqs_state):
+def test_ingestion_listener_should_remain_online(fresh_ingestion_queue_manager_for_testing):
     """ Tests that the 'should_remain_online' method works """
     _await = lambda: time.sleep(3)
     before = datetime.datetime.utcnow()
@@ -200,16 +210,16 @@ def test_ingestion_listener_should_remain_online(setup_and_teardown_sqs_state):
     assert after > (before + end_delta)
 
 
-def test_ingestion_listener_run(testapp, mocked_vcf_file, gene_workbook, setup_and_teardown_sqs_state,
+def test_ingestion_listener_run(testapp, mocked_vcf_file, gene_workbook, fresh_ingestion_queue_manager_for_testing,
                                 post_variant_consequence_items):
     """ Tests the 'run' method of ingestion listener, which will pull down and ingest a vcf file
         from the SQS queue.
     """
     file_meta = mocked_vcf_file['@graph'][0]
     uuid = file_meta['uuid']
-    queue_manager = setup_and_teardown_sqs_state
+    queue_manager = fresh_ingestion_queue_manager_for_testing
     queue_manager.add_uuids([uuid])
-    wait_for_queue_to_catch_up(0)
+    wait_for_queue_to_catch_up(queue_manager, 0)
 
     # configure run for 10 seconds
     start_time = datetime.datetime.utcnow()
