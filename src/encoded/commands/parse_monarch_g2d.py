@@ -34,7 +34,6 @@ from ..commands.parse_hpoa import (
     get_header_info_and_field_name_line,
     get_fields_from_line,
     compare_existing_to_newly_generated,
-
 )
 from ..commands.load_items import load_items
 
@@ -148,10 +147,6 @@ def get_gene2_altid_map(genes):
     return id2geneuid
 
 
-def line2list(line):
-    return [d.strip() for d in line.split('\t')]
-
-
 def find_gene_uid_from_file_fields(data, ids2geneuid):
     """ searches IDs (from a couple of different fields using preferred ids)
         used in annotation file and maps to existing gene uuid
@@ -162,24 +157,6 @@ def find_gene_uid_from_file_fields(data, ids2geneuid):
         geneid = ids2geneuid.get(id2chk)
         if geneid:
             return geneid
-
-
-def check_hpo_id_and_note_problems(fname, hpoid, hpoid2uuid, problems):
-    ''' Is the hpo_id in the mapping dict?  If so return uuid.
-        If not add info to the problems dict for later reporting
-    '''
-    hpuid = hpoid2uuid.get(hpoid)
-    if hpuid:
-        return hpuid
-    not_found = problems.get('hpo_not_found', {})
-    fields = []
-    if hpoid in not_found:
-        fields = not_found.get(hpoid, [])
-        if fname in fields:
-            return None
-    fields.append(fname)
-    problems.setdefault('hpo_not_found', {}).update({hpoid: fields})
-    return None
 
 
 def _parse_vals(vals):
