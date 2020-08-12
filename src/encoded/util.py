@@ -13,7 +13,6 @@ from snovault import COLLECTIONS, Collection
 from snovault.crud_views import collection_add as sno_collection_add
 from snovault.embed import make_subrequest
 from snovault.schema_utils import validate_request
-from typing import Type
 
 
 ENCODED_ROOT_DIR = os.path.dirname(__file__)
@@ -63,7 +62,7 @@ def gunzip_content(content):
     return gunzipped_content.decode('utf-8')
 
 
-DEBUGLOG_ENABLED = os.environ.get('DEBUGLOG_ENABLED', "FALSE").lower() == "true"
+DEBUGLOG = os.environ.get('DEBUGLOG', "")
 
 
 def debuglog(*args):
@@ -75,14 +74,38 @@ def debuglog(*args):
     It takes arguments like print or one of the logging operations and outputs to ~/DEBUGLOG-yyyymmdd.txt.
     Each line in the log is timestamped.
     """
-    if DEBUGLOG_ENABLED:
-        nowstr = str(datetime.datetime.now())
-        dateid = nowstr[:10].replace('-', '')
-        with io.open(os.path.expanduser("~/DEBUGLOG-%s.txt" % dateid), "a+") as fp:
-            print(nowstr, *args, file=fp)
+    if DEBUGLOG:
+        try:
+            nowstr = str(datetime.datetime.now())
+            dateid = nowstr[:10].replace('-', '')
+            with io.open(os.path.expanduser(os.path.join(DEBUGLOG, "DEBUGLOG-%s.txt" % dateid)), "a+") as fp:
+                print(nowstr, *args, file=fp)
+        except Exception:
+            # There are many things that could go wrong, but none of them are important enough to fuss over.
+            # Maybe it was a bad pathname? Out of disk space? Network error?
+            # It doesn't really matter. Just continue...
+            pass
 
 
 def subrequest_item_creation(request: pyramid.request.Request, item_type: str, json_body: dict = None) -> dict:
+    """
+    Acting as proxy on behalf of request, this creates a new item of the given item_type with attributes per json_body.
+
+    For example,
+
+        subrequest_item_creation(request=request, item_type='NobelPrize',
+                                 json_body={'category': 'peace', 'year': 2016))
+
+    Args:
+        request: the request on behalf of which this subrequest is done
+        item_type: the name of the item item type to be created
+        json_body: a python dictionary representing JSON containing data to use in initializing the newly created item
+
+    Returns:
+        a python dictionary (JSON description) of the item created
+
+    """
+
     if json_body is None:
         json_body = {}
     collection_path = '/' + item_type
