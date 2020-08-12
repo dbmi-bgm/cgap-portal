@@ -192,6 +192,19 @@ class QualityMetricQclist(QualityMetric):
     schema = load_schema('encoded:schemas/quality_metric_qclist.json')
     embedded_list = QualityMetric.embedded_list
 
+    @calculated_property(schema=QC_SUMMARY_SCHEMA)
+    def quality_metric_summary(self, request):
+        qc_list = self.properties.get('qc_list')
+        qc_summary = []
+        if qc_list:
+            for qc_item in qc_list:
+                qc_obj = request.embed(qc_item['value'], '@@object')
+                if 'quality_metric_summary' in qc_obj:
+                    for qcs_item in qc_obj['quality_metric_summary']:
+                        qc_summary.append(qcs_item)
+        
+        return qc_summary if qc_summary else None
+
 
 @collection(
     name='quality-metrics-cmphet',
