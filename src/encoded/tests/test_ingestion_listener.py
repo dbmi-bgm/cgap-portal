@@ -15,7 +15,6 @@ from .variant_fixtures import gene_workbook, post_variant_consequence_items
 pytestmark = [pytest.mark.working, pytest.mark.ingestion]
 QUEUE_INGESTION_URL = '/queue_ingestion'
 INGESTION_STATUS_URL = '/ingestion_status'
-MOCKED_ENV = 'fourfront-cgapother'
 notice_pytest_fixtures(gene_workbook, post_variant_consequence_items)
 
 
@@ -26,11 +25,31 @@ def wait_for_queue_to_catch_up(n):
     time.sleep(10)
 
 
+class MockedEnv:
+
+    MOCKED_ENV = 'fourfront-cgapother'
+    _count = 0
+
+    @classmethod
+    def bump_version(cls):
+        cls._count += 1
+
+    @classmethod
+    def current_name(cls):
+        return "%s%s" % (cls.MOCKED_ENV, cls._count)
+
+    @classmethod
+    def new_name(cls):
+        cls.bump_version()
+        return cls.current_name()
+
+
 @pytest.yield_fixture(scope='function', autouse=True)
 def setup_and_teardown_sqs_state():
     """ Yield fixture that initializes SQS and clears all messages after the each in this module. """
+    mocked_env = MockedEnv.new_name()
     registry = MockedRegistry({
-        'env.name': MOCKED_ENV
+        'env.name': mocked_env
     })
     queue_manager = IngestionQueueManager(registry)
     yield queue_manager
@@ -46,8 +65,8 @@ class MockedRegistry:
 def test_ingestion_queue_manager_basic(setup_and_teardown_sqs_state):
     """ Tests basic things about initializing the queue manager """
     queue_manager = setup_and_teardown_sqs_state
-    assert queue_manager.env_name == MOCKED_ENV
-    assert queue_manager.queue_name == MOCKED_ENV + queue_manager.BUCKET_EXTENSION
+    assert queue_manager.env_name == MockedEnv.current_name()
+    assert queue_manager.queue_name == MockedEnv.current_name() + queue_manager.BUCKET_EXTENSION
 
 
 def _expect_message_uuids(queue_manager, expected_uuids, max_tries=12):
@@ -77,6 +96,7 @@ def _expect_message_uuids(queue_manager, expected_uuids, max_tries=12):
         print(str(datetime.datetime.now()), "Received this try:", len(_msgs),
               "expected", _expected_messages, "stray", _stray_messages)
         expected_seen.extend(_expected_messages)
+        strays_seen.extend(_stray_messages)
         if not checklist:  # Stop if we have nothing more to look for
             print(str(datetime.datetime.now()), "Got what we wanted")
             break
@@ -103,7 +123,7 @@ def test_ingestion_queue_add_and_receive(setup_and_teardown_sqs_state):
 def test_ingestion_queue_add_via_route(setup_and_teardown_sqs_state, testapp):
     """ Tests adding uuids to the queue via /queue_ingestion """
     queue_manager = setup_and_teardown_sqs_state
-    assert queue_manager.queue_name == MOCKED_ENV + queue_manager.BUCKET_EXTENSION
+    assert queue_manager.queue_name == MockedEnv.current_name() + queue_manager.BUCKET_EXTENSION
     test_uuids = [str(uuid4()), str(uuid4())]
     print(str(datetime.datetime.now()), "test_uuids =", test_uuids)
     print(str(datetime.datetime.now()), "queue_manager.queue_name =", queue_manager.queue_name)
@@ -123,7 +143,7 @@ def test_ingestion_queue_delete(setup_and_teardown_sqs_state, testapp):
     queue_manager = setup_and_teardown_sqs_state
     request_body = {
         'uuids': [str(uuid4()), str(uuid4())],
-        'override_name': MOCKED_ENV + queue_manager.BUCKET_EXTENSION
+        'override_name': MockedEnv.current_name() + queue_manager.BUCKET_EXTENSION
     }
     testapp.post_json(QUEUE_INGESTION_URL, request_body, status=200)
     msgs = queue_manager.receive_messages()

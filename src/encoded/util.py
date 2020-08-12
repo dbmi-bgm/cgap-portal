@@ -63,7 +63,7 @@ def gunzip_content(content):
     return gunzipped_content.decode('utf-8')
 
 
-DEBUGLOG = os.environ.get('DEBUGLOG_PATH', "")
+DEBUGLOG = os.environ.get('DEBUGLOG', "")
 
 
 def debuglog(*args):
