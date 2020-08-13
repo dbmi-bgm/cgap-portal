@@ -35,8 +35,9 @@ export function GeneTabBody(props){
 
     const getTipForField = useMemo(function(){
         if (!schemas) return function(){ return null; };
+        // Helper func to basically just shorten `schemaTransforms.getSchemaProperty(field, schemas, itemType);`.
         return function(field, itemType = "Gene"){
-            // Func is scoped within GeneTabBody
+            // Func is scoped within GeneTabBody (uses its 'schemas')
             const schemaProperty = schemaTransforms.getSchemaProperty(field, schemas, itemType);
             return (schemaProperty || {}).description || null;
         };
@@ -69,7 +70,7 @@ export function GeneTabBody(props){
             <div className="row">
                 <div className="col-12 col-md-6 d-flex flex-column">
 
-                    <div className="flex-grow-1">
+                    <div className="flex-grow-1 pb-2 pb-md-0">
                         <div className="info-header-title">
                             <h4>Overview</h4>
                         </div>
@@ -156,7 +157,7 @@ export function GeneTabBody(props){
                     </div>
 
                     {/* Won't be ready for some time -
-                    <div className="flex-grow-0">
+                    <div className="flex-grow-0 pb-2 pb-md-0">
                         <div className="info-header-title">
                             <h4>Conditions</h4>
                         </div>
@@ -178,11 +179,11 @@ export function GeneTabBody(props){
                         </div>
                         <div className="info-body">
                             {/* maybe Gene Resources sub-header here */}
-                            <ExternalDatabasesSection {...{ schemas, currentGeneItem }} />
+                            <ExternalDatabasesSection {...{ schemas, currentGeneItem }} currentItem={currentGeneItem} />
                         </div>
                     </div>
 
-                    <div className="flex-grow-0">
+                    <div className="flex-grow-0 pb-2 pb-md-0">
                         <div className="info-header-title">
                             <h4>Constraint Scores</h4>
                         </div>
@@ -197,7 +198,17 @@ export function GeneTabBody(props){
     );
 }
 
-const ExternalDatabasesSection = React.memo(function ExternalDatabasesSection({ schemas = null, currentGeneItem }){
+const ExternalDatabasesSection = React.memo(function ExternalDatabasesSection(props){
+    const {
+        currentItem, // Renamed from 'currentGeneItem' in case want to move & re-use for Variant, also.
+        schemas = null,
+        itemType = "Gene",
+        // IN FUTURE WE WON"T HAVE THIS LIST
+        // AND INSTEAD GATHER THE PROPERTIES FROM SCHEMA
+        // ACCORDING TO PERHAPS "annotation_category" :"dbxref"
+        // Clinvar, medgen not exist yet it seems.
+        externalDatabaseFieldnames = ["genecards", "gnomad", "clinvar", "medgen", "omim_id", "hpa", "gtex_expression", "brainatlas_microarray", "marrvel", "mgi_id"]
+    } = props;
 
     if (!schemas) {
         return (
@@ -207,13 +218,8 @@ const ExternalDatabasesSection = React.memo(function ExternalDatabasesSection({ 
         );
     }
 
-    const { Gene: { properties: geneSchemaProperties } } = schemas;
+    const { [itemType]: { properties: geneSchemaProperties } } = schemas;
 
-    // IN FUTURE WE WON"T HAVE THIS LIST
-    // AND INSTEAD GATHER THE PROPERTIES FROM SCHEMA
-    // ACCORDING TO PERHAPS "annotation_category" :"dbxref"
-    // Clinvar, medgen not exist yet it seems.
-    const externalDatabaseFieldnames = ["genecards", "gnomad", "clinvar", "medgen", "omim_id", "hpa", "gtex_expression", "brainatlas_microarray", "marrvel", "mgi_id"];
 
     const externalDatabaseSchemaFields = externalDatabaseFieldnames.map(function(fieldName){
         return [ fieldName, geneSchemaProperties[fieldName] ];
@@ -229,7 +235,7 @@ const ExternalDatabasesSection = React.memo(function ExternalDatabasesSection({ 
             title = null,
             description = null
         } = fieldSchema;
-        const externalID = currentGeneItem[fieldName];
+        const externalID = currentItem[fieldName];
         if (!externalID) {
             return null;
         }
@@ -271,7 +277,7 @@ const ExternalDatabasesSection = React.memo(function ExternalDatabasesSection({ 
 
 });
 
-function ConstraintScoresSection({ schemas = null, currentGeneItem, getTipForField }){
+function ConstraintScoresSection({ currentGeneItem, getTipForField }){
     const {
         exp_lof, exp_mis, exp_syn,
         obs_lof, obs_mis, obs_syn,

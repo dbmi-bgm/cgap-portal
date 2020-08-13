@@ -28,7 +28,7 @@ function OverviewTabView(props){
                 Annotation Space
             </h3>
             <hr className="tab-section-title-horiz-divider"/>
-            <div className="container-wide bg-light py-3">
+            <div className="container-wide bg-light py-3 mh-inner-tab-height-full">
                 <VariantSampleOverview {...props}/>
             </div>
         </div>

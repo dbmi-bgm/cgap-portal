@@ -10,6 +10,7 @@ import { console, layout, ajax } from '@hms-dbmi-bgm/shared-portal-components/es
 import { Alerts } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/Alerts';
 
 import { VariantSampleInfoHeader } from './VariantSampleInfoHeader';
+import { VariantTabBody } from './VariantTabBody';
 import { GeneTabBody } from './GeneTabBody';
 
 
@@ -129,7 +130,7 @@ function VariantSampleOverviewTabView(props){
     // TODO change eventually to use 'if' condition or something and distribute props as needed.
     let tabViewBody = null;// { "Variant" : VariantTabBody, "Gene" : GeneTabBody, "Sample" : SampleTabBody }[currentTab];
     if (currentTab === "Variant"){
-        tabViewBody = <VariantTabBody {...{ context }} />;
+        tabViewBody = <VariantTabBody {...{ context, schemas }} />;
     } else if (currentTab === "Gene") {
         tabViewBody = <GeneTabBody {...{ context, schemas, currentGeneItem, currentGeneItemLoading }} />;
     } else if (currentTab === "Sample") {
@@ -182,11 +183,6 @@ const OverviewTabTitle = React.memo(function OverviewTabTitle(props){
         </button>
     );
 });
-
-function VariantTabBody(props){
-    return "Test1";
-}
-
 
 
 function SampleTabBody(props){
