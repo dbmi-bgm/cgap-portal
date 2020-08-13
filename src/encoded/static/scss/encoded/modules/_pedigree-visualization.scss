@@ -139,7 +139,7 @@ $pedigree-disease-colors :
                             height: 0px;
                             text-align: center;
                             padding: 0;
-                            background: $brand-primary;
+                            background: $primary;
                             font-size: 0.9rem;
                             @include transition(width 0s .2s, height 0s .2s);
                         }
