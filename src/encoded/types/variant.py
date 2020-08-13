@@ -26,6 +26,7 @@ from .base import (
 
 
 ANNOTATION_ID = 'annotation_id'
+ANNOTATION_ID_SEP = '_'
 
 
 def extend_embedded_list(embedded_list, fd, typ, prefix=None):
@@ -79,6 +80,17 @@ def build_variant_sample_embedded_list():
     return ['variant.*'] + embedded_list + Item.embedded_list
 
 
+def build_variant_display_title(chrom, pos, ref, alt, sep='>'):
+    """ Builds the variant display title. """
+    return 'chr%s:%s%s%s%s' % (
+        chrom,
+        pos,
+        ref,
+        sep,
+        alt
+    )
+
+
 @collection(
     name='variants',
     properties={
@@ -97,11 +109,12 @@ class Variant(Item):
     @classmethod
     def create(cls, registry, uuid, properties, sheets=None):
         """ Sets the annotation_id field on this variant prior to passing on. """
-        properties[ANNOTATION_ID] = 'chr%s:%s%s_%s' % (  # XXX: replace _ with > ('>' char is restricted)
+        properties[ANNOTATION_ID] = build_variant_display_title(
             properties['CHROM'],
             properties['POS'],
             properties['REF'],
-            properties['ALT']
+            properties['ALT'],
+            sep=ANNOTATION_ID_SEP  # XXX: replace _ with >  to get display_title('>' char is restricted)
         )
         return super().create(registry, uuid, properties, sheets)
 
@@ -111,7 +124,7 @@ class Variant(Item):
         "type": "string"
     })
     def display_title(self, CHROM, POS, REF, ALT):
-        return 'chr%s:%s%s>%s' % (CHROM, POS, REF, ALT)  # chr1:504A>T
+        return build_variant_display_title(CHROM, POS, REF, ALT)  # chr1:504A>T
 
 
 @collection(

@@ -7,19 +7,19 @@ from .variant_fixtures import GENE_ANNOTATION_FIELD_URL
 
 
 pytestmark = [pytest.mark.working, pytest.mark.ingestion]
-MT_LOC = resolve_file_path('annotations/gene_table_v0.4.5.csv')
+MT_LOC = resolve_file_path('annotations/gene_table_v0.4.6.csv')
 GENE_SCHEMA_TEST_LOC = resolve_file_path('schemas/gene.json')
 NUMBER_ANNOTATION_FIELDS = 284
-EXPECTED_INSERT = {'no': 1, 'field_name': 'chrom',
+EXPECTED_INSERT = {'field_name': 'chrom',
                    'schema_title': 'Chromosome', 'do_import': True,
                    'source_name': 'ENSEMBLgene', 'source_version': 'v99',
                    'description': "name of the chromosome or scaffold; chromosome names without a 'chr'",
                    'field_type': 'string', 'is_list': False,
                    'enum_list': ['1', '2', '3', '4', '5', '6','7', '8', '9', '10', '11', '12', '13', '14', '15', '16',
-                                 '17', '18', '19', '20', '21', '22', 'X', 'Y', 'M'],
-                   'value_example': '1; 2; 3; 4; 5; 6; 7; X; 8; 9'}
+                                 '17', '18', '19', '20', '21', '22', 'X', 'Y', 'M']}
 CLINGENDIS_FIELDS_EXPECTED = 4
 TRANSCRIPT_FIELDS_EXPECTED = 15
+CHROM_INDEX = 74  # 74 is index of CHROM now
 
 
 @pytest.fixture
@@ -40,17 +40,17 @@ def gene_schema(GTParser, inserts):
 
 def test_read_gene_table_header(GTParser):
     """ Tests that we can read mapping table header correctly based on the current format """
-    assert GTParser.version == 'gene_annV0.4.5'
-    assert GTParser.date == '2020.05.20'
+    assert GTParser.version == 'gene_annV0.4.6'
+    assert GTParser.date == '2020.08.07'
     #assert sorted(GTParser.fields) == sorted(EXPECTED_FIELDS)  # Not harmonized at the moment
 
 
 def test_process_gene_table_inserts(inserts):
     """
         Tests that we properly process gene annotation field inserts
-        There should be 254 total. A hand crafted example is checked
+        A hand crafted example is checked
     """
-    assert inserts[0] == EXPECTED_INSERT
+    assert inserts[CHROM_INDEX] == EXPECTED_INSERT
     assert len(inserts) == NUMBER_ANNOTATION_FIELDS
 
 
