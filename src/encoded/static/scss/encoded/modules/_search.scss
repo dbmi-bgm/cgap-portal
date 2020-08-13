@@ -164,7 +164,7 @@ $search-results-header-row-height: 52px; // 46px is existing default for both re
 
 /*** FACETS CONTAINER STICKY ***/
 
-$facetlist-selected-term-color: $brand-primary;
+$facetlist-selected-term-color: $primary;
 $facetlist-omitted-term-color: #901414;
 
 @import "../../../../../../node_modules/@hms-dbmi-bgm/shared-portal-components/scss/facet-list.scss";
@@ -208,7 +208,7 @@ $search-page-padding-resize-transition-out: padding .25s linear;
 		// 	top: 30px;
 		// 	height: 61px;
 		// 	opacity: 0;
-		// 	background-color: darken($color: $brand-primary-dark, $amount: 5%);
+		// 	background-color: darken($color: $primary-dark, $amount: 5%);
 		// 	transition: height .5s ease-out, opacity .5s ease-out;
 		// }
 

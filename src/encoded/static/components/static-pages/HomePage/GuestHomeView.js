@@ -5,20 +5,25 @@ import PropTypes from 'prop-types';
 import moment from 'moment';
 import ReactTooltip from 'react-tooltip';
 import _ from 'underscore';
+import { Alerts } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/Alerts';
 
 
 export const GuestHomeView = React.memo(function GuestHomeView(props){
+    const { alerts } = props;
     return (
         <React.Fragment>
+            <div id="item-page-alerts-container" className="bg-primary-dark">
+                <Alerts alerts={alerts} className="alerts" />
+            </div>
             <div className="jumbotron mb-0" style={{ borderRadius: 0, backgroundImage: "url('/static/img/homepage-banner3.jpeg')", backgroundSize: "cover" }}>
                 <div className="container">
                     <h2 className="homepage-section-title text-white">Streamline Your Bioinformatics Pipeline</h2>
-                    <hr style={{ borderColor: "#ffffff"}} />
+                    <hr className="border-white" />
                     <h4 className="text-500 text-white">Get Actionable Data, Fast.</h4>
-                    <p style={{ color: "#ffffff", maxWidth: "70%" }}>
-                        CGAP (the Clinical Genome Analysis Project) lorem ipsum dolor sit amet, consectetur adipiscing elit, 
-                        sed do eiusmod tempor Harvard Medical School incididunt ut labore et dolore magna aliqua. 
-                        Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris 
+                    <p className="text-white col-12 col-lg-9 px-0">
+                        CGAP (the Clinical Genome Analysis Project) lorem ipsum dolor sit amet, consectetur adipiscing elit,
+                        sed do eiusmod tempor Harvard Medical School incididunt ut labore et dolore magna aliqua.
+                        Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris
                         nisi ut aliquip ex ea commodo consequat.
                     </p>
                     {/* <button className="btn btn-outline-light btn-large">Request More Info</button> */}
@@ -37,7 +42,7 @@ export const GuestHomeView = React.memo(function GuestHomeView(props){
                         }} />
                         <p style={{ marginTop: "1rem" }}>
                             Excepteur sint occaecat cupidatat non in reprehenderit in
-                            proident, sunt in culpa qui officia deserunt mollit anim id est laborum. 
+                            proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
                         </p>
                     </div>
                     <div className="col-xs-12 col-md-4">
@@ -50,7 +55,7 @@ export const GuestHomeView = React.memo(function GuestHomeView(props){
                             backgroundSize: "cover"
                         }} />
                         <p style={{ marginTop: "1rem" }}>
-                            Duis aute irure dolor in reprehenderit in voluptate velit esse cillum 
+                            Duis aute irure dolor in reprehenderit in voluptate velit esse cillum
                             dolore <strong>CLIA-compatible workflow</strong> eu fugiat nulla pariatur.
                         </p>
                     </div>

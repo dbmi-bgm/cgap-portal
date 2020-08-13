@@ -15,7 +15,6 @@ import { Alerts } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/
 import { EditableField, FieldSet } from '@hms-dbmi-bgm/shared-portal-components/es/components/forms/components/EditableField';
 
 import { store } from './../../store';
-import { FormattedInfoBlock } from './components/FormattedInfoBlock';
 import { OnlyTitle, PageTitleContainer, pageTitleViews } from './../PageTitleSection';
 
 // eslint-disable-next-line no-unused-vars
@@ -621,6 +620,7 @@ class ProfileWorkFields extends React.PureComponent {
                         { role || <span className="not-set">No Job Title</span> }
                     </div>
                 </div>
+                {/*
                 <div className="row field-entry submits_for">
                     <div className="col-md-3 text-right text-left-xs">
                         <label htmlFor="submits_for">Submits For</label>
@@ -649,6 +649,7 @@ class ProfileWorkFields extends React.PureComponent {
                         />
                     </div>
                 </div>
+                */}
             </div>
         );
     }
