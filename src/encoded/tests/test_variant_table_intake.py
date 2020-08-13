@@ -29,9 +29,9 @@ VEP_CONSEQUENCE_EMBEDS = ['transcript.vep_consequence.var_conseq_id', 'transcrip
                           'transcript.vep_consequence.impact', 'transcript.vep_consequence.location',
                           'transcript.vep_consequence.coding_effect', 'transcript.vep_gene.display_title',
                           'transcript.vep_gene.gene_symbol', 'transcript.vep_gene.ensgid']
-NUMBER_ANNOTATION_FIELDS = 353
+NUMBER_ANNOTATION_FIELDS = 354
 SAMPLE_FIELDS_EXPECTED = 27
-VARIANT_FIELDS_EXPECTED = 326
+VARIANT_FIELDS_EXPECTED = 327
 TRANSCRIPT_FIELDS_EXPECTED = 35
 
 
@@ -73,7 +73,7 @@ def test_add_default_schema_fields(MTParser):
 def test_read_variant_table_header(MTParser):
     """ Tests that we can read mapping table header correctly based on the current format """
     assert MTParser.version == 'annV0.4.8'
-    assert MTParser.date == '08.10.2020'
+    assert MTParser.date == '08.13.2020'
     assert sorted(MTParser.fields) == sorted(EXPECTED_FIELDS)
     for field in EXPECTED_FIELDS:  # all fields are categorized by the Parser
         assert field in MTParser.ALL_FIELDS
@@ -143,8 +143,7 @@ def test_generate_variant_json_items(MTParser, inserts):
     assert 'gnomad_af' in facs
     assert facs['CHROM']['title'] == 'Chromosome'
     assert facs['CHROM']['grouping'] == 'Position'
-    assert facs['transcript.vep_sift_score']['aggregation_type'] == 'stats'
-    assert facs['transcript.vep_sift_score']['order'] == 24
+    assert cols['genes.genes_ensg.display_title']['order'] == 40
 
 
 def test_generate_variant_sample_schema(MTParser, sample_variant_items):
@@ -179,6 +178,7 @@ def test_generate_variant_sample_schema(MTParser, sample_variant_items):
     assert cols['DP']['order'] == 20
     assert cols['AF']['order'] == 21
     assert cols['GT']['order'] == 30
+    assert facs['cmphet.comhet_impact_gene']['order'] == 17
 
 
 def test_generate_variant_schema(MTParser, variant_items):

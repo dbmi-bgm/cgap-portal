@@ -509,6 +509,8 @@ class MappingTableParser(object):
         self.add_extra_variant_sample_columns(cols)
         schema['columns'] = cols
         schema['facets'] = facs
+        schema['facets'] = self.sort_schema_properties(schema, key='facets')
+        schema['columns'] = self.sort_schema_properties(schema, key='columns')
         logger.info('Built variant_sample schema')
         return schema
 
@@ -533,22 +535,26 @@ class MappingTableParser(object):
         schema['properties']['schema_version'] = {'default': '1'}
         schema['facets'] = facs
         schema['columns'] = cols
+        schema['facets'] = self.sort_schema_properties(schema, key='facets')
+        schema['columns'] = self.sort_schema_properties(schema, key='columns')
         # adds annotation ID field, effectively making display_title a primary key constraint
         self.add_identifier_field(schema['properties'])
         logger.info('Build variant schema')
         return schema
 
     @staticmethod
-    def sort_schema_properties(schema):
+    def sort_schema_properties(schema, key='properties'):
         """ Helper method that sorts schema properties by key by inserting sorted key, values into a new
             dictionary (since in Python3.6>= all dicts are ordered). Schemas from this point forward
             will have their properties sorted alphabetically so it is easier to visualize changes.
 
         Args:
             schema: schema with key 'properties' to be sorted
+            key: optional arg to use as key to resolve dictionary to sort, intended to allow us to sort
+            properties, columns and facets
         """
         sorted_properties = {}
-        for key, value in sorted(schema['properties'].items()):
+        for key, value in sorted(schema[key].items()):
             sorted_properties[key] = value
         return sorted_properties
 

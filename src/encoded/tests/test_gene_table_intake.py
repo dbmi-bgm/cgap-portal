@@ -19,7 +19,7 @@ EXPECTED_INSERT = {'field_name': 'chrom',
                                  '17', '18', '19', '20', '21', '22', 'X', 'Y', 'M']}
 CLINGENDIS_FIELDS_EXPECTED = 4
 TRANSCRIPT_FIELDS_EXPECTED = 15
-CHROM_INDEX = 74  # 74 is index of CHROM now
+CHROM_INDEX = 84  # 84 is index of CHROM now
 
 
 @pytest.fixture
@@ -41,7 +41,7 @@ def gene_schema(GTParser, inserts):
 def test_read_gene_table_header(GTParser):
     """ Tests that we can read mapping table header correctly based on the current format """
     assert GTParser.version == 'gene_annV0.4.6'
-    assert GTParser.date == '2020.08.07'
+    assert GTParser.date == '2020.08.13'
     #assert sorted(GTParser.fields) == sorted(EXPECTED_FIELDS)  # Not harmonized at the moment
 
 
@@ -104,4 +104,3 @@ def test_gene_table_run(GTParser, testapp):
     inserts = GTParser.run(gs_out=GENE_SCHEMA_TEST_LOC, write=False)
     for item in inserts:
         testapp.post_json(GENE_ANNOTATION_FIELD_URL, item, status=201)
-

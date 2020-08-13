@@ -375,19 +375,6 @@
                         "scope": "sample_variant",
                         "schema_title": "Sample Genotype (Nucleotide)"
                     },
-                    "samplegeno_ad": {
-                        "title": "Sample Genotype (Allele Depth)",
-                        "field_name": "samplegeno_ad",
-                        "type": "string",
-                        "do_import": true,
-                        "source_name": "SAMPLEGENO",
-                        "source_version": "v0.4",
-                        "sub_embedding_group": "{\"key\": \"samplegeno\", \"title\": \"Sample Genotype\"}",
-                        "annotation_category": "Genotype",
-                        "description": "Allelic depth",
-                        "scope": "sample_variant",
-                        "schema_title": "Sample Genotype (Allele Depth)"
-                    },
                     "samplegeno_sampleid": {
                         "title": "Sample Genotype (Sample ID)",
                         "field_name": "samplegeno_sampleid",
@@ -400,6 +387,19 @@
                         "description": "Sample ID",
                         "scope": "sample_variant",
                         "schema_title": "Sample Genotype (Sample ID)"
+                    },
+                    "samplegeno_ad": {
+                        "title": "Sample Genotype (Allele Depth)",
+                        "field_name": "samplegeno_ad",
+                        "type": "string",
+                        "do_import": true,
+                        "source_name": "SAMPLEGENO",
+                        "source_version": "v0.4",
+                        "sub_embedding_group": "{\"key\": \"samplegeno\", \"title\": \"Sample Genotype\"}",
+                        "annotation_category": "Genotype",
+                        "description": "Allelic depth",
+                        "scope": "sample_variant",
+                        "schema_title": "Sample Genotype (Allele Depth)"
                     }
                 }
             }
@@ -414,9 +414,11 @@
         }
     },
     "columns": {
-        "GT": {
-            "title": "Genotype",
-            "order": 30
+        "AF": {
+            "title": "VAF",
+            "aggregation_type": "stats",
+            "number_step": "any",
+            "order": 21
         },
         "DP": {
             "title": "Coverage",
@@ -424,33 +426,40 @@
             "number_step": 1,
             "order": 20
         },
-        "AF": {
-            "title": "VAF",
-            "aggregation_type": "stats",
-            "number_step": "any",
-            "order": 21
+        "GT": {
+            "title": "Genotype",
+            "order": 30
         },
-        "variant.genes.genes_ensg.display_title": {
-            "title": "Gene",
-            "order": 40
+        "bam_snapshot": {
+            "title": "Genome Snapshot",
+            "order": 81
         },
-        "variant.genes.genes_most_severe_transcript": {
-            "title": "Transcript",
-            "order": 41
-        },
-        "variant.genes.genes_most_severe_consequence.coding_effect": {
-            "title": "Coding Effect",
-            "order": 42
+        "variant.clinvar_variationid": {
+            "title": "Clinvar ID",
+            "order": 70
         },
         "variant.dbsnp_rs_number": {
             "title": "dbSNP ID",
             "order": 11
         },
-        "variant.max_pop_af_af_popmax": {
-            "title": "GnomAD Alt AF - PopMax",
-            "aggregation_type": "stats",
-            "number_step": "any",
-            "order": 61
+        "variant.display_title": {
+            "title": "Variant"
+        },
+        "variant.genes.genes_ensg.display_title": {
+            "title": "Gene",
+            "order": 40
+        },
+        "variant.genes.genes_most_severe_consequence.coding_effect": {
+            "title": "Coding Effect",
+            "order": 51
+        },
+        "variant.genes.genes_most_severe_hgvsc": {
+            "title": "Coding Sequence",
+            "order": 50
+        },
+        "variant.genes.genes_most_severe_transcript": {
+            "title": "Transcript",
+            "order": 41
         },
         "variant.gnomad_af": {
             "title": "GnomAD Alt Allele Frequency",
@@ -458,38 +467,26 @@
             "number_step": "any",
             "order": 60
         },
-        "variant.clinvar_variationid": {
-            "title": "Clinvar ID",
-            "order": 70
-        },
-        "bam_snapshot": {
-            "title": "Genome Snapshot",
-            "order": 81
-        },
-        "variant.display_title": {
-            "title": "Variant"
+        "variant.max_pop_af_af_popmax": {
+            "title": "GnomAD Alt AF - PopMax",
+            "aggregation_type": "stats",
+            "number_step": "any",
+            "order": 61
         }
     },
     "facets": {
-        "DP": {
-            "title": "Coverage",
-            "aggregation_type": "stats",
-            "number_step": 1,
-            "order": 8,
-            "grouping": "Variant Quality"
-        },
-        "GQ": {
-            "title": "Genotype Quality",
-            "aggregation_type": "stats",
-            "number_step": 1,
-            "order": 11,
-            "grouping": "Variant Quality"
-        },
         "AF": {
             "title": "VAF",
             "aggregation_type": "stats",
             "number_step": "any",
             "order": 9,
+            "grouping": "Variant Quality"
+        },
+        "DP": {
+            "title": "Coverage",
+            "aggregation_type": "stats",
+            "number_step": 1,
+            "order": 8,
             "grouping": "Variant Quality"
         },
         "FS": {
@@ -499,16 +496,23 @@
             "order": 10,
             "grouping": "Variant Quality"
         },
+        "GQ": {
+            "title": "Genotype Quality",
+            "aggregation_type": "stats",
+            "number_step": 1,
+            "order": 11,
+            "grouping": "Variant Quality"
+        },
+        "cmphet.comhet_impact_gene": {
+            "title": "ComHet Impact",
+            "order": 17,
+            "grouping": "Genotype"
+        },
         "novoPP": {
             "title": "novoCaller PP",
             "aggregation_type": "stats",
             "number_step": "any",
             "order": 16,
-            "grouping": "Genotype"
-        },
-        "cmphet.comhet_impact_gene": {
-            "title": "ComHet Impact",
-            "order": 17,
             "grouping": "Genotype"
         },
         "variant.CHROM": {
@@ -523,31 +527,50 @@
             "order": 2,
             "grouping": "Position"
         },
-        "variant.mutanno_variant_class": {
-            "title": "Variant Type",
-            "order": 4,
-            "grouping": "Variant Type"
-        },
-        "variant.transcript.vep_sift_score": {
-            "title": "SIFT score",
+        "variant.cadd_phred": {
+            "title": "CADD",
             "aggregation_type": "stats",
             "number_step": "any",
-            "order": 24,
+            "order": 23,
             "grouping": "Missense Predictors"
         },
-        "variant.transcript.vep_polyphen_score": {
-            "title": "PolyPhen score",
-            "aggregation_type": "stats",
-            "number_step": "any",
-            "order": 25,
-            "grouping": "Missense Predictors"
+        "variant.clinvar_clnsig": {
+            "title": "Clinvar",
+            "order": 36,
+            "grouping": "variant database"
         },
-        "variant.transcript.vep_maxentscan_diff": {
-            "title": "MaxEntScan",
+        "variant.conservation_phylop100": {
+            "title": "PhyloP (100 Vertabrates)",
             "aggregation_type": "stats",
             "number_step": "any",
-            "order": 31,
-            "grouping": "Splice Predictors"
+            "order": 22,
+            "grouping": "Conservation"
+        },
+        "variant.cytoband_cytoband": {
+            "title": "Cytoband",
+            "order": 3,
+            "grouping": "Position"
+        },
+        "variant.genes.genes_ensg.oe_lof": {
+            "title": "o/e (LoF)",
+            "aggregation_type": "stats",
+            "number_step": "any",
+            "order": 35,
+            "grouping": "Constraint Metrics"
+        },
+        "variant.genes.genes_ensg.oe_lof_upper": {
+            "title": "LOEUF",
+            "aggregation_type": "stats",
+            "number_step": "any",
+            "order": 33,
+            "grouping": "Constraint Metrics"
+        },
+        "variant.genes.genes_ensg.oe_mis": {
+            "title": "o/e (missense)",
+            "aggregation_type": "stats",
+            "number_step": "any",
+            "order": 34,
+            "grouping": "Constraint Metrics"
         },
         "variant.genes.genes_ensg.s_het": {
             "title": "S_het",
@@ -556,19 +579,10 @@
             "order": 32,
             "grouping": "Constraint Metrics"
         },
-        "variant.genes.genes_ensg.oe_mis": {
-            "title": "o/e (missense)",
-            "aggregation_type": "stats",
-            "number_step": "any",
-            "order": 33,
-            "grouping": "Constraint Metrics"
-        },
-        "variant.genes.genes_ensg.oe_lof": {
-            "title": "o/e (LoF)",
-            "aggregation_type": "stats",
-            "number_step": "any",
-            "order": 34,
-            "grouping": "Constraint Metrics"
+        "variant.genes.genes_most_severe_consequence.coding_effect": {
+            "title": "Coding Effect",
+            "order": 5,
+            "grouping": "Consequence"
         },
         "variant.genes.genes_most_severe_consequence.impact": {
             "title": "Impact",
@@ -580,42 +594,29 @@
             "order": 6,
             "grouping": "Consequence"
         },
-        "variant.genes.genes_most_severe_consequence.coding_effect": {
-            "title": "Coding Effect",
-            "order": 5,
-            "grouping": "Consequence"
-        },
-        "variant.cytoband_cytoband": {
-            "title": "Cytoband",
-            "order": 3,
-            "grouping": "Position"
-        },
-        "variant.conservation_phylop100": {
-            "title": "PhyloP (100 Vertabrates)",
+        "variant.genes.genes_most_severe_maxentscan_diff": {
+            "title": "genes_most_severe_maxentscan_diff",
             "aggregation_type": "stats",
             "number_step": "any",
-            "order": 22,
-            "grouping": "Conservation"
+            "order": 31
         },
-        "variant.cadd_phred": {
-            "title": "CADD",
+        "variant.genes.genes_most_severe_polyphen_score": {
+            "title": "PolyPhen score",
             "aggregation_type": "stats",
             "number_step": "any",
-            "order": 23,
-            "grouping": "Missense Predictors"
+            "order": 25
         },
-        "variant.spliceai_maxds": {
-            "title": "SpliceAI Max Delta",
+        "variant.genes.genes_most_severe_sift_score": {
+            "title": "SIFT score",
             "aggregation_type": "stats",
             "number_step": "any",
-            "order": 27,
-            "grouping": "Splice Predictors"
+            "order": 24
         },
-        "variant.max_pop_af_af_popmax": {
-            "title": "GnomAD Alt AF - PopMax",
+        "variant.gnomad_af": {
+            "title": "GnomAD Alt Allele Frequency",
             "aggregation_type": "stats",
             "number_step": "any",
-            "order": 19,
+            "order": 18,
             "grouping": "Population Frequency"
         },
         "variant.gnomad_an": {
@@ -625,13 +626,6 @@
             "order": 20,
             "grouping": "Population Frequency"
         },
-        "variant.gnomad_af": {
-            "title": "GnomAD Alt Allele Frequency",
-            "aggregation_type": "stats",
-            "number_step": "any",
-            "order": 18,
-            "grouping": "Population Frequency"
-        },
         "variant.gnomad_nhomalt": {
             "title": "GnomAD Homozgyous Count",
             "aggregation_type": "stats",
@@ -639,10 +633,24 @@
             "order": 21,
             "grouping": "Population Frequency"
         },
-        "variant.clinvar_clnsig": {
-            "title": "Clinvar",
-            "order": 36,
-            "grouping": "variant database"
+        "variant.max_pop_af_af_popmax": {
+            "title": "GnomAD Alt AF - PopMax",
+            "aggregation_type": "stats",
+            "number_step": "any",
+            "order": 19,
+            "grouping": "Population Frequency"
+        },
+        "variant.mutanno_variant_class": {
+            "title": "Variant Type",
+            "order": 4,
+            "grouping": "Variant Type"
+        },
+        "variant.spliceai_maxds": {
+            "title": "SpliceAI Max Delta",
+            "aggregation_type": "stats",
+            "number_step": "any",
+            "order": 27,
+            "grouping": "Splice Predictors"
         }
     }
 }
