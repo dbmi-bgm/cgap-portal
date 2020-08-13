@@ -111,6 +111,12 @@ def app_version(config):
     # Fourfront does GA stuff here that makes no sense in CGAP (yet).
 
 
+def init_sentry(dsn):
+    """ Helper function that initializes sentry SDK if a dsn is specified. """
+    if dsn:
+        sentry_sdk.init(dsn, integrations=[PyramidIntegration(), SqlalchemyIntegration()])
+
+
 def main(global_config, **local_config):
     """
     This function returns a Pyramid WSGI application.
@@ -200,14 +206,8 @@ def main(global_config, **local_config):
     # registered.
     config.include('.upgrade')
 
-    # initialize sentry reporting, split into "production" and "testing", do nothing in local/testing
-    current_env = settings.get('env.name', None)
-    if current_env in [CGAP_ENV_WEBPROD]:
-        sentry_sdk.init("https://878c137aa36a4a5bafbb9809d6303deb@o427308.ingest.sentry.io/5389894",
-                        integrations=[PyramidIntegration(), SqlalchemyIntegration()])
-    elif current_env is not None:
-        sentry_sdk.init("https://3e791f3faed748e2911f2fa4a4ac73f2@o427308.ingest.sentry.io/5389896",
-                        integrations=[PyramidIntegration(), SqlalchemyIntegration()])
+    # initialize sentry reporting
+    init_sentry(settings.get('sentry_dsn', None))
 
     app = config.make_wsgi_app()
 
