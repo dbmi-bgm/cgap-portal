@@ -210,6 +210,34 @@ def test_ingestion_listener_should_remain_online(fresh_ingestion_queue_manager_f
     assert after > (before + end_delta)
 
 
+@pytest.fixture
+def mocked_familial_relations():
+    return [{ 'sample_pedigrees': [
+                {
+                    'sample_name': 'sample_one',
+                    'relationship': 'mother'
+                },
+                {
+                    'sample_name': 'sample_two',
+                    'relationship': 'father'
+                },
+                {
+                    'sample_name': 'sample_three',
+                    'relationship': 'proband'
+                }
+            ]}]
+
+
+def test_ingestion_listener_build_familial_relations(fresh_ingestion_queue_manager_for_testing,
+                                                     mocked_familial_relations):
+    """ Tests that we correctly extract familial relations from a mocked objec that has the correct structure """
+    with mock.patch.object(IngestionListener, 'search_for_sample_relations', new=lambda: mocked_familial_relations):
+        relations = fresh_ingestion_queue_manager_for_testing.extract_sample_relations('dummy')
+        assert relations['sample_one'] == 'mother'
+        assert relations['sample_two'] == 'father'
+        assert relations['sample_three'] == 'proband'
+
+
 def test_ingestion_listener_run(testapp, mocked_vcf_file, gene_workbook, fresh_ingestion_queue_manager_for_testing,
                                 post_variant_consequence_items):
     """ Tests the 'run' method of ingestion listener, which will pull down and ingest a vcf file

@@ -311,6 +311,11 @@
                 }
             }
         },
+        "familial_relation": {
+            "title": "Familial Relation",
+            "description": "Relationship of the person who submitted this sample relative to the proband ie: proband,mother, father etc.",
+            "type": "string"
+        },
         "file": {
             "title": "File",
             "description": "String Accession of the vcf file used in digestion",

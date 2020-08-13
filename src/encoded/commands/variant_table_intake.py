@@ -490,6 +490,15 @@ class MappingTableParser(object):
             'description': 'Link to Genome Snapshot Image',
             'type': 'string'
         }
+        schema['properties']['familial_relation'] = {
+            'title': 'Familial Relation',
+            'description': 'Relationship of the person who submitted this sample relative to the proband ie: proband,'
+                           'mother, father etc.',
+            'type': 'string',
+            'enum': ['proband', 'father', 'mother', 'brother', 'sister', 'sibling', 'half-brother', 'half-sister',
+                     'half-sibling', 'wife', 'husband', 'grandson', 'granddaughter', 'grandchild',
+                     'grandmother', 'family-in-law', 'extended-family', 'not linked']
+        }
 
         # adds annotation ID field, effectively making display_title a primary key constraint
         self.add_identifier_field(schema['properties'])
