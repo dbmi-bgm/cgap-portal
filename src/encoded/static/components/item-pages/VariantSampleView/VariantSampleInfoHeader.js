@@ -262,6 +262,7 @@ function GDNAList({ context }){
     return renderedRows;
 }
 
+/** This might not be needed since there's a 'most severe consequence' field... oh well. */
 const CodingEffectValue = React.memo(function CodingEffectValue({ vep_consequence = [] }){
     // TODO grab most severe one?
     // This will likely need/get feedback and may change
@@ -279,11 +280,12 @@ const CodingEffectValue = React.memo(function CodingEffectValue({ vep_consequenc
     }
 
     const { display_title, coding_effect, '@id' : consequenceHref } = mostSevereConsequence;
-    return (
-        <a href={consequenceHref}>
-            { coding_effect || display_title }
-        </a>
-    );
+    // return (
+    //     <a href={consequenceHref}>
+    //         { coding_effect || display_title }
+    //     </a>
+    // );
+    return coding_effect || display_title;
 
 });
 CodingEffectValue.impactMap = {
