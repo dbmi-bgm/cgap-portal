@@ -7,11 +7,15 @@ import os
 import pkg_resources
 import subprocess
 import sys
+import sentry_sdk
 
 from dcicutils.beanstalk_utils import source_beanstalk_env_vars
+from dcicutils.env_utils import CGAP_ENV_WEBPROD
 from dcicutils.log_utils import set_logging
 from dcicutils.env_utils import get_mirror_env_from_context
 from dcicutils.ff_utils import get_health_page
+from sentry_sdk.integrations.pyramid import PyramidIntegration
+from sentry_sdk.integrations.sqlalchemy import SqlalchemyIntegration
 from pyramid.config import Configurator
 from pyramid_localroles import LocalRolesAuthorizationPolicy
 from pyramid.settings import asbool
@@ -195,6 +199,15 @@ def main(global_config, **local_config):
     # Load upgrades last so that all views (including testing views) are
     # registered.
     config.include('.upgrade')
+
+    # initialize sentry reporting, split into "production" and "testing", do nothing in local/testing
+    current_env = settings.get('env.name', None)
+    if current_env in [CGAP_ENV_WEBPROD]:
+        sentry_sdk.init("https://878c137aa36a4a5bafbb9809d6303deb@o427308.ingest.sentry.io/5389894",
+                        integrations=[PyramidIntegration(), SqlalchemyIntegration()])
+    elif current_env is not None:
+        sentry_sdk.init("https://3e791f3faed748e2911f2fa4a4ac73f2@o427308.ingest.sentry.io/5389896",
+                        integrations=[PyramidIntegration(), SqlalchemyIntegration()])
 
     app = config.make_wsgi_app()
 
