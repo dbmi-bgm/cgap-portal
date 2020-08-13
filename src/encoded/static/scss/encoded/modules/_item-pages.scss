@@ -2432,6 +2432,9 @@ $badge-item-min-height: 90px;
 				margin-bottom: 5px;
 				font-weight: 600;
 				border-radius: 0;
+				// cornflowerblue used in CaseView, re-used here.
+				// if we find we end up liking and using it another time or so,
+				// we should consider setting it as the $primary color perhaps?
 				background-color: cornflowerblue; // $primary-dark;
 				color: #fff;
 				&[disabled]{
@@ -2444,7 +2447,7 @@ $badge-item-min-height: 90px;
 					color: #000;
 					display: initial;
 					flex-direction: initial;
-					@include media-breakpoint-up(md){
+					@include media-breakpoint-up(lg){
 						border-top-right-radius: 0px;
 						border-top-right-radius: 0px;
 						&:after {
@@ -2452,8 +2455,8 @@ $badge-item-min-height: 90px;
 							position: absolute;
 							top: 0;
 							bottom: 0;
-							right: -3px;
-							width: 5px;
+							right: -4px;
+							width: 6px;
 							background-color: inherit;
 							border-top-right-radius: 0px;
 							border-bottom-right-radius: 0px;
@@ -2466,6 +2469,11 @@ $badge-item-min-height: 90px;
 			flex-basis: 320px;
 			min-width: 320px;
 			flex-grow: 1;
+			@include media-breakpoint-up(lg){
+				&.card {
+					border-top-left-radius: 0px;
+				}
+			}
 		}
 	}
 }

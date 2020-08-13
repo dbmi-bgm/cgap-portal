@@ -38,7 +38,7 @@ export function VariantTabBody ({ context, schemas }) {
                                 GnomAD
                             </h4>
                         </div>
-                        <div className="info-body">
+                        <div className="info-body overflow-auto">
                             <GnomADTable {...{ context, schemas, getTipForField }} />
                         </div>
                     </div>

@@ -38,7 +38,7 @@ OverviewTabView.getTabObject = function(props){
     return {
         'tab' : (
             <React.Fragment>
-                <i className="icon icon-sitemap fas icon-fw"/>
+                <i className="icon icon-eye-dropper fas icon-fw"/>
                 <span>Overview</span>
             </React.Fragment>
         ),

@@ -49,6 +49,7 @@ export function VariantSampleInfoHeader(props) {
         <span>
             { selectedGeneTitle }
             { currentGeneItemLoading ? <i className="ml-07 icon icon-spin fas icon-circle-notch"/> : null }
+            &nbsp;
         </span>
     ) : (geneTranscriptListLen === 0 ? <em>No genes available</em> : <em>No gene selected</em>);
 
@@ -75,7 +76,7 @@ export function VariantSampleInfoHeader(props) {
             <div className="card-body">
                 <div className="row flex-column flex-lg-row">
                     { caseID ?
-                        <div className="col col-lg-2 col-xl-1 d-flex flex-column">
+                        <div className="col pb-2 pb-lg-0 col-lg-2 col-xl-1 d-flex flex-column">
                             <div className="info-header-title">
                                 <h4>Case ID</h4>
                             </div>
@@ -84,7 +85,7 @@ export function VariantSampleInfoHeader(props) {
                             </div>
                         </div>
                         : null }
-                    <div className="col">
+                    <div className="col pb-2 pb-lg-0">
                         <div className="info-header-title">
                             <h4>Position</h4>
                         </div>
@@ -116,10 +117,12 @@ export function VariantSampleInfoHeader(props) {
 
                         </div>
                     </div>
-                    <div className="col">
+                    <div className="col pb-2 pb-lg-0">
                         <div className="d-flex">
-                            <div className="info-header-title">
-                                <DropdownButton title={geneTitleToShow} variant="outline-dark" onSelect={onSelectTranscript} disabled={geneTranscriptListLen === 0}>
+                            <div className="info-header-title" data-tip="Select a transcript (& gene) to view their details">
+                                {/* passing 'py-1' to className of button via `size` prop - kinda hacky - noting here in case changes in future version, or if find better prop to use */}
+                                <DropdownButton title={geneTitleToShow} size="lg py-1" variant="outline-dark" onSelect={onSelectTranscript}
+                                    disabled={geneTranscriptListLen === 0}>
                                     { geneListOptions }
                                 </DropdownButton>
                             </div>
