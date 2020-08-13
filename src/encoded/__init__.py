@@ -7,11 +7,15 @@ import os
 import pkg_resources
 import subprocess
 import sys
+import sentry_sdk
 
 from dcicutils.beanstalk_utils import source_beanstalk_env_vars
+from dcicutils.env_utils import CGAP_ENV_WEBPROD
 from dcicutils.log_utils import set_logging
 from dcicutils.env_utils import get_mirror_env_from_context
 from dcicutils.ff_utils import get_health_page
+from sentry_sdk.integrations.pyramid import PyramidIntegration
+from sentry_sdk.integrations.sqlalchemy import SqlalchemyIntegration
 from pyramid.config import Configurator
 from pyramid_localroles import LocalRolesAuthorizationPolicy
 from pyramid.settings import asbool
@@ -107,6 +111,12 @@ def app_version(config):
     # Fourfront does GA stuff here that makes no sense in CGAP (yet).
 
 
+def init_sentry(dsn):
+    """ Helper function that initializes sentry SDK if a dsn is specified. """
+    if dsn:
+        sentry_sdk.init(dsn, integrations=[PyramidIntegration(), SqlalchemyIntegration()])
+
+
 def main(global_config, **local_config):
     """
     This function returns a Pyramid WSGI application.
@@ -195,6 +205,9 @@ def main(global_config, **local_config):
     # Load upgrades last so that all views (including testing views) are
     # registered.
     config.include('.upgrade')
+
+    # initialize sentry reporting
+    init_sentry(settings.get('sentry_dsn', None))
 
     app = config.make_wsgi_app()
 
