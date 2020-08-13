@@ -11,7 +11,14 @@ import { Alerts } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/
 
 
 export function VariantSampleInfoHeader(props) {
-    const { context, currentTranscriptIdx, currentGeneItemLoading, onSelectTranscript, schemas } = props;
+    const {
+        context,
+        currentTranscriptIdx,
+        currentGeneItemLoading,
+        onSelectTranscript,
+        schemas,
+        caseID = <span className="text-muted">N/A</span> // null
+    } = props;
     const { variant = {} } = context;
     const {
         transcript: geneTranscriptList = [],
@@ -67,17 +74,16 @@ export function VariantSampleInfoHeader(props) {
         <div className="card mb-24">
             <div className="card-body">
                 <div className="row flex-column flex-lg-row">
-                    <div className="col col-lg-2 col-xl-1">
-                        <div className="info-header-title">
-                            <h4>Case ID</h4>
+                    { caseID ?
+                        <div className="col col-lg-2 col-xl-1 d-flex flex-column">
+                            <div className="info-header-title">
+                                <h4>Case ID</h4>
+                            </div>
+                            <div className="info-body flex-grow-1 d-flex align-items-center">
+                                <h4 className="text-400 text-center w-100">{ caseID }</h4>
+                            </div>
                         </div>
-                        <div className="info-body">
-                            {/** Can we get value for this from VariantSample Item itself?
-                              * If not, it could be an optional prop which if present, renders this <div className="col col-lg-2">..</div>,
-                              * else is just excluded?
-                              */}
-                        </div>
-                    </div>
+                        : null }
                     <div className="col">
                         <div className="info-header-title">
                             <h4>Position</h4>

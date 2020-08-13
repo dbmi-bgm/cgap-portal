@@ -33,7 +33,10 @@ export function VariantTabBody ({ context, schemas }) {
 
                     <div className="flex-grow-0 pb-2">
                         <div className="info-header-title">
-                            <h4>GnomAD</h4>
+                            <h4>
+                                {/* todo link to GnomAD -- is there a gnomad link somewhere ? */}
+                                GnomAD
+                            </h4>
                         </div>
                         <div className="info-body">
                             <GnomADTable {...{ context, schemas, getTipForField }} />
@@ -42,10 +45,12 @@ export function VariantTabBody ({ context, schemas }) {
 
                     <div className="flex-grow-1 pb-2 pb-md-0">
                         <div className="info-header-title">
-                            <h4>ClinVar</h4>
+                            <h4>
+                                {/* todo link to ClinVar */}
+                                ClinVar
+                            </h4>
                         </div>
                         <div className="info-body">
-                            {/* We could maybe rename+put `ExternalDatabasesSection` into own file (from GeneTabBody.js), parameterize itemtype for schemas, and re-use ? */}
                             <em>Todo</em>
                         </div>
                     </div>
