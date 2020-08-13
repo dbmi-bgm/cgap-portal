@@ -77,9 +77,6 @@ def get_fields_for_item_added_by_file():
     return item_fields
 
 
-ITEM_FIELDS = get_fields_for_item_added_by_file()
-
-
 def get_logger(lname, logfile):
     """logging setup
        logging config - to be moved to file at some point
@@ -292,7 +289,7 @@ def create_evi_annotation(data, hpoid2uuid, problems):
     return pheno_annot
 
 
-def compare_existing_to_newly_generated(logger, connection, evidence_items, itype):
+def compare_existing_to_newly_generated(logger, connection, evidence_items, itype, item_fields):
     """ gets all the existing evidence items from database and compares to all the newly
         generated ones from annotations and if found removes from list
     """
@@ -305,7 +302,7 @@ def compare_existing_to_newly_generated(logger, connection, evidence_items, ityp
     logger.info("comparing: {}".format(datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")))
     try:
         db_evi = next(dbitems)
-        tochk = convert2raw(db_evi)
+        tochk = convert2raw(db_evi, item_fields)
         if tochk in evidence_items:
             existing += 1
             evidence_items.remove(tochk)
@@ -314,20 +311,21 @@ def compare_existing_to_newly_generated(logger, connection, evidence_items, ityp
     except Exception as e:
         dbitems = []
     for db_evi in dbitems:
-        # import pdb; pdb.set_trace()
-        tochk = convert2raw(db_evi)
+        tochk = convert2raw(db_evi, item_fields)
         if tochk in evidence_items:
             existing += 1
             evidence_items.remove(tochk)
+            # TODO: get noo-file added fields to transfer if the item exists
+            # relevant only if other info is added to item via other means
         else:
             uids2obsolete.append(db_evi.get('uuid'))
     logger.info("result: {}".format(datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")))
     return evidence_items, existing, uids2obsolete
 
 
-def convert2raw(item):
+def convert2raw(item, item_fields):
     # need to remove properties not generated from file eg. calc props and others
-    stripped_item = {k: v for k, v in item.items() if k in ITEM_FIELDS}
+    stripped_item = {k: v for k, v in item.items() if k in item_fields}
     return get_raw_form(stripped_item)
 
 
@@ -454,7 +452,9 @@ def main():  # pragma: no cover
 
     logger.info("after parsing annotation file we have {} evidence items".format(len(evidence_items)))
 
-    evidence_items, existing, uids2obsolete = compare_existing_to_newly_generated(logger, connection, evidence_items, ITEMTYPE)
+    # get only the fields added from the file
+    item_fields = get_fields_for_item_added_by_file()
+    evidence_items, existing, uids2obsolete = compare_existing_to_newly_generated(logger, connection, evidence_items, ITEMTYPE, item_fields)
 
     logger.info('{} EXISTING DB ITEMS WILL NOT BE CHANGED'.format(existing))
     logger.info('{} EXISTING DB ITEMS WILL BE SET TO OBSOLETE'.format(len(uids2obsolete)))

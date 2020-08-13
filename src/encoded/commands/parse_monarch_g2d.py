@@ -34,6 +34,7 @@ from ..commands.parse_hpoa import (
     get_header_info_and_field_name_line,
     get_fields_from_line,
     compare_existing_to_newly_generated,
+    line2list,
 )
 from ..commands.load_items import load_items
 
@@ -72,19 +73,15 @@ FIELD_MAPPING = {
 }
 
 
-# def get_fields_for_item_added_by_file():
-#     ''' returns a list of all the property names of the item that are generated
-#         from the file - omits calc prop and other user editable fields like clinic_notes
-#         fields will be used to compare dbterms to terms from file
-#     '''
-#     item_fields = ['subject_item', 'object_item', 'relationship_name']
-#     to_add = [v for k, v in FIELD_MAPPING.items() if k not in ['Frequency', 'DiseaseName', 'HPO_ID']]
-#     item_fields.extend(to_add)
-#     item_fields.extend(FIELD_MAPPING.get('Frequency'))
-#     return item_fields
-#
-#
-# ITEM_FIELDS = get_fields_for_item_added_by_file()
+def get_fields_for_item_added_by_file():
+    ''' returns a list of all the property names of the item that are generated
+        from the file - omits calc prop and other user editable fields like clinic_notes
+        fields will be used to compare dbterms to terms from file
+    '''
+    item_fields = ['subject_item', 'object_item']
+    to_add = [v.get('field_name') for k, v in FIELD_MAPPING.items()]
+    item_fields.extend(to_add)
+    return item_fields
 
 
 def get_logger(lname, logfile):
@@ -344,7 +341,9 @@ def main():  # pragma: no cover
 
     logger.info("after parsing annotation file we have {} evidence items".format(len(evidence_items)))
 
-    evidence_items, existing, uids2obsolete = compare_existing_to_newly_generated(logger, connection, evidence_items, ITEMTYPE)
+    # get only the fields added from the file
+    item_fields = get_fields_for_item_added_by_file()
+    evidence_items, existing, uids2obsolete = compare_existing_to_newly_generated(logger, connection, evidence_items, ITEMTYPE, item_fields)
 
     logger.info('{} EXISTING DB ITEMS WILL NOT BE CHANGED'.format(existing))
     logger.info('{} EXISTING DB ITEMS WILL BE SET TO OBSOLETE'.format(len(uids2obsolete)))
