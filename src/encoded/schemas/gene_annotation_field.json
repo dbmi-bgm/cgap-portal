@@ -22,11 +22,6 @@
         "schema_version": {
             "default": "1"
         },
-        "no": {
-            "title": "Number",
-            "description": "Number on mapping table",
-            "type": "integer"
-        },
         "field_name": {
             "title": "Field Name",
             "description": "Original name of the annotation field name on vcf file",
@@ -118,11 +113,6 @@
             "title": "Maximum Value for this field",
             "type": "integer"
         },
-        "value_example": {
-            "title": "Example Value for this field",
-            "description": "Example Value for this field, stored as text",
-            "type": "string"
-        },
         "enum_list": {
             "title": "Enum List",
             "description": "List of possible values for this field if applicable",
@@ -178,11 +168,6 @@
             "title": "Calculated Property",
             "description": "Boolean on whether or not this field is a calculated property of a variant",
             "type": "boolean"
-        },
-        "comments": {
-            "title": "Comments",
-            "description": "Comments on this field",
-            "type": "string"
         }
     },
     "facets": {

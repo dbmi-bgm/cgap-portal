@@ -1,10 +1,19 @@
 import pytest
 
-from encoded.types.family import *
-
 from datetime import datetime
 # from unittest import mock
 from xml.etree.ElementTree import fromstring
+from ..types.family import (
+    Family,
+    add_to_clinic_notes,
+    affected_xml_to_phenotypic_features,
+    annotations_xml_ref_to_clinic_notes,
+    cause_of_death_xml_to_phenotype,
+    create_family_proband,
+    descendancy_xml_ref_to_parents,
+    diagnoses_xml_to_phenotypic_features,
+    etree_to_dict,
+)
 
 
 pytestmark = [pytest.mark.working, pytest.mark.schema]
@@ -186,7 +195,13 @@ def pedigree_ref_data(testapp):
             '2': {'proband': '0', 'relationships': {'@ref': '1'}, 'sex': 'F'},
             '3': {'proband': '1', 'relationships': None, 'descendancy': {'@ref': '1'}, 'sex': 'U', 'affected1': '1'},
             '1': {'active': '1', 'managedObjectID': '1', 'members': [{'@ref': '2'}, {'@ref': '0'}]},
-            'affected1': {'ageAtDx': None, 'causeOfDeath': None, 'id': 'HP:0002315', 'name': 'Headache', 'ontology': 'HPO'}
+            'affected1': {
+                'ageAtDx': None,
+                'causeOfDeath': None,
+                'id': 'HP:0002315',
+                'name': 'Headache',
+                'ontology': 'HPO'
+            }
         },
         'uuids_by_ref': {
             '0': '52e90271-2fac-4140-a0fb-16aa4697d6fe',
@@ -199,15 +214,35 @@ def pedigree_ref_data(testapp):
 @pytest.fixture
 def death_info(testapp):
     return [
-        {'causeOfDeathOntologyId': 'HP:0100651', 'causeOfDeathOntology': 'HPO', 'explicitlySetBiologicalMother': None,
-         'diagnoses': [
-             {'ageAtDx': '25', 'ageAtDxUnits': 'Y', 'causeOfDeath': None, 'modeOfInheritance': None, 'ontology': 'HPO', 'carrier': None,
-              'name': 'Type I diabetes mellitus', 'id': 'HP:0100651', 'order': '1', 'ontologyVersion': '2014-02-15 BUILD #889'}
-         ],
-         'sex': 'M', 'proband': '0', 'causeOfDeath': 'Type I diabetes mellitus', 'relationships': {'@ref': '11'},
-         'note': 'Date of death is 20s-30s', 'managedObjectID': '13', 'annotations': {'@ref': '14'}, 'ageAtDeathUnits': 'Y',
-         'ageAtDeath': '55', 'deceased': '1'
-         }
+        {
+            'causeOfDeathOntologyId': 'HP:0100651',
+            'causeOfDeathOntology': 'HPO',
+            'explicitlySetBiologicalMother': None,
+            'diagnoses': [
+                {
+                    'ageAtDx': '25',
+                    'ageAtDxUnits': 'Y',
+                    'causeOfDeath': None,
+                    'modeOfInheritance': None,
+                    'ontology': 'HPO',
+                    'carrier': None,
+                    'name': 'Type I diabetes mellitus',
+                    'id': 'HP:0100651',
+                    'order': '1',
+                    'ontologyVersion': '2014-02-15 BUILD #889'
+                }
+            ],
+            'sex': 'M',
+            'proband': '0',
+            'causeOfDeath': 'Type I diabetes mellitus',
+            'relationships': {'@ref': '11'},
+            'note': 'Date of death is 20s-30s',
+            'managedObjectID': '13',
+            'annotations': {'@ref': '14'},
+            'ageAtDeathUnits': 'Y',
+            'ageAtDeath': '55',
+            'deceased': '1'
+        }
     ]
 
 

@@ -538,7 +538,7 @@ def load_local_data(app, overwrite=False):
                 logger.info('Loading inserts from "{}" directory.'.format(test_insert_dir))
                 return load_data(app, docsdir='documents', indir=test_insert_dir,
                             use_master_inserts=False, overwrite=overwrite)
-    
+
     # Default to 'inserts' if no temp inserts found.
     return load_data(app, docsdir='documents', indir='inserts',
                          use_master_inserts=True, overwrite=overwrite)

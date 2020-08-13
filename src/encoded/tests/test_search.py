@@ -7,7 +7,8 @@ from dcicutils.misc_utils import Retry
 from pyramid.httpexceptions import HTTPBadRequest
 from snovault import TYPES, COLLECTIONS
 from snovault.elasticsearch import create_mapping
-from encoded.search.lucene_builder import LuceneBuilder
+from ..search import lucene_builder
+from ..search.lucene_builder import LuceneBuilder
 from snovault.elasticsearch.indexer_utils import get_namespaced_index
 from snovault.util import add_default_embeds
 from webtest import AppError
@@ -588,7 +589,7 @@ def test_search_with_hacked_query(anontestapp, hacked_query):
         verification function should throw an exception if there is any delta in the permissions object
         we explicitly attach to every search query.
     """
-    with mock.patch('encoded.search.lucene_builder.convert_search_to_dictionary', return_value=hacked_query):
+    with mock.patch.object(lucene_builder, 'convert_search_to_dictionary', return_value=hacked_query):
         mocked_request_with_least_permissive_permissions = MockedRequest()
         with pytest.raises(HTTPBadRequest):
             LuceneBuilder.verify_search_has_permissions(mocked_request_with_least_permissive_permissions, None)

@@ -1,8 +1,8 @@
 import os
 import argparse
 import logging
-from encoded.commands.variant_ingestion import run_variant_table_intake, run_ingest_vcf
-from encoded.commands.gene_ingestion import run_gene_table_intake, run_ingest_genes
+from ..commands.variant_ingestion import run_variant_table_intake, run_ingest_vcf
+from ..commands.gene_ingestion import run_gene_table_intake, run_ingest_genes
 from dcicutils.misc_utils import VirtualApp
 from dcicutils.env_utils import CGAP_ENV_DEV, CGAP_ENV_WOLF
 from pyramid.paster import get_app
