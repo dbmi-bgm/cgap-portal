@@ -176,15 +176,13 @@ def has_unexpected_members(members, expected_members):
     return [f for f in members if f not in expected_members]
 
 
-def get_header_info_and_field_name_line(lines, headermap=None, logger=None, first_nohash=True):
+def get_header_info_and_field_name_line(lines, headermap={}, logger=None, first_nohash=True):
     ''' Gets any hash commented lines at beginning of file and uses supplied
         field dict to parse out info from the header and log
         Also returns the line that contains field names - either:
         - the first uncommented line by default
         - or the final commented line of the header - first_nohash=False
     '''
-    if not headermap:
-        logger.info("Nothing provided to parse header info from file")
     hinfo = {}
     prev_line = None
     while True:
@@ -205,6 +203,8 @@ def get_header_info_and_field_name_line(lines, headermap=None, logger=None, firs
         logger.info("Annotation file info:\n")
         for f, v in hinfo.items():
             logger.info("\t{}: {}".format(f, v))
+    elif not headermap:
+        logger.info("Nothing provided to parse header info from file")
     else:
         logger.info("No header in the file")
     return line

@@ -54,15 +54,33 @@ def test_line2list():
     assert res == list
 
 
-def test_has_unexpected_fields_all_ok():
-    fm = ph.FIELD_MAPPING
-    assert not ph.has_unexpected_fields(fm)
+def test_has_unexpected_members_all_ok():
+    fm = ph.FIELD_MAPPING.keys()
+    em = list(fm)
+    assert not ph.has_unexpected_members(fm, em)
 
 
-def test_has_unexpected_fields_bad_field():
-    fm = ph.FIELD_MAPPING.copy()
-    fm['bad_field'] = 'blah'
-    assert 'bad_field' in ph.has_unexpected_fields(fm)
+def test_has_unexpected_members_bad_field():
+    fm = list(ph.FIELD_MAPPING.keys())
+    em = fm[:]
+    fm.append('bad_field')
+    assert 'bad_field' in ph.has_unexpected_members(fm, em)
+
+
+def test_get_fields_from_line_all_ok(mock_logger):
+    line = 'mockline'
+    with mock.patch.object(ph, 'line2list', return_value=list(ph.FIELD_MAPPING.keys())):
+        with mock.patch.object(ph, 'has_unexpected_members', return_value=[]):
+            fields = ph.get_fields_from_line(line, mock_logger, line)
+            assert fields == list(ph.FIELD_MAPPING.keys())
+
+
+def test_get_fields_from_line_bad_field(mock_logger):
+    line = 'mockline'
+    with mock.patch.object(ph, 'line2list', return_value=list(ph.FIELD_MAPPING.keys())):
+        with mock.patch.object(ph, 'has_unexpected_members', return_value=['bad_field']):
+            with pytest.raises(SystemExit):
+                ph.get_fields_from_line(line, mock_logger, line)
 
 
 @pytest.fixture
@@ -81,33 +99,47 @@ def mini_hpoa_lines():
     ]
 
 
-def test_get_header_info_and_field_names(capsys, mock_logger, mini_hpoa_lines):
-    with mock.patch.object(ph, 'has_unexpected_fields', return_value=False):
-        lfields = ph.line2list(mini_hpoa_lines[4])
-        fields, lines = ph.get_header_info_and_field_names(iter(mini_hpoa_lines), mock_logger)
-        assert fields == lfields
-        assert next(lines).startswith('OMIM:210100')
-        out = capsys.readouterr()[0]
-        assert out == 'INFO: Annotation file info:\n\tdate: 2019-11-08\n\tdescription: HPO annotations for rare diseases [7623: OMIM; 47: DECIPHER; 3771 ORPHANET]\n'
+def test_get_header_info_and_field_name_line_good_first_uncommented(capsys, mock_logger, mini_hpoa_lines):
+    testline = mini_hpoa_lines[4]
+    fieldline = ph.get_header_info_and_field_name_line(iter(mini_hpoa_lines), ph.HEADER_MAP, mock_logger)
+    assert fieldline == testline
+    out = capsys.readouterr()[0]
+    assert out.startswith('INFO: Annotation file info:\n')
+    assert '\tdate: 2019-11-08\n' in out
+    assert '\tdescription: HPO annotations for rare diseases [7623: OMIM; 47: DECIPHER; 3771 ORPHANET]\n'
 
 
-def test_get_header_info_and_field_names_no_comments(capsys, mock_logger, mini_hpoa_lines):
-    with mock.patch.object(ph, 'has_unexpected_fields', return_value=False):
-        lfields = ph.line2list(mini_hpoa_lines[4])
-        fields, lines = ph.get_header_info_and_field_names(iter(mini_hpoa_lines[4:]), mock_logger)
-        assert fields == lfields
-        assert next(lines).startswith('OMIM:210100')
-        out = capsys.readouterr()[0]
-        assert out == 'INFO: Annotation file info:\n\tdate: unknown\n\tdescription: unknown\n'
+def test_get_header_info_and_field_name_line_good_last_commented(capsys, mock_logger, mini_hpoa_lines):
+    testline = mini_hpoa_lines[3].replace('#', '').strip()
+    fieldline = ph.get_header_info_and_field_name_line(iter(mini_hpoa_lines), ph.HEADER_MAP, mock_logger, False)
+    assert fieldline == testline
+    out = capsys.readouterr()[0]
+    assert out.startswith('INFO: Annotation file info:\n')
+    assert '\tdate: 2019-11-08\n' in out
+    assert '\tdescription: HPO annotations for rare diseases [7623: OMIM; 47: DECIPHER; 3771 ORPHANET]\n'
 
 
-def test_get_header_info_and_field_names_misformatted(capsys, mock_logger, mini_hpoa_lines):
-    mini_hpoa_lines.insert(2, 'bad stuff')
-    with mock.patch.object(ph, 'has_unexpected_fields', return_value=['bad']):
-        with pytest.raises(SystemExit):
-            fields, lines = ph.get_header_info_and_field_names(iter(mini_hpoa_lines[4:]), mock_logger)
-        out = capsys.readouterr()[0]
-        assert out == 'INFO: Annotation file info:\n\tdate: unknown\n\tdescription: unknown\nERROR: UNKNOWN FIELDS FOUND: bad\n'
+def test_get_header_info_and_field_name_line_no_comment_lines(capsys, mock_logger, mini_hpoa_lines):
+    testline = mini_hpoa_lines[4]
+    fieldline = ph.get_header_info_and_field_name_line(iter(mini_hpoa_lines[4:]), ph.HEADER_MAP, mock_logger)
+    assert fieldline == testline
+    out = capsys.readouterr()[0]
+    assert out == "INFO: No header in the file\n"
+
+
+def test_get_header_info_and_field_name_line_no_comment_lines_try_last_commented(capsys, mock_logger, mini_hpoa_lines):
+    fieldline = ph.get_header_info_and_field_name_line(iter(mini_hpoa_lines[4:]), ph.HEADER_MAP, mock_logger, False)
+    assert not fieldline
+    out = capsys.readouterr()[0]
+    assert out == 'WARNING: Field name problem - fields expected in commented header lines but no commented lines found\n'
+
+
+def test_get_header_info_and_field_name_line_no_headermap(capsys, mock_logger, mini_hpoa_lines):
+    testline = mini_hpoa_lines[4]
+    fieldline = ph.get_header_info_and_field_name_line(iter(mini_hpoa_lines), {}, mock_logger)
+    assert fieldline == testline
+    out = capsys.readouterr()[0]
+    assert out == 'INFO: Nothing provided to parse header info from file\n'
 
 
 @pytest.fixture
@@ -273,7 +305,7 @@ def test_convert2raw(embedded_item_dict, raw_item_dict):
     embedded_item_dict['institution'] = '/institution/bwh'
     embedded_item_dict["principals_allowed"] = {"view": ["system.Everyone"], "edit": ["group.admin"]}
     with mock.patch.object(ph, 'get_raw_form', return_value=raw_item_dict):
-        raw_item = ph.convert2raw(embedded_item_dict)
+        raw_item = ph.convert2raw(embedded_item_dict, raw_item_dict.keys())
         assert raw_item == raw_item_dict
 
 
@@ -304,7 +336,7 @@ def evi_items():
 def test_compare_existing_to_newly_generated_all_new(mock_logger, connection, evi_items):
     itemcnt = len(evi_items)
     with mock.patch.object(ph, 'search_metadata', return_value=[]):
-        evi, exist, to_obs = ph.compare_existing_to_newly_generated(mock_logger, connection, evi_items, 'EvidenceDisPheno')
+        evi, exist, to_obs = ph.compare_existing_to_newly_generated(mock_logger, connection, evi_items, 'EvidenceDisPheno', evi_items[0].keys())
         assert evi == evi_items
         assert not to_obs
         assert exist == 0
@@ -312,9 +344,9 @@ def test_compare_existing_to_newly_generated_all_new(mock_logger, connection, ev
 
 def test_compare_existing_to_newly_generated_all_same(mock_logger, connection, evi_items):
     itemcnt = len(evi_items)
-    with mock.patch.object(ph, 'search_metadata', return_value=evi_items[:]):
-         with mock.patch.object(ph, 'get_raw_form', side_effect=evi_items[:]):
-            evi, exist, to_obs = ph.compare_existing_to_newly_generated(mock_logger, connection, evi_items, 'EvidenceDisPheno')
+    with mock.patch.object(ph, 'search_metadata', return_value=iter(evi_items[:])):
+        with mock.patch.object(ph, 'get_raw_form', side_effect=evi_items[:]):
+            evi, exist, to_obs = ph.compare_existing_to_newly_generated(mock_logger, connection, evi_items, 'EvidenceDisPheno', evi_items[0].keys())
             assert not evi
             assert not to_obs
             assert itemcnt == exist
@@ -325,9 +357,9 @@ def test_compare_existing_to_newly_generated_none_same(mock_logger, connection, 
     for e in evi_items:
         dbitems.append({k: v + '9' for k, v in e.items()})
     dbuuids = [d.get('uuid') for d in dbitems]
-    with mock.patch.object(ph, 'search_metadata', return_value=dbitems):
+    with mock.patch.object(ph, 'search_metadata', return_value=iter(dbitems)):
         with mock.patch.object(ph, 'get_raw_form', side_effect=dbitems):
-            evi, exist, to_obs = ph.compare_existing_to_newly_generated(mock_logger, connection, evi_items, 'EvidenceDisPheno')
+            evi, exist, to_obs = ph.compare_existing_to_newly_generated(mock_logger, connection, evi_items, 'EvidenceDisPheno', evi_items[0].keys())
             assert evi == evi_items
             assert to_obs == dbuuids
             assert exist == 0
