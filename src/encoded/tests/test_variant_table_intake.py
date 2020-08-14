@@ -29,6 +29,8 @@ VEP_CONSEQUENCE_EMBEDS = ['transcript.vep_consequence.var_conseq_id', 'transcrip
                           'transcript.vep_consequence.impact', 'transcript.vep_consequence.location',
                           'transcript.vep_consequence.coding_effect', 'transcript.vep_gene.display_title',
                           'transcript.vep_gene.gene_symbol', 'transcript.vep_gene.ensgid']
+VARIANT_TABLE_VERSION = 'annV0.4.8'
+VARIANT_TABLE_DATE = '08.13.2020'
 NUMBER_ANNOTATION_FIELDS = 354
 SAMPLE_FIELDS_EXPECTED = 27
 VARIANT_FIELDS_EXPECTED = 327
@@ -72,8 +74,8 @@ def test_add_default_schema_fields(MTParser):
 
 def test_read_variant_table_header(MTParser):
     """ Tests that we can read mapping table header correctly based on the current format """
-    assert MTParser.version == 'annV0.4.8'
-    assert MTParser.date == '08.13.2020'
+    assert MTParser.version == VARIANT_TABLE_VERSION
+    assert MTParser.date == VARIANT_TABLE_DATE
     assert sorted(MTParser.fields) == sorted(EXPECTED_FIELDS)
     for field in EXPECTED_FIELDS:  # all fields are categorized by the Parser
         assert field in MTParser.ALL_FIELDS
@@ -251,6 +253,6 @@ def test_post_inserts_via_run(MTParser, project, institution, testapp):
     """ Tests that we can run the above test using the 'run' method """
     inserts = MTParser.run(institution='encode-institution', project='encode-project',
                            vs_out=resolve_file_path('schemas/variant_sample.json'),
-                           v_out=resolve_file_path('schemas/variant.json'), write=True)  # enable to generate schemas
+                           v_out=resolve_file_path('schemas/variant.json'), write=False)  # enable to generate schemas
     for item in inserts:
         testapp.post_json(ANNOTATION_FIELD_URL, item, status=201)

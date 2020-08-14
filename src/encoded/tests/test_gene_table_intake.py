@@ -17,6 +17,8 @@ EXPECTED_INSERT = {'field_name': 'chrom',
                    'field_type': 'string', 'is_list': False,
                    'enum_list': ['1', '2', '3', '4', '5', '6','7', '8', '9', '10', '11', '12', '13', '14', '15', '16',
                                  '17', '18', '19', '20', '21', '22', 'X', 'Y', 'M']}
+GENE_TABLE_VERSION = 'gene_annV0.4.6'
+GENE_TABLE_DATE = '2020.08.13'
 CLINGENDIS_FIELDS_EXPECTED = 4
 TRANSCRIPT_FIELDS_EXPECTED = 15
 CHROM_INDEX = 84  # 84 is index of CHROM now
@@ -40,8 +42,8 @@ def gene_schema(GTParser, inserts):
 
 def test_read_gene_table_header(GTParser):
     """ Tests that we can read mapping table header correctly based on the current format """
-    assert GTParser.version == 'gene_annV0.4.6'
-    assert GTParser.date == '2020.08.13'
+    assert GTParser.version == GENE_TABLE_VERSION
+    assert GTParser.date == GENE_TABLE_DATE
     #assert sorted(GTParser.fields) == sorted(EXPECTED_FIELDS)  # Not harmonized at the moment
 
 

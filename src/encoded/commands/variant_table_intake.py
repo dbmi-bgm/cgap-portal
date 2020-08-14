@@ -492,8 +492,7 @@ class MappingTableParser(object):
         }
         schema['properties']['familial_relation'] = {
             'title': 'Familial Relation',
-            'description': 'Relationship of the person who submitted this sample relative to the proband ie: proband,'
-                           'mother, father etc.',
+            'description': 'Relationship of the person who submitted this sample relative to the proband',
             'type': 'string',
             'enum': ['proband', 'father', 'mother', 'brother', 'sister', 'sibling', 'half-brother', 'half-sister',
                      'half-sibling', 'wife', 'husband', 'grandson', 'granddaughter', 'grandchild',
