@@ -1,17 +1,123 @@
 [
     {
-        "uuid": "1ef57ffb-2c75-4621-a5fe-f583a90e040c",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-        "last_modified": {
-            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-            "date_modified": "2020-07-15T02:43:34.117441+00:00"
-        },
-        "date_created": "2020-07-15T02:39:47.508742+00:00",
-        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
         "overall_quality_status": "PASS",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
         "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
+        "status": "in review",
         "quickcheck": "OK",
+        "uuid": "1ef57ffb-2c75-4621-a5fe-f583a90e040c",
+        "date_created": "2020-07-15T02:39:47.508742+00:00",
         "schema_version": "1",
-        "status": "in review"
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+    },
+    {
+        "overall_quality_status": "PASS",
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "status": "in review",
+        "quickcheck": "OK",
+        "uuid": "a66a2390-bae0-41b4-945a-f1990aff3a8e",
+        "date_created": "2020-06-12T15:03:30.419296+00:00",
+        "schema_version": "1",
+        "submitted_by": "b041dba8-e2b2-4e54-a621-97edb508a0c4"
+    },
+    {
+        "overall_quality_status": "PASS",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
+        "status": "released",
+        "quickcheck": "OK",
+        "uuid": "9f86c3f6-2202-4fa1-b711-5b788623f9bf",
+        "date_created": "2020-07-15T02:39:47.761645+00:00",
+        "schema_version": "1",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+    },
+    {
+        "overall_quality_status": "PASS",
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "status": "in review",
+        "quickcheck": "OK",
+        "uuid": "a66688c5-aea7-47c3-9897-33cc3040697e",
+        "date_created": "2020-06-16T20:40:41.087864+00:00",
+        "schema_version": "1",
+        "submitted_by": "b041dba8-e2b2-4e54-a621-97edb508a0c4"
+    },
+    {
+        "overall_quality_status": "PASS",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
+        "status": "released",
+        "quickcheck": "OK",
+        "uuid": "7b965546-829b-4ccb-a7bd-412bfee31038",
+        "date_created": "2020-07-15T02:39:48.088143+00:00",
+        "schema_version": "1",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+    },
+    {
+        "overall_quality_status": "PASS",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
+        "status": "released",
+        "quickcheck": "OK",
+        "uuid": "3672769b-ae55-4b3d-a679-956e74bbfec3",
+        "date_created": "2020-07-15T02:39:48.404221+00:00",
+        "schema_version": "1",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+    },
+    {
+        "overall_quality_status": "PASS",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
+        "status": "released",
+        "quickcheck": "OK",
+        "uuid": "caba631a-908f-4a6e-a4bc-1f582d0f38bd",
+        "date_created": "2020-07-15T02:39:48.747476+00:00",
+        "schema_version": "1",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+    },
+    {
+        "overall_quality_status": "PASS",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
+        "status": "in review",
+        "quickcheck": "OK",
+        "uuid": "7c942764-3578-4d89-9a0e-25f5ae21c32b",
+        "date_created": "2020-07-15T02:39:49.112468+00:00",
+        "schema_version": "1",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+    },
+    {
+        "overall_quality_status": "PASS",
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "status": "in review",
+        "quickcheck": "OK",
+        "uuid": "63d1dd62-492b-4687-8122-8774c651a701",
+        "date_created": "2020-06-18T01:47:35.522802+00:00",
+        "schema_version": "1",
+        "submitted_by": "b041dba8-e2b2-4e54-a621-97edb508a0c4"
+    },
+    {
+        "overall_quality_status": "PASS",
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "status": "in review",
+        "quickcheck": "OK",
+        "uuid": "c05c5758-b323-4857-aec0-c9145a47ca85",
+        "date_created": "2020-06-18T17:51:41.317279+00:00",
+        "schema_version": "1",
+        "submitted_by": "b041dba8-e2b2-4e54-a621-97edb508a0c4"
+    },
+    {
+        "overall_quality_status": "PASS",
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "status": "in review",
+        "quickcheck": "OK",
+        "uuid": "4b96fb95-cb0d-44f5-83d9-8d8f39e9c73a",
+        "date_created": "2020-06-26T19:26:57.364758+00:00",
+        "schema_version": "1",
+        "submitted_by": "b041dba8-e2b2-4e54-a621-97edb508a0c4"
     }
 ]

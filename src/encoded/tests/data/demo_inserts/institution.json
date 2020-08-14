@@ -1,74 +1,62 @@
 [
     {
         "uuid": "84ac37a8-c135-4c95-86cb-93028399d37e",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-        "title": "Bioinformatics Core, HMS",
-        "date_created": "2020-07-15T02:37:35.895348+00:00",
-        "aliases": [
-            "hms-dbmi:bioinformatics_core"
-        ],
-        "last_modified": {
-            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-            "date_modified": "2020-07-15T02:41:05.259798+00:00"
-        },
         "contact_persons": [
             "1d524d43-01b5-4b71-94c6-32d2d09c8323"
         ],
-        "pi": "1d524d43-01b5-4b71-94c6-32d2d09c8323",
+        "aliases": [
+            "hms-dbmi:bioinformatics_core"
+        ],
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "status": "current",
+        "title": "Bioinformatics Core, HMS",
         "name": "Bioinformatics Core",
+        "date_created": "2020-07-15T02:37:35.895348+00:00",
         "schema_version": "1",
-        "status": "current"
+        "pi": "1d524d43-01b5-4b71-94c6-32d2d09c8323"
     },
     {
         "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-        "title": "HMS DBMI",
-        "date_created": "2020-07-15T02:26:28.666072+00:00",
-        "country": "USA",
-        "fax": "000-000-0000",
-        "state": "MA",
-        "phone2": "000-000-0000",
-        "phone1": "000-000-0000",
-        "name": "hms-dbmi",
-        "status": "current",
-        "uuid": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
-        "postal_code": "02115",
-        "schema_version": "1",
-        "last_modified": {
-            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-            "date_modified": "2020-07-15T02:41:05.684750+00:00"
-        },
         "address2": "10 Schattuck Street",
+        "date_created": "2020-07-15T02:26:28.666072+00:00",
+        "postal_code": "02115",
+        "status": "current",
+        "state": "MA",
+        "name": "hms-dbmi",
+        "country": "USA",
+        "phone2": "000-000-0000",
+        "city": "Boston",
         "contact_persons": [
             "986b362f-4eb6-4a9c-8173-3ab267307e3a"
         ],
-        "pi": "986b362f-4eb6-4a9c-8173-3ab267307e3a",
         "address1": "Biomedical Bioinfomatics",
-        "city": "Boston"
+        "title": "HMS DBMI",
+        "fax": "000-000-0000",
+        "uuid": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "phone1": "000-000-0000",
+        "schema_version": "1",
+        "pi": "986b362f-4eb6-4a9c-8173-3ab267307e3a"
     },
     {
         "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-        "title": "BWH",
-        "date_created": "2020-07-15T02:26:28.738572+00:00",
-        "country": "USA",
-        "fax": "000-000-0000",
-        "state": "MA",
-        "phone2": "000-000-0000",
-        "phone1": "000-000-0000",
-        "name": "bwh",
-        "status": "current",
-        "uuid": "828cd4fe-ebb0-4b36-ccbb-d2e3a36ca234",
-        "postal_code": "02115",
-        "schema_version": "1",
-        "last_modified": {
-            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-            "date_modified": "2020-07-15T02:41:05.559439+00:00"
-        },
         "address2": "75 Francis Street",
+        "date_created": "2020-07-15T02:26:28.738572+00:00",
+        "postal_code": "02115",
+        "status": "current",
+        "state": "MA",
+        "name": "bwh",
+        "country": "USA",
+        "phone2": "000-000-0000",
+        "city": "Boston",
         "contact_persons": [
             "986b362f-4eb6-4a9c-8173-3acba722bba1"
         ],
-        "pi": "986b362f-4eb6-4a9c-8173-3acba722bba1",
         "address1": "Brigham and Women's Hospital",
-        "city": "Boston"
+        "title": "BWH",
+        "fax": "000-000-0000",
+        "uuid": "828cd4fe-ebb0-4b36-ccbb-d2e3a36ca234",
+        "phone1": "000-000-0000",
+        "schema_version": "1",
+        "pi": "986b362f-4eb6-4a9c-8173-3acba722bba1"
     }
 ]

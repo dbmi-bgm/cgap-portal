@@ -1,35 +1,27 @@
 [
     {
-        "uuid": "f5210b6a-efcf-47bd-8f63-1f310072a4af",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-        "last_modified": {
-            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-            "date_modified": "2020-07-20T17:55:40.555279+00:00"
-        },
-        "date_created": "2020-07-20T17:55:40.546564+00:00",
-        "accession": "GAPREEF35XV3",
-        "description": "Report for NA12878 as secondary member of NA12879 analysis",
-        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
         "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
-        "status": "in review",
-        "schema_version": "1",
         "aliases": [
             "hms-dbmi:NA12878_mother_secondary_report"
-        ]
+        ],
+        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
+        "status": "in review",
+        "uuid": "f5210b6a-efcf-47bd-8f63-1f310072a4af",
+        "accession": "GAPREEF35XV3",
+        "date_created": "2020-07-20T17:55:40.546564+00:00",
+        "schema_version": "1",
+        "description": "Report for NA12878 as secondary member of NA12879 analysis",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
     },
     {
-        "uuid": "8dd51b60-2d65-4e74-ac86-08ff9159aaaa",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-        "last_modified": {
-            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-            "date_modified": "2020-07-20T17:51:43.580277+00:00"
-        },
-        "date_created": "2020-07-15T02:38:06.533666+00:00",
-        "accession": "GAPREEIM2FI1",
-        "description": "Report for proband of Platinum family trio",
         "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
         "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
+        "status": "in review",
+        "uuid": "8dd51b60-2d65-4e74-ac86-08ff9159aaaa",
+        "accession": "GAPREEIM2FI1",
+        "date_created": "2020-07-15T02:38:06.533666+00:00",
         "schema_version": "1",
-        "status": "in review"
+        "description": "Report for proband of Platinum family trio",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
     }
 ]

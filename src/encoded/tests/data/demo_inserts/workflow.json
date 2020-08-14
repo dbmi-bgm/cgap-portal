@@ -1,0 +1,4727 @@
+[
+    {
+        "docker_registry_url": "https://hub.docker.com/",
+        "version_upgrade_log": "Workflow is now using a single data source file instead of archive",
+        "status": "released",
+        "title": "Run mutanno annot plus output integrity-check",
+        "steps": [
+            {
+                "name": "annot",
+                "outputs": [
+                    {
+                        "name": "annotated_vcf",
+                        "target": [
+                            {
+                                "name": "annotated_vcf",
+                                "step": "vcf-integrity-check"
+                            }
+                        ],
+                        "meta": {
+                            "file_format": "vcf_gz",
+                            "type": "data file",
+                            "cardinality": "single",
+                            "global": true
+                        }
+                    }
+                ],
+                "inputs": [
+                    {
+                        "name": "input_vcf",
+                        "source": [
+                            {
+                                "name": "input_vcf"
+                            }
+                        ],
+                        "meta": {
+                            "file_format": "1b8f525f-aecb-4211-9ae5-a2c998b05599",
+                            "type": "data file",
+                            "cardinality": "single",
+                            "global": true
+                        }
+                    },
+                    {
+                        "name": "mti",
+                        "source": [
+                            {
+                                "name": "mti"
+                            }
+                        ],
+                        "meta": {
+                            "file_format": "d7fd1020-ae85-41a9-a45d-c66285efa996",
+                            "type": "reference file",
+                            "cardinality": "single",
+                            "global": true
+                        }
+                    },
+                    {
+                        "name": "chainfile",
+                        "source": [
+                            {
+                                "name": "chainfile"
+                            }
+                        ],
+                        "meta": {
+                            "file_format": "dd1ef82d-da5e-4680-bd5c-cf471a87eb5b",
+                            "type": "reference file",
+                            "cardinality": "single",
+                            "global": true
+                        }
+                    },
+                    {
+                        "name": "regions",
+                        "source": [
+                            {
+                                "name": "regions"
+                            }
+                        ],
+                        "meta": {
+                            "file_format": "0cd4e777-a596-4927-95c8-b07716121aa3",
+                            "type": "reference file",
+                            "cardinality": "single",
+                            "global": true
+                        }
+                    },
+                    {
+                        "name": "nthreads",
+                        "source": [
+                            {
+                                "name": "nthreads"
+                            }
+                        ],
+                        "meta": {
+                            "type": "parameter",
+                            "cardinality": "single",
+                            "global": true
+                        }
+                    }
+                ],
+                "meta": {
+                    "analysis_step_types": [
+                        "Run mutanno annot"
+                    ],
+                    "software_used": [
+                        "1d28b7b8-1033-492f-8a1a-d4ac5b1ab55e"
+                    ]
+                }
+            },
+            {
+                "name": "vcf-integrity-check",
+                "outputs": [
+                    {
+                        "name": "annotated_vcf-check",
+                        "target": [
+                            {
+                                "name": "annotated_vcf-check"
+                            }
+                        ],
+                        "meta": {
+                            "type": "QC",
+                            "cardinality": "single",
+                            "global": true
+                        }
+                    }
+                ],
+                "inputs": [
+                    {
+                        "name": "annotated_vcf",
+                        "source": [
+                            {
+                                "name": "annotated_vcf",
+                                "step": "annot"
+                            }
+                        ],
+                        "meta": {
+                            "file_format": "1b8f525f-aecb-4211-9ae5-a2c998b05599",
+                            "type": "data file",
+                            "cardinality": "single",
+                            "global": false
+                        }
+                    }
+                ],
+                "meta": {
+                    "analysis_step_types": [
+                        "Check integrity of vcf output file"
+                    ],
+                    "software_used": [
+                        "f7ac2c5f-9203-49fa-b918-cede02bf46f7"
+                    ]
+                }
+            }
+        ],
+        "description": "Run mutanno annot on vcf input file. Produce a fully-annotated vcf file. An integrity check is performed on the output file",
+        "docker_image_name": "cgap/cgap:v14",
+        "uuid": "62f16824-4d4b-43fb-9f2f-3bb5b328431a",
+        "category": [
+            "processing"
+        ],
+        "date_created": "2020-07-15T02:37:52.926202+00:00",
+        "schema_version": "7",
+        "cwl_child_filenames": [
+            "mutanno-annot.cwl",
+            "vcf-integrity-check.cwl"
+        ],
+        "arguments": [
+            {
+                "argument_type": "Input file",
+                "workflow_argument_name": "input_vcf",
+                "argument_format": "1b8f525f-aecb-4211-9ae5-a2c998b05599"
+            },
+            {
+                "argument_type": "Input file",
+                "workflow_argument_name": "mti",
+                "argument_format": "d7fd1020-ae85-41a9-a45d-c66285efa996"
+            },
+            {
+                "argument_type": "Input file",
+                "workflow_argument_name": "chainfile",
+                "argument_format": "dd1ef82d-da5e-4680-bd5c-cf471a87eb5b"
+            },
+            {
+                "argument_type": "Input file",
+                "workflow_argument_name": "regions",
+                "argument_format": "0cd4e777-a596-4927-95c8-b07716121aa3"
+            },
+            {
+                "argument_type": "Output processed file",
+                "secondary_file_formats": [
+                    "f84f1922-7f4e-4afc-922f-bec620969bf1"
+                ],
+                "workflow_argument_name": "annotated_vcf",
+                "argument_format": "1b8f525f-aecb-4211-9ae5-a2c998b05599"
+            },
+            {
+                "qc_type": "quality_metric_vcfcheck",
+                "qc_zipped": false,
+                "qc_html": false,
+                "qc_table": true,
+                "workflow_argument_name": "annotated_vcf-check",
+                "argument_to_be_attached_to": "annotated_vcf",
+                "qc_json": false,
+                "argument_type": "Output QC file"
+            },
+            {
+                "argument_type": "parameter",
+                "workflow_argument_name": "nthreads"
+            }
+        ],
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "previous_version": [
+            "883b7846-8c62-4f5a-a691-c84706420b93"
+        ],
+        "name": "workflow_mutanno-annot-check_v14",
+        "cwl_main_filename": "workflow_mutanno-annot_plus_vcf-integrity-check.cwl",
+        "workflow_language": "CWL",
+        "app_version": "v14",
+        "aliases": [
+            "cgap:workflow_mutanno-annot-check_v14"
+        ],
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "accession": "GAPLL6W5KV2Y",
+        "app_name": "workflow_mutanno-annot-check",
+        "cwl_directory_url_v1": "https://raw.githubusercontent.com/dbmi-bgm/cgap-pipeline/v14/cwl",
+        "cwl_pointer": "",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+    },
+    {
+        "docker_registry_url": "https://hub.docker.com/",
+        "status": "in review",
+        "title": "Run granite qcVCF",
+        "steps": [
+            {
+                "name": "granite",
+                "outputs": [
+                    {
+                        "name": "qc_json",
+                        "target": [
+                            {
+                                "name": "qc_json"
+                            }
+                        ],
+                        "meta": {
+                            "type": "QC",
+                            "cardinality": "single",
+                            "global": true
+                        }
+                    }
+                ],
+                "inputs": [
+                    {
+                        "name": "input_vcf",
+                        "source": [
+                            {
+                                "name": "input_vcf"
+                            }
+                        ],
+                        "meta": {
+                            "file_format": "fcc2647d-301b-4888-8d9d-83ea4270309c",
+                            "type": "data file",
+                            "cardinality": "single",
+                            "global": true
+                        }
+                    },
+                    {
+                        "name": "pedigree",
+                        "source": [
+                            {
+                                "name": "pedigree"
+                            }
+                        ],
+                        "meta": {
+                            "type": "parameter",
+                            "cardinality": "single",
+                            "global": true
+                        }
+                    },
+                    {
+                        "name": "samples",
+                        "source": [
+                            {
+                                "name": "samples"
+                            }
+                        ],
+                        "meta": {
+                            "type": "parameter",
+                            "cardinality": "single",
+                            "global": true
+                        }
+                    },
+                    {
+                        "name": "trio_errors",
+                        "source": [
+                            {
+                                "name": "trio_errors"
+                            }
+                        ],
+                        "meta": {
+                            "type": "parameter",
+                            "cardinality": "single",
+                            "global": true
+                        }
+                    },
+                    {
+                        "name": "het_hom",
+                        "source": [
+                            {
+                                "name": "het_hom"
+                            }
+                        ],
+                        "meta": {
+                            "type": "parameter",
+                            "cardinality": "single",
+                            "global": true
+                        }
+                    },
+                    {
+                        "name": "ti_tv",
+                        "source": [
+                            {
+                                "name": "ti_tv"
+                            }
+                        ],
+                        "meta": {
+                            "type": "parameter",
+                            "cardinality": "single",
+                            "global": true
+                        }
+                    }
+                ],
+                "meta": {
+                    "analysis_step_types": [
+                        "Run granite qcVCF"
+                    ],
+                    "software_used": [
+                        "48d44723-0ebe-4f12-a444-50cab323aad1"
+                    ]
+                }
+            }
+        ],
+        "description": "Run granite qcVCF on vcf input file. Produce a json report for quality metrics",
+        "docker_image_name": "cgap/qc:v1",
+        "uuid": "33a85705-b757-49e0-aaef-d786695d6d03",
+        "category": [
+            "QC"
+        ],
+        "date_created": "2020-07-15T02:37:53.471918+00:00",
+        "schema_version": "7",
+        "arguments": [
+            {
+                "argument_type": "Input file",
+                "workflow_argument_name": "input_vcf",
+                "argument_format": "fcc2647d-301b-4888-8d9d-83ea4270309c"
+            },
+            {
+                "qc_type": "quality_metric_vcfqc",
+                "qc_zipped": false,
+                "qc_html": false,
+                "qc_table": false,
+                "workflow_argument_name": "qc_json",
+                "argument_to_be_attached_to": "input_vcf",
+                "qc_json": true,
+                "argument_type": "Output QC file"
+            },
+            {
+                "argument_type": "parameter",
+                "workflow_argument_name": "pedigree"
+            },
+            {
+                "argument_type": "parameter",
+                "workflow_argument_name": "samples"
+            },
+            {
+                "argument_type": "parameter",
+                "workflow_argument_name": "trio_errors"
+            },
+            {
+                "argument_type": "parameter",
+                "workflow_argument_name": "het_hom"
+            },
+            {
+                "argument_type": "parameter",
+                "workflow_argument_name": "ti_tv"
+            }
+        ],
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "cwl_child_filenames": [],
+        "name": "workflow_granite-qcVCF_v1",
+        "cwl_main_filename": "granite-qcVCF.cwl",
+        "workflow_language": "CWL",
+        "app_version": "v1",
+        "aliases": [
+            "cgap:workflow_granite-qcVCF_v1"
+        ],
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "accession": "GAPXFA26IC9Q",
+        "app_name": "workflow_granite-qcVCF",
+        "cwl_directory_url_v1": "https://raw.githubusercontent.com/dbmi-bgm/cgap-qc/master/cwl/",
+        "cwl_pointer": "",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+    },
+    {
+        "docker_registry_url": "https://hub.docker.com/",
+        "status": "released",
+        "title": "Run gatk CombineGVCFs",
+        "steps": [
+            {
+                "name": "CombineGVCFs",
+                "outputs": [
+                    {
+                        "name": "combined_gvcf",
+                        "target": [
+                            {
+                                "name": "combined_gvcf"
+                            }
+                        ],
+                        "meta": {
+                            "file_format": "gvcf_gz",
+                            "type": "data file",
+                            "cardinality": "single",
+                            "global": true
+                        }
+                    }
+                ],
+                "inputs": [
+                    {
+                        "name": "input_gvcfs",
+                        "source": [
+                            {
+                                "name": "input_gvcfs"
+                            }
+                        ],
+                        "meta": {
+                            "file_format": "ad47d469-4561-4234-bce2-820f08f58e7c",
+                            "type": "data file",
+                            "cardinality": "array",
+                            "global": true
+                        }
+                    },
+                    {
+                        "name": "reference",
+                        "source": [
+                            {
+                                "name": "reference"
+                            }
+                        ],
+                        "meta": {
+                            "file_format": "5ced774b-a73e-4d1b-8186-d7fbbde7a3c2",
+                            "type": "reference file",
+                            "cardinality": "single",
+                            "global": true
+                        }
+                    },
+                    {
+                        "name": "chromosomes",
+                        "source": [
+                            {
+                                "name": "chromosomes"
+                            }
+                        ],
+                        "meta": {
+                            "file_format": "0cd4e777-a596-4927-95c8-b07716121aa3",
+                            "type": "reference file",
+                            "cardinality": "single",
+                            "global": true
+                        }
+                    },
+                    {
+                        "name": "nthreads",
+                        "source": [
+                            {
+                                "name": "nthreads"
+                            }
+                        ],
+                        "meta": {
+                            "type": "parameter",
+                            "cardinality": "single",
+                            "global": true
+                        }
+                    }
+                ],
+                "meta": {
+                    "analysis_step_types": [
+                        "Run gatk CombineGVCFs"
+                    ],
+                    "software_used": [
+                        "4ae88fb4-23f2-4939-8852-4644069d14d9"
+                    ]
+                }
+            }
+        ],
+        "description": "Run gatk CombineGVCFs on input g.vcf files",
+        "docker_image_name": "cgap/cgap:v13",
+        "uuid": "c7223a1c-ed48-4c54-a39f-35f05d61e850",
+        "category": [
+            "processing"
+        ],
+        "date_created": "2020-07-15T02:37:54.221330+00:00",
+        "schema_version": "7",
+        "arguments": [
+            {
+                "argument_type": "Input file",
+                "workflow_argument_name": "input_gvcfs",
+                "argument_format": "ad47d469-4561-4234-bce2-820f08f58e7c"
+            },
+            {
+                "argument_type": "Input file",
+                "workflow_argument_name": "reference",
+                "argument_format": "5ced774b-a73e-4d1b-8186-d7fbbde7a3c2"
+            },
+            {
+                "argument_type": "Input file",
+                "workflow_argument_name": "chromosomes",
+                "argument_format": "0cd4e777-a596-4927-95c8-b07716121aa3"
+            },
+            {
+                "argument_type": "Output processed file",
+                "secondary_file_formats": [
+                    "b01ee86e-b2c7-4725-81d7-798718674485"
+                ],
+                "workflow_argument_name": "combined_gvcf",
+                "argument_format": "ad47d469-4561-4234-bce2-820f08f58e7c"
+            },
+            {
+                "argument_type": "parameter",
+                "workflow_argument_name": "nthreads"
+            }
+        ],
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "cwl_child_filenames": [],
+        "name": "workflow_gatk-CombineGVCFs_v13",
+        "cwl_main_filename": "gatk-CombineGVCFs.cwl",
+        "workflow_language": "CWL",
+        "app_version": "v13",
+        "aliases": [
+            "cgap:workflow_gatk-CombineGVCFs_v13",
+            "cgap:workflow_gatk-CombineGVCFs_v12",
+            "cgap:workflow_gatk-CombineGVCFs_v11",
+            "cgap:workflow_gatk-CombineGVCFs_v10",
+            "cgap:workflow_gatk-CombineGVCFs_v9"
+        ],
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "accession": "GAPK5TL98R81",
+        "app_name": "workflow_gatk-CombineGVCFs",
+        "cwl_directory_url_v1": "https://raw.githubusercontent.com/dbmi-bgm/cgap-pipeline/v13/cwl",
+        "cwl_pointer": "",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+    },
+    {
+        "docker_registry_url": "https://hub.docker.com/",
+        "status": "released",
+        "cwl_directory_url": "https://raw.githubusercontent.com/dbmi-bgm/cgap-pipeline/v11/cwl",
+        "title": "Paired-end reads alignment to reference plus output integrity-check",
+        "steps": [
+            {
+                "name": "bwa-mem",
+                "outputs": [
+                    {
+                        "name": "raw_bam",
+                        "target": [
+                            {
+                                "name": "raw_bam",
+                                "step": "integrity-check"
+                            }
+                        ],
+                        "meta": {
+                            "file_format": "bam",
+                            "type": "data file",
+                            "cardinality": "single",
+                            "global": true
+                        }
+                    }
+                ],
+                "inputs": [
+                    {
+                        "name": "fastq_R1",
+                        "source": [
+                            {
+                                "name": "fastq_R1"
+                            }
+                        ],
+                        "meta": {
+                            "file_format": "c13d06cf-218e-4f61-aaf0-91f226248b2c",
+                            "type": "data file",
+                            "cardinality": "single",
+                            "global": true
+                        }
+                    },
+                    {
+                        "name": "fastq_R2",
+                        "source": [
+                            {
+                                "name": "fastq_R2"
+                            }
+                        ],
+                        "meta": {
+                            "file_format": "c13d06cf-218e-4f61-aaf0-91f226248b2c",
+                            "type": "data file",
+                            "cardinality": "single",
+                            "global": true
+                        }
+                    },
+                    {
+                        "name": "reference",
+                        "source": [
+                            {
+                                "name": "reference"
+                            }
+                        ],
+                        "meta": {
+                            "file_format": "813b0001-5f3f-4e28-9203-4cdf261e19c4",
+                            "type": "reference file",
+                            "cardinality": "single",
+                            "global": true
+                        }
+                    },
+                    {
+                        "name": "nthreads",
+                        "source": [
+                            {
+                                "name": "nthreads"
+                            }
+                        ],
+                        "meta": {
+                            "type": "parameter",
+                            "cardinality": "single",
+                            "global": true
+                        }
+                    }
+                ],
+                "meta": {
+                    "analysis_step_types": [
+                        "Align paired-end reads to reference genome"
+                    ],
+                    "software_used": [
+                        "42adeb1b-c46c-4ba8-b191-56036ddcd544"
+                    ]
+                }
+            },
+            {
+                "name": "integrity-check",
+                "outputs": [
+                    {
+                        "name": "raw_bam-check",
+                        "target": [
+                            {
+                                "name": "raw_bam-check"
+                            }
+                        ],
+                        "meta": {
+                            "type": "QC",
+                            "cardinality": "single",
+                            "global": true
+                        }
+                    }
+                ],
+                "inputs": [
+                    {
+                        "name": "raw_bam",
+                        "source": [
+                            {
+                                "name": "raw_bam",
+                                "step": "bwa-mem"
+                            }
+                        ],
+                        "meta": {
+                            "file_format": "d13d06cf-218e-4f61-aaf0-91f226248b3c",
+                            "type": "data file",
+                            "cardinality": "single",
+                            "global": false
+                        }
+                    },
+                    {
+                        "name": "count",
+                        "source": [
+                            {
+                                "name": "count"
+                            }
+                        ],
+                        "meta": {
+                            "type": "parameter",
+                            "cardinality": "single",
+                            "global": true
+                        }
+                    }
+                ],
+                "meta": {
+                    "analysis_step_types": [
+                        "Check integrity of output file"
+                    ],
+                    "software_used": [
+                        "3f2d3b0e-0365-4212-9468-c16ad9531c4d"
+                    ]
+                }
+            }
+        ],
+        "description": "Align paired-end reads to reference genome. Processing from fastq input files to bam output file. An integrity check is performed on the output file",
+        "docker_image_name": "cgap/cgap:v13",
+        "uuid": "9e094699-561b-4396-8d6a-ffc45f98c5e1",
+        "category": [
+            "processing"
+        ],
+        "date_created": "2020-07-15T02:37:54.716658+00:00",
+        "schema_version": "7",
+        "arguments": [
+            {
+                "argument_type": "Input file",
+                "workflow_argument_name": "fastq_R1",
+                "argument_format": "c13d06cf-218e-4f61-aaf0-91f226248b2c"
+            },
+            {
+                "argument_type": "Input file",
+                "workflow_argument_name": "fastq_R2",
+                "argument_format": "c13d06cf-218e-4f61-aaf0-91f226248b2c"
+            },
+            {
+                "argument_type": "Input file",
+                "workflow_argument_name": "reference",
+                "argument_format": "813b0001-5f3f-4e28-9203-4cdf261e19c4"
+            },
+            {
+                "argument_type": "Output processed file",
+                "workflow_argument_name": "raw_bam",
+                "argument_format": "d13d06cf-218e-4f61-aaf0-91f226248b3c"
+            },
+            {
+                "qc_type": "quality_metric_bamcheck",
+                "qc_zipped": false,
+                "qc_html": false,
+                "qc_table": true,
+                "workflow_argument_name": "raw_bam-check",
+                "argument_to_be_attached_to": "raw_bam",
+                "qc_json": false,
+                "argument_type": "Output QC file"
+            },
+            {
+                "argument_type": "parameter",
+                "workflow_argument_name": "nthreads"
+            },
+            {
+                "argument_type": "parameter",
+                "workflow_argument_name": "outdir"
+            },
+            {
+                "argument_type": "parameter",
+                "workflow_argument_name": "prefix"
+            },
+            {
+                "argument_type": "parameter",
+                "workflow_argument_name": "count"
+            }
+        ],
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "cwl_child_filenames": [
+            "bwa-mem-to-bam_no_unzip.cwl",
+            "integrity-check.cwl"
+        ],
+        "name": "workflow_bwa-mem_no_unzip-check_v13",
+        "cwl_main_filename": "workflow_bwa-mem-to-bam_no_unzip_plus_integrity-check.cwl",
+        "workflow_language": "CWL",
+        "app_version": "v13",
+        "aliases": [
+            "cgap:workflow_bwa-mem_no_unzip-check_v13",
+            "cgap:workflow_bwa-mem_no_unzip-check_v12",
+            "cgap:workflow_bwa-mem_no_unzip-check_v11",
+            "cgap:workflow_bwa-mem_no_unzip-check_v10",
+            "cgap:workflow_bwa-mem_no_unzip-check_v9"
+        ],
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "accession": "GAPWF9HYUJB9",
+        "app_name": "workflow_bwa-mem_no_unzip-check",
+        "cwl_directory_url_v1": "https://raw.githubusercontent.com/dbmi-bgm/cgap-pipeline/v13/cwl",
+        "cwl_pointer": "",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+    },
+    {
+        "docker_registry_url": "https://hub.docker.com/",
+        "status": "released",
+        "title": "Run mutanno annot plus output integrity-check",
+        "steps": [
+            {
+                "name": "annot",
+                "outputs": [
+                    {
+                        "name": "annotated_vcf",
+                        "target": [
+                            {
+                                "name": "annotated_vcf",
+                                "step": "vcf-integrity-check"
+                            }
+                        ],
+                        "meta": {
+                            "file_format": "vcf_gz",
+                            "type": "data file",
+                            "cardinality": "single",
+                            "global": true
+                        }
+                    }
+                ],
+                "inputs": [
+                    {
+                        "name": "input_vcf",
+                        "source": [
+                            {
+                                "name": "input_vcf"
+                            }
+                        ],
+                        "meta": {
+                            "file_format": "1b8f525f-aecb-4211-9ae5-a2c998b05599",
+                            "type": "data file",
+                            "cardinality": "single",
+                            "global": true
+                        }
+                    },
+                    {
+                        "name": "mti",
+                        "source": [
+                            {
+                                "name": "mti"
+                            }
+                        ],
+                        "meta": {
+                            "file_format": "d243d800-96b6-4b0a-a0ff-fc81be438365",
+                            "type": "reference file",
+                            "cardinality": "single",
+                            "global": true
+                        }
+                    },
+                    {
+                        "name": "regions",
+                        "source": [
+                            {
+                                "name": "regions"
+                            }
+                        ],
+                        "meta": {
+                            "file_format": "0cd4e777-a596-4927-95c8-b07716121aa3",
+                            "type": "reference file",
+                            "cardinality": "single",
+                            "global": true
+                        }
+                    },
+                    {
+                        "name": "blocksize",
+                        "source": [
+                            {
+                                "name": "blocksize"
+                            }
+                        ],
+                        "meta": {
+                            "type": "parameter",
+                            "cardinality": "single",
+                            "global": true
+                        }
+                    },
+                    {
+                        "name": "nthreads",
+                        "source": [
+                            {
+                                "name": "nthreads"
+                            }
+                        ],
+                        "meta": {
+                            "type": "parameter",
+                            "cardinality": "single",
+                            "global": true
+                        }
+                    }
+                ],
+                "meta": {
+                    "analysis_step_types": [
+                        "Run mutanno annot"
+                    ],
+                    "software_used": [
+                        "76479248-09d2-48e5-9ab3-94c167e51cc6"
+                    ]
+                }
+            },
+            {
+                "name": "vcf-integrity-check",
+                "outputs": [
+                    {
+                        "name": "annotated_vcf-check",
+                        "target": [
+                            {
+                                "name": "annotated_vcf-check"
+                            }
+                        ],
+                        "meta": {
+                            "type": "QC",
+                            "cardinality": "single",
+                            "global": true
+                        }
+                    }
+                ],
+                "inputs": [
+                    {
+                        "name": "annotated_vcf",
+                        "source": [
+                            {
+                                "name": "annotated_vcf",
+                                "step": "annot"
+                            }
+                        ],
+                        "meta": {
+                            "file_format": "1b8f525f-aecb-4211-9ae5-a2c998b05599",
+                            "type": "data file",
+                            "cardinality": "single",
+                            "global": false
+                        }
+                    }
+                ],
+                "meta": {
+                    "analysis_step_types": [
+                        "Check integrity of vcf output file"
+                    ],
+                    "software_used": [
+                        "f7ac2c5f-9203-49fa-b918-cede02bf46f7"
+                    ]
+                }
+            }
+        ],
+        "description": "Run mutanno annot on vcf input file. Produce a fully-annotated vcf file. An integrity check is performed on the output file",
+        "docker_image_name": "cgap/cgap:v13",
+        "uuid": "883b7846-8c62-4f5a-a691-c84706420b93",
+        "category": [
+            "processing"
+        ],
+        "date_created": "2020-07-15T02:37:54.975813+00:00",
+        "schema_version": "7",
+        "arguments": [
+            {
+                "argument_type": "Input file",
+                "workflow_argument_name": "input_vcf",
+                "argument_format": "1b8f525f-aecb-4211-9ae5-a2c998b05599"
+            },
+            {
+                "argument_type": "Input file",
+                "workflow_argument_name": "mti",
+                "argument_format": "d243d800-96b6-4b0a-a0ff-fc81be438365"
+            },
+            {
+                "argument_type": "Input file",
+                "workflow_argument_name": "regions",
+                "argument_format": "0cd4e777-a596-4927-95c8-b07716121aa3"
+            },
+            {
+                "argument_type": "Output processed file",
+                "secondary_file_formats": [
+                    "f84f1922-7f4e-4afc-922f-bec620969bf1"
+                ],
+                "workflow_argument_name": "annotated_vcf",
+                "argument_format": "1b8f525f-aecb-4211-9ae5-a2c998b05599"
+            },
+            {
+                "qc_type": "quality_metric_vcfcheck",
+                "qc_zipped": false,
+                "qc_html": false,
+                "qc_table": true,
+                "workflow_argument_name": "annotated_vcf-check",
+                "argument_to_be_attached_to": "annotated_vcf",
+                "qc_json": false,
+                "argument_type": "Output QC file"
+            },
+            {
+                "argument_type": "parameter",
+                "workflow_argument_name": "blocksize"
+            },
+            {
+                "argument_type": "parameter",
+                "workflow_argument_name": "nthreads"
+            }
+        ],
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "cwl_child_filenames": [
+            "mutanno-annot.cwl",
+            "vcf-integrity-check.cwl"
+        ],
+        "name": "workflow_mutanno-annot-check_v13",
+        "cwl_main_filename": "workflow_mutanno-annot_plus_vcf-integrity-check.cwl",
+        "workflow_language": "CWL",
+        "app_version": "v13",
+        "aliases": [
+            "cgap:workflow_mutanno-annot-check_v13"
+        ],
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "accession": "GAPL4C15KV2Y",
+        "app_name": "workflow_mutanno-annot-check",
+        "cwl_directory_url_v1": "https://raw.githubusercontent.com/dbmi-bgm/cgap-pipeline/v13/cwl",
+        "cwl_pointer": "",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+    },
+    {
+        "docker_registry_url": "https://hub.docker.com/",
+        "version_upgrade_log": "Error capture for parallel, redundant headerlines removed",
+        "status": "released",
+        "title": "Run gatk HaplotypeCaller",
+        "steps": [
+            {
+                "name": "HaplotypeCaller",
+                "outputs": [
+                    {
+                        "name": "gvcf",
+                        "target": [
+                            {
+                                "name": "gvcf"
+                            }
+                        ],
+                        "meta": {
+                            "file_format": "gvcf_gz",
+                            "type": "data file",
+                            "cardinality": "single",
+                            "global": true
+                        }
+                    }
+                ],
+                "inputs": [
+                    {
+                        "name": "input_bam",
+                        "source": [
+                            {
+                                "name": "input_bam"
+                            }
+                        ],
+                        "meta": {
+                            "file_format": "d13d06cf-218e-4f61-aaf0-91f226248b3c",
+                            "type": "data file",
+                            "cardinality": "single",
+                            "global": true
+                        }
+                    },
+                    {
+                        "name": "reference",
+                        "source": [
+                            {
+                                "name": "reference"
+                            }
+                        ],
+                        "meta": {
+                            "file_format": "5ced774b-a73e-4d1b-8186-d7fbbde7a3c2",
+                            "type": "reference file",
+                            "cardinality": "single",
+                            "global": true
+                        }
+                    },
+                    {
+                        "name": "regions",
+                        "source": [
+                            {
+                                "name": "regions"
+                            }
+                        ],
+                        "meta": {
+                            "file_format": "0cd4e777-a596-4927-95c8-b07716121aa3",
+                            "type": "reference file",
+                            "cardinality": "single",
+                            "global": true
+                        }
+                    },
+                    {
+                        "name": "threshold",
+                        "source": [
+                            {
+                                "name": "threshold"
+                            }
+                        ],
+                        "meta": {
+                            "type": "parameter",
+                            "cardinality": "single",
+                            "global": true
+                        }
+                    },
+                    {
+                        "name": "ERC",
+                        "source": [
+                            {
+                                "name": "ERC"
+                            }
+                        ],
+                        "meta": {
+                            "type": "parameter",
+                            "cardinality": "single",
+                            "global": true
+                        }
+                    },
+                    {
+                        "name": "nthreads",
+                        "source": [
+                            {
+                                "name": "nthreads"
+                            }
+                        ],
+                        "meta": {
+                            "type": "parameter",
+                            "cardinality": "single",
+                            "global": true
+                        }
+                    }
+                ],
+                "meta": {
+                    "analysis_step_types": [
+                        "Run gatk HaplotypeCaller"
+                    ],
+                    "software_used": [
+                        "4ae88fb4-23f2-4939-8852-4644069d14d9"
+                    ]
+                }
+            }
+        ],
+        "description": "Run gatk HaplotypeCaller on bam input file. Produce a g.vcf file",
+        "docker_image_name": "cgap/cgap:v13",
+        "uuid": "7fd67e19-3425-45f8-8149-c7cac4278fdb",
+        "category": [
+            "processing"
+        ],
+        "date_created": "2020-07-15T02:37:55.267882+00:00",
+        "schema_version": "7",
+        "cwl_child_filenames": [],
+        "arguments": [
+            {
+                "argument_type": "Input file",
+                "workflow_argument_name": "input_bam",
+                "argument_format": "d13d06cf-218e-4f61-aaf0-91f226248b3c"
+            },
+            {
+                "argument_type": "Input file",
+                "workflow_argument_name": "reference",
+                "argument_format": "5ced774b-a73e-4d1b-8186-d7fbbde7a3c2"
+            },
+            {
+                "argument_type": "Input file",
+                "workflow_argument_name": "regions",
+                "argument_format": "0cd4e777-a596-4927-95c8-b07716121aa3"
+            },
+            {
+                "argument_type": "Output processed file",
+                "secondary_file_formats": [
+                    "b01ee86e-b2c7-4725-81d7-798718674485"
+                ],
+                "workflow_argument_name": "gvcf",
+                "argument_format": "ad47d469-4561-4234-bce2-820f08f58e7c"
+            },
+            {
+                "argument_type": "parameter",
+                "workflow_argument_name": "threshold"
+            },
+            {
+                "argument_type": "parameter",
+                "workflow_argument_name": "ERC"
+            },
+            {
+                "argument_type": "parameter",
+                "workflow_argument_name": "nthreads"
+            }
+        ],
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "previous_version": [
+            "d6465b5f-1768-4c94-b025-edc96e101ac5"
+        ],
+        "name": "workflow_gatk-HaplotypeCaller_v13",
+        "cwl_main_filename": "gatk-HaplotypeCaller.cwl",
+        "workflow_language": "CWL",
+        "app_version": "v13",
+        "aliases": [
+            "cgap:workflow_gatk-HaplotypeCaller_v13",
+            "cgap:workflow_gatk-HaplotypeCaller_v12",
+            "cgap:workflow_gatk-HaplotypeCaller_v11"
+        ],
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "accession": "GAPG8T65T3X9",
+        "app_name": "workflow_gatk-HaplotypeCaller",
+        "cwl_directory_url_v1": "https://raw.githubusercontent.com/dbmi-bgm/cgap-pipeline/v13/cwl",
+        "cwl_pointer": "",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+    },
+    {
+        "docker_registry_url": "https://hub.docker.com/",
+        "version_upgrade_log": "Updated command line arguments and default to 0 for MQ and BQ thresholds",
+        "status": "released",
+        "title": "Run granite mpileupCounts",
+        "steps": [
+            {
+                "name": "granite",
+                "outputs": [
+                    {
+                        "name": "rck",
+                        "target": [
+                            {
+                                "name": "rck"
+                            }
+                        ],
+                        "meta": {
+                            "file_format": "rck_gz",
+                            "type": "data file",
+                            "cardinality": "single",
+                            "global": true
+                        }
+                    }
+                ],
+                "inputs": [
+                    {
+                        "name": "input_bam",
+                        "source": [
+                            {
+                                "name": "input_bam"
+                            }
+                        ],
+                        "meta": {
+                            "file_format": "d13d06cf-218e-4f61-aaf0-91f226248b3c",
+                            "type": "data file",
+                            "cardinality": "single",
+                            "global": true
+                        }
+                    },
+                    {
+                        "name": "reference",
+                        "source": [
+                            {
+                                "name": "reference"
+                            }
+                        ],
+                        "meta": {
+                            "file_format": "5ced774b-a73e-4d1b-8186-d7fbbde7a3c2",
+                            "type": "reference file",
+                            "cardinality": "single",
+                            "global": true
+                        }
+                    },
+                    {
+                        "name": "regions",
+                        "source": [
+                            {
+                                "name": "regions"
+                            }
+                        ],
+                        "meta": {
+                            "file_format": "0cd4e777-a596-4927-95c8-b07716121aa3",
+                            "type": "reference file",
+                            "cardinality": "single",
+                            "global": true
+                        }
+                    },
+                    {
+                        "name": "nthreads",
+                        "source": [
+                            {
+                                "name": "nthreads"
+                            }
+                        ],
+                        "meta": {
+                            "type": "parameter",
+                            "cardinality": "single",
+                            "global": true
+                        }
+                    },
+                    {
+                        "name": "MQthr",
+                        "source": [
+                            {
+                                "name": "MQthr"
+                            }
+                        ],
+                        "meta": {
+                            "type": "parameter",
+                            "cardinality": "single",
+                            "global": true
+                        }
+                    },
+                    {
+                        "name": "BQthr",
+                        "source": [
+                            {
+                                "name": "BQthr"
+                            }
+                        ],
+                        "meta": {
+                            "type": "parameter",
+                            "cardinality": "single",
+                            "global": true
+                        }
+                    }
+                ],
+                "meta": {
+                    "analysis_step_types": [
+                        "Run granite mpileupCounts"
+                    ],
+                    "software_used": [
+                        "5a0b864e-dc16-4484-bcf3-c64e35a25df9"
+                    ]
+                }
+            }
+        ],
+        "description": "Run granite mpileupCounts on bam input file. Produce a rck.gz file",
+        "docker_image_name": "cgap/cgap:v14",
+        "uuid": "6e89bc5d-b4a0-4954-9c3f-361477d5f537",
+        "category": [
+            "processing"
+        ],
+        "date_created": "2020-07-15T02:37:55.573405+00:00",
+        "schema_version": "7",
+        "cwl_child_filenames": [],
+        "arguments": [
+            {
+                "argument_type": "Input file",
+                "workflow_argument_name": "input_bam",
+                "argument_format": "d13d06cf-218e-4f61-aaf0-91f226248b3c"
+            },
+            {
+                "argument_type": "Input file",
+                "workflow_argument_name": "reference",
+                "argument_format": "5ced774b-a73e-4d1b-8186-d7fbbde7a3c2"
+            },
+            {
+                "argument_type": "Input file",
+                "workflow_argument_name": "regions",
+                "argument_format": "0cd4e777-a596-4927-95c8-b07716121aa3"
+            },
+            {
+                "argument_type": "Output processed file",
+                "secondary_file_formats": [
+                    "c55ace88-3289-49b0-a67a-c046e1004e5a"
+                ],
+                "workflow_argument_name": "rck",
+                "argument_format": "20d4d3aa-5f1c-4b75-9e25-73f9f370fefa"
+            },
+            {
+                "argument_type": "parameter",
+                "workflow_argument_name": "nthreads"
+            },
+            {
+                "argument_type": "parameter",
+                "workflow_argument_name": "MQthr"
+            },
+            {
+                "argument_type": "parameter",
+                "workflow_argument_name": "BQthr"
+            }
+        ],
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "previous_version": [
+            "e5c178cf-4b5c-488b-b4cc-08273d11697d"
+        ],
+        "name": "workflow_granite-mpileupCounts_v14",
+        "cwl_main_filename": "granite-mpileupCounts.cwl",
+        "workflow_language": "CWL",
+        "app_version": "v14",
+        "aliases": [
+            "cgap:workflow_granite-mpileupCounts_v14"
+        ],
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "accession": "GAPFK84GT38L",
+        "app_name": "workflow_granite-mpileupCounts",
+        "cwl_directory_url_v1": "https://raw.githubusercontent.com/dbmi-bgm/cgap-pipeline/v14/cwl",
+        "cwl_pointer": "",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+    },
+    {
+        "docker_registry_url": "https://hub.docker.com/",
+        "status": "released",
+        "title": "Run gatk ApplyBQSR plus output integrity-check",
+        "steps": [
+            {
+                "name": "ApplyBQSR",
+                "outputs": [
+                    {
+                        "name": "recalibrated_bam",
+                        "target": [
+                            {
+                                "name": "recalibrated_bam",
+                                "step": "integrity-check"
+                            }
+                        ],
+                        "meta": {
+                            "file_format": "bam",
+                            "type": "data file",
+                            "cardinality": "single",
+                            "global": true
+                        }
+                    }
+                ],
+                "inputs": [
+                    {
+                        "name": "input_bam",
+                        "source": [
+                            {
+                                "name": "input_bam"
+                            }
+                        ],
+                        "meta": {
+                            "file_format": "d13d06cf-218e-4f61-aaf0-91f226248b3c",
+                            "type": "data file",
+                            "cardinality": "single",
+                            "global": true
+                        }
+                    },
+                    {
+                        "name": "recalibration_report",
+                        "source": [
+                            {
+                                "name": "recalibration_report"
+                            }
+                        ],
+                        "meta": {
+                            "file_format": "0cd4e777-a596-4927-95c8-b07716121aa3",
+                            "type": "data file",
+                            "cardinality": "single",
+                            "global": true
+                        }
+                    },
+                    {
+                        "name": "reference",
+                        "source": [
+                            {
+                                "name": "reference"
+                            }
+                        ],
+                        "meta": {
+                            "file_format": "5ced774b-a73e-4d1b-8186-d7fbbde7a3c2",
+                            "type": "reference file",
+                            "cardinality": "single",
+                            "global": true
+                        }
+                    },
+                    {
+                        "name": "static-quantized-quals_1",
+                        "source": [
+                            {
+                                "name": "static-quantized-quals_1"
+                            }
+                        ],
+                        "meta": {
+                            "type": "parameter",
+                            "cardinality": "single",
+                            "global": true
+                        }
+                    },
+                    {
+                        "name": "static-quantized-quals_2",
+                        "source": [
+                            {
+                                "name": "static-quantized-quals_2"
+                            }
+                        ],
+                        "meta": {
+                            "type": "parameter",
+                            "cardinality": "single",
+                            "global": true
+                        }
+                    },
+                    {
+                        "name": "static-quantized-quals_3",
+                        "source": [
+                            {
+                                "name": "static-quantized-quals_3"
+                            }
+                        ],
+                        "meta": {
+                            "type": "parameter",
+                            "cardinality": "single",
+                            "global": true
+                        }
+                    }
+                ],
+                "meta": {
+                    "analysis_step_types": [
+                        "Run gatk ApplyBQSR"
+                    ],
+                    "software_used": [
+                        "4ae88fb4-23f2-4939-8852-4644069d14d9"
+                    ]
+                }
+            },
+            {
+                "name": "integrity-check",
+                "outputs": [
+                    {
+                        "name": "recalibrated_bam-check",
+                        "target": [
+                            {
+                                "name": "recalibrated_bam-check"
+                            }
+                        ],
+                        "meta": {
+                            "type": "QC",
+                            "cardinality": "single",
+                            "global": true
+                        }
+                    }
+                ],
+                "inputs": [
+                    {
+                        "name": "recalibrated_bam",
+                        "source": [
+                            {
+                                "name": "recalibrated_bam",
+                                "step": "ApplyBQSR"
+                            }
+                        ],
+                        "meta": {
+                            "file_format": "d13d06cf-218e-4f61-aaf0-91f226248b3c",
+                            "type": "data file",
+                            "cardinality": "single",
+                            "global": false
+                        }
+                    },
+                    {
+                        "name": "count",
+                        "source": [
+                            {
+                                "name": "count"
+                            }
+                        ],
+                        "meta": {
+                            "type": "parameter",
+                            "cardinality": "single",
+                            "global": true
+                        }
+                    }
+                ],
+                "meta": {
+                    "analysis_step_types": [
+                        "Check integrity of output file"
+                    ],
+                    "software_used": [
+                        "3f2d3b0e-0365-4212-9468-c16ad9531c4d"
+                    ]
+                }
+            }
+        ],
+        "description": "Run gatk ApplyBQSR on bam input file. Produce a recalibrated bam file. An integrity check is performed on the output file",
+        "docker_image_name": "cgap/cgap:v13",
+        "uuid": "6c9c6f49-f954-4e76-8dfb-d385cddcebd6",
+        "category": [
+            "processing"
+        ],
+        "date_created": "2020-07-15T02:37:55.908471+00:00",
+        "schema_version": "7",
+        "arguments": [
+            {
+                "argument_type": "Input file",
+                "workflow_argument_name": "input_bam",
+                "argument_format": "d13d06cf-218e-4f61-aaf0-91f226248b3c"
+            },
+            {
+                "argument_type": "Input file",
+                "workflow_argument_name": "reference",
+                "argument_format": "5ced774b-a73e-4d1b-8186-d7fbbde7a3c2"
+            },
+            {
+                "argument_type": "Input file",
+                "workflow_argument_name": "recalibration_report",
+                "argument_format": "0cd4e777-a596-4927-95c8-b07716121aa3"
+            },
+            {
+                "argument_type": "Output processed file",
+                "secondary_file_formats": [
+                    "d13d06c1-218e-4f61-aaf0-91f226248b3c"
+                ],
+                "workflow_argument_name": "recalibrated_bam",
+                "argument_format": "d13d06cf-218e-4f61-aaf0-91f226248b3c"
+            },
+            {
+                "qc_type": "quality_metric_bamcheck",
+                "qc_zipped": false,
+                "qc_html": false,
+                "qc_table": true,
+                "workflow_argument_name": "recalibrated_bam-check",
+                "argument_to_be_attached_to": "recalibrated_bam",
+                "qc_json": false,
+                "argument_type": "Output QC file"
+            },
+            {
+                "argument_type": "parameter",
+                "workflow_argument_name": "static-quantized-quals_1"
+            },
+            {
+                "argument_type": "parameter",
+                "workflow_argument_name": "static-quantized-quals_2"
+            },
+            {
+                "argument_type": "parameter",
+                "workflow_argument_name": "static-quantized-quals_3"
+            },
+            {
+                "argument_type": "parameter",
+                "workflow_argument_name": "count"
+            }
+        ],
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "cwl_child_filenames": [
+            "gatk-ApplyBQSR.cwl",
+            "integrity-check.cwl"
+        ],
+        "name": "workflow_gatk-ApplyBQSR-check_v13",
+        "cwl_main_filename": "workflow_gatk-ApplyBQSR_plus_integrity-check.cwl",
+        "workflow_language": "CWL",
+        "app_version": "v13",
+        "aliases": [
+            "cgap:workflow_gatk-ApplyBQSR-check_v13",
+            "cgap:workflow_gatk-ApplyBQSR-check_v12",
+            "cgap:workflow_gatk-ApplyBQSR-check_v11",
+            "cgap:workflow_gatk-ApplyBQSR-check_v10",
+            "cgap:workflow_gatk-ApplyBQSR-check_v9"
+        ],
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "accession": "GAPWF2MHT4SY",
+        "app_name": "workflow_gatk-ApplyBQSR-check",
+        "cwl_directory_url_v1": "https://raw.githubusercontent.com/dbmi-bgm/cgap-pipeline/v13/cwl",
+        "cwl_pointer": "",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+    },
+    {
+        "docker_registry_url": "https://hub.docker.com/",
+        "version_upgrade_log": "Internal parallelization",
+        "status": "released",
+        "title": "Run gatk GenotypeGVCFs plus output integrity-check",
+        "steps": [
+            {
+                "name": "GenotypeGVCFs",
+                "outputs": [
+                    {
+                        "name": "vcf",
+                        "target": [
+                            {
+                                "name": "vcf",
+                                "step": "vcf-integrity-check"
+                            }
+                        ],
+                        "meta": {
+                            "file_format": "vcf_gz",
+                            "type": "data file",
+                            "cardinality": "single",
+                            "global": true
+                        }
+                    }
+                ],
+                "inputs": [
+                    {
+                        "name": "input_gvcf",
+                        "source": [
+                            {
+                                "name": "input_gvcf"
+                            }
+                        ],
+                        "meta": {
+                            "file_format": "ad47d469-4561-4234-bce2-820f08f58e7c",
+                            "type": "data file",
+                            "cardinality": "single",
+                            "global": true
+                        }
+                    },
+                    {
+                        "name": "reference",
+                        "source": [
+                            {
+                                "name": "reference"
+                            }
+                        ],
+                        "meta": {
+                            "file_format": "5ced774b-a73e-4d1b-8186-d7fbbde7a3c2",
+                            "type": "reference file",
+                            "cardinality": "single",
+                            "global": true
+                        }
+                    },
+                    {
+                        "name": "known-sites-snp",
+                        "source": [
+                            {
+                                "name": "known-sites-snp"
+                            }
+                        ],
+                        "meta": {
+                            "file_format": "1b8f525f-aecb-4211-9ae5-a2c998b05599",
+                            "type": "reference file",
+                            "cardinality": "single",
+                            "global": true
+                        }
+                    },
+                    {
+                        "name": "chromosomes",
+                        "source": [
+                            {
+                                "name": "chromosomes"
+                            }
+                        ],
+                        "meta": {
+                            "file_format": "0cd4e777-a596-4927-95c8-b07716121aa3",
+                            "type": "reference file",
+                            "cardinality": "single",
+                            "global": true
+                        }
+                    },
+                    {
+                        "name": "nthreads",
+                        "source": [
+                            {
+                                "name": "nthreads"
+                            }
+                        ],
+                        "meta": {
+                            "type": "parameter",
+                            "cardinality": "single",
+                            "global": true
+                        }
+                    }
+                ],
+                "meta": {
+                    "analysis_step_types": [
+                        "Run gatk GenotypeGVCFs"
+                    ],
+                    "software_used": [
+                        "4ae88fb4-23f2-4939-8852-4644069d14d9"
+                    ]
+                }
+            },
+            {
+                "name": "vcf-integrity-check",
+                "outputs": [
+                    {
+                        "name": "vcf-check",
+                        "target": [
+                            {
+                                "name": "vcf-check"
+                            }
+                        ],
+                        "meta": {
+                            "type": "QC",
+                            "cardinality": "single",
+                            "global": true
+                        }
+                    }
+                ],
+                "inputs": [
+                    {
+                        "name": "vcf",
+                        "source": [
+                            {
+                                "name": "vcf",
+                                "step": "GenotypeGVCFs"
+                            }
+                        ],
+                        "meta": {
+                            "file_format": "1b8f525f-aecb-4211-9ae5-a2c998b05599",
+                            "type": "data file",
+                            "cardinality": "single",
+                            "global": false
+                        }
+                    }
+                ],
+                "meta": {
+                    "analysis_step_types": [
+                        "Check integrity of vcf output file"
+                    ],
+                    "software_used": [
+                        "f7ac2c5f-9203-49fa-b918-cede02bf46f7"
+                    ]
+                }
+            }
+        ],
+        "description": "Run gatk GenotypeGVCFs on g.vcf input file. Produce a vcf file. An integrity check is performed on the output file",
+        "docker_image_name": "cgap/cgap:v13",
+        "uuid": "4fbad226-859d-40d4-8192-10c305e819da",
+        "category": [
+            "processing"
+        ],
+        "date_created": "2020-07-15T02:37:53.217172+00:00",
+        "schema_version": "7",
+        "cwl_child_filenames": [
+            "gatk-GenotypeGVCFs.cwl",
+            "vcf-integrity-check.cwl"
+        ],
+        "arguments": [
+            {
+                "argument_type": "Input file",
+                "workflow_argument_name": "input_gvcf",
+                "argument_format": "ad47d469-4561-4234-bce2-820f08f58e7c"
+            },
+            {
+                "argument_type": "Input file",
+                "workflow_argument_name": "reference",
+                "argument_format": "5ced774b-a73e-4d1b-8186-d7fbbde7a3c2"
+            },
+            {
+                "argument_type": "Input file",
+                "workflow_argument_name": "known-sites-snp",
+                "argument_format": "1b8f525f-aecb-4211-9ae5-a2c998b05599"
+            },
+            {
+                "argument_type": "Input file",
+                "workflow_argument_name": "chromosomes",
+                "argument_format": "0cd4e777-a596-4927-95c8-b07716121aa3"
+            },
+            {
+                "argument_type": "Output processed file",
+                "secondary_file_formats": [
+                    "f84f1922-7f4e-4afc-922f-bec620969bf1"
+                ],
+                "workflow_argument_name": "vcf",
+                "argument_format": "1b8f525f-aecb-4211-9ae5-a2c998b05599"
+            },
+            {
+                "qc_type": "quality_metric_vcfcheck",
+                "qc_zipped": false,
+                "qc_html": false,
+                "qc_table": true,
+                "workflow_argument_name": "vcf-check",
+                "argument_to_be_attached_to": "vcf",
+                "qc_json": false,
+                "argument_type": "Output QC file"
+            },
+            {
+                "argument_type": "parameter",
+                "workflow_argument_name": "nthreads"
+            }
+        ],
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "previous_version": [
+            "be5b7395-ddf1-4d60-85ea-650d5d9210ea"
+        ],
+        "name": "workflow_gatk-GenotypeGVCFs-check_v13",
+        "cwl_main_filename": "workflow_gatk-GenotypeGVCFs_plus_vcf-integrity-check.cwl",
+        "workflow_language": "CWL",
+        "app_version": "v13",
+        "aliases": [
+            "cgap:workflow_gatk-GenotypeGVCFs-check_v13",
+            "cgap:workflow_gatk-GenotypeGVCFs-check_v12",
+            "cgap:workflow_gatk-GenotypeGVCFs-check_v11"
+        ],
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "accession": "GAPK956PL2H2",
+        "app_name": "workflow_gatk-GenotypeGVCFs-check",
+        "cwl_directory_url_v1": "https://raw.githubusercontent.com/dbmi-bgm/cgap-pipeline/v13/cwl",
+        "cwl_pointer": "",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+    },
+    {
+        "docker_registry_url": "https://hub.docker.com/",
+        "status": "released",
+        "title": "Run granite comHet plus output integrity-check",
+        "steps": [
+            {
+                "name": "granite",
+                "outputs": [
+                    {
+                        "name": "comHet_vcf",
+                        "target": [
+                            {
+                                "name": "comHet_vcf",
+                                "step": "vcf-integrity-check"
+                            }
+                        ],
+                        "meta": {
+                            "file_format": "vcf_gz",
+                            "type": "data file",
+                            "cardinality": "single",
+                            "global": true
+                        }
+                    },
+                    {
+                        "name": "comHet_vcf-json",
+                        "target": [
+                            {
+                                "name": "comHet_vcf-json"
+                            }
+                        ],
+                        "meta": {
+                            "type": "QC",
+                            "cardinality": "single",
+                            "global": true
+                        }
+                    }
+                ],
+                "inputs": [
+                    {
+                        "name": "input_vcf",
+                        "source": [
+                            {
+                                "name": "input_vcf"
+                            }
+                        ],
+                        "meta": {
+                            "file_format": "1b8f525f-aecb-4211-9ae5-a2c998b05599",
+                            "type": "data file",
+                            "cardinality": "single",
+                            "global": true
+                        }
+                    },
+                    {
+                        "name": "trio",
+                        "source": [
+                            {
+                                "name": "trio"
+                            }
+                        ],
+                        "meta": {
+                            "type": "parameter",
+                            "cardinality": "single",
+                            "global": true
+                        }
+                    }
+                ],
+                "meta": {
+                    "analysis_step_types": [
+                        "Run granite comHet"
+                    ],
+                    "software_used": [
+                        "5a0b864e-dc16-4484-bcf3-c64e35a25df9"
+                    ]
+                }
+            },
+            {
+                "name": "vcf-integrity-check",
+                "outputs": [
+                    {
+                        "name": "comHet_vcf-check",
+                        "target": [
+                            {
+                                "name": "comHet_vcf-check"
+                            }
+                        ],
+                        "meta": {
+                            "type": "QC",
+                            "cardinality": "single",
+                            "global": true
+                        }
+                    }
+                ],
+                "inputs": [
+                    {
+                        "name": "comHet_vcf",
+                        "source": [
+                            {
+                                "name": "comHet_vcf",
+                                "step": "granite"
+                            }
+                        ],
+                        "meta": {
+                            "file_format": "1b8f525f-aecb-4211-9ae5-a2c998b05599",
+                            "type": "data file",
+                            "cardinality": "single",
+                            "global": false
+                        }
+                    }
+                ],
+                "meta": {
+                    "analysis_step_types": [
+                        "Check integrity of vcf output file"
+                    ],
+                    "software_used": [
+                        "f7ac2c5f-9203-49fa-b918-cede02bf46f7"
+                    ]
+                }
+            }
+        ],
+        "description": "Run granite comHet on vcf input file. An integrity check is performed on the output file",
+        "docker_image_name": "cgap/cgap:v14",
+        "uuid": "4973be36-5e56-41be-98ef-dd771481f629",
+        "category": [
+            "processing"
+        ],
+        "date_created": "2020-07-15T02:37:57.178221+00:00",
+        "schema_version": "7",
+        "arguments": [
+            {
+                "argument_type": "Input file",
+                "workflow_argument_name": "input_vcf",
+                "argument_format": "1b8f525f-aecb-4211-9ae5-a2c998b05599"
+            },
+            {
+                "argument_type": "Output processed file",
+                "secondary_file_formats": [
+                    "f84f1922-7f4e-4afc-922f-bec620969bf1"
+                ],
+                "workflow_argument_name": "comHet_vcf",
+                "argument_format": "1b8f525f-aecb-4211-9ae5-a2c998b05599"
+            },
+            {
+                "qc_type": "quality_metric_cmphet",
+                "qc_zipped": false,
+                "qc_html": false,
+                "qc_table": false,
+                "workflow_argument_name": "comHet_vcf-json",
+                "argument_to_be_attached_to": "comHet_vcf",
+                "qc_json": true,
+                "argument_type": "Output QC file"
+            },
+            {
+                "qc_type": "quality_metric_vcfcheck",
+                "qc_zipped": false,
+                "qc_html": false,
+                "qc_table": true,
+                "workflow_argument_name": "comHet_vcf-check",
+                "argument_to_be_attached_to": "comHet_vcf",
+                "qc_json": false,
+                "argument_type": "Output QC file"
+            },
+            {
+                "argument_type": "parameter",
+                "workflow_argument_name": "trio"
+            }
+        ],
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "cwl_child_filenames": [
+            "granite-comHet.cwl",
+            "sort-bgzip-vcf.cwl",
+            "vcf-integrity-check.cwl"
+        ],
+        "name": "workflow_granite-comHet-check_v14",
+        "cwl_main_filename": "workflow_granite-comHet_plus_vcf-integrity-check.cwl",
+        "workflow_language": "CWL",
+        "app_version": "v14",
+        "aliases": [
+            "cgap:workflow_granite-comHet-check_v14"
+        ],
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "accession": "GAPKL48I02KC",
+        "app_name": "workflow_granite-comHet-check",
+        "cwl_directory_url_v1": "https://raw.githubusercontent.com/dbmi-bgm/cgap-pipeline/v14/cwl",
+        "cwl_pointer": "",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+    },
+    {
+        "docker_registry_url": "https://hub.docker.com/",
+        "version_upgrade_log": "Updated command line arguments and default to not filter out variants",
+        "status": "released",
+        "title": "Run granite novoCaller using rck files plus output integrity-check",
+        "steps": [
+            {
+                "name": "granite",
+                "outputs": [
+                    {
+                        "name": "novoCaller_vcf",
+                        "target": [
+                            {
+                                "name": "novoCaller_vcf",
+                                "step": "vcf-integrity-check"
+                            }
+                        ],
+                        "meta": {
+                            "file_format": "vcf_gz",
+                            "type": "data file",
+                            "cardinality": "single",
+                            "global": true
+                        }
+                    }
+                ],
+                "inputs": [
+                    {
+                        "name": "input_vcf",
+                        "source": [
+                            {
+                                "name": "input_vcf"
+                            }
+                        ],
+                        "meta": {
+                            "file_format": "1b8f525f-aecb-4211-9ae5-a2c998b05599",
+                            "type": "data file",
+                            "cardinality": "single",
+                            "global": true
+                        }
+                    },
+                    {
+                        "name": "unrelated",
+                        "source": [
+                            {
+                                "name": "unrelated"
+                            }
+                        ],
+                        "meta": {
+                            "file_format": "39f836d8-bbb1-46c7-80d4-e321d4a44204",
+                            "type": "reference file",
+                            "cardinality": "single",
+                            "global": true
+                        }
+                    },
+                    {
+                        "name": "trio",
+                        "source": [
+                            {
+                                "name": "trio"
+                            }
+                        ],
+                        "meta": {
+                            "file_format": "39f836d8-bbb1-46c7-80d4-e321d4a44204",
+                            "type": "reference file",
+                            "cardinality": "single",
+                            "global": true
+                        }
+                    }
+                ],
+                "meta": {
+                    "analysis_step_types": [
+                        "Run granite novoCaller"
+                    ],
+                    "software_used": [
+                        "5a0b864e-dc16-4484-bcf3-c64e35a25df9"
+                    ]
+                }
+            },
+            {
+                "name": "vcf-integrity-check",
+                "outputs": [
+                    {
+                        "name": "novoCaller_vcf-check",
+                        "target": [
+                            {
+                                "name": "novoCaller_vcf-check"
+                            }
+                        ],
+                        "meta": {
+                            "type": "QC",
+                            "cardinality": "single",
+                            "global": true
+                        }
+                    }
+                ],
+                "inputs": [
+                    {
+                        "name": "novoCaller_vcf",
+                        "source": [
+                            {
+                                "name": "novoCaller_vcf",
+                                "step": "granite"
+                            }
+                        ],
+                        "meta": {
+                            "file_format": "1b8f525f-aecb-4211-9ae5-a2c998b05599",
+                            "type": "data file",
+                            "cardinality": "single",
+                            "global": false
+                        }
+                    }
+                ],
+                "meta": {
+                    "analysis_step_types": [
+                        "Check integrity of vcf output file"
+                    ],
+                    "software_used": [
+                        "f7ac2c5f-9203-49fa-b918-cede02bf46f7"
+                    ]
+                }
+            }
+        ],
+        "description": "Run granite novoCaller on vcf input file. Use rck files. An integrity check is performed on the output file",
+        "docker_image_name": "cgap/cgap:v14",
+        "uuid": "f38b91fb-7e0c-44e0-a871-a91a58227b34",
+        "category": [
+            "processing"
+        ],
+        "date_created": "2020-07-15T02:37:59.107821+00:00",
+        "schema_version": "7",
+        "cwl_child_filenames": [
+            "granite-novoCaller-rck.cwl",
+            "vcf-integrity-check.cwl"
+        ],
+        "arguments": [
+            {
+                "argument_type": "Input file",
+                "workflow_argument_name": "input_vcf",
+                "argument_format": "1b8f525f-aecb-4211-9ae5-a2c998b05599"
+            },
+            {
+                "argument_type": "Input file",
+                "workflow_argument_name": "unrelated",
+                "argument_format": "39f836d8-bbb1-46c7-80d4-e321d4a44204"
+            },
+            {
+                "argument_type": "Input file",
+                "workflow_argument_name": "trio",
+                "argument_format": "39f836d8-bbb1-46c7-80d4-e321d4a44204"
+            },
+            {
+                "argument_type": "Output processed file",
+                "secondary_file_formats": [
+                    "f84f1922-7f4e-4afc-922f-bec620969bf1"
+                ],
+                "workflow_argument_name": "novoCaller_vcf",
+                "argument_format": "1b8f525f-aecb-4211-9ae5-a2c998b05599"
+            },
+            {
+                "qc_type": "quality_metric_vcfcheck",
+                "qc_zipped": false,
+                "qc_html": false,
+                "qc_table": true,
+                "workflow_argument_name": "novoCaller_vcf-check",
+                "argument_to_be_attached_to": "novoCaller_vcf",
+                "qc_json": false,
+                "argument_type": "Output QC file"
+            }
+        ],
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "previous_version": [
+            "35daf195-4fc5-4e2a-ada3-7a0cce08a7e4"
+        ],
+        "name": "workflow_granite-novoCaller-rck-check_v14",
+        "cwl_main_filename": "workflow_granite-novoCaller-rck_plus_vcf-integrity-check.cwl",
+        "workflow_language": "CWL",
+        "app_version": "v14",
+        "aliases": [
+            "cgap:workflow_granite-novoCaller-rck-check_v14"
+        ],
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "accession": "GAPS8L8U721V",
+        "app_name": "workflow_granite-novoCaller-rck-check",
+        "cwl_directory_url_v1": "https://raw.githubusercontent.com/dbmi-bgm/cgap-pipeline/v14/cwl",
+        "cwl_pointer": "",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+    },
+    {
+        "docker_registry_url": "https://hub.docker.com/",
+        "status": "released",
+        "title": "Run granite mpileupCounts",
+        "steps": [
+            {
+                "name": "granite",
+                "outputs": [
+                    {
+                        "name": "rck",
+                        "target": [
+                            {
+                                "name": "rck"
+                            }
+                        ],
+                        "meta": {
+                            "file_format": "rck_gz",
+                            "type": "data file",
+                            "cardinality": "single",
+                            "global": true
+                        }
+                    }
+                ],
+                "inputs": [
+                    {
+                        "name": "input_bam",
+                        "source": [
+                            {
+                                "name": "input_bam"
+                            }
+                        ],
+                        "meta": {
+                            "file_format": "d13d06cf-218e-4f61-aaf0-91f226248b3c",
+                            "type": "data file",
+                            "cardinality": "single",
+                            "global": true
+                        }
+                    },
+                    {
+                        "name": "reference",
+                        "source": [
+                            {
+                                "name": "reference"
+                            }
+                        ],
+                        "meta": {
+                            "file_format": "5ced774b-a73e-4d1b-8186-d7fbbde7a3c2",
+                            "type": "reference file",
+                            "cardinality": "single",
+                            "global": true
+                        }
+                    },
+                    {
+                        "name": "regions",
+                        "source": [
+                            {
+                                "name": "regions"
+                            }
+                        ],
+                        "meta": {
+                            "file_format": "0cd4e777-a596-4927-95c8-b07716121aa3",
+                            "type": "reference file",
+                            "cardinality": "single",
+                            "global": true
+                        }
+                    },
+                    {
+                        "name": "nthreads",
+                        "source": [
+                            {
+                                "name": "nthreads"
+                            }
+                        ],
+                        "meta": {
+                            "type": "parameter",
+                            "cardinality": "single",
+                            "global": true
+                        }
+                    }
+                ],
+                "meta": {
+                    "analysis_step_types": [
+                        "Run granite mpileupCounts"
+                    ],
+                    "software_used": [
+                        "8d4ca59b-750b-4c22-8a34-c5d4e795b8ad"
+                    ]
+                }
+            }
+        ],
+        "description": "Run granite mpileupCounts on bam input file. Produce a rck.gz file",
+        "docker_image_name": "cgap/cgap:v13",
+        "uuid": "e5c178cf-4b5c-488b-b4cc-08273d11697d",
+        "category": [
+            "processing"
+        ],
+        "date_created": "2020-07-15T02:37:56.537915+00:00",
+        "schema_version": "7",
+        "arguments": [
+            {
+                "argument_type": "Input file",
+                "workflow_argument_name": "input_bam",
+                "argument_format": "d13d06cf-218e-4f61-aaf0-91f226248b3c"
+            },
+            {
+                "argument_type": "Input file",
+                "workflow_argument_name": "reference",
+                "argument_format": "5ced774b-a73e-4d1b-8186-d7fbbde7a3c2"
+            },
+            {
+                "argument_type": "Input file",
+                "workflow_argument_name": "regions",
+                "argument_format": "0cd4e777-a596-4927-95c8-b07716121aa3"
+            },
+            {
+                "argument_type": "Output processed file",
+                "secondary_file_formats": [
+                    "c55ace88-3289-49b0-a67a-c046e1004e5a"
+                ],
+                "workflow_argument_name": "rck",
+                "argument_format": "20d4d3aa-5f1c-4b75-9e25-73f9f370fefa"
+            },
+            {
+                "argument_type": "parameter",
+                "workflow_argument_name": "nthreads"
+            }
+        ],
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "cwl_child_filenames": [],
+        "name": "workflow_granite-mpileupCounts_v13",
+        "cwl_main_filename": "granite-mpileupCounts.cwl",
+        "workflow_language": "CWL",
+        "app_version": "v13",
+        "aliases": [
+            "cgap:workflow_granite-mpileupCounts_v13"
+        ],
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "accession": "GAPF178LT2P9",
+        "app_name": "workflow_granite-mpileupCounts",
+        "cwl_directory_url_v1": "https://raw.githubusercontent.com/dbmi-bgm/cgap-pipeline/v13/cwl",
+        "cwl_pointer": "",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+    },
+    {
+        "docker_registry_url": "https://hub.docker.com/",
+        "version_upgrade_log": "Workflow is now using a single data source file instead of archive",
+        "status": "released",
+        "title": "Run mutanno micro-annot plus output integrity-check",
+        "steps": [
+            {
+                "name": "annot",
+                "outputs": [
+                    {
+                        "name": "annotated_vcf",
+                        "target": [
+                            {
+                                "name": "annotated_vcf",
+                                "step": "vcf-integrity-check"
+                            }
+                        ],
+                        "meta": {
+                            "file_format": "vcf_gz",
+                            "type": "data file",
+                            "cardinality": "single",
+                            "global": true
+                        }
+                    }
+                ],
+                "inputs": [
+                    {
+                        "name": "input_vcf",
+                        "source": [
+                            {
+                                "name": "input_vcf"
+                            }
+                        ],
+                        "meta": {
+                            "file_format": "1b8f525f-aecb-4211-9ae5-a2c998b05599",
+                            "type": "data file",
+                            "cardinality": "single",
+                            "global": true
+                        }
+                    },
+                    {
+                        "name": "mti",
+                        "source": [
+                            {
+                                "name": "mti"
+                            }
+                        ],
+                        "meta": {
+                            "file_format": "d7fd1020-ae85-41a9-a45d-c66285efa996",
+                            "type": "reference file",
+                            "cardinality": "single",
+                            "global": true
+                        }
+                    },
+                    {
+                        "name": "regions",
+                        "source": [
+                            {
+                                "name": "regions"
+                            }
+                        ],
+                        "meta": {
+                            "file_format": "0cd4e777-a596-4927-95c8-b07716121aa3",
+                            "type": "reference file",
+                            "cardinality": "single",
+                            "global": true
+                        }
+                    },
+                    {
+                        "name": "nthreads",
+                        "source": [
+                            {
+                                "name": "nthreads"
+                            }
+                        ],
+                        "meta": {
+                            "type": "parameter",
+                            "cardinality": "single",
+                            "global": true
+                        }
+                    }
+                ],
+                "meta": {
+                    "analysis_step_types": [
+                        "Run mutanno annot"
+                    ],
+                    "software_used": [
+                        "1d28b7b8-1033-492f-8a1a-d4ac5b1ab55e"
+                    ]
+                }
+            },
+            {
+                "name": "vcf-integrity-check",
+                "outputs": [
+                    {
+                        "name": "annotated_vcf-check",
+                        "target": [
+                            {
+                                "name": "annotated_vcf-check"
+                            }
+                        ],
+                        "meta": {
+                            "type": "QC",
+                            "cardinality": "single",
+                            "global": true
+                        }
+                    }
+                ],
+                "inputs": [
+                    {
+                        "name": "annotated_vcf",
+                        "source": [
+                            {
+                                "name": "annotated_vcf",
+                                "step": "annot"
+                            }
+                        ],
+                        "meta": {
+                            "file_format": "1b8f525f-aecb-4211-9ae5-a2c998b05599",
+                            "type": "data file",
+                            "cardinality": "single",
+                            "global": false
+                        }
+                    }
+                ],
+                "meta": {
+                    "analysis_step_types": [
+                        "Check integrity of vcf output file"
+                    ],
+                    "software_used": [
+                        "f7ac2c5f-9203-49fa-b918-cede02bf46f7"
+                    ]
+                }
+            }
+        ],
+        "description": "Run mutanno annot on vcf input file. Produce a micro-annotated vcf file. An integrity check is performed on the output file",
+        "docker_image_name": "cgap/cgap:v14",
+        "uuid": "de9c4579-30e2-432c-80e3-7f324d3d7dcb",
+        "category": [
+            "processing"
+        ],
+        "date_created": "2020-07-15T02:37:59.405428+00:00",
+        "schema_version": "7",
+        "cwl_child_filenames": [
+            "mutanno-annot.cwl",
+            "vcf-integrity-check.cwl"
+        ],
+        "arguments": [
+            {
+                "argument_type": "Input file",
+                "workflow_argument_name": "input_vcf",
+                "argument_format": "1b8f525f-aecb-4211-9ae5-a2c998b05599"
+            },
+            {
+                "argument_type": "Input file",
+                "workflow_argument_name": "mti",
+                "argument_format": "d7fd1020-ae85-41a9-a45d-c66285efa996"
+            },
+            {
+                "argument_type": "Input file",
+                "workflow_argument_name": "regions",
+                "argument_format": "0cd4e777-a596-4927-95c8-b07716121aa3"
+            },
+            {
+                "argument_type": "Output processed file",
+                "secondary_file_formats": [
+                    "f84f1922-7f4e-4afc-922f-bec620969bf1"
+                ],
+                "workflow_argument_name": "annotated_vcf",
+                "argument_format": "1b8f525f-aecb-4211-9ae5-a2c998b05599"
+            },
+            {
+                "qc_type": "quality_metric_vcfcheck",
+                "qc_zipped": false,
+                "qc_html": false,
+                "qc_table": true,
+                "workflow_argument_name": "annotated_vcf-check",
+                "argument_to_be_attached_to": "annotated_vcf",
+                "qc_json": false,
+                "argument_type": "Output QC file"
+            },
+            {
+                "argument_type": "parameter",
+                "workflow_argument_name": "nthreads"
+            }
+        ],
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "previous_version": [
+            "04caaa82-6a32-46d3-b52c-c1017cc0490a"
+        ],
+        "name": "workflow_mutanno-micro-annot-check_v14",
+        "cwl_main_filename": "workflow_mutanno-micro-annot_plus_vcf-integrity-check.cwl",
+        "workflow_language": "CWL",
+        "app_version": "v14",
+        "aliases": [
+            "cgap:workflow_mutanno-micro-annot-check_v14"
+        ],
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "accession": "GAPP8T9E313F",
+        "app_name": "workflow_mutanno-micro-annot-check",
+        "cwl_directory_url_v1": "https://raw.githubusercontent.com/dbmi-bgm/cgap-pipeline/v14/cwl",
+        "cwl_pointer": "",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+    },
+    {
+        "docker_registry_url": "https://hub.docker.com/",
+        "status": "released",
+        "title": "Run gatk HaplotypeCaller",
+        "steps": [
+            {
+                "name": "HaplotypeCaller",
+                "outputs": [
+                    {
+                        "name": "gvcf",
+                        "target": [
+                            {
+                                "name": "gvcf"
+                            }
+                        ],
+                        "meta": {
+                            "file_format": "gvcf_gz",
+                            "type": "data file",
+                            "cardinality": "single",
+                            "global": true
+                        }
+                    }
+                ],
+                "inputs": [
+                    {
+                        "name": "input_bam",
+                        "source": [
+                            {
+                                "name": "input_bam"
+                            }
+                        ],
+                        "meta": {
+                            "file_format": "d13d06cf-218e-4f61-aaf0-91f226248b3c",
+                            "type": "data file",
+                            "cardinality": "single",
+                            "global": true
+                        }
+                    },
+                    {
+                        "name": "reference",
+                        "source": [
+                            {
+                                "name": "reference"
+                            }
+                        ],
+                        "meta": {
+                            "file_format": "5ced774b-a73e-4d1b-8186-d7fbbde7a3c2",
+                            "type": "reference file",
+                            "cardinality": "single",
+                            "global": true
+                        }
+                    },
+                    {
+                        "name": "regions",
+                        "source": [
+                            {
+                                "name": "regions"
+                            }
+                        ],
+                        "meta": {
+                            "file_format": "0cd4e777-a596-4927-95c8-b07716121aa3",
+                            "type": "reference file",
+                            "cardinality": "single",
+                            "global": true
+                        }
+                    },
+                    {
+                        "name": "threshold",
+                        "source": [
+                            {
+                                "name": "threshold"
+                            }
+                        ],
+                        "meta": {
+                            "type": "parameter",
+                            "cardinality": "single",
+                            "global": true
+                        }
+                    },
+                    {
+                        "name": "ERC",
+                        "source": [
+                            {
+                                "name": "ERC"
+                            }
+                        ],
+                        "meta": {
+                            "type": "parameter",
+                            "cardinality": "single",
+                            "global": true
+                        }
+                    },
+                    {
+                        "name": "nthreads",
+                        "source": [
+                            {
+                                "name": "nthreads"
+                            }
+                        ],
+                        "meta": {
+                            "type": "parameter",
+                            "cardinality": "single",
+                            "global": true
+                        }
+                    }
+                ],
+                "meta": {
+                    "analysis_step_types": [
+                        "Run gatk HaplotypeCaller"
+                    ],
+                    "software_used": [
+                        "4ae88fb4-23f2-4939-8852-4644069d14d9"
+                    ]
+                }
+            }
+        ],
+        "description": "Run gatk HaplotypeCaller on bam input file. Produce a g.vcf file",
+        "docker_image_name": "cgap/cgap",
+        "uuid": "d6465b5f-1768-4c94-b025-edc96e101ac5",
+        "category": [
+            "processing"
+        ],
+        "date_created": "2020-07-15T02:37:53.728409+00:00",
+        "schema_version": "7",
+        "arguments": [
+            {
+                "argument_type": "Input file",
+                "workflow_argument_name": "input_bam",
+                "argument_format": "d13d06cf-218e-4f61-aaf0-91f226248b3c"
+            },
+            {
+                "argument_type": "Input file",
+                "workflow_argument_name": "reference",
+                "argument_format": "5ced774b-a73e-4d1b-8186-d7fbbde7a3c2"
+            },
+            {
+                "argument_type": "Input file",
+                "workflow_argument_name": "regions",
+                "argument_format": "0cd4e777-a596-4927-95c8-b07716121aa3"
+            },
+            {
+                "argument_type": "Output processed file",
+                "secondary_file_formats": [
+                    "b01ee86e-b2c7-4725-81d7-798718674485"
+                ],
+                "workflow_argument_name": "gvcf",
+                "argument_format": "ad47d469-4561-4234-bce2-820f08f58e7c"
+            },
+            {
+                "argument_type": "parameter",
+                "workflow_argument_name": "threshold"
+            },
+            {
+                "argument_type": "parameter",
+                "workflow_argument_name": "ERC"
+            },
+            {
+                "argument_type": "parameter",
+                "workflow_argument_name": "nthreads"
+            }
+        ],
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "cwl_child_filenames": [],
+        "name": "workflow_gatk-HaplotypeCaller_v10",
+        "cwl_main_filename": "gatk-HaplotypeCaller.cwl",
+        "workflow_language": "CWL",
+        "app_version": "v10",
+        "aliases": [
+            "cgap:workflow_gatk-HaplotypeCaller_v10"
+        ],
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "accession": "GAPG8T94T3X9",
+        "app_name": "workflow_gatk-HaplotypeCaller",
+        "cwl_directory_url_v1": "https://raw.githubusercontent.com/dbmi-bgm/cgap-pipeline/v10/cwl",
+        "cwl_pointer": "",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+    },
+    {
+        "docker_registry_url": "https://hub.docker.com/",
+        "status": "released",
+        "title": "Run gatk GenotypeGVCFs plus output integrity-check",
+        "steps": [
+            {
+                "name": "GenotypeGVCFs",
+                "outputs": [
+                    {
+                        "name": "vcf",
+                        "target": [
+                            {
+                                "name": "vcf",
+                                "step": "vcf-integrity-check"
+                            }
+                        ],
+                        "meta": {
+                            "file_format": "vcf_gz",
+                            "type": "data file",
+                            "cardinality": "single",
+                            "global": true
+                        }
+                    }
+                ],
+                "inputs": [
+                    {
+                        "name": "input_gvcf",
+                        "source": [
+                            {
+                                "name": "input_gvcf"
+                            }
+                        ],
+                        "meta": {
+                            "file_format": "ad47d469-4561-4234-bce2-820f08f58e7c",
+                            "type": "data file",
+                            "cardinality": "single",
+                            "global": true
+                        }
+                    },
+                    {
+                        "name": "reference",
+                        "source": [
+                            {
+                                "name": "reference"
+                            }
+                        ],
+                        "meta": {
+                            "file_format": "5ced774b-a73e-4d1b-8186-d7fbbde7a3c2",
+                            "type": "reference file",
+                            "cardinality": "single",
+                            "global": true
+                        }
+                    },
+                    {
+                        "name": "known-sites-snp",
+                        "source": [
+                            {
+                                "name": "known-sites-snp"
+                            }
+                        ],
+                        "meta": {
+                            "file_format": "1b8f525f-aecb-4211-9ae5-a2c998b05599",
+                            "type": "reference file",
+                            "cardinality": "single",
+                            "global": true
+                        }
+                    },
+                    {
+                        "name": "verbosity",
+                        "source": [
+                            {
+                                "name": "verbosity"
+                            }
+                        ],
+                        "meta": {
+                            "type": "parameter",
+                            "cardinality": "single",
+                            "global": true
+                        }
+                    }
+                ],
+                "meta": {
+                    "analysis_step_types": [
+                        "Run gatk GenotypeGVCFs"
+                    ],
+                    "software_used": [
+                        "4ae88fb4-23f2-4939-8852-4644069d14d9"
+                    ]
+                }
+            },
+            {
+                "name": "vcf-integrity-check",
+                "outputs": [
+                    {
+                        "name": "vcf-check",
+                        "target": [
+                            {
+                                "name": "vcf-check"
+                            }
+                        ],
+                        "meta": {
+                            "type": "QC",
+                            "cardinality": "single",
+                            "global": true
+                        }
+                    }
+                ],
+                "inputs": [
+                    {
+                        "name": "vcf",
+                        "source": [
+                            {
+                                "name": "vcf",
+                                "step": "GenotypeGVCFs"
+                            }
+                        ],
+                        "meta": {
+                            "file_format": "1b8f525f-aecb-4211-9ae5-a2c998b05599",
+                            "type": "data file",
+                            "cardinality": "single",
+                            "global": false
+                        }
+                    }
+                ],
+                "meta": {
+                    "analysis_step_types": [
+                        "Check integrity of vcf output file"
+                    ],
+                    "software_used": [
+                        "f7ac2c5f-9203-49fa-b918-cede02bf46f7"
+                    ]
+                }
+            }
+        ],
+        "description": "Run gatk GenotypeGVCFs on g.vcf input file. Produce a vcf file. An integrity check is performed on the output file",
+        "docker_image_name": "cgap/cgap",
+        "uuid": "be5b7395-ddf1-4d60-85ea-650d5d9210ea",
+        "category": [
+            "processing"
+        ],
+        "date_created": "2020-07-15T02:37:54.476500+00:00",
+        "schema_version": "7",
+        "arguments": [
+            {
+                "argument_type": "Input file",
+                "workflow_argument_name": "input_gvcf",
+                "argument_format": "ad47d469-4561-4234-bce2-820f08f58e7c"
+            },
+            {
+                "argument_type": "Input file",
+                "workflow_argument_name": "reference",
+                "argument_format": "5ced774b-a73e-4d1b-8186-d7fbbde7a3c2"
+            },
+            {
+                "argument_type": "Input file",
+                "workflow_argument_name": "known-sites-snp",
+                "argument_format": "1b8f525f-aecb-4211-9ae5-a2c998b05599"
+            },
+            {
+                "argument_type": "Output processed file",
+                "secondary_file_formats": [
+                    "f84f1922-7f4e-4afc-922f-bec620969bf1"
+                ],
+                "workflow_argument_name": "vcf",
+                "argument_format": "1b8f525f-aecb-4211-9ae5-a2c998b05599"
+            },
+            {
+                "qc_type": "quality_metric_vcfcheck",
+                "qc_zipped": false,
+                "qc_html": false,
+                "qc_table": true,
+                "workflow_argument_name": "vcf-check",
+                "argument_to_be_attached_to": "vcf",
+                "qc_json": false,
+                "argument_type": "Output QC file"
+            },
+            {
+                "argument_type": "parameter",
+                "workflow_argument_name": "verbosity"
+            }
+        ],
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "cwl_child_filenames": [
+            "gatk-GenotypeGVCFs.cwl",
+            "vcf-integrity-check.cwl"
+        ],
+        "name": "workflow_gatk-GenotypeGVCFs-check_v10",
+        "cwl_main_filename": "workflow_gatk-GenotypeGVCFs_plus_vcf-integrity-check.cwl",
+        "workflow_language": "CWL",
+        "app_version": "v10",
+        "aliases": [
+            "cgap:workflow_gatk-GenotypeGVCFs-check_v10"
+        ],
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "accession": "GAPK956PO1H2",
+        "app_name": "workflow_gatk-GenotypeGVCFs-check",
+        "cwl_directory_url_v1": "https://raw.githubusercontent.com/dbmi-bgm/cgap-pipeline/v10/cwl",
+        "cwl_pointer": "",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+    },
+    {
+        "docker_registry_url": "https://hub.docker.com/",
+        "status": "released",
+        "title": "Create a tar archive of rck files and an associate index file",
+        "steps": [
+            {
+                "name": "granite",
+                "outputs": [
+                    {
+                        "name": "rck_tar",
+                        "target": [
+                            {
+                                "name": "rck_tar"
+                            }
+                        ],
+                        "meta": {
+                            "file_format": "rck_tar",
+                            "type": "data file",
+                            "cardinality": "single",
+                            "global": true
+                        }
+                    }
+                ],
+                "inputs": [
+                    {
+                        "name": "input_rcks",
+                        "source": [
+                            {
+                                "name": "input_rcks"
+                            }
+                        ],
+                        "meta": {
+                            "file_format": "20d4d3aa-5f1c-4b75-9e25-73f9f370fefa",
+                            "type": "data file",
+                            "cardinality": "array",
+                            "global": true
+                        }
+                    }
+                ],
+                "meta": {
+                    "analysis_step_types": [
+                        "Run granite rckTar"
+                    ],
+                    "software_used": [
+                        "8d4ca59b-750b-4c22-8a34-c5d4e795b8ad"
+                    ]
+                }
+            }
+        ],
+        "description": "Create a tar archive of rck files. Create an index file for the archive",
+        "docker_image_name": "cgap/cgap:v13",
+        "uuid": "778149e7-98d7-4362-83a4-9e80af1da101",
+        "category": [
+            "processing"
+        ],
+        "date_created": "2020-07-15T02:37:57.480244+00:00",
+        "schema_version": "7",
+        "arguments": [
+            {
+                "argument_type": "Input file",
+                "workflow_argument_name": "input_rcks",
+                "argument_format": "20d4d3aa-5f1c-4b75-9e25-73f9f370fefa"
+            },
+            {
+                "argument_type": "Output processed file",
+                "secondary_file_formats": [
+                    "1c7dc723-811c-4fcf-b8e5-d5e17a2013f7"
+                ],
+                "workflow_argument_name": "rck_tar",
+                "argument_format": "39f836d8-bbb1-46c7-80d4-e321d4a44204"
+            }
+        ],
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "cwl_child_filenames": [],
+        "name": "workflow_granite-rckTar_v13",
+        "cwl_main_filename": "granite-rckTar.cwl",
+        "workflow_language": "CWL",
+        "app_version": "v13",
+        "aliases": [
+            "cgap:workflow_granite-rckTar_v13"
+        ],
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "accession": "GAPW9IH7L38P",
+        "app_name": "workflow_granite-rckTar",
+        "cwl_directory_url_v1": "https://raw.githubusercontent.com/dbmi-bgm/cgap-pipeline/v13/cwl",
+        "cwl_pointer": "",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+    },
+    {
+        "docker_registry_url": "https://hub.docker.com/",
+        "status": "released",
+        "title": "Sort bam file plus output integrity-check",
+        "steps": [
+            {
+                "name": "sort",
+                "outputs": [
+                    {
+                        "name": "sorted_bam",
+                        "target": [
+                            {
+                                "name": "sorted_bam",
+                                "step": "integrity-check"
+                            }
+                        ],
+                        "meta": {
+                            "file_format": "bam",
+                            "type": "data file",
+                            "cardinality": "single",
+                            "global": true
+                        }
+                    }
+                ],
+                "inputs": [
+                    {
+                        "name": "input_bam",
+                        "source": [
+                            {
+                                "name": "input_bam"
+                            }
+                        ],
+                        "meta": {
+                            "file_format": "d13d06cf-218e-4f61-aaf0-91f226248b3c",
+                            "type": "data file",
+                            "cardinality": "single",
+                            "global": true
+                        }
+                    },
+                    {
+                        "name": "max_memory",
+                        "source": [
+                            {
+                                "name": "max_memory"
+                            }
+                        ],
+                        "meta": {
+                            "type": "parameter",
+                            "cardinality": "single",
+                            "global": true
+                        }
+                    },
+                    {
+                        "name": "nthreads",
+                        "source": [
+                            {
+                                "name": "nthreads"
+                            }
+                        ],
+                        "meta": {
+                            "type": "parameter",
+                            "cardinality": "single",
+                            "global": true
+                        }
+                    }
+                ],
+                "meta": {
+                    "analysis_step_types": [
+                        "Sort bam input file"
+                    ],
+                    "software_used": [
+                        "3f2d3b0e-0365-4212-9468-c16ad9531c4d"
+                    ]
+                }
+            },
+            {
+                "name": "integrity-check",
+                "outputs": [
+                    {
+                        "name": "sorted_bam-check",
+                        "target": [
+                            {
+                                "name": "sorted_bam-check"
+                            }
+                        ],
+                        "meta": {
+                            "type": "QC",
+                            "cardinality": "single",
+                            "global": true
+                        }
+                    }
+                ],
+                "inputs": [
+                    {
+                        "name": "sorted_bam",
+                        "source": [
+                            {
+                                "name": "sorted_bam",
+                                "step": "sort"
+                            }
+                        ],
+                        "meta": {
+                            "file_format": "d13d06cf-218e-4f61-aaf0-91f226248b3c",
+                            "type": "data file",
+                            "cardinality": "single",
+                            "global": false
+                        }
+                    },
+                    {
+                        "name": "count",
+                        "source": [
+                            {
+                                "name": "count"
+                            }
+                        ],
+                        "meta": {
+                            "type": "parameter",
+                            "cardinality": "single",
+                            "global": true
+                        }
+                    }
+                ],
+                "meta": {
+                    "analysis_step_types": [
+                        "Check integrity of output file"
+                    ],
+                    "software_used": [
+                        "3f2d3b0e-0365-4212-9468-c16ad9531c4d"
+                    ]
+                }
+            }
+        ],
+        "description": "Sort bam input file. An integrity check is performed on the output file",
+        "docker_image_name": "cgap/cgap:v13",
+        "uuid": "560f5194-cd3a-4799-9b1a-6a2d2c371c89",
+        "category": [
+            "processing"
+        ],
+        "date_created": "2020-07-15T02:37:57.785200+00:00",
+        "schema_version": "7",
+        "arguments": [
+            {
+                "argument_type": "Input file",
+                "workflow_argument_name": "input_bam",
+                "argument_format": "d13d06cf-218e-4f61-aaf0-91f226248b3c"
+            },
+            {
+                "argument_type": "Output processed file",
+                "workflow_argument_name": "sorted_bam",
+                "argument_format": "d13d06cf-218e-4f61-aaf0-91f226248b3c"
+            },
+            {
+                "qc_type": "quality_metric_bamcheck",
+                "qc_zipped": false,
+                "qc_html": false,
+                "qc_table": true,
+                "workflow_argument_name": "sorted_bam-check",
+                "argument_to_be_attached_to": "sorted_bam",
+                "qc_json": false,
+                "argument_type": "Output QC file"
+            },
+            {
+                "argument_type": "parameter",
+                "workflow_argument_name": "max_memory"
+            },
+            {
+                "argument_type": "parameter",
+                "workflow_argument_name": "nthreads"
+            },
+            {
+                "argument_type": "parameter",
+                "workflow_argument_name": "count"
+            }
+        ],
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "cwl_child_filenames": [
+            "sort-bam.cwl",
+            "integrity-check.cwl"
+        ],
+        "name": "workflow_sort-bam-check_v13",
+        "cwl_main_filename": "workflow_sort-bam_plus_integrity-check.cwl",
+        "workflow_language": "CWL",
+        "app_version": "v13",
+        "aliases": [
+            "cgap:workflow_sort-bam-check_v13",
+            "cgap:workflow_sort-bam-check_v12",
+            "cgap:workflow_sort-bam-check_v11",
+            "cgap:workflow_sort-bam-check_v10",
+            "cgap:workflow_sort-bam-check_v9"
+        ],
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "accession": "GAPWFIFWUPJP",
+        "app_name": "workflow_sort-bam-check",
+        "cwl_directory_url_v1": "https://raw.githubusercontent.com/dbmi-bgm/cgap-pipeline/v13/cwl",
+        "cwl_pointer": "",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+    },
+    {
+        "docker_registry_url": "https://hub.docker.com/",
+        "status": "released",
+        "title": "Run gatk BaseRecalibrator",
+        "steps": [
+            {
+                "name": "BaseRecalibrator",
+                "outputs": [
+                    {
+                        "name": "recalibration_report",
+                        "target": [
+                            {
+                                "name": "recalibration_report"
+                            }
+                        ],
+                        "meta": {
+                            "file_format": "txt",
+                            "type": "data file",
+                            "cardinality": "single",
+                            "global": true
+                        }
+                    }
+                ],
+                "inputs": [
+                    {
+                        "name": "input_bam",
+                        "source": [
+                            {
+                                "name": "input_bam"
+                            }
+                        ],
+                        "meta": {
+                            "file_format": "d13d06cf-218e-4f61-aaf0-91f226248b3c",
+                            "type": "data file",
+                            "cardinality": "single",
+                            "global": true
+                        }
+                    },
+                    {
+                        "name": "reference",
+                        "source": [
+                            {
+                                "name": "reference"
+                            }
+                        ],
+                        "meta": {
+                            "file_format": "5ced774b-a73e-4d1b-8186-d7fbbde7a3c2",
+                            "type": "reference file",
+                            "cardinality": "single",
+                            "global": true
+                        }
+                    },
+                    {
+                        "name": "known-sites-snp",
+                        "source": [
+                            {
+                                "name": "known-sites-snp"
+                            }
+                        ],
+                        "meta": {
+                            "file_format": "1b8f525f-aecb-4211-9ae5-a2c998b05599",
+                            "type": "reference file",
+                            "cardinality": "single",
+                            "global": true
+                        }
+                    },
+                    {
+                        "name": "known-sites-indels",
+                        "source": [
+                            {
+                                "name": "known-sites-indels"
+                            }
+                        ],
+                        "meta": {
+                            "file_format": "fcc2647d-301b-4888-8d9d-83ea4270309c",
+                            "type": "reference file",
+                            "cardinality": "single",
+                            "global": true
+                        }
+                    }
+                ],
+                "meta": {
+                    "analysis_step_types": [
+                        "Run gatk BaseRecalibrator"
+                    ],
+                    "software_used": [
+                        "4ae88fb4-23f2-4939-8852-4644069d14d9"
+                    ]
+                }
+            }
+        ],
+        "description": "Run gatk BaseRecalibrator on bam input file. Produce a recalibration report",
+        "docker_image_name": "cgap/cgap:v13",
+        "uuid": "455b3056-64ca-4a9b-b546-294b01c9ca92",
+        "category": [
+            "processing"
+        ],
+        "date_created": "2020-07-15T02:37:58.552661+00:00",
+        "schema_version": "7",
+        "arguments": [
+            {
+                "argument_type": "Input file",
+                "workflow_argument_name": "input_bam",
+                "argument_format": "d13d06cf-218e-4f61-aaf0-91f226248b3c"
+            },
+            {
+                "argument_type": "Input file",
+                "workflow_argument_name": "reference",
+                "argument_format": "5ced774b-a73e-4d1b-8186-d7fbbde7a3c2"
+            },
+            {
+                "argument_type": "Input file",
+                "workflow_argument_name": "known-sites-snp",
+                "argument_format": "1b8f525f-aecb-4211-9ae5-a2c998b05599"
+            },
+            {
+                "argument_type": "Input file",
+                "workflow_argument_name": "known-sites-indels",
+                "argument_format": "fcc2647d-301b-4888-8d9d-83ea4270309c"
+            },
+            {
+                "argument_type": "Output processed file",
+                "workflow_argument_name": "recalibration_report",
+                "argument_format": "0cd4e777-a596-4927-95c8-b07716121aa3"
+            }
+        ],
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "cwl_child_filenames": [],
+        "name": "workflow_gatk-BaseRecalibrator_v13",
+        "cwl_main_filename": "gatk-BaseRecalibrator.cwl",
+        "workflow_language": "CWL",
+        "app_version": "v13",
+        "aliases": [
+            "cgap:workflow_gatk-BaseRecalibrator_v13",
+            "cgap:workflow_gatk-BaseRecalibrator_v12",
+            "cgap:workflow_gatk-BaseRecalibrator_v11",
+            "cgap:workflow_gatk-BaseRecalibrator_v10",
+            "cgap:workflow_gatk-BaseRecalibrator_v9"
+        ],
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "accession": "GAPWF3LQBB7P",
+        "app_name": "workflow_gatk-BaseRecalibrator",
+        "cwl_directory_url_v1": "https://raw.githubusercontent.com/dbmi-bgm/cgap-pipeline/v13/cwl",
+        "cwl_pointer": "",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+    },
+    {
+        "docker_registry_url": "https://hub.docker.com/",
+        "version_upgrade_log": "multithreading",
+        "status": "released",
+        "title": "Add read groups plus output integrity-check",
+        "steps": [
+            {
+                "name": "add-readgroups",
+                "outputs": [
+                    {
+                        "name": "bam_w_readgroups",
+                        "target": [
+                            {
+                                "name": "bam_w_readgroups",
+                                "step": "integrity-check"
+                            }
+                        ],
+                        "meta": {
+                            "file_format": "bam",
+                            "type": "data file",
+                            "cardinality": "single",
+                            "global": true
+                        }
+                    }
+                ],
+                "inputs": [
+                    {
+                        "name": "input_bam",
+                        "source": [
+                            {
+                                "name": "input_bam"
+                            }
+                        ],
+                        "meta": {
+                            "file_format": "d13d06cf-218e-4f61-aaf0-91f226248b3c",
+                            "type": "data file",
+                            "cardinality": "single",
+                            "global": true
+                        }
+                    },
+                    {
+                        "name": "sample_name",
+                        "source": [
+                            {
+                                "name": "sample_name"
+                            }
+                        ],
+                        "meta": {
+                            "type": "parameter",
+                            "cardinality": "single",
+                            "global": true
+                        }
+                    },
+                    {
+                        "name": "nthreads",
+                        "source": [
+                            {
+                                "name": "nthreads"
+                            }
+                        ],
+                        "meta": {
+                            "type": "parameter",
+                            "cardinality": "single",
+                            "global": true
+                        }
+                    }
+                ],
+                "meta": {
+                    "analysis_step_types": [
+                        "Add read groups to bam input file"
+                    ],
+                    "software_used": [
+                        "d7ac4c75-e133-4a8e-a19e-b7e87873cc16"
+                    ]
+                }
+            },
+            {
+                "name": "integrity-check",
+                "outputs": [
+                    {
+                        "name": "bam_w_readgroups-check",
+                        "target": [
+                            {
+                                "name": "bam_w_readgroups-check"
+                            }
+                        ],
+                        "meta": {
+                            "type": "QC",
+                            "cardinality": "single",
+                            "global": true
+                        }
+                    }
+                ],
+                "inputs": [
+                    {
+                        "name": "bam_w_readgroups",
+                        "source": [
+                            {
+                                "name": "bam_w_readgroups",
+                                "step": "add-readgroups"
+                            }
+                        ],
+                        "meta": {
+                            "file_format": "d13d06cf-218e-4f61-aaf0-91f226248b3c",
+                            "type": "data file",
+                            "cardinality": "single",
+                            "global": false
+                        }
+                    },
+                    {
+                        "name": "count",
+                        "source": [
+                            {
+                                "name": "count"
+                            }
+                        ],
+                        "meta": {
+                            "type": "parameter",
+                            "cardinality": "single",
+                            "global": true
+                        }
+                    }
+                ],
+                "meta": {
+                    "analysis_step_types": [
+                        "Check integrity of output file"
+                    ],
+                    "software_used": [
+                        "3f2d3b0e-0365-4212-9468-c16ad9531c4d"
+                    ]
+                }
+            }
+        ],
+        "description": "Add read groups to bam input file. An integrity check is performed on the output file",
+        "docker_image_name": "cgap/cgap:v11",
+        "uuid": "1ebf697c-949d-46b2-b9a4-8b1a7699ef1f",
+        "category": [
+            "processing"
+        ],
+        "date_created": "2020-07-15T02:37:58.799788+00:00",
+        "schema_version": "7",
+        "cwl_child_filenames": [
+            "add-readgroups.cwl",
+            "integrity-check.cwl"
+        ],
+        "arguments": [
+            {
+                "argument_type": "Input file",
+                "workflow_argument_name": "input_bam",
+                "argument_format": "d13d06cf-218e-4f61-aaf0-91f226248b3c"
+            },
+            {
+                "argument_type": "Output processed file",
+                "workflow_argument_name": "bam_w_readgroups",
+                "argument_format": "d13d06cf-218e-4f61-aaf0-91f226248b3c"
+            },
+            {
+                "qc_type": "quality_metric_bamcheck",
+                "qc_zipped": false,
+                "qc_html": false,
+                "qc_table": true,
+                "workflow_argument_name": "bam_w_readgroups-check",
+                "argument_to_be_attached_to": "bam_w_readgroups",
+                "qc_json": false,
+                "argument_type": "Output QC file"
+            },
+            {
+                "argument_type": "parameter",
+                "workflow_argument_name": "sample_name"
+            },
+            {
+                "argument_type": "parameter",
+                "workflow_argument_name": "nthreads"
+            },
+            {
+                "argument_type": "parameter",
+                "workflow_argument_name": "count"
+            }
+        ],
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "previous_version": [
+            "548e63a4-1936-4f68-8e8d-8e4658767911"
+        ],
+        "name": "workflow_add-readgroups-check_v11",
+        "cwl_main_filename": "workflow_add-readgroups_plus_integrity-check.cwl",
+        "workflow_language": "CWL",
+        "app_version": "v11",
+        "aliases": [
+            "cgap:workflow_add-readgroups-check_v11",
+            "cgap:workflow_add-readgroups-check_v10"
+        ],
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "accession": "GAPWFBN35DT2",
+        "app_name": "workflow_add-readgroups-check",
+        "cwl_directory_url_v1": "https://raw.githubusercontent.com/dbmi-bgm/cgap-pipeline/v11/cwl",
+        "cwl_pointer": "",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+    },
+    {
+        "docker_registry_url": "https://hub.docker.com/",
+        "status": "released",
+        "title": "Run granite to filter and clean input vcf (whiteList, cleanVCF, blackList) plus output integrity-check",
+        "steps": [
+            {
+                "name": "granite",
+                "outputs": [
+                    {
+                        "name": "merged_vcf",
+                        "target": [
+                            {
+                                "name": "merged_vcf",
+                                "step": "vcf-integrity-check"
+                            }
+                        ],
+                        "meta": {
+                            "file_format": "vcf_gz",
+                            "type": "data file",
+                            "cardinality": "single",
+                            "global": true
+                        }
+                    }
+                ],
+                "inputs": [
+                    {
+                        "name": "input_vcf",
+                        "source": [
+                            {
+                                "name": "input_vcf"
+                            }
+                        ],
+                        "meta": {
+                            "file_format": "1b8f525f-aecb-4211-9ae5-a2c998b05599",
+                            "type": "data file",
+                            "cardinality": "single",
+                            "global": true
+                        }
+                    },
+                    {
+                        "name": "BEDfile",
+                        "source": [
+                            {
+                                "name": "BEDfile"
+                            }
+                        ],
+                        "meta": {
+                            "file_format": "4c04f6de-89a7-4477-8dc4-811b50c67401",
+                            "type": "reference file",
+                            "cardinality": "single",
+                            "global": true
+                        }
+                    },
+                    {
+                        "name": "bigfile",
+                        "source": [
+                            {
+                                "name": "bigfile"
+                            }
+                        ],
+                        "meta": {
+                            "file_format": "f66af4df-c107-44f0-bc94-227f1b4ccf72",
+                            "type": "reference file",
+                            "cardinality": "single",
+                            "global": true
+                        }
+                    },
+                    {
+                        "name": "SpliceAI",
+                        "source": [
+                            {
+                                "name": "SpliceAI"
+                            }
+                        ],
+                        "meta": {
+                            "type": "parameter",
+                            "cardinality": "single",
+                            "global": true
+                        }
+                    },
+                    {
+                        "name": "VEPsep",
+                        "source": [
+                            {
+                                "name": "VEPsep"
+                            }
+                        ],
+                        "meta": {
+                            "type": "parameter",
+                            "cardinality": "single",
+                            "global": true
+                        }
+                    },
+                    {
+                        "name": "aftag",
+                        "source": [
+                            {
+                                "name": "aftag"
+                            }
+                        ],
+                        "meta": {
+                            "type": "parameter",
+                            "cardinality": "single",
+                            "global": true
+                        }
+                    },
+                    {
+                        "name": "afthr",
+                        "source": [
+                            {
+                                "name": "afthr"
+                            }
+                        ],
+                        "meta": {
+                            "type": "parameter",
+                            "cardinality": "single",
+                            "global": true
+                        }
+                    }
+                ],
+                "meta": {
+                    "analysis_step_types": [
+                        "Run granite whiteList, cleanVCF, blackList"
+                    ],
+                    "software_used": [
+                        "5a0b864e-dc16-4484-bcf3-c64e35a25df9"
+                    ]
+                }
+            },
+            {
+                "name": "vcf-integrity-check",
+                "outputs": [
+                    {
+                        "name": "merged_vcf-check",
+                        "target": [
+                            {
+                                "name": "merged_vcf-check"
+                            }
+                        ],
+                        "meta": {
+                            "type": "QC",
+                            "cardinality": "single",
+                            "global": true
+                        }
+                    }
+                ],
+                "inputs": [
+                    {
+                        "name": "merged_vcf",
+                        "source": [
+                            {
+                                "name": "merged_vcf",
+                                "step": "granite"
+                            }
+                        ],
+                        "meta": {
+                            "file_format": "1b8f525f-aecb-4211-9ae5-a2c998b05599",
+                            "type": "data file",
+                            "cardinality": "single",
+                            "global": false
+                        }
+                    }
+                ],
+                "meta": {
+                    "analysis_step_types": [
+                        "Check integrity of vcf output file"
+                    ],
+                    "software_used": [
+                        "f7ac2c5f-9203-49fa-b918-cede02bf46f7"
+                    ]
+                }
+            }
+        ],
+        "description": "Filter and clean the input vcf using granite (whiteList, cleanVCF, blackList). An integrity check is performed on the output file",
+        "docker_image_name": "cgap/cgap:v14",
+        "uuid": "cb85683c-54a6-44e8-820c-1800aec9fdcd",
+        "category": [
+            "processing"
+        ],
+        "date_created": "2020-07-15T02:38:00.338542+00:00",
+        "schema_version": "7",
+        "arguments": [
+            {
+                "argument_type": "Input file",
+                "workflow_argument_name": "input_vcf",
+                "argument_format": "1b8f525f-aecb-4211-9ae5-a2c998b05599"
+            },
+            {
+                "argument_type": "Input file",
+                "workflow_argument_name": "BEDfile",
+                "argument_format": "4c04f6de-89a7-4477-8dc4-811b50c67401"
+            },
+            {
+                "argument_type": "Input file",
+                "workflow_argument_name": "bigfile",
+                "argument_format": "f66af4df-c107-44f0-bc94-227f1b4ccf72"
+            },
+            {
+                "argument_type": "Output processed file",
+                "secondary_file_formats": [
+                    "f84f1922-7f4e-4afc-922f-bec620969bf1"
+                ],
+                "workflow_argument_name": "merged_vcf",
+                "argument_format": "1b8f525f-aecb-4211-9ae5-a2c998b05599"
+            },
+            {
+                "qc_type": "quality_metric_vcfcheck",
+                "qc_zipped": false,
+                "qc_html": false,
+                "qc_table": true,
+                "workflow_argument_name": "merged_vcf-check",
+                "argument_to_be_attached_to": "merged_vcf",
+                "qc_json": false,
+                "argument_type": "Output QC file"
+            },
+            {
+                "argument_type": "parameter",
+                "workflow_argument_name": "SpliceAI"
+            },
+            {
+                "argument_type": "parameter",
+                "workflow_argument_name": "VEPsep"
+            },
+            {
+                "argument_type": "parameter",
+                "workflow_argument_name": "aftag"
+            },
+            {
+                "argument_type": "parameter",
+                "workflow_argument_name": "afthr"
+            }
+        ],
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "cwl_child_filenames": [
+            "granite-whiteList.cwl",
+            "granite-cleanVCF.cwl",
+            "granite-blackList.cwl",
+            "merge-sort-vcf.cwl",
+            "vcf-integrity-check.cwl"
+        ],
+        "name": "workflow_granite-filtering-check_v14",
+        "cwl_main_filename": "workflow_granite-filtering_plus_vcf-integrity-check.cwl",
+        "workflow_language": "CWL",
+        "app_version": "v14",
+        "aliases": [
+            "cgap:workflow_granite-filtering-check_v14"
+        ],
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "accession": "GAPG8L8B113P",
+        "app_name": "workflow_granite-filtering-check",
+        "cwl_directory_url_v1": "https://raw.githubusercontent.com/dbmi-bgm/cgap-pipeline/v14/cwl",
+        "cwl_pointer": "",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+    },
+    {
+        "docker_registry_url": "https://hub.docker.com/",
+        "status": "released",
+        "cwl_directory_url": "https://raw.githubusercontent.com/dbmi-bgm/cgap-pipeline/v11/cwl",
+        "title": "Mark duplicates plus output integrity-check",
+        "steps": [
+            {
+                "name": "MarkDuplicates",
+                "outputs": [
+                    {
+                        "name": "dupmarked_bam",
+                        "target": [
+                            {
+                                "name": "dupmarked_bam",
+                                "step": "integrity-check"
+                            }
+                        ],
+                        "meta": {
+                            "file_format": "bam",
+                            "type": "data file",
+                            "cardinality": "single",
+                            "global": true
+                        }
+                    },
+                    {
+                        "name": "duplicate_metrics",
+                        "target": [
+                            {
+                                "name": "duplicate_metrics"
+                            }
+                        ],
+                        "meta": {
+                            "file_format": "txt",
+                            "type": "data file",
+                            "cardinality": "single",
+                            "global": true
+                        }
+                    }
+                ],
+                "inputs": [
+                    {
+                        "name": "input_bam",
+                        "source": [
+                            {
+                                "name": "input_bam"
+                            }
+                        ],
+                        "meta": {
+                            "file_format": "d13d06cf-218e-4f61-aaf0-91f226248b3c",
+                            "type": "data file",
+                            "cardinality": "single",
+                            "global": true
+                        }
+                    },
+                    {
+                        "name": "xmx",
+                        "source": [
+                            {
+                                "name": "xmx"
+                            }
+                        ],
+                        "meta": {
+                            "type": "parameter",
+                            "cardinality": "single",
+                            "global": true
+                        }
+                    },
+                    {
+                        "name": "xms",
+                        "source": [
+                            {
+                                "name": "xms"
+                            }
+                        ],
+                        "meta": {
+                            "type": "parameter",
+                            "cardinality": "single",
+                            "global": true
+                        }
+                    },
+                    {
+                        "name": "max_records_in_ram",
+                        "source": [
+                            {
+                                "name": "max_records_in_ram"
+                            }
+                        ],
+                        "meta": {
+                            "type": "parameter",
+                            "cardinality": "single",
+                            "global": true
+                        }
+                    },
+                    {
+                        "name": "duplicate_pixel_distance",
+                        "source": [
+                            {
+                                "name": "duplicate_pixel_distance"
+                            }
+                        ],
+                        "meta": {
+                            "type": "parameter",
+                            "cardinality": "single",
+                            "global": true
+                        }
+                    }
+                ],
+                "meta": {
+                    "analysis_step_types": [
+                        "Mark duplicates in bam input file"
+                    ],
+                    "software_used": [
+                        "586cef39-6505-4bf6-920a-4b26a500d210"
+                    ]
+                }
+            },
+            {
+                "name": "integrity-check",
+                "outputs": [
+                    {
+                        "name": "dupmarked_bam-check",
+                        "target": [
+                            {
+                                "name": "dupmarked_bam-check"
+                            }
+                        ],
+                        "meta": {
+                            "type": "report",
+                            "cardinality": "single",
+                            "global": true
+                        }
+                    }
+                ],
+                "inputs": [
+                    {
+                        "name": "dupmarked_bam",
+                        "source": [
+                            {
+                                "name": "dupmarked_bam",
+                                "step": "MarkDuplicates"
+                            }
+                        ],
+                        "meta": {
+                            "file_format": "d13d06cf-218e-4f61-aaf0-91f226248b3c",
+                            "type": "data file",
+                            "cardinality": "single",
+                            "global": false
+                        }
+                    },
+                    {
+                        "name": "count",
+                        "source": [
+                            {
+                                "name": "count"
+                            }
+                        ],
+                        "meta": {
+                            "type": "parameter",
+                            "cardinality": "single",
+                            "global": true
+                        }
+                    }
+                ],
+                "meta": {
+                    "analysis_step_types": [
+                        "Check integrity of output file"
+                    ],
+                    "software_used": [
+                        "3f2d3b0e-0365-4212-9468-c16ad9531c4d"
+                    ]
+                }
+            }
+        ],
+        "description": "Mark duplicates in bam input file. An integrity check is performed on the output file",
+        "docker_image_name": "cgap/cgap:v13",
+        "uuid": "beb2b340-94ee-4afe-b4e3-66caaf063397",
+        "category": [
+            "processing"
+        ],
+        "date_created": "2020-07-15T02:37:59.771331+00:00",
+        "schema_version": "7",
+        "arguments": [
+            {
+                "argument_type": "Input file",
+                "workflow_argument_name": "input_bam",
+                "argument_format": "d13d06cf-218e-4f61-aaf0-91f226248b3c"
+            },
+            {
+                "argument_type": "Output processed file",
+                "workflow_argument_name": "dupmarked_bam",
+                "argument_format": "d13d06cf-218e-4f61-aaf0-91f226248b3c"
+            },
+            {
+                "argument_type": "Output processed file",
+                "workflow_argument_name": "duplicate_metrics",
+                "argument_format": "0cd4e777-a596-4927-95c8-b07716121aa3"
+            },
+            {
+                "qc_type": "quality_metric_bamcheck",
+                "qc_zipped": false,
+                "qc_html": false,
+                "qc_table": true,
+                "workflow_argument_name": "dupmarked_bam-check",
+                "argument_to_be_attached_to": "dupmarked_bam",
+                "qc_json": false,
+                "argument_type": "Output QC file"
+            },
+            {
+                "argument_type": "parameter",
+                "workflow_argument_name": "xmx"
+            },
+            {
+                "argument_type": "parameter",
+                "workflow_argument_name": "xms"
+            },
+            {
+                "argument_type": "parameter",
+                "workflow_argument_name": "max_records_in_ram"
+            },
+            {
+                "argument_type": "parameter",
+                "workflow_argument_name": "duplicate_pixel_distance"
+            },
+            {
+                "argument_type": "parameter",
+                "workflow_argument_name": "count"
+            }
+        ],
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "cwl_child_filenames": [
+            "picard-MarkDuplicates.cwl",
+            "integrity-check.cwl"
+        ],
+        "name": "workflow_picard-MarkDuplicates-check_v13",
+        "cwl_main_filename": "workflow_picard-MarkDuplicates_plus_integrity-check.cwl",
+        "workflow_language": "CWL",
+        "app_version": "v13",
+        "aliases": [
+            "cgap:workflow_picard-MarkDuplicates-check_v13",
+            "cgap:workflow_picard-MarkDuplicates-check_v12",
+            "cgap:workflow_picard-MarkDuplicates-check_v11",
+            "cgap:workflow_picard-MarkDuplicates-check_v10",
+            "cgap:workflow_picard-MarkDuplicates-check_v9"
+        ],
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "accession": "GAPWFLNQ7XTG",
+        "app_name": "workflow_picard-MarkDuplicates-check",
+        "cwl_directory_url_v1": "https://raw.githubusercontent.com/dbmi-bgm/cgap-pipeline/v13/cwl",
+        "cwl_pointer": "",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+    },
+    {
+        "docker_registry_url": "https://hub.docker.com/",
+        "status": "released",
+        "cwl_directory_url": "https://raw.githubusercontent.com/dbmi-bgm/cgap-pipeline/v9/cwl",
+        "title": "Add read groups plus output integrity-check",
+        "steps": [
+            {
+                "name": "add-readgroups",
+                "outputs": [
+                    {
+                        "name": "bam_w_readgroups",
+                        "target": [
+                            {
+                                "name": "bam_w_readgroups",
+                                "step": "integrity-check"
+                            }
+                        ],
+                        "meta": {
+                            "file_format": "bam",
+                            "type": "data file",
+                            "cardinality": "single",
+                            "global": true
+                        }
+                    }
+                ],
+                "inputs": [
+                    {
+                        "name": "input_bam",
+                        "source": [
+                            {
+                                "name": "input_bam"
+                            }
+                        ],
+                        "meta": {
+                            "file_format": "d13d06cf-218e-4f61-aaf0-91f226248b3c",
+                            "type": "data file",
+                            "cardinality": "single",
+                            "global": true
+                        }
+                    },
+                    {
+                        "name": "sample_name",
+                        "source": [
+                            {
+                                "name": "sample_name"
+                            }
+                        ],
+                        "meta": {
+                            "type": "parameter",
+                            "cardinality": "single",
+                            "global": true
+                        }
+                    },
+                    {
+                        "name": "nthreads",
+                        "source": [
+                            {
+                                "name": "nthreads"
+                            }
+                        ],
+                        "meta": {
+                            "type": "parameter",
+                            "cardinality": "single",
+                            "global": true
+                        }
+                    }
+                ],
+                "meta": {
+                    "analysis_step_types": [
+                        "Add read groups to bam input file"
+                    ],
+                    "software_used": [
+                        "d7ac4c75-e133-4a8e-a19e-b7e87873cc16"
+                    ]
+                }
+            },
+            {
+                "name": "integrity-check",
+                "outputs": [
+                    {
+                        "name": "bam_w_readgroups-check",
+                        "target": [
+                            {
+                                "name": "bam_w_readgroups-check"
+                            }
+                        ],
+                        "meta": {
+                            "type": "QC",
+                            "cardinality": "single",
+                            "global": true
+                        }
+                    }
+                ],
+                "inputs": [
+                    {
+                        "name": "bam_w_readgroups",
+                        "source": [
+                            {
+                                "name": "bam_w_readgroups",
+                                "step": "add-readgroups"
+                            }
+                        ],
+                        "meta": {
+                            "file_format": "d13d06cf-218e-4f61-aaf0-91f226248b3c",
+                            "type": "data file",
+                            "cardinality": "single",
+                            "global": false
+                        }
+                    },
+                    {
+                        "name": "count",
+                        "source": [
+                            {
+                                "name": "count"
+                            }
+                        ],
+                        "meta": {
+                            "type": "parameter",
+                            "cardinality": "single",
+                            "global": true
+                        }
+                    }
+                ],
+                "meta": {
+                    "analysis_step_types": [
+                        "Check integrity of output file"
+                    ],
+                    "software_used": [
+                        "3f2d3b0e-0365-4212-9468-c16ad9531c4d"
+                    ]
+                }
+            }
+        ],
+        "description": "Add read groups to bam input file. An integrity check is performed on the output file",
+        "docker_image_name": "cgap/cgap",
+        "uuid": "548e63a4-1936-4f68-8e8d-8e4658767911",
+        "category": [
+            "processing"
+        ],
+        "date_created": "2020-07-15T02:37:58.110836+00:00",
+        "schema_version": "7",
+        "arguments": [
+            {
+                "argument_type": "Input file",
+                "workflow_argument_name": "input_bam",
+                "argument_format": "d13d06cf-218e-4f61-aaf0-91f226248b3c"
+            },
+            {
+                "argument_type": "Output processed file",
+                "workflow_argument_name": "bam_w_readgroups",
+                "argument_format": "d13d06cf-218e-4f61-aaf0-91f226248b3c"
+            },
+            {
+                "qc_type": "quality_metric_bamcheck",
+                "qc_zipped": false,
+                "qc_html": false,
+                "qc_table": true,
+                "workflow_argument_name": "bam_w_readgroups-check",
+                "argument_to_be_attached_to": "bam_w_readgroups",
+                "qc_json": false,
+                "argument_type": "Output QC file"
+            },
+            {
+                "argument_type": "parameter",
+                "workflow_argument_name": "sample_name"
+            },
+            {
+                "argument_type": "parameter",
+                "workflow_argument_name": "nthreads"
+            },
+            {
+                "argument_type": "parameter",
+                "workflow_argument_name": "count"
+            }
+        ],
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "cwl_child_filenames": [
+            "add-readgroups.cwl",
+            "integrity-check.cwl"
+        ],
+        "name": "workflow_add-readgroups-check_v9",
+        "cwl_main_filename": "workflow_add-readgroups_plus_integrity-check.cwl",
+        "workflow_language": "CWL",
+        "app_version": "v9",
+        "aliases": [
+            "cgap:workflow_add-readgroups-check_v9"
+        ],
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "accession": "GAPWFECVBVP9",
+        "app_name": "workflow_add-readgroups-check",
+        "cwl_directory_url_v1": "https://raw.githubusercontent.com/dbmi-bgm/cgap-pipeline/v9/cwl",
+        "cwl_pointer": "",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+    },
+    {
+        "docker_registry_url": "https://hub.docker.com/",
+        "status": "released",
+        "title": "Run granite novoCaller using rck files plus output integrity-check",
+        "steps": [
+            {
+                "name": "granite",
+                "outputs": [
+                    {
+                        "name": "novoCaller_vcf",
+                        "target": [
+                            {
+                                "name": "novoCaller_vcf",
+                                "step": "vcf-integrity-check"
+                            }
+                        ],
+                        "meta": {
+                            "file_format": "vcf_gz",
+                            "type": "data file",
+                            "cardinality": "single",
+                            "global": true
+                        }
+                    }
+                ],
+                "inputs": [
+                    {
+                        "name": "input_vcf",
+                        "source": [
+                            {
+                                "name": "input_vcf"
+                            }
+                        ],
+                        "meta": {
+                            "file_format": "fcc2647d-301b-4888-8d9d-83ea4270309c",
+                            "type": "data file",
+                            "cardinality": "single",
+                            "global": true
+                        }
+                    },
+                    {
+                        "name": "unrelated",
+                        "source": [
+                            {
+                                "name": "unrelated"
+                            }
+                        ],
+                        "meta": {
+                            "file_format": "39f836d8-bbb1-46c7-80d4-e321d4a44204",
+                            "type": "reference file",
+                            "cardinality": "single",
+                            "global": true
+                        }
+                    },
+                    {
+                        "name": "trio",
+                        "source": [
+                            {
+                                "name": "trio"
+                            }
+                        ],
+                        "meta": {
+                            "file_format": "39f836d8-bbb1-46c7-80d4-e321d4a44204",
+                            "type": "reference file",
+                            "cardinality": "single",
+                            "global": true
+                        }
+                    },
+                    {
+                        "name": "ppthr",
+                        "source": [
+                            {
+                                "name": "ppthr"
+                            }
+                        ],
+                        "meta": {
+                            "type": "parameter",
+                            "cardinality": "single",
+                            "global": true
+                        }
+                    },
+                    {
+                        "name": "aftag",
+                        "source": [
+                            {
+                                "name": "aftag"
+                            }
+                        ],
+                        "meta": {
+                            "type": "parameter",
+                            "cardinality": "single",
+                            "global": true
+                        }
+                    },
+                    {
+                        "name": "afthr",
+                        "source": [
+                            {
+                                "name": "afthr"
+                            }
+                        ],
+                        "meta": {
+                            "type": "parameter",
+                            "cardinality": "single",
+                            "global": true
+                        }
+                    },
+                    {
+                        "name": "afthr_unrelated",
+                        "source": [
+                            {
+                                "name": "afthr_unrelated"
+                            }
+                        ],
+                        "meta": {
+                            "type": "parameter",
+                            "cardinality": "single",
+                            "global": true
+                        }
+                    }
+                ],
+                "meta": {
+                    "analysis_step_types": [
+                        "Run granite novoCaller"
+                    ],
+                    "software_used": [
+                        "8d4ca59b-750b-4c22-8a34-c5d4e795b8ad"
+                    ]
+                }
+            },
+            {
+                "name": "vcf-integrity-check",
+                "outputs": [
+                    {
+                        "name": "novoCaller_vcf-check",
+                        "target": [
+                            {
+                                "name": "novoCaller_vcf-check"
+                            }
+                        ],
+                        "meta": {
+                            "type": "QC",
+                            "cardinality": "single",
+                            "global": true
+                        }
+                    }
+                ],
+                "inputs": [
+                    {
+                        "name": "novoCaller_vcf",
+                        "source": [
+                            {
+                                "name": "novoCaller_vcf",
+                                "step": "granite"
+                            }
+                        ],
+                        "meta": {
+                            "file_format": "1b8f525f-aecb-4211-9ae5-a2c998b05599",
+                            "type": "data file",
+                            "cardinality": "single",
+                            "global": false
+                        }
+                    }
+                ],
+                "meta": {
+                    "analysis_step_types": [
+                        "Check integrity of vcf output file"
+                    ],
+                    "software_used": [
+                        "f7ac2c5f-9203-49fa-b918-cede02bf46f7"
+                    ]
+                }
+            }
+        ],
+        "description": "Run granite novoCaller on vcf input file. Use rck files. An integrity check is performed on the output file",
+        "docker_image_name": "cgap/cgap:v13",
+        "uuid": "35daf195-4fc5-4e2a-ada3-7a0cce08a7e4",
+        "category": [
+            "processing"
+        ],
+        "date_created": "2020-07-15T02:38:00.082644+00:00",
+        "schema_version": "7",
+        "arguments": [
+            {
+                "argument_type": "Input file",
+                "workflow_argument_name": "input_vcf",
+                "argument_format": "fcc2647d-301b-4888-8d9d-83ea4270309c"
+            },
+            {
+                "argument_type": "Input file",
+                "workflow_argument_name": "unrelated",
+                "argument_format": "39f836d8-bbb1-46c7-80d4-e321d4a44204"
+            },
+            {
+                "argument_type": "Input file",
+                "workflow_argument_name": "trio",
+                "argument_format": "39f836d8-bbb1-46c7-80d4-e321d4a44204"
+            },
+            {
+                "argument_type": "Output processed file",
+                "secondary_file_formats": [
+                    "f84f1922-7f4e-4afc-922f-bec620969bf1"
+                ],
+                "workflow_argument_name": "novoCaller_vcf",
+                "argument_format": "1b8f525f-aecb-4211-9ae5-a2c998b05599"
+            },
+            {
+                "qc_type": "quality_metric_vcfcheck",
+                "qc_zipped": false,
+                "qc_html": false,
+                "qc_table": true,
+                "workflow_argument_name": "novoCaller_vcf-check",
+                "argument_to_be_attached_to": "novoCaller_vcf",
+                "qc_json": false,
+                "argument_type": "Output QC file"
+            },
+            {
+                "argument_type": "parameter",
+                "workflow_argument_name": "ppthr"
+            },
+            {
+                "argument_type": "parameter",
+                "workflow_argument_name": "aftag"
+            },
+            {
+                "argument_type": "parameter",
+                "workflow_argument_name": "afthr"
+            },
+            {
+                "argument_type": "parameter",
+                "workflow_argument_name": "afthr_unrelated"
+            }
+        ],
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "cwl_child_filenames": [
+            "granite-novoCaller-rck.cwl",
+            "vcf-integrity-check.cwl"
+        ],
+        "name": "workflow_granite-novoCaller-rck-check_v13",
+        "cwl_main_filename": "workflow_granite-novoCaller-rck_plus_vcf-integrity-check.cwl",
+        "workflow_language": "CWL",
+        "app_version": "v13",
+        "aliases": [
+            "cgap:workflow_granite-novoCaller-rck-check_v13"
+        ],
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "accession": "GAPS8B146J1A",
+        "app_name": "workflow_granite-novoCaller-rck-check",
+        "cwl_directory_url_v1": "https://raw.githubusercontent.com/dbmi-bgm/cgap-pipeline/v13/cwl",
+        "cwl_pointer": "",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+    },
+    {
+        "docker_registry_url": "https://hub.docker.com/",
+        "status": "released",
+        "title": "Run mutanno micro-annot plus output integrity-check",
+        "steps": [
+            {
+                "name": "annot",
+                "outputs": [
+                    {
+                        "name": "annotated_vcf",
+                        "target": [
+                            {
+                                "name": "annotated_vcf",
+                                "step": "vcf-integrity-check"
+                            }
+                        ],
+                        "meta": {
+                            "file_format": "vcf_gz",
+                            "type": "data file",
+                            "cardinality": "single",
+                            "global": true
+                        }
+                    }
+                ],
+                "inputs": [
+                    {
+                        "name": "input_vcf",
+                        "source": [
+                            {
+                                "name": "input_vcf"
+                            }
+                        ],
+                        "meta": {
+                            "file_format": "1b8f525f-aecb-4211-9ae5-a2c998b05599",
+                            "type": "data file",
+                            "cardinality": "single",
+                            "global": true
+                        }
+                    },
+                    {
+                        "name": "mti",
+                        "source": [
+                            {
+                                "name": "mti"
+                            }
+                        ],
+                        "meta": {
+                            "file_format": "d243d800-96b6-4b0a-a0ff-fc81be438365",
+                            "type": "reference file",
+                            "cardinality": "single",
+                            "global": true
+                        }
+                    },
+                    {
+                        "name": "regions",
+                        "source": [
+                            {
+                                "name": "regions"
+                            }
+                        ],
+                        "meta": {
+                            "file_format": "0cd4e777-a596-4927-95c8-b07716121aa3",
+                            "type": "reference file",
+                            "cardinality": "single",
+                            "global": true
+                        }
+                    },
+                    {
+                        "name": "blocksize",
+                        "source": [
+                            {
+                                "name": "blocksize"
+                            }
+                        ],
+                        "meta": {
+                            "type": "parameter",
+                            "cardinality": "single",
+                            "global": true
+                        }
+                    },
+                    {
+                        "name": "nthreads",
+                        "source": [
+                            {
+                                "name": "nthreads"
+                            }
+                        ],
+                        "meta": {
+                            "type": "parameter",
+                            "cardinality": "single",
+                            "global": true
+                        }
+                    }
+                ],
+                "meta": {
+                    "analysis_step_types": [
+                        "Run mutanno annot"
+                    ],
+                    "software_used": [
+                        "76479248-09d2-48e5-9ab3-94c167e51cc6"
+                    ]
+                }
+            },
+            {
+                "name": "vcf-integrity-check",
+                "outputs": [
+                    {
+                        "name": "annotated_vcf-check",
+                        "target": [
+                            {
+                                "name": "annotated_vcf-check"
+                            }
+                        ],
+                        "meta": {
+                            "type": "QC",
+                            "cardinality": "single",
+                            "global": true
+                        }
+                    }
+                ],
+                "inputs": [
+                    {
+                        "name": "annotated_vcf",
+                        "source": [
+                            {
+                                "name": "annotated_vcf",
+                                "step": "annot"
+                            }
+                        ],
+                        "meta": {
+                            "file_format": "1b8f525f-aecb-4211-9ae5-a2c998b05599",
+                            "type": "data file",
+                            "cardinality": "single",
+                            "global": false
+                        }
+                    }
+                ],
+                "meta": {
+                    "analysis_step_types": [
+                        "Check integrity of vcf output file"
+                    ],
+                    "software_used": [
+                        "f7ac2c5f-9203-49fa-b918-cede02bf46f7"
+                    ]
+                }
+            }
+        ],
+        "description": "Run mutanno annot on vcf input file. Produce a micro-annotated vcf file. An integrity check is performed on the output file",
+        "docker_image_name": "cgap/cgap:v13",
+        "uuid": "04caaa82-6a32-46d3-b52c-c1017cc0490a",
+        "category": [
+            "processing"
+        ],
+        "date_created": "2020-07-15T02:38:00.614545+00:00",
+        "schema_version": "7",
+        "arguments": [
+            {
+                "argument_type": "Input file",
+                "workflow_argument_name": "input_vcf",
+                "argument_format": "1b8f525f-aecb-4211-9ae5-a2c998b05599"
+            },
+            {
+                "argument_type": "Input file",
+                "workflow_argument_name": "mti",
+                "argument_format": "d243d800-96b6-4b0a-a0ff-fc81be438365"
+            },
+            {
+                "argument_type": "Input file",
+                "workflow_argument_name": "regions",
+                "argument_format": "0cd4e777-a596-4927-95c8-b07716121aa3"
+            },
+            {
+                "argument_type": "Output processed file",
+                "secondary_file_formats": [
+                    "f84f1922-7f4e-4afc-922f-bec620969bf1"
+                ],
+                "workflow_argument_name": "annotated_vcf",
+                "argument_format": "1b8f525f-aecb-4211-9ae5-a2c998b05599"
+            },
+            {
+                "qc_type": "quality_metric_vcfcheck",
+                "qc_zipped": false,
+                "qc_html": false,
+                "qc_table": true,
+                "workflow_argument_name": "annotated_vcf-check",
+                "argument_to_be_attached_to": "annotated_vcf",
+                "qc_json": false,
+                "argument_type": "Output QC file"
+            },
+            {
+                "argument_type": "parameter",
+                "workflow_argument_name": "blocksize"
+            },
+            {
+                "argument_type": "parameter",
+                "workflow_argument_name": "nthreads"
+            }
+        ],
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "cwl_child_filenames": [
+            "mutanno-annot.cwl",
+            "vcf-integrity-check.cwl"
+        ],
+        "name": "workflow_mutanno-micro-annot-check_v13",
+        "cwl_main_filename": "workflow_mutanno-micro-annot_plus_vcf-integrity-check.cwl",
+        "workflow_language": "CWL",
+        "app_version": "v13",
+        "aliases": [
+            "cgap:workflow_mutanno-micro-annot-check_v13"
+        ],
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "accession": "GAPP8T75K13F",
+        "app_name": "workflow_mutanno-micro-annot-check",
+        "cwl_directory_url_v1": "https://raw.githubusercontent.com/dbmi-bgm/cgap-pipeline/v13/cwl",
+        "cwl_pointer": "",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+    }
+]

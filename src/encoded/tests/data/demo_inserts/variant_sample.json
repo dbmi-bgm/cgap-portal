@@ -1,1052 +1,1052 @@
 [
     {
-        "samplegeno": [
-            {
-                "samplegeno_numgt": "0/0",
-                "samplegeno_ad": "35/0",
-                "samplegeno_sampleid": "NA12877_sample",
-                "samplegeno_gt": "C/C"
-            },
-            {
-                "samplegeno_numgt": "0/1",
-                "samplegeno_ad": "32/27",
-                "samplegeno_sampleid": "NA12878_sample",
-                "samplegeno_gt": "C/T"
-            },
-            {
-                "samplegeno_numgt": "0/1",
-                "samplegeno_ad": "23/22",
-                "samplegeno_sampleid": "NA12879_sample",
-                "samplegeno_gt": "C/T"
-            }
-        ],
-        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
-        "annotation_id": "NA12878_sample:16fbdd7d-fb7d-4418-ba13-80b81e1a4d2b:GAPFIPZSZYEK",
-        "novoPP": 0.0,
-        "GQ": 99,
-        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
-        "FS": 0.0,
         "CALL_INFO": "NA12878_sample",
-        "AD": "32,27",
-        "status": "in review",
-        "GT": "0/1",
-        "schema_version": "1",
-        "file": "GAPFIPZSZYEK",
-        "QUAL": 1366.12,
-        "date_created": "2020-08-14T16:15:48.111437+00:00",
-        "DP": 59,
         "PL": "759,0,925",
+        "DP": 59,
         "variant": "16fbdd7d-fb7d-4418-ba13-80b81e1a4d2b",
-        "uuid": "fc2c81f4-069d-49ce-8d3f-9229f7db832c"
-    },
-    {
+        "status": "in review",
+        "date_created": "2020-08-14T16:15:48.111437+00:00",
+        "uuid": "fc2c81f4-069d-49ce-8d3f-9229f7db832c",
+        "annotation_id": "NA12878_sample:16fbdd7d-fb7d-4418-ba13-80b81e1a4d2b:GAPFIPZSZYEK",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
         "samplegeno": [
             {
+                "samplegeno_numgt": "0/0",
+                "samplegeno_gt": "C/C",
+                "samplegeno_ad": "35/0",
+                "samplegeno_sampleid": "NA12877_sample"
+            },
+            {
                 "samplegeno_numgt": "0/1",
-                "samplegeno_ad": "27/33",
-                "samplegeno_sampleid": "NA12877_sample",
-                "samplegeno_gt": "C/T"
+                "samplegeno_gt": "C/T",
+                "samplegeno_ad": "32/27",
+                "samplegeno_sampleid": "NA12878_sample"
             },
             {
-                "samplegeno_numgt": "0/0",
-                "samplegeno_ad": "37/0",
-                "samplegeno_sampleid": "NA12878_sample",
-                "samplegeno_gt": "C/C"
-            },
-            {
-                "samplegeno_numgt": "0/0",
-                "samplegeno_ad": "38/0",
-                "samplegeno_sampleid": "NA12879_sample",
-                "samplegeno_gt": "C/C"
+                "samplegeno_numgt": "0/1",
+                "samplegeno_gt": "C/T",
+                "samplegeno_ad": "23/22",
+                "samplegeno_sampleid": "NA12879_sample"
             }
         ],
-        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
-        "annotation_id": "NA12877_sample:105e8e7e-392e-43e2-b9c8-d61e88a140f2:GAPFIPZSZYEK",
-        "novoPP": 0.0,
         "GQ": 99,
-        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
-        "FS": 9.266,
-        "CALL_INFO": "NA12877_sample",
-        "AD": "27,33",
-        "status": "in review",
-        "GT": "0/1",
-        "schema_version": "1",
+        "AD": "32,27",
+        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
+        "novoPP": 0.0,
         "file": "GAPFIPZSZYEK",
-        "QUAL": 957.25,
-        "date_created": "2020-08-14T16:15:44.121391+00:00",
-        "DP": 60,
-        "PL": "966,0,758",
-        "variant": "105e8e7e-392e-43e2-b9c8-d61e88a140f2",
-        "uuid": "f3fe5bf1-46d0-419e-9446-1caa1a405f36"
+        "GT": "0/1",
+        "FS": 0.0,
+        "schema_version": "1",
+        "QUAL": 1366.12
     },
     {
+        "CALL_INFO": "NA12877_sample",
+        "PL": "966,0,758",
+        "DP": 60,
+        "variant": "105e8e7e-392e-43e2-b9c8-d61e88a140f2",
+        "status": "in review",
+        "date_created": "2020-08-14T16:15:44.121391+00:00",
+        "uuid": "f3fe5bf1-46d0-419e-9446-1caa1a405f36",
+        "annotation_id": "NA12877_sample:105e8e7e-392e-43e2-b9c8-d61e88a140f2:GAPFIPZSZYEK",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
         "samplegeno": [
             {
                 "samplegeno_numgt": "0/1",
+                "samplegeno_gt": "C/T",
+                "samplegeno_ad": "27/33",
+                "samplegeno_sampleid": "NA12877_sample"
+            },
+            {
+                "samplegeno_numgt": "0/0",
+                "samplegeno_gt": "C/C",
+                "samplegeno_ad": "37/0",
+                "samplegeno_sampleid": "NA12878_sample"
+            },
+            {
+                "samplegeno_numgt": "0/0",
+                "samplegeno_gt": "C/C",
+                "samplegeno_ad": "38/0",
+                "samplegeno_sampleid": "NA12879_sample"
+            }
+        ],
+        "GQ": 99,
+        "AD": "27,33",
+        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
+        "novoPP": 0.0,
+        "file": "GAPFIPZSZYEK",
+        "GT": "0/1",
+        "FS": 9.266,
+        "schema_version": "1",
+        "QUAL": 957.25
+    },
+    {
+        "CALL_INFO": "NA12878_sample",
+        "PL": "822,0,936",
+        "DP": 62,
+        "variant": "e55da1e4-e258-4d7f-846b-e8553256cead",
+        "status": "in review",
+        "date_created": "2020-08-14T16:15:22.565646+00:00",
+        "uuid": "f3ee0bf0-34bf-44c9-9ed7-7573a0e426b4",
+        "annotation_id": "NA12878_sample:e55da1e4-e258-4d7f-846b-e8553256cead:GAPFIPZSZYEK",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "samplegeno": [
+            {
+                "samplegeno_numgt": "0/1",
+                "samplegeno_gt": "G/C",
                 "samplegeno_ad": "31/13",
-                "samplegeno_sampleid": "NA12877_sample",
-                "samplegeno_gt": "G/C"
+                "samplegeno_sampleid": "NA12877_sample"
             },
             {
                 "samplegeno_numgt": "0/1",
+                "samplegeno_gt": "G/C",
                 "samplegeno_ad": "33/29",
-                "samplegeno_sampleid": "NA12878_sample",
-                "samplegeno_gt": "G/C"
+                "samplegeno_sampleid": "NA12878_sample"
             },
             {
                 "samplegeno_numgt": "1/1",
+                "samplegeno_gt": "C/C",
                 "samplegeno_ad": "0/50",
-                "samplegeno_sampleid": "NA12879_sample",
-                "samplegeno_gt": "C/C"
+                "samplegeno_sampleid": "NA12879_sample"
             }
         ],
-        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
-        "annotation_id": "NA12878_sample:e55da1e4-e258-4d7f-846b-e8553256cead:GAPFIPZSZYEK",
-        "novoPP": 0.0,
         "GQ": 99,
-        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
-        "FS": 0.6,
-        "CALL_INFO": "NA12878_sample",
         "AD": "33,29",
-        "status": "in review",
-        "GT": "0/1",
-        "schema_version": "1",
+        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
+        "novoPP": 0.0,
         "file": "GAPFIPZSZYEK",
-        "QUAL": 2856.94,
-        "date_created": "2020-08-14T16:15:22.565646+00:00",
-        "DP": 62,
-        "PL": "822,0,936",
-        "variant": "e55da1e4-e258-4d7f-846b-e8553256cead",
-        "uuid": "f3ee0bf0-34bf-44c9-9ed7-7573a0e426b4"
+        "GT": "0/1",
+        "FS": 0.6,
+        "schema_version": "1",
+        "QUAL": 2856.94
     },
     {
-        "samplegeno": [
-            {
-                "samplegeno_numgt": "0/0",
-                "samplegeno_ad": "40/0",
-                "samplegeno_sampleid": "NA12877_sample",
-                "samplegeno_gt": "C/C"
-            },
-            {
-                "samplegeno_numgt": "0/1",
-                "samplegeno_ad": "41/21",
-                "samplegeno_sampleid": "NA12878_sample",
-                "samplegeno_gt": "C/G"
-            },
-            {
-                "samplegeno_numgt": "0/1",
-                "samplegeno_ad": "16/34",
-                "samplegeno_sampleid": "NA12879_sample",
-                "samplegeno_gt": "C/G"
-            }
-        ],
-        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
-        "annotation_id": "NA12878_sample:091d049e-4ac6-4677-9ecd-10bb4c822b98:GAPFIPZSZYEK",
-        "novoPP": 0.0,
-        "GQ": 99,
-        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
-        "FS": 12.034,
         "CALL_INFO": "NA12878_sample",
-        "AD": "41,21",
-        "status": "in review",
-        "GT": "0/1",
-        "schema_version": "1",
-        "file": "GAPFIPZSZYEK",
-        "QUAL": 1562.12,
-        "date_created": "2020-08-14T16:15:25.816304+00:00",
-        "DP": 62,
         "PL": "543,0,1238",
+        "DP": 62,
         "variant": "091d049e-4ac6-4677-9ecd-10bb4c822b98",
-        "uuid": "eed1b25a-8b67-4db3-afc1-a9af8cd3583c"
-    },
-    {
-        "samplegeno": [
-            {
-                "samplegeno_numgt": "0/0",
-                "samplegeno_ad": "35/0",
-                "samplegeno_sampleid": "NA12877_sample",
-                "samplegeno_gt": "A/A"
-            },
-            {
-                "samplegeno_numgt": "0/1",
-                "samplegeno_ad": "31/28",
-                "samplegeno_sampleid": "NA12878_sample",
-                "samplegeno_gt": "A/G"
-            },
-            {
-                "samplegeno_numgt": "0/0",
-                "samplegeno_ad": "38/0",
-                "samplegeno_sampleid": "NA12879_sample",
-                "samplegeno_gt": "A/A"
-            }
-        ],
-        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
-        "annotation_id": "NA12878_sample:e53173e9-18f7-4b60-908e-9d1498ad4ad5:GAPFIPZSZYEK",
-        "novoPP": 0.0,
-        "GQ": 99,
-        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
-        "FS": 5.238,
-        "CALL_INFO": "NA12878_sample",
-        "AD": "31,28",
         "status": "in review",
-        "GT": "0/1",
-        "schema_version": "1",
-        "file": "GAPFIPZSZYEK",
-        "QUAL": 775.25,
-        "date_created": "2020-08-14T16:15:26.891144+00:00",
-        "DP": 59,
-        "PL": "784,0,893",
-        "variant": "e53173e9-18f7-4b60-908e-9d1498ad4ad5",
-        "uuid": "c7b33209-9b7a-4754-b6ed-1fdc0641ae2f"
-    },
-    {
-        "samplegeno": [
-            {
-                "samplegeno_numgt": "0/0",
-                "samplegeno_ad": "37/0",
-                "samplegeno_sampleid": "NA12877_sample",
-                "samplegeno_gt": "T/T"
-            },
-            {
-                "samplegeno_numgt": "0/1",
-                "samplegeno_ad": "24/22",
-                "samplegeno_sampleid": "NA12878_sample",
-                "samplegeno_gt": "T/C"
-            },
-            {
-                "samplegeno_numgt": "0/1",
-                "samplegeno_ad": "37/35",
-                "samplegeno_sampleid": "NA12879_sample",
-                "samplegeno_gt": "T/C"
-            }
-        ],
-        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
-        "annotation_id": "NA12879_sample:cd5872bb-9d39-4d8a-a2d2-652372b81516:GAPFIPZSZYEK",
-        "novoPP": 0.0,
-        "GQ": 99,
+        "date_created": "2020-08-14T16:15:25.816304+00:00",
+        "uuid": "eed1b25a-8b67-4db3-afc1-a9af8cd3583c",
+        "annotation_id": "NA12878_sample:091d049e-4ac6-4677-9ecd-10bb4c822b98:GAPFIPZSZYEK",
         "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
-        "FS": 2.364,
-        "CALL_INFO": "NA12879_sample",
-        "AD": "37,35",
-        "status": "in review",
-        "GT": "0/1",
-        "schema_version": "1",
-        "file": "GAPFIPZSZYEK",
-        "QUAL": 1574.12,
-        "date_created": "2020-08-14T16:15:19.183529+00:00",
-        "DP": 72,
-        "PL": "970,0,1089",
-        "variant": "cd5872bb-9d39-4d8a-a2d2-652372b81516",
-        "uuid": "a4535a13-46b3-454d-b5ef-7adebca36e1d"
-    },
-    {
-        "samplegeno": [
-            {
-                "samplegeno_numgt": "0/1",
-                "samplegeno_ad": "22/22",
-                "samplegeno_sampleid": "NA12877_sample",
-                "samplegeno_gt": "G/A"
-            },
-            {
-                "samplegeno_numgt": "0/0",
-                "samplegeno_ad": "38/0",
-                "samplegeno_sampleid": "NA12878_sample",
-                "samplegeno_gt": "G/G"
-            },
-            {
-                "samplegeno_numgt": "0/1",
-                "samplegeno_ad": "32/27",
-                "samplegeno_sampleid": "NA12879_sample",
-                "samplegeno_gt": "G/A"
-            }
-        ],
-        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
-        "annotation_id": "NA12879_sample:a907c7a1-2b2f-4da2-a7d8-d2cf94d25a58:GAPFIPZSZYEK",
-        "novoPP": 0.0,
-        "GQ": 99,
-        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
-        "FS": 6.227,
-        "CALL_INFO": "NA12879_sample",
-        "AD": "32,27",
-        "status": "in review",
-        "GT": "0/1",
-        "schema_version": "1",
-        "file": "GAPFIPZSZYEK",
-        "QUAL": 1377.12,
-        "date_created": "2020-08-14T16:15:38.364192+00:00",
-        "DP": 59,
-        "PL": "759,0,930",
-        "variant": "a907c7a1-2b2f-4da2-a7d8-d2cf94d25a58",
-        "uuid": "8fdc544e-40d2-4f86-a4ae-45c204dd6997"
-    },
-    {
         "samplegeno": [
             {
                 "samplegeno_numgt": "0/0",
-                "samplegeno_ad": "46/0",
-                "samplegeno_sampleid": "NA12877_sample",
-                "samplegeno_gt": "T/T"
-            },
-            {
-                "samplegeno_numgt": "0/1",
-                "samplegeno_ad": "29/30",
-                "samplegeno_sampleid": "NA12878_sample",
-                "samplegeno_gt": "T/C"
-            },
-            {
-                "samplegeno_numgt": "0/0",
+                "samplegeno_gt": "C/C",
                 "samplegeno_ad": "40/0",
-                "samplegeno_sampleid": "NA12879_sample",
-                "samplegeno_gt": "T/T"
+                "samplegeno_sampleid": "NA12877_sample"
+            },
+            {
+                "samplegeno_numgt": "0/1",
+                "samplegeno_gt": "C/G",
+                "samplegeno_ad": "41/21",
+                "samplegeno_sampleid": "NA12878_sample"
+            },
+            {
+                "samplegeno_numgt": "0/1",
+                "samplegeno_gt": "C/G",
+                "samplegeno_ad": "16/34",
+                "samplegeno_sampleid": "NA12879_sample"
             }
         ],
-        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
-        "annotation_id": "NA12878_sample:8c1cd890-4a9d-485d-9064-89557dc48e9b:GAPFIPZSZYEK",
-        "novoPP": 0.0,
         "GQ": 99,
-        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
-        "FS": 2.248,
+        "AD": "41,21",
+        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
+        "novoPP": 0.0,
+        "file": "GAPFIPZSZYEK",
+        "GT": "0/1",
+        "FS": 12.034,
+        "schema_version": "1",
+        "QUAL": 1562.12
+    },
+    {
         "CALL_INFO": "NA12878_sample",
-        "AD": "29,30",
-        "status": "in review",
-        "GT": "0/1",
-        "schema_version": "1",
-        "file": "GAPFIPZSZYEK",
-        "QUAL": 836.25,
-        "date_created": "2020-08-14T16:15:22.174269+00:00",
+        "PL": "784,0,893",
         "DP": 59,
-        "PL": "845,0,831",
-        "variant": "8c1cd890-4a9d-485d-9064-89557dc48e9b",
-        "uuid": "8e75ccd7-5702-40e9-b46b-d47b68e25e9b"
-    },
-    {
+        "variant": "e53173e9-18f7-4b60-908e-9d1498ad4ad5",
+        "status": "in review",
+        "date_created": "2020-08-14T16:15:26.891144+00:00",
+        "uuid": "c7b33209-9b7a-4754-b6ed-1fdc0641ae2f",
+        "annotation_id": "NA12878_sample:e53173e9-18f7-4b60-908e-9d1498ad4ad5:GAPFIPZSZYEK",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
         "samplegeno": [
             {
                 "samplegeno_numgt": "0/0",
-                "samplegeno_ad": "34/0",
-                "samplegeno_sampleid": "NA12877_sample",
-                "samplegeno_gt": "G/G"
+                "samplegeno_gt": "A/A",
+                "samplegeno_ad": "35/0",
+                "samplegeno_sampleid": "NA12877_sample"
             },
             {
                 "samplegeno_numgt": "0/1",
-                "samplegeno_ad": "28/26",
-                "samplegeno_sampleid": "NA12878_sample",
-                "samplegeno_gt": "G/C"
+                "samplegeno_gt": "A/G",
+                "samplegeno_ad": "31/28",
+                "samplegeno_sampleid": "NA12878_sample"
             },
             {
-                "samplegeno_numgt": "0/1",
-                "samplegeno_ad": "30/34",
-                "samplegeno_sampleid": "NA12879_sample",
-                "samplegeno_gt": "G/C"
+                "samplegeno_numgt": "0/0",
+                "samplegeno_gt": "A/A",
+                "samplegeno_ad": "38/0",
+                "samplegeno_sampleid": "NA12879_sample"
             }
         ],
-        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
-        "annotation_id": "NA12879_sample:8845afa7-0da7-4290-81a0-f61bd3dbc963:GAPFIPZSZYEK",
-        "novoPP": 0.0,
         "GQ": 99,
-        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
-        "FS": 0.685,
+        "AD": "31,28",
+        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
+        "novoPP": 0.0,
+        "file": "GAPFIPZSZYEK",
+        "GT": "0/1",
+        "FS": 5.238,
+        "schema_version": "1",
+        "QUAL": 775.25
+    },
+    {
         "CALL_INFO": "NA12879_sample",
-        "AD": "30,34",
+        "PL": "970,0,1089",
+        "DP": 72,
+        "variant": "cd5872bb-9d39-4d8a-a2d2-652372b81516",
         "status": "in review",
-        "GT": "0/1",
-        "schema_version": "1",
+        "date_created": "2020-08-14T16:15:19.183529+00:00",
+        "uuid": "a4535a13-46b3-454d-b5ef-7adebca36e1d",
+        "annotation_id": "NA12879_sample:cd5872bb-9d39-4d8a-a2d2-652372b81516:GAPFIPZSZYEK",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "samplegeno": [
+            {
+                "samplegeno_numgt": "0/0",
+                "samplegeno_gt": "T/T",
+                "samplegeno_ad": "37/0",
+                "samplegeno_sampleid": "NA12877_sample"
+            },
+            {
+                "samplegeno_numgt": "0/1",
+                "samplegeno_gt": "T/C",
+                "samplegeno_ad": "24/22",
+                "samplegeno_sampleid": "NA12878_sample"
+            },
+            {
+                "samplegeno_numgt": "0/1",
+                "samplegeno_gt": "T/C",
+                "samplegeno_ad": "37/35",
+                "samplegeno_sampleid": "NA12879_sample"
+            }
+        ],
+        "GQ": 99,
+        "AD": "37,35",
+        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
+        "novoPP": 0.0,
         "file": "GAPFIPZSZYEK",
-        "QUAL": 1656.12,
-        "date_created": "2020-08-14T16:15:14.494885+00:00",
-        "DP": 64,
-        "PL": "960,0,801",
-        "variant": "8845afa7-0da7-4290-81a0-f61bd3dbc963",
-        "uuid": "878b0488-b6b1-4d3f-9c65-48739a605026"
+        "GT": "0/1",
+        "FS": 2.364,
+        "schema_version": "1",
+        "QUAL": 1574.12
     },
     {
+        "CALL_INFO": "NA12879_sample",
+        "PL": "759,0,930",
+        "DP": 59,
+        "variant": "a907c7a1-2b2f-4da2-a7d8-d2cf94d25a58",
+        "status": "in review",
+        "date_created": "2020-08-14T16:15:38.364192+00:00",
+        "uuid": "8fdc544e-40d2-4f86-a4ae-45c204dd6997",
+        "annotation_id": "NA12879_sample:a907c7a1-2b2f-4da2-a7d8-d2cf94d25a58:GAPFIPZSZYEK",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
         "samplegeno": [
             {
                 "samplegeno_numgt": "0/1",
-                "samplegeno_ad": "31/34",
-                "samplegeno_sampleid": "NA12877_sample",
-                "samplegeno_gt": "T/C"
+                "samplegeno_gt": "G/A",
+                "samplegeno_ad": "22/22",
+                "samplegeno_sampleid": "NA12877_sample"
             },
             {
                 "samplegeno_numgt": "0/0",
-                "samplegeno_ad": "42/0",
-                "samplegeno_sampleid": "NA12878_sample",
-                "samplegeno_gt": "T/T"
+                "samplegeno_gt": "G/G",
+                "samplegeno_ad": "38/0",
+                "samplegeno_sampleid": "NA12878_sample"
             },
             {
                 "samplegeno_numgt": "0/1",
-                "samplegeno_ad": "25/30",
-                "samplegeno_sampleid": "NA12879_sample",
-                "samplegeno_gt": "T/C"
+                "samplegeno_gt": "G/A",
+                "samplegeno_ad": "32/27",
+                "samplegeno_sampleid": "NA12879_sample"
             }
         ],
-        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
-        "annotation_id": "NA12877_sample:56bfbdd7-e147-40c5-8199-ece66b65b204:GAPFIPZSZYEK",
-        "novoPP": 0.0,
         "GQ": 99,
-        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
-        "FS": 8.436,
-        "CALL_INFO": "NA12877_sample",
-        "AD": "31,34",
-        "status": "in review",
-        "GT": "0/1",
-        "schema_version": "1",
-        "DP": 65,
+        "AD": "32,27",
+        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
+        "novoPP": 0.0,
         "file": "GAPFIPZSZYEK",
-        "QUAL": 1812.12,
-        "date_created": "2020-08-14T16:15:17.286194+00:00",
+        "GT": "0/1",
+        "FS": 6.227,
+        "schema_version": "1",
+        "QUAL": 1377.12
+    },
+    {
+        "CALL_INFO": "NA12878_sample",
+        "PL": "845,0,831",
+        "DP": 59,
+        "variant": "8c1cd890-4a9d-485d-9064-89557dc48e9b",
+        "status": "in review",
+        "date_created": "2020-08-14T16:15:22.174269+00:00",
+        "uuid": "8e75ccd7-5702-40e9-b46b-d47b68e25e9b",
+        "annotation_id": "NA12878_sample:8c1cd890-4a9d-485d-9064-89557dc48e9b:GAPFIPZSZYEK",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "samplegeno": [
+            {
+                "samplegeno_numgt": "0/0",
+                "samplegeno_gt": "T/T",
+                "samplegeno_ad": "46/0",
+                "samplegeno_sampleid": "NA12877_sample"
+            },
+            {
+                "samplegeno_numgt": "0/1",
+                "samplegeno_gt": "T/C",
+                "samplegeno_ad": "29/30",
+                "samplegeno_sampleid": "NA12878_sample"
+            },
+            {
+                "samplegeno_numgt": "0/0",
+                "samplegeno_gt": "T/T",
+                "samplegeno_ad": "40/0",
+                "samplegeno_sampleid": "NA12879_sample"
+            }
+        ],
+        "GQ": 99,
+        "AD": "29,30",
+        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
+        "novoPP": 0.0,
+        "file": "GAPFIPZSZYEK",
+        "GT": "0/1",
+        "FS": 2.248,
+        "schema_version": "1",
+        "QUAL": 836.25
+    },
+    {
+        "CALL_INFO": "NA12879_sample",
+        "PL": "960,0,801",
+        "DP": 64,
+        "variant": "8845afa7-0da7-4290-81a0-f61bd3dbc963",
+        "status": "in review",
+        "date_created": "2020-08-14T16:15:14.494885+00:00",
+        "uuid": "878b0488-b6b1-4d3f-9c65-48739a605026",
+        "annotation_id": "NA12879_sample:8845afa7-0da7-4290-81a0-f61bd3dbc963:GAPFIPZSZYEK",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "samplegeno": [
+            {
+                "samplegeno_numgt": "0/0",
+                "samplegeno_gt": "G/G",
+                "samplegeno_ad": "34/0",
+                "samplegeno_sampleid": "NA12877_sample"
+            },
+            {
+                "samplegeno_numgt": "0/1",
+                "samplegeno_gt": "G/C",
+                "samplegeno_ad": "28/26",
+                "samplegeno_sampleid": "NA12878_sample"
+            },
+            {
+                "samplegeno_numgt": "0/1",
+                "samplegeno_gt": "G/C",
+                "samplegeno_ad": "30/34",
+                "samplegeno_sampleid": "NA12879_sample"
+            }
+        ],
+        "GQ": 99,
+        "AD": "30,34",
+        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
+        "novoPP": 0.0,
+        "file": "GAPFIPZSZYEK",
+        "GT": "0/1",
+        "FS": 0.685,
+        "schema_version": "1",
+        "QUAL": 1656.12
+    },
+    {
+        "CALL_INFO": "NA12877_sample",
+        "PL": "966,0,882",
+        "DP": 65,
+        "variant": "56bfbdd7-e147-40c5-8199-ece66b65b204",
+        "status": "in review",
         "cmphet": [
             {
-                "comhet_mate_variant": "chr9:5919350A>G",
-                "comhet_phase": "Phased",
+                "comhet_transcript": "ENST00000381461~ENST00000399933",
                 "comhet_gene": "ENSG00000183354",
                 "comhet_impact_gene": "WEAK_PAIR",
-                "comhet_transcript": "ENST00000381461~ENST00000399933",
-                "comhet_impact_transcript": "WEAK_PAIR"
+                "comhet_impact_transcript": "WEAK_PAIR",
+                "comhet_phase": "Phased",
+                "comhet_mate_variant": "chr9:5919350A>G"
             }
         ],
-        "PL": "966,0,882",
-        "variant": "56bfbdd7-e147-40c5-8199-ece66b65b204",
-        "uuid": "800376b9-f250-435d-8c4f-42aebe87e26e"
-    },
-    {
-        "samplegeno": [
-            {
-                "samplegeno_numgt": "0/1",
-                "samplegeno_ad": "32/33",
-                "samplegeno_sampleid": "NA12877_sample",
-                "samplegeno_gt": "GA/G"
-            },
-            {
-                "samplegeno_numgt": "0/0",
-                "samplegeno_ad": "45/0",
-                "samplegeno_sampleid": "NA12878_sample",
-                "samplegeno_gt": "GA/GA"
-            },
-            {
-                "samplegeno_numgt": "0/0",
-                "samplegeno_ad": "45/0",
-                "samplegeno_sampleid": "NA12879_sample",
-                "samplegeno_gt": "GA/GA"
-            }
-        ],
-        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
-        "annotation_id": "NA12877_sample:1cece851-38d4-4e1e-8b05-e8ba0cf94aa8:GAPFIPZSZYEK",
-        "novoPP": 0.0,
-        "GQ": 99,
+        "date_created": "2020-08-14T16:15:17.286194+00:00",
+        "uuid": "800376b9-f250-435d-8c4f-42aebe87e26e",
+        "annotation_id": "NA12877_sample:56bfbdd7-e147-40c5-8199-ece66b65b204:GAPFIPZSZYEK",
         "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
-        "FS": 5.084,
-        "CALL_INFO": "NA12877_sample",
-        "AD": "32,33",
-        "status": "in review",
-        "GT": "0/1",
-        "schema_version": "1",
-        "file": "GAPFIPZSZYEK",
-        "QUAL": 804.25,
-        "date_created": "2020-08-14T16:15:19.508860+00:00",
-        "DP": 65,
-        "PL": "813,0,779",
-        "variant": "1cece851-38d4-4e1e-8b05-e8ba0cf94aa8",
-        "uuid": "67f2a571-41c7-44d7-9f39-acfd30a4efcc"
-    },
-    {
         "samplegeno": [
             {
                 "samplegeno_numgt": "0/1",
-                "samplegeno_ad": "30/30",
-                "samplegeno_sampleid": "NA12877_sample",
-                "samplegeno_gt": "C/T"
+                "samplegeno_gt": "T/C",
+                "samplegeno_ad": "31/34",
+                "samplegeno_sampleid": "NA12877_sample"
             },
             {
                 "samplegeno_numgt": "0/0",
-                "samplegeno_ad": "45/0",
-                "samplegeno_sampleid": "NA12878_sample",
-                "samplegeno_gt": "C/C"
-            },
-            {
-                "samplegeno_numgt": "0/0",
-                "samplegeno_ad": "40/0",
-                "samplegeno_sampleid": "NA12879_sample",
-                "samplegeno_gt": "C/C"
-            }
-        ],
-        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
-        "annotation_id": "NA12877_sample:29e24f21-d021-46e7-ae6e-7a133060dd38:GAPFIPZSZYEK",
-        "novoPP": 0.0,
-        "GQ": 99,
-        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
-        "FS": 7.092,
-        "CALL_INFO": "NA12877_sample",
-        "AD": "30,30",
-        "status": "in review",
-        "GT": "0/1",
-        "schema_version": "1",
-        "file": "GAPFIPZSZYEK",
-        "QUAL": 838.25,
-        "date_created": "2020-08-14T16:15:27.600353+00:00",
-        "DP": 60,
-        "PL": "847,0,858",
-        "variant": "29e24f21-d021-46e7-ae6e-7a133060dd38",
-        "uuid": "5f619743-98f5-4155-8b20-9622edb340ae"
-    },
-    {
-        "samplegeno": [
-            {
-                "samplegeno_numgt": "0/1",
-                "samplegeno_ad": "25/34",
-                "samplegeno_sampleid": "NA12877_sample",
-                "samplegeno_gt": "T/C"
-            },
-            {
-                "samplegeno_numgt": "0/0",
-                "samplegeno_ad": "38/0",
-                "samplegeno_sampleid": "NA12878_sample",
-                "samplegeno_gt": "T/T"
-            },
-            {
-                "samplegeno_numgt": "0/1",
-                "samplegeno_ad": "23/27",
-                "samplegeno_sampleid": "NA12879_sample",
-                "samplegeno_gt": "T/C"
-            }
-        ],
-        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
-        "annotation_id": "NA12877_sample:8d4ca775-804a-4ad7-b104-04956a53784c:GAPFIPZSZYEK",
-        "novoPP": 0.0,
-        "GQ": 99,
-        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
-        "FS": 9.105,
-        "CALL_INFO": "NA12877_sample",
-        "AD": "25,34",
-        "status": "in review",
-        "GT": "0/1",
-        "schema_version": "1",
-        "file": "GAPFIPZSZYEK",
-        "QUAL": 1741.12,
-        "date_created": "2020-08-14T16:15:22.914124+00:00",
-        "DP": 59,
-        "PL": "964,0,692",
-        "variant": "8d4ca775-804a-4ad7-b104-04956a53784c",
-        "uuid": "5a6aaf90-2838-458a-9006-666a47e307d4"
-    },
-    {
-        "samplegeno": [
-            {
-                "samplegeno_numgt": "0/1",
-                "samplegeno_ad": "30/30",
-                "samplegeno_sampleid": "NA12877_sample",
-                "samplegeno_gt": "A/G"
-            },
-            {
-                "samplegeno_numgt": "0/0",
-                "samplegeno_ad": "38/0",
-                "samplegeno_sampleid": "NA12878_sample",
-                "samplegeno_gt": "A/A"
-            },
-            {
-                "samplegeno_numgt": "0/1",
-                "samplegeno_ad": "19/27",
-                "samplegeno_sampleid": "NA12879_sample",
-                "samplegeno_gt": "A/G"
-            }
-        ],
-        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
-        "annotation_id": "NA12877_sample:b0a4f366-ee04-4bbc-bae3-9a3eb8d22f93:GAPFIPZSZYEK",
-        "novoPP": 0.0,
-        "GQ": 99,
-        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
-        "FS": 0.0,
-        "CALL_INFO": "NA12877_sample",
-        "AD": "30,30",
-        "status": "in review",
-        "GT": "0/1",
-        "schema_version": "1",
-        "file": "GAPFIPZSZYEK",
-        "QUAL": 1612.12,
-        "date_created": "2020-08-14T16:15:30.179572+00:00",
-        "DP": 60,
-        "PL": "823,0,828",
-        "variant": "b0a4f366-ee04-4bbc-bae3-9a3eb8d22f93",
-        "uuid": "565cf90a-0d22-47fd-b0a7-c86990b9b8c4"
-    },
-    {
-        "samplegeno": [
-            {
-                "samplegeno_numgt": "0/0",
-                "samplegeno_ad": "31/0",
-                "samplegeno_sampleid": "NA12877_sample",
-                "samplegeno_gt": "T/T"
-            },
-            {
-                "samplegeno_numgt": "0/1",
-                "samplegeno_ad": "34/31",
-                "samplegeno_sampleid": "NA12878_sample",
-                "samplegeno_gt": "T/TAGC"
-            },
-            {
-                "samplegeno_numgt": "0/0",
-                "samplegeno_ad": "34/0",
-                "samplegeno_sampleid": "NA12879_sample",
-                "samplegeno_gt": "T/T"
-            }
-        ],
-        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
-        "annotation_id": "NA12878_sample:fa2a963e-f94c-4d39-9e90-7b05d4b51a27:GAPFIPZSZYEK",
-        "novoPP": 0.0,
-        "GQ": 99,
-        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
-        "FS": 0.0,
-        "CALL_INFO": "NA12878_sample",
-        "AD": "34,31",
-        "status": "in review",
-        "GT": "0/1",
-        "schema_version": "1",
-        "file": "GAPFIPZSZYEK",
-        "QUAL": 1194.29,
-        "date_created": "2020-08-14T16:15:27.412656+00:00",
-        "DP": 65,
-        "PL": "1203,0,1619",
-        "variant": "fa2a963e-f94c-4d39-9e90-7b05d4b51a27",
-        "uuid": "4dad79ae-6b98-453b-a56f-8ca610ff6223"
-    },
-    {
-        "samplegeno": [
-            {
-                "samplegeno_numgt": "0/1",
-                "samplegeno_ad": "26/26",
-                "samplegeno_sampleid": "NA12877_sample",
-                "samplegeno_gt": "C/T"
-            },
-            {
-                "samplegeno_numgt": "0/0",
-                "samplegeno_ad": "34/0",
-                "samplegeno_sampleid": "NA12878_sample",
-                "samplegeno_gt": "C/C"
-            },
-            {
-                "samplegeno_numgt": "0/1",
-                "samplegeno_ad": "33/26",
-                "samplegeno_sampleid": "NA12879_sample",
-                "samplegeno_gt": "C/T"
-            }
-        ],
-        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
-        "annotation_id": "NA12879_sample:f79e8edd-86a6-436b-92a6-757176e6cf6d:GAPFIPZSZYEK",
-        "novoPP": 0.0,
-        "GQ": 99,
-        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
-        "FS": 0.717,
-        "CALL_INFO": "NA12879_sample",
-        "AD": "33,26",
-        "status": "in review",
-        "GT": "0/1",
-        "schema_version": "1",
-        "file": "GAPFIPZSZYEK",
-        "QUAL": 1432.12,
-        "date_created": "2020-08-14T16:15:17.650197+00:00",
-        "DP": 59,
-        "PL": "716,0,965",
-        "variant": "f79e8edd-86a6-436b-92a6-757176e6cf6d",
-        "uuid": "2ed69a03-05a4-4f6d-9c9f-788408a5c69a"
-    },
-    {
-        "samplegeno": [
-            {
-                "samplegeno_numgt": "0/1",
-                "samplegeno_ad": "33/37",
-                "samplegeno_sampleid": "NA12877_sample",
-                "samplegeno_gt": "A/T"
-            },
-            {
-                "samplegeno_numgt": "0/0",
-                "samplegeno_ad": "38/0",
-                "samplegeno_sampleid": "NA12878_sample",
-                "samplegeno_gt": "A/A"
-            },
-            {
-                "samplegeno_numgt": "0/1",
-                "samplegeno_ad": "22/15",
-                "samplegeno_sampleid": "NA12879_sample",
-                "samplegeno_gt": "A/T"
-            }
-        ],
-        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
-        "annotation_id": "NA12877_sample:6d81f13f-44bd-4c45-ba1d-61808cd91276:GAPFIPZSZYEK",
-        "novoPP": 0.0,
-        "GQ": 99,
-        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
-        "FS": 11.351,
-        "CALL_INFO": "NA12877_sample",
-        "AD": "33,37",
-        "status": "in review",
-        "GT": "0/1",
-        "schema_version": "1",
-        "file": "GAPFIPZSZYEK",
-        "QUAL": 1464.12,
-        "date_created": "2020-08-14T16:15:41.802561+00:00",
-        "DP": 70,
-        "PL": "1065,0,926",
-        "variant": "6d81f13f-44bd-4c45-ba1d-61808cd91276",
-        "uuid": "2e6e544f-9059-41a7-ba25-d48999613810"
-    },
-    {
-        "samplegeno": [
-            {
-                "samplegeno_numgt": "0/1",
-                "samplegeno_ad": "28/23",
-                "samplegeno_sampleid": "NA12877_sample",
-                "samplegeno_gt": "A/T"
-            },
-            {
-                "samplegeno_numgt": "0/0",
-                "samplegeno_ad": "37/0",
-                "samplegeno_sampleid": "NA12878_sample",
-                "samplegeno_gt": "A/A"
-            },
-            {
-                "samplegeno_numgt": "0/1",
-                "samplegeno_ad": "31/31",
-                "samplegeno_sampleid": "NA12879_sample",
-                "samplegeno_gt": "A/T"
-            }
-        ],
-        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
-        "annotation_id": "NA12879_sample:80881b6e-883e-4c86-9480-aa4cb3f571c1:GAPFIPZSZYEK",
-        "novoPP": 0.0,
-        "GQ": 99,
-        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
-        "FS": 1.5,
-        "CALL_INFO": "NA12879_sample",
-        "AD": "31,31",
-        "status": "in review",
-        "GT": "0/1",
-        "schema_version": "1",
-        "file": "GAPFIPZSZYEK",
-        "QUAL": 1526.12,
-        "date_created": "2020-08-14T16:15:21.258607+00:00",
-        "DP": 62,
-        "PL": "891,0,871",
-        "variant": "80881b6e-883e-4c86-9480-aa4cb3f571c1",
-        "uuid": "2da4a593-205a-45ea-b4d6-a5a4b755480b"
-    },
-    {
-        "samplegeno": [
-            {
-                "samplegeno_numgt": "0/0",
-                "samplegeno_ad": "38/0",
-                "samplegeno_sampleid": "NA12877_sample",
-                "samplegeno_gt": "T/T"
-            },
-            {
-                "samplegeno_numgt": "0/1",
-                "samplegeno_ad": "34/25",
-                "samplegeno_sampleid": "NA12878_sample",
-                "samplegeno_gt": "T/C"
-            },
-            {
-                "samplegeno_numgt": "0/0",
-                "samplegeno_ad": "40/0",
-                "samplegeno_sampleid": "NA12879_sample",
-                "samplegeno_gt": "T/T"
-            }
-        ],
-        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
-        "annotation_id": "NA12878_sample:e2d3e60e-51b0-4941-a40e-8c6a3d858da8:GAPFIPZSZYEK",
-        "novoPP": 0.0,
-        "GQ": 99,
-        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
-        "FS": 3.565,
-        "CALL_INFO": "NA12878_sample",
-        "AD": "34,25",
-        "status": "in review",
-        "GT": "0/1",
-        "schema_version": "1",
-        "file": "GAPFIPZSZYEK",
-        "QUAL": 681.25,
-        "date_created": "2020-08-14T16:15:34.275754+00:00",
-        "DP": 59,
-        "PL": "690,0,987",
-        "variant": "e2d3e60e-51b0-4941-a40e-8c6a3d858da8",
-        "uuid": "26368c17-390a-4899-8b78-1bd96c99c746"
-    },
-    {
-        "samplegeno": [
-            {
-                "samplegeno_numgt": "0/1",
-                "samplegeno_ad": "34/26",
-                "samplegeno_sampleid": "NA12877_sample",
-                "samplegeno_gt": "C/T"
-            },
-            {
-                "samplegeno_numgt": "0/0",
-                "samplegeno_ad": "44/0",
-                "samplegeno_sampleid": "NA12878_sample",
-                "samplegeno_gt": "C/C"
-            },
-            {
-                "samplegeno_numgt": "0/1",
-                "samplegeno_ad": "23/35",
-                "samplegeno_sampleid": "NA12879_sample",
-                "samplegeno_gt": "C/T"
-            }
-        ],
-        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
-        "annotation_id": "NA12877_sample:91027c84-6f20-403b-a9af-929df583f8cd:GAPFIPZSZYEK",
-        "novoPP": 0.0,
-        "GQ": 99,
-        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
-        "FS": 1.45,
-        "CALL_INFO": "NA12877_sample",
-        "AD": "34,26",
-        "status": "in review",
-        "GT": "0/1",
-        "schema_version": "1",
-        "file": "GAPFIPZSZYEK",
-        "QUAL": 1734.12,
-        "date_created": "2020-08-14T16:15:39.047409+00:00",
-        "DP": 60,
-        "PL": "713,0,981",
-        "variant": "91027c84-6f20-403b-a9af-929df583f8cd",
-        "uuid": "213ca89b-07bd-40f2-bf38-2c3d74cda80f"
-    },
-    {
-        "samplegeno": [
-            {
-                "samplegeno_numgt": "0/0",
-                "samplegeno_ad": "40/0",
-                "samplegeno_sampleid": "NA12877_sample",
-                "samplegeno_gt": "A/A"
-            },
-            {
-                "samplegeno_numgt": "0/1",
-                "samplegeno_ad": "26/27",
-                "samplegeno_sampleid": "NA12878_sample",
-                "samplegeno_gt": "A/G"
-            },
-            {
-                "samplegeno_numgt": "0/1",
-                "samplegeno_ad": "29/30",
-                "samplegeno_sampleid": "NA12879_sample",
-                "samplegeno_gt": "A/G"
-            }
-        ],
-        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
-        "annotation_id": "NA12879_sample:4f6ecd89-d19b-4d09-a1ad-99a200c4b40a:GAPFIPZSZYEK",
-        "novoPP": 0.0,
-        "GQ": 99,
-        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
-        "FS": 1.554,
-        "CALL_INFO": "NA12879_sample",
-        "AD": "29,30",
-        "status": "in review",
-        "GT": "0/1",
-        "schema_version": "1",
-        "file": "GAPFIPZSZYEK",
-        "QUAL": 1631.12,
-        "date_created": "2020-08-14T16:15:40.185440+00:00",
-        "DP": 59,
-        "PL": "864,0,829",
-        "variant": "4f6ecd89-d19b-4d09-a1ad-99a200c4b40a",
-        "uuid": "20d7e057-e792-4977-9725-bd5c703308b8"
-    },
-    {
-        "samplegeno": [
-            {
-                "samplegeno_numgt": "0/0",
-                "samplegeno_ad": "56/0",
-                "samplegeno_sampleid": "NA12877_sample",
-                "samplegeno_gt": "A/A"
-            },
-            {
-                "samplegeno_numgt": "0/1",
-                "samplegeno_ad": "28/42",
-                "samplegeno_sampleid": "NA12878_sample",
-                "samplegeno_gt": "A/G"
-            },
-            {
-                "samplegeno_numgt": "0/1",
-                "samplegeno_ad": "26/20",
-                "samplegeno_sampleid": "NA12879_sample",
-                "samplegeno_gt": "A/G"
-            }
-        ],
-        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
-        "annotation_id": "NA12878_sample:4fc1f85a-29a3-4748-80d9-bc6884ec2eec:GAPFIPZSZYEK",
-        "novoPP": 0.0,
-        "GQ": 99,
-        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
-        "FS": 1.494,
-        "CALL_INFO": "NA12878_sample",
-        "AD": "28,42",
-        "status": "in review",
-        "GT": "0/1",
-        "schema_version": "1",
-        "file": "GAPFIPZSZYEK",
-        "QUAL": 1759.12,
-        "date_created": "2020-08-14T16:15:42.674110+00:00",
-        "DP": 70,
-        "PL": "1226,0,721",
-        "variant": "4fc1f85a-29a3-4748-80d9-bc6884ec2eec",
-        "uuid": "1be34c74-d1aa-4482-b26d-607548fd37d8"
-    },
-    {
-        "samplegeno": [
-            {
-                "samplegeno_numgt": "0/1",
-                "samplegeno_ad": "29/32",
-                "samplegeno_sampleid": "NA12877_sample",
-                "samplegeno_gt": "A/C"
-            },
-            {
-                "samplegeno_numgt": "0/0",
-                "samplegeno_ad": "41/0",
-                "samplegeno_sampleid": "NA12878_sample",
-                "samplegeno_gt": "A/A"
-            },
-            {
-                "samplegeno_numgt": "0/0",
-                "samplegeno_ad": "41/0",
-                "samplegeno_sampleid": "NA12879_sample",
-                "samplegeno_gt": "A/A"
-            }
-        ],
-        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
-        "annotation_id": "NA12877_sample:728c9ef1-7735-4642-8033-a8ba6306e9cf:GAPFIPZSZYEK",
-        "novoPP": 0.0,
-        "GQ": 99,
-        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
-        "FS": 3.596,
-        "CALL_INFO": "NA12877_sample",
-        "AD": "29,32",
-        "status": "in review",
-        "GT": "0/1",
-        "schema_version": "1",
-        "file": "GAPFIPZSZYEK",
-        "QUAL": 877.25,
-        "date_created": "2020-08-14T16:15:36.373694+00:00",
-        "DP": 61,
-        "PL": "886,0,825",
-        "variant": "728c9ef1-7735-4642-8033-a8ba6306e9cf",
-        "uuid": "1b7b3f7c-d2d6-4493-858b-12c3343db6ce"
-    },
-    {
-        "samplegeno": [
-            {
-                "samplegeno_numgt": "0/0",
-                "samplegeno_ad": "43/0",
-                "samplegeno_sampleid": "NA12877_sample",
-                "samplegeno_gt": "A/A"
-            },
-            {
-                "samplegeno_numgt": "0/1",
-                "samplegeno_ad": "30/31",
-                "samplegeno_sampleid": "NA12878_sample",
-                "samplegeno_gt": "A/C"
-            },
-            {
-                "samplegeno_numgt": "0/0",
-                "samplegeno_ad": "43/0",
-                "samplegeno_sampleid": "NA12879_sample",
-                "samplegeno_gt": "A/A"
-            }
-        ],
-        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
-        "annotation_id": "NA12878_sample:82c23e9a-abdc-4cec-8152-edea3cad55cb:GAPFIPZSZYEK",
-        "novoPP": 0.0,
-        "GQ": 99,
-        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
-        "FS": 5.148,
-        "CALL_INFO": "NA12878_sample",
-        "AD": "30,31",
-        "status": "in review",
-        "GT": "0/1",
-        "schema_version": "1",
-        "file": "GAPFIPZSZYEK",
-        "QUAL": 810.25,
-        "date_created": "2020-08-14T16:15:48.857294+00:00",
-        "DP": 61,
-        "PL": "819,0,849",
-        "variant": "82c23e9a-abdc-4cec-8152-edea3cad55cb",
-        "uuid": "153de2ba-c677-43aa-b756-3660a6699deb"
-    },
-    {
-        "samplegeno": [
-            {
-                "samplegeno_numgt": "0/1",
-                "samplegeno_ad": "25/16",
-                "samplegeno_sampleid": "NA12877_sample",
-                "samplegeno_gt": "G/A"
-            },
-            {
-                "samplegeno_numgt": "0/0",
+                "samplegeno_gt": "T/T",
                 "samplegeno_ad": "42/0",
-                "samplegeno_sampleid": "NA12878_sample",
-                "samplegeno_gt": "G/G"
+                "samplegeno_sampleid": "NA12878_sample"
             },
             {
                 "samplegeno_numgt": "0/1",
-                "samplegeno_ad": "31/30",
-                "samplegeno_sampleid": "NA12879_sample",
-                "samplegeno_gt": "G/A"
+                "samplegeno_gt": "T/C",
+                "samplegeno_ad": "25/30",
+                "samplegeno_sampleid": "NA12879_sample"
             }
         ],
-        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
-        "annotation_id": "NA12879_sample:e8585a30-a5af-4937-8167-f3f4364945a3:GAPFIPZSZYEK",
-        "novoPP": 0.0,
         "GQ": 99,
-        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
-        "FS": 4.948,
-        "CALL_INFO": "NA12879_sample",
-        "AD": "31,30",
-        "status": "in review",
-        "GT": "0/1",
-        "schema_version": "1",
+        "AD": "31,34",
+        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
+        "novoPP": 0.0,
         "file": "GAPFIPZSZYEK",
-        "QUAL": 1247.12,
-        "date_created": "2020-08-14T16:15:19.371935+00:00",
-        "DP": 61,
-        "PL": "825,0,869",
-        "variant": "e8585a30-a5af-4937-8167-f3f4364945a3",
-        "uuid": "1415f6f8-d5a7-4d24-8341-92a70b4fede4"
+        "GT": "0/1",
+        "FS": 8.436,
+        "schema_version": "1",
+        "QUAL": 1812.12
     },
     {
+        "CALL_INFO": "NA12877_sample",
+        "PL": "813,0,779",
+        "DP": 65,
+        "variant": "1cece851-38d4-4e1e-8b05-e8ba0cf94aa8",
+        "status": "in review",
+        "date_created": "2020-08-14T16:15:19.508860+00:00",
+        "uuid": "67f2a571-41c7-44d7-9f39-acfd30a4efcc",
+        "annotation_id": "NA12877_sample:1cece851-38d4-4e1e-8b05-e8ba0cf94aa8:GAPFIPZSZYEK",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
         "samplegeno": [
             {
                 "samplegeno_numgt": "0/1",
-                "samplegeno_ad": "25/34",
-                "samplegeno_sampleid": "NA12877_sample",
-                "samplegeno_gt": "AT/A"
+                "samplegeno_gt": "GA/G",
+                "samplegeno_ad": "32/33",
+                "samplegeno_sampleid": "NA12877_sample"
             },
             {
                 "samplegeno_numgt": "0/0",
-                "samplegeno_ad": "37/0",
-                "samplegeno_sampleid": "NA12878_sample",
-                "samplegeno_gt": "AT/AT"
+                "samplegeno_gt": "GA/GA",
+                "samplegeno_ad": "45/0",
+                "samplegeno_sampleid": "NA12878_sample"
+            },
+            {
+                "samplegeno_numgt": "0/0",
+                "samplegeno_gt": "GA/GA",
+                "samplegeno_ad": "45/0",
+                "samplegeno_sampleid": "NA12879_sample"
+            }
+        ],
+        "GQ": 99,
+        "AD": "32,33",
+        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
+        "novoPP": 0.0,
+        "file": "GAPFIPZSZYEK",
+        "GT": "0/1",
+        "FS": 5.084,
+        "schema_version": "1",
+        "QUAL": 804.25
+    },
+    {
+        "CALL_INFO": "NA12877_sample",
+        "PL": "847,0,858",
+        "DP": 60,
+        "variant": "29e24f21-d021-46e7-ae6e-7a133060dd38",
+        "status": "in review",
+        "date_created": "2020-08-14T16:15:27.600353+00:00",
+        "uuid": "5f619743-98f5-4155-8b20-9622edb340ae",
+        "annotation_id": "NA12877_sample:29e24f21-d021-46e7-ae6e-7a133060dd38:GAPFIPZSZYEK",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "samplegeno": [
+            {
+                "samplegeno_numgt": "0/1",
+                "samplegeno_gt": "C/T",
+                "samplegeno_ad": "30/30",
+                "samplegeno_sampleid": "NA12877_sample"
+            },
+            {
+                "samplegeno_numgt": "0/0",
+                "samplegeno_gt": "C/C",
+                "samplegeno_ad": "45/0",
+                "samplegeno_sampleid": "NA12878_sample"
+            },
+            {
+                "samplegeno_numgt": "0/0",
+                "samplegeno_gt": "C/C",
+                "samplegeno_ad": "40/0",
+                "samplegeno_sampleid": "NA12879_sample"
+            }
+        ],
+        "GQ": 99,
+        "AD": "30,30",
+        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
+        "novoPP": 0.0,
+        "file": "GAPFIPZSZYEK",
+        "GT": "0/1",
+        "FS": 7.092,
+        "schema_version": "1",
+        "QUAL": 838.25
+    },
+    {
+        "CALL_INFO": "NA12877_sample",
+        "PL": "964,0,692",
+        "DP": 59,
+        "variant": "8d4ca775-804a-4ad7-b104-04956a53784c",
+        "status": "in review",
+        "date_created": "2020-08-14T16:15:22.914124+00:00",
+        "uuid": "5a6aaf90-2838-458a-9006-666a47e307d4",
+        "annotation_id": "NA12877_sample:8d4ca775-804a-4ad7-b104-04956a53784c:GAPFIPZSZYEK",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "samplegeno": [
+            {
+                "samplegeno_numgt": "0/1",
+                "samplegeno_gt": "T/C",
+                "samplegeno_ad": "25/34",
+                "samplegeno_sampleid": "NA12877_sample"
+            },
+            {
+                "samplegeno_numgt": "0/0",
+                "samplegeno_gt": "T/T",
+                "samplegeno_ad": "38/0",
+                "samplegeno_sampleid": "NA12878_sample"
             },
             {
                 "samplegeno_numgt": "0/1",
-                "samplegeno_ad": "14/16",
-                "samplegeno_sampleid": "NA12879_sample",
-                "samplegeno_gt": "AT/A"
+                "samplegeno_gt": "T/C",
+                "samplegeno_ad": "23/27",
+                "samplegeno_sampleid": "NA12879_sample"
             }
         ],
-        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
-        "annotation_id": "NA12877_sample:00e98dd4-25be-4d51-b6c5-7c30b3a5eeb9:GAPFIPZSZYEK",
-        "novoPP": 0.0,
         "GQ": 99,
-        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
-        "FS": 0.803,
-        "CALL_INFO": "NA12877_sample",
         "AD": "25,34",
-        "status": "in review",
-        "GT": "0/1",
-        "schema_version": "1",
+        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
+        "novoPP": 0.0,
         "file": "GAPFIPZSZYEK",
-        "QUAL": 1495.12,
-        "date_created": "2020-08-14T16:15:21.771046+00:00",
+        "GT": "0/1",
+        "FS": 9.105,
+        "schema_version": "1",
+        "QUAL": 1741.12
+    },
+    {
+        "CALL_INFO": "NA12877_sample",
+        "PL": "823,0,828",
+        "DP": 60,
+        "variant": "b0a4f366-ee04-4bbc-bae3-9a3eb8d22f93",
+        "status": "in review",
+        "date_created": "2020-08-14T16:15:30.179572+00:00",
+        "uuid": "565cf90a-0d22-47fd-b0a7-c86990b9b8c4",
+        "annotation_id": "NA12877_sample:b0a4f366-ee04-4bbc-bae3-9a3eb8d22f93:GAPFIPZSZYEK",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "samplegeno": [
+            {
+                "samplegeno_numgt": "0/1",
+                "samplegeno_gt": "A/G",
+                "samplegeno_ad": "30/30",
+                "samplegeno_sampleid": "NA12877_sample"
+            },
+            {
+                "samplegeno_numgt": "0/0",
+                "samplegeno_gt": "A/A",
+                "samplegeno_ad": "38/0",
+                "samplegeno_sampleid": "NA12878_sample"
+            },
+            {
+                "samplegeno_numgt": "0/1",
+                "samplegeno_gt": "A/G",
+                "samplegeno_ad": "19/27",
+                "samplegeno_sampleid": "NA12879_sample"
+            }
+        ],
+        "GQ": 99,
+        "AD": "30,30",
+        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
+        "novoPP": 0.0,
+        "file": "GAPFIPZSZYEK",
+        "GT": "0/1",
+        "FS": 0.0,
+        "schema_version": "1",
+        "QUAL": 1612.12
+    },
+    {
+        "CALL_INFO": "NA12878_sample",
+        "PL": "1203,0,1619",
+        "DP": 65,
+        "variant": "fa2a963e-f94c-4d39-9e90-7b05d4b51a27",
+        "status": "in review",
+        "date_created": "2020-08-14T16:15:27.412656+00:00",
+        "uuid": "4dad79ae-6b98-453b-a56f-8ca610ff6223",
+        "annotation_id": "NA12878_sample:fa2a963e-f94c-4d39-9e90-7b05d4b51a27:GAPFIPZSZYEK",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "samplegeno": [
+            {
+                "samplegeno_numgt": "0/0",
+                "samplegeno_gt": "T/T",
+                "samplegeno_ad": "31/0",
+                "samplegeno_sampleid": "NA12877_sample"
+            },
+            {
+                "samplegeno_numgt": "0/1",
+                "samplegeno_gt": "T/TAGC",
+                "samplegeno_ad": "34/31",
+                "samplegeno_sampleid": "NA12878_sample"
+            },
+            {
+                "samplegeno_numgt": "0/0",
+                "samplegeno_gt": "T/T",
+                "samplegeno_ad": "34/0",
+                "samplegeno_sampleid": "NA12879_sample"
+            }
+        ],
+        "GQ": 99,
+        "AD": "34,31",
+        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
+        "novoPP": 0.0,
+        "file": "GAPFIPZSZYEK",
+        "GT": "0/1",
+        "FS": 0.0,
+        "schema_version": "1",
+        "QUAL": 1194.29
+    },
+    {
+        "CALL_INFO": "NA12879_sample",
+        "PL": "716,0,965",
         "DP": 59,
+        "variant": "f79e8edd-86a6-436b-92a6-757176e6cf6d",
+        "status": "in review",
+        "date_created": "2020-08-14T16:15:17.650197+00:00",
+        "uuid": "2ed69a03-05a4-4f6d-9c9f-788408a5c69a",
+        "annotation_id": "NA12879_sample:f79e8edd-86a6-436b-92a6-757176e6cf6d:GAPFIPZSZYEK",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "samplegeno": [
+            {
+                "samplegeno_numgt": "0/1",
+                "samplegeno_gt": "C/T",
+                "samplegeno_ad": "26/26",
+                "samplegeno_sampleid": "NA12877_sample"
+            },
+            {
+                "samplegeno_numgt": "0/0",
+                "samplegeno_gt": "C/C",
+                "samplegeno_ad": "34/0",
+                "samplegeno_sampleid": "NA12878_sample"
+            },
+            {
+                "samplegeno_numgt": "0/1",
+                "samplegeno_gt": "C/T",
+                "samplegeno_ad": "33/26",
+                "samplegeno_sampleid": "NA12879_sample"
+            }
+        ],
+        "GQ": 99,
+        "AD": "33,26",
+        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
+        "novoPP": 0.0,
+        "file": "GAPFIPZSZYEK",
+        "GT": "0/1",
+        "FS": 0.717,
+        "schema_version": "1",
+        "QUAL": 1432.12
+    },
+    {
+        "CALL_INFO": "NA12877_sample",
+        "PL": "1065,0,926",
+        "DP": 70,
+        "variant": "6d81f13f-44bd-4c45-ba1d-61808cd91276",
+        "status": "in review",
+        "date_created": "2020-08-14T16:15:41.802561+00:00",
+        "uuid": "2e6e544f-9059-41a7-ba25-d48999613810",
+        "annotation_id": "NA12877_sample:6d81f13f-44bd-4c45-ba1d-61808cd91276:GAPFIPZSZYEK",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "samplegeno": [
+            {
+                "samplegeno_numgt": "0/1",
+                "samplegeno_gt": "A/T",
+                "samplegeno_ad": "33/37",
+                "samplegeno_sampleid": "NA12877_sample"
+            },
+            {
+                "samplegeno_numgt": "0/0",
+                "samplegeno_gt": "A/A",
+                "samplegeno_ad": "38/0",
+                "samplegeno_sampleid": "NA12878_sample"
+            },
+            {
+                "samplegeno_numgt": "0/1",
+                "samplegeno_gt": "A/T",
+                "samplegeno_ad": "22/15",
+                "samplegeno_sampleid": "NA12879_sample"
+            }
+        ],
+        "GQ": 99,
+        "AD": "33,37",
+        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
+        "novoPP": 0.0,
+        "file": "GAPFIPZSZYEK",
+        "GT": "0/1",
+        "FS": 11.351,
+        "schema_version": "1",
+        "QUAL": 1464.12
+    },
+    {
+        "CALL_INFO": "NA12879_sample",
+        "PL": "891,0,871",
+        "DP": 62,
+        "variant": "80881b6e-883e-4c86-9480-aa4cb3f571c1",
+        "status": "in review",
+        "date_created": "2020-08-14T16:15:21.258607+00:00",
+        "uuid": "2da4a593-205a-45ea-b4d6-a5a4b755480b",
+        "annotation_id": "NA12879_sample:80881b6e-883e-4c86-9480-aa4cb3f571c1:GAPFIPZSZYEK",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "samplegeno": [
+            {
+                "samplegeno_numgt": "0/1",
+                "samplegeno_gt": "A/T",
+                "samplegeno_ad": "28/23",
+                "samplegeno_sampleid": "NA12877_sample"
+            },
+            {
+                "samplegeno_numgt": "0/0",
+                "samplegeno_gt": "A/A",
+                "samplegeno_ad": "37/0",
+                "samplegeno_sampleid": "NA12878_sample"
+            },
+            {
+                "samplegeno_numgt": "0/1",
+                "samplegeno_gt": "A/T",
+                "samplegeno_ad": "31/31",
+                "samplegeno_sampleid": "NA12879_sample"
+            }
+        ],
+        "GQ": 99,
+        "AD": "31,31",
+        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
+        "novoPP": 0.0,
+        "file": "GAPFIPZSZYEK",
+        "GT": "0/1",
+        "FS": 1.5,
+        "schema_version": "1",
+        "QUAL": 1526.12
+    },
+    {
+        "CALL_INFO": "NA12878_sample",
+        "PL": "690,0,987",
+        "DP": 59,
+        "variant": "e2d3e60e-51b0-4941-a40e-8c6a3d858da8",
+        "status": "in review",
+        "date_created": "2020-08-14T16:15:34.275754+00:00",
+        "uuid": "26368c17-390a-4899-8b78-1bd96c99c746",
+        "annotation_id": "NA12878_sample:e2d3e60e-51b0-4941-a40e-8c6a3d858da8:GAPFIPZSZYEK",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "samplegeno": [
+            {
+                "samplegeno_numgt": "0/0",
+                "samplegeno_gt": "T/T",
+                "samplegeno_ad": "38/0",
+                "samplegeno_sampleid": "NA12877_sample"
+            },
+            {
+                "samplegeno_numgt": "0/1",
+                "samplegeno_gt": "T/C",
+                "samplegeno_ad": "34/25",
+                "samplegeno_sampleid": "NA12878_sample"
+            },
+            {
+                "samplegeno_numgt": "0/0",
+                "samplegeno_gt": "T/T",
+                "samplegeno_ad": "40/0",
+                "samplegeno_sampleid": "NA12879_sample"
+            }
+        ],
+        "GQ": 99,
+        "AD": "34,25",
+        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
+        "novoPP": 0.0,
+        "file": "GAPFIPZSZYEK",
+        "GT": "0/1",
+        "FS": 3.565,
+        "schema_version": "1",
+        "QUAL": 681.25
+    },
+    {
+        "CALL_INFO": "NA12877_sample",
+        "PL": "713,0,981",
+        "DP": 60,
+        "variant": "91027c84-6f20-403b-a9af-929df583f8cd",
+        "status": "in review",
+        "date_created": "2020-08-14T16:15:39.047409+00:00",
+        "uuid": "213ca89b-07bd-40f2-bf38-2c3d74cda80f",
+        "annotation_id": "NA12877_sample:91027c84-6f20-403b-a9af-929df583f8cd:GAPFIPZSZYEK",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "samplegeno": [
+            {
+                "samplegeno_numgt": "0/1",
+                "samplegeno_gt": "C/T",
+                "samplegeno_ad": "34/26",
+                "samplegeno_sampleid": "NA12877_sample"
+            },
+            {
+                "samplegeno_numgt": "0/0",
+                "samplegeno_gt": "C/C",
+                "samplegeno_ad": "44/0",
+                "samplegeno_sampleid": "NA12878_sample"
+            },
+            {
+                "samplegeno_numgt": "0/1",
+                "samplegeno_gt": "C/T",
+                "samplegeno_ad": "23/35",
+                "samplegeno_sampleid": "NA12879_sample"
+            }
+        ],
+        "GQ": 99,
+        "AD": "34,26",
+        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
+        "novoPP": 0.0,
+        "file": "GAPFIPZSZYEK",
+        "GT": "0/1",
+        "FS": 1.45,
+        "schema_version": "1",
+        "QUAL": 1734.12
+    },
+    {
+        "CALL_INFO": "NA12879_sample",
+        "PL": "864,0,829",
+        "DP": 59,
+        "variant": "4f6ecd89-d19b-4d09-a1ad-99a200c4b40a",
+        "status": "in review",
+        "date_created": "2020-08-14T16:15:40.185440+00:00",
+        "uuid": "20d7e057-e792-4977-9725-bd5c703308b8",
+        "annotation_id": "NA12879_sample:4f6ecd89-d19b-4d09-a1ad-99a200c4b40a:GAPFIPZSZYEK",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "samplegeno": [
+            {
+                "samplegeno_numgt": "0/0",
+                "samplegeno_gt": "A/A",
+                "samplegeno_ad": "40/0",
+                "samplegeno_sampleid": "NA12877_sample"
+            },
+            {
+                "samplegeno_numgt": "0/1",
+                "samplegeno_gt": "A/G",
+                "samplegeno_ad": "26/27",
+                "samplegeno_sampleid": "NA12878_sample"
+            },
+            {
+                "samplegeno_numgt": "0/1",
+                "samplegeno_gt": "A/G",
+                "samplegeno_ad": "29/30",
+                "samplegeno_sampleid": "NA12879_sample"
+            }
+        ],
+        "GQ": 99,
+        "AD": "29,30",
+        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
+        "novoPP": 0.0,
+        "file": "GAPFIPZSZYEK",
+        "GT": "0/1",
+        "FS": 1.554,
+        "schema_version": "1",
+        "QUAL": 1631.12
+    },
+    {
+        "CALL_INFO": "NA12878_sample",
+        "PL": "1226,0,721",
+        "DP": 70,
+        "variant": "4fc1f85a-29a3-4748-80d9-bc6884ec2eec",
+        "status": "in review",
+        "date_created": "2020-08-14T16:15:42.674110+00:00",
+        "uuid": "1be34c74-d1aa-4482-b26d-607548fd37d8",
+        "annotation_id": "NA12878_sample:4fc1f85a-29a3-4748-80d9-bc6884ec2eec:GAPFIPZSZYEK",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "samplegeno": [
+            {
+                "samplegeno_numgt": "0/0",
+                "samplegeno_gt": "A/A",
+                "samplegeno_ad": "56/0",
+                "samplegeno_sampleid": "NA12877_sample"
+            },
+            {
+                "samplegeno_numgt": "0/1",
+                "samplegeno_gt": "A/G",
+                "samplegeno_ad": "28/42",
+                "samplegeno_sampleid": "NA12878_sample"
+            },
+            {
+                "samplegeno_numgt": "0/1",
+                "samplegeno_gt": "A/G",
+                "samplegeno_ad": "26/20",
+                "samplegeno_sampleid": "NA12879_sample"
+            }
+        ],
+        "GQ": 99,
+        "AD": "28,42",
+        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
+        "novoPP": 0.0,
+        "file": "GAPFIPZSZYEK",
+        "GT": "0/1",
+        "FS": 1.494,
+        "schema_version": "1",
+        "QUAL": 1759.12
+    },
+    {
+        "CALL_INFO": "NA12877_sample",
+        "PL": "886,0,825",
+        "DP": 61,
+        "variant": "728c9ef1-7735-4642-8033-a8ba6306e9cf",
+        "status": "in review",
+        "date_created": "2020-08-14T16:15:36.373694+00:00",
+        "uuid": "1b7b3f7c-d2d6-4493-858b-12c3343db6ce",
+        "annotation_id": "NA12877_sample:728c9ef1-7735-4642-8033-a8ba6306e9cf:GAPFIPZSZYEK",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "samplegeno": [
+            {
+                "samplegeno_numgt": "0/1",
+                "samplegeno_gt": "A/C",
+                "samplegeno_ad": "29/32",
+                "samplegeno_sampleid": "NA12877_sample"
+            },
+            {
+                "samplegeno_numgt": "0/0",
+                "samplegeno_gt": "A/A",
+                "samplegeno_ad": "41/0",
+                "samplegeno_sampleid": "NA12878_sample"
+            },
+            {
+                "samplegeno_numgt": "0/0",
+                "samplegeno_gt": "A/A",
+                "samplegeno_ad": "41/0",
+                "samplegeno_sampleid": "NA12879_sample"
+            }
+        ],
+        "GQ": 99,
+        "AD": "29,32",
+        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
+        "novoPP": 0.0,
+        "file": "GAPFIPZSZYEK",
+        "GT": "0/1",
+        "FS": 3.596,
+        "schema_version": "1",
+        "QUAL": 877.25
+    },
+    {
+        "CALL_INFO": "NA12878_sample",
+        "PL": "819,0,849",
+        "DP": 61,
+        "variant": "82c23e9a-abdc-4cec-8152-edea3cad55cb",
+        "status": "in review",
+        "date_created": "2020-08-14T16:15:48.857294+00:00",
+        "uuid": "153de2ba-c677-43aa-b756-3660a6699deb",
+        "annotation_id": "NA12878_sample:82c23e9a-abdc-4cec-8152-edea3cad55cb:GAPFIPZSZYEK",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "samplegeno": [
+            {
+                "samplegeno_numgt": "0/0",
+                "samplegeno_gt": "A/A",
+                "samplegeno_ad": "43/0",
+                "samplegeno_sampleid": "NA12877_sample"
+            },
+            {
+                "samplegeno_numgt": "0/1",
+                "samplegeno_gt": "A/C",
+                "samplegeno_ad": "30/31",
+                "samplegeno_sampleid": "NA12878_sample"
+            },
+            {
+                "samplegeno_numgt": "0/0",
+                "samplegeno_gt": "A/A",
+                "samplegeno_ad": "43/0",
+                "samplegeno_sampleid": "NA12879_sample"
+            }
+        ],
+        "GQ": 99,
+        "AD": "30,31",
+        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
+        "novoPP": 0.0,
+        "file": "GAPFIPZSZYEK",
+        "GT": "0/1",
+        "FS": 5.148,
+        "schema_version": "1",
+        "QUAL": 810.25
+    },
+    {
+        "CALL_INFO": "NA12879_sample",
+        "PL": "825,0,869",
+        "DP": 61,
+        "variant": "e8585a30-a5af-4937-8167-f3f4364945a3",
+        "status": "in review",
+        "date_created": "2020-08-14T16:15:19.371935+00:00",
+        "uuid": "1415f6f8-d5a7-4d24-8341-92a70b4fede4",
+        "annotation_id": "NA12879_sample:e8585a30-a5af-4937-8167-f3f4364945a3:GAPFIPZSZYEK",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "samplegeno": [
+            {
+                "samplegeno_numgt": "0/1",
+                "samplegeno_gt": "G/A",
+                "samplegeno_ad": "25/16",
+                "samplegeno_sampleid": "NA12877_sample"
+            },
+            {
+                "samplegeno_numgt": "0/0",
+                "samplegeno_gt": "G/G",
+                "samplegeno_ad": "42/0",
+                "samplegeno_sampleid": "NA12878_sample"
+            },
+            {
+                "samplegeno_numgt": "0/1",
+                "samplegeno_gt": "G/A",
+                "samplegeno_ad": "31/30",
+                "samplegeno_sampleid": "NA12879_sample"
+            }
+        ],
+        "GQ": 99,
+        "AD": "31,30",
+        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
+        "novoPP": 0.0,
+        "file": "GAPFIPZSZYEK",
+        "GT": "0/1",
+        "FS": 4.948,
+        "schema_version": "1",
+        "QUAL": 1247.12
+    },
+    {
+        "CALL_INFO": "NA12877_sample",
         "PL": "1029,0,707",
+        "DP": 59,
         "variant": "00e98dd4-25be-4d51-b6c5-7c30b3a5eeb9",
-        "uuid": "12f40799-87e8-45fe-87f1-fd3f33a12b3a"
+        "status": "in review",
+        "date_created": "2020-08-14T16:15:21.771046+00:00",
+        "uuid": "12f40799-87e8-45fe-87f1-fd3f33a12b3a",
+        "annotation_id": "NA12877_sample:00e98dd4-25be-4d51-b6c5-7c30b3a5eeb9:GAPFIPZSZYEK",
+        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
+        "samplegeno": [
+            {
+                "samplegeno_numgt": "0/1",
+                "samplegeno_gt": "AT/A",
+                "samplegeno_ad": "25/34",
+                "samplegeno_sampleid": "NA12877_sample"
+            },
+            {
+                "samplegeno_numgt": "0/0",
+                "samplegeno_gt": "AT/AT",
+                "samplegeno_ad": "37/0",
+                "samplegeno_sampleid": "NA12878_sample"
+            },
+            {
+                "samplegeno_numgt": "0/1",
+                "samplegeno_gt": "AT/A",
+                "samplegeno_ad": "14/16",
+                "samplegeno_sampleid": "NA12879_sample"
+            }
+        ],
+        "GQ": 99,
+        "AD": "25,34",
+        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
+        "novoPP": 0.0,
+        "file": "GAPFIPZSZYEK",
+        "GT": "0/1",
+        "FS": 0.803,
+        "schema_version": "1",
+        "QUAL": 1495.12
     }
 ]
