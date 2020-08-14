@@ -335,7 +335,8 @@ $tabbar-height: 46px;
 }
 
 /*************************
-    Alerts - Shown differently on ItemPages than others
+	Alerts - Shown differently on ItemPages than others
+	(same styling also applied to homepage)
 **************************/
 
 #item-page-alerts-container {
@@ -2270,7 +2271,7 @@ $badge-item-min-height: 90px;
 		&[data-is-current-family="true"] {
 			> h4:first-child {
 				> i.icon {
-					color: $brand-primary;
+					color: $primary;
 				}
 			}
 		}
