@@ -34,37 +34,47 @@ export const CaseStats = React.memo(function CaseStats(props){
     } = props;
 
     const { individual = null, family = null } = caseItem || {};
-    const { individual_id = null } = individual || {};
-    const { accession: famAccession = null } = family || {};
+    const { individual_id = null, phenotypic_features = [] } = individual || {};
+    const { accession: famAccession = null, family_phenotypic_features = [] } = family || {};
+
+    const renderedPatientPhenotypicFeatures = useMemo(function(){
+        return mapFeaturesToBadges(phenotypic_features);
+    }, [ phenotypic_features ]);
+
+    const renderedFamilyPhenotypicFeatures = useMemo(function(){
+        return mapFeaturesToBadges(family_phenotypic_features);
+    }, [ family_phenotypic_features ]);
 
     return (
         // Stack into one column at small window size.
         <div id="case-stats" className="row">
             <div className="col-12 col-sm mb-2 mb-sm-0">
-                <StatCard title="Patient Info:" subtitle={individual_id} className="h-100" cardClassName="d-flex flex-column">
-                    <PatientInfo {...props} />
-                </StatCard>
+                <div className="card h-100">
+                    <h4 className="card-header mt-0 text-600">
+                        Patient Info: <span className="text-300">{ individual_id }</span>
+                    </h4>
+                    <div className="card-body">
+                        <PatientInfo {...props} />
+                    </div>
+                    <div className="card-footer">
+                        <label className="mb-03 text-large">Patient Phenotypic Features:</label>
+                        <div>{renderedPatientPhenotypicFeatures}</div>
+                    </div>
+                </div>
             </div>
             <div className="col-12 col-sm">
-                <StatCard title="Family Info:" subtitle={famAccession} className="h-100" cardClassName="d-flex flex-column">
-                    <FamilyInfo {...{ family, caseItem }} />
-                </StatCard>
-            </div>
-        </div>
-    );
-});
-
-export const StatCard = React.memo(function StatDrop(props){
-    const { title = null, subtitle = null, children = null, className = "", style = null, cardClassName = null } = props || {};
-    const cls = "card" + (className ? " " + className : "");
-
-    return (
-        <div className={cls} style={style}>
-            <h4 className="card-header mt-0 text-600">
-                { title } { subtitle ? <span className="text-300">{ subtitle }</span> : null }
-            </h4>
-            <div className={"card-body" + (cardClassName ? " " + cardClassName : "")}>
-                { children }
+                <div className="card h-100">
+                    <h4 className="card-header mt-0 text-600">
+                        Family Info: <span className="text-300">{ famAccession }</span>
+                    </h4>
+                    <div className="card-body">
+                        <FamilyInfo {...{ family, caseItem }} />
+                    </div>
+                    <div className="card-footer">
+                        <label className="mb-03 text-large">Family Phenotypic Features: </label>
+                        <div>{renderedFamilyPhenotypicFeatures}</div>
+                    </div>
+                </div>
             </div>
         </div>
     );
@@ -96,33 +106,26 @@ export const PatientInfo = React.memo(function PatientInfo(props) {
 
     return (
         <>
-            <div className="flex-grow-1">
-                <div className="card-text mb-1">
-                    <label className="mb-0">CGAP Individual ID:</label> { accession }
-                </div>
-                <div className="card-text mb-1">
-                    <label className="mb-0">Sex:</label> { sex || 'N/A'}
-                </div>
-                <div className="card-text mb-1">
-                    <label className="mb-0">Age: </label> { age && age_units ? `${age} ${age_units}(s)` : "N/A" }
-                </div>
-                <div className="card-text mb-1">
-                    <label className="mb-0">Life Status:</label> { life_status || 'N/A' }
-                </div>
-                <div className="card-text mb-1">
-                    <label className="mb-0">Status:</label> &nbsp;{ Schemas.Term.toName("status", status, true) }
-                </div>
-                <div className="card-text mb-1">
-                    <label className="mb-0">Accessioned:</label> { date_created ? <LocalizedTime timestamp={date_created} formatType="date-sm"/> : "N/A" }
-                </div>
-                <div className="card-text mb-1">
-                    <label className="mb-0">Aliases:</label> {aliases || "N/A"}
-                </div>
+            <div className="card-text mb-1">
+                <label className="mb-0">CGAP Individual ID:</label> { accession }
             </div>
-            <div className="card-text">
-                <hr/>
-                <label className="mb-0 text-large">Patient Phenotypic Features:</label>
-                <div>{renderedPhenotypicFeatures}</div>
+            <div className="card-text mb-1">
+                <label className="mb-0">Sex:</label> { sex || 'N/A'}
+            </div>
+            <div className="card-text mb-1">
+                <label className="mb-0">Age: </label> { age && age_units ? `${age} ${age_units}(s)` : "N/A" }
+            </div>
+            <div className="card-text mb-1">
+                <label className="mb-0">Life Status:</label> { life_status || 'N/A' }
+            </div>
+            <div className="card-text mb-1">
+                <label className="mb-0">Status:</label> &nbsp;{ Schemas.Term.toName("status", status, true) }
+            </div>
+            <div className="card-text mb-1">
+                <label className="mb-0">Accessioned:</label> { date_created ? <LocalizedTime timestamp={date_created} formatType="date-sm"/> : "N/A" }
+            </div>
+            <div className="card-text mb-1">
+                <label className="mb-0">Aliases:</label> {aliases || "N/A"}
             </div>
         </>
     );
@@ -150,21 +153,15 @@ export const FamilyInfo = React.memo(function FamilyInfo({ family, caseItem }) {
 
     return (
         <>
-            <div className="flex-grow-1">
-                <div className="card-text mb-1">
-                    <label className="mb-0">Family:</label> { familyTitle || familyDisplayTitle || "N/A" }
-                </div>
-                <div className="card-text mb-1">
-                    <label className="mb-0">Cohort:</label> { cohortTitle || "N/A" }
-                </div>
-                <div className="card-text mb-1">
-                    <label className="mb-0">Project:</label> { projectTitle || "N/A" }
-                </div>
+            <div className="card-text mb-1">
+                <label className="mb-0">Family:</label> { familyTitle || familyDisplayTitle || "N/A" }
             </div>
-            <div className="card-text">
-                <hr/>
-                <label className="mb-03 text-large">Family Phenotypic Features: </label>
-                <div>{renderedPhenotypicFeatures}</div>
+            <div className="card-text mb-1">
+                <label className="mb-0">Cohort:</label> { cohortTitle || "N/A" }
             </div>
-        </>);
+            <div className="card-text mb-1">
+                <label className="mb-0">Project:</label> { projectTitle || "N/A" }
+            </div>
+        </>
+    );
 });
