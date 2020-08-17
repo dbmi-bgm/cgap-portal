@@ -3,6 +3,7 @@
 import React, { useMemo } from 'react';
 import _ from 'underscore';
 import { LocalizedTime, formatPublicationDate } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/LocalizedTime';
+import { Schemas } from './../../util';
 
 
 /**
@@ -109,7 +110,7 @@ export const PatientInfo = React.memo(function PatientInfo(props) {
                     <label className="mb-0">Life Status:</label> { life_status || 'N/A' }
                 </div>
                 <div className="card-text mb-1">
-                    <label className="mb-0">Status:</label> { status } <i className="item-status-indicator-dot ml-02" />
+                    <label className="mb-0">Status:</label> &nbsp;{ Schemas.Term.toName("status", status, true) }
                 </div>
                 <div className="card-text mb-1">
                     <label className="mb-0">Accessioned:</label> { date_created ? <LocalizedTime timestamp={date_created} formatType="date-sm"/> : "N/A" }
