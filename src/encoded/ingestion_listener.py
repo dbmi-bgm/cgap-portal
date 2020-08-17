@@ -34,7 +34,7 @@ from .ingestion.exceptions import UnspecifiedFormParameter
 from .ingestion.processors import get_ingestion_processor
 from .types.ingestion import SubmissionFolio
 from .types.variant import build_variant_display_title, ANNOTATION_ID_SEP
-from .util import resolve_file_path, gunzip_content, debuglog
+from .util import resolve_file_path, gunzip_content, debuglog, get_trusted_email
 
 
 log = structlog.getLogger(__name__)
@@ -131,6 +131,7 @@ def submit_for_ingestion(context, request):
         "submission_uri": SubmissionFolio.make_submission_uri(submission_id),
         "bucket": DATA_BUNDLE_BUCKET,
         "authenticated_userid": request.authenticated_userid,
+        "email": get_trusted_email(request, context="Submission"),
         "success": success,
         "message": message,
         "upload_time": upload_time,
