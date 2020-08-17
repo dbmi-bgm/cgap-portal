@@ -256,8 +256,10 @@ class Case(Item):
     })
     def vcf_file(self, request, sample_processing=None):
         vcf_file = {}
-        """Map the vcf file to be digested
-        Currently we have a single file on processed_files field of sample processing"""
+        """
+        Map the vcf file to be digested
+        Currently we have a single file on processed_files field of sample processing
+        """
         if not sample_processing:
             return vcf_file
         sp_data = get_item_or_none(request, sample_processing, 'sample-processings')
@@ -275,7 +277,10 @@ class Case(Item):
         "type": "string"
     })
     def filter_set_flag_addon(self, request, sample_processing=None, individual=None):
-        """use vcf file and sample accessions to limit variant/variantsample to this case"""
+        """
+        Use vcf file and sample accessions to limit variant/variantsample to this case
+        TODO: Potentially rename since nothing to do with filtersets here I think? (Maybe TBD)
+        """
         if not individual or not sample_processing:
             return ''
         sample = self.sample(request, individual, sample_processing)
