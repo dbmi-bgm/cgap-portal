@@ -62,6 +62,7 @@ def patch_vcf_file_status(request, uuids):
     """
     for uuid in uuids:
         kwargs = {
+            'environ': request.environ,
             'method': 'PATCH',
             'content_type': 'application/json',
             'POST': json.dumps({
@@ -379,7 +380,7 @@ class IngestionListener:
         parser.format_variant_sub_embedded_objects(variant)
         try:
             self.vapp.post_json('/variant', variant, status=201)
-        except HTTPConflict:
+        except Exception:  # XXX: HTTPConflict is thrown and should be caught but does not work
             self.vapp.patch_json('/variant/%s' % build_variant_display_title(
                 variant['CHROM'],
                 variant['POS'],
