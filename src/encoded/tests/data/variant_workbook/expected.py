@@ -1,7 +1,7 @@
 # contains expected stuff for test_ingest_vcf
 
 
-TEST_VCF = './src/encoded/tests/data/variant_workbook/GAPFIRHN9YOZ.vcf'
+TEST_VCF = './src/encoded/tests/data/variant_workbook/GAPFI3JX5D2J_subset.vcf'
 EXPECTED_ANNOTATION_FIELDS = ['MUTANNO', 'VEP', 'CYTOBAND', 'UNIPROT_TRANSMEM', 'DBSNP',
                               'CONSERVATION', 'PRIMATEAI', 'CADD', 'SPLICEAI', 'MAX_POP_AF',
                               'GNOMAD', 'TOPMED', 'UK10K', 'GENOMIC_SUPER_DUPLICATES', 'SIMPLE_REPEAT',

@@ -1,8 +1,9 @@
 import argparse
 import structlog
 import logging
-from encoded.commands.purge_item_type import purge_item_type_from_storage
+
 from pyramid.paster import get_app
+from ..commands.purge_item_type import purge_item_type_from_storage
 
 
 logger = structlog.getLogger(__name__)

@@ -6,7 +6,9 @@ import tempfile
 
 from unittest import mock
 from dcicutils.qa_utils import ControlledTime
-from ..util import debuglog, deduplicate_list, gunzip_content, resolve_file_path, ENCODED_ROOT_DIR
+from ..util import (
+    debuglog, deduplicate_list, gunzip_content, resolve_file_path, ENCODED_ROOT_DIR, generate_fastq_file,
+)
 from .. import util as util_module
 
 
@@ -144,53 +146,92 @@ def test_debuglog():
 
     filename = tempfile.mktemp()
 
-    some_start_time = datetime.datetime(2010, 7, 4, 12, 30)  # Just a randomly chosen date
+    try:
 
-    dt = ControlledTime(initial_time=some_start_time, tick_seconds=1/128)
+        some_start_time = datetime.datetime(2010, 7, 4, 12, 30)  # Just a randomly chosen date
 
-    fake_homedir = "/home/user"
+        dt = ControlledTime(initial_time=some_start_time, tick_seconds=0.01)
 
-    with mock.patch("os.path.expanduser") as mock_expanduser:
+        fake_homedir = "/home/user"
 
-        def mocked_expanduser(x):
-            if x.startswith("~/"):
-                return os.path.join(fake_homedir, x[2:])
-            elif x.startswith("~"):
-                raise AssertionError("Beyond scope of this mock.")
-            else:
-                return x
+        with mock.patch("os.path.expanduser") as mock_expanduser:
 
-        mock_expanduser.side_effect = mocked_expanduser
+            def mocked_expanduser(x):
+                if x.startswith("~/"):
+                    return os.path.join(fake_homedir, x[2:])
+                elif x.startswith("~"):
+                    raise AssertionError("Beyond scope of this mock.")
+                else:
+                    return x
 
-        with mock.patch.object(datetime, "datetime", dt):
+            mock_expanduser.side_effect = mocked_expanduser
 
-            real_open = io.open
+            with mock.patch.object(datetime, "datetime", dt):
 
-            with mock.patch.object(io, "open") as mock_open:
+                real_open = io.open
 
-                def mocked_open(file, mode):
-                    assert file == "/home/user/DEBUGLOG-20100704.txt"
-                    print("Writing to", filename, "mode=", mode)
-                    return real_open(filename, mode)
+                with mock.patch.object(io, "open") as mock_open:
 
-                mock_open.side_effect = mocked_open
+                    def mocked_open(file, mode):
+                        assert file == "%s/DEBUGLOG-20100704.txt" % fake_homedir
+                        print("Writing to", filename, "mode=", mode)
+                        return real_open(filename, mode)
 
-                with mock.patch.object(util_module, 'DEBUGLOG_ENABLED', False):
+                    def log_content():
+                        with real_open(filename, 'r') as fp:
+                            text_content = fp.read()
+                            return text_content
 
-                    debuglog("test 1")
-                    debuglog("test 2")
+                    mock_open.side_effect = mocked_open
 
-                    assert not os.path.exists(filename)
+                    with mock.patch.object(util_module, 'DEBUGLOG', ""):
 
-                with mock.patch.object(util_module, 'DEBUGLOG_ENABLED', True):
+                        debuglog("test 1")
+                        debuglog("test 2")
 
-                    debuglog("test 1")
-                    debuglog("test 2")
+                        assert not os.path.exists(filename)
 
-            with io.open(filename, 'r') as fp:
-                text_content = fp.read()
+                    with mock.patch.object(util_module, 'DEBUGLOG', fake_homedir):
 
-            assert text_content == (
-                "2010-07-04 12:30:00.007812 test 1\n"
-                "2010-07-04 12:30:00.015624 test 2\n"
-            )
+                        debuglog("test 1")
+
+                        assert log_content() == (
+                            "2010-07-04 12:30:00.010000 test 1\n"
+                        )
+
+                        debuglog("test 2")
+
+                        assert log_content() == (
+                            "2010-07-04 12:30:00.010000 test 1\n"
+                            "2010-07-04 12:30:00.020000 test 2\n"
+                        )
+
+                    with mock.patch.object(util_module, 'DEBUGLOG', "~"):
+
+                        debuglog("test 3")
+
+                        assert log_content() == (
+                            "2010-07-04 12:30:00.010000 test 1\n"
+                            "2010-07-04 12:30:00.020000 test 2\n"
+                            "2010-07-04 12:30:00.030000 test 3\n"
+                        )
+
+                        debuglog("test 4")
+
+                        assert log_content() == (
+                            "2010-07-04 12:30:00.010000 test 1\n"
+                            "2010-07-04 12:30:00.020000 test 2\n"
+                            "2010-07-04 12:30:00.030000 test 3\n"
+                            "2010-07-04 12:30:00.040000 test 4\n"
+                        )
+
+    finally:
+
+        try:
+            os.remove(filename)
+        except Exception:
+            pass
+
+
+# def test_generate_fastq_file():
+#     ... Need test of generate_fastq_file here ...

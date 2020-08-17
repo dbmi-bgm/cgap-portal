@@ -19,7 +19,7 @@ from pyramid.settings import asbool
 from pyramid.threadlocal import get_current_request
 from pyramid.traversal import resource_path
 from pyramid.view import view_config
-from dcicutils.env_utils import CGAP_ENV_WEBPROD
+from dcicutils.env_utils import CGAP_ENV_WEBPROD, CGAP_ENV_WOLF
 from snovault import (
     AfterModified,
     BeforeModified,
@@ -165,7 +165,9 @@ class File(Item):
         'related_files.relationship_type',
         'related_files.file.accession',
         'quality_metric.display_title',
-        'quality_metric.@type'
+        'quality_metric.@type',
+        'quality_metric.qc_list.qc_type',
+        'quality_metric.qc_list.value.uuid'
     ]  # + lab_award_attribution_embed_list
     name_key = 'accession'
 
@@ -496,7 +498,7 @@ class FileFastq(File):
         "quality_metric.Total Sequences",
         "quality_metric.Sequence length",
         "quality_metric.url"
-    ]  + file_workflow_run_embeds
+        ] + file_workflow_run_embeds
     name_key = 'accession'
     rev = dict(File.rev, **{
         'workflow_run_inputs': ('WorkflowRun', 'input_files.value'),
@@ -709,10 +711,7 @@ def is_file_to_download(properties, file_format, expected_filename=None):
 @view_config(name='download', context=File, request_method='GET',
              permission='view', subpath_segments=[0, 1])
 def download(context, request):
-    # disable if not on cgap prod
-    if request.registry.settings.get('env.name', 'localhost') not in [CGAP_ENV_WEBPROD, 'localhost']:
-        raise HTTPForbidden('Downloads disabled when not on cgap-prod (or testing)!')
-
+    """ File download route. Generates a pre-signed S3 URL for the object that expires eventually. """
     # first check for restricted status
     try:
         user_props = session_properties(context, request)

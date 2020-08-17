@@ -26,7 +26,7 @@ from sqlalchemy import MetaData, func
 from timeit import default_timer as timer
 from unittest import mock
 from zope.sqlalchemy import mark_changed
-from .. import main
+from .. import main, loadxl
 from ..verifier import verify_item
 
 
@@ -290,7 +290,7 @@ def test_load_and_index_perf_data(testapp, indexer_testapp):
 
     # load -em up
     start = timer()
-    with mock.patch('encoded.loadxl.get_app') as mocked_app:
+    with mock.patch.object(loadxl, 'get_app') as mocked_app:
         mocked_app.return_value = testapp.app
         data = {'store': json_inserts}
         res = testapp.post_json('/load_data', data,  # status=200

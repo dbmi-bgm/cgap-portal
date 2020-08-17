@@ -1,14 +1,12 @@
 'use strict';
 
-import React, { useState, useMemo, useCallback } from 'react';
-import Collapse from 'react-bootstrap/esm/Collapse';
-import PropTypes from 'prop-types';
+import React, { useState, useMemo } from 'react';
 import memoize from 'memoize-one';
 import _ from 'underscore';
 import url from 'url';
 import queryString from 'query-string';
 
-import { console, layout, ajax, object, navigate } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
+import { console, layout, navigate } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { PartialList } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/PartialList';
 
 import { PedigreeVizView } from './../../viz/PedigreeViz';
@@ -22,7 +20,6 @@ import { PedigreeTabView, PedigreeTabViewOptionsController } from './PedigreeTab
 import { PedigreeFullScreenBtn } from './PedigreeFullScreenBtn';
 import { parseFamilyIntoDataset } from './family-parsing';
 import { CurrentFamilyController } from './CurrentFamilyController';
-import { AttachmentInputController, AttachmentInputMenuOption } from './attachment-input';
 import { CaseStats } from './CaseStats';
 import CaseSubmissionView from './CaseSubmissionView';
 
@@ -73,9 +70,10 @@ export default class CaseView extends DefaultItemView {
     }
 
     getTabViewContents(controllerProps = {}){
-        // const { pedigreeFamilies = [] } = controllerProps;
-        // const familiesLen = pedigreeFamilies.length;
-        const { context: { family: { members = [] } = {} } } = this.props;
+        const { context = null } = this.props;
+        const { family = null } = context || {};
+        const { members = [] } = family || {};
+
         const membersLen = members.length;
         const commonTabProps = { ...this.props, ...controllerProps };
         const initTabs = [];
@@ -95,6 +93,7 @@ export default class CaseView extends DefaultItemView {
      * @deprecated
      * Disabled for now since can only support one family per Case at moment.
      * To be removed once UX is more certain.
+     * AttachmentInputController, AttachmentInputMenuOption from './attachment-input'
      */
     additionalItemActionsContent(){
         return super.additionalItemActionsContent();
@@ -116,29 +115,22 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
     const {
         context = {},
         href,
-        // pedigreeFamilies = [],
-        // pedigreeFamiliesIdx = 0,
-        // onFamilySelect,
         graphData,
         selectedDiseases,
         windowWidth,
         windowHeight,
-        // currFamily,
         idToGraphIdentifier
     } = props;
     const {
-        family: currFamily = null, // Previously selected via CurrentFamilyController.js, now just the 1. Unless changed later.
+        family: currFamily = null, // Previously selected via CurrentFamilyController.js, now primary from case.
         secondary_families = null,
         case_phenotypic_features: caseFeatures = { case_phenotypic_features: [] },
         description = null,
-        actions: permissibleActions = [],
         sample_processing,
         display_title: caseTitle,
         accession: caseAccession,
         individual: caseIndividual
     } = context;
-
-    const editAction = _.findWhere(permissibleActions, { name: "edit" });
 
     const {
         countIndividuals: numIndividuals,
@@ -181,9 +173,6 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
         caseSearchTables = (
             <div className="mt-3">
                 <h4 className="text-400 mb-03">No individual assigned to this case</h4>
-                { editAction ?
-                    <div>{ "Add a family by pressing \"Actions\" at top right of page and then \"Add Family\"."}</div>
-                    : null }
             </div>
         );
     }
@@ -253,13 +242,6 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
                                     View Pedigree
                                 </button>
                             </div>
-                            {/*
-                            <a href="#pedigree" className="card-img-top d-none d-lg-block" rel="noreferrer noopener">
-                                <div className="text-center h-100">
-                                    <i className="icon icon-sitemap icon-4x fas" />
-                                </div>
-                            </a>
-                            */}
                             { pedBlock }
                         </div>
                     </div>
@@ -272,23 +254,25 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
                 </div>
             </div>
 
-            <DotRouter href={href} navClassName="container-wide pt-36 pb-36" contentsClassName="container-wide bg-light pt-36 pb-36" prependDotPath="case-info">
-                <DotRouterTab tabTitle="Accessioning" dotPath=".accessioning" default cache={false}>
-                    <AccessioningTab {...{ context, href, currFamily, secondary_families, }} />
-                </DotRouterTab>
-                <DotRouterTab tabTitle="Bioinformatics" dotPath=".bioinformatics" cache={false}>
-                    <BioinformaticsTab {...{ context, currFamily, secondary_families, idToGraphIdentifier, sample_processing }} />
-                </DotRouterTab>
-                <DotRouterTab tabTitle="Filtering" dotPath=".filtering">
-                    <FilteringTab context={context} windowHeight={windowHeight} />
-                </DotRouterTab>
-                <DotRouterTab tabTitle="Interpretation" dotPath=".interpretation" disabled cache={false}>
-                    <InterpretationTab {...props} />
-                </DotRouterTab>
-                <DotRouterTab tabTitle="Finalize Case" dotPath=".reporting" disabled cache={false}>
-                    <ReportingTab {...props} />
-                </DotRouterTab>
-            </DotRouter>
+            { currFamily && caseIndividual ?
+                <DotRouter href={href} navClassName="container-wide pt-36 pb-36" contentsClassName="container-wide bg-light pt-36 pb-36" prependDotPath="case-info">
+                    <DotRouterTab tabTitle="Accessioning" dotPath=".accessioning" default cache={false}>
+                        <AccessioningTab {...{ context, href, currFamily, secondary_families, }} />
+                    </DotRouterTab>
+                    <DotRouterTab tabTitle="Bioinformatics" dotPath=".bioinformatics" cache={false}>
+                        <BioinformaticsTab {...{ context, currFamily, secondary_families, idToGraphIdentifier, sample_processing }} />
+                    </DotRouterTab>
+                    <DotRouterTab tabTitle="Filtering" dotPath=".filtering">
+                        <FilteringTab context={context} windowHeight={windowHeight} />
+                    </DotRouterTab>
+                    <DotRouterTab tabTitle="Interpretation" dotPath=".interpretation" disabled cache={false}>
+                        <InterpretationTab {...props} />
+                    </DotRouterTab>
+                    <DotRouterTab tabTitle="Finalize Case" dotPath=".reporting" disabled cache={false}>
+                        <ReportingTab {...props} />
+                    </DotRouterTab>
+                </DotRouter>
+                : null }
         </React.Fragment>
     );
 });

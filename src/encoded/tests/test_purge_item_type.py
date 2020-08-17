@@ -1,7 +1,7 @@
 import pytest
 import time
 from .workbook_fixtures import app, workbook
-from encoded.commands.purge_item_type import purge_item_type_from_storage
+from ..commands.purge_item_type import purge_item_type_from_storage
 
 
 pytestmark = [pytest.mark.broken]

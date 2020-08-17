@@ -6,6 +6,7 @@ import tempfile
 from pyramid.httpexceptions import HTTPForbidden
 from unittest import mock
 from .. import source_beanstalk_env_vars
+from ..types import file as tf
 from ..types.file import FileFastq, post_upload, external_creds
 
 
@@ -33,7 +34,7 @@ def file(testapp, project, experiment, institution, file_formats):
 
 def test_external_creds():
 
-    with mock.patch('encoded.types.file.boto3', autospec=True):
+    with mock.patch.object(tf, 'boto3', autospec=True):
 
         ret = external_creds('test-wfout-bucket', 'test-key', 'name')
         assert ret['key'] == 'test-key'
