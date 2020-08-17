@@ -100,17 +100,16 @@ $danger:        #B24342;
 $light:         #f8f8f8;
 $dark:          #343a40;
 
-// Ext:
+// Extra Additions for CGAP:
 //$primary-dark: darken($primary, 15%);
 $primary-dark: #2b6088; //#0c5979;
 
-$brand-warning: $warning;
-$brand-success: $success;
-$brand-danger: $danger;
-$brand-info: $info;
-$brand-primary: $primary;
-$brand-primary-dark: $primary-dark;
-$brand-secondary: $secondary;
+
+// Will be extended in bootstrap's _variables.scss with Bootstrap orig colors (warning, success, primary, etc).
+// And then used to create utility classes 'text-primary-dark', 'bg-primary-dark', etc.
+$theme-colors: (
+    "primary-dark": $primary-dark
+);
 
 // override 1.5, to help center text
 $btn-line-height: 1.45rem;
