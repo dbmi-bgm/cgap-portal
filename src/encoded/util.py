@@ -3,17 +3,17 @@ import datetime
 import gzip
 import io
 import os
-import random
 import pyramid.request
 import tempfile
 
 from dcicutils.misc_utils import check_true
 from io import BytesIO
+from pyramid.httpexceptions import HTTPUnprocessableEntity
 from snovault import COLLECTIONS, Collection
 from snovault.crud_views import collection_add as sno_collection_add
 from snovault.embed import make_subrequest
 from snovault.schema_utils import validate_request
-from typing import Type
+from .types.base import get_item_or_none
 
 
 ENCODED_ROOT_DIR = os.path.dirname(__file__)
@@ -238,38 +238,35 @@ def create_empty_s3_file(s3_client, bucket: str, key: str):
     s3_client.upload_file(empty_file, Bucket=bucket, Key=key)
 
 
-def generate_fastq_file(filename, num=10, length=10):
+def get_trusted_email(request, context=None, raise_errors=True):
     """
-    Creates a new fastq file with the given name, containing (pseudo)randomly generated content.
+    Get an email address on behalf of which we can issue other requests.
 
-    Example usage:
+    If auth0 has authenticated user info to offer, return that.
+    Otherwise, look for a userid.xxx among request.effective_principals and get the email from that.
 
-        fastq_generator('fastq_sample.fastq.gz', 25, 50)
-           creates a new fastq file with 25 sequences, each of length 50.
-
-        fastq_generator('fastq_sample.fastq.gz')
-           creates a new fastq file with default characteristics (10 sequences, each of length 10).
-
-    Args:
-        filename str: the name of a file to create
-        num int: the number of random sequences (default 10)
-        length int: the length of the random sequences (default 10)
-
-    Returns:
-        the filename
-
+    This will raise HTTPUnprocessableEntity if there's a problem obtaining the mail.
     """
-    if not filename.endswith('.fastq.gz'):
-        filename = filename.rstrip('fastq').rstrip('fq').rstrip('.') + '.fastq.gz'
-    content = ''
-    bases = 'ACTG'
-
-    for i in range(num):
-        content += '@SEQUENCE{} length={}\n'.format(i, length)
-        content += ''.join(random.choice(bases) for i in range(length)) + '\n'
-        content += '+\n'
-        content += 'I' * length + '\n'
-    with gzip.open(filename, 'w') as outfile:
-        outfile.write(content.encode('ascii'))
-
-    return filename
+    try:
+        # import pdb;pdb.set_trace()
+        context = context or "Requirement"
+        email = getattr(request, '_auth0_authenticated', None)
+        if not email:
+            user_uuid = None
+            for principal in request.effective_principals:
+                if principal.startswith('userid.'):
+                    user_uuid = principal[7:]
+                    break
+            if not user_uuid:
+                raise HTTPUnprocessableEntity('%s: Must provide authentication' % context)
+            user_props = get_item_or_none(request, user_uuid)
+            if not user_props:
+                raise HTTPUnprocessableEntity('%s: User profile missing' % context)
+            if 'email' not in user_props:
+                raise HTTPUnprocessableEntity('%s: Entry for "email" missing in user profile.' % context)
+            email = user_props['email']
+        return email
+    except Exception:
+        if raise_errors:
+            raise
+        return None
