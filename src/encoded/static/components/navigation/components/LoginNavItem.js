@@ -10,7 +10,7 @@ import { UserRegistrationModal } from './UserRegistrationModal';
 
 
 export const LoginNavItem = React.memo(function LoginNavItem(props){
-    const { id, isRegistrationModalVisible, showLock, isLoading } = props;
+    const { id =  "loginbtn", isRegistrationModalVisible, showLock, isLoading } = props;
     return (
         <React.Fragment>
             <Nav.Link key="login-reg-btn" active={isRegistrationModalVisible} onClick={showLock} className="user-account-item" id={id}>

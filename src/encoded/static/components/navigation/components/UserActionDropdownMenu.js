@@ -90,6 +90,8 @@ export const UserActionDropdownMenu = React.memo(function UserActionDropdownMenu
         );
     } else {
         acctBtn = (
+            // TODO: We may need to move LoginController to wrap BodyElement in App perhaps so more components could potentially trigger a login.
+            // (Instead of just NavBar here)
             <LoginController {...{ href, session, updateUserInfo, overlaysContainer, schemas, windowWidth }}
                 auth0Options={cgapAuth0Options}>
                 <LoginNavItem key="login-register" className="user-account-item" />
