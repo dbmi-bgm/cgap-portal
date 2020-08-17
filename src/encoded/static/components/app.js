@@ -331,9 +331,9 @@ export default class App extends React.PureComponent {
 
             // Set Alert if not on homepage and not logged in.
             if (!session && pathname != "/") {
-                const onClick = function(e) {
-                    
-                }
+                const onAlertLoginClick = function(e) {
+                    // TODO;
+                };
                 Alerts.queue({
                     "title" : "Not Logged In",
                     // We can't really put in actual link to login since need to communicate w. LoginController.
@@ -1188,7 +1188,6 @@ export default class App extends React.PureComponent {
                     }}/>
                     <script data-prop-name="lastCSSBuildTime" type="application/json" dangerouslySetInnerHTML={{ __html: lastCSSBuildTime }}/>
                     <link rel="stylesheet" href={'/static/css/style.css?build=' + (lastCSSBuildTime || 0)} />
-                    <link rel="stylesheet" href="https://unpkg.com/rc-tabs@9.6.0/dist/rc-tabs.min.css" />
                     <SEO.CurrentContext {...{ context, hrefParts, baseDomain }} />
                     <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:200,300,400,600,700,900,300i,400i,600i|Yrsa|Source+Code+Pro:300,400,500,600" rel="stylesheet"/>
                     <script defer type="application/javascript" src="//www.google-analytics.com/analytics.js" />

@@ -16,7 +16,7 @@ import subprocess
 import sys
 
 from pkg_resources import resource_filename
-from pyramid.paster import get_app  # , get_appsettings
+from pyramid.paster import get_app, get_appsettings
 from pyramid.path import DottedNameResolver
 from snovault.elasticsearch import create_mapping
 from snovault.tests import elasticsearch_fixture, postgresql_fixture
@@ -98,7 +98,7 @@ def run(app_name, config_uri, datadir, clear=False, init=False, load=False, inge
 
     # get the config and see if we want to connect to non-local servers
     # TODO: This variable seems to not get used? -kmp 25-Jul-2020
-    # config = get_appsettings(config_uri, app_name)
+    config = get_appsettings(config_uri, app_name)
 
     datadir = os.path.abspath(datadir)
     pgdata = os.path.join(datadir, 'pgdata')
@@ -118,8 +118,10 @@ def run(app_name, config_uri, datadir, clear=False, init=False, load=False, inge
     postgres = postgresql_fixture.server_process(pgdata, echo=True)
     processes.append(postgres)
 
-    elasticsearch = elasticsearch_fixture.server_process(esdata, echo=True)
-    processes.append(elasticsearch)
+    es_server_url = config.get('elasticsearch.server', "localhost")
+    if not config.get("elasticsearch.aws_auth", False) and ("127.0.0.1" in es_server_url or "localhost" in es_server_url):
+        elasticsearch = elasticsearch_fixture.server_process(esdata, echo=True)
+        processes.append(elasticsearch)
 
     nginx = nginx_server_process(echo=True)
     processes.append(nginx)

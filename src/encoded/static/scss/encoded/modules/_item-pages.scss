@@ -1237,50 +1237,6 @@ $download-button-width : 100px;
 }
 
 
-/**********************************************************
-		     		Badges Tab View
-**********************************************************/
-
-$badge-item-min-height: 90px;
-
-.rc-tabs {
-
-	.badge-classification-group {
-		padding-top: 5px;
-		margin-bottom: 30px;
-
-		.badge-item {
-			padding-top: 15px;
-			padding-bottom: 15px;
-			min-height: $badge-item-min-height;
-
-			&:not(:last-child){
-				border-bottom: 1px solid #ddd;
-			}
-
-			.icon-col {
-				.icon-container > img {
-					max-width: 100%;
-					max-height: $badge-item-min-height;
-				}
-			}
-
-			.title-col {
-				display: flex;
-				align-items: center;
-
-				.messages-list {
-					padding-left: 32px;
-				}
-
-			}
-
-		}
-
-	}
-
-}
-
 
 /**********************************************************
 		     Embedded Static Sections
