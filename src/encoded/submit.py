@@ -3,7 +3,8 @@ import datetime
 import json
 import xlrd
 
-from dcicutils.misc_utils import VirtualApp, VirtualAppError
+from dcicutils.qa_utils import ignored
+from dcicutils.misc_utils import VirtualAppError  # , VirtualApp
 # from dcicutils import ff_utils
 # from pyramid.paster import get_app
 # from pyramid.response import Response
@@ -64,10 +65,11 @@ def submit_data_bundle(*, s3_client, bucket, key, project, institution, vapp,  #
 
     Args:
         data_stream: an open stream to xls workbook data
-        project: a project identifier
-        institution: an institution identifier
+        project str: a project identifier
+        institution str: an institution identifier
         vapp: a VirtualApp object
         log: a logging object capable of .info, .warning, .error, or .debug messages
+        validate_only bool: whether to exit after validation, before submission (default False)
     """
     with s3_local_file(s3_client, bucket=bucket, key=key) as file:
         project_json = vapp.get(project).json
@@ -111,10 +113,10 @@ def map_fields(row, metadata_dict, addl_fields, item_type):
 
 
 def xls_to_json(xls_data, project, institution):
-    '''
+    """
     Converts excel file to json for submission.
     Functional but expect future changes.
-    '''
+    """
     book = xlrd.open_workbook(xls_data)
     sheet, = book.sheets()
     row = row_generator(sheet)
@@ -134,10 +136,13 @@ def xls_to_json(xls_data, project, institution):
     if not header:
         msg = 'Column headers not detected in spreadsheet! "Individual ID*" column must be present in header.'
         return {'errors': [msg]}, False
-    # debuglog("keys:", keys)  # Temporary instrumentation for debugging to go away soon. -kmp 25-Jul-2020
+    # NOTE: A single row is allocated below the column headers to contain descriptions of row contents.
+    #       We could just blindly consume it, but then if it's missing we'll make an error.
+    #       Instead, we filter lines below, ignoring lines that like they're such a descriptive row.
     # descriptions = next(row)
-    # debuglog("descriptions:", descriptions)  # Temporary instrumentation for debugging to go away soon. -kmp 25-Jul-2020
+    # ignored(descriptions)
     rows = []
+    # This is now done in the loop above.
     # keys = [key.lower().strip().rstrip('*').rstrip() for key in keys]
     required = ['individual id', 'relation to proband', 'report required', 'analysis id', 'specimen id']
     missing = [col for col in required if col not in keys]
@@ -544,7 +549,7 @@ def compare_fields(profile, aliases, json_item, db_item):
 
 
 def validate_all_items(virtualapp, json_data):
-    '''
+    """
     Still in progress, not necessarily functional yet. NOT YET TESTED.
 
     Function that:
@@ -555,7 +560,7 @@ def validate_all_items(virtualapp, json_data):
     Current status:
     Still testing validation/data organization parts - patch/post part hasn't been fully
     written or tested.
-    '''
+    """
     alias_dict = {}
     errors = json_data['errors']
     all_aliases = [k for itype in json_data for k in json_data[itype]]
@@ -769,7 +774,7 @@ def cell_value(cell, datemode):
 
 
 def row_generator(sheet):
-    '''Generator that gets rows from excel sheet [From Submit4DN]'''
+    """Generator that gets rows from excel sheet [From Submit4DN]"""
     datemode = sheet.book.datemode
     for index in range(sheet.nrows):
         yield [cell_value(cell, datemode) for cell in sheet.row(index)]
