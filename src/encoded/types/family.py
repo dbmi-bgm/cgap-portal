@@ -11,14 +11,12 @@ from snovault import (
     calculated_property,
     collection,
     load_schema,
-    CONNECTION,
-    COLLECTIONS,
-    display_title_schema
 )
 from snovault.util import debug_log
 from webtest import TestApp
 from xml.etree.ElementTree import fromstring
 from .base import Item, get_item_or_none
+from ..util import get_trusted_email
 
 
 log = structlog.getLogger(__name__)
@@ -598,17 +596,7 @@ def process_pedigree(context, request):
     ped_timestamp = ped_datetime.isoformat() + '+00:00'
     app = get_app(config_uri, 'app')
     # get user email for TestApp authentication
-    email = getattr(request, '_auth0_authenticated', None)
-    if not email:
-        user_uuid = None
-        for principal in request.effective_principals:
-            if principal.startswith('userid.'):
-                user_uuid = principal[7:]
-                break
-        if not user_uuid:
-            raise HTTPUnprocessableEntity('Family %s: Must provide authentication' % family_item)
-        user_props = get_item_or_none(request, user_uuid)
-        email = user_props['email']
+    email = get_trusted_email(request, context="Family %s" % family_item)
     environ = {'HTTP_ACCEPT': 'application/json', 'REMOTE_USER': email}
     testapp = TestApp(app, environ)
 
