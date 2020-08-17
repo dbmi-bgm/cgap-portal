@@ -5,9 +5,9 @@ import pytest
 import tempfile
 
 from unittest import mock
-from dcicutils.qa_utils import ControlledTime
+from dcicutils.qa_utils import ControlledTime, ignored
 from ..util import (
-    debuglog, deduplicate_list, gunzip_content, resolve_file_path, ENCODED_ROOT_DIR,
+    debuglog, deduplicate_list, gunzip_content, resolve_file_path, ENCODED_ROOT_DIR, get_trusted_email,
 )
 from .. import util as util_module
 
@@ -231,3 +231,8 @@ def test_debuglog():
             os.remove(filename)
         except Exception:
             pass
+
+
+def test_get_trusted_email():
+    # TODO: This needs unit testing.
+    ignored(get_trusted_email)
