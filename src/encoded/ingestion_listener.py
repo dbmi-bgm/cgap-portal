@@ -389,8 +389,17 @@ class IngestionListener:
             ), variant, status=200)
         return variant
 
-    def build_and_post_variant_samples(self, parser, record, project, institution, variant, file):
-        """ Helper method that builds and posts all variant_samples associated with a record """
+    def build_and_post_variant_samples(self, parser, record, project, institution, variant, file, sample_relations):
+        """ Helper method that builds and posts all variant_samples associated with a record
+
+            :param parser: handle to VCF Parser
+            :param record: record to parse
+            :param project: project to associate with samples
+            :param institution: institution to associate with samples
+            :param variant: associated variant metadata
+            :param file: vcf file accession
+            :param sample_relations: dictionary mapping call_info -> familial relation
+        """
         if variant is None:
             return
         variant_samples = parser.create_sample_variant_from_record(record)
@@ -400,10 +409,38 @@ class IngestionListener:
                 sample['institution'] = institution
                 sample['variant'] = self.build_variant_link(variant)  # make links
                 sample['file'] = file
+                call_info = sample['CALL_INFO']  # extract familial relation
+                if call_info in sample_relations:
+                    sample['familial_relations'] = sample_relations[call_info]
+
                 self.vapp.post_json('/variant_sample', sample, status=201)
             except Exception as e:
                 log.error('Encountered exception posting variant_sample: %s' % e)
                 continue
+
+    def search_for_sample_relations(self, vcf_file_accession):
+        """ Helper function for below that handles search aspect (and can be mocked) """
+        search_qs = '/search/?type=SampleProcessing&processed_files.accession=%s' % vcf_file_accession
+        search_result = []
+        try:
+            search_result = self.vapp.get(search_qs).json['@graph']
+        except Exception as e:
+            log.error('No sample_processing found for this VCF! Familial relations will be absent. Error: %s' % e)
+        if len(search_result) > 1:
+            log.error('Ambiguous sample_processing detected for vcf %s, search: %s' % (vcf_file_accession, search_qs))
+        return search_result
+
+    def extract_sample_relations(self, vcf_file_accession):
+        """ Extracts a dictionary of sample relationships based on the file metadata given. """
+        search_result = self.search_for_sample_relations(vcf_file_accession)
+        if len(search_result) == 1:
+            sample_relations, sample_procesing = {}, search_result[0]
+            sample_pedigrees = sample_procesing['sample_pedigrees']
+            for entry in sample_pedigrees:
+                relationship = entry.get('relationship', None)
+                if relationship is not None:
+                    sample_relations[entry['sample_name']] = relationship
+            return sample_relations
 
     def post_variants_and_variant_samples(self, parser, file_meta):
         """ Posts variants and variant_sample items given the parser and relevant
@@ -419,11 +456,13 @@ class IngestionListener:
         success, error = 0, 0
         project, institution, file_accession = (file_meta['project']['uuid'], file_meta['institution']['uuid'],
                                                 file_meta['accession'])
+        sample_relations = self.extract_sample_relations(file_accession)
         for idx, record in enumerate(parser):
             log.info('Attempting parse on record %s' % record)
             try:
                 variant = self.build_and_post_variant(parser, record, project, institution)
-                self.build_and_post_variant_samples(parser, record, project, institution, variant, file_accession)
+                self.build_and_post_variant_samples(parser, record, project, institution, variant, file_accession,
+                                                    sample_relations)
                 success += 1
             except Exception as e:  # ANNOTATION spec validation error, recoverable
                 log.error('Encountered exception posting variant at row %s: %s ' % (idx, e))

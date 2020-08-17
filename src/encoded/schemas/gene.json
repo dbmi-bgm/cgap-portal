@@ -110,7 +110,7 @@
             "source_name": "BrainSpan",
             "source_version": "March.2013",
             "schema_title": "BrainSpan Microarray",
-            "link": "https://www.brainspan.org/lcm/search?exact_match=false&search_term=%<ID>%22&search_type=gene"
+            "link": "https://www.brainspan.org/lcm/search?exact_match=false&search_term=<ID>&search_type=gene&page_num=0"
         },
         "brainspan_rnaseq": {
             "title": "BrainSpan RNAseq",
@@ -216,17 +216,6 @@
                 "title": "ClinGen-Disease",
                 "type": "object",
                 "properties": {
-                    "disease_label": {
-                        "title": "Disease Label",
-                        "field_name": "disease_label",
-                        "type": "string",
-                        "do_import": true,
-                        "source_name": "ClinGenDisease",
-                        "source_version": "20200309",
-                        "sub_embedding_group": "{\"key\": \"clingendis\", \"title\": \"ClinGen-Disease\"}",
-                        "description": "Disease label list",
-                        "schema_title": "Disease Label"
-                    },
                     "disease_id": {
                         "title": "Disease ID (MONDO)",
                         "field_name": "disease_id",
@@ -238,6 +227,17 @@
                         "schema_title": "Disease ID (MONDO)",
                         "pattern": "^MONDO_[0-9]+$",
                         "link": "https://search.clinicalgenome.org/kb/conditions/<ID>"
+                    },
+                    "disease_label": {
+                        "title": "Disease Label",
+                        "field_name": "disease_label",
+                        "type": "string",
+                        "do_import": true,
+                        "source_name": "ClinGenDisease",
+                        "source_version": "20200309",
+                        "sub_embedding_group": "{\"key\": \"clingendis\", \"title\": \"ClinGen-Disease\"}",
+                        "description": "Disease label list",
+                        "schema_title": "Disease Label"
                     },
                     "inheritance": {
                         "title": "Inheritance",
@@ -555,7 +555,7 @@
             "source_version": "v1.2",
             "description": "Integrated information from six human genetic databases and seven model organism databases",
             "schema_title": "Marrvel",
-            "link": "http://www.marrvel.org/search/gene/<ID>"
+            "link": "http://v1.marrvel.org/search/gene/<ID>"
         },
         "mgd_id": {
             "title": "MGI",
@@ -669,13 +669,14 @@
             "source_version": "v2.1.1"
         },
         "oe_lof_upper": {
-            "title": "oe_lof_upper",
+            "title": "LOEUF",
             "field_name": "oe_lof_upper",
             "type": "number",
             "do_import": true,
             "source_name": "gnomADmetrics",
             "source_version": "v2.1.1",
-            "description": "LOEUF"
+            "description": "loss-of-function observed/expected upper bound fraction, is a metric that is developed by the gnomAD team and supersedes pLI. See gnomAD FAQs (https://gnomad.broadinstitute.org/faq) for more information.",
+            "schema_title": "LOEUF"
         },
         "oe_mis": {
             "title": "o/e (missense)",
@@ -780,8 +781,7 @@
             "source_version": "4.0c",
             "annotation_category": "dbxref",
             "description": "ID(s) of the Pathway(s) the gene belongs to (from KEGG)",
-            "schema_title": "KEGG",
-            "link": "https://www.genome.jp/dbget-bin/www_bget?<ID>"
+            "schema_title": "KEGG"
         },
         "pdb": {
             "title": "PDB",
@@ -1012,19 +1012,6 @@
                 "title": "Transcript ID",
                 "type": "object",
                 "properties": {
-                    "ensembl_trs": {
-                        "title": "ENSEMBL transcript",
-                        "field_name": "ensembl_trs",
-                        "type": "string",
-                        "do_import": true,
-                        "source_name": "ENSEMBLIDxref",
-                        "source_version": "v2.1.1",
-                        "sub_embedding_group": "{\"key\": \"transcriptid\", \"title\": \"Transcript ID\"}",
-                        "description": "ENSEMBL transcript ID list",
-                        "schema_title": "ENSEMBL transcript",
-                        "pattern": "^ENST[0-9]{11}$",
-                        "link": "https://useast.ensembl.org/Homo_sapiens/Transcript/Summary?t=<ID>"
-                    },
                     "ensembl_pro": {
                         "title": "ENSEMBL protein",
                         "field_name": "ensembl_pro",
@@ -1037,6 +1024,19 @@
                         "schema_title": "ENSEMBL protein",
                         "pattern": "^ENSP[0-9]{11}$",
                         "link": "http://www.ensembl.org/Homo_sapiens/protview?peptide=<ID>"
+                    },
+                    "ensembl_trs": {
+                        "title": "ENSEMBL transcript",
+                        "field_name": "ensembl_trs",
+                        "type": "string",
+                        "do_import": true,
+                        "source_name": "ENSEMBLIDxref",
+                        "source_version": "v2.1.1",
+                        "sub_embedding_group": "{\"key\": \"transcriptid\", \"title\": \"Transcript ID\"}",
+                        "description": "ENSEMBL transcript ID list",
+                        "schema_title": "ENSEMBL transcript",
+                        "pattern": "^ENST[0-9]{11}$",
+                        "link": "https://useast.ensembl.org/Homo_sapiens/Transcript/Summary?t=<ID>"
                     }
                 }
             }
