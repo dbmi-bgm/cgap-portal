@@ -248,7 +248,6 @@ def get_trusted_email(request, context=None, raise_errors=True):
     This will raise HTTPUnprocessableEntity if there's a problem obtaining the mail.
     """
     try:
-        # import pdb;pdb.set_trace()
         context = context or "Requirement"
         email = getattr(request, '_auth0_authenticated', None)
         if not email:
