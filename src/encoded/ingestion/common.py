@@ -15,7 +15,7 @@ DATA_BUNDLE_BUCKET = 'cgap-data-bundles'
 
 CONTENT_TYPE_SPECIAL_CASES = {
     'application/x-www-form-urlencoded': [
-        # Special case to allow us to POST to metadata TSV requests via form submission
+        # Legacy special case to allow us to POST to metadata TSV requests via form submission.
         '/metadata/'
     ]
 }
