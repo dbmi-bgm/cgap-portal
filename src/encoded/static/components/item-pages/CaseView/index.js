@@ -132,7 +132,6 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
         case_phenotypic_features: caseFeatures = { case_phenotypic_features: [] },
         description = null,
         actions: permissibleActions = [],
-        sample_processing,
         display_title: caseTitle,
         accession: caseAccession,
         individual: caseIndividual
@@ -272,23 +271,25 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
                 </div>
             </div>
 
-            <DotRouter href={href} navClassName="container-wide pt-36 pb-36" contentsClassName="container-wide bg-light pt-36 pb-36" prependDotPath="case-info">
-                <DotRouterTab tabTitle="Accessioning" dotPath=".accessioning" default cache={false}>
-                    <AccessioningTab {...{ context, href, currFamily, secondary_families, }} />
-                </DotRouterTab>
-                <DotRouterTab tabTitle="Bioinformatics" dotPath=".bioinformatics" cache={false}>
-                    <BioinformaticsTab {...{ context, currFamily, secondary_families, idToGraphIdentifier, sample_processing }} />
-                </DotRouterTab>
-                <DotRouterTab tabTitle="Filtering" dotPath=".filtering">
-                    <FilteringTab context={context} windowHeight={windowHeight} />
-                </DotRouterTab>
-                <DotRouterTab tabTitle="Interpretation" dotPath=".interpretation" disabled cache={false}>
-                    <InterpretationTab {...props} />
-                </DotRouterTab>
-                <DotRouterTab tabTitle="Finalize Case" dotPath=".reporting" disabled cache={false}>
-                    <ReportingTab {...props} />
-                </DotRouterTab>
-            </DotRouter>
+            { currFamily && caseIndividual ?
+                <DotRouter href={href} navClassName="container-wide pt-36 pb-36" contentsClassName="container-wide bg-light pt-36 pb-36" prependDotPath="case-info">
+                    <DotRouterTab tabTitle="Accessioning" dotPath=".accessioning" default cache={false}>
+                        <AccessioningTab {...{ context, href, currFamily, secondary_families, }} />
+                    </DotRouterTab>
+                    <DotRouterTab tabTitle="Bioinformatics" dotPath=".bioinformatics" cache={false}>
+                        <BioinformaticsTab {...{ context, currFamily, secondary_families, idToGraphIdentifier }} />
+                    </DotRouterTab>
+                    <DotRouterTab tabTitle="Filtering" dotPath=".filtering">
+                        <FilteringTab context={context} windowHeight={windowHeight} />
+                    </DotRouterTab>
+                    <DotRouterTab tabTitle="Interpretation" dotPath=".interpretation" disabled cache={false}>
+                        <InterpretationTab {...props} />
+                    </DotRouterTab>
+                    <DotRouterTab tabTitle="Finalize Case" dotPath=".reporting" disabled cache={false}>
+                        <ReportingTab {...props} />
+                    </DotRouterTab>
+                </DotRouter>
+                : null }
         </React.Fragment>
     );
 });
@@ -503,19 +504,193 @@ const AccessioningTab = React.memo(function AccessioningTab(props) {
     );
 });
 
+const BioinfoStats = React.memo(function BioinfoStats(props) {
+    // Note: Can probably clean up the render method of this a little bit by breaking each row
+    // into its own component. Not sure if worth it to do yet; is pretty long and repetitive, but
+    // may also be necessary to add to/edit rows individually in the future.
+    const {
+        caseSample = null,
+        sampleProcessing = null
+    } = props;
+
+    const {
+        bam_sample_id: caseSampleId = null,
+        processed_files: caseProcFiles = []
+    } = caseSample || {};
+    const {
+        processed_files: msaProcFiles = []
+    } = sampleProcessing || {};
+
+    const msaStats = {};
+
+    // Pull coverage and reads values from this case's sample's bam file
+    caseProcFiles.forEach((procFile) => {
+        const {
+            quality_metric: {
+                "@type": [ qmType ]=[],
+                quality_metric_summary: qmSummaries = []
+            }={}
+        } = procFile;
+        // Only continue if qclist (bamQC should only exist if there is also bamcheck)
+        if (qmType === "QualityMetricQclist") {
+            // Coverage and total reads should only be present in BAM, update if found
+            qmSummaries.forEach((qmSummary) => {
+                const { title = null, value = null, tooltip = null } = qmSummary;
+                if (title === "Coverage") {
+                    msaStats.coverage = { value, tooltip };
+                } else if (title === "Total Reads") {
+                    msaStats.reads = { value, tooltip };
+                }
+            });
+        }
+    });
+
+    // Pull variant stats, T-T ratio, heterozygosity ratio, etc. from sample_processing
+    msaProcFiles.forEach((procFile) => {
+        const {
+            quality_metric: {
+                "@type": [ qmType ]=[],
+                quality_metric_summary: qmSummaries = []
+            }={}
+        } = procFile;
+
+        console.log("procFile", procFile);
+        console.log("qmSummaries", qmSummaries);
+        // Only continue if qclist (vcfQC should only exist if there is also vcfcheck)
+        if (qmType === "QualityMetricQclist") {
+            // Stats should only be present in combined VCF, update if found
+            qmSummaries.forEach((qmSummary) => {
+                const { title = null, value = null, sample = null, tooltip = null } = qmSummary;
+                console.log("caseSampleId", caseSampleId, sample, title);
+                if (sample && sample === caseSampleId) {
+                    switch (title) {
+                        case "De Novo Fraction":
+                            msaStats.deNovo = { value, tooltip };
+                            break;
+                        case "Heterozygosity Ratio":
+                            msaStats.heterozygosity = { value, tooltip };
+                            break;
+                        case "Transition-Transversion Ratio":
+                            msaStats.transTansRatio = { value, tooltip };
+                            break;
+                        case "Total Variants Called":
+                            msaStats.totalVariants = { value, tooltip };
+                            break;
+                        case "Filtered Variants":
+                            msaStats.filteredVariants = { value, tooltip };
+                            break;
+                        default:
+                            break;
+                    }
+                }
+            });
+        }
+    });
+
+    return (
+        <>
+            <div className="row qc-summary">
+                <div className="col-sm-8 text-600">
+                    Total Number of Reads:
+                    { msaStats.reads && msaStats.reads.tooltip ?
+                        <i className="icon icon-info-circle fas icon-fw ml-05"
+                            data-tip={msaStats.reads.tooltip} data-place="right"/>
+                        : null }
+                </div>
+                <div className="col-sm-4">{/* 452.3 Million */}
+                    { (msaStats.reads && msaStats.reads.value) || "" }
+                </div>
+            </div>
+            <div className="row qc-summary">
+                <div className="col-sm-8 text-600">
+                    Coverage:
+                    { msaStats.coverage && msaStats.coverage.tooltip ?
+                        <i className="icon icon-info-circle fas icon-fw ml-05"
+                            data-tip={msaStats.coverage.tooltip} data-place="right"/>
+                        : null }
+                </div>
+                <div className="col-sm-4">{/* 30x */}
+                    { (msaStats.coverage && msaStats.coverage.value) || "" }
+                </div>
+            </div>
+            <div className="row qc-summary">
+                <div className="col-sm-8 text-600">
+                    Total Number of Variants Called:
+                    { msaStats.totalVariants && msaStats.totalVariants.tooltip ?
+                        <i className="icon icon-info-circle fas icon-fw ml-05"
+                            data-tip={msaStats.totalVariants.tooltip} data-place="right"/>
+                        : null }
+                </div>
+                <div className="col-sm-4">{/* 4,769,578 */}
+                    { (msaStats.totalVariants && msaStats.totalVariants.value) || "" }
+                </div>
+            </div>
+            <div className="row qc-summary">
+                <div className="col-sm-8 text-600">
+                    Transition-Tansversion ratio:
+                    { msaStats.transTansRatio && msaStats.transTansRatio.tooltip ?
+                        <i className="icon icon-info-circle fas icon-fw ml-05"
+                            data-tip={msaStats.transTansRatio.tooltip} data-place="right"/>
+                        : null }
+                </div>
+                <div className="col-sm-4">{/* Ex. 1.96 */}
+                    { (msaStats.transTansRatio && msaStats.transTansRatio.value) || "" }
+                </div>
+            </div>
+            <div className="row qc-summary">
+                <div className="col-sm-8 text-600">
+                    Heterozygosity ratio:
+                    { msaStats.heterozygosity && msaStats.heterozygosity.tooltip ?
+                        <i className="icon icon-info-circle fas icon-fw ml-05"
+                            data-tip={msaStats.heterozygosity.tooltip} data-place="right"/>
+                        : null }
+                </div>
+                <div className="col-sm-4">{/* Ex. 1.24 */}
+                    { (msaStats.heterozygosity && msaStats.heterozygosity.value) || "" }
+                </div>
+            </div>
+            <div className="row qc-summary">
+                <div className="col-sm-8 text-600">
+                    De novo Fraction:
+                    { msaStats.deNovo && msaStats.deNovo.tooltip ?
+                        <i className="icon icon-info-circle fas icon-fw ml-05"
+                            data-tip={msaStats.deNovo.tooltip} data-place="right"/>
+                        : null }
+                </div>
+                <div className="col-sm-4">{/* Ex. 2% */}
+                    { (msaStats.deNovo && msaStats.deNovo.value) || "" }
+                </div>
+            </div>
+            <div className="row qc-summary">
+                <div className="col-sm-8 text-600">
+                    Variants after hard filters:
+                    { msaStats.filteredVariants && msaStats.filteredVariants.tooltip ?
+                        <i className="icon icon-info-circle fas icon-fw ml-05"
+                            data-tip={msaStats.filteredVariants.tooltip} data-place="right"/>
+                        : null }
+                </div>
+                <div className="col-sm-4"> {/* Ex. 1,273 */}
+                    { (msaStats.filteredVariants && msaStats.filteredVariants.value) || "" }
+                </div>
+            </div>
+        </>
+    );
+});
+
 const BioinformaticsTab = React.memo(function BioinformaticsTab(props) {
     const {
         context,
-        currFamily,
-        secondary_families = [],
-        idToGraphIdentifier,
-        sample_processing = []
+        idToGraphIdentifier
     } = props;
-    const { display_title: caseDisplayTitle, family = null } = context;
+    const {
+        display_title: caseDisplayTitle,
+        family = null,
+        sample_processing: sampleProcessing = null,
+        sample: caseSample = null
+    } = context;
 
     const {
         original_pedigree: { display_title: pedFileName } = {},
-        members = [],
         display_title: familyDisplayTitle
     } = family;
     const onClick = useMemo(function(){
@@ -535,9 +710,6 @@ const BioinformaticsTab = React.memo(function BioinformaticsTab(props) {
         </h4>
     );
 
-
-    const dataTip = "Exonic and splice variants, clinvar pathogenic or conflicting submissions, spliceAI>0.2, not seen in 2 individuals among a set of 20 unrelated samples.";
-
     return (
         <React.Fragment>
             <h1>{ caseDisplayTitle }: <span className="text-300">Bioinformatics Analysis</span></h1>
@@ -547,70 +719,13 @@ const BioinformaticsTab = React.memo(function BioinformaticsTab(props) {
             </div>
             <div className="tab-inner-container">
                 <h2 className="section-header">Quality Control Metrics (QC)</h2>
-                <div className="row qc-summary">
-                    <div className="col-sm-8 text-600">
-                        Total Number of Reads:
-                    </div>
-                    <div className="col-sm-4">
-                        452.3 Million
-                    </div>
-                </div>
-                <div className="row qc-summary">
-                    <div className="col-sm-8 text-600">
-                        Coverage:
-                    </div>
-                    <div className="col-sm-4">
-                        30x
-                    </div>
-                </div>
-                <div className="row qc-summary">
-                    <div className="col-sm-8 text-600">
-                        Total Number of Variants Called:
-                    </div>
-                    <div className="col-sm-4">
-                        4,769,578
-                    </div>
-                </div>
-                <div className="row qc-summary">
-                    <div className="col-sm-8 text-600">
-                        Transition-Tansversion ratio:
-                    </div>
-                    <div className="col-sm-4">
-                        1.96
-                    </div>
-                </div>
-                <div className="row qc-summary">
-                    <div className="col-sm-8 text-600">
-                        Heterozygosity ratio:
-                    </div>
-                    <div className="col-sm-4">
-                        1.24
-                    </div>
-                </div>
-                <div className="row qc-summary">
-                    <div className="col-sm-8 text-600">
-                        De novo Fraction:
-                    </div>
-                    <div className="col-sm-4">
-                        2%
-                    </div>
-                </div>
-                <div className="row qc-summary">
-                    <div className="col-sm-8 text-600">
-                        Variants after hard filters:
-                        <i className="icon icon-info-circle fas icon-fw ml-05"
-                            data-tip={dataTip} data-place="right"/>
-                    </div>
-                    <div className="col-sm-4">
-                        2,291
-                    </div>
-                </div>
+                <BioinfoStats {...{ caseSample, sampleProcessing }} />
             </div>
             <div className="tab-inner-container">
                 <h2 className="section-header">Multisample Analysis Table</h2>
                 <div className="family-index-0" data-is-current-family={true}>
                     { title }
-                    <CaseSummaryTable {...family} sampleProcessing={[sample_processing]} isCurrentFamily={true} idx={0} {...{ idToGraphIdentifier }} />
+                    <CaseSummaryTable {...family} sampleProcessing={[sampleProcessing]} isCurrentFamily={true} idx={0} {...{ idToGraphIdentifier }} />
                 </div>
             </div>
         </React.Fragment>
