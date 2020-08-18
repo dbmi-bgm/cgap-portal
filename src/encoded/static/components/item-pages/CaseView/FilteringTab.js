@@ -150,6 +150,7 @@ export function FilteringTabSubtitle(props){
 
             function patchCaseItem(filterSetItemCreated = null){
                 console.log("Setting 'active_filterset'", filterSetItemCreated);
+                return; // TEMP EDIT FOR TESTING
                 const patchBody = {};
                 if (filterSetItemCreated) {
                     patchBody.active_filterset = filterSetItemCreated.uuid;

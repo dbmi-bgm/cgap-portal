@@ -36,10 +36,6 @@ $navbar-separator-color : scale-color($navbar-link-color, $alpha: -80%) !default
         color: $navbar-link-active-color; /* Set in _base.scss */
         //text-shadow: 0 0 0px $navbar-link-active-color;
         background-color: $navbar-link-active-bg;
-
-        i.icon {
-            //text-shadow: none;
-        }
     }
 
     &:focus,
