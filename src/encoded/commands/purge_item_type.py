@@ -48,13 +48,13 @@ def purge_item_type_from_storage(app, item_types, prod=False):
     for uuid in uuids_to_purge:
         try:
             pstorage.purge_uuid(uuid)
+            transaction.commit()
         except Exception as e:  # XXX: handle recoverable exceptions?
             logger.error('Encountered exception purging an item type (uuid: %s) from the DB: %s'
                          % (uuid, e))
             transaction.abort()
             return False
 
-    transaction.commit()
     return True
 
 

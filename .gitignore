@@ -79,3 +79,6 @@ elasticsearch-*.deb
 # Saved configurations from Elastic beanstalk that have been downloaded.
 .elasticbeanstalk/saved_configs/
 .elasticbeanstalk/app_versions/
+
+# Used for some kinds of debugging in dcicutils, snovault, cgap & ff.
+DEBUGLOG-*

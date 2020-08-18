@@ -289,6 +289,7 @@ def grandpa(testapp, project, institution, grandpa_sample):
 @pytest.fixture
 def mother(testapp, project, institution, grandpa, female_individual, mother_sample):
     item = {
+        "aliases": ["test-project:indiv-003389"],
         "accession": "GAPIDMOTHER1",
         "samples": [mother_sample['@id']],
         "age": 33,

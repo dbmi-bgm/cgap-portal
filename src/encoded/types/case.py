@@ -284,7 +284,10 @@ class Case(Item):
         files = sp_data.get('processed_files', [])
         if not files:
             return vcf_file
-        vcf_file = files[0]
+        # last file is the full annotated one
+        # this is not a good way to map the right file
+        # TODO: embedding file type and mapping with that would be better
+        vcf_file = files[-1]
         return vcf_file
 
     @calculated_property(schema={

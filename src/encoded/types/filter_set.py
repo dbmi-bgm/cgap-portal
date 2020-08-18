@@ -10,7 +10,7 @@ FILTER_BLOCKS = 'filter_blocks'
 
 @collection(
     name='filter-sets',
-    unique_key='nexus:title',
+    unique_key='filter_set:title',
     properties={
         'title': 'Filter Sets',
         'description': 'Filter Set for combining multiple queries'

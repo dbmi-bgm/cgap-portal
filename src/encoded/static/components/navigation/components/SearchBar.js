@@ -74,7 +74,7 @@ export class SearchBar extends React.PureComponent{
 
         this.state = {
             //'isVisible'         : false, // Not used atm
-            'searchItemType'    : this.memoized.deriveSearchItemTypeFromContextType(props.context['@type']), // Not used atm - theoreitcally later could have "cohorts", "all", "individual", ...
+            'searchItemType'    : this.memoized.deriveSearchItemTypeFromContextType(props.context['@type']), // Not used atm - theoreitcally later could have "cases", "all", "individual", ...
             'typedSearchQuery'  : initialQuery
         };
 

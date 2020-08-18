@@ -2,6 +2,7 @@ import json
 import argparse
 import logging
 from pyramid.paster import get_app
+from pyramid.httpexceptions import HTTPConflict
 from dcicutils.misc_utils import VirtualApp
 from tqdm import tqdm
 
@@ -51,7 +52,10 @@ class GeneIngestion(object):
                 gene['project'] = project
             if institution:
                 gene['institution'] = institution
-            vapp.post_json(self.GENE_ENDPOINT, gene, status=201)
+            try:
+                vapp.post_json(self.GENE_ENDPOINT, gene, status=201)
+            except HTTPConflict:  # XXX: PATCH on conflict - Should use put instead - See C4-272
+                vapp.patch_json('/'.join([self.GENE_ENDPOINT, gene['ensgid']]), gene)
 
 
 def main():

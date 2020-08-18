@@ -19,6 +19,7 @@ import { idToGraphIdentifier } from './PedigreeTabViewBody';
 export class CurrentFamilyController extends React.PureComponent {
 
     static haveFullViewPermissionForFamily(family){
+        if (!family) { return false; }
         const { original_pedigree = null, proband = null, members = [] } = family;
         // if (original_pedigree && !object.isAnItem(original_pedigree)){
         //     // Tests for presence of display_title and @id, lack of which indicates lack of view permission.

@@ -3,8 +3,8 @@ import argparse
 import logging
 from pyramid.paster import get_app
 from dcicutils.misc_utils import VirtualApp
-from encoded.commands.gene_table_intake import GeneTableParser, GeneTableIntakeException
-from encoded.commands.ingest_genes import GeneIngestion
+from ..commands.gene_table_intake import GeneTableParser, GeneTableIntakeException
+from ..commands.ingest_genes import GeneIngestion
 from tqdm import tqdm
 
 logger = logging.getLogger(__name__)
@@ -105,6 +105,7 @@ def main():
     app = get_app(args.config_uri, args.app_name)
     app_handle = VirtualApp(app, environ)
     sys.exit(run_gene_table_intake(app_handle, args) and run_ingest_genes(app_handle, args))
+
 
 if __name__ == '__main__':
     main()
