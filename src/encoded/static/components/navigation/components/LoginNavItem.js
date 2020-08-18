@@ -37,12 +37,3 @@ LoginNavItem.propTypes = {
     'windowWidth'   : PropTypes.number,
     ...UserRegistrationModal.propTypes
 };
-
-
-export const LogoutDropdownItem = React.memo(function LogoutDropdownItem({ performLogout }){
-    return (
-        <DropdownItem id="logoutbtn" onClick={performLogout} className="global-entry">
-            Log Out
-        </DropdownItem>
-    );
-});
