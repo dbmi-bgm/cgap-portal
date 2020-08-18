@@ -601,9 +601,10 @@ const BioinformaticsTab = React.memo(function BioinformaticsTab(props) {
     );
 });
 
+
 const FilteringTab = React.memo(function FilteringTab(props) {
     const { context = null, windowHeight } = props;
-    const { filter_set_flag_addon: filterFlags = "" } = context || {};
+    const { filter_set_flag_addon: filterFlags = "", display_title: caseDisplayTitle } = context || {};
     const searchHref = `/search/?type=VariantSample${filterFlags ? filterFlags : ""}`;
     const hideFacets = !filterFlags ? null : Object.keys(queryString.parse(filterFlags));
 
@@ -613,22 +614,39 @@ const FilteringTab = React.memo(function FilteringTab(props) {
     // Overrides default 400px.
     const maxHeight = typeof windowHeight === "number" && windowHeight > 800 ? (windowHeight - 405) : undefined;
 
-    return <EmbeddedItemSearchTable { ...{ searchHref, hideFacets, maxHeight }} title={<FilteringTabSubtitle {...{ context }} />} />;
+    return (
+        <React.Fragment>
+            <h1 className="mb-0 mt-0">
+                { caseDisplayTitle }: <span className="text-300">Variant Filtering and Technical Review</span>
+            </h1>
+            <EmbeddedItemSearchTable { ...{ searchHref, hideFacets, maxHeight }} title={<FilteringTabSubtitle caseItem={context} />} />
+        </React.Fragment>
+    );
 });
 
-function FilteringTabSubtitle({ totalCount, context: { display_title } }){
+/** Inherits props from EmbeddedItemSearchTable -> EmbeddedSearchView -> VirtualHrefController */
+function FilteringTabSubtitle(props){
+    const {
+        totalCount,
+        context: searchContext,
+        href: searchHref
+    } = props;
     // We give the span here an 'id' here so later on it'd be easy to find using Cypress
     // or other testing framework.
     return (
-        <div className="d-flex flex-column flex-lg-row mb-2 align-items-start align-items-lg-end justify-content-between">
-            <h1 className="mb-0 mt-0">
-                { display_title }: <span className="text-300">Variant Filtering and Technical Review</span>
-            </h1>
-            <h5 className="text-300 mt-0 mb-0">
-                <span id="filtering-variants-found" className="text-400 mr-05">{ totalCount || 0 }</span>
-                Variants found
-            </h5>
-        </div>
+        <React.Fragment>
+            <div className="d-flex flex-column flex-lg-row mb-2 align-items-start align-items-lg-center justify-content-between">
+                <h5 className="text-300 mt-0 mb-0">
+                    <span id="filtering-variants-found" className="text-400 mr-05">{ totalCount || 0 }</span>
+                    Variants found
+                </h5>
+                <h5 className="text-300 mt-0 mb-0">
+                    <button type="button" className="btn btn-primary">
+                        Save Current Filter
+                    </button>
+                </h5>
+            </div>
+        </React.Fragment>
     );
 }
 
