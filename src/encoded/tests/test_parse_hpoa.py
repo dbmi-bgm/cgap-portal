@@ -23,7 +23,7 @@ def test_ph_get_args_defaults():
     assert args.pretty is False
 
 
-def test_get_fields_for_item_added_by_file():
+def test_get_fields_for_item_added_by_file_hpoa():
     list2chk = ['subject_item', 'object_item', 'relationship_name']
     to_add = [v for k, v in ph.FIELD_MAPPING.items() if k not in ['Frequency', 'DiseaseName', 'HPO_ID']]
     list2chk.extend(to_add)

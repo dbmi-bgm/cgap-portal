@@ -42,6 +42,7 @@ from ..commands.load_items import load_items
 '''
 MONARCH_G2D_URL = 'https://archive.monarchinitiative.org/latest/tsv/gene_associations/gene_disease.9606.tsv'
 DATASOURCE = 'Monarch'
+ITEMTYPE = 'EvidenceGeneDisorder'
 ''' Fields in the annotation file or gene items that can be used for mapping file rows to Gene Items
     from_gene has prefixes used in annotation file for those IDs.
 '''
@@ -62,13 +63,17 @@ FIELD_MAPPING = {
     'source': {
         'field_name': 'attributed_pubs',
         'is_array': True,
-        'separator': '|'
+        'separator': '|',
+        'unique': True,
+        'validate': {'pattern': '^PMID:[0-9]+$'}
     },
     'is_defined_by': {
         'field_name': 'original_source',
         'is_array': True,
         'separator': '|',
-        'parse': True
+        'parse': True,
+        'unique': True,
+        'validate': {'enum': ['omim', 'orphanet', 'gwascatalog', 'clinvar.nt']}
     }
 }
 
@@ -79,9 +84,33 @@ def get_fields_for_item_added_by_file():
         fields will be used to compare dbterms to terms from file
     '''
     item_fields = ['subject_item', 'object_item']
-    to_add = [v.get('field_name') for k, v in FIELD_MAPPING.items()]
+    to_add = [v.get('field_name') for v in FIELD_MAPPING.values()]
     item_fields.extend(to_add)
     return item_fields
+
+
+def gather_validation_info(schema, fieldmap):
+    """ If schema is provided gets all fields with an enum or regex to use
+        to validate items created from file
+    """
+    vinfo = {}
+    if schema:
+        props = schema.get('properties', {})
+        for propname, pinfo in props.items():
+            if 'items' in pinfo:
+                pinfo = pinfo.get('items')
+            enum = pinfo.get('enum')
+            if enum is not None:
+                vinfo.setdefault(propname, {}).update({'enum': enum})
+            pattern = pinfo.get('pattern')
+            if pattern is not None:
+                vinfo.setdefault(propname, {}).update({'pattern': pattern})
+    # and add ad hoc specified additional info
+    if fieldmap:
+        for f, finfo in fieldmap.items():
+            if 'validate' in finfo:
+                vinfo.setdefault(f, {}).update(finfo.get('validate'))
+    return vinfo
 
 
 def get_logger(lname, logfile):
@@ -154,6 +183,7 @@ def find_gene_uid_from_file_fields(data, ids2geneuid):
         geneid = ids2geneuid.get(id2chk)
         if geneid:
             return geneid
+    return None
 
 
 def _parse_vals(vals):
@@ -165,7 +195,38 @@ def _parse_vals(vals):
     return pvals
 
 
-def create_gene2disorder_evi_annotation(data, problems, dt_time):
+def is_valid_g2d(annot, vinfo, problems):
+    ''' Use info in vinfo to check fields with enums and validate the values
+    '''
+    if not annot:  # an empty annotation?
+        return False
+    valid = True
+    for f, val in annot.items():
+        if f not in vinfo:
+            continue
+        # need to determine if val is a string and if so convert to list item
+        if isinstance(val, str):
+            val = [val]
+        vtype = vinfo.get(f)
+        if 'enum' in vtype:
+            okvals = vtype.get('enum')
+            invalid = [v for v in val if v not in okvals]
+            if invalid:
+                valid = False
+                annot['invalid_enum_vals'] = invalid
+                problems.setdefault('enum_invalid', []).append(annot)
+        if 'pattern' in vtype:
+            p = re.compile(vtype.get('pattern'))  # not sure if this will work out of the box
+            for v in val:
+                if not p.match(v):
+                    annot.setdefault('pattern_mismatch', []).append(v)
+            if 'pattern_mismatch' in annot:
+                valid = False
+                problems.setdefault('pattern_mismatch', []).append(annot)
+    return valid
+
+
+def create_gene2disorder_evi_annotation(data, problems, dt_time, valid_info=None):
     """ Looks at all the fields in the data line and
         transforms to GeneDisorderEvidence format
         fields we care about
@@ -176,10 +237,13 @@ def create_gene2disorder_evi_annotation(data, problems, dt_time):
         * subject -> using_gene_id
         * relation_label -> relationship_name
         * evidence_label (| separated values) -> evidence_class items
-        * source (| separated PMIDS) -> attibuted_pubs items
+        * source (| separated PMIDS) -> attributed_pubs items
         * is_defined_by (| separated url form) -> original_source items
+
+        At this point we know we have a valid subject_item and object_item
+        So validation only need be done for relationship_name
     """
-    g2d_annot = {'datasource': DATASOURCE, 'datasource_version': dt_time}
+    g2d_annot = {}
     for f, v in data.items():
         vals = []
         finfo = {}
@@ -191,6 +255,9 @@ def create_gene2disorder_evi_annotation(data, problems, dt_time):
             finfo = FIELD_MAPPING.get(f)
             if finfo.get('is_array'):
                 vals = [val.strip() for val in v.split(finfo.get('separator'))]
+                if finfo.get('unique'):
+                    # ensure unique values as required by schema
+                    vals = list(set(vals))
             else:
                 vals = [v.strip()]
 
@@ -202,25 +269,31 @@ def create_gene2disorder_evi_annotation(data, problems, dt_time):
             if not finfo.get('is_array'):
                 vals = vals[0]
             g2d_annot[finfo.get('field_name')] = vals
+    if g2d_annot:  # only add these constant fields if there is other info
+        g2d_annot.update({'datasource': DATASOURCE, 'datasource_version': dt_time})
 
-    return g2d_annot
+    # do some basic validation and add problems to list
+    if is_valid_g2d(g2d_annot, valid_info, problems):
+        return g2d_annot
+    else:
+        logger.warn("PROBLEM - NO annotation returned for\n\t{}".format(data))
+        return {}
+
+
+def get_item_schema(connection, itype, logger):
+    sname = re.sub(r'(?<!^)(?=[A-Z])', '_', itype).lower()  # convert to snake_case
+    q = 'profiles/' + sname + '.json'
+    schema = None
+    try:
+        schema = get_metadata(q, connection)
+    except Exception as e:
+        logger.warn("Can't retrieve schema for {} - will be unable to fully validate the created items prior to load".format(itype))
+        logger.warn(e)
+    return schema
 
 
 def log_problems(logger, problems):
-    missing_phenos = problems.get('hpo_not_found')
-    if missing_phenos:
-        logger.info("{} missing HPO terms used in hpoa file".format(len(missing_phenos)))
-        for hpoid, fields in missing_phenos.items():
-            logger.info("{}\t{}".format(hpoid, fields))
-    dup_annots = problems.get('redundant_annot')
-    if dup_annots:
-        logger.info("{} redundant annotations found".format(len(dup_annots)))
-    unmapped_dis = problems.get('no_map')
-    if unmapped_dis:
-        udis = {u.get('DatabaseID'): u.get(DIS_NAME_FIELD_FROM_INPUT) for u in unmapped_dis}
-        logger.info("{} disorders from {} annotation lines not found by xref".format(len(udis), len(unmapped_dis)))
-        for d in sorted(list(udis.keys())):
-            logger.info('{}\t{}'.format(d, udis[d]))
+    pass
 
 
 def get_args(args):  # pragma: no cover
@@ -258,19 +331,23 @@ def get_args(args):  # pragma: no cover
 
 
 def main():  # pragma: no cover
-    ITEMTYPE = 'EvidenceGeneDisorder'
-
     start = datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
     logfile = '{}_upd_gene2disorder_annot.log'.format(start.replace(':', '-'))
     logger = get_logger(__name__, logfile)
     logger.info('Processing gene to disorder annotations - START:{}'.format(start))
 
+    # initial setup and queries to get database items and schema
     args = get_args(sys.argv[1:])
 
     connection = connect2server(args.env, args.key, args.keyfile, logger)
     logger.info('Working with {}'.format(connection.get('server')))
 
     postfile, loaddb = prompt_check_for_output_options(args.load, args.outfile, ITEMTYPE, connection.get('server'), logger)
+
+    logger.info('Getting schema for {} item type from db'.format(ITEMTYPE))
+    evi_g2d_schema = get_item_schema(connection, ITEMTYPE, logger)
+    # set up for later validation - doing it once here to avoid unnecessary work later
+    validation_info = gather_validation_info(evi_g2d_schema, FIELD_MAPPING)
 
     logger.info('Getting existing Items from Database')
     logger.info('Disorders')
@@ -331,7 +408,7 @@ def main():  # pragma: no cover
             continue
         data['object_item'] = disorder_uid
 
-        g2d_evi = create_gene2disorder_evi_annotation(data, problems, start)
+        g2d_evi = create_gene2disorder_evi_annotation(data, problems, start, validation_info)
 
         if g2d_evi:
             if g2d_evi in evidence_items:
