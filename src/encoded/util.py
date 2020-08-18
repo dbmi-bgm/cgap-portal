@@ -3,7 +3,6 @@ import datetime
 import gzip
 import io
 import os
-import random
 import pyramid.request
 import tempfile
 
@@ -239,7 +238,7 @@ def create_empty_s3_file(s3_client, bucket: str, key: str):
     s3_client.upload_file(empty_file, Bucket=bucket, Key=key)
 
 
-def get_trusted_email(request, context=None):
+def get_trusted_email(request, context=None, raise_errors=True):
     """
     Get an email address on behalf of which we can issue other requests.
 
@@ -248,20 +247,26 @@ def get_trusted_email(request, context=None):
 
     This will raise HTTPUnprocessableEntity if there's a problem obtaining the mail.
     """
-    context = context or "Requirement"
-    email = getattr(request, '_auth0_authenticated', None)
-    if not email:
-        user_uuid = None
-        for principal in request.effective_principals:
-            if principal.startswith('userid.'):
-                user_uuid = principal[7:]
-                break
-        if not user_uuid:
-            raise HTTPUnprocessableEntity('%s: Must provide authentication' % context)
-        user_props = get_item_or_none(request, user_uuid)
-        if not user_props:
-            raise HTTPUnprocessableEntity('%s: User profile missing' % context)
-        if 'email' not in user_props:
-            raise HTTPUnprocessableEntity('%s: Entry for "email" missing in user profile.' % context)
-        email = user_props['email']
-    return email
+    try:
+        # import pdb;pdb.set_trace()
+        context = context or "Requirement"
+        email = getattr(request, '_auth0_authenticated', None)
+        if not email:
+            user_uuid = None
+            for principal in request.effective_principals:
+                if principal.startswith('userid.'):
+                    user_uuid = principal[7:]
+                    break
+            if not user_uuid:
+                raise HTTPUnprocessableEntity('%s: Must provide authentication' % context)
+            user_props = get_item_or_none(request, user_uuid)
+            if not user_props:
+                raise HTTPUnprocessableEntity('%s: User profile missing' % context)
+            if 'email' not in user_props:
+                raise HTTPUnprocessableEntity('%s: Entry for "email" missing in user profile.' % context)
+            email = user_props['email']
+        return email
+    except Exception:
+        if raise_errors:
+            raise
+        return None
