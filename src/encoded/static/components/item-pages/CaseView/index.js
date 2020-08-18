@@ -433,7 +433,6 @@ const AccessioningTab = React.memo(function AccessioningTab(props) {
     const { display_title: primaryFamilyTitle, '@id' : currFamilyID } = currFamily;
     const [ isSecondaryFamiliesOpen, setSecondaryFamiliesOpen ] = useState(false);
     const secondaryFamiliesLen = secondary_families.length;
-    console.log("families", currFamily, secondary_families);
 
     const viewSecondaryFamiliesBtn = secondaryFamiliesLen === 0 ? null : (
         <div className="pt-2">
@@ -537,14 +536,11 @@ const BioinfoStats = React.memo(function BioinfoStats(props) {
             }={}
         } = procFile;
 
-        console.log("procFile", procFile);
-        console.log("qmSummaries", qmSummaries);
         // Only continue if qclist (vcfQC should only exist if there is also vcfcheck)
         if (qmType === "QualityMetricQclist") {
             // Stats should only be present in combined VCF, update if found
             qmSummaries.forEach((qmSummary) => {
                 const { title = null, value = null, sample = null, tooltip = null } = qmSummary;
-                console.log("caseSampleId", caseSampleId, sample, title);
                 if (sample && sample === caseSampleId) {
                     switch (title) {
                         case "De Novo Fraction":
