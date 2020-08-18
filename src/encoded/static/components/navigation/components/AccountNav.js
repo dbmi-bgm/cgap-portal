@@ -3,7 +3,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import _ from 'underscore';
-import Nav from 'react-bootstrap/esm/Nav';
 
 import { JWT, isServerSide, object, console, memoizedUrlParse } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { LoginController, LogoutController } from '@hms-dbmi-bgm/shared-portal-components/es/components/navigation/components/LoginController';
@@ -56,11 +55,11 @@ export const AccountNav = React.memo(function AccountNav(props){
 
     if (!session) { // Render login button
         return (
-            <Nav className="navbar-acct">
+            <div className="navbar-nav navbar-acct">
                 <LoginController {...{ updateUserInfo, auth0Options }}>
                     <LoginNavItem {...{ schemas, session, href, windowWidth }} key="login-register" className="user-account-item" />
                 </LoginController>
-            </Nav>
+            </div>
         );
     }
 
@@ -79,12 +78,12 @@ export const AccountNav = React.memo(function AccountNav(props){
 
     // `navItemProps` contains: href, windowHeight, windowWidth, isFullscreen, testWarning, mounted, overlaysContainer
     return (
-        <Nav className="navbar-acct">
+        <div className="navbar-nav navbar-acct">
             <BigDropdownNavItem {...passProps} {...{ windowWidth, href }} id="account-menu-item"
                 navItemContent={navItemTitle} className={cls}>
                 <UserActionsMenu {...{ userActions, href, updateUserInfo, userDetails, windowWidth }}/>
             </BigDropdownNavItem>
-        </Nav>
+        </div>
     );
 });
 AccountNav.propTypes = {

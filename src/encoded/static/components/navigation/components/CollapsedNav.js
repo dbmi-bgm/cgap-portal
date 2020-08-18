@@ -4,8 +4,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import url from 'url';
 import _ from 'underscore';
-import Navbar from 'react-bootstrap/esm/Navbar';
-import Nav from 'react-bootstrap/esm/Nav';
+import NavbarCollapse from 'react-bootstrap/esm/NavbarCollapse';
 import { console, memoizedUrlParse } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { navigate } from './../../util'; // Extended w. browseBaseHref & related fxns.
 
@@ -40,9 +39,10 @@ export const CollapsedNav = React.memo(function CollapsedNav(props){
         schemas, updateUserInfo, testWarningVisible
     };
 
-
+    // We'll probably keep using NavbarCollapse for a bit since simpler than implementing own
+    // (responsive openable mobile menus)
     return (
-        <Navbar.Collapse>
+        <NavbarCollapse>
             <BigDropdownGroupController {...{ addToBodyClassList, removeFromBodyClassList }}>
                 { session ?
                     <LeftNavAuthenticated {...leftNavProps} />
@@ -50,7 +50,7 @@ export const CollapsedNav = React.memo(function CollapsedNav(props){
                 {/* <SearchBar {...{ href, currentAction, context }} /> */}
                 <AccountNav {...userActionNavProps} />
             </BigDropdownGroupController>
-        </Navbar.Collapse>
+        </NavbarCollapse>
     );
 });
 
@@ -79,12 +79,12 @@ const LeftNavAuthenticated = React.memo(function LeftNavAuthenticated(props){
     // TODO: query seems to be coming in empty, need to fix to get highlighting working again
 
     return (
-        <Nav className="mr-auto">
-            <Nav.Link key="browse-menu-item" href="/cases/" active={isCasesLinkActive} className="browse-nav-btn">
+        <div className="navbar-nav mr-auto">
+            <a href="/cases/" className={"nav-link browse-nav-btn" + (isCasesLinkActive ? " active" : "")}>
                 Cases
-            </Nav.Link>
+            </a>
             <HelpNavItem {...props} />
-        </Nav>
+        </div>
     );
 });
 
@@ -93,7 +93,7 @@ const LeftNavGuest = React.memo(function LeftNavGuest(props){
     const { pathname = "/" } = url.parse(href, false);
 
     return (
-        <Nav className="mr-auto">
+        <div className="navbar-nav mr-auto">
             <a href="/case-studies" className={"nav-link" + (pathname === "/case-studies" ? " active" : "")}>
                 Case Studies
             </a>
@@ -101,6 +101,6 @@ const LeftNavGuest = React.memo(function LeftNavGuest(props){
             <a href="/about" className={"nav-link" + (pathname === "/about" ? " active" : "")}>
                 About
             </a>
-        </Nav>
+        </div>
     );
 });
