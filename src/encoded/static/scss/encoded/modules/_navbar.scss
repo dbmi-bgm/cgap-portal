@@ -375,14 +375,13 @@ div#top-nav.navbar-fixed-top {
 
                         &.has-image {
                             padding-left: 8px;
+                            display: flex;
+                            align-items: center;
                             img.account-icon-image {
                                 margin-right: 8px;
                                 border-radius: 8px;
                                 width: 30px;
                                 height: 30px;
-                            }
-                            span {
-                                vertical-align: middle;
                             }
                             @include media-breakpoint-up(lg){
                                 img.account-icon-image {
@@ -894,9 +893,12 @@ body[data-current-action="multiselect"] {
             background-color: rgba(28,28,30,.7);
         }
 
+        // Rules for pages at which to be offset less from top.
         body.scrolled-past-top &,
         body.is-select-page &,
-        body.is-full-screen:not([data-pathname="/browse/"]):not([data-pathname="/search/"]) & {
+        body.is-item-view &,
+        body.is-full-screen & {
+        //body.is-full-screen:not([data-pathname="/browse/"]):not([data-pathname="/search/"]) & {
             //height: $navbar-small-height;
             top: $navbar-small-height;
             //height: calc(100vh - #{$navbar-small-height});
