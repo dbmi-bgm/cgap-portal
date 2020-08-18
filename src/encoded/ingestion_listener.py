@@ -131,7 +131,7 @@ def submit_for_ingestion(context, request):
         "submission_uri": SubmissionFolio.make_submission_uri(submission_id),
         "bucket": DATA_BUNDLE_BUCKET,
         "authenticated_userid": request.authenticated_userid,
-        "email": get_trusted_email(request, context="Submission"),
+        "email": get_trusted_email(request, context="Submission", raise_errors=False),
         "success": success,
         "message": message,
         "upload_time": upload_time,
