@@ -444,45 +444,54 @@ def create(context, request):
 
 
 
-@view_config(context=Collection, permission='add', request_method='POST',
-             validators=[]) # TURNS OFF VALIDATION HERE
-@view_config(context=Collection, permission='add_unvalidated', request_method='POST',
-             validators=[no_validate_item_content_post],
-             request_param=['validate=false'])
+@view_config(
+    context=Collection,
+    permission='add',
+    request_method='POST',
+    #validators=[] # TURNS OFF VALIDATION HERE ([validate_item_content_post] previously)
+    validators=[validate_item_content_post]
+)
+@view_config(
+    context=Collection,
+    permission='add_unvalidated',
+    request_method='POST',
+    validators=[no_validate_item_content_post],
+    request_param=['validate=false']
+)
 @debug_log
 def collection_add(context, request, render=None):
 
-    institution_needed = False
-    project_needed = False
-    data = request.json
-    schema = context.type_info.schema
+    # institution_needed = False
+    # project_needed = False
+    # data = request.json
+    # schema = context.type_info.schema
 
-    required_properties = schema.get("required", [])
-    if "institution" in required_properties and "institution" not in data:
-        institution_needed = True
+    # required_properties = schema.get("required", [])
+    # if "institution" in required_properties and "institution" not in data:
+    #     institution_needed = True
 
-    if "project" in required_properties and "project" not in data:
-        project_needed = True
+    # if "project" in required_properties and "project" not in data:
+    #     project_needed = True
 
-    if request.authenticated_userid and (institution_needed or project_needed):
-        namespace, userid = request.authenticated_userid.split(".", 1)
-        user_item = get_item_or_none(request, userid, itype="/users/", frame="object")
-        new_data = data.copy()
-        if institution_needed and "institution" in user_item:
-            new_data["institution"] = user_item["institution"]
-        if project_needed and "project" in user_item:
-            new_data["project"] = user_item["project"]
+    # if request.authenticated_userid and (institution_needed or project_needed):
+    #     namespace, userid = request.authenticated_userid.split(".", 1)
+    #     user_item = get_item_or_none(request, userid, itype="/users/", frame="object")
+    #     new_data = data.copy()
+    #     if institution_needed and "institution" in user_item:
+    #         new_data["institution"] = user_item["institution"]
+    #     if project_needed and "project" in user_item:
+    #         new_data["project"] = user_item["project"]
 
-        # Override initial JSON body of request (hacky? better way?)
-        setattr(request, "json", new_data)
+    #     # Override initial JSON body of request (hacky? better way?)
+    #     setattr(request, "json", new_data)
 
-    # Perform validation that would occur otherwise
-    validate_item_content_post(context, request)
-    if request.errors:
-        return HTTPUnprocessableEntity(
-            json={'errors': request.errors},
-            content_type='application/json'
-        )
+    # # Perform validation that would occur otherwise
+    # validate_item_content_post(context, request)
+    # if request.errors:
+    #     return HTTPUnprocessableEntity(
+    #         json={'errors': request.errors},
+    #         content_type='application/json'
+    #     )
 
     return sno_collection_add(context, request, render)
 

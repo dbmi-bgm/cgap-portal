@@ -6,6 +6,7 @@ import url from 'url';
 import queryString from 'query-string';
 
 import { console, layout, navigate, ajax } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
+import { Alerts } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/Alerts';
 
 import { EmbeddedItemSearchTable } from '../components/EmbeddedItemSearchTable';
 
@@ -88,7 +89,11 @@ export const FilteringTab = React.memo(function FilteringTab(props) {
 
     // TODO POST request w multiple of these filter_blocks, for now just first 1 is populated and used.
     const currentActiveFilterAppend = (filter_blocks[0] || {}).query || "";
-    const searchHrefAppend = initial_search_href_filter_addon + currentActiveFilterAppend;
+    const searchHrefAppend = (
+        initial_search_href_filter_addon +
+        (initial_search_href_filter_addon && currentActiveFilterAppend ? "&" + currentActiveFilterAppend : "")
+    );
+
     const initialSearchHref = "/search/?type=VariantSample" + (searchHrefAppend ? "&" + searchHrefAppend : "");
     // Hide facets that are ones used to initially narrow down results to those related to this case.
     const hideFacets = !initial_search_href_filter_addon ? null : Object.keys(queryString.parse(initial_search_href_filter_addon));
@@ -123,7 +128,13 @@ export function FilteringTabSubtitle(props){
         "@id" : caseAtID,
         accession: caseAccession = null,
         initial_search_href_filter_addon = "",
-        active_filterset = null
+        active_filterset = null,
+        project: {
+            "@id" : caseProjectID
+        },
+        institution: {
+            "@id" : caseInstitutionID
+        }
     } = caseItem;
     const {
         "@id" : activeFilterSetID,
@@ -141,25 +152,37 @@ export function FilteringTabSubtitle(props){
         const filterSetQueryStr = queryString.stringify(parsedCurrentQueryFiltered);
         const differsFromCurrentFilterSet = (
             (!active_filterset && filterSetQueryStr) ||
-            (filterSetQueryStr && active_filterset && _.isEqual(parsedCurrentQueryFiltered, queryString.parse(currentActiveFilterAppend)))
+            (active_filterset && filterSetQueryStr && !_.isEqual(parsedCurrentQueryFiltered, queryString.parse(currentActiveFilterAppend)))
+        );
+
+        console.log("TTT5",
+            active_filterset,
+            filterSetQueryStr,
+            parsedCurrentQueryFiltered,
+            queryString.parse(currentActiveFilterAppend),
+            _.isEqual(parsedCurrentQueryFiltered, queryString.parse(currentActiveFilterAppend))
         );
 
         function saveNewFilterset(e){
 
             // Hmm maybe should redo as promises/use the promisequeue..
 
-            function patchCaseItem(filterSetItemCreated = null){
-                console.log("Setting 'active_filterset'", filterSetItemCreated);
-                return; // TEMP EDIT FOR TESTING
+            function patchCaseItem(filterSetItemCreatedResponse = null){
                 const patchBody = {};
-                if (filterSetItemCreated) {
-                    patchBody.active_filterset = filterSetItemCreated.uuid;
+                if (filterSetItemCreatedResponse) {
+                    patchBody.active_filterset = filterSetItemCreatedResponse["@graph"][0].uuid;
                 }
-                ajax.load(caseAtID + (filterSetItemCreated ? "" : "?delete_fields=active_filterset"), function(res){
+                console.log("Setting 'active_filterset'", patchBody, filterSetItemCreatedResponse);
+                ajax.load(caseAtID + (filterSetItemCreatedResponse ? "" : "?delete_fields=active_filterset"), function(res){
                     console.info("PATCHed Case Item", res);
                     setIsLoading(false);
                 }, "PATCH", function(err){
-                    console.error("Error POSTing new FilterSet", err);
+                    console.error("Error PATCHing Case", err);
+                    Alerts.queue({
+                        "title" : "Error PATCHing Case",
+                        "message" : JSON.stringify(err),
+                        "style" : "danger"
+                    });
                     setIsLoading(false);
                 }, JSON.stringify(patchBody));
             }
@@ -168,12 +191,14 @@ export function FilteringTabSubtitle(props){
                 // TODO: Filter out initial_search_href_filter_addon
                 // If no filter, skip and just set Case `active_filterset` field to none.
                 const newFilterSetItem = {
-                    "title" : "FilterSet Created For Case " + caseAccession,
-                    "search_type" : "VariantSample",
-                    "filter_blocks" : [
+                    "title": "FilterSet Created For Case " + caseAccession,
+                    "search_type": "VariantSample",
+                    "institution": caseInstitutionID,
+                    "project": caseProjectID,
+                    "filter_blocks": [
                         {
-                            "name" : "Primary",
-                            "query" : filterSetQueryStr,
+                            "name": "Primary",
+                            "query": filterSetQueryStr,
                             // "flags_applied" : "case:" + caseAccession ? idk
                         }
                     ]
@@ -181,6 +206,11 @@ export function FilteringTabSubtitle(props){
                 setIsLoading(true);
                 ajax.load("/filter-sets/", callback, "POST", function(err){
                     console.error("Error POSTing new FilterSet", err);
+                    Alerts.queue({
+                        "title" : "Error POSTing new FilterSet",
+                        "message" : JSON.stringify(err),
+                        "style" : "danger"
+                    });
                     setIsLoading(false);
                 }, JSON.stringify(newFilterSetItem));
             }
@@ -197,6 +227,8 @@ export function FilteringTabSubtitle(props){
 
         return { filterSetQueryStr, differsFromCurrentFilterSet, saveNewFilterset };
     }, [ caseItem, searchHref ]);
+
+    console.log("TESTing123", currentActiveFilterAppend, searchHref, filterSetQueryStr);
 
     // We give the span here an 'id' here so later on it'd be easy to find using Cypress
     // or other testing framework.
