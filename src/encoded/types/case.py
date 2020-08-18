@@ -191,6 +191,7 @@ class Case(Item):
         "report.status",
         "report.accession",
         "report.case.accession",
+        "active_filterset.filter_blocks.query",
         "cohort.filter_set.*",
         "project.name"
     ]
@@ -275,14 +276,13 @@ class Case(Item):
         return vcf_file
 
     @calculated_property(schema={
-        "title": "Filter Set Flag add-on",
-        "description": "tag to be added to the filter set flag for limiting search to varants/sample variants from this case",
+        "title": "Search Query Filter String Add-On",
+        "description": "String to be appended to the initial search query to limit results to varants/sample variants from this case.",
         "type": "string"
     })
-    def filter_set_flag_addon(self, request, sample_processing=None, individual=None):
+    def initial_search_href_filter_addon(self, request, sample_processing=None, individual=None):
         """
         Use vcf file and sample accessions to limit variant/variantsample to this case
-        TODO: Potentially rename since nothing to do with filtersets here I think? (Maybe TBD)
         """
         if not individual or not sample_processing:
             return ''
@@ -297,7 +297,7 @@ class Case(Item):
         if not sample_read_group:
             return ''
         vcf_acc = vcf.split('/')[2]
-        add_on = "&CALL_INFO={}&file={}".format(sample_read_group, vcf_acc)
+        add_on = "CALL_INFO={}&file={}".format(sample_read_group, vcf_acc)
         return add_on
 
     @calculated_property(schema={

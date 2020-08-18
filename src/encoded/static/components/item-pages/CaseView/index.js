@@ -4,14 +4,14 @@ import React, { useState, useMemo } from 'react';
 import memoize from 'memoize-one';
 import _ from 'underscore';
 import url from 'url';
-import queryString from 'query-string';
 
-import { console, layout, navigate } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
+import { console, layout, navigate, ajax } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { PartialList } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/PartialList';
 
 import { PedigreeVizView } from './../../viz/PedigreeViz';
 import DefaultItemView from './../DefaultItemView';
 import { TabPaneErrorBoundary } from './../components/TabView';
+import { EmbeddedCaseSearchTable } from '../components/EmbeddedItemSearchTable';
 
 import { CaseSummaryTable } from './CaseSummaryTable';
 import { FamilyAccessionStackedTable } from './../../browse/CaseDetailPane';
@@ -21,9 +21,10 @@ import { PedigreeFullScreenBtn } from './PedigreeFullScreenBtn';
 import { parseFamilyIntoDataset } from './family-parsing';
 import { CurrentFamilyController } from './CurrentFamilyController';
 import { CaseStats } from './CaseStats';
+import { FilteringTab } from './FilteringTab';
 import CaseSubmissionView from './CaseSubmissionView';
 
-import { EmbeddedItemSearchTable, EmbeddedCaseSearchTable } from '../components/EmbeddedItemSearchTable';
+
 
 export {
     CaseSummaryTable,
@@ -115,6 +116,7 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
     const {
         context = {},
         href,
+        session,
         graphData,
         selectedDiseases,
         windowWidth,
@@ -263,7 +265,7 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
                         <BioinformaticsTab {...{ context, currFamily, secondary_families, idToGraphIdentifier, sample_processing }} />
                     </DotRouterTab>
                     <DotRouterTab tabTitle="Filtering" dotPath=".filtering">
-                        <FilteringTab context={context} windowHeight={windowHeight} />
+                        <FilteringTab {...{ context, windowHeight, session }} />
                     </DotRouterTab>
                     <DotRouterTab tabTitle="Interpretation" dotPath=".interpretation" disabled cache={false}>
                         <InterpretationTab {...props} />
@@ -602,53 +604,7 @@ const BioinformaticsTab = React.memo(function BioinformaticsTab(props) {
 });
 
 
-const FilteringTab = React.memo(function FilteringTab(props) {
-    const { context = null, windowHeight } = props;
-    const { filter_set_flag_addon: filterFlags = "", display_title: caseDisplayTitle } = context || {};
-    const searchHref = `/search/?type=VariantSample${filterFlags ? filterFlags : ""}`;
-    const hideFacets = !filterFlags ? null : Object.keys(queryString.parse(filterFlags));
 
-    // This maxHeight is stylistic and dependent on our view design/style
-    // wherein we have minHeight of tabs set to close to windowHeight in SCSS.
-    // 405px offset likely would need to be changed if we change height of tab nav, tab title area, etc.
-    // Overrides default 400px.
-    const maxHeight = typeof windowHeight === "number" && windowHeight > 800 ? (windowHeight - 405) : undefined;
-
-    return (
-        <React.Fragment>
-            <h1 className="mb-0 mt-0">
-                { caseDisplayTitle }: <span className="text-300">Variant Filtering and Technical Review</span>
-            </h1>
-            <EmbeddedItemSearchTable { ...{ searchHref, hideFacets, maxHeight }} title={<FilteringTabSubtitle caseItem={context} />} />
-        </React.Fragment>
-    );
-});
-
-/** Inherits props from EmbeddedItemSearchTable -> EmbeddedSearchView -> VirtualHrefController */
-function FilteringTabSubtitle(props){
-    const {
-        totalCount,
-        context: searchContext,
-        href: searchHref
-    } = props;
-    // We give the span here an 'id' here so later on it'd be easy to find using Cypress
-    // or other testing framework.
-    return (
-        <React.Fragment>
-            <div className="d-flex flex-column flex-lg-row mb-2 align-items-start align-items-lg-center justify-content-between">
-                <h5 className="text-300 mt-0 mb-0">
-                    <span id="filtering-variants-found" className="text-400 mr-05">{ totalCount || 0 }</span>
-                    Variants found
-                </h5>
-                <h5 className="text-300 mt-0 mb-0">
-                    <button type="button" className="btn btn-primary">
-                        Save Current Filter
-                    </button>
-                </h5>
-            </div>
-        </React.Fragment>
-    );
-}
 
 function InterpretationTab(props) {
     return <h1>This is the interpretation tab.</h1>;

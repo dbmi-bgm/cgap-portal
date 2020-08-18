@@ -28,11 +28,7 @@ function mapFeaturesToBadges(features = []) {
 
 /** @param {Object} props - Contents of a caseItem */
 export const CaseStats = React.memo(function CaseStats(props){
-    const {
-        className = '',
-        caseItem = null
-    } = props;
-
+    const { caseItem = null } = props;
     const { individual = null, family = null } = caseItem || {};
     const { individual_id = null, phenotypic_features = [] } = individual || {};
     const { accession: famAccession = null, family_phenotypic_features = [] } = family || {};
@@ -57,7 +53,7 @@ export const CaseStats = React.memo(function CaseStats(props){
                         <PatientInfo {...props} />
                     </div>
                     <div className="card-footer">
-                        <label className="mb-03 text-large">Patient Phenotypic Features:</label>
+                        <label className="py-1 mb-0 text-large">Patient Phenotypic Features:</label>
                         <div>{renderedPatientPhenotypicFeatures}</div>
                     </div>
                 </div>
@@ -71,7 +67,7 @@ export const CaseStats = React.memo(function CaseStats(props){
                         <FamilyInfo {...{ family, caseItem }} />
                     </div>
                     <div className="card-footer">
-                        <label className="mb-03 text-large">Family Phenotypic Features: </label>
+                        <label className="py-1 mb-0 text-large">Family Phenotypic Features: </label>
                         <div>{renderedFamilyPhenotypicFeatures}</div>
                     </div>
                 </div>
@@ -124,7 +120,7 @@ export const PatientInfo = React.memo(function PatientInfo(props) {
             <div className="card-text mb-1">
                 <label className="mb-0">Accessioned:</label> { date_created ? <LocalizedTime timestamp={date_created} formatType="date-sm"/> : "N/A" }
             </div>
-            <div className="card-text mb-1">
+            <div className="card-text">
                 <label className="mb-0">Aliases:</label> {aliases || "N/A"}
             </div>
         </>
