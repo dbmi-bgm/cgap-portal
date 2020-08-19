@@ -103,7 +103,7 @@ export const FilteringTab = React.memo(function FilteringTab(props) {
     // wherein we have minHeight of tabs set to close to windowHeight in SCSS.
     // 405px offset likely would need to be changed if we change height of tab nav, tab title area, etc.
     // Overrides default 400px.
-    const maxHeight = typeof windowHeight === "number" && windowHeight > 800 ? (windowHeight - 435) : undefined;
+    const maxHeight = typeof windowHeight === "number" && windowHeight > 845 ? (windowHeight - 445) : undefined;
 
     return (
         <React.Fragment>
@@ -150,23 +150,15 @@ export function FilteringTabSubtitle(props){
     // `undefined` means not ever set or removed previously vs `null` means explicitly nothing set in current session.
     const [ lastFilterSetSaved, setLastFilterSetSaved ] = useState(active_filterset || undefined);
 
-    const { differsFromCurrentFilterSet, filterSetQueryStr, saveNewFilterset } = useMemo(function(){
+    const { differsFromCurrentFilterSet, filterSetQueryStr, saveNewFilterset, saveFilterBtnTip } = useMemo(function(){
         const { query: currentQuery } = url.parse(searchHref, false);
-        const parsedCurrentQueryFiltered = filterQueryByQuery("type=VariantSample&" + currentQuery, initial_search_href_filter_addon);
+        const parsedCurrentQueryFiltered = filterQueryByQuery(currentQuery, "type=VariantSample&" + initial_search_href_filter_addon);
         const filterSetQueryStr = queryString.stringify(parsedCurrentQueryFiltered);
         const differsFromCurrentFilterSet = (
             (!active_filterset && filterSetQueryStr) ||
             (active_filterset && !filterSetQueryStr) ||
             (active_filterset && filterSetQueryStr && !_.isEqual(parsedCurrentQueryFiltered, queryString.parse(currentActiveFilterAppend)))
         );
-
-        // console.log("TTT5",
-        //     active_filterset,
-        //     filterSetQueryStr,
-        //     parsedCurrentQueryFiltered,
-        //     queryString.parse(currentActiveFilterAppend),
-        //     _.isEqual(parsedCurrentQueryFiltered, queryString.parse(currentActiveFilterAppend))
-        // );
 
         function saveNewFilterset(e){
 
@@ -231,15 +223,19 @@ export function FilteringTabSubtitle(props){
             }
         }
 
-        return { filterSetQueryStr, differsFromCurrentFilterSet, saveNewFilterset };
+        const saveFilterBtnTip = "<pre class='text-white mb-0'>" + JSON.stringify(parsedCurrentQueryFiltered, null, 4) + "</pre>";
+
+        return { filterSetQueryStr, differsFromCurrentFilterSet, saveNewFilterset, saveFilterBtnTip };
     }, [ caseItem, searchHref ]);
+
+    // console.log('TESTING', filterSetQueryStr, differsFromCurrentFilterSet);
 
     let btnPrepend = null;
     if (typeof lastFilterSetSaved !== "undefined") {
         if (lastFilterSetSaved === null) {
             btnPrepend = (
                 <div className="input-group-prepend">
-                    <div className="input-group-text">FilterSet Removed</div>
+                    <div className="input-group-text">Removed</div>
                 </div>
             );
         } else {
@@ -267,8 +263,8 @@ export function FilteringTabSubtitle(props){
             <h5 className="text-300 mt-0 mb-0">
                 <div className="btn-group" role="group" aria-label="FilterSet Controls">
                     { btnPrepend }
-                    <button type="button" className="btn btn-primary" data-current-query={filterSetQueryStr}
-                        disabled={!differsFromCurrentFilterSet || isLoading} onClick={saveNewFilterset}>
+                    <button type="button" className="btn btn-primary" data-current-query={filterSetQueryStr} data-html
+                        disabled={!differsFromCurrentFilterSet || isLoading} onClick={saveNewFilterset} data-tip={saveFilterBtnTip}>
                         { isLoading ?
                             <i className="icon icon-fw icon-spin icon-circle-notch fas mr-07" />
                             : <i className="icon icon-fw icon-save fas mr-07" /> }

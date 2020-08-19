@@ -340,8 +340,9 @@ $tabbar-height: 46px;
 **************************/
 
 #full-alerts-container {
-	position: relative;
-	z-index: 3;
+	position: sticky;
+	z-index: 500;
+	top: 40px;
 	> .alerts {
 		> .alert {
 			margin-bottom: 0px;
