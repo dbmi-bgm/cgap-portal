@@ -152,16 +152,17 @@ export function FilteringTabSubtitle(props){
         const filterSetQueryStr = queryString.stringify(parsedCurrentQueryFiltered);
         const differsFromCurrentFilterSet = (
             (!active_filterset && filterSetQueryStr) ||
+            (active_filterset && !filterSetQueryStr) ||
             (active_filterset && filterSetQueryStr && !_.isEqual(parsedCurrentQueryFiltered, queryString.parse(currentActiveFilterAppend)))
         );
 
-        console.log("TTT5",
-            active_filterset,
-            filterSetQueryStr,
-            parsedCurrentQueryFiltered,
-            queryString.parse(currentActiveFilterAppend),
-            _.isEqual(parsedCurrentQueryFiltered, queryString.parse(currentActiveFilterAppend))
-        );
+        // console.log("TTT5",
+        //     active_filterset,
+        //     filterSetQueryStr,
+        //     parsedCurrentQueryFiltered,
+        //     queryString.parse(currentActiveFilterAppend),
+        //     _.isEqual(parsedCurrentQueryFiltered, queryString.parse(currentActiveFilterAppend))
+        // );
 
         function saveNewFilterset(e){
 
@@ -203,7 +204,6 @@ export function FilteringTabSubtitle(props){
                         }
                     ]
                 };
-                setIsLoading(true);
                 ajax.load("/filter-sets/", callback, "POST", function(err){
                     console.error("Error POSTing new FilterSet", err);
                     Alerts.queue({
@@ -215,6 +215,7 @@ export function FilteringTabSubtitle(props){
                 }, JSON.stringify(newFilterSetItem));
             }
 
+            setIsLoading(true);
             if (!filterSetQueryStr) { // Falsy, e.g. "".
                 patchCaseItem(null);
             } else {
