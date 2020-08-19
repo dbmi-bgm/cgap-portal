@@ -193,6 +193,7 @@ export function FilteringTabSubtitle(props){
                     "search_type": "VariantSample",
                     "institution": caseInstitutionID,
                     "project": caseProjectID,
+                    "created_in_case_accession": caseAccession,
                     "filter_blocks": [
                         {
                             "name": "Primary",
