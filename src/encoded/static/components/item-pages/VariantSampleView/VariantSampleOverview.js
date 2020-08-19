@@ -12,6 +12,7 @@ import { Alerts } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/
 import { VariantSampleInfoHeader } from './VariantSampleInfoHeader';
 import { VariantTabBody } from './VariantTabBody';
 import { GeneTabBody } from './GeneTabBody';
+import { SampleTabBody } from './SampleTabBody';
 
 
 
@@ -183,10 +184,5 @@ const OverviewTabTitle = React.memo(function OverviewTabTitle(props){
         </button>
     );
 });
-
-
-function SampleTabBody(props){
-    return "Test3";
-}
 
 
