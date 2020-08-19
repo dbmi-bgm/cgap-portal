@@ -133,11 +133,15 @@ def run(app_name, config_uri, datadir, clear=False, init=False, load=False, inge
 
     es_server_url = config.get('elasticsearch.server', "localhost")
 
-    if not config.get("elasticsearch.aws_auth", False) and ("127.0.0.1" in es_server_url or "localhost" in es_server_url):
+    if ("127.0.0.1" in es_server_url or "localhost" in es_server_url):
+        # Bootup local ES server subprocess. Else assume connecting to remote ES cluster.
         elasticsearch = elasticsearch_fixture.server_process(esdata, echo=True)
         processes.append(elasticsearch)
     elif not config.get('indexer.namespace'):
         raise Exception("It looks like are connecting to remote elasticsearch.server but no indexer.namespace is defined.")
+    elif not config.get("elasticsearch.aws_auth", False):
+        # TODO detect if connecting to AWS or not before raising an Exception.
+        print("WARNING - elasticsearch.aws_auth is set to false. Connection will fail if connecting to remote ES cluster on AWS.")
 
     nginx = nginx_server_process(echo=True)
     processes.append(nginx)

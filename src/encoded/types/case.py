@@ -192,7 +192,8 @@ class Case(Item):
         "report.accession",
         "report.case.accession",
         "active_filterset.filter_blocks.query",
-        "active_filterset.filter_blocks.flags",
+        "active_filterset.filter_blocks.flags_applied",
+        "active_filterset.flags",
         "cohort.filter_set.*",
         "project.name"
     ]
