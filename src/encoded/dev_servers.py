@@ -137,7 +137,7 @@ def run(app_name, config_uri, datadir, clear=False, init=False, load=False, inge
         elasticsearch = elasticsearch_fixture.server_process(esdata, echo=True)
         processes.append(elasticsearch)
     elif not config.get('indexer.namespace'):
-        raise Exception("It looks like are connecting to remote elasticsearch.server but no elasticsearch.namespace is defined.")
+        raise Exception("It looks like are connecting to remote elasticsearch.server but no indexer.namespace is defined.")
 
     nginx = nginx_server_process(echo=True)
     processes.append(nginx)
