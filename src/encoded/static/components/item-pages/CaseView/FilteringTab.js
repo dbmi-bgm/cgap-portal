@@ -7,6 +7,7 @@ import queryString from 'query-string';
 
 import { console, layout, navigate, ajax } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { Alerts } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/Alerts';
+import { LocalizedTime } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/LocalizedTime';
 
 import { EmbeddedItemSearchTable } from '../components/EmbeddedItemSearchTable';
 
@@ -145,6 +146,9 @@ export function FilteringTabSubtitle(props){
     const currentActiveFilterAppend = (filter_blocks[0] || {}).query || "";
 
     const [ isLoading, setIsLoading ] = useState(false);
+    // From `state.lastFilterSetSaved` we use only `date_created` so doesn't matter if frame=object vs frame=page for it.
+    // `undefined` means not ever set or removed previously vs `null` means explicitly nothing set in current session.
+    const [ lastFilterSetSaved, setLastFilterSetSaved ] = useState(active_filterset || undefined);
 
     const { differsFromCurrentFilterSet, filterSetQueryStr, saveNewFilterset } = useMemo(function(){
         const { query: currentQuery } = url.parse(searchHref, false);
@@ -168,15 +172,16 @@ export function FilteringTabSubtitle(props){
 
             // Hmm maybe should redo as promises/use the promisequeue..
 
-            function patchCaseItem(filterSetItemCreatedResponse = null){
+            function patchCaseItem(newFilterSetItem = null){
                 const patchBody = {};
-                if (filterSetItemCreatedResponse) {
-                    patchBody.active_filterset = filterSetItemCreatedResponse["@graph"][0].uuid;
+                if (newFilterSetItem) {
+                    patchBody.active_filterset = newFilterSetItem.uuid;
                 }
-                console.log("Setting 'active_filterset'", patchBody, filterSetItemCreatedResponse);
-                ajax.load(caseAtID + (filterSetItemCreatedResponse ? "" : "?delete_fields=active_filterset"), function(res){
+                console.log("Setting 'active_filterset'", patchBody, newFilterSetItem);
+                ajax.load(caseAtID + (newFilterSetItem ? "" : "?delete_fields=active_filterset"), function(res){
                     console.info("PATCHed Case Item", res);
                     setIsLoading(false);
+                    setLastFilterSetSaved(newFilterSetItem);
                 }, "PATCH", function(err){
                     console.error("Error PATCHing Case", err);
                     Alerts.queue({
@@ -204,7 +209,10 @@ export function FilteringTabSubtitle(props){
                         }
                     ]
                 };
-                ajax.load("/filter-sets/", callback, "POST", function(err){
+                ajax.load("/filter-sets/", function(res){
+                    const { "@graph" : [ newFilterSetItem ] } = res;
+                    callback(newFilterSetItem);
+                }, "POST", function(err){
                     console.error("Error POSTing new FilterSet", err);
                     Alerts.queue({
                         "title" : "Error POSTing new FilterSet",
@@ -223,36 +231,51 @@ export function FilteringTabSubtitle(props){
             }
         }
 
-        // Probably temporary; relying on order of filters being same (might not be true)
-        //const saveFilterSetButtonDisabled = filterSetQueryStr ===
-
         return { filterSetQueryStr, differsFromCurrentFilterSet, saveNewFilterset };
     }, [ caseItem, searchHref ]);
 
-    console.log("TESTing123", currentActiveFilterAppend, searchHref, filterSetQueryStr);
+    let btnPrepend = null;
+    if (typeof lastFilterSetSaved !== "undefined") {
+        if (lastFilterSetSaved === null) {
+            btnPrepend = (
+                <div className="input-group-prepend">
+                    <div className="input-group-text">FilterSet Removed</div>
+                </div>
+            );
+        } else {
+            // This will eventually likely be turned into tooltip or something on FilterSet blocks UI.
+            const { display_title: fsTitle, date_created: fsCreated } = lastFilterSetSaved;
+            btnPrepend = (
+                <div className="input-group-prepend">
+                    <div className="input-group-text" data-tip={fsTitle}>
+                        Saved
+                        &nbsp;<LocalizedTime timestamp={fsCreated} formatType="date-time-lg" />
+                    </div>
+                </div>
+            );
+        }
+    }
 
     // We give the span here an 'id' here so later on it'd be easy to find using Cypress
     // or other testing framework.
     return (
-        <React.Fragment>
-            <div className="d-flex flex-column flex-lg-row mb-2 align-items-start align-items-lg-center justify-content-between">
-                <h5 className="text-300 mt-0 mb-0">
-                    <span id="filtering-variants-found" className="text-400 mr-05">{ totalCount || 0 }</span>
-                    Variants found
-                </h5>
-                <h5 className="text-300 mt-0 mb-0">
-                    {/* <div className="btn-group" role="group" aria-label="Basic example"> */}
+        <div className="d-flex flex-column flex-lg-row mt-1 mb-2 align-items-start justify-content-between">
+            <h5 className="text-300 mt-0 mb-0">
+                <span id="filtering-variants-found" className="text-400 mr-05">{ totalCount || 0 }</span>
+                Variants found
+            </h5>
+            <h5 className="text-300 mt-0 mb-0">
+                <div className="btn-group" role="group" aria-label="FilterSet Controls">
+                    { btnPrepend }
                     <button type="button" className="btn btn-primary" data-current-query={filterSetQueryStr}
-                        disabled={!differsFromCurrentFilterSet} onClick={saveNewFilterset}>
-                        { isLoading ? <i className="icon icon-spin icon-circle-notch fas mr-07" /> : null }
-                        Save Current Filter
+                        disabled={!differsFromCurrentFilterSet || isLoading} onClick={saveNewFilterset}>
+                        { isLoading ?
+                            <i className="icon icon-fw icon-spin icon-circle-notch fas mr-07" />
+                            : <i className="icon icon-fw icon-save fas mr-07" /> }
+                        { active_filterset && !filterSetQueryStr ?  "Save Filter Removal" : "Save Current Filter" }
                     </button>
-                    <a href={searchHref} className="btn btn-primary ml-05" data-tip="Advanced Search">
-                        <i className="icon icon-search fas"/>
-                    </a>
-                    {/* </div> */}
-                </h5>
-            </div>
-        </React.Fragment>
+                </div>
+            </h5>
+        </div>
     );
 }
