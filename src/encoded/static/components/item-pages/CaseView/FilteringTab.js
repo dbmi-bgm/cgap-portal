@@ -140,24 +140,25 @@ export function FilteringTabSubtitle(props){
     const {
         "@id" : activeFilterSetID,
         display_title: activeFilterSetTitle,
-        filter_blocks = []
+        //filter_blocks = []
     } = active_filterset || {};
-
-    const currentActiveFilterAppend = (filter_blocks[0] || {}).query || "";
 
     const [ isLoading, setIsLoading ] = useState(false);
     // From `state.lastFilterSetSaved` we use only `date_created` so doesn't matter if frame=object vs frame=page for it.
     // `undefined` means not ever set or removed previously vs `null` means explicitly nothing set in current session.
     const [ lastFilterSetSaved, setLastFilterSetSaved ] = useState(active_filterset || undefined);
 
+    const currentActiveFilter = typeof lastFilterSetSaved !== "undefined" ? lastFilterSetSaved : active_filterset || null;
+    const { filter_blocks: [ { query: currentActiveFilterAppend } = {} ] = [] } = currentActiveFilter || {};
+
     const { differsFromCurrentFilterSet, filterSetQueryStr, saveNewFilterset, saveFilterBtnTip } = useMemo(function(){
         const { query: currentQuery } = url.parse(searchHref, false);
         const parsedCurrentQueryFiltered = filterQueryByQuery(currentQuery, "type=VariantSample&" + initial_search_href_filter_addon);
         const filterSetQueryStr = queryString.stringify(parsedCurrentQueryFiltered);
-        const differsFromCurrentFilterSet = (
-            (!active_filterset && filterSetQueryStr) ||
-            (active_filterset && !filterSetQueryStr) ||
-            (active_filterset && filterSetQueryStr && !_.isEqual(parsedCurrentQueryFiltered, queryString.parse(currentActiveFilterAppend)))
+        const differsFromCurrentFilterSet = !!(
+            (!currentActiveFilter && filterSetQueryStr) ||
+            (currentActiveFilter && !filterSetQueryStr) ||
+            (currentActiveFilter && filterSetQueryStr && !_.isEqual(parsedCurrentQueryFiltered, queryString.parse(currentActiveFilterAppend)))
         );
 
         function saveNewFilterset(e){
@@ -227,9 +228,13 @@ export function FilteringTabSubtitle(props){
         const saveFilterBtnTip = "<pre class='text-white mb-0'>" + JSON.stringify(parsedCurrentQueryFiltered, null, 4) + "</pre>";
 
         return { filterSetQueryStr, differsFromCurrentFilterSet, saveNewFilterset, saveFilterBtnTip };
-    }, [ caseItem, searchHref ]);
+    }, [ caseItem, searchHref, currentActiveFilter ]);
 
-    // console.log('TESTING', filterSetQueryStr, differsFromCurrentFilterSet);
+    // console.log('TESTING', currentActiveFilter, '\n',
+    //     filterSetQueryStr, '\n',
+    //     differsFromCurrentFilterSet, '\n',
+    //     currentActiveFilterAppend, '\n',
+    // );
 
     let btnPrepend = null;
     if (typeof lastFilterSetSaved !== "undefined") {
@@ -269,7 +274,7 @@ export function FilteringTabSubtitle(props){
                         { isLoading ?
                             <i className="icon icon-fw icon-spin icon-circle-notch fas mr-07" />
                             : <i className="icon icon-fw icon-save fas mr-07" /> }
-                        { active_filterset && !filterSetQueryStr ?  "Save Filter Removal" : "Save Current Filter" }
+                        { currentActiveFilter && !filterSetQueryStr ?  "Save Filter Removal" : "Save Current Filter" }
                     </button>
                 </div>
             </h5>
