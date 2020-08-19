@@ -72,14 +72,7 @@ export function BigDropdownPageTreeMenu(props) {
                 className={"help-menu-tree level-1-no-child-links level-1 col-12" + (!hasLevel2Children? " col-lg-8" : " col-lg-4")}>
                 { level1ChildrenWithoutSubChildren.map(function(child){
                     const active = (urlParts.pathname.indexOf(child.name) > -1 ? ' active' : '');
-                    return (
-                        <div className={"level-1-title-container" + (active? " active" : "")} key={child.name}>
-                            <a className="level-1-title text-medium" href={'/' + child.name} data-tip={child.description}
-                                data-delay-show={500} id={"menutree-linkto-" + child.name.replace(/\//g, '_')} >
-                                <span>{ child.display_title }</span>
-                            </a>
-                        </div>
-                    );
+                    return <Level1Title childPageItem={child} key={child.name} active={active} />;
                 }) }
             </div>
         );
@@ -95,12 +88,7 @@ export function BigDropdownPageTreeMenu(props) {
         );
         return (
             <div className={outerCls} key={childLevel1.name}>
-                <div className={"level-1-title-container" + (active ? " active" : "")}>
-                    <a className="level-1-title text-medium" href={'/' + childLevel1.name} data-tip={childLevel1.description}
-                        data-delay-show={500} id={"menutree-linkto-" + childLevel1.name.replace(/\//g, '_')} >
-                        <span>{ childLevel1.display_title }</span>
-                    </a>
-                </div>
+                <Level1Title childPageItem={childLevel1} active={active} />
                 { hasChildren ?
                     level1Children.map(function(childLevel2){
                         return (
@@ -126,6 +114,19 @@ export function BigDropdownPageTreeMenu(props) {
         <div className={cls}>
             { topLeftMenuCol }
             { childItems }
+        </div>
+    );
+}
+
+/** TODO test & port to 4DN if works decently */
+function Level1Title({ childPageItem, active }){
+    const { name, display_title, description } = childPageItem;
+    return (
+        <div className={"level-1-title-container" + (active ? " active" : "")}>
+            <a className="level-1-title text-medium" href={'/' + name} data-tip={description}
+                data-delay-show={500} id={"menutree-linkto-" + name.replace(/\//g, '_')} >
+                <span>{ display_title }</span>
+            </a>
         </div>
     );
 }

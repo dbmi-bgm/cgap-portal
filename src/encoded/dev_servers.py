@@ -115,21 +115,6 @@ def run(app_name, config_uri, datadir, clear=False, init=False, load=False, inge
 
     processes = []
 
-    postgres = postgresql_fixture.server_process(pgdata, echo=True)
-    processes.append(postgres)
-
-    es_server_url = config.get('elasticsearch.server', "localhost")
-    if not config.get("elasticsearch.aws_auth", False) and ("127.0.0.1" in es_server_url or "localhost" in es_server_url):
-        elasticsearch = elasticsearch_fixture.server_process(esdata, echo=True)
-        processes.append(elasticsearch)
-
-    nginx = nginx_server_process(echo=True)
-    processes.append(nginx)
-
-    if ingest:
-        ingestion_listener = ingestion_listener_process(config_uri, app_name)
-        processes.append(ingestion_listener)
-
     @atexit.register
     def cleanup_process():
         for process in processes:
@@ -142,6 +127,24 @@ def run(app_name, config_uri, datadir, clear=False, init=False, load=False, inge
             except IOError:
                 pass
             process.wait()
+
+    postgres = postgresql_fixture.server_process(pgdata, echo=True)
+    processes.append(postgres)
+
+    es_server_url = config.get('elasticsearch.server', "localhost")
+
+    if not config.get("elasticsearch.aws_auth", False) and ("127.0.0.1" in es_server_url or "localhost" in es_server_url):
+        elasticsearch = elasticsearch_fixture.server_process(esdata, echo=True)
+        processes.append(elasticsearch)
+    elif not config.get('indexer.namespace'):
+        raise Exception("It looks like are connecting to remote elasticsearch.server but no elasticsearch.namespace is defined.")
+
+    nginx = nginx_server_process(echo=True)
+    processes.append(nginx)
+
+    if ingest:
+        ingestion_listener = ingestion_listener_process(config_uri, app_name)
+        processes.append(ingestion_listener)
 
     if init:
         app = get_app(config_uri, app_name)

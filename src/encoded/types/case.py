@@ -192,6 +192,7 @@ class Case(Item):
         "report.accession",
         "report.case.accession",
         "active_filterset.filter_blocks.query",
+        "active_filterset.filter_blocks.flags",
         "cohort.filter_set.*",
         "project.name"
     ]
@@ -277,7 +278,7 @@ class Case(Item):
 
     @calculated_property(schema={
         "title": "Search Query Filter String Add-On",
-        "description": "String to be appended to the initial search query to limit results to varants/sample variants from this case.",
+        "description": "String to be appended to the initial search query to limit variant sample results to those related to this case.",
         "type": "string"
     })
     def initial_search_href_filter_addon(self, request, sample_processing=None, individual=None):

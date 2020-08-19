@@ -8,7 +8,7 @@ import { console, ajax, layout } from '@hms-dbmi-bgm/shared-portal-components/es
 export class BigDropdownPageLoader extends React.PureComponent {
 
     static defaultProps = {
-        'treeURL': '/pages/311d0f4f-56ee-4450-8cbb-780c10229284/@@embedded',
+        'treeURL': '/help',
         'session': false
     };
 
