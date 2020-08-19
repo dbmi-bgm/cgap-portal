@@ -269,3 +269,11 @@ def get_trusted_email(request, context=None, raise_errors=True):
         if raise_errors:
             raise
         return None
+
+
+def beanstalk_env_from_request(request):
+    return beanstalk_env_from_registry(request.registry)
+
+
+def beanstalk_env_from_registry(registry):
+    return registry.settings.get('env.name')

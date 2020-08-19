@@ -2,7 +2,7 @@ import boto3
 import json
 import traceback
 
-from ..ingestion.common import DATA_BUNDLE_BUCKET, get_parameter
+from ..ingestion.common import cgap_data_bundle_bucket, get_parameter
 from ..util import debuglog, s3_output_stream, create_empty_s3_file
 from ..submit import submit_data_bundle
 from .exceptions import UndefinedIngestionProcessorType
@@ -47,7 +47,7 @@ def handle_data_bundle(submission):
     submission_id = submission.submission_id
     s3_client = boto3.client('s3')
     manifest_key = "%s/manifest.json" % submission_id
-    response = s3_client.get_object(Bucket=DATA_BUNDLE_BUCKET, Key=manifest_key)
+    response = s3_client.get_object(Bucket=submission.bucket, Key=manifest_key)
     manifest = json.load(response['Body'])
 
     object_name = manifest['object_name']
@@ -60,10 +60,10 @@ def handle_data_bundle(submission):
     debuglog(submission_id, "parameters:", parameters)
 
     started_key = "%s/started.txt" % submission_id
-    create_empty_s3_file(s3_client, bucket=DATA_BUNDLE_BUCKET, key=started_key)
+    create_empty_s3_file(s3_client, bucket=submission.bucket, key=started_key)
 
     # PyCharm thinks this is unused. -kmp 26-Jul-2020
-    # data_stream = s3_client.get_object(Bucket=DATA_BUNDLE_BUCKET, Key="%s/manifest.json" % submission_id)['Body']
+    # data_stream = s3_client.get_object(Bucket=submission.bucket, Key="%s/manifest.json" % submission_id)['Body']
 
     resolution = {
         "data_key": object_name,
@@ -84,7 +84,7 @@ def handle_data_bundle(submission):
         #     project = submission.vapp.get(project).json
 
         data_bundle_result = submit_data_bundle(s3_client=s3_client,
-                                                bucket=DATA_BUNDLE_BUCKET,
+                                                bucket=submission.bucket,
                                                 key=object_name,
                                                 project=project,
                                                 institution=institution,
@@ -104,24 +104,24 @@ def handle_data_bundle(submission):
             other_details['additional_data'] = additional_data = other_details.get('additional_data', {})
             additional_data[key] = data_bundle_result[bundle_key or key]
 
-        with s3_output_stream(s3_client, bucket=DATA_BUNDLE_BUCKET, key=validation_report_key) as fp:
+        with s3_output_stream(s3_client, bucket=submission.bucket, key=validation_report_key) as fp:
             _show_report_lines(data_bundle_result['validation_output'], fp)
             note_additional_datum('validation_output')
 
         # Next several files are created only if relevant.
 
         if data_bundle_result['result']:
-            with s3_output_stream(s3_client, bucket=DATA_BUNDLE_BUCKET, key=submission_key) as fp:
+            with s3_output_stream(s3_client, bucket=submission.bucket, key=submission_key) as fp:
                 print(json.dumps(data_bundle_result['result'], indent=2), file=fp)
                 other_details['result'] = data_bundle_result['result']
 
         if data_bundle_result['post_output']:
-            with s3_output_stream(s3_client, bucket=DATA_BUNDLE_BUCKET, key=submission_response_key) as fp:
+            with s3_output_stream(s3_client, bucket=submission.bucket, key=submission_response_key) as fp:
                 _show_report_lines(data_bundle_result['post_output'], fp)
                 note_additional_datum('post_output')
 
         if data_bundle_result['upload_info']:
-            with s3_output_stream(s3_client, bucket=DATA_BUNDLE_BUCKET, key=upload_info_key) as fp:
+            with s3_output_stream(s3_client, bucket=submission.bucket, key=upload_info_key) as fp:
                 print(json.dumps(data_bundle_result['upload_info'], indent=2), file=fp)
                 note_additional_datum('upload_info')
 
@@ -133,7 +133,7 @@ def handle_data_bundle(submission):
     except Exception as e:
 
         resolution["traceback_key"] = traceback_key = "%s/traceback.txt" % submission_id
-        with s3_output_stream(s3_client, bucket=DATA_BUNDLE_BUCKET, key=traceback_key) as fp:
+        with s3_output_stream(s3_client, bucket=submission.bucket, key=traceback_key) as fp:
             traceback.print_exc(file=fp)
 
         resolution["error_type"] = e.__class__.__name__
@@ -141,5 +141,5 @@ def handle_data_bundle(submission):
 
         submission.patch_item(processing_status={"state": "done", "outcome": "error", "progress": "incomplete"})
 
-    with s3_output_stream(s3_client, bucket=DATA_BUNDLE_BUCKET, key="%s/resolution.json" % submission_id) as fp:
+    with s3_output_stream(s3_client, bucket=submission.bucket, key="%s/resolution.json" % submission_id) as fp:
         print(json.dumps(resolution, indent=2), file=fp)

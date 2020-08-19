@@ -2,15 +2,38 @@
 common.py - tools common to various parts of ingestion
 """
 
-import codecs
-import contextlib
-import io
-import os
-import tempfile
-from .exceptions import SubmissionFailure, MissingParameter, BadParameter
+# import codecs
+# import contextlib
+# import io
+# import os
+# import tempfile
+
+from dcicutils.env_utils import is_stg_or_prd_env, is_cgap_env
+from dcicutils.misc_utils import check_true
+from .exceptions import MissingParameter, BadParameter
 
 
-DATA_BUNDLE_BUCKET = 'cgap-data-bundles'
+CGAP_DATA_BUNDLE_BUCKET_PRD = 'cgap-data-bundles-prd'
+
+CGAP_DATA_BUNDLE_BUCKETS_NON_PRD = {
+    'fourfront-cgapdev': 'cgap-data-bundles-dev',
+    'fourfront-cgaptest': 'cgap-data-bundles-test',
+    'fourfront-cgapwolf': 'cgap-data-bundles-wolf',
+}
+
+CGAP_DATA_BUNDLE_BUCKET_MISC = 'cgap-data-bundles'
+
+
+def cgap_data_bundle_bucket(bs_env):
+    check_true(is_cgap_env(bs_env), "bs_env is not a cgap environment.", error_class=ValueError)
+    if is_stg_or_prd_env(bs_env):
+        return CGAP_DATA_BUNDLE_BUCKET_PRD
+    else:
+        specific_bucket = CGAP_DATA_BUNDLE_BUCKETS_NON_PRD.get(bs_env)
+        if specific_bucket:
+            return specific_bucket
+        else:
+            return CGAP_DATA_BUNDLE_BUCKET_MISC
 
 
 CONTENT_TYPE_SPECIAL_CASES = {
@@ -61,11 +84,11 @@ def get_parameter(parameter_block, parameter_name, as_type=None, default=_NO_DEF
     If the parameter is not present but there is no default, an error of type MissingParameter will be raised.
 
     Args:
-        parameter_block dict: a dictionary whose keys are parameter names and whose values are parameter values
-        parameter_name str: the name of a parameter
+        parameter_block (dict): a dictionary whose keys are parameter names and whose values are parameter values
+        parameter_name (str): the name of a parameter
         as_type: if supplied, a type coercion to perform on the result
-        default object: a default value to be used if the parameter_name is not present.
-        update bool: if as_type is applied, whether to update the parameter_block
+        default (object): a default value to be used if the parameter_name is not present.
+        update (bool): if as_type is applied, whether to update the parameter_block
     """
 
     if isinstance(parameter_block, dict):

@@ -20,6 +20,7 @@ import urllib.parse
 import uuid
 import webtest
 
+from dcicutils.env_utils import is_stg_or_prd_env
 from dcicutils.misc_utils import VirtualApp, ignored
 from pyramid import paster
 from pyramid.httpexceptions import HTTPConflict, HTTPNotFound
@@ -29,12 +30,12 @@ from pyramid.view import view_config
 from snovault.util import debug_log
 from vcf import Reader
 from .commands.ingest_vcf import VCFParser
-from .ingestion.common import register_path_content_type, DATA_BUNDLE_BUCKET, SubmissionFailure, get_parameter
-from .ingestion.exceptions import UnspecifiedFormParameter
+from .ingestion.common import register_path_content_type, cgap_data_bundle_bucket, get_parameter
+from .ingestion.exceptions import UnspecifiedFormParameter, SubmissionFailure
 from .ingestion.processors import get_ingestion_processor
 from .types.ingestion import SubmissionFolio
 from .types.variant import build_variant_display_title, ANNOTATION_ID_SEP
-from .util import resolve_file_path, gunzip_content, debuglog, get_trusted_email
+from .util import resolve_file_path, gunzip_content, debuglog, get_trusted_email, beanstalk_env_from_request
 
 
 log = structlog.getLogger(__name__)
@@ -70,6 +71,8 @@ def submit_for_ingestion(context, request):
 
     ignored(context)
 
+    bs_env = beanstalk_env_from_request(request)
+    data_bundle_bucket = cgap_data_bundle_bucket(bs_env)
     ingestion_type = request.POST['ingestion_type']
     datafile = request.POST['datafile']
     if not isinstance(datafile, cgi.FieldStorage):
@@ -114,7 +117,7 @@ def submit_for_ingestion(context, request):
     message = "Uploaded successfully."
 
     try:
-        s3_client.upload_fileobj(input_file_stream, Bucket=DATA_BUNDLE_BUCKET, Key=object_name)
+        s3_client.upload_fileobj(input_file_stream, Bucket=data_bundle_bucket, Key=object_name)
 
     except botocore.exceptions.ClientError as e:
 
@@ -129,13 +132,15 @@ def submit_for_ingestion(context, request):
         "object_name": object_name,
         "submission_id": submission_id,
         "submission_uri": SubmissionFolio.make_submission_uri(submission_id),
-        "bucket": DATA_BUNDLE_BUCKET,
+        "beanstalk_env_is_prd": is_stg_or_prd_env(bs_env),
+        "beanstalk_env": bs_env,
+        "bucket": data_bundle_bucket,
         "authenticated_userid": request.authenticated_userid,
         "email": get_trusted_email(request, context="Submission", raise_errors=False),
         "success": success,
         "message": message,
         "upload_time": upload_time,
-        "parameters": parameters
+        "parameters": parameters,
     }
 
     manifest_content_formatted = json.dumps(manifest_content, indent=2)
@@ -144,7 +149,7 @@ def submit_for_ingestion(context, request):
 
         try:
             with io.BytesIO(manifest_content_formatted.encode('utf-8')) as fp:
-                s3_client.upload_fileobj(fp, Bucket=DATA_BUNDLE_BUCKET, Key=manifest_name)
+                s3_client.upload_fileobj(fp, Bucket=data_bundle_bucket, Key=manifest_name)
 
         except botocore.exceptions.ClientError as e:
 
@@ -444,10 +449,8 @@ class IngestionListener:
 
         # Get queue_manager
         registry = None
-        if isinstance(self.vapp, webtest.TestApp):  # if in testing
+        if isinstance(self.vapp, (webtest.TestApp, VirtualApp)):  # TestApp in testing or VirtualApp in production
             registry = self.vapp.app.registry
-        elif isinstance(self.vapp, VirtualApp):  # if in production
-            registry = self.vapp.wrapped_app.app.registry
         elif _queue_manager is None:  # if we got here, we cannot succeed in starting
             raise Exception('Bad arguments given to IngestionListener: %s, %s, %s' %
                             (self.vapp, _queue_manager, _update_status))
