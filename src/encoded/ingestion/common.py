@@ -25,7 +25,9 @@ CGAP_DATA_BUNDLE_BUCKET_MISC = 'cgap-data-bundles'
 
 
 def cgap_data_bundle_bucket(bs_env):
-    check_true(is_cgap_env(bs_env), "bs_env is not a cgap environment.", error_class=ValueError)
+    if bs_env is None:
+        return CGAP_DATA_BUNDLE_BUCKET_MISC
+    check_true(is_cgap_env(bs_env), "bs_env is not a cgap environment or None.", error_class=ValueError)
     if is_stg_or_prd_env(bs_env):
         return CGAP_DATA_BUNDLE_BUCKET_PRD
     else:
