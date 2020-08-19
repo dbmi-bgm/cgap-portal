@@ -367,6 +367,7 @@ def fetch_file_metadata(idx, filenames, proj_name):
             'row': idx,
             'file_format': '/file-formats/{}/'.format(fmt),
             'file_type': valid_extensions[extension[0]][1],
+            'status': 'uploading',
             'filename': filename.strip()  # causes problems without functional file upload
         }
         if fmt == 'fastq':
@@ -601,9 +602,11 @@ def validate_all_items(virtualapp, json_data):
                 #       then json_data[item_type][alias] seems suspect. It does work to do
                 #       json_data.get(item_type, {}).get(alias, {}).get('filename') but I would put that
                 #       quantity in a variable rather than compute it twice in a row. -kmp 25-Jul-2020
-                elif json_data[itemtype][alias].get('filename') and \
-                        json_data[itemtype][alias]['filename'] in ''.join(json_data['errors']):
-                    validation_results[itemtype]['errors'] += 1
+                elif json_data[itemtype][alias].get('filename'):
+                    if json_data[itemtype][alias]['filename'] in ''.join(json_data['errors']):
+                        validation_results[itemtype]['errors'] += 1
+                    else:
+                        json_data[itemtype][alias]['status'] = 'uploading'
                 else:
                     json_data_final['post'].setdefault(itemtype, [])
                     json_data_final['post'][itemtype].append(json_data[itemtype][alias])
@@ -613,6 +616,8 @@ def validate_all_items(virtualapp, json_data):
                 # alias_dict[alias] = results[alias]['@id']
                 # TODO: profile is only conditionally assigned in an "if" above. -kmp 25-Jul-2020
                 patch_data = compare_fields(profile, alias_dict, data, db_results[alias])
+                if itemtype in ['file_fastq', 'file_processed'] and 'filename' in patch_data:
+                    patch_data['status'] = 'uploading'
                 error = validate_item(virtualapp, patch_data, 'patch', itemtype,
                                       all_aliases, atid=db_results[alias]['@id'])
                 if error:  # do something to report validation errors
@@ -690,7 +695,7 @@ def post_and_patch_all_items(virtualapp, json_data_final):
                         json_data_final['patch'][k][atid] = patch_info
                         if k in item_names:
                             output.append('Success - {} {} posted'.format(k, item[item_names[k]]))
-                        if fname:
+                        if fname and item.get('status') == 'uploading':
                             files.append({
                                 'uuid': response.json['@graph'][0]['uuid'],
                                 'filename': fname
@@ -721,7 +726,7 @@ def post_and_patch_all_items(virtualapp, json_data_final):
                     # if k in item_names:
                     #     output.append('Success - {} {} patched'.format(k, patch_data[item_names[k]]))
                     final_status[k]['patched'] += 1
-                    if fname:
+                    if fname and patch_data.get('status') == 'uploading':
                         files.append({
                             'uuid': response.json['@graph'][0]['uuid'],
                             'filename': fname
