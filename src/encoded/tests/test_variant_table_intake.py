@@ -161,6 +161,7 @@ def test_generate_variant_sample_schema(MTParser, sample_variant_items):
     assert 'samplegeno_ad' in properties['samplegeno']['items']['properties']
     assert 'samplegeno_gt' in properties['samplegeno']['items']['properties']
     assert 'samplegeno_numgt' in properties['samplegeno']['items']['properties']
+    assert 'samplegeno_role' in properties['samplegeno']['items']['properties']
 
     # check comhet sub-embedded obj
     assert 'cmphet' in properties
@@ -253,6 +254,6 @@ def test_post_inserts_via_run(MTParser, project, institution, testapp):
     """ Tests that we can run the above test using the 'run' method """
     inserts = MTParser.run(institution='encode-institution', project='encode-project',
                            vs_out=resolve_file_path('schemas/variant_sample.json'),
-                           v_out=resolve_file_path('schemas/variant.json'), write=False)  # enable to generate schemas
+                           v_out=resolve_file_path('schemas/variant.json'), write=True)  # enable to generate schemas
     for item in inserts:
         testapp.post_json(ANNOTATION_FIELD_URL, item, status=201)

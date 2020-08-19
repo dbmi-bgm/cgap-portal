@@ -311,11 +311,6 @@
                 }
             }
         },
-        "familial_relation": {
-            "title": "Familial Relation",
-            "description": "Relationship of the person who submitted this sample relative to the proband ie: proband,mother, father etc.",
-            "type": "string"
-        },
         "file": {
             "title": "File",
             "description": "String Accession of the vcf file used in digestion",
@@ -405,6 +400,40 @@
                         "description": "Allelic depth",
                         "scope": "sample_variant",
                         "schema_title": "Sample Genotype (Allele Depth)"
+                    },
+                    "samplegeno_role": {
+                        "title": "Familial Relation",
+                        "description": "Relationship of the person who submitted this sample relative to the proband",
+                        "type": "string",
+                        "enum": [
+                            "proband",
+                            "father",
+                            "mother",
+                            "brother",
+                            "sister",
+                            "sibling",
+                            "half-brother",
+                            "half-sister",
+                            "half-sibling",
+                            "wife",
+                            "husband",
+                            "grandson",
+                            "granddaughter",
+                            "grandchild",
+                            "grandmother",
+                            "family-in-law",
+                            "extended-family",
+                            "not linked"
+                        ]
+                    },
+                    "samplegeno_sex": {
+                        "title": "Sex",
+                        "description": "Sex of the donor of this sample ID",
+                        "type": "string",
+                        "enum": [
+                            "M",
+                            "F"
+                        ]
                     }
                 }
             }

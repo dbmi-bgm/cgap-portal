@@ -490,13 +490,19 @@ class MappingTableParser(object):
             'description': 'Link to Genome Snapshot Image',
             'type': 'string'
         }
-        schema['properties']['familial_relation'] = {
+        schema['properties']['samplegeno']['items']['properties']['samplegeno_role'] = {  # noqa structure is there
             'title': 'Familial Relation',
             'description': 'Relationship of the person who submitted this sample relative to the proband',
             'type': 'string',
             'enum': ['proband', 'father', 'mother', 'brother', 'sister', 'sibling', 'half-brother', 'half-sister',
                      'half-sibling', 'wife', 'husband', 'grandson', 'granddaughter', 'grandchild',
                      'grandmother', 'family-in-law', 'extended-family', 'not linked']
+        }
+        schema['properties']['samplegeno']['items']['properties']['samplegeno_sex'] = {  # noqa structure is there
+            'title': 'Sex',
+            'description': 'Sex of the donor of this sample ID',
+            'type': 'string',
+            'enum': ['M', 'F']  # XXX: what others should be included?
         }
 
         # adds annotation ID field, effectively making display_title a primary key constraint

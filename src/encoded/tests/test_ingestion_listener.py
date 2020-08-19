@@ -215,15 +215,18 @@ def mocked_familial_relations():
     return [{'sample_pedigrees': [
                 {
                     'sample_name': 'sample_one',
-                    'relationship': 'mother'
+                    'relationship': 'mother',
+                    'sex': 'F'
                 },
                 {
                     'sample_name': 'sample_two',
-                    'relationship': 'father'
+                    'relationship': 'father',
+                    'sex': 'M'
                 },
                 {
                     'sample_name': 'sample_three',
-                    'relationship': 'proband'
+                    'relationship': 'proband',
+                    'sex': 'M'
                 }
     ]}]
 
@@ -233,9 +236,12 @@ def test_ingestion_listener_build_familial_relations(testapp, mocked_familial_re
     with mock.patch.object(IngestionListener, 'search_for_sample_relations', new=lambda x, y: mocked_familial_relations):
         listener = IngestionListener(testapp)
         relations = listener.extract_sample_relations('dummy')
-        assert relations['sample_one'] == 'mother'
-        assert relations['sample_two'] == 'father'
-        assert relations['sample_three'] == 'proband'
+        assert relations['sample_one']['samplegeno_role'] == 'mother'
+        assert relations['sample_two']['samplegeno_role'] == 'father'
+        assert relations['sample_three']['samplegeno_role'] == 'proband'
+        assert relations['sample_one']['samplegeno_sex'] == 'F'
+        assert relations['sample_two']['samplegeno_sex'] == 'M'
+        assert relations['sample_three']['samplegeno_sex'] == 'M'
 
 
 def test_ingestion_listener_run(testapp, mocked_vcf_file, gene_workbook, fresh_ingestion_queue_manager_for_testing,

@@ -15,6 +15,7 @@ import elasticsearch
 import requests  # XXX: C4-211 should not be needed but is
 from vcf import Reader
 from pyramid import paster
+from collections import defaultdict
 from dcicutils.misc_utils import VirtualApp
 from pyramid.view import view_config
 from pyramid.httpexceptions import HTTPConflict, HTTPNotFound
@@ -54,6 +55,22 @@ def ingestion_status(context, request):
     }
 
 
+def verify_vcf_file_status(request, uuid):
+    """ Verifies the given VCF file has not already been ingested by checking
+        'file_ingestion_status'
+    """
+    kwargs = {
+        'environ': request.environ,
+        'method': 'GET',
+        'content_type': 'application/json'
+    }
+    subreq = Request.blank('/' + uuid, **kwargs)
+    resp = request.invoke_subrequest(subreq)
+    if resp['file_ingestion_status'] == STATUS_INGESTED:
+        return False
+    return True
+
+
 def patch_vcf_file_status(request, uuids):
     """ Patches VCF File status to 'Queued'
         NOTE: This process makes queue_ingestion not scale terribly well.
@@ -72,7 +89,8 @@ def patch_vcf_file_status(request, uuids):
         subreq = Request.blank('/' + uuid, **kwargs)
         resp = None
         try:
-            resp = request.invoke_subrequest(subreq)
+            if verify_vcf_file_status(request, uuid):
+                resp = request.invoke_subrequest(subreq)
         except HTTPNotFound:
             log.error('Tried to patch %s but item does not exist: %s' % (uuid, resp))
 
@@ -410,9 +428,12 @@ class IngestionListener:
                 sample['institution'] = institution
                 sample['variant'] = self.build_variant_link(variant)  # make links
                 sample['file'] = file
-                call_info = sample['CALL_INFO']  # extract familial relation
-                if call_info in sample_relations:
-                    sample['familial_relations'] = sample_relations[call_info]
+
+                # add familial relations to samplegeno field
+                for geno in sample.get('samplegeno', []):
+                    sample_id = geno['samplegeno_sampleid']
+                    if sample_id in sample_relations:
+                        geno.update(sample_relations[sample_id])
 
                 self.vapp.post_json('/variant_sample', sample, status=201)
             except Exception as e:
@@ -438,9 +459,13 @@ class IngestionListener:
             sample_relations, sample_procesing = {}, search_result[0]
             sample_pedigrees = sample_procesing['sample_pedigrees']
             for entry in sample_pedigrees:
-                relationship = entry.get('relationship', None)
-                if relationship is not None:
-                    sample_relations[entry['sample_name']] = relationship
+                sample_id = entry['sample_name']
+                sample_relations[sample_id] = {}
+                for field, key in zip(['relationship', 'sex'], ['samplegeno_role', 'samplegeno_sex']):
+                    value = entry.get(field, None)
+                    if value is not None:
+                        sample_relations[sample_id][key] = value
+
             return sample_relations
 
     def post_variants_and_variant_samples(self, parser, file_meta):
