@@ -316,6 +316,17 @@
             "description": "String Accession of the vcf file used in digestion",
             "type": "string"
         },
+        "genotype_label": {
+            "title": "Genotype Label",
+            "type": "string"
+        },
+        "inheritance_modes": {
+            "title": "Inheritance Modes",
+            "type": "array",
+            "items": {
+                "type": "string"
+            }
+        },
         "multiallele_samplevariantkey": {
             "title": "multiallele_samplevariantkey",
             "field_name": "multiallele_samplevariantkey",

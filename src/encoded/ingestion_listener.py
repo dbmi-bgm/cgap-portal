@@ -438,6 +438,9 @@ class IngestionListener:
                     if sample_id in sample_relations:
                         geno.update(sample_relations[sample_id])
 
+                # add inheritance mode information
+                # TODO
+
                 self.vapp.post_json('/variant_sample', sample, status=201)
             except Exception as e:
                 log.error('Encountered exception posting variant_sample: %s' % e)

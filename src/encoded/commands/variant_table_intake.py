@@ -490,6 +490,17 @@ class MappingTableParser(object):
             'description': 'Link to Genome Snapshot Image',
             'type': 'string'
         }
+        schema['properties']['genotype_label'] = {
+            'title': 'Genotype Label',
+            'type': 'string'
+        }
+        schema['properties']['inheritance_modes'] = {
+            'title': 'Inheritance Modes',
+            'type': 'array',
+            'items': {
+                'type': 'string'
+            }
+        }
         schema['properties']['samplegeno']['items']['properties']['samplegeno_role'] = {  # noqa structure is there
             'title': 'Familial Relation',
             'description': 'Relationship of the person who submitted this sample relative to the proband',
