@@ -75,6 +75,7 @@ export class EmbeddedItemSearchTable extends React.PureComponent {
             separateSingleTermFacets: false
         };
 
+        /** @deprecated - Should just pass down to embeddedTableHeader once `title` instances that depend on totalCount are migrated */
         const showTitle = !title ? null
             : React.isValidElement(title) ? (
                 typeof title.type === "string" ? title
@@ -86,8 +87,7 @@ export class EmbeddedItemSearchTable extends React.PureComponent {
 
         return (
             <div className="embedded-search-view-outer-container">
-                { showTitle }
-                <EmbeddedSearchView {...passProps}/>
+                <EmbeddedSearchView {...passProps} embeddedTableHeader={showTitle} />
                 { showChildren }
             </div>
         );

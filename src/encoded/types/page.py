@@ -17,10 +17,6 @@ from snovault import (
     COLLECTIONS,
     CONNECTION
 )
-from snovault.crud_views import (
-    collection_add,
-    item_edit,
-)
 from snovault.resource_views import item_view_page
 from snovault.validators import (
     validate_item_content_post,
@@ -38,7 +34,11 @@ from urllib.parse import (
 )
 from dcicutils.misc_utils import filtered_warnings
 from ..search.search import get_iterable_search_results
-from .base import Item
+from .base import (
+    Item,
+    collection_add,
+    item_edit
+)
 from .user_content import (
     StaticSection
 )

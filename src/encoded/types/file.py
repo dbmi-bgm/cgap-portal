@@ -29,10 +29,6 @@ from snovault import (
     load_schema,
     abstract_collection,
 )
-from snovault.crud_views import (
-    collection_add,
-    item_edit,
-)
 from snovault.elasticsearch import ELASTIC_SEARCH
 from snovault.invalidation import add_to_indexing_queue
 from snovault.schema_utils import schema_validator
@@ -56,6 +52,8 @@ from .base import (
     Item,
     ALLOW_SUBMITTER_ADD,
     get_item_or_none,
+    collection_add,
+    item_edit,
     # lab_award_attribution_embed_list,
 )
 
