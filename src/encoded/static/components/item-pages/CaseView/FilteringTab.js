@@ -140,7 +140,7 @@ export function FilteringTabSubtitle(props){
 
     const [ isLoading, setIsLoading ] = useState(false);
     // From `state.lastFilterSetSaved` we use only non linkTo properties from it so doesn't matter if frame=object vs frame=page for it.
-    // `undefined` means not ever set or removed previously vs `null` means explicitly nothing set in current session.
+    // `undefined` means not ever set or removed previously vs `null` means explicitly nothing set in current session (for purposes of 'btnPrepend' var below)
     const [ lastFilterSetSaved, setLastFilterSetSaved ] = useState(active_filterset || undefined);
 
     const currentActiveFilter = typeof lastFilterSetSaved !== "undefined" ? lastFilterSetSaved : active_filterset || null;
