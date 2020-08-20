@@ -209,6 +209,9 @@ class Case(Item):
         "report.status",
         "report.accession",
         "report.case.accession",
+        "active_filterset.filter_blocks.query",
+        "active_filterset.filter_blocks.flags_applied",
+        "active_filterset.flags",
         "cohort.filter_set.*",
         "project.name"
     ]
@@ -274,8 +277,10 @@ class Case(Item):
     })
     def vcf_file(self, request, sample_processing=None):
         vcf_file = {}
-        """Map the vcf file to be digested
-        Currently we have a single file on processed_files field of sample processing"""
+        """
+        Map the vcf file to be digested
+        Currently we have a single file on processed_files field of sample processing
+        """
         if not sample_processing:
             return vcf_file
         sp_data = get_item_or_none(request, sample_processing, 'sample-processings')
@@ -291,12 +296,14 @@ class Case(Item):
         return vcf_file
 
     @calculated_property(schema={
-        "title": "Filter Set Flag add-on",
-        "description": "tag to be added to the filter set flag for limiting search to varants/sample variants from this case",
+        "title": "Search Query Filter String Add-On",
+        "description": "String to be appended to the initial search query to limit variant sample results to those related to this case.",
         "type": "string"
     })
-    def filter_set_flag_addon(self, request, sample_processing=None, individual=None):
-        """use vcf file and sample accessions to limit variant/variantsample to this case"""
+    def initial_search_href_filter_addon(self, request, sample_processing=None, individual=None):
+        """
+        Use vcf file and sample accessions to limit variant/variantsample to this case
+        """
         if not individual or not sample_processing:
             return ''
         sample = self.sample(request, individual, sample_processing)
@@ -310,7 +317,7 @@ class Case(Item):
         if not sample_read_group:
             return ''
         vcf_acc = vcf.split('/')[2]
-        add_on = "&CALL_INFO={}&file={}".format(sample_read_group, vcf_acc)
+        add_on = "CALL_INFO={}&file={}".format(sample_read_group, vcf_acc)
         return add_on
 
     @calculated_property(schema={

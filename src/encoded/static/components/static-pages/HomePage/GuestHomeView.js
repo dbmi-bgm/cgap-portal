@@ -5,16 +5,11 @@ import PropTypes from 'prop-types';
 import moment from 'moment';
 import ReactTooltip from 'react-tooltip';
 import _ from 'underscore';
-import { Alerts } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/Alerts';
 
 
 export const GuestHomeView = React.memo(function GuestHomeView(props){
-    const { alerts } = props;
     return (
         <React.Fragment>
-            <div id="item-page-alerts-container" className="bg-primary-dark">
-                <Alerts alerts={alerts} className="alerts" />
-            </div>
             <div className="jumbotron mb-0" style={{ borderRadius: 0, backgroundImage: "url('/static/img/homepage-banner3.jpeg')", backgroundSize: "cover" }}>
                 <div className="container">
                     <h2 className="homepage-section-title text-white">Streamline Your Bioinformatics Pipeline</h2>

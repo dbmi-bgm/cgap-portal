@@ -21,3 +21,6 @@ class FilterSet(Item):
     item_type = 'filter_set'
     schema = load_schema('encoded:schemas/filter_set.json')
     embedded_list = []
+
+    class Collection(Item.Collection):
+        pass
