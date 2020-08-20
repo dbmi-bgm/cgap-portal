@@ -18,11 +18,22 @@ from pyramid.traversal import find_root
 from pyramid.view import (
     view_config,
 )
+from pyramid.httpexceptions import HTTPUnprocessableEntity
+from snovault.util import debug_log
 # import snovault default post / patch stuff so we can overwrite it in this file
 from snovault.validators import (
     validate_item_content_post,
     validate_item_content_put,
-    validate_item_content_patch
+    validate_item_content_patch,
+    validate_item_content_in_place,
+    no_validate_item_content_post,
+    no_validate_item_content_put,
+    no_validate_item_content_patch
+)
+# We will extend the following functions with CGAP-specific actions
+from snovault.crud_views import (
+    collection_add as sno_collection_add,
+    item_edit as sno_item_edit,
 )
 from snovault.interfaces import CONNECTION
 # from ..schema_formats import is_accession
@@ -84,6 +95,8 @@ ALLOW_SUBMITTER_ADD = [
 ALLOW_ANY_USER_ADD = [
     (Allow, Authenticated, 'add'),
 ] + ALLOW_EVERYONE_VIEW
+
+
 
 
 def get_item_or_none(request, value, itype=None, frame='object'):
@@ -428,3 +441,81 @@ def create(context, request):
             'profile': '/profiles/{ti.name}.json'.format(ti=context.type_info),
             'href': '{item_uri}?currentAction=create'.format(item_uri=request.resource_path(context)),
         }
+
+
+
+@view_config(
+    context=Collection,
+    permission='add',
+    request_method='POST',
+    #validators=[] # TURNS OFF VALIDATION HERE ([validate_item_content_post] previously)
+    validators=[validate_item_content_post]
+)
+@view_config(
+    context=Collection,
+    permission='add_unvalidated',
+    request_method='POST',
+    validators=[no_validate_item_content_post],
+    request_param=['validate=false']
+)
+@debug_log
+def collection_add(context, request, render=None):
+
+    # institution_needed = False
+    # project_needed = False
+    # data = request.json
+    # schema = context.type_info.schema
+
+    # required_properties = schema.get("required", [])
+    # if "institution" in required_properties and "institution" not in data:
+    #     institution_needed = True
+
+    # if "project" in required_properties and "project" not in data:
+    #     project_needed = True
+
+    # if request.authenticated_userid and (institution_needed or project_needed):
+    #     namespace, userid = request.authenticated_userid.split(".", 1)
+    #     user_item = get_item_or_none(request, userid, itype="/users/", frame="object")
+    #     new_data = data.copy()
+    #     if institution_needed and "institution" in user_item:
+    #         new_data["institution"] = user_item["institution"]
+    #     if project_needed and "project" in user_item:
+    #         new_data["project"] = user_item["project"]
+
+    #     # Override initial JSON body of request (hacky? better way?)
+    #     setattr(request, "json", new_data)
+
+    # # Perform validation that would occur otherwise
+    # validate_item_content_post(context, request)
+    # if request.errors:
+    #     return HTTPUnprocessableEntity(
+    #         json={'errors': request.errors},
+    #         content_type='application/json'
+    #     )
+
+    return sno_collection_add(context, request, render)
+
+
+
+@view_config(context=Item, permission='edit', request_method='PUT',
+             validators=[validate_item_content_put])
+@view_config(context=Item, permission='edit', request_method='PATCH',
+             validators=[validate_item_content_patch])
+@view_config(context=Item, permission='edit_unvalidated', request_method='PUT',
+             validators=[no_validate_item_content_put],
+             request_param=['validate=false'])
+@view_config(context=Item, permission='edit_unvalidated', request_method='PATCH',
+             validators=[no_validate_item_content_patch],
+             request_param=['validate=false'])
+@view_config(context=Item, permission='index', request_method='GET',
+             validators=[validate_item_content_in_place],
+            request_param=['check_only=true'])
+@debug_log
+def item_edit(context, request, render=None):
+    # This works
+    # Probably don't need to extend re: institution + project since if editing, assuming these have previously existed.
+    return sno_item_edit(context, request, render)
+
+
+    
+

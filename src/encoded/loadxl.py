@@ -537,7 +537,7 @@ def load_local_data(app, overwrite=False):
             if any([fn for fn in filenames if fn.endswith('.json')]):
                 logger.info('Loading inserts from "{}" directory.'.format(test_insert_dir))
                 return load_data(app, docsdir='documents', indir=test_insert_dir,
-                            use_master_inserts=False, overwrite=overwrite)
+                            use_master_inserts=True, overwrite=overwrite)
 
     # Default to 'inserts' if no temp inserts found.
     return load_data(app, docsdir='documents', indir='inserts',
