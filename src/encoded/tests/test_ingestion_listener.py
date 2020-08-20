@@ -7,14 +7,18 @@ import time
 
 from dcicutils.qa_utils import ignored, notice_pytest_fixtures
 from uuid import uuid4
-from ..ingestion_listener import IngestionQueueManager, run, IngestionListener
+from pyramid.testing import DummyRequest
+from ..ingestion_listener import IngestionQueueManager, run, IngestionListener, verify_vcf_file_status_is_not_ingested
 from ..util import gunzip_content
 from .variant_fixtures import gene_workbook, post_variant_consequence_items
+from .workbook_fixtures import workbook, app
 
 
 pytestmark = [pytest.mark.working, pytest.mark.ingestion]
 QUEUE_INGESTION_URL = '/queue_ingestion'
 INGESTION_STATUS_URL = '/ingestion_status'
+INGESTED_ACCESSION = 'GAPFIZ123456'
+NA_ACCESSION = 'GAPFIZ654321'
 notice_pytest_fixtures(gene_workbook, post_variant_consequence_items)
 
 
@@ -242,6 +246,14 @@ def test_ingestion_listener_build_familial_relations(testapp, mocked_familial_re
         assert relations['sample_one']['samplegeno_sex'] == 'F'
         assert relations['sample_two']['samplegeno_sex'] == 'M'
         assert relations['sample_three']['samplegeno_sex'] == 'M'
+
+
+def test_ingestion_listener_verify_vcf_status_is_not_ingested(authenticated_testapp, app, workbook):
+    """ Posts a minimal processed file to be checked """
+    request = DummyRequest(environ={'REMOTE_USER': 'EMBED'})
+    request.invoke_subrequest = app.invoke_subrequest
+    assert verify_vcf_file_status_is_not_ingested(request, INGESTED_ACCESSION) is False
+    assert verify_vcf_file_status_is_not_ingested(request, NA_ACCESSION) is True
 
 
 def test_ingestion_listener_run(testapp, mocked_vcf_file, gene_workbook, fresh_ingestion_queue_manager_for_testing,

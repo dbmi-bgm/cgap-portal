@@ -18,7 +18,7 @@ from pyramid import paster
 from collections import defaultdict
 from dcicutils.misc_utils import VirtualApp
 from pyramid.view import view_config
-from pyramid.httpexceptions import HTTPConflict, HTTPNotFound
+from pyramid.httpexceptions import HTTPConflict, HTTPNotFound, HTTPMovedPermanently
 from pyramid.request import Request
 from snovault.util import debug_log
 from .util import resolve_file_path, gunzip_content
@@ -55,7 +55,7 @@ def ingestion_status(context, request):
     }
 
 
-def verify_vcf_file_status(request, uuid):
+def verify_vcf_file_status_is_not_ingested(request, uuid):
     """ Verifies the given VCF file has not already been ingested by checking
         'file_ingestion_status'
     """
@@ -65,8 +65,11 @@ def verify_vcf_file_status(request, uuid):
         'content_type': 'application/json'
     }
     subreq = Request.blank('/' + uuid, **kwargs)
-    resp = request.invoke_subrequest(subreq)
-    if resp['file_ingestion_status'] == STATUS_INGESTED:
+    resp = request.invoke_subrequest(subreq, use_tweens=True)
+    if isinstance(resp, HTTPMovedPermanently):  # if we hit a redirect, follow it
+        subreq = Request.blank(resp.location, **kwargs)
+        resp = request.invoke_subrequest(subreq, use_tweens=True)
+    if resp.json['file_ingestion_status'] == STATUS_INGESTED:
         return False
     return True
 
@@ -89,7 +92,7 @@ def patch_vcf_file_status(request, uuids):
         subreq = Request.blank('/' + uuid, **kwargs)
         resp = None
         try:
-            if verify_vcf_file_status(request, uuid):
+            if verify_vcf_file_status_is_not_ingested(request, uuid):
                 resp = request.invoke_subrequest(subreq)
         except HTTPNotFound:
             log.error('Tried to patch %s but item does not exist: %s' % (uuid, resp))
@@ -455,9 +458,10 @@ class IngestionListener:
     def extract_sample_relations(self, vcf_file_accession):
         """ Extracts a dictionary of sample relationships based on the file metadata given. """
         search_result = self.search_for_sample_relations(vcf_file_accession)
+        sample_relations = {}  # should never be None now
         if len(search_result) == 1:
-            sample_relations, sample_procesing = {}, search_result[0]
-            sample_pedigrees = sample_procesing['sample_pedigrees']
+            sample_procesing = search_result[0]
+            sample_pedigrees = sample_procesing.get('sample_pedigrees', None)
             for entry in sample_pedigrees:
                 sample_id = entry['sample_name']
                 sample_relations[sample_id] = {}
@@ -466,7 +470,7 @@ class IngestionListener:
                     if value is not None:
                         sample_relations[sample_id][key] = value
 
-            return sample_relations
+        return sample_relations
 
     def post_variants_and_variant_samples(self, parser, file_meta):
         """ Posts variants and variant_sample items given the parser and relevant

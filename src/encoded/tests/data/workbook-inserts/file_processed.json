@@ -1,0 +1,18 @@
+[
+  {
+    "file_format": "vcf_gz",
+    "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+    "institution": "hms-dbmi",
+    "file_ingestion_status": "Ingested",
+    "uuid": "c40a25bd-30e3-4e08-a801-96f822744664",
+    "accession": "GAPFIZ123456"
+  },
+  {
+    "file_format": "vcf_gz",
+    "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+    "institution": "hms-dbmi",
+    "file_ingestion_status": "N/A",
+    "uuid": "a0661ad2-099e-4092-b9e3-c35db70a17c1",
+    "accession": "GAPFIZ654321"
+  }
+]

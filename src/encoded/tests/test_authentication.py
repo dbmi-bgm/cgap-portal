@@ -3,6 +3,7 @@ import unittest
 
 from pyramid.interfaces import IAuthenticationPolicy
 from pyramid.security import Authenticated, Everyone
+
 from pyramid.testing import DummyRequest
 from zope.interface.verify import verifyClass, verifyObject
 from ..authentication import NamespacedAuthenticationPolicy
