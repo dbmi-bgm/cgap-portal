@@ -160,20 +160,52 @@ export function FilteringTabSubtitle(props){
 
             // Hmm maybe should redo as promises/use the promisequeue..
 
-            function patchCaseItem(newFilterSetItem = null){
-                const patchBody = {};
-                if (newFilterSetItem) {
-                    patchBody.active_filterset = newFilterSetItem.uuid;
-                }
-                console.log("Setting 'active_filterset'", patchBody, newFilterSetItem);
-                ajax.load(caseAtID + (newFilterSetItem ? "" : "?delete_fields=active_filterset"), function(res){
-                    console.info("PATCHed Case Item", res);
+            // TODO: Rename function once logic more cemented (i.e. it only PATCHes if we (rarely) get new FilterSet Item)
+            function patchCaseItem(nextFilterSetItem){
+                const { "@id" : nextFilterSetID, uuid: nextFilterSetUUID } = nextFilterSetItem;
+
+                if (lastFilterSetSaved && nextFilterSetID === lastFilterSetSaved["@id"]) {
+                    // Skip PATCHing, we just updated existing FilterSet.
+                    // Set as new `lastFilterSetSaved` (it has newly updated query) (later on won't need to do this and hopefully we just get updated context.active_filterset after websocket-notification-and-update)
+                    setLastFilterSetSaved(nextFilterSetItem);
                     setIsLoading(false);
-                    setLastFilterSetSaved(newFilterSetItem);
+                    return;
+                } else {
+                    // Brand new FilterSet, continue with patch.
+                    console.log("Setting 'active_filterset'", nextFilterSetItem);
+                    ajax.load(caseAtID, function(res){
+                        console.info("PATCHed Case Item", res);
+                        setIsLoading(false);
+                        setLastFilterSetSaved(nextFilterSetItem);
+                    }, "PATCH", function(err){
+                        console.error("Error PATCHing Case", err);
+                        Alerts.queue({
+                            "title" : "Error PATCHing Case",
+                            "message" : JSON.stringify(err),
+                            "style" : "danger"
+                        });
+                        setIsLoading(false);
+                    }, JSON.stringify({ "active_filterset" : nextFilterSetUUID }));
+                }
+            }
+
+            // Will change in future if multiple filter_blocks.
+            const nextFilterBlocks = [{
+                "name": "Primary",
+                "query": filterSetQueryStr,
+                // "flags_applied" : "case:" + caseAccession ? idk
+            }];
+
+            function patchFilterSet(callback) {
+                const { "@id" : existingFilterID } = currentActiveFilter;
+                const patchBody = { "filter_blocks": nextFilterBlocks };
+                ajax.load(existingFilterID, function(res){
+                    const { "@graph" : [ existingFilterSetItem ] } = res;
+                    callback(existingFilterSetItem);
                 }, "PATCH", function(err){
-                    console.error("Error PATCHing Case", err);
+                    console.error("Error PATCHing existing FilterSet", err);
                     Alerts.queue({
-                        "title" : "Error PATCHing Case",
+                        "title" : "Error PATCHing existing FilterSet",
                         "message" : JSON.stringify(err),
                         "style" : "danger"
                     });
@@ -190,13 +222,7 @@ export function FilteringTabSubtitle(props){
                     "institution": caseInstitutionID,
                     "project": caseProjectID,
                     "created_in_case_accession": caseAccession,
-                    "filter_blocks": [
-                        {
-                            "name": "Primary",
-                            "query": filterSetQueryStr,
-                            // "flags_applied" : "case:" + caseAccession ? idk
-                        }
-                    ]
+                    "filter_blocks": nextFilterBlocks
                 };
                 ajax.load("/filter-sets/", function(res){
                     const { "@graph" : [ newFilterSetItem ] } = res;
@@ -213,10 +239,10 @@ export function FilteringTabSubtitle(props){
             }
 
             setIsLoading(true);
-            if (!filterSetQueryStr) { // Falsy, e.g. "".
-                patchCaseItem(null);
-            } else {
+            if (!lastFilterSetSaved){
                 createFilterSet(patchCaseItem);
+            } else {
+                patchFilterSet(patchCaseItem);
             }
         }
 
@@ -241,12 +267,12 @@ export function FilteringTabSubtitle(props){
             );
         } else {
             // This will eventually likely be turned into tooltip or something on FilterSet blocks UI.
-            const { display_title: fsTitle, date_created: fsCreated } = lastFilterSetSaved;
+            const { display_title: fsTitle, last_modified: { date_modified: fsDateModified, modified_by: fsModifyAuthor } } = lastFilterSetSaved;
             btnPrepend = (
                 <div className="input-group-prepend">
                     <div className="input-group-text" data-tip={fsTitle}>
                         Saved
-                        &nbsp;<LocalizedTime timestamp={fsCreated} formatType="date-time-lg" />
+                        &nbsp;<LocalizedTime timestamp={fsDateModified} formatType="date-time-lg" />
                     </div>
                 </div>
             );
