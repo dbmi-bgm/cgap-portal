@@ -61,166 +61,239 @@ def test_get_gene2_altid_map(genes_w_altid_fields, id2guid):
     assert map == id2guid
 
 
-def test_find_uid_from_file_fields():
-    pass
-
-
 @pytest.fixture
-def hpoa_data():
-    return {
-        'DatabaseID': 'OMIM:163600',
-        'DiseaseName': 'NIPPLES INVERTED',
-        'Qualifier': None,
-        'Reference': 'OMIM:163600',
-        'Evidence': 'IEA',
-        'Frequency': 'HP:0040283',
-        'Sex': 'male',
-        'Aspect': 'I',
-        'Biocuration': 'HPO:iea[2009-02-17]',
-        'subject_item': 'dis_uuid1',
-        'object_item': 'phe_uuid1'
-    }
-
-
-def test_create_evi_annotation_no_data(hpo2uid_map):
-    assert not ph.create_evi_annotation({}, hpo2uid_map, {})
-
-
-def test_create_evi_annotation_with_data(hpoa_data, hpo2uid_map):
-    evi = ph.create_evi_annotation(hpoa_data, hpo2uid_map, {})
-    map = ph.FIELD_MAPPING
-    revmap = {v: k for k, v in map.items() if k != 'Frequency'}
-    for f, v in evi.items():
-        if f.endswith('_item'):
-            assert v == hpoa_data[f]
-        elif f == 'frequency_term':
-            assert v == 'phe_uuid2'
-        elif f == 'affected_sex':
-            assert v == 'M'
-        elif f in revmap:
-            assert v == hpoa_data.get(revmap[f])
-
-
-# the following test specific field cases
-
-def test_create_evi_annotation_with_qual(hpoa_data, hpo2uid_map):
-    hpoa_data['Qualifier'] = 'NOT'
-    evi = ph.create_evi_annotation(hpoa_data, hpo2uid_map, {})
-    assert evi.get('is_not')
-
-
-def test_create_evi_annotation_with_female(hpoa_data, hpo2uid_map):
-    hpoa_data['Sex'] = 'Female'
-    evi = ph.create_evi_annotation(hpoa_data, hpo2uid_map, {})
-    assert evi.get('affected_sex') == 'F'
-
-
-def test_create_evi_annotation_with_freq_str(hpoa_data, hpo2uid_map):
-    freq = '1 in 10'
-    hpoa_data['Frequency'] = freq
-    evi = ph.create_evi_annotation(hpoa_data, hpo2uid_map, {})
-    assert evi.get('frequency_value') == freq
-
-
-def test_create_evi_annotation_with_hp_modifier(hpoa_data, hpo2uid_map):
-    mod_phe = 'HP:0500252'
-    phe_uuid = '05648474-44de-4cdb-b35b-18f5362b8281'
-    hpoa_data['Modifier'] = mod_phe
-    with mock.patch.object(ph, 'check_hpo_id_and_note_problems', return_value=phe_uuid):
-        evi = ph.create_evi_annotation(hpoa_data, hpo2uid_map, {})
-        assert evi.get('modifier') == phe_uuid
-
-
-def test_create_evi_annotation_with_unknown_hp_modifier(hpoa_data, hpo2uid_map):
-    mod_phe = 'HP:0000002'
-    hpoa_data['Modifier'] = mod_phe
-    with mock.patch.object(ph, 'check_hpo_id_and_note_problems', return_value=None):
-        evi = ph.create_evi_annotation(hpoa_data, hpo2uid_map, {})
-        assert 'modifier' not in evi
-
-
-def test_convert2raw(embedded_item_dict, raw_item_dict):
-    # this is not really testing much as the mocked return value is what is being
-    # checked so no way to know if fields are really being stripped as expected
-    # first add some fields that should be ignored when getting raw form
-    embedded_item_dict['status'] = 'released'
-    embedded_item_dict['date_created'] = "2020-03-03T20:08:10.690526+00:00"
-    embedded_item_dict['institution'] = '/institution/bwh'
-    embedded_item_dict["principals_allowed"] = {"view": ["system.Everyone"], "edit": ["group.admin"]}
-    with mock.patch.object(ph, 'get_raw_form', return_value=raw_item_dict):
-        raw_item = ph.convert2raw(embedded_item_dict, raw_item_dict.keys())
-        assert raw_item == raw_item_dict
-
-
-@pytest.fixture
-def evi_items():
+def data_dicts_from_lines():
     return [
-        {
-            'uuid': 'uuid1',
-            'subject_item': 'duuid1',
-            'object_item': 'puuid1',
-            'relationship_name': 'associated with',
-        },
-        {
-            'uuid': 'uuid2',
-            'subject_item': 'duuid2',
-            'object_item': 'puuid2',
-            'relationship_name': 'associated with'
-        },
-        {
-            'uuid': 'uuid3',
-            'subject_item': 'duuid3',
-            'object_item': 'puuid3',
-            'relationship_name': 'associated with'
-        }
+        {'subject': 'HGNC:1'},
+        {'subject': 'NCBIGene:2', 'subject_label': 'Gene2'},
+        {'subject': 'blah', 'subject_label': 'gene3'},
+        {'subject': 'NCBIGene:4', 'subject_label': 'gene4'},
+        {'irrelevant_field': 'irr_value'},
+        {}
     ]
 
 
-def test_compare_existing_to_newly_generated_all_new(mock_logger, connection, evi_items):
-    itemcnt = len(evi_items)
-    with mock.patch.object(ph, 'search_metadata', return_value=[]):
-        evi, exist, to_obs = ph.compare_existing_to_newly_generated(mock_logger, connection, evi_items, 'EvidenceDisPheno', evi_items[0].keys())
-        assert evi == evi_items
-        assert not to_obs
-        assert exist == 0
+def test_find_uid_from_file_fields(data_dicts_from_lines, id2guid):
+    # need to transform id2guid value to string as that is what is used
+    id2geneuid = {k: v[0] for k, v in id2guid.items()}
+    # in order to test that subject is used preferentially change value
+    # of 'gene4' uuid so we can make sure it is not chosen
+    id2geneuid['gene4'] = 'bogus'
+    expected = ['uuid1', 'uuid2', 'uuid3', 'uuid4', None, None]
+    for i, di in enumerate(data_dicts_from_lines):
+        gid = pmg2d.find_gene_uid_from_file_fields(di, id2geneuid)
+        assert gid == expected[i]
 
 
-def test_compare_existing_to_newly_generated_all_same(mock_logger, connection, evi_items):
-    itemcnt = len(evi_items)
-    with mock.patch.object(ph, 'search_metadata', return_value=iter(evi_items[:])):
-        with mock.patch.object(ph, 'get_raw_form', side_effect=evi_items[:]):
-            evi, exist, to_obs = ph.compare_existing_to_newly_generated(mock_logger, connection, evi_items, 'EvidenceDisPheno', evi_items[0].keys())
-            assert not evi
-            assert not to_obs
-            assert itemcnt == exist
-
-
-def test_compare_existing_to_newly_generated_none_same(mock_logger, connection, evi_items):
-    dbitems = []
-    for e in evi_items:
-        dbitems.append({k: v + '9' for k, v in e.items()})
-    dbuuids = [d.get('uuid') for d in dbitems]
-    with mock.patch.object(ph, 'search_metadata', return_value=iter(dbitems)):
-        with mock.patch.object(ph, 'get_raw_form', side_effect=dbitems):
-            evi, exist, to_obs = ph.compare_existing_to_newly_generated(mock_logger, connection, evi_items, 'EvidenceDisPheno', evi_items[0].keys())
-            assert evi == evi_items
-            assert to_obs == dbuuids
-            assert exist == 0
+def test_parse_vals():
+    # testing that the specific source vals are being parsed correctly
+    # currently not testing generally
+    vals = [
+        'https://archive.monarchinitiative.org/#omim',
+        'https://data.monarchinitiative.org/ttl/clinvar.nt',
+        'https://archive.monarchinitiative.org/#gwascatalog',
+        'https://archive.monarchinitiative.org/#orphanet'
+    ]
+    expected = ['omim', 'clinvar.nt', 'gwascatalog', 'orphanet']
+    received = pmg2d._parse_vals(vals)
+    assert received == expected
 
 
 @pytest.fixture
-def problems(evi_items, hpoa_data):
-    not_found = OrderedDict()
-    not_found['HP:0000001'] = 'HPO_ID'
-    not_found['HP:0202021'] = 'Frequency'
+def g2devi_schema():
+    """ Stripped down version of the schema for testing
+        Has mainly values used in this script and most types of fields
+        NOTE: added pattern to datasource_version that does not exist in real schema
+    """
     return {
-        'hpo_not_found': not_found,
-        'redundant_annot': [evi_items],
-        'no_map': [hpoa_data]
+        "title": "Association Evidence for Genes to Disorders",
+        "type": "object",
+        "required": ["object_item", "subject_item", "datasource"],
+        "properties": {
+            "subject_item": {
+                "title": "Gene",
+                "type": "string",
+                "linkTo": "Gene"
+            },
+            "object_item": {
+                "title": "Disorder",
+                "type": "string",
+                "linkTo": "Disorder"
+            },
+            "datasource": {
+                "title": "Datasource",
+                "type": "string",
+                "description": "The data source of the association - ClinGen, Monarch or others",
+                "enum": ["ClinGen", "Monarch"]
+            },
+            "datasource_version": {
+                "title": "Datasource Version",
+                "description": "The version or date of the datasource",
+                "type": "string",
+                "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}.*"
+            },
+            "relationship_name": {
+                "enum": [
+                    "has curated association",
+                    "causes condition",
+                    "contributes to",
+                    "contributes to condition",
+                    "is causal gain of function germline mutation of in",
+                    "is causal germline mutation in",
+                    "is causal loss of function germline mutation of in",
+                    "is causal somatic mutation in",
+                    "is causal susceptibility factor for",
+                    "is marker for"
+                ]
+            },
+            "evidence_class": {
+                "title": "Evidence Classifications",
+                "type": "array",
+                "items": {
+                    "type": "string",
+                    "enum": [
+                        "genomic context evidence",
+                        "imported automatically asserted information used in automatic assertion",
+                        "combinatorial evidence used in automatic assertion",
+                        "inference from background scientific knowledge used in manual assertion",
+                        "imported manually asserted information used in automatic assertion",
+                        "sequencing assay evidence"
+                    ]
+                }
+            },
+            "original_source": {
+                "title": "Originating source(s)",
+                "type": "array",
+                "items": {
+                    "type": "string",
+                    "title": "Source DB",
+                    "uniqueItems": True
+                }
+            }
+        }
     }
 
 
-def test_log_problems(mock_logger, problems, capsys):
-    ph.log_problems(mock_logger, problems)
-    out = capsys.readouterr()[0]
-    assert out == "INFO: 2 missing HPO terms used in hpoa file\nINFO: HP:0000001	HPO_ID\nINFO: HP:0202021	Frequency\nINFO: 1 redundant annotations found\nINFO: 1 disorders from 1 annotation lines not found by xref\nINFO: OMIM:163600	NIPPLES INVERTED\n"
+def test_gather_validation_info_no_info():
+    assert not pmg2d.gather_validation_info(None, None)
+
+
+def test_gather_validation_info_schema_only(g2devi_schema):
+    expected_fields = {'datasource': 2, 'datasource_version': 'pattern', 'relationship_name': 10,
+                       'evidence_class': 6}
+    vinfo = pmg2d.gather_validation_info(g2devi_schema, None)
+    assert len(vinfo) == len(expected_fields)
+    for k, v in vinfo.items():
+        if k == 'datasource_version':
+            assert v.get('pattern') == '^[0-9]{4}-[0-9]{2}-[0-9]{2}.*'
+        else:
+            assert len(v.get('enum')) == expected_fields.get(k)
+
+
+def test_gather_validation_info_from_fieldmap_only():
+    fmap = pmg2d.FIELD_MAPPING
+    expected_fields = {v.get('field_name'): v.get('validate') for v in fmap.values() if 'validate' in v}
+    vinfo = pmg2d.gather_validation_info(None, fmap)
+    assert len(vinfo) == len(expected_fields)  # assuring no extras
+    for f, v in vinfo.items():
+        assert expected_fields.get(f) == v
+
+
+def test_gather_validation_info_from_both(g2devi_schema):
+    """ Here we just confirm we get the correct number of fields and to assure that
+        we can get both a pattern and an enum we tweak the schema artificially to add pattern to datasource
+        not that this is likely to happen in reality
+    """
+    g2devi_schema['properties']['datasource']['pattern'] = '^[Monarch|ClinGen]$'
+    fmap = pmg2d.FIELD_MAPPING
+    expected_count = 6
+    vinfo = pmg2d.gather_validation_info(g2devi_schema, fmap)
+    assert len(vinfo) == expected_count  # assuring no extras
+    dsinfo = vinfo.get('datasource')
+    assert len(dsinfo) == 2
+    assert 'enum' in dsinfo
+    assert 'pattern' in dsinfo
+
+
+def test_is_valid_g2d_no_annot():
+    assert not pmg2d.is_valid_g2d({}, None, {})
+
+
+def test_is_valid_g2d_no_vinfo():
+    assert pmg2d.is_valid_g2d({'test': 'minimal'}, None, {})
+
+
+def test_is_valid_g2d_no_fields_to_validate():
+    assert pmg2d.is_valid_g2d({'test': 'minimal'}, {'valid': 'field'}, {})
+
+
+def test_is_valid_g2d_string_enum_is_valid():
+    annot = {'test_field': 'string1'}
+    vinfo = {'test_field': {'enum': ['string1']}}
+    problems = {}
+    assert pmg2d.is_valid_g2d(annot, vinfo, problems)
+    assert not problems
+
+
+def test_is_valid_g2d_string_enum_invalid():
+    annot = {'test_field': 'string1'}
+    vinfo = {'test_field': {'enum': ['string2']}}
+    problems = {}
+    assert not pmg2d.is_valid_g2d(annot, vinfo, problems)
+    prob_annot = problems['enum_invalid'][0]
+    assert 'test_field' in prob_annot
+    assert 'enum_problems' in prob_annot
+
+
+def test_is_valid_g2d_list_enum_valid():
+    annot = {'test_field': ['item1', 'item2']}
+    vinfo = {'test_field': {'enum': ['item1', 'item2', 'item3']}}
+    problems = {}
+    assert pmg2d.is_valid_g2d(annot, vinfo, problems)
+    assert not problems
+
+
+def test_is_valid_g2d_list_enum_invalid():
+    annot = {'test_field': ['item1', 'item2', 'item3', 'item4']}
+    vinfo = {'test_field': {'enum': ['item2', 'item4']}}
+    problems = {}
+    assert not pmg2d.is_valid_g2d(annot, vinfo, problems)
+    prob_annot = problems['enum_invalid'][0]
+    assert 'test_field' in prob_annot
+    assert all([p for p in prob_annot['enum_problems'] if p in ['item1', 'item3']])
+
+
+def test_is_valid_g2d_string_pattern_is_valid():
+    annot = {'test_field': 'PMID:123'}
+    vinfo = {'test_field': {'pattern': '^PMID:[0-9]+$'}}
+    problems = {}
+    assert pmg2d.is_valid_g2d(annot, vinfo, problems)
+    assert not problems
+
+
+def test_is_valid_g2d_string_pattern_invalid():
+    annot = {'test_field': 'PMID:123'}
+    vinfo = {'test_field': {'pattern': '^PMID:[A-Z]+$'}}
+    problems = {}
+    assert not pmg2d.is_valid_g2d(annot, vinfo, problems)
+    prob_annot = problems['pattern_mismatch'][0]
+    assert 'test_field' in prob_annot
+    assert 'pattern_problem' in prob_annot
+
+
+def test_is_valid_g2d_list_pattern_is_valid():
+    annot = {'test_field': ['PMID:123', 'PMID:67812', 'PMID:44444444']}
+    vinfo = {'test_field': {'pattern': '^PMID:[0-9]+$'}}
+    problems = {}
+    assert pmg2d.is_valid_g2d(annot, vinfo, problems)
+    assert not problems
+
+
+def test_is_valid_g2d_list_pattern_invalid():
+    annot = {'test_field': ['PMID:123', 'PMID:ABC', 'PMID:44444444', 'AAA AAA']}
+    vinfo = {'test_field': {'pattern': '^PMID:[0-9]+$'}}
+    problems = {}
+    assert not pmg2d.is_valid_g2d(annot, vinfo, problems)
+    prob_annot = problems['pattern_mismatch'][0]
+    assert 'test_field' in prob_annot
+    assert all([p for p in prob_annot['pattern_problem'] if p in ['PMID:ABC', 'AAA AAA']])

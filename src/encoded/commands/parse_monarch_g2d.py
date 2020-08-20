@@ -107,9 +107,9 @@ def gather_validation_info(schema, fieldmap):
                 vinfo.setdefault(propname, {}).update({'pattern': pattern})
     # and add ad hoc specified additional info
     if fieldmap:
-        for f, finfo in fieldmap.items():
+        for finfo in fieldmap.values():
             if 'validate' in finfo:
-                vinfo.setdefault(f, {}).update(finfo.get('validate'))
+                vinfo.setdefault(finfo.get('field_name'), {}).update(finfo.get('validate'))
     return vinfo
 
 
@@ -197,10 +197,15 @@ def _parse_vals(vals):
 
 def is_valid_g2d(annot, vinfo, problems):
     ''' Use info in vinfo to check fields with enums and validate the values
+        If no validation info is provided then assume it's valid
     '''
     if not annot:  # an empty annotation?
         return False
     valid = True
+    if not vinfo:
+        return valid
+    enumprobs = {}
+    patternprobs = {}
     for f, val in annot.items():
         if f not in vinfo:
             continue
@@ -213,16 +218,20 @@ def is_valid_g2d(annot, vinfo, problems):
             invalid = [v for v in val if v not in okvals]
             if invalid:
                 valid = False
-                annot['invalid_enum_vals'] = invalid
-                problems.setdefault('enum_invalid', []).append(annot)
+                enumprobs[f] = invalid
         if 'pattern' in vtype:
             p = re.compile(vtype.get('pattern'))  # not sure if this will work out of the box
             for v in val:
                 if not p.match(v):
-                    annot.setdefault('pattern_mismatch', []).append(v)
-            if 'pattern_mismatch' in annot:
+                    patternprobs.setdefault(f, []).append(v)
+            if f in patternprobs:
                 valid = False
-                problems.setdefault('pattern_mismatch', []).append(annot)
+    if enumprobs:
+        annot['enum_problems'] = enumprobs
+        problems.setdefault('enum_invalid', []).append(annot)
+    if patternprobs:
+        annot['pattern_problem'] = patternprobs
+        problems.setdefault('pattern_mismatch', []).append(annot)
     return valid
 
 
@@ -250,6 +259,7 @@ def create_gene2disorder_evi_annotation(data, problems, dt_time, valid_info=None
         if not v:  # skip empty fields
             continue
         if f in ['subject_item', 'object_item']:
+            # these fields are guaranteed to exist at this point
             g2d_annot[f] = v
         elif f in FIELD_MAPPING:
             finfo = FIELD_MAPPING.get(f)
