@@ -8,6 +8,7 @@ import _ from 'underscore';
 
 import { console, ajax } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { LocalizedTime } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/LocalizedTime';
+import { Alerts } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/Alerts';
 import { pageTitleViews, PageTitleContainer, TitleAndSubtitleUnder, OnlyTitle } from './../../PageTitleSection';
 import { GuestHomeView } from './GuestHomeView';
 import { UserDashboard } from './UserDashboard';
@@ -27,9 +28,13 @@ export default class HomePage extends React.PureComponent {
      */
     render() {
         const { session, context, alerts } = this.props;
-        const commonProps = { context, alerts };
+        const commonProps = { context };
+        // Render alerts here instead of (unused-for-homepage) PageTitleSection
         return (
             <div className="homepage-wrapper">
+                <div id="full-alerts-container" className="bg-primary-dark">
+                    <Alerts alerts={alerts} className="alerts" />
+                </div>
                 { session ? <UserDashboard {...commonProps} /> : <GuestHomeView {...commonProps} /> }
             </div>
         );

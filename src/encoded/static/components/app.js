@@ -208,11 +208,10 @@ export default class App extends React.PureComponent {
      * - Shows browser suggestion alert if not using Chrome, Safari, Firefox.
      * - Sets state.mounted to be true.
      * - Clears out any UTM URI parameters three seconds after mounting (giving Google Analytics time to pick them up).
-     *
-     * @private
      */
     componentDidMount() {
         const { href, context } = this.props;
+        const { session } = this.state;
 
         // The href prop we have was from serverside. It would not have a hash in it, and might be shortened.
         // Here we grab full-length href from window and then update props.href (via Redux), if it is different.
@@ -307,16 +306,16 @@ export default class App extends React.PureComponent {
 
             // If we have UTM URL parameters in the URI, attempt to set history state (& browser) URL to exclude them after a few seconds
             // after Google Analytics may have stored proper 'source', 'medium', etc. (async)
-            const urlParts = url.parse(windowHref, true);
+            const { query = null, protocol, host, pathname } = url.parse(windowHref, true);
             const paramsToClear = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content'];
 
-            if (urlParts.query && _.any(paramsToClear, function(prm){ return typeof urlParts.query[prm] !== 'undefined'; })){
+            if (query && _.any(paramsToClear, function(prm){ return typeof query[prm] !== 'undefined'; })){
                 setTimeout(()=>{
-                    var queryToSet = _.clone(urlParts.query);
-                    _.forEach(paramsToClear, function(prm){ typeof queryToSet[prm] !== 'undefined' && delete queryToSet[prm]; });
-                    var nextUrl = (
-                        urlParts.protocol + '//' + urlParts.host +
-                        urlParts.pathname + (_.keys(queryToSet).length > 0 ? '?' + queryString.stringify(queryToSet) : '')
+                    const queryToSet = _.clone(query);
+                    paramsToClear.forEach(function(prm){ typeof queryToSet[prm] !== 'undefined' && delete queryToSet[prm]; });
+                    const nextUrl = (
+                        protocol + '//' + host +
+                        pathname + (_.keys(queryToSet).length > 0 ? '?' + queryString.stringify(queryToSet) : '')
                     );
                     if (nextUrl !== windowHref && this.historyEnabled){
                         try {
@@ -329,6 +328,23 @@ export default class App extends React.PureComponent {
                     }
                 }, 3000);
             }
+
+            // Set Alert if not on homepage and not logged in.
+            if (!session && pathname != "/") {
+                const onAlertLoginClick = function(e) {
+                    // TODO;
+                };
+                Alerts.queue({
+                    "title" : "Not Logged In",
+                    // We can't really put in actual link to login since need to communicate w. LoginController.
+                    // We could eventually move LoginController to wrap BodyElement or something (and move this into there)
+                    // .....or maybe have onClick func that finds and triggers a click mouse event on login button....
+                    "message" : <span>You are currently browsing as guest, please login if you have an account.</span>,
+                    "style" : "warning",
+                    "navigateDisappearThreshold" : 2
+                });
+            }
+
         });
     }
 
@@ -1172,7 +1188,6 @@ export default class App extends React.PureComponent {
                     }}/>
                     <script data-prop-name="lastCSSBuildTime" type="application/json" dangerouslySetInnerHTML={{ __html: lastCSSBuildTime }}/>
                     <link rel="stylesheet" href={'/static/css/style.css?build=' + (lastCSSBuildTime || 0)} />
-                    <link rel="stylesheet" href="https://unpkg.com/rc-tabs@9.6.0/dist/rc-tabs.min.css" />
                     <SEO.CurrentContext {...{ context, hrefParts, baseDomain }} />
                     <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:200,300,400,600,700,900,300i,400i,600i|Yrsa|Source+Code+Pro:300,400,500,600" rel="stylesheet"/>
                     <script defer type="application/javascript" src="//www.google-analytics.com/analytics.js" />

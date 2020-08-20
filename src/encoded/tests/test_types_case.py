@@ -88,8 +88,8 @@ def test_case_flag(testapp, sample_proc_fam, file_vcf, proband_case, mother_case
     file_acc = file_id.split('/')[2]
     proband_sample_tag = "ext_id_006"
     mother_sample_tag = "ext_id_003"
-    assert proband['filter_set_flag_addon'] == "&CALL_INFO={}&file={}".format(proband_sample_tag, file_acc)
-    assert mother['filter_set_flag_addon'] == "&CALL_INFO={}&file={}".format(mother_sample_tag, file_acc)
+    assert proband['initial_search_href_filter_addon'] == "CALL_INFO={}&file={}".format(proband_sample_tag, file_acc)
+    assert mother['initial_search_href_filter_addon'] == "CALL_INFO={}&file={}".format(mother_sample_tag, file_acc)
 
 
 def test_case_proband_case(testapp, proband_case, mother_case):

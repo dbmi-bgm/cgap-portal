@@ -347,7 +347,7 @@ export default class DefaultItemView extends React.PureComponent {
         }
         return (
             <div className={DefaultItemView.className(context)} id="content">
-                <div id="item-page-alerts-container">
+                <div id="full-alerts-container">
                     <Alerts alerts={alerts} className="alerts" />
                 </div>
                 { innerBody }
