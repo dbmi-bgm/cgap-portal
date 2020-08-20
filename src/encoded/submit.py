@@ -27,7 +27,8 @@ GENERIC_FIELD_MAPPING = {
         'sample id by ref lab': 'sequence_id',
         'req type': 'requisition_type',
         "date req rec'd": 'date_requisition_received',
-        'physician/provider': 'ordering_physician'
+        'physician/provider': 'ordering_physician',
+        'test requested': 'workup_type'
     },
     'requisition': {
         'req accepted y/n': 'accepted_rejected',
@@ -36,6 +37,18 @@ GENERIC_FIELD_MAPPING = {
         'corrective action taken by': 'action_taken_by',
         'correction notes': 'notes'
     }
+}
+
+
+ABBREVS = {
+    'male': 'M',
+    'female': 'F',
+    'yes': 'Y',
+    'no': 'N',
+    'p': 'proband',
+    'mth': 'mother',
+    'fth': 'father',
+    'sf': 'sibling'
 }
 
 # BGM_FIELD_MAPPING = {
@@ -55,6 +68,9 @@ LINKS = [
     'samples', 'members', 'mother', 'father', 'proband', 'report',
     'individual', 'sample_processing', 'families'
 ]
+
+
+ID_SOURCES = [ 'UDN' ]
 
 
 def submit_data_bundle(*, s3_client, bucket, key, project, institution, vapp,  # <- All keyword arguments, all required.
@@ -101,10 +117,17 @@ def submit_data_bundle(*, s3_client, bucket, key, project, institution, vapp,  #
 def map_fields(row, metadata_dict, addl_fields, item_type):
     for map_field in GENERIC_FIELD_MAPPING[item_type]:
         if map_field in row:
-            metadata_dict[GENERIC_FIELD_MAPPING[item_type][map_field]] = row.get(map_field)
+            metadata_dict[GENERIC_FIELD_MAPPING[item_type][map_field]] = use_abbrev(row.get(map_field))
     for field in addl_fields:
-        metadata_dict[field] = row.get(field.replace('_', ' '))
+        metadata_dict[field] = use_abbrev(row.get(field.replace('_', ' ')))
     return metadata_dict
+
+
+def use_abbrev(value):
+    if value in ABBREVS:
+        return ABBREVS[value]
+    else:
+        return value
 
 
 def xls_to_json(xls_data, project, institution):
@@ -121,7 +144,7 @@ def xls_to_json(xls_data, project, institution):
     while True:
         try:
             keys = next(row)
-            keys = [key.lower().strip().rstrip('*').rstrip() for key in keys]
+            keys = [key.lower().strip().rstrip('*:') for key in keys]
             counter += 1
             if 'individual id' in keys:
                 header = True
@@ -248,10 +271,19 @@ def fetch_individual_metadata(idx, row, items, indiv_alias, inst_name):
     new_items = items.copy()
     info = {'aliases': [indiv_alias]}
     info = map_fields(row, info, ['individual_id', 'sex', 'age', 'birth_year'], 'individual')
+    other_id_col = None
     if row.get('other individual id'):
-        other_id = {'id': row['other individual id'], 'id_source': inst_name}
+        other_id_col = 'other individual id'
+    elif row.get('other id'):
+        other_id_col = 'other id'
+    if other_id_col:
+        other_id = {'id': row[other_id_col], 'id_source': inst_name}
         if row.get('other individual id type'):
             other_id['id_source'] = row['other individual id source']
+        else:
+            for id_source in ID_SOURCES:
+                if row[other_id_col].upper().startswith(id_source):
+                    other_id['id_source'] = id_source
         info['institutional_id'] = other_id
     for col in ['age', 'birth_year']:
         if info.get(col) and isinstance(info[col], str) and info[col].isnumeric():
@@ -302,9 +334,9 @@ def fetch_sample_metadata(idx, row, items, indiv_alias, samp_alias, analysis_ali
     ]
     info = map_fields(row, info, fields, 'sample')
     info['row'] = idx
-    if info.get('specimen_accepted', '').lower() in ['y', 'yes']:
+    if info.get('specimen_accepted', '').lower() == 'y':
         info['specimen_accepted'] = 'Yes'
-    elif info.get('specimen_accepted', '').lower() in ['n', 'no']:
+    elif info.get('specimen_accepted', '').lower() == 'n':
         info['specimen_accepted'] = 'No'
     if row.get('second specimen id'):
         other_id = {'id': row['second specimen id'], 'id_type': proj_name}  # add proj info?
@@ -312,8 +344,8 @@ def fetch_sample_metadata(idx, row, items, indiv_alias, samp_alias, analysis_ali
             other_id['id_type'] = row['second specimen id type']
         info['other_specimen_ids'] = [other_id]
     req_info = map_fields(row, {}, ['date sent', 'date completed'], 'requisition')
-    if req_info.get('accepted_rejected', '').lower() in ['yes', 'no', 'y', 'n']:
-        if req_info['accepted_rejected'].lower().startswith('y'):
+    if req_info.get('accepted_rejected', '').lower() in ['y', 'n']:
+        if req_info['accepted_rejected'].lower() == 'y':
             req_info['accepted_rejected'] = 'Accepted'
         else:
             req_info['accepted_rejected'] = "Rejected"
