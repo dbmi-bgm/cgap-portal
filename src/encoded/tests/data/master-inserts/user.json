@@ -29,18 +29,6 @@
                            "role": "developer"}]
     },
     {
-        "email": "danavuzman@gmail.com",
-        "first_name": "Dana",
-        "role": "director",
-        "last_name": "Vuzman",
-        "uuid": "986b362f-4eb6-4a9c-8173-3ab267307e3a",
-        "groups": ["admin"],
-        "submits_for": ["hms-dbmi"],
-        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
-        "project_roles": [{"project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
-                           "role": "developer"}]
-    },
-    {
         "email": "dvuzman@research.bwh.harvard.edu",
         "first_name": "Dana",
         "last_name": "Vuzman",
@@ -58,18 +46,6 @@
         "last_name": "Balashov",
         "role": "developer",
         "uuid": "986b362f-4eb6-4a9c-8173-3ab245628888",
-        "groups": ["admin"],
-        "submits_for": ["hms-dbmi"],
-        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
-        "project_roles": [{"project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
-                           "role": "developer"}]
-    },
-    {
-        "email": "carl_vitzthum@hms.harvard.edu",
-        "first_name": "Carl",
-        "last_name": "Vitzthum",
-        "role": "developer",
-        "uuid": "986b362f-4eb6-4a9c-8173-3ab267226988",
         "groups": ["admin"],
         "submits_for": ["hms-dbmi"],
         "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
@@ -262,18 +238,6 @@
                            "role": "developer"}]
     },
     {
-        "email": "iris_braunstein@hms.harvard.edu",
-        "first_name": "Iris",
-        "last_name": "Braunstein",
-        "role": "scientist",
-        "uuid": "f9524d43-01b5-4b71-94c6-32d2d09c7893",
-        "groups": ["admin"],
-        "submits_for": ["hms-dbmi"],
-        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
-        "project_roles": [{"project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
-                           "role": "developer"}]
-    },
-    {
         "email": "sarah_reiff@hms.harvard.edu",
         "first_name": "Sarah",
         "last_name": "Reiff",
@@ -296,6 +260,17 @@
         "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
         "project_roles": [{"project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
                            "role": "developer"}]
+    },
+    {
+        "email": "luisa_mercado@hms.harvard.edu",
+        "first_name": "Luisa",
+        "last_name": "Mercado",
+        "role": "scientist",
+        "uuid": "f1d2c331-f5ee-490a-9a7c-69a953e04fee",
+        "groups": ["admin"],
+        "submits_for": ["hms-dbmi"],
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "project_roles": [{"project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+                           "role": "developer"}]
     }
-
 ]
