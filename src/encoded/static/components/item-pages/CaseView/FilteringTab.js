@@ -140,20 +140,18 @@ export function FilteringTabSubtitle(props){
 
     const [ isLoading, setIsLoading ] = useState(false);
     // From `state.lastFilterSetSaved` we use only non linkTo properties from it so doesn't matter if frame=object vs frame=page for it.
-    // `undefined` means not ever set or removed previously vs `null` means explicitly nothing set in current session (for purposes of 'btnPrepend' var below)
-    const [ lastFilterSetSaved, setLastFilterSetSaved ] = useState(active_filterset || undefined);
+    const [ lastFilterSetSaved, setLastFilterSetSaved ] = useState(active_filterset || null);
 
-    const currentActiveFilter = typeof lastFilterSetSaved !== "undefined" ? lastFilterSetSaved : active_filterset || null;
-    const { filter_blocks: [ { query: currentActiveFilterAppend } = {} ] = [] } = currentActiveFilter || {};
+    const { filter_blocks: [ { query: lastActiveFilterAppend } = {} ] = [] } = lastFilterSetSaved || {};
 
     const { differsFromCurrentFilterSet, filterSetQueryStr, saveNewFilterset, saveFilterBtnTip } = useMemo(function(){
         const { query: currentQuery } = url.parse(searchHref, false);
         const parsedCurrentQueryFiltered = filterQueryByQuery(currentQuery, "type=VariantSample&" + initial_search_href_filter_addon);
         const filterSetQueryStr = queryString.stringify(parsedCurrentQueryFiltered);
         const differsFromCurrentFilterSet = !!(
-            (!currentActiveFilter && filterSetQueryStr) ||
-            (currentActiveFilter && !filterSetQueryStr) ||
-            (currentActiveFilter && filterSetQueryStr && !_.isEqual(parsedCurrentQueryFiltered, queryString.parse(currentActiveFilterAppend)))
+            (!lastFilterSetSaved && filterSetQueryStr) ||
+            (lastFilterSetSaved && !filterSetQueryStr) ||
+            (lastFilterSetSaved && filterSetQueryStr && !_.isEqual(parsedCurrentQueryFiltered, queryString.parse(lastActiveFilterAppend)))
         );
 
         function saveNewFilterset(e){
@@ -197,7 +195,7 @@ export function FilteringTabSubtitle(props){
             }];
 
             function patchFilterSet(callback) {
-                const { "@id" : existingFilterID } = currentActiveFilter;
+                const { "@id" : existingFilterID } = lastFilterSetSaved;
                 const patchBody = { "filter_blocks": nextFilterBlocks };
                 ajax.load(existingFilterID, function(res){
                     const { "@graph" : [ existingFilterSetItem ] } = res;
@@ -249,33 +247,41 @@ export function FilteringTabSubtitle(props){
         const saveFilterBtnTip = "<pre class='text-white mb-0'>" + JSON.stringify(parsedCurrentQueryFiltered, null, 4) + "</pre>";
 
         return { filterSetQueryStr, differsFromCurrentFilterSet, saveNewFilterset, saveFilterBtnTip };
-    }, [ caseItem, searchHref, currentActiveFilter ]);
+    }, [ caseItem, searchHref, lastFilterSetSaved ]);
 
-    // console.log('TESTING', currentActiveFilter, '\n',
+    // console.log('TESTING', lastFilterSetSaved, '\n',
     //     filterSetQueryStr, '\n',
     //     differsFromCurrentFilterSet, '\n',
-    //     currentActiveFilterAppend, '\n',
+    //     lastFilterSetSaved, '\n',
     // );
 
     let btnPrepend = null;
-    if (typeof lastFilterSetSaved !== "undefined") {
-        if (lastFilterSetSaved === null) {
+    let btnDisabled = !differsFromCurrentFilterSet || isLoading; // TODO: maybe inform also via 'edit this FilterSet' and 'add any new FilterSet' actions/permissions.
+    if (lastFilterSetSaved) {
+        // This will eventually likely be turned into tooltip or something on FilterSet blocks UI.
+        const {
+            // `error` would likely be present (and other fields not present) if no view permissions.
+            error: fsError = null,
+            display_title: fsTitle = null,
+            last_modified: {
+                date_modified: fsDateModified = null,
+                modified_by: {
+                    // We're unlikely to have view permissions for User item unless logged in as admin or similar I think rn.. unsure.
+                    display_title: fsModifyAuthorTitle = null
+                } = {}
+            } = {}
+        } = lastFilterSetSaved;
+        if (fsDateModified && !fsError) {
             btnPrepend = (
                 <div className="input-group-prepend">
-                    <div className="input-group-text">Removed</div>
-                </div>
-            );
-        } else {
-            // This will eventually likely be turned into tooltip or something on FilterSet blocks UI.
-            const { display_title: fsTitle, last_modified: { date_modified: fsDateModified, modified_by: fsModifyAuthor } } = lastFilterSetSaved;
-            btnPrepend = (
-                <div className="input-group-prepend">
-                    <div className="input-group-text" data-tip={fsTitle}>
+                    <div className="input-group-text" data-tip={fsTitle + (fsModifyAuthorTitle ? " last modified by " + fsModifyAuthorTitle : "")}>
                         Saved
                         &nbsp;<LocalizedTime timestamp={fsDateModified} formatType="date-time-lg" />
                     </div>
                 </div>
             );
+        } else { // Means no view (nor, transitively, edit) permission
+            btnDisabled = true;
         }
     }
 
@@ -291,11 +297,11 @@ export function FilteringTabSubtitle(props){
                 <div className="btn-group" role="group" aria-label="FilterSet Controls">
                     { btnPrepend }
                     <button type="button" className="btn btn-primary" data-current-query={filterSetQueryStr} data-html
-                        disabled={!differsFromCurrentFilterSet || isLoading} onClick={saveNewFilterset} data-tip={saveFilterBtnTip}>
+                        disabled={btnDisabled} onClick={saveNewFilterset} data-tip={saveFilterBtnTip}>
                         { isLoading ?
                             <i className="icon icon-fw icon-spin icon-circle-notch fas mr-07" />
                             : <i className="icon icon-fw icon-save fas mr-07" /> }
-                        { currentActiveFilter && !filterSetQueryStr ?  "Save Filter Removal" : "Save Current Filter" }
+                        { (lastFilterSetSaved && !lastFilterSetSaved.error) && !filterSetQueryStr ?  "Save Filter Removal" : "Save Current Filter" }
                     </button>
                 </div>
             </h5>
