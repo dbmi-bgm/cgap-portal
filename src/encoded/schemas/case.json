@@ -62,6 +62,13 @@
             "description": "Cohort of the family",
             "type" : "string",
             "linkTo": "Nexus"
+        },
+        "active_filterset" : {
+            "title": "Active Filterset",
+            "description": "Current FilterSet used for this Case",
+            "type": "string",
+            "linkTo": "FilterSet",
+            "notes": "We could maybe have this be a sub-embedded object and save related metadata like date_changed or something, idk."
         }
     },
     "facets" : {
