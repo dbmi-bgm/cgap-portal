@@ -377,7 +377,11 @@ def fetch_sample_metadata(idx, row, items, indiv_alias, samp_alias, analysis_ali
                    'Sample cannot be processed.'.format(idx, row.get('analysis id')))
             new_items['errors'].append(msg)
         if row.get('unique analysis id'):
-            case_name_dict['{}-{}'.format(row.get('analysis id'), row.get('specimen id'))] = row['unique analysis id']
+            case_col = 'unique analysis id'
+        else:
+            case_col = 'optional case id (unique in all rows)'
+        if row.get(case_col):
+            case_name_dict['{}-{}'.format(row.get('analysis id'), row.get('specimen id'))] = row[case_col]
     new_items['sample_processing'].setdefault(analysis_alias, new_sp_item)
     new_items['sample_processing'][analysis_alias]['samples'].append(samp_alias)
     if row.get('report required').lower().startswith('y'):
