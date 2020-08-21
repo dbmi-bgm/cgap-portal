@@ -529,7 +529,7 @@ class MappingTableParser(object):
             'title': 'Sex',
             'description': 'Sex of the donor of this sample ID',
             'type': 'string',
-            'enum': ['M', 'F']  # XXX: what others should be included?
+            'enum': ['M', 'F', 'U']  # XXX: what others should be included?
         }
 
         # adds annotation ID field, effectively making display_title a primary key constraint

@@ -1,5 +1,10 @@
 import pytest
+import csv
 from ..inheritance_mode import InheritanceMode, InheritanceModeError
+from ..util import resolve_file_path
+
+
+CSV_TESTS = resolve_file_path('tests/data/variant_workbook/inheritance_mode_test_data.csv')
 
 
 def test_is_multiallelic_site_raises_error():
@@ -356,3 +361,68 @@ def test_compute_inheritance_mode_trio(gts, gt_labels, sexes, chrom, novoPP, exp
 def test_compute_inheritance_modes(variant_sample, expected_new_fields):
     """ Tests end-to-end inheritance mode computation """
     assert InheritanceMode.compute_inheritance_modes(variant_sample) == expected_new_fields
+
+
+def test_compute_inheritance_modes_csv_tests():
+    """ A larger, more involved test that reads test data from a CSV and generates test cases """
+    def get_answer(test):
+        return [test['inheritance_modes'][2:-2]]  # cut off [', ']
+
+    def infer_sex_of_self(test):
+        return 'F' if 'female' in test['condition'] else 'M'
+
+    def infer_chrom(test):
+        if 'autosome' in test['condition']:
+            return '1'
+        elif 'X' in test['condition']:
+            return 'X'
+        else:
+            return 'Y'
+
+    def infer_novo(test):
+        if 'novocaller high' in test['condition']:
+            return .95
+        elif 'novoPP=0' in test['condition']:
+            return 0
+        elif 'novoPP=None' in test['condition']:
+            return -1  # distinct
+        else:
+            return .001
+
+    def build_variant_sample(test):
+        """ Builds a variant_sample given a row """
+        return {
+            'samplegeno': [
+                {
+                    'samplegeno_role': 'self',
+                    'samplegeno_numgt': test['genotype_self'],
+                    'samplegeno_sex': infer_sex_of_self(test)
+                },
+                {
+                    'samplegeno_role': 'mother',
+                    'samplegeno_numgt': test['genotype_mother'],
+                    'samplegeno_sex': 'F'
+                },
+                {
+                    'samplegeno_role': 'father',
+                    'samplegeno_numgt': test['genotype_father'],
+                    'samplegeno_sex': 'M'
+                },
+            ],
+            'variant': {
+                'CHROM': infer_chrom(test)
+            },
+            'novoPP': infer_novo(test)
+        }
+
+    # run the tests
+    with open(CSV_TESTS) as reader:
+        tests = csv.DictReader(reader)
+        for idx, test in enumerate(tests):
+            vs = build_variant_sample(test)
+            reference = get_answer(test)
+            actual = InheritanceMode.compute_inheritance_modes(vs)['inheritance_modes']
+            if reference != actual:
+                #import pdb; pdb.set_trace() fix remaining tests
+                actual = InheritanceMode.compute_inheritance_modes(vs)['inheritance_modes']
+    raise Exception

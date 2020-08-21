@@ -4,7 +4,7 @@ class InheritanceModeError(Exception):
 
 class InheritanceMode:
 
-    EMPTY = '.'  # XXX: is this really what this is? Should it be called 'dot'?
+    MISSING = '.'  # XXX: is this really what this is? Should it be called 'dot'?
 
     AUTOSOME = 'autosome'
     CHROMOSOMES = [
@@ -45,7 +45,7 @@ class InheritanceMode:
     INHMODE_LABEL_X_LINKED_DOMINANT_MOTHER = "X-linked dominant (Maternal)"
     INHMODE_LABEL_X_LINKED_DOMINANT_FATHER = "X-linked dominant (Paternal)"
     INHMODE_LABEL_Y_LINKED = "Y-linked dominant"
-    INHMODE_LABEL_LOH = "Loss of heteozyogousity"
+    INHMODE_LABEL_LOH = "Loss of Heteozyogousity"
 
     INHMODE_LABEL_NONE_DOT = "Low relevance, missing call(s) in family"
     INHMODE_LABEL_NONE_MN = "Low relevance, multiallelic site family"
@@ -60,9 +60,9 @@ class InheritanceMode:
         return chrom == 'X' or chrom == 'Y'
 
     @staticmethod
-    def alleles_match(a1, a2, is_zero=False):
+    def is_homozygous(a1, a2, is_reference=False):
         """ Returns True if a1==a1 and additionally if a1==a2==0 if is_zero is True """
-        if is_zero:
+        if is_reference:
             return a1 == 0 and a2 == 0
         return a1 == a2
 
@@ -78,7 +78,7 @@ class InheritanceMode:
             raise InheritanceModeError('Passed None to is_multiallelic_site')
         for gt in genotypes:
             allele1, allele2 = gt.split('/')
-            if allele1 == cls.EMPTY:
+            if allele1 == cls.MISSING:
                 continue
             elif int(allele1) > 1 or int(allele2) > 1:  # could fail here
                 return True
@@ -99,9 +99,10 @@ class InheritanceMode:
         if chrom not in cls.CHROMOSOMES:
             raise InheritanceModeError('Bad chromosome given to compute_genotype_label: %s' % chrom)
 
-        # XXX: document what this is doing, refactor into descriptive helper method
-        if allele1 == cls.EMPTY:
-            if sex == cls.FEMALE and chrom == cls.MALE:
+        # distinguish between missing genotype in ChrY for a female, which is okay, vs any
+        # other site which indicates a low quality position
+        if allele1 == cls.MISSING:
+            if sex == cls.FEMALE and chrom == 'Y':
                 return cls.GENOTYPE_LABEL_FEMALE_CHRY
             return cls.GENOTYPE_LABEL_DOT
 
@@ -111,22 +112,22 @@ class InheritanceMode:
         except ValueError as e:
             raise InheritanceModeError('Bad genotype given to compute_genotype_label: %s' % e)
 
-        # XXX: document what this is doing, refactor into descriptive helper method
+        # Female variants in chrY should be 0/0 or ./. otherwise bad site
         if sex == cls.FEMALE and chrom == 'Y':
-            if cls.alleles_match(allele1, allele2, is_zero=True):
+            if cls.is_homozygous(allele1, allele2, is_reference=True):
                 return cls.GENOTYPE_LABEL_FEMALE_CHRY
             return cls.GENOTYPE_LABEL_SEX_INCONSISTENT
 
-        # XXX: document what this is doing, refactor into descriptive helper method
+        # Handle male chrXY
         if sex == cls.MALE and cls.is_sex_chromosome(chrom):
-            if not cls.alleles_match(allele1, allele2):
+            if not cls.is_homozygous(allele1, allele2):
                 return cls.GENOTYPE_LABEL_SEX_INCONSISTENT
             if allele1 == 0:
                 return cls.GENOTYPE_LABEL_0
             return cls.GENOTYPE_LABEL_M
 
-        # XXX: document what this is doing, refactor into descriptive helper method
-        if cls.alleles_match(allele1, allele2, is_zero=True):
+        # Handle diploid
+        if cls.is_homozygous(allele1, allele2, is_reference=True):
             return cls.GENOTYPE_LABEL_00
         elif allele1 == 0:
             return cls.GENOTYPE_LABEL_0M
@@ -185,21 +186,27 @@ class InheritanceMode:
         for d in [genotypes, genotype_labels, sexes]:
             for role in cls.TRIO:
                 if role not in d:
-                    return []  # or raise exception?
+                    return []
 
         if (cls.check_if_label_exists(cls.GENOTYPE_LABEL_DOT, genotype_labels) or
                 cls.is_multiallelic_site(genotypes.values()) or
                 cls.check_if_label_exists(cls.GENOTYPE_LABEL_SEX_INCONSISTENT, genotype_labels)):
             return []
 
-        # XXX: determine de novo (extract into helper?)
+        # De novo strong candidate
         if novoPP > 0.9:
             return [cls.INHMODE_LABEL_DE_NOVO_STRONG]
+
+        # De novo medium candidate
         if novoPP > 0.1:
             return [cls.INHMODE_LABEL_DE_NOVO_MEDIUM]
+
+        # De novo weak candidate
         if (cls.mother_father_ref_ref(genotypes[cls.MOTHER], genotypes[cls.FATHER]) and
                 genotypes[cls.SELF] == '0/1' and chrom == cls.AUTOSOME):
             return [cls.INHMODE_LABEL_DE_NOVO_WEAK]
+
+        # And de novo chrXY
         if (cls.mother_father_ref_ref(genotypes[cls.MOTHER], genotypes[cls.FATHER])
                 and ((genotypes[cls.SELF] == '0/1' and sexes[cls.SELF] == cls.FEMALE and chrom == cls.MALE)
                      or (genotypes[cls.SELF] == '1/1' and sexes[cls.SELF] == cls.MALE and chrom != 'autosome'))):
@@ -209,10 +216,9 @@ class InheritanceMode:
                 return [cls.INHMODE_LABEL_DE_NOVO_CHRXY]
             raise ValueError("novoPP is different from 0 or -1 on sex chromosome: %s" % novoPP)
 
-        # XXX: after the above, we should have some comments talking about what each of these
-        # are doing (and potentially extract them out).
+        # If not a de novo, assign inheritance mode based solely on genotypes (from GATK)
         if (genotypes[cls.MOTHER] == "0/0"
-                and genotype_labels[cls.FATHER] == cls.GENOTYPE_LABEL_0M
+                and genotype_labels[cls.FATHER][0] == cls.GENOTYPE_LABEL_0M
                 and genotypes[cls.SELF] == "0/1"):
             return [cls.INHMODE_DOMINANT_FATHER]
 
@@ -224,18 +230,20 @@ class InheritanceMode:
                 and genotypes[cls.SELF] == "1/1"):
             return [cls.INHMODE_LABEL_RECESSIVE]
 
+        # Inherited variants on sex chromosomes
         if (genotypes[cls.MOTHER] == "0/1" and genotypes[cls.FATHER] == "0/0"
                 and genotypes[cls.SELF] == "1/1" and sexes[cls.SELF] == cls.MALE and chrom == 'X'):
             return [cls.INHMODE_LABEL_X_LINKED_RECESSIVE_MOTHER, cls.INHMODE_LABEL_X_LINKED_DOMINANT_MOTHER]
 
         if (genotypes[cls.MOTHER] == "0/0" and genotype_labels[cls.FATHER] == cls.GENOTYPE_LABEL_M and
-                chrom == 'X' and genotype_labels[cls.SELF] in [cls.GENOTYPE_LABEL_M, cls.GENOTYPE_LABEL_0M]):
+                chrom == 'X' and genotype_labels[cls.SELF][0] in [cls.GENOTYPE_LABEL_M, cls.GENOTYPE_LABEL_0M]):
             return [cls.INHMODE_LABEL_X_LINKED_DOMINANT_FATHER]
 
-        if (genotype_labels[cls.FATHER] == cls.GENOTYPE_LABEL_M and
-                chrom == 'Y' and genotype_labels[cls.SELF] == cls.GENOTYPE_LABEL_M):
+        if (genotype_labels[cls.FATHER][0] == cls.GENOTYPE_LABEL_M and
+                chrom == 'Y' and genotype_labels[cls.SELF][0] == cls.GENOTYPE_LABEL_M):
             return [cls.INHMODE_LABEL_Y_LINKED]
 
+        # Check for loss of heterozygosity
         if (((genotypes[cls.MOTHER] == "0/1" and genotypes[cls.FATHER] == "0/0") or
              (genotypes[cls.MOTHER] == "0/0" and genotypes[cls.FATHER] == "0/1"))
                 and genotypes[cls.SELF] == "1/1"):
@@ -254,7 +262,7 @@ class InheritanceMode:
         for d in [genotypes, genotype_labels]:
             for role in cls.TRIO:
                 if role not in d:
-                    return [cls.INHMODE_LABEL_NONE_OTHER]  # XXX: is this correct?
+                    return []
 
         if cls.check_if_label_exists(cls.GENOTYPE_LABEL_DOT, genotype_labels):
             return [cls.INHMODE_LABEL_NONE_DOT]
