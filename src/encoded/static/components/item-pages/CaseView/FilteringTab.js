@@ -142,6 +142,16 @@ export function FilteringTabSubtitle(props){
     // From `state.lastFilterSetSaved` we use only non linkTo properties from it so doesn't matter if frame=object vs frame=page for it.
     const [ lastFilterSetSaved, setLastFilterSetSaved ] = useState(active_filterset || null);
 
+    // See https://reactjs.org/docs/hooks-faq.html#how-do-i-implement-getderivedstatefromprops
+    // Basically would just update lastFilterSetSaved to have @@embedded representation instead of the @@object representation
+    // that we get in the PATCH response. Keeping lastFilterSetSaved around b.c. why not - it'll give us some info/feedback before
+    // Case is reindexed. Maybe/hopefully Case will reindex fast enough that won't worry about keeping state.lastFilterSaved around
+    // until updated Case `context`/`caseItem` with updated `active_filterset` arrives. At which point could prly just remove state.lastFilterSaved
+    // and do ~ function doPatch(){ setIsLoading(false); PATCH.. } ... -> ... useEffect(func(){ setIsLoading(false); }[ active_filterset ])
+    if (active_filterset && lastFilterSetSaved && lastFilterSetSaved !== active_filterset && lastFilterSetSaved.last_modified.date_modified < active_filterset.last_modified.date_modified) {
+        setLastFilterSetSaved(active_filterset);
+    }
+
     const { filter_blocks: [ { query: lastActiveFilterAppend } = {} ] = [] } = lastFilterSetSaved || {};
 
     const { differsFromCurrentFilterSet, filterSetQueryStr, saveNewFilterset, saveFilterBtnTip } = useMemo(function(){
@@ -257,6 +267,7 @@ export function FilteringTabSubtitle(props){
 
     let btnPrepend = null;
     let btnDisabled = !differsFromCurrentFilterSet || isLoading; // TODO: maybe inform also via 'edit this FilterSet' and 'add any new FilterSet' actions/permissions.
+    let notYetReIndexed = false; // Not yet used. Should auto-update upon refresh of context
     if (lastFilterSetSaved) {
         // This will eventually likely be turned into tooltip or something on FilterSet blocks UI.
         const {
@@ -265,6 +276,7 @@ export function FilteringTabSubtitle(props){
             display_title: fsTitle = null,
             last_modified: {
                 date_modified: fsDateModified = null,
+                // I think we get back string from PATCH response for modified_by (linkTo), thus this not showing up properly..
                 modified_by: {
                     // We're unlikely to have view permissions for User item unless logged in as admin or similar I think rn.. unsure.
                     display_title: fsModifyAuthorTitle = null
@@ -274,12 +286,13 @@ export function FilteringTabSubtitle(props){
         if (fsDateModified && !fsError) {
             btnPrepend = (
                 <div className="input-group-prepend">
-                    <div className="input-group-text" data-tip={fsTitle + (fsModifyAuthorTitle ? " last modified by " + fsModifyAuthorTitle : "")}>
+                    <div className="input-group-text" data-tip={fsTitle + " last modified by " + (fsModifyAuthorTitle || "you") /*(fsModifyAuthorTitle ? " last modified by " + fsModifyAuthorTitle : "")*/}>
                         Saved
                         &nbsp;<LocalizedTime timestamp={fsDateModified} formatType="date-time-lg" />
                     </div>
                 </div>
             );
+            notYetReIndexed = fsDateModified !== (active_filterset && active_filterset.last_modified && active_filterset.last_modified.date_modified);
         } else { // Means no view (nor, transitively, edit) permission
             btnDisabled = true;
         }
