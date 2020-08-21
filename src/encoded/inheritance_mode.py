@@ -6,11 +6,10 @@ class InheritanceMode:
 
     EMPTY = '.'  # XXX: is this really what this is? Should it be called 'dot'?
 
-    CHROMOSOMES = [
-        '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14',
-        '15', '16', '17', '18', '19', '20', '21', '22', 'X', 'Y', 'M'
-    ]
     AUTOSOME = 'autosome'
+    CHROMOSOMES = [
+        AUTOSOME, 'X', 'Y', 'M'
+    ]
 
     MALE = 'M'
     FEMALE = 'F'
@@ -185,7 +184,8 @@ class InheritanceMode:
         # validate precondition
         for d in [genotypes, genotype_labels, sexes]:
             for role in cls.TRIO:
-                assert role in d
+                if role not in d:
+                    return []  # or raise exception?
 
         if (cls.check_if_label_exists(cls.GENOTYPE_LABEL_DOT, genotype_labels) or
                 cls.is_multiallelic_site(genotypes.values()) or
@@ -253,7 +253,8 @@ class InheritanceMode:
         """
         for d in [genotypes, genotype_labels]:
             for role in cls.TRIO:
-                assert role in d
+                if role not in d:
+                    return [cls.INHMODE_LABEL_NONE_OTHER]  # XXX: is this correct?
 
         if cls.check_if_label_exists(cls.GENOTYPE_LABEL_DOT, genotype_labels):
             return [cls.INHMODE_LABEL_NONE_DOT]
@@ -315,7 +316,7 @@ class InheritanceMode:
                 1. genotype_labels
                 2. inheritance_modes
         """
-        sample_geno = variant_sample.get('samplegeno', {})
+        sample_geno = variant_sample.get('samplegeno', [])
         genotypes = {s["samplegeno_role"]: s["samplegeno_numgt"] for s in sample_geno}
         sexes = {s["samplegeno_role"]: s["samplegeno_sex"] for s in sample_geno}
         chrom = variant_sample.get('variant', {}).get('CHROM')

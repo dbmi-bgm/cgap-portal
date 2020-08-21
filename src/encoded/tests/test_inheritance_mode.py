@@ -203,3 +203,156 @@ def test_compute_inheritance_mode_trio(gts, gt_labels, sexes, chrom, novoPP, exp
     """ Tests basic inheritance mode cases """
     assert InheritanceMode.compute_inheritance_mode_trio(genotypes=gts, genotype_labels=gt_labels,
                                                          sexes=sexes, chrom=chrom, novoPP=novoPP) == expected_inh
+
+
+@pytest.mark.parametrize('variant_sample, expected_new_fields', [
+    (  # test case 1
+        {
+            'samplegeno': [
+                {
+                    'samplegeno_role': 'self',
+                    'samplegeno_numgt': '1/1',
+                    'samplegeno_sex': 'M'
+                },
+                {
+                    'samplegeno_role': 'mother',
+                    'samplegeno_numgt': '0/1',
+                    'samplegeno_sex': 'F'
+                },
+                {
+                    'samplegeno_role': 'father',
+                    'samplegeno_numgt': '0/1',
+                    'samplegeno_sex': 'M'
+                },
+            ],
+            'novoPP': .95,
+            'cmphet': None,
+            'variant': {
+                'CHROM': 1
+            }
+        },
+        {
+            'genotype_labels': [
+                {'labels': ['Homozygus alternate'], 'role': 'self'},
+                {'labels': ['Heterozygous'], 'role': 'mother'},
+                {'labels': ['Heterozygous'], 'role': 'father'}
+            ],
+            'inheritance_modes': ['de novo (strong)']
+        }
+    ),
+    (  # test case 2
+        {
+            'samplegeno': [
+                {
+                    'samplegeno_role': 'self',
+                    'samplegeno_numgt': '1/1',
+                    'samplegeno_sex': 'M'
+                },
+                {
+                    'samplegeno_role': 'mother',
+                    'samplegeno_numgt': '0/1',
+                    'samplegeno_sex': 'F'
+                },
+                {
+                    'samplegeno_role': 'father',
+                    'samplegeno_numgt': '0/1',
+                    'samplegeno_sex': 'M'
+                },
+            ],
+            'novoPP': .5,
+            'cmphet': None,
+            'variant': {
+                'CHROM': 1
+            }
+        },
+        {
+            'genotype_labels': [
+                {'labels': ['Homozygus alternate'], 'role': 'self'},
+                {'labels': ['Heterozygous'], 'role': 'mother'},
+                {'labels': ['Heterozygous'], 'role': 'father'}
+            ],
+            'inheritance_modes': ['de novo (medium)']
+        }
+    ),
+    (  # test case 3
+        {
+            'samplegeno': [
+                {
+                    'samplegeno_role': 'self',
+                    'samplegeno_numgt': '1/1',
+                    'samplegeno_sex': 'M'
+                },
+                {
+                    'samplegeno_role': 'mother',
+                    'samplegeno_numgt': '0/1',
+                    'samplegeno_sex': 'F'
+                },
+                {
+                    'samplegeno_role': 'father',
+                    'samplegeno_numgt': '0/1',
+                    'samplegeno_sex': 'M'
+                },
+            ],
+            'novoPP': .05,
+            'cmphet': None,
+            'variant': {
+                'CHROM': 1
+            }
+        },
+        {
+            'genotype_labels': [
+                {'labels': ['Homozygus alternate'], 'role': 'self'},
+                {'labels': ['Heterozygous'], 'role': 'mother'},
+                {'labels': ['Heterozygous'], 'role': 'father'}
+            ],
+            'inheritance_modes': ['Recessive']
+        }
+    ),
+    (  # test case 4 (no mother, father)
+        {
+            'samplegeno': [
+                {
+                    'samplegeno_role': 'self',
+                    'samplegeno_numgt': '1/1',
+                    'samplegeno_sex': 'M'
+                },
+            ],
+            'novoPP': .05,
+            'cmphet': None,
+            'variant': {
+                'CHROM': 1
+            }
+        },
+        {
+            'genotype_labels': [
+                {'labels': ['Homozygus alternate'], 'role': 'self'},
+            ],
+            'inheritance_modes': ['Low relevance, other']
+        }
+    ),
+    (  # test case 5 - no mother, father with high novoPP (can this happen? should have no effect)
+        {
+            'samplegeno': [
+                {
+                    'samplegeno_role': 'self',
+                    'samplegeno_numgt': '1/1',
+                    'samplegeno_sex': 'M'
+                },
+            ],
+            'novoPP': .95,
+            'cmphet': None,
+            'variant': {
+                'CHROM': 1
+            }
+        },
+        {
+            'genotype_labels': [
+                {'labels': ['Homozygus alternate'], 'role': 'self'},
+            ],
+            'inheritance_modes': ['Low relevance, other']
+        }
+    )
+])
+def test_compute_inheritance_modes(variant_sample, expected_new_fields):
+    """ Tests end-to-end inheritance mode computation """
+    assert InheritanceMode.compute_inheritance_modes(variant_sample) == expected_new_fields
