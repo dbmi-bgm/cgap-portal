@@ -4,12 +4,13 @@ class InheritanceModeError(Exception):
 
 class InheritanceMode:
 
-    EMPTY = '.'  # XXX: is this really what this is?
+    EMPTY = '.'  # XXX: is this really what this is? Should it be called 'dot'?
 
     CHROMOSOMES = [
         '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14',
         '15', '16', '17', '18', '19', '20', '21', '22', 'X', 'Y', 'M'
     ]
+    AUTOSOME = 'autosome'
 
     MALE = 'M'
     FEMALE = 'F'
@@ -197,7 +198,7 @@ class InheritanceMode:
         if novoPP > 0.1:
             return [cls.INHMODE_LABEL_DE_NOVO_MEDIUM]
         if (cls.mother_father_ref_ref(genotypes[cls.MOTHER], genotypes[cls.FATHER]) and
-                genotypes[cls.SELF] == '0/1' and chrom == 'autosome'):  # XXX: since when can chrom have value 'autosome'?
+                genotypes[cls.SELF] == '0/1' and chrom == cls.AUTOSOME):
             return [cls.INHMODE_LABEL_DE_NOVO_WEAK]
         if (cls.mother_father_ref_ref(genotypes[cls.MOTHER], genotypes[cls.FATHER])
                 and ((genotypes[cls.SELF] == '0/1' and sexes[cls.SELF] == cls.FEMALE and chrom == cls.MALE)
@@ -241,3 +242,103 @@ class InheritanceMode:
             return [cls.INHMODE_LABEL_LOH]
 
         return []
+
+    @classmethod
+    def inheritance_modes_other_labels(cls, genotypes, genotype_labels):
+        """ Gives an inheritance mode where there would otherwise be None in an attempt to give
+            some additional information
+
+            :param genotypes: dictionary of role -> genotype mappings
+            :param genotype_labels: dictionary of role -> genotype_label mappings
+        """
+        for d in [genotypes, genotype_labels]:
+            for role in cls.TRIO:
+                assert role in d
+
+        if cls.check_if_label_exists(cls.GENOTYPE_LABEL_DOT, genotype_labels):
+            return [cls.INHMODE_LABEL_NONE_DOT]
+        if cls.is_multiallelic_site(genotypes.values()):
+            return [cls.INHMODE_LABEL_NONE_MN]
+        if cls.check_if_label_exists(cls.GENOTYPE_LABEL_SEX_INCONSISTENT, genotype_labels):
+            return [cls.INHMODE_LABEL_NONE_SEX_INCONSISTENT]
+
+        if genotypes[cls.MOTHER] == "1/1" or (
+                genotypes[cls.FATHER] == "1/1" and genotype_labels[cls.FATHER] != cls.GENOTYPE_LABEL_M):
+            return [cls.INHMODE_LABEL_NONE_HOMOZYGOUS_PARENT]
+        if ((genotypes[cls.MOTHER] == "1/1" or genotypes[cls.MOTHER] == "0/1") and
+                (genotypes[cls.FATHER] == "1/1" or genotypes[cls.FATHER] == "0/1")):
+            return [cls.INHMODE_LABEL_NONE_BOTH_PARENTS]
+
+        return [cls.INHMODE_LABEL_NONE_OTHER]
+
+    @staticmethod
+    def compute_cmphet_inheritance_modes(cmphet):
+        """ Collects and summarizes Compound het caller results """
+        inheritance_modes_set = set()
+        inheritance_modes = []
+        if cmphet is not None:
+            for entry in cmphet:
+                phase = entry.get('comhet_phase')
+                impact = entry.get('comhet_impact_gene')
+                s = 'Compound Het (%s/%s)' % (phase, impact.lower())
+                inheritance_modes_set.add(s)
+            inheritance_modes = list(inheritance_modes_set)
+            inheritance_modes.sort()
+        return inheritance_modes
+
+    @staticmethod
+    def build_genotype_label_structure(genotype_labels):
+        """ Converts the genotype_labels structure into a consistent structure that can be used
+            in our item ecosystem.
+
+            :param genotype_labels: dictionary role -> labels mapping
+            :returns: list of dictionaries with structure:
+                [{
+                    'role': <role>,
+                    'labels': <labels>
+                }]
+        """
+        structured_labels = []
+        for role, labels in genotype_labels.items():
+            structured_labels.append({
+                'role': role,
+                'labels': labels
+            })
+        return structured_labels
+
+    @classmethod
+    def compute_inheritance_modes(cls, variant_sample):
+        """ Computes inheritance modes given a variant_sample.
+            Intended to perform: variant_sample.update(new_fields) with result of this method.
+
+            Adds the following 2 fields to variant_sample given the complete information:
+                1. genotype_labels
+                2. inheritance_modes
+        """
+        sample_geno = variant_sample.get('samplegeno', {})
+        genotypes = {s["samplegeno_role"]: s["samplegeno_numgt"] for s in sample_geno}
+        sexes = {s["samplegeno_role"]: s["samplegeno_sex"] for s in sample_geno}
+        chrom = variant_sample.get('variant', {}).get('CHROM')
+        cmphet = variant_sample.get("cmphet")
+        novoPP = variant_sample.get("novoPP", -1)
+
+        if chrom not in ['X', 'Y']:
+            chrom = cls.AUTOSOME  # XXX: so chrom is one of ['X', 'Y', 'autosome'] ?
+
+        if cls.SELF not in genotypes:
+            raise InheritanceModeError('Role "self" not present in genotypes: %s' % genotypes)
+
+        genotype_labels = cls.compute_family_genotype_labels(genotypes, sexes, chrom)
+        inheritance_modes = cls.compute_inheritance_mode_trio(genotypes=genotypes,
+                                                              genotype_labels=genotype_labels,
+                                                              sexes=sexes, chrom=chrom, novoPP=novoPP)
+        inheritance_modes += cls.compute_cmphet_inheritance_modes(cmphet)
+        if len(inheritance_modes) == 0:
+            inheritance_modes = cls.inheritance_modes_other_labels(genotypes, genotype_labels)
+
+        new_fields = {
+            'genotype_labels': cls.build_genotype_label_structure(genotype_labels),
+            'inheritance_modes': inheritance_modes
+        }
+
+        return new_fields

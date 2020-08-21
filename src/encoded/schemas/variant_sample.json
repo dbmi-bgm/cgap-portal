@@ -245,6 +245,19 @@
                 "title": "Compound Het",
                 "type": "object",
                 "properties": {
+                    "comhet_impact_gene": {
+                        "title": "ComHet Impact",
+                        "field_name": "comhet_impact_gene",
+                        "type": "string",
+                        "do_import": true,
+                        "source_name": "COMHET",
+                        "source_version": "v1",
+                        "sub_embedding_group": "{\"key\": \"cmphet\", \"title\": \"Compound Het\"}",
+                        "annotation_category": "Genotype",
+                        "scope": "sample_variant",
+                        "schema_title": "ComHet Impact",
+                        "facet_order": 17
+                    },
                     "comhet_phase": {
                         "title": "comhet_phase",
                         "field_name": "comhet_phase",
@@ -275,19 +288,6 @@
                         "sub_embedding_group": "{\"key\": \"cmphet\", \"title\": \"Compound Het\"}",
                         "scope": "sample_variant"
                     },
-                    "comhet_impact_gene": {
-                        "title": "ComHet Impact",
-                        "field_name": "comhet_impact_gene",
-                        "type": "string",
-                        "do_import": true,
-                        "source_name": "COMHET",
-                        "source_version": "v1",
-                        "sub_embedding_group": "{\"key\": \"cmphet\", \"title\": \"Compound Het\"}",
-                        "annotation_category": "Genotype",
-                        "scope": "sample_variant",
-                        "schema_title": "ComHet Impact",
-                        "facet_order": 17
-                    },
                     "comhet_impact_transcript": {
                         "title": "comhet_impact_transcript",
                         "field_name": "comhet_impact_transcript",
@@ -316,9 +316,25 @@
             "description": "String Accession of the vcf file used in digestion",
             "type": "string"
         },
-        "genotype_label": {
-            "title": "Genotype Label",
-            "type": "string"
+        "genotype_labels": {
+            "title": "Genotype Labels",
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "role": {
+                        "title": "Role",
+                        "type": "string"
+                    },
+                    "labels": {
+                        "title": "Genotype Labels",
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
         },
         "inheritance_modes": {
             "title": "Inheritance Modes",
@@ -640,22 +656,25 @@
             "grouping": "Consequence"
         },
         "variant.genes.genes_most_severe_maxentscan_diff": {
-            "title": "genes_most_severe_maxentscan_diff",
+            "title": "MaxEntScan Diff",
             "aggregation_type": "stats",
             "number_step": "any",
-            "order": 31
+            "order": 31,
+            "grouping": "Splice Predictors"
         },
         "variant.genes.genes_most_severe_polyphen_score": {
             "title": "PolyPhen score",
             "aggregation_type": "stats",
             "number_step": "any",
-            "order": 25
+            "order": 25,
+            "grouping": "Missense Predictors"
         },
         "variant.genes.genes_most_severe_sift_score": {
             "title": "SIFT score",
             "aggregation_type": "stats",
             "number_step": "any",
-            "order": 24
+            "order": 24,
+            "grouping": "Missense Predictors"
         },
         "variant.gnomad_af": {
             "title": "GnomAD Alt Allele Frequency",

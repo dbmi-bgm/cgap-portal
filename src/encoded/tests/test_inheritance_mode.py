@@ -137,5 +137,69 @@ def test_compute_family_genotype_labels(gts, sexes, chrom, expected_labels):
         assert actual_labels[key] == value
 
 
-def test_compute_inheritance_mode_trio():
-    pass  # write me!
+@pytest.mark.parametrize('gts, gt_labels, sexes, chrom, novoPP, expected_inh', [
+    (  # test case 1
+        {
+            'self': '1/1',
+            'mother': '1/0',
+            'father': '0/1'
+        },
+        {
+            'self': ['Homozygus alternate'],
+            'mother': ['Heterozygous alt/alt -  multiallelic'],
+            'father': ['Heterozygous']
+        },
+        {
+            'self': 'M',
+            'mother': 'F',
+            'father': 'M'
+        },
+        '5',
+        .05,
+        []
+    ),
+    (  # test case 2
+        {
+            'self': '1/1',
+            'mother': '1/1',
+            'father': '0/1'
+        },
+        {
+            'self': ['Homozygus alternate'],
+            'mother': ['Homozygus alternate'],
+            'father': ['False']
+        },
+        {
+            'self': 'F',
+            'mother': 'F',
+            'father': 'M'
+        },
+        'X',
+        .95,
+        []
+    ),
+    (  # test case 3
+        {
+            'self': '0/1',
+            'mother': '1/1',
+            'father': '0/0'
+        },
+        {
+            'self': ['Heterozygous'],
+            'mother': ['Homozygus alternate'],
+            'father': ['Hemizygous reference']
+        },
+        {
+            'self': 'F',
+            'mother': 'F',
+            'father': 'M'
+        },
+        'X',
+        .8,
+        [InheritanceMode.INHMODE_LABEL_DE_NOVO_MEDIUM]
+    )
+])
+def test_compute_inheritance_mode_trio(gts, gt_labels, sexes, chrom, novoPP, expected_inh):
+    """ Tests basic inheritance mode cases """
+    assert InheritanceMode.compute_inheritance_mode_trio(genotypes=gts, genotype_labels=gt_labels,
+                                                         sexes=sexes, chrom=chrom, novoPP=novoPP) == expected_inh

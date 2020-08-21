@@ -490,9 +490,25 @@ class MappingTableParser(object):
             'description': 'Link to Genome Snapshot Image',
             'type': 'string'
         }
-        schema['properties']['genotype_label'] = {
-            'title': 'Genotype Label',
-            'type': 'string'
+        schema['properties']['genotype_labels'] = {
+            'title': 'Genotype Labels',
+            'type': 'array',
+            'items': {
+                'type': 'object',
+                'properties': {
+                    'role': {
+                        'title': 'Role',
+                        'type': 'string'
+                    },
+                    'labels': {
+                        'title': 'Genotype Labels',
+                        'type': 'array',
+                        'items': {
+                            'type': 'string'
+                        }
+                    }
+                }
+            }
         }
         schema['properties']['inheritance_modes'] = {
             'title': 'Inheritance Modes',

@@ -24,6 +24,7 @@ from snovault.util import debug_log
 from .util import resolve_file_path, gunzip_content
 from .commands.ingest_vcf import VCFParser
 from .types.variant import build_variant_display_title, ANNOTATION_ID_SEP
+from .inheritance_mode import InheritanceMode
 
 
 log = structlog.getLogger(__name__)
@@ -439,7 +440,7 @@ class IngestionListener:
                         geno.update(sample_relations[sample_id])
 
                 # add inheritance mode information
-                # TODO
+                sample.update(InheritanceMode.compute_inheritance_modes(sample))
 
                 self.vapp.post_json('/variant_sample', sample, status=201)
             except Exception as e:

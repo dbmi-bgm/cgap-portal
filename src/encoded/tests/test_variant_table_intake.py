@@ -30,7 +30,7 @@ VEP_CONSEQUENCE_EMBEDS = ['transcript.vep_consequence.var_conseq_id', 'transcrip
                           'transcript.vep_consequence.coding_effect', 'transcript.vep_gene.display_title',
                           'transcript.vep_gene.gene_symbol', 'transcript.vep_gene.ensgid']
 VARIANT_TABLE_VERSION = 'annV0.4.8'
-VARIANT_TABLE_DATE = '08.13.2020'
+VARIANT_TABLE_DATE = '08.21.2020'
 NUMBER_ANNOTATION_FIELDS = 354
 SAMPLE_FIELDS_EXPECTED = 27
 VARIANT_FIELDS_EXPECTED = 327
