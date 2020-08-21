@@ -1,8 +1,9 @@
 'use strict';
 
-import React from 'react';
+import React, { useMemo } from 'react';
 import _ from 'underscore';
 import { LocalizedTime, formatPublicationDate } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/LocalizedTime';
+import { Schemas } from './../../util';
 
 
 /**
@@ -27,46 +28,49 @@ function mapFeaturesToBadges(features = []) {
 
 /** @param {Object} props - Contents of a caseItem */
 export const CaseStats = React.memo(function CaseStats(props){
-    const {
-        className = '',
-        caseItem = null
-    } = props;
-
+    const { caseItem = null } = props;
     const { individual = null, family = null } = caseItem || {};
-    const { individual_id = null } = individual || {};
-    const { accession: famAccession = null } = family || {};
+    const { individual_id = null, phenotypic_features = [] } = individual || {};
+    const { accession: famAccession = null, family_phenotypic_features = [] } = family || {};
+
+    const renderedPatientPhenotypicFeatures = useMemo(function(){
+        return mapFeaturesToBadges(phenotypic_features);
+    }, [ phenotypic_features ]);
+
+    const renderedFamilyPhenotypicFeatures = useMemo(function(){
+        return mapFeaturesToBadges(family_phenotypic_features);
+    }, [ family_phenotypic_features ]);
 
     return (
         // Stack into one column at small window size.
         <div id="case-stats" className="row">
             <div className="col-12 col-sm mb-2 mb-sm-0">
-                <StatCard title="Patient Info:" subtitle={individual_id} className="h-100">
-                    <PatientInfo {...props} />
-                </StatCard>
+                <div className="card h-100">
+                    <h4 className="card-header mt-0 text-600">
+                        Patient Info: <span className="text-300">{ individual_id }</span>
+                    </h4>
+                    <div className="card-body">
+                        <PatientInfo {...props} />
+                    </div>
+                    <div className="card-footer">
+                        <label className="py-1 mb-0 text-large">Patient Phenotypic Features:</label>
+                        <div>{renderedPatientPhenotypicFeatures}</div>
+                    </div>
+                </div>
             </div>
-            <div className="col-12 col-sm d-flex flex-column">
-                <StatCard title="Patient Phenotypic Features" className="mb-2">
-                    <PhenotypicFeatures caseItem={caseItem} />
-                </StatCard>
-                <StatCard title="Family Info:" subtitle={famAccession} className="flex-fill">
-                    <FamilyInfo {...{ family, caseItem }} />
-                </StatCard>
-            </div>
-        </div>
-    );
-});
-
-export const StatCard = React.memo(function StatDrop(props){
-    const { title = null, subtitle = null, children = null, className = "", style = null } = props || {};
-    const cls = "card" + (className ? " " + className : "");
-
-    return (
-        <div className={cls} style={style}>
-            <h4 className="card-header mt-0 text-600">
-                { title } { subtitle ? <span className="text-300">{ subtitle }</span> : null }
-            </h4>
-            <div className="card-body">
-                { children }
+            <div className="col-12 col-sm">
+                <div className="card h-100">
+                    <h4 className="card-header mt-0 text-600">
+                        Family Info: <span className="text-300">{ famAccession }</span>
+                    </h4>
+                    <div className="card-body">
+                        <FamilyInfo {...{ family, caseItem }} />
+                    </div>
+                    <div className="card-footer">
+                        <label className="py-1 mb-0 text-large">Family Phenotypic Features: </label>
+                        <div>{renderedFamilyPhenotypicFeatures}</div>
+                    </div>
+                </div>
             </div>
         </div>
     );
@@ -86,8 +90,15 @@ export const PatientInfo = React.memo(function PatientInfo(props) {
         date_created = null,
         life_status = null,
         display_title = null,
-        aliases = null
+        aliases = null,
+        phenotypic_features = []
     } = individual || {};
+
+    const renderedPhenotypicFeatures = useMemo(function(){
+        return mapFeaturesToBadges(phenotypic_features);
+    }, [ phenotypic_features ]);
+
+    // TODO later maybe use card footer Bootstrap component if such exists.
 
     return (
         <>
@@ -104,24 +115,16 @@ export const PatientInfo = React.memo(function PatientInfo(props) {
                 <label className="mb-0">Life Status:</label> { life_status || 'N/A' }
             </div>
             <div className="card-text mb-1">
-                <label className="mb-0">Status:</label> { status } <i className="item-status-indicator-dot ml-02" />
+                <label className="mb-0">Status:</label> &nbsp;{ Schemas.Term.toName("status", status, true) }
             </div>
             <div className="card-text mb-1">
                 <label className="mb-0">Accessioned:</label> { date_created ? <LocalizedTime timestamp={date_created} formatType="date-sm"/> : "N/A" }
             </div>
-            <div className="card-text mb-1">
+            <div className="card-text">
                 <label className="mb-0">Aliases:</label> {aliases || "N/A"}
             </div>
         </>
     );
-});
-
-
-export const PhenotypicFeatures = React.memo(function PhenotypicFeatures({ caseItem }) {
-    const { individual = null } = caseItem || {};
-    const { phenotypic_features = [] } = individual || {};
-
-    return mapFeaturesToBadges(_.pluck(phenotypic_features, 'phenotypic_feature'));
 });
 
 
@@ -138,7 +141,11 @@ export const FamilyInfo = React.memo(function FamilyInfo({ family, caseItem }) {
     } = caseItem || {};
     const { display_title: cohortTitle = null } = cohort || {};
 
-    const renderedPhenotypicFeatures = mapFeaturesToBadges(familyFeatures);
+    const renderedPhenotypicFeatures = useMemo(function(){
+        return mapFeaturesToBadges(familyFeatures);
+    }, [ familyFeatures ]);
+
+    // TODO later maybe use card footer Bootstrap component if such exists.
 
     return (
         <>
@@ -151,9 +158,6 @@ export const FamilyInfo = React.memo(function FamilyInfo({ family, caseItem }) {
             <div className="card-text mb-1">
                 <label className="mb-0">Project:</label> { projectTitle || "N/A" }
             </div>
-            <div className="card-text">
-                <label className="mb-03">Family Phenotypic Features: </label>
-                <div>{renderedPhenotypicFeatures}</div>
-            </div>
-        </>);
+        </>
+    );
 });
