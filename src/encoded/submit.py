@@ -66,7 +66,7 @@ POST_ORDER = [
 
 LINKS = [
     'samples', 'members', 'mother', 'father', 'proband', 'report',
-    'individual', 'sample_processing', 'families'
+    'individual', 'sample_processing', 'families', 'files'
 ]
 
 
@@ -115,17 +115,17 @@ def submit_data_bundle(*, s3_client, bucket, key, project, institution, vapp,  #
 
 
 def map_fields(row, metadata_dict, addl_fields, item_type):
+    for field in addl_fields:
+        metadata_dict[field] = use_abbrev(row.get(field.replace('_', ' ')))
     for map_field in GENERIC_FIELD_MAPPING[item_type]:
         if map_field in row:
             metadata_dict[GENERIC_FIELD_MAPPING[item_type][map_field]] = use_abbrev(row.get(map_field))
-    for field in addl_fields:
-        metadata_dict[field] = use_abbrev(row.get(field.replace('_', ' ')))
     return metadata_dict
 
 
 def use_abbrev(value):
-    if value in ABBREVS:
-        return ABBREVS[value]
+    if value and value.lower() in ABBREVS:
+        return ABBREVS[value.lower()]
     else:
         return value
 
@@ -144,7 +144,7 @@ def xls_to_json(xls_data, project, institution):
     while True:
         try:
             keys = next(row)
-            keys = [key.lower().strip().rstrip('*:') for key in keys]
+            keys = [key.lower().strip().rstrip('*: ') for key in keys]
             counter += 1
             if 'individual id' in keys:
                 header = True
@@ -179,11 +179,13 @@ def xls_to_json(xls_data, project, institution):
         'reports': [], 'errors': []
     }
     file_errors = []
-    specimen_ids = {}
+    #specimen_ids = {}
     family_dict = create_families(rows)
     a_types = get_analysis_types(rows)
+    case_names = {}
     for i, row in enumerate(rows):
         debuglog("row:", repr(row))  # Temporary instrumentation for debugging to go away soon. -kmp 25-Jul-2020
+        print(row)
         row_num = i + counter + 1
         missing_required = [col for col in required if col not in row or not row[col]]
         if missing_required:
@@ -206,14 +208,14 @@ def xls_to_json(xls_data, project, institution):
         # create item for Sample if there is a specimen
         if row.get('specimen id'):
             samp_alias = '{}:sample-{}'.format(project['name'], row['specimen id'])
-            if row['specimen id'] in specimen_ids:
-                samp_alias = samp_alias + '-' + specimen_ids[row['specimen id']]
-                specimen_ids[row['specimen id']] += 1
-            else:
-                specimen_ids[row['specimen id']] = 1
+            # if row['specimen id'] in specimen_ids:
+            #     samp_alias = samp_alias + '-' + str(specimen_ids[row['specimen id']])
+            #     specimen_ids[row['specimen id']] += 1
+            # else:
+            #     specimen_ids[row['specimen id']] = 1
             analysis_alias = '{}:analysis-{}'.format(project['name'], row['analysis id'])
             items = fetch_sample_metadata(row_num, row, items, indiv_alias, samp_alias, analysis_alias,
-                                          fam_alias, project['name'], a_types)
+                                          fam_alias, project['name'], a_types, case_names)
             if row.get('files'):
                 file_items = fetch_file_metadata(row_num, row['files'].split(','), project['name'])
                 file_errors.extend(file_items['errors'])
@@ -225,7 +227,7 @@ def xls_to_json(xls_data, project, institution):
     # create SampleProcessing item for trio/group if needed
     # items = create_sample_processing_groups(items, sp_alias)
     items = add_relations(items)
-    items = create_case_items(items, project['name'])
+    items = create_case_items(items, project['name'], case_names)
     # removed unused fields, add project and institution
     for val1 in items.values():
         if isinstance(val1, dict):
@@ -252,7 +254,11 @@ def get_analysis_types(rows):
     for row in rows:
         analysis_relations.setdefault(row.get('analysis id'), [[], []])
         analysis_relations[row.get('analysis id')][0].append(row.get('relation to proband', '').lower())
-        analysis_relations[row.get('analysis id')][1].append(row.get('workup type', '').upper())
+        if row.get('test requested'):
+            col = 'test requested'
+        else:
+            col = 'workup type'
+        analysis_relations[row.get('analysis id')][1].append(row.get(col, '').upper())
     for k, v in analysis_relations.items():
         workup = list(set(v[1]))
         if len(workup) == 1 and '' not in workup:
@@ -302,10 +308,12 @@ def fetch_family_metadata(idx, row, items, indiv_alias, fam_alias):
     new_items = items.copy()
     info = {
         'aliases': [fam_alias],
-        'family_id': row['family id'],
+        'family_id': row.get('family id'),
         'members': [indiv_alias],
         'row': idx
     }
+    if not info['family_id']:
+        info['family_id'] = fam_alias[fam_alias.index(':') + 1:]
     if fam_alias not in new_items['family']:
         new_items['family'][fam_alias] = info
     if indiv_alias not in new_items['family'][fam_alias]['members']:
@@ -313,8 +321,9 @@ def fetch_family_metadata(idx, row, items, indiv_alias, fam_alias):
     valid_relations = ['proband', 'mother', 'father', 'brother', 'sister', 'sibling']
     relation_found = False
     for relation in valid_relations:
-        if row.get('relation to proband', '').lower().startswith(relation) and relation not in new_items['family'][fam_alias]:
-            new_items['family'][fam_alias][relation] = indiv_alias
+        if row.get('relation to proband', '').lower().startswith(relation):
+            if relation not in new_items['family'][fam_alias]:
+                new_items['family'][fam_alias][relation] = indiv_alias
             relation_found = True
             break
     if not relation_found:
@@ -325,12 +334,13 @@ def fetch_family_metadata(idx, row, items, indiv_alias, fam_alias):
     return new_items
 
 
-def fetch_sample_metadata(idx, row, items, indiv_alias, samp_alias, analysis_alias, fam_alias, proj_name, analysis_type_dict):
+def fetch_sample_metadata(idx, row, items, indiv_alias, samp_alias, analysis_alias,
+                          fam_alias, proj_name, analysis_type_dict, case_name_dict):
     new_items = items.copy()
     info = {'aliases': [samp_alias], 'files': []}  # TODO: implement creation of file db items
     fields = [
-        'workup_type', 'specimen_type', 'dna_concentration', 'date_transported',
-        'specimen_notes', 'research_protocol_name', 'sent_by', 'physician_id', 'indication'
+        'workup_type', 'specimen_type', 'dna_concentration', 'date_transported', 'indication',
+        'specimen_notes', 'research_protocol_name', 'sent_by', 'physician_id'
     ]
     info = map_fields(row, info, fields, 'sample')
     info['row'] = idx
@@ -365,6 +375,8 @@ def fetch_sample_metadata(idx, row, items, indiv_alias, samp_alias, analysis_ali
             msg = ('Row {} - Samples with analysis ID {} contain mis-matched or invalid workup type values. '
                    'Sample cannot be processed.'.format(idx, row.get('analysis id')))
             new_items['errors'].append(msg)
+        if row.get('unique analysis id'):
+            case_name_dict['{}-{}'.format(row.get('analysis id'), row.get('specimen id'))] = row['unique analysis id']
     new_items['sample_processing'].setdefault(analysis_alias, new_sp_item)
     new_items['sample_processing'][analysis_alias]['samples'].append(samp_alias)
     if row.get('report required').lower().startswith('y'):
@@ -409,18 +421,21 @@ def fetch_file_metadata(idx, filenames, proj_name):
     return files
 
 
-def create_case_items(items, proj_name):
+def create_case_items(items, proj_name, case_name_dict):
     new_items = items.copy()
+    print(json.dumps(items, indent=4))
     for k, v in items['sample_processing'].items():
         analysis_id = k[k.index('analysis-')+9:]
         for sample in v['samples']:
             case_id = '{}-{}'.format(analysis_id, items['sample'][sample]['specimen_accession'])
-            if len(v['samples']) == 1:
-                case_id += '-single'
-            elif len(v['samples']) > 1:
-                case_id += '-group'
+            if case_id in case_name_dict:
+                case_id = case_name_dict[case_id]
             case_alias = '{}:case-{}'.format(proj_name, case_id)
-            indiv = [ikey for ikey, ival in items['individual'].items() if sample in ival.get('samples', [])][0]
+            print([val.get('samples') for val in items['individual'].values()])
+            try:
+                indiv = [ikey for ikey, ival in items['individual'].items() if sample in ival.get('samples', [])][0]
+            except IndexError:
+                indiv = ''
             case_info = {
                 'aliases': [case_alias],
                 # 'case_id': case_id,
@@ -429,10 +444,14 @@ def create_case_items(items, proj_name):
             }
             if sample in items['reports']:
                 report_alias = case_alias.replace('case', 'report')
-                new_items['report'][report_alias] = {
-                    'aliases': [report_alias],
-                    'description': 'Analysis Report for Individual ID {}'.format(items['individual'][indiv]['individual_id'])
-                }
+                new_items['report'][report_alias] = {'aliases': [report_alias]}
+                report_info = {'aliases': [report_alias]}
+                if indiv:
+                    report_info['description'] = 'Analysis Report for Individual ID {} (Analysis {})'.format(
+                        items['individual'][indiv]['individual_id'], analysis_id
+                    )
+                else:
+                    report_info['description'] = 'Analysis Report for Case ID {}'.format(case_id)
                 case_info['report'] = report_alias
             new_items['case'][case_alias] = case_info
     del new_items['reports']
@@ -586,6 +605,9 @@ def validate_all_items(virtualapp, json_data):
     Still testing validation/data organization parts - patch/post part hasn't been fully
     written or tested.
     '''
+    if list(json_data.keys()) == ['errors']:
+        output.append('Errors found in spreadsheet columns. Please fix spreadsheet before submitting.')
+        return {}, output, False
     alias_dict = {}
     errors = json_data['errors']
     all_aliases = [k for itype in json_data for k in json_data[itype]]
@@ -593,91 +615,93 @@ def validate_all_items(virtualapp, json_data):
     validation_results = {}
     output = []
     for itemtype in POST_ORDER:  # don't pre-validate case and report
+        db_results = {}
         if itemtype in json_data:
             profile = virtualapp.get('/profiles/{}.json'.format(itemtype)).json
             validation_results[itemtype] = {'validated': 0, 'errors': 0}
-            db_results = {}
-        # TODO: json_data[itemtype] but item_type might not be in json_data according to previous "if" statement.
-        #       Maybe we want "for alias in json_data.get(item_type, {}):" here?
-        #       Alternatively, maybe give "json_data.get(item_type, {})" a variable name so that it can be referred
-        #       to more concisely in the several places below that it's needed.
-        #       -kmp 25-Jul-2020
-        for alias in json_data[itemtype]:
-            # first collect all atids before comparing and validating items
-            db_result = compare_with_db(virtualapp, alias)
-            if db_result:
-                alias_dict[alias] = db_result['@id']
-                # TODO: db_results is only conditionally assigned in the prevous "if".
-                #       Perhaps the db_results = {} above should be moved up outside the "if"?
-                #       Are we supposed to have a new dictionary on each iteration? -kmp 25-Jul-2020
-                db_results[alias] = db_result
-        # TODO: Likewise this should probably loop over json_data.get(itemtype, {}). -kmp 25-Jul-2020
-        for alias in json_data[itemtype]:
-            data = json_data[itemtype][alias].copy()
-            row = data.get('row')
-            if row:
-                del data['row']
-            if 'filename' in data:  # until we have functional file upload
-                del data['filename']
-            if not db_results.get(alias):
-                error = validate_item(virtualapp, data, 'post', itemtype, all_aliases)
-                if error:  # modify to check for presence of validation errors
-                    # do something to report validation errors
-                    if itemtype not in ['case', 'report']:
-                        for e in error:
-                            if row:
-                                errors.append('Row {} - Error found: {}'.format(row, e))
-                            else:
-                                errors.append('{} {} - Error found: {}'.format(itemtype, alias, e))
-                        validation_results[itemtype]['errors'] += 1
-                # TODO: If itemtype might not be in json_data (and conditionals above suggest that's so),
-                #       then json_data[item_type][alias] seems suspect. It does work to do
-                #       json_data.get(item_type, {}).get(alias, {}).get('filename') but I would put that
-                #       quantity in a variable rather than compute it twice in a row. -kmp 25-Jul-2020
-                elif json_data[itemtype][alias].get('filename'):
-                    if json_data[itemtype][alias]['filename'] in ''.join(json_data['errors']):
-                        validation_results[itemtype]['errors'] += 1
+            # db_results = {}
+            # TODO: json_data[itemtype] but item_type might not be in json_data according to previous "if" statement.
+            #       Maybe we want "for alias in json_data.get(item_type, {}):" here?
+            #       Alternatively, maybe give "json_data.get(item_type, {})" a variable name so that it can be referred
+            #       to more concisely in the several places below that it's needed.
+            #       -kmp 25-Jul-2020
+            for alias in json_data[itemtype]:
+                # first collect all atids before comparing and validating items
+                db_result = compare_with_db(virtualapp, alias)
+                if db_result:
+                    alias_dict[alias] = db_result['@id']
+                    # TODO: db_results is only conditionally assigned in the prevous "if".
+                    #       Perhaps the db_results = {} above should be moved up outside the "if"?
+                    #       Are we supposed to have a new dictionary on each iteration? -kmp 25-Jul-2020
+                    db_results[alias] = db_result
+            # TODO: Likewise this should probably loop over json_data.get(itemtype, {}). -kmp 25-Jul-2020
+            for alias in json_data[itemtype]:
+                data = json_data[itemtype][alias].copy()
+                row = data.get('row')
+                if row:
+                    del data['row']
+                fname = json_data[itemtype][alias].get('filename')
+                if fname:  # until we have functional file upload
+                    del data['filename']
+                if not db_results.get(alias):
+                    error = validate_item(virtualapp, data, 'post', itemtype, all_aliases)
+                    if error:  # modify to check for presence of validation errors
+                        # do something to report validation errors
+                        if itemtype not in ['case', 'report']:
+                            for e in error:
+                                if row:
+                                    errors.append('Row {} - Error found: {}'.format(row, e))
+                                else:
+                                    errors.append('{} {} - Error found: {}'.format(itemtype, alias, e))
+                            validation_results[itemtype]['errors'] += 1
+                    # TODO: If itemtype might not be in json_data (and conditionals above suggest that's so),
+                    #       then json_data[item_type][alias] seems suspect. It does work to do
+                    #       json_data.get(item_type, {}).get(alias, {}).get('filename') but I would put that
+                    #       quantity in a variable rather than compute it twice in a row. -kmp 25-Jul-2020
                     else:
-                        json_data[itemtype][alias]['status'] = 'uploading'
-                else:
-                    json_data_final['post'].setdefault(itemtype, [])
-                    json_data_final['post'][itemtype].append(json_data[itemtype][alias])
-                    validation_results[itemtype]['validated'] += 1
-            else:
-                # patch if item exists in db
-                # alias_dict[alias] = results[alias]['@id']
-                # TODO: profile is only conditionally assigned in an "if" above. -kmp 25-Jul-2020
-                patch_data = compare_fields(profile, alias_dict, data, db_results[alias])
-                if itemtype in ['file_fastq', 'file_processed'] and 'filename' in patch_data:
-                    patch_data['status'] = 'uploading'
-                error = validate_item(virtualapp, patch_data, 'patch', itemtype,
-                                      all_aliases, atid=db_results[alias]['@id'])
-                if error:  # do something to report validation errors
-                    if itemtype not in ['case', 'report']:
-                        for e in error:
-                            if row:
-                                errors.append('Row {} {} - Error found: {}'.format(row, itemtype, e))
+                        if fname:
+                            if fname in ''.join(json_data['errors']):
+                                validation_results[itemtype]['errors'] += 1
                             else:
-                                errors.append('{} {} - Error found: {}'.format(itemtype, alias, e))
+                                json_data[itemtype][alias]['status'] = 'uploading'
+                        json_data_final['post'].setdefault(itemtype, [])
+                        json_data_final['post'][itemtype].append(json_data[itemtype][alias])
+                        validation_results[itemtype]['validated'] += 1
+                else:
+                    # patch if item exists in db
+                    # alias_dict[alias] = results[alias]['@id']
+                    # TODO: profile is only conditionally assigned in an "if" above. -kmp 25-Jul-2020
+                    patch_data = compare_fields(profile, alias_dict, data, db_results[alias])
+                    if itemtype in ['file_fastq', 'file_processed']:
+                        if 'filename' in patch_data or db_results[alias]['status'] in ['upload failed', 'to be uploaded by workflow']:
+                            patch_data['status'] = 'uploading'
+                    error = validate_item(virtualapp, patch_data, 'patch', itemtype,
+                                          all_aliases, atid=db_results[alias]['@id'])
+                    if error:  # do something to report validation errors
+                        if itemtype not in ['case', 'report']:
+                            for e in error:
+                                if row:
+                                    errors.append('Row {} {} - Error found: {}'.format(row, itemtype, e))
+                                else:
+                                    errors.append('{} {} - Error found: {}'.format(itemtype, alias, e))
+                            validation_results[itemtype]['errors'] += 1
+                    elif fname and fname in ''.join(json_data['errors']):
                         validation_results[itemtype]['errors'] += 1
-                elif json_data[itemtype][alias].get('filename') and \
-                        json_data[itemtype][alias]['filename'] in ''.join(json_data['errors']):
-                    validation_results[itemtype]['errors'] += 1
-                else:  # patch
-                    json_data_final['patch'].setdefault(itemtype, {})
-                    if patch_data:
-                        json_data_final['patch'][itemtype][db_results[alias]['@id']] = patch_data
-                    elif itemtype not in ['case', 'report', 'sample_processing', 'file_fastq']:
-                        item_name = alias[alias.index(':')+1:]
-                        if item_name.startswith(itemtype + '-'):
-                            item_name = item_name[item_name.index('-') + 1:]
-                        if itemtype == 'family':
-                            item_name = 'family for ' + item_name
-                        else:
-                            item_name = itemtype + ' ' + item_name
-                        output.append('{} - Item already in database, no changes needed'.format(item_name))
-                    # do something to record response
-                    validation_results[itemtype]['validated'] += 1
+                    else:  # patch
+                        json_data_final['patch'].setdefault(itemtype, {})
+                        if patch_data:
+                            json_data_final['patch'][itemtype][db_results[alias]['@id']] = patch_data
+                        elif itemtype not in ['case', 'report', 'sample_processing', 'file_fastq']:
+                            item_name = alias[alias.index(':')+1:]
+                            if item_name.startswith(itemtype + '-'):
+                                item_name = item_name[item_name.index('-') + 1:]
+                            if itemtype == 'family':
+                                item_name = 'family for ' + item_name
+                            else:
+                                item_name = itemtype + ' ' + item_name
+                            output.append('{} - Item already in database, no changes needed'.format(item_name))
+                        # do something to record response
+                        validation_results[itemtype]['validated'] += 1
     output.extend([error for error in errors])
     for itemtype in validation_results:
         output.append('{} items: {} validated; {} errors'.format(
