@@ -16,7 +16,7 @@ import subprocess
 import sys
 
 from pkg_resources import resource_filename
-from pyramid.paster import get_app  # , get_appsettings
+from pyramid.paster import get_app, get_appsettings
 from pyramid.path import DottedNameResolver
 from snovault.elasticsearch import create_mapping
 from snovault.tests import elasticsearch_fixture, postgresql_fixture
@@ -98,7 +98,7 @@ def run(app_name, config_uri, datadir, clear=False, init=False, load=False, inge
 
     # get the config and see if we want to connect to non-local servers
     # TODO: This variable seems to not get used? -kmp 25-Jul-2020
-    # config = get_appsettings(config_uri, app_name)
+    config = get_appsettings(config_uri, app_name)
 
     datadir = os.path.abspath(datadir)
     pgdata = os.path.join(datadir, 'pgdata')
@@ -115,19 +115,6 @@ def run(app_name, config_uri, datadir, clear=False, init=False, load=False, inge
 
     processes = []
 
-    postgres = postgresql_fixture.server_process(pgdata, echo=True)
-    processes.append(postgres)
-
-    elasticsearch = elasticsearch_fixture.server_process(esdata, echo=True)
-    processes.append(elasticsearch)
-
-    nginx = nginx_server_process(echo=True)
-    processes.append(nginx)
-
-    if ingest:
-        ingestion_listener = ingestion_listener_process(config_uri, app_name)
-        processes.append(ingestion_listener)
-
     @atexit.register
     def cleanup_process():
         for process in processes:
@@ -140,6 +127,28 @@ def run(app_name, config_uri, datadir, clear=False, init=False, load=False, inge
             except IOError:
                 pass
             process.wait()
+
+    postgres = postgresql_fixture.server_process(pgdata, echo=True)
+    processes.append(postgres)
+
+    es_server_url = config.get('elasticsearch.server', "localhost")
+
+    if ("127.0.0.1" in es_server_url or "localhost" in es_server_url):
+        # Bootup local ES server subprocess. Else assume connecting to remote ES cluster.
+        elasticsearch = elasticsearch_fixture.server_process(esdata, echo=True)
+        processes.append(elasticsearch)
+    elif not config.get('indexer.namespace'):
+        raise Exception("It looks like are connecting to remote elasticsearch.server but no indexer.namespace is defined.")
+    elif not config.get("elasticsearch.aws_auth", False):
+        # TODO detect if connecting to AWS or not before raising an Exception.
+        print("WARNING - elasticsearch.aws_auth is set to false. Connection will fail if connecting to remote ES cluster on AWS.")
+
+    nginx = nginx_server_process(echo=True)
+    processes.append(nginx)
+
+    if ingest:
+        ingestion_listener = ingestion_listener_process(config_uri, app_name)
+        processes.append(ingestion_listener)
 
     if init:
         app = get_app(config_uri, app_name)

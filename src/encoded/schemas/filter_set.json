@@ -86,6 +86,13 @@
                     }
                 }
             }
+        },
+        "created_in_case_accession": {
+            "title" : "Created in Case Accession",
+            "description": "Case in context of which this FilterSet was originally created.",
+            "notes": "Maybe eventually this could be 'case_accession_contexts' (list of accessions) or something of all Cases this is used for if multiple.",
+            "type" : "string",
+            "format": "accession"
         }
     }
 }
