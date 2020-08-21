@@ -260,22 +260,49 @@ class Auth0AuthenticationPolicy(CallbackAuthenticationPolicy):
         return None
 
 
+# def get_jwt(request):
+#     token = None
+#     try:
+#         # ensure this is a jwt token not basic auth:
+#         auth_type = request.headers['Authorization'][:6]
+#         if auth_type.strip().lower() == 'bearer':
+#             token = request.headers['Authorization'][7:]
+#     except (ValueError, TypeError, KeyError):
+#         pass
+#
+#     if not token and request.method in ('GET', 'HEAD'):
+#         # Only grab this if is a GET request, not a transactional request to help mitigate CSRF attacks.
+#         # See: https://en.wikipedia.org/wiki/Cross-site_request_forgery#Cookie-to-header_token
+#         # The way our JS grabs and sticks JWT into Authorization header is somewhat analogous to above approach.
+#         # TODO: Ensure our `Access-Control-Allow-Origin` response headers are appropriate (more for CGAP).
+#         # TODO: Get a security audit done.
+#         token = request.cookies.get('jwtToken')
+#
+#     return token
+
+
 def get_jwt(request):
+
     token = None
+
+    # First try to obtain JWT from headers
     try:
-        # ensure this is a jwt token not basic auth:
-        auth_type = request.headers['Authorization'][:6]
-        if auth_type.strip().lower() == 'bearer':
-            token = request.headers['Authorization'][7:]
-    except (ValueError, TypeError, KeyError):
+        # Ensure this is a JWT token, not basic auth.
+        # Per https://developer.mozilla.org/en-US/docs/Web/HTTP/Authentication and
+        # https://tools.ietf.org/html/rfc6750, JWT is introduced by 'bearer', as in
+        #   Authorization: Bearer something.something.something
+        # rather than, for example, the 'basic' key information, which as discussed in
+        # https://tools.ietf.org/html/rfc7617 is base64 encoded and looks like:
+        #   Authorization: Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==
+        # See also https://jwt.io/introduction/ for other info specific to JWT.
+        [auth_type, auth_data] = request.headers['Authorization'].strip().split(' ', 1)
+        if auth_type.lower() == 'bearer':
+            token = auth_data.strip()  # The spec says exactly one space, but then a token, so spaces don't matter
+    except Exception:
         pass
 
-    if not token and request.method in ('GET', 'HEAD'):
-        # Only grab this if is a GET request, not a transactional request to help mitigate CSRF attacks.
-        # See: https://en.wikipedia.org/wiki/Cross-site_request_forgery#Cookie-to-header_token
-        # The way our JS grabs and sticks JWT into Authorization header is somewhat analogous to above approach.
-        # TODO: Ensure our `Access-Control-Allow-Origin` response headers are appropriate (more for CGAP).
-        # TODO: Get a security audit done.
+    # If the JWT is not in the headers, get it from cookies
+    if not token:
         token = request.cookies.get('jwtToken')
 
     return token
