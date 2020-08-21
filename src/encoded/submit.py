@@ -1,4 +1,5 @@
 import ast
+from copy import deepcopy
 import datetime
 import json
 import xlrd
@@ -43,6 +44,7 @@ GENERIC_FIELD_MAPPING = {
 ABBREVS = {
     'male': 'M',
     'female': 'F',
+    'unknown': 'U',
     'yes': 'Y',
     'no': 'N',
     'p': 'proband',
@@ -185,7 +187,6 @@ def xls_to_json(xls_data, project, institution):
     case_names = {}
     for i, row in enumerate(rows):
         debuglog("row:", repr(row))  # Temporary instrumentation for debugging to go away soon. -kmp 25-Jul-2020
-        print(row)
         row_num = i + counter + 1
         missing_required = [col for col in required if col not in row or not row[col]]
         if missing_required:
@@ -227,7 +228,6 @@ def xls_to_json(xls_data, project, institution):
     # create SampleProcessing item for trio/group if needed
     # items = create_sample_processing_groups(items, sp_alias)
     items = add_relations(items)
-    print(case_names)
     items = create_case_items(items, project['name'], case_names)
     # removed unused fields, add project and institution
     for val1 in items.values():
@@ -409,14 +409,13 @@ def fetch_file_metadata(idx, filenames, proj_name):
                 files['errors'].append('File extension on {} not supported - expecting one of: '
                               '.fastq.gz, .fq.gz, .cram, .vcf.gz'.format(filename))
             continue
-        file_alias = '{}:{}'.format(proj_name, filename.lstrip(' '))
+        file_alias = '{}:{}'.format(proj_name, filename.strip().split('/')[-1])
         fmt = valid_extensions[extension[0]][0]
         file_info = {
             'aliases': [file_alias],
             'row': idx,
             'file_format': '/file-formats/{}/'.format(fmt),
             'file_type': valid_extensions[extension[0]][1],
-            'status': 'uploading',
             'filename': filename.strip()  # causes problems without functional file upload
         }
         if fmt == 'fastq':
@@ -428,7 +427,6 @@ def fetch_file_metadata(idx, filenames, proj_name):
 
 def create_case_items(items, proj_name, case_name_dict):
     new_items = items.copy()
-    print(json.dumps(items, indent=4))
     for k, v in items['sample_processing'].items():
         analysis_id = k[k.index('analysis-')+9:]
         for sample in v['samples']:
@@ -437,7 +435,6 @@ def create_case_items(items, proj_name, case_name_dict):
                 name = True
                 case_id = case_name_dict[case_id]
             case_alias = '{}:case-{}'.format(proj_name, case_id)
-            print([val.get('samples') for val in items['individual'].values()])
             try:
                 indiv = [ikey for ikey, ival in items['individual'].items() if sample in ival.get('samples', [])][0]
             except IndexError:
@@ -500,16 +497,19 @@ def compare_with_db(virtualapp, alias):
 
 
 def validate_item(virtualapp, item, method, itemtype, aliases, atid=None):
+    data = deepcopy(item)
+    if data.get('filename'):
+        del data['filename']
     if method == 'post':
         try:
-            validation = virtualapp.post_json('/{}/?check_only=true'.format(itemtype), item)
+            validation = virtualapp.post_json('/{}/?check_only=true'.format(itemtype), data)
         except (AppError, VirtualAppError) as e:
             return parse_exception(e, aliases)
         else:
             return
     elif method == 'patch':
         try:
-            validation = virtualapp.patch_json(atid + '?check_only=true', item, status=200)
+            validation = virtualapp.patch_json(atid + '?check_only=true', data, status=200)
         except (AppError, VirtualAppError) as e:
             return parse_exception(e, aliases)
         else:
@@ -573,6 +573,12 @@ def map_enum_options(fieldname, error_message):
 def compare_fields(profile, aliases, json_item, db_item):
     to_patch = {}
     for field in json_item:
+        if field == 'filename':
+            if (db_item.get('status') in ['uploading', 'upload failed', 'to be uploaded by workflow'] or
+                        json_item['filename'].split('/')[-1] != db_item.get('filename')):
+                to_patch['filename'] = json_item['filename']
+                to_patch['status'] = 'uploading'
+            continue
         # if not an array, patch field gets overwritten (if different from db)
         if profile['properties'][field]['type'] != 'array':
             val = json_item[field]
@@ -649,8 +655,8 @@ def validate_all_items(virtualapp, json_data):
                 if row:
                     del data['row']
                 fname = json_data[itemtype][alias].get('filename')
-                if fname:  # until we have functional file upload
-                    del data['filename']
+                # if fname:  # until we have functional file upload
+                #     del data['filename']
                 if not db_results.get(alias):
                     error = validate_item(virtualapp, data, 'post', itemtype, all_aliases)
                     if error:  # modify to check for presence of validation errors
@@ -681,7 +687,7 @@ def validate_all_items(virtualapp, json_data):
                     # TODO: profile is only conditionally assigned in an "if" above. -kmp 25-Jul-2020
                     patch_data = compare_fields(profile, alias_dict, data, db_results[alias])
                     if itemtype in ['file_fastq', 'file_processed']:
-                        if 'filename' in patch_data or db_results[alias]['status'] in ['upload failed', 'to be uploaded by workflow']:
+                        if 'filename' in patch_data:
                             patch_data['status'] = 'uploading'
                     error = validate_item(virtualapp, patch_data, 'patch', itemtype,
                                           all_aliases, atid=db_results[alias]['@id'])
