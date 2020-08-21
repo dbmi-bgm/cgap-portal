@@ -227,6 +227,7 @@ def xls_to_json(xls_data, project, institution):
     # create SampleProcessing item for trio/group if needed
     # items = create_sample_processing_groups(items, sp_alias)
     items = add_relations(items)
+    print(case_names)
     items = create_case_items(items, project['name'], case_names)
     # removed unused fields, add project and institution
     for val1 in items.values():
@@ -429,6 +430,7 @@ def create_case_items(items, proj_name, case_name_dict):
         for sample in v['samples']:
             case_id = '{}-{}'.format(analysis_id, items['sample'][sample]['specimen_accession'])
             if case_id in case_name_dict:
+                name = True
                 case_id = case_name_dict[case_id]
             case_alias = '{}:case-{}'.format(proj_name, case_id)
             print([val.get('samples') for val in items['individual'].values()])
@@ -442,6 +444,8 @@ def create_case_items(items, proj_name, case_name_dict):
                 'sample_processing': k,
                 'individual': indiv
             }
+            if name:
+                case_info['case_id'] = case_id
             if sample in items['reports']:
                 report_alias = case_alias.replace('case', 'report')
                 new_items['report'][report_alias] = {'aliases': [report_alias]}
