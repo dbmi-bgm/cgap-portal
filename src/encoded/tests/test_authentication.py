@@ -101,3 +101,6 @@ class TestNamespacedAuthenticationPolicy(unittest.TestCase):
         result = policy.forget(request)
         self.assertEqual(request.session.get('userid'), None)
         self.assertEqual(result, [])
+
+
+# NOTE: Tests of get_jwt are in test_auth0.py
