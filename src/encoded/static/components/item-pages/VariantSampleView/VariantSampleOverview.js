@@ -160,7 +160,7 @@ function VariantSampleOverviewTabView(props){
     } else if (currentTab === "Gene") {
         tabViewBody = <GeneTabBody {...{ context, schemas, currentGeneItem, currentGeneItemLoading }} />;
     } else if (currentTab === "Sample") {
-        tabViewBody = <SampleTabBody {...{ context, loadedSampleItem, sampleItemLoading }} />;
+        tabViewBody = <SampleTabBody {...{ context, schemas, loadedSampleItem, sampleItemLoading }} />;
     }
 
     const onClick = useMemo(function(){

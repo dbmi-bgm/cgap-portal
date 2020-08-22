@@ -1,11 +1,32 @@
 'use strict';
 
-import React from 'react';
+import React, { useMemo } from 'react';
 import PropTypes from 'prop-types';
+import { schemaTransforms } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 
 
 export function SampleTabBody(props){
     console.log("sampleTabBodyProps", props);
+
+    const { context = null, schemas } = props;
+    const {
+        GQ : genotypeQuality = null,
+        QUAL: variantQuality = null,
+        PL: genotypeLikelihood = null,
+        FS: strandFisherScore = null,
+        uuid = null
+    } = context || {};
+
+    // Should probably define this in VariantSampleOverview and pass down to the tabs, since its being used in all 3 so far
+    const getTipForField = useMemo(function(){
+        if (!schemas) return function(){ return null; };
+        // Helper func to basically just shorten `schemaTransforms.getSchemaProperty(field, schemas, itemType);`.
+        return function(field, itemType = "VariantSample"){
+            // Func is scoped within GeneTabBody (uses its 'schemas')
+            const schemaProperty = schemaTransforms.getSchemaProperty(field, schemas, itemType);
+            return (schemaProperty || {}).description || null;
+        };
+    }, [ schemas ]);
     return (
         <div className="variant-tab-body card-body">
             <div className="row">
@@ -18,7 +39,7 @@ export function SampleTabBody(props){
                             </h4>
                         </div>
                         <div className="info-body overflow-auto">
-                            <QualityTable />
+                            <QualityTable {...{ uuid, genotypeQuality, genotypeLikelihood, variantQuality, strandFisherScore, getTipForField }} />
                         </div>
                     </div>
                 </div>
@@ -32,7 +53,7 @@ export function SampleTabBody(props){
                         </div>
                         <div className="info-body overflow-auto">
                             View BAM Snapshot
-                            <a href="#" className="d-block pt-2" style={{ textAlign: "center", margin: "0 auto" }}>
+                            <a href={`/${uuid}/@@download`} className="d-block pt-2" style={{ textAlign: "center", margin: "0 auto" }}>
                                 <i className="icon icon-fw icon-2x icon-external-link-alt fas" />
                             </a>
                         </div>
@@ -74,7 +95,8 @@ export function SampleTabBody(props){
 }
 
 
-function QualityTable(){
+function QualityTable(props){
+    const { genotypeLikelihood, genotypeQuality, variantQuality, strandFisherScore, getTipForField } = props;
     return (
         <table className="w-100">
             <thead>
@@ -87,25 +109,32 @@ function QualityTable(){
             <tbody>
                 <tr className="border-top">
                     <td className="text-600 text-left">Variant Quality</td>
-                    <td className="text-left">35.86</td>
-                    <td className="text-left">phred-scaled quality score for assertion made in ALT (multi-sample)</td>
+                    <td className="text-left">{ variantQuality }</td>
+                    <td className="text-left">{ getTipForField("QUAL") }</td>
                 </tr>
                 <tr>
                     <td className="text-600 text-left">Genotype Quality</td>
-                    <td className="text-left">44</td>
-                    <td className="text-left">phred-scaled quality score that the genotype is accurate [min(99,PL(max)-PL(second))]</td>
+                    <td className="text-left">{ genotypeQuality }</td>
+                    <td className="text-left">{ getTipForField("GQ") }</td>
                 </tr>
                 <tr>
                     <td className="text-600 text-left">Genotype Likelihoods(0/0,0/1,1/1)</td>
-                    <td className="text-left">44,9,529</td>
-                    <td className="text-left">phred-scaled likelihoods for genotype (Ref/Ref, Ref/Alt, Alt/Alt)</td>
+                    <td className="text-left">{ genotypeLikelihood }</td>
+                    <td className="text-left">{ getTipForField("PL") }</td>
                 </tr>
                 <tr>
                     <td className="text-600 text-left">Strand Fisher Score</td>
-                    <td className="text-left">0.5</td>
-                    <td className="text-left">Fisher strand score</td>
+                    <td className="text-left">{ strandFisherScore }</td>
+                    <td className="text-left">{ getTipForField("FS") }</td>
                 </tr>
             </tbody>
         </table>
     );
 }
+QualityTable.propTypes = {
+    genotypeLikelihood: PropTypes.string,
+    genotypeQuality: PropTypes.string,
+    variantQuality: PropTypes.string,
+    strandFisherScore: PropTypes.string,
+    getTipForField: PropTypes.func
+};
