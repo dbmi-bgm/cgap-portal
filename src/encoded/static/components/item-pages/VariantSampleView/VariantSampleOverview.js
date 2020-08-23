@@ -22,7 +22,6 @@ export class VariantSampleOverview extends React.PureComponent {
     constructor(props){
         super(props);
         this.loadGene = this.loadGene.bind(this);
-        this.loadSample = this.loadSample.bind(this);
         this.onSelectTranscript = this.onSelectTranscript.bind(this);
         const {
             context: {
@@ -51,15 +50,12 @@ export class VariantSampleOverview extends React.PureComponent {
             currentTranscriptIdx: initialIndex,
             currentGeneItem: null,
             currentGeneItemLoading: false,
-            loadedSampleItem: null,
-            sampleItemLoading: false
         };
         this.loadedGeneCache = {};
     }
 
     componentDidMount(){
         this.loadGene();
-        this.loadSample();
     }
 
     componentDidUpdate(pastProps, pastState){
@@ -101,39 +97,18 @@ export class VariantSampleOverview extends React.PureComponent {
         });
     }
 
-    loadSample(){
-        const { context: { 'CALL_INFO' : sample_id = null } = {} } = this.props;
-        const { loaded_sample_item } = this.state;
-
-        if (sample_id && !loaded_sample_item) {
-            console.log("loading sample:", sample_id);
-            this.setState({ sampleItemLoading : true }, ()=>{
-                ajax.load(`/search/?type=Sample&bam_sample_id=${sample_id}`, (response)=>{
-                    // May be multiple results, picking 1st one for now (may update later to check each one)
-                    const { '@graph': [sampleItem = null] = [] } = response;
-                    console.log("loaded sample item:", sampleItem);
-                    this.setState({ loadedSampleItem: sampleItem, sampleItemLoading : false });
-                });
-            });
-        } else if (!sample_id) {
-            throw new Error("No Sample Id found for this VariantSample...");
-        }
-        // else, sample already loaded (currently do nothing, but
-        // maybe later do a refresh if it has been a while since original sample load)
-    }
-
     onSelectTranscript(transcriptIndex){
         this.setState({ currentTranscriptIdx: parseInt(transcriptIndex) });
     }
 
     render(){
         const { context, schemas } = this.props;
-        const { currentTranscriptIdx, currentGeneItem, currentGeneItemLoading, loadedSampleItem, sampleItemLoading } = this.state;
+        const { currentTranscriptIdx, currentGeneItem, currentGeneItemLoading } = this.state;
         return (
             <div className="sample-variant-overview sample-variant-annotation-space-body">
                 {/* BA1, BS1, BS2, BS3 etc markers here */}
                 <VariantSampleInfoHeader { ...{ context, schemas, currentTranscriptIdx, currentGeneItemLoading, currentGeneItem }} onSelectTranscript={this.onSelectTranscript} />
-                <VariantSampleOverviewTabView {...{ context, schemas, currentGeneItem, currentGeneItemLoading, loadedSampleItem, sampleItemLoading }} />
+                <VariantSampleOverviewTabView {...{ context, schemas, currentGeneItem, currentGeneItemLoading }} />
             </div>
         );
     }
@@ -150,7 +125,7 @@ function getCurrentTranscriptGeneID(context, transcriptIndex){
 
 /** @todo probably eventually move into own file, along w child tabs */
 function VariantSampleOverviewTabView(props){
-    const { context, schemas, currentGeneItem, currentGeneItemLoading, loadedSampleItem, sampleItemLoading } = props;
+    const { context, schemas, currentGeneItem, currentGeneItemLoading } = props;
     const [ currentTab, setCurrentTab ] = useState("Variant");
 
     // TODO change eventually to use 'if' condition or something and distribute props as needed.
@@ -160,7 +135,7 @@ function VariantSampleOverviewTabView(props){
     } else if (currentTab === "Gene") {
         tabViewBody = <GeneTabBody {...{ context, schemas, currentGeneItem, currentGeneItemLoading }} />;
     } else if (currentTab === "Sample") {
-        tabViewBody = <SampleTabBody {...{ context, schemas, loadedSampleItem, sampleItemLoading }} />;
+        tabViewBody = <SampleTabBody {...{ context, schemas }} />;
     }
 
     const onClick = useMemo(function(){
