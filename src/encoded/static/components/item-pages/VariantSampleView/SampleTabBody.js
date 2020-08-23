@@ -14,7 +14,9 @@ export function SampleTabBody(props){
         QUAL: variantQuality = null,
         PL: genotypeLikelihood = null,
         FS: strandFisherScore = null,
-        uuid = null
+        novoPP = null,
+        uuid = null,
+        cmphet = []
     } = context || {};
 
     // Should probably define this in VariantSampleOverview and pass down to the tabs, since its being used in all 3 so far
@@ -39,7 +41,7 @@ export function SampleTabBody(props){
                             </h4>
                         </div>
                         <div className="info-body overflow-auto">
-                            <QualityTable {...{ uuid, genotypeQuality, genotypeLikelihood, variantQuality, strandFisherScore, getTipForField }} />
+                            <QualityTable {...{ genotypeQuality, genotypeLikelihood, variantQuality, strandFisherScore, getTipForField }} />
                         </div>
                     </div>
                 </div>
@@ -85,7 +87,10 @@ export function SampleTabBody(props){
                             </h4>
                         </div>
                         <div className="info-body overflow-auto">
-                            TODO
+                            <h5>DeNovo</h5>
+                            <DeNovoTable {...{ novoPP, getTipForField }}/>
+                            <h5>Compound Heterozygous</h5>
+                            <CompoundHetTable {...{ cmphet }} />
                         </div>
                     </div>
                 </div>
@@ -137,4 +142,76 @@ QualityTable.propTypes = {
     variantQuality: PropTypes.string,
     strandFisherScore: PropTypes.string,
     getTipForField: PropTypes.func
+};
+
+function DeNovoTable(props) {
+    const { getTipForField, novoPP } = props;
+    return (
+        <table className="w-100">
+            <thead>
+                <tr>
+                    <th className="text-left">Inheritance Mode</th>
+                    <th className="text-left">Score</th>
+                    <th className="text-left">Definition</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr className="border-top">
+                    <td className="text-600 text-left">NovoCaller</td>
+                    <td className="text-left">{ novoPP }</td>
+                    <td className="text-left">{ getTipForField("novoPP") }</td>
+                </tr>
+            </tbody>
+        </table>
+    );
+}
+DeNovoTable.propTypes = {
+    getTipForField: PropTypes.func,
+    novoPP: PropTypes.string
+};
+
+function CompoundHetTable(props) {
+    const { cmphet } = props;
+
+    return (
+        <table className="w-100">
+            <thead>
+                <tr>
+                    <th className="text-left">Variant</th>
+                    <th className="text-left">Phase</th>
+                    <th className="text-left">Gene</th>
+                    <th className="text-left">Impact</th>
+                    <th className="text-left">Transcript</th>
+                    <th className="text-left">Impact Transcript</th>
+                </tr>
+            </thead>
+            <tbody>
+                { cmphet.map((obj, i) => {
+                    const {
+                        comhet_mate_variant: variant = null,
+                        comhet_phase: phase = null,
+                        comhet_gene: gene = null,
+                        comhet_impact_gene: impactGene = null,
+                        comhet_transcript: transcript = null,
+                        comhet_impact_transcript: impactTranscript = null,
+                    } = obj;
+
+                    return (
+                        <tr key={i} className="border-top">
+                            <td className="text-600 text-left">{ variant }</td>
+                            <td className="text-left">{ phase }</td>
+                            <td className="text-left">{ gene }</td>
+                            <td className="text-left">{ impactGene }</td>
+                            <td className="text-left">{ transcript }</td>
+                            <td className="text-left">{ impactTranscript }</td>
+                        </tr>
+                    );
+                })}
+            </tbody>
+        </table>
+    );
+}
+CompoundHetTable.propTypes = {
+    getTipForField: PropTypes.func,
+    cmphet: PropTypes.array
 };
