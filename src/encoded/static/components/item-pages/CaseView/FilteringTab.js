@@ -148,7 +148,7 @@ export function FilteringTabSubtitle(props){
     // Case is reindexed. Maybe/hopefully Case will reindex fast enough that won't worry about keeping state.lastFilterSaved around
     // until updated Case `context`/`caseItem` with updated `active_filterset` arrives. At which point could prly just remove state.lastFilterSaved
     // and do ~ function doPatch(){ setIsLoading(true); PATCH.. } ... -> ... useEffect(func(){ setIsLoading(false); }[ active_filterset ])
-    if (active_filterset && lastFilterSetSaved && lastFilterSetSaved !== active_filterset && lastFilterSetSaved.last_modified.date_modified < active_filterset.last_modified.date_modified) {
+    if (active_filterset && lastFilterSetSaved !== active_filterset && (!lastFilterSetSaved || lastFilterSetSaved.last_modified.date_modified < active_filterset.last_modified.date_modified)) {
         setLastFilterSetSaved(active_filterset);
     }
 
