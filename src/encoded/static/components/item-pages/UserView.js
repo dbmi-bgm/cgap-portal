@@ -7,7 +7,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import _ from 'underscore';
 import Modal from 'react-bootstrap/esm/Modal';
-import FormControl from 'react-bootstrap/esm/FormControl';
 
 import { console, object, JWT, ajax, navigate } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { LocalizedTime } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/LocalizedTime';
@@ -15,7 +14,6 @@ import { Alerts } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/
 import { EditableField, FieldSet } from '@hms-dbmi-bgm/shared-portal-components/es/components/forms/components/EditableField';
 
 import { store } from './../../store';
-import { FormattedInfoBlock } from './components/FormattedInfoBlock';
 import { OnlyTitle, PageTitleContainer, pageTitleViews } from './../PageTitleSection';
 
 // eslint-disable-next-line no-unused-vars
@@ -621,6 +619,7 @@ class ProfileWorkFields extends React.PureComponent {
                         { role || <span className="not-set">No Job Title</span> }
                     </div>
                 </div>
+                {/*
                 <div className="row field-entry submits_for">
                     <div className="col-md-3 text-right text-left-xs">
                         <label htmlFor="submits_for">Submits For</label>
@@ -649,6 +648,7 @@ class ProfileWorkFields extends React.PureComponent {
                         />
                     </div>
                 </div>
+                */}
             </div>
         );
     }
@@ -656,10 +656,7 @@ class ProfileWorkFields extends React.PureComponent {
 }
 
 
-/**
- * @private
- * @type {Component}
- */
+
 class BasicForm extends React.PureComponent {
 
     constructor(props){
@@ -689,8 +686,7 @@ class BasicForm extends React.PureComponent {
         const { value } = this.state;
         return(
             <form onSubmit={this.handleSubmit}>
-                <FormControl className="mt-08" type="text" placeholder="Enter an email to impersonate..."
-                    onChange={this.handleChange} value={value}/>
+                <input type="text" className="mt-08 form-control" onChange={this.handleChange} value={value} placeholder="Enter an email to impersonate..." />
                 <button type="submit" className="btn btn-primary btn-md mt-15">
                     <i className="icon icon-fw icon-user icon-user-ninja fas"/>&nbsp; Impersonate
                 </button>
@@ -701,31 +697,16 @@ class BasicForm extends React.PureComponent {
 }
 
 
-/**
- * @private
- * @type {Component}
- */
-export class ImpersonateUserForm extends React.PureComponent {
-
-    static propTypes = {
-        'updateUserInfo': PropTypes.func.isRequired
-    };
-
-    constructor(props){
-        super(props);
-        this.handleSubmit = this.handleSubmit.bind(this);
-    }
+export function ImpersonateUserForm({ updateUserInfo }) {
 
     /**
      * Handler for Impersonate User submit button/action.
      * Performs AJAX request to '/impersonate-user' endpoint then saves returned JWT
      * as own and in order to pretend to be impersonated user.
      *
-     * @instance
      * @param {Object} data - User ID or email address.
      */
-    handleSubmit(data) {
-        const { updateUserInfo } = this.props;
+    const onSubmit = function(data){
         const url = "/impersonate-user";
         const postData = { 'userid' : data };
         const callbackFxn = (resp) => {
@@ -753,23 +734,20 @@ export class ImpersonateUserForm extends React.PureComponent {
         //    reqHeaders['Authorization'] = 'Bearer '+idToken;
         //}
         ajax.load(url, callbackFxn, 'POST', fallbackFxn, JSON.stringify(postData));
-    }
+    };
 
-    render() {
-        return (
-            <div className="mt-3 container" id="content">
-                <hr />
-                <h2 className="text-400 mt-5">Impersonate a User</h2>
-                <div className="row">
-                    <div className="col-12 col-lg-6">
-                        <BasicForm onSubmit={this.handleSubmit} />
-                    </div>
+    return (
+        <div className="mt-3 container" id="content">
+            <h2 className="text-400 mt-5">Impersonate a User</h2>
+            <div className="row">
+                <div className="col-12 col-lg-6">
+                    <BasicForm onSubmit={onSubmit} />
                 </div>
             </div>
-        );
-    }
-
+        </div>
+    );
 }
+
 
 
 /*** Page Tttles ***/

@@ -4,8 +4,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import _ from 'underscore';
 
-// import { Collapse } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/Collapse';
-// import { FlexibleDescriptionBox } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/FlexibleDescriptionBox';
 import { object, layout } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { StackedBlockTable, StackedBlock, StackedBlockList, StackedBlockName, StackedBlockNameLabel } from '@hms-dbmi-bgm/shared-portal-components/es/components/browse/components/StackedBlockTable';
 
@@ -36,19 +34,9 @@ export const CaseDetailPane = React.memo(function CaseDetailPane (props) {
     });
 
     return (
-        <div className="family-info-wrapper"> {/* Formerly experiment-set-info-wrapper*/}
-            <div className="family-addinfo"> {/* Formerly expset-addinfo */}
+        <div className="family-info-wrapper">
+            <div className="family-addinfo">
                 <div className="row">
-                    {/* <div className="col-md-6 addinfo-description-section">
-                        <FlexibleDescriptionBox
-                            windowWidth={windowWidth}
-                            description={ result.description }
-                            fitTo="self"
-                            textClassName="text-normal"
-                            dimensions={null}
-                            linesOfText={2}
-                        />
-                    </div> */}
                     <div className="col-md-6 addinfo-properties-section">
                         <div className="row mb-05 clearfix">
                             <div className="col-4 col-sm-3 text-500">
@@ -88,7 +76,10 @@ CaseDetailPane.defaultProps = {
     'minimumWidth' : 725,
 };
 
-
+/**
+ * Renders a collapsible button that opens to reveal a FamilyReportStackedTable containing information
+ * about each individual/sample/case in the current family.
+ */
 class FamilySection extends React.Component {
 
     constructor(props) {
@@ -133,9 +124,15 @@ class FamilySection extends React.Component {
 }
 
 /**
- * To be used within Case Search
+ * Used within Case Search
  *
  * Shows individuals within a passed-in family, as well as any sample analyses objects related to that Case.
+ * Takes in the current case item ('result' prop) and a single family associated with said case
+ * and renders a table containing all of the accessions/various IDs for each individual, sample,
+ * and report/case in that family. Result rows are sorted by individual (first proband, then individuals
+ * with samples, then the rest).
+ *
+ * TODO: highlight current case throughout the table using 'result' prop.
  */
 export class FamilyReportStackedTable extends React.PureComponent {
 
@@ -195,19 +192,21 @@ export class FamilyReportStackedTable extends React.PureComponent {
         this.renderIndividualBlockList = this.renderIndividualBlockList.bind(this);
     }
 
+    /**
+     * Renders an sample analysis block, and nested blocks for the reports and cases that use the current sample
+     * @param {object} sample               A single sample item/object
+     * @param {object} reportBlockMapping   Mapping of report atIDs to a JSX element representing a report block
+     * @param {object} caseToReportMap      Mapping of case atIDs to a report atID
+     *
+     * Mappings are created and passed in from this.renderIndividualBlock because of difficulty mapping
+     * samples to specific cases. Each case in Family.analysis_groups[i] is checked for the current sample.
+     * Once a case using this sample is found, caseToReportMap and reportBlockMapping are used to render a
+     * report block containing case AND report information.
+     */
     renderSampleBlock(sample, reportBlockMapping = null, caseToReportMap = null){
-        const { result = null, family = null } = this.props;
+        const { family = null } = this.props;
         const { analysis_groups: analysisGroups = [] } = family || {};
-        const { sample_processing = null } = result || {};
-        const { '@id': atId = null, workup_type = null, display_title = null, accession = null } = sample || {};
-        const { samples = [], completed_processes = [] } = sample_processing || {};
-
-        let blockValue = null;
-        samples.forEach((thisSample) => {
-            if (atId === thisSample['@id']) {
-                blockValue = completed_processes;
-            }
-        });
+        const { '@id': atId = null, workup_type = null, accession = null } = sample || {};
 
         return (
             <StackedBlock columnClass="libraries" hideNameOnHover={false} key={atId} id={atId}
@@ -219,7 +218,7 @@ export class FamilyReportStackedTable extends React.PureComponent {
                 </StackedBlockName>
                 <StackedBlockList className="analysis" title="Analysis">
                     {analysisGroups.map((group) => {
-                        const { analysis_type = null, samples = [], cases = [] } = group || {};
+                        const { analysis_type = null, cases = [] } = group || {};
                         let reportBlock = null;
 
                         // Figure out which report is associated with the current analysis group & sample
@@ -260,25 +259,18 @@ export class FamilyReportStackedTable extends React.PureComponent {
     }
 
     renderIndividualBlock(individual, role) {
-        // Break out useful values from result; used in determining whether the passed in individual === the result case individual
-        const { result = null, sample_processing = null, family = null } = this.props;
-        const { analysis_groups: analysisGroups = null } = family || {};
-        const { "@id": resultCaseAtId = null, individual: resultIndividual = null, report: resultReport = null, sample: resultSample = null } = result || {};
-        const { "@id": resultIndvAtId = null } = resultIndividual || {};
-        const { "@id": resultReportAtId = null } = resultReport || {};
-        const { "@id": resultSampleId = null } = resultSample || {};
-        const { procSamples = [], completed_processes = [] } = sample_processing || {};
-
-        // Passed in Individual
         const { "@id": atId = null, individual_id = null, display_title = null, case: cases = [], accession = null, samples: indvSamples = [] } = individual || {};
 
+        // reportToReportBlockMap maps report atIds to JSX elements rendering a report block containing case & report info.
+        // Note: in cases where there is a case but no report, a key with `case-{caseReportID}` is entered here, mapping to a report-less case block
         const reportToReportBlockMap = {};
-        const caseToReportMap = {};
+        const caseToReportMap = {}; // maps case atIds to report atIds
 
+        // Populate mappings with case and report info for rendering alongside appropriate samples in renderSampleBlock
         cases.forEach((currCase) => {
-            const { '@id': caseAtId = null, accession: caseAccession = null, case_title = null, sample = null, report = null } = currCase || {};
-            const { '@id': sampleAtId = null, accession: sampleAccession = null, workup_type = null } = sample || {};
-            const { '@id' : reportAtId = null, display_title : reportTitle = null, accession: reportAccession = null } = report || {};
+            const { '@id': caseAtId = null, case_title = null, sample = null, report = null } = currCase || {};
+            const { '@id': sampleAtId = null } = sample || {};
+            const { '@id' : reportAtId = null, display_title : reportTitle = null } = report || {};
 
             if (sampleAtId && reportAtId) {
                 reportToReportBlockMap[reportAtId] = (
@@ -294,7 +286,7 @@ export class FamilyReportStackedTable extends React.PureComponent {
                         </StackedBlockName>
                     </StackedBlock>);
                 caseToReportMap[caseAtId] = reportAtId;
-            } else {
+            } else { // render an appropriate block when there is a case but no report by mapping case+[caseAtID] : JSX block
                 reportToReportBlockMap['case-' + caseAtId] = (
                     <StackedBlock columnClass="report" hideNameOnHover={false} key={reportAtId} id={reportAtId}
                         label={<StackedBlockNameLabel title={null} accession={null} subtitleVisible/>}
@@ -353,9 +345,10 @@ export class FamilyReportStackedTable extends React.PureComponent {
             return samples.length > 0;
         }).value().reverse();
 
+        // Render each individual's block in according to relationship
         const indvBlocks = sortedMembers.map((familyMember) => {
             const { accession: currId = null, display_title = null } = familyMember;
-            const { relationship: currRelationship = null, sex: currSex = null } = relationshipMapping[currId] || {};
+            const { relationship: currRelationship = null } = relationshipMapping[currId] || {};
             return this.renderIndividualBlock(familyMember, currRelationship || display_title );
         });
 
@@ -397,9 +390,12 @@ export class FamilyReportStackedTable extends React.PureComponent {
 }
 
 /**
- * To be used within Case Search OR Accessioning tab on Case View
+ * Used within Accessioning tab on Case View
  *
- * Shows individuals within a passed-in family, as well as any sample analyses objects related to that Case.
+ * Takes in the current case item ('result' prop) and a single family associated with said case
+ * and renders a table containing all of the accessions/various IDs for each individual, sample,
+ * and report/case in that family. Current case is highlighted throughout the table, and results
+ * are sorted by individual (first proband, then individuals with samples, then the rest).
  */
 export class FamilyAccessionStackedTable extends React.PureComponent {
 
@@ -440,7 +436,7 @@ export class FamilyAccessionStackedTable extends React.PureComponent {
         'preventExpand'     : false
     };
 
-    static renderEmptyBlock(columnClass, depth) {
+    static renderEmptyBlock(columnClass) {
         return (
             <StackedBlock {...{ columnClass }} subtitleVisible={false}
                 label={<StackedBlockNameLabel title={null} accession={null} subtitle={null} subtitleVisible={false}/>}>
@@ -458,26 +454,28 @@ export class FamilyAccessionStackedTable extends React.PureComponent {
         this.renderIndividualBlockList = this.renderIndividualBlockList.bind(this);
     }
 
+    /**
+     * Renders a sample block, and nested blocks for the reports/cases that use the current sample
+     * @param {object} sample       A single sample item/object
+     * @param {array} reportBlocks  An array of pre-defined JSX elements containing markup
+     *                              for report/case blocks that use the current sample
+     *                              (logic for determining what blocks to map to what samples
+     *                              is located in this.renderIndividualBlock)
+     */
     renderSampleBlock(sample, reportBlocks = null){
         const { result } = this.props;
-        const { sample: resultSample = null, sample_processing = {} } = result;
-        const { samples = [], completed_processes = [] } = sample_processing;
+        const { sample: resultSample = null } = result;
         const { '@id': resultSampleAtId = null } = resultSample;
 
 
         const { '@id': atId = null, specimen_collection_date = null, specimen_type = null,
-            workup_type = null, display_title = null, accession = null, sequence_id = null,
+            workup_type = null, accession = null, sequence_id = null,
             bam_sample_id = null, other_specimen_ids, specimen_accession = null } = sample;
 
-        let blockValue = null;
-        samples.forEach((thisSample) => {
-            if (atId === thisSample['@id']) {
-                blockValue = completed_processes;
-            }
-        });
+        // Check if this is the current case
         const isSampleForResult = resultSampleAtId === atId;
 
-        const fullTable = (
+        const sampleAccessionTable = (
             <div className="w-100" style={{ maxWidth: "70%" }}>
                 <table className="accession-table w-100">
                     <tbody>
@@ -525,7 +523,6 @@ export class FamilyAccessionStackedTable extends React.PureComponent {
                 </table>
             </div>);
 
-
         return (
             <StackedBlock columnClass="libraries" hideNameOnHover={false} key={atId} id={atId}>
                 { (atId && workup_type) ?
@@ -535,7 +532,7 @@ export class FamilyAccessionStackedTable extends React.PureComponent {
                                 { workup_type }
                             </a>
                         </div>
-                        { fullTable }
+                        { sampleAccessionTable }
                     </StackedBlockName> :
                     <StackedBlockName>
                         { workup_type ? null : "No workup type found for sample"}
@@ -553,31 +550,43 @@ export class FamilyAccessionStackedTable extends React.PureComponent {
         );
     }
 
+    /**
+     * Renders a row for an individual, and then its nested sample and case/report blocks.
+     * @param {object} individual       The current row's individual item object
+     * @param {string} role             Relationship of the current individual to this family's proband
+     * @param {string} familyId         AtId for the family represented by this table
+     * @param {string} familyAccession  Accession for the family represented by this table
+     *
+     * Note: because an individual may be connected to many cases (which may or may not use the same samples),
+     * this method also contains logic for mapping the various samples this chosen individual may have to its
+     * various cases/associated reports. Individuals.cases[i].sample is compared to the current individual's samples
+     * to determine what samples are aligned with what cases, and render appropriate sample blocks
+     * (and nested case/report blocks).
+     */
     renderIndividualBlock(individual = null, role = null, familyId = null, familyAccession = null) {
-        // Break out useful values from result and family; used in determining whether the passed in individual === the result case individual
         const { result = null, family = null } = this.props;
         const { analysis_groups: analysisGroups = [] } = family || {};
+        const { "@id": resultCaseAtId = null } = result || {};
 
-        const { "@id": resultCaseAtId = null, individual: resultIndividual = null, report: resultReport = null, sample: resultSample = null } = result || {};
-        const { "@id": resultIndvAtId = null } = resultIndividual || {};
-        const { "@id": resultReportAtId = null } = resultReport || {};
-        const { "@id": resultSampleId = null } = resultSample || {};
-
-        // Passed in Individual
+        // Individual from params
         const { "@id": atId = null, individual_id = null, display_title = null, case: cases = [], accession = null, samples: indvSamples = [] } = individual || {};
 
+        // A mapping of sample @ids to an array of report/case blocks
         const sampleToCaseReportBlockMap = {};
 
+        // Generate a set of report/case blocks for each case
         cases.forEach((currCase) => {
             const { '@id': caseAtId = null, accession: caseAccession = null, case_title = null, sample = null, report = null } = currCase || {};
-            const { '@id': sampleAtId = null, accession: sampleAccession = null } = sample || {};
-            const { '@id' : reportAtId = null, display_title : reportTitle = null, accession: reportAccession = null } = report || {};
+            const { '@id': sampleAtId = null } = sample || {};
+            const { '@id' : reportAtId = null, accession: reportAccession = null } = report || {};
 
+            // Is this case the current case?
             const isResultCase = caseAtId === resultCaseAtId;
 
+            // Used as title for report/case block
             let analysisType = null;
 
-            // Search each analysis group for one with the current case to use as title
+            // Search each analysis group for one with the current case
             analysisGroups.forEach((analysisGroup) => {
                 const { cases: casesInAnalysisGroup = [], analysis_type = null } = analysisGroup || {};
                 casesInAnalysisGroup.forEach((agCase) => {
@@ -722,11 +731,11 @@ export class FamilyAccessionStackedTable extends React.PureComponent {
      * e.g. Individual's height is the combined height of its containing sample rows.
      *  _______________________________________________________
      * |                                                       |
-     * |             Sample Library       Analysis & Report    |
+     * |             Sequencing Libraries       Report         |
      * |                                                       |
      * | Individual  __________________________________________|
      * |                                                       |
-     * |             Sample Library       Analysis & Report    |
+     * |             Sequencing Libraries       Report         |
      * |                                                       |
      * |_______________________________________________________|
      *

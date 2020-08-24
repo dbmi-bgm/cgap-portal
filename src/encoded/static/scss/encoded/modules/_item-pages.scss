@@ -123,7 +123,7 @@ $tabbar-bg-color : #ececec !default;
 $tabbar-text-color : #333 !default;
 $tabbar-text-active-color: #000 !default;
 $tabbar-bg-active-color: #fff !default;
-// If override this, check e.g. CohortView Pedigree Tab height dimensioning (JS) since this 46px is accounted for in calculations
+// If override this, check e.g. CaseView Pedigree Tab height dimensioning (JS) since this 46px is accounted for in calculations
 $tabbar-height: 46px;
 
 .item-page-container {
@@ -335,12 +335,14 @@ $tabbar-height: 46px;
 }
 
 /*************************
-    Alerts - Shown differently on ItemPages than others
+	Alerts - Shown differently on ItemPages than others
+	(same styling also applied to homepage)
 **************************/
 
-#item-page-alerts-container {
-	position: relative;
-	z-index: 3;
+#full-alerts-container {
+	position: sticky;
+	z-index: 500;
+	top: 40px;
 	> .alerts {
 		> .alert {
 			margin-bottom: 0px;
@@ -1236,50 +1238,6 @@ $download-button-width : 100px;
 }
 
 
-/**********************************************************
-		     		Badges Tab View
-**********************************************************/
-
-$badge-item-min-height: 90px;
-
-.rc-tabs {
-
-	.badge-classification-group {
-		padding-top: 5px;
-		margin-bottom: 30px;
-
-		.badge-item {
-			padding-top: 15px;
-			padding-bottom: 15px;
-			min-height: $badge-item-min-height;
-
-			&:not(:last-child){
-				border-bottom: 1px solid #ddd;
-			}
-
-			.icon-col {
-				.icon-container > img {
-					max-width: 100%;
-					max-height: $badge-item-min-height;
-				}
-			}
-
-			.title-col {
-				display: flex;
-				align-items: center;
-
-				.messages-list {
-					padding-left: 32px;
-				}
-
-			}
-
-		}
-
-	}
-
-}
-
 
 /**********************************************************
 		     Embedded Static Sections
@@ -1712,13 +1670,12 @@ $badge-item-min-height: 90px;
 
 
 /**********************************************************
-			Processing Summary Table (CohortView)
+			Processing Summary Table (CaseView > Bioinfo Tab)
 **********************************************************/
 
 .item-page-container {
 
-	.case-summary-card-row,
-	.cohort-summary-card-row {
+	.case-summary-card-row{
 		display: flex;
 		flex-wrap: wrap;
 		margin: 0 -10px;
@@ -1748,7 +1705,6 @@ $badge-item-min-height: 90px;
 			flex-grow: 1;
 			flex-shrink: 0;
 			flex-basis: 100%;
-			> #cohort-stats,
 			> #case-stats {
 				min-height: 100%;
 			}
@@ -1792,8 +1748,7 @@ $badge-item-min-height: 90px;
 	
 	}
 
-	#case-overview-ped-link,
-	#cohort-overview-ped-link {
+	#case-overview-ped-link {
 		/* max-height: 336px; */
 		margin-left: 0;
 
@@ -2273,7 +2228,7 @@ $badge-item-min-height: 90px;
 		&[data-is-current-family="true"] {
 			> h4:first-child {
 				> i.icon {
-					color: $brand-primary;
+					color: $primary;
 				}
 			}
 		}
@@ -2285,7 +2240,7 @@ $badge-item-min-height: 90px;
 
 
 /**********************************************************
-  PedigreeViz View Tab (CohortView, IndividualView, ...)
+  PedigreeViz View Tab (CaseView, IndividualView, ...)
 **********************************************************/
 
 .item-page-container {

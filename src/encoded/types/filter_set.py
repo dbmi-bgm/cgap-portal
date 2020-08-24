@@ -10,7 +10,7 @@ FILTER_BLOCKS = 'filter_blocks'
 
 @collection(
     name='filter-sets',
-    unique_key='nexus:title',
+    unique_key='filter_set:title',
     properties={
         'title': 'Filter Sets',
         'description': 'Filter Set for combining multiple queries'
@@ -21,3 +21,6 @@ class FilterSet(Item):
     item_type = 'filter_set'
     schema = load_schema('encoded:schemas/filter_set.json')
     embedded_list = []
+
+    class Collection(Item.Collection):
+        pass

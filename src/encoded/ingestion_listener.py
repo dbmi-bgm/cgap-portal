@@ -25,11 +25,8 @@ from pyramid import paster
 from pyramid.request import Request
 from pyramid.response import Response
 from pyramid.view import view_config
-from requests.auth import HTTPBasicAuth
-from snovault import COLLECTIONS, Collection
-from snovault.crud_views import collection_add as sno_collection_add
-from snovault.embed import make_subrequest
-from snovault.schema_utils import validate_request
+from pyramid.httpexceptions import HTTPNotFound  # , HTTPConflict
+from pyramid.request import Request
 from snovault.util import debug_log
 from vcf import Reader
 from .commands.ingest_vcf import VCFParser
@@ -37,7 +34,8 @@ from .ingestion.common import register_path_content_type, DATA_BUNDLE_BUCKET, Su
 from .ingestion.exceptions import UnspecifiedFormParameter
 from .ingestion.processors import get_ingestion_processor
 from .types.ingestion import SubmissionFolio
-from .util import resolve_file_path, gunzip_content, debuglog, subrequest_item_creation
+from .util import resolve_file_path, gunzip_content, debuglog
+from .types.variant import build_variant_display_title, ANNOTATION_ID_SEP
 
 
 log = structlog.getLogger(__name__)
@@ -45,6 +43,8 @@ EPILOG = __doc__
 INGESTION_QUEUE = 'ingestion_queue'
 VARIANT_SCHEMA = resolve_file_path('./schemas/variant.json')
 VARIANT_SAMPLE_SCHEMA = resolve_file_path('./schemas/variant_sample.json')
+STATUS_QUEUED = 'Queued'
+STATUS_INGESTED = 'Ingested'
 
 
 def includeme(config):
@@ -176,13 +176,27 @@ def ingestion_status(context, request):
     }
 
 
-def patch_vcf_file_status(uuids):
+def patch_vcf_file_status(request, uuids):
     """ Patches VCF File status to 'Queued'
         NOTE: This process makes queue_ingestion not scale terribly well.
-              Batching above a certain number may result in 504.
+              Batching above a certain number may result in 504. There are
+              also permissions concerns here that are not dealt with.
     """
     for uuid in uuids:
-        pass  # XXX: How to best do this safely within a route? Async?
+        kwargs = {
+            'environ': request.environ,
+            'method': 'PATCH',
+            'content_type': 'application/json',
+            'POST': json.dumps({
+                'file_ingestion_status': STATUS_QUEUED
+            }).encode('utf-8')
+        }
+        subreq = Request.blank('/' + uuid, **kwargs)
+        resp = None
+        try:
+            resp = request.invoke_subrequest(subreq)
+        except HTTPNotFound:
+            log.error('Tried to patch %s but item does not exist: %s' % (uuid, resp))
 
 
 @view_config(route_name='queue_ingestion', request_method='POST', permission='index')
@@ -210,7 +224,7 @@ def enqueue_uuids_for_request(request, uuids, *, ingestion_type='vcf', override_
         response['notification'] = 'Success'
         response['number_queued'] = len(uuids)
         response['detail'] = 'Successfully queued the following uuids: %s' % uuids
-        patch_vcf_file_status(uuids)  # XXX: does nothing currently
+        patch_vcf_file_status(request, uuids)
     else:
         response['number_queued'] = len(uuids) - len(failed)
         response['detail'] = 'Some uuids failed: %s' % failed
@@ -422,8 +436,6 @@ class IngestionQueueManager:
 class IngestionListener:
     """ Organizes helper functions for the ingestion listener """
     POLL_INTERVAL = 10  # seconds between each poll
-    STATUS_QUEUED = 'Queued'
-    STATUS_INGESTED = 'Ingested'
 
     def __init__(self, vapp, _queue_manager=None, _update_status=None):
         self.vapp = vapp
@@ -486,11 +498,13 @@ class IngestionListener:
                 debuglog("Deleted messages")
                 break
 
-    def build_variant_link(self, variant):
+    @staticmethod
+    def build_variant_link(variant):
         """ This function takes a variant record and returns the corresponding UUID of this variant
             in the portal via search.
         """
-        annotation_id = 'chr%s:%s%s_%s' % (variant['CHROM'], variant['POS'], variant['REF'], variant['ALT'])
+        annotation_id = build_variant_display_title(variant['CHROM'], variant['POS'], variant['REF'], variant['ALT'],
+                                                    sep=ANNOTATION_ID_SEP)
         return annotation_id
 
     def build_and_post_variant(self, parser, record, project, institution):
@@ -499,11 +513,29 @@ class IngestionListener:
         variant['project'] = project
         variant['institution'] = institution
         parser.format_variant_sub_embedded_objects(variant)
-        self.vapp.post_json('/variant', variant, status=[201, 409])
+        try:
+            self.vapp.post_json('/variant', variant, status=201)
+        except Exception:  # XXX: HTTPConflict is thrown and should be caught but does not work
+            self.vapp.patch_json('/variant/%s' % build_variant_display_title(
+                variant['CHROM'],
+                variant['POS'],
+                variant['REF'],
+                variant['ALT'],
+                sep=ANNOTATION_ID_SEP
+            ), variant, status=200)
         return variant
 
-    def build_and_post_variant_samples(self, parser, record, project, institution, variant, file):
-        """ Helper method that builds and posts all variant_samples associated with a record """
+    def build_and_post_variant_samples(self, parser, record, project, institution, variant, file, sample_relations):
+        """ Helper method that builds and posts all variant_samples associated with a record
+
+            :param parser: handle to VCF Parser
+            :param record: record to parse
+            :param project: project to associate with samples
+            :param institution: institution to associate with samples
+            :param variant: associated variant metadata
+            :param file: vcf file accession
+            :param sample_relations: dictionary mapping call_info -> familial relation
+        """
         if variant is None:
             return
         variant_samples = parser.create_sample_variant_from_record(record)
@@ -513,10 +545,38 @@ class IngestionListener:
                 sample['institution'] = institution
                 sample['variant'] = self.build_variant_link(variant)  # make links
                 sample['file'] = file
+                call_info = sample['CALL_INFO']  # extract familial relation
+                if call_info in sample_relations:
+                    sample['familial_relations'] = sample_relations[call_info]
+
                 self.vapp.post_json('/variant_sample', sample, status=201)
             except Exception as e:
                 log.error('Encountered exception posting variant_sample: %s' % e)
                 continue
+
+    def search_for_sample_relations(self, vcf_file_accession):
+        """ Helper function for below that handles search aspect (and can be mocked) """
+        search_qs = '/search/?type=SampleProcessing&processed_files.accession=%s' % vcf_file_accession
+        search_result = []
+        try:
+            search_result = self.vapp.get(search_qs).json['@graph']
+        except Exception as e:
+            log.error('No sample_processing found for this VCF! Familial relations will be absent. Error: %s' % e)
+        if len(search_result) > 1:
+            log.error('Ambiguous sample_processing detected for vcf %s, search: %s' % (vcf_file_accession, search_qs))
+        return search_result
+
+    def extract_sample_relations(self, vcf_file_accession):
+        """ Extracts a dictionary of sample relationships based on the file metadata given. """
+        search_result = self.search_for_sample_relations(vcf_file_accession)
+        if len(search_result) == 1:
+            sample_relations, sample_procesing = {}, search_result[0]
+            sample_pedigrees = sample_procesing['sample_pedigrees']
+            for entry in sample_pedigrees:
+                relationship = entry.get('relationship', None)
+                if relationship is not None:
+                    sample_relations[entry['sample_name']] = relationship
+            return sample_relations
 
     def post_variants_and_variant_samples(self, parser, file_meta):
         """ Posts variants and variant_sample items given the parser and relevant
@@ -532,11 +592,13 @@ class IngestionListener:
         success, error = 0, 0
         project, institution, file_accession = (file_meta['project']['uuid'], file_meta['institution']['uuid'],
                                                 file_meta['accession'])
+        sample_relations = self.extract_sample_relations(file_accession)
         for idx, record in enumerate(parser):
             log.info('Attempting parse on record %s' % record)
             try:
                 variant = self.build_and_post_variant(parser, record, project, institution)
-                self.build_and_post_variant_samples(parser, record, project, institution, variant, file_accession)
+                self.build_and_post_variant_samples(parser, record, project, institution, variant, file_accession,
+                                                    sample_relations)
                 success += 1
             except Exception as e:  # ANNOTATION spec validation error, recoverable
                 log.error('Encountered exception posting variant at row %s: %s ' % (idx, e))
@@ -611,7 +673,7 @@ class IngestionListener:
                     continue
 
                 # if this file has been ingested, do not do anything with this message
-                if file_meta.get('file_ingestion_status', 'N/A') == self.STATUS_INGESTED:
+                if file_meta.get('file_ingestion_status', 'N/A') == STATUS_INGESTED:
                     continue
 
                 # attempt download with workaround
@@ -633,7 +695,7 @@ class IngestionListener:
                     log.error('Some VCF rows for uuid %s failed to post - not marking VCF '
                               'as ingested.' % uuid)
                 else:
-                    self.vapp.patch_json('/' + uuid, {'file_ingestion_status': self.STATUS_INGESTED})
+                    self.vapp.patch_json('/' + uuid, {'file_ingestion_status': STATUS_INGESTED})
 
                 # report results in error_log regardless of status
                 msg = ('INGESTION_REPORT:\n'

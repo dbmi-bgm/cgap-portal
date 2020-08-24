@@ -33,7 +33,7 @@ def rdf_objects_2_3():
 
 def test_get_rdfobjects_one_type_two_rdfobjs(owler, rdf_objects):
     checks = ['testrdfobj1', 'testrdfobj2']
-    with mock.patch('encoded.commands.owltools.ConjunctiveGraph') as graph:
+    with mock.patch.object(ot, 'ConjunctiveGraph') as graph:
         graph.objects.return_value = rdf_objects
         owler = ot.Owler('http://test.com')
         owler.rdfGraph = graph
@@ -47,7 +47,7 @@ def test_get_rdfobjects_one_type_two_rdfobjs(owler, rdf_objects):
 
 def test_get_rdfobjects_two_types_one_rdfobj(owler, rdf_objects_2_1):
     check = 'testrdfobj1'
-    with mock.patch('encoded.commands.owltools.ConjunctiveGraph') as graph:
+    with mock.patch.object(ot, 'ConjunctiveGraph') as graph:
         graph.objects.return_value = rdf_objects_2_1
         owler = ot.Owler('http://test.com')
         owler.rdfGraph = graph
@@ -59,7 +59,7 @@ def test_get_rdfobjects_two_types_one_rdfobj(owler, rdf_objects_2_1):
 
 def test_get_rdfobjects_two_types_three_rdfobj(rdf_objects_2_3):
     checks = ['testrdfobj1', 'testrdfobj2', 'testrdfobj3']
-    with mock.patch('encoded.commands.owltools.ConjunctiveGraph') as graph:
+    with mock.patch.object(ot, 'ConjunctiveGraph') as graph:
         graph.objects.return_value = rdf_objects_2_3
         owler = ot.Owler('http://test.com')
         owler.rdfGraph = graph
@@ -72,7 +72,7 @@ def test_get_rdfobjects_two_types_three_rdfobj(rdf_objects_2_3):
 
 
 def test_get_rdfobjects_none_there(owler):
-    with mock.patch('encoded.commands.owltools.ConjunctiveGraph') as graph:
+    with mock.patch.object(ot, 'ConjunctiveGraph') as graph:
         graph.objects.return_value = []
         owler = ot.Owler('http://test.com')
         owler.rdfGraph = graph

@@ -1,10 +1,11 @@
 import argparse
 import logging
-from encoded.commands.variant_table_intake import MappingTableParser
-from encoded.commands.ingest_vcf import VCFParser
+
 from dcicutils.misc_utils import VirtualApp
 from pyramid.paster import get_app
 from tqdm import tqdm
+from ..commands.variant_table_intake import MappingTableParser
+from ..commands.ingest_vcf import VCFParser
 
 
 logger = logging.getLogger(__name__)

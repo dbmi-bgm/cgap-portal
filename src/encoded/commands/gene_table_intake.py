@@ -2,7 +2,7 @@ import argparse
 import logging
 from pyramid.paster import get_app
 from dcicutils.misc_utils import VirtualApp
-from encoded.commands.variant_table_intake import MappingTableParser
+from ..commands.variant_table_intake import MappingTableParser
 
 
 logger = logging.getLogger(__name__)
@@ -70,7 +70,7 @@ class GeneTableParser(MappingTableParser):
         logger.info('Build gene schema')
         return schema
 
-    def run(self, gs_out=None, write=False):
+    def run(self, gs_out=None, write=False):  # noqa - args are different then in superclass but we don't care
         """
         Ingests the gene table, producing the gene schema
 

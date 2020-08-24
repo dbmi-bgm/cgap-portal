@@ -93,7 +93,6 @@ def vcf_qc(testapp, institution, project):
 @pytest.fixture
 def bam_qc(testapp, institution, project):
     item = {
-        "uuid": "af8e47c1-35bd-46fd-8a2e-e5d7b8956111",
         'institution': institution['@id'],
         'project': project['@id'],
         "status": "in review",
@@ -104,6 +103,20 @@ def bam_qc(testapp, institution, project):
         "uuid": "d918bc25-0888-4658-811b-53c20b944122"
     }
     return testapp.post_json('/quality_metric_bamqc', item).json['@graph'][0]
+
+
+@pytest.fixture
+def qclist(testapp, institution, project, bam_qc):
+    item = {
+        'institution': institution['@id'],
+        'project': project['@id'],
+        "status": "in review",
+        "overall_quality_status": "PASS",
+        "uuid": "f94b0c13-24f9-4be4-9663-5d2213c5678e",
+        "qc_list": [{'qc_type': "quality_metric_bamqc",
+                     'value': bam_qc['@id']}]
+    }
+    return testapp.post_json('/quality_metric_qclist', item).json['@graph'][0]
 
 
 def test_post_qc_metric(testapp, qc_metric_fastqc):
@@ -145,6 +158,16 @@ def test_quality_metric_summary_vcfqc(vcf_qc):
 
 def test_quality_metric_summary_bamqc(bam_qc):
     summary = bam_qc['quality_metric_summary']
+    expected_summary = [
+        {'title': 'Total Reads', 'sample': 'NA12879_sample', 'value': '467863567', 'numberType': 'integer'},
+        {'title': 'Coverage', 'sample': 'NA12879_sample', 'value': '30x', 'numberType': 'string'}
+        ]
+    for an_exp_info in expected_summary:
+        assert an_exp_info in summary
+
+
+def test_quality_metric_qclist(qclist):
+    summary = qclist['quality_metric_summary']
     expected_summary = [
         {'title': 'Total Reads', 'sample': 'NA12879_sample', 'value': '467863567', 'numberType': 'integer'},
         {'title': 'Coverage', 'sample': 'NA12879_sample', 'value': '30x', 'numberType': 'string'}

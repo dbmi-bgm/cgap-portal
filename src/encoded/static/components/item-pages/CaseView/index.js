@@ -1,19 +1,17 @@
 'use strict';
 
-import React, { useState, useMemo, useCallback } from 'react';
-import Collapse from 'react-bootstrap/esm/Collapse';
-import PropTypes from 'prop-types';
+import React, { useState, useMemo } from 'react';
 import memoize from 'memoize-one';
 import _ from 'underscore';
 import url from 'url';
-import queryString from 'query-string';
 
-import { console, layout, ajax, object, navigate } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
+import { console, layout, navigate, ajax } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { PartialList } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/PartialList';
 
 import { PedigreeVizView } from './../../viz/PedigreeViz';
 import DefaultItemView from './../DefaultItemView';
 import { TabPaneErrorBoundary } from './../components/TabView';
+import { EmbeddedCaseSearchTable } from '../components/EmbeddedItemSearchTable';
 
 import { CaseSummaryTable } from './CaseSummaryTable';
 import { FamilyAccessionStackedTable } from './../../browse/CaseDetailPane';
@@ -22,11 +20,11 @@ import { PedigreeTabView, PedigreeTabViewOptionsController } from './PedigreeTab
 import { PedigreeFullScreenBtn } from './PedigreeFullScreenBtn';
 import { parseFamilyIntoDataset } from './family-parsing';
 import { CurrentFamilyController } from './CurrentFamilyController';
-import { AttachmentInputController, AttachmentInputMenuOption } from './attachment-input';
 import { CaseStats } from './CaseStats';
+import { FilteringTab } from './FilteringTab';
 import CaseSubmissionView from './CaseSubmissionView';
 
-import { EmbeddedItemSearchTable, EmbeddedCaseSearchTable } from '../components/EmbeddedItemSearchTable';
+
 
 export {
     CaseSummaryTable,
@@ -73,9 +71,10 @@ export default class CaseView extends DefaultItemView {
     }
 
     getTabViewContents(controllerProps = {}){
-        // const { pedigreeFamilies = [] } = controllerProps;
-        // const familiesLen = pedigreeFamilies.length;
-        const { context: { family: { members = [] } = {} } } = this.props;
+        const { context = null } = this.props;
+        const { family = null } = context || {};
+        const { members = [] } = family || {};
+
         const membersLen = members.length;
         const commonTabProps = { ...this.props, ...controllerProps };
         const initTabs = [];
@@ -95,6 +94,7 @@ export default class CaseView extends DefaultItemView {
      * @deprecated
      * Disabled for now since can only support one family per Case at moment.
      * To be removed once UX is more certain.
+     * AttachmentInputController, AttachmentInputMenuOption from './attachment-input'
      */
     additionalItemActionsContent(){
         return super.additionalItemActionsContent();
@@ -116,29 +116,23 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
     const {
         context = {},
         href,
-        // pedigreeFamilies = [],
-        // pedigreeFamiliesIdx = 0,
-        // onFamilySelect,
+        session,
         graphData,
         selectedDiseases,
         windowWidth,
         windowHeight,
-        // currFamily,
         idToGraphIdentifier
     } = props;
     const {
-        family: currFamily = null, // Previously selected via CurrentFamilyController.js, now just the 1. Unless changed later.
+        family: currFamily = null, // Previously selected via CurrentFamilyController.js, now primary from case.
         secondary_families = null,
         case_phenotypic_features: caseFeatures = { case_phenotypic_features: [] },
         description = null,
         actions: permissibleActions = [],
-        sample_processing,
         display_title: caseTitle,
         accession: caseAccession,
         individual: caseIndividual
     } = context;
-
-    const editAction = _.findWhere(permissibleActions, { name: "edit" });
 
     const {
         countIndividuals: numIndividuals,
@@ -181,9 +175,6 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
         caseSearchTables = (
             <div className="mt-3">
                 <h4 className="text-400 mb-03">No individual assigned to this case</h4>
-                { editAction ?
-                    <div>{ "Add a family by pressing \"Actions\" at top right of page and then \"Add Family\"."}</div>
-                    : null }
             </div>
         );
     }
@@ -253,13 +244,6 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
                                     View Pedigree
                                 </button>
                             </div>
-                            {/*
-                            <a href="#pedigree" className="card-img-top d-none d-lg-block" rel="noreferrer noopener">
-                                <div className="text-center h-100">
-                                    <i className="icon icon-sitemap icon-4x fas" />
-                                </div>
-                            </a>
-                            */}
                             { pedBlock }
                         </div>
                     </div>
@@ -272,23 +256,25 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
                 </div>
             </div>
 
-            <DotRouter href={href} navClassName="container-wide pt-36 pb-36" contentsClassName="container-wide bg-light pt-36 pb-36" prependDotPath="case-info">
-                <DotRouterTab tabTitle="Accessioning" dotPath=".accessioning" default cache={false}>
-                    <AccessioningTab {...{ context, href, currFamily, secondary_families, }} />
-                </DotRouterTab>
-                <DotRouterTab tabTitle="Bioinformatics" dotPath=".bioinformatics" cache={false}>
-                    <BioinformaticsTab {...{ context, currFamily, secondary_families, idToGraphIdentifier, sample_processing }} />
-                </DotRouterTab>
-                <DotRouterTab tabTitle="Filtering" dotPath=".filtering">
-                    <FilteringTab context={context} windowHeight={windowHeight} />
-                </DotRouterTab>
-                <DotRouterTab tabTitle="Interpretation" dotPath=".interpretation" disabled cache={false}>
-                    <InterpretationTab {...props} />
-                </DotRouterTab>
-                <DotRouterTab tabTitle="Finalize Case" dotPath=".reporting" disabled cache={false}>
-                    <ReportingTab {...props} />
-                </DotRouterTab>
-            </DotRouter>
+            { currFamily && caseIndividual ?
+                <DotRouter href={href} navClassName="container-wide pt-36 pb-36" contentsClassName="container-wide bg-light pt-36 pb-36" prependDotPath="case-info">
+                    <DotRouterTab tabTitle="Accessioning" dotPath=".accessioning" default cache={false}>
+                        <AccessioningTab {...{ context, href, currFamily, secondary_families, }} />
+                    </DotRouterTab>
+                    <DotRouterTab tabTitle="Bioinformatics" dotPath=".bioinformatics" cache={false}>
+                        <BioinformaticsTab {...{ context, idToGraphIdentifier }} />
+                    </DotRouterTab>
+                    <DotRouterTab tabTitle="Filtering" dotPath=".filtering">
+                        <FilteringTab {...{ context, windowHeight, session }} />
+                    </DotRouterTab>
+                    <DotRouterTab tabTitle="Interpretation" dotPath=".interpretation" disabled cache={false}>
+                        <InterpretationTab {...props} />
+                    </DotRouterTab>
+                    <DotRouterTab tabTitle="Finalize Case" dotPath=".reporting" disabled cache={false}>
+                        <ReportingTab {...props} />
+                    </DotRouterTab>
+                </DotRouter>
+                : null }
         </React.Fragment>
     );
 });
@@ -449,7 +435,6 @@ const AccessioningTab = React.memo(function AccessioningTab(props) {
     const { display_title: primaryFamilyTitle, '@id' : currFamilyID } = currFamily;
     const [ isSecondaryFamiliesOpen, setSecondaryFamiliesOpen ] = useState(false);
     const secondaryFamiliesLen = secondary_families.length;
-    console.log("families", currFamily, secondary_families);
 
     const viewSecondaryFamiliesBtn = secondaryFamiliesLen === 0 ? null : (
         <div className="pt-2">
@@ -503,19 +488,190 @@ const AccessioningTab = React.memo(function AccessioningTab(props) {
     );
 });
 
+const BioinfoStats = React.memo(function BioinfoStats(props) {
+    // Note: Can probably clean up the render method of this a little bit by breaking each row
+    // into its own component. Not sure if worth it to do yet; is pretty long and repetitive, but
+    // may also be necessary to add to/edit rows individually in the future.
+    const {
+        caseSample = null,
+        sampleProcessing = null
+    } = props;
+
+    const {
+        bam_sample_id: caseSampleId = null,
+        processed_files: caseProcFiles = []
+    } = caseSample || {};
+    const {
+        processed_files: msaProcFiles = []
+    } = sampleProcessing || {};
+
+    const msaStats = {};
+
+    // Pull coverage and reads values from this case's sample's bam file
+    caseProcFiles.forEach((procFile) => {
+        const {
+            quality_metric: {
+                "@type": [ qmType ]=[],
+                quality_metric_summary: qmSummaries = []
+            }={}
+        } = procFile;
+        // Only continue if qclist (bamQC should only exist if there is also bamcheck)
+        if (qmType === "QualityMetricQclist") {
+            // Coverage and total reads should only be present in BAM, update if found
+            qmSummaries.forEach((qmSummary) => {
+                const { title = null, value = null, tooltip = null } = qmSummary;
+                if (title === "Coverage") {
+                    msaStats.coverage = { value, tooltip };
+                } else if (title === "Total Reads") {
+                    msaStats.reads = { value, tooltip };
+                }
+            });
+        }
+    });
+
+    // Pull variant stats, T-T ratio, heterozygosity ratio, etc. from sample_processing
+    msaProcFiles.forEach((procFile) => {
+        const {
+            quality_metric: {
+                "@type": [ qmType ]=[],
+                quality_metric_summary: qmSummaries = []
+            }={}
+        } = procFile;
+
+        // Only continue if qclist (vcfQC should only exist if there is also vcfcheck)
+        if (qmType === "QualityMetricQclist") {
+            // Stats should only be present in combined VCF, update if found
+            qmSummaries.forEach((qmSummary) => {
+                const { title = null, value = null, sample = null, tooltip = null } = qmSummary;
+                if (sample && sample === caseSampleId) {
+                    switch (title) {
+                        case "De Novo Fraction":
+                            msaStats.deNovo = { value, tooltip };
+                            break;
+                        case "Heterozygosity Ratio":
+                            msaStats.heterozygosity = { value, tooltip };
+                            break;
+                        case "Transition-Transversion Ratio":
+                            msaStats.transTansRatio = { value, tooltip };
+                            break;
+                        case "Total Variants Called":
+                            msaStats.totalVariants = { value, tooltip };
+                            break;
+                        case "Filtered Variants":
+                            msaStats.filteredVariants = { value, tooltip };
+                            break;
+                        default:
+                            break;
+                    }
+                }
+            });
+        }
+    });
+
+    return (
+        <>
+            <div className="row qc-summary">
+                <div className="col-sm-8 text-600">
+                    Total Number of Reads:
+                    { msaStats.reads && msaStats.reads.tooltip ?
+                        <i className="icon icon-info-circle fas icon-fw ml-05"
+                            data-tip={msaStats.reads.tooltip} data-place="right"/>
+                        : null }
+                </div>
+                <div className="col-sm-4">{/* 452.3 Million */}
+                    { (msaStats.reads && msaStats.reads.value) || "" }
+                </div>
+            </div>
+            <div className="row qc-summary">
+                <div className="col-sm-8 text-600">
+                    Coverage:
+                    { msaStats.coverage && msaStats.coverage.tooltip ?
+                        <i className="icon icon-info-circle fas icon-fw ml-05"
+                            data-tip={msaStats.coverage.tooltip} data-place="right"/>
+                        : null }
+                </div>
+                <div className="col-sm-4">{/* 30x */}
+                    { (msaStats.coverage && msaStats.coverage.value) || "" }
+                </div>
+            </div>
+            <div className="row qc-summary">
+                <div className="col-sm-8 text-600">
+                    Total Number of Variants Called:
+                    { msaStats.totalVariants && msaStats.totalVariants.tooltip ?
+                        <i className="icon icon-info-circle fas icon-fw ml-05"
+                            data-tip={msaStats.totalVariants.tooltip} data-place="right"/>
+                        : null }
+                </div>
+                <div className="col-sm-4">{/* 4,769,578 */}
+                    { (msaStats.totalVariants && msaStats.totalVariants.value) || "" }
+                </div>
+            </div>
+            <div className="row qc-summary">
+                <div className="col-sm-8 text-600">
+                    Transition-Tansversion ratio:
+                    { msaStats.transTansRatio && msaStats.transTansRatio.tooltip ?
+                        <i className="icon icon-info-circle fas icon-fw ml-05"
+                            data-tip={msaStats.transTansRatio.tooltip} data-place="right"/>
+                        : null }
+                </div>
+                <div className="col-sm-4">{/* Ex. 1.96 */}
+                    { (msaStats.transTansRatio && msaStats.transTansRatio.value) || "" }
+                </div>
+            </div>
+            <div className="row qc-summary">
+                <div className="col-sm-8 text-600">
+                    Heterozygosity ratio:
+                    { msaStats.heterozygosity && msaStats.heterozygosity.tooltip ?
+                        <i className="icon icon-info-circle fas icon-fw ml-05"
+                            data-tip={msaStats.heterozygosity.tooltip} data-place="right"/>
+                        : null }
+                </div>
+                <div className="col-sm-4">{/* Ex. 1.24 */}
+                    { (msaStats.heterozygosity && msaStats.heterozygosity.value) || "" }
+                </div>
+            </div>
+            <div className="row qc-summary">
+                <div className="col-sm-8 text-600">
+                    De novo Fraction:
+                    { msaStats.deNovo && msaStats.deNovo.tooltip ?
+                        <i className="icon icon-info-circle fas icon-fw ml-05"
+                            data-tip={msaStats.deNovo.tooltip} data-place="right"/>
+                        : null }
+                </div>
+                <div className="col-sm-4">{/* Ex. 2% */}
+                    { (msaStats.deNovo && msaStats.deNovo.value) || "" }
+                </div>
+            </div>
+            <div className="row qc-summary">
+                <div className="col-sm-8 text-600">
+                    Variants after hard filters:
+                    { msaStats.filteredVariants && msaStats.filteredVariants.tooltip ?
+                        <i className="icon icon-info-circle fas icon-fw ml-05"
+                            data-tip={msaStats.filteredVariants.tooltip} data-place="right"/>
+                        : null }
+                </div>
+                <div className="col-sm-4"> {/* Ex. 1,273 */}
+                    { (msaStats.filteredVariants && msaStats.filteredVariants.value) || "" }
+                </div>
+            </div>
+        </>
+    );
+});
+
 const BioinformaticsTab = React.memo(function BioinformaticsTab(props) {
     const {
         context,
-        currFamily,
-        secondary_families = [],
-        idToGraphIdentifier,
-        sample_processing = []
+        idToGraphIdentifier
     } = props;
-    const { display_title: caseDisplayTitle, family = null } = context;
+    const {
+        display_title: caseDisplayTitle,
+        family = null,
+        sample_processing: sampleProcessing = null,
+        sample: caseSample = null
+    } = context;
 
     const {
         original_pedigree: { display_title: pedFileName } = {},
-        members = [],
         display_title: familyDisplayTitle
     } = family;
     const onClick = useMemo(function(){
@@ -535,9 +691,6 @@ const BioinformaticsTab = React.memo(function BioinformaticsTab(props) {
         </h4>
     );
 
-
-    const dataTip = "Exonic and splice variants, clinvar pathogenic or conflicting submissions, spliceAI>0.2, not seen in 2 individuals among a set of 20 unrelated samples.";
-
     return (
         <React.Fragment>
             <h1>{ caseDisplayTitle }: <span className="text-300">Bioinformatics Analysis</span></h1>
@@ -547,106 +700,21 @@ const BioinformaticsTab = React.memo(function BioinformaticsTab(props) {
             </div>
             <div className="tab-inner-container">
                 <h2 className="section-header">Quality Control Metrics (QC)</h2>
-                <div className="row qc-summary">
-                    <div className="col-sm-8 text-600">
-                        Total Number of Reads:
-                    </div>
-                    <div className="col-sm-4">
-                        452.3 Million
-                    </div>
-                </div>
-                <div className="row qc-summary">
-                    <div className="col-sm-8 text-600">
-                        Coverage:
-                    </div>
-                    <div className="col-sm-4">
-                        30x
-                    </div>
-                </div>
-                <div className="row qc-summary">
-                    <div className="col-sm-8 text-600">
-                        Total Number of Variants Called:
-                    </div>
-                    <div className="col-sm-4">
-                        4,769,578
-                    </div>
-                </div>
-                <div className="row qc-summary">
-                    <div className="col-sm-8 text-600">
-                        Transition-Tansversion ratio:
-                    </div>
-                    <div className="col-sm-4">
-                        1.96
-                    </div>
-                </div>
-                <div className="row qc-summary">
-                    <div className="col-sm-8 text-600">
-                        Heterozygosity ratio:
-                    </div>
-                    <div className="col-sm-4">
-                        1.24
-                    </div>
-                </div>
-                <div className="row qc-summary">
-                    <div className="col-sm-8 text-600">
-                        De novo Fraction:
-                    </div>
-                    <div className="col-sm-4">
-                        2%
-                    </div>
-                </div>
-                <div className="row qc-summary">
-                    <div className="col-sm-8 text-600">
-                        Variants after hard filters:
-                        <i className="icon icon-info-circle fas icon-fw ml-05"
-                            data-tip={dataTip} data-place="right"/>
-                    </div>
-                    <div className="col-sm-4">
-                        2,291
-                    </div>
-                </div>
+                <BioinfoStats {...{ caseSample, sampleProcessing }} />
             </div>
             <div className="tab-inner-container">
                 <h2 className="section-header">Multisample Analysis Table</h2>
                 <div className="family-index-0" data-is-current-family={true}>
                     { title }
-                    <CaseSummaryTable {...family} sampleProcessing={[sample_processing]} isCurrentFamily={true} idx={0} {...{ idToGraphIdentifier }} />
+                    <CaseSummaryTable {...family} sampleProcessing={[sampleProcessing]} isCurrentFamily={true} idx={0} {...{ idToGraphIdentifier }} />
                 </div>
             </div>
         </React.Fragment>
     );
 });
 
-const FilteringTab = React.memo(function FilteringTab(props) {
-    const { context = null, windowHeight } = props;
-    const { filter_set_flag_addon: filterFlags = "" } = context || {};
-    const searchHref = `/search/?type=VariantSample${filterFlags ? filterFlags : ""}`;
-    const hideFacets = !filterFlags ? null : Object.keys(queryString.parse(filterFlags));
 
-    // This maxHeight is stylistic and dependent on our view design/style
-    // wherein we have minHeight of tabs set to close to windowHeight in SCSS.
-    // 405px offset likely would need to be changed if we change height of tab nav, tab title area, etc.
-    // Overrides default 400px.
-    const maxHeight = typeof windowHeight === "number" && windowHeight > 800 ? (windowHeight - 405) : undefined;
 
-    return <EmbeddedItemSearchTable { ...{ searchHref, hideFacets, maxHeight }} title={<FilteringTabSubtitle {...{ context }} />} />;
-});
-
-function FilteringTabSubtitle({ totalCount, context: { display_title } }){
-    // We give the span here an 'id' here so later on it'd be easy to find using Cypress
-    // or other testing framework.
-    return (
-        <div className="d-flex flex-column flex-lg-row mb-2 align-items-start align-items-lg-end justify-content-between">
-            <h1 className="mb-0 mt-0">
-                { display_title }: <span className="text-300">Variant Filtering and Technical Review</span>
-            </h1>
-            <h5 className="text-300 mt-0 mb-0">
-                <span id="filtering-variants-found" className="text-400 mr-05">{ totalCount || 0 }</span>
-                Variants found
-            </h5>
-        </div>
-    );
-}
 
 function InterpretationTab(props) {
     return <h1>This is the interpretation tab.</h1>;
