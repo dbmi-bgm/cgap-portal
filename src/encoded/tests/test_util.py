@@ -6,7 +6,6 @@ import tempfile
 
 from unittest import mock
 from dcicutils.qa_utils import ControlledTime, ignored
-from dcicutils.misc_utils import check_true
 from ..util import (
     debuglog, deduplicate_list, gunzip_content, resolve_file_path, ENCODED_ROOT_DIR, get_trusted_email,
 )
