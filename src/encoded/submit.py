@@ -439,6 +439,7 @@ def create_case_items(items, proj_name, case_name_dict):
         analysis_id = k[k.index('analysis-')+9:]
         for sample in v['samples']:
             case_id = '{}-{}'.format(analysis_id, items['sample'][sample]['specimen_accession'])
+            name = False
             if case_id in case_name_dict:
                 name = True
                 case_id = case_name_dict[case_id]
