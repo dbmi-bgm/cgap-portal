@@ -332,7 +332,7 @@ def test_compute_inheritance_mode_trio(gts, gt_labels, sexes, chrom, novoPP, exp
             'genotype_labels': [
                 {'labels': ['Homozygus alternate'], 'role': 'self'},
             ],
-            'inheritance_modes': ['Low relevance, other']
+            'inheritance_modes': []
         }
     ),
     (  # test case 5 - no mother, father with high novoPP (can this happen? should have no effect)
@@ -354,7 +354,7 @@ def test_compute_inheritance_mode_trio(gts, gt_labels, sexes, chrom, novoPP, exp
             'genotype_labels': [
                 {'labels': ['Homozygus alternate'], 'role': 'self'},
             ],
-            'inheritance_modes': ['Low relevance, other']
+            'inheritance_modes': []
         }
     )
 ])
