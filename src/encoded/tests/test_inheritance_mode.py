@@ -366,7 +366,8 @@ def test_compute_inheritance_modes(variant_sample, expected_new_fields):
 def test_compute_inheritance_modes_csv_tests():
     """ A larger, more involved test that reads test data from a CSV and generates test cases """
     def get_answer(test):
-        return [test['inheritance_modes'][2:-2]]  # cut off [', ']
+        answer = [test['inheritance_modes'][2:-2]]
+        return answer
 
     def infer_sex_of_self(test):
         return 'F' if 'female' in test['condition'] else 'M'
@@ -422,7 +423,5 @@ def test_compute_inheritance_modes_csv_tests():
             vs = build_variant_sample(test)
             reference = get_answer(test)
             actual = InheritanceMode.compute_inheritance_modes(vs)['inheritance_modes']
-            if reference != actual:
-                #import pdb; pdb.set_trace() uncomment this to look at difference
-                actual = InheritanceMode.compute_inheritance_modes(vs)['inheritance_modes']
-    raise Exception
+            for entry in actual:
+                assert entry in reference or entry in reference[0]

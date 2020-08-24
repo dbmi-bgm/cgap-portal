@@ -51,7 +51,6 @@ order,genotype_mother,genotype_father,genotype_self,condition,genotype_label_mot
 83,0/1,1/1,0/1,chrX - female child,het,hemi alt,het,"['Low relevance, present in both parent(s)']",,,
 88,0/1,1/1,1/1,chrX - female child,het,hemi alt,homo alt,"['Low relevance, present in both parent(s)']",,,
 38,0/0,1/1,0/1,chrX - female child,homo ref,hemi alt,het,['X-linked dominant (Paternal)'],,,updated
-5,0/0,0/0,0/1,chrX - female child - novoPP=0,homo ref,hemi ref,het,['de novo (weak)'],,,
 6,0/0,0/0,0/1,chrX - female child - novoPP=None,homo ref,hemi ref,het,['de novo (chrXY)'],agreed,,
 91,1/1,0/0,0/0,chrX - male child,homo alt,hemi ref,hemi ref,"['Low relevance, homozygous in a parent']",,,
 101,1/1,0/0,1/1,chrX - male child,homo alt,hemi ref,hemi alt,"['Low relevance, homozygous in a parent']",,,

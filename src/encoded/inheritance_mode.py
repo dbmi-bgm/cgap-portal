@@ -202,13 +202,13 @@ class InheritanceMode:
             return [cls.INHMODE_LABEL_DE_NOVO_MEDIUM]
 
         # De novo weak candidate
-        if (cls.mother_father_ref_ref(genotypes[cls.MOTHER], genotypes[cls.FATHER]) and
-                genotypes[cls.SELF] == '0/1' and chrom == cls.AUTOSOME):
+        if novoPP > 0 and ((cls.mother_father_ref_ref(genotypes[cls.MOTHER], genotypes[cls.FATHER]) and
+                genotypes[cls.SELF] == '0/1' and chrom == cls.AUTOSOME)):
             return [cls.INHMODE_LABEL_DE_NOVO_WEAK]
 
         # And de novo chrXY
         if (cls.mother_father_ref_ref(genotypes[cls.MOTHER], genotypes[cls.FATHER])
-                and ((genotypes[cls.SELF] == '0/1' and sexes[cls.SELF] == cls.FEMALE and chrom == cls.MALE)
+                and ((genotypes[cls.SELF] == '0/1' and sexes[cls.SELF] == cls.FEMALE and chrom == 'X')
                      or (genotypes[cls.SELF] == '1/1' and sexes[cls.SELF] == cls.MALE and chrom != 'autosome'))):
             if novoPP == 0:
                 return [cls.INHMODE_LABEL_DE_NOVO_WEAK]
@@ -273,17 +273,17 @@ class InheritanceMode:
             if cls.check_if_label_exists(cls.GENOTYPE_LABEL_SEX_INCONSISTENT, genotype_labels):
                 return [cls.INHMODE_LABEL_NONE_SEX_INCONSISTENT]
 
+            # XXX: This is wrong (missing a condition) - how to make it right?
+            if genotypes[cls.MOTHER] == "1/1" or (
+                    genotypes[cls.FATHER] == "1/1" and genotype_labels[cls.FATHER][0] != cls.GENOTYPE_LABEL_M):
+                return [cls.INHMODE_LABEL_NONE_HOMOZYGOUS_PARENT]
+
             # XXX: INHMODE_LABEL_NONE_BOTH_PARENTS should take precedence over INHMODE_LABEL_NONE_HOMOZYGOUS_PARENT
             # based on csv tests
             # but this precedence is relied upon in other rows ...
             if ((genotypes[cls.MOTHER] == "1/1" or genotypes[cls.MOTHER] == "0/1") and
                     (genotypes[cls.FATHER] == "1/1" or genotypes[cls.FATHER] == "0/1")):
                 return [cls.INHMODE_LABEL_NONE_BOTH_PARENTS]
-
-            # XXX: This is wrong (missing a condition) - how to make it right?
-            if genotypes[cls.MOTHER] == "1/1" or (
-                    genotypes[cls.FATHER] == "1/1" and genotype_labels[cls.FATHER][0] != cls.GENOTYPE_LABEL_M):
-                return [cls.INHMODE_LABEL_NONE_HOMOZYGOUS_PARENT]
         elif chrom == 'Y':
             if cls.check_if_label_exists(cls.GENOTYPE_LABEL_DOT, genotype_labels):
                 return [cls.INHMODE_LABEL_NONE_DOT]
@@ -311,17 +311,17 @@ class InheritanceMode:
             if cls.check_if_label_exists(cls.GENOTYPE_LABEL_SEX_INCONSISTENT, genotype_labels):
                 return [cls.INHMODE_LABEL_NONE_SEX_INCONSISTENT]
 
+            # XXX: This is wrong (missing a condition) - how to make it right?
+            if genotypes[cls.MOTHER] == "1/1" or (
+                    genotypes[cls.FATHER] == "1/1" and genotype_labels[cls.FATHER][0] != cls.GENOTYPE_LABEL_M):
+                return [cls.INHMODE_LABEL_NONE_HOMOZYGOUS_PARENT]
+
             # XXX: INHMODE_LABEL_NONE_BOTH_PARENTS should take precedence over INHMODE_LABEL_NONE_HOMOZYGOUS_PARENT
             # based on csv tests
             # but this precedence is relied upon in other rows ...
             if ((genotypes[cls.MOTHER] == "1/1" or genotypes[cls.MOTHER] == "0/1") and
                     (genotypes[cls.FATHER] == "1/1" or genotypes[cls.FATHER] == "0/1")):
                 return [cls.INHMODE_LABEL_NONE_BOTH_PARENTS]
-
-            # XXX: This is wrong (missing a condition) - how to make it right?
-            if genotypes[cls.MOTHER] == "1/1" or (
-                    genotypes[cls.FATHER] == "1/1" and genotype_labels[cls.FATHER][0] != cls.GENOTYPE_LABEL_M):
-                return [cls.INHMODE_LABEL_NONE_HOMOZYGOUS_PARENT]
 
         return [cls.INHMODE_LABEL_NONE_OTHER]
 
