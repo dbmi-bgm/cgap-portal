@@ -27,7 +27,7 @@
     ],
     "properties": {
         "schema_version": {
-            "default": "3"
+            "default": "1"
         },
         "object_bucket": {
             "title": "Object Bucket",
@@ -91,6 +91,7 @@
                 },
                 "progress": {
                     "title": "Progress",
+                    "description": "An adjectival word or phrase assessing progress, such as 'started', 'awaiting prerequisites', '88% done', or 'unavailable'.",
                     "type": "string",
                     "default": "unavailable"
                 }

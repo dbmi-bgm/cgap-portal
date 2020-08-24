@@ -13,17 +13,6 @@ from ..util import (
 from .. import util as util_module
 
 
-def test_check_true():
-
-    x = [1, 2, 3]
-    check_true(x == [1, 2, 3], "x is not a list of one, two, and three.")
-
-    msg = "x is not a list of four, five, and six."
-    with pytest.raises(RuntimeError) as e:
-        check_true(x == [4, 5, 6], msg)
-    assert msg in str(e)
-
-
 def test_deduplicate_list():
 
     def sort_somehow(seq):
@@ -248,3 +237,4 @@ def test_debuglog():
 def test_get_trusted_email():
     # TODO: This needs unit testing.
     ignored(get_trusted_email)
+

@@ -260,27 +260,6 @@ class Auth0AuthenticationPolicy(CallbackAuthenticationPolicy):
         return None
 
 
-# def get_jwt(request):
-#     token = None
-#     try:
-#         # ensure this is a jwt token not basic auth:
-#         auth_type = request.headers['Authorization'][:6]
-#         if auth_type.strip().lower() == 'bearer':
-#             token = request.headers['Authorization'][7:]
-#     except (ValueError, TypeError, KeyError):
-#         pass
-#
-#     if not token and request.method in ('GET', 'HEAD'):
-#         # Only grab this if is a GET request, not a transactional request to help mitigate CSRF attacks.
-#         # See: https://en.wikipedia.org/wiki/Cross-site_request_forgery#Cookie-to-header_token
-#         # The way our JS grabs and sticks JWT into Authorization header is somewhat analogous to above approach.
-#         # TODO: Ensure our `Access-Control-Allow-Origin` response headers are appropriate (more for CGAP).
-#         # TODO: Get a security audit done.
-#         token = request.cookies.get('jwtToken')
-#
-#     return token
-
-
 def get_jwt(request):
 
     token = None

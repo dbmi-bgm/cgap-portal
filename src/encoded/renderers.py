@@ -22,7 +22,7 @@ from pyramid.traversal import split_path_info, _join_path_tuple
 from subprocess_middleware.worker import TransformWorker
 from urllib.parse import urlencode
 from webob.cookies import Cookie
-from encoded.ingestion.common import content_type_allowed
+from .ingestion.common import content_type_allowed
 
 
 log = logging.getLogger(__name__)

@@ -13,7 +13,6 @@ from snovault import COLLECTIONS, Collection
 from snovault.crud_views import collection_add as sno_collection_add
 from snovault.embed import make_subrequest
 from snovault.schema_utils import validate_request
-from typing import Type
 from .types.base import get_item_or_none
 
 
@@ -107,6 +106,7 @@ def subrequest_item_creation(request: pyramid.request.Request, item_type: str, j
         a python dictionary (JSON description) of the item created
 
     """
+
     if json_body is None:
         json_body = {}
     collection_path = '/' + item_type
@@ -269,3 +269,11 @@ def get_trusted_email(request, context=None, raise_errors=True):
         if raise_errors:
             raise
         return None
+
+
+def beanstalk_env_from_request(request):
+    return beanstalk_env_from_registry(request.registry)
+
+
+def beanstalk_env_from_registry(registry):
+    return registry.settings.get('env.name')

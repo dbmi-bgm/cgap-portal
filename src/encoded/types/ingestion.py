@@ -7,7 +7,7 @@ import logging
 import re
 import uuid
 
-from dcicutils.misc_utils import ignored
+from dcicutils.misc_utils import ignored, check_true
 from snovault import collection, load_schema
 from pyramid.request import Request
 from pyramid.security import Allow, Deny, Everyone
@@ -21,8 +21,8 @@ from .base import (
 from .institution import (
     ONLY_ADMIN_VIEW,
 )
-from ..util import debuglog, subrequest_item_creation, check_true
-
+from ..util import debuglog, subrequest_item_creation, beanstalk_env_from_registry
+from ..ingestion.common import cgap_data_bundle_bucket
 
 ALLOW_SUBMITTER_VIEW = (
     # TODO: There is an issue here where we want a logged in user remotely only to view this
@@ -42,6 +42,8 @@ class SubmissionFolio:
         self.vapp = vapp
         self.ingestion_type = ingestion_type
         self.log = log or logging
+        self.bs_env = beanstalk_env_from_registry(vapp.app.registry)
+        self.bucket = cgap_data_bundle_bucket(self.bs_env)
         self.submission_id = submission_id
 
     def __str__(self):

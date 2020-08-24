@@ -1,7 +1,8 @@
-from pyramid.paster import get_app
-from encoded.submit import *
-from dcicutils.misc_utils import VirtualApp
 import json
+
+from dcicutils.misc_utils import VirtualApp
+from pyramid.paster import get_app
+from ..submit import xls_to_json, validate_all_items, post_and_patch_all_items
 
 
 def main():
@@ -11,13 +12,15 @@ def main():
     proj = virtualapp.get('/projects/12a92962-8265-4fc0-b2f8-cf14f05db58b/').json
     inst = virtualapp.get('/institutions/hms-dbmi/').json
     json_data, passing = xls_to_json('src/encoded/tests/data/documents/cgap_submit_test.xlsx', proj, inst)
-    print(json_data)
+    print('JSON data (to validate):', json.dumps(json_data))
     final_json, validation_log, passing = validate_all_items(virtualapp, json_data)
-    print('\n'.join(validation_log))
-    print(json.dumps(final_json, indent=4))
-    result, passing, files = post_and_patch_all_items(virtualapp, final_json)
-    print('\n'.join(result))
-    print(json.dumps(files, indent=4))
+    print('Validation Log:\n'.join(validation_log))
+    print("Passing (after validation):", passing)
+    print("Final JSON (to post, after validation):", json.dumps(final_json, indent=4))
+    output, passing, files = post_and_patch_all_items(virtualapp, final_json)
+    print('Post Output:\n', '\n'.join(output))
+    print('Passing (after post and patch):', passing)
+    print('Files:', json.dumps(files, indent=4))
 
 
 if __name__ == '__main__':
