@@ -272,14 +272,10 @@ class InheritanceMode:
         if cls.check_if_label_exists(cls.GENOTYPE_LABEL_SEX_INCONSISTENT, genotype_labels):
             return [cls.INHMODE_LABEL_NONE_SEX_INCONSISTENT]
 
-            # XXX: This is wrong (missing a condition) - how to make it right?
         if genotypes[cls.MOTHER] == "1/1" or (
                 genotypes[cls.FATHER] == "1/1" and genotype_labels[cls.FATHER][0] != cls.GENOTYPE_LABEL_M):
             return [cls.INHMODE_LABEL_NONE_HOMOZYGOUS_PARENT]
 
-            # XXX: INHMODE_LABEL_NONE_BOTH_PARENTS should take precedence over INHMODE_LABEL_NONE_HOMOZYGOUS_PARENT
-            # based on csv tests
-            # but this precedence is relied upon in other rows ...
         if ((genotypes[cls.MOTHER] == "1/1" or genotypes[cls.MOTHER] == "0/1") and
                 (genotypes[cls.FATHER] == "1/1" or genotypes[cls.FATHER] == "0/1")):
             return [cls.INHMODE_LABEL_NONE_BOTH_PARENTS]
