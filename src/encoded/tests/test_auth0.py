@@ -2,6 +2,7 @@ import os
 import pytest
 import requests
 
+from pyramid.testing import DummyRequest
 from ..authentication import get_jwt
 
 
@@ -94,6 +95,39 @@ def test_get_jwt_gets_bearer_auth(fake_request):
     assert jwt == fake_request.headers['Authorization'][7:]
 
 
+SPACE = ' '
+
+
+def test_get_jwt_gets_bearer_auth_too():
+
+    fake_jwt = 'abc.def.ghi'
+    req = DummyRequest(headers={'Authorization': 'bearer' + SPACE + fake_jwt})
+    jwt = get_jwt(req)
+    assert jwt == fake_jwt
+
+
+def test_get_jwt_gets_bearer_auth_ignores_extra_space():
+    fake_jwt = 'abc.def.ghi'
+    req = DummyRequest(headers={'Authorization': 'bearer' + 2*SPACE + fake_jwt + SPACE})
+    jwt = get_jwt(req)
+    assert jwt == fake_jwt
+
+
+def test_get_jwt_gets_jwt_with_spaces():
+    fake_jwt = 'abc def ghi'  # Spaces in a JWT are not legal
+    req = DummyRequest(headers={'Authorization': 'bearer' + SPACE + fake_jwt + SPACE})
+    jwt = get_jwt(req)
+    assert jwt == fake_jwt
+
+
+def test_get_jwt_fails_bearer_auth_no_sep():
+    fake_jwt = 'abc.def.ghi'
+    # This makes sure there's a space separator after 'bearer'.
+    req = DummyRequest(headers={'Authorization': 'bearer.' + fake_jwt})
+    jwt = get_jwt(req)
+    assert jwt is None
+
+
 def test_get_jwt_skips_basic_auth(fake_request):
     fake_request.headers['Authorization'] = 'Basic test_token'
     jwt = get_jwt(fake_request)
@@ -105,6 +139,22 @@ def test_get_jwt_falls_back_to_cookie(fake_request):
     fake_request.headers['Authorization'] = 'Basic test_token'
     jwt = get_jwt(fake_request)
     assert jwt == 'test_token'
+
+
+def test_get_jwt_falls_back_to_cookie_too(fake_request):
+    fake_request.cookies['jwtToken'] = 'test_token'
+    fake_request.headers['Authorization'] = 'Basic stuff_base64_encoded'
+    jwt = get_jwt(fake_request)
+    assert jwt == 'test_token'
+
+
+@pytest.mark.parametrize('request_method',  ['HEAD', 'GET', 'POST', 'PATCH'])
+def test_get_jwt_falls_back_to_cookie_for_any_method(fake_request, request_method):
+    req = DummyRequest(headers={'Authorization': 'Basic not_the_droids_you_are_looking_for'},
+                       cookies={'jwtToken': 'r2d2_and_c3po'})
+    req.method = request_method
+    jwt = get_jwt(req)
+    assert jwt == 'r2d2_and_c3po'
 
 
 def test_login_unknown_user(anontestapp, auth0_4dn_user_token):

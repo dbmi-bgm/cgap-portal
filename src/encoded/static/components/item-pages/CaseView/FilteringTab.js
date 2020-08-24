@@ -140,40 +140,80 @@ export function FilteringTabSubtitle(props){
 
     const [ isLoading, setIsLoading ] = useState(false);
     // From `state.lastFilterSetSaved` we use only non linkTo properties from it so doesn't matter if frame=object vs frame=page for it.
-    // `undefined` means not ever set or removed previously vs `null` means explicitly nothing set in current session (for purposes of 'btnPrepend' var below)
-    const [ lastFilterSetSaved, setLastFilterSetSaved ] = useState(active_filterset || undefined);
+    const [ lastFilterSetSaved, setLastFilterSetSaved ] = useState(active_filterset || null);
 
-    const currentActiveFilter = typeof lastFilterSetSaved !== "undefined" ? lastFilterSetSaved : active_filterset || null;
-    const { filter_blocks: [ { query: currentActiveFilterAppend } = {} ] = [] } = currentActiveFilter || {};
+    // See https://reactjs.org/docs/hooks-faq.html#how-do-i-implement-getderivedstatefromprops
+    // Basically would just update lastFilterSetSaved to have @@embedded representation instead of the @@object representation
+    // that we get in the PATCH response. Keeping lastFilterSetSaved around b.c. why not - it'll give us some info/feedback before
+    // Case is reindexed. Maybe/hopefully Case will reindex fast enough that won't worry about keeping state.lastFilterSaved around
+    // until updated Case `context`/`caseItem` with updated `active_filterset` arrives. At which point could prly just remove state.lastFilterSaved
+    // and do ~ function doPatch(){ setIsLoading(true); PATCH.. } ... -> ... useEffect(func(){ setIsLoading(false); }[ active_filterset ])
+    if (active_filterset && lastFilterSetSaved !== active_filterset && (!lastFilterSetSaved || lastFilterSetSaved.last_modified.date_modified < active_filterset.last_modified.date_modified)) {
+        setLastFilterSetSaved(active_filterset);
+    }
+
+    const { filter_blocks: [ { query: lastActiveFilterAppend } = {} ] = [] } = lastFilterSetSaved || {};
 
     const { differsFromCurrentFilterSet, filterSetQueryStr, saveNewFilterset, saveFilterBtnTip } = useMemo(function(){
         const { query: currentQuery } = url.parse(searchHref, false);
         const parsedCurrentQueryFiltered = filterQueryByQuery(currentQuery, "type=VariantSample&" + initial_search_href_filter_addon);
         const filterSetQueryStr = queryString.stringify(parsedCurrentQueryFiltered);
         const differsFromCurrentFilterSet = !!(
-            (!currentActiveFilter && filterSetQueryStr) ||
-            (currentActiveFilter && !filterSetQueryStr) ||
-            (currentActiveFilter && filterSetQueryStr && !_.isEqual(parsedCurrentQueryFiltered, queryString.parse(currentActiveFilterAppend)))
+            (!lastFilterSetSaved && filterSetQueryStr) ||
+            (lastFilterSetSaved && !filterSetQueryStr) ||
+            (lastFilterSetSaved && filterSetQueryStr && !_.isEqual(parsedCurrentQueryFiltered, queryString.parse(lastActiveFilterAppend)))
         );
 
         function saveNewFilterset(e){
 
             // Hmm maybe should redo as promises/use the promisequeue..
 
-            function patchCaseItem(newFilterSetItem = null){
-                const patchBody = {};
-                if (newFilterSetItem) {
-                    patchBody.active_filterset = newFilterSetItem.uuid;
-                }
-                console.log("Setting 'active_filterset'", patchBody, newFilterSetItem);
-                ajax.load(caseAtID + (newFilterSetItem ? "" : "?delete_fields=active_filterset"), function(res){
-                    console.info("PATCHed Case Item", res);
+            // TODO: Rename function once logic more cemented (i.e. it only PATCHes if we (rarely) get new FilterSet Item)
+            function patchCaseItem(nextFilterSetItem){
+                const { "@id" : nextFilterSetID, uuid: nextFilterSetUUID } = nextFilterSetItem;
+
+                if (lastFilterSetSaved && nextFilterSetID === lastFilterSetSaved["@id"]) {
+                    // Skip PATCHing, we just updated existing FilterSet.
+                    // Set as new `lastFilterSetSaved` (it has newly updated query) (later on won't need to do this and hopefully we just get updated context.active_filterset after websocket-notification-and-update)
+                    setLastFilterSetSaved(nextFilterSetItem);
                     setIsLoading(false);
-                    setLastFilterSetSaved(newFilterSetItem);
+                    return;
+                } else {
+                    // Brand new FilterSet, continue with patch.
+                    console.log("Setting 'active_filterset'", nextFilterSetItem);
+                    ajax.load(caseAtID, function(res){
+                        console.info("PATCHed Case Item", res);
+                        setIsLoading(false);
+                        setLastFilterSetSaved(nextFilterSetItem);
+                    }, "PATCH", function(err){
+                        console.error("Error PATCHing Case", err);
+                        Alerts.queue({
+                            "title" : "Error PATCHing Case",
+                            "message" : JSON.stringify(err),
+                            "style" : "danger"
+                        });
+                        setIsLoading(false);
+                    }, JSON.stringify({ "active_filterset" : nextFilterSetUUID }));
+                }
+            }
+
+            // Will change in future if multiple filter_blocks.
+            const nextFilterBlocks = [{
+                "name": "Primary",
+                "query": filterSetQueryStr,
+                // "flags_applied" : "case:" + caseAccession ? idk
+            }];
+
+            function patchFilterSet(callback) {
+                const { "@id" : existingFilterID } = lastFilterSetSaved;
+                const patchBody = { "filter_blocks": nextFilterBlocks };
+                ajax.load(existingFilterID, function(res){
+                    const { "@graph" : [ existingFilterSetItem ] } = res;
+                    callback(existingFilterSetItem);
                 }, "PATCH", function(err){
-                    console.error("Error PATCHing Case", err);
+                    console.error("Error PATCHing existing FilterSet", err);
                     Alerts.queue({
-                        "title" : "Error PATCHing Case",
+                        "title" : "Error PATCHing existing FilterSet",
                         "message" : JSON.stringify(err),
                         "style" : "danger"
                     });
@@ -190,13 +230,7 @@ export function FilteringTabSubtitle(props){
                     "institution": caseInstitutionID,
                     "project": caseProjectID,
                     "created_in_case_accession": caseAccession,
-                    "filter_blocks": [
-                        {
-                            "name": "Primary",
-                            "query": filterSetQueryStr,
-                            // "flags_applied" : "case:" + caseAccession ? idk
-                        }
-                    ]
+                    "filter_blocks": nextFilterBlocks
                 };
                 ajax.load("/filter-sets/", function(res){
                     const { "@graph" : [ newFilterSetItem ] } = res;
@@ -213,43 +247,54 @@ export function FilteringTabSubtitle(props){
             }
 
             setIsLoading(true);
-            if (!filterSetQueryStr) { // Falsy, e.g. "".
-                patchCaseItem(null);
-            } else {
+            if (!lastFilterSetSaved){
                 createFilterSet(patchCaseItem);
+            } else {
+                patchFilterSet(patchCaseItem);
             }
         }
 
         const saveFilterBtnTip = "<pre class='text-white mb-0'>" + JSON.stringify(parsedCurrentQueryFiltered, null, 4) + "</pre>";
 
         return { filterSetQueryStr, differsFromCurrentFilterSet, saveNewFilterset, saveFilterBtnTip };
-    }, [ caseItem, searchHref, currentActiveFilter ]);
+    }, [ caseItem, searchHref, lastFilterSetSaved ]);
 
-    // console.log('TESTING', currentActiveFilter, '\n',
+    // console.log('TESTING', lastFilterSetSaved, '\n',
     //     filterSetQueryStr, '\n',
     //     differsFromCurrentFilterSet, '\n',
-    //     currentActiveFilterAppend, '\n',
+    //     lastFilterSetSaved, '\n',
     // );
 
     let btnPrepend = null;
-    if (typeof lastFilterSetSaved !== "undefined") {
-        if (lastFilterSetSaved === null) {
+    let btnDisabled = !differsFromCurrentFilterSet || isLoading; // TODO: maybe inform also via 'edit this FilterSet' and 'add any new FilterSet' actions/permissions.
+    let notYetReIndexed = false; // Not yet used. Should auto-update upon refresh of context
+    if (lastFilterSetSaved) {
+        // This will eventually likely be turned into tooltip or something on FilterSet blocks UI.
+        const {
+            // `error` would likely be present (and other fields not present) if no view permissions.
+            error: fsError = null,
+            display_title: fsTitle = null,
+            last_modified: {
+                date_modified: fsDateModified = null,
+                // I think we get back string from PATCH response for modified_by (linkTo), thus this not showing up properly..
+                modified_by: {
+                    // We're unlikely to have view permissions for User item unless logged in as admin or similar I think rn.. unsure.
+                    display_title: fsModifyAuthorTitle = null
+                } = {}
+            } = {}
+        } = lastFilterSetSaved;
+        if (fsDateModified && !fsError) {
             btnPrepend = (
                 <div className="input-group-prepend">
-                    <div className="input-group-text">Removed</div>
-                </div>
-            );
-        } else {
-            // This will eventually likely be turned into tooltip or something on FilterSet blocks UI.
-            const { display_title: fsTitle, date_created: fsCreated } = lastFilterSetSaved;
-            btnPrepend = (
-                <div className="input-group-prepend">
-                    <div className="input-group-text" data-tip={fsTitle}>
+                    <div className="input-group-text" data-tip={fsTitle + " last modified by " + (fsModifyAuthorTitle || "you") /*(fsModifyAuthorTitle ? " last modified by " + fsModifyAuthorTitle : "")*/}>
                         Saved
-                        &nbsp;<LocalizedTime timestamp={fsCreated} formatType="date-time-lg" />
+                        &nbsp;<LocalizedTime timestamp={fsDateModified} formatType="date-time-lg" />
                     </div>
                 </div>
             );
+            notYetReIndexed = fsDateModified !== (active_filterset && active_filterset.last_modified && active_filterset.last_modified.date_modified);
+        } else { // Means no view (nor, transitively, edit) permission
+            btnDisabled = true;
         }
     }
 
@@ -265,11 +310,11 @@ export function FilteringTabSubtitle(props){
                 <div className="btn-group" role="group" aria-label="FilterSet Controls">
                     { btnPrepend }
                     <button type="button" className="btn btn-primary" data-current-query={filterSetQueryStr} data-html
-                        disabled={!differsFromCurrentFilterSet || isLoading} onClick={saveNewFilterset} data-tip={saveFilterBtnTip}>
+                        disabled={btnDisabled} onClick={saveNewFilterset} data-tip={saveFilterBtnTip}>
                         { isLoading ?
                             <i className="icon icon-fw icon-spin icon-circle-notch fas mr-07" />
                             : <i className="icon icon-fw icon-save fas mr-07" /> }
-                        { currentActiveFilter && !filterSetQueryStr ?  "Save Filter Removal" : "Save Current Filter" }
+                        { (lastFilterSetSaved && !lastFilterSetSaved.error) && !filterSetQueryStr ?  "Save Filter Removal" : "Save Current Filter" }
                     </button>
                 </div>
             </h5>
