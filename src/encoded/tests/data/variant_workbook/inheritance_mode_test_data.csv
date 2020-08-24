@@ -77,7 +77,6 @@ order,genotype_mother,genotype_father,genotype_self,condition,genotype_label_mot
 86,0/1,1/1,1/1,chrX - male child,het,hemi alt,hemi alt,"['Low relevance, present in both parent(s)']",,,
 41,0/0,1/1,1/1,chrX - male child,homo ref,hemi alt,hemi alt,['X-linked dominant (Paternal)'],,,
 56,0/1,0/0,1/1,chrX - male child,het,hemi ref,hemi alt,"['X-linked recessive (Maternal)', 'X-linked dominant (Maternal)']",,,
-9,0/0,0/0,1/1,chrX - male child - novoPP=0,homo ref,hemi ref,hemi alt,['de novo (weak)'],,,
 10,0/0,0/0,1/1,chrX - male child - novoPP=None,homo ref,hemi ref,hemi alt,['de novo (chrXY)'],agreed,,
 7,0/0,0/0,0/1,chrY - female child,-,hemi ref,FALSE,"['Low relevance, mismatching chrXY genotype(s)']",agreed,,
 14,0/0,0/0,1/1,chrY - female child,-,hemi ref,FALSE,"['Low relevance, mismatching chrXY genotype(s)']",agreed,,
@@ -130,5 +129,4 @@ order,genotype_mother,genotype_father,genotype_self,condition,genotype_label_mot
 132,1/1,1/1,1/1,chrY - male child,FALSE,hemi alt,hemi alt,"['Low relevance, mismatching chrXY genotype(s)']",,,
 32,0/0,1/1,0/0,chrY - male child,-,hemi alt,hemi ref,"['Low relevance, other']",,,
 42,0/0,1/1,1/1,chrY - male child,-,hemi alt,hemi alt,['Y-linked dominant'],,,
-11,0/0,0/0,1/1,chrY - male child - novoPP=0,-,hemi ref,hemi alt,['de novo (weak)'],,,
 12,0/0,0/0,1/1,chrY - male child - novoPP=None,-,hemi ref,hemi alt,['de novo (chrXY)'],agreed,,

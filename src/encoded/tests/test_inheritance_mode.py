@@ -424,4 +424,7 @@ def test_compute_inheritance_modes_csv_tests():
             reference = get_answer(test)
             actual = InheritanceMode.compute_inheritance_modes(vs)['inheritance_modes']
             for entry in actual:
-                assert entry in reference or entry in reference[0]
+                try:
+                    assert entry in reference or entry in reference[0]
+                except:
+                    import pdb; pdb.set_trace()

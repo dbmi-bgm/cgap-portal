@@ -211,11 +211,10 @@ class InheritanceMode:
         if (cls.mother_father_ref_ref(genotypes[cls.MOTHER], genotypes[cls.FATHER])
                 and ((genotypes[cls.SELF] == '0/1' and sexes[cls.SELF] == cls.FEMALE and chrom == 'X')
                      or (genotypes[cls.SELF] == '1/1' and sexes[cls.SELF] == cls.MALE and chrom != 'autosome'))):
-            if novoPP == 0:
-                return [cls.INHMODE_LABEL_DE_NOVO_WEAK]
+            if novoPP > 0:
+                raise ValueError("novoPP is different from 0 or -1 on sex chromosome: %s" % novoPP)
             if novoPP == -1:
                 return [cls.INHMODE_LABEL_DE_NOVO_CHRXY]
-            raise ValueError("novoPP is different from 0 or -1 on sex chromosome: %s" % novoPP)
 
         # If not a de novo, assign inheritance mode based solely on genotypes (from GATK)
         if (genotypes[cls.MOTHER] == "0/0"
@@ -254,7 +253,7 @@ class InheritanceMode:
         return []
 
     @classmethod
-    def inheritance_modes_other_labels(cls, genotypes, genotype_labels, chrom):
+    def inheritance_modes_other_labels(cls, genotypes, genotype_labels):
         """ Gives an inheritance mode where there would otherwise be None in an attempt to give
             some additional information
 
@@ -273,36 +272,17 @@ class InheritanceMode:
         if cls.check_if_label_exists(cls.GENOTYPE_LABEL_SEX_INCONSISTENT, genotype_labels):
             return [cls.INHMODE_LABEL_NONE_SEX_INCONSISTENT]
 
-        # INHMODE_LABEL_NONE_HOMOZYGOUS_PARENT takes precedence for chrX
-        if chrom == 'X':
-            if genotypes[cls.MOTHER] == "1/1" or (
-                    genotypes[cls.FATHER] == "1/1" and genotype_labels[cls.FATHER][0] != cls.GENOTYPE_LABEL_M):
-                return [cls.INHMODE_LABEL_NONE_HOMOZYGOUS_PARENT]
+            # XXX: This is wrong (missing a condition) - how to make it right?
+        if genotypes[cls.MOTHER] == "1/1" or (
+                genotypes[cls.FATHER] == "1/1" and genotype_labels[cls.FATHER][0] != cls.GENOTYPE_LABEL_M):
+            return [cls.INHMODE_LABEL_NONE_HOMOZYGOUS_PARENT]
 
-            if ((genotypes[cls.MOTHER] == "1/1" or genotypes[cls.MOTHER] == "0/1") and
-                    (genotypes[cls.FATHER] == "1/1" or genotypes[cls.FATHER] == "0/1")):
-                return [cls.INHMODE_LABEL_NONE_BOTH_PARENTS]
-
-        # INHMODE_LABEL_NONE_BOTH_PARENTS takes precedence for chrY
-        elif chrom == 'Y':
-            if ((genotypes[cls.MOTHER] == "1/1" or genotypes[cls.MOTHER] == "0/1") and
-                    (genotypes[cls.FATHER] == "1/1" or genotypes[cls.FATHER] == "0/1")):
-                return [cls.INHMODE_LABEL_NONE_BOTH_PARENTS]
-
-            if genotypes[cls.MOTHER] == "1/1" or (
-                    genotypes[cls.FATHER] == "1/1" and genotype_labels[cls.FATHER][0] != cls.GENOTYPE_LABEL_M):
-                return [cls.INHMODE_LABEL_NONE_HOMOZYGOUS_PARENT]
-
-        # INHMODE_LABEL_NONE_HOMOZYGOUS_PARENT takes precedence for autosomes
-        else:
-            if genotypes[cls.MOTHER] == "1/1" or (
-                    genotypes[cls.FATHER] == "1/1" and genotype_labels[cls.FATHER][0] != cls.GENOTYPE_LABEL_M):
-                return [cls.INHMODE_LABEL_NONE_HOMOZYGOUS_PARENT]
-
-            if ((genotypes[cls.MOTHER] == "1/1" or genotypes[cls.MOTHER] == "0/1") and
-                    (genotypes[cls.FATHER] == "1/1" or genotypes[cls.FATHER] == "0/1")):
-                return [cls.INHMODE_LABEL_NONE_BOTH_PARENTS]
-
+            # XXX: INHMODE_LABEL_NONE_BOTH_PARENTS should take precedence over INHMODE_LABEL_NONE_HOMOZYGOUS_PARENT
+            # based on csv tests
+            # but this precedence is relied upon in other rows ...
+        if ((genotypes[cls.MOTHER] == "1/1" or genotypes[cls.MOTHER] == "0/1") and
+                (genotypes[cls.FATHER] == "1/1" or genotypes[cls.FATHER] == "0/1")):
+            return [cls.INHMODE_LABEL_NONE_BOTH_PARENTS]
         return [cls.INHMODE_LABEL_NONE_OTHER]
 
     @staticmethod
@@ -368,7 +348,7 @@ class InheritanceMode:
                                                               sexes=sexes, chrom=chrom, novoPP=novoPP)
         inheritance_modes += cls.compute_cmphet_inheritance_modes(cmphet)
         if len(inheritance_modes) == 0:
-            inheritance_modes = cls.inheritance_modes_other_labels(genotypes, genotype_labels, chrom)
+            inheritance_modes = cls.inheritance_modes_other_labels(genotypes, genotype_labels)
 
         new_fields = {
             'genotype_labels': cls.build_genotype_label_structure(genotype_labels),
