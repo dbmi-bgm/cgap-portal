@@ -331,15 +331,28 @@ export default class App extends React.PureComponent {
 
             // Set Alert if not on homepage and not logged in.
             if (!session && pathname != "/") {
+
+                /** Somewhat 'wrap-around' but arguably likely cleanest way to open Auth0 login dialog modal */
                 const onAlertLoginClick = function(e) {
-                    // TODO;
+                    e.preventDefault();
+                    const btnElem = document.getElementById("loginbtn");
+                    if (btnElem && typeof btnElem.click === "function"){
+                        // See https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/click
+                        btnElem.click();
+                    }
+                    return false;
                 };
+
+                // TODO next time are working on shared-portal-components (SPC) repository:
+                // Put this Alert into SPC as a predefined/constant export, then cancel/remove it (if active) in the callback function
+                // upon login success ( https://github.com/4dn-dcic/shared-portal-components/blob/master/src/components/navigation/components/LoginController.js#L111 )
                 Alerts.queue({
                     "title" : "Not Logged In",
-                    // We can't really put in actual link to login since need to communicate w. LoginController.
-                    // We could eventually move LoginController to wrap BodyElement or something (and move this into there)
-                    // .....or maybe have onClick func that finds and triggers a click mouse event on login button....
-                    "message" : <span>You are currently browsing as guest, please login if you have an account.</span>,
+                    "message" : (
+                        <span>
+                            You are currently browsing as guest, please <a onClick={onAlertLoginClick} href="#loginbtn">login</a> if you have an account.
+                        </span>
+                    ),
                     "style" : "warning",
                     "navigateDisappearThreshold" : 2
                 });
