@@ -235,7 +235,8 @@ class InheritanceMode:
                 and genotypes[cls.SELF] == "1/1" and sexes[cls.SELF] == cls.MALE and chrom == 'X'):
             return [cls.INHMODE_LABEL_X_LINKED_RECESSIVE_MOTHER, cls.INHMODE_LABEL_X_LINKED_DOMINANT_MOTHER]
 
-        if (genotypes[cls.MOTHER] == "0/0" and genotype_labels[cls.FATHER] == cls.GENOTYPE_LABEL_M and
+        # bug here?
+        if (genotypes[cls.MOTHER] == "0/0" and genotype_labels[cls.FATHER][0] == cls.GENOTYPE_LABEL_M and
                 chrom == 'X' and genotype_labels[cls.SELF][0] in [cls.GENOTYPE_LABEL_M, cls.GENOTYPE_LABEL_0M]):
             return [cls.INHMODE_LABEL_X_LINKED_DOMINANT_FATHER]
 
@@ -252,7 +253,7 @@ class InheritanceMode:
         return []
 
     @classmethod
-    def inheritance_modes_other_labels(cls, genotypes, genotype_labels):
+    def inheritance_modes_other_labels(cls, genotypes, genotype_labels, chrom):
         """ Gives an inheritance mode where there would otherwise be None in an attempt to give
             some additional information
 
@@ -264,19 +265,63 @@ class InheritanceMode:
                 if role not in d:
                     return []
 
-        if cls.check_if_label_exists(cls.GENOTYPE_LABEL_DOT, genotype_labels):
-            return [cls.INHMODE_LABEL_NONE_DOT]
-        if cls.is_multiallelic_site(genotypes.values()):
-            return [cls.INHMODE_LABEL_NONE_MN]
-        if cls.check_if_label_exists(cls.GENOTYPE_LABEL_SEX_INCONSISTENT, genotype_labels):
-            return [cls.INHMODE_LABEL_NONE_SEX_INCONSISTENT]
+        if chrom == 'X':
+            if cls.check_if_label_exists(cls.GENOTYPE_LABEL_DOT, genotype_labels):
+                return [cls.INHMODE_LABEL_NONE_DOT]
+            if cls.is_multiallelic_site(genotypes.values()):
+                return [cls.INHMODE_LABEL_NONE_MN]
+            if cls.check_if_label_exists(cls.GENOTYPE_LABEL_SEX_INCONSISTENT, genotype_labels):
+                return [cls.INHMODE_LABEL_NONE_SEX_INCONSISTENT]
 
-        if genotypes[cls.MOTHER] == "1/1" or (
-                genotypes[cls.FATHER] == "1/1" and genotype_labels[cls.FATHER] != cls.GENOTYPE_LABEL_M):
-            return [cls.INHMODE_LABEL_NONE_HOMOZYGOUS_PARENT]
-        if ((genotypes[cls.MOTHER] == "1/1" or genotypes[cls.MOTHER] == "0/1") and
-                (genotypes[cls.FATHER] == "1/1" or genotypes[cls.FATHER] == "0/1")):
-            return [cls.INHMODE_LABEL_NONE_BOTH_PARENTS]
+            # XXX: INHMODE_LABEL_NONE_BOTH_PARENTS should take precedence over INHMODE_LABEL_NONE_HOMOZYGOUS_PARENT
+            # based on csv tests
+            # but this precedence is relied upon in other rows ...
+            if ((genotypes[cls.MOTHER] == "1/1" or genotypes[cls.MOTHER] == "0/1") and
+                    (genotypes[cls.FATHER] == "1/1" or genotypes[cls.FATHER] == "0/1")):
+                return [cls.INHMODE_LABEL_NONE_BOTH_PARENTS]
+
+            # XXX: This is wrong (missing a condition) - how to make it right?
+            if genotypes[cls.MOTHER] == "1/1" or (
+                    genotypes[cls.FATHER] == "1/1" and genotype_labels[cls.FATHER][0] != cls.GENOTYPE_LABEL_M):
+                return [cls.INHMODE_LABEL_NONE_HOMOZYGOUS_PARENT]
+        elif chrom == 'Y':
+            if cls.check_if_label_exists(cls.GENOTYPE_LABEL_DOT, genotype_labels):
+                return [cls.INHMODE_LABEL_NONE_DOT]
+            if cls.is_multiallelic_site(genotypes.values()):
+                return [cls.INHMODE_LABEL_NONE_MN]
+            if cls.check_if_label_exists(cls.GENOTYPE_LABEL_SEX_INCONSISTENT, genotype_labels):
+                return [cls.INHMODE_LABEL_NONE_SEX_INCONSISTENT]
+
+            # XXX: INHMODE_LABEL_NONE_BOTH_PARENTS should take precedence over INHMODE_LABEL_NONE_HOMOZYGOUS_PARENT
+            # based on csv tests
+            # but this precedence is relied upon in other rows ...
+            if ((genotypes[cls.MOTHER] == "1/1" or genotypes[cls.MOTHER] == "0/1") and
+                    (genotypes[cls.FATHER] == "1/1" or genotypes[cls.FATHER] == "0/1")):
+                return [cls.INHMODE_LABEL_NONE_BOTH_PARENTS]
+
+            # XXX: This is wrong (missing a condition) - how to make it right?
+            if genotypes[cls.MOTHER] == "1/1" or (
+                    genotypes[cls.FATHER] == "1/1" and genotype_labels[cls.FATHER][0] != cls.GENOTYPE_LABEL_M):
+                return [cls.INHMODE_LABEL_NONE_HOMOZYGOUS_PARENT]
+        else:
+            if cls.check_if_label_exists(cls.GENOTYPE_LABEL_DOT, genotype_labels):
+                return [cls.INHMODE_LABEL_NONE_DOT]
+            if cls.is_multiallelic_site(genotypes.values()):
+                return [cls.INHMODE_LABEL_NONE_MN]
+            if cls.check_if_label_exists(cls.GENOTYPE_LABEL_SEX_INCONSISTENT, genotype_labels):
+                return [cls.INHMODE_LABEL_NONE_SEX_INCONSISTENT]
+
+            # XXX: INHMODE_LABEL_NONE_BOTH_PARENTS should take precedence over INHMODE_LABEL_NONE_HOMOZYGOUS_PARENT
+            # based on csv tests
+            # but this precedence is relied upon in other rows ...
+            if ((genotypes[cls.MOTHER] == "1/1" or genotypes[cls.MOTHER] == "0/1") and
+                    (genotypes[cls.FATHER] == "1/1" or genotypes[cls.FATHER] == "0/1")):
+                return [cls.INHMODE_LABEL_NONE_BOTH_PARENTS]
+
+            # XXX: This is wrong (missing a condition) - how to make it right?
+            if genotypes[cls.MOTHER] == "1/1" or (
+                    genotypes[cls.FATHER] == "1/1" and genotype_labels[cls.FATHER][0] != cls.GENOTYPE_LABEL_M):
+                return [cls.INHMODE_LABEL_NONE_HOMOZYGOUS_PARENT]
 
         return [cls.INHMODE_LABEL_NONE_OTHER]
 
@@ -343,7 +388,7 @@ class InheritanceMode:
                                                               sexes=sexes, chrom=chrom, novoPP=novoPP)
         inheritance_modes += cls.compute_cmphet_inheritance_modes(cmphet)
         if len(inheritance_modes) == 0:
-            inheritance_modes = cls.inheritance_modes_other_labels(genotypes, genotype_labels)
+            inheritance_modes = cls.inheritance_modes_other_labels(genotypes, genotype_labels, chrom)
 
         new_fields = {
             'genotype_labels': cls.build_genotype_label_structure(genotype_labels),

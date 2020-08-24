@@ -423,6 +423,6 @@ def test_compute_inheritance_modes_csv_tests():
             reference = get_answer(test)
             actual = InheritanceMode.compute_inheritance_modes(vs)['inheritance_modes']
             if reference != actual:
-                #import pdb; pdb.set_trace() fix remaining tests
+                #import pdb; pdb.set_trace() uncomment this to look at difference
                 actual = InheritanceMode.compute_inheritance_modes(vs)['inheritance_modes']
     raise Exception
