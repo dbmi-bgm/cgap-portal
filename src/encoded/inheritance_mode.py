@@ -202,16 +202,14 @@ class InheritanceMode:
             return [cls.INHMODE_LABEL_DE_NOVO_MEDIUM]
 
         # De novo weak candidate
-        if (cls.mother_father_ref_ref(genotypes[cls.MOTHER], genotypes[cls.FATHER]) and
-                genotypes[cls.SELF] == '0/1' and chrom == cls.AUTOSOME):
+        if novoPP > 0 and ((cls.mother_father_ref_ref(genotypes[cls.MOTHER], genotypes[cls.FATHER]) and
+                genotypes[cls.SELF] == '0/1' and chrom == cls.AUTOSOME)):
             return [cls.INHMODE_LABEL_DE_NOVO_WEAK]
 
         # And de novo chrXY
         if (cls.mother_father_ref_ref(genotypes[cls.MOTHER], genotypes[cls.FATHER])
                 and ((genotypes[cls.SELF] == '0/1' and sexes[cls.SELF] == cls.FEMALE and chrom == cls.MALE)
                      or (genotypes[cls.SELF] == '1/1' and sexes[cls.SELF] == cls.MALE and chrom != 'autosome'))):
-            if novoPP == 0:
-                return [cls.INHMODE_LABEL_DE_NOVO_WEAK]
             if novoPP == -1:
                 return [cls.INHMODE_LABEL_DE_NOVO_CHRXY]
             raise ValueError("novoPP is different from 0 or -1 on sex chromosome: %s" % novoPP)
