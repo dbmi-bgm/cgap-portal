@@ -70,7 +70,7 @@ def verify_vcf_file_status_is_not_ingested(request, uuid):
     if isinstance(resp, HTTPMovedPermanently):  # if we hit a redirect, follow it
         subreq = Request.blank(resp.location, **kwargs)
         resp = request.invoke_subrequest(subreq, use_tweens=True)
-    if resp.json['file_ingestion_status'] == STATUS_INGESTED:
+    if resp.json.get('file_ingestion_status', None) == STATUS_INGESTED:
         return False
     return True
 
@@ -122,7 +122,7 @@ def queue_ingestion(context, request):
         response['notification'] = 'Success'
         response['number_queued'] = len(uuids)
         response['detail'] = 'Successfully queued the following uuids: %s' % uuids
-        patch_vcf_file_status(request, uuids)
+        patch_vcf_file_status(request, uuids)  # extra state management - may not be accurate, hard to get right
     else:
         response['number_queued'] = len(uuids) - len(failed)
         response['detail'] = 'Some uuids failed: %s' % failed
@@ -465,7 +465,7 @@ class IngestionListener:
         sample_relations = {}  # should never be None now
         if len(search_result) == 1:
             sample_procesing = search_result[0]
-            sample_pedigrees = sample_procesing.get('sample_pedigrees', None)
+            sample_pedigrees = sample_procesing.get('sample_pedigrees', [])
             for entry in sample_pedigrees:
                 sample_id = entry['sample_name']
                 sample_relations[sample_id] = {}
