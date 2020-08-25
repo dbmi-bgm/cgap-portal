@@ -65,7 +65,7 @@ export const VariantTabBody = React.memo(function VariantTabBody ({ context, sch
                         </div>
                         <div className="info-body">
                             {/* We could maybe rename+put `ExternalDatabasesSection` into own file (from GeneTabBody.js), parameterize itemtype for schemas, and re-use ? */}
-                            <em>Todo</em>
+                            <ExternalResourcesSection />
                         </div>
                     </div>
 
@@ -215,7 +215,6 @@ function PredictorsSection({ context, getTipForField, currentTranscriptIdx }){
         conservation_gerp = fallbackElem,
         conservation_phylop100 = fallbackElem,
         cadd_phred = fallbackElem,
-        genes_most_severe_sift_score = fallbackElem,
         transcript = [],
         spliceai_maxds = fallbackElem
     } = variant;
@@ -226,7 +225,7 @@ function PredictorsSection({ context, getTipForField, currentTranscriptIdx }){
         vep_sift_score = fallbackElem,
         vep_sift_prediction = fallbackElem,
         vep_polyphen_score = fallbackElem,
-        vep_polyphen_prediciton = fallbackElem
+        vep_polyphen_prediction = fallbackElem
     } = currentTranscript;
 
     // Not too sure whether to use table or <row> and <cols> here..
@@ -235,92 +234,90 @@ function PredictorsSection({ context, getTipForField, currentTranscriptIdx }){
 
     return (
         <React.Fragment>
-            <div>
 
-                <div className="d-flex align-items-center">
-                    <h5 className="col-auto px-0 mt-0 mb-08">Conservation</h5>
-                    {/* todo: boxes/identifiers at right */}
-                </div>
-
-                <div className="table-container">
-                    <table className="w-100">
-                        <PredictorsTableHeading/>
-                        <tbody>
-                            <tr>
-                                <td className="text-left">
-                                    <label className="mb-0" data-tip={getTipForField("conservation_gerp")}>GERP++</label>
-                                </td>
-                                <td className="text-left">{ conservation_gerp }</td>
-                                {/* TODO for all:
-                                <td className="text-left">{ prediction }/td>
-                                <td className="text-left">{ score }</td>
-                                */}
-                            </tr>
-                            <tr>
-                                <td className="text-left">
-                                    <label className="mb-0" data-tip={getTipForField("conservation_phylop100")}>phyloP100way</label>
-                                </td>
-                                <td className="text-left">{ conservation_phylop100 }</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-
-
-
-                <div className="d-flex align-items-center">
-                    <h5 className="col-auto px-0 mt-16 mb-08">Missense</h5>
-                    {/* todo: boxes/identifiers at right */}
-                </div>
-
-                <div className="table-container">
-                    <table className="w-100">
-                        <PredictorsTableHeading/>
-                        <tbody>
-                            <tr>
-                                <td className="text-left">
-                                    <label className="mb-0" data-tip={getTipForField("cadd_phred")}>CADD</label>
-                                </td>
-                                <td className="text-left">{ cadd_phred }</td>
-                            </tr>
-                            <tr>
-                                <td className="text-left">
-                                    <label className="mb-0" data-tip={getTipForField("transcript.vep_sift_score")}>SIFT</label>
-                                </td>
-                                <td className="text-left">{ vep_sift_score }</td>
-                            </tr>
-                            <tr>
-                                <td className="text-left">
-                                    <label className="mb-0" data-tip={getTipForField("transcript.vep_polyphen_score")}>PolyPhen2</label>
-                                </td>
-                                <td className="text-left">{ vep_polyphen_score }</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-
-
-
-                <div className="d-flex align-items-center">
-                    <h5 className="col-auto px-0 mt-16 mb-08">Splice</h5>
-                    {/* todo: boxes/identifiers at right */}
-                </div>
-
-                <div className="table-container">
-                    <table className="w-100">
-                        <PredictorsTableHeading/>
-                        <tbody>
-                            <tr>
-                                <td className="text-left">
-                                    <label className="mb-0" data-tip={getTipForField("spliceai_maxds")}>SpliceAI</label>
-                                </td>
-                                <td className="text-left">{ spliceai_maxds }</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-
+            <div className="d-flex align-items-center">
+                <h5 className="col-auto px-0 mt-0 mb-08">Conservation</h5>
+                {/* todo: boxes/identifiers at right */}
             </div>
+
+            <div className="table-container">
+                <table className="w-100">
+                    <PredictorsTableHeading/>
+                    <tbody>
+                        <tr>
+                            <td className="text-left">
+                                <label className="mb-0" data-tip={getTipForField("conservation_gerp")}>GERP++</label>
+                            </td>
+                            <td className="text-left">{ conservation_gerp }</td>
+                            {/* TODO for all:
+                            <td className="text-left">{ prediction }/td>
+                            <td className="text-left">{ score }</td>
+                            */}
+                        </tr>
+                        <tr>
+                            <td className="text-left">
+                                <label className="mb-0" data-tip={getTipForField("conservation_phylop100")}>phyloP100way</label>
+                            </td>
+                            <td className="text-left">{ conservation_phylop100 }</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+
+
+            <div className="d-flex align-items-center">
+                <h5 className="col-auto px-0 mt-16 mb-08">Missense</h5>
+                {/* todo: boxes/identifiers at right */}
+            </div>
+
+            <div className="table-container">
+                <table className="w-100">
+                    <PredictorsTableHeading/>
+                    <tbody>
+                        <tr>
+                            <td className="text-left">
+                                <label className="mb-0" data-tip={getTipForField("cadd_phred")}>CADD</label>
+                            </td>
+                            <td className="text-left">{ cadd_phred }</td>
+                        </tr>
+                        <tr>
+                            <td className="text-left">
+                                <label className="mb-0" data-tip={getTipForField("transcript.vep_sift_score")}>SIFT</label>
+                            </td>
+                            <td className="text-left">{ vep_sift_score }</td>
+                        </tr>
+                        <tr>
+                            <td className="text-left">
+                                <label className="mb-0" data-tip={getTipForField("transcript.vep_polyphen_score")}>PolyPhen2</label>
+                            </td>
+                            <td className="text-left">{ vep_polyphen_score }</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+
+
+            <div className="d-flex align-items-center">
+                <h5 className="col-auto px-0 mt-16 mb-08">Splice</h5>
+                {/* todo: boxes/identifiers at right */}
+            </div>
+
+            <div className="table-container">
+                <table className="w-100">
+                    <PredictorsTableHeading/>
+                    <tbody>
+                        <tr>
+                            <td className="text-left">
+                                <label className="mb-0" data-tip={getTipForField("spliceai_maxds")}>SpliceAI</label>
+                            </td>
+                            <td className="text-left">{ spliceai_maxds }</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
         </React.Fragment>
     );
 }
@@ -339,3 +336,13 @@ function PredictorsTableHeading(){
         </thead>
     );
 }
+
+
+function ExternalResourcesSection(){
+    return (
+        <div className="text-center">
+            <em>Coming Soon</em>
+        </div>
+    );
+}
+
