@@ -165,7 +165,7 @@ function VariantSampleOverviewTabView(props){
         <div className="d-flex align-items-flex-start sample-variant-overview-tab-view-container flex-column flex-lg-row">
             <div className="tabs-column col col-lg-2 col-xl-1 px-0" onClick={onClick}>
                 <OverviewTabTitle {...{ currentTab }} title="Variant" />
-                <OverviewTabTitle {...{ currentTab }} title="Gene" disabled={!currentGeneItem} />
+                <OverviewTabTitle {...{ currentTab }} title="Gene" disabled={!currentGeneItem} loading={currentGeneItemLoading} />
                 <OverviewTabTitle {...{ currentTab }} title="Sample" />
             </div>
             <div className="content-column card">
@@ -177,11 +177,13 @@ function VariantSampleOverviewTabView(props){
 
 
 const OverviewTabTitle = React.memo(function OverviewTabTitle(props){
-    const { currentTab, title, disabled = false } = props;
+    const { currentTab, title, disabled = false, loading = false } = props;
     const active = (currentTab === title);
     return (
         <button type="button" className="d-block overview-tab" data-tab-title={title} data-active={active} disabled={disabled}>
-            { title }
+            { loading ?
+                <i className="icon icon-spin icon-circle-notch fas mr-07"/>
+                : title }
         </button>
     );
 });

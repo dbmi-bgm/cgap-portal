@@ -286,9 +286,9 @@ function ConstraintScoresSection({ currentGeneItem, getTipForField }){
     } = currentGeneItem;
     return (
         <table className="w-100">
-            <thead>
+            <thead className="bg-transparent">
                 <tr>
-                    <th>Constraint</th>
+                    <th className="text-left">Constraint</th>
                     <th>Synonymous</th>
                     <th>Missense</th>
                     <th>LoF</th>
@@ -296,19 +296,19 @@ function ConstraintScoresSection({ currentGeneItem, getTipForField }){
             </thead>
             <tbody>
                 <tr>
-                    <td className="text-600">{"Exp. SNV's"}</td>
+                    <td className="text-600 text-left">{"Exp. SNV's"}</td>
                     <td data-tip={getTipForField("exp_syn")}>{ exp_syn }</td>
                     <td data-tip={getTipForField("exp_mis")}>{ exp_mis }</td>
                     <td data-tip={getTipForField("exp_lof")}>{ exp_lof }</td>
                 </tr>
                 <tr>
-                    <td className="text-600">{"Obs. SNV's"}</td>
+                    <td className="text-600 text-left">{"Obs. SNV's"}</td>
                     <td data-tip={getTipForField("obs_syn")}>{ obs_syn }</td>
                     <td data-tip={getTipForField("obs_mis")}>{ obs_mis }</td>
                     <td data-tip={getTipForField("obs_lof")}>{ obs_lof }</td>
                 </tr>
                 <tr>
-                    <td className="text-600">{"o/e"}</td>
+                    <td className="text-600 text-left">{"o/e"}</td>
                     <td data-tip={getTipForField("oe_syn")}>{ oe_syn }</td>
                     <td data-tip={getTipForField("oe_mis")}>{ oe_mis }</td>
                     <td data-tip={getTipForField("oe_lof")}>{ oe_lof }</td>

@@ -142,11 +142,11 @@ const GnomADTable = React.memo(function GnomADTable({ context, getTipForField })
         <table className="w-100">
             <thead>
                 <tr>
-                    <th>Population</th>
+                    <th className="text-left">Population</th>
                     <th data-tip={getTipForField("gnomad_ac")}>Allele Count</th>
                     <th data-tip={getTipForField("gnomad_an")}>Allele Number</th>
                     <th data-tip={getTipForField("gnomad_nhomalt")}># of Homozygotes</th>
-                    <th data-tip={getTipForField("gnomad_af")}>Allele Frequency</th>
+                    <th className="text-left" data-tip={getTipForField("gnomad_af")}>Allele Frequency</th>
                 </tr>
             </thead>
             <tbody>
@@ -327,11 +327,11 @@ function PredictorsTableHeading(){
     return (
         <thead className="bg-transparent">
             <tr>
-                <th className="text-left bg-transparent border-0 w-75">Prediction Tool</th>
-                <th className="text-left bg-transparent border-0 w-25">Score</th>
+                <th className="text-left w-75">Prediction Tool</th>
+                <th className="text-left w-25">Score</th>
                 {/* TODO (and change all to w-25):
-                <th className="text-left bg-transparent border-0 w-25">Prediction</th>
-                <th className="text-left bg-transparent border-0 w-25">Rank Score (0 to 1)</th>
+                <th className="text-left w-25">Prediction</th>
+                <th className="text-left w-25">Rank Score (0 to 1)</th>
                 */}
             </tr>
         </thead>
