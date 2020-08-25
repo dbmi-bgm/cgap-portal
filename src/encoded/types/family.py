@@ -368,7 +368,7 @@ class Family(Item):
         return relations
 
     @staticmethod
-    def calculate_relations(proband, all_props, family_id, members):
+    def calculate_relations(proband, all_props, family_id):
         # convert to ped_file format
         ped_text = Family.generate_ped(all_props, proband, family_id)
         primary_vectors = Family.extract_vectors(ped_text)
