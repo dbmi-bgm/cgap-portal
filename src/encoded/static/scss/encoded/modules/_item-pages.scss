@@ -2361,21 +2361,52 @@ $download-button-width : 100px;
   VariantSampleView & similar - Annotation Space
 **********************************************************/
 
-
 .sample-variant-annotation-space-body {
 
 	.info-header-title {
-		// todo: iterate on this more once content in place, e.g. bottom margin, align-items, etc.
 		display: flex;
 		align-items: center;
+		justify-content: space-between;
 		height: 32px;
-		margin-bottom: 16px;
+		position: relative;
+		z-index: 5;
 		> h4 {
 			// todo: maybe add color if to be just for this section (?)
 			font-weight: 600;
-			margin: 0;
+			margin: 0 0 16px;
 		}
 	}
+
+	.info-section {
+
+		display: flex;
+		flex-direction: column;
+
+		.info-header-title {
+			// todo: iterate on this more once content in place, e.g. bottom margin, align-items, etc.
+			flex-grow: 0;
+			padding: 0 8px;
+
+			> h4 {
+				margin: 0;
+				padding: 0 8px;
+				background-color: #fff;
+			}
+
+			.dropdown {
+				background-color: #fff;
+			}
+
+			+ .info-body {
+				border: 1px solid #ccc;
+    			padding: 24px 16px 16px;
+				margin-top: -16px;
+				flex-grow: 1;
+			}
+		}
+
+	}
+
 
 	.sample-variant-overview-tab-view-container {
 		.tabs-column {

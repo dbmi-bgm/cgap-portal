@@ -31,7 +31,7 @@ export const VariantTabBody = React.memo(function VariantTabBody ({ context, sch
             <div className="row">
                 <div className="col-12 col-md-6 d-flex flex-column">
 
-                    <div className="flex-grow-1 pb-2">
+                    <div className="info-section flex-grow-1 pb-2">
                         <div className="info-header-title">
                             <h4>
                                 {/* todo link to ClinVar */}
@@ -43,7 +43,7 @@ export const VariantTabBody = React.memo(function VariantTabBody ({ context, sch
                         </div>
                     </div>
 
-                    <div className="flex-grow-0 pb-2 pb-md-0">
+                    <div className="info-section flex-grow-1 pb-2 pb-md-0">
                         <div className="info-header-title">
                             <h4>
                                 {/* todo link to GnomAD -- is there a gnomad link somewhere ? */}
@@ -59,7 +59,7 @@ export const VariantTabBody = React.memo(function VariantTabBody ({ context, sch
                 </div>
                 <div className="col-12 col-md-6 d-flex flex-column">
 
-                    <div className="flex-grow-1 pb-2">
+                    <div className="info-section flex-grow-1 pb-2">
                         <div className="info-header-title">
                             <h4>External Resources</h4>
                         </div>
@@ -69,7 +69,7 @@ export const VariantTabBody = React.memo(function VariantTabBody ({ context, sch
                         </div>
                     </div>
 
-                    <div className="flex-grow-1 pb-2 pb-md-0">
+                    <div className="info-section flex-grow-1 pb-2 pb-md-0">
                         <div className="info-header-title">
                             <h4>Predictors</h4>
                         </div>
@@ -187,7 +187,7 @@ function ClinVarSection({ context, getTipForField }){
     if (!variationID) {
         // No ClinVar info available ??
         return (
-            <div className="text-large text-center">
+            <div className="text-large text-center pb-08">
                 <em>Not Available</em>
             </div>
         );
@@ -340,7 +340,7 @@ function PredictorsTableHeading(){
 
 function ExternalResourcesSection(){
     return (
-        <div className="text-center">
+        <div className="text-large text-center pb-08">
             <em>Coming Soon</em>
         </div>
     );

@@ -75,8 +75,9 @@ export function VariantSampleInfoHeader(props) {
         <div className="card mb-24">
             <div className="card-body">
                 <div className="row flex-column flex-lg-row">
+
                     { caseID ?
-                        <div className="col pb-2 pb-lg-0 col-lg-2 col-xl-1 d-flex flex-column">
+                        <div className="info-section col pb-2 pb-lg-0 col-lg-2 col-xl-1 d-flex flex-column">
                             <div className="info-header-title">
                                 <h4>Case ID</h4>
                             </div>
@@ -85,7 +86,8 @@ export function VariantSampleInfoHeader(props) {
                             </div>
                         </div>
                         : null }
-                    <div className="col pb-2 pb-lg-0">
+
+                    <div className="info-section col pb-2 pb-lg-0">
                         <div className="info-header-title">
                             <h4>Position</h4>
                         </div>
@@ -117,19 +119,20 @@ export function VariantSampleInfoHeader(props) {
 
                         </div>
                     </div>
-                    <div className="col pb-2 pb-lg-0">
-                        <div className="d-flex">
-                            <div className="info-header-title" data-tip="Select a transcript (& gene) to view their details">
-                                {/* passing 'py-1' to className of button via `size` prop - kinda hacky - noting here in case changes in future version, or if find better prop to use */}
-                                <DropdownButton title={geneTitleToShow} size="lg py-1" variant="outline-dark" onSelect={onSelectTranscript}
-                                    disabled={geneTranscriptListLen === 0}>
-                                    { geneListOptions }
-                                </DropdownButton>
-                            </div>
+
+                    <div className="info-section col pb-2 pb-lg-0">
+
+                        <div className="info-header-title" data-tip="Select a transcript (& gene) to view their details">
+                            {/* passing 'py-1' to className of button via `size` prop - kinda hacky - noting here in case changes in future version, or if find better prop to use */}
+                            <DropdownButton title={geneTitleToShow} size="lg py-1" variant="outline-dark" onSelect={onSelectTranscript}
+                                disabled={geneTranscriptListLen === 0}>
+                                { geneListOptions }
+                            </DropdownButton>
                             <div className="flex-grow-1 text-right">
                                 {/* BA1, BS1 here maybe */}
                             </div>
                         </div>
+
                         <div className="info-body">
                             <div className="row">
 
