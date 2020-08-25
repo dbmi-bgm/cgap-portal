@@ -122,10 +122,10 @@ export function VariantSampleInfoHeader(props) {
 
                     <div className="inner-card-section col pb-2 pb-lg-0">
 
-                        <div className="info-header-title" data-tip="Select a transcript (& gene) to view their details">
+                        <div className="info-header-title">
                             {/* passing 'py-1' to className of button via `size` prop - kinda hacky - noting here in case changes in future version, or if find better prop to use */}
                             <DropdownButton title={geneTitleToShow} size="lg py-1" variant="outline-dark" onSelect={onSelectTranscript}
-                                disabled={geneTranscriptListLen === 0}>
+                                disabled={geneTranscriptListLen === 0} data-tip="Select a transcript (& gene) to view their details">
                                 { geneListOptions }
                             </DropdownButton>
                             <div className="flex-grow-1 text-right">
