@@ -68,9 +68,9 @@ export function GeneTabBody(props){
     return (
         <div className="gene-tab-body card-body">
             <div className="row">
-                <div className="col-12 col-md-6 d-flex flex-column">
+                <div className="col-12 col-lg-6 d-flex flex-column">
 
-                    <div className="inner-card-section flex-grow-1 pb-2 pb-md-0">
+                    <div className="inner-card-section flex-grow-1 pb-2 pb-lg-0">
                         <div className="info-header-title">
                             <h4>Overview</h4>
                         </div>
@@ -171,7 +171,7 @@ export function GeneTabBody(props){
 
 
                 </div>
-                <div className="col-12 col-md-6 d-flex flex-column">
+                <div className="col-12 col-lg-6 d-flex flex-column">
 
                     <div className="inner-card-section flex-grow-1 pb-2">
                         <div className="info-header-title">
@@ -183,7 +183,7 @@ export function GeneTabBody(props){
                         </div>
                     </div>
 
-                    <div className="inner-card-section flex-grow-0 pb-2 pb-md-0">
+                    <div className="inner-card-section flex-grow-0 pb-2 pb-lg-0">
                         <div className="info-header-title">
                             <h4>Constraint Scores</h4>
                         </div>

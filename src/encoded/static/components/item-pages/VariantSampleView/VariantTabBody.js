@@ -29,7 +29,8 @@ export const VariantTabBody = React.memo(function VariantTabBody ({ context, sch
     return (
         <div className="variant-tab-body card-body">
             <div className="row">
-                <div className="col-12 col-md-6 d-flex flex-column">
+
+                <div className="col-12 col-xl-6 d-flex flex-column">
 
                     <div className="inner-card-section flex-grow-1 pb-2">
                         <div className="info-header-title">
@@ -43,7 +44,7 @@ export const VariantTabBody = React.memo(function VariantTabBody ({ context, sch
                         </div>
                     </div>
 
-                    <div className="inner-card-section flex-grow-0 pb-2 pb-md-0">
+                    <div className="inner-card-section flex-grow-0 pb-2 pb-xl-0">
                         <div className="info-header-title">
                             <h4>
                                 {/* todo link to GnomAD -- is there a gnomad link somewhere ? */}
@@ -57,7 +58,7 @@ export const VariantTabBody = React.memo(function VariantTabBody ({ context, sch
 
 
                 </div>
-                <div className="col-12 col-md-6 d-flex flex-column">
+                <div className="col-12 col-xl-6 d-flex flex-column">
 
                     <div className="inner-card-section flex-grow-1 pb-2">
                         <div className="info-header-title">
@@ -69,7 +70,7 @@ export const VariantTabBody = React.memo(function VariantTabBody ({ context, sch
                         </div>
                     </div>
 
-                    <div className="inner-card-section flex-grow-0 pb-2 pb-md-0">
+                    <div className="inner-card-section flex-grow-0 pb-2 pb-xl-0">
                         <div className="info-header-title">
                             <h4>Predictors</h4>
                         </div>
