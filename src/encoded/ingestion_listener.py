@@ -15,10 +15,9 @@ import elasticsearch
 import requests  # XXX: C4-211 should not be needed but is
 from vcf import Reader
 from pyramid import paster
-from collections import defaultdict
 from dcicutils.misc_utils import VirtualApp
 from pyramid.view import view_config
-from pyramid.httpexceptions import HTTPConflict, HTTPNotFound, HTTPMovedPermanently
+from pyramid.httpexceptions import HTTPNotFound, HTTPMovedPermanently
 from pyramid.request import Request
 from snovault.util import debug_log
 from .util import resolve_file_path, gunzip_content

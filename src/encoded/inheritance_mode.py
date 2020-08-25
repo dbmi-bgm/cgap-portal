@@ -1,4 +1,11 @@
+import structlog
+
+
+log = structlog.getLogger(__name__)
+
+
 class InheritanceModeError(Exception):
+    """ To be thrown if an error is raised in this code """
     pass
 
 
@@ -55,6 +62,10 @@ class InheritanceMode:
     INHMODE_LABEL_NONE_HOMOZYGOUS_PARENT = "Low relevance, homozygous in a parent"
     INHMODE_LABEL_NONE_BOTH_PARENTS = "Low relevance, present in both parent(s)"
     INHMODE_LABEL_NONE_OTHER = "Low relevance, other"
+
+    # value related constants
+    DE_NOVO_STRONG_CUTOFF = .9
+    DE_NOVO_MEDIUM_CUTOFF = .1
 
     @staticmethod
     def is_sex_chromosome(chrom):
@@ -195,11 +206,11 @@ class InheritanceMode:
             return []
 
         # De novo strong candidate
-        if novoPP > 0.9:
+        if novoPP > cls.DE_NOVO_STRONG_CUTOFF:
             return [cls.INHMODE_LABEL_DE_NOVO_STRONG]
 
         # De novo medium candidate
-        if novoPP > 0.1:
+        if novoPP > cls.DE_NOVO_MEDIUM_CUTOFF:
             return [cls.INHMODE_LABEL_DE_NOVO_MEDIUM]
 
         # De novo weak candidate
@@ -326,11 +337,16 @@ class InheritanceMode:
                 2. inheritance_modes
         """
         sample_geno = variant_sample.get('samplegeno', [])
-        genotypes = {s["samplegeno_role"]: s["samplegeno_numgt"] for s in sample_geno}
-        sexes = {s["samplegeno_role"]: s["samplegeno_sex"] for s in sample_geno}
-        chrom = variant_sample.get('variant', {}).get('CHROM')
-        cmphet = variant_sample.get("cmphet")
-        novoPP = variant_sample.get("novoPP", -1)
+        try:
+            genotypes = {s["samplegeno_role"]: s["samplegeno_numgt"] for s in sample_geno}
+            sexes = {s["samplegeno_role"]: s["samplegeno_sex"] for s in sample_geno}
+            chrom = variant_sample.get('variant', {}).get('CHROM')
+            cmphet = variant_sample.get("cmphet")
+            novoPP = variant_sample.get("novoPP", -1)
+        except Exception as e:
+            log.error('Was not able to extract inheritance modes - the required fields do not exist!'
+                      '\n%s\n%s\n%s' % (sample_geno, variant_sample, e))
+            return {}
 
         if chrom not in ['X', 'Y']:
             chrom = cls.AUTOSOME  # XXX: so chrom is one of ['X', 'Y', 'autosome'] ?
