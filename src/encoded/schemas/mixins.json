@@ -75,11 +75,7 @@
             "permission": "import_items",
             "enum": [
                 "current",
-                "released",
-                "replaced",
-                "released to project",
-                "released to institution",
-                "in public review",
+                "shared",
                 "in review",
                 "obsolete",
                 "inactive",

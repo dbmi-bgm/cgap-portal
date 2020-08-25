@@ -1,9 +1,16 @@
 [
     {
-        "title": "Test Project",
+        "title": "CGAP Core",
         "uuid": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
-        "description": "This is a test project",
+        "description": "Core Project for all items that are in general use",
         "status": "current",
         "name": "hms-dbmi"
+    },
+    {
+        "title": "Brigham Genomic Medicine",
+        "uuid": "91336042-f277-4f69-97e5-5c8a5f6d6058",
+        "status": "current",
+        "name": "brigham-genomic-medicine",
+        "aliases": ["hms-dbmi:BGM"]
     }
 ]

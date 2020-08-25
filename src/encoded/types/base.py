@@ -49,54 +49,67 @@ ONLY_ADMIN_VIEW = [
     (Deny, Everyone, ['view', 'edit'])
 ]
 
-# This acl allows item creation; it is easily overwritten in lab and user,
-# as these items should not be available for creation
-SUBMITTER_CREATE = [
-    (Allow, 'group.submitter', 'create')
-]
-
-ALLOW_OWNER_EDIT = [
-    (Allow, 'role.owner', ['edit', 'view', 'view_details']),
-]
-
+# this is for pages that should be visible to public
 ALLOW_EVERYONE_VIEW = [
     (Allow, Everyone, 'view'),
-] + ONLY_ADMIN_VIEW + SUBMITTER_CREATE
+] + ONLY_ADMIN_VIEW
+
+# view for shared items - add a status for common cgap items
+ALLOW_AUTHENTICATED_VIEW = [
+    (Allow, Authenticated, 'view'),
+] + ONLY_ADMIN_VIEW
 
 ALLOW_PROJECT_MEMBER_VIEW = [
     (Allow, 'role.project_member', 'view'),
-] + ONLY_ADMIN_VIEW + SUBMITTER_CREATE
-
-# institutions are more general than projects
-ALLOW_INSTITUTION_MEMBER_VIEW = [
-    (Allow, 'role.institution_member', 'view'),
-] + ALLOW_PROJECT_MEMBER_VIEW
-
-ALLOW_INSTITUTION_MEMBER_EDIT = [
-    (Allow, 'role.institution_submitter', 'edit'),
-] + ALLOW_INSTITUTION_MEMBER_VIEW
-
-ALLOW_CURRENT_AND_SUBMITTER_EDIT = [
-    (Allow, Everyone, 'view'),
-    (Allow, 'role.institution_submitter', 'edit'),
-] + ONLY_ADMIN_VIEW + SUBMITTER_CREATE
-
-ALLOW_CURRENT = ALLOW_EVERYONE_VIEW
+] + ONLY_ADMIN_VIEW
 
 DELETED = [
     (Deny, Everyone, 'visible_for_edit')
 ] + ONLY_ADMIN_VIEW
 
-# Collection acls
-ALLOW_SUBMITTER_ADD = [
-    (Allow, 'group.submitter', 'add'),
-]
+# above is minimal set until roles are expanded
+# ALLOW_OWNER_EDIT = [
+#     (Allow, 'role.owner', ['edit', 'view', 'view_details']),
+# ]
 
-ALLOW_ANY_USER_ADD = [
-    (Allow, Authenticated, 'add'),
-] + ALLOW_EVERYONE_VIEW
+# This acl allows item creation; it is easily overwritten in lab and user,
+# as these items should not be available for creation
+# SUBMITTER_CREATE = [
+#     (Allow, 'group.submitter', 'create')
+# ]
 
+# ALLOW_EVERYONE_VIEW = [
+#     (Allow, Everyone, 'view'),
+# ] + ONLY_ADMIN_VIEW + SUBMITTER_CREATE
 
+# ALLOW_PROJECT_MEMBER_VIEW = [
+#     (Allow, 'role.project_member', 'view'),
+# ] + ONLY_ADMIN_VIEW + SUBMITTER_CREATE
+
+# # institutions are more general than projects
+# ALLOW_INSTITUTION_MEMBER_VIEW = [
+#     (Allow, 'role.institution_member', 'view'),
+# ] + ALLOW_PROJECT_MEMBER_VIEW
+
+# ALLOW_INSTITUTION_MEMBER_EDIT = [
+#     (Allow, 'role.institution_submitter', 'edit'),
+# ] + ALLOW_INSTITUTION_MEMBER_VIEW
+
+# ALLOW_CURRENT_AND_SUBMITTER_EDIT = [
+#     (Allow, Everyone, 'view'),
+#     (Allow, 'role.institution_submitter', 'edit'),
+# ] + ONLY_ADMIN_VIEW + SUBMITTER_CREATE
+
+# ALLOW_CURRENT = ALLOW_EVERYONE_VIEW
+
+# # Collection acls
+# ALLOW_SUBMITTER_ADD = [
+#     (Allow, 'group.submitter', 'add'),
+# ]
+
+# ALLOW_ANY_USER_ADD = [
+#     (Allow, Authenticated, 'add'),
+# ] + ALLOW_EVERYONE_VIEW
 
 
 def get_item_or_none(request, value, itype=None, frame='object'):
@@ -269,20 +282,16 @@ class Item(snovault.Item):
     Collection = Collection
     STATUS_ACL = {
         # standard_status
-        'current': ALLOW_CURRENT,
-        'released': ALLOW_CURRENT,
-        'replaced': ALLOW_CURRENT,
-        'released to project': ALLOW_PROJECT_MEMBER_VIEW,
-        'released to institution': ALLOW_INSTITUTION_MEMBER_VIEW,
-        'in public review': ALLOW_CURRENT_AND_SUBMITTER_EDIT,
-        'in review': ALLOW_INSTITUTION_MEMBER_EDIT,
+        'shared': ALLOW_AUTHENTICATED_VIEW,
+        'in review': ONLY_ADMIN_VIEW,
+        'current': ALLOW_PROJECT_MEMBER_VIEW,
         'obsolete': DELETED,
-        'inactive': ALLOW_INSTITUTION_MEMBER_VIEW,
+        'inactive': ALLOW_PROJECT_MEMBER_VIEW,
         'deleted': DELETED
     }
 
     # Items of these statuses are filtered out from rev links
-    filtered_rev_statuses = ('deleted', 'replaced')
+    filtered_rev_statuses = ('deleted')
 
     # Default embed list for all 4DN Items
     embedded_list = static_content_embed_list
@@ -306,15 +315,13 @@ class Item(snovault.Item):
         # Don't finalize to avoid validation here.
         properties = self.upgrade_properties().copy()
         status = properties.get('status')
-        return self.STATUS_ACL.get(status, ALLOW_INSTITUTION_MEMBER_EDIT)
+        return self.STATUS_ACL.get(status, ONLY_ADMIN_VIEW)
 
     def __ac_local_roles__(self):
         """this creates roles based on properties of the object being accessed"""
         roles = {}
         properties = self.upgrade_properties()
         if 'institution' in properties:
-            inst_submitters = 'submits_for.%s' % properties['institution']
-            roles[inst_submitters] = 'role.institution_submitter'
             # add institution_member as well
             inst_member = 'institution.%s' % properties['institution']
             roles[inst_member] = 'role.institution_member'
@@ -515,7 +522,3 @@ def item_edit(context, request, render=None):
     # This works
     # Probably don't need to extend re: institution + project since if editing, assuming these have previously existed.
     return sno_item_edit(context, request, render)
-
-
-    
-

@@ -2,21 +2,21 @@
     {
         "name" : "about.introduction",
         "uuid" : "442c8aa0-dc6c-43d7-814a-854af460b008",
-        "status" : "released",
+        "status" : "current",
         "file" : "/src/encoded/static/data/about/introduction.html"
     },
     {
         "name" : "about.dcic",
         "uuid" : "442c8aa0-dc6c-43d7-814a-854af460b009",
         "title" : "Team",
-        "status" : "released",
+        "status" : "current",
         "file" : "/src/encoded/static/data/about/dcic.html"
     },
     {
         "name" : "about.acknowledgements",
         "uuid" : "442c8aa0-dc6c-43d7-814a-854af460b010",
         "title" : "Acknowledgements",
-        "status" : "released",
+        "status" : "current",
         "file" : "/src/encoded/static/data/about/acknowledgements.html"
     },
     {
@@ -26,6 +26,6 @@
         "uuid" : "4570c6b5-dad9-4f34-b366-9895b461334d",
         "file" : "/src/encoded/static/data/embedded-search-table-demo.jsx",
         "section_type" : "Page Section",
-        "status" : "released"
+        "status" : "current"
     }
 ]

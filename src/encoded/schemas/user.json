@@ -54,20 +54,6 @@
                 }
             }
         },
-        "submits_for": {
-            "title": "Submits for",
-            "description": "Institutions user is authorized to submit data for.",
-            "type": "array",
-            "permission": "import_items",
-            "lookup": 70,
-            "uniqueItems": true,
-            "notes": "This property is obsolete, and should be taken out with next permission implementation",
-            "items": {
-                "description": "An institution user is authorized to submit for.",
-                "type": "string",
-                "linkTo": "Institution"
-            }
-        },
         "email": {
             "title": "Account Email",
             "description": "Email used to log in to the 4DN Portal.",
