@@ -2,7 +2,6 @@
 from copy import deepcopy
 import csv
 import datetime
-import io
 import json
 import xlrd
 
@@ -186,7 +185,6 @@ def xls_to_json(row, project, institution):
         try:
             keys = next(row)
             keys = [key.lower().strip().rstrip('*: ') for key in keys]
-            print(keys)
             counter += 1
             if 'individual id' in keys:
                 header = True
