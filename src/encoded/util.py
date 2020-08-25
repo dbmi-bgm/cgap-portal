@@ -191,8 +191,8 @@ def s3_local_file(s3_client, bucket: str, key: str):
         bucket: an S3 bucket name
         key: the name of a key within the given S3 bucket
     """
-
-    tempfile_name = tempfile.mktemp()
+    ext = os.path.splitext(key)[-1]
+    tempfile_name = tempfile.mktemp() + ext
     try:
         s3_client.download_file(Bucket=bucket, Key=key, Filename=tempfile_name)
         yield tempfile_name
