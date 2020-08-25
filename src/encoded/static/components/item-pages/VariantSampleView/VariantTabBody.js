@@ -32,7 +32,7 @@ export const VariantTabBody = React.memo(function VariantTabBody ({ context, sch
 
                 <div className="col-12 col-xl-6 d-flex flex-column">
 
-                    <div className="inner-card-section flex-grow-1 pb-2">
+                    <div className="inner-card-section flex-grow-1 pb-2 pb-xl-1">
                         <div className="info-header-title">
                             <h4>
                                 {/* todo link to ClinVar */}
@@ -60,7 +60,7 @@ export const VariantTabBody = React.memo(function VariantTabBody ({ context, sch
                 </div>
                 <div className="col-12 col-xl-6 d-flex flex-column">
 
-                    <div className="inner-card-section flex-grow-1 pb-2">
+                    <div className="inner-card-section flex-grow-1 pb-2 pb-xl-1">
                         <div className="info-header-title">
                             <h4>External Resources</h4>
                         </div>

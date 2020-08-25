@@ -173,7 +173,7 @@ export function GeneTabBody(props){
                 </div>
                 <div className="col-12 col-lg-6 d-flex flex-column">
 
-                    <div className="inner-card-section flex-grow-1 pb-2">
+                    <div className="inner-card-section flex-grow-1 pb-2 pb-lg-1">
                         <div className="info-header-title">
                             <h4>External Databases</h4>
                         </div>
