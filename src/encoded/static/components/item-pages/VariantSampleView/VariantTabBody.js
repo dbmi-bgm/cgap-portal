@@ -14,7 +14,7 @@ import { Schemas } from './../../util';
  * Excluding the Gene Area (under position in mockuop https://gyazo.com/81d5b75b167bddef1b4c0a97f1640c51)
  */
 
-export function VariantTabBody ({ context, schemas }) {
+export const VariantTabBody = React.memo(function VariantTabBody ({ context, schemas }) {
 
     const getTipForField = useMemo(function(){
         if (!schemas) return function(){ return null; };
@@ -51,7 +51,7 @@ export function VariantTabBody ({ context, schemas }) {
                             </h4>
                         </div>
                         <div className="info-body">
-                            <em>Todo</em>
+                            <ClinVarSection {...{ getTipForField, context }} />
                         </div>
                     </div>
 
@@ -82,7 +82,7 @@ export function VariantTabBody ({ context, schemas }) {
             </div>
         </div>
     );
-}
+});
 
 function GnomADTable({ context, getTipForField }){
     const { variant } = context;
@@ -173,6 +173,38 @@ function GnomADTable({ context, getTipForField }){
                 </tr>
             </tbody>
         </table>
+    );
+}
+
+function ClinVarSection({ context, getTipForField }){
+    const { variant } = context;
+    const {
+        clinvar_variationid: variationID,
+        clinvar_clnsig: clinicalSignificance,
+        clinvar_clnsigconf: conflictingClinicalSignificance
+    } = variant;
+
+    if (!variationID) {
+        // No ClinVar info available ??
+        return (
+            <div className="text-large text-center">
+                <em>Not Available</em>
+            </div>
+        );
+    }
+
+    return (
+        <div>
+            <div className="row">
+                <div className="col">
+                    <label data-tip={getTipForField("clinvar_variationid")}>ID: </label>
+                    <a href="      #TODO         ">
+                        { variationID }
+                        <i className="icon icon-external-link-alt fas ml-07"/>
+                    </a>
+                </div>
+            </div>
+        </div>
     );
 }
 
