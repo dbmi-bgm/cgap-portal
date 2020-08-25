@@ -77,7 +77,7 @@ export function VariantSampleInfoHeader(props) {
                 <div className="row flex-column flex-lg-row">
 
                     { caseID ?
-                        <div className="info-section col pb-2 pb-lg-0 col-lg-2 col-xl-1 d-flex flex-column">
+                        <div className="inner-card-section col pb-2 pb-lg-0 col-lg-2 col-xl-1 d-flex flex-column">
                             <div className="info-header-title">
                                 <h4>Case ID</h4>
                             </div>
@@ -87,7 +87,7 @@ export function VariantSampleInfoHeader(props) {
                         </div>
                         : null }
 
-                    <div className="info-section col pb-2 pb-lg-0">
+                    <div className="inner-card-section col pb-2 pb-lg-0">
                         <div className="info-header-title">
                             <h4>Position</h4>
                         </div>
@@ -120,7 +120,7 @@ export function VariantSampleInfoHeader(props) {
                         </div>
                     </div>
 
-                    <div className="info-section col pb-2 pb-lg-0">
+                    <div className="inner-card-section col pb-2 pb-lg-0">
 
                         <div className="info-header-title" data-tip="Select a transcript (& gene) to view their details">
                             {/* passing 'py-1' to className of button via `size` prop - kinda hacky - noting here in case changes in future version, or if find better prop to use */}

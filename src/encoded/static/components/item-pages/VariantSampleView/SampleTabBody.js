@@ -33,7 +33,7 @@ export function SampleTabBody(props){
         <div className="variant-tab-body card-body">
             <div className="row">
                 <div className="col-8 col-md-9">
-                    <div className="info-section pb-2">
+                    <div className="inner-card-section pb-2">
                         <div className="info-header-title">
                             <h4>
                                 {/* todo link to GnomAD -- is there a gnomad link somewhere ? */}
@@ -46,7 +46,7 @@ export function SampleTabBody(props){
                     </div>
                 </div>
                 <div className="col-4 col-md-3">
-                    <div className="info-section pb-2">
+                    <div className="inner-card-section pb-2">
                         <div className="info-header-title">
                             <h4>
                                 {/* todo link to GnomAD -- is there a gnomad link somewhere ? */}
@@ -64,7 +64,7 @@ export function SampleTabBody(props){
             </div>
             <div className="row">
                 <div className="col-12 col-md-12 d-flex">
-                    <div className="info-section pb-2">
+                    <div className="inner-card-section pb-2">
                         <div className="info-header-title">
                             <h4>
                                 {/* todo link to GnomAD -- is there a gnomad link somewhere ? */}
@@ -79,7 +79,7 @@ export function SampleTabBody(props){
             </div>
             <div className="row">
                 <div className="col-12 col-md-12 d-flex">
-                    <div className="info-section pb-2">
+                    <div className="inner-card-section pb-2">
                         <div className="info-header-title">
                             <h4>
                                 {/* todo link to GnomAD -- is there a gnomad link somewhere ? */}

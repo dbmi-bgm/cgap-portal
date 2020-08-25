@@ -31,7 +31,7 @@ export const VariantTabBody = React.memo(function VariantTabBody ({ context, sch
             <div className="row">
                 <div className="col-12 col-md-6 d-flex flex-column">
 
-                    <div className="info-section flex-grow-1 pb-2">
+                    <div className="inner-card-section flex-grow-1 pb-2">
                         <div className="info-header-title">
                             <h4>
                                 {/* todo link to ClinVar */}
@@ -43,7 +43,7 @@ export const VariantTabBody = React.memo(function VariantTabBody ({ context, sch
                         </div>
                     </div>
 
-                    <div className="info-section flex-grow-1 pb-2 pb-md-0">
+                    <div className="inner-card-section flex-grow-1 pb-2 pb-md-0">
                         <div className="info-header-title">
                             <h4>
                                 {/* todo link to GnomAD -- is there a gnomad link somewhere ? */}
@@ -59,7 +59,7 @@ export const VariantTabBody = React.memo(function VariantTabBody ({ context, sch
                 </div>
                 <div className="col-12 col-md-6 d-flex flex-column">
 
-                    <div className="info-section flex-grow-1 pb-2">
+                    <div className="inner-card-section flex-grow-1 pb-2">
                         <div className="info-header-title">
                             <h4>External Resources</h4>
                         </div>
@@ -69,7 +69,7 @@ export const VariantTabBody = React.memo(function VariantTabBody ({ context, sch
                         </div>
                     </div>
 
-                    <div className="info-section flex-grow-1 pb-2 pb-md-0">
+                    <div className="inner-card-section flex-grow-1 pb-2 pb-md-0">
                         <div className="info-header-title">
                             <h4>Predictors</h4>
                         </div>

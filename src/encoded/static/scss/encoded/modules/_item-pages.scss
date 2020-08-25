@@ -2361,52 +2361,55 @@ $download-button-width : 100px;
   VariantSampleView & similar - Annotation Space
 **********************************************************/
 
-.sample-variant-annotation-space-body {
+// TODO maybe move somewhere else
+// Is (and should prly remain) a common style we potentially reuse
+// when need to block out card contents.
 
-	.info-header-title {
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-		height: 32px;
-		position: relative;
-		z-index: 5;
-		> h4 {
-			// todo: maybe add color if to be just for this section (?)
-			font-weight: 600;
-			margin: 0 0 16px;
-		}
-	}
+.card {
 
-	.info-section {
+	.inner-card-section {
 
 		display: flex;
 		flex-direction: column;
 
-		.info-header-title {
-			// todo: iterate on this more once content in place, e.g. bottom margin, align-items, etc.
+		.info-header-title { // TODO Rename from "info-" ?
+
 			flex-grow: 0;
 			padding: 0 8px;
 
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			height: 32px;
+			position: relative;
+			z-index: 5;
 			> h4 {
+				// todo: maybe add color if to be just for this section (?)
+				font-weight: 600;
 				margin: 0;
 				padding: 0 8px;
-				background-color: #fff;
+				background-color: $card-bg;
 			}
 
 			.dropdown {
-				background-color: #fff;
+				background-color: $card-bg;
 			}
 
 			+ .info-body {
-				border: 1px solid #ccc;
+				border: 1px solid $border-color;
+				// TODO maybe use or base off bootstrap vars here instd of hardcoded px vals.
     			padding: 24px 16px 16px;
 				margin-top: -16px;
 				flex-grow: 1;
+				border-radius: $border-radius-sm;
 			}
 		}
 
 	}
 
+}
+
+.sample-variant-annotation-space-body {
 
 	.sample-variant-overview-tab-view-container {
 		.tabs-column {
