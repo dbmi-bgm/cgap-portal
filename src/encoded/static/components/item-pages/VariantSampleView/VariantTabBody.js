@@ -14,7 +14,7 @@ import { Schemas } from './../../util';
  * Excluding the Gene Area (under position in mockuop https://gyazo.com/81d5b75b167bddef1b4c0a97f1640c51)
  */
 
-export const VariantTabBody = React.memo(function VariantTabBody ({ context, schemas }) {
+export const VariantTabBody = React.memo(function VariantTabBody ({ context, schemas, currentTranscriptIdx }) {
 
     const getTipForField = useMemo(function(){
         if (!schemas) return function(){ return null; };
@@ -31,19 +31,7 @@ export const VariantTabBody = React.memo(function VariantTabBody ({ context, sch
             <div className="row">
                 <div className="col-12 col-md-6 d-flex flex-column">
 
-                    <div className="flex-grow-0 pb-2">
-                        <div className="info-header-title">
-                            <h4>
-                                {/* todo link to GnomAD -- is there a gnomad link somewhere ? */}
-                                GnomAD
-                            </h4>
-                        </div>
-                        <div className="info-body overflow-auto">
-                            <GnomADTable {...{ context, schemas, getTipForField }} />
-                        </div>
-                    </div>
-
-                    <div className="flex-grow-1 pb-2 pb-md-0">
+                    <div className="flex-grow-1 pb-2">
                         <div className="info-header-title">
                             <h4>
                                 {/* todo link to ClinVar */}
@@ -52,6 +40,18 @@ export const VariantTabBody = React.memo(function VariantTabBody ({ context, sch
                         </div>
                         <div className="info-body">
                             <ClinVarSection {...{ getTipForField, context }} />
+                        </div>
+                    </div>
+
+                    <div className="flex-grow-0 pb-2 pb-md-0">
+                        <div className="info-header-title">
+                            <h4>
+                                {/* todo link to GnomAD -- is there a gnomad link somewhere ? */}
+                                GnomAD
+                            </h4>
+                        </div>
+                        <div className="info-body overflow-auto">
+                            <GnomADTable {...{ context, schemas, getTipForField }} />
                         </div>
                     </div>
 
@@ -74,7 +74,7 @@ export const VariantTabBody = React.memo(function VariantTabBody ({ context, sch
                             <h4>Predictors</h4>
                         </div>
                         <div className="info-body">
-                            <PredictorsSection {...{ schemas, context }} />
+                            <PredictorsSection {...{ context, getTipForField, currentTranscriptIdx }} />
                         </div>
                     </div>
 
@@ -84,7 +84,7 @@ export const VariantTabBody = React.memo(function VariantTabBody ({ context, sch
     );
 });
 
-function GnomADTable({ context, getTipForField }){
+const GnomADTable = React.memo(function GnomADTable({ context, getTipForField }){
     const { variant } = context;
     const {
         // Allele Counts
@@ -174,7 +174,7 @@ function GnomADTable({ context, getTipForField }){
             </tbody>
         </table>
     );
-}
+});
 
 function ClinVarSection({ context, getTipForField }){
     const { variant } = context;
@@ -208,6 +208,134 @@ function ClinVarSection({ context, getTipForField }){
     );
 }
 
-function PredictorsSection(props){
-    return <em>Todo</em>;
+function PredictorsSection({ context, getTipForField, currentTranscriptIdx }){
+    const { variant } = context;
+    const fallbackElem = <em data-tip="Not Available">N/A</em>;
+    const {
+        conservation_gerp = fallbackElem,
+        conservation_phylop100 = fallbackElem,
+        cadd_phred = fallbackElem,
+        genes_most_severe_sift_score = fallbackElem,
+        transcript = [],
+        spliceai_maxds = fallbackElem
+    } = variant;
+
+    // Should we instead find transcript with largest score instead of using current?
+    const currentTranscript = transcript[currentTranscriptIdx];
+    const {
+        vep_sift_score = fallbackElem,
+        vep_sift_prediction = fallbackElem,
+        vep_polyphen_score = fallbackElem,
+        vep_polyphen_prediciton = fallbackElem
+    } = currentTranscript;
+
+    // Not too sure whether to use table or <row> and <cols> here..
+    // Went with <table> since is more semantically correct for the data we're
+    // displaying, IMO...
+
+    return (
+        <React.Fragment>
+            <div>
+
+                <div className="d-flex align-items-center">
+                    <h5 className="col-auto px-0 mt-0 mb-08">Conservation</h5>
+                    {/* todo: boxes/identifiers at right */}
+                </div>
+
+                <div className="table-container">
+                    <table className="w-100">
+                        <PredictorsTableHeading/>
+                        <tbody>
+                            <tr>
+                                <td className="text-left">
+                                    <label className="mb-0" data-tip={getTipForField("conservation_gerp")}>GERP++</label>
+                                </td>
+                                <td className="text-left">{ conservation_gerp }</td>
+                                {/* TODO for all:
+                                <td className="text-left">{ prediction }/td>
+                                <td className="text-left">{ score }</td>
+                                */}
+                            </tr>
+                            <tr>
+                                <td className="text-left">
+                                    <label className="mb-0" data-tip={getTipForField("conservation_phylop100")}>phyloP100way</label>
+                                </td>
+                                <td className="text-left">{ conservation_phylop100 }</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+
+
+                <div className="d-flex align-items-center">
+                    <h5 className="col-auto px-0 mt-16 mb-08">Missense</h5>
+                    {/* todo: boxes/identifiers at right */}
+                </div>
+
+                <div className="table-container">
+                    <table className="w-100">
+                        <PredictorsTableHeading/>
+                        <tbody>
+                            <tr>
+                                <td className="text-left">
+                                    <label className="mb-0" data-tip={getTipForField("cadd_phred")}>CADD</label>
+                                </td>
+                                <td className="text-left">{ cadd_phred }</td>
+                            </tr>
+                            <tr>
+                                <td className="text-left">
+                                    <label className="mb-0" data-tip={getTipForField("transcript.vep_sift_score")}>SIFT</label>
+                                </td>
+                                <td className="text-left">{ vep_sift_score }</td>
+                            </tr>
+                            <tr>
+                                <td className="text-left">
+                                    <label className="mb-0" data-tip={getTipForField("transcript.vep_polyphen_score")}>PolyPhen2</label>
+                                </td>
+                                <td className="text-left">{ vep_polyphen_score }</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+
+
+                <div className="d-flex align-items-center">
+                    <h5 className="col-auto px-0 mt-16 mb-08">Splice</h5>
+                    {/* todo: boxes/identifiers at right */}
+                </div>
+
+                <div className="table-container">
+                    <table className="w-100">
+                        <PredictorsTableHeading/>
+                        <tbody>
+                            <tr>
+                                <td className="text-left">
+                                    <label className="mb-0" data-tip={getTipForField("spliceai_maxds")}>SpliceAI</label>
+                                </td>
+                                <td className="text-left">{ spliceai_maxds }</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+        </React.Fragment>
+    );
+}
+
+function PredictorsTableHeading(){
+    return (
+        <thead className="bg-transparent">
+            <tr>
+                <th className="text-left bg-transparent border-0 w-75">Prediction Tool</th>
+                <th className="text-left bg-transparent border-0 w-25">Score</th>
+                {/* TODO (and change all to w-25):
+                <th className="text-left bg-transparent border-0 w-25">Prediction</th>
+                <th className="text-left bg-transparent border-0 w-25">Rank Score (0 to 1)</th>
+                */}
+            </tr>
+        </thead>
+    );
 }

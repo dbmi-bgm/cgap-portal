@@ -104,11 +104,12 @@ export class VariantSampleOverview extends React.PureComponent {
     render(){
         const { context, schemas } = this.props;
         const { currentTranscriptIdx, currentGeneItem, currentGeneItemLoading } = this.state;
+        const passProps = { context, schemas, currentTranscriptIdx, currentGeneItem, currentGeneItemLoading };
         return (
             <div className="sample-variant-overview sample-variant-annotation-space-body">
                 {/* BA1, BS1, BS2, BS3 etc markers here */}
-                <VariantSampleInfoHeader { ...{ context, schemas, currentTranscriptIdx, currentGeneItemLoading, currentGeneItem }} onSelectTranscript={this.onSelectTranscript} />
-                <VariantSampleOverviewTabView {...{ context, schemas, currentGeneItem, currentGeneItemLoading }} />
+                <VariantSampleInfoHeader { ...passProps} onSelectTranscript={this.onSelectTranscript} />
+                <VariantSampleOverviewTabView {...passProps} />
             </div>
         );
     }
@@ -125,13 +126,13 @@ function getCurrentTranscriptGeneID(context, transcriptIndex){
 
 /** @todo probably eventually move into own file, along w child tabs */
 function VariantSampleOverviewTabView(props){
-    const { context, schemas, currentGeneItem, currentGeneItemLoading } = props;
+    const { context, schemas, currentGeneItem, currentGeneItemLoading, currentTranscriptIdx } = props;
     const [ currentTab, setCurrentTab ] = useState("Variant");
 
     // TODO change eventually to use 'if' condition or something and distribute props as needed.
     let tabViewBody = null;// { "Variant" : VariantTabBody, "Gene" : GeneTabBody, "Sample" : SampleTabBody }[currentTab];
     if (currentTab === "Variant"){
-        tabViewBody = <VariantTabBody {...{ context, schemas }} />;
+        tabViewBody = <VariantTabBody {...{ context, schemas, currentTranscriptIdx }} />;
     } else if (currentTab === "Gene") {
         tabViewBody = <GeneTabBody {...{ context, schemas, currentGeneItem, currentGeneItemLoading }} />;
     } else if (currentTab === "Sample") {
