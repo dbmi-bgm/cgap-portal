@@ -367,6 +367,37 @@ class Family(Item):
             relations.append([i, relation, association])
         return relations
 
+    @staticmethod
+    def calculate_relations(proband, all_props, family_id, members):
+        # convert to ped_file format
+        ped_text = Family.generate_ped(all_props, proband, family_id)
+        primary_vectors = Family.extract_vectors(ped_text)
+        proband_acc = proband.split('/')[2]
+        links = Family.construct_links(primary_vectors, proband_acc)
+        relations = Family.relationships_vocabulary(links)
+        results = []
+        for a_member_resp in all_props:
+            temp = {"individual": '',
+                    "sex": '',
+                    "relationship": '',
+                    "association": ''}
+            mem_acc = a_member_resp['accession']
+            temp['individual'] = mem_acc
+            sex = a_member_resp.get('sex', 'U')
+            temp['sex'] = sex
+            relation_dic = [i for i in relations if i[0] == mem_acc]
+            if not relation_dic:
+                temp['relationship'] = 'not linked'
+                # the individual is not linked to proband through individuals listed in members
+                results.append(temp)
+                continue
+            relation = relation_dic[0]
+            temp['relationship'] = relation[1]
+            if relation[2]:
+                temp['association'] = relation[2]
+            results.append(temp)
+        return results
+
     @calculated_property(schema={
         "title": "Relationships",
         "description": "Relationships to proband.",
@@ -456,10 +487,10 @@ class Family(Item):
         """Calculate relationships"""
         # Start of the function
         # empty list to accumulate results
-        relations = []
+        results = []
         # we need both the proband and the members to calculate
         if not proband or not members:
-            return relations
+            return results
         family_id = self.properties['accession']
         # collect members properties
         all_props = []
@@ -469,34 +500,7 @@ class Family(Item):
             #  for complete connection tracing
             props = get_item_or_none(request, a_member, 'individuals')
             all_props.append(props)
-        # convert to ped_file format
-        ped_text = self.generate_ped(all_props, proband, family_id)
-        primary_vectors = self.extract_vectors(ped_text)
-        proband_acc = proband.split('/')[2]
-        links = self.construct_links(primary_vectors, proband_acc)
-        relations = self.relationships_vocabulary(links)
-        results = []
-        for a_member in members:
-            a_member_resp = [i for i in all_props if i['@id'] == a_member][0]
-            temp = {"individual": '',
-                    "sex": '',
-                    "relationship": '',
-                    "association": ''}
-            mem_acc = a_member_resp['accession']
-            temp['individual'] = mem_acc
-            sex = a_member_resp.get('sex', 'U')
-            temp['sex'] = sex
-            relation_dic = [i for i in relations if i[0] == mem_acc]
-            if not relation_dic:
-                temp['relationship'] = 'not linked'
-                # the individual is not linked to proband through individuals listed in members
-                results.append(temp)
-                continue
-            relation = relation_dic[0]
-            temp['relationship'] = relation[1]
-            if relation[2]:
-                temp['association'] = relation[2]
-            results.append(temp)
+        results = self.calculate_relations(proband, all_props, family_id)
         return results
 
     @calculated_property(schema={
