@@ -32,7 +32,7 @@ export function SampleTabBody(props){
     return (
         <div className="variant-tab-body card-body">
             <div className="row">
-                <div className="col-8 col-md-9 d-flex">
+                <div className="col-8 col-md-9">
                     <div className="pb-2">
                         <div className="info-header-title">
                             <h4>
@@ -45,7 +45,7 @@ export function SampleTabBody(props){
                         </div>
                     </div>
                 </div>
-                <div className="col-4 col-md-3 d-flex justify-content-center">
+                <div className="col-4 col-md-3">
                     <div className="pb-2">
                         <div className="info-header-title">
                             <h4>
@@ -53,9 +53,9 @@ export function SampleTabBody(props){
                                 BAM Snapshot
                             </h4>
                         </div>
-                        <div className="info-body overflow-auto">
+                        <div className="info-body text-center">
                             View BAM Snapshot
-                            <a href={`/${uuid}/@@download`} className="d-block pt-2" style={{ textAlign: "center", margin: "0 auto" }}>
+                            <a href={`/${uuid}/@@download`} className="d-block pt-2 my-0 mx-auto">
                                 <i className="icon icon-fw icon-2x icon-external-link-alt fas" />
                             </a>
                         </div>
