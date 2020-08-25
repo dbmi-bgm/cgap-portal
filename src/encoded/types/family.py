@@ -369,6 +369,9 @@ class Family(Item):
 
     @staticmethod
     def calculate_relations(proband, all_props, family_id):
+        """Static wrapper for relations calculated property
+        so it can be called by other classes, curretly used by
+        sample_pedigree on sample_processing also."""
         # convert to ped_file format
         ped_text = Family.generate_ped(all_props, proband, family_id)
         primary_vectors = Family.extract_vectors(ped_text)
