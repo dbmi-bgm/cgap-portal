@@ -167,16 +167,6 @@ def test_ingestion_queue_delete(fresh_ingestion_queue_manager_for_testing, testa
     wait_for_queue_to_catch_up(queue_manager, 0)
 
 
-@pytest.mark.integrated  # uses s3
-def test_posting_vcf_processed_file(testapp, workbook):
-    """ Posts a dummy vcf file """
-    file_meta = testapp.get('/cd679bdc-8691-4352-a25b-1c5f48407e9b')
-    file_location = testapp.get(file_meta['href']).location  # if you .follow() this you get 404 erroneously
-    content = requests.get(file_location).content
-    raw_vcf_file = gunzip_content(content)
-    assert "##fileformat=VCFv4.2" in raw_vcf_file
-
-
 def test_ingestion_listener_should_remain_online(fresh_ingestion_queue_manager_for_testing):
     """ Tests that the 'should_remain_online' method works """
     _await = lambda: time.sleep(3)
@@ -229,8 +219,8 @@ def test_ingestion_listener_verify_vcf_status_is_not_ingested(authenticated_test
     assert verify_vcf_file_status_is_not_ingested(request, NA_ACCESSION) is True
 
 
-def test_ingestion_listener_run(testapp, fresh_ingestion_queue_manager_for_testing,
-                                post_variant_consequence_items, project, institution, gene_workbook):
+def test_ingestion_listener_run(testapp, fresh_ingestion_queue_manager_for_testing, workbook, project, institution,
+                                post_variant_consequence_items, gene_workbook):
     """ Tests the 'run' method of ingestion listener, which will pull down and ingest a vcf file
         from the SQS queue.
     """

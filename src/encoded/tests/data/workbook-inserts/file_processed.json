@@ -14,5 +14,14 @@
     "file_ingestion_status": "N/A",
     "uuid": "a0661ad2-099e-4092-b9e3-c35db70a17c1",
     "accession": "GAPFIZ654321"
+  },
+  {
+    "file_format": "vcf_gz",
+    "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+    "institution": "hms-dbmi",
+    "file_ingestion_status": "N/A",
+    "uuid": "cd679bdc-8691-4352-a25b-1c5f48407e9b",
+    "filename": "GAPFIPYY5V7Y.vcf.gz",
+    "accession": "GAPFIPYY5V7Y"
   }
 ]
