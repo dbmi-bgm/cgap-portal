@@ -7,6 +7,7 @@ from .base import (
     Item,
     get_item_or_none
 )
+from .family import Family
 
 
 @collection(
@@ -150,13 +151,26 @@ class SampleProcessing(Item):
         if len(families) != 1:
             return samples_pedigree
         family = families[0]
-        fam_data = get_item_or_none(request, family, 'families', frame='embedded')
+
+        # get relationship from family
+        fam_data = get_item_or_none(request, family, 'families')
         if not fam_data:
             return samples_pedigree
+        proband = fam_data.get('proband', '')
         members = fam_data.get('members', [])
-        relations = fam_data.get('relationships', [])
-        if not members:
+        if not proband or not members:
             return samples_pedigree
+        family_id = fam_data['accession']
+        # collect members properties
+        all_props = []
+        for a_member in members:
+            # This might be a step to optimize if families get larger
+            # TODO: make sure all mother fathers are in member list, if not fetch them too
+            #  for complete connection tracing
+            props = get_item_or_none(request, a_member, 'individuals')
+            all_props.append(props)
+        relations = Family.calculate_relations(proband, all_props, family_id)
+
         for a_sample in samples:
             temp = {
                 "individual": "",
@@ -167,11 +181,11 @@ class SampleProcessing(Item):
                 "sex": "",
                 # "association": ""  optional, add if exists
             }
-            mem_infos = [i for i in members if a_sample in [x['@id'] for x in i.get('samples', [])]]
+            mem_infos = [i for i in all_props if a_sample in i.get('samples', [])]
             if not mem_infos:
                 continue
             mem_info = mem_infos[0]
-            sample_info = [i for i in mem_info['samples'] if i['@id'] == a_sample][0]
+            sample_info = get_item_or_none(request, a_sample, 'samples')
             # fetch the calculated relation info
             relation_infos = [i for i in relations if i['individual'] == mem_info['accession']]
             # fill in temp dict
@@ -180,7 +194,9 @@ class SampleProcessing(Item):
             parents = []
             for a_parent in ['mother', 'father']:
                 if mem_info.get(a_parent):
-                    parents.append(mem_info[a_parent]['display_title'])
+                    # extract accession from @id
+                    mem_acc = mem_info[a_parent].split('/')[2]
+                    parents.append(mem_acc)
             temp['parents'] = parents
             temp['sample_accession'] = sample_info['display_title']
             temp['sample_name'] = sample_info.get('bam_sample_id', '')

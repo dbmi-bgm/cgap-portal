@@ -33,6 +33,7 @@ VARIANT_SCHEMA = resolve_file_path('./schemas/variant.json')
 VARIANT_SAMPLE_SCHEMA = resolve_file_path('./schemas/variant_sample.json')
 STATUS_QUEUED = 'Queued'
 STATUS_INGESTED = 'Ingested'
+STATUS_DISABLED = 'Ingestion disabled'
 
 
 def includeme(config):
@@ -532,8 +533,8 @@ class IngestionListener:
                     log.error('Could not locate uuid: %s with error: %s' % (uuid, e))
                     continue
 
-                # if this file has been ingested, do not do anything with this message
-                if file_meta.get('file_ingestion_status', 'N/A') == STATUS_INGESTED:
+                # if this file has been ingested (or explicitly disabled), do not do anything with this uuid
+                if file_meta.get('file_ingestion_status', 'N/A') in [STATUS_INGESTED, STATUS_DISABLED]:
                     continue
 
                 # attempt download with workaround
