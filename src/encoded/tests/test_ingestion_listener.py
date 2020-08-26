@@ -179,7 +179,7 @@ def test_ingestion_listener_should_remain_online(fresh_ingestion_queue_manager_f
 
 @pytest.fixture
 def mocked_familial_relations():
-    return [{'sample_pedigrees': [
+    return [{'samples_pedigree': [
                 {
                     'sample_name': 'sample_one',
                     'relationship': 'mother',
