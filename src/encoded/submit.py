@@ -242,6 +242,8 @@ def xls_to_json(row, project, institution):
         # create item for Sample if there is a specimen
         if row.get('specimen id'):
             samp_alias = '{}:sample-{}'.format(project['name'], row['specimen id'])
+            if row.get('run no.'):
+                samp_alias = samp_alias + '-' + row['run no.']
             analysis_alias = '{}:analysis-{}'.format(project['name'], row['analysis id'])
             items = fetch_sample_metadata(row_num, row, items, indiv_alias, samp_alias, analysis_alias,
                                           fam_alias, project['name'], a_types, case_names)
