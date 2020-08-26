@@ -142,15 +142,24 @@ def process_genelist(context, request):
     for a_gene in genes:
         query = '/search/?type=Gene&q=' + a_gene
         res = testapp.get(query).json
-        bulls_eye = [i for i in res if i.get('gene_symbol', '') == a_gene]
-        if bulls_eye:
-            gene_list.append(bulls_eye['uuid'])
+        # look up with common ids gene_symbol and ensemble id
+        bulls_eye_1 = [i for i in res if i.get('gene_symbol', '') == a_gene]
+        bulls_eye_2 = [i for i in res if i.get('ensgid', '') == a_gene]
+        # if it is gene_symbol
+        if bulls_eye_1:
+            gene_list.append(bulls_eye_1[0]['uuid'])
+        # if it is ensemble gene id
+        elif bulls_eye_2:
+            gene_list.append(bulls_eye_2[0]['uuid'])
+        # if no id match but some results were returned, report back top 10 gene ids
         elif res:
-            option_symbols = [i['gene_symbol'] for i in res]
-            option_uuids = [i['uuid'] for i in res]
+            topten = res[:10]
+            option_symbols = [i['gene_symbol'] for i in topten]
+            option_uuids = [i['uuid'] for i in topten]
             not_matching_with_options.append({'gene_id': a_gene,
                                               'option_symbols': option_symbols,
                                               'option_uuids': option_uuids})
+        # we don't have an option
         else:
             not_matching_no_options.append(a_gene)
 
