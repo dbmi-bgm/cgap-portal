@@ -21,11 +21,11 @@ class InheritanceMode:
 
     MALE = 'M'
     FEMALE = 'F'
-    SEXES = [MALE, FEMALE]  # XXX: any additional?
+    SEXES = [MALE, FEMALE]
 
     MOTHER = 'mother'
     FATHER = 'father'
-    SELF = 'self'
+    SELF = 'proband'  # XXX: this is what the data actually looks like, NOT 'self'
     TRIO = [MOTHER, FATHER, SELF]
 
     # Genotype labels
@@ -328,7 +328,7 @@ class InheritanceMode:
         return structured_labels
 
     @classmethod
-    def compute_inheritance_modes(cls, variant_sample):
+    def compute_inheritance_modes(cls, variant_sample, chrom=None):
         """ Computes inheritance modes given a variant_sample.
             Intended to perform: variant_sample.update(new_fields) with result of this method.
 
@@ -340,7 +340,7 @@ class InheritanceMode:
         try:
             genotypes = {s["samplegeno_role"]: s["samplegeno_numgt"] for s in sample_geno}
             sexes = {s["samplegeno_role"]: s["samplegeno_sex"] for s in sample_geno}
-            chrom = variant_sample.get('variant', {}).get('CHROM')
+            chrom = chrom if chrom else variant_sample.get('variant', {}).get('CHROM')  # attempt to get from variant
             cmphet = variant_sample.get("cmphet")
             novoPP = variant_sample.get("novoPP", -1)
         except Exception as e:
@@ -352,7 +352,7 @@ class InheritanceMode:
             chrom = cls.AUTOSOME  # XXX: so chrom is one of ['X', 'Y', 'autosome'] ?
 
         if cls.SELF not in genotypes:
-            raise InheritanceModeError('Role "self" not present in genotypes: %s' % genotypes)
+            raise InheritanceModeError('Role "proband" not present in genotypes: %s' % genotypes)
 
         genotype_labels = cls.compute_family_genotype_labels(genotypes, sexes, chrom)
         inheritance_modes = cls.compute_inheritance_mode_trio(genotypes=genotypes,

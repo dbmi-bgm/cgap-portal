@@ -440,7 +440,9 @@ class IngestionListener:
                         geno.update(sample_relations[sample_id])
 
                 # add inheritance mode information
-                sample.update(InheritanceMode.compute_inheritance_modes(sample))
+                variant_name = sample['variant']
+                chrom = variant_name[variant_name.index('chr') + 3]  # find chr* and get *
+                sample.update(InheritanceMode.compute_inheritance_modes(sample, chrom=chrom))
 
                 self.vapp.post_json('/variant_sample', sample, status=201)
             except Exception as e:
@@ -465,7 +467,7 @@ class IngestionListener:
         sample_relations = {}  # should never be None now
         if len(search_result) == 1:
             sample_procesing = search_result[0]
-            sample_pedigrees = sample_procesing.get('sample_pedigrees', [])
+            sample_pedigrees = sample_procesing.get('samples_pedigree', [])
             for entry in sample_pedigrees:
                 sample_id = entry['sample_name']
                 sample_relations[sample_id] = {}
