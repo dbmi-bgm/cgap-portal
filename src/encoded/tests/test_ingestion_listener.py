@@ -7,14 +7,18 @@ import time
 
 from dcicutils.qa_utils import ignored, notice_pytest_fixtures
 from uuid import uuid4
-from ..ingestion_listener import IngestionQueueManager, run, IngestionListener
+from pyramid.testing import DummyRequest
+from ..ingestion_listener import IngestionQueueManager, run, IngestionListener, verify_vcf_file_status_is_not_ingested
 from ..util import gunzip_content
 from .variant_fixtures import gene_workbook, post_variant_consequence_items
+from .workbook_fixtures import workbook, app
 
 
 pytestmark = [pytest.mark.working, pytest.mark.ingestion]
 QUEUE_INGESTION_URL = '/queue_ingestion'
 INGESTION_STATUS_URL = '/ingestion_status'
+INGESTED_ACCESSION = 'GAPFIZ123456'
+NA_ACCESSION = 'GAPFIZ654321'
 notice_pytest_fixtures(gene_workbook, post_variant_consequence_items)
 
 
@@ -163,43 +167,6 @@ def test_ingestion_queue_delete(fresh_ingestion_queue_manager_for_testing, testa
     wait_for_queue_to_catch_up(queue_manager, 0)
 
 
-@pytest.fixture
-def vcf_file_format(testapp, project, institution):
-    vcf_format = {
-        'project': project['@id'],
-        'institution': institution['@id'],
-        'file_format': 'vcf_gz',
-        'description': 'vcf, compressed',
-        'standard_file_extension': 'vcf.gz',
-        'valid_item_types': ['FileProcessed']
-    }
-    return testapp.post_json('/file_format', vcf_format, status=201).json
-
-
-@pytest.fixture
-def mocked_vcf_file(vcf_file_format, testapp, project, institution):
-    """ Posts a processed VCF File """
-    f = {
-        'uuid': 'cd679bdc-8691-4352-a25b-1c5f48407e9b',
-        'accession': 'GAPFIPYY5V7Y',
-        'project': project['@id'],
-        'institution': institution['@id'],
-        'filename': 'GAPFIPYY5V7Y.vcf.gz',
-        'file_format': 'vcf_gz'
-    }
-    return testapp.post_json('/file_processed', f, status=201).json
-
-
-@pytest.mark.integrated  # uses s3
-def test_posting_vcf_processed_file(testapp, mocked_vcf_file):
-    """ Posts a dummy vcf file """
-    file_meta = mocked_vcf_file['@graph'][0]
-    file_location = testapp.get(file_meta['href']).location  # if you .follow() this you get 404 erroneously
-    content = requests.get(file_location).content
-    raw_vcf_file = gunzip_content(content)
-    assert "##fileformat=VCFv4.2" in raw_vcf_file
-
-
 def test_ingestion_listener_should_remain_online(fresh_ingestion_queue_manager_for_testing):
     """ Tests that the 'should_remain_online' method works """
     _await = lambda: time.sleep(3)
@@ -212,18 +179,21 @@ def test_ingestion_listener_should_remain_online(fresh_ingestion_queue_manager_f
 
 @pytest.fixture
 def mocked_familial_relations():
-    return [{'sample_pedigrees': [
+    return [{'samples_pedigree': [
                 {
                     'sample_name': 'sample_one',
-                    'relationship': 'mother'
+                    'relationship': 'mother',
+                    'sex': 'F'
                 },
                 {
                     'sample_name': 'sample_two',
-                    'relationship': 'father'
+                    'relationship': 'father',
+                    'sex': 'M'
                 },
                 {
                     'sample_name': 'sample_three',
-                    'relationship': 'proband'
+                    'relationship': 'proband',
+                    'sex': 'M'
                 }
     ]}]
 
@@ -233,18 +203,28 @@ def test_ingestion_listener_build_familial_relations(testapp, mocked_familial_re
     with mock.patch.object(IngestionListener, 'search_for_sample_relations', new=lambda x, y: mocked_familial_relations):
         listener = IngestionListener(testapp)
         relations = listener.extract_sample_relations('dummy')
-        assert relations['sample_one'] == 'mother'
-        assert relations['sample_two'] == 'father'
-        assert relations['sample_three'] == 'proband'
+        assert relations['sample_one']['samplegeno_role'] == 'mother'
+        assert relations['sample_two']['samplegeno_role'] == 'father'
+        assert relations['sample_three']['samplegeno_role'] == 'proband'
+        assert relations['sample_one']['samplegeno_sex'] == 'F'
+        assert relations['sample_two']['samplegeno_sex'] == 'M'
+        assert relations['sample_three']['samplegeno_sex'] == 'M'
 
 
-def test_ingestion_listener_run(testapp, mocked_vcf_file, gene_workbook, fresh_ingestion_queue_manager_for_testing,
-                                post_variant_consequence_items):
+def test_ingestion_listener_verify_vcf_status_is_not_ingested(authenticated_testapp, app, workbook):
+    """ Posts a minimal processed file to be checked """
+    request = DummyRequest(environ={'REMOTE_USER': 'EMBED'})
+    request.invoke_subrequest = app.invoke_subrequest
+    assert verify_vcf_file_status_is_not_ingested(request, INGESTED_ACCESSION) is False
+    assert verify_vcf_file_status_is_not_ingested(request, NA_ACCESSION) is True
+
+
+def test_ingestion_listener_run(testapp, fresh_ingestion_queue_manager_for_testing, workbook, project, institution,
+                                post_variant_consequence_items, gene_workbook):
     """ Tests the 'run' method of ingestion listener, which will pull down and ingest a vcf file
         from the SQS queue.
     """
-    file_meta = mocked_vcf_file['@graph'][0]
-    uuid = file_meta['uuid']
+    uuid = 'cd679bdc-8691-4352-a25b-1c5f48407e9b'
     queue_manager = fresh_ingestion_queue_manager_for_testing
     queue_manager.add_uuids([uuid])
     wait_for_queue_to_catch_up(queue_manager, 0)
