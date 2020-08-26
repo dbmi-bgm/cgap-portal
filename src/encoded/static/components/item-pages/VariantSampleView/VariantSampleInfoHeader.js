@@ -11,6 +11,7 @@ import { Alerts } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/
 
 
 export function VariantSampleInfoHeader(props) {
+    const fallbackElem = <em className="text-muted" data-tip="Not Available">N/A</em>;
     const {
         context,
         currentTranscriptIdx,
@@ -19,11 +20,7 @@ export function VariantSampleInfoHeader(props) {
         schemas,
         caseID = <span className="text-muted">N/A</span> // null
     } = props;
-    const { variant = {} } = context;
-    const {
-        transcript: geneTranscriptList = [],
-        dbsnp_rs_number = <em>N/A</em>
-    } = variant;
+    const { variant: { dbsnp_rs_number = fallbackElem } = {} } = context;
 
     function getTipForField(field, itemType = "VariantSample"){
         if (!schemas) return null;
@@ -31,45 +28,7 @@ export function VariantSampleInfoHeader(props) {
         return (schemaProperty || {}).description || null;
     }
 
-    const geneTranscriptListLen = geneTranscriptList.length;
 
-    // Grab it from embedded item, rather than the AJAXed in currentGeneItem, as is more 'up-to-date'.
-    const selectedGeneTranscript = geneTranscriptList[currentTranscriptIdx];
-    const selectedGeneTitle = <GeneTranscriptDisplayTitle transcript={selectedGeneTranscript} />;
-
-    const geneListOptions = geneTranscriptList.map(function(transcript, idx){
-        return (
-            <DropdownItem key={idx} eventKey={idx} active={idx === currentTranscriptIdx}>
-                <GeneTranscriptDisplayTitle transcript={transcript} />
-            </DropdownItem>
-        );
-    });
-
-    const geneTitleToShow = selectedGeneTranscript ? (
-        <span>
-            { selectedGeneTitle }
-            { currentGeneItemLoading ? <i className="ml-07 icon icon-spin fas icon-circle-notch"/> : null }
-            &nbsp;
-        </span>
-    ) : (geneTranscriptListLen === 0 ? <em>No genes available</em> : <em>No gene selected</em>);
-
-    const currentTranscript = geneTranscriptList[currentTranscriptIdx];
-    const {
-        vep_hgvsc = <em>N/A</em>,
-        vep_hgvsp = <em>N/A</em>,
-        vep_exon = <em>N/A</em>,
-        vep_gene : {
-            display_title: currentGeneDisplayTitle = null
-        } = {},
-        vep_consequence = []
-    } = currentTranscript;
-
-    // TODO consider common styling for .info-header title, maybe it could be display: flex with align-items: center and vertically
-    // center its children equally regardless if text or DropdownButton (and maybe is applied to a div where h4 would become child of it)
-
-    // _POSSIBLE TODO_ - look up 'title', 'description' (for tooltips) for these fields from Schema where possible. Tho too early for that IMO since UX itself may still change.
-    // So leaving flexible for now. Storing these fields for now into label htmlFor and ids, which may or may not be ultimately useful for anything other than semantics
-    // (we could later use like SPC's object.getNestedProperty() if inside reusable component... maybe not re: selecting most severe thing tho..)
     return (
         // Stack these into flex column until large responsive size, then make into row.
         <div className="card mb-24">
@@ -120,96 +79,176 @@ export function VariantSampleInfoHeader(props) {
                         </div>
                     </div>
 
-                    <div className="inner-card-section col pb-2 pb-lg-0">
+                    <TranscriptSelectionSection {...{ context, currentTranscriptIdx, currentGeneItemLoading, onSelectTranscript, schemas }} />
 
-                        <div className="info-header-title">
-                            {/* passing 'py-1' to className of button via `size` prop - kinda hacky - noting here in case changes in future version, or if find better prop to use */}
-                            <DropdownButton title={geneTitleToShow} size="lg py-1" variant="outline-dark" onSelect={onSelectTranscript}
-                                disabled={geneTranscriptListLen === 0} data-tip="Select a transcript (& gene) to view their details">
-                                { geneListOptions }
-                            </DropdownButton>
-                            <div className="flex-grow-1 text-right">
-                                {/* BA1, BS1 here maybe */}
-                            </div>
-                        </div>
-
-                        <div className="info-body">
-                            <div className="row">
-
-                                <div className="col col-xl-6">
-
-                                    {/* We could make these below into reusable component later once know this what we want fo sure */}
-
-                                    <div className="row mb-03">
-                                        <div className="col-12 col-xl-3">
-                                            <label htmlFor="variant.transcript.vep_gene.display_title" className="mb-0" data-tip={getTipForField("transcript.vep_gene", "Variant")}>
-                                                Gene:
-                                            </label>
-                                        </div>
-                                        {/**
-                                          * 'col-xl' (instead of 'col-xl-9') allows entire item to ellide to next row.
-                                          * May or may not be preferable depending on value content/type/label-size.
-                                          * Will consider consistency more after.
-                                          */}
-                                        <div className="col-12 col-xl" id="variant.transcript.vep_gene.display_title">
-                                            { currentGeneDisplayTitle || <em>No transcript selected.</em> }
-                                        </div>
-                                    </div>
-
-                                    <div className="row mb-03">
-                                        <div className="col-12 col-xl-3">
-                                            <label htmlFor="vep_hgvsc" className="mb-0" data-tip={getTipForField("transcript.vep_hgvsc", "Variant")}>cDNA:</label>
-                                        </div>
-                                        <div className="col-12 col-xl-auto" id="variant.transcript.vep_hgvsc">
-                                            { vep_hgvsc }
-                                        </div>
-                                    </div>
-
-                                    <div className="row mb-03">
-                                        <div className="col-12 col-xl-3">
-                                            <label htmlFor="vep_hgvsp" className="mb-0" data-tip={getTipForField("transcript.vep_hgvsp", "Variant")}>AA / AA:</label>
-                                        </div>
-                                        <div className="col-12 col-xl" id="variant.transcript.vep_hgvsp">
-                                            { vep_hgvsp }
-                                        </div>
-                                    </div>
-
-                                </div>
-                                <div className="col col-xl-6">
-
-                                    {/* We could make these below into reusable component later once know this what we want fo sure */}
-
-                                    <div className="row mb-03">
-                                        <div className="col-12 col-xl-6">
-                                            <label htmlFor="vep_exon" className="mb-0" data-tip={getTipForField("transcript.vep_exon", "Variant")}>Location:</label>
-                                        </div>
-                                        <div className="col-12 col-xl" id="variant.transcript.vep_exon">
-                                            { vep_exon ? "Exon " + vep_exon : <em>No exon location</em> }
-                                        </div>
-                                    </div>
-
-                                    <div className="row mb-03">
-                                        <div className="col-12 col-xl-6">
-                                            <label htmlFor="variant.transcript.vep_consequence" className="mb-0"
-                                                data-tip={getTipForField("transcript.vep_consequence", "Variant")}>
-                                                Coding Effect:
-                                            </label>
-                                        </div>
-                                        <div className="col-12 col-xl" id="variant.transcript.vep_consequence">
-                                            <CodingEffectValue vep_consequence={vep_consequence} />
-                                        </div>
-                                    </div>
-
-                                </div>
-
-                            </div>
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>
     );
 }
+
+
+function TranscriptSelectionSection(props){
+    const {
+        context,
+        schemas,
+        currentTranscriptIdx,
+        currentGeneItemLoading,
+        onSelectTranscript,
+    } = props;
+    const { variant = {} } = context;
+    const { transcript: geneTranscriptList = [] } = variant;
+
+    const geneTranscriptListLen = geneTranscriptList.length;
+
+    // Grab it from embedded item, rather than the AJAXed in currentGeneItem, as is more 'up-to-date'.
+    const selectedGeneTranscript = geneTranscriptList[currentTranscriptIdx] || null;
+    const selectedGeneTitle = <GeneTranscriptDisplayTitle transcript={selectedGeneTranscript} />;
+
+    const geneListOptions = geneTranscriptList.map(function(transcript, idx){
+        return (
+            <DropdownItem key={idx} eventKey={idx} active={idx === currentTranscriptIdx}>
+                <GeneTranscriptDisplayTitle transcript={transcript} />
+            </DropdownItem>
+        );
+    });
+
+    let dropdownTitleToShow = null;
+    let body = null;
+
+    if (geneTranscriptListLen === 0) {
+        // Could maybe just return null, also, if want to hide completely..
+        dropdownTitleToShow = <em>No transcripts available</em>;
+        body = (
+            <div className="d-flex align-items-center justify-content-center h-100">
+                <i className="icon icon-fw icon-exclamation-triangle text-secondary text-larger fas py-08"/>
+            </div>
+        );
+    } else {
+        // TODO separate into own component?
+        dropdownTitleToShow = selectedGeneTranscript ? (
+            <span>
+                { selectedGeneTitle }
+                { currentGeneItemLoading ? <i className="ml-07 icon icon-spin fas icon-circle-notch"/> : null }
+                &nbsp;
+            </span>
+        ) : <em>No gene selected</em>;
+        body = <TranscriptSelectionSectionBody {...{ schemas }} currentTranscript={geneTranscriptList[currentTranscriptIdx]} />;
+    }
+
+
+    return (
+        <div className="inner-card-section col pb-2 pb-lg-0">
+
+            <div className="info-header-title">
+                {/* passing 'py-1' to className of button via `size` prop - kinda hacky - noting here in case changes in future version, or if find better prop to use */}
+                <DropdownButton title={dropdownTitleToShow} size="lg py-1" variant="outline-dark" onSelect={onSelectTranscript}
+                    disabled={geneTranscriptListLen === 0} data-tip="Select a transcript (& gene) to view their details">
+                    { geneListOptions }
+                </DropdownButton>
+                <div className="flex-grow-1 text-right">
+                    {/* BA1, BS1 here maybe */}
+                </div>
+            </div>
+
+            <div className="info-body">{ body }</div>
+        </div>
+    );
+}
+
+function TranscriptSelectionSectionBody({ schemas, currentTranscript }){
+    const fallbackElem = <em className="text-muted" data-tip="Not Available">N/A</em>;
+    const {
+        vep_hgvsc = fallbackElem,
+        vep_hgvsp = fallbackElem,
+        vep_exon = null,
+        vep_gene : {
+            display_title: currentGeneDisplayTitle = null
+        } = {},
+        vep_consequence = []
+    } = currentTranscript || {};
+
+    function getTipForField(field, itemType = "Transcript"){
+        if (!schemas) return null;
+        const schemaProperty = schemaTransforms.getSchemaProperty(field, schemas, itemType);
+        return (schemaProperty || {}).description || null;
+    }
+
+    return (
+        <div className="row">
+
+            <div className="col col-xl-6">
+
+                {/* We could make these below into reusable component later once know this what we want fo sure */}
+
+                <div className="row mb-03">
+                    <div className="col-12 col-xl-3">
+                        <label htmlFor="variant.transcript.vep_gene.display_title" className="mb-0" data-tip={getTipForField("vep_gene")}>
+                            Gene:
+                        </label>
+                    </div>
+                    {/**
+                            * 'col-xl' (instead of 'col-xl-9') allows entire item to ellide to next row.
+                            * May or may not be preferable depending on value content/type/label-size.
+                            * Will consider consistency more after.
+                            */}
+                    <div className="col-12 col-xl" id="variant.transcript.vep_gene.display_title">
+                        { currentGeneDisplayTitle || <em>None selected</em> }
+                    </div>
+                </div>
+
+                <div className="row mb-03">
+                    <div className="col-12 col-xl-3">
+                        <label htmlFor="vep_hgvsc" className="mb-0" data-tip={getTipForField("vep_hgvsc")}>cDNA:</label>
+                    </div>
+                    <div className="col-12 col-xl-auto" id="variant.transcript.vep_hgvsc">
+                        { vep_hgvsc }
+                    </div>
+                </div>
+
+                <div className="row mb-03">
+                    <div className="col-12 col-xl-3">
+                        <label htmlFor="vep_hgvsp" className="mb-0" data-tip={getTipForField("vep_hgvsp")}>AA / AA:</label>
+                    </div>
+                    <div className="col-12 col-xl" id="variant.transcript.vep_hgvsp">
+                        { vep_hgvsp }
+                    </div>
+                </div>
+
+            </div>
+
+
+            <div className="col col-xl-6">
+
+                {/* We could make these below into reusable component later once know this what we want fo sure */}
+
+                <div className="row mb-03">
+                    <div className="col-12 col-xl-6">
+                        <label htmlFor="vep_exon" className="mb-0" data-tip={getTipForField("vep_exon")}>Location:</label>
+                    </div>
+                    <div className="col-12 col-xl" id="variant.transcript.vep_exon">
+                        { vep_exon ? "Exon " + vep_exon : fallbackElem }
+                    </div>
+                </div>
+
+                <div className="row mb-03">
+                    <div className="col-12 col-xl-6">
+                        <label htmlFor="variant.transcript.vep_consequence" className="mb-0"
+                            data-tip={getTipForField("vep_consequence")}>
+                            Coding Effect:
+                        </label>
+                    </div>
+                    <div className="col-12 col-xl" id="variant.transcript.vep_consequence">
+                        <CodingEffectValue vep_consequence={vep_consequence} />
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    );
+}
+
 
 function GeneTranscriptDisplayTitle({ transcript, className = "text-600" }){
     if (!transcript) return null;
@@ -273,7 +312,7 @@ const CodingEffectValue = React.memo(function CodingEffectValue({ vep_consequenc
     let mostSevereConsequence = null;
 
     if (vcLen === 0) {
-        return <em>N/A</em>;
+        return <em data-tip="Not Available" className="text-muted">N/A</em>;
     } else if (vcLen === 1) {
         [ mostSevereConsequence ] = vep_consequence;
     } else {

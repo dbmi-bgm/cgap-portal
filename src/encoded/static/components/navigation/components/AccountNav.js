@@ -1,10 +1,11 @@
 'use strict';
 
-import React from 'react';
+import React, { useMemo } from 'react';
 import PropTypes from 'prop-types';
 import _ from 'underscore';
 
 import { JWT, isServerSide, object, console, memoizedUrlParse } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
+import { Alerts } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/Alerts';
 import { LoginController, LogoutController } from '@hms-dbmi-bgm/shared-portal-components/es/components/navigation/components/LoginController';
 
 import { LoginNavItem } from './LoginNavItem';

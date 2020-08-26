@@ -227,7 +227,7 @@ function PredictorsSection({ context, getTipForField, currentTranscriptIdx }){
         vep_sift_prediction = fallbackElem,
         vep_polyphen_score = fallbackElem,
         vep_polyphen_prediction = fallbackElem
-    } = currentTranscript;
+    } = currentTranscript || {};
 
     // Not too sure whether to use table or <row> and <cols> here..
     // Went with <table> since is more semantically correct for the data we're
