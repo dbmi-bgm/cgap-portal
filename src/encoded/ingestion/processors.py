@@ -2,7 +2,7 @@ import boto3
 import json
 import traceback
 
-from ..ingestion.common import cgap_data_bundle_bucket, get_parameter
+from ..ingestion.common import get_parameter
 from ..util import debuglog, s3_output_stream, create_empty_s3_file
 from ..submit import submit_data_bundle
 from .exceptions import UndefinedIngestionProcessorType

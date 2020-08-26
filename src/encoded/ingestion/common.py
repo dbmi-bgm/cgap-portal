@@ -13,29 +13,8 @@ from dcicutils.misc_utils import check_true
 from .exceptions import MissingParameter, BadParameter
 
 
-CGAP_DATA_BUNDLE_BUCKET_PRD = 'cgap-data-bundles-prd'
-
-CGAP_DATA_BUNDLE_BUCKETS_NON_PRD = {
-    'fourfront-cgapdev': 'cgap-data-bundles-dev',
-    'fourfront-cgaptest': 'cgap-data-bundles-test',
-    'fourfront-cgapwolf': 'cgap-data-bundles-wolf',
-}
-
-CGAP_DATA_BUNDLE_BUCKET_MISC = 'cgap-data-bundles'
-
-
-def cgap_data_bundle_bucket(bs_env):
-    if bs_env is None:
-        return CGAP_DATA_BUNDLE_BUCKET_MISC
-    check_true(is_cgap_env(bs_env), "bs_env is not a cgap environment or None.", error_class=ValueError)
-    if is_stg_or_prd_env(bs_env):
-        return CGAP_DATA_BUNDLE_BUCKET_PRD
-    else:
-        specific_bucket = CGAP_DATA_BUNDLE_BUCKETS_NON_PRD.get(bs_env)
-        if specific_bucket:
-            return specific_bucket
-        else:
-            return CGAP_DATA_BUNDLE_BUCKET_MISC
+def metadata_bundles_bucket(registry):
+    return registry.settings.get('metadata_bundles_bucket')
 
 
 CONTENT_TYPE_SPECIAL_CASES = {

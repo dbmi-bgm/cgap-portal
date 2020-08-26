@@ -30,7 +30,7 @@ from pyramid.view import view_config
 from snovault.util import debug_log
 from vcf import Reader
 from .commands.ingest_vcf import VCFParser
-from .ingestion.common import register_path_content_type, cgap_data_bundle_bucket, get_parameter
+from .ingestion.common import register_path_content_type, metadata_bundles_bucket, get_parameter
 from .ingestion.exceptions import UnspecifiedFormParameter, SubmissionFailure
 from .ingestion.processors import get_ingestion_processor
 from .types.ingestion import SubmissionFolio
@@ -72,7 +72,7 @@ def submit_for_ingestion(context, request):
     ignored(context)
 
     bs_env = beanstalk_env_from_request(request)
-    data_bundle_bucket = cgap_data_bundle_bucket(bs_env)
+    bundles_bucket = metadata_bundles_bucket(request.registry)
     ingestion_type = request.POST['ingestion_type']
     datafile = request.POST['datafile']
     if not isinstance(datafile, cgi.FieldStorage):
@@ -117,7 +117,7 @@ def submit_for_ingestion(context, request):
     message = "Uploaded successfully."
 
     try:
-        s3_client.upload_fileobj(input_file_stream, Bucket=data_bundle_bucket, Key=object_name)
+        s3_client.upload_fileobj(input_file_stream, Bucket=bundles_bucket, Key=object_name)
 
     except botocore.exceptions.ClientError as e:
 
@@ -134,7 +134,7 @@ def submit_for_ingestion(context, request):
         "submission_uri": SubmissionFolio.make_submission_uri(submission_id),
         "beanstalk_env_is_prd": is_stg_or_prd_env(bs_env),
         "beanstalk_env": bs_env,
-        "bucket": data_bundle_bucket,
+        "bucket": bundles_bucket,
         "authenticated_userid": request.authenticated_userid,
         "email": get_trusted_email(request, context="Submission", raise_errors=False),
         "success": success,
@@ -149,7 +149,7 @@ def submit_for_ingestion(context, request):
 
         try:
             with io.BytesIO(manifest_content_formatted.encode('utf-8')) as fp:
-                s3_client.upload_fileobj(fp, Bucket=data_bundle_bucket, Key=manifest_name)
+                s3_client.upload_fileobj(fp, Bucket=bundles_bucket, Key=manifest_name)
 
         except botocore.exceptions.ClientError as e:
 
