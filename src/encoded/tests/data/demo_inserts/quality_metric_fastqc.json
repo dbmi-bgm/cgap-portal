@@ -1,6 +1,6 @@
 [
     {
-        "status": "released",
+        "status": "shared",
         "Overrepresented sequences": "PASS",
         "Sequences flagged as poor quality": 0,
         "Total Sequences": 733505715,
@@ -26,7 +26,7 @@
         "Basic Statistics": "PASS"
     },
     {
-        "status": "released",
+        "status": "shared",
         "Overrepresented sequences": "PASS",
         "Sequences flagged as poor quality": 0,
         "Total Sequences": 755031372,
@@ -52,7 +52,7 @@
         "Basic Statistics": "PASS"
     },
     {
-        "status": "released",
+        "status": "shared",
         "Overrepresented sequences": "PASS",
         "Sequences flagged as poor quality": 0,
         "Total Sequences": 739336586,
@@ -78,7 +78,7 @@
         "Basic Statistics": "PASS"
     },
     {
-        "status": "released",
+        "status": "shared",
         "Overrepresented sequences": "PASS",
         "Sequences flagged as poor quality": 0,
         "Total Sequences": 739336586,
@@ -104,7 +104,7 @@
         "Basic Statistics": "PASS"
     },
     {
-        "status": "released",
+        "status": "shared",
         "Overrepresented sequences": "PASS",
         "Sequences flagged as poor quality": 0,
         "Total Sequences": 733505715,
@@ -130,7 +130,7 @@
         "Basic Statistics": "PASS"
     },
     {
-        "status": "released",
+        "status": "shared",
         "Overrepresented sequences": "PASS",
         "Sequences flagged as poor quality": 0,
         "Total Sequences": 755031372,

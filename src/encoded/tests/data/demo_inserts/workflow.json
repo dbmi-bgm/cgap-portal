@@ -2,7 +2,7 @@
     {
         "docker_registry_url": "https://hub.docker.com/",
         "version_upgrade_log": "Workflow is now using a single data source file instead of archive",
-        "status": "released",
+        "status": "shared",
         "title": "Run mutanno annot plus output integrity-check",
         "steps": [
             {
@@ -398,7 +398,7 @@
     },
     {
         "docker_registry_url": "https://hub.docker.com/",
-        "status": "released",
+        "status": "shared",
         "title": "Run gatk CombineGVCFs",
         "steps": [
             {
@@ -545,7 +545,7 @@
     },
     {
         "docker_registry_url": "https://hub.docker.com/",
-        "status": "released",
+        "status": "shared",
         "cwl_directory_url": "https://raw.githubusercontent.com/dbmi-bgm/cgap-pipeline/v11/cwl",
         "title": "Paired-end reads alignment to reference plus output integrity-check",
         "steps": [
@@ -772,7 +772,7 @@
     },
     {
         "docker_registry_url": "https://hub.docker.com/",
-        "status": "released",
+        "status": "shared",
         "title": "Run mutanno annot plus output integrity-check",
         "steps": [
             {
@@ -990,7 +990,7 @@
     {
         "docker_registry_url": "https://hub.docker.com/",
         "version_upgrade_log": "Error capture for parallel, redundant headerlines removed",
-        "status": "released",
+        "status": "shared",
         "title": "Run gatk HaplotypeCaller",
         "steps": [
             {
@@ -1173,7 +1173,7 @@
     {
         "docker_registry_url": "https://hub.docker.com/",
         "version_upgrade_log": "Updated command line arguments and default to 0 for MQ and BQ thresholds",
-        "status": "released",
+        "status": "shared",
         "title": "Run granite mpileupCounts",
         "steps": [
             {
@@ -1353,7 +1353,7 @@
     },
     {
         "docker_registry_url": "https://hub.docker.com/",
-        "status": "released",
+        "status": "shared",
         "title": "Run gatk ApplyBQSR plus output integrity-check",
         "steps": [
             {
@@ -1609,7 +1609,7 @@
     {
         "docker_registry_url": "https://hub.docker.com/",
         "version_upgrade_log": "Internal parallelization",
-        "status": "released",
+        "status": "shared",
         "title": "Run gatk GenotypeGVCFs plus output integrity-check",
         "steps": [
             {
@@ -1833,7 +1833,7 @@
     },
     {
         "docker_registry_url": "https://hub.docker.com/",
-        "status": "released",
+        "status": "shared",
         "title": "Run granite comHet plus output integrity-check",
         "steps": [
             {
@@ -2020,7 +2020,7 @@
     {
         "docker_registry_url": "https://hub.docker.com/",
         "version_upgrade_log": "Updated command line arguments and default to not filter out variants",
-        "status": "released",
+        "status": "shared",
         "title": "Run granite novoCaller using rck files plus output integrity-check",
         "steps": [
             {
@@ -2206,7 +2206,7 @@
     },
     {
         "docker_registry_url": "https://hub.docker.com/",
-        "status": "released",
+        "status": "shared",
         "title": "Run granite mpileupCounts",
         "steps": [
             {
@@ -2350,7 +2350,7 @@
     {
         "docker_registry_url": "https://hub.docker.com/",
         "version_upgrade_log": "Workflow is now using a single data source file instead of archive",
-        "status": "released",
+        "status": "shared",
         "title": "Run mutanno micro-annot plus output integrity-check",
         "steps": [
             {
@@ -2553,7 +2553,7 @@
     },
     {
         "docker_registry_url": "https://hub.docker.com/",
-        "status": "released",
+        "status": "shared",
         "title": "Run gatk HaplotypeCaller",
         "steps": [
             {
@@ -2730,7 +2730,7 @@
     },
     {
         "docker_registry_url": "https://hub.docker.com/",
-        "status": "released",
+        "status": "shared",
         "title": "Run gatk GenotypeGVCFs plus output integrity-check",
         "steps": [
             {
@@ -2930,7 +2930,7 @@
     },
     {
         "docker_registry_url": "https://hub.docker.com/",
-        "status": "released",
+        "status": "shared",
         "title": "Create a tar archive of rck files and an associate index file",
         "steps": [
             {
@@ -3018,7 +3018,7 @@
     },
     {
         "docker_registry_url": "https://hub.docker.com/",
-        "status": "released",
+        "status": "shared",
         "title": "Sort bam file plus output integrity-check",
         "steps": [
             {
@@ -3215,7 +3215,7 @@
     },
     {
         "docker_registry_url": "https://hub.docker.com/",
-        "status": "released",
+        "status": "shared",
         "title": "Run gatk BaseRecalibrator",
         "steps": [
             {
@@ -3362,7 +3362,7 @@
     {
         "docker_registry_url": "https://hub.docker.com/",
         "version_upgrade_log": "multithreading",
-        "status": "released",
+        "status": "shared",
         "title": "Add read groups plus output integrity-check",
         "steps": [
             {
@@ -3559,7 +3559,7 @@
     },
     {
         "docker_registry_url": "https://hub.docker.com/",
-        "status": "released",
+        "status": "shared",
         "title": "Run granite to filter and clean input vcf (whiteList, cleanVCF, blackList) plus output integrity-check",
         "steps": [
             {
@@ -3813,7 +3813,7 @@
     },
     {
         "docker_registry_url": "https://hub.docker.com/",
-        "status": "released",
+        "status": "shared",
         "cwl_directory_url": "https://raw.githubusercontent.com/dbmi-bgm/cgap-pipeline/v11/cwl",
         "title": "Mark duplicates plus output integrity-check",
         "steps": [
@@ -4064,7 +4064,7 @@
     },
     {
         "docker_registry_url": "https://hub.docker.com/",
-        "status": "released",
+        "status": "shared",
         "cwl_directory_url": "https://raw.githubusercontent.com/dbmi-bgm/cgap-pipeline/v9/cwl",
         "title": "Add read groups plus output integrity-check",
         "steps": [
@@ -4258,7 +4258,7 @@
     },
     {
         "docker_registry_url": "https://hub.docker.com/",
-        "status": "released",
+        "status": "shared",
         "title": "Run granite novoCaller using rck files plus output integrity-check",
         "steps": [
             {
@@ -4509,7 +4509,7 @@
     },
     {
         "docker_registry_url": "https://hub.docker.com/",
-        "status": "released",
+        "status": "shared",
         "title": "Run mutanno micro-annot plus output integrity-check",
         "steps": [
             {

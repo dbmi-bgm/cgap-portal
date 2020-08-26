@@ -1,7 +1,7 @@
 [
     {
         "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
-        "status": "released",
+        "status": "shared",
         "description": "Tabix index file of vcf, compressed",
         "valid_item_types": [
             "FileReference",
@@ -17,7 +17,7 @@
     },
     {
         "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
-        "status": "released",
+        "status": "shared",
         "description": "chain file for coordinates liftover, compressed",
         "valid_item_types": [
             "FileReference"
@@ -32,7 +32,7 @@
     },
     {
         "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
-        "status": "released",
+        "status": "shared",
         "description": "mutanno index file, compressed",
         "extrafile_formats": [
             "c0a56f31-d1af-4b88-9041-57b0830eeb8a",
@@ -51,7 +51,7 @@
     },
     {
         "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
-        "status": "released",
+        "status": "shared",
         "description": "vcf, compressed",
         "extrafile_formats": [
             "f84f1922-7f4e-4afc-922f-bec620969bf1"
@@ -70,7 +70,7 @@
     },
     {
         "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
-        "status": "released",
+        "status": "shared",
         "description": "This format is used for aligned reads",
         "valid_item_types": [
             "FileProcessed",
@@ -86,7 +86,7 @@
     },
     {
         "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
-        "status": "released",
+        "status": "shared",
         "description": "vcf, uncompressed",
         "extrafile_formats": [
             "ec96f95a-cf13-4633-ab0d-c4a5138bbe0b"
@@ -105,7 +105,7 @@
     },
     {
         "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
-        "status": "released",
+        "status": "shared",
         "description": "This format is used for aligned reads",
         "extrafile_formats": [
             "d13d06c1-218e-4f61-aaf0-91f226248b3c"
@@ -123,7 +123,7 @@
     },
     {
         "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
-        "status": "released",
+        "status": "shared",
         "description": "Bam index format",
         "valid_item_types": [
             "FileProcessed"
@@ -138,7 +138,7 @@
     },
     {
         "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
-        "status": "released",
+        "status": "shared",
         "other_allowed_extensions": [
             "fq.gz"
         ],
@@ -157,7 +157,7 @@
     },
     {
         "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
-        "status": "released",
+        "status": "shared",
         "description": "Tabix index file of mti, compressed",
         "valid_item_types": [
             "FileReference"
@@ -172,7 +172,7 @@
     },
     {
         "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
-        "status": "released",
+        "status": "shared",
         "description": "Tabix index file of gvcf, compressed",
         "valid_item_types": [
             "FileProcessed"
@@ -187,7 +187,7 @@
     },
     {
         "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
-        "status": "released",
+        "status": "shared",
         "description": "gvcf, compressed",
         "extrafile_formats": [
             "b01ee86e-b2c7-4725-81d7-798718674485"
@@ -205,7 +205,7 @@
     },
     {
         "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
-        "status": "released",
+        "status": "shared",
         "description": "mutanno index info file",
         "valid_item_types": [
             "FileReference"
@@ -220,7 +220,7 @@
     },
     {
         "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
-        "status": "released",
+        "status": "shared",
         "description": "BWA genome index, untarred, uncompressed",
         "extrafile_formats": [
             "106199e5-5a85-4817-9a55-7b31698e1fda",
@@ -241,7 +241,7 @@
     },
     {
         "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
-        "status": "released",
+        "status": "shared",
         "description": "genome reference fasta",
         "extrafile_formats": [
             "4ed9f7e0-2b2f-4aca-9533-a0a652b43442",
@@ -260,7 +260,7 @@
     },
     {
         "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
-        "status": "released",
+        "status": "shared",
         "description": "read count keeper, compressed",
         "extrafile_formats": [
             "c55ace88-3289-49b0-a67a-c046e1004e5a"
@@ -279,7 +279,7 @@
     },
     {
         "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
-        "status": "released",
+        "status": "shared",
         "description": "extra file of genome reference fasta",
         "valid_item_types": [
             "FileReference"
@@ -294,7 +294,7 @@
     },
     {
         "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
-        "status": "released",
+        "status": "shared",
         "description": "GATK/IGV-index of vcf, uncompressed",
         "valid_item_types": [
             "FileProcessed",
@@ -310,7 +310,7 @@
     },
     {
         "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
-        "status": "released",
+        "status": "shared",
         "description": "mutanno index files archive",
         "extrafile_formats": [
             "a112ef25-bd5d-44c1-824a-d5c6156db0a4"
@@ -328,7 +328,7 @@
     },
     {
         "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
-        "status": "released",
+        "status": "shared",
         "description": "Tabix index file of rck, compressed",
         "valid_item_types": [
             "FileProcessed",
@@ -344,7 +344,7 @@
     },
     {
         "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
-        "status": "released",
+        "status": "shared",
         "description": "An extra file of a bwt file",
         "valid_item_types": [
             "FileReference"
@@ -359,7 +359,7 @@
     },
     {
         "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
-        "status": "released",
+        "status": "shared",
         "description": "An extra file of a bwt file",
         "valid_item_types": [
             "FileReference"
@@ -374,7 +374,7 @@
     },
     {
         "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
-        "status": "released",
+        "status": "shared",
         "description": "extra file of genome reference fasta",
         "valid_item_types": [
             "FileReference"
@@ -389,7 +389,7 @@
     },
     {
         "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
-        "status": "released",
+        "status": "shared",
         "description": "rck files archive, compressed",
         "extrafile_formats": [
             "1c7dc723-811c-4fcf-b8e5-d5e17a2013f7"
@@ -408,7 +408,7 @@
     },
     {
         "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
-        "status": "released",
+        "status": "shared",
         "description": "An extra file of a bwt file",
         "valid_item_types": [
             "FileReference"
@@ -423,7 +423,7 @@
     },
     {
         "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
-        "status": "released",
+        "status": "shared",
         "description": "An extra file of a bwt file",
         "valid_item_types": [
             "FileReference"
@@ -438,7 +438,7 @@
     },
     {
         "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
-        "status": "released",
+        "status": "shared",
         "description": "binary index genome",
         "valid_item_types": [
             "FileProcessed",
@@ -454,7 +454,7 @@
     },
     {
         "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
-        "status": "released",
+        "status": "shared",
         "description": "index file for rck archive",
         "valid_item_types": [
             "FileProcessed",
@@ -470,7 +470,7 @@
     },
     {
         "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
-        "status": "released",
+        "status": "shared",
         "description": "bed, uncompressed",
         "valid_item_types": [
             "FileProcessed",

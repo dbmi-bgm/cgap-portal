@@ -4,7 +4,7 @@
         "family_id": "hms0123f",
         "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
         "institution": "hms-dbmi",
-        "status": "released",
+        "status": "shared",
         "uuid": "aa7d83a2-6886-4ca0-9402-7c49734ce3d4",
         "members": [
           "5ec91041-78a0-4758-abef-21c7f5fd9f12",
@@ -23,7 +23,7 @@
         "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
         "institution": "hms-dbmi",
         "family_id": "hms3456f",
-        "status": "released",
+        "status": "shared",
         "uuid": "cb7d83a2-6886-4ca0-9402-7c49734ce1d9",
         "members": [
             "5ec91041-78a0-4758-abef-21c7f5fd9f21",

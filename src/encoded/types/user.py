@@ -5,7 +5,7 @@ import logging
 import transaction
 
 from pyramid.httpexceptions import HTTPUnprocessableEntity
-from pyramid.security import Allow, Deny, Everyone
+# from pyramid.security import Allow, Deny, Everyone
 from pyramid.view import view_config
 from snovault import (
     CONNECTION,
@@ -25,37 +25,37 @@ from .base import Item
 logging.getLogger('boto3').setLevel(logging.INFO)
 log = logging.getLogger(__name__)
 
-ONLY_ADMIN_VIEW_DETAILS = [
-    (Allow, 'group.admin', ['view', 'view_details', 'edit']),
-    (Allow, 'group.read-only-admin', ['view', 'view_details']),
-    (Allow, 'remoteuser.INDEXER', ['view']),
-    (Allow, 'remoteuser.EMBED', ['view']),
-    (Deny, Everyone, ['view', 'view_details', 'edit']),
-]
-
-SUBMITTER_CREATE = []
-
-ONLY_OWNER_EDIT = [
-    (Allow, 'role.owner', 'view'),
-    (Allow, 'role.owner', 'edit'),
-    (Allow, 'role.owner', 'view_details')
-] + ONLY_ADMIN_VIEW_DETAILS
-
-USER_ALLOW_CURRENT = [
-    (Allow, Everyone, 'view'),
-] + ONLY_ADMIN_VIEW_DETAILS
-
-USER_DELETED = [
-    (Deny, Everyone, 'visible_for_edit')
-] + ONLY_ADMIN_VIEW_DETAILS
+# ONLY_ADMIN_VIEW_DETAILS = [
+#     (Allow, 'group.admin', ['view', 'view_details', 'edit']),
+#     (Allow, 'group.read-only-admin', ['view', 'view_details']),
+#     (Allow, 'remoteuser.INDEXER', ['view']),
+#     (Allow, 'remoteuser.EMBED', ['view']),
+#     (Deny, Everyone, ['view', 'view_details', 'edit']),
+# ]
+#
+# SUBMITTER_CREATE = []
+#
+# ONLY_OWNER_EDIT = [
+#     (Allow, 'role.owner', 'view'),
+#     (Allow, 'role.owner', 'edit'),
+#     (Allow, 'role.owner', 'view_details')
+# ] + ONLY_ADMIN_VIEW_DETAILS
+#
+# USER_ALLOW_CURRENT = [
+#     (Allow, Everyone, 'view'),
+# ] + ONLY_ADMIN_VIEW_DETAILS
+#
+# USER_DELETED = [
+#     (Deny, Everyone, 'visible_for_edit')
+# ] + ONLY_ADMIN_VIEW_DETAILS
 
 
 @collection(
     name='users',
     unique_key='user:email',
     properties={
-        'title': '4D Nucleome Users',
-        'description': 'Listing of current 4D Nucleome DCIC users',
+        'title': 'CGAP Users',
+        'description': 'Listing of current CGAP users',
     },
     acl=[])
 class User(Item):
@@ -65,15 +65,15 @@ class User(Item):
     schema = load_schema('encoded:schemas/user.json')
     embedded_list = [
         'project_roles.project.name',
-        'submits_for.name',
-        'submits_for.display_title'
+        # 'submits_for.name',
+        # 'submits_for.display_title'
     ]
 
-    STATUS_ACL = {
-        'current': ONLY_OWNER_EDIT,
-        'deleted': USER_DELETED,
-        'replaced': USER_DELETED
-    }
+    # STATUS_ACL = {
+    #     'current': ONLY_OWNER_EDIT,
+    #     'deleted': USER_DELETED,
+    #     'replaced': USER_DELETED
+    # }
 
     @calculated_property(schema={
         "title": "Title",

@@ -2,7 +2,7 @@
     {
         "filter_set": "dcf15d5e-40aa-43bc-b81c-32c70c9afbbb",
         "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
-        "status": "released",
+        "status": "shared",
         "pipeline": "Efficient Trio Analysis V10",
         "accession": "GAPCO8A7TOOO",
         "description": "Cohort for test institute Trio cases of rare diseases",

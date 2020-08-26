@@ -4,7 +4,7 @@
         "file_version_date": "2020-06-25",
         "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
         "file_type": "annotation source",
-        "status": "released",
+        "status": "shared",
         "content_md5sum": "7487ac28df1b207c9bf105e3c93c8a59",
         "extra_files": [
             {
@@ -51,7 +51,7 @@
     {
         "md5sum": "ff3031d93792f4cbb86af44055efd903",
         "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
-        "status": "released",
+        "status": "shared",
         "content_md5sum": "97b423dc9095cc322460f0ff7f50c93a",
         "accession": "GAPFIYPTSAU8",
         "description": "chain file for coordinates liftover, hg38 to hg19",
@@ -71,7 +71,7 @@
     {
         "md5sum": "cfbbd30794f8d36bd8084a05eceeef6d",
         "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
-        "status": "released",
+        "status": "shared",
         "filename": "GAPFIBGEOI72.txt",
         "accession": "GAPFIBGEOI72",
         "genome_assembly": "GRCh38",
@@ -88,7 +88,7 @@
     },
     {
         "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
-        "status": "released",
+        "status": "shared",
         "extra_files": [
             {
                 "upload_key": "b24ed5ed-a037-48a0-a938-3fecfb90d0cf/GAPFI4U1HXIY.ann",
@@ -144,7 +144,7 @@
     },
     {
         "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
-        "status": "released",
+        "status": "shared",
         "extra_files": [],
         "file_format": "0cd4e777-a596-4927-95c8-b07716121aa3",
         "description": "hg38 chromosomes Yfirst",
@@ -162,7 +162,7 @@
     },
     {
         "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
-        "status": "released",
+        "status": "shared",
         "extra_files": [
             {
                 "upload_key": "8ed35691-0af4-467a-adbc-81eb088549f0/GAPFI4LJRN98.vcf.gz.tbi",
@@ -191,7 +191,7 @@
     },
     {
         "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
-        "status": "released",
+        "status": "shared",
         "extra_files": [
             {
                 "upload_key": "1936f246-22e1-45dc-bb5c-9cfd55537fe7/GAPFIXRDPDK5.dict",
@@ -229,7 +229,7 @@
     },
     {
         "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
-        "status": "released",
+        "status": "shared",
         "extra_files": [
             {
                 "upload_key": "55ac5044-f927-4df7-afa2-bf713764ee57/GAPFIAX2PPYB.vcf.idx",
@@ -261,7 +261,7 @@
         "file_version_date": "2020-06-14",
         "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
         "file_type": "micro-annotation source",
-        "status": "released",
+        "status": "shared",
         "content_md5sum": "4ab2dc69a7bc56114e4f56f8faa9e575",
         "extra_files": [
             {

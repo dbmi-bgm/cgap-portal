@@ -2,7 +2,7 @@
     {
         "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
         "institution": "hms-dbmi",
-        "status": "released",
+        "status": "shared",
         "uuid": "5ec91041-78a0-4758-abef-21c7f5fd9ffc",
         "accession": "GAPID2X2NZC7",
         "sex": "M",
@@ -13,7 +13,7 @@
     {
         "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
         "institution": "hms-dbmi",
-        "status": "released",
+        "status": "shared",
         "uuid": "5c302401-88f6-44b8-9cf9-f062dfaa98c4",
         "accession": "GAPID4PTJHN3",
         "sex": "F",
@@ -22,7 +22,7 @@
     {
         "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
         "institution": "hms-dbmi",
-        "status": "released",
+        "status": "shared",
         "uuid": "96974f2e-de0a-4f3a-9be5-543359da74a1",
         "accession": "GAPIDWZ3U4EL",
         "sex": "M",
@@ -31,7 +31,7 @@
     {
         "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
         "institution": "hms-dbmi",
-        "status": "released",
+        "status": "shared",
         "uuid": "5ec91041-78a0-4758-abef-21c7f5fd9f12",
         "sex": "F",
         "accession": "GAPID8J9B9CR",
@@ -42,7 +42,7 @@
     {
         "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
         "institution": "hms-dbmi",
-        "status": "released",
+        "status": "shared",
         "uuid": "5ec91041-78a0-4758-abef-21c7f5fd9f34",
         "accession": "GAPIDUJF7U8G",
         "sex": "M",
@@ -53,7 +53,7 @@
     {
         "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
         "institution": "hms-dbmi",
-        "status": "released",
+        "status": "shared",
         "uuid": "5ec91041-78a0-4758-abef-21c7f5fd9f56",
         "accession": "GAPIDTXUP5D8",
         "sex": "M",
@@ -64,7 +64,7 @@
     {
         "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
         "institution": "hms-dbmi",
-        "status": "released",
+        "status": "shared",
         "uuid": "5ec91041-78a0-4758-abef-21c7f5fd9f78",
         "sex": "F",
         "is_deceased": false
@@ -72,7 +72,7 @@
     {
         "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
         "institution": "hms-dbmi",
-        "status": "released",
+        "status": "shared",
         "uuid": "5ec91041-78a0-4758-abef-21c7f5fd9f91",
         "accession": "GAPIDRU2NWFO",
         "sex": "M",
@@ -81,7 +81,7 @@
     {
         "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
         "institution": "hms-dbmi",
-        "status": "released",
+        "status": "shared",
         "uuid": "5ec91041-78a0-4758-abef-21c7f5fd9f92",
         "accession": "GAPID6ZUDPO2",
         "sex": "F",
@@ -90,7 +90,7 @@
     {
         "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
         "institution": "hms-dbmi",
-        "status": "released",
+        "status": "shared",
         "uuid": "5ec91041-78a0-4758-abef-21c7f5fd9f21",
         "sex": "M",
         "accession": "GAPID5HBSLG6",
@@ -101,7 +101,7 @@
     {
         "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
         "institution": "hms-dbmi",
-        "status": "released",
+        "status": "shared",
         "uuid": "5ec91041-78a0-4758-abef-21c7f5fd9f22",
         "accession": "GAPIDAF1DXBB",
         "sex": "F",
@@ -112,7 +112,7 @@
     {
         "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
         "institution": "hms-dbmi",
-        "status": "released",
+        "status": "shared",
         "uuid": "5ec91041-78a0-4758-abef-21c7f5fd9f23",
         "accession": "GAPIDZX3HN13",
         "sex": "F",
@@ -123,7 +123,7 @@
     {
         "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
         "institution": "hms-dbmi",
-        "status": "released",
+        "status": "shared",
         "uuid": "5ec91041-78a0-4758-abef-21c7f5fd9f24",
         "sex": "M",
         "accession": "GAPID3PW26SK",
@@ -132,7 +132,7 @@
     {
         "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
         "institution": "hms-dbmi",
-        "status": "released",
+        "status": "shared",
         "accession": "GAPIDISC7R73",
         "uuid": "5ec91041-78a0-4758-abef-21c7f5fd9f25",
         "sex": "F",
@@ -141,7 +141,7 @@
     {
         "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
         "institution": "hms-dbmi",
-        "status": "released",
+        "status": "shared",
         "accession": "GAPIDISC7R74",
         "uuid": "5ec91041-78a0-4758-abef-21c7f5fd9f26",
         "sex": "M",

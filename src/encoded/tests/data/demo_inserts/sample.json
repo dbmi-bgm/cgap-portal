@@ -2,7 +2,7 @@
     {
         "sequence_id": "BAE2201",
         "indication": "Not specified",
-        "status": "released",
+        "status": "shared",
         "specimen_accepted": "Yes",
         "bam_sample_id": "NA12878_sample",
         "transported_by": "FedEx",
@@ -58,7 +58,7 @@
     {
         "sequence_id": "BAE2202",
         "indication": "Not specified",
-        "status": "released",
+        "status": "shared",
         "specimen_accepted": "Yes",
         "bam_sample_id": "NA12877_sample",
         "transported_by": "FedEx",
@@ -114,7 +114,7 @@
     {
         "sequence_id": "BAE2203",
         "indication": "Not specified",
-        "status": "released",
+        "status": "shared",
         "specimen_accepted": "Yes",
         "bam_sample_id": "NA12879_sample",
         "transported_by": "FedEx",

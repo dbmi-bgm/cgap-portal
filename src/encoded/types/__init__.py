@@ -19,8 +19,8 @@ from .base import (
     Item,
     get_item_or_none,
     set_namekey_from_title,
-    ALLOW_OWNER_EDIT,
-    ALLOW_CURRENT,
+    # ALLOW_OWNER_EDIT,
+    # ALLOW_CURRENT,
     DELETED,
     ONLY_ADMIN_VIEW
 )
@@ -187,9 +187,9 @@ class TrackingItem(Item):
     embedded_list = []
     STATUS_ACL = Item.STATUS_ACL.copy()
     STATUS_ACL.update({
-        'released': ALLOW_OWNER_EDIT + ALLOW_CURRENT,
-        'deleted': ALLOW_OWNER_EDIT + DELETED,
-        'draft': ALLOW_OWNER_EDIT + ONLY_ADMIN_VIEW,
+        'released': ONLY_ADMIN_VIEW,
+        'deleted': DELETED,
+        'draft': ONLY_ADMIN_VIEW
     })
 
     @classmethod

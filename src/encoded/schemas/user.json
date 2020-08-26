@@ -175,9 +175,6 @@
     "facets" : {
         "institution.display_title" : {
             "title" : "Institution"
-        },
-        "submits_for.display_title" : {
-            "title" : "Submits for Institution"
         }
     }
 }

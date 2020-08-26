@@ -9,7 +9,7 @@ from snovault import (
 # from pyramid.security import Authenticated
 from .base import (
     Item,
-    ALLOW_SUBMITTER_ADD,
+    # ALLOW_SUBMITTER_ADD,
     # lab_award_attribution_embed_list
 )
 
@@ -72,7 +72,6 @@ to trigger the update with empty patches."""
 
 @abstract_collection(
     name='quality-metrics',
-    acl=ALLOW_SUBMITTER_ADD,
     properties={
         'title': 'Quality Metrics',
         'description': 'Listing of quality metrics',
@@ -202,7 +201,7 @@ class QualityMetricQclist(QualityMetric):
                 if 'quality_metric_summary' in qc_obj:
                     for qcs_item in qc_obj['quality_metric_summary']:
                         qc_summary.append(qcs_item)
-        
+
         return qc_summary if qc_summary else None
 
 

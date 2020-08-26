@@ -7,7 +7,6 @@
         "institution": "hms-dbmi",
         "last_name": "loadxl",
         "status": "current",
-        "submits_for": ["hms-dbmi"],
         "timezone": "US/Pacific",
         "uuid": "3202fd57-44d2-44fb-a131-afb1e43d8ae5",
         "date_created": "2020-01-28T00:00:00.000000+00:00",
@@ -21,7 +20,6 @@
         "last_name" : "Administration",
         "groups": ["admin"],
         "role": "developer",
-        "submits_for": ["hms-dbmi"],
         "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
         "uuid": "b5f738b6-455a-42e5-bc1c-77fbfd9b15d2",
         "date_created": "2019-06-20T00:00:00.0000000+00:00",
@@ -35,7 +33,6 @@
         "role": "director",
         "uuid": "986b362f-4eb6-4a9c-8173-3ab267307e4b",
         "groups": ["admin"],
-        "submits_for": ["hms-dbmi"],
         "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
         "project_roles": [{"project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
                            "role": "developer"}]
@@ -47,7 +44,6 @@
         "role": "developer",
         "uuid": "986b362f-4eb6-4a9c-8173-3ab245628888",
         "groups": ["admin"],
-        "submits_for": ["hms-dbmi"],
         "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
         "project_roles": [{"project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
                            "role": "developer"}]
@@ -59,7 +55,6 @@
         "role": "developer",
         "uuid": "986b362f-4eb6-4a9c-8173-3ab267226992",
         "groups": ["admin"],
-        "submits_for": ["hms-dbmi"],
         "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
         "project_roles": [{"project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
                            "role": "developer"}]
@@ -71,7 +66,6 @@
         "role": "developer",
         "uuid": "27d2ac03-7d12-442b-9375-211d3c5c5f97",
         "groups": ["admin"],
-        "submits_for": ["hms-dbmi"],
         "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
         "project_roles": [{"project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
                            "role": "developer"}]
@@ -83,7 +77,6 @@
         "role": "developer",
         "uuid": "3f0052c9-218d-42e1-94bd-4319d0615681",
         "groups": ["admin"],
-        "submits_for": ["hms-dbmi"],
         "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
         "project_roles": [{"project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
                            "role": "developer"}]
@@ -95,7 +88,6 @@
         "role": "clinician",
         "uuid": "986b362f-4eb6-4a9c-8173-3acba722bba1",
         "groups": ["admin"],
-        "submits_for": ["bwh"],
         "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
         "project_roles": [{"project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
                            "role": "developer"}]
@@ -107,7 +99,6 @@
         "role": "scientist",
         "uuid": "986b362f-4eb6-4a9c-8173-3ab267227777",
         "groups": ["admin"],
-        "submits_for": ["hms-dbmi"],
         "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
         "project_roles": [{"project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
                            "role": "developer"}]
@@ -119,7 +110,6 @@
         "role": "scientist",
         "uuid": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "groups": ["admin"],
-        "submits_for": ["hms-dbmi"],
         "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
         "project_roles": [{"project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
                            "role": "developer"}]
@@ -131,7 +121,6 @@
         "role": "scientist",
         "uuid": "1d524d43-01b5-4b71-94c6-32d2d09c8323",
         "groups": ["admin"],
-        "submits_for": ["hms-dbmi"],
         "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
         "project_roles": [{"project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
                            "role": "developer"}]
@@ -145,7 +134,6 @@
         "groups": ["admin"],
         "email": "foursight.app@gmail.com",
         "uuid": "7677f8a8-79d2-4cff-ab0a-a967a2a68e39",
-        "submits_for": ["hms-dbmi"],
         "role": "other",
         "project_roles": [{"project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
                            "role": "developer"}]
@@ -160,7 +148,6 @@
         "groups": ["admin"],
         "email": "tibanna.app@gmail.com",
         "uuid": "b041dba8-e2b2-4e54-a621-97edb508a0c4",
-        "submits_for": ["hms-dbmi"],
         "role": "other",
         "project_roles": [{"project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
                            "role": "developer"}]
@@ -172,7 +159,6 @@
         "role": "developer",
         "uuid": "70060f34-ec8f-4c34-a6c3-1b7b9ce8d314",
         "groups": ["admin"],
-        "submits_for": ["hms-dbmi"],
         "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
         "project_roles": [{"project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
                            "role": "developer"}]
@@ -184,7 +170,6 @@
         "role": "scientist",
         "uuid": "45524d43-01b5-4b71-94c6-32d2d09c1111",
         "groups": ["admin"],
-        "submits_for": ["hms-dbmi"],
         "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
         "project_roles": [{"project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
                            "role": "developer"}]
@@ -196,7 +181,6 @@
         "role": "scientist",
         "uuid": "f9524d43-01b5-4b71-94c6-32d2d09c2222",
         "groups": ["admin"],
-        "submits_for": ["hms-dbmi"],
         "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
         "project_roles": [{"project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
                            "role": "developer"}]
@@ -208,7 +192,6 @@
         "role": "clinician",
         "uuid": "f9524d43-01b5-4b71-94c6-32d2d09c3343",
         "groups": ["admin"],
-        "submits_for": ["bwh"],
         "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
         "project_roles": [{"project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
                            "role": "developer"}]
@@ -220,7 +203,6 @@
         "role": "clinician",
         "uuid": "f9524d43-01b5-4b71-94c6-32d2d09c4433",
         "groups": ["admin"],
-        "submits_for": ["bch"],
         "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
         "project_roles": [{"project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
                            "role": "developer"}]
@@ -232,7 +214,6 @@
         "role": "clinician",
         "uuid": "f9524d43-01b5-4b71-94c6-32d2d09c5633",
         "groups": ["admin"],
-        "submits_for": ["bch"],
         "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
         "project_roles": [{"project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
                            "role": "developer"}]
@@ -244,7 +225,6 @@
         "role": "scientist",
         "uuid": "834559db-a3f6-462c-81a4-f5d7e5e65707",
         "groups": ["admin"],
-        "submits_for": ["hms-dbmi"],
         "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
         "project_roles": [{"project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
                            "role": "developer"}]
@@ -256,7 +236,6 @@
         "role": "scientist",
         "uuid": "bf91416d-5d99-48bd-9035-3c6e520131a2",
         "groups": ["admin"],
-        "submits_for": ["hms-dbmi"],
         "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
         "project_roles": [{"project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
                            "role": "developer"}]
@@ -268,7 +247,6 @@
         "role": "scientist",
         "uuid": "f1d2c331-f5ee-490a-9a7c-69a953e04fee",
         "groups": ["admin"],
-        "submits_for": ["hms-dbmi"],
         "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
         "project_roles": [{"project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
                            "role": "developer"}]

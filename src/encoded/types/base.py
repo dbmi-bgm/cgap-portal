@@ -261,12 +261,8 @@ class Collection(snovault.Collection, AbstractCollection):
         if hasattr(self, '__acl__'):
             return
 
-        # If no ACLs are defined for collection, allow submitter add/create
-        # if the collection schema includes 'institution'
-        # collections should be setup after all types are registered.
-        # Don't access type_info.schema here as that precaches calculated schema too early.
-        if 'institution' in self.type_info.factory.schema['properties']:
-            self.__acl__ = ALLOW_SUBMITTER_ADD
+        # If no ACLs are defined for collection, allow admin only
+        self.__acl__ = ONLY_ADMIN_VIEW
 
 
 @snovault.abstract_collection(
@@ -283,17 +279,16 @@ class Item(snovault.Item):
     STATUS_ACL = {
         # standard_status
         'shared': ALLOW_AUTHENTICATED_VIEW,
-        'in review': ONLY_ADMIN_VIEW,
         'current': ALLOW_PROJECT_MEMBER_VIEW,
-        'obsolete': DELETED,
         'inactive': ALLOW_PROJECT_MEMBER_VIEW,
+        'obsolete': DELETED,
         'deleted': DELETED
     }
 
     # Items of these statuses are filtered out from rev links
     filtered_rev_statuses = ('deleted')
 
-    # Default embed list for all 4DN Items
+    # Default embed list for all CGAP Items
     embedded_list = static_content_embed_list
 
     def __init__(self, registry, models):
@@ -311,7 +306,10 @@ class Item(snovault.Item):
         return properties.get(self.name_key, None) or self.uuid
 
     def __acl__(self):
-        """smth."""
+        """This sets the ACL for the item based on mapping of status to ACL.
+           If there is no status or the status is not included in the STATUS_ACL
+           lookup then the access is set to admin only
+        """
         # Don't finalize to avoid validation here.
         properties = self.upgrade_properties().copy()
         status = properties.get('status')
@@ -440,7 +438,6 @@ def edit(context, request):
 
 @snovault.calculated_property(context=Item, category='action')
 def create(context, request):
-    """If the user submits for any institution, allow them to create"""
     if request.has_permission('create'):
         return {
             'name': 'create',

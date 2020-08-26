@@ -2,7 +2,7 @@
     {
         "schema_version": "1",
         "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
-        "status": "released",
+        "status": "shared",
         "name": "vcf-tools",
         "uuid": "f7ac2c5f-9203-49fa-b918-cede02bf46f7",
         "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
@@ -34,7 +34,7 @@
     {
         "schema_version": "1",
         "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
-        "status": "released",
+        "status": "shared",
         "name": "mutanno",
         "uuid": "1d28b7b8-1033-492f-8a1a-d4ac5b1ab55e",
         "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
@@ -50,7 +50,7 @@
     {
         "schema_version": "1",
         "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
-        "status": "released",
+        "status": "shared",
         "name": "mutanno",
         "uuid": "76479248-09d2-48e5-9ab3-94c167e51cc6",
         "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
@@ -66,7 +66,7 @@
     {
         "schema_version": "1",
         "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
-        "status": "released",
+        "status": "shared",
         "name": "granite",
         "uuid": "5a0b864e-dc16-4484-bcf3-c64e35a25df9",
         "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
@@ -81,7 +81,7 @@
     },
     {
         "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
-        "status": "released",
+        "status": "shared",
         "software_type": [
             "variant caller"
         ],
@@ -99,7 +99,7 @@
         "software_type": [
             "aligner"
         ],
-        "status": "released",
+        "status": "shared",
         "name": "bwa",
         "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
         "uuid": "42adeb1b-c46c-4ba8-b191-56036ddcd544",
@@ -113,7 +113,7 @@
     },
     {
         "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
-        "status": "released",
+        "status": "shared",
         "software_type": [
             "file format converter"
         ],
@@ -130,7 +130,7 @@
     {
         "schema_version": "1",
         "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
-        "status": "released",
+        "status": "shared",
         "name": "add-readgroups",
         "uuid": "d7ac4c75-e133-4a8e-a19e-b7e87873cc16",
         "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
@@ -146,7 +146,7 @@
     {
         "schema_version": "1",
         "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
-        "status": "released",
+        "status": "shared",
         "name": "granite",
         "uuid": "8d4ca59b-750b-4c22-8a34-c5d4e795b8ad",
         "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
@@ -161,7 +161,7 @@
     },
     {
         "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
-        "status": "released",
+        "status": "shared",
         "software_type": [
             "filter"
         ],

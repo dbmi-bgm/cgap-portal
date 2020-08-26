@@ -1,7 +1,7 @@
 [
     {
         "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
-        "status": "released",
+        "status": "shared",
         "family": "21f2af73-2c2e-4101-bbfb-bb2754f302ad",
         "accession": "GAPCAQPHN61Y",
         "description": "Benchmarking case for Platinum Trio Husband",
@@ -20,7 +20,7 @@
     {
         "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
         "report": "8dd51b60-2d65-4e74-ac86-08ff9159aaaa",
-        "status": "released",
+        "status": "shared",
         "family": "21f2af73-2c2e-4101-bbfb-bb2754f302ad",
         "accession": "GAPCAKQB9FPJ",
         "description": "Benchmarking case for Platinum Trio Father",
@@ -39,7 +39,7 @@
     {
         "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
         "report": "f5210b6a-efcf-47bd-8f63-1f310072a4af",
-        "status": "released",
+        "status": "shared",
         "family": "21f2af73-2c2e-4101-bbfb-bb2754f302ad",
         "accession": "GAPCALNEKP7C",
         "description": "Benchmarking case for Platinum Trio Proband",

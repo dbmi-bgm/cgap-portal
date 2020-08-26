@@ -36,7 +36,7 @@
         "md5sum": "666e24391f38e5ad4a77fb3f9d3908d2",
         "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
         "file_type": "alignments",
-        "status": "released",
+        "status": "shared",
         "quality_metric": "f1a7f082-3bcd-449a-afe1-71ff82798a10",
         "extra_files": [
             {
@@ -68,7 +68,7 @@
         "md5sum": "64edf0ddaf7bc44e5d535876a092bfc4",
         "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
         "file_type": "alignments",
-        "status": "released",
+        "status": "shared",
         "quality_metric": "71663988-1d7e-451f-a815-c47d3fcd450c",
         "extra_files": [
             {
@@ -99,7 +99,7 @@
     {
         "md5sum": "dd62e3172369f13e531a9aeb02c0937b",
         "file_size": 1037389,
-        "status": "released",
+        "status": "shared",
         "quality_metric": "d79a8857-46f6-4fac-80af-c38d97eeaca9",
         "extra_files": [
             {
@@ -130,7 +130,7 @@
         "md5sum": "55a2cabddcb84c0c62ea351e3b3b9c73",
         "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
         "file_type": "alignments",
-        "status": "released",
+        "status": "shared",
         "quality_metric": "5105cba1-64a4-4907-a6cc-f79a3b72ecef",
         "extra_files": [
             {
@@ -162,7 +162,7 @@
         "md5sum": "6a8a54c8b58ae40eb9f757162bc42028",
         "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
         "file_type": "gVCF",
-        "status": "released",
+        "status": "shared",
         "extra_files": [
             {
                 "md5sum": "fde9876636dd922eda3e097bd8e999e0",
@@ -193,7 +193,7 @@
         "md5sum": "8b52af755e590346cc6970f079237075",
         "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
         "file_type": "gVCF",
-        "status": "released",
+        "status": "shared",
         "extra_files": [
             {
                 "md5sum": "7d9a71ea6c3a560cc2558b48c87f9c5f",
@@ -224,7 +224,7 @@
         "md5sum": "7f0e6099c861c3a74471b0e812789350",
         "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
         "file_type": "gVCF",
-        "status": "released",
+        "status": "shared",
         "extra_files": [
             {
                 "md5sum": "a13f88bb93021373e5d4746a36df9d50",
@@ -255,7 +255,7 @@
         "md5sum": "6ed3a4ee7eb9841381d14998f14a8c57",
         "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
         "file_type": "intermediate file",
-        "status": "released",
+        "status": "shared",
         "quality_metric": "0cbb2e67-0c45-40a0-9aa0-837ff5dec1a1",
         "accession": "GAPFI5V1GIRY",
         "description": "Intermediate alignment file",
@@ -273,7 +273,7 @@
     {
         "md5sum": "6d3df9b0367a26b9b1668b09c04dd9b6",
         "file_size": 12539740629,
-        "status": "released",
+        "status": "shared",
         "extra_files": [
             {
                 "md5sum": "8239418a45226cfe120a5729b868c3d2",
@@ -303,7 +303,7 @@
         "md5sum": "bc27c82a5ad50715cd971977c95a6d63",
         "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
         "file_type": "intermediate file",
-        "status": "released",
+        "status": "shared",
         "quality_metric": "ded50f6d-a746-466c-abf6-7715fba65da6",
         "accession": "GAPFISSWY513",
         "description": "Intermediate alignment file",
@@ -352,7 +352,7 @@
         "md5sum": "1939cb0962905f37a35c036c6a77b9aa",
         "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
         "file_type": "intermediate file",
-        "status": "released",
+        "status": "shared",
         "quality_metric": "b0ce1bd6-ecdb-44a2-a977-4ae59edf21d1",
         "accession": "GAPFI67T8YV5",
         "description": "Intermediate alignment file",
@@ -370,7 +370,7 @@
     {
         "md5sum": "afd08ff92f1e4d03ee587ab761aa12e9",
         "file_size": 6181725748,
-        "status": "released",
+        "status": "shared",
         "extra_files": [
             {
                 "md5sum": "de12d201eb8c4f83f2a24536d0461635",
@@ -400,7 +400,7 @@
         "md5sum": "ce914caa3496734c4f22f7c47bd7c967",
         "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
         "file_type": "intermediate file",
-        "status": "released",
+        "status": "shared",
         "quality_metric": "cba2a229-0844-435c-822b-00f19be400f6",
         "accession": "GAPFIH1A1SPG",
         "description": "Intermediate alignment file",
@@ -418,7 +418,7 @@
     {
         "md5sum": "18fb102f310e31976d20af163871442b",
         "file_size": 1030556,
-        "status": "released",
+        "status": "shared",
         "quality_metric": "7b965546-829b-4ccb-a7bd-412bfee31038",
         "extra_files": [
             {
@@ -449,7 +449,7 @@
         "md5sum": "64c8af6ebbeef5d4e34a4c785b9db24a",
         "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
         "file_type": "intermediate file",
-        "status": "released",
+        "status": "shared",
         "quality_metric": "3a46b41e-7cb0-4398-ac47-ba8d80b34281",
         "accession": "GAPFIB7BFZ58",
         "description": "Intermediate alignment file",
@@ -467,7 +467,7 @@
     {
         "md5sum": "7caba51f510310cfa10deed703879cc0",
         "file_size": 12376586755,
-        "status": "released",
+        "status": "shared",
         "extra_files": [
             {
                 "md5sum": "6be50b3c2a53b291ee995aeb57da2487",
@@ -497,7 +497,7 @@
         "md5sum": "c56f001811b5eb9bd789a929aadb268d",
         "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
         "file_type": "intermediate file",
-        "status": "released",
+        "status": "shared",
         "accession": "GAPFID38UPJ1",
         "description": "Intermediate alignment file",
         "genome_assembly": "GRCh38",
@@ -515,7 +515,7 @@
         "md5sum": "bbadcd21bd2e324dcbbebfafcc3be188",
         "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
         "file_type": "intermediate file",
-        "status": "released",
+        "status": "shared",
         "accession": "GAPFIJG8GL3V",
         "description": "Intermediate alignment file",
         "genome_assembly": "GRCh38",
@@ -532,7 +532,7 @@
     {
         "md5sum": "0a510c37fa471e357f77020c93b5a246",
         "file_size": 12328217071,
-        "status": "released",
+        "status": "shared",
         "extra_files": [
             {
                 "md5sum": "51c872dcd9eb65382ce16fd9dd97f70b",
@@ -562,7 +562,7 @@
         "md5sum": "b92a1218f6b5ec5c33a359d4f9fcae90",
         "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
         "file_type": "intermediate file",
-        "status": "released",
+        "status": "shared",
         "quality_metric": "18c2ff4f-e88c-489b-aef1-6a411a36a3fc",
         "accession": "GAPFI9HDXSSI",
         "description": "Intermediate alignment file",
@@ -581,7 +581,7 @@
         "md5sum": "092228ff3617b2e6997d56d25c54d008",
         "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
         "file_type": "intermediate file",
-        "status": "released",
+        "status": "shared",
         "accession": "GAPFIJ9BD3JU",
         "description": "Intermediate alignment file",
         "genome_assembly": "GRCh38",
@@ -599,7 +599,7 @@
         "md5sum": "584e99bfa282f9c3c9f1daabfcad14de",
         "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
         "file_type": "intermediate file",
-        "status": "released",
+        "status": "shared",
         "quality_metric": "310c7958-6f7c-4bab-93fa-c5f3f49f5773",
         "accession": "GAPFILRE7OY6",
         "description": "Intermediate alignment file",
@@ -618,7 +618,7 @@
         "md5sum": "2f2e9f420ccb4f55a6815e7aed2cf0fe",
         "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
         "file_type": "intermediate file",
-        "status": "released",
+        "status": "shared",
         "quality_metric": "329cf33f-f30e-4634-a848-8a9a145ecfed",
         "accession": "GAPFIOH2AVOD",
         "description": "Intermediate alignment file",
@@ -636,7 +636,7 @@
     {
         "md5sum": "1a9970ce38f9b1eb31397a5f530e16e4",
         "file_size": 601306,
-        "status": "released",
+        "status": "shared",
         "quality_metric": "caba631a-908f-4a6e-a4bc-1f582d0f38bd",
         "extra_files": [
             {
@@ -666,7 +666,7 @@
     {
         "md5sum": "bb040a0cef358a9d84abf663e46490b4",
         "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
-        "status": "released",
+        "status": "shared",
         "content_md5sum": "bb040a0cef358a9d84abf663e46490b4",
         "extra_files": [
             {
@@ -701,7 +701,7 @@
         "md5sum": "b4ef620c997f44b1f9102dd69f4aea67",
         "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
         "file_type": "intermediate file",
-        "status": "released",
+        "status": "shared",
         "quality_metric": "35e411a6-0586-4e4e-a30e-42aa1a5d7b6a",
         "accession": "GAPFIIKU363K",
         "description": "Intermediate alignment file",
@@ -720,7 +720,7 @@
         "md5sum": "ad333b8c1d9f2ca07862fc62f2567972",
         "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
         "file_type": "intermediate file",
-        "status": "released",
+        "status": "shared",
         "quality_metric": "cf55bd29-2c1b-46fc-87c0-7004df5c93fc",
         "accession": "GAPFIK3FA7LW",
         "description": "Intermediate alignment file",
@@ -739,7 +739,7 @@
         "md5sum": "20fcf4f4ff5a94a53dd53628d52bdede",
         "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
         "file_type": "intermediate file",
-        "status": "released",
+        "status": "shared",
         "quality_metric": "38d19a8f-eda7-44db-a3e6-c2c23cc0c43a",
         "accession": "GAPFI9PUMN3F",
         "description": "Intermediate alignment file",
@@ -787,7 +787,7 @@
     {
         "md5sum": "44165cbd7695318f2a970a86cb86e7a8",
         "file_size": 37253355520,
-        "status": "released",
+        "status": "shared",
         "extra_files": [
             {
                 "md5sum": "766ce43322a5e0a6c99ab717a8514f63",
@@ -817,7 +817,7 @@
         "md5sum": "c81461eb000df318b6278a0ef30955b0",
         "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
         "file_type": "intermediate file",
-        "status": "released",
+        "status": "shared",
         "quality_metric": "85de219f-42ae-4ac2-b7ad-62b7d381baed",
         "accession": "GAPFIQHUBRKU",
         "description": "Intermediate alignment file",
@@ -835,7 +835,7 @@
     {
         "md5sum": "d7966fb41b633e6cce234173e48d97a5",
         "file_size": 425240276,
-        "status": "released",
+        "status": "shared",
         "quality_metric": "3672769b-ae55-4b3d-a679-956e74bbfec3",
         "extra_files": [
             {
@@ -865,7 +865,7 @@
     {
         "md5sum": "b4dfc1ae5716a6ba41a2ef3cf845206c",
         "file_size": 3527,
-        "status": "released",
+        "status": "shared",
         "accession": "GAPFIOIKS654",
         "genome_assembly": "GRCh38",
         "source_samples": [],
@@ -881,7 +881,7 @@
     {
         "md5sum": "a2e14c502a3935ccec689cd61bea43dd",
         "file_size": 3515,
-        "status": "released",
+        "status": "shared",
         "accession": "GAPFIRKBUASE",
         "genome_assembly": "GRCh38",
         "source_samples": [],
@@ -927,7 +927,7 @@
     {
         "md5sum": "00ffe8369c83fcad7a3c6888e2b7ef14",
         "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
-        "status": "released",
+        "status": "shared",
         "content_md5sum": "00ffe8369c83fcad7a3c6888e2b7ef14",
         "accession": "GAPFI19F1RAG",
         "description": "big test file, from 20 unrelated rck files with MQ = 0 and BQ = 0, 2 reads in 2 unrelated",
@@ -947,7 +947,7 @@
     {
         "md5sum": "8af84fd571b95012127d3f0f2c98a279",
         "file_size": 3520,
-        "status": "released",
+        "status": "shared",
         "accession": "GAPFIAST6ER2",
         "genome_assembly": "GRCh38",
         "source_samples": [],
