@@ -1,5 +1,6 @@
 # import ast
 from copy import deepcopy
+import csv
 import datetime
 import json
 import xlrd
@@ -82,7 +83,7 @@ def submit_metadata_bundle(*, s3_client, bucket, key, project, institution, vapp
         vapp: a VirtualApp object
         log: a logging object capable of .info, .warning, .error, or .debug messages
     """
-    with s3_local_file(s3_client, bucket=bucket, key=key) as file:
+    with s3_local_file(s3_client, bucket=bucket, key=key) as filename:
         project_json = vapp.get(project).json
         institution_json = vapp.get(institution).json
         results = {
@@ -92,7 +93,17 @@ def submit_metadata_bundle(*, s3_client, bucket, key, project, institution, vapp
             'post_output': [],
             'upload_info': []
         }
-        json_data, json_success = xls_to_json(file, project=project_json, institution=institution_json)
+        if filename.endswith('.xls') or filename.endswith('.xlsx'):
+            rows = digest_xls(filename)
+        elif filename.endswith('.csv') or filename.endswith('.tsv'):
+            delim = ',' if filename.endswith('csv') else '\t'
+            rows = digest_csv(filename, delim=delim)
+        else:
+            msg = ('Metadata bundle must be a file of type .xls, .xlsx, .csv, or .tsv.'
+                   'Please submit a file of the proper type.')
+            results['validation_output'].append(msg)
+            return results
+        json_data, json_success = xls_to_json(rows, project=project_json, institution=institution_json)
         if not json_success:
             results['validation_output'] = json_data['errors']
             return results
@@ -127,13 +138,46 @@ def use_abbrev(value):
         return value
 
 
-def xls_to_json(xls_data, project, institution):
+def get_column_name(row, columns):
     '''
-    Converts excel file to json for submission.
+    For cases where there is a variation on a particular column name.
+    Final column in list must be the default name.
     '''
+    for col in columns:
+        if row.get(col):
+            return col
+    return columns[-1]
+
+
+def digest_xls(xls_data):
     book = xlrd.open_workbook(xls_data)
     sheet, = book.sheets()
-    row = row_generator(sheet)
+    return row_generator(sheet)
+
+
+def digest_csv(input_data, delim=','):
+    with open(input_data) as csvfile:
+        rows = list(csv.reader(csvfile, delimiter=delim))
+    for row in rows:
+        yield(row)
+
+
+def xls_to_json(row, project, institution):
+    '''
+    Converts excel file (or csv/tsv table) to json for submission.
+    '''
+    # book = xlrd.open_workbook(xls_data)
+    # sheet, = book.sheets()
+    # row = row_generator(sheet)
+    # if xls_data.endswith('.xls') or xls_data.endswith('.xlsx'):
+    #     rows = digest_xls(xls_data)
+    # elif xls_data.endswith('.csv') or xls_data.endswith('.tsv'):
+    #     delim = ',' if xls_data.endswith('csv') else '\t'
+    #     rows = digest_csv(xls_data, delim=delim)
+    # else:
+    #     msg = ('Metadata bundle must be a file of type .xls, .xlsx, .csv, or .tsv.'
+    #            'Please submit a file of the proper type.')
+    #     return {'errors': [msg]}, False
     header = False
     counter = 0
     # debuglog("top_header:", top_header)  # Temporary instrumentation for debugging to go away soon. -kmp 25-Jul-2020
@@ -198,6 +242,8 @@ def xls_to_json(xls_data, project, institution):
         # create item for Sample if there is a specimen
         if row.get('specimen id'):
             samp_alias = '{}:sample-{}'.format(project['name'], row['specimen id'])
+            if row.get('run no.'):
+                samp_alias = samp_alias + '-' + row['run no.']
             analysis_alias = '{}:analysis-{}'.format(project['name'], row['analysis id'])
             items = fetch_sample_metadata(row_num, row, items, indiv_alias, samp_alias, analysis_alias,
                                           fam_alias, project['name'], a_types, case_names)
@@ -234,11 +280,8 @@ def get_analysis_types(rows):
     for row in rows:
         analysis_relations.setdefault(row.get('analysis id'), [[], []])
         analysis_relations[row.get('analysis id')][0].append(row.get('relation to proband', '').lower())
-        if row.get('test requested'):
-            col = 'test requested'
-        else:
-            col = 'workup type'
-        analysis_relations[row.get('analysis id')][1].append(row.get(col, '').upper())
+        workup_col = get_column_name(row, ['test requested', 'workup type'])
+        analysis_relations[row.get('analysis id')][1].append(row.get(workup_col, '').upper())
     for k, v in analysis_relations.items():
         workup = list(set(v[1]))
         if len(workup) == 1 and '' not in workup:
@@ -257,12 +300,8 @@ def fetch_individual_metadata(idx, row, items, indiv_alias, inst_name):
     new_items = items.copy()
     info = {'aliases': [indiv_alias]}
     info = map_fields(row, info, ['individual_id', 'sex', 'age', 'birth_year'], 'individual')
-    other_id_col = None
-    if row.get('other individual id'):
-        other_id_col = 'other individual id'
-    elif row.get('other id'):
-        other_id_col = 'other id'
-    if other_id_col:
+    other_id_col = get_column_name(row, ['other id', 'other individual id'])
+    if row.get(other_id_col):
         other_id = {'id': row[other_id_col], 'id_source': inst_name}
         if row.get('other individual id type'):
             other_id['id_source'] = row['other individual id source']
@@ -354,10 +393,7 @@ def fetch_sample_metadata(idx, row, items, indiv_alias, samp_alias, analysis_ali
             msg = ('Row {} - Samples with analysis ID {} contain mis-matched or invalid workup type values. '
                    'Sample cannot be processed.'.format(idx, row.get('analysis id')))
             new_items['errors'].append(msg)
-        if row.get('unique analysis id'):
-            case_col = 'unique analysis id'
-        else:
-            case_col = 'optional case id (unique in all rows)'
+        case_col = get_column_name(row, ['unique analysis id', 'optional case id (unique in all rows)'])
         if row.get(case_col):
             case_name_dict['{}-{}'.format(row.get('analysis id'), row.get('specimen id'))] = row[case_col]
     new_items['sample_processing'].setdefault(analysis_alias, new_sp_item)
