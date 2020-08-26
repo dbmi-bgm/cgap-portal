@@ -1,45 +1,32 @@
 [
     {
+        "status": "in review",
+        "date_created": "2020-08-07T17:58:40.113043+00:00",
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
         "qc_list": [
             {
+                "qc_type": "quality_metric_cmphet",
+                "value": "e29f5131-0447-4178-b118-dfd4ab03985c"
+            },
+            {
                 "qc_type": "quality_metric_vcfcheck",
-                "value": "1ef57ffb-2c75-4621-a5fe-f583a90e040c"
+                "value": "e57beed5-cf83-4b38-8480-38e844f8edc7"
             },
             {
                 "qc_type": "quality_metric_vcfqc",
-                "value": "576f2d32-cf91-4d5c-9cf2-a47c35f3e23c"
+                "value": "d58e195a-bb9e-4493-a2aa-8f533f8cddcc"
             }
         ],
+        "submitted_by": "b041dba8-e2b2-4e54-a621-97edb508a0c4",
         "overall_quality_status": "PASS",
-        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
-        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
+        "schema_version": "1",
+        "uuid": "4b1f6c0f-137d-42c9-87b8-2ad7eb6965b3",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b"
+    },
+    {
         "status": "in review",
-        "uuid": "eef6aab7-9b58-4635-917e-b2802792782d",
-        "date_created": "2020-07-15T02:40:09.070158+00:00",
-        "schema_version": "1",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
-    },
-    {
-        "qc_list": [
-            {
-                "qc_type": "quality_metric_vcfcheck",
-                "value": "9f86c3f6-2202-4fa1-b711-5b788623f9bf"
-            },
-            {
-                "qc_type": "quality_metric_cmphet",
-                "value": "ba404b50-1918-4119-8620-39eb2dbb011a"
-            }
-        ],
-        "overall_quality_status": "PASS",
+        "date_created": "2020-07-15T02:40:10.734571+00:00",
         "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
-        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
-        "status": "released",
-        "uuid": "d79a8857-46f6-4fac-80af-c38d97eeaca9",
-        "date_created": "2020-07-15T02:40:10.431921+00:00",
-        "schema_version": "1",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
-    },
-    {
         "qc_list": [
             {
                 "qc_type": "quality_metric_vcfcheck",
@@ -50,33 +37,30 @@
                 "value": "d918bc25-0888-4658-811b-53c20b944b76"
             }
         ],
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "overall_quality_status": "PASS",
-        "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
-        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
-        "status": "in review",
-        "uuid": "b576a9ef-29a3-41c3-86e2-800913fe5b0f",
-        "date_created": "2020-07-15T02:40:10.734571+00:00",
         "schema_version": "1",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        "uuid": "b576a9ef-29a3-41c3-86e2-800913fe5b0f",
+        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d"
     },
     {
+        "status": "in review",
+        "date_created": "2020-08-19T19:48:10.093883+00:00",
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
         "qc_list": [
             {
                 "qc_type": "quality_metric_vcfcheck",
-                "value": "c05c5758-b323-4857-aec0-c9145a47ca85"
+                "value": "4bfb57ee-5f95-4d90-91ce-f0591223a0b1"
             },
             {
                 "qc_type": "quality_metric_cmphet",
-                "value": "0fa65a36-40ff-4d54-86dd-ae9b4d2212fe"
+                "value": "2f480d4c-2dfe-4b67-89f2-6528fd17bc1b"
             }
         ],
+        "submitted_by": "b041dba8-e2b2-4e54-a621-97edb508a0c4",
         "overall_quality_status": "PASS",
-        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
-        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
-        "status": "in review",
-        "uuid": "432a1603-d452-4112-9e2e-446ae840fa19",
-        "date_created": "2020-06-18T17:51:41.756055+00:00",
         "schema_version": "1",
-        "submitted_by": "b041dba8-e2b2-4e54-a621-97edb508a0c4"
+        "uuid": "37d96b8d-3ee9-4e32-9946-8447ba9b1e01",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b"
     }
 ]
