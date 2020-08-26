@@ -63,11 +63,12 @@
             "type" : "string",
             "linkTo": "Nexus"
         },
-        "default_filter_set": {
-            "title": "Default FilterSet",
-            "description": "The default filterset defined by the user for this case",
+        "active_filterset" : {
+            "title": "Active Filterset",
+            "description": "Current FilterSet used for this Case",
             "type": "string",
-            "linkTo": "FilterSet"
+            "linkTo": "FilterSet",
+            "notes": "We could maybe have this be a sub-embedded object and save related metadata like date_changed or something, idk."
         }
     },
     "facets" : {

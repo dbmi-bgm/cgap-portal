@@ -166,6 +166,10 @@ class Case(Item):
         "sample.last_modified.*",
         "sample.specimen_collection_date",
         "sample.sequencing_date",
+        "sample.processed_files.quality_metric.quality_metric_summary.sample",
+        "sample.processed_files.quality_metric.quality_metric_summary.title",
+        "sample.processed_files.quality_metric.quality_metric_summary.value",
+        "sample.processed_files.quality_metric.quality_metric_summary.numberType",
         "sample_processing.analysis_type",
         "sample_processing.last_modified.*",
         "sample_processing.families.family_id",
@@ -183,6 +187,20 @@ class Case(Item):
         "sample_processing.families.members.case.sample.accession",
         "sample_processing.samples.accession",
         "sample_processing.processed_files",
+        "sample_processing.samples.processed_files.last_modified.*",
+        "sample_processing.samples.processed_files.quality_metric.quality_metric_summary.title",
+        "sample_processing.samples.processed_files.quality_metric.quality_metric_summary.sample",
+        "sample_processing.samples.processed_files.quality_metric.quality_metric_summary.value",
+        "sample_processing.samples.processed_files.quality_metric.quality_metric_summary.numberType",
+        "sample_processing.samples.processed_files.quality_metric.filtering_condition",
+        "sample_processing.samples.processed_files.quality_metric.*",
+        "sample_processing.samples.bam_sample_id",
+        "sample_processing.processed_files.quality_metric.quality_metric_summary.title",
+        "sample_processing.processed_files.quality_metric.quality_metric_summary.sample",
+        "sample_processing.processed_files.quality_metric.quality_metric_summary.value",
+        "sample_processing.processed_files.quality_metric.quality_metric_summary.numberType",
+        "sample_processing.processed_files.quality_metric.filtering_condition",
+        "sample_processing.processed_files.quality_metric.*",
         "sample_processing.families.analysis_groups",
         "sample_processing.sample_processed_files.processed_files.last_modified.*",
         "sample_processing.sample_processed_files.sample.accession",
@@ -191,6 +209,11 @@ class Case(Item):
         "report.status",
         "report.accession",
         "report.case.accession",
+        "active_filterset.last_modified.date_modified",
+        "active_filterset.last_modified.modified_by",
+        "active_filterset.filter_blocks.query",
+        "active_filterset.filter_blocks.flags_applied",
+        "active_filterset.flags",
         "cohort.filter_set.*",
         "project.name"
     ]
@@ -256,8 +279,10 @@ class Case(Item):
     })
     def vcf_file(self, request, sample_processing=None):
         vcf_file = {}
-        """Map the vcf file to be digested
-        Currently we have a single file on processed_files field of sample processing"""
+        """
+        Map the vcf file to be digested
+        Currently we have a single file on processed_files field of sample processing
+        """
         if not sample_processing:
             return vcf_file
         sp_data = get_item_or_none(request, sample_processing, 'sample-processings')
@@ -273,12 +298,14 @@ class Case(Item):
         return vcf_file
 
     @calculated_property(schema={
-        "title": "Filter Set Flag add-on",
-        "description": "tag to be added to the filter set flag for limiting search to varants/sample variants from this case",
+        "title": "Search Query Filter String Add-On",
+        "description": "String to be appended to the initial search query to limit variant sample results to those related to this case.",
         "type": "string"
     })
-    def filter_set_flag_addon(self, request, sample_processing=None, individual=None):
-        """use vcf file and sample accessions to limit variant/variantsample to this case"""
+    def initial_search_href_filter_addon(self, request, sample_processing=None, individual=None):
+        """
+        Use vcf file and sample accessions to limit variant/variantsample to this case
+        """
         if not individual or not sample_processing:
             return ''
         sample = self.sample(request, individual, sample_processing)
@@ -292,7 +319,7 @@ class Case(Item):
         if not sample_read_group:
             return ''
         vcf_acc = vcf.split('/')[2]
-        add_on = "&CALL_INFO={}&file={}".format(sample_read_group, vcf_acc)
+        add_on = "CALL_INFO={}&file={}".format(sample_read_group, vcf_acc)
         return add_on
 
     @calculated_property(schema={
