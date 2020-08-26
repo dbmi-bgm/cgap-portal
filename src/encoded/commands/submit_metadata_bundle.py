@@ -84,7 +84,7 @@ def main(simulated_args_for_testing=None):
         }
 
         post_data = {
-            'ingestion_type': 'data_bundle',
+            'ingestion_type': 'metadata_bundle',
             'institution': institution,
             'project': project,
         }

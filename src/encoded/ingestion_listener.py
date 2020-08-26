@@ -880,7 +880,7 @@ PROMPT_TEMPLATE = """
           </td>
           <td>
             <select id="ingestion_type" name="ingestion_type">
-              <option value="data_bundle">Data Bundle&nbsp;</option>
+              <option value="metadata_bundle">MetaData Bundle&nbsp;</option>
             </select>
           </td>
         </tr>

@@ -70,8 +70,8 @@ LINKS = [
 ID_SOURCES = [ 'UDN' ]
 
 
-def submit_data_bundle(*, s3_client, bucket, key, project, institution, vapp,  # <- All keyword arguments, all required.
-                       validate_only=False):  # <-- Additional options with defaults.
+def submit_metadata_bundle(*, s3_client, bucket, key, project, institution, vapp,  # <- Required keyword arguments
+                           validate_only=False):  # <-- Optional keyword arguments (with defaults)
     """
     Handles processing of a submitted workbook.
 

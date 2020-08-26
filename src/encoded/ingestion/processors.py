@@ -4,7 +4,7 @@ import traceback
 
 from ..ingestion.common import get_parameter
 from ..util import debuglog, s3_output_stream, create_empty_s3_file
-from ..submit import submit_data_bundle
+from ..submit import submit_metadata_bundle
 from .exceptions import UndefinedIngestionProcessorType
 
 
@@ -35,14 +35,14 @@ def _show_report_lines(lines, fp, default="Nothing to report."):
         print(line, file=fp)
 
 
-@ingestion_processor('data_bundle')
-def handle_data_bundle(submission):
+@ingestion_processor('metadata_bundle')
+def handle_metadata_bundle(submission):
 
     submission.log.info("Processing {submission_id} as {ingestion_type}."
                         .format(submission_id=submission.submission_id, ingestion_type=submission.ingestion_type))
 
-    if submission.ingestion_type != 'data_bundle':
-        raise RuntimeError("handle_data_bundle only works for ingestion_type data_bundle.")
+    if submission.ingestion_type != 'metadata_bundle':
+        raise RuntimeError("handle_metadata_bundle only works for ingestion_type metadata_bundle.")
 
     submission_id = submission.submission_id
     s3_client = boto3.client('s3')
@@ -83,15 +83,15 @@ def handle_data_bundle(submission):
         # if isinstance(project, str):
         #     project = submission.vapp.get(project).json
 
-        data_bundle_result = submit_data_bundle(s3_client=s3_client,
-                                                bucket=submission.bucket,
-                                                key=object_name,
-                                                project=project,
-                                                institution=institution,
-                                                vapp=submission.vapp,
-                                                validate_only=validate_only)
+        bundle_result = submit_metadata_bundle(s3_client=s3_client,
+                                                    bucket=submission.bucket,
+                                                    key=object_name,
+                                                    project=project,
+                                                    institution=institution,
+                                                    vapp=submission.vapp,
+                                                    validate_only=validate_only)
 
-        debuglog(submission_id, "data_bundle_result:", json.dumps(data_bundle_result, indent=2))
+        debuglog(submission_id, "bundle_result:", json.dumps(bundle_result, indent=2))
 
         resolution["validation_report_key"] = validation_report_key = "%s/validation-report.txt" % submission_id
         resolution["submission_key"] = submission_key = "%s/submission.json" % submission_id
@@ -102,30 +102,30 @@ def handle_data_bundle(submission):
 
         def note_additional_datum(key, bundle_key=None):
             other_details['additional_data'] = additional_data = other_details.get('additional_data', {})
-            additional_data[key] = data_bundle_result[bundle_key or key]
+            additional_data[key] = bundle_result[bundle_key or key]
 
         with s3_output_stream(s3_client, bucket=submission.bucket, key=validation_report_key) as fp:
-            _show_report_lines(data_bundle_result['validation_output'], fp)
+            _show_report_lines(bundle_result['validation_output'], fp)
             note_additional_datum('validation_output')
 
         # Next several files are created only if relevant.
 
-        if data_bundle_result['result']:
+        if bundle_result['result']:
             with s3_output_stream(s3_client, bucket=submission.bucket, key=submission_key) as fp:
-                print(json.dumps(data_bundle_result['result'], indent=2), file=fp)
-                other_details['result'] = data_bundle_result['result']
+                print(json.dumps(bundle_result['result'], indent=2), file=fp)
+                other_details['result'] = bundle_result['result']
 
-        if data_bundle_result['post_output']:
+        if bundle_result['post_output']:
             with s3_output_stream(s3_client, bucket=submission.bucket, key=submission_response_key) as fp:
-                _show_report_lines(data_bundle_result['post_output'], fp)
+                _show_report_lines(bundle_result['post_output'], fp)
                 note_additional_datum('post_output')
 
-        if data_bundle_result['upload_info']:
+        if bundle_result['upload_info']:
             with s3_output_stream(s3_client, bucket=submission.bucket, key=upload_info_key) as fp:
-                print(json.dumps(data_bundle_result['upload_info'], indent=2), file=fp)
+                print(json.dumps(bundle_result['upload_info'], indent=2), file=fp)
                 note_additional_datum('upload_info')
 
-        outcome = "success" if data_bundle_result['success'] else "failure"
+        outcome = "success" if bundle_result['success'] else "failure"
 
         submission.patch_item(processing_status={"state": "done", "outcome": outcome, "progress": "complete"},
                               **other_details)
