@@ -148,7 +148,7 @@ function CoverageTable(props) {
                     const thisData = mapRoleToCoverageData[role];
                     const { sampleID = null, coverage = null, labels : [label] = [] } = thisData || {};
                     return (
-                        <tr key={role} className={i == 0 ? "border-top": ""}>
+                        <tr key={role}>
                             <td className="text-left text-capitalize">{ role }</td>
                             <td className="text-left">{ sampleID ? sampleID.split("_")[0] : "" }</td>
                             <td className="text-left">{ coverage }</td>
@@ -174,7 +174,7 @@ function QualityTable(props) {
                 </tr>
             </thead>
             <tbody>
-                <tr className="border-top">
+                <tr>
                     <td className="text-600 text-left">Variant Quality</td>
                     <td className="text-left">{ variantQuality }</td>
                     <td className="text-left">{ getTipForField("QUAL") }</td>
@@ -221,7 +221,7 @@ function DeNovoTable(props) {
                 </tr>
             </thead>
             <tbody>
-                <tr className="border-top">
+                <tr>
                     <td className="text-600 text-left">NovoCaller</td>
                     <td className="text-left">{ novoPP }</td>
                     <td className="text-left">{ getTipForField("novoPP") }</td>
@@ -265,7 +265,7 @@ function CompoundHetTable(props) {
                     } = obj;
 
                     return (
-                        <tr key={i} className="border-top">
+                        <tr key={i}>
                             <td className="text-600 text-left">{ variant }</td>
                             <td className="text-left">{ phase }</td>
                             <td className="text-left">{ gene }</td>
