@@ -284,7 +284,7 @@ function GDNAList({ context }){
     // Canononical GRCh38 entry
     renderedRows.push(
         <div className="row pb-1 pb-md-03" key="GRCh38">
-            <div className="col-12 col-md-3 text-italic"><em>GRCh38</em></div>
+            <div className="col-12 col-md-3 font-italic"><em>GRCh38</em></div>
             <div className="col-12 col-md-2 ">{ chrom }</div>
             <div className="col-12 col-md-7">{ mutanno_hgvsg }</div>
         </div>
@@ -294,7 +294,7 @@ function GDNAList({ context }){
     hg19.forEach(function({ hg19_pos, hg19_chrom, hg19_hgvsg }, idx){
         renderedRows.push(
             <div className="row pb-1 pb-md-03" key={idx}>
-                <div className="col-12 col-md-3 text-italic"><em>GRCh37 (hg19)</em></div>
+                <div className="col-12 col-md-3 font-italic"><em>GRCh37 (hg19)</em></div>
                 <div className="col-12 col-md-2 ">{ hg19_chrom }</div>
                 <div className="col-12 col-md-7">{ hg19_hgvsg }</div>
             </div>

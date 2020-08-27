@@ -209,7 +209,7 @@ QualityTable.propTypes = {
 function DeNovoTable(props) {
     const { getTipForField, novoPP = null } = props;
     if (novoPP === null) {
-        return <span className="text-italic">No denovo data to display</span>;
+        return <span className="font-italic">No denovo data to display</span>;
     }
     return (
         <table className="w-100">
@@ -239,7 +239,7 @@ function CompoundHetTable(props) {
     const { cmphet } = props;
 
     if (cmphet.length === 0) {
-        return <span className="text-italic">No comphet data to display</span>;
+        return <span className="font-italic">No comphet data to display</span>;
     }
     return (
         <table className="w-100">

@@ -256,7 +256,7 @@ const ExternalDatabasesSection = React.memo(function ExternalDatabasesSection(pr
 
     const externalDatabaseElemsLen = externalDatabaseElems.length;
     if (externalDatabaseElemsLen === 0) {
-        return <h4 className="text-center text-italic text-400">No External Databases</h4>;
+        return <h4 className="text-center font-italic text-400">No External Databases</h4>;
     } else if (externalDatabaseElemsLen >= 4) {
         const mp = Math.ceil(externalDatabaseElemsLen / 2);
         const col1 = externalDatabaseElems.slice(0, mp);
