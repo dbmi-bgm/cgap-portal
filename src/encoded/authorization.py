@@ -45,28 +45,22 @@ def groupfinder(login, request):
 
     user_properties = user.properties
 
-    if user_properties.get('status') in ('deleted', 'revoked'):
+    if user_properties.get('status') in ('deleted'):
         return None
 
     principals = ['userid.%s' % user.uuid]
+
+    # not currently used for access
     institution = user_properties.get('institution')
     if institution:
         principals.append('institution.%s' % institution)
 
-    project = user_properties.get('project')
-    if project:
-        principals.append('project.%s' % project)
-
-    submits_for = user_properties.get('submits_for', [])
-    principals.extend('institution.%s' % inst_uuid for inst_uuid in submits_for)
-    principals.extend('submits_for.%s' % inst_uuid for inst_uuid in submits_for)
-    if submits_for:
-        principals.append('group.submitter')
-
-    # user role. should always be present
-    user_role = user_properties.get('role')
-    if user_role:
-        principals.append('user_role.%s' % user_role)
+    # first pass implementation uses project to give view access only - will need to be
+    # be modified when different user roles can provide different levels of access
+    # and users can belong to different project
+    # project_roles is a list of embedded objects with 'project' property required
+    project_roles = user_properties.get('project_roles', [])
+    principals.extend('project.{}'.format(pr.get('project')) for pr in project_roles)
 
     groups = user_properties.get('groups', [])
     principals.extend('group.%s' % group for group in groups)

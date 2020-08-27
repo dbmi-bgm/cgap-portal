@@ -23,18 +23,25 @@
             "default": "current"
         },
         "project_roles": {
-            "title": "User Roles for Projects",
-            "description": "Role of user for each project he/she is part of",
+            "title": "Projects and Roles",
+            "description": "Projects that a User is part of and the role(s) within that Project a User has",
             "type": "array",
             "permission": "import_items",
             "items": {
-                "title": "User Role",
+                "title": "Project-Role",
                 "type": "object",
+                "required": ["project"],
                 "properties": {
+                    "project": {
+                        "title": "Project",
+                        "type": "string",
+                        "linkTo": "Project"
+                    },
                     "role": {
                         "title": "Role",
-                        "description": "The role of the user.",
+                        "description": "The role of the user in the project.",
                         "type": "string",
+                        "default": "unknown",
                         "enum": [
                             "clinician",
                             "scientist",
@@ -45,11 +52,6 @@
                             "other",
                             "unknown"
                         ]
-                    },
-                    "project": {
-                        "title": "Project",
-                        "type": "string",
-                        "linkTo": "Project"
                     }
                 }
             }
@@ -74,12 +76,11 @@
             "type": "string",
             "lookup": 40
         },
-        "role": {
-            "title": "Role",
-            "description": "The role of the user.",
+        "job_title": {
+            "title": "Job Title",
             "type": "string",
-            "permission": "import_items",
-            "enum": [
+            "comment": "Can be user supplied - purely informational",
+            "suggested_enum": [
                 "clinician",
                 "scientist",
                 "developer",
@@ -91,19 +92,10 @@
             ],
             "lookup": 41
         },
-        "authorized_cohorts":{
-            "title": "Authorized Cohorts",
-            "description": "Cohorts this user is authorized to view or edit, depending on role",
-            "type": "array",
-            "items": {
-                "title": "Cohorts",
-                "type": "string",
-                "linkTo": "Cohort"
-            }
-        },
         "groups": {
             "title": "Groups",
             "description": "Additional access control groups",
+            "note": "USE WITH CAUTION - currently how we add admin access to a user",
             "type": "array",
             "lookup": 80,
             "uniqueItems": true,

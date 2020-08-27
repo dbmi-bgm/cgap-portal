@@ -282,7 +282,9 @@ class Item(snovault.Item):
         'current': ALLOW_PROJECT_MEMBER_VIEW,
         'inactive': ALLOW_PROJECT_MEMBER_VIEW,
         'obsolete': DELETED,
-        'deleted': DELETED
+        'deleted': DELETED,
+        # do we need one for everyone view?
+        # 'released': ALLOW_EVERYONE_VIEW
     }
 
     # Items of these statuses are filtered out from rev links
@@ -316,7 +318,13 @@ class Item(snovault.Item):
         return self.STATUS_ACL.get(status, ONLY_ADMIN_VIEW)
 
     def __ac_local_roles__(self):
-        """this creates roles based on properties of the object being accessed"""
+        """Adds additional information allowing access of the Item based on
+           properties of the Item - currently most important is Project.
+           eg. ITEM.__ac_local_roles = {
+                    institution.uuid: role.institution_member,
+                    project.uuid: role.project_member
+                }
+          """
         roles = {}
         properties = self.upgrade_properties()
         if 'institution' in properties:
