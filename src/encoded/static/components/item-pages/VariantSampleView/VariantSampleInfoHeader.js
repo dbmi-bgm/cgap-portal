@@ -312,7 +312,7 @@ const CodingEffectValue = React.memo(function CodingEffectValue({ vep_consequenc
     let mostSevereConsequence = null;
 
     if (vcLen === 0) {
-        return <em data-tip="Not Available" className="text-muted">N/A</em>;
+        return <em data-tip="None Available" className="text-muted">N/A</em>;
     } else if (vcLen === 1) {
         [ mostSevereConsequence ] = vep_consequence;
     } else {
@@ -335,5 +335,9 @@ CodingEffectValue.impactMap = {
     "MODERATE" : 1,
     "LOW" : 2,
     "MODIFIER" : 3
+};
+CodingEffectValue.propTypes = {
+    /** Passed down from variant.transcript[currentTranscriptIdx].vep_consequence */
+    vep_consequence: PropTypes.array.isRequired
 };
 
