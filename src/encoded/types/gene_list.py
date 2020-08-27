@@ -44,11 +44,11 @@ def process_genelist(context, request):
     Expected file format:
         txt file with gene ids (gene_symbol) separated by new line
     For each provided gene id, there are 3 scenirios:
-    1) We find a gene item with matching gene_symbol
+    1) We find a gene item with matching gene_symbol or ensemble gene id
     2) No match for gene_symbol, but the query with provided gene id returns gene items
     3) No result is returned with provided gene id as query
     If a match between the provided id and a gene_symbol is caught, its uuid is added to the list
-    If not, a query results is provided with error, and the option gene_symbols for the provided gene id
+    If not, a query results for the first 10 is provided with error, and the option gene_symbols for the provided gene id
     If the query does not return any results, that information is provided in the response
     Args:
         request (Request): the current request. Attachment data should be
@@ -65,8 +65,13 @@ def process_genelist(context, request):
                                       ' keys: download, type, href. Found: %s'
                                       % (genelist_item, request.json.keys()))
     # verification on the attachment.
-    accepted_types = ['text/plain', 'text/csv']
-    accepted_extensions = ['.txt', '.csv']
+    accepted_types = [
+        'text/plain',
+        'text/csv',
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        'application/vnd.ms-excel'
+        ]
+    accepted_extensions = ['.txt', '.csv', '.xlsx', '.xls']
     extension = request.json['download'].split('.')[-1]
     if request.json['type'] not in accepted_types or extension not in accepted_extensions:
         raise HTTPUnprocessableEntity('GeneList %s: Bad file upload. Use .txt'
