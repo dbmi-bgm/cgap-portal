@@ -142,7 +142,7 @@ function TranscriptSelectionSection(props){
 
             <div className="info-header-title">
                 {/* passing 'py-1' to className of button via `size` prop - kinda hacky - noting here in case changes in future version, or if find better prop to use */}
-                <DropdownButton title={dropdownTitleToShow} size="lg py-1" variant="outline-dark" onSelect={onSelectTranscript}
+                <DropdownButton title={dropdownTitleToShow} size="lg py-1" variant="outline-secondary" onSelect={onSelectTranscript}
                     disabled={geneTranscriptListLen === 0} data-tip="Select a transcript (& gene) to view their details">
                     { geneListOptions }
                 </DropdownButton>
