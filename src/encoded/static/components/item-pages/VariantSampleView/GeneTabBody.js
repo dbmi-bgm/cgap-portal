@@ -244,7 +244,7 @@ const ExternalDatabasesSection = React.memo(function ExternalDatabasesSection(pr
         return (
             <div className="row mb-03" key={fieldName}>
                 <div className="col-12 col-xl">
-                    <label className="mb-0" htmlFor={"variant.transcript.vep_gene." + fieldName} data-tip={description}>{ title || fieldName }</label>
+                    <label className="mb-0 black-label" htmlFor={"variant.transcript.vep_gene." + fieldName} data-tip={description}>{ title || fieldName }</label>
                 </div>
                 <a className="col-12 col-xl-auto" href={linkToID || null} tagret="_blank" rel="noopener noreferrer" id={"variant.transcript.vep_gene." + fieldName}>
                     <span>{ externalID }</span>
@@ -256,7 +256,7 @@ const ExternalDatabasesSection = React.memo(function ExternalDatabasesSection(pr
 
     const externalDatabaseElemsLen = externalDatabaseElems.length;
     if (externalDatabaseElemsLen === 0) {
-        return <h4 className="text-center text-italic text-400">No External Databases</h4>;
+        return <h4 className="text-center font-italic text-400">No External Databases</h4>;
     } else if (externalDatabaseElemsLen >= 4) {
         const mp = Math.ceil(externalDatabaseElemsLen / 2);
         const col1 = externalDatabaseElems.slice(0, mp);

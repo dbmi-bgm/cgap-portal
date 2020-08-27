@@ -2410,6 +2410,28 @@ $download-button-width : 100px;
 }
 
 .sample-variant-annotation-space-body {
+	.card .inner-card-section {
+		> .info-header-title > h4 {
+			color: $primary-dark;
+		}
+
+		label {
+			color: $primary-dark;
+		}
+		label.black-label {
+			color: #000000;
+		}
+
+		// This should probably be its own style at some point
+		.btn-outline-secondary {
+			color: $primary-dark;
+			border-color: #dee2e6;
+			&:hover, &:focus, &:active {
+				color: #ffffff;
+				border-color: none;
+			}
+		}
+	}
 
 	.sample-variant-overview-tab-view-container {
 		.tabs-column {
@@ -2425,11 +2447,8 @@ $download-button-width : 100px;
 				margin-bottom: 5px;
 				font-weight: 600;
 				border-radius: 0;
-				// cornflowerblue used in CaseView, re-used here.
-				// if we find we end up liking and using it another time or so,
-				// we should consider setting it as the $primary color perhaps?
-				background-color: cornflowerblue; // $primary-dark;
-				color: #fff;
+				background-color: #beccda;
+				color: $primary-dark;
 				&[disabled]{
 					color: #fff8;
 				}
@@ -2437,7 +2456,7 @@ $download-button-width : 100px;
 					// background-color: $primary-dark;
 					// color: #fff;
 					@extend .card;
-					color: #000;
+					color: $primary-dark;
 					display: initial;
 					flex-direction: initial;
 					@include media-breakpoint-up(lg){
@@ -2465,6 +2484,16 @@ $download-button-width : 100px;
 			@include media-breakpoint-up(lg){
 				&.card {
 					border-top-left-radius: 0px;
+				}
+			}
+
+			.inner-card-section {
+				.info-header-title, h4, h3 {
+					color: $primary-dark;
+				}
+				thead > tr > th {
+					background-color: #f0f1f5;
+					color: $primary-dark;
 				}
 			}
 		}
