@@ -13,6 +13,7 @@ import { VariantSampleInfoHeader } from './VariantSampleInfoHeader';
 import { VariantTabBody } from './VariantTabBody';
 import { GeneTabBody } from './GeneTabBody';
 import { SampleTabBody } from './SampleTabBody';
+import { BrowserTabBody } from './BrowserTabBody';
 
 
 
@@ -137,6 +138,8 @@ function VariantSampleOverviewTabView(props){
         tabViewBody = <GeneTabBody {...{ context, schemas, currentGeneItem, currentGeneItemLoading }} />;
     } else if (currentTab === "Sample") {
         tabViewBody = <SampleTabBody {...{ context, schemas }} />;
+    } else if (currentTab === "Browser") {
+        tabViewBody = <BrowserTabBody {...{ context, schemas }} />;
     }
 
     const onClick = useMemo(function(){
@@ -167,6 +170,7 @@ function VariantSampleOverviewTabView(props){
                 <OverviewTabTitle {...{ currentTab }} title="Variant" />
                 <OverviewTabTitle {...{ currentTab }} title="Gene" disabled={!currentGeneItem} loading={currentGeneItemLoading} />
                 <OverviewTabTitle {...{ currentTab }} title="Sample" />
+                <OverviewTabTitle {...{ currentTab }} title="Browser" />
             </div>
             <div className="content-column card">
                 { tabViewBody }
