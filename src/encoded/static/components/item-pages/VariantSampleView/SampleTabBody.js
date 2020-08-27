@@ -33,7 +33,7 @@ export function SampleTabBody(props){
         <div className="variant-tab-body card-body">
             <div className="row">
                 <div className="col-8 col-md-9">
-                    <div className="inner-card-section pb-2">
+                    <div className="pb-2 inner-card-section">
                         <div className="info-header-title">
                             <h4>
                                 {/* todo link to GnomAD -- is there a gnomad link somewhere ? */}
@@ -46,17 +46,17 @@ export function SampleTabBody(props){
                     </div>
                 </div>
                 <div className="col-4 col-md-3">
-                    <div className="inner-card-section pb-2">
+                    <div className="pb-2 inner-card-section h-100">
                         <div className="info-header-title">
                             <h4>
                                 {/* todo link to GnomAD -- is there a gnomad link somewhere ? */}
                                 BAM Snapshot
                             </h4>
                         </div>
-                        <div className="info-body text-center">
-                            View BAM Snapshot
-                            <a href={`/${uuid}/@@download`} className="d-block pt-2 my-0 mx-auto">
-                                <i className="icon icon-fw icon-2x icon-external-link-alt fas" />
+                        <div className="info-body text-center overflow-auto d-flex h-100 d-flex justify-content-center flex-column">
+                            <span>View BAM Snapshot</span>
+                            <a href={`/${uuid}/@@download`} className="d-block pt-2" style={{ textAlign: "center", margin: "0 auto" }}>
+                                <i className="icon icon-fw icon-2x icon-external-link-alt fas ml-05" />
                             </a>
                         </div>
                     </div>
@@ -64,7 +64,7 @@ export function SampleTabBody(props){
             </div>
             <div className="row">
                 <div className="col-12 col-md-12 d-flex">
-                    <div className="inner-card-section pb-2">
+                    <div className="pb-2 w-100 inner-card-section">
                         <div className="info-header-title">
                             <h4>
                                 {/* todo link to GnomAD -- is there a gnomad link somewhere ? */}
@@ -79,7 +79,7 @@ export function SampleTabBody(props){
             </div>
             <div className="row">
                 <div className="col-12 col-md-12 d-flex">
-                    <div className="inner-card-section pb-2">
+                    <div className="pb-2 w-100 inner-card-section">
                         <div className="info-header-title">
                             <h4>
                                 {/* todo link to GnomAD -- is there a gnomad link somewhere ? */}
@@ -99,8 +99,11 @@ export function SampleTabBody(props){
     );
 }
 
+function CoverageTable(props) {
 
-function QualityTable(props){
+}
+
+function QualityTable(props) {
     const { genotypeLikelihood, genotypeQuality, variantQuality, strandFisherScore, getTipForField } = props;
     return (
         <table className="w-100">
