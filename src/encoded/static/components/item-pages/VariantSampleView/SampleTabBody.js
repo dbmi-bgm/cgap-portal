@@ -10,13 +10,17 @@ export function SampleTabBody(props){
 
     const { context = null, schemas } = props;
     const {
+        DP: coverage = null,
         GQ : genotypeQuality = null,
         QUAL: variantQuality = null,
         PL: genotypeLikelihood = null,
         FS: strandFisherScore = null,
         novoPP = null,
         uuid = null,
-        cmphet = []
+        cmphet = [],
+        samplegeno = null,
+        genotype_labels: genotypeLabels = null,
+        CALL_INFO = null
     } = context || {};
 
     // Should probably define this in VariantSampleOverview and pass down to the tabs, since its being used in all 3 so far
@@ -72,7 +76,7 @@ export function SampleTabBody(props){
                             </h4>
                         </div>
                         <div className="info-body overflow-auto">
-                            TODO
+                            <CoverageTable {...{ samplegeno, genotypeLabels, CALL_INFO, coverage }}/>
                         </div>
                     </div>
                 </div>
@@ -89,7 +93,7 @@ export function SampleTabBody(props){
                         <div className="info-body overflow-auto">
                             <h5>DeNovo</h5>
                             <DeNovoTable {...{ novoPP, getTipForField }}/>
-                            <h5>Compound Heterozygous</h5>
+                            <h5 className="mt-2">Compound Heterozygous</h5>
                             <CompoundHetTable {...{ cmphet }} />
                         </div>
                     </div>
@@ -100,7 +104,62 @@ export function SampleTabBody(props){
 }
 
 function CoverageTable(props) {
+    const { samplegeno = [], genotypeLabels = [], CALL_INFO = null, coverage = null } = props;
 
+    // Compile data for rows by role (should maybe do by sampleID instead? Esp. in case of multiple siblings
+    // of same gender, for instance). Need another way to map labels to samples tho.
+    const mapRoleToCoverageData = {};
+    const rows = genotypeLabels.map((obj) => {
+        mapRoleToCoverageData[obj.role] = { labels : obj.labels };
+        return obj.role;
+    });
+
+    samplegeno.forEach((sg) => {
+        const {
+            samplegeno_role: role = null,
+            samplegeno_sampleid: sampleID = null
+        } = sg;
+
+        if (role) {
+            mapRoleToCoverageData[role]["sampleID"] = sampleID;
+
+            if (sg.samplegeno_sampleid === CALL_INFO) {
+                mapRoleToCoverageData[role]["coverage"] = coverage;
+            } // TODO: How best to get coverage data for other samples?
+        }
+    });
+
+    // Show proband first
+    rows.sort((a,b) => (a === "proband" ? -1 : 1));
+
+    return (
+        <table className="w-100">
+            <thead>
+                <tr>
+                    <th className="text-left">Relation</th>
+                    <th className="text-left">ID</th>
+                    <th className="text-left">Coverage</th>
+                    {/*  TODO: Insert ref and alts here */}
+                    <th className="text-left">Call</th>
+                </tr>
+            </thead>
+            <tbody>
+                {rows.map((role, i) => {
+                    const thisData = mapRoleToCoverageData[role];
+                    const { sampleID = null, coverage = null, labels : [label] = [] } = thisData || {};
+                    return (
+                        <tr key={role} className={i == 0 ? "border-top": ""}>
+                            <td className="text-left text-capitalize">{ role }</td>
+                            <td className="text-left">{ sampleID ? sampleID.split("_")[0] : "" }</td>
+                            <td className="text-left">{ coverage }</td>
+                            {/*  TODO: Insert ref and alts here */}
+                            <td className="text-left">{ label }</td>
+                        </tr>
+                    );
+                })}
+            </tbody>
+        </table>
+    );
 }
 
 function QualityTable(props) {
@@ -148,7 +207,10 @@ QualityTable.propTypes = {
 };
 
 function DeNovoTable(props) {
-    const { getTipForField, novoPP } = props;
+    const { getTipForField, novoPP = null } = props;
+    if (novoPP === null) {
+        return "No denovo data to display";
+    }
     return (
         <table className="w-100">
             <thead>
@@ -176,6 +238,9 @@ DeNovoTable.propTypes = {
 function CompoundHetTable(props) {
     const { cmphet } = props;
 
+    if (cmphet.length === 0) {
+        return "No comphet data to display";
+    }
     return (
         <table className="w-100">
             <thead>
