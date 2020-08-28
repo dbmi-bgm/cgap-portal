@@ -68,7 +68,9 @@ class Sample(Item):
 class SampleProcessing(Item):
     item_type = 'sample_processing'
     schema = load_schema('encoded:schemas/sample_processing.json')
-    embedded_list = []
+    embedded_list = [
+        'processed_files.accession'  # used to locate this file from annotated VCF via search
+    ]
     rev = {'case': ('Case', 'sample_processing')}
 
     @calculated_property(schema={

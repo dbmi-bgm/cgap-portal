@@ -9,5 +9,20 @@
         "valid_item_types": ["FileFastq"],
         "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
         "institution": "hms-dbmi"
+    },
+    {
+        "institution": "hms-dbmi",
+        "status": "released",
+        "description": "vcf, compressed",
+        "valid_item_types": [
+            "FileReference",
+            "FileProcessed"
+        ],
+        "standard_file_extension": "vcf.gz",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "file_format": "vcf_gz",
+        "uuid": "1b8f525f-aecb-4211-9ae5-a2c998b05599",
+        "date_created": "2020-08-19T02:37:43.305689+00:00",
+        "schema_version": "1"
     }
 ]
