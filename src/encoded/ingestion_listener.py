@@ -23,7 +23,7 @@ import webtest
 from dcicutils.env_utils import is_stg_or_prd_env
 from dcicutils.misc_utils import VirtualApp, ignored
 from pyramid import paster
-from pyramid.httpexceptions import HTTPConflict, HTTPNotFound
+from pyramid.httpexceptions import HTTPNotFound, HTTPMovedPermanently
 from pyramid.request import Request
 from pyramid.response import Response
 from pyramid.view import view_config
@@ -33,6 +33,7 @@ from .commands.ingest_vcf import VCFParser
 from .ingestion.common import register_path_content_type, metadata_bundles_bucket, get_parameter
 from .ingestion.exceptions import UnspecifiedFormParameter, SubmissionFailure
 from .ingestion.processors import get_ingestion_processor
+from .inheritance_mode import InheritanceMode
 from .types.ingestion import SubmissionFolio
 from .types.variant import build_variant_display_title, ANNOTATION_ID_SEP
 from .util import resolve_file_path, gunzip_content, debuglog, get_trusted_email, beanstalk_env_from_request
@@ -45,6 +46,7 @@ VARIANT_SCHEMA = resolve_file_path('./schemas/variant.json')
 VARIANT_SAMPLE_SCHEMA = resolve_file_path('./schemas/variant_sample.json')
 STATUS_QUEUED = 'Queued'
 STATUS_INGESTED = 'Ingested'
+STATUS_DISABLED = 'Ingestion disabled'
 
 
 def includeme(config):
@@ -183,6 +185,25 @@ def ingestion_status(context, request):
     }
 
 
+def verify_vcf_file_status_is_not_ingested(request, uuid):
+    """ Verifies the given VCF file has not already been ingested by checking
+        'file_ingestion_status'
+    """
+    kwargs = {
+        'environ': request.environ,
+        'method': 'GET',
+        'content_type': 'application/json'
+    }
+    subreq = Request.blank('/' + uuid, **kwargs)
+    resp = request.invoke_subrequest(subreq, use_tweens=True)
+    if isinstance(resp, HTTPMovedPermanently):  # if we hit a redirect, follow it
+        subreq = Request.blank(resp.location, **kwargs)
+        resp = request.invoke_subrequest(subreq, use_tweens=True)
+    if resp.json.get('file_ingestion_status', None) == STATUS_INGESTED:
+        return False
+    return True
+
+
 def patch_vcf_file_status(request, uuids):
     """ Patches VCF File status to 'Queued'
         NOTE: This process makes queue_ingestion not scale terribly well.
@@ -201,7 +222,8 @@ def patch_vcf_file_status(request, uuids):
         subreq = Request.blank('/' + uuid, **kwargs)
         resp = None
         try:
-            resp = request.invoke_subrequest(subreq)
+            if verify_vcf_file_status_is_not_ingested(request, uuid):
+                resp = request.invoke_subrequest(subreq)
         except HTTPNotFound:
             log.error('Tried to patch %s but item does not exist: %s' % (uuid, resp))
 
@@ -231,7 +253,7 @@ def enqueue_uuids_for_request(request, uuids, *, ingestion_type='vcf', override_
         response['notification'] = 'Success'
         response['number_queued'] = len(uuids)
         response['detail'] = 'Successfully queued the following uuids: %s' % uuids
-        patch_vcf_file_status(request, uuids)
+        patch_vcf_file_status(request, uuids)  # extra state management - may not be accurate, hard to get right
     else:
         response['number_queued'] = len(uuids) - len(failed)
         response['detail'] = 'Some uuids failed: %s' % failed
@@ -550,9 +572,17 @@ class IngestionListener:
                 sample['institution'] = institution
                 sample['variant'] = self.build_variant_link(variant)  # make links
                 sample['file'] = file
-                call_info = sample['CALL_INFO']  # extract familial relation
-                if call_info in sample_relations:
-                    sample['familial_relations'] = sample_relations[call_info]
+
+                # add familial relations to samplegeno field
+                for geno in sample.get('samplegeno', []):
+                    sample_id = geno['samplegeno_sampleid']
+                    if sample_id in sample_relations:
+                        geno.update(sample_relations[sample_id])
+
+                # add inheritance mode information
+                variant_name = sample['variant']
+                chrom = variant_name[variant_name.index('chr') + 3]  # find chr* and get *
+                sample.update(InheritanceMode.compute_inheritance_modes(sample, chrom=chrom))
 
                 self.vapp.post_json('/variant_sample', sample, status=201)
             except Exception as e:
@@ -574,14 +604,19 @@ class IngestionListener:
     def extract_sample_relations(self, vcf_file_accession):
         """ Extracts a dictionary of sample relationships based on the file metadata given. """
         search_result = self.search_for_sample_relations(vcf_file_accession)
+        sample_relations = {}  # should never be None now
         if len(search_result) == 1:
-            sample_relations, sample_procesing = {}, search_result[0]
-            sample_pedigrees = sample_procesing['sample_pedigrees']
+            sample_procesing = search_result[0]
+            sample_pedigrees = sample_procesing.get('samples_pedigree', [])
             for entry in sample_pedigrees:
-                relationship = entry.get('relationship', None)
-                if relationship is not None:
-                    sample_relations[entry['sample_name']] = relationship
-            return sample_relations
+                sample_id = entry['sample_name']
+                sample_relations[sample_id] = {}
+                for field, key in zip(['relationship', 'sex'], ['samplegeno_role', 'samplegeno_sex']):
+                    value = entry.get(field, None)
+                    if value is not None:
+                        sample_relations[sample_id][key] = value
+
+        return sample_relations
 
     def post_variants_and_variant_samples(self, parser, file_meta):
         """ Posts variants and variant_sample items given the parser and relevant
@@ -677,8 +712,8 @@ class IngestionListener:
                     log.error('Could not locate uuid: %s with error: %s' % (uuid, e))
                     continue
 
-                # if this file has been ingested, do not do anything with this message
-                if file_meta.get('file_ingestion_status', 'N/A') == STATUS_INGESTED:
+                # if this file has been ingested (or explicitly disabled), do not do anything with this uuid
+                if file_meta.get('file_ingestion_status', 'N/A') in [STATUS_INGESTED, STATUS_DISABLED]:
                     continue
 
                 # attempt download with workaround

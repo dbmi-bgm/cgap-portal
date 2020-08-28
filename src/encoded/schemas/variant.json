@@ -947,6 +947,7 @@
                         "source_name": "GENES",
                         "source_version": "v99",
                         "sub_embedding_group": "{\"key\": \"genes\", \"title\": \"Gene\"}",
+                        "annotation_category": "Missense Predictors",
                         "scope": "variant",
                         "schema_title": "SIFT score",
                         "facet_order": 24
@@ -959,19 +960,22 @@
                         "source_name": "GENES",
                         "source_version": "v99",
                         "sub_embedding_group": "{\"key\": \"genes\", \"title\": \"Gene\"}",
+                        "annotation_category": "Missense Predictors",
                         "scope": "variant",
                         "schema_title": "PolyPhen score",
                         "facet_order": 25
                     },
                     "genes_most_severe_maxentscan_diff": {
-                        "title": "genes_most_severe_maxentscan_diff",
+                        "title": "MaxEntScan Diff",
                         "field_name": "genes_most_severe_maxentscan_diff",
                         "type": "number",
                         "do_import": true,
                         "source_name": "GENES",
                         "source_version": "v99",
                         "sub_embedding_group": "{\"key\": \"genes\", \"title\": \"Gene\"}",
+                        "annotation_category": "Splice Predictors",
                         "scope": "variant",
+                        "schema_title": "MaxEntScan Diff",
                         "facet_order": 31
                     },
                     "genes_ensg": {
@@ -4087,22 +4091,25 @@
             "grouping": "Consequence"
         },
         "genes.genes_most_severe_maxentscan_diff": {
-            "title": "genes_most_severe_maxentscan_diff",
+            "title": "MaxEntScan Diff",
             "aggregation_type": "stats",
             "number_step": "any",
-            "order": 31
+            "order": 31,
+            "grouping": "Splice Predictors"
         },
         "genes.genes_most_severe_polyphen_score": {
             "title": "PolyPhen score",
             "aggregation_type": "stats",
             "number_step": "any",
-            "order": 25
+            "order": 25,
+            "grouping": "Missense Predictors"
         },
         "genes.genes_most_severe_sift_score": {
             "title": "SIFT score",
             "aggregation_type": "stats",
             "number_step": "any",
-            "order": 24
+            "order": 24,
+            "grouping": "Missense Predictors"
         },
         "gnomad_af": {
             "title": "GnomAD Alt Allele Frequency",
