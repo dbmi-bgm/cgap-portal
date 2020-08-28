@@ -39,7 +39,7 @@ export const VariantTabBody = React.memo(function VariantTabBody ({ context, sch
                                 ClinVar
                             </h4>
                         </div>
-                        <div className="info-body">
+                        <div className="info-body clinvar-info-body">
                             <ClinVarSection {...{ getTipForField, context }} />
                         </div>
                     </div>
@@ -182,7 +182,9 @@ function ClinVarSection({ context, getTipForField }){
     const {
         clinvar_variationid: variationID,
         clinvar_clnsig: clinicalSignificance,
-        clinvar_clnsigconf: conflictingClinicalSignificance
+        clinvar_clnsigconf: conflictingClinicalSignificance,
+        clinvar_submission = [],
+        clinvar_clnrevstat: reviewStatus
     } = variant;
 
     if (!variationID) {
@@ -194,20 +196,109 @@ function ClinVarSection({ context, getTipForField }){
         );
     }
 
+    const submissionLen = clinvar_submission.length;
+    const submissionsRendered = clinvar_submission.map(function(submission, idx){
+        const { clinvar_submission_accession } = submission;
+        return <ClinVarSubmissionEntry submission={submission} key={clinvar_submission_accession || idx} index={idx} />;
+    });
+
     return (
-        <div>
-            <div className="row">
+        <React.Fragment>
+
+            <div className="row mb-1">
                 <div className="col">
-                    <label data-tip={getTipForField("clinvar_variationid")}>ID: </label>
-                    <a href="      #TODO         ">
+                    <label data-tip={getTipForField("clinvar_variationid")} className="mr-1 mb-0">ID: </label>
+                    <a href="#TODO">
                         { variationID }
                         <i className="icon icon-external-link-alt fas ml-07"/>
                     </a>
+                </div>
+                <div className="col">
+                    <label data-tip={getTipForField("clinvar_submission")} className="mr-1 mb-0">Submissions: </label>
+                    <span>
+                        { submissionLen }
+                    </span>
+                </div>
+            </div>
+
+            <div className="row">
+                <div className="col-3">
+                    <label data-tip={getTipForField("clinvar_clnsig")} className="mb-03">Interpretation: </label>
+                </div>
+                <div className="col-9">
+                    { clinicalSignificance }
+                </div>
+            </div>
+
+            <div className="row">
+                <div className="col-3">
+                    <label data-tip={getTipForField("clinvar_clnrevstat")} className="mb-0">Review Status: </label>
+                </div>
+                <div className="col-9">
+                    { reviewStatus }
+                </div>
+            </div>
+
+            <hr/>
+
+            <div>
+                <div className="row mb-08">
+                    <div className="col-3">
+                        <h6 className="my-0 text-600">Classification</h6>
+                    </div>
+                    <div className="col-2">
+                        <h6 className="my-0 text-600">Date</h6>
+                    </div>
+                    <div className="col-4">
+                        <h6 className="my-0 text-600">Submitted By</h6>
+                    </div>
+                    <div className="col-3">
+                        <h6 className="my-0 text-600">Links</h6>
+                    </div>
+                </div>
+
+                { submissionsRendered }
+                { submissionsRendered }
+                { submissionsRendered }
+
+            </div>
+
+        </React.Fragment>
+    );
+}
+
+function ClinVarSubmissionEntry({ submission, index = 0 }){
+    const fallbackElem = <em data-tip="Not Available">N/A</em>;
+    const {
+        clinvar_submission_interpretation = fallbackElem,
+        clinvar_submission_submitter = fallbackElem,
+        clinvar_submission_accession = fallbackElem // change into link when available
+    } = submission;
+
+    return (
+        <div className={"my-1 border rounded p-1" + (index % 2 === 0 ? " bg-light" : "")}>
+            <div className="row align-items-center text-small">
+                <div className="col-3" data-field="clinvar_submission_interpretation">
+                    <i className="item-status-indicator-dot mr-07 ml-05" data-status={ClinVarSubmissionEntry.interpretationStatusMap[clinvar_submission_interpretation] || null} />
+                    { clinvar_submission_interpretation }
+                </div>
+                <div className="col-2">
+                    { fallbackElem }
+                </div>
+                <div className="col-4">
+                    { clinvar_submission_submitter }
+                </div>
+                <div className="col-3">
+                    { clinvar_submission_accession }
                 </div>
             </div>
         </div>
     );
 }
+// We re-use color definitions for Item.status to color our interpretation status icon.
+ClinVarSubmissionEntry.interpretationStatusMap = {
+    "risk factor" : "deleted" // red
+};
 
 function PredictorsSection({ context, getTipForField, currentTranscriptIdx }){
     const { variant } = context;
