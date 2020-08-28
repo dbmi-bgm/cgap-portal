@@ -3,11 +3,9 @@
         "email": "loadxl@loadxl.us",
         "first_name": "loadxl",
         "groups": ["admin"],
-        "role": "other",
         "institution": "hms-dbmi",
         "last_name": "loadxl",
         "status": "current",
-        "submits_for": ["hms-dbmi"],
         "timezone": "US/Pacific",
         "uuid": "3202fd57-44d2-44fb-a131-afb1e43d8ae5",
         "date_created": "2020-01-28T00:00:00.000000+00:00"
@@ -15,12 +13,9 @@
     {
         "email": "wrangler@wrangler.com",
         "first_name": "Wrangler",
-        "groups": ["submitter"],
-        "role": "scientist",
         "institution": "hms-dbmi",
         "last_name": "Wrangler",
         "status": "current",
-        "submits_for": ["hms-dbmi"],
         "timezone": "US/Pacific",
         "uuid": "986b362f-4eb6-4a9c-8173-3ab267307e3b"
     },
@@ -28,11 +23,8 @@
         "email": "test_person@people.com",
         "first_name": "testing",
         "last_name": "123",
-        "groups": ["submitter"],
-        "role": "scientist",
         "institution": "hms-dbmi",
         "status": "current",
-        "submits_for": ["hms-dbmi"],
         "timezone": "US/Pacific",
         "uuid": "986b362f-4eb6-4a9c-8173-3ab267307e4c"
     }

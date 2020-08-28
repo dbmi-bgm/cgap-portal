@@ -42,6 +42,16 @@ def institution(testapp):
 
 
 @pytest.fixture
+def core_project(testapp):
+    item = {
+        'name': 'core-project',
+        'title': 'CGAP',
+        'description': 'Project associated with most core shared items'
+    }
+    return testapp.post_json('/project', item).json['@graph'][0]
+
+
+@pytest.fixture
 def bgm_project(testapp):
     item = {
         'name': 'bgm-project',
@@ -59,6 +69,11 @@ def udn_project(testapp):
         'description': 'Undiagnosed Disease Network'
     }
     return testapp.post_json('/project', item).json['@graph'][0]
+
+
+@pytest.fixture
+def all_projects(core_project, bgm_project, udn_project):
+    return [core_project, bgm_project, udn_project]
 
 
 @pytest.fixture
@@ -182,6 +197,11 @@ def no_project_user_testapp(no_project_user, app, external_tx, zsa_savepoints):
 
 
 @pytest.fixture
+def deleted_user_testapp(deleted_user, app, external_tx, zsa_savepoints):
+    return remote_user_testapp(app, deleted_user['uuid'])
+
+
+@pytest.fixture
 def indexer_testapp(app, external_tx, zsa_savepoints):
     return remote_user_testapp(app, 'INDEXER')
 
@@ -288,17 +308,67 @@ def test_udn_user_cannot_patch_bgm_item(testapp, udn_user_testapp, simple_bgm_fi
             assert udn_user_testapp.patch_json(simple_bgm_file['@id'], {'read_length': 100}, status=403)
 
 
-def multi_project_user_can_access_current_items_from_multi_projects():
-    pass
+def test_multi_proj_user_can_access_items_w_ok_status_from_multi_projects(
+        testapp, multi_project_user_testapp, simple_bgm_file_item, all_projects, STATI):
+    # NOTE: replaced status is giving 403 on get even if user in theory should be redirected
+    # not sure this is as expexted?
+    corename = 'core-project'
+    del simple_bgm_file_item['uuid']
+    for project in all_projects:
+        pname = project.get('name')
+        if pname == corename:
+            ok_stati = STATI[:1]
+        else:
+            ok_stati = STATI[:3]
+        simple_bgm_file_item['project'] = project['@id']
+        for status in STATI:
+            simple_bgm_file_item['status'] = status
+            fitem = testapp.post_json('/file_fastq', simple_bgm_file_item, status=201).json['@graph'][0]
+            if status in ok_stati:
+                assert multi_project_user_testapp.get(fitem['@id'], status=200)
+            else:
+                assert multi_project_user_testapp.get(fitem['@id'], status=403)
 
 
-def multi_project_user_cannot_patch_current_items_from_multi_projects():
-    pass
+def test_project_users_can_access_shared_items_from_any_project(
+        testapp, bgm_user_testapp, simple_bgm_file, all_projects):
+    testapp.patch_json(simple_bgm_file['@id'], {'status': 'shared'}, status=200)
+    for project in all_projects:
+        testapp.patch_json(simple_bgm_file['@id'], {'project': project['@id']}, status=200)
+        assert bgm_user_testapp.get(simple_bgm_file['@id'], status=200)
 
 
-def project_users_can_access_shared_items():
-    pass
+def test_authenticated_user_wo_project_can_only_see_shared(
+        testapp, no_project_user_testapp, simple_bgm_file_item, STATI, all_projects):
+    del simple_bgm_file_item['uuid']
+    for project in all_projects:
+        simple_bgm_file_item['project'] = project['@id']
+        for status in STATI:
+            simple_bgm_file_item['status'] = status
+            fitem = testapp.post_json('/file_fastq', simple_bgm_file_item, status=201).json['@graph'][0]
+            if status == 'shared':
+                assert no_project_user_testapp.get(fitem['@id'], status=200)
+            else:
+                assert no_project_user_testapp.get(fitem['@id'], status=403)
 
 
-def project_users_cannot_patch_shared_items():
-    pass
+def test_deleted_user_has_no_access(
+        testapp, deleted_user_testapp, simple_bgm_file_item, STATI, all_projects):
+    del simple_bgm_file_item['uuid']
+    for project in all_projects:
+        simple_bgm_file_item['project'] = project['@id']
+        for status in STATI:
+            simple_bgm_file_item['status'] = status
+            fitem = testapp.post_json('/file_fastq', simple_bgm_file_item, status=201).json['@graph'][0]
+            assert deleted_user_testapp.get(fitem['@id'], status=403)
+
+
+def test_anonymous_user_has_no_access(
+        testapp, anontestapp, simple_bgm_file_item, STATI, all_projects):
+    del simple_bgm_file_item['uuid']
+    for project in all_projects:
+        simple_bgm_file_item['project'] = project['@id']
+        for status in STATI:
+            simple_bgm_file_item['status'] = status
+            fitem = testapp.post_json('/file_fastq', simple_bgm_file_item, status=201).json['@graph'][0]
+            assert anontestapp.get(fitem['@id'], status=403)
