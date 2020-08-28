@@ -258,8 +258,6 @@ function ClinVarSection({ context, getTipForField }){
                 </div>
 
                 { submissionsRendered }
-                { submissionsRendered }
-                { submissionsRendered }
 
             </div>
 
