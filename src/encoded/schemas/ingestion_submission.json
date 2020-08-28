@@ -44,6 +44,7 @@
             "description": "The type of processing requested for this submission.",
             "type": "string",
             "enum": [
+                "data_bundle",
                 "metadata_bundle",
                 "vcf"
             ]

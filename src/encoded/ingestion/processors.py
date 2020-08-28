@@ -6,6 +6,7 @@ from ..ingestion.common import get_parameter
 from ..util import debuglog, s3_output_stream, create_empty_s3_file
 from ..submit import submit_metadata_bundle
 from .exceptions import UndefinedIngestionProcessorType
+from ..types.ingestion import SubmissionFolio
 
 
 INGESTION_UPLOADERS = {}
@@ -35,48 +36,32 @@ def _show_report_lines(lines, fp, default="Nothing to report."):
         print(line, file=fp)
 
 
+@ingestion_processor('data_bundle')
+def handle_data_bundle(submission: SubmissionFolio):
+
+    # We originally called it 'data_bundle' and we retained that as OK in the schema
+    # to not upset anyone testing with the old name, but this is not the name to use
+    # any more, so reject new submissions of this kind. -kmp 27-Aug-2020
+
+    with submission.processing_context(submission):
+
+        raise RuntimeError("handle_data_bundle was called (for ingestion_type=%s). This is always an error."
+                           " The ingestion_type 'data_bundle' was renamed to 'metadata_bundle'"
+                           " prior to the initial release. Your submission program probably needs to be updated."
+                           % submission.ingestion_type)
+
+
 @ingestion_processor('metadata_bundle')
-def handle_metadata_bundle(submission):
+def handle_metadata_bundle(submission: SubmissionFolio):
 
-    submission.log.info("Processing {submission_id} as {ingestion_type}."
-                        .format(submission_id=submission.submission_id, ingestion_type=submission.ingestion_type))
+    with submission.processing_context(submission) as resolution:
 
-    if submission.ingestion_type != 'metadata_bundle':
-        raise RuntimeError("handle_metadata_bundle only works for ingestion_type metadata_bundle.")
+        s3_client = submission.s3_client
+        submission_id = submission.submission_id
 
-    submission_id = submission.submission_id
-    s3_client = boto3.client('s3')
-    manifest_key = "%s/manifest.json" % submission_id
-    response = s3_client.get_object(Bucket=submission.bucket, Key=manifest_key)
-    manifest = json.load(response['Body'])
-
-    object_name = manifest['object_name']
-    parameters = manifest['parameters']
-    institution = get_parameter(parameters, 'institution')
-    project = get_parameter(parameters, 'project')
-    validate_only = get_parameter(parameters, 'validate_only', as_type=bool, default=False)
-
-    debuglog(submission_id, "object_name:", object_name)
-    debuglog(submission_id, "parameters:", parameters)
-
-    started_key = "%s/started.txt" % submission_id
-    create_empty_s3_file(s3_client, bucket=submission.bucket, key=started_key)
-
-    # PyCharm thinks this is unused. -kmp 26-Jul-2020
-    # data_stream = s3_client.get_object(Bucket=submission.bucket, Key="%s/manifest.json" % submission_id)['Body']
-
-    resolution = {
-        "data_key": object_name,
-        "manifest_key": manifest_key,
-        "started_key": started_key,
-    }
-
-    try:
-
-        submission.patch_item(submission_id=submission_id,
-                              object_name=object_name,
-                              parameters=parameters,
-                              processing_status={"state": "processing"})
+        institution = get_parameter(submission.parameters, 'institution')
+        project = get_parameter(submission.parameters, 'project')
+        validate_only = get_parameter(submission.parameters, 'validate_only', as_type=bool, default=False)
 
         # if isinstance(institution, str):
         #     institution = submission.vapp.get(institution).json
@@ -85,7 +70,7 @@ def handle_metadata_bundle(submission):
 
         bundle_result = submit_metadata_bundle(s3_client=s3_client,
                                                     bucket=submission.bucket,
-                                                    key=object_name,
+                                                    key=submission.object_name,
                                                     project=project,
                                                     institution=institution,
                                                     vapp=submission.vapp,
@@ -98,10 +83,10 @@ def handle_metadata_bundle(submission):
         resolution["submission_response_key"] = submission_response_key = "%s/submission-response.txt" % submission_id
         resolution["upload_info_key"] = upload_info_key = "%s/upload_info.txt" % submission_id
 
-        other_details = {}
-
         def note_additional_datum(key, bundle_key=None):
-            other_details['additional_data'] = additional_data = other_details.get('additional_data', {})
+            submission.other_details['additional_data'] = additional_data = (
+                submission.other_details.get('additional_data', {})
+            )
             additional_data[key] = bundle_result[bundle_key or key]
 
         with s3_output_stream(s3_client, bucket=submission.bucket, key=validation_report_key) as fp:
@@ -113,7 +98,7 @@ def handle_metadata_bundle(submission):
         if bundle_result['result']:
             with s3_output_stream(s3_client, bucket=submission.bucket, key=submission_key) as fp:
                 print(json.dumps(bundle_result['result'], indent=2), file=fp)
-                other_details['result'] = bundle_result['result']
+                submission.other_details['result'] = bundle_result['result']
 
         if bundle_result['post_output']:
             with s3_output_stream(s3_client, bucket=submission.bucket, key=submission_response_key) as fp:
@@ -125,21 +110,4 @@ def handle_metadata_bundle(submission):
                 print(json.dumps(bundle_result['upload_info'], indent=2), file=fp)
                 note_additional_datum('upload_info')
 
-        outcome = "success" if bundle_result['success'] else "failure"
-
-        submission.patch_item(processing_status={"state": "done", "outcome": outcome, "progress": "complete"},
-                              **other_details)
-
-    except Exception as e:
-
-        resolution["traceback_key"] = traceback_key = "%s/traceback.txt" % submission_id
-        with s3_output_stream(s3_client, bucket=submission.bucket, key=traceback_key) as fp:
-            traceback.print_exc(file=fp)
-
-        resolution["error_type"] = e.__class__.__name__
-        resolution["error_message"] = str(e)
-
-        submission.patch_item(processing_status={"state": "done", "outcome": "error", "progress": "incomplete"})
-
-    with s3_output_stream(s3_client, bucket=submission.bucket, key="%s/resolution.json" % submission_id) as fp:
-        print(json.dumps(resolution, indent=2), file=fp)
+        submission.outcome = "success" if bundle_result['success'] else "failure"
