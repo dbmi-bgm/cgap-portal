@@ -3,7 +3,6 @@
 import React, { useMemo } from 'react';
 import PropTypes from 'prop-types';
 import { schemaTransforms } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
-import { sample } from 'underscore';
 
 
 export function SampleTabBody(props){
