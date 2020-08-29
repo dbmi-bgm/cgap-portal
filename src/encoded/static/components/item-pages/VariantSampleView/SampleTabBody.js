@@ -3,6 +3,7 @@
 import React, { useMemo } from 'react';
 import PropTypes from 'prop-types';
 import { schemaTransforms } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
+import { sample } from 'underscore';
 
 
 export function SampleTabBody(props){
@@ -104,33 +105,74 @@ export function SampleTabBody(props){
 }
 
 function CoverageTable(props) {
-    const { samplegeno = [], genotypeLabels = [], CALL_INFO = null, coverage = null } = props;
+    const { samplegeno = [], genotypeLabels = [], CALL_INFO = null } = props;
 
-    // Compile data for rows by role (should maybe do by sampleID instead? Esp. in case of multiple siblings
-    // of same gender, for instance). Need another way to map labels to samples tho.
+    // TODO: Will is fixing role collision issue; will need updating to use sample_id as
+    // row identifier instead of role once that change is pushed
     const mapRoleToCoverageData = {};
     const rows = genotypeLabels.map((obj) => {
         mapRoleToCoverageData[obj.role] = { labels : obj.labels };
         return obj.role;
     });
 
+    let ref;
+    const altRowObj = {}; // keep a record of all alt alleles (in case of multi-allelic)...
+    // Will flatten into array of mutually exclusive rows once populated with all possible alleles
+
     samplegeno.forEach((sg) => {
         const {
             samplegeno_role: role = null,
-            samplegeno_sampleid: sampleID = null
+            samplegeno_sampleid: sampleID = null,
+            samplegeno_ad = null,
+            samplegeno_gt = null
         } = sg;
+
+        // Convert AD & GT strings into arrays for easier traversal
+        let adArr = [];
+        let gtArr = [];
+        if (samplegeno_ad) { adArr = samplegeno_ad.split('/'); }
+        if (samplegeno_gt) { gtArr = samplegeno_gt.split('/'); }
 
         if (role) {
             mapRoleToCoverageData[role]["sampleID"] = sampleID;
 
-            if (sg.samplegeno_sampleid === CALL_INFO) {
-                mapRoleToCoverageData[role]["coverage"] = coverage;
-            } // TODO: How best to get coverage data for other samples?
+            const coverageObj = {};
+            if (gtArr.length > 0) {
+                // Add refs genotypes to row mapping if not already set
+                if (!ref) {
+                    ref = gtArr[0];
+                }
+
+                // Adds a mapping of GTs to ADs to row mapping
+                const gtToAD = { };
+                gtArr.forEach((gt, i) => {
+                    if (!gtToAD.hasOwnProperty(gt)) {
+                        gtToAD[gt] = adArr[i];
+                    }
+                });
+                coverageObj.gtToAD = gtToAD;
+
+                gtArr.splice(1, gtArr.length).filter((potentialAlt) => {
+                    if (potentialAlt !== ref) {
+                        altRowObj[potentialAlt] = true;
+                        return true;
+                    }
+                    return false;
+                });
+
+                // Create a sum total coverage value for this item by adding all ADs
+                coverageObj.total = adArr.reduce(
+                    (a, b) => Number.parseInt(a) + Number.parseInt(b)
+                );
+            }
+            mapRoleToCoverageData[role]["coverage"] = coverageObj;
         }
     });
 
     // Show proband first
     rows.sort((a,b) => (a === "proband" ? -1 : 1));
+
+    const altRows = Object.keys(altRowObj);
 
     return (
         <table className="w-100">
@@ -139,20 +181,33 @@ function CoverageTable(props) {
                     <th className="text-left">Relation</th>
                     <th className="text-left">ID</th>
                     <th className="text-left">Coverage</th>
-                    {/*  TODO: Insert ref and alts here */}
+                    <th className="text-left">Ref({ ref })</th>
+                    { altRows.map((alt) => <th key="alt" className="text-left">Alt({alt})</th>)}
                     <th className="text-left">Call</th>
                 </tr>
             </thead>
             <tbody>
-                {rows.map((role, i) => {
+                {rows.map((role) => {
                     const thisData = mapRoleToCoverageData[role];
                     const { sampleID = null, coverage = null, labels : [label] = [] } = thisData || {};
+                    const { gtToAD = null, total: totalCoverage = null } = coverage || {};
+
+                    let refAD = null;
+                    if (gtToAD) {
+                        refAD = gtToAD[ref];
+                    }
                     return (
                         <tr key={role}>
                             <td className="text-left text-capitalize">{ role }</td>
                             <td className="text-left">{ sampleID ? sampleID.split("_")[0] : "" }</td>
-                            <td className="text-left">{ coverage }</td>
-                            {/*  TODO: Insert ref and alts here */}
+                            <td className="text-left">{ totalCoverage }</td>
+                            <td className="text-left">{ refAD }</td>
+                            {altRows.map((alt) => {
+                                if (gtToAD) {
+                                    return <td key={alt} className="text-left">{ gtToAD[alt] || 0}</td>;
+                                }
+                                return(<td key={alt} className="text-left">0</td>);
+                            })}
                             <td className="text-left">{ label }</td>
                         </tr>
                     );
