@@ -234,7 +234,7 @@ def xls_to_json(row, project, institution):
         'reports': [], 'errors': []
     }
     file_errors = []
-    family_dict = create_families(rows)
+    family_dict = init_families(rows)
     a_types = get_analysis_types(rows)
     case_names = {}
     for i, row in enumerate(rows):
@@ -271,7 +271,7 @@ def xls_to_json(row, project, institution):
                 items['file_fastq'].update(file_items['file_fastq'])
                 items['file_processed'].update(file_items['file_processed'])
     items = add_relations(items)
-    items = create_case_items(items, project['name'], case_names)
+    items = create_case_item_metadata(items, project['name'], case_names)
     # removed unused fields, add project and institution
     for val1 in items.values():
         if isinstance(val1, dict):
@@ -286,7 +286,11 @@ def xls_to_json(row, project, institution):
     return items, True  # most errors passed to next step in order to combine with validation errors
 
 
-def create_families(rows):
+def init_families(rows):
+    """
+    Initializes metadata dicts for 'family' items. Requires multiple rows so must be done separately from
+    row-by-row parsing.
+    """
     proband_rows = [row for row in rows if row.get('relation to proband').lower() == 'proband']
     fams = {row.get('analysis id'): 'family-{}'.format(row.get('individual id')) for row in proband_rows}
     return fams
@@ -320,6 +324,9 @@ def get_analysis_types(rows):
 
 
 def extract_individual_metadata(idx, row, items, indiv_alias, inst_name):
+    """
+    Extracts 'individual' item metadata from each row
+    """
     new_items = items.copy()
     info = {'aliases': [indiv_alias]}
     info = map_fields(row, info, ['individual_id', 'sex', 'age', 'birth_year'], 'individual')
@@ -347,6 +354,9 @@ def extract_individual_metadata(idx, row, items, indiv_alias, inst_name):
 
 
 def extract_family_metadata(idx, row, items, indiv_alias, fam_alias):
+    """
+    Extracts 'family' item metadata from each row
+    """
     new_items = items.copy()
     info = {
         'aliases': [fam_alias],
@@ -378,6 +388,9 @@ def extract_family_metadata(idx, row, items, indiv_alias, fam_alias):
 
 def extract_sample_metadata(idx, row, items, indiv_alias, samp_alias, analysis_alias,
                           fam_alias, proj_name, analysis_type_dict, case_name_dict):
+    """
+    Extracts 'sample' item metadata from each row
+    """
     new_items = items.copy()
     info = {'aliases': [samp_alias], 'files': []}  # TODO: implement creation of file db items
     fields = [
@@ -429,6 +442,9 @@ def extract_sample_metadata(idx, row, items, indiv_alias, samp_alias, analysis_a
 
 
 def extract_file_metadata(idx, filenames, proj_name):
+    """
+    Extracts 'file' item metadata from each row
+    """
     valid_extensions = {
         '.fastq.gz': ('fastq', 'reads'),
         '.fq.gz': ('fastq', 'reads'),
@@ -461,7 +477,11 @@ def extract_file_metadata(idx, filenames, proj_name):
     return files
 
 
-def create_case_items(items, proj_name, case_name_dict):
+def create_case_item_metadata(items, proj_name, case_name_dict):
+    """
+    Creation of case metadata, which can only be done after all rows are processed
+    so that sample_processing metadata exists.
+    """
     new_items = items.copy()
     for k, v in items['sample_processing'].items():
         analysis_id = k[k.index('analysis-')+9:]
