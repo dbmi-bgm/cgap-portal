@@ -4,7 +4,7 @@ import React from 'react';
 import { console } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 
 // Abandoned-for-now test of importing HiGlass from SPC - not quite working due to react-bootstrap version + symlinking-during-local-dev issues
-// But to be potentially explored when time allows.
+// But to be potentially explored when time allows. More info in related PR: https://github.com/4dn-dcic/shared-portal-components/pull/42
 // import { HiGlassPlainContainer } from '@hms-dbmi-bgm/shared-portal-components/es/components/viz/HiGlass/HiGlassPlainContainer';
 
 
