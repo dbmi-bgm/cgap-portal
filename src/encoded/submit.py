@@ -118,8 +118,9 @@ def submit_metadata_bundle(*, s3_client, bucket, key, project, institution, vapp
 
 
 def map_fields(row, metadata_dict, addl_fields, item_type):
-    '''
-    function for grabbing metadata from row based on column headers.
+    """
+    function for grabbing metadata from spreadsheet row (in dictionary form) based on
+    mapping column headers to schema properties.
 
     Args:
         row - dictionary of format {column name1: value1, column name 2: value 2}
@@ -132,8 +133,8 @@ def map_fields(row, metadata_dict, addl_fields, item_type):
 
     Example usage:
     output = map_fields(row_dict, {}, ['individual_id', 'sex', 'age', 'birth_year'], 'individual')
-    
-    '''
+
+    """
     for field in addl_fields:
         metadata_dict[field] = use_abbrev(row.get(field.replace('_', ' ')))
     for map_field in GENERIC_FIELD_MAPPING[item_type]:
@@ -150,10 +151,10 @@ def use_abbrev(value):
 
 
 def get_column_name(row, columns):
-    '''
+    """
     For cases where there is a variation on a particular column name.
     Final column in list must be the default name.
-    '''
+    """
     for col in columns:
         if row.get(col):
             return col
@@ -174,21 +175,9 @@ def digest_csv(input_data, delim=','):
 
 
 def xls_to_json(row, project, institution):
-    '''
+    """
     Converts excel file (or csv/tsv table) to json for submission.
-    '''
-    # book = xlrd.open_workbook(xls_data)
-    # sheet, = book.sheets()
-    # row = row_generator(sheet)
-    # if xls_data.endswith('.xls') or xls_data.endswith('.xlsx'):
-    #     rows = digest_xls(xls_data)
-    # elif xls_data.endswith('.csv') or xls_data.endswith('.tsv'):
-    #     delim = ',' if xls_data.endswith('csv') else '\t'
-    #     rows = digest_csv(xls_data, delim=delim)
-    # else:
-    #     msg = ('Metadata bundle must be a file of type .xls, .xlsx, .csv, or .tsv.'
-    #            'Please submit a file of the proper type.')
-    #     return {'errors': [msg]}, False
+    """
     header = False
     counter = 0
     # debuglog("top_header:", top_header)  # Temporary instrumentation for debugging to go away soon. -kmp 25-Jul-2020
@@ -628,12 +617,12 @@ def compare_fields(profile, aliases, json_item, db_item):
 
 
 def validate_all_items(virtualapp, json_data):
-    '''
+    """
     Function that:
     1. looks up each item in json
     2. if item in db, will validate and patch any different metadata
     3. if item not in db, will post item
-    '''
+    """
     if list(json_data.keys()) == ['errors']:
         output.append('Errors found in spreadsheet columns. Please fix spreadsheet before submitting.')
         return {}, output, False
@@ -830,7 +819,7 @@ def cell_value(cell, datemode):
 
 
 def row_generator(sheet):
-    '''Generator that gets rows from excel sheet [From Submit4DN]'''
+    """Generator that gets rows from excel sheet [From Submit4DN]"""
     datemode = sheet.book.datemode
     for index in range(sheet.nrows):
         yield [cell_value(cell, datemode) for cell in sheet.row(index)]
