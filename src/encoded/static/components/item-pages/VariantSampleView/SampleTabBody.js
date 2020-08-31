@@ -6,8 +6,6 @@ import { schemaTransforms } from '@hms-dbmi-bgm/shared-portal-components/es/comp
 
 
 export function SampleTabBody(props){
-    console.log("sampleTabBodyProps", props);
-
     const { context = null, schemas } = props;
     const {
         DP: coverage = null,
@@ -107,7 +105,7 @@ function CoverageTable(props) {
     const { samplegeno = [], genotypeLabels = [], CALL_INFO = null } = props;
 
     // TODO: Will is fixing role collision issue; will need updating to use sample_id as
-    // row identifier instead of role once that change is pushed
+    // row identifier instead of role once that change is pushed & new data is populated
     const mapRoleToCoverageData = {};
     const rows = genotypeLabels.map((obj) => {
         mapRoleToCoverageData[obj.role] = { labels : obj.labels };
@@ -115,7 +113,7 @@ function CoverageTable(props) {
     });
 
     let ref;
-    const altRowObj = {}; // keep a record of all alt alleles (in case of multi-allelic)...
+    const altRowObj = {}; // Keep a record of all alt alleles (in case of multi-allelic)...
     // Will flatten into array of mutually exclusive rows once populated with all possible alleles
 
     samplegeno.forEach((sg) => {
@@ -151,6 +149,7 @@ function CoverageTable(props) {
                 });
                 coverageObj.gtToAD = gtToAD;
 
+                // Filter out non-ALTs
                 gtArr.splice(1, gtArr.length).filter((potentialAlt) => {
                     if (potentialAlt !== ref) {
                         altRowObj[potentialAlt] = true;
@@ -161,7 +160,7 @@ function CoverageTable(props) {
 
                 // Create a sum total coverage value for this item by adding all ADs
                 coverageObj.total = adArr.reduce(
-                    (a, b) => Number.parseInt(a) + Number.parseInt(b)
+                    (a = 0, b = 0) => Number.parseInt(a) + Number.parseInt(b)
                 );
             }
             mapRoleToCoverageData[role]["coverage"] = coverageObj;
@@ -191,19 +190,29 @@ function CoverageTable(props) {
                     const { sampleID = null, coverage = null, labels : [label] = [] } = thisData || {};
                     const { gtToAD = null, total: totalCoverage = null } = coverage || {};
 
-                    let refAD = null;
+                    let refAD = 0;
                     if (gtToAD) {
                         refAD = gtToAD[ref];
                     }
+
                     return (
                         <tr key={role}>
                             <td className="text-left text-capitalize">{ role }</td>
                             <td className="text-left">{ sampleID ? sampleID.split("_")[0] : "" }</td>
                             <td className="text-left">{ totalCoverage }</td>
-                            <td className="text-left">{ refAD }</td>
+                            <td className="text-left">
+                                { refAD }
+                                { (refAD > 0 && refAD != totalCoverage) ? ` (${ Math.round(refAD/totalCoverage * 100 )}%)`: null }
+                            </td>
                             {altRows.map((alt) => {
                                 if (gtToAD) {
-                                    return <td key={alt} className="text-left">{ gtToAD[alt] || 0}</td>;
+                                    const { [alt]: partialCoverage = 0 } = gtToAD;
+                                    return (
+                                        <td key={alt} className="text-left">
+                                            { partialCoverage.toString() || 0}
+                                            { partialCoverage > 0 ? ` (${ Math.round(gtToAD[alt]/totalCoverage * 100 )}%)`: null }
+                                        </td>
+                                    );
                                 }
                                 return(<td key={alt} className="text-left">0</td>);
                             })}
