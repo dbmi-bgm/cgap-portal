@@ -2414,12 +2414,13 @@ $download-button-width : 100px;
 		// TODO: Figure out how to apply this class to react bootstrap button via rbs
 		.btn-outline-secondary.select-transcript {
 			border-color: #dee2e6;
-			&:hover, &:focus, &:active{
+			color: #111111;
+			&:hover, &:active{
 				color: #ffffff;
 				border-color: transparent;
 			}
 			&[disabled] {
-				color: $primary-dark;
+				color: #6c757d;
 				border-color: #dee2e6;
 			} 
 		}
