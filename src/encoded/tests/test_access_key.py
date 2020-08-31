@@ -67,8 +67,6 @@ def test_access_key_principals(anontestapp, execute_counter, access_key, submitt
 
     assert sorted(res.json['effective_principals']) == [
         'accesskey.%s' % access_key['access_key_id'],
-        'group.submitter',
-        'institution.%s' % institution['uuid'],
         'system.Authenticated',
         'system.Everyone',
         'userid.%s' % submitter['uuid'],
