@@ -11,7 +11,7 @@ from webtest.app import AppError
 from .util import s3_local_file, debuglog
 
 
-GENERIC_FIELD_MAPPING = {
+GENERIC_FIELD_MAPPING = {  # for spreadsheet column names that are different from schema property names
     'individual': {},
     'family': {},
     'sample': {
@@ -118,6 +118,22 @@ def submit_metadata_bundle(*, s3_client, bucket, key, project, institution, vapp
 
 
 def map_fields(row, metadata_dict, addl_fields, item_type):
+    '''
+    function for grabbing metadata from row based on column headers.
+
+    Args:
+        row - dictionary of format {column name1: value1, column name 2: value 2}
+        metadata_dict - the dictionary (json) to be filled with metadata parsed in this function.
+            Can be empty.
+        addl_fields - list of fields not present in GENERIC_FIELD_MAPPING. These fields will appear
+            in the output dictionary as keys, with spaces replaced with underscores. E.g., a field
+            'individual id' will appear in the output dict as 'individual_id'.
+        item_type - the key in GENERIC_FIELD_MAPPING to look at for column name to schema property mappings.
+
+    Example usage:
+    output = map_fields(row_dict, {}, ['individual_id', 'sex', 'age', 'birth_year'], 'individual')
+    
+    '''
     for field in addl_fields:
         metadata_dict[field] = use_abbrev(row.get(field.replace('_', ' ')))
     for map_field in GENERIC_FIELD_MAPPING[item_type]:
