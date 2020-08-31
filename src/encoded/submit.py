@@ -254,19 +254,19 @@ def xls_to_json(row, project, institution):
             continue
         fam_alias = '{}:{}'.format(project['name'], family_dict[row['analysis id']])
         # create items for Individual
-        items = fetch_individual_metadata(row_num, row, items, indiv_alias, institution['name'])
+        items = extract_individual_metadata(row_num, row, items, indiv_alias, institution['name'])
         # create/edit items for Family
-        items = fetch_family_metadata(row_num, row, items, indiv_alias, fam_alias)
+        items = extract_family_metadata(row_num, row, items, indiv_alias, fam_alias)
         # create item for Sample if there is a specimen
         if row.get('specimen id'):
             samp_alias = '{}:sample-{}'.format(project['name'], row['specimen id'])
             if row.get('run no.'):
                 samp_alias = samp_alias + '-' + row['run no.']
             analysis_alias = '{}:analysis-{}'.format(project['name'], row['analysis id'])
-            items = fetch_sample_metadata(row_num, row, items, indiv_alias, samp_alias, analysis_alias,
+            items = extract_sample_metadata(row_num, row, items, indiv_alias, samp_alias, analysis_alias,
                                           fam_alias, project['name'], a_types, case_names)
             if row.get('files'):
-                file_items = fetch_file_metadata(row_num, row['files'].split(','), project['name'])
+                file_items = extract_file_metadata(row_num, row['files'].split(','), project['name'])
                 file_errors.extend(file_items['errors'])
                 items['file_fastq'].update(file_items['file_fastq'])
                 items['file_processed'].update(file_items['file_processed'])
@@ -319,7 +319,7 @@ def get_analysis_types(rows):
     return analysis_types
 
 
-def fetch_individual_metadata(idx, row, items, indiv_alias, inst_name):
+def extract_individual_metadata(idx, row, items, indiv_alias, inst_name):
     new_items = items.copy()
     info = {'aliases': [indiv_alias]}
     info = map_fields(row, info, ['individual_id', 'sex', 'age', 'birth_year'], 'individual')
@@ -346,7 +346,7 @@ def fetch_individual_metadata(idx, row, items, indiv_alias, inst_name):
     return new_items
 
 
-def fetch_family_metadata(idx, row, items, indiv_alias, fam_alias):
+def extract_family_metadata(idx, row, items, indiv_alias, fam_alias):
     new_items = items.copy()
     info = {
         'aliases': [fam_alias],
@@ -376,7 +376,7 @@ def fetch_family_metadata(idx, row, items, indiv_alias, fam_alias):
     return new_items
 
 
-def fetch_sample_metadata(idx, row, items, indiv_alias, samp_alias, analysis_alias,
+def extract_sample_metadata(idx, row, items, indiv_alias, samp_alias, analysis_alias,
                           fam_alias, proj_name, analysis_type_dict, case_name_dict):
     new_items = items.copy()
     info = {'aliases': [samp_alias], 'files': []}  # TODO: implement creation of file db items
@@ -428,7 +428,7 @@ def fetch_sample_metadata(idx, row, items, indiv_alias, samp_alias, analysis_ali
     return new_items
 
 
-def fetch_file_metadata(idx, filenames, proj_name):
+def extract_file_metadata(idx, filenames, proj_name):
     valid_extensions = {
         '.fastq.gz': ('fastq', 'reads'),
         '.fq.gz': ('fastq', 'reads'),
