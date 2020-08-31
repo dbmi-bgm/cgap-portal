@@ -177,6 +177,24 @@ def digest_csv(input_data, delim=','):
 def xls_to_json(row, project, institution):
     """
     Converts excel file (or csv/tsv table) to json for submission.
+
+    Args:
+        row - generator yielding rows of spreadsheet
+        project - dict (json) of project metadata submitter is submitting for
+        institution - dict (json) of institution metadata that submitter is submitting for
+
+    Output:
+        1. items - dictionary of db items the submitter wants to submit, of the format
+           {itemtype1: [{alias1: {metadata}, {alias2: {metadata}], itemtype2: [...], ...}
+           Also has an extra key 'errors' whose value is a list of errors found during processing,
+           to be combined with validation errors later in submission processing.
+        2. boolean indicating whether submission can move to next phase or not. False will be
+            returned if there are major errors in spreadsheet preventing rows from being
+            processed properly.
+
+    Basically, this function parses the column headers of the spreadsheet, turns each row into
+    a dictionary of {column header: cell value} pairs, then gathers the metadata it can find for each
+    db item type in each row. Minor spreadsheet errors are added to the output dictionary.
     """
     header = False
     counter = 0
@@ -275,6 +293,11 @@ def create_families(rows):
 
 
 def get_analysis_types(rows):
+    """
+    'analysis_type' is a property of sample_processing items, denoting the workup type (WGS, WES, etc)
+    as well as describing the grouping (Trio, Quad, etc). This info needs to be extracted from the spreadsheet
+    separately from most of the metadata since it depends info extracted from more than one row.
+    """
     analysis_relations = {}
     analysis_types = {}
     for row in rows:
@@ -477,6 +500,11 @@ def create_case_items(items, proj_name, case_name_dict):
 
 
 def add_relations(items):
+    """
+    This function adds relations info to 'individual' metadata for proband.
+    This is done separately from row by row processing because information needed from spreadsheet
+    is on multiple rows.
+    """
     new_items = items.copy()
     for alias, fam in items['family'].items():
         parents = False
