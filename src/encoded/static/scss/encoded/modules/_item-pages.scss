@@ -2411,25 +2411,17 @@ $download-button-width : 100px;
 
 .sample-variant-annotation-space-body {
 	.card .inner-card-section {
-		> .info-header-title > h4 {
-			color: $primary-dark;
-		}
-
-		label {
-			color: $primary-dark;
-		}
-		label.black-label {
-			color: #000000;
-		}
-
-		// This should probably be its own style at some point
-		.btn-outline-secondary {
-			color: $primary-dark;
+		// TODO: Figure out how to apply this class to react bootstrap button via rbs
+		.btn-outline-secondary.select-transcript {
 			border-color: #dee2e6;
-			&:hover, &:focus, &:active {
+			&:hover, &:focus, &:active{
 				color: #ffffff;
-				border-color: none;
+				border-color: transparent;
 			}
+			&[disabled] {
+				color: $primary-dark;
+				border-color: #dee2e6;
+			} 
 		}
 	}
 
