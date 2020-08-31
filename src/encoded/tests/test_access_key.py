@@ -23,7 +23,6 @@ def no_login_submitter(testapp, institution, project):
         'first_name': 'ENCODE',
         'last_name': 'Submitter',
         'email': 'no_login_submitter@example.org',
-        'submits_for': [institution['@id']],
         'status': 'deleted',
     }
     # User @@object view has keys omitted.
@@ -68,9 +67,6 @@ def test_access_key_principals(anontestapp, execute_counter, access_key, submitt
 
     assert sorted(res.json['effective_principals']) == [
         'accesskey.%s' % access_key['access_key_id'],
-        'group.submitter',
-        'institution.%s' % institution['uuid'],
-        'submits_for.%s' % institution['uuid'],
         'system.Authenticated',
         'system.Everyone',
         'userid.%s' % submitter['uuid'],
