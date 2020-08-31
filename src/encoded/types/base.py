@@ -41,7 +41,7 @@ from ..server_defaults import get_userid, add_last_modified
 
 
 # Item acls
-ONLY_ADMIN_VIEW = [
+ONLY_ADMIN_VIEW_ACL = [
     (Allow, 'group.admin', ['view', 'edit']),
     (Allow, 'group.read-only-admin', ['view']),
     (Allow, 'remoteuser.INDEXER', ['view']),
@@ -50,66 +50,22 @@ ONLY_ADMIN_VIEW = [
 ]
 
 # this is for pages that should be visible to public
-ALLOW_EVERYONE_VIEW = [
+ALLOW_EVERYONE_VIEW_ACL = [
     (Allow, Everyone, 'view'),
-] + ONLY_ADMIN_VIEW
+] + ONLY_ADMIN_VIEW_ACL
 
 # view for shared items - add a status for common cgap items
-ALLOW_AUTHENTICATED_VIEW = [
+ALLOW_AUTHENTICATED_VIEW_ACL = [
     (Allow, Authenticated, 'view'),
-] + ONLY_ADMIN_VIEW
+] + ONLY_ADMIN_VIEW_ACL
 
-ALLOW_PROJECT_MEMBER_VIEW = [
+ALLOW_PROJECT_MEMBER_VIEW_ACL = [
     (Allow, 'role.project_member', 'view'),
-] + ONLY_ADMIN_VIEW
+] + ONLY_ADMIN_VIEW_ACL
 
-DELETED = [
+DELETED_ACL = [
     (Deny, Everyone, 'visible_for_edit')
-] + ONLY_ADMIN_VIEW
-
-# above is minimal set until roles are expanded
-# ALLOW_OWNER_EDIT = [
-#     (Allow, 'role.owner', ['edit', 'view', 'view_details']),
-# ]
-
-# This acl allows item creation; it is easily overwritten in lab and user,
-# as these items should not be available for creation
-# SUBMITTER_CREATE = [
-#     (Allow, 'group.submitter', 'create')
-# ]
-
-# ALLOW_EVERYONE_VIEW = [
-#     (Allow, Everyone, 'view'),
-# ] + ONLY_ADMIN_VIEW + SUBMITTER_CREATE
-
-# ALLOW_PROJECT_MEMBER_VIEW = [
-#     (Allow, 'role.project_member', 'view'),
-# ] + ONLY_ADMIN_VIEW + SUBMITTER_CREATE
-
-# # institutions are more general than projects
-# ALLOW_INSTITUTION_MEMBER_VIEW = [
-#     (Allow, 'role.institution_member', 'view'),
-# ] + ALLOW_PROJECT_MEMBER_VIEW
-
-# ALLOW_INSTITUTION_MEMBER_EDIT = [
-#     (Allow, 'role.institution_submitter', 'edit'),
-# ] + ALLOW_INSTITUTION_MEMBER_VIEW
-
-# ALLOW_CURRENT_AND_SUBMITTER_EDIT = [
-#     (Allow, Everyone, 'view'),
-#     (Allow, 'role.institution_submitter', 'edit'),
-# ] + ONLY_ADMIN_VIEW + SUBMITTER_CREATE
-
-# ALLOW_CURRENT = ALLOW_EVERYONE_VIEW
-
-# # Collection acls
-# ALLOW_SUBMITTER_ADD = [
-#     (Allow, 'group.submitter', 'add'),
-# ]
-
-# ALLOW_ANY_USER_ADD = [
-#     (Allow, Authenticated, 'add'),
-# ] + ALLOW_EVERYONE_VIEW
+] + ONLY_ADMIN_VIEW_ACL
 
 
 def get_item_or_none(request, value, itype=None, frame='object'):
@@ -262,7 +218,7 @@ class Collection(snovault.Collection, AbstractCollection):
             return
 
         # If no ACLs are defined for collection, allow admin only
-        self.__acl__ = ONLY_ADMIN_VIEW
+        self.__acl__ = ONLY_ADMIN_VIEW_ACL
 
 
 @snovault.abstract_collection(
@@ -278,13 +234,13 @@ class Item(snovault.Item):
     Collection = Collection
     STATUS_ACL = {
         # standard_status
-        'shared': ALLOW_AUTHENTICATED_VIEW,
-        'current': ALLOW_PROJECT_MEMBER_VIEW,
-        'inactive': ALLOW_PROJECT_MEMBER_VIEW,
-        'obsolete': DELETED,
-        'deleted': DELETED,
+        'shared': ALLOW_AUTHENTICATED_VIEW_ACL,
+        'current': ALLOW_PROJECT_MEMBER_VIEW_ACL,
+        'inactive': ALLOW_PROJECT_MEMBER_VIEW_ACL,
+        'obsolete': DELETED_ACL,
+        'deleted': DELETED_ACL,
         # do we need one for everyone view?
-        # 'released': ALLOW_EVERYONE_VIEW
+        # 'released': ALLOW_EVERYONE_VIEW_ACL
     }
 
     # Items of these statuses are filtered out from rev links
@@ -315,7 +271,7 @@ class Item(snovault.Item):
         # Don't finalize to avoid validation here.
         properties = self.upgrade_properties().copy()
         status = properties.get('status')
-        return self.STATUS_ACL.get(status, ONLY_ADMIN_VIEW)
+        return self.STATUS_ACL.get(status, ONLY_ADMIN_VIEW_ACL)
 
     def __ac_local_roles__(self):
         """Adds additional information allowing access of the Item based on

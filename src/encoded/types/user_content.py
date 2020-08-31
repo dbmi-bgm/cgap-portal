@@ -9,15 +9,10 @@ from snovault import (
 from snovault.interfaces import STORAGE
 from .base import (
     Item,
-    # ALLOW_CURRENT,
-    # DELETED,
-    # ALLOW_PROJECT_MEMBER_VIEW,
-    # ALLOW_INSTITUTION_MEMBER_VIEW,
-    # ONLY_ADMIN_VIEW,
-    # ALLOW_OWNER_EDIT
 )
 import os
 import requests
+
 
 @abstract_collection(
     name='user-contents',
@@ -31,15 +26,6 @@ class UserContent(Item):
     base_types = ['UserContent'] + Item.base_types
     schema = load_schema('encoded:schemas/user_content.json')
     embedded_list = []
-    # embedded_list = lab_award_attribution_embed_list
-
-    # STATUS_ACL = {              # Defaults + allow owner to edit (in case owner has no labs or submit_for)
-    #     'released': ALLOW_OWNER_EDIT + ALLOW_CURRENT,
-    #     'deleted': ALLOW_OWNER_EDIT + DELETED,
-    #     'draft': ALLOW_OWNER_EDIT + ONLY_ADMIN_VIEW,
-    #     'released to project': ALLOW_OWNER_EDIT + ALLOW_PROJECT_MEMBER_VIEW,
-    #     'released to institution': ALLOW_OWNER_EDIT + ALLOW_INSTITUTION_MEMBER_VIEW
-    # }
 
     @calculated_property(schema={
         "title": "Content",
