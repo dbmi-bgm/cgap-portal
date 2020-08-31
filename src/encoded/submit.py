@@ -6,12 +6,7 @@ import json
 import xlrd
 
 from dcicutils.qa_utils import ignored
-from dcicutils.misc_utils import VirtualAppError  # , VirtualApp
-# from dcicutils import ff_utils
-# from pyramid.paster import get_app
-# from pyramid.response import Response
-# from snovault.util import debug_log
-# from pyramid.view import view_config
+from dcicutils.misc_utils import VirtualAppError
 from webtest.app import AppError
 from .util import s3_local_file, debuglog
 
