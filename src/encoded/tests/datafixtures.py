@@ -124,7 +124,6 @@ def submitter(testapp, institution, project):
         'first_name': 'ENCODE',
         'last_name': 'Submitter',
         'email': 'encode_submitter@example.org',
-        'submits_for': [institution['@id']],
         'status': "current"
     }
     # User @@object view has keys omitted.
