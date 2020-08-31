@@ -57,7 +57,7 @@ POST_ORDER = [
 ]
 
 
-LINKS = [
+LINKTO_FIELDS = [  # linkTo properties that we will want to patch in second-round
     'samples', 'members', 'mother', 'father', 'proband', 'report',
     'individual', 'sample_processing', 'families', 'files'
 ]
@@ -729,7 +729,7 @@ def post_and_patch_all_items(virtualapp, json_data_final):
                 fname = item.get('filename')
                 if fname:
                     del item['filename']
-                for field in LINKS:
+                for field in LINKTO_FIELDS:
                     if field in item:
                         patch_info[field] = item[field]
                         del item[field]
