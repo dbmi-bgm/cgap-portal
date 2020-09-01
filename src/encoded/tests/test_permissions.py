@@ -15,6 +15,7 @@ def STATI():
     return [
         # viewable by authenticated
         "shared",
+        "obsolete",
         # viewable by project member
         "current",
         "inactive",
@@ -24,7 +25,6 @@ def STATI():
         "uploaded",
         "upload failed",
         "to be uploaded by workflow",
-        "obsolete",
         "deleted",
         # special case because redirect
         "replaced"
@@ -249,7 +249,7 @@ def test_admin_can_patch_item_all_stati(admin_testapp, simple_bgm_file, STATI):
 
 def test_bgm_user_can_access_ok_stati_but_not_others_for_bgm_project_item(
         testapp, bgm_user_testapp, simple_bgm_file, STATI):
-    view_stati = STATI[0:3]
+    view_stati = STATI[0:4]
     rep_status = 'replaced'  # special case due to redirect returns 404
     for status in STATI:
         testapp.patch_json(simple_bgm_file['@id'], {'status': status}, status=200)
@@ -276,6 +276,8 @@ def test_bgm_user_cannot_patch_item(testapp, bgm_user_testapp, simple_bgm_file, 
         testapp.patch_json(simple_bgm_file['@id'], {'status': status}, status=200)
         if status == 'replaced':
             assert bgm_user_testapp.patch_json(simple_bgm_file['@id'], {'read_length': 100}, status=404)
+        elif status == 'current':
+            assert bgm_user_testapp.patch_json(simple_bgm_file['@id'], {'read_length': 100}, status=200)
         else:
             assert bgm_user_testapp.patch_json(simple_bgm_file['@id'], {'read_length': 100}, status=403)
 
@@ -283,7 +285,7 @@ def test_bgm_user_cannot_patch_item(testapp, bgm_user_testapp, simple_bgm_file, 
 def test_udn_user_cannot_access_bgm_item_unless_shared(testapp, udn_user_testapp, simple_bgm_file, STATI):
     for status in STATI:
         testapp.patch_json(simple_bgm_file['@id'], {'status': status}, status=200)
-        if status == 'shared':
+        if status in ['shared', 'obsolete']:
             assert udn_user_testapp.get(simple_bgm_file['@id'], status=200)
         elif status == 'replaced':
             assert udn_user_testapp.get(simple_bgm_file['@id'], status=404)
@@ -317,9 +319,9 @@ def test_multi_proj_user_can_access_items_w_ok_status_from_multi_projects(
     for project in all_projects:
         pname = project.get('name')
         if pname == corename:
-            ok_stati = STATI[:1]
+            ok_stati = STATI[:2]
         else:
-            ok_stati = STATI[:3]
+            ok_stati = STATI[:4]
         simple_bgm_file_item['project'] = project['@id']
         for status in STATI:
             simple_bgm_file_item['status'] = status
@@ -346,7 +348,7 @@ def test_authenticated_user_wo_project_can_only_see_shared(
         for status in STATI:
             simple_bgm_file_item['status'] = status
             fitem = testapp.post_json('/file_fastq', simple_bgm_file_item, status=201).json['@graph'][0]
-            if status == 'shared':
+            if status in ['shared', 'obsolete']:
                 assert no_project_user_testapp.get(fitem['@id'], status=200)
             else:
                 assert no_project_user_testapp.get(fitem['@id'], status=403)

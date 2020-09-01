@@ -59,6 +59,10 @@ ALLOW_AUTHENTICATED_VIEW_ACL = [
     (Allow, Authenticated, 'view'),
 ] + ONLY_ADMIN_VIEW_ACL
 
+ALLOW_PROJECT_MEMBER_EDIT_ACL = [
+    (Allow, 'role.project_member', ['view', 'edit']),
+] + ONLY_ADMIN_VIEW_ACL
+
 ALLOW_PROJECT_MEMBER_VIEW_ACL = [
     (Allow, 'role.project_member', 'view'),
 ] + ONLY_ADMIN_VIEW_ACL
@@ -235,9 +239,9 @@ class Item(snovault.Item):
     STATUS_ACL = {
         # standard_status
         'shared': ALLOW_AUTHENTICATED_VIEW_ACL,
-        'current': ALLOW_PROJECT_MEMBER_VIEW_ACL,
+        'obsolete': ALLOW_AUTHENTICATED_VIEW_ACL,
+        'current': ALLOW_PROJECT_MEMBER_EDIT_ACL,
         'inactive': ALLOW_PROJECT_MEMBER_VIEW_ACL,
-        'obsolete': DELETED_ACL,
         'deleted': DELETED_ACL,
         # do we need one for everyone view?
         # 'released': ALLOW_EVERYONE_VIEW_ACL
