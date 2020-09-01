@@ -43,3 +43,29 @@ LoginNavItem.propTypes = {
     'windowWidth'   : PropTypes.number,
     ...UserRegistrationModal.propTypes
 };
+
+
+/**
+ * Somewhat 'wrap-around' but arguably likely cleanest way to open Auth0 login dialog modal
+ * from Alert and not require to move up and pass down login-related stuff like `showLock()`.
+ */
+const onAlertLoginClick = function(e) {
+    e.preventDefault();
+    const btnElem = document.getElementById("loginbtn");
+    if (btnElem && typeof btnElem.click === "function"){
+        // See https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/click
+        btnElem.click();
+    }
+    return false;
+};
+
+export const NotLoggedInAlert = {
+    "title" : "Not Logged In",
+    "message" : (
+        <span>
+            You are currently browsing as guest, please <a onClick={onAlertLoginClick} href="#loginbtn">login</a> if you have an account.
+        </span>
+    ),
+    "style" : "warning",
+    "navigateDisappearThreshold" : 2
+};
