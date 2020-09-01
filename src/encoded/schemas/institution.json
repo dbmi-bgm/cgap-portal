@@ -22,7 +22,7 @@
             "title": "Status",
             "type": "string",
             "default": "current",
-            "permission": "restriced_fields",
+            "permission": "restricted_fields",
             "enum": [
                 "current",
                 "obsolete",
@@ -35,14 +35,14 @@
             "description": "A unique name for the institution.",
             "type": "string",
             "uniqueKey": "institution:name",
-            "permission": "restriced_fields"
+            "permission": "restricted_fields"
         },
         "title": {
             "title": "Title",
             "description": "A unique title for the instituion.",
             "type": "string",
             "uniqueKey": "institution:name",
-            "permission": "restriced_fields"
+            "permission": "restricted_fields"
         },
         "pi": {
             "title": "P.I.",

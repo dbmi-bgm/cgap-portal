@@ -263,7 +263,7 @@ def test_bgm_user_can_access_ok_stati_but_not_others_for_bgm_project_item(
 
 
 def test_bgm_user_cannot_post_item(bgm_user_testapp, simple_bgm_file_item):
-    # this is a bit hacky as it's actually failing validation doe to restriced_fields
+    # this is a bit hacky as it's actually failing validation doe to restricted_fields
     # on institution and project in attribution mixin so expect 422 rather than 403
     del simple_bgm_file_item['uuid']  # users wouldn't generally post uuids
     del simple_bgm_file_item['status']  # this property also has import-items but is not required

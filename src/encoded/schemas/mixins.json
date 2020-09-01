@@ -17,7 +17,7 @@
             "format": "uuid",
             "exclude_from": ["submit4dn", "FFedit-create"],
             "serverDefault": "uuid4",
-            "permission": "restriced_fields",
+            "permission": "restricted_fields",
             "requestMethod": "POST"
         }
     },
@@ -29,7 +29,7 @@
             "exclude_from": ["submit4dn", "FFedit-create"],
             "type": "string",
             "format": "accession",
-            "permission": "restriced_fields",
+            "permission": "restricted_fields",
             "serverDefault": "accession"
         },
         "alternate_accessions": {
@@ -43,7 +43,7 @@
                 "title": "Alternate Accession",
                 "description": "An accession previously assigned to an object that has been merged with this object.",
                 "type": "string",
-                "permission": "restriced_fields",
+                "permission": "restricted_fields",
                 "format": "accession"
             }
         }
@@ -72,7 +72,7 @@
             "exclude_from": ["submit4dn"],
             "type": "string",
             "default": "in review",
-            "permission": "restriced_fields",
+            "permission": "restricted_fields",
             "enum": [
                 "current",
                 "shared",
@@ -95,7 +95,7 @@
                 {"format": "date"}
             ],
             "serverDefault": "now",
-            "permission": "restriced_fields"
+            "permission": "restricted_fields"
         },
         "submitted_by": {
             "rdfs:subPropertyOf": "dc:creator",
@@ -105,7 +105,7 @@
             "linkTo": "User",
             "lookup": 1000,
             "serverDefault": "userid",
-            "permission": "restriced_fields"
+            "permission": "restricted_fields"
         }
     },
     "modified": {
@@ -124,14 +124,14 @@
                         {"format": "date-time"},
                         {"format": "date"}
                     ],
-                    "permission": "restriced_fields"
+                    "permission": "restricted_fields"
                 },
                 "modified_by": {
                     "title": "Modified by",
                     "description": "Do not submit, value is assigned by the server. The user that modfied the object.",
                     "type": "string",
                     "linkTo": "User",
-                    "permission": "restriced_fields"
+                    "permission": "restricted_fields"
                 }
             }
         }
@@ -141,7 +141,7 @@
             "title": "Institution",
              "description": "Institution associated with the submission.",
              "exclude_from": ["submit4dn"],
-             "permission": "restriced_fields",
+             "permission": "restricted_fields",
              "type": "string",
              "linkTo": "Institution",
              "linkSubmitsFor": true
@@ -150,7 +150,7 @@
             "title": "Project",
             "description": "Project associated with the submission.",
             "exclude_from": ["submit4dn"],
-            "permission": "restriced_fields",
+            "permission": "restricted_fields",
             "type": "string",
             "linkTo": "Project"
         }
@@ -315,7 +315,7 @@
             "description": "Array of linkTos for static sections to be displayed at the top of an item page",
             "type": "array",
             "uniqueItems": true,
-            "permission": "restriced_fields",
+            "permission": "restricted_fields",
             "exclude_from" : ["submit4dn"],
             "items": {
                 "title": "Static Header",
@@ -329,7 +329,7 @@
             "description": "Array of objects containing linkTo UserContent and 'position' to be placed on Item view(s).",
             "type": "array",
             "uniqueItems": true,
-            "permission": "restriced_fields",
+            "permission": "restricted_fields",
             "exclude_from" : ["submit4dn"],
             "items": {
                 "title" : "Static Content Definition",
