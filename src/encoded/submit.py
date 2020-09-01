@@ -271,7 +271,7 @@ def xls_to_json(row, project, institution):
                 items['file_fastq'].update(file_items['file_fastq'])
                 items['file_processed'].update(file_items['file_processed'])
     items = add_relations(items)
-    items = create_case_item_metadata(items, project['name'], case_names)
+    items = create_case_item_metadata(items, project['name'], case_names, family_dict)
     # removed unused fields, add project and institution
     for val1 in items.values():
         if isinstance(val1, dict):
@@ -477,7 +477,7 @@ def extract_file_metadata(idx, filenames, proj_name):
     return files
 
 
-def create_case_item_metadata(items, proj_name, case_name_dict):
+def create_case_item_metadata(items, proj_name, case_name_dict, family_dict):
     """
     Creation of case metadata, which can only be done after all rows are processed
     so that sample_processing metadata exists.
@@ -499,6 +499,7 @@ def create_case_item_metadata(items, proj_name, case_name_dict):
             case_info = {
                 'aliases': [case_alias],
                 'sample_processing': k,
+                'family': '{}:{}'.format(proj_name, family_dict.get(analysis_id)),
                 'individual': indiv
             }
             if name:
