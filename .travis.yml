@@ -19,39 +19,43 @@ addons:
     - make
     - graphviz
     - nginx
-  postgresql: '11.1'
 env:
   global:
+  - PGPORT=5433
   - BOTO_CONFIG=/bogus
-  - PATH="/usr/share/elasticsearch/bin:/usr/lib/postgresql/9.4/bin:$PATH"
+  - PATH="/usr/share/elasticsearch/bin:/usr/lib/postgresql/11/bin:$PATH"
   - ELASTIC_BEANSTALK_LABEL=$TRAVIS_COMMIT
   - USER="4dn-dcic"
   - SNO_REPO="snovault"
 before_install:
+- ls -dal /usr/lib/postgresql/*/bin/postgres
+- find /usr/lib/postgresql -name 'postgres' -print
+- ps auxww | grep postgres
+- sudo apt-get install -yq --no-install-suggests --no-install-recommends postgresql-common
+- sudo service postgresql stop
+- sudo apt install -yq --no-install-suggests --no-install-recommends postgresql-11 postgresql-client-11
+- sudo service postgresql status
+- sudo service postgresql start 11
+- sudo service postgresql status
 - python -c "import fcntl; fcntl.fcntl(1, fcntl.F_SETFL, 0)"
 - echo $tibanna_deploy
 - postgres --version
 - initdb --version
+- ls -dal /usr/lib/postgresql/*/bin/postgres
+- find /usr/lib/postgresql -name 'postgres' -print
+- ps auxww | grep postgres
 - nvm install 10 || (echo "Retrying nvm install" && sleep 5 && nvm install 10)
 - node --version
 - npm config set python /usr/bin/python2.7
 install:
-# need to manually change the version of six used by Travis for some reason
-- pip uninstall -y six
-- pip install six==1.11.0
-- pip install --upgrade pip==19.0.3
-- pip install poetry
-- pip install coveralls
-- pip install codacy-coverage
-- poetry install
-- make npm-setup
+- make build
 before_script:
-- configure-kibana-index --es-endpoint search-fourfront-builds-uhevxdzfcv7mkm5pj5svcri3aq.us-east-1.es.amazonaws.com:80
+- configure-kibana-index --es-endpoint search-cgap-testing-ud3ggpjj7x6vclx62nmzymyzfi.us-east-1.es.amazonaws.com:80
 script:
 - make travis-test
 after_script:
 - echo leader=$BUILD_LEADER status=$BUILD_AGGREGATE_STATUS
-- wipe-test-indices $TRAVIS_JOB_ID search-fourfront-builds-uhevxdzfcv7mkm5pj5svcri3aq.us-east-1.es.amazonaws.com:80
+- wipe-test-indices $TRAVIS_JOB_ID search-cgap-testing-ud3ggpjj7x6vclx62nmzymyzfi.us-east-1.es.amazonaws.com:80
 after_success:
 - coveralls
 - ! "if test -n \"$NPM\"; then \n   cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js\n
@@ -65,19 +69,6 @@ after_success:
 - echo $TRAVIS_PULL_REQUEST
 - echo $TRAVIS_BRANCH
 - echo $tibanna_deploy
-- ! "if [ \"$BUILD_LEADER\" = \"YES\" ]; then\n  if [ \"$BUILD_AGGREGATE_STATUS\"
-  = \"others_succeeded\" ]; then\n    if [ \"$TRAVIS_PULL_REQUEST\" = \"false\" ];
-  then\n      echo \"cleanup build artifacts\"\n      rm elasticsearch-5.4.1.deb\n
-  \     rm .to_export_back\n      rm versions.cfg\n      pip install awsebcli\n      aws
-  s3 cp --recursive s3://encoded-4dn-conf-prod/.aws /home/travis/.aws\n      git remote
-  add origin-travis https://${GH_TOKEN}@github.com/4dn-dcic/fourfront.git\n      git
-  config --global user.email \"travis@builder.com\"\n      git config --global user.name
-  \"Travis\"\n      if [ \"$TRAVIS_BRANCH\" = \"master\" ]; then\n         git config
-  --replace-all remote.origin.fetch '+refs/heads/*:refs/remotes/origin/*'\n         git
-  fetch --no-tags\n         git checkout master\n         \n         if [ -n \"$tibanna_deploy\"
-  ]; then\n            echo \"Job succeeded! PUBLISHING to ${tibanna_deploy} environment...\"\n
-  \           eb use ${tibanna_deploy} --debug\n            python deploy/deploy_beanstalk.py\n
-  \        fi\n      fi\n     fi\n   fi\n  fi\n"
 - |
   if  [[ $TRAVIS_BRANCH == 'master' ]]; then
     echo 'Triggering docs build';

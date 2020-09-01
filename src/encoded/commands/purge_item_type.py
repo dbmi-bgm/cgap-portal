@@ -48,13 +48,13 @@ def purge_item_type_from_storage(app, item_types, prod=False):
     for uuid in uuids_to_purge:
         try:
             pstorage.purge_uuid(uuid)
+            transaction.commit()
         except Exception as e:  # XXX: handle recoverable exceptions?
             logger.error('Encountered exception purging an item type (uuid: %s) from the DB: %s'
                          % (uuid, e))
             transaction.abort()
             return False
 
-    transaction.commit()
     return True
 
 
@@ -62,7 +62,7 @@ def main():
     """ Entry point for this command """
     logging.basicConfig()
 
-    parser = argparse.ArgumentParser(
+    parser = argparse.ArgumentParser(  # noqa - PyCharm wrongly thinks the formatter_class is specified wrong here.
         description='Clear an item type out of metadata storage',
         epilog=EPILOG,
         formatter_class=argparse.RawDescriptionHelpFormatter
@@ -76,3 +76,7 @@ def main():
 
     app = get_app(args.config_uri, args.app_name)
     sys.exit(purge_item_type_from_storage(app, [args.item_type], prod=args.prod))
+
+
+if __name__ == '__main__':
+    main()

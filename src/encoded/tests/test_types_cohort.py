@@ -1,5 +1,5 @@
 import pytest
-pytestmark = [pytest.mark.work, pytest.mark.schema]
+pytestmark = [pytest.mark.working, pytest.mark.schema]
 
 
 @pytest.fixture

@@ -2,16 +2,17 @@
 /*** Override ReactTooltip styles ***/
 
 .__react_component_tooltip {
-    max-width: 630px;
-    @include media-breakpoint-down(xs) {
-        max-width : 400px;
-    }
-    @include media-breakpoint-down(sm) {
-        max-width : 500px;
-    }
-    @include media-breakpoint-down(md) {
-        max-width : 600px;
-    }
+    // May bring back later if needed for anything
+    // max-width: 630px;
+    // @include media-breakpoint-down(xs) {
+    //     max-width : 400px;
+    // }
+    // @include media-breakpoint-down(sm) {
+    //     max-width : 500px;
+    // }
+    // @include media-breakpoint-down(md) {
+    //     max-width : 600px;
+    // }
 
     h1,h2,h3,h4,h5,h6 {
         color: #fff;

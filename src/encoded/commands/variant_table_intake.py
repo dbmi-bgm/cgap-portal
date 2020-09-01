@@ -6,7 +6,7 @@ import logging
 from pyramid.paster import get_app
 from dcicutils.misc_utils import VirtualApp
 from collections import OrderedDict, Mapping
-from encoded.util import resolve_file_path
+from ..util import resolve_file_path
 
 logger = logging.getLogger(__name__)
 EPILOG = __doc__
@@ -28,7 +28,7 @@ class MappingTableParser(object):
     STRING_FIELDS = ['field_name', 'source_name', 'source_version', 'sub_embedding_group',
                      'annotation_category', 'separator', 'description', 'value_example',
                      'scope', 'schema_title', 'pattern', 'link', 'comments']
-    SPECIAL_FIELDS = ['field_type', 'enum_list', 'links_to']
+    SPECIAL_FIELDS = ['field_type', 'enum_list', 'links_to', 'annotation_space_location']
     ALL_FIELDS = INTEGER_FIELDS + BOOLEAN_FIELDS + STRING_FIELDS + SPECIAL_FIELDS
     EMBEDDED_VARIANT_FIELDS = resolve_file_path('schemas/variant_embeds.json')
     EMBEDDED_VARIANT_SAMPLE_FIELDS = resolve_file_path('schemas/variant_sample_embeds.json')  # XXX: unused currently
@@ -36,11 +36,12 @@ class MappingTableParser(object):
                           ('variant_sample', EMBEDDED_VARIANT_SAMPLE_FIELDS)]
     NAME_FIELD = 'field_name'
 
-    def __init__(self, _mp, schema):
+    def __init__(self, _mp, schema, skip_embeds=False):
         self.mapping_table = _mp
         self.annotation_field_schema = json.load(open(schema, 'r'))
         self.version, self.date, self.fields = self.read_mp_meta()
-        self.provision_embeds()
+        if not skip_embeds:  # if calling from gene, do not wipe variant/variant_sample embeds
+            self.provision_embeds()
 
     @staticmethod
     def process_fields(row):
@@ -118,19 +119,19 @@ class MappingTableParser(object):
                 if row_idx <= self.HEADER_ROW_INDEX:  # skip header rows
                     continue
                 for field_name, entry in zip(self.fields, row):
-                    if not entry:
+                    if field_name not in self.annotation_field_schema['properties'] or not entry:
                         continue
                     if field_name in self.INTEGER_FIELDS:  # handle int fields
-                        if entry:
+                        if entry is not None:  # entry=0 is a normal value
                             insert[field_name] = int(entry)
                     elif field_name in self.BOOLEAN_FIELDS:  # handle bool fields
-                        if entry:
+                        if entry is not None:
                             if entry == 'Y':
                                 insert[field_name] = True
-                            else:
+                            else:  # assume False if anything other than 'Y' is present
                                 insert[field_name] = False
                     elif field_name in ['enum_list']:  # handle enum fields
-                        if entry:
+                        if entry is not None:
                             field_type = row[self.FIELD_TYPE_INDEX]
                             val_list = []
                             if field_type == 'string':
@@ -203,7 +204,7 @@ class MappingTableParser(object):
                                               'key other than "key" or "title": %s ' % type)
         try:
             fmt = json.loads(json_or_str)
-        except:  # just a string is given, use for both name and title
+        except Exception:  # just a string is given, use for both name and title
             return json_or_str
         else:
             return fmt[type]
@@ -259,46 +260,45 @@ class MappingTableParser(object):
 
             # handle int fields
             for a_field in self.INTEGER_FIELDS:
-                if item.get(a_field) and a_field != 'no':
+                if item.get(a_field) is not None:
                     features[a_field] = int(item[a_field])
 
-            if True:
-                # handle sub_embedded object
-                if item.get('sub_embedding_group'):
-                    sub_temp = OrderedDict()
-                    prop = OrderedDict()
-                    sum_ob_name = self.format_sub_embedding_group_name(item['sub_embedding_group'], type='key')
-                    sub_title = self.format_sub_embedding_group_name(item['sub_embedding_group'], type='title')
+            # handle sub_embedded object
+            if item.get('sub_embedding_group'):
+                sub_temp = OrderedDict()
+                prop = OrderedDict()
+                sum_ob_name = self.format_sub_embedding_group_name(item['sub_embedding_group'], type='key')
+                sub_title = self.format_sub_embedding_group_name(item['sub_embedding_group'], type='title')
 
-                    # handle sub-embedded object that is an array
-                    if item.get('is_list'):
-                        prop[prop_name] = {
-                            'title': item.get(self.NAME_FIELD, 'None provided'),
-                            'type': 'array',
-                            'items': features
-                        }
-                        sub_temp.update({
-                            'title': sum_ob_name,
-                            'type': 'array',
-                            'items': {
-                                'title': sub_title,
-                                'type': 'object',
-                                'properties': prop
-                                }
-                        })
-                    else:
-                        prop[prop_name] = features
-                        sub_temp.update({
+                # handle sub-embedded object that is an array
+                if item.get('is_list'):
+                    prop[prop_name] = {
+                        'title': item.get(self.NAME_FIELD, 'None provided'),
+                        'type': 'array',
+                        'items': features
+                    }
+                    sub_temp.update({
+                        'title': sum_ob_name,
+                        'type': 'array',
+                        'items': {
+                            'title': sub_title,
+                            'type': 'object',
+                            'properties': prop
+                            }
+                    })
+                else:
+                    prop[prop_name] = features
+                    sub_temp.update({
+                        "title": sub_title,
+                        "type": "array",
+                        "items": {
                             "title": sub_title,
-                            "type": "array",
-                            "items": {
-                                "title": sub_title,
-                                "type": "object",
-                                "properties": prop
-                                }
-                            })
-                    temp[sum_ob_name] = sub_temp
-                    return temp
+                            "type": "object",
+                            "properties": prop
+                            }
+                        })
+                temp[sum_ob_name] = sub_temp
+                return temp
 
             # convert to array structure
             if item.get('is_list'):
@@ -349,7 +349,7 @@ class MappingTableParser(object):
         def has_grouping(o):
             return o.get('annotation_category', False)
 
-        def insert_column_or_facet(d, o):
+        def insert_column_or_facet(d, o, facet=True):
             val = {'title': o.get('schema_title', o.get(self.NAME_FIELD))}
             if is_numbered_field(o) and is_facet(o):
                 val['aggregation_type'] = 'stats'
@@ -362,11 +362,13 @@ class MappingTableParser(object):
                     # but adding 'documentation through redundancy', if such thing is a thing.
                     val['number_step'] = "any"
 
-            # add facet grouping
-            if is_facet(o) is not None:
+            # add facet (or column) order/grouping
+            if facet and is_facet(o) is not None:
                 val['order'] = is_facet(o)
                 if has_grouping(o) is not False:
                     val['grouping'] = o.get('annotation_category')
+            if not facet and is_column(o) is not None:
+                val['order'] = is_column(o)
 
             if is_sub_embedded_object(o):
                 if is_link_to(o):  # add .display_title if we are a linkTo
@@ -384,22 +386,18 @@ class MappingTableParser(object):
         # go through all annotation objects generating schema properties and
         # adding columns/facets as defined by the mapping table
         for obj in inserts:
-            if variant:
-                update(props, get_prop(obj))
-                if is_variant(obj) and is_facet(obj):
+            update(props, get_prop(obj))
+            if variant:  # we are doing variant, so take columns only from variant context
+                if is_variant(obj):
+                    if is_facet(obj):
+                        insert_column_or_facet(facs, obj)
+                    if is_column(obj):
+                        insert_column_or_facet(cols, obj, facet=False)
+            else:  # we are doing variant_sample, so we should take columns/facets from BOTH
+                if is_facet(obj):
                     insert_column_or_facet(facs, obj)
-                if is_variant(obj) and is_column(obj):
-                    insert_column_or_facet(cols, obj)
-                else:
-                    continue
-            else:
-                update(props, get_prop(obj))
-                if not is_variant(obj) and is_facet(obj):
-                    insert_column_or_facet(facs, obj)
-                if not is_variant(obj) and is_column(obj):
-                    insert_column_or_facet(cols, obj)
-                else:
-                    continue
+                if is_column(obj):
+                    insert_column_or_facet(cols, obj, facet=False)
 
         if not props:
             raise MappingTableIntakeException('Got no properties on schema!')
@@ -414,8 +412,8 @@ class MappingTableParser(object):
         """
         schema['$schema'] = 'http://json-schema.org/draft-04/schema#'
         schema['type'] = 'object'
-        schema['required'] = ['institution', 'project', 'CHROM', 'POS', 'REF', 'ALT']  # for display_title
-        schema['identifyingProperties'] = ['uuid', 'aliases']
+        schema['required'] = ['institution', 'project']  # for display_title
+        schema['identifyingProperties'] = ['uuid', 'aliases', 'annotation_id']
         schema['additionalProperties'] = False
         schema['mixinProperties'] = [
             { "$ref": "mixins.json#/schema_version" },
@@ -429,6 +427,36 @@ class MappingTableParser(object):
             { "$ref": "mixins.json#/static_embeds" }
         ]
 
+    @staticmethod
+    def add_variant_required_fields(schema):
+        schema['required'].extend(['CHROM', 'REF', 'ALT', 'POS'])
+
+    @staticmethod
+    def add_variant_sample_required_fields(schema):
+        schema['required'].extend(['CALL_INFO', 'variant', 'file'])
+
+    @staticmethod
+    def add_identifier_field(props):
+        """ Adds the 'annotation_id' field, the unique_key constraint on variant/variant_sample which
+            is an alias for the display_title.
+        """
+        props['annotation_id'] = {
+            'title': 'Annotation ID',
+            'type': 'string',
+            'uniqueKey': True
+        }
+
+    @staticmethod
+    def add_extra_variant_sample_columns(cols):
+        """ Adds href, variant display title to columns (fields not on mapping table) """
+        cols['bam_snapshot'] = {
+            'title': 'Genome Snapshot',
+            'order': 81
+        }
+        cols['variant.display_title'] = {
+            'title': 'Variant'
+        }
+
     def generate_variant_sample_schema(self, sample_props, cols, facs, variant_cols, variant_facs):
         """ Builds the variant_sample.json schema based on sample_props. Will also add variant columns and
             facets since this information is embedded
@@ -441,21 +469,71 @@ class MappingTableParser(object):
         """
         schema = {}
         self.add_default_schema_fields(schema)
+        self.add_variant_sample_required_fields(schema)
         schema['title'] = 'Sample Variant'
         schema['description'] = "Schema for variant info for sample"
         schema['id'] = '/profiles/variant_sample.json'
         schema['properties'] = sample_props
         schema['properties']['schema_version'] = {'default': '1'}
-        schema['properties']['sample'] = {  # link to single sample
-            'title': 'Sample',
-            'type': 'string',
-            'linkTo': 'Sample'
-        }
         schema['properties']['variant'] = {  # link to single variant
             'title': 'Variant',
             'type': 'string',
             'linkTo': 'Variant'
         }
+        schema['properties']['file'] = {  # NOT a linkTo as the ID is sufficient for filtering
+            'title': 'File',
+            'description': 'String Accession of the vcf file used in digestion',
+            'type': 'string'
+        }
+        schema['properties']['bam_snapshot'] = {
+            'title': 'Genome Snapshot',
+            'description': 'Link to Genome Snapshot Image',
+            'type': 'string'
+        }
+        schema['properties']['genotype_labels'] = {
+            'title': 'Genotype Labels',
+            'type': 'array',
+            'items': {
+                'type': 'object',
+                'properties': {
+                    'role': {
+                        'title': 'Role',
+                        'type': 'string'
+                    },
+                    'labels': {
+                        'title': 'Genotype Labels',
+                        'type': 'array',
+                        'items': {
+                            'type': 'string'
+                        }
+                    }
+                }
+            }
+        }
+        schema['properties']['inheritance_modes'] = {
+            'title': 'Inheritance Modes',
+            'type': 'array',
+            'items': {
+                'type': 'string'
+            }
+        }
+        schema['properties']['samplegeno']['items']['properties']['samplegeno_role'] = {  # noqa structure is there
+            'title': 'Familial Relation',
+            'description': 'Relationship of the person who submitted this sample relative to the proband',
+            'type': 'string',
+            'enum': ['proband', 'father', 'mother', 'brother', 'sister', 'sibling', 'half-brother', 'half-sister',
+                     'half-sibling', 'wife', 'husband', 'grandson', 'granddaughter', 'grandchild',
+                     'grandmother', 'family-in-law', 'extended-family', 'not linked']
+        }
+        schema['properties']['samplegeno']['items']['properties']['samplegeno_sex'] = {  # noqa structure is there
+            'title': 'Sex',
+            'description': 'Sex of the donor of this sample ID',
+            'type': 'string',
+            'enum': ['M', 'F', 'U']  # XXX: what others should be included?
+        }
+
+        # adds annotation ID field, effectively making display_title a primary key constraint
+        self.add_identifier_field(schema['properties'])
 
         # helper so variant facets work on variant sample
         # XXX: Behavior needs testing
@@ -469,8 +547,11 @@ class MappingTableParser(object):
         variant_facs = format_variant_cols_or_facs(variant_facs)
         cols.update(variant_cols)  # add variant stuff since we are embedding this info
         facs.update(variant_facs)
+        self.add_extra_variant_sample_columns(cols)
         schema['columns'] = cols
         schema['facets'] = facs
+        schema['facets'] = self.sort_schema_properties(schema, key='facets')
+        schema['columns'] = self.sort_schema_properties(schema, key='columns')
         logger.info('Built variant_sample schema')
         return schema
 
@@ -487,6 +568,7 @@ class MappingTableParser(object):
         """
         schema = {}
         self.add_default_schema_fields(schema)
+        self.add_variant_required_fields(schema)
         schema['title'] = 'Variants'
         schema['description'] = "Schema for variants"
         schema['id'] = '/profiles/variant.json'
@@ -494,17 +576,37 @@ class MappingTableParser(object):
         schema['properties']['schema_version'] = {'default': '1'}
         schema['facets'] = facs
         schema['columns'] = cols
+        schema['facets'] = self.sort_schema_properties(schema, key='facets')
+        schema['columns'] = self.sort_schema_properties(schema, key='columns')
+        # adds annotation ID field, effectively making display_title a primary key constraint
+        self.add_identifier_field(schema['properties'])
         logger.info('Build variant schema')
         return schema
 
     @staticmethod
-    def write_schema(schema, fname):
+    def sort_schema_properties(schema, key='properties'):
+        """ Helper method that sorts schema properties by key by inserting sorted key, values into a new
+            dictionary (since in Python3.6>= all dicts are ordered). Schemas from this point forward
+            will have their properties sorted alphabetically so it is easier to visualize changes.
+
+        Args:
+            schema: schema with key 'properties' to be sorted
+            key: optional arg to use as key to resolve dictionary to sort, intended to allow us to sort
+            properties, columns and facets
+        """
+        sorted_properties = {}
+        for key, value in sorted(schema[key].items()):
+            sorted_properties[key] = value
+        return sorted_properties
+
+    def write_schema(self, schema, fname):
         """ Writes the given schema (JSON) to the given file 'fname'
 
         Args:
             schema: dictionary to write as json as the schema
             fname: file to write out to
         """
+        schema['properties'] = self.sort_schema_properties(schema)
         with open(fname, 'w+') as out:
             json.dump(schema, out, indent=4)
         logger.info('Successfully wrote schema: %s to file: %s\n' % (schema['title'], fname))
@@ -568,7 +670,7 @@ def main():
 
     """
     logging.basicConfig()
-    parser = argparse.ArgumentParser(
+    parser = argparse.ArgumentParser(  # noqa - PyCharm wrongly thinks the formatter_class is invalid
         description="Takes in a mapping table and produces inserts/schemas",
         epilog=EPILOG,
         formatter_class=argparse.RawDescriptionHelpFormatter

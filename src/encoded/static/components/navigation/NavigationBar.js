@@ -6,7 +6,7 @@ import _ from 'underscore';
 import Navbar from 'react-bootstrap/esm/Navbar';
 import { console } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { CGAPLogo } from './../viz/CGAPLogo';
-import { TestWarning, HelpNavItem, UserActionDropdownMenu, CollapsedNav } from './components';
+import { TestWarning, CollapsedNav } from './components';
 
 
 /**
@@ -53,9 +53,6 @@ export class NavigationBar extends React.PureComponent {
 
     /**
      * Initializes scroll event handler & loading of help menu tree.
-     *
-     * @private
-     * @returns {void}
      */
     componentDidMount(){
         this.setState({ 'mounted' : true });
@@ -63,9 +60,6 @@ export class NavigationBar extends React.PureComponent {
 
     /**
      * Re-loads help menu tree if session (user login state) has changed.
-     *
-     * @private
-     * @returns {void}
      */
     componentDidUpdate(prevProps, prevState){
         const { href, session } = this.props;
@@ -107,7 +101,7 @@ export class NavigationBar extends React.PureComponent {
                                 <i className="icon icon-bars icon-fw fas" />
                             </Navbar.Toggle>
 
-                            <CollapsedNav {...this.state} {...this.props} />
+                            <CollapsedNav {...this.state} {...this.props} testWarningVisible={testWarningVisible} />
                         </Navbar>
                     </div>
                 </div>

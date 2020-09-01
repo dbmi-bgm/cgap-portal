@@ -205,7 +205,7 @@ def test_post_object_with_child(content_with_child, testapp):
         ]
     }
     res = testapp.post_json('/testing-link-targets', edit, status=422).json
-    assert len(res['errors']) ==1
+    assert len(res['errors']) == 1
     assert res['errors'][0]['description'] == 'submission of calculatedProperty disallowed'
     assert res['errors'][0]['name'] == 'Schema: reverse'
 

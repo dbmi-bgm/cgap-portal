@@ -198,7 +198,7 @@ export default class DefaultItemView extends React.PureComponent {
     }
 
     /**
-     * Returns a list of _common_ tab definitions - `AttributionTabView`, `ItemDetailList`
+     * Returns a list of _common_ tab definitions - `ItemDetailList`
      * DO NOT EXTEND.
      *
      * @protected
@@ -208,11 +208,6 @@ export default class DefaultItemView extends React.PureComponent {
     getCommonTabs(){
         const { context, schemas, windowWidth } = this.props;
         const returnArr = [];
-
-        // Attribution Tab
-        //if (context.lab || context.submitted_by || context.publications_of_set || context.produced_in_pub){
-        //    returnArr.push(AttributionTabView.getTabObject(this.props));
-        //}
 
         returnArr.push(DetailsTabView.getTabObject(this.props));
 
@@ -238,9 +233,6 @@ export default class DefaultItemView extends React.PureComponent {
 
         returnArr.push(DetailsTabView.getTabObject(this.props));
 
-        //if (context.lab || context.submitted_by || context.publications_of_set || context.produced_in_pub){
-        //    returnArr.push(AttributionTabView.getTabObject(this.props));
-        //}
         return returnArr;
     }
 
@@ -355,7 +347,7 @@ export default class DefaultItemView extends React.PureComponent {
         }
         return (
             <div className={DefaultItemView.className(context)} id="content">
-                <div id="item-page-alerts-container">
+                <div id="full-alerts-container">
                     <Alerts alerts={alerts} className="alerts" />
                 </div>
                 { innerBody }
@@ -423,7 +415,7 @@ export class ItemActionsTab extends React.PureComponent {
         'itemActionsExtras': {
             'edit'      : {
                 description: 'Edit the properties of this Item.',
-                icon: "pencil fas"
+                icon: "pencil-alt fas"
             },
             'create'    : {
                 description: 'Create a blank new Item of the same type.',

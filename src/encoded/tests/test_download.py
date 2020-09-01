@@ -1,5 +1,8 @@
-from base64 import b64decode
 import pytest
+
+from base64 import b64decode
+
+
 pytestmark = [pytest.mark.working, pytest.mark.setone]
 
 
@@ -59,7 +62,6 @@ def test_download_create(testapp, testing_download):
 
 
 def test_download_update(testapp, testing_download):
-    from base64 import b64decode
     item = {
         'attachment': {
             'download': 'blue-dot.png',
@@ -152,7 +154,7 @@ def test_download_remove_one(testapp, testing_download):
     assert 'attachment2' not in res.json
 
     url = testing_download + '/@@download/attachment2/red-dot.png'
-    res = testapp.get(url, status=404)
+    testapp.get(url, status=404)
 
 
 @pytest.mark.parametrize(

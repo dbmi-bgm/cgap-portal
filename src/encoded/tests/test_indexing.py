@@ -6,6 +6,7 @@ elasticsearch running as subprocesses.
 import json
 import os
 import pytest
+import re
 import time
 import transaction
 import uuid
@@ -21,15 +22,27 @@ from snovault.elasticsearch.create_mapping import (
 )
 from snovault.elasticsearch.interfaces import INDEXER_QUEUE
 from snovault.elasticsearch.indexer_utils import get_namespaced_index
-from sqlalchemy import MetaData
+from sqlalchemy import MetaData, func
 from timeit import default_timer as timer
 from unittest import mock
 from zope.sqlalchemy import mark_changed
-from .. import main
+from .. import main, loadxl
 from ..verifier import verify_item
 
 
 pytestmark = [pytest.mark.working, pytest.mark.indexing, pytest.mark.flaky]
+
+
+POSTGRES_MAJOR_VERSION_EXPECTED = 11
+
+
+def test_postgres_version(session):
+
+    (version_info,) = session.query(func.version()).one()
+    print("version_info=", version_info)
+    assert isinstance(version_info, str)
+    assert re.match("PostgreSQL %s([.][0-9]+)? " % POSTGRES_MAJOR_VERSION_EXPECTED, version_info)
+
 
 # subset of collections to run test on
 TEST_COLLECTIONS = ['testing_post_put_patch', 'file_processed']
@@ -64,7 +77,8 @@ def setup_and_teardown(app):
     # AFTER THE TEST
     session = app.registry[DBSESSION]
     connection = session.connection().connect()
-    meta = MetaData(bind=session.connection(), reflect=True)
+    meta = MetaData(bind=session.connection())
+    meta.reflect()
     for table in meta.sorted_tables:
         print('Clear table %s' % table)
         print('Count before -->', str(connection.scalar("SELECT COUNT(*) FROM %s" % table)))
@@ -134,7 +148,7 @@ def test_create_mapping_on_indexing(app, testapp, registry, elasticsearch):
         try:
             namespaced_index = get_namespaced_index(app, item_type)
             item_index = es.indices.get(index=namespaced_index)
-        except:
+        except Exception:
             assert False
         found_index_mapping_emb = item_index[namespaced_index]['mappings'][item_type]['properties']['embedded']
         found_index_settings = item_index[namespaced_index]['settings']
@@ -244,7 +258,7 @@ def test_real_validation_error(app, indexer_testapp, testapp, institution,
     assert val_err_view['validation_errors'] == es_res['_source']['validation_errors']
 
 
-# @pytest.mark.performance
+@pytest.mark.performance
 @pytest.mark.skip(reason="need to update perf-testing inserts")
 def test_load_and_index_perf_data(testapp, indexer_testapp):
     '''
@@ -276,7 +290,7 @@ def test_load_and_index_perf_data(testapp, indexer_testapp):
 
     # load -em up
     start = timer()
-    with mock.patch('encoded.loadxl.get_app') as mocked_app:
+    with mock.patch.object(loadxl, 'get_app') as mocked_app:
         mocked_app.return_value = testapp.app
         data = {'store': json_inserts}
         res = testapp.post_json('/load_data', data,  # status=200

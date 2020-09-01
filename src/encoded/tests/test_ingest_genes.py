@@ -1,5 +1,5 @@
 import pytest
-from encoded.tests.variant_fixtures import test_genes, GENE_URL  # noqa (fixture)
+from .variant_fixtures import test_genes, GENE_URL  # noqa (fixture)
 
 
 pytestmark = [pytest.mark.working, pytest.mark.ingestion]

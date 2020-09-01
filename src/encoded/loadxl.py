@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
 """Load collections and determine the order."""
-import mimetypes
-import structlog
-import magic
+
 import json
+import magic
+import mimetypes
 import os
+import structlog
+import webtest
 
 from base64 import b64encode
 from past.builtins import basestring
@@ -14,7 +16,6 @@ from pyramid.paster import get_app
 from pyramid.response import Response
 from pyramid.view import view_config
 from snovault.util import debug_log
-from webtest import TestApp
 from .server_defaults import add_last_modified
 
 
@@ -30,22 +31,12 @@ def includeme(config):
 
 # order of items references with linkTo in a field in  'required' in schemas
 ORDER = [
-    'user',
     'project',
     'institution',
+    'user',
     'file_format',
-    'phenotype',
-    'disorder',
-    # 'variant_consequence',
-    # 'variant', # links to ^ variant_consequence
-    # 'variant_sample', # links to ^ variant
-    'cohort',
-    'family',
-    'individual',
-    'case',
-    'report',
-    'sample',
     'workflow',
+    'variant'
 ]
 
 IS_ATTACHMENT = [
@@ -109,7 +100,7 @@ def load_data_view(context, request):
     post_only = request.json.get('post_only', False)
     app = get_app(config_uri, 'app')
     environ = {'HTTP_ACCEPT': 'application/json', 'REMOTE_USER': 'TEST'}
-    testapp = TestApp(app, environ)
+    testapp = webtest.TestApp(app, environ)
     # expected response
     request.response.status = 200
     result = {
@@ -404,7 +395,7 @@ def load_all_gen(testapp, inserts, docsdir, overwrite=True, itype=None, from_jso
                         # 301 because @id is the existing item path, not uuid
                         testapp.get('/'+an_item['uuid'], status=[200, 301])
                         exists = True
-                    except:
+                    except Exception:
                         pass
                 # skip the items that exists
                 # if overwrite=True, still include them in PATCH round
@@ -483,7 +474,7 @@ def load_data(app, indir='inserts', docsdir=None, overwrite=False,
         'HTTP_ACCEPT': 'application/json',
         'REMOTE_USER': 'TEST',
     }
-    testapp = TestApp(app, environ)
+    testapp = webtest.TestApp(app, environ)
     # load master-inserts by default
     if indir != 'master-inserts' and use_master_inserts:
         master_inserts = resource_filename('encoded', 'tests/data/master-inserts/')
@@ -523,23 +514,30 @@ def load_test_data(app, overwrite=False):
 
 def load_local_data(app, overwrite=False):
     """
-    Load temp-local-inserts. If not present, load inserts and master-inserts
+    Load inserts from temporary insert folders, if present and populated
+    with .json insert files.
+    If not present, load inserts and master-inserts.
 
     Returns:
         None if successful, otherwise Exception encountered
     """
-    # if we have any json files in temp-local-inserts, use those
-    chk_dir = resource_filename('encoded', 'tests/data/temp-local-inserts')
-    use_temp_local = False
-    for (dirpath, dirnames, filenames) in os.walk(chk_dir):
-        use_temp_local = any([fn for fn in filenames if fn.endswith('.json')])
 
-    if use_temp_local:
-        return load_data(app, docsdir='documents', indir='temp-local-inserts',
-                         use_master_inserts=False, overwrite=overwrite)
-    else:
-        return load_data(app, docsdir='documents', indir='inserts',
-                         overwrite=overwrite)
+    test_insert_dirs = [
+        'temp-local-inserts',
+        'demo_inserts'
+    ]
+
+    for test_insert_dir in test_insert_dirs:
+        chk_dir = resource_filename('encoded', "tests/data/" + test_insert_dir)
+        for (dirpath, dirnames, filenames) in os.walk(chk_dir):
+            if any([fn for fn in filenames if fn.endswith('.json')]):
+                logger.info('Loading inserts from "{}" directory.'.format(test_insert_dir))
+                return load_data(app, docsdir='documents', indir=test_insert_dir,
+                            use_master_inserts=True, overwrite=overwrite)
+
+    # Default to 'inserts' if no temp inserts found.
+    return load_data(app, docsdir='documents', indir='inserts',
+                         use_master_inserts=True, overwrite=overwrite)
 
 
 def load_prod_data(app, overwrite=False):

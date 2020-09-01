@@ -1,21 +1,22 @@
+import mimetypes
+import structlog
+
+from base64 import b64encode
+from datetime import datetime
+from dateutil.relativedelta import relativedelta
+from pyramid.httpexceptions import HTTPUnprocessableEntity
+from pyramid.paster import get_app
+from pyramid.view import view_config
 from snovault import (
     calculated_property,
     collection,
     load_schema,
-    CONNECTION,
-    COLLECTIONS,
-    display_title_schema
 )
 from snovault.util import debug_log
-from .base import (
-    Item,
-    get_item_or_none
-)
-from pyramid.httpexceptions import HTTPUnprocessableEntity
-from pyramid.view import view_config
-from datetime import datetime
-from dateutil.relativedelta import relativedelta
-import structlog
+from webtest import TestApp
+from xml.etree.ElementTree import fromstring
+from .base import Item
+from ..util import get_trusted_email
 
 
 log = structlog.getLogger(__name__)
@@ -33,74 +34,7 @@ class Cohort(Item):
     name_key = 'accession'
     schema = load_schema('encoded:schemas/cohort.json')
     embedded_list = [
-        "families.members.accession",
-        "families.members.father",
-        "families.members.mother",
-        "families.members.status",
-        "families.members.sex",
-        "families.members.is_deceased",
-        "families.members.is_pregnancy",
-        "families.members.is_termination_of_pregnancy",
-        "families.members.is_spontaneous_abortion",
-        "families.members.is_still_birth",
-        "families.members.cause_of_death",
-        "families.members.age",
-        "families.members.age_units",
-        "families.members.age_at_death",
-        "families.members.age_at_death_units",
-        "families.members.is_no_children_by_choice",
-        "families.members.is_infertile",
-        "families.members.cause_of_infertility",
-        "families.members.ancestry",
-        "families.members.clinic_notes",
-        "families.members.phenotypic_features.phenotypic_feature",
-        "families.members.phenotypic_features.onset_age",
-        "families.members.phenotypic_features.onset_age_units",
-        "families.members.samples.status",
-        "families.members.samples.specimen_type",
-        "families.members.samples.specimen_notes",
-        "families.members.samples.specimen_collection_date",
-        "families.members.samples.workup_type",
-        "families.members.samples.processed_files",
-        "families.members.samples.processed_files.workflow_run_outputs",
-        "families.members.samples.processed_files.quality_metric",
-        "families.members.samples.processed_files.quality_metric.qc_list.qc_type",
-        "families.members.samples.processed_files.quality_metric.qc_list.value.overall_quality_status",
-        "families.members.samples.processed_files.quality_metric.qc_list.value.url",
-        "families.members.samples.processed_files.quality_metric.qc_list.value.status",
-        "families.members.samples.processed_files.quality_metric.overall_quality_status",
-        "families.members.samples.processed_files.quality_metric.url",
-        "families.members.samples.processed_files.quality_metric.status",
-        "families.members.samples.files.quality_metric",
-        "families.members.samples.files.quality_metric.qc_list.qc_type",
-        "families.members.samples.files.quality_metric.qc_list.value.overall_quality_status",
-        "families.members.samples.files.quality_metric.qc_list.value.url",
-        "families.members.samples.files.quality_metric.qc_list.value.status",
-        "families.members.samples.files.quality_metric.overall_quality_status",
-        "families.members.samples.files.quality_metric.url",
-        "families.members.samples.files.quality_metric.status",
-        "families.members.samples.completed_processes",
-        "sample_processes.samples.accession",
-        "sample_processes.processed_files",
-        "sample_processes.processed_files.quality_metric",
-        "sample_processes.processed_files.quality_metric.qc_list.qc_type",
-        "sample_processes.processed_files.quality_metric.qc_list.value.overall_quality_status",
-        "sample_processes.processed_files.quality_metric.qc_list.value.url",
-        "sample_processes.processed_files.quality_metric.qc_list.value.status",
-        "sample_processes.processed_files.quality_metric.overall_quality_status",
-        "sample_processes.processed_files.quality_metric.url",
-        "sample_processes.processed_files.quality_metric.status",
-        "sample_processes.sample_processed_files",
-        "sample_processes.sample_processed_files.sample.accession",
-        "sample_processes.sample_processed_files.processed_files.quality_metric",
-        "sample_processes.sample_processed_files.processed_files.quality_metric.qc_list.qc_type",
-        "sample_processes.sample_processed_files.processed_files.quality_metric.qc_list.value.overall_quality_status",
-        "sample_processes.sample_processed_files.processed_files.quality_metric.qc_list.value.url",
-        "sample_processes.sample_processed_files.processed_files.quality_metric.qc_list.value.status",
-        "sample_processes.sample_processed_files.processed_files.quality_metric.overall_quality_status",
-        "sample_processes.sample_processed_files.processed_files.quality_metric.url",
-        "sample_processes.sample_processed_files.processed_files.quality_metric.status",
-        "sample_processes.completed_processes",
+        
     ]
 
     @calculated_property(schema={
@@ -113,7 +47,7 @@ class Cohort(Item):
     @calculated_property(schema={
         "title": "Phenotypic features",
         "description": "Phenotypic features that define the cohort",
-        "type" : "array",
+        "type": "array",
         "items": {
             "title": "Phenotypic feature",
             "type": "string",
@@ -160,11 +94,6 @@ def process_pedigree(context, request):
     Raises:
         HTTPUnprocessableEntity: on an error. Extra information may be logged
     """
-    import mimetypes
-    from pyramid.paster import get_app
-    from webtest import TestApp
-    from base64 import b64encode
-    from xml.etree.ElementTree import fromstring
 
     cohort = str(context.uuid)  # used in logging
 
@@ -187,17 +116,7 @@ def process_pedigree(context, request):
     ped_timestamp = ped_datetime.isoformat() + '+00:00'
     app = get_app(config_uri, 'app')
     # get user email for TestApp authentication
-    email = getattr(request, '_auth0_authenticated', None)
-    if not email:
-        user_uuid = None
-        for principal in request.effective_principals:
-            if principal.startswith('userid.'):
-                user_uuid = principal[7:]
-                break
-        if not user_uuid:
-            raise HTTPUnprocessableEntity('Cohort %s: Must provide authentication' % cohort)
-        user_props = get_item_or_none(request, user_uuid)
-        email = user_props['email']
+    email = get_trusted_email(request, context="Cohort %s" % cohort)
     environ = {'HTTP_ACCEPT': 'application/json', 'REMOTE_USER': email}
     testapp = TestApp(app, environ)
 
@@ -226,7 +145,7 @@ def process_pedigree(context, request):
     xml_extra = {'ped_datetime': ped_datetime}
 
     family_uuids = create_family_proband(testapp, xml_data, refs, 'managedObjectID',
-                                   cohort, post_extra, xml_extra)
+                                         cohort, post_extra, xml_extra)
 
     # create Document for input pedigree file
     # pbxml files are not handled by default. Do some mimetype processing
@@ -291,7 +210,7 @@ def process_pedigree(context, request):
 
 
 #####################################
-### Pedigree processing functions ###
+# ## Pedigree processing functions ###
 #####################################
 
 
@@ -748,7 +667,7 @@ def create_family_proband(testapp, xml_data, refs, ref_field, cohort,
                         if ref_val is not None and 'xml_ref_fxn' in converted_dict:
                             # will update data in place
                             converted_dict['xml_ref_fxn'](testapp, ref_val, refs, data,
-                                                     cohort, uuids_by_ref)
+                                                          cohort, uuids_by_ref)
                         elif ref_val is not None:
                             data[converted_dict['corresponds_to']] = uuids_by_ref[ref_val]
 
@@ -797,7 +716,7 @@ def create_family_proband(testapp, xml_data, refs, ref_field, cohort,
     # invert uuids_by_ref to sort family members by managedObjectID (xml ref)
     refs_by_uuid = {v: k for k, v in uuids_by_ref.items()}
     family = {'members': sorted([m['uuid'] for m in family_members.values()],
-                                 key=lambda v: int(refs_by_uuid[v]))}
+                                key=lambda v: int(refs_by_uuid[v]))}
     if proband and proband in family_members:
         family['proband'] = family_members[proband]['uuid']
     else:

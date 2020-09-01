@@ -1,22 +1,26 @@
 import pytest
-import copy
+
+from uuid import uuid4
 
 
 ORDER = [
-    'user', 'project', 'institution', 'file_format', 'variant_consequence', 'phenotype',
-    'cohort', 'family', 'individual', 'sample', 'workflow', 'access_key', 'disorder',
-    'document', 'file_fastq', 'file_processed', 'file_reference', 'gene', 'sample_processing',
-    'case', 'filter_set', 'report', 'page', 'quality_metric_fastqc', 'evidence_dis_pheno',
+    'user', 'project', 'institution', 'filter_set', 'nexus',
+    'file_format', 'variant_consequence', 'phenotype',
+    'cohort', 'family', 'individual', 'sample', 'workflow',
+    'access_key', 'disorder', 'document', 'file_fastq',
+    'file_processed', 'file_reference', 'gene', 'sample_processing',
+    'case', 'report', 'page', 'quality_metric_fastqc', 'evidence_dis_pheno',
     'quality_metric_bamcheck', 'quality_metric_qclist', 'quality_metric_wgs_bamqc',
-    'quality_metric_cmphet',
-    'quality_metric_vcfcheck', 'quality_metric_workflowrun', 'software', 'static_section',
-    'tracking_item', 'workflow_mapping', 'workflow_run_awsem',
-    'workflow_run', 'annotation_field', 'variant_sample', 'variant', 'gene_annotation_field',
-    'gene',
+    'quality_metric_cmphet', 'quality_metric_vcfcheck', 'quality_metric_workflowrun',
+    'quality_metric_vcfqc', 'quality_metric_bamqc',
+    'software', 'static_section', 'tracking_item', 'workflow_mapping',
+    'workflow_run_awsem', 'workflow_run', 'annotation_field', 'variant_sample',
+    'variant', 'gene_annotation_field', 'gene',
 ]
 
 
 class MockedLogger(object):
+
     def info(self, msg):
         print('INFO: ' + msg)
 
@@ -141,10 +145,121 @@ def access_key(testapp, submitter):
     return result
 
 
+# ADD SAMPLES FOR FAMILY MEMBERS
 @pytest.fixture
-def female_individual(testapp, project, institution):
+def female_individual_sample(testapp, project, institution):
     item = {
-        "accession": "GAPINOOOAAQ1",
+        "accession": "GAPSAGRANDMA",
+        'project': project['@id'],
+        'institution': institution['@id'],
+        "bam_sample_id": "ext_id_001",
+        "status": "released"
+    }
+    return testapp.post_json('/sample', item).json['@graph'][0]
+
+
+@pytest.fixture
+def grandpa_sample(testapp, project, institution):
+    item = {
+        "accession": "GAPSAGRANDPA",
+        'project': project['@id'],
+        'institution': institution['@id'],
+        "bam_sample_id": "ext_id_002",
+        "status": "released"
+    }
+    return testapp.post_json('/sample', item).json['@graph'][0]
+
+
+@pytest.fixture
+def mother_sample(testapp, project, institution):
+    item = {
+        "accession": "GAPSAMOTHER1",
+        'project': project['@id'],
+        'institution': institution['@id'],
+        "bam_sample_id": "ext_id_003",
+        "status": "released"
+    }
+    return testapp.post_json('/sample', item).json['@graph'][0]
+
+
+@pytest.fixture
+def father_sample(testapp, project, institution):
+    item = {
+        "accession": "GAPSAFATHER1",
+        'project': project['@id'],
+        'institution': institution['@id'],
+        "bam_sample_id": "ext_id_004",
+        "status": "released"
+    }
+    return testapp.post_json('/sample', item).json['@graph'][0]
+
+
+@pytest.fixture
+def uncle_sample(testapp, project, institution):
+    item = {
+        "accession": "GAPSAUNCLE01",
+        'project': project['@id'],
+        'institution': institution['@id'],
+        "bam_sample_id": "ext_id_005",
+        "status": "released"
+    }
+    return testapp.post_json('/sample', item).json['@graph'][0]
+
+
+@pytest.fixture
+def child_sample(testapp, project, institution):
+    item = {
+        "accession": "GAPSAPROBAND",
+        'project': project['@id'],
+        'institution': institution['@id'],
+        "bam_sample_id": "ext_id_006",
+        "status": "released"
+    }
+    return testapp.post_json('/sample', item).json['@graph'][0]
+
+
+@pytest.fixture
+def cousin_sample(testapp, project, institution):
+    item = {
+        "accession": "GAPSACOUSIN1",
+        'project': project['@id'],
+        'institution': institution['@id'],
+        "bam_sample_id": "ext_id_007",
+        "status": "released"
+    }
+    return testapp.post_json('/sample', item).json['@graph'][0]
+
+
+@pytest.fixture
+def sister_sample(testapp, project, institution):
+    item = {
+        "accession": "GAPSAHALFSIS",
+        'project': project['@id'],
+        'institution': institution['@id'],
+        "bam_sample_id": "ext_id_008",
+        "status": "released"
+    }
+    return testapp.post_json('/sample', item).json['@graph'][0]
+
+
+@pytest.fixture
+def brother_sample(testapp, project, institution):
+    item = {
+        "accession": "GAPSABROTHER",
+        'project': project['@id'],
+        'institution': institution['@id'],
+        "bam_sample_id": "ext_id_009",
+        "status": "released"
+    }
+    return testapp.post_json('/sample', item).json['@graph'][0]
+
+
+# ADD FAMILY MEMBERS
+@pytest.fixture
+def female_individual(testapp, project, institution, female_individual_sample):
+    item = {
+        "accession": "GAPIDGRANDMA",
+        "samples": [female_individual_sample['@id']],
         "age": 53,
         "age_units": "year",
         'project': project['@id'],
@@ -157,8 +272,10 @@ def female_individual(testapp, project, institution):
 
 
 @pytest.fixture
-def grandpa(testapp, project, institution):
+def grandpa(testapp, project, institution, grandpa_sample):
     item = {
+        "accession": "GAPIDGRANDPA",
+        "samples": [grandpa_sample['@id']],
         "age": 53,
         "age_units": "year",
         'project': project['@id'],
@@ -170,8 +287,11 @@ def grandpa(testapp, project, institution):
 
 
 @pytest.fixture
-def mother(testapp, project, institution, grandpa, female_individual):
+def mother(testapp, project, institution, grandpa, female_individual, mother_sample):
     item = {
+        "aliases": ["test-project:indiv-003389"],
+        "accession": "GAPIDMOTHER1",
+        "samples": [mother_sample['@id']],
         "age": 33,
         "age_units": "year",
         'project': project['@id'],
@@ -184,8 +304,10 @@ def mother(testapp, project, institution, grandpa, female_individual):
 
 
 @pytest.fixture
-def father(testapp, project, institution):
+def father(testapp, project, institution, father_sample):
     item = {
+        "accession": "GAPIDFATHER1",
+        "samples": [father_sample['@id']],
         "age": 33,
         "age_units": "year",
         'project': project['@id'],
@@ -196,8 +318,10 @@ def father(testapp, project, institution):
 
 
 @pytest.fixture
-def uncle(testapp, project, institution, grandpa):
+def uncle(testapp, project, institution, grandpa, uncle_sample):
     item = {
+        "accession": "GAPIDUNCLE01",
+        "samples": [uncle_sample['@id']],
         "age": 35,
         "age_units": "year",
         'project': project['@id'],
@@ -209,8 +333,10 @@ def uncle(testapp, project, institution, grandpa):
 
 
 @pytest.fixture
-def child(testapp, project, institution, mother, father):
+def child(testapp, project, institution, mother, father, child_sample):
     item = {
+        "accession": "GAPIDPROBAND",
+        "samples": [child_sample['@id']],
         "age": 7,
         "age_units": "year",
         'project': project['@id'],
@@ -223,8 +349,10 @@ def child(testapp, project, institution, mother, father):
 
 
 @pytest.fixture
-def cousin(testapp, project, institution, uncle):
+def cousin(testapp, project, institution, uncle, cousin_sample):
     item = {
+        "accession": "GAPIDCOUSIN1",
+        "samples": [cousin_sample['@id']],
         "age": 11,
         "age_units": "year",
         'project': project['@id'],
@@ -236,8 +364,10 @@ def cousin(testapp, project, institution, uncle):
 
 
 @pytest.fixture
-def sister(testapp, project, institution, mother):
+def sister(testapp, project, institution, mother, sister_sample):
     item = {
+        "accession": "GAPIDHALFSIS",
+        "samples": [sister_sample['@id']],
         "age": 11,
         "age_units": "year",
         'project': project['@id'],
@@ -249,7 +379,24 @@ def sister(testapp, project, institution, mother):
 
 
 @pytest.fixture
-def fam(testapp, project, female_individual, institution, grandpa, mother, father, uncle, child, cousin, sister):
+def brother(testapp, project, institution, mother, father, brother_sample):
+    item = {
+        "accession": "GAPIDBROTHER",
+        "samples": [brother_sample['@id']],
+        "age": 13,
+        "age_units": "year",
+        'project': project['@id'],
+        'institution': institution['@id'],
+        "sex": "M",
+        "mother": mother['@id'],
+        "father": father['@id']
+    }
+    return testapp.post_json('/individual', item).json['@graph'][0]
+
+
+@pytest.fixture
+def fam(testapp, project, female_individual, institution, grandpa, mother, father, uncle,
+        child, cousin, sister, brother):
     item = {
         "project": project['@id'],
         "institution": institution['@id'],
@@ -258,6 +405,7 @@ def fam(testapp, project, female_individual, institution, grandpa, mother, fathe
         "members": [
             child['@id'],
             sister['@id'],
+            brother['@id'],
             mother['@id'],
             father['@id'],
             uncle['@id'],
@@ -270,6 +418,57 @@ def fam(testapp, project, female_individual, institution, grandpa, mother, fathe
 
 
 @pytest.fixture
+def sample_proc_fam(testapp, project, institution, fam):
+    data = {
+        'project': project['@id'],
+        'institution': institution['@id'],
+        'analysis_type': "WGS-Group",
+        'samples': [
+            "GAPSAPROBAND",
+            "GAPSAFATHER1",
+            "GAPSAMOTHER1",
+            "GAPSABROTHER",
+            "GAPSAGRANDPA",
+            "GAPSAGRANDMA",
+            "GAPSAHALFSIS",
+            "GAPSAUNCLE01",
+            "GAPSACOUSIN1"
+            ],
+        'families': [fam['@id']]
+    }
+    res = testapp.post_json('/sample_processing', data).json['@graph'][0]
+    return res
+
+
+@pytest.fixture
+def proband_case(testapp, project, institution, fam, sample_proc_fam):
+    data = {
+        "accession": "GAPCAP4E4GMG",
+        'project': project['@id'],
+        'institution': institution['@id'],
+        'family': fam['@id'],
+        'individual': 'GAPIDPROBAND',
+        'sample_processing': sample_proc_fam['@id']
+    }
+    res = testapp.post_json('/case', data).json['@graph'][0]
+    return res
+
+
+@pytest.fixture
+def mother_case(testapp, project, institution, fam, sample_proc_fam):
+    data = {
+        "accession": "GAPCAU1K3F5A",
+        'project': project['@id'],
+        'institution': institution['@id'],
+        'family': fam['@id'],
+        'individual': 'GAPIDMOTHER1',
+        'sample_processing': sample_proc_fam['@id']
+    }
+    res = testapp.post_json('/case', data).json['@graph'][0]
+    return res
+
+
+@pytest.fixture
 def sample_f(testapp, project, institution, female_individual):
     data = {
         'project': project['@id'],
@@ -278,6 +477,7 @@ def sample_f(testapp, project, institution, female_individual):
         'date_received': '2015-12-7'
     }
     return testapp.post_json('/sample', data).json['@graph'][0]
+
 
 @pytest.fixture
 def sample_proc(testapp, project, institution, sample_f, fam):
@@ -316,7 +516,6 @@ def protocol(testapp, protocol_data):
 
 @pytest.fixture
 def file_formats(testapp, institution, project):
-    from uuid import uuid4
     formats = {}
     ef_format_info = {
         # 'pairs_px2': {'standard_file_extension': 'pairs.gz.px2',
@@ -357,7 +556,9 @@ def file_formats(testapp, institution, project):
                    "valid_item_types": ["FileProcessed", "FileReference"]},
         'bed': {"standard_file_extension": "bed.gz",
                 "extrafile_formats": ['beddb'],
-                "valid_item_types": ["FileProcessed", "FileReference"]}
+                "valid_item_types": ["FileProcessed", "FileReference"]},
+        'vcf_gz': {"standard_file_extension": "vcf.gz",
+                   "valid_item_types": ["FileProcessed"]}
     }
 
     for eff, info in ef_format_info.items():
@@ -402,6 +603,18 @@ def file_fastq(testapp, institution, project, file_formats):
         'status': 'uploaded',  # avoid s3 upload codepath
     }
     return testapp.post_json('/file_fastq', item).json['@graph'][0]
+
+
+@pytest.fixture
+def file_vcf(testapp, institution, project, file_formats):
+    item = {
+        'file_format': file_formats.get('vcf_gz').get('@id'),
+        'md5sum': 'd41d8cd9f00b204e9800998ecf84211',
+        'institution': institution['@id'],
+        'project': project['@id'],
+        'status': 'uploaded',  # avoid s3 upload codepath
+    }
+    return testapp.post_json('/file_processed', item).json['@graph'][0]
 
 
 RED_DOT = """data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUA

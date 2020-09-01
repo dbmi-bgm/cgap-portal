@@ -1,7 +1,19 @@
 import json
+import boto3
+import pytz
+import datetime
 from pyramid.view import view_config
+from pyramid.settings import asbool
+from urllib.parse import (
+    parse_qs,
+    urlparse,
+)
+from pyramid.httpexceptions import (
+    HTTPTemporaryRedirect
+)
+from snovault.calculated import calculate_properties
 from snovault.util import debug_log
-from encoded.util import resolve_file_path
+from ..util import resolve_file_path
 from snovault import (
     calculated_property,
     collection,
@@ -11,6 +23,10 @@ from .base import (
     Item,
     get_item_or_none,
 )
+
+
+ANNOTATION_ID = 'annotation_id'
+ANNOTATION_ID_SEP = '_'
 
 
 def extend_embedded_list(embedded_list, fd, typ, prefix=None):
@@ -56,7 +72,9 @@ def build_variant_sample_embedded_list():
 
         :returns: list of embeds from 'variant' linkTo
     """
-    embedded_list = []
+    embedded_list = [
+        "cmphet.*"
+    ]
     with open(resolve_file_path('schemas/variant_embeds.json'), 'r') as fd:
         extend_embedded_list(embedded_list, fd, 'variant', prefix='variant.')
     with open(resolve_file_path('schemas/variant_sample_embeds.json'), 'r') as fd:
@@ -64,18 +82,43 @@ def build_variant_sample_embedded_list():
     return ['variant.*'] + embedded_list + Item.embedded_list
 
 
+def build_variant_display_title(chrom, pos, ref, alt, sep='>'):
+    """ Builds the variant display title. """
+    return 'chr%s:%s%s%s%s' % (
+        chrom,
+        pos,
+        ref,
+        sep,
+        alt
+    )
+
+
 @collection(
     name='variants',
     properties={
         'title': 'Variants',
         'description': 'List of all variants'
-    })
+    },
+    unique_key='variant:annotation_id')
 class Variant(Item):
     """ Variant class """
 
     item_type = 'variant'
+    name_key = 'annotation_id'
     schema = load_schema('encoded:schemas/variant.json')
     embedded_list = build_variant_embedded_list()
+
+    @classmethod
+    def create(cls, registry, uuid, properties, sheets=None):
+        """ Sets the annotation_id field on this variant prior to passing on. """
+        properties[ANNOTATION_ID] = build_variant_display_title(
+            properties['CHROM'],
+            properties['POS'],
+            properties['REF'],
+            properties['ALT'],
+            sep=ANNOTATION_ID_SEP  # XXX: replace _ with >  to get display_title('>' char is restricted)
+        )
+        return super().create(registry, uuid, properties, sheets)
 
     @calculated_property(schema={
         "title": "Display Title",
@@ -83,7 +126,7 @@ class Variant(Item):
         "type": "string"
     })
     def display_title(self, CHROM, POS, REF, ALT):
-        return 'chr%s:%s%s>%s' % (CHROM, POS, REF, ALT)  # chr1:504A>T
+        return build_variant_display_title(CHROM, POS, REF, ALT)  # chr1:504A>T
 
 
 @collection(
@@ -91,13 +134,24 @@ class Variant(Item):
     properties={
         'title': 'Variants (sample)',
         'description': 'List of all variants with sample specific information',
-    })
+    },
+    unique_key='variant_sample:annotation_id')
 class VariantSample(Item):
     """Class for variant samples."""
 
     item_type = 'variant_sample'
     schema = load_schema('encoded:schemas/variant_sample.json')
     embedded_list = build_variant_sample_embedded_list()
+
+    @classmethod
+    def create(cls, registry, uuid, properties, sheets=None):
+        """ Sets the annotation_id field on this variant_sample prior to passing on. """
+        properties[ANNOTATION_ID] = '%s:%s:%s' % (
+            properties['CALL_INFO'],
+            properties['variant'],
+            properties['file']
+        )
+        return super().create(registry, uuid, properties, sheets)
 
     @calculated_property(schema={
         "title": "Display Title",
@@ -115,8 +169,8 @@ class VariantSample(Item):
         "description": "Reference AD",
         "type": "integer"
     })
-    def AD_REF(self, AD):
-        if AD:
+    def AD_REF(self, AD=None):
+        if AD is not None:
             return int(AD.split(',')[0])
         return -1
 
@@ -125,8 +179,8 @@ class VariantSample(Item):
         "description": "Alternate AD",
         "type": "integer"
     })
-    def AD_ALT(self, AD):
-        if AD:
+    def AD_ALT(self, AD=None):
+        if AD is not None:
             return int(AD.split(',')[1])
         return -1
 
@@ -135,26 +189,55 @@ class VariantSample(Item):
         "description": "Allele Frequency",
         "type": "number"
     })
-    def AF(self, AD):
-        if AD:
+    def AF(self, AD=None):
+        if AD is not None:
             ref, alt = AD.split(',')
+            try:
+                denominator = int(ref) + int(alt)
+            except Exception:
+                raise ValueError('Bad value for AD (used to calculate AF): %s' % AD)
+            if denominator == 0:
+                return 0.0
             return round(int(alt) / (int(ref) + int(alt)), 3)  # round to 3 digits
         return 0.0
 
+    @calculated_property(schema={
+        "title": "bam_snapshot",
+        "description": "Link to Genome Snapshot Image",
+        "type": "string"
+    })
+    def bam_snapshot(self, request, file, variant):
+        variant_props = get_item_or_none(request, variant, 'Variant')
+        file_path = '%s/bamsnap/chr%s:%s.png' % (  # file = accession of associated VCF file
+            file, variant_props['CHROM'], variant_props['POS']
+        )
+        return file_path
 
-@view_config(name='variant_ingestion', context=Variant.Collection,
-             request_method='POST', permission='add')
+
+@view_config(name='download', context=VariantSample, request_method='GET',
+             permission='view', subpath_segments=[0, 1])
 @debug_log
-def variant_ingestion(context, request):
-    """
-        Variant Ingestion API
+def download(context, request):
+    """ Navigates to the IGV snapshot hrf on the bam_snapshot field. """
+    calculated = calculate_properties(context, request)
+    s3_client = boto3.client('s3')
+    params_to_get_obj = {
+        'Bucket': request.registry.settings.get('file_wfout_bucket'),
+        'Key': calculated['bam_snapshot']
+    }
+    location = s3_client.generate_presigned_url(
+        ClientMethod='get_object',
+        Params=params_to_get_obj,
+        ExpiresIn=36*60*60
+    )
 
-        Processes all, or none, of a vcf file based on the loaded annotation
-        fields and on the variant and variant sample schemas
-    """
-    # TODO: Implement this when we need it, though practically speaking it probably takes too long to do this way
-    # get vcf file
-    # build the variants, post a dry run
-    # if dry run is successful, run for real
-    # catch potential errors
-    pass
+    if asbool(request.params.get('soft')):
+        expires = int(parse_qs(urlparse(location).query)['Expires'][0])
+        return {
+            '@type': ['SoftRedirect'],
+            'location': location,
+            'expires': datetime.datetime.fromtimestamp(expires, pytz.utc).isoformat(),
+        }
+
+    # 307 redirect specifies to keep original method
+    raise HTTPTemporaryRedirect(location=location)  # 307

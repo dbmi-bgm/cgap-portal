@@ -1,4 +1,9 @@
 import pytest
+
+from webtest import TestApp
+from .datafixtures import ORDER
+
+
 pytestmark = [pytest.mark.setone, pytest.mark.working, pytest.mark.schema]
 
 
@@ -6,7 +11,6 @@ pytestmark = [pytest.mark.setone, pytest.mark.working, pytest.mark.schema]
 def minitestdata(app, conn):
     tx = conn.begin_nested()
 
-    from webtest import TestApp
     environ = {
         'HTTP_ACCEPT': 'application/json',
         'REMOTE_USER': 'TEST',
@@ -29,7 +33,6 @@ def minitestdata(app, conn):
 def minitestdata2(app, conn):
     tx = conn.begin_nested()
 
-    from webtest import TestApp
     environ = {
         'HTTP_ACCEPT': 'application/json',
         'REMOTE_USER': 'TEST',
@@ -95,9 +98,7 @@ def test_fixtures2(minitestdata2, testapp):
 
 
 def test_order_complete(app, conn):
-    from .datafixtures import ORDER
-    from webtest import TestApp
-    ORDER = ORDER + ['access_key']
+    order = ORDER + ['access_key']
     environ = {
         'HTTP_ACCEPT': 'application/json',
         'REMOTE_USER': 'TEST',
@@ -109,15 +110,15 @@ def test_order_complete(app, conn):
         if profiles[a_type].get('id') and profiles[a_type]['isAbstract'] is False:
             schema_name = profiles[a_type]['id'].split('/')[-1][:-5]
             master_types.append(schema_name)
-    print(ORDER)
+    print("order=", order)
     print(master_types)
-    print(len(ORDER))
-    print(len(master_types))
+    print("len(order)=", len(order))
+    print("len(master_types)=", len(master_types))
 
-    missing_types = [i for i in master_types if i not in ORDER]
-    extra_types = [i for i in ORDER if i not in master_types]
-    print(missing_types)
-    print(extra_types)
+    missing_types = [i for i in master_types if i not in order]
+    extra_types = [i for i in order if i not in master_types]
+    print("missing_types=", missing_types)
+    print("extra_types=", extra_types)
 
     assert missing_types == []
     assert extra_types == []

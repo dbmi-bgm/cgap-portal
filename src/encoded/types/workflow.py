@@ -11,7 +11,7 @@ import pstats
 from collections import OrderedDict, deque
 from dcicutils.env_utils import CGAP_ENV_WEBDEV, is_stg_or_prd_env, prod_bucket_env
 from inspect import signature
-from pyramid.httpexceptions import HTTPUnprocessableEntity
+from pyramid.httpexceptions import HTTPUnprocessableEntity, HTTPBadRequest
 from pyramid.response import Response
 from pyramid.view import view_config
 from snovault import calculated_property, collection, load_schema, CONNECTION, TYPES
@@ -697,6 +697,7 @@ class Workflow(Item):
 
 @collection(
     name='workflow-runs',
+    unique_key='accession',
     properties={
         'title': 'Workflow Runs',
         'description': 'Listing of executions of 4DN analysis workflows',
@@ -706,6 +707,7 @@ class WorkflowRun(Item):
 
     item_type = 'workflow_run'
     schema = load_schema('encoded:schemas/workflow_run.json')
+    name_key = 'accession'
     embedded_list = (
         Item.embedded_list +
         # lab_award_attribution_embed_list +
@@ -775,7 +777,7 @@ class WorkflowRun(Item):
             # is done against step step.[inputs | output].[target | source].name.
             global_pointing_source_target = [
                 source_target for source_target in all_io_source_targets
-                if source_target.get('step') == None
+                if source_target.get('step') is None
             ]
             if len(global_pointing_source_target) > 1:
                 raise Exception('Found more than one source or target without a step.')
@@ -793,8 +795,8 @@ class WorkflowRun(Item):
             :param wfr_runtime_inputs: List of Step inputs or outputs, such as 'input_files', 'output_files', 'quality_metric', or 'parameters'.
             :returns: True if found and added run_data property to analysis_step.input or analysis_step.output (param inputOrOutput).
             '''
-            #is_global_arg = step_io_arg.get('meta', {}).get('global', False) == True
-            #if not is_global_arg:
+            # is_global_arg = step_io_arg.get('meta', {}).get('global', False) == True
+            # if not is_global_arg:
             #    return False # Skip. We only care about global arguments.
 
             value_field_name = 'value' if io_type == 'parameter' else 'file'
@@ -857,9 +859,9 @@ class WorkflowRun(Item):
             return resultArgs
 
 
-        output_files    = mergeArgumentsWithSameArgumentName(self.properties.get('output_files',[]))
-        input_files     = mergeArgumentsWithSameArgumentName(self.properties.get('input_files',[]))
-        input_params    = mergeArgumentsWithSameArgumentName(self.properties.get('parameters',[]))
+        output_files = mergeArgumentsWithSameArgumentName(self.properties.get('output_files', []))
+        input_files = mergeArgumentsWithSameArgumentName(self.properties.get('input_files', []))
+        input_params = mergeArgumentsWithSameArgumentName(self.properties.get('parameters', []))
 
         for step in analysis_steps:
             # Add output file metadata to step outputs & inputs, based on workflow_argument_name v step output target name.
@@ -917,6 +919,7 @@ def validate_input_json(context, request):
              permission='add', validators=[validate_input_json])
 @debug_log
 def pseudo_run(context, request):
+    """ XXX: This needs documentation badly. """
     input_json = request.json
 
     # set env_name for awsem runner in tibanna
@@ -940,7 +943,14 @@ def pseudo_run(context, request):
                             Payload=json.dumps(input_json))
     res_decode = res['Payload'].read().decode()
     res_dict = json.loads(res_decode)
-    arn = res_dict['_tibanna']['response']['executionArn']
+
+    # propagate response and error up if encountered
+    try:
+        arn = res_dict['_tibanna']['response']['executionArn']
+    except Exception as e:
+        raise HTTPBadRequest('Exception encountered getting response from lambda: %s\n'
+                             'Response: %s' % (e, res_dict))
+
     # just loop until we get proper status
     for i in range(100):
         res = aws_lambda.invoke(FunctionName=TIBANNA_WORKFLOW_STATUS_LAMBDA_FUNCTION,

@@ -24,6 +24,7 @@ macpoetry-install:  # Same as 'poetry install' except that on OSX Catalina, an e
 	bin/macpoetry-install
 
 configure:  # does any pre-requisite installs
+	pip install --upgrade pip
 	pip install poetry
 
 macbuild:  # builds for Catalina
@@ -47,29 +48,45 @@ build-dev:  # same as build, but sets up locust as well
 
 macbuild-dev:  # same as macbuild, but sets up locust as well
 	make macbuild
-	pip install locust
+	make build-locust
 
 build-locust:  # just pip installs locust - may cause instability
 	pip install locust
 
 download-genes: # grabs latest gene list from the below link, unzips and drops in correct place
-	wget https://www.dropbox.com/s/s2xa978nwktd3ib/mvp_gene_datasource_v0.4.5.coding_gene_main_chrom.json.gz?dl=1
-	mv mvp_gene_datasource_v0.4.5.coding_gene_main_chrom.json.gz\?dl\=1 gene_inserts_v0.4.5.json.gz
-	gunzip gene_inserts_v0.4.5.json.gz
-	mv gene_inserts_v0.4.5.json src/encoded/annotations/gene_inserts_v0.4.5.json
+	wget https://www.dropbox.com/s/s6ahfq0gdn99uu8/mvp_gene_datasource_v0.4.6.coding_gene_main_chrom.json.gz?dl=1
+	mv mvp_gene_datasource_v0.4.6.coding_gene_main_chrom.json.gz\?dl\=1 gene_inserts_v0.4.6.json.gz
+	gunzip gene_inserts_v0.4.6.json.gz
+	mv gene_inserts_v0.4.6.json src/encoded/annotations/gene_inserts_v0.4.6.json
 
-deploy1:  # starts postgres/ES locally and loads inserts
-	@SNOVAULT_DB_TEST_PORT=`grep 'sqlalchemy[.]url =' development.ini | sed -E 's|.*:([0-9]+)/.*|\1|'` dev-servers development.ini --app-name app --clear --init --load
+deploy1:  # starts postgres/ES locally and loads inserts, and also starts ingestion engine
+	@DEBUGLOG=`pwd` SNOVAULT_DB_TEST_PORT=`grep 'sqlalchemy[.]url =' development.ini | sed -E 's|.*:([0-9]+)/.*|\1|'` dev-servers development.ini --app-name app --clear --init --load
+
+deploy1a:  # starts postgres/ES locally and loads inserts, but does not start the ingestion engine
+	@DEBUGLOG=`pwd` SNOVAULT_DB_TEST_PORT=`grep 'sqlalchemy[.]url =' development.ini | sed -E 's|.*:([0-9]+)/.*|\1|'` dev-servers development.ini --app-name app --clear --init --load --no_ingest
+
+deploy1b:  # starts ingestion engine separately so it can be easily stopped and restarted for debugging in foreground
+	@echo "Starting ingestion listener. Press ^C to exit." && DEBUGLOG=`pwd` SNOVAULT_DB_TEST_PORT=`grep 'sqlalchemy[.]url =' development.ini | sed -E 's|.*:([0-9]+)/.*|\1|'` poetry run ingestion-listener development.ini --app-name app
 
 deploy2:  # spins up waittress to serve the application
-	pserve development.ini
+	@DEBUGLOG=`pwd` SNOVAULT_DB_TEST_PORT=`grep 'sqlalchemy[.]url =' development.ini | sed -E 's|.*:([0-9]+)/.*|\1|'` pserve development.ini
 
 deploy3:  # uploads: GeneAnnotationFields, then Genes, then AnnotationFields, then Variant + VariantSamples
-	python src/encoded/commands/ingestion.py src/encoded/annotations/variant_table_v0.4.6.csv src/encoded/schemas/annotation_field.json src/encoded/schemas/variant.json src/encoded/schemas/variant_sample.json src/encoded/annotations/vcf_v0.4.6.vcf hms-dbmi hms-dbmi src/encoded/annotations/gene_table_v0.4.5.csv src/encoded/schemas/gene_annotation_field.json src/encoded/schemas/gene.json src/encoded/annotations/gene_inserts_v0.4.5.json hms-dbmi hms-dbmi development.ini --post-variant-consequences --post-variants --post-gene-annotation-field-inserts --post-gene-inserts --app-name app
+	python src/encoded/commands/ingestion.py src/encoded/annotations/variant_table_v0.4.8.csv src/encoded/schemas/annotation_field.json src/encoded/schemas/variant.json src/encoded/schemas/variant_sample.json src/encoded/annotations/GAPFI3JX5D2J.vcf hms-dbmi hms-dbmi src/encoded/annotations/gene_table_v0.4.6.csv src/encoded/schemas/gene_annotation_field.json src/encoded/schemas/gene.json src/encoded/annotations/gene_inserts_v0.4.6.json hms-dbmi hms-dbmi development.ini --post-variant-consequences --post-variants --post-gene-annotation-field-inserts --post-gene-inserts --app-name app
+
+psql-dev:  # starts psql with the url after 'sqlalchemy.url =' in development.ini
+	@psql `grep 'sqlalchemy[.]url =' development.ini | sed -E 's/^.* = (.*)/\1/'`
+
+kibana-start:
+	scripts/kibana-start
+
+kibana-stop:
+	scripts/kibana-stop
 
 kill:  # kills back-end processes associated with the application. Use with care.
 	pkill -f postgres &
 	pkill -f elasticsearch &
+	pkill -f moto_server &
 
 clean-python:
 	@echo -n "Are you sure? This will wipe all libraries installed on this virtualenv [y/N] " && read ans && [ $${ans:-N} = y ]
@@ -83,7 +100,7 @@ test-any:
 	bin/test -vv --timeout=200
 
 travis-test:
-	bin/test -vv --timeout=200 -m "working and not performance" --aws-auth --durations=10 --cov src/encoded --es search-fourfront-builds-uhevxdzfcv7mkm5pj5svcri3aq.us-east-1.es.amazonaws.com:80
+	bin/test -vv --timeout=300 -m "working and not performance" --aws-auth --durations=10 --cov src/encoded --es search-cgap-testing-ud3ggpjj7x6vclx62nmzymyzfi.us-east-1.es.amazonaws.com:80
 
 update:  # updates dependencies
 	poetry update
@@ -92,7 +109,7 @@ help:
 	@make info
 
 info:
-	@: $(info Printing some info on how to use make)
+	@: $(info Here are some 'make' options:)
 	   $(info - Use 'make aws-ip-ranges' to download latest ip range information. Invoked automatically when needed.)
 	   $(info - Use 'make build' (or 'make macbuild' on OSX Catalina) to build only application dependencies.)
 	   $(info - Use 'make build-dev' (or 'make macbuild-dev' on OSX Catalina) to build all dependencies, even locust.)
@@ -103,6 +120,8 @@ info:
 	   $(info - Use 'make deploy1' to spin up postgres/elasticsearch and load inserts.)
 	   $(info - Use 'make deploy2' to spin up the application server.)
 	   $(info - Use 'make deploy3' to load variants and genes.)
+	   $(info - Use 'make psql-dev' to start psql on data associated with an active 'make deploy1'.)
+	   $(info - Use 'make kibana-start' to start kibana, and 'make kibana-stop' to stop it.)
 	   $(info - Use 'make kill' to kill postgres and elasticsearch proccesses. Please use with care.)
 	   $(info - Use 'make moto-setup' to install moto, for less flaky tests. Implied by 'make build'.)
 	   $(info - Use 'make npm-setup' to build the front-end. Implied by 'make build'.)

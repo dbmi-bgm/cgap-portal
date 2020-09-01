@@ -520,6 +520,7 @@ class PedigreeVizViewUserInterface extends React.PureComponent {
         };
 
         return (
+            // IndividualsLayer may become deprecated, and move to all-SVG for easier exportability... unsure.
             <div className="pedigree-viz-container" style={outerContainerStyle} data-selection-disabled={disableSelect}
                 data-selected-node={selectedNode && selectedNode.id} data-instance-index={this.id}>
                 <div className="inner-container" ref={this.innerRef} style={innerContainerStyle}
@@ -555,7 +556,8 @@ const ShapesLayer = React.memo(function ShapesLayer(props){
         edges, relationships,
         selectedNode, hoveredNode,
         onNodeMouseIn, onNodeMouseLeave,
-        dims, scale
+        dims, scale,
+        showOrderBasedName, showNotes
     } = props;
     const svgStyle = { width: graphWidth, height: graphHeight };
 
@@ -568,7 +570,7 @@ const ShapesLayer = React.memo(function ShapesLayer(props){
             <EdgesLayer {...{ edges, dims }} />
             <SelectedNodeIdentifier {...{ selectedNode, dims, textScale }} />
             <RelationshipNodeShapeLayer {...{ relationships, hoveredNode, onNodeMouseIn, onNodeMouseLeave, dims, textScale, textScaleTransformStr }} />
-            <IndividualNodeShapeLayer {...props} {...{ textScale, textScaleTransformStr }} />
+            <IndividualNodeShapeLayer {...props} {...{ textScale, textScaleTransformStr, showOrderBasedName, showNotes }} />
         </svg>
     );
 });

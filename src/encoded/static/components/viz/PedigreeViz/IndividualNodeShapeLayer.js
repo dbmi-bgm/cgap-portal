@@ -123,6 +123,7 @@ export class IndividualNodeShape extends React.PureComponent {
             hoveredNode = null,
             selectedNode = null,
             showOrderBasedName = true,
+            showNotes = true,
             maxHeightIndex = Infinity
         } = this.props;
         const { individualWidth, individualHeight } = dims;
@@ -170,7 +171,7 @@ export class IndividualNodeShape extends React.PureComponent {
                 { fgShape }
                 <OverlayMarkers {...{ width, height, individual, shape, textScaleTransformStr, vizViewID }} />
                 <AboveNodeText {...{ width, height, individual, maxHeightIndex, dims, halfWidth, aboveNodeTextY, textScale, textScaleTransformStr }} />
-                <UnderNodeText {...{ width, height, individual, shape, diseaseToIndex, dims, halfWidth, showOrderBasedName, textScale, textScaleTransformStr }} />
+                <UnderNodeText {...{ width, height, individual, shape, diseaseToIndex, dims, halfWidth, showOrderBasedName, showNotes, textScale, textScaleTransformStr }} />
             </g>
         );
     }
@@ -450,6 +451,7 @@ function UnderNodeText(props){
         halfWidth = 40,
         diseaseToIndex = {},
         showOrderBasedName = true,
+        showNotes = true, // Name of this prop may change in future.
         textScale = 1,
         textScaleTransformStr = "scale3d(1,1,1)",
         dims
@@ -468,16 +470,19 @@ function UnderNodeText(props){
         textRows.push([ ageString, "age" ]);
     }
 
-    diseases.filter(function(disease){
-        return !diseaseToIndex[disease];
-    }).forEach(function(disease, i){
-        textRows.push([
-            <React.Fragment key={i}>
-                &bull; { disease }
-            </React.Fragment>,
-            "disease"
-        ]);
-    });
+    if (showNotes) {
+        // Eventually could have more stuff here, maybe have showNotes be enum of various opts to display.. idk.
+        diseases.filter(function(disease){
+            return !diseaseToIndex[disease];
+        }).forEach(function(disease, i){
+            textRows.push([
+                <React.Fragment key={i}>
+                    &bull; { disease }
+                </React.Fragment>,
+                "disease"
+            ]);
+        });
+    }
 
     const renderedTexts = textRows.map(function([ content, desc ], idx){
         const txtProps = {

@@ -1,11 +1,10 @@
 import pytest
 
-# Supports commented-out code below.
+# Code that uses this is commented-out below.
 # from ..types import TrackingItem
 
 
 pytestmark = [pytest.mark.setone, pytest.mark.working, pytest.mark.schema]
-
 
 
 @pytest.fixture

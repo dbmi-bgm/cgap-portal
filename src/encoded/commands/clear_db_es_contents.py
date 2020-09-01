@@ -31,7 +31,8 @@ def clear_db_tables(app):
     """
     success = False
     session = app.registry[DBSESSION]
-    meta = MetaData(bind=session.connection(), reflect=True)
+    meta = MetaData(bind=session.connection())
+    meta.reflect()
     connection = session.connection().connect()
     try:
         # truncate tables by only deleting contents
@@ -103,7 +104,7 @@ def main():
     # Loading app will have configured from config file. Reconfigure here:
     logging.getLogger('encoded').setLevel(logging.DEBUG)
 
-    parser = argparse.ArgumentParser(
+    parser = argparse.ArgumentParser(  # noqa - PyCharm wrongly thinks the formatter_class is specified wrong here.
         description='Clear DB and ES Contents', epilog=EPILOG,
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )

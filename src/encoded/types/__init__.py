@@ -1,18 +1,20 @@
 """init.py lists all the collections that do not have a dedicated types file."""
 
-from snovault.attachment import ItemWithAttachment
-from snovault.crud_views import collection_add as sno_collection_add
-from snovault.schema_utils import validate_request
-from snovault.validation import ValidationFailure
+import transaction
+
+# from pyramid.traversal import find_root
 from snovault import (
     calculated_property,
     collection,
     load_schema,
-    CONNECTION,
+    # CONNECTION,
     COLLECTIONS,
-    display_title_schema
+    # display_title_schema
 )
-# from pyramid.traversal import find_root
+from snovault.attachment import ItemWithAttachment
+from snovault.crud_views import collection_add as sno_collection_add
+from snovault.schema_utils import validate_request
+from snovault.validation import ValidationFailure
 from .base import (
     Item,
     get_item_or_none,
@@ -27,34 +29,6 @@ from .base import (
 def includeme(config):
     """include me method."""
     config.scan()
-
-
-@collection(
-    name='sample-processings',
-    properties={
-        'title': 'SampleProcessings',
-        'description': 'Listing of Sample Processings',
-    })
-class SampleProcessing(Item):
-    item_type = 'sample_processing'
-    schema = load_schema('encoded:schemas/sample_processing.json')
-    embedded_list = []
-    rev = {'case': ('Case', 'sample_processing')}
-
-    @calculated_property(schema={
-        "title": "Cases",
-        "description": "The case(s) this sample processing is for",
-        "type": "array",
-        "items": {
-            "title": "Case",
-            "type": "string",
-            "linkTo": "Case"
-        }
-    })
-    def cases(self, request):
-        rs = self.rev_link_atids(request, "case")
-        if rs:
-            return rs
 
 
 @collection(
@@ -239,7 +213,6 @@ class TrackingItem(Item):
         Raises:
             ValidationFailure if TrackingItem cannot be validated
         """
-        import transaction
         collection = request.registry[COLLECTIONS]['TrackingItem']
         # set remote_user to standarize permissions
         prior_remote = request.remote_user
@@ -308,3 +281,26 @@ class AnnotationField(Item):
     })
     def display_title(self, field_name):
         return field_name
+
+
+@collection(
+    name='nexuses',
+    unique_key='accession',
+    properties={
+        'title': 'Cohorts',
+        'description': 'List of Cohorts',
+    })
+class Nexus(Item):
+    """Class for Cohorts."""
+    item_type = 'nexus'
+    name_key = 'accession'
+    schema = load_schema('encoded:schemas/nexus.json')
+    embedded_list = []
+
+    @calculated_property(schema={
+        "title": "Display Title",
+        "description": "A calculated title for every object in 4DN",
+        "type": "string"
+    })
+    def display_title(self, title):
+        return title

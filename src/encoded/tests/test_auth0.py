@@ -2,6 +2,7 @@ import os
 import pytest
 import requests
 
+from pyramid.testing import DummyRequest
 from ..authentication import get_jwt
 
 
@@ -25,7 +26,7 @@ def auth0_access_token():
     except Exception as e:
         pytest.skip("Error retrieving auth0 test user access token: %r" % e)
 
-    data = res.json()
+    data = res.json()  # noqa - PyCharm doesn't know pytest.skip will unconditionally raise, so fears 'res' undefined
     if 'id_token' not in data:
         pytest.skip("Missing 'id_token' in auth0 test user access token: %r" % data)
 
@@ -49,7 +50,7 @@ def auth0_access_token_no_email():
     except Exception as e:
         pytest.skip("Error retrieving auth0 test user access token: %r" % e)
 
-    data = res.json()
+    data = res.json()  # noqa - PyCharm doesn't know pytest.skip will unconditionally raise, so fears 'res' undefined
     if 'id_token' not in data:
         pytest.skip("Missing 'id_token' in auth0 test user access token: %r" % data)
 
@@ -68,15 +69,19 @@ def auth0_4dn_user_profile():
 
 @pytest.fixture(scope='session')
 def headers(auth0_access_token):
-    return {'Accept': 'application/json', 'Content-Type': 'application/json', 'Authorization': 'Bearer ' +
-     auth0_access_token}
+    return {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + auth0_access_token
+    }
 
 
 @pytest.fixture(scope='session')
 def fake_request(headers):
 
     class FakeRequest(object):
-        '''TODO: See if could/should use or subclass from DummyRequest'''
+        """Mocked Request class"""
+        # TODO: See if could/should use or subclass from DummyRequest
         def __init__(self):
             self.headers = headers
             self.cookies = {}
@@ -88,6 +93,39 @@ def fake_request(headers):
 def test_get_jwt_gets_bearer_auth(fake_request):
     jwt = get_jwt(fake_request)
     assert jwt == fake_request.headers['Authorization'][7:]
+
+
+SPACE = ' '
+
+
+def test_get_jwt_gets_bearer_auth_too():
+
+    fake_jwt = 'abc.def.ghi'
+    req = DummyRequest(headers={'Authorization': 'bearer' + SPACE + fake_jwt})
+    jwt = get_jwt(req)
+    assert jwt == fake_jwt
+
+
+def test_get_jwt_gets_bearer_auth_ignores_extra_space():
+    fake_jwt = 'abc.def.ghi'
+    req = DummyRequest(headers={'Authorization': 'bearer' + 2*SPACE + fake_jwt + SPACE})
+    jwt = get_jwt(req)
+    assert jwt == fake_jwt
+
+
+def test_get_jwt_gets_jwt_with_spaces():
+    fake_jwt = 'abc def ghi'  # Spaces in a JWT are not legal
+    req = DummyRequest(headers={'Authorization': 'bearer' + SPACE + fake_jwt + SPACE})
+    jwt = get_jwt(req)
+    assert jwt == fake_jwt
+
+
+def test_get_jwt_fails_bearer_auth_no_sep():
+    fake_jwt = 'abc.def.ghi'
+    # This makes sure there's a space separator after 'bearer'.
+    req = DummyRequest(headers={'Authorization': 'bearer.' + fake_jwt})
+    jwt = get_jwt(req)
+    assert jwt is None
 
 
 def test_get_jwt_skips_basic_auth(fake_request):
@@ -103,6 +141,22 @@ def test_get_jwt_falls_back_to_cookie(fake_request):
     assert jwt == 'test_token'
 
 
+def test_get_jwt_falls_back_to_cookie_too(fake_request):
+    fake_request.cookies['jwtToken'] = 'test_token'
+    fake_request.headers['Authorization'] = 'Basic stuff_base64_encoded'
+    jwt = get_jwt(fake_request)
+    assert jwt == 'test_token'
+
+
+@pytest.mark.parametrize('request_method',  ['HEAD', 'GET', 'POST', 'PATCH'])
+def test_get_jwt_falls_back_to_cookie_for_any_method(fake_request, request_method):
+    req = DummyRequest(headers={'Authorization': 'Basic not_the_droids_you_are_looking_for'},
+                       cookies={'jwtToken': 'r2d2_and_c3po'})
+    req.method = request_method
+    jwt = get_jwt(req)
+    assert jwt == 'r2d2_and_c3po'
+
+
 def test_login_unknown_user(anontestapp, auth0_4dn_user_token):
     anontestapp.post_json('/login', auth0_4dn_user_token, status=401)
 
@@ -115,10 +169,10 @@ def test_login_token_no_email(anontestapp, auth0_access_token_no_email, headers)
 
 
 def test_invalid_login(anontestapp, headers):
-    headers1=headers.copy()
+    headers1 = headers.copy()
     headers1['Authorization'] = 'Bearer invalid token'
     # Log in without headers
-    res = anontestapp.post_json('/login', headers=headers1, status=401)
+    anontestapp.post_json('/login', headers=headers1, status=401)
 
 
 # TODO (C4-173): This is intentionally disabled for now. It requires additional security that we need to reconsider.
@@ -170,16 +224,12 @@ def test_404_keeps_auth_info(testapp, anontestapp, headers,
 
     # X-User-Info header is only set for text/html -formatted Responses.
     page_view_request_headers.update({
-        "Accept" : "text/html",
-        "Content-Type" : "text/html",
-        "Cookie" : "jwtToken=" + headers['Authorization'][7:]
+        "Accept": "text/html",
+        "Content-Type": "text/html",
+        "Cookie": "jwtToken=" + headers['Authorization'][7:]
     })
     # Log in
-    res = anontestapp.get(
-        '/not_found_url',
-        headers=page_view_request_headers,
-        status = 404
-    )
+    res = anontestapp.get('/not_found_url', headers=page_view_request_headers, status=404)
 
     assert str(res.status_int) == "404"
     try:
@@ -221,7 +271,7 @@ def test_404_keeps_auth_info(testapp, anontestapp, headers,
  
 
 def test_jwt_is_stateless_so_doesnt_actually_need_login(testapp, anontestapp, auth0_4dn_user_token,
-                      auth0_4dn_user_profile, headers):
+                                                        auth0_4dn_user_profile, headers):
     # Create a user with the proper email
     url = '/users/'
     email = auth0_4dn_user_profile['email']
@@ -237,7 +287,7 @@ def test_jwt_is_stateless_so_doesnt_actually_need_login(testapp, anontestapp, au
 
 
 def test_jwt_works_without_keys(testapp, anontestapp, auth0_4dn_user_token,
-                      auth0_4dn_user_profile, headers):
+                                auth0_4dn_user_profile, headers):
     # Create a user with the proper email
 
     url = '/users/'
@@ -249,14 +299,13 @@ def test_jwt_works_without_keys(testapp, anontestapp, auth0_4dn_user_token,
     }
     testapp.post_json(url, item, status=201)
 
-    #clear out keys
+    # clear out keys
     old_key = anontestapp.app.registry.settings['auth0.secret']
     anontestapp.app.registry.settings['auth0.secret'] = None
     res2 = anontestapp.get('/users/', headers=headers, status=200)
 
     anontestapp.app.registry.settings['auth0.secret'] = old_key
     assert '@id' in res2.json['@graph'][0]
-
 
 
 def test_impersonate_invalid_user(anontestapp, admin):
@@ -276,13 +325,15 @@ def test_impersonate_user(anontestapp, admin, submitter):
         extra_environ={'REMOTE_USER':
                        str(admin['email'])})
 
-    #we should get back a new token
+    # we should get back a new token
     assert 'user_actions' in res.json
     assert 'id_token' in res.json
 
-
     # and we should be able to use that token as the new user
-    headers = {'Accept': 'applicatin/json', 'Content-Type': 'application/json', 'Authorization': 'Bearer ' +
-     res.json['id_token']}
+    headers = {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + res.json['id_token']
+    }
     res2 = anontestapp.get('/users/', headers=headers)
     assert '@id' in res2.json['@graph'][0]

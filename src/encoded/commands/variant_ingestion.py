@@ -1,10 +1,11 @@
 import argparse
 import logging
-from encoded.commands.variant_table_intake import MappingTableParser
-from encoded.commands.ingest_vcf import VCFParser
+
 from dcicutils.misc_utils import VirtualApp
 from pyramid.paster import get_app
 from tqdm import tqdm
+from ..commands.variant_table_intake import MappingTableParser
+from ..commands.ingest_vcf import VCFParser
 
 
 logger = logging.getLogger(__name__)
@@ -20,7 +21,6 @@ def run_variant_table_intake(app_handle, args):
         app_handle.post_json('/annotation_field', entry)
     logger.info('Successfully posted annotations')
     return True
-
 
 def run_ingest_vcf(app_handle, args):
     """ Runs the vcf ingestion step """
@@ -40,7 +40,7 @@ def run_ingest_vcf(app_handle, args):
                     vcf_parser.format_variant_sub_embedded_objects(variant)
                     res = app_handle.post_json('/variant', variant, status=201).json['@graph'][0]  # only one item posted
                     success += 1
-                except:  # ANNOTATION spec validation error, recoverable
+                except Exception:  # ANNOTATION spec validation error, recoverable
                     error += 1
                     continue
                 variant_samples = vcf_parser.create_sample_variant_from_record(record)
@@ -48,6 +48,7 @@ def run_ingest_vcf(app_handle, args):
                     sample['project'] = args.variant_project
                     sample['institution'] = args.variant_institution
                     sample['variant'] = res['@id']  # make link
+                    sample['file'] = 'dummy-file'  # XXX: Do not use for actual loading!
                     app_handle.post_json('/variant_sample', sample, status=201)
         except Exception as e:  # VCF spec validation error, not recoverable
             logger.error('Encountered VCF format error: %s' % str(e))
@@ -97,7 +98,7 @@ def main():
 
     """
     logging.basicConfig()
-    parser = argparse.ArgumentParser(
+    parser = argparse.ArgumentParser(  # noqa - PyCharm wrongly thinks the formatter_class is invalid
         description="Variant Ingestion Program",
         epilog=EPILOG,
         formatter_class=argparse.RawDescriptionHelpFormatter
@@ -113,7 +114,7 @@ def main():
     parser.add_argument('variant_project', help='project to post inserts under')
     parser.add_argument('variant_institution', help='institution to post inserts under')
     parser.add_argument('config_uri', help="path to configfile")  # to get app
-    parser.add_argument('--write-variant-schemas', action='store_true', default=True,
+    parser.add_argument('--write-variant-schemas', action='store_true', default=False,
                         help='If specified will write new schemas to given locations')
     parser.add_argument('--app-name', help="Pyramid app name in configfile")  # to get app
     parser.add_argument('--post-variants', action='store_true', default=False,
@@ -137,7 +138,7 @@ def main():
         run_ingest_vcf(app_handle, args)
         exit(0)
     except Exception as e:
-        logger.info('Got exception in variant ingestion: %s' % str(e))
+        logger.error('Got exception in variant ingestion: %s' % e)
     # XXX: Catch more exceptions
     exit(1)
 

@@ -57,6 +57,9 @@ export const pedigreeVizViewPropTypes = {
     width: PropTypes.number,
     onNodeSelected: PropTypes.func,
     renderDetailPane: PropTypes.func,
+    showOrderBasedName: PropTypes.bool,
+    showNotes: PropTypes.bool,
+    // todo: more props here.
 };
 
 export const pedigreeVizPropTypes = {

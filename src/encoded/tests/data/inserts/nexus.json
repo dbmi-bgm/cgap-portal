@@ -1,0 +1,12 @@
+[
+    {
+        "title": "Rare Disease Trio Cohort",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "institution": "hms-dbmi",
+        "status": "released",
+        "uuid": "cc7d83a2-6886-4ca0-9402-7c49734cf111",
+        "description": "Cohort for test institute Trio cases of rare diseases",
+        "filter_set": "dcf15d5e-40aa-43bc-b81c-32c70c9afa99",
+        "pipeline": "Efficient Trio Analysis V10"
+    }
+]

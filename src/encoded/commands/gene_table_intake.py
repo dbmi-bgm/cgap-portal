@@ -2,7 +2,7 @@ import argparse
 import logging
 from pyramid.paster import get_app
 from dcicutils.misc_utils import VirtualApp
-from encoded.commands.variant_table_intake import MappingTableParser
+from ..commands.variant_table_intake import MappingTableParser
 
 
 logger = logging.getLogger(__name__)
@@ -21,6 +21,7 @@ class GeneTableParser(MappingTableParser):
 
     def __init__(self, *args, **kwargs):
         self.FIELD_TYPE_INDEX = 8
+        kwargs['skip_embeds'] = True  # do not clear embeds when running gene intake
         super(GeneTableParser, self).__init__(*args, **kwargs)
 
     @staticmethod
@@ -32,7 +33,7 @@ class GeneTableParser(MappingTableParser):
         """
         schema['$schema'] = 'http://json-schema.org/draft-04/schema#'
         schema['type'] = 'object'
-        schema['required'] = ['institution', 'project']
+        schema['required'] = ['institution', 'project', 'gene_symbol', 'ensgid']
         schema['identifyingProperties'] = ['uuid', 'aliases']
         schema['additionalProperties'] = False
         schema['mixinProperties'] = [
@@ -69,7 +70,7 @@ class GeneTableParser(MappingTableParser):
         logger.info('Build gene schema')
         return schema
 
-    def run(self, gs_out=None, write=True):
+    def run(self, gs_out=None, write=False):  # noqa - args are different then in superclass but we don't care
         """
         Ingests the gene table, producing the gene schema
 
@@ -99,7 +100,7 @@ def main():
                src/encoded/schemas/gene.json development.ini --app-name app --post-inserts
     """
     logging.basicConfig()
-    parser = argparse.ArgumentParser(
+    parser = argparse.ArgumentParser(  # noqa - PyCharm wrongly thinks the formatter_class is invalid
         description="Takes in a variant mapping table and produces variant related inserts/schemas",
         epilog=EPILOG,
         formatter_class=argparse.RawDescriptionHelpFormatter

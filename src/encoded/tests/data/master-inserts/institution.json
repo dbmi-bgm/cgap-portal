@@ -8,13 +8,13 @@
         "name": "hms-dbmi",
         "phone1": "000-000-0000",
         "phone2": "000-000-0000",
-        "pi": "danavuzman@gmail.com",
+        "pi": "dvuzman@research.bwh.harvard.edu",
         "postal_code": "02115",
         "state": "MA",
         "title": "HMS DBMI",
         "uuid": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
         "contact_persons" : [
-            "danavuzman@gmail.com"
+            "dvuzman@research.bwh.harvard.edu"
         ]
     },
     {

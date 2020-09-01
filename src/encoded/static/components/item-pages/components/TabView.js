@@ -26,7 +26,7 @@ export function getIconForCustomTab(tabName){
             return 'file-text';
         case 'data_processing':
             return 'area-chart';
-        case 'cohort_summary':
+        case 'case_summary':
         case 'processed_files':
             return 'microchip';
         case 'higlass':
@@ -329,13 +329,14 @@ const TabsBar = React.memo(function TabsBar({ tabs, currentTab, onTabClick, pref
             (disabled ? " disabled" : " clickable")
         );
         const onClick = function(e){
+            e.preventDefault(); // Prevent `a` elem click triggering an actual navigate; this is overriden in `onTabClick`.
             e.stopPropagation();
             onTabClick(key);
         };
         return (
-            <div className={cls} key={key} data-tab-for={key} data-tab-index={idx} onClick={!disabled && onClick}>
+            <a href={"#" + key} className={cls} key={key} data-tab-for={key} data-tab-index={idx} onClick={!disabled && onClick}>
                 { children }
-            </div>
+            </a>
         );
     });
 
@@ -410,7 +411,22 @@ class TabPane extends React.PureComponent {
 
 }
 
-class TabPaneErrorBoundary extends React.PureComponent {
+export class TabPaneErrorBoundary extends React.PureComponent {
+
+    static defaultProps = {
+        "fallbackView" : (
+            <div className="error-boundary-container container">
+                <div className="error-msg-container mt-3 mb-3 row">
+                    <i className="icon icon-times fas col-auto"/>
+                    <div className="title-wrapper col">
+                        <h4 className="text-400 mb-0 mt-0">
+                            A client-side error has occured, please go back or try again later.
+                        </h4>
+                    </div>
+                </div>
+            </div>
+        )
+    };
 
     static getDerivedStateFromError(error) {
         // Update state so the next render will show the fallback UI.
@@ -428,24 +444,10 @@ class TabPaneErrorBoundary extends React.PureComponent {
     }
 
     render(){
-        const { children } = this.props;
+        const { children, fallbackView } = this.props;
         const { hasError } = this.state;
 
-        if (hasError){
-            return (
-                <div className="error-boundary-container container">
-                    <div className="error-msg-container mt-3 mb-3 row">
-                        <i className="icon icon-times fas col-auto"/>
-                        <div className="title-wrapper col">
-                            <h4 className="text-400 mb-0 mt-0">
-                                A client-side error has occured, please go back or try again later.
-                            </h4>
-                        </div>
-                    </div>
-                </div>
-            );
-        }
-
+        if (hasError) return fallbackView;
         return children;
     }
 

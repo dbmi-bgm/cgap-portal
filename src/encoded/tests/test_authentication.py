@@ -3,6 +3,7 @@ import unittest
 
 from pyramid.interfaces import IAuthenticationPolicy
 from pyramid.security import Authenticated, Everyone
+
 from pyramid.testing import DummyRequest
 from zope.interface.verify import verifyClass, verifyObject
 from ..authentication import NamespacedAuthenticationPolicy
@@ -101,3 +102,6 @@ class TestNamespacedAuthenticationPolicy(unittest.TestCase):
         result = policy.forget(request)
         self.assertEqual(request.session.get('userid'), None)
         self.assertEqual(result, [])
+
+
+# NOTE: Tests of get_jwt are in test_auth0.py

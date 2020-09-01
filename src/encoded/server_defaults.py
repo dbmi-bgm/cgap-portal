@@ -1,14 +1,12 @@
-from datetime import datetime
-from jsonschema_serialize_fork import NO_DEFAULT
-from pyramid.threadlocal import get_current_request
-from string import (
-    digits,
-    ascii_uppercase,
-    )
 import random
 import uuid
 
+from datetime import datetime
+from jsonschema_serialize_fork import NO_DEFAULT
+from pyramid.path import DottedNameResolver
+from pyramid.threadlocal import get_current_request
 from snovault.schema_utils import server_default
+from string import digits, ascii_uppercase
 
 
 ACCESSION_FACTORY = __name__ + ':accession_factory'
@@ -16,7 +14,6 @@ ACCESSION_PREFIX = 'GAP'
 
 
 def includeme(config):
-    from pyramid.path import DottedNameResolver
     accession_factory = config.registry.settings.get('accession_factory')
     if accession_factory:
         factory = DottedNameResolver().resolve(accession_factory)

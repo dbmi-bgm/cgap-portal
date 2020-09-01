@@ -12,6 +12,7 @@ import jsonScriptEscape from '../libs/jsonScriptEscape';
 import { content_views as globalContentViews, portalConfig, getGoogleAnalyticsTrackingID, analyticsConfigurationOptions } from './globals';
 import ErrorPage from './static-pages/ErrorPage';
 import { NavigationBar } from './navigation/NavigationBar';
+import { NotLoggedInAlert } from './navigation/components/LoginNavItem';
 import { Footer } from './Footer';
 import { store } from './../store';
 
@@ -208,11 +209,10 @@ export default class App extends React.PureComponent {
      * - Shows browser suggestion alert if not using Chrome, Safari, Firefox.
      * - Sets state.mounted to be true.
      * - Clears out any UTM URI parameters three seconds after mounting (giving Google Analytics time to pick them up).
-     *
-     * @private
      */
     componentDidMount() {
         const { href, context } = this.props;
+        const { session } = this.state;
 
         // The href prop we have was from serverside. It would not have a hash in it, and might be shortened.
         // Here we grab full-length href from window and then update props.href (via Redux), if it is different.
@@ -307,16 +307,16 @@ export default class App extends React.PureComponent {
 
             // If we have UTM URL parameters in the URI, attempt to set history state (& browser) URL to exclude them after a few seconds
             // after Google Analytics may have stored proper 'source', 'medium', etc. (async)
-            const urlParts = url.parse(windowHref, true);
+            const { query = null, protocol, host, pathname } = url.parse(windowHref, true);
             const paramsToClear = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content'];
 
-            if (urlParts.query && _.any(paramsToClear, function(prm){ return typeof urlParts.query[prm] !== 'undefined'; })){
+            if (query && _.any(paramsToClear, function(prm){ return typeof query[prm] !== 'undefined'; })){
                 setTimeout(()=>{
-                    var queryToSet = _.clone(urlParts.query);
-                    _.forEach(paramsToClear, function(prm){ typeof queryToSet[prm] !== 'undefined' && delete queryToSet[prm]; });
-                    var nextUrl = (
-                        urlParts.protocol + '//' + urlParts.host +
-                        urlParts.pathname + (_.keys(queryToSet).length > 0 ? '?' + queryString.stringify(queryToSet) : '')
+                    const queryToSet = _.clone(query);
+                    paramsToClear.forEach(function(prm){ typeof queryToSet[prm] !== 'undefined' && delete queryToSet[prm]; });
+                    const nextUrl = (
+                        protocol + '//' + host +
+                        pathname + (_.keys(queryToSet).length > 0 ? '?' + queryString.stringify(queryToSet) : '')
                     );
                     if (nextUrl !== windowHref && this.historyEnabled){
                         try {
@@ -329,6 +329,16 @@ export default class App extends React.PureComponent {
                     }
                 }, 3000);
             }
+
+            // Set Alert if not on homepage and not logged in. This 'if' logic will likely change later
+            // especially if have multiple 'for-public' pages like blog posts, news, documentation, etc.
+            if (!session && pathname != "/") {
+                // MAYBE TODO next time are working on shared-portal-components (SPC) repository:
+                // Put this Alert into SPC as a predefined/constant export, then cancel/remove it (if active) in the callback function
+                // upon login success ( https://github.com/4dn-dcic/shared-portal-components/blob/master/src/components/navigation/components/LoginController.js#L111 )
+                Alerts.queue(NotLoggedInAlert);
+            }
+
         });
     }
 
@@ -482,7 +492,7 @@ export default class App extends React.PureComponent {
             const tHrefParts = url.parse(targetHref);
             const pHrefParts = memoizedUrlParse(href);
             let tHrefHash = tHrefParts.hash;
-            const samePath = pHrefParts.path === tHrefParts.path;
+            const samePath = pHrefParts.path === tHrefParts.path; // Occurs when click link which has same path but different hash, most often.
             const navOpts = {
                 // Same pathname & search but maybe different hash. Don't add history entry etc.
                 'replace'           : samePath,
@@ -498,9 +508,11 @@ export default class App extends React.PureComponent {
             navigate(targetHref, navOpts, function(){
                 if (targetOffset) targetOffset = parseInt(targetOffset);
                 if (!targetOffset || isNaN(targetOffset)) targetOffset = 112;
-                if (tHrefHash && typeof hrefHash === 'string' && tHrefHash.length > 1 && tHrefHash[1] !== '!'){
+                if (tHrefHash && typeof tHrefHash === 'string' && tHrefHash.length > 1 && tHrefHash[1] !== '!'){
                     tHrefHash = tHrefHash.slice(1); // Strip out '#'
-                    setTimeout(layout.animateScrollTo.bind(null, tHrefHash, 750, targetOffset), 100);
+                    setTimeout(function(){
+                        layout.animateScrollTo(tHrefHash, 750, targetOffset);
+                    }, 100);
                 }
             });
 
@@ -686,6 +698,8 @@ export default class App extends React.PureComponent {
                 Alerts.queue(Alerts.LoggedOut);
                 // Clear out remaining auth/JWT stuff from localStorage if any
                 JWT.remove();
+            } else if (session === true && existingSession === false){
+                Alerts.deQueue([ Alerts.LoggedOut, NotLoggedInAlert ]);
             }
             return { session };
         }, () => {
@@ -1082,12 +1096,7 @@ export default class App extends React.PureComponent {
         }
     }
 
-    /**
-     * Renders the entire HTML of the application.
-     *
-     * @private
-     * @returns {JSX.Element} An `<html>` element.
-     */
+    /** Renders the entire HTML of the application. */
     render() {
         const { context, lastCSSBuildTime, href, contextRequest } = this.props;
         const hrefParts       = memoizedUrlParse(href);
@@ -1170,7 +1179,6 @@ export default class App extends React.PureComponent {
                     }}/>
                     <script data-prop-name="lastCSSBuildTime" type="application/json" dangerouslySetInnerHTML={{ __html: lastCSSBuildTime }}/>
                     <link rel="stylesheet" href={'/static/css/style.css?build=' + (lastCSSBuildTime || 0)} />
-                    <link rel="stylesheet" href="https://unpkg.com/rc-tabs@9.6.0/dist/rc-tabs.min.css" />
                     <SEO.CurrentContext {...{ context, hrefParts, baseDomain }} />
                     <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:200,300,400,600,700,900,300i,400i,600i|Yrsa|Source+Code+Pro:300,400,500,600" rel="stylesheet"/>
                     <script defer type="application/javascript" src="//www.google-analytics.com/analytics.js" />
@@ -1329,7 +1337,6 @@ class BodyElement extends React.PureComponent {
         this.hideTestWarning = this.hideTestWarning.bind(this);
         this.onResize = _.debounce(this.onResize.bind(this), 300);
         this.setupScrollHandler = this.setupScrollHandler.bind(this);
-        this.onAfterTooltipHide = this.onAfterTooltipHide.bind(this);
 
         this.registerWindowOnResizeHandler = this.registerWindowOnResizeHandler.bind(this);
         this.registerWindowOnScrollHandler = this.registerWindowOnScrollHandler.bind(this);
@@ -1661,18 +1668,6 @@ class BodyElement extends React.PureComponent {
         setTimeout(this.throttledScrollHandler, 100, null);
     }
 
-    onAfterTooltipHide(e){
-        // Grab tip & unset style.left and style.top using same method tooltip does internally.
-        const ref = this.tooltipRef && this.tooltipRef.current;
-        const node = (ref && ref.tooltipRef) || null;
-        if (!node || !node.style) {
-            console.warn("Tooltip to hide not found");
-            return;
-        }
-        node.style.left = null;
-        node.style.top = null;
-    }
-
     toggleFullScreen(isFullscreen, callback){
         if (typeof isFullscreen === 'boolean'){
             this.setState({ isFullscreen }, callback);
@@ -1800,8 +1795,7 @@ class BodyElement extends React.PureComponent {
 
                 <div id="overlays-container" ref={this.overlaysContainerRef}/>
 
-                <ReactTooltip effect="solid" ref={this.tooltipRef} globalEventOff="click" key="tooltip"
-                    afterHide={this.onAfterTooltipHide} />
+                <ReactTooltip effect="solid" globalEventOff="click" key="tooltip" uuid="primary-tooltip-fake-uuid" />
 
             </body>
         );

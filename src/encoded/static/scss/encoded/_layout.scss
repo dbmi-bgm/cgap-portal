@@ -543,72 +543,50 @@ body.is-full-screen {
 $margin-util-sizes: 0, 1, 2, 3, 4, 5, 6, 7, 8;  		// * 10px
 $margin-util-sizes-mini: 1, 2, 3, 4, 5, 6, 7, 8; 		// * 1px
 
-@each $util-size in $margin-util-sizes {
-	.mb-#{$util-size},
-	* > .mb-#{$util-size}{
-		margin-bottom : $util-size * 10px !important;
-	}
-	.mt-#{$util-size},
-	* > .mt-#{$util-size}{
-		margin-top : $util-size * 10px !important;
-	}
 
-	@each $util-mini-size in $margin-util-sizes-mini {
-		.mb-#{$util-size}#{$util-mini-size},
-		* > .mb-#{$util-size}#{$util-mini-size}{
-			margin-bottom : ($util-size * 10px) + ($util-mini-size * 1px) !important;
+// Taken largely from bootstrap / spacing.scss
+// Overrides ONLY mb-, mt-, pb-, pt-, ml-, mr-, pl-, and pr- util classnames to use
+// increments of _pixels_ in place of rem units (not too difficult to convert between them when necessary; 16px, 24px, 32px, ..).
+@each $breakpoint in map-keys($grid-breakpoints) {
+	@include media-breakpoint-up($breakpoint) {
+	  	$infix: breakpoint-infix($breakpoint, $grid-breakpoints);
+  
+	  	@each $prop, $abbrev in (margin: m, padding: p) {
+			@each $util-size in $margin-util-sizes {
+				.#{$abbrev}t#{$infix}-#{$util-size} {
+					#{$prop}-top: $util-size * 10px !important;
+				}
+				.#{$abbrev}r#{$infix}-#{$util-size} {
+					#{$prop}-right: $util-size * 10px !important;
+				}
+				.#{$abbrev}b#{$infix}-#{$util-size} {
+					#{$prop}-bottom: $util-size * 10px !important;
+				}
+				.#{$abbrev}l#{$infix}-#{$util-size} {
+					#{$prop}-left: $util-size * 10px !important;
+				}
+
+				@each $util-mini-size in $margin-util-sizes-mini {
+					.#{$abbrev}t#{$infix}-#{$util-size}#{$util-mini-size} {
+						#{$prop}-top: $util-size * 10px + ($util-mini-size * 1px) !important;
+					}
+					.#{$abbrev}r#{$infix}-#{$util-size}#{$util-mini-size} {
+						#{$prop}-right: $util-size * 10px + ($util-mini-size * 1px) !important;
+					}
+					.#{$abbrev}b#{$infix}-#{$util-size}#{$util-mini-size} {
+						#{$prop}-bottom: $util-size * 10px + ($util-mini-size * 1px) !important;
+					}
+					.#{$abbrev}l#{$infix}-#{$util-size}#{$util-mini-size} {
+						#{$prop}-left: $util-size * 10px + ($util-mini-size * 1px) !important;
+					}
+				}
+
+			}
+
 		}
-		.mt-#{$util-size}#{$util-mini-size},
-		* > .mt-#{$util-size}#{$util-mini-size}{
-			margin-top : ($util-size * 10px) + ($util-mini-size * 1px) !important;
-		}
+
+
 	}
-
-}
-
-// Do same for padding.
-@each $util-size in $margin-util-sizes {
-	.pb-#{$util-size}, * > .pb-#{$util-size}{
-		padding-bottom : $util-size * 10px !important;
-	}
-	.pt-#{$util-size}, * > .pt-#{$util-size}{
-		padding-top : $util-size * 10px !important;
-	}
-
-	@each $util-mini-size in $margin-util-sizes-mini {
-		.pb-#{$util-size}#{$util-mini-size}, * > .pb-#{$util-size}#{$util-mini-size}{
-			padding-bottom : ($util-size * 10px) + ($util-mini-size * 1px) !important;
-		}
-		.pmt-#{$util-size}#{$util-mini-size}, * > .pt-#{$util-size}#{$util-mini-size}{
-			padding-top : ($util-size * 10px) + ($util-mini-size * 1px) !important;
-		}
-	}
-
-}
-
-
-// Margin left/right
-@each $util-size in $margin-util-sizes {
-	.ml-#{$util-size},
-	* > .ml-#{$util-size}{
-		margin-left : $util-size * 10px !important;
-	}
-	.mr-#{$util-size},
-	* > .mr-#{$util-size}{
-		margin-right : $util-size * 10px !important;
-	}
-
-	@each $util-mini-size in $margin-util-sizes-mini {
-		.ml-#{$util-size}#{$util-mini-size},
-		* > .ml-#{$util-size}#{$util-mini-size}{
-			margin-left : ($util-size * 10px) + ($util-mini-size * 1px) !important;
-		}
-		.mr-#{$util-size}#{$util-mini-size},
-		* > .mr-#{$util-size}#{$util-mini-size}{
-			margin-right : ($util-size * 10px) + ($util-mini-size * 1px) !important;
-		}
-	}
-
 }
 
 

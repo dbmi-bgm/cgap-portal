@@ -1,0 +1,1807 @@
+[
+    {
+        "status": "in review",
+        "genotype_labels": [
+            {
+                "role": "father",
+                "labels": [
+                    "Heterozygous"
+                ]
+            },
+            {
+                "role": "mother",
+                "labels": [
+                    "Homozygus reference"
+                ]
+            },
+            {
+                "role": "proband",
+                "labels": [
+                    "Heterozygous"
+                ]
+            }
+        ],
+        "PL": "713,0,981",
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "DP": 60,
+        "uuid": "f27fe67a-ba00-4911-b6f3-ddf15e277612",
+        "AD": "34,26",
+        "schema_version": "1",
+        "CALL_INFO": "NA12877_sample",
+        "inheritance_modes": [
+            "Dominant (paternal)"
+        ],
+        "samplegeno": [
+            {
+                "samplegeno_sampleid": "NA12877_sample",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_gt": "C/T",
+                "samplegeno_ad": "34/26",
+                "samplegeno_sex": "M",
+                "samplegeno_role": "father"
+            },
+            {
+                "samplegeno_sampleid": "NA12878_sample",
+                "samplegeno_numgt": "0/0",
+                "samplegeno_gt": "C/C",
+                "samplegeno_ad": "44/0",
+                "samplegeno_sex": "F",
+                "samplegeno_role": "mother"
+            },
+            {
+                "samplegeno_sampleid": "NA12879_sample",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_gt": "C/T",
+                "samplegeno_ad": "23/35",
+                "samplegeno_sex": "F",
+                "samplegeno_role": "proband"
+            }
+        ],
+        "file": "GAPFI2VBKGM7",
+        "date_created": "2020-08-26T15:57:36.117286+00:00",
+        "FS": 1.45,
+        "QUAL": 1734.12,
+        "GQ": 99,
+        "annotation_id": "NA12877_sample:13491630-89c2-456d-b827-4f05a9ef74ac:GAPFI2VBKGM7",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "variant": "13491630-89c2-456d-b827-4f05a9ef74ac",
+        "GT": "0/1",
+        "novoPP": 0.0
+    },
+    {
+        "status": "in review",
+        "genotype_labels": [
+            {
+                "role": "father",
+                "labels": [
+                    "Heterozygous"
+                ]
+            },
+            {
+                "role": "mother",
+                "labels": [
+                    "Heterozygous"
+                ]
+            },
+            {
+                "role": "proband",
+                "labels": [
+                    "Homozygus alternate"
+                ]
+            }
+        ],
+        "PL": "822,0,936",
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "DP": 62,
+        "uuid": "eceb3cdd-bc9e-464b-bd79-9a9031bce7b5",
+        "AD": "33,29",
+        "schema_version": "1",
+        "CALL_INFO": "NA12878_sample",
+        "inheritance_modes": [
+            "Recessive"
+        ],
+        "samplegeno": [
+            {
+                "samplegeno_sampleid": "NA12877_sample",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_gt": "G/C",
+                "samplegeno_ad": "31/13",
+                "samplegeno_sex": "M",
+                "samplegeno_role": "father"
+            },
+            {
+                "samplegeno_sampleid": "NA12878_sample",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_gt": "G/C",
+                "samplegeno_ad": "33/29",
+                "samplegeno_sex": "F",
+                "samplegeno_role": "mother"
+            },
+            {
+                "samplegeno_sampleid": "NA12879_sample",
+                "samplegeno_numgt": "1/1",
+                "samplegeno_gt": "C/C",
+                "samplegeno_ad": "0/50",
+                "samplegeno_sex": "F",
+                "samplegeno_role": "proband"
+            }
+        ],
+        "file": "GAPFI2VBKGM7",
+        "date_created": "2020-08-26T15:57:12.277841+00:00",
+        "FS": 0.6,
+        "QUAL": 2856.94,
+        "GQ": 99,
+        "annotation_id": "NA12878_sample:60adfe49-a675-494e-9b28-8e02516fc508:GAPFI2VBKGM7",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "variant": "60adfe49-a675-494e-9b28-8e02516fc508",
+        "GT": "0/1",
+        "novoPP": 0.0
+    },
+    {
+        "status": "in review",
+        "genotype_labels": [
+            {
+                "role": "father",
+                "labels": [
+                    "Heterozygous"
+                ]
+            },
+            {
+                "role": "mother",
+                "labels": [
+                    "Homozygus reference"
+                ]
+            },
+            {
+                "role": "proband",
+                "labels": [
+                    "Heterozygous"
+                ]
+            }
+        ],
+        "PL": "1029,0,707",
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "DP": 59,
+        "uuid": "ebc8756c-cade-48c8-8f2d-c7bd068d2f28",
+        "AD": "25,34",
+        "schema_version": "1",
+        "CALL_INFO": "NA12877_sample",
+        "inheritance_modes": [
+            "Dominant (paternal)"
+        ],
+        "samplegeno": [
+            {
+                "samplegeno_sampleid": "NA12877_sample",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_gt": "AT/A",
+                "samplegeno_ad": "25/34",
+                "samplegeno_sex": "M",
+                "samplegeno_role": "father"
+            },
+            {
+                "samplegeno_sampleid": "NA12878_sample",
+                "samplegeno_numgt": "0/0",
+                "samplegeno_gt": "AT/AT",
+                "samplegeno_ad": "37/0",
+                "samplegeno_sex": "F",
+                "samplegeno_role": "mother"
+            },
+            {
+                "samplegeno_sampleid": "NA12879_sample",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_gt": "AT/A",
+                "samplegeno_ad": "14/16",
+                "samplegeno_sex": "F",
+                "samplegeno_role": "proband"
+            }
+        ],
+        "file": "GAPFI2VBKGM7",
+        "date_created": "2020-08-26T15:57:11.243816+00:00",
+        "FS": 0.803,
+        "QUAL": 1495.12,
+        "GQ": 99,
+        "annotation_id": "NA12877_sample:ad505791-15b1-4f3b-87b8-5d4e932289ec:GAPFI2VBKGM7",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "variant": "ad505791-15b1-4f3b-87b8-5d4e932289ec",
+        "GT": "0/1",
+        "novoPP": 0.0
+    },
+    {
+        "status": "in review",
+        "genotype_labels": [
+            {
+                "role": "father",
+                "labels": [
+                    "Homozygus reference"
+                ]
+            },
+            {
+                "role": "mother",
+                "labels": [
+                    "Heterozygous"
+                ]
+            },
+            {
+                "role": "proband",
+                "labels": [
+                    "Heterozygous"
+                ]
+            }
+        ],
+        "PL": "864,0,829",
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "DP": 59,
+        "uuid": "d5f6cea1-ec03-48c4-8850-83304eeb8268",
+        "AD": "29,30",
+        "schema_version": "1",
+        "CALL_INFO": "NA12879_sample",
+        "inheritance_modes": [
+            "Dominant (maternal)"
+        ],
+        "samplegeno": [
+            {
+                "samplegeno_sampleid": "NA12877_sample",
+                "samplegeno_numgt": "0/0",
+                "samplegeno_gt": "A/A",
+                "samplegeno_ad": "40/0",
+                "samplegeno_sex": "M",
+                "samplegeno_role": "father"
+            },
+            {
+                "samplegeno_sampleid": "NA12878_sample",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_gt": "A/G",
+                "samplegeno_ad": "26/27",
+                "samplegeno_sex": "F",
+                "samplegeno_role": "mother"
+            },
+            {
+                "samplegeno_sampleid": "NA12879_sample",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_gt": "A/G",
+                "samplegeno_ad": "29/30",
+                "samplegeno_sex": "F",
+                "samplegeno_role": "proband"
+            }
+        ],
+        "file": "GAPFI2VBKGM7",
+        "date_created": "2020-08-26T15:57:37.280537+00:00",
+        "FS": 1.554,
+        "QUAL": 1631.12,
+        "GQ": 99,
+        "annotation_id": "NA12879_sample:507431fc-366e-4197-b0ed-7b4c624da7da:GAPFI2VBKGM7",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "variant": "507431fc-366e-4197-b0ed-7b4c624da7da",
+        "GT": "0/1",
+        "novoPP": 0.0
+    },
+    {
+        "status": "in review",
+        "genotype_labels": [
+            {
+                "role": "father",
+                "labels": [
+                    "Heterozygous"
+                ]
+            },
+            {
+                "role": "mother",
+                "labels": [
+                    "Homozygus reference"
+                ]
+            },
+            {
+                "role": "proband",
+                "labels": [
+                    "Heterozygous"
+                ]
+            }
+        ],
+        "PL": "964,0,692",
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "DP": 59,
+        "uuid": "cc150de1-aa9d-41a7-a45f-f816a171c606",
+        "AD": "25,34",
+        "schema_version": "1",
+        "CALL_INFO": "NA12877_sample",
+        "inheritance_modes": [
+            "Dominant (paternal)"
+        ],
+        "samplegeno": [
+            {
+                "samplegeno_sampleid": "NA12877_sample",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_gt": "T/C",
+                "samplegeno_ad": "25/34",
+                "samplegeno_sex": "M",
+                "samplegeno_role": "father"
+            },
+            {
+                "samplegeno_sampleid": "NA12878_sample",
+                "samplegeno_numgt": "0/0",
+                "samplegeno_gt": "T/T",
+                "samplegeno_ad": "38/0",
+                "samplegeno_sex": "F",
+                "samplegeno_role": "mother"
+            },
+            {
+                "samplegeno_sampleid": "NA12879_sample",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_gt": "T/C",
+                "samplegeno_ad": "23/27",
+                "samplegeno_sex": "F",
+                "samplegeno_role": "proband"
+            }
+        ],
+        "file": "GAPFI2VBKGM7",
+        "date_created": "2020-08-26T15:57:12.595389+00:00",
+        "FS": 9.105,
+        "QUAL": 1741.12,
+        "GQ": 99,
+        "annotation_id": "NA12877_sample:e48f41c1-6866-4755-8ab0-9ad83e576be4:GAPFI2VBKGM7",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "variant": "e48f41c1-6866-4755-8ab0-9ad83e576be4",
+        "GT": "0/1",
+        "novoPP": 0.0
+    },
+    {
+        "status": "in review",
+        "genotype_labels": [
+            {
+                "role": "father",
+                "labels": [
+                    "Heterozygous"
+                ]
+            },
+            {
+                "role": "mother",
+                "labels": [
+                    "Homozygus reference"
+                ]
+            },
+            {
+                "role": "proband",
+                "labels": [
+                    "Heterozygous"
+                ]
+            }
+        ],
+        "PL": "825,0,869",
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "DP": 61,
+        "uuid": "bf470c93-673b-4656-84fe-eadd99c0d713",
+        "AD": "31,30",
+        "schema_version": "1",
+        "CALL_INFO": "NA12879_sample",
+        "inheritance_modes": [
+            "Dominant (paternal)"
+        ],
+        "samplegeno": [
+            {
+                "samplegeno_sampleid": "NA12877_sample",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_gt": "G/A",
+                "samplegeno_ad": "25/16",
+                "samplegeno_sex": "M",
+                "samplegeno_role": "father"
+            },
+            {
+                "samplegeno_sampleid": "NA12878_sample",
+                "samplegeno_numgt": "0/0",
+                "samplegeno_gt": "G/G",
+                "samplegeno_ad": "42/0",
+                "samplegeno_sex": "F",
+                "samplegeno_role": "mother"
+            },
+            {
+                "samplegeno_sampleid": "NA12879_sample",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_gt": "G/A",
+                "samplegeno_ad": "31/30",
+                "samplegeno_sex": "F",
+                "samplegeno_role": "proband"
+            }
+        ],
+        "file": "GAPFI2VBKGM7",
+        "date_created": "2020-08-26T15:57:07.536772+00:00",
+        "FS": 4.948,
+        "QUAL": 1247.12,
+        "GQ": 99,
+        "annotation_id": "NA12879_sample:1fab2f83-4a36-4aff-b9d6-a00e24632402:GAPFI2VBKGM7",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "variant": "1fab2f83-4a36-4aff-b9d6-a00e24632402",
+        "GT": "0/1",
+        "novoPP": 0.0
+    },
+    {
+        "status": "in review",
+        "genotype_labels": [
+            {
+                "role": "father",
+                "labels": [
+                    "Homozygus reference"
+                ]
+            },
+            {
+                "role": "mother",
+                "labels": [
+                    "Heterozygous"
+                ]
+            },
+            {
+                "role": "proband",
+                "labels": [
+                    "Heterozygous"
+                ]
+            }
+        ],
+        "PL": "970,0,1089",
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "DP": 72,
+        "uuid": "b2485e88-18ae-438e-8ea7-a4c20d0f38ee",
+        "AD": "37,35",
+        "schema_version": "1",
+        "CALL_INFO": "NA12879_sample",
+        "inheritance_modes": [
+            "Dominant (maternal)"
+        ],
+        "samplegeno": [
+            {
+                "samplegeno_sampleid": "NA12877_sample",
+                "samplegeno_numgt": "0/0",
+                "samplegeno_gt": "T/T",
+                "samplegeno_ad": "37/0",
+                "samplegeno_sex": "M",
+                "samplegeno_role": "father"
+            },
+            {
+                "samplegeno_sampleid": "NA12878_sample",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_gt": "T/C",
+                "samplegeno_ad": "24/22",
+                "samplegeno_sex": "F",
+                "samplegeno_role": "mother"
+            },
+            {
+                "samplegeno_sampleid": "NA12879_sample",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_gt": "T/C",
+                "samplegeno_ad": "37/35",
+                "samplegeno_sex": "F",
+                "samplegeno_role": "proband"
+            }
+        ],
+        "file": "GAPFI2VBKGM7",
+        "date_created": "2020-08-26T15:57:07.224665+00:00",
+        "FS": 2.364,
+        "QUAL": 1574.12,
+        "GQ": 99,
+        "annotation_id": "NA12879_sample:dbed5da1-3797-4f91-bd8c-a7752e6f34ca:GAPFI2VBKGM7",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "variant": "dbed5da1-3797-4f91-bd8c-a7752e6f34ca",
+        "GT": "0/1",
+        "novoPP": 0.0
+    },
+    {
+        "status": "in review",
+        "PL": "966,0,882",
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "DP": 65,
+        "uuid": "a479457a-b0ba-4e7c-81d7-ce0824403019",
+        "schema_version": "1",
+        "date_created": "2020-08-26T15:57:04.799457+00:00",
+        "GT": "0/1",
+        "cmphet": [
+            {
+                "comhet_impact_transcript": "WEAK_PAIR",
+                "comhet_phase": "Phased",
+                "comhet_mate_variant": "chr9:5919350A>G",
+                "comhet_transcript": "ENST00000381461~ENST00000399933",
+                "comhet_gene": "ENSG00000183354",
+                "comhet_impact_gene": "WEAK_PAIR"
+            }
+        ],
+        "GQ": 99,
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "variant": "eb441913-6215-48ac-95ff-fac6c0ed16ea",
+        "novoPP": 0.0,
+        "AD": "31,34",
+        "CALL_INFO": "NA12877_sample",
+        "inheritance_modes": [
+            "Dominant (paternal)",
+            "Compound Het (Phased/weak_pair)"
+        ],
+        "samplegeno": [
+            {
+                "samplegeno_sampleid": "NA12877_sample",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_gt": "T/C",
+                "samplegeno_ad": "31/34",
+                "samplegeno_sex": "M",
+                "samplegeno_role": "father"
+            },
+            {
+                "samplegeno_sampleid": "NA12878_sample",
+                "samplegeno_numgt": "0/0",
+                "samplegeno_gt": "T/T",
+                "samplegeno_ad": "42/0",
+                "samplegeno_sex": "F",
+                "samplegeno_role": "mother"
+            },
+            {
+                "samplegeno_sampleid": "NA12879_sample",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_gt": "T/C",
+                "samplegeno_ad": "25/30",
+                "samplegeno_sex": "F",
+                "samplegeno_role": "proband"
+            }
+        ],
+        "file": "GAPFI2VBKGM7",
+        "FS": 8.436,
+        "QUAL": 1812.12,
+        "genotype_labels": [
+            {
+                "role": "father",
+                "labels": [
+                    "Heterozygous"
+                ]
+            },
+            {
+                "role": "mother",
+                "labels": [
+                    "Homozygus reference"
+                ]
+            },
+            {
+                "role": "proband",
+                "labels": [
+                    "Heterozygous"
+                ]
+            }
+        ],
+        "annotation_id": "NA12877_sample:eb441913-6215-48ac-95ff-fac6c0ed16ea:GAPFI2VBKGM7"
+    },
+    {
+        "status": "in review",
+        "genotype_labels": [
+            {
+                "role": "father",
+                "labels": [
+                    "Heterozygous"
+                ]
+            },
+            {
+                "role": "mother",
+                "labels": [
+                    "Homozygus reference"
+                ]
+            },
+            {
+                "role": "proband",
+                "labels": [
+                    "Heterozygous"
+                ]
+            }
+        ],
+        "PL": "1065,0,926",
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "DP": 70,
+        "uuid": "9c3c081f-12a3-4c85-9baf-30ea5e3c167d",
+        "AD": "33,37",
+        "schema_version": "1",
+        "CALL_INFO": "NA12877_sample",
+        "inheritance_modes": [
+            "Dominant (paternal)"
+        ],
+        "samplegeno": [
+            {
+                "samplegeno_sampleid": "NA12877_sample",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_gt": "A/T",
+                "samplegeno_ad": "33/37",
+                "samplegeno_sex": "M",
+                "samplegeno_role": "father"
+            },
+            {
+                "samplegeno_sampleid": "NA12878_sample",
+                "samplegeno_numgt": "0/0",
+                "samplegeno_gt": "A/A",
+                "samplegeno_ad": "38/0",
+                "samplegeno_sex": "F",
+                "samplegeno_role": "mother"
+            },
+            {
+                "samplegeno_sampleid": "NA12879_sample",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_gt": "A/T",
+                "samplegeno_ad": "22/15",
+                "samplegeno_sex": "F",
+                "samplegeno_role": "proband"
+            }
+        ],
+        "file": "GAPFI2VBKGM7",
+        "date_created": "2020-08-26T15:57:39.640153+00:00",
+        "FS": 11.351,
+        "QUAL": 1464.12,
+        "GQ": 99,
+        "annotation_id": "NA12877_sample:72d920b1-281d-47b3-abf2-a33fd5a0cfd4:GAPFI2VBKGM7",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "variant": "72d920b1-281d-47b3-abf2-a33fd5a0cfd4",
+        "GT": "0/1",
+        "novoPP": 0.0
+    },
+    {
+        "status": "in review",
+        "genotype_labels": [
+            {
+                "role": "father",
+                "labels": [
+                    "Homozygus reference"
+                ]
+            },
+            {
+                "role": "mother",
+                "labels": [
+                    "Heterozygous"
+                ]
+            },
+            {
+                "role": "proband",
+                "labels": [
+                    "Heterozygous"
+                ]
+            }
+        ],
+        "PL": "543,0,1238",
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "DP": 62,
+        "uuid": "965a950d-df37-430d-9939-55acfc40649e",
+        "AD": "41,21",
+        "schema_version": "1",
+        "CALL_INFO": "NA12878_sample",
+        "inheritance_modes": [
+            "Dominant (maternal)"
+        ],
+        "samplegeno": [
+            {
+                "samplegeno_sampleid": "NA12877_sample",
+                "samplegeno_numgt": "0/0",
+                "samplegeno_gt": "C/C",
+                "samplegeno_ad": "40/0",
+                "samplegeno_sex": "M",
+                "samplegeno_role": "father"
+            },
+            {
+                "samplegeno_sampleid": "NA12878_sample",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_gt": "C/G",
+                "samplegeno_ad": "41/21",
+                "samplegeno_sex": "F",
+                "samplegeno_role": "mother"
+            },
+            {
+                "samplegeno_sampleid": "NA12879_sample",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_gt": "C/G",
+                "samplegeno_ad": "16/34",
+                "samplegeno_sex": "F",
+                "samplegeno_role": "proband"
+            }
+        ],
+        "file": "GAPFI2VBKGM7",
+        "date_created": "2020-08-26T15:57:16.834042+00:00",
+        "FS": 12.034,
+        "QUAL": 1562.12,
+        "GQ": 99,
+        "annotation_id": "NA12878_sample:44b77d6d-cf0e-47db-b78a-8f6618b43d80:GAPFI2VBKGM7",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "variant": "44b77d6d-cf0e-47db-b78a-8f6618b43d80",
+        "GT": "0/1",
+        "novoPP": 0.0
+    },
+    {
+        "status": "in review",
+        "genotype_labels": [
+            {
+                "role": "father",
+                "labels": [
+                    "Heterozygous"
+                ]
+            },
+            {
+                "role": "mother",
+                "labels": [
+                    "Homozygus reference"
+                ]
+            },
+            {
+                "role": "proband",
+                "labels": [
+                    "Heterozygous"
+                ]
+            }
+        ],
+        "PL": "716,0,965",
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "DP": 59,
+        "uuid": "94daf47a-d092-45a3-b91a-15f3bb7c894e",
+        "AD": "33,26",
+        "schema_version": "1",
+        "CALL_INFO": "NA12879_sample",
+        "inheritance_modes": [
+            "Dominant (paternal)"
+        ],
+        "samplegeno": [
+            {
+                "samplegeno_sampleid": "NA12877_sample",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_gt": "C/T",
+                "samplegeno_ad": "26/26",
+                "samplegeno_sex": "M",
+                "samplegeno_role": "father"
+            },
+            {
+                "samplegeno_sampleid": "NA12878_sample",
+                "samplegeno_numgt": "0/0",
+                "samplegeno_gt": "C/C",
+                "samplegeno_ad": "34/0",
+                "samplegeno_sex": "F",
+                "samplegeno_role": "mother"
+            },
+            {
+                "samplegeno_sampleid": "NA12879_sample",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_gt": "C/T",
+                "samplegeno_ad": "33/26",
+                "samplegeno_sex": "F",
+                "samplegeno_role": "proband"
+            }
+        ],
+        "file": "GAPFI2VBKGM7",
+        "date_created": "2020-08-26T15:57:05.248181+00:00",
+        "FS": 0.717,
+        "QUAL": 1432.12,
+        "GQ": 99,
+        "annotation_id": "NA12879_sample:bfc68682-1d79-4555-abd8-6b4a8b8a3fa6:GAPFI2VBKGM7",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "variant": "bfc68682-1d79-4555-abd8-6b4a8b8a3fa6",
+        "GT": "0/1",
+        "novoPP": 0.0
+    },
+    {
+        "status": "in review",
+        "genotype_labels": [
+            {
+                "role": "father",
+                "labels": [
+                    "Heterozygous"
+                ]
+            },
+            {
+                "role": "mother",
+                "labels": [
+                    "Homozygus reference"
+                ]
+            },
+            {
+                "role": "proband",
+                "labels": [
+                    "Homozygus reference"
+                ]
+            }
+        ],
+        "PL": "847,0,858",
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "DP": 60,
+        "uuid": "8805b037-19a7-4d6d-a8d3-c0858c2248e9",
+        "AD": "30,30",
+        "schema_version": "1",
+        "CALL_INFO": "NA12877_sample",
+        "inheritance_modes": [
+            "Low relevance, other"
+        ],
+        "samplegeno": [
+            {
+                "samplegeno_sampleid": "NA12877_sample",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_gt": "C/T",
+                "samplegeno_ad": "30/30",
+                "samplegeno_sex": "M",
+                "samplegeno_role": "father"
+            },
+            {
+                "samplegeno_sampleid": "NA12878_sample",
+                "samplegeno_numgt": "0/0",
+                "samplegeno_gt": "C/C",
+                "samplegeno_ad": "45/0",
+                "samplegeno_sex": "F",
+                "samplegeno_role": "mother"
+            },
+            {
+                "samplegeno_sampleid": "NA12879_sample",
+                "samplegeno_numgt": "0/0",
+                "samplegeno_gt": "C/C",
+                "samplegeno_ad": "40/0",
+                "samplegeno_sex": "F",
+                "samplegeno_role": "proband"
+            }
+        ],
+        "file": "GAPFI2VBKGM7",
+        "date_created": "2020-08-26T15:57:19.589575+00:00",
+        "FS": 7.092,
+        "QUAL": 838.25,
+        "GQ": 99,
+        "annotation_id": "NA12877_sample:226de27f-44d1-47ce-9ceb-e938c59cd40f:GAPFI2VBKGM7",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "variant": "226de27f-44d1-47ce-9ceb-e938c59cd40f",
+        "GT": "0/1",
+        "novoPP": 0.0
+    },
+    {
+        "status": "in review",
+        "genotype_labels": [
+            {
+                "role": "father",
+                "labels": [
+                    "Homozygus reference"
+                ]
+            },
+            {
+                "role": "mother",
+                "labels": [
+                    "Heterozygous"
+                ]
+            },
+            {
+                "role": "proband",
+                "labels": [
+                    "Heterozygous"
+                ]
+            }
+        ],
+        "PL": "759,0,925",
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "DP": 59,
+        "uuid": "77712cdf-702c-47a7-be8c-9627175cafb9",
+        "AD": "32,27",
+        "schema_version": "1",
+        "CALL_INFO": "NA12878_sample",
+        "inheritance_modes": [
+            "Dominant (maternal)"
+        ],
+        "samplegeno": [
+            {
+                "samplegeno_sampleid": "NA12877_sample",
+                "samplegeno_numgt": "0/0",
+                "samplegeno_gt": "C/C",
+                "samplegeno_ad": "35/0",
+                "samplegeno_sex": "M",
+                "samplegeno_role": "father"
+            },
+            {
+                "samplegeno_sampleid": "NA12878_sample",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_gt": "C/T",
+                "samplegeno_ad": "32/27",
+                "samplegeno_sex": "F",
+                "samplegeno_role": "mother"
+            },
+            {
+                "samplegeno_sampleid": "NA12879_sample",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_gt": "C/T",
+                "samplegeno_ad": "23/22",
+                "samplegeno_sex": "F",
+                "samplegeno_role": "proband"
+            }
+        ],
+        "file": "GAPFI2VBKGM7",
+        "date_created": "2020-08-26T15:57:49.057355+00:00",
+        "FS": 0.0,
+        "QUAL": 1366.12,
+        "GQ": 99,
+        "annotation_id": "NA12878_sample:0854c328-9188-4f57-8ab0-3349de505bec:GAPFI2VBKGM7",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "variant": "0854c328-9188-4f57-8ab0-3349de505bec",
+        "GT": "0/1",
+        "novoPP": 0.0
+    },
+    {
+        "status": "in review",
+        "genotype_labels": [
+            {
+                "role": "father",
+                "labels": [
+                    "Heterozygous"
+                ]
+            },
+            {
+                "role": "mother",
+                "labels": [
+                    "Homozygus reference"
+                ]
+            },
+            {
+                "role": "proband",
+                "labels": [
+                    "Heterozygous"
+                ]
+            }
+        ],
+        "PL": "891,0,871",
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "DP": 62,
+        "uuid": "75733707-3b9f-448d-863c-0b04e956f5dc",
+        "AD": "31,31",
+        "schema_version": "1",
+        "CALL_INFO": "NA12879_sample",
+        "inheritance_modes": [
+            "Dominant (paternal)"
+        ],
+        "samplegeno": [
+            {
+                "samplegeno_sampleid": "NA12877_sample",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_gt": "A/T",
+                "samplegeno_ad": "28/23",
+                "samplegeno_sex": "M",
+                "samplegeno_role": "father"
+            },
+            {
+                "samplegeno_sampleid": "NA12878_sample",
+                "samplegeno_numgt": "0/0",
+                "samplegeno_gt": "A/A",
+                "samplegeno_ad": "37/0",
+                "samplegeno_sex": "F",
+                "samplegeno_role": "mother"
+            },
+            {
+                "samplegeno_sampleid": "NA12879_sample",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_gt": "A/T",
+                "samplegeno_ad": "31/31",
+                "samplegeno_sex": "F",
+                "samplegeno_role": "proband"
+            }
+        ],
+        "file": "GAPFI2VBKGM7",
+        "date_created": "2020-08-26T15:57:10.456905+00:00",
+        "FS": 1.5,
+        "QUAL": 1526.12,
+        "GQ": 99,
+        "annotation_id": "NA12879_sample:a94c9f0d-399e-43a2-83f1-994fcfa79a86:GAPFI2VBKGM7",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "variant": "a94c9f0d-399e-43a2-83f1-994fcfa79a86",
+        "GT": "0/1",
+        "novoPP": 0.0
+    },
+    {
+        "status": "in review",
+        "genotype_labels": [
+            {
+                "role": "father",
+                "labels": [
+                    "Homozygus reference"
+                ]
+            },
+            {
+                "role": "mother",
+                "labels": [
+                    "Heterozygous"
+                ]
+            },
+            {
+                "role": "proband",
+                "labels": [
+                    "Homozygus reference"
+                ]
+            }
+        ],
+        "PL": "845,0,831",
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "DP": 59,
+        "uuid": "73e00e00-cac7-4bdb-b155-0ca1e99dc336",
+        "AD": "29,30",
+        "schema_version": "1",
+        "CALL_INFO": "NA12878_sample",
+        "inheritance_modes": [
+            "Low relevance, other"
+        ],
+        "samplegeno": [
+            {
+                "samplegeno_sampleid": "NA12877_sample",
+                "samplegeno_numgt": "0/0",
+                "samplegeno_gt": "T/T",
+                "samplegeno_ad": "46/0",
+                "samplegeno_sex": "M",
+                "samplegeno_role": "father"
+            },
+            {
+                "samplegeno_sampleid": "NA12878_sample",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_gt": "T/C",
+                "samplegeno_ad": "29/30",
+                "samplegeno_sex": "F",
+                "samplegeno_role": "mother"
+            },
+            {
+                "samplegeno_sampleid": "NA12879_sample",
+                "samplegeno_numgt": "0/0",
+                "samplegeno_gt": "T/T",
+                "samplegeno_ad": "40/0",
+                "samplegeno_sex": "F",
+                "samplegeno_role": "proband"
+            }
+        ],
+        "file": "GAPFI2VBKGM7",
+        "date_created": "2020-08-26T15:57:11.604381+00:00",
+        "FS": 2.248,
+        "QUAL": 836.25,
+        "GQ": 99,
+        "annotation_id": "NA12878_sample:35391da0-a344-499f-9f3c-08d7a11af239:GAPFI2VBKGM7",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "variant": "35391da0-a344-499f-9f3c-08d7a11af239",
+        "GT": "0/1",
+        "novoPP": 0.0
+    },
+    {
+        "status": "in review",
+        "genotype_labels": [
+            {
+                "role": "father",
+                "labels": [
+                    "Homozygus reference"
+                ]
+            },
+            {
+                "role": "mother",
+                "labels": [
+                    "Heterozygous"
+                ]
+            },
+            {
+                "role": "proband",
+                "labels": [
+                    "Heterozygous"
+                ]
+            }
+        ],
+        "PL": "960,0,801",
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "DP": 64,
+        "uuid": "5c2545ca-f3c9-40cd-b188-d142e7aa9b10",
+        "AD": "30,34",
+        "schema_version": "1",
+        "CALL_INFO": "NA12879_sample",
+        "inheritance_modes": [
+            "Dominant (maternal)"
+        ],
+        "samplegeno": [
+            {
+                "samplegeno_sampleid": "NA12877_sample",
+                "samplegeno_numgt": "0/0",
+                "samplegeno_gt": "G/G",
+                "samplegeno_ad": "34/0",
+                "samplegeno_sex": "M",
+                "samplegeno_role": "father"
+            },
+            {
+                "samplegeno_sampleid": "NA12878_sample",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_gt": "G/C",
+                "samplegeno_ad": "28/26",
+                "samplegeno_sex": "F",
+                "samplegeno_role": "mother"
+            },
+            {
+                "samplegeno_sampleid": "NA12879_sample",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_gt": "G/C",
+                "samplegeno_ad": "30/34",
+                "samplegeno_sex": "F",
+                "samplegeno_role": "proband"
+            }
+        ],
+        "file": "GAPFI2VBKGM7",
+        "date_created": "2020-08-26T15:57:00.640293+00:00",
+        "FS": 0.685,
+        "QUAL": 1656.12,
+        "GQ": 99,
+        "annotation_id": "NA12879_sample:a1f2410a-8175-4923-b8bf-ff1717525e1e:GAPFI2VBKGM7",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "variant": "a1f2410a-8175-4923-b8bf-ff1717525e1e",
+        "GT": "0/1",
+        "novoPP": 0.0
+    },
+    {
+        "status": "in review",
+        "genotype_labels": [
+            {
+                "role": "father",
+                "labels": [
+                    "Heterozygous"
+                ]
+            },
+            {
+                "role": "mother",
+                "labels": [
+                    "Homozygus reference"
+                ]
+            },
+            {
+                "role": "proband",
+                "labels": [
+                    "Homozygus reference"
+                ]
+            }
+        ],
+        "PL": "813,0,779",
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "DP": 65,
+        "uuid": "4aa2b2f7-2189-4b73-8c12-d1559f507478",
+        "AD": "32,33",
+        "schema_version": "1",
+        "CALL_INFO": "NA12877_sample",
+        "inheritance_modes": [
+            "Low relevance, other"
+        ],
+        "samplegeno": [
+            {
+                "samplegeno_sampleid": "NA12877_sample",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_gt": "GA/G",
+                "samplegeno_ad": "32/33",
+                "samplegeno_sex": "M",
+                "samplegeno_role": "father"
+            },
+            {
+                "samplegeno_sampleid": "NA12878_sample",
+                "samplegeno_numgt": "0/0",
+                "samplegeno_gt": "GA/GA",
+                "samplegeno_ad": "45/0",
+                "samplegeno_sex": "F",
+                "samplegeno_role": "mother"
+            },
+            {
+                "samplegeno_sampleid": "NA12879_sample",
+                "samplegeno_numgt": "0/0",
+                "samplegeno_gt": "GA/GA",
+                "samplegeno_ad": "45/0",
+                "samplegeno_sex": "F",
+                "samplegeno_role": "proband"
+            }
+        ],
+        "file": "GAPFI2VBKGM7",
+        "date_created": "2020-08-26T15:57:07.823572+00:00",
+        "FS": 5.084,
+        "QUAL": 804.25,
+        "GQ": 99,
+        "annotation_id": "NA12877_sample:a5f1f048-fdd1-490b-8a92-8ae3404dac21:GAPFI2VBKGM7",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "variant": "a5f1f048-fdd1-490b-8a92-8ae3404dac21",
+        "GT": "0/1",
+        "novoPP": 0.0
+    },
+    {
+        "status": "in review",
+        "genotype_labels": [
+            {
+                "role": "father",
+                "labels": [
+                    "Homozygus reference"
+                ]
+            },
+            {
+                "role": "mother",
+                "labels": [
+                    "Heterozygous"
+                ]
+            },
+            {
+                "role": "proband",
+                "labels": [
+                    "Homozygus reference"
+                ]
+            }
+        ],
+        "PL": "819,0,849",
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "DP": 61,
+        "uuid": "47e67fc3-1dfd-4f15-8165-65fe82d4134e",
+        "AD": "30,31",
+        "schema_version": "1",
+        "CALL_INFO": "NA12878_sample",
+        "inheritance_modes": [
+            "Low relevance, other"
+        ],
+        "samplegeno": [
+            {
+                "samplegeno_sampleid": "NA12877_sample",
+                "samplegeno_numgt": "0/0",
+                "samplegeno_gt": "A/A",
+                "samplegeno_ad": "43/0",
+                "samplegeno_sex": "M",
+                "samplegeno_role": "father"
+            },
+            {
+                "samplegeno_sampleid": "NA12878_sample",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_gt": "A/C",
+                "samplegeno_ad": "30/31",
+                "samplegeno_sex": "F",
+                "samplegeno_role": "mother"
+            },
+            {
+                "samplegeno_sampleid": "NA12879_sample",
+                "samplegeno_numgt": "0/0",
+                "samplegeno_gt": "A/A",
+                "samplegeno_ad": "43/0",
+                "samplegeno_sex": "F",
+                "samplegeno_role": "proband"
+            }
+        ],
+        "file": "GAPFI2VBKGM7",
+        "date_created": "2020-08-26T15:57:50.152802+00:00",
+        "FS": 5.148,
+        "QUAL": 810.25,
+        "GQ": 99,
+        "annotation_id": "NA12878_sample:357e6cd4-3662-487d-8c02-0fc6c58101b4:GAPFI2VBKGM7",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "variant": "357e6cd4-3662-487d-8c02-0fc6c58101b4",
+        "GT": "0/1",
+        "novoPP": 0.0
+    },
+    {
+        "status": "in review",
+        "genotype_labels": [
+            {
+                "role": "father",
+                "labels": [
+                    "Homozygus reference"
+                ]
+            },
+            {
+                "role": "mother",
+                "labels": [
+                    "Heterozygous"
+                ]
+            },
+            {
+                "role": "proband",
+                "labels": [
+                    "Homozygus reference"
+                ]
+            }
+        ],
+        "PL": "1203,0,1619",
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "DP": 65,
+        "uuid": "2bc6d245-f638-43e8-962f-779aec42581f",
+        "AD": "34,31",
+        "schema_version": "1",
+        "CALL_INFO": "NA12878_sample",
+        "inheritance_modes": [
+            "Low relevance, other"
+        ],
+        "samplegeno": [
+            {
+                "samplegeno_sampleid": "NA12877_sample",
+                "samplegeno_numgt": "0/0",
+                "samplegeno_gt": "T/T",
+                "samplegeno_ad": "31/0",
+                "samplegeno_sex": "M",
+                "samplegeno_role": "father"
+            },
+            {
+                "samplegeno_sampleid": "NA12878_sample",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_gt": "T/TAGC",
+                "samplegeno_ad": "34/31",
+                "samplegeno_sex": "F",
+                "samplegeno_role": "mother"
+            },
+            {
+                "samplegeno_sampleid": "NA12879_sample",
+                "samplegeno_numgt": "0/0",
+                "samplegeno_gt": "T/T",
+                "samplegeno_ad": "34/0",
+                "samplegeno_sex": "F",
+                "samplegeno_role": "proband"
+            }
+        ],
+        "file": "GAPFI2VBKGM7",
+        "date_created": "2020-08-26T15:57:19.420688+00:00",
+        "FS": 0.0,
+        "QUAL": 1194.29,
+        "GQ": 99,
+        "annotation_id": "NA12878_sample:872be018-c99b-4428-9bfa-80ef03b52703:GAPFI2VBKGM7",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "variant": "872be018-c99b-4428-9bfa-80ef03b52703",
+        "GT": "0/1",
+        "novoPP": 0.0
+    },
+    {
+        "status": "in review",
+        "genotype_labels": [
+            {
+                "role": "father",
+                "labels": [
+                    "Heterozygous"
+                ]
+            },
+            {
+                "role": "mother",
+                "labels": [
+                    "Homozygus reference"
+                ]
+            },
+            {
+                "role": "proband",
+                "labels": [
+                    "Homozygus reference"
+                ]
+            }
+        ],
+        "PL": "966,0,758",
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "DP": 60,
+        "uuid": "274651f0-712a-49a4-98a3-b69d21b58aed",
+        "AD": "27,33",
+        "schema_version": "1",
+        "CALL_INFO": "NA12877_sample",
+        "inheritance_modes": [
+            "Low relevance, other"
+        ],
+        "samplegeno": [
+            {
+                "samplegeno_sampleid": "NA12877_sample",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_gt": "C/T",
+                "samplegeno_ad": "27/33",
+                "samplegeno_sex": "M",
+                "samplegeno_role": "father"
+            },
+            {
+                "samplegeno_sampleid": "NA12878_sample",
+                "samplegeno_numgt": "0/0",
+                "samplegeno_gt": "C/C",
+                "samplegeno_ad": "37/0",
+                "samplegeno_sex": "F",
+                "samplegeno_role": "mother"
+            },
+            {
+                "samplegeno_sampleid": "NA12879_sample",
+                "samplegeno_numgt": "0/0",
+                "samplegeno_gt": "C/C",
+                "samplegeno_ad": "38/0",
+                "samplegeno_sex": "F",
+                "samplegeno_role": "proband"
+            }
+        ],
+        "file": "GAPFI2VBKGM7",
+        "date_created": "2020-08-26T15:57:42.788859+00:00",
+        "FS": 9.266,
+        "QUAL": 957.25,
+        "GQ": 99,
+        "annotation_id": "NA12877_sample:c204ff53-06c1-4754-9657-ec965c749ee7:GAPFI2VBKGM7",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "variant": "c204ff53-06c1-4754-9657-ec965c749ee7",
+        "GT": "0/1",
+        "novoPP": 0.0
+    },
+    {
+        "status": "in review",
+        "genotype_labels": [
+            {
+                "role": "father",
+                "labels": [
+                    "Homozygus reference"
+                ]
+            },
+            {
+                "role": "mother",
+                "labels": [
+                    "Heterozygous"
+                ]
+            },
+            {
+                "role": "proband",
+                "labels": [
+                    "Homozygus reference"
+                ]
+            }
+        ],
+        "PL": "784,0,893",
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "DP": 59,
+        "uuid": "26bd9fa2-7e62-467b-a59a-f94a3974ad6d",
+        "AD": "31,28",
+        "schema_version": "1",
+        "CALL_INFO": "NA12878_sample",
+        "inheritance_modes": [
+            "Low relevance, other"
+        ],
+        "samplegeno": [
+            {
+                "samplegeno_sampleid": "NA12877_sample",
+                "samplegeno_numgt": "0/0",
+                "samplegeno_gt": "A/A",
+                "samplegeno_ad": "35/0",
+                "samplegeno_sex": "M",
+                "samplegeno_role": "father"
+            },
+            {
+                "samplegeno_sampleid": "NA12878_sample",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_gt": "A/G",
+                "samplegeno_ad": "31/28",
+                "samplegeno_sex": "F",
+                "samplegeno_role": "mother"
+            },
+            {
+                "samplegeno_sampleid": "NA12879_sample",
+                "samplegeno_numgt": "0/0",
+                "samplegeno_gt": "A/A",
+                "samplegeno_ad": "38/0",
+                "samplegeno_sex": "F",
+                "samplegeno_role": "proband"
+            }
+        ],
+        "file": "GAPFI2VBKGM7",
+        "date_created": "2020-08-26T15:57:18.692633+00:00",
+        "FS": 5.238,
+        "QUAL": 775.25,
+        "GQ": 99,
+        "annotation_id": "NA12878_sample:8d4a189c-c671-4969-9e15-a222f60e95bf:GAPFI2VBKGM7",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "variant": "8d4a189c-c671-4969-9e15-a222f60e95bf",
+        "GT": "0/1",
+        "novoPP": 0.0
+    },
+    {
+        "status": "in review",
+        "genotype_labels": [
+            {
+                "role": "father",
+                "labels": [
+                    "Homozygus reference"
+                ]
+            },
+            {
+                "role": "mother",
+                "labels": [
+                    "Heterozygous"
+                ]
+            },
+            {
+                "role": "proband",
+                "labels": [
+                    "Homozygus reference"
+                ]
+            }
+        ],
+        "PL": "690,0,987",
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "DP": 59,
+        "uuid": "2398f788-c92b-49a7-b2ce-9e2d95d450f8",
+        "AD": "34,25",
+        "schema_version": "1",
+        "CALL_INFO": "NA12878_sample",
+        "inheritance_modes": [
+            "Low relevance, other"
+        ],
+        "samplegeno": [
+            {
+                "samplegeno_sampleid": "NA12877_sample",
+                "samplegeno_numgt": "0/0",
+                "samplegeno_gt": "T/T",
+                "samplegeno_ad": "38/0",
+                "samplegeno_sex": "M",
+                "samplegeno_role": "father"
+            },
+            {
+                "samplegeno_sampleid": "NA12878_sample",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_gt": "T/C",
+                "samplegeno_ad": "34/25",
+                "samplegeno_sex": "F",
+                "samplegeno_role": "mother"
+            },
+            {
+                "samplegeno_sampleid": "NA12879_sample",
+                "samplegeno_numgt": "0/0",
+                "samplegeno_gt": "T/T",
+                "samplegeno_ad": "40/0",
+                "samplegeno_sex": "F",
+                "samplegeno_role": "proband"
+            }
+        ],
+        "file": "GAPFI2VBKGM7",
+        "date_created": "2020-08-26T15:57:29.131298+00:00",
+        "FS": 3.565,
+        "QUAL": 681.25,
+        "GQ": 99,
+        "annotation_id": "NA12878_sample:0893761e-27b6-4fd3-aa30-2cf6a700d463:GAPFI2VBKGM7",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "variant": "0893761e-27b6-4fd3-aa30-2cf6a700d463",
+        "GT": "0/1",
+        "novoPP": 0.0
+    },
+    {
+        "status": "in review",
+        "genotype_labels": [
+            {
+                "role": "father",
+                "labels": [
+                    "Heterozygous"
+                ]
+            },
+            {
+                "role": "mother",
+                "labels": [
+                    "Homozygus reference"
+                ]
+            },
+            {
+                "role": "proband",
+                "labels": [
+                    "Heterozygous"
+                ]
+            }
+        ],
+        "PL": "823,0,828",
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "DP": 60,
+        "uuid": "1b3f5182-7d7f-4017-9386-cdfdcdc1ac06",
+        "AD": "30,30",
+        "schema_version": "1",
+        "CALL_INFO": "NA12877_sample",
+        "inheritance_modes": [
+            "Dominant (paternal)"
+        ],
+        "samplegeno": [
+            {
+                "samplegeno_sampleid": "NA12877_sample",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_gt": "A/G",
+                "samplegeno_ad": "30/30",
+                "samplegeno_sex": "M",
+                "samplegeno_role": "father"
+            },
+            {
+                "samplegeno_sampleid": "NA12878_sample",
+                "samplegeno_numgt": "0/0",
+                "samplegeno_gt": "A/A",
+                "samplegeno_ad": "38/0",
+                "samplegeno_sex": "F",
+                "samplegeno_role": "mother"
+            },
+            {
+                "samplegeno_sampleid": "NA12879_sample",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_gt": "A/G",
+                "samplegeno_ad": "19/27",
+                "samplegeno_sex": "F",
+                "samplegeno_role": "proband"
+            }
+        ],
+        "file": "GAPFI2VBKGM7",
+        "date_created": "2020-08-26T15:57:23.159336+00:00",
+        "FS": 0.0,
+        "QUAL": 1612.12,
+        "GQ": 99,
+        "annotation_id": "NA12877_sample:fa6f3a94-f768-4119-8df6-e113659b72bf:GAPFI2VBKGM7",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "variant": "fa6f3a94-f768-4119-8df6-e113659b72bf",
+        "GT": "0/1",
+        "novoPP": 0.0
+    },
+    {
+        "status": "in review",
+        "genotype_labels": [
+            {
+                "role": "father",
+                "labels": [
+                    "Homozygus reference"
+                ]
+            },
+            {
+                "role": "mother",
+                "labels": [
+                    "Heterozygous"
+                ]
+            },
+            {
+                "role": "proband",
+                "labels": [
+                    "Heterozygous"
+                ]
+            }
+        ],
+        "PL": "1226,0,721",
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "DP": 70,
+        "uuid": "0f2befaa-1ff4-4068-9430-8fee2e7d653c",
+        "AD": "28,42",
+        "schema_version": "1",
+        "CALL_INFO": "NA12878_sample",
+        "inheritance_modes": [
+            "Dominant (maternal)"
+        ],
+        "samplegeno": [
+            {
+                "samplegeno_sampleid": "NA12877_sample",
+                "samplegeno_numgt": "0/0",
+                "samplegeno_gt": "A/A",
+                "samplegeno_ad": "56/0",
+                "samplegeno_sex": "M",
+                "samplegeno_role": "father"
+            },
+            {
+                "samplegeno_sampleid": "NA12878_sample",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_gt": "A/G",
+                "samplegeno_ad": "28/42",
+                "samplegeno_sex": "F",
+                "samplegeno_role": "mother"
+            },
+            {
+                "samplegeno_sampleid": "NA12879_sample",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_gt": "A/G",
+                "samplegeno_ad": "26/20",
+                "samplegeno_sex": "F",
+                "samplegeno_role": "proband"
+            }
+        ],
+        "file": "GAPFI2VBKGM7",
+        "date_created": "2020-08-26T15:57:40.419630+00:00",
+        "FS": 1.494,
+        "QUAL": 1759.12,
+        "GQ": 99,
+        "annotation_id": "NA12878_sample:5be681c8-9370-4423-9100-adb29b6a3a6d:GAPFI2VBKGM7",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "variant": "5be681c8-9370-4423-9100-adb29b6a3a6d",
+        "GT": "0/1",
+        "novoPP": 0.0
+    },
+    {
+        "status": "in review",
+        "genotype_labels": [
+            {
+                "role": "father",
+                "labels": [
+                    "Heterozygous"
+                ]
+            },
+            {
+                "role": "mother",
+                "labels": [
+                    "Homozygus reference"
+                ]
+            },
+            {
+                "role": "proband",
+                "labels": [
+                    "Homozygus reference"
+                ]
+            }
+        ],
+        "PL": "886,0,825",
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "DP": 61,
+        "uuid": "0891191f-ab0e-4a60-804f-51d26d6a6d50",
+        "AD": "29,32",
+        "schema_version": "1",
+        "CALL_INFO": "NA12877_sample",
+        "inheritance_modes": [
+            "Low relevance, other"
+        ],
+        "samplegeno": [
+            {
+                "samplegeno_sampleid": "NA12877_sample",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_gt": "A/C",
+                "samplegeno_ad": "29/32",
+                "samplegeno_sex": "M",
+                "samplegeno_role": "father"
+            },
+            {
+                "samplegeno_sampleid": "NA12878_sample",
+                "samplegeno_numgt": "0/0",
+                "samplegeno_gt": "A/A",
+                "samplegeno_ad": "41/0",
+                "samplegeno_sex": "F",
+                "samplegeno_role": "mother"
+            },
+            {
+                "samplegeno_sampleid": "NA12879_sample",
+                "samplegeno_numgt": "0/0",
+                "samplegeno_gt": "A/A",
+                "samplegeno_ad": "41/0",
+                "samplegeno_sex": "F",
+                "samplegeno_role": "proband"
+            }
+        ],
+        "file": "GAPFI2VBKGM7",
+        "date_created": "2020-08-26T15:57:32.311731+00:00",
+        "FS": 3.596,
+        "QUAL": 877.25,
+        "GQ": 99,
+        "annotation_id": "NA12877_sample:554b39a5-ea62-4e2d-9f4f-f1954533418e:GAPFI2VBKGM7",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "variant": "554b39a5-ea62-4e2d-9f4f-f1954533418e",
+        "GT": "0/1",
+        "novoPP": 0.0
+    },
+    {
+        "status": "in review",
+        "genotype_labels": [
+            {
+                "role": "father",
+                "labels": [
+                    "Heterozygous"
+                ]
+            },
+            {
+                "role": "mother",
+                "labels": [
+                    "Homozygus reference"
+                ]
+            },
+            {
+                "role": "proband",
+                "labels": [
+                    "Heterozygous"
+                ]
+            }
+        ],
+        "PL": "759,0,930",
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "DP": 59,
+        "uuid": "02acaf27-89be-4f89-aede-b4d63979b3ce",
+        "AD": "32,27",
+        "schema_version": "1",
+        "CALL_INFO": "NA12879_sample",
+        "inheritance_modes": [
+            "Dominant (paternal)"
+        ],
+        "samplegeno": [
+            {
+                "samplegeno_sampleid": "NA12877_sample",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_gt": "G/A",
+                "samplegeno_ad": "22/22",
+                "samplegeno_sex": "M",
+                "samplegeno_role": "father"
+            },
+            {
+                "samplegeno_sampleid": "NA12878_sample",
+                "samplegeno_numgt": "0/0",
+                "samplegeno_gt": "G/G",
+                "samplegeno_ad": "38/0",
+                "samplegeno_sex": "F",
+                "samplegeno_role": "mother"
+            },
+            {
+                "samplegeno_sampleid": "NA12879_sample",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_gt": "G/A",
+                "samplegeno_ad": "32/27",
+                "samplegeno_sex": "F",
+                "samplegeno_role": "proband"
+            }
+        ],
+        "file": "GAPFI2VBKGM7",
+        "date_created": "2020-08-26T15:57:35.125401+00:00",
+        "FS": 6.227,
+        "QUAL": 1377.12,
+        "GQ": 99,
+        "annotation_id": "NA12879_sample:f7194cfa-aed6-4f0c-b252-fe6b40ec0294:GAPFI2VBKGM7",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "variant": "f7194cfa-aed6-4f0c-b252-fe6b40ec0294",
+        "GT": "0/1",
+        "novoPP": 0.0
+    }
+]
