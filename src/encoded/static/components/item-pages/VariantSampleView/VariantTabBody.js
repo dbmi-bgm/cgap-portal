@@ -9,22 +9,39 @@ import { console, schemaTransforms } from '@hms-dbmi-bgm/shared-portal-component
 import { Alerts } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/Alerts';
 
 import { Schemas } from './../../util';
+import { ExternalDatabasesSection } from './GeneTabBody';
 
 /**
  * Excluding the Gene Area (under position in mockuop https://gyazo.com/81d5b75b167bddef1b4c0a97f1640c51)
  */
 
 export const VariantTabBody = React.memo(function VariantTabBody ({ context, schemas, currentTranscriptIdx }) {
+    const { variant } = context;
+    const {
+        clinvar_variationid: variationID,
+    } = variant;
 
-    const getTipForField = useMemo(function(){
-        if (!schemas) return function(){ return null; };
-        // Helper func to basically just shorten `schemaTransforms.getSchemaProperty(field, schemas, itemType);`.
-        return function(field, itemType = "Variant"){
-            // Func is scoped within GeneTabBody (uses its 'schemas')
-            const schemaProperty = schemaTransforms.getSchemaProperty(field, schemas, itemType);
-            return (schemaProperty || {}).description || null;
+    const { getTipForField, clinvarExternalHref } = useMemo(function(){
+
+        const ret = {
+            getTipForField: function(){ return null; },
+            clinvarIDSchemaProperty: null,
+            clinvarExternalHref: null
         };
-    }, [ schemas ]);
+
+        if (schemas){
+            // Helper func to basically just shorten `schemaTransforms.getSchemaProperty(field, schemas, itemType);`.
+            ret.getTipForField = function(field, itemType = "Variant"){
+                // Func is scoped within GeneTabBody (uses its 'schemas')
+                const schemaProperty = schemaTransforms.getSchemaProperty(field, schemas, itemType);
+                return (schemaProperty || {}).description || null;
+            };
+            const clinvarIDSchemaProperty = schemaTransforms.getSchemaProperty("clinvar_variationid", schemas, "Variant");
+            ret.clinvarExternalHref = clinvarIDSchemaProperty.link.replace("<ID>", variationID);
+        }
+
+        return ret;
+    }, [ schemas, variationID ]);
 
     return (
         <div className="variant-tab-body card-body">
@@ -35,12 +52,17 @@ export const VariantTabBody = React.memo(function VariantTabBody ({ context, sch
                     <div className="inner-card-section flex-grow-1 pb-2 pb-xl-1">
                         <div className="info-header-title">
                             <h4>
-                                {/* todo link to ClinVar */}
-                                ClinVar
+                                { clinvarExternalHref ?
+                                    <a href={clinvarExternalHref} rel="noopener noreferrer" target="_blank">
+                                        ClinVar
+                                        <i className="icon icon-external-link-alt fas ml-07 text-small"/>
+                                    </a>
+                                    : "ClinVar"
+                                }
                             </h4>
                         </div>
                         <div className="info-body clinvar-info-body">
-                            <ClinVarSection {...{ getTipForField, context }} />
+                            <ClinVarSection {...{ getTipForField, context, schemas, clinvarExternalHref }} />
                         </div>
                     </div>
 
@@ -66,7 +88,7 @@ export const VariantTabBody = React.memo(function VariantTabBody ({ context, sch
                         </div>
                         <div className="info-body">
                             {/* We could maybe rename+put `ExternalDatabasesSection` into own file (from GeneTabBody.js), parameterize itemtype for schemas, and re-use ? */}
-                            <ExternalResourcesSection />
+                            <ExternalResourcesSection {...{ context, schemas }} />
                         </div>
                     </div>
 
@@ -177,7 +199,7 @@ const GnomADTable = React.memo(function GnomADTable({ context, getTipForField })
     );
 });
 
-function ClinVarSection({ context, getTipForField }){
+function ClinVarSection({ context, getTipForField, schemas, clinvarExternalHref }){
     const { variant } = context;
     const {
         clinvar_variationid: variationID,
@@ -190,8 +212,8 @@ function ClinVarSection({ context, getTipForField }){
     if (!variationID) {
         // No ClinVar info available ??
         return (
-            <div className="d-flex align-items-center justify-content-center text-large h-100 pb-08">
-                <em>Not Available</em>
+            <div className="d-flex align-items-center justify-content-center text-large h-100">
+                <h4 className="font-italic text-400 my-0 pb-08">No record in ClinVar</h4>
             </div>
         );
     }
@@ -208,10 +230,12 @@ function ClinVarSection({ context, getTipForField }){
             <div className="row mb-1">
                 <div className="col">
                     <label data-tip={getTipForField("clinvar_variationid")} className="mr-1 mb-0">ID: </label>
-                    <a href="#TODO">
-                        { variationID }
-                        <i className="icon icon-external-link-alt fas ml-07"/>
-                    </a>
+                    { clinvarExternalHref?
+                        <a href={clinvarExternalHref} target="_blank" rel="noopener noreferrer">
+                            { variationID }
+                            <i className="icon icon-external-link-alt fas ml-07 text-small"/>
+                        </a>
+                        : <span>{ variationID }</span> }
                 </div>
                 <div className="col">
                     <label data-tip={getTipForField("clinvar_submission")} className="mr-1 mb-0">Submissions: </label>
@@ -428,11 +452,11 @@ function PredictorsTableHeading(){
 }
 
 
-function ExternalResourcesSection(){
+function ExternalResourcesSection({ context, schemas }){
+    const { variant } = context;
+    const externalDatabaseFieldnames = ["clinvar_variationid", "vep_feature", "vep_ccds", "vep_ensp", "vep_swissprot", "vep_trembl"];
     return (
-        <div className="d-flex align-items-center justify-content-center text-large h-100 pb-08">
-            <em>Coming Soon</em>
-        </div>
+        <ExternalDatabasesSection currentItem={variant} itemType="Variant" {...{ schemas, externalDatabaseFieldnames }} />
     );
 }
 

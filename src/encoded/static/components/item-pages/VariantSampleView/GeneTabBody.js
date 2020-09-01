@@ -122,11 +122,11 @@ export function GeneTabBody(props){
 
                             <div className="row mb-03">
                                 <div className="col-12 col-xl-3">
-                                    <label htmlFor="variant.transcript.vep_gene.todo2" className="mb-0" data-tip={null}>
+                                    <label htmlFor="variant.transcript.vep_gene.alias_symbol" className="mb-0" data-tip={null}>
                                         Alias Symbol:
                                     </label>
                                 </div>
-                                <div className="col-12 col-xl-9" id="variant.transcript.vep_gene.todo2">
+                                <div className="col-12 col-xl-9" id="variant.transcript.vep_gene.alias_symbol">
                                     { alias_symbol }
                                 </div>
                             </div>
@@ -198,7 +198,7 @@ export function GeneTabBody(props){
     );
 }
 
-const ExternalDatabasesSection = React.memo(function ExternalDatabasesSection(props){
+export const ExternalDatabasesSection = React.memo(function ExternalDatabasesSection(props){
     const {
         currentItem, // Renamed from 'currentGeneItem' in case want to move & re-use for Variant, also.
         schemas = null,
@@ -212,7 +212,7 @@ const ExternalDatabasesSection = React.memo(function ExternalDatabasesSection(pr
 
     if (!schemas) {
         return (
-            <div className="text-center">
+            <div className="text-secondary d-flex align-items-center justify-content-center h-100 pb-12 text-larger pb-08">
                 <i className="icon icon-spin icon-circle-notch fas" />
             </div>
         );
@@ -248,7 +248,7 @@ const ExternalDatabasesSection = React.memo(function ExternalDatabasesSection(pr
                 </div>
                 <a className="col-12 col-xl-auto" href={linkToID || null} tagret="_blank" rel="noopener noreferrer" id={"variant.transcript.vep_gene." + fieldName}>
                     <span>{ externalID }</span>
-                    <i className="ml-05 icon icon-fw icon-external-link-alt fas small text-secondary" />
+                    <i className="ml-05 icon icon-fw icon-external-link-alt fas text-smaller text-secondary" />
                 </a>
             </div>
         );
@@ -256,7 +256,7 @@ const ExternalDatabasesSection = React.memo(function ExternalDatabasesSection(pr
 
     const externalDatabaseElemsLen = externalDatabaseElems.length;
     if (externalDatabaseElemsLen === 0) {
-        return <h4 className="text-center font-italic text-400">No External Databases</h4>;
+        return <h4 className="text-center font-italic text-400 my-0 pb-08">No External Databases</h4>;
     } else if (externalDatabaseElemsLen >= 4) {
         const mp = Math.ceil(externalDatabaseElemsLen / 2);
         const col1 = externalDatabaseElems.slice(0, mp);
