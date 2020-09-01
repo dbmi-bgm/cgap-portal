@@ -2,14 +2,6 @@
 common.py - tools common to various parts of ingestion
 """
 
-# import codecs
-# import contextlib
-# import io
-# import os
-# import tempfile
-
-from dcicutils.env_utils import is_stg_or_prd_env, is_cgap_env
-from dcicutils.misc_utils import check_true
 from .exceptions import MissingParameter, BadParameter
 
 
@@ -17,9 +9,24 @@ def metadata_bundles_bucket(registry):
     return registry.settings.get('metadata_bundles_bucket')
 
 
+# ==================================================
+
+# IMPLEMENTATION NOTE:
+#
+#    We have middleware that overrides various details about content type that are declared in the view_config.
+#    It used to work by having a wired set of exceptions, but this facility allows us to do it in a more data-driven
+#    way. Really I think we should just rely on the information in the view_config, but I didn't have time to explore
+#    why we are not using that.
+#
+#    See validate_request_tween_factory in renderers.py for where this is used. This declaration info is here
+#    rather than there to simplify the load order dependencies.
+#
+#    -kmp 1-Sep-2020
+
 CONTENT_TYPE_SPECIAL_CASES = {
     'application/x-www-form-urlencoded': [
-        # Legacy special case to allow us to POST to metadata TSV requests via form submission.
+        # Single legacy special case to allow us to POST to metadata TSV requests via form submission.
+        # All other special case values should be added using register_path_content_type.
         '/metadata/'
     ]
 }
@@ -27,7 +34,10 @@ CONTENT_TYPE_SPECIAL_CASES = {
 
 def register_path_content_type(*, path, content_type):
     """
-    Registers that endpoints that begin with the specified path
+    Registers that endpoints that begin with the specified path use the indicated content_type.
+
+    This is part of an inelegant workaround for an issue in renderers.py that maybe we can make go away in the future.
+    See the 'implementation note' in ingestion/common.py for more details.
     """
     exceptions = CONTENT_TYPE_SPECIAL_CASES.get(content_type, None)
     if exceptions is None:
@@ -39,6 +49,9 @@ def register_path_content_type(*, path, content_type):
 def content_type_allowed(request):
     """
     Returns True if the current request allows the requested content type.
+
+    This is part of an inelegant workaround for an issue in renderers.py that maybe we can make go away in the future.
+    See the 'implementation note' in ingestion/common.py for more details.
     """
     if request.content_type == "application/json":
         # For better or worse, we always allow this.
@@ -53,6 +66,7 @@ def content_type_allowed(request):
 
     return False
 
+# ==================================================
 
 _NO_DEFAULT = object()
 
