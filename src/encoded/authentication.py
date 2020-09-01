@@ -536,7 +536,7 @@ def create_unauthorized_user(context, request):
     user_props['was_unauthorized'] = True
     user_props['email'] = user_props_email  # lowercased
     user_coll = request.registry[COLLECTIONS]['User']
-    request.remote_user = 'EMBED'  # permission = import_items
+    request.remote_user = 'EMBED'  # permission = restriced_fields
 
     # validate the User json
     validate_request(user_coll.type_info.schema, request, user_props)

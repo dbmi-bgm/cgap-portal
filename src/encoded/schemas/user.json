@@ -26,7 +26,7 @@
             "title": "Projects and Roles",
             "description": "Projects that a User is part of and the role(s) within that Project a User has",
             "type": "array",
-            "permission": "import_items",
+            "permission": "restriced_fields",
             "items": {
                 "title": "Project-Role",
                 "type": "object",
@@ -99,7 +99,7 @@
             "type": "array",
             "lookup": 80,
             "uniqueItems": true,
-            "permission": "import_items",
+            "permission": "restriced_fields",
             "items": {
                 "type": "string"
             }
@@ -155,11 +155,11 @@
             "title": "Pending Institution",
             "description": "Non-linkTo identifier of an institution this user wants associate with",
             "type": "string",
-            "permission": "import_items"
+            "permission": "restriced_fields"
         },
         "was_unauthorized": {
             "title": "Was Unauthorized",
-            "permission": "import_items",
+            "permission": "restriced_fields",
             "description": "Flag that is True if user was created with create-unauthorized-user endpoint",
             "type": "boolean"
         }

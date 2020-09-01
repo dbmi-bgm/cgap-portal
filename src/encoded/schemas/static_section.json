@@ -39,7 +39,7 @@
             "title": "Section Type",
             "type": "string",
             "description": "What this section is used for. Defaults to 'Page Section'.",
-            "permission" : "import_items",
+            "permission" : "restriced_fields",
             "default": "Page Section",
             "enum" : [
                 "Page Section",

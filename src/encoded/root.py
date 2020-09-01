@@ -194,7 +194,7 @@ class CGAPRoot(Root):
         acl = acl_from_settings(self.registry.settings) + [
             (Allow, Everyone, ['list', 'search']),
             (Allow, 'group.admin', ALL_PERMISSIONS),
-            (Allow, 'remoteuser.EMBED', 'import_items'),
+            (Allow, 'remoteuser.EMBED', 'restriced_fields'),
         ] + [
             (Allow, 'remoteuser.INDEXER', ['view', 'view_raw', 'list', 'index']),
             (Allow, 'remoteuser.EMBED', ['view', 'view_raw', 'expand']),
