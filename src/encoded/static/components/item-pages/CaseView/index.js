@@ -131,7 +131,8 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
         actions: permissibleActions = [],
         display_title: caseTitle,
         accession: caseAccession,
-        individual: caseIndividual
+        individual: caseIndividual,
+        sample_processing: sampleProcessing = null
     } = context;
 
     const {
@@ -214,6 +215,10 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
         }
     }
 
+    // Use amount of processed_files to determine if Bioinfo tab should be displayed
+    const { processed_files = [] } = sampleProcessing || {};
+    const disableBioinfo = !(processed_files.length > 0);
+
     return (
         <React.Fragment>
             <div className="container-wide">
@@ -259,9 +264,9 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
             { currFamily && caseIndividual ?
                 <DotRouter href={href} navClassName="container-wide pt-36 pb-36" contentsClassName="container-wide bg-light pt-36 pb-36" prependDotPath="case-info">
                     <DotRouterTab tabTitle="Accessioning" dotPath=".accessioning" default cache={false}>
-                        <AccessioningTab {...{ context, href, currFamily, secondary_families, }} />
+                        <AccessioningTab {...{ context, href, currFamily, secondary_families }} />
                     </DotRouterTab>
-                    <DotRouterTab tabTitle="Bioinformatics" dotPath=".bioinformatics" cache={false}>
+                    <DotRouterTab tabTitle="Bioinformatics" dotPath=".bioinformatics" cache={false} disabled={disableBioinfo}>
                         <BioinformaticsTab {...{ context, idToGraphIdentifier }} />
                     </DotRouterTab>
                     <DotRouterTab tabTitle="Filtering" dotPath=".filtering">
