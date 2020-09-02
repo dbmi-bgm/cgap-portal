@@ -260,9 +260,28 @@ class VariantSample(Item):
             }
         }
     })
-    def associated_genotype_labels(self, CALL_INFO, genotype_labels):
+    def associated_genotype_labels(self, CALL_INFO, samplegeno, genotype_labels):
         """ Builds the above sub-embedded object so we can search on the genotype labels """
-        pass
+
+        # XXX: will be useful if we want to have this field be "centric" WRT the
+        # person who submitted this variant_sample
+        def my_role(samplegeno, CALL_INFO):
+            for entry in samplegeno:
+                if entry['samplegeno_sampleid'] == CALL_INFO:
+                    return entry['samplegeno_role']
+            return None
+
+        def infer_key_from_role(role):
+            return role.replace(' ', '_').replace('-', '_') + '_genotype_label'
+
+        new_labels = {}
+        for role, label in genotype_labels:
+            if len(label) == 1:
+                new_labels[infer_key_from_role(role)] = label[0]
+            else:
+                new_labels[infer_key_from_role(role)] = ' '.join(label)  # just in case
+
+        return new_labels
 
 
 @view_config(name='download', context=VariantSample, request_method='GET',
