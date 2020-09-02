@@ -806,7 +806,7 @@ class SearchBuilder:
                         continue
 
                 if len(aggregations[full_agg_name].keys()) > 2:
-                    result_facet['extra_aggs'] = {k: v for k, v in aggregations[field_agg_name].items() if
+                    result_facet['extra_aggs'] = {k: v for k, v in aggregations[full_agg_name].items() if
                                                   k not in ('doc_count', "primary_agg")}
 
             result.append(result_facet)
