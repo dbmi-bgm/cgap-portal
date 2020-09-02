@@ -61,6 +61,8 @@ def test_relationships_roles(testapp, fam):
         "GAPIDFATHER1": "father",
         "GAPIDMOTHER1": "mother",
         "GAPIDBROTHER": "brother",
+        'GAPIDBROTHII': 'brother II',
+        'GAPIDBROTIII': 'brother III',
         "GAPIDGRANDPA": "grandfather",
         "GAPIDGRANDMA": "grandmother",
         "GAPIDHALFSIS": "half-sister",
@@ -80,6 +82,8 @@ def test_relationships_assosiation(testapp, fam):
         "GAPIDFATHER1": "",
         "GAPIDMOTHER1": "",
         "GAPIDBROTHER": "",
+        "GAPIDBROTHII": "",
+        "GAPIDBROTIII": "",
         "GAPIDGRANDPA": "maternal",
         "GAPIDGRANDMA": "maternal",
         "GAPIDHALFSIS": "",
@@ -191,6 +195,29 @@ def test_integer_to_roman():
     for i in range(1, 20):
         results.append(Family.integer_to_roman(i))
     assert results == expected_results
+
+
+def test_calculate_relations(testapp, fam):
+    family_id = fam['@id']
+    proband = fam['proband']
+    members = fam['members']
+    all_props = []
+    for a_member in members:
+        all_props.append(testapp.get(a_member + '?frame=object').json)
+    relations = Family.calculate_relations(proband, all_props, family_id)
+    expected_values = {'GAPIDBROTHER': 'brother',
+                       'GAPIDBROTHII': 'brother II',
+                       'GAPIDBROTIII': 'brother III',
+                       'GAPIDFATHER1': 'father',
+                       'GAPIDHALFSIS': 'half-sister',
+                       'GAPIDMOTHER1': 'mother',
+                       'GAPIDPROBAND': 'proband',
+                       'GAPIDCOUSIN1': 'cousin',
+                       'GAPIDGRANDPA': 'grandfather',
+                       'GAPIDGRANDMA': 'grandmother',
+                       'GAPIDUNCLE01': 'uncle'}
+    for a_rel in relations:
+        assert a_rel['relationship'] == expected_values[a_rel['individual']]
 
 
 ##########################
