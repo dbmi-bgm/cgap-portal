@@ -213,6 +213,57 @@ class VariantSample(Item):
         )
         return file_path
 
+    @calculated_property(schema={
+        "title": "Associated Genotype Labels",
+        "description": "Named Genotype Label fields that can be searched on",
+        "type": "object",
+        "properties": {
+            "proband_genotype_label": {
+                "title": "Proband Genotype Label",
+                "type": "string"
+            },
+            "mother_genotype_label": {
+                "title": "Mother Genotype Label",
+                "type": "string"
+            },
+            "father_genotype_label": {
+                "title": "Father Genotype Label",
+                "type": "string"
+            },
+            "sister_genotype_label": {
+                "title": "Sister Genotype Label",
+                "type": "string"
+            },
+            "brother_genotype_label": {
+                "title": "Brother Genotype Label",
+                "type": "string"
+            },
+            "co_parent_genotype_label": {
+                "title": "Co-Parent Genotype Label",
+                "type": "string"
+            },
+            "daughter_genotype_label": {
+                "title": "Daughter Genotype Label",
+                "type": "string"
+            },
+            "daughter_II_genotype_label": {
+                "title": "Daughter II Genotype Label",
+                "type": "string"
+            },
+            "son_genotype_label": {
+                "title": "Son Genotype Label",
+                "type": "string"
+            },
+            "son_II_genotype_label": {
+                "title": "Son II Genotype Label",
+                "type": "string"
+            }
+        }
+    })
+    def associated_genotype_labels(self, CALL_INFO, genotype_labels):
+        """ Builds the above sub-embedded object so we can search on the genotype labels """
+        pass
+
 
 @view_config(name='download', context=VariantSample, request_method='GET',
              permission='view', subpath_segments=[0, 1])

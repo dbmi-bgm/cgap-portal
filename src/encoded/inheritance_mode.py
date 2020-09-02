@@ -11,7 +11,7 @@ class InheritanceModeError(Exception):
 
 class InheritanceMode:
 
-    MISSING = '.'  # XXX: is this really what this is? Should it be called 'dot'?
+    MISSING = '.'
 
     AUTOSOME = 'autosome'
     CHROMOSOMES = [
@@ -25,7 +25,7 @@ class InheritanceMode:
 
     MOTHER = 'mother'
     FATHER = 'father'
-    SELF = 'proband'  # XXX: this is what the data actually looks like, NOT 'self'
+    SELF = 'proband'
     TRIO = [MOTHER, FATHER, SELF]
 
     # Genotype labels
@@ -351,7 +351,7 @@ class InheritanceMode:
             return {}
 
         if chrom not in ['X', 'Y']:
-            chrom = cls.AUTOSOME  # XXX: so chrom is one of ['X', 'Y', 'autosome'] ?
+            chrom = cls.AUTOSOME
 
         if cls.SELF not in genotypes:
             raise InheritanceModeError('Role "proband" not present in genotypes: %s' % genotypes)
