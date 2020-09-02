@@ -132,7 +132,8 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
         display_title: caseTitle,
         accession: caseAccession,
         individual: caseIndividual,
-        sample_processing: sampleProcessing = null
+        sample_processing: sampleProcessing = null,
+        initial_search_href_filter_addon: filterHrefAddon = "",
     } = context;
 
     const {
@@ -219,6 +220,9 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
     const { processed_files = [] } = sampleProcessing || {};
     const disableBioinfo = !(processed_files.length > 0);
 
+    // Use availability of search query filter string add-on to determine if Filtering tab should be displayed
+    const disableFiltering = !filterHrefAddon;
+
     return (
         <React.Fragment>
             <div className="container-wide">
@@ -269,7 +273,7 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
                     <DotRouterTab tabTitle="Bioinformatics" dotPath=".bioinformatics" cache={false} disabled={disableBioinfo}>
                         <BioinformaticsTab {...{ context, idToGraphIdentifier }} />
                     </DotRouterTab>
-                    <DotRouterTab tabTitle="Filtering" dotPath=".filtering">
+                    <DotRouterTab tabTitle="Filtering" dotPath=".filtering" disabled={disableFiltering}>
                         <FilteringTab {...{ context, windowHeight, session }} />
                     </DotRouterTab>
                     <DotRouterTab tabTitle="Interpretation" dotPath=".interpretation" disabled cache={false}>
