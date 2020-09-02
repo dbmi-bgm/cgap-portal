@@ -694,10 +694,10 @@ const BioinformaticsTab = React.memo(function BioinformaticsTab(props) {
     return (
         <React.Fragment>
             <h1>{ caseDisplayTitle }: <span className="text-300">Bioinformatics Analysis</span></h1>
-            <div className="tab-inner-container clearfix font-italic qc-status">
+            {/* <div className="tab-inner-container clearfix font-italic qc-status">
                 <span className="text-600">Current Status:</span><span className="text-success"> PASS <i className="icon icon-check fas"></i></span>
                 <span className="pull-right">3/28/20</span>
-            </div>
+            </div> */}
             <div className="tab-inner-container">
                 <h2 className="section-header">Quality Control Metrics (QC)</h2>
                 <BioinfoStats {...{ caseSample, sampleProcessing }} />
