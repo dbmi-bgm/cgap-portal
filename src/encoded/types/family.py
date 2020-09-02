@@ -257,6 +257,19 @@ class Family(Item):
         (ie if x created in children_roles, can not be used in parent roles)
         Nomenclature guided by
         https://www.devonfhs.org.uk/pdfs/tools/eichhorn-rlationship-chart.pdf"""
+        # possible values for roles we calculated, they might be appended by roman numaeral
+        # co-parent is used to replace wife and husband
+        roles = [
+            'proband', 'father', 'mother', 'brother', 'sister', 'sibling', 'half-brother', 'half-sister', 'half-sibling', 'co-parent',
+            'grandson', 'granddaughter', 'grandchild', 'grandmother', 'grandfather', 'great-grandson', 'great-granddaughter', 'great-grandchild',
+            'great-great-grandson', 'great-great-granddaughter', 'great-great-grandchild', 'great-grandmother', 'great-grandfather',
+            'great-great-grandmother', 'great-great-grandfather',
+            'nephew', 'niece', 'nibling', 'grandnephew', 'grandniece', 'grandnibling',
+            'uncle', 'aunt', 'auncle', 'granduncle', 'grandaunt', 'grandauncle',
+            'cousin', 'cousin-once-removed(descendant)', 'cousin-twice-removed(descendant)', 'cousin-once-removed(ascendant)',
+            'second-cousin', 'second-cousin-once-removed(descendant)', 'second-cousin-twice-removed(descendant)',
+            'family-in-law', 'extended-family', 'not-linked'
+                 ]
         # return a nested list of  [acc, calculated_relation, association]
         # start convert with seed roles
         Converter = {
@@ -301,11 +314,11 @@ class Family(Item):
         children_roles = [
             {'roles': ['uncle', 'aunt', 'auncle'], 'children': 'cousin'},
             {'roles': ['cousin'], 'children': 'cousin once removed (descendant)'},
-            {'roles': ['cousin once removed (descendant)'], 'children': 'cousin twice removed (descendant)'},
-            {'roles': ['granduncle', 'grandaunt', 'grandauncle'], 'children': 'cousin once removed (ascendant)'},
-            {'roles': ['cousin once removed (ascendant)'], 'children': 'second cousin'},
-            {'roles': ['second cousin'], 'children': 'second cousin once removed (descendant)'},
-            {'roles': ['second cousin once removed (descendant)'], 'children': 'second cousin twice removed (descendant)'},
+            {'roles': ['cousin-once-removed(descendant)'], 'children': 'cousin-twice-removed(descendant)'},
+            {'roles': ['granduncle', 'grandaunt', 'grandauncle'], 'children': 'cousin-once-removed-(ascendant)'},
+            {'roles': ['cousin-once-removed(ascendant)'], 'children': 'second-cousin'},
+            {'roles': ['second-cousin'], 'children': 'second-cousin-once-removed(descendant)'},
+            {'roles': ['second-cousin-once-removed(descendant)'], 'children': 'second-cousin-twice-removed(descendant)'},
             ]
         for an_extension in children_roles:
             all_combinations = [i for i in Converter if Converter[i] in an_extension['roles']]
@@ -318,7 +331,7 @@ class Family(Item):
             """If you are going down from proband, you need to keep going down
             If you are going up from proband, you can change direction once
             If you are out of these cases, you are not blood relative
-            We make an exception for the Husband and Wife"""
+            We make an exception for the Husband and Wife (co-parent)"""
             up = ['f', 'm']
             down = ['d', 's', 'c']
             state = 1
@@ -432,56 +445,7 @@ class Family(Item):
                 },
                 "relationship": {
                     "title": "Relationship",
-                    "type": "string",
-                    "enum": ['proband',
-                             'father',
-                             'mother',
-                             'brother',
-                             'sister',
-                             'sibling',
-                             'half-brother',
-                             'half-sister',
-                             'half-sibling',
-                             'wife',
-                             'husband',
-                             'grandson',
-                             'granddaughter',
-                             'grandchild',
-                             'grandmother',
-                             'grandfather',
-                             'great-grandson',
-                             'great-granddaughter',
-                             'great-grandchild',
-                             'great-great-grandson',
-                             'great-great-granddaughter',
-                             'great-great-grandchild',
-                             'great-grandmother',
-                             'great-grandfather',
-                             'great-great-grandmother',
-                             'great-great-grandfather',
-                             'nephew',
-                             'niece',
-                             'nibling',
-                             'grandnephew',
-                             'grandniece',
-                             'grandnibling',
-                             'uncle',
-                             'aunt',
-                             'auncle',
-                             'granduncle',
-                             'grandaunt',
-                             'grandauncle',
-                             'cousin',
-                             'cousin once removed (descendant)',
-                             'cousin twice removed (descendant)',
-                             'cousin once removed (ascendant)',
-                             'second cousin',
-                             'second cousin once removed (descendant)',
-                             'second cousin twice removed (descendant)',
-                             'family-in-law',
-                             'extended-family',
-                             'not linked'
-                             ]
+                    "type": "string"
                     }
                 }
             }
