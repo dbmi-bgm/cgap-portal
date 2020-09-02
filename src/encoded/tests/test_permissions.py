@@ -30,6 +30,28 @@ def STATI():
         "replaced"
     ]
 
+
+"""List of basic statuses for testing access to Items
+    statuses in this list have a mapping to an ACL
+    with the exception of 'uploaded' that acts as a standin for all non-ACL
+    mapped statuses and defaults to the admin only ACL
+
+    NOTE: 'public' applies to only certain Items - specified in status enum
+    and give public access so is tested separately
+"""
+STATUSES = [
+    # viewable by authenticated
+    "shared",
+    "obsolete",
+    # viewable by project member
+    "current",
+    "inactive",
+    # kind of special admin-only
+    "deleted",
+    # special file status case due to redirect
+    "replaced"
+]
+
 # institution, project and user fixtures
 @pytest.fixture
 def institution(testapp):
@@ -221,65 +243,61 @@ def simple_bgm_file_item(institution, bgm_project, file_formats):
 
 
 @pytest.fixture
+def simple_doc_item(institution, bgm_project):
+    # using file as it has all the statuses
+    return {
+        'institution': institution['@id'],
+        'project': bgm_project['@id'],
+        'description': 'test document'
+    }
+
+
+@pytest.fixture
 def simple_bgm_file(testapp, simple_bgm_file_item):
     return testapp.post_json('/file_fastq', simple_bgm_file_item, status=201).json['@graph'][0]
 
 
 # permission tests
-def test_admin_can_view_item_all_stati(testapp, admin_testapp, simple_bgm_file, STATI):
-    # patch the item with each status and assert admin can get
-    for status in STATI:
-        file_res = testapp.patch_json(simple_bgm_file['@id'], {'status': status}, status=200).json['@graph'][0]
-        assert admin_testapp.get(file_res['@id'], status=200)
+@pytest.mark.parametrize('status', STATUSES)
+def test_admin_can_view_item_all_stati(testapp, admin_testapp, simple_bgm_file, status):
+    file_res = testapp.patch_json(simple_bgm_file['@id'], {'status': status}, status=200).json['@graph'][0]
+    assert admin_testapp.get(file_res['@id'], status=200)
 
 
-def test_admin_can_post_item_all_stati(testapp, admin_testapp, simple_bgm_file_item, STATI):
+@pytest.mark.parametrize('status', STATUSES)
+def test_admin_can_post_item_all_stati(testapp, admin_testapp, simple_bgm_file_item, status):
     del simple_bgm_file_item['uuid']
-    for status in STATI:
-        simple_bgm_file_item['status'] = status
-        assert admin_testapp.post_json('/file_fastq', simple_bgm_file_item, status=201)
+    simple_bgm_file_item['status'] = status
+    assert admin_testapp.post_json('/file_fastq', simple_bgm_file_item, status=201)
 
 
-def test_admin_can_patch_item_all_stati(admin_testapp, simple_bgm_file, STATI):
+@pytest.mark.parametrize('status', STATUSES)
+def test_admin_can_patch_item_all_stati(admin_testapp, simple_bgm_file, status):
     assert simple_bgm_file['status'] == 'uploaded'
-    for status in STATI:
-        res = admin_testapp.patch_json(simple_bgm_file['@id'], {'status': status}, status=200).json['@graph'][0]
-        assert res['status'] == status
+    res = admin_testapp.patch_json(simple_bgm_file['@id'], {'status': status}, status=200).json['@graph'][0]
+    assert res['status'] == status
 
 
+@pytest.mark.parametrize('status, expres', list(zip(STATUSES, [200, 200, 200, 200, 403, 404])))
 def test_bgm_user_can_access_ok_stati_but_not_others_for_bgm_project_item(
-        testapp, bgm_user_testapp, simple_bgm_file, STATI):
-    view_stati = STATI[0:4]
-    rep_status = 'replaced'  # special case due to redirect returns 404
-    for status in STATI:
-        testapp.patch_json(simple_bgm_file['@id'], {'status': status}, status=200)
-        if status in view_stati:
-            res = bgm_user_testapp.get(simple_bgm_file['@id'], status=200).json
-            assert res['status'] == status
-        elif status == rep_status:
-            res = bgm_user_testapp.get(simple_bgm_file['@id'], status=404)
-        else:
-            res = bgm_user_testapp.get(simple_bgm_file['@id'], status=403)
+        testapp, bgm_user_testapp, simple_bgm_file, status, expres):
+    testapp.patch_json(simple_bgm_file['@id'], {'status': status}, status=200)
+    res = bgm_user_testapp.get(simple_bgm_file['@id'], status=expres).json
+    if expres == 200:
+        assert res['status'] == status
+    else:
+        assert res['status'] == 'error'  # because get fails
 
 
-def test_bgm_user_cannot_post_item(bgm_user_testapp, simple_bgm_file_item):
-    # this is a bit hacky as it's actually failing validation doe to restricted_fields
-    # on institution and project in attribution mixin so expect 422 rather than 403
-    del simple_bgm_file_item['uuid']  # users wouldn't generally post uuids
-    del simple_bgm_file_item['status']  # this property also has import-items but is not required
-    assert bgm_user_testapp.post_json('/file_fastq', simple_bgm_file_item, status=422)
+def test_bgm_user_can_post_item(bgm_user_testapp, simple_doc_item):
+    assert bgm_user_testapp.post_json('/document', simple_doc_item, status=200)
 
 
-def test_bgm_user_cannot_patch_item(testapp, bgm_user_testapp, simple_bgm_file, STATI):
-    # should be same regardless of status but yet again replaced is 404
-    for status in STATI:
-        testapp.patch_json(simple_bgm_file['@id'], {'status': status}, status=200)
-        if status == 'replaced':
-            assert bgm_user_testapp.patch_json(simple_bgm_file['@id'], {'read_length': 100}, status=404)
-        elif status == 'current':
-            assert bgm_user_testapp.patch_json(simple_bgm_file['@id'], {'read_length': 100}, status=200)
-        else:
-            assert bgm_user_testapp.patch_json(simple_bgm_file['@id'], {'read_length': 100}, status=403)
+@pytest.mark.parametrize('status, expres', list(zip(STATUSES, [403, 403, 200, 403, 403, 404])))
+def test_bgm_user_can_only_patch_current_item(testapp, bgm_user_testapp, simple_bgm_file, status, expres):
+    # want bgm user to only be able to patch items linked to their project with current status
+    testapp.patch_json(simple_bgm_file['@id'], {'status': status}, status=200)
+    assert bgm_user_testapp.patch_json(simple_bgm_file['@id'], {'read_length': 100}, status=expres)
 
 
 def test_udn_user_cannot_access_bgm_item_unless_shared(testapp, udn_user_testapp, simple_bgm_file, STATI):

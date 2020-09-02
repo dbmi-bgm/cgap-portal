@@ -49,23 +49,36 @@ ONLY_ADMIN_VIEW_ACL = [
     (Deny, Everyone, ['view', 'edit'])
 ]
 
+""" This acl allows item creation; it should be overwritten with an empty
+    list in Item types a project member user should not be able to create
+    likely worthwhile to review and set it up in the opposite way as there
+    will probably be more items than a regular user shouldn't create
+    this gets added to the Collection class __init__
+"""
+PROJECT_MEMBER_CREATE_ACL = [
+    (Allow, 'role.project_member', 'add'),
+    (Allow, 'role.project_member', 'create')
+]
+
 # this is for pages that should be visible to public
 ALLOW_EVERYONE_VIEW_ACL = [
     (Allow, Everyone, 'view'),
-] + ONLY_ADMIN_VIEW_ACL
+] + ONLY_ADMIN_VIEW_ACL + PROJECT_MEMBER_CREATE_ACL
 
 # view for shared items - add a status for common cgap items
+# not sure if we want project members to have create on these?
 ALLOW_AUTHENTICATED_VIEW_ACL = [
     (Allow, Authenticated, 'view'),
-] + ONLY_ADMIN_VIEW_ACL
+] + ONLY_ADMIN_VIEW_ACL + PROJECT_MEMBER_CREATE_ACL
 
 ALLOW_PROJECT_MEMBER_EDIT_ACL = [
     (Allow, 'role.project_member', ['view', 'edit']),
-] + ONLY_ADMIN_VIEW_ACL
+] + ONLY_ADMIN_VIEW_ACL + PROJECT_MEMBER_CREATE_ACL
+
 
 ALLOW_PROJECT_MEMBER_VIEW_ACL = [
     (Allow, 'role.project_member', 'view'),
-] + ONLY_ADMIN_VIEW_ACL
+] + ONLY_ADMIN_VIEW_ACL + PROJECT_MEMBER_CREATE_ACL
 
 DELETED_ACL = [
     (Deny, Everyone, 'visible_for_edit')
@@ -221,8 +234,8 @@ class Collection(snovault.Collection, AbstractCollection):
         if hasattr(self, '__acl__'):
             return
 
-        # If no ACLs are defined for collection, allow admin only
-        self.__acl__ = ONLY_ADMIN_VIEW_ACL
+        # If no ACLs are defined for collection, allow project members to create
+        self.__acl__ = PROJECT_MEMBER_CREATE_ACL
 
 
 @snovault.abstract_collection(

@@ -141,16 +141,13 @@
             "title": "Institution",
              "description": "Institution associated with the submission.",
              "exclude_from": ["submit4dn"],
-             "permission": "restricted_fields",
              "type": "string",
-             "linkTo": "Institution",
-             "linkSubmitsFor": true
+             "linkTo": "Institution"
         },
         "project": {
             "title": "Project",
             "description": "Project associated with the submission.",
             "exclude_from": ["submit4dn"],
-            "permission": "restricted_fields",
             "type": "string",
             "linkTo": "Project"
         }

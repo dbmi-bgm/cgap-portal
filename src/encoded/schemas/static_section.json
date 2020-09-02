@@ -12,7 +12,6 @@
         { "$ref": "mixins.json#/aliases" },
         { "$ref": "mixins.json#/submitted" },
         { "$ref": "mixins.json#/modified" },
-        { "$ref": "mixins.json#/status" },
         { "$ref": "user_content.json#/properties" },
         { "$ref": "mixins.json#/attribution" }
     ],
@@ -21,6 +20,10 @@
             "default": "2"
         },
         "status": {
+            "title": "Status",
+            "exclude_from": ["submit4dn"],
+            "type": "string",
+            "permission": "restricted_fields",
             "default": "current",
             "enum": [
                 "public",

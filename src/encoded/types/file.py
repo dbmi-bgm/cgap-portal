@@ -53,6 +53,7 @@ from .base import (
     get_item_or_none,
     collection_add,
     item_edit,
+    PROJECT_MEMBER_CREATE_ACL,
     # lab_award_attribution_embed_list,
 )
 
@@ -147,6 +148,7 @@ def property_closure(request, propname, root_uuid):
 @abstract_collection(
     name='files',
     unique_key='accession',
+    acl=PROJECT_MEMBER_CREATE_ACL,
     properties={
         'title': 'Files',
         'description': 'Listing of Files',
