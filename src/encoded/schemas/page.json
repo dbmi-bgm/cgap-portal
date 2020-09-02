@@ -21,6 +21,14 @@
         },
         "status": {
             "default": "current",
+            "enum": [
+                "public",
+                "shared",
+                "current",
+                "inactive",
+                "in review",
+                "deleted"
+            ],
             "lookup" : 55
         },
         "name": {

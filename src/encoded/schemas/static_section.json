@@ -20,6 +20,17 @@
         "schema_version": {
             "default": "2"
         },
+        "status": {
+            "default": "current",
+            "enum": [
+                "public",
+                "shared",
+                "current",
+                "inactive",
+                "in review",
+                "deleted"
+            ]
+        },
         "body":{
             "title": "Raw Body",
             "type": "string",

@@ -243,8 +243,8 @@ class Item(snovault.Item):
         'current': ALLOW_PROJECT_MEMBER_EDIT_ACL,
         'inactive': ALLOW_PROJECT_MEMBER_VIEW_ACL,
         'deleted': DELETED_ACL,
-        # do we need one for everyone view?
-        # 'released': ALLOW_EVERYONE_VIEW_ACL
+        # everyone view - restrict to specific items via schema
+        'public': ALLOW_EVERYONE_VIEW_ACL
     }
 
     # Items of these statuses are filtered out from rev links
