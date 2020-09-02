@@ -2,5 +2,5 @@
 
 export { SearchBar } from './SearchBar';
 export { TestWarning } from './TestWarning';
-export { LoginNavItem } from './LoginNavItem';
+export { LoginNavItem, NotLoggedInAlert } from './LoginNavItem';
 export { CollapsedNav } from './CollapsedNav';

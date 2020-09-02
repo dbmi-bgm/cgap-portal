@@ -1,36 +1,50 @@
 /*  COMMON TABLES */
 
 table {
-    @include font-size(0.9rem);
+	@include font-size(0.9rem);
+	
+	> thead {
+		> tr {
+			> th {
+				background-color: #f0f1f5;
+				border-top: none;
+				/* border-bottom: 1px solid #ddd; */
+				/* border-left: 1px solid #ddd; */
+				padding: 5px 3px 5px;
+				font-weight: bold; /* In case 600 not available for font */
+				font-weight: 600;
+				white-space: nowrap;
+				text-align: center;
+				vertical-align: middle !important;
+				/*
+				&:first-child {
+					border-left: none !important;
+				}
+				*/
+			}
+		}
+
+		&.bg-transparent {
+			> tr > th {
+				background-color: transparent;
+			}
+		}
+	}
+
+	> tbody {
+		> tr {
+			> td {
+				border-top: 0px;
+				padding: 2px 3px;
+				text-align: center;
+				vertical-align: middle !important;
+				outline: none !important;
+			}
+		}
+	}
+
 }
 
-thead, tfoot {
-    background: none repeat scroll 0 0 #f5f5f5;
-}
-
-table>thead>tr>th {
-    background-color: #eee;
-    border-top: none;
-    border-bottom: 1px solid #ddd;
-    border-left: 1px solid #ddd;
-    padding: 5px 3px 5px;
-    font-weight: bold; /* In case 600 not available for font */
-    font-weight: 600;
-    white-space: nowrap;
-    text-align: center;
-    vertical-align: middle !important;
-    &:first-child {
-        border-left: none !important;
-    }
-}
-
-table>tbody>tr>td {
-    border-top: 0px;
-    padding: 2px 3px;
-    text-align: center;
-	vertical-align: middle !important;
-	outline: none !important;
-}
 
 .table-striped {
     > tbody {

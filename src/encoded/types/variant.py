@@ -72,7 +72,9 @@ def build_variant_sample_embedded_list():
 
         :returns: list of embeds from 'variant' linkTo
     """
-    embedded_list = []
+    embedded_list = [
+        "cmphet.*"
+    ]
     with open(resolve_file_path('schemas/variant_embeds.json'), 'r') as fd:
         extend_embedded_list(embedded_list, fd, 'variant', prefix='variant.')
     with open(resolve_file_path('schemas/variant_sample_embeds.json'), 'r') as fd:

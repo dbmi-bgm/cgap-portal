@@ -12,6 +12,7 @@ import jsonScriptEscape from '../libs/jsonScriptEscape';
 import { content_views as globalContentViews, portalConfig, getGoogleAnalyticsTrackingID, analyticsConfigurationOptions } from './globals';
 import ErrorPage from './static-pages/ErrorPage';
 import { NavigationBar } from './navigation/NavigationBar';
+import { NotLoggedInAlert } from './navigation/components/LoginNavItem';
 import { Footer } from './Footer';
 import { store } from './../store';
 
@@ -329,20 +330,13 @@ export default class App extends React.PureComponent {
                 }, 3000);
             }
 
-            // Set Alert if not on homepage and not logged in.
+            // Set Alert if not on homepage and not logged in. This 'if' logic will likely change later
+            // especially if have multiple 'for-public' pages like blog posts, news, documentation, etc.
             if (!session && pathname != "/") {
-                const onAlertLoginClick = function(e) {
-                    // TODO;
-                };
-                Alerts.queue({
-                    "title" : "Not Logged In",
-                    // We can't really put in actual link to login since need to communicate w. LoginController.
-                    // We could eventually move LoginController to wrap BodyElement or something (and move this into there)
-                    // .....or maybe have onClick func that finds and triggers a click mouse event on login button....
-                    "message" : <span>You are currently browsing as guest, please login if you have an account.</span>,
-                    "style" : "warning",
-                    "navigateDisappearThreshold" : 2
-                });
+                // MAYBE TODO next time are working on shared-portal-components (SPC) repository:
+                // Put this Alert into SPC as a predefined/constant export, then cancel/remove it (if active) in the callback function
+                // upon login success ( https://github.com/4dn-dcic/shared-portal-components/blob/master/src/components/navigation/components/LoginController.js#L111 )
+                Alerts.queue(NotLoggedInAlert);
             }
 
         });
@@ -704,6 +698,8 @@ export default class App extends React.PureComponent {
                 Alerts.queue(Alerts.LoggedOut);
                 // Clear out remaining auth/JWT stuff from localStorage if any
                 JWT.remove();
+            } else if (session === true && existingSession === false){
+                Alerts.deQueue([ Alerts.LoggedOut, NotLoggedInAlert ]);
             }
             return { session };
         }, () => {
@@ -1100,12 +1096,7 @@ export default class App extends React.PureComponent {
         }
     }
 
-    /**
-     * Renders the entire HTML of the application.
-     *
-     * @private
-     * @returns {JSX.Element} An `<html>` element.
-     */
+    /** Renders the entire HTML of the application. */
     render() {
         const { context, lastCSSBuildTime, href, contextRequest } = this.props;
         const hrefParts       = memoizedUrlParse(href);

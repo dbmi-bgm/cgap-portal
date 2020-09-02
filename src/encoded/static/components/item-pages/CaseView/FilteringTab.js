@@ -178,6 +178,11 @@ export function FilteringTabSubtitle(props){
                     setLastFilterSetSaved(nextFilterSetItem);
                     setIsLoading(false);
                     return;
+
+                    // TODO: In future, upon @@embedded response from PATCH endpoint, we may be able to get rid of lastFilterSetSaved and do equivalent of:
+                    // newContext = context.copy()
+                    // newContext.active_filterset = nextFilterSetItem;
+                    // reduxStore.dispatch({ context: newContext })
                 } else {
                     // Brand new FilterSet, continue with patch.
                     console.log("Setting 'active_filterset'", nextFilterSetItem);
@@ -210,6 +215,7 @@ export function FilteringTabSubtitle(props){
                 ajax.load(existingFilterID, function(res){
                     const { "@graph" : [ existingFilterSetItem ] } = res;
                     callback(existingFilterSetItem);
+
                 }, "PATCH", function(err){
                     console.error("Error PATCHing existing FilterSet", err);
                     Alerts.queue({
