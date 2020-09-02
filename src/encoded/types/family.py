@@ -381,6 +381,20 @@ class Family(Item):
         return relations
 
     @staticmethod
+    def integer_to_roman(integer):
+        """Convert Integer to roman"""
+        RomanAlphabet = [[1000, "M"], [900, "CM"], [500, "D"], [400, "CD"],
+                         [100, "C"], [90, "XC"], [50, "L"], [40, "XL"],
+                         [10, "X"], [9, "IX"], [5, "V"], [4, "IV"], [1, "I"]]
+        roman = ""
+        for base, roman_letter in RomanAlphabet:
+            quotient, integer = divmod(integer, base)
+            roman += roman_letter * quotient
+            if integer == 0:
+                break
+        return roman
+
+    @staticmethod
     def calculate_relations(proband, all_props, family_id):
         """Static wrapper for relations calculated property
         so it can be called by other classes, curretly used by
@@ -392,18 +406,27 @@ class Family(Item):
         links = Family.construct_links(primary_vectors, proband_acc)
         relations = Family.relationships_vocabulary(links)
         results = []
+        # add a consistent age unit for ordering all members
+        unit_converter = {"day": 1, "week": 7, "month": 30, "year": 365}
+        for an_ind in all_props:
+            age_days = 0
+            if an_ind.get('age') and an_ind.get('age_units'):
+                age_days = an_ind['age'] * unit_converter[an_ind['age_units']]
+            an_ind['age_days'] = age_days
+        # generate the relationship dict for each member
         for a_member_resp in all_props:
             temp = {"individual": '',
                     "sex": '',
                     "relationship": '',
-                    "association": ''}
+                    "association": '',
+                    "age_days": a_member_resp['age_days']}
             mem_acc = a_member_resp['accession']
             temp['individual'] = mem_acc
             sex = a_member_resp.get('sex', 'U')
             temp['sex'] = sex
             relation_dic = [i for i in relations if i[0] == mem_acc]
             if not relation_dic:
-                temp['relationship'] = 'not linked'
+                temp['relationship'] = 'not-linked'
                 # the individual is not linked to proband through individuals listed in members
                 results.append(temp)
                 continue
@@ -412,6 +435,22 @@ class Family(Item):
             if relation[2]:
                 temp['association'] = relation[2]
             results.append(temp)
+        # sort by association, relationship, ages (decreasing), and finally accession
+        results = sorted(results, key=lambda i: (i['association'], i['relationship'], -i['age_days'], i['individual']))
+        # add roman numerals to repeating roles
+        # keep track of all roles in family for enumeration
+        # for this purpose, the role definition is association + relationship
+        # ie the enumaration for parental and maternal aunts are kept separate
+        role_numbers = {}
+        for a_relationship in results:
+            del a_relationship['age_days']
+            full_relationship = a_relationship['relationship'] + a_relationship['association']
+            if full_relationship not in role_numbers:
+                role_numbers[full_relationship] = 1
+            else:
+                role_numbers[full_relationship] += 1
+                roman_add_on = Family.integer_to_roman(role_numbers[full_relationship])
+                a_relationship['relationship'] = a_relationship['relationship'] + ' ' + roman_add_on
         return results
 
     @calculated_property(schema={

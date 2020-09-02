@@ -184,6 +184,15 @@ def test_relationships_vocabulary(ptolemaic_pedigree):
     assert rel_to_4DNFICLEOIII == 'great-great-granddaughter'
 
 
+def test_integer_to_roman():
+    expected_results = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X',
+                        'XI', 'XII', 'XIII', 'XIV', 'XV', 'XVI', 'XVII', 'XVIII', 'XIX']
+    results = []
+    for i in range(1, 20):
+        results.append(Family.integer_to_roman(i))
+    assert results == expected_results
+
+
 ##########################
 # PROCESS PEDIGREE TESTS #
 ##########################
