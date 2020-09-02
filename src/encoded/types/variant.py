@@ -275,7 +275,7 @@ class VariantSample(Item):
             return role.replace(' ', '_').replace('-', '_') + '_genotype_label'
 
         new_labels = {}
-        for role, label in genotype_labels:
+        for role, label in genotype_labels.items():
             if len(label) == 1:
                 new_labels[infer_key_from_role(role)] = label[0]
             else:
