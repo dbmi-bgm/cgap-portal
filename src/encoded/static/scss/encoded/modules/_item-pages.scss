@@ -1,3 +1,20 @@
+/**** VARIABLES ****/
+
+// We make this almost full height.
+// - IMPORTANT -
+// Equivalent of this is performed in JS in PedigreeViz, for browsers
+// which do not yet support calc().
+// If change size of footer, header, navbar, sub-navbar, etc. then this 216px must
+// be adjusted here and in JS
+// This is originally from PedigreeViz and now reused for places where we want a minimum height
+// to match full height of window, minus navbar, tabbar, and tab title heading.
+$inner-tab-contents-full-height: calc(100vh - 216px);
+
+/* used also for new utility class - not sure is best name */
+.mh-inner-tab-height-full {
+	min-height: $inner-tab-contents-full-height !important;
+}
+
 /***********************************************************
 Custom Classes & Styling for Item Pages (e.g. Experiment Sets)
 ************************************************************/
@@ -172,6 +189,7 @@ $tabbar-height: 46px;
 				height: 100%;
 				border-bottom: 1px solid darken($tabbar-bg-color, 10%);
 				border-right: 1px solid transparent;
+				text-decoration: none;
 
 				&:not(:first-child){
 					border-left: 1px solid darken($tabbar-bg-color, 20%);
@@ -2256,7 +2274,7 @@ $download-button-width : 100px;
 			// If change size of footer, header, navbar, sub-navbar, etc. then this 216px must
 			// be adjusted here and in JS
 			@include navbar-fixed-position {
-				min-height: calc(100vh - 216px) !important;
+				min-height: $inner-tab-contents-full-height !important;
 			}
 		}
 
@@ -2335,6 +2353,155 @@ $download-button-width : 100px;
 	}
 
 
+}
+
+
+
+/**********************************************************
+  VariantSampleView & similar - Annotation Space
+**********************************************************/
+
+// TODO maybe move somewhere else
+// Is (and should prly remain) a common style we potentially reuse
+// when need to block out card contents.
+
+.card {
+
+	.inner-card-section {
+
+		display: flex;
+		flex-direction: column;
+
+		.info-header-title { // TODO Rename from "info-" ?
+
+			flex-grow: 0;
+			padding: 0 8px;
+
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			height: 32px;
+			position: relative;
+			z-index: 5;
+			> h4 {
+				// todo: maybe add color if to be just for this section (?)
+				font-weight: 600;
+				margin: 0;
+				padding: 0 8px;
+				background-color: $card-bg;
+			}
+
+			.dropdown {
+				background-color: $card-bg;
+			}
+
+			+ .info-body {
+				border: 1px solid $border-color;
+				// TODO maybe use or base off bootstrap vars here instd of hardcoded px vals.
+    			padding: 24px 16px 16px;
+				margin-top: -16px;
+				flex-grow: 1;
+				border-radius: $border-radius-sm;
+			}
+		}
+
+	}
+
+}
+
+.sample-variant-annotation-space-body {
+	.card .inner-card-section {
+		// TODO: Figure out how to apply this class to react bootstrap button via rbs
+		.btn-outline-secondary.select-transcript {
+			border-color: #dee2e6;
+			color: #111111;
+			&:hover, &:active{
+				color: #ffffff;
+				border-color: transparent;
+			}
+			&[disabled] {
+				color: #6c757d;
+				border-color: #dee2e6;
+			} 
+		}
+	}
+
+	.sample-variant-overview-tab-view-container {
+		.tabs-column {
+			position: relative;
+			z-index: 2;
+			//flex-grow: 0; // Will adjust via responsive Bootstrap classNames
+			//flex-shrink: 0;
+			> button.overview-tab {
+				height: 48px;
+				width: 100%;
+				display: block;
+				border: none;
+				margin-bottom: 5px;
+				font-weight: 600;
+				border-radius: 0;
+				background-color: #beccda;
+				color: $primary-dark;
+				&[disabled]{
+					color: #fff8;
+				}
+				&[data-active="true"] {
+					// background-color: $primary-dark;
+					// color: #fff;
+					@extend .card;
+					color: $primary-dark;
+					display: initial;
+					flex-direction: initial;
+					@include media-breakpoint-up(lg){
+						border-top-right-radius: 0px;
+						border-top-right-radius: 0px;
+						&:after {
+							content: "";
+							position: absolute;
+							top: 0;
+							bottom: 0;
+							right: -4px;
+							width: 6px;
+							background-color: inherit;
+							border-top-right-radius: 0px;
+							border-bottom-right-radius: 0px;
+						}
+					}
+				}
+			}
+		}
+		.content-column {
+			flex-basis: 320px;
+			min-width: 320px;
+			flex-grow: 1;
+			@include media-breakpoint-up(lg){
+				&.card {
+					border-top-left-radius: 0px;
+				}
+			}
+
+			
+			.inner-card-section {
+
+				.clinvar-info-body {
+					// Special case where we want overflow: auto + max-height when large responsive breakpoint.
+					@include media-breakpoint-up(xl){
+						max-height: 280px;
+						overflow: auto;
+					}
+				}
+
+				/*
+				.info-header-title, h4, h3 {
+					color: $primary-dark;
+				}
+				thead > tr > th {
+					color: $primary-dark;
+				}
+				*/
+			}
+		}
+	}
 }
 
 
