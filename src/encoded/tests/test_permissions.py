@@ -119,7 +119,12 @@ def bgm_user(testapp, institution, bgm_project):
         'last_name': 'user',
         'email': 'bgmuser@example.org',
         'institution': institution['name'],
-        'project_roles': [{'project': bgm_project['@id']}],
+        'project_roles': [
+            {
+                'project': bgm_project['@id'],
+                'role': 'project_member'  # XXX: you probably want this
+            }
+        ],
         'status': 'current'
     }
     # User @@object view has keys omitted.
@@ -290,7 +295,7 @@ def test_bgm_user_can_access_ok_stati_but_not_others_for_bgm_project_item(
 
 
 def test_bgm_user_can_post_item(bgm_user_testapp, simple_doc_item):
-    assert bgm_user_testapp.post_json('/document', simple_doc_item, status=200)
+    assert bgm_user_testapp.post_json('/document', simple_doc_item, status=201)
 
 
 @pytest.mark.parametrize('status, expres', list(zip(STATUSES, [403, 403, 200, 403, 403, 404])))
@@ -315,7 +320,7 @@ def test_udn_user_cannot_post_bgm_item(udn_user_testapp, simple_bgm_file_item):
     # see above - not really testing what we want to here
     del simple_bgm_file_item['uuid']  # users wouldn't generally post uuids
     del simple_bgm_file_item['status']  # this property also has import-items but is not required
-    assert udn_user_testapp.post_json('/file_fastq', simple_bgm_file_item, status=422)
+    assert udn_user_testapp.post_json('/file_fastq', simple_bgm_file_item, status=403)
 
 
 def test_udn_user_cannot_patch_bgm_item(testapp, udn_user_testapp, simple_bgm_file, STATI):

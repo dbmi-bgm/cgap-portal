@@ -56,8 +56,7 @@ ONLY_ADMIN_VIEW_ACL = [
     this gets added to the Collection class __init__
 """
 PROJECT_MEMBER_CREATE_ACL = [
-    (Allow, 'role.project_member', 'add'),
-    (Allow, 'role.project_member', 'create')
+    (Allow, 'role.project_member', 'add')
 ]
 
 # this is for pages that should be visible to public
@@ -255,6 +254,7 @@ class Item(snovault.Item):
         'obsolete': ALLOW_AUTHENTICATED_VIEW_ACL,
         'current': ALLOW_PROJECT_MEMBER_EDIT_ACL,
         'inactive': ALLOW_PROJECT_MEMBER_VIEW_ACL,
+        'in review': ALLOW_PROJECT_MEMBER_EDIT_ACL,
         'deleted': DELETED_ACL,
         # everyone view - restrict to specific items via schema
         'public': ALLOW_EVERYONE_VIEW_ACL
