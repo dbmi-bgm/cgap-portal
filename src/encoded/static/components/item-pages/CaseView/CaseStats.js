@@ -11,12 +11,10 @@ import { Schemas } from './../../util';
  * @param {Array} features An array of phenotypic features items
  */
 function mapFeaturesToBadges(features = []) {
-    console.log("mapping features to Badges:", features);
     if (features.length === 0) {
         return <em>None</em>;
     }
     return features.map(function(feature){
-        console.log("mapping through each feature");
         const { display_title = null, '@id': featureID } = feature;
         return (
             // TODO: create own ~ `.tag` styling or override Bootstrap's default. Maybe.
@@ -94,15 +92,7 @@ export const PatientInfo = React.memo(function PatientInfo(props) {
         age = null, age_units = null,
         status = null,
         date_created = null,
-        life_status = null,
-        display_title = null,
-        aliases = null,
-        phenotypic_features = []
     } = individual || {};
-
-    const renderedPhenotypicFeatures = useMemo(function(){
-        return mapFeaturesToBadges(phenotypic_features);
-    }, [ phenotypic_features ]);
 
     // TODO later maybe use card footer Bootstrap component if such exists.
 
@@ -112,22 +102,16 @@ export const PatientInfo = React.memo(function PatientInfo(props) {
                 <label className="mb-0">CGAP Individual ID:</label> { accession }
             </div>
             <div className="card-text mb-1">
-                <label className="mb-0">Sex:</label> { sex || 'N/A'}
+                <label className="mb-0">Sex:</label> { sex }
             </div>
             <div className="card-text mb-1">
-                <label className="mb-0">Age: </label> { age && age_units ? `${age} ${age_units}(s)` : "N/A" }
-            </div>
-            <div className="card-text mb-1">
-                <label className="mb-0">Life Status:</label> { life_status || 'N/A' }
+                <label className="mb-0">Age: </label> { age && age_units ? `${age} ${age_units}(s)` : null }
             </div>
             <div className="card-text mb-1">
                 <label className="mb-0">Status:</label> &nbsp;{ Schemas.Term.toName("status", status, true) }
             </div>
             <div className="card-text mb-1">
-                <label className="mb-0">Accessioned:</label> { date_created ? <LocalizedTime timestamp={date_created} formatType="date-sm"/> : "N/A" }
-            </div>
-            <div className="card-text">
-                <label className="mb-0">Aliases:</label> {aliases || "N/A"}
+                <label className="mb-0">Accessioned:</label> { date_created ? <LocalizedTime timestamp={date_created} formatType="date-sm"/> : null }
             </div>
         </>
     );
@@ -138,7 +122,6 @@ export const FamilyInfo = React.memo(function FamilyInfo({ family, caseItem }) {
     const {
         display_title : familyDisplayTitle = null,
         title: familyTitle= null,
-        family_phenotypic_features: familyFeatures = [],
         project = null
     } = family || {};
     const { display_title: projectTitle } = project || {};
@@ -147,22 +130,18 @@ export const FamilyInfo = React.memo(function FamilyInfo({ family, caseItem }) {
     } = caseItem || {};
     const { display_title: cohortTitle = null } = cohort || {};
 
-    const renderedPhenotypicFeatures = useMemo(function(){
-        return mapFeaturesToBadges(familyFeatures);
-    }, [ familyFeatures ]);
-
     // TODO later maybe use card footer Bootstrap component if such exists.
 
     return (
         <>
             <div className="card-text mb-1">
-                <label className="mb-0">Family:</label> { familyTitle || familyDisplayTitle || "N/A" }
+                <label className="mb-0">Family:</label> { familyTitle || familyDisplayTitle || null }
             </div>
             <div className="card-text mb-1">
-                <label className="mb-0">Cohort:</label> { cohortTitle || "N/A" }
+                <label className="mb-0">Cohort:</label> { cohortTitle || null }
             </div>
             <div className="card-text mb-1">
-                <label className="mb-0">Project:</label> { projectTitle || "N/A" }
+                <label className="mb-0">Project:</label> { projectTitle || null }
             </div>
         </>
     );
