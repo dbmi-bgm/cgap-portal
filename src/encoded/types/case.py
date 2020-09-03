@@ -262,13 +262,15 @@ class Case(Item):
         }
     })
     def secondary_families(self, request, individual=None, family=None):
+        """Calculate secondary families for a given case
+        family = @id of primary family"""
         if not individual or not family:
             return []
-        ind_data = get_item_or_none(request, individual, 'individuals', frame='embedded')
+        ind_data = get_item_or_none(request, individual, 'individuals')
         if not ind_data:
             return []
         individual_families = ind_data.get('families', [])
-        secondary_families = [i['@id'] for i in individual_families if i['@id'] != family]
+        secondary_families = [i for i in individual_families if i != family]
         return secondary_families
 
     @calculated_property(schema={

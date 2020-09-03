@@ -39,6 +39,8 @@ export const Term = {
         let name = null;
 
         switch (field) {
+            case '@id':
+                return term;
             case 'type':
                 return getTitleForType(term, get());
             case 'status':
@@ -60,6 +62,17 @@ export const Term = {
                     return <LocalizedTime timestamp={term} localize={false} />;
                 }
                 return dateFormat(term);
+            case 'accession':
+                //if (allowJSXOutput) {
+                //    return <span className="accession text-small">{ term }</span>;
+                //}
+                return term;
+
+            case "gene_biotype":
+                if (typeof term !== 'string') return term;
+                return term.split("_").map(capitalize).join(" ");
+
+            /** Related to Individual Items: */
             case 'is_pregnancy':
             case 'is_spontaneous_abortion':
             case 'is_infertile':
@@ -78,16 +91,21 @@ export const Term = {
                 if (term === "false") return "False";
                 if (term === "No value") return term; // Ideally could have this as "False" but then get 2+ "False" values in list of Facet terms.
                 return term;
-            case 'accession':
-                //if (allowJSXOutput) {
-                //    return <span className="accession text-small">{ term }</span>;
-                //}
-                return term;
-            case 'description':
+            case 'sex':
+                if (term === "M") name = "Male";
+                if (term === "F") name = "Female";
+                if (term === "U") name = "Undetermined";
                 if (allowJSXOutput) {
-                    return <span className="text-monospace text-small">{ term }</span>;
+                    return (
+                        <React.Fragment>
+                            <i className={`mr-03 icon icon-fw icon-${Term.genderCharacterToIcon(term)}`}/>
+                            { name }
+                        </React.Fragment>
+                    );
                 }
-                return term;
+                return name;
+
+            /** Related to File Items: */
             case 'file_type':
             case 'file_classification':
             case 'file_type_detailed':
@@ -111,21 +129,7 @@ export const Term = {
                     name = null;
                 }
                 break;
-            case 'sex':
-                if (term === "M") name = "Male";
-                if (term === "F") name = "Female";
-                if (term === "U") name = "Undetermined";
-                if (allowJSXOutput) {
-                    return (
-                        <React.Fragment>
-                            <i className={`mr-03 icon icon-fw icon-${Term.genderCharacterToIcon(term)}`}/>
-                            { name }
-                        </React.Fragment>
-                    );
-                }
-                return name;
-            case '@id':
-                return term;
+
             default:
                 break;
         }

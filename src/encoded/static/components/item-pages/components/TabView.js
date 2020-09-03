@@ -329,13 +329,14 @@ const TabsBar = React.memo(function TabsBar({ tabs, currentTab, onTabClick, pref
             (disabled ? " disabled" : " clickable")
         );
         const onClick = function(e){
+            e.preventDefault(); // Prevent `a` elem click triggering an actual navigate; this is overriden in `onTabClick`.
             e.stopPropagation();
             onTabClick(key);
         };
         return (
-            <div className={cls} key={key} data-tab-for={key} data-tab-index={idx} onClick={!disabled && onClick}>
+            <a href={"#" + key} className={cls} key={key} data-tab-for={key} data-tab-index={idx} onClick={!disabled && onClick}>
                 { children }
-            </div>
+            </a>
         );
     });
 
