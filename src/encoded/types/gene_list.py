@@ -1,5 +1,5 @@
 import structlog
-from base64 import b64encode
+from base64 import b64decode
 from pyramid.httpexceptions import HTTPUnprocessableEntity
 from pyramid.paster import get_app
 from pyramid.view import view_config
@@ -13,6 +13,7 @@ from snovault import (
 from snovault.util import debug_log
 from webtest import TestApp
 from .base import Item, get_item_or_none
+from pandas import read_excel
 
 log = structlog.getLogger(__name__)
 
@@ -64,53 +65,13 @@ def process_genelist(context, request):
         raise HTTPUnprocessableEntity('GeneList %s: Request JSON must include following'
                                       ' keys: download, type, href. Found: %s'
                                       % (genelist_item, request.json.keys()))
-    # verification on the attachment.
-    accepted_types = [
-        'text/plain',
-        'text/csv',
-        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-        'application/vnd.ms-excel'
-        ]
-    accepted_extensions = ['.txt', '.csv', '.xlsx', '.xls']
-    extension = request.json['download'].split('.')[-1]
-    if request.json['type'] not in accepted_types or extension not in accepted_extensions:
-        raise HTTPUnprocessableEntity('GeneList %s: Bad file upload. Use .txt'
-                                      ' file. Found: %s (file type), %s (file name)'
-                                      % (genelist_item, request.json['type'], request.json['download']))
 
-    config_uri = request.params.get('config_uri', 'production.ini')
-    app = get_app(config_uri, 'app')
-    # get user email for TestApp authentication
-    email = getattr(request, '_auth0_authenticated', None)
-    if not email:
-        user_uuid = None
-        for principal in request.effective_principals:
-            if principal.startswith('userid.'):
-                user_uuid = principal[7:]
-                break
-        if not user_uuid:
-            raise HTTPUnprocessableEntity('GeneList %s: Must provide authentication' % genelist_item)
-        user_props = get_item_or_none(request, user_uuid)
-        email = user_props['email']
-    environ = {'HTTP_ACCEPT': 'application/json', 'REMOTE_USER': email}
-    testapp = TestApp(app, environ)
+    genes = get_genes(request.json, genelist_item)
+    if isinstance(genes, str):
+        raise HTTPUnprocessableEntity(genes)
+
     # parse the file for genes
     response = {'title': 'GeneList Processing'}
-
-    # convert content to list of ids
-    genes = process_input_content(request.json['href'], )
-    try:
-        content = request.json['href']
-        # use following as delimenter [space, tab, new line, comma, colon, semicolon]
-        for delimeter in [' ', '\t', '\r\n', '\r', '\n', ',', ':', ';']:
-            content = content.replace(delimeter, ',')
-        genes = [i.strip().upper() for i in content.split(',') if i]
-        assert genes
-    except Exception as exc:
-        response['status'] = 'failure'
-        response['detail'] = 'Error parsing file: %s' % str(exc)
-        return response
-
     # extra values that are used when creating the pedigree
     gene_list_props = context.upgrade_properties()
     post_extra = {'project': gene_list_props['project'],
@@ -124,11 +85,29 @@ def process_genelist(context, request):
         return response
 
     # create Document for input genelist file
-    data_href = 'data:%s;base64,%s' % (request.json['type'], b64encode(request.json['href'].encode()).decode('ascii'))
+    data_href = 'data:%s;base64,%s' % (request.json['type'], request.json['href'])
     attach = {'attachment': {'download': request.json['download'],
                              'type': request.json['type'],
                              'href': data_href}}
     attach.update(post_extra)
+
+    # get user email for TestApp authentication
+    email = getattr(request, '_auth0_authenticated', None)
+    if not email:
+        user_uuid = None
+        for principal in request.effective_principals:
+            if principal.startswith('userid.'):
+                user_uuid = principal[7:]
+                break
+        if not user_uuid:
+            raise HTTPUnprocessableEntity('GeneList %s: Must provide authentication' % genelist_item)
+        user_props = get_item_or_none(request, user_uuid)
+        email = user_props['email']
+    environ = {'HTTP_ACCEPT': 'application/json', 'REMOTE_USER': email}
+    config_uri = request.params.get('config_uri', 'production.ini')
+    app = get_app(config_uri, 'app')
+    testapp = TestApp(app, environ)
+
     try:
         attach_res = testapp.post_json('/Document', attach)
         assert attach_res.status_code == 201
@@ -194,3 +173,41 @@ def process_genelist(context, request):
         response['not_matching_no_options'] = not_matching_no_options
         response['not_matching_with_options'] = not_matching_with_options
         return response
+
+
+def get_genes(request_json, genelist_item):
+    """get list of genes from the request, if str is returned, use it as error msg"""
+    # verification on the attachment.
+    accepted_types = [
+        'text/plain',
+        'text/csv',
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        'application/vnd.ms-excel'
+        ]
+    accepted_extensions = ['txt', 'csv', 'xlsx', 'xls']
+    extension = request_json['download'].split('.')[-1]
+    if request_json['type'] not in accepted_types or extension not in accepted_extensions:
+        error_msg = ('GeneList %s: Bad file upload. Use txt/csv/xls/xlsx'
+                     ' files. Found: %s (file type), %s (file name)'
+                     % (genelist_item, request_json['type'], request_json['download']))
+        return error_msg
+
+    # get b64 coded file
+    content = b64decode(request_json['href'].encode('ascii'))
+    # convert content to list of ids
+    try:
+        if extension in ['xlsx', 'xls']:
+            excel_df = read_excel(content, header=None)
+            content = excel_df.to_csv(index=False, header=False)
+        else:
+            content = content.decode()
+        # use following as delimenter [space, tab, new line, comma, colon, semicolon]
+        for delimeter in [' ', '\t', '\r\n', '\r', '\n', ',', ':', ';']:
+            content = content.replace(delimeter, ',')
+        genes = [i.strip().upper() for i in content.split(',') if i]
+        # if there are any headers, they should start with #
+        genes = [i for i in genes if not i.startswith('#')]
+        return genes
+    except Exception as exc:
+        error_msg = 'Error parsing file: %s' % str(exc)
+        return error_msg
