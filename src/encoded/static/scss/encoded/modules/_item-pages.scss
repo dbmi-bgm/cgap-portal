@@ -2411,19 +2411,18 @@ $download-button-width : 100px;
 
 .sample-variant-annotation-space-body {
 	.card .inner-card-section {
-		// TODO: Figure out how to apply this class to react bootstrap button via rbs
+		// TODO: Maybe consider propagating further, overriding btn-outline-secondary or btn-secondary with
+		// this (since their defaults look somewhat like disabled - but maybe useful idk)
 		.btn-outline-secondary.select-transcript {
-			border-color: #dee2e6;
-			color: #111111;
-			&:hover, &:active{
-				color: #ffffff;
-				border-color: transparent;
-			}
-			&[disabled] {
-				color: #6c757d;
-				border-color: #dee2e6;
-			} 
+			@include button-variant(#fff, #e0e0e0);
 		}
+	}
+
+	.sample-variant-info-header {
+		// Ensure we're above other titles/etc.
+		// For dropdown
+		position: relative;
+		z-index: 10;
 	}
 
 	.sample-variant-overview-tab-view-container {
