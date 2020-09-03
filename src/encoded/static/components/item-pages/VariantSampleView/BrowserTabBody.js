@@ -20,7 +20,7 @@ export const BrowserTabBody = React.memo(function BrowserTabBody ({ context, sch
     useEffect(function(){
         setTimeout(function(){
             setHiGlassInitialized(true);
-        }, 500);
+        }, 100);
     }, []); // Empty arr = run only once ever.
 
     console.log("----");
@@ -49,7 +49,7 @@ export const BrowserTabBody = React.memo(function BrowserTabBody ({ context, sch
                                 HiGlass Browser
                             </h4>
                         </div>
-                        <div className="info-body" style={{ height: 600 }}>
+                        <div className="info-body">
                             { body }
                             {/* <HiGlassPlainContainer viewConfig={dummyViewConfig} /> */}
                         </div>
