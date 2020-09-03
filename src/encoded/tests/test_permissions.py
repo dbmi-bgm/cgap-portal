@@ -19,8 +19,8 @@ def STATI():
         # viewable by project member
         "current",
         "inactive",
-        # admin only
         "in review",
+        # admin only
         "uploading",
         "uploaded",
         "upload failed",
@@ -125,6 +125,7 @@ def bgm_user(testapp, institution, bgm_project):
                 'role': 'project_member'  # XXX: you probably want this
             }
         ],
+        'project': bgm_project['@id'],
         'status': 'current'
     }
     # User @@object view has keys omitted.
@@ -344,7 +345,7 @@ def test_multi_proj_user_can_access_items_w_ok_status_from_multi_projects(
         if pname == corename:
             ok_stati = STATI[:2]
         else:
-            ok_stati = STATI[:4]
+            ok_stati = STATI[:5]
         simple_bgm_file_item['project'] = project['@id']
         for status in STATI:
             simple_bgm_file_item['status'] = status

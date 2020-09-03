@@ -23,3 +23,11 @@ class Project(Item):
     item_type = 'project'
     schema = load_schema('encoded:schemas/project.json')
     embedded_list = Item.embedded_list
+
+
+    # def __ac_local_roles__(self):
+    #     """ Maybe needs override? """
+    #     properties = self.upgrade_properties()
+    #     return {
+    #         'project.%s' % properties['name']: 'role.project_member'
+    #     }

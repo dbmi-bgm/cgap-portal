@@ -59,9 +59,8 @@ def groupfinder(login, request):
     # be modified when different user roles can provide different levels of access
     # and users can belong to different project
     # project_roles is a list of embedded objects with 'project' property required
-    project_roles = user_properties.get('project_roles', None)
-    if project_roles is not None:
-        principals.append('role.project_member')  # XXX: needs to be smarter
+    project_roles = user_properties.get('project_roles', [])
+    principals.extend('project.{}'.format(pr.get('project')) for pr in project_roles)
 
     groups = user_properties.get('groups', [])
     principals.extend('group.%s' % group for group in groups)

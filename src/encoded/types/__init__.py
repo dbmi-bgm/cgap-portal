@@ -148,6 +148,9 @@ class Document(ItemWithAttachment, Item):
             return attachment.get('download')
         return Item.display_title(self)
 
+    class Collection(Item.Collection):
+        pass
+
 
 @collection(
     name='file-formats',

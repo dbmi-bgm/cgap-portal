@@ -56,7 +56,9 @@ ONLY_ADMIN_VIEW_ACL = [
     this gets added to the Collection class __init__
 """
 PROJECT_MEMBER_CREATE_ACL = [
-    (Allow, 'role.project_member', 'add')
+    (Allow, 'role.project_member', 'add'),
+    (Allow, 'role.project_member', 'create'),
+    (Allow, 'role.project_member', 'edit')
 ]
 
 # this is for pages that should be visible to public
@@ -234,7 +236,8 @@ class Collection(snovault.Collection, AbstractCollection):
             return
 
         # If no ACLs are defined for collection, allow project members to create
-        self.__acl__ = PROJECT_MEMBER_CREATE_ACL
+        if 'project' in self.type_info.factory.schema['properties']:
+            self.__acl__ = PROJECT_MEMBER_CREATE_ACL
 
 
 @snovault.abstract_collection(
@@ -298,6 +301,7 @@ class Item(snovault.Item):
                     project.uuid: role.project_member
                 }
           """
+        #import pdb; pdb.set_trace()
         roles = {}
         properties = self.upgrade_properties()
         if 'institution' in properties:
@@ -428,7 +432,6 @@ def create(context, request):
         }
 
 
-
 @view_config(
     context=Collection,
     permission='add',
@@ -450,14 +453,14 @@ def collection_add(context, request, render=None):
     # project_needed = False
     # data = request.json
     # schema = context.type_info.schema
-
+    #
     # required_properties = schema.get("required", [])
     # if "institution" in required_properties and "institution" not in data:
     #     institution_needed = True
-
+    #
     # if "project" in required_properties and "project" not in data:
     #     project_needed = True
-
+    #
     # if request.authenticated_userid and (institution_needed or project_needed):
     #     namespace, userid = request.authenticated_userid.split(".", 1)
     #     user_item = get_item_or_none(request, userid, itype="/users/", frame="object")
@@ -466,10 +469,10 @@ def collection_add(context, request, render=None):
     #         new_data["institution"] = user_item["institution"]
     #     if project_needed and "project" in user_item:
     #         new_data["project"] = user_item["project"]
-
+    #
     #     # Override initial JSON body of request (hacky? better way?)
     #     setattr(request, "json", new_data)
-
+    #
     # # Perform validation that would occur otherwise
     # validate_item_content_post(context, request)
     # if request.errors:
@@ -477,7 +480,6 @@ def collection_add(context, request, render=None):
     #         json={'errors': request.errors},
     #         content_type='application/json'
     #     )
-
     return sno_collection_add(context, request, render)
 
 
