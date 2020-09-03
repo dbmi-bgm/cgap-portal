@@ -371,7 +371,7 @@ function PredictorsSection({ context, getTipForField, currentTranscriptIdx }){
                         </tr>
                         <tr>
                             <td className="text-left">
-                                <label className="mb-0" data-tip={getTipForField("conservation_phylop100")}>phyloP100way</label>
+                                <label className="mb-0" data-tip={getTipForField("conservation_phylop100")}>PhyloP (100 Vertabrates)</label>
                             </td>
                             <td className="text-left">{ conservation_phylop100 }</td>
                         </tr>
