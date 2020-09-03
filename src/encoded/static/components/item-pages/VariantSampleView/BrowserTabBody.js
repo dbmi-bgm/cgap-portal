@@ -1,6 +1,6 @@
 'use strict';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { console } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { HiGlassAjaxLoadContainer } from './../components/HiGlass/HiGlassAjaxLoadContainer';
 
@@ -12,11 +12,32 @@ import { HiGlassAjaxLoadContainer } from './../components/HiGlass/HiGlassAjaxLoa
 
 export const BrowserTabBody = React.memo(function BrowserTabBody ({ context, schemas }) {
 
-    const higlassContainerRef = React.createRef();
+    const higlassContainerRef = React.createRef(); // I'm not sure is safe
     const variantPositionAbsCoord = context.variant.POS_ABS;
+
+    const [ higlassInitialized, setHiGlassInitialized ] = useState(false);
+
+    useEffect(function(){
+        setTimeout(function(){
+            setHiGlassInitialized(true);
+        }, 500);
+    }, []); // Empty arr = run only once ever.
+
     console.log("----");
     console.log(context);
     console.log("----");
+
+    let body = null;
+
+    if (!higlassInitialized) {
+        body = (
+            <div className="text-center">
+                Loading...
+            </div>
+        );
+    } else {
+        body = <HiGlassAjaxLoadContainer variantPositionAbsCoord={variantPositionAbsCoord} height={600} ref={higlassContainerRef} />;
+    }
 
     return (
         <div className="browser-tab-body card-body">
@@ -29,7 +50,7 @@ export const BrowserTabBody = React.memo(function BrowserTabBody ({ context, sch
                             </h4>
                         </div>
                         <div className="info-body" style={{ height: 600 }}>
-                            <HiGlassAjaxLoadContainer variantPositionAbsCoord={variantPositionAbsCoord} height={600} ref={higlassContainerRef} />
+                            { body }
                             {/* <HiGlassPlainContainer viewConfig={dummyViewConfig} /> */}
                         </div>
                     </div>
