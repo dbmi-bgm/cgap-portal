@@ -56,9 +56,8 @@ ONLY_ADMIN_VIEW_ACL = [
     this gets added to the Collection class __init__
 """
 PROJECT_MEMBER_CREATE_ACL = [
-    (Allow, 'role.project_member', 'add'),
-    (Allow, 'role.project_member', 'create'),
-    (Allow, 'role.project_member', 'edit')
+    (Allow, 'group.project_member', 'add'),
+    (Allow, 'group.project_member', 'create'),
 ]
 
 # this is for pages that should be visible to public
@@ -84,6 +83,8 @@ ALLOW_PROJECT_MEMBER_VIEW_ACL = [
 DELETED_ACL = [
     (Deny, Everyone, 'visible_for_edit')
 ] + ONLY_ADMIN_VIEW_ACL
+
+ALLOW_PROJECT_MEMBER_ADD_ACL = PROJECT_MEMBER_CREATE_ACL
 
 
 def get_item_or_none(request, value, itype=None, frame='object'):
@@ -237,7 +238,7 @@ class Collection(snovault.Collection, AbstractCollection):
 
         # If no ACLs are defined for collection, allow project members to create
         if 'project' in self.type_info.factory.schema['properties']:
-            self.__acl__ = PROJECT_MEMBER_CREATE_ACL
+            self.__acl__ = ALLOW_PROJECT_MEMBER_ADD_ACL
 
 
 @snovault.abstract_collection(
@@ -291,7 +292,7 @@ class Item(snovault.Item):
         # Don't finalize to avoid validation here.
         properties = self.upgrade_properties().copy()
         status = properties.get('status')
-        return self.STATUS_ACL.get(status, ONLY_ADMIN_VIEW_ACL)
+        return self.STATUS_ACL.get(status, ALLOW_PROJECT_MEMBER_EDIT_ACL)
 
     def __ac_local_roles__(self):
         """Adds additional information allowing access of the Item based on
@@ -313,9 +314,9 @@ class Item(snovault.Item):
             roles[proj_group_members] = 'role.project_member'
 
         # This emulates __ac_local_roles__ of User.py (role.owner)
-        if 'submitted_by' in properties:
-            submitter = 'userid.%s' % properties['submitted_by']
-            roles[submitter] = 'role.owner'
+        # if 'submitted_by' in properties:
+        #     submitter = 'userid.%s' % properties['submitted_by']
+        #     roles[submitter] = 'role.owner'
         return roles
 
     def add_accession_to_title(self, title):

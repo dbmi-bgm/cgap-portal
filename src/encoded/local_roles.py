@@ -14,7 +14,6 @@ def local_principals(context, principals):
         to disable) and add local principals. This only works if you're in correct context, though,
         which does not seem to be the case.
     """
-
     local_principals = set()
 
     block = False

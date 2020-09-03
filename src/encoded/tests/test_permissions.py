@@ -46,6 +46,7 @@ STATUSES = [
     # viewable by project member
     "current",
     "inactive",
+    "in review",
     # kind of special admin-only
     "deleted",
     # special file status case due to redirect
@@ -284,7 +285,7 @@ def test_admin_can_patch_item_all_stati(admin_testapp, simple_bgm_file, status):
     assert res['status'] == status
 
 
-@pytest.mark.parametrize('status, expres', list(zip(STATUSES, [200, 200, 200, 200, 403, 404])))
+@pytest.mark.parametrize('status, expres', list(zip(STATUSES, [200, 200, 200, 200, 200, 403, 404])))
 def test_bgm_user_can_access_ok_stati_but_not_others_for_bgm_project_item(
         testapp, bgm_user_testapp, simple_bgm_file, status, expres):
     testapp.patch_json(simple_bgm_file['@id'], {'status': status}, status=200)
@@ -299,8 +300,8 @@ def test_bgm_user_can_post_item(bgm_user_testapp, simple_doc_item):
     assert bgm_user_testapp.post_json('/document', simple_doc_item, status=201)
 
 
-@pytest.mark.parametrize('status, expres', list(zip(STATUSES, [403, 403, 200, 403, 403, 404])))
-def test_bgm_user_can_only_patch_current_item(testapp, bgm_user_testapp, simple_bgm_file, status, expres):
+@pytest.mark.parametrize('status, expres', list(zip(STATUSES, [403, 403, 200, 403, 200, 403, 404])))
+def test_bgm_user_can_only_patch_current_or_in_review_item(testapp, bgm_user_testapp, simple_bgm_file, status, expres):
     # want bgm user to only be able to patch items linked to their project with current status
     testapp.patch_json(simple_bgm_file['@id'], {'status': status}, status=200)
     assert bgm_user_testapp.patch_json(simple_bgm_file['@id'], {'read_length': 100}, status=expres)

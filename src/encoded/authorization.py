@@ -61,6 +61,7 @@ def groupfinder(login, request):
     # project_roles is a list of embedded objects with 'project' property required
     project_roles = user_properties.get('project_roles', [])
     principals.extend('project.{}'.format(pr.get('project')) for pr in project_roles)
+    principals.append('group.project_member')
 
     groups = user_properties.get('groups', [])
     principals.extend('group.%s' % group for group in groups)
