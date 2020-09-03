@@ -11,10 +11,12 @@ import { Schemas } from './../../util';
  * @param {Array} features An array of phenotypic features items
  */
 function mapFeaturesToBadges(features = []) {
+    console.log("mapping features to Badges:", features);
     if (features.length === 0) {
         return <em>None</em>;
     }
     return features.map(function(feature){
+        console.log("mapping through each feature");
         const { display_title = null, '@id': featureID } = feature;
         return (
             // TODO: create own ~ `.tag` styling or override Bootstrap's default. Maybe.
@@ -34,7 +36,11 @@ export const CaseStats = React.memo(function CaseStats(props){
     const { accession: famAccession = null, family_phenotypic_features = [] } = family || {};
 
     const renderedPatientPhenotypicFeatures = useMemo(function(){
-        return mapFeaturesToBadges(phenotypic_features);
+        const onlyPhenotypicFeatures = phenotypic_features.map((feature) => {
+            const { phenotypic_feature = null } = feature;
+            return phenotypic_feature;
+        });
+        return mapFeaturesToBadges(onlyPhenotypicFeatures);
     }, [ phenotypic_features ]);
 
     const renderedFamilyPhenotypicFeatures = useMemo(function(){
