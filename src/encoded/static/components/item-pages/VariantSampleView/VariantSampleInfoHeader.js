@@ -11,15 +11,15 @@ import { Alerts } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/
 
 
 export function VariantSampleInfoHeader(props) {
-    const fallbackElem = <em className="text-muted" data-tip="Not Available">-</em>;
+    const fallbackElem = <em className="text-muted" data-tip="Not Available"> - </em>;
     const {
         context,
         currentTranscriptIdx,
         currentGeneItemLoading,
         onSelectTranscript,
         schemas,
-        caseID = <span className="text-muted">-</span> // null
-    } = props;
+        caseID = <span className="text-muted"> - </span> // null
+     } = props;
     const { variant: { dbsnp_rs_number = fallbackElem } = {} } = context;
 
     function getTipForField(field, itemType = "VariantSample"){
@@ -31,7 +31,7 @@ export function VariantSampleInfoHeader(props) {
 
     return (
         // Stack these into flex column until large responsive size, then make into row.
-        <div className="card mb-24">
+        <div className="card mb-24 sample-variant-info-header">
             <div className="card-body">
                 <div className="row flex-column flex-lg-row">
 
@@ -157,7 +157,7 @@ function TranscriptSelectionSection(props){
 }
 
 function TranscriptSelectionSectionBody({ schemas, currentTranscript }){
-    const fallbackElem = <em className="text-muted" data-tip="Not Available">-</em>;
+    const fallbackElem = <em className="text-muted" data-tip="Not Available"> - </em>;
     const {
         vep_hgvsc = fallbackElem,
         vep_hgvsp = fallbackElem,
@@ -168,14 +168,62 @@ function TranscriptSelectionSectionBody({ schemas, currentTranscript }){
         vep_consequence = []
     } = currentTranscript || {};
 
+    /* Helper func to basically just shorten `schemaTransforms.getSchemaProperty(field, schemas, itemType);`. */
     function getTipForField(field, itemType = "Transcript"){
         if (!schemas) return null;
         const schemaProperty = schemaTransforms.getSchemaProperty(field, schemas, itemType);
         return (schemaProperty || {}).description || null;
     }
 
+    const mostSevereConsequence = useMemo(function(){
+        return getMostSevereConsequence(vep_consequence);
+    }, [ vep_consequence ]);
+
+    const transcriptLocation = useMemo(function(){
+        return getTranscriptLocation(currentTranscript, mostSevereConsequence);
+    }, [ currentTranscript, mostSevereConsequence ]);
+
+    const {
+        display_title: consequenceTitle,
+        coding_effect: consequenceCodingEffect,
+        // '@id' : consequenceHref = null
+    } = mostSevereConsequence || {};
+
+    const codingEffectValue = consequenceCodingEffect || consequenceTitle || fallbackElem;
+
     return (
         <div className="row">
+
+
+
+            <div className="col col-xl-6">
+
+                {/* We could make these below into reusable component later once know this what we want fo sure */}
+
+                <div className="row mb-03">
+                    <div className="col-12 col-xl-6">
+                        <label htmlFor="calculated_transcript_location" className="mb-0">Location:</label>
+                    </div>
+                    <div className="col-12 col-xl" id="calculated_transcript_location">
+                        { transcriptLocation }
+                    </div>
+                </div>
+
+                <div className="row mb-03">
+                    <div className="col-12 col-xl-6">
+                        <label htmlFor="variant.transcript.vep_consequence" className="mb-0"
+                            data-tip={getTipForField("vep_consequence")}>
+                            Coding Effect:
+                        </label>
+                    </div>
+                    <div className="col-12 col-xl" id="variant.transcript.vep_consequence">
+                        { codingEffectValue }
+                    </div>
+                </div>
+
+            </div>
+
+
 
             <div className="col col-xl-6">
 
@@ -217,34 +265,6 @@ function TranscriptSelectionSectionBody({ schemas, currentTranscript }){
 
             </div>
 
-
-            <div className="col col-xl-6">
-
-                {/* We could make these below into reusable component later once know this what we want fo sure */}
-
-                <div className="row mb-03">
-                    <div className="col-12 col-xl-6">
-                        <label htmlFor="vep_exon" className="mb-0" data-tip={getTipForField("vep_exon")}>Location:</label>
-                    </div>
-                    <div className="col-12 col-xl" id="variant.transcript.vep_exon">
-                        { vep_exon ? "Exon " + vep_exon : fallbackElem }
-                    </div>
-                </div>
-
-                <div className="row mb-03">
-                    <div className="col-12 col-xl-6">
-                        <label htmlFor="variant.transcript.vep_consequence" className="mb-0"
-                            data-tip={getTipForField("vep_consequence")}>
-                            Coding Effect:
-                        </label>
-                    </div>
-                    <div className="col-12 col-xl" id="variant.transcript.vep_consequence">
-                        <CodingEffectValue vep_consequence={vep_consequence} />
-                    </div>
-                </div>
-
-            </div>
-
         </div>
     );
 }
@@ -270,8 +290,73 @@ function GeneTranscriptDisplayTitle({ transcript, className = "text-600" }){
     );
 }
 
+/** This will likely need/get feedback and may change */
+function getMostSevereConsequence(vep_consequence = []){
+    const impactMap = {
+        "HIGH" : 0,
+        "MODERATE" : 1,
+        "LOW" : 2,
+        "MODIFIER" : 3
+    };
+
+    const vcLen = vep_consequence.length;
+    let mostSevereConsequence = null;
+
+    if (vcLen === 0) {
+        return null;
+    } else if (vcLen === 1) {
+        [ mostSevereConsequence ] = vep_consequence;
+    } else {
+        [ mostSevereConsequence ] = vep_consequence.slice().sort(function({ impact: iA }, { impact: iB }){
+            return impactMap[iA] - impactMap[iB];
+        });
+    }
+
+    return mostSevereConsequence;
+}
+
+function getTranscriptLocation(transcript, mostSevereConsequence = null){
+    const {
+        vep_exon = null,
+        vep_intron = null,
+        vep_distance = null,
+    } = transcript || {};
+
+    const { var_conseq_name = null } = mostSevereConsequence || {};
+    const consequenceName = (typeof var_conseq_name === "string" && var_conseq_name.toLowerCase()) || null;
+
+    // TODO : "if variant.transcript.vep_consequence.display_title is 3 prime utr variant, then 3' UTR. Similarly with 5' UTR."
+    // `variant.transcript.vep_consequence` === `mostSevereConsequence` here.
+
+    if (consequenceName === "3_prime_utr_variant"){
+        return "3' UTR";
+    }
+
+    if (consequenceName === "5_prime_utr_variant"){
+        return "5' UTR";
+    }
+
+    if (vep_exon !== null) { // In case vep_exon is `0` or something (unsure if possible)
+        return "Exon " + vep_exon;
+    }
+
+    if (vep_intron !== null) {
+        return "Intron " + vep_intron;
+    }
+
+    if (vep_distance !== null) {
+        if (consequenceName === "downstream_gene_variant") {
+            return vep_distance + "bp downstream";
+        }
+        if (consequenceName === "upstream_gene_variant") {
+            return vep_distance + "bp upstream";
+        }
+    }
+
+}
+
 function GDNAList({ context }){
-    const fallbackElem = <em data-tip="Not Available">-</em>;
+    const fallbackElem = <em data-tip="Not Available"> - </em>;
     const { variant = {} } = context;
     const {
         mutanno_hgvsg = fallbackElem,
@@ -304,41 +389,4 @@ function GDNAList({ context }){
 
     return renderedRows;
 }
-
-/** This might not be needed since there's a 'most severe consequence' field... oh well. */
-const CodingEffectValue = React.memo(function CodingEffectValue({ vep_consequence = [] }){
-    // TODO grab most severe one?
-    // This will likely need/get feedback and may change
-    const vcLen = vep_consequence.length;
-    let mostSevereConsequence = null;
-
-    if (vcLen === 0) {
-        return <em data-tip="None Available" className="text-muted">-</em>;
-    } else if (vcLen === 1) {
-        [ mostSevereConsequence ] = vep_consequence;
-    } else {
-        [ mostSevereConsequence ] = vep_consequence.slice().sort(function({ impact: iA }, { impact: iB }){
-            return CodingEffectValue.impactMap[iA] - CodingEffectValue.impactMap[iB];
-        });
-    }
-
-    const { display_title, coding_effect, '@id' : consequenceHref } = mostSevereConsequence;
-    // return (
-    //     <a href={consequenceHref}>
-    //         { coding_effect || display_title }
-    //     </a>
-    // );
-    return coding_effect || display_title;
-
-});
-CodingEffectValue.impactMap = {
-    "HIGH" : 0,
-    "MODERATE" : 1,
-    "LOW" : 2,
-    "MODIFIER" : 3
-};
-CodingEffectValue.propTypes = {
-    /** Passed down from variant.transcript[currentTranscriptIdx].vep_consequence */
-    vep_consequence: PropTypes.array.isRequired
-};
 
