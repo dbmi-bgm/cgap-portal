@@ -11,14 +11,14 @@ import { Alerts } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/
 
 
 export function VariantSampleInfoHeader(props) {
-    const fallbackElem = <em className="text-muted" data-tip="Not Available">N/A</em>;
+    const fallbackElem = <em className="text-muted" data-tip="Not Available">-</em>;
     const {
         context,
         currentTranscriptIdx,
         currentGeneItemLoading,
         onSelectTranscript,
         schemas,
-        caseID = <span className="text-muted">N/A</span> // null
+        caseID = <span className="text-muted">-</span> // null
     } = props;
     const { variant: { dbsnp_rs_number = fallbackElem } = {} } = context;
 
@@ -157,7 +157,7 @@ function TranscriptSelectionSection(props){
 }
 
 function TranscriptSelectionSectionBody({ schemas, currentTranscript }){
-    const fallbackElem = <em className="text-muted" data-tip="Not Available">N/A</em>;
+    const fallbackElem = <em className="text-muted" data-tip="Not Available">-</em>;
     const {
         vep_hgvsc = fallbackElem,
         vep_hgvsp = fallbackElem,
@@ -271,11 +271,12 @@ function GeneTranscriptDisplayTitle({ transcript, className = "text-600" }){
 }
 
 function GDNAList({ context }){
+    const fallbackElem = <em data-tip="Not Available">-</em>;
     const { variant = {} } = context;
     const {
-        mutanno_hgvsg = <em>N/A</em>,
+        mutanno_hgvsg = fallbackElem,
         // POS: pos,
-        CHROM: chrom = <em>N/A</em>,
+        CHROM: chrom = fallbackElem,
         hg19 = []
     } = variant;
 
@@ -312,7 +313,7 @@ const CodingEffectValue = React.memo(function CodingEffectValue({ vep_consequenc
     let mostSevereConsequence = null;
 
     if (vcLen === 0) {
-        return <em data-tip="None Available" className="text-muted">N/A</em>;
+        return <em data-tip="None Available" className="text-muted">-</em>;
     } else if (vcLen === 1) {
         [ mostSevereConsequence ] = vep_consequence;
     } else {
