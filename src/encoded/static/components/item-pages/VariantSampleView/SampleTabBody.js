@@ -191,7 +191,7 @@ function CoverageTable(props) {
     // Show proband first
     rows.sort((a,b) => {
         const { role = null } = a;
-        return (role === "proband" ? -1 : 1);
+        return (role === "proband" ? 1 : -1);
     });
 
     const altRows = Object.keys(altRowObj);
