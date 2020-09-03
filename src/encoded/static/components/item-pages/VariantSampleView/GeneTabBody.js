@@ -233,23 +233,36 @@ export const ExternalDatabasesSection = React.memo(function ExternalDatabasesSec
         const {
             link: linkFormat = null,
             title = null,
-            description = null
+            // description = null
         } = fieldSchema;
         const externalID = currentItem[fieldName];
-        if (!externalID) {
-            return null;
-        }
-        // IN FUTURE WE WILL GET LINK BACK FROM BACK-END RATHER THAN MAKE IT HERE.
-        const linkToID = linkFormat.replace("<ID>", externalID);
-        return (
-            <div className="row mb-03" key={fieldName}>
-                <div className="col-12 col-xl">
-                    <label className="mb-0 black-label" htmlFor={"variant.transcript.vep_gene." + fieldName} data-tip={description}>{ title || fieldName }</label>
-                </div>
-                <a className="col-12 col-xl-auto" href={linkToID || null} tagret="_blank" rel="noopener noreferrer" id={"variant.transcript.vep_gene." + fieldName}>
+
+        // if (!externalID) {
+        //     return null;
+        // }
+
+        let val;
+
+        if (externalID) {
+            const linkToID = linkFormat.replace("<ID>", externalID);
+            val = (
+                <a href={linkToID || null} target="_blank" rel="noopener noreferrer" id={"external_resource_for_" + fieldName}>
                     <span>{ externalID }</span>
                     <i className="ml-05 icon icon-fw icon-external-link-alt fas text-smaller text-secondary" />
                 </a>
+            );
+        } else {
+            val = <em data-tip="Not Available" className="px-1"> - </em>;
+        }
+
+        return (
+            <div className="row mb-03" key={fieldName}>
+                <div className="col-12 col-xl">
+                    <label className="mb-0 black-label" htmlFor={"external_resource_for_" + fieldName}>{ title || fieldName }</label>
+                </div>
+                <div className="col-12 col-xl-auto">
+                    { val }
+                </div>
             </div>
         );
     }).filter(function(elem){ return !!elem; });

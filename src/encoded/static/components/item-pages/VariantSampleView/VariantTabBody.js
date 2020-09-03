@@ -36,8 +36,10 @@ export const VariantTabBody = React.memo(function VariantTabBody ({ context, sch
                 const schemaProperty = schemaTransforms.getSchemaProperty(field, schemas, itemType);
                 return (schemaProperty || {}).description || null;
             };
-            const clinvarIDSchemaProperty = schemaTransforms.getSchemaProperty("clinvar_variationid", schemas, "Variant");
-            ret.clinvarExternalHref = clinvarIDSchemaProperty.link.replace("<ID>", variationID);
+            if (variationID) {
+                const clinvarIDSchemaProperty = schemaTransforms.getSchemaProperty("clinvar_variationid", schemas, "Variant");
+                ret.clinvarExternalHref = clinvarIDSchemaProperty.link.replace("<ID>", variationID);
+            }
         }
 
         return ret;
@@ -290,7 +292,7 @@ function ClinVarSection({ context, getTipForField, schemas, clinvarExternalHref 
 }
 
 function ClinVarSubmissionEntry({ submission, index = 0 }){
-    const fallbackElem = <em data-tip="Not Available">N/A</em>;
+    const fallbackElem = <em data-tip="Not Available"> - </em>;
     const {
         clinvar_submission_interpretation = fallbackElem,
         clinvar_submission_submitter = fallbackElem,
@@ -324,7 +326,7 @@ ClinVarSubmissionEntry.interpretationStatusMap = {
 
 function PredictorsSection({ context, getTipForField, currentTranscriptIdx }){
     const { variant } = context;
-    const fallbackElem = <em data-tip="Not Available">N/A</em>;
+    const fallbackElem = <em data-tip="Not Available"> - </em>;
     const {
         conservation_gerp = fallbackElem,
         conservation_phylop100 = fallbackElem,
