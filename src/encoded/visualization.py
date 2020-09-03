@@ -22,6 +22,7 @@ def includeme(config):
         '/trace_workflow_run_steps/{file_uuid}/',
         traverse='/{file_uuid}'
     )
+    config.add_route('get_higlass_viewconf', '/get_higlass_viewconf/')
     config.scan(__name__)
 
 
@@ -87,3 +88,50 @@ def trace_workflow_runs(context, request):
         return trace_workflows(files_objs_to_trace, request, options)
     except WorkflowRunTracingException as e:
         raise HTTPBadRequest(detail=e.args[0])
+
+
+
+@view_config(route_name='get_higlass_viewconf', request_method='POST')
+@debug_log
+def get_higlass_viewconf(context, request):
+    """ Add multiple files to the given Higlass view config.
+    Args:
+        request(obj): Http request object. Assumes request's request is JSON and contains these keys:
+            viewconfig_uuid(str)       : UUID of the viewconf
+    Returns:
+        A dictionary.
+            success(bool)       : Boolean indicating success.
+            errors(str)         : A string containing errors. Will be None if this is successful.
+            viewconfig(dict)    : Dict representing the new viewconfig.
+    """
+    uuid = request.json_body.get('viewconfig_uuid', None)  
+    uuid = uuid if uuid else "00000000-1111-0000-1111-000000000000"
+
+    variant_pos = request.json_body.get('variant_pos_abs', None)  
+    variant_pos = variant_pos if variant_pos else 100000
+    window_size = 10
+
+    default_higlass_viewconf = get_item_or_none(request, uuid)
+    higlass_viewconfig = default_higlass_viewconf["viewconfig"] if default_higlass_viewconf else None
+
+    # If no view config could be found, fail
+    if not higlass_viewconfig:
+        return {
+            "success" : False,
+            "errors": "No view config found.",
+            "viewconfig": None
+        }   
+
+    higlass_viewconfig['views'][0]['initialXDomain'][0] = variant_pos - window_size
+    higlass_viewconfig['views'][0]['initialXDomain'][1] = variant_pos + window_size 
+
+    higlass_viewconfig['views'][0]['tracks']['whole'][0]['x'] = variant_pos
+    higlass_viewconfig['views'][0]['tracks']['whole'][1]['x'] = variant_pos + 1
+
+    return {
+        "success" : True,
+        "errors": "",
+        "viewconfig" : higlass_viewconfig
+    }        
+
+    
