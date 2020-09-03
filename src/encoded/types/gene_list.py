@@ -96,6 +96,9 @@ def process_genelist(context, request):
     testapp = TestApp(app, environ)
     # parse the file for genes
     response = {'title': 'GeneList Processing'}
+
+    # convert content to list of ids
+    genes = process_input_content(request.json['href'], )
     try:
         content = request.json['href']
         # use following as delimenter [space, tab, new line, comma, colon, semicolon]
