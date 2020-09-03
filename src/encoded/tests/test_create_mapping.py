@@ -11,7 +11,7 @@ from ..commands.create_mapping_on_deploy import ITEM_INDEX_ORDER, get_deployment
 pytestmark = [pytest.mark.setone, pytest.mark.working]
 
 
-@pytest.mark.parametrize('item_type', ORDER)  # XXX: change back to ORDER later
+@pytest.mark.parametrize('item_type', ORDER)
 def test_create_mapping_correctly_maps_embeds(registry, item_type):
     """
     This test does not actually use elasticsearch
@@ -38,7 +38,6 @@ def test_create_mapping_correctly_maps_embeds(registry, item_type):
                 else:
                     assert 'properties' in final_mapping or final_mapping.get('type') == 'object'
             else:
-                # XXX mixins are not being added
                 assert split_ in mapping_pointer['properties']
                 mapping_pointer = mapping_pointer['properties'][split_]
 
