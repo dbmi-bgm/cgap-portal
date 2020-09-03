@@ -1,6 +1,6 @@
 'use strict';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { console } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { HiGlassAjaxLoadContainer } from './../components/HiGlass/HiGlassAjaxLoadContainer';
 
@@ -12,7 +12,7 @@ import { HiGlassAjaxLoadContainer } from './../components/HiGlass/HiGlassAjaxLoa
 
 export const BrowserTabBody = React.memo(function BrowserTabBody ({ context, schemas }) {
 
-    const higlassContainerRef = React.createRef(); // I'm not sure is safe
+    const higlassContainerRef = useRef(null);
     const variantPositionAbsCoord = context.variant.POS_ABS;
 
     const [ higlassInitialized, setHiGlassInitialized ] = useState(false);
