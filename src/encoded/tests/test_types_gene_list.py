@@ -111,3 +111,29 @@ def test_get_genes_xls():
     expected_genes = ['GENEID1', 'GENEID2', 'ENSG00000000003', 'ENSG00000000004']
     print(genes)
     assert genes == expected_genes
+
+
+# def test_process_genelist_txt(testapp, project, institution,
+#                               gene1, gene2, gene3, gene4):
+#     """Test Gene List creation endpoint."""
+#     test_file = 'src/encoded/tests/data/documents/gene_lists/test1.txt'
+#     # create and empty genelist item
+#     post_body = {'project': project['@id'],
+#                  'institution': institution['@id'],
+#                  'title': 'Test Gene List with TXT input'}
+#     gene_list_item = testapp.post_json('/gene_list', post_body).json['@graph'][0]
+#     # gather patch info
+#     size = os.stat(test_file).st_size
+#     with open(test_file, 'rb') as stream:
+#         content = b64encode(stream.read()).decode('ascii')
+#     guessed_mime = mimetypes.guess_type(test_file)[0]
+#     detected_mime = magic.from_file(test_file, mime=True)
+#     assert guessed_mime == detected_mime
+#     payload = {'size': size,
+#                'href': content,
+#                'download': test_file,
+#                'type': detected_mime}
+#     process_endpoint = gene_list_item['@id'] + 'process-genelist'
+#     process_response = testapp.patch_json(process_endpoint, payload).json
+#     print(process_response)
+#     assert False
