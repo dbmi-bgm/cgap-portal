@@ -260,7 +260,7 @@ class VariantSample(Item):
             }
         }
     })
-    def associated_genotype_labels(self, CALL_INFO, samplegeno, genotype_labels):
+    def associated_genotype_labels(self, CALL_INFO, samplegeno=None, genotype_labels=None):
         """ Builds the above sub-embedded object so we can search on the genotype labels """
 
         # XXX: will be useful if we want to have this field be "centric" WRT the
@@ -273,6 +273,9 @@ class VariantSample(Item):
 
         def infer_key_from_role(role):
             return role.replace(' ', '_').replace('-', '_') + '_genotype_label'
+
+        if not genotype_labels or not samplegeno:
+            return None
 
         new_labels = {}
         for role, label in genotype_labels.items():
