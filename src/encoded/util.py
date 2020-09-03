@@ -112,7 +112,8 @@ def subrequest_item_creation(request: pyramid.request.Request, item_type: str, j
     collection_path = '/' + item_type
     method = 'POST'
     # json_utf8 = json.dumps(json_body).encode('utf-8')  # Unused, but here just in case
-    check_true(not request.remote_user, "request.remote_user has %s before we set it." % request.remote_user)
+    # XXX: not clear why below line is necessary
+    #check_true(not request.remote_user, "request.remote_user has %s before we set it." % request.remote_user)
     request.remote_user = 'EMBED'
     subrequest = make_subrequest(request=request, path=collection_path, method=method, json_body=json_body)
     subrequest.remote_user = 'EMBED'

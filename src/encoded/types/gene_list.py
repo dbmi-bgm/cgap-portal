@@ -1,8 +1,10 @@
 import structlog
+import json
 from base64 import b64decode
-from pyramid.httpexceptions import HTTPUnprocessableEntity
+from pyramid.httpexceptions import HTTPUnprocessableEntity, HTTPNotFound
 from pyramid.paster import get_app
 from pyramid.view import view_config
+from pyramid.request import Request
 from snovault import (
     calculated_property,
     collection,
@@ -13,6 +15,7 @@ from snovault import (
 from snovault.util import debug_log
 from webtest import TestApp
 from .base import Item, get_item_or_none
+from ..util import get_trusted_email, subrequest_item_creation
 from pandas import read_excel
 
 log = structlog.getLogger(__name__)
@@ -92,33 +95,27 @@ def process_genelist(context, request):
     attach.update(post_extra)
 
     # get user email for TestApp authentication
-    email = getattr(request, '_auth0_authenticated', None)
-    if not email:
-        user_uuid = None
-        for principal in request.effective_principals:
-            if principal.startswith('userid.'):
-                user_uuid = principal[7:]
-                break
-        if not user_uuid:
-            raise HTTPUnprocessableEntity('GeneList %s: Must provide authentication' % genelist_item)
-        user_props = get_item_or_none(request, user_uuid)
-        email = user_props['email']
-    environ = {'HTTP_ACCEPT': 'application/json', 'REMOTE_USER': email}
-    config_uri = request.params.get('config_uri', 'production.ini')
-    app = get_app(config_uri, 'app')
-    testapp = TestApp(app, environ)
+    # email = get_trusted_email(request, context=GeneList)
+    # environ = {'HTTP_ACCEPT': 'application/json', 'REMOTE_USER': email}
+    # config_uri = request.params.get('config_uri', 'production.ini')
+    # app = get_app(config_uri, 'app')
+    # testapp = TestApp(app, environ)
 
-    try:
-        attach_res = testapp.post_json('/Document', attach)
-        assert attach_res.status_code == 201
-    except Exception as exc:
-        log.error('Failure to POST Document in process-gene_list! Exception: %s' % exc)
-        error_msg = ('GeneList %s: Error encountered on POST in process-gene_list.'
-                     % (genelist_item))
-        raise HTTPUnprocessableEntity(error_msg)
+    # XXX: instead of this
+    # try:
+    #     attach_res = testapp.post_json('/Document', attach)
+    #     assert attach_res.status_code == 201
+    # except Exception as exc:
+    #     log.error('Failure to POST Document in process-gene_list! Exception: %s' % exc)
+    #     error_msg = ('GeneList %s: Error encountered on POST in process-gene_list.'
+    #                  % (genelist_item))
+    #     raise HTTPUnprocessableEntity(error_msg)
+
+    # do this
+    attach_res = subrequest_item_creation(request, 'Document', attach)
 
     # add document to the gene_list item
-    attach_uuid = attach_res.json['@graph'][0]['uuid']
+    attach_uuid = attach_res['@graph'][0]
     gene_list_patch = {}
     gene_list_patch['source_file'] = attach_uuid
 
@@ -128,7 +125,17 @@ def process_genelist(context, request):
     not_matching_no_options = []
     for a_gene in genes:
         query = '/search/?type=Gene&q=' + a_gene
-        res = testapp.get(query).json
+        kwargs = {
+            'environ': request.environ,
+            'method': 'GET',
+            'content_type': 'application/json',
+            'path_info': query
+        }
+        subreq = Request.blank(query, **kwargs)
+        try:
+            res = request.invoke_subrequest(subreq)
+        except HTTPNotFound:
+            continue
         # look up with common ids gene_symbol and ensemble id
         bulls_eye_1 = [i for i in res if i.get('gene_symbol', '') == a_gene]
         bulls_eye_2 = [i for i in res if i.get('ensgid', '') == a_gene]
@@ -154,6 +161,18 @@ def process_genelist(context, request):
         gene_list_patch['genes'] = gene_list
         # PATCH the GeneList with genes
         try:
+            query = '/' + genelist_item
+            kwargs = {
+                'environ': request.environ,
+                'method': 'PATCH',
+                'content_type': 'application/json',
+                'path_info': query,
+                'body': json.dumps(gene_list_patch).encode('utf-8')
+            }
+            subreq = Request.blank(query, **kwargs)
+            subreq.remote_user = 'EMBED'
+            import pdb; pdb.set_trace()
+            genelist_res = request.invoke_subrequest(subreq)
             genelist_res = testapp.patch_json('/' + genelist_item, gene_list_patch)
             assert genelist_res.status_code == 200
             response['context'] = testapp.get('/gene_lists/' + genelist_item + '?frame=page&datastore=database', status=200).json
