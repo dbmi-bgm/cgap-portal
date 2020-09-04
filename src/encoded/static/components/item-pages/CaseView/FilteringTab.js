@@ -160,7 +160,7 @@ export function FilteringTabSubtitle(props){
         const filterSetQueryStr = queryString.stringify(parsedCurrentQueryFiltered);
         const differsFromCurrentFilterSet = !!(
             (!lastFilterSetSaved && filterSetQueryStr) ||
-            (lastFilterSetSaved && !filterSetQueryStr) ||
+            (/*lastFilterSetSaved*/ lastActiveFilterAppend && !filterSetQueryStr) ||
             (lastFilterSetSaved && filterSetQueryStr && !_.isEqual(parsedCurrentQueryFiltered, queryString.parse(lastActiveFilterAppend)))
         );
 
