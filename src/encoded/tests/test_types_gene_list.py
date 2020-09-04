@@ -3,9 +3,9 @@ import mimetypes
 import os
 import magic
 from base64 import b64encode
-from ..types.gene_list import (
-    get_genes,
-    )
+# from ..types.gene_list import (
+#     get_genes,
+#     )
 pytestmark = [pytest.mark.working, pytest.mark.schema]
 
 
