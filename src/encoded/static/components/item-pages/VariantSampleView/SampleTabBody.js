@@ -354,7 +354,7 @@ function CompoundHetTable(props) {
                         comhet_phase: phase = null,
                         comhet_gene: gene = null,
                         comhet_impact_gene: impactGene = null,
-                        comhet_transcript: transcript = null,
+                        comhet_transcript: transcript = [],
                         comhet_impact_transcript: impactTranscript = null,
                     } = obj;
 
@@ -364,7 +364,14 @@ function CompoundHetTable(props) {
                             <td className="text-left">{ phase }</td>
                             <td className="text-left">{ gene }</td>
                             <td className="text-left">{ impactGene }</td>
-                            <td className="text-left">{ transcript }</td>
+                            <td className="text-left">
+                                { transcript.map((item, i) => {
+                                    if (transcript.length - 1 !== i) {
+                                        return item + ", ";
+                                    }
+                                    return item;
+                                }) }
+                            </td>
                             <td className="text-left">{ impactTranscript }</td>
                         </tr>
                     );
