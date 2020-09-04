@@ -28,12 +28,13 @@ EXPECTED_INSERT = {'field_name': 'CHROM', 'schema_title': 'Chromosome',
 VEP_CONSEQUENCE_EMBEDS = ['transcript.vep_consequence.var_conseq_id', 'transcript.vep_consequence.definition',
                           'transcript.vep_consequence.impact', 'transcript.vep_consequence.location',
                           'transcript.vep_consequence.coding_effect', 'transcript.vep_gene.display_title',
-                          'transcript.vep_gene.gene_symbol', 'transcript.vep_gene.ensgid']
+                          'transcript.vep_gene.gene_symbol', 'transcript.vep_gene.ensgid',
+                          'transcript.vep_consequence.var_conseq_name']
 VARIANT_TABLE_VERSION = 'annV0.4.8'
-VARIANT_TABLE_DATE = '08.21.2020'
-NUMBER_ANNOTATION_FIELDS = 354
+VARIANT_TABLE_DATE = '09.04.2020'
+NUMBER_ANNOTATION_FIELDS = 356
 SAMPLE_FIELDS_EXPECTED = 27
-VARIANT_FIELDS_EXPECTED = 327
+VARIANT_FIELDS_EXPECTED = 329
 TRANSCRIPT_FIELDS_EXPECTED = 35
 
 
@@ -182,6 +183,7 @@ def test_generate_variant_sample_schema(MTParser, sample_variant_items):
     assert cols['AF']['order'] == 21
     assert cols['GT']['order'] == 30
     assert facs['cmphet.comhet_impact_gene']['order'] == 17
+    assert facs['inheritance_modes']['order'] == 15
 
 
 def test_generate_variant_schema(MTParser, variant_items):

@@ -1,0 +1,30 @@
+[
+    {
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "status": "released",
+        "uuid": "cc7d83a2-6886-4ca0-9402-7c49734c1111",
+        "gene_symbol": "my_gene_1",
+        "ensgid": "ENSGmock0100001"
+    },
+    {
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "status": "released",
+        "uuid": "cc7d83a2-6886-4ca0-9402-7c49734c2222",
+        "gene_symbol": "my_gene_2",
+        "ensgid": "ENSGmock0100002"
+    },
+    {
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "status": "released",
+        "uuid": "cc7d83a2-6886-4ca0-9402-7c49734c3333",
+        "gene_symbol": "my_gene_3",
+        "ensgid": "ENSGmock0100003"
+    },
+    {
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "status": "released",
+        "uuid": "cc7d83a2-6886-4ca0-9402-7c49734c4444",
+        "gene_symbol": "my_gene_4",
+        "ensgid": "ENSGmock0100004"
+    }
+]

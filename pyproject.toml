@@ -1,7 +1,7 @@
 [tool.poetry]
 # Note: Various modules refer to this system as "encoded", not "cgap-portal".
 name = "encoded"
-version = "2.4.20"
+version = "2.5.0"
 description = "Clinical Genomics Analysis Platform"
 authors = ["4DN-DCIC Team <support@4dnucleome.org>"]
 license = "MIT"
@@ -35,7 +35,7 @@ classifiers = [
 ]
 
 [tool.poetry.dependencies]
-python = ">=3.6,<3.7"
+python = ">=3.6.1,<3.7"
 boto3 = "^1.10.46"
 botocore = "^1.13.46"
 certifi = ">=2020.4.5.2"
@@ -80,7 +80,7 @@ pyramid-multiauth = "0.8.0"
 pyramid-retry = "1.0"
 pyramid-tm = "2.2.1"
 pyramid-translogger = "^0.1"
-python-dateutil = "2.5.3"
+python-dateutil = "2.7.3"
 # python-magic is presently pinned to 0.4.15 in lockstep with dcicsnovault's requirements. See explanation there.
 python-magic = "0.4.15"
 pytz = ">=2020.1"

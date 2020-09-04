@@ -1,0 +1,15 @@
+[
+    {
+        "uuid": "117d83a2-6886-4ca0-9111-1119734cfaaa",
+        "title": "Demo Gene List - 1",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "genes": [
+            "b7f4b448-7961-417b-8ace-0a30ecbd9e10",
+            "b4c348af-a926-4b5d-bcad-c9d1f77b7fe0",
+            "a623d377-87c5-4c53-ac71-0b6822cd493e",
+            "a6164640-71f9-46a3-af2e-6977e747d15e",
+            "a116835b-207a-4cc8-bcb0-7ea0417c9978"
+        ]
+    }
+]
