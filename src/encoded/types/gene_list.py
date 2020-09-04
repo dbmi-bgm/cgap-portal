@@ -191,6 +191,9 @@ def process_genelist(context, request):
         else:
             not_matching_no_options.append(a_gene)
 
+    # remove duplicates from gene Lists
+    gene_list = list(set(gene_list))
+
     if not not_matching_with_options and not not_matching_no_options:
         gene_list_patch['genes'] = gene_list
         # PATCH the GeneList with genes
@@ -248,6 +251,8 @@ def get_genes(request_json, genelist_item):
         genes = [i.strip().upper() for i in content.split(',') if i]
         # if there are any headers, they should start with #
         genes = [i for i in genes if not i.startswith('#')]
+        # remove duplicates
+        genes = list(set(genes))
         return genes
     except Exception as exc:
         error_msg = 'Error parsing file: %s' % str(exc)
