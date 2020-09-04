@@ -169,7 +169,7 @@ function TranscriptSelectionSectionBody({ schemas, currentTranscript }){
     } = currentTranscript || {};
 
     /* Helper func to basically just shorten `schemaTransforms.getSchemaProperty(field, schemas, itemType);`. */
-    function getTipForField(field, itemType = "Transcript"){
+    function getTipForField(field, itemType = "Variant"){
         if (!schemas) return null;
         const schemaProperty = schemaTransforms.getSchemaProperty(field, schemas, itemType);
         return (schemaProperty || {}).description || null;
@@ -183,20 +183,14 @@ function TranscriptSelectionSectionBody({ schemas, currentTranscript }){
         return getTranscriptLocation(currentTranscript, mostSevereConsequence);
     }, [ currentTranscript, mostSevereConsequence ]);
 
-    const {
-        display_title: consequenceTitle,
-        coding_effect: consequenceCodingEffect,
-        // '@id' : consequenceHref = null
-    } = mostSevereConsequence || {};
-
-    const codingEffectValue = consequenceCodingEffect || consequenceTitle || fallbackElem;
+    const { coding_effect: consequenceCodingEffect = fallbackElem } = mostSevereConsequence || {};
 
     return (
         <div className="row">
 
 
 
-            <div className="col col-xl-6">
+            <div className="col col-xl-5">
 
                 {/* We could make these below into reusable component later once know this what we want fo sure */}
 
@@ -211,13 +205,13 @@ function TranscriptSelectionSectionBody({ schemas, currentTranscript }){
 
                 <div className="row mb-03">
                     <div className="col-12 col-xl-6">
-                        <label htmlFor="variant.transcript.vep_consequence" className="mb-0"
-                            data-tip={getTipForField("vep_consequence")}>
+                        <label htmlFor="variant.transcript.vep_consequence.coding_effect" className="mb-0"
+                            data-tip={getTipForField("transcript.vep_consequence.coding_effect")}>
                             Coding Effect:
                         </label>
                     </div>
-                    <div className="col-12 col-xl" id="variant.transcript.vep_consequence">
-                        { codingEffectValue }
+                    <div className="col-12 col-xl" id="variant.transcript.vep_consequence.coding_effect">
+                        { consequenceCodingEffect }
                     </div>
                 </div>
 
@@ -225,13 +219,13 @@ function TranscriptSelectionSectionBody({ schemas, currentTranscript }){
 
 
 
-            <div className="col col-xl-6">
+            <div className="col col-xl-7">
 
                 {/* We could make these below into reusable component later once know this what we want fo sure */}
 
                 <div className="row mb-03">
                     <div className="col-12 col-xl-3">
-                        <label htmlFor="variant.transcript.vep_gene.display_title" className="mb-0" data-tip={getTipForField("vep_gene")}>
+                        <label htmlFor="variant.transcript.vep_gene.display_title" className="mb-0" data-tip={getTipForField("transcript.vep_gene")}>
                             Gene:
                         </label>
                     </div>
@@ -247,7 +241,7 @@ function TranscriptSelectionSectionBody({ schemas, currentTranscript }){
 
                 <div className="row mb-03">
                     <div className="col-12 col-xl-3">
-                        <label htmlFor="vep_hgvsc" className="mb-0" data-tip={getTipForField("vep_hgvsc")}>cDNA:</label>
+                        <label htmlFor="vep_hgvsc" className="mb-0" data-tip={getTipForField("transcript.vep_hgvsc")}>cDNA:</label>
                     </div>
                     <div className="col-12 col-xl-auto" id="variant.transcript.vep_hgvsc">
                         { vep_hgvsc }
@@ -256,7 +250,7 @@ function TranscriptSelectionSectionBody({ schemas, currentTranscript }){
 
                 <div className="row mb-03">
                     <div className="col-12 col-xl-3">
-                        <label htmlFor="vep_hgvsp" className="mb-0" data-tip={getTipForField("vep_hgvsp")}>AA / AA:</label>
+                        <label htmlFor="vep_hgvsp" className="mb-0" data-tip={getTipForField("transcript.vep_hgvsp")}>AA / AA:</label>
                     </div>
                     <div className="col-12 col-xl" id="variant.transcript.vep_hgvsp">
                         { vep_hgvsp }
@@ -299,18 +293,13 @@ function getMostSevereConsequence(vep_consequence = []){
         "MODIFIER" : 3
     };
 
-    const vcLen = vep_consequence.length;
-    let mostSevereConsequence = null;
-
-    if (vcLen === 0) {
+    if (vep_consequence.length === 0) {
         return null;
-    } else if (vcLen === 1) {
-        [ mostSevereConsequence ] = vep_consequence;
-    } else {
-        [ mostSevereConsequence ] = vep_consequence.slice().sort(function({ impact: iA }, { impact: iB }){
-            return impactMap[iA] - impactMap[iB];
-        });
     }
+
+    const [ mostSevereConsequence ] = vep_consequence.slice().sort(function({ impact: iA }, { impact: iB }){
+        return impactMap[iA] - impactMap[iB];
+    });
 
     return mostSevereConsequence;
 }
@@ -325,42 +314,36 @@ function getTranscriptLocation(transcript, mostSevereConsequence = null){
     const { var_conseq_name = null } = mostSevereConsequence || {};
     const consequenceName = (typeof var_conseq_name === "string" && var_conseq_name.toLowerCase()) || null;
 
-    // TODO : "if variant.transcript.vep_consequence.display_title is 3 prime utr variant, then 3' UTR. Similarly with 5' UTR."
-    // `variant.transcript.vep_consequence` === `mostSevereConsequence` here.
-
-    if (consequenceName === "3_prime_utr_variant"){
-        return "3' UTR";
-    }
-
-    if (consequenceName === "5_prime_utr_variant"){
-        return "5' UTR";
-    }
+    let returnString = null;
 
     if (vep_exon !== null) { // In case vep_exon is `0` or something (unsure if possible)
-        return "Exon " + vep_exon;
-    }
-
-    if (vep_intron !== null) {
-        return "Intron " + vep_intron;
-    }
-
-    if (vep_distance !== null) {
+        returnString = "Exon " + vep_exon;
+    } else if (vep_intron !== null) {
+        returnString = "Intron " + vep_intron;
+    } else if (vep_distance !== null) {
         if (consequenceName === "downstream_gene_variant") {
-            return vep_distance + "bp downstream";
-        }
-        if (consequenceName === "upstream_gene_variant") {
-            return vep_distance + "bp upstream";
+            returnString = vep_distance + "bp downstream";
+        } else if (consequenceName === "upstream_gene_variant") {
+            returnString = vep_distance + "bp upstream";
         }
     }
 
+    if (consequenceName === "3_prime_utr_variant"){
+        returnString = returnString ? returnString + " (3′ UTR)" : "3′ UTR" ;
+    } else if (consequenceName === "5_prime_utr_variant"){
+        returnString = returnString ? returnString + " (5′ UTR)" : "5′ UTR" ;
+    }
+
+    return returnString;
 }
 
 function GDNAList({ context }){
+    const fallbackElem = <em data-tip="Not Available"> - </em>;
     const { variant = {} } = context;
     const {
-        mutanno_hgvsg = <em> - </em>,
+        mutanno_hgvsg = fallbackElem,
         // POS: pos,
-        CHROM: chrom = <em> - </em>,
+        CHROM: chrom = fallbackElem,
         hg19 = []
     } = variant;
 
@@ -370,7 +353,7 @@ function GDNAList({ context }){
     renderedRows.push(
         <div className="row pb-1 pb-md-03" key="GRCh38">
             <div className="col-12 col-md-3 font-italic"><em>GRCh38</em></div>
-            <div className="col-12 col-md-2 ">{ chrom }</div>
+            <div className="col-12 col-md-2">{ chrom }</div>
             <div className="col-12 col-md-7">{ mutanno_hgvsg }</div>
         </div>
     );

@@ -23,6 +23,7 @@ from .base import (
     Item,
     get_item_or_none,
 )
+import negspy.coordinates as nc
 
 
 ANNOTATION_ID = 'annotation_id'
@@ -127,6 +128,15 @@ class Variant(Item):
     })
     def display_title(self, CHROM, POS, REF, ALT):
         return build_variant_display_title(CHROM, POS, REF, ALT)  # chr1:504A>T
+
+    @calculated_property(schema={
+        "title": "Position (genome coordinates)",
+        "description": "Absolute position in genome coordinates",
+        "type": "integer"
+    })
+    def POS_ABS(self, CHROM, POS):
+        chrom_info = nc.get_chrominfo('hg38')
+        return nc.chr_pos_to_genome_pos('chr'+CHROM, POS, chrom_info)
 
 
 @collection(
@@ -263,6 +273,11 @@ class VariantSample(Item):
     def associated_genotype_labels(self, CALL_INFO, samplegeno=None, genotype_labels=None):
         """ Builds the above sub-embedded object so we can search on the genotype labels """
 
+        possible_keys = ['proband_genotype_label', 'mother_genotype_label', 'father_genotype_label',
+                         'sister_genotype_label', 'brother_genotype_label', 'co_parent_genotype_label',
+                         'daughter_genotype_label', 'daughter_II_genotype_label', 'son_genotype_label',
+                         'son_II_genotype_label']
+
         # XXX: will be useful if we want to have this field be "centric" WRT the
         # person who submitted this variant_sample
         def my_role(samplegeno, CALL_INFO):
@@ -279,10 +294,13 @@ class VariantSample(Item):
 
         new_labels = {}
         for role, label in genotype_labels.items():
-            if len(label) == 1:
-                new_labels[infer_key_from_role(role)] = label[0]
+            role_key = infer_key_from_role(role)
+            if role_key not in possible_keys:
+                continue
+            elif len(label) == 1:
+                new_labels[role_key] = label[0]
             else:
-                new_labels[infer_key_from_role(role)] = ' '.join(label)  # just in case
+                new_labels[role_key] = ' '.join(label)  # just in case
 
         return new_labels
 

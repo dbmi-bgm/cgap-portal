@@ -16,8 +16,8 @@ export function SampleTabBody(props){
         novoPP = null,
         uuid = null,
         cmphet = [],
-        samplegeno = null,
-        genotype_labels: genotypeLabels = null,
+        samplegeno = [],
+        genotype_labels: genotypeLabels = [],
         CALL_INFO = null
     } = context || {};
 
@@ -104,19 +104,29 @@ export function SampleTabBody(props){
 function CoverageTable(props) {
     const { samplegeno = [], genotypeLabels = [], CALL_INFO = null } = props;
 
-    // TODO: Will is fixing role collision issue; will need updating to use sample_id as
-    // row identifier instead of role once that change is pushed & new data is populated
-    const mapRoleToCoverageData = {};
-    const rows = genotypeLabels.map((obj) => {
-        mapRoleToCoverageData[obj.role] = { labels : obj.labels };
-        return obj.role;
+    if (samplegeno.length === 0) {
+        return <span className="font-italic">No per-sample coverage data available.</span>;
+    }
+
+    const mapSampleIDToCoverageData = {};
+    const mapRoleToLabelData = {};
+
+    // Populate ID->Coverage map with genotype label information (currently does nothing)
+    genotypeLabels.forEach((obj) => {
+        const { role = null, labels = [], sample_id = null } = obj;
+        if (sample_id !== null) {
+            mapSampleIDToCoverageData[sample_id] = { labels, role };
+        }
+        if (role) {
+            mapRoleToLabelData[role] = labels;
+        }
     });
 
     let ref;
     const altRowObj = {}; // Keep a record of all alt alleles (in case of multi-allelic)...
     // Will flatten into array of mutually exclusive rows once populated with all possible alleles
 
-    samplegeno.forEach((sg) => {
+    const rows = samplegeno.map((sg) => {
         const {
             samplegeno_role: role = null,
             samplegeno_sampleid: sampleID = null,
@@ -124,51 +134,65 @@ function CoverageTable(props) {
             samplegeno_gt = null
         } = sg;
 
+        // If there were no genotypeLabels, and a sampleID wasn't registered previously, register now. (Stopgap)
+        mapSampleIDToCoverageData[sampleID] = {};
+
         // Convert AD & GT strings into arrays for easier traversal
         let adArr = [];
         let gtArr = [];
         if (samplegeno_ad) { adArr = samplegeno_ad.split('/'); }
         if (samplegeno_gt) { gtArr = samplegeno_gt.split('/'); }
 
-        if (role) {
-            mapRoleToCoverageData[role]["sampleID"] = sampleID;
+        // If role/label data couldn't be populated by genotypeLabel sort, see if can populate here
+        if (role && !mapSampleIDToCoverageData[sampleID]["role"]) {
+            mapSampleIDToCoverageData[sampleID]["role"] = role;
+            const labels = mapRoleToLabelData[role];
 
-            const coverageObj = {};
-            if (gtArr.length > 0) {
-                // Add refs genotypes to row mapping if not already set
-                if (!ref) {
-                    ref = gtArr[0];
-                }
-
-                // Adds a mapping of GTs to ADs to row mapping
-                const gtToAD = { };
-                gtArr.forEach((gt, i) => {
-                    if (!gtToAD.hasOwnProperty(gt)) {
-                        gtToAD[gt] = adArr[i];
-                    }
-                });
-                coverageObj.gtToAD = gtToAD;
-
-                // Filter out non-ALTs
-                gtArr.splice(1, gtArr.length).filter((potentialAlt) => {
-                    if (potentialAlt !== ref) {
-                        altRowObj[potentialAlt] = true;
-                        return true;
-                    }
-                    return false;
-                });
-
-                // Create a sum total coverage value for this item by adding all ADs
-                coverageObj.total = adArr.reduce(
-                    (a = 0, b = 0) => Number.parseInt(a) + Number.parseInt(b)
-                );
+            if (labels && !mapSampleIDToCoverageData[sampleID]["labels"]) {
+                mapSampleIDToCoverageData[sampleID]["labels"] = labels;
             }
-            mapRoleToCoverageData[role]["coverage"] = coverageObj;
         }
+
+        const coverageObj = {};
+        if (gtArr.length > 0) {
+            // Add refs genotypes to row mapping if not already set
+            if (!ref) {
+                ref = gtArr[0];
+            }
+
+            // Adds a mapping of GTs to ADs to row mapping
+            const gtToAD = { };
+            gtArr.forEach((gt, i) => {
+                if (!gtToAD.hasOwnProperty(gt)) {
+                    gtToAD[gt] = adArr[i];
+                }
+            });
+            coverageObj.gtToAD = gtToAD;
+
+            // Filter out non-ALTs
+            gtArr.splice(1, gtArr.length).filter((potentialAlt) => {
+                if (potentialAlt !== ref) {
+                    altRowObj[potentialAlt] = true;
+                    return true;
+                }
+                return false;
+            });
+
+            // Create a sum total coverage value for this item by adding all ADs
+            coverageObj.total = adArr.reduce(
+                (a = 0, b = 0) => Number.parseInt(a) + Number.parseInt(b)
+            );
+        }
+        mapSampleIDToCoverageData[sampleID]["coverage"] = coverageObj;
+
+        return sampleID;
     });
 
     // Show proband first
-    rows.sort((a,b) => (a === "proband" ? -1 : 1));
+    rows.sort((a,b) => {
+        const { role = null } = a;
+        return (role === "proband" ? 1 : -1);
+    });
 
     const altRows = Object.keys(altRowObj);
 
@@ -185,16 +209,15 @@ function CoverageTable(props) {
                 </tr>
             </thead>
             <tbody>
-                {rows.map((role) => {
-                    const thisData = mapRoleToCoverageData[role];
-                    const { sampleID = null, coverage = null, labels : [label] = [] } = thisData || {};
+                {rows.map((sampleID) => { // rows now distinguished by sampleIDs, not roles
+                    const rowData = mapSampleIDToCoverageData[sampleID];
+                    const { coverage = null, labels : [label] = [], role = null } = rowData || {};
                     const { gtToAD = null, total: totalCoverage = null } = coverage || {};
 
                     let refAD = 0;
                     if (gtToAD) {
                         refAD = gtToAD[ref];
                     }
-
                     return (
                         <tr key={role}>
                             <td className="text-left text-capitalize">{ role }</td>
