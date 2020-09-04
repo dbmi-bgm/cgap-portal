@@ -1936,8 +1936,8 @@ transaction = ">=1.6.0"
 test = ["zope.testing"]
 
 [metadata]
-content-hash = "44a468333a1fdeaa8bb08090c9276271d054278f6503525798be52183f9de88c"
-python-versions = ">=3.6,<3.7"
+content-hash = "83f7587fbd92bbd28a0be25c44d2b78d0d65681fc034cc72208d1f6610d46f46"
+python-versions = ">=3.6.1,<3.7"
 
 [metadata.files]
 apipkg = [
