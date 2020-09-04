@@ -19,6 +19,45 @@ log = structlog.getLogger(__name__)
 
 
 @collection(
+    name='genes',
+    unique_key='gene:ensgid',
+    properties={
+        'title': 'Genes',
+        'description': 'Gene items',
+    })
+class Gene(Item):
+    """Gene class."""
+    item_type = 'gene'
+    name_key = 'ensgid'  # use the ENSEMBL Gene ID as the identifier
+    schema = load_schema('encoded:schemas/gene.json')
+    rev = {'gene_lists': ('GeneList', 'genes')}
+    embedded_list = ['gene_lists.title']
+
+    @calculated_property(schema={
+        "title": "Display Title",
+        "description": "Gene ID",
+        "type": "string"
+    })
+    def display_title(self, gene_symbol):
+        return gene_symbol
+
+    @calculated_property(schema={
+        "title": "Gene Lists",
+        "description": "Gene Lists which this gene is part of",
+        "type": "array",
+        "items": {
+            "title": "Gene List",
+            "type": "string",
+            "linkTo": "GeneList"
+        }
+    })
+    def gene_lists(self, request):
+        result = self.rev_link_atids(request, "gene_lists")
+        if result:
+            return result
+
+
+@collection(
     name='gene-lists',
     properties={
         'title': 'Gene Lists',
@@ -66,31 +105,6 @@ def process_genelist(context, request):
                                       ' keys: download, type, href. Found: %s'
                                       % (genelist_item, request.json.keys()))
 
-    genes = get_genes(request.json, genelist_item)
-    if isinstance(genes, str):
-        raise HTTPUnprocessableEntity(genes)
-
-    # parse the file for genes
-    response = {'title': 'GeneList Processing'}
-    # extra values that are used when creating the pedigree
-    gene_list_props = context.upgrade_properties()
-    post_extra = {'project': gene_list_props['project'],
-                  'institution': gene_list_props['institution']}
-
-    # bail if the gene list already has genes
-    # the logic here can change based on the expected behavior
-    if gene_list_props.get('genes'):
-        response['status'] = 'failure'
-        response['detail'] = 'GeneList item already has genes, expected empty'
-        return response
-
-    # create Document for input genelist file
-    data_href = 'data:%s;base64,%s' % (request.json['type'], request.json['href'])
-    attach = {'attachment': {'download': request.json['download'],
-                             'type': request.json['type'],
-                             'href': data_href}}
-    attach.update(post_extra)
-
     # get user email for TestApp authentication
     email = getattr(request, '_auth0_authenticated', None)
     if not email:
@@ -107,6 +121,33 @@ def process_genelist(context, request):
     config_uri = request.params.get('config_uri', 'production.ini')
     app = get_app(config_uri, 'app')
     testapp = TestApp(app, environ)
+
+    # run get genes function to extact list of ref_ids
+    # titles should start with #, they will be ignored by gen_genes
+    # expected output is list, if str is returned, it carries an error message
+    genes = get_genes(request.json, genelist_item)
+    if isinstance(genes, str):
+        raise HTTPUnprocessableEntity(genes)
+
+    # parse the file for genes
+    response = {'title': 'GeneList Processing'}
+    # extra values that are used when creating the pedigree
+    gene_list_props = context.upgrade_properties()
+    post_extra = {'project': gene_list_props['project'],
+                  'institution': gene_list_props['institution']}
+    # bail if the gene list already has genes
+    # the logic here can change based on the expected behavior
+    if gene_list_props.get('genes'):
+        response['status'] = 'failure'
+        response['detail'] = 'GeneList item already has genes, expected empty'
+        return response
+
+    # create Document for input genelist file
+    data_href = 'data:%s;base64,%s' % (request.json['type'], request.json['href'])
+    attach = {'attachment': {'download': request.json['download'],
+                             'type': request.json['type'],
+                             'href': data_href}}
+    attach.update(post_extra)
 
     try:
         attach_res = testapp.post_json('/Document', attach)

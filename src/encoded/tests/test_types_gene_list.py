@@ -53,6 +53,19 @@ def gene4(testapp, project, institution):
     return testapp.post_json('/gene', item).json['@graph'][0]
 
 
+def test_rev_link_on_genes(testapp, project, institution, gene1, gene2, gene3, gene4):
+    post_body = {
+        'project': project['@id'],
+        'institution': institution['@id'],
+        'title': 'Basic Gene List',
+        'genes': [gene1['@id'], gene2['@id'], gene3['@id'], gene4['@id']]
+        }
+    testapp.post_json('/gene_list', post_body)
+    gene1_item = testapp.get(gene1['@id']).json
+    assert gene1_item['gene_lists'][0]['title'] == post_body['title']
+    assert gene1_item['gene_lists'][0]['display_title'] == post_body['title']
+
+
 def test_get_genes_txt():
     """Test Gene List creation endpoint."""
     test_file = 'src/encoded/tests/data/documents/gene_lists/test1.txt'

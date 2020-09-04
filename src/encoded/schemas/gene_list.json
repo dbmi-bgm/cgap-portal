@@ -24,7 +24,8 @@
         },
         "title": {
             "title": "Title",
-            "description": "Title for this Family",
+            "description": "Title for this Gene List",
+            "uniqueItems": true,
             "type": "string"
         },
         "genes" : {
