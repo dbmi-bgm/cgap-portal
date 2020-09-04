@@ -17,7 +17,7 @@ export class HiGlassAjaxLoadContainer extends React.PureComponent {
 
     constructor(props){
         super(props);
-        console.log("PROPS",props)
+
         this.getFullHiglassItem = this.getFullHiglassItem.bind(this);
 
         this.state = {
@@ -32,17 +32,6 @@ export class HiGlassAjaxLoadContainer extends React.PureComponent {
         if (!this.state.higlassItem) {
             this.getFullHiglassItem();
         }
-    }
-
-    componentDidUpdate(pastProps){
-        // After updating the component, load the new higlass component if it changed.
-        // if (pastProps.higlassItem !== this.props.higlassItem){
-        //     if (this.props.higlassItem.viewconfig){
-        //         this.setState({ 'higlassItem' : this.props.higlassItem });
-        //     } else {
-        //         this.getFullHiglassItem();
-        //     }
-        // }
     }
 
     /**
@@ -67,14 +56,11 @@ export class HiGlassAjaxLoadContainer extends React.PureComponent {
             };
 
             const { variantPositionAbsCoord } = this.state;
-            console.log("variantPositionAbsCoord",variantPositionAbsCoord)
         
             const payload = {
                 'viewconfig_uuid' : "00000000-1111-0000-1111-000000000000", // Default CGAP viewconf
                 'variant_pos_abs' : variantPositionAbsCoord
             };
-
-            console.log("payload",payload)
         
             ajax.load(
                 "/get_higlass_viewconf/",
@@ -83,6 +69,7 @@ export class HiGlassAjaxLoadContainer extends React.PureComponent {
                         viewconfig:  resp.viewconfig
                     }
                     this.setState({ 'higlassItem' : higlassItem,'loading': false });
+                    console.log("Loading done")
                 },
                 'POST',
                 fallbackCallback,

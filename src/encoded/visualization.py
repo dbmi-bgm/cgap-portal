@@ -109,7 +109,7 @@ def get_higlass_viewconf(context, request):
 
     variant_pos = request.json_body.get('variant_pos_abs', None)  
     variant_pos = variant_pos if variant_pos else 100000
-    window_size = 10
+    window_size = 20
 
     default_higlass_viewconf = get_item_or_none(request, uuid)
     higlass_viewconfig = default_higlass_viewconf["viewconfig"] if default_higlass_viewconf else None
@@ -125,6 +125,7 @@ def get_higlass_viewconf(context, request):
     higlass_viewconfig['views'][0]['initialXDomain'][0] = variant_pos - window_size
     higlass_viewconfig['views'][0]['initialXDomain'][1] = variant_pos + window_size 
 
+    # Vertical rules
     higlass_viewconfig['views'][0]['tracks']['whole'][0]['x'] = variant_pos
     higlass_viewconfig['views'][0]['tracks']['whole'][1]['x'] = variant_pos + 1
 

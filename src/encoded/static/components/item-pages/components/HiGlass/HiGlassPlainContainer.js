@@ -66,10 +66,10 @@ export class HiGlassPlainContainer extends React.PureComponent {
     };
 
     static defaultProps = {
-        'options' : { 'bounded' : true },
+        'options' : { 'bounded' : false },
         'isValidating' : false,
         'disabled' : false,
-        'height' : 500,
+        'height' : 600,
         'viewConfig' : null,
         'mountDelay' : 300,
         'placeholder' : <HiGlassLoadingIndicator/>,
@@ -113,20 +113,6 @@ export class HiGlassPlainContainer extends React.PureComponent {
                 // Load in HiGlass libraries as separate JS file due to large size.
                 // @see https://webpack.js.org/api/module-methods/#requireensure
                 // TODO figure out how to use import() syntax to load multiple dependencies, to keep HiGlass working.
-                // require.ensure(['higlass/dist/hglib', 'higlass-register', 'higlass-multivec/es/StackedBarTrack'], (require) => {
-                //     HiGlassComponent = require('higlass/dist/hglib').HiGlassComponent;
-                //     higlassRegister = require('higlass-register').default;
-                //     StackedBarTrack = require('higlass-multivec/es/StackedBarTrack').default;
-                //     // Possible todo: use pluginTracks prop to pass `"horizontal-stacked-bar" : StackedBarTrack`
-                //     // in render method instead.
-                //     higlassRegister({
-                //         name: 'StackedBarTrack',
-                //         track: StackedBarTrack,
-                //         config: StackedBarTrack.config,
-                //     });
-                //     finish();
-                // }, "higlass-utils-bundle");
-
                 require.ensure(['higlass/dist/hglib', 'higlass-register'], (require) => {
                     HiGlassComponent = require('higlass/dist/hglib').HiGlassComponent;
                     higlassRegister = require('higlass-register').default;
@@ -176,7 +162,7 @@ export class HiGlassPlainContainer extends React.PureComponent {
     correctTrackDimensions(){
         var hgc = this.getHiGlassComponent();
         if (hgc){
-            HiGlassPlainContainer.correctTrackDimensions(hgc);
+            //HiGlassPlainContainer.correctTrackDimensions(hgc);
         } else {
             console.error('NO HGC');
         }
@@ -251,7 +237,7 @@ export class HiGlassPlainContainer extends React.PureComponent {
             );
         } else {
             hiGlassInstance = (
-                <div key={outerKey} className="higlass-instance" style={{ 'transition' : 'none', height, 'width' : width || null }} ref={this.instanceContainerRefFunction}>
+                <div key={outerKey} className="higlass-instance" style={{ 'transition' : 'none', 'height' : '100%', 'width' : width || null }} ref={this.instanceContainerRefFunction}>
                     <HiGlassComponent {...{ options, viewConfig, width, height }} ref={this.hgcRef} />
                 </div>
             );
@@ -264,7 +250,6 @@ export class HiGlassPlainContainer extends React.PureComponent {
         return (
             <div className={"higlass-view-container" + (className ? ' ' + className : '')} style={style}>
                 <link type="text/css" rel="stylesheet" href={`https://unpkg.com/higlass@${higlassVersionUsed}/dist/hglib.css`} crossOrigin="true" />
-                {/*<script src="https://unpkg.com/higlass@0.10.19/dist/scripts/hglib.js"/>*/}
                 <div className="higlass-wrapper">{ hiGlassInstance }</div>
             </div>
         );

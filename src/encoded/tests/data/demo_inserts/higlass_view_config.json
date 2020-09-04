@@ -79,6 +79,37 @@
                   "height":25
                 },
                 {
+                  "server": "http://higlass.io/api/v1",
+                  "uid": "emptytrack_transcripts",
+                  "type": "empty",
+                  "options": {
+                    "color": "#808080",
+                    "stroke": "#ffffff",
+                    "fontSize": 14,
+                    "fontIsLeftAligned": false,
+                    "showMousePosition": false,
+                    "mousePositionColor": "#000000"
+                  },
+                  "width": 568,
+                  "height": 10
+                },
+                {
+                  "uid": "texttrack_transcripts",
+                  "type": "text",
+                  "options": {
+                    "backgroundColor": "#ededed",
+                    "textColor": "#333333",
+                    "fontSize": 11,
+                    "fontFamily": "Arial",
+                    "fontWeight": "normal",
+                    "offsetY": 4,
+                    "align": "left",
+                    "text": "Transcripts"
+                  },
+                  "width": 568,
+                  "height": 20
+                },
+                {
                   "server": "http://ec2-3-231-224-18.compute-1.amazonaws.com/api/v1",
                   "tilesetUid": "transcripts_hg38",
                   "uid": "transcript_annotation",
@@ -109,6 +140,93 @@
                   },
                   "width": 768,
                   "height": 134
+                },
+                {
+                  "server": "http://higlass.io/api/v1",
+                  "uid": "emptytrack_clinvar",
+                  "type": "empty",
+                  "options": {
+                    "color": "#808080",
+                    "stroke": "#ffffff",
+                    "fontSize": 14,
+                    "fontIsLeftAligned": false,
+                    "showMousePosition": false,
+                    "mousePositionColor": "#000000"
+                  },
+                  "width": 568,
+                  "height": 10
+                },
+                {
+                  "uid": "texttrack_clinvar",
+                  "type": "text",
+                  "options": {
+                    "backgroundColor": "#ededed",
+                    "textColor": "#333333",
+                    "fontSize": 11,
+                    "fontFamily": "Arial",
+                    "fontWeight": "normal",
+                    "offsetY": 4,
+                    "align": "left",
+                    "text": "ClinVar variants"
+                  },
+                  "width": 568,
+                  "height": 20
+                },
+                {
+                  "type": "horizontal-clinvar",
+                  "height": 110,
+                  "tilesetUid": "clinvar_20200824_hg38",
+                  "server": "http://ec2-3-231-224-18.compute-1.amazonaws.com/api/v1",
+                  "uid": "clinvar_20200824_v5",
+                  "options": {
+                    "name": "Clinvar"
+                  }
+                },
+                {
+                  "server": "http://higlass.io/api/v1",
+                  "uid": "emptytrack_orthologs",
+                  "type": "empty",
+                  "options": {
+                    "color": "#808080",
+                    "stroke": "#ffffff",
+                    "fontSize": 14,
+                    "fontIsLeftAligned": false,
+                    "showMousePosition": false,
+                    "mousePositionColor": "#000000"
+                  },
+                  "width": 568,
+                  "height": 10
+                },
+                {
+                  "uid": "texttrack_orthologs",
+                  "type": "text",
+                  "options": {
+                    "backgroundColor": "#ededed",
+                    "textColor": "#333333",
+                    "fontSize": 11,
+                    "fontFamily": "Arial",
+                    "fontWeight": "normal",
+                    "offsetY": 4,
+                    "align": "left",
+                    "text": "Orthologs"
+                  },
+                  "width": 568,
+                  "height": 20
+                },
+                {
+                  "server": "http://higlass.io/api/v1",
+                  "uid": "emptytrack_orthologs2",
+                  "type": "empty",
+                  "options": {
+                    "color": "#808080",
+                    "stroke": "#ffffff",
+                    "fontSize": 14,
+                    "fontIsLeftAligned": false,
+                    "showMousePosition": false,
+                    "mousePositionColor": "#000000"
+                  },
+                  "width": 568,
+                  "height": 7
                 },
                 {
                   "type": "horizontal-orthologs",
@@ -142,6 +260,21 @@
                       "zebrafish"
                     ]
                   }
+                },
+                {
+                  "server": "http://higlass.io/api/v1",
+                  "uid": "emptytrack",
+                  "type": "empty",
+                  "options": {
+                    "color": "#808080",
+                    "stroke": "#ffffff",
+                    "fontSize": 14,
+                    "fontIsLeftAligned": false,
+                    "showMousePosition": false,
+                    "mousePositionColor": "#000000"
+                  },
+                  "width": 568,
+                  "height": 20
                 }
               ],
               "left":[
