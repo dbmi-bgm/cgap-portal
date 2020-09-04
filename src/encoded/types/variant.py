@@ -229,43 +229,43 @@ class VariantSample(Item):
         "type": "object",
         "properties": {
             "proband_genotype_label": {
-                "title": "Proband Genotype Label",
+                "title": "Proband Genotype",
                 "type": "string"
             },
             "mother_genotype_label": {
-                "title": "Mother Genotype Label",
+                "title": "Mother Genotype",
                 "type": "string"
             },
             "father_genotype_label": {
-                "title": "Father Genotype Label",
+                "title": "Father Genotype",
                 "type": "string"
             },
             "sister_genotype_label": {
-                "title": "Sister Genotype Label",
+                "title": "Sister Genotype",
                 "type": "string"
             },
             "brother_genotype_label": {
-                "title": "Brother Genotype Label",
+                "title": "Brother Genotype",
                 "type": "string"
             },
             "co_parent_genotype_label": {
-                "title": "Co-Parent Genotype Label",
+                "title": "Co-Parent Genotype",
                 "type": "string"
             },
             "daughter_genotype_label": {
-                "title": "Daughter Genotype Label",
+                "title": "Daughter Genotype",
                 "type": "string"
             },
             "daughter_II_genotype_label": {
-                "title": "Daughter II Genotype Label",
+                "title": "Daughter II Genotype",
                 "type": "string"
             },
             "son_genotype_label": {
-                "title": "Son Genotype Label",
+                "title": "Son Genotype",
                 "type": "string"
             },
             "son_II_genotype_label": {
-                "title": "Son II Genotype Label",
+                "title": "Son II Genotype",
                 "type": "string"
             }
         }

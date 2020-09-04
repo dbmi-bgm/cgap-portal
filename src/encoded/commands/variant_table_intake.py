@@ -460,17 +460,17 @@ class MappingTableParser(object):
     @staticmethod
     def add_extra_variant_sample_facets(facs):
         facs['associated_genotype_labels.proband_genotype_label'] = {
-            'title': 'Proband Genotype Label',
+            'title': 'Proband Genotype',
             'order': 12,
             'grouping': 'Genotype'
         }
         facs['associated_genotype_labels.mother_genotype_label'] = {
-            'title': 'Mother Genotype Label',
+            'title': 'Mother Genotype',
             'order': 13,
             'grouping': 'Genotype'
         }
         facs['associated_genotype_labels.father_genotype_label'] = {
-            'title': 'Father Genotype Label',
+            'title': 'Father Genotype',
             'order': 14,
             'grouping': 'Genotype'
         }
