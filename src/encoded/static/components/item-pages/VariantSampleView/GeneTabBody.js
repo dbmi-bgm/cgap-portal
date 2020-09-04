@@ -28,9 +28,13 @@ export function GeneTabBody(props){
         name                = <em>None</em>,
         gene_symbol         = null,
         gene_biotype        = <em>None</em>,
-        alias_symbol        = <em>Todo 2</em>,
+        alias_symbol        = [],
+        prev_symbol         = [],
         alias_name          = <em>Todo 3</em>,
-        gene_summary        = <em>No summary available</em>
+        gene_summary        = <em>No summary available</em>,
+        chrom = null,
+        spos = null,
+        epos = null
     } = currentGeneItem;
 
     const getTipForField = useMemo(function(){
@@ -64,6 +68,28 @@ export function GeneTabBody(props){
             </div>
         );
     }
+
+    const aliasSymbolRendered = alias_symbol.length === 0 ? <em> - </em> : (
+        <div>
+            { alias_symbol.map(function(sym, i){
+                return <div key={i}>{ sym }</div>;
+            }) }
+        </div>
+    );
+
+    const prevSymbolRendered = prev_symbol.length === 0 ? <em> - </em> : (
+        <div>
+            { prev_symbol.map(function(sym, i){
+                return <div key={i}>{ sym }</div>;
+            }) }
+        </div>
+    );
+
+    const geneLocation = (
+        (chrom? chrom : "") +
+        ((epos || spos) && chrom ? ": " : "") +
+        (spos || 'unknown') + "-" + (epos || 'unknown')
+    );
 
     return (
         <div className="gene-tab-body card-body">
@@ -105,7 +131,7 @@ export function GeneTabBody(props){
                                     </label>
                                 </div>
                                 <div className="col-12 col-xl-9" id="variant.transcript.vep_gene.todo1">
-                                    { <em>Todo 1</em> }
+                                    { geneLocation }
                                 </div>
                             </div>
 
@@ -127,7 +153,18 @@ export function GeneTabBody(props){
                                     </label>
                                 </div>
                                 <div className="col-12 col-xl-9" id="variant.transcript.vep_gene.alias_symbol">
-                                    { alias_symbol }
+                                    { aliasSymbolRendered }
+                                </div>
+                            </div>
+
+                            <div className="row mb-03">
+                                <div className="col-12 col-xl-3">
+                                    <label htmlFor="variant.transcript.vep_gene.prev_symbol" className="mb-0" data-tip={null}>
+                                        Previous Symbol:
+                                    </label>
+                                </div>
+                                <div className="col-12 col-xl-9" id="variant.transcript.vep_gene.prev_symbol">
+                                    { prevSymbolRendered }
                                 </div>
                             </div>
 
@@ -207,7 +244,37 @@ export const ExternalDatabasesSection = React.memo(function ExternalDatabasesSec
         // AND INSTEAD GATHER THE PROPERTIES FROM SCHEMA
         // ACCORDING TO PERHAPS "annotation_category" :"dbxref"
         // Clinvar, medgen not exist yet it seems.
-        externalDatabaseFieldnames = ["genecards", "gnomad", "clinvar", "medgen", "omim_id", "hpa", "gtex_expression", "brainatlas_microarray", "marrvel", "mgi_id"]
+
+        externalDatabaseFieldnames = [
+            // TODO handle commented-out sub-objects:
+            "genecards",
+            "ensgid",
+            "entrez_id",
+            "hgnc_id",
+            // "ccds_id", - duplicate
+            "genereviews",
+            // "transcriptid.ensembl_pro", - duplicate
+            "uniprot_ids",
+            "pdb",
+            "mgi_id",
+            "marrvel",
+            "omim_id",
+            "orphanet",
+            "trait_association_gwas_pmid",
+            "clingen",
+            "pharmgkb",
+            "gtex_expression",
+            "brainspan_microarray",
+            "brainspan_rnaseq",
+            "brainatlas_microarray",
+            "biogrid",
+            "string",
+            // "gene_symbol", - duplicate
+            "refseq_accession",
+            // "clingendis.disease_id", // todo - handle
+            // "transcriptid.ensembl_trs", // todo - handle
+            "gnomad"
+        ]
     } = props;
 
     if (!schemas) {
@@ -218,38 +285,64 @@ export const ExternalDatabasesSection = React.memo(function ExternalDatabasesSec
         );
     }
 
-    const { [itemType]: { properties: geneSchemaProperties } } = schemas;
-
-
     const externalDatabaseSchemaFields = externalDatabaseFieldnames.map(function(fieldName){
-        return [ fieldName, geneSchemaProperties[fieldName] ];
+        const propertySchema = schemaTransforms.getSchemaProperty(fieldName, schemas, itemType);
+        return [ fieldName, propertySchema ];
     }).filter(function(f){
         // Filter out fields which don't exist in schema yet.
         // Or for which we can't form links for.
-        return !!(f[1] && f[1].link);
+        return !!(
+            f[1] &&
+            (f[1].link || (f[1].items && f[1].items.link))
+        );
     });
 
     const externalDatabaseElems = externalDatabaseSchemaFields.map(function([ fieldName, fieldSchema ]){
+
+        const isArray = fieldSchema.items && fieldSchema.type === "array";
+
         const {
             link: linkFormat = null,
             title = null,
-            description = null
-        } = fieldSchema;
-        const externalID = currentItem[fieldName];
-        if (!externalID) {
-            return null;
+            // description = null
+        } = (isArray ? fieldSchema.items : fieldSchema);
+
+        let externalIDs = currentItem[fieldName];
+        if (typeof externalIDs === "undefined") {
+            externalIDs = [];
+        } else if (!isArray) {
+            externalIDs = [ externalIDs ];
         }
-        // IN FUTURE WE WILL GET LINK BACK FROM BACK-END RATHER THAN MAKE IT HERE.
-        const linkToID = linkFormat.replace("<ID>", externalID);
+
+
+        // if (!externalID) {
+        //     return null;
+        // }
+
+        let val;
+
+        if (externalIDs.length === 0) {
+            val = <em data-tip="Not Available" className="px-1"> - </em>;
+        } else {
+            val = externalIDs.map(function(externalID){
+                const linkToID = linkFormat.replace("<ID>", externalID);
+                return (
+                    <a href={linkToID || null} className="d-block" target="_blank" rel="noopener noreferrer" id={"external_resource_for_" + fieldName} key={externalID}>
+                        <span>{ externalID }</span>
+                        <i className="ml-05 icon icon-fw icon-external-link-alt fas text-smaller text-secondary" />
+                    </a>
+                );
+            });
+        }
+
         return (
             <div className="row mb-03" key={fieldName}>
                 <div className="col-12 col-xl">
-                    <label className="mb-0 black-label" htmlFor={"variant.transcript.vep_gene." + fieldName} data-tip={description}>{ title || fieldName }</label>
+                    <label className="mb-0 black-label" htmlFor={"external_resource_for_" + fieldName}>{ title || fieldName }</label>
                 </div>
-                <a className="col-12 col-xl-auto" href={linkToID || null} tagret="_blank" rel="noopener noreferrer" id={"variant.transcript.vep_gene." + fieldName}>
-                    <span>{ externalID }</span>
-                    <i className="ml-05 icon icon-fw icon-external-link-alt fas text-smaller text-secondary" />
-                </a>
+                <div className="col-12 col-xl-auto">
+                    { val }
+                </div>
             </div>
         );
     }).filter(function(elem){ return !!elem; });

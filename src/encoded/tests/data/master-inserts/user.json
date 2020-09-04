@@ -150,6 +150,18 @@
                            "role": "developer"}]
     },
     {
+        "email": "alexander_veit@hms.harvard.edu",
+        "first_name": "Alexander",
+        "last_name": "Veit",
+        "role": "developer",
+        "uuid": "45ac3b0a-6640-4ccc-8ba7-e4cc7c778c15",
+        "groups": ["admin"],
+        "submits_for": ["hms-dbmi"],
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "project_roles": [{"project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+                           "role": "developer"}]
+    },
+    {
         "email": "burak_alver@hms.harvard.edu",
         "first_name": "Burak",
         "last_name": "Alver",

@@ -308,3 +308,17 @@ class QualityMetricBamqc(QualityMetric):
                            "value": qc.get("coverage"),
                            "numberType": "string"})
         return qc_summary
+
+
+@collection(
+    name='quality-metrics-peddyqc',
+    properties={
+        'title': 'Quality Metrics for VCF files, Peddy',
+        'description': 'Listing of Quality Metrics for VCF files calculated with Peddy'
+    })
+class QualityMetricPeddyqc(QualityMetric):
+    """Subclass of quality matrics for VCF files, Peddy"""
+
+    item_type = 'quality_metric_peddyqc'
+    schema = load_schema('encoded:schemas/quality_metric_peddyqc.json')
+    embedded_list = QualityMetric.embedded_list
