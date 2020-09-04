@@ -100,6 +100,15 @@ def all_projects(core_project, bgm_project, udn_project):
 
 
 @pytest.fixture
+def projects_by_name(core_project, bgm_project, udn_project):
+    return {
+        core_project.get('name'): core_project,
+        bgm_project.get('name'): bgm_project,
+        udn_project.get('name'): udn_project
+    }
+
+
+@pytest.fixture
 def admin_user(testapp):
     item = {
         'first_name': 'CGAP',
@@ -296,8 +305,28 @@ def test_bgm_user_can_access_ok_stati_but_not_others_for_bgm_project_item(
         assert res['status'] == 'error'  # because get fails
 
 
-def test_bgm_user_can_post_item(bgm_user_testapp, simple_doc_item):
+""" Testing project-based posting - non-admin users can only post items that are attributed to the projects that
+    they are part of
+"""
+
+
+def test_bgm_user_can_post_bgm_item(bgm_user_testapp, simple_doc_item):
     assert bgm_user_testapp.post_json('/document', simple_doc_item, status=201)
+
+
+def test_bgm_user_can_post_bgm_file(bgm_user_testapp, simple_bgm_file_item):
+    del simple_bgm_file_item['uuid']  # users wouldn't generally post uuids
+    del simple_bgm_file_item['status']  # this property also has restricted-fields and is not required
+    assert bgm_user_testapp.post_json('/file_fastq', simple_bgm_file_item, status=201)
+
+
+def test_udn_user_cannot_post_bgm_item(udn_user_testapp, simple_doc_item):
+    assert udn_user_testapp.post_json('/document', simple_doc_item, status=403)
+
+
+def test_udn_user_can_post_udn_item(udn_user_testapp, udn_project, simple_doc_item):
+    simple_doc_item['project'] = udn_project['@id']
+    assert udn_user_testapp.post_json('/document', simple_doc_item, status=201)
 
 
 @pytest.mark.parametrize('status, expres', list(zip(STATUSES, [403, 403, 200, 403, 200, 403, 404])))
@@ -307,95 +336,122 @@ def test_bgm_user_can_only_patch_current_or_in_review_item(testapp, bgm_user_tes
     assert bgm_user_testapp.patch_json(simple_bgm_file['@id'], {'read_length': 100}, status=expres)
 
 
-def test_udn_user_cannot_access_bgm_item_unless_shared(testapp, udn_user_testapp, simple_bgm_file, STATI):
-    for status in STATI:
-        testapp.patch_json(simple_bgm_file['@id'], {'status': status}, status=200)
-        if status in ['shared', 'obsolete']:
-            assert udn_user_testapp.get(simple_bgm_file['@id'], status=200)
-        elif status == 'replaced':
-            assert udn_user_testapp.get(simple_bgm_file['@id'], status=404)
-        else:
-            assert udn_user_testapp.get(simple_bgm_file['@id'], status=403)
+@pytest.mark.parametrize('status, expres', list(zip(STATUSES, [200, 200, 403, 403, 403, 403, 404])))
+def test_udn_user_cannot_access_bgm_item_unless_shared(testapp, udn_user_testapp, simple_bgm_file, status, expres):
+    testapp.patch_json(simple_bgm_file['@id'], {'status': status}, status=200)
+    assert udn_user_testapp.get(simple_bgm_file['@id'], status=expres)
 
 
-def test_udn_user_cannot_post_bgm_item(udn_user_testapp, simple_bgm_file_item):
-    # see above - not really testing what we want to here
-    del simple_bgm_file_item['uuid']  # users wouldn't generally post uuids
-    del simple_bgm_file_item['status']  # this property also has import-items but is not required
-    assert udn_user_testapp.post_json('/file_fastq', simple_bgm_file_item, status=403)
-
-
-def test_udn_user_cannot_patch_bgm_item(testapp, udn_user_testapp, simple_bgm_file, STATI):
+@pytest.mark.parametrize('status, expres', list(zip(STATUSES, [403] * 7)))
+def test_udn_user_cannot_patch_bgm_item(testapp, udn_user_testapp, simple_bgm_file, status, expres):
     # shouldn't be able to patch at all but this may chenge
-    for status in STATI:
-        testapp.patch_json(simple_bgm_file['@id'], {'status': status}, status=200)
-        if status == 'replaced':
-            assert udn_user_testapp.patch_json(simple_bgm_file['@id'], {'read_length': 100}, status=404)
-        else:
-            assert udn_user_testapp.patch_json(simple_bgm_file['@id'], {'read_length': 100}, status=403)
+    fitem = testapp.patch_json(simple_bgm_file['@id'], {'status': status}, status=200).json['@graph'][0]
+    assert fitem.get('status') == status
+    assert udn_user_testapp.patch_json(fitem['@id'], {'read_length': 100}, status=expres)
 
 
+# STATUSES = [
+#     # viewable by authenticated
+#     "shared",
+#     "obsolete",
+#     # viewable by project member
+#     "current",
+#     "inactive",
+#     "in review",
+#     # kind of special admin-only
+#     "deleted",
+#     # special file status case due to redirect
+#     "replaced"
+# ]
+@pytest.mark.parametrize('project_name, status, expres', [
+    ('core-project', 'shared', 200),
+    ('core-project', 'obsolete', 200),
+    ('core-project', 'current', 403),
+    ('core-project', 'inactive', 403),
+    ('core-project', 'in review', 403),
+    ('core-project', 'deleted', 403),
+    ('core-project', 'replaced', 403),
+    ('bgm-project', 'shared', 200),
+    ('bgm-project', 'obsolete', 200),
+    ('bgm-project', 'current', 200),
+    ('bgm-project', 'inactive', 200),
+    ('bgm-project', 'in review', 200),
+    ('bgm-project', 'deleted', 403),
+    ('bgm-project', 'replaced', 403),
+    ('udn-project', 'shared', 200),
+    ('udn-project', 'obsolete', 200),
+    ('udn-project', 'current', 200),
+    ('udn-project', 'inactive', 200),
+    ('udn-project', 'in review', 200),
+    ('udn-project', 'deleted', 403),
+    ('udn-project', 'replaced', 403),
+])
 def test_multi_proj_user_can_access_items_w_ok_status_from_multi_projects(
-        testapp, multi_project_user_testapp, simple_bgm_file_item, all_projects, STATI):
-    # NOTE: replaced status is giving 403 on get even if user in theory should be redirected
-    # not sure this is as expexted?
-    corename = 'core-project'
+        testapp, multi_project_user_testapp, simple_bgm_file_item,
+        projects_by_name, project_name, status, expres):
     del simple_bgm_file_item['uuid']
-    for project in all_projects:
-        pname = project.get('name')
-        if pname == corename:
-            ok_stati = STATI[:2]
-        else:
-            ok_stati = STATI[:5]
-        simple_bgm_file_item['project'] = project['@id']
-        for status in STATI:
-            simple_bgm_file_item['status'] = status
-            fitem = testapp.post_json('/file_fastq', simple_bgm_file_item, status=201).json['@graph'][0]
-            if status in ok_stati:
-                assert multi_project_user_testapp.get(fitem['@id'], status=200)
-            else:
-                assert multi_project_user_testapp.get(fitem['@id'], status=403)
+    simple_bgm_file_item['project'] = projects_by_name.get(project_name).get('@id')
+    simple_bgm_file_item['status'] = status
+    fitem = testapp.post_json('/file_fastq', simple_bgm_file_item, status=201).json['@graph'][0]
+    assert multi_project_user_testapp.get(fitem['@id'], status=expres)
 
 
+@pytest.mark.parametrize('project_name', ['core-project', 'bgm-project', 'udn-project'])
 def test_project_users_can_access_shared_items_from_any_project(
-        testapp, bgm_user_testapp, simple_bgm_file, all_projects):
-    testapp.patch_json(simple_bgm_file['@id'], {'status': 'shared'}, status=200)
-    for project in all_projects:
-        testapp.patch_json(simple_bgm_file['@id'], {'project': project['@id']}, status=200)
-        assert bgm_user_testapp.get(simple_bgm_file['@id'], status=200)
+        testapp, bgm_user_testapp, simple_bgm_file, projects_by_name, project_name):
+    testapp.patch_json(
+        simple_bgm_file['@id'], {'status': 'shared', 'project': projects_by_name.get(project_name).get('@id')}, status=200)
+    assert bgm_user_testapp.get(simple_bgm_file['@id'], status=200)
 
 
+@pytest.mark.parametrize('project_name, status, expres', [
+    ('core-project', 'shared', 200),
+    ('core-project', 'obsolete', 200),
+    ('core-project', 'current', 403),
+    ('core-project', 'inactive', 403),
+    ('core-project', 'in review', 403),
+    ('core-project', 'deleted', 403),
+    ('core-project', 'replaced', 403),
+    ('bgm-project', 'shared', 200),
+    ('bgm-project', 'obsolete', 200),
+    ('bgm-project', 'current', 403),
+    ('bgm-project', 'inactive', 403),
+    ('bgm-project', 'in review', 403),
+    ('bgm-project', 'deleted', 403),
+    ('bgm-project', 'replaced', 403),
+    ('udn-project', 'shared', 200),
+    ('udn-project', 'obsolete', 200),
+    ('udn-project', 'current', 403),
+    ('udn-project', 'inactive', 403),
+    ('udn-project', 'in review', 403),
+    ('udn-project', 'deleted', 403),
+    ('udn-project', 'replaced', 403),
+])
 def test_authenticated_user_wo_project_can_only_see_shared(
-        testapp, no_project_user_testapp, simple_bgm_file_item, STATI, all_projects):
+        testapp, no_project_user_testapp, simple_bgm_file_item, projects_by_name,
+        project_name, status, expres):
     del simple_bgm_file_item['uuid']
-    for project in all_projects:
-        simple_bgm_file_item['project'] = project['@id']
-        for status in STATI:
-            simple_bgm_file_item['status'] = status
-            fitem = testapp.post_json('/file_fastq', simple_bgm_file_item, status=201).json['@graph'][0]
-            if status in ['shared', 'obsolete']:
-                assert no_project_user_testapp.get(fitem['@id'], status=200)
-            else:
-                assert no_project_user_testapp.get(fitem['@id'], status=403)
+    simple_bgm_file_item['project'] = projects_by_name.get(project_name).get('@id')
+    simple_bgm_file_item['status'] = status
+    fitem = testapp.post_json('/file_fastq', simple_bgm_file_item, status=201).json['@graph'][0]
+    assert no_project_user_testapp.get(fitem['@id'], status=expres)
 
 
+@pytest.mark.parametrize('project_name, status, expres', list(zip(['core-project', 'bgm-project', 'udn-project'] * 7, STATUSES * 3, [403] * 21)))
 def test_deleted_user_has_no_access(
-        testapp, deleted_user_testapp, simple_bgm_file_item, STATI, all_projects):
+        testapp, deleted_user_testapp, simple_bgm_file_item, projects_by_name,
+        project_name, status, expres):
     del simple_bgm_file_item['uuid']
-    for project in all_projects:
-        simple_bgm_file_item['project'] = project['@id']
-        for status in STATI:
-            simple_bgm_file_item['status'] = status
-            fitem = testapp.post_json('/file_fastq', simple_bgm_file_item, status=201).json['@graph'][0]
-            assert deleted_user_testapp.get(fitem['@id'], status=403)
+    simple_bgm_file_item['status'] = status
+    fitem = testapp.post_json('/file_fastq', simple_bgm_file_item, status=201).json['@graph'][0]
+    assert deleted_user_testapp.get(fitem['@id'], status=expres)
 
 
+@pytest.mark.parametrize('project_name, status, expres', list(zip(['core-project', 'bgm-project', 'udn-project'] * 7, STATUSES * 3, [403] * 21)))
 def test_anonymous_user_has_no_access(
-        testapp, anontestapp, simple_bgm_file_item, STATI, all_projects):
+        testapp, anontestapp, simple_bgm_file_item, projects_by_name,
+        project_name, status, expres):
     del simple_bgm_file_item['uuid']
-    for project in all_projects:
-        simple_bgm_file_item['project'] = project['@id']
-        for status in STATI:
-            simple_bgm_file_item['status'] = status
-            fitem = testapp.post_json('/file_fastq', simple_bgm_file_item, status=201).json['@graph'][0]
-            assert anontestapp.get(fitem['@id'], status=403)
+    simple_bgm_file_item['status'] = status
+    fitem = testapp.post_json('/file_fastq', simple_bgm_file_item, status=201).json['@graph'][0]
+    assert anontestapp.get(fitem['@id'], status=expres)
