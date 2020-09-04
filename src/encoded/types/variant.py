@@ -293,7 +293,9 @@ class VariantSample(Item):
             return None
 
         new_labels = {}
-        for role, label in genotype_labels.items():
+        for entry in genotype_labels:
+            role = entry.get('role', '')
+            label = entry.get('labels', [])
             role_key = infer_key_from_role(role)
             if role_key not in possible_keys:
                 continue
