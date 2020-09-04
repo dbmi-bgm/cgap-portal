@@ -1,6 +1,6 @@
 'use strict';
 
-import React from 'react';
+import React, { useRef } from 'react';
 //import { console } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { HiGlassAjaxLoadContainer } from './../components/HiGlass/HiGlassAjaxLoadContainer';
 
