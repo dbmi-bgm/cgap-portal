@@ -1,7 +1,7 @@
 [tool.poetry]
 # Note: Various modules refer to this system as "encoded", not "cgap-portal".
 name = "encoded"
-version = "2.4.19"
+version = "2.4.20"
 description = "Clinical Genomics Analysis Platform"
 authors = ["4DN-DCIC Team <support@4dnucleome.org>"]
 license = "MIT"
@@ -58,6 +58,8 @@ jsonschema-serialize-fork = "2.1.1"
 keepalive = "0.5"
 loremipsum = "1.0.5"
 netaddr = ">=0.7.18,<1"
+negspy = "0.2.24"
+numpy = "1.19.1" # negspy needs it
 passlib = "1.6.5"
 PasteDeploy = "1.5.2"
 pbkdf2 = "1.3"

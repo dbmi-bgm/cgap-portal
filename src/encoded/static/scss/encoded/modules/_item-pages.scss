@@ -2256,6 +2256,119 @@ $download-button-width : 100px;
 }
 
 
+/**********************************************************
+  HiGlass Views
+**********************************************************/
+
+.higlass-wrapper {
+
+	margin-bottom: 10px;
+
+	.higlass-instance {
+
+		margin-left: -10px;
+		margin-right: -10px;
+		height: 600px; // Default. May be overriden.
+		transition: opacity 1s;
+		opacity: 0;
+
+
+		.TrackControl-module_track-control-2zDf3 { // Menu which appears on hover
+			.TrackControl-module_track-control-button-2fdIb { // Hide "add track" button.
+				display: none;
+				&:nth-child(2),
+				&:last-child,
+				&:first-child {
+					display: block;
+				}
+			}
+		}
+
+		.CenterTrack-module_center-track-container-2ELhp {
+			.TrackControl-module_track-control-2zDf3 { // Menu which appears on hover
+				.TrackControl-module_track-control-button-2fdIb { // Hide "add track", "close", & "move" buttons.
+					display: none;
+					&:first-child {
+						display: block;
+					}
+				}
+			}
+		}
+
+		.ViewHeader-module_multitrack-header-3XnZx .ViewHeader-module_multitrack-header-nav-list-2nvcu {
+			.ViewHeader-module_multitrack-header-icon-squeazed-25lkF:nth-child(3), // Hide 'plus' button in header.
+			.ViewHeader-module_multitrack-header-icon-16QKZ:nth-child(3) {
+				display: none;
+			}
+		}
+
+		div[class^="ViewConfigEditor-module_view-config-editor-"] {
+			textarea, pre, pre span {
+				font-family: $font-family-monospace !important;
+			}
+		}
+
+		.glyphicon.glyphicon-search {
+			&:before {
+				content : "\f002";
+				font-family: $fa-font-family;
+				font-weight: 900;
+			}
+		}
+
+		.react-grid-layout {
+			.form-group {
+				div.dropdown.btn-group-sm {
+					> .btn.dropdown-toggle {
+						padding-right: 24px !important;
+					}
+				}
+				input.GenomePositionSearchBox-module_genome-position-search-bar-1_0ZU {
+					font-family: $font-family-monospace;
+					font-size: 0.825rem;
+				}
+			}
+		}
+	}
+}
+
+/** For when HiGlass track is being dragged **/
+/**
+    All of this 'hide/override via CSS' is kinda hacky anyway, esp. with the PostCSS classNames;
+    ideally would be nice if can pass in props to HiGlassComponent
+    re: what menu options to include/exclude.
+**/
+
+.TiledPlot-module_stylizedItem-2bQBK {
+	.TrackControl-module_track-control-2zDf3 { // Menu which appears on hover
+		.TrackControl-module_track-control-button-2fdIb { // Hide "add track" button.
+			display: none;
+			&:nth-child(2),
+			&:last-child,
+			&:first-child {
+				display: block;
+			}
+		}
+	}
+}
+
+/* Disabled for now - can't reliably target menu items (same classNames)
+.hg-popup {
+	.context-menu-item > div {
+		> .ContextMenu-module_context-menu-hr-3yapb:nth-child(4),
+		> .ContextMenu-module_context-menu-item-1HeVv:nth-child(5) {
+			display: none;
+		}
+	}
+	> .ContextMenu-module_context-menu-2OwvL {
+		.ContextMenu-module_context-menu-item-1HeVv:nth-child(6),
+		.ContextMenu-module_context-menu-item-1HeVv:nth-child(8) {
+			display: none;
+		}
+	}
+}
+*/
+
 
 /**********************************************************
   PedigreeViz View Tab (CaseView, IndividualView, ...)

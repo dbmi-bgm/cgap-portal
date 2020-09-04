@@ -23,6 +23,7 @@ from .base import (
     Item,
     get_item_or_none,
 )
+import negspy.coordinates as nc
 
 
 ANNOTATION_ID = 'annotation_id'
@@ -127,6 +128,15 @@ class Variant(Item):
     })
     def display_title(self, CHROM, POS, REF, ALT):
         return build_variant_display_title(CHROM, POS, REF, ALT)  # chr1:504A>T
+
+    @calculated_property(schema={
+        "title": "Position (genome coordinates)",
+        "description": "Absolute position in genome coordinates",
+        "type": "integer"
+    })
+    def POS_ABS(self, CHROM, POS):
+        chrom_info = nc.get_chrominfo('hg38')
+        return nc.chr_pos_to_genome_pos('chr'+CHROM, POS, chrom_info)
 
 
 @collection(

@@ -207,7 +207,37 @@ export const ExternalDatabasesSection = React.memo(function ExternalDatabasesSec
         // AND INSTEAD GATHER THE PROPERTIES FROM SCHEMA
         // ACCORDING TO PERHAPS "annotation_category" :"dbxref"
         // Clinvar, medgen not exist yet it seems.
-        externalDatabaseFieldnames = ["genecards", "gnomad", "clinvar", "medgen", "omim_id", "hpa", "gtex_expression", "brainatlas_microarray", "marrvel", "mgi_id"]
+
+        externalDatabaseFieldnames = [
+            // TODO handle commented-out sub-objects:
+            "genecards",
+            "ensgid",
+            "entrez_id",
+            "hgnc_id",
+            // "ccds_id", - duplicate
+            "genereviews",
+            // "transcriptid.ensembl_pro", - duplicate
+            "uniprot_ids",
+            "pdb",
+            "mgi_id",
+            "marrvel",
+            "omim_id",
+            "orphanet",
+            "trait_association_gwas_pmid",
+            "clingen",
+            "pharmgkb",
+            "gtex_expression",
+            "brainspan_microarray",
+            "brainspan_rnaseq",
+            "brainatlas_microarray",
+            "biogrid",
+            "string",
+            "gene_symbol",
+            "refseq_accession",
+            // "clingendis.disease_id", // todo - handle
+            // "transcriptid.ensembl_trs", // todo - handle
+            "gnomad"
+        ]
     } = props;
 
     if (!schemas) {
@@ -218,24 +248,35 @@ export const ExternalDatabasesSection = React.memo(function ExternalDatabasesSec
         );
     }
 
-    const { [itemType]: { properties: geneSchemaProperties } } = schemas;
-
-
     const externalDatabaseSchemaFields = externalDatabaseFieldnames.map(function(fieldName){
-        return [ fieldName, geneSchemaProperties[fieldName] ];
+        const propertySchema = schemaTransforms.getSchemaProperty(fieldName, schemas, itemType);
+        return [ fieldName, propertySchema ];
     }).filter(function(f){
         // Filter out fields which don't exist in schema yet.
         // Or for which we can't form links for.
-        return !!(f[1] && f[1].link);
+        return !!(
+            f[1] &&
+            (f[1].link || (f[1].items && f[1].items.link))
+        );
     });
 
     const externalDatabaseElems = externalDatabaseSchemaFields.map(function([ fieldName, fieldSchema ]){
+
+        const isArray = fieldSchema.items && fieldSchema.type === "array";
+
         const {
             link: linkFormat = null,
             title = null,
             // description = null
-        } = fieldSchema;
-        const externalID = currentItem[fieldName];
+        } = (isArray ? fieldSchema.items : fieldSchema);
+
+        let externalIDs = currentItem[fieldName];
+        if (typeof externalIDs === "undefined") {
+            externalIDs = [];
+        } else if (!isArray) {
+            externalIDs = [ externalIDs ];
+        }
+
 
         // if (!externalID) {
         //     return null;
@@ -243,16 +284,18 @@ export const ExternalDatabasesSection = React.memo(function ExternalDatabasesSec
 
         let val;
 
-        if (externalID) {
-            const linkToID = linkFormat.replace("<ID>", externalID);
-            val = (
-                <a href={linkToID || null} target="_blank" rel="noopener noreferrer" id={"external_resource_for_" + fieldName}>
-                    <span>{ externalID }</span>
-                    <i className="ml-05 icon icon-fw icon-external-link-alt fas text-smaller text-secondary" />
-                </a>
-            );
-        } else {
+        if (externalIDs.length === 0) {
             val = <em data-tip="Not Available" className="px-1"> - </em>;
+        } else {
+            val = externalIDs.map(function(externalID){
+                const linkToID = linkFormat.replace("<ID>", externalID);
+                return (
+                    <a href={linkToID || null} className="d-block" target="_blank" rel="noopener noreferrer" id={"external_resource_for_" + fieldName} key={externalID}>
+                        <span>{ externalID }</span>
+                        <i className="ml-05 icon icon-fw icon-external-link-alt fas text-smaller text-secondary" />
+                    </a>
+                );
+            });
         }
 
         return (

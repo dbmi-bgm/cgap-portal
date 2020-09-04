@@ -36,7 +36,8 @@ ORDER = [
     'user',
     'file_format',
     'workflow',
-    'variant'
+    'variant',
+    'higlass_view_config'
 ]
 
 IS_ATTACHMENT = [
