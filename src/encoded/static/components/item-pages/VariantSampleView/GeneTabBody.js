@@ -28,9 +28,13 @@ export function GeneTabBody(props){
         name                = <em>None</em>,
         gene_symbol         = null,
         gene_biotype        = <em>None</em>,
-        alias_symbol        = <em>Todo 2</em>,
+        alias_symbol        = [],
+        prev_symbol         = [],
         alias_name          = <em>Todo 3</em>,
-        gene_summary        = <em>No summary available</em>
+        gene_summary        = <em>No summary available</em>,
+        chrom = null,
+        spos = null,
+        epos = null
     } = currentGeneItem;
 
     const getTipForField = useMemo(function(){
@@ -64,6 +68,28 @@ export function GeneTabBody(props){
             </div>
         );
     }
+
+    const aliasSymbolRendered = alias_symbol.length === 0 ? <em> - </em> : (
+        <div>
+            { alias_symbol.map(function(sym, i){
+                return <div key={i}>{ sym }</div>;
+            }) }
+        </div>
+    );
+
+    const prevSymbolRendered = prev_symbol.length === 0 ? <em> - </em> : (
+        <div>
+            { prev_symbol.map(function(sym, i){
+                return <div key={i}>{ sym }</div>;
+            }) }
+        </div>
+    );
+
+    const geneLocation = (
+        (chrom? chrom : "") +
+        ((epos || spos) && chrom ? ": " : "") +
+        (spos || 'unknown') + "-" + (epos || 'unknown')
+    );
 
     return (
         <div className="gene-tab-body card-body">
@@ -105,7 +131,7 @@ export function GeneTabBody(props){
                                     </label>
                                 </div>
                                 <div className="col-12 col-xl-9" id="variant.transcript.vep_gene.todo1">
-                                    { <em>Todo 1</em> }
+                                    { geneLocation }
                                 </div>
                             </div>
 
@@ -127,7 +153,18 @@ export function GeneTabBody(props){
                                     </label>
                                 </div>
                                 <div className="col-12 col-xl-9" id="variant.transcript.vep_gene.alias_symbol">
-                                    { alias_symbol }
+                                    { aliasSymbolRendered }
+                                </div>
+                            </div>
+
+                            <div className="row mb-03">
+                                <div className="col-12 col-xl-3">
+                                    <label htmlFor="variant.transcript.vep_gene.prev_symbol" className="mb-0" data-tip={null}>
+                                        Previous Symbol:
+                                    </label>
+                                </div>
+                                <div className="col-12 col-xl-9" id="variant.transcript.vep_gene.prev_symbol">
+                                    { prevSymbolRendered }
                                 </div>
                             </div>
 
@@ -232,7 +269,7 @@ export const ExternalDatabasesSection = React.memo(function ExternalDatabasesSec
             "brainatlas_microarray",
             "biogrid",
             "string",
-            "gene_symbol",
+            // "gene_symbol", - duplicate
             "refseq_accession",
             // "clingendis.disease_id", // todo - handle
             // "transcriptid.ensembl_trs", // todo - handle
