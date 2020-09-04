@@ -218,11 +218,9 @@ export const ExternalDatabasesSection = React.memo(function ExternalDatabasesSec
         );
     }
 
-    const { [itemType]: { properties: geneSchemaProperties } } = schemas;
-
-
     const externalDatabaseSchemaFields = externalDatabaseFieldnames.map(function(fieldName){
-        return [ fieldName, geneSchemaProperties[fieldName] ];
+        const propertySchema = schemaTransforms.getSchemaProperty(fieldName, schemas, itemType);
+        return [ fieldName, propertySchema ];
     }).filter(function(f){
         // Filter out fields which don't exist in schema yet.
         // Or for which we can't form links for.
@@ -235,6 +233,7 @@ export const ExternalDatabasesSection = React.memo(function ExternalDatabasesSec
             title = null,
             // description = null
         } = fieldSchema;
+
         const externalID = currentItem[fieldName];
 
         // if (!externalID) {

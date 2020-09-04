@@ -17,9 +17,7 @@ import { ExternalDatabasesSection } from './GeneTabBody';
 
 export const VariantTabBody = React.memo(function VariantTabBody ({ context, schemas, currentTranscriptIdx }) {
     const { variant } = context;
-    const {
-        clinvar_variationid: variationID,
-    } = variant;
+    const { clinvar_variationid: variationID } = variant;
 
     const { getTipForField, clinvarExternalHref } = useMemo(function(){
 
@@ -90,7 +88,7 @@ export const VariantTabBody = React.memo(function VariantTabBody ({ context, sch
                         </div>
                         <div className="info-body">
                             {/* We could maybe rename+put `ExternalDatabasesSection` into own file (from GeneTabBody.js), parameterize itemtype for schemas, and re-use ? */}
-                            <ExternalResourcesSection {...{ context, schemas }} />
+                            <ExternalResourcesSection {...{ context, schemas, currentTranscriptIdx }} />
                         </div>
                     </div>
 
@@ -461,11 +459,38 @@ function PredictorsTableHeading(){
 }
 
 
-function ExternalResourcesSection({ context, schemas }){
+function ExternalResourcesSection({ context, schemas, currentTranscriptIdx }){
     const { variant } = context;
-    const externalDatabaseFieldnames = ["clinvar_variationid", "vep_feature", "vep_ccds", "vep_ensp", "vep_swissprot", "vep_trembl"];
+    const { transcript = [], } = variant;
+    const externalDatabaseFieldnames = [
+        "clinvar_variationid"
+    ];
+
+    const transcriptFieldNames = [
+        "vep_feature",
+        "vep_ccds",
+        "vep_ensp",
+        "vep_swissprot",
+        "vep_trembl"
+    ];
+
+    // For now we kind of create combo object of these above ^
+    const currentItem = {};
+
+    externalDatabaseFieldnames.forEach(function(fieldName){
+        currentItem[fieldName] = variant[fieldName];
+    });
+
+    const currentTranscript = transcript[currentTranscriptIdx];
+    transcriptFieldNames.forEach(function(fieldName){
+        const newFieldName = "transcript." + fieldName;
+        externalDatabaseFieldnames.push(newFieldName);
+        currentItem[newFieldName] = currentTranscript[fieldName];
+    });
+
+
     return (
-        <ExternalDatabasesSection currentItem={variant} itemType="Variant" {...{ schemas, externalDatabaseFieldnames }} />
+        <ExternalDatabasesSection itemType="Variant" {...{ currentItem, schemas, externalDatabaseFieldnames }} />
     );
 }
 
