@@ -9,28 +9,6 @@ from ..types.institution import Institution
 pytestmark = [pytest.mark.setone, pytest.mark.working, pytest.mark.schema]
 
 
-# rewrite for CGAP - initially project based permissions with minimal roles - admin and project_member
-@pytest.fixture
-def STATI():
-    return [
-        # viewable by authenticated
-        "shared",
-        "obsolete",
-        # viewable by project member
-        "current",
-        "inactive",
-        "in review",
-        # admin only
-        "uploading",
-        "uploaded",
-        "upload failed",
-        "to be uploaded by workflow",
-        "deleted",
-        # special case because redirect
-        "replaced"
-    ]
-
-
 """List of basic statuses for testing access to Items
     statuses in this list have a mapping to an ACL
     with the exception of 'uploaded' that acts as a standin for all non-ACL
@@ -92,11 +70,6 @@ def udn_project(testapp):
         'description': 'Undiagnosed Disease Network'
     }
     return testapp.post_json('/project', item).json['@graph'][0]
-
-
-@pytest.fixture
-def all_projects(core_project, bgm_project, udn_project):
-    return [core_project, bgm_project, udn_project]
 
 
 @pytest.fixture
@@ -244,6 +217,13 @@ def indexer_testapp(app, external_tx, zsa_savepoints):
     return remote_user_testapp(app, 'INDEXER')
 
 
+@pytest.fixture
+def all_testapps(admin_testapp, bgm_user_testapp, udn_user_testapp,
+                 multi_project_user_testapp, no_project_user_testapp, anontestapp):
+    return [admin_testapp, bgm_user_testapp, udn_user_testapp,
+            multi_project_user_testapp, no_project_user_testapp, anontestapp]
+
+
 # Item fixtures
 @pytest.fixture
 def simple_bgm_file_item(institution, bgm_project, file_formats):
@@ -350,19 +330,6 @@ def test_udn_user_cannot_patch_bgm_item(testapp, udn_user_testapp, simple_bgm_fi
     assert udn_user_testapp.patch_json(fitem['@id'], {'read_length': 100}, status=expres)
 
 
-# STATUSES = [
-#     # viewable by authenticated
-#     "shared",
-#     "obsolete",
-#     # viewable by project member
-#     "current",
-#     "inactive",
-#     "in review",
-#     # kind of special admin-only
-#     "deleted",
-#     # special file status case due to redirect
-#     "replaced"
-# ]
 @pytest.mark.parametrize('project_name, status, expres', [
     ('core-project', 'shared', 200),
     ('core-project', 'obsolete', 200),
@@ -455,3 +422,45 @@ def test_anonymous_user_has_no_access(
     simple_bgm_file_item['status'] = status
     fitem = testapp.post_json('/file_fastq', simple_bgm_file_item, status=201).json['@graph'][0]
     assert anontestapp.get(fitem['@id'], status=expres)
+
+
+@pytest.fixture
+def public_static_section(testapp):
+    ss = {'status': 'public', 'name': 'test section', 'section_type': 'Page Section', 'body': 'test section'}
+    return testapp.post_json('/static_section', ss, status=201).json['@graph'][0]
+
+
+def test_public_item_can_be_seen_by_anyone(all_testapps, public_static_section):
+    for app in all_testapps:
+        assert app.get(public_static_section['@id'], status=200)
+
+
+def test_public_item_wo_project_can_be_patched_by_admin(admin_testapp, public_static_section):
+    name2patch = 'patch name'
+    res = admin_testapp.patch_json(public_static_section['@id'], {'name': name2patch}, status=200).json['@graph'][0]
+    assert res.get('name') == name2patch
+
+
+def test_public_item_wo_project_cannot_be_patched_by_project_member(bgm_user_testapp, public_static_section):
+    name2patch = 'patch name'
+    assert bgm_user_testapp.patch_json(public_static_section['@id'], {'name': name2patch}, status=403)
+
+
+""" The current permissions behavior is to allow a project user to create an item of that type but if status
+    is public then project members cannot patch - is this the desired behavior?
+"""
+
+
+def test_public_item_w_project_cannot_be_patched_by_project_member(testapp, bgm_user_testapp, bgm_project, public_static_section):
+    testapp.patch_json(public_static_section['@id'], {'project': bgm_project['@id']}, status=200)
+    name2patch = 'patch name'
+    assert bgm_user_testapp.patch_json(public_static_section['@id'], {'name': name2patch}, status=403)
+
+
+def test_public_item_wo_project_can_be_posted_by_project_member(bgm_user_testapp, public_static_section):
+    fields2post = ['body', 'section_type']
+    res = bgm_user_testapp.get(public_static_section['@id'], status=200).json
+    to_post = {k: v for k, v in res.items() if k in fields2post}
+    # need to have a uniquename
+    to_post['name'] = 'another section name'
+    bgm_user_testapp.post_json('/static_section', to_post, status=201)
