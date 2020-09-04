@@ -314,9 +314,6 @@ function getTranscriptLocation(transcript, mostSevereConsequence = null){
     const { var_conseq_name = null } = mostSevereConsequence || {};
     const consequenceName = (typeof var_conseq_name === "string" && var_conseq_name.toLowerCase()) || null;
 
-    // TODO : "if variant.transcript.vep_consequence.display_title is 3 prime utr variant, then 3' UTR. Similarly with 5' UTR."
-    // `variant.transcript.vep_consequence` === `mostSevereConsequence` here.
-
     let returnString = null;
 
     if (vep_exon !== null) { // In case vep_exon is `0` or something (unsure if possible)
@@ -326,17 +323,14 @@ function getTranscriptLocation(transcript, mostSevereConsequence = null){
     } else if (vep_distance !== null) {
         if (consequenceName === "downstream_gene_variant") {
             returnString = vep_distance + "bp downstream";
-        }
-        if (consequenceName === "upstream_gene_variant") {
+        } else if (consequenceName === "upstream_gene_variant") {
             returnString = vep_distance + "bp upstream";
         }
     }
 
     if (consequenceName === "3_prime_utr_variant"){
         returnString = returnString ? returnString + " (3′ UTR)" : "3′ UTR" ;
-    }
-
-    if (consequenceName === "5_prime_utr_variant"){
+    } else if (consequenceName === "5_prime_utr_variant"){
         returnString = returnString ? returnString + " (5′ UTR)" : "5′ UTR" ;
     }
 
