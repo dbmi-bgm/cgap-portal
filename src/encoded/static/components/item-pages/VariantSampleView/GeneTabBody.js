@@ -209,37 +209,34 @@ export const ExternalDatabasesSection = React.memo(function ExternalDatabasesSec
         // Clinvar, medgen not exist yet it seems.
 
         externalDatabaseFieldnames = [
+            // TODO handle commented-out sub-objects:
             "genecards",
-            "gnomad",
-            "clinvar",
-            "medgen",
-            "omim_id",
-            "hpa",
-            "gtex_expression",
-            "brainatlas_microarray",
-            "marrvel",
-            "mgi_id",
             "ensgid",
-            "gene_symbol",
-            "hgnc_id",
             "entrez_id",
-            "refseq_accession",
-            "ccds_id",
+            "hgnc_id",
+            // "ccds_id", - duplicate
+            "genereviews",
+            // "transcriptid.ensembl_pro", - duplicate
             "uniprot_ids",
-            "orphanet",
-            "clingen",
-            // TODO handle these sub-objects:
-            // "clingendis.disease_id",
-            // "transcriptid.ensembl_trs",
-            // "transcriptid.ensembl_pro",
             "pdb",
+            "mgi_id",
+            "marrvel",
+            "omim_id",
+            "orphanet",
+            "trait_association_gwas_pmid",
+            "clingen",
+            "pharmgkb",
+            "gtex_expression",
+            "brainspan_microarray",
+            "brainspan_rnaseq",
+            "brainatlas_microarray",
             "biogrid",
             "string",
-            "pharmgkb",
-            "genereviews",
-            "trait_association_gwas_pmid",
-            "brainspan_microarray",
-            "brainspan_rnaseq"
+            "gene_symbol",
+            "refseq_accession",
+            // "clingendis.disease_id", // todo - handle
+            // "transcriptid.ensembl_trs", // todo - handle
+            "gnomad"
         ]
     } = props;
 
