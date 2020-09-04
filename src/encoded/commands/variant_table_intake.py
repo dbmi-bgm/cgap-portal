@@ -457,6 +457,29 @@ class MappingTableParser(object):
             'title': 'Variant'
         }
 
+    @staticmethod
+    def add_extra_variant_sample_facets(facs):
+        facs['associated_genotype_labels.proband_genotype_label'] = {
+            'title': 'Proband Genotype',
+            'order': 12,
+            'grouping': 'Genotype'
+        }
+        facs['associated_genotype_labels.mother_genotype_label'] = {
+            'title': 'Mother Genotype',
+            'order': 13,
+            'grouping': 'Genotype'
+        }
+        facs['associated_genotype_labels.father_genotype_label'] = {
+            'title': 'Father Genotype',
+            'order': 14,
+            'grouping': 'Genotype'
+        }
+        facs['inheritance_modes'] = {
+            'title': 'Inheritance Modes',
+            'order': 15,
+            'grouping': 'Genotype'
+        }
+
     def generate_variant_sample_schema(self, sample_props, cols, facs, variant_cols, variant_facs):
         """ Builds the variant_sample.json schema based on sample_props. Will also add variant columns and
             facets since this information is embedded
@@ -548,6 +571,7 @@ class MappingTableParser(object):
         cols.update(variant_cols)  # add variant stuff since we are embedding this info
         facs.update(variant_facs)
         self.add_extra_variant_sample_columns(cols)
+        self.add_extra_variant_sample_facets(facs)
         schema['columns'] = cols
         schema['facets'] = facs
         schema['facets'] = self.sort_schema_properties(schema, key='facets')

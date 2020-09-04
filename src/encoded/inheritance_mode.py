@@ -11,7 +11,7 @@ class InheritanceModeError(Exception):
 
 class InheritanceMode:
 
-    MISSING = '.'  # XXX: is this really what this is? Should it be called 'dot'?
+    MISSING = '.'
 
     AUTOSOME = 'autosome'
     CHROMOSOMES = [
@@ -25,7 +25,7 @@ class InheritanceMode:
 
     MOTHER = 'mother'
     FATHER = 'father'
-    SELF = 'proband'  # XXX: this is what the data actually looks like, NOT 'self'
+    SELF = 'proband'
     TRIO = [MOTHER, FATHER, SELF]
 
     # Genotype labels
@@ -308,7 +308,7 @@ class InheritanceMode:
         return inheritance_modes
 
     @staticmethod
-    def build_genotype_label_structure(genotype_labels):
+    def build_genotype_label_structure(genotype_labels, sample_ids):
         """ Converts the genotype_labels structure into a consistent structure that can be used
             in our item ecosystem.
 
@@ -323,7 +323,8 @@ class InheritanceMode:
         for role, labels in genotype_labels.items():
             structured_labels.append({
                 'role': role,
-                'labels': labels
+                'labels': labels,
+                'sample_id': sample_ids.get(role)
             })
         return structured_labels
 
@@ -338,6 +339,7 @@ class InheritanceMode:
         """
         sample_geno = variant_sample.get('samplegeno', [])
         try:
+            sample_ids = {s["samplegeno_role"]: s["samplegeno_sampleid"] for s in sample_geno}
             genotypes = {s["samplegeno_role"]: s["samplegeno_numgt"] for s in sample_geno}
             sexes = {s["samplegeno_role"]: s["samplegeno_sex"] for s in sample_geno}
             chrom = chrom if chrom else variant_sample.get('variant', {}).get('CHROM')  # attempt to get from variant
@@ -349,7 +351,7 @@ class InheritanceMode:
             return {}
 
         if chrom not in ['X', 'Y']:
-            chrom = cls.AUTOSOME  # XXX: so chrom is one of ['X', 'Y', 'autosome'] ?
+            chrom = cls.AUTOSOME
 
         if cls.SELF not in genotypes:
             raise InheritanceModeError('Role "proband" not present in genotypes: %s' % genotypes)
@@ -363,7 +365,7 @@ class InheritanceMode:
             inheritance_modes = cls.inheritance_modes_other_labels(genotypes, genotype_labels)
 
         new_fields = {
-            'genotype_labels': cls.build_genotype_label_structure(genotype_labels),
+            'genotype_labels': cls.build_genotype_label_structure(genotype_labels, sample_ids),
             'inheritance_modes': inheritance_modes
         }
 

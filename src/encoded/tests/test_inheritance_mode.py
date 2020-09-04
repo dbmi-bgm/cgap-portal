@@ -217,17 +217,20 @@ def test_compute_inheritance_mode_trio(gts, gt_labels, sexes, chrom, novoPP, exp
                 {
                     'samplegeno_role': 'proband',
                     'samplegeno_numgt': '1/1',
-                    'samplegeno_sex': 'M'
+                    'samplegeno_sex': 'M',
+                    'samplegeno_sampleid': 'sample_id_1'
                 },
                 {
                     'samplegeno_role': 'mother',
                     'samplegeno_numgt': '0/1',
-                    'samplegeno_sex': 'F'
+                    'samplegeno_sex': 'F',
+                    'samplegeno_sampleid': 'sample_id_2'
                 },
                 {
                     'samplegeno_role': 'father',
                     'samplegeno_numgt': '0/1',
-                    'samplegeno_sex': 'M'
+                    'samplegeno_sex': 'M',
+                    'samplegeno_sampleid': 'sample_id_3'
                 },
             ],
             'novoPP': .95,
@@ -238,9 +241,9 @@ def test_compute_inheritance_mode_trio(gts, gt_labels, sexes, chrom, novoPP, exp
         },
         {
             'genotype_labels': [
-                {'labels': ['Homozygus alternate'], 'role': 'proband'},
-                {'labels': ['Heterozygous'], 'role': 'mother'},
-                {'labels': ['Heterozygous'], 'role': 'father'}
+                {'labels': ['Homozygus alternate'], 'role': 'proband', 'sample_id': 'sample_id_1'},
+                {'labels': ['Heterozygous'], 'role': 'mother', 'sample_id': 'sample_id_2'},
+                {'labels': ['Heterozygous'], 'role': 'father', 'sample_id': 'sample_id_3'}
             ],
             'inheritance_modes': ['de novo (strong)']
         }
@@ -251,17 +254,20 @@ def test_compute_inheritance_mode_trio(gts, gt_labels, sexes, chrom, novoPP, exp
                 {
                     'samplegeno_role': 'proband',
                     'samplegeno_numgt': '1/1',
-                    'samplegeno_sex': 'M'
+                    'samplegeno_sex': 'M',
+                    'samplegeno_sampleid': 'sample_id_1'
                 },
                 {
                     'samplegeno_role': 'mother',
                     'samplegeno_numgt': '0/1',
-                    'samplegeno_sex': 'F'
+                    'samplegeno_sex': 'F',
+                    'samplegeno_sampleid': 'sample_id_2'
                 },
                 {
                     'samplegeno_role': 'father',
                     'samplegeno_numgt': '0/1',
-                    'samplegeno_sex': 'M'
+                    'samplegeno_sex': 'M',
+                    'samplegeno_sampleid': 'sample_id_3'
                 },
             ],
             'novoPP': .5,
@@ -272,9 +278,9 @@ def test_compute_inheritance_mode_trio(gts, gt_labels, sexes, chrom, novoPP, exp
         },
         {
             'genotype_labels': [
-                {'labels': ['Homozygus alternate'], 'role': 'proband'},
-                {'labels': ['Heterozygous'], 'role': 'mother'},
-                {'labels': ['Heterozygous'], 'role': 'father'}
+                {'labels': ['Homozygus alternate'], 'role': 'proband', 'sample_id': 'sample_id_1'},
+                {'labels': ['Heterozygous'], 'role': 'mother', 'sample_id': 'sample_id_2'},
+                {'labels': ['Heterozygous'], 'role': 'father', 'sample_id': 'sample_id_3'}
             ],
             'inheritance_modes': ['de novo (medium)']
         }
@@ -285,17 +291,20 @@ def test_compute_inheritance_mode_trio(gts, gt_labels, sexes, chrom, novoPP, exp
                 {
                     'samplegeno_role': 'proband',
                     'samplegeno_numgt': '1/1',
-                    'samplegeno_sex': 'M'
+                    'samplegeno_sex': 'M',
+                    'samplegeno_sampleid': 'sample_id_1'
                 },
                 {
                     'samplegeno_role': 'mother',
                     'samplegeno_numgt': '0/1',
-                    'samplegeno_sex': 'F'
+                    'samplegeno_sex': 'F',
+                    'samplegeno_sampleid': 'sample_id_2'
                 },
                 {
                     'samplegeno_role': 'father',
                     'samplegeno_numgt': '0/1',
-                    'samplegeno_sex': 'M'
+                    'samplegeno_sex': 'M',
+                    'samplegeno_sampleid': 'sample_id_3'
                 },
             ],
             'novoPP': .05,
@@ -306,9 +315,9 @@ def test_compute_inheritance_mode_trio(gts, gt_labels, sexes, chrom, novoPP, exp
         },
         {
             'genotype_labels': [
-                {'labels': ['Homozygus alternate'], 'role': 'proband'},
-                {'labels': ['Heterozygous'], 'role': 'mother'},
-                {'labels': ['Heterozygous'], 'role': 'father'}
+                {'labels': ['Homozygus alternate'], 'role': 'proband', 'sample_id': 'sample_id_1'},
+                {'labels': ['Heterozygous'], 'role': 'mother', 'sample_id': 'sample_id_2'},
+                {'labels': ['Heterozygous'], 'role': 'father', 'sample_id': 'sample_id_3'}
             ],
             'inheritance_modes': ['Recessive']
         }
@@ -319,7 +328,8 @@ def test_compute_inheritance_mode_trio(gts, gt_labels, sexes, chrom, novoPP, exp
                 {
                     'samplegeno_role': 'proband',
                     'samplegeno_numgt': '1/1',
-                    'samplegeno_sex': 'M'
+                    'samplegeno_sex': 'M',
+                    'samplegeno_sampleid': 'sample_id_1'
                 },
             ],
             'novoPP': .05,
@@ -330,7 +340,7 @@ def test_compute_inheritance_mode_trio(gts, gt_labels, sexes, chrom, novoPP, exp
         },
         {
             'genotype_labels': [
-                {'labels': ['Homozygus alternate'], 'role': 'proband'},
+                {'labels': ['Homozygus alternate'], 'role': 'proband', 'sample_id': 'sample_id_1'},
             ],
             'inheritance_modes': []
         }
@@ -341,7 +351,8 @@ def test_compute_inheritance_mode_trio(gts, gt_labels, sexes, chrom, novoPP, exp
                 {
                     'samplegeno_role': 'proband',
                     'samplegeno_numgt': '1/1',
-                    'samplegeno_sex': 'M'
+                    'samplegeno_sex': 'M',
+                    'samplegeno_sampleid': 'sample_id_1'
                 },
             ],
             'novoPP': .95,
@@ -352,7 +363,7 @@ def test_compute_inheritance_mode_trio(gts, gt_labels, sexes, chrom, novoPP, exp
         },
         {
             'genotype_labels': [
-                {'labels': ['Homozygus alternate'], 'role': 'proband'},
+                {'labels': ['Homozygus alternate'], 'role': 'proband', 'sample_id': 'sample_id_1'},
             ],
             'inheritance_modes': []
         }
@@ -397,17 +408,20 @@ def test_compute_inheritance_modes_csv_tests():
                 {
                     'samplegeno_role': 'proband',
                     'samplegeno_numgt': test['genotype_self'],
-                    'samplegeno_sex': infer_sex_of_self(test)
+                    'samplegeno_sex': infer_sex_of_self(test),
+                    'samplegeno_sampleid': 'sample_id_1'
                 },
                 {
                     'samplegeno_role': 'mother',
                     'samplegeno_numgt': test['genotype_mother'],
-                    'samplegeno_sex': 'F'
+                    'samplegeno_sex': 'F',
+                    'samplegeno_sampleid': 'sample_id_2'
                 },
                 {
                     'samplegeno_role': 'father',
                     'samplegeno_numgt': test['genotype_father'],
-                    'samplegeno_sex': 'M'
+                    'samplegeno_sex': 'M',
+                    'samplegeno_sampleid': 'sample_id_3'
                 },
             ],
             'variant': {
