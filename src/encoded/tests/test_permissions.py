@@ -53,16 +53,6 @@ def core_project(testapp):
 
 
 @pytest.fixture
-def bgm_project(testapp):
-    item = {
-        'name': 'bgm-project',
-        'title': 'BGM Project',
-        'description': 'Brigham Genomic Medicine'
-    }
-    return testapp.post_json('/project', item).json['@graph'][0]
-
-
-@pytest.fixture
 def udn_project(testapp):
     item = {
         'name': 'udn-project',
@@ -90,27 +80,6 @@ def admin_user(testapp):
         'groups': ['admin'],
     }
 
-    # User @@object view has keys omitted.
-    res = testapp.post_json('/user', item)
-    return testapp.get(res.location).json
-
-
-@pytest.fixture
-def bgm_user(testapp, institution, bgm_project):
-    item = {
-        'first_name': 'BGM',
-        'last_name': 'user',
-        'email': 'bgmuser@example.org',
-        'institution': institution['name'],
-        'project_roles': [
-            {
-                'project': bgm_project['@id'],
-                'role': 'project_member'  # XXX: you probably want this
-            }
-        ],
-        'project': bgm_project['@id'],
-        'status': 'current'
-    }
     # User @@object view has keys omitted.
     res = testapp.post_json('/user', item)
     return testapp.get(res.location).json

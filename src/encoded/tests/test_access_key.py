@@ -58,18 +58,22 @@ def test_access_key_get_bad_password(anontestapp, access_key):
     anontestapp.get('/', headers=headers, status=401)
 
 
-def test_access_key_principals(anontestapp, execute_counter, access_key, submitter, institution):
+def test_access_key_principals(anontestapp, execute_counter, access_key, bgm_user, bgm_project, institution):
+    # TO DO - needs to be reviewed in context of what prinicipals do we want on access keys
     headers = {'Authorization': auth_header(access_key)}
     with execute_counter.expect(2):
         res = anontestapp.get('/@@testing-user', headers=headers)
 
     assert res.json['authenticated_userid'] == 'accesskey.' + access_key['access_key_id']
-
+    print(sorted(res.json['effective_principals']))
     assert sorted(res.json['effective_principals']) == [
         'accesskey.%s' % access_key['access_key_id'],
+        'group.project_member',
+        'institution.%s' % institution['uuid'],
+        'project.%s' % bgm_project['uuid'],
         'system.Authenticated',
         'system.Everyone',
-        'userid.%s' % submitter['uuid'],
+        'userid.%s' % bgm_user['uuid'],
     ]
 
 
