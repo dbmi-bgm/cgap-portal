@@ -46,7 +46,6 @@ export function HiGlassLoadingIndicator(props) {
 
 /** Loaded upon componentDidMount; HiGlassComponent is not supported server-side. */
 let HiGlassComponent = null;
-let StackedBarTrack = null;
 let higlassRegister = null;
 
 export class HiGlassPlainContainer extends React.PureComponent {
@@ -71,7 +70,7 @@ export class HiGlassPlainContainer extends React.PureComponent {
         'disabled' : false,
         'height' : 600,
         'viewConfig' : null,
-        'mountDelay' : 300,
+        'mountDelay' : 500,
         'placeholder' : <HiGlassLoadingIndicator/>,
     };
 
@@ -84,7 +83,8 @@ export class HiGlassPlainContainer extends React.PureComponent {
         this.state = {
             'mounted' : false,
             'mountCount' : 0,
-            'hasRuntimeError' : false
+            'hasRuntimeError' : false,
+            'higlassInitialized' : false
         };
 
         this.hgcRef = React.createRef();
@@ -94,15 +94,24 @@ export class HiGlassPlainContainer extends React.PureComponent {
         const { mountDelay, onViewConfigUpdated } = this.props;
         const finish = () => {
             this.setState(function(currState){
-                return { 'mounted' : true, 'mountCount' : currState.mountCount + 1 };
+                return {
+                    'mounted' : true,
+                    'mountCount' : currState.mountCount + 1
+                };
             }, () => {
-                setTimeout(this.correctTrackDimensions, 500);
-                if (onViewConfigUpdated && typeof onViewConfigUpdated === 'function') {
-                    const hgc = this.getHiGlassComponent();
-                    if (hgc) {
-                        hgc.api.on("viewConfig", onViewConfigUpdated);
-                    }
-                }
+
+                setTimeout(()=>{
+                    this.setState({ "higlassInitialized": true }, ()=>{
+                        setTimeout(this.correctTrackDimensions, 500);
+                        if (onViewConfigUpdated && typeof onViewConfigUpdated === 'function') {
+                            const hgc = this.getHiGlassComponent();
+                            if (hgc) {
+                                hgc.api.on("viewConfig", onViewConfigUpdated);
+                            }
+                        }
+                    });
+                }, 500);
+
             });
         };
 
@@ -155,7 +164,7 @@ export class HiGlassPlainContainer extends React.PureComponent {
                 finish();
             }
 
-        }, mountDelay || 500);
+        }, mountDelay);
 
     }
 
@@ -210,14 +219,14 @@ export class HiGlassPlainContainer extends React.PureComponent {
 
     render(){
         const { disabled, isValidating, tilesetUid, height, width, options, style, className, viewConfig, placeholder } = this.props;
-        const { mounted, mountCount, hasRuntimeError } = this.state;
+        const { mounted, mountCount, hasRuntimeError, higlassInitialized = false } = this.state;
 
         const { dependencies : { higlass : { version: higlassVersionUsed } } } = installedPackageLockJson;
         let hiGlassInstance = null;
         const outerKey = "mount-number-" + mountCount;
 
-        if (isValidating || !mounted){
-            var placeholderStyle = {};
+        if (isValidating || !mounted || !higlassInitialized){
+            var placeholderStyle = { width: width || null };
             if (typeof height === 'number' && height >= 140){
                 placeholderStyle.height = height;
                 placeholderStyle.paddingTop = (height / 2) - 40;

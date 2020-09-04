@@ -11,7 +11,7 @@ import { HiGlassAjaxLoadContainer } from './../components/HiGlass/HiGlassAjaxLoa
 
 export const BrowserTabBody = React.memo(function BrowserTabBody ({ context, schemas }) {
 
-    const higlassContainerRef = React.createRef(); // I'm not sure is safe
+    const higlassContainerRef = useRef(null);
     const variantPositionAbsCoord = context.variant.POS_ABS;
 
     return (
