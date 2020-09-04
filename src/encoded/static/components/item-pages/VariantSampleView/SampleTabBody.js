@@ -124,6 +124,9 @@ function CoverageTable(props) {
 
     const mapNumGTToGT = {};
 
+    let shortGTDupPresent = false;
+    const shortGTDupTester = {};
+
     const rows = samplegeno.map((sg) => {
         const {
             samplegeno_role: role = null,
@@ -144,11 +147,33 @@ function CoverageTable(props) {
         if (samplegeno_gt) { gtArr = samplegeno_gt.split('/'); }
         if (samplegeno_numgt) { numGTArr = samplegeno_numgt.split('/');}
 
-        // Populate mapNumGTtoGT with info
+        // Populate mapNumGTtoGT with GT info
         numGTArr.forEach((numGT, i) => {
             if (!mapNumGTToGT.hasOwnProperty(numGT)) {
-                mapNumGTToGT[numGT] = gtArr[i];
-            } else if (mapNumGTToGT[numGT] !== gtArr[i]) {
+                let gtObj = {};
+                const fullGT = gtArr[i];
+
+                if (fullGT.length > 12) { // Calculate shortened versions of GTs
+                    const first4 = fullGT.substring(0, 4);
+                    const middle = fullGT.substring(4, fullGT.length - 4);
+                    const last4 = fullGT.substring(fullGT.length - 4, fullGT.length);
+                    const shortGT = `${first4}...${last4}`;
+                    const bpGT = `${first4}...${middle.length}bp...${last4}`;
+
+                    // Determine if to use ...BP... shortened version or normal shortened version
+                    if (!shortGTDupTester[shortGT]) {
+                        shortGTDupTester[shortGT] = true;
+                    } else {
+                        shortGTDupPresent = true;
+                    }
+
+                    gtObj = { fullGT, shortGT, bpGT };
+                } else {
+                    gtObj = { fullGT };
+                }
+
+                mapNumGTToGT[numGT] = gtObj;
+            } else if (mapNumGTToGT[numGT] && mapNumGTToGT[numGT].fullGT !== gtArr[i]) {
                 throw new Error ("numGT mismatch at ", numGT);
             }
         });
@@ -185,23 +210,11 @@ function CoverageTable(props) {
                     <th className="text-left">ID</th>
                     <th className="text-left">Coverage</th>
                     { cols.map((numGT) => {
-                        const fullGT = mapNumGTToGT[numGT];
-                        let shortGT;
-                        if (fullGT.length > 12) {
-                            const first4 = fullGT.substring(0,4);
-                            const middle = fullGT.substring(4,fullGT.length-4);
-                            const last4 = fullGT.substring(fullGT.length - 4, fullGT.length);
-                            console.log(first4, middle, last4);
-
-                            // if (first4 != last4) {
-                            //     shortGT = `${first4}...${last4}`;
-                            // } else {
-                            //     shortGT = `${first4}...${middle.length}bp...${last4}`;
-                            // }
-                        }
+                        const { fullGT, shortGT, bpGT } = mapNumGTToGT[numGT];
+                        const useBPGT = shortGTDupPresent && bpGT;
                         return (
-                            <th key={fullGT} className="text-left" data-tip={shortGT && fullGT}>
-                                {numGT === "0" ? "Ref" : "Alt"}({ shortGT || fullGT })
+                            <th key={fullGT} className="text-left" data-tip={(shortGT || bpGT) ? fullGT : null}>
+                                {numGT === "0" ? "Ref" : "Alt"}({ useBPGT ? bpGT : (shortGT || fullGT) })
                             </th>
                         );
                     })}
