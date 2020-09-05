@@ -4,8 +4,7 @@
         "editable":true,
         "zoomFixed":false,
         "trackSourceServers":[
-          "//higlass.io/api/v1",
-          "https://resgen.io/api/v1/gt/paper-data"
+          "https://cgap-higlass.com/api/v1"
         ],
         "exportViewUrl":"/api/v1/viewconfs",
         "views":[
@@ -17,9 +16,9 @@
             ],
             "autocompleteSource":"/api/v1/suggest/?d=OHJakQICQD6gTD7skx4EWA&",
             "genomePositionSearchBox":{
-              "autocompleteServer":"//higlass.io/api/v1",
+              "autocompleteServer":"https://cgap-higlass.com/api/v1",
               "autocompleteId":"P0PLbQMwTYGy-5uPIQid7A",
-              "chromInfoServer":"//higlass.io/api/v1",
+              "chromInfoServer":"https://cgap-higlass.com/api/v1",
               "chromInfoId":"hg38",
               "visible":true
             },
@@ -46,6 +45,7 @@
                 {
                   "uid":"fastaex",
                   "type":"horizontal-sequence",
+                  "server": "https://cgap-higlass.com/api/v1",
                   "data":{
                     "type":"fasta",
                     "fastaUrl":"https://aveit.s3.amazonaws.com/higlass/data/sequence/hg38.fa",
@@ -79,7 +79,7 @@
                   "height":25
                 },
                 {
-                  "server": "http://higlass.io/api/v1",
+                  "server": "https://cgap-higlass.com/api/v1",
                   "uid": "emptytrack_transcripts",
                   "type": "empty",
                   "options": {
@@ -96,6 +96,7 @@
                 {
                   "uid": "texttrack_transcripts",
                   "type": "text",
+                  "server": "https://cgap-higlass.com/api/v1",
                   "options": {
                     "backgroundColor": "#ededed",
                     "textColor": "#333333",
@@ -110,7 +111,7 @@
                   "height": 20
                 },
                 {
-                  "server": "http://ec2-3-231-224-18.compute-1.amazonaws.com/api/v1",
+                  "server": "https://cgap-higlass.com/api/v1",
                   "tilesetUid": "transcripts_hg38",
                   "uid": "transcript_annotation",
                   "type": "horizontal-transcripts",
@@ -142,7 +143,7 @@
                   "height": 134
                 },
                 {
-                  "server": "http://higlass.io/api/v1",
+                  "server": "https://cgap-higlass.com/api/v1",
                   "uid": "emptytrack_clinvar",
                   "type": "empty",
                   "options": {
@@ -159,6 +160,7 @@
                 {
                   "uid": "texttrack_clinvar",
                   "type": "text",
+                  "server": "https://cgap-higlass.com/api/v1",
                   "options": {
                     "backgroundColor": "#ededed",
                     "textColor": "#333333",
@@ -176,14 +178,14 @@
                   "type": "horizontal-clinvar",
                   "height": 110,
                   "tilesetUid": "clinvar_20200824_hg38",
-                  "server": "http://ec2-3-231-224-18.compute-1.amazonaws.com/api/v1",
+                  "server": "https://cgap-higlass.com/api/v1",
                   "uid": "clinvar_20200824_v5",
                   "options": {
                     "name": "Clinvar"
                   }
                 },
                 {
-                  "server": "http://higlass.io/api/v1",
+                  "server": "https://cgap-higlass.com/api/v1",
                   "uid": "emptytrack_orthologs",
                   "type": "empty",
                   "options": {
@@ -200,6 +202,7 @@
                 {
                   "uid": "texttrack_orthologs",
                   "type": "text",
+                  "server": "https://cgap-higlass.com/api/v1",
                   "options": {
                     "backgroundColor": "#ededed",
                     "textColor": "#333333",
@@ -214,7 +217,7 @@
                   "height": 20
                 },
                 {
-                  "server": "http://higlass.io/api/v1",
+                  "server": "https://cgap-higlass.com/api/v1",
                   "uid": "emptytrack_orthologs2",
                   "type": "empty",
                   "options": {
@@ -232,7 +235,7 @@
                   "type": "horizontal-orthologs",
                   "height": 100,
                   "tilesetUid": "canonical_transcripts_hg38",
-                  "server": "http://ec2-3-231-224-18.compute-1.amazonaws.com/api/v1",
+                  "server": "https://cgap-higlass.com/api/v1",
                   "uid": "orthologs",
                   "options": {
                     "rowHeight": 11,
@@ -262,7 +265,7 @@
                   }
                 },
                 {
-                  "server": "http://higlass.io/api/v1",
+                  "server": "https://cgap-higlass.com/api/v1",
                   "uid": "emptytrack",
                   "type": "empty",
                   "options": {
