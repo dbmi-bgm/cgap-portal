@@ -69,21 +69,8 @@ export function GeneTabBody(props){
         );
     }
 
-    const aliasSymbolRendered = alias_symbol.length === 0 ? <em> - </em> : (
-        <div>
-            { alias_symbol.map(function(sym, i){
-                return <div key={i}>{ sym }</div>;
-            }) }
-        </div>
-    );
-
-    const prevSymbolRendered = prev_symbol.length === 0 ? <em> - </em> : (
-        <div>
-            { prev_symbol.map(function(sym, i){
-                return <div key={i}>{ sym }</div>;
-            }) }
-        </div>
-    );
+    const aliasSymbolRendered = alias_symbol.length === 0 ? <em> - </em> : alias_symbol.join(", ");
+    const prevSymbolRendered = prev_symbol.length === 0 ? <em> - </em> : prev_symbol.join(", ");
 
     const geneLocation = (
         (chrom? chrom : "") +
@@ -286,7 +273,7 @@ export const ExternalDatabasesSection = React.memo(function ExternalDatabasesSec
     }
 
     const externalDatabaseSchemaFields = externalDatabaseFieldnames.map(function(fieldName){
-        const propertySchema = schemaTransforms.getSchemaProperty(fieldName, schemas, itemType);
+        const propertySchema = schemaTransforms.getSchemaProperty(fieldName, schemas, itemType); // We get .items from this if array field. Might change in future.
         return [ fieldName, propertySchema ];
     }).filter(function(f){
         // Filter out fields which don't exist in schema yet.
@@ -299,20 +286,24 @@ export const ExternalDatabasesSection = React.memo(function ExternalDatabasesSec
 
     const externalDatabaseElems = externalDatabaseSchemaFields.map(function([ fieldName, fieldSchema ]){
 
-        const isArray = fieldSchema.items && fieldSchema.type === "array";
+        const isArray = !!(fieldSchema.items && fieldSchema.type === "array");
 
         const {
             link: linkFormat = null,
             title = null,
             // description = null
-        } = (isArray ? fieldSchema.items : fieldSchema);
+        } = fieldSchema;
 
         let externalIDs = currentItem[fieldName];
         if (typeof externalIDs === "undefined") {
             externalIDs = [];
-        } else if (!isArray) {
+        } else if (!Array.isArray(externalIDs)) {
             externalIDs = [ externalIDs ];
         }
+
+        console.log('TTT', fieldSchema, isArray, externalIDs);
+
+        const extIDsLen = externalIDs.length;
 
 
         // if (!externalID) {
@@ -321,9 +312,10 @@ export const ExternalDatabasesSection = React.memo(function ExternalDatabasesSec
 
         let val;
 
-        if (externalIDs.length === 0) {
+        if (extIDsLen === 0) {
             val = <em data-tip="Not Available" className="px-1"> - </em>;
-        } else {
+        } else if (extIDsLen < 5) {
+            // Newline for each
             val = externalIDs.map(function(externalID){
                 const linkToID = linkFormat.replace("<ID>", externalID);
                 return (
@@ -331,6 +323,23 @@ export const ExternalDatabasesSection = React.memo(function ExternalDatabasesSec
                         <span>{ externalID }</span>
                         <i className="ml-05 icon icon-fw icon-external-link-alt fas text-smaller text-secondary" />
                     </a>
+                );
+            });
+        } else {
+            // Same line, comma, count instd of titles for subsequents.
+            val = externalIDs.map(function(externalID, index){
+                const linkToID = linkFormat.replace("<ID>", externalID);
+                const title = index === 0 ? externalID : `(${index + 1})`;
+                return (
+                    <React.Fragment key={externalID}>
+                        <a href={linkToID || null} target="_blank" rel="noopener noreferrer" id={"external_resource_for_" + fieldName}
+                            data-tip={index === 0 ? null : externalID}>
+                            { title }
+                        </a>
+                        { index === extIDsLen - 1 ?
+                            <i className="ml-05 icon icon-fw icon-external-link-alt fas text-smaller text-secondary" />
+                            : " " }
+                    </React.Fragment>
                 );
             });
         }

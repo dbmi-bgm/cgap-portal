@@ -292,17 +292,20 @@ function ClinVarSection({ context, getTipForField, schemas, clinvarExternalHref 
 function ClinVarSubmissionEntry({ submission, index = 0 }){
     const fallbackElem = <em data-tip="Not Available"> - </em>;
     const {
-        clinvar_submission_interpretation = fallbackElem,
+        clinvar_submission_interpretation = null,
         clinvar_submission_submitter = fallbackElem,
         clinvar_submission_accession = fallbackElem // change into link when available
     } = submission;
+
+    const interpretation = clinvar_submission_interpretation || fallbackElem;
+    const fakeStatusValue = clinvar_submission_interpretation ? ClinVarSubmissionEntry.interpretationStatusMap[clinvar_submission_interpretation.toLowerCase()] || null : null;
 
     return (
         <div className={"my-1 border rounded p-1" + (index % 2 === 0 ? " bg-light" : "")}>
             <div className="row align-items-center text-small">
                 <div className="col-3" data-field="clinvar_submission_interpretation">
-                    <i className="item-status-indicator-dot mr-07 ml-05" data-status={ClinVarSubmissionEntry.interpretationStatusMap[clinvar_submission_interpretation] || null} />
-                    { clinvar_submission_interpretation }
+                    <i className="item-status-indicator-dot mr-07 ml-05" data-status={fakeStatusValue} />
+                    { interpretation }
                 </div>
                 <div className="col-2">
                     { fallbackElem }
@@ -319,7 +322,10 @@ function ClinVarSubmissionEntry({ submission, index = 0 }){
 }
 // We re-use color definitions for Item.status to color our interpretation status icon.
 ClinVarSubmissionEntry.interpretationStatusMap = {
-    "risk factor" : "deleted" // red
+    "risk factor" : "deleted", // red
+    "benign" : "released", // green
+    "likely benign" : "released", // green
+    "uncertain significance" : "in review" // yellow
 };
 
 function PredictorsSection({ context, getTipForField, currentTranscriptIdx }){
@@ -474,6 +480,10 @@ function ExternalResourcesSection({ context, schemas, currentTranscriptIdx }){
         "vep_trembl"
     ];
 
+    if (!variant) {
+        return null;
+    }
+
     // For now we kind of create combo object of these above ^
     const currentItem = {};
 
@@ -481,7 +491,7 @@ function ExternalResourcesSection({ context, schemas, currentTranscriptIdx }){
         currentItem[fieldName] = variant[fieldName];
     });
 
-    const currentTranscript = transcript[currentTranscriptIdx];
+    const currentTranscript = transcript[currentTranscriptIdx] || {}; // Fallback to blank values.
     transcriptFieldNames.forEach(function(fieldName){
         const newFieldName = "transcript." + fieldName;
         externalDatabaseFieldnames.push(newFieldName);
