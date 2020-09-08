@@ -38,7 +38,6 @@ def test_create_mapping_correctly_maps_embeds(registry, item_type):
                 else:
                     assert 'properties' in final_mapping or final_mapping.get('type') == 'object'
             else:
-                # XXX mixins are not being added
                 assert split_ in mapping_pointer['properties']
                 mapping_pointer = mapping_pointer['properties'][split_]
 

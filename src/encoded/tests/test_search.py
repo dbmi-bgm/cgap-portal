@@ -23,9 +23,6 @@ pytestmark = [pytest.mark.working, pytest.mark.schema, pytest.mark.indexing, pyt
 # uses the inserts in ./data/workbook_inserts
 # design your tests accordingly
 
-# to fix: test_search_with_simple_query, test_search_ngram,
-# test_search_date_range_find_within, test_search_query_string_with_booleans
-
 
 # just a little helper function
 def recursively_find_uuids(json, uuids):
