@@ -33,6 +33,7 @@ ITEM_INDEX_ORDER = [
     'FileReference',
     'Image',
     'Gene',
+    'GeneList',
     'Phenotype',
     'Disorder',
     'Individual',
@@ -48,6 +49,7 @@ ITEM_INDEX_ORDER = [
     'QualityMetricWorkflowrun',
     'QualityMetricVcfcheck',
     'QualityMetricVcfqc',
+    'QualityMetricPeddyqc',
     'TrackingItem',
     'Software',
     'Sample',
@@ -60,6 +62,7 @@ ITEM_INDEX_ORDER = [
     'EvidenceDisPheno',
     'Page',
     'GeneAnnotationField',
+    'HiglassViewConfig'
 ]
 
 ENV_HOTSEAT = 'fourfront-cgaphot'
