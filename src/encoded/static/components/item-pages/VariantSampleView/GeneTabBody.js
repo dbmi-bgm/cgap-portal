@@ -226,14 +226,21 @@ export function GeneTabBody(props){
 
 
 function ConstraintScoresSection({ currentGeneItem, getTipForField }){
+    const fallbackNotPresent = <em data-tip="Not Available"> - </em>;
+    const fallbackNotImplemented = <em data-tip="Not present or implemented"> &bull; </em>;
     const {
         exp_lof, exp_mis, exp_syn,
         obs_lof, obs_mis, obs_syn,
-        oe_lof,  oe_mis,  oe_syn,
+        oe_lof, oe_lof_lower = null, oe_lof_upper = null,
+        oe_syn, oe_syn_lower = null, oe_syn_upper = null,
+        oe_mis, oe_mis_lower =    0, oe_mis_upper = null,
+        syn_z, mis_z, lof_z,
+        s_het,
+        rvis_exac
         // more todo
     } = currentGeneItem;
     return (
-        <table className="w-100">
+        <table className="w-100 text-left">
             <thead className="bg-transparent">
                 <tr>
                     <th className="text-left">Constraint</th>
@@ -244,24 +251,107 @@ function ConstraintScoresSection({ currentGeneItem, getTipForField }){
             </thead>
             <tbody>
                 <tr>
-                    <td className="text-600 text-left">{"Exp. SNV's"}</td>
-                    <td data-tip={getTipForField("exp_syn")}>{ exp_syn }</td>
-                    <td data-tip={getTipForField("exp_mis")}>{ exp_mis }</td>
-                    <td data-tip={getTipForField("exp_lof")}>{ exp_lof }</td>
+                    <td className="text-600 text-left">Expected</td>
+                    <td>
+                        <span data-tip={getTipForField("exp_syn")}>{ exp_syn || fallbackNotPresent }</span>
+                    </td>
+                    <td>
+                        <span data-tip={getTipForField("exp_mis")}>{ exp_mis || fallbackNotPresent }</span>
+                    </td>
+                    <td>
+                        <span data-tip={getTipForField("exp_lof")}>{ exp_lof || fallbackNotPresent }</span>
+                    </td>
                 </tr>
                 <tr>
-                    <td className="text-600 text-left">{"Obs. SNV's"}</td>
-                    <td data-tip={getTipForField("obs_syn")}>{ obs_syn }</td>
-                    <td data-tip={getTipForField("obs_mis")}>{ obs_mis }</td>
-                    <td data-tip={getTipForField("obs_lof")}>{ obs_lof }</td>
+                    <td className="text-600 text-left">Observed</td>
+                    <td>
+                        <span data-tip={getTipForField("obs_syn")}>{ obs_syn || fallbackNotPresent }</span>
+                    </td>
+                    <td>
+                        <span data-tip={getTipForField("obs_mis")}>{ obs_mis || fallbackNotPresent }</span>
+                    </td>
+                    <td>
+                        <span data-tip={getTipForField("obs_lof")}>{ obs_lof || fallbackNotPresent }</span>
+                    </td>
                 </tr>
                 <tr>
-                    <td className="text-600 text-left">{"o/e"}</td>
-                    <td data-tip={getTipForField("oe_syn")}>{ oe_syn }</td>
-                    <td data-tip={getTipForField("oe_mis")}>{ oe_mis }</td>
-                    <td data-tip={getTipForField("oe_lof")}>{ oe_lof }</td>
+                    <td className="text-600 text-left">O/E (range)</td>
+                    <td>
+                        <span data-tip={getTipForField("oe_syn")}>{ shortenToSignificantDigits(oe_syn) || fallbackNotPresent }</span>
+                        { oe_syn_lower !== null && oe_syn_upper !== null ? ` (${oe_syn_lower} - ${oe_syn_upper})` : null }
+                    </td>
+                    <td>
+                        <span data-tip={getTipForField("oe_mis")}>{ shortenToSignificantDigits(oe_mis) || fallbackNotPresent }</span>
+                        { oe_mis_lower !== null && oe_mis_upper !== null ? ` (${oe_mis_lower} - ${oe_mis_upper})` : null }
+                    </td>
+                    <td>
+                        <span data-tip={getTipForField("oe_lof")}>{ shortenToSignificantDigits(oe_lof) || fallbackNotPresent }</span>
+                        { oe_lof_lower !== null && oe_lof_upper !== null ? ` (${oe_lof_lower} - ${oe_lof_upper})` : null }
+                    </td>
+                </tr>
+                <tr>
+                    <td className="text-600 text-left">Z-score</td>
+                    <td>
+                        <span data-tip={getTipForField("syn_z")}>{ shortenToSignificantDigits(syn_z) || fallbackNotPresent }</span>
+                    </td>
+                    <td>
+                        <span data-tip={getTipForField("mis_z")}>{ shortenToSignificantDigits(mis_z) || fallbackNotPresent }</span>
+                    </td>
+                    <td>
+                        <span data-tip={getTipForField("lof_z")}>{ shortenToSignificantDigits(lof_z) || fallbackNotPresent }</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td className="text-600 text-left">LOEUF</td>
+                    <td>{ fallbackNotImplemented }</td>
+                    <td>{ fallbackNotImplemented }</td>
+                    <td>
+                        <span data-tip={getTipForField("oe_lof_upper")}>{ oe_lof_upper || fallbackNotPresent }</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td className="text-600 text-left">S-Het</td>
+                    <td>{ fallbackNotImplemented }</td>
+                    <td>
+                        <span data-tip={getTipForField("s_het")}>{ shortenToSignificantDigits(s_het) || fallbackNotPresent }</span>
+                    </td>
+                    <td>{ fallbackNotImplemented }</td>
+                </tr>
+                <tr>
+                    <td className="text-600 text-left">RVIS (ExAC)</td>
+                    <td>{ fallbackNotImplemented }</td>
+                    <td>
+                        <span data-tip={getTipForField("rvis_exac")}>{ shortenToSignificantDigits(rvis_exac) || fallbackNotPresent }</span>
+                    </td>
+                    <td>{ fallbackNotImplemented }</td>
                 </tr>
             </tbody>
         </table>
     );
+}
+
+/**
+ * @todo Move into shared-portal-components > util > valueTransforms ?
+ * @todo Maybe, if to be reused:
+ *   Handle & abbreviate large numbers using 'M', 'B', 'T' maybe?
+ *   We have `valueTransforms.roundLargeNumber(num, decimalPlaces = 2)` function already which can just be re-used if we paramaterize its `numberLevels`.
+ *       (currently: `['', 'k', 'm', ' billion', ' trillion', ' quadrillion', ' quintillion']`)
+ */
+function shortenToSignificantDigits(numberToShorten, countDigits = 3) {
+
+    if (!numberToShorten) {
+        // Pass through falsy values such as "0" (doesnt need shortening) or null, false, undefined.
+        return numberToShorten;
+    }
+
+    if (typeof numberToShorten !== "number" || isNaN(numberToShorten)) {
+        throw new Error("Expected well-formed number (or falsy value).");
+    }
+
+    if (numberToShorten >= Math.pow(10, countDigits - 1)) {
+        // todo: handle later
+        return "" + Math.round(numberToShorten);
+    }
+
+    return numberToShorten.toPrecision(countDigits);
 }
