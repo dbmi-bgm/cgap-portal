@@ -5,10 +5,11 @@ import PropTypes from 'prop-types';
 import _ from 'underscore';
 import DropdownButton from 'react-bootstrap/esm/DropdownButton';
 import DropdownItem from 'react-bootstrap/esm/DropdownItem';
-import { console, schemaTransforms } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
+import { console, schemaTransforms, object } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { Alerts } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/Alerts';
 
 import { Schemas } from './../../util';
+import { ExternalDatabasesSection } from './ExternalDatabasesSection';
 
 
 /**
@@ -222,162 +223,7 @@ export function GeneTabBody(props){
     );
 }
 
-export const ExternalDatabasesSection = React.memo(function ExternalDatabasesSection(props){
-    const {
-        currentItem, // Renamed from 'currentGeneItem' in case want to move & re-use for Variant, also.
-        schemas = null,
-        itemType = "Gene",
-        // IN FUTURE WE WON"T HAVE THIS LIST
-        // AND INSTEAD GATHER THE PROPERTIES FROM SCHEMA
-        // ACCORDING TO PERHAPS "annotation_category" :"dbxref"
-        // Clinvar, medgen not exist yet it seems.
 
-        externalDatabaseFieldnames = [
-            // TODO handle commented-out sub-objects:
-            "genecards",
-            "ensgid",
-            "entrez_id",
-            "hgnc_id",
-            // "ccds_id", - duplicate
-            "genereviews",
-            // "transcriptid.ensembl_pro", - duplicate
-            "uniprot_ids",
-            "pdb",
-            "mgi_id",
-            "marrvel",
-            "omim_id",
-            "orphanet",
-            "trait_association_gwas_pmid",
-            "clingen",
-            "pharmgkb",
-            "gtex_expression",
-            "brainspan_microarray",
-            "brainspan_rnaseq",
-            "brainatlas_microarray",
-            "biogrid",
-            "string",
-            // "gene_symbol", - duplicate
-            "refseq_accession",
-            // "clingendis.disease_id", // todo - handle
-            // "transcriptid.ensembl_trs", // todo - handle
-            "gnomad"
-        ]
-    } = props;
-
-    if (!schemas) {
-        return (
-            <div className="text-secondary d-flex align-items-center justify-content-center h-100 pb-12 text-larger pb-08">
-                <i className="icon icon-spin icon-circle-notch fas" />
-            </div>
-        );
-    }
-
-    const externalDatabaseSchemaFields = externalDatabaseFieldnames.map(function(fieldName){
-        const propertySchema = schemaTransforms.getSchemaProperty(fieldName, schemas, itemType); // We get .items from this if array field. Might change in future.
-        return [ fieldName, propertySchema ];
-    }).filter(function(f){
-        // Filter out fields which don't exist in schema yet.
-        // Or for which we can't form links for.
-        return !!(
-            f[1] &&
-            (f[1].link || (f[1].items && f[1].items.link))
-        );
-    });
-
-    const externalDatabaseElems = externalDatabaseSchemaFields.map(function([ fieldName, fieldSchema ]){
-
-        const isArray = !!(fieldSchema.items && fieldSchema.type === "array");
-
-        const {
-            link: linkFormat = null,
-            title = null,
-            // description = null
-        } = fieldSchema;
-
-        let externalIDs = currentItem[fieldName];
-        if (typeof externalIDs === "undefined") {
-            externalIDs = [];
-        } else if (!Array.isArray(externalIDs)) {
-            externalIDs = [ externalIDs ];
-        }
-
-        console.log('TTT', fieldSchema, isArray, externalIDs);
-
-        const extIDsLen = externalIDs.length;
-
-
-        // if (!externalID) {
-        //     return null;
-        // }
-
-        let val;
-
-        if (extIDsLen === 0) {
-            val = <em data-tip="Not Available" className="px-1"> - </em>;
-        } else if (extIDsLen < 5) {
-            // Newline for each
-            val = externalIDs.map(function(externalID){
-                const linkToID = linkFormat.replace("<ID>", externalID);
-                return (
-                    <a href={linkToID || null} className="d-block" target="_blank" rel="noopener noreferrer" id={"external_resource_for_" + fieldName} key={externalID}>
-                        <span>{ externalID }</span>
-                        <i className="ml-05 icon icon-fw icon-external-link-alt fas text-smaller text-secondary" />
-                    </a>
-                );
-            });
-        } else {
-            // Same line, comma, count instd of titles for subsequents.
-            val = externalIDs.map(function(externalID, index){
-                const linkToID = linkFormat.replace("<ID>", externalID);
-                const title = index === 0 ? externalID : `(${index + 1})`;
-                return (
-                    <React.Fragment key={externalID}>
-                        <a href={linkToID || null} target="_blank" rel="noopener noreferrer" id={"external_resource_for_" + fieldName}
-                            data-tip={index === 0 ? null : externalID}>
-                            { title }
-                        </a>
-                        { index === extIDsLen - 1 ?
-                            <i className="ml-05 icon icon-fw icon-external-link-alt fas text-smaller text-secondary" />
-                            : " " }
-                    </React.Fragment>
-                );
-            });
-        }
-
-        return (
-            <div className="row mb-03" key={fieldName}>
-                <div className="col-12 col-xl">
-                    <label className="mb-0 black-label" htmlFor={"external_resource_for_" + fieldName}>{ title || fieldName }</label>
-                </div>
-                <div className="col-12 col-xl-auto">
-                    { val }
-                </div>
-            </div>
-        );
-    }).filter(function(elem){ return !!elem; });
-
-    const externalDatabaseElemsLen = externalDatabaseElems.length;
-    if (externalDatabaseElemsLen === 0) {
-        return <h4 className="text-center font-italic text-400 my-0 pb-08">No External Databases</h4>;
-    } else if (externalDatabaseElemsLen >= 4) {
-        const mp = Math.ceil(externalDatabaseElemsLen / 2);
-        const col1 = externalDatabaseElems.slice(0, mp);
-        const col2 = externalDatabaseElems.slice(mp);
-        return (
-            <div className="row">
-                <div className="col-12 col-xl-6">
-                    { col1 }
-                </div>
-                <div className="col-12 col-xl-6">
-                    { col2 }
-                </div>
-            </div>
-        );
-    } else {
-        return externalDatabaseElems;
-    }
-
-});
 
 function ConstraintScoresSection({ currentGeneItem, getTipForField }){
     const {
