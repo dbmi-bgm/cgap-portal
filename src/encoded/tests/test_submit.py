@@ -7,12 +7,10 @@ from .. import submit
 from ..submit import (
     compare_fields,
     digest_xls,
-    init_families,
-    extract_family_metadata,
-    extract_file_metadata,
-    extract_individual_metadata,
-    extract_sample_metadata,
-    get_analysis_types,
+    MetadataItem,
+    SubmissionRow,
+    SubmissionMetadata,
+    SpreadsheetProcessing,
     map_fields,
     parse_exception,
     row_generator,
@@ -141,129 +139,129 @@ def test_map_fields(sample_info):
     assert not result.get('sequencing_lab')
 
 
-def test_init_families(example_rows):
-    fams = init_families(example_rows)
-    assert sorted(list(fams.keys())) == ['1111', '2222', '3333']
-    assert fams['1111'] == 'family-456'
-    assert fams['2222'] == 'family-456'
-    assert fams['3333'] == 'family-555'
-
-
-def test_get_analysis_types(example_rows):
-    a_types = get_analysis_types(example_rows)
-    assert a_types['1111'] == 'WGS-Trio'
-    assert a_types['2222'] == 'WGS'
-    assert a_types['3333'] == 'WES-Group'
-    example_rows[1]['workup type'] = 'WES'
-    new_a_types = get_analysis_types(example_rows)
-    assert new_a_types['1111'] is None
-
-
-def test_extract_individual_metadata_new(row_dict, empty_items):
-    items_out = extract_individual_metadata(1, row_dict, empty_items, 'test-proj:indiv1', 'hms-dbmi')
-    assert items_out['individual']['test-proj:indiv1']['aliases'] == ['test-proj:indiv1']
-    assert items_out['individual']['test-proj:indiv1']['individual_id'] == '456'
-
-
-def test_extract_individual_metadata_old(row_dict, empty_items):
-    items = empty_items.copy()
-    items['individual'] = {'test-proj:indiv1': {
-        'individual_id': '456',
-        'age': 46,
-        'aliases': ['test-proj:indiv1']
-    }}
-    items_out = extract_individual_metadata(1, row_dict, items, 'test-proj:indiv1', 'hms-dbmi')
-    assert len(items['individual']) == len(items_out['individual'])
-    assert 'sex' in items_out['individual']['test-proj:indiv1']
-    assert 'age' in items_out['individual']['test-proj:indiv1']
-
-
-def test_extract_individual_metadata_nums(row_dict, empty_items):
-    items2 = deepcopy(empty_items)
-    row_dict['age'] = '33'
-    row_dict['birth year'] = '1988'
-    items_out_nums = extract_individual_metadata(1, row_dict, empty_items, 'test-proj:indiv1', 'hms-dbmi')
-    assert not items_out_nums['errors']
-    assert isinstance(items_out_nums['individual']['test-proj:indiv1']['age'], int)
-    assert isinstance(items_out_nums['individual']['test-proj:indiv1']['birth_year'], int)
-    # text values for age and birth year should be passed on without errors to eventually fail validation
-    row_dict['age'] = 'abc'
-    row_dict['birth year'] = 'def'
-    items_out_text = extract_individual_metadata(1, row_dict, items2, 'test-proj:indiv1', 'hms-dbmi')
-    assert not items_out_text['errors']
-    assert isinstance(items_out_text['individual']['test-proj:indiv1']['age'], str)
-    assert isinstance(items_out_text['individual']['test-proj:indiv1']['birth_year'], str)
-
-
-def test_extract_family_metadata_new(row_dict, empty_items):
-    items_out = extract_family_metadata(1, row_dict, empty_items, 'test-proj:indiv1', 'test-proj:fam1')
-    assert items_out['family']['test-proj:fam1']['members'] == ['test-proj:indiv1']
-    assert items_out['family']['test-proj:fam1']['proband'] == 'test-proj:indiv1'
-
-
-def test_extract_family_metadata_old(row_dict, empty_items):
-    items = empty_items.copy()
-    items['family'] = {'test-proj:fam1': {
-        'aliases': ['test-proj:fam1'],
-        'family_id': '333',
-        'members': ['test-proj:indiv2'],
-        'mother': 'test-proj:indiv2'
-    }}
-    items_out = extract_family_metadata(1, row_dict, items, 'test-proj:indiv1', 'test-proj:fam1')
-    assert items_out['family']['test-proj:fam1']['members'] == ['test-proj:indiv2', 'test-proj:indiv1']
-    assert items_out['family']['test-proj:fam1']['proband'] == 'test-proj:indiv1'
-    assert items_out['family']['test-proj:fam1']['mother'] == 'test-proj:indiv2'
-
-
-def test_extract_family_metadata_invalid_relation(row_dict, empty_items):
-    row_dict['relation to proband'] = 'grandmother'
-    items_out = extract_family_metadata(1, row_dict, empty_items, 'test-proj:indiv1', 'test-proj:fam1')
-    assert 'Row 1 - Invalid relation' in items_out['errors'][0]
-
-
-def test_extract_sample_metadata_sp(row_dict, empty_items):
-    items = empty_items.copy()
-    items['individual'] = {'test-proj:indiv1': {}}
-    row_dict['req accepted y/n'] = 'Yes'
-    row_dict['specimen accepted by ref lab'] = "n"
-    items_out = extract_sample_metadata(
-        1, row_dict, items, 'test-proj:indiv1', 'test-proj:samp1',
-        'test-proj:sp1', 'test-proj:fam1', 'test-proj', {}, {}
-    )
-    print(items_out['sample']['test-proj:samp1'])
-    assert items_out['sample']['test-proj:samp1']['specimen_accession'] == row_dict['specimen id']
-    assert items_out['sample']['test-proj:samp1']['specimen_accepted'] == 'No'
-    assert items_out['sample']['test-proj:samp1']['requisition_acceptance']['accepted_rejected'] == 'Accepted'
-    assert items_out['sample_processing']['test-proj:sp1']['samples'] == ['test-proj:samp1']
-    assert items_out['individual']['test-proj:indiv1']['samples'] == ['test-proj:samp1']
-
-
-def test_extract_file_metadata_valid():
-    results = extract_file_metadata(1, ['f1.fastq.gz', 'f2.cram', 'f3.vcf.gz'], 'test-proj')
-    assert 'test-proj:f1.fastq.gz' in results['file_fastq']
-    assert results['file_fastq']['test-proj:f1.fastq.gz']['file_format'] == '/file-formats/fastq/'
-    assert results['file_fastq']['test-proj:f1.fastq.gz']['file_type'] == 'reads'
-    assert 'test-proj:f2.cram' in results['file_processed']
-    assert 'test-proj:f3.vcf.gz' in results['file_processed']
-    assert not results['errors']
-
-
-def test_extract_file_metadata_uncompressed():
-    results = extract_file_metadata(1, ['f1.fastq', 'f2.cram', 'f3.vcf'], 'test-proj')
-    assert not results['file_fastq']
-    assert 'test-proj:f2.cram' in results['file_processed']
-    assert 'test-proj:f3.vcf' not in results['file_processed']
-    assert len(results['errors']) == 2
-    assert all('File must be compressed' in error for error in results['errors'])
-
-
-def test_extract_file_metadata_invalid():
-    results = extract_file_metadata(1, ['f3.gvcf.gz'], 'test-proj')
-    assert all(not results[key] for key in ['file_fastq', 'file_processed'])
-    assert results['errors'] == [
-        'File extension on f3.gvcf.gz not supported - '
-        'expecting one of: .fastq.gz, .fq.gz, .cram, .vcf.gz'
-    ]
+# def test_init_families(example_rows):
+#     fams = init_families(example_rows)
+#     assert sorted(list(fams.keys())) == ['1111', '2222', '3333']
+#     assert fams['1111'] == 'family-456'
+#     assert fams['2222'] == 'family-456'
+#     assert fams['3333'] == 'family-555'
+#
+#
+# def test_get_analysis_types(example_rows):
+#     a_types = get_analysis_types(example_rows)
+#     assert a_types['1111'] == 'WGS-Trio'
+#     assert a_types['2222'] == 'WGS'
+#     assert a_types['3333'] == 'WES-Group'
+#     example_rows[1]['workup type'] = 'WES'
+#     new_a_types = get_analysis_types(example_rows)
+#     assert new_a_types['1111'] is None
+#
+#
+# def test_extract_individual_metadata_new(row_dict, empty_items):
+#     items_out = extract_individual_metadata(1, row_dict, empty_items, 'test-proj:indiv1', 'hms-dbmi')
+#     assert items_out['individual']['test-proj:indiv1']['aliases'] == ['test-proj:indiv1']
+#     assert items_out['individual']['test-proj:indiv1']['individual_id'] == '456'
+#
+#
+# def test_extract_individual_metadata_old(row_dict, empty_items):
+#     items = empty_items.copy()
+#     items['individual'] = {'test-proj:indiv1': {
+#         'individual_id': '456',
+#         'age': 46,
+#         'aliases': ['test-proj:indiv1']
+#     }}
+#     items_out = extract_individual_metadata(1, row_dict, items, 'test-proj:indiv1', 'hms-dbmi')
+#     assert len(items['individual']) == len(items_out['individual'])
+#     assert 'sex' in items_out['individual']['test-proj:indiv1']
+#     assert 'age' in items_out['individual']['test-proj:indiv1']
+#
+#
+# def test_extract_individual_metadata_nums(row_dict, empty_items):
+#     items2 = deepcopy(empty_items)
+#     row_dict['age'] = '33'
+#     row_dict['birth year'] = '1988'
+#     items_out_nums = extract_individual_metadata(1, row_dict, empty_items, 'test-proj:indiv1', 'hms-dbmi')
+#     assert not items_out_nums['errors']
+#     assert isinstance(items_out_nums['individual']['test-proj:indiv1']['age'], int)
+#     assert isinstance(items_out_nums['individual']['test-proj:indiv1']['birth_year'], int)
+#     # text values for age and birth year should be passed on without errors to eventually fail validation
+#     row_dict['age'] = 'abc'
+#     row_dict['birth year'] = 'def'
+#     items_out_text = extract_individual_metadata(1, row_dict, items2, 'test-proj:indiv1', 'hms-dbmi')
+#     assert not items_out_text['errors']
+#     assert isinstance(items_out_text['individual']['test-proj:indiv1']['age'], str)
+#     assert isinstance(items_out_text['individual']['test-proj:indiv1']['birth_year'], str)
+#
+#
+# def test_extract_family_metadata_new(row_dict, empty_items):
+#     items_out = extract_family_metadata(1, row_dict, empty_items, 'test-proj:indiv1', 'test-proj:fam1')
+#     assert items_out['family']['test-proj:fam1']['members'] == ['test-proj:indiv1']
+#     assert items_out['family']['test-proj:fam1']['proband'] == 'test-proj:indiv1'
+#
+#
+# def test_extract_family_metadata_old(row_dict, empty_items):
+#     items = empty_items.copy()
+#     items['family'] = {'test-proj:fam1': {
+#         'aliases': ['test-proj:fam1'],
+#         'family_id': '333',
+#         'members': ['test-proj:indiv2'],
+#         'mother': 'test-proj:indiv2'
+#     }}
+#     items_out = extract_family_metadata(1, row_dict, items, 'test-proj:indiv1', 'test-proj:fam1')
+#     assert items_out['family']['test-proj:fam1']['members'] == ['test-proj:indiv2', 'test-proj:indiv1']
+#     assert items_out['family']['test-proj:fam1']['proband'] == 'test-proj:indiv1'
+#     assert items_out['family']['test-proj:fam1']['mother'] == 'test-proj:indiv2'
+#
+#
+# def test_extract_family_metadata_invalid_relation(row_dict, empty_items):
+#     row_dict['relation to proband'] = 'grandmother'
+#     items_out = extract_family_metadata(1, row_dict, empty_items, 'test-proj:indiv1', 'test-proj:fam1')
+#     assert 'Row 1 - Invalid relation' in items_out['errors'][0]
+#
+#
+# def test_extract_sample_metadata_sp(row_dict, empty_items):
+#     items = empty_items.copy()
+#     items['individual'] = {'test-proj:indiv1': {}}
+#     row_dict['req accepted y/n'] = 'Yes'
+#     row_dict['specimen accepted by ref lab'] = "n"
+#     items_out = extract_sample_metadata(
+#         1, row_dict, items, 'test-proj:indiv1', 'test-proj:samp1',
+#         'test-proj:sp1', 'test-proj:fam1', 'test-proj', {}, {}
+#     )
+#     print(items_out['sample']['test-proj:samp1'])
+#     assert items_out['sample']['test-proj:samp1']['specimen_accession'] == row_dict['specimen id']
+#     assert items_out['sample']['test-proj:samp1']['specimen_accepted'] == 'No'
+#     assert items_out['sample']['test-proj:samp1']['requisition_acceptance']['accepted_rejected'] == 'Accepted'
+#     assert items_out['sample_processing']['test-proj:sp1']['samples'] == ['test-proj:samp1']
+#     assert items_out['individual']['test-proj:indiv1']['samples'] == ['test-proj:samp1']
+#
+#
+# def test_extract_file_metadata_valid():
+#     results = extract_file_metadata(1, ['f1.fastq.gz', 'f2.cram', 'f3.vcf.gz'], 'test-proj')
+#     assert 'test-proj:f1.fastq.gz' in results['file_fastq']
+#     assert results['file_fastq']['test-proj:f1.fastq.gz']['file_format'] == '/file-formats/fastq/'
+#     assert results['file_fastq']['test-proj:f1.fastq.gz']['file_type'] == 'reads'
+#     assert 'test-proj:f2.cram' in results['file_processed']
+#     assert 'test-proj:f3.vcf.gz' in results['file_processed']
+#     assert not results['errors']
+#
+#
+# def test_extract_file_metadata_uncompressed():
+#     results = extract_file_metadata(1, ['f1.fastq', 'f2.cram', 'f3.vcf'], 'test-proj')
+#     assert not results['file_fastq']
+#     assert 'test-proj:f2.cram' in results['file_processed']
+#     assert 'test-proj:f3.vcf' not in results['file_processed']
+#     assert len(results['errors']) == 2
+#     assert all('File must be compressed' in error for error in results['errors'])
+#
+#
+# def test_extract_file_metadata_invalid():
+#     results = extract_file_metadata(1, ['f3.gvcf.gz'], 'test-proj')
+#     assert all(not results[key] for key in ['file_fastq', 'file_processed'])
+#     assert results['errors'] == [
+#         'File extension on f3.gvcf.gz not supported - '
+#         'expecting one of: .fastq.gz, .fq.gz, .cram, .vcf.gz'
+#     ]
 
 
 def test_xls_to_json(project, institution):
