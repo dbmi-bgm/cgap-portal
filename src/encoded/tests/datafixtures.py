@@ -112,7 +112,8 @@ def disorder(testapp):
         "uuid": "231111bc-8535-4448-903e-854af460b254",
         "disorder_name": "Dummy Disorder",
         "disorder_id": "DD1",
-        "comment": "This comment is to test oranges"
+        "comment": "This comment is to test oranges",
+        "status": "in review"
     }
     res = testapp.post_json('/disorder', item)
     return testapp.get(res.location).json

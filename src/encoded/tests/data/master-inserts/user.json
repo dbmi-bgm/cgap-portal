@@ -153,10 +153,8 @@
         "email": "alexander_veit@hms.harvard.edu",
         "first_name": "Alexander",
         "last_name": "Veit",
-        "role": "developer",
         "uuid": "45ac3b0a-6640-4ccc-8ba7-e4cc7c778c15",
         "groups": ["admin"],
-        "submits_for": ["hms-dbmi"],
         "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
         "project_roles": [{"project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
                            "role": "developer"}]
@@ -195,21 +193,13 @@
         "email": "shira.rockowitz@childrens.harvard.edu",
         "first_name": "Shira",
         "last_name": "Rockowitz",
-        "uuid": "f9524d43-01b5-4b71-94c6-32d2d09c4433",
-        "groups": ["admin"],
-        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
-        "project_roles": [{"project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
-                           "role": "developer"}]
+        "uuid": "f9524d43-01b5-4b71-94c6-32d2d09c4433"
     },
     {
         "email": "guilherme_yamamoto@hms.harvard.edu",
         "first_name": "Guilherme",
         "last_name": "Yamamoto",
-        "uuid": "f9524d43-01b5-4b71-94c6-32d2d09c5633",
-        "groups": ["admin"],
-        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
-        "project_roles": [{"project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
-                           "role": "developer"}]
+        "uuid": "f9524d43-01b5-4b71-94c6-32d2d09c5633"
     },
     {
         "email": "sarah_reiff@hms.harvard.edu",

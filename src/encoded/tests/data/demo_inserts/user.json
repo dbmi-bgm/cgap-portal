@@ -72,7 +72,7 @@
         "email": "burak_alver@hms.harvard.edu"
     },
     {
-        "role": "scientist",
+        "job_title": "scientist",
         "first_name": "Alexander",
         "status": "current",
         "project_roles": [
@@ -95,9 +95,6 @@
         ],
         "last_name": "Veit",
         "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
-        "submits_for": [
-            "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989"
-        ],
         "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "uuid": "45ac3b0a-6640-4ccc-8ba7-e4cc7c778c15",
         "date_created": "2020-07-15T02:26:30.280626+00:00",
@@ -105,7 +102,7 @@
         "email": "alexander_veit@hms.harvard.edu"
     },
     {
-        "role": "scientist",
+        "job_title": "scientist",
         "first_name": "Soo",
         "status": "current",
         "project_roles": [

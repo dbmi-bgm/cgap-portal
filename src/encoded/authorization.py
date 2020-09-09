@@ -1,4 +1,5 @@
 from snovault import COLLECTIONS
+from pyramid.security import Authenticated
 
 
 def groupfinder(login, request):
@@ -9,6 +10,11 @@ def groupfinder(login, request):
 
     collections = request.registry[COLLECTIONS]
 
+    """ At least part of this stanza seems mainly for testing purposes
+        should the testing bits be refactored elsewhere???
+        20-09-08 changed permission model requires import of Authenticated
+        is that kosher
+    """
     if namespace == 'remoteuser':
         if localname in ['EMBED', 'INDEXER']:
             return []
@@ -17,7 +23,7 @@ def groupfinder(login, request):
         elif localname in ['TEST_SUBMITTER']:
             return ['group.submitter']
         elif localname in ['TEST_AUTHENTICATED']:
-            return ['viewing_group.ENCODE']
+            return [Authenticated]
 
     if namespace in ('mailto', 'remoteuser', 'auth0'):
         users = collections.by_item_type['user']

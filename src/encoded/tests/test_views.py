@@ -258,13 +258,11 @@ def test_user_effective_principals(submitter, institution, anontestapp, execute_
         res = anontestapp.get('/@@testing-user',
                               extra_environ={'REMOTE_USER': str(email)})
     assert sorted(res.json['effective_principals']) == [
-    'group.submitter',
-    'institution.%s' % institution['uuid'],
-    'remoteuser.encode_submitter@example.org',
-    'submits_for.%s' % institution['uuid'],
-    'system.Authenticated',
-    'system.Everyone',
-    'userid.%s' % submitter['uuid']]
+        'group.project_member',
+        'remoteuser.encode_submitter@example.org',
+        'system.Authenticated',
+        'system.Everyone',
+        'userid.%s' % submitter['uuid']]
 
 
 def test_jsonld_context(testapp):

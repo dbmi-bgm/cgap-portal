@@ -14,10 +14,11 @@ pytestmark = [pytest.mark.indexing, pytest.mark.working]
 def help_page_section_json():
     return {
         "title": "",
-        "name" : "help.user-guide.rest-api.rest_api_submission",
+        "name": "help.user-guide.rest-api.rest_api_submission",
         "file": "/docs/source/rest_api_submission.rst",
-        "uuid" : "442c8aa0-dc6c-43d7-814a-854af460c020"
+        "uuid": "442c8aa0-dc6c-43d7-814a-854af460c020"
     }
+
 
 @pytest.fixture(scope='module')
 def help_page_json():
@@ -33,6 +34,7 @@ def help_page_json():
         }
     }
 
+
 @pytest.fixture(scope='module')
 def help_page_json_draft():
     return {
@@ -45,8 +47,9 @@ def help_page_json_draft():
             "header-depth": 4,
             "list-styles": ["decimal", "lower-alpha", "lower-roman"]
         },
-        "status" : "draft"
+        "status": "draft"
     }
+
 
 @pytest.fixture(scope='module')
 def help_page_json_deleted():
@@ -60,7 +63,7 @@ def help_page_json_deleted():
             "header-depth": 4,
             "list-styles": ["decimal", "lower-alpha", "lower-roman"]
         },
-        "status" : "deleted"
+        "status": "deleted"
     }
 
 
@@ -87,12 +90,12 @@ def help_page(testapp, posted_help_page_section, help_page_json):
 
 
 @pytest.fixture(scope='module')
-def help_page_deleted(testapp, posted_help_page_section, help_page_json_draft):
+def help_page_deleted(testapp, posted_help_page_section, help_page_json_deleted):
     try:
-        res = testapp.post_json('/pages/', help_page_json_draft, status=201)
+        res = testapp.post_json('/pages/', help_page_json_deleted, status=201)
         val = res.json['@graph'][0]
     except webtest.AppError:
-        res = testapp.get('/' + help_page_json_draft['uuid'], status=301).follow()
+        res = testapp.get('/' + help_page_json_deleted['uuid'], status=301).follow()
         val = res.json
     return val
 
