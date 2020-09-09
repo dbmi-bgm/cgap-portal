@@ -51,6 +51,10 @@ ABBREVS = {
 }
 
 
+RELATIONS = ['proband', 'mother', 'father', 'sibling', 'brother', 'sister']
+
+REQUIRED_COLUMNS = ['individual id', 'relation to proband', 'report required', 'analysis id', 'specimen id']
+
 POST_ORDER = [
     'file_fastq', 'file_processed', 'sample', 'individual',
     'family', 'sample_processing', 'report', 'case'
@@ -98,7 +102,7 @@ def submit_metadata_bundle(*, s3_client, bucket, key, project, institution, vapp
                    'Please submit a file of the proper type.')
             results['validation_output'].append(msg)
             return results
-        json_data, json_success = xls_to_json(rows, project=project_json, institution=institution_json)
+        json_data, json_success = xls_to_json(rows, project=project_json.get('name'), institution=institution_json.get('name'))
         if not json_success:
             results['validation_output'] = json_data['errors']
             return results
@@ -176,106 +180,121 @@ def digest_csv(input_data, delim=','):
 
 class MetadataItem:
 
-    def __init__(self, metadata, idx):
+    def __init__(self, metadata, idx, itemtype):
         self.metadata = metadata
         self.row = idx
         self.alias = self.metadata.get('aliases', [''])[0]
+        self.itemtype = itemtype
+        self.metadata['row'] = self.row
 
 
 class SubmissionRow:
 
-    def __init__(self, row, idx, project, institution):
+    def __init__(self, row, idx, family_alias, project, institution):
         self.project = project
         self.institution = institution
         self.metadata = row
         self.row = idx
-        self.indiv_alias = '{}:individual-{}'.format(project, row['individual id'])
-        self.fam_alias = ''
-        self.sample_alias = '{}:sample-{}'.format(project, row['specimen id'])
-        self.analysis_alias = '{}:sample-{}'.format(project, row['specimen id'])
-        self.individual = {}
-        self.family = {}
-        self.sample = {}
-        self.analysis = {}
-        self.files_fastq = []
-        self.files_processed = []
-        self.report = {}
         self.errors = []
-        self.report_required = False
+        self.check_missing_values()
+        if not self.errors:
+            self.indiv_alias = '{}:individual-{}'.format(project, row['individual id'])
+            self.fam_alias = family_alias
+            self.sample_alias = '{}:sample-{}'.format(project, row['specimen id'])
+            self.analysis_alias = '{}:analysis-{}'.format(project, row['analysis id'])
+            self.case_name = row.get('unique analysis id')
+            self.individual = {}
+            self.family = {}
+            self.sample = {}
+            self.analysis = {}
+            self.files_fastq = []
+            self.files_processed = []
+            self.report = {}
+            self.report_required = False
+            self.extract_individual_metadata()
+            self.extract_family_metadata()
+            self.extract_sample_metadata()
+            self.extract_file_metadata()
 
-    def extract_individual_metadata(self, idx, row, indiv_alias):
+    def check_missing_values(self):
+        missing_required = [col for col in REQUIRED_COLUMNS if col not in self.metadata
+                            or not self.metadata[col]]
+        if missing_required:
+            self.errors.append(
+                'Row {} - missing required field(s) {}. This row cannot be processed.'
+                ''.format(self.row, ', '.join(missing_required))
+            )
+
+    def extract_individual_metadata(self):
         """
         Extracts 'individual' item metadata from each row
         """
-        # new_items = items.copy()
-        info = {'aliases': [indiv_alias]}
-        info = map_fields(row, info, ['individual_id', 'sex', 'age', 'birth_year'], 'individual')
-        other_id_col = get_column_name(row, ['other id', 'other individual id'])
-        if row.get(other_id_col):  # for 'other_id' sub-embedded object
-            other_id = {'id': row[other_id_col], 'id_source': inst_name}
-            if row.get('other individual id type'):
-                other_id['id_source'] = row['other individual id source']
+        info = {'aliases': [self.indiv_alias]}
+        info = map_fields(self.metadata, info, ['individual_id', 'sex', 'age', 'birth_year'], 'individual')
+        other_id_col = get_column_name(self.metadata, ['other id', 'other individual id'])
+        if self.metadata.get(other_id_col):  # for 'other_id' sub-embedded object
+            other_id = {'id': self.metadata[other_id_col], 'id_source': self.institution}
+            if self.metadata.get('other individual id type'):
+                other_id['id_source'] = self.metadata['other individual id source']
             else:
                 for id_source in ID_SOURCES:
-                    if row[other_id_col].upper().startswith(id_source):
+                    if self.metadata[other_id_col].upper().startswith(id_source):
                         other_id['id_source'] = id_source
             info['institutional_id'] = other_id
         for col in ['age', 'birth_year']:
             if info.get(col) and isinstance(info[col], str) and info[col].isnumeric():
                 info[col] = int(info[col])
-        self.individual = info
+        self.individual = MetadataItem(info, self.row, 'individual')
 
-    def extract_family_metadata(self, idx, row):
+    def extract_family_metadata(self):
         """
         Extracts 'family' item metadata from each row
         """
-        fam_alias = self.project['name'] + ':' + self.family_dict[row.get('analysis id')]
         info = {
-            'aliases': [fam_alias],
-            'family_id': row.get('family id'),
-            'members': [indiv_alias],
-            'row': idx
+            'aliases': [self.fam_alias],
+            'family_id': self.metadata.get('family id'),
+            'members': [self.indiv_alias],
+            # 'row': self.row
         }
         if not info['family_id']:
             info['family_id'] = fam_alias[fam_alias.index(':') + 1:]
         valid_relations = ['proband', 'mother', 'father', 'brother', 'sister', 'sibling']
         relation_found = False
         for relation in valid_relations:
-            if row.get('relation to proband', '').lower().startswith(relation):
-                if relation not in new_items['family'][fam_alias]:
-                    new_items['family'][fam_alias][relation] = indiv_alias
+            if self.metadata.get('relation to proband', '').lower().startswith(relation):
                 relation_found = True
+                info[relation] = self.indiv_alias
                 break
         if not relation_found:
             msg = 'Row {} - Invalid relation "{}" for individual {} - Relation should be one of: {}'.format(
-                idx, row.get('relation to proband'), row.get('individual id'), ', '.join(valid_relations)
+                self.row, self.metadata.get('relation to proband'), self.metadata.get('individual id'),
+                ', '.join(valid_relations)
             )
             self.errors.append(msg)
+        self.family = MetadataItem(info, self.row, 'family')
 
-    # def extract_sample_metadata(idx, row, items, indiv_alias, samp_alias, analysis_alias,
-    #                           fam_alias, proj_name, analysis_type_dict, case_name_dict):
-    def extract_sample_metadata(self, row):
+    def extract_sample_metadata(self):
         """
         Extracts 'sample' item metadata from each row
         """
-        info = {'aliases': [samp_alias], 'files': []}
+        info = {'aliases': [self.sample_alias], 'files': []}
         fields = [
             'workup_type', 'specimen_type', 'dna_concentration', 'date_transported', 'indication',
             'specimen_notes', 'research_protocol_name', 'sent_by', 'physician_id'
         ]
-        info = map_fields(row, info, fields, 'sample')
+        info = map_fields(self.metadata, info, fields, 'sample')
         # handle enum values
         if info.get('specimen_accepted', '').lower() == 'y':
             info['specimen_accepted'] = 'Yes'
         elif info.get('specimen_accepted', '').lower() == 'n':
             info['specimen_accepted'] = 'No'
         # SEO
-        if row.get('second specimen id'):
-            other_id = {'id': row['second specimen id'], 'id_type': proj_name}  # add proj info?
-            if row.get('second specimen id type'):
-                other_id['id_type'] = row['second specimen id type']
+        if self.metadata.get('second specimen id'):
+            other_id = {'id': self.metadata['second specimen id'], 'id_type': self.project}  # add proj info?
+            if self.metadata.get('second specimen id type'):
+                other_id['id_type'] = self.metadata['second specimen id type']
             info['other_specimen_ids'] = [other_id]
-        req_info = map_fields(row, {}, ['date sent', 'date completed'], 'requisition')
+        req_info = map_fields(self.metadata, {}, ['date sent', 'date completed'], 'requisition')
         # handle requisition enum
         if req_info.get('accepted_rejected', '').lower() in ['y', 'n']:
             if req_info['accepted_rejected'].lower() == 'y':
@@ -284,33 +303,19 @@ class SubmissionRow:
                 req_info['accepted_rejected'] = "Rejected"
         # remove keys if no value
         info['requisition_acceptance'] = {k: v for k, v in req_info.items() if v}
-        self.sample = {k: v for k, v in info.items() if v}
+        self.sample = MetadataItem({k: v for k, v in info.items() if v}, self.row, 'sample')
         if self.individual:
-            self.individual['samples'] = [samp_alias]
+            self.individual.metadata['samples'] = [self.sample_alias]
         new_sp_item = {
             'aliases': [self.analysis_alias],
-            'samples': [],
+            'samples': [self.sample_alias],
             'families': [self.fam_alias]
         }
-        # if row.get('analysis id') in analysis_type_dict:
-        #     new_sp_item['analysis_type'] = analysis_type_dict[row.get('analysis id')]
-        #     if not analysis_type_dict[row.get('analysis id')]:
-        #         msg = ('Row {} - Samples with analysis ID {} contain mis-matched or invalid workup type values. '
-        #                'Sample cannot be processed.'.format(idx, row.get('analysis id')))
-        #         new_items['errors'].append(msg)
-        #     case_col = get_column_name(row, ['unique analysis id', 'optional case id (unique in all rows)'])
-        #     if row.get(case_col):
-        #         case_name_dict['{}-{}'.format(row.get('analysis id'), row.get('specimen id'))] = row[case_col]
-        # new_items['sample_processing'].setdefault(analysis_alias, new_sp_item)
-        # new_items['sample_processing'][analysis_alias]['samples'].append(samp_alias)
-        self.analysis = new_sp_item
-        if row.get('report required').lower().startswith('y'):
+        self.analysis = MetadataItem(new_sp_item, self.row, 'sample_processing')
+        if self.metadata.get('report required').lower().startswith('y'):
             self.report_required = True
-        # if fam_alias not in new_items['sample_processing'][analysis_alias]['families']:
-        #     new_items['sample_processing'][analysis_alias]['families'].append(fam_alias)
 
-    # def extract_file_metadata(idx, filenames, proj_name):
-    def extract_file_metadata(self, idx, row):
+    def extract_file_metadata(self):
         """
         Extracts 'file' item metadata from each row
         """
@@ -321,7 +326,9 @@ class SubmissionRow:
             '.vcf.gz': ('vcf_gz', 'raw VCF')
         }
         files = {'file_fastq': {}, 'file_processed': {}, 'errors': []}
-        for filename in filenames:
+        filenames = [f.strip() for f in self.metadata.get('files', '').split(',') if f.strip()]
+        paired = True if len(filenames) % 2 == 0 else False
+        for i, filename in enumerate(filenames):
             extension = [ext for ext in valid_extensions if filename.endswith(ext)]
             if not extension:
                 if [ext for ext in ['.fastq', '.fq', '.vcf'] if filename.endswith(ext)]:
@@ -334,39 +341,66 @@ class SubmissionRow:
             fmt = valid_extensions[extension[0]][0]
             file_info = {
                 'aliases': [file_alias],
-                'row': idx,
+                # 'row': self.row,
                 'file_format': '/file-formats/{}/'.format(fmt),
                 'file_type': valid_extensions[extension[0]][1],
                 'filename': filename.strip()
             }
             if fmt == 'fastq':
-                self.files_fastq.append(file_info)
+                if paired:
+                    paired_end = str(int(2-((i+1)%2)))
+                    file_info['paired end'] = paired_end
+                    if paired_end == '2':
+                        file_info['related_files'] = [
+                            {'relationship_type': 'paired with',
+                             'file': self.files_fastq[-1].alias}
+                        ]
+                self.files_fastq.append(MetadataItem(file_info, self.row, 'file_fastq'))
             else:
-                self.files_processed.append(file_info)
+                self.files_processed.append(MetadataItem(file_info, self.row, 'file_processed'))
 
 
 class SubmissionMetadata:
 
-    def __init__(self, rows, project, institution):
-        self.project = project
-        self.institution = institution
+    def __init__(self, rows, project, institution, counter=1):
         self.rows = rows
-        self.proband_rows = row for row in rows if row.get('relation to proband').lower() == 'proband']
+        self.project = project.get('name')
+        self.project_atid = project.get('@id')
+        self.institution = institution.get('name')
+        self.institution_atid = institution.get('@id')
+        self.counter = counter
+        self.proband_rows = [row for row in rows if row.get('relation to proband').lower() == 'proband']
         self.family_dict = {
-            row.get('analysis id'): 'family-{}'.format(row.get('individual id')) for row in self.proband_rows
+            row.get('analysis id'): '{}:family-{}'.format(
+                self.project, row.get('individual id')
+            ) for row in self.proband_rows
         }
         self.metadata = []
         self.individuals = {}
         self.families = {}
         self.samples = {}
         self.sample_processings = {}
-        self.report = {}
-        self.case = {}
-        self.reports_req = {}
+        self.reports = {}
+        self.cases = {}
+        self.files_fastq = {}
+        self.files_processed = {}
+        self.reports_req = []
         self.errors = []
         self.analysis_types = {}
         self.case_names = {}
         self.json_out = {}
+        self.itemtype_dict = {
+            'individual': self.individuals,
+            'family': self.families,
+            'sample': self.samples,
+            'sample_processing': self.sample_processings,
+            'file_fastq': self.files_fastq,
+            'file_processed': self.files_processed,
+            'case': self.cases,
+            'report': self.reports
+        }
+        self.process_rows()
+        self.create_json_out()
 
     def get_analysis_types(self):
         """
@@ -395,429 +429,573 @@ class SubmissionMetadata:
         self.analysis_types = analysis_types
 
     #def extract_individual_metadata(idx, row, items, indiv_alias, inst_name):
-    def add_individual_metadata(self, indiv_item):
+    def add_metadata_single_item(self, item):
         """
         Extracts 'individual' item metadata from each row
         """
-        prev_individuals = [indiv.alias for indiv in self.individuals]
-        if indiv_item.indiv_alias not in prev_individuals:
-            self.individuals[indiv_alias] = indiv_item.metadata
+        previous = self.itemtype_dict[item.itemtype]
+        prev = [p for p in previous.keys()]
+        if item.alias not in prev:
+            previous[item.alias] = item.metadata
         else:
-            for key in indiv_item:
-                if key not in self.individuals[indiv_alias].metadata:
-                    self.individuals[indiv_alias].metadata = indiv_item[key]
+            for key in item.metadata:
+                if key not in previous[item.alias]:
+                    previous[item.alias][key] = item.metadata[key]
 
     #def extract_family_metadata(idx, row, items, indiv_alias, fam_alias):
-    def add_family_metadata(self, idx, row):
+    def add_family_metadata(self, idx, family, individual):
         """
         Extracts 'family' item metadata from each row
         """
-        #new_items = items.copy()
-        fam_alias = self.project['name'] + ':' + self.family_dict[row.get('analysis id')]
-        info = {
-            'aliases': [fam_alias],
-            'family_id': row.get('family id'),
-            'members': [indiv_alias],
-            'row': idx
-        }
-        if not info['family_id']:
-            info['family_id'] = fam_alias[fam_alias.index(':') + 1:]
-        if fam_alias not in new_items['family']:
-            new_items['family'][fam_alias] = info
-        # if indiv_alias not in new_items['family'][fam_alias]['members']:
-        #     new_items['family'][fam_alias]['members'].append(indiv_alias)
-        # valid_relations = ['proband', 'mother', 'father', 'brother', 'sister', 'sibling']
-        # relation_found = False
-        # for relation in valid_relations:
-        #     if row.get('relation to proband', '').lower().startswith(relation):
-        #         if relation not in new_items['family'][fam_alias]:
-        #             new_items['family'][fam_alias][relation] = indiv_alias
-        #         relation_found = True
-        #         break
-        # if not relation_found:
-        #     msg = 'Row {} - Invalid relation "{}" for individual {} - Relation should be one of: {}'.format(
-        #         idx, row.get('relation to proband'), row.get('individual id'), ', '.join(valid_relations)
-        #     )
-        #     new_items['errors'].append(msg)
-        return new_items
+        if family.alias in self.families:
+            # consolidate members
+            for member in family.metadata.get('members', []):
+                if member not in self.families[family.alias]['members']:
+                    self.families[family.alias]['members'].append(member)
+            # deal with relations
+            for relation in RELATIONS:
+                if family.metadata.get(relation):
+                    if relation in self.families[family.alias]:
+                        if self.families[family.alias][relation] != individual.alias:
+                            msg = ('Row {} - Multiple values for relation "{}" in family {}'
+                                   ' found in spreadsheet'.format(idx, relation, family.metadata['family_id']))
+
+                    else:
+                        self.families[family.alias][relation] = family.metadata[relation]
+        else:
+            self.families[family.alias] = family.metadata
+
+    def add_sample_processing(self, sp_item, analysis_id):
+        # also add analysis types
+        sp_item.metadata['analysis_type'] = self.analysis_types.get(analysis_id)
+        if analysis_id in self.analysis_types:
+            sp_item.metadata['analysis_type'] = self.analysis_types.get(analysis_id)
+            if not self.analysis_types[analysis_id]:
+                msg = ('Row {} - Samples with analysis ID {} contain mis-matched or invalid workup type values. '
+                       'Sample cannot be processed.'.format(sp_item.row, analysis_id))
+                self.errors.append(msg)
+        if sp_item.alias in self.sample_processings:
+            for field in ['samples', 'families']:
+                if sp_item.metadata[field][0] not in self.sample_processings[sp_item.alias][field]:
+                    self.sample_processings[sp_item.alias][field].extend(sp_item.metadata[field])
+        else:
+            self.sample_processings[sp_item.alias] = sp_item.metadata
+
+    def create_case_metadata(self):
+        for k, v in self.sample_processings.items():
+            analysis_id = k[k.index('analysis-')+9:]
+            for sample in v['samples']:
+                case_id = '{}-{}'.format(analysis_id, self.samples[sample].get('specimen_accession', ''))
+                name = False
+                if case_id in self.case_names:
+                    name = True
+                    case_id = self.case_names[case_id]
+                case_alias = '{}:case-{}'.format(self.project, case_id)
+                try:
+                    indiv = [ikey for ikey, ival in self.individuals.items() if sample in ival.get('samples', [])][0]
+                except IndexError:
+                    indiv = ''
+                case_info = {'aliases': [case_alias],'sample_processing': k,'individual': indiv}
+                for fam in v.get('families', []):
+                    if fam in self.families and indiv in self.families[fam]['members']:
+                        case_info['family'] = fam
+                        break
+                if name:
+                    case_info['case_id'] = case_id
+                if sample in self.reports_req:
+                    report_alias = case_alias.replace('case', 'report')
+                    report_info = {'aliases': [report_alias]}
+                    if indiv:
+                        report_info['description'] = ('Analysis Report for Individual ID {}'
+                                                      ' (Analysis {})'.format(self.individuals[indiv]['individual_id'], analysis_id)
+                                                        )
+                    else:
+                        report_info['description'] = 'Analysis Report for Case ID {}'.format(case_id)
+                    case_info['report'] = report_alias
+                    self.reports[report_alias] = report_info
+                self.cases[case_alias] = case_info
+
+    def add_case_info(self, row_item):
+        if all(field in row_item.metadata for field in ['analysis id', 'unique analysis id', 'specimen id']):
+            key = '{}-{}'.format(row['analysis id'], row['specimen id'])
+            self.case_names[key] = (row_item.metadata['unique analysis id'], row_item.family_alias)
+
+    def add_individual_relations(self):
+        for family in self.families.values():
+            for parent in ['mother', 'father']:
+                if family.get(parent):
+                    self.individuals[family['proband']][parent] = family[parent]
+                    for sibling in ['sibling', 'brother', 'sister']:
+                        if family.get(sibling):
+                            self.individuals[family[sibling]][parent] = family[parent]
+                    del family[parent]
 
     def process_rows(self):
+        self.get_analysis_types()
         for i, row in enumerate(self.rows):
-            processed_row = SubmissionRow(row, i, self.project, self.institution)
-            self.add_individual_metadata(processed_row)
-            self.add_family_metadata(processed_row)
+            try:
+                fam = self.family_dict[row.get('analysis id')]
+            except KeyError:
+                self.errors.append('Row {} - Family/Analysis does not include a proband.'
+                                   ' Row cannot be processed.'.format(i))
+                continue
+            try:
+                processed_row = SubmissionRow(row, i + self.counter, fam, self.project, self.institution)
+                simple_add_items = [processed_row.individual, processed_row.sample]
+                simple_add_items.extend(processed_row.files_fastq)
+                simple_add_items.extend(processed_row.files_processed)
+                for item in simple_add_items:
+                    self.add_metadata_single_item(item)
+                self.add_family_metadata(processed_row.row, processed_row.family, processed_row.individual)
+                self.add_sample_processing(processed_row.analysis, processed_row.metadata.get('analysis id'))
+                if processed_row.report_required:
+                    self.reports_req.append(processed_row.sample_alias)
+                self.add_case_info(processed_row)
+                self.errors.extend(processed_row.errors)
+            except AttributeError:
+                self.errors.extend(processed_row.errors)
+                continue
+        self.add_individual_relations()
+        self.create_case_metadata()
 
+    def create_json_out(self):
+        for key in self.itemtype_dict:
+            for metadata in self.itemtype_dict[key].values():
+                metadata['project'] = self.project_atid
+                metadata['institution'] = self.institution_atid
+            self.json_out[key] = self.itemtype_dict[key]
+
+
+class SpreadsheetProcessing:
+
+    def __init__(self, row, project, institution):
+        self.input = row
+        self.project = project
+        self.institution = institution
+        self.output = {}
+        self.errors = []
+        self.keys = []
+        self.header = False
+        self.counter = 0
+        self.rows = []
+        self.passing = False
+        self.get_header()
+        if self.header:
+            self.create_row_dict()
+        if self.rows:
+            self.extract_metadata()
+
+    def get_header(self):
+        while self.input:
+            try:
+                keys = next(self.input)
+                self.keys = [key.lower().strip().rstrip('*: ') for key in keys]
+                self.counter += 1
+                if 'individual id' in self.keys:
+                    self.header = True
+                    break
+            except StopIteration:
+                break
+        if not self.header:
+            msg = 'Column headers not detected in spreadsheet! "Individual ID*" column must be present in header.'
+            self.errors.append(msg)
+
+    def create_row_dict(self):
+        missing = [col for col in REQUIRED_COLUMNS if col not in self.keys]
+        if missing:
+            msg = 'Column(s) "{}" not found in spreadsheet! Spreadsheet cannot be processed.'.format('", "'.join(missing))
+            self.errors.append(msg)
+        else:
+            for values in self.input:
+                r = [val for val in values]
+                if 'y/n' in ''.join(r).lower() or ''.join(r) == '':  # skip comments/description/blank row if present
+                    self.counter += 1
+                    continue
+                row_dict = {self.keys[i]: item for i, item in enumerate(r)}
+                self.rows.append(row_dict)
+
+    def extract_metadata(self):
+        result = SubmissionMetadata(self.rows, self.project, self.institution, self.counter)
+        self.output = result.json_out
+        self.errors.extend(result.errors)
+        self.passing = True
 
 
 def xls_to_json(row, project, institution):
-    """
-    Converts excel file (or csv/tsv table) to json for submission.
-
-    Args:
-        row - generator yielding rows of spreadsheet
-        project - dict (json) of project metadata submitter is submitting for
-        institution - dict (json) of institution metadata that submitter is submitting for
-
-    Output:
-        1. items - dictionary of db items the submitter wants to submit, of the format
-           {itemtype1: [{alias1: {metadata}, {alias2: {metadata}], itemtype2: [...], ...}
-           Also has an extra key 'errors' whose value is a list of errors found during processing,
-           to be combined with validation errors later in submission processing.
-        2. boolean indicating whether submission can move to next phase or not. False will be
-            returned if there are major errors in spreadsheet preventing rows from being
-            processed properly.
-
-    Basically, this function parses the column headers of the spreadsheet, turns each row into
-    a dictionary of {column header: cell value} pairs, then gathers the metadata it can find for each
-    db item type in each row. Minor spreadsheet errors are added to the output dictionary.
-    """
-    header = False
-    counter = 0
-    # debuglog("top_header:", top_header)  # Temporary instrumentation for debugging to go away soon. -kmp 25-Jul-2020
-    while True:
-        try:
-            keys = next(row)
-            keys = [key.lower().strip().rstrip('*: ') for key in keys]
-            counter += 1
-            if 'individual id' in keys:
-                header = True
-                break
-        except StopIteration:
-            break
-    if not header:
-        msg = 'Column headers not detected in spreadsheet! "Individual ID*" column must be present in header.'
-        return {'errors': [msg]}, False
-    # debuglog("keys:", keys)  # Temporary instrumentation for debugging to go away soon. -kmp 25-Jul-2020
-    rows = []
-    required = ['individual id', 'relation to proband', 'report required', 'analysis id', 'specimen id']
-    missing = [col for col in required if col not in keys]
-    if missing:
-        msg = 'Column(s) "{}" not found in spreadsheet! Spreadsheet cannot be processed.'.format('", "'.join(missing))
-        return {'errors': [msg]}, False
-
-    for values in row:
-        r = [val for val in values]
-        if 'y/n' in ''.join(r).lower() or ''.join(r) == '':  # skip comments/description/blank row if present
-            counter += 1
-            continue
-        row_dict = {keys[i]: item for i, item in enumerate(r)}
-        rows.append(row_dict)
-
-    items = {
-        'individual': {}, 'family': {}, 'sample': {}, 'sample_processing': {},
-        'file_fastq': {}, 'file_processed': {}, 'case': {}, 'report': {},
-        'reports': [], 'errors': []
-    }
-    file_errors = []
-    family_dict = init_families(rows)
-    a_types = get_analysis_types(rows)
-    case_names = {}
-    for i, row in enumerate(rows):
-        debuglog("row:", repr(row))  # Temporary instrumentation for debugging to go away soon. -kmp 25-Jul-2020
-        row_num = i + counter + 1
-        missing_required = [col for col in required if col not in row or not row[col]]
-        if missing_required:
-            items['errors'].append(
-                'Row {} - missing required field(s) {}. This row cannot be processed.'
-                ''.format(row_num, ', '.join(missing_required))
-            )
-        indiv_alias = '{}:individual-{}'.format(project['name'], row['individual id'])
-        if not family_dict.get(row['analysis id']):
-            msg = ('Row {} - Proband for this analysis could not be found. '
-                   'This row cannot be processed.'.format(i))
-            items['errors'].append(msg)
-            continue
-        fam_alias = '{}:{}'.format(project['name'], family_dict[row['analysis id']])
-        # create items for Individual
-        items = extract_individual_metadata(row_num, row, items, indiv_alias, institution['name'])
-        # create/edit items for Family
-        items = extract_family_metadata(row_num, row, items, indiv_alias, fam_alias)
-        # create item for Sample if there is a specimen
-        if row.get('specimen id'):
-            samp_alias = '{}:sample-{}'.format(project['name'], row['specimen id'])
-            if row.get('run no.'):
-                samp_alias = samp_alias + '-' + row['run no.']
-            analysis_alias = '{}:analysis-{}'.format(project['name'], row['analysis id'])
-            items = extract_sample_metadata(row_num, row, items, indiv_alias, samp_alias, analysis_alias,
-                                          fam_alias, project['name'], a_types, case_names)
-            if row.get('files'):
-                file_items = extract_file_metadata(row_num, row['files'].split(','), project['name'])
-                file_errors.extend(file_items['errors'])
-                items['file_fastq'].update(file_items['file_fastq'])
-                items['file_processed'].update(file_items['file_processed'])
-    items = add_relations(items)
-    items = create_case_item_metadata(items, project['name'], case_names)
-    # removed unused fields, add project and institution
-    for val1 in items.values():
-        if isinstance(val1, dict):
-            for val2 in val1.values():
-                remove_keys = [k for k, v in val2.items() if not v]
-                for key in remove_keys:
-                    del val2[key]
-                val2['project'] = project['@id']
-                val2['institution'] = institution['@id']
-    items['errors'].extend(file_errors)
-    items['errors'] = list(set(items['errors']))
-    return items, True  # most errors passed to next step in order to combine with validation errors
+    result = SpreadsheetProcessing(row, project, institution)
+    result.output['errors'] = result.errors
+    return result.output, result.passing
 
 
-def init_families(rows):
-    """
-    Initializes metadata dicts for 'family' items. Requires multiple rows so must be done separately from
-    row-by-row parsing.
-    """
-    proband_rows = [row for row in rows if row.get('relation to proband').lower() == 'proband']
-    fams = {row.get('analysis id'): 'family-{}'.format(row.get('individual id')) for row in proband_rows}
-    return fams
-
-
-def get_analysis_types(rows):
-    """
-    'analysis_type' is a property of sample_processing items, denoting the workup type (WGS, WES, etc)
-    as well as describing the grouping (Trio, Quad, etc). This info needs to be extracted from the spreadsheet
-    separately from most of the metadata since it depends info extracted from more than one row.
-    """
-    analysis_relations = {}
-    analysis_types = {}
-    for row in rows:
-        analysis_relations.setdefault(row.get('analysis id'), [[], []])
-        analysis_relations[row.get('analysis id')][0].append(row.get('relation to proband', '').lower())
-        workup_col = get_column_name(row, ['test requested', 'workup type'])
-        analysis_relations[row.get('analysis id')][1].append(row.get(workup_col, '').upper())
-    for k, v in analysis_relations.items():
-        workup = list(set(v[1]))
-        if len(workup) == 1 and '' not in workup:
-            if len(v[0]) == 1:
-                analysis_types[k] = v[1][0]
-            elif sorted(v[0]) == ['father', 'mother', 'proband']:
-                analysis_types[k] = v[1][0] + '-Trio'
-            else:
-                analysis_types[k] = v[1][0] + '-Group'
-        else:
-            analysis_types[k] = None
-    return analysis_types
-
-
-def extract_individual_metadata(idx, row, items, indiv_alias, inst_name):
-    """
-    Extracts 'individual' item metadata from each row
-    """
-    new_items = items.copy()
-    info = {'aliases': [indiv_alias]}
-    info = map_fields(row, info, ['individual_id', 'sex', 'age', 'birth_year'], 'individual')
-    other_id_col = get_column_name(row, ['other id', 'other individual id'])
-    if row.get(other_id_col):
-        other_id = {'id': row[other_id_col], 'id_source': inst_name}
-        if row.get('other individual id type'):
-            other_id['id_source'] = row['other individual id source']
-        else:
-            for id_source in ID_SOURCES:
-                if row[other_id_col].upper().startswith(id_source):
-                    other_id['id_source'] = id_source
-        info['institutional_id'] = other_id
-    for col in ['age', 'birth_year']:
-        if info.get(col) and isinstance(info[col], str) and info[col].isnumeric():
-            info[col] = int(info[col])
-    if indiv_alias not in new_items['individual']:
-        new_items['individual'][indiv_alias] = {k: v for k, v in info.items() if v}
-        new_items['individual'][indiv_alias]['row'] = idx
-    else:
-        for key in info:
-            if key not in new_items['individual'][indiv_alias]:
-                new_items['individual'][indiv_alias][key] = info[key]
-    return new_items
-
-
-def extract_family_metadata(idx, row, items, indiv_alias, fam_alias):
-    """
-    Extracts 'family' item metadata from each row
-    """
-    new_items = items.copy()
-    info = {
-        'aliases': [fam_alias],
-        'family_id': row.get('family id'),
-        'members': [indiv_alias],
-        'row': idx
-    }
-    if not info['family_id']:
-        info['family_id'] = fam_alias[fam_alias.index(':') + 1:]
-    if fam_alias not in new_items['family']:
-        new_items['family'][fam_alias] = info
-    if indiv_alias not in new_items['family'][fam_alias]['members']:
-        new_items['family'][fam_alias]['members'].append(indiv_alias)
-    valid_relations = ['proband', 'mother', 'father', 'brother', 'sister', 'sibling']
-    relation_found = False
-    for relation in valid_relations:
-        if row.get('relation to proband', '').lower().startswith(relation):
-            if relation not in new_items['family'][fam_alias]:
-                new_items['family'][fam_alias][relation] = indiv_alias
-            relation_found = True
-            break
-    if not relation_found:
-        msg = 'Row {} - Invalid relation "{}" for individual {} - Relation should be one of: {}'.format(
-            idx, row.get('relation to proband'), row.get('individual id'), ', '.join(valid_relations)
-        )
-        new_items['errors'].append(msg)
-    return new_items
-
-
-def extract_sample_metadata(idx, row, items, indiv_alias, samp_alias, analysis_alias,
-                          fam_alias, proj_name, analysis_type_dict, case_name_dict):
-    """
-    Extracts 'sample' item metadata from each row
-    """
-    new_items = items.copy()
-    info = {'aliases': [samp_alias], 'files': []}  # TODO: implement creation of file db items
-    fields = [
-        'workup_type', 'specimen_type', 'dna_concentration', 'date_transported', 'indication',
-        'specimen_notes', 'research_protocol_name', 'sent_by', 'physician_id'
-    ]
-    info = map_fields(row, info, fields, 'sample')
-    info['row'] = idx
-    if info.get('specimen_accepted', '').lower() == 'y':
-        info['specimen_accepted'] = 'Yes'
-    elif info.get('specimen_accepted', '').lower() == 'n':
-        info['specimen_accepted'] = 'No'
-    if row.get('second specimen id'):
-        other_id = {'id': row['second specimen id'], 'id_type': proj_name}  # add proj info?
-        if row.get('second specimen id type'):
-            other_id['id_type'] = row['second specimen id type']
-        info['other_specimen_ids'] = [other_id]
-    req_info = map_fields(row, {}, ['date sent', 'date completed'], 'requisition')
-    if req_info.get('accepted_rejected', '').lower() in ['y', 'n']:
-        if req_info['accepted_rejected'].lower() == 'y':
-            req_info['accepted_rejected'] = 'Accepted'
-        else:
-            req_info['accepted_rejected'] = "Rejected"
-    info['requisition_acceptance'] = {k: v for k, v in req_info.items() if v}
-    new_items['sample'][samp_alias] = {k: v for k, v in info.items() if v}
-    if indiv_alias in new_items['individual']:
-        new_items['individual'][indiv_alias]['samples'] = [samp_alias]
-    new_sp_item = {
-        'aliases': [analysis_alias],
-        'samples': [],
-        'families': []
-    }
-    if row.get('analysis id') in analysis_type_dict:
-        new_sp_item['analysis_type'] = analysis_type_dict[row.get('analysis id')]
-        if not analysis_type_dict[row.get('analysis id')]:
-            msg = ('Row {} - Samples with analysis ID {} contain mis-matched or invalid workup type values. '
-                   'Sample cannot be processed.'.format(idx, row.get('analysis id')))
-            new_items['errors'].append(msg)
-        case_col = get_column_name(row, ['unique analysis id', 'optional case id (unique in all rows)'])
-        if row.get(case_col):
-            case_name_dict['{}-{}'.format(row.get('analysis id'), row.get('specimen id'))] = row[case_col]
-    new_items['sample_processing'].setdefault(analysis_alias, new_sp_item)
-    new_items['sample_processing'][analysis_alias]['samples'].append(samp_alias)
-    if row.get('report required').lower().startswith('y'):
-        new_items['reports'].append(samp_alias)
-    if fam_alias not in new_items['sample_processing'][analysis_alias]['families']:
-        new_items['sample_processing'][analysis_alias]['families'].append(fam_alias)
-    return new_items
-
-
-def extract_file_metadata(idx, filenames, proj_name):
-    """
-    Extracts 'file' item metadata from each row
-    """
-    valid_extensions = {
-        '.fastq.gz': ('fastq', 'reads'),
-        '.fq.gz': ('fastq', 'reads'),
-        '.cram': ('cram', 'alignments'),
-        '.vcf.gz': ('vcf_gz', 'raw VCF')
-    }
-    files = {'file_fastq': {}, 'file_processed': {}, 'errors': []}
-    for filename in filenames:
-        extension = [ext for ext in valid_extensions if filename.endswith(ext)]
-        if not extension:
-            if [ext for ext in ['.fastq', '.fq', '.vcf'] if filename.endswith(ext)]:
-                files['errors'].append('File must be compressed - please gzip file {}'.format(filename))
-            else:
-                files['errors'].append('File extension on {} not supported - expecting one of: '
-                              '.fastq.gz, .fq.gz, .cram, .vcf.gz'.format(filename))
-            continue
-        file_alias = '{}:{}'.format(proj_name, filename.strip().split('/')[-1])
-        fmt = valid_extensions[extension[0]][0]
-        file_info = {
-            'aliases': [file_alias],
-            'row': idx,
-            'file_format': '/file-formats/{}/'.format(fmt),
-            'file_type': valid_extensions[extension[0]][1],
-            'filename': filename.strip()
-        }
-        if fmt == 'fastq':
-            files['file_fastq'][file_alias] = file_info
-        else:
-            files['file_processed'][file_alias] = file_info
-    return files
-
-
-def create_case_item_metadata(items, proj_name, case_name_dict):
-    """
-    Creation of case metadata, which can only be done after all rows are processed
-    so that sample_processing metadata exists.
-    """
-    new_items = items.copy()
-    for k, v in items['sample_processing'].items():
-        analysis_id = k[k.index('analysis-')+9:]
-        for sample in v['samples']:
-            case_id = '{}-{}'.format(analysis_id, items['sample'][sample]['specimen_accession'])
-            name = False
-            if case_id in case_name_dict:
-                name = True
-                case_id = case_name_dict[case_id]
-            case_alias = '{}:case-{}'.format(proj_name, case_id)
-            try:
-                indiv = [ikey for ikey, ival in items['individual'].items() if sample in ival.get('samples', [])][0]
-            except IndexError:
-                indiv = ''
-            case_info = {
-                'aliases': [case_alias],
-                'sample_processing': k,
-                'individual': indiv
-            }
-            if name:
-                case_info['case_id'] = case_id
-            if sample in items['reports']:
-                report_alias = case_alias.replace('case', 'report')
-                new_items['report'][report_alias] = {'aliases': [report_alias]}
-                report_info = {'aliases': [report_alias]}
-                if indiv:
-                    report_info['description'] = 'Analysis Report for Individual ID {} (Analysis {})'.format(
-                        items['individual'][indiv]['individual_id'], analysis_id
-                    )
-                else:
-                    report_info['description'] = 'Analysis Report for Case ID {}'.format(case_id)
-                case_info['report'] = report_alias
-            new_items['case'][case_alias] = case_info
-    del new_items['reports']
-    return new_items
-
-
-def add_relations(items):
-    """
-    This function adds relations info to 'individual' metadata for proband.
-    This is done separately from row by row processing because information needed from spreadsheet
-    is on multiple rows.
-    """
-    new_items = items.copy()
-    for alias, fam in items['family'].items():
-        parents = False
-        for relation in ['mother', 'father']:
-            if fam.get(relation):
-                if fam.get('proband'):
-                    new_items['individual'][fam['proband']][relation] = fam[relation]
-                    parents = True
-                del new_items['family'][alias][relation]
-        for relation in ['brother', 'sister', 'sibling']:
-            if fam.get(relation):
-                if parents:
-                    for parent in ['mother', 'father']:
-                        if new_items['individual'][fam['proband']].get(parent):
-                            new_items['individual'][fam[relation]][parent] = new_items['individual'][fam['proband']][parent]
-                del new_items['family'][alias][relation]
-    return new_items
-
+# def xls_to_json(row, project, institution):
+#     """
+#     Converts excel file (or csv/tsv table) to json for submission.
+#
+#     Args:
+#         row - generator yielding rows of spreadsheet
+#         project - dict (json) of project metadata submitter is submitting for
+#         institution - dict (json) of institution metadata that submitter is submitting for
+#
+#     Output:
+#         1. items - dictionary of db items the submitter wants to submit, of the format
+#            {itemtype1: [{alias1: {metadata}, {alias2: {metadata}], itemtype2: [...], ...}
+#            Also has an extra key 'errors' whose value is a list of errors found during processing,
+#            to be combined with validation errors later in submission processing.
+#         2. boolean indicating whether submission can move to next phase or not. False will be
+#             returned if there are major errors in spreadsheet preventing rows from being
+#             processed properly.
+#
+#     Basically, this function parses the column headers of the spreadsheet, turns each row into
+#     a dictionary of {column header: cell value} pairs, then gathers the metadata it can find for each
+#     db item type in each row. Minor spreadsheet errors are added to the output dictionary.
+#     """
+#     header = False
+#     counter = 0
+#     # debuglog("top_header:", top_header)  # Temporary instrumentation for debugging to go away soon. -kmp 25-Jul-2020
+#     while True:
+#         try:
+#             keys = next(row)
+#             keys = [key.lower().strip().rstrip('*: ') for key in keys]
+#             counter += 1
+#             if 'individual id' in keys:
+#                 header = True
+#                 break
+#         except StopIteration:
+#             break
+#     if not header:
+#         msg = 'Column headers not detected in spreadsheet! "Individual ID*" column must be present in header.'
+#         return {'errors': [msg]}, False
+#     # debuglog("keys:", keys)  # Temporary instrumentation for debugging to go away soon. -kmp 25-Jul-2020
+#     rows = []
+#     required = ['individual id', 'relation to proband', 'report required', 'analysis id', 'specimen id']
+#     missing = [col for col in required if col not in keys]
+#     if missing:
+#         msg = 'Column(s) "{}" not found in spreadsheet! Spreadsheet cannot be processed.'.format('", "'.join(missing))
+#         return {'errors': [msg]}, False
+#
+#     for values in row:
+#         r = [val for val in values]
+#         if 'y/n' in ''.join(r).lower() or ''.join(r) == '':  # skip comments/description/blank row if present
+#             counter += 1
+#             continue
+#         row_dict = {keys[i]: item for i, item in enumerate(r)}
+#         rows.append(row_dict)
+#
+#     items = {
+#         'individual': {}, 'family': {}, 'sample': {}, 'sample_processing': {},
+#         'file_fastq': {}, 'file_processed': {}, 'case': {}, 'report': {},
+#         'reports': [], 'errors': []
+#     }
+#     file_errors = []
+#     family_dict = init_families(rows)
+#     a_types = get_analysis_types(rows)
+#     case_names = {}
+#     for i, row in enumerate(rows):
+#         debuglog("row:", repr(row))  # Temporary instrumentation for debugging to go away soon. -kmp 25-Jul-2020
+#         row_num = i + counter + 1
+#         missing_required = [col for col in required if col not in row or not row[col]]
+#         if missing_required:
+#             items['errors'].append(
+#                 'Row {} - missing required field(s) {}. This row cannot be processed.'
+#                 ''.format(row_num, ', '.join(missing_required))
+#             )
+#         indiv_alias = '{}:individual-{}'.format(project['name'], row['individual id'])
+#         if not family_dict.get(row['analysis id']):
+#             msg = ('Row {} - Proband for this analysis could not be found. '
+#                    'This row cannot be processed.'.format(i))
+#             items['errors'].append(msg)
+#             continue
+#         fam_alias = '{}:{}'.format(project['name'], family_dict[row['analysis id']])
+#         # create items for Individual
+#         items = extract_individual_metadata(row_num, row, items, indiv_alias, institution['name'])
+#         # create/edit items for Family
+#         items = extract_family_metadata(row_num, row, items, indiv_alias, fam_alias)
+#         # create item for Sample if there is a specimen
+#         if row.get('specimen id'):
+#             samp_alias = '{}:sample-{}'.format(project['name'], row['specimen id'])
+#             if row.get('run no.'):
+#                 samp_alias = samp_alias + '-' + row['run no.']
+#             analysis_alias = '{}:analysis-{}'.format(project['name'], row['analysis id'])
+#             items = extract_sample_metadata(row_num, row, items, indiv_alias, samp_alias, analysis_alias,
+#                                           fam_alias, project['name'], a_types, case_names)
+#             if row.get('files'):
+#                 file_items = extract_file_metadata(row_num, row['files'].split(','), project['name'])
+#                 file_errors.extend(file_items['errors'])
+#                 items['file_fastq'].update(file_items['file_fastq'])
+#                 items['file_processed'].update(file_items['file_processed'])
+#     items = add_relations(items)
+#     items = create_case_item_metadata(items, project['name'], case_names)
+#     # removed unused fields, add project and institution
+#     for val1 in items.values():
+#         if isinstance(val1, dict):
+#             for val2 in val1.values():
+#                 remove_keys = [k for k, v in val2.items() if not v]
+#                 for key in remove_keys:
+#                     del val2[key]
+#                 val2['project'] = project['@id']
+#                 val2['institution'] = institution['@id']
+#     items['errors'].extend(file_errors)
+#     items['errors'] = list(set(items['errors']))
+#     return items, True  # most errors passed to next step in order to combine with validation errors
+#
+#
+# def init_families(rows):
+#     """
+#     Initializes metadata dicts for 'family' items. Requires multiple rows so must be done separately from
+#     row-by-row parsing.
+#     """
+#     proband_rows = [row for row in rows if row.get('relation to proband').lower() == 'proband']
+#     fams = {row.get('analysis id'): 'family-{}'.format(row.get('individual id')) for row in proband_rows}
+#     return fams
+#
+#
+# def get_analysis_types(rows):
+#     """
+#     'analysis_type' is a property of sample_processing items, denoting the workup type (WGS, WES, etc)
+#     as well as describing the grouping (Trio, Quad, etc). This info needs to be extracted from the spreadsheet
+#     separately from most of the metadata since it depends info extracted from more than one row.
+#     """
+#     analysis_relations = {}
+#     analysis_types = {}
+#     for row in rows:
+#         analysis_relations.setdefault(row.get('analysis id'), [[], []])
+#         analysis_relations[row.get('analysis id')][0].append(row.get('relation to proband', '').lower())
+#         workup_col = get_column_name(row, ['test requested', 'workup type'])
+#         analysis_relations[row.get('analysis id')][1].append(row.get(workup_col, '').upper())
+#     for k, v in analysis_relations.items():
+#         workup = list(set(v[1]))
+#         if len(workup) == 1 and '' not in workup:
+#             if len(v[0]) == 1:
+#                 analysis_types[k] = v[1][0]
+#             elif sorted(v[0]) == ['father', 'mother', 'proband']:
+#                 analysis_types[k] = v[1][0] + '-Trio'
+#             else:
+#                 analysis_types[k] = v[1][0] + '-Group'
+#         else:
+#             analysis_types[k] = None
+#     return analysis_types
+#
+#
+# def extract_individual_metadata(idx, row, items, indiv_alias, inst_name):
+#     """
+#     Extracts 'individual' item metadata from each row
+#     """
+#     new_items = items.copy()
+#     info = {'aliases': [indiv_alias]}
+#     info = map_fields(row, info, ['individual_id', 'sex', 'age', 'birth_year'], 'individual')
+#     other_id_col = get_column_name(row, ['other id', 'other individual id'])
+#     if row.get(other_id_col):
+#         other_id = {'id': row[other_id_col], 'id_source': inst_name}
+#         if row.get('other individual id type'):
+#             other_id['id_source'] = row['other individual id source']
+#         else:
+#             for id_source in ID_SOURCES:
+#                 if row[other_id_col].upper().startswith(id_source):
+#                     other_id['id_source'] = id_source
+#         info['institutional_id'] = other_id
+#     for col in ['age', 'birth_year']:
+#         if info.get(col) and isinstance(info[col], str) and info[col].isnumeric():
+#             info[col] = int(info[col])
+#     if indiv_alias not in new_items['individual']:
+#         new_items['individual'][indiv_alias] = {k: v for k, v in info.items() if v}
+#         new_items['individual'][indiv_alias]['row'] = idx
+#     else:
+#         for key in info:
+#             if key not in new_items['individual'][indiv_alias]:
+#                 new_items['individual'][indiv_alias][key] = info[key]
+#     return new_items
+#
+#
+# def extract_family_metadata(idx, row, items, indiv_alias, fam_alias):
+#     """
+#     Extracts 'family' item metadata from each row
+#     """
+#     new_items = items.copy()
+#     info = {
+#         'aliases': [fam_alias],
+#         'family_id': row.get('family id'),
+#         'members': [indiv_alias],
+#         'row': idx
+#     }
+#     if not info['family_id']:
+#         info['family_id'] = fam_alias[fam_alias.index(':') + 1:]
+#     if fam_alias not in new_items['family']:
+#         new_items['family'][fam_alias] = info
+#     if indiv_alias not in new_items['family'][fam_alias]['members']:
+#         new_items['family'][fam_alias]['members'].append(indiv_alias)
+#     valid_relations = ['proband', 'mother', 'father', 'brother', 'sister', 'sibling']
+#     relation_found = False
+#     for relation in valid_relations:
+#         if row.get('relation to proband', '').lower().startswith(relation):
+#             if relation not in new_items['family'][fam_alias]:
+#                 new_items['family'][fam_alias][relation] = indiv_alias
+#             relation_found = True
+#             break
+#     if not relation_found:
+#         msg = 'Row {} - Invalid relation "{}" for individual {} - Relation should be one of: {}'.format(
+#             idx, row.get('relation to proband'), row.get('individual id'), ', '.join(valid_relations)
+#         )
+#         new_items['errors'].append(msg)
+#     return new_items
+#
+#
+# def extract_sample_metadata(idx, row, items, indiv_alias, samp_alias, analysis_alias,
+#                           fam_alias, proj_name, analysis_type_dict, case_name_dict):
+#     """
+#     Extracts 'sample' item metadata from each row
+#     """
+#     new_items = items.copy()
+#     info = {'aliases': [samp_alias], 'files': []}  # TODO: implement creation of file db items
+#     fields = [
+#         'workup_type', 'specimen_type', 'dna_concentration', 'date_transported', 'indication',
+#         'specimen_notes', 'research_protocol_name', 'sent_by', 'physician_id'
+#     ]
+#     info = map_fields(row, info, fields, 'sample')
+#     info['row'] = idx
+#     if info.get('specimen_accepted', '').lower() == 'y':
+#         info['specimen_accepted'] = 'Yes'
+#     elif info.get('specimen_accepted', '').lower() == 'n':
+#         info['specimen_accepted'] = 'No'
+#     if row.get('second specimen id'):
+#         other_id = {'id': row['second specimen id'], 'id_type': proj_name}  # add proj info?
+#         if row.get('second specimen id type'):
+#             other_id['id_type'] = row['second specimen id type']
+#         info['other_specimen_ids'] = [other_id]
+#     req_info = map_fields(row, {}, ['date sent', 'date completed'], 'requisition')
+#     if req_info.get('accepted_rejected', '').lower() in ['y', 'n']:
+#         if req_info['accepted_rejected'].lower() == 'y':
+#             req_info['accepted_rejected'] = 'Accepted'
+#         else:
+#             req_info['accepted_rejected'] = "Rejected"
+#     info['requisition_acceptance'] = {k: v for k, v in req_info.items() if v}
+#     new_items['sample'][samp_alias] = {k: v for k, v in info.items() if v}
+#     if indiv_alias in new_items['individual']:
+#         new_items['individual'][indiv_alias]['samples'] = [samp_alias]
+#     new_sp_item = {
+#         'aliases': [analysis_alias],
+#         'samples': [],
+#         'families': []
+#     }
+#     if row.get('analysis id') in analysis_type_dict:
+#         new_sp_item['analysis_type'] = analysis_type_dict[row.get('analysis id')]
+#         if not analysis_type_dict[row.get('analysis id')]:
+#             msg = ('Row {} - Samples with analysis ID {} contain mis-matched or invalid workup type values. '
+#                    'Sample cannot be processed.'.format(idx, row.get('analysis id')))
+#             new_items['errors'].append(msg)
+#         case_col = get_column_name(row, ['unique analysis id', 'optional case id (unique in all rows)'])
+#         if row.get(case_col):
+#             case_name_dict['{}-{}'.format(row.get('analysis id'), row.get('specimen id'))] = row[case_col]
+#     new_items['sample_processing'].setdefault(analysis_alias, new_sp_item)
+#     new_items['sample_processing'][analysis_alias]['samples'].append(samp_alias)
+#     if row.get('report required').lower().startswith('y'):
+#         new_items['reports'].append(samp_alias)
+#     if fam_alias not in new_items['sample_processing'][analysis_alias]['families']:
+#         new_items['sample_processing'][analysis_alias]['families'].append(fam_alias)
+#     return new_items
+#
+#
+# def extract_file_metadata(idx, filenames, proj_name):
+#     """
+#     Extracts 'file' item metadata from each row
+#     """
+#     valid_extensions = {
+#         '.fastq.gz': ('fastq', 'reads'),
+#         '.fq.gz': ('fastq', 'reads'),
+#         '.cram': ('cram', 'alignments'),
+#         '.vcf.gz': ('vcf_gz', 'raw VCF')
+#     }
+#     files = {'file_fastq': {}, 'file_processed': {}, 'errors': []}
+#     for filename in filenames:
+#         extension = [ext for ext in valid_extensions if filename.endswith(ext)]
+#         if not extension:
+#             if [ext for ext in ['.fastq', '.fq', '.vcf'] if filename.endswith(ext)]:
+#                 files['errors'].append('File must be compressed - please gzip file {}'.format(filename))
+#             else:
+#                 files['errors'].append('File extension on {} not supported - expecting one of: '
+#                               '.fastq.gz, .fq.gz, .cram, .vcf.gz'.format(filename))
+#             continue
+#         file_alias = '{}:{}'.format(proj_name, filename.strip().split('/')[-1])
+#         fmt = valid_extensions[extension[0]][0]
+#         file_info = {
+#             'aliases': [file_alias],
+#             'row': idx,
+#             'file_format': '/file-formats/{}/'.format(fmt),
+#             'file_type': valid_extensions[extension[0]][1],
+#             'filename': filename.strip()
+#         }
+#         if fmt == 'fastq':
+#             files['file_fastq'][file_alias] = file_info
+#         else:
+#             files['file_processed'][file_alias] = file_info
+#     return files
+#
+#
+# def create_case_item_metadata(items, proj_name, case_name_dict):
+#     """
+#     Creation of case metadata, which can only be done after all rows are processed
+#     so that sample_processing metadata exists.
+#     """
+#     new_items = items.copy()
+#     for k, v in items['sample_processing'].items():
+#         analysis_id = k[k.index('analysis-')+9:]
+#         for sample in v['samples']:
+#             case_id = '{}-{}'.format(analysis_id, items['sample'][sample]['specimen_accession'])
+#             name = False
+#             if case_id in case_name_dict:
+#                 name = True
+#                 case_id = case_name_dict[case_id]
+#             case_alias = '{}:case-{}'.format(proj_name, case_id)
+#             try:
+#                 indiv = [ikey for ikey, ival in items['individual'].items() if sample in ival.get('samples', [])][0]
+#             except IndexError:
+#                 indiv = ''
+#             case_info = {
+#                 'aliases': [case_alias],
+#                 'sample_processing': k,
+#                 'individual': indiv
+#             }
+#             if name:
+#                 case_info['case_id'] = case_id
+#             if sample in items['reports']:
+#                 report_alias = case_alias.replace('case', 'report')
+#                 new_items['report'][report_alias] = {'aliases': [report_alias]}
+#                 report_info = {'aliases': [report_alias]}
+#                 if indiv:
+#                     report_info['description'] = 'Analysis Report for Individual ID {} (Analysis {})'.format(
+#                         items['individual'][indiv]['individual_id'], analysis_id
+#                     )
+#                 else:
+#                     report_info['description'] = 'Analysis Report for Case ID {}'.format(case_id)
+#                 case_info['report'] = report_alias
+#             new_items['case'][case_alias] = case_info
+#     del new_items['reports']
+#     return new_items
+#
+#
+# def add_relations(items):
+#     """
+#     This function adds relations info to 'individual' metadata for proband.
+#     This is done separately from row by row processing because information needed from spreadsheet
+#     is on multiple rows.
+#     """
+#     new_items = items.copy()
+#     for alias, fam in items['family'].items():
+#         parents = False
+#         for relation in ['mother', 'father']:
+#             if fam.get(relation):
+#                 if fam.get('proband'):
+#                     new_items['individual'][fam['proband']][relation] = fam[relation]
+#                     parents = True
+#                 del new_items['family'][alias][relation]
+#         for relation in ['brother', 'sister', 'sibling']:
+#             if fam.get(relation):
+#                 if parents:
+#                     for parent in ['mother', 'father']:
+#                         if new_items['individual'][fam['proband']].get(parent):
+#                             new_items['individual'][fam[relation]][parent] = new_items['individual'][fam['proband']][parent]
+#                 del new_items['family'][alias][relation]
+#     return new_items
+#
 
 def compare_with_db(virtualapp, alias):
     try:  # check if already in db
