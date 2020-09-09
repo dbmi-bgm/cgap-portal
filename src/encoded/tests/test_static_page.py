@@ -14,8 +14,8 @@ pytestmark = [pytest.mark.indexing, pytest.mark.working]
 def help_page_section_json():
     return {
         "title": "",
-        "name": "help.user-guide.rest-api.rest_api_submission",
-        "file": "/docs/source/rest_api_submission.rst",
+        "name": "help.user-guide.rev-links.rev",
+        "file": "/src/encoded/tests/data/documents/test-static-section.rst",
         "uuid": "442c8aa0-dc6c-43d7-814a-854af460c020"
     }
 
@@ -23,8 +23,8 @@ def help_page_section_json():
 @pytest.fixture(scope='module')
 def help_page_json():
     return {
-        "name": "help/user-guide/rest-api",
-        "title": "The REST-API",
+        "name": "help/user-guide/rev-links",
+        "title": "Reverse Links",
         "content": ["442c8aa0-dc6c-43d7-814a-854af460c020"],
         "uuid": "a2aa8bb9-9dd9-4c80-bdb6-2349b7a3540d",
         "table-of-contents": {
@@ -36,10 +36,10 @@ def help_page_json():
 
 
 @pytest.fixture(scope='module')
-def help_page_json_draft():
+def help_page_json_in_review():
     return {
-        "name": "help/user-guide/rest-api-draft",
-        "title": "The REST-API",
+        "name": "help/user-guide/rev-links-in-review",
+        "title": "Reverse Links",
         "content": ["442c8aa0-dc6c-43d7-814a-854af460c020"],
         "uuid": "a2aa8bb9-9dd9-4c80-bdb6-2349b7a3540c",
         "table-of-contents": {
@@ -47,15 +47,15 @@ def help_page_json_draft():
             "header-depth": 4,
             "list-styles": ["decimal", "lower-alpha", "lower-roman"]
         },
-        "status": "draft"
+        "status": "in review"
     }
 
 
 @pytest.fixture(scope='module')
 def help_page_json_deleted():
     return {
-        "name": "help/user-guide/rest-api-deleted",
-        "title": "The REST-API",
+        "name": "help/user-guide/rev-links-deleted",
+        "title": "Reverse Links",
         "content": ["442c8aa0-dc6c-43d7-814a-854af460c020"],
         "uuid": "a2aa8bb9-9dd9-4c80-bdb6-2349b7a3540a",
         "table-of-contents": {
@@ -101,12 +101,12 @@ def help_page_deleted(testapp, posted_help_page_section, help_page_json_deleted)
 
 
 @pytest.fixture(scope='module')
-def help_page_restricted(testapp, posted_help_page_section, help_page_json_deleted):
+def help_page_in_review(testapp, posted_help_page_section, help_page_json_in_review):
     try:
-        res = testapp.post_json('/pages/', help_page_json_deleted, status=201)
+        res = testapp.post_json('/pages/', help_page_json_in_review, status=201)
         val = res.json['@graph'][0]
     except webtest.AppError:
-        res = testapp.get('/' + help_page_json_deleted['uuid'], status=301).follow()
+        res = testapp.get('/' + help_page_json_in_review['uuid'], status=301).follow()
         val = res.json
     return val
 
@@ -118,8 +118,8 @@ def test_get_help_page(testapp, help_page):
     assert res.json['@context'] == help_page_url
     assert 'HelpPage' in res.json['@type']
     assert 'StaticPage' in res.json['@type']
-    #assert res.json['content'] == help_page['content'] # No longer works latter is set to an @id of static_section
-    assert 'Accession and uuid are automatically assigned during initial posting' in res.json['content'][0]['content'] # Instead lets check what we have embedded on GET request is inside our doc file (rest_api_submission.md).
+    # check what we have embedded on GET request is inside our doc file (test-static-section.rst).
+    assert 'Reverse links\n============================\n\nReverse (rev) links are actually a pretty cool thing.' in res.json['content'][0]['content']
     assert res.json['toc'] == help_page['table-of-contents']
 
 
@@ -128,8 +128,8 @@ def test_get_help_page_deleted(anonhtmltestapp, help_page_deleted):
     anonhtmltestapp.get(help_page_url, status=403)
 
 
-def test_get_help_page_no_access(anonhtmltestapp, testapp, help_page_restricted):
-    help_page_url = "/" + help_page_restricted['name']
+def test_get_help_page_no_access(anonhtmltestapp, testapp, help_page_in_review):
+    help_page_url = "/" + help_page_in_review['name']
     anonhtmltestapp.get(help_page_url, status=403)
     testapp.get(help_page_url, status=200)
 
