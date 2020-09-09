@@ -179,6 +179,9 @@ def digest_csv(input_data, delim=','):
 
 
 class MetadataItem:
+    """
+    class for single DB-item-worth of json
+    """
 
     def __init__(self, metadata, idx, itemtype):
         self.metadata = metadata
@@ -189,6 +192,9 @@ class MetadataItem:
 
 
 class SubmissionRow:
+    """
+    class used to hold metadata parsed from one row of spreadsheet at a time
+    """
 
     def __init__(self, row, idx, family_alias, project, institution):
         self.project = project
@@ -217,6 +223,7 @@ class SubmissionRow:
             self.extract_file_metadata()
 
     def check_missing_values(self):
+        # makes sure no required values from spreadsheet are missing
         missing_required = [col for col in REQUIRED_COLUMNS if col not in self.metadata
                             or not self.metadata[col]]
         if missing_required:
@@ -306,6 +313,7 @@ class SubmissionRow:
         self.sample = MetadataItem({k: v for k, v in info.items() if v}, self.row, 'sample')
         if self.individual:
             self.individual.metadata['samples'] = [self.sample_alias]
+        # metadata for sample_processing item
         new_sp_item = {
             'aliases': [self.analysis_alias],
             'samples': [self.sample_alias],
@@ -346,6 +354,7 @@ class SubmissionRow:
                 'file_type': valid_extensions[extension[0]][1],
                 'filename': filename.strip()
             }
+            # file relationships if paired
             if fmt == 'fastq':
                 if paired:
                     paired_end = str(int(2-((i+1)%2)))
@@ -361,6 +370,14 @@ class SubmissionRow:
 
 
 class SubmissionMetadata:
+    """
+    class to hold info parsed from one spreadsheet.
+
+    One row is parsed at a time and a SubmissionRow object is generated; this is then
+    compared with previous rows already added to SubmissionMetadata object, and compared,
+    and changes made if necessary. This is because some objects (like family and sample_processing)
+    have metadata that occurs across multiple rows.
+    """
 
     def __init__(self, rows, project, institution, counter=1):
         self.rows = rows
@@ -431,7 +448,11 @@ class SubmissionMetadata:
     #def extract_individual_metadata(idx, row, items, indiv_alias, inst_name):
     def add_metadata_single_item(self, item):
         """
-        Extracts 'individual' item metadata from each row
+        Looks at metadata from a SubmissionRow object, one DB itemtype at a time
+        and compares and adds it. If each item is not
+        already represented in metadata for current SubmissionMetadata instance,
+        it is added; if it is represented, missing fields are added to item.
+        Currently used for Individual and Sample items
         """
         previous = self.itemtype_dict[item.itemtype]
         prev = [p for p in previous.keys()]
@@ -445,7 +466,8 @@ class SubmissionMetadata:
     #def extract_family_metadata(idx, row, items, indiv_alias, fam_alias):
     def add_family_metadata(self, idx, family, individual):
         """
-        Extracts 'family' item metadata from each row
+        Looks at 'family' metadata from SubmissionRow object. Adds family to SubmissionMetadata
+        instance if not already present. If present, family is compared and necessary changes added.
         """
         if family.alias in self.families:
             # consolidate members
@@ -466,7 +488,10 @@ class SubmissionMetadata:
             self.families[family.alias] = family.metadata
 
     def add_sample_processing(self, sp_item, analysis_id):
-        # also add analysis types
+        """
+        Looks at 'sample_processing' metadata from SubmissionRow object. Adds SP item to SubmissionMetadata
+        instance if not already present. If present, SP metadata is compared and necessary changes added.
+        """
         sp_item.metadata['analysis_type'] = self.analysis_types.get(analysis_id)
         if analysis_id in self.analysis_types:
             sp_item.metadata['analysis_type'] = self.analysis_types.get(analysis_id)
@@ -482,6 +507,10 @@ class SubmissionMetadata:
             self.sample_processings[sp_item.alias] = sp_item.metadata
 
     def create_case_metadata(self):
+        """
+        Cases can only be created after sample_processing items are done. Reports also
+        created here, if spreadsheet row indicates it is required.
+        """
         for k, v in self.sample_processings.items():
             analysis_id = k[k.index('analysis-')+9:]
             for sample in v['samples']:
@@ -516,11 +545,19 @@ class SubmissionMetadata:
                 self.cases[case_alias] = case_info
 
     def add_case_info(self, row_item):
+        """
+        Creates a dictionary linking analysis ID and specimen ID combination to the Case name
+        indicated in the spreadsheet.
+        """
         if all(field in row_item.metadata for field in ['analysis id', 'unique analysis id', 'specimen id']):
             key = '{}-{}'.format(row['analysis id'], row['specimen id'])
             self.case_names[key] = (row_item.metadata['unique analysis id'], row_item.family_alias)
 
     def add_individual_relations(self):
+        """
+        After family metadata has finished parsing/processing, mother and father fields are added to
+        proband and sibling if relevant metadata are present.
+        """
         for family in self.families.values():
             for parent in ['mother', 'father']:
                 if family.get(parent):
@@ -531,6 +568,10 @@ class SubmissionMetadata:
                     del family[parent]
 
     def process_rows(self):
+        """
+        Method for iterating over spreadsheet rows to process each one and compare it to previous rows.
+        Case creation and family relations added after all rows have been processed.
+        """
         self.get_analysis_types()
         for i, row in enumerate(self.rows):
             try:
@@ -559,6 +600,9 @@ class SubmissionMetadata:
         self.create_case_metadata()
 
     def create_json_out(self):
+        """
+        Creates final json that can be used for subsequent validation function.
+        """
         for key in self.itemtype_dict:
             for metadata in self.itemtype_dict[key].values():
                 metadata['project'] = self.project_atid
@@ -567,6 +611,11 @@ class SubmissionMetadata:
 
 
 class SpreadsheetProcessing:
+    """
+    class that holds relevant information for processing of a single spreadsheet.
+    After initial processing of header and rows, will create an instance of SpreadsheetMetadata
+    to hold all metadata extracted from spreadsheet.
+    """
 
     def __init__(self, row, project, institution):
         self.input = row
@@ -586,6 +635,10 @@ class SpreadsheetProcessing:
             self.extract_metadata()
 
     def get_header(self):
+        """
+        The header we are looking for may not always be the first row - some iterations of the
+        submission spreadsheet had super-headings to group columns into categories.
+        """
         while self.input:
             try:
                 keys = next(self.input)
