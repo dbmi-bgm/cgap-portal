@@ -392,74 +392,6 @@
                         "sub_embedding_group": "{\"key\": \"clinvar_submission\", \"title\": \"Submitted Interpretations\"}",
                         "scope": "variant"
                     },
-                    "clinvar_submission_submitter": {
-                        "title": "clinvar_submission_submitter",
-                        "field_name": "clinvar_submission_submitter",
-                        "type": "string",
-                        "do_import": true,
-                        "source_name": "CLINVAR_SUBMISSION",
-                        "source_version": "20191021",
-                        "sub_embedding_group": "{\"key\": \"clinvar_submission\", \"title\": \"Submitted Interpretations\"}",
-                        "scope": "variant"
-                    },
-                    "clinvar_submission_submitterid": {
-                        "title": "clinvar_submission_submitterid",
-                        "field_name": "clinvar_submission_submitterid",
-                        "type": "string",
-                        "do_import": true,
-                        "source_name": "CLINVAR_SUBMISSION",
-                        "source_version": "20191021",
-                        "sub_embedding_group": "{\"key\": \"clinvar_submission\", \"title\": \"Submitted Interpretations\"}",
-                        "scope": "variant"
-                    },
-                    "clinvar_submission_citation": {
-                        "title": "clinvar_submission_citation",
-                        "type": "array",
-                        "items": {
-                            "title": "clinvar_submission_citation",
-                            "field_name": "clinvar_submission_citation",
-                            "type": "string",
-                            "do_import": true,
-                            "source_name": "CLINVAR_SUBMISSION",
-                            "source_version": "20191021",
-                            "sub_embedding_group": "{\"key\": \"clinvar_submission\", \"title\": \"Submitted Interpretations\"}",
-                            "scope": "variant"
-                        }
-                    },
-                    "clinvar_submission_comment": {
-                        "title": "clinvar_submission_comment",
-                        "type": "array",
-                        "items": {
-                            "title": "clinvar_submission_comment",
-                            "field_name": "clinvar_submission_comment",
-                            "type": "string",
-                            "do_import": true,
-                            "source_name": "CLINVAR_SUBMISSION",
-                            "source_version": "20191021",
-                            "sub_embedding_group": "{\"key\": \"clinvar_submission\", \"title\": \"Submitted Interpretations\"}",
-                            "scope": "variant"
-                        }
-                    },
-                    "clinvar_submission_accession": {
-                        "title": "clinvar_submission_accession",
-                        "field_name": "clinvar_submission_accession",
-                        "type": "string",
-                        "do_import": true,
-                        "source_name": "CLINVAR_SUBMISSION",
-                        "source_version": "20191021",
-                        "sub_embedding_group": "{\"key\": \"clinvar_submission\", \"title\": \"Submitted Interpretations\"}",
-                        "scope": "variant"
-                    },
-                    "clinvar_submission_variationid": {
-                        "title": "clinvar_submission_variationid",
-                        "field_name": "clinvar_submission_variationid",
-                        "type": "string",
-                        "do_import": true,
-                        "source_name": "CLINVAR_SUBMISSION",
-                        "source_version": "20191021",
-                        "sub_embedding_group": "{\"key\": \"clinvar_submission\", \"title\": \"Submitted Interpretations\"}",
-                        "scope": "variant"
-                    },
                     "clinvar_submission_assertionmethod": {
                         "title": "clinvar_submission_assertionmethod",
                         "field_name": "clinvar_submission_assertionmethod",
@@ -521,6 +453,74 @@
                     "clinvar_submission_alleleorigin": {
                         "title": "clinvar_submission_alleleorigin",
                         "field_name": "clinvar_submission_alleleorigin",
+                        "type": "string",
+                        "do_import": true,
+                        "source_name": "CLINVAR_SUBMISSION",
+                        "source_version": "20191021",
+                        "sub_embedding_group": "{\"key\": \"clinvar_submission\", \"title\": \"Submitted Interpretations\"}",
+                        "scope": "variant"
+                    },
+                    "clinvar_submission_submitter": {
+                        "title": "clinvar_submission_submitter",
+                        "field_name": "clinvar_submission_submitter",
+                        "type": "string",
+                        "do_import": true,
+                        "source_name": "CLINVAR_SUBMISSION",
+                        "source_version": "20191021",
+                        "sub_embedding_group": "{\"key\": \"clinvar_submission\", \"title\": \"Submitted Interpretations\"}",
+                        "scope": "variant"
+                    },
+                    "clinvar_submission_submitterid": {
+                        "title": "clinvar_submission_submitterid",
+                        "field_name": "clinvar_submission_submitterid",
+                        "type": "string",
+                        "do_import": true,
+                        "source_name": "CLINVAR_SUBMISSION",
+                        "source_version": "20191021",
+                        "sub_embedding_group": "{\"key\": \"clinvar_submission\", \"title\": \"Submitted Interpretations\"}",
+                        "scope": "variant"
+                    },
+                    "clinvar_submission_citation": {
+                        "title": "clinvar_submission_citation",
+                        "type": "array",
+                        "items": {
+                            "title": "clinvar_submission_citation",
+                            "field_name": "clinvar_submission_citation",
+                            "type": "string",
+                            "do_import": true,
+                            "source_name": "CLINVAR_SUBMISSION",
+                            "source_version": "20191021",
+                            "sub_embedding_group": "{\"key\": \"clinvar_submission\", \"title\": \"Submitted Interpretations\"}",
+                            "scope": "variant"
+                        }
+                    },
+                    "clinvar_submission_comment": {
+                        "title": "clinvar_submission_comment",
+                        "type": "array",
+                        "items": {
+                            "title": "clinvar_submission_comment",
+                            "field_name": "clinvar_submission_comment",
+                            "type": "string",
+                            "do_import": true,
+                            "source_name": "CLINVAR_SUBMISSION",
+                            "source_version": "20191021",
+                            "sub_embedding_group": "{\"key\": \"clinvar_submission\", \"title\": \"Submitted Interpretations\"}",
+                            "scope": "variant"
+                        }
+                    },
+                    "clinvar_submission_accession": {
+                        "title": "clinvar_submission_accession",
+                        "field_name": "clinvar_submission_accession",
+                        "type": "string",
+                        "do_import": true,
+                        "source_name": "CLINVAR_SUBMISSION",
+                        "source_version": "20191021",
+                        "sub_embedding_group": "{\"key\": \"clinvar_submission\", \"title\": \"Submitted Interpretations\"}",
+                        "scope": "variant"
+                    },
+                    "clinvar_submission_variationid": {
+                        "title": "clinvar_submission_variationid",
+                        "field_name": "clinvar_submission_variationid",
                         "type": "string",
                         "do_import": true,
                         "source_name": "CLINVAR_SUBMISSION",
@@ -942,45 +942,6 @@
                 "title": "Gene",
                 "type": "object",
                 "properties": {
-                    "genes_most_severe_sift_score": {
-                        "title": "SIFT score",
-                        "field_name": "genes_most_severe_sift_score",
-                        "type": "number",
-                        "do_import": true,
-                        "source_name": "GENES",
-                        "source_version": "v99",
-                        "sub_embedding_group": "{\"key\": \"genes\", \"title\": \"Gene\"}",
-                        "annotation_category": "Missense Predictors",
-                        "scope": "variant",
-                        "schema_title": "SIFT score",
-                        "facet_order": 24
-                    },
-                    "genes_most_severe_polyphen_score": {
-                        "title": "PolyPhen score",
-                        "field_name": "genes_most_severe_polyphen_score",
-                        "type": "number",
-                        "do_import": true,
-                        "source_name": "GENES",
-                        "source_version": "v99",
-                        "sub_embedding_group": "{\"key\": \"genes\", \"title\": \"Gene\"}",
-                        "annotation_category": "Missense Predictors",
-                        "scope": "variant",
-                        "schema_title": "PolyPhen score",
-                        "facet_order": 25
-                    },
-                    "genes_most_severe_maxentscan_diff": {
-                        "title": "MaxEntScan Diff",
-                        "field_name": "genes_most_severe_maxentscan_diff",
-                        "type": "number",
-                        "do_import": true,
-                        "source_name": "GENES",
-                        "source_version": "v99",
-                        "sub_embedding_group": "{\"key\": \"genes\", \"title\": \"Gene\"}",
-                        "annotation_category": "Splice Predictors",
-                        "scope": "variant",
-                        "schema_title": "MaxEntScan Diff",
-                        "facet_order": 31
-                    },
                     "genes_ensg": {
                         "title": "Gene",
                         "field_name": "genes_ensg",
@@ -1040,6 +1001,45 @@
                         "source_version": "v99",
                         "sub_embedding_group": "{\"key\": \"genes\", \"title\": \"Gene\"}",
                         "scope": "variant"
+                    },
+                    "genes_most_severe_sift_score": {
+                        "title": "SIFT score",
+                        "field_name": "genes_most_severe_sift_score",
+                        "type": "number",
+                        "do_import": true,
+                        "source_name": "GENES",
+                        "source_version": "v99",
+                        "sub_embedding_group": "{\"key\": \"genes\", \"title\": \"Gene\"}",
+                        "annotation_category": "Missense Predictors",
+                        "scope": "variant",
+                        "schema_title": "SIFT score",
+                        "facet_order": 24
+                    },
+                    "genes_most_severe_polyphen_score": {
+                        "title": "PolyPhen score",
+                        "field_name": "genes_most_severe_polyphen_score",
+                        "type": "number",
+                        "do_import": true,
+                        "source_name": "GENES",
+                        "source_version": "v99",
+                        "sub_embedding_group": "{\"key\": \"genes\", \"title\": \"Gene\"}",
+                        "annotation_category": "Missense Predictors",
+                        "scope": "variant",
+                        "schema_title": "PolyPhen score",
+                        "facet_order": 25
+                    },
+                    "genes_most_severe_maxentscan_diff": {
+                        "title": "MaxEntScan Diff",
+                        "field_name": "genes_most_severe_maxentscan_diff",
+                        "type": "number",
+                        "do_import": true,
+                        "source_name": "GENES",
+                        "source_version": "v99",
+                        "sub_embedding_group": "{\"key\": \"genes\", \"title\": \"Gene\"}",
+                        "annotation_category": "Splice Predictors",
+                        "scope": "variant",
+                        "schema_title": "MaxEntScan Diff",
+                        "facet_order": 31
                     },
                     "genes_most_severe_consequence": {
                         "title": "genes_most_severe_consequence",
@@ -3438,140 +3438,6 @@
                 "title": "Transcript",
                 "type": "object",
                 "properties": {
-                    "vep_maxentscan_alt": {
-                        "title": "MaxEntScan - Alt",
-                        "field_name": "vep_maxentscan_alt",
-                        "type": "number",
-                        "do_import": true,
-                        "source_name": "VEP",
-                        "source_version": "v99",
-                        "sub_embedding_group": "{\"key\": \"transcript\", \"title\": \"Transcript\"}",
-                        "annotation_category": "Splice Predictors",
-                        "description": "MaxEntScan alternate sequence score",
-                        "scope": "variant",
-                        "schema_title": "MaxEntScan - Alt"
-                    },
-                    "vep_feature_ncbi": {
-                        "title": "Transcript",
-                        "field_name": "vep_feature_ncbi",
-                        "type": "string",
-                        "do_import": true,
-                        "source_name": "VEP",
-                        "source_version": "v99",
-                        "sub_embedding_group": "{\"key\": \"transcript\", \"title\": \"Transcript\"}",
-                        "description": "Stable ID of feature",
-                        "scope": "variant",
-                        "schema_title": "Transcript"
-                    },
-                    "vep_hgvsc": {
-                        "title": "HGVS-coding",
-                        "field_name": "vep_hgvsc",
-                        "type": "string",
-                        "do_import": true,
-                        "source_name": "VEP",
-                        "source_version": "v99",
-                        "sub_embedding_group": "{\"key\": \"transcript\", \"title\": \"Transcript\"}",
-                        "description": "HGVS coding sequence name",
-                        "scope": "variant",
-                        "schema_title": "HGVS-coding"
-                    },
-                    "vep_hgvsp": {
-                        "title": "HGVS-protein",
-                        "field_name": "vep_hgvsp",
-                        "type": "string",
-                        "do_import": true,
-                        "source_name": "VEP",
-                        "source_version": "v99",
-                        "sub_embedding_group": "{\"key\": \"transcript\", \"title\": \"Transcript\"}",
-                        "description": "HGVS protein sequence name",
-                        "scope": "variant",
-                        "schema_title": "HGVS-protein"
-                    },
-                    "vep_most_severe": {
-                        "title": "Most Severe Transcript (Boolean)",
-                        "field_name": "vep_most_severe",
-                        "type": "boolean",
-                        "do_import": true,
-                        "source_name": "VEP",
-                        "source_version": "v99",
-                        "sub_embedding_group": "{\"key\": \"transcript\", \"title\": \"Transcript\"}",
-                        "description": "Indicates if transcript is most severe for this gene",
-                        "scope": "variant",
-                        "schema_title": "Most Severe Transcript (Boolean)"
-                    },
-                    "vep_feature": {
-                        "title": "Transcript (Ensembl)",
-                        "field_name": "vep_feature",
-                        "type": "string",
-                        "do_import": true,
-                        "source_name": "VEP",
-                        "source_version": "v99",
-                        "sub_embedding_group": "{\"key\": \"transcript\", \"title\": \"Transcript\"}",
-                        "description": "Stable ID of feature",
-                        "scope": "variant",
-                        "schema_title": "Transcript (Ensembl)",
-                        "link": "http://useast.ensembl.org/Homo_sapiens/Transcript/Summary?db=core;t=<ID>"
-                    },
-                    "vep_amino_acids": {
-                        "title": "AA change",
-                        "field_name": "vep_amino_acids",
-                        "type": "string",
-                        "do_import": true,
-                        "source_name": "VEP",
-                        "source_version": "v99",
-                        "sub_embedding_group": "{\"key\": \"transcript\", \"title\": \"Transcript\"}",
-                        "description": "Reference and variant amino acids",
-                        "scope": "variant",
-                        "schema_title": "AA change"
-                    },
-                    "vep_codons": {
-                        "title": "codon change",
-                        "field_name": "vep_codons",
-                        "type": "string",
-                        "do_import": true,
-                        "source_name": "VEP",
-                        "source_version": "v99",
-                        "sub_embedding_group": "{\"key\": \"transcript\", \"title\": \"Transcript\"}",
-                        "description": "Reference and variant codon sequence",
-                        "scope": "variant",
-                        "schema_title": "codon change"
-                    },
-                    "vep_canonical": {
-                        "title": "Canonical Transcript (Boolean)",
-                        "field_name": "vep_canonical",
-                        "type": "boolean",
-                        "do_import": true,
-                        "source_name": "VEP",
-                        "source_version": "v99",
-                        "sub_embedding_group": "{\"key\": \"transcript\", \"title\": \"Transcript\"}",
-                        "description": "Indicates if transcript is canonical for this gene",
-                        "scope": "variant",
-                        "schema_title": "Canonical Transcript (Boolean)"
-                    },
-                    "vep_exon": {
-                        "title": "Exon",
-                        "field_name": "vep_exon",
-                        "type": "string",
-                        "do_import": true,
-                        "source_name": "VEP",
-                        "source_version": "v99",
-                        "sub_embedding_group": "{\"key\": \"transcript\", \"title\": \"Transcript\"}",
-                        "description": "Exon number(s) / total",
-                        "scope": "variant",
-                        "schema_title": "Exon"
-                    },
-                    "vep_intron": {
-                        "title": "Intron",
-                        "field_name": "vep_intron",
-                        "type": "string",
-                        "do_import": true,
-                        "source_name": "VEP",
-                        "source_version": "v99",
-                        "sub_embedding_group": "{\"key\": \"transcript\", \"title\": \"Transcript\"}",
-                        "description": "Intron number(s) / total",
-                        "scope": "variant",
-                        "schema_title": "Intron"
-                    },
                     "vep_consequence": {
                         "title": "vep_consequence",
                         "type": "array",
@@ -3601,6 +3467,31 @@
                         "annotation_category": "Gene Identifiers",
                         "scope": "variant"
                     },
+                    "vep_feature": {
+                        "title": "Transcript (Ensembl)",
+                        "field_name": "vep_feature",
+                        "type": "string",
+                        "do_import": true,
+                        "source_name": "VEP",
+                        "source_version": "v99",
+                        "sub_embedding_group": "{\"key\": \"transcript\", \"title\": \"Transcript\"}",
+                        "description": "Stable ID of feature",
+                        "scope": "variant",
+                        "schema_title": "Transcript (Ensembl)",
+                        "link": "http://useast.ensembl.org/Homo_sapiens/Transcript/Summary?db=core;t=<ID>"
+                    },
+                    "vep_feature_ncbi": {
+                        "title": "Transcript",
+                        "field_name": "vep_feature_ncbi",
+                        "type": "string",
+                        "do_import": true,
+                        "source_name": "VEP",
+                        "source_version": "v99",
+                        "sub_embedding_group": "{\"key\": \"transcript\", \"title\": \"Transcript\"}",
+                        "description": "Stable ID of feature",
+                        "scope": "variant",
+                        "schema_title": "Transcript"
+                    },
                     "vep_biotype": {
                         "title": "Biotype",
                         "field_name": "vep_biotype",
@@ -3612,6 +3503,54 @@
                         "description": "Biotype of transcript or regulatory feature",
                         "scope": "variant",
                         "schema_title": "Biotype"
+                    },
+                    "vep_exon": {
+                        "title": "Exon",
+                        "field_name": "vep_exon",
+                        "type": "string",
+                        "do_import": true,
+                        "source_name": "VEP",
+                        "source_version": "v99",
+                        "sub_embedding_group": "{\"key\": \"transcript\", \"title\": \"Transcript\"}",
+                        "description": "Exon number(s) / total",
+                        "scope": "variant",
+                        "schema_title": "Exon"
+                    },
+                    "vep_intron": {
+                        "title": "Intron",
+                        "field_name": "vep_intron",
+                        "type": "string",
+                        "do_import": true,
+                        "source_name": "VEP",
+                        "source_version": "v99",
+                        "sub_embedding_group": "{\"key\": \"transcript\", \"title\": \"Transcript\"}",
+                        "description": "Intron number(s) / total",
+                        "scope": "variant",
+                        "schema_title": "Intron"
+                    },
+                    "vep_hgvsc": {
+                        "title": "HGVS-coding",
+                        "field_name": "vep_hgvsc",
+                        "type": "string",
+                        "do_import": true,
+                        "source_name": "VEP",
+                        "source_version": "v99",
+                        "sub_embedding_group": "{\"key\": \"transcript\", \"title\": \"Transcript\"}",
+                        "description": "HGVS coding sequence name",
+                        "scope": "variant",
+                        "schema_title": "HGVS-coding"
+                    },
+                    "vep_hgvsp": {
+                        "title": "HGVS-protein",
+                        "field_name": "vep_hgvsp",
+                        "type": "string",
+                        "do_import": true,
+                        "source_name": "VEP",
+                        "source_version": "v99",
+                        "sub_embedding_group": "{\"key\": \"transcript\", \"title\": \"Transcript\"}",
+                        "description": "HGVS protein sequence name",
+                        "scope": "variant",
+                        "schema_title": "HGVS-protein"
                     },
                     "vep_cdna_position": {
                         "title": "cDNA position",
@@ -3649,6 +3588,30 @@
                         "scope": "variant",
                         "schema_title": "AA position"
                     },
+                    "vep_amino_acids": {
+                        "title": "AA change",
+                        "field_name": "vep_amino_acids",
+                        "type": "string",
+                        "do_import": true,
+                        "source_name": "VEP",
+                        "source_version": "v99",
+                        "sub_embedding_group": "{\"key\": \"transcript\", \"title\": \"Transcript\"}",
+                        "description": "Reference and variant amino acids",
+                        "scope": "variant",
+                        "schema_title": "AA change"
+                    },
+                    "vep_codons": {
+                        "title": "codon change",
+                        "field_name": "vep_codons",
+                        "type": "string",
+                        "do_import": true,
+                        "source_name": "VEP",
+                        "source_version": "v99",
+                        "sub_embedding_group": "{\"key\": \"transcript\", \"title\": \"Transcript\"}",
+                        "description": "Reference and variant codon sequence",
+                        "scope": "variant",
+                        "schema_title": "codon change"
+                    },
                     "vep_distance": {
                         "title": "distance to transcript",
                         "field_name": "vep_distance",
@@ -3672,6 +3635,30 @@
                         "description": "Strand of the feature",
                         "scope": "variant",
                         "schema_title": "Strand"
+                    },
+                    "vep_canonical": {
+                        "title": "Canonical Transcript (Boolean)",
+                        "field_name": "vep_canonical",
+                        "type": "boolean",
+                        "do_import": true,
+                        "source_name": "VEP",
+                        "source_version": "v99",
+                        "sub_embedding_group": "{\"key\": \"transcript\", \"title\": \"Transcript\"}",
+                        "description": "Indicates if transcript is canonical for this gene",
+                        "scope": "variant",
+                        "schema_title": "Canonical Transcript (Boolean)"
+                    },
+                    "vep_most_severe": {
+                        "title": "Most Severe Transcript (Boolean)",
+                        "field_name": "vep_most_severe",
+                        "type": "boolean",
+                        "do_import": true,
+                        "source_name": "VEP",
+                        "source_version": "v99",
+                        "sub_embedding_group": "{\"key\": \"transcript\", \"title\": \"Transcript\"}",
+                        "description": "Indicates if transcript is most severe for this gene",
+                        "scope": "variant",
+                        "schema_title": "Most Severe Transcript (Boolean)"
                     },
                     "vep_tsl": {
                         "title": "Transcript support level",
@@ -3842,6 +3829,19 @@
                             "description": "Pubmed ID(s) of publications that cite existing variant",
                             "scope": "variant"
                         }
+                    },
+                    "vep_maxentscan_alt": {
+                        "title": "MaxEntScan - Alt",
+                        "field_name": "vep_maxentscan_alt",
+                        "type": "number",
+                        "do_import": true,
+                        "source_name": "VEP",
+                        "source_version": "v99",
+                        "sub_embedding_group": "{\"key\": \"transcript\", \"title\": \"Transcript\"}",
+                        "annotation_category": "Splice Predictors",
+                        "description": "MaxEntScan alternate sequence score",
+                        "scope": "variant",
+                        "schema_title": "MaxEntScan - Alt"
                     },
                     "vep_maxentscan_diff": {
                         "title": "MaxEntScan",
@@ -4049,6 +4049,11 @@
             "title": "Cytoband",
             "order": 3,
             "grouping": "Position"
+        },
+        "genes.genes_ensg.gene_lists.display_title": {
+            "title": "Gene List",
+            "order": 99,
+            "grouping": "Genes"
         },
         "genes.genes_ensg.oe_lof": {
             "title": "o/e (LoF)",

@@ -102,10 +102,10 @@ export function SampleTabBody(props){
 }
 
 function CoverageTable(props) {
-    const { samplegeno = [], genotypeLabels = [], CALL_INFO = null } = props;
+    const { samplegeno = [], genotypeLabels = [] } = props;
 
     if (samplegeno.length === 0) {
-        return <span className="font-italic">No per-sample coverage data available.</span>;
+        return <span className="font-italic">No coverage data available.</span>;
     }
 
     const mapSampleIDToCoverageData = {};
@@ -122,16 +122,18 @@ function CoverageTable(props) {
         }
     });
 
-    let ref;
-    const altRowObj = {}; // Keep a record of all alt alleles (in case of multi-allelic)...
-    // Will flatten into array of mutually exclusive rows once populated with all possible alleles
+    const mapNumGTToGT = {};
+
+    let shortGTDupPresent = false;
+    const shortGTDupTester = {};
 
     const rows = samplegeno.map((sg) => {
         const {
             samplegeno_role: role = null,
             samplegeno_sampleid: sampleID = null,
             samplegeno_ad = null,
-            samplegeno_gt = null
+            samplegeno_gt = null,
+            samplegeno_numgt = null
         } = sg;
 
         // If there were no genotypeLabels, and a sampleID wasn't registered previously, register now. (Stopgap)
@@ -140,8 +142,41 @@ function CoverageTable(props) {
         // Convert AD & GT strings into arrays for easier traversal
         let adArr = [];
         let gtArr = [];
+        let numGTArr = [];
         if (samplegeno_ad) { adArr = samplegeno_ad.split('/'); }
         if (samplegeno_gt) { gtArr = samplegeno_gt.split('/'); }
+        if (samplegeno_numgt) { numGTArr = samplegeno_numgt.split('/');}
+
+        // Populate mapNumGTtoGT with GT info
+        numGTArr.forEach((numGT, i) => {
+            if (!mapNumGTToGT.hasOwnProperty(numGT)) {
+                let gtObj = {};
+                const fullGT = gtArr[i];
+
+                if (fullGT.length > 12) { // Calculate shortened versions of GTs
+                    const first4 = fullGT.substring(0, 4);
+                    const middle = fullGT.substring(4, fullGT.length - 4);
+                    const last4 = fullGT.substring(fullGT.length - 4, fullGT.length);
+                    const shortGT = `${first4}...${last4}`;
+                    const bpGT = `${first4}...${middle.length}bp...${last4}`;
+
+                    // Determine if to use ...BP... shortened version or normal shortened version
+                    if (!shortGTDupTester[shortGT]) {
+                        shortGTDupTester[shortGT] = true;
+                    } else {
+                        shortGTDupPresent = true;
+                    }
+
+                    gtObj = { fullGT, shortGT, bpGT };
+                } else {
+                    gtObj = { fullGT };
+                }
+
+                mapNumGTToGT[numGT] = gtObj;
+            } else if (mapNumGTToGT[numGT] && mapNumGTToGT[numGT].fullGT !== gtArr[i]) {
+                throw new Error ("numGT mismatch at ", numGT);
+            }
+        });
 
         // If role/label data couldn't be populated by genotypeLabel sort, see if can populate here
         if (role && !mapSampleIDToCoverageData[sampleID]["role"]) {
@@ -153,37 +188,7 @@ function CoverageTable(props) {
             }
         }
 
-        const coverageObj = {};
-        if (gtArr.length > 0) {
-            // Add refs genotypes to row mapping if not already set
-            if (!ref) {
-                ref = gtArr[0];
-            }
-
-            // Adds a mapping of GTs to ADs to row mapping
-            const gtToAD = { };
-            gtArr.forEach((gt, i) => {
-                if (!gtToAD.hasOwnProperty(gt)) {
-                    gtToAD[gt] = adArr[i];
-                }
-            });
-            coverageObj.gtToAD = gtToAD;
-
-            // Filter out non-ALTs
-            gtArr.splice(1, gtArr.length).filter((potentialAlt) => {
-                if (potentialAlt !== ref) {
-                    altRowObj[potentialAlt] = true;
-                    return true;
-                }
-                return false;
-            });
-
-            // Create a sum total coverage value for this item by adding all ADs
-            coverageObj.total = adArr.reduce(
-                (a = 0, b = 0) => Number.parseInt(a) + Number.parseInt(b)
-            );
-        }
-        mapSampleIDToCoverageData[sampleID]["coverage"] = coverageObj;
+        mapSampleIDToCoverageData[sampleID]["adArr"] = adArr;
 
         return sampleID;
     });
@@ -194,7 +199,8 @@ function CoverageTable(props) {
         return (role === "proband" ? 1 : -1);
     });
 
-    const altRows = Object.keys(altRowObj);
+    // Ref will always be mapNumGTToGt[0]; sort to ascend 0 -> 2
+    const cols = Object.keys(mapNumGTToGT).sort((a,b) => a - b);
 
     return (
         <table className="w-100">
@@ -203,41 +209,43 @@ function CoverageTable(props) {
                     <th className="text-left">Relation</th>
                     <th className="text-left">ID</th>
                     <th className="text-left">Coverage</th>
-                    <th className="text-left">Ref({ ref })</th>
-                    { altRows.map((alt) => <th key="alt" className="text-left">Alt({alt})</th>)}
+                    { cols.map((numGT) => {
+                        const { fullGT, shortGT, bpGT } = mapNumGTToGT[numGT];
+                        const useBPGT = shortGTDupPresent && bpGT;
+                        return (
+                            <th key={fullGT} className="text-left" data-tip={(shortGT || bpGT) ? fullGT : null}>
+                                {numGT === "0" ? "Ref" : "Alt"}({ useBPGT ? bpGT : (shortGT || fullGT) })
+                            </th>
+                        );
+                    })}
                     <th className="text-left">Call</th>
                 </tr>
             </thead>
             <tbody>
                 {rows.map((sampleID) => { // rows now distinguished by sampleIDs, not roles
                     const rowData = mapSampleIDToCoverageData[sampleID];
-                    const { coverage = null, labels : [label] = [], role = null } = rowData || {};
-                    const { gtToAD = null, total: totalCoverage = null } = coverage || {};
+                    const { adArr = [], labels : [label] = [], role = null } = rowData || {};
 
-                    let refAD = 0;
-                    if (gtToAD) {
-                        refAD = gtToAD[ref];
-                    }
+                    let totalCoverage = 0;
+                    adArr.forEach((ad, i) => {
+                        totalCoverage += Number.parseInt(ad);
+                    });
+
                     return (
                         <tr key={role}>
                             <td className="text-left text-capitalize">{ role }</td>
                             <td className="text-left">{ sampleID ? sampleID.split("_")[0] : "" }</td>
                             <td className="text-left">{ totalCoverage }</td>
-                            <td className="text-left">
-                                { refAD }
-                                { (refAD > 0 && refAD != totalCoverage) ? ` (${ Math.round(refAD/totalCoverage * 100 )}%)`: null }
-                            </td>
-                            {altRows.map((alt) => {
-                                if (gtToAD) {
-                                    const { [alt]: partialCoverage = 0 } = gtToAD;
-                                    return (
-                                        <td key={alt} className="text-left">
-                                            { partialCoverage.toString() || 0}
-                                            { partialCoverage > 0 ? ` (${ Math.round(gtToAD[alt]/totalCoverage * 100 )}%)`: null }
-                                        </td>
-                                    );
+                            { adArr.map((ad, i) => {
+                                if (i === 0) {
+                                    return <td key={ad} className="text-left">{ad} {(ad > 0 && ad != totalCoverage) ? ` (${ Math.round(ad/totalCoverage * 100 )}%)`: null }</td>;
                                 }
-                                return(<td key={alt} className="text-left">0</td>);
+                                return (
+                                    <td key={ad} className="text-left">
+                                        { ad.toString() || 0}
+                                        { ad > 0 ? ` (${ Math.round(ad/totalCoverage * 100 )}%)`: null }
+                                    </td>
+                                );
                             })}
                             <td className="text-left">{ label }</td>
                         </tr>
@@ -350,13 +358,32 @@ function CompoundHetTable(props) {
                         comhet_impact_transcript: impactTranscript = null,
                     } = obj;
 
+                    // Stopgap until comhet transcript type update complete (handles array & string)
+                    let finalTranscripts;
+                    if (Array.isArray(transcript)) {
+                        finalTranscripts = transcript;
+                    } else {
+                        if (!transcript) { // if null or empty string
+                            finalTranscripts = [];
+                        } else {
+                            finalTranscripts = transcript.split("~");
+                        }
+                    }
+
                     return (
                         <tr key={i}>
                             <td className="text-600 text-left">{ variant }</td>
                             <td className="text-left">{ phase }</td>
                             <td className="text-left">{ gene }</td>
                             <td className="text-left">{ impactGene }</td>
-                            <td className="text-left">{ transcript }</td>
+                            <td className="text-left">
+                                { finalTranscripts.map((item, i) => {
+                                    if (finalTranscripts.length - 1 !== i) {
+                                        return item + ", ";
+                                    }
+                                    return item;
+                                }) }
+                            </td>
                             <td className="text-left">{ impactTranscript }</td>
                         </tr>
                     );
