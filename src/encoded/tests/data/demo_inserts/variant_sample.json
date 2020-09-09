@@ -11,7 +11,7 @@
             {
                 "role": "mother",
                 "labels": [
-                    "Homozygus reference"
+                    "Homozygous reference"
                 ]
             },
             {
@@ -86,7 +86,7 @@
             {
                 "role": "proband",
                 "labels": [
-                    "Homozygus alternate"
+                    "Homozygous alternate"
                 ]
             }
         ],
@@ -149,7 +149,7 @@
             {
                 "role": "mother",
                 "labels": [
-                    "Homozygus reference"
+                    "Homozygous reference"
                 ]
             },
             {
@@ -212,7 +212,7 @@
             {
                 "role": "father",
                 "labels": [
-                    "Homozygus reference"
+                    "Homozygous reference"
                 ]
             },
             {
@@ -287,7 +287,7 @@
             {
                 "role": "mother",
                 "labels": [
-                    "Homozygus reference"
+                    "Homozygous reference"
                 ]
             },
             {
@@ -356,7 +356,7 @@
             {
                 "role": "mother",
                 "labels": [
-                    "Homozygus reference"
+                    "Homozygous reference"
                 ]
             },
             {
@@ -419,7 +419,7 @@
             {
                 "role": "father",
                 "labels": [
-                    "Homozygus reference"
+                    "Homozygous reference"
                 ]
             },
             {
@@ -550,7 +550,7 @@
             {
                 "role": "mother",
                 "labels": [
-                    "Homozygus reference"
+                    "Homozygous reference"
                 ]
             },
             {
@@ -574,7 +574,7 @@
             {
                 "role": "mother",
                 "labels": [
-                    "Homozygus reference"
+                    "Homozygous reference"
                 ]
             },
             {
@@ -637,7 +637,7 @@
             {
                 "role": "father",
                 "labels": [
-                    "Homozygus reference"
+                    "Homozygous reference"
                 ]
             },
             {
@@ -712,7 +712,7 @@
             {
                 "role": "mother",
                 "labels": [
-                    "Homozygus reference"
+                    "Homozygous reference"
                 ]
             },
             {
@@ -781,13 +781,13 @@
             {
                 "role": "mother",
                 "labels": [
-                    "Homozygus reference"
+                    "Homozygous reference"
                 ]
             },
             {
                 "role": "proband",
                 "labels": [
-                    "Homozygus reference"
+                    "Homozygous reference"
                 ]
             }
         ],
@@ -844,7 +844,7 @@
             {
                 "role": "father",
                 "labels": [
-                    "Homozygus reference"
+                    "Homozygous reference"
                 ]
             },
             {
@@ -919,7 +919,7 @@
             {
                 "role": "mother",
                 "labels": [
-                    "Homozygus reference"
+                    "Homozygous reference"
                 ]
             },
             {
@@ -982,7 +982,7 @@
             {
                 "role": "father",
                 "labels": [
-                    "Homozygus reference"
+                    "Homozygous reference"
                 ]
             },
             {
@@ -994,7 +994,7 @@
             {
                 "role": "proband",
                 "labels": [
-                    "Homozygus reference"
+                    "Homozygous reference"
                 ]
             }
         ],
@@ -1051,7 +1051,7 @@
             {
                 "role": "father",
                 "labels": [
-                    "Homozygus reference"
+                    "Homozygous reference"
                 ]
             },
             {
@@ -1126,13 +1126,13 @@
             {
                 "role": "mother",
                 "labels": [
-                    "Homozygus reference"
+                    "Homozygous reference"
                 ]
             },
             {
                 "role": "proband",
                 "labels": [
-                    "Homozygus reference"
+                    "Homozygous reference"
                 ]
             }
         ],
@@ -1189,7 +1189,7 @@
             {
                 "role": "father",
                 "labels": [
-                    "Homozygus reference"
+                    "Homozygous reference"
                 ]
             },
             {
@@ -1201,7 +1201,7 @@
             {
                 "role": "proband",
                 "labels": [
-                    "Homozygus reference"
+                    "Homozygous reference"
                 ]
             }
         ],
@@ -1258,7 +1258,7 @@
             {
                 "role": "father",
                 "labels": [
-                    "Homozygus reference"
+                    "Homozygous reference"
                 ]
             },
             {
@@ -1270,7 +1270,7 @@
             {
                 "role": "proband",
                 "labels": [
-                    "Homozygus reference"
+                    "Homozygous reference"
                 ]
             }
         ],
@@ -1333,13 +1333,13 @@
             {
                 "role": "mother",
                 "labels": [
-                    "Homozygus reference"
+                    "Homozygous reference"
                 ]
             },
             {
                 "role": "proband",
                 "labels": [
-                    "Homozygus reference"
+                    "Homozygous reference"
                 ]
             }
         ],
@@ -1396,7 +1396,7 @@
             {
                 "role": "father",
                 "labels": [
-                    "Homozygus reference"
+                    "Homozygous reference"
                 ]
             },
             {
@@ -1408,7 +1408,7 @@
             {
                 "role": "proband",
                 "labels": [
-                    "Homozygus reference"
+                    "Homozygous reference"
                 ]
             }
         ],
@@ -1465,7 +1465,7 @@
             {
                 "role": "father",
                 "labels": [
-                    "Homozygus reference"
+                    "Homozygous reference"
                 ]
             },
             {
@@ -1477,7 +1477,7 @@
             {
                 "role": "proband",
                 "labels": [
-                    "Homozygus reference"
+                    "Homozygous reference"
                 ]
             }
         ],
@@ -1540,7 +1540,7 @@
             {
                 "role": "mother",
                 "labels": [
-                    "Homozygus reference"
+                    "Homozygous reference"
                 ]
             },
             {
@@ -1603,7 +1603,7 @@
             {
                 "role": "father",
                 "labels": [
-                    "Homozygus reference"
+                    "Homozygous reference"
                 ]
             },
             {
@@ -1678,13 +1678,13 @@
             {
                 "role": "mother",
                 "labels": [
-                    "Homozygus reference"
+                    "Homozygous reference"
                 ]
             },
             {
                 "role": "proband",
                 "labels": [
-                    "Homozygus reference"
+                    "Homozygous reference"
                 ]
             }
         ],
@@ -1747,7 +1747,7 @@
             {
                 "role": "mother",
                 "labels": [
-                    "Homozygus reference"
+                    "Homozygous reference"
                 ]
             },
             {
