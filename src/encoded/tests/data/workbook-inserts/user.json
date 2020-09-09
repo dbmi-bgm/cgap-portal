@@ -15,6 +15,7 @@
         "first_name": "Wrangler",
         "institution": "hms-dbmi",
         "last_name": "Wrangler",
+        "job_title": "scientist",
         "status": "current",
         "timezone": "US/Pacific",
         "uuid": "986b362f-4eb6-4a9c-8173-3ab267307e3b"
@@ -23,6 +24,7 @@
         "email": "test_person@people.com",
         "first_name": "testing",
         "last_name": "123",
+        "job_title": "scientist",
         "institution": "hms-dbmi",
         "status": "current",
         "timezone": "US/Pacific",
