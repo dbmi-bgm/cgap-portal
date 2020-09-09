@@ -33,7 +33,7 @@ log = logging.getLogger(__name__)
         'title': 'CGAP Users',
         'description': 'Listing of current CGAP users',
     },
-    acl=[])
+)
 class User(Item):
     """The user class."""
 

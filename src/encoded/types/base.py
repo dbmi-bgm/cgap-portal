@@ -42,7 +42,7 @@ from ..server_defaults import get_userid, add_last_modified
 
 # Item acls
 ONLY_ADMIN_VIEW_ACL = [
-    (Allow, 'group.admin', ['view', 'edit']),
+    (Allow, 'group.admin', ['view', 'edit', 'view_details']),
     (Allow, 'group.read-only-admin', ['view']),
     (Allow, 'remoteuser.INDEXER', ['view']),
     (Allow, 'remoteuser.EMBED', ['view']),

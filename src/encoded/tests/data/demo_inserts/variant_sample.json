@@ -496,7 +496,7 @@
                 "comhet_impact_transcript": "WEAK_PAIR",
                 "comhet_phase": "Phased",
                 "comhet_mate_variant": "chr9:5919350A>G",
-                "comhet_transcript": "ENST00000381461~ENST00000399933",
+                "comhet_transcript": ["ENST00000381461", "ENST00000399933"],
                 "comhet_gene": "ENSG00000183354",
                 "comhet_impact_gene": "WEAK_PAIR"
             }
