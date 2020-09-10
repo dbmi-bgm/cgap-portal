@@ -23,15 +23,16 @@ import { ExternalDatabasesSection } from './ExternalDatabasesSection';
  */
 export function GeneTabBody(props){
     const { currentGeneItemLoading, currentGeneItem, context, schemas } = props;
+    const fallbackElem = <em> - </em>;
     const {
         error               = null,
         '@id' : geneAtID    = null,
-        name                = <em>None</em>,
+        name                = fallbackElem,
         gene_symbol         = null,
-        gene_biotype        = <em>None</em>,
+        gene_biotype        = fallbackElem,
         alias_symbol        = [],
         prev_symbol         = [],
-        alias_name          = <em>Todo 3</em>,
+        alias_name          = fallbackElem,
         gene_summary        = <em>No summary available</em>,
         chrom = null,
         spos = null,
