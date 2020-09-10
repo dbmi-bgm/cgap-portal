@@ -154,7 +154,8 @@ def test_load_schema(schema, master_mixins, registry, pattern_fields, testapp):
         'treatment.json',
         'workflow_run.json',
         'user_content.json',
-        'evidence.json'
+        'evidence.json',
+        'higlass_view_config.json'
     ]
 
     loaded_schema = load_schema('encoded:schemas/%s' % schema)
@@ -219,7 +220,7 @@ def test_load_schema(schema, master_mixins, registry, pattern_fields, testapp):
                 'user.json', 'project.json', 'institution.json', 'organism.json',
                 'page.json',
                 'static_section.json', 'badge.json', 'tracking_item.json',
-                'file_format.json', 'experiment_type.json', 'higlass_view_config.json'
+                'file_format.json', 'experiment_type.json'
             ]
             for prop in shared_properties:
                 if schema == 'experiment.json':
