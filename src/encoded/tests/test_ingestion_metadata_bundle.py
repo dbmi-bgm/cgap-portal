@@ -5,6 +5,7 @@ import io
 import json
 import os
 import pytz
+import webtest
 
 from dcicutils import qa_utils
 from dcicutils.qa_utils import ignored, ControlledTime, MockFileSystem
@@ -176,7 +177,10 @@ def check_submit_for_ingestion_authorized(testapp, mocked_s3_client, expected_st
                                     response = testapp.post(SUBMIT_FOR_INGESTION, post_data, upload_files=post_files,
                                                             content_type='multipart/form-data', status=expected_status)
 
-                                    response.raise_for_status()
+                                    assert response.status_code == expected_status, (
+                                        "Expected response status %s but got %s."
+                                        % (expected_status, response.status_code)
+                                    )
 
                                     # The FakeGuid facility makes ids sequentially, so we can predict we'll get
                                     # one guid added to our mock queue. This test doesn't test the queue processing,
@@ -232,17 +236,59 @@ def check_submit_for_ingestion_authorized(testapp, mocked_s3_client, expected_st
                                     assert response.status_code == 200
 
 
+# This runs the standard test pretty much as expected.
 def test_submit_for_ingestion_authorized(testapp):
+
     check_submit_for_ingestion_authorized(testapp, MockBotoS3Client())
 
+# The next couple of tests are small variations in which the first or second interaction with S3 fails
 
-def test_submit_for_ingestion_authorized_buggy_s3(testapp):
+class MockBuggyBotoS3Client(MockBotoS3Client):
 
-    class MockBuggyBotoS3Client(MockBotoS3Client):
+    def __init__(self, allowed_ok=0):
+        self.counter = 0
+        self.allowed_ok = allowed_ok
+        super().__init__()
 
-        def upload_fileobj(self, input_file_stream, Bucket, Key):  # noqa - AWS decided args were uppercase
-
+    def upload_fileobj(self, input_file_stream, Bucket, Key):  # noqa - AWS decided args were uppercase
+        self.counter += 1
+        if self.counter <= self.allowed_ok:
+            return super().upload_fileobj(input_file_stream, Bucket=Bucket, Key=Key)
+        else:
             raise botocore.exceptions.ClientError({'Error': {'Code': 400, 'Message': "Simulated error."}},
                                                   'upload_fileobj')
 
-    check_submit_for_ingestion_authorized(testapp, MockBuggyBotoS3Client(), expected_status=400)
+
+def test_submit_for_ingestion_authorized_but_failed_first_s3_interaction(testapp):
+
+    try:
+        check_submit_for_ingestion_authorized(testapp, MockBuggyBotoS3Client(), expected_status=400)
+    except webtest.AppError as e:
+        assert str(e) == ('Bad response: 500 Internal Server Error (not 400)\n'
+                          'b\'{"@type": ["SubmissionFailure", "Error"],'
+                          ' "status": "error",'
+                          ' "code": 500,'
+                          ' "title": "Internal Server Error",'
+                          ' "description": "",'
+                          ' "detail": "botocore.exceptions.ClientError:'
+                          ' An error occurred (400) when calling the upload_fileobj operation: Simulated error."}\'')
+    else:
+        raise AssertionError("An expected webtest.AppError was not raised.")
+
+
+def test_submit_for_ingestion_authorized_but_failed_second_s3_interaction(testapp):
+
+    try:
+        check_submit_for_ingestion_authorized(testapp, MockBuggyBotoS3Client(allowed_ok=1), expected_status=400)
+    except webtest.AppError as e:
+        assert str(e) == ('Bad response: 500 Internal Server Error (not 400)\n'
+                          'b\'{"@type": ["SubmissionFailure", "Error"],'
+                          ' "status": "error",'
+                          ' "code": 500,'
+                          ' "title": "Internal Server Error",'
+                          ' "description": "",'
+                          ' "detail": "botocore.exceptions.ClientError (while uploading metadata):'
+                          ' An error occurred (400) when calling the upload_fileobj operation: Simulated error."}\'')
+    else:
+        raise AssertionError("An expected webtest.AppError was not raised.")
+

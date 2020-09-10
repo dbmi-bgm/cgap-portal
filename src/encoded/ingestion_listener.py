@@ -31,9 +31,11 @@ from .ingestion.common import register_path_content_type, metadata_bundles_bucke
 from .ingestion.exceptions import UnspecifiedFormParameter, SubmissionFailure
 from .ingestion.processors import get_ingestion_processor
 from .inheritance_mode import InheritanceMode
-from .types.ingestion import SubmissionFolio, ALLOW_SUBMITTER_ADD
+from .types.ingestion import SubmissionFolio
 from .types.variant import build_variant_display_title, ANNOTATION_ID_SEP
-from .util import resolve_file_path, gunzip_content, debuglog, get_trusted_email, beanstalk_env_from_request
+from .util import (
+    resolve_file_path, gunzip_content, debuglog, get_trusted_email, beanstalk_env_from_request, full_class_name,
+)
 
 
 log = structlog.getLogger(__name__)
@@ -66,7 +68,11 @@ def prompt_for_ingestion(context, request):
 register_path_content_type(path='/submit_for_ingestion', content_type='multipart/form-data')
 
 
-@view_config(route_name='submit_for_ingestion', request_method='POST', # accept='multipart/form-data',
+@view_config(route_name='submit_for_ingestion', request_method='POST',
+             # Apparently adding this 'accept' causes discrimination on incoming requests not to find this method.
+             # We do want this type, and instead we check the request to make sure we got it, but we omit it here
+             # for practical reasons. -kmp 10-Sep-2020
+             # accept='multipart/form-data',
              permission='add')
 @debug_log
 def submit_for_ingestion(context, request):
@@ -128,7 +134,7 @@ def submit_for_ingestion(context, request):
         log.error(e)
 
         success = False
-        message = "{error_type}: {error_message}".format(error_type=type(e), error_message=str(e))
+        message = "{error_type}: {error_message}".format(error_type=full_class_name(e), error_message=str(e))
 
     # This manifest will be stored in the manifest.json file on on s3 AND will be returned from this endpoint call.
     manifest_content = {
@@ -159,8 +165,8 @@ def submit_for_ingestion(context, request):
 
             log.error(e)
 
-            message = "{error_type} (while uploading metadata): {error_message}".format(error_type=type(e),
-                                                                                        error_message=str(e))
+            message = ("{error_type} (while uploading metadata): {error_message}"
+                       .format(error_type=full_class_name(e), error_message=str(e)))
 
             raise SubmissionFailure(message)
 
