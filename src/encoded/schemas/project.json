@@ -37,7 +37,8 @@
             "type": "string",
             "lookup": 20,
             "uniqueKey": true,
-            "permission": "restricted_fields"
+            "permission": "restricted_fields",
+            "pattern": "^[A-Za-z0-9\\-]+$"
         },
         "title": {
             "title": "Title",
@@ -81,21 +82,9 @@
             "format": "uri",
             "lookup": 70
         },
-        "viewing_group": {
-            "title": "View access group",
-            "description": "The group that determines which set of data the user has permission to view.",
-            "type": "string",
-            "lookup": 100,
-            "enum": [
-                "4DN",
-                "Not 4DN",
-                "NOFIC",
-                "CvDC"
-            ]
-        },
         "pi": {
-            "title": "P.I.",
-            "description": "Principle Investigator of the project.",
+            "title": "Project Lead",
+            "description": "Lead Investigator of the project.",
             "comment": "See user.json for available identifiers.",
             "type": "string",
             "lookup": 80,
