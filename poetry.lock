@@ -553,7 +553,7 @@ description = "Utility package for interacting with the 4DN Data Portal and othe
 name = "dcicutils"
 optional = false
 python-versions = ">=3.4,<3.8"
-version = "0.38.1"
+version = "0.41.0"
 
 [package.dependencies]
 aws-requests-auth = ">=0.4.2,<1"
@@ -1934,6 +1934,7 @@ test = ["zope.testing"]
 
 [metadata]
 content-hash = "d7d2b7b679c3878c384e7f43bca9ab37b8374b5e61b6e6ea67ad85c5cf1055fa"
+lock-version = "1.0"
 python-versions = ">=3.6,<3.7"
 
 [metadata.files]
@@ -2100,8 +2101,8 @@ dcicsnovault = [
     {file = "dcicsnovault-3.1.9.tar.gz", hash = "sha256:347ab5ee3053a80273b081803f93fe115ed48ad53e6ce91c65a5d21a8f02d0e2"},
 ]
 dcicutils = [
-    {file = "dcicutils-0.38.1-py3-none-any.whl", hash = "sha256:7cf6a219a5794b07436946602b4c353314916fe463c1c42d240cf9db528f7a8b"},
-    {file = "dcicutils-0.38.1.tar.gz", hash = "sha256:3612f0bc26f17a6b14ab6112f3dca13cbb2f38eeacbd2d47922814ce90548fdf"},
+    {file = "dcicutils-0.41.0-py3-none-any.whl", hash = "sha256:64f0ec5a83340e4b9ee189089f2937890feb01ee6ffdb97e46634f6062afb04f"},
+    {file = "dcicutils-0.41.0.tar.gz", hash = "sha256:9573bbf5379c387ac33ad092e8507339ab2a1158ecebc8c68fc506f070cad6ea"},
 ]
 docker = [
     {file = "docker-4.3.0-py2.py3-none-any.whl", hash = "sha256:ba118607b0ba6bfc1b236ec32019a355c47b5d012d01d976467d4692ef443929"},
@@ -2429,7 +2430,6 @@ pycryptodome = [
     {file = "pycryptodome-3.9.8-cp38-cp38-win_amd64.whl", hash = "sha256:55eb61aca2c883db770999f50d091ff7c14016f2769ad7bca3d9b75d1d7c1b68"},
     {file = "pycryptodome-3.9.8-cp39-cp39-manylinux1_i686.whl", hash = "sha256:39ef9fb52d6ec7728fce1f1693cb99d60ce302aeebd59bcedea70ca3203fda60"},
     {file = "pycryptodome-3.9.8-cp39-cp39-manylinux1_x86_64.whl", hash = "sha256:de6e1cd75677423ff64712c337521e62e3a7a4fc84caabbd93207752e831a85a"},
-    {file = "pycryptodome-3.9.8.tar.gz", hash = "sha256:0e24171cf01021bc5dc17d6a9d4f33a048f09d62cc3f62541e95ef104588bda4"},
 ]
 pyflakes = [
     {file = "pyflakes-2.2.0-py2.py3-none-any.whl", hash = "sha256:0d94e0e05a19e57a99444b6ddcf9a6eb2e5c68d3ca1e98e90707af8152c90a92"},
