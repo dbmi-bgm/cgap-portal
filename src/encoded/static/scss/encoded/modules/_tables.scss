@@ -41,9 +41,40 @@ table {
 				outline: none !important;
 			}
 		}
+
+		/* If entire table or row has .text-left etc, apply to children as well (unless itself overrides). */
+		&.text-left,
+		&.text-right {
+			> tr {
+				text-align: inherit;
+				> th,
+				> td {
+					text-align: inherit;
+				}
+			}
+		}
 	}
 
+	/* If entire table or row has .text-left etc, apply to children as well. */
+	&.text-left,
+	&.text-right {
+		> thead,
+		> tbody {
+			text-align: inherit;
+			> tr {
+				text-align: inherit;
+				> th,
+				> td {
+					text-align: inherit;
+				}
+			}
+		}
+	}
+
+
+
 }
+
 
 
 .table-striped {

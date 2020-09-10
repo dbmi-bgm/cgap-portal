@@ -547,7 +547,10 @@ class VCFParser(object):
                         for group in comhet:
                             annotations = {}
                             for field_name, value in zip(field_names, group.split('|')):
-                                annotations[field_name] = self.fix_encoding(value)
+                                if field_name == 'comhet_transcript':  # array field
+                                    annotations[field_name] = self.fix_encoding(value).split('~')
+                                else:
+                                    annotations[field_name] = self.fix_encoding(value)
                             s['cmphet'].append(annotations)
 
             self.parse_samples(s, sample)  # add sample fields, already formatted
