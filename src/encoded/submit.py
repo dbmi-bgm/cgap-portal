@@ -287,7 +287,7 @@ class SubmissionRow:
         info = {'aliases': [self.sample_alias], 'files': []}
         fields = [
             'workup_type', 'specimen_type', 'dna_concentration', 'date_transported', 'indication',
-            'specimen_notes', 'research_protocol_name', 'sent_by', 'physician_id'
+            'specimen_notes', 'research_protocol_name', 'sent_by', 'physician_id', 'bam_sample_id'
         ]
         info = map_fields(self.metadata, info, fields, 'sample')
         # handle enum values
@@ -295,6 +295,9 @@ class SubmissionRow:
             info['specimen_accepted'] = 'Yes'
         elif info.get('specimen_accepted', '').lower() == 'n':
             info['specimen_accepted'] = 'No'
+        # handle bam sample ID
+        if not info.get('bam_sample_id'):
+            info['bam_sample_id'] = info.get('specimen_accession')
         # SEO
         if self.metadata.get('second specimen id'):
             other_id = {'id': self.metadata['second specimen id'], 'id_type': self.project}  # add proj info?
