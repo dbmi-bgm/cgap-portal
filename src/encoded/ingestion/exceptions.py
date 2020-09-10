@@ -2,10 +2,10 @@
 Exception definitions for ingestion
 """
 
-from pyramid.httpexceptions import HTTPBadRequest
+from pyramid.httpexceptions import HTTPBadRequest, HTTPServerError
 
 
-class SubmissionFailure(Exception):
+class SubmissionFailure(HTTPServerError):
     pass
 
 
