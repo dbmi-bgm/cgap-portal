@@ -12,8 +12,7 @@
         { "$ref": "mixins.json#/aliases" },
         { "$ref": "mixins.json#/submitted" },
         { "$ref": "mixins.json#/modified" },
-        { "$ref": "mixins.json#/status" },
-        { "$ref": "mixins.json#/attribution" }
+        { "$ref": "mixins.json#/status" }
     ],
     "properties": {
         "schema_version": {
@@ -21,6 +20,21 @@
         },
         "status": {
             "default": "current"
+        },
+        "institution": {
+            "title": "Institution",
+             "description": "Institution of whomever created this User Item in the system.",
+             "exclude_from": ["submit4dn"],
+             "type": "string",
+             "linkTo": "Institution"
+        },
+        "project": {
+            "title": "Project",
+            "description": "Project of whomever created this User Item in the system.",
+            "comment": "The value of this property determines who can potentially edit the User",
+            "exclude_from": ["submit4dn"],
+            "type": "string",
+            "linkTo": "Project"
         },
         "project_roles": {
             "title": "Projects and Roles",
@@ -34,6 +48,7 @@
                 "properties": {
                     "project": {
                         "title": "Project",
+                        "description": "Values here are used to authorize view and edit permissions of other Items in the database - eventually in combination with role",
                         "type": "string",
                         "linkTo": "Project"
                     },
@@ -91,6 +106,11 @@
                 "unknown"
             ],
             "lookup": 41
+        },
+        "role": {
+            "title": "RETIRED FIELD",
+            "type": "string",
+            "comment": "This used to be the property equivalent to job_title - rather than upgrade will just move the info"
         },
         "groups": {
             "title": "Groups",
