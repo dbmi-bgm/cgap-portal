@@ -241,6 +241,7 @@ def test_submit_for_ingestion_authorized(testapp):
 
     check_submit_for_ingestion_authorized(testapp, MockBotoS3Client())
 
+
 # The next couple of tests are small variations in which the first or second interaction with S3 fails
 
 class MockBuggyBotoS3Client(MockBotoS3Client):
@@ -291,4 +292,3 @@ def test_submit_for_ingestion_authorized_but_failed_second_s3_interaction(testap
                           ' An error occurred (400) when calling the upload_fileobj operation: Simulated error."}\'')
     else:
         raise AssertionError("An expected webtest.AppError was not raised.")
-
