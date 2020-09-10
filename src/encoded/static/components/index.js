@@ -10,42 +10,44 @@
  * Individual item-type-view files might themselves register a PageTitle panel view.
  */
 
-import { content_views }        from './globals';
+import { content_views }                    from './globals';
 
-import StaticPage               from './static-pages/StaticPage';
-import DirectoryPage            from './static-pages/DirectoryPage';
+import StaticPage                           from './static-pages/StaticPage';
+import DirectoryPage                        from './static-pages/DirectoryPage';
 
-import HomePage                 from './static-pages/HomePage';
-import ReleaseUpdates           from './static-pages/ReleaseUpdates';
+import HomePage                             from './static-pages/HomePage';
+import ReleaseUpdates                       from './static-pages/ReleaseUpdates';
 
 
-import DefaultItemView          from './item-pages/DefaultItemView';
-import CaseView, { CaseSubmissionView } from './item-pages/CaseView';
-import IndividualView           from './item-pages/IndividualView';
-import FileProcessedView        from './item-pages/FileProcessedView';
-import SampleView               from './item-pages/SampleView';
-import HealthView               from './item-pages/HealthView';
-import UserView, { ImpersonateUserForm } from './item-pages/UserView';
-import SchemaView               from './item-pages/SchemaView';
-import FallbackView             from './item-pages/FallbackView';
-import DocumentView             from './item-pages/DocumentView';
-import StaticSectionView        from './item-pages/StaticSectionView';
-import CGAPSubmissionView       from './forms/CGAPSubmissionView';
-import SearchView               from './browse/SearchView';
+import DefaultItemView                      from './item-pages/DefaultItemView';
+import CaseView, { CaseSubmissionView }     from './item-pages/CaseView';
+import VariantSampleView                    from './item-pages/VariantSampleView';
+import IndividualView                       from './item-pages/IndividualView';
+import FileProcessedView                    from './item-pages/FileProcessedView';
+import SampleView                           from './item-pages/SampleView';
+import HealthView                           from './item-pages/HealthView';
+import UserView, { ImpersonateUserForm }    from './item-pages/UserView';
+import SchemaView                           from './item-pages/SchemaView';
+import FallbackView                         from './item-pages/FallbackView';
+import DocumentView                         from './item-pages/DocumentView';
+import StaticSectionView                    from './item-pages/StaticSectionView';
+import CGAPSubmissionView                   from './forms/CGAPSubmissionView';
+import SearchView                           from './browse/SearchView';
 
 /**
  * These content_view.register actions occur in this index.js as otherwise
  * the item-type-view files might not be included in the compiled build.js
  * due to webpack/babel tree-shaking config/plugins.
  */
-content_views.register(StaticPage,    'StaticPage');
-content_views.register(DirectoryPage, 'DirectoryPage');
+content_views.register(StaticPage,              'StaticPage');
+content_views.register(DirectoryPage,           'DirectoryPage');
 
 content_views.register(HomePage,                'HomePage');
 content_views.register(ReleaseUpdates,          'Release-updatesPage');
 
 content_views.register(DefaultItemView,         'Item');
 content_views.register(CaseView,                'Case');
+content_views.register(VariantSampleView,       'VariantSample');
 content_views.register(IndividualView,          'Individual');
 content_views.register(FileProcessedView,       'FileProcessed');
 content_views.register(SampleView,              'Sample');

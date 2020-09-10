@@ -9,15 +9,12 @@ import io
 import json
 import os
 import psycopg2
-import pyramid.request
 import requests  # XXX: C4-211 should not be needed but is // KMP needs this, too, until subrequest posts work
 import signal
 import socket
 import structlog
 import threading
 import time
-import urllib.parse
-import uuid
 import webtest
 
 from dcicutils.env_utils import is_stg_or_prd_env
@@ -67,6 +64,8 @@ def prompt_for_ingestion(context, request):
 
 
 register_path_content_type(path='/submit_for_ingestion', content_type='multipart/form-data')
+
+
 @view_config(route_name='submit_for_ingestion', request_method='POST', accept='multipart/form-data')
 @debug_log
 def submit_for_ingestion(context, request):
@@ -176,6 +175,7 @@ def submit_for_ingestion(context, request):
 @debug_log
 def ingestion_status(context, request):
     """ Status route, essentially identical to indexing_status. """
+    ignored(context)
     queue_manager = request.registry[INGESTION_QUEUE]
     n_waiting, n_inflight = queue_manager.get_counts()
     return {
@@ -234,6 +234,7 @@ def queue_ingestion(context, request):
     """ Queues uuids as part of the request body for ingestion. Can batch as many as desired in a
         single request.
     """
+    ignored(context)
     uuids = request.json.get('uuids', [])
     override_name = request.json.get('override_name', None)
     return enqueue_uuids_for_request(request, uuids, override_name=override_name)
@@ -253,7 +254,8 @@ def enqueue_uuids_for_request(request, uuids, *, ingestion_type='vcf', override_
         response['notification'] = 'Success'
         response['number_queued'] = len(uuids)
         response['detail'] = 'Successfully queued the following uuids: %s' % uuids
-        patch_vcf_file_status(request, uuids)  # extra state management - may not be accurate, hard to get right
+        if ingestion_type == 'vcf':
+            patch_vcf_file_status(request, uuids)  # extra state management - may not be accurate, hard to get right
     else:
         response['number_queued'] = len(uuids) - len(failed)
         response['detail'] = 'Some uuids failed: %s' % failed
@@ -307,7 +309,7 @@ class IngestionQueueManager:
                 Attributes=self.queue_attrs[self.queue_name]
             )
             queue_url = response['QueueUrl']
-        except self.client.exceptions.QueueNameExists as e:
+        except self.client.exceptions.QueueNameExists:
             queue_url = self._get_queue_url(self.queue_name)
         except Exception as e:
             log.error('Error while attempting to create queue: %s' % e)
@@ -404,6 +406,7 @@ class IngestionQueueManager:
 
             :precondition: uuids are all of type FileProcessed
             :param uuids: uuids to be added to the queue.
+            :param ingestion_type: the ingestion type of the uuids (default 'vcf' for legacy reasons)
             :returns: 2-tuple: uuids queued, failed messages (if any)
         """
         curr_time = datetime.datetime.utcnow().isoformat()
@@ -767,10 +770,10 @@ class ErrorHandlingThread(threading.Thread):
     def run(self):
         # interval = self._kwargs.get('interval', DEFAULT_INTERVAL)
         interval = 60  # DB polling can and should be slower
-        update_status = self._kwargs['_update_status']
+        update_status = self._kwargs['_update_status']  # noQA - uses private instance variables of parent class
         while True:
             try:
-                self._target(*self._args, **self._kwargs)
+                self._target(*self._args, **self._kwargs)  # noQA - uses private instance variables of parent class
             except (psycopg2.OperationalError, elasticsearch.exceptions.ConnectionError) as e:
                 # Handle database restart
                 log.warning('Database not there, maybe starting up: %r', e)
@@ -851,6 +854,7 @@ def composite(loader, global_conf, **settings):
         """ Allows you to get the status of the ingestion "manager". This will be much
             more useful once multi-processing is thrown at ingestion.
         """
+        ignored(environ)
         status = '200 OK'
         response_headers = [('Content-type', 'application/json')]
         start_response(status, response_headers)
@@ -881,6 +885,7 @@ def main():
 
     vapp = VirtualApp(app, config)
     return run(vapp)
+
 
 PROMPT_TEMPLATE = """
 <!DOCTYPE html>

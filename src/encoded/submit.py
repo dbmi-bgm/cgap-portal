@@ -654,6 +654,9 @@ class SpreadsheetProcessing:
             self.errors.append(msg)
 
     def create_row_dict(self):
+        """
+        Turns each row into a dictionary of form {column heading1: row value1, ...}
+        """
         missing = [col for col in REQUIRED_COLUMNS if col not in self.keys]
         if missing:
             msg = 'Column(s) "{}" not found in spreadsheet! Spreadsheet cannot be processed.'.format('", "'.join(missing))
@@ -675,6 +678,12 @@ class SpreadsheetProcessing:
 
 
 def xls_to_json(row, project, institution):
+    """
+    Wrapper for SpreadsheetProcessing that returns expected values:
+    result.output - metadata to be submitted in json
+    result.passing - whether submission "passes" this part of the code and can move
+        on to the next step.
+    """
     result = SpreadsheetProcessing(row, project, institution)
     result.output['errors'] = result.errors
     return result.output, result.passing
