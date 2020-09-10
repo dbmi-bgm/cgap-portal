@@ -1,6 +1,7 @@
 import datetime
 import io
 import os
+import pyramid.httpexceptions
 import pytest
 import tempfile
 
@@ -8,8 +9,15 @@ from unittest import mock
 from dcicutils.qa_utils import ControlledTime, ignored
 from ..util import (
     debuglog, deduplicate_list, gunzip_content, resolve_file_path, ENCODED_ROOT_DIR, get_trusted_email,
+    full_class_name,
 )
 from .. import util as util_module
+
+
+def test_full_class_name():
+
+    assert full_class_name(3) == 'int'
+    assert full_class_name(pyramid.httpexceptions.HTTPClientError("Oops")) == "pyramid.httpexceptions.HTTPClientError"
 
 
 def test_deduplicate_list():

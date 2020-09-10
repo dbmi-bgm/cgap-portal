@@ -238,6 +238,16 @@ def create_empty_s3_file(s3_client, bucket: str, key: str):
     s3_client.upload_file(empty_file, Bucket=bucket, Key=key)
 
 
+def full_class_name(object):
+    # Source: https://stackoverflow.com/questions/2020014/get-fully-qualified-class-name-of-an-object-in-python
+
+    module = object.__class__.__module__
+    if module is None or module == str.__class__.__module__:
+        return object.__class__.__name__  # Avoid reporting __builtin__
+    else:
+        return module + '.' + object.__class__.__name__
+
+
 def get_trusted_email(request, context=None, raise_errors=True):
     """
     Get an email address on behalf of which we can issue other requests.
