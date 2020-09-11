@@ -611,7 +611,25 @@ h3.submission-subtitle {
 	}
 }
 
+@mixin caseStatusColorStyles {
+	&[data-status="complete"]:before {
+		color: #fff;
+		background-color: #308756;
+	}
 
+	&[data-status="incomplete"]:before {
+		color: #fff;
+		background-color: #d8bd22;
+	}
+
+	&[data-status="not-implemented"]:before,
+	&[data-status="not-started"]:before {
+		color: #fff;
+		background-color: #7b7b7b;
+	}
+}
+
+i.status-indicator-dot,
 i.item-status-indicator-dot {
 	display: inline-block;
 	position: relative;
@@ -623,11 +641,15 @@ i.item-status-indicator-dot {
 		position: relative;
 		border-radius: 50%;
 	}
+}
+
+i.item-status-indicator-dot {
 	@include statusColorStyles;
 }
 
-
-
+i.status-indicator-dot.case-status-indicator-dot {
+	@include caseStatusColorStyles;
+}
 
 
 
