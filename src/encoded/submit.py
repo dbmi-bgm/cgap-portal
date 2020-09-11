@@ -423,7 +423,7 @@ class SubmissionMetadata:
         self.files_processed = {}
         self.reports_req = []
         self.errors = []
-        self.analysis_types = {}
+        self.analysis_types = self.get_analysis_types()
         self.case_names = {}
         self.json_out = {}
         self.itemtype_dict = {
@@ -463,7 +463,7 @@ class SubmissionMetadata:
                     analysis_types[k] = v[1][0] + '-Group'
             else:
                 analysis_types[k] = None
-        self.analysis_types = analysis_types
+        return analysis_types
 
     #def extract_individual_metadata(idx, row, items, indiv_alias, inst_name):
     def add_metadata_single_item(self, item):

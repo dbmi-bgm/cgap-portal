@@ -27,6 +27,7 @@ def row_dict():
         'family id': '333',
         'sex': 'M',
         'relation to proband': 'proband',
+        'analysis id': '999',
         'report required': 'Y',
         'specimen id': '3464467',
         'specimen type': 'blood',
@@ -96,13 +97,18 @@ def sample_info():
 @pytest.fixture
 def example_rows():
     return [
-        {'individual id': '456', 'analysis id': '1111', 'relation to proband': 'proband', 'workup type': 'WGS'},
-        {'individual id': '123', 'analysis id': '1111', 'relation to proband': 'mother', 'workup type': 'WGS'},
-        {'individual id': '789', 'analysis id': '1111', 'relation to proband': 'father', 'workup type': 'WGS'},
-        {'individual id': '456', 'analysis id': '2222', 'relation to proband': 'proband', 'workup type': 'WGS'},
-        {'individual id': '555', 'analysis id': '3333', 'relation to proband': 'proband', 'workup type': 'WES'},
-        {'individual id': '546', 'analysis id': '3333', 'relation to proband': 'mother', 'workup type': 'WES'}
+        {'individual id': '456', 'analysis id': '1111', 'relation to proband': 'proband', 'workup type': 'WGS', 'specimen id': '1'},
+        {'individual id': '123', 'analysis id': '1111', 'relation to proband': 'mother', 'workup type': 'WGS', 'specimen id': '1'},
+        {'individual id': '789', 'analysis id': '1111', 'relation to proband': 'father', 'workup type': 'WGS', 'specimen id': '1'},
+        {'individual id': '456', 'analysis id': '2222', 'relation to proband': 'proband', 'workup type': 'WGS', 'specimen id': '1'},
+        {'individual id': '555', 'analysis id': '3333', 'relation to proband': 'proband', 'workup type': 'WES', 'specimen id': '1'},
+        {'individual id': '546', 'analysis id': '3333', 'relation to proband': 'mother', 'workup type': 'WES', 'specimen id': '1'}
     ]
+
+
+@pytest.fixture
+def example_rows_obj(example_rows, project, institution):
+    return SubmissionMetadata(example_rows, project, institution)
 
 
 @pytest.fixture
@@ -139,31 +145,36 @@ def test_map_fields(sample_info):
     assert not result.get('sequencing_lab')
 
 
-# def test_init_families(example_rows):
-#     fams = init_families(example_rows)
-#     assert sorted(list(fams.keys())) == ['1111', '2222', '3333']
-#     assert fams['1111'] == 'family-456'
-#     assert fams['2222'] == 'family-456'
-#     assert fams['3333'] == 'family-555'
-#
-#
-# def test_get_analysis_types(example_rows):
-#     a_types = get_analysis_types(example_rows)
-#     assert a_types['1111'] == 'WGS-Trio'
-#     assert a_types['2222'] == 'WGS'
-#     assert a_types['3333'] == 'WES-Group'
-#     example_rows[1]['workup type'] = 'WES'
-#     new_a_types = get_analysis_types(example_rows)
-#     assert new_a_types['1111'] is None
-#
-#
-# def test_extract_individual_metadata_new(row_dict, empty_items):
-#     items_out = extract_individual_metadata(1, row_dict, empty_items, 'test-proj:indiv1', 'hms-dbmi')
-#     assert items_out['individual']['test-proj:indiv1']['aliases'] == ['test-proj:indiv1']
-#     assert items_out['individual']['test-proj:indiv1']['individual_id'] == '456'
-#
-#
-# def test_extract_individual_metadata_old(row_dict, empty_items):
+def test_init_families(example_rows_obj, project):
+    # test family aliases are named after proband individual ids
+    proj_name = project['name'] + ':'
+    fams = example_rows_obj.family_dict
+    assert sorted(list(fams.keys())) == ['1111', '2222', '3333']
+    assert fams['1111'] == proj_name + 'family-456'
+    assert fams['2222'] == proj_name + 'family-456'
+    assert fams['3333'] == proj_name + 'family-555'
+
+
+def test_get_analysis_types(example_rows_obj, example_rows, project, institution):
+    a_types = example_rows_obj.analysis_types
+    assert a_types['1111'] == 'WGS-Trio'
+    assert a_types['2222'] == 'WGS'
+    assert a_types['3333'] == 'WES-Group'
+    example_rows[1]['workup type'] = 'WES'
+    # analysis type should be none if workup types in samples don't match
+    new_obj = SubmissionMetadata(example_rows, project, institution)
+    new_a_types = new_obj.analysis_types
+    assert new_a_types['1111'] is None
+
+
+def test_extract_individual_metadata(row_dict, project, institution):
+    obj = SubmissionRow(row_dict, 1, 'test-proj:fam1', project['name'], institution['name'])
+    assert obj.indiv_alias == 'encode-project:individual-456'
+    assert obj.individual.metadata['aliases'] == [obj.indiv_alias]
+    assert obj.individual.metadata['individual_id'] == row_dict['individual id']
+
+
+# def test_add_individual_metadata(row_dict, empty_items):
 #     items = empty_items.copy()
 #     items['individual'] = {'test-proj:indiv1': {
 #         'individual_id': '456',
