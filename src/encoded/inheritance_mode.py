@@ -30,9 +30,9 @@ class InheritanceMode:
 
     # Genotype labels
     GENOTYPE_LABEL_DOT = "Missing"
-    GENOTYPE_LABEL_00 = "Homozygus reference"
+    GENOTYPE_LABEL_00 = "Homozygous reference"
     GENOTYPE_LABEL_0M = "Heterozygous"
-    GENOTYPE_LABEL_MM = "Homozygus alternate"
+    GENOTYPE_LABEL_MM = "Homozygous alternate"
     GENOTYPE_LABEL_MN_KEYWORD = "multiallelic"
     GENOTYPE_LABEL_MN = "Heterozygous alt/alt -  %s" % GENOTYPE_LABEL_MN_KEYWORD
     GENOTYPE_LABEL_MN_ADDON = " (%s in family)" % GENOTYPE_LABEL_MN_KEYWORD
