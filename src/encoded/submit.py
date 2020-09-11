@@ -202,27 +202,21 @@ class SubmissionRow:
         self.metadata = row
         self.row = idx
         self.errors = []
-        self.check_missing_values()
-        if not self.errors:
+        if not self.found_missing_values():
             self.indiv_alias = '{}:individual-{}'.format(project, row['individual id'])
             self.fam_alias = family_alias
             self.sample_alias = '{}:sample-{}'.format(project, row['specimen id'])
             self.analysis_alias = '{}:analysis-{}'.format(project, row['analysis id'])
             self.case_name = row.get('unique analysis id')
-            self.individual = {}
-            self.family = {}
-            self.sample = {}
-            self.analysis = {}
+            self.report_required = False
+            self.individual = self.extract_individual_metadata()
+            self.family = self.extract_family_metadata()
+            self.sample, self.analysis = self.extract_sample_metadata()
             self.files_fastq = []
             self.files_processed = []
-            self.report = {}
-            self.report_required = False
-            self.extract_individual_metadata()
-            self.extract_family_metadata()
-            self.extract_sample_metadata()
             self.extract_file_metadata()
 
-    def check_missing_values(self):
+    def found_missing_values(self):
         # makes sure no required values from spreadsheet are missing
         missing_required = [col for col in REQUIRED_COLUMNS if col not in self.metadata
                             or not self.metadata[col]]
@@ -231,10 +225,12 @@ class SubmissionRow:
                 'Row {} - missing required field(s) {}. This row cannot be processed.'
                 ''.format(self.row, ', '.join(missing_required))
             )
+        return len(self.errors) > 0
 
     def extract_individual_metadata(self):
         """
-        Extracts 'individual' item metadata from each row
+        Extracts 'individual' item metadata from each row,
+        generating a MetadataItem object (assigned to self.individual in __init__).
         """
         info = {'aliases': [self.indiv_alias]}
         info = map_fields(self.metadata, info, ['individual_id', 'sex', 'age', 'birth_year'], 'individual')
@@ -251,11 +247,12 @@ class SubmissionRow:
         for col in ['age', 'birth_year']:
             if info.get(col) and isinstance(info[col], str) and info[col].isnumeric():
                 info[col] = int(info[col])
-        self.individual = MetadataItem(info, self.row, 'individual')
+        return MetadataItem(info, self.row, 'individual')
 
     def extract_family_metadata(self):
         """
-        Extracts 'family' item metadata from each row
+        Extracts 'family' item metadata from each row, generating a
+        MetadataItem object (assigned to self.family in __init__)
         """
         info = {
             'aliases': [self.fam_alias],
@@ -278,11 +275,12 @@ class SubmissionRow:
                 ', '.join(valid_relations)
             )
             self.errors.append(msg)
-        self.family = MetadataItem(info, self.row, 'family')
+        return MetadataItem(info, self.row, 'family')
 
     def extract_sample_metadata(self):
         """
-        Extracts 'sample' item metadata from each row
+        Extracts 'sample' item metadata from each row, generating MetadataItem objects
+        (assigned to self.sample and self.analysis in __init__)
         """
         info = {'aliases': [self.sample_alias], 'files': []}
         fields = [
@@ -313,7 +311,7 @@ class SubmissionRow:
                 req_info['accepted_rejected'] = "Rejected"
         # remove keys if no value
         info['requisition_acceptance'] = {k: v for k, v in req_info.items() if v}
-        self.sample = MetadataItem({k: v for k, v in info.items() if v}, self.row, 'sample')
+        # self.sample = MetadataItem({k: v for k, v in info.items() if v}, self.row, 'sample')
         if self.individual:
             self.individual.metadata['samples'] = [self.sample_alias]
         # metadata for sample_processing item
@@ -322,13 +320,32 @@ class SubmissionRow:
             'samples': [self.sample_alias],
             'families': [self.fam_alias]
         }
-        self.analysis = MetadataItem(new_sp_item, self.row, 'sample_processing')
+        # self.analysis = MetadataItem(new_sp_item, self.row, 'sample_processing')
         if self.metadata.get('report required').lower().startswith('y'):
             self.report_required = True
+        return (MetadataItem({k: v for k, v in info.items() if v}, self.row, 'sample'),
+                MetadataItem(new_sp_item, self.row, 'sample_processing'))
+
+    @staticmethod
+    def get_paired_end_value(index):
+        """
+        Returns the 'paired end' value for fastq pairs (1 or 2) given an index in a list.
+        0 --> 1
+        1 --> 2
+        2 --> 1
+        3 --> 2
+        4 --> 1
+        5 --> 2
+        ..
+        etc.
+        """
+        return int(2 - ((index + 1) % 2))
 
     def extract_file_metadata(self):
         """
-        Extracts 'file' item metadata from each row
+        Extracts 'file' item metadata from each row, generating MetadataItem
+        object(s). Objects are appended to self.files_fastq or self.files_processed,
+        as appropriate, which are initialized as empty lists.
         """
         valid_extensions = {
             '.fastq.gz': ('fastq', 'reads'),
@@ -360,7 +377,7 @@ class SubmissionRow:
             # file relationships if paired
             if fmt == 'fastq':
                 if paired:
-                    paired_end = str(int(2-((i+1)%2)))
+                    paired_end = str(SubmissionRow.get_paired_end_value(i))
                     file_info['paired end'] = paired_end
                     if paired_end == '2':
                         file_info['related_files'] = [
@@ -627,17 +644,15 @@ class SpreadsheetProcessing:
         self.output = {}
         self.errors = []
         self.keys = []
-        self.header = False
         self.counter = 0
         self.rows = []
         self.passing = False
-        self.get_header()
-        if self.header:
+        if self.header_found():
             self.create_row_dict()
         if self.rows:
             self.extract_metadata()
 
-    def get_header(self):
+    def header_found(self):
         """
         The header we are looking for may not always be the first row - some iterations of the
         submission spreadsheet had super-headings to group columns into categories.
@@ -648,13 +663,12 @@ class SpreadsheetProcessing:
                 self.keys = [key.lower().strip().rstrip('*: ') for key in keys]
                 self.counter += 1
                 if 'individual id' in self.keys:
-                    self.header = True
-                    break
+                    return True
             except StopIteration:
                 break
-        if not self.header:
-            msg = 'Column headers not detected in spreadsheet! "Individual ID*" column must be present in header.'
-            self.errors.append(msg)
+        msg = 'Column headers not detected in spreadsheet! "Individual ID*" column must be present in header.'
+        self.errors.append(msg)
+        return False
 
     def create_row_dict(self):
         """
