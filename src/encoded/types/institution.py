@@ -27,19 +27,3 @@ class Institution(Item):
     schema = load_schema('encoded:schemas/institution.json')
     name_key = 'name'
     embedded_list = Item.embedded_list
-
-    # def __init__(self, registry, models):
-    #     super().__init__(registry, models)
-    #     if hasattr(self, 'STATUS_ACL'):
-    #         self.STATUS_ACL.update(self.__class__.STATUS_ACL)
-    #     else:
-    #         self.STATUS_ACL = self.__class__.STATUS_ACL
-
-    # def __ac_local_roles__(self):
-    #     """This creates roles that the lab item needs so it can be edited & viewed"""
-    #     roles = {}
-    #     # institution_submitters = 'submits_for.%s' % self.uuid
-    #     # roles[institution_submitters] = 'role.institution_submitter'
-    #     institution_member = 'lab.%s' % self.uuid
-    #     roles[institution_member] = 'role.institution_member'
-    #     return roles

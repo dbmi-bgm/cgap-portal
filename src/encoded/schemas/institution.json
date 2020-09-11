@@ -34,14 +34,14 @@
             "title": "Name",
             "description": "A unique name for the institution.",
             "type": "string",
-            "uniqueKey": "institution:name",
-            "permission": "restricted_fields"
+            "uniqueKey": true,
+            "permission": "restricted_fields",
+            "pattern": "^[A-Za-z0-9\\-]+$"
         },
         "title": {
             "title": "Title",
             "description": "A unique title for the instituion.",
             "type": "string",
-            "uniqueKey": "institution:name",
             "permission": "restricted_fields"
         },
         "pi": {
