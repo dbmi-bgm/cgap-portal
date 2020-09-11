@@ -310,7 +310,6 @@ def test_xls_to_json_invalid_workup(project, institution, xls_list):
     rows = iter(xls_list)
     json_out, success = xls_to_json(rows, project, institution)
     assert json_out['errors']
-    print(json_out['errors'])
     assert success
     assert ('Row 5 - Samples with analysis ID 55432 contain mis-matched '
             'or invalid workup type values.') in ''.join(json_out['errors'])
