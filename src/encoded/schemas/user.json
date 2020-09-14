@@ -24,7 +24,7 @@
         "institution": {
             "title": "Institution",
              "description": "Institution of whomever created this User Item in the system.",
-             "exclude_from": ["submit4dn"],
+             "exclude_from": ["FFedit-create"],
              "type": "string",
              "linkTo": "Institution"
         },
@@ -32,7 +32,7 @@
             "title": "Project",
             "description": "Project of whomever created this User Item in the system.",
             "comment": "The value of this property determines who can potentially edit the User",
-            "exclude_from": ["submit4dn"],
+            "exclude_from": ["FFedit-create"],
             "type": "string",
             "linkTo": "Project"
         },
@@ -143,15 +143,13 @@
             "title": "Alternate phone number",
             "description": "The user's secondary phone number (with country code).",
             "type": "string",
-            "format": "phone",
-            "exclude_from": ["submit4dn"]
+            "format": "phone"
         },
         "fax": {
             "title": "Fax number",
             "description": "A FAX number for the user (with country code).",
             "type": "string",
-            "format": "phone",
-            "exclude_from": ["submit4dn"]
+            "format": "phone"
         },
         "skype": {
             "title": "Skype ID",

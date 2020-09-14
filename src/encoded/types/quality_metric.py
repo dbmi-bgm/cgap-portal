@@ -18,7 +18,7 @@ QC_SUMMARY_SCHEMA = {
     "type": "array",
     "title": "Quality Metric Summary",
     "description": "Selected Quality Metrics for Summary",
-    "exclude_from": ["submit4dn", "FFedit-create"],
+    "exclude_from": ["FFedit-create"],
     "items": {
             "title": "Selected Quality Metric",
             "type": "object",

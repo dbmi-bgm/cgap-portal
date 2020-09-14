@@ -55,7 +55,7 @@
             "title": "General Classification",
             "type": "string",
             "default": "ancillary file",
-            "exclude_from": ["submit4dn", "FFedit-create"],
+            "exclude_from": ["FFedit-create"],
             "enum": ["ancillary file"]
         },
         "genome_assembly": {

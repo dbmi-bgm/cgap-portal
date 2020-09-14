@@ -20,7 +20,7 @@ You can read this is as: we want to create a reverse link to ExperimentSet using
     "title": "Experiment Sets",
     "description": "Experiment Sets to which this experiment belongs.",
     "type": "array",
-    "exclude_from": ["submit4dn", "FFedit-create"],
+    "exclude_from": ["FFedit-create"],
     "items": {
         "title": "Experiment Set",
         "type": ["string", "object"],

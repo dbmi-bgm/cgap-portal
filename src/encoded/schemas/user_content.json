@@ -19,7 +19,6 @@
         },
         "status": {
             "title": "Status",
-            "exclude_from": ["submit4dn"],
             "type": "string",
             "permission": "restricted_fields",
             "default": "current",
