@@ -5,10 +5,11 @@ import PropTypes from 'prop-types';
 import _ from 'underscore';
 import DropdownButton from 'react-bootstrap/esm/DropdownButton';
 import DropdownItem from 'react-bootstrap/esm/DropdownItem';
-import { console, schemaTransforms } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
+import { console, schemaTransforms, object } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { Alerts } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/Alerts';
 
 import { Schemas } from './../../util';
+import { ExternalDatabasesSection } from './ExternalDatabasesSection';
 
 
 /**
@@ -22,15 +23,16 @@ import { Schemas } from './../../util';
  */
 export function GeneTabBody(props){
     const { currentGeneItemLoading, currentGeneItem, context, schemas } = props;
+    const fallbackElem = <em> - </em>;
     const {
         error               = null,
         '@id' : geneAtID    = null,
-        name                = <em>None</em>,
+        name                = fallbackElem,
         gene_symbol         = null,
-        gene_biotype        = <em>None</em>,
+        gene_biotype        = fallbackElem,
         alias_symbol        = [],
         prev_symbol         = [],
-        alias_name          = <em>Todo 3</em>,
+        alias_name          = fallbackElem,
         gene_summary        = <em>No summary available</em>,
         chrom = null,
         spos = null,
@@ -222,172 +224,24 @@ export function GeneTabBody(props){
     );
 }
 
-export const ExternalDatabasesSection = React.memo(function ExternalDatabasesSection(props){
-    const {
-        currentItem, // Renamed from 'currentGeneItem' in case want to move & re-use for Variant, also.
-        schemas = null,
-        itemType = "Gene",
-        // IN FUTURE WE WON"T HAVE THIS LIST
-        // AND INSTEAD GATHER THE PROPERTIES FROM SCHEMA
-        // ACCORDING TO PERHAPS "annotation_category" :"dbxref"
-        // Clinvar, medgen not exist yet it seems.
 
-        externalDatabaseFieldnames = [
-            // TODO handle commented-out sub-objects:
-            "genecards",
-            "ensgid",
-            "entrez_id",
-            "hgnc_id",
-            // "ccds_id", - duplicate
-            "genereviews",
-            // "transcriptid.ensembl_pro", - duplicate
-            "uniprot_ids",
-            "pdb",
-            "mgi_id",
-            "marrvel",
-            "omim_id",
-            "orphanet",
-            "trait_association_gwas_pmid",
-            "clingen",
-            "pharmgkb",
-            "gtex_expression",
-            "brainspan_microarray",
-            "brainspan_rnaseq",
-            "brainatlas_microarray",
-            "biogrid",
-            "string",
-            // "gene_symbol", - duplicate
-            "refseq_accession",
-            // "clingendis.disease_id", // todo - handle
-            // "transcriptid.ensembl_trs", // todo - handle
-            "gnomad"
-        ]
-    } = props;
-
-    if (!schemas) {
-        return (
-            <div className="text-secondary d-flex align-items-center justify-content-center h-100 pb-12 text-larger pb-08">
-                <i className="icon icon-spin icon-circle-notch fas" />
-            </div>
-        );
-    }
-
-    const externalDatabaseSchemaFields = externalDatabaseFieldnames.map(function(fieldName){
-        const propertySchema = schemaTransforms.getSchemaProperty(fieldName, schemas, itemType); // We get .items from this if array field. Might change in future.
-        return [ fieldName, propertySchema ];
-    }).filter(function(f){
-        // Filter out fields which don't exist in schema yet.
-        // Or for which we can't form links for.
-        return !!(
-            f[1] &&
-            (f[1].link || (f[1].items && f[1].items.link))
-        );
-    });
-
-    const externalDatabaseElems = externalDatabaseSchemaFields.map(function([ fieldName, fieldSchema ]){
-
-        const isArray = !!(fieldSchema.items && fieldSchema.type === "array");
-
-        const {
-            link: linkFormat = null,
-            title = null,
-            // description = null
-        } = fieldSchema;
-
-        let externalIDs = currentItem[fieldName];
-        if (typeof externalIDs === "undefined") {
-            externalIDs = [];
-        } else if (!Array.isArray(externalIDs)) {
-            externalIDs = [ externalIDs ];
-        }
-
-        console.log('TTT', fieldSchema, isArray, externalIDs);
-
-        const extIDsLen = externalIDs.length;
-
-
-        // if (!externalID) {
-        //     return null;
-        // }
-
-        let val;
-
-        if (extIDsLen === 0) {
-            val = <em data-tip="Not Available" className="px-1"> - </em>;
-        } else if (extIDsLen < 5) {
-            // Newline for each
-            val = externalIDs.map(function(externalID){
-                const linkToID = linkFormat.replace("<ID>", externalID);
-                return (
-                    <a href={linkToID || null} className="d-block" target="_blank" rel="noopener noreferrer" id={"external_resource_for_" + fieldName} key={externalID}>
-                        <span>{ externalID }</span>
-                        <i className="ml-05 icon icon-fw icon-external-link-alt fas text-smaller text-secondary" />
-                    </a>
-                );
-            });
-        } else {
-            // Same line, comma, count instd of titles for subsequents.
-            val = externalIDs.map(function(externalID, index){
-                const linkToID = linkFormat.replace("<ID>", externalID);
-                const title = index === 0 ? externalID : `(${index + 1})`;
-                return (
-                    <React.Fragment key={externalID}>
-                        <a href={linkToID || null} target="_blank" rel="noopener noreferrer" id={"external_resource_for_" + fieldName}
-                            data-tip={index === 0 ? null : externalID}>
-                            { title }
-                        </a>
-                        { index === extIDsLen - 1 ?
-                            <i className="ml-05 icon icon-fw icon-external-link-alt fas text-smaller text-secondary" />
-                            : " " }
-                    </React.Fragment>
-                );
-            });
-        }
-
-        return (
-            <div className="row mb-03" key={fieldName}>
-                <div className="col-12 col-xl">
-                    <label className="mb-0 black-label" htmlFor={"external_resource_for_" + fieldName}>{ title || fieldName }</label>
-                </div>
-                <div className="col-12 col-xl-auto">
-                    { val }
-                </div>
-            </div>
-        );
-    }).filter(function(elem){ return !!elem; });
-
-    const externalDatabaseElemsLen = externalDatabaseElems.length;
-    if (externalDatabaseElemsLen === 0) {
-        return <h4 className="text-center font-italic text-400 my-0 pb-08">No External Databases</h4>;
-    } else if (externalDatabaseElemsLen >= 4) {
-        const mp = Math.ceil(externalDatabaseElemsLen / 2);
-        const col1 = externalDatabaseElems.slice(0, mp);
-        const col2 = externalDatabaseElems.slice(mp);
-        return (
-            <div className="row">
-                <div className="col-12 col-xl-6">
-                    { col1 }
-                </div>
-                <div className="col-12 col-xl-6">
-                    { col2 }
-                </div>
-            </div>
-        );
-    } else {
-        return externalDatabaseElems;
-    }
-
-});
 
 function ConstraintScoresSection({ currentGeneItem, getTipForField }){
+    const fallbackNotPresent = <em data-tip="Not Available"> - </em>;
+    const fallbackNotImplemented = <em data-tip="Not present or implemented"> &bull; </em>;
     const {
         exp_lof, exp_mis, exp_syn,
         obs_lof, obs_mis, obs_syn,
-        oe_lof,  oe_mis,  oe_syn,
+        oe_lof, oe_lof_lower = null, oe_lof_upper = null,
+        oe_syn, oe_syn_lower = null, oe_syn_upper = null,
+        oe_mis, oe_mis_lower =    0, oe_mis_upper = null,
+        syn_z, mis_z, lof_z,
+        s_het,
+        rvis_exac
         // more todo
     } = currentGeneItem;
     return (
-        <table className="w-100">
+        <table className="w-100 text-left">
             <thead className="bg-transparent">
                 <tr>
                     <th className="text-left">Constraint</th>
@@ -398,24 +252,107 @@ function ConstraintScoresSection({ currentGeneItem, getTipForField }){
             </thead>
             <tbody>
                 <tr>
-                    <td className="text-600 text-left">{"Exp. SNV's"}</td>
-                    <td data-tip={getTipForField("exp_syn")}>{ exp_syn }</td>
-                    <td data-tip={getTipForField("exp_mis")}>{ exp_mis }</td>
-                    <td data-tip={getTipForField("exp_lof")}>{ exp_lof }</td>
+                    <td className="text-600 text-left">Expected</td>
+                    <td>
+                        <span data-tip={getTipForField("exp_syn")}>{ exp_syn || fallbackNotPresent }</span>
+                    </td>
+                    <td>
+                        <span data-tip={getTipForField("exp_mis")}>{ exp_mis || fallbackNotPresent }</span>
+                    </td>
+                    <td>
+                        <span data-tip={getTipForField("exp_lof")}>{ exp_lof || fallbackNotPresent }</span>
+                    </td>
                 </tr>
                 <tr>
-                    <td className="text-600 text-left">{"Obs. SNV's"}</td>
-                    <td data-tip={getTipForField("obs_syn")}>{ obs_syn }</td>
-                    <td data-tip={getTipForField("obs_mis")}>{ obs_mis }</td>
-                    <td data-tip={getTipForField("obs_lof")}>{ obs_lof }</td>
+                    <td className="text-600 text-left">Observed</td>
+                    <td>
+                        <span data-tip={getTipForField("obs_syn")}>{ obs_syn || fallbackNotPresent }</span>
+                    </td>
+                    <td>
+                        <span data-tip={getTipForField("obs_mis")}>{ obs_mis || fallbackNotPresent }</span>
+                    </td>
+                    <td>
+                        <span data-tip={getTipForField("obs_lof")}>{ obs_lof || fallbackNotPresent }</span>
+                    </td>
                 </tr>
                 <tr>
-                    <td className="text-600 text-left">{"o/e"}</td>
-                    <td data-tip={getTipForField("oe_syn")}>{ oe_syn }</td>
-                    <td data-tip={getTipForField("oe_mis")}>{ oe_mis }</td>
-                    <td data-tip={getTipForField("oe_lof")}>{ oe_lof }</td>
+                    <td className="text-600 text-left">O/E (range)</td>
+                    <td>
+                        <span data-tip={getTipForField("oe_syn")}>{ shortenToSignificantDigits(oe_syn) || fallbackNotPresent }</span>
+                        { oe_syn_lower !== null && oe_syn_upper !== null ? ` (${oe_syn_lower} - ${oe_syn_upper})` : null }
+                    </td>
+                    <td>
+                        <span data-tip={getTipForField("oe_mis")}>{ shortenToSignificantDigits(oe_mis) || fallbackNotPresent }</span>
+                        { oe_mis_lower !== null && oe_mis_upper !== null ? ` (${oe_mis_lower} - ${oe_mis_upper})` : null }
+                    </td>
+                    <td>
+                        <span data-tip={getTipForField("oe_lof")}>{ shortenToSignificantDigits(oe_lof) || fallbackNotPresent }</span>
+                        { oe_lof_lower !== null && oe_lof_upper !== null ? ` (${oe_lof_lower} - ${oe_lof_upper})` : null }
+                    </td>
+                </tr>
+                <tr>
+                    <td className="text-600 text-left">Z-score</td>
+                    <td>
+                        <span data-tip={getTipForField("syn_z")}>{ shortenToSignificantDigits(syn_z) || fallbackNotPresent }</span>
+                    </td>
+                    <td>
+                        <span data-tip={getTipForField("mis_z")}>{ shortenToSignificantDigits(mis_z) || fallbackNotPresent }</span>
+                    </td>
+                    <td>
+                        <span data-tip={getTipForField("lof_z")}>{ shortenToSignificantDigits(lof_z) || fallbackNotPresent }</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td className="text-600 text-left">LOEUF</td>
+                    <td>{ fallbackNotImplemented }</td>
+                    <td>{ fallbackNotImplemented }</td>
+                    <td>
+                        <span data-tip={getTipForField("oe_lof_upper")}>{ oe_lof_upper || fallbackNotPresent }</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td className="text-600 text-left">S-Het</td>
+                    <td>{ fallbackNotImplemented }</td>
+                    <td>
+                        <span data-tip={getTipForField("s_het")}>{ shortenToSignificantDigits(s_het) || fallbackNotPresent }</span>
+                    </td>
+                    <td>{ fallbackNotImplemented }</td>
+                </tr>
+                <tr>
+                    <td className="text-600 text-left">RVIS (ExAC)</td>
+                    <td>{ fallbackNotImplemented }</td>
+                    <td>
+                        <span data-tip={getTipForField("rvis_exac")}>{ shortenToSignificantDigits(rvis_exac) || fallbackNotPresent }</span>
+                    </td>
+                    <td>{ fallbackNotImplemented }</td>
                 </tr>
             </tbody>
         </table>
     );
+}
+
+/**
+ * @todo Move into shared-portal-components > util > valueTransforms ?
+ * @todo Maybe, if to be reused:
+ *   Handle & abbreviate large numbers using 'M', 'B', 'T' maybe?
+ *   We have `valueTransforms.roundLargeNumber(num, decimalPlaces = 2)` function already which can just be re-used if we paramaterize its `numberLevels`.
+ *       (currently: `['', 'k', 'm', ' billion', ' trillion', ' quadrillion', ' quintillion']`)
+ */
+function shortenToSignificantDigits(numberToShorten, countDigits = 3) {
+
+    if (!numberToShorten) {
+        // Pass through falsy values such as "0" (doesnt need shortening) or null, false, undefined.
+        return numberToShorten;
+    }
+
+    if (typeof numberToShorten !== "number" || isNaN(numberToShorten)) {
+        throw new Error("Expected well-formed number (or falsy value).");
+    }
+
+    if (numberToShorten >= Math.pow(10, countDigits - 1)) {
+        // todo: handle later
+        return "" + Math.round(numberToShorten);
+    }
+
+    return numberToShorten.toPrecision(countDigits);
 }

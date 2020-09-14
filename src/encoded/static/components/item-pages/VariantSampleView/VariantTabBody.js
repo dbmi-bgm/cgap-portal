@@ -9,7 +9,7 @@ import { console, schemaTransforms } from '@hms-dbmi-bgm/shared-portal-component
 import { Alerts } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/Alerts';
 
 import { Schemas } from './../../util';
-import { ExternalDatabasesSection } from './GeneTabBody';
+import { ExternalDatabasesSection } from './ExternalDatabasesSection';
 
 /**
  * Excluding the Gene Area (under position in mockuop https://gyazo.com/81d5b75b167bddef1b4c0a97f1640c51)
@@ -484,8 +484,10 @@ function ExternalResourcesSection({ context, schemas, currentTranscriptIdx }){
         return null;
     }
 
-    // For now we kind of create combo object of these above ^
-    const currentItem = {};
+    // For now we kind of create combo object of these above ^, transforming "transcript" to be single item for vals to be plucked from
+    const currentItem = {
+        "transcript" : [{}] // Keeping as arr only for consistency w. parent `context` otherwise for code itself it could've been {} instd of [{}].
+    };
 
     externalDatabaseFieldnames.forEach(function(fieldName){
         currentItem[fieldName] = variant[fieldName];
@@ -495,7 +497,7 @@ function ExternalResourcesSection({ context, schemas, currentTranscriptIdx }){
     transcriptFieldNames.forEach(function(fieldName){
         const newFieldName = "transcript." + fieldName;
         externalDatabaseFieldnames.push(newFieldName);
-        currentItem[newFieldName] = currentTranscript[fieldName];
+        currentItem.transcript[0][fieldName] = currentTranscript[fieldName];
     });
 
 

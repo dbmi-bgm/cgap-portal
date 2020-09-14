@@ -17,7 +17,6 @@ import { BrowserTabBody } from './BrowserTabBody';
 
 
 
-
 export class VariantSampleOverview extends React.PureComponent {
 
     constructor(props){
@@ -124,22 +123,37 @@ function getCurrentTranscriptGeneID(context, transcriptIndex){
 }
 
 
-
-/** @todo probably eventually move into own file, along w child tabs */
+/**
+ * We don't want to include DotRouter (or its functionality) in here yet/for-now since
+ * this will also be an overlayed UI on CaseView. We might later conditionally pass in like
+ * 'onMount' prop/function that could detect if ".variant-tab" or something and then update own state,
+ * (componentDidMount can be replicated in functional component using memoized useEffect hook).
+ * (I guess it wouldn't need to be a prop, and on CaseView we could theoretically support like #case-info.filtering.variant-sample-overlay.variant-tab ? idk lol)
+ *
+ * @todo probably eventually move into own file, along w child tabs
+ */
 function VariantSampleOverviewTabView(props){
     const { context, schemas, currentGeneItem, currentGeneItemLoading, currentTranscriptIdx } = props;
     const [ currentTab, setCurrentTab ] = useState("Variant");
 
-    // TODO change eventually to use 'if' condition or something and distribute props as needed.
-    let tabViewBody = null;// { "Variant" : VariantTabBody, "Gene" : GeneTabBody, "Sample" : SampleTabBody }[currentTab];
-    if (currentTab === "Variant"){
-        tabViewBody = <VariantTabBody {...{ context, schemas, currentTranscriptIdx }} />;
-    } else if (currentTab === "Gene") {
-        tabViewBody = <GeneTabBody {...{ context, schemas, currentGeneItem, currentGeneItemLoading }} />;
-    } else if (currentTab === "Sample") {
-        tabViewBody = <SampleTabBody {...{ context, schemas }} />;
-    } else if (currentTab === "Browser") {
-        tabViewBody = <BrowserTabBody {...{ context, schemas }} />;
+    let tabViewBody = null;
+
+    // Route by tab title (in future may change into some sort of dot-router 'key' later like '.variant-sample-overview.variant' or something).
+    switch (currentTab) {
+        case "Variant":
+            tabViewBody = <VariantTabBody {...{ context, schemas, currentTranscriptIdx }} />;
+            break;
+        case "Gene":
+            tabViewBody = <GeneTabBody {...{ context, schemas, currentGeneItem, currentGeneItemLoading }} />;
+            break;
+        case "Sample":
+            tabViewBody = <SampleTabBody {...{ context, schemas }} />;
+            break;
+        case "Browser":
+            tabViewBody = <BrowserTabBody {...{ context, schemas }} />;
+            break;
+        default:
+            throw new Error("Unsupported tab");
     }
 
     const onClick = useMemo(function(){
