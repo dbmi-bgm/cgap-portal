@@ -291,9 +291,10 @@ def test_udn_user_cannot_access_bgm_item_unless_shared(testapp, udn_user_testapp
     assert udn_user_testapp.get(simple_bgm_file['@id'], status=expres)
 
 
-@pytest.mark.parametrize('status, expres', list(zip(STATUSES, [403] * 7)))
-def test_udn_user_cannot_patch_bgm_item(testapp, udn_user_testapp, simple_bgm_file, status, expres):
-    # shouldn't be able to patch at all but this may chenge
+@pytest.mark.parametrize('status', STATUSES)
+def test_udn_user_cannot_patch_bgm_item(testapp, udn_user_testapp, simple_bgm_file, status):
+    # shouldn't be able to patch at all but this may change
+    expres = 403
     fitem = testapp.patch_json(simple_bgm_file['@id'], {'status': status}, status=200).json['@graph'][0]
     assert fitem.get('status') == status
     assert udn_user_testapp.patch_json(fitem['@id'], {'read_length': 100}, status=expres)
