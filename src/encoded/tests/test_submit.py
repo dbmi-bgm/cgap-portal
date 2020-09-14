@@ -26,6 +26,8 @@ def row_dict():
         'individual id': '456',
         'family id': '333',
         'sex': 'M',
+        # 'age': '33',
+        # 'birth year': '1986',
         'relation to proband': 'proband',
         'analysis id': '999',
         'report required': 'Y',
@@ -33,6 +35,27 @@ def row_dict():
         'specimen type': 'blood',
         'workup type': 'WGS'
     }
+
+
+# @pytest.fixture
+# def row_dict_nums(row_dict):
+#     row_dict['age'] = 33
+#     row_dict['birth year'] = 1986
+#     return row_dict
+#
+#
+# # @pytest.fixture
+# # def row_dict_str(row_dict):
+# #     row_dict['age'] = '33'
+# #     row_dict['birth year'] = '1986'
+# #     return row_dict
+#
+#
+# @pytest.fixture
+# def row_dict_text(row_dict):
+#     row_dict['age'] = 'abc'
+#     row_dict['birth year'] = 'def'
+#     return row_dict
 
 
 @pytest.fixture
@@ -185,32 +208,38 @@ def test_extract_individual_metadata(row_dict, project, institution):
 #     assert len(items['individual']) == len(items_out['individual'])
 #     assert 'sex' in items_out['individual']['test-proj:indiv1']
 #     assert 'age' in items_out['individual']['test-proj:indiv1']
+
+
+@pytest.mark.parametrize('age, birth_year, val_type', [
+    ('33', '1986', int),
+    # text values for age and birth year should be passed on without errors to eventually fail validation
+    ('abc', 'def', str)
+])
+def test_extract_individual_metadata_nums(row_dict, age, birth_year, val_type, project, institution):
+    row_dict['age'] = age
+    row_dict['birth year'] = birth_year
+    obj = SubmissionRow(row_dict, 1, 'test-proj:fam1', project['name'], institution['name'])
+    assert isinstance(obj.individual.metadata['age'], val_type)
+    assert not obj.errors
+
+
+@pytest.mark.parametrize('relation, error', [
+    ('proband', False),
+    ('grandmother', True)
+])
+def test_extract_family_metadata_new(row_dict, project, institution, relation, error):
+    row_dict['relation to proband'] = relation
+    obj = SubmissionRow(row_dict, 1, 'test-proj:fam1', project['name'], institution['name'])
+    assert obj.family.alias == 'test-proj:fam1'
+    assert obj.family.metadata['members'] == ['encode-project:individual-456']
+    if relation == 'proband':
+        assert obj.family.metadata['proband'] == 'encode-project:individual-456'
+    assert not obj.errors == (not error)  # check presence of errors
+    # check for correct error message
+    assert ('Row 1 - Invalid relation' in ''.join(obj.errors)) == error
 #
 #
-# def test_extract_individual_metadata_nums(row_dict, empty_items):
-#     items2 = deepcopy(empty_items)
-#     row_dict['age'] = '33'
-#     row_dict['birth year'] = '1988'
-#     items_out_nums = extract_individual_metadata(1, row_dict, empty_items, 'test-proj:indiv1', 'hms-dbmi')
-#     assert not items_out_nums['errors']
-#     assert isinstance(items_out_nums['individual']['test-proj:indiv1']['age'], int)
-#     assert isinstance(items_out_nums['individual']['test-proj:indiv1']['birth_year'], int)
-#     # text values for age and birth year should be passed on without errors to eventually fail validation
-#     row_dict['age'] = 'abc'
-#     row_dict['birth year'] = 'def'
-#     items_out_text = extract_individual_metadata(1, row_dict, items2, 'test-proj:indiv1', 'hms-dbmi')
-#     assert not items_out_text['errors']
-#     assert isinstance(items_out_text['individual']['test-proj:indiv1']['age'], str)
-#     assert isinstance(items_out_text['individual']['test-proj:indiv1']['birth_year'], str)
-#
-#
-# def test_extract_family_metadata_new(row_dict, empty_items):
-#     items_out = extract_family_metadata(1, row_dict, empty_items, 'test-proj:indiv1', 'test-proj:fam1')
-#     assert items_out['family']['test-proj:fam1']['members'] == ['test-proj:indiv1']
-#     assert items_out['family']['test-proj:fam1']['proband'] == 'test-proj:indiv1'
-#
-#
-# def test_extract_family_metadata_old(row_dict, empty_items):
+# def test_add_family_metadata_old(row_dict, empty_items):
 #     items = empty_items.copy()
 #     items['family'] = {'test-proj:fam1': {
 #         'aliases': ['test-proj:fam1'],
@@ -222,31 +251,19 @@ def test_extract_individual_metadata(row_dict, project, institution):
 #     assert items_out['family']['test-proj:fam1']['members'] == ['test-proj:indiv2', 'test-proj:indiv1']
 #     assert items_out['family']['test-proj:fam1']['proband'] == 'test-proj:indiv1'
 #     assert items_out['family']['test-proj:fam1']['mother'] == 'test-proj:indiv2'
-#
-#
-# def test_extract_family_metadata_invalid_relation(row_dict, empty_items):
-#     row_dict['relation to proband'] = 'grandmother'
-#     items_out = extract_family_metadata(1, row_dict, empty_items, 'test-proj:indiv1', 'test-proj:fam1')
-#     assert 'Row 1 - Invalid relation' in items_out['errors'][0]
-#
-#
-# def test_extract_sample_metadata_sp(row_dict, empty_items):
-#     items = empty_items.copy()
-#     items['individual'] = {'test-proj:indiv1': {}}
-#     row_dict['req accepted y/n'] = 'Yes'
-#     row_dict['specimen accepted by ref lab'] = "n"
-#     items_out = extract_sample_metadata(
-#         1, row_dict, items, 'test-proj:indiv1', 'test-proj:samp1',
-#         'test-proj:sp1', 'test-proj:fam1', 'test-proj', {}, {}
-#     )
-#     print(items_out['sample']['test-proj:samp1'])
-#     assert items_out['sample']['test-proj:samp1']['specimen_accession'] == row_dict['specimen id']
-#     assert items_out['sample']['test-proj:samp1']['specimen_accepted'] == 'No'
-#     assert items_out['sample']['test-proj:samp1']['requisition_acceptance']['accepted_rejected'] == 'Accepted'
-#     assert items_out['sample_processing']['test-proj:sp1']['samples'] == ['test-proj:samp1']
-#     assert items_out['individual']['test-proj:indiv1']['samples'] == ['test-proj:samp1']
-#
-#
+
+
+def test_extract_sample_metadata(row_dict, project, institution):
+    row_dict['req accepted y/n'] = 'Yes'
+    row_dict['specimen accepted by ref lab'] = "n"
+    obj = SubmissionRow(row_dict, 1, 'test-proj:fam1', project['name'], institution['name'])
+    assert obj.sample.metadata['specimen_accession'] == row_dict['specimen id']
+    assert obj.sample.metadata['specimen_accepted'] == 'No'
+    assert obj.sample.metadata['requisition_acceptance']['accepted_rejected'] == 'Accepted'
+    assert obj.analysis.metadata['samples'] == [obj.sample.alias]
+    assert obj.individual.metadata['samples'] == [obj.sample.alias]
+
+
 # def test_extract_file_metadata_valid():
 #     results = extract_file_metadata(1, ['f1.fastq.gz', 'f2.cram', 'f3.vcf.gz'], 'test-proj')
 #     assert 'test-proj:f1.fastq.gz' in results['file_fastq']
