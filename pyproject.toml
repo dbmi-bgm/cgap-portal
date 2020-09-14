@@ -1,7 +1,7 @@
 [tool.poetry]
 # Note: Various modules refer to this system as "encoded", not "cgap-portal".
 name = "encoded"
-version = "2.5.4"
+version = "3.0.0"
 description = "Clinical Genomics Analysis Platform"
 authors = ["4DN-DCIC Team <support@4dnucleome.org>"]
 license = "MIT"
@@ -42,8 +42,8 @@ certifi = ">=2020.4.5.2"
 chardet = "3.0.4"
 colorama = "0.3.3"
 dcicpyvcf = "1.0.0"
-dcicsnovault = "^4.0.0"
-dcicutils = "1.0.0b0"
+dcicsnovault = "^4.0.1"
+dcicutils = "1.0.0b1"
 docutils = "0.12"
 elasticsearch = "6.4.0"
 elasticsearch-dsl = "^6.4.0"
