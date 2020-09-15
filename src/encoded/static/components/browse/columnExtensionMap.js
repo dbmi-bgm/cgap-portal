@@ -44,7 +44,7 @@ const MultiLevelColumn = React.memo(function MultiLevelColumn(props){
                 <span className="col-topleft">
                     { topLeft }
                 </span>
-                <i className="status-indicator-dot ml-07" data-status={status} data-tip={statusTip || Schemas.Term.toName("status", status)} data-html />
+                { status ? <i className="status-indicator-dot ml-07" data-status={status} data-tip={statusTip || Schemas.Term.toName("status", status)} data-html />: null }
             </div>
             <h4 className="col-main">
                 { mainTitle || "-" }
