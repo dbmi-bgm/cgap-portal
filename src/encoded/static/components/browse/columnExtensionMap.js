@@ -32,7 +32,6 @@ export const DEFAULT_WIDTH_MAP = { 'lg' : 200, 'md' : 180, 'sm' : 120, 'xs' : 12
 const MultiLevelColumn = React.memo(function MultiLevelColumn(props){
     const {
         topLeft,
-        statusBlock = null,
         status,
         statusTip = null,
         mainTitle = null,
@@ -45,7 +44,7 @@ const MultiLevelColumn = React.memo(function MultiLevelColumn(props){
                 <span className="col-topleft">
                     { topLeft }
                 </span>
-                { statusBlock === null ? <i className="item-status-indicator-dot ml-07" data-status={status} data-tip={statusTip || Schemas.Term.toName("status", status)} data-html /> : statusBlock}
+                <i className="status-indicator-dot ml-07" data-status={status} data-tip={statusTip || Schemas.Term.toName("status", status)} data-html />
             </div>
             <h4 className="col-main">
                 { mainTitle || "-" }
@@ -90,7 +89,6 @@ export const DisplayTitleColumnCase = React.memo(function DisplayTitleCaseDefaul
         '@id' : caseHref,
         display_title = null,
         accession = null,
-        status = null,
         date_created: date = null,
         case_title = null,
         individual = null,
@@ -104,16 +102,19 @@ export const DisplayTitleColumnCase = React.memo(function DisplayTitleCaseDefaul
     const { uuid: familyID = null } = family || {};
     const { uuid: spID = null } = sample_processing || {};
 
-    let statusBlock = null;
+    let status = null;
+    let statusTip = null;
     if (indvID && familyID && spID) {
-        statusBlock = <i className="case-status-indicator-dot status-indicator-dot ml-07" data-status="complete" data-tip={"Case, Individual, Family and Sample Processing are created with required fields."} data-html />;
+        status = "complete";
+        statusTip = "Case, Individual, Family and Sample Processing are created with required fields.";
     } else {
-        statusBlock = <i className="case-status-indicator-dot status-indicator-dot ml-07" data-status="incomplete" data-tip={"Case exists, but some linked item is missing: Family, Individual, or Sample Processing."} data-html />;
+        status = "incomplete";
+        statusTip = "Case exists, but some linked item is missing: Family, Individual, or Sample Processing.";
     }
 
     return (
         <a href={caseHref} className="adv-block-link w-100 title-block d-flex flex-column" data-tip={tooltip} data-delay-show={750}>
-            <MultiLevelColumn {...{ mainTitle, date, status, statusBlock }} dateTitle="Accessioned:" topLeft={<span className="accession">{ accession }</span>} />
+            <MultiLevelColumn {...{ mainTitle, date, status, statusTip }} dateTitle="Accessioned:" topLeft={<span className="accession">{ accession }</span>} />
         </a>
     );
 });
@@ -176,7 +177,6 @@ export const columnExtensionMap = {
             const {
                 display_title: mainTitle = null,
                 accession = null,
-                status = null,
                 last_modified : { date_modified: date = null } = {}
             } = report || {};
 
@@ -184,14 +184,10 @@ export const columnExtensionMap = {
                 return null;
             }
 
-            // Currently unimplemented, let statusBlock indicate that
-            const statusBlock = <i className="case-status-indicator-dot status-indicator-dot ml-07" data-status="not-implemented" data-tip={"Not implemented."} data-html />;
-
-            // May appear in other non-Case results, where advanced column will look strange, so check and use default rendering otherwise
             const showAccessionSeparately = accession !== mainTitle;
             return (
                 <a href={resultHref} className="adv-block-link">
-                    <MultiLevelColumn {...{ mainTitle, date, status, statusBlock }} dateTitle="Last Modified:" topLeft={showAccessionSeparately ? <span className="accession">{ accession }</span> : null} />
+                    <MultiLevelColumn {...{ mainTitle, date, status: "not implemented", statusTip: "Not Implemented" }} dateTitle="Last Modified:" topLeft={showAccessionSeparately ? <span className="accession">{ accession }</span> : null} />
                 </a>
             );
         }
@@ -203,22 +199,24 @@ export const columnExtensionMap = {
             const {
                 '@id' : atId = null,
                 accession = null,
-                status = null,
                 date_created: date = null,
                 family_id: mainTitle = null,
                 uuid = null
             } = family;
 
-            let statusBlock = null;
+            let status = null;
+            let statusTip = null;
             if (uuid && mainTitle) {
-                statusBlock = <i className="case-status-indicator-dot status-indicator-dot ml-07" data-status="complete" data-tip={"Family is created with required fields."} data-html />;
+                status = "complete";
+                statusTip = "Family is created with required fields.";
             } else {
-                statusBlock = <i className="case-status-indicator-dot status-indicator-dot ml-07" data-status="incomplete" data-tip={"Family exists, but some field is missing: uuid or family_id."} data-html />;
+                status = "incomplete";
+                statusTip = "Family exists, but some field is missing: uuid or family_id.";
             }
 
             return (
                 <a href={atId} className="adv-block-link">
-                    <MultiLevelColumn {...{ mainTitle, date, status, statusBlock }} dateTitle="Last Modified:" topLeft={<span className="accession">{ accession }</span>} />
+                    <MultiLevelColumn {...{ mainTitle, date, status, statusTip }} dateTitle="Last Modified:" topLeft={<span className="accession">{ accession }</span>} />
                 </a>
             );
         }
@@ -233,7 +231,6 @@ export const columnExtensionMap = {
                 '@id' : atId = null,
                 display_title = null,
                 accession = null,
-                status = null,
                 date_created: date = null,
                 individual_id = null,
                 uuid = null
@@ -241,16 +238,19 @@ export const columnExtensionMap = {
 
             const mainTitle = individual_id ? individual_id : display_title;
 
-            let statusBlock = null;
+            let status = null;
+            let statusTip = null;
             if (uuid && individual_id) {
-                statusBlock = <i className="case-status-indicator-dot status-indicator-dot ml-07" data-status="complete" data-tip={"Individual is created with required fields."} data-html />;
+                status = "complete";
+                statusTip = "Individual is created with required fields.";
             } else {
-                statusBlock = <i className="case-status-indicator-dot status-indicator-dot ml-07" data-status="incomplete" data-tip={"Individual exists, but some field is missing: uuid or individual_id."} data-html />;
+                status = "incomplete";
+                statusTip = "Individual exists, but some field is missing: uuid or individual_id.";
             }
 
             return (
                 <a href={atId} className="adv-block-link">
-                    <MultiLevelColumn {...{ mainTitle, date, status, statusBlock }} dateTitle="Accessioned:" topLeft={<span className="accession">{ accession }</span>} />
+                    <MultiLevelColumn {...{ mainTitle, date, status, statusTip }} dateTitle="Accessioned:" topLeft={<span className="accession">{ accession }</span>} />
                 </a>
             );
         }
@@ -332,18 +332,21 @@ export const columnExtensionMap = {
     'sample.specimen_type': {
         'render' : function renderSampleColumn(result, parentProps){
             const { sample = null } = result;
-            const { uuid = null, bam_sample_id = null, '@id': sampleId, accession, status, specimen_type: mainTitle, specimen_collection_date: date } = sample || {};
+            const { uuid = null, bam_sample_id = null, '@id': sampleId, accession, specimen_type: mainTitle, specimen_collection_date: date } = sample || {};
             // Unlikely to show in non-Case item results, so didn't add Case filter
 
-            let statusBlock = null;
+            let status = null;
+            let statusTip = null;
             if (uuid && bam_sample_id) {
-                statusBlock = <i className="case-status-indicator-dot status-indicator-dot ml-07" data-status="complete" data-tip={"Sample is created with required fields."} data-html />;
+                status = "complete";
+                statusTip = "Sample is created with required fields.";
             } else {
-                statusBlock = <i className="case-status-indicator-dot status-indicator-dot ml-07" data-status="incomplete" data-tip={"Sample exists, but some field is missing: uuid or bam_sample_id."} data-html />;
+                status = "incomplete";
+                statusTip = "Sample exists, but some field is missing: uuid or bam_sample_id.";
             }
             return (
                 <a href={sampleId} className="adv-block-link">
-                    <MultiLevelColumn {...{ mainTitle, date, status, statusBlock }} dateTitle="Collected:" topLeft={<span className="accession">{ accession }</span>} />
+                    <MultiLevelColumn {...{ mainTitle, date, status, statusTip }} dateTitle="Collected:" topLeft={<span className="accession">{ accession }</span>} />
                 </a>);
         }
     },
