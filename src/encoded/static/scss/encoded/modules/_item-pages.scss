@@ -568,7 +568,8 @@ h3.submission-subtitle {
 	}
 
 	&[data-status="deleted"]:before,
-	&[data-status="upload failed"]:before {
+	&[data-status="upload failed"]:before,
+	&[data-status="failed"]:before {
 		color: #fff;
 		background-color: #a90d0b;
 	}
@@ -585,7 +586,8 @@ h3.submission-subtitle {
 	&[data-status="submission in progress"]:before,
 	&[data-status="uploading"]:before,
 	&[data-status="draft"]:before,
-	&[data-status="incomplete"]:before {
+	&[data-status="incomplete"]:before, 
+	&[data-status="in progress"]:before {
 		color: #fff;
 		background-color: #d8bd22;
 	}
@@ -603,16 +605,15 @@ h3.submission-subtitle {
 	&[data-status="unspecified"]:before,
 	&[data-status="archived"]:before,
 	&[data-status="archived to project"]:before,
-	&[data-status="not-implemented"]:before,
-	&[data-status="not-started"]:before {
+	&[data-status="not implemented"]:before,
+	&[data-status="not started"]:before {
 		color: #fff;
 		background-color: #7b7b7b;
 		//display: none;
 	}
 }
 
-i.status-indicator-dot,
-i.item-status-indicator-dot {
+i.status-indicator-dot {
 	display: inline-block;
 	position: relative;
 	&:before {
