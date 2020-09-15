@@ -6,7 +6,7 @@
         "aliases": [
             "hms-dbmi:bioinformatics_core"
         ],
-        "name": "Bioinformatics Core",
+        "name": "bioinformatics-core",
         "schema_version": "1",
         "uuid": "84ac37a8-c135-4c95-86cb-93028399d37e",
         "date_created": "2020-07-15T02:37:35.895348+00:00",
