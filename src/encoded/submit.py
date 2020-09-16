@@ -261,7 +261,8 @@ class SubmissionRow:
             # 'row': self.row
         }
         if not info['family_id']:
-            info['family_id'] = fam_alias[fam_alias.index(':') + 1:]
+            alias = self.project + ":" + self.fam_alias if ':' not in self.fam_alias else self.fam_alias
+            info['family_id'] = alias[alias.index(':') + 1:]
         valid_relations = ['proband', 'mother', 'father', 'brother', 'sister', 'sibling']
         relation_found = False
         for relation in valid_relations:
@@ -498,10 +499,12 @@ class SubmissionMetadata:
             for relation in RELATIONS:
                 if family.metadata.get(relation):
                     if relation in self.families[family.alias]:
+                        print(self.families[family.alias][relation])
+                        print(individual.alias)
                         if self.families[family.alias][relation] != individual.alias:
                             msg = ('Row {} - Multiple values for relation "{}" in family {}'
                                    ' found in spreadsheet'.format(idx, relation, family.metadata['family_id']))
-
+                            self.errors.append(msg)
                     else:
                         self.families[family.alias][relation] = family.metadata[relation]
         else:
@@ -536,9 +539,9 @@ class SubmissionMetadata:
             for sample in v['samples']:
                 case_id = '{}-{}'.format(analysis_id, self.samples[sample].get('specimen_accession', ''))
                 name = False
-                if case_id in self.case_names:
+                if case_id in self.case_names and self.case_names[case_id][0]:
                     name = True
-                    case_id = self.case_names[case_id]
+                    case_id = self.case_names[case_id][0]
                 case_alias = '{}:case-{}'.format(self.project, case_id)
                 try:
                     indiv = [ikey for ikey, ival in self.individuals.items() if sample in ival.get('samples', [])][0]
@@ -570,8 +573,8 @@ class SubmissionMetadata:
         indicated in the spreadsheet.
         """
         if all(field in row_item.metadata for field in ['analysis id', 'unique analysis id', 'specimen id']):
-            key = '{}-{}'.format(row['analysis id'], row['specimen id'])
-            self.case_names[key] = (row_item.metadata['unique analysis id'], row_item.family_alias)
+            key = '{}-{}'.format(row_item.metadata['analysis id'], row_item.metadata['specimen id'])
+            self.case_names[key] = (row_item.metadata['unique analysis id'], row_item.fam_alias)
 
     def add_individual_relations(self):
         """
@@ -628,6 +631,7 @@ class SubmissionMetadata:
                 metadata['project'] = self.project_atid
                 metadata['institution'] = self.institution_atid
             self.json_out[key] = self.itemtype_dict[key]
+            self.json_out['errors'] = self.errors
 
 
 class SpreadsheetProcessing:
