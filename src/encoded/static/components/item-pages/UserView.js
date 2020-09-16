@@ -383,7 +383,7 @@ export default class UserView extends React.Component {
 
     render() {
         const { context : user, schemas, href, windowWidth } = this.props;
-        const { email, lab, submits_for, access_keys } = user;
+        const { email, project, access_keys } = user;
         const mayEdit = this.mayEdit();
         // Todo: remove
         const ifCurrentlyEditingClass = this.state && this.state.currentlyEditing ? ' editing editable-fields-container' : '';
@@ -436,7 +436,7 @@ export default class UserView extends React.Component {
 
                     </div>
 
-                    { lab || submits_for ? <SyncedAccessKeyTable user={user} access_keys={access_keys} /> : null }
+                    { <SyncedAccessKeyTable user={user} access_keys={access_keys} /> }
 
                 </div>
             </div>
