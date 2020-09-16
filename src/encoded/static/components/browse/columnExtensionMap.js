@@ -28,6 +28,9 @@ export const DEFAULT_WIDTH_MAP = { 'lg' : 200, 'md' : 180, 'sm' : 120, 'xs' : 12
  * Another thought - it's unlikely that the props passed to this component will _ever_ change, I think.
  * Maybe we could have something like 'shouldComponentUpdate(){ return false; }` to prevent it from ever even
  * attempting to compare props for performance gain (since many table cells).
+ *
+ * Colors are bound to 'data-status' attribute values in SCSS to statuses, so we re-use those here rather than 
+ * creating separate 'color map' for this, and override tooltip with custom value.
  */
 const MultiLevelColumn = React.memo(function MultiLevelColumn(props){
     const {
@@ -263,14 +266,31 @@ export const columnExtensionMap = {
             const {
                 workup_type: mainTitle = null,
                 sequencing_date: date = null,
-                completed_processes = []
+                files = []
             } = sample;
-            const complProcLen = completed_processes.length;
 
-            // We have colors bound to 'data-status' attribute values in SCSS to statuses, so we'll just
-            // re-use one of those here rather than creating separate 'color map' for this.
-            // And override tooltip.
-            // TODO move into reusable func if after while we keep statusTip etc sample between this and sample_processing.analysis_type
+            let statusTip = null;
+            let status = null;
+
+            let fastqPresent = false;
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+                const { '@type': [type] } = file;
+                if (type === "FileFastq") {
+                    fastqPresent = true;
+                    break;
+                }
+            }
+
+            if (fastqPresent) {
+                statusTip = "Fastq file(s) uploaded";
+                status = "complete";
+            } else {
+                statusTip = "No fastq files";
+                stauts = "incomplete";
+            }
+
+            /** @DEPRECATED as of 9/16/20 -- keeping here until confirmation new tips will stay.
             let status, statusTip;
             if (complProcLen > 0){
                 status = "released";
@@ -283,6 +303,7 @@ export const columnExtensionMap = {
                 status = "uploading";
                 statusTip = "This sample/case has no completed processes yet";
             }
+            */
 
             return (
                 <a href={resultHrefPath + "#case-info.bioinformatics"} className="adv-block-link">
