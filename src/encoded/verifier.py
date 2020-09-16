@@ -1,7 +1,7 @@
 from functools import wraps
 from snovault import TYPES
 # TODO: Production code should not rely on tests.
-from .tests.test_create_mapping import test_create_mapping
+from .tests.test_create_mapping import test_create_mapping_correctly_maps_embeds
 from .tests.test_embedding import test_add_default_embeds, test_manual_embeds
 from .tests.test_schemas import compute_master_mixins, test_load_schema
 
@@ -86,7 +86,7 @@ def verify_embeds(registry, item_type):
 
 @verifier
 def verify_mapping(registry, item_type):
-    test_create_mapping(registry, item_type)
+    test_create_mapping_correctly_maps_embeds(registry, item_type)
 
 
 def verify_item(item_uuid, indexer_testapp, testapp, registry):

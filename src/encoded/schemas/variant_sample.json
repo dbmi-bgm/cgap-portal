@@ -245,19 +245,6 @@
                 "title": "Compound Het",
                 "type": "object",
                 "properties": {
-                    "comhet_impact_gene": {
-                        "title": "ComHet Impact",
-                        "field_name": "comhet_impact_gene",
-                        "type": "string",
-                        "do_import": true,
-                        "source_name": "COMHET",
-                        "source_version": "v1",
-                        "sub_embedding_group": "{\"key\": \"cmphet\", \"title\": \"Compound Het\"}",
-                        "annotation_category": "Genotype",
-                        "scope": "sample_variant",
-                        "schema_title": "ComHet Impact",
-                        "facet_order": 17
-                    },
                     "comhet_phase": {
                         "title": "comhet_phase",
                         "field_name": "comhet_phase",
@@ -280,13 +267,30 @@
                     },
                     "comhet_transcript": {
                         "title": "comhet_transcript",
-                        "field_name": "comhet_transcript",
+                        "type": "array",
+                        "items": {
+                            "title": "comhet_transcript",
+                            "field_name": "comhet_transcript",
+                            "type": "string",
+                            "do_import": true,
+                            "source_name": "COMHET",
+                            "source_version": "v1",
+                            "sub_embedding_group": "{\"key\": \"cmphet\", \"title\": \"Compound Het\"}",
+                            "scope": "sample_variant"
+                        }
+                    },
+                    "comhet_impact_gene": {
+                        "title": "ComHet Impact",
+                        "field_name": "comhet_impact_gene",
                         "type": "string",
                         "do_import": true,
                         "source_name": "COMHET",
                         "source_version": "v1",
                         "sub_embedding_group": "{\"key\": \"cmphet\", \"title\": \"Compound Het\"}",
-                        "scope": "sample_variant"
+                        "annotation_category": "Genotype",
+                        "scope": "sample_variant",
+                        "schema_title": "ComHet Impact",
+                        "facet_order": 17
                     },
                     "comhet_impact_transcript": {
                         "title": "comhet_impact_transcript",
@@ -402,19 +406,6 @@
                         "scope": "sample_variant",
                         "schema_title": "Sample Genotype (Nucleotide)"
                     },
-                    "samplegeno_sampleid": {
-                        "title": "Sample Genotype (Sample ID)",
-                        "field_name": "samplegeno_sampleid",
-                        "type": "string",
-                        "do_import": true,
-                        "source_name": "SAMPLEGENO",
-                        "source_version": "v0.4",
-                        "sub_embedding_group": "{\"key\": \"samplegeno\", \"title\": \"Sample Genotype\"}",
-                        "annotation_category": "Genotype",
-                        "description": "Sample ID",
-                        "scope": "sample_variant",
-                        "schema_title": "Sample Genotype (Sample ID)"
-                    },
                     "samplegeno_ad": {
                         "title": "Sample Genotype (Allele Depth)",
                         "field_name": "samplegeno_ad",
@@ -427,6 +418,19 @@
                         "description": "Allelic depth",
                         "scope": "sample_variant",
                         "schema_title": "Sample Genotype (Allele Depth)"
+                    },
+                    "samplegeno_sampleid": {
+                        "title": "Sample Genotype (Sample ID)",
+                        "field_name": "samplegeno_sampleid",
+                        "type": "string",
+                        "do_import": true,
+                        "source_name": "SAMPLEGENO",
+                        "source_version": "v0.4",
+                        "sub_embedding_group": "{\"key\": \"samplegeno\", \"title\": \"Sample Genotype\"}",
+                        "annotation_category": "Genotype",
+                        "description": "Sample ID",
+                        "scope": "sample_variant",
+                        "schema_title": "Sample Genotype (Sample ID)"
                     },
                     "samplegeno_role": {
                         "title": "Familial Relation",
@@ -459,7 +463,8 @@
                         "type": "string",
                         "enum": [
                             "M",
-                            "F"
+                            "F",
+                            "U"
                         ]
                     }
                 }
@@ -564,9 +569,29 @@
             "order": 11,
             "grouping": "Variant Quality"
         },
+        "associated_genotype_labels.father_genotype_label": {
+            "title": "Father Genotype",
+            "order": 14,
+            "grouping": "Genotype"
+        },
+        "associated_genotype_labels.mother_genotype_label": {
+            "title": "Mother Genotype",
+            "order": 13,
+            "grouping": "Genotype"
+        },
+        "associated_genotype_labels.proband_genotype_label": {
+            "title": "Proband Genotype",
+            "order": 12,
+            "grouping": "Genotype"
+        },
         "cmphet.comhet_impact_gene": {
             "title": "ComHet Impact",
             "order": 17,
+            "grouping": "Genotype"
+        },
+        "inheritance_modes": {
+            "title": "Inheritance Modes",
+            "order": 15,
             "grouping": "Genotype"
         },
         "novoPP": {
@@ -611,6 +636,11 @@
             "title": "Cytoband",
             "order": 3,
             "grouping": "Position"
+        },
+        "variant.genes.genes_ensg.gene_lists.display_title": {
+            "title": "Gene List",
+            "order": 99,
+            "grouping": "Genes"
         },
         "variant.genes.genes_ensg.oe_lof": {
             "title": "o/e (LoF)",

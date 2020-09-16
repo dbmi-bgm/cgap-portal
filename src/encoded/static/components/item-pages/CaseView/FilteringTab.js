@@ -95,7 +95,7 @@ export const FilteringTab = React.memo(function FilteringTab(props) {
         (initial_search_href_filter_addon && currentActiveFilterAppend ? "&" + currentActiveFilterAppend : "")
     );
 
-    const initialSearchHref = "/search/?type=VariantSample" + (searchHrefAppend ? "&" + searchHrefAppend : "");
+    const initialSearchHref = "/search/?type=VariantSample" + (searchHrefAppend ? "&" + searchHrefAppend : "") + "&sort=date_created";
     // Hide facets that are ones used to initially narrow down results to those related to this case.
     const hideFacets = !initial_search_href_filter_addon ? null : Object.keys(queryString.parse(initial_search_href_filter_addon));
 
@@ -156,11 +156,11 @@ export function FilteringTabSubtitle(props){
 
     const { differsFromCurrentFilterSet, filterSetQueryStr, saveNewFilterset, saveFilterBtnTip } = useMemo(function(){
         const { query: currentQuery } = url.parse(searchHref, false);
-        const parsedCurrentQueryFiltered = filterQueryByQuery(currentQuery, "type=VariantSample&" + initial_search_href_filter_addon);
+        const parsedCurrentQueryFiltered = filterQueryByQuery(currentQuery, "type=VariantSample&sort=date_created&" + initial_search_href_filter_addon);
         const filterSetQueryStr = queryString.stringify(parsedCurrentQueryFiltered);
         const differsFromCurrentFilterSet = !!(
-            (!lastFilterSetSaved && filterSetQueryStr) ||
-            (lastFilterSetSaved && !filterSetQueryStr) ||
+            (/*!lastFilterSetSaved*/ !lastActiveFilterAppend && filterSetQueryStr) ||
+            (/*lastFilterSetSaved*/ lastActiveFilterAppend && !filterSetQueryStr) ||
             (lastFilterSetSaved && filterSetQueryStr && !_.isEqual(parsedCurrentQueryFiltered, queryString.parse(lastActiveFilterAppend)))
         );
 
