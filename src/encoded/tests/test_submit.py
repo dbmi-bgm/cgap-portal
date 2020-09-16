@@ -120,12 +120,18 @@ def sample_info():
 @pytest.fixture
 def example_rows():
     return [
-        {'individual id': '456', 'analysis id': '1111', 'relation to proband': 'proband', 'workup type': 'WGS', 'specimen id': '1'},
-        {'individual id': '123', 'analysis id': '1111', 'relation to proband': 'mother', 'workup type': 'WGS', 'specimen id': '1'},
-        {'individual id': '789', 'analysis id': '1111', 'relation to proband': 'father', 'workup type': 'WGS', 'specimen id': '1'},
-        {'individual id': '456', 'analysis id': '2222', 'relation to proband': 'proband', 'workup type': 'WGS', 'specimen id': '1'},
-        {'individual id': '555', 'analysis id': '3333', 'relation to proband': 'proband', 'workup type': 'WES', 'specimen id': '1'},
-        {'individual id': '546', 'analysis id': '3333', 'relation to proband': 'mother', 'workup type': 'WES', 'specimen id': '1'}
+        {'individual id': '456', 'analysis id': '1111', 'relation to proband': 'proband',
+         'report required': 'Y', 'workup type': 'WGS', 'specimen id': '1'},
+        {'individual id': '123', 'analysis id': '1111', 'relation to proband': 'mother',
+         'report required': 'N', 'workup type': 'WGS', 'specimen id': '2'},
+        {'individual id': '789', 'analysis id': '1111', 'relation to proband': 'father',
+         'report required': 'N', 'workup type': 'WGS', 'specimen id': '3'},
+        {'individual id': '456', 'analysis id': '2222', 'relation to proband': 'proband',
+         'report required': 'Y', 'workup type': 'WGS', 'specimen id': '1'},
+        {'individual id': '555', 'analysis id': '3333', 'relation to proband': 'proband',
+         'report required': 'Y', 'workup type': 'WES', 'specimen id': '5'},
+        {'individual id': '546', 'analysis id': '3333', 'relation to proband': 'mother',
+         'report required': 'N', 'workup type': 'WES', 'specimen id': '6'}
     ]
 
 
@@ -197,17 +203,25 @@ def test_extract_individual_metadata(row_dict, project, institution):
     assert obj.individual.metadata['individual_id'] == row_dict['individual id']
 
 
-# def test_add_individual_metadata(row_dict, empty_items):
-#     items = empty_items.copy()
-#     items['individual'] = {'test-proj:indiv1': {
-#         'individual_id': '456',
-#         'age': 46,
-#         'aliases': ['test-proj:indiv1']
-#     }}
-#     items_out = extract_individual_metadata(1, row_dict, items, 'test-proj:indiv1', 'hms-dbmi')
-#     assert len(items['individual']) == len(items_out['individual'])
-#     assert 'sex' in items_out['individual']['test-proj:indiv1']
-#     assert 'age' in items_out['individual']['test-proj:indiv1']
+def test_add_metadata_single_item(example_rows, project, institution):
+    """
+    if json for an item was already created in a previous row, any new fields for that
+    item in the current row should be added to the existing json.
+    if the current row has less information than the previous json item, the fields in
+    the previous json item won't get overwritten.
+    """
+    for rowidx in (1, 2):
+        data = [
+            {k: v for k, v in example_rows[0].items()},
+            # 2 rows have same sample
+            {k: v for k, v in example_rows[1].items()},
+            {k: v for k, v in example_rows[1].items()}
+        ]
+        data[rowidx]['specimen accepted by ref lab'] = 'Y'
+        submission = SubmissionMetadata(data, project, institution)
+        assert len(submission.individuals) == 2
+        assert len(submission.samples) == 2
+        assert 'specimen_accepted' in list(submission.samples.values())[1]
 
 
 @pytest.mark.parametrize('age, birth_year, val_type', [
@@ -237,20 +251,22 @@ def test_extract_family_metadata_new(row_dict, project, institution, relation, e
     assert not obj.errors == (not error)  # check presence of errors
     # check for correct error message
     assert ('Row 1 - Invalid relation' in ''.join(obj.errors)) == error
-#
-#
-# def test_add_family_metadata_old(row_dict, empty_items):
-#     items = empty_items.copy()
-#     items['family'] = {'test-proj:fam1': {
-#         'aliases': ['test-proj:fam1'],
-#         'family_id': '333',
-#         'members': ['test-proj:indiv2'],
-#         'mother': 'test-proj:indiv2'
-#     }}
-#     items_out = extract_family_metadata(1, row_dict, items, 'test-proj:indiv1', 'test-proj:fam1')
-#     assert items_out['family']['test-proj:fam1']['members'] == ['test-proj:indiv2', 'test-proj:indiv1']
-#     assert items_out['family']['test-proj:fam1']['proband'] == 'test-proj:indiv1'
-#     assert items_out['family']['test-proj:fam1']['mother'] == 'test-proj:indiv2'
+
+
+@pytest.mark.parametrize('relation2, relation3, error', [
+    ('mother', 'father', False),
+    ('mother', 'mother', True)
+])
+def test_add_family_metadata(example_rows, project, institution, relation2, relation3, error):
+    data = example_rows[:3]
+    data[1]['relation to proband'] = relation2
+    data[2]['relation to proband'] = relation3
+    submission = SubmissionMetadata(data, project, institution)
+    assert len(submission.families) == 1
+    fam = list(submission.families.values())[0]
+    assert len(fam['members']) == 3
+    assert (len(submission.errors) > 0) == error
+    assert ('Multiple values for relation' in ''.join(submission.errors)) == error
 
 
 def test_extract_sample_metadata(row_dict, project, institution):
@@ -264,32 +280,116 @@ def test_extract_sample_metadata(row_dict, project, institution):
     assert obj.individual.metadata['samples'] == [obj.sample.alias]
 
 
-# def test_extract_file_metadata_valid():
-#     results = extract_file_metadata(1, ['f1.fastq.gz', 'f2.cram', 'f3.vcf.gz'], 'test-proj')
-#     assert 'test-proj:f1.fastq.gz' in results['file_fastq']
-#     assert results['file_fastq']['test-proj:f1.fastq.gz']['file_format'] == '/file-formats/fastq/'
-#     assert results['file_fastq']['test-proj:f1.fastq.gz']['file_type'] == 'reads'
-#     assert 'test-proj:f2.cram' in results['file_processed']
-#     assert 'test-proj:f3.vcf.gz' in results['file_processed']
-#     assert not results['errors']
-#
-#
-# def test_extract_file_metadata_uncompressed():
-#     results = extract_file_metadata(1, ['f1.fastq', 'f2.cram', 'f3.vcf'], 'test-proj')
-#     assert not results['file_fastq']
-#     assert 'test-proj:f2.cram' in results['file_processed']
-#     assert 'test-proj:f3.vcf' not in results['file_processed']
-#     assert len(results['errors']) == 2
-#     assert all('File must be compressed' in error for error in results['errors'])
-#
-#
-# def test_extract_file_metadata_invalid():
-#     results = extract_file_metadata(1, ['f3.gvcf.gz'], 'test-proj')
-#     assert all(not results[key] for key in ['file_fastq', 'file_processed'])
-#     assert results['errors'] == [
-#         'File extension on f3.gvcf.gz not supported - '
-#         'expecting one of: .fastq.gz, .fq.gz, .cram, .vcf.gz'
-#     ]
+def test_extract_file_metadata_valid(row_dict, project, institution):
+    row_dict['files'] = 'f1.fastq.gz, f2.cram, f3.vcf.gz'
+    files = [f.strip() for f in row_dict['files'].split(',')]
+    obj = SubmissionRow(row_dict, 1, 'fam1', project['name'], institution['name'])
+    assert files[0] in obj.files_fastq[0].alias
+    assert obj.files_fastq[0].metadata['file_format'] == '/file-formats/fastq/'
+    assert obj.files_fastq[0].metadata['file_type'] == 'reads'
+    assert obj.files_processed[0].alias == 'encode-project:f2.cram'
+    assert files[2] in obj.files_processed[1].alias
+    assert not obj.errors
+
+
+# filenames indicating uncompressed fastqs/vcfs should lead to errors
+def test_extract_file_metadata_uncompressed(row_dict, project, institution):
+    row_dict['files'] = 'f1.fastq, f2.cram, f3.vcf'
+    files = [f.strip() for f in row_dict['files'].split(',')]
+    obj = SubmissionRow(row_dict, 1, 'fam1', project['name'], institution['name'])
+    assert not obj.files_fastq
+    assert obj.files_processed[0].alias == 'encode-project:f2.cram'
+    assert files[2] not in ''.join([f.alias for f in obj.files_processed])
+    assert all('File must be compressed' in error for error in obj.errors)
+
+
+# file extensions other than fastq.gz,.cram, .vcf.gz should generate an error
+def test_extract_file_metadata_invalid(row_dict, project, institution):
+    row_dict['files'] = 'f3.gvcf.gz'
+    files = [f.strip() for f in row_dict['files'].split(',')]
+    obj = SubmissionRow(row_dict, 1, 'fam1', project['name'], institution['name'])
+    assert not obj.files_processed
+    assert 'File extension on f3.gvcf.gz not supported - ' in ''.join(obj.errors)
+
+
+@pytest.mark.parametrize('field, error', [
+    ('workup type', False),
+    ('specimen id', True),
+    ('individual id', True),
+    ('family id', False),
+    ('relation to proband', True),
+    ('analysis id', True),
+    ('report required', True),
+    ('specimen type', False),
+    ('alsdkjfdk', False)
+])
+def test_found_missing_values(row_dict, project, institution, field, error):
+    row_dict[field] = None
+    obj = SubmissionRow(row_dict, 1, 'fam1', project['name'], institution['name'])
+    assert (len(obj.errors) > 0) == error
+    assert ('Row 1 - missing required field(s) {}. This row cannot be processed.'
+            ''.format(field) in obj.errors) == error
+
+
+@pytest.mark.parametrize('num, val', [(0, 1), (1, 2), (2, 1), (3, 2), (4, 1), (5, 2)])
+def test_get_paired_end_value(num, val):
+    assert SubmissionRow.get_paired_end_value(num) == val
+
+# add sample processing
+
+
+@pytest.mark.parametrize('case_id, report', [(None, True), ('Case123', True), ('Case123', False)])
+def test_create_case_metadata(row_dict, case_id, report, project, institution):
+    if not report:
+        row_dict['report required'] = 'N'
+    row_dict['unique analysis id'] = case_id
+    submission = SubmissionMetadata([row_dict], project, institution)
+    case = list(submission.cases.values())[0]
+    assert row_dict['individual id'] in case['individual']
+    assert case['family'] == list(submission.families.keys())[0]
+    assert (len(submission.reports) > 0) == report
+    case_alias = list(submission.cases.keys())[0]
+    if case_id:
+        assert case_id in case_alias
+    else:
+        assert '{}-{}'.format(row_dict['analysis id'], row_dict['specimen id']) in case_alias
+    if report:
+        assert case['report']
+
+
+@pytest.mark.parametrize('case_id', [(None), ('Case123')])
+def test_add_case_info(row_dict, case_id, project, institution):
+    row_dict['unique analysis id'] = case_id
+    submission = SubmissionMetadata([row_dict], project, institution)
+    key = '{}-{}'.format(row_dict['analysis id'], row_dict['specimen id'])
+    assert submission.case_names.get(key)[0] == case_id
+
+
+def test_add_individual_relations(example_rows, project, institution):
+    submission = SubmissionMetadata(example_rows, project, institution)
+    assert all(field in submission.individuals['encode-project:individual-456'] for field in ['mother', 'father'])
+    assert not any(field in submission.families['encode-project:family-456'] for field in ['mother', 'father'])
+
+
+def test_process_rows(example_rows, project, institution):
+    submission = SubmissionMetadata(example_rows, project, institution)
+    assert submission.json_out
+    assert len(submission.individuals) == 5
+    assert len(submission.families) == 2
+    assert len(submission.samples) == 5
+    assert len(submission.sample_processings) == 3
+    assert len(submission.cases) == 6
+    assert len(submission.reports) == 3
+
+
+def test_create_json_out(example_rows, project, institution):
+    submission = SubmissionMetadata(example_rows, project, institution)
+    assert all(submission.json_out[key] for key in ['individual', 'family', 'sample', 'sample_processing', 'case', 'report'])
+    for key, val in submission.json_out.items():
+        if key != 'errors':
+            for val2 in val.values():
+                assert val2['project']
+                assert val2['institution']
 
 
 def test_xls_to_json(project, institution):
