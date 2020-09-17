@@ -56,8 +56,8 @@ ONLY_ADMIN_VIEW_ACL = [
     this gets added to the Collection class __init__
 """
 PROJECT_MEMBER_CREATE_ACL = [
-    (Allow, 'group.project_member', 'add'),
-    (Allow, 'group.project_member', 'create'),
+    (Allow, 'group.project_editor', 'add'),
+    (Allow, 'group.project_editor', 'create'),
 ]
 
 # this is for pages that should be visible to public
@@ -72,12 +72,12 @@ ALLOW_AUTHENTICATED_VIEW_ACL = [
 ] + ONLY_ADMIN_VIEW_ACL + PROJECT_MEMBER_CREATE_ACL
 
 ALLOW_PROJECT_MEMBER_EDIT_ACL = [
-    (Allow, 'role.project_member', ['view', 'edit']),
+    (Allow, 'role.project_editor', ['view', 'edit']),
 ] + ONLY_ADMIN_VIEW_ACL + PROJECT_MEMBER_CREATE_ACL
 
 
 ALLOW_PROJECT_MEMBER_VIEW_ACL = [
-    (Allow, 'role.project_member', 'view'),
+    (Allow, 'role.project_editor', 'view'),
 ] + ONLY_ADMIN_VIEW_ACL + PROJECT_MEMBER_CREATE_ACL
 
 DELETED_ACL = [
@@ -310,14 +310,13 @@ class Item(snovault.Item):
             # add institution_member as well
             inst_member = 'institution.%s' % properties['institution']
             roles[inst_member] = 'role.institution_member'
+        """ to avoid conflation of the project used for attribution of the User ITEM
+            from the project(s) specified in the project_roles specifying project_editor
+            role - instead of using 'bare' project
+        """
         if 'project' in properties:
-            proj_group_members = 'project.%s' % properties['project']
-            roles[proj_group_members] = 'role.project_member'
-
-        # This emulates __ac_local_roles__ of User.py (role.owner)
-        # if 'submitted_by' in properties:
-        #     submitter = 'userid.%s' % properties['submitted_by']
-        #     roles[submitter] = 'role.owner'
+            project_editors = 'editor_for.%s' % properties['project']
+            roles[project_editors] = 'role.project_editor'
         return roles
 
     def add_accession_to_title(self, title):
