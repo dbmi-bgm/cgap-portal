@@ -37,27 +37,6 @@ def row_dict():
     }
 
 
-# @pytest.fixture
-# def row_dict_nums(row_dict):
-#     row_dict['age'] = 33
-#     row_dict['birth year'] = 1986
-#     return row_dict
-#
-#
-# # @pytest.fixture
-# # def row_dict_str(row_dict):
-# #     row_dict['age'] = '33'
-# #     row_dict['birth year'] = '1986'
-# #     return row_dict
-#
-#
-# @pytest.fixture
-# def row_dict_text(row_dict):
-#     row_dict['age'] = 'abc'
-#     row_dict['birth year'] = 'def'
-#     return row_dict
-
-
 @pytest.fixture
 def xls_list():
     book = xlrd.open_workbook('src/encoded/tests/data/documents/cgap_submit_test.xlsx')
@@ -167,6 +146,7 @@ def aunt(testapp, project, institution):
 
 
 def test_map_fields(sample_info):
+    # tests spreadsheet fields are mapped to correct cgap property
     result = map_fields(sample_info, {}, ['workup_type'], 'sample')
     assert result['workup_type'] == 'WES'
     assert result['specimen_accession'] == '9034'
@@ -195,201 +175,231 @@ def test_get_analysis_types(example_rows_obj, example_rows, project, institution
     new_a_types = new_obj.analysis_types
     assert new_a_types['1111'] is None
 
+class TestSubmissionRow:
 
-def test_extract_individual_metadata(row_dict, project, institution):
-    obj = SubmissionRow(row_dict, 1, 'test-proj:fam1', project['name'], institution['name'])
-    assert obj.indiv_alias == 'encode-project:individual-456'
-    assert obj.individual.metadata['aliases'] == [obj.indiv_alias]
-    assert obj.individual.metadata['individual_id'] == row_dict['individual id']
+    def test_extract_individual_metadata(self, row_dict, project, institution):
+        obj = SubmissionRow(row_dict, 1, 'test-proj:fam1', project['name'], institution['name'])
+        assert obj.indiv_alias == 'encode-project:individual-456'
+        assert obj.individual.metadata['aliases'] == [obj.indiv_alias]
+        assert obj.individual.metadata['individual_id'] == row_dict['individual id']
+
+    @pytest.mark.parametrize('age, birth_year, val_type', [
+        ('33', '1986', int),
+        # text values for age and birth year should be passed on without errors to eventually fail validation
+        ('abc', 'def', str)
+    ])
+    def test_extract_individual_metadata_nums(self, row_dict, age, birth_year, val_type, project, institution):
+        row_dict['age'] = age
+        row_dict['birth year'] = birth_year
+        obj = SubmissionRow(row_dict, 1, 'test-proj:fam1', project['name'], institution['name'])
+        assert isinstance(obj.individual.metadata['age'], val_type)
+        assert not obj.errors
+
+    @pytest.mark.parametrize('relation, error', [
+        ('proband', False),
+        ('grandmother', True)
+    ])
+    def test_extract_family_metadata_new(self, row_dict, project, institution, relation, error):
+        row_dict['relation to proband'] = relation
+        obj = SubmissionRow(row_dict, 1, 'test-proj:fam1', project['name'], institution['name'])
+        assert obj.family.alias == 'test-proj:fam1'
+        assert obj.family.metadata['members'] == ['encode-project:individual-456']
+        if relation == 'proband':
+            assert obj.family.metadata['proband'] == 'encode-project:individual-456'
+        assert not obj.errors == (not error)  # check presence of errors
+        # check for correct error message
+        assert ('Row 1 - Invalid relation' in ''.join(obj.errors)) == error
+
+    def test_extract_sample_metadata(self, row_dict, project, institution):
+        row_dict['req accepted y/n'] = 'Yes'
+        row_dict['specimen accepted by ref lab'] = "n"
+        obj = SubmissionRow(row_dict, 1, 'test-proj:fam1', project['name'], institution['name'])
+        assert obj.sample.metadata['specimen_accession'] == row_dict['specimen id']
+        assert obj.sample.metadata['specimen_accepted'] == 'No'
+        assert obj.sample.metadata['requisition_acceptance']['accepted_rejected'] == 'Accepted'
+        assert obj.analysis.metadata['samples'] == [obj.sample.alias]
+        assert obj.individual.metadata['samples'] == [obj.sample.alias]
+
+    def test_extract_file_metadata_valid(self, row_dict, project, institution):
+        row_dict['files'] = 'f1.fastq.gz, f2.cram, f3.vcf.gz'
+        files = [f.strip() for f in row_dict['files'].split(',')]
+        obj = SubmissionRow(row_dict, 1, 'fam1', project['name'], institution['name'])
+        assert files[0] in obj.files_fastq[0].alias
+        assert obj.files_fastq[0].metadata['file_format'] == '/file-formats/fastq/'
+        assert obj.files_fastq[0].metadata['file_type'] == 'reads'
+        assert obj.files_processed[0].alias == 'encode-project:f2.cram'
+        assert files[2] in obj.files_processed[1].alias
+        assert not obj.errors
+
+    # filenames indicating uncompressed fastqs/vcfs should lead to errors
+    def test_extract_file_metadata_uncompressed(self, row_dict, project, institution):
+        row_dict['files'] = 'f1.fastq, f2.cram, f3.vcf'
+        files = [f.strip() for f in row_dict['files'].split(',')]
+        obj = SubmissionRow(row_dict, 1, 'fam1', project['name'], institution['name'])
+        assert not obj.files_fastq
+        assert obj.files_processed[0].alias == 'encode-project:f2.cram'
+        assert files[2] not in ''.join([f.alias for f in obj.files_processed])
+        assert all('File must be compressed' in error for error in obj.errors)
+
+    # file extensions other than fastq.gz,.cram, .vcf.gz should generate an error
+    def test_extract_file_metadata_invalid(self, row_dict, project, institution):
+        row_dict['files'] = 'f3.gvcf.gz'
+        files = [f.strip() for f in row_dict['files'].split(',')]
+        obj = SubmissionRow(row_dict, 1, 'fam1', project['name'], institution['name'])
+        assert not obj.files_processed
+        assert 'File extension on f3.gvcf.gz not supported - ' in ''.join(obj.errors)
+
+    @pytest.mark.parametrize('field, error', [
+        ('workup type', False),
+        ('specimen id', True),
+        ('individual id', True),
+        ('family id', False),
+        ('relation to proband', True),
+        ('analysis id', True),
+        ('report required', True),
+        ('specimen type', False),
+        ('alsdkjfdk', False)
+    ])
+    def test_found_missing_values(self, row_dict, project, institution, field, error):
+        row_dict[field] = None
+        obj = SubmissionRow(row_dict, 1, 'fam1', project['name'], institution['name'])
+        assert (len(obj.errors) > 0) == error
+        assert ('Row 1 - missing required field(s) {}. This row cannot be processed.'
+                ''.format(field) in obj.errors) == error
 
 
-def test_add_metadata_single_item(example_rows, project, institution):
-    """
-    if json for an item was already created in a previous row, any new fields for that
-    item in the current row should be added to the existing json.
-    if the current row has less information than the previous json item, the fields in
-    the previous json item won't get overwritten.
-    """
-    for rowidx in (1, 2):
-        data = [
-            {k: v for k, v in example_rows[0].items()},
-            # 2 rows have same sample
-            {k: v for k, v in example_rows[1].items()},
-            {k: v for k, v in example_rows[1].items()}
-        ]
-        data[rowidx]['specimen accepted by ref lab'] = 'Y'
+    @pytest.mark.parametrize('num, val', [(0, 1), (1, 2), (2, 1), (3, 2), (4, 1), (5, 2)])
+    def test_get_paired_end_value(self, num, val):
+        assert SubmissionRow.get_paired_end_value(num) == val
+
+
+class TestSubmissionMetadata:
+
+    def test_add_metadata_single_item(self, example_rows, project, institution):
+        """
+        if json for an item was already created in a previous row, any new fields for that
+        item in the current row should be added to the existing json.
+        if the current row has less information than the previous json item, the fields in
+        the previous json item won't get overwritten.
+        """
+        for rowidx in (1, 2):
+            data = [
+                {k: v for k, v in example_rows[0].items()},
+                # 2 rows have same sample
+                {k: v for k, v in example_rows[1].items()},
+                {k: v for k, v in example_rows[1].items()}
+            ]
+            data[rowidx]['specimen accepted by ref lab'] = 'Y'
+            submission = SubmissionMetadata(data, project, institution)
+            assert len(submission.individuals) == 2
+            assert len(submission.samples) == 2
+            assert 'specimen_accepted' in list(submission.samples.values())[1]
+
+    @pytest.mark.parametrize('relation2, relation3, error', [
+        ('mother', 'father', False),
+        ('mother', 'mother', True)
+    ])
+    def test_add_family_metadata(self, example_rows, project, institution, relation2, relation3, error):
+        data = example_rows[:3]
+        data[1]['relation to proband'] = relation2
+        data[2]['relation to proband'] = relation3
         submission = SubmissionMetadata(data, project, institution)
-        assert len(submission.individuals) == 2
-        assert len(submission.samples) == 2
-        assert 'specimen_accepted' in list(submission.samples.values())[1]
+        assert len(submission.families) == 1
+        fam = list(submission.families.values())[0]
+        assert len(fam['members']) == 3
+        assert (len(submission.errors) > 0) == error
+        assert ('Multiple values for relation' in ''.join(submission.errors)) == error
+
+    def test_add_sample_processing(self, example_rows, project, institution):
+        example_rows[5]['workup type'] = 'WGS'  # analysis 3333 will have mismatched workup type values
+        submission = SubmissionMetadata(example_rows, project, institution)
+        sps = submission.sample_processings
+        assert sps['encode-project:analysis-1111']['analysis_type'] == 'WGS-Trio'
+        assert sps['encode-project:analysis-2222']['analysis_type'] == 'WGS'
+        assert sps['encode-project:analysis-1111']['samples'] == [
+            'encode-project:sample-1', 'encode-project:sample-2', 'encode-project:sample-3'
+        ]
+        assert sps['encode-project:analysis-2222']['samples'] == ['encode-project:sample-1']
+        assert not sps['encode-project:analysis-3333']['analysis_type']
+        assert '3333 contain mis-matched or invalid workup type values' in ''.join(submission.errors)
+
+    @pytest.mark.parametrize('case_id, report', [(None, True), ('Case123', True), ('Case123', False)])
+    def test_create_case_metadata(self, row_dict, case_id, report, project, institution):
+        if not report:
+            row_dict['report required'] = 'N'
+        row_dict['unique analysis id'] = case_id
+        submission = SubmissionMetadata([row_dict], project, institution)
+        case = list(submission.cases.values())[0]
+        assert row_dict['individual id'] in case['individual']
+        assert case['family'] == list(submission.families.keys())[0]
+        assert (len(submission.reports) > 0) == report
+        case_alias = list(submission.cases.keys())[0]
+        if case_id:
+            assert case_id in case_alias
+        else:
+            assert '{}-{}'.format(row_dict['analysis id'], row_dict['specimen id']) in case_alias
+        if report:
+            assert case['report']
+
+    @pytest.mark.parametrize('case_id', [(None), ('Case123')])
+    def test_add_case_info(self, row_dict, case_id, project, institution):
+        row_dict['unique analysis id'] = case_id
+        submission = SubmissionMetadata([row_dict], project, institution)
+        key = '{}-{}'.format(row_dict['analysis id'], row_dict['specimen id'])
+        assert submission.case_names.get(key)[0] == case_id
+
+    def test_add_individual_relations(self, example_rows, project, institution):
+        submission = SubmissionMetadata(example_rows, project, institution)
+        assert all(field in submission.individuals['encode-project:individual-456'] for field in ['mother', 'father'])
+        assert not any(field in submission.families['encode-project:family-456'] for field in ['mother', 'father'])
+
+    def test_process_rows(self, example_rows, project, institution):
+        submission = SubmissionMetadata(example_rows, project, institution)
+        assert submission.json_out
+        assert len(submission.individuals) == 5
+        assert len(submission.families) == 2
+        assert len(submission.samples) == 5
+        assert len(submission.sample_processings) == 3
+        assert len(submission.cases) == 6
+        assert len(submission.reports) == 3
+
+    def test_create_json_out(self, example_rows, project, institution):
+        submission = SubmissionMetadata(example_rows, project, institution)
+        assert all(submission.json_out[key] for key in ['individual', 'family', 'sample', 'sample_processing', 'case', 'report'])
+        for key, val in submission.json_out.items():
+            if key != 'errors':
+                for val2 in val.values():
+                    assert val2['project']
+                    assert val2['institution']
 
 
-@pytest.mark.parametrize('age, birth_year, val_type', [
-    ('33', '1986', int),
-    # text values for age and birth year should be passed on without errors to eventually fail validation
-    ('abc', 'def', str)
-])
-def test_extract_individual_metadata_nums(row_dict, age, birth_year, val_type, project, institution):
-    row_dict['age'] = age
-    row_dict['birth year'] = birth_year
-    obj = SubmissionRow(row_dict, 1, 'test-proj:fam1', project['name'], institution['name'])
-    assert isinstance(obj.individual.metadata['age'], val_type)
-    assert not obj.errors
+class TestSpreadsheetProcessing:
 
+    @pytest.mark.parametrize('remove_row, success_bool', [
+        (0, True),  # super header missing should work ok (e.g. 'Patient Information' row)
+        (1, False),  # main header missing should cause a caught error
+        (2, True)  # missing comment row should work ok
+    ])
+    def test_header_found(self, project, institution, xls_list, remove_row, success_bool):
+        data = iter(xls_list[0:remove_row] + xls_list[(remove_row) + 1:])
+        obj = SpreadsheetProcessing(data, project, institution)
+        assert obj.passing == success_bool
+        assert (len(obj.errors) == 0) == success_bool
+        assert ('Column headers not detected in spreadsheet!' in ''.join(obj.errors)) == (not success_bool)
 
-@pytest.mark.parametrize('relation, error', [
-    ('proband', False),
-    ('grandmother', True)
-])
-def test_extract_family_metadata_new(row_dict, project, institution, relation, error):
-    row_dict['relation to proband'] = relation
-    obj = SubmissionRow(row_dict, 1, 'test-proj:fam1', project['name'], institution['name'])
-    assert obj.family.alias == 'test-proj:fam1'
-    assert obj.family.metadata['members'] == ['encode-project:individual-456']
-    if relation == 'proband':
-        assert obj.family.metadata['proband'] == 'encode-project:individual-456'
-    assert not obj.errors == (not error)  # check presence of errors
-    # check for correct error message
-    assert ('Row 1 - Invalid relation' in ''.join(obj.errors)) == error
+    def test_create_row_dict(self, xls_list, project, institution):
+        obj = SpreadsheetProcessing(iter(xls_list), project, institution)
+        assert obj.keys
+        assert len(obj.rows) == 3
+        for row in obj.rows:
+            assert all(key in row for key in obj.keys)
 
-
-@pytest.mark.parametrize('relation2, relation3, error', [
-    ('mother', 'father', False),
-    ('mother', 'mother', True)
-])
-def test_add_family_metadata(example_rows, project, institution, relation2, relation3, error):
-    data = example_rows[:3]
-    data[1]['relation to proband'] = relation2
-    data[2]['relation to proband'] = relation3
-    submission = SubmissionMetadata(data, project, institution)
-    assert len(submission.families) == 1
-    fam = list(submission.families.values())[0]
-    assert len(fam['members']) == 3
-    assert (len(submission.errors) > 0) == error
-    assert ('Multiple values for relation' in ''.join(submission.errors)) == error
-
-
-def test_extract_sample_metadata(row_dict, project, institution):
-    row_dict['req accepted y/n'] = 'Yes'
-    row_dict['specimen accepted by ref lab'] = "n"
-    obj = SubmissionRow(row_dict, 1, 'test-proj:fam1', project['name'], institution['name'])
-    assert obj.sample.metadata['specimen_accession'] == row_dict['specimen id']
-    assert obj.sample.metadata['specimen_accepted'] == 'No'
-    assert obj.sample.metadata['requisition_acceptance']['accepted_rejected'] == 'Accepted'
-    assert obj.analysis.metadata['samples'] == [obj.sample.alias]
-    assert obj.individual.metadata['samples'] == [obj.sample.alias]
-
-
-def test_extract_file_metadata_valid(row_dict, project, institution):
-    row_dict['files'] = 'f1.fastq.gz, f2.cram, f3.vcf.gz'
-    files = [f.strip() for f in row_dict['files'].split(',')]
-    obj = SubmissionRow(row_dict, 1, 'fam1', project['name'], institution['name'])
-    assert files[0] in obj.files_fastq[0].alias
-    assert obj.files_fastq[0].metadata['file_format'] == '/file-formats/fastq/'
-    assert obj.files_fastq[0].metadata['file_type'] == 'reads'
-    assert obj.files_processed[0].alias == 'encode-project:f2.cram'
-    assert files[2] in obj.files_processed[1].alias
-    assert not obj.errors
-
-
-# filenames indicating uncompressed fastqs/vcfs should lead to errors
-def test_extract_file_metadata_uncompressed(row_dict, project, institution):
-    row_dict['files'] = 'f1.fastq, f2.cram, f3.vcf'
-    files = [f.strip() for f in row_dict['files'].split(',')]
-    obj = SubmissionRow(row_dict, 1, 'fam1', project['name'], institution['name'])
-    assert not obj.files_fastq
-    assert obj.files_processed[0].alias == 'encode-project:f2.cram'
-    assert files[2] not in ''.join([f.alias for f in obj.files_processed])
-    assert all('File must be compressed' in error for error in obj.errors)
-
-
-# file extensions other than fastq.gz,.cram, .vcf.gz should generate an error
-def test_extract_file_metadata_invalid(row_dict, project, institution):
-    row_dict['files'] = 'f3.gvcf.gz'
-    files = [f.strip() for f in row_dict['files'].split(',')]
-    obj = SubmissionRow(row_dict, 1, 'fam1', project['name'], institution['name'])
-    assert not obj.files_processed
-    assert 'File extension on f3.gvcf.gz not supported - ' in ''.join(obj.errors)
-
-
-@pytest.mark.parametrize('field, error', [
-    ('workup type', False),
-    ('specimen id', True),
-    ('individual id', True),
-    ('family id', False),
-    ('relation to proband', True),
-    ('analysis id', True),
-    ('report required', True),
-    ('specimen type', False),
-    ('alsdkjfdk', False)
-])
-def test_found_missing_values(row_dict, project, institution, field, error):
-    row_dict[field] = None
-    obj = SubmissionRow(row_dict, 1, 'fam1', project['name'], institution['name'])
-    assert (len(obj.errors) > 0) == error
-    assert ('Row 1 - missing required field(s) {}. This row cannot be processed.'
-            ''.format(field) in obj.errors) == error
-
-
-@pytest.mark.parametrize('num, val', [(0, 1), (1, 2), (2, 1), (3, 2), (4, 1), (5, 2)])
-def test_get_paired_end_value(num, val):
-    assert SubmissionRow.get_paired_end_value(num) == val
-
-# add sample processing
-
-
-@pytest.mark.parametrize('case_id, report', [(None, True), ('Case123', True), ('Case123', False)])
-def test_create_case_metadata(row_dict, case_id, report, project, institution):
-    if not report:
-        row_dict['report required'] = 'N'
-    row_dict['unique analysis id'] = case_id
-    submission = SubmissionMetadata([row_dict], project, institution)
-    case = list(submission.cases.values())[0]
-    assert row_dict['individual id'] in case['individual']
-    assert case['family'] == list(submission.families.keys())[0]
-    assert (len(submission.reports) > 0) == report
-    case_alias = list(submission.cases.keys())[0]
-    if case_id:
-        assert case_id in case_alias
-    else:
-        assert '{}-{}'.format(row_dict['analysis id'], row_dict['specimen id']) in case_alias
-    if report:
-        assert case['report']
-
-
-@pytest.mark.parametrize('case_id', [(None), ('Case123')])
-def test_add_case_info(row_dict, case_id, project, institution):
-    row_dict['unique analysis id'] = case_id
-    submission = SubmissionMetadata([row_dict], project, institution)
-    key = '{}-{}'.format(row_dict['analysis id'], row_dict['specimen id'])
-    assert submission.case_names.get(key)[0] == case_id
-
-
-def test_add_individual_relations(example_rows, project, institution):
-    submission = SubmissionMetadata(example_rows, project, institution)
-    assert all(field in submission.individuals['encode-project:individual-456'] for field in ['mother', 'father'])
-    assert not any(field in submission.families['encode-project:family-456'] for field in ['mother', 'father'])
-
-
-def test_process_rows(example_rows, project, institution):
-    submission = SubmissionMetadata(example_rows, project, institution)
-    assert submission.json_out
-    assert len(submission.individuals) == 5
-    assert len(submission.families) == 2
-    assert len(submission.samples) == 5
-    assert len(submission.sample_processings) == 3
-    assert len(submission.cases) == 6
-    assert len(submission.reports) == 3
-
-
-def test_create_json_out(example_rows, project, institution):
-    submission = SubmissionMetadata(example_rows, project, institution)
-    assert all(submission.json_out[key] for key in ['individual', 'family', 'sample', 'sample_processing', 'case', 'report'])
-    for key, val in submission.json_out.items():
-        if key != 'errors':
-            for val2 in val.values():
-                assert val2['project']
-                assert val2['institution']
+    def test_create_row_dict_missing_col(self, xls_list, project, institution):
+        idx = xls_list[1].index('Specimen ID')
+        rows = (row[0:idx] + row[idx+1:] for row in xls_list)
+        obj = SpreadsheetProcessing(rows, project, institution)
+        assert not obj.passing
+        assert 'Column(s) "specimen id" not found in spreadsheet!' in ''.join(obj.errors)
 
 
 def test_xls_to_json(project, institution):
@@ -399,26 +409,6 @@ def test_xls_to_json(project, institution):
     assert 'encode-project:family-456' in json_out['family']
     assert len(json_out['individual']) == 3
     assert all(['encode-project:individual-' + x in json_out['individual'] for x in ['123', '456', '789']])
-
-
-def test_xls_to_json_no_header(project, institution, xls_list):
-    no_top_header = iter(xls_list[1:])  # top header missing should work ok (e.g. 'Patient Information', etc)
-    no_main_header = iter([xls_list[0]] + xls_list[2:])  # main header missing should cause a caught error
-    no_comments = iter(xls_list[0:2] + xls_list[3:])
-    json_out, success = xls_to_json(no_top_header, project, institution)
-    assert success
-    json_out, success = xls_to_json(no_main_header, project, institution)
-    assert not success
-    json_out, success = xls_to_json(no_comments, project, institution)
-    assert success
-
-
-def test_xls_to_json_missing_req_col(project, institution, xls_list):
-    # test error is caught when a required column in missing from excel file
-    idx = xls_list[1].index('Specimen ID')
-    rows = (row[0:idx] + row[idx+1:] for row in xls_list)
-    json_out, success = xls_to_json(rows, project, institution)
-    assert not success
 
 
 def test_xls_to_json_missing_req_val(project, institution, xls_list):
