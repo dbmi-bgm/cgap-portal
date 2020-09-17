@@ -476,8 +476,7 @@ class MappingTableParser(object):
         }
         facs['inheritance_modes'] = {
             'title': 'Inheritance Modes',
-            'order': 15,
-            'grouping': 'Genotype'
+            'order': 15
         }
 
     def generate_variant_sample_schema(self, sample_props, cols, facs, variant_cols, variant_facs):

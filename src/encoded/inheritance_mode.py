@@ -350,7 +350,10 @@ class InheritanceMode:
                       '\n%s\n%s\n%s' % (sample_geno, variant_sample, e))
             return {}
 
-        if chrom not in ['X', 'Y']:
+        # exclude mitochondrial variants
+        if chrom == 'M':
+            return {}
+        elif chrom not in ['X', 'Y']:
             chrom = cls.AUTOSOME
 
         if cls.SELF not in genotypes:
