@@ -3,7 +3,7 @@
 import React from 'react';
 import _ from 'underscore';
 
-import { console, object } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
+import { object } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { itemUtil } from '@hms-dbmi-bgm/shared-portal-components/es/components/util/object';
 import { LocalizedTime, formatPublicationDate } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/LocalizedTime';
 import { basicColumnExtensionMap,
@@ -47,7 +47,7 @@ const MultiLevelColumn = React.memo(function MultiLevelColumn(props){
                 <span className="col-topleft">
                     { topLeft }
                 </span>
-                { status ? <i className="status-indicator-dot ml-07" data-status={status} data-tip={statusTip || Schemas.Term.toName("status", status)} data-html />: null }
+                <i className="status-indicator-dot ml-07" data-status={status} data-tip={statusTip || Schemas.Term.toName("status", status)} data-html />
             </div>
             <h4 className="col-main">
                 { mainTitle || "-" }
@@ -267,15 +267,15 @@ export const columnExtensionMap = {
                 workup_type: mainTitle = null,
                 sequencing_date: date = null,
                 files = []
-            } = sample;
+            } = sample || {};
 
-            let statusTip = null;
             let status = null;
+            let statusTip = null;
 
             let fastqPresent = false;
             for (let i = 0; i < files.length; i++) {
                 const file = files[i];
-                const { '@type': [type] } = file;
+                const { '@type': [type] } = file || {};
                 if (type === "FileFastq") {
                     fastqPresent = true;
                     break;
@@ -315,31 +315,51 @@ export const columnExtensionMap = {
     /** "Bioinformatics" column title */
     'sample_processing.analysis_type': {
         'render' : function renderBioinformaticsColumn(result, parentProps){
-            const { '@id' : resultHrefPath, sample_processing = null } = result;
+            const { '@id' : resultHrefPath, sample = null, sample_processing = null } = result;
             if (!sample_processing) return null; // Unsure if possible, but fallback to null / '-' in case so (not showing datetitle etc)
             const {
                 analysis_type: mainTitle = null,
-                last_modified: { date_modified: date = null } = {},
-                completed_processes = [] // This is a list of _string_ values such as ["WGS_partI_V11", ..]
+                last_modified: { date_modified: date = null } = {}
             } = sample_processing;
-            const complProcLen = completed_processes.length;
+            const {
+                files = [],
+                processed_files = []
+            } = sample || {};
 
-            // We have colors bound to 'data-status' attribute values in SCSS to statuses, so we'll just
-            // re-use one of those here rather than creating separate 'color map' for this.
-            // And override tooltip.
-            // TODO move into reusable func if after while we keep statusTip etc sample between this and sample_processing.analysis_type
-            let status, statusTip;
-            if (complProcLen > 0){
-                status = "released";
-                if (complProcLen === 1) {
-                    statusTip = `Process <span class="text-600">${completed_processes[0]}</span> has completed`;
+            let status = null;
+            let statusTip = null;
+
+            // Ensure fastQs exist
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+                const { uuid = null, status: fileStatus = null } = file;
+                if (!uuid || fileStatus === "uploading" || fileStatus === "upload_failed" || !fileStatus) {
+                    statusTip = "No fastq files";
+                    status = "not started";
+                    break;
                 } else {
-                    statusTip = `This sample/case has <strong>${complProcLen}</strong> completed processes`;
+                    statusTip = "Fastq file(s) uploaded";
+                    status = "in progress";
                 }
-            } else {
-                status = "uploading";
-                statusTip = "This sample/case has no completed processes yet";
             }
+
+            // If fastQs are present...
+            if (status === "in progress") {
+                // Check if VCFs have been ingested & if QCs passed
+                for (let j = 0; j < processed_files.length; j++) {
+                    const procFile = processed_files[j];
+                    const { file_ingestion_status: ingestionStatus = null, file_format = null } = procFile || {};
+                    const { file_format: fileType } = file_format || {};
+                    if ((fileType === "vcf_gz" || fileType === "gvcf_gz")
+                        && ingestionStatus === "Ingested") {
+                        statusTip = "Variants are ingested";
+                        status = "complete";
+
+                        // TODO: Add QC status from overall QC status once implemented
+                    } // Not VCF or not yet ingested, ignore
+                }
+            }
+
 
             // Unlikely to show in non-Case item results, so didn't add Case filter
             return (
