@@ -356,10 +356,9 @@ export const columnExtensionMap = {
                         status = "complete";
 
                         // TODO: Add QC status from overall QC status once implemented
-                    } // Not VCF or not yet ingested, ignore
+                    } // Else, not VCF or not yet ingested, ignore
                 }
             }
-
 
             // Unlikely to show in non-Case item results, so didn't add Case filter
             return (
