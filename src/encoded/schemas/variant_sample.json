@@ -343,6 +343,7 @@
         "inheritance_modes": {
             "title": "Inheritance Modes",
             "type": "array",
+            "extended_description" : "src/encoded/docs/extended_description_VariantSample_inheritance_mode.html",
             "items": {
                 "type": "string"
             }

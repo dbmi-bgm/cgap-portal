@@ -1,4 +1,5 @@
 import json
+import os
 import boto3
 import pytz
 import datetime
@@ -139,6 +140,31 @@ class Variant(Item):
         return nc.chr_pos_to_genome_pos('chr'+CHROM, POS, chrom_info)
 
 
+
+variant_sample_schema = load_schema('encoded:schemas/variant_sample.json')
+def load_extended_descriptions_in_schemas(schema_properties):
+    '''
+    TODO: Maybe reuse?
+    '''
+    for field_name, field_schema in schema_properties.items():
+        if field_name == "inheritance_modes":
+            print('FS', field_name, field_schema)
+        if "extended_description" in field_schema:
+            if field_schema["extended_description"][-5:] == ".html":
+                html_file_path = os.path.join(os.path.abspath(os.path.dirname(__file__)), "../../..", field_schema["extended_description"])
+                with open(html_file_path) as open_file:
+                    field_schema["extended_description"] = "".join([ l.strip() for l in open_file.readlines() ])
+
+        if field_schema["type"] == "object" and "properties" in field_schema:
+            load_extended_descriptions_in_schemas(field_schema["properties"])
+            continue
+
+        if field_schema["type"] == "array" and "items" in field_schema and field_schema["items"]["type"] == "object" and "properties" in field_schema["items"]:
+            load_extended_descriptions_in_schemas(field_schema["items"]["properties"])
+            continue
+
+load_extended_descriptions_in_schemas(variant_sample_schema["properties"])
+
 @collection(
     name='variant-samples',
     properties={
@@ -150,7 +176,7 @@ class VariantSample(Item):
     """Class for variant samples."""
 
     item_type = 'variant_sample'
-    schema = load_schema('encoded:schemas/variant_sample.json')
+    schema = variant_sample_schema
     embedded_list = build_variant_sample_embedded_list()
 
     @classmethod
