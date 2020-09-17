@@ -268,7 +268,10 @@ class SubmissionRow:
         for relation in valid_relations:
             if self.metadata.get('relation to proband', '').lower().startswith(relation):
                 relation_found = True
-                info[relation] = self.indiv_alias
+                if relation in ['brother', 'sister', 'sibling']:
+                    info[relation] = [self.indiv_alias]
+                else:
+                    info[relation] = self.indiv_alias
                 break
         if not relation_found:
             msg = 'Row {} - Invalid relation "{}" for individual {} - Relation should be one of: {}'.format(
@@ -499,9 +502,10 @@ class SubmissionMetadata:
             for relation in RELATIONS:
                 if family.metadata.get(relation):
                     if relation in self.families[family.alias]:
-                        print(self.families[family.alias][relation])
-                        print(individual.alias)
-                        if self.families[family.alias][relation] != individual.alias:
+                        if relation in ['brother', 'sister', 'sibling']:
+                            if individual.alias not in self.families[family.alias][relation]:
+                                self.families[family.alias][relation].extend(family.metadata[relation])
+                        elif self.families[family.alias][relation] != individual.alias:
                             msg = ('Row {} - Multiple values for relation "{}" in family {}'
                                    ' found in spreadsheet'.format(idx, relation, family.metadata['family_id']))
                             self.errors.append(msg)
@@ -585,10 +589,14 @@ class SubmissionMetadata:
             for parent in ['mother', 'father']:
                 if family.get(parent):
                     self.individuals[family['proband']][parent] = family[parent]
-                    for sibling in ['sibling', 'brother', 'sister']:
-                        if family.get(sibling):
-                            self.individuals[family[sibling]][parent] = family[parent]
+                    for term in ['sibling', 'brother', 'sister']:
+                        if family.get(term):
+                            for sibling in family[term]:
+                                self.individuals[sibling][parent] = family[parent]
                     del family[parent]
+            for term in ['sibling', 'brother', 'sister']:
+                if family.get(term):
+                    del family[term]
 
     def process_rows(self):
         """

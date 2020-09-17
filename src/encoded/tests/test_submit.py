@@ -26,8 +26,6 @@ def row_dict():
         'individual id': '456',
         'family id': '333',
         'sex': 'M',
-        # 'age': '33',
-        # 'birth year': '1986',
         'relation to proband': 'proband',
         'analysis id': '999',
         'report required': 'Y',
@@ -115,6 +113,22 @@ def example_rows():
 
 
 @pytest.fixture
+def big_family_rows():
+    return [
+        {'individual id': '456', 'analysis id': '1111', 'relation to proband': 'proband',
+         'report required': 'Y', 'workup type': 'WGS', 'specimen id': '1'},
+        {'individual id': '123', 'analysis id': '1111', 'relation to proband': 'mother',
+         'report required': 'N', 'workup type': 'WGS', 'specimen id': '2'},
+        {'individual id': '789', 'analysis id': '1111', 'relation to proband': 'father',
+         'report required': 'N', 'workup type': 'WGS', 'specimen id': '3'},
+        {'individual id': '546', 'analysis id': '1111', 'relation to proband': 'sister',
+         'report required': 'Y', 'workup type': 'WGS', 'specimen id': '4'},
+        {'individual id': '555', 'analysis id': '1111', 'relation to proband': 'brother',
+         'report required': 'Y', 'workup type': 'WGS', 'specimen id': '5'}
+    ]
+
+
+@pytest.fixture
 def example_rows_obj(example_rows, project, institution):
     return SubmissionMetadata(example_rows, project, institution)
 
@@ -132,19 +146,6 @@ def new_family(child, mother, father):
     }
 
 
-@pytest.fixture
-def aunt(testapp, project, institution):
-    item = {
-        "accession": "GAPIDAUNT001",
-        "age": 35,
-        "age_units": "year",
-        'project': project['@id'],
-        'institution': institution['@id'],
-        "sex": "F"
-    }
-    return testapp.post_json('/individual', item).json['@graph'][0]
-
-
 def test_map_fields(sample_info):
     # tests spreadsheet fields are mapped to correct cgap property
     result = map_fields(sample_info, {}, ['workup_type'], 'sample')
@@ -153,27 +154,6 @@ def test_map_fields(sample_info):
     assert result['specimen_collection_date'] == '2020-01-06'
     assert not result.get('sequencing_lab')
 
-
-def test_init_families(example_rows_obj, project):
-    # test family aliases are named after proband individual ids
-    proj_name = project['name'] + ':'
-    fams = example_rows_obj.family_dict
-    assert sorted(list(fams.keys())) == ['1111', '2222', '3333']
-    assert fams['1111'] == proj_name + 'family-456'
-    assert fams['2222'] == proj_name + 'family-456'
-    assert fams['3333'] == proj_name + 'family-555'
-
-
-def test_get_analysis_types(example_rows_obj, example_rows, project, institution):
-    a_types = example_rows_obj.analysis_types
-    assert a_types['1111'] == 'WGS-Trio'
-    assert a_types['2222'] == 'WGS'
-    assert a_types['3333'] == 'WES-Group'
-    example_rows[1]['workup type'] = 'WES'
-    # analysis type should be none if workup types in samples don't match
-    new_obj = SubmissionMetadata(example_rows, project, institution)
-    new_a_types = new_obj.analysis_types
-    assert new_a_types['1111'] is None
 
 class TestSubmissionRow:
 
@@ -200,6 +180,11 @@ class TestSubmissionRow:
         ('grandmother', True)
     ])
     def test_extract_family_metadata_new(self, row_dict, project, institution, relation, error):
+        """
+        Currently without pedigree processing, can only parse proband/mother/father/sibling relationships.
+        Other relationships like 'grandmother' should result in an error message, but in the future may
+        be permitted with a pedigree file.
+        """
         row_dict['relation to proband'] = relation
         obj = SubmissionRow(row_dict, 1, 'test-proj:fam1', project['name'], institution['name'])
         assert obj.family.alias == 'test-proj:fam1'
@@ -211,6 +196,12 @@ class TestSubmissionRow:
         assert ('Row 1 - Invalid relation' in ''.join(obj.errors)) == error
 
     def test_extract_sample_metadata(self, row_dict, project, institution):
+        """
+        Some fields are formatted differently in spreadsheets vs in DB -
+        ex.
+        'Yes' --> 'Accepted' / 'No' --> 'Rejected' for requisition accepted field
+        'Y' --> 'Yes' / 'N' --> 'No' for specimen accepted field
+        """
         row_dict['req accepted y/n'] = 'Yes'
         row_dict['specimen accepted by ref lab'] = "n"
         obj = SubmissionRow(row_dict, 1, 'test-proj:fam1', project['name'], institution['name'])
@@ -259,7 +250,7 @@ class TestSubmissionRow:
         ('report required', True),
         ('specimen type', False),
         ('alsdkjfdk', False)
-    ])
+    ])  # some columns are required, others are optional.
     def test_found_missing_values(self, row_dict, project, institution, field, error):
         row_dict[field] = None
         obj = SubmissionRow(row_dict, 1, 'fam1', project['name'], institution['name'])
@@ -267,13 +258,32 @@ class TestSubmissionRow:
         assert ('Row 1 - missing required field(s) {}. This row cannot be processed.'
                 ''.format(field) in obj.errors) == error
 
-
     @pytest.mark.parametrize('num, val', [(0, 1), (1, 2), (2, 1), (3, 2), (4, 1), (5, 2)])
     def test_get_paired_end_value(self, num, val):
         assert SubmissionRow.get_paired_end_value(num) == val
 
 
 class TestSubmissionMetadata:
+
+    def test_init_families(self, example_rows_obj, project):
+        # test family aliases are named after proband individual ids
+        proj_name = project['name'] + ':'
+        fams = example_rows_obj.family_dict
+        assert sorted(list(fams.keys())) == ['1111', '2222', '3333']
+        assert fams['1111'] == proj_name + 'family-456'
+        assert fams['2222'] == proj_name + 'family-456'
+        assert fams['3333'] == proj_name + 'family-555'
+
+    def test_get_analysis_types(self, example_rows_obj, example_rows, project, institution):
+        a_types = example_rows_obj.analysis_types
+        assert a_types['1111'] == 'WGS-Trio'
+        assert a_types['2222'] == 'WGS'
+        assert a_types['3333'] == 'WES-Group'
+        example_rows[1]['workup type'] = 'WES'
+        # analysis type should be none if workup types in samples don't match
+        new_obj = SubmissionMetadata(example_rows, project, institution)
+        new_a_types = new_obj.analysis_types
+        assert new_a_types['1111'] is None
 
     def test_add_metadata_single_item(self, example_rows, project, institution):
         """
@@ -295,18 +305,17 @@ class TestSubmissionMetadata:
             assert len(submission.samples) == 2
             assert 'specimen_accepted' in list(submission.samples.values())[1]
 
-    @pytest.mark.parametrize('relation2, relation3, error', [
-        ('mother', 'father', False),
-        ('mother', 'mother', True)
+    @pytest.mark.parametrize('last_relation, error', [
+        ('brother', False),  # not a duplicate relation
+        ('mother', True),  # error if two members of family have same parental relation
+        ('sister', False)  # two siblings can have same relation
     ])
-    def test_add_family_metadata(self, example_rows, project, institution, relation2, relation3, error):
-        data = example_rows[:3]
-        data[1]['relation to proband'] = relation2
-        data[2]['relation to proband'] = relation3
-        submission = SubmissionMetadata(data, project, institution)
+    def test_add_family_metadata(self, big_family_rows, project, institution, last_relation, error):
+        big_family_rows[4]['relation to proband'] = last_relation
+        submission = SubmissionMetadata(big_family_rows, project, institution)
         assert len(submission.families) == 1
         fam = list(submission.families.values())[0]
-        assert len(fam['members']) == 3
+        assert len(fam['members']) == 5
         assert (len(submission.errors) > 0) == error
         assert ('Multiple values for relation' in ''.join(submission.errors)) == error
 
@@ -348,25 +357,31 @@ class TestSubmissionMetadata:
         key = '{}-{}'.format(row_dict['analysis id'], row_dict['specimen id'])
         assert submission.case_names.get(key)[0] == case_id
 
-    def test_add_individual_relations(self, example_rows, project, institution):
-        submission = SubmissionMetadata(example_rows, project, institution)
-        assert all(field in submission.individuals['encode-project:individual-456'] for field in ['mother', 'father'])
-        assert not any(field in submission.families['encode-project:family-456'] for field in ['mother', 'father'])
+    def test_add_individual_relations(self, big_family_rows, project, institution):
+        obj = SubmissionMetadata(big_family_rows, project, institution)
+        proband = obj.individuals['encode-project:individual-456']
+        sister = obj.individuals['encode-project:individual-546']
+        brother = obj.individuals['encode-project:individual-555']
+        parent = obj.individuals['encode-project:individual-789']
+        assert all(field in proband for field in ['mother', 'father'])
+        assert all(field not in parent for field in ['mother', 'father'])
+        assert proband['mother'] == sister['mother'] == brother['mother']
+        assert proband['father'] == sister['father'] == brother['father']
+        assert not any(field in obj.families['encode-project:family-456']
+                       for field in ['mother', 'father', 'sister', 'brother'])
 
-    def test_process_rows(self, example_rows, project, institution):
-        submission = SubmissionMetadata(example_rows, project, institution)
-        assert submission.json_out
-        assert len(submission.individuals) == 5
-        assert len(submission.families) == 2
-        assert len(submission.samples) == 5
-        assert len(submission.sample_processings) == 3
-        assert len(submission.cases) == 6
-        assert len(submission.reports) == 3
+    def test_process_rows(self, example_rows_obj, project, institution):
+        assert example_rows_obj.json_out
+        assert len(example_rows_obj.individuals) == 5
+        assert len(example_rows_obj.families) == 2
+        assert len(example_rows_obj.samples) == 5
+        assert len(example_rows_obj.sample_processings) == 3
+        assert len(example_rows_obj.cases) == 6
+        assert len(example_rows_obj.reports) == 3
 
-    def test_create_json_out(self, example_rows, project, institution):
-        submission = SubmissionMetadata(example_rows, project, institution)
-        assert all(submission.json_out[key] for key in ['individual', 'family', 'sample', 'sample_processing', 'case', 'report'])
-        for key, val in submission.json_out.items():
+    def test_create_json_out(self, example_rows_obj, project, institution):
+        assert all(example_rows_obj.json_out[key] for key in ['individual', 'family', 'sample', 'sample_processing', 'case', 'report'])
+        for key, val in example_rows_obj.json_out.items():
             if key != 'errors':
                 for val2 in val.values():
                     assert val2['project']
@@ -405,20 +420,11 @@ class TestSpreadsheetProcessing:
 def test_xls_to_json(project, institution):
     rows = digest_xls('src/encoded/tests/data/documents/cgap_submit_test.xlsx')
     json_out, success = xls_to_json(rows, project, institution)
+    assert success
     assert len(json_out['family']) == 1
     assert 'encode-project:family-456' in json_out['family']
     assert len(json_out['individual']) == 3
     assert all(['encode-project:individual-' + x in json_out['individual'] for x in ['123', '456', '789']])
-
-
-def test_xls_to_json_missing_req_val(project, institution, xls_list):
-    # test error is caught when a required column is present but value is missing in a row
-    idx = xls_list[1].index('Specimen ID')
-    xls_list[4] = xls_list[4][0:idx] + [''] + xls_list[4][idx+1:]
-    rows = iter(xls_list)
-    json_out, success = xls_to_json(rows, project, institution)
-    assert json_out['errors']
-    assert success
 
 
 def test_xls_to_json_invalid_workup(project, institution, xls_list):
@@ -431,22 +437,6 @@ def test_xls_to_json_invalid_workup(project, institution, xls_list):
     assert success
     assert ('Row 5 - Samples with analysis ID 55432 contain mis-matched '
             'or invalid workup type values.') in ''.join(json_out['errors'])
-
-
-def test_xls_to_json_mixed_workup(project, institution, xls_list):
-    # mixed workup types per analysis caught as an error
-    idx = xls_list[1].index('Workup Type')
-    xls_list[3] = xls_list[3][0:idx] + ['WES'] + xls_list[3][idx+1:]
-    one_row = xls_list[:4]
-    rows = iter(xls_list)
-    json_out, success = xls_to_json(rows, project, institution)
-    assert json_out['errors']
-    assert success
-    assert ('Row 5 - Samples with analysis ID 55432 contain mis-matched '
-            'or invalid workup type values.') in ''.join(json_out['errors'])
-    single_row = iter(one_row)
-    one_json_out, one_success = xls_to_json(single_row, project, institution)
-    assert not one_json_out['errors']
 
 
 def test_parse_exception_invalid_alias(testapp, a_case):
@@ -478,8 +468,8 @@ def test_compare_fields_same(testapp, fam, new_family):
     assert not result
 
 
-def test_compare_fields_different(testapp, aunt, fam, new_family):
-    new_family['members'].append(aunt['@id'])
+def test_compare_fields_different(testapp, fam, new_family):
+    new_family['members'].append('/individuals/GAPIDAUNT001/')
     new_family['title'] = 'Smythe family'
     profile = testapp.get('/profiles/family.json').json
     result = compare_fields(profile, [], new_family, fam)
