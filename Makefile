@@ -100,7 +100,7 @@ test-any:
 	bin/test -vv --timeout=200
 
 travis-test:
-	bin/test -vv --timeout=300 -m "working and not performance" --aws-auth --durations=10 --cov src/encoded --es search-cgap-testing-ud3ggpjj7x6vclx62nmzymyzfi.us-east-1.es.amazonaws.com:80
+	bin/test -vv --timeout=300 -m "working and not performance" --aws-auth --durations=10 --cov src/encoded --es search-cgap-testing-6-8-vo4mdkmkshvmyddc65ux7dtaou.us-east-1.es.amazonaws.com:443 
 
 update:  # updates dependencies
 	poetry update
