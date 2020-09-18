@@ -16,6 +16,7 @@ ORDER = [
     'software', 'static_section', 'tracking_item', 'workflow_mapping',
     'workflow_run_awsem', 'workflow_run', 'annotation_field', 'variant_sample',
     'variant', 'gene_annotation_field', 'gene', 'higlass_view_config',
+    'ingestion_submission',
 ]
 
 

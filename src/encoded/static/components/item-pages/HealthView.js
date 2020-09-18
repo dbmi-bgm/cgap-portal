@@ -36,8 +36,8 @@ export default class HealthView extends React.PureComponent {
         'href' : PropTypes.string
     };
 
-    static defaultProps = {	
-        "excludedKeys" : [ ...ItemDetailList.Detail.defaultProps.excludedKeys, 'content' ],	
+    static defaultProps = {
+        "excludedKeys" : [ ...ItemDetailList.Detail.defaultProps.excludedKeys, 'content' ],
         "keyTitleDescriptionMapConfig" : {
             'aggregations' : {
                 title : 'Aggregations',
@@ -73,6 +73,10 @@ export default class HealthView extends React.PureComponent {
             'foursight' : {
                 title : "Foursight",
                 description : "URI of corresponding Foursight page."
+            },
+            'metadata_bundles_bucket' : {
+                title: "MetaData Bundles Bucket",
+                description : "Name of S3 bucket used for metadata bundles."
             },
             'indexer' : {
                 title : "Indexer",
@@ -119,15 +123,15 @@ export default class HealthView extends React.PureComponent {
                 description : "Software version of dcicutils being used."
             },
         },
-        "keyTitleDescriptionMapCounts" : {	
-            'db_es_total' : {	
-                title : "DB and ES Counts",	
-                description : "Total counts of items in database and elasticsearch."	
-            },	
-            'db_es_compare' : {	
-                title : "DB and ES Counts by Type",	
-                description : "Counts of items in database and elasticsearch for each doc_type index."	
-            }	
+        "keyTitleDescriptionMapCounts" : {
+            'db_es_total' : {
+                title : "DB and ES Counts",
+                description : "Total counts of items in database and elasticsearch."
+            },
+            'db_es_compare' : {
+                title : "DB and ES Counts by Type",
+                description : "Counts of items in database and elasticsearch for each doc_type index."
+            }
         }
     };
 

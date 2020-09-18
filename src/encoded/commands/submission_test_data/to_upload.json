@@ -1,0 +1,18 @@
+[
+    {
+        "uuid": "48ee5042-7498-491d-b599-bcf5afcdbfa7",
+        "filename": "f1.fastq.gz"
+    },
+    {
+        "uuid": "eca0f76c-06d8-4953-828e-0bd8998639dc",
+        "filename": "f2.fastq.gz"
+    },
+    {
+        "uuid": "9f576938-bd3e-4eef-ae7c-13cd06bdc3fe",
+        "filename": "f3.fastq.gz"
+    },
+    {
+        "uuid": "eedfa412-a797-48a8-863f-639a33ba2814",
+        "filename": "f4.fastq.gz"
+    }
+]
