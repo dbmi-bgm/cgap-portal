@@ -95,6 +95,19 @@ def sample_info():
 
 
 @pytest.fixture
+def aunt(testapp, project, institution):
+    item = {
+        "accession": "GAPIDAUNT001",
+        "age": 35,
+        "age_units": "year",
+        'project': project['@id'],
+        'institution': institution['@id'],
+        "sex": "F"
+    }
+    return testapp.post_json('/individual', item).json['@graph'][0]
+
+
+@pytest.fixture
 def example_rows():
     return [
         {'individual id': '456', 'analysis id': '1111', 'relation to proband': 'proband',
@@ -468,8 +481,8 @@ def test_compare_fields_same(testapp, fam, new_family):
     assert not result
 
 
-def test_compare_fields_different(testapp, fam, new_family):
-    new_family['members'].append('/individuals/GAPIDAUNT001/')
+def test_compare_fields_different(testapp, aunt, fam, new_family):
+    new_family['members'].append(aunt['@id'])
     new_family['title'] = 'Smythe family'
     profile = testapp.get('/profiles/family.json').json
     result = compare_fields(profile, [], new_family, fam)

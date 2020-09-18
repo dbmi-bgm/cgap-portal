@@ -146,13 +146,5 @@
         "uuid": "5ec91041-78a0-4758-abef-21c7f5fd9f26",
         "sex": "M",
         "is_deceased": false
-    },
-    {
-        "accession": "GAPIDAUNT001",
-        "age": 35,
-        "age_units": "year",
-        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
-        "institution": "hms-dbmi",
-        "sex": "F"
     }
 ]
