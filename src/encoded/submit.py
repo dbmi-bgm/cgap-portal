@@ -103,7 +103,7 @@ def submit_metadata_bundle(*, s3_client, bucket, key, project, institution, vapp
                    'Please submit a file of the proper type.')
             results['validation_output'].append(msg)
             return results
-        json_data, json_success = xls_to_json(rows, project=project_json.get('name'), institution=institution_json.get('name'))
+        json_data, json_success = xls_to_json(rows, project=project_json, institution=institution_json)
         if not json_success:
             results['validation_output'] = json_data['errors']
             return results
@@ -383,7 +383,7 @@ class SubmissionRow:
             if fmt == 'fastq':
                 if paired:
                     paired_end = str(SubmissionRow.get_paired_end_value(i))
-                    file_info['paired end'] = paired_end
+                    file_info['paired_end'] = paired_end
                     if paired_end == '2':
                         file_info['related_files'] = [
                             {'relationship_type': 'paired with',
@@ -589,7 +589,8 @@ class SubmissionMetadata:
         for family in self.families.values():
             for parent in ['mother', 'father']:
                 if family.get(parent):
-                    self.individuals[family['proband']][parent] = family[parent]
+                    if family.get('proband'):
+                        self.individuals[family['proband']][parent] = family[parent]
                     for term in ['sibling', 'brother', 'sister']:
                         if family.get(term):
                             for sibling in family[term]:
@@ -610,10 +611,10 @@ class SubmissionMetadata:
                 fam = self.family_dict[row.get('analysis id')]
             except KeyError:
                 self.errors.append('Row {} - Family/Analysis does not include a proband.'
-                                   ' Row cannot be processed.'.format(i))
+                                   ' Row cannot be processed.'.format(i + 1 + self.counter))
                 continue
             try:
-                processed_row = SubmissionRow(row, i + self.counter, fam, self.project, self.institution)
+                processed_row = SubmissionRow(row, i + 1 + self.counter, fam, self.project, self.institution)
                 simple_add_items = [processed_row.individual, processed_row.sample]
                 simple_add_items.extend(processed_row.files_fastq)
                 simple_add_items.extend(processed_row.files_processed)
@@ -636,10 +637,13 @@ class SubmissionMetadata:
         Creates final json that can be used for subsequent validation function.
         """
         for key in self.itemtype_dict:
-            for metadata in self.itemtype_dict[key].values():
-                metadata['project'] = self.project_atid
-                metadata['institution'] = self.institution_atid
-            self.json_out[key] = self.itemtype_dict[key]
+            self.json_out[key] = {}
+            for alias, metadata in self.itemtype_dict[key].items():
+                new_metadata = {k: v for k, v in metadata.items() if v}
+                new_metadata['project'] = self.project_atid
+                new_metadata['institution'] = self.institution_atid
+                self.json_out[key][alias] = new_metadata
+            # self.json_out[key] = self.itemtype_dict[key]
             self.json_out['errors'] = self.errors
 
 
@@ -779,7 +783,8 @@ def parse_exception(e, aliases):
             if 'not found' in error and error.split("'")[1] in aliases:
                 continue
             else:
-                error = error.lstrip('Schema: ')
+                if error.startswith('Schema: '):
+                    error = error[8:]
                 if error.index('- ') > 0:
                     field_name = error[:error.index(' - ')]
                     field = None
@@ -790,7 +795,6 @@ def parse_exception(e, aliases):
                     error = map_enum_options(field_name, error)
                     if not field:
                         field = field_name.replace('_', ' ')
-
                     error = 'field: ' + error.replace(field_name, field)
                     keep.append(error)
                 elif 'Additional properties are not allowed' in error:
