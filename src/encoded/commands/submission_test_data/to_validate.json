@@ -1,0 +1,253 @@
+{
+  "individual": {
+    "hms-dbmi:individual-456": {
+      "aliases": [
+        "hms-dbmi:individual-456"
+      ],
+      "individual_id": "456",
+      "sex": "M",
+      "birth_year": 1991,
+      "row": 4,
+      "samples": [
+        "hms-dbmi:sample-3464467"
+      ],
+      "mother": "hms-dbmi:individual-123",
+      "father": "hms-dbmi:individual-789",
+      "project": "/projects/12a92962-8265-4fc0-b2f8-cf14f05db58b/",
+      "institution": "/institutions/hms-dbmi/"
+    },
+    "hms-dbmi:individual-789": {
+      "aliases": [
+        "hms-dbmi:individual-789"
+      ],
+      "individual_id": "789",
+      "sex": "M",
+      "birth_year": 1961,
+      "row": 5,
+      "samples": [
+        "hms-dbmi:sample-3464468"
+      ],
+      "project": "/projects/12a92962-8265-4fc0-b2f8-cf14f05db58b/",
+      "institution": "/institutions/hms-dbmi/"
+    },
+    "hms-dbmi:individual-123": {
+      "aliases": [
+        "hms-dbmi:individual-123"
+      ],
+      "individual_id": "123",
+      "sex": "F",
+      "birth_year": 1945,
+      "row": 6,
+      "samples": [
+        "hms-dbmi:sample-3464469"
+      ],
+      "project": "/projects/12a92962-8265-4fc0-b2f8-cf14f05db58b/",
+      "institution": "/institutions/hms-dbmi/"
+    }
+  },
+  "family": {
+    "hms-dbmi:family-456": {
+      "aliases": [
+        "hms-dbmi:family-456"
+      ],
+      "family_id": "333",
+      "members": [
+        "hms-dbmi:individual-456",
+        "hms-dbmi:individual-789",
+        "hms-dbmi:individual-123"
+      ],
+      "row": 4,
+      "proband": "hms-dbmi:individual-456",
+      "project": "/projects/12a92962-8265-4fc0-b2f8-cf14f05db58b/",
+      "institution": "/institutions/hms-dbmi/"
+    }
+  },
+  "sample": {
+    "hms-dbmi:sample-3464467": {
+      "aliases": [
+        "hms-dbmi:sample-3464467"
+      ],
+      "workup_type": "WGS",
+      "specimen_type": "Peripheral Blood",
+      "date_transported": "2020-11-02",
+      "indication": "Ovarian cancer",
+      "sent_by": "tr44",
+      "physician_id": "11946744",
+      "specimen_collection_date": "2020-11-02",
+      "specimen_accession": "3464467",
+      "transported_by": "Fedex",
+      "sequencing_lab": "Broad",
+      "requisition_type": "GED or BioBank",
+      "date_requisition_received": "2020-02-02",
+      "row": 4,
+      "other_specimen_ids": [
+        {
+          "id": "N/A",
+          "id_type": "hms-dbmi"
+        }
+      ],
+      "requisition_acceptance": {
+        "accepted_rejected": "Rejected",
+        "rejection_reason": "missing DOB"
+      },
+      "project": "/projects/12a92962-8265-4fc0-b2f8-cf14f05db58b/",
+      "institution": "/institutions/hms-dbmi/"
+    },
+    "hms-dbmi:sample-3464468": {
+      "aliases": [
+        "hms-dbmi:sample-3464468"
+      ],
+      "workup_type": "WGS",
+      "specimen_type": "Peripheral Blood",
+      "date_transported": "2020-11-02",
+      "indication": "Ovarian cancer",
+      "sent_by": "tr44",
+      "physician_id": "11946744",
+      "specimen_collection_date": "2020-11-02",
+      "specimen_accession": "3464468",
+      "transported_by": "Fedex",
+      "sequencing_lab": "Broad",
+      "requisition_type": "GED or BioBank",
+      "date_requisition_received": "2020-02-02",
+      "row": 5,
+      "requisition_acceptance": {
+        "accepted_rejected": "Rejected",
+        "rejection_reason": "missing DOB"
+      },
+      "project": "/projects/12a92962-8265-4fc0-b2f8-cf14f05db58b/",
+      "institution": "/institutions/hms-dbmi/"
+    },
+    "hms-dbmi:sample-3464469": {
+      "aliases": [
+        "hms-dbmi:sample-3464469"
+      ],
+      "workup_type": "WGS",
+      "specimen_type": "Peripheral Blood",
+      "date_transported": "2020-11-02",
+      "indication": "Ovarian cancer",
+      "sent_by": "tr44",
+      "physician_id": "11946744",
+      "specimen_collection_date": "2020-11-02",
+      "specimen_accession": "3464469",
+      "transported_by": "Fedex",
+      "sequencing_lab": "Broad",
+      "requisition_type": "GED or BioBank",
+      "date_requisition_received": "2020-02-02",
+      "row": 6,
+      "requisition_acceptance": {
+        "accepted_rejected": "Rejected",
+        "rejection_reason": "missing DOB"
+      },
+      "project": "/projects/12a92962-8265-4fc0-b2f8-cf14f05db58b/",
+      "institution": "/institutions/hms-dbmi/"
+    }
+  },
+  "sample_processing": {
+    "hms-dbmi:analysis-55432": {
+      "aliases": [
+        "hms-dbmi:analysis-55432"
+      ],
+      "samples": [
+        "hms-dbmi:sample-3464467",
+        "hms-dbmi:sample-3464468",
+        "hms-dbmi:sample-3464469"
+      ],
+      "families": [
+        "hms-dbmi:family-456"
+      ],
+      "analysis_type": "WGS-Trio",
+      "project": "/projects/12a92962-8265-4fc0-b2f8-cf14f05db58b/",
+      "institution": "/institutions/hms-dbmi/"
+    }
+  },
+  "file_fastq": {
+    "hms-dbmi:f1.fastq.gz": {
+      "aliases": [
+        "hms-dbmi:f1.fastq.gz"
+      ],
+      "row": 4,
+      "file_format": "/file-formats/fastq/",
+      "file_type": "reads",
+      "filename": "f1.fastq.gz",
+      "project": "/projects/12a92962-8265-4fc0-b2f8-cf14f05db58b/",
+      "institution": "/institutions/hms-dbmi/"
+    },
+    "hms-dbmi:f2.fastq.gz": {
+      "aliases": [
+        "hms-dbmi:f2.fastq.gz"
+      ],
+      "row": 4,
+      "file_format": "/file-formats/fastq/",
+      "file_type": "reads",
+      "filename": "f2.fastq.gz",
+      "project": "/projects/12a92962-8265-4fc0-b2f8-cf14f05db58b/",
+      "institution": "/institutions/hms-dbmi/"
+    },
+    "hms-dbmi:f3.fastq.gz": {
+      "aliases": [
+        "hms-dbmi:f3.fastq.gz"
+      ],
+      "row": 5,
+      "file_format": "/file-formats/fastq/",
+      "file_type": "reads",
+      "filename": "f3.fastq.gz",
+      "project": "/projects/12a92962-8265-4fc0-b2f8-cf14f05db58b/",
+      "institution": "/institutions/hms-dbmi/"
+    },
+    "hms-dbmi:f4.fastq.gz": {
+      "aliases": [
+        "hms-dbmi:f4.fastq.gz"
+      ],
+      "row": 6,
+      "file_format": "/file-formats/fastq/",
+      "file_type": "reads",
+      "filename": "f4.fastq.gz",
+      "project": "/projects/12a92962-8265-4fc0-b2f8-cf14f05db58b/",
+      "institution": "/institutions/hms-dbmi/"
+    }
+  },
+  "file_processed": {},
+  "case": {
+    "hms-dbmi:case-55432-3464467": {
+      "aliases": [
+        "hms-dbmi:case-55432-3464467"
+      ],
+      "sample_processing": "hms-dbmi:analysis-55432",
+      "family": "hms-dbmi:family-456",
+      "individual": "hms-dbmi:individual-456",
+      "report": "hms-dbmi:report-55432-3464467",
+      "project": "/projects/12a92962-8265-4fc0-b2f8-cf14f05db58b/",
+      "institution": "/institutions/hms-dbmi/"
+    },
+    "hms-dbmi:case-55432-3464468": {
+      "aliases": [
+        "hms-dbmi:case-55432-3464468"
+      ],
+      "sample_processing": "hms-dbmi:analysis-55432",
+      "family": "hms-dbmi:family-456",
+      "individual": "hms-dbmi:individual-789",
+      "project": "/projects/12a92962-8265-4fc0-b2f8-cf14f05db58b/",
+      "institution": "/institutions/hms-dbmi/"
+    },
+    "hms-dbmi:case-55432-3464469": {
+      "aliases": [
+        "hms-dbmi:case-55432-3464469"
+      ],
+      "sample_processing": "hms-dbmi:analysis-55432",
+      "family": "hms-dbmi:family-456",
+      "individual": "hms-dbmi:individual-123",
+      "project": "/projects/12a92962-8265-4fc0-b2f8-cf14f05db58b/",
+      "institution": "/institutions/hms-dbmi/"
+    }
+  },
+  "report": {
+    "hms-dbmi:report-55432-3464467": {
+      "aliases": [
+        "hms-dbmi:report-55432-3464467"
+      ],
+      "project": "/projects/12a92962-8265-4fc0-b2f8-cf14f05db58b/",
+      "institution": "/institutions/hms-dbmi/"
+    }
+  },
+  "errors": []
+}
