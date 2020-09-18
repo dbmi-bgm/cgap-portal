@@ -5,7 +5,7 @@ import logging
 import transaction
 
 from pyramid.httpexceptions import HTTPUnprocessableEntity
-# from pyramid.security import Allow, Deny, Everyone
+from pyramid.security import Allow, Deny, Everyone
 from pyramid.view import view_config
 from snovault import (
     CONNECTION,
@@ -25,6 +25,27 @@ from .base import Item
 logging.getLogger('boto3').setLevel(logging.INFO)
 log = logging.getLogger(__name__)
 
+""" In order to allow a user to add an access key they need to at
+    least see their basic profile info and the access_key table
+"""
+
+ONLY_ADMIN_VIEW_USER_DETAILS_ACL = [
+    (Allow, 'group.admin', ['view', 'view_details', 'edit']),
+    (Allow, 'remoteuser.INDEXER', ['view']),
+    (Allow, 'remoteuser.EMBED', ['view']),
+    (Deny, Everyone, ['view', 'view_details', 'edit']),
+]
+
+ONLY_OWNER_VIEW_PROFILE_ACL = [
+    (Allow, 'role.owner', 'view'),
+    # (Allow, 'role.owner', 'edit'),
+    # (Allow, 'role.owner', 'view_details'),
+] + ONLY_ADMIN_VIEW_USER_DETAILS_ACL
+
+DELETED_USER_ACL = [
+    (Deny, Everyone, 'visible_for_edit')
+] + ONLY_ADMIN_VIEW_USER_DETAILS_ACL
+
 
 @collection(
     name='users',
@@ -42,6 +63,13 @@ class User(Item):
     embedded_list = [
         'project_roles.project.name',
     ]
+
+    STATUS_ACL = {
+        'current': ONLY_OWNER_VIEW_PROFILE_ACL,
+        'deleted': DELETED_USER_ACL,
+        'revoked': DELETED_USER_ACL,
+        'inactive': ONLY_OWNER_VIEW_PROFILE_ACL,
+    }
 
     @calculated_property(schema={
         "title": "Title",
