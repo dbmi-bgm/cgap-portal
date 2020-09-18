@@ -18,7 +18,7 @@ import time
 import webtest
 
 from dcicutils.env_utils import is_stg_or_prd_env
-from dcicutils.misc_utils import VirtualApp, ignored
+from dcicutils.misc_utils import VirtualApp, ignored, check_true
 from pyramid import paster
 from pyramid.httpexceptions import HTTPNotFound, HTTPMovedPermanently
 from pyramid.request import Request
@@ -33,7 +33,9 @@ from .ingestion.processors import get_ingestion_processor
 from .inheritance_mode import InheritanceMode
 from .types.ingestion import SubmissionFolio
 from .types.variant import build_variant_display_title, ANNOTATION_ID_SEP
-from .util import resolve_file_path, gunzip_content, debuglog, get_trusted_email, beanstalk_env_from_request
+from .util import (
+    resolve_file_path, gunzip_content, debuglog, get_trusted_email, beanstalk_env_from_request, full_class_name,
+)
 
 
 log = structlog.getLogger(__name__)
@@ -66,11 +68,18 @@ def prompt_for_ingestion(context, request):
 register_path_content_type(path='/submit_for_ingestion', content_type='multipart/form-data')
 
 
-@view_config(route_name='submit_for_ingestion', request_method='POST', accept='multipart/form-data')
+@view_config(route_name='submit_for_ingestion', request_method='POST',
+             # Apparently adding this 'accept' causes discrimination on incoming requests not to find this method.
+             # We do want this type, and instead we check the request to make sure we got it, but we omit it here
+             # for practical reasons. -kmp 10-Sep-2020
+             # accept='multipart/form-data',
+             permission='add')
 @debug_log
 def submit_for_ingestion(context, request):
-
     ignored(context)
+
+    check_true(request.content_type == 'multipart/form-data',  # even though we can't declare we accept this
+               "Expected request to have content_type 'multipart/form-data'.", error_class=RuntimeError)
 
     bs_env = beanstalk_env_from_request(request)
     bundles_bucket = metadata_bundles_bucket(request.registry)
@@ -125,7 +134,7 @@ def submit_for_ingestion(context, request):
         log.error(e)
 
         success = False
-        message = "{error_type}: {error_message}".format(error_type=type(e), error_message=str(e))
+        message = "{error_type}: {error_message}".format(error_type=full_class_name(e), error_message=str(e))
 
     # This manifest will be stored in the manifest.json file on on s3 AND will be returned from this endpoint call.
     manifest_content = {
@@ -156,17 +165,21 @@ def submit_for_ingestion(context, request):
 
             log.error(e)
 
-            message = "{error_type} (while uploading metadata): {error_message}".format(error_type=type(e),
-                                                                                        error_message=str(e))
+            message = ("{error_type} (while uploading metadata): {error_message}"
+                       .format(error_type=full_class_name(e), error_message=str(e)))
 
             raise SubmissionFailure(message)
 
-    queue_manager = get_queue_manager(request, override_name=override_name)
-    _, failed = queue_manager.add_uuids([submission_id], ingestion_type=ingestion_type)
+        queue_manager = get_queue_manager(request, override_name=override_name)
+        _, failed = queue_manager.add_uuids([submission_id], ingestion_type=ingestion_type)
 
-    if failed:
-        # If there's a failure, failed will be a list of one problem description since we only submitted one thing.
-        raise SubmissionFailure(failed[0])
+        if failed:
+            # If there's a failure, failed will be a list of one problem description since we only submitted one thing.
+            raise SubmissionFailure(failed[0])
+
+    if not success:
+
+        raise SubmissionFailure(message)
 
     return manifest_content
 

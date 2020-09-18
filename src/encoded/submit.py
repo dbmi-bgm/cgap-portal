@@ -84,7 +84,7 @@ def submit_metadata_bundle(*, s3_client, bucket, key, project, institution, vapp
         results = {
             'success': False,
             'validation_output': [],
-            'final_json': {},
+            'result': {},
             'post_output': [],
             'upload_info': []
         }
