@@ -144,9 +144,13 @@ function CoverageTable2(props) {
         return <span className="font-italic">No per-sample coverage data available.</span>;
     }
 
-    const mapGTToShortenedTitles = {};
     const mapNumgtToGT = {};
     const rows = [];
+
+    // Keep track of duplicates for shortened titles
+    let shortGTDupPresent = false;
+    const mapGTToShortenedTitles = {};
+    const shortGTDupTester = {};
 
     let samplegenolen;
 
@@ -167,7 +171,35 @@ function CoverageTable2(props) {
             // Fallbacks for no-values handled later
             if (numgt !== ".") {
                 if (gtSplit[i] !== ".") {
-                    mapNumgtToGT[numgt] = gtSplit[i];
+                    const fullGT = gtSplit[i];
+                    mapNumgtToGT[numgt] = fullGT;
+
+                    // Populate mapGTToShortenedTitles mapping
+                    if (!mapGTToShortenedTitles.hasOwnProperty(fullGT)) {
+                        let gtObj;
+                        const n = 2; // Number of bp to show on either end when shortened
+        
+                        if (fullGT.length > 10) { // Calculate shortened versions of GTs
+                            const firstN = fullGT.substring(0, n);
+                            const middle = fullGT.substring(n, fullGT.length - n);
+                            const lastN = fullGT.substring(fullGT.length - n, fullGT.length);
+                            const shortGT = `${firstN}...${lastN}`;
+                            const bpGT = `${firstN}...${middle.length}bp...${lastN}`;
+        
+                            // Determine if to use ...BP... shortened version or normal shortened version
+                            if (!shortGTDupTester[shortGT]) {
+                                shortGTDupTester[shortGT] = true;
+                            } else {
+                                shortGTDupPresent = true;
+                            }
+        
+                            gtObj = { fullGT, shortGT, bpGT };
+                        } else {
+                            gtObj = { fullGT };
+                        }
+
+                        mapGTToShortenedTitles[fullGT] = gtObj;
+                    }
                 }
             }
         });
@@ -196,7 +228,8 @@ function CoverageTable2(props) {
     if (samplegenolen === numCol) { // great, no further effort needed, just sort the keys and use them to populate the rows
         refAndAltCols = numGTKeys.sort((a,b) => a - b).map((numGT, i) => {
             const thisGT = mapNumgtToGT[numGT];
-            return <th key={i} className="text-left">{`${numGT == 0 ? 'Ref': 'Alt'} (${thisGT})`}</th>;
+            const { bpGT = null, shortGT = null } = mapGTToShortenedTitles[thisGT];
+            return <th key={i} data-tip={thisGT} className="text-left">{`${numGT == 0 ? 'Ref': 'Alt'} (${bpGT || shortGT || thisGT})`}</th>;
         });
     } else { // looks like some columns were missing/incomplete, need to ensure # matches
         refAndAltCols = [];
@@ -213,10 +246,13 @@ function CoverageTable2(props) {
                 }
             } else { // use actual value
                 const thisGT = mapNumgtToGT[i];
-                refAndAltCols.push(<th key={i} className="text-left">{`${i == 0 ? 'Ref': 'Alt'} (${thisGT})`}</th>);
+                const { bpGT = null, shortGT = null } = mapGTToShortenedTitles[thisGT];
+                refAndAltCols.push(<th key={i} data-tip={thisGT} className="text-left">{`${i == 0 ? 'Ref': 'Alt'} (${bpGT || shortGT || thisGT})`}</th>);
             }
         }
     }
+
+    console.log("mapGTToShortenedTitles", mapGTToShortenedTitles);
 
     console.log("samplegeno", samplegeno);
     console.log("genotypeLabels", genotypeLabels);
