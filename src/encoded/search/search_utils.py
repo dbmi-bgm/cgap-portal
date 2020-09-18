@@ -260,8 +260,9 @@ def get_es_mapping(es, es_index):
     if '*' in es_index or ',' in es_index:  # no type=nested searches can be done on * or multi-index
         return {}
     else:
-        item_type = list(es.indices.get(es_index)[es_index]['mappings'].keys())[0]  # no other way to get it
-        return es.indices.get(es_index)[es_index]['mappings'][item_type]['properties']
+        index = es.indices.get(es_index)
+        item_type = list(index[es_index]['mappings'].keys())[0]
+        return index[es_index]['mappings'][item_type]['properties']
 
 
 def get_search_fields(request, doc_types):
