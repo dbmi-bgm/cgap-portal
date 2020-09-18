@@ -1,4 +1,3 @@
-# import ast
 from copy import deepcopy
 import csv
 import datetime
@@ -7,7 +6,7 @@ import xlrd
 
 from dcicutils.qa_utils import ignored
 from dcicutils.misc_utils import VirtualAppError
-from webtest.app import AppError
+from webtest import AppError
 from .util import s3_local_file, debuglog
 
 
@@ -67,7 +66,7 @@ LINKTO_FIELDS = [  # linkTo properties that we will want to patch in second-roun
 ]
 
 
-ID_SOURCES = [ 'UDN' ]
+ID_SOURCES = ['UDN']
 
 
 def submit_metadata_bundle(*, s3_client, bucket, key, project, institution, vapp,  # <- Required keyword arguments
@@ -76,11 +75,13 @@ def submit_metadata_bundle(*, s3_client, bucket, key, project, institution, vapp
     Handles processing of a submitted workbook.
 
     Args:
-        data_stream: an open stream to xls workbook data
+        s3_client: a boto3 s3 client object
+        bucket: the name of the s3 bucket that contains the data to be processed
+        key: the name of a key within the given bucket that contains the data to be processed
         project: a project identifier
         institution: an institution identifier
         vapp: a VirtualApp object
-        log: a logging object capable of .info, .warning, .error, or .debug messages
+        validate_only: a bool. If True, only do validation, not posting; otherwise (if False), do posting, too.
     """
     with s3_local_file(s3_client, bucket=bucket, key=key) as filename:
         project_json = vapp.get(project).json
@@ -88,7 +89,7 @@ def submit_metadata_bundle(*, s3_client, bucket, key, project, institution, vapp
         results = {
             'success': False,
             'validation_output': [],
-            'final_json': {},
+            'result': {},
             'post_output': [],
             'upload_info': []
         }
@@ -175,7 +176,7 @@ def digest_csv(input_data, delim=','):
     with open(input_data) as csvfile:
         rows = list(csv.reader(csvfile, delimiter=delim))
     for row in rows:
-        yield(row)
+        yield row
 
 
 class MetadataItem:
@@ -738,6 +739,7 @@ def validate_item(virtualapp, item, method, itemtype, aliases, atid=None):
     if method == 'post':
         try:
             validation = virtualapp.post_json('/{}/?check_only=true'.format(itemtype), data)
+            ignored(validation)  # should it be? why did we assign it? -kmp 18-Sep-2020
         except (AppError, VirtualAppError) as e:
             return parse_exception(e, aliases)
         else:
@@ -745,6 +747,7 @@ def validate_item(virtualapp, item, method, itemtype, aliases, atid=None):
     elif method == 'patch':
         try:
             validation = virtualapp.patch_json(atid + '?check_only=true', data, status=200)
+            ignored(validation)  # should it be? why did we assign it? -kmp 18-Sep-2020
         except (AppError, VirtualAppError) as e:
             return parse_exception(e, aliases)
         else:
@@ -809,8 +812,8 @@ def compare_fields(profile, aliases, json_item, db_item):
     to_patch = {}
     for field in json_item:
         if field == 'filename':
-            if (db_item.get('status') in ['uploading', 'upload failed', 'to be uploaded by workflow'] or
-                        json_item['filename'].split('/')[-1] != db_item.get('filename')):
+            if (db_item.get('status') in ['uploading', 'upload failed', 'to be uploaded by workflow']
+                    or json_item['filename'].split('/')[-1] != db_item.get('filename')):
                 to_patch['filename'] = json_item['filename']
                 to_patch['status'] = 'uploading'
             continue
@@ -845,6 +848,7 @@ def validate_all_items(virtualapp, json_data):
     2. if item in db, will validate and patch any different metadata
     3. if item not in db, will post item
     """
+    output = []
     if list(json_data.keys()) == ['errors']:
         output.append('Errors found in spreadsheet columns. Please fix spreadsheet before submitting.')
         return {}, output, False
@@ -853,7 +857,6 @@ def validate_all_items(virtualapp, json_data):
     all_aliases = [k for itype in json_data for k in json_data[itype]]
     json_data_final = {'post': {}, 'patch': {}}
     validation_results = {}
-    output = []
     for itemtype in POST_ORDER:  # don't pre-validate case and report
         db_results = {}
         if itemtype in json_data:

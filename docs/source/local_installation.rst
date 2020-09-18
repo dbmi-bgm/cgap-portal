@@ -1,5 +1,5 @@
 Local Installation
-============
+==================
 
 The following instructions are for running a CGAP deployment with macOS and homebrew.
 
@@ -18,12 +18,12 @@ CGAP is known to work with Python 3.6.x and will not work with Python 3.7 or gre
    $ brew install freetype libjpeg libtiff littlecms webp  # Required by Pillow
    $ brew cask install homebrew/cask-versions/adoptopenjdk8
    $ brew tap homebrew/versions
-   $ brew install elasticsearch@5.6 node@10
+   $ brew install elasticsearch@6.8 node@10
 
 
 You may need to link the brew-installed elasticsearch::
 
-   $ brew link --force elasticsearch@5.6
+   $ brew link --force elasticsearch@6.8
 
 
 If you need to update dependencies::
@@ -33,11 +33,9 @@ If you need to update dependencies::
    $ rm -rf encoded/eggs
 
 
-* Step 3: Run buildout::
+* Step 3: Run make::
 
-   $ pip install -U zc.buildout setuptools
-   $ buildout bootstrap --buildout-version 2.9.5 --setuptools-version 36.6.0
-   $ bin/buildout
+   $ make build
 
    NOTE:
    If you have issues with postgres or the python interface to it (psycogpg2) you
@@ -57,7 +55,7 @@ If you wish to completely rebuild the application, or have updated dependencies:
 
 In one terminal startup the database servers and nginx proxy with::
 
-   $ bin/dev-servers development.ini --app-name app --clear --init --load
+   $ make deploy1
 
 This will first clear any existing data in /tmp/encoded.
 Then postgres and elasticsearch servers will be initiated within /tmp/encoded.
@@ -66,7 +64,7 @@ The servers are started, and finally the test set will be loaded.
 
 In a second terminal, run the app with::
 
-   $ bin/pserve development.ini
+   $ make deploy2
 
 Indexing will then proceed in a background thread similar to the production setup.
 
