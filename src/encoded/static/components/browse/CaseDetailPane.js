@@ -57,7 +57,7 @@ export const CaseDetailPane = React.memo(function CaseDetailPane (props) {
                     </div>
                 </div>
             </div>
-            <div style={{ overflowX : 'auto', width: containerWidth ? (containerWidth - usePadWidth) : null }} className="family-tables-container"> {/*formerly files-tables-container */}
+            <div style={{ width: containerWidth ? (containerWidth - usePadWidth) : null }} className="family-tables-container overflow-auto"> {/*formerly files-tables-container */}
                 { familySections }
             </div>
         </div>

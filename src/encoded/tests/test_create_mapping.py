@@ -11,9 +11,8 @@ from ..commands.create_mapping_on_deploy import ITEM_INDEX_ORDER, get_deployment
 pytestmark = [pytest.mark.setone, pytest.mark.working]
 
 
-# XXX: Gene does not get 'genomic_region'
-@pytest.mark.parametrize('item_type', [k for k in ORDER if k != 'gene'])
-def test_create_mapping(registry, item_type):
+@pytest.mark.parametrize('item_type', ORDER)
+def test_create_mapping_correctly_maps_embeds(registry, item_type):
     """
     This test does not actually use elasticsearch
     Only tests the mappings generated from schemas

@@ -69,29 +69,6 @@ class Report(Item):
 
 
 @collection(
-    name='genes',
-    unique_key='gene:ensgid',
-    properties={
-        'title': 'Genes',
-        'description': 'Gene items',
-    })
-class Gene(Item):
-    """Gene class."""
-    item_type = 'gene'
-    name_key = 'ensgid'  # use the ENSEMBL Gene ID as the identifier
-    schema = load_schema('encoded:schemas/gene.json')
-    embedded_list = []
-
-    @calculated_property(schema={
-        "title": "Display Title",
-        "description": "Gene ID",
-        "type": "string"
-    })
-    def display_title(self, gene_symbol):
-        return gene_symbol
-
-
-@collection(
     name='gene-annotation-fields',
     unique_key='gene_annotation_field:field_name',
     properties={
