@@ -1,4 +1,3 @@
-# import ast
 from copy import deepcopy
 import csv
 import datetime
@@ -7,7 +6,7 @@ import xlrd
 
 from dcicutils.qa_utils import ignored
 from dcicutils.misc_utils import VirtualAppError
-from webtest.app import AppError
+from webtest import AppError
 from .util import s3_local_file, debuglog
 
 
@@ -63,7 +62,7 @@ LINKTO_FIELDS = [  # linkTo properties that we will want to patch in second-roun
 ]
 
 
-ID_SOURCES = [ 'UDN' ]
+ID_SOURCES = ['UDN']
 
 
 def submit_metadata_bundle(*, s3_client, bucket, key, project, institution, vapp,  # <- Required keyword arguments
@@ -72,11 +71,13 @@ def submit_metadata_bundle(*, s3_client, bucket, key, project, institution, vapp
     Handles processing of a submitted workbook.
 
     Args:
-        data_stream: an open stream to xls workbook data
+        s3_client: a boto3 s3 client object
+        bucket: the name of the s3 bucket that contains the data to be processed
+        key: the name of a key within the given bucket that contains the data to be processed
         project: a project identifier
         institution: an institution identifier
         vapp: a VirtualApp object
-        log: a logging object capable of .info, .warning, .error, or .debug messages
+        validate_only: a bool. If True, only do validation, not posting; otherwise (if False), do posting, too.
     """
     with s3_local_file(s3_client, bucket=bucket, key=key) as filename:
         project_json = vapp.get(project).json
@@ -171,7 +172,7 @@ def digest_csv(input_data, delim=','):
     with open(input_data) as csvfile:
         rows = list(csv.reader(csvfile, delimiter=delim))
     for row in rows:
-        yield(row)
+        yield row
 
 
 def xls_to_json(row, project, institution):
@@ -196,6 +197,7 @@ def xls_to_json(row, project, institution):
     a dictionary of {column header: cell value} pairs, then gathers the metadata it can find for each
     db item type in each row. Minor spreadsheet errors are added to the output dictionary.
     """
+    keys = {}  # In case there are no rows, so key doesn't get assigned below
     header = False
     counter = 0
     # debuglog("top_header:", top_header)  # Temporary instrumentation for debugging to go away soon. -kmp 25-Jul-2020
@@ -264,7 +266,7 @@ def xls_to_json(row, project, institution):
                 samp_alias = samp_alias + '-' + row['run no.']
             analysis_alias = '{}:analysis-{}'.format(project['name'], row['analysis id'])
             items = extract_sample_metadata(row_num, row, items, indiv_alias, samp_alias, analysis_alias,
-                                          fam_alias, project['name'], a_types, case_names)
+                                            fam_alias, project['name'], a_types, case_names)
             if row.get('files'):
                 file_items = extract_file_metadata(row_num, row['files'].split(','), project['name'])
                 file_errors.extend(file_items['errors'])
@@ -387,7 +389,7 @@ def extract_family_metadata(idx, row, items, indiv_alias, fam_alias):
 
 
 def extract_sample_metadata(idx, row, items, indiv_alias, samp_alias, analysis_alias,
-                          fam_alias, proj_name, analysis_type_dict, case_name_dict):
+                            fam_alias, proj_name, analysis_type_dict, case_name_dict):
     """
     Extracts 'sample' item metadata from each row
     """
@@ -459,7 +461,7 @@ def extract_file_metadata(idx, filenames, proj_name):
                 files['errors'].append('File must be compressed - please gzip file {}'.format(filename))
             else:
                 files['errors'].append('File extension on {} not supported - expecting one of: '
-                              '.fastq.gz, .fq.gz, .cram, .vcf.gz'.format(filename))
+                                       '.fastq.gz, .fq.gz, .cram, .vcf.gz'.format(filename))
             continue
         file_alias = '{}:{}'.format(proj_name, filename.strip().split('/')[-1])
         fmt = valid_extensions[extension[0]][0]
@@ -540,7 +542,9 @@ def add_relations(items):
                 if parents:
                     for parent in ['mother', 'father']:
                         if new_items['individual'][fam['proband']].get(parent):
-                            new_items['individual'][fam[relation]][parent] = new_items['individual'][fam['proband']][parent]
+                            new_items['individual'][fam[relation]][parent] = (
+                                new_items['individual'][fam['proband']][parent]
+                            )
                 del new_items['family'][alias][relation]
     return new_items
 
@@ -565,6 +569,7 @@ def validate_item(virtualapp, item, method, itemtype, aliases, atid=None):
     if method == 'post':
         try:
             validation = virtualapp.post_json('/{}/?check_only=true'.format(itemtype), data)
+            ignored(validation)  # should it be? why did we assign it? -kmp 18-Sep-2020
         except (AppError, VirtualAppError) as e:
             return parse_exception(e, aliases)
         else:
@@ -572,6 +577,7 @@ def validate_item(virtualapp, item, method, itemtype, aliases, atid=None):
     elif method == 'patch':
         try:
             validation = virtualapp.patch_json(atid + '?check_only=true', data, status=200)
+            ignored(validation)  # should it be? why did we assign it? -kmp 18-Sep-2020
         except (AppError, VirtualAppError) as e:
             return parse_exception(e, aliases)
         else:
@@ -636,8 +642,8 @@ def compare_fields(profile, aliases, json_item, db_item):
     to_patch = {}
     for field in json_item:
         if field == 'filename':
-            if (db_item.get('status') in ['uploading', 'upload failed', 'to be uploaded by workflow'] or
-                        json_item['filename'].split('/')[-1] != db_item.get('filename')):
+            if (db_item.get('status') in ['uploading', 'upload failed', 'to be uploaded by workflow']
+                    or json_item['filename'].split('/')[-1] != db_item.get('filename')):
                 to_patch['filename'] = json_item['filename']
                 to_patch['status'] = 'uploading'
             continue
@@ -672,6 +678,7 @@ def validate_all_items(virtualapp, json_data):
     2. if item in db, will validate and patch any different metadata
     3. if item not in db, will post item
     """
+    output = []
     if list(json_data.keys()) == ['errors']:
         output.append('Errors found in spreadsheet columns. Please fix spreadsheet before submitting.')
         return {}, output, False
@@ -680,7 +687,6 @@ def validate_all_items(virtualapp, json_data):
     all_aliases = [k for itype in json_data for k in json_data[itype]]
     json_data_final = {'post': {}, 'patch': {}}
     validation_results = {}
-    output = []
     for itemtype in POST_ORDER:  # don't pre-validate case and report
         db_results = {}
         if itemtype in json_data:
