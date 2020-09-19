@@ -883,12 +883,6 @@ class SearchBuilder:
                         # If @type or display_title etc. column defined in schema, then override defaults.
                         for prop in schema_columns[name]:
                             columns[name][prop] = schema_columns[name][prop]
-                    # Add description from field schema, if none otherwise.
-                    if not columns[name].get('description'):
-                        field_schema = schema_for_field(name, self.request, self.doc_types)
-                        if field_schema:
-                            if field_schema.get('description') is not None:
-                                columns[name]['description'] = field_schema['description']
 
         # Add status column, if not present, at end.
         if 'status' not in columns:
