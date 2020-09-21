@@ -34,6 +34,8 @@ VARIANT_SAMPLE_SCHEMA = resolve_file_path('./schemas/variant_sample.json')
 STATUS_QUEUED = 'Queued'
 STATUS_INGESTED = 'Ingested'
 STATUS_DISABLED = 'Ingestion disabled'
+CGAP_CORE_PROJECT = '/projects/cgap-core'
+CGAP_CORE_INSTITUTION = '/institutions/hms-dbmi/'
 
 
 def includeme(config):
@@ -490,14 +492,16 @@ class IngestionListener:
         :return: 2-tuple of successful, failed number of posts
         """
         success, error = 0, 0
-        project, institution, file_accession = (file_meta['project']['uuid'], file_meta['institution']['uuid'],
+        vs_project, vs_institution, file_accession = (file_meta['project']['uuid'], file_meta['institution']['uuid'],
                                                 file_meta['accession'])
         sample_relations = self.extract_sample_relations(file_accession)
         for idx, record in enumerate(parser):
             log.info('Attempting parse on record %s' % record)
             try:
-                variant = self.build_and_post_variant(parser, record, project, institution)
-                self.build_and_post_variant_samples(parser, record, project, institution, variant, file_accession,
+                variant = self.build_and_post_variant(parser, record,
+                                                      CGAP_CORE_PROJECT,  # /projects/cgap-core
+                                                      CGAP_CORE_INSTITUTION)  # /institutions/hms-dbmi/
+                self.build_and_post_variant_samples(parser, record, vs_project, vs_institution, variant, file_accession,
                                                     sample_relations)
                 success += 1
             except Exception as e:  # ANNOTATION spec validation error, recoverable
