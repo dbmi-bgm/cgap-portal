@@ -115,6 +115,7 @@ class SearchBuilder:
 
         # Can potentially make an outside API call, but ideally is cached
         # Only needed if searching on a single item type
+        self.item_type_es_mapping = {}
         self._get_es_mapping_if_necessary()
 
     @property
@@ -327,12 +328,20 @@ class SearchBuilder:
         if (len(self.doc_types) == 1) and 'Item' not in self.doc_types:
             search_term = 'search-info-header.' + self.doc_types[0]
             static_section = self.request.registry['collections']['StaticSection'].get(search_term)
-            if static_section and hasattr(static_section.model, 'source'):
+            if static_section and hasattr(static_section.model, 'source'):  # extract from ES structure
                 item = static_section.model.source['object']
                 self.response['search_header'] = {}
                 self.response['search_header']['content'] = item['content']
                 self.response['search_header']['title'] = item.get('title', item['display_title'])
                 self.response['search_header']['filetype'] = item['filetype']
+            elif static_section and hasattr(static_section.model, 'data'):  # extract form DB structure
+                item = static_section.upgrade_properties()
+                self.response['search_header'] = {}
+                self.response['search_header']['content'] = item['body']
+                self.response['search_header']['title'] = item.get('title', 'No title')
+                self.response['search_header']['filetype'] = item.get('filetype', 'No filetype')
+            else:
+                pass  # no static header found
 
     def set_pagination(self):
         """
