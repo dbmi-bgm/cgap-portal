@@ -15,6 +15,7 @@ from snovault import (
     AbstractCollection,
     TYPES,
     COLLECTIONS,
+    STORAGE
 )
 from snovault.elasticsearch import ELASTIC_SEARCH
 from snovault.elasticsearch.create_mapping import determine_if_is_date_field
@@ -81,6 +82,21 @@ class SearchBuilder:
         self.search_session_id = None
         self.string_query = None
 
+    def _get_es_mapping_if_necessary(self):
+        """ Looks in the registry to see if the single doc_type mapping is cached in the registry, which it
+            should be - thus saving us some time from external API calls at the expense of application memory.
+        """
+        if len(self.doc_types) == 1:  # extract mapping from storage if we're searching on a single doc type
+            item_type = self.doc_types[0]
+            item_type_snake_case = ''.join(['_' + c.lower() if c.isupper() else c for c in self.doc_types[0]]).lstrip('_')
+            mappings = self.request.registry[STORAGE].read.mappings.get()
+            if item_type in mappings:
+                self.item_type_es_mapping = mappings[item_type]
+            elif item_type_snake_case in mappings:
+                self.item_type_es_mapping = mappings[item_type_snake_case]
+            else:
+                self.item_type_es_mapping = get_es_mapping(self.es, self.es_index)
+
     def _bootstrap_query(self, search_type=None, return_generator=False, forced_type='Search',
                          custom_aggregations=None):
         """ Helper method that will bootstrap metadata necessary for building a search query. """
@@ -97,8 +113,9 @@ class SearchBuilder:
         self.search_frame = self.request.normalized_params.get('frame', self.DEFAULT_SEARCH_FRAME)  # embedded
         self.prepared_terms = self.prepare_search_term(self.request)
 
-        # Outside API Calls
-        self.item_type_es_mapping = get_es_mapping(self.es, self.es_index)  # mapping for the item type we are searching
+        # Can potentially make an outside API call, but ideally is cached
+        # Only needed if searching on a single item type
+        self._get_es_mapping_if_necessary()
 
     @property
     def forced_type_token(self):
