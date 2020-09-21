@@ -14,9 +14,10 @@ class InheritanceMode:
     MISSING = '.'
 
     AUTOSOME = 'autosome'
+    MITOCHONDRIAL = 'M'
     CHROMOSOMES = [
         '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20',
-        '21', AUTOSOME, 'X', 'Y', 'M'
+        '21', AUTOSOME, 'X', 'Y', MITOCHONDRIAL
     ]
 
     MALE = 'M'
@@ -351,7 +352,7 @@ class InheritanceMode:
             return {}
 
         # exclude mitochondrial variants
-        if chrom == 'M':
+        if chrom == cls.MITOCHONDRIAL:
             return {}
         elif chrom not in ['X', 'Y']:
             chrom = cls.AUTOSOME
