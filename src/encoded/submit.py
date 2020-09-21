@@ -62,7 +62,7 @@ POST_ORDER = [
 
 LINKTO_FIELDS = [  # linkTo properties that we will want to patch in second-round
     'samples', 'members', 'mother', 'father', 'proband', 'report',
-    'individual', 'sample_processing', 'families', 'files'
+    'individual', 'sample_processing', 'families', 'family', 'files'
 ]
 
 
@@ -328,7 +328,7 @@ class SubmissionRow:
         # self.analysis = MetadataItem(new_sp_item, self.row, 'sample_processing')
         if self.metadata.get('report required').lower().startswith('y'):
             self.report_required = True
-        return (MetadataItem({k: v for k, v in info.items() if v}, self.row, 'sample'),
+        return (MetadataItem(info, self.row, 'sample'),
                 MetadataItem(new_sp_item, self.row, 'sample_processing'))
 
     @staticmethod
@@ -381,6 +381,7 @@ class SubmissionRow:
             }
             # file relationships if paired
             if fmt == 'fastq':
+                self.sample.metadata['files'].append(file_alias)
                 if paired:
                     paired_end = str(SubmissionRow.get_paired_end_value(i))
                     file_info['paired_end'] = paired_end
@@ -391,6 +392,10 @@ class SubmissionRow:
                         ]
                 self.files_fastq.append(MetadataItem(file_info, self.row, 'file_fastq'))
             else:
+                if fmt == 'cram':
+                    self.sample.metadata['cram_files'].append(file_alias)
+                else:
+                    self.sample.metadata['processed_files'].append(file_alias)
                 self.files_processed.append(MetadataItem(file_info, self.row, 'file_processed'))
 
 
@@ -830,8 +835,14 @@ def compare_fields(profile, aliases, json_item, db_item):
                 to_patch[field] = val
         else:
             # if array, patch field vals get added to what's in db
-            if field != 'aliases' and profile['properties'][field].get('items', {}).get('linkTo'):
-                val = [aliases[v] if v in aliases else v for v in json_item[field]]
+            if field != 'aliases':
+                if profile['properties'][field].get('items', {}).get('linkTo'):
+                    val = [aliases[v] if v in aliases else v for v in json_item[field]]
+                elif profile['properties'][field].get('items', {}).get('type') == 'object':
+                    val = [  # handle sub-embedded object with or without linkTo
+                        dict([(k, aliases[v]) if v in aliases else (k, v) for k, v in dict_item.items()])
+                        for dict_item in json_item[field]
+                    ]
             else:
                 val = [v for v in json_item[field]]
             if all(v in db_item.get(field, []) for v in val):
@@ -916,8 +927,8 @@ def validate_all_items(virtualapp, json_data):
                     elif fname and fname in ''.join(json_data['errors']):
                         validation_results[itemtype]['errors'] += 1
                     else:  # patch
-                        json_data_final['patch'].setdefault(itemtype, {})
                         if patch_data:
+                            json_data_final['patch'].setdefault(itemtype, {})
                             json_data_final['patch'][itemtype][db_results[alias]['@id']] = patch_data
                         elif itemtype not in ['case', 'report', 'sample_processing', 'file_fastq']:
                             item_name = alias[alias.index(':')+1:]
