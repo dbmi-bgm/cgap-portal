@@ -287,7 +287,7 @@ class SubmissionRow:
         Extracts 'sample' item metadata from each row, generating MetadataItem objects
         (assigned to self.sample and self.analysis in __init__)
         """
-        info = {'aliases': [self.sample_alias], 'files': []}
+        info = {'aliases': [self.sample_alias]}
         fields = [
             'workup_type', 'specimen_type', 'dna_concentration', 'date_transported', 'indication',
             'specimen_notes', 'research_protocol_name', 'sent_by', 'physician_id', 'bam_sample_id'
@@ -381,7 +381,7 @@ class SubmissionRow:
             }
             # file relationships if paired
             if fmt == 'fastq':
-                self.sample.metadata['files'].append(file_alias)
+                self.sample.metadata.setdefault('files', []).append(file_alias)
                 if paired:
                     paired_end = str(SubmissionRow.get_paired_end_value(i))
                     file_info['paired_end'] = paired_end
@@ -393,9 +393,9 @@ class SubmissionRow:
                 self.files_fastq.append(MetadataItem(file_info, self.row, 'file_fastq'))
             else:
                 if fmt == 'cram':
-                    self.sample.metadata['cram_files'].append(file_alias)
+                    self.sample.metadata.setdefault('cram_files', []).append(file_alias)
                 else:
-                    self.sample.metadata['processed_files'].append(file_alias)
+                    self.sample.metadata.setdefault('processed_files', []).append(file_alias)
                 self.files_processed.append(MetadataItem(file_info, self.row, 'file_processed'))
 
 

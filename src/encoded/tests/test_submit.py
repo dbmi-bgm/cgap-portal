@@ -399,6 +399,7 @@ class TestSubmissionMetadata:
                 for val2 in val.values():
                     assert val2['project']
                     assert val2['institution']
+                    assert all(val3  for val3 in val2.values())  # test all None values are removed
 
 
 class TestSpreadsheetProcessing:
@@ -438,6 +439,13 @@ def test_xls_to_json(project, institution):
     assert 'encode-project:family-456' in json_out['family']
     assert len(json_out['individual']) == 3
     assert all(['encode-project:individual-' + x in json_out['individual'] for x in ['123', '456', '789']])
+
+
+def test_xls_to_json_errors(project, institution):
+    rows = digest_xls('src/encoded/tests/data/documents/cgap_submit_test_with_errors.xlsx')
+    json_out, success = xls_to_json(rows, project, institution)
+    assert 'Row 4' in ''.join(json_out['errors'])  # row counting info correct
+    assert success  # still able to proceed to validation step
 
 
 def test_xls_to_json_invalid_workup(project, institution, xls_list):
@@ -481,6 +489,21 @@ def test_compare_fields_same(testapp, fam, new_family):
     assert not result
 
 
+def test_compare_fields_same_seo(testapp, file_fastq, file_fastq2, project, institution):
+    db_relation = {'related_files': [{'relationship_type': 'paired with', 'file': file_fastq2['@id']}]}
+    file1 = testapp.patch_json(file_fastq['@id'], db_relation).json['@graph'][0]
+    profile = testapp.get('/profiles/file_fastq.json').json
+    json_data = {
+        'file_format': '/file-formats/fastq/',
+        'institution': institution['@id'],
+        'project': project['@id'],
+        'status': 'uploaded',
+        'related_files': [{'relationship_type': 'paired with', 'file': 'test-project:file2'}]
+    }
+    result = compare_fields(profile, {'test-project:file2': file_fastq2['@id']}, json_data, file1)
+    assert not result
+
+
 def test_compare_fields_different(testapp, aunt, fam, new_family):
     new_family['members'].append(aunt['@id'])
     new_family['title'] = 'Smythe family'
@@ -502,12 +525,14 @@ def test_validate_item_post_invalid(testapp, a_case):
     assert 'not found' in result[0]
 
 
-def test_validate_item_post_invalid_yn(testapp, sample_info):
+def test_validate_item_post_invalid_yn(testapp, sample_info, project, institution):
     sample_info['req accepted y/n'] = 'not sure'
     sample_info['specimen accepted by ref lab'] = "I don't know"
     sample_item = map_fields(sample_info, {}, ['workup_type'], 'sample')
     req_info = map_fields(sample_info, {}, ['date sent', 'date completed'], 'requisition')
     sample_item['requisition_acceptance'] = req_info
+    sample_item['project'] = project['@id']
+    sample_item['institution'] = institution['@id']
     result = validate_item(testapp, sample_item, 'post', 'sample', [])
     assert len(result) == 2
     assert all("is not one of ['Y', 'N']" in error for error in result)
