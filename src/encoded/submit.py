@@ -985,7 +985,8 @@ def post_and_patch_all_items(virtualapp, json_data_final):
                         atid = response.json['@graph'][0]['@id']
                         json_data_final['aliases'][item['aliases'][0]] = atid
                         json_data_final['patch'].setdefault(k, {})
-                        json_data_final['patch'][k][atid] = patch_info
+                        if patch_info:
+                            json_data_final['patch'][k][atid] = patch_info
                         if k in item_names:
                             output.append('Success - {} {} posted'.format(k, item[item_names[k]]))
                         if fname and item.get('status') == 'uploading':
