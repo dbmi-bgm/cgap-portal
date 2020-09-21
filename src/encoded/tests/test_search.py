@@ -466,24 +466,17 @@ def test_search_with_static_header(workbook, testapp, indexer_testapp):
     search = '/search/?type=Workflow'
     indexer_testapp.post_json('/index', {'record': False})
 
-    def test_it1():
-        res_json = testapp.get(search, status=404).json  # no items, just checking hdr
-        assert 'search_header' in res_json
-        assert 'content' in res_json['search_header']
-        assert res_json['search_header']['title'] == 'Workflow Information'
+    res_json = testapp.get(search, status=404).json  # no items, just checking hdr
+    assert 'search_header' in res_json
+    assert 'content' in res_json['search_header']
+    assert res_json['search_header']['title'] == 'Workflow Information'
 
-    test_it1()
-    #Retry.retrying(test_it1, retries_allowed=3, wait_seconds=3)()
+    search = '/search/?type=workflow'  # check type resolution
+    res_json = testapp.get(search, status=404).json
+    assert 'search_header' in res_json
+    assert 'content' in res_json['search_header']
+    assert res_json['search_header']['title'] == 'Workflow Information'
 
-    def test_it2():
-        search = '/search/?type=workflow'  # check type resolution
-        res_json = testapp.get(search, status=404).json
-        assert 'search_header' in res_json
-        assert 'content' in res_json['search_header']
-        assert res_json['search_header']['title'] == 'Workflow Information'
-
-    test_it2()
-    #Retry.retrying(test_it2, retries_allowed=3, wait_seconds=3)()
 
 
 def test_search_multiple_types(workbook, testapp):
