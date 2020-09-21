@@ -1,0 +1,47 @@
+{
+    "post": {},
+    "patch": {
+        "file_fastq": {
+            "/files-fastq/GAPFINDNNXMD/": {
+                "filename": "f1.fastq.gz",
+                "status": "uploading"
+            },
+            "/files-fastq/GAPFI8NPRCLA/": {
+                "filename": "f2.fastq.gz",
+                "status": "uploading"
+            },
+            "/files-fastq/GAPFIHLOD3W5/": {
+                "filename": "f3.fastq.gz",
+                "status": "uploading"
+            },
+            "/files-fastq/GAPFI558AY9P/": {
+                "filename": "f4.fastq.gz",
+                "status": "uploading"
+            }
+        },
+        "sample": {},
+        "individual": {},
+        "family": {},
+        "sample_processing": {},
+        "report": {},
+        "case": {}
+    },
+    "aliases": {
+        "hms-dbmi:f1.fastq.gz": "/files-fastq/GAPFINDNNXMD/",
+        "hms-dbmi:f2.fastq.gz": "/files-fastq/GAPFI8NPRCLA/",
+        "hms-dbmi:f3.fastq.gz": "/files-fastq/GAPFIHLOD3W5/",
+        "hms-dbmi:f4.fastq.gz": "/files-fastq/GAPFI558AY9P/",
+        "hms-dbmi:sample-3464467": "/samples/GAPSAOZBTKEV/",
+        "hms-dbmi:sample-3464468": "/samples/GAPSALGBXFHS/",
+        "hms-dbmi:sample-3464469": "/samples/GAPSA4YIRPGC/",
+        "hms-dbmi:individual-456": "/individuals/GAPIDXBYJESJ/",
+        "hms-dbmi:individual-789": "/individuals/GAPID16TYLTK/",
+        "hms-dbmi:individual-123": "/individuals/GAPIDF5WPST7/",
+        "hms-dbmi:family-456": "/families/GAPFA5SLA4GB/",
+        "hms-dbmi:analysis-55432": "/sample-processings/43a03760-4e11-41ae-81d9-a408acd29f16/",
+        "hms-dbmi:report-55432-3464467": "/reports/ea7490cb-d480-4ecf-b913-467fc24d7294/",
+        "hms-dbmi:case-55432-3464467": "/cases/GAPCA12VO85Q/",
+        "hms-dbmi:case-55432-3464468": "/cases/GAPCAWSV5574/",
+        "hms-dbmi:case-55432-3464469": "/cases/GAPCA2SA3Z84/"
+    }
+}

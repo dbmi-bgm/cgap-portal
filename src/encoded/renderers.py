@@ -11,21 +11,18 @@ from pyramid.httpexceptions import (
     HTTPMovedPermanently,
     HTTPPreconditionFailed,
     HTTPUnauthorized,
-    HTTPForbidden,
     HTTPUnsupportedMediaType,
     HTTPNotAcceptable,
     HTTPServerError
 )
 from pyramid.response import Response
-from pyramid.security import forget
 from pyramid.settings import asbool
 from pyramid.threadlocal import manager
 from pyramid.traversal import split_path_info, _join_path_tuple
-from snovault.validation import CSRFTokenError
-from subprocess_middleware.tween import SubprocessTween
 from subprocess_middleware.worker import TransformWorker
 from urllib.parse import urlencode
 from webob.cookies import Cookie
+from .ingestion.common import content_type_allowed
 
 
 log = logging.getLogger(__name__)
@@ -107,14 +104,12 @@ def validate_request_tween_factory(handler, registry):
             # Includes page text/html requests.
             return handler(request)
 
-        elif request.content_type != 'application/json':
-            if request.content_type == 'application/x-www-form-urlencoded' and request.path[0:10] == '/metadata/':
-                # Special case to allow us to POST to metadata TSV requests via form submission
-                return handler(request)
+        elif content_type_allowed(request):
+            return handler(request)
+
+        else:
             detail = "Request content type %s is not 'application/json'" % request.content_type
             raise HTTPUnsupportedMediaType(detail)
-
-        return handler(request)
 
     return validate_request_tween
 

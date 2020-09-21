@@ -141,7 +141,7 @@ function CoverageTable2(props) {
     const { samplegeno = [], genotypeLabels = [], varRef } = props;
 
     if (samplegeno.length === 0) {
-        return <span className="font-italic">No per-sample coverage data available.</span>;
+        return <span className="font-italic">No coverage data available.</span>;
     }
 
     const mapNumgtToGT = {};
@@ -539,13 +539,32 @@ function CompoundHetTable(props) {
                         comhet_impact_transcript: impactTranscript = null,
                     } = obj;
 
+                    // Stopgap until comhet transcript type update complete (handles array & string)
+                    let finalTranscripts;
+                    if (Array.isArray(transcript)) {
+                        finalTranscripts = transcript;
+                    } else {
+                        if (!transcript) { // if null or empty string
+                            finalTranscripts = [];
+                        } else {
+                            finalTranscripts = transcript.split("~");
+                        }
+                    }
+
                     return (
                         <tr key={i}>
                             <td className="text-600 text-left">{ variant }</td>
                             <td className="text-left">{ phase }</td>
                             <td className="text-left">{ gene }</td>
                             <td className="text-left">{ impactGene }</td>
-                            <td className="text-left">{ transcript }</td>
+                            <td className="text-left">
+                                { finalTranscripts.map((item, i) => {
+                                    if (finalTranscripts.length - 1 !== i) {
+                                        return item + ", ";
+                                    }
+                                    return item;
+                                }) }
+                            </td>
                             <td className="text-left">{ impactTranscript }</td>
                         </tr>
                     );

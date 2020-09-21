@@ -62,7 +62,8 @@ ITEM_INDEX_ORDER = [
     'EvidenceDisPheno',
     'Page',
     'GeneAnnotationField',
-    'HiglassViewConfig'
+    'HiglassViewConfig',
+    'IngestionSubmission',
 ]
 
 ENV_HOTSEAT = 'fourfront-cgaphot'
