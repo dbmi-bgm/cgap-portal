@@ -289,12 +289,12 @@ class MappingTableParser(object):
                 else:
                     prop[prop_name] = features
                     sub_temp.update({
-                        "title": sub_title,
-                        "type": "array",
-                        "items": {
-                            "title": sub_title,
-                            "type": "object",
-                            "properties": prop
+                        'title': sub_title,
+                        'type': 'array',
+                        'items': {
+                            'title': sub_title,
+                            'type': 'object',
+                            'properties': prop,
                             }
                         })
                 temp[sum_ob_name] = sub_temp
@@ -443,7 +443,7 @@ class MappingTableParser(object):
         props['annotation_id'] = {
             'title': 'Annotation ID',
             'type': 'string',
-            'uniqueKey': True
+            'uniqueKey': True,
         }
 
     @staticmethod
@@ -451,10 +451,10 @@ class MappingTableParser(object):
         """ Adds href, variant display title to columns (fields not on mapping table) """
         cols['bam_snapshot'] = {
             'title': 'Genome Snapshot',
-            'order': 81
+            'order': 81,
         }
         cols['variant.display_title'] = {
-            'title': 'Variant'
+            'title': 'Variant',
         }
 
     @staticmethod
@@ -462,22 +462,21 @@ class MappingTableParser(object):
         facs['associated_genotype_labels.proband_genotype_label'] = {
             'title': 'Proband Genotype',
             'order': 12,
-            'grouping': 'Genotype'
+            'grouping': 'Genotype',
         }
         facs['associated_genotype_labels.mother_genotype_label'] = {
             'title': 'Mother Genotype',
             'order': 13,
-            'grouping': 'Genotype'
+            'grouping': 'Genotype',
         }
         facs['associated_genotype_labels.father_genotype_label'] = {
             'title': 'Father Genotype',
             'order': 14,
-            'grouping': 'Genotype'
+            'grouping': 'Genotype',
         }
         facs['inheritance_modes'] = {
             'title': 'Inheritance Modes',
             'order': 15,
-            'grouping': 'Genotype'
         }
 
     def generate_variant_sample_schema(self, sample_props, cols, facs, variant_cols, variant_facs):
@@ -501,17 +500,17 @@ class MappingTableParser(object):
         schema['properties']['variant'] = {  # link to single variant
             'title': 'Variant',
             'type': 'string',
-            'linkTo': 'Variant'
+            'linkTo': 'Variant',
         }
         schema['properties']['file'] = {  # NOT a linkTo as the ID is sufficient for filtering
             'title': 'File',
             'description': 'String Accession of the vcf file used in digestion',
-            'type': 'string'
+            'type': 'string',
         }
         schema['properties']['bam_snapshot'] = {
             'title': 'Genome Snapshot',
             'description': 'Link to Genome Snapshot Image',
-            'type': 'string'
+            'type': 'string',
         }
         schema['properties']['genotype_labels'] = {
             'title': 'Genotype Labels',
@@ -521,7 +520,7 @@ class MappingTableParser(object):
                 'properties': {
                     'role': {
                         'title': 'Role',
-                        'type': 'string'
+                        'type': 'string',
                     },
                     'labels': {
                         'title': 'Genotype Labels',
@@ -546,13 +545,13 @@ class MappingTableParser(object):
             'type': 'string',
             'enum': ['proband', 'father', 'mother', 'brother', 'sister', 'sibling', 'half-brother', 'half-sister',
                      'half-sibling', 'wife', 'husband', 'grandson', 'granddaughter', 'grandchild',
-                     'grandmother', 'family-in-law', 'extended-family', 'not linked']
+                     'grandmother', 'family-in-law', 'extended-family', 'not linked'],
         }
         schema['properties']['samplegeno']['items']['properties']['samplegeno_sex'] = {  # noqa structure is there
             'title': 'Sex',
             'description': 'Sex of the donor of this sample ID',
             'type': 'string',
-            'enum': ['M', 'F', 'U']  # XXX: what others should be included?
+            'enum': ['M', 'F', 'U'],  # XXX: what others should be included?
         }
 
         # adds annotation ID field, effectively making display_title a primary key constraint
