@@ -592,8 +592,7 @@
         },
         "inheritance_modes": {
             "title": "Inheritance Modes",
-            "order": 15,
-            "grouping": "Genotype"
+            "order": 15
         },
         "novoPP": {
             "title": "novoCaller PP",
