@@ -322,8 +322,6 @@ class SearchBuilder:
         Get static section (if applicable) when searching a single item type
         Note: Because we rely on 'source', if the static_section hasn't been indexed
         into Elasticsearch it will not be loaded
-
-        XXX: this could be cached application side as well
         """
         if (len(self.doc_types) == 1) and 'Item' not in self.doc_types:
             search_term = 'search-info-header.' + self.doc_types[0]

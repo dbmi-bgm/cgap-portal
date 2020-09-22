@@ -478,7 +478,6 @@ def test_search_with_static_header(workbook, testapp, indexer_testapp):
     assert res_json['search_header']['title'] == 'Workflow Information'
 
 
-
 def test_search_multiple_types(workbook, testapp):
     """ Note that the behavior now is in '@type' will be the highest common ancestor if searched on multiple types """
     search = '/search/?type=Individual&type=Workflow'
