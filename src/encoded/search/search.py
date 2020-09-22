@@ -327,6 +327,7 @@ class SearchBuilder:
         """
         if (len(self.doc_types) == 1) and 'Item' not in self.doc_types:
             search_term = 'search-info-header.' + self.doc_types[0]
+            # XXX: this could be cached application side as well
             static_section = self.request.registry['collections']['StaticSection'].get(search_term)
             if static_section and hasattr(static_section.model, 'source'):  # extract from ES structure
                 item = static_section.model.source['object']
