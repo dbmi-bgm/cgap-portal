@@ -10,8 +10,41 @@ import { Alerts } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/
 import { LocalizedTime } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/LocalizedTime';
 
 import { EmbeddedItemSearchTable } from '../components/EmbeddedItemSearchTable';
+import { DisplayTitleColumnWrapper, DisplayTitleColumnDefault } from '@hms-dbmi-bgm/shared-portal-components/es/components/browse/components/table-commons';
 
+function CaseViewEmbeddedVariantSampleSearchTable(props){
+    const {
+        columnExtensionMap: originalColExtMap = EmbeddedItemSearchTable.defaultProps.columnExtensionMap, // Get/reuse default colExtMap from EmbeddedItemSearchTable
+        // onSelectVariant, // `onSelectVariant` theoretically passed down from FilteringTab or something; performs AJAX request + updates selected variantsample state.
+        ...passProps
+    } = props;
+    console.log(passProps);
+    const onSelectVariant = function(e) {
+        e.preventDefault();
+        console.log("thing happened, e", e);
+    };
+    const columnExtensionMap = {
+        ...originalColExtMap, // Copy in existing vals but overwrite display_title.render
+        display_title : {
+            ...originalColExtMap.display_title,
+            render: function(result, parentProps){
+                const { href, context, rowNumber, detailOpen, toggleDetailOpen } = parentProps;
+                return (
+                    <DisplayTitleColumnWrapper {...{ result, href, context, rowNumber, detailOpen, toggleDetailOpen }}>
+                        <SelectableTitle onSelectVariant={onSelectVariant} />
+                    </DisplayTitleColumnWrapper>
+                );
+            }
+        }
+    };
+    return <EmbeddedItemSearchTable {...passProps} {...{ columnExtensionMap }} />;
+}
 
+function SelectableTitle({ onSelectVariant, result, link }){
+    // DisplayTitleColumnWrapper passes own 'onClick' func as prop to this component which would navigate to Item URL; don't use it here; intercept and instead use onSelectVariant from FilteringTab (or wherever).
+    // `link` is also from DisplayTitleColumnWrapper; I think good to keep as it'll translate into <a href={link}> in DisplayTitleColumnDefault and this will still allow to right-click + open in new tab (may need event.preventDefault() and/or event.stopPropagation() present in onSelectVariant).
+    return <DisplayTitleColumnDefault {...{ result, link }} onClick={onSelectVariant} />;
+}
 
 /**
  * @todo maybe reuse somewhere
@@ -95,7 +128,7 @@ export const FilteringTab = React.memo(function FilteringTab(props) {
         (initial_search_href_filter_addon && currentActiveFilterAppend ? "&" + currentActiveFilterAppend : "")
     );
 
-    const initialSearchHref = "/search/?type=VariantSample" + (searchHrefAppend ? "&" + searchHrefAppend : "") + "&sort=date_created";
+    const initialSearchHref = "/search/?type=VariantSample" + (searchHrefAppend ? "&" + searchHrefAppend : "");
     // Hide facets that are ones used to initially narrow down results to those related to this case.
     const hideFacets = !initial_search_href_filter_addon ? null : Object.keys(queryString.parse(initial_search_href_filter_addon));
 
@@ -110,7 +143,7 @@ export const FilteringTab = React.memo(function FilteringTab(props) {
             <h1 className="mb-0 mt-0">
                 { caseDisplayTitle }: <span className="text-300">Variant Filtering and Technical Review</span>
             </h1>
-            <EmbeddedItemSearchTable { ...{ hideFacets, maxHeight, session }} searchHref={initialSearchHref} title={
+            <CaseViewEmbeddedVariantSampleSearchTable { ...{ hideFacets, maxHeight, session }} searchHref={initialSearchHref} title={
                 <FilteringTabSubtitle caseItem={context} />
             } key={"session:" + session} />
         </React.Fragment>
