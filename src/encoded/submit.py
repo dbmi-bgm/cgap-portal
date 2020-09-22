@@ -817,7 +817,7 @@ def post_and_patch_all_items(virtualapp, json_data_final):
                     no_errors = False
         for itype in final_status:
             if final_status[itype]['posted'] > 0 or final_status[itype]['not posted'] > 0:
-                output.append('{}: {} items posted successfully; {} items not posted'.format(
+                output.append('{}: {} items created (with POST); {} items failed creation'.format(
                     itype, final_status[itype]['posted'], final_status[itype]['not posted']
                 ))
     for k, v in json_data_final['patch'].items():
@@ -843,7 +843,7 @@ def post_and_patch_all_items(virtualapp, json_data_final):
                 output.append(str(e))
                 no_errors = False
         if final_status[k]['patched'] > 0 or final_status[k]['not patched'] > 0:
-            output.append('{}: {} items patched successfully; {} items not patched'.format(
+            output.append('{}: attributes of {} items updated (with PATCH); {} items failed updating'.format(
                 k, final_status[k]['patched'], final_status[k]['not patched']
             ))
     return output, no_errors, files
