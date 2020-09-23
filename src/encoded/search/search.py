@@ -332,11 +332,11 @@ class SearchBuilder:
                 self.response['search_header'] = {}
                 self.response['search_header']['content'] = item.get('content', 'Content Missing')
                 self.response['search_header']['title'] = item.get('title', item['display_title'])
-                self.response['search_header']['filetype'] = item['filetype']
+                self.response['search_header']['filetype'] = item.get('filetype', 'No filetype')
             elif static_section and hasattr(static_section.model, 'data'):  # extract form DB structure
                 item = static_section.upgrade_properties()
                 self.response['search_header'] = {}
-                self.response['search_header']['content'] = item('body', 'Content Missing')
+                self.response['search_header']['content'] = item.get('body', 'Content Missing')
                 self.response['search_header']['title'] = item.get('title', 'No title')
                 self.response['search_header']['filetype'] = item.get('filetype', 'No filetype')
             else:
