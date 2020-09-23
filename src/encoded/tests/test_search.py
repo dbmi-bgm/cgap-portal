@@ -463,15 +463,17 @@ def test_search_with_no_value(workbook, testapp):
 
 def test_search_with_static_header(workbook, testapp, indexer_testapp):
     """ Performs a search which should be accompanied by a search header """
-    search = '/search/?type=Workflow'
-    indexer_testapp.post_json('/index', {'record': False})
+    indexer_testapp.post_json('/index', {'record': False})  # try to ensure static_sections are indexed
 
-    res_json = testapp.get(search, status=404).json  # no items, just checking hdr
+    # No items, just checking header
+    search = '/search/?type=Workflow'
+    res_json = testapp.get(search, status=404).json
     assert 'search_header' in res_json
     assert 'content' in res_json['search_header']
     assert res_json['search_header']['title'] == 'Workflow Information'
 
-    search = '/search/?type=workflow'  # check type resolution
+    # Check snake_case type resolution (should redirect to CamelCase)
+    search = '/search/?type=workflow'
     res_json = testapp.get(search, status=404).json
     assert 'search_header' in res_json
     assert 'content' in res_json['search_header']

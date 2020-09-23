@@ -90,12 +90,13 @@ class SearchBuilder:
             item_type = self.doc_types[0]
             item_type_snake_case = ''.join(['_' + c.lower() if c.isupper() else c for c in self.doc_types[0]]).lstrip('_')
             mappings = self.request.registry[STORAGE].read.mappings.get()
-            if item_type in mappings:
-                self.item_type_es_mapping = mappings[item_type]
+            if item_type in mappings:  # mappings use snake case but search uses CamelCase
+                return mappings[item_type]
             elif item_type_snake_case in mappings:
-                self.item_type_es_mapping = mappings[item_type_snake_case]
+                return mappings[item_type_snake_case]
             else:
-                self.item_type_es_mapping = get_es_mapping(self.es, self.es_index)
+                return get_es_mapping(self.es, self.es_index)
+        return {}
 
     def _bootstrap_query(self, search_type=None, return_generator=False, forced_type='Search',
                          custom_aggregations=None):
@@ -115,8 +116,7 @@ class SearchBuilder:
 
         # Can potentially make an outside API call, but ideally is cached
         # Only needed if searching on a single item type
-        self.item_type_es_mapping = {}
-        self._get_es_mapping_if_necessary()
+        self.item_type_es_mapping = self._get_es_mapping_if_necessary()
 
     @property
     def forced_type_token(self):
@@ -330,13 +330,13 @@ class SearchBuilder:
             if static_section and hasattr(static_section.model, 'source'):  # extract from ES structure
                 item = static_section.model.source['object']
                 self.response['search_header'] = {}
-                self.response['search_header']['content'] = item['content']
+                self.response['search_header']['content'] = item.get('content', 'Content Missing')
                 self.response['search_header']['title'] = item.get('title', item['display_title'])
                 self.response['search_header']['filetype'] = item['filetype']
             elif static_section and hasattr(static_section.model, 'data'):  # extract form DB structure
                 item = static_section.upgrade_properties()
                 self.response['search_header'] = {}
-                self.response['search_header']['content'] = item['body']
+                self.response['search_header']['content'] = item('body', 'Content Missing')
                 self.response['search_header']['title'] = item.get('title', 'No title')
                 self.response['search_header']['filetype'] = item.get('filetype', 'No filetype')
             else:
