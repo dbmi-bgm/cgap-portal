@@ -472,8 +472,8 @@ def test_post_and_patch_all_items(testapp, post_data):
     output, success, file_info = post_and_patch_all_items(testapp, post_data)
     assert success
     for itemtype in post_data['post']:
-        assert '{}: 1 items created (with POST); 0 items failed creation'.format(itemtype) in output
-        assert '{}: attributes of 1 items updated (with PATCH); 0 items failed updating'.format(itemtype) in output
+        assert '{}: 1 item created (with POST); 0 items failed creation'.format(itemtype) in output
+        assert '{}: attributes of 1 item updated (with PATCH); 0 items failed updating'.format(itemtype) in output
 
 def test_post_and_patch_all_items_error(testapp, post_data):
     """
@@ -483,4 +483,4 @@ def test_post_and_patch_all_items_error(testapp, post_data):
     post_data['post']['family'][0]['extra_field'] = 'extra field value'
     output, success, file_info = post_and_patch_all_items(testapp, post_data)
     assert not success
-    assert 'family: 0 items created (with POST); 1 items failed creation' in output
+    assert 'family: 0 items created (with POST); 1 item failed creation' in output
