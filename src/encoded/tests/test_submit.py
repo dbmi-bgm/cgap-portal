@@ -79,7 +79,6 @@ def submission_info3(submission_info2):
     info = submission_info2.copy()
     info['family']['test-proj:fam1']['members'].append('test-proj:indiv3')
     info['family']['test-proj:fam1']['mother'] = 'test-proj:indiv2'
-    # submission_info['family']['test-proj:fam1']['father'] = 'test-proj:indiv3'
     info['individual']['test-proj:indiv3'] = {'samples': ['test-proj:samp3']}
     info['sample']['test-proj:samp3'] = {'workup_type': 'WGS'}
     return info
@@ -178,10 +177,13 @@ class TestSubmissionRow:
 
     @pytest.mark.parametrize('age, birth_year, val_type', [
         ('33', '1986', int),
-        # text values for age and birth year should be passed on without errors to eventually fail validation
         ('abc', 'def', str)
     ])
     def test_extract_individual_metadata_nums(self, row_dict, age, birth_year, val_type, project, institution):
+        """
+        numerical values for age and birth year are expected
+        text values for age and birth year should be passed on without errors to eventually fail validation
+        """
         row_dict['age'] = age
         row_dict['birth year'] = birth_year
         obj = SubmissionRow(row_dict, 1, 'test-proj:fam1', project['name'], institution['name'])
@@ -225,6 +227,7 @@ class TestSubmissionRow:
         assert obj.individual.metadata['samples'] == [obj.sample.alias]
 
     def test_extract_file_metadata_valid(self, row_dict, project, institution):
+        """expected file extensions in spreadsheet"""
         row_dict['files'] = 'f1.fastq.gz, f2.cram, f3.vcf.gz'
         files = [f.strip() for f in row_dict['files'].split(',')]
         obj = SubmissionRow(row_dict, 1, 'fam1', project['name'], institution['name'])
@@ -235,8 +238,8 @@ class TestSubmissionRow:
         assert files[2] in obj.files_processed[1].alias
         assert not obj.errors
 
-    # filenames indicating uncompressed fastqs/vcfs should lead to errors
     def test_extract_file_metadata_uncompressed(self, row_dict, project, institution):
+        """filenames indicating uncompressed fastqs/vcfs should lead to errors"""
         row_dict['files'] = 'f1.fastq, f2.cram, f3.vcf'
         files = [f.strip() for f in row_dict['files'].split(',')]
         obj = SubmissionRow(row_dict, 1, 'fam1', project['name'], institution['name'])
@@ -245,8 +248,8 @@ class TestSubmissionRow:
         assert files[2] not in ''.join([f.alias for f in obj.files_processed])
         assert all('File must be compressed' in error for error in obj.errors)
 
-    # file extensions other than fastq.gz,.cram, .vcf.gz should generate an error
     def test_extract_file_metadata_invalid(self, row_dict, project, institution):
+        """# file extensions other than fastq.gz,.cram, .vcf.gz should generate an error"""
         row_dict['files'] = 'f3.gvcf.gz'
         files = [f.strip() for f in row_dict['files'].split(',')]
         obj = SubmissionRow(row_dict, 1, 'fam1', project['name'], institution['name'])
@@ -263,8 +266,9 @@ class TestSubmissionRow:
         ('report required', True),
         ('specimen type', False),
         ('alsdkjfdk', False)
-    ])  # some columns are required, others are optional.
+    ])
     def test_found_missing_values(self, row_dict, project, institution, field, error):
+        """some columns are required for spreadsheet submission, others are optional."""
         row_dict[field] = None
         obj = SubmissionRow(row_dict, 1, 'fam1', project['name'], institution['name'])
         assert (len(obj.errors) > 0) == error
@@ -279,7 +283,7 @@ class TestSubmissionRow:
 class TestSubmissionMetadata:
 
     def test_init_families(self, example_rows_obj, project):
-        # test family aliases are named after proband individual ids
+        """test family aliases are named after proband individual ids"""
         proj_name = project['name'] + ':'
         fams = example_rows_obj.family_dict
         assert sorted(list(fams.keys())) == ['1111', '2222', '3333']
@@ -288,12 +292,12 @@ class TestSubmissionMetadata:
         assert fams['3333'] == proj_name + 'family-555'
 
     def test_get_analysis_types(self, example_rows_obj, example_rows, project, institution):
+        """analysis type should be none if workup types in samples don't match"""
         a_types = example_rows_obj.analysis_types
         assert a_types['1111'] == 'WGS-Trio'
         assert a_types['2222'] == 'WGS'
         assert a_types['3333'] == 'WES-Group'
         example_rows[1]['workup type'] = 'WES'
-        # analysis type should be none if workup types in samples don't match
         new_obj = SubmissionMetadata(example_rows, project, institution)
         new_a_types = new_obj.analysis_types
         assert new_a_types['1111'] is None
@@ -324,6 +328,10 @@ class TestSubmissionMetadata:
         ('sister', False)  # two siblings can have same relation
     ])
     def test_add_family_metadata(self, big_family_rows, project, institution, last_relation, error):
+        """
+        tests handling of duplicate relations for parents vs siblings.
+        before modification, fixture contains proband, mother, father, sister.
+        """
         big_family_rows[4]['relation to proband'] = last_relation
         submission = SubmissionMetadata(big_family_rows, project, institution)
         assert len(submission.families) == 1
@@ -333,6 +341,7 @@ class TestSubmissionMetadata:
         assert ('Multiple values for relation' in ''.join(submission.errors)) == error
 
     def test_add_sample_processing(self, example_rows, project, institution):
+        """tests metadata creation for sample_processing item from a set of rows"""
         example_rows[5]['workup type'] = 'WGS'  # analysis 3333 will have mismatched workup type values
         submission = SubmissionMetadata(example_rows, project, institution)
         sps = submission.sample_processings
@@ -347,6 +356,7 @@ class TestSubmissionMetadata:
 
     @pytest.mark.parametrize('case_id, report', [(None, True), ('Case123', True), ('Case123', False)])
     def test_create_case_metadata(self, row_dict, case_id, report, project, institution):
+        """tests case and report item creation after all rows processed"""
         if not report:
             row_dict['report required'] = 'N'
         row_dict['unique analysis id'] = case_id
@@ -365,12 +375,17 @@ class TestSubmissionMetadata:
 
     @pytest.mark.parametrize('case_id', [(None), ('Case123')])
     def test_add_case_info(self, row_dict, case_id, project, institution):
+        """tests that case ID from row gets added to proper dictionary attribute"""
         row_dict['unique analysis id'] = case_id
         submission = SubmissionMetadata([row_dict], project, institution)
         key = '{}-{}'.format(row_dict['analysis id'], row_dict['specimen id'])
         assert submission.case_names.get(key)[0] == case_id
 
     def test_add_individual_relations(self, big_family_rows, project, institution):
+        """
+        tests that correct proband mother and father get added to individual item metadata
+        after all rows are processed
+        """
         obj = SubmissionMetadata(big_family_rows, project, institution)
         proband = obj.individuals['encode-project:individual-456']
         sister = obj.individuals['encode-project:individual-546']
@@ -384,6 +399,7 @@ class TestSubmissionMetadata:
                        for field in ['mother', 'father', 'sister', 'brother'])
 
     def test_process_rows(self, example_rows_obj, project, institution):
+        """tests that all rows get processed and create desired number and type of json items"""
         assert example_rows_obj.json_out
         assert len(example_rows_obj.individuals) == 5
         assert len(example_rows_obj.families) == 2
@@ -393,6 +409,7 @@ class TestSubmissionMetadata:
         assert len(example_rows_obj.reports) == 3
 
     def test_create_json_out(self, example_rows_obj, project, institution):
+        """tests that all expected items are present in final json as well as project and institution fields"""
         assert all(example_rows_obj.json_out[key] for key in ['individual', 'family', 'sample', 'sample_processing', 'case', 'report'])
         for key, val in example_rows_obj.json_out.items():
             if key != 'errors':
@@ -410,6 +427,7 @@ class TestSpreadsheetProcessing:
         (2, True)  # missing comment row should work ok
     ])
     def test_header_found(self, project, institution, xls_list, remove_row, success_bool):
+        """tests that proper header is found when present"""
         data = iter(xls_list[0:remove_row] + xls_list[(remove_row) + 1:])
         obj = SpreadsheetProcessing(data, project, institution)
         assert obj.passing == success_bool
@@ -417,6 +435,7 @@ class TestSpreadsheetProcessing:
         assert ('Column headers not detected in spreadsheet!' in ''.join(obj.errors)) == (not success_bool)
 
     def test_create_row_dict(self, xls_list, project, institution):
+        """tests that dictionary of colname: field value is created for each row"""
         obj = SpreadsheetProcessing(iter(xls_list), project, institution)
         assert obj.keys
         assert len(obj.rows) == 3
@@ -424,6 +443,7 @@ class TestSpreadsheetProcessing:
             assert all(key in row for key in obj.keys)
 
     def test_create_row_dict_missing_col(self, xls_list, project, institution):
+        """tests that correct error is returned when a required column header is not in spreadsheet"""
         idx = xls_list[1].index('Specimen ID')
         rows = (row[0:idx] + row[idx+1:] for row in xls_list)
         obj = SpreadsheetProcessing(rows, project, institution)
@@ -432,6 +452,7 @@ class TestSpreadsheetProcessing:
 
 
 def test_xls_to_json(project, institution):
+    """tests that xls_to_json returns expected output when a spreadsheet is formatted correctly"""
     rows = digest_xls('src/encoded/tests/data/documents/cgap_submit_test.xlsx')
     json_out, success = xls_to_json(rows, project, institution)
     assert success
@@ -442,6 +463,7 @@ def test_xls_to_json(project, institution):
 
 
 def test_xls_to_json_errors(project, institution):
+    """tests for expected output when spreadsheet is not formatted correctly"""
     rows = digest_xls('src/encoded/tests/data/documents/cgap_submit_test_with_errors.xlsx')
     json_out, success = xls_to_json(rows, project, institution)
     assert 'Row 4' in ''.join(json_out['errors'])  # row counting info correct
@@ -449,7 +471,11 @@ def test_xls_to_json_errors(project, institution):
 
 
 def test_xls_to_json_invalid_workup(project, institution, xls_list):
-    # invalid workup type is caught as an error
+    """
+    tests that an invalid workup type is caught as an error -
+    tested via xls_to_json to ensure that errors generated in child objects are passed
+    all the way up to parent function that calls them
+    """
     idx = xls_list[1].index('Workup Type')
     xls_list[4] = xls_list[4][0:idx] + ['Other'] + xls_list[4][idx+1:]
     rows = iter(xls_list)
@@ -484,12 +510,14 @@ def test_parse_exception_with_alias(testapp, a_case):
 
 
 def test_compare_fields_same(testapp, fam, new_family):
+    """tests that compare_fields returns None when json item has no new info compared to db item"""
     profile = testapp.get('/profiles/family.json').json
     result = compare_fields(profile, [], new_family, fam)
     assert not result
 
 
 def test_compare_fields_same_seo(testapp, file_fastq, file_fastq2, project, institution):
+    """tests that sub-embedded objects that are the same are recognized as the same in compare_fields"""
     db_relation = {'related_files': [{'relationship_type': 'paired with', 'file': file_fastq2['@id']}]}
     file1 = testapp.patch_json(file_fastq['@id'], db_relation).json['@graph'][0]
     profile = testapp.get('/profiles/file_fastq.json').json
@@ -505,6 +533,7 @@ def test_compare_fields_same_seo(testapp, file_fastq, file_fastq2, project, inst
 
 
 def test_compare_fields_different(testapp, aunt, fam, new_family):
+    """tests that compare_fields finds differences between json item and db item  when present"""
     new_family['members'].append(aunt['@id'])
     new_family['title'] = 'Smythe family'
     profile = testapp.get('/profiles/family.json').json
@@ -515,17 +544,23 @@ def test_compare_fields_different(testapp, aunt, fam, new_family):
 
 
 def test_validate_item_post_valid(testapp, a_case):
+    """tests that no errors are returned when item passes validation"""
     result = validate_item(testapp, a_case, 'post', 'case', [])
     assert not result
 
 
 def test_validate_item_post_invalid(testapp, a_case):
+    """tests for expected error when item fails validation"""
     a_case['project'] = '/projects/invalid-project/'
     result = validate_item(testapp, a_case, 'post', 'case', [])
     assert 'not found' in result[0]
 
 
 def test_validate_item_post_invalid_yn(testapp, sample_info, project, institution):
+    """
+    tests expected error message is generated for fields in which
+    spreadsheet value is expected to have a Y/N value but doesn't
+    """
     sample_info['req accepted y/n'] = 'not sure'
     sample_info['specimen accepted by ref lab'] = "I don't know"
     sample_item = map_fields(sample_info, {}, ['workup_type'], 'sample')
@@ -539,24 +574,28 @@ def test_validate_item_post_invalid_yn(testapp, sample_info, project, institutio
 
 
 def test_validate_item_patch_valid(testapp, mother, grandpa):
+    """tests that patch info passes validation when expected and generates no errors"""
     patch_dict = {'mother': mother['aliases'][0]}
     result = validate_item(testapp, patch_dict, 'patch', 'individual', [], atid=grandpa['@id'])
     assert not result
 
 
 def test_validate_item_patch_invalid(testapp, grandpa):
+    """tests that patch info fails validation when expected and generates error"""
     patch_dict = {'mother': 'non-existant-alias'}
     result = validate_item(testapp, patch_dict, 'patch', 'individual', [], atid=grandpa['@id'])
     assert 'not found' in result[0]
 
 
 def test_validate_item_patch_alias(testapp, grandpa):
+    """tests that linkTo passes validation if item linked hasn't been posted yet"""
     patch_dict = {'mother': 'existing-alias'}
     result = validate_item(testapp, patch_dict, 'patch', 'individual', ['existing-alias'], atid=grandpa['@id'])
     assert not result
 
 
 def test_validate_all_items_errors(testapp, mother, empty_items):
+    """tests that validation error messages get passed up to parent validate_all_items function result"""
     new_individual = {
         'aliases': ['test-proj:new-individual-alias'],
         'individual_id': '1234',
