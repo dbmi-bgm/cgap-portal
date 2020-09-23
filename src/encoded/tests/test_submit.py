@@ -13,10 +13,11 @@ from ..submit import (
     SpreadsheetProcessing,
     map_fields,
     parse_exception,
+    post_and_patch_all_items,
     row_generator,
     validate_all_items,
     validate_item,
-    xls_to_json,
+    xls_to_json
 )
 
 
@@ -82,6 +83,39 @@ def submission_info3(submission_info2):
     info['individual']['test-proj:indiv3'] = {'samples': ['test-proj:samp3']}
     info['sample']['test-proj:samp3'] = {'workup_type': 'WGS'}
     return info
+
+
+@pytest.fixture
+def post_data(project, institution):
+    return {
+        'post': {
+            'family': [{
+                'aliases': ['test-proj:fam1'],
+                'family_id': 'fam1',
+                'members': ['test-proj:indiv1'],
+                'proband': 'test-proj:indiv1',
+                'project': project['@id'],
+                'institution': institution['@id']
+            }],
+            'individual': [{
+                'aliases': ['test-proj:indiv1'],
+                'individual_id': 'indiv1',
+                'sex': 'F',
+                'samples': ['test-proj:samp1'],
+                'project': project['@id'],
+                'institution': institution['@id']
+            }],
+            'sample': [{
+                'aliases': ['test-proj:samp1'],
+                'workup_type': 'WGS',
+                'specimen_accession': 'samp1',
+                'project': project['@id'],
+                'institution': institution['@id']
+            }]
+        },
+        'patch': {},
+        'aliases': {}
+    }
 
 
 @pytest.fixture
@@ -614,3 +648,21 @@ def test_validate_all_items_errors(testapp, mother, empty_items):
     assert "'test-proj:invalid-project-alias' not found" in errors
     assert "'test-proj:invalid-institution-alias' not found" in errors
     assert mother['aliases'][0] not in errors
+
+
+def test_post_and_patch_all_items(testapp, post_data):
+    output, success, file_info = post_and_patch_all_items(testapp, post_data)
+    assert success
+    for itemtype in post_data['post']:
+        assert '{}: 1 item created (with POST); 0 items failed creation'.format(itemtype) in output
+        assert '{}: attributes of 1 item updated (with PATCH); 0 items failed updating'.format(itemtype) in output
+
+def test_post_and_patch_all_items_error(testapp, post_data):
+    """
+    additional property introduced into 'family' item json  -
+    designed to test appropriate error message produced in 'output' when item fails to post
+    """
+    post_data['post']['family'][0]['extra_field'] = 'extra field value'
+    output, success, file_info = post_and_patch_all_items(testapp, post_data)
+    assert not success
+    assert 'family: 0 items created (with POST); 1 item failed creation' in output
