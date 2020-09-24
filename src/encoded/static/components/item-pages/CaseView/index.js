@@ -131,7 +131,9 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
         actions: permissibleActions = [],
         display_title: caseTitle,
         accession: caseAccession,
-        individual: caseIndividual
+        individual: caseIndividual,
+        sample_processing: sampleProcessing = null,
+        initial_search_href_filter_addon: filterHrefAddon = "",
     } = context;
 
     const {
@@ -214,6 +216,13 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
         }
     }
 
+    // Use amount of processed_files to determine if Bioinfo tab should be displayed
+    const { processed_files = [] } = sampleProcessing || {};
+    const disableBioinfo = !(processed_files.length > 0);
+
+    // Use availability of search query filter string add-on to determine if Filtering tab should be displayed
+    const disableFiltering = !filterHrefAddon;
+
     return (
         <React.Fragment>
             <div className="container-wide">
@@ -259,12 +268,12 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
             { currFamily && caseIndividual ?
                 <DotRouter href={href} navClassName="container-wide pt-36 pb-36" contentsClassName="container-wide bg-light pt-36 pb-36" prependDotPath="case-info">
                     <DotRouterTab tabTitle="Accessioning" dotPath=".accessioning" default cache={false}>
-                        <AccessioningTab {...{ context, href, currFamily, secondary_families, }} />
+                        <AccessioningTab {...{ context, href, currFamily, secondary_families }} />
                     </DotRouterTab>
-                    <DotRouterTab tabTitle="Bioinformatics" dotPath=".bioinformatics" cache={false}>
+                    <DotRouterTab tabTitle="Bioinformatics" dotPath=".bioinformatics" cache={false} disabled={disableBioinfo}>
                         <BioinformaticsTab {...{ context, idToGraphIdentifier }} />
                     </DotRouterTab>
-                    <DotRouterTab tabTitle="Filtering" dotPath=".filtering">
+                    <DotRouterTab tabTitle="Filtering" dotPath=".filtering" disabled={disableFiltering}>
                         <FilteringTab {...{ context, windowHeight, session }} />
                     </DotRouterTab>
                     <DotRouterTab tabTitle="Interpretation" dotPath=".interpretation" disabled cache={false}>
@@ -694,10 +703,10 @@ const BioinformaticsTab = React.memo(function BioinformaticsTab(props) {
     return (
         <React.Fragment>
             <h1>{ caseDisplayTitle }: <span className="text-300">Bioinformatics Analysis</span></h1>
-            <div className="tab-inner-container clearfix font-italic qc-status">
+            {/* <div className="tab-inner-container clearfix font-italic qc-status">
                 <span className="text-600">Current Status:</span><span className="text-success"> PASS <i className="icon icon-check fas"></i></span>
                 <span className="pull-right">3/28/20</span>
-            </div>
+            </div> */}
             <div className="tab-inner-container">
                 <h2 className="section-header">Quality Control Metrics (QC)</h2>
                 <BioinfoStats {...{ caseSample, sampleProcessing }} />

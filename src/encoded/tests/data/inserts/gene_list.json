@@ -1,0 +1,17 @@
+[
+    {
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "status": "released",
+        "uuid": "cc7d83a2-6886-4ca0-9402-7c49734l1111",
+        "title": "Test Gene List for Green Thumb condition",
+        "genes": [
+            "cc7d83a2-6886-4ca0-9402-7c49734c1111",
+            "cc7d83a2-6886-4ca0-9402-7c49734c2222",
+            "cc7d83a2-6886-4ca0-9402-7c49734c3333",
+            "cc7d83a2-6886-4ca0-9402-7c49734c4444"
+        ],
+        "disorders": [
+            "71bae2e1-4532-45cf-8fd7-958b47d7e446"
+        ]
+    }
+]

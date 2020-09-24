@@ -23,6 +23,7 @@ from .base import (
     Item,
     get_item_or_none,
 )
+import negspy.coordinates as nc
 
 
 ANNOTATION_ID = 'annotation_id'
@@ -128,6 +129,15 @@ class Variant(Item):
     def display_title(self, CHROM, POS, REF, ALT):
         return build_variant_display_title(CHROM, POS, REF, ALT)  # chr1:504A>T
 
+    @calculated_property(schema={
+        "title": "Position (genome coordinates)",
+        "description": "Absolute position in genome coordinates",
+        "type": "integer"
+    })
+    def POS_ABS(self, CHROM, POS):
+        chrom_info = nc.get_chrominfo('hg38')
+        return nc.chr_pos_to_genome_pos('chr'+CHROM, POS, chrom_info)
+
 
 @collection(
     name='variant-samples',
@@ -212,6 +222,94 @@ class VariantSample(Item):
             file, variant_props['CHROM'], variant_props['POS']
         )
         return file_path
+
+    @calculated_property(schema={
+        "title": "Associated Genotype Labels",
+        "description": "Named Genotype Label fields that can be searched on",
+        "type": "object",
+        "properties": {
+            "proband_genotype_label": {
+                "title": "Proband Genotype",
+                "type": "string"
+            },
+            "mother_genotype_label": {
+                "title": "Mother Genotype",
+                "type": "string"
+            },
+            "father_genotype_label": {
+                "title": "Father Genotype",
+                "type": "string"
+            },
+            "sister_genotype_label": {
+                "title": "Sister Genotype",
+                "type": "string"
+            },
+            "brother_genotype_label": {
+                "title": "Brother Genotype",
+                "type": "string"
+            },
+            "co_parent_genotype_label": {
+                "title": "Co-Parent Genotype",
+                "type": "string"
+            },
+            "daughter_genotype_label": {
+                "title": "Daughter Genotype",
+                "type": "string"
+            },
+            "daughter_II_genotype_label": {
+                "title": "Daughter II Genotype",
+                "type": "string"
+            },
+            "son_genotype_label": {
+                "title": "Son Genotype",
+                "type": "string"
+            },
+            "son_II_genotype_label": {
+                "title": "Son II Genotype",
+                "type": "string"
+            }
+        }
+    })
+    def associated_genotype_labels(self, variant, CALL_INFO, samplegeno=None, genotype_labels=None):
+        """ Builds the above sub-embedded object so we can search on the genotype labels """
+
+        possible_keys = ['proband_genotype_label', 'mother_genotype_label', 'father_genotype_label',
+                         'sister_genotype_label', 'brother_genotype_label', 'co_parent_genotype_label',
+                         'daughter_genotype_label', 'daughter_II_genotype_label', 'son_genotype_label',
+                         'son_II_genotype_label']
+
+        # XXX: will be useful if we want to have this field be "centric" WRT the
+        # person who submitted this variant_sample
+        def my_role(samplegeno, CALL_INFO):
+            for entry in samplegeno:
+                if entry['samplegeno_sampleid'] == CALL_INFO:
+                    return entry['samplegeno_role']
+            return None
+
+        def infer_key_from_role(role):
+            return role.replace(' ', '_').replace('-', '_') + '_genotype_label'
+
+        # variant always starts with chr* where * is the chrom we are looking for
+        def extract_chrom_from_variant(v):
+            return v[3]
+
+        # drop if there are no genotype labels or no samplegeno field or this is a mitochondrial variant
+        if not genotype_labels or not samplegeno or extract_chrom_from_variant(variant) == 'M':
+            return None
+
+        new_labels = {}
+        for entry in genotype_labels:
+            role = entry.get('role', '')
+            label = entry.get('labels', [])
+            role_key = infer_key_from_role(role)
+            if role_key not in possible_keys:
+                continue
+            elif len(label) == 1:
+                new_labels[role_key] = label[0]
+            else:
+                new_labels[role_key] = ' '.join(label)  # just in case
+
+        return new_labels
 
 
 @view_config(name='download', context=VariantSample, request_method='GET',

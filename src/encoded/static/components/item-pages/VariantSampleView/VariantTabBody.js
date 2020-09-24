@@ -9,7 +9,7 @@ import { console, schemaTransforms } from '@hms-dbmi-bgm/shared-portal-component
 import { Alerts } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/Alerts';
 
 import { Schemas } from './../../util';
-import { ExternalDatabasesSection } from './GeneTabBody';
+import { ExternalDatabasesSection } from './ExternalDatabasesSection';
 
 /**
  * Excluding the Gene Area (under position in mockuop https://gyazo.com/81d5b75b167bddef1b4c0a97f1640c51)
@@ -17,9 +17,7 @@ import { ExternalDatabasesSection } from './GeneTabBody';
 
 export const VariantTabBody = React.memo(function VariantTabBody ({ context, schemas, currentTranscriptIdx }) {
     const { variant } = context;
-    const {
-        clinvar_variationid: variationID,
-    } = variant;
+    const { clinvar_variationid: variationID } = variant;
 
     const { getTipForField, clinvarExternalHref } = useMemo(function(){
 
@@ -36,8 +34,10 @@ export const VariantTabBody = React.memo(function VariantTabBody ({ context, sch
                 const schemaProperty = schemaTransforms.getSchemaProperty(field, schemas, itemType);
                 return (schemaProperty || {}).description || null;
             };
-            const clinvarIDSchemaProperty = schemaTransforms.getSchemaProperty("clinvar_variationid", schemas, "Variant");
-            ret.clinvarExternalHref = clinvarIDSchemaProperty.link.replace("<ID>", variationID);
+            if (variationID) {
+                const clinvarIDSchemaProperty = schemaTransforms.getSchemaProperty("clinvar_variationid", schemas, "Variant");
+                ret.clinvarExternalHref = clinvarIDSchemaProperty.link.replace("<ID>", variationID);
+            }
         }
 
         return ret;
@@ -88,7 +88,7 @@ export const VariantTabBody = React.memo(function VariantTabBody ({ context, sch
                         </div>
                         <div className="info-body">
                             {/* We could maybe rename+put `ExternalDatabasesSection` into own file (from GeneTabBody.js), parameterize itemtype for schemas, and re-use ? */}
-                            <ExternalResourcesSection {...{ context, schemas }} />
+                            <ExternalResourcesSection {...{ context, schemas, currentTranscriptIdx }} />
                         </div>
                     </div>
 
@@ -290,19 +290,22 @@ function ClinVarSection({ context, getTipForField, schemas, clinvarExternalHref 
 }
 
 function ClinVarSubmissionEntry({ submission, index = 0 }){
-    const fallbackElem = <em data-tip="Not Available">N/A</em>;
+    const fallbackElem = <em data-tip="Not Available"> - </em>;
     const {
-        clinvar_submission_interpretation = fallbackElem,
+        clinvar_submission_interpretation = null,
         clinvar_submission_submitter = fallbackElem,
         clinvar_submission_accession = fallbackElem // change into link when available
     } = submission;
+
+    const interpretation = clinvar_submission_interpretation || fallbackElem;
+    const fakeStatusValue = clinvar_submission_interpretation ? ClinVarSubmissionEntry.interpretationStatusMap[clinvar_submission_interpretation.toLowerCase()] || null : null;
 
     return (
         <div className={"my-1 border rounded p-1" + (index % 2 === 0 ? " bg-light" : "")}>
             <div className="row align-items-center text-small">
                 <div className="col-3" data-field="clinvar_submission_interpretation">
-                    <i className="item-status-indicator-dot mr-07 ml-05" data-status={ClinVarSubmissionEntry.interpretationStatusMap[clinvar_submission_interpretation] || null} />
-                    { clinvar_submission_interpretation }
+                    <i className="item-status-indicator-dot mr-07 ml-05" data-status={fakeStatusValue} />
+                    { interpretation }
                 </div>
                 <div className="col-2">
                     { fallbackElem }
@@ -319,18 +322,22 @@ function ClinVarSubmissionEntry({ submission, index = 0 }){
 }
 // We re-use color definitions for Item.status to color our interpretation status icon.
 ClinVarSubmissionEntry.interpretationStatusMap = {
-    "risk factor" : "deleted" // red
+    "risk factor" : "deleted", // red
+    "benign" : "released", // green
+    "likely benign" : "released", // green
+    "uncertain significance" : "in review" // yellow
 };
 
 function PredictorsSection({ context, getTipForField, currentTranscriptIdx }){
     const { variant } = context;
-    const fallbackElem = <em data-tip="Not Available">N/A</em>;
+    const fallbackElem = <em data-tip="Not Available"> - </em>;
     const {
         conservation_gerp = fallbackElem,
         conservation_phylop100 = fallbackElem,
         cadd_phred = fallbackElem,
         transcript = [],
-        spliceai_maxds = fallbackElem
+        spliceai_maxds = fallbackElem,
+        primateai_primatedl_score = fallbackElem
     } = variant;
 
     // Should we instead find transcript with largest score instead of using current?
@@ -370,7 +377,7 @@ function PredictorsSection({ context, getTipForField, currentTranscriptIdx }){
                         </tr>
                         <tr>
                             <td className="text-left">
-                                <label className="mb-0" data-tip={getTipForField("conservation_phylop100")}>phyloP100way</label>
+                                <label className="mb-0" data-tip={getTipForField("conservation_phylop100")}>PhyloP (100 Vertabrates)</label>
                             </td>
                             <td className="text-left">{ conservation_phylop100 }</td>
                         </tr>
@@ -406,6 +413,12 @@ function PredictorsSection({ context, getTipForField, currentTranscriptIdx }){
                                 <label className="mb-0" data-tip={getTipForField("transcript.vep_polyphen_score")}>PolyPhen2</label>
                             </td>
                             <td className="text-left">{ vep_polyphen_score }</td>
+                        </tr>
+                        <tr>
+                            <td className="text-left">
+                                <label className="mb-0" data-tip={getTipForField("primateai_primatedl_score")}>PrimateAI DL Score</label>
+                            </td>
+                            <td className="text-left">{ primateai_primatedl_score }</td>
                         </tr>
                     </tbody>
                 </table>
@@ -452,11 +465,44 @@ function PredictorsTableHeading(){
 }
 
 
-function ExternalResourcesSection({ context, schemas }){
+function ExternalResourcesSection({ context, schemas, currentTranscriptIdx }){
     const { variant } = context;
-    const externalDatabaseFieldnames = ["clinvar_variationid", "vep_feature", "vep_ccds", "vep_ensp", "vep_swissprot", "vep_trembl"];
+    const { transcript = [], } = variant;
+    const externalDatabaseFieldnames = [
+        "clinvar_variationid"
+    ];
+
+    const transcriptFieldNames = [
+        "vep_feature",
+        "vep_ccds",
+        "vep_ensp",
+        "vep_swissprot",
+        "vep_trembl"
+    ];
+
+    if (!variant) {
+        return null;
+    }
+
+    // For now we kind of create combo object of these above ^, transforming "transcript" to be single item for vals to be plucked from
+    const currentItem = {
+        "transcript" : [{}] // Keeping as arr only for consistency w. parent `context` otherwise for code itself it could've been {} instd of [{}].
+    };
+
+    externalDatabaseFieldnames.forEach(function(fieldName){
+        currentItem[fieldName] = variant[fieldName];
+    });
+
+    const currentTranscript = transcript[currentTranscriptIdx] || {}; // Fallback to blank values.
+    transcriptFieldNames.forEach(function(fieldName){
+        const newFieldName = "transcript." + fieldName;
+        externalDatabaseFieldnames.push(newFieldName);
+        currentItem.transcript[0][fieldName] = currentTranscript[fieldName];
+    });
+
+
     return (
-        <ExternalDatabasesSection currentItem={variant} itemType="Variant" {...{ schemas, externalDatabaseFieldnames }} />
+        <ExternalDatabasesSection itemType="Variant" {...{ currentItem, schemas, externalDatabaseFieldnames }} />
     );
 }
 

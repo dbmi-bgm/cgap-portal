@@ -8,14 +8,15 @@ ORDER = [
     'file_format', 'variant_consequence', 'phenotype',
     'cohort', 'family', 'individual', 'sample', 'workflow',
     'access_key', 'disorder', 'document', 'file_fastq',
-    'file_processed', 'file_reference', 'gene', 'sample_processing',
+    'file_processed', 'file_reference', 'gene', 'gene_list', 'sample_processing',
     'case', 'report', 'page', 'quality_metric_fastqc', 'evidence_dis_pheno',
     'quality_metric_bamcheck', 'quality_metric_qclist', 'quality_metric_wgs_bamqc',
     'quality_metric_cmphet', 'quality_metric_vcfcheck', 'quality_metric_workflowrun',
     'quality_metric_vcfqc', 'quality_metric_bamqc', 'quality_metric_peddyqc',
     'software', 'static_section', 'tracking_item', 'workflow_mapping',
     'workflow_run_awsem', 'workflow_run', 'annotation_field', 'variant_sample',
-    'variant', 'gene_annotation_field', 'gene',
+    'variant', 'gene_annotation_field', 'gene', 'higlass_view_config',
+    'ingestion_submission',
 ]
 
 
@@ -630,6 +631,19 @@ def file_fastq(testapp, institution, project, file_formats):
     item = {
         'file_format': file_formats.get('fastq').get('@id'),
         'md5sum': 'd41d8cd9f00b204e9800998ecf8427e',
+        'institution': institution['@id'],
+        'project': project['@id'],
+        'status': 'uploaded',  # avoid s3 upload codepath
+    }
+    return testapp.post_json('/file_fastq', item).json['@graph'][0]
+
+
+@pytest.fixture
+def file_fastq2(testapp, institution, project, file_formats):
+    item = {
+        'aliases': ['test-project:file2'],
+        'file_format': file_formats.get('fastq').get('@id'),
+        'md5sum': 'd41d8cd9f00b204e9800998ecf8429e',
         'institution': institution['@id'],
         'project': project['@id'],
         'status': 'uploaded',  # avoid s3 upload codepath

@@ -1,7 +1,7 @@
 [tool.poetry]
 # Note: Various modules refer to this system as "encoded", not "cgap-portal".
 name = "encoded"
-version = "2.4.18"
+version = "3.1.7"
 description = "Clinical Genomics Analysis Platform"
 authors = ["4DN-DCIC Team <support@4dnucleome.org>"]
 license = "MIT"
@@ -35,18 +35,18 @@ classifiers = [
 ]
 
 [tool.poetry.dependencies]
-python = ">=3.6,<3.7"
+python = ">=3.6.1,<3.7"
 boto3 = "^1.10.46"
 botocore = "^1.13.46"
 certifi = ">=2020.4.5.2"
 chardet = "3.0.4"
 colorama = "0.3.3"
 dcicpyvcf = "1.0.0"
-dcicsnovault = ">=3.1.9,<4"  # Fixes build problems in 3.1.8
-dcicutils = ">=0.38.1,<1"  # has LockoutManager 0.38.0 and check_true 0.38.1
+dcicsnovault = "^4.0.3"
+dcicutils = "1.0.0b1"
 docutils = "0.12"
-elasticsearch = "5.5.3"
-elasticsearch-dsl = "^5.4.0"
+elasticsearch = "6.4.0"
+elasticsearch-dsl = "^6.4.0"
 execnet = "1.4.1"
 future = "^0.15.2"
 humanfriendly = "1.44.5"
@@ -58,6 +58,8 @@ jsonschema-serialize-fork = "2.1.1"
 keepalive = "0.5"
 loremipsum = "1.0.5"
 netaddr = ">=0.7.18,<1"
+negspy = "0.2.24"
+numpy = "1.19.1" # negspy needs it
 passlib = "1.6.5"
 PasteDeploy = "1.5.2"
 pbkdf2 = "1.3"
@@ -78,7 +80,7 @@ pyramid-multiauth = "0.8.0"
 pyramid-retry = "1.0"
 pyramid-tm = "2.2.1"
 pyramid-translogger = "^0.1"
-python-dateutil = "2.5.3"
+python-dateutil = "2.7.3"
 # python-magic is presently pinned to 0.4.15 in lockstep with dcicsnovault's requirements. See explanation there.
 python-magic = "0.4.15"
 pytz = ">=2020.1"
@@ -113,11 +115,11 @@ xlwt = "1.2.0"
 "zope.deprecation" = "4.4.0"
 "zope.interface" = "4.6.0"
 "zope.sqlalchemy" = "1.3"
-sentry-sdk = "^0.16.4"
+sentry-sdk = "^0.16.5"
 
 [tool.poetry.dev-dependencies]
 # PyCharm says boto3-stubs contains useful type hints
-boto3-stubs = ">=1.14.37.0"
+boto3-stubs = ">=1.14.55.2"
 coverage = ">=5.2"
 codacy-coverage = ">=1.3.11"
 coveralls = ">=2.1.1"
@@ -177,6 +179,9 @@ profiler = "encoded.commands.profiler:main"
 purge-item-type = "encoded.commands.purge_item_type:main"
 run-upgrade-on-inserts = "encoded.commands.run_upgrader_on_inserts:main"
 spreadsheet-to-json = "encoded.commands.spreadsheet_to_json:main"
+submission-test = "encoded.commands.submission_test:main"
+# Use the same-named script in SubmitCGAP instead.
+# submit-metadata-bundle = "encoded.commands.submit_metadata_bundle:main"
 update-inserts-from-server = "encoded.commands.update_inserts_from_server:main"
 verify-item = "encoded.commands.verify_item:main"
 

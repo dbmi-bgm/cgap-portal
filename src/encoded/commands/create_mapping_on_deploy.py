@@ -33,6 +33,7 @@ ITEM_INDEX_ORDER = [
     'FileReference',
     'Image',
     'Gene',
+    'GeneList',
     'Phenotype',
     'Disorder',
     'Individual',
@@ -61,6 +62,8 @@ ITEM_INDEX_ORDER = [
     'EvidenceDisPheno',
     'Page',
     'GeneAnnotationField',
+    'HiglassViewConfig',
+    'IngestionSubmission',
 ]
 
 ENV_HOTSEAT = 'fourfront-cgaphot'
