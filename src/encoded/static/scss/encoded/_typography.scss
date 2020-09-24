@@ -1,25 +1,90 @@
 
-/* Note: most base styles handled by Bootstrap, with variable settings in bootstrap/_variables.scss */
+/**********************************************************************************
+ ** NOTE:                                                                        **
+ ** Most base styles handled by Bootstrap, with _base.scss setting or overriding **  
+ ** bootstrap/_variables.scss.                                                    **
+ ***********************************************************************************/
 
-hr { clear: both; }
+h1, h2, h3, h4, h5, h6, th {
+    /* Carried over from 4DN & ENCODE */
+	color: #111;
+}
 
-
-
-// Override Bootstrap's header sizes
-h1, .h1 { @include font-size(2.6rem); }
-h2, .h2 { @include font-size(2.1rem); }
-h3, .h3 { @include font-size(1.7rem); }
 h4, .h4 {
-    @include font-size(1.3rem);
+    // Font-size for this is set in _base.scss to 1.3rem
     line-height: 140%;
 }
-h5, .h5 { @include font-size(1rem); }
-h6, .h6 { @include font-size(0.85rem); }
+
+h1, .h1,
+h2, .h2,
+h3, .h3,
+h4, .h4,
+h5, .h5,
+h6, .h6 {
+    // Overrides Bootstrap's default of just margin-bottom.
+    margin: $headings-margin-bottom 0;
+    + ol, + ul, + dl {
+        margin-top: $headings-margin-bottom;
+    }
+    + p {
+        margin-top: $headings-margin-bottom * 2;
+    }
+    + h1, + .h1,
+    + h2, + .h2,
+    + h3, + .h3,
+    + h4, + .h4,
+    + h5, + .h5,
+    + h6, + .h6 {
+        margin-top: $headings-margin-bottom * 2;
+    }
+}
+
 
 blockquote {
     @include font-size(1rem);
 }
 
+
+// Override Bootstrap Defaults (margin below block typographical elements) with 'smart'er approach.
+
+p, ul, ol, dl {
+    margin-bottom: 0; // Default was $paragraph-margin-bottom (~1rem);
+    + p {
+        margin-top: $paragraph-margin-bottom; // == 1rem
+    }
+    + h1, + .h1,
+    + h2, + .h2,
+    + h3, + .h3,
+    + h4, + .h4,
+    + h5, + .h5,
+    + h6, + .h6 {
+        margin-top: $headings-margin-bottom * 2; // == 1rem
+    }
+}
+
+p {
+    + ul, + ol, + dl {
+        margin-top: $paragraph-margin-bottom / 4; // == .25rem
+    }
+}
+
+ul, ol, dl {
+    margin-bottom: 0; // Default was $paragraph-margin-bottom (~1rem);
+    + p, + ul, + ol, + dl { // Pretty rare top have sibling lists but handled just in case.
+        margin-top: $paragraph-margin-bottom; // == 1rem
+    }
+}
+
+
+hr {
+    clear: both;
+}
+
+// Possible todo: change to 'text-error' or something less generic than 'error'
+.error {
+    text-align: center;
+    color: red;
+}
 
 /************ Typography Utility Classes **********/
 /****** BOOTSTRAP HAS SIMILAR UTILITY CLASSES *****/
@@ -57,25 +122,4 @@ a.text-600, button.text-600 { font-weight: 600 !important; }
 
 
 
-h1, h2, h3, h4, h5, h6, td, th, span {
-	font-family: $font-family-sans-serif;
-}
 
-h1, h2, h3, h4, h5, h6, th {
-	color: #111;
-}
-
-h1, h2, h3, h4, h5, h6 {
-	margin: 10px 0px 10px 0px;
-}
-
-// Probably redundant; carried over from existing layout.scss content.
-p, input {
-	font-family: $font-family-sans-serif;
-}
-
-// Possible todo: change to 'text-error' or something less generic than 'error'
-.error {
-    text-align: center;
-    color: red;
-}
