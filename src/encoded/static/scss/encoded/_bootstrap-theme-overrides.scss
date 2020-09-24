@@ -1,3 +1,61 @@
+/** N.B. Typography is overriden in _typography.scss, not this file **/
+
+/**************************************
+ *********** Utility Classes **********
+ **************************************/
+
+
+$margin-util-sizes: 0, 1, 2, 3, 4, 5, 6, 7, 8;  		// * 10px
+$margin-util-sizes-mini: 1, 2, 3, 4, 5, 6, 7, 8; 		// * 1px
+
+
+// Taken largely from bootstrap / spacing.scss
+// Overrides ONLY mb-, mt-, pb-, pt-, ml-, mr-, pl-, and pr- util classnames to use
+// increments of _pixels_ in place of rem units (not too difficult to convert between them when necessary; 16px, 24px, 32px, ..).
+@each $breakpoint in map-keys($grid-breakpoints) {
+	@include media-breakpoint-up($breakpoint) {
+	  	$infix: breakpoint-infix($breakpoint, $grid-breakpoints);
+  
+	  	@each $prop, $abbrev in (margin: m, padding: p) {
+			@each $util-size in $margin-util-sizes {
+				.#{$abbrev}t#{$infix}-#{$util-size} {
+					#{$prop}-top: $util-size * 10px !important;
+				}
+				.#{$abbrev}r#{$infix}-#{$util-size} {
+					#{$prop}-right: $util-size * 10px !important;
+				}
+				.#{$abbrev}b#{$infix}-#{$util-size} {
+					#{$prop}-bottom: $util-size * 10px !important;
+				}
+				.#{$abbrev}l#{$infix}-#{$util-size} {
+					#{$prop}-left: $util-size * 10px !important;
+				}
+
+				@each $util-mini-size in $margin-util-sizes-mini {
+					.#{$abbrev}t#{$infix}-#{$util-size}#{$util-mini-size} {
+						#{$prop}-top: $util-size * 10px + ($util-mini-size * 1px) !important;
+					}
+					.#{$abbrev}r#{$infix}-#{$util-size}#{$util-mini-size} {
+						#{$prop}-right: $util-size * 10px + ($util-mini-size * 1px) !important;
+					}
+					.#{$abbrev}b#{$infix}-#{$util-size}#{$util-mini-size} {
+						#{$prop}-bottom: $util-size * 10px + ($util-mini-size * 1px) !important;
+					}
+					.#{$abbrev}l#{$infix}-#{$util-size}#{$util-mini-size} {
+						#{$prop}-left: $util-size * 10px + ($util-mini-size * 1px) !important;
+					}
+				}
+
+			}
+
+		}
+
+
+	}
+}
+
+
+
 /**************************************
  ************ Button Styles ***********
  **************************************/
@@ -59,6 +117,12 @@
 }
 
 
+/* Override sizing of btn-sm button re: our font */
+.btn.btn-sm {
+	padding-bottom: 4px;
+}
+
+
 /**************************************
  ************ Form Inputs *************
  **************************************/
@@ -99,9 +163,76 @@
 
     .card-header,
     .card-footer {
+        // TODO: Maybe there's bootstrap var for header/footer-bg?
         /* Original value: calc(.25rem - 1px) calc(.25rem - 1px) 0 0; */
         background-color: $card-bg;
     }
 
 }
+
+/**************************************
+ ************* Popovers ***************
+ **************************************/
+
+
+// Done here instead of overriding $popover-max-width since $popover-max-width set using
+// px values and we likely want to keep that as fallback.
+
+.popover {
+    
+    > .popover-body {
+        /* Limit height & make scrollable if necessary */
+        max-height: 50vh;
+        overflow: auto;
+    }
+
+    @include media-breakpoint-up(lg){
+        max-width: 45vw; /* increase from default ~276px */
+        box-shadow: 0px 0px 36px #0004;
+        > .popover-body {
+            max-height: 35vh; /* Limit height further */
+        }
+    }
+}
+
+
+/**************************************
+ ************ Modal Stuff *************
+ **************************************/
+
+
+.modal-dialog {
+
+	padding-left: 15px;
+	padding-right: 15px;
+
+	.modal-content {
+
+		.modal-body p {
+			font-family: inherit;
+		}
+
+	}
+}
+
+div[role="dialog"] {
+
+	> .modal {
+
+		> .modal-dialog {
+
+			/* Re-create some modern Bootstrap v4 effects, e.g. vertical centering */
+			display: flex;
+			align-items: center;
+			height: 100%;
+
+			> .modal-content {
+				width: 100%;
+			}
+
+		}
+
+	}
+}
+
 

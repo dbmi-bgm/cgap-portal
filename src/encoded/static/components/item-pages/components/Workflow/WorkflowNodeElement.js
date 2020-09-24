@@ -189,7 +189,7 @@ export class WorkflowNodeElement extends React.PureComponent {
             if (argumentName === 'Input' || argumentName === 'Output'){
                 argumentName += ' Argument &nbsp; <span class="text-500 text-monospace">' + name + '</span>';
             }
-            output += '<small class="mb-03 inline-block">' + argumentName + '</small>';
+            output += '<small class="mb-03 d-inline-block">' + argumentName + '</small>';
         }
 
         // If file, and has file-size, add it (idk, why not)
@@ -213,7 +213,7 @@ export class WorkflowNodeElement extends React.PureComponent {
         );
         if (description){
             output += '<hr class="mt-05 mb-05"/>';
-            output += '<small class="mb-05 inline-block">' + description + '</small>';
+            output += '<small class="mb-05 d-inline-block">' + description + '</small>';
         }
 
         return output;
@@ -224,7 +224,7 @@ export class WorkflowNodeElement extends React.PureComponent {
         const fileFormatAsString = WorkflowNodeElement.getFileFormatString(node);
         const elemProps = {
             'style'         : { 'maxWidth' : columnWidth },
-            'className'     : "text-ellipsis-container above-node-title",
+            'className'     : "text-truncate above-node-title",
             'key'           : 'above-node-title'
         };
 
@@ -290,7 +290,7 @@ export class WorkflowNodeElement extends React.PureComponent {
         const { node, columnWidth } = this.props;
         const elemProps = {
             'style'     : { 'maxWidth' : columnWidth },
-            'className' : "text-ellipsis-container below-node-title",
+            'className' : "text-truncate below-node-title",
             'key'       : 'below-node-title'
         };
 

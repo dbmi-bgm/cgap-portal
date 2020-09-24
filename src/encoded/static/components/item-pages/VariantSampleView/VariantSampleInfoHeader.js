@@ -38,7 +38,7 @@ export function VariantSampleInfoHeader(props) {
                     { caseID ?
                         <div className="inner-card-section col pb-2 pb-lg-0 col-lg-2 col-xl-1 d-flex flex-column">
                             <div className="info-header-title">
-                                <h4 className="text-ellipsis-container">Case ID</h4>
+                                <h4 className="text-truncate">Case ID</h4>
                             </div>
                             <div className="info-body flex-grow-1 d-flex align-items-center">
                                 <h4 className="text-400 text-center w-100">{ caseID }</h4>

@@ -1739,9 +1739,12 @@ class BodyElement extends React.PureComponent {
         }
     }
 
-    /** Renders out the body layout of the application. */
+    /**
+     * Renders out the body layout of the application.
+     * TestWarning stuff is _possibly_ deprecated and for 4DN only.
+     */
     render(){
-        const { onBodyClick, onBodySubmit, context, alerts, canonical, currentAction, hrefParts, slowLoad, mounted, href } = this.props;
+        const { onBodyClick, onBodySubmit, context, alerts, canonical, currentAction, hrefParts, slowLoad, mounted, href, session, schemas, browseBaseState, updateUserInfo } = this.props;
         const { windowWidth, windowHeight, classList, hasError, isFullscreen, testWarningPresent } = this.state;
         const { registerWindowOnResizeHandler, registerWindowOnScrollHandler, addToBodyClassList, removeFromBodyClassList, toggleFullScreen } = this;
         const appClass = slowLoad ? 'communicating' : 'done';
@@ -1761,6 +1764,28 @@ class BodyElement extends React.PureComponent {
                 );
             }
         }
+
+        const navbarProps = {
+            windowWidth, windowHeight,
+            isFullscreen, toggleFullScreen, overlaysContainer,
+            testWarningPresent, hideTestWarning: this.hideTestWarning,
+            context, href, currentAction, session, schemas,
+            browseBaseState, updateUserInfo
+        };
+
+        const propsPassedToAllViews = {
+            ...this.props,
+            windowWidth,
+            windowHeight,
+            navigate, // <- We could probably stop passing this down since can use the global aliased function instead...
+            registerWindowOnResizeHandler,
+            registerWindowOnScrollHandler,
+            addToBodyClassList, removeFromBodyClassList,
+            toggleFullScreen, isFullscreen, // <- These two are probably deprecated, were originally for 4DN.
+            overlaysContainer,
+            innerOverlaysContainer,
+            alerts
+        };
 
         return (
             <body data-current-action={currentAction} onClick={onBodyClick} onSubmit={onBodySubmit} data-path={hrefParts.path}
@@ -1783,19 +1808,14 @@ class BodyElement extends React.PureComponent {
                     <div id="application" className={appClass}>
                         <div id="layout">
 
-                            <NavigationBar {...{ windowWidth, windowHeight, isFullscreen, toggleFullScreen, overlaysContainer, testWarningPresent }}
-                                hideTestWarning={this.hideTestWarning}
-                                {..._.pick(this.props, 'href', 'currentAction', 'session', 'schemas', 'browseBaseState',
-                                    'context', 'updateUserInfo')}/>
+                            <NavigationBar {...navbarProps} />
 
                             <div id="post-navbar-container" style={{ minHeight : innerContainerMinHeight }}>
 
                                 <PageTitleSection {...this.props} windowWidth={windowWidth} />
 
-                                <ContentErrorBoundary canonical={canonical} href={href}>
-                                    <ContentRenderer { ...this.props } { ...{ windowWidth, windowHeight, navigate, registerWindowOnResizeHandler,
-                                        registerWindowOnScrollHandler, addToBodyClassList, removeFromBodyClassList, toggleFullScreen, isFullscreen,
-                                        overlaysContainer, innerOverlaysContainer, alerts } } />
+                                <ContentErrorBoundary {...{ canonical, href }}>
+                                    <ContentRenderer {...propsPassedToAllViews} />
                                 </ContentErrorBoundary>
 
                                 <div id="inner-overlays-container" ref={this.innerOverlaysContainerRef} />

@@ -1,18 +1,15 @@
 @charset "UTF-8";
 
 
-// Root HTML doc variables/settings
-
-:root {
-    // `rem` units will be based on this.
-	font-size: 16px;
-	// Same as Bootstrap's logic for setting default sans-serif and monospace
-	// base fonts.
-	--font-family-serif: #{inspect($font-family-serif)};
-}
-
 /* BASE STYLES */
 /* Note: most base styles handled by Bootstrap, with variable settings in bootstrap/_variables.scss */
+
+:root {
+    /* `rem` units will be based on this. */
+	font-size: 16px;
+	/* Same as Bootstrap's logic for setting default sans-serif and monospace base fonts. */
+	--font-family-serif: #{inspect($font-family-serif)};
+}
 
 html {
 	font-size: $font-size-base * $mobile-font-factor;
@@ -44,34 +41,12 @@ body {
     background-color: $appBackgroundColor;
 }
 
-hr { clear: both; }
-
-
-
-// Override Bootstrap's header sizes
-h1, .h1 { @include font-size(2.6rem); }
-h2, .h2 { @include font-size(2.1rem); }
-h3, .h3 { @include font-size(1.7rem); }
-h4, .h4 {
-    @include font-size(1.3rem);
-    line-height: 140%;
-}
-h5, .h5 { @include font-size(1rem); }
-h6, .h6 { @include font-size(0.85rem); }
-
-blockquote {
-    @include font-size(1rem);
-}
-
 
 *, *:after, *:before {
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
 }
-
-
-
 
 #layout {
 	height: auto !important;
@@ -81,18 +56,7 @@ blockquote {
 	// overflow-x: hidden;
 }
 
-.project-info {
-	h1,h2,h3,h4 {
-		text-shadow: 1px 1px 0 #fff;
-	}
-    margin-bottom: 10px;
-	display: block;
-	@include font-size(1.3rem);
-}
 
-.text-panel {
-    margin-top: 10px;
-}
 
 
 /***********************************************************
@@ -432,9 +396,6 @@ body.is-full-screen {
 	display: inline-block;
 }
 
-.overflow-hidden {
-	overflow: hidden;
-}
 
 .clickable {
 	cursor: pointer;
@@ -539,125 +500,6 @@ body.is-full-screen {
 	}
 }
 
-/** Margin Classes, inspired by Swiss github-pages/jekyll template **/
-$margin-util-sizes: 0, 1, 2, 3, 4, 5, 6, 7, 8;  		// * 10px
-$margin-util-sizes-mini: 1, 2, 3, 4, 5, 6, 7, 8; 		// * 1px
-
-
-// Taken largely from bootstrap / spacing.scss
-// Overrides ONLY mb-, mt-, pb-, pt-, ml-, mr-, pl-, and pr- util classnames to use
-// increments of _pixels_ in place of rem units (not too difficult to convert between them when necessary; 16px, 24px, 32px, ..).
-@each $breakpoint in map-keys($grid-breakpoints) {
-	@include media-breakpoint-up($breakpoint) {
-	  	$infix: breakpoint-infix($breakpoint, $grid-breakpoints);
-  
-	  	@each $prop, $abbrev in (margin: m, padding: p) {
-			@each $util-size in $margin-util-sizes {
-				.#{$abbrev}t#{$infix}-#{$util-size} {
-					#{$prop}-top: $util-size * 10px !important;
-				}
-				.#{$abbrev}r#{$infix}-#{$util-size} {
-					#{$prop}-right: $util-size * 10px !important;
-				}
-				.#{$abbrev}b#{$infix}-#{$util-size} {
-					#{$prop}-bottom: $util-size * 10px !important;
-				}
-				.#{$abbrev}l#{$infix}-#{$util-size} {
-					#{$prop}-left: $util-size * 10px !important;
-				}
-
-				@each $util-mini-size in $margin-util-sizes-mini {
-					.#{$abbrev}t#{$infix}-#{$util-size}#{$util-mini-size} {
-						#{$prop}-top: $util-size * 10px + ($util-mini-size * 1px) !important;
-					}
-					.#{$abbrev}r#{$infix}-#{$util-size}#{$util-mini-size} {
-						#{$prop}-right: $util-size * 10px + ($util-mini-size * 1px) !important;
-					}
-					.#{$abbrev}b#{$infix}-#{$util-size}#{$util-mini-size} {
-						#{$prop}-bottom: $util-size * 10px + ($util-mini-size * 1px) !important;
-					}
-					.#{$abbrev}l#{$infix}-#{$util-size}#{$util-mini-size} {
-						#{$prop}-left: $util-size * 10px + ($util-mini-size * 1px) !important;
-					}
-				}
-
-			}
-
-		}
-
-
-	}
-}
-
-
-
-/** Modal Stuff **/
-
-.modal-dialog {
-
-	padding-left: 15px;
-	padding-right: 15px;
-
-	.modal-content {
-
-		.modal-body p {
-			font-family: inherit;
-		}
-
-	}
-}
-
-div[role="dialog"] {
-
-	> .modal {
-
-		> .modal-dialog {
-
-			/* Re-create some modern Bootstrap v4 effects, e.g. vertical centering */
-			display: flex;
-			align-items: center;
-			height: 100%;
-
-			> .modal-content {
-				width: 100%;
-			}
-
-		}
-
-	}
-}
-
-/************** Common Typography ************/
-/*** BOOTSTRAP HAS SIMILAR UTILITY CLASSES ***/
-/********* THIS SOMEWHAT EXTENDS THEM ********/
-
-.text-capitalize 	{ text-transform: capitalize; } // Same class as Bootstrap (in newer version of it?)
-.text-uppercase 	{ text-transform: uppercase; }
-.text-serif 		{ font-family: $font-family-serif; }
-
-.text-100 { font-weight: 100; }
-a.text-100, button.text-100 { font-weight: 100 !important; }
-.text-200 { font-weight: 200; }
-a.text-200, button.text-200 { font-weight: 200 !important; }
-.text-300 { font-weight: 300; }
-a.text-300, button.text-300 { font-weight: 300 !important; }
-.text-400 { font-weight: 400; }
-a.text-400, button.text-400 { font-weight: 400 !important; }
-.text-500 { font-weight: 500; }
-a.text-500, button.text-500 { font-weight: 500 !important; }
-.text-600 { font-weight: 600; }
-a.text-600, button.text-600 { font-weight: 600 !important; }
-
-.text-normal { font-size: 1rem; } // Reset to default size.
-.text-small { font-size: 0.9rem; }
-.text-smaller { font-size: 0.75rem; }
-.text-medium { font-size: 15px; font-size: 15.75px; }
-.text-large { font-size: 17.5px; }
-.text-larger { font-size: 20px; line-height: 25px; }
-
-.accession {
-	font-family: $font-family-monospace;
-}
 
 @include media-breakpoint-down(xs) {
 
@@ -667,16 +509,6 @@ a.text-600, button.text-600 { font-weight: 600 !important; }
 		text-align: left !important;
 	}
 
-}
-
-.text-ellipsis-container {
-	overflow: hidden;
-	text-overflow: ellipsis;
-	white-space: nowrap;
-}
-
-.no-wrap {
-	white-space: nowrap;
 }
 
 
@@ -708,10 +540,6 @@ div.dropdown.btn-group {
 	top: 1px;
 }
 
-/* Override sizing of btn-sm button re: our font */
-.btn.btn-sm {
-	padding-bottom: 4px;
-}
 
 /**************** React Tooltips (NPM: react-tooltip) overwrite of styling *********************/
 
@@ -719,130 +547,3 @@ body .__react_component_tooltip {
 	padding: 6px 15px;
 }
 
-
-/* *********************************************************
-		CARL'S LOGIN BOX
-********************************************************** */
-
-.login-box{
-    width: inherit;
-	height: inherit;
-    border: 2px solid #000000;
-    background-color: #ffffff;
-    padding: 5px;
-	display: block;
-    margin-left: auto;
-    margin-right: auto;
-}
-.sexy-btn{
-    background-color: #ffffff;
-	color: #b3b3b3;
-    border: 2px solid #b3b3b3;
-    padding: 5px 10px;
-    text-align: center;
-    font-size: 16px;
-    cursor: pointer;
-	font-family: $font-family-sans-serif;
-}
-.sexy-btn:hover, .sexy-btn:focus {
-  color: #000000;
-  border: 2px solid #000000;
-}
-
-.sexy-btn span{
-  display: inline-block;
-  position: relative;
-  transition: 0.5s;
-}
-.sexy-btn span:after {
-  content: '»';
-  position: absolute;
-  opacity: 0;
-  top: 0;
-  right: -20px;
-  transition: 0.5s;
-}
-
-.sexy-btn:hover span, .sexy-btn:focus span {
-  padding-right: 25px;
-}
-
-.sexy-btn:hover span:after, .sexy-btn:focus span:after {
-  opacity: 1;
-  right: 0;
-}
-
-
-.links {
-    padding-left: 0px;
-}
-.links li{
-    margin-top: 20px;
-    margin-bottom: 20px;
-    text-align: center;
-    display: block;
-    margin-left: auto;
-    margin-right: auto;
-}
-
-.fill-label{
-    display: block;
-    text-align: center;
-}
-
-
-.title{
-    text-align: center;
-}
-.error {
-    text-align: center;
-    color: red;
-}
-
-
-// simply used to make invisible elements
-.invis{
-	display: none !important;
-}
-
-// simply used to make hidden elements
-.placeholder{
-	visibility: hidden !important;
-}
-
-// used in item.js
-.item-icon{
-	padding-left: 4px;
-}
-
-h1, h2, h3, h4, h5, h6, td, th, span {
-	font-family: $font-family-sans-serif;
-}
-
-h1, h2, h3, h4, h5, h6, th {
-	color: #111;
-}
-
-h1, h2, h3, h4, h5, h6 {
-	margin: 10px 0px 10px 0px;
-}
-
-//make all else use ysra
-p, input {
-	font-family: $font-family-sans-serif; //'Yrsa', serif;
-}
-
-.inline-subheader{
-	display: inline;
-	color: #999999 !important;
-}
-
-.impersonate-user{
-	display:block;
-	margin-top: 15px;
-}
-
-.impersonate-user-field{
-	width: 400px;
-	border: 2px solid #999999;
-}
