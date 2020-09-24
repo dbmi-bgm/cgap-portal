@@ -607,6 +607,19 @@ def file_fastq(testapp, institution, project, file_formats):
 
 
 @pytest.fixture
+def file_fastq2(testapp, institution, project, file_formats):
+    item = {
+        'aliases': ['test-project:file2'],
+        'file_format': file_formats.get('fastq').get('@id'),
+        'md5sum': 'd41d8cd9f00b204e9800998ecf8429e',
+        'institution': institution['@id'],
+        'project': project['@id'],
+        'status': 'uploaded',  # avoid s3 upload codepath
+    }
+    return testapp.post_json('/file_fastq', item).json['@graph'][0]
+
+
+@pytest.fixture
 def file_vcf(testapp, institution, project, file_formats):
     item = {
         'file_format': file_formats.get('vcf_gz').get('@id'),
