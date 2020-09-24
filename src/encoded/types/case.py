@@ -166,6 +166,7 @@ class Case(Item):
         "sample.last_modified.*",
         "sample.specimen_collection_date",
         "sample.sequencing_date",
+        "sample.files.status",
         "sample.processed_files.quality_metric.quality_metric_summary.sample",
         "sample.processed_files.quality_metric.quality_metric_summary.title",
         "sample.processed_files.quality_metric.quality_metric_summary.value",
