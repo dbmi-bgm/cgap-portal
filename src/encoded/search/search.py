@@ -22,6 +22,7 @@ from snovault.elasticsearch.create_mapping import determine_if_is_date_field
 from snovault.util import (
     debug_log,
 )
+from snovault.elasticsearch.indexer_utils import get_namespaced_index
 from snovault.typeinfo import AbstractTypeInfo
 from .lucene_builder import LuceneBuilder
 from .search_utils import (
@@ -87,14 +88,11 @@ class SearchBuilder:
             should be - thus saving us some time from external API calls at the expense of application memory.
         """
         if len(self.doc_types) == 1:  # extract mapping from storage if we're searching on a single doc type
-            item_type = self.doc_types[0]
             item_type_snake_case = ''.join(['_' + c.lower() if c.isupper() else c for c in self.doc_types[0]]).lstrip('_')
             mappings = self.request.registry[STORAGE].read.mappings.get()
-            if item_type in mappings:  # mappings use snake case but search uses CamelCase
-                return mappings[item_type]['mappings'][item_type]['properties']
-            elif item_type_snake_case in mappings:
-                return mappings[item_type_snake_case]['mappings'][item_type_snake_case]['properties']
-            else:
+            if self.es_index in mappings:
+                return mappings[self.es_index]['mappings'][item_type_snake_case]['properties']
+            else:  # new item was added after last cache update, get directly via API
                 return get_es_mapping(self.es, self.es_index)
         return {}
 
