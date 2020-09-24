@@ -23,6 +23,8 @@ class Sample(Item):
     schema = load_schema('encoded:schemas/sample.json')
     rev = {'indiv': ('Individual', 'samples')}
     embedded_list = [
+        "files.status",
+        "cram_files.status",
         "processed_files.workflow_run_outputs"
     ]
 
@@ -69,7 +71,9 @@ class SampleProcessing(Item):
     item_type = 'sample_processing'
     schema = load_schema('encoded:schemas/sample_processing.json')
     embedded_list = [
-        'processed_files.accession'  # used to locate this file from annotated VCF via search
+        'processed_files.accession',  # used to locate this file from annotated VCF via search
+        'samples.completed_processes',
+        "samples.processed_files.uuid",
     ]
     rev = {'case': ('Case', 'sample_processing')}
 
