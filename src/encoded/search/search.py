@@ -22,7 +22,6 @@ from snovault.elasticsearch.create_mapping import determine_if_is_date_field
 from snovault.util import (
     debug_log,
 )
-from snovault.elasticsearch.indexer_utils import get_namespaced_index
 from snovault.typeinfo import AbstractTypeInfo
 from .lucene_builder import LuceneBuilder
 from .search_utils import (
