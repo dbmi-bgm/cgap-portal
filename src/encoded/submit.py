@@ -180,6 +180,12 @@ def digest_csv(input_data, delim=','):
         yield row
 
 
+def replace_cell_contents(info_dict, field, **kwargs):
+    existing = info_dict.get(field, '').lower()
+    if existing in kwargs:
+        info_dict[field] = kwargs[existing]
+
+
 class MetadataItem:
     """
     class for single DB-item-worth of json
@@ -220,8 +226,8 @@ class SubmissionRow:
 
     def found_missing_values(self):
         # makes sure no required values from spreadsheet are missing
-        missing_required = [col for col in REQUIRED_COLUMNS if col not in self.metadata
-                            or not self.metadata[col]]
+        missing_required = [col for col in REQUIRED_COLUMNS
+                            if col not in self.metadata or not self.metadata[col]]
         if missing_required:
             self.errors.append(
                 'Row {} - missing required field(s) {}. This row cannot be processed.'
@@ -295,10 +301,7 @@ class SubmissionRow:
         ]
         info = map_fields(self.metadata, info, fields, 'sample')
         # handle enum values
-        if info.get('specimen_accepted', '').lower() == 'y':
-            info['specimen_accepted'] = 'Yes'
-        elif info.get('specimen_accepted', '').lower() == 'n':
-            info['specimen_accepted'] = 'No'
+        replace_cell_contents(info, 'specimen_accepted', y='Yes', n='No')
         # handle bam sample ID
         if not info.get('bam_sample_id'):
             info['bam_sample_id'] = info.get('specimen_accession')
@@ -310,14 +313,9 @@ class SubmissionRow:
             info['other_specimen_ids'] = [other_id]
         req_info = map_fields(self.metadata, {}, ['date sent', 'date completed'], 'requisition')
         # handle requisition enum
-        if req_info.get('accepted_rejected', '').lower() in ['y', 'n']:
-            if req_info['accepted_rejected'].lower() == 'y':
-                req_info['accepted_rejected'] = 'Accepted'
-            else:
-                req_info['accepted_rejected'] = "Rejected"
+        replace_cell_contents(req_info, 'accepted_rejected', y='Accepted', n='Rejected')
         # remove keys if no value
         info['requisition_acceptance'] = {k: v for k, v in req_info.items() if v}
-        # self.sample = MetadataItem({k: v for k, v in info.items() if v}, self.row, 'sample')
         if self.individual:
             self.individual.metadata['samples'] = [self.sample_alias]
         # metadata for sample_processing item
@@ -326,7 +324,6 @@ class SubmissionRow:
             'samples': [self.sample_alias],
             'families': [self.fam_alias]
         }
-        # self.analysis = MetadataItem(new_sp_item, self.row, 'sample_processing')
         if self.metadata.get('report required').lower().startswith('y'):
             self.report_required = True
         return (MetadataItem(info, self.row, 'sample'),
@@ -453,8 +450,19 @@ class SubmissionMetadata:
     def get_analysis_types(self):
         """
         'analysis_type' is a property of sample_processing items, denoting the workup type (WGS, WES, etc)
-        as well as describing the grouping (Trio, Quad, etc). This info needs to be extracted from the spreadsheet
+        as well as describing the grouping (Trio, Group, etc). This info needs to be extracted from the spreadsheet
         separately from most of the metadata since it depends info extracted from more than one row.
+
+        An example analysis_relations dict as created by the method is shown below, with the corresponding
+        analysis type returned by the second half of the method:
+        analysis_relations = {
+            '111': (['proband', 'mother', 'father'], ['WGS', 'WGS', 'WGS']),  # --> WGS-Trio
+            '222': (['proband'], ['WES']),                                    # --> WES
+            '333': (['proband', 'father', 'sibling'], ['WGS', 'WGS', 'WGS']), # --> WGS-Group
+            '234': (['proband', 'mother'], ['WGS', 'WES']),                   # --> None
+        }
+        The last entry in the dict will get an analysis_type of None because the workup types are mixed which is
+        not allowed.
         """
         analysis_relations = {}
         analysis_types = {}
@@ -463,20 +471,22 @@ class SubmissionMetadata:
             analysis_relations[row.get('analysis id')][0].append(row.get('relation to proband', '').lower())
             workup_col = get_column_name(row, ['test requested', 'workup type'])
             analysis_relations[row.get('analysis id')][1].append(row.get(workup_col, '').upper())
+            # dict now has format {analysis id: (relations list, workup types list)}
         for k, v in analysis_relations.items():
-            workup = list(set(v[1]))
-            if len(workup) == 1 and '' not in workup:
-                if len(v[0]) == 1:
-                    analysis_types[k] = v[1][0]
-                elif sorted(v[0]) == ['father', 'mother', 'proband']:
-                    analysis_types[k] = v[1][0] + '-Trio'
+            workups = list(set(v[1]))
+            relations = v[0]
+            if len(workups) == 1 and '' not in workups:
+                # if all samples in analysis have same workup type, determine if it is Trio or Group
+                if len(relations) == 1:
+                    [analysis_types[k]] = workups
+                elif sorted(relations) == ['father', 'mother', 'proband']:
+                    analysis_types[k] = f'{workups[0]}-Trio'
                 else:
-                    analysis_types[k] = v[1][0] + '-Group'
-            else:
+                    analysis_types[k] = f'{workups[0]}-Group'
+            else:  # analysis type not determined if multiple workup types present in one analysis
                 analysis_types[k] = None
         return analysis_types
 
-    #def extract_individual_metadata(idx, row, items, indiv_alias, inst_name):
     def add_metadata_single_item(self, item):
         """
         Looks at metadata from a SubmissionRow object, one DB itemtype at a time
@@ -535,6 +545,9 @@ class SubmissionMetadata:
                 self.errors.append(msg)
         if sp_item.alias in self.sample_processings:
             for field in ['samples', 'families']:
+                # the sp_item.metadata generated by a single row is expected to only have one
+                # sample and family even though these props are arrays - extend the arrays in
+                # sample_processings dict when necessary.
                 if sp_item.metadata[field][0] not in self.sample_processings[sp_item.alias][field]:
                     self.sample_processings[sp_item.alias][field].extend(sp_item.metadata[field])
         else:

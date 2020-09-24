@@ -553,7 +553,7 @@ def test_compare_fields_same(testapp, fam, new_family):
 def test_compare_fields_same_seo(testapp, file_fastq, file_fastq2, project, institution):
     """tests that sub-embedded objects that are the same are recognized as the same in compare_fields"""
     db_relation = {'related_files': [{'relationship_type': 'paired with', 'file': file_fastq2['@id']}]}
-    file1 = testapp.patch_json(file_fastq['@id'], db_relation).json['@graph'][0]
+    [file1] = testapp.patch_json(file_fastq['@id'], db_relation).json['@graph']
     profile = testapp.get('/profiles/file_fastq.json').json
     json_data = {
         'file_format': '/file-formats/fastq/',
@@ -654,8 +654,9 @@ def test_post_and_patch_all_items(testapp, post_data):
     output, success, file_info = post_and_patch_all_items(testapp, post_data)
     assert success
     for itemtype in post_data['post']:
-        assert '{}: 1 item created (with POST); 0 items failed creation'.format(itemtype) in output
-        assert '{}: attributes of 1 item updated (with PATCH); 0 items failed updating'.format(itemtype) in output
+        assert f'{itemtype}: 1 item created (with POST); 0 items failed creation' in output
+        if post_data['patch'].get(itemtype):
+            assert f'{itemtype}: attributes of 1 item updated (with PATCH); 0 items failed updating' in output
 
 def test_post_and_patch_all_items_error(testapp, post_data):
     """
