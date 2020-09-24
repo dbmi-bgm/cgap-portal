@@ -270,7 +270,7 @@ class VariantSample(Item):
             }
         }
     })
-    def associated_genotype_labels(self, CALL_INFO, samplegeno=None, genotype_labels=None):
+    def associated_genotype_labels(self, variant, CALL_INFO, samplegeno=None, genotype_labels=None):
         """ Builds the above sub-embedded object so we can search on the genotype labels """
 
         possible_keys = ['proband_genotype_label', 'mother_genotype_label', 'father_genotype_label',
@@ -289,7 +289,12 @@ class VariantSample(Item):
         def infer_key_from_role(role):
             return role.replace(' ', '_').replace('-', '_') + '_genotype_label'
 
-        if not genotype_labels or not samplegeno:
+        # variant always starts with chr* where * is the chrom we are looking for
+        def extract_chrom_from_variant(v):
+            return v[3]
+
+        # drop if there are no genotype labels or no samplegeno field or this is a mitochondrial variant
+        if not genotype_labels or not samplegeno or extract_chrom_from_variant(variant) == 'M':
             return None
 
         new_labels = {}

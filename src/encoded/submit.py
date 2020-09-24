@@ -4,6 +4,7 @@ import datetime
 import json
 import xlrd
 
+from dcicutils.lang_utils import n_of
 from dcicutils.qa_utils import ignored
 from dcicutils.misc_utils import VirtualAppError
 from webtest import AppError
@@ -817,9 +818,9 @@ def post_and_patch_all_items(virtualapp, json_data_final):
                     no_errors = False
         for itype in final_status:
             if final_status[itype]['posted'] > 0 or final_status[itype]['not posted'] > 0:
-                output.append('{}: {} items posted successfully; {} items not posted'.format(
-                    itype, final_status[itype]['posted'], final_status[itype]['not posted']
-                ))
+                output.append('{}: {} created (with POST); {} failed creation'.format(itype,
+                                      n_of(final_status[itype]['posted'], 'item'),
+                                      n_of(final_status[itype]['not posted'], 'item')))
     for k, v in json_data_final['patch'].items():
         final_status.setdefault(k, {'patched': 0, 'not patched': 0})
         for item_id, patch_data in v.items():
@@ -843,9 +844,10 @@ def post_and_patch_all_items(virtualapp, json_data_final):
                 output.append(str(e))
                 no_errors = False
         if final_status[k]['patched'] > 0 or final_status[k]['not patched'] > 0:
-            output.append('{}: {} items patched successfully; {} items not patched'.format(
-                k, final_status[k]['patched'], final_status[k]['not patched']
-            ))
+            output.append('{}: attributes of {} updated (with PATCH);'
+                          ' {} failed updating'.format(
+                                    k, n_of(final_status[k]['patched'], 'item'),
+                                    n_of(final_status[k]['not patched'], 'item')))
     return output, no_errors, files
 
 

@@ -1,8 +1,6 @@
 import base64
 import os
 from operator import itemgetter
-from datetime import datetime
-import time
 import jwt
 from base64 import b64decode
 
@@ -213,9 +211,11 @@ class Auth0AuthenticationPolicy(CallbackAuthenticationPolicy):
         for identity in payload.get('identities', []): # if auth0 decoded
             if identity.get('connection', '') in ['partners', 'hms-it']:
                 return True
+
+        # XXX: Refactor to use regex? Also should potentially be data-driven?
         if 'partners' in payload.get('sub', ''):
             return True
-        elif 'hms.harvard' in payload.get('sub', ''):
+        elif 'harvard.edu' in payload.get('sub', ''):
             return True
         elif payload.get('email_verified'):
             return True
