@@ -121,10 +121,13 @@ class LuceneBuilder:
                 must_terms = cls.construct_nested_sub_queries(query_field, filters, key='must_terms')
                 must_not_terms = cls.construct_nested_sub_queries(query_field, filters, key='must_not_terms')
 
+                # XXX: BREAKING ES 6 CHANGE
+                # MUST -> MUST_NOT EXISTS does not work?
+                # Have to use EXISTS under MUST_NOT
                 if filters['add_no_value'] is True:  # when searching on 'No Value'
                     should_arr = [must_terms] if must_terms else []
-                    should_arr.append({BOOL: {MUST_NOT: {EXISTS: {FIELD: query_field}}}})  # field=value OR field DNE
-                    must_filters_nested.append((query_field, should_arr))
+                    should_arr.append({BOOL: {MUST: {EXISTS: {FIELD: query_field}}}})  # field=value OR field DNE
+                    must_not_filters_nested.append((query_field, should_arr))
                 elif filters['add_no_value'] is False:  # when not searching on 'No Value'
                     should_arr = [must_terms] if must_terms else []
                     should_arr.append({EXISTS: {FIELD: query_field}})   # field=value OR field EXISTS
