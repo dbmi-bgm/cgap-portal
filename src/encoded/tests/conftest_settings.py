@@ -30,6 +30,7 @@ _app_settings = {
     'file_upload_bucket': 'test-wfout-bucket',
     'file_wfout_bucket': 'test-wfout-bucket',
     'file_upload_profile_name': 'test-profile',
+    'metadata_bundles_bucket': 'elasticbeanstalk-fourfront-cgaplocal-test-metadata-bundles',
 }
 
 
