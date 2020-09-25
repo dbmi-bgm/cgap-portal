@@ -287,7 +287,7 @@ export const columnExtensionMap = {
                 status = "complete";
             } else {
                 statusTip = "No fastq files";
-                stauts = "incomplete";
+                status = "incomplete";
             }
 
             /** @DEPRECATED as of 9/16/20 -- keeping here until confirmation new tips will stay.
