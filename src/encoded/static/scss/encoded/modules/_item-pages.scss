@@ -554,7 +554,8 @@ h3.submission-subtitle {
 	&[data-status="released"]:before,
 	&[data-status="current"]:before,
 	&[data-status="uploaded"]:before,
-	&[data-status="published"]:before {
+	&[data-status="published"]:before,
+	&[data-status="complete"]:before {
 		color: #fff;
 		background-color: #308756;
 	}
@@ -567,7 +568,8 @@ h3.submission-subtitle {
 	}
 
 	&[data-status="deleted"]:before,
-	&[data-status="upload failed"]:before {
+	&[data-status="upload failed"]:before,
+	&[data-status="failed"]:before {
 		color: #fff;
 		background-color: #a90d0b;
 	}
@@ -580,14 +582,12 @@ h3.submission-subtitle {
 	}
 
 	&[data-status="in review by lab"]:before,
-	&[data-status="in review"]:before {
-		color: #fff;
-		background-color: #d8bd22;
-	}
-
+	&[data-status="in review"]:before,
 	&[data-status="submission in progress"]:before,
 	&[data-status="uploading"]:before,
-	&[data-status="draft"]:before {
+	&[data-status="draft"]:before,
+	&[data-status="incomplete"]:before, 
+	&[data-status="in progress"]:before {
 		color: #fff;
 		background-color: #d8bd22;
 	}
@@ -604,15 +604,16 @@ h3.submission-subtitle {
 
 	&[data-status="unspecified"]:before,
 	&[data-status="archived"]:before,
-	&[data-status="archived to project"]:before {
+	&[data-status="archived to project"]:before,
+	&[data-status="not implemented"]:before,
+	&[data-status="not started"]:before {
 		color: #fff;
 		background-color: #7b7b7b;
 		//display: none;
 	}
 }
 
-
-i.item-status-indicator-dot {
+i.status-indicator-dot {
 	display: inline-block;
 	position: relative;
 	&:before {
@@ -623,11 +624,9 @@ i.item-status-indicator-dot {
 		position: relative;
 		border-radius: 50%;
 	}
+
 	@include statusColorStyles;
 }
-
-
-
 
 
 
