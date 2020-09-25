@@ -648,7 +648,7 @@ const BioinfoStats = React.memo(function BioinfoStats(props) {
                         : null }
                 </div>
                 <div className="col-sm-4">{/* Ex. 2% */}
-                    { (msaStats.deNovo && msaStats.deNovo.value) + "%" || "" }
+                    { (msaStats.deNovo && msaStats.deNovo.value) ?  msaStats.deNovo.value + "%" : "" }
                 </div>
             </div>
             <div className="row qc-summary">
