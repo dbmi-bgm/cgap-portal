@@ -39,7 +39,6 @@ export function SampleTabBody(props){
                     <div className="pb-2 inner-card-section">
                         <div className="info-header-title">
                             <h4>
-                                {/* todo link to GnomAD -- is there a gnomad link somewhere ? */}
                                 Quality
                             </h4>
                         </div>
@@ -52,7 +51,6 @@ export function SampleTabBody(props){
                     <div className="pb-2 inner-card-section h-100">
                         <div className="info-header-title">
                             <h4>
-                                {/* todo link to GnomAD -- is there a gnomad link somewhere ? */}
                                 BAM Snapshot
                             </h4>
                         </div>
@@ -70,12 +68,10 @@ export function SampleTabBody(props){
                     <div className="pb-2 w-100 inner-card-section">
                         <div className="info-header-title">
                             <h4>
-                                {/* todo link to GnomAD -- is there a gnomad link somewhere ? */}
                                 Coverage
                             </h4>
                         </div>
                         <div className="info-body overflow-auto">
-                            {/* <CoverageTable {...{ samplegeno, genotypeLabels, varRef }}/> */}
                             <CoverageTable {...{ samplegeno, genotypeLabels, varRef }} />
                         </div>
                     </div>
@@ -86,7 +82,6 @@ export function SampleTabBody(props){
                     <div className="pb-2 w-100 inner-card-section">
                         <div className="info-header-title">
                             <h4>
-                                {/* todo link to GnomAD -- is there a gnomad link somewhere ? */}
                                 Inheritance Mode
                             </h4>
                         </div>
