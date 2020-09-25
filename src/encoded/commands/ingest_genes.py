@@ -4,6 +4,7 @@ import logging
 from pyramid.paster import get_app
 from pyramid.httpexceptions import HTTPConflict
 from dcicutils.misc_utils import VirtualApp
+from ..ingestion_listener import CGAP_CORE_INSTITUTION, CGAP_CORE_PROJECT
 from tqdm import tqdm
 
 
@@ -60,7 +61,8 @@ class GeneIngestion(object):
 
 def main():
     """
-        Main entry point for gene ingestion.
+        Main entry point for gene ingestion. Always attributes genes to the CGAP_CORE_PROJECT
+        and CGAP_CORE_INSTITUTION as defined in ..ingestion_listener.py
 
         Args (viar argparse):
             path_to_genes (str): path to genes to ingest
@@ -84,7 +86,7 @@ def main():
     }
     vapp = VirtualApp(get_app(args.config_uri, args.app_name), environ)
     try:
-        gene_parser.upload(vapp, project='hms-dbmi', institution='hms-dbmi', use_tqdm=True)
+        gene_parser.upload(vapp, project=CGAP_CORE_PROJECT, institution=CGAP_CORE_INSTITUTION, use_tqdm=True)
         logger.info('Successfully posted genes')
     except Exception as e:
         logger.error('Exception encountered during gene ingestion: %s' % str(e))

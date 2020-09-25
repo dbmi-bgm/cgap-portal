@@ -93,6 +93,7 @@ $search-results-header-row-height: 52px; // 46px is existing default for both re
 	
 	&[data-field="status"] {
 		> .inner {
+			i.status-indicator-dot,
 			i.item-status-indicator-dot {
 				margin-left: 4px;
 				margin-right: 2px;
