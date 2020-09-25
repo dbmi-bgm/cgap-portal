@@ -76,7 +76,7 @@ export function SampleTabBody(props){
                         </div>
                         <div className="info-body overflow-auto">
                             {/* <CoverageTable {...{ samplegeno, genotypeLabels, varRef }}/> */}
-                            <CoverageTable2 {...{ samplegeno, genotypeLabels, varRef }} />
+                            <CoverageTable {...{ samplegeno, genotypeLabels, varRef }} />
                         </div>
                     </div>
                 </div>
@@ -111,12 +111,10 @@ function CoverageTableRow(props) {
         relation = "",
         refAD = 0,
         altADs = [],
-        label = "-"
+        labels : [label] = []
     } = props;
 
     if (!sampleID) { return null; }
-
-    console.log("row props", props);
 
     const caseID = sampleID ? sampleID.split("_")[0] : "";
 
@@ -132,12 +130,12 @@ function CoverageTableRow(props) {
                     { ad > 0 ? ` (${ Math.round(ad/totalCoverage * 100 )}%)`: null }
                 </td>
             ))}
-            <td className="text-left">{ label }</td>
+            <td className="text-left">{ label || "-" }</td>
         </tr>
     );
 }
 
-function CoverageTable2(props) {
+function CoverageTable(props) {
     const { samplegeno = [], genotypeLabels = [], varRef } = props;
 
     if (samplegeno.length === 0) {
@@ -154,6 +152,19 @@ function CoverageTable2(props) {
 
     let samplegenolen;
 
+    // Populate ID->Coverage map with genotype label information
+    const mapSampleIDToGenotypeLabel = {};
+    const mapRoleToLabelData = {}; // stopgap
+    genotypeLabels.forEach((obj) => {
+        const { role = null, labels = [], sample_id = null } = obj;
+        if (sample_id !== null) {
+            mapSampleIDToGenotypeLabel[sample_id] = { labels, role };
+        }
+        if (role) {
+            mapRoleToLabelData[role] = labels;
+        }
+    });
+
     samplegeno.forEach((sg) => {
         const {
             samplegeno_ad = "",
@@ -166,6 +177,9 @@ function CoverageTable2(props) {
         // Populate numGT to GT mapping (used to display column titles)
         const gtSplit = samplegeno_gt.split("/");
         const numgtSplit = samplegeno_numgt.split("/");
+
+        // If there were no genotypeLabels, and a sampleID wasn't registered previously, register now. (Stopgap)
+        mapSampleIDToGenotypeLabel[samplegeno_sampleid] = {};
 
         numgtSplit.forEach((numgt, i) => {
             // Fallbacks for no-values handled later
@@ -208,12 +222,24 @@ function CoverageTable2(props) {
         const adSplit = samplegeno_ad.split("/"); // .length is always === # of total ref+alt cols
         if (!samplegenolen) { samplegenolen = adSplit.length; } // use for verifying col# later
 
+        // If role/label data couldn't be populated by genotypeLabel sort, see if can populate here
+        if (samplegeno_role && !mapSampleIDToGenotypeLabel[samplegeno_sampleid]["role"]) {
+            mapSampleIDToGenotypeLabel[samplegeno_sampleid]["role"] = samplegeno_role;
+            const labels = mapRoleToLabelData[samplegeno_role];
+
+            if (labels && !mapSampleIDToGenotypeLabel[samplegeno_sampleid]["labels"]) {
+                mapSampleIDToGenotypeLabel[samplegeno_sampleid]["labels"] = labels;
+            }
+        }
+        mapSampleIDToGenotypeLabel[samplegeno_sampleid]["adArr"] = adSplit;
+
         const row = {
             sampleID : samplegeno_sampleid,
             totalCoverage : adSplit.reduce((pv, cv) => parseInt(pv) + parseInt(cv)), // these are a little dangerous... but should always be an int...
             relation: samplegeno_role,
             refAD : adSplit[0],
-            altADs : adSplit.slice(1, adSplit.length)
+            altADs : adSplit.slice(1, adSplit.length),
+            labels: mapSampleIDToGenotypeLabel[samplegeno_sampleid]["labels"]
         };
 
         rows.push(row);
@@ -221,8 +247,7 @@ function CoverageTable2(props) {
 
     // Check if there are any columns missing (because gt/numgt came in blank)
     const numGTKeys = Object.keys(mapNumgtToGT);
-    console.log("numGTmapping", mapNumgtToGT);
-    console.log("numGTKeys", numGTKeys);
+
     const numCol = numGTKeys.length;
     let refAndAltCols;
     if (samplegenolen === numCol) { // great, no further effort needed, just sort the keys and use them to populate the rows
@@ -252,13 +277,20 @@ function CoverageTable2(props) {
         }
     }
 
-    console.log("mapGTToShortenedTitles", mapGTToShortenedTitles);
-
-    console.log("samplegeno", samplegeno);
-    console.log("genotypeLabels", genotypeLabels);
-    console.log("rows", rows);
-
-    const cols = ["Relation", "ID", "Coverage", `Ref (${varRef})`];
+    // Proband first, then mother, then father, then rest
+    rows.sort((a,b) => {
+        const { relation: relationA = null } = a;
+        const { relation: relationB = null } = b;
+        if (relationA === "proband") {
+            return -1;
+        } else if (relationA === "mother" && relationB !== "proband") {
+            return -1;
+        } else if (relationA === "father" && relationB !== "proband" && relationB !== "mother") {
+            return -1;
+        } else {
+            return 1;
+        }
+    });
 
     return (
         <table className="w-100">
@@ -277,165 +309,6 @@ function CoverageTable2(props) {
         </table>
     );
 }
-
-// function CoverageTable(props) {
-//     const { samplegeno = [], genotypeLabels = [], varRef = null } = props;
-
-//     if (samplegeno.length === 0) {
-//         return <span className="font-italic">No coverage data available.</span>;
-//     }
-
-//     const mapSampleIDToCoverageData = {};
-//     const mapRoleToLabelData = {};
-
-//     // Populate ID->Coverage map with genotype label information (currently does nothing)
-//     genotypeLabels.forEach((obj) => {
-//         const { role = null, labels = [], sample_id = null } = obj;
-//         if (sample_id !== null) {
-//             mapSampleIDToCoverageData[sample_id] = { labels, role };
-//         }
-//         if (role) {
-//             mapRoleToLabelData[role] = labels;
-//         }
-//     });
-
-//     const mapNumGTToGT = {};
-
-//     let shortGTDupPresent = false;
-//     const shortGTDupTester = {};
-
-//     const rows = samplegeno.map((sg) => {
-//         const {
-//             samplegeno_role: role = null,
-//             samplegeno_sampleid: sampleID = null,
-//             samplegeno_ad = null,
-//             samplegeno_gt = null,
-//             samplegeno_numgt = null
-//         } = sg;
-
-//         // If there were no genotypeLabels, and a sampleID wasn't registered previously, register now. (Stopgap)
-//         mapSampleIDToCoverageData[sampleID] = {};
-
-//         // Convert AD & GT strings into arrays for easier traversal
-//         let adArr = [];
-//         let gtArr = [];
-//         let numGTArr = [];
-//         if (samplegeno_ad) { adArr = samplegeno_ad.split('/').filter((v) => v === "."); }
-//         if (samplegeno_gt) { gtArr = samplegeno_gt.split('/'); }
-//         if (samplegeno_numgt) { numGTArr = samplegeno_numgt.split('/');}
-
-//         // Populate mapNumGTtoGT with GT info
-//         numGTArr.forEach((numGT, i) => {
-//             if (numGT === ".") { return; }
-//             console.log("numGT", numGT);
-//             if (!mapNumGTToGT.hasOwnProperty(numGT)) {
-//                 let gtObj = {};
-//                 const fullGT = gtArr[i];
-
-//                 if (fullGT.length > 12) { // Calculate shortened versions of GTs
-//                     const first4 = fullGT.substring(0, 4);
-//                     const middle = fullGT.substring(4, fullGT.length - 4);
-//                     const last4 = fullGT.substring(fullGT.length - 4, fullGT.length);
-//                     const shortGT = `${first4}...${last4}`;
-//                     const bpGT = `${first4}...${middle.length}bp...${last4}`;
-
-//                     // Determine if to use ...BP... shortened version or normal shortened version
-//                     if (!shortGTDupTester[shortGT]) {
-//                         shortGTDupTester[shortGT] = true;
-//                     } else {
-//                         shortGTDupPresent = true;
-//                     }
-
-//                     gtObj = { fullGT, shortGT, bpGT };
-//                 } else {
-//                     gtObj = { fullGT };
-//                 }
-
-//                 mapNumGTToGT[numGT] = gtObj;
-//             } else if (mapNumGTToGT[numGT] && mapNumGTToGT[numGT].fullGT !== gtArr[i]) {
-//                 throw new Error ("numGT mismatch at ", numGT);
-//             }
-//         });
-
-//         // If role/label data couldn't be populated by genotypeLabel sort, see if can populate here
-//         if (role && !mapSampleIDToCoverageData[sampleID]["role"]) {
-//             mapSampleIDToCoverageData[sampleID]["role"] = role;
-//             const labels = mapRoleToLabelData[role];
-
-//             if (labels && !mapSampleIDToCoverageData[sampleID]["labels"]) {
-//                 mapSampleIDToCoverageData[sampleID]["labels"] = labels;
-//             }
-//         }
-
-//         mapSampleIDToCoverageData[sampleID]["adArr"] = adArr;
-
-//         return sampleID;
-//     });
-
-//     console.log("mapNumGTToGT", mapNumGTToGT);
-//     // Show proband first
-//     rows.sort((a,b) => {
-//         const { role = null } = a;
-//         return (role === "proband" ? 1 : -1);
-//     });
-
-//     // Ref will always be mapNumGTToGt[0]; sort to ascend 0 -> 2
-//     const nonRefCcols = Object.keys(mapNumGTToGT).sort((a,b) => a - b);
-
-//     return (
-// <table className="w-100">
-//     <thead>
-//         <tr>
-//             <th className="text-left">Relation</th>
-//             <th className="text-left">ID</th>
-//             <th className="text-left">Coverage</th>
-//             <th className="text-left">Ref ({varRef})</th>
-//             { cols.map((numGT) => {
-//                 const { fullGT, shortGT, bpGT } = mapNumGTToGT[numGT];
-//                 const useBPGT = shortGTDupPresent && bpGT;
-//                 return (
-//                     <th key={fullGT} className="text-left" data-tip={(shortGT || bpGT) ? fullGT : null}>
-//                         {numGT === "0" ? "Ref" : "Alt"}({ useBPGT ? bpGT : (shortGT || fullGT) })
-//                     </th>
-//                 );
-//             })}
-//             <th className="text-left">Call</th>
-//         </tr>
-//     </thead>
-//     <tbody>
-//         {rows.map((sampleID) => { // rows now distinguished by sampleIDs, not roles
-//             const rowData = mapSampleIDToCoverageData[sampleID];
-//             const { adArr = [], labels : [label] = [], role = null } = rowData || {};
-
-//             let totalCoverage = 0;
-//             adArr.forEach((ad, i) => {
-//                 totalCoverage += Number.parseInt(ad);
-//             });
-
-//             return (
-//                 <tr key={role}>
-//                     <td className="text-left text-capitalize">{ role }</td>
-//                     <td className="text-left">{ sampleID ? sampleID.split("_")[0] : "" }</td>
-//                     <td className="text-left">{ totalCoverage }</td>
-//                     { adArr.map((ad, i) => {
-//                         if (i === 0) {
-//                             return <td key={ad} className="text-left">{ad} {(ad > 0 && ad != totalCoverage) ? ` (${ Math.round(ad/totalCoverage * 100 )}%)`: null }</td>;
-//                         }
-//                         return (
-//                             <td key={ad} className="text-left">
-//                                 { ad.toString() || 0}
-//                                 { ad > 0 ? ` (${ Math.round(ad/totalCoverage * 100 )}%)`: null }
-//                             </td>
-//                         );
-//                     })}
-//                     <td className="text-left">{ label }</td>
-//                 </tr>
-//             );
-//         })}
-//     </tbody>
-// </table>
-//     );
-// }
 
 function QualityTable(props) {
     const { genotypeLikelihood, genotypeQuality, variantQuality, strandFisherScore, getTipForField } = props;
