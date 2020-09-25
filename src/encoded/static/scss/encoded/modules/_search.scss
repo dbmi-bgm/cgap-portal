@@ -348,8 +348,10 @@ body[data-pathname="/search/"]:not([data-current-action="add"]) {
 		}
 	}
 
-	.result-table-detail-container .result-table-detail {
-		padding-left: 57px;
+	.result-table-detail-container {
+		.result-table-detail {
+			padding-left: 57px;
+		}
 	}
 
 }
