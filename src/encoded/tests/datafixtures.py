@@ -396,8 +396,38 @@ def brother(testapp, project, institution, mother, father, brother_sample):
 
 
 @pytest.fixture
+def brotherII(testapp, project, institution, mother, father):
+    item = {
+        "accession": "GAPIDBROTHII",
+        "age": 9,
+        "age_units": "week",
+        'project': project['@id'],
+        'institution': institution['@id'],
+        "sex": "M",
+        "mother": mother['@id'],
+        "father": father['@id']
+    }
+    return testapp.post_json('/individual', item).json['@graph'][0]
+
+
+@pytest.fixture
+def brotherIII(testapp, project, institution, mother, father):
+    item = {
+        "accession": "GAPIDBROTIII",
+        "age": 3,
+        "age_units": "day",
+        'project': project['@id'],
+        'institution': institution['@id'],
+        "sex": "M",
+        "mother": mother['@id'],
+        "father": father['@id']
+    }
+    return testapp.post_json('/individual', item).json['@graph'][0]
+
+
+@pytest.fixture
 def fam(testapp, project, female_individual, institution, grandpa, mother, father, uncle,
-        child, cousin, sister, brother):
+        child, cousin, sister, brother, brotherII, brotherIII):
     item = {
         "project": project['@id'],
         "institution": institution['@id'],
@@ -407,6 +437,8 @@ def fam(testapp, project, female_individual, institution, grandpa, mother, fathe
             child['@id'],
             sister['@id'],
             brother['@id'],
+            brotherII['@id'],
+            brotherIII['@id'],
             mother['@id'],
             father['@id'],
             uncle['@id'],
