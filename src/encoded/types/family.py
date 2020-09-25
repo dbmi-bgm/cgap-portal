@@ -254,6 +254,19 @@ class Family(Item):
         (ie if x created in children_roles, can not be used in parent roles)
         Nomenclature guided by
         https://www.devonfhs.org.uk/pdfs/tools/eichhorn-rlationship-chart.pdf"""
+        # possible values for roles we calculated, they might be appended by roman numaeral
+        # co-parent is used to replace wife and husband
+        roles = [
+            'proband', 'father', 'mother', 'brother', 'sister', 'sibling', 'half-brother', 'half-sister', 'half-sibling', 'co-parent',
+            'grandson', 'granddaughter', 'grandchild', 'grandmother', 'grandfather', 'great-grandson', 'great-granddaughter', 'great-grandchild',
+            'great-great-grandson', 'great-great-granddaughter', 'great-great-grandchild', 'great-grandmother', 'great-grandfather',
+            'great-great-grandmother', 'great-great-grandfather',
+            'nephew', 'niece', 'nibling', 'grandnephew', 'grandniece', 'grandnibling',
+            'uncle', 'aunt', 'auncle', 'granduncle', 'grandaunt', 'grandauncle',
+            'cousin', 'cousin-once-removed(descendant)', 'cousin-twice-removed(descendant)', 'cousin-once-removed(ascendant)',
+            'second-cousin', 'second-cousin-once-removed(descendant)', 'second-cousin-twice-removed(descendant)',
+            'family-in-law', 'extended-family', 'not-linked'
+                 ]
         # return a nested list of  [acc, calculated_relation, association]
         # start convert with seed roles
         Converter = {
@@ -298,11 +311,11 @@ class Family(Item):
         children_roles = [
             {'roles': ['uncle', 'aunt', 'auncle'], 'children': 'cousin'},
             {'roles': ['cousin'], 'children': 'cousin once removed (descendant)'},
-            {'roles': ['cousin once removed (descendant)'], 'children': 'cousin twice removed (descendant)'},
-            {'roles': ['granduncle', 'grandaunt', 'grandauncle'], 'children': 'cousin once removed (ascendant)'},
-            {'roles': ['cousin once removed (ascendant)'], 'children': 'second cousin'},
-            {'roles': ['second cousin'], 'children': 'second cousin once removed (descendant)'},
-            {'roles': ['second cousin once removed (descendant)'], 'children': 'second cousin twice removed (descendant)'},
+            {'roles': ['cousin-once-removed(descendant)'], 'children': 'cousin-twice-removed(descendant)'},
+            {'roles': ['granduncle', 'grandaunt', 'grandauncle'], 'children': 'cousin-once-removed-(ascendant)'},
+            {'roles': ['cousin-once-removed(ascendant)'], 'children': 'second-cousin'},
+            {'roles': ['second-cousin'], 'children': 'second-cousin-once-removed(descendant)'},
+            {'roles': ['second-cousin-once-removed(descendant)'], 'children': 'second-cousin-twice-removed(descendant)'},
             ]
         for an_extension in children_roles:
             all_combinations = [i for i in Converter if Converter[i] in an_extension['roles']]
@@ -315,7 +328,7 @@ class Family(Item):
             """If you are going down from proband, you need to keep going down
             If you are going up from proband, you can change direction once
             If you are out of these cases, you are not blood relative
-            We make an exception for the Husband and Wife"""
+            We make an exception for the Husband and Wife (co-parent)"""
             up = ['f', 'm']
             down = ['d', 's', 'c']
             state = 1
@@ -365,6 +378,20 @@ class Family(Item):
         return relations
 
     @staticmethod
+    def integer_to_roman(integer):
+        """Convert Integer to roman"""
+        RomanAlphabet = [[1000, "M"], [900, "CM"], [500, "D"], [400, "CD"],
+                         [100, "C"], [90, "XC"], [50, "L"], [40, "XL"],
+                         [10, "X"], [9, "IX"], [5, "V"], [4, "IV"], [1, "I"]]
+        roman = ""
+        for base, roman_letter in RomanAlphabet:
+            quotient, integer = divmod(integer, base)
+            roman += roman_letter * quotient
+            if integer == 0:
+                break
+        return roman
+
+    @staticmethod
     def calculate_relations(proband, all_props, family_id):
         """Static wrapper for relations calculated property
         so it can be called by other classes, curretly used by
@@ -376,18 +403,27 @@ class Family(Item):
         links = Family.construct_links(primary_vectors, proband_acc)
         relations = Family.relationships_vocabulary(links)
         results = []
+        # add a consistent age unit for ordering all members
+        unit_converter = {"day": 1, "week": 7, "month": 30, "year": 365}
+        for an_ind in all_props:
+            age_days = 0
+            if an_ind.get('age') and an_ind.get('age_units'):
+                age_days = an_ind['age'] * unit_converter[an_ind['age_units']]
+            an_ind['age_days'] = age_days
+        # generate the relationship dict for each member
         for a_member_resp in all_props:
             temp = {"individual": '',
                     "sex": '',
                     "relationship": '',
-                    "association": ''}
+                    "association": '',
+                    "age_days": a_member_resp['age_days']}
             mem_acc = a_member_resp['accession']
             temp['individual'] = mem_acc
             sex = a_member_resp.get('sex', 'U')
             temp['sex'] = sex
             relation_dic = [i for i in relations if i[0] == mem_acc]
             if not relation_dic:
-                temp['relationship'] = 'not linked'
+                temp['relationship'] = 'not-linked'
                 # the individual is not linked to proband through individuals listed in members
                 results.append(temp)
                 continue
@@ -396,6 +432,22 @@ class Family(Item):
             if relation[2]:
                 temp['association'] = relation[2]
             results.append(temp)
+        # sort by association, relationship, ages (decreasing), and finally accession
+        results = sorted(results, key=lambda i: (i['association'], i['relationship'], -i['age_days'], i['individual']))
+        # add roman numerals to repeating roles
+        # keep track of all roles in family for enumeration
+        # for this purpose, the role definition is association + relationship
+        # ie the enumaration for parental and maternal aunts are kept separate
+        role_numbers = {}
+        for a_relationship in results:
+            del a_relationship['age_days']
+            full_relationship = a_relationship['relationship'] + a_relationship['association']
+            if full_relationship not in role_numbers:
+                role_numbers[full_relationship] = 1
+            else:
+                role_numbers[full_relationship] += 1
+                roman_add_on = Family.integer_to_roman(role_numbers[full_relationship])
+                a_relationship['relationship'] = a_relationship['relationship'] + ' ' + roman_add_on
         return results
 
     @calculated_property(schema={
@@ -429,56 +481,7 @@ class Family(Item):
                 },
                 "relationship": {
                     "title": "Relationship",
-                    "type": "string",
-                    "enum": ['proband',
-                             'father',
-                             'mother',
-                             'brother',
-                             'sister',
-                             'sibling',
-                             'half-brother',
-                             'half-sister',
-                             'half-sibling',
-                             'wife',
-                             'husband',
-                             'grandson',
-                             'granddaughter',
-                             'grandchild',
-                             'grandmother',
-                             'grandfather',
-                             'great-grandson',
-                             'great-granddaughter',
-                             'great-grandchild',
-                             'great-great-grandson',
-                             'great-great-granddaughter',
-                             'great-great-grandchild',
-                             'great-grandmother',
-                             'great-grandfather',
-                             'great-great-grandmother',
-                             'great-great-grandfather',
-                             'nephew',
-                             'niece',
-                             'nibling',
-                             'grandnephew',
-                             'grandniece',
-                             'grandnibling',
-                             'uncle',
-                             'aunt',
-                             'auncle',
-                             'granduncle',
-                             'grandaunt',
-                             'grandauncle',
-                             'cousin',
-                             'cousin once removed (descendant)',
-                             'cousin twice removed (descendant)',
-                             'cousin once removed (ascendant)',
-                             'second cousin',
-                             'second cousin once removed (descendant)',
-                             'second cousin twice removed (descendant)',
-                             'family-in-law',
-                             'extended-family',
-                             'not linked'
-                             ]
+                    "type": "string"
                     }
                 }
             }

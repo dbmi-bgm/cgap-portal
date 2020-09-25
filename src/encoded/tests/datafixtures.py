@@ -396,8 +396,38 @@ def brother(testapp, project, institution, mother, father, brother_sample):
 
 
 @pytest.fixture
+def brotherII(testapp, project, institution, mother, father):
+    item = {
+        "accession": "GAPIDBROTHII",
+        "age": 9,
+        "age_units": "week",
+        'project': project['@id'],
+        'institution': institution['@id'],
+        "sex": "M",
+        "mother": mother['@id'],
+        "father": father['@id']
+    }
+    return testapp.post_json('/individual', item).json['@graph'][0]
+
+
+@pytest.fixture
+def brotherIII(testapp, project, institution, mother, father):
+    item = {
+        "accession": "GAPIDBROTIII",
+        "age": 3,
+        "age_units": "day",
+        'project': project['@id'],
+        'institution': institution['@id'],
+        "sex": "M",
+        "mother": mother['@id'],
+        "father": father['@id']
+    }
+    return testapp.post_json('/individual', item).json['@graph'][0]
+
+
+@pytest.fixture
 def fam(testapp, project, female_individual, institution, grandpa, mother, father, uncle,
-        child, cousin, sister, brother):
+        child, cousin, sister, brother, brotherII, brotherIII):
     item = {
         "project": project['@id'],
         "institution": institution['@id'],
@@ -407,6 +437,8 @@ def fam(testapp, project, female_individual, institution, grandpa, mother, fathe
             child['@id'],
             sister['@id'],
             brother['@id'],
+            brotherII['@id'],
+            brotherIII['@id'],
             mother['@id'],
             father['@id'],
             uncle['@id'],
@@ -599,6 +631,19 @@ def file_fastq(testapp, institution, project, file_formats):
     item = {
         'file_format': file_formats.get('fastq').get('@id'),
         'md5sum': 'd41d8cd9f00b204e9800998ecf8427e',
+        'institution': institution['@id'],
+        'project': project['@id'],
+        'status': 'uploaded',  # avoid s3 upload codepath
+    }
+    return testapp.post_json('/file_fastq', item).json['@graph'][0]
+
+
+@pytest.fixture
+def file_fastq2(testapp, institution, project, file_formats):
+    item = {
+        'aliases': ['test-project:file2'],
+        'file_format': file_formats.get('fastq').get('@id'),
+        'md5sum': 'd41d8cd9f00b204e9800998ecf8429e',
         'institution': institution['@id'],
         'project': project['@id'],
         'status': 'uploaded',  # avoid s3 upload codepath
