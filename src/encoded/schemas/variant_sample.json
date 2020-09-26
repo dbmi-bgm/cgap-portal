@@ -534,17 +534,6 @@
             "title": "Predictors",
             "order": 61
         },
-        "GT": {
-            "title": "Zygosity",
-            "order": 62,
-            "sort_fields": [
-                { "field" : "GT", "title": "Genotype" }
-            ]
-        },
-        "variant.clinvar_variationid": {
-            "title": "Clinvar ID",
-            "order": 70
-        },
         "bam_snapshot": {
             "title": "Genome Snapshot",
             "order": 81
