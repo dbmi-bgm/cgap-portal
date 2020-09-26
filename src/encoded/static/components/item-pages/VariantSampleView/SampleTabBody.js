@@ -130,9 +130,7 @@ function CoverageTableRow(props) {
     );
 }
 
-function CoverageTable(props) {
-    const { samplegeno = [], genotypeLabels = [], varRef } = props;
-
+const CoverageTable = React.memo(function CoverageTable({ samplegeno = [], genotypeLabels = [], varRef }) {
     if (samplegeno.length === 0) {
         return <span className="font-italic">No coverage data available.</span>;
     }
@@ -303,7 +301,7 @@ function CoverageTable(props) {
             </tbody>
         </table>
     );
-}
+});
 
 function QualityTable(props) {
     const { genotypeLikelihood, genotypeQuality, variantQuality, strandFisherScore, getTipForField } = props;
