@@ -12,6 +12,15 @@ import { LocalizedTime } from '@hms-dbmi-bgm/shared-portal-components/es/compone
 import { EmbeddedItemSearchTable } from '../components/EmbeddedItemSearchTable';
 import { DisplayTitleColumnWrapper, DisplayTitleColumnDefault } from '@hms-dbmi-bgm/shared-portal-components/es/components/browse/components/table-commons';
 
+const GenesMostSevereHGVSCColumn = React.memo(function GenesMostSevereHGVSCColumn({ hgvsc }){
+    // Memoized on the 1 prop it receives which is dependency for its calculation.
+    const hgvscSplit = hgvsc.split(":");
+    const pSplit = hgvscSplit[1].split(".");
+    // Will add hgvsp when added in data/backend
+    const rows = [<div key="genes_severe_transcript"><span className="text-600">{ pSplit[0] }.</span><span>{ pSplit[1] }</span></div>];
+    return <StackedRowColumn rowKey="genes_hgvsc" className="align-items-center" {...{ rows }} />;
+});
+
 function CaseViewEmbeddedVariantSampleSearchTable(props){
     const {
         columnExtensionMap: originalColExtMap = EmbeddedItemSearchTable.defaultProps.columnExtensionMap, // Get/reuse default colExtMap from EmbeddedItemSearchTable
@@ -89,11 +98,7 @@ function CaseViewEmbeddedVariantSampleSearchTable(props){
                     const { genes_most_severe_hgvsc = null } = firstGene || {};
 
                     if (firstGene && genes_most_severe_hgvsc) {
-                        const hgvscSplit = genes_most_severe_hgvsc.split(":");
-                        const pSplit = hgvscSplit[1].split(".");
-                        // Will add hgvsp when added in data/backend
-                        const rows = [<div key="genes_severe_transcript"><span className="text-600">{ pSplit[0] }.</span><span>{ pSplit[1] }</span></div>];
-                        return <StackedRowColumn rowKey="genes_hgvsc" className="align-items-center" {...{ rows }} />;
+                        return <GenesMostSevereHGVSCColumn hgvsc={genes_most_severe_hgvsc} />;
                     }
                     return null;
                 }
