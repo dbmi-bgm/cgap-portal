@@ -167,6 +167,7 @@ class Case(Item):
         "sample.library_info",
         "sample.last_modified.*",
         "sample.files.status",
+        "sample.completed_processes",
         "sample.processed_files.file_format.file_format",
         "sample.processed_files.file_ingestion_status",
         "sample.processed_files.quality_metric.quality_metric_summary.sample",
