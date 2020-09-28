@@ -9,8 +9,10 @@ from snovault import TYPES, COLLECTIONS
 from snovault.elasticsearch import create_mapping
 from ..search import lucene_builder
 from ..search.lucene_builder import LuceneBuilder
+from ..search.search_utils import find_nested_path
 from snovault.elasticsearch.indexer_utils import get_namespaced_index
 from snovault.util import add_default_embeds
+from snovault.schema_utils import load_schema
 from webtest import AppError
 
 # Use workbook fixture from BDD tests (including elasticsearch)
@@ -619,6 +621,27 @@ def test_search_with_principals_allowed_fails(workbook, anontestapp):
     with pytest.raises(AppError):
         anontestapp.get('/search/?type=Gene'
                         '&principals_allowed.view=group.PERMISSION_YOU_DONT_HAVE')
+
+
+@pytest.fixture
+def sample_processing_mapping():
+    return load_schema('encoded:tests/data/sample_processing_mapping.json')
+
+
+@pytest.mark.parametrize('field, nested_path', [
+    ('bad_field', None),
+    ('embedded.@id', None),
+    ('embedded.date_created', None),
+    ('embedded.cases', 'embedded.cases'),  # not meaningful but should still work
+    ('embedded.cases.@id', 'embedded.cases'),
+    ('embedded.samples.processed_files.display_title', 'embedded.samples.processed_files')
+])
+def test_find_nested_path(sample_processing_mapping, field, nested_path):
+    """ Tests that we can correctly resolve nested paths in a few different field scenarios given a
+        non-trivial mapping.
+    """
+    es_mapping = sample_processing_mapping['sample_processing']['mappings']['sample_processing']
+    assert find_nested_path(field, es_mapping) == nested_path
 
 
 class TestNestedSearch(object):

@@ -100,6 +100,7 @@ def find_nested_path(field, es_mapping):
     :return: path for nested query or None
     """
     location = es_mapping
+    possible_nested_paths = []
     path = []
     for cursor in field.split('.'):
         if cursor == 'raw':  # if we get to this point we're definitely at a leaf and should stop
@@ -112,9 +113,10 @@ def find_nested_path(field, es_mapping):
             break
         location = location[cursor]
         path.append(cursor)
-        if location.get('type', None) == 'nested':
-            return '.'.join(path)
-    return None
+        if location.get('type', None) == 'nested':  # this could be a path
+            possible_nested_paths.append('.'.join(path))
+    # the last path added is the closest in proximity to the field and thus is correct
+    return possible_nested_paths[-1] if len(possible_nested_paths) > 0 else None
 
 
 def is_schema_field(field):
