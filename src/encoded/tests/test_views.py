@@ -258,7 +258,7 @@ def test_user_effective_principals(submitter, institution, anontestapp, execute_
         res = anontestapp.get('/@@testing-user',
                               extra_environ={'REMOTE_USER': str(email)})
     assert sorted(res.json['effective_principals']) == [
-        'group.project_member',
+        'group.project_editor',
         'remoteuser.encode_submitter@example.org',
         'system.Authenticated',
         'system.Everyone',
